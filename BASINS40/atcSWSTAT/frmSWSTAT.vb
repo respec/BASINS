@@ -94,7 +94,7 @@ Friend Class frmSWSTAT
                     End If
                 Next
             Catch e As Exception
-                MapWinUtility.Logger.Dbg("Error retrieving saved settings: " & e.Message)
+                Logger.Dbg("Error retrieving saved settings: " & e.Message)
             End Try
         Else
             LoadListDefaults(lst)
@@ -957,7 +957,7 @@ Friend Class frmSWSTAT
     End Sub
 
     'Return all selected items, or if none are selected then all items
-    Private Function ListToArray(ByVal aList As System.Windows.Forms.ListBox) As Double()
+    Private Function ListToArray(ByVal aList As Windows.Forms.ListBox) As Double()
         Dim lArray() As Double
         Dim lCollection As New ArrayList
         If aList.SelectedItems.Count > 0 Then
@@ -978,6 +978,19 @@ Friend Class frmSWSTAT
             lArray(lIndex) = lCollection.Item(lIndex)
         Next
         Return lArray
+    End Function
+
+    Private Function ListDefaultArray(ByVal aList As Windows.Forms.ListBox) As Double()
+        Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
+        Dim lNDayHi As atcDefinedValue = lCalculator.AvailableOperations.GetDefinedValue("n-day high value")
+        Dim lArgs As atcDataAttributes = lNDayHi.Arguments
+        Dim lArgName As String = aList.Tag
+        Dim lDefault As Object = lArgs.GetDefinedValue(lArgName).Definition.DefaultValue
+        If IsArray(lDefault) Then
+            Return lDefault
+        Else
+            Return Nothing
+        End If
     End Function
 
     Private Function SelectedData() As atcTimeseriesGroup
@@ -1181,29 +1194,25 @@ Friend Class frmSWSTAT
         LoadListDefaults(lstNday)
     End Sub
 
-    Private Sub LoadListDefaults(ByVal lst As Windows.Forms.ListBox)
-        Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
-        Dim lNDayHi As atcDefinedValue = lCalculator.AvailableOperations.GetDefinedValue("n-day high value")
-        Dim lArgs As atcDataAttributes = lNDayHi.Arguments
-        Dim lArgName As String = lst.Tag
-        Dim lDefault As Object = lArgs.GetDefinedValue(lArgName).Definition.DefaultValue
-        If Not lDefault Is Nothing AndAlso IsArray(lDefault) Then
-            lst.Items.Clear()
+    Private Sub LoadListDefaults(ByVal aList As Windows.Forms.ListBox)
+        Dim lDefault() As Double = ListDefaultArray(aList)
+        If Not lDefault Is Nothing Then
+            aList.Items.Clear()
             For Each lNumber As Double In lDefault
                 Dim lLabel As String = Format(lNumber, "0.####")
-                lst.Items.Add(lLabel)
+                aList.Items.Add(lLabel)
             Next
         End If
     End Sub
 
-    Private Sub Calculate(ByVal aOperationName As String)
+    Private Sub Calculate(ByVal aOperationName As String, ByVal aReturnPeriods() As Double)
         ClearAttributes()
         SeasonsYearsFromForm()
         Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
         Dim lArgs As New atcDataAttributes
         lArgs.SetValue("Timeseries", pDataGroup)
         lArgs.SetValue("NDay", ListToArray(lstNday))
-        lArgs.SetValue("Return Period", ListToArray(lstRecurrence))
+        lArgs.SetValue("Return Period", aReturnPeriods)
         lArgs.SetValue("LogFlg", chkLog.Checked)
         If pYearStartMonth > 0 Then lArgs.SetValue("BoundaryMonth", pYearStartMonth)
         If pYearStartDay > 0 Then lArgs.SetValue("BoundaryDay", pYearStartDay)
@@ -1359,7 +1368,7 @@ Friend Class frmSWSTAT
 
     Private Sub btnDoFrequencyGrid_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDoFrequencyGrid.Click
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
-        Calculate("n-day " & HighOrLowString() & " value")
+        Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
 
         Dim lFreqForm As New frmDisplayFrequencyGrid(pDataGroup, radioHigh.Checked, ListToArray(lstNday), ListToArray(lstRecurrence))
 
@@ -1368,7 +1377,7 @@ Friend Class frmSWSTAT
 
     Private Sub btnDoFrequencyGraph_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDoFrequencyGraph.Click
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
-        Calculate("n-day " & HighOrLowString() & " value")
+        Calculate("n-day " & HighOrLowString() & " value", ListDefaultArray(lstRecurrence))
 
         Dim lGraphPlugin As New atcGraph.atcGraphPlugin
         Dim lGraphForm As atcGraph.atcGraphForm = lGraphPlugin.Show(pDataGroup, "Frequency")

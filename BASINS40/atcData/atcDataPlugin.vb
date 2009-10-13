@@ -17,7 +17,7 @@ Public Class atcDataPlugin
     <CLSCompliant(False)> _
     Protected pMapWin As MapWindow.Interfaces.IMapWin
     Protected pMapWinWindowHandle As Integer
-    Private pMenusAdded As New ArrayList
+    Protected pMenusAdded As New ArrayList
 
     ''' <summary>create a new atcDataPlugin</summary>
     Public Sub New()

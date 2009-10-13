@@ -173,6 +173,28 @@ Public Class atcFrequencyGridSource
         Return ReplaceString(pRecurrence.GetByIndex((aRow - Me.FixedRows) Mod pRecurrence.Count), ",", "")
     End Function
 
+    Public Shared Function DataSetLabel(ByVal aDataSet As atcDataSet) As String
+        Dim lLabel As String = ""
+        Dim lScenario As String = aDataSet.Attributes.GetValue("Scenario", "")
+        If lScenario.Length > 0 AndAlso lScenario <> "<unk>" Then
+            lLabel = lScenario
+        End If
+        Dim lLocation As String = aDataSet.Attributes.GetValue("STAID", "")
+        If lLocation.Length = 0 Then 'use Location attribute for start of location header
+            lLocation = aDataSet.Attributes.GetValue("Location", "")
+        End If
+        If lLocation.Length > 0 AndAlso lLocation <> "<unk>" Then
+            If lLabel.Length > 0 Then lLabel &= " "
+            lLabel &= lLocation
+        End If
+        Dim lConstituent As String = aDataSet.Attributes.GetValue("Constituent", "")
+        If lConstituent.Length > 0 AndAlso lConstituent <> "<unk>" Then
+            If lLabel.Length > 0 Then lLabel &= " "
+            lLabel &= lConstituent
+        End If
+        Return lLabel
+    End Function
+
     Overrides Property CellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
         Get
             If aRow = 0 Then
@@ -184,7 +206,7 @@ Public Class atcFrequencyGridSource
                 End Select
             Else
                 Select Case aColumn
-                    Case 0 : Return DataSetAt(aRow).ToString
+                    Case 0 : Return DataSetLabel(DataSetAt(aRow))
                     Case 1 : Return DoubleToString(1 / RecurrenceAt(aRow), , "0.0000")
                     Case 2 : Return RecurrenceAt(aRow)
                     Case Else

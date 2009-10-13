@@ -189,11 +189,12 @@ FoundMatch:
                               Optional ByVal aCommonLocation As String = Nothing, _
                               Optional ByVal aCommonUnits As String = Nothing)
         If Not aCommonTimeUnitName Is Nothing AndAlso aCommonTimeUnitName.Length > 0 _
+           AndAlso aCommonTimeUnitName <> "<unk>" _
            AndAlso Not aPane.XAxis.Title.Text.Contains(aCommonTimeUnitName) Then
             aPane.XAxis.Title.Text &= " " & aCommonTimeUnitName
         End If
 
-        If aCommonScenario IsNot Nothing AndAlso aCommonScenario.Length > 0 Then
+        If aCommonScenario IsNot Nothing AndAlso aCommonScenario.Length > 0 AndAlso aCommonScenario <> "<unk>" Then
             If aCommonConstituent.Length > 0 _
                AndAlso Not aPane.YAxis.Title.Text.Contains(aCommonScenario) Then
                 aPane.YAxis.Title.Text &= " " & aCommonScenario
@@ -203,17 +204,20 @@ FoundMatch:
         End If
 
         If aCommonConstituent IsNot Nothing AndAlso aCommonConstituent.Length > 0 _
+           AndAlso aCommonConstituent <> "<unk>" _
            AndAlso Not aPane.YAxis.Title.Text.Contains(aCommonConstituent) Then
             aPane.YAxis.Title.Text &= " " & aCommonConstituent
         End If
 
         If aCommonLocation IsNot Nothing AndAlso aCommonLocation.Length > 0 _
+           AndAlso aCommonLocation <> "<unk>" _
            AndAlso Not aPane.XAxis.Title.Text.Contains(aCommonLocation) Then
             If aPane.XAxis.Title.Text.Length > 0 Then aPane.XAxis.Title.Text &= " at "
             aPane.XAxis.Title.Text &= aCommonLocation
         End If
 
         If aCommonUnits IsNot Nothing AndAlso aCommonUnits.Length > 0 _
+           AndAlso aCommonUnits <> "<unk>" _
            AndAlso Not aPane.YAxis.Title.Text.Contains(aCommonUnits) Then
             If aPane.YAxis.Title.Text.Length > 0 Then
                 aPane.YAxis.Title.Text &= " (" & aCommonUnits & ")"
@@ -367,14 +371,20 @@ FoundMatch:
                 lCurveLabel &= .GetValue("Constituent", "") & " "
             End If
             If aCommonLocation Is Nothing OrElse aCommonLocation.Length = 0 Then
-                If lCurveLabel.Length > 0 Then lCurveLabel &= "at "
-                lCurveLabel &= .GetValue("Location", "")
+                Dim lLocation As String = .GetValue("Location", "")
+                If lLocation.Length = 0 OrElse lLocation = "<unk>" Then
+                    lLocation = .GetValue("STAID", "")
+                End If
+                If lLocation.Length > 0 AndAlso lLocation <> "<unk>" Then
+                    If lCurveLabel.Length > 0 Then lCurveLabel &= "at "
+                    lCurveLabel &= lLocation
+                End If
             End If
             If (aCommonUnits Is Nothing OrElse aCommonUnits.Length = 0) AndAlso .ContainsAttribute("Units") Then
                 lCurveLabel &= " (" & .GetValue("Units", "") & ")"
             End If
 
-            Return lCurveLabel.TrimEnd '.GetValue("scenario") & " " & .GetValue("constituent") & " at " & .GetValue("location")
+            Return lCurveLabel.Replace("<unk>", "").Trim '.GetValue("scenario") & " " & .GetValue("constituent") & " at " & .GetValue("location")
         End With
     End Function
 
