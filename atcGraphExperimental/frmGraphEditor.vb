@@ -194,9 +194,11 @@ Public Class frmGraphEditor
                     End If
                 End If
                 If Double.TryParse(txtAxisDisplayMinimum.Text, lTemp) Then
+                    .Scale.MinAuto = False
                     .Scale.Min = lTemp
                 End If
                 If Double.TryParse(txtAxisDisplayMaximum.Text, lTemp) Then
+                    .Scale.MaxAuto = False
                     .Scale.Max = lTemp
                 End If
                 .Title.Text = txtAxisLabel.Text
@@ -352,7 +354,8 @@ Public Class frmGraphEditor
         chkAxisMinorTicsVisible.CheckedChanged, _
         chkCurveLineVisible.CheckedChanged, _
         chkCurveSymbolVisible.CheckedChanged, _
-        chkLegendOutline.CheckedChanged
+        chkLegendOutline.CheckedChanged, _
+        chkRangeReverse.CheckedChanged
 
         If chkAutoApply.Checked Then ApplyAll()
     End Sub

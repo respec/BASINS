@@ -82,7 +82,7 @@ Public Class clsGraphFrequency
 
                 'Add USGS Peakfq label
                 Dim lUSGSLabel As TextObj = Nothing
-                Dim lStr As String = "run " & Date.Today.ToString() & vbCrLf _
+                Dim lStr As String = "run " & Date.Now.ToString("yyyy-MM-dd") & vbCrLf _
                                    & "NOTE - Preliminary computation" & vbCrLf _
                                    & "User is reponsible for assessment and interpretation."
                 lUSGSLabel = New TextObj(lStr, 0.7, 0.7, CoordType.ChartFraction)
@@ -102,6 +102,9 @@ Public Class clsGraphFrequency
                     '.Title.Text = "Percent Exceeded"
                     .Title.Text = "ANNUAL EXCEEDANCE PROBABILITY, PERCENT" ' & vbCrLf & "Station - " & aTimeseries.ToString()
                     .Scale.Format = "0.####"
+                    .Scale.MaxAuto = False
+                    .Scale.Min = 0.01
+                    .Scale.Max = 0.99
                     Dim lProbScale As ProbabilityScale = .Scale
                     lProbScale.LabelStyle = ProbabilityScale.ProbabilityLabelStyle.Percent
                     lProbScale.IsReverse = True
@@ -183,16 +186,17 @@ Public Class clsGraphFrequency
         Next ' lData
 
         For Each lNdays In pNdays.Values
-            AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "Low", "")
-            AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "High", "")
+            AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "Low", "", Drawing2D.DashStyle.Solid)
+            AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "High", "", Drawing2D.DashStyle.Solid)
 
             'Only add confidence intervals when we have one dataset and one n-day
             If Datasets.Count = 1 AndAlso pNdays.Count = 1 Then
-                AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "Low", " CI Lower")
-                AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "High", " CI Lower")
+                Dim lCIcolor As Color = Color.FromArgb(80, aCurveColor.R, aCurveColor.G, aCurveColor.B)
+                AddAttributeCurve(aTimeseries, aPane, lCIcolor, lNdays & "Low", " CI Upper", Drawing2D.DashStyle.Dash)
+                AddAttributeCurve(aTimeseries, aPane, lCIcolor, lNdays & "High", " CI Upper", Drawing2D.DashStyle.Dash)
 
-                AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "Low", " CI Upper")
-                AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "High", " CI Upper")
+                AddAttributeCurve(aTimeseries, aPane, lCIcolor, lNdays & "Low", " CI Lower", Drawing2D.DashStyle.Dot)
+                AddAttributeCurve(aTimeseries, aPane, lCIcolor, lNdays & "High", " CI Lower", Drawing2D.DashStyle.Dot)
             End If
         Next
     End Sub
@@ -219,11 +223,17 @@ Public Class clsGraphFrequency
         For Each lCurve As ZedGraph.CurveItem In aPane.CurveList
             For lPointIndex As Integer = 0 To lCurve.NPts - 1
                 Dim lY As Double = lCurve.Points(lPointIndex).Y
-                lYMax = Math.Max(lYMax, lY)
-                lYMin = Math.Min(lYMin, lY)
+                If Not Double.IsInfinity(lY) AndAlso Not Double.IsNaN(lY) Then
+                    Dim lX As Double = lCurve.Points(lPointIndex).X
+                    If lX >= aPane.XAxis.Scale.Min AndAlso lX <= aPane.XAxis.Scale.Max Then
+                        lYMax = Math.Max(lYMax, lY)
+                        lYMin = Math.Min(lYMin, lY)
+                    End If
+                End If
             Next
         Next
         aPane.YAxis.Scale.MaxAuto = False
+        aPane.YAxis.Scale.MinAuto = False
         aPane.YAxis.Scale.Max = Math.Pow(10, Math.Ceiling(Log10(lYMax)))
         aPane.YAxis.Scale.Min = Math.Pow(10, Math.Floor(Log10(lYMin)))
     End Sub
@@ -232,7 +242,7 @@ Public Class clsGraphFrequency
                                         ByVal aPane As ZedGraph.GraphPane, _
                                         ByVal aCurveLabel As String, _
                                         ByVal aCurveColor As Color) As LineItem
-        Dim lDataCount As Integer = aTimeseries.Values.GetUpperBound(0)
+        Dim lDataCount As Integer = aTimeseries.Attributes.GetValue("Count") '.Values.GetUpperBound(0)
 
         Dim lXFracExceed(lDataCount - 1) As Double
         Dim lY(lDataCount - 1) As Double
@@ -259,7 +269,8 @@ Public Class clsGraphFrequency
                                        ByVal aPane As ZedGraph.GraphPane, _
                                        ByVal aCurveColor As Color, _
                                        ByVal aAttributePrefix As String, _
-                                       ByVal aAttributeSuffix As String) As LineItem
+                                       ByVal aAttributeSuffix As String, _
+                                       ByVal aCurveStyle As Drawing2D.DashStyle) As LineItem
         Dim lPreLen As Integer = aAttributePrefix.Length
         Dim lSufLen As Integer = aAttributeSuffix.Length
         Dim lReturnStr As String
@@ -284,7 +295,9 @@ Public Class clsGraphFrequency
                 'Logger.Dbg("Add Point " & lPoint.Key & " = " & lPoint.Value)
                 lZedGraphPoints.Add(New ZedGraph.PointPair(lX, lPoint.Value, CStr(lPoint.Key)))
             Next
-            Return aPane.AddCurve(aAttributePrefix & aAttributeSuffix, lZedGraphPoints, aCurveColor, SymbolType.None)
+            Dim lCurve As LineItem = aPane.AddCurve(aAttributePrefix & aAttributeSuffix, lZedGraphPoints, aCurveColor, SymbolType.None)
+            lCurve.Line.Style = aCurveStyle
+            Return lCurve
         Else
             Return Nothing
         End If
