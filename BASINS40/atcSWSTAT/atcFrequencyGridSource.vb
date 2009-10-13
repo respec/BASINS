@@ -603,7 +603,7 @@ Public Class atcFrequencyGridSource
                         Dim lRecurrence As String = pRecurrence.Item(lRecurrenceKey).ToString.Replace(",", "")
                         Dim lNyears As Double = CDbl(lRecurrence)
 
-                        lStr = DoubleToString(1 / lNyears, , "0.0000")
+                        lStr = DoubleToString(1 / lNyears, , "0.0000", "0.000")
                         If aExpFmt Then
                             lExpRows(0) &= vbTab & DoubleToString(lNyears, , "0.00")
                             lExpRows(1) &= vbTab & lStr
@@ -611,7 +611,7 @@ Public Class atcFrequencyGridSource
                             lThisRow = ("  " & lStr.PadLeft(10))
 
                             If lNyears < 1.05 Then
-                                lThisRow &= DoubleToString(lNyears, , "0.000").PadLeft(14)
+                                lThisRow &= DoubleToString(lNyears, , "0.000", "0.0000").PadLeft(14)
                             Else
                                 lThisRow &= DoubleToString(lNyears, , "0.00").PadLeft(13) & " "
                             End If
@@ -621,29 +621,29 @@ Public Class atcFrequencyGridSource
                             'but, don't display adjusted probs
                             'lThisRow &= pAdjProb.Item(lRecurrenceKey).PadLeft(15)
                             If aExpFmt Then
-                                lExpRows(2) &= vbTab & DoubleToString(pAdj.Item(lRecurrenceKey), , "0.000")
+                                lExpRows(2) &= vbTab & DoubleToString(pAdj.Item(lRecurrenceKey), , "0.000", "0.000")
                             Else
                                 If pAdj.Item(lRecurrenceKey) Is Nothing Then
                                     lThisRow &= "".PadLeft(11)
                                 Else
-                                    lThisRow &= DoubleToString(pAdj.Item(lRecurrenceKey), , "0.000").PadLeft(11)
+                                    lThisRow &= DoubleToString(pAdj.Item(lRecurrenceKey), , "0.000", "0.000").PadLeft(11)
                                 End If
                             End If
                         ElseIf aExpFmt Then
-                            lExpRows(2) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000")
+                            lExpRows(2) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000", "0.000")
                         Else
-                            lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000").PadLeft(11)
+                            lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000", "0.000").PadLeft(11)
                         End If
 
                         'variance of estimate and confidence intervals
                         If aExpFmt Then
-                            lExpRows(4) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " Variance of Estimate", 0), , "0.000")
-                            lExpRows(5) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Lower", 0), , "0.000")
-                            lExpRows(6) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Upper", 0), , "0.000")
+                            lExpRows(4) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " Variance of Estimate", 0), , "0.000", "0.000")
+                            lExpRows(5) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Lower", 0), , "0.000", "0.000")
+                            lExpRows(6) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Upper", 0), , "0.000", "0.000")
                         Else
-                            lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " Variance of Estimate", 0), , "0.000").PadLeft(11)
-                            lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Lower", 0), , "0.000").PadLeft(11)
-                            lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Upper", 0), , "0.000").PadLeft(11)
+                            lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " Variance of Estimate", 0), , "0.000", "0.000").PadLeft(11)
+                            lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Lower", 0), , "0.000", "0.000").PadLeft(11)
+                            lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Upper", 0), , "0.000", "0.000").PadLeft(11)
                         End If
 
                         If pHigh Then

@@ -29,7 +29,7 @@ Public Class clsGraphFrequency
             For Each lTimeseries As atcTimeseries In aDataGroup
                 AddDatasetCurve(lTimeseries, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
             Next
-            AxisTitlesFromCommonAttributes(pZgc.MasterPane.PaneList(0), lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
+            'AxisTitlesFromCommonAttributes(pZgc.MasterPane.PaneList(0), lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
             pZgc.Refresh()
         End Set
     End Property
@@ -100,7 +100,7 @@ Public Class clsGraphFrequency
                     End With
                     .Title.FontSpec.IsBold = False
                     '.Title.Text = "Percent Exceeded"
-                    .Title.Text = "ANNUAL EXCEEDANCE PROBABILITY, PERCENT" & vbCrLf & "Station - " & aTimeseries.ToString()
+                    .Title.Text = "ANNUAL EXCEEDANCE PROBABILITY, PERCENT" ' & vbCrLf & "Station - " & aTimeseries.ToString()
                     .Scale.Format = "0.####"
                     Dim lProbScale As ProbabilityScale = .Scale
                     lProbScale.LabelStyle = ProbabilityScale.ProbabilityLabelStyle.Percent
@@ -111,10 +111,12 @@ Public Class clsGraphFrequency
                     .Type = AxisType.Log
                     .Scale.IsUseTenPower = False
                     .Title.FontSpec.IsBold = False
-                    .Title.Text = "ANNUAL PEAK DISCHARGE" & vbCrLf & "CUBIC FEET PER SECOND"
+                    .Title.Text = "ANNUAL PEAK DISCHARGE" & vbCrLf
                     If aTimeseries.Attributes.ContainsAttribute("Units") Then
-                        .Title.Text = aTimeseries.Attributes.GetValue("Units")
+                        .Title.Text &= aTimeseries.Attributes.GetValue("Units")
                         .Title.IsVisible = True
+                    Else
+                        .Title.Text &= "CUBIC FEET PER SECOND"
                     End If
                 End With
             End If
@@ -149,7 +151,7 @@ Public Class clsGraphFrequency
                 AddDatasetCurve(lAnnualTS)
             Next
         Else
-            Dim lNdays() As Double
+            Dim lNdays() As Double = Nothing
             AddPercentileCurve(aTimeseries, lPane, lCurveLabel, lCurveColor)
             AddAttributeCurves(aTimeseries, lPane, lCurveColor, lNdays)
         End If
@@ -176,7 +178,7 @@ Public Class clsGraphFrequency
                             pNdays.Add(lKey, lNdays)
                         End If
                     End If
-                End If 'Not lAttribute.Arguments Is Nothing
+                End If
             Next ' lAttribute
         Next ' lData
 
@@ -184,11 +186,14 @@ Public Class clsGraphFrequency
             AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "Low", "")
             AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "High", "")
 
-            AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "Low", " CI Lower")
-            AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "High", " CI Lower")
+            'Only add confidence intervals when we have one dataset and one n-day
+            If Datasets.Count = 1 AndAlso pNdays.Count = 1 Then
+                AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "Low", " CI Lower")
+                AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "High", " CI Lower")
 
-            AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "Low", " CI Upper")
-            AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "High", " CI Upper")
+                AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "Low", " CI Upper")
+                AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "High", " CI Upper")
+            End If
         Next
     End Sub
 

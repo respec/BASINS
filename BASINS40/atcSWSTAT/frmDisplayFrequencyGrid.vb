@@ -6,7 +6,7 @@ Imports System.Windows.Forms
 Friend Class frmDisplayFrequencyGrid
     Inherits System.Windows.Forms.Form
     Private pInitializing As Boolean
-    Private WithEvents pFormSpecify As frmSWSTAT
+    Public WithEvents SWSTATform As frmSWSTAT
 
     'The group of atcTimeseries displayed
     Private WithEvents pDataGroup As atcTimeseriesGroup
@@ -262,8 +262,16 @@ Friend Class frmDisplayFrequencyGrid
 
     Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
         If sender.Text = "Graph" Then
-            Dim lGraphPlugin As New atcGraph.atcGraphPlugin
-            Dim lGraphForm As atcGraph.atcGraphForm = lGraphPlugin.Show(pDataGroup, "Frequency")
+            Try
+                If SWSTATform Is Nothing Then
+                    Dim lGraphPlugin As New atcGraph.atcGraphPlugin
+                    Dim lGraphForm As atcGraph.atcGraphForm = lGraphPlugin.Show(pDataGroup, "Frequency")
+                Else
+                    SWSTATform.DoFrequencyGraph()
+                End If
+            Catch ex As Exception
+                MapWinUtility.Logger.Msg("Create frequency graph from main SWSTAT form" & vbCrLf & ex.Message, "Unable to create frequency graph")
+            End Try
         Else
             atcDataManager.ShowDisplay(sender.Text, pDataGroup)
         End If
