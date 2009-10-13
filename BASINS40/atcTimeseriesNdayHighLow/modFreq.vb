@@ -185,7 +185,7 @@ Module modFreq
             If aHigh Then lIlh = 1 Else lIlh = 2
 
             Try
-                LGPSTX(lN, aNumZero, lNumons, (lIntervalMax + 1), lMean, lStd, lSkew, lLogarh, lIlh, True, lSe, _
+                LGPSTX(lN, aNumZero, lNumons, (lIntervalMax + 1), lMean, lStd, lSkew, lLogarh, lIlh, False, lSe, _
                        lC, lCcpa, lP, lQ, lAdp, lQnew, lRi, lRsout, lRetcod)
                 lNobs(0) = lN
                 lTL(0) = -1.0E+21
@@ -214,7 +214,13 @@ Module modFreq
                         lCILow(i) = (1 - lWt) * lCILowVal(0) + lWt * lCILowVal2(0)
                         lCIHigh(i) = (1 - lWt) * lCIHighVal2(0) + lWt * lCIHighVal2(0)
                     End If
-                    lVarEst(i) = lVarEstArray(0, 0)
+                    If aLogFg Then
+                        lCILow(i) = 10 ^ lCILow(i)
+                        lCIHigh(i) = 10 ^ lCIHigh(i)
+                        lVarEst(i) = 10 ^ lVarEstArray(0, 0)
+                    Else
+                        lVarEst(i) = lVarEstArray(0, 0)
+                    End If
                 Next i
                 Dim lMsg As String = ""
 
