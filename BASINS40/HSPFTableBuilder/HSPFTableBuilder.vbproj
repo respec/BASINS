@@ -102,6 +102,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="modBuildMetSegments.vb" />
+    <Compile Include="modCBP.vb" />
     <Compile Include="modHSPFTableBuilder.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -171,10 +172,18 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\atcData\atcData.vbproj">
+      <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
+      <Name>atcData</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcUCI\atcUCI.vbproj">
       <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>
       <Name>atcUCI</Name>
       <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcWDM\atcWDM.vbproj">
+      <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
+      <Name>atcWDM</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
