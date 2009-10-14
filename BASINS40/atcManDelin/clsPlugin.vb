@@ -577,7 +577,7 @@ Module ManDelin
         Dim bfound As Boolean
         Dim r2 As Double
         Dim tAreaFieldIndex As Integer
-        tAreaFieldIndex = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "TAREA", 2, 10)
+        tAreaFieldIndex = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "TAREA", 2, 20)
         If tAreaFieldIndex < lMinField Then lMinField = tAreaFieldIndex
         For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
             r = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, AreaFieldIndex)
@@ -586,18 +586,21 @@ Module ManDelin
         For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
             Logger.Progress(i, GisUtil.NumFeatures(lStreamsLayerIndex))
             System.Windows.Forms.Application.DoEvents()
+            r2 = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, AreaFieldIndex)                        'local area of this one
+            rval = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, ReachSubbasinFieldIndex)
+            'Logger.Dbg("ManDelin:adding area from feature " & rval)
             'is there anything downstream of this one?
             dval = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lDownstreamFieldIndex)
             Do While dval > 0
+                'Logger.Dbg("ManDelin:" & dval & " downstream of " & rval)
                 bfound = False
                 For lStreamIndexDownstream As Integer = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
                     rval = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndexDownstream - 1, ReachSubbasinFieldIndex)
                     If rval = dval Then 'this is the one
                         r = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndexDownstream - 1, tAreaFieldIndex)   'total area of downstream one
-                        r2 = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, AreaFieldIndex)                        'local area of this one
                         GisUtil.SetFeatureValue(lStreamsLayerIndex, tAreaFieldIndex, lStreamIndexDownstream - 1, r + r2)
+                        'Logger.Dbg("ManDelin:" & rval & " area now " & r + r2)
                         dval = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndexDownstream - 1, lDownstreamFieldIndex)
-                        Logger.Dbg("ManDelin:" & dval & " downstream of " & rval)
                         bfound = True
                         Exit For
                     End If
@@ -608,7 +611,7 @@ Module ManDelin
             Loop
         Next i
         'add total contributing area in acres and square miles
-        Dim AreaAcresFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "TAREAACRES", 2, 10)
+        Dim AreaAcresFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "TAREAACRES", 2, 20)
         Dim AreaMi2FieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "TAREAMI2", 2, 10)
         For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
             r = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, tAreaFieldIndex)

@@ -466,7 +466,8 @@ Public Class GisUtil
         Dim lField As New MapWinGIS.Field
         lField.Name = aFieldName
         lField.Type = aFieldType
-        If lField.Type = MapWinGIS.FieldType.STRING_FIELD Then lField.Width = aFieldWidth
+        'If lField.Type = MapWinGIS.FieldType.STRING_FIELD Then lField.Width = aFieldWidth
+        lField.Width = aFieldWidth
 
         Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
 
@@ -970,6 +971,10 @@ Public Class GisUtil
                 'TODO: error checks
                 lRetc = lSf.StartEditingTable()
                 lRetc = lSf.EditCellValue(aFieldIndex, aFeatureIndex, aValue)
+                If Not lRetc Then
+                    'problem setting value
+                    Logger.Dbg("problem setting value to " & aValue)
+                End If
                 lRetc = lSf.StopEditingTable()
             End If
         End If
