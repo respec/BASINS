@@ -11,7 +11,7 @@ Module modHSPFTableBuilder
     Friend g_MetSegmentBuild As Boolean = True
     Friend g_BaseDrive As String = "G"
     Friend g_Debug As Boolean = False
-    Friend g_Project As String = "CentralAZ" '_SALT" '"Willamette"  
+    Friend g_Project As String = "Susq" '020501" '"CentralAZ" '_SALT" '"Willamette"  
     Friend g_BaseFolder As String
     Friend g_LandSurfaceSegmentRepeat As Integer = 25 'TODO: hardcoded for TT_GCRP - make generic
 
@@ -27,6 +27,10 @@ Module modHSPFTableBuilder
         Initialize()
         My.Computer.FileSystem.CurrentDirectory = g_BaseFolder
         Logger.StartToFile("logs\" & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-HSPFTableBuilderLog.txt", , False)
+
+        If g_Project.ToLower.Contains("susq") Then
+            ParmSummary()
+        End If
 
         pUci.FastReadUciForStarter(pMsg, "parms\" & g_Project & ".uci")
         Dim lError As String = pUci.ErrorDescription
