@@ -225,6 +225,7 @@ Public Class atcCollection
         Next
         MyBase.Clear()
         MyBase.AddRange(lNewValues)
+        pKeys = lNewKeys
     End Sub
 
     Public Sub SortByValue()
