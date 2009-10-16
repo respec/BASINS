@@ -1372,7 +1372,23 @@ Friend Class frmSWSTAT
     Public Sub DoFrequencyGraph()
         Calculate("n-day " & HighOrLowString() & " value", clsSWSTATPlugin.ListDefaultArray("Return Period"))
         Dim lGraphPlugin As New atcGraph.atcGraphPlugin
-        Dim lGraphForm As atcGraph.atcGraphForm = lGraphPlugin.Show(pDataGroup, "Frequency")
+        Dim lSeparateGraphs As Boolean = False
+        Select Case pDataGroup.Count
+            Case 0 : Return
+            Case 1 : lSeparateGraphs = False
+            Case Else
+                lSeparateGraphs = (Logger.MsgCustomCheckbox("Create separate graphs or all on one graph?", _
+                                                            pDataGroup.Count & " datasets selected", _
+                                                            "Do not ask again", "BASINS", "SWSTAT", "SeparateFreqGraphs", _
+                                                            "Separate", "One Graph") = "Separate")
+        End Select
+        If lSeparateGraphs Then
+            For Each lDataSet As atcTimeseries In pDataGroup
+                lGraphPlugin.Show(New atcTimeseriesGroup(lDataSet), "Frequency")
+            Next
+        Else
+            lGraphPlugin.Show(pDataGroup, "Frequency")
+        End If
     End Sub
 
     Private Sub cboYears_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboYears.SelectedIndexChanged
