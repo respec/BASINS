@@ -14,6 +14,7 @@ Public Class frmGraphEditor
     Private pPane As GraphPane
     Private WithEvents pZgc As ZedGraphControl
     Private pDateFormat As atcDateFormat
+    Private pSettingControls As Integer = 0
 
     ''' <summary>
     ''' Show this form for customizing the specified ZedGraphControl
@@ -44,6 +45,7 @@ Public Class frmGraphEditor
     End Sub
 
     Private Sub SetComboFromCurves()
+        pSettingControls += 1
         comboWhichCurve.Items.Clear()
         For Each lCurve As CurveItem In pPane.CurveList
             If lCurve.Label.Text.Length > 0 Then
@@ -54,9 +56,11 @@ Public Class frmGraphEditor
                 comboWhichCurve.Items.Add("curve " & comboWhichCurve.Items.Count + 1)
             End If
         Next
+        pSettingControls -= 1
     End Sub
 
     Private Sub SetComboFromTexts()
+        pSettingControls += 1
         comboWhichText.Items.Clear()
         comboWhichText.Text = ""
         For Each lItem As ZedGraph.GraphObj In pPane.GraphObjList
@@ -68,9 +72,11 @@ Public Class frmGraphEditor
         If comboWhichText.Items.Count > 0 Then
             comboWhichText.SelectedIndex = comboWhichText.Items.Count - 1
         End If
+        pSettingControls -= 1
     End Sub
 
     Private Sub SetControlsFromPane()
+        pSettingControls += 1
         If comboWhichCurve.Items.Count > 0 Then comboWhichCurve.SelectedIndex = 0
         SetControlsFromAxis(AxisFromCombo())
         Select Case pPane.XAxis.Type
@@ -81,6 +87,7 @@ Public Class frmGraphEditor
         End Select
         chkLegendOutline.Checked = pPane.Legend.Border.IsVisible
         txtLegendFontColor.BackColor = pPane.Legend.FontSpec.FontColor
+        pSettingControls -= 1
     End Sub
 
     Private Function AxisFromCombo() As Axis
@@ -99,6 +106,7 @@ Public Class frmGraphEditor
     End Function
 
     Private Sub SetControlsFromAxis(ByVal aAxis As Axis)
+        pSettingControls += 1
         If Not aAxis Is Nothing Then
             txtAxisLabel.Text = aAxis.Title.Text
             radioAxisTime.Enabled = False
@@ -140,9 +148,11 @@ Public Class frmGraphEditor
             txtAxisMinorGridColor.BackColor = aAxis.MinorGrid.Color
             chkAxisMinorTicsVisible.Checked = aAxis.MinorTic.IsInside
         End If
+        pSettingControls -= 1
     End Sub
 
     Private Sub SetControlsMinMax(ByVal aAxis As Axis)
+        pSettingControls += 1
         If Not aAxis Is Nothing Then
             If radioAxisTime.Checked Then
                 txtAxisDisplayMinimum.Text = pDateFormat.JDateToString(aAxis.Scale.Min)
@@ -158,8 +168,8 @@ Public Class frmGraphEditor
                 txtAxisDisplayMaximum.Text = DoubleToString(aAxis.Scale.Max)
             End If
         End If
+        pSettingControls -= 1
     End Sub
-
 
     Private Sub SetAxisFromControls(ByVal aAxis As Axis)
         On Error Resume Next 'Set whatever we can legally set
@@ -214,12 +224,15 @@ Public Class frmGraphEditor
     End Sub
 
     Private Sub SetControlsFromSelectedCurve()
+        pSettingControls += 1
         If comboWhichCurve.SelectedIndex >= 0 AndAlso Not pPane Is Nothing AndAlso comboWhichCurve.SelectedIndex < pPane.CurveList.Count Then
             SetControlsFromCurve(pPane.CurveList(comboWhichCurve.SelectedIndex))
         End If
+        pSettingControls -= 1
     End Sub
 
     Private Sub SetControlsFromCurve(ByVal aCurve As LineItem)
+        pSettingControls += 1
         If Not aCurve Is Nothing Then
             On Error Resume Next
             txtCurveLabel.Text = aCurve.Label.Text
@@ -235,21 +248,9 @@ Public Class frmGraphEditor
 
             chkCurveSymbolVisible.Checked = aCurve.Symbol.IsVisible
             txtCurveSymbolSize.Text = aCurve.Symbol.Size
-            cboCurveSymbolType.Text = System.Enum.GetName(aCurve.Symbol.GetType, aCurve.Symbol)
-            'Select Case aCurve.Symbol.Type
-            '    Case SymbolType.Square : cboCurveSymbolType.Text = "Square"
-            '    Case SymbolType.Diamond : cboCurveSymbolType.Text = "Diamond"
-            '    Case SymbolType.Triangle : cboCurveSymbolType.Text = "Triangle"
-            '    Case SymbolType.Circle : cboCurveSymbolType.Text = "3"
-            '    Case SymbolType.XCross : cboCurveSymbolType.Text = "4"
-            '    Case SymbolType.Plus : cboCurveSymbolType.Text = "5"
-            '    Case SymbolType.Star : cboCurveSymbolType.Text = "6"
-            '    Case SymbolType.TriangleDown : cboCurveSymbolType.Text = "7"
-            '    Case SymbolType.HDash : cboCurveSymbolType.Text = "8"
-            '    Case SymbolType.VDash : cboCurveSymbolType.Text = "9"
-            '    Case SymbolType.None : cboCurveSymbolType.Text = "10"
-            'End Select
+            cboCurveSymbolType.Text = System.Enum.GetName(GetType(ZedGraph.SymbolType), aCurve.Symbol.Type)
         End If
+        pSettingControls -= 1
     End Sub
 
     Private Sub SetCurveFromControls(ByVal aCurve As LineItem)
@@ -267,7 +268,7 @@ Public Class frmGraphEditor
             aCurve.Symbol.IsVisible = chkCurveSymbolVisible.Checked
             If Integer.TryParse(txtCurveSymbolSize.Text, lInt) Then aCurve.Symbol.Size = lInt
 
-            aCurve.Symbol.Type = System.Enum.Parse(aCurve.Symbol.Type.GetType, cboCurveSymbolType.Text)
+            aCurve.Symbol.Type = System.Enum.Parse(GetType(ZedGraph.SymbolType), cboCurveSymbolType.Text)
             'Select Case cboCurveSymbolType.Text
             '    Case "Square" : aCurve.Symbol.Type = SymbolType.Square
             '    Case "Diamond" : aCurve.Symbol.Type = SymbolType.Diamond
@@ -312,21 +313,25 @@ Public Class frmGraphEditor
     End Sub
 
     Private Sub ApplyAll()
-        SetAxisFromControls(AxisFromCombo())
-        SetLegendFromControls()
-        If comboWhichCurve.SelectedIndex >= 0 Then
-            SetCurveFromControls(pPane.CurveList(comboWhichCurve.SelectedIndex))
-            SetComboFromCurves()
-        End If
-
-        If txtText.Text.Length > 0 Then
-            Dim lText As TextObj = FindTextObject(txtText.Text)
-            If lText Is Nothing Then
-                AddTextFromControls
+        If pSettingControls = 0 Then
+            SetAxisFromControls(AxisFromCombo())
+            SetLegendFromControls()
+            Dim lSelectedCurveIndex As Integer = comboWhichCurve.SelectedIndex
+            If lSelectedCurveIndex >= 0 Then
+                SetCurveFromControls(pPane.CurveList(comboWhichCurve.SelectedIndex))
+                SetComboFromCurves()
+                comboWhichCurve.SelectedIndex = lSelectedCurveIndex
             End If
-        End If
 
-        RaiseEvent Apply()
+            If txtText.Text.Length > 0 Then
+                Dim lText As TextObj = FindTextObject(txtText.Text)
+                If lText Is Nothing Then
+                    AddTextFromControls()
+                End If
+            End If
+
+            RaiseEvent Apply()
+        End If
     End Sub
 
     Private Sub cboWhichAxis_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)

@@ -84,8 +84,8 @@ Public Class clsGraphFrequency
                 Dim lUSGSLabel As TextObj = Nothing
                 Dim lStr As String = "run " & Date.Now.ToString("yyyy-MM-dd") & vbCrLf _
                                    & "NOTE - Preliminary computation" & vbCrLf _
-                                   & "User is reponsible for assessment and interpretation."
-                lUSGSLabel = New TextObj(lStr, 0.7, 0.7, CoordType.ChartFraction)
+                                   & " User is reponsible for assessment and interpretation."
+                lUSGSLabel = New TextObj(lStr, 0.6, 0.9, CoordType.ChartFraction)
                 lUSGSLabel.ZOrder = ZOrder.A_InFront
                 .GraphObjList.Add(lUSGSLabel)
                 lUSGSLabel.IsVisible = True
@@ -157,10 +157,8 @@ Public Class clsGraphFrequency
             Dim lNdays() As Double = Nothing
             AddPercentileCurve(aTimeseries, lPane, lCurveLabel, lCurveColor)
             AddAttributeCurves(aTimeseries, lPane, lCurveColor, lNdays)
+            SetYRange(lPane)
         End If
-
-        SetYRange(lPane) 'TODO: does this do anything?
-
     End Sub
 
     Private Sub AddAttributeCurves(ByVal aTimeseries As atcTimeseries, _
@@ -185,13 +183,25 @@ Public Class clsGraphFrequency
             Next ' lAttribute
         Next ' lData
 
+        Dim lOneCurve As Boolean = (Datasets.Count = 1 AndAlso pNdays.Count = 1)
+        Dim lCurve As ZedGraph.LineItem
         For Each lNdays In pNdays.Values
-            AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "Low", "", Drawing2D.DashStyle.Solid)
+            lCurve = AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "Low", "", Drawing2D.DashStyle.Solid)
+            If lOneCurve Then
+                lCurve.Color = Color.Blue
+                lCurve.Line.Width = 2
+            End If
+
             AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "High", "", Drawing2D.DashStyle.Solid)
+            If lOneCurve Then
+                lCurve.Color = Color.Blue
+                lCurve.Line.Width = 2
+            End If
 
             'Only add confidence intervals when we have one dataset and one n-day
-            If Datasets.Count = 1 AndAlso pNdays.Count = 1 Then
-                Dim lCIcolor As Color = Color.FromArgb(80, aCurveColor.R, aCurveColor.G, aCurveColor.B)
+            If lOneCurve Then
+                'Dim lCIcolor As Color = Color.FromArgb(80, aCurveColor.R, aCurveColor.G, aCurveColor.B)
+                Dim lCIcolor As Color = Color.Red
                 AddAttributeCurve(aTimeseries, aPane, lCIcolor, lNdays & "Low", " CI Upper", Drawing2D.DashStyle.Dash)
                 AddAttributeCurve(aTimeseries, aPane, lCIcolor, lNdays & "High", " CI Upper", Drawing2D.DashStyle.Dash)
 
@@ -223,7 +233,7 @@ Public Class clsGraphFrequency
         For Each lCurve As ZedGraph.CurveItem In aPane.CurveList
             For lPointIndex As Integer = 0 To lCurve.NPts - 1
                 Dim lY As Double = lCurve.Points(lPointIndex).Y
-                If Not Double.IsInfinity(lY) AndAlso Not Double.IsNaN(lY) Then
+                If lY > 0 AndAlso Not Double.IsInfinity(lY) Then
                     Dim lX As Double = lCurve.Points(lPointIndex).X
                     If lX >= aPane.XAxis.Scale.Min AndAlso lX <= aPane.XAxis.Scale.Max Then
                         lYMax = Math.Max(lYMax, lY)
@@ -232,10 +242,15 @@ Public Class clsGraphFrequency
                 End If
             Next
         Next
-        aPane.YAxis.Scale.MaxAuto = False
-        aPane.YAxis.Scale.MinAuto = False
-        aPane.YAxis.Scale.Max = Math.Pow(10, Math.Ceiling(Log10(lYMax)))
-        aPane.YAxis.Scale.Min = Math.Pow(10, Math.Floor(Log10(lYMin)))
+        If lYMin < 0.001 Then
+            lYMin = 0.001
+        End If
+        If lYMin < lYMax Then
+            aPane.YAxis.Scale.MaxAuto = False
+            aPane.YAxis.Scale.MinAuto = False
+            aPane.YAxis.Scale.Max = Math.Pow(10, Math.Ceiling(Log10(lYMax)))
+            aPane.YAxis.Scale.Min = Math.Pow(10, Math.Floor(Log10(lYMin)))
+        End If
     End Sub
 
     Private Function AddPercentileCurve(ByVal aTimeseries As atcTimeseries, _

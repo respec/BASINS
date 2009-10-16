@@ -312,17 +312,19 @@ Public Class atcGraphForm
         Dim printdoc As New Printing.PrintDocument
         AddHandler printdoc.PrintPage, AddressOf Me.PrintPage
 
-        printdlg.Document = printdoc
-        printdlg.AllowSelection = False
-        printdlg.ShowHelp = True
-
-        ' If the result is OK then print the document.
-        If (printdlg.ShowDialog = Windows.Forms.DialogResult.OK) Then
-            Dim saveRect As RectangleF = pMaster.Rect
-            printdoc.Print()
-            ' Restore graph size to fit form's bounds. 
-            pMaster.ReSize(Me.CreateGraphics, saveRect)
-        End If
+        With printdlg
+            .Document = printdoc
+            .AllowSelection = False
+            .ShowHelp = True
+            'TODO: default to landscape if graph is wider than tall
+            ' If the result is OK then print the document.
+            If (.ShowDialog = Windows.Forms.DialogResult.OK) Then
+                Dim saveRect As RectangleF = pMaster.Rect
+                printdoc.Print()
+                ' Restore graph size to fit form's bounds. 
+                pMaster.ReSize(Me.CreateGraphics, saveRect)
+            End If
+        End With
     End Sub
 
     '' <summary> Prints the displayed graph. </summary> 
@@ -355,13 +357,18 @@ Public Class atcGraphForm
     End Sub
 
     Private Sub mnuEditGraph_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuEditGraph.Click
-        pEditor = New frmGraphEditor ' ZedGraph.frmEdit
+        If pEditor IsNot Nothing Then 'Try to re-use existing editor
+            Try
+                pEditor.Show()
+                pEditor.BringToFront()
+                Exit Sub
+            Catch ex As Exception
+                'Probably existing one was already disposed, fall through to creating a new one below
+            End Try
+        End If
+        pEditor = New frmGraphEditor
         pEditor.Text = "Edit " & Me.Text
         pEditor.Edit(pZgc)
-
-        'pEditor = New frmGraphEdit
-        'pEditor.Initialize(zgc.GraphPane)
-        'pEditor.Show()
     End Sub
 
     Private Sub mnuAnalysis_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
