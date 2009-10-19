@@ -804,10 +804,13 @@ Friend Class frmSWSTAT
             End If
         Next
 
+        grpHighLow.Enabled = True
         grpNday.Enabled = True
         If lHaveAnnual Then
             If lAnnualIsLow <> lAnnualIsHigh Then
                 radioHigh.Checked = lAnnualIsHigh
+                radioLow.Checked = Not lAnnualIsHigh
+                grpHighLow.Enabled = False
             Else
                 If lAnnualIsLow Then
                     Logger.Msg("Low and high annual datasets cannot be analyzed at the same time", _
