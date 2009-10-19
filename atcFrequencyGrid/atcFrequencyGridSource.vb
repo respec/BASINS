@@ -333,46 +333,35 @@ Friend Class atcFrequencyGridSource
 
                     lRept.AppendLine()
                     lRept.AppendLine()
-                    If lIsLog Then
-                        lRept.AppendLine("                Log-Pearson Type III Statistics")
-                        lRept.AppendLine()
-                        lRept.AppendLine("                  (based on USGS Program A193)")
-                        lRept.AppendLine()
-                        lRept.AppendLine("  Notice -- Use of Log-Pearson Type III or Pearson-Type III")
-                        lRept.AppendLine("            distributions are for preliminary computations.")
-                        lRept.AppendLine("            User is responsible for assessment and ")
-                        lRept.AppendLine("            interpretation.")
-                    Else
-                        lRept.AppendLine("                  Pearson Type III Statistics")
-                        lRept.AppendLine()
-                        lRept.AppendLine("                  (based on USGS Program A193)")
-                        lRept.AppendLine()
-                        lRept.AppendLine("  Notice -- Use of Pearson Type III distribution is for")
-                        lRept.AppendLine("            preliminary computations.  User is responsible")
-                        lRept.AppendLine("            for assessment and interpretation.")
-                    End If
+                    lRept.AppendLine("Program SWStat             U.S. GEOLOGICAL SURVEY             Seq.000.000")
+                    lRept.AppendLine("Ver. 5.0 Beta 1   Log-Pearson & Pearson Type III Statistics   Run Date / Time")
+                    lRept.AppendLine("10/1/2009                based on USGS Program A193           " & System.DateTime.Now.ToString)
+                    lRept.AppendLine()
+                    lRept.AppendLine(" Notice -- Log-Pearson Type III or Pearson Type III distributions are for")
+                    lRept.AppendLine("           preliminary computations. Users are responsible for assessment")
+                    lRept.AppendLine("           and interpretation.")
 
 
                     lRept.AppendLine()
                     lRept.AppendLine()
-                    lRept.AppendLine("               " & lLocation.PadRight(64))
-                    lRept.AppendLine(lStartDate.ToString("MMMM").PadLeft(24) & lStartDate.Day.ToString.PadLeft(3) & " - start of season")
-                    lRept.AppendLine(lEndDate.ToString("MMMM").PadLeft(24) & lEndDate.Day.ToString.PadLeft(3) & " - end of season")
-                    lRept.AppendLine("                " & lStartDateAnnual.Year & " - " & lEndDate.Year & " - time period")
+                    lRept.AppendLine("       Description:  " & lLocation)
+                    lRept.AppendLine("            Season:  " & lStartDate.ToString("MMMM") & lStartDate.Day.ToString.PadLeft(3) & " - " & _
+                                                               lEndDate.ToString("MMMM") & lEndDate.Day.ToString.PadLeft(3))
+                    lRept.AppendLine("  Period of Record:  " & lStartDateAnnual.Year & " - " & lEndDate.Year)
                     lStr = lNdays & "-day "
                     If pHigh Then lStr &= "high" Else lStr &= "low"
-                    lRept.AppendLine(lStr.PadLeft(27) & " - parameter")
+                    lRept.AppendLine("         Parameter:  " & lStr)
 
                     Dim lNumZero As Integer = lNdayTsNonLog.Attributes.GetValue("Count Zero", -1)
                     Dim lNumMissing As Integer = lNdayTsNonLog.Attributes.GetValue("Count Missing", 0)
                     Dim lNumPositive As Integer = lNdayTsNonLog.numValues - lNumZero - lNumMissing
 
                     lStr = lNumPositive
-                    lRept.AppendLine(lStr.PadLeft(27) & " - non-zero values")
+                    lRept.AppendLine("   non-zero values:  " & lStr.PadLeft(4))
                     lStr = lNumZero
-                    lRept.AppendLine(lStr.PadLeft(27) & " - zero values")
+                    lRept.AppendLine("       zero values:  " & lStr.PadLeft(4))
                     lStr = lNumMissing
-                    lRept.AppendLine(lStr.PadLeft(27) & " - missing values (ignored)")
+                    lRept.AppendLine("   negative values:  " & lStr.PadLeft(4) & "  (ignored)")
 
                     If lNumMissing = 0 AndAlso lNumZero = 0 Then
                         lPositiveNdayTs = lNdayTsNonLog
@@ -391,22 +380,30 @@ Friend Class atcFrequencyGridSource
                         Next
                     End If
 
-                    lColumn = 6
+                    lRept.AppendLine()
+                    lRept.AppendLine("Input time series (zero and negative values not included in listing.)")
+                    lColumn = 9
                     For lIndex = 1 To lPositiveNdayTs.numValues
-                        If lColumn > 5 Then
+                        If lColumn > 8 Then
                             lRept.AppendLine()
-                            lRept.Append("     ")
+                            'lRept.Append("     ")
                             lColumn = 1
                         End If
                         lStr = DoubleToString(lPositiveNdayTs.Value(lIndex), , "0.000")
-                        lRept.Append(lStr.PadLeft(12))
+                        lRept.Append(lStr.PadLeft(10))
                         lColumn += 1
                     Next
 
                     lRept.AppendLine()
                     lRept.AppendLine()
                     lRept.AppendLine()
-                    lRept.AppendLine("  The following 7 statistics are based on non-zero values:")
+                    If lIsLog Then
+                        lRept.AppendLine("  LOG PEARSON TYPE III Frequency Curve Parameters")
+                        lRept.AppendLine("  (based on logs of the non-zero values)")
+                    Else
+                        lRept.AppendLine("  PEARSON TYPE III Frequency Curve Parameters")
+                        lRept.AppendLine("  (based on non-zero values)")
+                    End If
                     lRept.AppendLine()
 
                     If lIsLog Then 'switch back to log version of n-day timeseries for stats
@@ -434,19 +431,28 @@ Friend Class atcFrequencyGridSource
 
                     lRept.AppendLine()
                     lRept.AppendLine()
+                    lRept.AppendLine("Frequency Curve - Parameter values at selected probabilities")
+                    lRept.AppendLine()
 
-                    If lNumZero > 0 Then
-                        lRept.AppendLine("                                            Adjusted ")
-                    End If
                     If pHigh Then
-                        lRept.AppendLine("        Exceedence        Recurrence        Parameter")
+                        If lNumZero > 0 Then
+                            lRept.AppendLine("                            Adjusted   Variance    95-Pct Confidence")
+                        Else
+                            lRept.AppendLine("                                       Variance    95-Pct Confidence")
+                        End If
+                        lRept.AppendLine(" Exceedence     Recurrence  Parameter     of          Intervals")
                     Else
-                        lRept.AppendLine("       Non-exceedance     Recurrence        Parameter")
+                        If lNumZero > 0 Then
+                            lRept.AppendLine("   Non-                     Adjusted   Variance    95-Pct Confidence")
+                        Else
+                            lRept.AppendLine("   Non-                                Variance    95-Pct Confidence")
+                        End If
+                        lRept.AppendLine(" exceedance     Recurrence  Parameter     of          Intervals")
                     End If
                     'If just aligns code
                     If True Then
-                        lRept.AppendLine("        Probability        Interval           Value  ")
-                        lRept.AppendLine("        -----------       ----------        ---------")
+                        lRept.AppendLine(" Probability     Interval     Value    Estimate    Lower      Upper")
+                        lRept.AppendLine(" -----------    ----------  ---------  --------  ---------  ---------")
                     End If
 
                     Dim lReverseString As String = ""
@@ -456,25 +462,28 @@ Friend Class atcFrequencyGridSource
                         Dim lNyears As Double = CDbl(lRecurrence)
 
                         lStr = DoubleToString(1 / lNyears, , "0.0000")
-                        lThisRow = ("  " & lStr.PadLeft(17))
+                        lThisRow = ("  " & lStr.PadLeft(10))
 
                         If lNyears < 1.05 Then
-                            lThisRow &= DoubleToString(lNyears, , "0.000").PadLeft(18)
+                            lThisRow &= DoubleToString(lNyears, , "0.000").PadLeft(14)
                         Else
-                            lThisRow &= DoubleToString(lNyears, , "0.00").PadLeft(17) & " "
+                            lThisRow &= DoubleToString(lNyears, , "0.00").PadLeft(13) & " "
                         End If
 
-
-                        If lNumZero > 0 Then 'If there is/area zero annual event, then add adj values and probs
+                        If lNumZero > 0 Then 'If there is/are a zero annual event, then display adjusted values 
+                            'but, don't display adjusted probs
                             'lThisRow &= pAdjProb.Item(lRecurrenceKey).PadLeft(15)
                             If pAdj.Item(lRecurrenceKey) Is Nothing Then
-                                lThisRow &= "".PadLeft(16)
+                                lThisRow &= "".PadLeft(11)
                             Else
-                                lThisRow &= DoubleToString(pAdj.Item(lRecurrenceKey), , "0.000").PadLeft(16)
+                                lThisRow &= DoubleToString(pAdj.Item(lRecurrenceKey), , "0.000").PadLeft(11)
                             End If
                         Else
-                            lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000").PadLeft(16)
+                            lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000").PadLeft(11)
                         End If
+
+                        'variance of estimate and confidence intervals go here
+
 
                         If pHigh Then
                             lReverseString &= lThisRow & vbCrLf
@@ -485,6 +494,11 @@ Friend Class atcFrequencyGridSource
                     lRept.Append(lReverseString)
 
                     lRept.AppendLine()
+                    If lNumZero > 0 Then
+                        lRept.AppendLine(" Note -- Conditional Probability Adjustment applied because of zero flow(s),")
+                        lRept.AppendLine("         Adjusted parameter values (column 3) correspond with non-exceedence")
+                        lRept.AppendLine("         probabilities (column 1) and recurrence intervals (column 2).")
+                    End If
                     lRept.AppendLine()
                     'lRept.AppendLine("    7 statistics were added as attributes to data set   163:")
                     'lRept.AppendLine()
