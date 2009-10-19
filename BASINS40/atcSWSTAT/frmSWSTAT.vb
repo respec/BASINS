@@ -761,6 +761,11 @@ Friend Class frmSWSTAT
         Dim lAllText As String = "All"
         Dim lCommonText As String = "Common"
 
+        Dim lHaveAnnual As Boolean = False
+        Dim lAnnualIsHigh As Boolean = False
+        Dim lAnnualIsLow As Boolean = False
+        Dim lAnnualNday As Integer = 0
+
         For Each lDataset As atcData.atcTimeseries In pDataGroup
             If lDataset.Dates.numValues > 0 Then
                 Dim lThisDate As Double = lDataset.Dates.Value(1)
@@ -769,8 +774,54 @@ Friend Class frmSWSTAT
                 lThisDate = lDataset.Dates.Value(lDataset.Dates.numValues)
                 If lThisDate > lLastDate Then lLastDate = lThisDate
                 If lThisDate < pCommonEnd Then pCommonEnd = lThisDate
+
+                If lDataset.Attributes.GetValue("Tu", atcTimeUnit.TUDay) = atcTimeUnit.TUYear Then
+                    lHaveAnnual = True
+                    Dim lConstituent As String = lDataset.Attributes.GetValue("Constituent", "")
+                    If lConstituent.Length < 4 Then
+                        Logger.Msg("Dataset #" & lDataset.Attributes.GetValue("ID", "") & " " & lDataset.ToString, _
+                                   "Annual Dataset Missing Constituent")
+                    Else
+                        Select Case lConstituent.Substring(0, 1).ToUpper
+                            Case "L" : lAnnualIsLow = True
+                            Case "H" : lAnnualIsHigh = True
+                            Case Else
+                                Logger.Msg("Dataset #" & lDataset.Attributes.GetValue("ID", "") & " " & lDataset.ToString, _
+                                           "Annual Dataset Constituent does not start with L or H")
+                        End Select
+                        Dim lNday As Integer
+                        If Integer.TryParse(lConstituent.Substring(1), lNday) Then
+                            If lAnnualNday = 0 Then
+                                lAnnualNday = lNday
+                            ElseIf lAnnualNday <> lNday Then
+                                Logger.Msg("Annual datasets with different N-Day cannot be analyzed at the same time." & vbCrLf _
+                                           & "N-Day values of both " & lAnnualNday & " and " & lNday & " were found.", _
+                                           "Incompatible Annual Data Selected")
+                            End If
+                        End If
+                    End If
+                End If
             End If
         Next
+
+        grpNday.Enabled = True
+        If lHaveAnnual Then
+            If lAnnualIsLow <> lAnnualIsHigh Then
+                radioHigh.Checked = lAnnualIsHigh
+            Else
+                If lAnnualIsLow Then
+                    Logger.Msg("Low and high annual datasets cannot be analyzed at the same time", _
+                               "Incompatible Annual Data Selected")
+                End If
+            End If
+
+            If lAnnualNday > 0 Then
+                lstNday.ClearSelected()
+                SelectNday(lAnnualNday)
+                grpNday.Enabled = False
+            End If
+        End If
+
         If lFirstDate < GetMaxValue() AndAlso lLastDate > GetMinValue() Then
             lblDataStart.Text = lblDataStart.Tag & " " & pDateFormat.JDateToString(lFirstDate)
             lblDataEnd.Text = lblDataEnd.Tag & " " & pDateFormat.JDateToString(lLastDate)
@@ -1140,21 +1191,37 @@ Friend Class frmSWSTAT
     End Sub
 
     Private Sub btnNdayAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNdayAdd.Click
-        If IsNumeric(txtNdayAdd.Text) Then
+        AddNday(txtNdayAdd.Text)
+    End Sub
+
+    Private Sub AddNday(ByVal aNday As String)
+        If IsNumeric(aNday) Then
             Try
                 Dim lIndex As Integer = 0
-                Dim lNewValue As Double = CDbl(txtNdayAdd.Text)
+                Dim lNewValue As Double = CDbl(aNday)
                 While lIndex < lstNday.Items.Count AndAlso CDbl(lstNday.Items(lIndex)) < lNewValue
                     lIndex += 1
                 End While
-                lstNday.Items.Insert(lIndex, txtNdayAdd.Text)
+                lstNday.Items.Insert(lIndex, aNday)
                 lstNday.SetSelected(lIndex, True)
             Catch ex As Exception
-                Logger.Dbg("Exception adding N-day '" & txtNdayAdd.Text & "': " & ex.Message)
+                Logger.Dbg("Exception adding N-day '" & aNday & "': " & ex.Message)
             End Try
         Else
-            Logger.Msg("Type a number of days to add in the blank, then press the add button again")
+            Logger.Msg("Non-numeric value '" & aNday & "' could not be added to N-Day list")
         End If
+    End Sub
+
+    Private Sub SelectNday(ByVal aNday As String)
+        If Not lstNday.Items.Contains(aNday) Then
+            AddNday(aNday)
+        End If
+        For lNdayIndex As Integer = 0 To lstNday.Items.Count - 1
+            If CInt(lstNday.Items(lNdayIndex)) = aNday Then
+                lstNday.SelectedIndex = lNdayIndex
+                Exit For
+            End If
+        Next
     End Sub
 
     Private Sub btnNdayRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNdayRemove.Click
@@ -1357,7 +1424,10 @@ Friend Class frmSWSTAT
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
         Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
 
-        Dim lFreqForm As New frmDisplayFrequencyGrid(pDataGroup, radioHigh.Checked, ListToArray(lstNday), ListToArray(lstRecurrence))
+        Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup, _
+                                                     aHigh:=radioHigh.Checked, _
+                                                     aNday:=ListToArray(lstNday), _
+                                                     aReturns:=ListToArray(lstRecurrence))
         lFreqForm.SWSTATform = Me
 
         Me.Cursor = System.Windows.Forms.Cursors.Default

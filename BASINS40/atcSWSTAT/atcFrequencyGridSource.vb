@@ -381,7 +381,6 @@ Public Class atcFrequencyGridSource
                     Dim lIsLog As Boolean = False
                     Dim lLogString As String = "   "
 
-                    'Compile again
                     If lAttributes.GetValue("LDIST", "") = "LP3" Then
                         'Get original version of NDayTimeseries (not log version)
                         lIsLog = True
