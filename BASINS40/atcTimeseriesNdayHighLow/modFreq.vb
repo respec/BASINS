@@ -114,12 +114,23 @@ Module modFreq
                             ByVal aNumZero As Integer)
 
         Dim lNonLogTS As atcTimeseries = aTs.Attributes.GetValue("NDayTimeseries", aTs)
+        Dim lPositiveTS As atcTimeseries = PositiveOnlyTimeseries(lNonLogTS)
+        Dim lPositiveLogTs As atcTimeseries
+        If aLogFg Then
+            Dim lArgsMath As New atcDataAttributes
+            Dim lDoLog As New atcTimeseriesMath.atcTimeseriesMath
+            lArgsMath.SetValue("timeseries", New atcTimeseriesGroup(lPositiveTS))
+            lDoLog.Open("log 10", lArgsMath)
+            lPositiveLogTs = lDoLog.DataSets(0)
+        Else
+            lPositiveLogTs = lPositiveTS
+        End If
 
         'Dim lN As Integer = aTs.Attributes.GetValue("Count")
         Dim lN As Integer = lNonLogTS.Attributes.GetValue("count positive")
-        Dim lMean As Double = aTs.Attributes.GetValue("Mean")
-        Dim lStd As Double = aTs.Attributes.GetValue("Standard Deviation")
-        Dim lSkew As Double = aTs.Attributes.GetValue("Skew")
+        Dim lMean As Double = lPositiveLogTs.Attributes.GetValue("Mean")
+        Dim lStd As Double = lPositiveLogTs.Attributes.GetValue("Standard Deviation")
+        Dim lSkew As Double = lPositiveLogTs.Attributes.GetValue("Skew")
 
         If lN = 0 OrElse Double.IsNaN(lMean) Then ' <= 0 Then 'no data or problem data
             Throw New ApplicationException("Count = 0 or Mean = NaN")
@@ -316,4 +327,22 @@ Module modFreq
             End Try
         End If
     End Sub
+
+    Private Function PositiveOnlyTimeseries(ByVal aTimeseries As atcTimeseries) As atcTimeseries
+        Dim lNumPositive As Integer = aTimeseries.Attributes.GetValue("count positive", 0)
+        Dim lEpsilon As Double = 0.0000001
+        Dim lCurNewValueIndex As Integer = 1
+        Dim lNumNewValues As Integer = lNumPositive
+        Dim lPositiveNdayTs As New atcTimeseries(Nothing)
+        lPositiveNdayTs.Dates = New atcTimeseries(Nothing)
+        lPositiveNdayTs.numValues = lNumPositive
+        For lIndex As Integer = 1 To aTimeseries.numValues
+            If aTimeseries.Value(lIndex) - lEpsilon > 0 Then
+                lPositiveNdayTs.Value(lCurNewValueIndex) = aTimeseries.Value(lIndex)
+                lPositiveNdayTs.Dates.Value(lCurNewValueIndex) = aTimeseries.Dates.Value(lIndex)
+                lCurNewValueIndex += 1
+            End If
+        Next
+        Return lPositiveNdayTs
+    End Function
 End Module
