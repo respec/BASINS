@@ -12,6 +12,11 @@ Public Module Script_USGS_SWSTAT_Test
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Dim lOrigCurrentDirectory As String = My.Computer.FileSystem.CurrentDirectory
+        If Not lOrigCurrentDirectory.ToLower.StartsWith(pBaseDrive) Then
+            Dim lBaseDriveOld As String = pBaseDrive
+            pBaseDrive = lOrigCurrentDirectory.Substring(0, 2)
+            pBaseFolder = pBaseFolder.Replace(lBaseDriveOld, pBaseDrive)
+        End If
         My.Computer.FileSystem.CurrentDirectory = pBaseFolder
         Dim lOrigLogFileName As String = Logger.FileName
         Logger.Dbg("StartingScript_USGS_SWSTAT_Test")
