@@ -54,9 +54,11 @@ Module modCBP
             Dim lLu As String = lName(4) 'TODO: get landuse a better way
             If lLu <> lLuOld Then
                 lOutputFile = lBaseFolderOrig & "\" & g_ParmFileName.Replace("all", lLu)
-                Dim lOutputFileInfo As IO.FileSystemInfo = My.Computer.FileSystem.GetFileInfo(lOutputFile)
-                If lOutputFileInfo.CreationTime < lStartTime Then
-                    IO.File.Delete(lOutputFile)
+                If IO.File.Exists(lOutputFile) Then
+                    Dim lOutputFileInfo As IO.FileSystemInfo = My.Computer.FileSystem.GetFileInfo(lOutputFile)
+                    If lOutputFileInfo.CreationTime < lStartTime Then
+                        IO.File.Delete(lOutputFile)
+                    End If
                 End If
                 lSB = Nothing
                 lSB = New StringBuilder

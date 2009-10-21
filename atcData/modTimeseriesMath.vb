@@ -884,7 +884,7 @@ NextOldVal:
         lNewTimeseries.Dates = lDates
         lNewTimeseries.numValues = lNewTimeseries.Dates.numValues
         lNewTimeseries.Value(0) = GetNaN()
-        If aSetAllValues <> 0 Then
+        If Double.IsNaN(aSetAllValues) OrElse aSetAllValues <> 0 Then
             For lIndex As Integer = 1 To lNewTimeseries.numValues
                 lNewTimeseries.Value(lIndex) = aSetAllValues
             Next

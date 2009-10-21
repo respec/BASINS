@@ -5,7 +5,7 @@ Imports atcUtility
 Imports atcData
 
 Module SummarizeTimeseriesMultiple
-    Private pBaseFolder As String = "D:\Mono_10\"
+    Private pBaseFolder As String = "D:\Mono_70\"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         ChDriveDir(pBaseFolder)
@@ -20,6 +20,7 @@ Module SummarizeTimeseriesMultiple
         Dim lSeasonalAttributeNames As New ArrayList
         lSeasonalAttributeNames.Add("Mean")
         lSeasonalAttributeNames.Add("SumAnnual")
+        lSeasonalAttributeNames.Add("Standard Deviation")
 
         Dim lAttributes As New atcCollection
         With lAttributes
@@ -31,6 +32,7 @@ Module SummarizeTimeseriesMultiple
             .Add("End Date", True)
             .Add("Count", True)
             .Add("Mean", True)
+            .Add("Standard Deviation", True)
             .Add("SumAnnual", True)
             .Add("Geometric Mean", True)
             .Add("Minimum", True)
@@ -43,7 +45,9 @@ Module SummarizeTimeseriesMultiple
         lConstituents.Add("EVAP")
 
         Dim lWdmNames As New System.Collections.Specialized.NameValueCollection
-        AddFilesInDir(lWdmNames, pBaseFolder, False, "*base.wdm")
+        Dim lBaseWdmName As String = pBaseFolder & "base.wdm"
+        lWdmNames.Add(lBaseWdmName.ToLower, lBaseWdmName)
+        AddFilesInDir(lWdmNames, pBaseFolder, False, "*_m.base.wdm")
 
         Dim lStringBuilder As New Text.StringBuilder
         Dim lInit As Boolean = True

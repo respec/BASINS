@@ -11,7 +11,7 @@ Module modHSPFTableBuilder
     Friend g_MetSegmentBuild As Boolean = True
     Friend g_BaseDrive As String = "G"
     Friend g_Debug As Boolean = False
-    Friend g_Project As String = "Susq" '020501" '"CentralAZ" '_SALT" '"Willamette"  
+    Friend g_Project As String = "Susq_020501" '020501" '"CentralAZ" '_SALT" '"Willamette"  
     Friend g_BaseFolder As String
     Friend g_LandSurfaceSegmentRepeat As Integer = 25 'TODO: hardcoded for TT_GCRP - make generic
 
@@ -29,7 +29,7 @@ Module modHSPFTableBuilder
         Logger.StartToFile("logs\" & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-HSPFTableBuilderLog.txt", , False)
 
         If g_Project.ToLower.Contains("susq") Then
-            ParmSummary()
+            'ParmSummary()
         End If
 
         pUci.FastReadUciForStarter(pMsg, "parms\" & g_Project & ".uci")
@@ -85,69 +85,69 @@ Module modHSPFTableBuilder
         'update PERLND/PWATER parameters based on values from ATC standard spreadsheet 
         Dim lPrmUpdTable As New atcTableDelimited
         lPrmUpdTable.Delimiter = vbTab
-        lPrmUpdTable.OpenFile("parms\parms.txt")
-
-        Dim lReclassifyTable As New atcTableDelimited
-        lReclassifyTable.Delimiter = vbTab
-        Dim lReclassifyTableName As String = "hrus\HruSummarizeSubBasin.txt"
-        If Not IO.File.Exists(lReclassifyTableName) Then
-            lReclassifyTableName = "parms\HruSummarizeSubBasin.txt"
-        End If
-        lReclassifyTable.OpenFile(lReclassifyTableName)
-        Dim lSlpRecFieldNumber(1) As Integer
-        lSlpRecFieldNumber(0) = lReclassifyTable.FieldNumber("SubBasin")
-        lSlpRecFieldNumber(1) = lReclassifyTable.FieldNumber("LandUse")
-        Dim lSlopeReclassifyValueField As Integer = lReclassifyTable.FieldNumber("SlopeReclass")
-
-        Dim lSlpRecFieldOperation() As String = {"=", "="}
-        Dim lSlpRecFieldValue(1) As String
-        Dim lPrmUpdFieldNumber() As Integer = {1, 4, 5}
-        Dim lPrmUpdFieldOperation() As String = {"=", "=", "="}
-        Dim lPrmUpdFieldValue(2) As String
-        For Each lOperation As atcUCI.HspfOperation In pUci.OpnBlks("PERLND").Ids
-            Dim lMetSegmentComment As String = lOperation.MetSeg.Comment
-            Dim lMetSegmentName As String = lMetSegmentComment.Substring(lMetSegmentComment.Length - 8)
-            Dim lLandUseName As String = lOperation.Tables("GEN-INFO").Parms(0).Value
-            Dim lSlopeReclassValue As Integer = 1
-            lSlpRecFieldValue(0) = lMetSegmentName
-            lSlpRecFieldValue(1) = lLandUseName
-            If lReclassifyTable.FindMatch(lSlpRecFieldNumber, lSlpRecFieldOperation, lSlpRecFieldValue) Then
-                lSlopeReclassValue = lReclassifyTable.Value(lSlopeReclassifyValueField)
-                If g_Debug Then Logger.Dbg("ID,Met,LU,SlopeReclass:" & lOperation.Id & ":" & lMetSegmentName & ":" & lLandUseName & ":" & lSlopeReclassValue)
-                lPrmUpdFieldValue(0) = "PERLND"
-                lPrmUpdFieldValue(1) = lLandUseName
-                lPrmUpdFieldValue(2) = lSlopeReclassValue
-                Dim lRecordStart As Integer = 1
-                Dim lRecordsFound As Integer = 0
-                While lPrmUpdTable.FindMatch(lPrmUpdFieldNumber, lPrmUpdFieldOperation, lPrmUpdFieldValue, , lRecordStart)
-                    lRecordsFound += 1
-                    Dim lTableName As String = lPrmUpdTable.Value(2)
-                    Dim lParmName As String = lPrmUpdTable.Value(3)
-                    Dim lParmValue As String = lPrmUpdTable.Value(6)
-                    lRecordStart = lPrmUpdTable.CurrentRecord + 1
-                    For Each lTable As HspfTable In lOperation.Tables
-                        If lTable.Name = lTableName Then
-                            For Each lParm As HspfParm In lTable.Parms
-                                If lParmName = lParm.Name Then
-                                    If g_Debug Then Logger.Dbg("Update:" & lTableName & ":" & lParmName & ":" & lParm.Value & ":" & lParmValue)
-                                    lParm.Value = lParmValue
-                                    Exit For
-                                End If
-                            Next
-                            Exit For
-                        End If
-                    Next
-                End While
-                If lRecordsFound = 0 Then
-                    Logger.Dbg("NoParmUpdatesFor " & lMetSegmentName & ":" & lLandUseName)
-                End If
-            Else
-                Logger.Dbg("NoSlopeReclassFor " & lMetSegmentName & ":" & lLandUseName)
+        If lPrmUpdTable.OpenFile("parms\parms.txt") Then
+            Dim lReclassifyTable As New atcTableDelimited
+            lReclassifyTable.Delimiter = vbTab
+            Dim lReclassifyTableName As String = "hrus\HruSummarizeSubBasin.txt"
+            If Not IO.File.Exists(lReclassifyTableName) Then
+                lReclassifyTableName = "parms\HruSummarizeSubBasin.txt"
             End If
-        Next lOperation
-        'Next
-        pUci.Name = FilenameNoExt(pUci.Name) & "Hydparmupd.uci"
-        pUci.Save()
+            lReclassifyTable.OpenFile(lReclassifyTableName)
+            Dim lSlpRecFieldNumber(1) As Integer
+            lSlpRecFieldNumber(0) = lReclassifyTable.FieldNumber("SubBasin")
+            lSlpRecFieldNumber(1) = lReclassifyTable.FieldNumber("LandUse")
+            Dim lSlopeReclassifyValueField As Integer = lReclassifyTable.FieldNumber("SlopeReclass")
+
+            Dim lSlpRecFieldOperation() As String = {"=", "="}
+            Dim lSlpRecFieldValue(1) As String
+            Dim lPrmUpdFieldNumber() As Integer = {1, 4, 5}
+            Dim lPrmUpdFieldOperation() As String = {"=", "=", "="}
+            Dim lPrmUpdFieldValue(2) As String
+            For Each lOperation As atcUCI.HspfOperation In pUci.OpnBlks("PERLND").Ids
+                Dim lMetSegmentComment As String = lOperation.MetSeg.Comment
+                Dim lMetSegmentName As String = lMetSegmentComment.Substring(lMetSegmentComment.Length - 8)
+                Dim lLandUseName As String = lOperation.Tables("GEN-INFO").Parms(0).Value
+                Dim lSlopeReclassValue As Integer = 1
+                lSlpRecFieldValue(0) = lMetSegmentName
+                lSlpRecFieldValue(1) = lLandUseName
+                If lReclassifyTable.FindMatch(lSlpRecFieldNumber, lSlpRecFieldOperation, lSlpRecFieldValue) Then
+                    lSlopeReclassValue = lReclassifyTable.Value(lSlopeReclassifyValueField)
+                    If g_Debug Then Logger.Dbg("ID,Met,LU,SlopeReclass:" & lOperation.Id & ":" & lMetSegmentName & ":" & lLandUseName & ":" & lSlopeReclassValue)
+                    lPrmUpdFieldValue(0) = "PERLND"
+                    lPrmUpdFieldValue(1) = lLandUseName
+                    lPrmUpdFieldValue(2) = lSlopeReclassValue
+                    Dim lRecordStart As Integer = 1
+                    Dim lRecordsFound As Integer = 0
+                    While lPrmUpdTable.FindMatch(lPrmUpdFieldNumber, lPrmUpdFieldOperation, lPrmUpdFieldValue, , lRecordStart)
+                        lRecordsFound += 1
+                        Dim lTableName As String = lPrmUpdTable.Value(2)
+                        Dim lParmName As String = lPrmUpdTable.Value(3)
+                        Dim lParmValue As String = lPrmUpdTable.Value(6)
+                        lRecordStart = lPrmUpdTable.CurrentRecord + 1
+                        For Each lTable As HspfTable In lOperation.Tables
+                            If lTable.Name = lTableName Then
+                                For Each lParm As HspfParm In lTable.Parms
+                                    If lParmName = lParm.Name Then
+                                        If g_Debug Then Logger.Dbg("Update:" & lTableName & ":" & lParmName & ":" & lParm.Value & ":" & lParmValue)
+                                        lParm.Value = lParmValue
+                                        Exit For
+                                    End If
+                                Next
+                                Exit For
+                            End If
+                        Next
+                    End While
+                    If lRecordsFound = 0 Then
+                        Logger.Dbg("NoParmUpdatesFor " & lMetSegmentName & ":" & lLandUseName)
+                    End If
+                Else
+                    Logger.Dbg("NoSlopeReclassFor " & lMetSegmentName & ":" & lLandUseName)
+                End If
+            Next lOperation
+            'Next
+            pUci.Name = FilenameNoExt(pUci.Name) & "Hydparmupd.uci"
+            pUci.Save()
+        End If
 
         Dim pExpertSystemLocsFileName As String = "parms\ExpertSystemLocs.txt"
         If IO.File.Exists(pExpertSystemLocsFileName) Then
