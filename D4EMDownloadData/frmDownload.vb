@@ -169,6 +169,7 @@ Public Class frmDownload
     End Function
 
     Private Sub SetCheckboxVisibilityFromMap()
+        chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.GrayText
         If pMapWin.View IsNot Nothing Then
             Dim lSelected As MapWindow.Interfaces.SelectInfo = pMapWin.View.SelectedShapes
             If lSelected.NumSelected > 0 Then
@@ -190,6 +191,7 @@ Public Class frmDownload
                         chkSTORET_Results.Text = "Results"
                         chkSTORET_Results.Checked = True
                     Case "met"
+                        chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
                         chkBASINS_MetData.Enabled = True
                 End Select
             End If
@@ -545,6 +547,16 @@ Public Class frmDownload
         If Not RegionValid(cboRegion.SelectedItem, lReason) Then
             MapWinUtility.Logger.Msg("Cannot use " & cboRegion.SelectedItem & ":" & vbCrLf & lReason, MsgBoxStyle.OkOnly, "Region Type Not Valid")
             cboRegion.SelectedItem = pRegionEnterCoordinates
+        End If
+    End Sub
+
+    Private Sub chkBASINS_MetData_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkBASINS_MetData.CheckedChanged
+        If chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.GrayText Then
+            If chkBASINS_MetData.Checked Then
+                MapWinUtility.Logger.Msg("BASINS Met Stations must be downloaded then selected on map" & vbCrLf _
+                                       & "before downloading BASINS Met Data", "Met Data Prerequisite")
+                chkBASINS_MetData.Checked = False
+            End If
         End If
     End Sub
 End Class

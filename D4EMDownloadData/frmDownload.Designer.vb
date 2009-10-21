@@ -674,7 +674,6 @@ Partial Class frmDownload
         'chkBASINS_MetData
         '
         Me.chkBASINS_MetData.AutoSize = True
-        Me.chkBASINS_MetData.Enabled = False
         Me.chkBASINS_MetData.Location = New System.Drawing.Point(356, 42)
         Me.chkBASINS_MetData.Name = "chkBASINS_MetData"
         Me.chkBASINS_MetData.Size = New System.Drawing.Size(70, 17)
