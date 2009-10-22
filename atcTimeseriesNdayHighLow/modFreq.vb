@@ -25,6 +25,7 @@ Module modFreq
                                                ByVal QNEW() As Single, _
                                                ByVal RI() As Single, _
                                                ByVal RSOUT() As Single, _
+                                               ByVal KP3DEV() As Single, _
                                                ByRef RETCOD As Integer)
     Private Declare Sub KENT Lib "usgs_swstats.dll" (ByVal X() As Single, _
                                               ByRef N As Integer, _
@@ -190,6 +191,7 @@ Module modFreq
             Dim lQnew(lIntervalMax) As Single
             Dim lRi(lIntervalMax) As Single
             Dim lRsout(1 + (2 * lIntervalMax)) As Single
+            Dim lKP3Dev(lIntervalMax) As Single
             Dim lRetcod As Integer
 
             Dim lIlh As Integer  'stats option 1-hi, 2-low,3-month
@@ -197,7 +199,7 @@ Module modFreq
 
             Try
                 LGPSTX(lN, aNumZero, lNumons, (lIntervalMax + 1), lMean, lStd, lSkew, lLogarh, lIlh, False, lSe, _
-                       lC, lCcpa, lP, lQ, lAdp, lQnew, lRi, lRsout, lRetcod)
+                       lC, lCcpa, lP, lQ, lAdp, lQnew, lRi, lRsout, lKP3Dev, lRetcod)
                 lNobs(0) = lN
                 lTL(0) = -1.0E+21
                 lTU(0) = 1.0E+21
@@ -205,34 +207,39 @@ Module modFreq
                 lCMoms(0) = lMean
                 lCMoms(1) = lStd ^ 2 'needs to be variance (std dev squared)
                 lCMoms(2) = lSkew
-                For i As Integer = 0 To lIntervalMax
-                    lPQ = lP(i)
-                    If Math.Abs(lCMoms(2)) > lSkewMin Then
-                        VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray) 'CDbl(lP(i)), lmse, lyp(i), lVarEstArray)
-                        CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal, lCIHighVal)
-                        lCILow(i) = lCILowVal(0)
-                        lCIHigh(i) = lCIHighVal(0)
-                    Else 'for skews close to zero, compute a weighted sum/interpolate values
-                        lCMoms(2) = -lSkewMin
-                        VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray)
-                        CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal, lCIHighVal)
 
-                        lCMoms(2) = lSkewMin
-                        VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray)
-                        CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal2, lCIHighVal2)
+                Dim lCalcEMA As Boolean = aTs.Attributes.GetValue("CalcEMA", False)
 
-                        lWt = (lSkew + lSkewMin) / (2 * lSkewMin) 'weight to attach to positive skew
-                        lCILow(i) = (1 - lWt) * lCILowVal(0) + lWt * lCILowVal2(0)
-                        lCIHigh(i) = (1 - lWt) * lCIHighVal2(0) + lWt * lCIHighVal2(0)
-                    End If
-                    If aLogFg Then
-                        lCILow(i) = 10 ^ lCILow(i)
-                        lCIHigh(i) = 10 ^ lCIHigh(i)
-                        lVarEst(i) = 10 ^ lVarEstArray(0, 0)
-                    Else
-                        lVarEst(i) = lVarEstArray(0, 0)
-                    End If
-                Next i
+                If lCalcEMA Then
+                    For i As Integer = 0 To lIntervalMax
+                        lPQ = lP(i)
+                        If Math.Abs(lCMoms(2)) > lSkewMin Then
+                            VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray) 'CDbl(lP(i)), lmse, lyp(i), lVarEstArray)
+                            CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal, lCIHighVal)
+                            lCILow(i) = lCILowVal(0)
+                            lCIHigh(i) = lCIHighVal(0)
+                        Else 'for skews close to zero, compute a weighted sum/interpolate values
+                            lCMoms(2) = -lSkewMin
+                            VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray)
+                            CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal, lCIHighVal)
+
+                            lCMoms(2) = lSkewMin
+                            VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray)
+                            CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal2, lCIHighVal2)
+
+                            lWt = (lSkew + lSkewMin) / (2 * lSkewMin) 'weight to attach to positive skew
+                            lCILow(i) = (1 - lWt) * lCILowVal(0) + lWt * lCILowVal2(0)
+                            lCIHigh(i) = (1 - lWt) * lCIHighVal2(0) + lWt * lCIHighVal2(0)
+                        End If
+                        If aLogFg Then
+                            lCILow(i) = 10 ^ lCILow(i)
+                            lCIHigh(i) = 10 ^ lCIHigh(i)
+                            lVarEst(i) = 10 ^ lVarEstArray(0, 0)
+                        Else
+                            lVarEst(i) = lVarEstArray(0, 0)
+                        End If
+                    Next i
+                End If
                 Dim lMsg As String = ""
 
                 Dim lNday As Integer = aTs.Attributes.GetValue("NDay")
@@ -271,17 +278,19 @@ Module modFreq
                     aAttributesStorage.SetValue(lNewAttribute, lQ(lIndex), lArguments)
                     lNonLogTS.Attributes.SetValue(lNewAttribute, lQ(lIndex), lArguments)
 
-                    Dim lNewAttVarEst As atcAttributeDefinition = atcDataAttributes.GetDefinition(lS & " Variance of Estimate")
-                    aAttributesStorage.SetValue(lNewAttVarEst, lVarEst(lIndex), lArguments)
-                    lNonLogTS.Attributes.SetValue(lNewAttVarEst, lVarEst(lIndex), lArguments)
+                    If lCalcEMA Then
+                        Dim lNewAttVarEst As atcAttributeDefinition = atcDataAttributes.GetDefinition(lS & " Variance of Estimate")
+                        aAttributesStorage.SetValue(lNewAttVarEst, lVarEst(lIndex), lArguments)
+                        lNonLogTS.Attributes.SetValue(lNewAttVarEst, lVarEst(lIndex), lArguments)
 
-                    Dim lNewAttCILower As atcAttributeDefinition = atcDataAttributes.GetDefinition(lS & " CI Lower")
-                    aAttributesStorage.SetValue(lNewAttCILower, lCILow(lIndex), lArguments)
-                    lNonLogTS.Attributes.SetValue(lNewAttCILower, lCILow(lIndex), lArguments)
+                        Dim lNewAttCILower As atcAttributeDefinition = atcDataAttributes.GetDefinition(lS & " CI Lower")
+                        aAttributesStorage.SetValue(lNewAttCILower, lCILow(lIndex), lArguments)
+                        lNonLogTS.Attributes.SetValue(lNewAttCILower, lCILow(lIndex), lArguments)
 
-                    Dim lNewAttCIUpper As atcAttributeDefinition = atcDataAttributes.GetDefinition(lS & " CI Upper")
-                    aAttributesStorage.SetValue(lNewAttCIUpper, lCIHigh(lIndex), lArguments)
-                    lNonLogTS.Attributes.SetValue(lNewAttCIUpper, lCIHigh(lIndex), lArguments)
+                        Dim lNewAttCIUpper As atcAttributeDefinition = atcDataAttributes.GetDefinition(lS & " CI Upper")
+                        aAttributesStorage.SetValue(lNewAttCIUpper, lCIHigh(lIndex), lArguments)
+                        lNonLogTS.Attributes.SetValue(lNewAttCIUpper, lCIHigh(lIndex), lArguments)
+                    End If
 
                     If aNumZero > 0 Then
                         lNewAttribute = atcDataAttributes.GetDefinition(lS & "Adj")

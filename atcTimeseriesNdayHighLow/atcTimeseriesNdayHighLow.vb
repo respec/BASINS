@@ -110,13 +110,6 @@ Public Class atcTimeseriesNdayHighLow
 
                 AddOperation("Kendall Tau", "Kendall Tau Statistics", _
                              "Double", defTimeSeriesOne, defDays, defHigh)
-
-                AddOperation("Variance of Estimate", "Variance of Estimate", _
-                             "Double", defTimeSeriesOne, defDays, defReturnPeriod)
-                AddOperation("CI Lower", "95% Confidence Interval, Lower", _
-                             "Double", defTimeSeriesOne, defDays, defReturnPeriod)
-                AddOperation("CI Upper", "95% Confidence Interval, Upper", _
-                             "Double", defTimeSeriesOne, defDays, defReturnPeriod)
             End If
             Return pAvailableOperations
         End Get
