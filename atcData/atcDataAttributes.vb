@@ -81,6 +81,8 @@ Public Class atcDataAttributes
                     lDef = pAllDefinitions.ItemByKey("CI Lower")
                 ElseIf lKey.Contains("CI Upper") Then
                     lDef = pAllDefinitions.ItemByKey("CI Upper")
+                ElseIf lKey.Contains("K Value") Then
+                    lDef = pAllDefinitions.ItemByKey("K Value")
                 Else
                     lDef = pAllDefinitions.ItemByKey("n-day low value")
                 End If
