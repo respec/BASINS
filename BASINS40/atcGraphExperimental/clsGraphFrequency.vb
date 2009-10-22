@@ -187,13 +187,13 @@ Public Class clsGraphFrequency
         Dim lCurve As ZedGraph.LineItem
         For Each lNdays In pNdays.Values
             lCurve = AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "Low", "", Drawing2D.DashStyle.Solid)
-            If lOneCurve Then
+            If lOneCurve AndAlso lCurve IsNot Nothing Then
                 lCurve.Color = Color.Blue
                 lCurve.Line.Width = 2
             End If
 
             AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "High", "", Drawing2D.DashStyle.Solid)
-            If lOneCurve Then
+            If lOneCurve AndAlso lCurve IsNot Nothing Then
                 lCurve.Color = Color.Blue
                 lCurve.Line.Width = 2
             End If
