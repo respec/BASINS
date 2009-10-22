@@ -13,6 +13,8 @@ Module modHSPFTableBuilder
     Friend g_Debug As Boolean = False
     Friend g_Project As String = "Susq_020501" '020501" '"CentralAZ" '_SALT" '"Willamette"  
     Friend g_BaseFolder As String
+    Friend g_ObsDataWDM As String
+    Friend g_OutputWDMCreate As Boolean = True
     Friend g_LandSurfaceSegmentRepeat As Integer = 25 'TODO: hardcoded for TT_GCRP - make generic
 
     Private pMsg As New HspfMsg("hspfmsg.mdb")
@@ -21,6 +23,7 @@ Module modHSPFTableBuilder
 
     Sub Initialize()
         g_BaseFolder = g_BaseDrive & ":\Projects\TT_GCRP\ProjectsTT\" & g_Project & "\"
+        g_ObsDataWDM = g_BaseFolder & "parms\Danville.wdm"
     End Sub
 
     Sub main()
@@ -32,13 +35,15 @@ Module modHSPFTableBuilder
             'ParmSummary()
         End If
 
-        pUci.FastReadUciForStarter(pMsg, "parms\" & g_Project & ".uci")
+        pUci.FastReadUciForStarter(pMsg, "parms\" & g_Project & "starter.uci")
         Dim lError As String = pUci.ErrorDescription
         If lError.Length > 0 Then
             Logger.Dbg("UciReadError " & lError)
             Exit Sub
         End If
         Logger.Dbg("UCI " & pUci.Name & " Opened")
+
+        lError(+pUci.Name = FilenameNoExt(pUci.Name).Replace("starter", ""))
 
         pUci.Name = FilenameNoExt(pUci.Name) & "Aft.uci"
         If g_MetSegmentBuild Then
@@ -149,12 +154,33 @@ Module modHSPFTableBuilder
             pUci.Save()
         End If
 
+        'open or create a wdm file for output as needed
+        Dim lDefaultOutputWdmFileName As String = "parms\" & g_Project & ".wdm"
+        If g_OutputWdmCreate AndAlso IO.File.Exists(lDefaultOutputWdmFileName) Then
+            IO.File.Delete(lDefaultOutputWdmFileName)
+        End If
+        Dim lWdmOutput As New atcWDM.atcDataSourceWDM
+        lWdmOutput.Open(lDefaultOutputWdmFileName)
+        For Each lConnection As HspfConnection In pUci.Connections
+            If lConnection.Target.VolName.Contains("WDM") Then
+                Dim lDataset As New atcData.atcTimeseries(Nothing)
+                With lDataset.Attributes
+                    .SetValue("ID", lConnection.Target.VolId)
+                    .SetValue("Scenario", IO.Path.GetFileNameWithoutExtension(pUci.Name))
+                    .SetValue("Constituent", lConnection.Target.Member)
+                    .SetValue("Location", lConnection.Source.Opn.Name.Substring(0, 1) & ":" & lConnection.Source.Opn.Id)
+                    .SetValue("TU", 4)
+                    .SetValue("TS", 1)
+                    .SetValue("TSTYPE", lConnection.Target.Member)
+                End With
+                Dim lTsDate As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
+                lDataset.Dates = lTsDate
+                Dim lAddedDsn As Boolean = lWdmOutput.AddDataset(lDataset)
+            End If
+        Next
+
         Dim pExpertSystemLocsFileName As String = "parms\ExpertSystemLocs.txt"
         If IO.File.Exists(pExpertSystemLocsFileName) Then
-            'open or create a wdm file for output as needed
-            Dim lDefaultOutputWdmFileName As String = "parms\" & g_Project & ".wdm"
-            Dim lWdmOutput As New atcWDM.atcDataSourceWDM
-            lWdmOutput.Open(lDefaultOutputWdmFileName)
             Dim lOstr(28) As String
             Dim lDsns(28) As Integer
             For Each lRecord As String In LinesInFile(pExpertSystemLocsFileName)
@@ -163,8 +189,17 @@ Module modHSPFTableBuilder
             Next
             pUci.Name = FilenameNoExt(pUci.Name) & "Expert.uci"
             pUci.Save()
+
+            If g_ObsDataWDM.Length > 0 Then
+                Dim lWdmObserved As New atcWDM.atcDataSourceWDM
+                lWdmObserved.Open(g_ObsDataWDM)
+                For Each lDataSet As atcData.atcTimeseries In lWdmObserved.DataSets
+                    lWdmOutput.AddDataset(lDataSet.Clone, atcData.atcDataSource.EnumExistAction.ExistRenumber)
+                Next
+            End If
         End If
 
+        IO.File.Copy(pUci.Name, "parms\" & g_Project & ".uci", True)
         Logger.Dbg("AllDone")
     End Sub
 
