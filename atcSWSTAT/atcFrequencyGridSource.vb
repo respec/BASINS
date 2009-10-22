@@ -636,8 +636,9 @@ Public Class atcFrequencyGridSource
                             lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000", "0.000").PadLeft(11)
                         End If
 
-                        'variance of estimate and confidence intervals
+                        'K Value (export only), variance of estimate and confidence intervals
                         If aExpFmt Then
+                            lExpRows(3) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " K Value", 0), , "0.000", "0.000")
                             lExpRows(4) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " Variance of Estimate", 0), , "0.000", "0.000")
                             lExpRows(5) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Lower", 0), , "0.000", "0.000")
                             lExpRows(6) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Upper", 0), , "0.000", "0.000")
