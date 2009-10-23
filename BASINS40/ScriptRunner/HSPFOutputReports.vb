@@ -12,7 +12,7 @@ Imports MapWindow.Interfaces
 Imports System.Collections.Specialized
 
 Module HSPFOutputReports
-    Private pBaseDrive As String = "v:"
+    Private pBaseDrive As String = "g:"
     Private pBaseFolders As New ArrayList
     Private pTestPath As String
     Private pBaseName As String
@@ -28,6 +28,8 @@ Module HSPFOutputReports
     Private pGraphWQOnly As Boolean = False
     Private pGraphWQ As Boolean = False
     Private pWaterYears As Boolean = False
+    Private pExpertPrec As Boolean = False
+    Private pIdsPerSeg As Integer = 50
 
     Private Sub Initialize()
         pOutputLocations.Clear()
@@ -37,12 +39,13 @@ Module HSPFOutputReports
         pGraphSaveWidth = 1024
         pGraphSaveHeight = 768
 
+        Dim lTestName As String = "Susq_020501"
         'Dim lTestName As String = "tinley"
         'Dim lTestName As String = "hspf"
         'Dim lTestName As String = "hyd_man"
         'Dim lTestName As String = "shena"
         'Dim lTestName As String = "mono_lu2030a2_base"
-        Dim lTestName As String = "upatoi"
+        'Dim lTestName As String = "upatoi"
         'Dim lTestName As String = "housatonic"
         'Dim lTestName As String = "beaver"
         'Dim lTestName As String = "calleguas_cat"
@@ -59,6 +62,12 @@ Module HSPFOutputReports
         'pConstituents.Add("TotalP")
 
         Select Case lTestName
+            Case "Susq_020501"
+                pTestPath = "G:\Projects\TT_GCRP\ProjectsTT\Susq\parms"
+                pBaseName = "Susq_020501"
+                pOutputLocations.Add("R:69")
+                pExpertPrec = True
+                pIdsPerSeg = 25
             Case "mono"
                 pTestPath = "d:\mono_base"
                 pBaseName = "base"
@@ -251,7 +260,7 @@ Module HSPFOutputReports
             Dim lWdmFileName As String = pTestPath & "\" & pBaseName & ".wdm"
             Dim lWdmDataSource As New atcDataSourceWDM()
             lWdmDataSource.Open(lWdmFileName)
-
+            'TODO: allow observed flow to come from a different fileEXPE
 
             Dim lExpertSystemFileNames As New NameValueCollection
             AddFilesInDir(lExpertSystemFileNames, IO.Directory.GetCurrentDirectory, False, "*.exs")
@@ -298,68 +307,75 @@ Module HSPFOutputReports
                         Dim lAreaOriginal As Double
                         Dim lPrecSourceCollection As New atcCollection
                         Dim lAreaFromWeight As Double = lHspfUci.WeightedSourceArea(lOperation, "PREC", lPrecSourceCollection, lAreaOriginal)
-                        Logger.Dbg("AreaFromWeight" & lAreaFromWeight & " AreaOriginal " & lAreaOriginal)
+                        Logger.Dbg("AreaFromWeight " & lAreaFromWeight & " AreaOriginal " & lAreaOriginal)
+                        If (lAreaFromWeight - lAreaOriginal) > 1 Then
+                            Logger.Dbg("**** AREA PROBLEM ****")
+                        End If
+
                         Dim lPrecTser As atcTimeseries = Nothing
-                        Dim lMath As New atcTimeseriesMath.atcTimeseriesMath
-                        Dim lMathArgs As New atcDataAttributes
-                        For lSourceIndex As Integer = 0 To lPrecSourceCollection.Count - 1
-                            Dim lPrecDataGroup As atcTimeseriesGroup = lWdmDataSource.DataSets.FindData("ID", lPrecSourceCollection.Keys(lSourceIndex))
-                            If lPrecDataGroup.Count = 0 Then
-                                Dim lPrecWdmDataSource As New atcDataSourceWDM()
-                                lPrecWdmDataSource.Open(pTestPath & "\FBMet.wdm")
-                                lPrecDataGroup = lPrecWdmDataSource.DataSets.FindData("ID", lPrecSourceCollection.Keys(lSourceIndex))
-                                Logger.Dbg("PrecDataGroupFrom FBMet.wdm " & lPrecDataGroup.count)
-                            Else
-                                Logger.Dbg("PrecDataGroupFrom " & lWdmFileName & " " & lPrecDataGroup.Count)
-                            End If
-
-                            Dim lPrecSubsetDataGroup As New atctimeseriesgroup
-                            For lIndex As Integer = 0 To lPrecDataGroup.Count - 1
-                                lPrecSubsetDataGroup.add(SubsetByDate(lPrecDataGroup(lIndex), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing))
-                            Next
-
-                            lMathArgs.SetValue("Timeseries", lPrecSubsetDataGroup)
-                            Dim lPrecMultiply As Double = lPrecSourceCollection.Item(lSourceIndex)
-                            lMathArgs.SetValue("Number", lPrecMultiply)
-                            If lMath.Open("Multiply", lMathArgs) Then
-                                Logger.Dbg("SourceIndex " & lSourceIndex & _
-                                           " DSN " & lPrecSubsetDataGroup.Item(0).Attributes.GetDefinedValue("ID").Value & _
-                                           " MultBy " & lPrecMultiply)
-                                If lSourceIndex = 0 Then
-                                    lPrecTser = lMath.DataSets(0).Clone
+                        If pExpertPrec Then
+                            Dim lPrecDsn As Integer = lSite.DSN(5)
+                            lPrecTser = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lPrecDsn), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                        Else
+                            Dim lMath As New atcTimeseriesMath.atcTimeseriesMath
+                            Dim lMathArgs As New atcDataAttributes
+                            For lSourceIndex As Integer = 0 To lPrecSourceCollection.Count - 1
+                                Dim lPrecDataGroup As atcTimeseriesGroup = lWdmDataSource.DataSets.FindData("ID", lPrecSourceCollection.Keys(lSourceIndex))
+                                If lPrecDataGroup.Count = 0 Then
+                                    Dim lPrecWdmDataSource As New atcDataSourceWDM()
+                                    lPrecWdmDataSource.Open(pTestPath & "\FBMet.wdm")
+                                    lPrecDataGroup = lPrecWdmDataSource.DataSets.FindData("ID", lPrecSourceCollection.Keys(lSourceIndex))
+                                    Logger.Dbg("PrecDataGroupFrom FBMet.wdm " & lPrecDataGroup.Count)
                                 Else
-                                    Dim lMathAdd As New atcTimeseriesMath.atcTimeseriesMath
-                                    Dim lMathAddArgs As New atcDataAttributes
-                                    Dim lDataGroup As New atcTimeseriesGroup
-                                    lDataGroup.Add(lPrecTser)
-                                    lDataGroup.Add(lMath.DataSets(0))
-                                    lMathAddArgs.SetValue("Timeseries", lDataGroup)
-                                    If lMathAdd.Open("Add", lMathAddArgs) Then
-                                        lPrecTser = lMathAdd.DataSets(0).Clone
-                                        Logger.Dbg(" AfterAdd " & lPrecTser.Attributes.GetValue("SumAnnual"))
-                                    Else
-                                        Logger.Dbg("ProblemWithAdd")
-                                    End If
+                                    Logger.Dbg("PrecDataGroupFrom " & lWdmFileName & " " & lPrecDataGroup.Count)
                                 End If
-                            Else
-                                Logger.Dbg("ProblemWithMultiply ")
-                            End If
-                            lMath.Clear()
-                            lMathArgs.Clear()
-                        Next
-                        lMathArgs.SetValue("Timeseries", lPrecTser)
-                        If Math.Abs(lSite.area - lAreaOriginal) < 0.01 Then
-                            Logger.Dbg("AreaDiscrepancy " & lSite.area & " " & lAreaOriginal)
-                        End If
-                        lMathArgs.SetValue("Number", lAreaOriginal)
-                        If Not lMath.Open("Divide", lMathArgs) Then
-                            Logger.Dbg("ProblemWithDivide")
-                        End If
-                        lPrecTser = lMath.DataSets(0)
-                        Logger.Dbg(" AfterDivide " & lPrecTser.Attributes.GetValue("SumAnnual"))
-                        lPrecTser.Attributes.SetValue("Location", "Weighted Average")
 
-                        'Dim lPrecTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(5))
+                                Dim lPrecSubsetDataGroup As New atcTimeseriesGroup
+                                For lIndex As Integer = 0 To lPrecDataGroup.Count - 1
+                                    lPrecSubsetDataGroup.Add(SubsetByDate(lPrecDataGroup(lIndex), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing))
+                                Next
+
+                                lMathArgs.SetValue("Timeseries", lPrecSubsetDataGroup)
+                                Dim lPrecMultiply As Double = lPrecSourceCollection.Item(lSourceIndex)
+                                lMathArgs.SetValue("Number", lPrecMultiply)
+                                If lMath.Open("Multiply", lMathArgs) Then
+                                    Logger.Dbg("SourceIndex " & lSourceIndex & _
+                                               " DSN " & lPrecSubsetDataGroup.Item(0).Attributes.GetDefinedValue("ID").Value & _
+                                               " MultBy " & lPrecMultiply)
+                                    If lSourceIndex = 0 Then
+                                        lPrecTser = lMath.DataSets(0).Clone
+                                    Else
+                                        Dim lMathAdd As New atcTimeseriesMath.atcTimeseriesMath
+                                        Dim lMathAddArgs As New atcDataAttributes
+                                        Dim lDataGroup As New atcTimeseriesGroup
+                                        lDataGroup.Add(lPrecTser)
+                                        lDataGroup.Add(lMath.DataSets(0))
+                                        lMathAddArgs.SetValue("Timeseries", lDataGroup)
+                                        If lMathAdd.Open("Add", lMathAddArgs) Then
+                                            lPrecTser = lMathAdd.DataSets(0).Clone
+                                            Logger.Dbg(" AfterAdd " & lPrecTser.Attributes.GetValue("SumAnnual"))
+                                        Else
+                                            Logger.Dbg("ProblemWithAdd")
+                                        End If
+                                    End If
+                                Else
+                                    Logger.Dbg("ProblemWithMultiply ")
+                                End If
+                                lMath.Clear()
+                                lMathArgs.Clear()
+                            Next
+                            lMathArgs.SetValue("Timeseries", lPrecTser)
+                            If Math.Abs(lSite.Area - lAreaOriginal) < 0.01 Then
+                                Logger.Dbg("AreaDiscrepancy " & lSite.Area & " " & lAreaOriginal)
+                            End If
+                            lMathArgs.SetValue("Number", lAreaOriginal)
+                            If Not lMath.Open("Divide", lMathArgs) Then
+                                Logger.Dbg("ProblemWithDivide")
+                            End If
+                            lPrecTser = lMath.DataSets(0)
+                            Logger.Dbg(" AfterDivide " & lPrecTser.Attributes.GetValue("SumAnnual"))
+                            lPrecTser.Attributes.SetValue("Location", "Weighted Average")
+                        End If
                         lPrecTser.Attributes.SetValue("Units", "inches")
 
                         lStr = HspfSupport.MonthlyAverageCompareStats.Report(lHspfUci, _
@@ -411,14 +427,9 @@ Module HSPFOutputReports
                                  pGraphAnnual, lOutFolderName)
                         lTimeSeries.Clear()
 
-                        'TODO: dont hard code DSN here
-                        lTimeSeries.Add("Observed", Aggregate(lWdmDataSource.DataSets.ItemByKey(5), atcTimeUnit.TUHour, 1, atcTran.TranAverSame))
-
-                        'TODO: dont hard code DSN here
-                        lTimeSeries.Add("Simulated", lWdmDataSource.DataSets.ItemByKey(3002))
-
+                        lTimeSeries.Add("Observed", lObsTSer)
+                        lTimeSeries.Add("Simulated", lSimTSer)
                         lTimeSeries.Add("Prec", lPrecTser)
-                        'lTimeSeries.Add("Prec", lWdmDataSource.DataSets.ItemByKey(1010))
 
                         lTimeSeries(0).Attributes.SetValue("Units", "cfs")
                         lTimeSeries(0).Attributes.SetValue("StepType", pCurveStepType)
@@ -441,13 +452,13 @@ Module HSPFOutputReports
         For Each lConstituent As String In pConstituents
             Logger.Dbg("------ Begin summary for " & lConstituent & " -----------------")
 
-            Dim lString As String = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, , , , pWaterYears).ToString
+            Dim lString As String = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, , , , pWaterYears, pIdsPerSeg).ToString
             Dim lOutFileName As String = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedOverland.txt"
             SaveFileString(lOutFileName, lString)
-            lString = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, True, pWaterYears).ToString
+            lString = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, True, pWaterYears, pIdsPerSeg).ToString
             lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedOverlandShortWithMinMax.txt"
             SaveFileString(lOutFileName, lString)
-            lString = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, False, pWaterYears).ToString
+            lString = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, False, pWaterYears, pIdsPerSeg).ToString
             lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedOverlandShort.txt"
             SaveFileString(lOutFileName, lString)
 

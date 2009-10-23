@@ -17,7 +17,8 @@ Public Module WatershedSummaryOverland
                   Optional ByVal aEachYear As Boolean = True, _
                   Optional ByVal aSummary As Boolean = True, _
                   Optional ByVal aIncludeMinMax As Boolean = True, _
-                  Optional ByVal aWaterYears As Boolean = False) As Text.StringBuilder
+                  Optional ByVal aWaterYears As Boolean = False, _
+                  Optional ByVal aIdsPerSeg As Integer = 50) As Text.StringBuilder
 
         Dim lNumberFormat As String = "#,##0.000"
         Dim lUnits As String = ""
@@ -58,10 +59,10 @@ Public Module WatershedSummaryOverland
 
         Dim lPerlndUniqueIds As ArrayList = Nothing
         FindSegmentStarts(lPerlndOperations, aPerlndSegmentStarts, lPerlndColumns, lPerlndUniqueIds)
-        lPerlndLastId = lPerlndLastId Mod 50 '+ aPerlndSegmentStarts(0)
+        lPerlndLastId = lPerlndLastId Mod aIdsPerSeg  '+ aPerlndSegmentStarts(0)
         Dim lImplndUniqueIds As ArrayList = Nothing
         FindSegmentStarts(lImplndOperations, aImplndSegmentStarts, lImplndColumns, lImplndUniqueIds)
-        lImplndLastId = lImplndLastId Mod 50 '+ aImplndSegmentStarts(0)
+        lImplndLastId = lImplndLastId Mod aIdsPerSeg '+ aImplndSegmentStarts(0)
 
         Select Case aConstituentType
             Case "Sediment"
@@ -226,7 +227,9 @@ Public Module WatershedSummaryOverland
                 Dim lRecord As Integer = lFirstDataRecord
                 For lSegmentIndex As Integer = 0 To aPerlndSegmentStarts.GetUpperBound(0)
                     lSegment = aPerlndSegmentStarts(lSegmentIndex)
-                    lSegmentImplnd = aImplndSegmentStarts(lSegmentIndex)
+                    If aImplndSegmentStarts.GetUpperBound(0) > 0 Then
+                        lSegmentImplnd = aImplndSegmentStarts(lSegmentIndex)
+                    End If
                     'While lSegment < lPerlndLastId OrElse lSegmentImplnd < lImplndLastId
                     .CurrentRecord = lRecord
                     Dim lFound As Boolean = False
@@ -240,9 +243,9 @@ Public Module WatershedSummaryOverland
                         Dim lRowTotalTonsMean As Double = 0
                         Dim lRowTotalTonsMin As Double = 0
                         Dim lRowTotalTonsMax As Double = 0
-                        Dim lBaseId As Integer = lID - lID Mod 50
+                        Dim lBaseId As Integer = lID - lID Mod aIdsPerSeg
                         SetCellsTonsPerAcre(lSummary, aUci, lPerlndOperations, lPerlndColumns, lPerlndUniqueIds, _
-                                            lID, lBaseId + lPerlndLastId, _
+                                            lID, lBaseId + lPerlndLastId, aIdsPerSeg, _
                                             lCurrentNonpointData, _
                                             lOutputTable, lField, _
                                             lRowTotalArea, _
@@ -251,7 +254,7 @@ Public Module WatershedSummaryOverland
 
                         lID = lSegmentImplnd
                         SetCellsTonsPerAcre(lSummary, aUci, lImplndOperations, lImplndColumns, lImplndUniqueIds, _
-                                            lID, lBaseId + lImplndLastId, _
+                                            lID, lBaseId + lImplndLastId, aIdsPerSeg, _
                                             lCurrentNonpointData, _
                                             lOutputTable, lField, _
                                             lRowTotalArea, _
@@ -426,7 +429,7 @@ Public Module WatershedSummaryOverland
                                     ByVal aOperations As HspfOperations, _
                                     ByVal aHeaders As ArrayList, _
                                     ByVal aUniqueIds As ArrayList, _
-                                    ByVal aID As Integer, ByVal aLastID As Integer, _
+                                    ByVal aID As Integer, ByVal aLastID As Integer, ByVal aIdsPerSeg As Integer, _
                                     ByVal aData As atcTimeseriesGroup, _
                                     ByVal aTable As atcTable, _
                                     ByRef aField As Integer, _
@@ -436,10 +439,19 @@ Public Module WatershedSummaryOverland
                                     ByRef aYearlyTonsMax As Double, _
                                     ByRef aTotalAreaPerColumn() As Double, _
                                     ByRef aTotalTonsPerColumn() As Double)
+
         While aID <= aLastID
             Dim lKey As String = "K" & aID
             If aOperations.Contains(lKey) Then
                 aField += 1
+                If aField >= aTotalAreaPerColumn.GetUpperBound(0) Then
+                    Dim lExpandAmount As Integer = 1
+                    If aIncludeMinMax Then lExpandAmount = 3
+                    Logger.Dbg("Field " & aField & " ExpandArrays")
+                    ReDim Preserve aTotalAreaPerColumn(aField + lExpandAmount)
+                    ReDim Preserve aTotalTonsPerColumn(aField + lExpandAmount)
+                    aTable.NumFields += lExpandAmount
+                End If
                 Dim lOperation As HspfOperation = aOperations.Item(lKey)
                 Dim lArea As Double = OperationArea(aUCI, lOperation)
                 Dim lSumAnnual As Double = 0
@@ -476,7 +488,7 @@ Public Module WatershedSummaryOverland
                     aTotalAreaPerColumn(aField) += lArea
                     aTotalTonsPerColumn(aField) += lMaxAnnual
                 End If
-            ElseIf aUniqueIds.Contains(aID Mod 50) Then
+            ElseIf aUniqueIds.Contains(aID Mod aIdsPerSeg) Then
                 aField += 1
                 aTable.Value(aField) = "--"
                 If aIncludeMinMax Then
