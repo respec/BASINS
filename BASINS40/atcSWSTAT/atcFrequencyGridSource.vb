@@ -586,7 +586,11 @@ Public Class atcFrequencyGridSource
                     Dim lExpRows(6) As String
                     If aExpFmt Then
                         lExpRows(0) = "    Recur"
-                        lExpRows(1) = "    NonExc"
+                        If pHigh Then
+                            lExpRows(1) = "    Exceed"
+                        Else
+                            lExpRows(1) = "    NonExc"
+                        End If
                         If pHigh Then
                             lExpRows(2) = "    " & lNdays & "-Day High"
                         Else
