@@ -313,6 +313,7 @@ Module modFreq
                             End With
                         End If
                         aAttributesStorage.SetValue(lNewAttribute, lQnew(lIndex), lArguments)
+                        lNonLogTS.Attributes.SetValue(lNewAttribute, lQnew(lIndex), lArguments)
 
                         lNewAttribute = atcDataAttributes.GetDefinition(lS & "AdjProb")
                         If lNewAttribute Is Nothing Then

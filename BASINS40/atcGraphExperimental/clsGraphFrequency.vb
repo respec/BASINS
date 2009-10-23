@@ -7,11 +7,93 @@ Imports ZedGraph
 
 Public Class clsGraphFrequency
     Inherits clsGraphBase
+    Private pExceedance As Boolean
+    Private pXMin As Double = 0.01
+    Private pXMax As Double = 0.99
 
     <CLSCompliant(False)> _
     Public Sub New(ByVal aDataGroup As atcTimeseriesGroup, ByVal aZedGraphControl As ZedGraphControl)
         MyBase.New(aDataGroup, aZedGraphControl)
+
+        With pZgc.MasterPane.PaneList(0)
+            'Add USGS Peakfq label
+            Dim lUSGSLabel As TextObj = Nothing
+            Dim lStr As String = "run " & Date.Now.ToString("yyyy-MM-dd") & vbCrLf _
+                               & "NOTE - Preliminary computation" & vbCrLf _
+                               & " User is reponsible for assessment and interpretation."
+            lUSGSLabel = New TextObj(lStr, 0.6, 0.9, CoordType.ChartFraction)
+            lUSGSLabel.ZOrder = ZOrder.A_InFront
+            .GraphObjList.Add(lUSGSLabel)
+            lUSGSLabel.IsVisible = True
+
+            With .XAxis
+                If .Type <> AxisType.Probability Then .Type = AxisType.Probability
+                With .MajorTic
+                    .IsInside = True
+                    .IsCrossInside = True
+                    .IsOutside = False
+                    .IsCrossOutside = False
+                End With
+                .Title.FontSpec.IsBold = False
+                '.Title.Text = "Percent Exceeded"
+                If pExceedance Then
+                    .Title.Text = "ANNUAL EXCEEDANCE PROBABILITY, PERCENT" ' & vbCrLf & "Station - " & aTimeseries.ToString()
+                Else
+                    .Title.Text = "ANNUAL NON-EXCEEDANCE PROBABILITY, PERCENT"
+                End If
+                .Scale.Format = "0.####"
+                .Scale.MaxAuto = False
+                .Scale.Min = 0.01
+                .Scale.Max = 0.99
+                Dim lProbScale As ProbabilityScale = .Scale
+                lProbScale.LabelStyle = ProbabilityScale.ProbabilityLabelStyle.Percent
+                lProbScale.IsReverse = True
+            End With
+
+            With .YAxis
+                .Type = AxisType.Log
+                .Scale.IsUseTenPower = False
+                .Title.FontSpec.IsBold = False
+                .Title.IsVisible = True
+            End With
+        End With
     End Sub
+
+    Public Property Exceedance() As Boolean
+        Get
+            Return pExceedance
+        End Get
+        Set(ByVal value As Boolean)
+            If value <> pExceedance Then
+                pExceedance = value
+                Dim lCurves As New Generic.List(Of CurveItem)
+                lCurves.AddRange(MyBase.pZgc.MasterPane.PaneList.Item(0).CurveList)
+                If MyBase.pZgc.MasterPane.PaneList.Count > 1 Then
+                    lCurves.AddRange(MyBase.pZgc.MasterPane.PaneList.Item(1).CurveList)
+                End If
+
+                For Each lCurve As CurveItem In lCurves
+                    If lCurve.IsLine Then
+                        Dim lLine As LineItem = lCurve
+                        If Not pExceedance OrElse Not lLine.Line.IsVisible Then
+                            For lPointIndex As Integer = 0 To lCurve.NPts - 1
+                                lCurve.Points(lPointIndex).X = 1 - lCurve.Points(lPointIndex).X
+                            Next
+                        End If
+                    End If
+                Next
+
+                With pZgc.MasterPane.PaneList(0).XAxis.Title
+                    If pExceedance Then
+                        .Text = .Text.Replace(" NON-EXCEEDANCE", " EXCEEDANCE")
+                    Else
+                        .Text = .Text.Replace(" EXCEEDANCE", " NON-EXCEEDANCE")
+                    End If
+                End With
+                pZgc.Refresh()
+            End If
+        End Set
+    End Property
 
     Public Overrides Property Datasets() As atcTimeseriesGroup
         Get
@@ -77,53 +159,7 @@ Public Class clsGraphFrequency
         Dim lCurveLabel As String = TSCurveLabel(aTimeseries, aCommonTimeUnitName, aCommonScenario, aCommonConstituent, aCommonLocation, aCommonUnits)
         Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
 
-        With lPane
-            If .GraphObjList.Count = 0 Then
-
-                'Add USGS Peakfq label
-                Dim lUSGSLabel As TextObj = Nothing
-                Dim lStr As String = "run " & Date.Now.ToString("yyyy-MM-dd") & vbCrLf _
-                                   & "NOTE - Preliminary computation" & vbCrLf _
-                                   & " User is reponsible for assessment and interpretation."
-                lUSGSLabel = New TextObj(lStr, 0.6, 0.9, CoordType.ChartFraction)
-                lUSGSLabel.ZOrder = ZOrder.A_InFront
-                .GraphObjList.Add(lUSGSLabel)
-                lUSGSLabel.IsVisible = True
-
-                With .XAxis
-                    If .Type <> AxisType.Probability Then .Type = AxisType.Probability
-                    With .MajorTic
-                        .IsInside = True
-                        .IsCrossInside = True
-                        .IsOutside = False
-                        .IsCrossOutside = False
-                    End With
-                    .Title.FontSpec.IsBold = False
-                    '.Title.Text = "Percent Exceeded"
-                    .Title.Text = "ANNUAL EXCEEDANCE PROBABILITY, PERCENT" ' & vbCrLf & "Station - " & aTimeseries.ToString()
-                    .Scale.Format = "0.####"
-                    .Scale.MaxAuto = False
-                    .Scale.Min = 0.01
-                    .Scale.Max = 0.99
-                    Dim lProbScale As ProbabilityScale = .Scale
-                    lProbScale.LabelStyle = ProbabilityScale.ProbabilityLabelStyle.Percent
-                    lProbScale.IsReverse = True
-                End With
-
-                With .YAxis
-                    .Type = AxisType.Log
-                    .Scale.IsUseTenPower = False
-                    .Title.FontSpec.IsBold = False
-                    .Title.Text = "ANNUAL PEAK DISCHARGE" & vbCrLf
-                    If aTimeseries.Attributes.ContainsAttribute("Units") Then
-                        .Title.Text &= aTimeseries.Attributes.GetValue("Units")
-                        .Title.IsVisible = True
-                    Else
-                        .Title.Text &= "CUBIC FEET PER SECOND"
-                    End If
-                End With
-            End If
-        End With
+        lPane.YAxis.Title.Text = "FLOW, " & aTimeseries.Attributes.GetValue("Units", "CUBIC FEET PER SECOND")
 
         'check to see if this is an annual timseries
         If aTimeseries.Attributes.GetValue("Time Units") <> atcTimeUnit.TUYear Then
@@ -147,7 +183,7 @@ Public Class clsGraphFrequency
 
             'TODO: compute an annual timeseries or throw an exception
             If lAllAnnual.Count = 0 Then
-
+                Logger.Msg("Annual timeseries not yet computed, use SWSTAT plugin")
             End If
 
             For Each lAnnualTS In lAllAnnual
@@ -155,8 +191,8 @@ Public Class clsGraphFrequency
             Next
         Else
             Dim lNdays() As Double = Nothing
-            AddPercentileCurve(aTimeseries, lPane, lCurveLabel, lCurveColor)
-            AddAttributeCurves(aTimeseries, lPane, lCurveColor, lNdays)
+            Dim lPercentileCurve As LineItem = AddPercentileCurve(aTimeseries, lPane, lCurveLabel, lCurveColor)
+            AddAttributeCurves(aTimeseries, lPane, lCurveColor, lNdays, GetMinValue, GetMaxValue) ' lPercentileCurve.Points(0).X, lPercentileCurve.Points(lPercentileCurve.NPts - 1).X)
             SetYRange(lPane)
         End If
     End Sub
@@ -164,7 +200,9 @@ Public Class clsGraphFrequency
     Private Sub AddAttributeCurves(ByVal aTimeseries As atcTimeseries, _
                                    ByVal aPane As ZedGraph.GraphPane, _
                                    ByVal aCurveColor As Color, _
-                                   ByVal aNdays() As Double)
+                                   ByVal aNdays() As Double, _
+                                   ByVal aMinX As Double, _
+                                   ByVal aMaxX As Double)
         Dim pNdays As New SortedList
         Dim lNdays As String
 
@@ -185,28 +223,39 @@ Public Class clsGraphFrequency
 
         Dim lOneCurve As Boolean = (Datasets.Count = 1 AndAlso pNdays.Count = 1)
         Dim lCurve As ZedGraph.LineItem
+        Dim lHigh As Boolean = True
         For Each lNdays In pNdays.Values
-            lCurve = AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "Low", "", Drawing2D.DashStyle.Solid)
-            If lOneCurve AndAlso lCurve IsNot Nothing Then
-                lCurve.Color = Color.Blue
-                lCurve.Line.Width = 2
-            End If
+            lCurve = AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "Low", "", Drawing2D.DashStyle.Solid, aMinX, aMaxX)
+            If lCurve IsNot Nothing Then
+                lHigh = False
+                Me.Exceedance = False
+                If lOneCurve Then
+                    lCurve.Color = Color.Blue
+                    lCurve.Line.Width = 2
+                End If
 
-            AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "High", "", Drawing2D.DashStyle.Solid)
-            If lOneCurve AndAlso lCurve IsNot Nothing Then
-                lCurve.Color = Color.Blue
-                lCurve.Line.Width = 2
+            End If
+            lCurve = AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "High", "", Drawing2D.DashStyle.Solid, aMinX, aMaxX)
+            If lCurve IsNot Nothing Then
+                Me.Exceedance = True
+                If lOneCurve Then
+                    lCurve.Color = Color.Blue
+                    lCurve.Line.Width = 2
+                End If
             End If
 
             'Only add confidence intervals when we have one dataset and one n-day
             If lOneCurve Then
                 'Dim lCIcolor As Color = Color.FromArgb(80, aCurveColor.R, aCurveColor.G, aCurveColor.B)
                 Dim lCIcolor As Color = Color.Red
-                AddAttributeCurve(aTimeseries, aPane, lCIcolor, lNdays & "Low", " CI Upper", Drawing2D.DashStyle.Dash)
-                AddAttributeCurve(aTimeseries, aPane, lCIcolor, lNdays & "High", " CI Upper", Drawing2D.DashStyle.Dash)
-
-                AddAttributeCurve(aTimeseries, aPane, lCIcolor, lNdays & "Low", " CI Lower", Drawing2D.DashStyle.Dot)
-                AddAttributeCurve(aTimeseries, aPane, lCIcolor, lNdays & "High", " CI Lower", Drawing2D.DashStyle.Dot)
+                Dim lHighLowWord As String
+                If lHigh Then
+                    lHighLowWord = "High"
+                Else
+                    lHighLowWord = "Low"
+                End If
+                AddAttributeCurve(aTimeseries, aPane, lCIcolor, lNdays & lHighLowWord, " CI Upper", Drawing2D.DashStyle.Dash, aMinX, aMaxX)
+                AddAttributeCurve(aTimeseries, aPane, lCIcolor, lNdays & lHighLowWord, " CI Lower", Drawing2D.DashStyle.Dot, aMinX, aMaxX)
             End If
         Next
     End Sub
@@ -235,7 +284,7 @@ Public Class clsGraphFrequency
                 Dim lY As Double = lCurve.Points(lPointIndex).Y
                 If lY > 0 AndAlso Not Double.IsInfinity(lY) Then
                     Dim lX As Double = lCurve.Points(lPointIndex).X
-                    If lX >= aPane.XAxis.Scale.Min AndAlso lX <= aPane.XAxis.Scale.Max Then
+                    If lX >= 0.01 AndAlso lX <= 0.99 Then
                         lYMax = Math.Max(lYMax, lY)
                         lYMin = Math.Min(lYMin, lY)
                     End If
@@ -250,6 +299,8 @@ Public Class clsGraphFrequency
             aPane.YAxis.Scale.MinAuto = False
             aPane.YAxis.Scale.Max = Math.Pow(10, Math.Ceiling(Log10(lYMax)))
             aPane.YAxis.Scale.Min = Math.Pow(10, Math.Floor(Log10(lYMin)))
+            Debug.Print("setYRange: Min " & aPane.YAxis.Scale.Min)
+            Debug.Print("setYRange: Max " & aPane.YAxis.Scale.Max)
         End If
     End Sub
 
@@ -266,7 +317,10 @@ Public Class clsGraphFrequency
         For Each lBin As ArrayList In aTimeseries.Attributes.GetValue("Bins")
             For Each lValue As Double In lBin
                 lY(lDataIndex) = lValue
-                lXFracExceed(lDataIndex) = 1 - ((lDataIndex + 1) / CDbl(lDataCount + 1))
+                lXFracExceed(lDataIndex) = ((lDataIndex + 1) / CDbl(lDataCount + 1))
+                If pExceedance Then
+                    lXFracExceed(lDataIndex) = 1 - lXFracExceed(lDataIndex)
+                End If
                 lDataIndex += 1
             Next
         Next
@@ -285,7 +339,16 @@ Public Class clsGraphFrequency
                                        ByVal aCurveColor As Color, _
                                        ByVal aAttributePrefix As String, _
                                        ByVal aAttributeSuffix As String, _
-                                       ByVal aCurveStyle As Drawing2D.DashStyle) As LineItem
+                                       ByVal aCurveStyle As Drawing2D.DashStyle, _
+                                       ByVal aMinX As Double, _
+                                       ByVal aMaxX As Double) As LineItem
+
+        If aMinX > aMaxX Then
+            Dim lTemp As Double = aMinX
+            aMinX = aMaxX
+            aMaxX = lTemp
+        End If
+
         Dim lPreLen As Integer = aAttributePrefix.Length
         Dim lSufLen As Integer = aAttributeSuffix.Length
         Dim lReturnStr As String
@@ -298,7 +361,11 @@ Public Class clsGraphFrequency
                 lReturnStr = lName.Substring(lPreLen, lName.Length - lPreLen - lSufLen)
                 If Double.TryParse(lReturnStr, lReturnDbl) Then
                     'Logger.Dbg("Found Attribute " & lName)
-                    lPoints.Add(lReturnDbl, lAttribute.Value)
+                    Dim lValue As Double = lAttribute.Value
+                    If aTimeseries.Attributes.ContainsAttribute(lName & "Adj") Then
+                        Double.TryParse(aTimeseries.Attributes.GetValue(lName & "Adj", ""), lValue)
+                    End If
+                    lPoints.Add(lReturnDbl, lValue)
                 End If
             End If
         Next
@@ -306,9 +373,14 @@ Public Class clsGraphFrequency
         If lPoints.Count > 0 Then
             Dim lZedGraphPoints As New ZedGraph.PointPairList
             For Each lPoint As DictionaryEntry In lPoints
-                Dim lX As Double = 1 - 1 / lPoint.Key
+                Dim lX As Double = 1 / lPoint.Key
+                'If pExceedance Then
+                'lX = 1 - lX
+                'End If
+                'If lX >= aMinX AndAlso lX <= aMaxX Then
                 'Logger.Dbg("Add Point " & lPoint.Key & " = " & lPoint.Value)
                 lZedGraphPoints.Add(New ZedGraph.PointPair(lX, lPoint.Value, CStr(lPoint.Key)))
+                'End If
             Next
             Dim lCurve As LineItem = aPane.AddCurve(aAttributePrefix & aAttributeSuffix, lZedGraphPoints, aCurveColor, SymbolType.None)
             lCurve.Line.Style = aCurveStyle
