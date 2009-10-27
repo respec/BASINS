@@ -333,7 +333,7 @@ CaseExistRenumber:
                 lWriteIt = True
             End If
 
-            If lWriteIt Then
+            If lWriteIt AndAlso lNvals > 0 Then
                 Dim lTSFill As Double = lTimser.Attributes.GetValue("tsfill", -999)
                 If Double.IsNaN(lTSFill) Then lTSFill = -999
                 Dim lValue As Double
@@ -346,7 +346,7 @@ CaseExistRenumber:
                 Next
 
                 'J2DateRoundup(lTimser.Dates.Value(0), lTu, lSDat)
-                J2DateRoundDown(lTimser.Dates.Value(0), lTu, lSDat)
+                J2DateRounddown(lTimser.Dates.Value(0), lTu, lSDat)
 
                 'Logger.Dbg("atcDataSourceWdm:AddDataset:WDTPUT:call:" & _
                 '            lWdmHandle.Unit & ":" & lDsn & ":" & lTs & ":" & lNvals & ":" & _
@@ -527,7 +527,12 @@ CaseExistRenumber:
 
         If lTu < atcTimeUnit.TUYear Then
             Dim lCSDat(6) As Integer
-            J2Date(aTs.Dates.Value(0), lCSDat)
+            If aTs.Dates Is Nothing OrElse aTs.Dates.numValues = 0 Then 'no dates in timeseries
+                lCSDat(0) = 1950
+            Else
+                J2Date(aTs.Dates.Value(0), lCSDat)
+            End If
+
             Dim lDecade As Integer = lCSDat(0) Mod 10
             If lDecade > 0 Then 'subtract back to start of this decade
                 lIVal = lCSDat(0) - lDecade
