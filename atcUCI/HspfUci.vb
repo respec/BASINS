@@ -1083,11 +1083,12 @@ Public Class HspfUci
                                ByVal aWdmId As atcWDM.atcDataSourceWDM, _
                                ByRef aBaseDsn As Integer, _
                                ByRef aDsns() As Integer, _
-                               ByRef aOstr() As String)
+                               ByRef aOstr() As String, _
+                               Optional ByRef aUpstreamArea As Double = 0.0)
         'TODO: think this through with PaulDuda!!!!!
         If pWdmCount = 0 Then
             pWDMObj(1) = aWdmId
-            AddExpertSystem(aId, aLocn, 1, aBaseDsn, aDsns, aOstr)
+            AddExpertSystem(aId, aLocn, 1, aBaseDsn, aDsns, aOstr, aUpstreamArea)
         End If
     End Sub
 
@@ -1096,7 +1097,8 @@ Public Class HspfUci
                                ByVal aWdmId As Integer, _
                                ByRef aBaseDsn As Integer, _
                                ByRef aDsns() As Integer, _
-                               ByRef aOstr() As String)
+                               ByRef aOstr() As String, _
+                               Optional ByRef aUpstreamArea As Double = 0.0)
         'add data sets
         AddExpertDsns(aId, aLocn, aWdmId, aBaseDsn, aDsns, aOstr)
         'add to copy block
@@ -1104,11 +1106,14 @@ Public Class HspfUci
         AddOperation("COPY", lCopyId)
         AddTable("COPY", lCopyId, "TIMESERIES")
         Dim lTable As HspfTable = OpnBlks("COPY").OperFromID(lCopyId).Tables("TIMESERIES")
-        lTable.Parms("NMN").Value = 7
+        lTable.Parms("NMN").Value = 8
         'add to opn seq block
         OpnSeqBlock.Add(OpnBlks("COPY").OperFromID(lCopyId))
         'add to ext targets block
-        Dim lContribArea As Double = UpstreamArea(OpnBlks.Item("RCHRES").OperFromID(aId))
+        Dim lContribArea As Double = aUpstreamArea
+        If aUpstreamArea < 0.001 Then
+            lContribArea = UpstreamArea(OpnBlks.Item("RCHRES").OperFromID(aId))
+        End If
         AddExpertExtTargets(aId, lCopyId, lContribArea, aDsns, aOstr)
         'add mass-link and schematic copy records
         AddExpertSchematic(aId, lCopyId)
@@ -1129,27 +1134,34 @@ Public Class HspfUci
         aOstr(6) = "SAET    "
         aOstr(7) = "UZSX    "
         aOstr(8) = "LZSX    "
+        aOstr(9) = "SUPY    "
 
         If aWdmId > 0 Then 'okay to continue
             Dim lDsn As Integer = aBaseDsn
             Dim lScenario As String = IO.Path.GetFileNameWithoutExtension(Name)
 
-            For lIndex As Integer = 1 To 8 'create each of the expert system dsns
-                lDsn = FindFreeDSN(aWdmId, lDsn)
-                Dim lGenTs As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
-                With lGenTs.Attributes
-                    .SetValue("ID", lDsn)
-                    .SetValue("Scenario", lScenario.ToUpper)
-                    .SetValue("Constituent", aOstr(lIndex).ToUpper)
-                    .SetValue("Location", aLocn.ToUpper)
-                    .SetValue("TU", 4)
-                    .SetValue("TS", 1)
-                    .SetValue("TSTYPE", aOstr(lIndex).ToUpper)
-                End With
-                Dim lTsDate As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
-                lGenTs.Dates = lTsDate
+            For lIndex As Integer = 1 To 9 'create each of the expert system dsns if missing
+                'TODO: debug this!
+                Dim lMatchTimser As Collection = FindTimser(lScenario, aLocn, aOstr(lIndex).ToUpper)
+                If lMatchTimser.Count > 0 Then
+                    lDsn = CType(lMatchTimser(0), atcTimeseries).Attributes.GetValue("ID", 0).Value
+                Else
+                    lDsn = FindFreeDSN(aWdmId, lDsn)
+                    Dim lGenTs As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
+                    With lGenTs.Attributes
+                        .SetValue("ID", lDsn)
+                        .SetValue("Scenario", lScenario.ToUpper)
+                        .SetValue("Constituent", aOstr(lIndex).ToUpper)
+                        .SetValue("Location", aLocn.ToUpper)
+                        .SetValue("TU", 4)
+                        .SetValue("TS", 1)
+                        .SetValue("TSTYPE", aOstr(lIndex).ToUpper)
+                    End With
+                    Dim lTsDate As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
+                    lGenTs.Dates = lTsDate
 
-                Dim lAddedDsn As Boolean = pWDMObj(aWdmId).AddDataset(lGenTs)
+                    Dim lAddedDsn As Boolean = pWDMObj(aWdmId).AddDataset(lGenTs)
+                End If
                 aDsn(lIndex) = lDsn
             Next lIndex
         Else 'no wdm files in this uci
@@ -1354,8 +1366,8 @@ Public Class HspfUci
         If copyid > 0 Then
             MFact = 1.0# / ContribArea
             'mfact = Format(mfact, "0.#######")
-            For i = 2 To 8
-                If i < 7 Then
+            For i = 2 To 9
+                If i < 7 Or i = 9 Then
                     Tran = "    "
                 Else
                     Tran = "AVER"
@@ -1430,9 +1442,13 @@ Public Class HspfUci
         lConsName.Add("P:TAET", "5")
         lConsName.Add("P:UZS", "6")
         lConsName.Add("P:LZS", "7")
+        'TODO: figure out if to use a term from SNOW
+        lConsName.Add("P:SUPY", "8")
         lConsName.Add("I:SURO", "1")
         lConsName.Add("I:PET", "4")
         lConsName.Add("I:IMPEV", "5")
+        'TODO: figure out if to use a term from SNOW
+        lConsName.Add("I:SUPY", "8")
 
         'determine mass link numbers
         Dim lPerlndMassLinkNumber As Integer = 0

@@ -11,7 +11,8 @@ Module modHSPFTableBuilder
     Friend g_MetSegmentBuild As Boolean = True
     Friend g_BaseDrive As String = "G"
     Friend g_Debug As Boolean = False
-    Friend g_Project As String = "Susq_020501" '020501" '"CentralAZ" '_SALT" '"Willamette"  
+    Friend g_Project As String = "Susq" ''"CentralAZ" '_SALT" '"Willamette" 
+    Friend g_SubProject As String = "020503" '"020503" '020501
     Friend g_BaseFolder As String
     Friend g_ObsDataWDM As String
     Friend g_OutputWDMCreate As Boolean = True
@@ -23,7 +24,14 @@ Module modHSPFTableBuilder
 
     Sub Initialize()
         g_BaseFolder = g_BaseDrive & ":\Projects\TT_GCRP\ProjectsTT\" & g_Project & "\"
-        g_ObsDataWDM = g_BaseFolder & "parms\Danville.wdm"
+        Select Case g_SubProject
+            Case "020501"
+                g_ObsDataWDM = g_BaseFolder & "parms" & g_SubProject & "\Danville.wdm"
+            Case "020502"
+                g_ObsDataWDM = g_BaseFolder & "parms" & g_SubProject & "\westbrsusq.wdm"
+            Case "020503"
+                g_ObsDataWDM = g_BaseFolder & "parms" & g_SubProject & "\marietta.wdm"
+        End Select
     End Sub
 
     Sub main()
@@ -35,7 +43,41 @@ Module modHSPFTableBuilder
             'ParmSummary()
         End If
 
-        pUci.FastReadUciForStarter(pMsg, "parms\" & g_Project & "starter.uci")
+        Dim lTransWdmName As String = ""
+        Dim lConnectionTable As New atcTableDelimited
+        Dim lTargetCons() As String = {"FVOL", "SED1", "SED2", "SED3", "DQAL1", "DQAL2"}
+
+        If IO.File.Exists("parms\" & g_Project & "Trans.txt") Then
+            lConnectionTable.Delimiter = ","
+            lConnectionTable.OpenFile("parms\" & g_Project & "Trans.txt")
+            Dim lHspfTimeseriesTransferDetails As ArrayList = lConnectionTable.PopulateObjects((New HspfTimeseriesTransferDetails).GetType)
+
+            lTransWdmName = "parms\" & g_Project & "Trans.wdm"
+            If Not IO.File.Exists(lTransWdmName) Then
+                Dim lTransWdm As New atcWDM.atcDataSourceWDM
+                Dim lTransDataset As New atcData.atcTimeseries(Nothing)
+                lTransDataset.Attributes.SetValue("TU", 3)
+                lTransDataset.Attributes.SetValue("TS", 1)
+
+                If lTransWdm.Open(lTransWdmName) Then
+                    Logger.Dbg("OpenedTransferWdmFile " & lTransWdm.Name)
+                Else
+                    Logger.Dbg("*** ProblemOpeningTransferWdmFile " & lTransWdmName)
+                End If
+                For Each lHspfTimeseriesTransferDetail As HspfTimeseriesTransferDetails In lHspfTimeseriesTransferDetails
+                    Dim lId As Integer = lHspfTimeseriesTransferDetail.BaseDsn
+                    For Each lTargetCon As String In lTargetCons
+                        Dim lTransdatasetToAdd As atcData.atcTimeseries = lTransDataset.Clone
+                        lTransdatasetToAdd.Attributes.SetValue("ID", lId)
+                        lTransdatasetToAdd.Attributes.SetValue("Constituent", lTargetCon)
+                        lTransWdm.AddDataset(lTransdatasetToAdd)
+                        lId += 1
+                    Next
+                Next
+            End If
+        End If
+
+        pUci.FastReadUciForStarter(pMsg, "parms" & g_SubProject & "\" & g_Project & g_SubProject & "starter.uci")
         Dim lError As String = pUci.ErrorDescription
         If lError.Length > 0 Then
             Logger.Dbg("UciReadError " & lError)
@@ -43,9 +85,9 @@ Module modHSPFTableBuilder
         End If
         Logger.Dbg("UCI " & pUci.Name & " Opened")
 
-        lError(+pUci.Name = FilenameNoExt(pUci.Name).Replace("starter", ""))
-
+        pUci.Name = FilenameNoExt(pUci.Name).Replace("starter", "")
         pUci.Name = FilenameNoExt(pUci.Name) & "Aft.uci"
+
         If g_MetSegmentBuild Then
             FixMetSegments(pUci)
             pUci.Name = FilenameNoExt(pUci.Name) & "Met.uci"
@@ -155,8 +197,8 @@ Module modHSPFTableBuilder
         End If
 
         'open or create a wdm file for output as needed
-        Dim lDefaultOutputWdmFileName As String = "parms\" & g_Project & ".wdm"
-        If g_OutputWdmCreate AndAlso IO.File.Exists(lDefaultOutputWdmFileName) Then
+        Dim lDefaultOutputWdmFileName As String = "parms" & g_SubProject & "\" & g_Project & g_SubProject & ".wdm"
+        If g_OutputWDMCreate AndAlso IO.File.Exists(lDefaultOutputWdmFileName) Then
             IO.File.Delete(lDefaultOutputWdmFileName)
         End If
         Dim lWdmOutput As New atcWDM.atcDataSourceWDM
@@ -179,13 +221,17 @@ Module modHSPFTableBuilder
             End If
         Next
 
-        Dim pExpertSystemLocsFileName As String = "parms\ExpertSystemLocs.txt"
+        Dim pExpertSystemLocsFileName As String = "parms" & g_SubProject & "\ExpertSystemLocs.txt"
         If IO.File.Exists(pExpertSystemLocsFileName) Then
             Dim lOstr(28) As String
             Dim lDsns(28) As Integer
             For Each lRecord As String In LinesInFile(pExpertSystemLocsFileName)
-                Dim lParms() As String = lRecord.Split(",") 'reachId, location, base dsn
-                pUci.AddExpertSystem(lParms(0), lParms(1), lWdmOutput, lParms(2), lDsns, lOstr)
+                Dim lParms() As String = lRecord.Split(",") 'reachId, location, base dsn, upstreamArea(including this uci)
+                Dim lUpstreamArea As Double = 0.0
+                If lParms.GetUpperBound(0) > 2 Then
+                    lUpstreamArea = lParms(3)
+                End If
+                pUci.AddExpertSystem(lParms(0), lParms(1), lWdmOutput, lParms(2), lDsns, lOstr, lUpstreamArea)
             Next
             pUci.Name = FilenameNoExt(pUci.Name) & "Expert.uci"
             pUci.Save()
@@ -199,10 +245,17 @@ Module modHSPFTableBuilder
             End If
         End If
 
-        IO.File.Copy(pUci.Name, "parms\" & g_Project & ".uci", True)
+        IO.File.Copy(pUci.Name, "parms" & g_SubProject & "\" & g_Project & g_SubProject & ".uci", True)
         Logger.Dbg("AllDone")
     End Sub
 
+    Friend Class HspfTimeseriesTransferDetails
+        Public SourceHuc As Integer
+        Public SourceId As Integer
+        Public TargetHuc As Integer
+        Public TargetId As Integer
+        Public BaseDsn As Integer
+    End Class
     '
     'TODO: remaining code from WinHSPF - modWinHSPF - need to refactor both and move to atcUCI
     '

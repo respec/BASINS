@@ -6,6 +6,9 @@ Module modBuildMetSegments
     Sub FixMetSegments(ByVal aUci As HspfUci)
         Logger.Dbg("FixMetSegments")
         Dim lMetSegmentPath As String = g_BaseFolder & "MetSegments\"
+        If g_SubProject.Length > 0 Then
+            lMetSegmentPath &= g_SubProject & "\"
+        End If
         Dim lMetDataTypes() As String = {"PREC", "ATEM", "PEVT"}
 
         'be sure correct number of met inputs available in each segment
