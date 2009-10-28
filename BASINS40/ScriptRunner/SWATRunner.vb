@@ -625,7 +625,7 @@ DOSUMMARYONLY:
             Dim lTotalAreaCornNow As Double = 0.0
             Dim lCropChangesSummaryFilename As String = IO.Path.Combine(pLogsFolder, "CropChanges.txt")
             Dim lCropChangesHruFilename As String = IO.Path.Combine(pLogsFolder, "CropHruChanges.txt")
-            Dim lCropConversions As New CropConversions("CORN")
+            Dim lCropConversions As New CropConversions("CORNX")
 
             If pCropChangeSummarize Then ' This switch has to be set to True in order to set the lTotalAreaCornNow
                 SummarizeCropChange(lSwatInput, _
@@ -707,13 +707,13 @@ DOSUMMARYONLY:
                 If pScenario.Contains("Exist") Then
                     ' No landuse change
                 ElseIf pScenario.Contains("2010") Then
-                    lDesiredFutureCornArea += 1410.26
+                    'lDesiredFutureCornArea += 1410.26
                 ElseIf pScenario.Contains("2015") Then
-                    lDesiredFutureCornArea += 1730.24
+                    lDesiredFutureCornArea += 3439.9
                 ElseIf pScenario.Contains("2020") Then
-                    lDesiredFutureCornArea += 1602.83
+                    lDesiredFutureCornArea += 5139.6
                 ElseIf pScenario.Contains("2022") Then
-                    lDesiredFutureCornArea += 1523.6
+                    lDesiredFutureCornArea += 5746.7
                 End If
 
                 Logger.Dbg("DesiredFutureCornArea = " & lDesiredFutureCornArea)
@@ -2373,6 +2373,15 @@ Module SWATArea
                 Me.Add(New CropConversion("AGRR", 0.0, "CCCC", "CSC1", "SCS1"))
                 Me.Add(New CropConversion("CRP", 0.0, "CCCC", "CSC1", "SCS1"))
                 Me.Add(New CropConversion("HAY", 0.0, "CCCC", "CSC1", "SCS1"))
+            ElseIf aCropToName = "CORNX" Then
+                '"CCCC", "CCS1", "SCC1", "CSC1", "SCS1", "CSS1", "SSC1"
+                Me.Add(New CropConversion("CCCC", 0.0, "CSC1", "SCS1"))
+                Me.Add(New CropConversion("CSC1", 0.5, "CSC1"))
+                Me.Add(New CropConversion("SCS1", 0.5, "SCS1"))
+                Me.Add(New CropConversion("CCS1", 0.66667, "CCS1"))
+                Me.Add(New CropConversion("CSS1", 0.33333, "CSS1"))
+                Me.Add(New CropConversion("SCC1", 0.66667, "SCC1"))
+                Me.Add(New CropConversion("SSC1", 0.33333, "SSC1"))
             End If
         End Sub
     End Class
