@@ -523,7 +523,7 @@ NextRecord:
                                             If Not Double.TryParse(.Value(lField).Trim, lVd(lValueIndex)) Then
                                                 lVd(lValueIndex) = pNaN
                                             End If
-                                            lReadValues(lLocationIndex) = lVd
+                                            If lFinalReadingIndex > 0 Then lReadValues(lLocationIndex) = lVd
                                         End If
                                     Next
 NextRecord:

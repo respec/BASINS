@@ -460,7 +460,7 @@ NextIteration:
                     .DataSets = lOriginalDatasets
                 End With
             End If
-            End If
+        End If
     End Sub
 
     Friend Function MemUsage() As String
