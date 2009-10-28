@@ -395,7 +395,6 @@ NextRecord:
     End Sub
 
     Public Overrides Sub ReadData(ByVal aReadMe As atcDataSet)
-        Dim lField As Integer
         If Not DataSets.Contains(aReadMe) Then
             Logger.Dbg("Dataset not from this source:" & aReadMe.ToString & vbCrLf & _
                        "Source:'" & Specification & "'")
@@ -422,6 +421,7 @@ NextRecord:
             If lFinalReadingIndex < 0 Then
                 Logger.Dbg("No datasets to read")
             Else
+                Dim lField As Integer = lReadField(0)
                 Dim lTable As atcTable = OpenTable()
                 If lTable Is Nothing Then
                     Logger.Dbg("Unable to open " & Specification)
@@ -514,7 +514,6 @@ NextRecord:
                                     Else
                                         lLocation = .Value(1).Trim
                                     End If
-
                                     For lLocationIndex = 0 To lFinalReadingIndex
                                         If lReadLocation(lLocationIndex) = lLocation Then
                                             If lFinalReadingIndex > 0 Then
