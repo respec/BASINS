@@ -90,10 +90,10 @@ Module SWATRunner
             .Add("CrpFutureColumn", pCrpFutureColumn)
             .Add("SWATExe", pSWATExe)
 
-            .Add("Change Rainfall", pchangePCP)
-            .Add("Change Temperature", pchangeTemp)
-            .Add("Change Fertilization Rate", pchangeFert)
-            .Add("Remove Corn Residue", pchangeResRmv)
+            '.Add("Change Rainfall", pchangePCP)
+            '.Add("Change Temperature", pchangeTemp)
+            '.Add("Change Fertilization Rate", pchangeFert)
+            '.Add("Remove Corn Residue", pchangeResRmv)
 
         End With
         If pUserInteractiveUpdate Then
@@ -121,15 +121,15 @@ Module SWATRunner
                     pBaseFolder = .ItemByKey("BaseFolder")
                     pSWATGDB = .ItemByKey("SWATGDB")
                     pOutGDB = .ItemByKey("OutGDB")
-                    pParmChangesTextfile = .ItemByKey("ParmChangesTextfile")
-                    pCrpFuture = .ItemByKey("CrpFutureTextfile")
-                    pCrpFutureColumn = .ItemByKey("CrpFutureColumn")
+                    'pParmChangesTextfile = .ItemByKey("ParmChangesTextfile")
+                    'pCrpFuture = .ItemByKey("CrpFutureTextfile")
+                    'pCrpFutureColumn = .ItemByKey("CrpFutureColumn")
                     pSWATExe = .ItemByKey("SWATExe")
 
-                    pchangePCP = .ItemByKey("Change Rainfall")
-                    pchangeTemp = .ItemByKey("Change Temperature")
-                    pchangeFert = .ItemByKey("Change Fertilization Rate")
-                    pchangeResRmv = .ItemByKey("Remove Corn Residue")
+                    'pchangePCP = .ItemByKey("Change Rainfall")
+                    'pchangeTemp = .ItemByKey("Change Temperature")
+                    'pchangeFert = .ItemByKey("Change Fertilization Rate")
+                    'pchangeResRmv = .ItemByKey("Remove Corn Residue")
 
                 End With
             End If
@@ -162,7 +162,9 @@ Module SWATRunner
             'lAllScenarios.Add("ScenExistRevP")
             'lAllScenarios.Add("MetBase")
             'lAllScenarios.Add("SA_FertInc50")
-            lAllScenarios.Add("SA_FertDec10")
+            'lAllScenarios.Add("SA_FertDec10")
+
+            lAllScenarios.Add("ScenExistRevP2007")
 
             For Each pScenario In lAllScenarios
                 pInputFolder = IO.Path.Combine(pBaseFolder, "Scenarios" & IO.Path.DirectorySeparatorChar & pScenario)
@@ -469,7 +471,7 @@ Module SWATRunner
                             'Next
 
                             'change harvest index
-                            lzSwatInput.UpdateSWATGDB("crop", "ICNUM = 19 OR ICNUM = 98 OR ICNUM = 99 OR ICNUM = 100 OR ICNUM = 101", "HVSTI", "0.9")
+                            'lzSwatInput.UpdateSWATGDB("crop", "ICNUM = 19 OR ICNUM = 98 OR ICNUM = 99 OR ICNUM = 100 OR ICNUM = 101", "HVSTI", "0.9")
                         End If
 
                         ''Clean up mgt2
@@ -625,6 +627,7 @@ DOSUMMARYONLY:
             Dim lTotalAreaCornNow As Double = 0.0
             Dim lCropChangesSummaryFilename As String = IO.Path.Combine(pLogsFolder, "CropChanges.txt")
             Dim lCropChangesHruFilename As String = IO.Path.Combine(pLogsFolder, "CropHruChanges.txt")
+            'Dim lCropConversions As New CropConversions("CORN")
             Dim lCropConversions As New CropConversions("CORNX")
 
             If pCropChangeSummarize Then ' This switch has to be set to True in order to set the lTotalAreaCornNow
