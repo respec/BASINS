@@ -667,11 +667,11 @@ Module ManDelin
                 gmax = GisUtil.GridValueAtPoint(lElevationLayerIndex, x2, y2)
             End If
             If aElevUnits = "Centimeters" Then
-                gmin = gmin / 100  'this is an ned grid (in cm), convert to meters
-                gmax = gmax / 100
+                gmin /= 100  'this is an ned grid (in cm), convert to meters
+                gmax /= 100
             ElseIf aElevUnits = "Feet" Then
-                gmin = gmin / 3.281  'this is a grid in ft, convert to meters
-                gmax = gmax / 3.281
+                gmin /= 3.281  'this is a grid in ft, convert to meters
+                gmax /= 3.281
             End If
             If gmax < gmin Then
                 gtemp = gmin
@@ -739,10 +739,10 @@ Module ManDelin
         Dim outputpath As String
         Dim success As Boolean
         outputpath = PathNameOnly(GisUtil.LayerFileName(lStreamsLayerIndex))
-        aOutletThemeName = outputpath & "\outlets" & i & ".shp"
+        aOutletThemeName = outputpath & g_PathChar & "outlets" & i & ".shp"
         Do While FileExists(aOutletThemeName)
             i += 1
-            aOutletThemeName = outputpath & "\outlets" & i & ".shp"
+            aOutletThemeName = outputpath & g_PathChar & "outlets" & i & ".shp"
         Loop
         'add points to the shapefile
         Dim lShapefile As New MapWinGIS.Shapefile

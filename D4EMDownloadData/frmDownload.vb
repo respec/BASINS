@@ -190,9 +190,10 @@ Public Class frmDownload
                         chkSTORET_Results.Enabled = True
                         chkSTORET_Results.Text = "Results"
                         chkSTORET_Results.Checked = True
-                    Case "met"
-                        chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
-                        chkBASINS_MetData.Enabled = True
+                    Case Else
+                        If lFilename.StartsWith("met") Then
+                            chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
+                        End If
                 End Select
             End If
         End If
@@ -553,8 +554,10 @@ Public Class frmDownload
     Private Sub chkBASINS_MetData_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkBASINS_MetData.CheckedChanged
         If chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.GrayText Then
             If chkBASINS_MetData.Checked Then
-                MapWinUtility.Logger.Msg("BASINS Met Stations must be downloaded then selected on map" & vbCrLf _
-                                       & "before downloading BASINS Met Data", "Met Data Prerequisite")
+                MapWinUtility.Logger.Msg("1. Download BASINS Met Stations" & vbCrLf _
+                                       & "2. Choose the Weather Station Sites layer on the map" & vbCrLf _
+                                       & "3. Selected stations to get data for on the map" & vbCrLf _
+                                       & "4. Download BASINS Met Data", "One or more Met Stations must be selected")
                 chkBASINS_MetData.Checked = False
             End If
         End If

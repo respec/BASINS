@@ -1248,7 +1248,9 @@ AtEndOfStream:
                             pCurrentLine = ""
                             Return False
                         End If
-                        Logger.Progress(pStreamReader.BaseStream.Position / pStreamReader.BaseStream.Length * 1000, 1000)
+                        If pLength > 0 Then
+                            Logger.Progress(pStreamReader.BaseStream.Position / pLength * 1000, 1000)
+                        End If
                         Return True
                     End If
                 Catch lEndOfStreamException As IO.EndOfStreamException

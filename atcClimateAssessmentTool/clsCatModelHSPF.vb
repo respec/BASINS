@@ -83,7 +83,7 @@ Public Class clsCatModelHSPF
                     Else
                         'Commented out code preserves path of original file, we are putting Modified files in same folder as modified UCI
                         'lPathname = PathNameOnly(lFilename)
-                        'If lPathname.Length > 0 Then lPathname &= "\"
+                        'If lPathname.Length > 0 Then lPathname &= g_PathChar
                         'lFilename = lPathname & aNewScenarioName & "." & FilenameNoPath(lFilename)
                         lFilename = aNewScenarioName & "." & FilenameNoPath(lFilename)
                         lNewFilesBlock &= lCurrentLine.Substring(0, 16) & lFilename & lSaveLineEnd & vbLf
@@ -126,7 +126,7 @@ Public Class clsCatModelHSPF
 
         If IO.File.Exists(pBaseScenario) Then
             Dim lNewBaseFilename As String = AbsolutePath(pBaseScenario, CurDir)
-            Dim lNewFolder As String = PathNameOnly(lNewBaseFilename) & "\"
+            Dim lNewFolder As String = PathNameOnly(lNewBaseFilename) & g_PathChar
             lNewBaseFilename = lNewFolder & aNewScenarioName & "."
             Dim lNewUCIfilename As String = ""
 
@@ -203,7 +203,7 @@ Public Class clsCatModelHSPF
 
             If aRunModel Then
                 'Run scenario
-                Dim lWinHspfLtExeName As String = FindFile("Please locate WinHspfLt.exe", "\BASINS\models\HSPF\bin\WinHspfLt.exe")
+                Dim lWinHspfLtExeName As String = FindFile("Please locate WinHspfLt.exe", g_PathChar & "BASINS\models\HSPF\bin\WinHspfLt.exe")
 
                 Dim lPipeHandles As String = " -1 -1 "
                 If aShowProgress Then lPipeHandles = " "
@@ -212,7 +212,7 @@ Public Class clsCatModelHSPF
 
                 ''don't let winhspflt bring up message boxes
                 'Dim lBaseFolder As String = PathNameOnly(AbsolutePath(BaseScenario, CurDir))
-                'SaveFileString(lBaseFolder & "\WinHSPFLtError.Log", "WinHSPFMessagesFollow:" & vbCrLf)
+                'SaveFileString(lBaseFolder & g_PathChar & "WinHSPFLtError.Log", "WinHSPFMessagesFollow:" & vbCrLf)
 
                 AppendFileString(lNewFolder & "WinHSPFLtError.Log", "Start log for " & lNewBaseFilename & vbCrLf)
                 Dim lArgs As String = lPipeHandles & lNewUCIfilename
@@ -240,7 +240,7 @@ Public Class clsCatModelHSPF
                     If aNewScenarioName.ToLower = "base" Then
                         lNewFilename = lBinOutFilename
                     Else
-                        lNewFilename = PathNameOnly(lBinOutFilename) & "\" & aNewScenarioName & "." & IO.Path.GetFileName(lBinOutFilename)
+                        lNewFilename = PathNameOnly(lBinOutFilename) & g_PathChar & aNewScenarioName & "." & IO.Path.GetFileName(lBinOutFilename)
                     End If
                     If IO.File.Exists(lNewFilename) Then
                         'Dim lHBNResults As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
