@@ -62,22 +62,19 @@ Public Class atcTimeseriesSWAT
         If IO.Path.GetFileNameWithoutExtension(Specification) = "tab" Then
             lTable = New atcTableDelimited
             pTableDelimited = True
+            lTable.NumHeaderRows = 0
+            CType(lTable, atcTableDelimited).Delimiter = vbTab
+            pBaseDataField = 6
+            pSubIdField = 3
         Else
             lTableStreaming = New atcTableFixedStreaming
             lTable = lTableStreaming
             pTableDelimited = False
+            lTable.NumHeaderRows = 9
+            pBaseDataField = 4
+            pSubIdField = 2
         End If
         With lTable
-            If pTableDelimited Then
-                .NumHeaderRows = 0
-                CType(lTable, atcTableDelimited).Delimiter = vbTab
-                pBaseDataField = 6
-                pSubIdField = 3
-            Else
-                .NumHeaderRows = 9
-                pBaseDataField = 4
-                pSubIdField = 2
-            End If
             If .OpenFile(Specification) Then
                 Dim lConstituentHeader As String = ""
                 If Not pTableDelimited Then
@@ -117,7 +114,7 @@ Public Class atcTimeseriesSWAT
                             lFieldStart += .FieldLength(lField)
                         Next
                     Case ".hru", ".hrux"
-                       'Default SWAT header is off by one character, we insert a space after first SURQ
+                        'Default SWAT header is off by one character, we insert a space after first SURQ
                         lConstituentHeader = "LULC HRU      GIS  SUB  MGT  MON   AREAkm2  PRECIPmm SNOFALLmm SNOMELTmm     IRRmm     PETmm      ETmm SW_INITmm  SW_ENDmm    PERCmm GW_RCHGmm DA_RCHGmm   REVAPmm  SA_IRRmm  DA_IRRmm   SA_STmm   DA_STmm SURQ_GENmmSURQ_CNTmm   TLOSSmm    LATQmm    GW_Qmm    WYLDmm   DAILYCN TMP_AVdgC TMP_MXdgC TMP_MNdgCSOL_TMPdgCSOLARMJ/m2  SYLDt/ha  USLEt/haN_APPkg/haP_APPkg/haNAUTOkg/haPAUTOkg/ha NGRZkg/ha PGRZkg/haNCFRTkg/haPCFRTkg/haNRAINkg/ha NFIXkg/ha F-MNkg/ha A-MNkg/ha A-SNkg/ha F-MPkg/haAO-LPkg/ha L-APkg/ha A-SPkg/ha DNITkg/ha  NUPkg/ha  PUPkg/ha ORGNkg/ha ORGPkg/ha SEDPkg/haNSURQkg/haNLATQkg/ha NO3Lkg/haNO3GWkg/ha SOLPkg/ha P_GWkg/ha    W_STRS  TMP_STRS    N_STRS    P_STRS  BIOMt/ha       LAI   YLDt/ha   BACTPct  BACTLPct"
                         pSaveSubwatershedId = True
                         If Not pTableDelimited Then
@@ -408,8 +405,8 @@ NextRecord:
 
             AddTsToList(aReadMe, lReadThese, lReadLocation, lReadField, lReadValues)
 
-            If Me.DataSets.Count < 3000 Then
-                'Reading all datasets at once is much faster than one at a time
+            'Reading all datasets at once is much faster than one at a time, but all might be too large
+            If Me.DataSets.Count * pNumValues < 100000000 Then 'Read them all if they will fit in ~1G
                 For Each lReadTS In Me.DataSets
                     If lReadTS.Serial <> aReadMe.Serial AndAlso lReadTS.ValuesNeedToBeRead Then
                         AddTsToList(lReadTS, lReadThese, lReadLocation, lReadField, lReadValues)
@@ -499,7 +496,7 @@ NextRecord:
                                             Next
                                         End If
                                         If lYear <> lYearReading Then
-                                            Logger.Status("Reading year " & lYear, True)
+                                            If pMONcontains = 1 Then Logger.Status("Reading year " & lYear, True)
                                             Logger.Flush()
                                             lYearReading = lYear
                                             If pYearBase = 0 Then pYearBase = lYear
