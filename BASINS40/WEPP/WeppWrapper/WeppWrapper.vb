@@ -13,19 +13,25 @@ Public Module Main
             'begin set block (set things in here)
             '----------------------------------
             'give this particular run an ID
-            Dim lRunId As String = "1"
+            Dim lRunId As String = "16"
 
             'set the WDM file path
-            Dim lWDMFilePath As String = "C:\FTB\wdm\FBmet.wdm"
+            Dim lWDMFilePath As String = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\ucis.wdms\FBmet.wdm"
+            'check if the path is more than 64 characters
+            If lWDMFilePath.Length > 64 Then
+                Dim lTempWdmFilePath As String = System.IO.Path.GetTempPath & "\temp.wdm"
+                System.IO.File.Copy(lWDMFilePath, lTempWdmFilePath, True)
+                lWDMFilePath = lTempWdmFilePath
+            End If
 
             'set the output file path
-            Dim lOutputFilePath As String = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\wepp.run\cli.met\" & lRunId & ".cli"
+            Dim lOutputFilePath As String = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\cli.met\" & lRunId & ".cli"
 
             'set the log file path
-            Dim lLogFilePath As String = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\wepp.run\cli.met\" & lRunId & "-log.txt"
+            Dim lLogFilePath As String = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\cli.met\" & lRunId & "-log.txt"
 
             'set the DSNs for constituents
-            Dim lDsnPREC As Integer = 106
+            Dim lDsnPREC As Integer = 11
             Dim lDsnATEM As Integer = 13
             Dim lDsnDEWP As Integer = 17
             Dim lDsnWIND As Integer = 14
@@ -37,7 +43,7 @@ Public Module Main
 
             'Set the flag for exporting the raw timeseries data as a comma-separated textfile (not in WEPP format). Next line is path to export to.
             Dim lRawTsFlag As Boolean = False
-            Dim lRawTsFilePath As String = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\wepp.run\cli.met\" & lRunId & "-RawTs.csv"
+            Dim lRawTsFilePath As String = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\cli.met\" & lRunId & "-RawTs.csv"
 
             'Set arrays of dates for begin/end of model
             'Important: Data must begin on hour "0" of first day and end on hour "24" of last day
@@ -152,7 +158,7 @@ Public Module Main
 
                 lWritePreamble(1) = " 0.0"
                 lWritePreamble(2) = "1".PadLeft(lTableCellWidth, lTableDelimiter) & "1".PadLeft(lTableCellWidth, lTableDelimiter) & "1".PadLeft(lTableCellWidth, lTableDelimiter)
-                lWritePreamble(3) = lTSPREC.Attributes.GetDefinedValue("Parent Timeseries").Value.ToString & "RunID: " & lRunId
+                lWritePreamble(3) = lTSPREC.Attributes.GetDefinedValue("Parent Timeseries").Value.ToString & " - RunID: " & lRunId
                 lWritePreamble(4) = " Latitude Longitude Elevation (m) Obs. Years   Beginning year  Years simulated"
                 lWritePreamble(5) = lTSPREC.Attributes.GetDefinedValue("Latitude").Value.ToString.PadLeft(10, lTableDelimiter) & " " & lTSPREC.Attributes.GetDefinedValue("Longitude").Value.ToString.PadLeft(10, lTableDelimiter) & " " & lElevation.PadLeft(10, lTableDelimiter) & " " & lStrModelEnd(0) - lStrModelBegin(0).ToString.PadLeft(lTableCellWidth, lTableDelimiter) & " " & 1 & " " & lStrModelEnd(0) - lStrModelBegin(0).ToString.PadLeft(lTableCellWidth, lTableDelimiter)
                 lWritePreamble(6) = " Observed monthly ave max temperature (C)"
