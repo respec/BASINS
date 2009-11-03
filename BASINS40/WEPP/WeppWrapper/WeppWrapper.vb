@@ -13,16 +13,16 @@ Public Module Main
             'begin set block (set things in here)
             '----------------------------------
             'give this particular run an ID
-            Dim lRunNumber As String = "test"
+            Dim lRunId As String = "1"
 
             'set the WDM file path
             Dim lWDMFilePath As String = "C:\FTB\wdm\FBmet.wdm"
 
             'set the output file path
-            Dim lOutputFilePath As String = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\wepp.run\cli.met\" & lRunNumber & ".cli"
+            Dim lOutputFilePath As String = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\wepp.run\cli.met\" & lRunId & ".cli"
 
             'set the log file path
-            Dim lLogFilePath As String = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\wepp.run\cli.met\" & lRunNumber & "-log.txt"
+            Dim lLogFilePath As String = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\wepp.run\cli.met\" & lRunId & "-log.txt"
 
             'set the DSNs for constituents
             Dim lDsnPREC As Integer = 106
@@ -32,7 +32,21 @@ Public Module Main
             Dim lDsnSOLR As Integer = 15
             Dim lDsnPEVT As Integer = 16
 
+            'Set the elevation in meters
+            Dim lElevation As String = "150"
 
+            'Set the flag for exporting the raw timeseries data as a comma-separated textfile (not in WEPP format). Next line is path to export to.
+            Dim lRawTsFlag As Boolean = False
+            Dim lRawTsFilePath As String = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\wepp.run\cli.met\" & lRunId & "-RawTs.csv"
+
+            'Set arrays of dates for begin/end of model
+            'Important: Data must begin on hour "0" of first day and end on hour "24" of last day
+            Dim lStrModelBegin() As Integer = {1999, 10, 1, 0, 0, 0}
+            Dim lStrModelEnd() As Integer = {2006, 9, 30, 24, 0, 0}
+
+            'set raw pre int file path
+            Dim lPreInterpolatorRawTsFlag As Boolean = False
+            Dim lPreInterpolatorRawTsFilePath As String = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\wepp.run\cli.met\" & lRunId & "-PreInterpolatorRawTs.csv"
             'end set block
             '----------------------------------
 
@@ -47,17 +61,46 @@ Public Module Main
             Dim lWDMDataSource As New atcWDM.atcDataSourceWDM
             If lWDMDataSource.Open(lWDMFilePath) Then    'use the WDM file name
 
+                'export a raw csv timeseries before the subset by date and interpolator (if lPreInterpolatorRawTsFlag is True)
+                If lPreInterpolatorRawTsFlag Then
+                    Dim TTS As atcTimeseries = lWDMDataSource.DataSets.ItemByKey(lDsnPREC)
+                    Dim lPreInterpolatoeRawTS As System.IO.StreamWriter = System.IO.File.CreateText(lPreInterpolatorRawTsFilePath)
+                    For i = 1 To TTS.Values.Length - 1
+
+                        Dim lDatePre(5) As Integer
+                        J2Date(TTS.Dates.Values(i), lDatePre)
+                        Dim lTempStringPre As String = ""
+                        For j = 0 To 5
+                            lTempStringPre &= lDatePre(j) & ","
+                        Next
+                        lPreInterpolatoeRawTS.WriteLine(lTempStringPre & TTS.Values(i) * 25.4)
+                    Next
+                    lPreInterpolatoeRawTS.Flush()
+                    lPreInterpolatoeRawTS.Close()
+                End If
+
+
                 'successfully opened the wdm
                 Logger.Dbg("Opened " & lWDMDataSource.Name)
-                Logger.Dbg("DSNs for this run: " & "PREC=" & lDsnPREC & " ATEM=" & lDsnATEM & " DEWP=" & lDsnDEWP & " WIND=" & lDsnWIND & " SOLR=" & lDsnPREC & " PEVT=" & lDsnPEVT)
+                Logger.Dbg("DSNs for this run: " & "PREC=" & lDsnPREC & " ATEM=" & lDsnATEM & " DEWP=" & lDsnDEWP & " WIND=" & lDsnWIND & " SOLR=" & lDsnSOLR & " PEVT=" & lDsnPEVT)
 
                 Dim lJulianDate As Double
                 Dim lDate(5) As Integer
 
-                'Set arrays of dates for begin/end of model
-                'Important: Data must begin on hour "0" of first day and end on hour "24" of last day
-                Dim lStrModelBegin() As Integer = {1999, 10, 1, 0, 0, 0}
-                Dim lStrModelEnd() As Integer = {2006, 9, 30, 24, 0, 0}
+                Dim lTempString As String = ""
+                For i = 0 To 5
+                    lTempString &= lStrModelBegin(i).ToString & " "
+                Next
+
+                Logger.Dbg("Model Begin (yyyy mm dd hh mm ss): = " & lTempString)
+
+                lTempString = ""
+                For i = 0 To 5
+                    lTempString &= lStrModelEnd(i).ToString & " "
+                Next
+
+                Logger.Dbg("Model End (yyyy mm dd hh mm ss): = " & lTempString)
+                lTempString = ""
 
                 Dim lTableDelimiter As String = " "
                 Dim lTableCellWidth As Integer = 12
@@ -67,29 +110,37 @@ Public Module Main
 
                 'make timeseries
 
-                'Dim lWDMDataSetIndex As Integer = lWDMDataSource.DataSets.IndexFromKey(102)
-                'Dim lWDMDataSet As atcTimeseries = lWDMDataSource.DataSets.ItemByIndex(lWDMDataSetIndex)
-
                 'PREC
-                Dim lTSPREC As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(107), Date2J(lStrModelBegin), Date2J(lStrModelEnd), lWDMDataSource)
+                Dim lTSPREC As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(lDsnPREC), Date2J(lStrModelBegin), Date2J(lStrModelEnd), lWDMDataSource)
+
+                'print all attributes in the debug log file for checking
                 Dim lSeasons As atcSeasonBase = New atcSeasonsMonth
                 Dim lSeasonalAttributes As New atcDataAttributes
                 lSeasons.SetSeasonalAttributes(lTSPREC, lSeasonalAttributes, lTSPREC.Attributes)
-                'DumpAttributes(lTSPREC)
+                DumpAttributes(lTSPREC)
 
                 'ATEM
-                Dim lTSATEM As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(13), Date2J(lStrModelBegin), Date2J(lStrModelEnd), lWDMDataSource)
+                Dim lTSATEM As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(lDsnATEM), Date2J(lStrModelBegin), Date2J(lStrModelEnd), lWDMDataSource)
                 'DEWP
-                Dim lTSDEWP As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(17), Date2J(lStrModelBegin), Date2J(lStrModelEnd), lWDMDataSource)
+                Dim lTSDEWP As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(lDsnDEWP), Date2J(lStrModelBegin), Date2J(lStrModelEnd), lWDMDataSource)
                 'WIND
-                Dim lTSWIND As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(14), Date2J(lStrModelBegin), Date2J(lStrModelEnd), lWDMDataSource)
+                Dim lTSWIND As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(lDsnWIND), Date2J(lStrModelBegin), Date2J(lStrModelEnd), lWDMDataSource)
                 'SOLR
-                Dim lTSSOLR As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(15), Date2J(lStrModelBegin), Date2J(lStrModelEnd), lWDMDataSource)
+                Dim lTSSOLR As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(lDsnSOLR), Date2J(lStrModelBegin), Date2J(lStrModelEnd), lWDMDataSource)
                 'PEVT
-                Dim lTSPEVT As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(16), Date2J(lStrModelBegin), Date2J(lStrModelEnd), lWDMDataSource)
+                Dim lTSPEVT As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(lDsnPEVT), Date2J(lStrModelBegin), Date2J(lStrModelEnd), lWDMDataSource)
 
-                ' Create a file to write to.
-                Dim lSw As System.IO.StreamWriter = System.IO.File.CreateText(lOutputFilePath)
+                ' Create a file to write WEPP output to
+                Dim lWeppOutputStream As System.IO.StreamWriter = System.IO.File.CreateText(lOutputFilePath)
+
+                'Create a file to write raw Timeseries values to (if lRawTsFlag is true)
+                'constructed below to quiet the error debug messages due to declaration in If statement
+                Dim lRawTsOutputStream As Object
+                Dim lRawTsString As Object
+                If lRawTsFlag Then
+                    lRawTsOutputStream = System.IO.File.CreateText(lRawTsFilePath)
+                    lRawTsString = ""
+                End If
 
                 'sring that grows recursively with each new hour. Gets written at the end of the stat computations.
                 Dim lWriteBreakPointLines As String = ""
@@ -101,10 +152,9 @@ Public Module Main
 
                 lWritePreamble(1) = " 0.0"
                 lWritePreamble(2) = "1".PadLeft(lTableCellWidth, lTableDelimiter) & "1".PadLeft(lTableCellWidth, lTableDelimiter) & "1".PadLeft(lTableCellWidth, lTableDelimiter)
-                lWritePreamble(3) = " FT. Benning - " & lTSPREC.Attributes.GetDefinedValue("Parent Timeseries").Value.ToString
+                lWritePreamble(3) = lTSPREC.Attributes.GetDefinedValue("Parent Timeseries").Value.ToString & "RunID: " & lRunId
                 lWritePreamble(4) = " Latitude Longitude Elevation (m) Obs. Years   Beginning year  Years simulated"
-                lWritePreamble(5) = "32.353".PadLeft(10, lTableDelimiter) & " " & "-84.745".PadLeft(10, lTableDelimiter) & " " & "150".PadLeft(10, lTableDelimiter) & " " & lStrModelEnd(0) - lStrModelBegin(0).ToString.PadLeft(lTableCellWidth, lTableDelimiter) & " " & lStrModelBegin(0).ToString.PadLeft(lTableCellWidth, lTableDelimiter) & " " & lStrModelEnd(0) - lStrModelBegin(0).ToString.PadLeft(lTableCellWidth, lTableDelimiter)
-                lWritePreamble(5) = "32.353".PadLeft(10, lTableDelimiter) & " " & "-84.745".PadLeft(10, lTableDelimiter) & " " & "150".PadLeft(10, lTableDelimiter) & " " & lStrModelEnd(0) - lStrModelBegin(0).ToString.PadLeft(lTableCellWidth, lTableDelimiter) & " " & 1 & " " & lStrModelEnd(0) - lStrModelBegin(0).ToString.PadLeft(lTableCellWidth, lTableDelimiter)
+                lWritePreamble(5) = lTSPREC.Attributes.GetDefinedValue("Latitude").Value.ToString.PadLeft(10, lTableDelimiter) & " " & lTSPREC.Attributes.GetDefinedValue("Longitude").Value.ToString.PadLeft(10, lTableDelimiter) & " " & lElevation.PadLeft(10, lTableDelimiter) & " " & lStrModelEnd(0) - lStrModelBegin(0).ToString.PadLeft(lTableCellWidth, lTableDelimiter) & " " & 1 & " " & lStrModelEnd(0) - lStrModelBegin(0).ToString.PadLeft(lTableCellWidth, lTableDelimiter)
                 lWritePreamble(6) = " Observed monthly ave max temperature (C)"
                 lWritePreamble(7) = "##### Calculated #####"
                 lWritePreamble(8) = " Observed monthly ave min temperature (C)"
@@ -163,6 +213,17 @@ Public Module Main
                         J2Date(lJulianDate, lDate)
                     End If
 
+                    'export current date to string for raw timeseries textfile (if lRawTsFlag is true). vbCrLf is added after we gather the precip value below
+                    If lRawTsFlag Then
+
+                        'loop through the date array and place a "-" between year, month, day hour will be added in the midnight loop (j)
+                        lTempString = ""
+                        For k = 0 To 2
+                            lTempString &= lDate(k).ToString & ","
+                        Next
+
+                    End If
+
                     'Its midnight in the loop "i", so let us loop through 24 hours then calculate the stats.
                     If lDate(3) = 0 AndAlso i <> lHourIndexEnd - 1 Then
 
@@ -213,6 +274,10 @@ Public Module Main
                             lTempDayPrecipAccumulate += lTempRecord
                             lDayOutString = lDayOutString & " " & j.ToString.PadLeft(2, " ") & " " & WEPPformatMoreDetail(lTempDayPrecipAccumulate)
 
+                            'export this hour's values to the debug raw timeseries textfile (if lRawTsFlag is true)
+                            If lRawTsFlag Then
+                                lRawTsOutputStream.WriteLine(lTempString & j & "," & lTempRecord)
+                            End If
 
                             If j = 24 Then
                                 'average things
@@ -239,9 +304,9 @@ Public Module Main
 
                         'Dont append a linefeed if this is the last hour. This prevents blank lines (which is bad, I think).
                         If i = 0 Then
-                            lWriteBreakPointLines = lWriteBreakPointLines & lDayOutString
+                            lWriteBreakPointLines &= lDayOutString
                         Else
-                            lWriteBreakPointLines = lWriteBreakPointLines & vbCrLf & lDayOutString
+                            lWriteBreakPointLines &= vbCrLf & lDayOutString
                         End If
 
                         'reset the string to nothing
@@ -321,7 +386,7 @@ Public Module Main
                 Next
 
                 For k = 1 To 15
-                    lSw.WriteLine(lWritePreamble(k))
+                    lWeppOutputStream.WriteLine(lWritePreamble(k))
                 Next
 
                 'WRITE LINES 16, 17 and subsequent lines.
@@ -331,17 +396,28 @@ Public Module Main
                     lAnnualSummary &= WEPPformat(lYearCollection.Item(i)) & " "
                 Next
 
-                Logger.Dbg("By Month Annual Averages (mm) " & lAnnualSummary)
-                Logger.Dbg("Mean of annual recipitation counts: " & WEPPformat(MeanCollectionOfDoubles(lYearCollection)))
-                lSw.WriteLine(lWriteBreakPointLines)
+                Logger.Dbg("For Stat Checking: Total precipitation for each year (mm): " & lAnnualSummary)
+                Logger.Dbg("For Stat Checking: Mean of Total precipitation for each year (mm): " & WEPPformat(MeanCollectionOfDoubles(lYearCollection)))
+                lWeppOutputStream.WriteLine(lWriteBreakPointLines)
+
+                If lRawTsFlag Then
+                    lRawTsOutputStream.Flush()
+                    lRawTsOutputStream.Close()
+                End If
+
 
                 'clean up file stuff in memory.
-                lSw.Flush()
-                lSw.Close()
-                'lWDMDataSet = Nothing
+                lWeppOutputStream.Flush()
+                lWeppOutputStream.Close()
                 lWDMDataSource = Nothing
             End If
-            Logger.Dbg("Done with " & lRunNumber)
+            Logger.Dbg("Done with " & lRunId)
+
+
+
+
+
+
 
         Catch ex As Exception
             Logger.Dbg("Badness message: " & ex.ToString)
