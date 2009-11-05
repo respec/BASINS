@@ -348,7 +348,7 @@ Public Class atcCollection
 
         Public Sub New(ByVal aCollection As atcCollection)
             pCollection = aCollection
-            pIndex = 0
+            pIndex = -1
         End Sub
 
         ReadOnly Property Current() As Object Implements IEnumerator.Current
@@ -367,7 +367,7 @@ Public Class atcCollection
         End Function
 
         Public Sub Reset() Implements IEnumerator.Reset
-            pIndex = 0
+            pIndex = -1
         End Sub
 
         Public Function GetEnumerator() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
