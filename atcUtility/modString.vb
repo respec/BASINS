@@ -1424,4 +1424,11 @@ TryOldString:
 
     End Function
 
+    Public Function StringQuotedAsNeeded(ByVal aInputString As String, Optional ByVal aDelimiter As String = ",", Optional ByVal aQuote As String = """") As String
+        If aInputString.Contains(aDelimiter) Then
+            Return aQuote & aInputString & aQuote
+        Else
+            Return aInputString
+        End If
+    End Function
 End Module
