@@ -608,7 +608,6 @@ Public Module modReflection
         Return aObjects
     End Function
 
-
     ''' <summary>
     ''' Set a property or field given its name and a new value
     ''' </summary>
@@ -687,6 +686,20 @@ Public Module modReflection
             End If
         End Try
         Return lSetSomething
+    End Function
+
+    Public Function GetSomething(ByRef aObject As Object, ByVal aFieldName As String) As Object
+        Dim lType As Type = aObject.GetType
+        Dim lProperty As Reflection.PropertyInfo = lType.GetProperty(aFieldName)
+        If lProperty IsNot Nothing Then
+            Return lProperty.GetValue(aObject, Nothing)
+        Else
+            Dim lField As Reflection.FieldInfo = lType.GetField(aFieldName)
+            If lField IsNot Nothing Then
+                Return lField.GetValue(aObject)
+            End If
+        End If
+        Return Nothing
     End Function
 
     Public Function MemUsage() As String
