@@ -88,6 +88,10 @@ Public Class atcCollection
         End If
     End Function
 
+    Public Function Increment(ByVal aKey As Object) As Double
+        Return Increment(aKey, 1)
+    End Function
+
     Public Function Increment(ByVal aKey As Object, ByVal aValue As Double) As Double
         Dim lKeyIndex As Integer = IndexFromKey(aKey)
         If lKeyIndex = -1 Then
@@ -328,4 +332,50 @@ Public Class atcCollection
     Public Overrides Function ToString() As String
         Return Me.ToString(10)
     End Function
+
+    Public Function DictionaryEntries() As IEnumerable
+        Return New clsDictionaryEnumerator(Me)
+    End Function
+
+    ''' <summary>
+    ''' Enumerator returns key/value pairs as DictionaryEntry objects
+    ''' </summary>
+    Private Class clsDictionaryEnumerator
+        Implements IEnumerable, IEnumerator, IDisposable
+
+        Private pCollection As atcCollection
+        Private pIndex As Integer
+
+        Public Sub New(ByVal aCollection As atcCollection)
+            pCollection = aCollection
+            pIndex = 0
+        End Sub
+
+        ReadOnly Property Current() As Object Implements IEnumerator.Current
+            Get
+                Return New DictionaryEntry(pCollection.Keys(pIndex), pCollection.ItemByIndex(pIndex))
+            End Get
+        End Property
+
+        Public Function MoveNext() As Boolean Implements IEnumerator.MoveNext
+            If pIndex + 1 < pCollection.Count Then
+                pIndex += 1
+                Return True
+            Else
+                Return False
+            End If
+        End Function
+
+        Public Sub Reset() Implements IEnumerator.Reset
+            pIndex = 0
+        End Sub
+
+        Public Function GetEnumerator() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
+            Return Me
+        End Function
+
+        Public Sub Dispose() Implements IDisposable.Dispose
+        End Sub
+    End Class
 End Class
+
