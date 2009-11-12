@@ -8,6 +8,7 @@ Public Class atcExpertSystem
     Public Sites As New Generic.List(Of HexSite)
     Public ReadOnly SDateJ As Double, EDateJ As Double
 
+    Private pFlowOnly As Boolean
     Private pStatistics As New HexStatistics
     Private pDatasetTypes As New HexDatasetTypes
 
@@ -48,7 +49,9 @@ Public Class atcExpertSystem
     Private Const pConvert As Double = 24.0# * 3600.0# * 12.0# / 43560.0#
     Private Const pNSteps As Integer = 500
 
-    Public Sub New(ByVal aUci As atcUCI.HspfUci, ByVal aDataSource As atcTimeseriesSource)
+    Public Sub New(ByVal aUci As atcUCI.HspfUci, ByVal aDataSource As atcTimeseriesSource, _
+                   Optional ByVal aExpertFlowOnly As Boolean = False)
+        pFlowOnly = aExpertFlowOnly
         pUci = aUci
         pDataSource = aDataSource
         Dim lFileName As String = IO.Path.GetFileNameWithoutExtension(aUci.Name) & ".exs"
@@ -295,9 +298,15 @@ Public Class atcExpertSystem
     End Function
 
     Private Sub CalcStats(ByVal aDataSource As atcTimeseriesSource)
-        Dim lDataSetTypes() As String = {"SimTotRunoff", "ObsStreamflow", _
-                                         "SimInterflow", "SimBaseflow", _
-                                         "ObsPotentialET", "SimActualET"}
+        Dim lDataSetTypes() As String = {"SimTotRunoff", "ObsStreamflow"}
+        If Not pFlowOnly Then
+            ReDim Preserve lDataSetTypes(5)
+            lDataSetTypes(2) = "SimInterflow"
+            lDataSetTypes(3) = "SimBaseflow"
+            lDataSetTypes(4) = "ObsPotentialET"
+            lDataSetTypes(5) = "SimActualET"
+        End If
+
         ReDim pStats(pStatistics.Count, lDataSetTypes.GetUpperBound(0) + 1, Sites.Count)
 
         'get number of values
@@ -653,14 +662,20 @@ Public Class atcExpertSystem
         Dim lStr As String = Space(30) & aTitle & vbCrLf & vbCrLf
         lStr &= Space(30) & _
               "Observed".PadLeft(15) & _
-              "Simulated".PadLeft(15) & _
-              "Simulated".PadLeft(15) & _
-              "Simulated".PadLeft(15) & vbCrLf
+              "Simulated".PadLeft(15)
+        If Not pFlowOnly Then
+            lStr &= "Simulated".PadLeft(15) & _
+                    "Simulated".PadLeft(15)
+        End If
+        lStr &= vbCrLf
         lStr &= Space(30) & _
               "Total Runoff".PadLeft(15) & _
-              "Total Runoff".PadLeft(15) & _
-              "Surface Runoff".PadLeft(15) & _
-              "Interflow".PadLeft(15) & vbCrLf
+              "Total Runoff".PadLeft(15)
+        If Not pFlowOnly Then
+            lStr &= "Surface Runoff".PadLeft(15) & _
+                    "Interflow".PadLeft(15)
+        End If
+        lStr &= vbCrLf
         'Write runoff block
         For lStatPrintIndex As Integer = 1 To pStatistics.Count 'loop for each statistic to print
             For lStatIndex As Integer = 1 To pStatistics.Count
@@ -668,7 +683,9 @@ Public Class atcExpertSystem
                 If lStatistic.PrintPosition = lStatPrintIndex Then
                     lStr &= (lStatistic.Name & " =").PadLeft(30)
                     Dim lColumnPointer() As Integer = {0, 2, 1, 3, 4} 'gets print order correct within statistic
-                    For lColumn As Integer = 1 To 4
+                    Dim lColumnMax As Integer = 4
+                    If pFlowOnly Then lColumnMax = 2
+                    For lColumn As Integer = 1 To lColumnMax
                         If Not Double.IsNaN(pStats(lStatIndex, lColumnPointer(lColumn), aSite)) Then
                             Dim lConv As Double = aConv
                             If lStatIndex = 5 Or lStatIndex = 6 Then 'dont need adjustment for storm peaks or recession rate
@@ -685,13 +702,17 @@ Public Class atcExpertSystem
             Next lStatIndex
         Next lStatPrintIndex
         lStr &= vbCrLf
-        'Write EvapoTranspiration block
-        lStr &= Space(30) & "EvapoTranspiration".PadRight(28) & vbCrLf
-        lStr &= Space(30) & "Potential".PadLeft(15) & "Actual".PadLeft(15) & vbCrLf
-        lStr &= ("total (inches) = ").PadLeft(30)
-        lStr &= DecimalAlign(pStats(1, 5, aSite) / aConv, 15)
-        lStr &= DecimalAlign(pStats(1, 6, aSite) / aConv, 15)
-        lStr &= vbCrLf & vbCrLf
+
+        If Not pFlowOnly Then 'Write EvapoTranspiration block
+            lStr &= Space(30) & "EvapoTranspiration".PadRight(28) & vbCrLf
+            lStr &= Space(30) & "Potential".PadLeft(15) & "Actual".PadLeft(15) & vbCrLf
+            lStr &= ("total (inches) = ").PadLeft(30)
+            lStr &= DecimalAlign(pStats(1, 5, aSite) / aConv, 15)
+            lStr &= DecimalAlign(pStats(1, 6, aSite) / aConv, 15)
+            lStr &= vbCrLf
+        End If
+
+        lStr &= vbCrLf
         Return lStr
     End Function
 

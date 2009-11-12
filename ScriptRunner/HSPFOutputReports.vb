@@ -11,10 +11,11 @@ Imports ZedGraph
 Imports MapWindow.Interfaces
 Imports System.Collections.Specialized
 
-Module HSPFOutputReports
-    Private pBaseDrive As String = "c:"
+Public Module HSPFOutputReports
+    Private pBaseDrive As String = "g:"
     Private pBaseFolders As New ArrayList
     Private pTestPath As String
+    Private pPrecWdmName As String = ""
     Private pBaseName As String
     Private pOutputLocations As New atcCollection
     Private pGraphSaveFormat As String
@@ -29,29 +30,36 @@ Module HSPFOutputReports
     Private pGraphWQ As Boolean = False
     Private pWaterYears As Boolean = False
     Private pExpertPrec As Boolean = False
+    Private pExpertFlowOnly As Boolean = False 'if true, no PET, AET, Suro or Ifwo in expert system report.
     Private pIdsPerSeg As Integer = 50
+    Private pStormIntervalDetails As Boolean = False
 
-    Private Sub Initialize()
+    Private Sub Initialize(Optional ByVal aTestName As String = "")
         pOutputLocations.Clear()
 
-        'pGraphSaveFormat = ".png"
-        pGraphSaveFormat = ".emf"
+        pGraphSaveFormat = ".png"
+        'pGraphSaveFormat = ".emf"
         pGraphSaveWidth = 1024
         pGraphSaveHeight = 768
 
-        'Dim lTestName As String = "Susq_020501"
-        'Dim lTestName As String = "tinley"
-        'Dim lTestName As String = "hspf"
-        'Dim lTestName As String = "hyd_man"
-        'Dim lTestName As String = "shena"
-        'Dim lTestName As String = "mono_lu2030a2_base"
-        'Dim lTestName As String = "upatoi"
-        'Dim lTestName As String = "housatonic"
-        'Dim lTestName As String = "beaver"
-        'Dim lTestName As String = "calleguas_cat"
-        'Dim lTestName As String = "calleguas_nocat"
-        Dim lTestName As String = "SantaClara"
-        'Dim lTestName As String = "NonUpatoi"
+        Dim lTestName As String
+        If aTestName.Length = 0 Then
+            'lTestName = "susq020501" '"susq020501","susq020502","susq020503"
+            'Dim lTestName As String = "tinley"
+            'Dim lTestName As String = "hspf"
+            'Dim lTestName As String = "hyd_man"
+            'Dim lTestName As String = "shena"
+            'Dim lTestName As String = "mono_lu2030a2_base"
+            'Dim lTestName As String = "upatoi"
+            'Dim lTestName As String = "housatonic"
+            'Dim lTestName As String = "beaver"
+            'Dim lTestName As String = "calleguas_cat"
+            'Dim lTestName As String = "calleguas_nocat"
+            lTestName = "santaclara"
+            'Dim lTestName As String = "nonupatoi"
+        Else
+            lTestName = aTestName
+        End If
 
         pConstituents.Add("Water")
         'pConstituents.Add("Sediment")
@@ -61,11 +69,23 @@ Module HSPFOutputReports
         'pConstituents.Add("TotalN")
         'pConstituents.Add("TotalP")
 
-        Select Case lTestName
-            Case "Susq_020501"
-                pTestPath = "G:\Projects\TT_GCRP\ProjectsTT\Susq\parms"
-                pBaseName = "Susq_020501"
+        Select Case lTestName.ToLower
+            Case "susq020501"
+                pTestPath = "G:\Projects\TT_GCRP\ProjectsTT\Susq\parms020501"
+                pBaseName = "Susq020501"
                 pOutputLocations.Add("R:69")
+                pExpertPrec = True
+                pIdsPerSeg = 25
+            Case "susq020502"
+                pTestPath = "G:\Projects\TT_GCRP\ProjectsTT\Susq\parms020502"
+                pBaseName = "Susq020502"
+                pOutputLocations.Add("R:43")
+                pExpertPrec = True
+                pIdsPerSeg = 25
+            Case "susq020503"
+                pTestPath = "G:\Projects\TT_GCRP\ProjectsTT\Susq\parms020503"
+                pBaseName = "Susq020503"
+                pOutputLocations.Add("R:86")
                 pExpertPrec = True
                 pIdsPerSeg = 25
             Case "mono"
@@ -121,8 +141,10 @@ Module HSPFOutputReports
                 'pTestPath = "D:\Basins\modelout\Upatoi"
                 'pTestPath = "C:\Basins\data\20710\PollutantModeling\calibration\hydrology"
                 'pTestPath = "C:\Basins\data\20710-01\Upatoi"
-                pTestPath = "v:\"
+                pTestPath = "V:\"
+                pPrecWdmName = "fb.wdm"
                 pBaseName = "Upatoi"
+                pStormIntervalDetails = True 'uses hard coded dsns - see 
                 'pOutputLocations.Add("R:639")
                 pOutputLocations.Add("R:614")
                 'pOutputLocations.Add("R:626")
@@ -166,15 +188,18 @@ Module HSPFOutputReports
             Case "hspf"
                 pTestPath = "C:\test\HSPF"
                 pBaseName = "test10"
-            Case "SantaClara"
-                pTestPath = "C:\Projects\20705\SCR-Model\SCR12"
+            Case "santaclara"
+                pTestPath = "G:\Projects\SantaClara\SCR12"
+                pPrecWdmName = "Precip-calib.wdm"
+                'pTestPath = "G:\Projects\SantaClara\nocat"
                 pBaseName = "SCR12"
-                'pOutputLocations.Add("R:70")
-                'pOutputLocations.Add("R:180")
-                'pOutputLocations.Add("R:320")
-                'pOutputLocations.Add("R:410")
+                pExpertFlowOnly = True
+                pOutputLocations.Add("R:70")
+                pOutputLocations.Add("R:180")
+                pOutputLocations.Add("R:320")
+                pOutputLocations.Add("R:410")
                 pOutputLocations.Add("R:880")
-            Case "NonUpatoi"
+            Case "nonupatoi"
                 pTestPath = "H:"
                 pBaseName = "NonUpatoi"
                 pOutputLocations.Add("R:109")
@@ -189,11 +214,22 @@ Module HSPFOutputReports
                 pImplndSegmentStarts = pUpatoiImplndSegmentStarts
                 pCurveStepType = "NonStep" 'Tony's convention 
                 pWaterYears = True 'TODO: figure this out from run
+            Case Else
+                Logger.Msg("CouldNotFindProject " & lTestName)
         End Select
     End Sub
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
-        Initialize()
+        ScriptMainStandAlone()
+    End Sub
+
+    Sub ScriptMainStandAlone(Optional ByVal aTestName As String = "")
+        Initialize(aTestName)
+
+        If pTestPath.Length = 0 Then
+            Exit Sub
+        End If
+
         ChDriveDir(pTestPath)
         Logger.Dbg("CurrentFolder " & My.Computer.FileSystem.CurrentDirectory)
         If FileExists(pBaseName & "Orig.uci") Then
@@ -269,7 +305,7 @@ Module HSPFOutputReports
                     If IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName).ToLower <> pBaseName.ToLower Then
                         lFileCopied = TryCopy(lExpertSystemFileName, pBaseName & ".exs")
                     End If
-                    lExpertSystem = New HspfSupport.atcExpertSystem(lHspfUci, lWdmDataSource)
+                    lExpertSystem = New HspfSupport.atcExpertSystem(lHspfUci, lWdmDataSource, pExpertFlowOnly)
                     lStr = lExpertSystem.Report
                     SaveFileString(lOutFolderName & "ExpertSysStats-" & IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName) & ".txt", lStr)
                     SaveFileString(lOutFolderName & pBaseName & ".exs", lExpertSystem.AsString)
@@ -281,13 +317,13 @@ Module HSPFOutputReports
                     For Each lSite As HexSite In lExpertSystem.Sites
                         Dim lSiteName As String = lSite.Name
                         Dim lArea As Double = lSite.Area
-                        Dim lSimTSerInches As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(0)), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                        Dim lSimTSerInches As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(0)), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
                         lSimTSerInches.Attributes.SetValue("Units", "Flow (inches)")
                         Dim lSimTSer As atcTimeseries = InchesToCfs(lSimTSerInches, lArea)
                         lSimTSer.Attributes.SetValue("Units", "Flow (cfs)")
                         lSimTSer.Attributes.SetValue("YAxis", "Left")
                         lSimTSer.Attributes.SetValue("StepType", pCurveStepType)
-                        Dim lObsTSer As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.Dsn(1)), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                        Dim lObsTSer As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lSite.DSN(1)), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
                         lObsTSer.Attributes.SetValue("Units", "Flow (cfs)")
                         lObsTSer.Attributes.SetValue("YAxis", "Left")
                         lObsTSer.Attributes.SetValue("StepType", pCurveStepType)
@@ -321,9 +357,14 @@ Module HSPFOutputReports
                                 Dim lPrecDataGroup As atcTimeseriesGroup = lWdmDataSource.DataSets.FindData("ID", lPrecSourceCollection.Keys(lSourceIndex))
                                 If lPrecDataGroup.Count = 0 Then
                                     Dim lPrecWdmDataSource As New atcDataSourceWDM()
-                                    lPrecWdmDataSource.Open(pTestPath & "\Precip-calib.wdm")
-                                    lPrecDataGroup = lPrecWdmDataSource.DataSets.FindData("ID", lPrecSourceCollection.Keys(lSourceIndex))
-                                    'Logger.Dbg("PrecDataGroupFrom FBMet.wdm " & lPrecDataGroup.Count)
+                                    Dim lPrecWdmName As String = pTestPath & "\" & pPrecWdmName
+                                    If IO.File.Exists(lPrecWdmName) Then
+                                        lPrecWdmDataSource.Open(lPrecWdmName)
+                                        lPrecDataGroup = lPrecWdmDataSource.DataSets.FindData("ID", lPrecSourceCollection.Keys(lSourceIndex))
+                                        Logger.Dbg("PrecDataGroupFrom " & pPrecWdmName & " " & lPrecDataGroup.Count)
+                                    Else
+                                        Logger.Dbg("***** No Precip WDM found, triyed " & pPrecWdmName)
+                                    End If
                                 Else
                                     Logger.Dbg("PrecDataGroupFrom " & lWdmFileName & " " & lPrecDataGroup.Count)
                                 End If
@@ -331,15 +372,17 @@ Module HSPFOutputReports
                                 Dim lPrecSubsetDataGroup As New atcTimeseriesGroup
                                 For lIndex As Integer = 0 To lPrecDataGroup.Count - 1
                                     lPrecSubsetDataGroup.Add(SubsetByDate(lPrecDataGroup(lIndex), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing))
+                                    lPrecSubsetDataGroup.Item(lIndex).Attributes.SetValueIfMissing("ID", lPrecDataGroup(lIndex).Attributes.GetValue("ID", -1))
                                 Next
+                                Logger.Dbg("PrecSubsetDataGroupCreated " & lPrecSubsetDataGroup.Count)
 
                                 lMathArgs.SetValue("Timeseries", lPrecSubsetDataGroup)
                                 Dim lPrecMultiply As Double = lPrecSourceCollection.Item(lSourceIndex)
                                 lMathArgs.SetValue("Number", lPrecMultiply)
                                 If lMath.Open("Multiply", lMathArgs) Then
-                                    'Logger.Dbg("SourceIndex " & lSourceIndex & _
-                                    '           " DSN " & lPrecSubsetDataGroup.Item(0).Attributes.GetDefinedValue("ID").Value & _
-                                    '           " MultBy " & lPrecMultiply)
+                                    Logger.Dbg("SourceIndex " & lSourceIndex & _
+                                               " DSN " & lPrecSubsetDataGroup.Item(0).Attributes.GetValue("ID", -1) & _
+                                               " MultBy " & lPrecMultiply)
                                     If lSourceIndex = 0 Then
                                         lPrecTser = lMath.DataSets(0).Clone
                                     Else
@@ -425,21 +468,20 @@ Module HSPFOutputReports
                                  pGraphAnnual, lOutFolderName)
                         lTimeSeries.Clear()
 
-                        'TODO: dont hard code DSN here
-                        Dim lObs As atcTimeseries = lWdmDataSource.DataSets.FindData("Location", "RCH880"). _
-                                        FindData("Constituent", "FLOW").Finddata("Scenario", "OBSERVED").FindData("Time Unit", 4)(0)
-                        If lObs IsNot Nothing Then
-                            lTimeSeries.Add("Observed", Aggregate(lObs, atcTimeUnit.TUHour, 1, atcTran.TranAverSame))
-                        End If
+                        If pStormIntervalDetails Then
+                            'TODO: dont hard code DSN here
+                            lTimeSeries.Add("Observed", Aggregate(lWdmDataSource.DataSets.ItemByKey(5), atcTimeUnit.TUHour, 1, atcTran.TranAverSame))
+                            'TODO: dont hard code DSN here
+                            lTimeSeries.Add("Simulated", lWdmDataSource.DataSets.ItemByKey(3002))
 
-                        'TODO: dont hard code DSN here
-                        Dim lSim As atcTimeseries = lWdmDataSource.DataSets.FindData("Location", "RCH880"). _
-                                        FindData("Constituent", "FLOW").FindData("Scenario", pBaseName).FindData("Time Unit", 4)(0)
-                        If lSim IsNot Nothing Then
-                            lTimeSeries.Add("Simulated", lSim) 'lWdmDataSource.DataSets.ItemByKey(3002))
+                            lTimeSeries.Add("Prec", lPrecTser)
+                            'lTimeSeries.Add("Prec", lWdmDataSource.DataSets.ItemByKey(1010))
+                        Else
+                            'TODO: need to use interval version of these 3, not daily!!!
+                            lTimeSeries.Add("Observed", lObsTSer)
+                            lTimeSeries.Add("Simulated", lSimTSer)
+                            lTimeSeries.Add("Prec", lPrecTser)
                         End If
-
-                        lTimeSeries.Add("Prec", lPrecTser)
 
                         lTimeSeries(0).Attributes.SetValue("Units", "cfs")
                         lTimeSeries(0).Attributes.SetValue("StepType", pCurveStepType)
