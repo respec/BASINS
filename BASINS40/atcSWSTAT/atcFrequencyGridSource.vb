@@ -508,9 +508,10 @@ Public Class atcFrequencyGridSource
                         Dim lStartYear As Integer = lStartDateAnnual.Year
                         If Not pHigh AndAlso lEndMon <= lStartDate.Month Then
                             lStartYear -= 1
-                            lEndYear -= 1
                         End If
-                        lRept.AppendLine("  Period of Record:  " & lStartYear & " - " & lEndYear)
+                        lRept.AppendLine("  Period of Record:  " & _
+                                         lStartDate.ToString("MMMM") & lStartDate.Day.ToString.PadLeft(3) & ", " & lStartYear & " - " & _
+                                         lEndDateForPrint.ToString("MMMM") & lEndDateForPrint.Day.ToString.PadLeft(3) & ", " & lEndYear)
 
                         lStr = lNdays & "-day "
                         If pHigh Then lStr &= "high" Else lStr &= "low"

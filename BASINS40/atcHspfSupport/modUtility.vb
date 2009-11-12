@@ -1,3 +1,4 @@
+Imports MapWinUtility
 Imports atcUtility
 Imports atcData
 Imports atcUCI
@@ -403,6 +404,7 @@ Public Module Utility
         Dim lOperName As String = aOperationTypes.ItemByKey(aLocation.Substring(0, 2))
         Dim lOperation As HspfOperation = aUci.OpnBlks(lOperName).OperFromID(aLocation.Substring(2))
         If Not lOperation Is Nothing Then
+            Dim lUpstreamChecked As New atcCollection
             For Each lConnection As HspfConnection In lOperation.Sources
                 Dim lSourceVolName As String = lConnection.Source.VolName
                 Dim lLocationKey As String = lSourceVolName.Substring(0, 1) & ":" & lConnection.Source.VolId
@@ -412,7 +414,17 @@ Public Module Utility
                     End If
                 ElseIf lSourceVolName = "RCHRES" Then
                     If aUpstream Then
-                        LocationAreaCalc(aUci, lLocationKey, aOperationTypes, aLocations, True)
+                        If lUpstreamChecked.Contains(lLocationKey) Then
+                            Logger.Dbg("SkipDuplicate:" & lLocationKey)
+                        ElseIf aUci.Name.ToLower.Contains("scr") AndAlso _
+                               lConnection.Source.VolId = 229 AndAlso _
+                               lConnection.Target.VolId = 516 Then
+                            'TODO: figure out a way not to hardcode this!
+                            Logger.Dbg("Skip 229 to 516 in SantaClara")
+                        Else
+                            LocationAreaCalc(aUci, lLocationKey, aOperationTypes, aLocations, True)
+                            lUpstreamChecked.Add(lLocationKey)
+                        End If
                     Else
                         aLocations.Add(lLocationKey, 0)
                     End If
@@ -519,6 +531,7 @@ Public Module Utility
 
         Return lSB.ToString
     End Function
+
     Private Function AreaReportLocation(ByVal aUci As HspfUci, ByVal aOperationtypes As atcCollection, _
                                         ByVal aLocation As String, ByVal aLandUseReport As Boolean, _
                                         ByVal aReportPath As String, ByVal aRunMade As String) As String
@@ -541,13 +554,8 @@ Public Module Utility
             For lLandUseIndex As Integer = 0 To lLandUsesCombinePervImpv.Count - 1
                 Dim lLandUseAreaString As String = lLandUsesCombinePervImpv.Item(lLandUseIndex)
                 Dim lImprArea As Double = StrRetRem(lLandUseAreaString)
-                Dim lPervArea As Double
-                Try
-                    lPervArea = lLandUseAreaString
-                Catch
-                    Stop
-                End Try
-
+                Dim lPervArea As Double = lLandUseAreaString
+                
                 Dim lLandUseArea As Double = lPervArea + lImprArea
                 lSB.AppendLine(lLandUsesCombinePervImpv.Keys(lLandUseIndex).ToString.PadLeft(20) & vbTab & _
                                DecimalAlign(lPervArea, , 2, 7) & vbTab & _
@@ -605,6 +613,7 @@ Public Module Utility
                 lUpstreamLocationsString & vbCrLf
         Return lStr
     End Function
+
     Private Function LandUsesCombined(ByVal aLandUses As atcCollection) As atcCollection
         Dim lLUCombined As New atcCollection
         For lIndex As Integer = 0 To aLandUses.Count - 1
@@ -619,13 +628,18 @@ Public Module Utility
                 Dim lLandUseString As String = ""
                 If lLandUseKey = -1 Then
                     lLandUseString = lLandUseArea
-                    'If lLandUseName.StartsWith("P") Then
-                    lLandUseString = "0.0," & lLandUseString
-                    'End If
+                    If lLandUseName.StartsWith("P") Then
+                        lLandUseString = "0.0," & lLandUseString
+                    End If
                     lLUCombined.Add(lLandUseName.Remove(0, 2), lLandUseString)
                 Else
                     lLUCombined(lLandUseKey) &= "," & lLandUseArea
                 End If
+            End If
+        Next
+        For lIndex As Integer = 0 To lLUCombined.Count - 1
+            If Not lLUCombined.ItemByIndex(lIndex).Contains(",") Then
+                lLUCombined.ItemByIndex(lIndex) &= ",0.0"
             End If
         Next
         Return lLUCombined

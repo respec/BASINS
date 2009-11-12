@@ -211,14 +211,18 @@ Public Class HspfOpnBlk
                                         pTables.Add(lTable)
                                     End If
                                 Else
-                                    Try
-                                        lOperation.Tables.Add(lTable)
-                                        If Not TableExists(lTable.Name) Then
-                                            pTables.Add(lTable)
-                                        End If
-                                    Catch
-                                        Logger.Dbg("TableProblem:" & lTable.Name & ":" & lOperation.Id)
-                                    End Try
+                                    If Not lOperation.Tables.Contains(lTable.Name) Then
+                                        Try
+                                            lOperation.Tables.Add(lTable)
+                                            If Not TableExists(lTable.Name) Then
+                                                pTables.Add(lTable)
+                                            End If
+                                        Catch lex As Exception
+                                            Logger.Dbg("TableProblem:" & lTable.Name & ":" & lOperation.Id & ":" & lex.Message)
+                                        End Try
+                                        'Else
+                                        '    Logger.Dbg("UsingExisting " & lTable.Name)
+                                    End If
                                 End If
                                 If lTable.Name = "GEN-INFO" Then
                                     lOperation.Description = lTable.Parms(0).Value
