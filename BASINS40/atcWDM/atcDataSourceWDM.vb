@@ -798,6 +798,7 @@ CaseExistRenumber:
                        "Specification:'" & Specification & "'")
         Else
             Dim lReadTS As atcTimeseries = aReadMe
+            lReadTS.ValuesNeedToBeRead = False
             'Logger.dbg("WDM read data " & aReadMe.Attributes.GetValue("Location"))
             Dim lWdmHandle As New atcWdmHandle(0, Specification)
             If lWdmHandle.Unit > 0 Then

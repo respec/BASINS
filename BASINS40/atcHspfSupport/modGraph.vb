@@ -36,16 +36,31 @@ Public Module Graph
         lZgc.Height = aGraphSaveHeight
         Dim lGraphDur As New clsGraphProbability(lDataGroup, lZgc)
         With lGraphDur.ZedGraphCtrl.GraphPane
-            If .YAxis.Scale.Min < 1 Then
-                .YAxis.Scale.MinAuto = False
-                .YAxis.Scale.Min = 10
-                .XAxis.Scale.MinAuto = False
-                .XAxis.Scale.Min = 0.001
-                .XAxis.Scale.MaxAuto = False
-                .XAxis.Scale.Max = 0.9998
-                .AxisChange()
-            End If
+            'If .YAxis.Scale.Min < 1 Then
+            .YAxis.Scale.MinAuto = False
+            .YAxis.Scale.Min = 1
+            '.YAxis.Scale.Max = 10000
+            .XAxis.Scale.MinAuto = True
+            .YAxis.Scale.MaxAuto = True
+            '.XAxis.Scale.Min = 0.001
+            .XAxis.Scale.MaxAuto = True
+            '.XAxis.Scale.Max = 0.9998
+            .AxisChange()
+            'End If
+
+            .YAxis.Title.FontSpec.Size += 2
+            .YAxis.Title.Text = "Flow (cfs)"
+            .XAxis.Scale.FontSpec.Size += 1
+            .XAxis.Title.FontSpec.Size += 1
+            .XAxis.Title.Text = "Percent chance daily flow exceeded (cfs)"
+            .YAxis.Scale.FontSpec.IsBold = True
+            .YAxis.Scale.FontSpec.Size += 1
+            .CurveList(0).Label.Text = "Observed Flow"
+            .CurveList(1).Label.Text = "Simulated Flow"
+
         End With
+
+        
         'TODO: add title 
         lZgc.SaveIn(lOutFileBase & "_dur" & aGraphSaveFormat)
         lGraphDur.Dispose()
@@ -142,25 +157,27 @@ Public Module Graph
         If lPaneCount = 2 Then
             lMonthDataGroup.Add(Aggregate(lDataGroup.Item(2), atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv))
         End If
-        lZgc = CreateZgc()
-        lZgc.Width = aGraphSaveWidth * 2
-        lZgc.Height = aGraphSaveHeight
-        Dim lGrapher As New clsGraphTime(lMonthDataGroup, lZgc)
-        If lPaneCount = 2 Then lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
-        Dim lDualDateScale As Object = lZgc.MasterPane.PaneList(0).XAxis.Scale
-        lDualDateScale.MaxDaysMonthLabeled = 1200
-        lZgc.SaveIn(lOutFileBase & "_month" & aGraphSaveFormat)
+        GraphTimeseries(lMonthDataGroup, lPaneCount, lOutFileBase & "_month", aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight)
+
+        'lZgc = CreateZgc()
+        'lZgc.Width = aGraphSaveWidth * 2
+        'lZgc.Height = aGraphSaveHeight
+        Dim lGrapher As clsGraphTime 'New clsGraphTime(lMonthDataGroup, lZgc)
+        'If lPaneCount = 2 Then lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
+        Dim lDualDateScale As Object '= lZgc.MasterPane.PaneList(0).XAxis.Scale
+        'lDualDateScale.MaxDaysMonthLabeled = 1200
+        'lZgc.SaveIn(lOutFileBase & "_month" & aGraphSaveFormat)
 
         'monthly timeseries - log
-        With lZgc.MasterPane.PaneList(lPaneCount - 1) 'main pane, not aux
-            .YAxis.Type = ZedGraph.AxisType.Log
-            .YAxis.Scale.Max *= 4 'wag!
-            .YAxis.Scale.MaxAuto = False
-            .YAxis.Scale.IsUseTenPower = False
-        End With
-        lZgc.SaveIn(lOutFileBase & "_month_log" & aGraphSaveFormat)
-        lZgc.Dispose()
-        lGrapher.Dispose()
+        'With lZgc.MasterPane.PaneList(lPaneCount - 1) 'main pane, not aux
+        '    .YAxis.Type = ZedGraph.AxisType.Log
+        '    .YAxis.Scale.Max *= 4 'wag!
+        '    .YAxis.Scale.MaxAuto = False
+        '    .YAxis.Scale.IsUseTenPower = False
+        'End With
+        'lZgc.SaveIn(lOutFileBase & "_month_log" & aGraphSaveFormat)
+        'lZgc.Dispose()
+        'lGrapher.Dispose()
 
         Dim lKeys As New Collection
         If aTimeSeries.Keys.Contains("PotET") AndAlso _
@@ -260,33 +277,62 @@ Public Module Graph
         Dim lGrapher As New clsGraphTime(aDataGroup, lZgc)
         If aPaneCount = 2 Then
             EnableAuxAxis(lZgc.MasterPane, True, 0.2)
+
+            'Move X axis label into legend labels
+            Dim lXlabel As String = lZgc.MasterPane.PaneList(1).XAxis.Title.Text.Trim & " "
+            Dim lBoldFont As New ZedGraph.FontSpec()
+            lBoldFont.IsBold = True
+            lBoldFont.Border.IsVisible = False
+            lBoldFont.Size += 2
+            lXlabel = CapitalizeFirstLetter(lXlabel)
+
             lZgc.MasterPane.PaneList(0).YAxis.Title.Text = "Precip (in)"
+            lZgc.MasterPane.PaneList(0).YAxis.Title.FontSpec.IsBold = True
+            lZgc.MasterPane.PaneList(0).YAxis.Title.FontSpec.Size += 2
+            lZgc.MasterPane.PaneList(0).YAxis.Scale.FontSpec.IsBold = True
+            lZgc.MasterPane.PaneList(0).YAxis.Scale.FontSpec.Size += 1
+            lZgc.MasterPane.PaneList(0).YAxis.Scale.Max *= 1.1
+
             lZgc.MasterPane.PaneList(1).YAxis.Title.Text = "Flow (cfs)"
+            lZgc.MasterPane.PaneList(1).YAxis.Title.FontSpec.IsBold = True
+            lZgc.MasterPane.PaneList(1).YAxis.Title.FontSpec.Size += 2
+            lZgc.MasterPane.PaneList(1).YAxis.Scale.Max *= 1.1
+
+            lZgc.MasterPane.PaneList(1).YAxis.Scale.FontSpec.Size += 1
+            lZgc.MasterPane.PaneList(1).YAxis.Scale.FontSpec.IsBold = True
             lZgc.MasterPane.PaneList(1).YAxis.Scale.Min = 0
-            If lZgc.MasterPane.PaneList(0).CurveList(0).Label.Text.Contains(" Weighted Average ") Then
-                lZgc.MasterPane.PaneList(0).CurveList(0).Label.Text = "Observed Precipitation at Upatoi Crk, MCB Bridge (RCH46)"
-            End If
+            lZgc.MasterPane.PaneList(1).XAxis.Scale.FontSpec.IsBold = True
+            lZgc.MasterPane.PaneList(1).XAxis.Scale.FontSpec.Size += 1
 
-            If lZgc.MasterPane.PaneList(1).CurveList(0).Label.Text.Contains("OBSERVED FLOW at RCH46 ") Then
-                lZgc.MasterPane.PaneList(1).CurveList(0).Label.Text = "Observed Flow at Upatoi Crk, MCB Bridge (RCH46)"
-            End If
 
-            If lZgc.MasterPane.PaneList(1).CurveList(1).Label.Text.Contains("SIMULATE SIMQ at RCH46 ") Then
-                lZgc.MasterPane.PaneList(1).CurveList(1).Label.Text = "Simulated Flow at Upatoi Crk, MCB Bridge (RCH46)"
-            End If
+            'If lZgc.MasterPane.PaneList(0).CurveList(0).Label.Text.Contains(" Weighted Average ") Then
+            '    lZgc.MasterPane.PaneList(0).CurveList(0).Label.Text = lXlabel & "Observed Precipitation at Upatoi Crk, MCB Bridge (RCH46)"
+            '    lZgc.MasterPane.PaneList(0).CurveList(0).Label.FontSpec = lBoldFont
+            'End If
+
+            'If lZgc.MasterPane.PaneList(1).CurveList(0).Label.Text.Contains("OBSERVED FLOW at RCH46 ") Then
+            '    lZgc.MasterPane.PaneList(1).CurveList(0).Label.Text = lXlabel & "Observed Flow at Upatoi Crk, MCB Bridge (RCH46)"
+            '    lZgc.MasterPane.PaneList(1).CurveList(0).Label.FontSpec = lBoldFont
+            '    lZgc.MasterPane.PaneList(1).XAxis.Title.Text = ""
+            'End If
+
+            'If lZgc.MasterPane.PaneList(1).CurveList(1).Label.Text.Contains("SIMULATE") Then
+            '    lZgc.MasterPane.PaneList(1).CurveList(1).Label.Text = lXlabel & "Simulated Flow at Upatoi Crk, MCB Bridge (RCH46)"
+            '    lZgc.MasterPane.PaneList(1).CurveList(1).Label.FontSpec = lBoldFont
+            '    lZgc.MasterPane.PaneList(1).XAxis.Title.Text = ""
+            'End If
         End If
         
         lZgc.SaveIn(aOutFileBase & aGraphSaveFormat)
         'timeseries - log
         With lZgc.MasterPane.PaneList(aPaneCount - 1)
             .YAxis.Type = ZedGraph.AxisType.Log
-            'ScaleAxis(lDataGroup, .YAxis)
+            ScaleAxis(aDataGroup, .YAxis)
             .YAxis.Scale.Max *= 4 'wag!
             .YAxis.Scale.MaxAuto = False
+            .YAxis.Scale.Min = 1
             .YAxis.Scale.IsUseTenPower = False
         End With
-
-
 
         Dim lOutFileName As String = ""
         If aLogPrefix Then
@@ -346,7 +392,7 @@ Public Module Graph
         With lZgc.MasterPane.PaneList(1) 'main pane, not aux
             .YAxis.Type = ZedGraph.AxisType.Log
             .YAxis.Scale.Max = 4
-            .YAxis.Scale.Min = 0.001
+            .YAxis.Scale.Min = 1
             .YAxis.Scale.MaxAuto = False
             .YAxis.Scale.IsUseTenPower = False
         End With

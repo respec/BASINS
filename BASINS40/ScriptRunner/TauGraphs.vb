@@ -16,7 +16,7 @@ Module TauGraphs
     Private Const pTimeseriesAuxAxis As String = "Aux"
     Private Const pTimeseriesAuxIsPoint As Boolean = False
 
-    'Private pOutputHBNFileName As String = "H:\Upatoitau4.hbn"
+    Private pOutputHBNFileName As String = "H:\NonUpatoiTau.hbn"
     Private Const pTimeseries1Axis As String = "Left"
     Private Const pTimeseries1IsPoint As Boolean = False
 
@@ -24,59 +24,59 @@ Module TauGraphs
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
 
         ChDriveDir(pWorkingDirectory)
-        Dim TauPercentOutput As String = "AVVEL\AVVEL.txt"
-        Dim lTser1 As atcTimeseries
+        Dim TauPercentOutput As String = "Sediment\TauPercent.txt"
+        'Dim lTser1 As atcTimeseries
         Dim lTser2 As atcTimeseries
         
-        Dim i As Integer
-        For i = 1 To 4
 
-            Dim pOutputHBNFileName As String = "H:\Upatoitau" & i & ".hbn"
+        'Dim pOutputHBNFileName As String = "H:\Upatoitau" & i & ".hbn"
 
-            Dim lHspfBinDataSource As New atcTimeseriesFileHspfBinOut()
-            lHspfBinDataSource.Open(pOutputHBNFileName)
-            Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
+        Dim lHspfBinDataSource As New atcTimeseriesFileHspfBinOut()
+        lHspfBinDataSource.Open(pOutputHBNFileName)
+        Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
 
 
-            For Each lLocation As String In lHspfBinDataSource.DataSets.SortedAttributeValues("Location", "unknown")
-                lTser2 = lHspfBinDataSource.DataSets.FindData("Location", lLocation). _
-                                    FindData("Constituent", "AVVEL")(0)
-                'lTser2 = Aggregate(lTser1, atcTimeUnit.TUDay, 1, atcTran.TranMax)
-                'lTser2.Attributes.GetValue("Start Date")
+        For Each lLocation As String In lHspfBinDataSource.DataSets.SortedAttributeValues("Location", "unknown")
+            lTser2 = lHspfBinDataSource.DataSets.FindData("Location", lLocation). _
+                                FindData("Constituent", "TAU")(0)
+            'lTser1 = lHspfBinDataSource.DataSets.FindData("Location", lLocation). _
+            'FindData("Constituent", "AVEDP")(0)
+            'lTser2 = Aggregate(lTser1, atcTimeUnit.TUDay, 1, atcTran.TranMax)
+            'lTser2.Attributes.GetValue("Start Date")
 
-                lTser2.Attributes.SetValue("YAxis", pTimeseries1Axis)
-                lTser2.Attributes.SetValue("Point", pTimeseries1IsPoint)
+            lTser2.Attributes.SetValue("YAxis", pTimeseries1Axis)
+            lTser2.Attributes.SetValue("Point", pTimeseries1IsPoint)
 
-                'lTser1 = lTser1.Values.GetUpperBound()
-                'lTser1 = lHspfBinDataSource.DataSets.FindData("Location", lLocation). _
-                'FindData("Constituent", "Flow").FindData("Time Unit", 3)(0)
-                Dim lTimeseriesGroup As New atcTimeseriesGroup
-                lTimeseriesGroup.Add(lTser2)
+            'lTser1 = lTser1.Values.GetUpperBound()
+            'lTser1 = lHspfBinDataSource.DataSets.FindData("Location", lLocation). _
+            'FindData("Constituent", "Flow").FindData("Time Unit", 3)(0)
+            Dim lTimeseriesGroup As New atcTimeseriesGroup
+            lTimeseriesGroup.Add(lTser2)
 
-                pBaseName = lLocation & "AVVEL"
-                'Dim EightyPercentTau As String = Format(lTser2.Attributes.GetValue("%80"), "##.##")
-                'Dim OnePercentTau As String = Format(lTser2.Attributes.GetValue("%01"), "##.##")
-                'Dim LocationAndPercent As String = lLocation & "," & EightyPercentTau & "," & OnePercentTau & vbCrLf
-                Dim Minimum As String = Format(lTser2.Attributes.GetValue("Minimum"), "##.##")
-                Dim Average As String = Format(lTser2.Attributes.GetValue("Mean"), "##.##")
-                Dim Maximum As String = Format(lTser2.Attributes.GetValue("Maximum"), "##.##")
-                'Dim LocationAndPercent As String = lLocation & "," & EightyPercentTau & "," & OnePercentTau & vbCrLf
-                Dim LocationAndPercent As String = lLocation & "," & Minimum & "," & Average & "," & Maximum & vbCrLf
-                IO.File.AppendAllText(TauPercentOutput, LocationAndPercent)
+            pBaseName = "TAU_Calc" & lLocation
+            Dim EightyPercentTau As String = Format(lTser2.Attributes.GetValue("%80"), "##.##")
+            Dim OnePercentTau As String = Format(lTser2.Attributes.GetValue("%05"), "##.##")
+            'Dim Minimum As String = Format(lTser2.Attributes.GetValue("Minimum"), "##.##")
+            'Dim Average As String = Format(lTser2.Attributes.GetValue("Mean"), "##.##")
+            'Dim Maximum As String = Format(lTser2.Attributes.GetValue("Maximum"), "##.##")
+            Dim LocationAndPercent As String = lLocation & "," & EightyPercentTau & "," & OnePercentTau & vbCrLf
+            'Dim LocationAndPercent As String = lLocation & "," & Minimum & "," & Average & "," & Maximum & vbCrLf
 
-                'GraphTimeseriesBatch(lTimeseriesGroup)
-                'GraphDurationBatch(lTimeseriesGroup)
+            IO.File.AppendAllText(TauPercentOutput, LocationAndPercent)
 
-            Next
-
-
+            GraphTimeseriesBatch(lTimeseriesGroup)
+            'GraphDurationBatch(lTimeseriesGroup)
 
         Next
+
+
+
+        'Next
     End Sub
 
     Sub GraphTimeseriesBatch(ByVal aDataGroup As atcTimeseriesGroup)
         pBaseName = SafeFilename(pBaseName)
-        Dim lOutFileName As String = "AVVEL\" & pBaseName
+        Dim lOutFileName As String = "Sediment\" & pBaseName
         Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
         Dim lGrapher As New clsGraphTime(aDataGroup, lZgc)
         'Dim lPaneAux As GraphPane = lZgc.MasterPane.PaneList(0)
@@ -133,7 +133,7 @@ Module TauGraphs
     End Sub
 
     Sub GraphDurationBatch(ByVal aDataGroup As atcTimeseriesGroup)
-        Dim lOutFileName As String = "AVVEL\" & pBaseName & "_dur"
+        Dim lOutFileName As String = "Sediment\" & "_dur" & pBaseName
         Dim lZgc As ZedGraphControl = CreateZgc()
         Dim lGrapher As New clsGraphProbability(aDataGroup, lZgc)
         Dim lPane As GraphPane = lZgc.MasterPane.PaneList(0)

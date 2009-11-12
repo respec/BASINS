@@ -44,6 +44,7 @@ Public Class clsGraphProbability
 
     Overrides Sub pDataGroup_Removed(ByVal aRemoved As atcUtility.atcCollection)
         Dim lCurveList As ZedGraph.CurveList = MyBase.pZgc.MasterPane.PaneList.Item(0).CurveList
+
         Dim lCurveListAux As ZedGraph.CurveList = Nothing
         If MyBase.pZgc.MasterPane.PaneList.Count > 1 Then
             lCurveListAux = MyBase.pZgc.MasterPane.PaneList.Item(1).CurveList
@@ -76,6 +77,7 @@ Public Class clsGraphProbability
         Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
         Dim lCurveLabel As String = TSCurveLabel(aTimeseries, aCommonTimeUnitName, aCommonScenario, aCommonConstituent, aCommonLocation, aCommonUnits)
         Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
+
         Dim lCurve As LineItem = Nothing
 
         Dim lX(pNumProbabilityPoints) As Double
@@ -128,6 +130,7 @@ Public Class clsGraphProbability
         With lPane.YAxis
             .Type = AxisType.Log
             .Scale.IsUseTenPower = False
+            '.Scale.Min = 10
             If aTimeseries.Attributes.ContainsAttribute("Units") Then
                 .Title.Text = aTimeseries.Attributes.GetValue("Units")
                 .Title.IsVisible = True
@@ -136,9 +139,13 @@ Public Class clsGraphProbability
 
         'Upper right corner of chart is better for this graph type
         lPane.Legend.Location = New Location(0.95, 0.05, CoordType.ChartFraction, AlignH.Right, AlignV.Top)
+        lPane.Legend.FontSpec.Size += 2
+        lPane.Legend.FontSpec.IsBold = True
 
         lCurve = lPane.AddCurve(lCurveLabel, lXFracExceed, lY, lCurveColor, SymbolType.None)
-        lCurve.Line.Width = 1
+        lCurve.Line.Width = 2
+
+        
         lCurve.Line.StepType = StepType.NonStep
         SetYMax(lPane)
     End Sub

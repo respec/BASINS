@@ -263,7 +263,8 @@ Public Class atcTimeseriesMath
                 AddDataSet(lNewTS)
                 Return True
             End If
-        Catch
+        Catch lex As Exception
+            Debug.Print(lex.ToString)
         End Try
         Return False
     End Function
