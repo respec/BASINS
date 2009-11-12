@@ -326,8 +326,10 @@ Public Class atcExpertSystem
                 End With
                 'Get data - daily values and max values as necessary
                 Dim lTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(lDSN))
+                If lTSer Is Nothing Then Stop
                 'subset by date to simulation period
                 Dim lNewTSer As atcTimeseries = SubsetByDate(lTSer, SDateJ, EDateJ, Nothing)
+                If lNewTSer Is Nothing Then Stop
                 'don't Clear lTSer as that will clear the original, precluding its future use
                 lTSer = Nothing
 

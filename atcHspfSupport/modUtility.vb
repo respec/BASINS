@@ -541,7 +541,13 @@ Public Module Utility
             For lLandUseIndex As Integer = 0 To lLandUsesCombinePervImpv.Count - 1
                 Dim lLandUseAreaString As String = lLandUsesCombinePervImpv.Item(lLandUseIndex)
                 Dim lImprArea As Double = StrRetRem(lLandUseAreaString)
-                Dim lPervArea As Double = lLandUseAreaString
+                Dim lPervArea As Double
+                Try
+                    lPervArea = lLandUseAreaString
+                Catch
+                    Stop
+                End Try
+
                 Dim lLandUseArea As Double = lPervArea + lImprArea
                 lSB.AppendLine(lLandUsesCombinePervImpv.Keys(lLandUseIndex).ToString.PadLeft(20) & vbTab & _
                                DecimalAlign(lPervArea, , 2, 7) & vbTab & _
@@ -613,9 +619,9 @@ Public Module Utility
                 Dim lLandUseString As String = ""
                 If lLandUseKey = -1 Then
                     lLandUseString = lLandUseArea
-                    If lLandUseName.StartsWith("P") Then
-                        lLandUseString = "0.0," & lLandUseString
-                    End If
+                    'If lLandUseName.StartsWith("P") Then
+                    lLandUseString = "0.0," & lLandUseString
+                    'End If
                     lLUCombined.Add(lLandUseName.Remove(0, 2), lLandUseString)
                 Else
                     lLUCombined(lLandUseKey) &= "," & lLandUseArea

@@ -22,7 +22,7 @@ Module HSPFWatershedSummaryWQReport
         'Dim lTestName As String = "addtrail"
         Select Case lTestName
             Case "upatoi"
-                pTestPath = pDrive & "\Basins\modelout\Upatoi"
+                pTestPath = pDrive & "\Basins\data\20710-01\Upatoi"
                 pBaseName = "upatoi"
             Case "addtrail"
                 pTestPath = pDrive & "\Basins\modelout\UpatoiScen"

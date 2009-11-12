@@ -284,6 +284,7 @@ Public Class atcTimeseriesFileHspfBinOut
         Dim lJDates As New Generic.List(Of Double)
 
         Dim lTimeseries As atcTimeseries = aDataSet
+        lTimeseries.ValuesNeedToBeRead = False
         Dim lKey As String = lTimeseries.Attributes.GetValue("Operation") & ":" & _
                              Mid(lTimeseries.Attributes.GetValue("IDLOCN"), 3) & ":" & _
                              lTimeseries.Attributes.GetValue("Section")

@@ -12,7 +12,7 @@ Imports MapWindow.Interfaces
 Imports System.Collections.Specialized
 
 Module HSPFOutputReports
-    Private pBaseDrive As String = "g:"
+    Private pBaseDrive As String = "c:"
     Private pBaseFolders As New ArrayList
     Private pTestPath As String
     Private pBaseName As String
@@ -34,12 +34,12 @@ Module HSPFOutputReports
     Private Sub Initialize()
         pOutputLocations.Clear()
 
-        pGraphSaveFormat = ".png"
-        'pGraphSaveFormat = ".emf"
+        'pGraphSaveFormat = ".png"
+        pGraphSaveFormat = ".emf"
         pGraphSaveWidth = 1024
         pGraphSaveHeight = 768
 
-        Dim lTestName As String = "Susq_020501"
+        'Dim lTestName As String = "Susq_020501"
         'Dim lTestName As String = "tinley"
         'Dim lTestName As String = "hspf"
         'Dim lTestName As String = "hyd_man"
@@ -50,11 +50,11 @@ Module HSPFOutputReports
         'Dim lTestName As String = "beaver"
         'Dim lTestName As String = "calleguas_cat"
         'Dim lTestName As String = "calleguas_nocat"
-        'Dim lTestName As String = "SantaClara"
+        Dim lTestName As String = "SantaClara"
         'Dim lTestName As String = "NonUpatoi"
 
         pConstituents.Add("Water")
-        pConstituents.Add("Sediment")
+        'pConstituents.Add("Sediment")
         'pConstituents.Add("N-PQUAL")
         'pConstituents.Add("P-PQUAL")
         'pConstituents.Add("BOD-PQUAL")
@@ -121,27 +121,25 @@ Module HSPFOutputReports
                 'pTestPath = "D:\Basins\modelout\Upatoi"
                 'pTestPath = "C:\Basins\data\20710\PollutantModeling\calibration\hydrology"
                 'pTestPath = "C:\Basins\data\20710-01\Upatoi"
-                pTestPath = "V:\"
+                pTestPath = "v:\"
                 pBaseName = "Upatoi"
                 'pOutputLocations.Add("R:639")
-                'pOutputLocations.Add("R:614")
+                pOutputLocations.Add("R:614")
                 'pOutputLocations.Add("R:626")
                 'pOutputLocations.Add("R:30")
-                'pOutputLocations.Add("R:33")
+                pOutputLocations.Add("R:34")
+                pOutputLocations.Add("R:45")
                 'pOutputLocations.Add("R:36")
                 'pOutputLocations.Add("R:35")
                 'pOutputLocations.Add("R:662")
                 'pOutputLocations.Add("R:666")
-                'pOutputLocations.Add("R:46")
-                'pOutputLocations.Add("R:74")
-                pOutputLocations.Add("R:2")
-                pOutputLocations.Add("R:3")
-                pOutputLocations.Add("R:6")
+                pOutputLocations.Add("R:46")
+                pOutputLocations.Add("R:74")
                 pGraphAnnual = True
                 pCurveStepType = "NonStep" 'Tony's convention 
-                Dim pUpatoiPerlndSegmentStarts() As Integer = {101} ', 201, 301, 401, 501, 601, 701, 801, 901, 951}
+                Dim pUpatoiPerlndSegmentStarts() As Integer = {101, 201, 301, 401, 501, 601, 701, 801, 901, 951}
                 pPerlndSegmentStarts = pUpatoiPerlndSegmentStarts
-                Dim pUpatoiImplndSegmentStarts() As Integer = {102} ', 202, 302, 402, 502, 602, 702, 802, 902, 952}
+                Dim pUpatoiImplndSegmentStarts() As Integer = {102, 202, 302, 402, 502, 602, 702, 802, 902, 952}
                 pImplndSegmentStarts = pUpatoiImplndSegmentStarts
                 pWaterYears = True 'TODO: figure this out from run
             Case "tinley"
@@ -169,12 +167,12 @@ Module HSPFOutputReports
                 pTestPath = "C:\test\HSPF"
                 pBaseName = "test10"
             Case "SantaClara"
-                pTestPath = "D:\MountainViewData\SantaClara\nocat"
-                pBaseName = "SCR10"
-                pOutputLocations.Add("R:70")
-                pOutputLocations.Add("R:180")
-                pOutputLocations.Add("R:320")
-                pOutputLocations.Add("R:410")
+                pTestPath = "C:\Projects\20705\SCR-Model\SCR12"
+                pBaseName = "SCR12"
+                'pOutputLocations.Add("R:70")
+                'pOutputLocations.Add("R:180")
+                'pOutputLocations.Add("R:320")
+                'pOutputLocations.Add("R:410")
                 pOutputLocations.Add("R:880")
             Case "NonUpatoi"
                 pTestPath = "H:"
@@ -323,9 +321,9 @@ Module HSPFOutputReports
                                 Dim lPrecDataGroup As atcTimeseriesGroup = lWdmDataSource.DataSets.FindData("ID", lPrecSourceCollection.Keys(lSourceIndex))
                                 If lPrecDataGroup.Count = 0 Then
                                     Dim lPrecWdmDataSource As New atcDataSourceWDM()
-                                    lPrecWdmDataSource.Open(pTestPath & "\FBMet.wdm")
+                                    lPrecWdmDataSource.Open(pTestPath & "\Precip-calib.wdm")
                                     lPrecDataGroup = lPrecWdmDataSource.DataSets.FindData("ID", lPrecSourceCollection.Keys(lSourceIndex))
-                                    Logger.Dbg("PrecDataGroupFrom FBMet.wdm " & lPrecDataGroup.Count)
+                                    'Logger.Dbg("PrecDataGroupFrom FBMet.wdm " & lPrecDataGroup.Count)
                                 Else
                                     Logger.Dbg("PrecDataGroupFrom " & lWdmFileName & " " & lPrecDataGroup.Count)
                                 End If
@@ -339,9 +337,9 @@ Module HSPFOutputReports
                                 Dim lPrecMultiply As Double = lPrecSourceCollection.Item(lSourceIndex)
                                 lMathArgs.SetValue("Number", lPrecMultiply)
                                 If lMath.Open("Multiply", lMathArgs) Then
-                                    Logger.Dbg("SourceIndex " & lSourceIndex & _
-                                               " DSN " & lPrecSubsetDataGroup.Item(0).Attributes.GetDefinedValue("ID").Value & _
-                                               " MultBy " & lPrecMultiply)
+                                    'Logger.Dbg("SourceIndex " & lSourceIndex & _
+                                    '           " DSN " & lPrecSubsetDataGroup.Item(0).Attributes.GetDefinedValue("ID").Value & _
+                                    '           " MultBy " & lPrecMultiply)
                                     If lSourceIndex = 0 Then
                                         lPrecTser = lMath.DataSets(0).Clone
                                     Else
@@ -427,8 +425,20 @@ Module HSPFOutputReports
                                  pGraphAnnual, lOutFolderName)
                         lTimeSeries.Clear()
 
-                        lTimeSeries.Add("Observed", lObsTSer)
-                        lTimeSeries.Add("Simulated", lSimTSer)
+                        'TODO: dont hard code DSN here
+                        Dim lObs As atcTimeseries = lWdmDataSource.DataSets.FindData("Location", "RCH880"). _
+                                        FindData("Constituent", "FLOW").Finddata("Scenario", "OBSERVED").FindData("Time Unit", 4)(0)
+                        If lObs IsNot Nothing Then
+                            lTimeSeries.Add("Observed", Aggregate(lObs, atcTimeUnit.TUHour, 1, atcTran.TranAverSame))
+                        End If
+
+                        'TODO: dont hard code DSN here
+                        Dim lSim As atcTimeseries = lWdmDataSource.DataSets.FindData("Location", "RCH880"). _
+                                        FindData("Constituent", "FLOW").FindData("Scenario", pBaseName).FindData("Time Unit", 4)(0)
+                        If lSim IsNot Nothing Then
+                            lTimeSeries.Add("Simulated", lSim) 'lWdmDataSource.DataSets.ItemByKey(3002))
+                        End If
+
                         lTimeSeries.Add("Prec", lPrecTser)
 
                         lTimeSeries(0).Attributes.SetValue("Units", "cfs")
