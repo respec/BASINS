@@ -20,3 +20,4 @@ Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\c
 Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\cli.met\RunMultiWepp.exe
 Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\cli.met\RunMultiWepp.pdb
 Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\cli.met\RunMultiWepp.xml
+C:\Dev\BASINS40\WEPP\RunMultiWepp\obj\x86\Release\RunMultiWepp.RunMultiWeppForm1.resources
