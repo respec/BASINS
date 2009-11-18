@@ -1,5 +1,5 @@
 ﻿Imports System.IO
-Imports atcUtility
+
 
 Public Class RunMultiWeppForm1
 
@@ -19,6 +19,11 @@ Public Class RunMultiWeppForm1
         txtPathPlot.Text = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\wepp.run\out-plot.txt"
         txtPathOutput.Text = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\sensitivity\A"
 
+
+
+        PopulateCopyAlso()
+
+
         txtSlopeStart.Text = "1"
         txtSlopeStop.Text = "40"
         txtSlopeDelta.Text = "4"
@@ -28,7 +33,7 @@ Public Class RunMultiWeppForm1
         txtLengthDelta.Text = "15"
 
         CalculateIterations()
-
+        AddHandler chkEnableAlso.CheckStateChanged, AddressOf PopulateCopyAlso
         AddHandler txtSlopeStart.TextChanged, AddressOf ParamTextChanged
         AddHandler txtSlopeStop.TextChanged, AddressOf ParamTextChanged
         AddHandler txtSlopeDelta.TextChanged, AddressOf ParamTextChanged
@@ -37,7 +42,47 @@ Public Class RunMultiWeppForm1
         AddHandler txtLengthDelta.TextChanged, AddressOf ParamTextChanged
 
     End Sub
-    
+    Private Function GetBaseDir() As String
+        Dim lString As String = ""
+
+        If txtPathBase.Text.Length > 1 Then
+            lString = Microsoft.VisualBasic.Left(txtPathBase.Text, txtPathBase.Text.LastIndexOf("\")) & "\"
+        End If
+
+        Return lString
+    End Function
+
+    Private Sub PopulateCopyAlso()
+        Try
+
+            If chkEnableAlso.Checked Then
+
+                lstCopyAlso.Enabled = True
+
+            'copy other files from base to wepp executable if they are selected
+            Dim lObjBaseDir As Directory
+                Dim lBaseFileList() As String = lObjBaseDir.GetFiles(GetBaseDir, "*")
+            Dim lOper As String
+            Dim lSingleFileName As String
+            Dim lAutoDetect As Boolean
+
+                For Each lOper In lBaseFileList
+                    If lOper <> txtPathBase.Text Then
+                        lSingleFileName = Microsoft.VisualBasic.Right(lOper, lOper.Length - lOper.LastIndexOf("\") - 1)
+                        If Microsoft.VisualBasic.Right(lSingleFileName, 3) = "man" Or Microsoft.VisualBasic.Right(lSingleFileName, 3) = "cli" Or Microsoft.VisualBasic.Right(lSingleFileName, 3) = "run" Or Microsoft.VisualBasic.Right(lSingleFileName, 3) = "sol" Then lAutoDetect = True
+                        lstCopyAlso.Items.Add(lSingleFileName, lAutoDetect)
+                        lAutoDetect = False
+                    End If
+                Next
+            Else
+                lstCopyAlso.Items.Clear()
+                lstCopyAlso.Enabled = False
+            End If
+
+        Catch ex As Exception
+
+        End Try
+    End Sub
     Private Sub btnBasePath_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBasePath.Click
         Try
             OpenFileDialog1.ShowDialog()
@@ -124,7 +169,15 @@ Public Class RunMultiWeppForm1
 
         Try
 
-            'Read the source slop file (once)
+            'copy additional files if any were selected
+            If lstCopyAlso.CheckedItems.Count > 1 Then
+                For Each lObj In lstCopyAlso.CheckedItems
+                    System.IO.File.Copy(GetBaseDir() & lObj, txtPathWepp.Text & "\" & lObj, True)
+                Next
+            End If
+
+
+            'Read the source slope file (once)
             Dim objReader As New System.IO.StreamReader(txtPathBase.Text)
             Dim lLinesSlopeIn As New ArrayList
 
@@ -132,13 +185,20 @@ Public Class RunMultiWeppForm1
                 lLinesSlopeIn.Add(objReader.ReadLine())
             Loop
 
+            'Make a text file linking main step index to parameter values. Plot files are names after main step index.
+            If Not System.IO.File.Exists(txtPathOutput.Text & "\index.txt") Then System.IO.File.Create(txtPathOutput.Text & "\index.txt", 1)
 
-            'Copy the master slope file input to a local copy to muck with
-            Dim lLinesCurrentSlope As ArrayList = lLinesSlopeIn
+            Dim objIndexWriter As New System.IO.StreamWriter(txtPathOutput.Text & "\index.txt")
+            objIndexWriter.WriteLine("# Index of multiple slope vs. length WEPP:Road runs. (index,slope(%),length(m)")
 
-            For j = 0 To 0 ' Step length
-                For k = 0 To 0 'Step slope (first)
 
+
+            For j = 0 To lLengthIterations - 1 ' Step length
+                For k = 0 To lSlopeIterations - 1 'Step slope (first)
+
+
+                    'Copy the master slope file input to a local copy to muck with
+                    Dim lLinesCurrentSlope As ArrayList = lLinesSlopeIn
 
                     'LINE 5 !!!! Get the new road length
                     lLinesCurrentSlope(4) = "2 " & lCurrentLength * 0.3048
@@ -177,19 +237,24 @@ Public Class RunMultiWeppForm1
 
                     objWriter.Close()
 
-                    lCurrentSlope += lSlopeDelta
-
-
+                    'note that the actual index (that is references) is one more than this, a -1 indicates that the first try of executing wepp was not successfull.
+                    'could do this with exit code and another index, but not able to turn the pesky Vista security warnings off when executing an external shell command in a more contemporary way.
                     lMainStepIndex += 1
+
+                    'write line in comma separated format for this index indicating parameter values
+                    objIndexWriter.WriteLine(lMainStepIndex + 1 & "," & lCurrentSlope & "," & lCurrentLength & vbCrLf)
+
                     txtRunStatus.Text = "Running: " & lMainStepIndex + 1 & "/" & lRunCount.ToString
                     ProgressBar1.Value = Math.Round((lMainStepIndex) / lRunCount) * 100
                     Shell(txtPathWepp.Text & "\weppbat.bat", AppWinStyle.Hide, True)
 
-                    If System.IO.File.Exists(txtPathPlot.Text) Then System.IO.File.Copy(txtPathPlot.Text, txtPathOutput.Text & "\please.txt")
-
+                    If System.IO.File.Exists(txtPathPlot.Text) Then System.IO.File.Copy(txtPathPlot.Text, txtPathOutput.Text & "\" & lMainStepIndex + 1 & ".txt", True)
+                    lCurrentSlope += lSlopeDelta
                 Next
                 lCurrentLength += lLengthDelta
             Next
+            objIndexWriter.Close()
+
             ProgressBar1.Value = 100
             txtRunStatus.Text = "Done!"
         Catch ex As Exception
@@ -204,8 +269,8 @@ Public Class RunMultiWeppForm1
         'Calculate the number of times to interate based on both length and slope variation
 
         If CDbl(txtSlopeDelta.Text) <> 0 AndAlso CDbl(txtLengthDelta.Text) <> 0 Then
-            lSlopeIterations = CInt(Math.Floor((CInt(txtSlopeStop.Text) - CInt(txtSlopeStart.Text) + 1) / CDbl(txtSlopeDelta.Text)))
-            lLengthIterations = CInt(Math.Floor((CDbl(txtLengthStop.Text) - CDbl(txtLengthStart.Text) + 1) / CDbl(txtLengthDelta.Text)))
+            lSlopeIterations = CInt(Math.Floor((CInt(txtSlopeStop.Text) - CInt(txtSlopeStart.Text) + CDbl(txtSlopeDelta.Text)) / CDbl(txtSlopeDelta.Text)))
+            lLengthIterations = CInt(Math.Floor((CDbl(txtLengthStop.Text) - CDbl(txtLengthStart.Text) + CDbl(txtLengthDelta.Text)) / CDbl(txtLengthDelta.Text)))
 
             txtSlopeSteps.Text = lSlopeIterations
             txtLengthSteps.Text = lLengthIterations
@@ -241,5 +306,7 @@ Public Class RunMultiWeppForm1
 
     End Sub
 
-
+    Private Sub txtPathBase_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtPathBase.TextChanged
+        GetBaseDir()
+    End Sub
 End Class
