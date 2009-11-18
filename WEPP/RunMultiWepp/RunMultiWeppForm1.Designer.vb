@@ -62,11 +62,16 @@ Partial Class RunMultiWeppForm1
         Me.Label5 = New System.Windows.Forms.Label()
         Me.btnPathPlot = New System.Windows.Forms.Button()
         Me.txtPathPlot = New System.Windows.Forms.TextBox()
+        Me.lstCopyAlso = New System.Windows.Forms.CheckedListBox()
+        Me.GroupBox4 = New System.Windows.Forms.GroupBox()
+        Me.chkEnableAlso = New System.Windows.Forms.CheckBox()
+        Me.Label8 = New System.Windows.Forms.Label()
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
+        Me.GroupBox4.SuspendLayout()
         Me.SuspendLayout()
         '
         'TabControl1
@@ -78,18 +83,19 @@ Partial Class RunMultiWeppForm1
         Me.TabControl1.Location = New System.Drawing.Point(27, 12)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(689, 567)
+        Me.TabControl1.Size = New System.Drawing.Size(970, 700)
         Me.TabControl1.TabIndex = 6
         '
         'TabPage1
         '
+        Me.TabPage1.Controls.Add(Me.GroupBox4)
         Me.TabPage1.Controls.Add(Me.GroupBox3)
         Me.TabPage1.Controls.Add(Me.GroupBox2)
         Me.TabPage1.Controls.Add(Me.GroupBox1)
         Me.TabPage1.Location = New System.Drawing.Point(4, 22)
         Me.TabPage1.Name = "TabPage1"
         Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage1.Size = New System.Drawing.Size(681, 541)
+        Me.TabPage1.Size = New System.Drawing.Size(962, 674)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "Road (Slope vs. Length)"
         Me.TabPage1.UseVisualStyleBackColor = True
@@ -101,9 +107,9 @@ Partial Class RunMultiWeppForm1
         Me.GroupBox3.Controls.Add(Me.txtRunStatus)
         Me.GroupBox3.Controls.Add(Me.btnExecute)
         Me.GroupBox3.Controls.Add(Me.ProgressBar1)
-        Me.GroupBox3.Location = New System.Drawing.Point(35, 426)
+        Me.GroupBox3.Location = New System.Drawing.Point(30, 501)
         Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(620, 99)
+        Me.GroupBox3.Size = New System.Drawing.Size(901, 99)
         Me.GroupBox3.TabIndex = 27
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "Execute"
@@ -148,11 +154,13 @@ Partial Class RunMultiWeppForm1
         '
         Me.ProgressBar1.Location = New System.Drawing.Point(165, 29)
         Me.ProgressBar1.Name = "ProgressBar1"
-        Me.ProgressBar1.Size = New System.Drawing.Size(433, 19)
+        Me.ProgressBar1.Size = New System.Drawing.Size(714, 19)
         Me.ProgressBar1.TabIndex = 26
         '
         'GroupBox2
         '
+        Me.GroupBox2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox2.Controls.Add(Me.Label5)
         Me.GroupBox2.Controls.Add(Me.btnPathPlot)
         Me.GroupBox2.Controls.Add(Me.txtPathPlot)
@@ -170,7 +178,7 @@ Partial Class RunMultiWeppForm1
         Me.GroupBox2.Controls.Add(Me.txtPathBase)
         Me.GroupBox2.Location = New System.Drawing.Point(30, 16)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(620, 202)
+        Me.GroupBox2.Size = New System.Drawing.Size(901, 226)
         Me.GroupBox2.TabIndex = 24
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Paths"
@@ -178,7 +186,7 @@ Partial Class RunMultiWeppForm1
         'Label6
         '
         Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(25, 65)
+        Me.Label6.Location = New System.Drawing.Point(25, 100)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(125, 13)
         Me.Label6.TabIndex = 22
@@ -186,7 +194,7 @@ Partial Class RunMultiWeppForm1
         '
         'btnSlopePath
         '
-        Me.btnSlopePath.Location = New System.Drawing.Point(165, 59)
+        Me.btnSlopePath.Location = New System.Drawing.Point(165, 94)
         Me.btnSlopePath.Name = "btnSlopePath"
         Me.btnSlopePath.Size = New System.Drawing.Size(28, 25)
         Me.btnSlopePath.TabIndex = 20
@@ -195,15 +203,17 @@ Partial Class RunMultiWeppForm1
         '
         'txtPathSlope
         '
-        Me.txtPathSlope.Location = New System.Drawing.Point(204, 61)
+        Me.txtPathSlope.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtPathSlope.Location = New System.Drawing.Point(204, 96)
         Me.txtPathSlope.Name = "txtPathSlope"
-        Me.txtPathSlope.Size = New System.Drawing.Size(394, 20)
+        Me.txtPathSlope.Size = New System.Drawing.Size(675, 20)
         Me.txtPathSlope.TabIndex = 21
         '
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(25, 155)
+        Me.Label3.Location = New System.Drawing.Point(25, 190)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(74, 13)
         Me.Label3.TabIndex = 19
@@ -211,7 +221,7 @@ Partial Class RunMultiWeppForm1
         '
         'btnOutPath
         '
-        Me.btnOutPath.Location = New System.Drawing.Point(165, 149)
+        Me.btnOutPath.Location = New System.Drawing.Point(165, 184)
         Me.btnOutPath.Name = "btnOutPath"
         Me.btnOutPath.Size = New System.Drawing.Size(28, 25)
         Me.btnOutPath.TabIndex = 17
@@ -220,15 +230,17 @@ Partial Class RunMultiWeppForm1
         '
         'txtPathOutput
         '
-        Me.txtPathOutput.Location = New System.Drawing.Point(204, 151)
+        Me.txtPathOutput.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtPathOutput.Location = New System.Drawing.Point(204, 186)
         Me.txtPathOutput.Name = "txtPathOutput"
-        Me.txtPathOutput.Size = New System.Drawing.Size(394, 20)
+        Me.txtPathOutput.Size = New System.Drawing.Size(675, 20)
         Me.txtPathOutput.TabIndex = 18
         '
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(25, 94)
+        Me.Label1.Location = New System.Drawing.Point(25, 129)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(124, 13)
         Me.Label1.TabIndex = 16
@@ -236,7 +248,7 @@ Partial Class RunMultiWeppForm1
         '
         'btnWeppPath
         '
-        Me.btnWeppPath.Location = New System.Drawing.Point(165, 88)
+        Me.btnWeppPath.Location = New System.Drawing.Point(165, 123)
         Me.btnWeppPath.Name = "btnWeppPath"
         Me.btnWeppPath.Size = New System.Drawing.Size(28, 25)
         Me.btnWeppPath.TabIndex = 14
@@ -245,15 +257,17 @@ Partial Class RunMultiWeppForm1
         '
         'txtPathWepp
         '
-        Me.txtPathWepp.Location = New System.Drawing.Point(204, 90)
+        Me.txtPathWepp.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtPathWepp.Location = New System.Drawing.Point(204, 125)
         Me.txtPathWepp.Name = "txtPathWepp"
-        Me.txtPathWepp.Size = New System.Drawing.Size(394, 20)
+        Me.txtPathWepp.Size = New System.Drawing.Size(675, 20)
         Me.txtPathWepp.TabIndex = 15
         '
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(25, 36)
+        Me.Label2.Location = New System.Drawing.Point(25, 71)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(108, 13)
         Me.Label2.TabIndex = 13
@@ -261,7 +275,7 @@ Partial Class RunMultiWeppForm1
         '
         'btnBasePath
         '
-        Me.btnBasePath.Location = New System.Drawing.Point(165, 30)
+        Me.btnBasePath.Location = New System.Drawing.Point(165, 65)
         Me.btnBasePath.Name = "btnBasePath"
         Me.btnBasePath.Size = New System.Drawing.Size(28, 25)
         Me.btnBasePath.TabIndex = 11
@@ -270,9 +284,11 @@ Partial Class RunMultiWeppForm1
         '
         'txtPathBase
         '
-        Me.txtPathBase.Location = New System.Drawing.Point(204, 32)
+        Me.txtPathBase.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtPathBase.Location = New System.Drawing.Point(204, 67)
         Me.txtPathBase.Name = "txtPathBase"
-        Me.txtPathBase.Size = New System.Drawing.Size(394, 20)
+        Me.txtPathBase.Size = New System.Drawing.Size(675, 20)
         Me.txtPathBase.TabIndex = 12
         '
         'GroupBox1
@@ -291,9 +307,9 @@ Partial Class RunMultiWeppForm1
         Me.GroupBox1.Controls.Add(Me.txtLengthStart)
         Me.GroupBox1.Controls.Add(Me.txtLengthStop)
         Me.GroupBox1.Controls.Add(Me.txtLengthDelta)
-        Me.GroupBox1.Location = New System.Drawing.Point(40, 283)
+        Me.GroupBox1.Location = New System.Drawing.Point(30, 258)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(620, 137)
+        Me.GroupBox1.Size = New System.Drawing.Size(496, 226)
         Me.GroupBox1.TabIndex = 23
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Variables"
@@ -301,7 +317,7 @@ Partial Class RunMultiWeppForm1
         'Label9
         '
         Me.Label9.AutoSize = True
-        Me.Label9.Location = New System.Drawing.Point(2, 33)
+        Me.Label9.Location = New System.Drawing.Point(2, 71)
         Me.Label9.Name = "Label9"
         Me.Label9.Size = New System.Drawing.Size(86, 13)
         Me.Label9.TabIndex = 28
@@ -310,7 +326,7 @@ Partial Class RunMultiWeppForm1
         'Label10
         '
         Me.Label10.AutoSize = True
-        Me.Label10.Location = New System.Drawing.Point(336, 17)
+        Me.Label10.Location = New System.Drawing.Point(336, 55)
         Me.Label10.Name = "Label10"
         Me.Label10.Size = New System.Drawing.Size(32, 13)
         Me.Label10.TabIndex = 32
@@ -318,7 +334,7 @@ Partial Class RunMultiWeppForm1
         '
         'txtSlopeStart
         '
-        Me.txtSlopeStart.Location = New System.Drawing.Point(131, 33)
+        Me.txtSlopeStart.Location = New System.Drawing.Point(131, 71)
         Me.txtSlopeStart.Name = "txtSlopeStart"
         Me.txtSlopeStart.Size = New System.Drawing.Size(79, 20)
         Me.txtSlopeStart.TabIndex = 22
@@ -326,7 +342,7 @@ Partial Class RunMultiWeppForm1
         'Label11
         '
         Me.Label11.AutoSize = True
-        Me.Label11.Location = New System.Drawing.Point(247, 17)
+        Me.Label11.Location = New System.Drawing.Point(247, 55)
         Me.Label11.Name = "Label11"
         Me.Label11.Size = New System.Drawing.Size(29, 13)
         Me.Label11.TabIndex = 31
@@ -334,7 +350,7 @@ Partial Class RunMultiWeppForm1
         '
         'txtSlopeStop
         '
-        Me.txtSlopeStop.Location = New System.Drawing.Point(222, 33)
+        Me.txtSlopeStop.Location = New System.Drawing.Point(222, 71)
         Me.txtSlopeStop.Name = "txtSlopeStop"
         Me.txtSlopeStop.Size = New System.Drawing.Size(79, 20)
         Me.txtSlopeStop.TabIndex = 23
@@ -342,7 +358,7 @@ Partial Class RunMultiWeppForm1
         'Label12
         '
         Me.Label12.AutoSize = True
-        Me.Label12.Location = New System.Drawing.Point(156, 17)
+        Me.Label12.Location = New System.Drawing.Point(156, 55)
         Me.Label12.Name = "Label12"
         Me.Label12.Size = New System.Drawing.Size(29, 13)
         Me.Label12.TabIndex = 30
@@ -350,7 +366,7 @@ Partial Class RunMultiWeppForm1
         '
         'txtSlopeDelta
         '
-        Me.txtSlopeDelta.Location = New System.Drawing.Point(313, 33)
+        Me.txtSlopeDelta.Location = New System.Drawing.Point(313, 71)
         Me.txtSlopeDelta.Name = "txtSlopeDelta"
         Me.txtSlopeDelta.Size = New System.Drawing.Size(79, 20)
         Me.txtSlopeDelta.TabIndex = 24
@@ -358,7 +374,7 @@ Partial Class RunMultiWeppForm1
         'Label13
         '
         Me.Label13.AutoSize = True
-        Me.Label13.Location = New System.Drawing.Point(2, 72)
+        Me.Label13.Location = New System.Drawing.Point(2, 127)
         Me.Label13.Name = "Label13"
         Me.Label13.Size = New System.Drawing.Size(83, 13)
         Me.Label13.TabIndex = 29
@@ -366,21 +382,21 @@ Partial Class RunMultiWeppForm1
         '
         'txtLengthStart
         '
-        Me.txtLengthStart.Location = New System.Drawing.Point(131, 69)
+        Me.txtLengthStart.Location = New System.Drawing.Point(131, 124)
         Me.txtLengthStart.Name = "txtLengthStart"
         Me.txtLengthStart.Size = New System.Drawing.Size(79, 20)
         Me.txtLengthStart.TabIndex = 25
         '
         'txtLengthStop
         '
-        Me.txtLengthStop.Location = New System.Drawing.Point(222, 69)
+        Me.txtLengthStop.Location = New System.Drawing.Point(222, 124)
         Me.txtLengthStop.Name = "txtLengthStop"
         Me.txtLengthStop.Size = New System.Drawing.Size(79, 20)
         Me.txtLengthStop.TabIndex = 26
         '
         'txtLengthDelta
         '
-        Me.txtLengthDelta.Location = New System.Drawing.Point(313, 69)
+        Me.txtLengthDelta.Location = New System.Drawing.Point(313, 124)
         Me.txtLengthDelta.Name = "txtLengthDelta"
         Me.txtLengthDelta.Size = New System.Drawing.Size(79, 20)
         Me.txtLengthDelta.TabIndex = 27
@@ -392,7 +408,7 @@ Partial Class RunMultiWeppForm1
         'txtSlopeSteps
         '
         Me.txtSlopeSteps.Enabled = False
-        Me.txtSlopeSteps.Location = New System.Drawing.Point(398, 33)
+        Me.txtSlopeSteps.Location = New System.Drawing.Point(398, 71)
         Me.txtSlopeSteps.Name = "txtSlopeSteps"
         Me.txtSlopeSteps.Size = New System.Drawing.Size(79, 20)
         Me.txtSlopeSteps.TabIndex = 33
@@ -400,7 +416,7 @@ Partial Class RunMultiWeppForm1
         'txtLengthSteps
         '
         Me.txtLengthSteps.Enabled = False
-        Me.txtLengthSteps.Location = New System.Drawing.Point(398, 69)
+        Me.txtLengthSteps.Location = New System.Drawing.Point(398, 124)
         Me.txtLengthSteps.Name = "txtLengthSteps"
         Me.txtLengthSteps.Size = New System.Drawing.Size(79, 20)
         Me.txtLengthSteps.TabIndex = 34
@@ -408,7 +424,7 @@ Partial Class RunMultiWeppForm1
         'Label7
         '
         Me.Label7.AutoSize = True
-        Me.Label7.Location = New System.Drawing.Point(421, 17)
+        Me.Label7.Location = New System.Drawing.Point(421, 55)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(34, 13)
         Me.Label7.TabIndex = 35
@@ -417,7 +433,7 @@ Partial Class RunMultiWeppForm1
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(25, 124)
+        Me.Label5.Location = New System.Drawing.Point(25, 159)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(72, 13)
         Me.Label5.TabIndex = 25
@@ -425,7 +441,7 @@ Partial Class RunMultiWeppForm1
         '
         'btnPathPlot
         '
-        Me.btnPathPlot.Location = New System.Drawing.Point(165, 118)
+        Me.btnPathPlot.Location = New System.Drawing.Point(165, 153)
         Me.btnPathPlot.Name = "btnPathPlot"
         Me.btnPathPlot.Size = New System.Drawing.Size(28, 25)
         Me.btnPathPlot.TabIndex = 23
@@ -434,20 +450,62 @@ Partial Class RunMultiWeppForm1
         '
         'txtPathPlot
         '
-        Me.txtPathPlot.Location = New System.Drawing.Point(204, 120)
+        Me.txtPathPlot.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtPathPlot.Location = New System.Drawing.Point(204, 155)
         Me.txtPathPlot.Name = "txtPathPlot"
-        Me.txtPathPlot.Size = New System.Drawing.Size(394, 20)
+        Me.txtPathPlot.Size = New System.Drawing.Size(675, 20)
         Me.txtPathPlot.TabIndex = 24
+        '
+        'lstCopyAlso
+        '
+        Me.lstCopyAlso.FormattingEnabled = True
+        Me.lstCopyAlso.Location = New System.Drawing.Point(46, 55)
+        Me.lstCopyAlso.Name = "lstCopyAlso"
+        Me.lstCopyAlso.Size = New System.Drawing.Size(301, 154)
+        Me.lstCopyAlso.TabIndex = 28
+        '
+        'GroupBox4
+        '
+        Me.GroupBox4.Controls.Add(Me.Label8)
+        Me.GroupBox4.Controls.Add(Me.chkEnableAlso)
+        Me.GroupBox4.Controls.Add(Me.lstCopyAlso)
+        Me.GroupBox4.Location = New System.Drawing.Point(539, 258)
+        Me.GroupBox4.Name = "GroupBox4"
+        Me.GroupBox4.Size = New System.Drawing.Size(392, 226)
+        Me.GroupBox4.TabIndex = 29
+        Me.GroupBox4.TabStop = False
+        Me.GroupBox4.Text = "Copy Additional Files from Base Folder to Wepp Exec Folder ?"
+        '
+        'chkEnableAlso
+        '
+        Me.chkEnableAlso.AutoSize = True
+        Me.chkEnableAlso.Location = New System.Drawing.Point(19, 24)
+        Me.chkEnableAlso.Name = "chkEnableAlso"
+        Me.chkEnableAlso.Size = New System.Drawing.Size(44, 17)
+        Me.chkEnableAlso.TabIndex = 29
+        Me.chkEnableAlso.Text = "Yes"
+        Me.chkEnableAlso.UseVisualStyleBackColor = True
+        '
+        'Label8
+        '
+        Me.Label8.AutoSize = True
+        Me.Label8.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label8.Location = New System.Drawing.Point(104, 26)
+        Me.Label8.Name = "Label8"
+        Me.Label8.Size = New System.Drawing.Size(171, 13)
+        Me.Label8.TabIndex = 36
+        Me.Label8.Text = "(Caution, Overwrites Existing Files!)"
         '
         'RunMultiWeppForm1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(753, 591)
+        Me.ClientSize = New System.Drawing.Size(1034, 724)
         Me.Controls.Add(Me.TabControl1)
-        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
         Me.MaximizeBox = False
         Me.MinimizeBox = False
+        Me.MinimumSize = New System.Drawing.Size(1050, 760)
         Me.Name = "RunMultiWeppForm1"
         Me.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide
         Me.Text = "Run Multi Wepp Tool"
@@ -459,6 +517,8 @@ Partial Class RunMultiWeppForm1
         Me.GroupBox2.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
+        Me.GroupBox4.ResumeLayout(False)
+        Me.GroupBox4.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -502,4 +562,8 @@ Partial Class RunMultiWeppForm1
     Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents btnPathPlot As System.Windows.Forms.Button
     Friend WithEvents txtPathPlot As System.Windows.Forms.TextBox
+    Friend WithEvents GroupBox4 As System.Windows.Forms.GroupBox
+    Friend WithEvents lstCopyAlso As System.Windows.Forms.CheckedListBox
+    Friend WithEvents chkEnableAlso As System.Windows.Forms.CheckBox
+    Friend WithEvents Label8 As System.Windows.Forms.Label
 End Class
