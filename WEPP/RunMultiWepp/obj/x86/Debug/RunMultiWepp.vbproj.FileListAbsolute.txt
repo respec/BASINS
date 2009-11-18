@@ -1,0 +1,15 @@
+C:\Dev\BASINS40\WEPP\RunMultiWepp\bin\Debug\RunMultiWepp.exe
+C:\Dev\BASINS40\WEPP\RunMultiWepp\bin\Debug\RunMultiWepp.pdb
+C:\Dev\BASINS40\WEPP\RunMultiWepp\bin\Debug\RunMultiWepp.xml
+C:\Dev\BASINS40\WEPP\RunMultiWepp\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Dev\BASINS40\WEPP\RunMultiWepp\obj\x86\Debug\RunMultiWepp.Resources.resources
+C:\Dev\BASINS40\WEPP\RunMultiWepp\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Dev\BASINS40\WEPP\RunMultiWepp\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Dev\BASINS40\WEPP\RunMultiWepp\obj\x86\Debug\RunMultiWepp.exe
+C:\Dev\BASINS40\WEPP\RunMultiWepp\obj\x86\Debug\RunMultiWepp.xml
+C:\Dev\BASINS40\WEPP\RunMultiWepp\obj\x86\Debug\RunMultiWepp.pdb
+C:\Dev\BASINS40\WEPP\RunMultiWepp\bin\Debug\RunMultiWepp.exe.manifest
+C:\Dev\BASINS40\WEPP\RunMultiWepp\bin\Debug\RunMultiWepp.application
+C:\Dev\BASINS40\WEPP\RunMultiWepp\obj\x86\Debug\RunMultiWepp.exe.manifest
+C:\Dev\BASINS40\WEPP\RunMultiWepp\obj\x86\Debug\RunMultiWepp.application
+C:\Dev\BASINS40\WEPP\RunMultiWepp\obj\x86\Debug\RunMultiWepp.RunMultiWeppForm1.resources
