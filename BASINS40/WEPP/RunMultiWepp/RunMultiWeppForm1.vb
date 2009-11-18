@@ -1,48 +1,44 @@
 ﻿Imports System.IO
+Imports atcUtility
 
 Public Class RunMultiWeppForm1
+
+    Public lSlopeIterations As Integer
+    Public lLengthIterations As Integer
+    Public lRunCount As Integer = 0
 
     Public Sub New()
 
         ' This call is required by the designer.
         InitializeComponent()
 
-        txtPathBase.Text = "<>"
+        'Temporary Default Value set
         txtPathBase.Text = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\cli.met\4\in.slp"
-        txtPathWepp.Text = "<>"
-        txtPathOutput.Text = "<>"
-        txtPathOutput.Text = "C:\output.txt"
+        txtPathSlope.Text = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\wepp.run\in.slp"
+        txtPathWepp.Text = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\wepp.run"
+        txtPathPlot.Text = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\wepp.run\out-plot.txt"
+        txtPathOutput.Text = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\sensitivity\A"
 
-        txtSlopeStart.Text = "0"
-        txtSlopeStop.Text = "0"
-        txtSlopeDelta.Text = "0"
+        txtSlopeStart.Text = "1"
+        txtSlopeStop.Text = "40"
+        txtSlopeDelta.Text = "4"
 
-        txtLengthStart.Text = "0"
-        txtLengthStop.Text = "0"
-        txtLengthDelta.Text = "0"
+        txtLengthStart.Text = "1"
+        txtLengthStop.Text = "300"
+        txtLengthDelta.Text = "15"
 
-    End Sub
+        CalculateIterations()
 
-    Public Sub ShellandWait(ByVal ProcessPath As String)
-        Dim objProcess As System.Diagnostics.Process
-        Try
-            objProcess = New System.Diagnostics.Process()
-            objProcess.StartInfo.FileName = ProcessPath
-            objProcess.StartInfo.WindowStyle = ProcessWindowStyle.Normal
-            objProcess.Start()
+        AddHandler txtSlopeStart.TextChanged, AddressOf ParamTextChanged
+        AddHandler txtSlopeStop.TextChanged, AddressOf ParamTextChanged
+        AddHandler txtSlopeDelta.TextChanged, AddressOf ParamTextChanged
+        AddHandler txtLengthStart.TextChanged, AddressOf ParamTextChanged
+        AddHandler txtLengthStop.TextChanged, AddressOf ParamTextChanged
+        AddHandler txtLengthDelta.TextChanged, AddressOf ParamTextChanged
 
-            'Wait until the process passes back an exit code 
-            objProcess.WaitForExit()
-
-            'Free resources associated with this process
-            objProcess.Close()
-        Catch
-            MessageBox.Show("Could not start process " & ProcessPath, "Error")
-        End Try
     End Sub
     
-
-    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+    Private Sub btnBasePath_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBasePath.Click
         Try
             OpenFileDialog1.ShowDialog()
 
@@ -56,7 +52,7 @@ Public Class RunMultiWeppForm1
 
     End Sub
 
-    Private Sub Button2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
+    Private Sub btnWeppPath_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnWeppPath.Click
         Try
             OpenFileDialog1.Reset()
             OpenFileDialog1.ShowDialog()
@@ -70,7 +66,35 @@ Public Class RunMultiWeppForm1
         End Try
     End Sub
 
-    Private Sub Button3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button3.Click
+    Private Sub btnSlopePath_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSlopePath.Click
+        Try
+            OpenFileDialog1.Reset()
+            OpenFileDialog1.ShowDialog()
+
+            If Not OpenFileDialog1.FileName Is Nothing Then
+                txtPathSlope.Text = OpenFileDialog1.FileName
+            End If
+
+        Catch ex As Exception
+            MsgBox("Bad Path Name")
+        End Try
+    End Sub
+
+    Private Sub btnPathPlot_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPathPlot.Click
+        Try
+            OpenFileDialog1.Reset()
+            OpenFileDialog1.ShowDialog()
+
+            If Not OpenFileDialog1.FileName Is Nothing Then
+                txtPathPlot.Text = OpenFileDialog1.FileName
+            End If
+
+        Catch ex As Exception
+            MsgBox("Bad Path Name")
+        End Try
+    End Sub
+
+    Private Sub btnOutPath_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOutPath.Click
         Try
             OpenFileDialog1.Reset()
             OpenFileDialog1.ShowDialog()
@@ -85,7 +109,19 @@ Public Class RunMultiWeppForm1
     End Sub
 
 
+    Function WEPPformatMoreDetail(ByVal aNumber As Double) As String
+        Dim lStr As String = Math.Round(aNumber, 2, MidpointRounding.AwayFromZero)
+        Return lStr
+    End Function
+
     Private Sub btnExecute_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnExecute.Click
+        Dim lMainStepIndex As Integer = -1
+
+        Dim lCurrentSlope As Double = CDbl(txtSlopeStart.Text)
+        Dim lCurrentLength As Double = CDbl(txtLengthStart.Text)
+        Dim lSlopeDelta As Double = CDbl(txtSlopeDelta.Text)
+        Dim lLengthDelta As Double = CDbl(txtLengthDelta.Text)
+
         Try
 
             'Read the source slop file (once)
@@ -96,32 +132,114 @@ Public Class RunMultiWeppForm1
                 lLinesSlopeIn.Add(objReader.ReadLine())
             Loop
 
-            'Copy the master slope file input to a local copy to much with
+
+            'Copy the master slope file input to a local copy to muck with
             Dim lLinesCurrentSlope As ArrayList = lLinesSlopeIn
 
-            'Get the new length
-            lLinesCurrentSlope(4) = "2 " & txtLengthStart.Text
+            For j = 0 To 0 ' Step length
+                For k = 0 To 0 'Step slope (first)
 
-            'read line 6 and separate the elements by delimiter of comma
 
-            Dim lLine6Elements() As String = lLinesSlopeIn(5).ToString.Split(" ")
-            lLine6Elements(1) = txtSlopeStart.Text
+                    'LINE 5 !!!! Get the new road length
+                    lLinesCurrentSlope(4) = "2 " & lCurrentLength * 0.3048
 
-            lLinesCurrentSlope(5) = "2 " & CDbl(txtLengthStart.Text)
+                    'LINE 6 !!!! Read line 6 and separate the elements by delimiter of comma
 
-            'Write the modified Slope File
-            If Not System.IO.File.Exists(txtPathOutput.Text) Then System.IO.File.Create(txtPathOutput.Text, 1, FileOptions.None)
+                    Dim lLine6Elements() As String = lLinesSlopeIn(5).ToString.Split(" ")
+                    lLine6Elements(1) = WEPPformatMoreDetail(lCurrentSlope / 100)
+                    lLine6Elements(4) = WEPPformatMoreDetail(lCurrentSlope / 100)
 
-            Dim objWriter As New System.IO.StreamWriter(txtPathOutput.Text)
+                    lLinesCurrentSlope(5) = ""
+                    For i = 0 To lLine6Elements.Length - 1
+                        lLinesCurrentSlope(5) &= lLine6Elements(i)
+                        If Not i = lLine6Elements.Length - 1 Then lLinesCurrentSlope(5) &= " "
+                    Next
 
-            For i = 0 To lLinesSlopeIn.Count - 1
-                objWriter.WriteLine(lLinesCurrentSlope(i))
+                    'LINE 8 !!!! Read line 6 and separate the elements by delimiter of comma
+
+                    Dim lLine8Elements() As String = lLinesSlopeIn(7).ToString.Split(" ")
+                    lLine8Elements(1) = WEPPformatMoreDetail(lCurrentSlope / 100)
+
+                    lLinesCurrentSlope(7) = ""
+                    For i = 0 To lLine8Elements.Length - 1
+                        lLinesCurrentSlope(7) &= lLine8Elements(i)
+                        If Not i = lLine8Elements.Length - 1 Then lLinesCurrentSlope(7) &= " "
+                    Next
+
+                    'Write the modified Slope File
+                    If Not System.IO.File.Exists(txtPathSlope.Text) Then System.IO.File.Create(txtPathSlope.Text, 1)
+
+                    Dim objWriter As New System.IO.StreamWriter(txtPathSlope.Text)
+
+                    For i = 0 To lLinesSlopeIn.Count - 1
+                        objWriter.WriteLine(lLinesCurrentSlope(i))
+                    Next
+
+                    objWriter.Close()
+
+                    lCurrentSlope += lSlopeDelta
+
+
+                    lMainStepIndex += 1
+                    txtRunStatus.Text = "Running: " & lMainStepIndex + 1 & "/" & lRunCount.ToString
+                    ProgressBar1.Value = Math.Round((lMainStepIndex) / lRunCount) * 100
+                    Shell(txtPathWepp.Text & "\weppbat.bat", AppWinStyle.Hide, True)
+
+                    If System.IO.File.Exists(txtPathPlot.Text) Then System.IO.File.Copy(txtPathPlot.Text, txtPathOutput.Text & "\please.txt")
+
+                Next
+                lCurrentLength += lLengthDelta
             Next
-
-            objWriter.Close()
-
+            ProgressBar1.Value = 100
+            txtRunStatus.Text = "Done!"
         Catch ex As Exception
+            If lMainStepIndex > -1 Then
+                txtRunStatus.Text = "Error: Last attempted run was at index " & lMainStepIndex & "(Slope = " & lCurrentSlope & ", Length = " & lCurrentLength & ".)"
+            End If
+            txtRunStatus.Text = "Error"
             MsgBox("Something(s) Bad, Check Input, paths and Wepp error file")
         End Try
     End Sub
+    Private Sub CalculateIterations()
+        'Calculate the number of times to interate based on both length and slope variation
+
+        If CDbl(txtSlopeDelta.Text) <> 0 AndAlso CDbl(txtLengthDelta.Text) <> 0 Then
+            lSlopeIterations = CInt(Math.Floor((CInt(txtSlopeStop.Text) - CInt(txtSlopeStart.Text) + 1) / CDbl(txtSlopeDelta.Text)))
+            lLengthIterations = CInt(Math.Floor((CDbl(txtLengthStop.Text) - CDbl(txtLengthStart.Text) + 1) / CDbl(txtLengthDelta.Text)))
+
+            txtSlopeSteps.Text = lSlopeIterations
+            txtLengthSteps.Text = lLengthIterations
+
+            lRunCount = CInt(lSlopeIterations * lLengthIterations)
+        End If
+        If lRunCount > 0 AndAlso Math.IEEERemainder(lRunCount, 1) = 0 Then
+            btnExecute.Enabled = True
+            btnExecute.Text = "Go!"
+            txtRunCount.Text = lRunCount
+        End If
+    End Sub
+
+    Private Sub ParamTextChanged(ByVal aSender As System.Object, ByVal aEventArgs As System.EventArgs)
+        Dim lLocalControl As New System.Windows.Forms.TextBox
+        lLocalControl = aSender
+
+        If IsNumeric(lLocalControl.Text) Then
+            CalculateIterations()
+        Else
+            lRunCount = 0
+            txtRunCount.Text = "-"
+            If Microsoft.VisualBasic.Left(lLocalControl.Name, 8) = "txtSlope" Then
+                txtSlopeSteps.Text = "Bad Input"
+            ElseIf Microsoft.VisualBasic.Left(lLocalControl.Name, 9) = "txtLength" Then
+                txtLengthSteps.Text = "Bad Input"
+            End If
+            btnExecute.Enabled = False
+            btnExecute.Text = "Bad Input"
+        End If
+
+
+
+    End Sub
+
+
 End Class

@@ -8,14 +8,14 @@
     <framework targetVersion="4.0" profile="Full" supportedRuntime="4.0.21006" />
   </compatibleFrameworks>
   <dependency>
-    <dependentAssembly dependencyType="install" codebase="RunMultiWepp.exe.manifest" size="3072">
+    <dependentAssembly dependencyType="install" codebase="RunMultiWepp.exe.manifest" size="3693">
       <assemblyIdentity name="RunMultiWepp.exe" version="1.0.1.1" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>QihPK+S7zoLQUq1peTkX/5gheq4=</dsig:DigestValue>
+        <dsig:DigestValue>KI6ZSLM6B9VMAkuxT9ic/rUW+sY=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
