@@ -5,6 +5,8 @@ Public Class RunMultiWeppForm1
 
     Public lSlopeIterations As Integer
     Public lLengthIterations As Integer
+    Public lSlopeDelta As Double
+    Public lLengthDelta As Double
     Public lRunCount As Integer = 0
 
     Public Sub New()
@@ -19,27 +21,27 @@ Public Class RunMultiWeppForm1
         txtPathPlot.Text = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\wepp.run\out-plot.txt"
         txtPathOutput.Text = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\sensitivity\A"
 
-
-
         PopulateCopyAlso()
 
-
-        txtSlopeStart.Text = "1"
+        txtSlopeStart.Text = "0.1"
         txtSlopeStop.Text = "40"
-        txtSlopeDelta.Text = "4"
+        txtSlopeDelta.Text = "<>"
+        txtSlopeSteps.Text = "20"
 
         txtLengthStart.Text = "1"
         txtLengthStop.Text = "300"
-        txtLengthDelta.Text = "15"
+        txtLengthDelta.Text = "<>"
+        txtLengthSteps.Text = "20"
 
         CalculateIterations()
+
         AddHandler chkEnableAlso.CheckStateChanged, AddressOf PopulateCopyAlso
         AddHandler txtSlopeStart.TextChanged, AddressOf ParamTextChanged
         AddHandler txtSlopeStop.TextChanged, AddressOf ParamTextChanged
-        AddHandler txtSlopeDelta.TextChanged, AddressOf ParamTextChanged
+        AddHandler txtSlopeSteps.TextChanged, AddressOf ParamTextChanged
         AddHandler txtLengthStart.TextChanged, AddressOf ParamTextChanged
         AddHandler txtLengthStop.TextChanged, AddressOf ParamTextChanged
-        AddHandler txtLengthDelta.TextChanged, AddressOf ParamTextChanged
+        AddHandler txtLengthSteps.TextChanged, AddressOf ParamTextChanged
 
     End Sub
     Private Function GetBaseDir() As String
@@ -160,12 +162,14 @@ Public Class RunMultiWeppForm1
     End Function
 
     Private Sub btnExecute_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnExecute.Click
+        txtRunStatus.Text = "Running..."
+        btnExecute.Enabled = False
+        btnExecute.Text = "Running..."
+
         Dim lMainStepIndex As Integer = -1
 
-        Dim lCurrentSlope As Double = CDbl(txtSlopeStart.Text)
+        Dim lCurrentSlope As Double = CDbl(txtLengthStart.Text)
         Dim lCurrentLength As Double = CDbl(txtLengthStart.Text)
-        Dim lSlopeDelta As Double = CDbl(txtSlopeDelta.Text)
-        Dim lLengthDelta As Double = CDbl(txtLengthDelta.Text)
 
         Try
 
@@ -186,15 +190,17 @@ Public Class RunMultiWeppForm1
             Loop
 
             'Make a text file linking main step index to parameter values. Plot files are names after main step index.
-            If Not System.IO.File.Exists(txtPathOutput.Text & "\index.txt") Then System.IO.File.Create(txtPathOutput.Text & "\index.txt", 1)
+            If Not System.IO.File.Exists(txtPathOutput.Text & "\index.csv") Then System.IO.File.Create(txtPathOutput.Text & "\index.csv", 1)
 
-            Dim objIndexWriter As New System.IO.StreamWriter(txtPathOutput.Text & "\index.txt")
+            Dim objIndexWriter As New System.IO.StreamWriter(txtPathOutput.Text & "\index.csv")
             objIndexWriter.WriteLine("# Index of multiple slope vs. length WEPP:Road runs. (index,slope(%),length(m)")
 
 
 
             For j = 0 To lLengthIterations - 1 ' Step length
+                lCurrentLength = CDbl(txtLengthStart.Text) + j * lLengthDelta
                 For k = 0 To lSlopeIterations - 1 'Step slope (first)
+                    lCurrentSlope = CDbl(txtSlopeStart.Text) + k * lSlopeDelta
 
 
                     'Copy the master slope file input to a local copy to muck with
@@ -242,21 +248,24 @@ Public Class RunMultiWeppForm1
                     lMainStepIndex += 1
 
                     'write line in comma separated format for this index indicating parameter values
-                    objIndexWriter.WriteLine(lMainStepIndex + 1 & "," & lCurrentSlope & "," & lCurrentLength & vbCrLf)
+                    objIndexWriter.WriteLine(lMainStepIndex + 1 & "," & lCurrentSlope & "," & lCurrentLength)
 
                     txtRunStatus.Text = "Running: " & lMainStepIndex + 1 & "/" & lRunCount.ToString
                     ProgressBar1.Value = Math.Round((lMainStepIndex) / lRunCount) * 100
                     Shell(txtPathWepp.Text & "\weppbat.bat", AppWinStyle.Hide, True)
 
                     If System.IO.File.Exists(txtPathPlot.Text) Then System.IO.File.Copy(txtPathPlot.Text, txtPathOutput.Text & "\" & lMainStepIndex + 1 & ".txt", True)
-                    lCurrentSlope += lSlopeDelta
+
                 Next
-                lCurrentLength += lLengthDelta
+
             Next
             objIndexWriter.Close()
 
             ProgressBar1.Value = 100
             txtRunStatus.Text = "Done!"
+
+            btnExecute.Enabled = True
+            btnExecute.Text = "Go!"
         Catch ex As Exception
             If lMainStepIndex > -1 Then
                 txtRunStatus.Text = "Error: Last attempted run was at index " & lMainStepIndex & "(Slope = " & lCurrentSlope & ", Length = " & lCurrentLength & ".)"
@@ -265,18 +274,36 @@ Public Class RunMultiWeppForm1
             MsgBox("Something(s) Bad, Check Input, paths and Wepp error file")
         End Try
     End Sub
+
     Private Sub CalculateIterations()
         'Calculate the number of times to interate based on both length and slope variation
 
-        If CDbl(txtSlopeDelta.Text) <> 0 AndAlso CDbl(txtLengthDelta.Text) <> 0 Then
-            lSlopeIterations = CInt(Math.Floor((CInt(txtSlopeStop.Text) - CInt(txtSlopeStart.Text) + CDbl(txtSlopeDelta.Text)) / CDbl(txtSlopeDelta.Text)))
-            lLengthIterations = CInt(Math.Floor((CDbl(txtLengthStop.Text) - CDbl(txtLengthStart.Text) + CDbl(txtLengthDelta.Text)) / CDbl(txtLengthDelta.Text)))
-
-            txtSlopeSteps.Text = lSlopeIterations
-            txtLengthSteps.Text = lLengthIterations
-
-            lRunCount = CInt(lSlopeIterations * lLengthIterations)
+        If CDbl(txtSlopeSteps.Text) > 1 Then
+            lSlopeDelta = (CDbl(txtSlopeStop.Text) - CDbl(txtSlopeStart.Text)) / (CDbl(txtSlopeSteps.Text) - 1)
+            txtSlopeDelta.Text = lSlopeDelta
+        ElseIf CDbl(txtSlopeDelta.Text) <= 1 Then
+            lSlopeIterations = 1
+            txtSlopeStop.Text = txtSlopeStart.Text
+            txtSlopeSteps.Text = "1"
+            lSlopeDelta = 0
         End If
+
+        If CDbl(txtLengthSteps.Text) > 1 Then
+            lLengthDelta = (CDbl(txtLengthStop.Text) - CDbl(txtLengthStart.Text)) / (CDbl(txtLengthSteps.Text) - 1)
+            txtLengthDelta.Text = lLengthDelta
+        ElseIf CDbl(txtLengthDelta.Text) <= 1 Then
+            lLengthIterations = 1
+            txtLengthStop.Text = txtLengthStart.Text
+            txtLengthSteps.Text = "1"
+            lLengthDelta = 0
+        End If
+
+        lSlopeIterations = CInt(txtSlopeSteps.Text)
+        lLengthIterations = CInt(txtLengthSteps.Text)
+
+        lRunCount = CInt(lSlopeIterations * lLengthIterations)
+        txtRunCount.Text = lRunCount.ToString
+
         If lRunCount > 0 AndAlso Math.IEEERemainder(lRunCount, 1) = 0 Then
             btnExecute.Enabled = True
             btnExecute.Text = "Go!"
@@ -293,13 +320,10 @@ Public Class RunMultiWeppForm1
         Else
             lRunCount = 0
             txtRunCount.Text = "-"
-            If Microsoft.VisualBasic.Left(lLocalControl.Name, 8) = "txtSlope" Then
-                txtSlopeSteps.Text = "Bad Input"
-            ElseIf Microsoft.VisualBasic.Left(lLocalControl.Name, 9) = "txtLength" Then
-                txtLengthSteps.Text = "Bad Input"
-            End If
             btnExecute.Enabled = False
             btnExecute.Text = "Bad Input"
+            txtSlopeDelta.Text = "-"
+            txtLengthDelta.Text = "-"
         End If
 
 

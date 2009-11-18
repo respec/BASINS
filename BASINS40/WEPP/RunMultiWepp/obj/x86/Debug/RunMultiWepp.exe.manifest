@@ -42,14 +42,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="RunMultiWepp.exe" size="44544">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="RunMultiWepp.exe" size="45056">
       <assemblyIdentity name="RunMultiWepp" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>EPnKZIFFsnoQCedQeU0g6ReTv9Y=</dsig:DigestValue>
+        <dsig:DigestValue>uTKh8b6MDr+6wZbEpdVA3c6JjHc=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
