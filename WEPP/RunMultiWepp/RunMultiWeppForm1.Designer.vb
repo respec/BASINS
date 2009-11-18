@@ -366,6 +366,7 @@ Partial Class RunMultiWeppForm1
         '
         'txtSlopeDelta
         '
+        Me.txtSlopeDelta.Enabled = False
         Me.txtSlopeDelta.Location = New System.Drawing.Point(313, 71)
         Me.txtSlopeDelta.Name = "txtSlopeDelta"
         Me.txtSlopeDelta.Size = New System.Drawing.Size(79, 20)
@@ -396,6 +397,7 @@ Partial Class RunMultiWeppForm1
         '
         'txtLengthDelta
         '
+        Me.txtLengthDelta.Enabled = False
         Me.txtLengthDelta.Location = New System.Drawing.Point(313, 124)
         Me.txtLengthDelta.Name = "txtLengthDelta"
         Me.txtLengthDelta.Size = New System.Drawing.Size(79, 20)
@@ -407,7 +409,6 @@ Partial Class RunMultiWeppForm1
         '
         'txtSlopeSteps
         '
-        Me.txtSlopeSteps.Enabled = False
         Me.txtSlopeSteps.Location = New System.Drawing.Point(398, 71)
         Me.txtSlopeSteps.Name = "txtSlopeSteps"
         Me.txtSlopeSteps.Size = New System.Drawing.Size(79, 20)
@@ -415,7 +416,6 @@ Partial Class RunMultiWeppForm1
         '
         'txtLengthSteps
         '
-        Me.txtLengthSteps.Enabled = False
         Me.txtLengthSteps.Location = New System.Drawing.Point(398, 124)
         Me.txtLengthSteps.Name = "txtLengthSteps"
         Me.txtLengthSteps.Size = New System.Drawing.Size(79, 20)

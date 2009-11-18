@@ -42,26 +42,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="atcUtility.dll" size="140800">
-      <assemblyIdentity name="atcUtility" version="3.1.2.0" language="neutral" processorArchitecture="msil" />
-      <hash>
-        <dsig:Transforms>
-          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-        </dsig:Transforms>
-        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>OqeumNnPVGq6hHipyqNFr0CXUZY=</dsig:DigestValue>
-      </hash>
-    </dependentAssembly>
-  </dependency>
-  <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="RunMultiWepp.exe" size="33792">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="RunMultiWepp.exe" size="39424">
       <assemblyIdentity name="RunMultiWepp" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>EYANKz/ujgthlGJR2vjXjyym/Fg=</dsig:DigestValue>
+        <dsig:DigestValue>1atOFvNTgf1tqYXJGryDDGeCwf8=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
