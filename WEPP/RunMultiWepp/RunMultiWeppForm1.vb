@@ -23,25 +23,25 @@ Public Class RunMultiWeppForm1
 
         PopulateCopyAlso()
 
-        txtSlopeStart.Text = "0.1"
+        txtSlopeStart.Text = "1"
         txtSlopeStop.Text = "40"
-        txtSlopeDelta.Text = "<>"
-        txtSlopeSteps.Text = "20"
-
+        txtSlopeDelta.Text = "1"
+        
         txtLengthStart.Text = "1"
         txtLengthStop.Text = "300"
-        txtLengthDelta.Text = "<>"
-        txtLengthSteps.Text = "20"
-
-        CalculateIterations()
+        txtLengthDelta.Text = "20"
+        
+        radioOFERoad.Checked = True
 
         AddHandler chkEnableAlso.CheckStateChanged, AddressOf PopulateCopyAlso
         AddHandler txtSlopeStart.TextChanged, AddressOf ParamTextChanged
         AddHandler txtSlopeStop.TextChanged, AddressOf ParamTextChanged
-        AddHandler txtSlopeSteps.TextChanged, AddressOf ParamTextChanged
+        AddHandler txtSlopeDelta.TextChanged, AddressOf ParamTextChanged
         AddHandler txtLengthStart.TextChanged, AddressOf ParamTextChanged
         AddHandler txtLengthStop.TextChanged, AddressOf ParamTextChanged
-        AddHandler txtLengthSteps.TextChanged, AddressOf ParamTextChanged
+        AddHandler txtLengthDelta.TextChanged, AddressOf ParamTextChanged
+        
+        CalculateIterations()
 
     End Sub
     Private Function GetBaseDir() As String
@@ -180,6 +180,14 @@ Public Class RunMultiWeppForm1
                 Next
             End If
 
+            'Remove other files in out directory
+            If chkDelAll.Checked Then
+
+                For Each lFileFound As String In Directory.GetFiles(txtPathOutput.Text, "*.*")
+                    File.Delete(lFileFound)
+                Next
+
+            End If
 
             'Read the source slope file (once)
             Dim objReader As New System.IO.StreamReader(txtPathBase.Text)
@@ -196,41 +204,65 @@ Public Class RunMultiWeppForm1
             objIndexWriter.WriteLine("# Index of multiple slope vs. length WEPP:Road runs. (index,slope(%),length(m)")
 
 
-
             For j = 0 To lLengthIterations - 1 ' Step length
                 lCurrentLength = CDbl(txtLengthStart.Text) + j * lLengthDelta
                 For k = 0 To lSlopeIterations - 1 'Step slope (first)
                     lCurrentSlope = CDbl(txtSlopeStart.Text) + k * lSlopeDelta
 
-
-                    'Copy the master slope file input to a local copy to muck with
+                                                            'Copy the master slope file input to a local copy to muck with
                     Dim lLinesCurrentSlope As ArrayList = lLinesSlopeIn
 
-                    'LINE 5 !!!! Get the new road length
-                    lLinesCurrentSlope(4) = "2 " & lCurrentLength * 0.3048
+                    If radioOFERoad.Checked Then
 
-                    'LINE 6 !!!! Read line 6 and separate the elements by delimiter of comma
 
-                    Dim lLine6Elements() As String = lLinesSlopeIn(5).ToString.Split(" ")
-                    lLine6Elements(1) = WEPPformatMoreDetail(lCurrentSlope / 100)
-                    lLine6Elements(4) = WEPPformatMoreDetail(lCurrentSlope / 100)
+                        'LINE 5 !!!! Get the new road length
+                        lLinesCurrentSlope(4) = "2 " & lCurrentLength * 0.3048
 
-                    lLinesCurrentSlope(5) = ""
-                    For i = 0 To lLine6Elements.Length - 1
-                        lLinesCurrentSlope(5) &= lLine6Elements(i)
-                        If Not i = lLine6Elements.Length - 1 Then lLinesCurrentSlope(5) &= " "
-                    Next
+                        'LINE 6 !!!! Read line 6 and separate the elements by delimiter of comma
 
-                    'LINE 8 !!!! Read line 6 and separate the elements by delimiter of comma
+                        Dim lLine6Elements() As String = lLinesSlopeIn(5).ToString.Split(" ")
+                        lLine6Elements(1) = WEPPformatMoreDetail(lCurrentSlope / 100)
+                        lLine6Elements(4) = WEPPformatMoreDetail(lCurrentSlope / 100)
 
-                    Dim lLine8Elements() As String = lLinesSlopeIn(7).ToString.Split(" ")
-                    lLine8Elements(1) = WEPPformatMoreDetail(lCurrentSlope / 100)
+                        lLinesCurrentSlope(5) = ""
+                        For i = 0 To lLine6Elements.Length - 1
+                            lLinesCurrentSlope(5) &= lLine6Elements(i)
+                            If Not i = lLine6Elements.Length - 1 Then lLinesCurrentSlope(5) &= " "
+                        Next
 
-                    lLinesCurrentSlope(7) = ""
-                    For i = 0 To lLine8Elements.Length - 1
-                        lLinesCurrentSlope(7) &= lLine8Elements(i)
-                        If Not i = lLine8Elements.Length - 1 Then lLinesCurrentSlope(7) &= " "
-                    Next
+                        'LINE 8 !!!! Read line 8 and separate the elements by delimiter of comma
+
+                        Dim lLine8Elements() As String = lLinesSlopeIn(7).ToString.Split(" ")
+                        lLine8Elements(1) = WEPPformatMoreDetail(lCurrentSlope / 100)
+
+                        lLinesCurrentSlope(7) = ""
+                        For i = 0 To lLine8Elements.Length - 1
+                            lLinesCurrentSlope(7) &= lLine8Elements(i)
+                            If Not i = lLine8Elements.Length - 1 Then lLinesCurrentSlope(7) &= " "
+                        Next
+
+
+                    ElseIf radioOFEBuffer.Checked Then
+
+                        'LINE 9 !!!! Get the new road length
+                        lLinesCurrentSlope(8) = "3 " & lCurrentLength * 0.3048
+
+                        'LINE 10 !!!! Read line 10 and separate the elements by delimiter of comma
+
+                        Dim lLine10Elements() As String = lLinesSlopeIn(9).ToString.Split(" ")
+
+                        lLine10Elements(4) = WEPPformatMoreDetail(lCurrentSlope / 100)
+                        lLine10Elements(7) = WEPPformatMoreDetail(lCurrentSlope / 100)
+
+                        lLinesCurrentSlope(9) = ""
+                        For i = 0 To lLine10Elements.Length - 1
+                            lLinesCurrentSlope(9) &= lLine10Elements(i)
+                            If Not i = lLine10Elements.Length - 1 Then lLinesCurrentSlope(9) &= " "
+                        Next
+
+
+
+                    End If
 
                     'Write the modified Slope File
                     If Not System.IO.File.Exists(txtPathSlope.Text) Then System.IO.File.Create(txtPathSlope.Text, 1)
@@ -259,56 +291,55 @@ Public Class RunMultiWeppForm1
                 Next
 
             Next
+
+            
+
             objIndexWriter.Close()
 
             ProgressBar1.Value = 100
             txtRunStatus.Text = "Done!"
 
             btnExecute.Enabled = True
-            btnExecute.Text = "Go!"
+            btnExecute.Text = "Run"
         Catch ex As Exception
             If lMainStepIndex > -1 Then
                 txtRunStatus.Text = "Error: Last attempted run was at index " & lMainStepIndex & "(Slope = " & lCurrentSlope & ", Length = " & lCurrentLength & ".)"
             End If
             txtRunStatus.Text = "Error"
             MsgBox("Something(s) Bad, Check Input, paths and Wepp error file")
+            btnExecute.Enabled = True
         End Try
     End Sub
 
     Private Sub CalculateIterations()
         'Calculate the number of times to interate based on both length and slope variation
+        txtRunStatus.Text = "<Press Run>"
 
-        If CDbl(txtSlopeSteps.Text) > 1 Then
-            lSlopeDelta = (CDbl(txtSlopeStop.Text) - CDbl(txtSlopeStart.Text)) / (CDbl(txtSlopeSteps.Text) - 1)
-            txtSlopeDelta.Text = lSlopeDelta
-        ElseIf CDbl(txtSlopeDelta.Text) <= 1 Then
-            lSlopeIterations = 1
-            txtSlopeStop.Text = txtSlopeStart.Text
-            txtSlopeSteps.Text = "1"
-            lSlopeDelta = 0
-        End If
+        Dim lSlopeStart As Double = CDbl(txtSlopeStart.Text)
+        Dim lSlopeStop As Double = CDbl(txtSlopeStop.Text)
 
-        If CDbl(txtLengthSteps.Text) > 1 Then
-            lLengthDelta = (CDbl(txtLengthStop.Text) - CDbl(txtLengthStart.Text)) / (CDbl(txtLengthSteps.Text) - 1)
-            txtLengthDelta.Text = lLengthDelta
-        ElseIf CDbl(txtLengthDelta.Text) <= 1 Then
-            lLengthIterations = 1
-            txtLengthStop.Text = txtLengthStart.Text
-            txtLengthSteps.Text = "1"
-            lLengthDelta = 0
-        End If
+        Dim lLengthStart As Double = CDbl(txtLengthStart.Text)
+        Dim lLengthStop As Double = CDbl(txtLengthStop.Text)
 
-        lSlopeIterations = CInt(txtSlopeSteps.Text)
-        lLengthIterations = CInt(txtLengthSteps.Text)
+        lSlopeDelta = CDbl(txtSlopeDelta.Text)
+        lLengthDelta = CDbl(txtLengthDelta.Text)
+
+        lSlopeIterations = Math.Floor((lSlopeStop - lSlopeStart) / (lSlopeDelta) + 1)
+        lLengthIterations = Math.Floor((lLengthStop - lLengthStart) / (lLengthDelta) + 1)
 
         lRunCount = CInt(lSlopeIterations * lLengthIterations)
         txtRunCount.Text = lRunCount.ToString
 
         If lRunCount > 0 AndAlso Math.IEEERemainder(lRunCount, 1) = 0 Then
             btnExecute.Enabled = True
-            btnExecute.Text = "Go!"
+            btnExecute.Text = "Run"
             txtRunCount.Text = lRunCount
+        Else
+            btnExecute.Enabled = False
+            btnExecute.Text = "Input Error :-("
         End If
+
+
     End Sub
 
     Private Sub ParamTextChanged(ByVal aSender As System.Object, ByVal aEventArgs As System.EventArgs)
@@ -322,15 +353,35 @@ Public Class RunMultiWeppForm1
             txtRunCount.Text = "-"
             btnExecute.Enabled = False
             btnExecute.Text = "Bad Input"
-            txtSlopeDelta.Text = "-"
-            txtLengthDelta.Text = "-"
         End If
 
-
-
+    End Sub
+    
+    Private Sub txtPathBase_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        GetBaseDir()
     End Sub
 
-    Private Sub txtPathBase_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtPathBase.TextChanged
-        GetBaseDir()
+    Private Sub radioOFEBuffer_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles radioOFEBuffer.CheckedChanged
+        txtSlopeStart.Text = "1"
+        txtSlopeStop.Text = "100"
+        txtSlopeDelta.Text = "5"
+
+        txtLengthStart.Text = "1"
+        txtLengthStop.Text = "300"
+        txtLengthDelta.Text = "20"
+    End Sub
+
+    Private Sub radioOFERoad_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles radioOFERoad.CheckedChanged
+        txtSlopeStart.Text = "1"
+        txtSlopeStop.Text = "40"
+        txtSlopeDelta.Text = "2"
+
+        txtLengthStart.Text = "1"
+        txtLengthStop.Text = "300"
+        txtLengthDelta.Text = "20"
+    End Sub
+
+    Private Sub RunMultiWeppForm1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+
     End Sub
 End Class

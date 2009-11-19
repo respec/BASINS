@@ -22,8 +22,11 @@ Partial Class RunMultiWeppForm1
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.TabControl1 = New System.Windows.Forms.TabControl()
-        Me.TabPage1 = New System.Windows.Forms.TabPage()
+        Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
+        Me.GroupBox4 = New System.Windows.Forms.GroupBox()
+        Me.Label8 = New System.Windows.Forms.Label()
+        Me.chkEnableAlso = New System.Windows.Forms.CheckBox()
+        Me.lstCopyAlso = New System.Windows.Forms.CheckedListBox()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
         Me.txtRunCount = New System.Windows.Forms.Label()
         Me.Label4 = New System.Windows.Forms.Label()
@@ -31,6 +34,9 @@ Partial Class RunMultiWeppForm1
         Me.btnExecute = New System.Windows.Forms.Button()
         Me.ProgressBar1 = New System.Windows.Forms.ProgressBar()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.Label5 = New System.Windows.Forms.Label()
+        Me.btnPathPlot = New System.Windows.Forms.Button()
+        Me.txtPathPlot = New System.Windows.Forms.TextBox()
         Me.Label6 = New System.Windows.Forms.Label()
         Me.btnSlopePath = New System.Windows.Forms.Button()
         Me.txtPathSlope = New System.Windows.Forms.TextBox()
@@ -44,8 +50,11 @@ Partial Class RunMultiWeppForm1
         Me.btnBasePath = New System.Windows.Forms.Button()
         Me.txtPathBase = New System.Windows.Forms.TextBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.boxOFE = New System.Windows.Forms.GroupBox()
+        Me.radioOFEBuffer = New System.Windows.Forms.RadioButton()
+        Me.radioOFEFillSlope = New System.Windows.Forms.RadioButton()
+        Me.radioOFERoad = New System.Windows.Forms.RadioButton()
         Me.Label9 = New System.Windows.Forms.Label()
-        Me.Label10 = New System.Windows.Forms.Label()
         Me.txtSlopeStart = New System.Windows.Forms.TextBox()
         Me.Label11 = New System.Windows.Forms.Label()
         Me.txtSlopeStop = New System.Windows.Forms.TextBox()
@@ -55,62 +64,71 @@ Partial Class RunMultiWeppForm1
         Me.txtLengthStart = New System.Windows.Forms.TextBox()
         Me.txtLengthStop = New System.Windows.Forms.TextBox()
         Me.txtLengthDelta = New System.Windows.Forms.TextBox()
-        Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
-        Me.txtSlopeSteps = New System.Windows.Forms.TextBox()
-        Me.txtLengthSteps = New System.Windows.Forms.TextBox()
         Me.Label7 = New System.Windows.Forms.Label()
-        Me.Label5 = New System.Windows.Forms.Label()
-        Me.btnPathPlot = New System.Windows.Forms.Button()
-        Me.txtPathPlot = New System.Windows.Forms.TextBox()
-        Me.lstCopyAlso = New System.Windows.Forms.CheckedListBox()
-        Me.GroupBox4 = New System.Windows.Forms.GroupBox()
-        Me.chkEnableAlso = New System.Windows.Forms.CheckBox()
-        Me.Label8 = New System.Windows.Forms.Label()
-        Me.TabControl1.SuspendLayout()
-        Me.TabPage1.SuspendLayout()
+        Me.chkDelAll = New System.Windows.Forms.CheckBox()
+        Me.GroupBox4.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
-        Me.GroupBox4.SuspendLayout()
+        Me.boxOFE.SuspendLayout()
         Me.SuspendLayout()
         '
-        'TabControl1
+        'OpenFileDialog1
         '
-        Me.TabControl1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.TabControl1.Controls.Add(Me.TabPage1)
-        Me.TabControl1.Location = New System.Drawing.Point(27, 12)
-        Me.TabControl1.Name = "TabControl1"
-        Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(970, 700)
-        Me.TabControl1.TabIndex = 6
+        Me.OpenFileDialog1.FileName = "OpenFileDialog1"
         '
-        'TabPage1
+        'GroupBox4
         '
-        Me.TabPage1.Controls.Add(Me.GroupBox4)
-        Me.TabPage1.Controls.Add(Me.GroupBox3)
-        Me.TabPage1.Controls.Add(Me.GroupBox2)
-        Me.TabPage1.Controls.Add(Me.GroupBox1)
-        Me.TabPage1.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage1.Size = New System.Drawing.Size(962, 674)
-        Me.TabPage1.TabIndex = 0
-        Me.TabPage1.Text = "Road (Slope vs. Length)"
-        Me.TabPage1.UseVisualStyleBackColor = True
+        Me.GroupBox4.Controls.Add(Me.Label8)
+        Me.GroupBox4.Controls.Add(Me.chkEnableAlso)
+        Me.GroupBox4.Controls.Add(Me.lstCopyAlso)
+        Me.GroupBox4.Location = New System.Drawing.Point(616, 265)
+        Me.GroupBox4.Name = "GroupBox4"
+        Me.GroupBox4.Size = New System.Drawing.Size(392, 279)
+        Me.GroupBox4.TabIndex = 33
+        Me.GroupBox4.TabStop = False
+        Me.GroupBox4.Text = "Copy Additional Files from Base Folder to Wepp Exec Folder ?"
+        '
+        'Label8
+        '
+        Me.Label8.AutoSize = True
+        Me.Label8.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label8.Location = New System.Drawing.Point(104, 26)
+        Me.Label8.Name = "Label8"
+        Me.Label8.Size = New System.Drawing.Size(171, 13)
+        Me.Label8.TabIndex = 36
+        Me.Label8.Text = "(Caution, Overwrites Existing Files!)"
+        '
+        'chkEnableAlso
+        '
+        Me.chkEnableAlso.AutoSize = True
+        Me.chkEnableAlso.Location = New System.Drawing.Point(19, 24)
+        Me.chkEnableAlso.Name = "chkEnableAlso"
+        Me.chkEnableAlso.Size = New System.Drawing.Size(44, 17)
+        Me.chkEnableAlso.TabIndex = 29
+        Me.chkEnableAlso.Text = "Yes"
+        Me.chkEnableAlso.UseVisualStyleBackColor = True
+        '
+        'lstCopyAlso
+        '
+        Me.lstCopyAlso.FormattingEnabled = True
+        Me.lstCopyAlso.Location = New System.Drawing.Point(46, 55)
+        Me.lstCopyAlso.Name = "lstCopyAlso"
+        Me.lstCopyAlso.Size = New System.Drawing.Size(301, 154)
+        Me.lstCopyAlso.TabIndex = 28
         '
         'GroupBox3
         '
+        Me.GroupBox3.Controls.Add(Me.chkDelAll)
         Me.GroupBox3.Controls.Add(Me.txtRunCount)
         Me.GroupBox3.Controls.Add(Me.Label4)
         Me.GroupBox3.Controls.Add(Me.txtRunStatus)
         Me.GroupBox3.Controls.Add(Me.btnExecute)
         Me.GroupBox3.Controls.Add(Me.ProgressBar1)
-        Me.GroupBox3.Location = New System.Drawing.Point(30, 501)
+        Me.GroupBox3.Location = New System.Drawing.Point(36, 568)
         Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(901, 99)
-        Me.GroupBox3.TabIndex = 27
+        Me.GroupBox3.Size = New System.Drawing.Size(972, 99)
+        Me.GroupBox3.TabIndex = 32
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "Execute"
         '
@@ -147,14 +165,14 @@ Partial Class RunMultiWeppForm1
         Me.btnExecute.Name = "btnExecute"
         Me.btnExecute.Size = New System.Drawing.Size(114, 28)
         Me.btnExecute.TabIndex = 25
-        Me.btnExecute.Text = "Go!"
+        Me.btnExecute.Text = "Run"
         Me.btnExecute.UseVisualStyleBackColor = True
         '
         'ProgressBar1
         '
         Me.ProgressBar1.Location = New System.Drawing.Point(165, 29)
         Me.ProgressBar1.Name = "ProgressBar1"
-        Me.ProgressBar1.Size = New System.Drawing.Size(714, 19)
+        Me.ProgressBar1.Size = New System.Drawing.Size(762, 19)
         Me.ProgressBar1.TabIndex = 26
         '
         'GroupBox2
@@ -176,12 +194,39 @@ Partial Class RunMultiWeppForm1
         Me.GroupBox2.Controls.Add(Me.Label2)
         Me.GroupBox2.Controls.Add(Me.btnBasePath)
         Me.GroupBox2.Controls.Add(Me.txtPathBase)
-        Me.GroupBox2.Location = New System.Drawing.Point(30, 16)
+        Me.GroupBox2.Location = New System.Drawing.Point(36, 23)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(901, 226)
-        Me.GroupBox2.TabIndex = 24
+        Me.GroupBox2.Size = New System.Drawing.Size(972, 226)
+        Me.GroupBox2.TabIndex = 31
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Paths"
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(25, 159)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(72, 13)
+        Me.Label5.TabIndex = 25
+        Me.Label5.Text = "Plot File Path:"
+        '
+        'btnPathPlot
+        '
+        Me.btnPathPlot.Location = New System.Drawing.Point(165, 153)
+        Me.btnPathPlot.Name = "btnPathPlot"
+        Me.btnPathPlot.Size = New System.Drawing.Size(28, 25)
+        Me.btnPathPlot.TabIndex = 23
+        Me.btnPathPlot.Text = "..."
+        Me.btnPathPlot.UseVisualStyleBackColor = True
+        '
+        'txtPathPlot
+        '
+        Me.txtPathPlot.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtPathPlot.Location = New System.Drawing.Point(204, 155)
+        Me.txtPathPlot.Name = "txtPathPlot"
+        Me.txtPathPlot.Size = New System.Drawing.Size(746, 20)
+        Me.txtPathPlot.TabIndex = 24
         '
         'Label6
         '
@@ -207,7 +252,7 @@ Partial Class RunMultiWeppForm1
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtPathSlope.Location = New System.Drawing.Point(204, 96)
         Me.txtPathSlope.Name = "txtPathSlope"
-        Me.txtPathSlope.Size = New System.Drawing.Size(675, 20)
+        Me.txtPathSlope.Size = New System.Drawing.Size(746, 20)
         Me.txtPathSlope.TabIndex = 21
         '
         'Label3
@@ -234,7 +279,7 @@ Partial Class RunMultiWeppForm1
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtPathOutput.Location = New System.Drawing.Point(204, 186)
         Me.txtPathOutput.Name = "txtPathOutput"
-        Me.txtPathOutput.Size = New System.Drawing.Size(675, 20)
+        Me.txtPathOutput.Size = New System.Drawing.Size(746, 20)
         Me.txtPathOutput.TabIndex = 18
         '
         'Label1
@@ -261,7 +306,7 @@ Partial Class RunMultiWeppForm1
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtPathWepp.Location = New System.Drawing.Point(204, 125)
         Me.txtPathWepp.Name = "txtPathWepp"
-        Me.txtPathWepp.Size = New System.Drawing.Size(675, 20)
+        Me.txtPathWepp.Size = New System.Drawing.Size(746, 20)
         Me.txtPathWepp.TabIndex = 15
         '
         'Label2
@@ -288,16 +333,14 @@ Partial Class RunMultiWeppForm1
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtPathBase.Location = New System.Drawing.Point(204, 67)
         Me.txtPathBase.Name = "txtPathBase"
-        Me.txtPathBase.Size = New System.Drawing.Size(675, 20)
+        Me.txtPathBase.Size = New System.Drawing.Size(746, 20)
         Me.txtPathBase.TabIndex = 12
         '
         'GroupBox1
         '
         Me.GroupBox1.Controls.Add(Me.Label7)
-        Me.GroupBox1.Controls.Add(Me.txtLengthSteps)
-        Me.GroupBox1.Controls.Add(Me.txtSlopeSteps)
+        Me.GroupBox1.Controls.Add(Me.boxOFE)
         Me.GroupBox1.Controls.Add(Me.Label9)
-        Me.GroupBox1.Controls.Add(Me.Label10)
         Me.GroupBox1.Controls.Add(Me.txtSlopeStart)
         Me.GroupBox1.Controls.Add(Me.Label11)
         Me.GroupBox1.Controls.Add(Me.txtSlopeStop)
@@ -307,240 +350,204 @@ Partial Class RunMultiWeppForm1
         Me.GroupBox1.Controls.Add(Me.txtLengthStart)
         Me.GroupBox1.Controls.Add(Me.txtLengthStop)
         Me.GroupBox1.Controls.Add(Me.txtLengthDelta)
-        Me.GroupBox1.Location = New System.Drawing.Point(30, 258)
+        Me.GroupBox1.Location = New System.Drawing.Point(36, 265)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(496, 226)
-        Me.GroupBox1.TabIndex = 23
+        Me.GroupBox1.Size = New System.Drawing.Size(560, 279)
+        Me.GroupBox1.TabIndex = 30
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Variables"
+        '
+        'boxOFE
+        '
+        Me.boxOFE.Controls.Add(Me.radioOFEBuffer)
+        Me.boxOFE.Controls.Add(Me.radioOFEFillSlope)
+        Me.boxOFE.Controls.Add(Me.radioOFERoad)
+        Me.boxOFE.Location = New System.Drawing.Point(88, 170)
+        Me.boxOFE.Name = "boxOFE"
+        Me.boxOFE.Size = New System.Drawing.Size(387, 69)
+        Me.boxOFE.TabIndex = 68
+        Me.boxOFE.TabStop = False
+        Me.boxOFE.Text = "OFE To Model"
+        '
+        'radioOFEBuffer
+        '
+        Me.radioOFEBuffer.AutoSize = True
+        Me.radioOFEBuffer.Location = New System.Drawing.Point(290, 26)
+        Me.radioOFEBuffer.Name = "radioOFEBuffer"
+        Me.radioOFEBuffer.Size = New System.Drawing.Size(53, 17)
+        Me.radioOFEBuffer.TabIndex = 2
+        Me.radioOFEBuffer.TabStop = True
+        Me.radioOFEBuffer.Text = "Buffer"
+        Me.radioOFEBuffer.UseVisualStyleBackColor = True
+        '
+        'radioOFEFillSlope
+        '
+        Me.radioOFEFillSlope.AutoSize = True
+        Me.radioOFEFillSlope.Enabled = False
+        Me.radioOFEFillSlope.Location = New System.Drawing.Point(160, 26)
+        Me.radioOFEFillSlope.Name = "radioOFEFillSlope"
+        Me.radioOFEFillSlope.Size = New System.Drawing.Size(64, 17)
+        Me.radioOFEFillSlope.TabIndex = 1
+        Me.radioOFEFillSlope.TabStop = True
+        Me.radioOFEFillSlope.Text = "FillSlope"
+        Me.radioOFEFillSlope.UseVisualStyleBackColor = True
+        '
+        'radioOFERoad
+        '
+        Me.radioOFERoad.AutoSize = True
+        Me.radioOFERoad.Location = New System.Drawing.Point(43, 26)
+        Me.radioOFERoad.Name = "radioOFERoad"
+        Me.radioOFERoad.Size = New System.Drawing.Size(51, 17)
+        Me.radioOFERoad.TabIndex = 0
+        Me.radioOFERoad.TabStop = True
+        Me.radioOFERoad.Text = "Road"
+        Me.radioOFERoad.UseVisualStyleBackColor = True
         '
         'Label9
         '
         Me.Label9.AutoSize = True
-        Me.Label9.Location = New System.Drawing.Point(2, 71)
+        Me.Label9.Location = New System.Drawing.Point(85, 68)
         Me.Label9.Name = "Label9"
         Me.Label9.Size = New System.Drawing.Size(86, 13)
-        Me.Label9.TabIndex = 28
+        Me.Label9.TabIndex = 60
         Me.Label9.Text = "Slope Values (%)"
-        '
-        'Label10
-        '
-        Me.Label10.AutoSize = True
-        Me.Label10.Location = New System.Drawing.Point(336, 55)
-        Me.Label10.Name = "Label10"
-        Me.Label10.Size = New System.Drawing.Size(32, 13)
-        Me.Label10.TabIndex = 32
-        Me.Label10.Text = "Delta"
         '
         'txtSlopeStart
         '
-        Me.txtSlopeStart.Location = New System.Drawing.Point(131, 71)
+        Me.txtSlopeStart.Location = New System.Drawing.Point(214, 68)
         Me.txtSlopeStart.Name = "txtSlopeStart"
         Me.txtSlopeStart.Size = New System.Drawing.Size(79, 20)
-        Me.txtSlopeStart.TabIndex = 22
+        Me.txtSlopeStart.TabIndex = 54
         '
         'Label11
         '
         Me.Label11.AutoSize = True
-        Me.Label11.Location = New System.Drawing.Point(247, 55)
+        Me.Label11.Location = New System.Drawing.Point(330, 47)
         Me.Label11.Name = "Label11"
         Me.Label11.Size = New System.Drawing.Size(29, 13)
-        Me.Label11.TabIndex = 31
+        Me.Label11.TabIndex = 63
         Me.Label11.Text = "Stop"
         '
         'txtSlopeStop
         '
-        Me.txtSlopeStop.Location = New System.Drawing.Point(222, 71)
+        Me.txtSlopeStop.Location = New System.Drawing.Point(305, 68)
         Me.txtSlopeStop.Name = "txtSlopeStop"
         Me.txtSlopeStop.Size = New System.Drawing.Size(79, 20)
-        Me.txtSlopeStop.TabIndex = 23
+        Me.txtSlopeStop.TabIndex = 55
         '
         'Label12
         '
         Me.Label12.AutoSize = True
-        Me.Label12.Location = New System.Drawing.Point(156, 55)
+        Me.Label12.Location = New System.Drawing.Point(239, 47)
         Me.Label12.Name = "Label12"
         Me.Label12.Size = New System.Drawing.Size(29, 13)
-        Me.Label12.TabIndex = 30
+        Me.Label12.TabIndex = 62
         Me.Label12.Text = "Start"
         '
         'txtSlopeDelta
         '
-        Me.txtSlopeDelta.Enabled = False
-        Me.txtSlopeDelta.Location = New System.Drawing.Point(313, 71)
+        Me.txtSlopeDelta.Location = New System.Drawing.Point(396, 68)
         Me.txtSlopeDelta.Name = "txtSlopeDelta"
         Me.txtSlopeDelta.Size = New System.Drawing.Size(79, 20)
-        Me.txtSlopeDelta.TabIndex = 24
+        Me.txtSlopeDelta.TabIndex = 56
         '
         'Label13
         '
         Me.Label13.AutoSize = True
-        Me.Label13.Location = New System.Drawing.Point(2, 127)
+        Me.Label13.Location = New System.Drawing.Point(85, 124)
         Me.Label13.Name = "Label13"
         Me.Label13.Size = New System.Drawing.Size(83, 13)
-        Me.Label13.TabIndex = 29
+        Me.Label13.TabIndex = 61
         Me.Label13.Text = "Road length (ft.)"
         '
         'txtLengthStart
         '
-        Me.txtLengthStart.Location = New System.Drawing.Point(131, 124)
+        Me.txtLengthStart.Location = New System.Drawing.Point(214, 121)
         Me.txtLengthStart.Name = "txtLengthStart"
         Me.txtLengthStart.Size = New System.Drawing.Size(79, 20)
-        Me.txtLengthStart.TabIndex = 25
+        Me.txtLengthStart.TabIndex = 57
         '
         'txtLengthStop
         '
-        Me.txtLengthStop.Location = New System.Drawing.Point(222, 124)
+        Me.txtLengthStop.Location = New System.Drawing.Point(305, 121)
         Me.txtLengthStop.Name = "txtLengthStop"
         Me.txtLengthStop.Size = New System.Drawing.Size(79, 20)
-        Me.txtLengthStop.TabIndex = 26
+        Me.txtLengthStop.TabIndex = 58
         '
         'txtLengthDelta
         '
-        Me.txtLengthDelta.Enabled = False
-        Me.txtLengthDelta.Location = New System.Drawing.Point(313, 124)
+        Me.txtLengthDelta.Location = New System.Drawing.Point(396, 121)
         Me.txtLengthDelta.Name = "txtLengthDelta"
         Me.txtLengthDelta.Size = New System.Drawing.Size(79, 20)
-        Me.txtLengthDelta.TabIndex = 27
-        '
-        'OpenFileDialog1
-        '
-        Me.OpenFileDialog1.FileName = "OpenFileDialog1"
-        '
-        'txtSlopeSteps
-        '
-        Me.txtSlopeSteps.Location = New System.Drawing.Point(398, 71)
-        Me.txtSlopeSteps.Name = "txtSlopeSteps"
-        Me.txtSlopeSteps.Size = New System.Drawing.Size(79, 20)
-        Me.txtSlopeSteps.TabIndex = 33
-        '
-        'txtLengthSteps
-        '
-        Me.txtLengthSteps.Location = New System.Drawing.Point(398, 124)
-        Me.txtLengthSteps.Name = "txtLengthSteps"
-        Me.txtLengthSteps.Size = New System.Drawing.Size(79, 20)
-        Me.txtLengthSteps.TabIndex = 34
+        Me.txtLengthDelta.TabIndex = 59
         '
         'Label7
         '
         Me.Label7.AutoSize = True
-        Me.Label7.Location = New System.Drawing.Point(421, 55)
+        Me.Label7.Location = New System.Drawing.Point(421, 47)
         Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(34, 13)
-        Me.Label7.TabIndex = 35
-        Me.Label7.Text = "Steps"
+        Me.Label7.Size = New System.Drawing.Size(32, 13)
+        Me.Label7.TabIndex = 69
+        Me.Label7.Text = "Delta"
         '
-        'Label5
+        'chkDelAll
         '
-        Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(25, 159)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(72, 13)
-        Me.Label5.TabIndex = 25
-        Me.Label5.Text = "Plot File Path:"
-        '
-        'btnPathPlot
-        '
-        Me.btnPathPlot.Location = New System.Drawing.Point(165, 153)
-        Me.btnPathPlot.Name = "btnPathPlot"
-        Me.btnPathPlot.Size = New System.Drawing.Size(28, 25)
-        Me.btnPathPlot.TabIndex = 23
-        Me.btnPathPlot.Text = "..."
-        Me.btnPathPlot.UseVisualStyleBackColor = True
-        '
-        'txtPathPlot
-        '
-        Me.txtPathPlot.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtPathPlot.Location = New System.Drawing.Point(204, 155)
-        Me.txtPathPlot.Name = "txtPathPlot"
-        Me.txtPathPlot.Size = New System.Drawing.Size(675, 20)
-        Me.txtPathPlot.TabIndex = 24
-        '
-        'lstCopyAlso
-        '
-        Me.lstCopyAlso.FormattingEnabled = True
-        Me.lstCopyAlso.Location = New System.Drawing.Point(46, 55)
-        Me.lstCopyAlso.Name = "lstCopyAlso"
-        Me.lstCopyAlso.Size = New System.Drawing.Size(301, 154)
-        Me.lstCopyAlso.TabIndex = 28
-        '
-        'GroupBox4
-        '
-        Me.GroupBox4.Controls.Add(Me.Label8)
-        Me.GroupBox4.Controls.Add(Me.chkEnableAlso)
-        Me.GroupBox4.Controls.Add(Me.lstCopyAlso)
-        Me.GroupBox4.Location = New System.Drawing.Point(539, 258)
-        Me.GroupBox4.Name = "GroupBox4"
-        Me.GroupBox4.Size = New System.Drawing.Size(392, 226)
-        Me.GroupBox4.TabIndex = 29
-        Me.GroupBox4.TabStop = False
-        Me.GroupBox4.Text = "Copy Additional Files from Base Folder to Wepp Exec Folder ?"
-        '
-        'chkEnableAlso
-        '
-        Me.chkEnableAlso.AutoSize = True
-        Me.chkEnableAlso.Location = New System.Drawing.Point(19, 24)
-        Me.chkEnableAlso.Name = "chkEnableAlso"
-        Me.chkEnableAlso.Size = New System.Drawing.Size(44, 17)
-        Me.chkEnableAlso.TabIndex = 29
-        Me.chkEnableAlso.Text = "Yes"
-        Me.chkEnableAlso.UseVisualStyleBackColor = True
-        '
-        'Label8
-        '
-        Me.Label8.AutoSize = True
-        Me.Label8.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label8.Location = New System.Drawing.Point(104, 26)
-        Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(171, 13)
-        Me.Label8.TabIndex = 36
-        Me.Label8.Text = "(Caution, Overwrites Existing Files!)"
+        Me.chkDelAll.AutoSize = True
+        Me.chkDelAll.Checked = True
+        Me.chkDelAll.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkDelAll.Location = New System.Drawing.Point(719, 60)
+        Me.chkDelAll.Name = "chkDelAll"
+        Me.chkDelAll.Size = New System.Drawing.Size(208, 17)
+        Me.chkDelAll.TabIndex = 37
+        Me.chkDelAll.Text = "Remove All other files in the Ouput Dir."
+        Me.chkDelAll.UseVisualStyleBackColor = True
         '
         'RunMultiWeppForm1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1034, 724)
-        Me.Controls.Add(Me.TabControl1)
+        Me.Controls.Add(Me.GroupBox4)
+        Me.Controls.Add(Me.GroupBox3)
+        Me.Controls.Add(Me.GroupBox2)
+        Me.Controls.Add(Me.GroupBox1)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.MinimumSize = New System.Drawing.Size(1050, 760)
         Me.Name = "RunMultiWeppForm1"
         Me.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide
         Me.Text = "Run Multi Wepp Tool"
-        Me.TabControl1.ResumeLayout(False)
-        Me.TabPage1.ResumeLayout(False)
+        Me.GroupBox4.ResumeLayout(False)
+        Me.GroupBox4.PerformLayout()
         Me.GroupBox3.ResumeLayout(False)
         Me.GroupBox3.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
-        Me.GroupBox4.ResumeLayout(False)
-        Me.GroupBox4.PerformLayout()
+        Me.boxOFE.ResumeLayout(False)
+        Me.boxOFE.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents TabControl1 As System.Windows.Forms.TabControl
-    Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
-    Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
-    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
-    Friend WithEvents Label9 As System.Windows.Forms.Label
-    Friend WithEvents Label10 As System.Windows.Forms.Label
-    Friend WithEvents txtSlopeStart As System.Windows.Forms.TextBox
-    Friend WithEvents Label11 As System.Windows.Forms.Label
-    Friend WithEvents txtSlopeStop As System.Windows.Forms.TextBox
-    Friend WithEvents Label12 As System.Windows.Forms.Label
-    Friend WithEvents txtSlopeDelta As System.Windows.Forms.TextBox
-    Friend WithEvents Label13 As System.Windows.Forms.Label
-    Friend WithEvents txtLengthStart As System.Windows.Forms.TextBox
-    Friend WithEvents txtLengthStop As System.Windows.Forms.TextBox
-    Friend WithEvents txtLengthDelta As System.Windows.Forms.TextBox
+    Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents GroupBox4 As System.Windows.Forms.GroupBox
+    Friend WithEvents Label8 As System.Windows.Forms.Label
+    Friend WithEvents chkEnableAlso As System.Windows.Forms.CheckBox
+    Friend WithEvents lstCopyAlso As System.Windows.Forms.CheckedListBox
     Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
+    Friend WithEvents txtRunCount As System.Windows.Forms.Label
+    Friend WithEvents Label4 As System.Windows.Forms.Label
     Friend WithEvents txtRunStatus As System.Windows.Forms.Label
     Friend WithEvents btnExecute As System.Windows.Forms.Button
     Friend WithEvents ProgressBar1 As System.Windows.Forms.ProgressBar
+    Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
+    Friend WithEvents Label5 As System.Windows.Forms.Label
+    Friend WithEvents btnPathPlot As System.Windows.Forms.Button
+    Friend WithEvents txtPathPlot As System.Windows.Forms.TextBox
+    Friend WithEvents Label6 As System.Windows.Forms.Label
+    Friend WithEvents btnSlopePath As System.Windows.Forms.Button
+    Friend WithEvents txtPathSlope As System.Windows.Forms.TextBox
     Friend WithEvents Label3 As System.Windows.Forms.Label
     Friend WithEvents btnOutPath As System.Windows.Forms.Button
     Friend WithEvents txtPathOutput As System.Windows.Forms.TextBox
@@ -550,20 +557,21 @@ Partial Class RunMultiWeppForm1
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents btnBasePath As System.Windows.Forms.Button
     Friend WithEvents txtPathBase As System.Windows.Forms.TextBox
-    Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog
-    Friend WithEvents txtRunCount As System.Windows.Forms.Label
-    Friend WithEvents Label4 As System.Windows.Forms.Label
-    Friend WithEvents Label6 As System.Windows.Forms.Label
-    Friend WithEvents btnSlopePath As System.Windows.Forms.Button
-    Friend WithEvents txtPathSlope As System.Windows.Forms.TextBox
+    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents boxOFE As System.Windows.Forms.GroupBox
+    Friend WithEvents radioOFEBuffer As System.Windows.Forms.RadioButton
+    Friend WithEvents radioOFEFillSlope As System.Windows.Forms.RadioButton
+    Friend WithEvents radioOFERoad As System.Windows.Forms.RadioButton
+    Friend WithEvents Label9 As System.Windows.Forms.Label
+    Friend WithEvents txtSlopeStart As System.Windows.Forms.TextBox
+    Friend WithEvents Label11 As System.Windows.Forms.Label
+    Friend WithEvents txtSlopeStop As System.Windows.Forms.TextBox
+    Friend WithEvents Label12 As System.Windows.Forms.Label
+    Friend WithEvents txtSlopeDelta As System.Windows.Forms.TextBox
+    Friend WithEvents Label13 As System.Windows.Forms.Label
+    Friend WithEvents txtLengthStart As System.Windows.Forms.TextBox
+    Friend WithEvents txtLengthStop As System.Windows.Forms.TextBox
+    Friend WithEvents txtLengthDelta As System.Windows.Forms.TextBox
     Friend WithEvents Label7 As System.Windows.Forms.Label
-    Friend WithEvents txtLengthSteps As System.Windows.Forms.TextBox
-    Friend WithEvents txtSlopeSteps As System.Windows.Forms.TextBox
-    Friend WithEvents Label5 As System.Windows.Forms.Label
-    Friend WithEvents btnPathPlot As System.Windows.Forms.Button
-    Friend WithEvents txtPathPlot As System.Windows.Forms.TextBox
-    Friend WithEvents GroupBox4 As System.Windows.Forms.GroupBox
-    Friend WithEvents lstCopyAlso As System.Windows.Forms.CheckedListBox
-    Friend WithEvents chkEnableAlso As System.Windows.Forms.CheckBox
-    Friend WithEvents Label8 As System.Windows.Forms.Label
+    Friend WithEvents chkDelAll As System.Windows.Forms.CheckBox
 End Class
