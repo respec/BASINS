@@ -27,6 +27,12 @@ Public Class frmWASPInitialize
 
     Public Sub InitializeUI(ByVal aPlugIn As PlugIn)
         pPlugIn = aPlugIn
+        cboLowest.Items.Add("1")
+        cboLowest.Items.Add("2")
+        cboLowest.Items.Add("3")
+        cboLowest.Items.Add("4")
+        cboLowest.Items.Add("5")
+        cboLowest.SelectedIndex = 0
         RefreshSelectionInfo()
     End Sub
 
@@ -76,6 +82,7 @@ Public Class frmWASPInitialize
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         Dim lComids = New atcCollection
         Dim lToComids = New atcCollection
+        Dim lStreamOrders = New atcCollection
 
         If pNumSelected > 0 Then
             'build collection of comid, tocomid
@@ -87,10 +94,17 @@ Public Class frmWASPInitialize
             If GisUtil.IsField(pCurrentLayerIndex, "TOCOMID") Then
                 lToComidFieldIndex = GisUtil.FieldIndex(pCurrentLayerIndex, "TOCOMID")
             End If
+            Dim lStreamOrderFieldIndex As Integer = 0
+            If GisUtil.IsField(pCurrentLayerIndex, "STREAMORDE") Then
+                lStreamOrderFieldIndex = GisUtil.FieldIndex(pCurrentLayerIndex, "STREAMORDE")
+            End If
             For lIndex As Integer = 0 To GisUtil.NumFeatures(pCurrentLayerIndex) - 1
                 lComids.Add(lIndex, GisUtil.FieldValue(pCurrentLayerIndex, lIndex, lComidFieldIndex))
                 lToComids.Add(lIndex, GisUtil.FieldValue(pCurrentLayerIndex, lIndex, lToComidFieldIndex))
+                lStreamOrders.Add(lIndex, GisUtil.FieldValue(pCurrentLayerIndex, lIndex, lStreamOrderFieldIndex))
             Next
+
+            Dim lLowestStreamOrder As Integer = cboLowest.SelectedIndex + 1
 
             'loop through each selected segment, see if anything is upstream of it
             Dim lSegmentIndexesToCheck As New Collection
@@ -107,7 +121,9 @@ Public Class frmWASPInitialize
                         If lToComids(lindex) = lSelectedComid Then
                             'see if what is upstream of this one is in the selected index collection
                             If Not pSelectedIndexes.Contains(lindex) Then
-                                lSegmentIndexesToAdd.Add(lindex)
+                                If lStreamOrders(lindex) >= lLowestStreamOrder Then
+                                    lSegmentIndexesToAdd.Add(lindex)
+                                End If
                             End If
                         End If
                     Next
