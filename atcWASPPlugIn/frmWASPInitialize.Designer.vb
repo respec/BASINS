@@ -26,11 +26,13 @@ Partial Class frmWASPInitialize
         Me.cmdRefresh = New System.Windows.Forms.Button
         Me.txtInfo = New System.Windows.Forms.TextBox
         Me.txtWarning = New System.Windows.Forms.TextBox
+        Me.cboLowest = New System.Windows.Forms.ComboBox
+        Me.Label1 = New System.Windows.Forms.Label
         Me.SuspendLayout()
         '
         'cmdOK
         '
-        Me.cmdOK.Location = New System.Drawing.Point(132, 194)
+        Me.cmdOK.Location = New System.Drawing.Point(69, 237)
         Me.cmdOK.Name = "cmdOK"
         Me.cmdOK.Size = New System.Drawing.Size(103, 32)
         Me.cmdOK.TabIndex = 0
@@ -39,7 +41,7 @@ Partial Class frmWASPInitialize
         '
         'cmdCancel
         '
-        Me.cmdCancel.Location = New System.Drawing.Point(252, 194)
+        Me.cmdCancel.Location = New System.Drawing.Point(188, 237)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(103, 32)
         Me.cmdCancel.TabIndex = 1
@@ -48,30 +50,30 @@ Partial Class frmWASPInitialize
         '
         'cmdSelect
         '
-        Me.cmdSelect.Location = New System.Drawing.Point(12, 12)
+        Me.cmdSelect.Location = New System.Drawing.Point(23, 123)
         Me.cmdSelect.Name = "cmdSelect"
-        Me.cmdSelect.Size = New System.Drawing.Size(103, 49)
+        Me.cmdSelect.Size = New System.Drawing.Size(149, 25)
         Me.cmdSelect.TabIndex = 2
         Me.cmdSelect.Text = "Select Upstream"
         Me.cmdSelect.UseVisualStyleBackColor = True
         '
         'cmdRefresh
         '
-        Me.cmdRefresh.Location = New System.Drawing.Point(12, 76)
+        Me.cmdRefresh.Location = New System.Drawing.Point(361, 237)
         Me.cmdRefresh.Name = "cmdRefresh"
-        Me.cmdRefresh.Size = New System.Drawing.Size(103, 49)
+        Me.cmdRefresh.Size = New System.Drawing.Size(103, 32)
         Me.cmdRefresh.TabIndex = 3
-        Me.cmdRefresh.Text = "Refresh Selection"
+        Me.cmdRefresh.Text = "Refresh"
         Me.cmdRefresh.UseVisualStyleBackColor = True
         '
         'txtInfo
         '
         Me.txtInfo.BackColor = System.Drawing.SystemColors.InactiveBorder
-        Me.txtInfo.Location = New System.Drawing.Point(141, 28)
+        Me.txtInfo.Location = New System.Drawing.Point(23, 25)
         Me.txtInfo.Multiline = True
         Me.txtInfo.Name = "txtInfo"
         Me.txtInfo.ReadOnly = True
-        Me.txtInfo.Size = New System.Drawing.Size(312, 78)
+        Me.txtInfo.Size = New System.Drawing.Size(431, 78)
         Me.txtInfo.TabIndex = 4
         '
         'txtWarning
@@ -79,18 +81,39 @@ Partial Class frmWASPInitialize
         Me.txtWarning.BackColor = System.Drawing.SystemColors.InactiveBorder
         Me.txtWarning.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.txtWarning.ForeColor = System.Drawing.Color.Maroon
-        Me.txtWarning.Location = New System.Drawing.Point(23, 141)
+        Me.txtWarning.Location = New System.Drawing.Point(23, 168)
         Me.txtWarning.Multiline = True
         Me.txtWarning.Name = "txtWarning"
         Me.txtWarning.ReadOnly = True
         Me.txtWarning.Size = New System.Drawing.Size(441, 41)
         Me.txtWarning.TabIndex = 5
         '
+        'cboLowest
+        '
+        Me.cboLowest.AllowDrop = True
+        Me.cboLowest.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboLowest.FormattingEnabled = True
+        Me.cboLowest.Location = New System.Drawing.Point(389, 124)
+        Me.cboLowest.Name = "cboLowest"
+        Me.cboLowest.Size = New System.Drawing.Size(65, 24)
+        Me.cboLowest.TabIndex = 6
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(185, 127)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(205, 17)
+        Me.Label1.TabIndex = 7
+        Me.Label1.Text = "Lowest Stream Order to Select:"
+        '
         'frmWASPInitialize
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(486, 238)
+        Me.ClientSize = New System.Drawing.Size(486, 281)
+        Me.Controls.Add(Me.Label1)
+        Me.Controls.Add(Me.cboLowest)
         Me.Controls.Add(Me.txtWarning)
         Me.Controls.Add(Me.txtInfo)
         Me.Controls.Add(Me.cmdRefresh)
@@ -114,4 +137,6 @@ Partial Class frmWASPInitialize
     Friend WithEvents cmdRefresh As System.Windows.Forms.Button
     Friend WithEvents txtInfo As System.Windows.Forms.TextBox
     Friend WithEvents txtWarning As System.Windows.Forms.TextBox
+    Friend WithEvents cboLowest As System.Windows.Forms.ComboBox
+    Friend WithEvents Label1 As System.Windows.Forms.Label
 End Class

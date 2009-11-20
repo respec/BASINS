@@ -779,7 +779,7 @@ Public Class atcWASPProject
         lIntroText.AppendLine("    0               Negative Solution Option")
         lIntroText.AppendLine("    0               Restart Option")
         lIntroText.AppendLine("    1               Time Optimization Option")
-        lIntroText.AppendLine("    1               WQ Module Linkage Option")
+        lIntroText.AppendLine("    0               WQ Module Linkage Option")
         lIntroText.AppendLine("    0.9000          TOPT Factor")
         lIntroText.AppendLine("0.003000  1.000     Min and Max Timestep")
         lIntroText.AppendLine("    2               Number print intervals")
