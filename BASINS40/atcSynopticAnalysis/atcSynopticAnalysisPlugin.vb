@@ -241,7 +241,6 @@ Public Class atcSynopticAnalysisPlugin
 
         Dim lSource As New atcControls.atcGridSource
         With lSource
-
             .Columns = aColumnTitles.Length
             .FixedRows = 3
             .Rows = aGroups.Count + lSource.FixedRows
@@ -285,6 +284,8 @@ Public Class atcSynopticAnalysisPlugin
                 Select Case aColumnTitles(lColumn)
                     Case "Group"
                         lSource.CellValue(lGroupIndex + lSource.FixedRows, lColumn) = aGroups.Keys(lGroupIndex)
+                    Case "Location"
+                        lSource.CellValue(lGroupIndex + lSource.FixedRows, lColumn) = lGroup.ItemByIndex(0).Attributes.GetValue("Location")
                     Case "Start Date"
                         lDataset = lGroup.ItemByIndex(0)
                         lDate = Date.FromOADate(lDataset.Dates.Value(1))
@@ -357,7 +358,7 @@ Public Class atcSynopticAnalysisPlugin
             Case "Start Date" : Return ""
             Case "Start Time" : Return ""
             Case "Measurements" : Return ""
-            Case "Volume" : Return "in"
+            Case "Volume" : Return "in" 'TODO: use data units
             Case "Duration" : Return aTimeUnits
             Case "Intensity" : Return "in/hr" 'TODO: use aTimeUnits?
             Case "Time Since Last" : Return aTimeUnits

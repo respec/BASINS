@@ -46,7 +46,7 @@ Public Class atcEventPlugin
 
         If Not aArgs Is Nothing Then
             ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
-            lThresh = aArgs.GetValue("Threshold", GetNaN)
+            lThresh = aArgs.GetValue("Threshold", lThresh)
             lDaysGapAllowed = aArgs.GetValue("DaysGapAllowed", 0)
             lHigh = aArgs.GetValue("High", True)
         End If

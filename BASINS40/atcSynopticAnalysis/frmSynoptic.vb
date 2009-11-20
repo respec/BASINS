@@ -34,8 +34,8 @@ Public Class frmSynoptic
     Private pColumnAttributesAllDefault() As String = {"", "", "", "Max", "Mean", "Sum", "Cumulative", "Max", "Mean", "Sum", "Standard Deviation", "Max", "Mean", "Standard Deviation", "Mean"}
 
     'Private pColumnTitlesEventAvailable() As String = {"Group", "Start Date", "Start Time", "Measurements", "Volume", "Duration", "Intensity", "Time Since Last"}
-    Private pColumnTitlesEventDefault() As String = {"Group", "Start Date", "Start Time", "Measurements", "Volume", "Duration", "Intensity", "Intensity", "Time Since Last"}
-    Private pColumnAttributesEventDefault() As String = {"", "", "", "", "Sum", "Sum", "Max", "Mean", "Mean"}
+    Private pColumnTitlesEventDefault() As String = {"Group", "Location", "Start Date", "Start Time", "Measurements", "Volume", "Duration", "Intensity", "Intensity", "Time Since Last"}
+    Private pColumnAttributesEventDefault() As String = {"", "", "", "", "", "Sum", "Sum", "Max", "Mean", "Mean"}
 
     Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing)
         If aTimeseriesGroup Is Nothing Then
@@ -56,7 +56,11 @@ Public Class frmSynoptic
         End If
 
         If pDataGroup.Count > 0 Then
-            Me.Text &= " of " & pDataGroup.ItemByIndex(0).ToString
+            If pDataGroup.Count = 1 Then
+                Me.Text &= " of " & pDataGroup.ItemByIndex(0).ToString
+            Else
+                Me.Text &= " of " & pDataGroup.Count & " datasets"
+            End If
             Me.Show()
             cboGapUnits.Items.AddRange(atcSynopticAnalysisPlugin.TimeUnitNames)
             cboGroupBy.Items.AddRange(pGroupByNames)
@@ -98,7 +102,7 @@ Public Class frmSynoptic
             pColumnTitlesAll = pColumnTitlesAllDefault.Clone
             pColumnAttributesAll = pColumnAttributesAllDefault.Clone
         End If
-        If pColumnAttributesEvent.Length <> pColumnTitlesEvent.Length Then
+        If pColumnAttributesEvent.Length <> pColumnTitlesEvent.Length OrElse Array.IndexOf(pColumnTitlesEvent, "Location") = -1 Then
             pColumnTitlesEvent = pColumnTitlesEventDefault.Clone
             pColumnAttributesEvent = pColumnAttributesEventDefault.Clone
         End If
