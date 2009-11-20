@@ -884,11 +884,17 @@ NextOldVal:
         lNewTimeseries.Dates = lDates
         lNewTimeseries.numValues = lNewTimeseries.Dates.numValues
         lNewTimeseries.Value(0) = GetNaN()
-        If Double.IsNaN(aSetAllValues) OrElse aSetAllValues <> 0 Then
+        Try
+            If Double.IsNaN(aSetAllValues) OrElse aSetAllValues <> 0 Then
+                For lIndex As Integer = 1 To lNewTimeseries.numValues
+                    lNewTimeseries.Value(lIndex) = aSetAllValues
+                Next
+            End If
+        Catch 'For some reason, the above If sometimes triggers an exception when aSetAllValuesis NaN, same loop as above
             For lIndex As Integer = 1 To lNewTimeseries.numValues
                 lNewTimeseries.Value(lIndex) = aSetAllValues
             Next
-        End If
+        End Try
         Return lNewTimeseries
     End Function
 

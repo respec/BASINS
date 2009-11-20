@@ -60,6 +60,7 @@ Public Class atcDataSourceBasinsObsWQ
                 Dim lTSIndex As Integer
                 Dim lLocation As String = ""
                 Dim s As String
+                Dim lNaN As Double = GetNaN()
                 lDBF = New atcTableDBF
                 lDBF.OpenFile(Specification)
                 For i As Integer = 1 To lDBF.NumFields
@@ -107,7 +108,7 @@ Public Class atcDataSourceBasinsObsWQ
                         If IsNumeric(lDataValue) Then
                             lData.Value(lTSIndex) = lDataValue
                         Else
-                            lData.Value(lTSIndex) = GetNaN()
+                            lData.Value(lTSIndex) = lNaN
                         End If
                         lData.Dates.Value(lTSIndex) = parseWQObsDate(lDBF.Value(lDateCol), lDBF.Value(lTimeCol))
                         lData.Attributes.SetValue("Count", lTSIndex)

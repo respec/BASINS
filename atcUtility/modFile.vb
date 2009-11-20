@@ -1327,16 +1327,16 @@ ReadCharacter:
     ''' <remarks>workaround for mystery bug - program exit without message on first reference to NaN</remarks>
     Public Function GetNaN() As Double
         Static lFirst As Boolean = True
-        If lFirst Then Logger.Dbg("GetNaN")
-        Dim lStatus As UInteger = _statusfp
+        'If lFirst Then Logger.Dbg("GetNaN")
+        'Dim lStatus As UInteger = _statusfp
         If lFirst Then
-            Logger.Dbg("StatusB4 " & lStatus)
+            'Logger.Dbg("StatusB4 " & lStatus)
             _fpreset()
-            Logger.Dbg("StatusAf " & _statusfp)
+            'Logger.Dbg("StatusAf " & _statusfp)
             lFirst = False
-        ElseIf lStatus > 1 Then
-            Logger.Dbg("StatusB4 " & lStatus)
-            _fpreset()
+            'ElseIf lStatus > 1 Then
+            'Logger.Dbg("StatusB4 " & lStatus)
+            '_fpreset()
         End If
         Return GetNaNInternal()
     End Function

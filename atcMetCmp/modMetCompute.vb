@@ -93,6 +93,7 @@ Public Module modMetCompute
         Dim CldCov(aCldTSer.numValues) As Double
         Dim lCmpTs As New atcTimeseries(aSource)
         Dim lPoint As Boolean = aCldTSer.Attributes.GetValue("point", False)
+        Dim lNaN As Double = GetNaN()
 
         CopyBaseAttributes(aCldTSer, lCmpTs)
         lCmpTs.Attributes.SetValue("Constituent", "DSOL")
@@ -116,7 +117,7 @@ Public Module modMetCompute
                 End If
                 Call RadClc(aLatDeg, CldCov(i), ldate(1), ldate(2), SolRad(i))
             Else
-                SolRad(i) = GetNaN()
+                SolRad(i) = lNaN
             End If
         Next i
         Array.Copy(SolRad, 1, lCmpTs.Values, 1, lCmpTs.numValues)
@@ -669,6 +670,7 @@ Public Module modMetCompute
         Dim lDisTs As New atcTimeseries(aDataSource)
         Dim lPoint As Boolean = aInTs.Attributes.GetValue("point", False)
         Dim lHrVals(24) As Double
+        Dim lNaN As Double = GetNaN()
 
         CopyBaseAttributes(aInTs, lDisTs)
         lDisTs.Attributes.SetValue("Scenario", "COMPUTED")
@@ -715,7 +717,7 @@ Public Module modMetCompute
                 Next j
             Else
                 For j = 1 To 24
-                    lOutTs(lHrPos + j) = GetNaN()
+                    lOutTs(lHrPos + j) = lNaN
                 Next j
             End If
             'increment to next 24 hour period

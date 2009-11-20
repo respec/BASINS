@@ -443,7 +443,7 @@ Public Class atcExpertSystem
                             lRecessionTimser.Values(lIndex - 1) = lRecession
                         Next lIndex
                         lRecessionTimser.Attributes.DiscardCalculated()
-                        lRecessionTimser.Attributes.CalculateAll()
+                        'lRecessionTimser.Attributes.CalculateAll()
 
                         'new percent of time in base flow term
                         Dim lStr As String = lRecessionTimser.Attributes.GetFormattedValue("%50")

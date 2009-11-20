@@ -238,7 +238,7 @@ Public Class atcDataSourceWDM
                             ElseIf lIndex > lTimser.numValues Then
                                 Logger.Dbg("OutOfValuesAt:" & lTimser.numValues)
                             ElseIf lAggregationCount = 0 Then
-                                .Values(lIndexConst) = GetNaN()
+                                .Values(lIndexConst) = pNan
                             End If
                         Next
                     End With

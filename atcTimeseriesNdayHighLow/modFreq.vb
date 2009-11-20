@@ -193,6 +193,7 @@ Module modFreq
             Dim lRsout(1 + (2 * lIntervalMax)) As Single
             Dim lKP3Dev(lIntervalMax) As Single
             Dim lRetcod As Integer
+            Dim lNaN As Double = GetNaN()
 
             Dim lIlh As Integer  'stats option 1-hi, 2-low,3-month
             If aHigh Then lIlh = 1 Else lIlh = 2
@@ -252,7 +253,7 @@ Module modFreq
                     If lQ(lIndex) = 0 Or Double.IsNaN(lQ(lIndex)) Then
                         If lMsg.Length = 0 Then
                             lMsg = "ComputeFreq:ZeroOrNan:" & lQ(lIndex) & ":"
-                            lQ(lIndex) = GetNaN()
+                            lQ(lIndex) = lNaN
                         End If
 
                         lMsg &= lNday & ":" & aRecurOrProbs(lIndex) & ":" & aHigh & ":" & lN

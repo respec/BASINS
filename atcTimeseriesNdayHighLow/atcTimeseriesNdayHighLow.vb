@@ -212,6 +212,7 @@ Public Class atcTimeseriesNdayHighLow
             Dim lSJday As Double = sjday
             Dim lNextSJday As Double
             Dim lEndJday As Double
+            Dim lNaN As Double = GetNaN()
 
             If TimAddJ(sjday, lTimeCode, 1, nYears) < ejday Then
                 nYears += 1
@@ -288,7 +289,7 @@ Public Class atcTimeseriesNdayHighLow
                                 newTS.Value(indexNew) = HighOrLowValue(lCurrentYear, CInt(lNDayNow), aHigh, lDate)
                                 newTS.ValueAttributes(indexNew).Add("Date", lDate)
                             Catch e As Exception
-                                newTS.Value(indexNew) = GetNaN()
+                                newTS.Value(indexNew) = lNaN
                                 newTS.ValueAttributes(indexNew) = New atcDataAttributes()
                                 newTS.ValueAttributes(indexNew).SetValue("Explanation", e.Message)
                             End Try
@@ -448,6 +449,7 @@ Public Class atcTimeseriesNdayHighLow
         Dim lTsMath As atcTimeseriesSource = Nothing
         Dim lQ As Double
         Dim lMsg As String = ""
+        Dim lNaN As Double = GetNaN()
 
         Dim lRecurOrProbs() As Double = Obj2Array(aRecurOrProb)
 
@@ -463,7 +465,7 @@ Public Class atcTimeseriesNdayHighLow
                 For lIndex As Integer = 1 To lNonLogTs.numValues
                     If Math.Abs(lNonLogTs.Value(lIndex)) < 1.0E-30 Then ' See if an NDay annual value is zero
                         lNumZero += 1
-                        lNonLogTs.Value(lIndex) = GetNaN()
+                        lNonLogTs.Value(lIndex) = lNaN
                         lNonLogTs.ValueAttributes(lIndex).SetValue("Was Zero", True)
                     End If
                 Next
@@ -491,7 +493,7 @@ Public Class atcTimeseriesNdayHighLow
                     PearsonType3(lNdayTs, lRecurOrProbs, aHigh, aLogFg, Me, aAttributesStorage, lNumZero)
                 Catch ex As Exception
                     lMsg = "ComputeFreq:Exception:" & ex.ToString & ":"
-                    lQ = GetNaN()
+                    lQ = lNaN
                 End Try
 
                 lTsMath = Nothing
