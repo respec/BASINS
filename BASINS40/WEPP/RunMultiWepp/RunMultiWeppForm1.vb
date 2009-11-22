@@ -21,6 +21,10 @@ Public Class RunMultiWeppForm1
         txtPathPlot.Text = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\wepp.run\out-plot.txt"
         txtPathOutput.Text = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\sensitivity\A"
 
+        txtScenarioRoot.Text = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\cli.met"
+        txtScenarioWeppExe.Text = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\wepp.run"
+        txtScenarioCopyResults.Text = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\cli.met\report"
+
         PopulateCopyAlso()
 
         txtSlopeStart.Text = "1"
@@ -30,6 +34,22 @@ Public Class RunMultiWeppForm1
         txtLengthStart.Text = "1"
         txtLengthStop.Text = "300"
         txtLengthDelta.Text = "20"
+
+        lstScenarioCopyFiles.CheckOnClick = True
+        lstScenarioCopyFiles.Items.Add("in.slp", True)
+        lstScenarioCopyFiles.Items.Add("in.sol", True)
+        lstScenarioCopyFiles.Items.Add("in.man", True)
+        lstScenarioCopyFiles.Items.Add("in.cli", True)
+        lstScenarioCopyFiles.Items.Add("in.run", True)
+
+        cboRoadType.DropDownStyle = ComboBoxStyle.DropDownList
+        cboRoadType.Items.Add("Insloped, bare ditch")
+        cboRoadType.Items.Add("Insloped, vegetated or rocked ditch")
+        cboRoadType.Items.Add("Outsloped, rutted")
+        cboRoadType.Items.Add("Outsloped, unrutted")
+
+        cboRoadType.SelectedIndex = 2
+        lstRootSubdir.CheckOnClick = True
         
         radioOFERoad.Checked = True
 
@@ -41,7 +61,7 @@ Public Class RunMultiWeppForm1
         AddHandler txtLengthStop.TextChanged, AddressOf ParamTextChanged
         AddHandler txtLengthDelta.TextChanged, AddressOf ParamTextChanged
         
-        CalculateIterations()
+        CalculateSlopeLengthIterations()
 
     End Sub
     Private Function GetBaseDir() As String
@@ -61,12 +81,12 @@ Public Class RunMultiWeppForm1
 
                 lstCopyAlso.Enabled = True
 
-            'copy other files from base to wepp executable if they are selected
-            Dim lObjBaseDir As Directory
+                'copy other files from base to wepp executable if they are selected
+                Dim lObjBaseDir As Directory
                 Dim lBaseFileList() As String = lObjBaseDir.GetFiles(GetBaseDir, "*")
-            Dim lOper As String
-            Dim lSingleFileName As String
-            Dim lAutoDetect As Boolean
+                Dim lOper As String
+                Dim lSingleFileName As String
+                Dim lAutoDetect As Boolean
 
                 For Each lOper In lBaseFileList
                     If lOper <> txtPathBase.Text Then
@@ -162,9 +182,58 @@ Public Class RunMultiWeppForm1
     End Function
 
     Private Sub btnExecute_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnExecute.Click
+        If tabMode.SelectedIndex = 0 Then
+            SlopeLengthExecute()
+        ElseIf tabMode.SelectedIndex = 1 Then
+            ScenarioExecute()
+        End If
+
+
+    End Sub
+
+    Private Sub ScenarioExecute()
         txtRunStatus.Text = "Running..."
         btnExecute.Enabled = False
         btnExecute.Text = "Running..."
+
+        Try
+
+
+            If chkDelAll.Checked Then
+
+                For Each lFileFound As String In Directory.GetFiles(txtScenarioCopyResults.Text, "*.*")
+                    File.Delete(lFileFound)
+                Next
+
+            End If
+
+            Dim lScenarioStepIndex As Integer = 0
+
+            For Each lDirString As String In lstRootSubdir.CheckedItems
+                lScenarioStepIndex += 1
+                For Each lCopyFile As String In lstScenarioCopyFiles.SelectedItems
+                    System.IO.File.Copy(txtScenarioRoot.Text & "\" & lDirString & "\" & lCopyFile, txtScenarioWeppExe.Text & "\" & lCopyFile, True)
+                Next
+
+                ProgressBar1.Value = Math.Round((lScenarioStepIndex) / lstRootSubdir.CheckedItems.Count) * 100
+                Shell(txtScenarioWeppExe.Text & "\weppbat.bat", AppWinStyle.Hide, True)
+                System.IO.File.Copy(txtScenarioWeppExe.Text & "\" & "out-plot.txt", txtScenarioCopyResults.Text & "\" & lScenarioStepIndex & ".txt", True)
+            Next
+
+        Catch ex As Exception
+
+        End Try
+
+        txtRunStatus.Text = "Done!"
+        btnExecute.Enabled = True
+        btnExecute.Text = "Run"
+
+    End Sub
+    Private Sub SlopeLengthExecute()
+
+        txtRunStatus.Text = "Running..."
+        btnExecute.Enabled = False
+
 
         Dim lMainStepIndex As Integer = -1
 
@@ -209,7 +278,7 @@ Public Class RunMultiWeppForm1
                 For k = 0 To lSlopeIterations - 1 'Step slope (first)
                     lCurrentSlope = CDbl(txtSlopeStart.Text) + k * lSlopeDelta
 
-                                                            'Copy the master slope file input to a local copy to muck with
+                    'Copy the master slope file input to a local copy to muck with
                     Dim lLinesCurrentSlope As ArrayList = lLinesSlopeIn
 
                     If radioOFERoad.Checked Then
@@ -284,15 +353,13 @@ Public Class RunMultiWeppForm1
 
                     txtRunStatus.Text = "Running: " & lMainStepIndex + 1 & "/" & lRunCount.ToString
                     ProgressBar1.Value = Math.Round((lMainStepIndex) / lRunCount) * 100
-                    Shell(txtPathWepp.Text & "\weppbat.bat", AppWinStyle.Hide, True)
+
 
                     If System.IO.File.Exists(txtPathPlot.Text) Then System.IO.File.Copy(txtPathPlot.Text, txtPathOutput.Text & "\" & lMainStepIndex + 1 & ".txt", True)
 
                 Next
 
             Next
-
-            
 
             objIndexWriter.Close()
 
@@ -311,7 +378,7 @@ Public Class RunMultiWeppForm1
         End Try
     End Sub
 
-    Private Sub CalculateIterations()
+    Private Sub CalculateSlopeLengthIterations()
         'Calculate the number of times to interate based on both length and slope variation
         txtRunStatus.Text = "<Press Run>"
 
@@ -347,7 +414,7 @@ Public Class RunMultiWeppForm1
         lLocalControl = aSender
 
         If IsNumeric(lLocalControl.Text) Then
-            CalculateIterations()
+            CalculateSlopeLengthIterations()
         Else
             lRunCount = 0
             txtRunCount.Text = "-"
@@ -356,12 +423,14 @@ Public Class RunMultiWeppForm1
         End If
 
     End Sub
-    
+
     Private Sub txtPathBase_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
         GetBaseDir()
     End Sub
 
     Private Sub radioOFEBuffer_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles radioOFEBuffer.CheckedChanged
+        cboRoadType.Enabled = False
+
         txtSlopeStart.Text = "1"
         txtSlopeStop.Text = "100"
         txtSlopeDelta.Text = "5"
@@ -369,9 +438,14 @@ Public Class RunMultiWeppForm1
         txtLengthStart.Text = "1"
         txtLengthStop.Text = "300"
         txtLengthDelta.Text = "20"
+
+
     End Sub
 
     Private Sub radioOFERoad_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles radioOFERoad.CheckedChanged
+
+        cboRoadType.Enabled = True
+
         txtSlopeStart.Text = "1"
         txtSlopeStop.Text = "40"
         txtSlopeDelta.Text = "2"
@@ -379,9 +453,85 @@ Public Class RunMultiWeppForm1
         txtLengthStart.Text = "1"
         txtLengthStop.Text = "300"
         txtLengthDelta.Text = "20"
-    End Sub
-
-    Private Sub RunMultiWeppForm1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
     End Sub
+
+    Private Sub btnScenario_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnScenarioPathRoot.Click
+        Try
+            OpenFileDialog1.Reset()
+            OpenFileDialog1.ShowDialog()
+
+            If Not OpenFileDialog1.FileName Is Nothing Then
+                txtScenarioRoot.Text = OpenFileDialog1.FileName
+            End If
+
+        Catch ex As Exception
+            MsgBox("Bad Path Name")
+        End Try
+    End Sub
+
+
+    Private Sub btnScenarioPathWeppExe_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnScenarioPathWeppExe.Click
+        Try
+            OpenFileDialog1.Reset()
+            OpenFileDialog1.ShowDialog()
+
+            If Not OpenFileDialog1.FileName Is Nothing Then
+                txtScenarioWeppExe.Text = OpenFileDialog1.FileName
+            End If
+
+        Catch ex As Exception
+            MsgBox("Bad Path Name")
+        End Try
+    End Sub
+
+    Private Sub btnScenarioPathCopyResults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnScenarioPathCopyResults.Click
+        Try
+            OpenFileDialog1.Reset()
+            OpenFileDialog1.ShowDialog()
+
+            If Not OpenFileDialog1.FileName Is Nothing Then
+                txtScenarioCopyResults.Text = OpenFileDialog1.FileName
+            End If
+
+        Catch ex As Exception
+            MsgBox("Bad Path Name")
+        End Try
+    End Sub
+
+    Private Sub TabModeChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tabMode.SelectedIndexChanged
+        If tabMode.SelectedIndex = 1 Then
+            PopulateScenarioRootSubDir()
+        End If
+    End Sub
+
+    Private Sub PopulateScenarioRootSubDir()
+        Try
+            If System.IO.Directory.Exists(txtScenarioRoot.Text) Then
+                lstRootSubdir.Items.Clear()
+
+                    'copy other files from base to wepp executable if they are selected
+                Dim lScenarioRootDir As Directory
+                Dim lScenarioRootDirList() As String = lScenarioRootDir.GetDirectories(txtScenarioRoot.Text, "*")
+                    Dim lOper As String
+                    Dim lSingleFileName As String
+
+                For Each lOper In lScenarioRootDirList
+
+                    lSingleFileName = Microsoft.VisualBasic.Right(lOper, lOper.Length - lOper.LastIndexOf("\") - 1)
+                    'dont add the directory that the results are copied out to
+                    If lOper <> txtScenarioCopyResults.Text Then
+                        lstRootSubdir.Items.Add(lSingleFileName, True)
+                    End If
+
+                Next
+
+                txtRunCount.Text = lstRootSubdir.CheckedItems.Count
+            End If
+        Catch ex As Exception
+
+        End Try
+
+    End Sub
+
 End Class
