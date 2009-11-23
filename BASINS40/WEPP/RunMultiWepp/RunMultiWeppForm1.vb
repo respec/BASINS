@@ -199,6 +199,7 @@ Public Class RunMultiWeppForm1
         Try
 
 
+
             If chkDelAll.Checked Then
 
                 For Each lFileFound As String In Directory.GetFiles(txtScenarioCopyResults.Text, "*.*")
@@ -207,26 +208,37 @@ Public Class RunMultiWeppForm1
 
             End If
 
+            'Make a text file linking main step index to parameter values. Plot files are names after main step index.
+            If Not System.IO.File.Exists(txtScenarioCopyResults.Text & "\index.csv") Then System.IO.File.Create(txtScenarioCopyResults.Text & "\index.csv", 1)
+
+            Dim objIndexWriter As New System.IO.StreamWriter(txtScenarioCopyResults.Text & "\index.csv")
+            objIndexWriter.WriteLine("# Index of scenario WEPP:Road runs. (index")
+
             Dim lScenarioStepIndex As Integer = 0
 
             For Each lDirString As String In lstRootSubdir.CheckedItems
                 lScenarioStepIndex += 1
-                For Each lCopyFile As String In lstScenarioCopyFiles.SelectedItems
+                For Each lCopyFile As String In lstScenarioCopyFiles.CheckedItems
                     System.IO.File.Copy(txtScenarioRoot.Text & "\" & lDirString & "\" & lCopyFile, txtScenarioWeppExe.Text & "\" & lCopyFile, True)
                 Next
 
                 ProgressBar1.Value = Math.Round((lScenarioStepIndex) / lstRootSubdir.CheckedItems.Count) * 100
                 Shell(txtScenarioWeppExe.Text & "\weppbat.bat", AppWinStyle.Hide, True)
-                System.IO.File.Copy(txtScenarioWeppExe.Text & "\" & "out-plot.txt", txtScenarioCopyResults.Text & "\" & lScenarioStepIndex & ".txt", True)
+                System.IO.File.Copy(txtScenarioWeppExe.Text & "\" & "out-plot.txt", txtScenarioCopyResults.Text & "\" & lDirString & ".txt", True)
+                objIndexWriter.WriteLine(lDirString)
             Next
-
+            objIndexWriter.Close()
+            txtRunStatus.Text = "Done!"
+            btnExecute.Enabled = True
+            btnExecute.Text = "Run"
         Catch ex As Exception
-
+            txtRunStatus.Text = "Something went wrong: "
+            MsgBox(ex.ToString)
+            btnExecute.Enabled = True
+            btnExecute.Text = "Run"
         End Try
 
-        txtRunStatus.Text = "Done!"
-        btnExecute.Enabled = True
-        btnExecute.Text = "Run"
+
 
     End Sub
     Private Sub SlopeLengthExecute()
