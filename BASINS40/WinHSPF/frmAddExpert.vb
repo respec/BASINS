@@ -121,7 +121,16 @@ Public Class frmAddExpert
                 lId = pListBox1DataItems.Item(lstOperation.SelectedIndex + 1)
                 If Not pfrmOutput.IsCalibLocation("RCHRES", lId) Then
                     Me.Cursor = Cursors.WaitCursor
-                    pUCI.AddExpertSystem(lId, lblOperation.Text, atxBase.Text, lDsns, lOstr)
+
+                    Dim lWDMId As Integer = 0
+                    For lWdmIndex As Integer = 1 To 4
+                        If Not pUCI.GetWDMObj(lWdmIndex) Is Nothing Then 'use this as the output wdm
+                            lWDMId = lWdmIndex
+                            Exit For
+                        End If
+                    Next lWdmIndex
+
+                    pUCI.AddExpertSystem(lId, lblOperation.Text, lWDMId, atxBase.Text, lDsns, lOstr)
                     pUCI.Edited = True
                     Me.Cursor = Cursors.Arrow
                 End If
@@ -204,12 +213,12 @@ Public Class frmAddExpert
                 Dim lctemp As String = lstOperation.Items(lstOperation.SelectedIndex)
                 Dim lSpacePos As Integer = InStr(1, lctemp, " ")
                 Dim lOpname As String = Mid(lctemp, 1, lSpacePos - 1)
-                lId = CInt(Mid(lctemp, lspacepos + 1))
+                lId = CInt(Mid(lctemp, lSpacePos + 1))
                 Dim lFromOper As HspfOperation = pUCI.OpnBlks(lOpname).OperFromID(lId)
                 lctemp = lstGroup.Items(lstOperation.SelectedIndex)
-                lspacepos = InStr(1, lctemp, " ")
+                lSpacePos = InStr(1, lctemp, " ")
                 lOpname = Mid(lctemp, 1, lSpacePos - 1)
-                lId = CInt(Mid(lctemp, lspacepos + 1))
+                lId = CInt(Mid(lctemp, lSpacePos + 1))
                 Dim lToOper As HspfOperation = pUCI.OpnBlks(lOpname).OperFromID(lId)
                 Dim lFromCalib As Boolean
                 If lFromOper.Name = "RCHRES" Then

@@ -14,7 +14,7 @@ Public Class frmSaveAs
         Me.MinimumSize = Me.Size
         Me.MaximumSize = Me.Size
 
-        pCurrentDirectory = PathNameOnly(AbsolutePath(pUCI.Name, CurDir))
+        pCurrentDirectory = PathNameOnly(pUCIFullFileName)
         atxName.Text = FilenameNoExt(pUCI.Name)
 
     End Sub
