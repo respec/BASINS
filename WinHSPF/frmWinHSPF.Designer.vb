@@ -262,7 +262,7 @@ Partial Class frmWinHSPF
         '
         Me.HSPFparmToolStripMenuItem.Name = "HSPFparmToolStripMenuItem"
         Me.HSPFparmToolStripMenuItem.Size = New System.Drawing.Size(288, 22)
-        Me.HSPFparmToolStripMenuItem.Text = "HSPFparm"
+        Me.HSPFparmToolStripMenuItem.Text = "HSPFParm"
         '
         'StarterToolStripMenuItem
         '

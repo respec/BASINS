@@ -157,16 +157,34 @@ Public Class frmWinHSPF
 
     Private Sub AQUATOXToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AQUATOXToolStripMenuItem.Click
 
-        If IsNothing(pfrmAQUATOX) Then
-            pfrmAQUATOX = New frmAQUATOX
-            pfrmAQUATOX.Show()
+        Dim lAQlocCnt As Integer = 0
+
+        For Each lOper As HspfOperation In pUCI.OpnSeqBlock.Opns
+            If lOper.Name = "RCHRES" Then
+                If frmOutput.IsAQUATOXLocation(lOper.Name, lOper.Id) Then
+                    'this is an aquatox output location
+                    lAQlocCnt = lAQlocCnt + 1
+                End If
+            End If
+        Next
+
+        If lAQlocCnt = 0 Then
+            Logger.Msg("At least one AQUATOX output location must be specified " & vbCrLf & "in the Output Manager " & _
+                       "before linking to AQUATOX.", "WinHSPF-AQUATOX Problem")
         Else
-            If pfrmAQUATOX.IsDisposed Then
+            If IsNothing(pfrmAQUATOX) Then
                 pfrmAQUATOX = New frmAQUATOX
+                pfrmAQUATOX.Init()
                 pfrmAQUATOX.Show()
             Else
-                pfrmAQUATOX.WindowState = FormWindowState.Normal
-                pfrmAQUATOX.BringToFront()
+                If pfrmAQUATOX.IsDisposed Then
+                    pfrmAQUATOX = New frmAQUATOX
+                    pfrmAQUATOX.Init()
+                    pfrmAQUATOX.Show()
+                Else
+                    pfrmAQUATOX.WindowState = FormWindowState.Normal
+                    pfrmAQUATOX.BringToFront()
+                End If
             End If
         End If
 

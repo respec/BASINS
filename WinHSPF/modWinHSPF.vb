@@ -12,6 +12,7 @@ Public Module WinHSPF
     Friend pIcon As Icon
     Friend pDefUCI As HspfUci
     Friend pPollutantList As Collection
+    Friend pUCIFullFileName As String
 
     'Variableize each form to prevent multiple open and facilitate BringToFront if already open
     Friend pfrmReach As frmReach
@@ -107,6 +108,7 @@ Public Module WinHSPF
         Dim lWorkingDir As String = IO.Path.GetDirectoryName(aFileName)
         ChDriveDir(lWorkingDir)
         Logger.Dbg("WinHSPF:WorkingDir:" & lWorkingDir & ":" & CurDir())
+        pUCIFullFileName = aFileName
 
         pUCI = New HspfUci
         Dim lUCIName As String = IO.Path.GetFileName(aFileName)
@@ -185,6 +187,7 @@ Public Module WinHSPF
                                      lDataSources, _
                                      pDefUCI)
             pUCI.Save()
+            pUCIFullFileName = lUCIFileName
             If pWinHSPF IsNot Nothing Then
                 pWinHSPF.Text = pWinHSPF.Tag & ": " & pUCI.Name
                 pWinHSPF.SchematicDiagram.UCI = pUCI

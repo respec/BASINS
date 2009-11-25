@@ -21,31 +21,33 @@ Partial Class frmAQUATOX
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmAQUATOX))
-        Me.cmdFile = New System.Windows.Forms.Button
+        Me.cmdWatershedFile = New System.Windows.Forms.Button
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
-        Me.lblFile = New System.Windows.Forms.TextBox
-        Me.Button1 = New System.Windows.Forms.Button
-        Me.TextBox1 = New System.Windows.Forms.TextBox
+        Me.cmdWDMFile = New System.Windows.Forms.Button
         Me.Label1 = New System.Windows.Forms.Label
         Me.Label2 = New System.Windows.Forms.Label
         Me.Label3 = New System.Windows.Forms.Label
-        Me.ComboBox1 = New System.Windows.Forms.ComboBox
+        Me.cboRchres = New System.Windows.Forms.ComboBox
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdAQUATOX = New System.Windows.Forms.Button
+        Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
+        Me.lblWatershedFile = New System.Windows.Forms.Label
+        Me.lblWDMFile = New System.Windows.Forms.Label
         Me.SuspendLayout()
         '
-        'cmdFile
+        'cmdWatershedFile
         '
-        Me.cmdFile.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.cmdFile.ImageIndex = 0
-        Me.cmdFile.ImageList = Me.ImageList1
-        Me.cmdFile.Location = New System.Drawing.Point(140, 10)
-        Me.cmdFile.Name = "cmdFile"
-        Me.cmdFile.Size = New System.Drawing.Size(63, 19)
-        Me.cmdFile.TabIndex = 3
-        Me.cmdFile.Text = "Select"
-        Me.cmdFile.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.cmdFile.UseVisualStyleBackColor = True
+        Me.cmdWatershedFile.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.cmdWatershedFile.ImageIndex = 0
+        Me.cmdWatershedFile.ImageList = Me.ImageList1
+        Me.cmdWatershedFile.Location = New System.Drawing.Point(187, 12)
+        Me.cmdWatershedFile.Margin = New System.Windows.Forms.Padding(4)
+        Me.cmdWatershedFile.Name = "cmdWatershedFile"
+        Me.cmdWatershedFile.Size = New System.Drawing.Size(84, 23)
+        Me.cmdWatershedFile.TabIndex = 3
+        Me.cmdWatershedFile.Text = "Select"
+        Me.cmdWatershedFile.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.cmdWatershedFile.UseVisualStyleBackColor = True
         '
         'ImageList1
         '
@@ -53,77 +55,69 @@ Partial Class frmAQUATOX
         Me.ImageList1.TransparentColor = System.Drawing.Color.Transparent
         Me.ImageList1.Images.SetKeyName(0, "toolbar-openicon.png")
         '
-        'lblFile
+        'cmdWDMFile
         '
-        Me.lblFile.BackColor = System.Drawing.SystemColors.Control
-        Me.lblFile.Location = New System.Drawing.Point(204, 11)
-        Me.lblFile.Name = "lblFile"
-        Me.lblFile.Size = New System.Drawing.Size(287, 20)
-        Me.lblFile.TabIndex = 2
-        '
-        'Button1
-        '
-        Me.Button1.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.Button1.ImageIndex = 0
-        Me.Button1.ImageList = Me.ImageList1
-        Me.Button1.Location = New System.Drawing.Point(140, 40)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(63, 19)
-        Me.Button1.TabIndex = 5
-        Me.Button1.Text = "Select"
-        Me.Button1.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.Button1.UseVisualStyleBackColor = True
-        '
-        'TextBox1
-        '
-        Me.TextBox1.BackColor = System.Drawing.SystemColors.Control
-        Me.TextBox1.Location = New System.Drawing.Point(204, 41)
-        Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.Size = New System.Drawing.Size(287, 20)
-        Me.TextBox1.TabIndex = 4
+        Me.cmdWDMFile.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.cmdWDMFile.ImageIndex = 0
+        Me.cmdWDMFile.ImageList = Me.ImageList1
+        Me.cmdWDMFile.Location = New System.Drawing.Point(187, 49)
+        Me.cmdWDMFile.Margin = New System.Windows.Forms.Padding(4)
+        Me.cmdWDMFile.Name = "cmdWDMFile"
+        Me.cmdWDMFile.Size = New System.Drawing.Size(84, 23)
+        Me.cmdWDMFile.TabIndex = 5
+        Me.cmdWDMFile.Text = "Select"
+        Me.cmdWDMFile.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.cmdWDMFile.UseVisualStyleBackColor = True
         '
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(13, 15)
+        Me.Label1.Location = New System.Drawing.Point(17, 18)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(120, 13)
+        Me.Label1.Size = New System.Drawing.Size(156, 17)
         Me.Label1.TabIndex = 6
         Me.Label1.Text = "BASINS Watershed File"
         '
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(13, 45)
+        Me.Label2.Location = New System.Drawing.Point(17, 55)
+        Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(90, 13)
+        Me.Label2.Size = New System.Drawing.Size(116, 17)
         Me.Label2.TabIndex = 7
         Me.Label2.Text = "Project WDM File"
         '
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(13, 81)
+        Me.Label3.Location = New System.Drawing.Point(17, 100)
+        Me.Label3.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(123, 13)
+        Me.Label3.Size = New System.Drawing.Size(158, 17)
         Me.Label3.TabIndex = 8
         Me.Label3.Text = "Select RCHRES to Link:"
         '
-        'ComboBox1
+        'cboRchres
         '
-        Me.ComboBox1.FormattingEnabled = True
-        Me.ComboBox1.Location = New System.Drawing.Point(204, 78)
-        Me.ComboBox1.Name = "ComboBox1"
-        Me.ComboBox1.Size = New System.Drawing.Size(163, 21)
-        Me.ComboBox1.TabIndex = 9
+        Me.cboRchres.AllowDrop = True
+        Me.cboRchres.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboRchres.FormattingEnabled = True
+        Me.cboRchres.Location = New System.Drawing.Point(272, 96)
+        Me.cboRchres.Margin = New System.Windows.Forms.Padding(4)
+        Me.cboRchres.Name = "cboRchres"
+        Me.cboRchres.Size = New System.Drawing.Size(216, 24)
+        Me.cboRchres.TabIndex = 9
         '
         'cmdCancel
         '
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdCancel.Location = New System.Drawing.Point(293, 118)
+        Me.cmdCancel.Location = New System.Drawing.Point(391, 145)
+        Me.cmdCancel.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdCancel.Name = "cmdCancel"
-        Me.cmdCancel.Size = New System.Drawing.Size(101, 26)
+        Me.cmdCancel.Size = New System.Drawing.Size(135, 32)
         Me.cmdCancel.TabIndex = 22
         Me.cmdCancel.Text = "&Cancel"
         Me.cmdCancel.UseVisualStyleBackColor = True
@@ -131,43 +125,68 @@ Partial Class frmAQUATOX
         'cmdAQUATOX
         '
         Me.cmdAQUATOX.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdAQUATOX.Location = New System.Drawing.Point(139, 118)
+        Me.cmdAQUATOX.Location = New System.Drawing.Point(185, 145)
+        Me.cmdAQUATOX.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdAQUATOX.Name = "cmdAQUATOX"
-        Me.cmdAQUATOX.Size = New System.Drawing.Size(146, 26)
+        Me.cmdAQUATOX.Size = New System.Drawing.Size(195, 32)
         Me.cmdAQUATOX.TabIndex = 21
         Me.cmdAQUATOX.Text = "&Start AQUATOX"
         Me.cmdAQUATOX.UseVisualStyleBackColor = True
         '
+        'OpenFileDialog1
+        '
+        Me.OpenFileDialog1.FileName = "OpenFileDialog1"
+        '
+        'lblWatershedFile
+        '
+        Me.lblWatershedFile.AutoSize = True
+        Me.lblWatershedFile.Location = New System.Drawing.Point(278, 15)
+        Me.lblWatershedFile.Name = "lblWatershedFile"
+        Me.lblWatershedFile.Size = New System.Drawing.Size(56, 17)
+        Me.lblWatershedFile.TabIndex = 23
+        Me.lblWatershedFile.Text = "<none>"
+        '
+        'lblWDMFile
+        '
+        Me.lblWDMFile.AutoSize = True
+        Me.lblWDMFile.Location = New System.Drawing.Point(278, 52)
+        Me.lblWDMFile.Name = "lblWDMFile"
+        Me.lblWDMFile.Size = New System.Drawing.Size(56, 17)
+        Me.lblWDMFile.TabIndex = 24
+        Me.lblWDMFile.Text = "<none>"
+        '
         'frmAQUATOX
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(505, 156)
+        Me.ClientSize = New System.Drawing.Size(699, 192)
+        Me.Controls.Add(Me.lblWDMFile)
+        Me.Controls.Add(Me.lblWatershedFile)
         Me.Controls.Add(Me.cmdCancel)
         Me.Controls.Add(Me.cmdAQUATOX)
-        Me.Controls.Add(Me.ComboBox1)
+        Me.Controls.Add(Me.cboRchres)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.Label1)
-        Me.Controls.Add(Me.Button1)
-        Me.Controls.Add(Me.TextBox1)
-        Me.Controls.Add(Me.cmdFile)
-        Me.Controls.Add(Me.lblFile)
+        Me.Controls.Add(Me.cmdWDMFile)
+        Me.Controls.Add(Me.cmdWatershedFile)
+        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmAQUATOX"
         Me.Text = "WinHSPF - AQUATOX Linkage"
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents cmdFile As System.Windows.Forms.Button
-    Friend WithEvents lblFile As System.Windows.Forms.TextBox
-    Friend WithEvents Button1 As System.Windows.Forms.Button
-    Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
+    Friend WithEvents cmdWatershedFile As System.Windows.Forms.Button
+    Friend WithEvents cmdWDMFile As System.Windows.Forms.Button
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents Label3 As System.Windows.Forms.Label
-    Friend WithEvents ComboBox1 As System.Windows.Forms.ComboBox
+    Friend WithEvents cboRchres As System.Windows.Forms.ComboBox
     Friend WithEvents cmdCancel As System.Windows.Forms.Button
     Friend WithEvents cmdAQUATOX As System.Windows.Forms.Button
     Friend WithEvents ImageList1 As System.Windows.Forms.ImageList
+    Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents lblWatershedFile As System.Windows.Forms.Label
+    Friend WithEvents lblWDMFile As System.Windows.Forms.Label
 End Class
