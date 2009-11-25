@@ -14,7 +14,7 @@ for o in systemObjects:
   MapWinUtility.Logger.Dbg("Object " + o)
   clr.AddReferenceByPartialName(o)
 
-basinsObjects = ['MapWinInterfaces', 'atcUtility', 'atcControls', 'atcData', 'atcTimeseriesMath', 'atcTimeseriesRDB', 'atcGraph']
+basinsObjects = ['MapWinInterfaces', 'atcUtility', 'atcControls', 'atcData', 'atcTimeseriesMath', 'atcTimeseriesRDB', 'atcGraph', 'atcDataTree', 'ZedGraph']
 for o in basinsObjects:
   MapWinUtility.Logger.Dbg("Object " + o)
   clr.AddReferenceToFile(o + ".dll")
@@ -53,7 +53,30 @@ MapWinUtility.Logger.Dbg("atcUtility.modDate:ClassDir " + str( dir (atcUtility.m
 t = atcData.modTimeseriesMath.NewTimeseries(20000,20100,atcUtility.modDate.atcTimeUnit.TUDay,1)
 n = t.numValues
 MapWinUtility.Logger.Dbg("Timeseries.numValues " + str(n))
-    
+grp = atcData.atcTimeseriesGroup(t)
+MapWinUtility.Logger.Dbg("TimeseriesGroupCount " + str( grp.Count))
+
+import atcDataTree.atcDataTreePlugin
+MapWinUtility.Logger.Dbg("atcDataTree.atcDataTreePlugin:ClassDir " + str( dir (atcDataTree.atcDataTreePlugin)))
+p = atcDataTree.atcDataTreePlugin()
+MapWinUtility.Logger.Dbg("atcDataTreePlugIn:Name " + p.Name)
+p.Save(grp,'dataTree.txt')
+
+import ZedGraph
+MapWinUtility.Logger.Dbg("ZedGraph:ClassDir " + str( dir (ZedGraph)))
+
+import atcGraph.modGraph
+MapWinUtility.Logger.Dbg("atcGraph.modGraph:ClassDir " + str( dir (atcGraph.modGraph)))
+
+z = atcGraph.modGraph.CreateZgc()
+z.Width = 1024
+z.Height = 768
+MapWinUtility.Logger.Dbg("ZedGraphVersion " + z.ProductVersion)
+
+g = atcGraph.clsGraphTime(grp,z)
+z.SaveIn('graph.png')
+
+
 
 
 
