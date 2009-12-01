@@ -30,6 +30,12 @@ Public Module Main
             'set the log file path
             Dim lLogFilePath As String = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\cli.met\" & lRunId & "-log.txt"
 
+            'set the units of the ATEMP timeseries
+            '1: Celsius
+            '2: Fahrenheit
+            '3: Kelvin
+            Dim lTempUnits As Integer = 2
+
             'set the DSNs for constituents
             Dim lDsnPREC As Integer = 11
             Dim lDsnATEM As Integer = 13
@@ -133,8 +139,7 @@ Public Module Main
                 Dim lTSWIND As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(lDsnWIND), Date2J(lStrModelBegin), Date2J(lStrModelEnd), lWDMDataSource)
                 'SOLR
                 Dim lTSSOLR As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(lDsnSOLR), Date2J(lStrModelBegin), Date2J(lStrModelEnd), lWDMDataSource)
-                'PEVT
-                Dim lTSPEVT As atcTimeseries = modTimeseriesMath.SubsetByDate(lWDMDataSource.DataSets.ItemByKey(lDsnPEVT), Date2J(lStrModelBegin), Date2J(lStrModelEnd), lWDMDataSource)
+             
 
                 ' Create a file to write WEPP output to
                 Dim lWeppOutputStream As System.IO.StreamWriter = System.IO.File.CreateText(lOutputFilePath)
@@ -243,8 +248,14 @@ Public Module Main
                         For j = 1 To 24
                             'ATEM: min and max temperature for the current day
                             lTempRecord = lTSATEM.Values(i + j)
+
+                            If lTempUnits = 2 Then
+                                lTempRecord = (lTempRecord - 32) * 5 / 9
+                            ElseIf lTempUnits = 3 Then
+                                lTempRecord = lTempRecord - 273.15
+                            End If
                             'convert from degrees F to C
-                            lTempRecord = (lTempRecord - 32) * 5 / 9
+
                             If j = 1 Then
                                 lTempDayStatResults(0) = lTempRecord
                                 lTempDayStatResults(1) = lTempRecord
