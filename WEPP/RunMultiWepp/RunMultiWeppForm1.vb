@@ -286,9 +286,25 @@ Public Class RunMultiWeppForm1
 
 
             For j = 0 To lLengthIterations - 1 ' Step length
-                lCurrentLength = CDbl(txtLengthStart.Text) + j * lLengthDelta
-                For k = 0 To lSlopeIterations - 1 'Step slope (first)
-                    lCurrentSlope = CDbl(txtSlopeStart.Text) + k * lSlopeDelta
+                If j = 0 Then
+                    lCurrentLength = CDbl(txtLengthStart.Text)
+                ElseIf j = 1 Then
+                    lCurrentLength = CDbl(txtLengthStart.Text) + lLengthDelta - 1
+                ElseIf j > 1 Then
+                    lCurrentLength = CDbl(txtLengthStart.Text) + lLengthDelta - 1 + (j - 1) * lLengthDelta
+                End If
+
+                For k = 0 To lSlopeIterations - 1  'Step slope (first)
+                    If k = 0 Then
+                        lCurrentSlope = CDbl(txtSlopeStart.Text)
+                    ElseIf k = 1 Then
+                        lCurrentSlope = CDbl(txtSlopeStart.Text) + lSlopeDelta - 1
+                    ElseIf k > 1 Then
+                        lCurrentSlope = CDbl(txtSlopeStart.Text) + lSlopeDelta - 1 + (k - 1) * lSlopeDelta
+                    End If
+
+
+
 
                     'Copy the master slope file input to a local copy to muck with
                     Dim lLinesCurrentSlope As ArrayList = lLinesSlopeIn
@@ -365,7 +381,7 @@ Public Class RunMultiWeppForm1
 
                     txtRunStatus.Text = "Running: " & lMainStepIndex + 1 & "/" & lRunCount.ToString
                     ProgressBar1.Value = Math.Round((lMainStepIndex) / lRunCount) * 100
-
+                    Shell(txtScenarioWeppExe.Text & "\weppbat.bat", AppWinStyle.Hide, True)
 
                     If System.IO.File.Exists(txtPathPlot.Text) Then System.IO.File.Copy(txtPathPlot.Text, txtPathOutput.Text & "\" & lMainStepIndex + 1 & ".txt", True)
 
@@ -403,8 +419,8 @@ Public Class RunMultiWeppForm1
         lSlopeDelta = CDbl(txtSlopeDelta.Text)
         lLengthDelta = CDbl(txtLengthDelta.Text)
 
-        lSlopeIterations = Math.Floor((lSlopeStop - lSlopeStart) / (lSlopeDelta) + 1)
-        lLengthIterations = Math.Floor((lLengthStop - lLengthStart) / (lLengthDelta) + 1)
+        lSlopeIterations = Math.Floor((lSlopeStop - lSlopeStart + 1) / (lSlopeDelta)) + 1
+        lLengthIterations = Math.Floor((lLengthStop - lLengthStart + 1) / (lLengthDelta)) + 1
 
         lRunCount = CInt(lSlopeIterations * lLengthIterations)
         txtRunCount.Text = lRunCount.ToString
