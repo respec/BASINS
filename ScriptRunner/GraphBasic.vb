@@ -145,7 +145,9 @@ Module GraphBasic
 
             'get timeseries 1
             Dim lDataSource1 As New atcDataSourceWDM
-            Dim lTser1, lTser2, ltser3 As atcTimeseries
+            Dim lTser1 As atcTimeseries = Nothing
+            Dim lTser2 As atcTimeseries = Nothing
+            Dim ltser3 As atcTimeseries = Nothing
 
             If lDataSource1.Open(pTimeseries1FileName) Then
 

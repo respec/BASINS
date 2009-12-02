@@ -1,9 +1,15 @@
 Imports atcUCI
 Imports atcUCIForms
+Imports MapWinUtility
 
 Public Class frmReach
 
     Dim pVScrollColumnOffset As Integer = 16
+    Dim pSelectedRow As Integer = 1
+
+    Private Sub grdReach_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdReach.MouseDownCell
+        pSelectedRow = aRow
+    End Sub
 
     Private Sub grdReach_Resize(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles grdReach.Resize
         grdReach.SizeAllColumnsToContents(grdReach.Width - pVScrollColumnOffset, True)
@@ -77,51 +83,78 @@ Public Class frmReach
     End Sub
 
     Private Sub FTables_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles FTables.Click
-        UCIForms.Edit(Me, pUCI.OpnBlks("RCHRES").NthOper(1).FTable)  'todo: use selected row
+        If pSelectedRow > 0 Then
+            UCIForms.Edit(Me, pUCI.OpnBlks("RCHRES").NthOper(1).FTable)
+        Else
+            UCIForms.Edit(Me, pUCI.OpnBlks("RCHRES").NthOper(pSelectedRow).FTable)
+        End If
     End Sub
 
     Private Sub grdReach_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdReach.CellEdited
-        'todo: add limits 
-        'units = myUci.GlobalBlock.emfg
-        'lOpnBlk = myUci.OpnBlks("RCHRES")
-        'lTable = lOpnBlk.tables("HYDR-PARM2")
+        Dim lUnitfg As Integer = pUCI.GlobalBlock.EmFg
 
-        'If units = 1 Then
-        '    .TextMatrix(0, 2) = "Length (mi)"
-        '    .ColMin(2) = lTable.Parms("LEN").Def.Min
-        '    .ColMax(2) = lTable.Parms("LEN").Def.Max
-        'Else
-        '    .TextMatrix(0, 2) = "Length (km)"
-        '    .ColMin(2) = lTable.Parms("LEN").Def.MetricMin
-        '    .ColMax(2) = lTable.Parms("LEN").Def.MetricMax
-        'End If
+        Dim lMinValue As Integer = -999
+        Dim lMaxValue As Integer = -999
 
-        'If units = 1 Then
-        '    .TextMatrix(0, 3) = "Delta H (ft)"
-        '    .ColMin(3) = lTable.Parms("DELTH").Def.Min
-        '    .ColMax(3) = lTable.Parms("DELTH").Def.Max
-        'Else
-        '    .TextMatrix(0, 3) = "Delta H (m)"
-        '    .ColMin(3) = lTable.Parms("DELTH").Def.MetricMin
-        '    .ColMax(3) = lTable.Parms("DELTH").Def.MetricMax
-        'End If
+        Dim lOpnBlk As HspfOpnBlk = pUCI.OpnBlks("RCHRES")
+        Dim lTable As HspfTable = Nothing
 
-        '.ColMin(4) = 0
-        '.ColMax(4) = 999
+        If aColumn = 2 Or aColumn = 3 Then
+            lTable = lOpnBlk.Tables("HYDR-PARM2")
+        ElseIf aColumn = 4 Then
+            lMinValue = 0
+            lMaxValue = 999
+        ElseIf aColumn = 5 Or aColumn = 6 Then
+            lTable = lOpnBlk.Tables("GEN-INFO")
+        End If
 
-        'lTable = lOpnBlk.tables("GEN-INFO")
+        Dim lParmName As String = ""
+        If aColumn = 2 Then
+            lParmName = "LEN"
+        ElseIf aColumn = 3 Then
+            lParmName = "DELTH"
+        ElseIf aColumn = 5 Then
+            lParmName = "NEXITS"
+        ElseIf aColumn = 6 Then
+            lParmName = "LKFG"
+        End If
 
-        '.ColMin(5) = lTable.Parms("NEXITS").Def.Min
-        '.ColMax(5) = lTable.Parms("NEXITS").Def.Max
+        If Not lTable Is Nothing Then
+            Dim lParm As HspfParm = lTable.Parms(lParmName)
 
-        '.TextMatrix(0, 6) = "Lake Flag"
-        '.ColMin(6) = lTable.Parms("LKFG").Def.Min
-        '.ColMax(6) = lTable.Parms("LKFG").Def.Max
+            If lParm.Def.Typ = 1 Or lParm.Def.Typ = 2 Then
+                'this is a numeric field
+                If lUnitfg = 1 Then 'english
+                    lMaxValue = lParm.Def.Max
+                    lMinValue = lParm.Def.Min
+                ElseIf lUnitfg = 2 Then 'metric
+                    lMaxValue = lParm.Def.MetricMax
+                    lMinValue = lParm.Def.MetricMin
+                End If
+            End If
+        End If
+
+        If lMaxValue <> -999 Or lMinValue <> -999 Then
+            Dim lNewValue As String = aGrid.Source.CellValue(aRow, aColumn)
+            Dim lNewValueNumeric As Double = -999
+            If IsNumeric(lNewValue) Then lNewValueNumeric = CDbl(lNewValue)
+            Dim lNewColor As Color = aGrid.Source.CellColor(aRow, aColumn)
+            If (lNewValueNumeric >= lMinValue And lMinValue <> -999) AndAlso (lNewValueNumeric <= lMaxValue And lMaxValue <> -999) Then
+                lNewColor = aGrid.CellBackColor
+            Else
+                lNewColor = Color.Pink
+            End If
+            If Not lNewColor.Equals(aGrid.Source.CellColor(aRow, aColumn)) Then
+                aGrid.Source.CellColor(aRow, aColumn) = lNewColor
+            End If
+        End If
 
     End Sub
 
-    Private Sub cmdOK_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
-        'changednetwork = False
+    Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
+        Dim lChangedNetwork As Boolean = False
+        Dim lErrorFg As Boolean = False
+
         With grdReach.Source
             Dim lOperBlock As HspfOpnBlk = pUCI.OpnBlks("RCHRES")
             For lRow As Integer = 1 To lOperBlock.Count
@@ -133,127 +166,122 @@ Public Class frmReach
                 lTable = lOperation.Tables("HYDR-PARM2")
                 lTable.Parms("LEN").Value = .CellValue(lRow, 2)
                 lTable.Parms("DELTH").Value = .CellValue(lRow, 3)
-                'TODO -- put downoper back into puci structure
-                'If lOper.DownOper("RCHRES") <> .TextMatrix(i, 4) Then
-                '    'changed downstream id
-                '    changednetwork = True
-                '    oldDownId = lOper.DownOper("RCHRES")
-                '    'check to make sure new one is ok
-                '    newDownId = .TextMatrix(i, 4)
-                '    tOper = lOper.OpnBlk.operfromid(newDownId)
-                '    If tOper Is Nothing And newDownId <> 0 Then
-                '        'invalid oper id
-                '        errorfg = True
-                '        myMsgBox.Show("RCHRES Operation ID " & newDownId & " is invalid.", "Reach Editor Problem", "OK")
-                '        Exit For
-                '    End If
-                '    If Not errorfg Then
-                '        'remove old connection from uci
-                '        If oldDownId > 0 Then
-                '            For j = 1 To myUci.Connections.Count
-                '                lConn = myUci.Connections(j)
-                '                If lConn.Source.volname = "RCHRES" And lConn.Source.volid = lOper.Id _
-                '                   And lConn.Target.volname = "RCHRES" And lConn.Target.volid = oldDownId Then
-                '                    myUci.Connections.Remove(j)
-                '                    tempConn = lConn
-                '                    Exit For
-                '                End If
-                '            Next j
-                '        Else
-                '            'no down id, used to go to 0
-                '            tempConn = New HspfConnection
-                '            For j = 1 To myUci.Connections.Count
-                '                lConn = myUci.Connections(j)
-                '                If lConn.Source.volname = "RCHRES" _
-                '                   And lConn.Target.volname = "RCHRES" Then
-                '                    'make like this one
-                '                    tempConn.Amdstrg = lConn.Amdstrg
-                '                    tempConn.MassLink = lConn.MassLink
-                '                    tempConn.MFact = lConn.MFact
-                '                    tempConn.Sgapstrg = lConn.Sgapstrg
-                '                    tempConn.Ssystem = lConn.Ssystem
-                '                    tempConn.Tran = lConn.Tran
-                '                    tempConn.Typ = lConn.Typ
-                '                    tempConn.Uci = lConn.Uci
-                '                    tempConn.Source.Opn = lOper
-                '                    tempConn.Source.volid = lOper.Id
-                '                    tempConn.Source.volname = lOper.Name
-                '                    Exit For
-                '                End If
-                '            Next j
-                '        End If
-                '        'remove old connection from source and target ops
-                '        For j = 1 To lOper.targets.Count
-                '            lConn = lOper.targets(j)
-                '            If lConn.Source.volname = "RCHRES" And lConn.Source.volid = lOper.Id _
-                '               And lConn.Target.volname = "RCHRES" And lConn.Target.volid = oldDownId Then
-                '                lOper.targets.Remove(j)
-                '                Exit For
-                '            End If
-                '        Next j
-                '        If oldDownId > 0 Then
-                '            OldOper = lOper.OpnBlk.operfromid(oldDownId)
-                '            For j = 1 To OldOper.Sources.Count
-                '                lConn = OldOper.Sources(j)
-                '                If lConn.Source.volname = "RCHRES" And lConn.Source.volid = lOper.Id _
-                '                   And lConn.Target.volname = "RCHRES" And lConn.Target.volid = oldDownId Then
-                '                    OldOper.Sources.Remove(j)
-                '                    Exit For
-                '                End If
-                '            Next j
-                '        End If
-                '        'add new connection to uci
-                '        If newDownId > 0 Then
-                '            newOper = lOper.OpnBlk.operfromid(newDownId)
-                '            tempConn.Target.Opn = newOper
-                '            tempConn.Target.volid = newDownId
-                '            myUci.Connections.Add(tempConn)
-                '            'add new connection to source and target ops
-                '            lOper.targets.Add(tempConn)
-                '            newOper.Sources.Add(tempConn)
-                '        End If
-                '    End If
-                'End If
+
+                If lOperation.DownOper("RCHRES") <> .CellValue(lRow, 4) Then
+                    'changed downstream id
+                    lChangedNetwork = True
+                    Dim lOldDownId As Integer = lOperation.DownOper("RCHRES")
+                    'check to make sure new one is ok
+                    Dim lNewDownId As Integer = .CellValue(lRow, 4)
+                    Dim tOper As HspfOperation = lOperation.OpnBlk.OperFromID(lNewDownId)
+                    If tOper Is Nothing And lNewDownId <> 0 Then
+                        'invalid oper id
+                        lErrorFg = True
+                        Logger.Msg("RCHRES Operation ID " & lNewDownId & " is invalid.", "Reach Editor Problem")
+                        Exit For
+                    End If
+                    If Not lErrorFg Then
+                        'remove old connection from uci
+                        Dim lTempConn As New HspfConnection
+                        If lOldDownId > 0 Then
+                            For Each lConn As HspfConnection In pUCI.Connections
+                                If lConn.Source.VolName = "RCHRES" And lConn.Source.VolId = lOperation.Id _
+                                   And lConn.Target.VolName = "RCHRES" And lConn.Target.VolId = lOldDownId Then
+                                    lTempConn = lConn
+                                    pUCI.Connections.Remove(lConn)
+                                    Exit For
+                                End If
+                            Next
+                        Else
+                            'no down id, used to go to 0
+                            For Each lConn As HspfConnection In pUCI.Connections
+                                If lConn.Source.VolName = "RCHRES" _
+                                   And lConn.Target.VolName = "RCHRES" Then
+                                    'make like this one
+                                    lTempConn.Amdstrg = lConn.Amdstrg
+                                    lTempConn.MassLink = lConn.MassLink
+                                    lTempConn.MFact = lConn.MFact
+                                    lTempConn.Sgapstrg = lConn.Sgapstrg
+                                    lTempConn.Ssystem = lConn.Ssystem
+                                    lTempConn.Tran = lConn.Tran
+                                    lTempConn.Typ = lConn.Typ
+                                    lTempConn.Uci = lConn.Uci
+                                    lTempConn.Source.Opn = lOperation
+                                    lTempConn.Source.VolId = lOperation.Id
+                                    lTempConn.Source.VolName = lOperation.Name
+                                    Exit For
+                                End If
+                            Next
+                        End If
+                        'remove old connection from source and target ops
+                        For Each lConn As HspfConnection In lOperation.Targets
+                            If lConn.Source.VolName = "RCHRES" And lConn.Source.VolId = lOperation.Id _
+                               And lConn.Target.VolName = "RCHRES" And lConn.Target.VolId = lOldDownId Then
+                                lOperation.Targets.Remove(lConn)
+                                Exit For
+                            End If
+                        Next
+                        If lOldDownId > 0 Then
+                            Dim lOldOper As HspfOperation = lOperation.OpnBlk.OperFromID(lOldDownId)
+                            For Each lConn As HspfConnection In lOldOper.Sources
+                                If lConn.Source.VolName = "RCHRES" And lConn.Source.VolId = lOldOper.Id _
+                                   And lConn.Target.VolName = "RCHRES" And lConn.Target.VolId = lOldDownId Then
+                                    lOldOper.Sources.Remove(lConn)
+                                    Exit For
+                                End If
+                            Next
+                        End If
+                        'add new connection to uci
+                        If lNewDownId > 0 Then
+                            Dim lNewOper As HspfOperation = lOperation.OpnBlk.OperFromID(lNewDownId)
+                            lTempConn.Target.Opn = lNewOper
+                            lTempConn.Target.VolId = lNewDownId
+                            pUCI.Connections.Add(lTempConn)
+                            'add new connection to source and target ops
+                            lOperation.Targets.Add(lTempConn)
+                            lNewOper.Sources.Add(lTempConn)
+                        End If
+                    End If
+                End If
             Next
-            'If changednetwork Then
-            '    'update opn sequence if necessary
-            '    switched = True
-            '    changecount = 0
-            '    Do Until switched = False
-            '        switched = False
-            '        For j = 1 To myUci.Connections.Count
-            '            lConn = myUci.Connections(j)
-            '            If lConn.Source.volname = "RCHRES" _
-            '               And lConn.Target.volname = "RCHRES" Then
-            '                sourcepos = 0
-            '                targetpos = 0
-            '                For k = 1 To myUci.OpnSeqBlock.Opns.Count
-            '                    tOper = myUci.OpnSeqBlock.Opns(k)
-            '                    If tOper.Name = lConn.Source.volname And tOper.Id = lConn.Source.volid Then
-            '                        sourcepos = k
-            '                    End If
-            '                    If tOper.Name = lConn.Target.volname And tOper.Id = lConn.Target.volid Then
-            '                        targetpos = k
-            '                    End If
-            '                Next k
-            '                If sourcepos > 0 And targetpos > 0 And sourcepos > targetpos Then
-            '                    'need to switch these 2
-            '                    switched = True
-            '                    tOper = myUci.OpnSeqBlock.Opns(targetpos)
-            '                    myUci.OpnSeqBlock.Opns.Remove(targetpos)
-            '                    myUci.OpnSeqBlock.Opns.Add(tOper, after:=sourcepos - 1)
-            '                    Exit For
-            '                End If
-            '            End If
-            '        Next j
-            '        changecount = changecount + 1
-            '        If changecount > 2000 Then
-            '            'must have infinite loop
-            '            myMsgBox.Show("This reach network is not resolving." & vbCrLf & "Check for circular connections.", "Reach Editor Problem", "OK")
-            '            switched = False
-            '        End If
-            '    Loop
-            'End If
+            If lChangedNetwork Then
+                'update opn sequence if necessary
+                Dim lSwitched As Boolean = True
+                Dim lChangeCount = 0
+                Do Until lSwitched = False
+                    lSwitched = False
+                    For Each lConn As HspfConnection In pUCI.Connections
+                        If lConn.Source.VolName = "RCHRES" _
+                           And lConn.Target.VolName = "RCHRES" Then
+                            Dim lSourcePos As Integer = 0
+                            Dim lTargetPos As Integer = 0
+                            For lIndex As Integer = 1 To pUCI.OpnSeqBlock.Opns.Count
+                                Dim lOper As HspfOperation = pUCI.OpnSeqBlock.Opns(lIndex)
+                                If lOper.Name = lConn.Source.VolName And lOper.Id = lConn.Source.VolId Then
+                                    lSourcePos = lIndex
+                                End If
+                                If lOper.Name = lConn.Target.VolName And lOper.Id = lConn.Target.VolId Then
+                                    lTargetPos = lIndex
+                                End If
+                            Next lIndex
+                            If lSourcePos > 0 And lTargetPos > 0 And lSourcePos > lTargetPos Then
+                                'need to switch these 2
+                                lSwitched = True
+                                Dim lOper As HspfOperation = pUCI.OpnSeqBlock.Opns(lTargetPos)
+                                pUCI.OpnSeqBlock.Opns.Remove(lOper)
+                                pUCI.OpnSeqBlock.Opns.Insert(lSourcePos - 1, lOper)
+                                Exit For
+                            End If
+                        End If
+                    Next
+                    lChangeCount = lChangeCount + 1
+                    If lChangeCount > 2000 Then
+                        'must have infinite loop
+                        Logger.Msg("This reach network is not resolving." & vbCrLf & "Check for circular connections.", "Reach Editor Problem")
+                        lSwitched = False
+                    End If
+                Loop
+            End If
         End With
         Me.Dispose()
     End Sub
