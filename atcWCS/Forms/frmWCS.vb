@@ -1,4 +1,6 @@
-﻿Public Class frmWCS
+﻿Imports MapWinUtility
+
+Public Class frmWCS
 
     Friend Function UpdateProgress(ByVal Message As String, ByVal ItemNum As Integer, ByVal MaxItemNum As Integer) As Boolean
         If Message <> "" And ItemNum <> MaxItemNum Then
@@ -94,7 +96,7 @@
 
     Private Sub cboLandUseType_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboLandUseType.SelectedIndexChanged
         cboLanduseLayer.Enabled = True
-        lblLandUseLayer.Enabled = True
+        lblLanduseLayer.Enabled = True
         cboLanduseField.Enabled = False
         cboLanduseLayer.Items.Clear()
         Project.LanduseType = cboLandUseType.SelectedIndex

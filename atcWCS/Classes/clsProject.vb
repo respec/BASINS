@@ -1,4 +1,7 @@
-﻿Friend Class clsSoil
+﻿Imports MapWinUtility
+Imports HTMLBuilder
+
+Friend Class clsSoil
     Friend ID, Name, Group As String
     Sub New(ByVal _ID As String, ByVal _Name As String, ByVal _Group As String)
         ID = _ID
@@ -469,7 +472,7 @@ Friend Class clsProject
             hb.AppendTableColumn("Other", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Right)
 
             Dim lyrS As Integer = GisUtil.LayerIndex(SubbasinLayer)
-            Dim lyr As Integer = GisUtil.LayerIndex(Pop1Layer)
+            Dim lyr As Integer = GisUtil.LayerIndex(SewerLayer)
             Dim fldName As Integer = GisUtil.FieldIndex(lyr, SewerNameField)
             Dim fldPop As Integer = GisUtil.FieldIndex(lyr, SewerPopField)
             Dim fldHouse As Integer = GisUtil.FieldIndex(lyr, SewerHouseField)
@@ -561,7 +564,8 @@ Friend Class clsProject
                 For Each kv2 As KeyValuePair(Of String, Single) In kv.Value
                     Dim ID As String = kv2.Key
                     Dim Area As Single = kv2.Value / (DistFactor ^ 2 * 4046.86)
-                    Dim Name, Group As String
+                    Dim Name As String = ""
+                    Dim Group As String = ""
                     Dim soil As clsSoil = Nothing
                     If dictSoil.TryGetValue(ID, soil) Then
                         Name = soil.Name
