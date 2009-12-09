@@ -102,10 +102,10 @@ Public Module modBasinsPlugin
     ''' <remarks></remarks>
     Friend Sub LoadNationalProject()
         If Not NationalProjectIsOpen() Then
-            Dim lFileName As String = IO.Path.Combine(g_ProgramDir, "Data\national\" & NationalProjectFilename)
+            Dim lFileName As String = IO.Path.Combine(g_ProgramDir, "Data\national" & g_PathChar & NationalProjectFilename)
             If Not FileExists(lFileName) Then
                 For Each lDir As String In g_BasinsDataDirs
-                    lFileName = lDir & "national\" & NationalProjectFilename
+                    lFileName = lDir & "national" & g_PathChar & NationalProjectFilename
                     If FileExists(lFileName) Then 'found existing national project
                         Exit For
                     End If
@@ -186,12 +186,12 @@ Public Module modBasinsPlugin
 
     Public Function DefaultBasinsDataDir() As String
         'TODO: change to using MyDocuments when the installer starts using Progra~1
-        'Return My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\" & BasinsDataPath
+        'Return My.Computer.FileSystem.SpecialDirectories.MyDocuments & g_PathChar & BasinsDataPath
 
         If Not g_BasinsDataDirs Is Nothing AndAlso g_BasinsDataDirs.Count > 0 Then
             Return g_BasinsDataDirs(0)
         Else
-            Return My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\" & BasinsDataPath
+            Return My.Computer.FileSystem.SpecialDirectories.MyDocuments & g_PathChar & BasinsDataPath
         End If
     End Function
 

@@ -241,7 +241,7 @@ Public Class frmSelectDisplay
             If lDataSource.DataSets.Equals(pTimeseriesGroup) Then
                 If Logger.Msg("Discard " & lDataSource.ToString, MsgBoxStyle.YesNo, "Discard Data") = MsgBoxResult.Yes Then
                     pTimeseriesGroup.Dispose()
-                    atcDataManager.DataSources.Remove(lDataSource)
+                    atcDataManager.RemoveDataSource(lDataSource)
                     Me.Close()
                 Else
                     Exit Sub

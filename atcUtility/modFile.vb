@@ -39,7 +39,7 @@ Public Module modFile
                     Dim lDirectory As String = aToPath
                     If IO.Directory.Exists(lDirectory) Then
                         aToPath = IO.Path.Combine(lDirectory, IO.Path.GetFileName(aFromFilename))
-                    ElseIf aToPath.EndsWith(IO.Path.DirectorySeparatorChar) Then
+                    ElseIf aToPath.EndsWith(g_PathChar) Then
                         IO.Directory.CreateDirectory(lDirectory)
                         aToPath = IO.Path.Combine(lDirectory, IO.Path.GetFileName(aFromFilename))
                     Else
@@ -250,7 +250,7 @@ Public Module modFile
     ''' </returns>
     ''' <remarks>It is the caller's responsibility to remove this folder and its contents later.</remarks>
     Public Function NewTempDir(ByVal aBaseName As String) As String
-        Dim lName As String = GetTemporaryFileName(aBaseName, Nothing) & IO.Path.DirectorySeparatorChar
+        Dim lName As String = GetTemporaryFileName(aBaseName, Nothing) & g_PathChar
         Logger.Dbg("Creating temporary directory '" & lName & "'")
         IO.Directory.CreateDirectory(lName)
         Return lName
@@ -403,7 +403,7 @@ EndFound:
             Return aFileName
         End If
 
-        If aStartPath.EndsWith(IO.Path.DirectorySeparatorChar) Then
+        If aStartPath.EndsWith(g_PathChar) Then
             aStartPath = Left(aStartPath, Len(aStartPath) - 1)
         End If
 
@@ -411,12 +411,12 @@ EndFound:
         Dim lSlashposPath As Integer
 
         If UCase(Left(aFileName, 2)) <> UCase(Left(aStartPath, 2)) Then
-            aFileName = aStartPath & IO.Path.DirectorySeparatorChar & aFileName
+            aFileName = aStartPath & g_PathChar & aFileName
         End If
 
         lSlashposFilename = InStr(aFileName, g_PathChar & ".." & g_PathChar)
         While lSlashposFilename > 0
-            lSlashposPath = InStrRev(aFileName, IO.Path.DirectorySeparatorChar, lSlashposFilename - 1)
+            lSlashposPath = InStrRev(aFileName, g_PathChar, lSlashposFilename - 1)
             If lSlashposPath = 0 Then
                 lSlashposFilename = 0
             Else
@@ -443,20 +443,20 @@ EndFound:
         Dim sameUntil As Integer
 
         'Remove trailing slash if necessary
-        If StartPath.EndsWith(IO.Path.DirectorySeparatorChar) Then
+        If StartPath.EndsWith(g_PathChar) Then
             StartPath = Left(StartPath, Len(StartPath) - 1)
         End If
         If Len(filename) > 2 Then
             If filename.StartsWith(".." & g_PathChar) Then
                 'Concatenate StartPath and Filename
-                filename = StartPath & IO.Path.DirectorySeparatorChar & filename
+                filename = StartPath & g_PathChar & filename
             End If
         End If
 
         'Adjust path for Filename as necessary
         slashposFilename = InStr(filename, g_PathChar & ".." & g_PathChar)
         While slashposFilename > 0
-            slashposPath = InStrRev(filename, IO.Path.DirectorySeparatorChar, slashposFilename - 1)
+            slashposPath = InStrRev(filename, g_PathChar, slashposFilename - 1)
             If slashposPath = 0 Then
                 slashposFilename = 0
             Else
@@ -465,14 +465,14 @@ EndFound:
             End If
         End While
 
-        If InStr(filename, IO.Path.DirectorySeparatorChar) = 0 Then
+        If InStr(filename, g_PathChar) = 0 Then
             'No path to check, so assume it is a file in StartPath
         ElseIf LCase(Left(filename, 2)) <> LCase(Left(StartPath, 2)) Then
             'filename is already relative or is on different drive
         Else
             'Reconcile StartPath and Filename
             slashposPath = Len(StartPath)
-            If Mid(filename, slashposPath + 1, 1) = IO.Path.DirectorySeparatorChar Then 'Filename might include whole path
+            If Mid(filename, slashposPath + 1, 1) = g_PathChar Then 'Filename might include whole path
                 If LCase(Left(filename, slashposPath)) = LCase(StartPath) Then
                     sameUntil = slashposPath + 1
                     GoTo FoundSameUntil
@@ -484,8 +484,8 @@ EndFound:
             While slashposFilename = slashposPath
                 If LCase(Left(filename, slashposPath)) = LCase(Left(StartPath, slashposPath)) Then
                     sameUntil = slashposPath
-                    slashposFilename = InStr(slashposPath + 1, filename, IO.Path.DirectorySeparatorChar)
-                    slashposPath = InStr(slashposPath + 1, StartPath, IO.Path.DirectorySeparatorChar)
+                    slashposFilename = InStr(slashposPath + 1, filename, g_PathChar)
+                    slashposPath = InStr(slashposPath + 1, StartPath, g_PathChar)
                     If slashposPath = 0 Then slashposPath = -1 'If neither has another \, must end loop
                 Else
                     slashposFilename = 0
@@ -496,10 +496,10 @@ FoundSameUntil:
             'Set relative path from point of divergence between StartPath and Filename
             filename = Mid(filename, sameUntil + 1)
             If sameUntil < 1 Then sameUntil = 1
-            slashposPath = InStr(sameUntil, StartPath, IO.Path.DirectorySeparatorChar)
+            slashposPath = InStr(sameUntil, StartPath, g_PathChar)
             While slashposPath > 0
                 filename = ".." & g_PathChar & filename
-                slashposPath = InStr(slashposPath + 1, StartPath, IO.Path.DirectorySeparatorChar)
+                slashposPath = InStr(slashposPath + 1, StartPath, g_PathChar)
             End While
         End If
         Return filename
@@ -535,7 +535,7 @@ FoundSameUntil:
                 End If
 
                 If FileMatches Then
-                    fName = CurDir() & IO.Path.DirectorySeparatorChar & fName
+                    fName = CurDir() & g_PathChar & fName
                     key = fName.ToLower
                     'Try
                     vName = aFilenames.Get(key)
@@ -564,7 +564,7 @@ FoundSameUntil:
                 End While
 
                 For Each fName In dirsThisDir
-                    AddFilesInDir(aFilenames, aDirName & IO.Path.DirectorySeparatorChar & fName, True, aFileFilter, aAttributes)
+                    AddFilesInDir(aFilenames, aDirName & g_PathChar & fName, True, aFileFilter, aAttributes)
                 Next fName
 
             End If
@@ -729,7 +729,7 @@ ErrorWriting:
 
         On Error Resume Next
 
-        If lFileName.EndsWith(IO.Path.DirectorySeparatorChar) Then 'this is a folder
+        If lFileName.EndsWith(g_PathChar) Then 'this is a folder
             Return ""
             'TODO: Implement FindFolder
             'Return FindFolder(aFileDialogTitle, _
@@ -763,8 +763,8 @@ ErrorWriting:
                     If IO.Directory.Exists(lDocumentsBasins) Then lFileName = FindRecursive(lBaseFileName, lDocumentsBasins)
 
                     If Not FileExists(lFileName) Then
-                        lExePath = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location).ToLower & IO.Path.DirectorySeparatorChar
-                        lDLLpath = PathNameOnly(Reflection.Assembly.GetExecutingAssembly.Location).ToLower & IO.Path.DirectorySeparatorChar
+                        lExePath = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location).ToLower & g_PathChar
+                        lDLLpath = PathNameOnly(Reflection.Assembly.GetExecutingAssembly.Location).ToLower & g_PathChar
 
                         'First check in same folder or subfolder containing current .exe or .dll
                         lFileName = FindRecursive(lBaseFileName, lDLLpath, lExePath)
@@ -845,7 +845,7 @@ ErrorWriting:
     Private Function FindRecursive(ByVal aFilename As String, ByVal ParamArray aStartDirs() As String) As String
         Dim lFoundPath As String = ""
         For Each lStartDir As String In aStartDirs
-            If lStartDir.Length > 0 AndAlso Not lStartDir.EndsWith(IO.Path.DirectorySeparatorChar) Then lStartDir &= IO.Path.DirectorySeparatorChar
+            If lStartDir.Length > 0 AndAlso Not lStartDir.EndsWith(g_PathChar) Then lStartDir &= g_PathChar
             If FileExists(lStartDir & aFilename) Then
                 Return lStartDir & aFilename
             ElseIf FileExists(lStartDir, True, False) Then

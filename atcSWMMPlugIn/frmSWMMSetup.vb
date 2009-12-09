@@ -1158,7 +1158,7 @@ Public Class frmSWMMSetup
             cboLandUseLayer.Items.Clear()
             For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
                 If GisUtil.LayerType(lLayerIndex) = 4 Then  'Grid 
-                    If InStr(UCase(GisUtil.LayerFileName(lLayerIndex)), "\NLCD\") > 0 Then
+                    If InStr(UCase(GisUtil.LayerFileName(lLayerIndex)), g_PathChar & "NLCD" & g_PathChar) > 0 Then
                         cboLandUseLayer.Items.Add(GisUtil.LayerName(lLayerIndex))
                     End If
                 End If
@@ -1549,7 +1549,7 @@ Public Class frmSWMMSetup
 
         Dim lName As String = tbxName.Text
         'TODO: still use modelout?
-        Dim lSWMMProjectFileName As String = pBasinsFolder & "\modelout\" & lName & "\" & lName & ".inp"
+        Dim lSWMMProjectFileName As String = pBasinsFolder & g_PathChar & "modelout" & g_PathChar & lName & g_PathChar & lName & ".inp"
         MkDirPath(PathNameOnly(lSWMMProjectFileName))
 
         If PreProcessChecking(lSWMMProjectFileName, lNodeLayerIndex, lConduitLayerIndex, lCatchmentLayerIndex) Then
@@ -1980,8 +1980,8 @@ Public Class frmSWMMSetup
                 Dim lStateIndex As Integer = GisUtil.LayerIndex("State Boundaries")
                 Dim lDefaultState As String = GisUtil.FieldValue(lStateIndex, 0, GisUtil.FieldIndex(lStateIndex, "ST"))
                 Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-                Dim lDataPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "data\"
-                txtMetWDMName.Text = lDataPath & "met_data\" & lDefaultState & ".wdm"
+                Dim lDataPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "data" & g_PathChar
+                txtMetWDMName.Text = lDataPath & "met_data" & g_PathChar & lDefaultState & ".wdm"
             End If
         ElseIf lMetLayerName.IndexOf("<none>") > -1 Then 'none, clear out met wdm name
             txtMetWDMName.Text = ""

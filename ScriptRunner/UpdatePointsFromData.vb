@@ -145,7 +145,7 @@ Module UpdatePointsFromData
     End Sub
 
     Private Function NewShapeFile(ByVal aOriginalShapeFile As Shapefile, ByVal aNewFileName As String) As Shapefile
-        If Not aNewFileName.Contains(IO.Path.DirectorySeparatorChar) Then
+        If Not aNewFileName.Contains(g_PathChar) Then
             aNewFileName = IO.Path.Combine(IO.Path.GetDirectoryName(aOriginalShapeFile.Filename), aNewFileName)
         End If
         Dim lShapeFileNew As Shapefile = New Shapefile

@@ -146,7 +146,7 @@ Public Class clsCatModelHSPF
                     Next
                     For Each lWDMfilename As String In lWDMFilenames
                         lWDMfilename = AbsolutePath(lWDMfilename, CurDir).Trim()
-                        Dim lWDMResults As atcWDM.atcDataSourceWDM = atcData.atcDataManager.DataSources(0)
+                        Dim lWDMResults As atcWDM.atcDataSourceWDM = atcData.atcDataManager.DataSources(0) 'TODO: is it a good assumption that (0) is the results?
                         For Each lCurrentTimeseries In aModifiedData
                             If Not lCurrentTimeseries Is Nothing _
                                AndAlso lCurrentTimeseries.Attributes.GetValue("History 1").ToString.ToLower.Equals("read from " & lWDMfilename.ToLower) Then

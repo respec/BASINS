@@ -79,7 +79,7 @@ Public Module ConstituentBalanceScript
             ConstituentBalance.ReportsToFiles(lHspfUci, lOperations, lConstituents, lScenario, lHspfBinFile, lLocations, lHspfBinFileInfo.LastWriteTime)
 
             'clean up 
-            atcDataManager.DataSources.Remove(lHspfBinFile)
+            atcDataManager.RemoveDataSource(lHspfBinFile)
             lHspfBinFile.DataSets.Clear()
             lHspfBinFile = Nothing
         Next lScenario

@@ -1704,29 +1704,18 @@ Public Class HspfUci
             End Try
         End If
 
-        Dim lWDMFile As New atcWDM.atcDataSourceWDM
-        Dim lFound As Boolean = False
-        If atcDataManager.DataSources IsNot Nothing Then
-            For Each lBASINSDataSource As atcTimeseriesSource In atcDataManager.DataSources
-                If lBASINSDataSource.Specification.ToUpper = IO.Path.GetFullPath(aName).ToUpper Then
-                    'found it in the BASINS data sources
-                    lWDMFile = lBASINSDataSource
-                    lFound = True
-                    Exit For
-                End If
-            Next
-        End If
-
-        If Not lFound Then
+        Dim lWDMFile As atcWDM.atcDataSourceWDM = Nothing
+        lWDMFile = atcDataManager.DataSourceBySpecification(IO.Path.GetFullPath(aName))
+        If lWDMFile Is Nothing Then
+            lWDMFile = New atcWDM.atcDataSourceWDM
             If Not lWDMFile.Open(aName) Then 'had a problem
                 Logger.Msg("Could not open WDM file" & vbCr & aName, MsgBoxStyle.Exclamation, "AddWDMFile Failed")
-                Return Nothing
+                lWDMFile = Nothing
             Else
                 pTserFiles.AddRange(lWDMFile.DataSets)
             End If
         End If
         Return lWDMFile
-
     End Function
 
     Public Function PreScanFilesBlock(ByRef aEchoFile As String) As Boolean

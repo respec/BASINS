@@ -336,12 +336,7 @@ Friend Class frmManager
 
             'If we already have specified data source open, skip asking user
             If lSaveInSpecification IsNot Nothing AndAlso lSaveInSpecification.Length > 0 Then
-                For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
-                    If lDataSource.Specification = lSaveInSpecification Then
-                        lSaveIn = lDataSource
-                        Exit For
-                    End If
-                Next
+                lSaveIn = atcDataManager.DataSourceBySpecification(lSaveInSpecification)
             End If
 
             If lSaveIn Is Nothing Then
@@ -610,10 +605,7 @@ Friend Class frmManager
     End Sub
 
     Private Sub CloseAllToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CloseAllToolStripMenuItem.Click
-        For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
-            lDataSource.Clear()
-        Next
-        atcDataManager.DataSources.Clear()
+        atcDataManager.Clear()
         Populate(-1)
     End Sub
 

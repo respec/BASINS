@@ -338,7 +338,7 @@ Friend Module modSWMMFromMW
         Dim lTotalPolygonCount As Integer = 0
         Dim lTileFileNames As New atcCollection
         For Each lLandUseTile As String In lLandUseTiles
-            Dim lNewFileName As String = lLandUsePathName & "\" & lLandUseTile & ".shp"
+            Dim lNewFileName As String = lLandUsePathName & g_PathChar & lLandUseTile & ".shp"
             lTileFileNames.Add(lNewFileName)
             If Not GisUtil.IsLayerByFileName(lNewFileName) Then
                 If Not GisUtil.AddLayer(lNewFileName, lLandUseTile) Then
@@ -455,25 +455,18 @@ Friend Module modSWMMFromMW
         Logger.Dbg("Begin " & aScenario & " Location " & aLocation & " Constituent " & aConstituent)
         Dim lGetTimeseries As atcData.atcTimeseries = Nothing
 
-        Dim lDataSource As New atcWDM.atcDataSourceWDM
+        Dim lDataSource As atcWDM.atcDataSourceWDM
         If FileExists(aMetWDMName) Then
-            Dim lFound As Boolean = False
-            For Each lBASINSDataSource As atcTimeseriesSource In atcDataManager.DataSources
-                If lBASINSDataSource.Specification.ToUpper = aMetWDMName.ToUpper Then
-                    'found it in the BASINS data sources
-                    lDataSource = lBASINSDataSource
-                    lFound = True
-                    Exit For
-                End If
-            Next
+            lDataSource = atcDataManager.DataSourceBySpecification(aMetWDMName)
 
-            If Not lFound Then 'need to open it here
-                If lDataSource.Open(aMetWDMName) Then
-                    lFound = True
+            If lDataSource Is Nothing Then 'need to open it here
+                lDataSource = New atcWDM.atcDataSourceWDM
+                If Not lDataSource.Open(aMetWDMName) Then
+                    lDataSource = Nothing
                 End If
             End If
 
-            If lFound Then
+            If lDataSource IsNot Nothing Then
                 For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
                     If (lDataSet.Attributes.GetValue("Scenario") = aScenario And _
                         lDataSet.Attributes.GetValue("Constituent") = aConstituent And _
@@ -631,24 +624,16 @@ Friend Module modSWMMFromMW
         aStations.Clear()
         Dim lDataSource As atcWDM.atcDataSourceWDM = Nothing
         If FileExists(aMetWDMName) Then
-            Dim lFound As Boolean = False
-            For Each lBASINSDataSource As atcTimeseriesSource In atcDataManager.DataSources
-                If lBASINSDataSource.Specification.ToUpper = aMetWDMName.ToUpper Then
-                    'found it in the BASINS data sources
-                    lDataSource = lBASINSDataSource
-                    lFound = True
-                    Exit For
-                End If
-            Next
+            lDataSource = atcDataManager.DataSourceBySpecification(aMetWDMName)
 
-            If Not lFound Then 'need to open it here
+            If lDataSource Is Nothing Then 'need to open it here
                 lDataSource = New atcWDM.atcDataSourceWDM
-                If lDataSource.Open(aMetWDMName) Then
-                    lFound = True
+                If Not lDataSource.Open(aMetWDMName) Then
+                    lDataSource = Nothing
                 End If
             End If
 
-            If Not lFound Then
+            If lDataSource Is Nothing Then
                 Logger.Dbg("WDMFile Not found") 'FindFile?
             Else
                 Dim lCounter As Integer = 0

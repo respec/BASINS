@@ -54,8 +54,8 @@ Public Module modDownload
 
                         'prompt user for new name
                         Dim lProjectFileName As String = PromptForNewProjectFileName(lDefDirName, lDefaultProjectFileName)
-                        Dim lOldDataDir As String = PathNameOnly(GisUtil.ProjectFileName) & "\"
-                        Dim lNewDataDir As String = PathNameOnly(lProjectFileName) & "\"
+                        Dim lOldDataDir As String = PathNameOnly(GisUtil.ProjectFileName) & g_PathChar
+                        Dim lNewDataDir As String = PathNameOnly(lProjectFileName) & g_PathChar
 
                         If lProjectFileName.Length > 0 Then
 
@@ -389,7 +389,7 @@ Public Module modDownload
             Else
                 'build new basins project from mapwindow project
                 Dim lDataPath As String = DefaultBasinsDataDir()
-                Dim lNewDataDir As String = PathNameOnly(pExistingMapWindowProjectName) & "\"
+                Dim lNewDataDir As String = PathNameOnly(pExistingMapWindowProjectName) & g_PathChar
                 'download and project core data
                 If Not IO.File.Exists(lNewDataDir & "prj.proj") Then
                     IO.File.WriteAllText(lNewDataDir & "prj.proj", g_Project.ProjectProjection)
@@ -459,7 +459,7 @@ StartOver:
         System.IO.Directory.CreateDirectory(lDefDirName)
 
         lProjectFileName = PromptForNewProjectFileName(lDefDirName, lDefaultProjectFileName)
-        lNewDataDir = PathNameOnly(lProjectFileName) & "\"
+        lNewDataDir = PathNameOnly(lProjectFileName) & g_PathChar
 
         If lProjectFileName.Length = 0 Then
             Return ""
@@ -539,7 +539,7 @@ StartOver:
                                                    Optional ByVal aExistingMapWindowProject As Boolean = False)
         Dim lQuery As String
         Dim lProjection As String = CleanUpUserProjString(IO.File.ReadAllText(aNewDataDir & "prj.proj"))
-        Dim lNationalDir As String = IO.Path.Combine(g_ProgramDir, "Data\national\")
+        Dim lNationalDir As String = IO.Path.Combine(g_ProgramDir, "Data\national" & g_PathChar)
         If IO.Directory.Exists(lNationalDir) Then
             CopyFromIfNeeded("sic.dbf", lNationalDir, aNewDataDir)
             CopyFromIfNeeded("storetag.dbf", lNationalDir, aNewDataDir)
@@ -667,9 +667,9 @@ StartOver:
 
         ProcessDownloadResult = ""
 
-        If g_MapWin IsNot Nothing AndAlso g_MapWin.Project IsNot Nothing AndAlso g_MapWin.Project.FileName IsNot Nothing AndAlso g_MapWin.Project.FileName.Contains("\") Then
+        If g_MapWin IsNot Nothing AndAlso g_MapWin.Project IsNot Nothing AndAlso g_MapWin.Project.FileName IsNot Nothing AndAlso g_MapWin.Project.FileName.Contains(g_PathChar) Then
             lProjectDir = IO.Path.GetDirectoryName(g_MapWin.Project.FileName)
-            If lProjectDir.Length > 0 AndAlso Not lProjectDir.EndsWith("\") Then lProjectDir &= "\"
+            If lProjectDir.Length > 0 AndAlso Not lProjectDir.EndsWith(g_PathChar) Then lProjectDir &= g_PathChar
         End If
 
         If Not aInstructions.StartsWith("<") Then
@@ -779,7 +779,7 @@ StartOver:
                     lPoint5.x = lSf.Extents.xMin
                     lPoint5.y = lSf.Extents.yMin
                     lSuccess = lShape.InsertPoint(lPoint5, 0)
-                    If InStr(lOutputFileName, "\nlcd\") > 0 Then
+                    If InStr(lOutputFileName, "\nlcd" & g_PathChar) > 0 Then
                         'project the extents into the albers projection for nlcd
                         MkDirPath(lProjectDir & "nlcd")
                         TryDeleteShapefile(lProjectDir & "nlcd\catextent.shp")
@@ -810,7 +810,7 @@ StartOver:
                     g_StatusBar(1).Text = ""
                 Case "project_dir"
                     lProjectDir = lProjectorNode.InnerText
-                    If Not lProjectDir.EndsWith("\") Then lProjectDir &= "\"
+                    If Not lProjectDir.EndsWith(g_PathChar) Then lProjectDir &= g_PathChar
                 Case "convert_shape"
                     lOutputFileName = lProjectorNode.Attributes.GetNamedItem("output").InnerText
                     lCurFilename = lProjectorNode.InnerText
@@ -856,7 +856,7 @@ StartOver:
                     TryDelete(lOutputFileName)
                     lOutputProjection = WholeFileString(lProjectDir & "prj.proj")
                     lOutputProjection = CleanUpUserProjString(lOutputProjection)
-                    If InStr(lOutputFileName, "\nlcd\") > 0 Then
+                    If InStr(lOutputFileName, "\nlcd" & g_PathChar) > 0 Then
                         'exception for nlcd data, already in albers
                         lInputProjection = "+proj=aea +ellps=GRS80 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
                         If lOutputProjection = "+proj=aea +ellps=clrk66 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m" Then
@@ -891,7 +891,7 @@ StartOver:
                     If lOutputDirName Is Nothing OrElse lOutputDirName.Length = 0 Then
                         lOutputDirName = lInputDirName
                     End If
-                    If Right(lOutputDirName, 1) <> "\" Then lOutputDirName &= "\"
+                    If Right(lOutputDirName, 1) <> g_PathChar Then lOutputDirName &= g_PathChar
 
                     InputFileList.Clear()
 
@@ -907,7 +907,7 @@ StartOver:
                             'this is a shapefile
                             lOutputFileName = lOutputDirName & FilenameNoPath(lCurFilename)
                             'change projection and merge
-                            If (FileExists(lOutputFileName) And (InStr(1, lOutputFileName, "\landuse\") > 0)) Then
+                            If (FileExists(lOutputFileName) And (InStr(1, lOutputFileName, "\landuse" & g_PathChar) > 0)) Then
                                 'if the output file exists and it is a landuse shape, dont bother
                             Else
                                 ShapeUtilMerge(lCurFilename, lOutputFileName, lProjectDir & "prj.proj")
@@ -1020,18 +1020,18 @@ StartOver:
         lSaveDialog.CheckPathExists = False
         lSaveDialog.FileName = aDefaultProjectFileName
         If lSaveDialog.ShowDialog() <> Windows.Forms.DialogResult.OK Then
-            lSaveDialog.FileName = "\"
+            lSaveDialog.FileName = g_PathChar
             lSaveDialog.Dispose()
             System.IO.Directory.Delete(PathNameOnly(aDefaultProjectFileName), False) 'Cancelled save dialog
             Logger.Dbg("CreateNewProject:CANCELLED")
             PromptForNewProjectFileName = ""
         Else
             PromptForNewProjectFileName = lSaveDialog.FileName
-            Dim lNewDataDir As String = PathNameOnly(PromptForNewProjectFileName) & "\"
+            Dim lNewDataDir As String = PathNameOnly(PromptForNewProjectFileName) & g_PathChar
             Logger.Dbg("CreateNewProjectDir:" & lNewDataDir)
             Logger.Dbg("CreateNewProjectName:" & PromptForNewProjectFileName)
             'Make sure lSaveDialog is not holding a reference to the file so we can delete the dir if needed
-            lSaveDialog.FileName = "\"
+            lSaveDialog.FileName = g_PathChar
             lSaveDialog.Dispose()
             'If the user did not choose the default folder or a subfolder of it
             If Not lNewDataDir.ToLower.StartsWith(aDefDirName.ToLower) Then
@@ -1124,7 +1124,7 @@ StartOver:
 
         Logger.Dbg("AddAllShapesInDir: '" & aPath & "'")
 
-        If Right(aPath, 1) <> "\" Then aPath = aPath & "\"
+        If Right(aPath, 1) <> g_PathChar Then aPath = aPath & g_PathChar
         AddFilesInDir(allFiles, aPath, True, "*.shp")
 
         AddAllShapesInDir = New atcCollection
@@ -1176,7 +1176,7 @@ StartOver:
 
                 If lRendererFilename.Length > 0 AndAlso Not IO.File.Exists(lRendererFilename) Then
                     Dim lRendererFilenameNoPath As String = IO.Path.GetFileName(lRendererFilename)
-                    Dim lRenderersPath As String = g_ProgramDir & "etc\renderers\"
+                    Dim lRenderersPath As String = g_ProgramDir & "etc\renderers" & g_PathChar
                     Dim lDefaultRendererFilename As String = FindFile("", lRenderersPath & lRendererFilenameNoPath)
                     If Not FileExists(lDefaultRendererFilename) Then
                         If lRendererFilenameNoPath.Contains("_") Then 'Some layers are named huc8_xxx.shp, renderer is named _xxx & lRendererExt
@@ -1336,17 +1336,17 @@ StartOver:
                 MWlay.Visible = Visible
 
                 'TODO: replace hard-coded SetLandUseColors and others with full renderer from defaults
-                If LCase(aFilename).IndexOf("\landuse\") > 0 Then
+                If LCase(aFilename).IndexOf("\landuse" & g_PathChar) > 0 Then
                     SetLandUseColors(MWlay, shpFile)
-                ElseIf LCase(aFilename).IndexOf("\nhd\") > 0 Then
+                ElseIf LCase(aFilename).IndexOf("\nhd" & g_PathChar) > 0 Then
                     If InStr(IO.Path.GetFileNameWithoutExtension(shpFile.Filename), "NHD") > 0 Then
                         MWlay.Name = IO.Path.GetFileNameWithoutExtension(shpFile.Filename)
                     Else
                         MWlay.Name &= " " & IO.Path.GetFileNameWithoutExtension(shpFile.Filename)
                     End If
-                ElseIf LCase(aFilename).IndexOf("\census\") > 0 Then
+                ElseIf LCase(aFilename).IndexOf("\census" & g_PathChar) > 0 Then
                     SetCensusColors(MWlay, shpFile)
-                ElseIf LCase(aFilename).IndexOf("\dem\") > 0 Then
+                ElseIf LCase(aFilename).IndexOf("\dem" & g_PathChar) > 0 Then
                     SetDemColors(MWlay, shpFile)
                 ElseIf LCase(aFilename).EndsWith("cat.shp") Then
                     MWlay.ZoomTo()
@@ -1414,7 +1414,7 @@ StartOver:
                 g = New MapWinGIS.Grid
                 g.Open(aFilename)
                 Dim lSuccess As Boolean = False
-                If LCase(aFilename).IndexOf("\nlcd\") > 0 Then
+                If LCase(aFilename).IndexOf("\nlcd" & g_PathChar) > 0 Then
                     g.Header.NodataValue = 0
                     lSuccess = g.Save(aFilename)
                     g.Close()
@@ -1426,11 +1426,11 @@ StartOver:
                 MWlay.UseTransparentColor = True
 
                 'TODO: replace hard-coded SetLandUseColors and others with full renderer from defaults
-                If LCase(aFilename).IndexOf("\demg\") > 0 Then
+                If LCase(aFilename).IndexOf("\demg" & g_PathChar) > 0 Then
                     SetElevationGridColors(MWlay, g)
-                ElseIf LCase(aFilename).IndexOf("\ned\") > 0 Then
+                ElseIf LCase(aFilename).IndexOf("\ned" & g_PathChar) > 0 Then
                     SetElevationGridColors(MWlay, g)
-                    'ElseIf LCase(aFilename).IndexOf("\nlcd\") > 0 Then
+                    'ElseIf LCase(aFilename).IndexOf("\nlcd" & g_PathChar) > 0 Then
                     'SetLandUseColorsGrid(MWlay, g)
                 End If
             End If
