@@ -171,13 +171,10 @@ StartOver:
     End Property
 
     Friend Shared Function OpenDataSource(ByVal aFilename As String) As atcTimeseriesSource
-        For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
-            If lDataSource.Specification.ToLower = aFilename.ToLower Then 'already open
-                Return lDataSource
-            End If
-        Next
-        If FileExists(aFilename) Then
-            Dim lDataSource As atcTimeseriesSource
+        Dim lDataSource As atcTimeseriesSource = atcDataManager.DataSourceBySpecification(aFilename)
+        If lDataSource IsNot Nothing Then 'already open
+            Return lDataSource
+        ElseIf FileExists(aFilename) Then
             Select Case IO.Path.GetExtension(aFilename).Substring(1).ToLower 'test letters after .
                 Case "wdm" : lDataSource = New atcWDM.atcDataSourceWDM
                 Case "hbn" : lDataSource = New atcHspfBinOut.atcTimeseriesFileHspfBinOut
@@ -387,16 +384,10 @@ NextIteration:
                 'Close any open results
                 For Each lSpecification As String In lResults
                     lSpecification = lSpecification.ToLower
-                    Dim lMatchDataSource As atcTimeseriesSource = Nothing
-                    For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
-                        If lDataSource.Specification.ToLower = lSpecification Then
-                            lMatchDataSource = lDataSource
-                            Exit For
-                        End If
-                    Next
-                    If Not lMatchDataSource Is Nothing Then
+                    Dim lMatchDataSource As atcTimeseriesSource = atcDataManager.DataSourceBySpecification(lSpecification)
+                    If lMatchDataSource IsNot Nothing Then
                         'lMatchDataSource.clear 'TODO: want to make sure we don't have a memory leak here
-                        atcDataManager.DataSources.Remove(lMatchDataSource)
+                        atcDataManager.RemoveDataSource(lMatchDataSource)
                         lMatchDataSource.Clear()
                         System.GC.Collect()
                         System.GC.WaitForPendingFinalizers()

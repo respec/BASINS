@@ -49,6 +49,12 @@ Public Class atcDataManager
     '''          Defaults Datasources, Selection Attributes and Display Attributes.
     ''' </summary>
     Public Shared Sub Clear()
+        If pDataSources IsNot Nothing Then
+            For Each lDataSource As atcTimeseriesSource In pDataSources
+                lDataSource.Clear()
+            Next
+            pDataSources.Clear()
+        End If
         pDataSources = New ArrayList
         pSelectionAttributes = New ArrayList(pDefaultSelectionAttributes)
         pDisplayAttributes = New ArrayList(pDefaultDisplayAttributes)
@@ -194,14 +200,11 @@ Public Class atcDataManager
     End Sub
 
     Public Shared Sub RemoveDataSource(ByVal aSpecification As String)
-        aSpecification = aSpecification.ToLower
-        For Each lDataSource As atcTimeseriesSource In DataSources
-            If lDataSource.Specification.ToLower.Equals(aSpecification) Then
-                DataSources.Remove(lDataSource)
-                RemovedDataSource(lDataSource)
-                Exit For
-            End If
-        Next
+        Dim lDataSource As atcTimeseriesSource = DataSourceBySpecification(aSpecification)
+        If lDataSource IsNot Nothing Then
+            DataSources.Remove(lDataSource)
+            RemovedDataSource(lDataSource)
+        End If
     End Sub
 
     Public Shared Sub RemoveDataSource(ByVal aDataSource As atcDataSource)
@@ -234,6 +237,28 @@ Public Class atcDataManager
                 Return lDataSource.NewOne
             End If
         Next
+        Return Nothing
+    End Function
+
+    ''' <summary>
+    ''' Get a data source that is already open by its specification
+    ''' </summary>
+    ''' <param name="aSpecification">The file name for file-based data sources</param>
+    ''' <returns>the data source if it is already open, Nothing if it is not open</returns>
+    ''' <remarks>
+    ''' Searching for a match is not case sensitive but it can be fooled if two different specifications refer to the same file
+    ''' Always use consistent full path of files
+    ''' Use OpenDataSource to open one that is not yet open
+    ''' </remarks>
+    Public Shared Function DataSourceBySpecification(ByVal aSpecification As String) As atcTimeseriesSource
+        If DataSources IsNot Nothing Then
+            aSpecification = aSpecification.ToLower
+            For Each lDataSource As atcTimeseriesSource In DataSources
+                If lDataSource.Specification.ToLower.Equals(aSpecification) Then
+                    Return lDataSource
+                End If
+            Next
+        End If
         Return Nothing
     End Function
 
@@ -376,12 +401,7 @@ Public Class atcDataManager
 
             'If we already have specified data source open, skip asking user
             If aSpecification IsNot Nothing AndAlso aSpecification.Length > 0 Then
-                For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
-                    If lDataSource.Specification = aSpecification Then
-                        lSaveIn = lDataSource
-                        Exit For
-                    End If
-                Next
+                lSaveIn = atcDataManager.DataSourceBySpecification(aSpecification)
             End If
 
             If lSaveIn Is Nothing Then

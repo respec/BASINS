@@ -792,17 +792,15 @@ Public Class atcVariation
                     Dim lDataGroup As atcTimeseriesGroup = Nothing
                     If lHistory.Length > 10 Then
                         Dim lSourceSpecification As String = lHistory.Substring(10).ToLower
-                        For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
-                            If lDataSource.Specification.ToLower.Equals(lSourceSpecification) Then
-                                lDataGroup = lDataSource.DataSets.FindData("ID", lID, 2)
-                                If lDataGroup.Count > 0 Then
-                                    Logger.Dbg("Found data set #" & lID & " in " & lSourceSpecification)
-                                    Exit For
-                                Else
-                                    lDataGroup = Nothing
-                                End If
+                        Dim lDataSource As atcTimeseriesSource = atcDataManager.DataSourceBySpecification(lSourceSpecification)
+                        If lDataSource IsNot Nothing Then
+                            lDataGroup = lDataSource.DataSets.FindData("ID", lID, 2)
+                            If lDataGroup.Count > 0 Then
+                                Logger.Dbg("Found data set #" & lID & " in " & lSourceSpecification)
+                            Else
+                                lDataGroup = Nothing
                             End If
-                        Next
+                        End If
                     End If
                     If lDataGroup Is Nothing Then
                         lDataGroup = atcDataManager.DataSets.FindData("ID", lID, 2)

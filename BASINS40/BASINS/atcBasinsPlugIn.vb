@@ -88,9 +88,9 @@ Public Class atcBasinsPlugIn
         g_MapWinWindowHandle = aParentHandle
         g_MapWin.ApplicationInfo.WelcomePlugin = "plugin" 'tell the main app to Plugins.BroadcastMessage("WELCOME_SCREEN") instead of showing default MW welcome screen
         'Set g_ProgramDir to folder above the Bin folder where the app and plugins live
-        g_ProgramDir = PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)) & IO.Path.DirectorySeparatorChar
+        g_ProgramDir = PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)) & g_PathChar
 
-        Logger.StartToFile(g_ProgramDir & "cache\log\" _
+        Logger.StartToFile(g_ProgramDir & "cache\log" & g_PathChar _
                          & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & g_AppNameShort & ".log")
         Logger.Icon = g_MapWin.ApplicationInfo.FormIcon
 
@@ -102,7 +102,7 @@ Public Class atcBasinsPlugIn
         '    If Logger.MsgCustomCheckbox("Test Message " & i, "Test Title " & i, g_AppNameShort, "Test", "Buttons", "Button One", "2", "All") = "All" Then Exit For
         'Next
 
-        'If LaunchMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), g_ProgramDir & "cache\log\", System.Diagnostics.Process.GetCurrentProcess.Id) Then
+        'If LaunchMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), g_ProgramDir & "cache\log" & g_PathChar, System.Diagnostics.Process.GetCurrentProcess.Id) Then
         '    Logger.ProgressStatus = New MonitorProgressStatus
         '    SendMonitorMessage("Show")
         '    Logger.Status("Testing")
@@ -254,7 +254,7 @@ Public Class atcBasinsPlugIn
                 ShowHelp("")
             Case atcDataManager.LaunchMenuName & "_ArcView3"
                 'create apr if it does not exist, then open it
-                Dim lAprFileName As String = "\basins\apr\" & IO.Path.GetFileNameWithoutExtension(g_Project.FileName) & ".apr"
+                Dim lAprFileName As String = "\basins\apr" & g_PathChar & IO.Path.GetFileNameWithoutExtension(g_Project.FileName) & ".apr"
                 If Not FileExists(lAprFileName) Then 'build it
                     Dim lExeName As String = _
                        FindFile("Please locate BasinsArchive.exe", _
@@ -359,7 +359,7 @@ FoundDir:
                 End If
             End If
 
-            lPrjFileName = aDataDirName & "\" & IO.Path.GetFileNameWithoutExtension(aDataDirName) & ".mwprj"
+            lPrjFileName = aDataDirName & g_PathChar & IO.Path.GetFileNameWithoutExtension(aDataDirName) & ".mwprj"
             If FileExists(lPrjFileName) Then
                 Logger.Dbg("Opening project " & lPrjFileName)
                 Return g_Project.Load(lPrjFileName)

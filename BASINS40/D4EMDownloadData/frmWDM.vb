@@ -22,6 +22,7 @@ Public Class frmWDM
             ElseIf RadioAddNew.Checked Then
                 Return "<SaveWDM>" & txtFilenameNew.Text & "</SaveWDM>" & vbCrLf
             ElseIf RadioAddExisting.Checked Then
+                atcData.atcDataManager.RemoveDataSource(txtFilenameExisting.Text)
                 Return "<SaveWDM>" & txtFilenameExisting.Text & "</SaveWDM>" & vbCrLf
             ElseIf RadioDontAdd.Checked Then
                 Return "<CacheOnly>True</CacheOnly>"

@@ -82,25 +82,17 @@ Module modModelSetup
                                           ByVal aMetBaseDsns As atcCollection)
         aMetStations.Clear()
         aMetBaseDsns.Clear()
-        Dim lDataSource As New atcWDM.atcDataSourceWDM
+        Dim lDataSource As atcWDM.atcDataSourceWDM = Nothing
         If IO.File.Exists(aMetWDMName) Then
-            Dim lFound As Boolean = False
-            For Each lBASINSDataSource As atcTimeseriesSource In atcDataManager.DataSources
-                If lBASINSDataSource.Specification.ToUpper = aMetWDMName.ToUpper Then
-                    'found it in the BASINS data sources
-                    lDataSource = lBASINSDataSource
-                    lFound = True
-                    Exit For
-                End If
-            Next
-
-            If Not lFound Then 'need to open it here
-                If lDataSource.Open(aMetWDMName) Then
-                    lFound = True
+            lDataSource = atcDataManager.DataSourceBySpecification(aMetWDMName)
+            If lDataSource Is Nothing Then 'need to open it here
+                lDataSource = New atcWDM.atcDataSourceWDM
+                If Not lDataSource.Open(aMetWDMName) Then
+                    lDataSource = Nothing
                 End If
             End If
 
-            If lFound Then
+            If lDataSource IsNot Nothing Then
                 Dim lCounter As Integer = 0
                 For Each lDataSet As atcTimeseries In lDataSource.DataSets
                     lCounter += 1
@@ -169,9 +161,9 @@ Module modModelSetup
         'get starter uci ready
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
         Dim lStarterUciName As String = "starter.uci"
-        Dim lStarterPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "models\hspf\bin\starter\" & lStarterUciName
+        Dim lStarterPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "models\hspf\bin\starter" & g_PathChar & lStarterUciName
         If Not IO.File.Exists(lStarterPath) Then
-            lStarterPath = "\basins\models\hspf\bin\starter\" & lStarterUciName
+            lStarterPath = g_PathChar & "basins\models\hspf\bin\starter" & g_PathChar & lStarterUciName
             If Not IO.File.Exists(lStarterPath) Then
                 lStarterPath = FindFile("Please locate " & lStarterUciName, lStarterUciName)
             End If
@@ -180,54 +172,42 @@ Module modModelSetup
 
         'location master pollutant list 
         Dim lPollutantListFileName As String = "poltnt_2.prn"
-        Dim lPollutantListPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "models\hspf\bin\" & lPollutantListFileName
+        Dim lPollutantListPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "models\hspf\bin" & g_PathChar & lPollutantListFileName
         If Not IO.File.Exists(lPollutantListPath) Then
-            lPollutantListPath = "\basins\models\hspf\bin\" & lPollutantListFileName
+            lPollutantListPath = g_PathChar & "basins\models\hspf\bin" & g_PathChar & lPollutantListFileName
             If Not FileExists(lPollutantListPath) Then
                 lPollutantListPath = FindFile("Please locate " & lPollutantListFileName, lPollutantListFileName)
             End If
         End If
         lPollutantListFileName = lPollutantListPath
 
-        'open project wdm
         Dim lDataSources As New Collection(Of atcData.atcTimeseriesSource)
-        Dim lDataSource As New atcWDM.atcDataSourceWDM
+        Dim lDataSource As atcWDM.atcDataSourceWDM
         Dim lProjectWDMName As String = IO.Path.GetFileNameWithoutExtension(aUciName) & ".wdm"
-        Dim lFound As Boolean = False
-        For Each lBASINSDataSource As atcTimeseriesSource In atcDataManager.DataSources
-            If lBASINSDataSource.Specification.ToUpper = lProjectWDMName.ToUpper Then
-                'found it in the BASINS data sources
-                lDataSource = lBASINSDataSource
-                lFound = True
-                Exit For
-            End If
-        Next
 
-        If Not lFound Then 'need to open it here
-            If lDataSource.Open(lProjectWDMName) Then
-                lFound = True
+        'open project wdm
+        lDataSource = atcDataManager.DataSourceBySpecification(lProjectWDMName)
+        If lDataSource Is Nothing Then 'need to open it here
+            lDataSource = New atcWDM.atcDataSourceWDM
+            If Not lDataSource.Open(lProjectWDMName) Then
+                lDataSource = Nothing
             End If
         End If
-        lDataSources.Add(lDataSource)
+        If lDataSource IsNot Nothing Then
+            lDataSources.Add(lDataSource)
+        End If
 
         'open met wdm
-        lDataSource = New atcWDM.atcDataSourceWDM
-        lFound = False
-        For Each lBASINSDataSource As atcTimeseriesSource In atcDataManager.DataSources
-            If lBASINSDataSource.Specification.ToUpper = aMetWDMName.ToUpper Then
-                'found it in the BASINS data sources
-                lDataSource = lBASINSDataSource
-                lFound = True
-                Exit For
-            End If
-        Next
-
-        If Not lFound Then 'need to open it here
-            If lDataSource.Open(aMetWDMName) Then
-                lFound = True
+        lDataSource = atcDataManager.DataSourceBySpecification(aMetWDMName)
+        If lDataSource Is Nothing Then 'need to open it here
+            lDataSource = New atcWDM.atcDataSourceWDM
+            If Not lDataSource.Open(aMetWDMName) Then
+                lDataSource = Nothing
             End If
         End If
-        lDataSources.Add(lDataSource)
+        If lDataSource IsNot Nothing Then
+            lDataSources.Add(lDataSource)
+        End If
 
         ChDriveDir(PathNameOnly(aUciName))
 
@@ -632,7 +612,7 @@ Module modModelSetup
                     End If
                     'check for dbf associated with each npdes point
                     Dim i As Integer = 1
-                    lDbName = PathNameOnly(GisUtil.LayerFileName(lPcsLayerIndex)) & "\pcs\"
+                    lDbName = PathNameOnly(GisUtil.LayerFileName(lPcsLayerIndex)) & g_PathChar & "pcs" & g_PathChar
                     For Each lNpdesSite As Object In lNPDESSites
                         Dim lDbfFileName As String = lHucs(i).ToString.Trim & ".dbf"
                         If IO.File.Exists(lDbName & lDbfFileName) And lNpdesSite.ToString.Trim.Length > 0 Then
@@ -706,7 +686,7 @@ Module modModelSetup
         Dim lParmCode(0) As String, lParmName(0) As String
         If Not aChkCustom Then 'read in Permitted Discharges Parameter Table
             If lNPDESSites.Count > 0 Then 'open dbf file
-                Dim lDbf As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(PathNameOnly(GisUtil.LayerFileName(lPcsLayerIndex)) & "\pcs3_prm.dbf")
+                Dim lDbf As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(PathNameOnly(GisUtil.LayerFileName(lPcsLayerIndex)) & g_PathChar & "pcs3_prm.dbf")
                 lRowCount = lDbf.NumRecords
                 ReDim lParmCode(lRowCount)
                 ReDim lParmName(lRowCount)

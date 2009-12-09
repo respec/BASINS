@@ -21,11 +21,10 @@ Public Class frmSaveData
                     End If
                     Return lDataSource
                 Case Is > 0 'Already-open file
-                    For Each lDataSource As atcDataSource In atcDataManager.DataSources
-                        If lDataSource.CanSave AndAlso lDataSource.Specification.Equals(lstDataSources.SelectedItem) Then
-                            Return lDataSource
-                        End If
-                    Next
+                    Dim lDataSource As atcDataSource = atcDataManager.DataSourceByName(lstDataSources.SelectedItem)
+                    If lDataSource IsNot Nothing AndAlso lDataSource.CanSave Then
+                        Return lDataSource
+                    End If
             End Select
         End If
         Return Nothing

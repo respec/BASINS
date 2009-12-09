@@ -1,3 +1,5 @@
+Imports atcUtility
+
 Public Class frmDownload
 
     Public Const CancelString As String = "<Cancel>"
@@ -159,10 +161,10 @@ Public Class frmDownload
                         lStationsXML &= "<stationid>" & lLayerShapefile.CellValue(lKeyField, lSelected.Item(lShapeIndex).ShapeIndex) & "</stationid>" & vbCrLf
                     Next
                 End If
-            'Else
-            '    For Each lId As String In pStationIDs
-            '        lStationsXML &= "<stationid>" & lId & "</stationid>" & vbCrLf
-            '    Next
+                'Else
+                '    For Each lId As String In pStationIDs
+                '        lStationsXML &= "<stationid>" & lId & "</stationid>" & vbCrLf
+                '    Next
             End If
         End If
         Return lStationsXML
@@ -268,7 +270,14 @@ Public Class frmDownload
 
             Dim lCacheFolder As String = GetSetting("DataDownload", "defaults", "Cache_dir")
             If lCacheFolder.Length = 0 Then
-                lCacheFolder = IO.Path.GetDirectoryName(IO.Path.GetDirectoryName(Reflection.Assembly.GetEntryAssembly.Location)) & IO.Path.DirectorySeparatorChar
+                lCacheFolder = IO.Path.GetDirectoryName(IO.Path.GetDirectoryName(Reflection.Assembly.GetEntryAssembly.Location)) & g_PathChar & "cache" & g_PathChar
+            End If
+            If Not IO.Directory.Exists(lCacheFolder) Then
+                Try
+                    IO.Directory.CreateDirectory(lCacheFolder)
+                Catch ex As Exception
+                    lCacheFolder = IO.Path.GetTempPath
+                End Try
             End If
             lCacheFolder = "<CacheFolder>" & lCacheFolder & "</CacheFolder>" & vbCrLf
 
@@ -355,7 +364,7 @@ Public Class frmDownload
             Dim lIndex As Integer = 0
             While lIndex < pMapWin.Layers.NumLayers
                 Try
-                    If pMapWin.Layers(lIndex).FileName.ToLower.EndsWith(IO.Path.DirectorySeparatorChar & "cat.shp") Then
+                    If pMapWin.Layers(lIndex).FileName.ToLower.EndsWith(g_PathChar & "cat.shp") Then
                         Return lIndex
                     End If
                 Catch ex As Exception

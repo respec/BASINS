@@ -33,7 +33,7 @@ Public Class RainGages
                 lSB.Append(" ")
                 lSB.Append(StrPad(.Type, 10, " ", False))
                 lSB.Append(" ")
-                lSB.Append(StrPad("""" & PathNameOnly(Me.SWMMProject.FileName) & "\" & .Name & "P.DAT" & """", 16, " ", False))
+                lSB.Append(StrPad("""" & PathNameOnly(Me.SWMMProject.FileName) & g_PathChar & .Name & "P.DAT" & """", 16, " ", False))
                 lSB.Append(" ")
                 lSB.Append(StrPad(.Name, 10, " ", False))
                 lSB.Append(" ")
@@ -69,7 +69,7 @@ Public Class RainGages
     Public Function TimeSeriesToFile() As Boolean
 
         For Each lRaingage As RainGage In Me
-            Dim lFileName As String = PathNameOnly(Me.SWMMProject.FileName) & "\" & lRaingage.Name & "P.DAT"
+            Dim lFileName As String = PathNameOnly(Me.SWMMProject.FileName) & g_PathChar & lRaingage.Name & "P.DAT"
             Dim lSB As New StringBuilder
             lSB.Append(Me.SWMMProject.TimeSeriesToString(lRaingage.TimeSeries, lRaingage.Name))
             SaveFileString(lFileName, lSB.ToString)
