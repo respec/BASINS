@@ -34,6 +34,7 @@ Partial Class SwatInput
         Public POT_NSED As Single
         Public POT_NO3L As Single
         Public DEP_IMP As Long
+        Public DIS_STREAM As Long
 
         Public Sub New(ByVal aSUBBASIN As Double, _
                        ByVal aHRU As Double, _
@@ -57,7 +58,7 @@ Partial Class SwatInput
                  & HRU_FR & "', '" & SLSUBBSN & "', '" & HRU_SLP & "', '" & OV_N & "', '" & LAT_TTIME & "', '" & LAT_SED & "', '" _
                  & SLSOIL & "', '" & CANMX & "', '" & ESCO & "', '" & EPCO & "', '" & RSDIN & "', '" _
                  & ERORGN & "', '" & ERORGP & "', '" & POT_FR & "', '" & FLD_FR & "', '" & RIP_FR & "', '" _
-                 & POT_TILE & "', '" & POT_VOLX & "', '" & POT_VOL & "', '" & POT_NSED & "', '" & POT_NO3L & "', '" & DEP_IMP & "'  )"
+                 & POT_TILE & "', '" & POT_VOLX & "', '" & POT_VOL & "', '" & POT_NSED & "', '" & POT_NO3L & "', '" & DEP_IMP & "', '" & DIS_STREAM & "'  )"
         End Function
     End Class
 
@@ -105,6 +106,7 @@ Partial Class SwatInput
             Columns.Add(New clsDataColumn("POT_NSED", 1, "Single", "0.000", 16, "    | POT_NSED : Normal sediment concentration in pothole [mg/l]"))
             Columns.Add(New clsDataColumn("POT_NO3L", 1, "Single", "0.000", 16, "    | POT_NO3L : Nitrate decay rate in pothole [1/day]"))
             Columns.Add(New clsDataColumn("DEP_IMP", 1, "Long", "0", 16, "    | DEP_IMP : Depth to impervious layer in soil profile [mm]"))
+            Columns.Add(New clsDataColumn("DIS_STREAM", 1, "Single", "0.000", 16, "    | DIS_STREAM :  Stream Distance [m]"))
         End Sub
 
         Public Function TableCreate() As Boolean

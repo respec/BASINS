@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{724F2B12-E252-4493-BE02-708FF8C5D56E}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -11,6 +11,12 @@
     <AssemblyName>SwatObject</AssemblyName>
     <MyType>Windows</MyType>
     <OptionStrict>Off</OptionStrict>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -79,6 +85,7 @@
     <Compile Include="clsHru.vb" />
     <Compile Include="clsPest.vb" />
     <Compile Include="clsPnd.vb" />
+    <Compile Include="clsPp.vb" />
     <Compile Include="clsRes.vb" />
     <Compile Include="clsSol.vb" />
     <Compile Include="clsSubBsn.vb" />
