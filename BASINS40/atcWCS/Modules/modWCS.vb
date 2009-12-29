@@ -32,9 +32,9 @@
     ''' <param name="ErrorText">Error text to display</param>
     ''' <param name="ex">Exception (will display traceback info)</param>
     Friend Sub ErrorMsg(Optional ByVal ErrorText As String = "", Optional ByVal ex As Exception = Nothing)
-        If ErrorText = "" Then ErrorText = "An unhandled error has occurred in the BASINS WCS tool."
-        If ex IsNot Nothing Then ErrorText &= vbCr & vbCr & "The detailed error message was:" & vbCr & vbCr & ex.ToString
-        MapWinUtility.Logger.Message(ErrorText, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, DialogResult.OK)
+        If ErrorText = "" Then ErrorText = "An error has occurred in the BASINS WCS tool. Please check your layer and field selections and verify that the selections are reasonable and consistent."
+        If ex IsNot Nothing Then ErrorText &= String.Format("\n\n{0}\n\n\nThe detailed error message was:\n\n{1}", ex.Message, ex.ToString)
+        MapWinUtility.Logger.Message(ErrorText.Replace("\n", vbCr), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, DialogResult.OK)
     End Sub
 
     ''' <summary>

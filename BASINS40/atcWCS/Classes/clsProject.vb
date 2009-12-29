@@ -105,11 +105,11 @@ Friend Class clsProject
             For t As enumLandUseType = enumLandUseType.GIRAS To enumLandUseType.UserGrid
                 dictLanduse(t) = New Generic.SortedDictionary(Of String, clsLanduse)
                 Dim ar() As String = sr.ReadLine.Split(vbTab)
-                If ar.Length <> 2 Then Throw New Exception("Invalid file format in " & Filename)
+                If ar.Length <> 2 Then Throw New ApplicationException("Invalid file format in " & Filename)
                 Dim num As Integer = ar(1)
                 For i As Integer = 0 To num - 1
                     ar = sr.ReadLine.Split(vbTab)
-                    If ar.Length <> 2 Then Throw New Exception("Invalid file format in " & Filename)
+                    If ar.Length <> 2 Then Throw New ApplicationException("Invalid file format in " & Filename)
                     dictLanduse(t).Add(ar(0), New clsLanduse(ar(0), ar(1)))
                 Next
             Next
@@ -404,13 +404,13 @@ Friend Class clsProject
             Dim fldNameIndex2 As Integer = GisUtil.FieldIndex(lyrIndex2, PopNameField)
             Dim fldPopIndex2 As Integer = GisUtil.FieldIndex(lyrIndex2, PopPopField)
 
-            If dictPop1.Count <> dictPop2.Count Then Throw New Exception("Unequal number of subbasins in two census layers.")
+            If dictPop1.Count <> dictPop2.Count Then Throw New ApplicationException("Unequal number of subbasins in two census layers.")
 
             For Each kv1 As KeyValuePair(Of String, Generic.SortedDictionary(Of String, Single)) In dictPop1
                 Dim SubName As String = kv1.Key
                 Dim sumPop1 As Integer = 0
                 Dim sumPop2 As Integer = 0
-                If Not dictPop2.ContainsKey(SubName) Then Throw New Exception("Missing subbasin name in second census layer: " & SubName)
+                If Not dictPop2.ContainsKey(SubName) Then Throw New ApplicationException("Missing subbasin name in second census layer: " & SubName)
                 Dim ctr As Integer = 0
                 For Each kv2 As KeyValuePair(Of String, Single) In kv1.Value
                     Dim CensusName As String = kv2.Key
@@ -419,7 +419,7 @@ Friend Class clsProject
                     Dim Pop1 As Integer = GisUtil.FieldValue(lyrIndex1, shpIndex1, fldPopIndex1)
                     Dim pct As Single = Area1 / GisUtil.FeatureArea(lyrIndex1, shpIndex1) 'should be same as for #2
                     If pct < 0.005 Then Continue For
-                    If Not dictPop2(SubName).ContainsKey(CensusName) Then Throw New Exception("Missing census name in second census layer: " & CensusName)
+                    If Not dictPop2(SubName).ContainsKey(CensusName) Then Throw New ApplicationException(String.Format("Missing census name in second census layer: {0}. Note that tracts may be subdivided or removed in consecutive censuses, so it may not be possible to prepare the population report by tract.", CensusName))
                     Dim Area2 As Single = dictPop2(SubName)(CensusName)
                     Dim shpIndex2 As Integer = GisUtil.FindFeatureIndex(lyrIndex2, fldNameIndex2, CensusName)
                     Dim Pop2 As Integer = GisUtil.FieldValue(lyrIndex2, shpIndex2, fldPopIndex2)

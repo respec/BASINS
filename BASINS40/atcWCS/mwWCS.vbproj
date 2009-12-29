@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\..\Basins\bin\Plugins\WCS\</OutputPath>
+    <OutputPath>..\..\..\Basins\bin\Plugins\WCS\</OutputPath>
     <DocumentationFile>atcWCS.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
@@ -40,13 +40,23 @@
       <HintPath>..\..\..\Basins\bin\Plugins\BASINS\atcData.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="atcMwGisUtility, Version=3.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Basins\bin\Plugins\BASINS\atcMwGisUtility.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="atcUtility, Version=3.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Basins\bin\Plugins\BASINS\atcUtility.dll</HintPath>
+      <HintPath>..\..\..\Basins\bin\Plugins\BASINS\atcUtility.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="IniFile, Version=5.0.3427.14285, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="HTMLBuilder, Version=5.0.3513.22753, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\WRDB 5.0\IniFile\IniFile\bin\IniFile.dll</HintPath>
+      <HintPath>..\atcSediment\HTMLBuilder\bin\HTMLBuilder.dll</HintPath>
+    </Reference>
+    <Reference Include="IniFile, Version=5.0.3649.19527, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Redist\IniFile.dll</HintPath>
     </Reference>
     <Reference Include="MapWinInterfaces, Version=4.3.3034.36587, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
@@ -131,17 +141,6 @@
       <Isolated>False</Isolated>
       <Private>False</Private>
     </COMReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Dev\Basins40\atcMwGisUtility\atcMwGisUtility.vbproj">
-      <Project>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</Project>
-      <Name>atcMwGisUtility</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Dev\Basins40\atcSediment\HTMLBuilder\HTMLBuilder.vbproj">
-      <Project>{6EA9D463-E649-4371-ADD3-80D2216C189B}</Project>
-      <Name>HTMLBuilder</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="LandUses.txt">
