@@ -271,7 +271,7 @@ Public Class clsMonitor
                 'lNowDouble = Now.ToOADate
                 'TODO: Check for form button presses here?
             Catch e As Exception
-                MsgBox(e.Message, MsgBoxStyle.Critical, "Exception in RefreshWindow")
+                'MsgBox(e.Message, MsgBoxStyle.Critical, "Exception in RefreshWindow")
             End Try
             pfrmStatus.Refresh()
         End If
