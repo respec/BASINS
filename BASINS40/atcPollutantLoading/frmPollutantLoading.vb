@@ -1223,7 +1223,7 @@ Friend Class frmPollutantLoading
                     cboLandUseIDField.Visible = True
                     lblLandUseIDField.Visible = True
                 ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "NLCD Grid" Then
-                    If InStr(GisUtil.LayerFileName(lLyr), "\nlcd\") > 0 Then
+                    If GisUtil.LayerFileName(lLyr).ToUpper.Contains("\NLCD\") Then
                         cboLandUseLayer.Items.Add(GisUtil.LayerName(lLyr))
                     End If
                     cboLandUseIDField.Visible = False

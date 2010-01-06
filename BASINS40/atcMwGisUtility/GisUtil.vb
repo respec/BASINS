@@ -1457,20 +1457,40 @@ Public Class GisUtil
         End If
     End Sub
 
+    Public Shared Sub GridMeanInPolygon(ByVal aGridLayerName As String, ByVal aPolygonLayerName As String, _
+                                        ByVal aPolygonFeatureIndex As Integer, _
+                                        ByRef aMean As Double)
+        'Given a grid and a polygon layer, find the mean grid value within the feature.
+
+        Dim lPolygonSf As New MapWinGIS.Shapefile
+        If lPolygonSf.Open(aPolygonLayerName) Then
+            aMean = ComputeGridMeanInPolygon(aGridLayerName, lPolygonSf, aPolygonFeatureIndex)
+            lPolygonSf.Close()
+        Else
+            aMean = -999
+        End If
+    End Sub
+
     Public Shared Sub GridMeanInPolygon(ByVal aGridLayerName As String, ByVal aPolygonLayerIndex As Integer, _
                                         ByVal aPolygonFeatureIndex As Integer, _
                                         ByRef aMean As Double)
         'Given a grid and a polygon layer, find the mean grid value within the feature.
 
-        'set input grid
-        Dim lInputGrid As New MapWinGIS.Grid
-        lInputGrid.Open(aGridLayerName)
-
-        'set input polygon layer
         Dim lPolygonSf As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aPolygonLayerIndex)
-        Dim lShape As New MapWinGIS.Shape
-        If FeatureIndexValid(aPolygonFeatureIndex, lPolygonSf) Then
-            lShape = lPolygonSf.Shape(aPolygonFeatureIndex)
+        aMean = ComputeGridMeanInPolygon(aGridLayerName, lPolygonSf, aPolygonFeatureIndex)
+    End Sub
+
+    Private Shared Function ComputeGridMeanInPolygon(ByVal aGridLayerName As String, ByVal aPolygonShapefile As MapWinGIS.Shapefile, ByVal aPolygonFeatureIndex As Integer) As Double
+        'Given a grid and a polygon layer, find the mean grid value within the feature.
+
+        Dim lMean As Double = -999.0
+        If FeatureIndexValid(aPolygonFeatureIndex, aPolygonShapefile) Then
+            'set input grid
+            Dim lInputGrid As New MapWinGIS.Grid
+            lInputGrid.Open(aGridLayerName)
+
+            Dim lShape As New MapWinGIS.Shape
+            lShape = aPolygonShapefile.Shape(aPolygonFeatureIndex)
 
             'figure out what part of the grid overlays this polygon
             Dim lStartCol As Integer
@@ -1483,13 +1503,13 @@ Public Class GisUtil
             Dim lCellcount As Integer = 0
 
             Dim lSum As Double = 0
-            lPolygonSf.BeginPointInShapefile()
+            aPolygonShapefile.BeginPointInShapefile()
             For lCol As Integer = lStartCol To lEndCol
                 For lRow As Integer = lStartRow To lEndRow
                     Dim lXPos As Double
                     Dim lYPos As Double
                     lInputGrid.CellToProj(lCol, lRow, lXPos, lYPos)
-                    Dim lSubId As Integer = lPolygonSf.PointInShapefile(lXPos, lYPos)
+                    Dim lSubId As Integer = aPolygonShapefile.PointInShapefile(lXPos, lYPos)
                     If lSubId = aPolygonFeatureIndex Then 'this is in the polygon we want
                         If Not lInputGrid.Value(lCol, lRow) < 0 Then
                             lSum = lSum + lInputGrid.Value(lCol, lRow)
@@ -1498,18 +1518,18 @@ Public Class GisUtil
                     End If
                 Next lRow
             Next lCol
-            lPolygonSf.EndPointInShapefile()
+            aPolygonShapefile.EndPointInShapefile()
+
+            lInputGrid.Close()
+            lInputGrid = Nothing
 
             If lCellcount > 0 Then
-                aMean = lSum / lCellcount
-            Else
-                aMean = -999
+                lMean = lSum / lCellcount
             End If
         End If
+        Return lMean
 
-        lInputGrid.Close()
-        lInputGrid = Nothing
-    End Sub
+    End Function
 
     Public Shared Function GridSlopeInPolygon(ByVal aGridLayerIndex As Integer, ByVal aPolygonLayerIndex As Integer, _
                                               ByVal aPolygonFeatureIndex As Integer) As Double
@@ -3238,10 +3258,12 @@ Public Class GisUtil
                             Dim shpLanduse As MapWinGIS.Shape = sfLanduse.Shape(j)
                             Try
                                 Dim shpInt As MapWinGIS.Shape = MapWinGeoProc.SpatialOperations.Intersection(shpSubbasin, shpLanduse)
-                                If shpInt.numPoints > 0 Then
-                                    Dim LandUse As String = sfLanduse.CellValue(fldLanduse, j)
-                                    If Not dictSubbasin(ID).ContainsKey(LandUse) Then dictSubbasin(ID).Add(LandUse, 0.0)
-                                    dictSubbasin(ID)(LandUse) += MapWinGeoProc.Utils.Area(shpInt)
+                                If Not shpInt Is Nothing Then
+                                    If shpInt.numPoints > 0 Then
+                                        Dim LandUse As String = sfLanduse.CellValue(fldLanduse, j)
+                                        If Not dictSubbasin(ID).ContainsKey(LandUse) Then dictSubbasin(ID).Add(LandUse, 0.0)
+                                        dictSubbasin(ID)(LandUse) += MapWinGeoProc.Utils.Area(shpInt)
+                                    End If
                                 End If
                             Catch ex As Exception
                                 NumErrors += 1
