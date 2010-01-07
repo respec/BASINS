@@ -554,7 +554,7 @@ StartOver:
                & "<arguments>" _
                & "<DataType>core31</DataType>" _
                & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
-               & "<CacheFolder>" & IO.Path.Combine(g_ProgramDir, "cache") & "</CacheFolder>" _
+               & "<CacheFolder>" & IO.Path.Combine(aDataPath, "cache") & "</CacheFolder>" _
                & "<DesiredProjection>" & lProjection & "</DesiredProjection>" _
                & aRegion _
                & "<clip>False</clip>" _
