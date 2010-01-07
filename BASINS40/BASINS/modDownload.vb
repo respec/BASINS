@@ -540,6 +540,9 @@ StartOver:
         Dim lQuery As String
         Dim lProjection As String = CleanUpUserProjString(IO.File.ReadAllText(aNewDataDir & "prj.proj"))
         Dim lNationalDir As String = IO.Path.Combine(g_ProgramDir, "Data\national" & g_PathChar)
+        If Not IO.Directory.Exists(lNationalDir) Then
+            lNationalDir = IO.Path.Combine(aDataPath, "national" & g_PathChar)
+        End If
         If IO.Directory.Exists(lNationalDir) Then
             CopyFromIfNeeded("sic.dbf", lNationalDir, aNewDataDir)
             CopyFromIfNeeded("storetag.dbf", lNationalDir, aNewDataDir)
