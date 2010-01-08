@@ -5,7 +5,7 @@ Imports MapWinUtility
 Public Class clsCatModelSWAT
     Implements clsCatModel
 
-    Public SWATProgramBase As String = "C:\Program Files\SWAT 2005 Editor\"
+    Public SWATProgramBase As String = "C:\Program Files\SWAT 2005 Editor" & g_PathChar
 
     Public Event BaseScenarioSet(ByVal aBaseScenario As String) Implements clsCatModel.BaseScenarioSet
 
@@ -58,7 +58,7 @@ Public Class clsCatModelSWAT
             'Find and open met data WDM file
             Dim lWDMfilename As String = IO.Path.GetDirectoryName(aFilename) & "\met.wdm"
             If Not IO.File.Exists(lWDMfilename) Then
-                lWDMfilename = IO.Path.GetDirectoryName(aFilename) & "\met\met.wdm"
+                lWDMfilename = IO.Path.GetDirectoryName(aFilename) & g_PathChar & "met\met.wdm"
             End If
 OpenMetWDM:
             If IO.File.Exists(lWDMfilename) Then
@@ -80,22 +80,22 @@ OpenMetWDM:
             If pMetWDM IsNot Nothing Then
 OpenOutput:
                 'Find and open output from base run, TODO: offer to run base case
-                Dim lTxtInOutFolder As String = IO.Path.GetDirectoryName(aFilename) & "\Scenarios\base\TxtInOut\" ' trailing directory separator
+                Dim lTxtInOutFolder As String = IO.Path.GetDirectoryName(aFilename) & g_PathChar & "Scenarios\base\TxtInOut" & g_PathChar ' trailing directory separator
                 If Not FileExists(pBaseOutputHruFileName) Then
                     pBaseOutputHruFileName = lTxtInOutFolder & "output.hru"
                     If Not FileExists(pBaseOutputHruFileName) Then
                         'In BatchSWAT we name the base scenario folder the same as the project folder, so check there for output
-                        pBaseOutputHruFileName = IO.Path.GetDirectoryName(aFilename) & "\Scenarios\" & IO.Path.GetFileName(IO.Path.GetDirectoryName(aFilename)) & "\TxtInOut\output.hru"
+                        pBaseOutputHruFileName = IO.Path.GetDirectoryName(aFilename) & g_PathChar & "Scenarios" & g_PathChar & IO.Path.GetFileName(IO.Path.GetDirectoryName(aFilename)) & g_PathChar & "TxtInOut\output.hru"
                     End If
                     If Not FileExists(pBaseOutputHruFileName) Then
-                        Dim lScenarios As String() = IO.Directory.GetDirectories(IO.Path.GetDirectoryName(aFilename) & "\Scenarios\")
-                        If lScenarios.Length = 1 AndAlso Not lScenarios(0).Contains("Modified") AndAlso IO.File.Exists(lScenarios(0) & "\TxtInOut\output.hru") Then
-                            pBaseOutputHruFileName = lScenarios(0) & "\TxtInOut\output.hru"
+                        Dim lScenarios As String() = IO.Directory.GetDirectories(IO.Path.GetDirectoryName(aFilename) & g_PathChar & "Scenarios" & g_PathChar)
+                        If lScenarios.Length = 1 AndAlso Not lScenarios(0).Contains("Modified") AndAlso IO.File.Exists(lScenarios(0) & g_PathChar & "TxtInOut\output.hru") Then
+                            pBaseOutputHruFileName = lScenarios(0) & g_PathChar & "TxtInOut\output.hru"
                         Else
                             Dim cdlg As New Windows.Forms.OpenFileDialog
                             With cdlg
                                 .Title = "Please locate 'output.hru' from base SWAT run"
-                                .FileName = IO.Path.GetDirectoryName(aFilename) & "\Scenarios\output.hru"
+                                .FileName = IO.Path.GetDirectoryName(aFilename) & g_PathChar & "Scenarios\output.hru"
                                 .Filter = "output.hru|output.hru"
                                 .FilterIndex = 1
                                 .DefaultExt = "hru"
@@ -110,7 +110,7 @@ OpenOutput:
                     End If
                 End If
                 If FileExists(pBaseOutputHruFileName) Then
-                    lTxtInOutFolder = IO.Path.GetDirectoryName(pBaseOutputHruFileName) & "\"
+                    lTxtInOutFolder = IO.Path.GetDirectoryName(pBaseOutputHruFileName) & g_PathChar
                     Dim lOutputHru As New atcTimeseriesSWAT.atcTimeseriesSWAT
                     Dim lOutputFields As New atcData.atcDataAttributes
                     With lOutputHru
@@ -183,9 +183,9 @@ ALREADYSET:
                                                         Implements clsCatModel.ScenarioRun
         Dim lSaveDir As String = CurDir()
         Dim lProjectFolder As String = IO.Path.GetDirectoryName(pBaseScenario)
-        Dim lScenarioFolder As String = lProjectFolder & "\Scenarios\" & aNewScenarioName
+        Dim lScenarioFolder As String = lProjectFolder & "\Scenarios" & g_PathChar & aNewScenarioName
         TryDelete(lScenarioFolder)
-        Dim lTxtInOutFolder As String = lScenarioFolder & "\TxtInOut\" ' trailing directory separator
+        Dim lTxtInOutFolder As String = lScenarioFolder & "\TxtInOut" & g_PathChar ' trailing directory separator
         Dim lSwatInput As New SwatObject.SwatInput(SWATDatabasePath, pBaseScenario, lProjectFolder, aNewScenarioName)
         lSwatInput.SaveAllTextInput()
         Dim lFigFilename As String = IO.Path.Combine(IO.Path.GetDirectoryName(pBaseScenario), "fig.fig")

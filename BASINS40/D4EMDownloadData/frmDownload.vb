@@ -12,7 +12,7 @@ Public Class frmDownload
     Private pRegionEnterCoordinates As String = "Enter Coordinates of Rectangle"
     Private pRegionHydrologicUnit As String = "Hydrologic Unit"
 
-    Public Function AskUser(ByVal aMapWin As MapWindow.Interfaces.IMapWin) As String
+    Public Function AskUser(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer) As String
         pMapWin = aMapWin
 
         'The following line hot-wires the form to just do met data download
@@ -56,7 +56,8 @@ Public Class frmDownload
         SetColorsFromAvailability()
 
         Do
-            Me.ShowDialog()
+            Me.ShowDialog(System.Windows.Forms.Control.FromHandle(New IntPtr(aParentHandle)))
+
             If pOk Then
                 Dim lXML As String = Me.XML
                 If lXML.Length = 0 Then
@@ -195,6 +196,7 @@ Public Class frmDownload
                     Case Else
                         If lFilename.StartsWith("met") Then
                             chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
+                            chkBASINS_MetData.Checked = True
                         End If
                 End Select
             End If
@@ -316,16 +318,17 @@ Public Class frmDownload
                             Dim lChildName As String = lChild.Name.Substring(lControl.Name.Length + 1)
                             If lChildName.ToLower.StartsWith("get") Then 'this checkbox has its own function name
 
-                                Dim lWDMfilename As String = ""
+                                Dim lWDMxml As String = ""
                                 If lChild Is chkNWIS_GetNWISDischarge Then
                                     Dim lWDMfrm As New frmWDM
-                                    lWDMfilename = lWDMfrm.AskUser(Me.Icon, "Flow", IO.Path.Combine(lSaveFolderOnly, "nwis"))
+                                    lWDMxml = lWDMfrm.AskUser(Me.Icon, "Flow", IO.Path.Combine(lSaveFolderOnly, "nwis"))
                                 End If
-
-                                lXML &= "<function name='" & lChildName & "'>" & vbCrLf _
-                                     & "<arguments>" & vbCrLf _
-                                     & lWDMfilename _
-                                     & lXMLcommon & vbCrLf
+                                If lWDMxml IsNot Nothing Then
+                                    lXML &= "<function name='" & lChildName & "'>" & vbCrLf _
+                                         & "<arguments>" & vbCrLf _
+                                         & lWDMxml _
+                                         & lXMLcommon & vbCrLf
+                                End If
                             Else 'This checkbox adds a data type to the parent function
                                 lCheckedChildren &= "<DataType>" & lChildName & "</DataType>" & vbCrLf
                             End If
@@ -334,18 +337,18 @@ Public Class frmDownload
 
                     If lCheckedChildren.Length > 0 Then
 
-                        Dim lWDMfilename As String = ""
+                        Dim lWDMxml As String = ""
                         If lCheckedChildren.Contains("<DataType>MetData</DataType>") Then
                             Dim lWDMfrm As New frmWDM
-                            lWDMfilename = lWDMfrm.AskUser(Me.Icon, "Met", IO.Path.Combine(lSaveFolderOnly, "met"))
+                            lWDMxml = lWDMfrm.AskUser(Me.Icon, "Met", IO.Path.Combine(lSaveFolderOnly, "met"))
                         End If
-
-                        lXML &= "<function name='Get" & lControl.Name.Substring(3) & "'>" & vbCrLf _
-                             & "<arguments>" & vbCrLf _
-                             & lCheckedChildren _
-                             & lWDMfilename _
-                             & lXMLcommon & vbCrLf
-
+                        If lWDMxml IsNot Nothing Then
+                            lXML &= "<function name='Get" & lControl.Name.Substring(3) & "'>" & vbCrLf _
+                                 & "<arguments>" & vbCrLf _
+                                 & lCheckedChildren _
+                                 & lWDMxml _
+                                 & lXMLcommon & vbCrLf
+                        End If
                     End If
                 End If
             Next

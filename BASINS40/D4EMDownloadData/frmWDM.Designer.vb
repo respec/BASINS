@@ -140,6 +140,7 @@ Partial Class frmWDM
         'frmWDM
         '
         Me.AcceptButton = Me.btnOk
+        Me.AllowDrop = True
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(575, 171)

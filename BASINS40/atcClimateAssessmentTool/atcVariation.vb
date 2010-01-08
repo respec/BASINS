@@ -180,7 +180,6 @@ Public Class atcVariation
                                     lEvents.RemoveAt(lEventIndex)
                                 End If
                             End If
-
                         Next
                     End If
                 Catch e As Exception
@@ -205,9 +204,11 @@ Public Class atcVariation
                 End If
 
                 If Operation <> "Intensify" Then
-                    lModifyThis = MergeTimeseries(lEvents)
-                    lSplitData = New atcTimeseriesGroup(lModifyThis)
-                    lSplitData.Add(lOriginalData)
+                    If lEvents.Count > 0 Then
+                        lModifyThis = MergeTimeseries(lEvents)
+                        lSplitData = New atcTimeseriesGroup(lModifyThis)
+                        lSplitData.Add(lOriginalData)
+                    End If
                 End If
 
             Else
@@ -332,16 +333,20 @@ Public Class atcVariation
                     End If
 
                 Case Else '"Add", "Multiply"
-                    Dim lSplitTS As atcTimeseries = lSplitData.ItemByIndex(0)
-                    ComputationSource.DataSets.Clear()
-                    lArgsMath.Clear()
-                    lArgsMath.SetValue("timeseries", lSplitTS)
-                    lArgsMath.SetValue("Number", CurrentValue)
-                    ComputationSource.Open(Operation, lArgsMath)
-                    lModifiedTS = ComputationSource.DataSets(0)
-                    lModifiedSplit.Add(ComputationSource.DataSets(0))
-                    If lSplitData.Count > 1 Then
-                        lModifiedSplit.Add(lSplitData.ItemByIndex(1))
+                    If lSplitData IsNot Nothing AndAlso lSplitData.Count > 0 Then
+                        Dim lSplitTS As atcTimeseries = lSplitData.ItemByIndex(0)
+                        ComputationSource.DataSets.Clear()
+                        lArgsMath.Clear()
+                        lArgsMath.SetValue("timeseries", lSplitTS)
+                        lArgsMath.SetValue("Number", CurrentValue)
+                        ComputationSource.Open(Operation, lArgsMath)
+                        lModifiedTS = ComputationSource.DataSets(0)
+                        lModifiedSplit.Add(ComputationSource.DataSets(0))
+                        If lSplitData.Count > 1 Then
+                            lModifiedSplit.Add(lSplitData.ItemByIndex(1))
+                        End If
+                    Else
+                        lModifiedSplit.Add(lOriginalData.Clone)
                     End If
             End Select
 
