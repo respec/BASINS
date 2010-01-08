@@ -10,9 +10,16 @@ Public Class frmWDM
         Dim lFilename As String = IO.Path.Combine(aSaveFolder, aType.ToLower & ".wdm")
         If IO.File.Exists(lFilename) Then
             txtFilenameExisting.Text = lFilename
+            RadioAddExisting.Checked = True
             txtFilenameNew.Text = atcUtility.GetTemporaryFileName(IO.Path.Combine(aSaveFolder, aType.ToLower), "wdm")
         Else
             txtFilenameNew.Text = lFilename
+            RadioAddNew.Checked = True
+            Dim lExistingWdmFiles() As String = IO.Directory.GetFiles(aSaveFolder, "*.wdm")
+            If lExistingWdmFiles.Length > 0 Then
+                txtFilenameExisting.Text = lExistingWdmFiles(0)
+                RadioAddExisting.Checked = True
+            End If
         End If
 
         If Me.ShowDialog() = Windows.Forms.DialogResult.OK Then
@@ -69,5 +76,23 @@ Public Class frmWDM
 
     Private Sub txtFilenameExisting_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtFilenameExisting.TextChanged
         RadioAddExisting.Checked = True
+    End Sub
+
+    Private Sub frmWDM_DragDrop(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles Me.DragDrop
+        Me.Activate()
+        If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) AndAlso IsWdmFileName(e.Data.GetData(Windows.Forms.DataFormats.FileDrop)) Then
+            txtFilenameExisting.Text = e.Data.GetData(Windows.Forms.DataFormats.FileDrop)(0)
+            RadioAddExisting.Checked = True
+        End If
+    End Sub
+
+    Private Function IsWdmFileName(ByVal aFilenames() As String) As Boolean
+        Return aFilenames.Length = 1 AndAlso IO.Path.GetExtension(aFilenames(0)).ToLower = ".wdm"
+    End Function
+
+    Private Sub frmWDM_DragEnter(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles Me.DragEnter
+        If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) AndAlso IsWdmFileName(e.Data.GetData(Windows.Forms.DataFormats.FileDrop)) Then
+            e.Effect = Windows.Forms.DragDropEffects.All
+        End If
     End Sub
 End Class

@@ -193,7 +193,7 @@ Public Class DownloadDataPlugin
                     BASINS.SpecifyAndCreateNewProject()
                 Else
                     Dim lDownloadForm As New frmDownload
-                    Dim lQuery As String = lDownloadForm.AskUser(g_MapWin)
+                    Dim lQuery As String = lDownloadForm.AskUser(g_MapWin, g_MainForm)
                     'Logger.Msg(lQuery, "Query from frmDownload")
                     If lQuery.Length > 0 Then
                         If lQuery.Equals(frmDownload.CancelString) Then

@@ -204,105 +204,106 @@ Public Module modTimeseriesMath
     Public Function MergeTimeseries(ByVal aGroup As atcTimeseriesGroup, _
                            Optional ByVal aFilterNoData As Boolean = False) As atcTimeseries
         Dim lNewTS As New atcTimeseries(Nothing) 'will contain new (merged) dates
-        Dim lNewIndex As Integer
-        Dim lTotalNumValues As Integer = 0
-        Dim lOldTS As atcTimeseries 'points to current timeseries from aGroup
-        Dim lMinDate As Double = pMaxValue
-        Dim lMaxGroupIndex As Integer = aGroup.Count - 1
-        Dim lIndex As Integer
-        Dim lMinIndex As Integer
-        Dim lNextIndex() As Integer
-        Dim lNextDate() As Double
-
-        ReDim lNextIndex(aGroup.Count - 1)
-        ReDim lNextDate(aGroup.Count - 1)
-
-        MergeAttributes(aGroup, lNewTS)
-        'lNewTS.Attributes.AddHistory("Merged " & aGroup.Count)
-
         lNewTS.Dates = New atcTimeseries(Nothing)
+        If aGroup IsNot Nothing AndAlso aGroup.Count > 0 Then
+            Dim lNewIndex As Integer
+            Dim lTotalNumValues As Integer = 0
+            Dim lOldTS As atcTimeseries 'points to current timeseries from aGroup
+            Dim lMinDate As Double = pMaxValue
+            Dim lMaxGroupIndex As Integer = aGroup.Count - 1
+            Dim lIndex As Integer
+            Dim lMinIndex As Integer
+            Dim lNextIndex() As Integer
+            Dim lNextDate() As Double
 
-        'Count total number of values and set up 
-        For lIndex = 0 To lMaxGroupIndex
-            lOldTS = aGroup.Item(lIndex)
-            Try
-                lTotalNumValues += lOldTS.numValues
-                GetNextDateIndex(lOldTS, aFilterNoData, lNextIndex(lIndex), lNextDate(lIndex))
-                'Find minimum starting date and take date before from that TS
-                If lNextDate(lIndex) < lMinDate Then
-                    lMinDate = lOldTS.Dates.Value(lNextIndex(lIndex) - 1)
-                End If
-            Catch 'Can't get dates values from this TS
-                lNextIndex(lIndex) = -1
-            End Try
-        Next
+            ReDim lNextIndex(aGroup.Count - 1)
+            ReDim lNextDate(aGroup.Count - 1)
 
-        If lTotalNumValues > 0 Then
-            lNewTS.numValues = lTotalNumValues
-            lNewTS.Dates.numValues = lTotalNumValues
-            If lMinDate < pMaxValue Then
-                lNewTS.Dates.Value(0) = lMinDate
-            Else
-                lNewTS.Dates.Value(0) = pNaN
-            End If
-            lNewTS.Value(0) = pNaN
+            MergeAttributes(aGroup, lNewTS)
+            'lNewTS.Attributes.AddHistory("Merged " & aGroup.Count)
 
-            For lNewIndex = 1 To lTotalNumValues
-                'Find earliest date not yet used
-                lMinIndex = -1
-                lMinDate = pMaxValue
-                For lIndex = 0 To lMaxGroupIndex
-                    If lNextIndex(lIndex) > 0 AndAlso lNextDate(lIndex) < lMinDate Then
-                        lMinIndex = lIndex
-                        lMinDate = lNextDate(lIndex)
+            'Count total number of values and set up 
+            For lIndex = 0 To lMaxGroupIndex
+                lOldTS = aGroup.Item(lIndex)
+                Try
+                    lTotalNumValues += lOldTS.numValues
+                    GetNextDateIndex(lOldTS, aFilterNoData, lNextIndex(lIndex), lNextDate(lIndex))
+                    'Find minimum starting date and take date before from that TS
+                    If lNextDate(lIndex) < lMinDate Then
+                        lMinDate = lOldTS.Dates.Value(lNextIndex(lIndex) - 1)
                     End If
-                Next
-
-                'TODO: could make common cases faster with Array.Copy
-                'Now that we have found lMinDate, could also find the lNextMinDate when the 
-                'minimum date from a different TS happens, then find out how many more values 
-                'from this TS are earlier than lNextMinDate, then copy all of them to the 
-                'new TS at once
-
-                'Add earliest date and value to new TS
-                If lMinIndex >= 0 Then
-                    'Logger.Dbg("---found min date in data set " & lMinIndex)
-                    lOldTS = aGroup.Item(lMinIndex)
-                    If lOldTS.ValueAttributesGetValue(lNextIndex(lMinIndex), "Inserted", False) Then
-                        'Logger.Dbg("---discarding inserted value")
-                        'This value was inserted during splitting and will now be discarded
-                        lNewIndex -= 1
-                        lTotalNumValues -= 1
-                        GetNextDateIndex(lOldTS, aFilterNoData, _
-                                         lNextIndex(lMinIndex), _
-                                         lNextDate(lMinIndex))
-                    Else
-                        'Logger.Dbg("---MergeTimeseries adding date " & lMinDate & " value " & lOldTS.Value(lNextIndex(lMinIndex)) & " from dataset " & lMinIndex)
-                        lNewTS.Dates.Value(lNewIndex) = lMinDate
-                        lNewTS.Value(lNewIndex) = lOldTS.Value(lNextIndex(lMinIndex))
-
-                        GetNextDateIndex(lOldTS, aFilterNoData, lNextIndex(lMinIndex), lNextDate(lMinIndex))
-
-                        For lIndex = 0 To lMaxGroupIndex
-                            'Discard next value from any TS that falls within one millisecond
-                            'Don't need Math.Abs because we already found minimum
-                            While lNextIndex(lIndex) > 0 AndAlso (lNextDate(lIndex) - lMinDate) < JulianMillisecond
-                                lOldTS = aGroup.Item(lIndex)
-                                'Logger.Dbg("---MergeTimeseries discarding date " & DumpDate(lNextDate(lIndex)) & " value " & lOldTS.Value(lNextIndex(lIndex)) & " from dataset " & lIndex)
-                                lTotalNumValues -= 1    'This duplicate no longer counts toward total
-                                GetNextDateIndex(lOldTS, aFilterNoData, lNextIndex(lIndex), lNextDate(lIndex))
-                            End While
-                        Next
-                    End If
-                Else 'out of values in all the datasets
-                    'Logger.Dbg("Warning:MergeTimeseries:Ran out of values at " & lNewIndex & " of " & lTotalNumValues)
-                    lTotalNumValues = lNewIndex - 1
-                    Exit For
-                End If
+                Catch 'Can't get dates values from this TS
+                    lNextIndex(lIndex) = -1
+                End Try
             Next
-            If lTotalNumValues < lNewTS.numValues Then
+
+            If lTotalNumValues > 0 Then
                 lNewTS.numValues = lTotalNumValues
                 lNewTS.Dates.numValues = lTotalNumValues
+                If lMinDate < pMaxValue Then
+                    lNewTS.Dates.Value(0) = lMinDate
+                Else
+                    lNewTS.Dates.Value(0) = pNaN
+                End If
+                lNewTS.Value(0) = pNaN
+
+                For lNewIndex = 1 To lTotalNumValues
+                    'Find earliest date not yet used
+                    lMinIndex = -1
+                    lMinDate = pMaxValue
+                    For lIndex = 0 To lMaxGroupIndex
+                        If lNextIndex(lIndex) > 0 AndAlso lNextDate(lIndex) < lMinDate Then
+                            lMinIndex = lIndex
+                            lMinDate = lNextDate(lIndex)
+                        End If
+                    Next
+
+                    'TODO: could make common cases faster with Array.Copy
+                    'Now that we have found lMinDate, could also find the lNextMinDate when the 
+                    'minimum date from a different TS happens, then find out how many more values 
+                    'from this TS are earlier than lNextMinDate, then copy all of them to the 
+                    'new TS at once
+
+                    'Add earliest date and value to new TS
+                    If lMinIndex >= 0 Then
+                        'Logger.Dbg("---found min date in data set " & lMinIndex)
+                        lOldTS = aGroup.Item(lMinIndex)
+                        If lOldTS.ValueAttributesGetValue(lNextIndex(lMinIndex), "Inserted", False) Then
+                            'Logger.Dbg("---discarding inserted value")
+                            'This value was inserted during splitting and will now be discarded
+                            lNewIndex -= 1
+                            lTotalNumValues -= 1
+                            GetNextDateIndex(lOldTS, aFilterNoData, _
+                                             lNextIndex(lMinIndex), _
+                                             lNextDate(lMinIndex))
+                        Else
+                            'Logger.Dbg("---MergeTimeseries adding date " & lMinDate & " value " & lOldTS.Value(lNextIndex(lMinIndex)) & " from dataset " & lMinIndex)
+                            lNewTS.Dates.Value(lNewIndex) = lMinDate
+                            lNewTS.Value(lNewIndex) = lOldTS.Value(lNextIndex(lMinIndex))
+
+                            GetNextDateIndex(lOldTS, aFilterNoData, lNextIndex(lMinIndex), lNextDate(lMinIndex))
+
+                            For lIndex = 0 To lMaxGroupIndex
+                                'Discard next value from any TS that falls within one millisecond
+                                'Don't need Math.Abs because we already found minimum
+                                While lNextIndex(lIndex) > 0 AndAlso (lNextDate(lIndex) - lMinDate) < JulianMillisecond
+                                    lOldTS = aGroup.Item(lIndex)
+                                    'Logger.Dbg("---MergeTimeseries discarding date " & DumpDate(lNextDate(lIndex)) & " value " & lOldTS.Value(lNextIndex(lIndex)) & " from dataset " & lIndex)
+                                    lTotalNumValues -= 1    'This duplicate no longer counts toward total
+                                    GetNextDateIndex(lOldTS, aFilterNoData, lNextIndex(lIndex), lNextDate(lIndex))
+                                End While
+                            Next
+                        End If
+                    Else 'out of values in all the datasets
+                        'Logger.Dbg("Warning:MergeTimeseries:Ran out of values at " & lNewIndex & " of " & lTotalNumValues)
+                        lTotalNumValues = lNewIndex - 1
+                        Exit For
+                    End If
+                Next
+                If lTotalNumValues < lNewTS.numValues Then
+                    lNewTS.numValues = lTotalNumValues
+                    lNewTS.Dates.numValues = lTotalNumValues
+                End If
             End If
         End If
         Return lNewTS
