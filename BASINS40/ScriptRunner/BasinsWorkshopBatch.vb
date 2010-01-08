@@ -9,13 +9,14 @@ Imports D4EMDataManager
 
 Module BasinsWorkshopBatch
     Private pMapWin As IMapWin
+    Private pHUC8 As String = "02060006"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         pMapWin = aMapWin
         Dim lOriginalDir As String = IO.Directory.GetCurrentDirectory
         Dim lOriginalDisplayMessages As Boolean = Logger.DisplayMessageBoxes
         Logger.DisplayMessageBoxes = False
-        Logger.Dbg("BasinsWorkshopBatch:CurDir:" & lOriginalDir)
+        Logger.Dbg("BasinsWorkshopBatch:OriginalDir:" & lOriginalDir)
         Dim lBasinsProjectDataDir As String = DefaultBasinsDataDir() & "WorkshopBatch\"
         Try
             If IO.Directory.Exists(lBasinsProjectDataDir) Then
@@ -38,8 +39,13 @@ Module BasinsWorkshopBatch
         '  Build a New BASINS Project
         '  TODO: open National Project and select Patuxent in code
         '  TODO: clear cache?
+
+        '  create project
         Dim lProjection As String = "proj +proj=utm +zone=18 +ellps=GRS80 +lon_0=-75 +lat_0=0 +k=0.9996 +x_0=500000.0 +y_0=0 end "
         SaveFileString(aBasinsProjectDataDir & "prj.proj", lProjection) 'Side effect: makes data directory
+        IO.Directory.SetCurrentDirectory(aBasinsProjectDataDir)
+        If Not IO.Directory.Exists("snapshots") Then IO.Directory.CreateDirectory("snapshots")
+
         Dim lRegion As String = _
            "<region>" & _
            "   <northbc>1975392.91047589</northbc>" & _
@@ -47,14 +53,14 @@ Module BasinsWorkshopBatch
            "   <eastbc>1684619.12695581</eastbc>" & _
            "   <westbc>1595425.21946512</westbc>" & _
            "   <projection>+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs</projection>" & _
-           "   <HUC8 status=""set by BASINS System Application"">02060006</HUC8>" & _
+           "   <HUC8 status=""set by BASINS System Application"">" & pHUC8 & "</HUC8>" & _
            "</region> "
         CreateNewProjectAndDownloadCoreData(lRegion, DefaultBasinsDataDir, aBasinsProjectDataDir, aBasinsProjectDataDir & "Patuxent.mwprj")
-        Debug.Print("ProjectSaved:" & pMapWin.Project.Save(pMapWin.Project.FileName))
+        SnapShotAndSave("AfterDownloadCore")
 
         '  Navigate the BASINS 4.0 GIS Environment
 
-        '  General Data Download
+        '  General Specs for download
         Dim lPlugins As New ArrayList
         For lPluginIndex As Integer = 0 To pMapWin.Plugins.Count
             Try
@@ -78,7 +84,7 @@ Module BasinsWorkshopBatch
           "       <southbc>38.257273329737</southbc>" & _
           "       <eastbc>-76.4009709099128</eastbc>" & _
           "       <westbc>-77.2070255407762</westbc>" & _
-          "       <HUC8>02060006</HUC8>" & _
+          "       <HUC8>" & pHUC8 & "</HUC8>" & _
           "       <preferredformat>huc8</preferredformat>" & _
           "       <projection>+proj=latlong +datum=NAD83</projection>" & _
           "    </region>" & _
@@ -95,6 +101,7 @@ Module BasinsWorkshopBatch
             'Nothing to report, no success or error
         ElseIf lResultLU.StartsWith("<success>") Then
             BASINS.ProcessDownloadResults(lResultLU)
+            SnapShotAndSave("AfterDownloadLandUse")
             For lLayerIndex As Integer = 0 To pMapWin.Layers.NumLayers - 1
                 With pMapWin.Layers(lLayerIndex)
                     If .Name.ToLower.Contains("land use") Then
@@ -105,7 +112,6 @@ Module BasinsWorkshopBatch
         Else
             Logger.Msg(atcUtility.ReadableFromXML(lResultLU), "LUDownload Result")
         End If
-        Debug.Print("ProjectSaved:" & pMapWin.Project.Save(pMapWin.Project.FileName))
 
         '  Add NHDPlus Data
         Dim lQueryNHD As String = lQuery.Replace("#DataType#", "hydrography</DataType> <DataType>Catchment").Replace("#Name#", "GetNHDPlus")
@@ -114,6 +120,7 @@ Module BasinsWorkshopBatch
             'Nothing to report, no success or error
         ElseIf lResultNHD.StartsWith("<success>") Then
             BASINS.ProcessDownloadResults(lResultNHD)
+            SnapShotAndSave("AfterDownloadNHD")
             For Each lLayer As MapWindow.Interfaces.Layer In pMapWin.Layers
                 Dim lName As String = lLayer.Name.ToLower
                 If lName.Contains("flowline") OrElse _
@@ -126,7 +133,6 @@ Module BasinsWorkshopBatch
         Else
             Logger.Msg(atcUtility.ReadableFromXML(lResultNHD), "NHDDownload Result")
         End If
-        Debug.Print("ProjectSaved:" & pMapWin.Project.Save(pMapWin.Project.FileName))
 
         '  Add BASINS census and TIGER line data
         Dim lQueryCensus As String = lQuery.Replace("#DataType#", "Census").Replace("#Name#", "GetBASINS")
@@ -135,6 +141,7 @@ Module BasinsWorkshopBatch
             'Nothing to report, no success or error
         ElseIf lResultCensus.StartsWith("<success>") Then
             BASINS.ProcessDownloadResults(lResultCensus)
+            SnapShotAndSave("AfterDownloadCensus")
             For Each lLayer As MapWindow.Interfaces.Layer In pMapWin.Layers
                 If lLayer.Name.ToLower.Contains("tiger") Then
                     lLayer.Visible = False
@@ -143,7 +150,6 @@ Module BasinsWorkshopBatch
         Else
             Logger.Msg(atcUtility.ReadableFromXML(lResultNHD), "CensusDownload Result")
         End If
-        Debug.Print("ProjectSaved:" & pMapWin.Project.Save(pMapWin.Project.FileName))
 
         '  Add BASINS Digital Elevation Model (DEM) grids
         Dim lQueryDEMG As String = lQuery.Replace("#DataType#", "DEMG").Replace("#Name#", "GetBASINS")
@@ -155,7 +161,7 @@ Module BasinsWorkshopBatch
         Else
             Logger.Msg(atcUtility.ReadableFromXML(lResultNHD), "DEMGDownload Result")
         End If
-        Debug.Print("ProjectSaved:" & pMapWin.Project.Save(pMapWin.Project.FileName))
+        SnapShotAndSave("AfterDownloadDEM")
 
         '  Import other shapefiles
         For Each lLayer As MapWindow.Interfaces.Layer In pMapWin.Layers
@@ -174,7 +180,7 @@ Module BasinsWorkshopBatch
         Else
             Logger.Dbg("FileNotFound:" & lPreDefDelinFile)
         End If
-        Debug.Print("ProjectSaved:" & pMapWin.Project.Save(pMapWin.Project.FileName))
+        SnapShotAndSave("AfterDownloadPredifined")
 
         '  Download timeseries data for use in modeling
         Dim lQueryMetStations As String = lQuery.Replace("#DataType#", "MetStations").Replace("#Name#", "GetBASINS")
@@ -188,7 +194,7 @@ Module BasinsWorkshopBatch
         End If
         Debug.Print("ProjectSaved:" & pMapWin.Project.Save(pMapWin.Project.FileName))
 
-        Dim lQueryMetData As String = "<function name='GetBASINS'> <arguments> <DataType>MetData</DataType> <SaveWDM>C:\Basins\data\WorkshopBatch\met\met.wdm</SaveWDM> <SaveIn>C:\Basins\data\WorkshopBatch</SaveIn> <CacheFolder>C:\dev\BASINS40\</CacheFolder> <DesiredProjection>+proj=utm +zone=18 +ellps=GRS80 +datum=NAD83 +units=m +no_defs</DesiredProjection> <region> <northbc>39.3668056784273</northbc> <southbc>38.257273329737</southbc> <eastbc>-76.4009709099128</eastbc> <westbc>-77.2070255407762</westbc> <HUC8>02060006</HUC8> <preferredformat>huc8</preferredformat> <projection>+proj=latlong +datum=NAD83</projection> </region> " & _
+        Dim lQueryMetData As String = "<function name='GetBASINS'> <arguments> <DataType>MetData</DataType> <SaveWDM>C:\Basins\data\WorkshopBatch\met\met.wdm</SaveWDM> <SaveIn>C:\Basins\data\WorkshopBatch</SaveIn> <CacheFolder>C:\dev\BASINS40\</CacheFolder> <DesiredProjection>+proj=utm +zone=18 +ellps=GRS80 +datum=NAD83 +units=m +no_defs</DesiredProjection> <region> <northbc>39.3668056784273</northbc> <southbc>38.257273329737</southbc> <eastbc>-76.4009709099128</eastbc> <westbc>-77.2070255407762</westbc> <HUC8>" & pHUC8 & "</HUC8> <preferredformat>huc8</preferredformat> <projection>+proj=latlong +datum=NAD83</projection> </region> " & _
                                       "<stationid>MD180193</stationid> <stationid>MD180193</stationid> <stationid>MD180193</stationid> <stationid>MD180460</stationid> <stationid>MD180460</stationid> <stationid>MD180460</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> " & _
                                       "<stationid>MD180465</stationid> <stationid>MD180470</stationid> <stationid>MD180470</stationid> <stationid>MD180470</stationid> <stationid>MD180470</stationid> <stationid>MD180475</stationid> <stationid>MD180475</stationid> <stationid>MD180475</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180701</stationid> <stationid>MD180701</stationid> <stationid>MD180701</stationid> <stationid>MD180702</stationid> <stationid>MD180702</stationid> <stationid>MD180702</stationid> <stationid>MD180703</stationid> <stationid>MD180703</stationid> <stationid>MD180703</stationid> <stationid>MD180704</stationid> <stationid>MD180704</stationid> <stationid>MD180704</stationid> <stationid>MD180705</stationid> <stationid>MD180705</stationid> <stationid>MD180705</stationid> <stationid>MD180705</stationid> " & _
                                       "<stationid>MD180706</stationid> <stationid>MD180706</stationid> <stationid>MD180706</stationid> <stationid>MD180795</stationid> <stationid>MD180800</stationid> <stationid>MD180800</stationid> <stationid>MD180800</stationid> <stationid>MD181125</stationid> <stationid>MD181135</stationid> <stationid>MD181135</stationid> <stationid>MD181170</stationid> <stationid>MD181278</stationid> <stationid>MD181685</stationid> <stationid>MD181685</stationid> <stationid>MD181685</stationid> <stationid>MD181710</stationid> <stationid>MD181710</stationid> <stationid>MD181710</stationid> <stationid>MD181862</stationid> <stationid>MD181862</stationid> <stationid>MD181862</stationid> <stationid>MD181995</stationid> <stationid>MD181995</stationid> <stationid>MD181995</stationid> <stationid>MD181995</stationid> <stationid>MD182325</stationid> <stationid>MD182325</stationid> <stationid>MD182325</stationid> <stationid>MD182585</stationid> <stationid>MD182585</stationid> <stationid>MD182585</stationid> <stationid>MD182660</stationid> " & _
@@ -204,7 +210,7 @@ Module BasinsWorkshopBatch
         Else
             Logger.Msg(atcUtility.ReadableFromXML(lResultMetData), "MetDataDownload Result")
         End If
-        Debug.Print("ProjectSaved:" & pMapWin.Project.Save(pMapWin.Project.FileName))
+        SnapShotAndSave("AfterDownloadMetData")
 
         Return True
     End Function
@@ -212,6 +218,29 @@ Module BasinsWorkshopBatch
     Private Function Exercise2() As Boolean
         Logger.Dbg("NotYetImplemented")
         Return False
+    End Function
+
+    Private Function SnapShotAndSave(ByVal aSnapShotName As String) As Boolean
+        Dim lSnapShotName As String = aSnapShotName
+        If Not lSnapShotName.ToLower.EndsWith(".png") Then lSnapShotName &= ".png"
+        Debug.Print("ProjectSaved:" & pMapWin.Project.Save(pMapWin.Project.FileName) & ":" & lSnapShotName)
+        SnapShot(lSnapShotName)
+        Return True
+    End Function
+
+    Private Function SnapShot(ByVal aSnapShotName As String) As Boolean
+        With pMapWin.View
+            Dim lImage As MapWinGIS.Image = .Snapshot(.Extents)
+            Dim lDrawImg As System.Drawing.Image = MapWinUtility.ImageUtils.ObjectToImage(lImage.Picture)
+            Dim lBaseFolder As String = ""
+            If IO.Directory.Exists("snapshots") Then lBaseFolder = "snapshots\"
+            lDrawImg.Save(lBaseFolder & aSnapShotName, System.Drawing.Imaging.ImageFormat.Png)
+            Dim lLegendFileName As String = IO.Path.GetFileNameWithoutExtension(aSnapShotName) & "Legend.png"
+            .LegendControl.Snapshot().Save(lBaseFolder & lLegendFileName)
+            lLegendFileName = IO.Path.GetFileNameWithoutExtension(aSnapShotName) & "LegendVisible.png"
+            .LegendControl.Snapshot(True).Save(lBaseFolder & lLegendFileName)
+        End With
+        Return True
     End Function
 
 End Module
