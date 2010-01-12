@@ -248,7 +248,299 @@ Public Class atcDataSourceTimeseriesD4EM
         lWriter.Close()
     End Function
 
+    Public Function SaveArcSWAT(ByVal aProjectFolder As String) As Boolean
+        Dim aSaveFileName As String = aProjectFolder
+        Me.Specification = aSaveFileName
+
+        Dim dctTS As Dictionary(Of String, atcTimeseries) = New Dictionary(Of String, atcTimeseries)
+        Dim lGroup As New atcDataGroup
+        Dim lTS As atcTimeseries = DataSets(0)
+        Dim lStartDate As Double = lTS.Dates.Value(0)
+        Dim lEndDate As Double = lTS.Dates.Value(lTS.numValues)
+        Dim lNumDays As Integer = lTS.numValues
+        Dim lColumnName As String
+        For Each lColumnName In pColumns
+            If DataSets.Keys.Contains(lColumnName) Then
+                lTS = DataSets.ItemByKey(lColumnName)
+            ElseIf lColumnName = "hmd" Then
+                'Default relative humidity to 40%
+                lTS = NewTimeseries(lStartDate, lEndDate, atcTimeUnit.TUDay, 1, Me, 40)
+                lTS.Attributes.SetValueIfMissing("Units", "%")
+            Else
+                lTS = Nothing
+            End If
+            lGroup.Add(lColumnName, lTS)
+            'WriteDatasetAttributes(lTS, aSaveFileName & "." & lColumnName & "-attributes.txt")
+        Next
+
+        Dim sLoc As String = ""
+        Dim sLat As String = ""
+        Dim sLon As String = ""
+        Dim sStationName As String = ""
+
+        Dim lName As String
+
+        For Each lAttribute As atcDefinedValue In lTS.Attributes
+            If Not lAttribute.Definition.Calculated Then
+                lName = lAttribute.Definition.Name
+                'sStation = lAttribute.Value.ToString()
+                'Console.WriteLine("Name:" + lName + "-  Value: " + sStation)
+                If (lName = "Location") Then
+                    sLoc = lAttribute.Value
+                End If
+                If (lName = "Longitude") Then
+                    sLon = lAttribute.Value
+                End If
+                If (lName = "Latitude") Then
+                    sLat = lAttribute.Value
+                End If
+                If (lName = "STANAM") Then
+                    sStationName = lAttribute.Value
+                End If
+            End If
+        Next
+
+
+
+        Dim dctWriters As Dictionary(Of String, atcTableDBF)
+        dctWriters = CreateDbfDataWriters(lNumDays)
+        Dim dctStationWriters As Dictionary(Of String, atcTableDBF)
+        dctStationWriters = CreateDbfStationWriters()
+
+        Dim dbfWriter As atcTableDBF
+        Dim dbfStationWriter As atcTableDBF
+        Dim sd As String = DumpDate(lStartDate)
+        Dim startDate As Date = Convert.ToDateTime(sd)
+        'Dim dt As DateTime = New DateTime("")
+        Dim sDate As String = startDate.ToShortDateString()
+
+
+        'Day number and all values for that day
+        For lDay As Integer = 1 To lNumDays
+            sDate = startDate.AddDays(lDay - 1).ToString("yyyyMMdd")
+
+            For Each lColumnName In pColumns
+                lTS = lGroup.ItemByKey(lColumnName)
+
+                If Not (lTS Is Nothing) Then
+
+                    If (lColumnName = "tmin") Then
+
+                        dbfWriter = dctWriters("temp")
+
+                        If (lDay > 1) Then
+                            dbfWriter.MoveNext()
+                        End If
+
+                        dbfWriter.Value(1) = sDate
+                        dbfWriter.Value(3) = lTS.Value(lDay)
+
+                        dbfStationWriter = dctStationWriters("temp")
+
+                    ElseIf (lColumnName = "tmax") Then
+                        dbfWriter = dctWriters("temp")
+                        dbfWriter.Value(2) = lTS.Value(lDay)
+
+
+                    ElseIf (lColumnName = "tmean") Then
+                        'skip
+                    Else
+                        dbfWriter = dctWriters(lColumnName)
+                        If (lDay > 1) Then
+                            dbfWriter.MoveNext()
+                        End If
+
+                        dbfWriter.Value(1) = sDate
+                        dbfWriter.Value(2) = lTS.Value(lDay)
+
+                    End If
+                End If
+
+            Next
+        Next
+
+        Dim sFileData As String = ""
+        Dim sFileStation As String = ""
+        For Each lColumnName In dctWriters.Keys
+
+            sFileData = "Met" + lColumnName + "D"
+            sFileStation = "Met" + lColumnName + "S"
+
+            dbfWriter = dctWriters(lColumnName)
+            dbfWriter.WriteFile(aProjectFolder + "\ArcSWAT\" + sFileData + ".dbf")
+
+
+            dbfStationWriter = dctStationWriters(lColumnName)
+            dbfStationWriter.Value(1) = "1"
+            dbfStationWriter.Value(2) = sFileData
+            dbfStationWriter.Value(3) = sLat
+            dbfStationWriter.Value(4) = sLon
+            dbfStationWriter.Value(5) = "0"
+            dbfStationWriter.WriteFile(aProjectFolder + "\ArcSWAT\" + sFileStation + ".dbf")
+
+
+        Next
+
+
+        'lWriter.WriteLine()
+
+
+        'lWriter.Close()
+    End Function
+
     Public Sub New()
         Filter = pFilter
+    End Sub
+
+
+    Public Function CreateTimeSeriesDbfFile(ByVal numRecords As Integer, ByVal columnName As String) As atcTableDBF
+
+
+        Dim newDBF As New atcTableDBF()
+
+
+        newDBF.NumFields = 2
+
+        newDBF.FieldName(1) = "DATE"
+        newDBF.FieldType(1) = "D"
+        newDBF.FieldLength(1) = 10
+        newDBF.FieldDecimalCount(1) = 1
+
+        newDBF.FieldName(2) = columnName
+        newDBF.FieldType(2) = "N"
+        newDBF.FieldLength(2) = 5
+        newDBF.FieldDecimalCount(2) = 1
+
+        newDBF.NumRecords = numRecords
+        newDBF.InitData()
+
+
+        newDBF.MoveFirst()
+
+
+        Return newDBF
+
+    End Function
+
+    Public Function CreateTempTimeSeriesDbfFile(ByVal numRecords As Integer) As atcTableDBF
+
+
+        Dim newDBF As New atcTableDBF()
+
+        newDBF.NumFields = 3
+
+        newDBF.FieldName(1) = "DATE"
+        newDBF.FieldType(1) = "D"
+        newDBF.FieldLength(1) = 10
+        newDBF.FieldDecimalCount(1) = 0
+
+        newDBF.FieldName(2) = "MAX"
+        newDBF.FieldType(2) = "N"
+        newDBF.FieldLength(2) = 5
+        newDBF.FieldDecimalCount(2) = 1
+
+        newDBF.FieldName(3) = "MIN"
+        newDBF.FieldType(3) = "N"
+        newDBF.FieldLength(3) = 5
+        newDBF.FieldDecimalCount(3) = 1
+
+        newDBF.NumRecords = numRecords
+        newDBF.InitData()
+
+        newDBF.MoveFirst()
+
+        Return newDBF
+
+    End Function
+
+    Private Function CreateDbfDataWriters(ByVal numRecords As Integer) As Dictionary(Of String, atcTableDBF)
+        Dim lColumnName As String
+
+        'Dim dbfWriters As Generic.List(Of atcTableDBF) = New Generic.List(Of atcTableDBF)
+        Dim dctWriters As Dictionary(Of String, atcTableDBF) = New Dictionary(Of String, atcTableDBF)
+
+        Dim newDBF As atcTableDBF
+        For Each lColumnName In pColumns
+            If Not ((lColumnName = "tmin") Or (lColumnName = "tmean") Or (lColumnName = "tmax")) Then
+                newDBF = CreateTimeSeriesDbfFile(numRecords, lColumnName)
+                'dbfWriters.Add(newDBF)
+                dctWriters.Add(lColumnName, newDBF)
+            End If
+        Next
+
+        newDBF = CreateTempTimeSeriesDbfFile(numRecords)
+        dctWriters.Add("temp", newDBF)
+        'dbfWriters.Add(newDBF)
+
+        Return dctWriters
+
+
+    End Function
+
+
+    Private Function CreateDbfStationWriters() As Dictionary(Of String, atcTableDBF)
+        Dim lColumnName As String
+
+        'Dim dbfWriters As Generic.List(Of atcTableDBF) = New Generic.List(Of atcTableDBF)
+        Dim dctWriters As Dictionary(Of String, atcTableDBF) = New Dictionary(Of String, atcTableDBF)
+
+        Dim newDBF As atcTableDBF
+        For Each lColumnName In pColumns
+            If Not ((lColumnName = "tmin") Or (lColumnName = "tmean") Or (lColumnName = "tmax")) Then
+                newDBF = CreateStationDbfFile()
+                'dbfWriters.Add(newDBF)
+                dctWriters.Add(lColumnName, newDBF)
+            End If
+        Next
+
+        newDBF = CreateStationDbfFile()
+        dctWriters.Add("temp", newDBF)
+        'dbfWriters.Add(newDBF)
+
+        Return dctWriters
+    End Function
+    Public Function CreateStationDbfFile() As atcTableDBF
+
+
+        Dim newDBF As New atcTableDBF()
+
+        newDBF.NumFields = 5
+        newDBF.FieldName(1) = "ID"
+        newDBF.FieldType(1) = "N"
+        newDBF.FieldLength(1) = 4
+        newDBF.FieldDecimalCount(1) = 0
+
+        newDBF.FieldName(2) = "NAME"
+        newDBF.FieldType(2) = "C"
+        newDBF.FieldLength(2) = 8
+        newDBF.FieldDecimalCount(2) = 0
+
+        newDBF.FieldName(3) = "LAT"
+        newDBF.FieldType(3) = "N"
+        newDBF.FieldLength(3) = 9
+        newDBF.FieldDecimalCount(3) = 4
+
+        newDBF.FieldName(4) = "LONG"
+        newDBF.FieldType(4) = "N"
+        newDBF.FieldLength(4) = 9
+        newDBF.FieldDecimalCount(4) = 4
+
+        newDBF.FieldName(5) = "ELEVATION"
+        newDBF.FieldType(5) = "N"
+        newDBF.FieldLength(5) = 11
+        newDBF.FieldDecimalCount(5) = 0
+        newDBF.NumRecords = 1
+
+        newDBF.InitData()
+
+        newDBF.MoveFirst()
+
+
+        Return newDBF
+
+    End Function
+
+    Private Sub BuildDbfWriters()
+
     End Sub
 End Class
