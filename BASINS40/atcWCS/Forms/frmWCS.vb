@@ -2,7 +2,7 @@
 
 Public Class frmWCS
 
-    Friend Function UpdateProgress(ByVal Message As String, ByVal ItemNum As Integer, ByVal MaxItemNum As Integer) As Boolean
+    Private Sub UpdProg(ByVal Message As String, ByVal ItemNum As Integer, ByVal MaxItemNum As Integer)
         If Message <> "" And ItemNum <> MaxItemNum Then
             lblProgress.Text = Message
             ProgressBar.Value = ItemNum * 100.0 / MaxItemNum
@@ -11,6 +11,10 @@ Public Class frmWCS
         Else
             tblProgress.Visible = False
         End If
+    End Sub
+
+    Friend Function UpdateProgress(ByVal Message As String, ByVal ItemNum As Integer, ByVal MaxItemNum As Integer) As Boolean
+        UpdProg(Message, ItemNum, MaxItemNum)
         Return Not GisUtil.Cancel
     End Function
 
@@ -233,7 +237,7 @@ Public Class frmWCS
         WCSForm = Nothing
         gMapWin.StatusBar(2).Text = ""
         SaveWindowPos(REGAPP, Me)
-        RemoveHandler GisUtil.Progress, AddressOf UpdateProgress
+        RemoveHandler GisUtil.Progress, AddressOf UpdProg
     End Sub
 
     Private Sub frmWCS_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -241,7 +245,7 @@ Public Class frmWCS
         Project = New clsProject
         Project.Load()
         LoadForm()
-        AddHandler GisUtil.Progress, AddressOf UpdateProgress
+        AddHandler GisUtil.Progress, AddressOf UpdProg
     End Sub
 
     Private Sub lnkCancel_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lnkCancel.LinkClicked
