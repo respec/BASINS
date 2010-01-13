@@ -223,7 +223,11 @@ Public Module modFile
     ''' <remarks>It is the caller's responsibility to both create and remove this file. Two identical calls will get the same result if the file is not created before the second call.</remarks>
     Public Function GetNewFileName(ByVal aBaseName As String, ByVal aExtension As String) As String
         Dim lCounter As Integer = 1
-        If aBaseName Is Nothing OrElse aBaseName.Length = 0 Then aBaseName = "temp"
+        If aBaseName Is Nothing OrElse aBaseName.Length = 0 Then
+            aBaseName = "temp"
+        Else
+            aBaseName = IO.Path.Combine(IO.Path.GetDirectoryName(aBaseName), IO.Path.GetFileNameWithoutExtension(aBaseName))
+        End If
         Dim lBaseName As String
         If IO.Path.IsPathRooted(aBaseName) Then
             lBaseName = aBaseName
