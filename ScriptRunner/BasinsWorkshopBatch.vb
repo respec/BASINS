@@ -4,25 +4,38 @@ Imports MapWinUtility
 
 Imports atcUtility
 Imports atcData
+Imports atcManDelin
 Imports BASINS
 Imports D4EMDataManager
 
 Module BasinsWorkshopBatch
     Private pMapWin As IMapWin
     Private pHUC8 As String = "02060006"
+    Private pDrive As String = "C:"
+    Private pBaseFolder As String = pDrive & "\BASINS\"
+    Private pProjectFolder As String = pBaseFolder & "Data\WorkshopBatch\"
+    Private pCacheFolder As String = pProjectFolder & "Cache\"
+    Private pCacheFolderSave As String = pCacheFolder.Replace("Batch", "BatchSave")
+    Private pCacheClear As Boolean = False
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         pMapWin = aMapWin
         Dim lOriginalDir As String = IO.Directory.GetCurrentDirectory
+        Dim lOriginalLog As String = Logger.FileName
         Dim lOriginalDisplayMessages As Boolean = Logger.DisplayMessageBoxes
         Logger.DisplayMessageBoxes = False
         Logger.Dbg("BasinsWorkshopBatch:OriginalDir:" & lOriginalDir)
-        Dim lBasinsProjectDataDir As String = DefaultBasinsDataDir() & "WorkshopBatch\"
+        Logger.Dbg("  AboutToChangeLog")
         Try
-            If IO.Directory.Exists(lBasinsProjectDataDir) Then
-                IO.Directory.Delete(lBasinsProjectDataDir, True)
+            If IO.Directory.Exists(pProjectFolder) Then
+                IO.Directory.Delete(pProjectFolder, True)
+                Logger.Dbg("ExistingProjectFolderDeleted:" & pProjectFolder)
             End If
-            If Not Exercise1(lBasinsProjectDataDir) Then
+            If Not IO.Directory.Exists(pCacheFolder) Then
+                IO.Directory.CreateDirectory(pCacheFolder)
+            End If
+            Logger.StartToFile(pCacheFolder & "BasinsWorkshopBatch.log", , , True)
+            If Not Exercise1(pProjectFolder) Then
                 Logger.Dbg("***** Exercise1 FAIL *****")
             ElseIf Not Exercise2() Then
                 Logger.Dbg("***** Exercise2 FAIL *****")
@@ -31,6 +44,9 @@ Module BasinsWorkshopBatch
             Logger.Dbg("Problem " & lEx.ToString)
         End Try
         IO.Directory.SetCurrentDirectory(lOriginalDir)
+        Logger.Dbg("BasinsWorkshopBatchDone")
+        Logger.StartToFile(lOriginalLog, True, , True)
+        Logger.Dbg("BackFromBasinsWorkshopBatch")
         Logger.DisplayMessageBoxes = lOriginalDisplayMessages
     End Sub
 
@@ -38,7 +54,26 @@ Module BasinsWorkshopBatch
         'Adding Data to a New BASINS Project
         '  Build a New BASINS Project
         '  TODO: open National Project and select Patuxent in code
-        '  TODO: clear cache?
+
+        If Not pCacheClear AndAlso IO.Directory.Exists(pCacheFolderSave) Then
+            'copy existing cache
+            pMapWin.StatusBar.Item(1).Text = "Copy Existing Cache"
+            Dim lFileCopyCount As Integer = 0
+            For Each lFile As String In IO.Directory.GetFiles(pCacheFolderSave, "*", IO.SearchOption.AllDirectories)
+                Dim lNewFolder As String = IO.Path.GetDirectoryName(lFile).Replace(pCacheFolderSave, pCacheFolder) & "\"
+                If Not IO.Directory.Exists(lNewFolder) Then
+                    IO.Directory.CreateDirectory(lNewFolder)
+                End If
+                Dim lFileNew As String = lNewFolder & IO.Path.GetFileName(lFile)
+                If IO.File.Exists(lFileNew) Then
+                    Logger.Dbg("UsingExisting " & lFileNew)
+                Else
+                    IO.File.Copy(lFile, lNewFolder & IO.Path.GetFileName(lFile))
+                    lFileCopyCount += 1
+                End If
+            Next
+            Logger.Dbg("E1_UseExistingCache:FileCount:" & lFileCopyCount)
+        End If
 
         '  create project
         Dim lProjection As String = "proj +proj=utm +zone=18 +ellps=GRS80 +lon_0=-75 +lat_0=0 +k=0.9996 +x_0=500000.0 +y_0=0 end "
@@ -55,10 +90,11 @@ Module BasinsWorkshopBatch
            "   <projection>+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs</projection>" & _
            "   <HUC8 status=""set by BASINS System Application"">" & pHUC8 & "</HUC8>" & _
            "</region> "
-        CreateNewProjectAndDownloadCoreData(lRegion, DefaultBasinsDataDir, aBasinsProjectDataDir, aBasinsProjectDataDir & "Patuxent.mwprj")
-        SnapShotAndSave("AfterDownloadCore")
+        CreateNewProjectAndDownloadCoreData(lRegion, DefaultBasinsDataDir, aBasinsProjectDataDir, aBasinsProjectDataDir & "Patuxent.mwprj", False, pCacheFolder)
+        SnapShotAndSave("E1_AfterDownloadCore")
 
         '  Navigate the BASINS 4.0 GIS Environment
+        '  TODO: Turn reach layer off and on, Zoom in and out, zoom to cataloging unit layer extent, edit attribute table
 
         '  General Specs for download
         Dim lPlugins As New ArrayList
@@ -76,8 +112,8 @@ Module BasinsWorkshopBatch
           "<function name='#Name#'>" & _
           "  <arguments>" & _
           "    <DataType>#DataType#</DataType>" & _
-          "    <SaveIn>C:\Basins\data\WorkshopBatch</SaveIn>" & _
-          "    <CacheFolder>C:\BASINS\cache\</CacheFolder>" & _
+          "    <SaveIn>" & pProjectFolder & "</SaveIn>" & _
+          "    <CacheFolder>" & pCacheFolder & "</CacheFolder>" & _
           "    <DesiredProjection>+proj=utm +zone=18 +ellps=GRS80 +datum=NAD83 +units=m +no_defs</DesiredProjection>" & _
           "    <region>" & _
           "       <northbc>39.3668056784273</northbc>" & _
@@ -101,7 +137,7 @@ Module BasinsWorkshopBatch
             'Nothing to report, no success or error
         ElseIf lResultLU.StartsWith("<success>") Then
             BASINS.ProcessDownloadResults(lResultLU)
-            SnapShotAndSave("AfterDownloadLandUse")
+            SnapShotAndSave("E1_AfterDownloadLandUse")
             For lLayerIndex As Integer = 0 To pMapWin.Layers.NumLayers - 1
                 With pMapWin.Layers(lLayerIndex)
                     If .Name.ToLower.Contains("land use") Then
@@ -120,7 +156,7 @@ Module BasinsWorkshopBatch
             'Nothing to report, no success or error
         ElseIf lResultNHD.StartsWith("<success>") Then
             BASINS.ProcessDownloadResults(lResultNHD)
-            SnapShotAndSave("AfterDownloadNHD")
+            SnapShotAndSave("E1_AfterDownloadNHD")
             For Each lLayer As MapWindow.Interfaces.Layer In pMapWin.Layers
                 Dim lName As String = lLayer.Name.ToLower
                 If lName.Contains("flowline") OrElse _
@@ -141,7 +177,7 @@ Module BasinsWorkshopBatch
             'Nothing to report, no success or error
         ElseIf lResultCensus.StartsWith("<success>") Then
             BASINS.ProcessDownloadResults(lResultCensus)
-            SnapShotAndSave("AfterDownloadCensus")
+            SnapShotAndSave("E1_AfterDownloadCensus")
             For Each lLayer As MapWindow.Interfaces.Layer In pMapWin.Layers
                 If lLayer.Name.ToLower.Contains("tiger") Then
                     lLayer.Visible = False
@@ -161,18 +197,27 @@ Module BasinsWorkshopBatch
         Else
             Logger.Msg(atcUtility.ReadableFromXML(lResultNHD), "DEMGDownload Result")
         End If
-        SnapShotAndSave("AfterDownloadDEM")
+        SnapShotAndSave("E1_AfterDownloadDEM")
 
         '  Import other shapefiles
         For Each lLayer As MapWindow.Interfaces.Layer In pMapWin.Layers
             If lLayer.Name.ToLower.Contains("flowline features") Then
                 lLayer.Visible = True
+                pMapWin.Layers.CurrentLayer = lLayer.Handle
                 Exit For
             End If
         Next
-        Dim lPreDefDelinFile As String = aBasinsProjectDataDir.Replace("WorkshopBatch\", "WorkshopFiles\Predefined Delineations\w_branch.shp")
+
+        Dim lPreDefDelinDir As String = aBasinsProjectDataDir & "Predefined Delineations\"
+        If Not IO.Directory.Exists(lPreDefDelinDir) Then
+            IO.Directory.CreateDirectory(lPreDefDelinDir)
+        End If
+        For Each lFileName As String In IO.Directory.GetFiles(aBasinsProjectDataDir.Replace("WorkshopBatch\", "WorkshopFiles\Predefined Delineations\"))
+            IO.File.Copy(lFileName, lPreDefDelinDir & IO.Path.GetFileName(lFileName))
+        Next
+        Dim lPreDefDelinFile As String = lPreDefDelinDir & "w_branch.shp"
         If IO.File.Exists(lPreDefDelinFile) Then
-            Dim lLayerAdd As MapWindow.Interfaces.Layer = pMapWin.Layers.Add(lPreDefDelinFile)
+            Dim lLayerAdd As MapWindow.Interfaces.Layer = pMapWin.Layers.Add(lPreDefDelinFile, "w_branch", True, True)
             With lLayerAdd
                 .OutlineColor = Drawing.Color.Red
                 .DrawFill = False
@@ -180,7 +225,7 @@ Module BasinsWorkshopBatch
         Else
             Logger.Dbg("FileNotFound:" & lPreDefDelinFile)
         End If
-        SnapShotAndSave("AfterDownloadPredifined")
+        SnapShotAndSave("E1_AfterDownloadPredifined")
 
         '  Download timeseries data for use in modeling
         Dim lQueryMetStations As String = lQuery.Replace("#DataType#", "MetStations").Replace("#Name#", "GetBASINS")
@@ -194,7 +239,11 @@ Module BasinsWorkshopBatch
         End If
         Debug.Print("ProjectSaved:" & pMapWin.Project.Save(pMapWin.Project.FileName))
 
-        Dim lQueryMetData As String = "<function name='GetBASINS'> <arguments> <DataType>MetData</DataType> <SaveWDM>C:\Basins\data\WorkshopBatch\met\met.wdm</SaveWDM> <SaveIn>C:\Basins\data\WorkshopBatch</SaveIn> <CacheFolder>C:\dev\BASINS40\</CacheFolder> <DesiredProjection>+proj=utm +zone=18 +ellps=GRS80 +datum=NAD83 +units=m +no_defs</DesiredProjection> <region> <northbc>39.3668056784273</northbc> <southbc>38.257273329737</southbc> <eastbc>-76.4009709099128</eastbc> <westbc>-77.2070255407762</westbc> <HUC8>" & pHUC8 & "</HUC8> <preferredformat>huc8</preferredformat> <projection>+proj=latlong +datum=NAD83</projection> </region> " & _
+        Dim lQueryMetData As String = "<function name='GetBASINS'> <arguments> <DataType>MetData</DataType>" & _
+                                      "<SaveWDM>" & pProjectFolder & "met\met.wdm</SaveWDM>" & _
+                                      "<SaveIn>" & pProjectFolder & "</SaveIn>" & _
+                                      "<CacheFolder>" & pCacheFolder & "</CacheFolder>" & _
+                                      "<DesiredProjection>+proj=utm +zone=18 +ellps=GRS80 +datum=NAD83 +units=m +no_defs</DesiredProjection> <region> <northbc>39.3668056784273</northbc> <southbc>38.257273329737</southbc> <eastbc>-76.4009709099128</eastbc> <westbc>-77.2070255407762</westbc> <HUC8>" & pHUC8 & "</HUC8> <preferredformat>huc8</preferredformat> <projection>+proj=latlong +datum=NAD83</projection> </region> " & _
                                       "<stationid>MD180193</stationid> <stationid>MD180193</stationid> <stationid>MD180193</stationid> <stationid>MD180460</stationid> <stationid>MD180460</stationid> <stationid>MD180460</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> " & _
                                       "<stationid>MD180465</stationid> <stationid>MD180470</stationid> <stationid>MD180470</stationid> <stationid>MD180470</stationid> <stationid>MD180470</stationid> <stationid>MD180475</stationid> <stationid>MD180475</stationid> <stationid>MD180475</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180701</stationid> <stationid>MD180701</stationid> <stationid>MD180701</stationid> <stationid>MD180702</stationid> <stationid>MD180702</stationid> <stationid>MD180702</stationid> <stationid>MD180703</stationid> <stationid>MD180703</stationid> <stationid>MD180703</stationid> <stationid>MD180704</stationid> <stationid>MD180704</stationid> <stationid>MD180704</stationid> <stationid>MD180705</stationid> <stationid>MD180705</stationid> <stationid>MD180705</stationid> <stationid>MD180705</stationid> " & _
                                       "<stationid>MD180706</stationid> <stationid>MD180706</stationid> <stationid>MD180706</stationid> <stationid>MD180795</stationid> <stationid>MD180800</stationid> <stationid>MD180800</stationid> <stationid>MD180800</stationid> <stationid>MD181125</stationid> <stationid>MD181135</stationid> <stationid>MD181135</stationid> <stationid>MD181170</stationid> <stationid>MD181278</stationid> <stationid>MD181685</stationid> <stationid>MD181685</stationid> <stationid>MD181685</stationid> <stationid>MD181710</stationid> <stationid>MD181710</stationid> <stationid>MD181710</stationid> <stationid>MD181862</stationid> <stationid>MD181862</stationid> <stationid>MD181862</stationid> <stationid>MD181995</stationid> <stationid>MD181995</stationid> <stationid>MD181995</stationid> <stationid>MD181995</stationid> <stationid>MD182325</stationid> <stationid>MD182325</stationid> <stationid>MD182325</stationid> <stationid>MD182585</stationid> <stationid>MD182585</stationid> <stationid>MD182585</stationid> <stationid>MD182660</stationid> " & _
@@ -210,21 +259,62 @@ Module BasinsWorkshopBatch
         Else
             Logger.Msg(atcUtility.ReadableFromXML(lResultMetData), "MetDataDownload Result")
         End If
-        SnapShotAndSave("AfterDownloadMetData")
+        SnapShotAndSave("E1_AfterDownloadMetData")
 
         Return True
     End Function
 
     Private Function Exercise2() As Boolean
-        Logger.Dbg("NotYetImplemented")
-        Return False
+        Dim lLayersActive() As String = {"cataloging unit boundaries", "state boundaries", "flowline features", "w_branch"}
+        For Each lLayer As MapWindow.Interfaces.Layer In pMapWin.Layers
+            Dim lLayerName As String = lLayer.Name.ToLower
+            If Array.IndexOf(lLayersActive, lLayerName) = -1 Then
+                lLayer.Visible = False
+            Else
+                lLayer.Visible = True
+                If lLayer.Name.ToLower.Contains("w_branch") Then
+                    pMapWin.Layers.CurrentLayer = lLayer.Handle
+                End If
+            End If
+        Next
+        SnapShotAndSave("E2_AfterLayerSetting")
+
+        Dim lPlugInsActive() As String = {"manual delineation", "watershed delineation"}
+        Dim lManualDelinPlugIn As atcManDelin.PlugIn
+        For lPlugInIndex As Integer = 0 To pMapWin.Plugins.Count - 1
+            Dim lPlugIn As MapWindow.Interfaces.IPlugin = pMapWin.Plugins.Item(lPlugInIndex)
+            If Not lPlugIn Is Nothing Then
+                Dim lPlugInName As String = lPlugIn.Name.ToLower
+                Dim lPlugInKey As String = pMapWin.Plugins.GetPluginKey(lPlugInName)
+                If Array.IndexOf(lPlugInsActive, lPlugInName) >= 0 Then
+                    If pMapWin.Plugins.PluginIsLoaded(lPlugInName) Then
+                        Debug.Print("AlreadyLoaded " & lPlugInName)
+                    Else
+                        pMapWin.Plugins.StartPlugin(lPlugInName)
+                    End If
+                    If lPlugInName.Contains("manual") Then
+                        lManualDelinPlugIn = pMapWin.Plugins(lPlugInIndex)
+                    End If
+                ElseIf lPlugInName.Contains("deli") Then
+                    Debug.Print("Why")
+                End If
+            End If
+        Next
+
+        pMapWin.Layers(pMapWin.Layers.CurrentLayer).ZoomTo()
+        SnapShotAndSave("E2_AfterZoomTo")
+
+        'TODO: Do some more stuff here
+
+        Return True
     End Function
 
     Private Function SnapShotAndSave(ByVal aSnapShotName As String) As Boolean
         Dim lSnapShotName As String = aSnapShotName
         If Not lSnapShotName.ToLower.EndsWith(".png") Then lSnapShotName &= ".png"
-        Debug.Print("ProjectSaved:" & pMapWin.Project.Save(pMapWin.Project.FileName) & ":" & lSnapShotName)
         SnapShot(lSnapShotName)
+        Logger.Dbg("ProjectSavedAndMapSnapshot:" & pMapWin.Project.Save(pMapWin.Project.FileName) & ":" & lSnapShotName)
+        pMapWin.StatusBar.Item(1).Text = IO.Path.GetFileNameWithoutExtension(lSnapShotName)
         Return True
     End Function
 

@@ -536,7 +536,8 @@ StartOver:
                                                    ByVal aDataPath As String, _
                                                    ByVal aNewDataDir As String, _
                                                    ByVal aProjectFileName As String, _
-                                                   Optional ByVal aExistingMapWindowProject As Boolean = False)
+                                                   Optional ByVal aExistingMapWindowProject As Boolean = False, _
+                                                   Optional ByVal aCacheFolder As String = "")
         Dim lQuery As String
         Dim lProjection As String = CleanUpUserProjString(IO.File.ReadAllText(aNewDataDir & "prj.proj"))
         Dim lNationalDir As String = IO.Path.Combine(g_ProgramDir, "Data\national" & g_PathChar)
@@ -550,11 +551,15 @@ StartOver:
             CopyFromIfNeeded("wqobs_prm.dbf", lNationalDir, aNewDataDir)
         End If
 
+        Dim lCacheFolder As String = IO.Path.Combine(aDataPath, "cache")
+        If aCacheFolder.Length > 0 Then
+            lCacheFolder = aCacheFolder
+        End If
         lQuery = "<function name='GetBASINS'>" _
                & "<arguments>" _
                & "<DataType>core31</DataType>" _
                & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
-               & "<CacheFolder>" & IO.Path.Combine(aDataPath, "cache") & "</CacheFolder>" _
+               & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
                & "<DesiredProjection>" & lProjection & "</DesiredProjection>" _
                & aRegion _
                & "<clip>False</clip>" _
