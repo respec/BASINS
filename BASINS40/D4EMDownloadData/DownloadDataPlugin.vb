@@ -215,6 +215,8 @@ Public Class DownloadDataPlugin
                             'Logger.Msg(lResult, "Result of Query from DataManager")
                             If lResult Is Nothing OrElse lResult.Length = 0 Then
                                 'Nothing to report, no success or error
+                            ElseIf lResult.ToLower = "<success />" Then
+                                Logger.Msg("", "Download Complete")
                             ElseIf lResult.StartsWith("<success>") Then
                                 BASINS.ProcessDownloadResults(lResult)
                             Else
