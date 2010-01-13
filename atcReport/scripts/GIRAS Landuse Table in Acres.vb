@@ -53,12 +53,12 @@ Public Module GIRASLanduseTable
                     Next j
                 Next i
 
-                Dim lPathName As String = PathNameOnly(GisUtil.LayerFileName(lLanduseLayerIndex)) & "\landuse"
+                Dim lPathName As String = PathNameOnly(GisUtil.LayerFileName(lLanduseLayerIndex)) & g_PathChar & "landuse"
                 Dim lLandUseFieldName As String
                 Dim lbfirst As Boolean = True
                 For j = 1 To lcluTiles.Count
                     'loop thru each land use tile
-                    lNewFileName = lPathName & "\" & lcluTiles(j) & ".shp"
+                    lNewFileName = lPathName & g_PathChar & lcluTiles(j) & ".shp"
                     If Not GisUtil.AddLayer(lNewFileName, lcluTiles(j)) Then
                         lProblem = "Missing GIRAS Land Use Layer " & lcluTiles(j)
                         Logger.Dbg(lProblem)
@@ -71,7 +71,7 @@ Public Module GIRASLanduseTable
                             GisUtil.Overlay(lcluTiles(j), lLandUseFieldName, _
                                             GisUtil.LayerName(aAreaLayerIndex), _
                                             GisUtil.FieldName(aAreaIDFieldIndex, aAreaLayerIndex), _
-                                            lPathName & "\overlay.shp", lbfirst)
+                                            lPathName & g_PathChar & "overlay.shp", lbfirst)
                             lbfirst = False
                         End If
                     End If
@@ -86,7 +86,7 @@ Public Module GIRASLanduseTable
 
                     'if simple reclassifyfile exists, read it in
                     Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-                    Dim lReclassifyFile As String = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\"
+                    Dim lReclassifyFile As String = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc" & g_PathChar
                     Dim ltmpDbf As IatcTable
                     If FileExists(lReclassifyFile) Then
                         lReclassifyFile = lReclassifyFile & "giras.dbf"
@@ -108,7 +108,7 @@ Public Module GIRASLanduseTable
                     Dim lcSubid As New Collection
                     Dim lcArea As New Collection
                     Dim lincollection As Boolean
-                    ltmpDbf = atcUtility.atcTableOpener.OpenAnyTable(lPathName & "\overlay.dbf")
+                    ltmpDbf = atcUtility.atcTableOpener.OpenAnyTable(lPathName & g_PathChar & "overlay.dbf")
                     For i = 1 To ltmpDbf.NumRecords
                         ltmpDbf.CurrentRecord = i
                         lincollection = False

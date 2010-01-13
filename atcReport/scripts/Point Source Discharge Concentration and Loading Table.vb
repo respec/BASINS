@@ -55,7 +55,7 @@ Public Module PCSDischargeTable
 
             If Len(lProblem) = 0 Then
                 'open PCS loading dbfs
-                Dim lpcspath As String = PathNameOnly(GisUtil.LayerFileName(lPCSLayerIndex)) & "\pcs\"
+                Dim lpcspath As String = PathNameOnly(GisUtil.LayerFileName(lPCSLayerIndex)) & g_PathChar & "pcs" & g_PathChar
                 Dim lallFiles As New NameValueCollection
                 Dim lcNpdes As New Collection
                 Dim lcParm As New Collection
@@ -88,7 +88,7 @@ Public Module PCSDischargeTable
 
                 If Len(lProblem) = 0 Then
                     'read in parm name table
-                    lpcspath = PathNameOnly(GisUtil.LayerFileName(lPCSLayerIndex)) & "\pcs3_prm.dbf"
+                    lpcspath = PathNameOnly(GisUtil.LayerFileName(lPCSLayerIndex)) & g_PathChar & "pcs3_prm.dbf"
                     ltmpDbf = atcUtility.atcTableOpener.OpenAnyTable(lpcspath)
                     Dim lcParmCode As New Collection
                     Dim lcParmName As New Collection

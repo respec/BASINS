@@ -284,7 +284,7 @@ Public Class frmDownload
             lCacheFolder = "<CacheFolder>" & lCacheFolder & "</CacheFolder>" & vbCrLf
 
             Dim lCacheOnly As String = ""
-            If chkCacheOnly.Checked Then lCacheOnly = "<cacheonly>" & chkCacheOnly.Checked & "</cacheonly>" & vbCrLf
+            If chkCacheOnly.Checked Then lCacheOnly = "<CacheOnly>" & chkCacheOnly.Checked & "</CacheOnly>" & vbCrLf
 
             Dim lSaveFolderOnly As String = ""
             Dim lSaveFolder As String = ""
@@ -567,8 +567,8 @@ Public Class frmDownload
         If chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.GrayText Then
             If chkBASINS_MetData.Checked Then
                 MapWinUtility.Logger.Msg("1. Download BASINS Met Stations" & vbCrLf _
-                                       & "2. Choose the Weather Station Sites layer on the map" & vbCrLf _
-                                       & "3. Selected stations to get data for on the map" & vbCrLf _
+                                       & "2. In the map legend, choose the Weather Station Sites layer" & vbCrLf _
+                                       & "3. On the map, select the stations to get data from" & vbCrLf _
                                        & "4. Download BASINS Met Data", "One or more Met Stations must be selected")
                 chkBASINS_MetData.Checked = False
             End If
