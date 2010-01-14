@@ -687,7 +687,7 @@ Public Class frmManDelin
             Dim lElevationThemeName As String = cboDEM.Items(cboDEM.SelectedIndex)
             Dim lElevationUnitsName As String = cboUnits.Items(cboUnits.SelectedIndex)
             pProgressStatus.ProgressLabel = lblCalc
-            CalculateSubbasinParameters(lSubbasinThemeName, lElevationThemeName, lElevationUnitsName)
+            ManDelinPlugIn.CalculateSubbasinParameters(lSubbasinThemeName, lElevationThemeName, lElevationUnitsName)
         Else
             Logger.Msg("No Subbasin Layer to Calculate Paramters for")
         End If
@@ -707,7 +707,7 @@ Public Class frmManDelin
 
         Dim lOutletShapeFileName As String = ""
         Dim lElevationUnitsName As String = cboUnits.Items(cboUnits.SelectedIndex)
-        CalculateReaches(lSubbasinThemeName, lReachThemeName, cboDEM.Items(cboDEM.SelectedIndex), _
+        ManDelinPlugIn.CalculateReaches(lSubbasinThemeName, lReachThemeName, cboDEM.Items(cboDEM.SelectedIndex), _
                          cbxPCS.Checked, cbxCombine.Checked, lOutletShapeFileName, lElevationUnitsName)
 
         'add outlets layer to the map
