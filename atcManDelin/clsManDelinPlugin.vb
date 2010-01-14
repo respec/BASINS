@@ -2,7 +2,7 @@ Imports atcUtility
 Imports atcMwGisUtility
 Imports MapWinUtility
 
-Public Class PlugIn
+Public Class ManDelinPlugIn
     Implements MapWindow.Interfaces.IPlugin
 
     Private pMapWin As MapWindow.Interfaces.IMapWin
@@ -154,10 +154,8 @@ Public Class PlugIn
     <CLSCompliant(False)> _
     Public Sub ShapesSelected(ByVal Handle As Integer, ByVal SelectInfo As MapWindow.Interfaces.SelectInfo) Implements MapWindow.Interfaces.IPlugin.ShapesSelected
     End Sub
-End Class
 
-Module ManDelin
-    Public Sub CalculateSubbasinParameters(ByVal aSubBasinThemeName As String, ByVal aElevationThemeName As String, _
+    Public Shared Sub CalculateSubbasinParameters(ByVal aSubBasinThemeName As String, ByVal aElevationThemeName As String, _
                                            Optional ByVal aElevUnits As String = "Meters")
         Logger.Status("Calculating...")
         Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(aSubBasinThemeName)
@@ -325,7 +323,7 @@ Module ManDelin
         Logger.Status("")
     End Sub
 
-    Sub CalculateReaches(ByVal aSubbasinThemeName As String, ByVal aReachThemeName As String, _
+    Public Shared Sub CalculateReaches(ByVal aSubbasinThemeName As String, ByVal aReachThemeName As String, _
                          ByVal aElevationThemeName As String, ByVal aPCS As Boolean, ByVal aCombine As Boolean, _
                          ByRef aOutletThemeName As String, Optional ByVal aElevUnits As String = "Meters")
         Logger.Status("Calculating...")
@@ -837,8 +835,7 @@ Module ManDelin
 
         Logger.Status("")
     End Sub
-
-End Module
+End Class
 
 Public Class clsProgressStatus
     Implements MapWinUtility.IProgressStatus
