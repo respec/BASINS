@@ -25,13 +25,21 @@ Enum endpoints
 End Enum
 Module catGraph
     Private pflowBase As Double = 1223.2 'cfs
-
+    'Private pTrial As String = "Trial1"
+    Private pTrial As String = "Trial2"
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Dim lZgc As ZedGraphControl
         lZgc = CreateZgc()
         Dim lGraphSaveWidth As Integer = 1000
         Dim lGraphSaveHeight As Integer = 600
         Dim lfilename As String = ""
+        If pTrial = "Trial1" Then
+            lfilename = "C:\ZDocs\mono_luChange\graphs\zedGraphs\test.emf"
+        ElseIf pTrial = "Trial2" Then
+            lfilename = "G:\ZDocs\Graphing\test.emf"
+            GoTo DOGRAPH
+        End If
+
         Dim labelsArrayList As New ArrayList()
         Dim lemScen As String = "A2" ' <<< change this for B2
 
@@ -151,13 +159,15 @@ Module catGraph
             labels(i) = labelsArrayList(i)
         Next
 
+DOGRAPH:
         'CreateTornado(lZgc, labels, hilowList, listcccm, "Scenario", "Flow")
-        CreateTornadoOHLC(lZgc, labels, spl, listcccm, listccsr, listcsir, listechm, listgfdl, listhadc, listncar, "Scenario", "Flow")
+        'CreateTornadoOHLC(lZgc, labels, spl, listcccm, listccsr, listcsir, listechm, listgfdl, listhadc, listncar, "Scenario", "Flow")
         'CreateChart1(lZgc)
         'CreateChartHBar(lZgc)
         'CreateChartErrorBar(lZgc)
         'CreateChartOHLC(lZgc)
         'CreateGraphCandlestick(lZgc)
+        CreateChartTD(lZgc)
         lZgc.SaveAs(lfilename)
         OpenFile(lfilename)
     End Sub
@@ -197,7 +207,7 @@ Module catGraph
         myPane.Title.Text = ""
         myPane.XAxis.Title.Text = ""
         myPane.YAxis.Title.Text = aytitle
-        myPane.BarSettings.Base = BarBase.X
+        myPane.BarSettings.Base = BarBase.Y
         'myPane.Fill = lpaneBgfill
         'myPane.Fill.Type = FillType.None
         myPane.Margin.Bottom = 100
@@ -372,6 +382,7 @@ Module catGraph
         azgc.AxisChange()
     End Sub
     ' Call this method from the Form_Load method, passing your ZedGraphControl
+
     Public Sub CreateChartOHLC(ByVal zgc As ZedGraphControl)
         Dim myPane As GraphPane = zgc.GraphPane
 
@@ -448,7 +459,6 @@ Module catGraph
         ' Tell ZedGraph to calculate the axis ranges
         zgc.AxisChange()
     End Sub
-
 
     ' Call this method from the Form_Load method, passing your ZedGraphControl
     Private Sub CreateGraphCandlestick(ByVal zgc As ZedGraphControl)
@@ -589,7 +599,6 @@ Module catGraph
 
         BarItem.CreateBarLabels(myPane, False, "f0")
     End Sub
-
 
     ' Call this method from the Form_Load method, passing your ZedGraphControl
     Public Sub CreateChart1(ByVal zgc As ZedGraphControl)
@@ -819,6 +828,65 @@ Module catGraph
         lText.Location.AlignH = AlignH.Left
         lText.Location.AlignV = AlignV.Top
         aPane.GraphObjList.Add(lText)
+    End Sub
+
+    ' Call this method from the Form_Load method, passing your ZedGraphControl
+    Public Sub CreateChartTD(ByVal zgc As ZedGraphControl)
+        Dim myPane As GraphPane = zgc.GraphPane
+
+        ' Set the title and axis labels
+
+        'Scenario	LowPct	HiPct
+        '(8) RS	0	7.62
+        '(17) AFNSTRS	-1.96	5.03
+        '(21) AFRate	-5.36	3.58
+        '(27) PCP	-6.38	4.32
+        '(59) AFEff	-12.20	12.70
+        '(64) TMP	-39.03	-5.99
+
+        myPane.Title.Text = "N Applied"
+        myPane.YAxis.Title.Text = "Scenarios"
+        myPane.XAxis.Title.Text = "Percent change from baseline value (%)"
+        myPane.Legend.Position = LegendPos.TopCenter
+        myPane.Legend.IsVisible = False
+
+        ' Make up some data points
+        Dim labels As String() = {"(8) RS", "(17) AFNSTRS", "(21) AFRate", "(27) PCP", "(59) AFEff", "(64) TMP"}
+
+        Dim x As Double() = {0, -1.96, -5.36, -6.38, -12.2, -39.03}
+        Dim x2 As Double() = {7.62, 5.03, 3.58, 4.32, 12.7, -5.99}
+
+        ' Generate a blue bar with "Curve 2" in the legend
+        Dim myCurve As BarItem = myPane.AddBar("", x2, Nothing, Color.Blue)
+        ' Fill the bar with a Blue-white-Blue color gradient for a 3d look
+        myCurve.Bar.Fill = New Fill(Color.Red, Color.White, Color.Blue, 90.0F)
+        myCurve.Item(5).ColorValue = 0.0
+
+        ' Generate a red bar with "Curve 1" in the legend
+        myCurve = myPane.AddBar("", x, Nothing, Color.Blue)
+        ' Fill the bar with a red-white-red color gradient for a 3d look
+        myCurve.Bar.Fill = New Fill(Color.Blue, Color.White, Color.Blue, 90.0F)
+
+
+        ' Draw the Y tics between the labels instead of at the labels
+        myPane.YAxis.MajorTic.IsBetweenLabels = True
+
+        ' Set the YAxis labels
+        myPane.YAxis.Scale.TextLabels = labels
+        ' Set the YAxis to Text type
+        myPane.YAxis.Type = AxisType.Text
+
+        ' Set the bar type to stack, which stacks the bars by automatically accumulating the values
+        myPane.BarSettings.Type = BarType.Overlay ' Important
+
+        ' Make the bars horizontal by setting the BarBase to "Y"
+        myPane.BarSettings.Base = BarBase.Y  ' Important
+
+        ' Fill the chart background with a color gradient
+        myPane.Chart.Fill = New Fill(Color.White, Color.FromArgb(255, 255, 166), 45.0F)
+
+        ' Calculate the Axis Scale Ranges
+        zgc.AxisChange()
     End Sub
 
 End Module
