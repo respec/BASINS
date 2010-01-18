@@ -14,7 +14,7 @@ Friend Class atcDataTreeForm
         If aDataGroup Is Nothing Then aDataGroup = New atcTimeseriesGroup
 
         If aDataGroup.Count = 0 Then 'ask user to specify some Data
-            atcDataManager.UserSelectData(, aDataGroup)
+            aDataGroup = atcDataManager.UserSelectData(, aDataGroup)
         End If
 
         If aDataGroup.Count > 0 Then

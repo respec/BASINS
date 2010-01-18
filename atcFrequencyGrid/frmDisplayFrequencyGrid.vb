@@ -29,7 +29,7 @@ Friend Class frmDisplayFrequencyGrid
         Next
 
         If pDataGroup.Count = 0 Then 'ask user to specify some Data
-            atcDataManager.UserSelectData(, pDataGroup)
+            pDataGroup = atcDataManager.UserSelectData(, pDataGroup)
         End If
 
         If pDataGroup.Count > 0 Then
@@ -314,7 +314,7 @@ Friend Class frmDisplayFrequencyGrid
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
         pInitializing = True
-        pDataGroup = atcDataManager.UserSelectData(, pDataGroup)
+        atcDataManager.UserSelectData(, pDataGroup)
         pInitializing = False
         PopulateGrid()
     End Sub

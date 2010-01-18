@@ -36,7 +36,7 @@ Public Class atcGraphPlugin
         Dim lTimeseriesGroup As atcTimeseriesGroup = aTimeseriesGroup
         If lTimeseriesGroup Is Nothing Then lTimeseriesGroup = New atcTimeseriesGroup
         If lTimeseriesGroup.Count = 0 Then 'ask user to specify some Data
-            atcDataManager.UserSelectData("Select Data To Graph", lTimeseriesGroup)
+            lTimeseriesGroup = atcDataManager.UserSelectData("Select Data To Graph", lTimeseriesGroup)
         End If
 
         If lTimeseriesGroup.Count > 0 Then

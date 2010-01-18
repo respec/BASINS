@@ -52,7 +52,7 @@ Public Class frmSynoptic
         Next
 
         If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
-            atcDataManager.UserSelectData("Select Data for Synoptic Analysis", pDataGroup)
+            pDataGroup = atcDataManager.UserSelectData("Select Data for Synoptic Analysis", pDataGroup)
         End If
 
         If pDataGroup.Count > 0 Then
