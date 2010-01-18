@@ -569,7 +569,7 @@ FoundDir:
 
     Public Sub ProjectLoading(ByVal aProjectFile As String, ByVal aSettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectLoading
         CloseForms()
-        If Not aProjectFile Is Nothing AndAlso aProjectFile.Length > 0 Then
+        If aProjectFile IsNot Nothing AndAlso aProjectFile.Length > 0 Then
             Try
                 ChDriveDir(IO.Path.GetDirectoryName(aProjectFile))
             Catch
