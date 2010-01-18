@@ -251,7 +251,7 @@ Public Class atcListForm
         End If
 
         If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
-            atcDataManager.UserSelectData(, pDataGroup)
+            pDataGroup = atcDataManager.UserSelectData(, pDataGroup)
         End If
 
         If pDataGroup.Count > 0 Then

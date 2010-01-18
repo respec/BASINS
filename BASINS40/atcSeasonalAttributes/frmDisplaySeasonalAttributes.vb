@@ -28,7 +28,7 @@ Friend Class frmDisplaySeasonalAttributes
         Next
 
         If pTimeseriesGroup.Count = 0 Then 'ask user to specify some Data
-            atcDataManager.UserSelectData(, pTimeseriesGroup)
+            pTimeseriesGroup = atcDataManager.UserSelectData(, pTimeseriesGroup)
         End If
 
         pInitializing = False
