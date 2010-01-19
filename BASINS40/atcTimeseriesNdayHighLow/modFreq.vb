@@ -32,37 +32,37 @@ Module modFreq
                                               ByRef TAU As Single, _
                                               ByRef PLEVEL As Single, _
                                               ByRef SLOPE As Single)
-    Private Declare Sub EMAFITB Lib "usgs_swstats.dll" (ByRef N As Integer, _
-                                               ByVal QL_IN() As Single, _
-                                               ByVal QU_IN() As Single, _
-                                               ByVal TL_IN() As Single, _
-                                               ByVal TU_IN() As Single, _
-                                               ByRef REG_SKEW As Single, _
-                                               ByRef REG_MSE As Single, _
-                                               ByRef NEPS As Integer, _
-                                               ByVal EPS() As Single, _
-                                               ByRef GBTHRSH0 As Single, _
-                                               ByRef PQ As Single, _
-                                               ByVal CMOMS(,) As Single, _
-                                               ByRef YP As Single, _
-                                               ByVal CI_LOW() As Single, _
-                                               ByVal CI_HIGH() As Single, _
-                                               ByVal VAR_EST() As Single)
-    Private Declare Sub VAR_EMA Lib "usgs_swstats.dll" (ByRef NT As Integer, _
-                                               ByVal NOBS() As Double, _
-                                               ByVal TL_IN() As Double, _
-                                               ByVal TU_IN() As Double, _
-                                               ByVal CMOMS() As Double, _
-                                               ByRef PQ As Double, _
-                                               ByRef REG_MSE As Double, _
-                                               ByRef YP As Double, _
-                                               ByVal VAR_EST(,) As Double)
-    Private Declare Sub CI_EMA_M3 Lib "usgs_swstats.dll" (ByRef YP As Double, _
-                                               ByVal VAR_EST(,) As Double, _
-                                               ByRef NEPS As Integer, _
-                                               ByVal EPS() As Double, _
-                                               ByVal CI_LOW() As Double, _
-                                               ByVal CI_HIGH() As Double)
+    'Private Declare Sub EMAFITB Lib "usgs_swstats.dll" (ByRef N As Integer, _
+    '                                           ByVal QL_IN() As Single, _
+    '                                           ByVal QU_IN() As Single, _
+    '                                           ByVal TL_IN() As Single, _
+    '                                           ByVal TU_IN() As Single, _
+    '                                           ByRef REG_SKEW As Single, _
+    '                                           ByRef REG_MSE As Single, _
+    '                                           ByRef NEPS As Integer, _
+    '                                           ByVal EPS() As Single, _
+    '                                           ByRef GBTHRSH0 As Single, _
+    '                                           ByRef PQ As Single, _
+    '                                           ByVal CMOMS(,) As Single, _
+    '                                           ByRef YP As Single, _
+    '                                           ByVal CI_LOW() As Single, _
+    '                                           ByVal CI_HIGH() As Single, _
+    '                                           ByVal VAR_EST() As Single)
+    'Private Declare Sub VAR_EMA Lib "usgs_swstats.dll" (ByRef NT As Integer, _
+    '                                           ByVal NOBS() As Double, _
+    '                                           ByVal TL_IN() As Double, _
+    '                                           ByVal TU_IN() As Double, _
+    '                                           ByVal CMOMS() As Double, _
+    '                                           ByRef PQ As Double, _
+    '                                           ByRef REG_MSE As Double, _
+    '                                           ByRef YP As Double, _
+    '                                           ByVal VAR_EST(,) As Double)
+    'Private Declare Sub CI_EMA_M3 Lib "usgs_swstats.dll" (ByRef YP As Double, _
+    '                                           ByVal VAR_EST(,) As Double, _
+    '                                           ByRef NEPS As Integer, _
+    '                                           ByVal EPS() As Double, _
+    '                                           ByVal CI_LOW() As Double, _
+    '                                           ByVal CI_HIGH() As Double)
 
 
     'Kendall Tau Calculation
@@ -209,42 +209,42 @@ Module modFreq
                 lCMoms(1) = lStd ^ 2 'needs to be variance (std dev squared)
                 lCMoms(2) = lSkew
 
-                Dim lCalcEMA As Boolean = aTs.Attributes.GetValue("CalcEMA", False)
-
+                'Dim lCalcEMA As Boolean = aTs.Attributes.GetValue("CalcEMA", False)
                 'If lCalcEMA Then
-                For i As Integer = 0 To lIntervalMax
-                    If aHigh Then
-                        lPQ = 1 - lP(i)
-                    Else
-                        lPQ = lP(i)
-                    End If
-                    If Math.Abs(lCMoms(2)) > lSkewMin Then
-                        VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray) 'CDbl(lP(i)), lmse, lyp(i), lVarEstArray)
-                        CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal, lCIHighVal)
-                        lCILow(i) = lCILowVal(0)
-                        lCIHigh(i) = lCIHighVal(0)
-                    Else 'for skews close to zero, compute a weighted sum/interpolate values
-                        lCMoms(2) = -lSkewMin
-                        VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray)
-                        CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal, lCIHighVal)
+                '    For i As Integer = 0 To lIntervalMax
+                '        If aHigh Then
+                '            lPQ = 1 - lP(i)
+                '        Else
+                '            lPQ = lP(i)
+                '        End If
+                '        If Math.Abs(lCMoms(2)) > lSkewMin Then
+                '            VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray) 'CDbl(lP(i)), lmse, lyp(i), lVarEstArray)
+                '            CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal, lCIHighVal)
+                '            lCILow(i) = lCILowVal(0)
+                '            lCIHigh(i) = lCIHighVal(0)
+                '        Else 'for skews close to zero, compute a weighted sum/interpolate values
+                '            lCMoms(2) = -lSkewMin
+                '            VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray)
+                '            CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal, lCIHighVal)
 
-                        lCMoms(2) = lSkewMin
-                        VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray)
-                        CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal2, lCIHighVal2)
+                '            lCMoms(2) = lSkewMin
+                '            VAR_EMA(lneps, lNobs, lTL, lTU, lCMoms, lPQ, lmse, lyp, lVarEstArray)
+                '            CI_EMA_M3(lyp, lVarEstArray, lneps, leps, lCILowVal2, lCIHighVal2)
 
-                        lWt = (lSkew + lSkewMin) / (2 * lSkewMin) 'weight to attach to positive skew
-                        lCILow(i) = (1 - lWt) * lCILowVal(0) + lWt * lCILowVal2(0)
-                        lCIHigh(i) = (1 - lWt) * lCIHighVal2(0) + lWt * lCIHighVal2(0)
-                    End If
-                    If aLogFg Then
-                        lCILow(i) = 10 ^ lCILow(i)
-                        lCIHigh(i) = 10 ^ lCIHigh(i)
-                        lVarEst(i) = 10 ^ lVarEstArray(0, 0)
-                    Else
-                        lVarEst(i) = lVarEstArray(0, 0)
-                    End If
-                Next i
+                '            lWt = (lSkew + lSkewMin) / (2 * lSkewMin) 'weight to attach to positive skew
+                '            lCILow(i) = (1 - lWt) * lCILowVal(0) + lWt * lCILowVal2(0)
+                '            lCIHigh(i) = (1 - lWt) * lCIHighVal2(0) + lWt * lCIHighVal2(0)
+                '        End If
+                '        If aLogFg Then
+                '            lCILow(i) = 10 ^ lCILow(i)
+                '            lCIHigh(i) = 10 ^ lCIHigh(i)
+                '            lVarEst(i) = 10 ^ lVarEstArray(0, 0)
+                '        Else
+                '            lVarEst(i) = lVarEstArray(0, 0)
+                '        End If
+                '    Next i
                 'End If
+
                 Dim lMsg As String = ""
 
                 Dim lNday As Integer = aTs.Attributes.GetValue("NDay")

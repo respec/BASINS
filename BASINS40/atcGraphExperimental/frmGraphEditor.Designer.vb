@@ -591,6 +591,7 @@ Partial Class frmGraphEditor
         Me.panelProbability.Name = "panelProbability"
         Me.panelProbability.Size = New System.Drawing.Size(379, 28)
         Me.panelProbability.TabIndex = 39
+        Me.panelProbability.Visible = False
         '
         'radioProbablilityReturnPeriod
         '
