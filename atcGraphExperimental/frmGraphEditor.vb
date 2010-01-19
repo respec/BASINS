@@ -115,19 +115,22 @@ Public Class frmGraphEditor
             radioAxisProbability.Enabled = False
             Select Case aAxis.Type
                 Case AxisType.DateDual
+                    panelProbability.Visible = False
                     radioAxisTime.Checked = True
                 Case AxisType.Linear
+                    panelProbability.Visible = False
                     radioAxisLinear.Enabled = True
                     radioAxisLogarithmic.Enabled = True
                     radioAxisLinear.Checked = True
                 Case AxisType.Log
+                    panelProbability.Visible = False
                     radioAxisLinear.Enabled = True
                     radioAxisLogarithmic.Enabled = True
                     radioAxisLogarithmic.Checked = True
                 Case AxisType.Probability
+                    panelProbability.Visible = True
                     radioAxisProbability.Checked = True
                     panelAxisType.Visible = False
-                    panelProbability.Visible = True
                     Dim lProbScale As ZedGraph.ProbabilityScale = aAxis.Scale
                     Select Case lProbScale.LabelStyle
                         Case ProbabilityScale.ProbabilityLabelStyle.Percent
