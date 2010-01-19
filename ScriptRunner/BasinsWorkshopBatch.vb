@@ -1,4 +1,6 @@
-﻿Imports System.Collections.Specialized
+Imports System
+Imports System.Collections 
+Imports System.Collections.Specialized
 Imports MapWindow.Interfaces
 Imports MapWinUtility
 
@@ -65,7 +67,7 @@ Module BasinsWorkshopBatch
                         lPlugins.Add(pMapWin.Plugins.Item(lPluginIndex))
                     End If
                 Catch lEx As Exception
-                    Debug.Print(lPluginIndex.ToString & " Problem:" & lEx.ToString)
+                    Logger.Dbg(lPluginIndex.ToString & " Problem:" & lEx.ToString)
                 End Try
             Next
             Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
@@ -82,6 +84,7 @@ Module BasinsWorkshopBatch
         Catch lEx As Exception
             Logger.Dbg("Problem " & lEx.ToString)
         End Try
+        SnapShotAndSave("AllDone")
         IO.Directory.SetCurrentDirectory(lOriginalFolder)
         Logger.Dbg("BasinsWorkshopBatchDone")
         Logger.StartToFile(lOriginalLog, True, , True)
@@ -95,7 +98,7 @@ Module BasinsWorkshopBatch
         '  TODO: open National Project and select Patuxent in code
 
         '  create project
-        Dim lProjection As String = "proj +proj=utm +zone=18 +ellps=GRS80 +lon_0=-75 +lat_0=0 +k=0.9996 +x_0=500000.0 +y_0=0 end "
+        Dim lProjection As String = "+proj=utm +zone=18 +ellps=GRS80 +lon_0=-75 +lat_0=0 +k=0.9996 +x_0=500000.0 +y_0=0 +datum=NAD83 +units=m"
         SaveFileString(aBasinsProjectDataFolder & "prj.proj", lProjection) 'Side effect: makes data directory
         IO.Directory.SetCurrentDirectory(aBasinsProjectDataFolder)
         If Not IO.Directory.Exists("snapshots") Then IO.Directory.CreateDirectory("snapshots")
@@ -216,11 +219,11 @@ Module BasinsWorkshopBatch
             End If
         Next
 
-        Dim lPreDefDelinDir As String = aBasinsProjectDataFolder & "Predefined Delineations\"
+        Dim lPreDefDelinDir As String = aBasinsProjectDataFolder & "tutorial\"
         If Not IO.Directory.Exists(lPreDefDelinDir) Then
             IO.Directory.CreateDirectory(lPreDefDelinDir)
         End If
-        For Each lFileName As String In IO.Directory.GetFiles(aBasinsProjectDataFolder.Replace("WorkshopBatch\", "WorkshopFiles\Predefined Delineations\"))
+        For Each lFileName As String In IO.Directory.GetFiles(aBasinsProjectDataFolder.Replace("WorkshopBatch\", "tutorial\"))
             IO.File.Copy(lFileName, lPreDefDelinDir & IO.Path.GetFileName(lFileName))
         Next
         Dim lPreDefDelinFile As String = lPreDefDelinDir & "w_branch.shp"
@@ -245,7 +248,7 @@ Module BasinsWorkshopBatch
         Else
             Logger.Msg(atcUtility.ReadableFromXML(lResultMetStations), "MetStationsDownload Result")
         End If
-        Debug.Print("ProjectSaved:" & pMapWin.Project.Save(pMapWin.Project.FileName))
+        Logger.Dbg("ProjectSaved:" & pMapWin.Project.Save(pMapWin.Project.FileName))
 
         Dim lQueryMetData As String = "<function name='GetBASINS'> <arguments> <DataType>MetData</DataType>" & _
                                       "<SaveWDM>" & aBasinsProjectDataFolder & "met\met.wdm</SaveWDM>" & _
@@ -296,7 +299,7 @@ Module BasinsWorkshopBatch
                 Dim lPlugInKey As String = pMapWin.Plugins.GetPluginKey(lPlugInName)
                 If Array.IndexOf(lPlugInsActive, lPlugInName) >= 0 Then
                     If pMapWin.Plugins.PluginIsLoaded(lPlugInName) Then
-                        Debug.Print("AlreadyLoaded " & lPlugInName)
+                        Logger.Dbg("AlreadyLoaded " & lPlugInName)
                     Else
                         pMapWin.Plugins.StartPlugin(lPlugInName)
                     End If
@@ -304,7 +307,7 @@ Module BasinsWorkshopBatch
                         lManualDelinPlugIn = pMapWin.Plugins(lPlugInIndex)
                     End If
                 ElseIf lPlugInName.Contains("deli") Then
-                    Debug.Print("Why")
+                    Logger.Dbg("WhyGotHere:" & lPlugInName)
                 End If
             End If
         Next
@@ -355,7 +358,7 @@ Module BasinsWorkshopBatch
         Return True
     End Function
 
-    Private Function Exercise6(ByVal aBasinsProjectDataFolder As String)
+    Private Function Exercise6(ByVal aBasinsProjectDataFolder As String) As Boolean
         Dim lOutputFolder As String = aBasinsProjectDataFolder & "ReportsAndGraphs\"
         If Not IO.Directory.Exists(lOutputFolder) Then
             IO.Directory.CreateDirectory(lOutputFolder)
@@ -392,8 +395,8 @@ Module BasinsWorkshopBatch
         'TODO: set what to list explicitly here
         lList.Save(lDataGroup, lOutputFolder & "List.txt")
 
-        Dim lStats As New atcSWSTAT.clsSWSTATPlugin
-        lStats.Save(lDataGroup, lOutputFolder & "Stats.txt")
+        'Dim lStats As New atcSWSTAT.clsSWSTATPlugin
+        'lStats.Save(lDataGroup, lOutputFolder & "Stats.txt")
 
         Return True
     End Function
