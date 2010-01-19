@@ -288,17 +288,19 @@ Public Module modFile
                 lHelpProcess = Nothing
             End If
 
-            If Not IO.File.Exists(lHelpFilename) Then
-                lHelpFilename = FindFile("Please locate BASINS 4 help file", "Basins4.0.chm")
-            End If
+            If Not aHelpTopic.Equals("CLOSE") Then
+                If Not IO.File.Exists(lHelpFilename) Then
+                    lHelpFilename = FindFile("Please locate BASINS 4 help file", "Basins4.0.chm")
+                End If
 
-            If IO.File.Exists(lHelpFilename) Then
-                If aHelpTopic.Length < 1 Then
-                    Logger.Dbg("Showing help file '" & lHelpFilename & "'")
-                    lHelpProcess = Process.Start("hh.exe", lHelpFilename)
-                ElseIf Not aHelpTopic.Equals("CLOSE") Then
-                    Logger.Dbg("Showing help file '" & lHelpFilename & "' topic '" & aHelpTopic & "'")
-                    lHelpProcess = Process.Start("hh.exe", "mk:@MSITStore:" & lHelpFilename & "::/" & aHelpTopic)
+                If IO.File.Exists(lHelpFilename) Then
+                    If aHelpTopic.Length < 1 Then
+                        Logger.Dbg("Showing help file '" & lHelpFilename & "'")
+                        lHelpProcess = Process.Start("hh.exe", lHelpFilename)
+                    Else
+                        Logger.Dbg("Showing help file '" & lHelpFilename & "' topic '" & aHelpTopic & "'")
+                        lHelpProcess = Process.Start("hh.exe", "mk:@MSITStore:" & lHelpFilename & "::/" & aHelpTopic)
+                    End If
                 End If
             End If
         End If

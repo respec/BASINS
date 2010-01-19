@@ -152,6 +152,10 @@ FoundMatch:
             lYaxisNames.Add(lTimeseries.Serial, lYAxisName)
         Next
 
+        If lAuxDataSets.Count > 0 Then
+            EnableAuxAxis(aZgc.MasterPane, True, 0.2)
+        End If
+
         For Each lTimeseries As atcTimeseries In aDataGroup
             Dim lCurve As ZedGraph.CurveItem = AddTimeseriesCurve(lTimeseries, aZgc, lYaxisNames.ItemByKey(lTimeseries.Serial))
             lCurve.Label.Text = TSCurveLabel(lTimeseries, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
@@ -296,6 +300,7 @@ FoundMatch:
         End Select
 
         lYAxis.IsVisible = True
+        lYAxis.Scale.IsVisible = True
 
         With lPane
             If .XAxis.Type <> AxisType.DateDual Then
@@ -429,14 +434,17 @@ FoundMatch:
                 .PaneList.Add(lPaneAux)
                 .PaneList.Add(lPaneMain)
                 .SetLayout(lGraphics, PaneLayout.SingleColumn)
+                .IsCommonScaleFactor = True
                 Dim lOrigAuxHeight As Single = lPaneAux.Rect.Height
                 Dim lTotalPaneHeight As Single = lPaneMain.Rect.Height + lOrigAuxHeight
+                Dim lPaneX As Single = Math.Max(lPaneAux.Rect.X, lPaneMain.Rect.X)
+                Dim lPaneWidth As Single = Math.Min(lPaneAux.Rect.Width, lPaneMain.Rect.Width)
                 lPaneAux.Rect = New System.Drawing.Rectangle( _
-                        lPaneAux.Rect.X, lPaneAux.Rect.Y, _
-                        lPaneAux.Rect.Width, lTotalPaneHeight * aAuxFraction)
+                        lPaneX, lPaneAux.Rect.Y, _
+                        lPaneWidth, lTotalPaneHeight * aAuxFraction)
                 lPaneMain.Rect = New System.Drawing.Rectangle( _
-                        lPaneMain.Rect.X, lPaneMain.Rect.Y - lOrigAuxHeight + lPaneAux.Rect.Height, _
-                        lPaneMain.Rect.Width, lTotalPaneHeight - lPaneAux.Rect.Height)
+                        lPaneX, lPaneMain.Rect.Y - lOrigAuxHeight + lPaneAux.Rect.Height, _
+                        lPaneWidth, lTotalPaneHeight - lPaneAux.Rect.Height)
             End With
         Else
             aMasterPane.PaneList.Add(lPaneMain)
@@ -534,52 +542,9 @@ FoundMatch:
             With .X2Axis
                 .IsVisible = False
             End With
-            With .YAxis
-                .Scale.IsUseTenPower = False
-                .Scale.FontSpec.Size = 14
-                .Scale.FontSpec.IsBold = True
-                .Title.IsOmitMag = True
-                .Scale.Mag = 0
-                .MajorGrid.IsVisible = True
-                .MajorTic.IsOutside = False
-                .MajorTic.IsInside = True
-                .MinorTic.IsOutside = False
-                .MinorTic.IsInside = True
-                .Scale.Format = DefaultAxisLabelFormat
-                .Scale.Align = AlignP.Inside
-                With .MajorGrid
-                    .Color = DefaultMajorGridColor
-                    .DashOn = 0
-                    .DashOff = 0
-                    .IsVisible = True
-                End With
-                With .MinorGrid
-                    .Color = DefaultMinorGridColor
-                    .DashOn = 0
-                    .DashOff = 0
-                    .IsVisible = True
-                End With
-            End With
-            With .Y2Axis
-                .MajorTic.IsOutside = False
-                .MajorTic.IsInside = True
-                .MinorTic.IsOutside = False
-                .MinorTic.IsInside = True
-                .Scale.Format = DefaultAxisLabelFormat
-                .Scale.Align = AlignP.Inside
-                With .MajorGrid
-                    .Color = DefaultMajorGridColor
-                    .DashOn = 0
-                    .DashOff = 0
-                    .IsVisible = True
-                End With
-                With .MinorGrid
-                    .Color = DefaultMinorGridColor
-                    .DashOn = 0
-                    .DashOff = 0
-                    .IsVisible = True
-                End With
-            End With
+            SetYaxisDefaults(.YAxis)
+            SetYaxisDefaults(.Y2Axis)
+            .Y2Axis.Scale.IsVisible = False 'Default to not labeling on Y2, will be turned on later if different from Y
             With .Legend
                 .Position = LegendPos.Float
                 .Location = New Location(0.05, 0.05, CoordType.ChartFraction, AlignH.Left, AlignV.Top)
@@ -591,6 +556,34 @@ FoundMatch:
         End With
     End Sub
 
+    Private Sub SetYaxisDefaults(ByVal aYaxis As Axis)
+        With aYaxis
+            .Title.IsOmitMag = True
+            .MajorGrid.IsVisible = True
+            .MajorTic.IsOutside = False
+            .MajorTic.IsInside = True
+            .MinorTic.IsOutside = False
+            .MinorTic.IsInside = True
+            .Scale.IsUseTenPower = False
+            .Scale.FontSpec.Size = 14
+            .Scale.FontSpec.IsBold = True
+            .Scale.Mag = 0
+            .Scale.Format = DefaultAxisLabelFormat
+            .Scale.Align = AlignP.Inside
+            With .MajorGrid
+                .Color = DefaultMajorGridColor
+                .DashOn = 0
+                .DashOff = 0
+                .IsVisible = True
+            End With
+            With .MinorGrid
+                .Color = DefaultMinorGridColor
+                .DashOn = 0
+                .DashOff = 0
+                .IsVisible = True
+            End With
+        End With
+    End Sub
 
     <CLSCompliant(False)> _
     Public Sub ScaleAxis(ByVal aDataGroup As atcTimeseriesGroup, ByVal aAxis As Axis)
