@@ -364,6 +364,42 @@ Partial Class SwatInput
             IO.File.WriteAllText(pSwatInput.TxtInOutFolder & "\basins.bsn", lSB.ToString)
         End Sub
 
-        
+        ''' <summary>
+        ''' First draft of code to read SWAT input text file
+        ''' </summary>
+        Public Sub ReadText()
+            pSwatInput.Status("Reading " & pTableName & " text ...")
+            Dim lItem As New clsBsnItem()
+            With lItem
+                For Each lLine As String In atcUtility.LinesInFile(pSwatInput.TxtInOutFolder & "\basins.bsn")
+                    Try
+                        Dim lPipePos As Integer = lLine.IndexOf("|")
+                        If lPipePos > 0 Then
+                            Dim lFieldName As String = lLine.Substring(lPipePos + 1).TrimStart
+                            Dim lSpacePos As Integer = lLine.IndexOf(" ")
+                            Dim lColonPos As Integer = lLine.IndexOf(":")
+                            If lSpacePos < 0 Then lSpacePos = lFieldName.Length
+                            If lColonPos < 0 Then lColonPos = lFieldName.Length
+                            lFieldName = lFieldName.Substring(0, Math.Min(lSpacePos, lColonPos))
+                            Dim lValue As String = lLine.Substring(0, lPipePos - 1).Trim
+                            If Not atcUtility.SetSomething(lItem, lFieldName, lValue) Then
+                                Select Case lFieldName
+                                    Case "PETFILE" : .ETFILE = lValue
+                                    Case "MSK_CO1" : .MSK_COL1 = lValue
+                                    Case "MSK_CO2" : .MSK_COL2 = lValue
+                                        '"   basins.wwq       | WWQFILE: name of watershed water quality file")
+                                    Case Else
+                                        MsgBox("Could not set field '" & lFieldName & "'", MsgBoxStyle.Critical, "Error reading basins.bsn")
+                                End Select
+                            End If
+                        End If
+                    Catch e As Exception
+                        MsgBox(e.Message, MsgBoxStyle.Critical, "Error reading basins.bsn")
+                    End Try
+                Next
+                'TODO: write lItem into database? change Sub into Function and Return lItem?
+            End With
+        End Sub
+
     End Class
 End Class

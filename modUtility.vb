@@ -129,7 +129,7 @@ TryExecute:
                 'End If
                 GoTo TryExecute
             Else
-                Logger.Dbg("ExecuteNonQuery Exception after " & Date.Now.Subtract(lStartTime).Seconds & " seconds: " & e.Message)
+                Logger.Dbg("ExecuteNonQuery: " & e.Message & vbCrLf & aSQL)
                 Return False
             End If
         End Try
