@@ -12,6 +12,7 @@ Public Class frmGraphEditor
     Public Event Apply()
 
     Private pPane As GraphPane
+    Private pPaneAux As GraphPane
     Private WithEvents pZgc As ZedGraphControl
     Private pDateFormat As atcDateFormat
     Private pSettingControls As Integer = 0
@@ -37,6 +38,12 @@ Public Class frmGraphEditor
 
         pZgc = aZgc
         pPane = aZgc.MasterPane.PaneList(aZgc.MasterPane.PaneList.Count - 1)
+        If aZgc.MasterPane.PaneList.Count > 1 Then
+            pPaneAux = aZgc.MasterPane.PaneList(0)
+            radioAxisAux.Enabled = True
+        Else
+            radioAxisAux.Enabled = False
+        End If
         SetComboFromCurves()
         SetComboFromTexts()
         SetControlsFromPane()
@@ -47,16 +54,23 @@ Public Class frmGraphEditor
     Private Sub SetComboFromCurves()
         pSettingControls += 1
         comboWhichCurve.Items.Clear()
-        For Each lCurve As CurveItem In pPane.CurveList
-            If lCurve.Label.Text.Length > 0 Then
-                comboWhichCurve.Items.Add(lCurve.Label.Text)
-            ElseIf Not lCurve.Tag Is Nothing Then
-                comboWhichCurve.Items.Add(lCurve.Tag)
-            Else
-                comboWhichCurve.Items.Add("curve " & comboWhichCurve.Items.Count + 1)
-            End If
-        Next
+        AddCurvesToComboWhichCurve(pPane)
+        AddCurvesToComboWhichCurve(pPaneAux)        
         pSettingControls -= 1
+    End Sub
+
+    Private Sub AddCurvesToComboWhichCurve(ByVal aPane As GraphPane)
+        If aPane IsNot Nothing AndAlso aPane.CurveList IsNot Nothing Then
+            For Each lCurve As CurveItem In aPane.CurveList
+                If lCurve.Label.Text.Length > 0 Then
+                    comboWhichCurve.Items.Add(lCurve.Label.Text)
+                ElseIf Not lCurve.Tag Is Nothing Then
+                    comboWhichCurve.Items.Add(lCurve.Tag)
+                Else
+                    comboWhichCurve.Items.Add("curve " & comboWhichCurve.Items.Count + 1)
+                End If
+            Next
+        End If
     End Sub
 
     Private Sub SetComboFromTexts()
@@ -99,7 +113,7 @@ Public Class frmGraphEditor
             ElseIf radioAxisRight.Checked Then
                 Return pPane.Y2Axis
             ElseIf radioAxisAux.Checked Then
-                'TODO: find aux axis
+                Return pPaneAux.YAxis
             End If
         End If
         Return Nothing
@@ -214,7 +228,12 @@ Public Class frmGraphEditor
                     .Scale.MaxAuto = False
                     .Scale.Max = lTemp
                 End If
-                .Title.Text = txtAxisLabel.Text
+                If aAxis IsNot pPaneAux.XAxis Then
+                    .Title.Text = txtAxisLabel.Text
+                    If aAxis Is pPane.XAxis AndAlso pPaneAux IsNot Nothing Then
+                        SetAxisFromControls(pPaneAux.XAxis)
+                    End If
+                End If
                 .Scale.IsReverse = chkRangeReverse.Checked
                 .MajorGrid.IsVisible = chkAxisMajorGridVisible.Checked
                 .MajorGrid.Color = txtAxisMajorGridColor.BackColor
@@ -228,8 +247,14 @@ Public Class frmGraphEditor
 
     Private Sub SetControlsFromSelectedCurve()
         pSettingControls += 1
-        If comboWhichCurve.SelectedIndex >= 0 AndAlso Not pPane Is Nothing AndAlso comboWhichCurve.SelectedIndex < pPane.CurveList.Count Then
-            SetControlsFromCurve(pPane.CurveList(comboWhichCurve.SelectedIndex))
+        If comboWhichCurve.SelectedIndex >= 0 Then
+            Dim lPaneCurves As Integer = 0
+            If pPane IsNot Nothing Then lPaneCurves = pPane.CurveList.Count
+            If comboWhichCurve.SelectedIndex < lPaneCurves Then
+                SetControlsFromCurve(pPane.CurveList(comboWhichCurve.SelectedIndex))
+            ElseIf pPaneAux IsNot Nothing AndAlso comboWhichCurve.SelectedIndex < lPaneCurves + pPaneAux.CurveList.Count Then
+                SetControlsFromCurve(pPaneAux.CurveList(comboWhichCurve.SelectedIndex - lPaneCurves))
+            End If
         End If
         pSettingControls -= 1
     End Sub
@@ -321,7 +346,13 @@ Public Class frmGraphEditor
             SetLegendFromControls()
             Dim lSelectedCurveIndex As Integer = comboWhichCurve.SelectedIndex
             If lSelectedCurveIndex >= 0 Then
-                SetCurveFromControls(pPane.CurveList(comboWhichCurve.SelectedIndex))
+                Dim lPaneCurves As Integer = 0
+                If pPane IsNot Nothing Then lPaneCurves = pPane.CurveList.Count
+                If comboWhichCurve.SelectedIndex < lPaneCurves Then
+                    SetCurveFromControls(pPane.CurveList(comboWhichCurve.SelectedIndex))
+                ElseIf pPaneAux IsNot Nothing AndAlso comboWhichCurve.SelectedIndex < lPaneCurves + pPaneAux.CurveList.Count Then
+                    SetCurveFromControls(pPaneAux.CurveList(comboWhichCurve.SelectedIndex - lPaneCurves))
+                End If
                 SetComboFromCurves()
                 comboWhichCurve.SelectedIndex = lSelectedCurveIndex
             End If
