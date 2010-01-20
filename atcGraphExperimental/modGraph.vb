@@ -137,7 +137,7 @@ Public Module modGraph
                     GoTo FoundMatch
                 End If
 
-                If lYaxisNames.Count = 1 Then 'Put new curve on right axis if we already have a non-matching curve
+                If lYaxisNames.Contains("LEFT") Then 'Put new curve on right axis if we already have a non-matching curve on the left
                     lYAxisName = "RIGHT"
                     GoTo FoundMatch
                 End If
@@ -152,8 +152,14 @@ FoundMatch:
             lYaxisNames.Add(lTimeseries.Serial, lYAxisName)
         Next
 
+        Dim lMain As ZedGraph.GraphPane = Nothing
+        Dim lAux As ZedGraph.GraphPane = Nothing
         If lAuxDataSets.Count > 0 Then
             EnableAuxAxis(aZgc.MasterPane, True, 0.2)
+            lAux = aZgc.MasterPane.PaneList(0)
+            lMain = aZgc.MasterPane.PaneList(1)
+        Else
+            lMain = aZgc.MasterPane.PaneList(0)
         End If
 
         For Each lTimeseries As atcTimeseries In aDataGroup
@@ -166,20 +172,23 @@ FoundMatch:
         End If
         If lRightDataSets.Count > 0 Then
             ScaleAxis(lRightDataSets, lPaneMain.Y2Axis)
+            lMain.Y2Axis.MinSpace = 80
+        Else
+            lMain.Y2Axis.MinSpace = 20
         End If
         If lAuxDataSets.Count > 0 Then
-            Dim lAux As ZedGraph.GraphPane = aZgc.MasterPane.PaneList(0)
-            Dim lMain As ZedGraph.GraphPane = aZgc.MasterPane.PaneList(1)
+            lAux.YAxis.MinSpace = lMain.YAxis.MinSpace
+            lAux.Y2Axis.MinSpace = lMain.Y2Axis.MinSpace
 
             ScaleAxis(lAuxDataSets, lAux.YAxis)
             lAux.XAxis.Scale.Min = lMain.XAxis.Scale.Min
             lAux.XAxis.Scale.Max = lMain.XAxis.Scale.Max
 
             'Make sure both graphs line up horizontally
-            Dim lMaxX As Single = Math.Max(lAux.Rect.X, lMain.Rect.X)
-            Dim lMinRight As Single = Math.Max(lAux.Rect.Right, lMain.Rect.Right)
-            lAux.Rect = New RectangleF(lMaxX, lAux.Rect.Y, lMinRight - lMaxX, lAux.Rect.Height)
-            lMain.Rect = New RectangleF(lMaxX, lMain.Rect.Y, lMinRight - lMaxX, lMain.Rect.Height)
+            'Dim lMaxX As Single = Math.Max(lAux.Rect.X, lMain.Rect.X)
+            'Dim lMinRight As Single = Math.Max(lAux.Rect.Right, lMain.Rect.Right)
+            'lAux.Rect = New RectangleF(lMaxX, lAux.Rect.Y, lMinRight - lMaxX, lAux.Rect.Height)
+            'lMain.Rect = New RectangleF(lMaxX, lMain.Rect.Y, lMinRight - lMaxX, lMain.Rect.Height)
         End If
 
         AxisTitlesFromCommonAttributes(lPaneMain, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
@@ -288,15 +297,17 @@ FoundMatch:
                 lPane = aZgc.MasterPane.PaneList(0)
                 lYAxis = lPane.YAxis
             Case "RIGHT"
-                lYAxis = lPane.Y2Axis
                 With lPane.YAxis
                     .MajorTic.IsOpposite = False
                     .MinorTic.IsOpposite = False
                 End With
-                With lYAxis
+                With lPane.Y2Axis
                     .MajorTic.IsOpposite = False
                     .MinorTic.IsOpposite = False
+                    .MinSpace = 80
+                    aZgc.MasterPane.PaneList(0).Y2Axis.MinSpace = .MinSpace 'align right space on aux graph if present
                 End With
+                lYAxis = lPane.Y2Axis
         End Select
 
         lYAxis.IsVisible = True
@@ -404,8 +415,6 @@ FoundMatch:
         If aEnable Then
             ' Main pane already exists, just needs to be shifted
             With lPaneMain
-                .YAxis.MinSpace = 80
-                .Y2Axis.MinSpace = 20
                 .Margin.All = 0
                 .Margin.Top = 10
                 .Margin.Bottom = 10
@@ -425,9 +434,9 @@ FoundMatch:
                 .X2Axis.IsVisible = False
                 With .YAxis
                     .Type = AxisType.Linear
-                    .MinSpace = 80
+                    .MinSpace = lPaneMain.YAxis.MinSpace
                 End With
-                .Y2Axis.MinSpace = 20
+                .Y2Axis.MinSpace = lPaneMain.Y2Axis.MinSpace
             End With
 
             With aMasterPane
@@ -544,6 +553,8 @@ FoundMatch:
             End With
             SetYaxisDefaults(.YAxis)
             SetYaxisDefaults(.Y2Axis)
+            .YAxis.MinSpace = 80
+            .Y2Axis.MinSpace = 20
             .Y2Axis.Scale.IsVisible = False 'Default to not labeling on Y2, will be turned on later if different from Y
             With .Legend
                 .Position = LegendPos.Float
