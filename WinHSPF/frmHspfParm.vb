@@ -4,8 +4,11 @@ Imports atcControls
 Imports atcUtility
 Imports MapWinUtility
 Imports System.Collections.ObjectModel
+Imports System.IO
 
 Public Class frmHspfParm
+
+    Public pHspfParms As Collection(Of HSPFParameter)
 
     Public Sub New()
 
@@ -36,16 +39,14 @@ Public Class frmHspfParm
             .Source.CellValue(0, 1) = "Mapped from HSPFParm Operation"
         End With
 
-        If radioParameter.Checked Then
-            agdStarter.Visible = True
-        Else
-            agdStarter.Visible = False
-        End If
+        optParameter.Checked = True
+        fraParameter.Visible = True
+        agdStarter.Visible = False
 
         cmdApply.Enabled = False
 
-        For i = 0 To pUCI.OpnBlks.Count - 1
-            lOpType = pUCI.OpnBlks(i)
+        For i = 0 To pDefUCI.OpnBlks.Count - 1
+            lOpType = pDefUCI.OpnBlks(i)
             With agdStarter.Source
                 For Each vOpn In lOpType.Ids
                     lRow = .Rows
@@ -57,516 +58,341 @@ Public Class frmHspfParm
             End With
         Next
 
-
+        'make column 1 editable
+        For lRowIndex As Integer = 1 To agdStarter.Source.Rows - 1
+            agdStarter.Source.CellEditable(lRowIndex, 1) = True
+        Next
         agdStarter.SizeAllColumnsToContents()
         agdStarter.Refresh()
 
-        'temporarty fill of list.
-
     End Sub
 
-    '    Private Sub agdStarter_CommitChange(ByVal ChangeFromRow As Long, ByVal ChangeToRow As Long, ByVal ChangeFromCol As Long, ByVal ChangeToCol As Long)
-    '        Dim i As Long
-    '        DoLimits()
-    '        For i = 1 To agdStarter.rows
-    '            If agdStarter.TextMatrix(i, 1) <> "<none>" Then
-    '                cmdApply.Enabled = True
-    '            End If
-    '        Next i
-    '    End Sub
+    Private Sub optParameter_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles optParameter.CheckedChanged
+        RadioButtonChecked()
+    End Sub
 
-    '    Private Sub agdStarter_RowColChange()
-    '        DoLimits()
-    '    End Sub
+    Private Sub optLandUse_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles optLandUse.CheckedChanged
+        RadioButtonChecked()
+    End Sub
 
-    '    Private Sub agdStarter_TextChange(ByVal ChangeFromRow As Long, ByVal ChangeToRow As Long, ByVal ChangeFromCol As Long, ByVal ChangeToCol As Long)
-    '        DoLimits()
-    '    End Sub
+    Private Sub RadioButtonChecked()
+        cmdApply.Enabled = False
+        If optParameter.Checked Then
+            fraParameter.Visible = True
+            agdStarter.Visible = False
+            If lstStarter.SelectedItems.Count > 0 Then
+                cmdApply.Enabled = True
+            End If
+        Else
+            agdStarter.Visible = True
+            fraParameter.Visible = False
+            For lRowIndex As Integer = 1 To agdStarter.Source.Rows - 1
+                If agdStarter.Source.CellValue(lRowIndex, 1) <> "<none>" Then
+                    cmdApply.Enabled = True
+                End If
+            Next lRowIndex
+        End If
+    End Sub
 
-    '    Private Sub cmdApply_Click()
-    '        Dim defOpn As HspfOperation
-    '        Dim ctemp As String
-    '        Dim OpId As Long
-    '        Dim OpType As String
-    '        Dim Desc As String
-    '        Dim lParm As clsHSPFParm
-    '        Dim i As Long
-    '        Dim j As Long
-    '        Dim ilen As Long
-    '        Dim ipos As Long
-
-    '        If OptAssign(0) Then
-    '            'by parameter
-    '            For i = 0 To lstParms.listcount - 1
-    '                If lstParms.Selected(i) Then
-    '                    lParm = HSPFParms(lstParms.ItemData(i))
-    '                    For j = 0 To lstStarter.listcount - 1
-    '                        If lstStarter.Selected(j) Then
-    '                            'set this parm in starter
-    '                            ctemp = lstStarter.List(j)
-    '                            OpType = StrRetRem(ctemp)
-    '                            OpId = CInt(StrRetRem(ctemp))
-    '                            defOpn = defUci.OpnBlks(OpType).operfromid(OpId)
-    '                            If defOpn.TableExists(lParm.Table) Then
-    '                                defOpn.tables(lParm.Table).Parms(lParm.Parm) = lParm.Value
-    '                            Else
-    '                                myMsgBox.Show("Table " & lParm.Table & " does not exist in the Starter UCI.", "HSPFParm Linkage Problem", "OK")
-    '                            End If
-    '                        End If
-    '                    Next j
-    '                End If
-    '            Next i
-    '        Else
-    '            'by land use
-    '            With agdStarter
-    '                For i = 1 To .rows
-    '                    If .TextMatrix(i, 1) <> "<none>" Then
-    '                        ctemp = .TextMatrix(i, 1)
-    '                        OpType = StrRetRem(ctemp)
-    '                        OpId = CInt(StrRetRem(ctemp))
-    '                        ilen = Len(ctemp)
-    '                        ipos = InStr(1, ctemp, "(")
-    '                        Desc = Mid(ctemp, ipos + 1, ilen - ipos - 1)
-    '                        For j = 1 To HSPFParms.Count
-    '                            lParm = HSPFParms(j)
-    '                            If lParm.OpType = OpType And lParm.Desc = Desc Then
-    '                                'update this parameter
-    '                                ctemp = .TextMatrix(i, 0)
-    '                                OpType = StrRetRem(ctemp)
-    '                                OpId = CInt(StrRetRem(ctemp))
-    '                                defOpn = defUci.OpnBlks(OpType).operfromid(OpId)
-    '                                If defOpn.TableExists(lParm.Table) Then
-    '                                    defOpn.tables(lParm.Table).Parms(lParm.Parm) = lParm.Value
-    '                                Else
-    '                                    myMsgBox.Show("Table " & lParm.Table & " does not exist in the Starter UCI.", "HSPFParm Linkage Problem", "OK")
-    '                                End If
-    '                            End If
-    '                        Next j
-    '                    End If
-    '                Next i
-    '            End With
-    '        End If
-    '        'now save starter uci file
-    '        ChDriveDir(HSPFMain.W_STARTERPATH)
-    '        defUci.Save()
-    '    End Sub
-
-    '    Private Sub cmdClose_Click()
-    '        Unload(Me)
-    '    End Sub
-
-    '    Private Sub cmdFile_Click()
-    '        Dim ret&, ArrayIds$(), cnt&, i&
-
-    '        If FileExists(BASINSPath & "\modelout", True, False) Then
-    '            ChDriveDir(BASINSPath & "\modelout")
-    '        End If
-    '        CDFile.flags = &H8806&
-    '        CDFile.Filter = "HSPFParm Report Files (*.*)"
-    '        CDFile.Filename = "*.*"
-    '        CDFile.DialogTitle = "Select HSPFParm Report File"
-    '        On Error GoTo 50
-    '        CDFile.CancelError = True
-    '        CDFile.Action = 1
-    '        'read file here
-    '        ReadReportFile(CDFile.Filename, ret)
-    '        If ret = 0 Then
-    '            lblFile.Caption = CDFile.Filename
-    '            'fill in grid or lists
-    '            Me.MousePointer = vbHourglass
-    '            RefreshParms()
-    '            DefaultGrid()
-    '            Me.MousePointer = vbNormal
-    '        End If
-    '50:     'continue here on cancel
-    '    End Sub
-
-    '    Private Sub cmdStart_Click()
-    '        StartHSPFParm()
-    '    End Sub
-
-    '    Private Sub StartHSPFParm()
-    '        Dim HSPFParmEXE$
-    '        Dim ff As New ATCoFindFile
-    '        '    Dim reg As New ATCoRegistry
-    '        '    HSPFParmEXE = reg.RegGetString(HKEY_LOCAL_MACHINE, "SOFTWARE\AQUA TERRA Consultants\HSPFParm\ExePath", "") & "\hspfparm.exe"
-    '        '    If Len(Dir(HSPFParmEXE)) = 0 Then HSPFParmEXE = PathNameOnly(App.EXEName) & "\hspfparm.exe"
-    '        '    If Len(Dir(HSPFParmEXE)) = 0 Then HSPFParmEXE = CurDir & "\hspfparm.exe"
-    '        '    If Len(Dir(HSPFParmEXE)) = 0 Then HSPFParmEXE = "c:\program files\basins\bin\hspfparm.exe"
-    '        '    If Len(Dir(HSPFParmEXE)) = 0 Then HSPFParmEXE = "c:\basins\models\HSPF\bin\hspfparm.exe"
-    '        '
-    '        '    If Len(Dir(HSPFParmEXE)) = 0 Then
-    '        '      'hspfparm not in registry
-    '        '      On Error GoTo NeverMind
-    '        '      CDFile.CancelError = True
-    '        '      CDFile.DialogTitle = "Please locate HSPFParm.exe so HSPFParm can be started."
-    '        '      CDFile.Filename = "HSPFParm.exe"
-    '        '      CDFile.ShowOpen
-    '        '      HSPFParmEXE = CDFile.Filename
-    '        '    End If
-    '        ff.SetDialogProperties("Please locate HSPFParm.exe so HSPFParm can be started", "HSPFParm.exe")
-    '        ff.SetRegistryInfo("HSPFParm", "files", "ExePath")
-    '        HSPFParmEXE = ff.GetName
-    '        If Not FileExists(HSPFParmEXE) Then
-    '            DisableAll(True)
-    '            myMsgBox.Show("WinHSPF could not find HSPFParm.exe", "Start HSPFParm Problem", "+-&Close")
-    '            DisableAll(False)
-    '        Else
-    '            'Me.Hide
-    '            IPC.dbg("Starting HSPFParm... " & HSPFParmEXE)
-    '            IPC.StartProcess("HSPFParm", HSPFParmEXE, 0, 864000)
-    '            IPC.dbg("Finished Running HSPFParm")
-    '            'Me.Show
-    '        End If
-    'NeverMind:
-    '    End Sub
-
-
-    
-
-    '    Private Sub lstParms_Click()
-    '        Dim lopname$
-    '        Dim lOpType As HspfOpnBlk
-    '        Dim vOpn As Object
-    '        Dim lOpn As HspfOperation
-    '        Dim tempOpname$
-    '        Dim Desc As String
-    '        Dim i As Long
-
-    '        If lstParms.SelCount > 0 Then
-    '            If lstParms.SelCount > 1 Then
-    '                tempOpname = ""
-    '                For i = 1 To lstParms.listcount
-    '                    If lstParms.Selected(i - 1) Then
-    '                        If tempOpname = "" Then
-    '                            tempOpname = HSPFParms(lstParms.ItemData(i - 1)).OpType
-    '                        ElseIf tempOpname <> HSPFParms(lstParms.ItemData(i - 1)).OpType Then
-    '                            'unselect operations if different oper names
-    '                            lstParms.Selected(i - 1) = False
-    '                        End If
-    '                    End If
-    '                Next i
-    '            End If
-
-    '            lstStarter.Clear()
-    '            For i = 1 To lstParms.listcount
-    '                If lstParms.Selected(i - 1) Then
-    '                    lopname = HSPFParms(lstParms.ItemData(i - 1)).OpType
-    '                    If defUci.OpnBlks(lopname).Count > 0 Then
-    '                        lOpType = defUci.OpnBlks(lopname)
-    '                        For Each vOpn In lOpType.Ids
-    '                            lOpn = vOpn
-    '                            Desc = lOpn.Description
-    '                            lstStarter.AddItem(lOpn.Name & " " & lOpn.Id & " - " & lOpn.Description)
-    '                        Next vOpn
-    '                        Exit For
-    '                    End If
-    '                End If
-    '            Next i
-    '        Else
-    '            lstStarter.Clear()
-    '        End If
-    '    End Sub
-
-    '    Private Sub lstStarter_Click()
-    '        cmdApply.Enabled = True
-    '    End Sub
-
-    '    Private Sub OptAssign_Click(ByVal Index As Integer)
-    '        Dim i As Long
-    '        cmdApply.Enabled = False
-    '        If OptAssign(0) Then
-    '            fraParameter.Visible = True
-    '            agdStarter.Visible = False
-    '            If lstStarter.SelCount > 0 Then
-    '                cmdApply.Enabled = True
-    '            End If
-    '        Else
-    '            agdStarter.Visible = True
-    '            fraParameter.Visible = False
-    '            For i = 1 To agdStarter.rows
-    '                If agdStarter.TextMatrix(i, 1) <> "<none>" Then
-    '                    cmdApply.Enabled = True
-    '                End If
-    '            Next i
-    '        End If
-    '    End Sub
-
-    '    Private Sub RefreshParms()
-    '        Dim vParm As Object, lParm As clsHSPFParm
-    '        Dim ctemp As String
-
-    '        lstParms.Clear()
-    '        For Each vParm In HSPFParms
-    '            lParm = vParm
-    '            ctemp = lParm.Parm & " = " & lParm.Value & " (" & lParm.OpType & " " & lParm.OpId
-    '            If Len(lParm.Desc) > 0 Then
-    '                ctemp = ctemp & " - " & lParm.Desc & ")"
-    '            Else
-    '                ctemp = ctemp & ")"
-    '            End If
-    '            If Not InList(ctemp, lstParms) Then
-    '                lstParms.AddItem(ctemp)
-    '                lstParms.ItemData(lstParms.listcount - 1) = lParm.Id
-    '            End If
-    '        Next vParm
-    '    End Sub
-
-    '    Private Sub DefaultGrid()
-    '        Dim lOpType As HspfOpnBlk
-    '        Dim vOpn As Object
-    '        Dim lOpn As HspfOperation
-    '        Dim vParm As Object, lParm As clsHSPFParm
-    '        Dim ctemp As String, i&, row&
-
-    '        row = 0
-    '        For i = 1 To defUci.OpnBlks.Count
-    '            lOpType = defUci.OpnBlks(i)
-    '            For Each vOpn In lOpType.Ids
-    '                lOpn = vOpn
-    '                row = row + 1
-    '                For Each vParm In HSPFParms
-    '                    lParm = vParm
-    '                    If lParm.OpType = lOpn.Name And UCase(lParm.Desc) = UCase(lOpn.Description) Then
-    '                        'matching land use name
-    '                        ctemp = vParm.OpType & " " & vParm.OpId & " (" & vParm.Desc & ")"
-    '                        agdStarter.TextMatrix(row, 1) = ctemp
-    '                    End If
-    '                Next vParm
-    '            Next vOpn
-    '        Next i
-
-    '    End Sub
-
-    '    Private Function FindTableName(ByVal lOpType$, ByVal lparmname$) As String
-    '        Dim i&, vTable As Object, lTable As HspfTableDef
-    '        Dim vParm As Object
-
-    '        FindTableName = ""
-    '        For Each vTable In myMsg.BlockDefs(lOpType).TableDefs
-    '            lTable = vTable
-    '            For Each vParm In lTable.ParmDefs
-    '                If vParm.Name = lparmname Then
-    '                    FindTableName = lTable.Name
-    '                    Exit For
-    '                End If
-    '            Next vParm
-    '            If Len(FindTableName) > 0 Then Exit For
-    '        Next vTable
-    '    End Function
-
-    '    Private Sub DoLimits()
-    '        Dim vHSPFParm As Object, tHSPFParm As clsHSPFParm
-    '        Dim ctemp$, listcount&, alist$(), ifound As Boolean
-    '        Dim i As Long
-
-    '        With agdStarter
-    '            .ClearValues()
-    '            If .col = 1 Then
-    '                If Not HSPFParms Is Nothing Then
-    '                    .ColEditable(1) = True
-    '                    .AddValue("<none>")
-    '                    listcount = 0
-    '                    For Each vHSPFParm In HSPFParms
-    '                        tHSPFParm = vHSPFParm
-    '                        If tHSPFParm.OpType = Mid(.TextMatrix(.row, 0), 1, 6) Then
-    '                            ctemp = tHSPFParm.OpType & " " & tHSPFParm.OpId & " (" & tHSPFParm.Desc & ")"
-    '                            If listcount = 0 Then
-    '                                listcount = listcount + 1
-    '                                ReDim Preserve alist(listcount)
-    '                                alist(listcount) = ctemp
-    '                            Else
-    '                                For i = 1 To listcount
-    '                                    ifound = False
-    '                                    If alist(i) = ctemp Then
-    '                                        ifound = True
-    '                                    End If
-    '                                Next i
-    '                                If ifound = False Then
-    '                                    listcount = listcount + 1
-    '                                    ReDim Preserve alist(listcount)
-    '                                    alist(listcount) = ctemp
-    '                                End If
-    '                            End If
-    '                        End If
-    '                    Next vHSPFParm
-    '                    For i = 1 To listcount
-    '                        .AddValue(alist(i))
-    '                    Next i
-    '                End If
-    '            End If
-    '        End With
-    '    End Sub
+    Private Sub cmdStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdStart.Click
+        Dim lHSPFParmExe As String = FindFile("Please locate HSPFParm.exe so HSPFParm can be started", "HSPFParm.exe")
+        If Not IO.File.Exists(lHSPFParmExe) Then
+            Logger.Msg("Cannot find HSPFParm.exe", MsgBoxStyle.Critical, "WinHSPF-HSFPParm Problem")
+        Else
+            Logger.Dbg("Starting HSPFParm... " & lHSPFParmExe)
+            Process.Start(lHSPFParmExe)
+            Logger.Dbg("Finished Running HSPFParm")
+        End If
+    End Sub
 
     Private Sub cmdFile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdFile.Click
-        'Dim ArrayIds$(), cnt&, i&
-        'Dim lFileName As String
-        'Dim ret As Integer
+        OpenFileDialog1.InitialDirectory = PathNameOnly(pUCIFullFileName)
+        OpenFileDialog1.Filter = "HSPFParm Report Files (*.*)|*.*"
+        OpenFileDialog1.FileName = "*.*"
+        OpenFileDialog1.Title = "Select HSPFParm Report File"
 
-
-        '  Try
-        '      OpenFileDialog1.InitialDirectory = System.Reflection.Assembly.GetEntryAssembly.Location
-        '      OpenFileDialog1.Filter = "HSPFParm Report Files | *.prn"
-        '      OpenFileDialog1.FileName = "*.*"
-        '      OpenFileDialog1.Title = "Select HSPFParm Report File"
-
-        '      If OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK Then
-        '          lFileName = OpenFileDialog1.FileName
-        '      Else
-        '          Exit Try
-        '      End If
-
-        '      '.net conversion note: ReadReportFile function now included in this sub
-        '      Dim lstr$, i&, ilen&, havedesc As Boolean, j&
-        '      Dim lParm$, loptyp$, lOpId$, lDesc$, lValue$
-        '      Dim dOpn As HspfOperation, lTable$
-        '      Dim lparmname$(), lTabledef As HspfTableDef
-        '      Dim tHSPFParm As clsHSPFParm
-        '      Dim istart As Long
-        '      Dim nparms As Long
-
-        '      HspfParms = New Collection 'of type hspfparm
-
-        '      ret = 0
-        '      i = FreeFile(0)
-        '      On Error GoTo ErrHandler
-        'Open Filename For Input As #i
-        '      Do Until EOF(i)
-        '  Line Input #i, lstr
-        '          lstr = Trim(lstr)
-        '          ilen = Len(lstr)
-        '          If ilen > 8 Then
-        '              If Mid(lstr, 1, 9) = "Parameter" Then
-        '                  'process these parameter records
-        '      Line Input #i, lstr 'blank line
-        '      Line Input #i, lstr 'header line
-        '                  lstr = Trim(lstr)
-        '                  ilen = Len(lstr)
-        '                  If ilen > 50 Then
-        '                      'have operation description
-        '                      havedesc = True
-        '                  Else
-        '                      havedesc = False
-        '                  End If
-        '      Line Input #i, lstr 'parameter line
-        '                  Do Until Len(Trim(lstr)) = 0
-        '                      tHSPFParm = New clsHSPFParm
-        '                      tHSPFParm.Parm = StrRetRem(lstr)
-        '                      tHSPFParm.Value = StrRetRem(lstr)
-        '                      tHSPFParm.OpType = StrRetRem(lstr)
-        '                      tHSPFParm.OpId = StrRetRem(lstr)
-        '                      tHSPFParm.Table = FindTableName(tHSPFParm.OpType, tHSPFParm.Parm)
-        '                      If havedesc Then
-        '                          tHSPFParm.Desc = Trim(Mid(lstr, 21))
-        '                      Else
-        '                          tHSPFParm.Desc = ""
-        '                      End If
-        '                      tHSPFParm.Id = HspfParms.Count + 1
-        '                      HspfParms.Add(tHSPFParm)
-        '        Line Input #i, lstr 'parameter line
-        '                  Loop
-        '              End If
-        '          End If
-        '          If ilen > 5 Then
-        '              If Mid(lstr, 1, 5) = "Table" Then
-        '                  'process these table records
-        '                  lTable = Trim(Mid(lstr, 7))
-        '      Line Input #i, lstr
-        '                  lstr = Trim(lstr)
-        '                  loptyp = Trim(Mid(lstr, 9))
-        '      Line Input #i, lstr 'blank
-        '      Line Input #i, lstr 'header
-        '                  If Mid(lstr, 21, 4) = "Desc" Then
-        '                      'have operation description
-        '                      havedesc = True
-        '                      istart = 40
-        '                  Else
-        '                      havedesc = False
-        '                      istart = 20
-        '                  End If
-        '                  If Mid(lstr, 21, 5) = "Occur" Or Mid(lstr, 21, 6) = "QUALID" Or Mid(lstr, 21, 4) = "GQID" Then
-        '                      'multiple occurance table, don't do for now
-        '                  Else
-        '                      'ok to continue
-        '                      ilen = Len(Trim(lstr)) - istart
-
-        '                      'nparms = Int(ilen / 10) + 1   'why assume 10 chars
-        '                      lTabledef = myMsg.BlockDefs(loptyp).TableDefs(lTable)
-        '                      nparms = lTabledef.ParmDefs.Count
-
-        '                      ReDim lparmname(nparms)
-        '                      lstr = Mid(lstr, istart + 1)
-        '                      For j = 1 To nparms
-        '                          'lparmname(j) = StrRetRem(lstr)
-        '                          lparmname(j) = lTabledef.ParmDefs(j).Name
-        '                      Next j
-        '        Line Input #i, lstr 'data line
-        '                      Do Until Len(Trim(lstr)) = 0
-        '                          lOpId = Mid(lstr, 1, 5)
-        '                          If havedesc Then
-        '                              lDesc = Mid(lstr, 21, 20)
-        '                          Else
-        '                              lDesc = ""
-        '                          End If
-        '                          lstr = Mid(lstr, istart + 1)
-        '                          For j = 1 To nparms
-        '                              tHSPFParm = New clsHSPFParm
-        '                              tHSPFParm.Parm = lparmname(j)
-        '                              tHSPFParm.Table = lTable
-        '                              'tHSPFParm.Value = StrRetRem(lstr)
-        '                              If lTabledef.ParmDefs(j).typ <> 0 And Len(lstr) >= lTabledef.ParmDefs(j).Length Then
-        '                                  tHSPFParm.Value = Mid(lstr, 1, lTabledef.ParmDefs(j).Length)
-        '                              End If
-        '                              lstr = Mid(lstr, lTabledef.ParmDefs(j).Length + 1)
-        '                              tHSPFParm.OpType = loptyp
-        '                              tHSPFParm.OpId = lOpId
-        '                              tHSPFParm.Desc = Trim(lDesc)
-        '                              tHSPFParm.Id = HspfParms.Count + 1
-        '                              HspfParms.Add(tHSPFParm)
-        '                          Next j
-        '          Line Input #i, lstr 'data line
-        '                      Loop
-        '                  End If
-        '              End If
-        '          End If
-        '      Loop
-        'Close #i
-        '      Exit Sub
-        '      '.net conversion note: end of the essence of the formeer ReadReportfile sub from VB6 code/
-
-        '      If ret = 0 Then
-        '          lblFile.Text = lFileName
-        '          'fill in grid or lists
-        '          Me.Cursor = Cursors.WaitCursor
-        '          RefreshParms()
-        '          DefaultGrid()
-        '          Me.Cursor = Cursors.Arrow
-        '      End If
-
-        '  Catch ex As Exception
-        '      Logger.Message("There was a problem loading the file specified." & vbCrLf & "Check the syntax of the file and make sure it is not locked by another process.", "HSPFParm Report File load error", MessageBoxButtons.OK, MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
-        '  End Try
-
-        '        If FileExists(BASINSPath & "\modelout", True, False) Then
-        '            ChDriveDir(BASINSPath & "\modelout")
-        '        End If
-        '        CDFile.flags = &H8806&
-        '        CDFile.Filter = "HSPFParm Report Files (*.*)"
-        '        CDFile.Filename = "*.*"
-        '        CDFile.DialogTitle = "Select HSPFParm Report File"
-        '        On Error GoTo 50
-        '        CDFile.CancelError = True
-        '        CDFile.Action = 1
-        '        'read file here
-        '        ReadReportFile(CDFile.Filename, ret)
-        '        If ret = 0 Then
-        '            lblFile.Caption = CDFile.Filename
-        '            'fill in grid or lists
-        '            Me.MousePointer = vbHourglass
-        '            RefreshParms()
-        '            DefaultGrid()
-        '            Me.MousePointer = vbNormal
-        '        End If
-        '50:     'continue here on cancel
+        If OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK Then
+            Dim lReturn As Integer = ReadReportFile(OpenFileDialog1.FileName)
+            If lReturn = 0 Then
+                lblFile.Text = OpenFileDialog1.FileName
+                'fill in grid or lists
+                Me.Cursor = Cursors.WaitCursor
+                RefreshParms()
+                DefaultGrid()
+                Me.Cursor = Cursors.Default
+            End If
+        Else
+            Exit Sub
+        End If
     End Sub
+
+    Private Sub cmdApply_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdApply.Click
+        If optParameter.Checked Then
+            'by parameter
+            For lIndex As Integer = 1 To lstParms.SelectedItems.Count
+                Dim lParm As HSPFParameter = pHspfParms(lstParms.SelectedIndices(lIndex - 1))
+                For Each lSelectedItem As String In lstStarter.SelectedItems
+                    'set this parm in starter
+                    Dim lOpType As String = StrRetRem(lSelectedItem)
+                    Dim lOpId As Integer = CInt(StrRetRem(lSelectedItem))
+                    Dim lDefOpn As HspfOperation = pDefUCI.OpnBlks(lOpType).OperFromID(lOpId)
+                    If lDefOpn.TableExists(lParm.Table) Then
+                        lDefOpn.Tables(lParm.Table).Parms(lParm.Parm).Value = lParm.Value
+                    Else
+                        Logger.Msg("Table " & lParm.Table & " does not exist in the Starter UCI.", "HSPFParm Linkage Problem")
+                    End If
+                Next
+            Next
+        Else
+            'by land use
+            With agdStarter.Source
+                For lRow As Integer = 1 To .Rows - 1
+                    If .CellValue(lRow, 1) <> "<none>" Then
+                        Dim lTemp As String = .CellValue(lRow, 1)
+                        Dim lOpType As String = StrRetRem(lTemp)
+                        Dim lOpId As Integer = CInt(StrRetRem(lTemp))
+                        Dim lPos As Integer = InStr(1, lTemp, "(")
+                        Dim lDesc As String = Mid(lTemp, lPos + 1, lTemp.Length - lPos - 1)
+                        For Each lParm As HSPFParameter In pHspfParms
+                            If lParm.OpType = lOpType And lParm.Desc = lDesc Then
+                                'update this parameter
+                                lTemp = .CellValue(lRow, 0)
+                                lOpType = StrRetRem(lTemp)
+                                lOpId = CInt(StrRetRem(lTemp))
+                                Dim lDefOpn As HspfOperation = pDefUCI.OpnBlks(lOpType).OperFromID(lOpId)
+                                If lDefOpn.TableExists(lParm.Table) Then
+                                    lDefOpn.Tables(lParm.Table).Parms(lParm.Parm).Value = lParm.Value
+                                Else
+                                    Logger.Msg("Table " & lParm.Table & " does not exist in the Starter UCI.", "HSPFParm Linkage Problem")
+                                End If
+                            End If
+                        Next
+                    End If
+                Next lRow
+            End With
+        End If
+        'now save starter uci file
+        pDefUCI.Save()
+    End Sub
+
+    Private Sub cmdClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdClose.Click
+        Me.Dispose()
+    End Sub
+
+    Private Sub DoLimits(ByVal aSelectedColumn As Integer, ByVal aSelectedRow As Integer)
+        With agdStarter
+            Dim lValidValues As New Collection
+            .AllowNewValidValues = True
+            If aSelectedColumn = 1 Then
+                If Not pHspfParms Is Nothing Then
+                    lValidValues.Add("<none>")
+                    For Each lHSPFParm As HSPFParameter In pHspfParms
+                        If lHSPFParm.OpType = Mid(.Source.CellValue(aSelectedRow, 0), 1, 6) Then
+                            Dim lTemp As String = lHSPFParm.OpType & " " & lHSPFParm.OpId & " (" & lHSPFParm.Desc & ")"
+                            Dim lInList As Boolean = False
+                            For Each lItem As String In lValidValues
+                                If lItem = lTemp Then
+                                    lInList = True
+                                End If
+                            Next
+                            If Not lInList Then
+                                lValidValues.Add(lTemp)
+                            End If
+                        End If
+                    Next
+                End If
+            End If
+            .ValidValues = lValidValues
+            .AllowNewValidValues = False
+            .Refresh()
+        End With
+
+    End Sub
+
+    Private Function ReadReportFile(ByVal aFilename As String)
+        Dim lHaveDesc As Boolean
+        Dim lHSPFParm As HSPFParameter
+        pHspfParms = New Collection(Of HSPFParameter)
+        Dim lReturnCode As Integer = 0
+
+        Try
+            Dim lCurrentRecord As String
+            Dim lStreamReader As New StreamReader(aFilename)
+            Do Until lStreamReader.EndOfStream
+                lCurrentRecord = lStreamReader.ReadLine.Trim
+                If lCurrentRecord Is Nothing Then
+                    Exit Do
+                ElseIf lCurrentRecord.Trim.StartsWith("Parameter") Then
+                    'process these parameter records
+                    lCurrentRecord = lStreamReader.ReadLine.Trim 'blank line
+                    lCurrentRecord = lStreamReader.ReadLine.Trim 'header line
+                    If lCurrentRecord.Length > 50 Then
+                        'have operation description
+                        lHaveDesc = True
+                    Else
+                        lHaveDesc = False
+                    End If
+                    lCurrentRecord = lStreamReader.ReadLine.Trim 'parameter line
+                    Do Until lCurrentRecord.Trim.Length = 0
+                        lHSPFParm = New HSPFParameter
+                        lHSPFParm.Parm = StrRetRem(lCurrentRecord)
+                        lHSPFParm.Value = StrRetRem(lCurrentRecord)
+                        lHSPFParm.OpType = StrRetRem(lCurrentRecord)
+                        lHSPFParm.OpId = StrRetRem(lCurrentRecord)
+                        lHSPFParm.Table = FindTableName(lHSPFParm.OpType, lHSPFParm.Parm)
+                        If lHaveDesc Then
+                            lHSPFParm.Desc = Trim(Mid(lCurrentRecord, 21))
+                        Else
+                            lHSPFParm.Desc = ""
+                        End If
+                        lHSPFParm.Id = pHspfParms.Count + 1
+                        pHspfParms.Add(lHSPFParm)
+                        lCurrentRecord = lStreamReader.ReadLine.Trim 'parameter line
+                    Loop
+                ElseIf lCurrentRecord.Trim.StartsWith("Table") Then
+                    'process these table records
+                    Dim lTable As String = Trim(Mid(lCurrentRecord, 7))
+                    lCurrentRecord = lStreamReader.ReadLine.Trim
+                    Dim lOpTyp As String = Trim(Mid(lCurrentRecord, 9))
+                    lCurrentRecord = lStreamReader.ReadLine.Trim 'blank
+                    lCurrentRecord = lStreamReader.ReadLine.Trim 'header
+                    Dim lStart As Integer
+                    If Mid(lCurrentRecord, 21, 4) = "Desc" Then
+                        'have operation description
+                        lHaveDesc = True
+                        lStart = 40
+                    Else
+                        lHaveDesc = False
+                        lStart = 20
+                    End If
+                    If Mid(lCurrentRecord, 21, 5) = "Occur" Or Mid(lCurrentRecord, 21, 6) = "QUALID" Or Mid(lCurrentRecord, 21, 4) = "GQID" Then
+                        'multiple occurance table, don't do for now
+                    Else
+                        'ok to continue
+                        Dim lTabledef As HspfTableDef = pMsg.BlockDefs(lOpTyp).TableDefs(lTable)
+                        Dim lNumParms As Long = lTabledef.ParmDefs.Count
+                        Dim lParmName(lNumParms) As String
+                        lCurrentRecord = Mid(lCurrentRecord, lStart + 1)
+                        For j As Integer = 0 To lNumParms - 1
+                            lParmName(j) = lTabledef.ParmDefs(j).Name
+                        Next j
+                        lCurrentRecord = lStreamReader.ReadLine.Trim 'data line
+                        Do Until lCurrentRecord.Trim.Length = 0
+                            Dim lOpId As String = Mid(lCurrentRecord, 1, 5)
+                            Dim lDesc As String = ""
+                            If lHaveDesc Then
+                                lDesc = Mid(lCurrentRecord, 21, 20)
+                            Else
+                                lDesc = ""
+                            End If
+                            lCurrentRecord = Mid(lCurrentRecord, lStart + 1)
+                            For j As Integer = 0 To lNumParms - 1
+                                lHSPFParm = New HSPFParameter
+                                lHSPFParm.Parm = lParmName(j)
+                                lHSPFParm.Table = lTable
+                                If lTabledef.ParmDefs(j).Typ <> 0 And lCurrentRecord.Length >= lTabledef.ParmDefs(j).Length Then
+                                    If IsNumeric(Mid(lCurrentRecord, 1, lTabledef.ParmDefs(j).Length)) Then
+                                        lHSPFParm.Value = Mid(lCurrentRecord, 1, lTabledef.ParmDefs(j).Length)
+                                    End If
+                                End If
+                                lCurrentRecord = Mid(lCurrentRecord, lTabledef.ParmDefs(j).Length + 1)
+                                lHSPFParm.OpType = lOpTyp
+                                lHSPFParm.OpId = lOpId
+                                lHSPFParm.Desc = Trim(lDesc)
+                                lHSPFParm.Id = pHspfParms.Count + 1
+                                pHspfParms.Add(lHSPFParm)
+                            Next j
+                            lCurrentRecord = lStreamReader.ReadLine.Trim 'data line
+                        Loop
+                    End If
+                End If
+            Loop
+        Catch e As ApplicationException
+            Logger.Msg("Problem reading file " & aFilename & vbCrLf & e.Message, "HSPFParm Report File Problem")
+            lReturnCode = 3
+        End Try
+        Return lReturnCode
+
+    End Function
+
+    Private Sub RefreshParms()
+        lstParms.Items.Clear()
+        For Each lParm As HSPFParameter In pHspfParms
+            Dim lTemp As String = lParm.Parm & " = " & lParm.Value & " (" & lParm.OpType & " " & lParm.OpId
+            If lParm.Desc.Length > 0 Then
+                lTemp = lTemp & " - " & lParm.Desc & ")"
+            Else
+                lTemp = lTemp & ")"
+            End If
+            lstParms.Items.Add(lTemp)
+        Next
+    End Sub
+
+    Private Sub DefaultGrid()
+        Dim lRow As Integer = 0
+        For Each lOpType As HspfOpnBlk In pDefUCI.OpnBlks
+            For Each lOpn As HspfOperation In lOpType.Ids
+                lRow += 1
+                For Each lParm As HSPFParameter In pHspfParms
+                    If lParm.OpType = lOpn.Name And lParm.Desc.ToUpper = lOpn.Description.ToUpper Then
+                        'matching land use name
+                        agdStarter.Source.CellValue(lRow, 1) = lParm.OpType & " " & lParm.OpId & " (" & lParm.Desc & ")"
+                    End If
+                Next
+            Next lOpn
+        Next lOpType
+    End Sub
+
+    Private Function FindTableName(ByVal aOpType As String, ByVal aParmName As String) As String
+        FindTableName = ""
+        For Each lTable As HspfTableDef In pMsg.BlockDefs(aOpType).TableDefs
+            For Each lParm As HSPFParmDef In lTable.ParmDefs
+                If lParm.Name = aParmName Then
+                    FindTableName = lTable.Name
+                    Exit For
+                End If
+            Next
+            If Len(FindTableName) > 0 Then Exit For
+        Next
+    End Function
+
+    Private Sub lstParms_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lstParms.SelectedIndexChanged
+        lstStarter.Items.Clear()
+        For lIndex As Integer = 1 To lstParms.SelectedItems.Count
+            Dim lOpName As String = pHspfParms(lstParms.SelectedIndices(lIndex - 1)).OpType
+            If pDefUCI.OpnBlks(lOpName).Count > 0 Then
+                Dim lOpType As HspfOpnBlk = pDefUCI.OpnBlks(lOpName)
+                For Each lOpn As HspfOperation In lOpType.Ids
+                    lstStarter.Items.Add(lOpn.Name & " " & lOpn.Id & " - " & lOpn.Description)
+                Next
+                Exit For
+            End If
+        Next lIndex
+    End Sub
+
+    Private Sub lstStarter_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lstStarter.SelectedIndexChanged
+        cmdApply.Enabled = True
+    End Sub
+
+    Private Sub agdStarter_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdStarter.CellEdited
+        For lRow As Integer = 1 To agdStarter.Source.Rows - 1
+            If agdStarter.Source.CellValue(lRow, 1) <> "<none>" Then
+                cmdApply.Enabled = True
+            End If
+        Next
+    End Sub
+
+    Private Sub agdStarter_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdStarter.MouseDownCell
+        DoLimits(aColumn, aRow)
+    End Sub
+End Class
+
+Public Class HSPFParameter
+    Public Desc As String
+    Public Parm As String
+    Public Table As String
+    Public Value As Single
+    Public OpType As String
+    Public OpId As Long
+    Public Id As Long
 End Class
