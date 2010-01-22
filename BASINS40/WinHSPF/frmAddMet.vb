@@ -314,20 +314,21 @@ Public Class frmAddMet
                 End If
             ElseIf pSelectedColumn = 3 Then 'valid dsns
                 Dim lWDMid As String = .Source.CellValue(pSelectedRow, pSelectedColumn - 2)
+                Dim lId As Integer
                 If IsNumeric(Mid(lWDMid, 4, 1)) Then
-                    Dim lId As Integer = CInt(Mid(lWDMid, 4, 1))
-                    Dim lTsFile As New atcData.atcTimeseriesSource
-                    If IsNumeric(lId) Then
-                        lTsFile = pUCI.GetWDMObj(CInt(lId))
-                        If Not lTsFile Is Nothing Then
-                            For Each lts As atcData.atcTimeseries In lTsFile.DataSets
-                                If lts.Attributes.GetValue("TSTYPE") = .Source.CellValue(pSelectedRow, pSelectedColumn - 1) Then
-                                    Dim lDsn As String = lts.Attributes.GetValue("ID")
-                                    lValidValues.Add(lDsn & LocFromDsn(lId, CInt(lDsn)))
-                                End If
-                            Next
+                    lId = CInt(Mid(lWDMid, 4, 1))
+                Else
+                    lId = 1
+                End If
+                Dim lTsFile As New atcData.atcTimeseriesSource
+                lTsFile = pUCI.GetWDMObj(CInt(lId))
+                If Not lTsFile Is Nothing Then
+                    For Each lts As atcData.atcTimeseries In lTsFile.DataSets
+                        If lts.Attributes.GetValue("TSTYPE") = .Source.CellValue(pSelectedRow, pSelectedColumn - 1) Then
+                            Dim lDsn As String = lts.Attributes.GetValue("ID")
+                            lValidValues.Add(lDsn & LocFromDsn(lId, CInt(lDsn)))
                         End If
-                    End If
+                    Next
                 End If
             End If
 
@@ -505,6 +506,7 @@ Public Class frmAddMet
                        Len(Trim(.CellValue(1, 2))) > 0 And _
                        Len(Trim(.CellValue(1, 3))) > 0 Then
                         lblName.Text = pUCI.GetWDMAttr(.CellValue(1, 1), DsnOnly(.CellValue(1, 3)), "LOC")
+                        pSegmentName = lblName.Text
                     End If
                 End With
             End If

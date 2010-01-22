@@ -56,7 +56,7 @@ Partial Class frmTime
         Me.txtEndMinute.HardMin = 0
         Me.txtEndMinute.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtEndMinute.Location = New System.Drawing.Point(435, 60)
-        Me.txtEndMinute.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.txtEndMinute.Margin = New System.Windows.Forms.Padding(4)
         Me.txtEndMinute.MaxWidth = 0
         Me.txtEndMinute.Name = "txtEndMinute"
         Me.txtEndMinute.NumericFormat = "0.#####"
@@ -80,7 +80,7 @@ Partial Class frmTime
         Me.txtStartMinute.HardMin = 0
         Me.txtStartMinute.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtStartMinute.Location = New System.Drawing.Point(435, 31)
-        Me.txtStartMinute.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.txtStartMinute.Margin = New System.Windows.Forms.Padding(4)
         Me.txtStartMinute.MaxWidth = 0
         Me.txtStartMinute.Name = "txtStartMinute"
         Me.txtStartMinute.NumericFormat = "0.#####"
@@ -104,7 +104,7 @@ Partial Class frmTime
         Me.txtEndHour.HardMin = 0
         Me.txtEndHour.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtEndHour.Location = New System.Drawing.Point(352, 60)
-        Me.txtEndHour.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.txtEndHour.Margin = New System.Windows.Forms.Padding(4)
         Me.txtEndHour.MaxWidth = 0
         Me.txtEndHour.Name = "txtEndHour"
         Me.txtEndHour.NumericFormat = "0.#####"
@@ -128,7 +128,7 @@ Partial Class frmTime
         Me.txtStartHour.HardMin = 0
         Me.txtStartHour.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtStartHour.Location = New System.Drawing.Point(352, 31)
-        Me.txtStartHour.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.txtStartHour.Margin = New System.Windows.Forms.Padding(4)
         Me.txtStartHour.MaxWidth = 0
         Me.txtStartHour.Name = "txtStartHour"
         Me.txtStartHour.NumericFormat = "0.#####"
@@ -152,7 +152,7 @@ Partial Class frmTime
         Me.txtEndDay.HardMin = 1
         Me.txtEndDay.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtEndDay.Location = New System.Drawing.Point(269, 60)
-        Me.txtEndDay.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.txtEndDay.Margin = New System.Windows.Forms.Padding(4)
         Me.txtEndDay.MaxWidth = 0
         Me.txtEndDay.Name = "txtEndDay"
         Me.txtEndDay.NumericFormat = "0.#####"
@@ -176,7 +176,7 @@ Partial Class frmTime
         Me.txtStartDay.HardMin = 1
         Me.txtStartDay.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtStartDay.Location = New System.Drawing.Point(269, 31)
-        Me.txtStartDay.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.txtStartDay.Margin = New System.Windows.Forms.Padding(4)
         Me.txtStartDay.MaxWidth = 0
         Me.txtStartDay.Name = "txtStartDay"
         Me.txtStartDay.NumericFormat = "0.#####"
@@ -200,7 +200,7 @@ Partial Class frmTime
         Me.txtEndMonth.HardMin = 1
         Me.txtEndMonth.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtEndMonth.Location = New System.Drawing.Point(188, 63)
-        Me.txtEndMonth.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.txtEndMonth.Margin = New System.Windows.Forms.Padding(4)
         Me.txtEndMonth.MaxWidth = 0
         Me.txtEndMonth.Name = "txtEndMonth"
         Me.txtEndMonth.NumericFormat = "0.#####"
@@ -224,7 +224,7 @@ Partial Class frmTime
         Me.txtStartMonth.HardMin = 1
         Me.txtStartMonth.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtStartMonth.Location = New System.Drawing.Point(187, 31)
-        Me.txtStartMonth.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.txtStartMonth.Margin = New System.Windows.Forms.Padding(4)
         Me.txtStartMonth.MaxWidth = 0
         Me.txtStartMonth.Name = "txtStartMonth"
         Me.txtStartMonth.NumericFormat = "0.#####"
@@ -248,7 +248,7 @@ Partial Class frmTime
         Me.txtEndYear.HardMin = 0
         Me.txtEndYear.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtEndYear.Location = New System.Drawing.Point(104, 60)
-        Me.txtEndYear.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.txtEndYear.Margin = New System.Windows.Forms.Padding(4)
         Me.txtEndYear.MaxWidth = 0
         Me.txtEndYear.Name = "txtEndYear"
         Me.txtEndYear.NumericFormat = "0.#####"
@@ -272,7 +272,7 @@ Partial Class frmTime
         Me.txtStartYear.HardMin = 0
         Me.txtStartYear.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.txtStartYear.Location = New System.Drawing.Point(104, 31)
-        Me.txtStartYear.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.txtStartYear.Margin = New System.Windows.Forms.Padding(4)
         Me.txtStartYear.MaxWidth = 0
         Me.txtStartYear.Name = "txtStartYear"
         Me.txtStartYear.NumericFormat = "0.#####"
@@ -376,9 +376,9 @@ Partial Class frmTime
         Me.GroupBox1.Controls.Add(Me.Label1)
         Me.GroupBox1.Controls.Add(Me.agdMet)
         Me.GroupBox1.Location = New System.Drawing.Point(25, 103)
-        Me.GroupBox1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.GroupBox1.Margin = New System.Windows.Forms.Padding(4)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(4)
         Me.GroupBox1.Size = New System.Drawing.Size(512, 455)
         Me.GroupBox1.TabIndex = 46
         Me.GroupBox1.TabStop = False
@@ -386,8 +386,9 @@ Partial Class frmTime
         '
         'cmdApply
         '
+        Me.cmdApply.Enabled = False
         Me.cmdApply.Location = New System.Drawing.Point(207, 37)
-        Me.cmdApply.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdApply.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdApply.Name = "cmdApply"
         Me.cmdApply.Size = New System.Drawing.Size(89, 31)
         Me.cmdApply.TabIndex = 4
@@ -397,7 +398,7 @@ Partial Class frmTime
         'cmdEdit
         '
         Me.cmdEdit.Location = New System.Drawing.Point(109, 37)
-        Me.cmdEdit.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdEdit.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdEdit.Name = "cmdEdit"
         Me.cmdEdit.Size = New System.Drawing.Size(89, 31)
         Me.cmdEdit.TabIndex = 3
@@ -407,7 +408,7 @@ Partial Class frmTime
         'cmdAdd
         '
         Me.cmdAdd.Location = New System.Drawing.Point(12, 37)
-        Me.cmdAdd.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdAdd.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdAdd.Name = "cmdAdd"
         Me.cmdAdd.Size = New System.Drawing.Size(89, 31)
         Me.cmdAdd.TabIndex = 2
@@ -436,7 +437,7 @@ Partial Class frmTime
         Me.agdMet.LineColor = System.Drawing.Color.Empty
         Me.agdMet.LineWidth = 0.0!
         Me.agdMet.Location = New System.Drawing.Point(17, 108)
-        Me.agdMet.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.agdMet.Margin = New System.Windows.Forms.Padding(4)
         Me.agdMet.Name = "agdMet"
         Me.agdMet.Size = New System.Drawing.Size(476, 334)
         Me.agdMet.Source = Nothing
@@ -446,7 +447,7 @@ Partial Class frmTime
         '
         Me.Cancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom
         Me.Cancel.Location = New System.Drawing.Point(289, 580)
-        Me.Cancel.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Cancel.Margin = New System.Windows.Forms.Padding(4)
         Me.Cancel.Name = "Cancel"
         Me.Cancel.Size = New System.Drawing.Size(101, 31)
         Me.Cancel.TabIndex = 6
@@ -457,7 +458,7 @@ Partial Class frmTime
         '
         Me.cmdOK.Anchor = System.Windows.Forms.AnchorStyles.Bottom
         Me.cmdOK.Location = New System.Drawing.Point(172, 580)
-        Me.cmdOK.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdOK.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdOK.Name = "cmdOK"
         Me.cmdOK.Size = New System.Drawing.Size(101, 31)
         Me.cmdOK.TabIndex = 5
@@ -489,7 +490,7 @@ Partial Class frmTime
         Me.Controls.Add(Me.Label9)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.Label2)
-        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmTime"
         Me.Text = "WinHSPF - Simulation Time and Meteorologic Data"
         Me.GroupBox1.ResumeLayout(False)
