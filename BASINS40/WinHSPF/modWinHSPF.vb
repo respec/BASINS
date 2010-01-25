@@ -44,7 +44,11 @@ Public Module WinHSPF
     'Friend pIPC As ATCoIPC
 
     Sub Main()
-        Logger.StartToFile("C:\dev\basins40\logs\WinHSPF.log")
+        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+        Dim lLogFolder As String = lBasinsBinLoc
+        If lLogFolder.EndsWith("Debug") Then lLogFolder = PathNameOnly(lLogFolder)
+        lLogFolder = PathNameOnly(lLogFolder)
+        Logger.StartToFile(IO.Path.Combine(IO.Path.Combine(lLogFolder, "logs"), "WinHSPF.log"))
 
         'open hspf message mdb
         pMsg = New HspfMsg
@@ -52,7 +56,6 @@ Public Module WinHSPF
         Logger.Dbg("WinHSPF:Opened:hspfmsg.mdb")
 
         'get starter uci ready
-        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
         Dim lStarterUciName As String = "starter.uci"
         Dim lStarterPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "models\hspf\bin\starter\" & lStarterUciName
         If Not FileExists(lStarterPath) Then
