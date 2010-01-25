@@ -77,26 +77,28 @@ Public Class ctlLegend
     ''' </summary>
     ''' <remarks></remarks>
     Public Sub PlaceIcons()
-        Dim lY As Integer = IconMargin
-        Dim lIndex As Integer = 0
-        Dim lBackground As Bitmap = New Bitmap(pnlLegend.Width, pnlLegend.Height, Drawing.Imaging.PixelFormat.Format32bppArgb)
-        Dim lGraphics As Graphics = Graphics.FromImage(lBackground)
+        If pnlLegend.Height > IconMargin AndAlso pnlLegend.Width > IconMargin Then
+            Dim lY As Integer = IconMargin
+            Dim lIndex As Integer = 0
+            Dim lBackground As Bitmap = New Bitmap(pnlLegend.Width, pnlLegend.Height, Drawing.Imaging.PixelFormat.Format32bppArgb)
+            Dim lGraphics As Graphics = Graphics.FromImage(lBackground)
 
-        For Each lIcon As clsIcon In Icons
-            If lIndex < TopIconIndex Then
-                lIcon.Top = -lIcon.Height
-            Else
-                lIcon.Top = lY
-                lIcon.Width = IconWidth()
-                If lIcon.Selected Then
-                    lGraphics.FillRectangle(SystemBrushes.Highlight, 0, lY - IconMargin, Me.Width, lIcon.Height + IconMargin + IconMargin)
+            For Each lIcon As clsIcon In Icons
+                If lIndex < TopIconIndex Then
+                    lIcon.Top = -lIcon.Height
+                Else
+                    lIcon.Top = lY
+                    lIcon.Width = IconWidth()
+                    If lIcon.Selected Then
+                        lGraphics.FillRectangle(SystemBrushes.Highlight, 0, lY - IconMargin, Me.Width, lIcon.Height + IconMargin + IconMargin)
+                    End If
+                    lY += lIcon.Height + IconMargin * 2
                 End If
-                lY += lIcon.Height + IconMargin * 2
-            End If
-            lIndex += 1
-        Next
-        lGraphics.Dispose()
-        pnlLegend.BackgroundImage = lBackground
+                lIndex += 1
+            Next
+            lGraphics.Dispose()
+            pnlLegend.BackgroundImage = lBackground
+        End If
     End Sub
 
     Private Sub ctlLegend_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
