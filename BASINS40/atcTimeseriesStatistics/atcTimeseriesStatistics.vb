@@ -76,8 +76,10 @@ Public Class atcTimeseriesStatistics
                 AddOperation("Last", "Last value", defTimeSeriesOne, lCategory)
 
                 AddOperation("Max", "Maximum value", defTimeSeriesOne, lCategory)
+                AddOperation("MaxDate", "Date of maximum value", defTimeSeriesOne, lCategory)
 
                 AddOperation("Min", "Minimum value", defTimeSeriesOne, lCategory)
+                AddOperation("MinDate", "Date of minimum value", defTimeSeriesOne, lCategory)
 
                 AddOperation("Sum", "Summation of all values", defTimeSeriesOne, lCategory)
 
@@ -185,7 +187,9 @@ Public Class atcTimeseriesStatistics
             Dim lDev As Double
 
             Dim lMax As Double = pMinValue
+            Dim lMaxDate As Double = pNaN
             Dim lMin As Double = pMaxValue
+            Dim lMinDate As Double = pNaN
 
             Dim lGeoMean As Double = 0
             Dim lStdDev As Double = pNaN
@@ -206,8 +210,14 @@ Public Class atcTimeseriesStatistics
                 lVal = aTimeseries.Value(lIndex)
                 If Not Double.IsNaN(lVal) Then
                     lCount += 1
-                    If lVal > lMax Then lMax = lVal
-                    If lVal < lMin Then lMin = lVal
+                    If lVal > lMax Then
+                        lMax = lVal
+                        lMaxDate = aTimeseries.Dates.Value(lIndex)
+                    End If
+                    If lVal < lMin Then
+                        lMin = lVal
+                        lMinDate = aTimeseries.Dates.Value(lIndex)
+                    End If
                     lSum += lVal
                     If lMin > 0 Then lGeoMean += Math.Log(lVal)
 
@@ -229,7 +239,9 @@ Public Class atcTimeseriesStatistics
             If lCount > 0 Then
                 aTimeseries.Attributes.SetValue("Last", aTimeseries.Value(lLastValueIndex))
                 aTimeseries.Attributes.SetValue("Max", lMax)
+                aTimeseries.Attributes.SetValue("MaxDate", lMaxDate)
                 aTimeseries.Attributes.SetValue("Min", lMin)
+                aTimeseries.Attributes.SetValue("MinDate", lMinDate)
                 aTimeseries.Attributes.SetValue("Sum", lSum)
                 If Not aTimeseries.Dates Is Nothing Then
                     With aTimeseries.Dates
