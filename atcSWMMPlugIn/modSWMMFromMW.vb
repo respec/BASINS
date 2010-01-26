@@ -781,7 +781,7 @@ Friend Module modSWMMFromMW
         For Each lEntity As Object In aEntities
             For Each lField As System.Reflection.FieldInfo In lEntity.GetType.GetFields()
                 If lField.FieldType.Name = "String" Then
-                    If lField.GetValue(lEntity).ToString.Length = 0 Then
+                    If lField.GetValue(lEntity) Is Nothing OrElse lField.GetValue(lEntity).ToString.Length = 0 Then
                         'the value is blank, use default
                         If aFieldDetails.Contains(lField.Name) Then
                             If aFieldDetails(lField.Name).DefaultValue.Length > 0 Then
@@ -790,7 +790,7 @@ Friend Module modSWMMFromMW
                         End If
                     End If
                 ElseIf lField.FieldType.Name = "Integer" Or lField.FieldType.Name = "Int32" Then
-                    If lField.GetValue(lEntity) < 0 Then
+                    If lField.GetValue(lEntity) Is Nothing OrElse lField.GetValue(lEntity) < 0 Then
                         'the value is less than zero, use default
                         If aFieldDetails.Contains(lField.Name) Then
                             If IsNumeric(aFieldDetails(lField.Name).DefaultValue) AndAlso CInt(aFieldDetails(lField.Name).DefaultValue) >= 0 Then
@@ -799,7 +799,7 @@ Friend Module modSWMMFromMW
                         End If
                     End If
                 ElseIf lField.FieldType.Name = "Double" Then
-                    If lField.GetValue(lEntity) < 0 Then
+                    If lField.GetValue(lEntity) Is Nothing OrElse lField.GetValue(lEntity) < 0 Then
                         'the value is less than zero, use default
                         If aFieldDetails.Contains(lField.Name) Then
                             If IsNumeric(aFieldDetails(lField.Name).DefaultValue) AndAlso CDbl(aFieldDetails(lField.Name).DefaultValue) >= 0 Then
