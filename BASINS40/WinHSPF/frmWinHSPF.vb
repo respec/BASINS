@@ -297,4 +297,33 @@ Public Class frmWinHSPF
     Private Sub cmdRunHSPF_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdRunHSPF.Click
         RunHSPF()
     End Sub
+
+    Private Sub frmWinHSPF_DragDrop(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles Me.DragDrop
+        Dim lUciFilename As String = DraggingUCI(e)
+        If IO.File.Exists(lUciFilename) Then
+            Me.Activate()
+            OpenUCI(lUciFilename)
+        End If
+    End Sub
+
+    Private Sub frmWinHSPF_DragEnter(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles Me.DragEnter
+        If DraggingUCI(e).Length > 0 Then
+            e.Effect = Windows.Forms.DragDropEffects.All
+        End If
+    End Sub
+
+    Private Function DraggingUCI(ByVal e As System.Windows.Forms.DragEventArgs) As String
+        If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
+            Dim lFilenames() As String = e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
+            If lFilenames.Length = 1 AndAlso lFilenames(0).ToLower.EndsWith(".uci") Then
+                Return lFilenames(0)
+            End If
+        End If
+        Return ""
+    End Function
+
+    Private Sub frmWinHSPF_Layout(ByVal sender As Object, ByVal e As System.Windows.Forms.LayoutEventArgs) Handles Me.Layout
+        SchematicDiagram.Top = TopPanel.Height
+    End Sub
+
 End Class

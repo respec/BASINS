@@ -55,7 +55,7 @@ Public Class ctlLegend
     End Function
 
     Public Function IconWidth() As Integer
-        Return Me.Width - IconMargin - IconMargin
+        Return Math.Max(Me.Width - IconMargin - IconMargin, 20)
     End Function
 
     Private Sub btnScrollLegendUp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnScrollLegendUp.Click

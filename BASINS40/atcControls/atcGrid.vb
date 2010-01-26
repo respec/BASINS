@@ -21,8 +21,8 @@ Public Class atcGrid
     Private pLineWidth As Single
     Private pCellBackColor As Color
     Private pCellTextColor As Color
-    Private pRowHeight As ArrayList = New ArrayList   'of Integer
-    Private pColumnWidth As ArrayList = New ArrayList 'of Integer
+    Private pRowHeight As New Generic.List(Of Integer)
+    Private pColumnWidth As New Generic.List(Of Integer)
     Private pVisibleWidth As Integer = 0
 
     Private pRowsScrolled As Integer 'Number of rows that are scrolled up above the view area
@@ -146,8 +146,8 @@ Public Class atcGrid
 
         pRowsScrolled = 0
 
-        pRowHeight = New ArrayList
-        pColumnWidth = New ArrayList
+        pRowHeight = New Generic.List(Of Integer)
+        pColumnWidth = New Generic.List(Of Integer)
 
         pRowBottom = New atcCollection
         pColumnRight = New atcCollection
@@ -753,7 +753,7 @@ Public Class atcGrid
             Next
             If aTotalWidth > 0 AndAlso (aShrinkToTotalWidth OrElse aTotalWidth > lContentsWidth) Then
                 For lCol As Integer = 0 To lMaxColumn
-                    ColumnWidth(lCol) = ColumnWidth(lCol) * aTotalWidth / lContentsWidth
+                    ColumnWidth(lCol) = Math.Floor(ColumnWidth(lCol) * aTotalWidth / lContentsWidth)
                 Next
             End If
         End If
@@ -996,7 +996,7 @@ Public Class atcGrid
         Return -1
     End Function
 
-    Private Sub atcGrid_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Resize
+    Private Sub atcGrid_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Layout
         CellComboBox.Visible = False
         CellEditBox.Visible = False
         SizeScrollers()
