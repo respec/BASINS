@@ -3,7 +3,7 @@ Imports atcUtility
 Imports MapWinUtility
 Imports System.Collections.ObjectModel
 
-Public Class ctlLegend
+Friend Class ctlLegend
 
     Public Shared IconMargin As Integer = 3
 
@@ -83,6 +83,8 @@ Public Class ctlLegend
             Dim lBackground As Bitmap = New Bitmap(pnlLegend.Width, pnlLegend.Height, Drawing.Imaging.PixelFormat.Format32bppArgb)
             Dim lGraphics As Graphics = Graphics.FromImage(lBackground)
 
+            btnScrollLegendUp.Visible = (TopIconIndex > 0)
+
             For Each lIcon As clsIcon In Icons
                 If lIndex < TopIconIndex Then
                     lIcon.Top = -lIcon.Height
@@ -96,6 +98,9 @@ Public Class ctlLegend
                 End If
                 lIndex += 1
             Next
+
+            btnScrollLegendDown.Visible = (lY > pnlLegend.Height)
+
             lGraphics.Dispose()
             pnlLegend.BackgroundImage = lBackground
         End If
@@ -104,6 +109,7 @@ Public Class ctlLegend
     Private Sub ctlLegend_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
         btnScrollLegendUp.Width = Me.Width - IconMargin * 2
         btnScrollLegendDown.Width = Me.Width - IconMargin * 2
+        PlaceIcons()
         RaiseEvent Resized()
     End Sub
 End Class

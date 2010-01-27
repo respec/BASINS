@@ -13,7 +13,6 @@ Public Class frmWinHSPF
 
         'set edit menu
         SetEditMenu()
-
     End Sub
 
     Private Sub SetEditMenu()
@@ -322,8 +321,13 @@ Public Class frmWinHSPF
         Return ""
     End Function
 
-    Private Sub frmWinHSPF_Layout(ByVal sender As Object, ByVal e As System.Windows.Forms.LayoutEventArgs) Handles Me.Layout
-        SchematicDiagram.Top = TopPanel.Height
+    Private Sub frmWinHSPF_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
+        ResizeDiagram()
     End Sub
-
+    Public Sub ResizeDiagram()
+        SchematicDiagram.Top = TopPanel.Height
+        SchematicDiagram.Size = New Size(Me.ClientRectangle.Width, Me.ClientRectangle.Height - SchematicDiagram.Top)
+        SchematicDiagram.RefreshDetails()
+        SchematicDiagram.RefreshDetails()
+    End Sub
 End Class
