@@ -751,6 +751,13 @@ Public Class atcGrid
                 If lCol < 100 Then SizeColumnToContents(lCol)
                 lContentsWidth += ColumnWidth(lCol)
             Next
+            If aTotalWidth = -1 Then
+                If pVisibleWidth > 0 Then
+                    aTotalWidth = pVisibleWidth
+                Else
+                    aTotalWidth = Me.Width - VScroller.Width
+                End If
+            End If
             If aTotalWidth > 0 AndAlso (aShrinkToTotalWidth OrElse aTotalWidth > lContentsWidth) Then
                 For lCol As Integer = 0 To lMaxColumn
                     ColumnWidth(lCol) = Math.Floor(ColumnWidth(lCol) * aTotalWidth / lContentsWidth)
@@ -996,7 +1003,7 @@ Public Class atcGrid
         Return -1
     End Function
 
-    Private Sub atcGrid_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Layout
+    Private Sub atcGrid_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Resize
         CellComboBox.Visible = False
         CellEditBox.Visible = False
         SizeScrollers()
