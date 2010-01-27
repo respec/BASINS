@@ -476,7 +476,6 @@ Public Class HspfUci
                         Dim lCurrArea As Double = 0.0
                         If lConnection.Source.VolName = "PERLND" Or _
                            lConnection.Source.VolName = "IMPLND" Then
-                            lCurrArea = lConnection.MFact
                             For Each lSourceConnection As HspfConnection In lOperation.Sources
                                 If lSourceConnection.Source.VolName = "PERLND" Or _
                                    lSourceConnection.Source.VolName = "IMPLND" Or _

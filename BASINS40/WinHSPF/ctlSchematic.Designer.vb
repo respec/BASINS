@@ -104,6 +104,7 @@ Partial Class ctlSchematic
         '
         Me.LegendLandSurface.Dock = System.Windows.Forms.DockStyle.Fill
         Me.LegendLandSurface.Location = New System.Drawing.Point(3, 3)
+        Me.LegendLandSurface.Margin = New System.Windows.Forms.Padding(0)
         Me.LegendLandSurface.Name = "LegendLandSurface"
         Me.LegendLandSurface.Size = New System.Drawing.Size(175, 306)
         Me.LegendLandSurface.TabIndex = 0
@@ -123,6 +124,7 @@ Partial Class ctlSchematic
         '
         Me.LegendMetSegs.Dock = System.Windows.Forms.DockStyle.Fill
         Me.LegendMetSegs.Location = New System.Drawing.Point(3, 3)
+        Me.LegendMetSegs.Margin = New System.Windows.Forms.Padding(0)
         Me.LegendMetSegs.Name = "LegendMetSegs"
         Me.LegendMetSegs.Size = New System.Drawing.Size(175, 306)
         Me.LegendMetSegs.TabIndex = 1
@@ -142,6 +144,7 @@ Partial Class ctlSchematic
         '
         Me.LegendPointSources.Dock = System.Windows.Forms.DockStyle.Fill
         Me.LegendPointSources.Location = New System.Drawing.Point(3, 3)
+        Me.LegendPointSources.Margin = New System.Windows.Forms.Padding(0)
         Me.LegendPointSources.Name = "LegendPointSources"
         Me.LegendPointSources.Size = New System.Drawing.Size(175, 306)
         Me.LegendPointSources.TabIndex = 1
@@ -150,6 +153,7 @@ Partial Class ctlSchematic
         '
         Me.agdDetails.AllowHorizontalScrolling = True
         Me.agdDetails.AllowNewValidValues = False
+        Me.agdDetails.BackColor = System.Drawing.SystemColors.Control
         Me.agdDetails.CellBackColor = System.Drawing.Color.Empty
         Me.agdDetails.Dock = System.Windows.Forms.DockStyle.Fill
         Me.agdDetails.Fixed3D = False

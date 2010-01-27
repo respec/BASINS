@@ -371,9 +371,9 @@ EndFound:
     End Function
 
     <DllImport("kernel32.dll", SetLastError:=True, CharSet:=CharSet.Auto)> _
-       Public Function GetShortPathName(ByVal lpszLongPath As String, _
-                                        ByVal lpszShortPath As StringBuilder, _
-                                        ByVal cchBuffer As Integer) As Integer
+    Public Function GetShortPathName(ByVal lpszLongPath As String, _
+                                     ByVal lpszShortPath As StringBuilder, _
+                                     ByVal cchBuffer As Integer) As Integer
     End Function
 
     ''' <summary>

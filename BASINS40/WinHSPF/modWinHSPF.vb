@@ -120,6 +120,7 @@ Public Module WinHSPF
         If pWinHSPF IsNot Nothing Then
             pWinHSPF.Text = pWinHSPF.Tag & ": " & pUCI.Name
             pWinHSPF.SchematicDiagram.UCI = pUCI
+            pWinHSPF.ResizeDiagram()
         End If
         Logger.Dbg("WinHSPF:FastReadUci:Done:" & lUCIName)
     End Sub
