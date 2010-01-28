@@ -263,7 +263,7 @@ Public Class frmAddExpert
         ElseIf pCheckedRadioIndex = 3 Then 'add aquatox linkage
             If lstOperation.SelectedIndex > -1 Then
                 lId = pListBox1DataItems.Item(lstOperation.SelectedIndex + 1)
-                If Not pfrmOutput.IsAQUATOXLocation("RCHRES", (lId)) Then
+                If Not frmOutput.IsAQUATOXLocation("RCHRES", (lId)) Then
                     'make sure required sections are on  
                     Dim lOper As HspfOperation = pUCI.OpnBlks("RCHRES").OperFromID(lId)
                     Dim lTable As HspfTable = lOper.Tables("ACTIVITY")

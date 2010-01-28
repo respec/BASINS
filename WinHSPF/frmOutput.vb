@@ -234,7 +234,7 @@ Public Class frmOutput
 
     End Function
 
-    Private Function WDMInd(ByVal aWDMId As String) As Long
+    Private Shared Function WDMInd(ByVal aWDMId As String) As Long
         Dim lString As String
 
         If Len(aWDMId) > 3 Then
@@ -269,7 +269,7 @@ Public Class frmOutput
         Next lOper1
     End Function
 
-    Public Function IsAQUATOXLocation(ByVal aName As String, ByVal aId As Integer) As Boolean
+    Public Shared Function IsAQUATOXLocation(ByVal aName As String, ByVal aId As Integer) As Boolean
         'call it an aquatox loc if required sections are on and
 
         Dim lHspfTable As HspfTable

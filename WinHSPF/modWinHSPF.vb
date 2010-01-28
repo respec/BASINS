@@ -45,10 +45,13 @@ Public Module WinHSPF
 
     Sub Main()
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-        Dim lLogFolder As String = lBasinsBinLoc
-        If lLogFolder.EndsWith("Debug") Then lLogFolder = PathNameOnly(lLogFolder)
-        lLogFolder = PathNameOnly(lLogFolder)
-        Logger.StartToFile(IO.Path.Combine(IO.Path.Combine(lLogFolder, "logs"), "WinHSPF.log"))
+
+        If Not FileExists(Logger.FileName) Then
+            Dim lLogFolder As String = lBasinsBinLoc
+            If lLogFolder.EndsWith("Debug") Then lLogFolder = PathNameOnly(lLogFolder)
+            lLogFolder = PathNameOnly(lLogFolder)
+            Logger.StartToFile(IO.Path.Combine(IO.Path.Combine(lLogFolder, "logs"), "WinHSPF.log"))
+        End If
 
         'open hspf message mdb
         pMsg = New HspfMsg
