@@ -543,7 +543,7 @@ Public Class frmPollutant
                     Dim ltConn As HspfConnection = lOper.Targets(lIndex)
                     If ltConn.Target.VolName = lConn.Target.VolName And _
                        ltConn.Target.VolId = lConn.Target.VolId Then
-                        lOper.Targets.Remove(lIndex)
+                        lOper.Targets.RemoveAt(lIndex)
                     Else
                         lIndex = lIndex + 1
                     End If
