@@ -2819,7 +2819,29 @@ Public Class GisUtil
     Public Shared Sub BufferLayer(ByVal aInputShapefileFilename As String, ByVal aResultShapefileFilename As String, _
                                   ByVal aBufferDistance As Double)
         'create a new shapefile as a buffer around the specified layer
-        MapWinGeoProc.SpatialOperations.BufferSF(aInputShapefileFilename, aResultShapefileFilename, aBufferDistance, False)
+        'MapWinGeoProc.SpatialOperations.BufferSF(aInputShapefileFilename, aResultShapefileFilename, aBufferDistance, False)
+
+        'Can replace geoproc version with one that uses ocx, seems to be more reliable 
+        Dim lInSf As New MapWinGIS.Shapefile
+        lInSf.Open(aInputShapefileFilename)
+        Dim lOutSf As New MapWinGIS.Shapefile
+        If lOutSf.CreateNew(aResultShapefileFilename, MapWinGIS.ShpfileType.SHP_POLYGON) Then
+            For lFieldIndex As Integer = 1 To lInSf.NumFields
+                lOutSf.EditInsertField(lInSf.Field(lFieldIndex - 1), lFieldIndex - 1)
+            Next lFieldIndex
+            lOutSf.StartEditingShapes()
+            For lIndex As Integer = 0 To lInSf.NumShapes - 1
+                Dim lShape As MapWinGIS.Shape = lInSf.Shape(lIndex)
+                Dim lNewShape As New MapWinGIS.Shape
+                lNewShape = lShape.Buffer(aBufferDistance, 0)
+                lOutSf.EditInsertShape(lNewShape, lOutSf.NumShapes)
+                For lFieldIndex As Integer = 0 To lInSf.NumFields - 1
+                    lOutSf.EditCellValue(lFieldIndex, lOutSf.NumShapes - 1, lInSf.CellValue(lFieldIndex, lIndex))
+                Next lFieldIndex
+            Next
+        End If
+        lOutSf.SaveAs(aResultShapefileFilename)
+        lOutSf.Close()
 
         Dim lInputProjectionFileName As String = FilenameSetExt(aInputShapefileFilename, "prj")
         If FileExists(lInputProjectionFileName) Then
