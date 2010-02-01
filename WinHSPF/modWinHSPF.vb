@@ -44,6 +44,7 @@ Public Module WinHSPF
     'Friend pIPC As ATCoIPC
 
     Sub Main()
+        pDefUCI = New HspfUci
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
 
         If Not FileExists(Logger.FileName) Then
@@ -67,8 +68,11 @@ Public Module WinHSPF
                 lStarterPath = FindFile("Please locate " & lStarterUciName, lStarterUciName)
             End If
         End If
-        pDefUCI = New HspfUci
         pDefUCI.FastReadUciForStarter(pMsg, lStarterPath)
+
+        'read pollutant list
+        pPollutantList = New Collection
+        ReadPollutantList()
 
         'show main form
         pWinHSPF = New frmWinHSPF
@@ -686,5 +690,37 @@ Public Module WinHSPF
                 Next
             End If
         Next
+    End Sub
+
+    Private Sub ReadPollutantList()
+        Dim lPollutantFileName As String = Nothing
+        Dim lLineNumber As Integer = 0
+
+        Try
+            lPollutantFileName = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location) & "\Poltnt_2.prn"
+
+            If Not FileExists(lPollutantFileName) Then
+                lPollutantFileName = FindFile("Please locate Poltnt_2.prn", "Poltnt_2.prn")
+            End If
+
+            For Each lString As String In LinesInFile(lPollutantFileName)
+                If lLineNumber = 0 Then
+                    'skip the first line which is assumed to be a header
+                    If InStr(lString, "PARM_CODE    PARM_NAME") < 1 Then
+                        If Logger.Message("The header of this pollutant file: " & vbCrLf & lPollutantFileName & vbCrLf & "Does not match common fomating standards. Do you want to continue?", "Pollutant File Suspicious", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, Windows.Forms.DialogResult.Yes) = Windows.Forms.DialogResult.No Then
+                            Exit Try
+                        End If
+                    End If
+                Else
+                    If lString.Length > 1 Then
+                        pPollutantList.Add(lString)
+                    End If
+                End If
+                lLineNumber += 1
+            Next
+        Catch ex As Exception
+            pPollutantList.Clear()
+            Logger.Message("There was an error reading the selected pollutant list." & vbCrLf & "Ensure that the pollutant file selected is formatted properly.", "Error Reading the pollutant file", MessageBoxButtons.OK, MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
+        End Try
     End Sub
 End Module

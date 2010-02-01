@@ -145,6 +145,7 @@ Public Class clsSchematicIcon
     Public Implnd As HspfOperation
     Public Perlnd As HspfOperation
     Public MetSeg As HspfMetSeg
+    Public PointSource As HspfPointSource
     Public DownstreamIcons As New Generic.List(Of clsIcon)
     Public UpstreamIcons As New Generic.List(Of clsIcon)
     Public DistanceFromOutlet As Integer = -1
