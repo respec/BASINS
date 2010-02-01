@@ -326,6 +326,40 @@ Friend Class ctlSchematic
         aExistingIcon = lNewIcon
     End Sub
 
+    Private Sub SetPointLegendIcon(ByVal aPointSource As HspfPointSource, ByVal aPrinting As Boolean, ByRef aExistingIcon As clsIcon)
+        Dim lNewIcon As clsSchematicIcon
+        If aExistingIcon Is Nothing Then
+            lNewIcon = New clsSchematicIcon
+            lNewIcon.Width = pCurrentLegend.IconWidth
+            lNewIcon.Height = pIconHeight
+            AddHandler lNewIcon.MouseDown, AddressOf LegendIcon_MouseDown
+        Else
+            lNewIcon = aExistingIcon
+        End If
+        With lNewIcon
+            .Key = aPointSource.Id
+            Dim lBitmap As New Bitmap(.Width, .Height, Drawing.Imaging.PixelFormat.Format32bppArgb)
+            Dim g As Graphics = Graphics.FromImage(lBitmap)
+
+            .PointSource = aPointSource
+            .Label = aPointSource.Id & ":" & aPointSource.Name
+
+            Dim lStringMeasurement As Drawing.SizeF = g.MeasureString(.Label, Me.Font)
+            Dim lX As Single = (.Width - lStringMeasurement.Width) / 2
+            Dim lY As Single = (.Height - lStringMeasurement.Height) / 2
+
+            g.Clear(SystemColors.Control)
+            g.DrawString(.Label, Me.Font, SystemBrushes.ControlDarkDark, lX, lY)
+
+            lY /= 4
+
+            drawBorder(g, .Width, .Height, Not aPrinting)
+            g.Dispose()
+            .BackgroundImage = lBitmap
+        End With
+        aExistingIcon = lNewIcon
+    End Sub
+
     'Draw icon representing aOperation into given graphics object
     Public Sub SetSchematicIcon(ByVal aOperation As HspfOperation, ByVal g As Graphics)
         Dim sid, barPos As Integer
@@ -755,27 +789,27 @@ Friend Class ctlSchematic
             .CellValue(0, lMfactColumnR) = "R MFact" ') : .set_ColType(3, ATCoCtl.ATCoDataType.ATCoSng)
             .CellValue(0, lTranColumn) = "Tran" ') : .set_ColType(4, ATCoCtl.ATCoDataType.ATCoTxt)
 
+            .CellValue(1, 0) = "Precip"
+            .CellValue(2, 0) = "Air Temp"
+            .CellValue(3, 0) = "Dew Point"
+            .CellValue(4, 0) = "Wind"
+            .CellValue(5, 0) = "Solar Rad"
+            .CellValue(6, 0) = "Cloud"
+            .CellValue(7, 0) = "Pot Evap"
+
             If pUci IsNot Nothing AndAlso pUci.Name.Length > 0 AndAlso pUci.MetSegs.Count > 0 Then
                 For Each lMetSeg As HspfMetSeg In pUci.MetSegs
                     If Me.LegendMetSegs.Icon(lMetSeg.Id).Selected Then
-                        For lSegRow As Integer = 1 To 7
-                            lRow += 1
-                            Dim lRec As HspfMetSegRecord = lMetSeg.MetSegRecs(lSegRow - 1)
-                            Select Case lSegRow
-                                Case 1 : .CellValue(lRow, lDataTypeColumn) = "Precip"
-                                Case 2 : .CellValue(lRow, lDataTypeColumn) = "Air Temp"
-                                Case 3 : .CellValue(lRow, lDataTypeColumn) = "Dew Point"
-                                Case 4 : .CellValue(lRow, lDataTypeColumn) = "Wind"
-                                Case 5 : .CellValue(lRow, lDataTypeColumn) = "Solar Rad"
-                                Case 6 : .CellValue(lRow, lDataTypeColumn) = "Cloud"
-                                Case 7 : .CellValue(lRow, lDataTypeColumn) = "Pot Evap"
+                        For Each lRec As HspfMetSegRecord In lMetSeg.MetSegRecs
+                            Select Case lRec.Name
+                                Case "PREC" : lRow = 1
+                                Case "ATEM" : lRow = 2
+                                Case "DEWP" : lRow = 3
+                                Case "WIND" : lRow = 4
+                                Case "SOLR" : lRow = 5
+                                Case "CLOU" : lRow = 6
+                                Case "PEVT" : lRow = 7
                             End Select
-                            'If lRec.Typ = 0 Then
-                            '    .CellValue(lRow, lSourceColumn) = ""
-                            '    .CellValue(lRow, lMfactColumnPI) = ""
-                            '    .CellValue(lRow, lMfactColumnR) = ""
-                            '    .CellValue(lRow, lTranColumn) = ""
-                            'Else
                             Try
                                 .CellValue(lRow, lSourceColumn) = lRec.Source.VolName & " " & lRec.Source.VolId
                                 .CellValue(lRow, lMfactColumnPI) = lRec.MFactP
@@ -784,7 +818,6 @@ Friend Class ctlSchematic
                             Catch e As Exception
                                 Logger.Dbg("Exception filling met grid: " & e.Message)
                             End Try
-                            'End If
                         Next
                     End If
                 Next
@@ -794,61 +827,36 @@ Friend Class ctlSchematic
     End Sub
 
     Private Sub PopulatePointGrid()
+
         Dim lDetailsSource As New atcControls.atcGridSource
         With lDetailsSource
             .Rows = 1
             .FixedRows = 1
+            .Columns = 2
+            .CellValue(0, 0) = "Point Source"
+            .CellValue(0, 1) = "Constituent"
+
+            If pUci IsNot Nothing AndAlso pUci.Name.Length > 0 AndAlso pUci.PointSources.Count > 0 Then
+                For Each lPoint As HspfPointSource In pUci.PointSources
+                    If Me.LegendPointSources.Icon(lPoint.Id) IsNot Nothing AndAlso Me.LegendPointSources.Icon(lPoint.Id).Selected Then
+                        Dim lRow As Integer = .Rows
+                        .CellValue(lRow, 0) = lPoint.Name
+                        Dim lCon As String = lPoint.Con
+                        If lCon.Length > 0 Then
+                            'look for this con in pollutant list
+                            For Each lPol As String In pPollutantList
+                                If Mid(lCon, 1, 5) = Mid(lPol, 1, 5) Then
+                                    lCon = lPol
+                                    Exit For
+                                End If
+                            Next
+                            .CellValue(lRow, 1) = lCon
+                        End If
+                    End If
+                Next
+            End If
         End With
-        'Dim cMfac, cdata, r, cSour, ctran As Integer
-        'Dim lPoint As HspfPoint
-        'Dim i As Integer
-        'Dim lcon, lpol As String
-        'Dim vpol As Object
 
-        'If pUci.Name = "" Then Exit Sub
-        'If pUci.PointSources.Count = 0 Then Exit Sub
-
-        'With agdDetails
-        '    .Visible = False
-        '    .ClearData()
-        '    .set_Header("")
-        '    .rows = 1
-        '    .cols = 2
-        '    .set_ColTitle(0, "Point Source") : .set_ColType(0, ATCoCtl.ATCoDataType.ATCoTxt)
-        '    .set_ColTitle(1, "Constituent") : .set_ColType(1, ATCoCtl.ATCoDataType.ATCoTxt)
-        'End With
-
-        'If IsNumeric(picLegend(PointSelected).Tag) Then
-        '    lPoint = pUci.PointSources.Item(CShort(picLegend(PointSelected).Tag))
-        'Else
-        '    lPoint = pUci.PointSources.Item(1)
-        'End If
-
-        'i = 0
-        'For Each lPoint In pUci.PointSources
-        '    If lPoint.Id = PointSelected + 1 Then
-        '        i = i + 1
-        '        With agdDetails
-        '            If .rows < i Then .rows = .rows + 1
-        '            .CellValue(.rows, 0) = lPoint.Name
-        '            lcon = lPoint.con
-        '            If Len(lcon) > 0 Then
-        '                'look for this con in pollutant list
-        '                For Each vpol In PollutantList
-        '                    'UPGRADE_WARNING: Couldn't resolve default property of object vpol. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-        '                    lpol = vpol
-        '                    If Mid(lcon, 1, 5) = Mid(lpol, 1, 5) Then
-        '                        lcon = lpol
-        '                        Exit For
-        '                    End If
-        '                Next vpol
-        '            End If
-        '            .set_TextMatrix(.rows, 1, lcon)
-        '        End With
-        '    End If
-        'Next lPoint
-        'agdDetails.SizeAllColumnsToContents()
-        'agdDetails.Visible = True
         agdDetails.Initialize(lDetailsSource)
     End Sub
 
@@ -878,6 +886,13 @@ Friend Class ctlSchematic
                         pCurrentLegend.Add(lIcon)
                         LegendOrder.Add(lIcon.Key)
                     Next lMetSeg
+                Case EnumLegendType.LegPoint
+                    For Each lPoint As HspfPointSource In pUci.PointSources
+                        Dim lIcon As clsIcon = Nothing
+                        SetPointLegendIcon(lPoint, False, lIcon)
+                        pCurrentLegend.Add(lIcon)
+                        LegendOrder.Add(lIcon.Key)
+                    Next lPoint
             End Select
         End If
         pCurrentLegend.ResumeLayout()
@@ -1323,6 +1338,15 @@ NextLandIcon:
                 Next
 
             Case EnumLegendType.LegPoint
+                aLegendIcon.Selected = Not aLegendIcon.Selected
+                For Each lIcon As clsSchematicIcon In pIcons
+                    For Each lPoint As HspfPointSource In lIcon.ReachOrBMP.PointSources
+                        If lPoint.Id = aLegendIcon.Key AndAlso lIcon.Selected <> aLegendIcon.Selected Then
+                            lChangedSchematicSelection = True
+                            lIcon.Selected = aLegendIcon.Selected
+                        End If
+                    Next
+                Next
         End Select
         pCurrentLegend.PlaceIcons()
         If lChangedSchematicSelection Then

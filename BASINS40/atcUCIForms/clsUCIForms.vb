@@ -133,7 +133,7 @@ Public Class UCIForms
         If Not lForm Is Nothing Then
 
             lForm.Icon = aParent.Icon
-            lForm.Show()
+            lForm.ShowDialog()
 
         End If
     End Function

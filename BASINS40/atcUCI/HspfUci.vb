@@ -997,7 +997,7 @@ Public Class HspfUci
 
             lOffsetAfterDeleteIndex = 0
             For lOper = 1 To lDeleteSourceAtIndex.Count
-                Me.Connections.RemoveAt(lDeleteTargetAtIndex.Item(lOper) - lOffsetAfterDeleteIndex)
+                Me.Connections.RemoveAt(lDeleteSourceAtIndex.Item(lOper) - lOffsetAfterDeleteIndex)
                 lOffsetAfterDeleteIndex += 1
             Next
 
