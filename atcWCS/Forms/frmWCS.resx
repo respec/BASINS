@@ -120,13 +120,6 @@
   <metadata name="HelpProvider1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
-  <data name="Label1.Text" xml:space="preserve">
-    <value>The BASINS Watershed Characterization System can be used to select and generate several standard reports designed to describe the physical characteristics of watersheds (subbasins) you have defined. Some reports utilize layers that are not downloaded by default, requiring you to use the BASINS download utility to acquire them.
-
-Default layer and field names are automatically assigned the first time you use WCS and settings are stored with the BASINS project.
-
-Press F1 on each field for context sensitive help on each item.</value>
-  </data>
   <data name="txtOutputName.HelpString" xml:space="preserve">
     <value>Enter (or browse to) the desired output folder which will contain the formatted reports that will be generated. Reports are in HTML format which can be easily incorporated into documents and spreadsheets. Reports are automatically named like Report1.htm, Report2.htm, etc.</value>
   </data>
@@ -135,6 +128,13 @@ Press F1 on each field for context sensitive help on each item.</value>
   </data>
   <data name="dgLandUse.HelpString" xml:space="preserve">
     <value>This is a read-only view of the tab-delimited text file called Landuses.txt which is located in the WCS plugin folder and contains the landuse IDs and Names for each type of landuse layer (e.g., GIRAS, NLCD, etc.). Use a text editor or spreadsheet program to manually edit this data file.</value>
+  </data>
+  <data name="Label1.Text" xml:space="preserve">
+    <value>The BASINS Watershed Characterization System can be used to select and generate several standard reports designed to describe the physical characteristics of watersheds (subbasins) you have defined. Some reports utilize layers that are not downloaded by default, requiring you to use the BASINS download utility to acquire them.
+
+Default layer and field names are automatically assigned the first time you use WCS and settings are stored with the BASINS project.
+
+Press F1 on each field for context sensitive help on each item.</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">

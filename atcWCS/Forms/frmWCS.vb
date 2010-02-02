@@ -22,10 +22,6 @@ Public Class frmWCS
         Logger.Msg("BASINS Watershed Characterization System (WCS)" & vbCrLf & vbCrLf & _
            "Version " & System.Reflection.Assembly.GetExecutingAssembly.GetName.Version.ToString, _
            "BASINS - WCS")
-        'With New frmAbout
-        '    .ShowDialog()
-        '    .Dispose()
-        'End With
     End Sub
 
     Private Sub btnAllNone_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAll.Click, btnNone.Click, btnNoneDS.Click, btnAllDS.Click
@@ -385,5 +381,9 @@ Public Class frmWCS
                 My.Computer.FileSystem.DeleteFile(rpt)
             Next
         End If
+    End Sub
+
+    Private Sub btnHelp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnHelp.Click
+        Logger.Message("Help should be hooked up here.", "Help", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1)
     End Sub
 End Class
