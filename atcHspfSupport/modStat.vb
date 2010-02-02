@@ -106,16 +106,16 @@ Public Module modStat
         Return lStr
     End Function
 
-    Public Function GetClassLimits(ByVal aTs As atcTimeseries) As Generic.List(Of Double)
+    'TODO: replace use of these class limits with new list of percentiles
+    Friend Function GetClassLimits(ByVal aTs As atcTimeseries) As Generic.List(Of Double)
         'Dim lAllLimits() As Double = {1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000, 10000, 20000, 25000, 50000, 100000}
         Dim lAllLimits() As Double = {0, 1, 1.4, 2, 2.8, 4, 5.7, 8.1, 11, 16, 23, 33, 46, 66, 93, 130, 190, 270, 380, 530, 760, 1100, 1500, 2200, 3100, 4300, 6100, 8700, 12000, 17000, 25000, 35000, 50000, 71000, 100000}
         Dim lLimits As New Generic.List(Of Double)
         'Dim lMin As Double = aTs.Attributes.GetValue("Min")
-        'Dim lMax As Double = aTs.Attributes.GetValue("Max")
-        'For Each lValue As Double In lAllLimits
-        '    If lValue Then
-        lLimits.AddRange(lAllLimits)
-        'Next
+        Dim lMax As Double = aTs.Attributes.GetValue("Max")
+        For Each lValue As Double In lAllLimits
+            If lValue < lMax Then lLimits.Add(lValue)
+        Next
         Return lLimits
     End Function
 
@@ -186,6 +186,9 @@ Public Module modStat
             'lStr &="               Observed  - 11517500 Shasta River near Yreka, CA.               " & vbCrLf 
 
             lStr &= "            Data Series 1 - " & TimeserIdString(aTSer1) & vbCrLf & vbCrLf
+
+            'TODO: include season attributes, date span of input data
+
             lStr &= "              Cases equal or" & vbCrLf
             lStr &= "              exceeding lower    Cases equal or" & vbCrLf
             lStr &= "              limit and less     exceeding lower" & vbCrLf
