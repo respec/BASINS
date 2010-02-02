@@ -285,7 +285,6 @@ Partial Class frmCompare
         Me.Controls.Add(Me.btnObserved)
         Me.Controls.Add(Me.txtObserved)
         Me.Controls.Add(Me.lblObserved)
-        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmCompare"
         Me.Text = "Compare"
         Me.gbClassLimits.ResumeLayout(False)

@@ -3,11 +3,22 @@ Imports atcUtility
 Imports atcDurationCompare
 'Imports System.Windows.Forms.WebBrowser
 
-
 Public Class frmCompare
 
     Private pObserved As atcTimeseries
     Private pSimulated As atcTimeseries
+
+    Public Sub Initialize(ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup)
+        If aTimeseriesGroup.Count > 0 Then
+            pObserved = aTimeseriesGroup(0)
+            txtObserved.Text = pObserved.ToString
+            If aTimeseriesGroup.Count > 1 Then
+                pSimulated = aTimeseriesGroup(1)
+                txtSimulated.Text = pSimulated.ToString
+                SetDates()
+            End If
+        End If
+    End Sub
 
     Private Sub btnCompare_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCompare.Click
         Dim cdlg As New Windows.Forms.SaveFileDialog
