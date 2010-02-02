@@ -19,14 +19,14 @@ Public Class clsHspfSupportPlugin
 
         atcDataManager.AddMenuIfMissing(atcDataManager.AnalysisMenuName, "", atcDataManager.AnalysisMenuString, atcDataManager.FileMenuName)
         pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_Duration", atcDataManager.AnalysisMenuName, "Duration", Me.Icon, , , True))
-        'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_Compare", atcDataManager.AnalysisMenuName, "Compare", Me.Icon, , , True))
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_Compare", atcDataManager.AnalysisMenuName, "Compare", Me.Icon, , , True))
     End Sub
 
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         Dim lFrm As Object = Nothing 'Windows.Forms.Form
         Select Case aItemName
             Case atcDataManager.AnalysisMenuName & "_Duration" : lFrm = New frmDuration
-                'Case atcDataManager.AnalysisMenuName & "_Compare" : lFrm = New frmCompare
+            Case atcDataManager.AnalysisMenuName & "_Compare" : lFrm = New frmCompare
         End Select
 
         If lFrm IsNot Nothing Then
@@ -37,6 +37,5 @@ Public Class clsHspfSupportPlugin
                 lFrm.Show()
             End If
         End If
-
     End Sub
 End Class
