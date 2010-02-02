@@ -1,6 +1,7 @@
 Imports atcUtility
 Imports atcData
 Imports atcTimeseriesMath
+Imports atcDurationCompare
 
 Public Module AnnualCompareStats
     Public Function Report(ByVal aUci As atcUCI.HspfUci, _

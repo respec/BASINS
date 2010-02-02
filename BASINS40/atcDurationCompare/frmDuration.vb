@@ -1,5 +1,6 @@
 Imports atcData
 Imports atcUtility
+Imports atcDurationCompare
 
 Public Class frmDuration
     Private pTSer As atcTimeseries

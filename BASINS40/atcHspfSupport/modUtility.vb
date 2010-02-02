@@ -492,29 +492,6 @@ Public Module Utility
         End If
     End Sub
 
-    Friend Function Attributes(ByVal aName As String, _
-                               ByVal aTSer1 As atcTimeseries, _
-                               ByVal aTSer2 As atcTimeseries, _
-                      Optional ByVal aTSerOpt As atcTimeseries = Nothing, _
-                      Optional ByVal aIncludeResidual As Boolean = False) As String
-        Dim lStr As String = ""
-        If aTSerOpt Is Nothing Then
-            lStr = aName.PadLeft(36)
-        Else
-            lStr = aName.PadLeft(24) & DecimalAlign(aTSerOpt.Attributes.GetFormattedValue(aName), 12, 2)
-        End If
-        Dim lValue1 As Double = aTSer1.Attributes.GetValue(aName)
-        Dim lValue2 As Double = aTSer2.Attributes.GetValue(aName)
-        lStr &= DecimalAlign(lValue1, 12, 2) & _
-                DecimalAlign(lValue2, 12, 2)
-        If aIncludeResidual Then
-            Dim lResidual As Double = lValue1 - lValue2
-            lStr &= DecimalAlign(lResidual, 12, 2).PadLeft(12) _
-                  & DecimalAlign(100 * lResidual / lValue2, 11, 2).PadLeft(11) & "%"
-        End If
-        Return lStr & vbCrLf
-    End Function
-
     Public Function AreaReport(ByVal aUci As HspfUci, ByVal aRunMade As String, _
                                ByVal aOperationTypes As atcCollection, ByVal aLocations As atcCollection, _
                                ByVal aLandUseReport As Boolean, ByVal aReportPath As String) As String
