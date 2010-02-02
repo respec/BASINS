@@ -107,7 +107,7 @@ Public Module modStat
     End Function
 
     'TODO: replace use of these class limits with new list of percentiles
-    Friend Function GetClassLimits(ByVal aTs As atcTimeseries) As Generic.List(Of Double)
+    Public Function GetClassLimits(ByVal aTs As atcTimeseries) As Generic.List(Of Double)
         'Dim lAllLimits() As Double = {1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000, 10000, 20000, 25000, 50000, 100000}
         Dim lAllLimits() As Double = {0, 1, 1.4, 2, 2.8, 4, 5.7, 8.1, 11, 16, 23, 33, 46, 66, 93, 130, 190, 270, 380, 530, 760, 1100, 1500, 2200, 3100, 4300, 6100, 8700, 12000, 17000, 25000, 35000, 50000, 71000, 100000}
         Dim lLimits As New Generic.List(Of Double)
@@ -119,18 +119,13 @@ Public Module modStat
         Return lLimits
     End Function
 
-    ''' <summary>
-    ''' Calculate duration stats for DS2 (or the simulated data), related to CompareStats,
-    ''' that compares two data series
-    ''' </summary>
+    ''' <summary>Calculate duration statistics of a timeseries</summary>
+    ''' <remarks>related to CompareStats that compares two data series</remarks>
     Public Function DurationStats(ByVal aTSer1 As atcTimeseries, _
                          Optional ByVal aClassLimits As Generic.List(Of Double) = Nothing) As String
-        '
-        ' Pass in the simulated time series data
-        '
         Dim lStr As String = ""
         Dim lNote As String = ""
-        Dim lVal1 As Double
+        Dim lValue As Double
         Dim lSkipCount As Integer = 0
         Dim lGoodCount As Integer = 0
 
@@ -142,15 +137,13 @@ Public Module modStat
             Logger.Msg("aClassLimits is nothing")
         End If
         For lIndex As Integer = 1 To aTSer1.numValues
-            lVal1 = aTSer1.Values(lIndex)
-            'Logger.Dbg("lVal1:" & CStr(lVal1) & ":lVal2:" & CStr(lVal2))
-            If Not Double.IsNaN(lVal1) Then
-
+            lValue = aTSer1.Values(lIndex)
+            If Not Double.IsNaN(lValue) Then
                 lGoodCount += 1
                 If aClassLimits IsNot Nothing Then
                     lClassLimit = aClassLimits(0)
                     For Each lLimit As Double In aClassLimits
-                        If lLimit > lVal1 Then Exit For
+                        If lLimit > lValue Then Exit For
                         lClassLimit = lLimit
                     Next
 
@@ -161,8 +154,7 @@ Public Module modStat
                         'lClassBucket.setErrInt(lErrInt)
                         lClassBuckets.Add(lClassLimit, lClassBucket)
                     End If
-                    lClassBucket.IncrementCount(lVal1)
-
+                    lClassBucket.IncrementCount(lValue)
                 End If
             Else
                 lSkipCount += 1
@@ -176,15 +168,9 @@ Public Module modStat
             lNote &= " and " & lSkipCount - 1 & " more" & vbCrLf
         End If
 
-
         'The duration curve table, which is a shortened version of Table 2 in CompareStats
-        '
         If aClassLimits IsNot Nothing Then
             lStr &= "                Flow duration curve" & vbCrLf
-            'lStr &= aTSer1.ToString() & vbCrLf
-            'lStr &="             Simulated - 11519500 Scott River near Fort Jones, CA.             " & vbCrLf 
-            'lStr &="               Observed  - 11517500 Shasta River near Yreka, CA.               " & vbCrLf 
-
             lStr &= "            Data Series 1 - " & TimeserIdString(aTSer1) & vbCrLf & vbCrLf
 
             'TODO: include season attributes, date span of input data
@@ -197,9 +183,9 @@ Public Module modStat
             lStr &= "   limit     Cases    Percent    Cases    Percent" & vbCrLf
             lStr &= "--------- --------- --------- --------- ---------" & vbCrLf
 
-            Dim pctfrac As Double = 0.0
-            Dim numExceedPct As Double = 0.0
-            Dim avgClass As Double = 0.0
+            Dim lPctFrac As Double = 0.0
+            Dim lNumExceedPct As Double = 0.0
+            Dim lAvgClass As Double = 0.0
             For Each lLimit As Double In aClassLimits
                 lStr &= DecimalAlign(lLimit, 12, 0)
                 If lClassBuckets.Keys.Contains(lLimit) Then
@@ -207,13 +193,12 @@ Public Module modStat
                     With lClassBucket
                         lStr &= CStr(.Count1).PadLeft(5)
 
-                        pctfrac = .Count1 * 100.0 / lGoodCount
-                        lStr &= DecimalAlign(CStr(pctfrac), 15, 2)
-                        numExceedPct = numberExceeding(lLimit, lClassBuckets, False)
-                        lStr &= DecimalAlign(numExceedPct, 15, 0)
-                        numExceedPct = numberExceeding(lLimit, lClassBuckets, False) * 100.0 / lGoodCount
-                        lStr &= DecimalAlign(numExceedPct, 15, 2)
-
+                        lPctFrac = .Count1 * 100.0 / lGoodCount
+                        lStr &= DecimalAlign(CStr(lPctFrac), 15, 2)
+                        lNumExceedPct = NumberExceeding(lLimit, lClassBuckets, False)
+                        lStr &= DecimalAlign(lNumExceedPct, 15, 0)
+                        lNumExceedPct = NumberExceeding(lLimit, lClassBuckets, False) * 100.0 / lGoodCount
+                        lStr &= DecimalAlign(lNumExceedPct, 15, 2)
                     End With
                 Else
                     Logger.Dbg("No Bucket for " & lLimit)
@@ -242,7 +227,6 @@ Public Module modStat
     ''' <summary>
     ''' Compare stats for DS1 (or the observed data) and DS2 (or the simulated data)
     ''' </summary>
-
     Public Function CompareStats(ByVal aTSer1 As atcTimeseries, _
                                  ByVal aTSer2 As atcTimeseries, _
                         Optional ByVal aClassLimits As Generic.List(Of Double) = Nothing) As String
@@ -523,9 +507,9 @@ Public Module modStat
                         lStr &= DecimalAlign(CStr(pctfrac), 15, 2)
                         pctfrac = .Count2 * 100.0 / lGoodCount
                         lStr &= DecimalAlign(CStr(pctfrac), 15, 2)
-                        numExceedPct = numberExceeding(lLimit, lClassBuckets, False) * 100.0 / lGoodCount
+                        numExceedPct = NumberExceeding(lLimit, lClassBuckets, False) * 100.0 / lGoodCount
                         lStr &= DecimalAlign(numExceedPct, 15, 2)
-                        numExceedPct = numberExceeding(lLimit, lClassBuckets, True) * 100.0 / lGoodCount
+                        numExceedPct = NumberExceeding(lLimit, lClassBuckets, True) * 100.0 / lGoodCount
                         lStr &= DecimalAlign(numExceedPct, 15, 2)
 
                         avgClass = .Total1 / .Count1
@@ -634,20 +618,18 @@ Public Module modStat
         Return lStr.Trim
     End Function
 
-    Private Function numberExceeding(ByVal aClassLimit As Double, ByVal aClassList As atcCollection, ByVal aTS2 As Boolean) As Double
-
+    Private Function NumberExceeding(ByVal aClassLimit As Double, ByVal aClassList As atcCollection, ByVal aTS2 As Boolean) As Double
         Dim lBucket As ClassBucket
         For Each lClassLimit As Double In aClassList.Keys
             If aClassLimit <= lClassLimit Then
                 lBucket = aClassList.ItemByKey(lClassLimit)
                 If aTS2 Then
-                    numberExceeding += lBucket.Count2
+                    NumberExceeding += lBucket.Count2
                 Else
-                    numberExceeding += lBucket.Count1
+                    NumberExceeding += lBucket.Count1
                 End If
             End If
         Next
-
     End Function
 
     Private Class ClassBucket
@@ -665,6 +647,7 @@ Public Module modStat
         Public ErrIntv() As Double ' Error interval (TSCBAT, ERRINT)
         Public ErrDevCount() As Integer ' Error deviation for me classLimit
         'Public ClassLimit As Double
+
         Sub Increment(ByVal aVal1 As Double, ByVal aVal2 As Double)
             Count1 += 1
             Total1 += aVal1
@@ -677,15 +660,14 @@ Public Module modStat
                 TotalSSPCT += (lValDiff / aVal1) ^ 2
                 TotalBiasPCT += (lValDiff / aVal1)
             End If
-
         End Sub
 
-        Sub IncrementCount(ByVal aVal As Double)
+        Friend Sub IncrementCount(ByVal aVal As Double)
             Count1 += 1
             Total1 += aVal
         End Sub
 
-        Sub IncrementErr(ByVal aVal1 As Double, ByVal aVal2 As Double, ByVal aLimit As Double)
+        Friend Sub IncrementErr(ByVal aVal1 As Double, ByVal aVal2 As Double, ByVal aLimit As Double)
             '
             'Increment the error deviation count
             '
@@ -719,7 +701,7 @@ Public Module modStat
             End If
 
         End Sub
-        Sub setErrInt(ByVal aEI() As Double)
+        Friend Sub setErrInt(ByVal aEI() As Double)
             Dim lC As Integer = 0
             'Logger.Msg("Argument length: " & aEI.Length)
             ErrIntv = aEI.Clone
@@ -727,4 +709,26 @@ Public Module modStat
         End Sub
     End Class
 
+    Private Function Attributes(ByVal aName As String, _
+                               ByVal aTSer1 As atcTimeseries, _
+                               ByVal aTSer2 As atcTimeseries, _
+                      Optional ByVal aTSerOpt As atcTimeseries = Nothing, _
+                      Optional ByVal aIncludeResidual As Boolean = False) As String
+        Dim lStr As String = ""
+        If aTSerOpt Is Nothing Then
+            lStr = aName.PadLeft(36)
+        Else
+            lStr = aName.PadLeft(24) & DecimalAlign(aTSerOpt.Attributes.GetFormattedValue(aName), 12, 2)
+        End If
+        Dim lValue1 As Double = aTSer1.Attributes.GetValue(aName)
+        Dim lValue2 As Double = aTSer2.Attributes.GetValue(aName)
+        lStr &= DecimalAlign(lValue1, 12, 2) & _
+                DecimalAlign(lValue2, 12, 2)
+        If aIncludeResidual Then
+            Dim lResidual As Double = lValue1 - lValue2
+            lStr &= DecimalAlign(lResidual, 12, 2).PadLeft(12) _
+                  & DecimalAlign(100 * lResidual / lValue2, 11, 2).PadLeft(11) & "%"
+        End If
+        Return lStr & vbCrLf
+    End Function
 End Module

@@ -11,7 +11,7 @@ Public Class clsHspfSupportPlugin
 
     <CLSCompliant(False)> _
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
-                                      ByVal aParentHandle As Integer)
+                                    ByVal aParentHandle As Integer)
 
         pMapWin = aMapWin
         pMapWinWindowHandle = aParentHandle
@@ -39,17 +39,4 @@ Public Class clsHspfSupportPlugin
         End If
 
     End Sub
-
-    '    Public Overrides ReadOnly Property Name() As String
-    '        Get
-    '            Return "Analysis::Compare"
-    '        End Get
-    '    End Property
-
-    '    Public Overrides Function Show() As Object
-    '        Dim lFrm As New frmCompare
-    '        lFrm.Show()
-    '        Return lFrm
-    '    End Function
-
 End Class

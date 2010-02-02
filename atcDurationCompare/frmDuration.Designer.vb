@@ -40,7 +40,7 @@ Partial Class frmDuration
         Me.txtReport.Multiline = True
         Me.txtReport.Name = "txtReport"
         Me.txtReport.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtReport.Size = New System.Drawing.Size(405, 389)
+        Me.txtReport.Size = New System.Drawing.Size(715, 568)
         Me.txtReport.TabIndex = 4
         '
         'MenuStrip1
@@ -48,7 +48,7 @@ Partial Class frmDuration
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFile, Me.mnuAnalysis})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(429, 27)
+        Me.MenuStrip1.Size = New System.Drawing.Size(739, 24)
         Me.MenuStrip1.TabIndex = 5
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -56,27 +56,27 @@ Partial Class frmDuration
         '
         Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuSave})
         Me.mnuFile.Name = "mnuFile"
-        Me.mnuFile.Size = New System.Drawing.Size(45, 23)
+        Me.mnuFile.Size = New System.Drawing.Size(35, 20)
         Me.mnuFile.Text = "File"
         '
         'mnuSave
         '
         Me.mnuSave.Name = "mnuSave"
         Me.mnuSave.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.S), System.Windows.Forms.Keys)
-        Me.mnuSave.Size = New System.Drawing.Size(182, 24)
+        Me.mnuSave.Size = New System.Drawing.Size(147, 22)
         Me.mnuSave.Text = "&Save"
         '
         'mnuAnalysis
         '
         Me.mnuAnalysis.Name = "mnuAnalysis"
-        Me.mnuAnalysis.Size = New System.Drawing.Size(79, 23)
+        Me.mnuAnalysis.Size = New System.Drawing.Size(58, 20)
         Me.mnuAnalysis.Text = "Analysis"
         '
         'frmDuration
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(429, 431)
+        Me.ClientSize = New System.Drawing.Size(739, 610)
         Me.Controls.Add(Me.txtReport)
         Me.Controls.Add(Me.MenuStrip1)
         Me.MainMenuStrip = Me.MenuStrip1
