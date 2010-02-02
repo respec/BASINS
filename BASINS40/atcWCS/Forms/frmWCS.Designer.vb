@@ -25,52 +25,83 @@ Partial Class frmWCS
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmWCS))
         Me.HelpProvider1 = New System.Windows.Forms.HelpProvider
         Me.btnGenerate = New System.Windows.Forms.Button
-        Me.tabWCS = New System.Windows.Forms.TabControl
-        Me.TabPage4 = New System.Windows.Forms.TabPage
-        Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel
         Me.cboSubbasinField = New System.Windows.Forms.ComboBox
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.lblOutput = New System.Windows.Forms.Label
         Me.txtOutputName = New System.Windows.Forms.TextBox
         Me.btnOutputName = New System.Windows.Forms.Button
-        Me.lblSubbasinsLayer = New System.Windows.Forms.Label
         Me.cboSubbasinLayer = New System.Windows.Forms.ComboBox
-        Me.Label3 = New System.Windows.Forms.Label
-        Me.TabPage1 = New System.Windows.Forms.TabPage
-        Me.TableLayoutPanel9 = New System.Windows.Forms.TableLayoutPanel
         Me.lstReports = New System.Windows.Forms.CheckedListBox
         Me.btnAll = New System.Windows.Forms.Button
         Me.btnNone = New System.Windows.Forms.Button
+        Me.cboReachLayer = New System.Windows.Forms.ComboBox
+        Me.cbo303dLayer = New System.Windows.Forms.ComboBox
+        Me.cboReachField = New System.Windows.Forms.ComboBox
+        Me.cboWaterBodyField = New System.Windows.Forms.ComboBox
+        Me.cboImpairmentField = New System.Windows.Forms.ComboBox
+        Me.cboPop1Layer = New System.Windows.Forms.ComboBox
+        Me.cboPop2Layer = New System.Windows.Forms.ComboBox
+        Me.cboPopNameField = New System.Windows.Forms.ComboBox
+        Me.cboPopPopField = New System.Windows.Forms.ComboBox
+        Me.cboSewerLayer = New System.Windows.Forms.ComboBox
+        Me.cboSewerNameField = New System.Windows.Forms.ComboBox
+        Me.cboSewerPopField = New System.Windows.Forms.ComboBox
+        Me.cboSewerHouseField = New System.Windows.Forms.ComboBox
+        Me.cboSewerPublicField = New System.Windows.Forms.ComboBox
+        Me.cboSewerSepticField = New System.Windows.Forms.ComboBox
+        Me.cboSewerOtherField = New System.Windows.Forms.ComboBox
+        Me.cboSoilLayer = New System.Windows.Forms.ComboBox
+        Me.cboSoilField = New System.Windows.Forms.ComboBox
+        Me.cboLandUseType = New System.Windows.Forms.ComboBox
+        Me.cboLanduseField = New System.Windows.Forms.ComboBox
+        Me.cboLanduseLayer = New System.Windows.Forms.ComboBox
+        Me.cboPCSLayer = New System.Windows.Forms.ComboBox
+        Me.cboNPDESField = New System.Windows.Forms.ComboBox
+        Me.cboFacNameField = New System.Windows.Forms.ComboBox
+        Me.cboSICField = New System.Windows.Forms.ComboBox
+        Me.cboSICNameField = New System.Windows.Forms.ComboBox
+        Me.cboCityField = New System.Windows.Forms.ComboBox
+        Me.cboRecWaterField = New System.Windows.Forms.ComboBox
+        Me.cboMajorField = New System.Windows.Forms.ComboBox
+        Me.cboActiveField = New System.Windows.Forms.ComboBox
+        Me.lstDataSources = New System.Windows.Forms.CheckedListBox
+        Me.btnCopy = New System.Windows.Forms.Button
+        Me.btnPreview = New System.Windows.Forms.Button
+        Me.btnPrint = New System.Windows.Forms.Button
+        Me.wbResults = New System.Windows.Forms.WebBrowser
+        Me.btnAbout = New System.Windows.Forms.Button
+        Me.btnAllDS = New System.Windows.Forms.Button
+        Me.btnNoneDS = New System.Windows.Forms.Button
+        Me.lnkDeleteReports = New System.Windows.Forms.LinkLabel
+        Me.dgSoil = New System.Windows.Forms.DataGridView
+        Me.dgLandUse = New System.Windows.Forms.DataGridView
+        Me.tabWCS = New System.Windows.Forms.TabControl
+        Me.TabPage4 = New System.Windows.Forms.TabPage
+        Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel
+        Me.Label1 = New System.Windows.Forms.Label
+        Me.lblOutput = New System.Windows.Forms.Label
+        Me.Label3 = New System.Windows.Forms.Label
+        Me.lblSubbasinsLayer = New System.Windows.Forms.Label
+        Me.TabPage1 = New System.Windows.Forms.TabPage
+        Me.TableLayoutPanel9 = New System.Windows.Forms.TableLayoutPanel
+        Me.Label38 = New System.Windows.Forms.Label
         Me.tabReports = New System.Windows.Forms.TabControl
         Me.TabPage9 = New System.Windows.Forms.TabPage
         Me.TableLayoutPanel7 = New System.Windows.Forms.TableLayoutPanel
-        Me.cboReachLayer = New System.Windows.Forms.ComboBox
         Me.Label20 = New System.Windows.Forms.Label
         Me.Label22 = New System.Windows.Forms.Label
-        Me.cbo303dLayer = New System.Windows.Forms.ComboBox
         Me.Label23 = New System.Windows.Forms.Label
         Me.Label24 = New System.Windows.Forms.Label
-        Me.cboReachField = New System.Windows.Forms.ComboBox
-        Me.cboWaterBodyField = New System.Windows.Forms.ComboBox
         Me.Label25 = New System.Windows.Forms.Label
         Me.Label26 = New System.Windows.Forms.Label
-        Me.cboImpairmentField = New System.Windows.Forms.ComboBox
         Me.TabPage5 = New System.Windows.Forms.TabPage
         Me.TableLayoutPanel3 = New System.Windows.Forms.TableLayoutPanel
-        Me.cboPop1Layer = New System.Windows.Forms.ComboBox
         Me.Label4 = New System.Windows.Forms.Label
         Me.Label5 = New System.Windows.Forms.Label
-        Me.cboPop2Layer = New System.Windows.Forms.ComboBox
         Me.Label6 = New System.Windows.Forms.Label
         Me.Label2 = New System.Windows.Forms.Label
-        Me.cboPopNameField = New System.Windows.Forms.ComboBox
-        Me.cboPopPopField = New System.Windows.Forms.ComboBox
         Me.Label15 = New System.Windows.Forms.Label
         Me.TabPage6 = New System.Windows.Forms.TabPage
         Me.TableLayoutPanel4 = New System.Windows.Forms.TableLayoutPanel
-        Me.cboSewerLayer = New System.Windows.Forms.ComboBox
         Me.Label7 = New System.Windows.Forms.Label
-        Me.cboSewerNameField = New System.Windows.Forms.ComboBox
         Me.Label9 = New System.Windows.Forms.Label
         Me.Label8 = New System.Windows.Forms.Label
         Me.Label10 = New System.Windows.Forms.Label
@@ -78,32 +109,22 @@ Partial Class frmWCS
         Me.Label12 = New System.Windows.Forms.Label
         Me.Label13 = New System.Windows.Forms.Label
         Me.Label14 = New System.Windows.Forms.Label
-        Me.cboSewerPopField = New System.Windows.Forms.ComboBox
-        Me.cboSewerHouseField = New System.Windows.Forms.ComboBox
-        Me.cboSewerPublicField = New System.Windows.Forms.ComboBox
-        Me.cboSewerSepticField = New System.Windows.Forms.ComboBox
-        Me.cboSewerOtherField = New System.Windows.Forms.ComboBox
         Me.TabPage8 = New System.Windows.Forms.TabPage
         Me.TableLayoutPanel5 = New System.Windows.Forms.TableLayoutPanel
-        Me.cboSoilLayer = New System.Windows.Forms.ComboBox
         Me.Label16 = New System.Windows.Forms.Label
         Me.Label18 = New System.Windows.Forms.Label
         Me.Label19 = New System.Windows.Forms.Label
-        Me.cboSoilField = New System.Windows.Forms.ComboBox
+        Me.Label39 = New System.Windows.Forms.Label
         Me.TabPage7 = New System.Windows.Forms.TabPage
         Me.TableLayoutPanel6 = New System.Windows.Forms.TableLayoutPanel
-        Me.cboLandUseType = New System.Windows.Forms.ComboBox
         Me.lblLanduseField = New System.Windows.Forms.Label
         Me.Label21 = New System.Windows.Forms.Label
-        Me.cboLanduseField = New System.Windows.Forms.ComboBox
         Me.Label17 = New System.Windows.Forms.Label
         Me.lblLanduseLayer = New System.Windows.Forms.Label
-        Me.cboLanduseLayer = New System.Windows.Forms.ComboBox
+        Me.Label40 = New System.Windows.Forms.Label
         Me.TabPage10 = New System.Windows.Forms.TabPage
         Me.TableLayoutPanel8 = New System.Windows.Forms.TableLayoutPanel
-        Me.cboPCSLayer = New System.Windows.Forms.ComboBox
         Me.Label27 = New System.Windows.Forms.Label
-        Me.cboNPDESField = New System.Windows.Forms.ComboBox
         Me.Label28 = New System.Windows.Forms.Label
         Me.Label29 = New System.Windows.Forms.Label
         Me.Label30 = New System.Windows.Forms.Label
@@ -111,40 +132,22 @@ Partial Class frmWCS
         Me.Label32 = New System.Windows.Forms.Label
         Me.Label33 = New System.Windows.Forms.Label
         Me.Label34 = New System.Windows.Forms.Label
-        Me.cboFacNameField = New System.Windows.Forms.ComboBox
-        Me.cboSICField = New System.Windows.Forms.ComboBox
-        Me.cboSICNameField = New System.Windows.Forms.ComboBox
-        Me.cboCityField = New System.Windows.Forms.ComboBox
         Me.Label35 = New System.Windows.Forms.Label
-        Me.cboRecWaterField = New System.Windows.Forms.ComboBox
-        Me.cboMajorField = New System.Windows.Forms.ComboBox
         Me.Label36 = New System.Windows.Forms.Label
-        Me.cboActiveField = New System.Windows.Forms.ComboBox
         Me.TabPage11 = New System.Windows.Forms.TabPage
-        Me.lstDataSources = New System.Windows.Forms.CheckedListBox
+        Me.TableLayoutPanel10 = New System.Windows.Forms.TableLayoutPanel
         Me.Label37 = New System.Windows.Forms.Label
         Me.TabPage2 = New System.Windows.Forms.TabPage
         Me.TableLayoutPanel2 = New System.Windows.Forms.TableLayoutPanel
-        Me.btnCopy = New System.Windows.Forms.Button
-        Me.btnPreview = New System.Windows.Forms.Button
-        Me.btnPrint = New System.Windows.Forms.Button
-        Me.wbResults = New System.Windows.Forms.WebBrowser
+        Me.lblGenerate = New System.Windows.Forms.Label
         Me.btnCancel = New System.Windows.Forms.Button
-        Me.btnAbout = New System.Windows.Forms.Button
         Me.tblProgress = New System.Windows.Forms.TableLayoutPanel
         Me.ProgressBar = New System.Windows.Forms.ProgressBar
         Me.lnkCancel = New System.Windows.Forms.LinkLabel
         Me.lblProgress = New System.Windows.Forms.Label
-        Me.TableLayoutPanel10 = New System.Windows.Forms.TableLayoutPanel
-        Me.btnAllDS = New System.Windows.Forms.Button
-        Me.btnNoneDS = New System.Windows.Forms.Button
-        Me.lnkDeleteReports = New System.Windows.Forms.LinkLabel
-        Me.Label38 = New System.Windows.Forms.Label
-        Me.Label39 = New System.Windows.Forms.Label
-        Me.dgSoil = New System.Windows.Forms.DataGridView
-        Me.Label40 = New System.Windows.Forms.Label
-        Me.dgLandUse = New System.Windows.Forms.DataGridView
-        Me.lblGenerate = New System.Windows.Forms.Label
+        Me.btnHelp = New System.Windows.Forms.Button
+        CType(Me.dgSoil, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dgLandUse, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.tabWCS.SuspendLayout()
         Me.TabPage4.SuspendLayout()
         Me.TableLayoutPanel1.SuspendLayout()
@@ -164,12 +167,10 @@ Partial Class frmWCS
         Me.TabPage10.SuspendLayout()
         Me.TableLayoutPanel8.SuspendLayout()
         Me.TabPage11.SuspendLayout()
+        Me.TableLayoutPanel10.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
         Me.tblProgress.SuspendLayout()
-        Me.TableLayoutPanel10.SuspendLayout()
-        CType(Me.dgSoil, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.dgLandUse, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'btnGenerate
@@ -177,64 +178,12 @@ Partial Class frmWCS
         Me.btnGenerate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnGenerate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.HelpProvider1.SetHelpString(Me.btnGenerate, "Generated the selected WCS reports.")
-        Me.btnGenerate.Location = New System.Drawing.Point(397, 351)
+        Me.btnGenerate.Location = New System.Drawing.Point(414, 351)
         Me.btnGenerate.Name = "btnGenerate"
         Me.HelpProvider1.SetShowHelp(Me.btnGenerate, True)
         Me.btnGenerate.Size = New System.Drawing.Size(85, 26)
-        Me.btnGenerate.TabIndex = 3
+        Me.btnGenerate.TabIndex = 4
         Me.btnGenerate.Text = "&Generate"
-        '
-        'tabWCS
-        '
-        Me.tabWCS.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.tabWCS.Controls.Add(Me.TabPage4)
-        Me.tabWCS.Controls.Add(Me.TabPage1)
-        Me.tabWCS.Controls.Add(Me.TabPage2)
-        Me.tabWCS.Location = New System.Drawing.Point(12, 12)
-        Me.tabWCS.Name = "tabWCS"
-        Me.tabWCS.SelectedIndex = 0
-        Me.tabWCS.Size = New System.Drawing.Size(551, 333)
-        Me.tabWCS.TabIndex = 0
-        '
-        'TabPage4
-        '
-        Me.TabPage4.Controls.Add(Me.TableLayoutPanel1)
-        Me.TabPage4.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage4.Name = "TabPage4"
-        Me.TabPage4.Size = New System.Drawing.Size(543, 307)
-        Me.TabPage4.TabIndex = 0
-        Me.TabPage4.Text = "General"
-        Me.TabPage4.UseVisualStyleBackColor = True
-        '
-        'TableLayoutPanel1
-        '
-        Me.TableLayoutPanel1.ColumnCount = 3
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle)
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle)
-        Me.TableLayoutPanel1.Controls.Add(Me.Label1, 0, 0)
-        Me.TableLayoutPanel1.Controls.Add(Me.lblOutput, 0, 1)
-        Me.TableLayoutPanel1.Controls.Add(Me.txtOutputName, 1, 1)
-        Me.TableLayoutPanel1.Controls.Add(Me.btnOutputName, 2, 1)
-        Me.TableLayoutPanel1.Controls.Add(Me.cboSubbasinField, 1, 4)
-        Me.TableLayoutPanel1.Controls.Add(Me.cboSubbasinLayer, 1, 3)
-        Me.TableLayoutPanel1.Controls.Add(Me.lnkDeleteReports, 1, 2)
-        Me.TableLayoutPanel1.Controls.Add(Me.Label3, 0, 4)
-        Me.TableLayoutPanel1.Controls.Add(Me.lblSubbasinsLayer, 0, 3)
-        Me.TableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(0, 0)
-        Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
-        Me.TableLayoutPanel1.RowCount = 6
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 132.0!))
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle)
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle)
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle)
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(543, 307)
-        Me.TableLayoutPanel1.TabIndex = 0
         '
         'cboSubbasinField
         '
@@ -246,33 +195,8 @@ Partial Class frmWCS
         Me.cboSubbasinField.Location = New System.Drawing.Point(119, 211)
         Me.cboSubbasinField.Name = "cboSubbasinField"
         Me.HelpProvider1.SetShowHelp(Me.cboSubbasinField, True)
-        Me.cboSubbasinField.Size = New System.Drawing.Size(350, 21)
+        Me.cboSubbasinField.Size = New System.Drawing.Size(367, 21)
         Me.cboSubbasinField.TabIndex = 8
-        '
-        'Label1
-        '
-        Me.Label1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Label1.BackColor = System.Drawing.SystemColors.Info
-        Me.Label1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
-        Me.TableLayoutPanel1.SetColumnSpan(Me.Label1, 3)
-        Me.Label1.Location = New System.Drawing.Point(3, 0)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(537, 132)
-        Me.Label1.TabIndex = 0
-        Me.Label1.Text = resources.GetString("Label1.Text")
-        Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-        '
-        'lblOutput
-        '
-        Me.lblOutput.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.lblOutput.AutoSize = True
-        Me.lblOutput.Location = New System.Drawing.Point(3, 140)
-        Me.lblOutput.Name = "lblOutput"
-        Me.lblOutput.Size = New System.Drawing.Size(105, 13)
-        Me.lblOutput.TabIndex = 1
-        Me.lblOutput.Text = "&Output Folder Name:"
         '
         'txtOutputName
         '
@@ -281,30 +205,20 @@ Partial Class frmWCS
         Me.txtOutputName.Location = New System.Drawing.Point(119, 136)
         Me.txtOutputName.Name = "txtOutputName"
         Me.HelpProvider1.SetShowHelp(Me.txtOutputName, True)
-        Me.txtOutputName.Size = New System.Drawing.Size(350, 20)
+        Me.txtOutputName.Size = New System.Drawing.Size(367, 20)
         Me.txtOutputName.TabIndex = 2
         '
         'btnOutputName
         '
         Me.btnOutputName.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.HelpProvider1.SetHelpString(Me.btnOutputName, "Browse to select the folder where report files will be stored.")
-        Me.btnOutputName.Location = New System.Drawing.Point(475, 135)
+        Me.btnOutputName.Location = New System.Drawing.Point(492, 135)
         Me.btnOutputName.Name = "btnOutputName"
         Me.HelpProvider1.SetShowHelp(Me.btnOutputName, True)
         Me.btnOutputName.Size = New System.Drawing.Size(65, 23)
         Me.btnOutputName.TabIndex = 3
         Me.btnOutputName.Text = "Browse..."
         Me.btnOutputName.UseVisualStyleBackColor = True
-        '
-        'lblSubbasinsLayer
-        '
-        Me.lblSubbasinsLayer.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.lblSubbasinsLayer.AutoSize = True
-        Me.lblSubbasinsLayer.Location = New System.Drawing.Point(3, 188)
-        Me.lblSubbasinsLayer.Name = "lblSubbasinsLayer"
-        Me.lblSubbasinsLayer.Size = New System.Drawing.Size(83, 13)
-        Me.lblSubbasinsLayer.TabIndex = 5
-        Me.lblSubbasinsLayer.Text = "Subbasin &Layer:"
         '
         'cboSubbasinLayer
         '
@@ -316,51 +230,9 @@ Partial Class frmWCS
         Me.cboSubbasinLayer.Location = New System.Drawing.Point(119, 184)
         Me.cboSubbasinLayer.Name = "cboSubbasinLayer"
         Me.HelpProvider1.SetShowHelp(Me.cboSubbasinLayer, True)
-        Me.cboSubbasinLayer.Size = New System.Drawing.Size(350, 21)
+        Me.cboSubbasinLayer.Size = New System.Drawing.Size(367, 21)
         Me.cboSubbasinLayer.Sorted = True
         Me.cboSubbasinLayer.TabIndex = 6
-        '
-        'Label3
-        '
-        Me.Label3.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(3, 215)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(110, 13)
-        Me.Label3.TabIndex = 7
-        Me.Label3.Text = "Subbasin &Name Field:"
-        '
-        'TabPage1
-        '
-        Me.TabPage1.Controls.Add(Me.TableLayoutPanel9)
-        Me.TabPage1.Controls.Add(Me.tabReports)
-        Me.TabPage1.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage1.Size = New System.Drawing.Size(543, 307)
-        Me.TabPage1.TabIndex = 1
-        Me.TabPage1.Text = "Available Reports"
-        Me.TabPage1.UseVisualStyleBackColor = True
-        '
-        'TableLayoutPanel9
-        '
-        Me.TableLayoutPanel9.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.TableLayoutPanel9.ColumnCount = 2
-        Me.TableLayoutPanel9.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel9.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel9.Controls.Add(Me.lstReports, 0, 1)
-        Me.TableLayoutPanel9.Controls.Add(Me.btnAll, 0, 2)
-        Me.TableLayoutPanel9.Controls.Add(Me.btnNone, 1, 2)
-        Me.TableLayoutPanel9.Controls.Add(Me.Label38, 0, 0)
-        Me.TableLayoutPanel9.Location = New System.Drawing.Point(6, 6)
-        Me.TableLayoutPanel9.Name = "TableLayoutPanel9"
-        Me.TableLayoutPanel9.RowCount = 3
-        Me.TableLayoutPanel9.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-        Me.TableLayoutPanel9.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutPanel9.RowStyles.Add(New System.Windows.Forms.RowStyle)
-        Me.TableLayoutPanel9.Size = New System.Drawing.Size(150, 295)
-        Me.TableLayoutPanel9.TabIndex = 0
         '
         'lstReports
         '
@@ -402,6 +274,698 @@ Partial Class frmWCS
         Me.btnNone.Text = "None"
         Me.btnNone.UseVisualStyleBackColor = True
         '
+        'cboReachLayer
+        '
+        Me.cboReachLayer.AllowDrop = True
+        Me.cboReachLayer.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboReachLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboReachLayer, "Select the line layer containing the streams (e.g., RF1 or RF3 layer)")
+        Me.cboReachLayer.Location = New System.Drawing.Point(137, 3)
+        Me.cboReachLayer.Name = "cboReachLayer"
+        Me.HelpProvider1.SetShowHelp(Me.cboReachLayer, True)
+        Me.cboReachLayer.Size = New System.Drawing.Size(189, 21)
+        Me.cboReachLayer.Sorted = True
+        Me.cboReachLayer.TabIndex = 1
+        '
+        'cbo303dLayer
+        '
+        Me.cbo303dLayer.AllowDrop = True
+        Me.cbo303dLayer.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cbo303dLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cbo303dLayer, "Select the line layer containing the 303d listed waterbodies")
+        Me.cbo303dLayer.Location = New System.Drawing.Point(137, 30)
+        Me.cbo303dLayer.Name = "cbo303dLayer"
+        Me.HelpProvider1.SetShowHelp(Me.cbo303dLayer, True)
+        Me.cbo303dLayer.Size = New System.Drawing.Size(189, 21)
+        Me.cbo303dLayer.Sorted = True
+        Me.cbo303dLayer.TabIndex = 3
+        '
+        'cboReachField
+        '
+        Me.cboReachField.AllowDrop = True
+        Me.cboReachField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboReachField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboReachField, "Select the name of the field in the reach file that contains the stream name")
+        Me.cboReachField.Location = New System.Drawing.Point(137, 81)
+        Me.cboReachField.Name = "cboReachField"
+        Me.HelpProvider1.SetShowHelp(Me.cboReachField, True)
+        Me.cboReachField.Size = New System.Drawing.Size(189, 21)
+        Me.cboReachField.Sorted = True
+        Me.cboReachField.TabIndex = 6
+        '
+        'cboWaterBodyField
+        '
+        Me.cboWaterBodyField.AllowDrop = True
+        Me.cboWaterBodyField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboWaterBodyField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboWaterBodyField, "Select the name of the field in the 303d file that contains the water body name")
+        Me.cboWaterBodyField.Location = New System.Drawing.Point(137, 108)
+        Me.cboWaterBodyField.Name = "cboWaterBodyField"
+        Me.HelpProvider1.SetShowHelp(Me.cboWaterBodyField, True)
+        Me.cboWaterBodyField.Size = New System.Drawing.Size(189, 21)
+        Me.cboWaterBodyField.Sorted = True
+        Me.cboWaterBodyField.TabIndex = 8
+        '
+        'cboImpairmentField
+        '
+        Me.cboImpairmentField.AllowDrop = True
+        Me.cboImpairmentField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboImpairmentField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboImpairmentField, "Select the name of the field in the 303d file that contains the description of th" & _
+                "e impairment (either state or EPA definition)")
+        Me.cboImpairmentField.Location = New System.Drawing.Point(137, 135)
+        Me.cboImpairmentField.Name = "cboImpairmentField"
+        Me.HelpProvider1.SetShowHelp(Me.cboImpairmentField, True)
+        Me.cboImpairmentField.Size = New System.Drawing.Size(189, 21)
+        Me.cboImpairmentField.Sorted = True
+        Me.cboImpairmentField.TabIndex = 10
+        '
+        'cboPop1Layer
+        '
+        Me.cboPop1Layer.AllowDrop = True
+        Me.cboPop1Layer.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboPop1Layer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboPop1Layer, "Select the polygon layer associated with the first census period (e.g., 1990)")
+        Me.cboPop1Layer.Location = New System.Drawing.Point(92, 3)
+        Me.cboPop1Layer.Name = "cboPop1Layer"
+        Me.HelpProvider1.SetShowHelp(Me.cboPop1Layer, True)
+        Me.cboPop1Layer.Size = New System.Drawing.Size(266, 21)
+        Me.cboPop1Layer.Sorted = True
+        Me.cboPop1Layer.TabIndex = 1
+        '
+        'cboPop2Layer
+        '
+        Me.cboPop2Layer.AllowDrop = True
+        Me.cboPop2Layer.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboPop2Layer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboPop2Layer, "Select the polygon layer associated with the second census period (e.g., 2000)")
+        Me.cboPop2Layer.Location = New System.Drawing.Point(92, 30)
+        Me.cboPop2Layer.Name = "cboPop2Layer"
+        Me.HelpProvider1.SetShowHelp(Me.cboPop2Layer, True)
+        Me.cboPop2Layer.Size = New System.Drawing.Size(266, 21)
+        Me.cboPop2Layer.Sorted = True
+        Me.cboPop2Layer.TabIndex = 3
+        '
+        'cboPopNameField
+        '
+        Me.cboPopNameField.AllowDrop = True
+        Me.cboPopNameField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboPopNameField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboPopNameField, "Select the field in the census files that contains the name of each census area. " & _
+                "Note that census results are tabulated by county, zip code, community, etc.")
+        Me.cboPopNameField.Location = New System.Drawing.Point(92, 81)
+        Me.cboPopNameField.Name = "cboPopNameField"
+        Me.HelpProvider1.SetShowHelp(Me.cboPopNameField, True)
+        Me.cboPopNameField.Size = New System.Drawing.Size(266, 21)
+        Me.cboPopNameField.Sorted = True
+        Me.cboPopNameField.TabIndex = 6
+        '
+        'cboPopPopField
+        '
+        Me.cboPopPopField.AllowDrop = True
+        Me.cboPopPopField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboPopPopField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboPopPopField, "Select the field that contains the population of each census area")
+        Me.cboPopPopField.Location = New System.Drawing.Point(92, 108)
+        Me.cboPopPopField.Name = "cboPopPopField"
+        Me.HelpProvider1.SetShowHelp(Me.cboPopPopField, True)
+        Me.cboPopPopField.Size = New System.Drawing.Size(266, 21)
+        Me.cboPopPopField.Sorted = True
+        Me.cboPopPopField.TabIndex = 8
+        '
+        'cboSewerLayer
+        '
+        Me.cboSewerLayer.AllowDrop = True
+        Me.cboSewerLayer.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboSewerLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboSewerLayer, "Select the polygon layer that contains the census data including sewer coverage")
+        Me.cboSewerLayer.Location = New System.Drawing.Point(86, 3)
+        Me.cboSewerLayer.Name = "cboSewerLayer"
+        Me.HelpProvider1.SetShowHelp(Me.cboSewerLayer, True)
+        Me.cboSewerLayer.Size = New System.Drawing.Size(272, 21)
+        Me.cboSewerLayer.Sorted = True
+        Me.cboSewerLayer.TabIndex = 1
+        '
+        'cboSewerNameField
+        '
+        Me.cboSewerNameField.AllowDrop = True
+        Me.cboSewerNameField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboSewerNameField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboSewerNameField, "Select the field in the census files that contains the name of each census area. " & _
+                "Note that census results are tabulated by county, zip code, community, etc.")
+        Me.cboSewerNameField.Location = New System.Drawing.Point(86, 54)
+        Me.cboSewerNameField.Name = "cboSewerNameField"
+        Me.HelpProvider1.SetShowHelp(Me.cboSewerNameField, True)
+        Me.cboSewerNameField.Size = New System.Drawing.Size(272, 21)
+        Me.cboSewerNameField.Sorted = True
+        Me.cboSewerNameField.TabIndex = 4
+        '
+        'cboSewerPopField
+        '
+        Me.cboSewerPopField.AllowDrop = True
+        Me.cboSewerPopField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboSewerPopField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboSewerPopField, "Select the field that contains the population of each census area")
+        Me.cboSewerPopField.Location = New System.Drawing.Point(86, 81)
+        Me.cboSewerPopField.Name = "cboSewerPopField"
+        Me.HelpProvider1.SetShowHelp(Me.cboSewerPopField, True)
+        Me.cboSewerPopField.Size = New System.Drawing.Size(272, 21)
+        Me.cboSewerPopField.Sorted = True
+        Me.cboSewerPopField.TabIndex = 6
+        '
+        'cboSewerHouseField
+        '
+        Me.cboSewerHouseField.AllowDrop = True
+        Me.cboSewerHouseField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboSewerHouseField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboSewerHouseField, "Select the field that contains the number of housing units in each census area")
+        Me.cboSewerHouseField.Location = New System.Drawing.Point(86, 108)
+        Me.cboSewerHouseField.Name = "cboSewerHouseField"
+        Me.HelpProvider1.SetShowHelp(Me.cboSewerHouseField, True)
+        Me.cboSewerHouseField.Size = New System.Drawing.Size(272, 21)
+        Me.cboSewerHouseField.Sorted = True
+        Me.cboSewerHouseField.TabIndex = 8
+        '
+        'cboSewerPublicField
+        '
+        Me.cboSewerPublicField.AllowDrop = True
+        Me.cboSewerPublicField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboSewerPublicField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboSewerPublicField, "Select the field that contains the housing units served by public sewers in each " & _
+                "census area")
+        Me.cboSewerPublicField.Location = New System.Drawing.Point(86, 135)
+        Me.cboSewerPublicField.Name = "cboSewerPublicField"
+        Me.HelpProvider1.SetShowHelp(Me.cboSewerPublicField, True)
+        Me.cboSewerPublicField.Size = New System.Drawing.Size(272, 21)
+        Me.cboSewerPublicField.Sorted = True
+        Me.cboSewerPublicField.TabIndex = 10
+        '
+        'cboSewerSepticField
+        '
+        Me.cboSewerSepticField.AllowDrop = True
+        Me.cboSewerSepticField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboSewerSepticField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboSewerSepticField, "Select the field that contains the housing units served by septic systems in each" & _
+                " census area")
+        Me.cboSewerSepticField.Location = New System.Drawing.Point(86, 162)
+        Me.cboSewerSepticField.Name = "cboSewerSepticField"
+        Me.HelpProvider1.SetShowHelp(Me.cboSewerSepticField, True)
+        Me.cboSewerSepticField.Size = New System.Drawing.Size(272, 21)
+        Me.cboSewerSepticField.Sorted = True
+        Me.cboSewerSepticField.TabIndex = 12
+        '
+        'cboSewerOtherField
+        '
+        Me.cboSewerOtherField.AllowDrop = True
+        Me.cboSewerOtherField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboSewerOtherField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboSewerOtherField, "Select the field that contains the housing units served by other sewer system in " & _
+                "each census area")
+        Me.cboSewerOtherField.Location = New System.Drawing.Point(86, 189)
+        Me.cboSewerOtherField.Name = "cboSewerOtherField"
+        Me.HelpProvider1.SetShowHelp(Me.cboSewerOtherField, True)
+        Me.cboSewerOtherField.Size = New System.Drawing.Size(272, 21)
+        Me.cboSewerOtherField.Sorted = True
+        Me.cboSewerOtherField.TabIndex = 14
+        '
+        'cboSoilLayer
+        '
+        Me.cboSoilLayer.AllowDrop = True
+        Me.cboSoilLayer.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboSoilLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboSoilLayer, "Select the polygon layer describing the soil type distribution")
+        Me.cboSoilLayer.Location = New System.Drawing.Point(65, 3)
+        Me.cboSoilLayer.Name = "cboSoilLayer"
+        Me.HelpProvider1.SetShowHelp(Me.cboSoilLayer, True)
+        Me.cboSoilLayer.Size = New System.Drawing.Size(293, 21)
+        Me.cboSoilLayer.Sorted = True
+        Me.cboSoilLayer.TabIndex = 1
+        '
+        'cboSoilField
+        '
+        Me.cboSoilField.AllowDrop = True
+        Me.cboSoilField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboSoilField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboSoilField, "Select the field which contains the soil ID for each polygon (e.g., MUID); this i" & _
+                "s used to link to the soil data table displayed below which contains more detail" & _
+                "ed information on the soils")
+        Me.cboSoilField.Location = New System.Drawing.Point(65, 54)
+        Me.cboSoilField.Name = "cboSoilField"
+        Me.HelpProvider1.SetShowHelp(Me.cboSoilField, True)
+        Me.cboSoilField.Size = New System.Drawing.Size(293, 21)
+        Me.cboSoilField.Sorted = True
+        Me.cboSoilField.TabIndex = 4
+        '
+        'cboLandUseType
+        '
+        Me.cboLandUseType.AllowDrop = True
+        Me.cboLandUseType.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboLandUseType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboLandUseType, "Select the type of landuse layer to use")
+        Me.cboLandUseType.Location = New System.Drawing.Point(89, 3)
+        Me.cboLandUseType.Name = "cboLandUseType"
+        Me.HelpProvider1.SetShowHelp(Me.cboLandUseType, True)
+        Me.cboLandUseType.Size = New System.Drawing.Size(269, 21)
+        Me.cboLandUseType.TabIndex = 1
+        '
+        'cboLanduseField
+        '
+        Me.cboLanduseField.AllowDrop = True
+        Me.cboLanduseField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboLanduseField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboLanduseField, "If the landuse type is not GIRAS or User Grid, select the field name correspondin" & _
+                "g to the landuse ID. This is linked to the table below to return the landuse nam" & _
+                "e for the report.")
+        Me.cboLanduseField.Location = New System.Drawing.Point(89, 81)
+        Me.cboLanduseField.Name = "cboLanduseField"
+        Me.HelpProvider1.SetShowHelp(Me.cboLanduseField, True)
+        Me.cboLanduseField.Size = New System.Drawing.Size(269, 21)
+        Me.cboLanduseField.Sorted = True
+        Me.cboLanduseField.TabIndex = 6
+        '
+        'cboLanduseLayer
+        '
+        Me.cboLanduseLayer.AllowDrop = True
+        Me.cboLanduseLayer.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboLanduseLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboLanduseLayer, "If not using the GIRAS landuse type, select the polygon or grid layer containing " & _
+                "the land use information")
+        Me.cboLanduseLayer.Location = New System.Drawing.Point(89, 30)
+        Me.cboLanduseLayer.Name = "cboLanduseLayer"
+        Me.HelpProvider1.SetShowHelp(Me.cboLanduseLayer, True)
+        Me.cboLanduseLayer.Size = New System.Drawing.Size(269, 21)
+        Me.cboLanduseLayer.Sorted = True
+        Me.cboLanduseLayer.TabIndex = 3
+        '
+        'cboPCSLayer
+        '
+        Me.cboPCSLayer.AllowDrop = True
+        Me.cboPCSLayer.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboPCSLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboPCSLayer, "Select the point layer associated with the EPA Permit Compliance System (PCS) NPD" & _
+                "ES permit locations. Note that only active permits are listed.")
+        Me.cboPCSLayer.Location = New System.Drawing.Point(108, 3)
+        Me.cboPCSLayer.Name = "cboPCSLayer"
+        Me.HelpProvider1.SetShowHelp(Me.cboPCSLayer, True)
+        Me.cboPCSLayer.Size = New System.Drawing.Size(250, 21)
+        Me.cboPCSLayer.Sorted = True
+        Me.cboPCSLayer.TabIndex = 1
+        '
+        'cboNPDESField
+        '
+        Me.cboNPDESField.AllowDrop = True
+        Me.cboNPDESField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboNPDESField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboNPDESField, "Select the field containing the NPDES permit number.")
+        Me.cboNPDESField.Location = New System.Drawing.Point(108, 54)
+        Me.cboNPDESField.Name = "cboNPDESField"
+        Me.HelpProvider1.SetShowHelp(Me.cboNPDESField, True)
+        Me.cboNPDESField.Size = New System.Drawing.Size(250, 21)
+        Me.cboNPDESField.Sorted = True
+        Me.cboNPDESField.TabIndex = 4
+        '
+        'cboFacNameField
+        '
+        Me.cboFacNameField.AllowDrop = True
+        Me.cboFacNameField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboFacNameField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboFacNameField, "Select the field containing the NPDES facility name.")
+        Me.cboFacNameField.Location = New System.Drawing.Point(108, 81)
+        Me.cboFacNameField.Name = "cboFacNameField"
+        Me.HelpProvider1.SetShowHelp(Me.cboFacNameField, True)
+        Me.cboFacNameField.Size = New System.Drawing.Size(250, 21)
+        Me.cboFacNameField.Sorted = True
+        Me.cboFacNameField.TabIndex = 6
+        '
+        'cboSICField
+        '
+        Me.cboSICField.AllowDrop = True
+        Me.cboSICField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboSICField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboSICField, "Select the field containing the Standard Industrial Classification (SIC) number.")
+        Me.cboSICField.Location = New System.Drawing.Point(108, 108)
+        Me.cboSICField.Name = "cboSICField"
+        Me.HelpProvider1.SetShowHelp(Me.cboSICField, True)
+        Me.cboSICField.Size = New System.Drawing.Size(250, 21)
+        Me.cboSICField.Sorted = True
+        Me.cboSICField.TabIndex = 8
+        '
+        'cboSICNameField
+        '
+        Me.cboSICNameField.AllowDrop = True
+        Me.cboSICNameField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboSICNameField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboSICNameField, "Select the field containing the Standard Industrial Classification (SIC) descript" & _
+                "ion.")
+        Me.cboSICNameField.Location = New System.Drawing.Point(108, 135)
+        Me.cboSICNameField.Name = "cboSICNameField"
+        Me.HelpProvider1.SetShowHelp(Me.cboSICNameField, True)
+        Me.cboSICNameField.Size = New System.Drawing.Size(250, 21)
+        Me.cboSICNameField.Sorted = True
+        Me.cboSICNameField.TabIndex = 10
+        '
+        'cboCityField
+        '
+        Me.cboCityField.AllowDrop = True
+        Me.cboCityField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboCityField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboCityField, "Select the field containing the name of the nearest city to the facility.")
+        Me.cboCityField.Location = New System.Drawing.Point(108, 162)
+        Me.cboCityField.Name = "cboCityField"
+        Me.HelpProvider1.SetShowHelp(Me.cboCityField, True)
+        Me.cboCityField.Size = New System.Drawing.Size(250, 21)
+        Me.cboCityField.Sorted = True
+        Me.cboCityField.TabIndex = 12
+        '
+        'cboRecWaterField
+        '
+        Me.cboRecWaterField.AllowDrop = True
+        Me.cboRecWaterField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboRecWaterField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboRecWaterField, "Select the field containing the name of the receiving water body.")
+        Me.cboRecWaterField.Location = New System.Drawing.Point(108, 216)
+        Me.cboRecWaterField.Name = "cboRecWaterField"
+        Me.HelpProvider1.SetShowHelp(Me.cboRecWaterField, True)
+        Me.cboRecWaterField.Size = New System.Drawing.Size(250, 21)
+        Me.cboRecWaterField.Sorted = True
+        Me.cboRecWaterField.TabIndex = 16
+        '
+        'cboMajorField
+        '
+        Me.cboMajorField.AllowDrop = True
+        Me.cboMajorField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboMajorField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboMajorField, "Select the field containing the flag which describes the discharger as either maj" & _
+                "or or minor.")
+        Me.cboMajorField.Location = New System.Drawing.Point(108, 189)
+        Me.cboMajorField.Name = "cboMajorField"
+        Me.HelpProvider1.SetShowHelp(Me.cboMajorField, True)
+        Me.cboMajorField.Size = New System.Drawing.Size(250, 21)
+        Me.cboMajorField.Sorted = True
+        Me.cboMajorField.TabIndex = 14
+        '
+        'cboActiveField
+        '
+        Me.cboActiveField.AllowDrop = True
+        Me.cboActiveField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboActiveField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.HelpProvider1.SetHelpString(Me.cboActiveField, "Select the field containing the flag which describes whether the permit is active" & _
+                " or not. Only active permits are included in report.")
+        Me.cboActiveField.Location = New System.Drawing.Point(108, 243)
+        Me.cboActiveField.Name = "cboActiveField"
+        Me.HelpProvider1.SetShowHelp(Me.cboActiveField, True)
+        Me.cboActiveField.Size = New System.Drawing.Size(250, 21)
+        Me.cboActiveField.Sorted = True
+        Me.cboActiveField.TabIndex = 18
+        '
+        'lstDataSources
+        '
+        Me.lstDataSources.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lstDataSources.CheckOnClick = True
+        Me.TableLayoutPanel10.SetColumnSpan(Me.lstDataSources, 3)
+        Me.lstDataSources.FormattingEnabled = True
+        Me.HelpProvider1.SetHelpString(Me.lstDataSources, "This is a list of all previously downloaded BASINS datasets (e.g., STORET, NWIS, " & _
+                "Meteorology, etc.)")
+        Me.lstDataSources.IntegralHeight = False
+        Me.lstDataSources.Location = New System.Drawing.Point(3, 23)
+        Me.lstDataSources.Name = "lstDataSources"
+        Me.HelpProvider1.SetShowHelp(Me.lstDataSources, True)
+        Me.lstDataSources.Size = New System.Drawing.Size(355, 208)
+        Me.lstDataSources.TabIndex = 1
+        '
+        'btnCopy
+        '
+        Me.HelpProvider1.SetHelpString(Me.btnCopy, "Copy the entire HTML report to the clipboard.")
+        Me.btnCopy.Location = New System.Drawing.Point(3, 275)
+        Me.btnCopy.Name = "btnCopy"
+        Me.HelpProvider1.SetShowHelp(Me.btnCopy, True)
+        Me.btnCopy.Size = New System.Drawing.Size(75, 23)
+        Me.btnCopy.TabIndex = 1
+        Me.btnCopy.Text = "&Copy"
+        Me.btnCopy.UseVisualStyleBackColor = True
+        '
+        'btnPreview
+        '
+        Me.btnPreview.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.HelpProvider1.SetHelpString(Me.btnPreview, "Display the print preview form.")
+        Me.btnPreview.Location = New System.Drawing.Point(395, 275)
+        Me.btnPreview.Name = "btnPreview"
+        Me.HelpProvider1.SetShowHelp(Me.btnPreview, True)
+        Me.btnPreview.Size = New System.Drawing.Size(75, 23)
+        Me.btnPreview.TabIndex = 3
+        Me.btnPreview.Text = "Pre&view..."
+        Me.btnPreview.UseVisualStyleBackColor = True
+        '
+        'btnPrint
+        '
+        Me.btnPrint.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.HelpProvider1.SetHelpString(Me.btnPrint, "Send the HTML report to the printer.")
+        Me.btnPrint.Location = New System.Drawing.Point(476, 275)
+        Me.btnPrint.Name = "btnPrint"
+        Me.HelpProvider1.SetShowHelp(Me.btnPrint, True)
+        Me.btnPrint.Size = New System.Drawing.Size(75, 23)
+        Me.btnPrint.TabIndex = 4
+        Me.btnPrint.Text = "&Print..."
+        Me.btnPrint.UseVisualStyleBackColor = True
+        '
+        'wbResults
+        '
+        Me.wbResults.AllowWebBrowserDrop = False
+        Me.wbResults.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TableLayoutPanel2.SetColumnSpan(Me.wbResults, 4)
+        Me.HelpProvider1.SetHelpString(Me.wbResults, "When the reports are ready, this browser will contain all selected reports.")
+        Me.wbResults.IsWebBrowserContextMenuEnabled = False
+        Me.wbResults.Location = New System.Drawing.Point(3, 3)
+        Me.wbResults.MinimumSize = New System.Drawing.Size(20, 20)
+        Me.wbResults.Name = "wbResults"
+        Me.HelpProvider1.SetShowHelp(Me.wbResults, True)
+        Me.wbResults.Size = New System.Drawing.Size(548, 266)
+        Me.wbResults.TabIndex = 0
+        Me.wbResults.WebBrowserShortcutsEnabled = False
+        '
+        'btnAbout
+        '
+        Me.btnAbout.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnAbout.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.btnAbout.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.HelpProvider1.SetHelpString(Me.btnAbout, "Displays the About dialog box.")
+        Me.btnAbout.Location = New System.Drawing.Point(12, 351)
+        Me.btnAbout.Name = "btnAbout"
+        Me.HelpProvider1.SetShowHelp(Me.btnAbout, True)
+        Me.btnAbout.Size = New System.Drawing.Size(75, 26)
+        Me.btnAbout.TabIndex = 1
+        Me.btnAbout.Text = "&About"
+        '
+        'btnAllDS
+        '
+        Me.HelpProvider1.SetHelpString(Me.btnAllDS, "Check all datasets above")
+        Me.btnAllDS.Location = New System.Drawing.Point(214, 237)
+        Me.btnAllDS.Name = "btnAllDS"
+        Me.HelpProvider1.SetShowHelp(Me.btnAllDS, True)
+        Me.btnAllDS.Size = New System.Drawing.Size(69, 23)
+        Me.btnAllDS.TabIndex = 2
+        Me.btnAllDS.Text = "All"
+        Me.btnAllDS.UseVisualStyleBackColor = True
+        '
+        'btnNoneDS
+        '
+        Me.HelpProvider1.SetHelpString(Me.btnNoneDS, "Uncheck all datasets above")
+        Me.btnNoneDS.Location = New System.Drawing.Point(289, 237)
+        Me.btnNoneDS.Name = "btnNoneDS"
+        Me.HelpProvider1.SetShowHelp(Me.btnNoneDS, True)
+        Me.btnNoneDS.Size = New System.Drawing.Size(69, 23)
+        Me.btnNoneDS.TabIndex = 3
+        Me.btnNoneDS.Text = "None"
+        Me.btnNoneDS.UseVisualStyleBackColor = True
+        '
+        'lnkDeleteReports
+        '
+        Me.lnkDeleteReports.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.lnkDeleteReports.AutoSize = True
+        Me.HelpProvider1.SetHelpString(Me.lnkDeleteReports, "Report files are automatically created and sequentially numbered each time you cl" & _
+                "ick the Generate button. Click this link to delete all old report files.")
+        Me.lnkDeleteReports.Location = New System.Drawing.Point(209, 164)
+        Me.lnkDeleteReports.Name = "lnkDeleteReports"
+        Me.HelpProvider1.SetShowHelp(Me.lnkDeleteReports, True)
+        Me.lnkDeleteReports.Size = New System.Drawing.Size(187, 13)
+        Me.lnkDeleteReports.TabIndex = 4
+        Me.lnkDeleteReports.TabStop = True
+        Me.lnkDeleteReports.Text = "Delete all previously generated reports"
+        '
+        'dgSoil
+        '
+        Me.dgSoil.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dgSoil.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.TableLayoutPanel5.SetColumnSpan(Me.dgSoil, 2)
+        Me.HelpProvider1.SetHelpString(Me.dgSoil, resources.GetString("dgSoil.HelpString"))
+        Me.dgSoil.Location = New System.Drawing.Point(3, 105)
+        Me.dgSoil.Name = "dgSoil"
+        Me.dgSoil.ReadOnly = True
+        Me.HelpProvider1.SetShowHelp(Me.dgSoil, True)
+        Me.dgSoil.Size = New System.Drawing.Size(355, 155)
+        Me.dgSoil.TabIndex = 6
+        '
+        'dgLandUse
+        '
+        Me.dgLandUse.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dgLandUse.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.TableLayoutPanel6.SetColumnSpan(Me.dgLandUse, 2)
+        Me.HelpProvider1.SetHelpString(Me.dgLandUse, resources.GetString("dgLandUse.HelpString"))
+        Me.dgLandUse.Location = New System.Drawing.Point(3, 132)
+        Me.dgLandUse.Name = "dgLandUse"
+        Me.dgLandUse.ReadOnly = True
+        Me.HelpProvider1.SetShowHelp(Me.dgLandUse, True)
+        Me.dgLandUse.Size = New System.Drawing.Size(355, 128)
+        Me.dgLandUse.TabIndex = 8
+        '
+        'tabWCS
+        '
+        Me.tabWCS.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.tabWCS.Controls.Add(Me.TabPage4)
+        Me.tabWCS.Controls.Add(Me.TabPage1)
+        Me.tabWCS.Controls.Add(Me.TabPage2)
+        Me.tabWCS.Location = New System.Drawing.Point(12, 12)
+        Me.tabWCS.Name = "tabWCS"
+        Me.tabWCS.SelectedIndex = 0
+        Me.tabWCS.Size = New System.Drawing.Size(568, 333)
+        Me.tabWCS.TabIndex = 0
+        '
+        'TabPage4
+        '
+        Me.TabPage4.Controls.Add(Me.TableLayoutPanel1)
+        Me.TabPage4.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage4.Name = "TabPage4"
+        Me.TabPage4.Size = New System.Drawing.Size(560, 307)
+        Me.TabPage4.TabIndex = 0
+        Me.TabPage4.Text = "General"
+        Me.TabPage4.UseVisualStyleBackColor = True
+        '
+        'TableLayoutPanel1
+        '
+        Me.TableLayoutPanel1.ColumnCount = 3
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle)
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle)
+        Me.TableLayoutPanel1.Controls.Add(Me.Label1, 0, 0)
+        Me.TableLayoutPanel1.Controls.Add(Me.lblOutput, 0, 1)
+        Me.TableLayoutPanel1.Controls.Add(Me.txtOutputName, 1, 1)
+        Me.TableLayoutPanel1.Controls.Add(Me.btnOutputName, 2, 1)
+        Me.TableLayoutPanel1.Controls.Add(Me.cboSubbasinField, 1, 4)
+        Me.TableLayoutPanel1.Controls.Add(Me.cboSubbasinLayer, 1, 3)
+        Me.TableLayoutPanel1.Controls.Add(Me.lnkDeleteReports, 1, 2)
+        Me.TableLayoutPanel1.Controls.Add(Me.Label3, 0, 4)
+        Me.TableLayoutPanel1.Controls.Add(Me.lblSubbasinsLayer, 0, 3)
+        Me.TableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(0, 0)
+        Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
+        Me.TableLayoutPanel1.RowCount = 6
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 132.0!))
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle)
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle)
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle)
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(560, 307)
+        Me.TableLayoutPanel1.TabIndex = 0
+        '
+        'Label1
+        '
+        Me.Label1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Label1.BackColor = System.Drawing.SystemColors.Info
+        Me.Label1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
+        Me.TableLayoutPanel1.SetColumnSpan(Me.Label1, 3)
+        Me.Label1.Location = New System.Drawing.Point(3, 0)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(554, 132)
+        Me.Label1.TabIndex = 0
+        Me.Label1.Text = resources.GetString("Label1.Text")
+        Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'lblOutput
+        '
+        Me.lblOutput.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.lblOutput.AutoSize = True
+        Me.lblOutput.Location = New System.Drawing.Point(3, 140)
+        Me.lblOutput.Name = "lblOutput"
+        Me.lblOutput.Size = New System.Drawing.Size(105, 13)
+        Me.lblOutput.TabIndex = 1
+        Me.lblOutput.Text = "&Output Folder Name:"
+        '
+        'Label3
+        '
+        Me.Label3.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(3, 215)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(110, 13)
+        Me.Label3.TabIndex = 7
+        Me.Label3.Text = "Subbasin &Name Field:"
+        '
+        'lblSubbasinsLayer
+        '
+        Me.lblSubbasinsLayer.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.lblSubbasinsLayer.AutoSize = True
+        Me.lblSubbasinsLayer.Location = New System.Drawing.Point(3, 188)
+        Me.lblSubbasinsLayer.Name = "lblSubbasinsLayer"
+        Me.lblSubbasinsLayer.Size = New System.Drawing.Size(83, 13)
+        Me.lblSubbasinsLayer.TabIndex = 5
+        Me.lblSubbasinsLayer.Text = "Subbasin &Layer:"
+        '
+        'TabPage1
+        '
+        Me.TabPage1.Controls.Add(Me.TableLayoutPanel9)
+        Me.TabPage1.Controls.Add(Me.tabReports)
+        Me.TabPage1.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage1.Name = "TabPage1"
+        Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage1.Size = New System.Drawing.Size(560, 307)
+        Me.TabPage1.TabIndex = 1
+        Me.TabPage1.Text = "Available Reports"
+        Me.TabPage1.UseVisualStyleBackColor = True
+        '
+        'TableLayoutPanel9
+        '
+        Me.TableLayoutPanel9.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.TableLayoutPanel9.ColumnCount = 2
+        Me.TableLayoutPanel9.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.TableLayoutPanel9.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.TableLayoutPanel9.Controls.Add(Me.lstReports, 0, 1)
+        Me.TableLayoutPanel9.Controls.Add(Me.btnAll, 0, 2)
+        Me.TableLayoutPanel9.Controls.Add(Me.btnNone, 1, 2)
+        Me.TableLayoutPanel9.Controls.Add(Me.Label38, 0, 0)
+        Me.TableLayoutPanel9.Location = New System.Drawing.Point(6, 6)
+        Me.TableLayoutPanel9.Name = "TableLayoutPanel9"
+        Me.TableLayoutPanel9.RowCount = 3
+        Me.TableLayoutPanel9.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+        Me.TableLayoutPanel9.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TableLayoutPanel9.RowStyles.Add(New System.Windows.Forms.RowStyle)
+        Me.TableLayoutPanel9.Size = New System.Drawing.Size(150, 295)
+        Me.TableLayoutPanel9.TabIndex = 0
+        '
+        'Label38
+        '
+        Me.Label38.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.Label38.AutoSize = True
+        Me.TableLayoutPanel9.SetColumnSpan(Me.Label38, 2)
+        Me.Label38.Location = New System.Drawing.Point(3, 3)
+        Me.Label38.Name = "Label38"
+        Me.Label38.Size = New System.Drawing.Size(93, 13)
+        Me.Label38.TabIndex = 0
+        Me.Label38.Text = "A&vailable Reports:"
+        '
         'tabReports
         '
         Me.tabReports.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
@@ -417,7 +981,7 @@ Partial Class frmWCS
         Me.tabReports.Location = New System.Drawing.Point(162, 6)
         Me.tabReports.Name = "tabReports"
         Me.tabReports.SelectedIndex = 0
-        Me.tabReports.Size = New System.Drawing.Size(375, 295)
+        Me.tabReports.Size = New System.Drawing.Size(343, 295)
         Me.tabReports.TabIndex = 1
         '
         'TabPage9
@@ -426,7 +990,7 @@ Partial Class frmWCS
         Me.TabPage9.Location = New System.Drawing.Point(4, 22)
         Me.TabPage9.Name = "TabPage9"
         Me.TabPage9.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage9.Size = New System.Drawing.Size(367, 269)
+        Me.TabPage9.Size = New System.Drawing.Size(335, 269)
         Me.TabPage9.TabIndex = 0
         Me.TabPage9.Text = "Water Bodies"
         Me.TabPage9.UseVisualStyleBackColor = True
@@ -458,21 +1022,8 @@ Partial Class frmWCS
         Me.TableLayoutPanel7.RowStyles.Add(New System.Windows.Forms.RowStyle)
         Me.TableLayoutPanel7.RowStyles.Add(New System.Windows.Forms.RowStyle)
         Me.TableLayoutPanel7.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-        Me.TableLayoutPanel7.Size = New System.Drawing.Size(361, 263)
+        Me.TableLayoutPanel7.Size = New System.Drawing.Size(329, 263)
         Me.TableLayoutPanel7.TabIndex = 0
-        '
-        'cboReachLayer
-        '
-        Me.cboReachLayer.AllowDrop = True
-        Me.cboReachLayer.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboReachLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboReachLayer, "Select the line layer containing the streams (e.g., RF1 or RF3 layer)")
-        Me.cboReachLayer.Location = New System.Drawing.Point(137, 3)
-        Me.cboReachLayer.Name = "cboReachLayer"
-        Me.HelpProvider1.SetShowHelp(Me.cboReachLayer, True)
-        Me.cboReachLayer.Size = New System.Drawing.Size(221, 21)
-        Me.cboReachLayer.Sorted = True
-        Me.cboReachLayer.TabIndex = 1
         '
         'Label20
         '
@@ -494,19 +1045,6 @@ Partial Class frmWCS
         Me.Label22.TabIndex = 2
         Me.Label22.Text = "&303d Layer:"
         '
-        'cbo303dLayer
-        '
-        Me.cbo303dLayer.AllowDrop = True
-        Me.cbo303dLayer.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cbo303dLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cbo303dLayer, "Select the line layer containing the 303d listed waterbodies")
-        Me.cbo303dLayer.Location = New System.Drawing.Point(137, 30)
-        Me.cbo303dLayer.Name = "cbo303dLayer"
-        Me.HelpProvider1.SetShowHelp(Me.cbo303dLayer, True)
-        Me.cbo303dLayer.Size = New System.Drawing.Size(221, 21)
-        Me.cbo303dLayer.Sorted = True
-        Me.cbo303dLayer.TabIndex = 3
-        '
         'Label23
         '
         Me.Label23.Anchor = System.Windows.Forms.AnchorStyles.Left
@@ -523,37 +1061,11 @@ Partial Class frmWCS
         Me.Label24.AutoSize = True
         Me.TableLayoutPanel7.SetColumnSpan(Me.Label24, 2)
         Me.Label24.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label24.Location = New System.Drawing.Point(148, 59)
+        Me.Label24.Location = New System.Drawing.Point(132, 59)
         Me.Label24.Name = "Label24"
         Me.Label24.Size = New System.Drawing.Size(65, 13)
         Me.Label24.TabIndex = 4
         Me.Label24.Text = "Field Names"
-        '
-        'cboReachField
-        '
-        Me.cboReachField.AllowDrop = True
-        Me.cboReachField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboReachField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboReachField, "Select the name of the field in the reach file that contains the stream name")
-        Me.cboReachField.Location = New System.Drawing.Point(137, 81)
-        Me.cboReachField.Name = "cboReachField"
-        Me.HelpProvider1.SetShowHelp(Me.cboReachField, True)
-        Me.cboReachField.Size = New System.Drawing.Size(221, 21)
-        Me.cboReachField.Sorted = True
-        Me.cboReachField.TabIndex = 6
-        '
-        'cboWaterBodyField
-        '
-        Me.cboWaterBodyField.AllowDrop = True
-        Me.cboWaterBodyField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboWaterBodyField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboWaterBodyField, "Select the name of the field in the 303d file that contains the water body name")
-        Me.cboWaterBodyField.Location = New System.Drawing.Point(137, 108)
-        Me.cboWaterBodyField.Name = "cboWaterBodyField"
-        Me.HelpProvider1.SetShowHelp(Me.cboWaterBodyField, True)
-        Me.cboWaterBodyField.Size = New System.Drawing.Size(221, 21)
-        Me.cboWaterBodyField.Sorted = True
-        Me.cboWaterBodyField.TabIndex = 8
         '
         'Label25
         '
@@ -574,20 +1086,6 @@ Partial Class frmWCS
         Me.Label26.Size = New System.Drawing.Size(88, 13)
         Me.Label26.TabIndex = 9
         Me.Label26.Text = "303d &Impairment:"
-        '
-        'cboImpairmentField
-        '
-        Me.cboImpairmentField.AllowDrop = True
-        Me.cboImpairmentField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboImpairmentField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboImpairmentField, "Select the name of the field in the 303d file that contains the description of th" & _
-                "e impairment (either state or EPA definition)")
-        Me.cboImpairmentField.Location = New System.Drawing.Point(137, 135)
-        Me.cboImpairmentField.Name = "cboImpairmentField"
-        Me.HelpProvider1.SetShowHelp(Me.cboImpairmentField, True)
-        Me.cboImpairmentField.Size = New System.Drawing.Size(221, 21)
-        Me.cboImpairmentField.Sorted = True
-        Me.cboImpairmentField.TabIndex = 10
         '
         'TabPage5
         '
@@ -627,19 +1125,6 @@ Partial Class frmWCS
         Me.TableLayoutPanel3.Size = New System.Drawing.Size(361, 263)
         Me.TableLayoutPanel3.TabIndex = 0
         '
-        'cboPop1Layer
-        '
-        Me.cboPop1Layer.AllowDrop = True
-        Me.cboPop1Layer.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboPop1Layer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboPop1Layer, "Select the polygon layer associated with the first census period (e.g., 1990)")
-        Me.cboPop1Layer.Location = New System.Drawing.Point(92, 3)
-        Me.cboPop1Layer.Name = "cboPop1Layer"
-        Me.HelpProvider1.SetShowHelp(Me.cboPop1Layer, True)
-        Me.cboPop1Layer.Size = New System.Drawing.Size(266, 21)
-        Me.cboPop1Layer.Sorted = True
-        Me.cboPop1Layer.TabIndex = 1
-        '
         'Label4
         '
         Me.Label4.Anchor = System.Windows.Forms.AnchorStyles.Left
@@ -659,19 +1144,6 @@ Partial Class frmWCS
         Me.Label5.Size = New System.Drawing.Size(83, 13)
         Me.Label5.TabIndex = 2
         Me.Label5.Text = "Census Layer &2:"
-        '
-        'cboPop2Layer
-        '
-        Me.cboPop2Layer.AllowDrop = True
-        Me.cboPop2Layer.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboPop2Layer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboPop2Layer, "Select the polygon layer associated with the second census period (e.g., 2000)")
-        Me.cboPop2Layer.Location = New System.Drawing.Point(92, 30)
-        Me.cboPop2Layer.Name = "cboPop2Layer"
-        Me.HelpProvider1.SetShowHelp(Me.cboPop2Layer, True)
-        Me.cboPop2Layer.Size = New System.Drawing.Size(266, 21)
-        Me.cboPop2Layer.Sorted = True
-        Me.cboPop2Layer.TabIndex = 3
         '
         'Label6
         '
@@ -694,33 +1166,6 @@ Partial Class frmWCS
         Me.Label2.Size = New System.Drawing.Size(65, 13)
         Me.Label2.TabIndex = 4
         Me.Label2.Text = "Field Names"
-        '
-        'cboPopNameField
-        '
-        Me.cboPopNameField.AllowDrop = True
-        Me.cboPopNameField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboPopNameField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboPopNameField, "Select the field in the census files that contains the name of each census area. " & _
-                "Note that census results are tabulated by county, zip code, community, etc.")
-        Me.cboPopNameField.Location = New System.Drawing.Point(92, 81)
-        Me.cboPopNameField.Name = "cboPopNameField"
-        Me.HelpProvider1.SetShowHelp(Me.cboPopNameField, True)
-        Me.cboPopNameField.Size = New System.Drawing.Size(266, 21)
-        Me.cboPopNameField.Sorted = True
-        Me.cboPopNameField.TabIndex = 6
-        '
-        'cboPopPopField
-        '
-        Me.cboPopPopField.AllowDrop = True
-        Me.cboPopPopField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboPopPopField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboPopPopField, "Select the field that contains the population of each census area")
-        Me.cboPopPopField.Location = New System.Drawing.Point(92, 108)
-        Me.cboPopPopField.Name = "cboPopPopField"
-        Me.HelpProvider1.SetShowHelp(Me.cboPopPopField, True)
-        Me.cboPopPopField.Size = New System.Drawing.Size(266, 21)
-        Me.cboPopPopField.Sorted = True
-        Me.cboPopPopField.TabIndex = 8
         '
         'Label15
         '
@@ -779,19 +1224,6 @@ Partial Class frmWCS
         Me.TableLayoutPanel4.Size = New System.Drawing.Size(361, 263)
         Me.TableLayoutPanel4.TabIndex = 0
         '
-        'cboSewerLayer
-        '
-        Me.cboSewerLayer.AllowDrop = True
-        Me.cboSewerLayer.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboSewerLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboSewerLayer, "Select the polygon layer that contains the census data including sewer coverage")
-        Me.cboSewerLayer.Location = New System.Drawing.Point(86, 3)
-        Me.cboSewerLayer.Name = "cboSewerLayer"
-        Me.HelpProvider1.SetShowHelp(Me.cboSewerLayer, True)
-        Me.cboSewerLayer.Size = New System.Drawing.Size(272, 21)
-        Me.cboSewerLayer.Sorted = True
-        Me.cboSewerLayer.TabIndex = 1
-        '
         'Label7
         '
         Me.Label7.Anchor = System.Windows.Forms.AnchorStyles.Left
@@ -801,20 +1233,6 @@ Partial Class frmWCS
         Me.Label7.Size = New System.Drawing.Size(74, 13)
         Me.Label7.TabIndex = 0
         Me.Label7.Text = "Census &Layer:"
-        '
-        'cboSewerNameField
-        '
-        Me.cboSewerNameField.AllowDrop = True
-        Me.cboSewerNameField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboSewerNameField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboSewerNameField, "Select the field in the census files that contains the name of each census area. " & _
-                "Note that census results are tabulated by county, zip code, community, etc.")
-        Me.cboSewerNameField.Location = New System.Drawing.Point(86, 54)
-        Me.cboSewerNameField.Name = "cboSewerNameField"
-        Me.HelpProvider1.SetShowHelp(Me.cboSewerNameField, True)
-        Me.cboSewerNameField.Size = New System.Drawing.Size(272, 21)
-        Me.cboSewerNameField.Sorted = True
-        Me.cboSewerNameField.TabIndex = 4
         '
         'Label9
         '
@@ -888,74 +1306,6 @@ Partial Class frmWCS
         Me.Label14.TabIndex = 13
         Me.Label14.Text = "&Other Sewer:"
         '
-        'cboSewerPopField
-        '
-        Me.cboSewerPopField.AllowDrop = True
-        Me.cboSewerPopField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboSewerPopField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboSewerPopField, "Select the field that contains the population of each census area")
-        Me.cboSewerPopField.Location = New System.Drawing.Point(86, 81)
-        Me.cboSewerPopField.Name = "cboSewerPopField"
-        Me.HelpProvider1.SetShowHelp(Me.cboSewerPopField, True)
-        Me.cboSewerPopField.Size = New System.Drawing.Size(272, 21)
-        Me.cboSewerPopField.Sorted = True
-        Me.cboSewerPopField.TabIndex = 6
-        '
-        'cboSewerHouseField
-        '
-        Me.cboSewerHouseField.AllowDrop = True
-        Me.cboSewerHouseField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboSewerHouseField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboSewerHouseField, "Select the field that contains the number of housing units in each census area")
-        Me.cboSewerHouseField.Location = New System.Drawing.Point(86, 108)
-        Me.cboSewerHouseField.Name = "cboSewerHouseField"
-        Me.HelpProvider1.SetShowHelp(Me.cboSewerHouseField, True)
-        Me.cboSewerHouseField.Size = New System.Drawing.Size(272, 21)
-        Me.cboSewerHouseField.Sorted = True
-        Me.cboSewerHouseField.TabIndex = 8
-        '
-        'cboSewerPublicField
-        '
-        Me.cboSewerPublicField.AllowDrop = True
-        Me.cboSewerPublicField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboSewerPublicField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboSewerPublicField, "Select the field that contains the housing units served by public sewers in each " & _
-                "census area")
-        Me.cboSewerPublicField.Location = New System.Drawing.Point(86, 135)
-        Me.cboSewerPublicField.Name = "cboSewerPublicField"
-        Me.HelpProvider1.SetShowHelp(Me.cboSewerPublicField, True)
-        Me.cboSewerPublicField.Size = New System.Drawing.Size(272, 21)
-        Me.cboSewerPublicField.Sorted = True
-        Me.cboSewerPublicField.TabIndex = 10
-        '
-        'cboSewerSepticField
-        '
-        Me.cboSewerSepticField.AllowDrop = True
-        Me.cboSewerSepticField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboSewerSepticField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboSewerSepticField, "Select the field that contains the housing units served by septic systems in each" & _
-                " census area")
-        Me.cboSewerSepticField.Location = New System.Drawing.Point(86, 162)
-        Me.cboSewerSepticField.Name = "cboSewerSepticField"
-        Me.HelpProvider1.SetShowHelp(Me.cboSewerSepticField, True)
-        Me.cboSewerSepticField.Size = New System.Drawing.Size(272, 21)
-        Me.cboSewerSepticField.Sorted = True
-        Me.cboSewerSepticField.TabIndex = 12
-        '
-        'cboSewerOtherField
-        '
-        Me.cboSewerOtherField.AllowDrop = True
-        Me.cboSewerOtherField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboSewerOtherField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboSewerOtherField, "Select the field that contains the housing units served by other sewer system in " & _
-                "each census area")
-        Me.cboSewerOtherField.Location = New System.Drawing.Point(86, 189)
-        Me.cboSewerOtherField.Name = "cboSewerOtherField"
-        Me.HelpProvider1.SetShowHelp(Me.cboSewerOtherField, True)
-        Me.cboSewerOtherField.Size = New System.Drawing.Size(272, 21)
-        Me.cboSewerOtherField.Sorted = True
-        Me.cboSewerOtherField.TabIndex = 14
-        '
         'TabPage8
         '
         Me.TabPage8.Controls.Add(Me.TableLayoutPanel5)
@@ -993,19 +1343,6 @@ Partial Class frmWCS
         Me.TableLayoutPanel5.Size = New System.Drawing.Size(361, 263)
         Me.TableLayoutPanel5.TabIndex = 0
         '
-        'cboSoilLayer
-        '
-        Me.cboSoilLayer.AllowDrop = True
-        Me.cboSoilLayer.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboSoilLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboSoilLayer, "Select the polygon layer describing the soil type distribution")
-        Me.cboSoilLayer.Location = New System.Drawing.Point(65, 3)
-        Me.cboSoilLayer.Name = "cboSoilLayer"
-        Me.HelpProvider1.SetShowHelp(Me.cboSoilLayer, True)
-        Me.cboSoilLayer.Size = New System.Drawing.Size(293, 21)
-        Me.cboSoilLayer.Sorted = True
-        Me.cboSoilLayer.TabIndex = 1
-        '
         'Label16
         '
         Me.Label16.Anchor = System.Windows.Forms.AnchorStyles.Left
@@ -1038,20 +1375,17 @@ Partial Class frmWCS
         Me.Label19.TabIndex = 2
         Me.Label19.Text = "Field Names"
         '
-        'cboSoilField
+        'Label39
         '
-        Me.cboSoilField.AllowDrop = True
-        Me.cboSoilField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboSoilField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboSoilField, "Select the field which contains the soil ID for each polygon (e.g., MUID); this i" & _
-                "s used to link to the soil data table displayed below which contains more detail" & _
-                "ed information on the soils")
-        Me.cboSoilField.Location = New System.Drawing.Point(65, 54)
-        Me.cboSoilField.Name = "cboSoilField"
-        Me.HelpProvider1.SetShowHelp(Me.cboSoilField, True)
-        Me.cboSoilField.Size = New System.Drawing.Size(293, 21)
-        Me.cboSoilField.Sorted = True
-        Me.cboSoilField.TabIndex = 4
+        Me.Label39.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.Label39.AutoSize = True
+        Me.TableLayoutPanel5.SetColumnSpan(Me.Label39, 2)
+        Me.Label39.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label39.Location = New System.Drawing.Point(150, 83)
+        Me.Label39.Name = "Label39"
+        Me.Label39.Size = New System.Drawing.Size(60, 13)
+        Me.Label39.TabIndex = 5
+        Me.Label39.Text = "Data Table"
         '
         'TabPage7
         '
@@ -1092,18 +1426,6 @@ Partial Class frmWCS
         Me.TableLayoutPanel6.Size = New System.Drawing.Size(361, 263)
         Me.TableLayoutPanel6.TabIndex = 0
         '
-        'cboLandUseType
-        '
-        Me.cboLandUseType.AllowDrop = True
-        Me.cboLandUseType.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboLandUseType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboLandUseType, "Select the type of landuse layer to use")
-        Me.cboLandUseType.Location = New System.Drawing.Point(89, 3)
-        Me.cboLandUseType.Name = "cboLandUseType"
-        Me.HelpProvider1.SetShowHelp(Me.cboLandUseType, True)
-        Me.cboLandUseType.Size = New System.Drawing.Size(269, 21)
-        Me.cboLandUseType.TabIndex = 1
-        '
         'lblLanduseField
         '
         Me.lblLanduseField.Anchor = System.Windows.Forms.AnchorStyles.Left
@@ -1126,21 +1448,6 @@ Partial Class frmWCS
         Me.Label21.TabIndex = 4
         Me.Label21.Text = "Field Names"
         '
-        'cboLanduseField
-        '
-        Me.cboLanduseField.AllowDrop = True
-        Me.cboLanduseField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboLanduseField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboLanduseField, "If the landuse type is not GIRAS or User Grid, select the field name correspondin" & _
-                "g to the landuse ID. This is linked to the table below to return the landuse nam" & _
-                "e for the report.")
-        Me.cboLanduseField.Location = New System.Drawing.Point(89, 81)
-        Me.cboLanduseField.Name = "cboLanduseField"
-        Me.HelpProvider1.SetShowHelp(Me.cboLanduseField, True)
-        Me.cboLanduseField.Size = New System.Drawing.Size(269, 21)
-        Me.cboLanduseField.Sorted = True
-        Me.cboLanduseField.TabIndex = 6
-        '
         'Label17
         '
         Me.Label17.Anchor = System.Windows.Forms.AnchorStyles.Left
@@ -1161,19 +1468,17 @@ Partial Class frmWCS
         Me.lblLanduseLayer.TabIndex = 2
         Me.lblLanduseLayer.Text = "Landuse &Layer:"
         '
-        'cboLanduseLayer
+        'Label40
         '
-        Me.cboLanduseLayer.AllowDrop = True
-        Me.cboLanduseLayer.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboLanduseLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboLanduseLayer, "If not using the GIRAS landuse type, select the polygon or grid layer containing " & _
-                "the land use information")
-        Me.cboLanduseLayer.Location = New System.Drawing.Point(89, 30)
-        Me.cboLanduseLayer.Name = "cboLanduseLayer"
-        Me.HelpProvider1.SetShowHelp(Me.cboLanduseLayer, True)
-        Me.cboLanduseLayer.Size = New System.Drawing.Size(269, 21)
-        Me.cboLanduseLayer.Sorted = True
-        Me.cboLanduseLayer.TabIndex = 3
+        Me.Label40.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.Label40.AutoSize = True
+        Me.TableLayoutPanel6.SetColumnSpan(Me.Label40, 2)
+        Me.Label40.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label40.Location = New System.Drawing.Point(150, 110)
+        Me.Label40.Name = "Label40"
+        Me.Label40.Size = New System.Drawing.Size(60, 13)
+        Me.Label40.TabIndex = 7
+        Me.Label40.Text = "Data Table"
         '
         'TabPage10
         '
@@ -1228,20 +1533,6 @@ Partial Class frmWCS
         Me.TableLayoutPanel8.Size = New System.Drawing.Size(361, 263)
         Me.TableLayoutPanel8.TabIndex = 0
         '
-        'cboPCSLayer
-        '
-        Me.cboPCSLayer.AllowDrop = True
-        Me.cboPCSLayer.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboPCSLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboPCSLayer, "Select the point layer associated with the EPA Permit Compliance System (PCS) NPD" & _
-                "ES permit locations. Note that only active permits are listed.")
-        Me.cboPCSLayer.Location = New System.Drawing.Point(108, 3)
-        Me.cboPCSLayer.Name = "cboPCSLayer"
-        Me.HelpProvider1.SetShowHelp(Me.cboPCSLayer, True)
-        Me.cboPCSLayer.Size = New System.Drawing.Size(250, 21)
-        Me.cboPCSLayer.Sorted = True
-        Me.cboPCSLayer.TabIndex = 1
-        '
         'Label27
         '
         Me.Label27.Anchor = System.Windows.Forms.AnchorStyles.Left
@@ -1251,19 +1542,6 @@ Partial Class frmWCS
         Me.Label27.Size = New System.Drawing.Size(60, 13)
         Me.Label27.TabIndex = 0
         Me.Label27.Text = "PCS &Layer:"
-        '
-        'cboNPDESField
-        '
-        Me.cboNPDESField.AllowDrop = True
-        Me.cboNPDESField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboNPDESField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboNPDESField, "Select the field containing the NPDES permit number.")
-        Me.cboNPDESField.Location = New System.Drawing.Point(108, 54)
-        Me.cboNPDESField.Name = "cboNPDESField"
-        Me.HelpProvider1.SetShowHelp(Me.cboNPDESField, True)
-        Me.cboNPDESField.Size = New System.Drawing.Size(250, 21)
-        Me.cboNPDESField.Sorted = True
-        Me.cboNPDESField.TabIndex = 4
         '
         'Label28
         '
@@ -1337,59 +1615,6 @@ Partial Class frmWCS
         Me.Label34.TabIndex = 13
         Me.Label34.Text = "&Major/Minor:"
         '
-        'cboFacNameField
-        '
-        Me.cboFacNameField.AllowDrop = True
-        Me.cboFacNameField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboFacNameField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboFacNameField, "Select the field containing the NPDES facility name.")
-        Me.cboFacNameField.Location = New System.Drawing.Point(108, 81)
-        Me.cboFacNameField.Name = "cboFacNameField"
-        Me.HelpProvider1.SetShowHelp(Me.cboFacNameField, True)
-        Me.cboFacNameField.Size = New System.Drawing.Size(250, 21)
-        Me.cboFacNameField.Sorted = True
-        Me.cboFacNameField.TabIndex = 6
-        '
-        'cboSICField
-        '
-        Me.cboSICField.AllowDrop = True
-        Me.cboSICField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboSICField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboSICField, "Select the field containing the Standard Industrial Classification (SIC) number.")
-        Me.cboSICField.Location = New System.Drawing.Point(108, 108)
-        Me.cboSICField.Name = "cboSICField"
-        Me.HelpProvider1.SetShowHelp(Me.cboSICField, True)
-        Me.cboSICField.Size = New System.Drawing.Size(250, 21)
-        Me.cboSICField.Sorted = True
-        Me.cboSICField.TabIndex = 8
-        '
-        'cboSICNameField
-        '
-        Me.cboSICNameField.AllowDrop = True
-        Me.cboSICNameField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboSICNameField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboSICNameField, "Select the field containing the Standard Industrial Classification (SIC) descript" & _
-                "ion.")
-        Me.cboSICNameField.Location = New System.Drawing.Point(108, 135)
-        Me.cboSICNameField.Name = "cboSICNameField"
-        Me.HelpProvider1.SetShowHelp(Me.cboSICNameField, True)
-        Me.cboSICNameField.Size = New System.Drawing.Size(250, 21)
-        Me.cboSICNameField.Sorted = True
-        Me.cboSICNameField.TabIndex = 10
-        '
-        'cboCityField
-        '
-        Me.cboCityField.AllowDrop = True
-        Me.cboCityField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboCityField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboCityField, "Select the field containing the name of the nearest city to the facility.")
-        Me.cboCityField.Location = New System.Drawing.Point(108, 162)
-        Me.cboCityField.Name = "cboCityField"
-        Me.HelpProvider1.SetShowHelp(Me.cboCityField, True)
-        Me.cboCityField.Size = New System.Drawing.Size(250, 21)
-        Me.cboCityField.Sorted = True
-        Me.cboCityField.TabIndex = 12
-        '
         'Label35
         '
         Me.Label35.Anchor = System.Windows.Forms.AnchorStyles.Left
@@ -1400,33 +1625,6 @@ Partial Class frmWCS
         Me.Label35.TabIndex = 15
         Me.Label35.Text = "&Waterbody:"
         '
-        'cboRecWaterField
-        '
-        Me.cboRecWaterField.AllowDrop = True
-        Me.cboRecWaterField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboRecWaterField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboRecWaterField, "Select the field containing the name of the receiving water body.")
-        Me.cboRecWaterField.Location = New System.Drawing.Point(108, 216)
-        Me.cboRecWaterField.Name = "cboRecWaterField"
-        Me.HelpProvider1.SetShowHelp(Me.cboRecWaterField, True)
-        Me.cboRecWaterField.Size = New System.Drawing.Size(250, 21)
-        Me.cboRecWaterField.Sorted = True
-        Me.cboRecWaterField.TabIndex = 16
-        '
-        'cboMajorField
-        '
-        Me.cboMajorField.AllowDrop = True
-        Me.cboMajorField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboMajorField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboMajorField, "Select the field containing the flag which describes the discharger as either maj" & _
-                "or or minor.")
-        Me.cboMajorField.Location = New System.Drawing.Point(108, 189)
-        Me.cboMajorField.Name = "cboMajorField"
-        Me.HelpProvider1.SetShowHelp(Me.cboMajorField, True)
-        Me.cboMajorField.Size = New System.Drawing.Size(250, 21)
-        Me.cboMajorField.Sorted = True
-        Me.cboMajorField.TabIndex = 14
-        '
         'Label36
         '
         Me.Label36.Anchor = System.Windows.Forms.AnchorStyles.Left
@@ -1436,20 +1634,6 @@ Partial Class frmWCS
         Me.Label36.Size = New System.Drawing.Size(83, 13)
         Me.Label36.TabIndex = 17
         Me.Label36.Text = "&Active/Inactive:"
-        '
-        'cboActiveField
-        '
-        Me.cboActiveField.AllowDrop = True
-        Me.cboActiveField.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboActiveField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.HelpProvider1.SetHelpString(Me.cboActiveField, "Select the field containing the flag which describes whether the permit is active" & _
-                " or not. Only active permits are included in report.")
-        Me.cboActiveField.Location = New System.Drawing.Point(108, 243)
-        Me.cboActiveField.Name = "cboActiveField"
-        Me.HelpProvider1.SetShowHelp(Me.cboActiveField, True)
-        Me.cboActiveField.Size = New System.Drawing.Size(250, 21)
-        Me.cboActiveField.Sorted = True
-        Me.cboActiveField.TabIndex = 18
         '
         'TabPage11
         '
@@ -1462,22 +1646,25 @@ Partial Class frmWCS
         Me.TabPage11.Text = "Data"
         Me.TabPage11.UseVisualStyleBackColor = True
         '
-        'lstDataSources
+        'TableLayoutPanel10
         '
-        Me.lstDataSources.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lstDataSources.CheckOnClick = True
-        Me.TableLayoutPanel10.SetColumnSpan(Me.lstDataSources, 3)
-        Me.lstDataSources.FormattingEnabled = True
-        Me.HelpProvider1.SetHelpString(Me.lstDataSources, "This is a list of all previously downloaded BASINS datasets (e.g., STORET, NWIS, " & _
-                "Meteorology, etc.)")
-        Me.lstDataSources.IntegralHeight = False
-        Me.lstDataSources.Location = New System.Drawing.Point(3, 23)
-        Me.lstDataSources.Name = "lstDataSources"
-        Me.HelpProvider1.SetShowHelp(Me.lstDataSources, True)
-        Me.lstDataSources.Size = New System.Drawing.Size(355, 208)
-        Me.lstDataSources.TabIndex = 1
+        Me.TableLayoutPanel10.ColumnCount = 3
+        Me.TableLayoutPanel10.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TableLayoutPanel10.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle)
+        Me.TableLayoutPanel10.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle)
+        Me.TableLayoutPanel10.Controls.Add(Me.Label37, 0, 0)
+        Me.TableLayoutPanel10.Controls.Add(Me.btnAllDS, 1, 2)
+        Me.TableLayoutPanel10.Controls.Add(Me.btnNoneDS, 2, 2)
+        Me.TableLayoutPanel10.Controls.Add(Me.lstDataSources, 0, 1)
+        Me.TableLayoutPanel10.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TableLayoutPanel10.Location = New System.Drawing.Point(3, 3)
+        Me.TableLayoutPanel10.Name = "TableLayoutPanel10"
+        Me.TableLayoutPanel10.RowCount = 3
+        Me.TableLayoutPanel10.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+        Me.TableLayoutPanel10.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TableLayoutPanel10.RowStyles.Add(New System.Windows.Forms.RowStyle)
+        Me.TableLayoutPanel10.Size = New System.Drawing.Size(361, 263)
+        Me.TableLayoutPanel10.TabIndex = 0
         '
         'Label37
         '
@@ -1496,7 +1683,7 @@ Partial Class frmWCS
         Me.TabPage2.Location = New System.Drawing.Point(4, 22)
         Me.TabPage2.Name = "TabPage2"
         Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(543, 307)
+        Me.TabPage2.Size = New System.Drawing.Size(560, 307)
         Me.TabPage2.TabIndex = 2
         Me.TabPage2.Text = "Results"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -1519,84 +1706,30 @@ Partial Class frmWCS
         Me.TableLayoutPanel2.RowCount = 2
         Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
         Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle)
-        Me.TableLayoutPanel2.Size = New System.Drawing.Size(537, 301)
+        Me.TableLayoutPanel2.Size = New System.Drawing.Size(554, 301)
         Me.TableLayoutPanel2.TabIndex = 0
         '
-        'btnCopy
+        'lblGenerate
         '
-        Me.HelpProvider1.SetHelpString(Me.btnCopy, "Copy the entire HTML report to the clipboard.")
-        Me.btnCopy.Location = New System.Drawing.Point(3, 275)
-        Me.btnCopy.Name = "btnCopy"
-        Me.HelpProvider1.SetShowHelp(Me.btnCopy, True)
-        Me.btnCopy.Size = New System.Drawing.Size(75, 23)
-        Me.btnCopy.TabIndex = 1
-        Me.btnCopy.Text = "&Copy"
-        Me.btnCopy.UseVisualStyleBackColor = True
-        '
-        'btnPreview
-        '
-        Me.btnPreview.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.HelpProvider1.SetHelpString(Me.btnPreview, "Display the print preview form.")
-        Me.btnPreview.Location = New System.Drawing.Point(378, 275)
-        Me.btnPreview.Name = "btnPreview"
-        Me.HelpProvider1.SetShowHelp(Me.btnPreview, True)
-        Me.btnPreview.Size = New System.Drawing.Size(75, 23)
-        Me.btnPreview.TabIndex = 2
-        Me.btnPreview.Text = "Pre&view..."
-        Me.btnPreview.UseVisualStyleBackColor = True
-        '
-        'btnPrint
-        '
-        Me.btnPrint.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.HelpProvider1.SetHelpString(Me.btnPrint, "Send the HTML report to the printer.")
-        Me.btnPrint.Location = New System.Drawing.Point(459, 275)
-        Me.btnPrint.Name = "btnPrint"
-        Me.HelpProvider1.SetShowHelp(Me.btnPrint, True)
-        Me.btnPrint.Size = New System.Drawing.Size(75, 23)
-        Me.btnPrint.TabIndex = 3
-        Me.btnPrint.Text = "&Print..."
-        Me.btnPrint.UseVisualStyleBackColor = True
-        '
-        'wbResults
-        '
-        Me.wbResults.AllowWebBrowserDrop = False
-        Me.wbResults.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.TableLayoutPanel2.SetColumnSpan(Me.wbResults, 4)
-        Me.HelpProvider1.SetHelpString(Me.wbResults, "When the reports are ready, this browser will contain all selected reports.")
-        Me.wbResults.IsWebBrowserContextMenuEnabled = False
-        Me.wbResults.Location = New System.Drawing.Point(3, 3)
-        Me.wbResults.MinimumSize = New System.Drawing.Size(20, 20)
-        Me.wbResults.Name = "wbResults"
-        Me.HelpProvider1.SetShowHelp(Me.wbResults, True)
-        Me.wbResults.Size = New System.Drawing.Size(531, 266)
-        Me.wbResults.TabIndex = 0
-        Me.wbResults.WebBrowserShortcutsEnabled = False
+        Me.lblGenerate.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.lblGenerate.AutoSize = True
+        Me.lblGenerate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblGenerate.Location = New System.Drawing.Point(84, 280)
+        Me.lblGenerate.Name = "lblGenerate"
+        Me.lblGenerate.Size = New System.Drawing.Size(190, 13)
+        Me.lblGenerate.TabIndex = 2
+        Me.lblGenerate.Text = "Click Generate button to refresh results"
         '
         'btnCancel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnCancel.Location = New System.Drawing.Point(488, 351)
+        Me.btnCancel.Location = New System.Drawing.Point(505, 351)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(75, 26)
-        Me.btnCancel.TabIndex = 4
+        Me.btnCancel.TabIndex = 5
         Me.btnCancel.Text = "Close"
-        '
-        'btnAbout
-        '
-        Me.btnAbout.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnAbout.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnAbout.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.HelpProvider1.SetHelpString(Me.btnAbout, "Displays the About dialog box.")
-        Me.btnAbout.Location = New System.Drawing.Point(12, 351)
-        Me.btnAbout.Name = "btnAbout"
-        Me.HelpProvider1.SetShowHelp(Me.btnAbout, True)
-        Me.btnAbout.Size = New System.Drawing.Size(75, 26)
-        Me.btnAbout.TabIndex = 1
-        Me.btnAbout.Text = "&About"
         '
         'tblProgress
         '
@@ -1609,18 +1742,18 @@ Partial Class frmWCS
         Me.tblProgress.Controls.Add(Me.ProgressBar, 1, 0)
         Me.tblProgress.Controls.Add(Me.lnkCancel, 2, 0)
         Me.tblProgress.Controls.Add(Me.lblProgress, 0, 0)
-        Me.tblProgress.Location = New System.Drawing.Point(93, 351)
+        Me.tblProgress.Location = New System.Drawing.Point(174, 351)
         Me.tblProgress.Name = "tblProgress"
         Me.tblProgress.RowCount = 1
         Me.tblProgress.RowStyles.Add(New System.Windows.Forms.RowStyle)
-        Me.tblProgress.Size = New System.Drawing.Size(298, 26)
-        Me.tblProgress.TabIndex = 2
+        Me.tblProgress.Size = New System.Drawing.Size(234, 26)
+        Me.tblProgress.TabIndex = 3
         Me.tblProgress.Visible = False
         '
         'ProgressBar
         '
         Me.ProgressBar.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ProgressBar.Location = New System.Drawing.Point(137, 4)
+        Me.ProgressBar.Location = New System.Drawing.Point(73, 4)
         Me.ProgressBar.Name = "ProgressBar"
         Me.ProgressBar.Size = New System.Drawing.Size(112, 18)
         Me.ProgressBar.TabIndex = 1
@@ -1629,7 +1762,7 @@ Partial Class frmWCS
         '
         Me.lnkCancel.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lnkCancel.AutoSize = True
-        Me.lnkCancel.Location = New System.Drawing.Point(255, 6)
+        Me.lnkCancel.Location = New System.Drawing.Point(191, 6)
         Me.lnkCancel.Name = "lnkCancel"
         Me.lnkCancel.Size = New System.Drawing.Size(40, 13)
         Me.lnkCancel.TabIndex = 2
@@ -1640,151 +1773,33 @@ Partial Class frmWCS
         '
         Me.lblProgress.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblProgress.AutoSize = True
-        Me.lblProgress.Location = New System.Drawing.Point(70, 6)
+        Me.lblProgress.Location = New System.Drawing.Point(6, 6)
         Me.lblProgress.Name = "lblProgress"
         Me.lblProgress.Size = New System.Drawing.Size(61, 13)
         Me.lblProgress.TabIndex = 0
         Me.lblProgress.Text = "Initializing..."
         '
-        'TableLayoutPanel10
+        'btnHelp
         '
-        Me.TableLayoutPanel10.ColumnCount = 3
-        Me.TableLayoutPanel10.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutPanel10.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle)
-        Me.TableLayoutPanel10.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle)
-        Me.TableLayoutPanel10.Controls.Add(Me.Label37, 0, 0)
-        Me.TableLayoutPanel10.Controls.Add(Me.btnAllDS, 1, 2)
-        Me.TableLayoutPanel10.Controls.Add(Me.btnNoneDS, 2, 2)
-        Me.TableLayoutPanel10.Controls.Add(Me.lstDataSources, 0, 1)
-        Me.TableLayoutPanel10.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.TableLayoutPanel10.Location = New System.Drawing.Point(3, 3)
-        Me.TableLayoutPanel10.Name = "TableLayoutPanel10"
-        Me.TableLayoutPanel10.RowCount = 3
-        Me.TableLayoutPanel10.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-        Me.TableLayoutPanel10.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutPanel10.RowStyles.Add(New System.Windows.Forms.RowStyle)
-        Me.TableLayoutPanel10.Size = New System.Drawing.Size(361, 263)
-        Me.TableLayoutPanel10.TabIndex = 0
-        '
-        'btnAllDS
-        '
-        Me.HelpProvider1.SetHelpString(Me.btnAllDS, "Check all datasets above")
-        Me.btnAllDS.Location = New System.Drawing.Point(214, 237)
-        Me.btnAllDS.Name = "btnAllDS"
-        Me.HelpProvider1.SetShowHelp(Me.btnAllDS, True)
-        Me.btnAllDS.Size = New System.Drawing.Size(69, 23)
-        Me.btnAllDS.TabIndex = 2
-        Me.btnAllDS.Text = "All"
-        Me.btnAllDS.UseVisualStyleBackColor = True
-        '
-        'btnNoneDS
-        '
-        Me.HelpProvider1.SetHelpString(Me.btnNoneDS, "Uncheck all datasets above")
-        Me.btnNoneDS.Location = New System.Drawing.Point(289, 237)
-        Me.btnNoneDS.Name = "btnNoneDS"
-        Me.HelpProvider1.SetShowHelp(Me.btnNoneDS, True)
-        Me.btnNoneDS.Size = New System.Drawing.Size(69, 23)
-        Me.btnNoneDS.TabIndex = 3
-        Me.btnNoneDS.Text = "None"
-        Me.btnNoneDS.UseVisualStyleBackColor = True
-        '
-        'lnkDeleteReports
-        '
-        Me.lnkDeleteReports.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.lnkDeleteReports.AutoSize = True
-        Me.HelpProvider1.SetHelpString(Me.lnkDeleteReports, "Report files are automatically created and sequentially numbered each time you cl" & _
-                "ick the Generate button. Click this link to delete all old report files.")
-        Me.lnkDeleteReports.Location = New System.Drawing.Point(200, 164)
-        Me.lnkDeleteReports.Name = "lnkDeleteReports"
-        Me.HelpProvider1.SetShowHelp(Me.lnkDeleteReports, True)
-        Me.lnkDeleteReports.Size = New System.Drawing.Size(187, 13)
-        Me.lnkDeleteReports.TabIndex = 4
-        Me.lnkDeleteReports.TabStop = True
-        Me.lnkDeleteReports.Text = "Delete all previously generated reports"
-        '
-        'Label38
-        '
-        Me.Label38.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.Label38.AutoSize = True
-        Me.TableLayoutPanel9.SetColumnSpan(Me.Label38, 2)
-        Me.Label38.Location = New System.Drawing.Point(3, 3)
-        Me.Label38.Name = "Label38"
-        Me.Label38.Size = New System.Drawing.Size(93, 13)
-        Me.Label38.TabIndex = 0
-        Me.Label38.Text = "A&vailable Reports:"
-        '
-        'Label39
-        '
-        Me.Label39.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.Label39.AutoSize = True
-        Me.TableLayoutPanel5.SetColumnSpan(Me.Label39, 2)
-        Me.Label39.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label39.Location = New System.Drawing.Point(150, 83)
-        Me.Label39.Name = "Label39"
-        Me.Label39.Size = New System.Drawing.Size(60, 13)
-        Me.Label39.TabIndex = 5
-        Me.Label39.Text = "Data Table"
-        '
-        'dgSoil
-        '
-        Me.dgSoil.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.dgSoil.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.TableLayoutPanel5.SetColumnSpan(Me.dgSoil, 2)
-        Me.HelpProvider1.SetHelpString(Me.dgSoil, resources.GetString("dgSoil.HelpString"))
-        Me.dgSoil.Location = New System.Drawing.Point(3, 105)
-        Me.dgSoil.Name = "dgSoil"
-        Me.dgSoil.ReadOnly = True
-        Me.HelpProvider1.SetShowHelp(Me.dgSoil, True)
-        Me.dgSoil.Size = New System.Drawing.Size(355, 155)
-        Me.dgSoil.TabIndex = 6
-        '
-        'Label40
-        '
-        Me.Label40.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.Label40.AutoSize = True
-        Me.TableLayoutPanel6.SetColumnSpan(Me.Label40, 2)
-        Me.Label40.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label40.Location = New System.Drawing.Point(150, 110)
-        Me.Label40.Name = "Label40"
-        Me.Label40.Size = New System.Drawing.Size(60, 13)
-        Me.Label40.TabIndex = 7
-        Me.Label40.Text = "Data Table"
-        '
-        'dgLandUse
-        '
-        Me.dgLandUse.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.dgLandUse.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.TableLayoutPanel6.SetColumnSpan(Me.dgLandUse, 2)
-        Me.HelpProvider1.SetHelpString(Me.dgLandUse, resources.GetString("dgLandUse.HelpString"))
-        Me.dgLandUse.Location = New System.Drawing.Point(3, 132)
-        Me.dgLandUse.Name = "dgLandUse"
-        Me.dgLandUse.ReadOnly = True
-        Me.HelpProvider1.SetShowHelp(Me.dgLandUse, True)
-        Me.dgLandUse.Size = New System.Drawing.Size(355, 128)
-        Me.dgLandUse.TabIndex = 8
-        '
-        'lblGenerate
-        '
-        Me.lblGenerate.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.lblGenerate.AutoSize = True
-        Me.lblGenerate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblGenerate.Location = New System.Drawing.Point(84, 280)
-        Me.lblGenerate.Name = "lblGenerate"
-        Me.lblGenerate.Size = New System.Drawing.Size(190, 13)
-        Me.lblGenerate.TabIndex = 5
-        Me.lblGenerate.Text = "Click Generate button to refresh results"
+        Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnHelp.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.btnHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.HelpProvider1.SetHelpString(Me.btnHelp, "Display the help file for WCS")
+        Me.btnHelp.Location = New System.Drawing.Point(93, 351)
+        Me.btnHelp.Name = "btnHelp"
+        Me.HelpProvider1.SetShowHelp(Me.btnHelp, True)
+        Me.btnHelp.Size = New System.Drawing.Size(75, 26)
+        Me.btnHelp.TabIndex = 2
+        Me.btnHelp.Text = "&Help"
         '
         'frmWCS
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(575, 389)
+        Me.ClientSize = New System.Drawing.Size(592, 389)
         Me.Controls.Add(Me.tblProgress)
         Me.Controls.Add(Me.btnGenerate)
+        Me.Controls.Add(Me.btnHelp)
         Me.Controls.Add(Me.btnAbout)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.tabWCS)
@@ -1792,10 +1807,12 @@ Partial Class frmWCS
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.MinimumSize = New System.Drawing.Size(583, 423)
+        Me.MinimumSize = New System.Drawing.Size(600, 423)
         Me.Name = "frmWCS"
         Me.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show
         Me.Text = "Watershed Characterization System (WCS)"
+        CType(Me.dgSoil, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dgLandUse, System.ComponentModel.ISupportInitialize).EndInit()
         Me.tabWCS.ResumeLayout(False)
         Me.TabPage4.ResumeLayout(False)
         Me.TableLayoutPanel1.ResumeLayout(False)
@@ -1823,15 +1840,13 @@ Partial Class frmWCS
         Me.TableLayoutPanel8.ResumeLayout(False)
         Me.TableLayoutPanel8.PerformLayout()
         Me.TabPage11.ResumeLayout(False)
+        Me.TableLayoutPanel10.ResumeLayout(False)
+        Me.TableLayoutPanel10.PerformLayout()
         Me.TabPage2.ResumeLayout(False)
         Me.TableLayoutPanel2.ResumeLayout(False)
         Me.TableLayoutPanel2.PerformLayout()
         Me.tblProgress.ResumeLayout(False)
         Me.tblProgress.PerformLayout()
-        Me.TableLayoutPanel10.ResumeLayout(False)
-        Me.TableLayoutPanel10.PerformLayout()
-        CType(Me.dgSoil, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.dgLandUse, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -1957,4 +1972,5 @@ Partial Class frmWCS
     Friend WithEvents dgLandUse As System.Windows.Forms.DataGridView
     Friend WithEvents Label40 As System.Windows.Forms.Label
     Friend WithEvents lblGenerate As System.Windows.Forms.Label
+    Friend WithEvents btnHelp As System.Windows.Forms.Button
 End Class

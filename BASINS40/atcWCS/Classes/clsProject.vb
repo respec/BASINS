@@ -61,7 +61,7 @@ Friend Class clsProject
     Public Sub New()
         ProjectFolder = IO.Path.GetDirectoryName(GisUtil.ProjectFileName) & "\WCS"
         If Not My.Computer.FileSystem.DirectoryExists(ProjectFolder) Then My.Computer.FileSystem.CreateDirectory(ProjectFolder)
-        AppFolder = IO.Path.GetDirectoryName(Reflection.Assembly.GetEntryAssembly.Location) & "\Plugins\WCS"
+        AppFolder = IO.Path.GetDirectoryName(Reflection.Assembly.GetEntryAssembly.Location) & "\Plugins\BASINS"
         Select Case GisUtil.MapUnits.ToUpper
             Case "METERS"
                 DistFactor = 1.0
@@ -863,7 +863,13 @@ Friend Class clsProject
                                 End If
                                 Dim PCode As String = .GetValue("Constituent")
                                 If Not dictData.ContainsKey(StaID & PCode) Then dictData.Add(StaID & PCode, New clsData(StaID, Name, PCode))
-                                dictData(StaID & PCode).Update(.GetValue("Count"), .GetValue("Min"), .GetValue("Max"), .GetValue("Mean"), Date.FromOADate(.GetValue("Start Date")), Date.FromOADate(.GetValue("End Date")))
+                                Dim StartDate As Date = #1/1/1900#
+                                Dim EndDate As Date = #1/1/1900#
+                                Dim StartDateDbl As Double = .GetValue("Start Date")
+                                Dim EndDateDbl As Double = .GetValue("End Date")
+                                If Not Double.IsNaN(StartDateDbl) Then StartDate = Date.FromOADate(StartDateDbl)
+                                If Not Double.IsNaN(EndDateDbl) Then EndDate = Date.FromOADate(EndDateDbl)
+                                dictData(StaID & PCode).Update(.GetValue("Count"), .GetValue("Min"), .GetValue("Max"), .GetValue("Mean"), StartDate, EndDate)
                             End With
                             If Not WCSForm.UpdateProgress("Summarizing data...", i, ds.DataSets.Count - 1) Then Exit Sub
                         Next
