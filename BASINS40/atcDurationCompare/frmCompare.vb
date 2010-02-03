@@ -43,7 +43,8 @@ Public Class frmCompare
 
                 pObserved = Aggregate(lDataGroup(0), lTU, 1, lTran)
                 pSimulated = Aggregate(lDataGroup(1), lTU, 1, lTran)
-                IO.File.WriteAllText(.FileName, CompareStats(pObserved, pSimulated, GetClassLimits(pObserved)))
+                Dim lReport As New DurationReport
+                IO.File.WriteAllText(.FileName, CompareStats(pObserved, pSimulated, lReport.ClassLimitsNeeded(pObserved)))
                 OpenFile(.FileName)
             End If
         End With
@@ -93,24 +94,12 @@ Public Class frmCompare
         DateChooser.DataGroup = lDataGroup
     End Sub
 
-    Private Sub lblHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lblHelp.Click
-        Dim lHelpBrowser As Windows.Forms.WebBrowser
-        lHelpBrowser = New Windows.Forms.WebBrowser()
+    Public Sub mnuAnalysis_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
+        atcDataManager.ShowDisplay(sender.Text, New atcTimeseriesGroup(pObserved, pSimulated))
+    End Sub
 
-        Dim lStrHelpText As String
-
-        'lHelpWin = New Windows.Forms.HtmlDocument
-        lStrHelpText = "<html><head><title>Help:AWSTAT->Compare</title></head>" & vbCrLf
-        lStrHelpText &= "<body>Help with AWSTAT->Compare</body></html>" & vbCrLf
-
-        'lHelpWin.Write(lStrHelpText)
-        lHelpBrowser.Document.Write(lStrHelpText) '  .Window.Open("", lStrHelpText, "", False)
-        lHelpBrowser.Height = 100
-        lHelpBrowser.Width = 200
-        lHelpBrowser.Select()
-        lHelpBrowser.Visible = True
-        lHelpBrowser.Show()
-        'lHelpBrowser.Url = System.Uri("http://www.aquaterra.com")
-
+    Private pHelpLocation As String = "BASINS Details\Analysis\Time Series Functions\Compare.html"
+    Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
+        ShowHelp(pHelpLocation)
     End Sub
 End Class

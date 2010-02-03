@@ -25,11 +25,19 @@ Public Class clsHspfSupportPlugin
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         Dim lFrm As Object = Nothing 'Windows.Forms.Form
         Select Case aItemName
-            Case atcDataManager.AnalysisMenuName & "_Duration" : lFrm = New frmDuration
-            Case atcDataManager.AnalysisMenuName & "_Compare" : lFrm = New frmCompare
+            Case atcDataManager.AnalysisMenuName & "_Duration"
+                lFrm = New frmDuration
+            Case atcDataManager.AnalysisMenuName & "_Compare"
+                lFrm = New frmCompare
         End Select
 
         If lFrm IsNot Nothing Then
+            Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
+            For Each lDisp As atcDataDisplay In DisplayPlugins
+                Dim lMenuText As String = lDisp.Name
+                If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
+                lFrm.mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf lFrm.mnuAnalysis_Click))
+            Next
             If pMapWin IsNot Nothing AndAlso pMapWin.ApplicationInfo.FormIcon IsNot Nothing Then lFrm.Icon = pMapWin.ApplicationInfo.FormIcon
             Dim lTimeseriesGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Data For " & aItemName.Substring(atcDataManager.AnalysisMenuName.Length + 1))
             If lTimeseriesGroup.Count > 0 Then

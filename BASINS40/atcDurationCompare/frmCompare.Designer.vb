@@ -22,7 +22,7 @@ Partial Class frmCompare
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmCompare))
+        Me.components = New System.ComponentModel.Container
         Me.lblObserved = New System.Windows.Forms.Label
         Me.txtObserved = New System.Windows.Forms.TextBox
         Me.btnObserved = New System.Windows.Forms.Button
@@ -37,14 +37,15 @@ Partial Class frmCompare
         Me.radioTUMonthly = New System.Windows.Forms.RadioButton
         Me.radioTUYearly = New System.Windows.Forms.RadioButton
         Me.btnCompare = New System.Windows.Forms.Button
-        Me.lblHelp = New System.Windows.Forms.Button
         Me.gbClassLimits = New System.Windows.Forms.GroupBox
-        Me.radioArithmetic = New System.Windows.Forms.RadioButton
-        Me.radioLogrithmic = New System.Windows.Forms.RadioButton
-        Me.lblNumClassLimits = New System.Windows.Forms.Label
         Me.TextBox1 = New System.Windows.Forms.TextBox
-        Me.TextBox2 = New System.Windows.Forms.TextBox
-        Me.TextBox3 = New System.Windows.Forms.TextBox
+        Me.lblNumClassLimits = New System.Windows.Forms.Label
+        Me.radioLogrithmic = New System.Windows.Forms.RadioButton
+        Me.radioArithmetic = New System.Windows.Forms.RadioButton
+        Me.MainMenu1 = New System.Windows.Forms.MainMenu(Me.components)
+        Me.mnuFile = New System.Windows.Forms.MenuItem
+        Me.mnuAnalysis = New System.Windows.Forms.MenuItem
+        Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.gbClassLimits.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -63,13 +64,13 @@ Partial Class frmCompare
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtObserved.Location = New System.Drawing.Point(125, 55)
         Me.txtObserved.Name = "txtObserved"
-        Me.txtObserved.Size = New System.Drawing.Size(451, 20)
+        Me.txtObserved.Size = New System.Drawing.Size(389, 20)
         Me.txtObserved.TabIndex = 1
         '
         'btnObserved
         '
         Me.btnObserved.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnObserved.Location = New System.Drawing.Point(582, 55)
+        Me.btnObserved.Location = New System.Drawing.Point(520, 55)
         Me.btnObserved.Name = "btnObserved"
         Me.btnObserved.Size = New System.Drawing.Size(30, 23)
         Me.btnObserved.TabIndex = 2
@@ -79,7 +80,7 @@ Partial Class frmCompare
         'btnSimulated
         '
         Me.btnSimulated.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSimulated.Location = New System.Drawing.Point(582, 81)
+        Me.btnSimulated.Location = New System.Drawing.Point(520, 81)
         Me.btnSimulated.Name = "btnSimulated"
         Me.btnSimulated.Size = New System.Drawing.Size(30, 23)
         Me.btnSimulated.TabIndex = 5
@@ -92,7 +93,7 @@ Partial Class frmCompare
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtSimulated.Location = New System.Drawing.Point(125, 81)
         Me.txtSimulated.Name = "txtSimulated"
-        Me.txtSimulated.Size = New System.Drawing.Size(451, 20)
+        Me.txtSimulated.Size = New System.Drawing.Size(389, 20)
         Me.txtSimulated.TabIndex = 4
         '
         'lblSimulated
@@ -106,8 +107,6 @@ Partial Class frmCompare
         '
         'DateChooser
         '
-        Me.DateChooser.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.DateChooser.CommonEnd = 1.7976931348623157E+308
         Me.DateChooser.CommonStart = -1.7976931348623157E+308
         Me.DateChooser.DataGroup = Nothing
@@ -117,7 +116,7 @@ Partial Class frmCompare
         Me.DateChooser.Name = "DateChooser"
         Me.DateChooser.OmitAfter = 0
         Me.DateChooser.OmitBefore = 0
-        Me.DateChooser.Size = New System.Drawing.Size(600, 88)
+        Me.DateChooser.Size = New System.Drawing.Size(285, 88)
         Me.DateChooser.TabIndex = 6
         '
         'txtTitle
@@ -126,7 +125,7 @@ Partial Class frmCompare
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtTitle.Location = New System.Drawing.Point(125, 12)
         Me.txtTitle.Name = "txtTitle"
-        Me.txtTitle.Size = New System.Drawing.Size(487, 20)
+        Me.txtTitle.Size = New System.Drawing.Size(425, 20)
         Me.txtTitle.TabIndex = 8
         '
         'lblTitle
@@ -181,36 +180,52 @@ Partial Class frmCompare
         '
         'btnCompare
         '
-        Me.btnCompare.Location = New System.Drawing.Point(12, 442)
+        Me.btnCompare.Location = New System.Drawing.Point(15, 262)
         Me.btnCompare.Name = "btnCompare"
         Me.btnCompare.Size = New System.Drawing.Size(75, 23)
         Me.btnCompare.TabIndex = 13
         Me.btnCompare.Text = "Compare"
         Me.btnCompare.UseVisualStyleBackColor = True
         '
-        'lblHelp
-        '
-        Me.lblHelp.Location = New System.Drawing.Point(306, 442)
-        Me.lblHelp.Name = "lblHelp"
-        Me.lblHelp.Size = New System.Drawing.Size(75, 23)
-        Me.lblHelp.TabIndex = 14
-        Me.lblHelp.Text = "Help"
-        Me.lblHelp.UseVisualStyleBackColor = True
-        '
         'gbClassLimits
         '
-        Me.gbClassLimits.Controls.Add(Me.TextBox3)
-        Me.gbClassLimits.Controls.Add(Me.TextBox2)
         Me.gbClassLimits.Controls.Add(Me.TextBox1)
         Me.gbClassLimits.Controls.Add(Me.lblNumClassLimits)
         Me.gbClassLimits.Controls.Add(Me.radioLogrithmic)
         Me.gbClassLimits.Controls.Add(Me.radioArithmetic)
-        Me.gbClassLimits.Location = New System.Drawing.Point(34, 270)
+        Me.gbClassLimits.Location = New System.Drawing.Point(306, 110)
         Me.gbClassLimits.Name = "gbClassLimits"
-        Me.gbClassLimits.Size = New System.Drawing.Size(257, 156)
+        Me.gbClassLimits.Size = New System.Drawing.Size(239, 88)
         Me.gbClassLimits.TabIndex = 15
         Me.gbClassLimits.TabStop = False
         Me.gbClassLimits.Text = "Class Limits"
+        '
+        'TextBox1
+        '
+        Me.TextBox1.Location = New System.Drawing.Point(130, 63)
+        Me.TextBox1.Name = "TextBox1"
+        Me.TextBox1.Size = New System.Drawing.Size(100, 20)
+        Me.TextBox1.TabIndex = 3
+        '
+        'lblNumClassLimits
+        '
+        Me.lblNumClassLimits.AutoSize = True
+        Me.lblNumClassLimits.Location = New System.Drawing.Point(11, 63)
+        Me.lblNumClassLimits.Name = "lblNumClassLimits"
+        Me.lblNumClassLimits.Size = New System.Drawing.Size(113, 13)
+        Me.lblNumClassLimits.TabIndex = 2
+        Me.lblNumClassLimits.Text = "Number of Class Limits"
+        '
+        'radioLogrithmic
+        '
+        Me.radioLogrithmic.AutoSize = True
+        Me.radioLogrithmic.Location = New System.Drawing.Point(134, 32)
+        Me.radioLogrithmic.Name = "radioLogrithmic"
+        Me.radioLogrithmic.Size = New System.Drawing.Size(79, 17)
+        Me.radioLogrithmic.TabIndex = 1
+        Me.radioLogrithmic.TabStop = True
+        Me.radioLogrithmic.Text = "Logarithmic"
+        Me.radioLogrithmic.UseVisualStyleBackColor = True
         '
         'radioArithmetic
         '
@@ -223,54 +238,31 @@ Partial Class frmCompare
         Me.radioArithmetic.Text = "Arithmetic"
         Me.radioArithmetic.UseVisualStyleBackColor = True
         '
-        'radioLogrithmic
+        'MainMenu1
         '
-        Me.radioLogrithmic.AutoSize = True
-        Me.radioLogrithmic.Location = New System.Drawing.Point(14, 55)
-        Me.radioLogrithmic.Name = "radioLogrithmic"
-        Me.radioLogrithmic.Size = New System.Drawing.Size(79, 17)
-        Me.radioLogrithmic.TabIndex = 1
-        Me.radioLogrithmic.TabStop = True
-        Me.radioLogrithmic.Text = "Logarithmic"
-        Me.radioLogrithmic.UseVisualStyleBackColor = True
+        Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuAnalysis, Me.mnuHelp})
         '
-        'lblNumClassLimits
+        'mnuFile
         '
-        Me.lblNumClassLimits.AutoSize = True
-        Me.lblNumClassLimits.Location = New System.Drawing.Point(14, 79)
-        Me.lblNumClassLimits.Name = "lblNumClassLimits"
-        Me.lblNumClassLimits.Size = New System.Drawing.Size(113, 13)
-        Me.lblNumClassLimits.TabIndex = 2
-        Me.lblNumClassLimits.Text = "Number of Class Limits"
+        Me.mnuFile.Index = 0
+        Me.mnuFile.Text = "File"
         '
-        'TextBox1
+        'mnuAnalysis
         '
-        Me.TextBox1.Location = New System.Drawing.Point(134, 79)
-        Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.Size = New System.Drawing.Size(100, 20)
-        Me.TextBox1.TabIndex = 3
+        Me.mnuAnalysis.Index = 1
+        Me.mnuAnalysis.Text = "Analysis"
         '
-        'TextBox2
+        'mnuHelp
         '
-        Me.TextBox2.Location = New System.Drawing.Point(134, 105)
-        Me.TextBox2.Name = "TextBox2"
-        Me.TextBox2.Size = New System.Drawing.Size(100, 20)
-        Me.TextBox2.TabIndex = 4
-        '
-        'TextBox3
-        '
-        Me.TextBox3.Location = New System.Drawing.Point(134, 130)
-        Me.TextBox3.Name = "TextBox3"
-        Me.TextBox3.Size = New System.Drawing.Size(100, 20)
-        Me.TextBox3.TabIndex = 5
+        Me.mnuHelp.Index = 2
+        Me.mnuHelp.Text = "Help"
         '
         'frmCompare
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(624, 501)
+        Me.ClientSize = New System.Drawing.Size(562, 296)
         Me.Controls.Add(Me.gbClassLimits)
-        Me.Controls.Add(Me.lblHelp)
         Me.Controls.Add(Me.btnCompare)
         Me.Controls.Add(Me.radioTUYearly)
         Me.Controls.Add(Me.radioTUMonthly)
@@ -285,6 +277,7 @@ Partial Class frmCompare
         Me.Controls.Add(Me.btnObserved)
         Me.Controls.Add(Me.txtObserved)
         Me.Controls.Add(Me.lblObserved)
+        Me.Menu = Me.MainMenu1
         Me.Name = "frmCompare"
         Me.Text = "Compare"
         Me.gbClassLimits.ResumeLayout(False)
@@ -307,12 +300,13 @@ Partial Class frmCompare
     Friend WithEvents radioTUMonthly As System.Windows.Forms.RadioButton
     Friend WithEvents radioTUYearly As System.Windows.Forms.RadioButton
     Friend WithEvents btnCompare As System.Windows.Forms.Button
-    Friend WithEvents lblHelp As System.Windows.Forms.Button
     Friend WithEvents gbClassLimits As System.Windows.Forms.GroupBox
     Friend WithEvents radioLogrithmic As System.Windows.Forms.RadioButton
     Friend WithEvents radioArithmetic As System.Windows.Forms.RadioButton
     Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
     Friend WithEvents lblNumClassLimits As System.Windows.Forms.Label
-    Friend WithEvents TextBox2 As System.Windows.Forms.TextBox
-    Friend WithEvents TextBox3 As System.Windows.Forms.TextBox
+    Friend WithEvents MainMenu1 As System.Windows.Forms.MainMenu
+    Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
+    Public WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
 End Class
