@@ -35,42 +35,42 @@ Partial Class frmPoint
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdOK = New System.Windows.Forms.Button
         Me.grpDetails = New System.Windows.Forms.GroupBox
-        Me.agdPoint = New atcControls.atcGrid
         Me.cmdDelete = New System.Windows.Forms.Button
-        Me.cmdShowTable = New System.Windows.Forms.Button
-        Me.Button8 = New System.Windows.Forms.Button
+        Me.cmdList = New System.Windows.Forms.Button
+        Me.cmdGraph = New System.Windows.Forms.Button
         Me.cmdDetailsShow = New System.Windows.Forms.Button
         Me.cmdDetailsHide = New System.Windows.Forms.Button
-        Me.agdMasterPoint = New atcControls.atcGrid
-        Me.grpPollutants = New System.Windows.Forms.GroupBox
-        Me.cboPollutantList = New System.Windows.Forms.ComboBox
-        Me.cmdFile = New System.Windows.Forms.Button
-        Me.txtPollutantPath = New System.Windows.Forms.TextBox
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
+        Me.agdMasterPoint = New atcControls.atcGrid
+        Me.agdPoint = New atcControls.atcGrid
         Me.grpSources.SuspendLayout()
         Me.menuPointSources.SuspendLayout()
         Me.grpDetails.SuspendLayout()
-        Me.grpPollutants.SuspendLayout()
         Me.SuspendLayout()
         '
         'chkAllSources
         '
         Me.chkAllSources.AutoSize = True
-        Me.chkAllSources.Location = New System.Drawing.Point(16, 51)
+        Me.chkAllSources.Location = New System.Drawing.Point(21, 63)
+        Me.chkAllSources.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.chkAllSources.Name = "chkAllSources"
-        Me.chkAllSources.Size = New System.Drawing.Size(117, 17)
+        Me.chkAllSources.Size = New System.Drawing.Size(144, 21)
         Me.chkAllSources.TabIndex = 7
         Me.chkAllSources.Text = "Select/Deselect All"
         Me.chkAllSources.UseVisualStyleBackColor = True
         '
         'grpSources
         '
+        Me.grpSources.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.grpSources.Controls.Add(Me.menuPointSources)
         Me.grpSources.Controls.Add(Me.lstPoints)
         Me.grpSources.Controls.Add(Me.chkAllSources)
-        Me.grpSources.Location = New System.Drawing.Point(12, 12)
+        Me.grpSources.Location = New System.Drawing.Point(16, 15)
+        Me.grpSources.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.grpSources.Name = "grpSources"
-        Me.grpSources.Size = New System.Drawing.Size(245, 324)
+        Me.grpSources.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.grpSources.Size = New System.Drawing.Size(327, 519)
         Me.grpSources.TabIndex = 14
         Me.grpSources.TabStop = False
         Me.grpSources.Text = "Point Sources"
@@ -79,10 +79,11 @@ Partial Class frmPoint
         '
         Me.menuPointSources.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuAddPointSources, Me.cmdScenario})
         Me.menuPointSources.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow
-        Me.menuPointSources.Location = New System.Drawing.Point(3, 16)
+        Me.menuPointSources.Location = New System.Drawing.Point(4, 19)
         Me.menuPointSources.Name = "menuPointSources"
+        Me.menuPointSources.Padding = New System.Windows.Forms.Padding(8, 2, 0, 2)
         Me.menuPointSources.RenderMode = System.Windows.Forms.ToolStripRenderMode.System
-        Me.menuPointSources.Size = New System.Drawing.Size(239, 24)
+        Me.menuPointSources.Size = New System.Drawing.Size(319, 26)
         Me.menuPointSources.Stretch = False
         Me.menuPointSources.TabIndex = 18
         Me.menuPointSources.Text = "MenuStrip1"
@@ -94,46 +95,49 @@ Partial Class frmPoint
         Me.MenuAddPointSources.ForeColor = System.Drawing.SystemColors.ControlText
         Me.MenuAddPointSources.Image = CType(resources.GetObject("MenuAddPointSources.Image"), System.Drawing.Image)
         Me.MenuAddPointSources.Name = "MenuAddPointSources"
-        Me.MenuAddPointSources.Size = New System.Drawing.Size(117, 20)
+        Me.MenuAddPointSources.Size = New System.Drawing.Size(146, 22)
         Me.MenuAddPointSources.Text = "Add Point Source"
         '
         'cmdSimpleCreate
         '
         Me.cmdSimpleCreate.Name = "cmdSimpleCreate"
-        Me.cmdSimpleCreate.Size = New System.Drawing.Size(232, 22)
+        Me.cmdSimpleCreate.Size = New System.Drawing.Size(293, 22)
         Me.cmdSimpleCreate.Text = "Simple Create"
         '
         'cmdImportMustin
         '
         Me.cmdImportMustin.Name = "cmdImportMustin"
-        Me.cmdImportMustin.Size = New System.Drawing.Size(232, 22)
+        Me.cmdImportMustin.Size = New System.Drawing.Size(293, 22)
         Me.cmdImportMustin.Text = "Import MUTSIN Format"
         '
         'cmdConvertMustin
         '
         Me.cmdConvertMustin.Name = "cmdConvertMustin"
-        Me.cmdConvertMustin.Size = New System.Drawing.Size(232, 22)
+        Me.cmdConvertMustin.Size = New System.Drawing.Size(293, 22)
         Me.cmdConvertMustin.Text = "Convert All MUTSINs in Project"
         '
         'cmdAdvancedGen
         '
         Me.cmdAdvancedGen.Name = "cmdAdvancedGen"
-        Me.cmdAdvancedGen.Size = New System.Drawing.Size(232, 22)
+        Me.cmdAdvancedGen.Size = New System.Drawing.Size(293, 22)
         Me.cmdAdvancedGen.Text = "Advanced Generation"
         '
         'cmdScenario
         '
         Me.cmdScenario.Image = CType(resources.GetObject("cmdScenario.Image"), System.Drawing.Image)
         Me.cmdScenario.Name = "cmdScenario"
-        Me.cmdScenario.Size = New System.Drawing.Size(112, 20)
+        Me.cmdScenario.Size = New System.Drawing.Size(138, 22)
         Me.cmdScenario.Text = "Create Scenario"
         '
         'lstPoints
         '
+        Me.lstPoints.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lstPoints.FormattingEnabled = True
-        Me.lstPoints.Location = New System.Drawing.Point(18, 78)
+        Me.lstPoints.Location = New System.Drawing.Point(24, 96)
+        Me.lstPoints.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.lstPoints.Name = "lstPoints"
-        Me.lstPoints.Size = New System.Drawing.Size(211, 229)
+        Me.lstPoints.Size = New System.Drawing.Size(280, 395)
         Me.lstPoints.TabIndex = 17
         '
         'ImageList1
@@ -149,9 +153,10 @@ Partial Class frmPoint
         'cmdCancel
         '
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdCancel.Location = New System.Drawing.Point(137, 516)
+        Me.cmdCancel.Location = New System.Drawing.Point(183, 635)
+        Me.cmdCancel.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.cmdCancel.Name = "cmdCancel"
-        Me.cmdCancel.Size = New System.Drawing.Size(101, 26)
+        Me.cmdCancel.Size = New System.Drawing.Size(135, 32)
         Me.cmdCancel.TabIndex = 18
         Me.cmdCancel.Text = "&Cancel"
         Me.cmdCancel.UseVisualStyleBackColor = True
@@ -159,9 +164,10 @@ Partial Class frmPoint
         'cmdOK
         '
         Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdOK.Location = New System.Drawing.Point(28, 516)
+        Me.cmdOK.Location = New System.Drawing.Point(37, 635)
+        Me.cmdOK.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.cmdOK.Name = "cmdOK"
-        Me.cmdOK.Size = New System.Drawing.Size(101, 26)
+        Me.cmdOK.Size = New System.Drawing.Size(135, 32)
         Me.cmdOK.TabIndex = 17
         Me.cmdOK.Text = "&OK"
         Me.cmdOK.UseVisualStyleBackColor = True
@@ -173,61 +179,49 @@ Partial Class frmPoint
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpDetails.Controls.Add(Me.agdPoint)
         Me.grpDetails.Controls.Add(Me.cmdDelete)
-        Me.grpDetails.Controls.Add(Me.cmdShowTable)
-        Me.grpDetails.Controls.Add(Me.Button8)
-        Me.grpDetails.Location = New System.Drawing.Point(283, 12)
+        Me.grpDetails.Controls.Add(Me.cmdList)
+        Me.grpDetails.Controls.Add(Me.cmdGraph)
+        Me.grpDetails.Location = New System.Drawing.Point(377, 15)
+        Me.grpDetails.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.grpDetails.Name = "grpDetails"
-        Me.grpDetails.Size = New System.Drawing.Size(778, 422)
+        Me.grpDetails.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.grpDetails.Size = New System.Drawing.Size(1037, 519)
         Me.grpDetails.TabIndex = 19
         Me.grpDetails.TabStop = False
         Me.grpDetails.Text = "Details of <    >"
-        '
-        'agdPoint
-        '
-        Me.agdPoint.AllowHorizontalScrolling = True
-        Me.agdPoint.AllowNewValidValues = False
-        Me.agdPoint.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.agdPoint.CellBackColor = System.Drawing.Color.Empty
-        Me.agdPoint.Fixed3D = False
-        Me.agdPoint.LineColor = System.Drawing.Color.Empty
-        Me.agdPoint.LineWidth = 0.0!
-        Me.agdPoint.Location = New System.Drawing.Point(57, 16)
-        Me.agdPoint.Name = "agdPoint"
-        Me.agdPoint.Size = New System.Drawing.Size(711, 389)
-        Me.agdPoint.Source = Nothing
-        Me.agdPoint.TabIndex = 25
         '
         'cmdDelete
         '
         Me.cmdDelete.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
         Me.cmdDelete.Image = CType(resources.GetObject("cmdDelete.Image"), System.Drawing.Image)
-        Me.cmdDelete.Location = New System.Drawing.Point(6, 112)
+        Me.cmdDelete.Location = New System.Drawing.Point(8, 138)
+        Me.cmdDelete.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.cmdDelete.Name = "cmdDelete"
-        Me.cmdDelete.Size = New System.Drawing.Size(40, 35)
+        Me.cmdDelete.Size = New System.Drawing.Size(53, 43)
         Me.cmdDelete.TabIndex = 24
         Me.cmdDelete.UseVisualStyleBackColor = True
         '
-        'cmdShowTable
+        'cmdList
         '
-        Me.cmdShowTable.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
-        Me.cmdShowTable.Image = CType(resources.GetObject("cmdShowTable.Image"), System.Drawing.Image)
-        Me.cmdShowTable.Location = New System.Drawing.Point(6, 71)
-        Me.cmdShowTable.Name = "cmdShowTable"
-        Me.cmdShowTable.Size = New System.Drawing.Size(40, 35)
-        Me.cmdShowTable.TabIndex = 23
-        Me.cmdShowTable.UseVisualStyleBackColor = True
+        Me.cmdList.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
+        Me.cmdList.Image = CType(resources.GetObject("cmdList.Image"), System.Drawing.Image)
+        Me.cmdList.Location = New System.Drawing.Point(8, 87)
+        Me.cmdList.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdList.Name = "cmdList"
+        Me.cmdList.Size = New System.Drawing.Size(53, 43)
+        Me.cmdList.TabIndex = 23
+        Me.cmdList.UseVisualStyleBackColor = True
         '
-        'Button8
+        'cmdGraph
         '
-        Me.Button8.BackgroundImage = CType(resources.GetObject("Button8.BackgroundImage"), System.Drawing.Image)
-        Me.Button8.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
-        Me.Button8.Location = New System.Drawing.Point(6, 30)
-        Me.Button8.Name = "Button8"
-        Me.Button8.Size = New System.Drawing.Size(40, 35)
-        Me.Button8.TabIndex = 22
-        Me.Button8.UseVisualStyleBackColor = True
+        Me.cmdGraph.BackgroundImage = CType(resources.GetObject("cmdGraph.BackgroundImage"), System.Drawing.Image)
+        Me.cmdGraph.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
+        Me.cmdGraph.Location = New System.Drawing.Point(8, 37)
+        Me.cmdGraph.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdGraph.Name = "cmdGraph"
+        Me.cmdGraph.Size = New System.Drawing.Size(53, 43)
+        Me.cmdGraph.TabIndex = 22
+        Me.cmdGraph.UseVisualStyleBackColor = True
         '
         'cmdDetailsShow
         '
@@ -236,9 +230,10 @@ Partial Class frmPoint
         Me.cmdDetailsShow.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.cmdDetailsShow.ImageIndex = 1
         Me.cmdDetailsShow.ImageList = Me.ImageList1
-        Me.cmdDetailsShow.Location = New System.Drawing.Point(157, 466)
+        Me.cmdDetailsShow.Location = New System.Drawing.Point(209, 574)
+        Me.cmdDetailsShow.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.cmdDetailsShow.Name = "cmdDetailsShow"
-        Me.cmdDetailsShow.Size = New System.Drawing.Size(100, 21)
+        Me.cmdDetailsShow.Size = New System.Drawing.Size(133, 26)
         Me.cmdDetailsShow.TabIndex = 17
         Me.cmdDetailsShow.Text = "Show Details"
         Me.cmdDetailsShow.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -251,13 +246,18 @@ Partial Class frmPoint
         Me.cmdDetailsHide.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.cmdDetailsHide.ImageIndex = 0
         Me.cmdDetailsHide.ImageList = Me.ImageList1
-        Me.cmdDetailsHide.Location = New System.Drawing.Point(283, 466)
+        Me.cmdDetailsHide.Location = New System.Drawing.Point(377, 574)
+        Me.cmdDetailsHide.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.cmdDetailsHide.Name = "cmdDetailsHide"
-        Me.cmdDetailsHide.Size = New System.Drawing.Size(100, 21)
+        Me.cmdDetailsHide.Size = New System.Drawing.Size(133, 26)
         Me.cmdDetailsHide.TabIndex = 20
         Me.cmdDetailsHide.Text = "Hide Details"
         Me.cmdDetailsHide.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.cmdDetailsHide.UseVisualStyleBackColor = True
+        '
+        'OpenFileDialog1
+        '
+        Me.OpenFileDialog1.FileName = "OpenFileDialog1"
         '
         'agdMasterPoint
         '
@@ -270,67 +270,36 @@ Partial Class frmPoint
         Me.agdMasterPoint.Fixed3D = False
         Me.agdMasterPoint.LineColor = System.Drawing.Color.Empty
         Me.agdMasterPoint.LineWidth = 0.0!
-        Me.agdMasterPoint.Location = New System.Drawing.Point(389, 455)
+        Me.agdMasterPoint.Location = New System.Drawing.Point(519, 560)
+        Me.agdMasterPoint.Margin = New System.Windows.Forms.Padding(4)
         Me.agdMasterPoint.Name = "agdMasterPoint"
-        Me.agdMasterPoint.Size = New System.Drawing.Size(672, 87)
+        Me.agdMasterPoint.Size = New System.Drawing.Size(896, 107)
         Me.agdMasterPoint.Source = Nothing
         Me.agdMasterPoint.TabIndex = 21
         '
-        'grpPollutants
+        'agdPoint
         '
-        Me.grpPollutants.Controls.Add(Me.cboPollutantList)
-        Me.grpPollutants.Controls.Add(Me.cmdFile)
-        Me.grpPollutants.Controls.Add(Me.txtPollutantPath)
-        Me.grpPollutants.Location = New System.Drawing.Point(12, 345)
-        Me.grpPollutants.Name = "grpPollutants"
-        Me.grpPollutants.Size = New System.Drawing.Size(245, 89)
-        Me.grpPollutants.TabIndex = 23
-        Me.grpPollutants.TabStop = False
-        Me.grpPollutants.Text = "Pollutant List"
-        '
-        'cboPollutantList
-        '
-        Me.cboPollutantList.BackColor = System.Drawing.SystemColors.Control
-        Me.cboPollutantList.Cursor = System.Windows.Forms.Cursors.Arrow
-        Me.cboPollutantList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboPollutantList.FormattingEnabled = True
-        Me.cboPollutantList.Location = New System.Drawing.Point(13, 55)
-        Me.cboPollutantList.MaxDropDownItems = 20
-        Me.cboPollutantList.Name = "cboPollutantList"
-        Me.cboPollutantList.Size = New System.Drawing.Size(219, 21)
-        Me.cboPollutantList.TabIndex = 25
-        '
-        'cmdFile
-        '
-        Me.cmdFile.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.cmdFile.ImageIndex = 4
-        Me.cmdFile.ImageList = Me.ImageList1
-        Me.cmdFile.Location = New System.Drawing.Point(13, 24)
-        Me.cmdFile.Name = "cmdFile"
-        Me.cmdFile.Size = New System.Drawing.Size(58, 22)
-        Me.cmdFile.TabIndex = 24
-        Me.cmdFile.Text = "Open"
-        Me.cmdFile.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.cmdFile.UseVisualStyleBackColor = True
-        '
-        'txtPollutantPath
-        '
-        Me.txtPollutantPath.Location = New System.Drawing.Point(73, 25)
-        Me.txtPollutantPath.Name = "txtPollutantPath"
-        Me.txtPollutantPath.ReadOnly = True
-        Me.txtPollutantPath.Size = New System.Drawing.Size(159, 20)
-        Me.txtPollutantPath.TabIndex = 23
-        '
-        'OpenFileDialog1
-        '
-        Me.OpenFileDialog1.FileName = "OpenFileDialog1"
+        Me.agdPoint.AllowHorizontalScrolling = True
+        Me.agdPoint.AllowNewValidValues = False
+        Me.agdPoint.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.agdPoint.CellBackColor = System.Drawing.Color.Empty
+        Me.agdPoint.Fixed3D = False
+        Me.agdPoint.LineColor = System.Drawing.Color.Empty
+        Me.agdPoint.LineWidth = 0.0!
+        Me.agdPoint.Location = New System.Drawing.Point(76, 20)
+        Me.agdPoint.Margin = New System.Windows.Forms.Padding(4)
+        Me.agdPoint.Name = "agdPoint"
+        Me.agdPoint.Size = New System.Drawing.Size(948, 479)
+        Me.agdPoint.Source = Nothing
+        Me.agdPoint.TabIndex = 25
         '
         'frmPoint
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1092, 563)
-        Me.Controls.Add(Me.grpPollutants)
+        Me.ClientSize = New System.Drawing.Size(1456, 693)
         Me.Controls.Add(Me.cmdDetailsHide)
         Me.Controls.Add(Me.cmdDetailsShow)
         Me.Controls.Add(Me.agdMasterPoint)
@@ -338,6 +307,7 @@ Partial Class frmPoint
         Me.Controls.Add(Me.cmdCancel)
         Me.Controls.Add(Me.cmdOK)
         Me.Controls.Add(Me.grpSources)
+        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.Name = "frmPoint"
         Me.Text = "WinHSPF - Point Sources"
         Me.grpSources.ResumeLayout(False)
@@ -345,8 +315,6 @@ Partial Class frmPoint
         Me.menuPointSources.ResumeLayout(False)
         Me.menuPointSources.PerformLayout()
         Me.grpDetails.ResumeLayout(False)
-        Me.grpPollutants.ResumeLayout(False)
-        Me.grpPollutants.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -355,9 +323,9 @@ Partial Class frmPoint
     Friend WithEvents cmdCancel As System.Windows.Forms.Button
     Friend WithEvents cmdOK As System.Windows.Forms.Button
     Friend WithEvents grpDetails As System.Windows.Forms.GroupBox
-    Friend WithEvents Button8 As System.Windows.Forms.Button
+    Friend WithEvents cmdGraph As System.Windows.Forms.Button
     Friend WithEvents cmdDelete As System.Windows.Forms.Button
-    Friend WithEvents cmdShowTable As System.Windows.Forms.Button
+    Friend WithEvents cmdList As System.Windows.Forms.Button
     Friend WithEvents agdPoint As atcControls.atcGrid
     Friend WithEvents cmdDetailsHide As System.Windows.Forms.Button
     Friend WithEvents cmdDetailsShow As System.Windows.Forms.Button
@@ -371,9 +339,5 @@ Partial Class frmPoint
     Friend WithEvents cmdAdvancedGen As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents cmdScenario As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents agdMasterPoint As atcControls.atcGrid
-    Friend WithEvents grpPollutants As System.Windows.Forms.GroupBox
-    Friend WithEvents txtPollutantPath As System.Windows.Forms.TextBox
-    Friend WithEvents cmdFile As System.Windows.Forms.Button
     Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog
-    Friend WithEvents cboPollutantList As System.Windows.Forms.ComboBox
 End Class

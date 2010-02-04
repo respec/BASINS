@@ -292,6 +292,7 @@ Public Class HspfUci
         pPollutants = New Collection(Of HspfPollutant)
 
         pOrder = DefaultBlockOrder()
+        pTserFiles = New atcData.atcTimeseriesGroup
     End Sub
 
     Public Sub FastReadUciForStarter(ByRef aMsg As HspfMsg, ByRef aNewName As String)

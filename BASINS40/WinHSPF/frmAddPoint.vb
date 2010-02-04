@@ -1,21 +1,11 @@
 Imports atcControls
 Imports atcData
 Imports atcUCI
-Imports atcUCIForms
-Imports atcUtility
 Imports MapWinUtility
-Imports WinHSPF
-Imports System.Collections.ObjectModel
 
 Public Class frmAddPoint
 
     Public Sub New()
-        Dim lHspfOperation As HspfOperation
-        Dim lOpnBlk As HspfOpnBlk
-        Dim lObject As Object
-        Dim lOper As Integer
-        Dim lTempString As String
-
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
 
@@ -24,31 +14,24 @@ Public Class frmAddPoint
         Me.MaximumSize = Me.Size
 
         cboReach.Items.Clear()
-        lOpnBlk = pUCI.OpnBlks("RCHRES")
-        For lOper = 1 To lOpnBlk.Count
-            lHspfOperation = lOpnBlk.OperFromID(lOper)
+        Dim lOpnBlk As HspfOpnBlk = pUCI.OpnBlks("RCHRES")
+        For lOper As Integer = 1 To lOpnBlk.Count
+            Dim lHspfOperation As HspfOperation = lOpnBlk.OperFromID(lOper)
             cboReach.Items.Add("RCHRES " & lHspfOperation.Id & " - " & lHspfOperation.Description)
         Next lOper
         cboReach.SelectedIndex = 0
 
         cboPollutant.Items.Clear()
-        For Each lObject In pPollutantList
-            cboPollutant.Items.Add(lObject)
-        Next lObject
-
-        For lOper = 1 To pfrmPoint.agdMasterPoint.Source.Rows()
-            lTempString = pfrmPoint.agdMasterPoint.Source.CellValue(lOper, 4)
+        For lOper As Integer = 1 To pfrmPoint.agdMasterPoint.Source.Rows()
+            Dim lTempString As String = pfrmPoint.agdMasterPoint.Source.CellValue(lOper, 4)
             If Not cboPollutant.Items.Contains(lTempString) Then
                 cboPollutant.Items.Add(lTempString)
             End If
         Next lOper
 
         cboFac.Items.Clear()
-        'For i = 1 To pfrmPoint.cmbFac.ListCount - 1
-        '  cboFac.AddItem pfrmPoint.cmbFac.List(i)
-        'Next i
-        For lOper = 1 To pfrmPoint.agdMasterPoint.Source.Rows - 1
-            lTempString = pfrmPoint.agdMasterPoint.Source.CellValue(lOper, 3)
+        For lOper As Integer = 1 To pfrmPoint.agdMasterPoint.Source.Rows - 1
+            Dim lTempString As String = pfrmPoint.agdMasterPoint.Source.CellValue(lOper, 3)
             If Not cboFac.Items.Contains(lTempString) Then
                 cboFac.Items.Add(lTempString)
             End If
