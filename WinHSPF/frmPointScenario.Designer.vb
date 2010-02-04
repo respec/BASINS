@@ -22,9 +22,9 @@ Partial Class frmPointScenario
         Me.Label1 = New System.Windows.Forms.Label
         Me.Label2 = New System.Windows.Forms.Label
         Me.Label3 = New System.Windows.Forms.Label
-        Me.AtcText1 = New atcControls.atcText
-        Me.ComboBox1 = New System.Windows.Forms.ComboBox
-        Me.AtcText2 = New atcControls.atcText
+        Me.atxNew = New atcControls.atcText
+        Me.cboBase = New System.Windows.Forms.ComboBox
+        Me.atxMult = New atcControls.atcText
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdOK = New System.Windows.Forms.Button
         Me.SuspendLayout()
@@ -32,90 +32,98 @@ Partial Class frmPointScenario
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(39, 18)
+        Me.Label1.Location = New System.Drawing.Point(52, 22)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(91, 13)
+        Me.Label1.Size = New System.Drawing.Size(120, 17)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Base on Scenario"
         '
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(39, 49)
+        Me.Label2.Location = New System.Drawing.Point(52, 60)
+        Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(105, 13)
+        Me.Label2.Size = New System.Drawing.Size(136, 17)
         Me.Label2.TabIndex = 1
         Me.Label2.Text = "New Scenario Name"
         '
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(39, 77)
+        Me.Label3.Location = New System.Drawing.Point(52, 95)
+        Me.Label3.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(48, 13)
+        Me.Label3.Size = New System.Drawing.Size(64, 17)
         Me.Label3.TabIndex = 2
         Me.Label3.Text = "Multiplier"
         '
-        'AtcText1
+        'atxNew
         '
-        Me.AtcText1.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText1.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
-        Me.AtcText1.DefaultValue = ""
-        Me.AtcText1.HardMax = -999
-        Me.AtcText1.HardMin = -999
-        Me.AtcText1.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText1.Location = New System.Drawing.Point(148, 44)
-        Me.AtcText1.MaxWidth = 20
-        Me.AtcText1.Name = "AtcText1"
-        Me.AtcText1.NumericFormat = "0.#####"
-        Me.AtcText1.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText1.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText1.SelLength = 1
-        Me.AtcText1.SelStart = 0
-        Me.AtcText1.Size = New System.Drawing.Size(129, 23)
-        Me.AtcText1.SoftMax = -999
-        Me.AtcText1.SoftMin = -999
-        Me.AtcText1.TabIndex = 3
-        Me.AtcText1.ValueDouble = 0
-        Me.AtcText1.ValueInteger = 0
+        Me.atxNew.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxNew.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
+        Me.atxNew.DefaultValue = ""
+        Me.atxNew.HardMax = -999
+        Me.atxNew.HardMin = -999
+        Me.atxNew.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxNew.Location = New System.Drawing.Point(197, 54)
+        Me.atxNew.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.atxNew.MaxWidth = 20
+        Me.atxNew.Name = "atxNew"
+        Me.atxNew.NumericFormat = "0.#####"
+        Me.atxNew.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxNew.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxNew.SelLength = 0
+        Me.atxNew.SelStart = 0
+        Me.atxNew.Size = New System.Drawing.Size(172, 28)
+        Me.atxNew.SoftMax = -999
+        Me.atxNew.SoftMin = -999
+        Me.atxNew.TabIndex = 3
+        Me.atxNew.ValueDouble = 0
+        Me.atxNew.ValueInteger = 0
         '
-        'ComboBox1
+        'cboBase
         '
-        Me.ComboBox1.FormattingEnabled = True
-        Me.ComboBox1.Location = New System.Drawing.Point(148, 14)
-        Me.ComboBox1.Name = "ComboBox1"
-        Me.ComboBox1.Size = New System.Drawing.Size(129, 21)
-        Me.ComboBox1.TabIndex = 5
+        Me.cboBase.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboBase.FormattingEnabled = True
+        Me.cboBase.Location = New System.Drawing.Point(197, 17)
+        Me.cboBase.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cboBase.Name = "cboBase"
+        Me.cboBase.Size = New System.Drawing.Size(171, 24)
+        Me.cboBase.TabIndex = 5
         '
-        'AtcText2
+        'atxMult
         '
-        Me.AtcText2.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText2.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
-        Me.AtcText2.DefaultValue = ""
-        Me.AtcText2.HardMax = -999
-        Me.AtcText2.HardMin = -999
-        Me.AtcText2.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText2.Location = New System.Drawing.Point(148, 72)
-        Me.AtcText2.MaxWidth = 20
-        Me.AtcText2.Name = "AtcText2"
-        Me.AtcText2.NumericFormat = "0.#####"
-        Me.AtcText2.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText2.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText2.SelLength = 1
-        Me.AtcText2.SelStart = 0
-        Me.AtcText2.Size = New System.Drawing.Size(129, 23)
-        Me.AtcText2.SoftMax = -999
-        Me.AtcText2.SoftMin = -999
-        Me.AtcText2.TabIndex = 6
-        Me.AtcText2.ValueDouble = 0
-        Me.AtcText2.ValueInteger = 0
+        Me.atxMult.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxMult.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
+        Me.atxMult.DefaultValue = ""
+        Me.atxMult.HardMax = -999
+        Me.atxMult.HardMin = -999
+        Me.atxMult.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxMult.Location = New System.Drawing.Point(197, 89)
+        Me.atxMult.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.atxMult.MaxWidth = 20
+        Me.atxMult.Name = "atxMult"
+        Me.atxMult.NumericFormat = "0.#####"
+        Me.atxMult.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxMult.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxMult.SelLength = 0
+        Me.atxMult.SelStart = 0
+        Me.atxMult.Size = New System.Drawing.Size(172, 28)
+        Me.atxMult.SoftMax = -999
+        Me.atxMult.SoftMin = -999
+        Me.atxMult.TabIndex = 6
+        Me.atxMult.ValueDouble = 0
+        Me.atxMult.ValueInteger = 0
         '
         'cmdCancel
         '
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdCancel.Location = New System.Drawing.Point(162, 111)
+        Me.cmdCancel.Location = New System.Drawing.Point(216, 137)
+        Me.cmdCancel.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.cmdCancel.Name = "cmdCancel"
-        Me.cmdCancel.Size = New System.Drawing.Size(101, 26)
+        Me.cmdCancel.Size = New System.Drawing.Size(135, 32)
         Me.cmdCancel.TabIndex = 20
         Me.cmdCancel.Text = "&Cancel"
         Me.cmdCancel.UseVisualStyleBackColor = True
@@ -123,26 +131,28 @@ Partial Class frmPointScenario
         'cmdOK
         '
         Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdOK.Location = New System.Drawing.Point(53, 111)
+        Me.cmdOK.Location = New System.Drawing.Point(71, 137)
+        Me.cmdOK.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.cmdOK.Name = "cmdOK"
-        Me.cmdOK.Size = New System.Drawing.Size(101, 26)
+        Me.cmdOK.Size = New System.Drawing.Size(135, 32)
         Me.cmdOK.TabIndex = 19
         Me.cmdOK.Text = "&OK"
         Me.cmdOK.UseVisualStyleBackColor = True
         '
         'frmPointScenario
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(316, 149)
+        Me.ClientSize = New System.Drawing.Size(421, 183)
         Me.Controls.Add(Me.cmdCancel)
         Me.Controls.Add(Me.cmdOK)
-        Me.Controls.Add(Me.AtcText2)
-        Me.Controls.Add(Me.ComboBox1)
-        Me.Controls.Add(Me.AtcText1)
+        Me.Controls.Add(Me.atxMult)
+        Me.Controls.Add(Me.cboBase)
+        Me.Controls.Add(Me.atxNew)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.Label1)
+        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.Name = "frmPointScenario"
         Me.Text = "WinHSPF - Create Point Source Scenario"
         Me.ResumeLayout(False)
@@ -152,9 +162,9 @@ Partial Class frmPointScenario
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents Label3 As System.Windows.Forms.Label
-    Friend WithEvents AtcText1 As atcControls.atcText
-    Friend WithEvents ComboBox1 As System.Windows.Forms.ComboBox
-    Friend WithEvents AtcText2 As atcControls.atcText
+    Friend WithEvents atxNew As atcControls.atcText
+    Friend WithEvents cboBase As System.Windows.Forms.ComboBox
+    Friend WithEvents atxMult As atcControls.atcText
     Friend WithEvents cmdCancel As System.Windows.Forms.Button
     Friend WithEvents cmdOK As System.Windows.Forms.Button
 End Class
