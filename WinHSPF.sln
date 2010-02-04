@@ -18,6 +18,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcSegmentation", "atcSegme
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-MapWinUtility", "..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility.vbproj", "{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "WinHSPFplugin", "WinHSPF\WinHSPFplugin\WinHSPFplugin.vbproj", "{C49A6605-B48C-4E05-9F4B-7FB6BE2D6B22}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,6 +62,10 @@ Global
 		{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C49A6605-B48C-4E05-9F4B-7FB6BE2D6B22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C49A6605-B48C-4E05-9F4B-7FB6BE2D6B22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C49A6605-B48C-4E05-9F4B-7FB6BE2D6B22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C49A6605-B48C-4E05-9F4B-7FB6BE2D6B22}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

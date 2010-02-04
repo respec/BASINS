@@ -95,9 +95,13 @@ Public Class frmDownload
     End Sub
 
     Private Sub btnDownload_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDownload.Click
-        SaveSetting("DataDownload", "Defaults", "RegionTypeName", cboRegion.SelectedItem)
-        SaveSetting("DataDownload", "Defaults", "Clip", chkClip.Checked.ToString)
-        SaveSetting("DataDownload", "Defaults", "Merge", chkMerge.Checked.ToString)
+        Try
+            If cboRegion.SelectedItem IsNot Nothing Then SaveSetting("DataDownload", "Defaults", "RegionTypeName", cboRegion.SelectedItem)
+            SaveSetting("DataDownload", "Defaults", "Clip", chkClip.Checked.ToString)
+            SaveSetting("DataDownload", "Defaults", "Merge", chkMerge.Checked.ToString)
+        Catch ex As Exception
+            MapWinUtility.Logger.Dbg(ex.Message, ex.StackTrace)
+        End Try
 
         pOk = True
         Me.Close()

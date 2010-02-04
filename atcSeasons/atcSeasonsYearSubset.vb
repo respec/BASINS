@@ -23,14 +23,15 @@ Public Class atcSeasonsYearSubset
     End Sub
 
     Public Sub New(ByVal aStartMonth As Integer, ByVal aStartDay As Integer, ByVal aEndMonth As Integer, ByVal aEndDay As Integer)
+        aStartDay = Math.Min(aStartDay, atcUtility.daymon(1901, aStartMonth))
+        If aStartDay < 1 Then aStartDay = 1
+        aEndDay = Math.Min(aEndDay, atcUtility.daymon(1901, aEndMonth))
+        If aEndDay < 1 Then aEndDay = 1
+
         pStartDate = New Date(1900, aStartMonth, aStartDay, 0, 0, 0, 0)
         If aEndMonth < aStartMonth OrElse aEndMonth = aStartMonth AndAlso aEndDay < aStartDay Then
             pEndDateNextYear = True
-            If aEndMonth = 2 AndAlso aEndDay = 29 Then
-                pEndDate = New Date(1901, aEndMonth, 28, 0, 0, 0, 0)
-            Else
-                pEndDate = New Date(1901, aEndMonth, aEndDay, 0, 0, 0, 0)
-            End If
+            pEndDate = New Date(1901, aEndMonth, aEndDay, 0, 0, 0, 0)
         Else
             pEndDate = New Date(1900, aEndMonth, aEndDay, 0, 0, 0, 0)
         End If

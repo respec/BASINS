@@ -100,7 +100,7 @@ Public Module modBasinsPlugin
     ''' 
     ''' </summary>
     ''' <remarks></remarks>
-    Friend Sub LoadNationalProject()
+    Public Sub LoadNationalProject()
         If Not NationalProjectIsOpen() Then
             Dim lFileName As String = IO.Path.Combine(g_ProgramDir, "Data\national" & g_PathChar & NationalProjectFilename)
             If Not FileExists(lFileName) Then

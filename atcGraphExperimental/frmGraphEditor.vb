@@ -40,9 +40,6 @@ Public Class frmGraphEditor
         pPane = aZgc.MasterPane.PaneList(aZgc.MasterPane.PaneList.Count - 1)
         If aZgc.MasterPane.PaneList.Count > 1 Then
             pPaneAux = aZgc.MasterPane.PaneList(0)
-            radioAxisAux.Enabled = True
-        Else
-            radioAxisAux.Enabled = False
         End If
         SetComboFromCurves()
         SetComboFromTexts()
@@ -113,6 +110,11 @@ Public Class frmGraphEditor
             ElseIf radioAxisRight.Checked Then
                 Return pPane.Y2Axis
             ElseIf radioAxisAux.Checked Then
+                If pPaneAux Is Nothing Then
+                    EnableAuxAxis(pZgc.MasterPane, True, 0.2)
+                    pPaneAux = pZgc.MasterPane.PaneList(0)
+                    pPane = pZgc.MasterPane.PaneList(1)
+                End If
                 Return pPaneAux.YAxis
             End If
         End If
@@ -264,10 +266,14 @@ Public Class frmGraphEditor
         If Not aCurve Is Nothing Then
             On Error Resume Next
             txtCurveLabel.Text = aCurve.Label.Text
-            If aCurve.IsY2Axis Then
-                radioCurveYaxisRight.Checked = True
+            If pPaneAux IsNot Nothing AndAlso pPaneAux.CurveList.Contains(aCurve) Then
+                radioCurveYaxisAuxiliary.Checked = True
             Else
-                radioCurveYaxisLeft.Checked = True
+                If aCurve.IsY2Axis Then
+                    radioCurveYaxisRight.Checked = True
+                Else
+                    radioCurveYaxisLeft.Checked = True
+                End If
             End If
 
             txtCurveColor.BackColor = aCurve.Color
@@ -286,8 +292,23 @@ Public Class frmGraphEditor
             On Error Resume Next
             Dim lInt As Integer
             aCurve.Label.Text = txtCurveLabel.Text
+            If radioCurveYaxisAuxiliary.Checked Then 'move to aux pane
+                If pPaneAux Is Nothing Then
+                    EnableAuxAxis(pZgc.MasterPane, True, 0.2)
+                    pPaneAux = pZgc.MasterPane.PaneList(0)
+                    pPane = pZgc.MasterPane.PaneList(1)
+                End If
+                If Not pPaneAux.CurveList.Contains(aCurve) Then
+                    pPaneAux.CurveList.Add(aCurve)
+                    pPane.CurveList.Remove(aCurve)
+                End If
+            Else
+                If pPaneAux IsNot Nothing AndAlso pPaneAux.CurveList.Contains(aCurve) Then
+                    pPaneAux.CurveList.Remove(aCurve)
+                    pPane.CurveList.Add(aCurve)
+                End If
+            End If
             aCurve.IsY2Axis = radioCurveYaxisRight.Checked
-            'TODO: If radioCurveYaxisAuxiliary.Checked then [move to aux pane]
 
             aCurve.Color = txtCurveColor.BackColor
             aCurve.Line.IsVisible = chkCurveLineVisible.Checked
@@ -427,10 +448,8 @@ Public Class frmGraphEditor
         End If
     End Sub
 
-    Private Sub comboWhichCurve_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles comboWhichCurve.SelectedIndexChanged
-        If comboWhichCurve.SelectedIndex >= 0 AndAlso pPane.CurveList.Count > comboWhichCurve.SelectedIndex Then
-            SetControlsFromCurve(pPane.CurveList(comboWhichCurve.SelectedIndex))
-        End If
+    Private Sub comboWhichCurve_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles comboWhichCurve.SelectedIndexChanged        
+        SetControlsFromSelectedCurve()
     End Sub
 
     Private Sub cboCurveAxis_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)

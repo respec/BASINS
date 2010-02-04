@@ -10,12 +10,6 @@ Public Class PlugIn
         End Get
     End Property
 
-    Public Overrides ReadOnly Property Author() As String
-        Get
-            Return "AQUA TERRA Consultants"
-        End Get
-    End Property
-
     Public Overrides ReadOnly Property Description() As String
         Get
             Return "An interface for initializing two BASINS models: HSPF and AQUATOX."

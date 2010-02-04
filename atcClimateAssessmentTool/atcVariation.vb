@@ -383,6 +383,9 @@ Public Class atcVariation
                     .SetValue("Constituent", lOldPET.Attributes.GetValue("Constituent"))
                     .SetValue("History 1", lOldPET.Attributes.GetValue("History 1").ToString)
                     .SetValue("Id", lOldPET.Attributes.GetValue("Id"))
+                    If lOldPET.Attributes.ContainsAttribute("TSTYPE") Then
+                        .SetValue("TSTYPE", lOldPET.Attributes.GetValue("TSTYPE"))
+                    End If
                 End With
                 lModifiedGroup.Add(lOldPET, lNewPET)
             End If

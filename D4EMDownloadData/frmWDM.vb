@@ -9,16 +9,13 @@ Public Class frmWDM
 
         Dim lFilename As String = IO.Path.Combine(aSaveFolder, aType.ToLower & ".wdm")
         If IO.File.Exists(lFilename) Then
-            txtFilenameExisting.Text = lFilename
-            RadioAddExisting.Checked = True
             txtFilenameNew.Text = atcUtility.GetTemporaryFileName(IO.Path.Combine(aSaveFolder, aType.ToLower), "wdm")
+            txtFilenameExisting.Text = lFilename
         Else
             txtFilenameNew.Text = lFilename
-            RadioAddNew.Checked = True
             Dim lExistingWdmFiles() As String = IO.Directory.GetFiles(aSaveFolder, "*.wdm")
             If lExistingWdmFiles.Length > 0 Then
                 txtFilenameExisting.Text = lExistingWdmFiles(0)
-                RadioAddExisting.Checked = True
             End If
         End If
 
