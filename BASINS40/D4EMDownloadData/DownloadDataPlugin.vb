@@ -191,6 +191,8 @@ Public Class DownloadDataPlugin
 
                 If BASINS.NationalProjectIsOpen() Then
                     BASINS.SpecifyAndCreateNewProject()
+                ElseIf g_MapWin.Layers.NumLayers < 1 Then
+                    BASINS.LoadNationalProject()
                 Else
                     Dim lDownloadForm As New frmDownload
                     Dim lQuery As String = lDownloadForm.AskUser(g_MapWin, g_MainForm)

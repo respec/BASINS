@@ -978,12 +978,14 @@ Friend Class frmSWSTAT
         pYearStartMonth = cboStartMonth.SelectedIndex + 1
         pYearEndMonth = cboEndMonth.SelectedIndex + 1
         If IsNumeric(txtStartDay.Text) Then
-            pYearStartDay = txtStartDay.Text
+            pYearStartDay = Math.Min(CInt(txtStartDay.Text), daymon(1901, pYearStartMonth))
+            txtStartDay.Text = pYearStartDay
         Else
             pYearStartDay = 0
         End If
         If IsNumeric(txtEndDay.Text) Then
-            pYearEndDay = txtEndDay.Text
+            pYearEndDay = Math.Min(CInt(txtEndDay.Text), daymon(1901, pYearEndMonth))
+            txtEndDay.Text = pYearEndDay
         Else
             pYearEndDay = 0
         End If

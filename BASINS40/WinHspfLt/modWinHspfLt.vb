@@ -58,7 +58,8 @@ Module modWinHSPFLt
     ''' Entry point for WinHspfLt
     ''' </summary>
     ''' <remarks></remarks>
-    Public Sub Main()
+    Public Function Main() As Integer
+        Dim lRetcod As Integer = 1234
         Try
             Dim lErrLogName As String = "WinHspfLt.log"
             Dim lErrLogFlag As Boolean = False
@@ -110,7 +111,6 @@ Module modWinHSPFLt
 
             Dim lOpt As Integer = 1
             Dim lMsgUnit As Integer
-            Dim lRetcod As Integer
             F90_WDBOPNR(lOpt, lMsgName, lMsgUnit, lRetcod, Len(lMsgName))
 
             If lMsgUnit <> 0 Then
@@ -137,7 +137,7 @@ Module modWinHSPFLt
                     Dim lLoggerString As String = "Begin Logging"
                     If lErrLogFlag Then
                         lLoggerString = WholeFileString(Logger.FileName)
-                        Logger.Dbg("ChangeLogFileTO:" & lErrLogName)
+                        Logger.Dbg("ChangeLogFileTo:" & lErrLogName)
                     End If
                     Logger.Status("Show")
                     Logger.Status("Label Title WinHSPFLt " & lUci)
@@ -171,6 +171,7 @@ Module modWinHSPFLt
             End If
 
         Catch ex As Exception
+            If lRetcod = 0 Then lRetcod = 4321
             If Logger.Msg(ex.Message & vbCrLf & "Send a feedback message to the WinHspfLt development team?", _
                           MsgBoxStyle.YesNo, _
                           MsgBoxResult.No, "WinHspfLt Feedback") = MsgBoxResult.Yes Then
@@ -185,7 +186,8 @@ Module modWinHSPFLt
 
         Logger.Status("EXIT")
         Application.DoEvents()
-    End Sub
+        Return lRetcod
+    End Function
 
     Private Sub ShowFeedback(ByRef aProgress As String)
         Dim lfrmFeedback As New frmFeedback

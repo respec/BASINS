@@ -756,7 +756,6 @@ Partial Class frmGraphEditor
         'radioCurveYaxisAuxiliary
         '
         Me.radioCurveYaxisAuxiliary.AutoSize = True
-        Me.radioCurveYaxisAuxiliary.Enabled = False
         Me.radioCurveYaxisAuxiliary.Location = New System.Drawing.Point(208, 63)
         Me.radioCurveYaxisAuxiliary.Name = "radioCurveYaxisAuxiliary"
         Me.radioCurveYaxisAuxiliary.Size = New System.Drawing.Size(63, 17)
