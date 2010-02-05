@@ -525,7 +525,7 @@ FoundSameUntil:
 
         OrigDir = CurDir()
         If ChDriveDir(aDirName) Then
-
+            Windows.Forms.Application.DoEvents()
             If aFilenames Is Nothing Then aFilenames = New NameValueCollection
 
             'get all matching file names in this dir before changing into a subdirectory
@@ -577,6 +577,27 @@ FoundSameUntil:
             ChDriveDir(OrigDir)
         End If
     End Sub
+
+    Public Function ReportFilesInDir(ByVal aDirName As String, _
+                                     ByVal aSubdirs As Boolean, _
+                            Optional ByVal aFileFilter As String = "*", _
+                            Optional ByVal aAttributes As Integer = 0) As String
+        'Dim lLastDoEvents As Date = Now
+        Dim lReport As New Text.StringBuilder
+        Dim lSkipFilename As Integer = aDirName.Length
+        lReport.AppendLine("Files in " & aDirName)
+
+        Dim lallFiles As New Collections.Specialized.NameValueCollection
+        AddFilesInDir(lallFiles, aDirName, aSubdirs, aFileFilter, aAttributes)
+        For Each lFilename As String In lallFiles
+            lReport.AppendLine(FileDateTime(lFilename).ToString("yyyy-MM-dd HH:mm:ss") & vbTab & StrPad(Format(FileLen(lFilename), "#,###"), 10) & vbTab & lFilename.Substring(lSkipFilename))
+            'If Now.Subtract(lLastDoEvents).TotalSeconds > 0.01 Then
+            Windows.Forms.Application.DoEvents()
+            'lLastDoEvents = Now
+            'End If
+        Next
+        Return lReport.ToString
+    End Function
 
     Public Sub SaveFileString(ByVal filename As String, ByVal FileContents As String)
         ' ##SUMMARY Saves incoming string to a text file.

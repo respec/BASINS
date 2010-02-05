@@ -198,21 +198,59 @@ Public Class frmFeedback
 
     Private pSend As Boolean = False
 
-    Public Function ShowFeedback(ByRef aName As String, ByRef aEmail As String, ByRef aMessage As String, ByRef aSystemInformation As String) As Boolean
-        txtName.Text = aName
-        txtEmail.Text = aEmail
-        txtMessage.Text = aMessage
+    Public Function ShowFeedback(ByRef aName As String, _
+                                 ByRef aEmail As String, _
+                                 ByRef aMessage As String, _
+                                 ByRef aSystemInformation As String, _
+                                 ByVal aAddGenericSystemInfo As Boolean, _
+                                 ByVal aAddDebugInfo As Boolean, _
+                                 ByVal aAddModuleInfo As Boolean, _
+                                 ByVal aAddFilesInFolder As String) As Boolean
+        If aName IsNot Nothing AndAlso aName.Length > 0 Then
+            txtName.Text = aName
+        Else
+            txtName.Text = GetSetting("BASINS4", "Feedback", "Name", "")
+        End If
+
+        If aEmail IsNot Nothing AndAlso aEmail.Length > 0 Then
+            txtEmail.Text = aEmail
+        Else
+            txtEmail.Text = GetSetting("BASINS4", "Feedback", "Email", "")
+        End If
+
+        If aMessage IsNot Nothing Then txtMessage.Text = aMessage
+        If aSystemInformation Is Nothing Then
+            aSystemInformation = ""
+        End If
         txtSystemInformation.Text = aSystemInformation
         Me.Show()
         Me.Refresh()
+        Windows.Forms.Application.DoEvents()
 
-        If aSystemInformation.Length = 0 Then
-            txtSystemInformation.Text = FeedbackGenericSystemInformation()
+        If aAddGenericSystemInfo Then
+            txtSystemInformation.Text &= GetSystemInfo()
+            txtSystemInformation.Refresh()
+            Windows.Forms.Application.DoEvents()
+        End If
+
+        If aAddDebugInfo Then
+            txtSystemInformation.Text &= GetDebugInfo()
+            Windows.Forms.Application.DoEvents()
+        End If
+
+        If aAddModuleInfo Then
+            txtSystemInformation.Text &= GetModuleInfo()
+            Windows.Forms.Application.DoEvents()
+        End If
+
+        If FileExists(aAddFilesInFolder, True, False) Then
+            txtSystemInformation.Text &= ReportFilesInDir(aAddFilesInFolder, True)
+            Windows.Forms.Application.DoEvents()
         End If
 
         While Me.Visible
+            System.Threading.Thread.Sleep(50)
             Windows.Forms.Application.DoEvents()
-            System.Threading.Thread.Sleep(100)
         End While
 
         If pSend Then
@@ -244,19 +282,13 @@ Public Class frmFeedback
         Me.Hide()
     End Sub
 
-    Private Sub frmFeedback_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-        txtName.Text = GetSetting("BASINS4", "Feedback", "Name", "")
-        txtEmail.Text = GetSetting("BASINS4", "Feedback", "Email", "")
-    End Sub
-
     Private Sub btnCancel_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnCancel.Click
         pSend = False
         Me.Hide()
     End Sub
 
-    Public Function FeedbackGenericSystemInformation() As String
+    Public Function GetSystemInfo() As String
         Dim lFeedback As String = "Feedback at " & Now.ToString("u") & vbCrLf _
-            & MapWinUtility.MiscUtils.GetDebugInfo & vbCrLf _
             & "User: " & Environment.UserName & vbCrLf _
             & "Machine: " & Environment.MachineName & vbCrLf _
             & "CLRVersion: " & Environment.Version.ToString & vbCrLf _
@@ -272,5 +304,91 @@ Public Class frmFeedback
         End If
 
         Return lFeedback & "___________________________" & vbCrLf
+    End Function
+
+    'Verbose out put of process information, CPU info, memory info,
+    'environment variables, etc.
+    Public Shared Function GetDebugInfo() As String
+        Dim lInfo As New System.Text.StringBuilder
+
+        Try
+            lInfo.AppendLine("atcUtility Assembly Version: " + Environment.Version.Major.ToString() + "." + Environment.Version.Minor.ToString() + "." + Environment.Version.Revision.ToString() + "." + Environment.Version.Build.ToString())
+            lInfo.AppendLine("Operating System: " + Environment.OSVersion.Platform.ToString())
+            lInfo.AppendLine("Service Pack: " + Environment.OSVersion.ServicePack())
+            lInfo.AppendLine("Major Version:	" + Environment.OSVersion.Version.Major.ToString())
+            lInfo.AppendLine("Minor Version:	" + Environment.OSVersion.Version.Minor.ToString())
+            lInfo.AppendLine("Revision:		" + Environment.OSVersion.Version.MajorRevision.ToString())
+            lInfo.AppendLine("Build:		" + Environment.OSVersion.Version.Build.ToString())
+            lInfo.AppendLine()
+            lInfo.AppendLine("-------------------------------------------------")
+            lInfo.Append("Logical Drives: ")
+            For Each s As String In Environment.GetLogicalDrives()
+                lInfo.Append(s & " ")
+            Next
+            lInfo.AppendLine()
+            lInfo.AppendLine("System Directory: " + Environment.SystemDirectory)
+            lInfo.AppendLine("Current Directory: " + Environment.CurrentDirectory)
+            lInfo.AppendLine("Command Line: " + Environment.CommandLine)
+            lInfo.AppendLine("Command Line Args: ")
+            For Each s As String In Environment.GetCommandLineArgs
+                lInfo.AppendLine(" " & s)
+            Next
+            lInfo.AppendLine()
+            lInfo.AppendLine()
+            lInfo.AppendLine("------------Environment Variables-----------------")
+            For Each lVariable As DictionaryEntry In Environment.GetEnvironmentVariables
+                If lVariable.Key.ToString.ToUpper = "PATH" Then
+                    lInfo.AppendLine(lVariable.Key & " =" & vbCrLf & " " & lVariable.Value.ToString.Replace(";", ";" & vbCrLf & " "))
+                Else
+                    lInfo.AppendLine(lVariable.Key & " = " & lVariable.Value)
+                End If
+            Next
+            lInfo.AppendLine()
+            lInfo.AppendLine("------------Performance Info (Bytes)--------------")
+
+            Dim currentProc As Process = Process.GetCurrentProcess()
+            With currentProc
+                .Refresh()
+                lInfo.AppendLine("Private Memory:  " & .PrivateMemorySize64.ToString())
+                lInfo.AppendLine("Virtual Memory:  " & .VirtualMemorySize64.ToString())
+                lInfo.AppendLine("Total CPU time: " & .TotalProcessorTime.ToString())
+                lInfo.AppendLine("Total User Mode CPU time: " & .UserProcessorTime.ToString())
+                lInfo.AppendLine()
+            End With
+        Catch e As Exception
+            lInfo.AppendLine("Exception in GetDebugInfo: " & e.Message)
+        End Try
+        lInfo.AppendLine("------------End Debug Info------------------------")
+
+        Return lInfo.ToString()
+    End Function
+
+    Public Function GetModuleInfo() As String
+        Dim lInfo As New System.Text.StringBuilder
+        lInfo.AppendLine("------------Module Info:--------------------------")
+        Try
+            Dim currentProc As Process = Process.GetCurrentProcess()
+            currentProc.Refresh()
+            Dim myProcessModuleCollection As ProcessModuleCollection = currentProc.Modules
+            Dim myProcessModule As ProcessModule
+            For Each myProcessModule In myProcessModuleCollection
+                Try
+                    Windows.Forms.Application.DoEvents()
+                    lInfo.Append("----Module Name:  ").AppendLine(myProcessModule.ModuleName)
+                    lInfo.Append("    Path:  ").AppendLine(myProcessModule.FileName)
+                    If myProcessModule.FileVersionInfo.FileVersion IsNot Nothing Then
+                        lInfo.Append("    Version: ").AppendLine(myProcessModule.FileVersionInfo.FileVersion.ToString())
+                    End If
+                Catch
+                End Try
+            Next myProcessModule
+
+            lInfo.AppendLine()
+        Catch e As Exception
+            lInfo.AppendLine("Exception in GetModuleInfo: " & e.Message)
+        End Try
+        lInfo.AppendLine("------------End Module Info------------------------")
+
+        Return lInfo.ToString()
     End Function
 End Class
