@@ -72,7 +72,7 @@ Public Class frmFeedback
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtName.Location = New System.Drawing.Point(128, 16)
         Me.txtName.Name = "txtName"
-        Me.txtName.Size = New System.Drawing.Size(260, 20)
+        Me.txtName.Size = New System.Drawing.Size(285, 20)
         Me.txtName.TabIndex = 1
         '
         'txtEmail
@@ -81,7 +81,7 @@ Public Class frmFeedback
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtEmail.Location = New System.Drawing.Point(128, 40)
         Me.txtEmail.Name = "txtEmail"
-        Me.txtEmail.Size = New System.Drawing.Size(260, 20)
+        Me.txtEmail.Size = New System.Drawing.Size(285, 20)
         Me.txtEmail.TabIndex = 3
         '
         'lblEmail
@@ -95,11 +95,12 @@ Public Class frmFeedback
         '
         'lblEnterAmessage
         '
+        Me.lblEnterAmessage.AutoSize = True
         Me.lblEnterAmessage.Location = New System.Drawing.Point(12, 80)
         Me.lblEnterAmessage.Name = "lblEnterAmessage"
-        Me.lblEnterAmessage.Size = New System.Drawing.Size(192, 16)
+        Me.lblEnterAmessage.Size = New System.Drawing.Size(382, 13)
         Me.lblEnterAmessage.TabIndex = 4
-        Me.lblEnterAmessage.Text = "Enter a message to the developers:"
+        Me.lblEnterAmessage.Text = "Please describe what happened so the developers can find and fix the problem:"
         '
         'txtMessage
         '
@@ -109,7 +110,7 @@ Public Class frmFeedback
         Me.txtMessage.Multiline = True
         Me.txtMessage.Name = "txtMessage"
         Me.txtMessage.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtMessage.Size = New System.Drawing.Size(376, 104)
+        Me.txtMessage.Size = New System.Drawing.Size(401, 104)
         Me.txtMessage.TabIndex = 5
         '
         'txtSystemInformation
@@ -123,14 +124,14 @@ Public Class frmFeedback
         Me.txtSystemInformation.Multiline = True
         Me.txtSystemInformation.Name = "txtSystemInformation"
         Me.txtSystemInformation.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtSystemInformation.Size = New System.Drawing.Size(376, 99)
+        Me.txtSystemInformation.Size = New System.Drawing.Size(401, 99)
         Me.txtSystemInformation.TabIndex = 7
         '
         'btnSend
         '
         Me.btnSend.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnSend.DialogResult = System.Windows.Forms.DialogResult.OK
-        Me.btnSend.Location = New System.Drawing.Point(160, 337)
+        Me.btnSend.Location = New System.Drawing.Point(185, 337)
         Me.btnSend.Name = "btnSend"
         Me.btnSend.Size = New System.Drawing.Size(72, 24)
         Me.btnSend.TabIndex = 8
@@ -139,7 +140,7 @@ Public Class frmFeedback
         'btnCopy
         '
         Me.btnCopy.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnCopy.Location = New System.Drawing.Point(238, 337)
+        Me.btnCopy.Location = New System.Drawing.Point(263, 337)
         Me.btnCopy.Name = "btnCopy"
         Me.btnCopy.Size = New System.Drawing.Size(72, 24)
         Me.btnCopy.TabIndex = 9
@@ -149,7 +150,7 @@ Public Class frmFeedback
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(316, 337)
+        Me.btnCancel.Location = New System.Drawing.Point(341, 337)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(72, 24)
         Me.btnCancel.TabIndex = 10
@@ -173,7 +174,7 @@ Public Class frmFeedback
         Me.AcceptButton = Me.btnSend
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(400, 373)
+        Me.ClientSize = New System.Drawing.Size(425, 373)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnCopy)
         Me.Controls.Add(Me.btnSend)
@@ -254,15 +255,13 @@ Public Class frmFeedback
     End Sub
 
     Public Function FeedbackGenericSystemInformation() As String
-        'TODO: format as an html document?
-        Dim lSectionFooter As String = "___________________________" & vbCrLf
-        Dim lFeedback As String = "Feedback at " & Now.ToString("u") & vbCrLf
-        lFeedback &= "CommandLine: " & Environment.CommandLine & vbCrLf
-        lFeedback &= "User: " & Environment.UserName & vbCrLf
-        lFeedback &= "Machine: " & Environment.MachineName & vbCrLf
-        lFeedback &= "OSVersion: " & Environment.OSVersion.ToString & vbCrLf
-        lFeedback &= "CLRVersion: " & Environment.Version.ToString & vbCrLf
-        lFeedback &= "LogFile: " & Logger.FileName & vbCrLf
+        Dim lFeedback As String = "Feedback at " & Now.ToString("u") & vbCrLf _
+            & MapWinUtility.MiscUtils.GetDebugInfo & vbCrLf _
+            & "User: " & Environment.UserName & vbCrLf _
+            & "Machine: " & Environment.MachineName & vbCrLf _
+            & "CLRVersion: " & Environment.Version.ToString & vbCrLf _
+            & "LogFile: " & Logger.FileName & vbCrLf
+
         If IO.File.Exists(Logger.FileName) Then
             Try
                 lFeedback &= WholeFileString(Logger.FileName) & vbCrLf
@@ -271,8 +270,7 @@ Public Class frmFeedback
                              vbCrLf & e.ToString & vbCrLf & vbCrLf
             End Try
         End If
-        lFeedback &= lSectionFooter
 
-        Return lFeedback
+        Return lFeedback & "___________________________" & vbCrLf
     End Function
 End Class
