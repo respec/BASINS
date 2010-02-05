@@ -424,42 +424,25 @@ FoundDir:
         Dim lMessage As String = ""
 
         Dim lFeedbackForm As New frmFeedback
-
-        'TODO: format as an html document?
-        Dim lFeedback As String = lFeedbackForm.FeedbackGenericSystemInformation()
-        Dim lSectionFooter As String = "___________________________" & vbCrLf
+        Dim lFeedback As String = ""
 
         lFeedback &= "Project: " & g_Project.FileName & vbCrLf
         lFeedback &= "Config: " & g_Project.ConfigFileName & vbCrLf
 
         'plugin info
-        lFeedback &= vbCrLf & "Plugins loaded:" & vbCrLf
-        Dim lLastPlugIn As Integer = g_Plugins.Count() - 1
-        For iPlugin As Integer = 0 To lLastPlugIn
-            Dim lCurPlugin As MapWindow.Interfaces.IPlugin = g_Plugins.Item(iPlugin)
-            If Not lCurPlugin Is Nothing Then
-                With lCurPlugin
-                    lFeedback &= .Name & vbTab & .Version & vbTab & .BuildDate & vbCrLf
-                End With
-            End If
-        Next
-        lFeedback &= lSectionFooter
+        'lFeedback &= vbCrLf & "Plugins loaded:" & vbCrLf
+        'Dim lLastPlugIn As Integer = g_Plugins.Count() - 1
+        'For iPlugin As Integer = 0 To lLastPlugIn
+        '    Dim lCurPlugin As MapWindow.Interfaces.IPlugin = g_Plugins.Item(iPlugin)
+        '    If Not lCurPlugin Is Nothing Then
+        '        With lCurPlugin
+        '            lFeedback &= .Name & vbTab & .Version & vbTab & .BuildDate & vbCrLf
+        '        End With
+        '    End If
+        'Next
+        'lFeedback &= "___________________________" & vbCrLf
 
-        'TODO: add map layers info?
-        lFeedback &= vbCrLf & "Information from MapWinUtility.MiscUtils.GetDebugInfo" & vbCrLf & _
-                              MapWinUtility.MiscUtils.GetDebugInfo & vbCrLf & vbCrLf
-
-        Dim lSkipFilename As Integer = g_ProgramDir.Length
-        lFeedback &= vbCrLf & "Files in " & g_ProgramDir & vbCrLf
-
-        Dim lallFiles As New NameValueCollection
-        AddFilesInDir(lallFiles, g_ProgramDir, True)
-        'lFeedback &= vbCrLf & "Modified" & vbTab & "Size" & vbTab & "Filename" & vbCrLf
-        For Each lFilename As String In lallFiles
-            lFeedback &= FileDateTime(lFilename).ToString("yyyy-MM-dd HH:mm:ss") & vbTab & StrPad(Format(FileLen(lFilename), "#,###"), 10) & vbTab & lFilename.Substring(lSkipFilename) & vbCrLf
-        Next
-
-        If lFeedbackForm.ShowFeedback(lName, lEmail, lMessage, lFeedback) Then
+        If lFeedbackForm.ShowFeedback(lName, lEmail, lMessage, lFeedback, True, True, True, g_ProgramDir) Then
             Dim lFeedbackCollection As New NameValueCollection
             lFeedbackCollection.Add("name", Trim(lName))
             lFeedbackCollection.Add("email", Trim(lEmail))
