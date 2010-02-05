@@ -888,24 +888,16 @@ Public Class HspfUci
 
     Public Sub DeleteOperation(ByRef aName As String, ByRef aId As Integer)
         'figure out where this operation is in operation sequence block and delete it
-        Dim lOperationIndex As Integer = 1
-        Dim lDeleteOperationAtIndex, lDeleteTargetAtIndex, lDeleteSourceAtIndex As New Collection
-        Dim lHspfOperation As HspfOperation
-        Dim lHspfConnection As HspfConnection
-        Dim lOper As Integer
-        Dim lHspfConnectionIndex As Integer
-
-
-        For lOperationIndex = 0 To pOpnSeqBlk.Opns.Count - 1
-            lHspfOperation = pOpnSeqBlk.Opns.Item(lOperationIndex)
+        Dim lDeleteOperationAtIndex As New Collection
+        For lOperationIndex As Integer = 0 To pOpnSeqBlk.Opns.Count - 1
+            Dim lHspfOperation As HspfOperation = pOpnSeqBlk.Opns.Item(lOperationIndex)
             If lHspfOperation.Name = aName AndAlso lHspfOperation.Id = aId Then
-                'pOpnSeqBlk.Delete(lOperationIndex - 1)
+                'save the position of this operation for deleting
                 lDeleteOperationAtIndex.Add(lOperationIndex)
             End If
         Next
-
-        For lOper = 1 To lDeleteOperationAtIndex.Count
-            pOpnSeqBlk.Delete(lDeleteOperationAtIndex(lOper))
+        For lOperIndex As Integer = 1 To lDeleteOperationAtIndex.Count
+            pOpnSeqBlk.Delete(lDeleteOperationAtIndex(lOperIndex))
         Next
 
         'need to remove from all operation type blocks
@@ -916,17 +908,13 @@ Public Class HspfUci
 
         'remove connections
         'need to remove connections between this and anything else
-        Dim lConnectionIndex As Integer = 1
-        Dim lTargetVolId As Integer = 0
         Dim lSourceCount As Integer = 0
         Dim lSourceVolId() As Integer = {}
-        Dim lMassLink, lTargetIndex, lSourceIndex, lHspfOperationIndex As Integer
+        Dim lTargetVolId As Integer = 0
         Dim lRemoveUciConnectionAtIndex As New Collection
-        Dim lRemoveOperationTargetAtIndex, lRemoveOperationSourceAtIndex As New Collection
-        Dim lOffsetAfterDeleteIndex As Integer
-
-        For lHspfConnectionIndex = 0 To Me.Connections.Count - 1
-            lHspfConnection = Me.Connections.Item(lHspfConnectionIndex)
+        Dim lMassLink As Integer = 0
+        For lHspfConnectionIndex As Integer = 0 To Me.Connections.Count - 1
+            Dim lHspfConnection As HspfConnection = Me.Connections.Item(lHspfConnectionIndex)
 
             If (lHspfConnection.Source.VolName = aName And lHspfConnection.Source.VolId = aId) Or (lHspfConnection.Target.VolName = aName And lHspfConnection.Target.VolId = aId) Then
                 lMassLink = lHspfConnection.MassLink
@@ -943,21 +931,21 @@ Public Class HspfUci
             End If
         Next
 
-        lOffsetAfterDeleteIndex = 0
-        For lOper = 1 To lRemoveUciConnectionAtIndex.Count
-            Me.Connections.RemoveAt(lRemoveUciConnectionAtIndex.Item(lOper) - lOffsetAfterDeleteIndex)
+        Dim lOffsetAfterDeleteIndex As Integer = 0
+        For lOperIndex As Integer = 1 To lRemoveUciConnectionAtIndex.Count
+            Me.Connections.RemoveAt(lRemoveUciConnectionAtIndex.Item(lOperIndex) - lOffsetAfterDeleteIndex)
             lOffsetAfterDeleteIndex += 1
         Next
 
         If lSourceCount > 0 And lTargetVolId > 0 Then
             'need to join sources and targets of this deleted opn
-            For lConnectionIndex = 1 To lSourceCount
+            For lSourceConnectionIndex As Integer = 1 To lSourceCount
                 Dim lConnection As HspfConnection = New HspfConnection
                 lConnection.Uci = Me
                 lConnection.Typ = 3
                 lConnection.Source.VolName = aName
-                lConnection.Source.VolId = lSourceVolId(lConnectionIndex)
-                lConnection.Source.Opn = pOpnBlks.Item(aName).OperFromID(lSourceVolId(lConnectionIndex))
+                lConnection.Source.VolId = lSourceVolId(lSourceConnectionIndex)
+                lConnection.Source.Opn = pOpnBlks.Item(aName).OperFromID(lSourceVolId(lSourceConnectionIndex))
                 lConnection.MFact = 1.0#
                 lConnection.Target.VolName = aName
                 lConnection.Target.VolId = lTargetVolId
@@ -970,40 +958,38 @@ Public Class HspfUci
                 Me.Connections.Add(lConnection)
                 lConnection.Source.Opn.Targets.Add(lConnection)
                 lConnection.Target.Opn.Sources.Add(lConnection)
-            Next lConnectionIndex
+            Next
         End If
 
         'remove this oper from source and target collections for other operations
-        For lHspfOperationIndex = 0 To pOpnSeqBlk.Opns.Count - 1
-            lHspfOperation = pOpnSeqBlk.Opns.Item(lHspfOperationIndex)
+        For lHspfOperationIndex As Integer = 0 To pOpnSeqBlk.Opns.Count - 1
+            Dim lHspfOperation As HspfOperation = pOpnSeqBlk.Opns.Item(lHspfOperationIndex)
 
-            For lTargetIndex = 0 To lHspfOperation.Targets.Count - 1
+            Dim lDeleteTargetAtIndex As New Collection
+            For lTargetIndex As Integer = 0 To lHspfOperation.Targets.Count - 1
                 If lHspfOperation.Targets.Item(lTargetIndex).Target.VolId = aId AndAlso lHspfOperation.Targets.Item(lTargetIndex).Target.VolName = aName Then
                     lDeleteTargetAtIndex.Add(lTargetIndex)
                 End If
             Next
 
             lOffsetAfterDeleteIndex = 0
-            For lOper = 1 To lDeleteTargetAtIndex.Count
-                Me.Connections.RemoveAt(lDeleteTargetAtIndex.Item(lOper) - lOffsetAfterDeleteIndex)
+            For lOperIndex As Integer = 1 To lDeleteTargetAtIndex.Count
+                Me.Connections.RemoveAt(lDeleteTargetAtIndex.Item(lOperIndex) - lOffsetAfterDeleteIndex)
                 lOffsetAfterDeleteIndex += 1
             Next
 
-
-            For lSourceIndex = 0 To lHspfOperation.Sources.Count - 1
+            Dim lDeleteSourceAtIndex As New Collection
+            For lSourceIndex As Integer = 0 To lHspfOperation.Sources.Count - 1
                 If lHspfOperation.Sources.Item(lSourceIndex).Source.VolId = aId AndAlso lHspfOperation.Sources.Item(lSourceIndex).Source.VolName = aName Then
                     lDeleteSourceAtIndex.Add(lSourceIndex)
                 End If
             Next
 
             lOffsetAfterDeleteIndex = 0
-            For lOper = 1 To lDeleteSourceAtIndex.Count
-                Me.Connections.RemoveAt(lDeleteSourceAtIndex.Item(lOper) - lOffsetAfterDeleteIndex)
+            For lOperIndex As Integer = 1 To lDeleteSourceAtIndex.Count
+                Me.Connections.RemoveAt(lDeleteSourceAtIndex.Item(lOperIndex) - lOffsetAfterDeleteIndex)
                 lOffsetAfterDeleteIndex += 1
             Next
-
-
-
         Next
     End Sub
 

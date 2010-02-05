@@ -10,6 +10,7 @@ Public Class ctlEditOpnSeqBlock
     Dim pVScrollColumnOffset As Integer = 16
     Dim pHspfOpnSeqBlk As HspfOpnSeqBlk
     Dim pfrmAddOperation As frmAddOperation
+    Dim pfrmRenumberOperation As frmRenumberOperation
 
     Dim pChanged As Boolean
     Dim pCurrentSelectedColumn As Integer
@@ -130,6 +131,7 @@ Public Class ctlEditOpnSeqBlock
         pHspfOpnSeqBlk.Delt = txtIndelt.ValueInteger
 
         'find out if any operations have been deleted
+        Dim lOpnsToDelete As New Collection
         For Each lOpn As HspfOperation In pHspfOpnSeqBlk.Opns
             Dim lInList As Boolean = False
             For lRow As Integer = 1 To grdEdit.Source.Rows
@@ -143,9 +145,13 @@ Public Class ctlEditOpnSeqBlock
             Next
             If Not lInList Then
                 'delete this operation
-                pHspfOpnSeqBlk.Uci.DeleteOperation(lOpn.Name, lOpn.Id)
+                lOpnsToDelete.Add(lOpn)
             End If
         Next
+        For Each lOpn As HspfOperation In lOpnsToDelete
+            pHspfOpnSeqBlk.Uci.DeleteOperation(lOpn.Name, lOpn.Id)
+        Next
+
         'find out if any operations have been added
         For lRow As Integer = 1 To grdEdit.Source.Rows
             Dim lInList As Boolean = False
@@ -169,7 +175,14 @@ Public Class ctlEditOpnSeqBlock
             End If
         Next
 
-        'TODO: look for operations that are not in the same order as in the opn seq block
+        With grdEdit.Source
+            For lRow As Integer = 1 To .Rows - 1
+                Dim lOpnBlk As HspfOpnBlk = pHspfOpnSeqBlk.Uci.OpnBlks(.CellValue(lRow, 0))
+                If lOpnBlk IsNot Nothing Then
+                    pHspfOpnSeqBlk.Opns(lRow - 1) = lOpnBlk.OperFromID(.CellValue(lRow, 1))
+                End If
+            Next
+        End With
 
     End Sub
 
@@ -222,4 +235,22 @@ Public Class ctlEditOpnSeqBlock
         End If
     End Sub
 
+    Private Sub cmdRenumber_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdRenumber.Click
+        If IsNothing(pfrmRenumberOperation) Then
+            pfrmRenumberOperation = New frmRenumberOperation
+            pfrmRenumberOperation.Init(pHspfOpnSeqBlk, Me.Parent.Parent)
+            pfrmRenumberOperation.ShowDialog()
+            Data = pHspfOpnSeqBlk
+        Else
+            If pfrmRenumberOperation.IsDisposed Then
+                pfrmRenumberOperation = New frmRenumberOperation
+                pfrmRenumberOperation.Init(pHspfOpnSeqBlk, Me.Parent.Parent)
+                pfrmRenumberOperation.ShowDialog()
+                Data = pHspfOpnSeqBlk
+            Else
+                pfrmRenumberOperation.WindowState = FormWindowState.Normal
+                pfrmRenumberOperation.BringToFront()
+            End If
+        End If
+    End Sub
 End Class
