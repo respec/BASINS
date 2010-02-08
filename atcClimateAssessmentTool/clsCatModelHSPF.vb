@@ -201,6 +201,7 @@ Public Class clsCatModelHSPF
                     Next
             End Select
 
+            Dim lRunExitCode As Integer = 0
             If aRunModel Then
                 'Run scenario
                 Dim lWinHspfLtExeName As String = FindFile("Please locate WinHspfLt.exe", g_PathChar & "BASINS\models\HSPF\bin\WinHspfLt.exe")
@@ -217,42 +218,48 @@ Public Class clsCatModelHSPF
                 AppendFileString(lNewFolder & "WinHSPFLtError.Log", "Start log for " & lNewBaseFilename & vbCrLf)
                 Dim lArgs As String = lPipeHandles & lNewUCIfilename
                 Logger.Dbg("Start " & lWinHspfLtExeName & " with Arguments '" & lArgs & "'")
-                Dim newProc As Diagnostics.Process
-                newProc = Diagnostics.Process.Start(lWinHspfLtExeName, lArgs)
-                While Not newProc.HasExited
+                Dim lHspfProcess As Diagnostics.Process
+                lHspfProcess = Diagnostics.Process.Start(lWinHspfLtExeName, lArgs)
+                While Not lHspfProcess.HasExited
                     If Not g_Running And Not aKeepRunning Then
-                        newProc.Kill()
+                        lHspfProcess.Kill()
                     End If
                     Windows.Forms.Application.DoEvents()
                     Threading.Thread.Sleep(50)
                 End While
-                Logger.Dbg("Model exit code " & newProc.ExitCode)
-                If newProc.ExitCode <> 0 Then
+                lRunExitCode = lHspfProcess.ExitCode
+                Logger.Dbg("Model exit code " & lRunExitCode)
+                If lRunExitCode <> 0 Then
                     Logger.Dbg("****************** Problem *********************")
                 End If
             Else
                 Logger.Dbg("Skipping running model")
             End If
+
             If g_Running Then
-                For Each lBinOutFilename As String In UCIFilesBlockFilenames(WholeFileString(pBaseScenario), "BINO")
-                    lBinOutFilename = AbsolutePath(lBinOutFilename, CurDir)
-                    Dim lNewFilename As String
-                    If aNewScenarioName.ToLower = "base" Then
-                        lNewFilename = lBinOutFilename
-                    Else
-                        lNewFilename = PathNameOnly(lBinOutFilename) & g_PathChar & aNewScenarioName & "." & IO.Path.GetFileName(lBinOutFilename)
-                    End If
-                    If IO.File.Exists(lNewFilename) Then
-                        'Dim lHBNResults As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
-                        'If lHBNResults.Open(lNewFilename) Then
-                        lModified.Add(IO.Path.GetFileName(lBinOutFilename).ToLower.Trim, lNewFilename.Trim)
-                        'Else
-                        '    Logger.Dbg("Could not open HBN file '" & lNewFilename & "'")
-                        'End If
-                    Else
-                        Logger.Dbg("Could not find HBN file '" & lNewFilename & "'")
-                    End If
-                Next
+                If lRunExitCode <> 0 Then 'hspf run failed, don't send any timeseries back to cat
+                    lModified.Clear()
+                Else
+                    For Each lBinOutFilename As String In UCIFilesBlockFilenames(WholeFileString(pBaseScenario), "BINO")
+                        lBinOutFilename = AbsolutePath(lBinOutFilename, CurDir)
+                        Dim lNewFilename As String
+                        If aNewScenarioName.ToLower = "base" Then
+                            lNewFilename = lBinOutFilename
+                        Else
+                            lNewFilename = PathNameOnly(lBinOutFilename) & g_PathChar & aNewScenarioName & "." & IO.Path.GetFileName(lBinOutFilename)
+                        End If
+                        If IO.File.Exists(lNewFilename) Then
+                            'Dim lHBNResults As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
+                            'If lHBNResults.Open(lNewFilename) Then
+                            lModified.Add(IO.Path.GetFileName(lBinOutFilename).ToLower.Trim, lNewFilename.Trim)
+                            'Else
+                            '    Logger.Dbg("Could not open HBN file '" & lNewFilename & "'")
+                            'End If
+                        Else
+                            Logger.Dbg("Could not find HBN file '" & lNewFilename & "'")
+                        End If
+                    Next
+                End If
             End If
         Else
             Logger.Msg("Could not find base UCI file '" & pBaseScenario & "'" & vbCrLf & "Could not run model", "Scenario Run")

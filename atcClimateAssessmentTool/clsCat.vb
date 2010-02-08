@@ -305,11 +305,11 @@ NextIteration:
                 RaiseEvent StartIteration(aIteration)
                 TimePerRun = Now.ToOADate
                 Dim lResults As atcCollection = Model.ScenarioRun(lModifiedScenarioName, aModifiedData, lPreparedInput, RunModel, ShowEachRunProgress, False)
-                If lResults Is Nothing Then
+                If lResults Is Nothing OrElse lResults.Count = 0 Then
                     Logger.Dbg("Null scenario results from ScenarioRun")
-                    Exit Sub
+                Else
+                    TimePerRun = (Now.ToOADate - TimePerRun) * 24 * 60 * 60 'Convert days to seconds
                 End If
-                TimePerRun = (Now.ToOADate - TimePerRun) * 24 * 60 * 60 'Convert days to seconds
 
                 With ResultsGrid
                     Dim lRow As Integer = aIteration + .FixedRows
@@ -335,15 +335,18 @@ NextIteration:
                         System.GC.WaitForPendingFinalizers()
                         If lVariation.Selected Then
                             For Each lOldData As atcDataSet In lVariation.DataSets
+                                .CellValue(lRow, lColumn) = "RunFailed"
                                 Dim lGroup As atcTimeseriesGroup = Nothing
                                 Dim lOriginalDataSpec As String = lOldData.Attributes.GetValue("History 1", "").Substring(10)
                                 Dim lResultDataSpec As String = lResults.ItemByKey(IO.Path.GetFileName(lOriginalDataSpec).ToLower.Trim)
                                 If lResultDataSpec Is Nothing Then
                                     Logger.Dbg("ResultsDataSpec is Nothing for " & lOldData.ToString)
+                                    .CellValue(lRow, lColumn) = "RunFailed 1"
                                 Else
                                     Dim lResultDataSource As atcTimeseriesSource = OpenDataSource(lResultDataSpec)
                                     If lResultDataSource Is Nothing Then
                                         Logger.Dbg("ResultsDataSource is Nothing for " & lResultDataSpec.ToString)
+                                        .CellValue(lRow, lColumn) = "RunFailed 2"
                                     Else
                                         lGroup = lResultDataSource.DataSets.FindData("ID", lOldData.Attributes.GetValue("ID"), 1)
                                         If Not (lGroup Is Nothing) AndAlso lGroup.Count > 0 Then
@@ -369,11 +372,11 @@ NextIteration:
                                         Else
                                             Logger.Dbg("No Data for ID " & lOldData.Attributes.GetValue("ID") & _
                                                        " Count " & lResultDataSource.DataSets.Count)
-                                            .CellValue(lRow, lColumn) = ""
+                                            .CellValue(lRow, lColumn) = "RunFailed 3"
                                         End If
-                                        lColumn += 1
                                     End If
                                 End If
+                                lColumn += 1
                             Next
                         End If
                     Next
