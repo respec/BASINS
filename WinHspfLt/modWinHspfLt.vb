@@ -2,7 +2,7 @@ Option Strict Off
 Option Explicit On
 
 Imports MapWinUtility 'for Logger
-Imports atcUtility 'for StrRetRem, StrFirstInt, FindFile, FilenameOnly, FilenameSetExt, WholdFileString, frmFeedBack
+Imports atcUtility 'for StrRetRem, StrFirstInt, FindFile, ChDriveDir, FilenameSetExt, WholeFileString, frmFeedBack
 
 ''' <summary>
 ''' Windows wrapper for HSPF 
@@ -172,16 +172,9 @@ Module modWinHSPFLt
 
         Catch ex As Exception
             If lRetcod = 0 Then lRetcod = 4321
-            If Logger.Msg(ex.Message & vbCrLf & "Send a feedback message to the WinHspfLt development team?", _
-                          MsgBoxStyle.YesNo, _
-                          MsgBoxResult.No, "WinHspfLt Feedback") = MsgBoxResult.Yes Then
-                Dim lStr As String = ""
-                If Logger.FileName.Length > 0 Then
-                    lStr = vbCrLf & "------------ Logfile '" & Logger.FileName & "' Contents ---------------" & _
-                           vbCrLf & WholeFileString(Logger.FileName)
-                End If
-                ShowFeedback(lStr)
-            End If
+            Logger.Dbg(ex.Message & vbCrLf & ex.StackTrace)
+            ShowFeedback()
+            'End If
         End Try
 
         Logger.Status("EXIT")
@@ -189,13 +182,13 @@ Module modWinHSPFLt
         Return lRetcod
     End Function
 
-    Private Sub ShowFeedback(ByRef aProgress As String)
-        Dim lfrmFeedback As New frmFeedback
-
+    Private Sub ShowFeedback()
         Dim lName As String = ""
         Dim lEmail As String = ""
         Dim lMessage As String = ""
-        Dim lFeedback As String = MapWinUtility.MiscUtils.GetDebugInfo & aProgress
+        Dim lfrmFeedback As New frmFeedback
+        Dim lFeedback As String = lfrmFeedback.FeedbackGenericSystemInformation
+        lfrmFeedback.Text = "HSPF Error Report"
         If lfrmFeedback.ShowFeedback(lName, lEmail, lMessage, lFeedback) Then
             Dim lFeedbackCollection As New System.Collections.Specialized.NameValueCollection
             lFeedbackCollection.Add("name", Trim(lName))
