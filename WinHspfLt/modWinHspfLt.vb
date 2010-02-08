@@ -186,15 +186,15 @@ Module modWinHSPFLt
         Dim lName As String = ""
         Dim lEmail As String = ""
         Dim lMessage As String = ""
+        Dim lSysInfo As String = ""
         Dim lfrmFeedback As New frmFeedback
-        Dim lFeedback As String = lfrmFeedback.FeedbackGenericSystemInformation
         lfrmFeedback.Text = "HSPF Error Report"
-        If lfrmFeedback.ShowFeedback(lName, lEmail, lMessage, lFeedback) Then
+        If lfrmFeedback.ShowFeedback(lName, lEmail, lMessage, lSysInfo, True, True, True, Nothing) Then
             Dim lFeedbackCollection As New System.Collections.Specialized.NameValueCollection
             lFeedbackCollection.Add("name", Trim(lName))
             lFeedbackCollection.Add("email", Trim(lEmail))
             lFeedbackCollection.Add("message", Trim(lMessage))
-            lFeedbackCollection.Add("sysinfo", lFeedback)
+            lFeedbackCollection.Add("sysinfo", lSysInfo)
             Dim lClient As New System.Net.WebClient
             lClient.UploadValues("http://hspf.com/cgi-bin/feedback-basins4.cgi", "POST", lFeedbackCollection)
             Logger.Msg("Feedback successfully sent", "Send Feedback")
