@@ -259,16 +259,16 @@ Friend Class StatusMonitor
                 '
                 pMonitorProcess.StandardInput.WriteLine("Show")
                 'pMonitorProcess.BeginErrorReadLine()
-                pMonitorProcess.BeginOutputReadLine()
+                'pMonitorProcess.BeginOutputReadLine()
                 Logger.Dbg("MonitorLaunched")
-                Dim lStream As IO.FileStream = pMonitorProcess.StandardInput.BaseStream
-                pPipeWriteToStatus = lStream.SafeFileHandle.DangerousGetHandle
-                'lStream = pMonitorProcess.StandardOutput.BaseStream
-                'pPipeReadFromStatus = lStream.SafeFileHandle.DangerousGetHandle
-                pInit = True
+                Dim lStreamMonitorInputFromMyOutput As IO.FileStream = pMonitorProcess.StandardInput.BaseStream
+                pPipeWriteToStatus = lStreamMonitorInputFromMyOutput.SafeFileHandle.DangerousGetHandle
+                Dim lStreamMonitorOutputToMyInput As IO.FileStream = pMonitorProcess.StandardOutput.BaseStream
+                pPipeReadFromStatus = lStreamMonitorOutputToMyInput.SafeFileHandle.DangerousGetHandle
             Catch ex As Exception
                 Logger.Msg("StatusProcessStartError:" & ex.Message)
             End Try
+            pInit = True
         End If
 
         WriteStatus(aStatusMessage)
