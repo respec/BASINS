@@ -60,6 +60,7 @@ Module modWinHSPFLt
     ''' <remarks></remarks>
     Public Function Main() As Integer
         Dim lRetcod As Integer = 1234
+        Dim lSendFeedBack As Boolean = True
         Try
             Dim lErrLogName As String = "WinHspfLt.log"
             Dim lErrLogFlag As Boolean = False
@@ -70,6 +71,14 @@ Module modWinHSPFLt
                 Logger.StartToFile(lErrLogName, False, False, True)
                 Logger.Dbg("Early Logging On")
                 lErrLogFlag = True
+            End If
+
+            If StringFindAndRemove(lExeCmd, "/nosendfeedback") Then
+                lSendFeedBack = False
+            End If
+
+            If StringFindAndRemove(lExeCmd, "/debugpause") Then
+                Logger.Msg("Pause to attach to process")
             End If
 
             Logger.Dbg("ExeName '" & StrRetRem(lExeCmd) & "'")
@@ -173,8 +182,9 @@ Module modWinHSPFLt
         Catch ex As Exception
             If lRetcod = 0 Then lRetcod = 4321
             Logger.Dbg(ex.Message & vbCrLf & ex.StackTrace)
-            ShowFeedback()
-            'End If
+            If lSendFeedBack Then
+                ShowFeedback()
+            End If
         End Try
 
         Logger.Status("EXIT")
