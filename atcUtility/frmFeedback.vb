@@ -158,8 +158,6 @@ Public Class frmFeedback
         '
         'chkSendSystemInformation
         '
-        Me.chkSendSystemInformation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkSendSystemInformation.AutoSize = True
         Me.chkSendSystemInformation.Checked = True
         Me.chkSendSystemInformation.CheckState = System.Windows.Forms.CheckState.Checked

@@ -583,7 +583,7 @@ FoundSameUntil:
                             Optional ByVal aFileFilter As String = "*", _
                             Optional ByVal aAttributes As Integer = 0) As String
         'Dim lLastDoEvents As Date = Now
-        Dim lReport As New Text.StringBuilder
+        Dim lReport As New System.Text.StringBuilder
         Dim lSkipFilename As Integer = aDirName.Length
         lReport.AppendLine("Files in " & aDirName)
 
