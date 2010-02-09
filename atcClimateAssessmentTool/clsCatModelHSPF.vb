@@ -204,7 +204,7 @@ Public Class clsCatModelHSPF
             Dim lRunExitCode As Integer = 0
             If aRunModel Then
                 'Run scenario
-                Dim lWinHspfLtExeName As String = FindFile("Please locate WinHspfLt.exe", g_PathChar & "BASINS\models\HSPF\bin\WinHspfLt.exe")
+                Dim lWinHspfLtExeName As String = FindFile("Please locate WinHspfLt.exe", g_PathChar & "BASINS\bin\WinHspfLt.exe")
 
                 Dim lPipeHandles As String = " -1 -1 "
                 If aShowProgress Then lPipeHandles = " "
@@ -218,8 +218,15 @@ Public Class clsCatModelHSPF
                 AppendFileString(lNewFolder & "WinHSPFLtError.Log", "Start log for " & lNewBaseFilename & vbCrLf)
                 Dim lArgs As String = lPipeHandles & lNewUCIfilename & " /nosendfeedback "
                 Logger.Dbg("Start " & lWinHspfLtExeName & " with Arguments '" & lArgs & "'")
-                Dim lHspfProcess As Diagnostics.Process
-                lHspfProcess = Diagnostics.Process.Start(lWinHspfLtExeName, lArgs)
+                'lHspfProcess = Diagnostics.Process.Start(lWinHspfLtExeName, lArgs)
+                Dim lHspfProcess As New Diagnostics.Process
+                With lHspfProcess.StartInfo
+                    .FileName = lWinHspfLtExeName
+                    .Arguments = lArgs
+                    .CreateNoWindow = True
+                    .UseShellExecute = False
+                End With
+                lHspfProcess.Start()
                 While Not lHspfProcess.HasExited
                     If Not g_Running And Not aKeepRunning Then
                         lHspfProcess.Kill()
