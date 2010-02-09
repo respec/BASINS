@@ -38,10 +38,9 @@
     <StartArguments>/log base.uci</StartArguments>
     <StartPage>
     </StartPage>
-    <StartProgram>G:\dev\BASINS40\Bin\WinHspfLt.exe</StartProgram>
+    <StartProgram>\dev\BASINS40\Bin\WinHspfLt.exe</StartProgram>
     <StartURL>
     </StartURL>
-    <StartWorkingDirectory>D:\Basins\data\Climate\</StartWorkingDirectory>
     <StartWithIE>false</StartWithIE>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -56,10 +55,9 @@
     <StartArguments>/log base.uci</StartArguments>
     <StartPage>
     </StartPage>
-    <StartProgram>G:\dev\BASINS40\Bin\WinHspfLt.exe</StartProgram>
+    <StartProgram>\dev\BASINS40\Bin\WinHspfLt.exe</StartProgram>
     <StartURL>
     </StartURL>
-    <StartWorkingDirectory>D:\Basins\data\Climate\</StartWorkingDirectory>
     <StartWithIE>false</StartWithIE>
   </PropertyGroup>
 </Project>
