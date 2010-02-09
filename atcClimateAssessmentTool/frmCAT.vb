@@ -1597,4 +1597,8 @@ Public Class frmCAT
         lPltForm.LoadSetting()
         lPltForm.Show()
     End Sub
+
+    Private Sub chkShowEachRunProgress_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles chkShowEachRunProgress.CheckedChanged
+        pCat.ShowEachRunProgress = chkShowEachRunProgress.Checked
+    End Sub
 End Class

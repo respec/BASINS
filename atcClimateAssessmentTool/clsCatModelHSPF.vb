@@ -216,7 +216,7 @@ Public Class clsCatModelHSPF
                 'SaveFileString(lBaseFolder & g_PathChar & "WinHSPFLtError.Log", "WinHSPFMessagesFollow:" & vbCrLf)
 
                 AppendFileString(lNewFolder & "WinHSPFLtError.Log", "Start log for " & lNewBaseFilename & vbCrLf)
-                Dim lArgs As String = lPipeHandles & lNewUCIfilename
+                Dim lArgs As String = lPipeHandles & lNewUCIfilename & " /nosendfeedback "
                 Logger.Dbg("Start " & lWinHspfLtExeName & " with Arguments '" & lArgs & "'")
                 Dim lHspfProcess As Diagnostics.Process
                 lHspfProcess = Diagnostics.Process.Start(lWinHspfLtExeName, lArgs)

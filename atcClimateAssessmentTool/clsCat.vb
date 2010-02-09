@@ -335,13 +335,13 @@ NextIteration:
                         System.GC.WaitForPendingFinalizers()
                         If lVariation.Selected Then
                             For Each lOldData As atcDataSet In lVariation.DataSets
-                                .CellValue(lRow, lColumn) = "RunFailed"
+                                .CellValue(lRow, lColumn) = "RunFailed 1"
                                 Dim lGroup As atcTimeseriesGroup = Nothing
                                 Dim lOriginalDataSpec As String = lOldData.Attributes.GetValue("History 1", "").Substring(10)
                                 Dim lResultDataSpec As String = lResults.ItemByKey(IO.Path.GetFileName(lOriginalDataSpec).ToLower.Trim)
                                 If lResultDataSpec Is Nothing Then
                                     Logger.Dbg("ResultsDataSpec is Nothing for " & lOldData.ToString)
-                                    .CellValue(lRow, lColumn) = "RunFailed 1"
+                                    .CellValue(lRow, lColumn) = "RunFailed"
                                 Else
                                     Dim lResultDataSource As atcTimeseriesSource = OpenDataSource(lResultDataSpec)
                                     If lResultDataSource Is Nothing Then
