@@ -3,7 +3,6 @@
     <LastOpenVersion>7.10.3077</LastOpenVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ReferencePath>C:\dev\BASINS40\Bin\;C:\dev\BASINS40\Bin\Plugins\BASINS\</ReferencePath>
     <CopyProjectDestinationFolder>
     </CopyProjectDestinationFolder>
     <CopyProjectUncPath>
@@ -25,7 +24,7 @@
     </StartArguments>
     <StartPage>
     </StartPage>
-    <StartProgram>C:\dev\BASINS40\Bin\MapWindow.exe</StartProgram>
+    <StartProgram>\dev\BASINS40\Bin\MapWindow.exe</StartProgram>
     <StartURL>
     </StartURL>
     <StartWorkingDirectory>
@@ -45,7 +44,7 @@
     </StartArguments>
     <StartPage>
     </StartPage>
-    <StartProgram>C:\dev\BASINS40\Bin\MapWindow.exe</StartProgram>
+    <StartProgram>\dev\BASINS40\Bin\MapWindow.exe</StartProgram>
     <StartURL>
     </StartURL>
     <StartWorkingDirectory>

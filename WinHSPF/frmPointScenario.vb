@@ -69,7 +69,7 @@ Public Class frmPointScenario
                 Dim newdsn As Integer
                 pUCI.AddPointSourceDataSet(lSen, lLoc, lCon, lStanam, lTstype, _
                     0, lJdates, lRload, newwdmid, newdsn)
-                frmPoint.UpdateListsForNewPointSource(lSen, lStanam, lLoc, lCon, newwdmid, _
+                pfrmPoint.UpdateListsForNewPointSource(lSen, lStanam, lLoc, lCon, newwdmid, _
                   newdsn, "RCHRES", CInt(Mid(lLoc, 4)), lLongloc)
             Next
             Me.Dispose()
