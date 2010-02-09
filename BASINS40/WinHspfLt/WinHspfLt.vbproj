@@ -64,7 +64,10 @@
     <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MapWinUtility, Version=4.8.1.27615, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="MapWinUtility, Version=4.7.5.19621, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Microsoft.VisualBasic.Compatibility">
       <Name>Microsoft.VisualBasic.Compatibility</Name>
     </Reference>
@@ -135,7 +138,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="frmFeedback.resx">
+    <EmbeddedResource Include="..\atcUtility\frmFeedback.resx">
       <DependentUpon>frmFeedback.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
