@@ -301,7 +301,7 @@ Public Class atcCollection
 
     Public Overloads Function ToString(ByVal aNumValues As Integer) As String
         Dim lCount As Integer = Me.Count
-        Dim lString As New Text.StringBuilder
+        Dim lString As New System.Text.StringBuilder
         lString.AppendLine("Collection count = " & lCount)
 
         Dim lStop As Integer = lCount - 1
