@@ -12,13 +12,47 @@ Imports D4EMDataManager
 
 Module BasinsWorkshopBatch
     Private pMapWin As IMapWin
-    Private pHUC8 As String = "02060006"
+    Private pProjectName As String = "06010105" '"Patuxent"
+    Private pHUC8 As String = ""
     Private pDrive As String = "C:"
     Private pBaseFolder As String = pDrive & "\BASINS\"
     Private pProjectFolder As String = pBaseFolder & "Data\WorkshopBatch\"
     Private pCacheFolder As String = pProjectFolder & "Cache\"
     Private pCacheFolderSave As String = pCacheFolder.Replace("Batch", "BatchSave")
-    Private pCacheClear As Boolean = False
+    Private pCacheClear As Boolean = True ' False
+    Private pBoundingBoxAea As String = ""
+    Private pBoundingBoxLL As String = ""
+    Private pMetStationIds As String = ""
+    Private pProjection As String = ""
+
+    Private Sub Initialize()
+        Select Case pProjectName
+            Case "Patuxent"
+                pHUC8 = "02060006"
+                pProjection = "+proj=utm +zone=18 +ellps=GRS80 +lon_0=-75 +lat_0=0 +k=0.9996 +x_0=500000.0 +y_0=0 +datum=NAD83 +units=m"
+                pBoundingBoxAea = _
+                      "   <northbc>1975392.91047589</northbc>" & _
+                      "   <southbc>1866978.51560156</southbc>" & _
+                      "   <eastbc>1684619.12695581</eastbc>" & _
+                      "   <westbc>1595425.21946512</westbc>"
+                pBoundingBoxLL = _
+                      "   <northbc>39.3668056784273</northbc>" & _
+                      "   <southbc>38.257273329737</southbc>" & _
+                      "   <eastbc>-76.4009709099128</eastbc>" & _
+                      "   <westbc>-77.2070255407762</westbc>"
+                pMetStationIds = _
+                      "<stationid>MD180193</stationid> <stationid>MD180193</stationid> <stationid>MD180193</stationid> <stationid>MD180460</stationid> <stationid>MD180460</stationid> <stationid>MD180460</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> " & _
+                      "<stationid>MD180465</stationid> <stationid>MD180470</stationid> <stationid>MD180470</stationid> <stationid>MD180470</stationid> <stationid>MD180470</stationid> <stationid>MD180475</stationid> <stationid>MD180475</stationid> <stationid>MD180475</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180701</stationid> <stationid>MD180701</stationid> <stationid>MD180701</stationid> <stationid>MD180702</stationid> <stationid>MD180702</stationid> <stationid>MD180702</stationid> <stationid>MD180703</stationid> <stationid>MD180703</stationid> <stationid>MD180703</stationid> <stationid>MD180704</stationid> <stationid>MD180704</stationid> <stationid>MD180704</stationid> <stationid>MD180705</stationid> <stationid>MD180705</stationid> <stationid>MD180705</stationid> <stationid>MD180705</stationid> " & _
+                      "<stationid>MD180706</stationid> <stationid>MD180706</stationid> <stationid>MD180706</stationid> <stationid>MD180795</stationid> <stationid>MD180800</stationid> <stationid>MD180800</stationid> <stationid>MD180800</stationid> <stationid>MD181125</stationid> <stationid>MD181135</stationid> <stationid>MD181135</stationid> <stationid>MD181170</stationid> <stationid>MD181278</stationid> <stationid>MD181685</stationid> <stationid>MD181685</stationid> <stationid>MD181685</stationid> <stationid>MD181710</stationid> <stationid>MD181710</stationid> <stationid>MD181710</stationid> <stationid>MD181862</stationid> <stationid>MD181862</stationid> <stationid>MD181862</stationid> <stationid>MD181995</stationid> <stationid>MD181995</stationid> <stationid>MD181995</stationid> <stationid>MD181995</stationid> <stationid>MD182325</stationid> <stationid>MD182325</stationid> <stationid>MD182325</stationid> <stationid>MD182585</stationid> <stationid>MD182585</stationid> <stationid>MD182585</stationid> <stationid>MD182660</stationid> " & _
+                      "<stationid>MD182660</stationid> <stationid>MD182660</stationid> <stationid>MD183230</stationid> <stationid>MD183230</stationid> <stationid>MD183230</stationid> <stationid>MD183645</stationid> <stationid>MD183675</stationid> <stationid>MD183675</stationid> <stationid>MD183675</stationid> <stationid>MD183860</stationid> <stationid>MD183860</stationid> <stationid>MD183860</stationid> <stationid>MD185080</stationid> <stationid>MD185080</stationid> <stationid>MD185080</stationid> <stationid>MD185111</stationid> <stationid>MD185111</stationid> <stationid>MD185111</stationid> <stationid>MD185201</stationid> <stationid>MD185201</stationid> <stationid>MD185201</stationid> <stationid>MD185718</stationid> <stationid>MD185718</stationid> <stationid>MD185718</stationid> <stationid>MD185718</stationid> <stationid>MD185865</stationid> <stationid>MD185865</stationid> <stationid>MD185865</stationid> <stationid>MD185916</stationid> <stationid>MD185916</stationid> <stationid>MD185916</stationid> <stationid>MD186350</stationid> " & _
+                      "<stationid>MD186350</stationid> <stationid>MD186350</stationid> <stationid>MD186770</stationid> <stationid>MD186770</stationid> <stationid>MD186770</stationid> <stationid>MD186915</stationid> <stationid>MD186915</stationid> <stationid>MD186915</stationid> <stationid>MD187325</stationid> <stationid>MD187325</stationid> <stationid>MD187325</stationid> <stationid>MD187615</stationid> <stationid>MD187615</stationid> <stationid>MD187615</stationid> <stationid>MD187705</stationid> <stationid>MD187705</stationid> <stationid>MD187705</stationid> <stationid>MD188656</stationid> <stationid>MD188656</stationid> <stationid>MD188656</stationid> <stationid>MD188725</stationid> <stationid>MD188725</stationid> <stationid>MD188725</stationid> <stationid>MD189035</stationid> <stationid>MD189035</stationid> <stationid>MD189035</stationid> <stationid>MD189070</stationid> <stationid>MD189070</stationid> <stationid>MD189070</stationid> <stationid>MD189187</stationid> <stationid>MD189187</stationid> <stationid>MD189187</stationid> " & _
+                      "<stationid>MD189195</stationid> <stationid>MD189195</stationid> <stationid>MD189195</stationid> <stationid>MD189290</stationid> <stationid>MD189290</stationid> <stationid>MD189290</stationid> <stationid>MD189290</stationid> <stationid>MD189314</stationid> <stationid>MD189314</stationid> <stationid>MD189314</stationid> <stationid>MD189502</stationid> <stationid>MD189502</stationid> <stationid>MD189502</stationid> <stationid>MD189750</stationid> <stationid>MD189750</stationid> <stationid>MD189750</stationid> <stationid>MD724040</stationid> <stationid>MD724040</stationid> <stationid>MD724040</stationid> <stationid>MD724040</stationid> <stationid>MD724040</stationid> <stationid>MD724040</stationid> <stationid>MD745940</stationid> <stationid>MD745940</stationid> <stationid>MD745940</stationid> <stationid>MD745940</stationid> <stationid>MD745940</stationid> <stationid>MD745940</stationid> <stationid>MD994400</stationid> <stationid>MD994400</stationid> <stationid>MD994400</stationid> <stationid>VA440090</stationid> " & _
+                      "<stationid>VA440090</stationid> <stationid>VA440090</stationid> <stationid>VA440097</stationid> <stationid>VA440097</stationid> <stationid>VA440097</stationid> <stationid>VA441729</stationid> <stationid>VA442195</stationid> <stationid>VA442195</stationid> <stationid>VA442195</stationid> <stationid>VA442809</stationid> <stationid>VA442809</stationid> <stationid>VA442809</stationid> <stationid>VA442922</stationid> <stationid>VA442922</stationid> <stationid>VA442922</stationid> <stationid>VA443635</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448938</stationid> <stationid>VA448938</stationid> <stationid>VA448938</stationid> "
+            Case Else
+                phuc8 = pProjectName
+                pProjection = "+proj=utm +zone=17 +ellps=GRS80 +lon_0=-75 +lat_0=0 +k=0.9996 +x_0=500000.0 +y_0=0 +datum=NAD83 +units=m"
+        End Select
+    End Sub
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         pMapWin = aMapWin
@@ -28,6 +62,7 @@ Module BasinsWorkshopBatch
         Logger.DisplayMessageBoxes = False
         Logger.Dbg("BasinsWorkshopBatch:OriginalDir:" & lOriginalFolder)
         Logger.Dbg("  AboutToChangeLog")
+        Initialize()
         Try
             If IO.Directory.Exists(pProjectFolder) Then
                 IO.Directory.Delete(pProjectFolder, True)
@@ -95,24 +130,18 @@ Module BasinsWorkshopBatch
     Private Function Exercise1(ByVal aBasinsProjectDataFolder As String, ByVal aDownloadManager As D4EMDataManager.DataManager, ByVal aCacheFolder As String) As Boolean
         'Adding Data to a New BASINS Project
         '  Build a New BASINS Project
-        '  TODO: open National Project and select Patuxent in code
+        '  TODO: open National Project and select pProject in code
 
         '  create project
-        Dim lProjection As String = "+proj=utm +zone=18 +ellps=GRS80 +lon_0=-75 +lat_0=0 +k=0.9996 +x_0=500000.0 +y_0=0 +datum=NAD83 +units=m"
-        SaveFileString(aBasinsProjectDataFolder & "prj.proj", lProjection) 'Side effect: makes data directory
+        SaveFileString(aBasinsProjectDataFolder & "prj.proj", pProjection) 'Side effect: makes data directory
         IO.Directory.SetCurrentDirectory(aBasinsProjectDataFolder)
         If Not IO.Directory.Exists("snapshots") Then IO.Directory.CreateDirectory("snapshots")
 
-        Dim lRegion As String = _
-           "<region>" & _
-           "   <northbc>1975392.91047589</northbc>" & _
-           "   <southbc>1866978.51560156</southbc>" & _
-           "   <eastbc>1684619.12695581</eastbc>" & _
-           "   <westbc>1595425.21946512</westbc>" & _
+        Dim lRegion As String = "<region>" & pBoundingBoxAea & _
            "   <projection>+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs</projection>" & _
            "   <HUC8 status=""set by BASINS System Application"">" & pHUC8 & "</HUC8>" & _
            "</region> "
-        CreateNewProjectAndDownloadCoreData(lRegion, DefaultBasinsDataDir, aBasinsProjectDataFolder, aBasinsProjectDataFolder & "Patuxent.mwprj", False, aCacheFolder)
+        CreateNewProjectAndDownloadCoreData(lRegion, DefaultBasinsDataDir, aBasinsProjectDataFolder, aBasinsProjectDataFolder & pProjectName & ".mwprj", False, aCacheFolder)
         SnapShotAndSave("E1_AfterDownloadCore")
 
         '  Navigate the BASINS 4.0 GIS Environment
@@ -125,12 +154,8 @@ Module BasinsWorkshopBatch
           "    <DataType>#DataType#</DataType>" & _
           "    <SaveIn>" & aBasinsProjectDataFolder & "</SaveIn>" & _
           "    <CacheFolder>" & aCacheFolder & "</CacheFolder>" & _
-          "    <DesiredProjection>+proj=utm +zone=18 +ellps=GRS80 +datum=NAD83 +units=m +no_defs</DesiredProjection>" & _
+          "    <DesiredProjection>" & pProjection & "</DesiredProjection>" & _
           "    <region>" & _
-          "       <northbc>39.3668056784273</northbc>" & _
-          "       <southbc>38.257273329737</southbc>" & _
-          "       <eastbc>-76.4009709099128</eastbc>" & _
-          "       <westbc>-77.2070255407762</westbc>" & _
           "       <HUC8>" & pHUC8 & "</HUC8>" & _
           "       <preferredformat>huc8</preferredformat>" & _
           "       <projection>+proj=latlong +datum=NAD83</projection>" & _
@@ -181,21 +206,23 @@ Module BasinsWorkshopBatch
             Logger.Msg(atcUtility.ReadableFromXML(lResultNHD), "NHDDownload Result")
         End If
 
-        '  Add BASINS census and TIGER line data
-        Dim lQueryCensus As String = lQuery.Replace("#DataType#", "Census").Replace("#Name#", "GetBASINS")
-        Dim lResultCensus As String = aDownloadManager.Execute(lQueryCensus)
-        If lResultCensus Is Nothing OrElse lResultCensus.Length = 0 Then
-            'Nothing to report, no success or error
-        ElseIf lResultCensus.StartsWith("<success>") Then
-            BASINS.ProcessDownloadResults(lResultCensus)
-            SnapShotAndSave("E1_AfterDownloadCensus")
-            For Each lLayer As MapWindow.Interfaces.Layer In pMapWin.Layers
-                If lLayer.Name.ToLower.Contains("tiger") Then
-                    lLayer.Visible = False
-                End If
-            Next
-        Else
-            Logger.Msg(atcUtility.ReadableFromXML(lResultNHD), "CensusDownload Result")
+        If pProjectName = "Patuxent" Then
+            '  Add BASINS census and TIGER line data
+            Dim lQueryCensus As String = lQuery.Replace("#DataType#", "Census").Replace("#Name#", "GetBASINS")
+            Dim lResultCensus As String = aDownloadManager.Execute(lQueryCensus)
+            If lResultCensus Is Nothing OrElse lResultCensus.Length = 0 Then
+                'Nothing to report, no success or error
+            ElseIf lResultCensus.StartsWith("<success>") Then
+                BASINS.ProcessDownloadResults(lResultCensus)
+                SnapShotAndSave("E1_AfterDownloadCensus")
+                For Each lLayer As MapWindow.Interfaces.Layer In pMapWin.Layers
+                    If lLayer.Name.ToLower.Contains("tiger") Then
+                        lLayer.Visible = False
+                    End If
+                Next
+            Else
+                Logger.Msg(atcUtility.ReadableFromXML(lResultNHD), "CensusDownload Result")
+            End If
         End If
 
         '  Add BASINS Digital Elevation Model (DEM) grids
@@ -219,24 +246,26 @@ Module BasinsWorkshopBatch
             End If
         Next
 
-        Dim lPreDefDelinDir As String = aBasinsProjectDataFolder & "tutorial\"
-        If Not IO.Directory.Exists(lPreDefDelinDir) Then
-            IO.Directory.CreateDirectory(lPreDefDelinDir)
+        If pProjectName = "Patuxent" Then
+            Dim lPreDefDelinDir As String = aBasinsProjectDataFolder & "tutorial\"
+            If Not IO.Directory.Exists(lPreDefDelinDir) Then
+                IO.Directory.CreateDirectory(lPreDefDelinDir)
+            End If
+            For Each lFileName As String In IO.Directory.GetFiles(aBasinsProjectDataFolder.Replace("WorkshopBatch\", "tutorial\"))
+                IO.File.Copy(lFileName, lPreDefDelinDir & IO.Path.GetFileName(lFileName))
+            Next
+            Dim lPreDefDelinFile As String = lPreDefDelinDir & "w_branch.shp"
+            If IO.File.Exists(lPreDefDelinFile) Then
+                Dim lLayerAdd As MapWindow.Interfaces.Layer = pMapWin.Layers.Add(lPreDefDelinFile, "w_branch", True, True)
+                With lLayerAdd
+                    .OutlineColor = Drawing.Color.Red
+                    .DrawFill = False
+                End With
+            Else
+                Logger.Dbg("FileNotFound:" & lPreDefDelinFile)
+            End If
+            SnapShotAndSave("E1_AfterDownloadPredifined")
         End If
-        For Each lFileName As String In IO.Directory.GetFiles(aBasinsProjectDataFolder.Replace("WorkshopBatch\", "tutorial\"))
-            IO.File.Copy(lFileName, lPreDefDelinDir & IO.Path.GetFileName(lFileName))
-        Next
-        Dim lPreDefDelinFile As String = lPreDefDelinDir & "w_branch.shp"
-        If IO.File.Exists(lPreDefDelinFile) Then
-            Dim lLayerAdd As MapWindow.Interfaces.Layer = pMapWin.Layers.Add(lPreDefDelinFile, "w_branch", True, True)
-            With lLayerAdd
-                .OutlineColor = Drawing.Color.Red
-                .DrawFill = False
-            End With
-        Else
-            Logger.Dbg("FileNotFound:" & lPreDefDelinFile)
-        End If
-        SnapShotAndSave("E1_AfterDownloadPredifined")
 
         '  Download timeseries data for use in modeling
         Dim lQueryMetStations As String = lQuery.Replace("#DataType#", "MetStations").Replace("#Name#", "GetBASINS")
@@ -254,14 +283,11 @@ Module BasinsWorkshopBatch
                                       "<SaveWDM>" & aBasinsProjectDataFolder & "met\met.wdm</SaveWDM>" & _
                                       "<SaveIn>" & aBasinsProjectDataFolder & "</SaveIn>" & _
                                       "<CacheFolder>" & aCacheFolder & "</CacheFolder>" & _
-                                      "<DesiredProjection>+proj=utm +zone=18 +ellps=GRS80 +datum=NAD83 +units=m +no_defs</DesiredProjection> <region> <northbc>39.3668056784273</northbc> <southbc>38.257273329737</southbc> <eastbc>-76.4009709099128</eastbc> <westbc>-77.2070255407762</westbc> <HUC8>" & pHUC8 & "</HUC8> <preferredformat>huc8</preferredformat> <projection>+proj=latlong +datum=NAD83</projection> </region> " & _
-                                      "<stationid>MD180193</stationid> <stationid>MD180193</stationid> <stationid>MD180193</stationid> <stationid>MD180460</stationid> <stationid>MD180460</stationid> <stationid>MD180460</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> <stationid>MD180465</stationid> " & _
-                                      "<stationid>MD180465</stationid> <stationid>MD180470</stationid> <stationid>MD180470</stationid> <stationid>MD180470</stationid> <stationid>MD180470</stationid> <stationid>MD180475</stationid> <stationid>MD180475</stationid> <stationid>MD180475</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180700</stationid> <stationid>MD180701</stationid> <stationid>MD180701</stationid> <stationid>MD180701</stationid> <stationid>MD180702</stationid> <stationid>MD180702</stationid> <stationid>MD180702</stationid> <stationid>MD180703</stationid> <stationid>MD180703</stationid> <stationid>MD180703</stationid> <stationid>MD180704</stationid> <stationid>MD180704</stationid> <stationid>MD180704</stationid> <stationid>MD180705</stationid> <stationid>MD180705</stationid> <stationid>MD180705</stationid> <stationid>MD180705</stationid> " & _
-                                      "<stationid>MD180706</stationid> <stationid>MD180706</stationid> <stationid>MD180706</stationid> <stationid>MD180795</stationid> <stationid>MD180800</stationid> <stationid>MD180800</stationid> <stationid>MD180800</stationid> <stationid>MD181125</stationid> <stationid>MD181135</stationid> <stationid>MD181135</stationid> <stationid>MD181170</stationid> <stationid>MD181278</stationid> <stationid>MD181685</stationid> <stationid>MD181685</stationid> <stationid>MD181685</stationid> <stationid>MD181710</stationid> <stationid>MD181710</stationid> <stationid>MD181710</stationid> <stationid>MD181862</stationid> <stationid>MD181862</stationid> <stationid>MD181862</stationid> <stationid>MD181995</stationid> <stationid>MD181995</stationid> <stationid>MD181995</stationid> <stationid>MD181995</stationid> <stationid>MD182325</stationid> <stationid>MD182325</stationid> <stationid>MD182325</stationid> <stationid>MD182585</stationid> <stationid>MD182585</stationid> <stationid>MD182585</stationid> <stationid>MD182660</stationid> " & _
-                                      "<stationid>MD182660</stationid> <stationid>MD182660</stationid> <stationid>MD183230</stationid> <stationid>MD183230</stationid> <stationid>MD183230</stationid> <stationid>MD183645</stationid> <stationid>MD183675</stationid> <stationid>MD183675</stationid> <stationid>MD183675</stationid> <stationid>MD183860</stationid> <stationid>MD183860</stationid> <stationid>MD183860</stationid> <stationid>MD185080</stationid> <stationid>MD185080</stationid> <stationid>MD185080</stationid> <stationid>MD185111</stationid> <stationid>MD185111</stationid> <stationid>MD185111</stationid> <stationid>MD185201</stationid> <stationid>MD185201</stationid> <stationid>MD185201</stationid> <stationid>MD185718</stationid> <stationid>MD185718</stationid> <stationid>MD185718</stationid> <stationid>MD185718</stationid> <stationid>MD185865</stationid> <stationid>MD185865</stationid> <stationid>MD185865</stationid> <stationid>MD185916</stationid> <stationid>MD185916</stationid> <stationid>MD185916</stationid> <stationid>MD186350</stationid> " & _
-                                      "<stationid>MD186350</stationid> <stationid>MD186350</stationid> <stationid>MD186770</stationid> <stationid>MD186770</stationid> <stationid>MD186770</stationid> <stationid>MD186915</stationid> <stationid>MD186915</stationid> <stationid>MD186915</stationid> <stationid>MD187325</stationid> <stationid>MD187325</stationid> <stationid>MD187325</stationid> <stationid>MD187615</stationid> <stationid>MD187615</stationid> <stationid>MD187615</stationid> <stationid>MD187705</stationid> <stationid>MD187705</stationid> <stationid>MD187705</stationid> <stationid>MD188656</stationid> <stationid>MD188656</stationid> <stationid>MD188656</stationid> <stationid>MD188725</stationid> <stationid>MD188725</stationid> <stationid>MD188725</stationid> <stationid>MD189035</stationid> <stationid>MD189035</stationid> <stationid>MD189035</stationid> <stationid>MD189070</stationid> <stationid>MD189070</stationid> <stationid>MD189070</stationid> <stationid>MD189187</stationid> <stationid>MD189187</stationid> <stationid>MD189187</stationid> " & _
-                                      "<stationid>MD189195</stationid> <stationid>MD189195</stationid> <stationid>MD189195</stationid> <stationid>MD189290</stationid> <stationid>MD189290</stationid> <stationid>MD189290</stationid> <stationid>MD189290</stationid> <stationid>MD189314</stationid> <stationid>MD189314</stationid> <stationid>MD189314</stationid> <stationid>MD189502</stationid> <stationid>MD189502</stationid> <stationid>MD189502</stationid> <stationid>MD189750</stationid> <stationid>MD189750</stationid> <stationid>MD189750</stationid> <stationid>MD724040</stationid> <stationid>MD724040</stationid> <stationid>MD724040</stationid> <stationid>MD724040</stationid> <stationid>MD724040</stationid> <stationid>MD724040</stationid> <stationid>MD745940</stationid> <stationid>MD745940</stationid> <stationid>MD745940</stationid> <stationid>MD745940</stationid> <stationid>MD745940</stationid> <stationid>MD745940</stationid> <stationid>MD994400</stationid> <stationid>MD994400</stationid> <stationid>MD994400</stationid> <stationid>VA440090</stationid> " & _
-                                      "<stationid>VA440090</stationid> <stationid>VA440090</stationid> <stationid>VA440097</stationid> <stationid>VA440097</stationid> <stationid>VA440097</stationid> <stationid>VA441729</stationid> <stationid>VA442195</stationid> <stationid>VA442195</stationid> <stationid>VA442195</stationid> <stationid>VA442809</stationid> <stationid>VA442809</stationid> <stationid>VA442809</stationid> <stationid>VA442922</stationid> <stationid>VA442922</stationid> <stationid>VA442922</stationid> <stationid>VA443635</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448938</stationid> <stationid>VA448938</stationid> <stationid>VA448938</stationid> <clip>False</clip> <merge>False</merge> <joinattributes>true</joinattributes> </arguments> </function>  "
+                                      "<DesiredProjection>" & pProjection & "</DesiredProjection> " & _
+                                      "<region> " & _
+                                      "<HUC8>" & pHUC8 & "</HUC8> <preferredformat>huc8</preferredformat> <projection>+proj=latlong +datum=NAD83</projection> </region> " & _
+                                      pMetStationIds & _
+                                      "<clip>False</clip> <merge>False</merge> <joinattributes>true</joinattributes> </arguments> </function>  "
         Dim lResultMetData As String = aDownloadManager.Execute(lQueryMetData)
         If lResultMetData Is Nothing OrElse lResultMetData.Length = 0 Then
             'Nothing to report, no success or error
@@ -315,8 +341,12 @@ Module BasinsWorkshopBatch
         pMapWin.Layers(pMapWin.Layers.CurrentLayer).ZoomTo()
         SnapShotAndSave("E2_AfterZoomTo")
 
-        ManDelinPlugIn.CalculateSubbasinParameters("W_Branch", "Digital Elevation Model")
-        ManDelinPlugIn.CalculateReaches("W_Branch", "Reach File, V1", "Digital Elevation Model", False, False, "")
+        Dim lSubBasinThemeName As String = "Cataloging Unit Boundaries"
+        If pProjectName = "Patuxent" Then
+            lSubBasinThemeName = "W_Branch"
+        End If
+        ManDelinPlugIn.CalculateSubbasinParameters(lSubBasinThemeName, "Digital Elevation Model")
+        ManDelinPlugIn.CalculateReaches(lSubBasinThemeName, "Reach File, V1", "Digital Elevation Model", False, False, "")
 
         'TODO: Do some more stuff here
 
@@ -328,7 +358,8 @@ Module BasinsWorkshopBatch
               "<SaveIn>" & aBasinsProjectDataFolder & "</SaveIn>" & _
               "<CacheFolder>" & aCacheFolder & "</CacheFolder>" & _
               "<DesiredProjection>+proj=utm +zone=18 +ellps=GRS80 +datum=NAD83 +units=m +no_defs</DesiredProjection>" & _
-              "<region> <northbc>39.3668056784273</northbc> <southbc>38.257273329737</southbc> <eastbc>-76.4009709099128</eastbc> <westbc>-77.2070255407762</westbc> <HUC8>02060006</HUC8> <preferredformat>huc8</preferredformat> <projection>+proj=latlong +datum=NAD83</projection> </region>" & _
+              "<region> " & _
+              "<HUC8>02060006</HUC8> <preferredformat>huc8</preferredformat> <projection>+proj=latlong +datum=NAD83</projection> </region>" & _
               "<clip>False</clip>" & _
               "<merge>False</merge>" & _
               "<joinattributes>true</joinattributes>"
