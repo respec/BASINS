@@ -17,7 +17,7 @@ Module BasinsWorkshopBatch
 
     Private pProjectName As String
     Private pHUC8 As String = ""
-    Private pDrive As String = "C:"
+    Private pDrive As String = "d:"
     Private pBaseFolder As String = pDrive & "\BASINS\"
     Private pProjectFolder As String = ""
     Private pCacheFolder As String = ""
@@ -271,12 +271,13 @@ Module BasinsWorkshopBatch
             If Not IO.Directory.Exists(lPreDefDelinDir) Then
                 IO.Directory.CreateDirectory(lPreDefDelinDir)
             End If
-            For Each lFileName As String In IO.Directory.GetFiles(aBasinsProjectDataFolder.Replace("WorkshopBatch\Patuxent\", "tutorial\"))
+            Dim lPreDefDelinName As String = "w_branch"
+            For Each lFileName As String In IO.Directory.GetFiles(aBasinsProjectDataFolder.Replace("WorkshopBatch\Patuxent\", "tutorial\"), lPreDefDelinName)
                 IO.File.Copy(lFileName, lPreDefDelinDir & IO.Path.GetFileName(lFileName))
             Next
-            Dim lPreDefDelinFile As String = lPreDefDelinDir & "w_branch.shp"
+            Dim lPreDefDelinFile As String = lPreDefDelinDir & lPreDefDelinName & ".shp"
             If IO.File.Exists(lPreDefDelinFile) Then
-                Dim lLayerAdd As MapWindow.Interfaces.Layer = pMapWin.Layers.Add(lPreDefDelinFile, "w_branch", True, True)
+                Dim lLayerAdd As MapWindow.Interfaces.Layer = pMapWin.Layers.Add(lPreDefDelinFile, lPreDefDelinName, True, True)
                 With lLayerAdd
                     .OutlineColor = Drawing.Color.Red
                     .DrawFill = False
