@@ -47,6 +47,8 @@ Public Class atcBasinsPlugIn
     End Property
 #End Region
 
+    Private pStatusMonitor As clsLoggerStatusMonitor
+
     <CLSCompliant(False)> _
     Public ReadOnly Property MapWin() As MapWindow.Interfaces.IMapWin
         Get
@@ -93,6 +95,9 @@ Public Class atcBasinsPlugIn
         Logger.StartToFile(g_ProgramDir & "cache\log" & g_PathChar _
                          & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & g_AppNameShort & ".log")
         Logger.Icon = g_MapWin.ApplicationInfo.FormIcon
+        pStatusMonitor = New clsLoggerStatusMonitor
+        pStatusMonitor.InnerProgressStatus = Logger.ProgressStatus
+        Logger.ProgressStatus = pStatusMonitor
 
         'Logger.MsgCustom("Test Message", "Test Title", "Button One", "2")
         'For i As Integer = 1 To 10
@@ -218,7 +223,9 @@ Public Class atcBasinsPlugIn
         g_MapWin.ClearCustomWindowTitle()
 
         CloseForms()
-        'StopMonitor()
+
+        Logger.ProgressStatus = pStatusMonitor.InnerProgressStatus
+
         SaveSetting(g_AppNameRegistry, "DataManager", "SelectionAttributes", String.Join(vbTab, atcDataManager.SelectionAttributes.ToArray("".GetType)))
         SaveSetting(g_AppNameRegistry, "DataManager", "DisplayAttributes", String.Join(vbTab, atcDataManager.DisplayAttributes.ToArray("".GetType)))
     End Sub
