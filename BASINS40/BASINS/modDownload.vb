@@ -1455,47 +1455,47 @@ StartOver:
     End Function
 
     Private Sub AddLayerToGroup(ByVal aLay As MapWindow.Interfaces.Layer, ByVal aGroupName As String)
-        Dim GroupHandle As Object
-        Dim iExistingGroup As Integer = 0
-
-        While iExistingGroup < g_MapWin.Layers.Groups.Count AndAlso _
-              g_MapWin.Layers.Groups.ItemByPosition(iExistingGroup).Text <> aGroupName
-            iExistingGroup += 1
+        Dim lExistingGroupIndex As Integer = 0
+        While lExistingGroupIndex < g_MapWin.Layers.Groups.Count AndAlso _
+              g_MapWin.Layers.Groups.ItemByPosition(lExistingGroupIndex).Text <> aGroupName
+            lExistingGroupIndex += 1
         End While
 
-        If iExistingGroup < g_MapWin.Layers.Groups.Count Then
-            GroupHandle = g_MapWin.Layers.Groups.ItemByPosition(iExistingGroup).Handle
+        Dim lGroupHandle As Integer
+        If lExistingGroupIndex < g_MapWin.Layers.Groups.Count Then
+            lGroupHandle = g_MapWin.Layers.Groups.ItemByPosition(lExistingGroupIndex).Handle
         Else
             'TODO: read group order from a file rather than hard-coded array
-            Dim GroupOrder() As String = {"Data Layers", _
-                                          "Hydrology", _
-                                          "Observed Data Stations", _
-                                          "Point Sources & Withdrawals", _
-                                          "Political", _
-                                          "Census", _
-                                          "Transportation", _
-                                          "Soil, Land Use/Cover", _
-                                          "Other"}
-            Dim iNewGroup As Integer = Array.IndexOf(GroupOrder, aGroupName)
-            iExistingGroup = g_MapWin.Layers.Groups.Count
-            If iNewGroup > 0 Then
-                While iExistingGroup > 0 AndAlso _
-                      Array.IndexOf(GroupOrder, _
-                                    g_MapWin.Layers.Groups.ItemByPosition(iExistingGroup - 1).Text) < iNewGroup
-                    iExistingGroup -= 1
+            Dim lGroupOrder() As String = {"Data Layers", _
+                                           "Observed Data Stations", _
+                                           "Point Sources & Withdrawals", _
+                                           "Hydrology", _
+                                           "Political", _
+                                           "Census", _
+                                           "Transportation", _
+                                           "Soil, Land Use/Cover", _
+                                           "Elevation", _
+                                           "Other"}
+            Dim lNewGroupIndex As Integer = Array.IndexOf(lGroupOrder, aGroupName)
+            lExistingGroupIndex = g_MapWin.Layers.Groups.Count
+            If lNewGroupIndex > 0 Then
+                While lExistingGroupIndex > 0 AndAlso _
+                      Array.IndexOf(lGroupOrder, _
+                                    g_MapWin.Layers.Groups.ItemByPosition(lExistingGroupIndex - 1).Text) < lNewGroupIndex
+                    lExistingGroupIndex -= 1
                 End While
             End If
-            GroupHandle = g_MapWin.Layers.Groups.Add(aGroupName, iExistingGroup)
+            lGroupHandle = g_MapWin.Layers.Groups.Add(aGroupName, lExistingGroupIndex)
         End If
 
         Select Case aLay.LayerType
             Case MapWindow.Interfaces.eLayerType.Grid, MapWindow.Interfaces.eLayerType.Image, MapWindow.Interfaces.eLayerType.PolygonShapefile
-                aLay.MoveTo(0, GroupHandle) 'move grid/image/polygon to bottom of group
+                aLay.MoveTo(0, lGroupHandle) 'move grid/image/polygon to bottom of group
             Case MapWindow.Interfaces.eLayerType.LineShapefile, MapWindow.Interfaces.eLayerType.PointShapefile
-                aLay.MoveTo(99, GroupHandle) 'move line/point layer to top of group
+                aLay.MoveTo(99, lGroupHandle) 'move line/point layer to top of group
             Case Else
                 Logger.Dbg("AddLayerToGroup: Unexpected layer type: " & aLay.LayerType & " for layer " & aLay.Name)
-                aLay.MoveTo(0, GroupHandle)
+                aLay.MoveTo(0, lGroupHandle)
         End Select
     End Sub
 

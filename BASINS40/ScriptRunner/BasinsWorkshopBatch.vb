@@ -12,17 +12,16 @@ Imports D4EMDataManager
 
 Module BasinsWorkshopBatch
     Private pMapWin As IMapWin
-    'Private pProjectNames() As String = {"06010105"}
-    Private pProjectNames() As String = {"Patuxent", "06010105"}
+    Private pProjectNames() As String = {"06010105", "Patuxent"}
 
     Private pProjectName As String
     Private pHUC8 As String = ""
-    Private pDrive As String = "d:"
+    Private pDrive As String = "c:"
     Private pBaseFolder As String = pDrive & "\BASINS\"
     Private pProjectFolder As String = ""
     Private pCacheFolder As String = ""
     Private pCacheFolderSave As String = ""
-    Private pCacheClear As Boolean = True ' False
+    Private pCacheClear As Boolean = False
     Private pBoundingBoxAea As String = ""
     Private pBoundingBoxLL As String = ""
     Private pMetStationIds As String = ""
@@ -246,6 +245,7 @@ Module BasinsWorkshopBatch
         End If
 
         '  Add BASINS Digital Elevation Model (DEM) grids
+        pMapWin.Layers.CurrentLayer = pMapWin.Layers.NumLayers - 1
         Dim lQueryDEMG As String = lQuery.Replace("#DataType#", "DEMG").Replace("#Name#", "GetBASINS")
         Dim lResultDEMG As String = aDownloadManager.Execute(lQueryDEMG)
         If lResultDEMG Is Nothing OrElse lResultDEMG.Length = 0 Then
@@ -315,8 +315,9 @@ Module BasinsWorkshopBatch
                     Exit For
                 End If
             Next
+            pMetStationIds = ""
             For lShapeIndex As Integer = 0 To lStationShapefile.NumShapes - 1
-                pDischargeStationIds &= "<stationid>" & lStationShapefile.CellValue(lFieldIndex, lShapeIndex) & "</stationid>"
+                pMetStationIds &= "<stationid>" & lStationShapefile.CellValue(lFieldIndex, lShapeIndex) & "</stationid>"
                 If lShapeIndex > pMaxStations Then Exit For
             Next
         End If
