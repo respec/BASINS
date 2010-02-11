@@ -12,21 +12,29 @@ Imports D4EMDataManager
 
 Module BasinsWorkshopBatch
     Private pMapWin As IMapWin
-    Private pProjectName As String = "06010105" '"Patuxent"
+    'Private pProjectNames() As String = {"06010105"}
+    Private pProjectNames() As String = {"Patuxent", "06010105"}
+
+    Private pProjectName As String
     Private pHUC8 As String = ""
     Private pDrive As String = "C:"
     Private pBaseFolder As String = pDrive & "\BASINS\"
-    Private pProjectFolder As String = pBaseFolder & "Data\WorkshopBatch\"
-    Private pCacheFolder As String = pProjectFolder & "Cache\"
-    Private pCacheFolderSave As String = pCacheFolder.Replace("Batch", "BatchSave")
+    Private pProjectFolder As String = ""
+    Private pCacheFolder As String = ""
+    Private pCacheFolderSave As String = ""
     Private pCacheClear As Boolean = True ' False
     Private pBoundingBoxAea As String = ""
     Private pBoundingBoxLL As String = ""
     Private pMetStationIds As String = ""
     Private pProjection As String = ""
 
-    Private Sub Initialize()
-        Select Case pProjectName
+    Private Sub Initialize(ByVal aProjectName As String)
+        pProjectName = aProjectName
+        pProjectFolder = pBaseFolder & "Data\WorkshopBatch\" & pProjectName & "\"
+        pCacheFolder = pProjectFolder & "Cache\"
+        pCacheFolderSave = pCacheFolder.Replace("Batch", "BatchSave")
+
+        Select Case aProjectName
             Case "Patuxent"
                 pHUC8 = "02060006"
                 pProjection = "+proj=utm +zone=18 +ellps=GRS80 +lon_0=-75 +lat_0=0 +k=0.9996 +x_0=500000.0 +y_0=0 +datum=NAD83 +units=m"
@@ -49,7 +57,7 @@ Module BasinsWorkshopBatch
                       "<stationid>MD189195</stationid> <stationid>MD189195</stationid> <stationid>MD189195</stationid> <stationid>MD189290</stationid> <stationid>MD189290</stationid> <stationid>MD189290</stationid> <stationid>MD189290</stationid> <stationid>MD189314</stationid> <stationid>MD189314</stationid> <stationid>MD189314</stationid> <stationid>MD189502</stationid> <stationid>MD189502</stationid> <stationid>MD189502</stationid> <stationid>MD189750</stationid> <stationid>MD189750</stationid> <stationid>MD189750</stationid> <stationid>MD724040</stationid> <stationid>MD724040</stationid> <stationid>MD724040</stationid> <stationid>MD724040</stationid> <stationid>MD724040</stationid> <stationid>MD724040</stationid> <stationid>MD745940</stationid> <stationid>MD745940</stationid> <stationid>MD745940</stationid> <stationid>MD745940</stationid> <stationid>MD745940</stationid> <stationid>MD745940</stationid> <stationid>MD994400</stationid> <stationid>MD994400</stationid> <stationid>MD994400</stationid> <stationid>VA440090</stationid> " & _
                       "<stationid>VA440090</stationid> <stationid>VA440090</stationid> <stationid>VA440097</stationid> <stationid>VA440097</stationid> <stationid>VA440097</stationid> <stationid>VA441729</stationid> <stationid>VA442195</stationid> <stationid>VA442195</stationid> <stationid>VA442195</stationid> <stationid>VA442809</stationid> <stationid>VA442809</stationid> <stationid>VA442809</stationid> <stationid>VA442922</stationid> <stationid>VA442922</stationid> <stationid>VA442922</stationid> <stationid>VA443635</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448938</stationid> <stationid>VA448938</stationid> <stationid>VA448938</stationid> "
             Case Else
-                phuc8 = pProjectName
+                pHUC8 = aProjectName
                 pProjection = "+proj=utm +zone=17 +ellps=GRS80 +lon_0=-75 +lat_0=0 +k=0.9996 +x_0=500000.0 +y_0=0 +datum=NAD83 +units=m"
         End Select
     End Sub
@@ -62,64 +70,68 @@ Module BasinsWorkshopBatch
         Logger.DisplayMessageBoxes = False
         Logger.Dbg("BasinsWorkshopBatch:OriginalDir:" & lOriginalFolder)
         Logger.Dbg("  AboutToChangeLog")
-        Initialize()
-        Try
-            If IO.Directory.Exists(pProjectFolder) Then
-                IO.Directory.Delete(pProjectFolder, True)
-                Logger.Dbg("ExistingProjectFolderDeleted:" & pProjectFolder)
-            End If
-            If Not IO.Directory.Exists(pCacheFolder) Then
-                IO.Directory.CreateDirectory(pCacheFolder)
-                Logger.Dbg("CacheFolderCreated:" & pCacheFolder)
-            End If
-            Logger.StartToFile(pCacheFolder & "BasinsWorkshopBatch.log", , , True)
+        For Each lProject As String In pProjectNames
+            Initialize(lProject)
+            Try
+                If IO.Directory.Exists(pProjectFolder) Then
+                    IO.Directory.Delete(pProjectFolder, True)
+                    Logger.Dbg("ExistingProjectFolderDeleted:" & pProjectFolder)
+                End If
+                If Not IO.Directory.Exists(pCacheFolder) Then
+                    IO.Directory.CreateDirectory(pCacheFolder)
+                    Logger.Dbg("CacheFolderCreated:" & pCacheFolder)
+                End If
+                Logger.StartToFile(pCacheFolder & "BasinsWorkshopBatch.log", , , True)
 
-            If Not pCacheClear AndAlso IO.Directory.Exists(pCacheFolderSave) Then
-                'copy existing cache
-                pMapWin.StatusBar.Item(1).Text = "Copy Existing Cache"
-                Logger.Dbg("UsingExistingCacheFrom:" & pCacheFolderSave)
-                Dim lFileCopyCount As Integer = 0
-                For Each lFile As String In IO.Directory.GetFiles(pCacheFolderSave, "*", IO.SearchOption.AllDirectories)
-                    Dim lNewFolder As String = IO.Path.GetDirectoryName(lFile).Replace(pCacheFolderSave.Trim("\"), pCacheFolder.Trim("\") & "\")
-                    If Not IO.Directory.Exists(lNewFolder) Then
-                        IO.Directory.CreateDirectory(lNewFolder)
-                    End If
-                    Dim lFileNew As String = lNewFolder & IO.Path.GetFileName(lFile)
-                    If IO.File.Exists(lFileNew) Then
-                        Logger.Dbg("UsingExisting " & lFileNew)
-                    Else
-                        IO.File.Copy(lFile, lNewFolder & IO.Path.GetFileName(lFile))
-                        lFileCopyCount += 1
-                    End If
+                If Not pCacheClear AndAlso IO.Directory.Exists(pCacheFolderSave) Then
+                    'copy existing cache
+                    pMapWin.StatusBar.Item(1).Text = "Copy Existing Cache"
+                    Logger.Dbg("UsingExistingCacheFrom:" & pCacheFolderSave)
+                    Dim lFileCopyCount As Integer = 0
+                    For Each lFile As String In IO.Directory.GetFiles(pCacheFolderSave, "*", IO.SearchOption.AllDirectories)
+                        Dim lNewFolder As String = IO.Path.GetDirectoryName(lFile).Replace(pCacheFolderSave.Trim("\"), pCacheFolder.Trim("\") & "\")
+                        If Not IO.Directory.Exists(lNewFolder) Then
+                            IO.Directory.CreateDirectory(lNewFolder)
+                        End If
+                        Dim lFileNew As String = lNewFolder & IO.Path.GetFileName(lFile)
+                        If IO.File.Exists(lFileNew) Then
+                            Logger.Dbg("UsingExisting " & lFileNew)
+                        Else
+                            IO.File.Copy(lFile, lNewFolder & IO.Path.GetFileName(lFile))
+                            lFileCopyCount += 1
+                        End If
+                    Next
+                    Logger.Dbg("UseExistingCache:FileCount:" & lFileCopyCount)
+                End If
+
+                Dim lPlugins As New ArrayList
+                For lPluginIndex As Integer = 0 To pMapWin.Plugins.Count
+                    Try
+                        If Not pMapWin.Plugins.Item(lPluginIndex) Is Nothing Then
+                            lPlugins.Add(pMapWin.Plugins.Item(lPluginIndex))
+                        End If
+                    Catch lEx As Exception
+                        Logger.Dbg(lPluginIndex.ToString & " Problem:" & lEx.ToString)
+                    End Try
                 Next
-                Logger.Dbg("UseExistingCache:FileCount:" & lFileCopyCount)
-            End If
+                Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
 
-            Dim lPlugins As New ArrayList
-            For lPluginIndex As Integer = 0 To pMapWin.Plugins.Count
-                Try
-                    If Not pMapWin.Plugins.Item(lPluginIndex) Is Nothing Then
-                        lPlugins.Add(pMapWin.Plugins.Item(lPluginIndex))
-                    End If
-                Catch lEx As Exception
-                    Logger.Dbg(lPluginIndex.ToString & " Problem:" & lEx.ToString)
-                End Try
-            Next
-            Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
-
-            If Not Exercise1(pProjectFolder, lDownloadManager, pCacheFolder) Then
-                Logger.Dbg("***** Exercise1 FAIL *****")
-            ElseIf Not Exercise2() Then
-                Logger.Dbg("***** Exercise2 FAIL *****")
-            ElseIf Not Exercise4(pProjectFolder, lDownloadManager, pCacheFolder) Then
-                Logger.Dbg("***** Exercise4 FAIL *****")
-            ElseIf Not Exercise6(pProjectFolder) Then
-                Logger.Dbg("***** Exercise6 FAIL *****")
-            End If
-        Catch lEx As Exception
-            Logger.Dbg("Problem " & lEx.ToString)
-        End Try
-        SnapShotAndSave("AllDone")
+                If Not Exercise1(pProjectFolder, lDownloadManager, pCacheFolder) Then
+                    Logger.Dbg("***** Exercise1 FAIL *****")
+                ElseIf Not Exercise2() Then
+                    Logger.Dbg("***** Exercise2 FAIL *****")
+                ElseIf Not Exercise4(pProjectFolder, lDownloadManager, pCacheFolder) Then
+                    Logger.Dbg("***** Exercise4 FAIL *****")
+                ElseIf Not Exercise6(pProjectFolder) Then
+                    Logger.Dbg("***** Exercise6 FAIL *****")
+                End If
+                SnapShotAndSave("AllDone " & lProject)
+            Catch lEx As Exception
+                Logger.Dbg("ProblemProject " & lProject & " " & lEx.ToString)
+            End Try
+            pMapWin.Layers.Clear()
+            pMapWin.PreviewMap.GetPictureFromMap()
+        Next
         IO.Directory.SetCurrentDirectory(lOriginalFolder)
         Logger.Dbg("BasinsWorkshopBatchDone")
         Logger.StartToFile(lOriginalLog, True, , True)
@@ -251,7 +263,7 @@ Module BasinsWorkshopBatch
             If Not IO.Directory.Exists(lPreDefDelinDir) Then
                 IO.Directory.CreateDirectory(lPreDefDelinDir)
             End If
-            For Each lFileName As String In IO.Directory.GetFiles(aBasinsProjectDataFolder.Replace("WorkshopBatch\", "tutorial\"))
+            For Each lFileName As String In IO.Directory.GetFiles(aBasinsProjectDataFolder.Replace("WorkshopBatch\Patuxent\", "tutorial\"))
                 IO.File.Copy(lFileName, lPreDefDelinDir & IO.Path.GetFileName(lFileName))
             Next
             Dim lPreDefDelinFile As String = lPreDefDelinDir & "w_branch.shp"
@@ -345,11 +357,14 @@ Module BasinsWorkshopBatch
         If pProjectName = "Patuxent" Then
             lSubBasinThemeName = "W_Branch"
         End If
-        ManDelinPlugIn.CalculateSubbasinParameters(lSubBasinThemeName, "Digital Elevation Model")
-        ManDelinPlugIn.CalculateReaches(lSubBasinThemeName, "Reach File, V1", "Digital Elevation Model", False, False, "")
 
-        'TODO: Do some more stuff here
-
+        If My.Computer.Info.OSFullName.Contains("x64") Then
+            Logger.Dbg("SkippingManDelinOn64Bit")
+        Else
+            ManDelinPlugIn.CalculateSubbasinParameters(lSubBasinThemeName, "Digital Elevation Model")
+            ManDelinPlugIn.CalculateReaches(lSubBasinThemeName, "Reach File, V1", "Digital Elevation Model", False, False, "")
+            'TODO: Do some more stuff here
+        End If
         Return True
     End Function
 
@@ -378,7 +393,7 @@ Module BasinsWorkshopBatch
         Dim lQueryDischargeData As String = _
           "<function name='GetNWISDischarge'>" & _
             "<arguments>" & _
-              "<SaveWDM>C:\BASINS\Data\WorkshopBatch\nwis\flow.wdm</SaveWDM>" & _
+              "<SaveWDM>" & aBasinsProjectDataFolder & "nwis\flow.wdm</SaveWDM>" & _
               "<stationid>01594526</stationid>" & _
               lBaseQuery & _
             "</arguments>" & _
