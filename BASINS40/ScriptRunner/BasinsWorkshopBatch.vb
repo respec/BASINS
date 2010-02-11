@@ -26,7 +26,9 @@ Module BasinsWorkshopBatch
     Private pBoundingBoxAea As String = ""
     Private pBoundingBoxLL As String = ""
     Private pMetStationIds As String = ""
+    Private pDischargeStationIds As String = ""
     Private pProjection As String = ""
+    Private pMaxStations As Integer = 20
 
     Private Sub Initialize(ByVal aProjectName As String)
         pProjectName = aProjectName
@@ -56,9 +58,14 @@ Module BasinsWorkshopBatch
                       "<stationid>MD186350</stationid> <stationid>MD186350</stationid> <stationid>MD186770</stationid> <stationid>MD186770</stationid> <stationid>MD186770</stationid> <stationid>MD186915</stationid> <stationid>MD186915</stationid> <stationid>MD186915</stationid> <stationid>MD187325</stationid> <stationid>MD187325</stationid> <stationid>MD187325</stationid> <stationid>MD187615</stationid> <stationid>MD187615</stationid> <stationid>MD187615</stationid> <stationid>MD187705</stationid> <stationid>MD187705</stationid> <stationid>MD187705</stationid> <stationid>MD188656</stationid> <stationid>MD188656</stationid> <stationid>MD188656</stationid> <stationid>MD188725</stationid> <stationid>MD188725</stationid> <stationid>MD188725</stationid> <stationid>MD189035</stationid> <stationid>MD189035</stationid> <stationid>MD189035</stationid> <stationid>MD189070</stationid> <stationid>MD189070</stationid> <stationid>MD189070</stationid> <stationid>MD189187</stationid> <stationid>MD189187</stationid> <stationid>MD189187</stationid> " & _
                       "<stationid>MD189195</stationid> <stationid>MD189195</stationid> <stationid>MD189195</stationid> <stationid>MD189290</stationid> <stationid>MD189290</stationid> <stationid>MD189290</stationid> <stationid>MD189290</stationid> <stationid>MD189314</stationid> <stationid>MD189314</stationid> <stationid>MD189314</stationid> <stationid>MD189502</stationid> <stationid>MD189502</stationid> <stationid>MD189502</stationid> <stationid>MD189750</stationid> <stationid>MD189750</stationid> <stationid>MD189750</stationid> <stationid>MD724040</stationid> <stationid>MD724040</stationid> <stationid>MD724040</stationid> <stationid>MD724040</stationid> <stationid>MD724040</stationid> <stationid>MD724040</stationid> <stationid>MD745940</stationid> <stationid>MD745940</stationid> <stationid>MD745940</stationid> <stationid>MD745940</stationid> <stationid>MD745940</stationid> <stationid>MD745940</stationid> <stationid>MD994400</stationid> <stationid>MD994400</stationid> <stationid>MD994400</stationid> <stationid>VA440090</stationid> " & _
                       "<stationid>VA440090</stationid> <stationid>VA440090</stationid> <stationid>VA440097</stationid> <stationid>VA440097</stationid> <stationid>VA440097</stationid> <stationid>VA441729</stationid> <stationid>VA442195</stationid> <stationid>VA442195</stationid> <stationid>VA442195</stationid> <stationid>VA442809</stationid> <stationid>VA442809</stationid> <stationid>VA442809</stationid> <stationid>VA442922</stationid> <stationid>VA442922</stationid> <stationid>VA442922</stationid> <stationid>VA443635</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448906</stationid> <stationid>VA448938</stationid> <stationid>VA448938</stationid> <stationid>VA448938</stationid> "
+                pDischargeStationIds = "<stationid>01594526</stationid>"
             Case Else
                 pHUC8 = aProjectName
                 pProjection = "+proj=utm +zone=17 +ellps=GRS80 +lon_0=-75 +lat_0=0 +k=0.9996 +x_0=500000.0 +y_0=0 +datum=NAD83 +units=m"
+                pBoundingBoxAea = ""
+                pBoundingBoxLL = ""
+                pMetStationIds = ""
+                pDischargeStationIds = ""
         End Select
     End Sub
 
@@ -69,9 +76,22 @@ Module BasinsWorkshopBatch
         Dim lOriginalDisplayMessages As Boolean = Logger.DisplayMessageBoxes
         Logger.DisplayMessageBoxes = False
         Logger.Dbg("BasinsWorkshopBatch:OriginalDir:" & lOriginalFolder)
-        Logger.Dbg("  AboutToChangeLog")
+
+        Dim lPlugins As New ArrayList
+        For lPluginIndex As Integer = 0 To pMapWin.Plugins.Count
+            Try
+                If Not pMapWin.Plugins.Item(lPluginIndex) Is Nothing Then
+                    lPlugins.Add(pMapWin.Plugins.Item(lPluginIndex))
+                End If
+            Catch lEx As Exception
+                Logger.Dbg(lPluginIndex.ToString & " Problem:" & lEx.ToString)
+            End Try
+        Next
+        Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
+
         For Each lProject As String In pProjectNames
             Initialize(lProject)
+            Logger.Dbg("  AboutToChangeLog NewProject " & lProject)
             Try
                 If IO.Directory.Exists(pProjectFolder) Then
                     IO.Directory.Delete(pProjectFolder, True)
@@ -103,18 +123,6 @@ Module BasinsWorkshopBatch
                     Next
                     Logger.Dbg("UseExistingCache:FileCount:" & lFileCopyCount)
                 End If
-
-                Dim lPlugins As New ArrayList
-                For lPluginIndex As Integer = 0 To pMapWin.Plugins.Count
-                    Try
-                        If Not pMapWin.Plugins.Item(lPluginIndex) Is Nothing Then
-                            lPlugins.Add(pMapWin.Plugins.Item(lPluginIndex))
-                        End If
-                    Catch lEx As Exception
-                        Logger.Dbg(lPluginIndex.ToString & " Problem:" & lEx.ToString)
-                    End Try
-                Next
-                Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
 
                 If Not Exercise1(pProjectFolder, lDownloadManager, pCacheFolder) Then
                     Logger.Dbg("***** Exercise1 FAIL *****")
@@ -291,6 +299,27 @@ Module BasinsWorkshopBatch
         End If
         Logger.Dbg("ProjectSaved:" & pMapWin.Project.Save(pMapWin.Project.FileName))
 
+        If pMetStationIds.Length = 0 Then
+            Dim lLayer As MapWindow.Interfaces.Layer = Nothing
+            For Each lLayer In pMapWin.Layers
+                If lLayer.Name.Contains("Weather Station Sites 2006") Then
+                    pMapWin.Layers.CurrentLayer = lLayer.Handle
+                    Exit For
+                End If
+            Next
+            Dim lStationShapefile As MapWinGIS.Shapefile = lLayer.GetObject
+            Dim lFieldIndex As Integer = 0
+            For lFieldIndex = 0 To lStationShapefile.NumFields - 1
+                If lStationShapefile.Field(lFieldIndex).Name = "LOCATION" Then
+                    Exit For
+                End If
+            Next
+            For lShapeIndex As Integer = 0 To lStationShapefile.NumShapes - 1
+                pDischargeStationIds &= "<stationid>" & lStationShapefile.CellValue(lFieldIndex, lShapeIndex) & "</stationid>"
+                If lShapeIndex > pMaxStations Then Exit For
+            Next
+        End If
+
         Dim lQueryMetData As String = "<function name='GetBASINS'> <arguments> <DataType>MetData</DataType>" & _
                                       "<SaveWDM>" & aBasinsProjectDataFolder & "met\met.wdm</SaveWDM>" & _
                                       "<SaveIn>" & aBasinsProjectDataFolder & "</SaveIn>" & _
@@ -372,9 +401,11 @@ Module BasinsWorkshopBatch
         Dim lBaseQuery As String = _
               "<SaveIn>" & aBasinsProjectDataFolder & "</SaveIn>" & _
               "<CacheFolder>" & aCacheFolder & "</CacheFolder>" & _
-              "<DesiredProjection>+proj=utm +zone=18 +ellps=GRS80 +datum=NAD83 +units=m +no_defs</DesiredProjection>" & _
+              "<DesiredProjection>" & pProjection & "</DesiredProjection>" & _
               "<region> " & _
-              "<HUC8>02060006</HUC8> <preferredformat>huc8</preferredformat> <projection>+proj=latlong +datum=NAD83</projection> </region>" & _
+              pBoundingBoxLL & _
+              "<HUC8>" & pHUC8 & "</HUC8> " & _
+              "<preferredformat>huc8</preferredformat> <projection>+proj=latlong +datum=NAD83</projection> </region>" & _
               "<clip>False</clip>" & _
               "<merge>False</merge>" & _
               "<joinattributes>true</joinattributes>"
@@ -390,11 +421,32 @@ Module BasinsWorkshopBatch
         BASINS.ProcessDownloadResults(lResultDischargeStations)
         SnapShotAndSave("E4_AfterDischargeStations")
 
+        If pDischargeStationIds.Length = 0 Then
+            Dim lLayer As MapWindow.Interfaces.Layer = Nothing
+            For Each lLayer In pMapWin.Layers
+                If lLayer.Name.Contains("NWIS Daily Discharge Stations") Then
+                    pMapWin.Layers.CurrentLayer = lLayer.Handle
+                    Exit For
+                End If
+            Next
+            Dim lStationShapefile As MapWinGIS.Shapefile = lLayer.GetObject
+            Dim lFieldIndex As Integer = 0
+            For lFieldIndex = 0 To lStationShapefile.NumFields - 1
+                If lStationShapefile.Field(lFieldIndex).Name = "site_no" Then
+                    Exit For
+                End If
+            Next
+            For lShapeIndex As Integer = 0 To lStationShapefile.NumShapes - 1
+                pDischargeStationIds &= "<stationid>" & lStationShapefile.CellValue(lFieldIndex, lShapeIndex) & "</stationid>"
+                If lShapeIndex > pMaxStations Then Exit For
+            Next
+        End If
+
         Dim lQueryDischargeData As String = _
           "<function name='GetNWISDischarge'>" & _
             "<arguments>" & _
               "<SaveWDM>" & aBasinsProjectDataFolder & "nwis\flow.wdm</SaveWDM>" & _
-              "<stationid>01594526</stationid>" & _
+              pDischargeStationIds & _
               lBaseQuery & _
             "</arguments>" & _
           "</function>"
