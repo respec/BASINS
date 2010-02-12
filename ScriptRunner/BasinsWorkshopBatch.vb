@@ -108,16 +108,20 @@ Module BasinsWorkshopBatch
                     Logger.Dbg("UsingExistingCacheFrom:" & pCacheFolderSave)
                     Dim lFileCopyCount As Integer = 0
                     For Each lFile As String In IO.Directory.GetFiles(pCacheFolderSave, "*", IO.SearchOption.AllDirectories)
-                        Dim lNewFolder As String = IO.Path.GetDirectoryName(lFile).Replace(pCacheFolderSave.Trim("\"), pCacheFolder.Trim("\") & "\")
-                        If Not IO.Directory.Exists(lNewFolder) Then
-                            IO.Directory.CreateDirectory(lNewFolder)
-                        End If
-                        Dim lFileNew As String = lNewFolder & IO.Path.GetFileName(lFile)
-                        If IO.File.Exists(lFileNew) Then
-                            Logger.Dbg("UsingExisting " & lFileNew)
+                        If IO.Path.GetExtension(lFile) = ".log" Then
+                            Logger.Dbg("Skip " & lFile)
                         Else
-                            IO.File.Copy(lFile, lNewFolder & IO.Path.GetFileName(lFile))
-                            lFileCopyCount += 1
+                            Dim lNewFolder As String = IO.Path.GetDirectoryName(lFile).Replace(pCacheFolderSave.Trim("\"), pCacheFolder.Trim("\")) & "\"
+                            If Not IO.Directory.Exists(lNewFolder) Then
+                                IO.Directory.CreateDirectory(lNewFolder)
+                            End If
+                            Dim lFileNew As String = lNewFolder & IO.Path.GetFileName(lFile)
+                            If IO.File.Exists(lFileNew) Then
+                                Logger.Dbg("UsingExisting " & lFileNew)
+                            Else
+                                IO.File.Copy(lFile, lNewFolder & IO.Path.GetFileName(lFile))
+                                lFileCopyCount += 1
+                            End If
                         End If
                     Next
                     Logger.Dbg("UseExistingCache:FileCount:" & lFileCopyCount)

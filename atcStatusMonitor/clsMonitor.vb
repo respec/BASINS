@@ -190,14 +190,14 @@ Public Class clsMonitor
                             .Progress.Refresh()
                             If pLabelLogged(2).Length = 0 AndAlso pLabelLogged(4).Length = 0 Then
                                 .Label(2) = "0"
-                                .Label(4) = pProgressFinal
+                                .Label(4) = Format(pProgressFinal, "#,###")
                             End If
 
                             If pLabelLogged(3).Length = 0 Then
                                 If pProgressFinal = 100 Then
                                     .Label(3) = ""
                                 Else
-                                    .Label(3) = pProgressCurrent & " of " & pProgressFinal
+                                    .Label(3) = Format(pProgressCurrent, "#,###") & " of " & Format(pProgressFinal, "#,###")
                                 End If
                             End If
 
