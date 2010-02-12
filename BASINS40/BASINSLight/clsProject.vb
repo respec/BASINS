@@ -1,3 +1,4 @@
+Imports MapWindow.Interfaces
 '************************************************************
 'Class:         Project
 'Context:       Public - part of the plug-in interface
@@ -53,6 +54,15 @@ Public Class Project
         ProjInfo.ConfigFileName = FileName
         Return ProjInfo.SaveConfig()
     End Function
+
+    Public Function SaveCopy(ByVal FileName As String) As Boolean Implements MapWindow.Interfaces.Project.SaveCopy
+    End Function
+
+    Public ReadOnly Property LegendPanel() As LegendPanel
+        Get
+
+        End Get
+    End Property
 
     Public ReadOnly Property ConfigFileName() As String Implements MapWindow.Interfaces.Project.ConfigFileName
         'Implements the IMapWin.Interfaces.Project.ConfigFileName property. 
@@ -170,4 +180,9 @@ Public Class Project
             modMain.ProjInfo.SaveShapeSettings = value
         End Set
     End Property
+
+    Public Function LoadLayerSymbologyFromProjectFile(ByVal Filename As String, ByVal Handle As Integer) Implements Interfaces.Project.LoadLayerSymbologyFromProjectFile
+    End Function
+
+
 End Class
