@@ -151,7 +151,6 @@ Partial Class frmRenumberOperation
         '
         'atxNew
         '
-        Me.atxNew.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.atxNew.DataType = atcControls.atcText.ATCoDataType.ATCoInt
         Me.atxNew.DefaultValue = ""
         Me.atxNew.HardMax = 999
