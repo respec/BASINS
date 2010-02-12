@@ -95,6 +95,8 @@ Public Class atcBasinsPlugIn
         Logger.StartToFile(g_ProgramDir & "cache\log" & g_PathChar _
                          & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & g_AppNameShort & ".log")
         Logger.Icon = g_MapWin.ApplicationInfo.FormIcon
+
+        'put our new seperate executable status monitor (StatusMonitor.exe) between the Logger and the default MW status monitor
         pStatusMonitor = New clsLoggerStatusMonitor
         pStatusMonitor.InnerProgressStatus = Logger.ProgressStatus
         Logger.ProgressStatus = pStatusMonitor
@@ -128,12 +130,11 @@ Public Class atcBasinsPlugIn
             Dim lKey As String = g_MapWin.Plugins.GetPluginKey("Timeseries::Statistics")
             'If Not g_MapWin.Plugins.PluginIsLoaded(lKey) Then 
             g_MapWin.Plugins.StartPlugin(lKey)
-        Catch e As Exception
-            Logger.Dbg("Exception loading Timeseries::Statistics - " & e.Message)
+        Catch lEx As Exception
+            Logger.Dbg("Exception loading Timeseries::Statistics - " & lEx.Message)
         End Try
 
-        Dim lHelpFilename As String
-        lHelpFilename = FindFile("", g_ProgramDir & "docs\Basins4.0.chm")
+        Dim lHelpFilename As String = FindFile("", g_ProgramDir & "docs\Basins4.0.chm")
         If FileExists(lHelpFilename) Then
             ShowHelp(lHelpFilename)
         Else
@@ -162,14 +163,14 @@ Public Class atcBasinsPlugIn
         atcDataManager.AddMenuIfMissing(CheckForUpdatesMenuName, HelpMenuName, CheckForUpdatesMenuString, RegisterMenuName)
         atcDataManager.AddMenuIfMissing(SendFeedbackMenuName, HelpMenuName, SendFeedbackMenuString, CheckForUpdatesMenuName)
 
-        Dim mnu As MapWindow.Interfaces.MenuItem
+        Dim lMenuItem As MapWindow.Interfaces.MenuItem
         For Each lDataDir As String In g_BasinsDataDirs
             For Each lProjectDir As String In IO.Directory.GetDirectories(lDataDir)
                 Dim DirShortName As String = IO.Path.GetFileName(lProjectDir)
                 'TODO: differentiate between projects in different data dirs If g_BasinsDrives.Length > 0 Then DirShortName = DriveLetter & ": " & DirShortName
-                mnu = atcDataManager.AddMenuIfMissing(ProjectsMenuName & "_" & DirShortName, _
+                lMenuItem = atcDataManager.AddMenuIfMissing(ProjectsMenuName & "_" & DirShortName, _
                                        ProjectsMenuName, DirShortName)
-                mnu.Tooltip = lProjectDir
+                lMenuItem.Tooltip = lProjectDir
             Next
         Next
 
