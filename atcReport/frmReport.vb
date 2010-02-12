@@ -358,16 +358,16 @@ Public Class frmReport
         Next lReport
 
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-        lblFolder.Text = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "Reports\"
+        lblFolder.Text = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "Reports" & g_PathChar
 
     End Sub
 
     Private Sub lblFolder_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lblFolder.Click
         fbdFolder.ShowDialog()
         lblFolder.Text = fbdFolder.SelectedPath
-        If Microsoft.VisualBasic.Right(lblFolder.Text, 1) <> "/" And _
+        If Microsoft.VisualBasic.Right(lblFolder.Text, 1) <> "/" AndAlso _
            Microsoft.VisualBasic.Right(lblFolder.Text, 1) <> "\" Then
-            lblFolder.Text = lblFolder.Text & "\"
+            lblFolder.Text = lblFolder.Text & g_PathChar
         End If
     End Sub
 
