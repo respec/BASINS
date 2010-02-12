@@ -48,7 +48,6 @@ Partial Class ctlEditOpnSeqBlock
         '
         'txtIndelt
         '
-        Me.txtIndelt.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.txtIndelt.DataType = atcControls.atcText.ATCoDataType.ATCoInt
         Me.txtIndelt.DefaultValue = "0"
         Me.txtIndelt.HardMax = 99999
