@@ -73,6 +73,10 @@ Partial Class frmWCS
         Me.lnkDeleteReports = New System.Windows.Forms.LinkLabel
         Me.dgSoil = New System.Windows.Forms.DataGridView
         Me.dgLandUse = New System.Windows.Forms.DataGridView
+        Me.btnHelp = New System.Windows.Forms.Button
+        Me.lnkLandUseClear = New System.Windows.Forms.LinkLabel
+        Me.lnkLandUseRefresh = New System.Windows.Forms.LinkLabel
+        Me.lnkLandUseSave = New System.Windows.Forms.LinkLabel
         Me.tabWCS = New System.Windows.Forms.TabControl
         Me.TabPage4 = New System.Windows.Forms.TabPage
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel
@@ -81,6 +85,7 @@ Partial Class frmWCS
         Me.Label3 = New System.Windows.Forms.Label
         Me.lblSubbasinsLayer = New System.Windows.Forms.Label
         Me.TabPage1 = New System.Windows.Forms.TabPage
+        Me.TableLayoutPanel11 = New System.Windows.Forms.TableLayoutPanel
         Me.TableLayoutPanel9 = New System.Windows.Forms.TableLayoutPanel
         Me.Label38 = New System.Windows.Forms.Label
         Me.tabReports = New System.Windows.Forms.TabControl
@@ -122,6 +127,8 @@ Partial Class frmWCS
         Me.Label17 = New System.Windows.Forms.Label
         Me.lblLanduseLayer = New System.Windows.Forms.Label
         Me.Label40 = New System.Windows.Forms.Label
+        Me.tblLanduse = New System.Windows.Forms.TableLayoutPanel
+        Me.chkLanduseIDShown = New System.Windows.Forms.CheckBox
         Me.TabPage10 = New System.Windows.Forms.TabPage
         Me.TableLayoutPanel8 = New System.Windows.Forms.TableLayoutPanel
         Me.Label27 = New System.Windows.Forms.Label
@@ -145,13 +152,13 @@ Partial Class frmWCS
         Me.ProgressBar = New System.Windows.Forms.ProgressBar
         Me.lnkCancel = New System.Windows.Forms.LinkLabel
         Me.lblProgress = New System.Windows.Forms.Label
-        Me.btnHelp = New System.Windows.Forms.Button
         CType(Me.dgSoil, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.dgLandUse, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.tabWCS.SuspendLayout()
         Me.TabPage4.SuspendLayout()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
+        Me.TableLayoutPanel11.SuspendLayout()
         Me.TableLayoutPanel9.SuspendLayout()
         Me.tabReports.SuspendLayout()
         Me.TabPage9.SuspendLayout()
@@ -164,6 +171,7 @@ Partial Class frmWCS
         Me.TableLayoutPanel5.SuspendLayout()
         Me.TabPage7.SuspendLayout()
         Me.TableLayoutPanel6.SuspendLayout()
+        Me.tblLanduse.SuspendLayout()
         Me.TabPage10.SuspendLayout()
         Me.TableLayoutPanel8.SuspendLayout()
         Me.TabPage11.SuspendLayout()
@@ -178,7 +186,7 @@ Partial Class frmWCS
         Me.btnGenerate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnGenerate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.HelpProvider1.SetHelpString(Me.btnGenerate, "Generated the selected WCS reports.")
-        Me.btnGenerate.Location = New System.Drawing.Point(414, 351)
+        Me.btnGenerate.Location = New System.Drawing.Point(395, 356)
         Me.btnGenerate.Name = "btnGenerate"
         Me.HelpProvider1.SetShowHelp(Me.btnGenerate, True)
         Me.btnGenerate.Size = New System.Drawing.Size(85, 26)
@@ -195,7 +203,7 @@ Partial Class frmWCS
         Me.cboSubbasinField.Location = New System.Drawing.Point(119, 211)
         Me.cboSubbasinField.Name = "cboSubbasinField"
         Me.HelpProvider1.SetShowHelp(Me.cboSubbasinField, True)
-        Me.cboSubbasinField.Size = New System.Drawing.Size(367, 21)
+        Me.cboSubbasinField.Size = New System.Drawing.Size(348, 21)
         Me.cboSubbasinField.TabIndex = 8
         '
         'txtOutputName
@@ -205,14 +213,14 @@ Partial Class frmWCS
         Me.txtOutputName.Location = New System.Drawing.Point(119, 136)
         Me.txtOutputName.Name = "txtOutputName"
         Me.HelpProvider1.SetShowHelp(Me.txtOutputName, True)
-        Me.txtOutputName.Size = New System.Drawing.Size(367, 20)
+        Me.txtOutputName.Size = New System.Drawing.Size(348, 20)
         Me.txtOutputName.TabIndex = 2
         '
         'btnOutputName
         '
         Me.btnOutputName.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.HelpProvider1.SetHelpString(Me.btnOutputName, "Browse to select the folder where report files will be stored.")
-        Me.btnOutputName.Location = New System.Drawing.Point(492, 135)
+        Me.btnOutputName.Location = New System.Drawing.Point(473, 135)
         Me.btnOutputName.Name = "btnOutputName"
         Me.HelpProvider1.SetShowHelp(Me.btnOutputName, True)
         Me.btnOutputName.Size = New System.Drawing.Size(65, 23)
@@ -230,7 +238,7 @@ Partial Class frmWCS
         Me.cboSubbasinLayer.Location = New System.Drawing.Point(119, 184)
         Me.cboSubbasinLayer.Name = "cboSubbasinLayer"
         Me.HelpProvider1.SetShowHelp(Me.cboSubbasinLayer, True)
-        Me.cboSubbasinLayer.Size = New System.Drawing.Size(367, 21)
+        Me.cboSubbasinLayer.Size = New System.Drawing.Size(348, 21)
         Me.cboSubbasinLayer.Sorted = True
         Me.cboSubbasinLayer.TabIndex = 6
         '
@@ -249,13 +257,13 @@ Partial Class frmWCS
         Me.lstReports.Location = New System.Drawing.Point(3, 23)
         Me.lstReports.Name = "lstReports"
         Me.HelpProvider1.SetShowHelp(Me.lstReports, True)
-        Me.lstReports.Size = New System.Drawing.Size(144, 240)
+        Me.lstReports.Size = New System.Drawing.Size(144, 245)
         Me.lstReports.TabIndex = 1
         '
         'btnAll
         '
         Me.HelpProvider1.SetHelpString(Me.btnAll, "Check all reports above")
-        Me.btnAll.Location = New System.Drawing.Point(3, 269)
+        Me.btnAll.Location = New System.Drawing.Point(3, 274)
         Me.btnAll.Name = "btnAll"
         Me.HelpProvider1.SetShowHelp(Me.btnAll, True)
         Me.btnAll.Size = New System.Drawing.Size(69, 23)
@@ -266,7 +274,7 @@ Partial Class frmWCS
         'btnNone
         '
         Me.HelpProvider1.SetHelpString(Me.btnNone, "Uncheck all reports above")
-        Me.btnNone.Location = New System.Drawing.Point(78, 269)
+        Me.btnNone.Location = New System.Drawing.Point(78, 274)
         Me.btnNone.Name = "btnNone"
         Me.HelpProvider1.SetShowHelp(Me.btnNone, True)
         Me.btnNone.Size = New System.Drawing.Size(69, 23)
@@ -283,7 +291,7 @@ Partial Class frmWCS
         Me.cboReachLayer.Location = New System.Drawing.Point(137, 3)
         Me.cboReachLayer.Name = "cboReachLayer"
         Me.HelpProvider1.SetShowHelp(Me.cboReachLayer, True)
-        Me.cboReachLayer.Size = New System.Drawing.Size(189, 21)
+        Me.cboReachLayer.Size = New System.Drawing.Size(219, 21)
         Me.cboReachLayer.Sorted = True
         Me.cboReachLayer.TabIndex = 1
         '
@@ -296,7 +304,7 @@ Partial Class frmWCS
         Me.cbo303dLayer.Location = New System.Drawing.Point(137, 30)
         Me.cbo303dLayer.Name = "cbo303dLayer"
         Me.HelpProvider1.SetShowHelp(Me.cbo303dLayer, True)
-        Me.cbo303dLayer.Size = New System.Drawing.Size(189, 21)
+        Me.cbo303dLayer.Size = New System.Drawing.Size(219, 21)
         Me.cbo303dLayer.Sorted = True
         Me.cbo303dLayer.TabIndex = 3
         '
@@ -309,7 +317,7 @@ Partial Class frmWCS
         Me.cboReachField.Location = New System.Drawing.Point(137, 81)
         Me.cboReachField.Name = "cboReachField"
         Me.HelpProvider1.SetShowHelp(Me.cboReachField, True)
-        Me.cboReachField.Size = New System.Drawing.Size(189, 21)
+        Me.cboReachField.Size = New System.Drawing.Size(219, 21)
         Me.cboReachField.Sorted = True
         Me.cboReachField.TabIndex = 6
         '
@@ -322,7 +330,7 @@ Partial Class frmWCS
         Me.cboWaterBodyField.Location = New System.Drawing.Point(137, 108)
         Me.cboWaterBodyField.Name = "cboWaterBodyField"
         Me.HelpProvider1.SetShowHelp(Me.cboWaterBodyField, True)
-        Me.cboWaterBodyField.Size = New System.Drawing.Size(189, 21)
+        Me.cboWaterBodyField.Size = New System.Drawing.Size(219, 21)
         Me.cboWaterBodyField.Sorted = True
         Me.cboWaterBodyField.TabIndex = 8
         '
@@ -336,7 +344,7 @@ Partial Class frmWCS
         Me.cboImpairmentField.Location = New System.Drawing.Point(137, 135)
         Me.cboImpairmentField.Name = "cboImpairmentField"
         Me.HelpProvider1.SetShowHelp(Me.cboImpairmentField, True)
-        Me.cboImpairmentField.Size = New System.Drawing.Size(189, 21)
+        Me.cboImpairmentField.Size = New System.Drawing.Size(219, 21)
         Me.cboImpairmentField.Sorted = True
         Me.cboImpairmentField.TabIndex = 10
         '
@@ -349,7 +357,7 @@ Partial Class frmWCS
         Me.cboPop1Layer.Location = New System.Drawing.Point(92, 3)
         Me.cboPop1Layer.Name = "cboPop1Layer"
         Me.HelpProvider1.SetShowHelp(Me.cboPop1Layer, True)
-        Me.cboPop1Layer.Size = New System.Drawing.Size(266, 21)
+        Me.cboPop1Layer.Size = New System.Drawing.Size(264, 21)
         Me.cboPop1Layer.Sorted = True
         Me.cboPop1Layer.TabIndex = 1
         '
@@ -362,7 +370,7 @@ Partial Class frmWCS
         Me.cboPop2Layer.Location = New System.Drawing.Point(92, 30)
         Me.cboPop2Layer.Name = "cboPop2Layer"
         Me.HelpProvider1.SetShowHelp(Me.cboPop2Layer, True)
-        Me.cboPop2Layer.Size = New System.Drawing.Size(266, 21)
+        Me.cboPop2Layer.Size = New System.Drawing.Size(264, 21)
         Me.cboPop2Layer.Sorted = True
         Me.cboPop2Layer.TabIndex = 3
         '
@@ -376,7 +384,7 @@ Partial Class frmWCS
         Me.cboPopNameField.Location = New System.Drawing.Point(92, 81)
         Me.cboPopNameField.Name = "cboPopNameField"
         Me.HelpProvider1.SetShowHelp(Me.cboPopNameField, True)
-        Me.cboPopNameField.Size = New System.Drawing.Size(266, 21)
+        Me.cboPopNameField.Size = New System.Drawing.Size(264, 21)
         Me.cboPopNameField.Sorted = True
         Me.cboPopNameField.TabIndex = 6
         '
@@ -389,7 +397,7 @@ Partial Class frmWCS
         Me.cboPopPopField.Location = New System.Drawing.Point(92, 108)
         Me.cboPopPopField.Name = "cboPopPopField"
         Me.HelpProvider1.SetShowHelp(Me.cboPopPopField, True)
-        Me.cboPopPopField.Size = New System.Drawing.Size(266, 21)
+        Me.cboPopPopField.Size = New System.Drawing.Size(264, 21)
         Me.cboPopPopField.Sorted = True
         Me.cboPopPopField.TabIndex = 8
         '
@@ -402,7 +410,7 @@ Partial Class frmWCS
         Me.cboSewerLayer.Location = New System.Drawing.Point(86, 3)
         Me.cboSewerLayer.Name = "cboSewerLayer"
         Me.HelpProvider1.SetShowHelp(Me.cboSewerLayer, True)
-        Me.cboSewerLayer.Size = New System.Drawing.Size(272, 21)
+        Me.cboSewerLayer.Size = New System.Drawing.Size(270, 21)
         Me.cboSewerLayer.Sorted = True
         Me.cboSewerLayer.TabIndex = 1
         '
@@ -416,7 +424,7 @@ Partial Class frmWCS
         Me.cboSewerNameField.Location = New System.Drawing.Point(86, 54)
         Me.cboSewerNameField.Name = "cboSewerNameField"
         Me.HelpProvider1.SetShowHelp(Me.cboSewerNameField, True)
-        Me.cboSewerNameField.Size = New System.Drawing.Size(272, 21)
+        Me.cboSewerNameField.Size = New System.Drawing.Size(270, 21)
         Me.cboSewerNameField.Sorted = True
         Me.cboSewerNameField.TabIndex = 4
         '
@@ -429,7 +437,7 @@ Partial Class frmWCS
         Me.cboSewerPopField.Location = New System.Drawing.Point(86, 81)
         Me.cboSewerPopField.Name = "cboSewerPopField"
         Me.HelpProvider1.SetShowHelp(Me.cboSewerPopField, True)
-        Me.cboSewerPopField.Size = New System.Drawing.Size(272, 21)
+        Me.cboSewerPopField.Size = New System.Drawing.Size(270, 21)
         Me.cboSewerPopField.Sorted = True
         Me.cboSewerPopField.TabIndex = 6
         '
@@ -442,7 +450,7 @@ Partial Class frmWCS
         Me.cboSewerHouseField.Location = New System.Drawing.Point(86, 108)
         Me.cboSewerHouseField.Name = "cboSewerHouseField"
         Me.HelpProvider1.SetShowHelp(Me.cboSewerHouseField, True)
-        Me.cboSewerHouseField.Size = New System.Drawing.Size(272, 21)
+        Me.cboSewerHouseField.Size = New System.Drawing.Size(270, 21)
         Me.cboSewerHouseField.Sorted = True
         Me.cboSewerHouseField.TabIndex = 8
         '
@@ -456,7 +464,7 @@ Partial Class frmWCS
         Me.cboSewerPublicField.Location = New System.Drawing.Point(86, 135)
         Me.cboSewerPublicField.Name = "cboSewerPublicField"
         Me.HelpProvider1.SetShowHelp(Me.cboSewerPublicField, True)
-        Me.cboSewerPublicField.Size = New System.Drawing.Size(272, 21)
+        Me.cboSewerPublicField.Size = New System.Drawing.Size(270, 21)
         Me.cboSewerPublicField.Sorted = True
         Me.cboSewerPublicField.TabIndex = 10
         '
@@ -470,7 +478,7 @@ Partial Class frmWCS
         Me.cboSewerSepticField.Location = New System.Drawing.Point(86, 162)
         Me.cboSewerSepticField.Name = "cboSewerSepticField"
         Me.HelpProvider1.SetShowHelp(Me.cboSewerSepticField, True)
-        Me.cboSewerSepticField.Size = New System.Drawing.Size(272, 21)
+        Me.cboSewerSepticField.Size = New System.Drawing.Size(270, 21)
         Me.cboSewerSepticField.Sorted = True
         Me.cboSewerSepticField.TabIndex = 12
         '
@@ -484,7 +492,7 @@ Partial Class frmWCS
         Me.cboSewerOtherField.Location = New System.Drawing.Point(86, 189)
         Me.cboSewerOtherField.Name = "cboSewerOtherField"
         Me.HelpProvider1.SetShowHelp(Me.cboSewerOtherField, True)
-        Me.cboSewerOtherField.Size = New System.Drawing.Size(272, 21)
+        Me.cboSewerOtherField.Size = New System.Drawing.Size(270, 21)
         Me.cboSewerOtherField.Sorted = True
         Me.cboSewerOtherField.TabIndex = 14
         '
@@ -497,7 +505,7 @@ Partial Class frmWCS
         Me.cboSoilLayer.Location = New System.Drawing.Point(65, 3)
         Me.cboSoilLayer.Name = "cboSoilLayer"
         Me.HelpProvider1.SetShowHelp(Me.cboSoilLayer, True)
-        Me.cboSoilLayer.Size = New System.Drawing.Size(293, 21)
+        Me.cboSoilLayer.Size = New System.Drawing.Size(291, 21)
         Me.cboSoilLayer.Sorted = True
         Me.cboSoilLayer.TabIndex = 1
         '
@@ -512,7 +520,7 @@ Partial Class frmWCS
         Me.cboSoilField.Location = New System.Drawing.Point(65, 54)
         Me.cboSoilField.Name = "cboSoilField"
         Me.HelpProvider1.SetShowHelp(Me.cboSoilField, True)
-        Me.cboSoilField.Size = New System.Drawing.Size(293, 21)
+        Me.cboSoilField.Size = New System.Drawing.Size(291, 21)
         Me.cboSoilField.Sorted = True
         Me.cboSoilField.TabIndex = 4
         '
@@ -525,7 +533,7 @@ Partial Class frmWCS
         Me.cboLandUseType.Location = New System.Drawing.Point(89, 3)
         Me.cboLandUseType.Name = "cboLandUseType"
         Me.HelpProvider1.SetShowHelp(Me.cboLandUseType, True)
-        Me.cboLandUseType.Size = New System.Drawing.Size(269, 21)
+        Me.cboLandUseType.Size = New System.Drawing.Size(267, 21)
         Me.cboLandUseType.TabIndex = 1
         '
         'cboLanduseField
@@ -539,7 +547,7 @@ Partial Class frmWCS
         Me.cboLanduseField.Location = New System.Drawing.Point(89, 81)
         Me.cboLanduseField.Name = "cboLanduseField"
         Me.HelpProvider1.SetShowHelp(Me.cboLanduseField, True)
-        Me.cboLanduseField.Size = New System.Drawing.Size(269, 21)
+        Me.cboLanduseField.Size = New System.Drawing.Size(267, 21)
         Me.cboLanduseField.Sorted = True
         Me.cboLanduseField.TabIndex = 6
         '
@@ -553,7 +561,7 @@ Partial Class frmWCS
         Me.cboLanduseLayer.Location = New System.Drawing.Point(89, 30)
         Me.cboLanduseLayer.Name = "cboLanduseLayer"
         Me.HelpProvider1.SetShowHelp(Me.cboLanduseLayer, True)
-        Me.cboLanduseLayer.Size = New System.Drawing.Size(269, 21)
+        Me.cboLanduseLayer.Size = New System.Drawing.Size(267, 21)
         Me.cboLanduseLayer.Sorted = True
         Me.cboLanduseLayer.TabIndex = 3
         '
@@ -567,7 +575,7 @@ Partial Class frmWCS
         Me.cboPCSLayer.Location = New System.Drawing.Point(108, 3)
         Me.cboPCSLayer.Name = "cboPCSLayer"
         Me.HelpProvider1.SetShowHelp(Me.cboPCSLayer, True)
-        Me.cboPCSLayer.Size = New System.Drawing.Size(250, 21)
+        Me.cboPCSLayer.Size = New System.Drawing.Size(248, 21)
         Me.cboPCSLayer.Sorted = True
         Me.cboPCSLayer.TabIndex = 1
         '
@@ -580,7 +588,7 @@ Partial Class frmWCS
         Me.cboNPDESField.Location = New System.Drawing.Point(108, 54)
         Me.cboNPDESField.Name = "cboNPDESField"
         Me.HelpProvider1.SetShowHelp(Me.cboNPDESField, True)
-        Me.cboNPDESField.Size = New System.Drawing.Size(250, 21)
+        Me.cboNPDESField.Size = New System.Drawing.Size(248, 21)
         Me.cboNPDESField.Sorted = True
         Me.cboNPDESField.TabIndex = 4
         '
@@ -593,7 +601,7 @@ Partial Class frmWCS
         Me.cboFacNameField.Location = New System.Drawing.Point(108, 81)
         Me.cboFacNameField.Name = "cboFacNameField"
         Me.HelpProvider1.SetShowHelp(Me.cboFacNameField, True)
-        Me.cboFacNameField.Size = New System.Drawing.Size(250, 21)
+        Me.cboFacNameField.Size = New System.Drawing.Size(248, 21)
         Me.cboFacNameField.Sorted = True
         Me.cboFacNameField.TabIndex = 6
         '
@@ -606,7 +614,7 @@ Partial Class frmWCS
         Me.cboSICField.Location = New System.Drawing.Point(108, 108)
         Me.cboSICField.Name = "cboSICField"
         Me.HelpProvider1.SetShowHelp(Me.cboSICField, True)
-        Me.cboSICField.Size = New System.Drawing.Size(250, 21)
+        Me.cboSICField.Size = New System.Drawing.Size(248, 21)
         Me.cboSICField.Sorted = True
         Me.cboSICField.TabIndex = 8
         '
@@ -620,7 +628,7 @@ Partial Class frmWCS
         Me.cboSICNameField.Location = New System.Drawing.Point(108, 135)
         Me.cboSICNameField.Name = "cboSICNameField"
         Me.HelpProvider1.SetShowHelp(Me.cboSICNameField, True)
-        Me.cboSICNameField.Size = New System.Drawing.Size(250, 21)
+        Me.cboSICNameField.Size = New System.Drawing.Size(248, 21)
         Me.cboSICNameField.Sorted = True
         Me.cboSICNameField.TabIndex = 10
         '
@@ -633,7 +641,7 @@ Partial Class frmWCS
         Me.cboCityField.Location = New System.Drawing.Point(108, 162)
         Me.cboCityField.Name = "cboCityField"
         Me.HelpProvider1.SetShowHelp(Me.cboCityField, True)
-        Me.cboCityField.Size = New System.Drawing.Size(250, 21)
+        Me.cboCityField.Size = New System.Drawing.Size(248, 21)
         Me.cboCityField.Sorted = True
         Me.cboCityField.TabIndex = 12
         '
@@ -646,7 +654,7 @@ Partial Class frmWCS
         Me.cboRecWaterField.Location = New System.Drawing.Point(108, 216)
         Me.cboRecWaterField.Name = "cboRecWaterField"
         Me.HelpProvider1.SetShowHelp(Me.cboRecWaterField, True)
-        Me.cboRecWaterField.Size = New System.Drawing.Size(250, 21)
+        Me.cboRecWaterField.Size = New System.Drawing.Size(248, 21)
         Me.cboRecWaterField.Sorted = True
         Me.cboRecWaterField.TabIndex = 16
         '
@@ -660,7 +668,7 @@ Partial Class frmWCS
         Me.cboMajorField.Location = New System.Drawing.Point(108, 189)
         Me.cboMajorField.Name = "cboMajorField"
         Me.HelpProvider1.SetShowHelp(Me.cboMajorField, True)
-        Me.cboMajorField.Size = New System.Drawing.Size(250, 21)
+        Me.cboMajorField.Size = New System.Drawing.Size(248, 21)
         Me.cboMajorField.Sorted = True
         Me.cboMajorField.TabIndex = 14
         '
@@ -674,7 +682,7 @@ Partial Class frmWCS
         Me.cboActiveField.Location = New System.Drawing.Point(108, 243)
         Me.cboActiveField.Name = "cboActiveField"
         Me.HelpProvider1.SetShowHelp(Me.cboActiveField, True)
-        Me.cboActiveField.Size = New System.Drawing.Size(250, 21)
+        Me.cboActiveField.Size = New System.Drawing.Size(248, 21)
         Me.cboActiveField.Sorted = True
         Me.cboActiveField.TabIndex = 18
         '
@@ -692,13 +700,13 @@ Partial Class frmWCS
         Me.lstDataSources.Location = New System.Drawing.Point(3, 23)
         Me.lstDataSources.Name = "lstDataSources"
         Me.HelpProvider1.SetShowHelp(Me.lstDataSources, True)
-        Me.lstDataSources.Size = New System.Drawing.Size(355, 208)
+        Me.lstDataSources.Size = New System.Drawing.Size(353, 213)
         Me.lstDataSources.TabIndex = 1
         '
         'btnCopy
         '
         Me.HelpProvider1.SetHelpString(Me.btnCopy, "Copy the entire HTML report to the clipboard.")
-        Me.btnCopy.Location = New System.Drawing.Point(3, 275)
+        Me.btnCopy.Location = New System.Drawing.Point(3, 280)
         Me.btnCopy.Name = "btnCopy"
         Me.HelpProvider1.SetShowHelp(Me.btnCopy, True)
         Me.btnCopy.Size = New System.Drawing.Size(75, 23)
@@ -710,7 +718,7 @@ Partial Class frmWCS
         '
         Me.btnPreview.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.HelpProvider1.SetHelpString(Me.btnPreview, "Display the print preview form.")
-        Me.btnPreview.Location = New System.Drawing.Point(395, 275)
+        Me.btnPreview.Location = New System.Drawing.Point(376, 280)
         Me.btnPreview.Name = "btnPreview"
         Me.HelpProvider1.SetShowHelp(Me.btnPreview, True)
         Me.btnPreview.Size = New System.Drawing.Size(75, 23)
@@ -722,7 +730,7 @@ Partial Class frmWCS
         '
         Me.btnPrint.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.HelpProvider1.SetHelpString(Me.btnPrint, "Send the HTML report to the printer.")
-        Me.btnPrint.Location = New System.Drawing.Point(476, 275)
+        Me.btnPrint.Location = New System.Drawing.Point(457, 280)
         Me.btnPrint.Name = "btnPrint"
         Me.HelpProvider1.SetShowHelp(Me.btnPrint, True)
         Me.btnPrint.Size = New System.Drawing.Size(75, 23)
@@ -743,7 +751,7 @@ Partial Class frmWCS
         Me.wbResults.MinimumSize = New System.Drawing.Size(20, 20)
         Me.wbResults.Name = "wbResults"
         Me.HelpProvider1.SetShowHelp(Me.wbResults, True)
-        Me.wbResults.Size = New System.Drawing.Size(548, 266)
+        Me.wbResults.Size = New System.Drawing.Size(529, 271)
         Me.wbResults.TabIndex = 0
         Me.wbResults.WebBrowserShortcutsEnabled = False
         '
@@ -753,7 +761,7 @@ Partial Class frmWCS
         Me.btnAbout.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnAbout.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.HelpProvider1.SetHelpString(Me.btnAbout, "Displays the About dialog box.")
-        Me.btnAbout.Location = New System.Drawing.Point(12, 351)
+        Me.btnAbout.Location = New System.Drawing.Point(12, 356)
         Me.btnAbout.Name = "btnAbout"
         Me.HelpProvider1.SetShowHelp(Me.btnAbout, True)
         Me.btnAbout.Size = New System.Drawing.Size(75, 26)
@@ -763,7 +771,7 @@ Partial Class frmWCS
         'btnAllDS
         '
         Me.HelpProvider1.SetHelpString(Me.btnAllDS, "Check all datasets above")
-        Me.btnAllDS.Location = New System.Drawing.Point(214, 237)
+        Me.btnAllDS.Location = New System.Drawing.Point(212, 242)
         Me.btnAllDS.Name = "btnAllDS"
         Me.HelpProvider1.SetShowHelp(Me.btnAllDS, True)
         Me.btnAllDS.Size = New System.Drawing.Size(69, 23)
@@ -774,7 +782,7 @@ Partial Class frmWCS
         'btnNoneDS
         '
         Me.HelpProvider1.SetHelpString(Me.btnNoneDS, "Uncheck all datasets above")
-        Me.btnNoneDS.Location = New System.Drawing.Point(289, 237)
+        Me.btnNoneDS.Location = New System.Drawing.Point(287, 242)
         Me.btnNoneDS.Name = "btnNoneDS"
         Me.HelpProvider1.SetShowHelp(Me.btnNoneDS, True)
         Me.btnNoneDS.Size = New System.Drawing.Size(69, 23)
@@ -788,7 +796,7 @@ Partial Class frmWCS
         Me.lnkDeleteReports.AutoSize = True
         Me.HelpProvider1.SetHelpString(Me.lnkDeleteReports, "Report files are automatically created and sequentially numbered each time you cl" & _
                 "ick the Generate button. Click this link to delete all old report files.")
-        Me.lnkDeleteReports.Location = New System.Drawing.Point(209, 164)
+        Me.lnkDeleteReports.Location = New System.Drawing.Point(199, 164)
         Me.lnkDeleteReports.Name = "lnkDeleteReports"
         Me.HelpProvider1.SetShowHelp(Me.lnkDeleteReports, True)
         Me.lnkDeleteReports.Size = New System.Drawing.Size(187, 13)
@@ -808,7 +816,7 @@ Partial Class frmWCS
         Me.dgSoil.Name = "dgSoil"
         Me.dgSoil.ReadOnly = True
         Me.HelpProvider1.SetShowHelp(Me.dgSoil, True)
-        Me.dgSoil.Size = New System.Drawing.Size(355, 155)
+        Me.dgSoil.Size = New System.Drawing.Size(353, 160)
         Me.dgSoil.TabIndex = 6
         '
         'dgLandUse
@@ -819,12 +827,64 @@ Partial Class frmWCS
         Me.dgLandUse.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.TableLayoutPanel6.SetColumnSpan(Me.dgLandUse, 2)
         Me.HelpProvider1.SetHelpString(Me.dgLandUse, resources.GetString("dgLandUse.HelpString"))
-        Me.dgLandUse.Location = New System.Drawing.Point(3, 132)
+        Me.dgLandUse.Location = New System.Drawing.Point(3, 176)
         Me.dgLandUse.Name = "dgLandUse"
-        Me.dgLandUse.ReadOnly = True
         Me.HelpProvider1.SetShowHelp(Me.dgLandUse, True)
-        Me.dgLandUse.Size = New System.Drawing.Size(355, 128)
-        Me.dgLandUse.TabIndex = 8
+        Me.dgLandUse.Size = New System.Drawing.Size(353, 89)
+        Me.dgLandUse.TabIndex = 10
+        '
+        'btnHelp
+        '
+        Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnHelp.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.btnHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.HelpProvider1.SetHelpString(Me.btnHelp, "Display the help file for WCS")
+        Me.btnHelp.Location = New System.Drawing.Point(93, 356)
+        Me.btnHelp.Name = "btnHelp"
+        Me.HelpProvider1.SetShowHelp(Me.btnHelp, True)
+        Me.btnHelp.Size = New System.Drawing.Size(75, 26)
+        Me.btnHelp.TabIndex = 2
+        Me.btnHelp.Text = "&Help"
+        '
+        'lnkLandUseClear
+        '
+        Me.lnkLandUseClear.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.lnkLandUseClear.AutoSize = True
+        Me.HelpProvider1.SetHelpString(Me.lnkLandUseClear, "Clear the grid below")
+        Me.lnkLandUseClear.Location = New System.Drawing.Point(43, 1)
+        Me.lnkLandUseClear.Name = "lnkLandUseClear"
+        Me.HelpProvider1.SetShowHelp(Me.lnkLandUseClear, True)
+        Me.lnkLandUseClear.Size = New System.Drawing.Size(31, 13)
+        Me.lnkLandUseClear.TabIndex = 0
+        Me.lnkLandUseClear.TabStop = True
+        Me.lnkLandUseClear.Text = "Clear"
+        '
+        'lnkLandUseRefresh
+        '
+        Me.lnkLandUseRefresh.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.lnkLandUseRefresh.AutoSize = True
+        Me.HelpProvider1.SetHelpString(Me.lnkLandUseRefresh, "Determine all distinct landuses within all subbasins and add them to the custom g" & _
+                "rid below")
+        Me.lnkLandUseRefresh.Location = New System.Drawing.Point(154, 1)
+        Me.lnkLandUseRefresh.Name = "lnkLandUseRefresh"
+        Me.HelpProvider1.SetShowHelp(Me.lnkLandUseRefresh, True)
+        Me.lnkLandUseRefresh.Size = New System.Drawing.Size(44, 13)
+        Me.lnkLandUseRefresh.TabIndex = 1
+        Me.lnkLandUseRefresh.TabStop = True
+        Me.lnkLandUseRefresh.Text = "Refresh"
+        '
+        'lnkLandUseSave
+        '
+        Me.lnkLandUseSave.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.lnkLandUseSave.AutoSize = True
+        Me.HelpProvider1.SetHelpString(Me.lnkLandUseSave, "All edits to the grid below will be saved")
+        Me.lnkLandUseSave.Location = New System.Drawing.Point(277, 1)
+        Me.lnkLandUseSave.Name = "lnkLandUseSave"
+        Me.HelpProvider1.SetShowHelp(Me.lnkLandUseSave, True)
+        Me.lnkLandUseSave.Size = New System.Drawing.Size(32, 13)
+        Me.lnkLandUseSave.TabIndex = 2
+        Me.lnkLandUseSave.TabStop = True
+        Me.lnkLandUseSave.Text = "Save"
         '
         'tabWCS
         '
@@ -837,7 +897,7 @@ Partial Class frmWCS
         Me.tabWCS.Location = New System.Drawing.Point(12, 12)
         Me.tabWCS.Name = "tabWCS"
         Me.tabWCS.SelectedIndex = 0
-        Me.tabWCS.Size = New System.Drawing.Size(568, 333)
+        Me.tabWCS.Size = New System.Drawing.Size(549, 338)
         Me.tabWCS.TabIndex = 0
         '
         'TabPage4
@@ -845,7 +905,7 @@ Partial Class frmWCS
         Me.TabPage4.Controls.Add(Me.TableLayoutPanel1)
         Me.TabPage4.Location = New System.Drawing.Point(4, 22)
         Me.TabPage4.Name = "TabPage4"
-        Me.TabPage4.Size = New System.Drawing.Size(560, 307)
+        Me.TabPage4.Size = New System.Drawing.Size(541, 312)
         Me.TabPage4.TabIndex = 0
         Me.TabPage4.Text = "General"
         Me.TabPage4.UseVisualStyleBackColor = True
@@ -875,7 +935,7 @@ Partial Class frmWCS
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle)
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle)
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(560, 307)
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(541, 312)
         Me.TableLayoutPanel1.TabIndex = 0
         '
         'Label1
@@ -888,7 +948,7 @@ Partial Class frmWCS
         Me.TableLayoutPanel1.SetColumnSpan(Me.Label1, 3)
         Me.Label1.Location = New System.Drawing.Point(3, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(554, 132)
+        Me.Label1.Size = New System.Drawing.Size(535, 132)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = resources.GetString("Label1.Text")
         Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -925,15 +985,29 @@ Partial Class frmWCS
         '
         'TabPage1
         '
-        Me.TabPage1.Controls.Add(Me.TableLayoutPanel9)
-        Me.TabPage1.Controls.Add(Me.tabReports)
+        Me.TabPage1.Controls.Add(Me.TableLayoutPanel11)
         Me.TabPage1.Location = New System.Drawing.Point(4, 22)
         Me.TabPage1.Name = "TabPage1"
         Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage1.Size = New System.Drawing.Size(560, 307)
+        Me.TabPage1.Size = New System.Drawing.Size(541, 312)
         Me.TabPage1.TabIndex = 1
         Me.TabPage1.Text = "Available Reports"
         Me.TabPage1.UseVisualStyleBackColor = True
+        '
+        'TableLayoutPanel11
+        '
+        Me.TableLayoutPanel11.ColumnCount = 2
+        Me.TableLayoutPanel11.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle)
+        Me.TableLayoutPanel11.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TableLayoutPanel11.Controls.Add(Me.TableLayoutPanel9, 0, 0)
+        Me.TableLayoutPanel11.Controls.Add(Me.tabReports, 1, 0)
+        Me.TableLayoutPanel11.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TableLayoutPanel11.Location = New System.Drawing.Point(3, 3)
+        Me.TableLayoutPanel11.Name = "TableLayoutPanel11"
+        Me.TableLayoutPanel11.RowCount = 1
+        Me.TableLayoutPanel11.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TableLayoutPanel11.Size = New System.Drawing.Size(535, 306)
+        Me.TableLayoutPanel11.TabIndex = 0
         '
         'TableLayoutPanel9
         '
@@ -946,13 +1020,13 @@ Partial Class frmWCS
         Me.TableLayoutPanel9.Controls.Add(Me.btnAll, 0, 2)
         Me.TableLayoutPanel9.Controls.Add(Me.btnNone, 1, 2)
         Me.TableLayoutPanel9.Controls.Add(Me.Label38, 0, 0)
-        Me.TableLayoutPanel9.Location = New System.Drawing.Point(6, 6)
+        Me.TableLayoutPanel9.Location = New System.Drawing.Point(3, 3)
         Me.TableLayoutPanel9.Name = "TableLayoutPanel9"
         Me.TableLayoutPanel9.RowCount = 3
         Me.TableLayoutPanel9.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
         Me.TableLayoutPanel9.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
         Me.TableLayoutPanel9.RowStyles.Add(New System.Windows.Forms.RowStyle)
-        Me.TableLayoutPanel9.Size = New System.Drawing.Size(150, 295)
+        Me.TableLayoutPanel9.Size = New System.Drawing.Size(150, 300)
         Me.TableLayoutPanel9.TabIndex = 0
         '
         'Label38
@@ -978,10 +1052,10 @@ Partial Class frmWCS
         Me.tabReports.Controls.Add(Me.TabPage7)
         Me.tabReports.Controls.Add(Me.TabPage10)
         Me.tabReports.Controls.Add(Me.TabPage11)
-        Me.tabReports.Location = New System.Drawing.Point(162, 6)
+        Me.tabReports.Location = New System.Drawing.Point(159, 3)
         Me.tabReports.Name = "tabReports"
         Me.tabReports.SelectedIndex = 0
-        Me.tabReports.Size = New System.Drawing.Size(343, 295)
+        Me.tabReports.Size = New System.Drawing.Size(373, 300)
         Me.tabReports.TabIndex = 1
         '
         'TabPage9
@@ -990,7 +1064,7 @@ Partial Class frmWCS
         Me.TabPage9.Location = New System.Drawing.Point(4, 22)
         Me.TabPage9.Name = "TabPage9"
         Me.TabPage9.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage9.Size = New System.Drawing.Size(335, 269)
+        Me.TabPage9.Size = New System.Drawing.Size(365, 274)
         Me.TabPage9.TabIndex = 0
         Me.TabPage9.Text = "Water Bodies"
         Me.TabPage9.UseVisualStyleBackColor = True
@@ -1022,7 +1096,7 @@ Partial Class frmWCS
         Me.TableLayoutPanel7.RowStyles.Add(New System.Windows.Forms.RowStyle)
         Me.TableLayoutPanel7.RowStyles.Add(New System.Windows.Forms.RowStyle)
         Me.TableLayoutPanel7.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-        Me.TableLayoutPanel7.Size = New System.Drawing.Size(329, 263)
+        Me.TableLayoutPanel7.Size = New System.Drawing.Size(359, 268)
         Me.TableLayoutPanel7.TabIndex = 0
         '
         'Label20
@@ -1061,7 +1135,7 @@ Partial Class frmWCS
         Me.Label24.AutoSize = True
         Me.TableLayoutPanel7.SetColumnSpan(Me.Label24, 2)
         Me.Label24.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label24.Location = New System.Drawing.Point(132, 59)
+        Me.Label24.Location = New System.Drawing.Point(147, 59)
         Me.Label24.Name = "Label24"
         Me.Label24.Size = New System.Drawing.Size(65, 13)
         Me.Label24.TabIndex = 4
@@ -1093,7 +1167,7 @@ Partial Class frmWCS
         Me.TabPage5.Location = New System.Drawing.Point(4, 22)
         Me.TabPage5.Name = "TabPage5"
         Me.TabPage5.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage5.Size = New System.Drawing.Size(367, 269)
+        Me.TabPage5.Size = New System.Drawing.Size(365, 274)
         Me.TabPage5.TabIndex = 1
         Me.TabPage5.Text = "Population"
         Me.TabPage5.UseVisualStyleBackColor = True
@@ -1122,7 +1196,7 @@ Partial Class frmWCS
         Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle)
         Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle)
         Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-        Me.TableLayoutPanel3.Size = New System.Drawing.Size(361, 263)
+        Me.TableLayoutPanel3.Size = New System.Drawing.Size(359, 268)
         Me.TableLayoutPanel3.TabIndex = 0
         '
         'Label4
@@ -1161,7 +1235,7 @@ Partial Class frmWCS
         Me.Label2.AutoSize = True
         Me.TableLayoutPanel3.SetColumnSpan(Me.Label2, 2)
         Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label2.Location = New System.Drawing.Point(148, 59)
+        Me.Label2.Location = New System.Drawing.Point(147, 59)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(65, 13)
         Me.Label2.TabIndex = 4
@@ -1183,7 +1257,7 @@ Partial Class frmWCS
         Me.TabPage6.Location = New System.Drawing.Point(4, 22)
         Me.TabPage6.Name = "TabPage6"
         Me.TabPage6.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage6.Size = New System.Drawing.Size(367, 269)
+        Me.TabPage6.Size = New System.Drawing.Size(365, 274)
         Me.TabPage6.TabIndex = 2
         Me.TabPage6.Text = "Sewage"
         Me.TabPage6.UseVisualStyleBackColor = True
@@ -1221,7 +1295,7 @@ Partial Class frmWCS
         Me.TableLayoutPanel4.RowStyles.Add(New System.Windows.Forms.RowStyle)
         Me.TableLayoutPanel4.RowStyles.Add(New System.Windows.Forms.RowStyle)
         Me.TableLayoutPanel4.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 16.0!))
-        Me.TableLayoutPanel4.Size = New System.Drawing.Size(361, 263)
+        Me.TableLayoutPanel4.Size = New System.Drawing.Size(359, 268)
         Me.TableLayoutPanel4.TabIndex = 0
         '
         'Label7
@@ -1250,7 +1324,7 @@ Partial Class frmWCS
         Me.Label8.AutoSize = True
         Me.TableLayoutPanel4.SetColumnSpan(Me.Label8, 2)
         Me.Label8.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label8.Location = New System.Drawing.Point(148, 32)
+        Me.Label8.Location = New System.Drawing.Point(147, 32)
         Me.Label8.Name = "Label8"
         Me.Label8.Size = New System.Drawing.Size(65, 13)
         Me.Label8.TabIndex = 2
@@ -1312,7 +1386,7 @@ Partial Class frmWCS
         Me.TabPage8.Location = New System.Drawing.Point(4, 22)
         Me.TabPage8.Name = "TabPage8"
         Me.TabPage8.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage8.Size = New System.Drawing.Size(367, 269)
+        Me.TabPage8.Size = New System.Drawing.Size(365, 274)
         Me.TabPage8.TabIndex = 3
         Me.TabPage8.Text = "Soils"
         Me.TabPage8.UseVisualStyleBackColor = True
@@ -1340,7 +1414,7 @@ Partial Class frmWCS
         Me.TableLayoutPanel5.RowStyles.Add(New System.Windows.Forms.RowStyle)
         Me.TableLayoutPanel5.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 24.0!))
         Me.TableLayoutPanel5.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-        Me.TableLayoutPanel5.Size = New System.Drawing.Size(361, 263)
+        Me.TableLayoutPanel5.Size = New System.Drawing.Size(359, 268)
         Me.TableLayoutPanel5.TabIndex = 0
         '
         'Label16
@@ -1369,7 +1443,7 @@ Partial Class frmWCS
         Me.Label19.AutoSize = True
         Me.TableLayoutPanel5.SetColumnSpan(Me.Label19, 2)
         Me.Label19.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label19.Location = New System.Drawing.Point(148, 32)
+        Me.Label19.Location = New System.Drawing.Point(147, 32)
         Me.Label19.Name = "Label19"
         Me.Label19.Size = New System.Drawing.Size(65, 13)
         Me.Label19.TabIndex = 2
@@ -1381,7 +1455,7 @@ Partial Class frmWCS
         Me.Label39.AutoSize = True
         Me.TableLayoutPanel5.SetColumnSpan(Me.Label39, 2)
         Me.Label39.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label39.Location = New System.Drawing.Point(150, 83)
+        Me.Label39.Location = New System.Drawing.Point(149, 83)
         Me.Label39.Name = "Label39"
         Me.Label39.Size = New System.Drawing.Size(60, 13)
         Me.Label39.TabIndex = 5
@@ -1393,7 +1467,7 @@ Partial Class frmWCS
         Me.TabPage7.Location = New System.Drawing.Point(4, 22)
         Me.TabPage7.Name = "TabPage7"
         Me.TabPage7.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage7.Size = New System.Drawing.Size(367, 269)
+        Me.TabPage7.Size = New System.Drawing.Size(365, 274)
         Me.TabPage7.TabIndex = 4
         Me.TabPage7.Text = "Landuse"
         Me.TabPage7.UseVisualStyleBackColor = True
@@ -1403,7 +1477,6 @@ Partial Class frmWCS
         Me.TableLayoutPanel6.ColumnCount = 2
         Me.TableLayoutPanel6.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle)
         Me.TableLayoutPanel6.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutPanel6.Controls.Add(Me.dgLandUse, 0, 6)
         Me.TableLayoutPanel6.Controls.Add(Me.cboLandUseType, 1, 0)
         Me.TableLayoutPanel6.Controls.Add(Me.lblLanduseField, 0, 3)
         Me.TableLayoutPanel6.Controls.Add(Me.Label21, 0, 2)
@@ -1412,18 +1485,22 @@ Partial Class frmWCS
         Me.TableLayoutPanel6.Controls.Add(Me.lblLanduseLayer, 0, 1)
         Me.TableLayoutPanel6.Controls.Add(Me.cboLanduseLayer, 1, 1)
         Me.TableLayoutPanel6.Controls.Add(Me.Label40, 0, 5)
+        Me.TableLayoutPanel6.Controls.Add(Me.dgLandUse, 0, 7)
+        Me.TableLayoutPanel6.Controls.Add(Me.tblLanduse, 0, 6)
+        Me.TableLayoutPanel6.Controls.Add(Me.chkLanduseIDShown, 0, 4)
         Me.TableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TableLayoutPanel6.Location = New System.Drawing.Point(3, 3)
         Me.TableLayoutPanel6.Name = "TableLayoutPanel6"
-        Me.TableLayoutPanel6.RowCount = 7
+        Me.TableLayoutPanel6.RowCount = 8
         Me.TableLayoutPanel6.RowStyles.Add(New System.Windows.Forms.RowStyle)
         Me.TableLayoutPanel6.RowStyles.Add(New System.Windows.Forms.RowStyle)
         Me.TableLayoutPanel6.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 24.0!))
         Me.TableLayoutPanel6.RowStyles.Add(New System.Windows.Forms.RowStyle)
         Me.TableLayoutPanel6.RowStyles.Add(New System.Windows.Forms.RowStyle)
         Me.TableLayoutPanel6.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 24.0!))
+        Me.TableLayoutPanel6.RowStyles.Add(New System.Windows.Forms.RowStyle)
         Me.TableLayoutPanel6.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-        Me.TableLayoutPanel6.Size = New System.Drawing.Size(361, 263)
+        Me.TableLayoutPanel6.Size = New System.Drawing.Size(359, 268)
         Me.TableLayoutPanel6.TabIndex = 0
         '
         'lblLanduseField
@@ -1442,7 +1519,7 @@ Partial Class frmWCS
         Me.Label21.AutoSize = True
         Me.TableLayoutPanel6.SetColumnSpan(Me.Label21, 2)
         Me.Label21.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label21.Location = New System.Drawing.Point(148, 59)
+        Me.Label21.Location = New System.Drawing.Point(147, 59)
         Me.Label21.Name = "Label21"
         Me.Label21.Size = New System.Drawing.Size(65, 13)
         Me.Label21.TabIndex = 4
@@ -1474,11 +1551,43 @@ Partial Class frmWCS
         Me.Label40.AutoSize = True
         Me.TableLayoutPanel6.SetColumnSpan(Me.Label40, 2)
         Me.Label40.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label40.Location = New System.Drawing.Point(150, 110)
+        Me.Label40.Location = New System.Drawing.Point(149, 133)
         Me.Label40.Name = "Label40"
         Me.Label40.Size = New System.Drawing.Size(60, 13)
-        Me.Label40.TabIndex = 7
+        Me.Label40.TabIndex = 8
         Me.Label40.Text = "Data Table"
+        '
+        'tblLanduse
+        '
+        Me.tblLanduse.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.tblLanduse.AutoSize = True
+        Me.tblLanduse.BackColor = System.Drawing.Color.Transparent
+        Me.tblLanduse.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.[Single]
+        Me.tblLanduse.ColumnCount = 3
+        Me.TableLayoutPanel6.SetColumnSpan(Me.tblLanduse, 2)
+        Me.tblLanduse.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
+        Me.tblLanduse.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33334!))
+        Me.tblLanduse.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33334!))
+        Me.tblLanduse.Controls.Add(Me.lnkLandUseClear, 0, 0)
+        Me.tblLanduse.Controls.Add(Me.lnkLandUseRefresh, 1, 0)
+        Me.tblLanduse.Controls.Add(Me.lnkLandUseSave, 2, 0)
+        Me.tblLanduse.Location = New System.Drawing.Point(3, 155)
+        Me.tblLanduse.Name = "tblLanduse"
+        Me.tblLanduse.RowCount = 1
+        Me.tblLanduse.RowStyles.Add(New System.Windows.Forms.RowStyle)
+        Me.tblLanduse.Size = New System.Drawing.Size(353, 15)
+        Me.tblLanduse.TabIndex = 9
+        '
+        'chkLanduseIDShown
+        '
+        Me.chkLanduseIDShown.AutoSize = True
+        Me.TableLayoutPanel6.SetColumnSpan(Me.chkLanduseIDShown, 2)
+        Me.chkLanduseIDShown.Location = New System.Drawing.Point(3, 108)
+        Me.chkLanduseIDShown.Name = "chkLanduseIDShown"
+        Me.chkLanduseIDShown.Size = New System.Drawing.Size(203, 17)
+        Me.chkLanduseIDShown.TabIndex = 7
+        Me.chkLanduseIDShown.Text = "Include Landuse ID Column in &Report"
+        Me.chkLanduseIDShown.UseVisualStyleBackColor = True
         '
         'TabPage10
         '
@@ -1486,7 +1595,7 @@ Partial Class frmWCS
         Me.TabPage10.Location = New System.Drawing.Point(4, 22)
         Me.TabPage10.Name = "TabPage10"
         Me.TabPage10.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage10.Size = New System.Drawing.Size(367, 269)
+        Me.TabPage10.Size = New System.Drawing.Size(365, 274)
         Me.TabPage10.TabIndex = 5
         Me.TabPage10.Text = "PCS"
         Me.TabPage10.UseVisualStyleBackColor = True
@@ -1530,7 +1639,7 @@ Partial Class frmWCS
         Me.TableLayoutPanel8.RowStyles.Add(New System.Windows.Forms.RowStyle)
         Me.TableLayoutPanel8.RowStyles.Add(New System.Windows.Forms.RowStyle)
         Me.TableLayoutPanel8.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-        Me.TableLayoutPanel8.Size = New System.Drawing.Size(361, 263)
+        Me.TableLayoutPanel8.Size = New System.Drawing.Size(359, 268)
         Me.TableLayoutPanel8.TabIndex = 0
         '
         'Label27
@@ -1559,7 +1668,7 @@ Partial Class frmWCS
         Me.Label29.AutoSize = True
         Me.TableLayoutPanel8.SetColumnSpan(Me.Label29, 2)
         Me.Label29.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label29.Location = New System.Drawing.Point(148, 32)
+        Me.Label29.Location = New System.Drawing.Point(147, 32)
         Me.Label29.Name = "Label29"
         Me.Label29.Size = New System.Drawing.Size(65, 13)
         Me.Label29.TabIndex = 2
@@ -1641,7 +1750,7 @@ Partial Class frmWCS
         Me.TabPage11.Location = New System.Drawing.Point(4, 22)
         Me.TabPage11.Name = "TabPage11"
         Me.TabPage11.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage11.Size = New System.Drawing.Size(367, 269)
+        Me.TabPage11.Size = New System.Drawing.Size(365, 274)
         Me.TabPage11.TabIndex = 6
         Me.TabPage11.Text = "Data"
         Me.TabPage11.UseVisualStyleBackColor = True
@@ -1663,7 +1772,7 @@ Partial Class frmWCS
         Me.TableLayoutPanel10.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
         Me.TableLayoutPanel10.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
         Me.TableLayoutPanel10.RowStyles.Add(New System.Windows.Forms.RowStyle)
-        Me.TableLayoutPanel10.Size = New System.Drawing.Size(361, 263)
+        Me.TableLayoutPanel10.Size = New System.Drawing.Size(359, 268)
         Me.TableLayoutPanel10.TabIndex = 0
         '
         'Label37
@@ -1683,7 +1792,7 @@ Partial Class frmWCS
         Me.TabPage2.Location = New System.Drawing.Point(4, 22)
         Me.TabPage2.Name = "TabPage2"
         Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(560, 307)
+        Me.TabPage2.Size = New System.Drawing.Size(541, 312)
         Me.TabPage2.TabIndex = 2
         Me.TabPage2.Text = "Results"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -1706,7 +1815,7 @@ Partial Class frmWCS
         Me.TableLayoutPanel2.RowCount = 2
         Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
         Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle)
-        Me.TableLayoutPanel2.Size = New System.Drawing.Size(554, 301)
+        Me.TableLayoutPanel2.Size = New System.Drawing.Size(535, 306)
         Me.TableLayoutPanel2.TabIndex = 0
         '
         'lblGenerate
@@ -1714,7 +1823,7 @@ Partial Class frmWCS
         Me.lblGenerate.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lblGenerate.AutoSize = True
         Me.lblGenerate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblGenerate.Location = New System.Drawing.Point(84, 280)
+        Me.lblGenerate.Location = New System.Drawing.Point(84, 285)
         Me.lblGenerate.Name = "lblGenerate"
         Me.lblGenerate.Size = New System.Drawing.Size(190, 13)
         Me.lblGenerate.TabIndex = 2
@@ -1725,7 +1834,7 @@ Partial Class frmWCS
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnCancel.Location = New System.Drawing.Point(505, 351)
+        Me.btnCancel.Location = New System.Drawing.Point(486, 356)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(75, 26)
         Me.btnCancel.TabIndex = 5
@@ -1742,18 +1851,18 @@ Partial Class frmWCS
         Me.tblProgress.Controls.Add(Me.ProgressBar, 1, 0)
         Me.tblProgress.Controls.Add(Me.lnkCancel, 2, 0)
         Me.tblProgress.Controls.Add(Me.lblProgress, 0, 0)
-        Me.tblProgress.Location = New System.Drawing.Point(174, 351)
+        Me.tblProgress.Location = New System.Drawing.Point(174, 356)
         Me.tblProgress.Name = "tblProgress"
         Me.tblProgress.RowCount = 1
         Me.tblProgress.RowStyles.Add(New System.Windows.Forms.RowStyle)
-        Me.tblProgress.Size = New System.Drawing.Size(234, 26)
+        Me.tblProgress.Size = New System.Drawing.Size(215, 26)
         Me.tblProgress.TabIndex = 3
         Me.tblProgress.Visible = False
         '
         'ProgressBar
         '
         Me.ProgressBar.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ProgressBar.Location = New System.Drawing.Point(73, 4)
+        Me.ProgressBar.Location = New System.Drawing.Point(54, 4)
         Me.ProgressBar.Name = "ProgressBar"
         Me.ProgressBar.Size = New System.Drawing.Size(112, 18)
         Me.ProgressBar.TabIndex = 1
@@ -1762,7 +1871,7 @@ Partial Class frmWCS
         '
         Me.lnkCancel.Anchor = System.Windows.Forms.AnchorStyles.Left
         Me.lnkCancel.AutoSize = True
-        Me.lnkCancel.Location = New System.Drawing.Point(191, 6)
+        Me.lnkCancel.Location = New System.Drawing.Point(172, 6)
         Me.lnkCancel.Name = "lnkCancel"
         Me.lnkCancel.Size = New System.Drawing.Size(40, 13)
         Me.lnkCancel.TabIndex = 2
@@ -1773,30 +1882,17 @@ Partial Class frmWCS
         '
         Me.lblProgress.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.lblProgress.AutoSize = True
-        Me.lblProgress.Location = New System.Drawing.Point(6, 6)
+        Me.lblProgress.Location = New System.Drawing.Point(8, 0)
         Me.lblProgress.Name = "lblProgress"
-        Me.lblProgress.Size = New System.Drawing.Size(61, 13)
+        Me.lblProgress.Size = New System.Drawing.Size(40, 26)
         Me.lblProgress.TabIndex = 0
         Me.lblProgress.Text = "Initializing..."
-        '
-        'btnHelp
-        '
-        Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnHelp.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.HelpProvider1.SetHelpString(Me.btnHelp, "Display the help file for WCS")
-        Me.btnHelp.Location = New System.Drawing.Point(93, 351)
-        Me.btnHelp.Name = "btnHelp"
-        Me.HelpProvider1.SetShowHelp(Me.btnHelp, True)
-        Me.btnHelp.Size = New System.Drawing.Size(75, 26)
-        Me.btnHelp.TabIndex = 2
-        Me.btnHelp.Text = "&Help"
         '
         'frmWCS
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(592, 389)
+        Me.ClientSize = New System.Drawing.Size(573, 394)
         Me.Controls.Add(Me.tblProgress)
         Me.Controls.Add(Me.btnGenerate)
         Me.Controls.Add(Me.btnHelp)
@@ -1807,7 +1903,7 @@ Partial Class frmWCS
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.MinimumSize = New System.Drawing.Size(600, 423)
+        Me.MinimumSize = New System.Drawing.Size(581, 428)
         Me.Name = "frmWCS"
         Me.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show
         Me.Text = "Watershed Characterization System (WCS)"
@@ -1818,6 +1914,7 @@ Partial Class frmWCS
         Me.TableLayoutPanel1.ResumeLayout(False)
         Me.TableLayoutPanel1.PerformLayout()
         Me.TabPage1.ResumeLayout(False)
+        Me.TableLayoutPanel11.ResumeLayout(False)
         Me.TableLayoutPanel9.ResumeLayout(False)
         Me.TableLayoutPanel9.PerformLayout()
         Me.tabReports.ResumeLayout(False)
@@ -1836,6 +1933,8 @@ Partial Class frmWCS
         Me.TabPage7.ResumeLayout(False)
         Me.TableLayoutPanel6.ResumeLayout(False)
         Me.TableLayoutPanel6.PerformLayout()
+        Me.tblLanduse.ResumeLayout(False)
+        Me.tblLanduse.PerformLayout()
         Me.TabPage10.ResumeLayout(False)
         Me.TableLayoutPanel8.ResumeLayout(False)
         Me.TableLayoutPanel8.PerformLayout()
@@ -1973,4 +2072,10 @@ Partial Class frmWCS
     Friend WithEvents Label40 As System.Windows.Forms.Label
     Friend WithEvents lblGenerate As System.Windows.Forms.Label
     Friend WithEvents btnHelp As System.Windows.Forms.Button
+    Friend WithEvents TableLayoutPanel11 As System.Windows.Forms.TableLayoutPanel
+    Friend WithEvents tblLanduse As System.Windows.Forms.TableLayoutPanel
+    Friend WithEvents lnkLandUseClear As System.Windows.Forms.LinkLabel
+    Friend WithEvents lnkLandUseRefresh As System.Windows.Forms.LinkLabel
+    Friend WithEvents lnkLandUseSave As System.Windows.Forms.LinkLabel
+    Friend WithEvents chkLanduseIDShown As System.Windows.Forms.CheckBox
 End Class

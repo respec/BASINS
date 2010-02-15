@@ -11,10 +11,11 @@ Friend Class clsSoil
 End Class
 
 Friend Class clsLanduse
-    Friend ID As Integer, Name As String
-    Sub New(ByVal _ID As String, ByVal _Name As String)
+    Friend ID As String, Name As String, Area As Double
+    Sub New(ByVal _ID As String, ByVal _Name As String, Optional ByVal _Area As Double = 0)
         ID = _ID
         Name = _Name
+        Area = _Area
     End Sub
 End Class
 
@@ -51,6 +52,7 @@ Friend Class clsProject
     Friend LanduseType As enumLandUseType
     Friend LanduseLayer As String
     Friend LanduseField As String
+    Friend LanduseIDShown As Boolean
     Friend dictLanduse(enumLandUseType.UserGrid) As Generic.SortedDictionary(Of String, clsLanduse)
 
     Friend PCSLayer As String
@@ -61,7 +63,7 @@ Friend Class clsProject
     Public Sub New()
         ProjectFolder = IO.Path.GetDirectoryName(GisUtil.ProjectFileName) & "\WCS"
         If Not My.Computer.FileSystem.DirectoryExists(ProjectFolder) Then My.Computer.FileSystem.CreateDirectory(ProjectFolder)
-        AppFolder = IO.Path.GetDirectoryName(Reflection.Assembly.GetEntryAssembly.Location) & "\Plugins\BASINS"
+        AppFolder = IO.Path.GetDirectoryName(Reflection.Assembly.GetEntryAssembly.Location) & "\Plugins\WCS"
         Select Case GisUtil.MapUnits.ToUpper
             Case "METERS"
                 DistFactor = 1.0
@@ -122,6 +124,25 @@ Friend Class clsProject
 
     End Sub
 
+    Friend Sub SaveLanduses()
+        Dim Filename As String = AppFolder & "\Landuses.txt"
+
+        Dim sw As New IO.StreamWriter(Filename)
+        Try
+            For t As enumLandUseType = enumLandUseType.GIRAS To enumLandUseType.UserGrid
+                sw.WriteLine(Choose(t + 1, "GIRAS", "NLCD-1992", "NLCD-2001", "USER-SHAPEFILE", "USER-GRIDFILE") & vbTab & dictLanduse(t).Count)
+                For Each kv As Generic.KeyValuePair(Of String, clsLanduse) In dictLanduse(t)
+                    sw.WriteLine(kv.Key & vbTab & kv.Value.Name)
+                Next
+            Next
+        Catch ex As Exception
+            ErrorMsg("Unable to write landuse data file: " & Filename, ex)
+        Finally
+            sw.Close()
+            sw.Dispose()
+        End Try
+    End Sub
+
 #Region "Project Load and Save"
 
     Friend Sub Load()
@@ -151,6 +172,7 @@ Friend Class clsProject
         LanduseType = iniFile.GetKeyText("Layers", "LanduseType", 0)
         LanduseLayer = iniFile.GetKeyText("Layers", "LanduseLayer", "Land*")
         LanduseField = iniFile.GetKeyText("Fields", "LanduseField", "LUCODE")
+        LanduseIDShown = iniFile.GetKeyText("Fields", "LanduseIDShown", False)
         PCSLayer = iniFile.GetKeyText("Layers", "PCSLayer", "Permit*")
         PCSNpdesField = iniFile.GetKeyText("Fields", "PCSNpdesField", "NPDES")
         PCSFacNameField = iniFile.GetKeyText("Fields", "PCSFacNameField", "FAC_NAME")
@@ -189,6 +211,7 @@ Friend Class clsProject
         iniFile.SetKeyText("Layers", "LanduseType", LanduseType)
         iniFile.SetKeyText("Layers", "LanduseLayer", LanduseLayer)
         iniFile.SetKeyText("Fields", "LanduseField", LanduseField)
+        iniFile.SetKeyText("Fields", "LanduseIDShown", LanduseIDShown)
         iniFile.SetKeyText("Layers", "PCSLayer", PCSLayer)
         iniFile.SetKeyText("Fields", "PCSNpdesField", PCSNpdesField)
         iniFile.SetKeyText("Fields", "PCSFacNameField", PCSFacNameField)
@@ -605,7 +628,7 @@ Friend Class clsProject
             hb.AppendHeading(clsHTMLBuilder.enumHeading.Level4, clsHTMLBuilder.enumAlign.Left, TableName)
             hb.AppendTable(100, clsHTMLBuilder.enumWidthUnits.Percent)
             hb.AppendTableColumn("Subbasin Name", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Center)
-            hb.AppendTableColumn("Land Use ID", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Right)
+            If LanduseIDShown Then hb.AppendTableColumn("Land Use ID", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Left)
             hb.AppendTableColumn("Description", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Left)
             hb.AppendTableColumn("Area (ac)", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Right)
             hb.AppendTableColumn("Portion of Watershed (%)", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Right)
@@ -652,17 +675,137 @@ Friend Class clsProject
                 Dim SubName As String = kv.Key
                 Dim SubIndex As Integer = GisUtil.FindFeatureIndex(lyrS, fldS, SubName)
                 Dim SubArea As Single = GisUtil.FeatureArea(lyrS, SubIndex) / (DistFactor ^ 2 * 4046.86)
+
+                'areas are now tabulated for each subbasin by ID; want to report by name (in case user aggregated by using same name for more than one ID)
+                'so form new sorted list by name and accumulate all codes with that name
+
+                Dim dictLanduseName As New Generic.SortedDictionary(Of String, clsLanduse)
+
                 For Each kv2 As KeyValuePair(Of String, Single) In kv.Value
-                    Dim LUCode As String = kv2.Key
+                    Dim LUCode As String = kv2.Key.Replace("<", "(").Replace(">", ")")
                     Dim Area As Single = kv2.Value / (DistFactor ^ 2 * 4046.86)
-                    Dim Name As String = ""
+                    Dim Name As String = StrConv(LUCode, VbStrConv.ProperCase)
                     Dim landuse As clsLanduse = Nothing
-                    If dictLanduse(LanduseType).TryGetValue(LUCode, landuse) Then Name = landuse.Name
-                    If Area > 0 Then hb.AppendTableRow(SubName, LUCode, Name, Area.ToString("0.0"), (Area * 100 / SubArea).ToString("0.00"))
+                    If dictLanduse(LanduseType).TryGetValue(LUCode, landuse) AndAlso Not String.IsNullOrEmpty(landuse.Name) Then Name = landuse.Name
+                    If Area > 0 Then
+                        If dictLanduseName.ContainsKey(Name) Then
+                            dictLanduseName(Name).ID &= "; " & LUCode
+                            dictLanduseName(Name).Area += Area
+                        Else
+                            dictLanduseName.Add(Name, New clsLanduse(LUCode, Name, Area))
+                        End If
+                    End If
+                    If Not dictLanduse(LanduseType).ContainsKey(LUCode) Then
+                        dictLanduse(LanduseType).Add(LUCode, New clsLanduse(LUCode, Name))
+                    End If
                 Next
-                hb.AppendTableRow(SubName, "", "Totals", SubArea.ToString("0.0"), "100.00")
+
+                For Each kv3 As KeyValuePair(Of String, clsLanduse) In dictLanduseName
+                    If LanduseIDShown Then
+                        hb.AppendTableRow(SubName, kv3.Value.ID, kv3.Value.Name, kv3.Value.Area.ToString("0.0"), (kv3.Value.Area * 100 / SubArea).ToString("0.00"))
+                    Else
+                        hb.AppendTableRow(SubName, kv3.Value.Name, kv3.Value.Area.ToString("0.0"), (kv3.Value.Area * 100 / SubArea).ToString("0.00"))
+                    End If
+                Next
+
+                'For Each kv2 As KeyValuePair(Of String, Single) In kv.Value
+                '    Dim LUCode As String = kv2.Key
+                '    Dim Area As Single = kv2.Value / (DistFactor ^ 2 * 4046.86)
+                '    Dim Name As String = ""
+                '    Dim landuse As clsLanduse = Nothing
+                '    If dictLanduse(LanduseType).TryGetValue(LUCode, landuse) Then Name = landuse.Name
+                '    If Area > 0 Then
+                '        hb.AppendTableRow(SubName, LUCode, Name, Area.ToString("0.0"), (Area * 100 / SubArea).ToString("0.00"))
+                '        If Not dictLanduse(LanduseType).ContainsKey(LUCode) Then
+                '            dictLanduse(LanduseType).Add(LUCode, New clsLanduse(LUCode, Name))
+                '        End If
+                '    End If
+                'Next
+
+                If LanduseIDShown Then
+                    hb.AppendTableRow(SubName, "", "Totals", SubArea.ToString("0.0"), "100.00")
+                Else
+                    hb.AppendTableRow(SubName, "Totals", SubArea.ToString("0.0"), "100.00")
+                End If
             Next
             hb.AppendTableEnd()
+
+        Catch ex As Exception
+            ErrorMsg(, ex)
+        Finally
+            Logger.Progress("", 1, 1)
+            WCSForm.tblProgress.Visible = False
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Retrieve list of unique land use categories in all subbasins and store in dictionary
+    ''' </summary>
+    Friend Sub GetLanduses(ByVal LandUseType As enumLandUseType)
+        Try
+            GisUtil.Cancel = False
+
+            If String.IsNullOrEmpty(SubbasinLayer) Or _
+               String.IsNullOrEmpty(SubbasinField) Or _
+               (LanduseType <> enumLandUseType.GIRAS And String.IsNullOrEmpty(LanduseLayer)) Or _
+               (LanduseType = enumLandUseType.UserShapefile And String.IsNullOrEmpty(LanduseField)) Then
+                WarningMsg("One or more layers or fields have not been specified.")
+                Exit Sub
+            End If
+
+            Dim lyrS As Integer = GisUtil.LayerIndex(SubbasinLayer)
+            Dim fldS As Integer = GisUtil.FieldIndex(lyrS, SubbasinField)
+            Dim LUField As String
+
+            Dim dictAreaSum As New Generic.SortedDictionary(Of String, Generic.SortedDictionary(Of String, Single))
+
+            Select Case LanduseType
+                Case enumLandUseType.GIRAS, enumLandUseType.UserShapefile
+                    Dim lstLyr As Generic.List(Of Integer)
+                    If LanduseType = enumLandUseType.GIRAS Then
+                        lstLyr = GIRASLayers(lyrS)
+                        LUField = "LUCODE"
+                    Else
+                        lstLyr = New Generic.List(Of Integer)
+                        lstLyr.Add(GisUtil.LayerIndex(LanduseLayer))
+                        LUField = LanduseField
+                    End If
+                    For Each lyr As Integer In lstLyr
+                        Dim dictArea As Generic.SortedDictionary(Of String, Generic.SortedDictionary(Of String, Single))
+                        dictArea = GisUtil.TabulateAreas(SubbasinLayer, SubbasinField, GisUtil.LayerName(lyr), LUField)
+                        If dictArea Is Nothing Then Exit Sub
+                        For Each kv As KeyValuePair(Of String, Generic.SortedDictionary(Of String, Single)) In dictArea
+                            Dim SubName As String = kv.Key
+                            If Not dictAreaSum.ContainsKey(SubName) Then dictAreaSum.Add(SubName, New SortedDictionary(Of String, Single))
+                            For Each kv2 As KeyValuePair(Of String, Single) In kv.Value
+                                Dim LUCode As String = kv2.Key
+                                Dim Area As Single = kv2.Value
+                                If Not dictAreaSum(SubName).ContainsKey(LUCode) Then dictAreaSum(SubName).Add(LUCode, 0.0)
+                                dictAreaSum(SubName)(LUCode) += Area
+                            Next
+                        Next
+                    Next
+                Case Else
+                    dictAreaSum = GisUtil.TabulateAreas(SubbasinLayer, SubbasinField, LanduseLayer)
+            End Select
+
+            If dictAreaSum Is Nothing Then Exit Sub
+
+            For Each kv As KeyValuePair(Of String, Generic.SortedDictionary(Of String, Single)) In dictAreaSum
+                Dim SubName As String = kv.Key
+                Dim SubIndex As Integer = GisUtil.FindFeatureIndex(lyrS, fldS, SubName)
+                Dim SubArea As Single = GisUtil.FeatureArea(lyrS, SubIndex) / (DistFactor ^ 2 * 4046.86)
+                For Each kv2 As KeyValuePair(Of String, Single) In kv.Value
+                    Dim LUCode As String = kv2.Key.Replace("<", "(").Replace(">", ")")
+                    Dim Area As Single = kv2.Value / (DistFactor ^ 2 * 4046.86)
+                    Dim Name As String = StrConv(LUCode, VbStrConv.ProperCase)
+                    Dim landuse As clsLanduse = Nothing
+                    If dictLanduse(LandUseType).TryGetValue(LUCode, landuse) AndAlso Not String.IsNullOrEmpty(landuse.Name) Then Name = landuse.Name
+                    If Not dictLanduse(LandUseType).ContainsKey(LUCode) Then
+                        dictLanduse(LandUseType).Add(LUCode, New clsLanduse(LUCode, Name))
+                    End If
+                Next
+            Next
 
         Catch ex As Exception
             ErrorMsg(, ex)
