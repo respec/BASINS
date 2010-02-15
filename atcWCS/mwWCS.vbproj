@@ -132,17 +132,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="MapWinGIS">
-      <Guid>{C368D713-CC5F-40ED-9F53-F84FE197B96A}</Guid>
-      <VersionMajor>3</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <Private>False</Private>
-    </COMReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="LandUses.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

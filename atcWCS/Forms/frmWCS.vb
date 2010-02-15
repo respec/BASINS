@@ -72,6 +72,13 @@ Public Class frmWCS
 
         lblGenerate.Text = String.Format("{0} (Click Generate button to refresh results)", IO.Path.GetFileName(filename))
         EnableControls(True)
+
+        If lstReports.CheckedIndices.Contains(4) Then 'land use report was generated
+            Select Case Project.LanduseType
+                Case clsProject.enumLandUseType.UserGrid, clsProject.enumLandUseType.UserShapefile
+                    LoadLanduseGrid()
+            End Select
+        End If
     End Sub
 
     Private Sub btnOutputName_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOutputName.Click
@@ -116,30 +123,7 @@ Public Class frmWCS
             End If
         Next
         If cboLanduseLayer.Items.Count > 0 Then cboLanduseLayer.SelectedIndex = 0
-
-        'populate landuse grid
-        With dgLandUse
-            .ReadOnly = True
-            .AllowUserToAddRows = False
-            .AllowUserToOrderColumns = False
-            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
-            .Columns.Clear()
-            For i As Integer = 0 To 1
-                .Columns.Add(Choose(i + 1, "ID", "Name"), Choose(i + 1, "Landuse ID", "Landuse Name"))
-                With .Columns(i)
-                    .ValueType = GetType(String)
-                    .HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
-                    .DefaultCellStyle.Alignment = IIf(i = 1, DataGridViewContentAlignment.MiddleLeft, DataGridViewContentAlignment.MiddleCenter)
-                    .DefaultCellStyle.ForeColor = Drawing.Color.Gray
-                    .AutoSizeMode = IIf(i = 1, DataGridViewAutoSizeColumnMode.Fill, DataGridViewAutoSizeColumnMode.None)
-                    .SortMode = DataGridViewColumnSortMode.NotSortable
-                End With
-            Next
-            For Each kv As KeyValuePair(Of String, clsLanduse) In Project.dictLanduse(cboLandUseType.SelectedIndex)
-                .Rows.Add(kv.Value.ID, kv.Value.Name)
-            Next
-        End With
-
+        LoadLanduseGrid()
     End Sub
 
     Private Sub cboLayer_SelectedValueChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboSubbasinLayer.SelectedValueChanged, cboPop1Layer.SelectedValueChanged, cboSewerLayer.SelectedValueChanged, cboSoilLayer.SelectedValueChanged, cboLanduseLayer.SelectedValueChanged, cboReachLayer.SelectedValueChanged, cbo303dLayer.SelectedValueChanged, cboPCSLayer.SelectedValueChanged
@@ -180,6 +164,19 @@ Public Class frmWCS
 
     Private Sub cboLU_SelectionChangeCommitted(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboLandUseType.SelectionChangeCommitted, cboLanduseLayer.SelectionChangeCommitted, cboLanduseField.SelectionChangeCommitted
         lstReports.SetItemChecked(4, True)
+    End Sub
+
+    ''' <summary>
+    ''' Land use field has changed or User grid selected; show Refresh button
+    ''' </summary>
+    Private Sub cboLUField_SelectionChangeCommitted(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboLanduseField.SelectionChangeCommitted, cboLandUseType.SelectionChangeCommitted, cboLanduseLayer.SelectionChangeCommitted
+        'tblLanduse.Visible = False
+        'dgLandUse.ReadOnly = True
+        'Select Case CType(cboLandUseType.SelectedIndex, clsProject.enumLandUseType)
+        '    Case clsProject.enumLandUseType.UserGrid, clsProject.enumLandUseType.UserShapefile
+        '        tblLanduse.Visible = True
+        '        dgLandUse.ReadOnly = False
+        'End Select
     End Sub
 
     Private Sub cboPCS_SelectionChangeCommitted(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboPCSLayer.SelectionChangeCommitted, cboNPDESField.SelectionChangeCommitted, cboFacNameField.SelectionChangeCommitted, cboSICField.SelectionChangeCommitted, cboSICNameField.SelectionChangeCommitted, cboCityField.SelectionChangeCommitted, cboMajorField.SelectionChangeCommitted, cboWaterBodyField.SelectionChangeCommitted, cboActiveField.SelectionChangeCommitted
@@ -277,6 +274,7 @@ Public Class frmWCS
                 .Items.AddRange(New String() {"USGS GIRAS Shapefiles", "NLCD 1992 Grid", "NLCD 2001 Grid", "User Shapefile", "User Grid"})
                 .SelectedIndex = Project.LanduseType
             End With
+            chkLanduseIDShown.Checked = .LanduseIDShown
             SetDefault(cboPCSLayer, .PCSLayer)
 
             'populate soil grid (landuse grid gets populated on listchanged event
@@ -345,6 +343,7 @@ Public Class frmWCS
             .LanduseType = cboLandUseType.SelectedIndex
             .LanduseLayer = cboLanduseLayer.Text
             .LanduseField = cboLanduseField.Text
+            .LanduseIDShown = chkLanduseIDShown.Checked
             .PCSLayer = cboPCSLayer.Text
             .PCSNpdesField = cboNPDESField.Text
             .PCSFacNameField = cboFacNameField.Text
@@ -359,6 +358,9 @@ Public Class frmWCS
             For Each s As String In lstDataSources.CheckedItems
                 .lstDatasets.Add(s)
             Next
+
+            SaveLanduseGrid()
+
         End With
     End Sub
 
@@ -385,5 +387,72 @@ Public Class frmWCS
 
     Private Sub btnHelp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnHelp.Click
         Logger.Message("Help should be hooked up here.", "Help", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1)
+    End Sub
+
+    Private Sub lnkLandUseRefresh_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles lnkLandUseRefresh.Click
+        SaveForm()
+        Project.GetLanduses(Me.cboLandUseType.SelectedIndex)
+        LoadLanduseGrid()
+    End Sub
+
+    Private Sub lnkLandUseClear_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles lnkLandUseClear.Click
+        SaveForm()
+        Project.dictLanduse(cboLandUseType.SelectedIndex).Clear()
+        dgLandUse.Rows.Clear()
+    End Sub
+
+    Private Sub lnkLandUseSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles lnkLandUseSave.Click
+        SaveForm()
+        SaveLanduseGrid()
+        Project.SaveLanduses()
+    End Sub
+
+    Private Sub SaveLanduseGrid()
+        With Project.dictLanduse(cboLandUseType.SelectedIndex)
+            dgLandUse.EndEdit()
+            .Clear()
+            For r As Integer = 0 To dgLandUse.Rows.Count - 1
+                Dim lucode As String = dgLandUse.Item(0, r).Value
+                Dim luname As String = dgLandUse.Item(1, r).Value
+                If Not String.IsNullOrEmpty(lucode) AndAlso Not .ContainsKey(lucode) Then
+                    .Add(lucode, New clsLanduse(lucode, luname))
+                End If
+            Next
+        End With
+    End Sub
+
+    Private Sub LoadLanduseGrid()
+        'populate landuse grid
+        With dgLandUse
+            .AllowUserToAddRows = True
+            .AllowUserToOrderColumns = False
+            .Columns.Clear()
+            For i As Integer = 0 To 1
+                .Columns.Add(Choose(i + 1, "ID", "Name"), Choose(i + 1, "Landuse ID", "Landuse Name"))
+                With .Columns(i)
+                    .ValueType = GetType(String)
+                    .HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
+                    .DefaultCellStyle.Alignment = IIf(i = 1, DataGridViewContentAlignment.MiddleLeft, DataGridViewContentAlignment.MiddleCenter)
+                    .AutoSizeMode = IIf(i = 1, DataGridViewAutoSizeColumnMode.Fill, DataGridViewAutoSizeColumnMode.None)
+                    .SortMode = DataGridViewColumnSortMode.NotSortable
+                End With
+            Next
+            'Select Case Project.LanduseType
+            '    Case clsProject.enumLandUseType.UserGrid, clsProject.enumLandUseType.UserShapefile
+            '        .ReadOnly = False
+            '        .DefaultCellStyle.ForeColor = Drawing.Color.Black
+            '        .Columns(0).ReadOnly = True
+            '        .Columns(0).DefaultCellStyle.ForeColor = Drawing.Color.Gray
+            '        .SelectionMode = DataGridViewSelectionMode.CellSelect
+            '    Case Else
+            '        .DefaultCellStyle.ForeColor = Drawing.Color.Gray
+            '        .ReadOnly = True
+            '        .SelectionMode = DataGridViewSelectionMode.FullRowSelect
+            'End Select
+            For Each kv As KeyValuePair(Of String, clsLanduse) In Project.dictLanduse(cboLandUseType.SelectedIndex)
+                .Rows.Add(kv.Value.ID, kv.Value.Name)
+            Next
+            .Columns(0).AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+        End With
     End Sub
 End Class
