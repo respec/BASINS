@@ -1,6 +1,9 @@
 Public Class frmStatus
     Inherits System.Windows.Forms.Form
 
+    Private pLevels As New Generic.List(Of ctlStatus)
+    Private pMargin As Integer = 10
+
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents btnPause As System.Windows.Forms.Button
     Friend WithEvents btnDetails As System.Windows.Forms.Button
@@ -16,6 +19,7 @@ Public Class frmStatus
 
         'Add any initialization after the InitializeComponent() call
 
+        Me.Level = 1
     End Sub
 
     'Form overrides dispose to clean up the component list.
@@ -34,44 +38,14 @@ Public Class frmStatus
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    Friend WithEvents lblTop As System.Windows.Forms.Label
     Friend WithEvents txtLog As System.Windows.Forms.TextBox
-    Friend WithEvents lblRight As System.Windows.Forms.Label
-    Friend WithEvents Progress As System.Windows.Forms.ProgressBar
-    Friend WithEvents lblLeft As System.Windows.Forms.Label
-    Friend WithEvents lblMiddle As System.Windows.Forms.Label
-    Friend WithEvents lblBottom As System.Windows.Forms.Label
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmStatus))
-        Me.Progress = New System.Windows.Forms.ProgressBar
-        Me.lblTop = New System.Windows.Forms.Label
         Me.txtLog = New System.Windows.Forms.TextBox
-        Me.lblLeft = New System.Windows.Forms.Label
-        Me.lblMiddle = New System.Windows.Forms.Label
-        Me.lblRight = New System.Windows.Forms.Label
-        Me.lblBottom = New System.Windows.Forms.Label
         Me.btnCancel = New System.Windows.Forms.Button
         Me.btnPause = New System.Windows.Forms.Button
         Me.btnDetails = New System.Windows.Forms.Button
         Me.SuspendLayout()
-        '
-        'Progress
-        '
-        Me.Progress.Location = New System.Drawing.Point(8, 72)
-        Me.Progress.Name = "Progress"
-        Me.Progress.Size = New System.Drawing.Size(497, 24)
-        Me.Progress.TabIndex = 0
-        '
-        'lblTop
-        '
-        Me.lblTop.AutoSize = True
-        Me.lblTop.BackColor = System.Drawing.Color.Transparent
-        Me.lblTop.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblTop.Location = New System.Drawing.Point(8, 8)
-        Me.lblTop.Name = "lblTop"
-        Me.lblTop.Size = New System.Drawing.Size(42, 13)
-        Me.lblTop.TabIndex = 1
-        Me.lblTop.Text = "lblTop"
         '
         'txtLog
         '
@@ -82,58 +56,11 @@ Public Class frmStatus
         Me.txtLog.Size = New System.Drawing.Size(497, 244)
         Me.txtLog.TabIndex = 2
         '
-        'lblLeft
-        '
-        Me.lblLeft.AutoSize = True
-        Me.lblLeft.BackColor = System.Drawing.Color.Transparent
-        Me.lblLeft.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblLeft.Location = New System.Drawing.Point(8, 40)
-        Me.lblLeft.Name = "lblLeft"
-        Me.lblLeft.Size = New System.Drawing.Size(42, 13)
-        Me.lblLeft.TabIndex = 3
-        Me.lblLeft.Text = "lblLeft"
-        '
-        'lblMiddle
-        '
-        Me.lblMiddle.BackColor = System.Drawing.Color.Transparent
-        Me.lblMiddle.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblMiddle.Location = New System.Drawing.Point(8, 40)
-        Me.lblMiddle.Name = "lblMiddle"
-        Me.lblMiddle.Size = New System.Drawing.Size(497, 16)
-        Me.lblMiddle.TabIndex = 4
-        Me.lblMiddle.Text = "lblMiddle"
-        Me.lblMiddle.TextAlign = System.Drawing.ContentAlignment.TopCenter
-        '
-        'lblRight
-        '
-        Me.lblRight.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblRight.AutoSize = True
-        Me.lblRight.BackColor = System.Drawing.Color.Transparent
-        Me.lblRight.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblRight.Location = New System.Drawing.Point(458, 40)
-        Me.lblRight.Name = "lblRight"
-        Me.lblRight.Size = New System.Drawing.Size(50, 13)
-        Me.lblRight.TabIndex = 5
-        Me.lblRight.Text = "lblRight"
-        Me.lblRight.TextAlign = System.Drawing.ContentAlignment.TopRight
-        '
-        'lblBottom
-        '
-        Me.lblBottom.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblBottom.BackColor = System.Drawing.Color.Transparent
-        Me.lblBottom.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblBottom.Location = New System.Drawing.Point(8, 112)
-        Me.lblBottom.Name = "lblBottom"
-        Me.lblBottom.Size = New System.Drawing.Size(497, 16)
-        Me.lblBottom.TabIndex = 6
-        Me.lblBottom.Text = "lblBottom"
-        Me.lblBottom.TextAlign = System.Drawing.ContentAlignment.TopCenter
-        '
         'btnCancel
         '
+        Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnCancel.Location = New System.Drawing.Point(11, 131)
+        Me.btnCancel.Location = New System.Drawing.Point(12, 14)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(65, 26)
         Me.btnCancel.TabIndex = 7
@@ -142,8 +69,9 @@ Public Class frmStatus
         '
         'btnPause
         '
+        Me.btnPause.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnPause.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnPause.Location = New System.Drawing.Point(82, 131)
+        Me.btnPause.Location = New System.Drawing.Point(83, 14)
         Me.btnPause.Name = "btnPause"
         Me.btnPause.Size = New System.Drawing.Size(65, 26)
         Me.btnPause.TabIndex = 8
@@ -152,8 +80,9 @@ Public Class frmStatus
         '
         'btnDetails
         '
+        Me.btnDetails.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnDetails.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnDetails.Location = New System.Drawing.Point(153, 131)
+        Me.btnDetails.Location = New System.Drawing.Point(154, 14)
         Me.btnDetails.Name = "btnDetails"
         Me.btnDetails.Size = New System.Drawing.Size(65, 26)
         Me.btnDetails.TabIndex = 9
@@ -163,17 +92,11 @@ Public Class frmStatus
         'frmStatus
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(514, 169)
+        Me.ClientSize = New System.Drawing.Size(514, 52)
         Me.Controls.Add(Me.btnDetails)
         Me.Controls.Add(Me.btnPause)
         Me.Controls.Add(Me.btnCancel)
-        Me.Controls.Add(Me.lblBottom)
-        Me.Controls.Add(Me.lblRight)
-        Me.Controls.Add(Me.lblLeft)
         Me.Controls.Add(Me.txtLog)
-        Me.Controls.Add(Me.lblTop)
-        Me.Controls.Add(Me.Progress)
-        Me.Controls.Add(Me.lblMiddle)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmStatus"
         Me.Text = "Status "
@@ -188,28 +111,53 @@ Public Class frmStatus
 
     Friend ReadOnly LastLabel As Integer = 5
 
+    Public Property Level() As Integer
+        Get
+            Return pLevels.Count
+        End Get
+        Set(ByVal value As Integer)
+            If value > 0 AndAlso value < 10 Then
+                While value > pLevels.Count
+                    Dim newLevel As New ctlStatus
+                    pLevels.Add(newLevel)
+                    Me.Controls.Add(newLevel)
+                    With newLevel
+                        .Top = pMargin + (pLevels.Count - 1) * (.Height + pMargin)
+                        .Left = pMargin
+                        .Width = Me.Width - pMargin * 2
+                        .Anchor = AnchorStyles.Top + AnchorStyles.Left + AnchorStyles.Right
+                        Me.Height += .Height + pMargin
+                    End With
+                End While
+                If Level < pLevels.Count Then
+                    pLevels.RemoveRange(Level, pLevels.Count - Level)
+                    Me.Height -= (pLevels(0).Height + pMargin) * (pLevels.Count - Level)
+                End If
+            End If
+        End Set
+    End Property
+
     Public Property Label(ByVal aIndex As Integer) As String
         Get
-            Select Case aIndex
-                Case 0 : Return Me.Text
-                Case 1 : Return lblTop.Text
-                Case 2 : Return lblLeft.Text
-                Case 3 : Return lblMiddle.Text
-                Case 4 : Return lblRight.Text
-                Case 5 : Return lblBottom.Text
-                Case Else : Return ""
-            End Select
+            If pLevels.Count < 1 Then
+                Return ""
+            Else
+                Return pLevels(pLevels.Count - 1).Label(aIndex)
+            End If
         End Get
         Set(ByVal aNewValue As String)
-            Select Case aIndex
-                Case 0 : Me.Text = aNewValue
-                Case 1 : lblTop.Text = aNewValue
-                Case 2 : lblLeft.Text = aNewValue
-                Case 3 : lblMiddle.Text = aNewValue
-                Case 4 : lblRight.Text = aNewValue : lblRight.Left = Me.ClientRectangle.Width - lblRight.Width - lblLeft.Left
-                Case 5 : lblBottom.Text = aNewValue
-            End Select
+            If pLevels.Count > 0 Then pLevels(pLevels.Count - 1).Label(aIndex) = aNewValue
         End Set
+    End Property
+
+    Public ReadOnly Property Progress() As Windows.Forms.ProgressBar
+        Get
+            If pLevels.Count < 1 Then
+                Return Nothing
+            Else
+                Return pLevels(pLevels.Count - 1).Progress
+            End If
+        End Get
     End Property
 
     Public Sub Clear()
@@ -254,12 +202,8 @@ Public Class frmStatus
 
     Private Sub frmStatus_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
         Try
-            lblRight.Left = Me.ClientRectangle.Width - lblRight.Width - lblLeft.Left
-            Dim lControlWidth As Integer = Me.ClientRectangle.Width - Progress.Left * 2
-            lblMiddle.Width = lControlWidth
-            Progress.Width = lControlWidth
             If Me.Height > txtLog.Top + txtLog.Left * 3 Then
-                txtLog.Width = lControlWidth
+                txtLog.Width = Me.ClientRectangle.Width - pMargin * 2
                 txtLog.Height = Me.ClientRectangle.Height - txtLog.Top - txtLog.Left
                 txtLog.Visible = True
             Else
@@ -268,5 +212,4 @@ Public Class frmStatus
         Catch
         End Try
     End Sub
-
 End Class
