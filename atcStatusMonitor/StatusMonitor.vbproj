@@ -119,6 +119,12 @@
     <Compile Include="clsMonitor.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ctlStatus.Designer.vb">
+      <DependentUpon>ctlStatus.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ctlStatus.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="frmStatus.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -131,6 +137,10 @@
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
     </Content>
+    <EmbeddedResource Include="ctlStatus.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ctlStatus.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmStatus.resx">
       <DependentUpon>frmStatus.vb</DependentUpon>
       <SubType>Designer</SubType>
