@@ -226,6 +226,7 @@ Public Class atcBasinsPlugIn
         CloseForms()
 
         Logger.ProgressStatus = pStatusMonitor.InnerProgressStatus
+        pStatusMonitor.Dispose()
 
         SaveSetting(g_AppNameRegistry, "DataManager", "SelectionAttributes", String.Join(vbTab, atcDataManager.SelectionAttributes.ToArray("".GetType)))
         SaveSetting(g_AppNameRegistry, "DataManager", "DisplayAttributes", String.Join(vbTab, atcDataManager.DisplayAttributes.ToArray("".GetType)))

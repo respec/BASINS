@@ -33,16 +33,23 @@ Public Class frmDownload
         End If
 
         Dim lRegionTypeName As String = GetSetting("DataDownload", "Defaults", "RegionTypeName", pRegionViewRectangle)
+        If lRegionTypeName.StartsWith(pRegionHydrologicUnit) Then
+            lRegionTypeName = pRegionHydrologicUnit
+        End If
         Dim lReason As String = ""
         If Not RegionValid(lRegionTypeName, lReason) Then 'Fall back on the option that is always valid
             MapWinUtility.Logger.Dbg("Could not use region type '" & lRegionTypeName & "' because '" & lReason & "' so defaulting to " & pRegionEnterCoordinates)
             lRegionTypeName = pRegionEnterCoordinates
         End If
         For lRegionIndex As Integer = 0 To cboRegion.Items.Count - 1
-            If cboRegion.Items(lRegionIndex) = lRegionTypeName Then
+            If cboRegion.Items(lRegionIndex).ToString.StartsWith(lRegionTypeName) Then
                 cboRegion.SelectedIndex = lRegionIndex
+                Exit For
             End If
         Next
+        If cboRegion.SelectedIndex < 0 Then
+            cboRegion.SelectedIndex = 0
+        End If
 
         If GetSetting("DataDownload", "Defaults", "Clip", "").ToLower.Equals("true") Then
             chkClip.Checked = True

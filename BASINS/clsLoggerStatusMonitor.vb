@@ -1,12 +1,13 @@
 ﻿Imports MapWinUtility
 
 Public Class clsLoggerStatusMonitor
-    Implements MapWinUtility.IProgressStatus
+    Implements MapWinUtility.IProgressStatus, System.IDisposable
 
     Private pInit As Boolean = False
     Private pMonitorProcess As Process
-    Private pPipeWriteToStatus As Integer = 0
-    Private pPipeReadFromStatus As Integer = 0
+    'Private pPipeWriteToStatus As Integer = 0
+    'Private pPipeReadFromStatus As Integer = 0
+    Private pPaused As Boolean = False
 
     <CLSCompliant(False)> _
     Public InnerProgressStatus As IProgressStatus = Nothing
@@ -14,7 +15,20 @@ Public Class clsLoggerStatusMonitor
     Public Sub Progress(ByVal aCurrentPosition As Integer, ByVal aLastPosition As Integer) Implements MapWinUtility.IProgressStatus.Progress
         If InnerProgressStatus IsNot Nothing Then InnerProgressStatus.Progress(aCurrentPosition, aLastPosition)
         WriteStatus("PROGRESS " & aCurrentPosition & " of " & aLastPosition)
+        While pPaused
+            Application.DoEvents()
+            Threading.Thread.Sleep(100)
+        End While
     End Sub
+
+    Property Paused() As Boolean
+        Get
+            Return pPaused
+        End Get
+        Set(ByVal aPaused As Boolean)
+            pPaused = aPaused
+        End Set
+    End Property
 
     Public Sub Status(ByVal aStatusMessage As String) Implements MapWinUtility.IProgressStatus.Status
         If InnerProgressStatus IsNot Nothing Then InnerProgressStatus.Status(aStatusMessage)
@@ -38,13 +52,13 @@ Public Class clsLoggerStatusMonitor
                 'NOTE: to debug pMonitorProcess, in VS2005 (not Express) - choose Tools:AttachToProcess - StatusMonitor
                 '
                 pMonitorProcess.StandardInput.WriteLine("Show")
-                'pMonitorProcess.BeginErrorReadLine()
-                'pMonitorProcess.BeginOutputReadLine()
+                pMonitorProcess.BeginErrorReadLine()
+                pMonitorProcess.BeginOutputReadLine()
                 Logger.Dbg("MonitorLaunched")
-                Dim lStreamMonitorInputFromMyOutput As IO.FileStream = pMonitorProcess.StandardInput.BaseStream
-                pPipeWriteToStatus = lStreamMonitorInputFromMyOutput.SafeFileHandle.DangerousGetHandle
-                Dim lStreamMonitorOutputToMyInput As IO.FileStream = pMonitorProcess.StandardOutput.BaseStream
-                pPipeReadFromStatus = lStreamMonitorOutputToMyInput.SafeFileHandle.DangerousGetHandle
+                'Dim lStreamMonitorInputFromMyOutput As IO.FileStream = pMonitorProcess.StandardInput.BaseStream
+                'pPipeWriteToStatus = lStreamMonitorInputFromMyOutput.SafeFileHandle.DangerousGetHandle
+                'Dim lStreamMonitorOutputToMyInput As IO.FileStream = pMonitorProcess.StandardOutput.BaseStream
+                'pPipeReadFromStatus = lStreamMonitorOutputToMyInput.SafeFileHandle.DangerousGetHandle
             Catch ex As Exception
                 Logger.Msg("StatusProcessStartError:" & ex.Message)
             End Try
@@ -85,22 +99,37 @@ Public Class clsLoggerStatusMonitor
     Private Sub MonitorMessageHandler(ByVal aSendingProcess As Object, _
                                       ByVal aOutLine As DataReceivedEventArgs)
         If Not String.IsNullOrEmpty(aOutLine.Data) Then
-            Logger.Dbg(aOutLine.Data.ToString)
-            Logger.Flush()
+            Dim lMessage As String = aOutLine.Data.ToString
+            Logger.Dbg("MsgFromStatusMonitor " & lMessage)
+            Select Case lMessage
+                Case "P"
+                    Paused = True
+                Case "R"
+                    Paused = False
+                Case "C"
+                    Paused = False
+                    'TODO: Canceling = True
+            End Select
         End If
     End Sub
 
-    Protected Overrides Sub Finalize()
-        Try
-            If pMonitorProcess IsNot Nothing AndAlso Not pMonitorProcess.HasExited Then
-                pMonitorProcess.StandardInput.WriteLine("Exit")
+    Private pDisposedValue As Boolean = False        ' To detect redundant calls
+
+    Public Sub Dispose() Implements IDisposable.Dispose
+        ' Do not change this code.  Put cleanup code in Dispose(ByVal disposing As Boolean) above.
+        If Not Me.pDisposedValue Then
+            Try
+                If pMonitorProcess IsNot Nothing AndAlso Not pMonitorProcess.HasExited Then
+                    pMonitorProcess.StandardInput.WriteLine("Exit")
+                    Windows.Forms.Application.DoEvents()
+                    Threading.Thread.Sleep(100)
+                    If Not pMonitorProcess.HasExited Then pMonitorProcess.Kill()
+                End If
+            Catch e As Exception
                 Windows.Forms.Application.DoEvents()
-                Threading.Thread.Sleep(100)
-                If Not pMonitorProcess.HasExited Then pMonitorProcess.Kill()
-            End If
-        Catch e As Exception
-            Windows.Forms.Application.DoEvents()
-        End Try
-        MyBase.Finalize()
+            End Try
+        End If
+        Me.pDisposedValue = True
     End Sub
+
 End Class
