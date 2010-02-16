@@ -301,7 +301,9 @@ Public Class atcText
             Return lInt
         End Get
         Set(ByVal newValue As Integer)
-            Me.Text = newValue.ToString
+            If DataType = ATCoDataType.ATCoInt Then
+                Me.Text = newValue.ToString
+            End If
         End Set
     End Property
 
@@ -314,7 +316,9 @@ Public Class atcText
             Return lDbl
         End Get
         Set(ByVal newValue As Double)
-            Me.Text = newValue.ToString
+            If DataType = ATCoDataType.ATCoDbl Then
+                Me.Text = newValue.ToString
+            End If
         End Set
     End Property
 
