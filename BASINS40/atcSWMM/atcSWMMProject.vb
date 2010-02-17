@@ -203,7 +203,8 @@ Public Class SWMMProject
     End Function
 
     Public Function TimeSeriesToString(ByVal aTimeSeries As atcData.atcTimeseries, _
-                                       ByVal aTimeseriesTag As String) As String
+                                       ByVal aTimeseriesTag As String, _
+                                       Optional ByVal aType As String = "PREC") As String
         Dim lStartIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.SJDate, True)
         If Me.SJDate = aTimeSeries.Dates.Values(0) Or lStartIndex < 0 Then
             lStartIndex = 0
@@ -211,12 +212,19 @@ Public Class SWMMProject
         Dim lEndIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.EJDate, True)
         Dim lSB As New StringBuilder
         For lIndex As Integer = lStartIndex To lEndIndex - 1
-            lSB.Append(StrPad(aTimeseriesTag, 16, " ", False))
-            lSB.Append(" ")
+            If aType = "PREC" Then
+                lSB.Append(StrPad(aTimeseriesTag, 16, " ", False))
+                lSB.Append(" ")
+            End If
             Dim lJDate As Double = aTimeSeries.Dates.Values(lIndex)
             Dim lDate(6) As Integer
             J2Date(lJDate, lDate)
-            Dim lDateString As String = lDate(0) & "  " & lDate(1) & "  " & lDate(2) & "  " & lDate(3) & "  " & lDate(4)
+            Dim lDateString As String
+            If aType = "PREC" Then
+                lDateString = lDate(0) & "  " & lDate(1) & "  " & lDate(2) & "  " & lDate(3) & "  " & lDate(4)
+            Else
+                lDateString = lDate(1) & "/" & lDate(2) & "/" & lDate(0) & " " & lDate(3) & ":" & lDate(4)
+            End If
             lSB.Append(StrPad(lDateString, 20, " ", False))
             lSB.Append(" ")
             lSB.Append(StrPad(Format(aTimeSeries.Values(lIndex + 1), "0.000"), 10, " ", False))
