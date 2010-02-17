@@ -125,12 +125,12 @@ Public Class MetConstituents
             If lMetConstituent.Type = "EVAP" Or lMetConstituent.Type = "PEVT" Then
                 Dim lFileName As String = PathNameOnly(Me.SWMMProject.FileName) & g_PathChar & lMetConstituent.TimeSeries.Attributes.GetValue("Location") & "E.DAT"
                 Dim lSB As New StringBuilder
-                lSB.Append(Me.SWMMProject.TimeSeriesToString(lMetConstituent.TimeSeries, lMetConstituent.TimeSeries.Attributes.GetValue("Location") & ":E"))
+                lSB.Append(Me.SWMMProject.TimeSeriesToString(lMetConstituent.TimeSeries, lMetConstituent.TimeSeries.Attributes.GetValue("Location") & ":E", lMetConstituent.Type))
                 SaveFileString(lFileName, lSB.ToString)
             ElseIf lMetConstituent.Type = "ATEM" Or lMetConstituent.Type = "ATMP" Then
                 Dim lFileName As String = PathNameOnly(Me.SWMMProject.FileName) & g_PathChar & lMetConstituent.TimeSeries.Attributes.GetValue("Location") & "T.DAT"
                 Dim lSB As New StringBuilder
-                lSB.Append(Me.SWMMProject.TimeSeriesToString(lMetConstituent.TimeSeries, lMetConstituent.TimeSeries.Attributes.GetValue("Location") & ":T"))
+                lSB.Append(Me.SWMMProject.TimeSeriesToString(lMetConstituent.TimeSeries, lMetConstituent.TimeSeries.Attributes.GetValue("Location") & ":T", lMetConstituent.Type))
                 SaveFileString(lFileName, lSB.ToString)
             End If
         Next
