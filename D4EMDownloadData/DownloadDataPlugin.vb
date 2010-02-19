@@ -203,6 +203,7 @@ Public Class DownloadDataPlugin
                         Else
                             Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor 'Logger.Busy = True
                             Windows.Forms.Application.DoEvents() 'refresh main form to get rid of vestiges of download form
+                            'Make sure all loaded plugins are available for DataManager
                             Dim lPlugins As New ArrayList
                             For lPluginIndex As Integer = 0 To g_MapWin.Plugins.Count
                                 Try
@@ -214,16 +215,25 @@ Public Class DownloadDataPlugin
                             Next
                             Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
                             Dim lResult As String = lDownloadManager.Execute(lQuery)
-                            'Logger.Msg(lResult, "Result of Query from DataManager")
-                            If lResult Is Nothing OrElse lResult.Length = 0 Then
-                                'Nothing to report, no success or error
-                            ElseIf lResult.ToLower = "<success />" Then
-                                Logger.Msg("", "Download Complete")
-                            ElseIf lResult.StartsWith("<success>") Then
-                                BASINS.ProcessDownloadResults(lResult)
+                            If lResult Is Nothing Then
+                                Logger.Dbg("QueryResult:Nothing")
                             Else
-                                Logger.Msg(atcUtility.ReadableFromXML(lResult), "Download Result")
+                                'Logger.Msg(lResult, "Result of Query from DataManager")
+                                Logger.Dbg("QueryResult:" & lResult)
+                                Dim lSilentSuccess As Boolean = lResult.ToLower.Contains("<success />")
+                                If lSilentSuccess Then
+                                    lResult = lResult.Replace("<success />", "").Trim
+                                    Logger.Dbg("QueryResultTrimmed:" & lResult)
+                                End If
+                                If lResult.Length = 0 Then
+                                    If lSilentSuccess Then Logger.Msg("Download Complete", "Data Download")
+                                ElseIf lResult.StartsWith("<success>") Then
+                                    BASINS.ProcessDownloadResults(lResult)
+                                Else
+                                    Logger.Msg(atcUtility.ReadableFromXML(lResult), "Data Download")
+                                End If
                             End If
+
                             Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default 'Logger.Busy = False
                         End If
                     End If
