@@ -35,13 +35,15 @@ Public Class frmBMP
     Private pTribs As Collection 'of TribInfo
 
     Private pMsgTitle As String = "Best Management Practices Editor"
-    Private curBMPId As Integer
-    '    Public BMPDesc$
+    Private pCurrentBMPId As Integer
+    Private pInitializing As Boolean
 
     Public Sub New()
 
         ' This call is required by the Windows Form Designer.
+        pInitializing = True
         InitializeComponent()
+        pInitializing = False
 
         Me.Icon = pIcon
         Me.MinimumSize = Me.Size
@@ -50,10 +52,9 @@ Public Class frmBMP
         'are any reaches available?
         Dim lOpnBlk As HspfOpnBlk = pUCI.OpnBlks("RCHRES")
 
-        Dim pReaches As New Collection
-        pReaches.Clear()
-        Dim pBmps As New Collection
-        pBmps.Clear()
+        pReaches = New Collection
+        pBmps = New Collection
+        pTribs = New Collection
 
         If lOpnBlk.Count > 0 Then
             'what reaches are available?
@@ -123,149 +124,137 @@ Public Class frmBMP
 
     End Sub
 
-    Private Sub GetUciInfo(ByVal cur&)
+    Private Sub GetUciInfo(ByVal aCurrentReach As Integer)
 
-        '    Dim Init&, Id&, rorb&
-        '    Dim ctxt$, cmor$, pnam$, rcnt&, tcnt&
-        '    Dim i&, j&, k&, h&, bcnt&, found As Boolean
-        '    Dim rarea!, barea!
-        '    Dim lOper As HspfOperation
-        '    Dim lOpnBlk As HspfOpnBlk
-        '    Dim vConn As Object
-        '    Dim lConn As HspfConnection
+        Dim lId As Integer = pReaches(aCurrentReach).Id
+        'assume bmps not in use for this reach
+        For lBmpIndex As Integer = 0 To pBmps.Count - 1
+            pBmps(lBmpIndex).InUseNow = False
+        Next lBmpIndex
 
-        '    Id = MyRch(cur).Id
-        '    'assume bmps not in use for this reach
-        '    For i = 1 To UBound(myBmp)
-        '        myBmp(i).InUseNow = False
-        '    Next i
+        pTribs = New Collection
+        pTribs.Clear()
+        Dim lTribCount As Integer = 0
+        Dim lBmpCount As Integer = pBmps.Count
+        Dim lOpnBlk As HspfOpnBlk = pUCI.OpnBlks("RCHRES")
+        Dim lOper As HspfOperation = lOpnBlk.OperFromID(lId)
 
-        '    ReDim myTrib(0)
-        '    tcnt = 0
-        '    bcnt = UBound(myBmp)
-        '    lOpnBlk = myUci.OpnBlks("RCHRES")  'reach
-        '    lOper = lOpnBlk.operfromid(Id)
+        If Not lOper Is Nothing Then
+            'loop through all connections looking for this oper as target
+            For Each lConn As HspfConnection In pUCI.Connections
+                If lConn.Typ = 3 Or lConn.Typ = 2 Then 'network or schematic
+                    If Not lConn.Target.Opn Is Nothing Then
+                        If lConn.Target.Opn.Id = lOper.Id And _
+                           lConn.Target.Opn.Name = lOper.Name Then  'found a source
+                            If lConn.Source.VolName = "BMPRAC" Then
+                                For lBmpIndex As Integer = 0 To lBmpCount - 1
+                                    If pBmps(lBmpIndex).Id = lConn.Source.VolId Then
+                                        pBmps(lBmpIndex).InUseNow = True
+                                        pReaches(aCurrentReach).BMPCnt = pReaches(aCurrentReach).BMPCnt + 1
+                                        Exit For
+                                    End If
+                                Next lBmpIndex
+                            Else 'non-bmp source
+                                lTribCount = lTribCount + 1
+                                Dim lTrib As New TribInfo
+                                lTrib.Id = lConn.Source.VolId
+                                lTrib.OpNam = lConn.Source.VolName
+                                lTrib.Area = lConn.MFact
+                                lTrib.Desc = lConn.Source.Opn.Description
+                                lTrib.BMPCnt = 0
+                                pTribs.Add(lTrib)
+                                ReDim lTrib.BmpPtr(0)
+                            End If
+                        End If
+                    End If
+                End If
+            Next
 
-        '    If Not lOper Is Nothing Then
-        '        'loop through all connections looking for this oper as target
-        '        For Each vConn In myUci.Connections
-        '            lConn = vConn
-        '            If lConn.Typ = 3 Or lConn.Typ = 2 Then 'network or schematic
-        '                If Not lConn.Target.Opn Is Nothing Then
-        '                    If lConn.Target.Opn.Id = lOper.Id And _
-        '                       lConn.Target.Opn.Name = lOper.Name Then  'found a source
-        '                        If lConn.Source.volname = "BMPRAC" Then
-        '                            For i = 1 To bcnt
-        '                                If myBmp(i).Id = lConn.Source.volid Then
-        '                                    myBmp(i).InUseNow = True
-        '                                    MyRch(cur).BMPCnt = MyRch(cur).BMPCnt + 1
-        '                                    Exit For
-        '                                End If
-        '                            Next i
-        '                        Else 'non-bmp source
-        '                            tcnt = tcnt + 1
-        '                            ReDim Preserve myTrib(tcnt)
-        '                            myTrib(tcnt).Id = lConn.Source.volid
-        '                            myTrib(tcnt).OpNam = lConn.Source.volname
-        '                            myTrib(tcnt).Area = lConn.MFact
-        '                            myTrib(tcnt).Desc = lConn.Source.Opn.Description
-        '                            myTrib(tcnt).BMPCnt = 0
-        '                            ReDim myTrib(tcnt).BmpPtr(0)
-        '                        End If
-        '                    End If
-        '                End If
-        '            End If
-        '        Next vConn
+            For lBmpIndex As Integer = 0 To lBmpCount - 1 'loop thru bmps to find their tribs
+                If pBmps(lBmpIndex).InUseNow Then
+                    lId = pBmps(lBmpIndex).Id
+                    lOpnBlk = pUCI.OpnBlks("BMPRAC")  'bmp
+                    lOper = lOpnBlk.OperFromID(lId)
 
-        '        For i = 1 To bcnt 'loop thru bmps to find their tribs
-        '            If myBmp(i).InUseNow Then
-        '                Id = myBmp(i).Id
-        '                lOpnBlk = myUci.OpnBlks("BMPRAC")  'bmp
-        '                lOper = lOpnBlk.operfromid(Id)
+                    For Each lConn As HspfConnection In pUCI.Connections
+                        If lConn.Typ = 3 Or lConn.Typ = 2 Then 'network or schematic
+                            If lConn.Target.Opn.Id = lOper.Id And _
+                               lConn.Target.Opn.Name = lOper.Name Then 'found a source
+                                If lConn.Source.VolName = "BMPRAC" Then
+                                    Logger.Msg("PROBLEM - BMPs cant go to BMPs in the WinHSPF BMP Editor", vbOKOnly, pMsgTitle)
+                                    Me.Dispose() 'close up bmp editing
+                                End If
+                                Dim found As Boolean = False
+                                For lTribIndex As Integer = 0 To lTribCount - 1
+                                    If pTribs(lTribIndex).OpNam = lConn.Source.VolName Then
+                                        If pTribs(lTribIndex).Id = lConn.Source.Opn.Id Then
+                                            'know about this trib
+                                            found = True
+                                            Exit For
+                                        End If
+                                    End If
+                                Next lTribIndex
+                                If Not (found) Then 'add to trib list
+                                    lTribCount = lTribCount + 1
+                                    Dim lTrib As New TribInfo
+                                    lTrib.Desc = lConn.Source.Opn.Description
+                                    lTrib.Id = lConn.Source.Opn.Id
+                                    lTrib.OpNam = lConn.Source.VolName
+                                    lTrib.BMPCnt += 1
+                                    ReDim Preserve lTrib.BmpPtr(lTrib.BMPCnt)
+                                    lTrib.BmpPtr(lTrib.BMPCnt).Ind = lBmpIndex
+                                    lTrib.BmpPtr(lTrib.BMPCnt).Area = lConn.MFact
+                                    lTrib.Area = lTrib.Area + lConn.MFact
+                                    pTribs.Add(lTrib)
+                                End If
+                            End If
+                        End If
+                    Next lConn
+                End If
+            Next lBmpIndex 'bmp
 
-        '                For Each vConn In myUci.Connections
-        '                    lConn = vConn
-        '                    If lConn.Typ = 3 Or lConn.Typ = 2 Then 'network or schematic
-        '                        If lConn.Target.Opn.Id = lOper.Id And _
-        '                           lConn.Target.Opn.Name = lOper.Name Then 'found a source
-        '                            If lConn.Source.volname = "BMPRAC" Then
-        '                                MsgBox("PROBLEM - BMPs cant go to BMPs in the WinHSPF BMP Editor", vbOKOnly, msgTitle)
-        '                                cmdBMP_Click(2) 'close up bmp editing
-        '                            End If
-        '                            found = False
-        '                            For j = 1 To tcnt
-        '                                If myTrib(j).OpNam = lConn.Source.volname Then
-        '                                    If myTrib(j).Id = lConn.Source.Opn.Id Then
-        '                                        'know about this trib
-        '                                        found = True
-        '                                        Exit For
-        '                                    End If
-        '                                End If
-        '                            Next j
-        '                            If Not (found) Then 'add to trib list
-        '                                tcnt = tcnt + 1
-        '                                j = tcnt
-        '                                ReDim Preserve myTrib(j)
-        '                                myTrib(j).Desc = lConn.Source.Opn.Description
-        '                                myTrib(j).Id = lConn.Source.Opn.Id
-        '                                myTrib(j).OpNam = lConn.Source.volname
-        '                            End If
-
-        '                            With myTrib(j)
-        '                                .BMPCnt = .BMPCnt + 1
-        '                                ReDim Preserve .BmpPtr(.BMPCnt)
-        '                                .BmpPtr(.BMPCnt).Ind = i
-        '                                .BmpPtr(.BMPCnt).Area = lConn.MFact
-        '                                .Area = .Area + lConn.MFact
-        '                            End With
-        '                        End If
-        '                    End If
-        '                Next vConn
-        '            End If
-        '        Next i 'bmp
-
-        '        For i = 1 To bcnt
-        '            If myBmp(i).InUseNow Then
-        '                For j = 1 To UBound(myTrib)
-        '                    found = False
-        '                    For k = 1 To myTrib(j).BMPCnt
-        '                        If myTrib(j).BmpPtr(k).Ind = i Then
-        '                            found = True
-        '                            Exit For
-        '                        ElseIf myTrib(j).BmpPtr(k).Ind > i Then
-        '                            With myTrib(j)
-        '                                .BMPCnt = .BMPCnt + 1
-        '                                ReDim Preserve .BmpPtr(.BMPCnt)
-        '                                For h = .BMPCnt To k + 1 Step -1
-        '                                    .BmpPtr(h) = .BmpPtr(h - 1)
-        '                                Next h
-        '                                .BmpPtr(k).Ind = i
-        '                                .BmpPtr(k).Area = 0
-        '                            End With
-        '                            found = True 'we added it
-        '                            Exit For
-        '                        End If
-        '                    Next k
-        '                    If Not found Then 'add to end
-        '                        With myTrib(j)
-        '                            .BMPCnt = .BMPCnt + 1
-        '                            ReDim Preserve .BmpPtr(.BMPCnt)
-        '                            .BmpPtr(.BMPCnt).Ind = i
-        '                            .BmpPtr(.BMPCnt).Area = 0
-        '                        End With
-        '                    End If
-        '                Next j
-        '            End If
-        '        Next i
-        '    End If
+            For lBmpIndex As Integer = 0 To lBmpCount - 1
+                If pBmps(lBmpIndex).InUseNow Then
+                    For lTribIndex As Integer = 0 To pTribs.Count - 1
+                        Dim lFound As Boolean = False
+                        For lTribBmpIndex As Integer = 1 To pTribs(lTribIndex).BMPCnt
+                            If pTribs(lTribIndex).BmpPtr(lTribBmpIndex).Ind = lBmpIndex Then
+                                lFound = True
+                                Exit For
+                            ElseIf pTribs(lTribIndex).BmpPtr(lTribBmpIndex).Ind > lBmpIndex Then
+                                With pTribs(lTribIndex)
+                                    .BMPCnt = .BMPCnt + 1
+                                    ReDim Preserve .BmpPtr(.BMPCnt)
+                                    For lPtrIndex As Integer = .BMPCnt To lTribBmpIndex + 1 Step -1
+                                        .BmpPtr(lPtrIndex) = .BmpPtr(lPtrIndex - 1)
+                                    Next lPtrIndex
+                                    .BmpPtr(lTribBmpIndex).Ind = lBmpIndex
+                                    .BmpPtr(lTribBmpIndex).Area = 0
+                                End With
+                                lFound = True 'we added it
+                                Exit For
+                            End If
+                        Next lTribBmpIndex
+                        If Not lFound Then 'add to end
+                            With pTribs(lTribIndex)
+                                .BMPCnt = .BMPCnt + 1
+                                ReDim Preserve .BmpPtr(.BMPCnt)
+                                .BmpPtr(.BMPCnt).Ind = lBmpIndex
+                                .BmpPtr(.BMPCnt).Area = 0
+                            End With
+                        End If
+                    Next lTribIndex
+                End If
+            Next lBmpIndex
+        End If
     End Sub
 
     Private Sub BmpDescUpdate(ByVal aBmpIndex As Integer)
         If aBmpIndex > 0 Then
             With agdSource.Source
-                curBMPId = Mid(.CellValue(0, .Columns), 6, Len(.CellValue(0, .Columns)) - 4)
+                pCurrentBMPId = Mid(.CellValue(0, .Columns), 6, Len(.CellValue(0, .Columns)) - 4)
                 For lBmpIndex As Integer = 1 To pBmps.Count
-                    If curBMPId = pBmps(lBmpIndex).Id Then
+                    If pCurrentBMPId = pBmps(lBmpIndex).Id Then
                         atxBMPId.Text = pBmps(lBmpIndex).Id
                         atxBMPDesc.Text = pBmps(lBmpIndex).Desc
                         Exit For
@@ -274,7 +263,7 @@ Public Class frmBMP
                 fraBMPDet.Visible = True
             End With
         Else
-            curBMPId = 0
+            pCurrentBMPId = 0
             fraBMPDet.Visible = False
         End If
     End Sub
@@ -418,267 +407,243 @@ Public Class frmBMP
     End Sub
 
     Private Sub atxBMPId_LostFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles atxBMPId.LostFocus
-        'Dim i&, bcnt&
+        If atxBMPId.Enabled = True Then
+            For lBmpIndex As Integer = 0 To pBmps.Count - 1
+                If pBmps(lBmpIndex).Id = atxBMPId.Text Then
+                    Logger.Msg("BMP id " & pBmps(lBmpIndex).Id & " is already in use" & vbCrLf & _
+                            "Try another ID number", vbOKOnly, pMsgTitle)
+                    atxBMPId.Text = pCurrentBMPId
+                    Exit Sub
+                End If
+            Next lBmpIndex
 
-        'If atxBMPId.Enabled = True Then
-        '    bcnt = UBound(myBmp)
-        '    For i = 1 To bcnt
-        '        If myBmp(i).Id = atxBMPId.Value Then
-        '            MsgBox("BMP id " & myBmp(i).Id & " is already in use" & vbCrLf & _
-        '                    "Try another ID number", vbOKOnly, msgTitle)
-        '            atxBMPId.Value = curBMPId
-        '            Exit Sub
-        '        End If
-        '    Next i
+            pCurrentBMPId = atxBMPId.Text
 
-        '    curBMPId = atxBMPId.Value
+            agdSource.Source.CellValue(0, agdSource.Source.Columns) = "% BMP " & pCurrentBMPId
+            pBmps(agdSource.Source.Columns - 2).Id = pCurrentBMPId
 
-        '    grdSrc.ColTitle(grdSrc.col) = "% BMP " & curBMPId
-        '    myBmp(grdSrc.col - 2).Id = curBMPId
-
-        '    cmdUpU.Enabled = True
-        'End If
+            cmdUpdateUCI.Enabled = True
+        End If
     End Sub
 
     Private Sub cboReach_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboReach.Click
-        'If cmbReach.ListIndex = 0 Then
-        '    rdoOpt(0).Visible = False 'True
-        '    rdoOpt(1).Visible = False 'True
-        'Else
-        '    rdoOpt(0).Visible = False
-        '    rdoOpt(1).Visible = False
-        'End If
-        'Call GetUciInfo(cmbReach.ListIndex)
-        'Call PopulateGrid()
-        'cmdUpU.Enabled = False
-        'atxBMPId.Enabled = False
+        Call GetUciInfo(cboReach.SelectedIndex)
+        Call PopulateGrid()
+        cmdUpdateUCI.Enabled = False
+        atxBMPId.Enabled = False
     End Sub
 
     Private Sub cmdAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAdd.Click
-        'Dim ans&, i&, j&, k&, cur&, nth&, ncnt&, curbmp&
-        'Dim done As Boolean
+        Dim cur As Integer = cboReach.SelectedIndex
 
-        'cur = cmbReach.ListIndex
+        Dim lNewBmp As New BmpInfo
+        ' assign an id not in use
+        Dim lNewIndex As Integer = 0
+        Dim lDone As Integer = False
+        Do Until lDone
+            lDone = True ' assume the best
+            For lBmpIndex As Integer = 0 To pBmps.Count - 1
+                If pBmps(lBmpIndex).Id = pReaches(cur).Id + lNewIndex Then 'in use
+                    lNewIndex = lNewIndex + 1
+                    lDone = False
+                    Exit For
+                End If
+            Next lBmpIndex
+        Loop
 
-        '    i = UBound(myBmp) + 1
-        '    ReDim Preserve myBmp(i)
-        '    ' assign an id not in use
-        '    j = 0
-        '    done = False
-        '    Do Until done
-        '        done = True ' assume the best
-        '        For k = 1 To i - 1
-        '            If myBmp(k).Id = MyRch(cur).Id + j Then 'in use
-        '                j = j + 1
-        '                done = False
-        '                Exit For
-        '            End If
-        '        Next k
-        '    Loop
+        lNewBmp.Id = pReaches(cur).Id + lNewIndex
+        lNewBmp.Desc = "New BMP"
+        lNewBmp.InUseNow = True
+        For lNewIndex = 0 To pTribs.Count - 1
+            pTribs(lNewIndex).BMPCnt = pTribs(lNewIndex).BMPCnt + 1
+            Dim lBmpCount As Integer = pTribs(lNewIndex).BMPCnt
+            ReDim Preserve pTribs(lNewIndex).BmpPtr(lBmpCount)
+            pTribs(lNewIndex).BmpPtr(lBmpCount).Area = 0
+            pTribs(lNewIndex).BmpPtr(lBmpCount).Ind = pBmps.Count
+        Next lNewIndex
+        pReaches(cur).BMPCnt = pReaches(cur).BMPCnt + 1
 
-        '    myBmp(i).Id = MyRch(cur).Id + j
-        '    myBmp(i).Desc = "New BMP"
-        '    myBmp(i).InUseNow = True
-        '    For j = 1 To UBound(myTrib)
-        '        myTrib(j).BMPCnt = myTrib(j).BMPCnt + 1
-        '        k = myTrib(j).BMPCnt
-        '        ReDim Preserve myTrib(j).BmpPtr(k)
-        '        myTrib(j).BmpPtr(k).Area = 0
-        '        myTrib(j).BmpPtr(k).Ind = i
-        '    Next j
-        '    MyRch(cur).BMPCnt = MyRch(cur).BMPCnt + 1
-        '    Call PopulateGrid()
-        '    cmdUpU.Enabled = True
-        '    atxBMPId.Enabled = True
+        pBmps.Add(lNewBmp)
+
+        Call PopulateGrid()
+        cmdUpdateUCI.Enabled = True
+        atxBMPId.Enabled = True
     End Sub
 
     Private Sub cmdDelete_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDelete.Click
-        'Dim ans&, i&, j&, k&, cur&, nth&, ncnt&, curbmp&
-        'Dim done As Boolean
+        Dim lCurReach As Integer = cboReach.SelectedIndex
 
-        'cur = cmbReach.ListIndex
-
-        'If MyRch(cur).BMPCnt = 0 Then
-        '    MsgBox("No BMPs are associated with Reach " & MyRch(cur).Id, _
-        '           vbExclamation, msgTitle)
-        'ElseIf grdSrc.col > 2 Then 'are in a bmp
-        '    'delete nth bmp
-        '    nth = grdSrc.col - 2
-        '    ncnt = 0
-        '    For j = 1 To UBound(myBmp)
-        '        If myBmp(j).InUseNow = True Then
-        '            ncnt = ncnt + 1
-        '            If nth = ncnt Then
-        '                'this is the one to delete
-        '                curbmp = myBmp(j).Id
-        '                nth = j
-        '            End If
-        '        End If
-        '    Next j
-        '    curbmp = atxBMPId.Value
-        '    ans = MsgBox("Are you sure you want to Delete BMP " & curbmp & "?", _
-        '           vbYesNo, msgTitle)
-        '    If ans = vbYes Then
-        '        myBmp(nth).DeletePending = True
-        '        myBmp(nth).InUseNow = False
-        '        MyRch(cur).BMPCnt = MyRch(cur).BMPCnt - 1
-        '        For j = 1 To UBound(myTrib)
-        '            'adjust here
-        '        Next j
-        '        grdSrc.cols = grdSrc.cols - 1
-        '        grdSrc.col = 2
-        '        Call PopulateGrid()
-        '        cmdUpU.Enabled = True
-        '    End If
-        'End If
+        If pReaches(lCurReach).BMPCnt = 0 Then
+            Logger.Msg("No BMPs are associated with Reach " & pReaches(lCurReach).Id, _
+                       vbExclamation, pMsgTitle)
+        ElseIf agdSource.Source.Columns > 2 Then 'are in a bmp
+            'delete nth bmp
+            Dim lNth As Integer = agdSource.Source.Columns - 2
+            Dim lNCnt As Integer = 0
+            Dim lCurBmp As Integer
+            For lBmpIndex As Integer = 0 To pBmps.Count - 1
+                If pBmps(lBmpIndex).InUseNow = True Then
+                    lNCnt = lNCnt + 1
+                    If lNth = lNCnt Then
+                        'this is the one to delete
+                        lCurBmp = pBmps(lBmpIndex).Id
+                        lNth = lBmpIndex
+                    End If
+                End If
+            Next lBmpIndex
+            lCurBmp = atxBMPId.Text
+            If Logger.Msg("Are you sure you want to Delete BMP " & lCurBmp & "?", _
+                   vbYesNo, pMsgTitle) = vbYes Then
+                pBmps(lNth).DeletePending = True
+                pBmps(lNth).InUseNow = False
+                pReaches(lCurReach).BMPCnt = pReaches(lCurReach).BMPCnt - 1
+                For lTribIndex As Integer = 1 To pTribs.Count
+                    'adjust here
+                Next lTribIndex
+                agdSource.Source.Columns = agdSource.Source.Columns - 1
+                'agdSource.Source.col = 2
+                Call PopulateGrid()
+                cmdUpdateUCI.Enabled = True
+            End If
+        End If
     End Sub
 
     Private Sub cmdClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdClose.Click
-        'If cmdUpU.Enabled = True Then
-        '    ans = MsgBox("You have changes to your UCI made which have not been saved. " & vbCrLf & _
-        '                 "OK trashes them, Cancel allows you a chance to update your UCI.", _
-        '                 vbOKCancel, msgTitle)
-        'Else 'no changes pending
-        '    ans = vbOK
-        'End If
-
-        'If ans = vbOK Then
-        '    Unload(Me)
-        'End If
+        If cmdUpdateUCI.Enabled = True Then
+            If Logger.Msg("You have changes to your UCI made which have not been saved. " & vbCrLf & _
+                             "OK trashes them, Cancel allows you a chance to update your UCI.", _
+                             vbOKCancel, pMsgTitle) = MsgBoxResult.Ok Then
+                Me.Dispose()
+            End If
+        Else 'no changes pending
+            Me.Dispose()
+        End If
     End Sub
 
     Private Sub cmdUpdateUCI_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdUpdateUCI.Click
-        'Dim i&, j&, k&, ret&, rchid&, c&, bmpId&, itmnam$
-        'Dim lOpn As HspfOperation, addit As Boolean, a#
-        'Dim lOpnBlk As HspfOpnBlk, addbefore&
-        'Dim vConn As Object
-        'Dim lConn As HspfConnection
-        'Dim lTable As HspfTable
 
-        'rchid = MyRch(cmbReach.ListIndex).Id
+        Dim lRchId As Integer = pReaches(cboReach.SelectedIndex).Id
 
-        'atxBMPId.Enabled = False
-        'For i = 1 To UBound(myBmp) 'process deletes first
-        '    If myBmp(i).DeletePending Then 'get rid of it
-        '        myUci.DeleteOperation("BMPRAC", myBmp(i).Id)
-        '        myBmp(i).InUseNow = False
-        '    End If
-        'Next i
+        atxBMPId.Enabled = False
+        For lBmpIndex As Integer = 0 To pBmps.Count - 1 'process deletes first
+            If pBmps(lBmpIndex).DeletePending Then 'get rid of it
+                pUCI.DeleteOperation("BMPRAC", pBmps(lBmpIndex).Id)
+                pBmps(lBmpIndex).InUseNow = False
+            End If
+        Next lBmpIndex
 
-        ''put areas back for the bmps that are in use
-        'For i = 1 To UBound(myBmp)
-        '    If myBmp(i).InUseNow Then
+        'put areas back for the bmps that are in use
+        For lBmpIndex As Integer = 0 To pBmps.Count - 1
+            If pBmps(lBmpIndex).InUseNow Then
 
-        '        'see if we need to add this bmp to opn seq block
-        '        lOpnBlk = myUci.OpnBlks("BMPRAC")
-        '        addit = True
-        '        If lOpnBlk.Count > 0 Then
-        '            lOpn = lOpnBlk.operfromid(myBmp(i).Id)
-        '            If Not lOpn Is Nothing Then addit = False
-        '        End If
-        '        If addit Then
-        '            'add new bmprac operation
-        '            myUci.AddOperation("BMPRAC", myBmp(i).Id)
-        '            'figure out where to put it in opn seq block
-        '            addbefore = myUci.OpnSeqBlock.Opns.Count
-        '            For j = 1 To myUci.OpnSeqBlock.Opns.Count
-        '                If myUci.OpnSeqBlock.Opn(j).Name = "RCHRES" And _
-        '                   myUci.OpnSeqBlock.Opn(j).Id = rchid Then
-        '                    addbefore = j
-        '                End If
-        '            Next j
-        '            'now add to opn seq block
-        '            lOpn = lOpnBlk.operfromid(myBmp(i).Id)
-        '            lOpn.Description = myBmp(i).Desc
-        '            lOpn.Uci = myUci
-        '            lOpn.OpnBlk = lOpnBlk
-        '            myUci.OpnSeqBlock.addbefore(lOpn, addbefore)
-        '            If lOpnBlk.Count > 1 Then
-        '                'already have some of this operation
-        '                For Each lTable In lOpnBlk.Ids(1).tables
-        '                    'add this opn id to this table
-        '                    myUci.AddTable("BMPRAC", myBmp(i).Id, lTable.Name)
-        '                Next lTable
-        '            Else
-        '                'added the first bmprac, need to add associated tables
-        '                Dim lBlock As HspfBlockDef
-        '                Dim vSection As Object, lSection As HspfSectionDef
-        '                Dim vTable As Object, lTabledef As HspfTableDef
-        '                lBlock = myMsg.BlockDefs("BMPRAC")
-        '                For Each vSection In lBlock.SectionDefs
-        '                    lSection = vSection
-        '                    For Each vTable In lSection.TableDefs
-        '                        lTabledef = vTable
-        '                        myUci.AddTable("BMPRAC", myBmp(i).Id, lTabledef.Name)
-        '                    Next vTable
-        '                Next vSection
-        '            End If
-        '            lTable = lOpnBlk.tables("GEN-INFO")
-        '            lTable.Parms("BMPID").Value = myBmp(i).Desc
-        '            lTable.Parms("NGQUAL").Value = 0   'assume no gquals
-        '            lTable = lOpnBlk.tables("GQ-FRAC")
-        '            lTable.Parms("GQID").Value = "unknown"
-        '        End If
+                'see if we need to add this bmp to opn seq block
+                Dim lOpnBlk As HspfOpnBlk = pUCI.OpnBlks("BMPRAC")
+                Dim lAddIt As Boolean = True
+                If lOpnBlk.Count > 0 Then
+                    Dim lOpn As HspfOperation = lOpnBlk.OperFromID(pBmps(lBmpIndex).Id)
+                    If Not lOpn Is Nothing Then lAddIt = False
+                End If
+                If lAddIt Then
+                    'add new bmprac operation
+                    pUCI.AddOperation("BMPRAC", pBmps(lBmpIndex).Id)
+                    'figure out where to put it in opn seq block
+                    Dim lAddBefore As Integer = pUCI.OpnSeqBlock.Opns.Count
+                    For lOpIndex As Integer = 1 To pUCI.OpnSeqBlock.Opns.Count
+                        If pUCI.OpnSeqBlock.Opn(lOpIndex).Name = "RCHRES" And _
+                           pUCI.OpnSeqBlock.Opn(lOpIndex).Id = lRchId Then
+                            lAddBefore = lOpIndex
+                        End If
+                    Next lOpIndex
+                    'now add to opn seq block
+                    Dim lOpn As HspfOperation = lOpnBlk.OperFromID(pBmps(lBmpIndex).Id)
+                    lOpn.Description = pBmps(lBmpIndex).Desc
+                    lOpn.Uci = pUCI
+                    lOpn.OpnBlk = lOpnBlk
+                    pUCI.OpnSeqBlock.AddBefore(lOpn, lAddBefore)
+                    Dim lTable As HspfTable
+                    If lOpnBlk.Count > 1 Then
+                        'already have some of this operation
+                        For Each lTable In lOpnBlk.Ids(1).Tables
+                            'add this opn id to this table
+                            pUCI.AddTable("BMPRAC", pBmps(lBmpIndex).Id, lTable.Name)
+                        Next lTable
+                    Else
+                        'added the first bmprac, need to add associated tables
+                        Dim lBlock As HspfBlockDef
+                        Dim lSection As HspfSectionDef
+                        Dim lTabledef As HspfTableDef
+                        lBlock = pMsg.BlockDefs("BMPRAC")
+                        For Each lSection In lBlock.SectionDefs
+                            For Each lTabledef In lSection.TableDefs
+                                pUCI.AddTable("BMPRAC", pBmps(lBmpIndex).Id, lTabledef.Name)
+                            Next
+                        Next
+                    End If
+                    lTable = lOpnBlk.Tables("GEN-INFO")
+                    lTable.Parms("BMPID").Value = pBmps(lBmpIndex).Desc
+                    lTable.Parms("NGQUAL").Value = 0   'assume no gquals
+                    lTable = lOpnBlk.tables("GQ-FRAC")
+                    lTable.Parms("GQID").Value = "unknown"
+                End If
 
-        '        'look for bmp to rchres connection, add it if not existing
-        '        Call PutSchematicRecord("BMPRAC", myBmp(i).Id, "RCHRES", rchid, 1.0#)
-        '    End If
-        'Next i
+                'look for bmp to rchres connection, add it if not existing
+                Call PutSchematicRecord("BMPRAC", pBmps(lBmpIndex).Id, "RCHRES", lRchId, 1.0#)
+            End If
+        Next lBmpIndex
 
-        'For j = 1 To UBound(myTrib)
-        '    'put area going directly to rch
-        '    a = myTrib(j).Area * CSng((grdSrc.TextMatrix(j, 2) / 100))
-        '    Call PutSchematicRecord(myTrib(j).OpNam, myTrib(j).Id, "RCHRES", rchid, a)
-        '    'put area going to bmps
-        '    For k = 1 To myTrib(j).BMPCnt
-        '        If myBmp(myTrib(j).BmpPtr(k).Ind).InUseNow Then
-        '            bmpId = myBmp(myTrib(j).BmpPtr(k).Ind).Id
-        '            c = myBmp(myTrib(j).BmpPtr(k).Ind).col
-        '            a = myTrib(j).Area * CSng((grdSrc.TextMatrix(j, c) / 100))
-        '            Call PutSchematicRecord(myTrib(j).OpNam, myTrib(j).Id, "BMPRAC", bmpId, a)
-        '        End If
-        '    Next k
-        'Next j
+        For lTribIndex As Integer = 0 To pTribs.Count - 1
+            'put area going directly to rch
+            Dim lArea As Double = pTribs(lTribIndex).Area * CSng((agdSource.Source.CellValue(lTribIndex, 2) / 100))
+            Call PutSchematicRecord(pTribs(lTribIndex).OpNam, pTribs(lTribIndex).Id, "RCHRES", lRchId, lArea)
+            'put area going to bmps
+            For lTribBmpIndex As Integer = 1 To pTribs(lTribIndex).BMPCnt
+                If pBmps(pTribs(lTribIndex).BmpPtr(lTribBmpIndex).Ind).InUseNow Then
+                    Dim lBmpId As Integer = pBmps(pTribs(lTribIndex).BmpPtr(lTribBmpIndex).Ind).Id
+                    Dim lColId As Integer = pBmps(pTribs(lTribIndex).BmpPtr(lTribBmpIndex).Ind).col
+                    lArea = pTribs(lTribIndex).Area * CSng((agdSource.Source.CellValue(lTribIndex, lColId) / 100))
+                    Call PutSchematicRecord(pTribs(lTribIndex).OpNam, pTribs(lTribIndex).Id, "BMPRAC", lBmpId, lArea)
+                End If
+            Next lTribBmpIndex
+        Next lTribIndex
 
-        'Call GetUciInfo(cmbReach.ListIndex) 'refresh with new data
-        'Call PopulateGrid()
-        'cmdUpU.Enabled = False
+        GetUciInfo(cboReach.SelectedIndex) 'refresh with new data
+        PopulateGrid()
+        cmdUpdateUCI.Enabled = False
     End Sub
 
     Private Sub agdSource_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdSource.CellEdited
-        'Dim t!, i&, r&, c&, a&, cNow&
+        'was on commit change event, not sure what this is now
+        Dim lCol As Integer = aColumn
 
-        'c = ChangeToCol
+        For lRow As Integer = 1 To aRow
+            Dim lVal As Double = agdSource.Source.CellValue(lRow, lCol) 'highest priority is just set value
 
-        'For r = ChangeFromRow To ChangeToRow
-        '    t = grdSrc.TextMatrix(r, c) 'highest priority is just set value
+            Dim lcNow As Integer = 2
+            For lBmpIndex As Integer = 0 To pBmps.Count - 1 ' each bmp
+                If pBmps(lBmpIndex).InUseNow And Not (pBmps(lBmpIndex).DeletePending) Then
+                    lcNow = lcNow + 1
+                    If lcNow <> lCol Then 'dont double count current
+                        lVal = lVal + agdSource.Source.CellValue(lRow, lcNow)
+                        If lVal > 100 Then
+                            agdSource.Source.CellValue(lRow, lcNow) = agdSource.Source.CellValue(lRow, lcNow) - lVal + 100
+                            lVal = 100
+                        End If
+                    End If
+                End If
+            Next lBmpIndex
 
-        '    cNow = 2
-        '    For i = 1 To UBound(myBmp) ' each bmp
-        '        If myBmp(i).InUseNow And Not (myBmp(i).DeletePending) Then
-        '            cNow = cNow + 1
-        '            If cNow <> c Then 'dont double count current
-        '                t = t + grdSrc.TextMatrix(r, cNow)
-        '                If t > 100 Then
-        '                    grdSrc.TextMatrix(r, cNow) = grdSrc.TextMatrix(r, cNow) - t + 100
-        '                    t = 100
-        '                End If
-        '            End If
-        '        End If
-        '    Next i
+            If lVal < 100 Then 'need some more
+                If lCol = 2 Then ' changing no bmp col, adjust first bmp
+                    agdSource.Source.CellValue(lRow, 3) = 100 - (lVal + agdSource.Source.CellValue(lRow, 3))
+                Else 'changing a bmp, adjust no bmp
+                    agdSource.Source.CellValue(lRow, 2) = 100 - lVal
+                End If
+            ElseIf lCol > 2 Then
+                agdSource.Source.CellValue(lRow, 2) = 100 - lVal
+            End If
+        Next lRow
 
-        '    If t < 100 Then 'need some more
-        '        If c = 2 Then ' changing no bmp col, adjust first bmp
-        '            grdSrc.TextMatrix(r, 3) = 100 - (t + grdSrc.TextMatrix(r, 3))
-        '        Else 'changing a bmp, adjust no bmp
-        '            grdSrc.TextMatrix(r, 2) = 100 - t
-        '        End If
-        '    ElseIf c > 2 Then
-        '        grdSrc.TextMatrix(r, 2) = 100 - t
-        '    End If
-        'Next r
-
-        'cmdUpU.Enabled = True
+        cmdUpdateUCI.Enabled = True
     End Sub
 
     'Private Sub grdSrc_RowColChange()
@@ -688,229 +653,218 @@ Public Class frmBMP
     'End Sub
 
     Private Sub atxBMPDesc_Change() Handles atxBMPDesc.Change
-        'Dim i&
-        'For i = 1 To UBound(myBmp)
-        '    If myBmp(i).InUseNow Then
-        '        myBmp(i).Desc = txtBMPDesc.Text
-        '    End If
-        'Next i
-        'cmdUpU.Enabled = True
+        If Not pInitializing Then
+            For lBmpIndex As Integer = 0 To pBmps.Count - 1
+                If pBmps(lBmpIndex).InUseNow Then
+                    pBmps(lBmpIndex).Desc = atxBMPDesc.Text
+                End If
+            Next
+            cmdUpdateUCI.Enabled = True
+        End If
     End Sub
 
-    Private Sub PutSchematicRecord(ByVal sname$, ByVal sid&, ByVal tname$, ByVal tid&, ByVal multfact#)
-        'Dim addit As Boolean, mlid&, deleteit As Boolean
-        'Dim vConn As Object, deleteindex&
-        'Dim lConn As HspfConnection
-        'Dim lOpnBlk As HspfOpnBlk, i&
-        'Dim lOpn As HspfOperation, tempOpn As HspfOperation
+    Private Sub PutSchematicRecord(ByVal aSName As String, ByVal aSId As Integer, ByVal aTName As String, ByVal aTId As Integer, ByVal aMultFact As Double)
 
-        'If sname = "RCHRES" And tname = "BMPRAC" Then 'dont do rchres to bmp connections
-        'Else
-        '    If sname = "RCHRES" And tname = "RCHRES" Then
-        '        multfact = 1.0#
-        '    End If
-        '    addit = True
-        '    deleteit = False
-        '    For i = 1 To myUci.Connections.Count
-        '        lConn = myUci.Connections(i)
-        '        If lConn.Typ = 3 Then 'schematic
-        '            If lConn.Target.Opn.Id = tid And _
-        '               lConn.Target.Opn.Name = tname And _
-        '               lConn.Source.Opn.Id = sid And _
-        '               lConn.Source.Opn.Name = sname Then
-        '                addit = False
-        '                lConn.MFact = multfact
-        '                If Abs(multfact) < 0.00000001 Then
-        '                    deleteit = True
-        '                    deleteindex = i
-        '                End If
-        '            End If
-        '        End If
-        '    Next i
-        '    If addit And Abs(multfact) > 0.00000001 Then 'need to add the connection
-        '        lConn = New HspfConnection
-        '        lOpnBlk = myUci.OpnBlks(sname)
-        '        lOpn = lOpnBlk.operfromid(sid)
-        '        lConn.Source.Opn = lOpn
-        '        lConn.Source.volname = lOpn.Name
-        '        lConn.Source.volid = lOpn.Id
-        '        lConn.Typ = 3
-        '        lConn.MFact = multfact
-        '        lOpnBlk = myUci.OpnBlks(tname)
-        '        lOpn = lOpnBlk.operfromid(tid)
-        '        lConn.Target.Opn = lOpn
-        '        lConn.Target.volname = lOpn.Name
-        '        lConn.Target.volid = lOpn.Id
-        '        Call GetMassLinkID(sname, tname, mlid)
-        '        If mlid = 0 Then
-        '            Call AddMassLink(sname, tname, mlid)
-        '        End If
-        '        lConn.MassLink = mlid
-        '        lConn.Uci = myUci
-        '        'add targets to source opn
-        '        lOpnBlk = myUci.OpnBlks(sname)
-        '        lOpn = lOpnBlk.operfromid(sid)
-        '        lOpn.targets.Add(lConn)
-        '        lConn.Source.Opn = lOpn
-        '        'add sources to target opn
-        '        lOpnBlk = myUci.OpnBlks(tname)
-        '        lOpn = lOpnBlk.operfromid(tid)
-        '        lOpn.Sources.Add(lConn)
-        '        lConn.Target.Opn = lOpn
-        '        'add to collection of connections
-        '        myUci.Connections.Add(lConn)
-        '    ElseIf deleteit Then 'need to delete the connection
-        '        myUci.Connections.Remove(deleteindex)
-        '        'remove target from source opn
-        '        lOpnBlk = myUci.OpnBlks(sname)
-        '        lOpn = lOpnBlk.operfromid(sid)
-        '        i = 1
-        '        For Each vConn In lOpn.targets
-        '            lConn = vConn
-        '            If lConn.Target.volname = tname And _
-        '               lConn.Target.volid = tid Then
-        '                lOpn.targets.Remove(i)
-        '            Else
-        '                i = i + 1
-        '            End If
-        '        Next vConn
-        '        'remove source from target opn
-        '        lOpnBlk = myUci.OpnBlks(tname)
-        '        lOpn = lOpnBlk.operfromid(tid)
-        '        i = 1
-        '        For Each vConn In lOpn.Sources
-        '            lConn = vConn
-        '            If lConn.Source.volname = sname And _
-        '               lConn.Source.volid = sid Then
-        '                lOpn.Sources.Remove(i)
-        '            Else
-        '                i = i + 1
-        '            End If
-        '        Next vConn
-        '    End If
-        'End If
+        If aSName = "RCHRES" And aTName = "BMPRAC" Then 'dont do rchres to bmp connections
+        Else
+            If aSName = "RCHRES" And aTName = "RCHRES" Then
+                aMultFact = 1.0#
+            End If
+            Dim lAddIt As Boolean = True
+            Dim lDeleteIt As Boolean = False
+            Dim lDeleteIndex As Integer = 0
+            For lIndex As Integer = 1 To pUCI.Connections.Count
+                Dim lConn As HspfConnection = pUCI.Connections(lIndex)
+                If lConn.Typ = 3 Then 'schematic
+                    If lConn.Target.Opn.Id = aTId And _
+                       lConn.Target.Opn.Name = aTName And _
+                       lConn.Source.Opn.Id = aSId And _
+                       lConn.Source.Opn.Name = aSName Then
+                        lAddIt = False
+                        lConn.MFact = aMultFact
+                        If Math.Abs(aMultFact) < 0.00000001 Then
+                            lDeleteIt = True
+                            lDeleteIndex = lIndex
+                        End If
+                    End If
+                End If
+            Next lIndex
+            If lAddIt And Math.Abs(aMultFact) > 0.00000001 Then 'need to add the connection
+                Dim lConn = New HspfConnection
+                Dim lOpnBlk As HspfOpnBlk = pUCI.OpnBlks(aSName)
+                Dim lOpn As HspfOperation = lOpnBlk.OperFromID(aSId)
+                lConn.Source.Opn = lOpn
+                lConn.Source.volname = lOpn.Name
+                lConn.Source.volid = lOpn.Id
+                lConn.Typ = 3
+                lConn.MFact = aMultFact
+                lOpnBlk = pUCI.OpnBlks(aTName)
+                lOpn = lOpnBlk.OperFromID(aTId)
+                lConn.Target.Opn = lOpn
+                lConn.Target.volname = lOpn.Name
+                lConn.Target.volid = lOpn.Id
+                Dim lMLId As Integer = 0
+                GetMassLinkID(aSName, aTName, lMLId)
+                If lMLId = 0 Then
+                    AddMassLink(aSName, aTName, lMLId)
+                End If
+                lConn.MassLink = lMLId
+                lConn.Uci = pUCI
+                'add targets to source opn
+                lOpnBlk = pUCI.OpnBlks(aSName)
+                lOpn = lOpnBlk.OperFromID(aSId)
+                lOpn.Targets.Add(lConn)
+                lConn.Source.Opn = lOpn
+                'add sources to target opn
+                lOpnBlk = pUCI.OpnBlks(aTName)
+                lOpn = lOpnBlk.OperFromID(aTId)
+                lOpn.Sources.Add(lConn)
+                lConn.Target.Opn = lOpn
+                'add to collection of connections
+                pUCI.Connections.Add(lConn)
+            ElseIf lDeleteIt Then 'need to delete the connection
+                pUCI.Connections.RemoveAt(lDeleteIndex)
+                'remove target from source opn
+                Dim lOpnBlk As HspfOpnBlk = pUCI.OpnBlks(aSName)
+                Dim lOpn As HspfOperation = lOpnBlk.OperFromID(aSId)
+                Dim lIndex As Integer = 1
+                For Each lConn As HspfConnection In lOpn.Targets
+                    If lConn.Target.VolName = aTName And _
+                       lConn.Target.VolId = aTId Then
+                        lOpn.Targets.RemoveAt(lIndex)
+                    Else
+                        lIndex = lIndex + 1
+                    End If
+                Next
+                'remove source from target opn
+                lOpnBlk = pUCI.OpnBlks(aTName)
+                lOpn = lOpnBlk.OperFromID(aTId)
+                lIndex = 1
+                For Each lConn As HspfConnection In lOpn.Sources
+                    If lConn.Source.VolName = aSName And _
+                       lConn.Source.VolId = aSId Then
+                        lOpn.Sources.RemoveAt(lIndex)
+                    Else
+                        lIndex = lIndex + 1
+                    End If
+                Next
+            End If
+        End If
     End Sub
 
-    Private Sub GetMassLinkID(ByVal sname$, ByVal tname$, ByVal mlid&)
-        'Dim lConn As HspfConnection
+    Private Sub GetMassLinkID(ByVal aSName As String, ByVal aTName As String, ByVal aMLId As Integer)
+        Dim lConn As HspfConnection
 
-        ''determine mass link number
-        'mlid = 0
-        'For Each lConn In myUci.Connections
-        '    If lConn.Typ = 3 Then
-        '        If lConn.Source.volname = sname And lConn.Target.volname = tname Then
-        '            mlid = lConn.MassLink
-        '        End If
-        '    End If
-        'Next lConn
+        'determine mass link number
+        aMLId = 0
+        For Each lConn In pUCI.Connections
+            If lConn.Typ = 3 Then
+                If lConn.Source.VolName = aSName And lConn.Target.VolName = aTName Then
+                    aMLId = lConn.MassLink
+                End If
+            End If
+        Next lConn
     End Sub
 
-    Private Sub AddMassLink(ByVal sname$, ByVal tname$, ByVal mlid&)
-        'Dim lOpn As HspfOperation
-        'Dim cOpns As Collection 'of hspfOperations
-        'Dim i&, j&, found As Boolean
-        'Dim pml&, iml&, ostr$(10)
-        'Dim lConn As HspfConnection, lMassLink As HspfMassLink
-        'Dim cMassLink As HspfMassLink, copyid&
+    Private Sub AddMassLink(ByVal aSName As String, ByVal aTName As String, ByVal aMLId As Integer)
+        'need to add masslink, find an unused number
+        Dim lFound As Boolean = True
+        aMLId = 1
+        Do Until lFound = False
+            lFound = False
+            For Each lMassLink As HspfMassLink In pUCI.MassLinks
+                If lMassLink.MassLinkId = aMLId Then
+                    aMLId = aMLId + 1
+                    lFound = True
+                    Exit For
+                End If
+            Next lMassLink
+        Loop
+        'find id of masslink to copy
+        Dim lCopyId As Integer = 0
+        If aSName = "BMPRAC" And aTName = "RCHRES" Then
+            'copy from perlnd to rchres masslink
+            Call GetMassLinkID("PERLND", aTName, lCopyId)
+        ElseIf aSName = "PERLND" And aTName = "BMPRAC" Then
+            'copy from perlnd to rchres masslink
+            Call GetMassLinkID(aSName, "RCHRES", lCopyId)
+        ElseIf aSName = "IMPLND" And aTName = "BMPRAC" Then
+            'copy from implnd to rchres masslink
+            Call GetMassLinkID(aSName, "RCHRES", lCopyId)
+        End If
+        If aMLId > 0 And lCopyId > 0 Then
+            'now copy masslink
+            For Each lcMassLink As HspfMassLink In pUCI.MassLinks
+                If lcMassLink.MassLinkId = lCopyId Then
+                    'copy this record
+                    Dim lMassLink As New HspfMassLink
+                    lMassLink.Uci = pUCI
+                    lMassLink.MassLinkId = aMLId
+                    lMassLink.Source.VolName = aSName
+                    lMassLink.Source.VolId = 0
+                    lMassLink.Source.Group = lcMassLink.Source.Group
+                    lMassLink.Source.Member = lcMassLink.Source.Member
+                    lMassLink.Source.MemSub1 = lcMassLink.Source.MemSub1
+                    lMassLink.Source.MemSub2 = lcMassLink.Source.MemSub2
+                    lMassLink.MFact = lcMassLink.MFact
+                    lMassLink.Tran = lcMassLink.Tran
+                    lMassLink.Target.VolName = aTName
+                    lMassLink.Target.VolId = 0
+                    lMassLink.Target.Group = lcMassLink.Target.Group
+                    lMassLink.Target.Member = lcMassLink.Target.Member
+                    lMassLink.Target.MemSub1 = lcMassLink.Target.MemSub1
+                    lMassLink.Target.MemSub2 = lcMassLink.Target.MemSub2
 
-        ''need to add masslink, find an unused number
-        'found = True
-        'mlid = 1
-        'Do Until found = False
-        '    found = False
-        '    For Each lMassLink In myUci.MassLinks
-        '        If lMassLink.MassLinkID = mlid Then
-        '            mlid = mlid + 1
-        '            found = True
-        '            Exit For
-        '        End If
-        '    Next lMassLink
-        'Loop
-        ''find id of masslink to copy
-        'copyid = 0
-        'If sname = "BMPRAC" And tname = "RCHRES" Then
-        '    'copy from perlnd to rchres masslink
-        '    Call GetMassLinkID("PERLND", tname, copyid)
-        'ElseIf sname = "PERLND" And tname = "BMPRAC" Then
-        '    'copy from perlnd to rchres masslink
-        '    Call GetMassLinkID(sname, "RCHRES", copyid)
-        'ElseIf sname = "IMPLND" And tname = "BMPRAC" Then
-        '    'copy from implnd to rchres masslink
-        '    Call GetMassLinkID(sname, "RCHRES", copyid)
-        'End If
-        'If mlid > 0 And copyid > 0 Then
-        '    'now copy masslink
-        '    For Each cMassLink In myUci.MassLinks
-        '        If cMassLink.MassLinkID = copyid Then
-        '            'copy this record
-        '            lMassLink = New HspfMassLink
-        '            lMassLink.Uci = myUci
-        '            lMassLink.MassLinkID = mlid
-        '            lMassLink.Source.volname = sname
-        '            lMassLink.Source.volid = 0
-        '            lMassLink.Source.group = cMassLink.Source.group
-        '            lMassLink.Source.member = cMassLink.Source.member
-        '            lMassLink.Source.memsub1 = cMassLink.Source.memsub1
-        '            lMassLink.Source.memsub2 = cMassLink.Source.memsub2
-        '            lMassLink.MFact = cMassLink.MFact
-        '            lMassLink.Tran = cMassLink.Tran
-        '            lMassLink.Target.volname = tname
-        '            lMassLink.Target.volid = 0
-        '            lMassLink.Target.group = cMassLink.Target.group
-        '            lMassLink.Target.member = cMassLink.Target.member
-        '            lMassLink.Target.memsub1 = cMassLink.Target.memsub1
-        '            lMassLink.Target.memsub2 = cMassLink.Target.memsub2
+                    If (aSName = "PERLND" Or aSName = "IMPLND") And _
+                      aTName = "BMPRAC" Then  'special cases
+                        If lcMassLink.Target.Member = "OXIF" Then
+                            lMassLink.Target.Member = "IOX"
+                        ElseIf lcMassLink.Target.Member = "NUIF1" Then
+                            lMassLink.Target.Member = "IDNUT"
+                        ElseIf lcMassLink.Target.Member = "NUIF2" Then
+                            lMassLink.Target.Member = "ISNUT"
+                        ElseIf lcMassLink.Target.Member = "PKIF" Then
+                            lMassLink.Target.Member = "IPLK"
+                        End If
+                    End If
 
-        '            If (sname = "PERLND" Or sname = "IMPLND") And _
-        '              tname = "BMPRAC" Then  'special cases
-        '                If cMassLink.Target.member = "OXIF" Then
-        '                    lMassLink.Target.member = "IOX"
-        '                ElseIf cMassLink.Target.member = "NUIF1" Then
-        '                    lMassLink.Target.member = "IDNUT"
-        '                ElseIf cMassLink.Target.member = "NUIF2" Then
-        '                    lMassLink.Target.member = "ISNUT"
-        '                ElseIf cMassLink.Target.member = "PKIF" Then
-        '                    lMassLink.Target.member = "IPLK"
-        '                End If
-        '            End If
+                    If aSName = "BMPRAC" And aTName = "RCHRES" Then
+                        'special cases
+                        lMassLink.Source.Group = "ROFLOW"
+                        lMassLink.MFact = 1.0#
+                        If lcMassLink.Target.Member = "IVOL" Then
+                            lMassLink.Source.Member = "ROVOL"
+                        ElseIf lcMassLink.Target.Member = "CIVOL" Then
+                            lMassLink.Source.Member = "CROVOL"
+                        ElseIf lcMassLink.Target.Member = "ICON" Then
+                            lMassLink.Source.Member = "ROCON"
+                        ElseIf lcMassLink.Target.Member = "IHEAT" Then
+                            lMassLink.Source.Member = "ROHEAT"
+                        ElseIf lcMassLink.Target.Member = "ISED" Then
+                            lMassLink.Source.Member = "ROSED"
+                        ElseIf lcMassLink.Target.Member = "IDQAL" Then
+                            lMassLink.Source.Member = "RODQAL"
+                        ElseIf lcMassLink.Target.Member = "ISQAL" Then
+                            lMassLink.Source.Member = "ROSQAL"
+                        ElseIf lcMassLink.Target.Member = "OXIF" Then
+                            lMassLink.Source.Member = "ROOX"
+                        ElseIf lcMassLink.Target.Member = "NUIF1" Then
+                            lMassLink.Source.Member = "RODNUT"
+                        ElseIf lcMassLink.Target.Member = "NUIF2" Then
+                            lMassLink.Source.Member = "ROSNUT"
+                        ElseIf lcMassLink.Target.Member = "PKIF" Then
+                            lMassLink.Source.Member = "ROPLK"
+                        ElseIf lcMassLink.Target.Member = "PHIF" Then
+                            lMassLink.Source.Member = "ROPH"
+                        End If
+                        lMassLink.Source.MemSub1 = lcMassLink.Target.MemSub1
+                        lMassLink.Source.MemSub2 = lcMassLink.Target.MemSub2
+                    End If
 
-        '            If sname = "BMPRAC" And tname = "RCHRES" Then
-        '                'special cases
-        '                lMassLink.Source.group = "ROFLOW"
-        '                lMassLink.MFact = 1.0#
-        '                If cMassLink.Target.member = "IVOL" Then
-        '                    lMassLink.Source.member = "ROVOL"
-        '                ElseIf cMassLink.Target.member = "CIVOL" Then
-        '                    lMassLink.Source.member = "CROVOL"
-        '                ElseIf cMassLink.Target.member = "ICON" Then
-        '                    lMassLink.Source.member = "ROCON"
-        '                ElseIf cMassLink.Target.member = "IHEAT" Then
-        '                    lMassLink.Source.member = "ROHEAT"
-        '                ElseIf cMassLink.Target.member = "ISED" Then
-        '                    lMassLink.Source.member = "ROSED"
-        '                ElseIf cMassLink.Target.member = "IDQAL" Then
-        '                    lMassLink.Source.member = "RODQAL"
-        '                ElseIf cMassLink.Target.member = "ISQAL" Then
-        '                    lMassLink.Source.member = "ROSQAL"
-        '                ElseIf cMassLink.Target.member = "OXIF" Then
-        '                    lMassLink.Source.member = "ROOX"
-        '                ElseIf cMassLink.Target.member = "NUIF1" Then
-        '                    lMassLink.Source.member = "RODNUT"
-        '                ElseIf cMassLink.Target.member = "NUIF2" Then
-        '                    lMassLink.Source.member = "ROSNUT"
-        '                ElseIf cMassLink.Target.member = "PKIF" Then
-        '                    lMassLink.Source.member = "ROPLK"
-        '                ElseIf cMassLink.Target.member = "PHIF" Then
-        '                    lMassLink.Source.member = "ROPH"
-        '                End If
-        '                lMassLink.Source.memsub1 = cMassLink.Target.memsub1
-        '                lMassLink.Source.memsub2 = cMassLink.Target.memsub2
-        '            End If
-
-        '            myUci.MassLinks.Add(lMassLink)
-        '        End If
-        '    Next cMassLink
-        'End If
+                    pUCI.MassLinks.Add(lMassLink)
+                End If
+            Next lcMassLink
+        End If
 
     End Sub
 End Class
