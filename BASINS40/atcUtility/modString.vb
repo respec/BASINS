@@ -360,19 +360,15 @@ Public Module modString
 
         If lString.Length > aMaxWidth Then 'Too long, need to shorten
             'First try leaving out commas to shorten
-            If lString.Replace(",", "").Length <= aMaxWidth Then
-                lString = lString.Replace(",", "")
-            Else
-                Dim lDecimalPos As Integer = lString.IndexOf(".")
-                Select Case lDecimalPos
-                    Case -1 'string does not contain a decimal, can't shorten by formatting with fewer decimal places
-                        GoTo TryExpFormat
-                    Case aMaxWidth, aMaxWidth - 1 'string contains decimal point at end of max width, format without decimal places
-                        lString = Format(lValue, "0")
-                    Case Is < aMaxWidth 'string contains a decimal before max width, format with fewer decimal places
-                        lString = Format(lValue, "0." & StrDup(aMaxWidth - lDecimalPos, "#"))
-                End Select
-            End If
+            Dim lDecimalPos As Integer = lString.IndexOf(".")
+            Select Case lDecimalPos
+                Case -1 'string does not contain a decimal, can't shorten by formatting with fewer decimal places
+                    GoTo TryExpFormat
+                Case aMaxWidth, aMaxWidth - 1 'string contains decimal point at end of max width, format without decimal places
+                    lString = Format(lValue, "0")
+                Case Is < aMaxWidth 'string contains a decimal before max width, format with fewer decimal places
+                    lString = Format(lValue, "0." & StrDup(aMaxWidth - lDecimalPos, "#"))
+            End Select
         End If
 
         Dim lStrToDbl As Double = GetNaN()

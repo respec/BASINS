@@ -215,7 +215,7 @@ Public Class atcListForm
     'Value formatting options, can be overridden by timeseries attributes
     Private pMaxWidth As Integer = 10
     Private pFormat As String = "#,##0.########"
-    Private pExpFormat As String = "#.#e#"
+    Private pExpFormat As String = ""
     Private pCantFit As String = "#"
     Private pSignificantDigits As Integer = 5
 
