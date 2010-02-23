@@ -111,6 +111,18 @@ Public Module Utility
                 lConstituentsToOutput.Add("R:Copper-ROSQAL-CLAY", "  Clay Cu")
                 lConstituentsToOutput.Add("R:Copper-ROSQAL-Tot", "Total Sediment Cu")
                 lConstituentsToOutput.Add("R:Copper-TROQAL", "Total Cu")
+            Case "FColi"
+                lConstituentsToOutput.Add("P:Header1", "Perv Load")
+                lConstituentsToOutput.Add("P:SOQUAL-F.Coliform", "Surface")
+                lConstituentsToOutput.Add("P:IOQUAL-F.Coliform", "Interflow")
+                lConstituentsToOutput.Add("P:AOQUAL-F.Coliform", "Baseflow")
+                lConstituentsToOutput.Add("P:POQUAL-F.Coliform", "Total")
+                lConstituentsToOutput.Add("I:Header2", "Imperv Load")
+                lConstituentsToOutput.Add("I:SOQUAL-F.Coliform", "ImpervSurf")
+                lConstituentsToOutput.Add("R:Header3", "Instream")
+                lConstituentsToOutput.Add("R:F.Coliform-TIQAL", "  Inflow")
+                lConstituentsToOutput.Add("R:F.Coliform-DDQAL-TOT", "  Decay")
+                lConstituentsToOutput.Add("R:F.Coliform-TROQAL", "  Outflow")
             Case "N-PQUAL"
                 lConstituentsToOutput.Add("P:Header1", "NH3+NH4 (lb/ac)")
                 lConstituentsToOutput.Add("P:WASHQS-NH3+NH4", "WASHQS")
@@ -531,7 +543,11 @@ Public Module Utility
             For lLandUseIndex As Integer = 0 To lLandUsesCombinePervImpv.Count - 1
                 Dim lLandUseAreaString As String = lLandUsesCombinePervImpv.Item(lLandUseIndex)
                 Dim lImprArea As Double = StrRetRem(lLandUseAreaString)
-                Dim lPervArea As Double = lLandUseAreaString
+                Dim lPervArea As Double = 0
+                If lLandUseAreaString.Length > 0 Then
+                    lPervArea = lLandUseAreaString
+                End If
+
                 
                 Dim lLandUseArea As Double = lPervArea + lImprArea
                 lSB.AppendLine(lLandUsesCombinePervImpv.Keys(lLandUseIndex).ToString.PadLeft(20) & vbTab & _
