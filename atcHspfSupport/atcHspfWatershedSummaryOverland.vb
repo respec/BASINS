@@ -397,10 +397,14 @@ Public Module WatershedSummaryOverland
             With lOperation
                 Dim lId As Integer = .Id Mod 100
                 If Not lOperationIds.ContainsValue(.Description) Then
-                    lOperationIds.Add(lId, .Description)
+                    If lOperationIds.IndexOfKey(lId) = -1 Then
+                        lOperationIds.Add(lId, .Description)
+                    Else
+                        'TODO: update description
+                    End If
                 End If
-                If .Id < lMinID Then lMinID = .Id : lMinDescription = .Description
-                If .Id > lMaxID Then lMaxID = .Id
+                    If .Id < lMinID Then lMinID = .Id : lMinDescription = .Description
+                    If .Id > lMaxID Then lMaxID = .Id
             End With
         Next
 

@@ -93,7 +93,11 @@ Public Module WatershedConstituentBalance
                                         lSurfaceIndex = lConstituents.Count
                                     End If
                                 ElseIf lConstituent = "Impervious" Then
-                                    lConstituents.Insert(lBaseETIndex, lConstituent, lSummaryDetails)
+                                    If lBaseETIndex = -1 Then
+                                        Logger.Dbg("ReportsToFiles:Impervious:NoBaseETIndex")
+                                    Else
+                                        lConstituents.Insert(lBaseETIndex, lConstituent, lSummaryDetails)
+                                    End If
                                 Else
                                     lConstituents.Add(lConstituent, lSummaryDetails)
                                 End If
@@ -352,6 +356,9 @@ Public Module WatershedConstituentBalance
                                                             End If
                                                         End If
                                                 End Select
+                                                If aBalanceType = "FColi" Then
+                                                    lMult = 1 / 1000000000.0 '10^9
+                                                End If
                                                 Dim lAttribute As atcDefinedValue
                                                 Select Case lConstituentDataName
                                                     Case "BEDDEP", "RSED-BED-SAND", "RSED-BED-SILT", "RSED-BED-CLAY", "RSED-BED-TOT"
@@ -604,6 +611,10 @@ Public Module WatershedConstituentBalance
                 lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "tons/ac".PadLeft(12) & _
                                                             vbTab & "tons".PadLeft(12) & _
                                                             vbTab & "tons/ac".PadLeft(12))
+            ElseIf aBalanceType = "FColi" Then
+                lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "10^9/ac".PadLeft(12) & _
+                                                            vbTab & "10^9".PadLeft(12) & _
+                                                            vbTab & "10^9/ac".PadLeft(12))
             Else
                 lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "lbs/ac".PadLeft(12) & _
                                                             vbTab & "lbs".PadLeft(12) & _
@@ -627,6 +638,9 @@ Public Module WatershedConstituentBalance
                                 ElseIf aBalanceType = "Sediment" Then
                                     lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "tons".PadLeft(12) & _
                                                                                 vbTab & "tons/ac".PadLeft(12))
+                                ElseIf aBalanceType = "FColi" Then
+                                    lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "10^9/ac".PadLeft(12) & _
+                                                                                vbTab & "10^9".PadLeft(12))
                                 Else
                                     lSummarySB.AppendLine(Space(lRowIdLength) & vbTab & "lbs/ac".PadLeft(12) & _
                                                                                 vbTab & "lbs".PadLeft(12))
