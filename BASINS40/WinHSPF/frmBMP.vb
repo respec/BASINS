@@ -1,38 +1,38 @@
+Imports System.Collections.ObjectModel
 Imports atcUCI
 Imports MapWinUtility
 
 Public Class frmBMP
+    Friend Class BmpInfo
+        Friend Id As Long
+        Friend Desc As String
+        Friend InUseNow As Boolean 'associated with current reach
+        Friend DeletePending As Boolean 'get rid of at next update uci
+        Friend col As Long
+    End Class
+    Friend pBmps As Collection(Of BmpInfo)
 
-    Private Structure BmpInfo
-        Dim Id As Long
-        Dim Desc As String
-        Dim InUseNow As Boolean 'associated with current reach
-        Dim DeletePending As Boolean 'get rid of at next update uci
-        Dim col As Long
-    End Structure
-    Private pBmps As Collection 'of BmpInfo
+    Friend Class RchInfo
+        Friend Id As Long
+        Friend Desc As String
+        Friend BMPCnt As Long
+    End Class
+    Friend pReaches As Collection(Of RchInfo)
 
-    Private Structure RchInfo
-        Dim Id As Long
-        Dim Desc As String
-        Dim BMPCnt As Long
-    End Structure
-    Private pReaches As Collection  'of RchInfo
+    Friend Class BmpPtrInfo
+        Friend Ind As Long 'into type bmpinfo
+        Friend Area As Single
+    End Class
 
-    Private Structure BmpPtrInfo
-        Dim Ind As Long 'into type bmpinfo
-        Dim Area As Single
-    End Structure
-
-    Private Structure TribInfo
-        Dim Id As Long
-        Dim OpNam As String
-        Dim Desc As String
-        Dim Area As Single
-        Dim BMPCnt As Long
-        Dim BmpPtr() As BmpPtrInfo
-    End Structure
-    Private pTribs As Collection 'of TribInfo
+    Friend Class TribInfo
+        Friend Id As Long
+        Friend OpNam As String
+        Friend Desc As String
+        Friend Area As Single
+        'Friend BMPCnt As Long
+        Friend BmpPtrs As Collection(Of BmpPtrInfo)
+    End Class
+    Friend pTribs As Collection(Of TribInfo)
 
     Private pMsgTitle As String = "Best Management Practices Editor"
     Private pCurrentBMPId As Integer
@@ -46,15 +46,13 @@ Public Class frmBMP
         pInitializing = False
 
         Me.Icon = pIcon
-        Me.MinimumSize = Me.Size
-        Me.MaximumSize = Me.Size
 
         'are any reaches available?
         Dim lOpnBlk As HspfOpnBlk = pUCI.OpnBlks("RCHRES")
 
-        pReaches = New Collection
-        pBmps = New Collection
-        pTribs = New Collection
+        pReaches = New Collection(Of RchInfo)
+        pBmps = New Collection(Of BmpInfo)
+        pTribs = New Collection(Of TribInfo)
 
         If lOpnBlk.Count > 0 Then
             'what reaches are available?
@@ -132,9 +130,8 @@ Public Class frmBMP
             pBmps(lBmpIndex).InUseNow = False
         Next lBmpIndex
 
-        pTribs = New Collection
+        pTribs = New Collection(Of TribInfo)
         pTribs.Clear()
-        Dim lTribCount As Integer = 0
         Dim lBmpCount As Integer = pBmps.Count
         Dim lOpnBlk As HspfOpnBlk = pUCI.OpnBlks("RCHRES")
         Dim lOper As HspfOperation = lOpnBlk.OperFromID(lId)
@@ -155,15 +152,14 @@ Public Class frmBMP
                                     End If
                                 Next lBmpIndex
                             Else 'non-bmp source
-                                lTribCount = lTribCount + 1
                                 Dim lTrib As New TribInfo
                                 lTrib.Id = lConn.Source.VolId
                                 lTrib.OpNam = lConn.Source.VolName
                                 lTrib.Area = lConn.MFact
                                 lTrib.Desc = lConn.Source.Opn.Description
-                                lTrib.BMPCnt = 0
+                                Dim lBmpPtrs As New Collection(Of BmpPtrInfo)
+                                lTrib.BmpPtrs = lBmpPtrs
                                 pTribs.Add(lTrib)
-                                ReDim lTrib.BmpPtr(0)
                             End If
                         End If
                     End If
@@ -185,25 +181,33 @@ Public Class frmBMP
                                     Me.Dispose() 'close up bmp editing
                                 End If
                                 Dim found As Boolean = False
-                                For lTribIndex As Integer = 0 To lTribCount - 1
+                                For lTribIndex As Integer = 0 To pTribs.Count - 1
                                     If pTribs(lTribIndex).OpNam = lConn.Source.VolName Then
                                         If pTribs(lTribIndex).Id = lConn.Source.Opn.Id Then
                                             'know about this trib
                                             found = True
+                                            Dim lBmpPtr As New BmpPtrInfo
+                                            lBmpPtr.Ind = lBmpIndex
+                                            lBmpPtr.Area = lConn.MFact
+                                            Dim lBmpPtrs As New Collection(Of BmpPtrInfo)
+                                            pTribs(lTribIndex).BmpPtrs = lBmpPtrs
+                                            pTribs(lTribIndex).BmpPtrs.Add(lBmpPtr)
+                                            pTribs(lTribIndex).Area = pTribs(lTribIndex).Area + lConn.MFact
                                             Exit For
                                         End If
                                     End If
                                 Next lTribIndex
                                 If Not (found) Then 'add to trib list
-                                    lTribCount = lTribCount + 1
                                     Dim lTrib As New TribInfo
                                     lTrib.Desc = lConn.Source.Opn.Description
                                     lTrib.Id = lConn.Source.Opn.Id
                                     lTrib.OpNam = lConn.Source.VolName
-                                    lTrib.BMPCnt += 1
-                                    ReDim Preserve lTrib.BmpPtr(lTrib.BMPCnt)
-                                    lTrib.BmpPtr(lTrib.BMPCnt).Ind = lBmpIndex
-                                    lTrib.BmpPtr(lTrib.BMPCnt).Area = lConn.MFact
+                                    Dim lBmpPtr As New BmpPtrInfo
+                                    lBmpPtr.Ind = lBmpIndex
+                                    lBmpPtr.Area = lConn.MFact
+                                    Dim lBmpPtrs As New Collection(Of BmpPtrInfo)
+                                    lTrib.BmpPtrs = lBmpPtrs
+                                    lTrib.BmpPtrs.Add(lBmpPtr)
                                     lTrib.Area = lTrib.Area + lConn.MFact
                                     pTribs.Add(lTrib)
                                 End If
@@ -217,19 +221,16 @@ Public Class frmBMP
                 If pBmps(lBmpIndex).InUseNow Then
                     For lTribIndex As Integer = 0 To pTribs.Count - 1
                         Dim lFound As Boolean = False
-                        For lTribBmpIndex As Integer = 1 To pTribs(lTribIndex).BMPCnt
-                            If pTribs(lTribIndex).BmpPtr(lTribBmpIndex).Ind = lBmpIndex Then
+                        For lTribBmpIndex As Integer = 0 To pTribs(lTribIndex).BmpPtrs.Count - 1
+                            If pTribs(lTribIndex).BmpPtrs(lTribBmpIndex).Ind = lBmpIndex Then
                                 lFound = True
                                 Exit For
-                            ElseIf pTribs(lTribIndex).BmpPtr(lTribBmpIndex).Ind > lBmpIndex Then
+                            ElseIf pTribs(lTribIndex).BmpPtrs(lTribBmpIndex).Ind > lBmpIndex Then
                                 With pTribs(lTribIndex)
-                                    .BMPCnt = .BMPCnt + 1
-                                    ReDim Preserve .BmpPtr(.BMPCnt)
-                                    For lPtrIndex As Integer = .BMPCnt To lTribBmpIndex + 1 Step -1
-                                        .BmpPtr(lPtrIndex) = .BmpPtr(lPtrIndex - 1)
-                                    Next lPtrIndex
-                                    .BmpPtr(lTribBmpIndex).Ind = lBmpIndex
-                                    .BmpPtr(lTribBmpIndex).Area = 0
+                                    Dim lBmpPtr As New BmpPtrInfo
+                                    lBmpPtr.Ind = lBmpIndex
+                                    lBmpPtr.Area = 0
+                                    .BmpPtrs.Add(lBmpPtr)
                                 End With
                                 lFound = True 'we added it
                                 Exit For
@@ -237,10 +238,10 @@ Public Class frmBMP
                         Next lTribBmpIndex
                         If Not lFound Then 'add to end
                             With pTribs(lTribIndex)
-                                .BMPCnt = .BMPCnt + 1
-                                ReDim Preserve .BmpPtr(.BMPCnt)
-                                .BmpPtr(.BMPCnt).Ind = lBmpIndex
-                                .BmpPtr(.BMPCnt).Area = 0
+                                Dim lBmpPtr As New BmpPtrInfo
+                                lBmpPtr.Ind = lBmpIndex
+                                lBmpPtr.Area = 0
+                                .BmpPtrs.Add(lBmpPtr)
                             End With
                         End If
                     Next lTribIndex
@@ -252,8 +253,8 @@ Public Class frmBMP
     Private Sub BmpDescUpdate(ByVal aBmpIndex As Integer)
         If aBmpIndex > 0 Then
             With agdSource.Source
-                pCurrentBMPId = Mid(.CellValue(0, .Columns), 6, Len(.CellValue(0, .Columns)) - 4)
-                For lBmpIndex As Integer = 1 To pBmps.Count
+                pCurrentBMPId = Mid(.CellValue(0, .Columns - 1), 6, Len(.CellValue(0, .Columns - 1)) - 4)
+                For lBmpIndex As Integer = 0 To pBmps.Count - 1
                     If pCurrentBMPId = pBmps(lBmpIndex).Id Then
                         atxBMPId.Text = pBmps(lBmpIndex).Id
                         atxBMPDesc.Text = pBmps(lBmpIndex).Desc
@@ -270,7 +271,6 @@ Public Class frmBMP
 
     Private Sub PopulateGrid()
         Dim lBmpCount As Integer = pBmps.Count
-        Dim lTribCount As Integer = pTribs.Count
         Dim lCurrentReach As Integer = cboReach.SelectedIndex
 
         '    grdSrc.Clear()
@@ -282,11 +282,14 @@ Public Class frmBMP
             'summary style grid
             lblContributing.Text = "Summary of Areas by LandUse and Reach"
             agdSource.Source.Columns = 1
+            agdSource.Source.FixedColumns = 1
+            agdSource.Source.FixedRows = 1
             For lRchIndex As Integer = 1 To cboReach.Items.Count - 1
                 lRchCount = lRchCount + 1
                 agdSource.Source.CellValue(lRchCount, 0) = "R:" & cboReach.Items(lRchIndex)
-                GetUciInfo(lRchIndex)
-                For lTribIndex As Integer = 0 To lTribCount - 1
+                agdSource.Source.CellColor(lRchCount, 0) = Me.BackColor
+                GetUciInfo(lRchIndex - 1)
+                For lTribIndex As Integer = 0 To pTribs.Count - 1
                     If pTribs(lTribIndex).OpNam <> "RCHRES" Then
                         Dim lExists As Boolean = False
                         Dim lTempTitle As String = ""
@@ -305,7 +308,7 @@ Public Class frmBMP
                         If Not lExists Then
                             lColIndex = agdSource.Source.Columns
                             agdSource.Source.CellValue(0, lColIndex) = lTempTitle
-                            agdSource.Source.CellEditable(lRchCount, lColIndex) = False 'do for whole column
+                            agdSource.Source.CellEditable(lRchCount, lColIndex) = False
                             'agdSource.Source.ColType(lcolindex) = ATCoSng
                         End If
                         agdSource.Source.CellValue(lRchCount, lColIndex) = pTribs(lTribIndex).Area
@@ -317,26 +320,28 @@ Public Class frmBMP
             cmdDelete.Visible = False
         Else
             'build reach/bmp grid
-            lblContributing.Text = "Contributing Sources to Reach " & pReaches(lCurrentReach).Id & " (" & pReaches(lCurrentReach).Desc & ")"
+            lblContributing.Text = "Contributing Sources to Reach " & pReaches(lCurrentReach - 1).Id & " (" & pReaches(lCurrentReach - 1).Desc & ")"
 
             agdSource.Source.CellValue(0, 0) = "Source"
-            agdSource.Source.CellEditable(0, 0) = False 'do for whole column
+            agdSource.Source.CellEditable(0, 0) = False
             agdSource.Source.CellValue(0, 1) = "Area"
-            agdSource.Source.CellEditable(0, 1) = False 'do for whole column
+            agdSource.Source.CellEditable(0, 1) = False
             agdSource.Source.CellValue(0, 2) = "% No BMP"
-            agdSource.Source.CellEditable(0, 2) = True 'do for whole column
+            agdSource.Source.CellEditable(0, 2) = False
             'agdSource.Source.ColMax(2) = 100
             'agdSource.Source.ColType(2) = ATCoSng
             agdSource.Source.Columns = 3
+            agdSource.Source.FixedColumns = 1
+            agdSource.Source.FixedRows = 1
 
             Dim lCountBmpInUse As Integer = 0
-            For lBmpIndex As Integer = 1 To lBmpCount
+            For lBmpIndex As Integer = 0 To lBmpCount - 1
                 If pBmps(lBmpIndex).InUseNow And Not (pBmps(lBmpIndex).DeletePending) Then
                     pBmps(lBmpIndex).col = agdSource.Source.Columns
                     agdSource.Source.Columns = agdSource.Source.Columns + 1
                     lCountBmpInUse = lCountBmpInUse + 1
                     agdSource.Source.CellValue(0, 2 + lCountBmpInUse) = "% BMP " & pBmps(lBmpIndex).Id
-                    agdSource.Source.CellEditable(1, 2 + lCountBmpInUse) = True   'do for whole column
+                    agdSource.Source.CellEditable(1, 2 + lCountBmpInUse) = True
                     'agdSource.Source.ColMin(2 + lCountBmpInUse) = 0
                     'agdSource.Source.ColMax(2 + lCountBmpInUse) = 100
                     'grdSrc.ColType(2 + lCountBmpInUse) = ATCoSng
@@ -348,11 +353,11 @@ Public Class frmBMP
             If lCountBmpInUse = 0 Then ' no bmps, % must be 100
                 'grdSrc.ColMin(2) = 100
                 fraBMPDet.Visible = False
-                agdSource.Source.CellEditable(1, 2) = False 'do for whole column
+                agdSource.Source.CellEditable(1, 2) = False
             Else
                 'grdSrc.ColMin(2) = 0
                 fraBMPDet.Visible = True
-                agdSource.Source.CellEditable(1, 2) = True 'do for whole column
+                agdSource.Source.CellEditable(1, 2) = True
             End If
 
             'agdSource.Source.ColWidth(0) = agdSource.Source.Width * 0.4
@@ -361,33 +366,42 @@ Public Class frmBMP
             'agdSource.Source.ColWidth(i) = agdSource.Source.ColWidth(1)
             'Next i
 
-            For lTribIndex As Integer = 1 To lTribCount 'trib source areas and %
+            For lTribIndex As Integer = 0 To pTribs.Count - 1 'trib source areas and %
                 If pTribs(lTribIndex).OpNam <> "BMPRAC" Then
                     lRchCount = lRchCount + 1
                     agdSource.Source.Rows = lRchCount
                     Dim lTxt As String = pTribs(lTribIndex).OpNam & " : " & pTribs(lTribIndex).Id & " (" & pTribs(lTribIndex).Desc & ")"
                     agdSource.Source.CellValue(lRchCount, 0) = lTxt
+                    agdSource.Source.CellEditable(lRchCount, 0) = False
+                    agdSource.Source.CellColor(lRchCount, 0) = Me.BackColor
                     Dim lBmpArea As Double = 0
+                    agdSource.Source.CellEditable(lRchCount, 1) = False
                     If lTxt.StartsWith("RCH") Then
-                        agdSource.Source.CellValue(lTribIndex, 1) = "NA"
+                        agdSource.Source.CellValue(lRchCount, 1) = "NA"
                     Else
-                        agdSource.Source.CellValue(lTribIndex, 1) = pTribs(lTribIndex).Area
+                        agdSource.Source.CellValue(lRchCount, 1) = pTribs(lTribIndex).Area
                     End If
                     lCountBmpInUse = 0
                     Dim lRArea As Double = 0.0
-                    For lBmpIndex As Integer = 1 To lBmpCount
+                    For lBmpIndex As Integer = 0 To lBmpCount - 1
                         If pBmps(lBmpIndex).InUseNow And Not (pBmps(lBmpIndex).DeletePending) Then
                             lCountBmpInUse = lCountBmpInUse + 1
-                            If lCountBmpInUse <= pTribs(lTribIndex).BMPCnt Then
-                                lRArea = pTribs(lTribIndex).BmpPtr(lCountBmpInUse).Area
+                            If lCountBmpInUse <= pTribs(lTribIndex).BmpPtrs.Count Then
+                                lRArea = pTribs(lTribIndex).BmpPtrs(lCountBmpInUse - 1).Area
                             Else
                                 lRArea = 0
                             End If
-                            agdSource.Source.CellValue(lTribIndex, 2 + lCountBmpInUse) = 100 * (lRArea / pTribs(lTribIndex).Area)
+                            agdSource.Source.CellValue(lRchCount, 2 + lCountBmpInUse) = 100 * (lRArea / pTribs(lTribIndex).Area)
+                            agdSource.Source.CellEditable(lRchCount, 2 + lCountBmpInUse) = True
                             lBmpArea = lBmpArea + lRArea
                         End If
                     Next lBmpIndex
-                    agdSource.Source.CellValue(lTribIndex, 2) = 100 - 100 * (lBmpArea / pTribs(lTribIndex).Area)
+                    agdSource.Source.CellValue(lRchCount, 2) = 100 - 100 * (lBmpArea / pTribs(lTribIndex).Area)
+                    If lCountBmpInUse = 0 Then ' no bmps, % must be 100
+                        agdSource.Source.CellEditable(lRchCount, 2) = False
+                    Else
+                        agdSource.Source.CellEditable(lRchCount, 2) = True
+                    End If
                 End If
             Next lTribIndex
             ' default pos to first row, bmp col (if avail)
@@ -426,15 +440,17 @@ Public Class frmBMP
         End If
     End Sub
 
-    Private Sub cboReach_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboReach.Click
-        Call GetUciInfo(cboReach.SelectedIndex)
-        Call PopulateGrid()
+    Private Sub cboReach_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboReach.SelectedIndexChanged
+        If cboReach.SelectedIndex > 0 Then
+            GetUciInfo(cboReach.SelectedIndex - 1)
+        End If
+        PopulateGrid()
         cmdUpdateUCI.Enabled = False
         atxBMPId.Enabled = False
     End Sub
 
     Private Sub cmdAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAdd.Click
-        Dim cur As Integer = cboReach.SelectedIndex
+        Dim lCurReach As Integer = cboReach.SelectedIndex - 1
 
         Dim lNewBmp As New BmpInfo
         ' assign an id not in use
@@ -443,7 +459,7 @@ Public Class frmBMP
         Do Until lDone
             lDone = True ' assume the best
             For lBmpIndex As Integer = 0 To pBmps.Count - 1
-                If pBmps(lBmpIndex).Id = pReaches(cur).Id + lNewIndex Then 'in use
+                If pBmps(lBmpIndex).Id = pReaches(lCurReach).Id + lNewIndex Then 'in use
                     lNewIndex = lNewIndex + 1
                     lDone = False
                     Exit For
@@ -451,27 +467,26 @@ Public Class frmBMP
             Next lBmpIndex
         Loop
 
-        lNewBmp.Id = pReaches(cur).Id + lNewIndex
+        lNewBmp.Id = pReaches(lCurReach).Id + lNewIndex
         lNewBmp.Desc = "New BMP"
         lNewBmp.InUseNow = True
         For lNewIndex = 0 To pTribs.Count - 1
-            pTribs(lNewIndex).BMPCnt = pTribs(lNewIndex).BMPCnt + 1
-            Dim lBmpCount As Integer = pTribs(lNewIndex).BMPCnt
-            ReDim Preserve pTribs(lNewIndex).BmpPtr(lBmpCount)
-            pTribs(lNewIndex).BmpPtr(lBmpCount).Area = 0
-            pTribs(lNewIndex).BmpPtr(lBmpCount).Ind = pBmps.Count
+            Dim lBmpPtr As New BmpPtrInfo
+            lBmpPtr.Area = 0
+            lBmpPtr.Ind = pBmps.Count
+            pTribs(lNewIndex).BmpPtrs.Add(lBmpPtr)
         Next lNewIndex
-        pReaches(cur).BMPCnt = pReaches(cur).BMPCnt + 1
+        pReaches(lCurReach).BMPCnt = pReaches(lCurReach).BMPCnt + 1
 
         pBmps.Add(lNewBmp)
 
-        Call PopulateGrid()
+        PopulateGrid()
         cmdUpdateUCI.Enabled = True
         atxBMPId.Enabled = True
     End Sub
 
     Private Sub cmdDelete_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDelete.Click
-        Dim lCurReach As Integer = cboReach.SelectedIndex
+        Dim lCurReach As Integer = cboReach.SelectedIndex - 1
 
         If pReaches(lCurReach).BMPCnt = 0 Then
             Logger.Msg("No BMPs are associated with Reach " & pReaches(lCurReach).Id, _
@@ -502,7 +517,7 @@ Public Class frmBMP
                 Next lTribIndex
                 agdSource.Source.Columns = agdSource.Source.Columns - 1
                 'agdSource.Source.col = 2
-                Call PopulateGrid()
+                PopulateGrid()
                 cmdUpdateUCI.Enabled = True
             End If
         End If
@@ -522,7 +537,7 @@ Public Class frmBMP
 
     Private Sub cmdUpdateUCI_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdUpdateUCI.Click
 
-        Dim lRchId As Integer = pReaches(cboReach.SelectedIndex).Id
+        Dim lRchId As Integer = pReaches(cboReach.SelectedIndex - 1).Id
 
         atxBMPId.Enabled = False
         For lBmpIndex As Integer = 0 To pBmps.Count - 1 'process deletes first
@@ -548,7 +563,7 @@ Public Class frmBMP
                     pUCI.AddOperation("BMPRAC", pBmps(lBmpIndex).Id)
                     'figure out where to put it in opn seq block
                     Dim lAddBefore As Integer = pUCI.OpnSeqBlock.Opns.Count
-                    For lOpIndex As Integer = 1 To pUCI.OpnSeqBlock.Opns.Count
+                    For lOpIndex As Integer = 0 To pUCI.OpnSeqBlock.Opns.Count - 1
                         If pUCI.OpnSeqBlock.Opn(lOpIndex).Name = "RCHRES" And _
                            pUCI.OpnSeqBlock.Opn(lOpIndex).Id = lRchId Then
                             lAddBefore = lOpIndex
@@ -582,31 +597,32 @@ Public Class frmBMP
                     lTable = lOpnBlk.Tables("GEN-INFO")
                     lTable.Parms("BMPID").Value = pBmps(lBmpIndex).Desc
                     lTable.Parms("NGQUAL").Value = 0   'assume no gquals
-                    lTable = lOpnBlk.tables("GQ-FRAC")
+                    lTable = lOpnBlk.Tables("GQ-FRAC")
                     lTable.Parms("GQID").Value = "unknown"
                 End If
 
                 'look for bmp to rchres connection, add it if not existing
-                Call PutSchematicRecord("BMPRAC", pBmps(lBmpIndex).Id, "RCHRES", lRchId, 1.0#)
+                PutSchematicRecord("BMPRAC", pBmps(lBmpIndex).Id, "RCHRES", lRchId, 1.0#)
             End If
         Next lBmpIndex
 
         For lTribIndex As Integer = 0 To pTribs.Count - 1
             'put area going directly to rch
-            Dim lArea As Double = pTribs(lTribIndex).Area * CSng((agdSource.Source.CellValue(lTribIndex, 2) / 100))
-            Call PutSchematicRecord(pTribs(lTribIndex).OpNam, pTribs(lTribIndex).Id, "RCHRES", lRchId, lArea)
+            Dim lArea As Double = pTribs(lTribIndex).Area * CSng((agdSource.Source.CellValue(lTribIndex + 1, 2) / 100))
+            PutSchematicRecord(pTribs(lTribIndex).OpNam, pTribs(lTribIndex).Id, "RCHRES", lRchId, lArea)
             'put area going to bmps
-            For lTribBmpIndex As Integer = 1 To pTribs(lTribIndex).BMPCnt
-                If pBmps(pTribs(lTribIndex).BmpPtr(lTribBmpIndex).Ind).InUseNow Then
-                    Dim lBmpId As Integer = pBmps(pTribs(lTribIndex).BmpPtr(lTribBmpIndex).Ind).Id
-                    Dim lColId As Integer = pBmps(pTribs(lTribIndex).BmpPtr(lTribBmpIndex).Ind).col
-                    lArea = pTribs(lTribIndex).Area * CSng((agdSource.Source.CellValue(lTribIndex, lColId) / 100))
-                    Call PutSchematicRecord(pTribs(lTribIndex).OpNam, pTribs(lTribIndex).Id, "BMPRAC", lBmpId, lArea)
+            For lTribBmpIndex As Integer = 0 To pTribs(lTribIndex).BmpPtrs.Count - 1
+                If pBmps(pTribs(lTribIndex).BmpPtrs(lTribBmpIndex).Ind).InUseNow Then
+                    Dim lBmpId As Integer = pBmps(pTribs(lTribIndex).BmpPtrs(lTribBmpIndex).Ind).Id
+                    Dim lColId As Integer = pBmps(pTribs(lTribIndex).BmpPtrs(lTribBmpIndex).Ind).col
+                    lArea = pTribs(lTribIndex).Area * CSng((agdSource.Source.CellValue(lTribIndex + 1, lColId) / 100))
+                    pTribs(lTribIndex).BmpPtrs(lTribBmpIndex).Area = lArea
+                    PutSchematicRecord(pTribs(lTribIndex).OpNam, pTribs(lTribIndex).Id, "BMPRAC", lBmpId, lArea)
                 End If
             Next lTribBmpIndex
         Next lTribIndex
 
-        GetUciInfo(cboReach.SelectedIndex) 'refresh with new data
+        GetUciInfo(cboReach.SelectedIndex - 1) 'refresh with new data
         PopulateGrid()
         cmdUpdateUCI.Enabled = False
     End Sub
@@ -643,6 +659,7 @@ Public Class frmBMP
             End If
         Next lRow
 
+        agdSource.Refresh()
         cmdUpdateUCI.Enabled = True
     End Sub
 
@@ -673,7 +690,7 @@ Public Class frmBMP
             Dim lAddIt As Boolean = True
             Dim lDeleteIt As Boolean = False
             Dim lDeleteIndex As Integer = 0
-            For lIndex As Integer = 1 To pUCI.Connections.Count
+            For lIndex As Integer = 0 To pUCI.Connections.Count - 1
                 Dim lConn As HspfConnection = pUCI.Connections(lIndex)
                 If lConn.Typ = 3 Then 'schematic
                     If lConn.Target.Opn.Id = aTId And _
@@ -867,4 +884,5 @@ Public Class frmBMP
         End If
 
     End Sub
+
 End Class
