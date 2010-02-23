@@ -206,7 +206,7 @@ Public Class atcCollection
     End Sub
     Public Shadows Sub SetRange(ByVal aIndex As Integer, ByVal aKeys As ICollection, ByVal aValues As ICollection)
         pKeys.SetRange(aIndex, aKeys)
-        MyBase.SetRange(aIndex, aKeys)
+        MyBase.SetRange(aIndex, aValues)
     End Sub
 
     Public Shadows Sub Sort()
