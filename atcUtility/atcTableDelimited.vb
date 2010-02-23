@@ -340,7 +340,7 @@ TryAgain:
                     For lRow As Integer = 1 To NumRecords
                         CurrentRecord = lRow
                         Dim lConsName As String = Value(1)
-                        If lConsName.Trim.Length > 0 AndAlso lConsName.StartsWith(" ") Then
+                        If lConsName.Trim.Length > 0 Then 'AndAlso lConsName.StartsWith(" ") Then
                             If Value(lColumnIndex).Length > 0 Then
                                 lSB.Append(Delimiter & Value(lColumnIndex))
                             Else
