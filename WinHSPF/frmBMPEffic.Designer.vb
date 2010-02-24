@@ -19,84 +19,92 @@ Partial Class frmBMPEffic
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.ComboBox1 = New System.Windows.Forms.ComboBox
-        Me.Label2 = New System.Windows.Forms.Label
-        Me.TextBox1 = New System.Windows.Forms.TextBox
-        Me.Label3 = New System.Windows.Forms.Label
-        Me.AtcGrid1 = New atcControls.atcGrid
+        Me.lblBmpName = New System.Windows.Forms.Label
+        Me.cmbBmpName = New System.Windows.Forms.ComboBox
+        Me.lblId = New System.Windows.Forms.Label
+        Me.lblReference = New System.Windows.Forms.TextBox
+        Me.lblRemoval = New System.Windows.Forms.Label
+        Me.agdBmpEfc = New atcControls.atcGrid
         Me.cmdClose = New System.Windows.Forms.Button
         Me.cmdUpdateUCI = New System.Windows.Forms.Button
         Me.SuspendLayout()
         '
-        'Label1
+        'lblBmpName
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(7, 14)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(64, 13)
-        Me.Label1.TabIndex = 0
-        Me.Label1.Text = "BMP Name:"
+        Me.lblBmpName.AutoSize = True
+        Me.lblBmpName.Location = New System.Drawing.Point(9, 17)
+        Me.lblBmpName.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblBmpName.Name = "lblBmpName"
+        Me.lblBmpName.Size = New System.Drawing.Size(82, 17)
+        Me.lblBmpName.TabIndex = 0
+        Me.lblBmpName.Text = "BMP Name:"
         '
-        'ComboBox1
+        'cmbBmpName
         '
-        Me.ComboBox1.FormattingEnabled = True
-        Me.ComboBox1.Location = New System.Drawing.Point(77, 10)
-        Me.ComboBox1.Name = "ComboBox1"
-        Me.ComboBox1.Size = New System.Drawing.Size(254, 21)
-        Me.ComboBox1.TabIndex = 1
+        Me.cmbBmpName.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cmbBmpName.FormattingEnabled = True
+        Me.cmbBmpName.Location = New System.Drawing.Point(103, 12)
+        Me.cmbBmpName.Margin = New System.Windows.Forms.Padding(4)
+        Me.cmbBmpName.Name = "cmbBmpName"
+        Me.cmbBmpName.Size = New System.Drawing.Size(337, 24)
+        Me.cmbBmpName.TabIndex = 1
         '
-        'Label2
+        'lblId
         '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(346, 14)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(94, 13)
-        Me.Label2.TabIndex = 2
-        Me.Label2.Text = "BMP Operation <>"
+        Me.lblId.AutoSize = True
+        Me.lblId.Location = New System.Drawing.Point(461, 17)
+        Me.lblId.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblId.Name = "lblId"
+        Me.lblId.Size = New System.Drawing.Size(124, 17)
+        Me.lblId.TabIndex = 2
+        Me.lblId.Text = "BMP Operation <>"
         '
-        'TextBox1
+        'lblReference
         '
-        Me.TextBox1.BackColor = System.Drawing.SystemColors.Control
-        Me.TextBox1.Location = New System.Drawing.Point(10, 50)
-        Me.TextBox1.Multiline = True
-        Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.Size = New System.Drawing.Size(508, 89)
-        Me.TextBox1.TabIndex = 3
-        Me.TextBox1.Text = "Reference: <not applicable>"
+        Me.lblReference.BackColor = System.Drawing.SystemColors.Control
+        Me.lblReference.Location = New System.Drawing.Point(13, 62)
+        Me.lblReference.Margin = New System.Windows.Forms.Padding(4)
+        Me.lblReference.Multiline = True
+        Me.lblReference.Name = "lblReference"
+        Me.lblReference.Size = New System.Drawing.Size(676, 109)
+        Me.lblReference.TabIndex = 3
+        Me.lblReference.Text = "Reference: <not applicable>"
         '
-        'Label3
+        'lblRemoval
         '
-        Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(7, 157)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(95, 13)
-        Me.Label3.TabIndex = 4
-        Me.Label3.Text = "Removal Fractions"
+        Me.lblRemoval.AutoSize = True
+        Me.lblRemoval.Location = New System.Drawing.Point(9, 193)
+        Me.lblRemoval.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblRemoval.Name = "lblRemoval"
+        Me.lblRemoval.Size = New System.Drawing.Size(125, 17)
+        Me.lblRemoval.TabIndex = 4
+        Me.lblRemoval.Text = "Removal Fractions"
         '
-        'AtcGrid1
+        'agdBmpEfc
         '
-        Me.AtcGrid1.AllowHorizontalScrolling = True
-        Me.AtcGrid1.AllowNewValidValues = False
-        Me.AtcGrid1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+        Me.agdBmpEfc.AllowHorizontalScrolling = True
+        Me.agdBmpEfc.AllowNewValidValues = False
+        Me.agdBmpEfc.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGrid1.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGrid1.Fixed3D = False
-        Me.AtcGrid1.LineColor = System.Drawing.Color.Empty
-        Me.AtcGrid1.LineWidth = 0.0!
-        Me.AtcGrid1.Location = New System.Drawing.Point(10, 176)
-        Me.AtcGrid1.Name = "AtcGrid1"
-        Me.AtcGrid1.Size = New System.Drawing.Size(508, 282)
-        Me.AtcGrid1.Source = Nothing
-        Me.AtcGrid1.TabIndex = 5
+        Me.agdBmpEfc.CellBackColor = System.Drawing.Color.Empty
+        Me.agdBmpEfc.Fixed3D = False
+        Me.agdBmpEfc.LineColor = System.Drawing.Color.Empty
+        Me.agdBmpEfc.LineWidth = 0.0!
+        Me.agdBmpEfc.Location = New System.Drawing.Point(13, 217)
+        Me.agdBmpEfc.Margin = New System.Windows.Forms.Padding(4)
+        Me.agdBmpEfc.Name = "agdBmpEfc"
+        Me.agdBmpEfc.Size = New System.Drawing.Size(677, 347)
+        Me.agdBmpEfc.Source = Nothing
+        Me.agdBmpEfc.TabIndex = 5
         '
         'cmdClose
         '
         Me.cmdClose.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdClose.Location = New System.Drawing.Point(119, 471)
+        Me.cmdClose.Location = New System.Drawing.Point(159, 580)
+        Me.cmdClose.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdClose.Name = "cmdClose"
-        Me.cmdClose.Size = New System.Drawing.Size(101, 26)
+        Me.cmdClose.Size = New System.Drawing.Size(135, 32)
         Me.cmdClose.TabIndex = 22
         Me.cmdClose.Text = "&Close"
         Me.cmdClose.UseVisualStyleBackColor = True
@@ -104,38 +112,40 @@ Partial Class frmBMPEffic
         'cmdUpdateUCI
         '
         Me.cmdUpdateUCI.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdUpdateUCI.Location = New System.Drawing.Point(10, 471)
+        Me.cmdUpdateUCI.Location = New System.Drawing.Point(13, 580)
+        Me.cmdUpdateUCI.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdUpdateUCI.Name = "cmdUpdateUCI"
-        Me.cmdUpdateUCI.Size = New System.Drawing.Size(101, 26)
+        Me.cmdUpdateUCI.Size = New System.Drawing.Size(135, 32)
         Me.cmdUpdateUCI.TabIndex = 21
         Me.cmdUpdateUCI.Text = "&Update UCI"
         Me.cmdUpdateUCI.UseVisualStyleBackColor = True
         '
         'frmBMPEffic
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(530, 516)
+        Me.ClientSize = New System.Drawing.Size(707, 635)
         Me.Controls.Add(Me.cmdClose)
         Me.Controls.Add(Me.cmdUpdateUCI)
-        Me.Controls.Add(Me.AtcGrid1)
-        Me.Controls.Add(Me.Label3)
-        Me.Controls.Add(Me.TextBox1)
-        Me.Controls.Add(Me.Label2)
-        Me.Controls.Add(Me.ComboBox1)
-        Me.Controls.Add(Me.Label1)
+        Me.Controls.Add(Me.agdBmpEfc)
+        Me.Controls.Add(Me.lblRemoval)
+        Me.Controls.Add(Me.lblReference)
+        Me.Controls.Add(Me.lblId)
+        Me.Controls.Add(Me.cmbBmpName)
+        Me.Controls.Add(Me.lblBmpName)
+        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmBMPEffic"
         Me.Text = "WinHSPF - Best Management Practices Efficiency Editor"
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents Label1 As System.Windows.Forms.Label
-    Friend WithEvents ComboBox1 As System.Windows.Forms.ComboBox
-    Friend WithEvents Label2 As System.Windows.Forms.Label
-    Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
-    Friend WithEvents Label3 As System.Windows.Forms.Label
-    Friend WithEvents AtcGrid1 As atcControls.atcGrid
+    Friend WithEvents lblBmpName As System.Windows.Forms.Label
+    Friend WithEvents cmbBmpName As System.Windows.Forms.ComboBox
+    Friend WithEvents lblId As System.Windows.Forms.Label
+    Friend WithEvents lblReference As System.Windows.Forms.TextBox
+    Friend WithEvents lblRemoval As System.Windows.Forms.Label
+    Friend WithEvents agdBmpEfc As atcControls.atcGrid
     Friend WithEvents cmdClose As System.Windows.Forms.Button
     Friend WithEvents cmdUpdateUCI As System.Windows.Forms.Button
 End Class
