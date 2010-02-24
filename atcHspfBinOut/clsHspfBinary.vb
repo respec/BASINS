@@ -156,7 +156,9 @@ Friend Class HspfBinary
                             Dim lVariableCount As Integer = lHspfBinaryHeader.VarNames.Count
                             ReDim .Value(lVariableCount - 1)
                             For lVariableIndex As Integer = 0 To lVariableCount - 1
-                                .Value(lVariableIndex) = BitConverter.ToSingle(lCurrentRecord, 52 + (lVariableIndex * 4))
+                                Dim lValue As Double = BitConverter.ToSingle(lCurrentRecord, 52 + (lVariableIndex * 4))
+                                If lValue < -1.0E+29 Then lValue = Double.NaN
+                                .Value(lVariableIndex) = lValue
                             Next lVariableIndex
                             Dim lDataKey As String = .OutLev & ":" & Date2J(.DateArray)
                             Try
