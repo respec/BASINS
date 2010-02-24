@@ -109,10 +109,12 @@ Public Class frmBMP
 
         If IsNothing(pfrmBMPEffic) Then
             pfrmBMPEffic = New frmBMPEffic
+            pfrmBMPEffic.Init(atxBMPId.Text, atxBMPDesc.Text)
             pfrmBMPEffic.Show()
         Else
             If pfrmBMPEffic.IsDisposed Then
                 pfrmBMPEffic = New frmBMPEffic
+                pfrmBMPEffic.Init(atxBMPId.Text, atxBMPDesc.Text)
                 pfrmBMPEffic.Show()
             Else
                 pfrmBMPEffic.WindowState = FormWindowState.Normal
@@ -630,6 +632,22 @@ Public Class frmBMP
     Private Sub agdSource_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdSource.CellEdited
         'was on commit change event, not sure what this is now
         Dim lCol As Integer = aColumn
+
+        Dim lMinValue As Integer = 0
+        Dim lMaxValue As Integer = 100
+
+        Dim lNewValue As String = aGrid.Source.CellValue(aRow, aColumn)
+        Dim lNewValueNumeric As Double = -999
+        If IsNumeric(lNewValue) Then lNewValueNumeric = CDbl(lNewValue)
+        Dim lNewColor As Color = aGrid.Source.CellColor(aRow, aColumn)
+        If (lNewValueNumeric >= lMinValue And lMinValue <> -999) AndAlso (lNewValueNumeric <= lMaxValue And lMaxValue <> -999) Then
+            lNewColor = aGrid.CellBackColor
+        Else
+            lNewColor = Color.Pink
+        End If
+        If Not lNewColor.Equals(aGrid.Source.CellColor(aRow, aColumn)) Then
+            aGrid.Source.CellColor(aRow, aColumn) = lNewColor
+        End If
 
         For lRow As Integer = 1 To aRow
             Dim lVal As Double = agdSource.Source.CellValue(lRow, lCol) 'highest priority is just set value
