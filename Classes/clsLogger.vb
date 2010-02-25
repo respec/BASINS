@@ -38,6 +38,7 @@ Public Class Logger
 
     'set to default value so we don't have to check whether it is set each time we use it
     Private Shared pProgressStatus As IProgressStatus = New NullProgressStatus
+    Private Shared pCancelable As Boolean = False
 
     Private Shared pFileStream As IO.StreamWriter
     Private Shared pTimeStamp As Boolean = True  'Default to including time stamps
@@ -146,8 +147,32 @@ Public Class Logger
         End Get
         Set(ByVal newValue As IProgressStatus)
             pProgressStatus = newValue
+            pCancelable = TypeOf newValue Is IProgressStatusCancel
         End Set
     End Property
+
+    '''' <summary>
+    '''' True if user may request cancelation of current operation
+    '''' </summary>
+    'Public Shared ReadOnly Property Cancelable() As Boolean
+    '    Get
+    '        Return pCancelable
+    '    End Get
+    'End Property
+
+    '''' <summary>
+    '''' True if user has requested to cancel current operation
+    '''' </summary>
+    'Public Shared Property Canceled() As Boolean
+    '    Get
+    '        Return pCancelable AndAlso CType(pProgressStatus, IProgressStatusCancel).Canceled
+    '    End Get
+    '    Set(ByVal aSetCanceled As Boolean)
+    '        If pCancelable Then
+    '            CType(pProgressStatus, IProgressStatusCancel).Canceled = aSetCanceled
+    '        End If
+    '    End Set
+    'End Property
 
     ''' <summary>Write any pending log messages to the log file (if logging to a file)</summary>
     Public Shared Sub Flush()
@@ -575,6 +600,9 @@ Public Class Logger
     ''' </remarks>
     Public Shared Sub Progress(ByVal aCurrent As Integer, ByVal aLast As Integer)
         Try
+            If pCancelable AndAlso CType(pProgressStatus, IProgressStatusCancel).Canceled Then
+                Throw New ProgressCancelException
+            End If
             Dim lCurTime As Double = Now.ToOADate
             If aCurrent = aLast Then 'Reached end, stop showing progress bar
                 pProgressStatus.Progress(aCurrent, aLast)

@@ -1,7 +1,19 @@
 Public Module modLaunch
 
-    Private pMonitorProcess As System.Diagnostics.Process
-
+    ''' <summary>
+    ''' Launch a program and redirect its standard output and error into Logger.Dbg
+    ''' </summary>
+    ''' <param name="aExeName">Full path of program to launch</param>
+    ''' <param name="aWorkingDirectory">Folder to start program in</param>
+    ''' <param name="aArguments">Command-line arguments to program to launch</param>
+    ''' <param name="aWait">
+    ''' True to wait until program finishes before returning from LaunchProgram, 
+    ''' False to return immediately while program continues to run
+    ''' </param>
+    ''' <returns>
+    ''' 0 if aWait=False and launch was successful
+    ''' -1 if launch was unsuccessful
+    ''' exit code of program if aWait=True and launch was successful</returns>
     Public Function LaunchProgram(ByVal aExeName As String, _
                                   ByVal aWorkingDirectory As String, _
                          Optional ByVal aArguments As String = "", _
@@ -15,7 +27,7 @@ Public Module modLaunch
                 .WorkingDirectory = aWorkingDirectory
                 .CreateNoWindow = True
                 .UseShellExecute = False
-                .Arguments = aArguments
+                If Not String.IsNullOrEmpty(aArguments) Then .Arguments = aArguments
                 .RedirectStandardOutput = True
                 AddHandler lProcess.OutputDataReceived, AddressOf MessageHandler
                 .RedirectStandardError = True
@@ -46,76 +58,7 @@ KeepWaiting:
                                ByVal aOutLine As DataReceivedEventArgs)
         If Not String.IsNullOrEmpty(aOutLine.Data) Then
             Logger.Dbg(aOutLine.Data.ToString)
-            Logger.Flush()
         End If
     End Sub
 
-    Public Function LaunchMonitor(ByVal aMonitorName As String, _
-                             ByVal aWorkingDirectory As String, _
-                    Optional ByVal aArguments As String = "") As Boolean
-        Logger.Dbg("Start " & aMonitorName & " in " & aWorkingDirectory)
-        Try
-            If Not IO.File.Exists(aMonitorName) Then
-                Logger.Dbg("Monitor not found to launch at '" & aMonitorName & "'")
-            Else
-                If pMonitorProcess Is Nothing Then
-                    pMonitorProcess = New System.Diagnostics.Process
-                    With pMonitorProcess.StartInfo
-                        .FileName = aMonitorName
-                        .WorkingDirectory = aWorkingDirectory
-                        .CreateNoWindow = True
-                        .UseShellExecute = False
-                        .Arguments = aArguments
-                        .RedirectStandardInput = True
-                        .RedirectStandardOutput = True
-                        AddHandler pMonitorProcess.OutputDataReceived, AddressOf MonitorMessageHandler
-                        .RedirectStandardError = True
-                        AddHandler pMonitorProcess.ErrorDataReceived, AddressOf MonitorMessageHandler
-                    End With
-                    pMonitorProcess.Start()
-                    pMonitorProcess.BeginErrorReadLine()
-                    pMonitorProcess.BeginOutputReadLine()
-                    Logger.Dbg("MonitorLaunched")
-                Else
-                    Logger.Dbg("UsingExistingMonitor")
-                End If
-                Return True
-            End If
-        Catch lEx As ApplicationException
-            pMonitorProcess = Nothing
-            Logger.Dbg("Problem " & lEx.Message)
-        End Try
-        Return False
-    End Function
-
-    Public Function StopMonitor() As Boolean
-        If pMonitorProcess Is Nothing Then
-            Logger.Dbg("NoMonitorToStop")
-            Return False
-        ElseIf pMonitorProcess.HasExited Then
-            Logger.Dbg("MonitorHasExited")
-            pMonitorProcess = Nothing
-            Return False
-        Else
-            pMonitorProcess.Kill()
-            Logger.Dbg("MonitorStopped")
-            pMonitorProcess = Nothing
-            Return True
-        End If
-    End Function
-
-    Public Sub SendMonitorMessage(ByVal aMessage As String)
-        If pMonitorProcess IsNot Nothing Then
-            pMonitorProcess.StandardInput.WriteLine(aMessage)
-            pMonitorProcess.StandardInput.Flush()
-        End If
-    End Sub
-
-    Private Sub MonitorMessageHandler(ByVal aSendingProcess As Object, _
-                                      ByVal aOutLine As DataReceivedEventArgs)
-        If Not String.IsNullOrEmpty(aOutLine.Data) Then
-            Logger.Dbg(aOutLine.Data.ToString)
-            Logger.Flush()
-        End If
-    End Sub
 End Module

@@ -12,8 +12,10 @@ Public Module modFile
                       Optional ByVal aAcceptDirectories As Boolean = False, _
                       Optional ByVal aAcceptFiles As Boolean = True) As Boolean
         Try
-            If aAcceptFiles AndAlso IO.File.Exists(aPathName) Then Return True
-            If aAcceptDirectories AndAlso IO.Directory.Exists(aPathName) Then Return True
+            If aPathName IsNot Nothing Then
+                If aAcceptFiles AndAlso IO.File.Exists(aPathName) Then Return True
+                If aAcceptDirectories AndAlso IO.Directory.Exists(aPathName) Then Return True
+            End If
         Catch ex As Exception 'If there was an exception, assume that means the file does not exist
         End Try
         Return False
