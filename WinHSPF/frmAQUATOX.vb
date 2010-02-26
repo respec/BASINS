@@ -125,4 +125,11 @@ Public Class frmAQUATOX
         End If
 
     End Sub
+
+    Private Sub frmAQUATOX_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pWinHSPFManualName)
+            ShowHelp("User's Guide\Detailed Functions\AQUATOX.html")
+        End If
+    End Sub
 End Class

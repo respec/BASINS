@@ -80,6 +80,7 @@ Partial Class frmPollutant
         Me.Controls.Add(Me.clbPollutants)
         Me.Controls.Add(Me.cmdCancel)
         Me.Controls.Add(Me.cmdOK)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmPollutant"
         Me.Text = "WinHSPF -Pollutant Selection"

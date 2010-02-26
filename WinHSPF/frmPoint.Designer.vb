@@ -35,6 +35,7 @@ Partial Class frmPoint
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdOK = New System.Windows.Forms.Button
         Me.grpDetails = New System.Windows.Forms.GroupBox
+        Me.agdPoint = New atcControls.atcGrid
         Me.cmdDelete = New System.Windows.Forms.Button
         Me.cmdList = New System.Windows.Forms.Button
         Me.cmdGraph = New System.Windows.Forms.Button
@@ -42,7 +43,6 @@ Partial Class frmPoint
         Me.cmdDetailsHide = New System.Windows.Forms.Button
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
         Me.agdMasterPoint = New atcControls.atcGrid
-        Me.agdPoint = New atcControls.atcGrid
         Me.grpSources.SuspendLayout()
         Me.menuPointSources.SuspendLayout()
         Me.grpDetails.SuspendLayout()
@@ -52,7 +52,7 @@ Partial Class frmPoint
         '
         Me.chkAllSources.AutoSize = True
         Me.chkAllSources.Location = New System.Drawing.Point(21, 63)
-        Me.chkAllSources.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.chkAllSources.Margin = New System.Windows.Forms.Padding(4)
         Me.chkAllSources.Name = "chkAllSources"
         Me.chkAllSources.Size = New System.Drawing.Size(144, 21)
         Me.chkAllSources.TabIndex = 7
@@ -67,9 +67,9 @@ Partial Class frmPoint
         Me.grpSources.Controls.Add(Me.lstPoints)
         Me.grpSources.Controls.Add(Me.chkAllSources)
         Me.grpSources.Location = New System.Drawing.Point(16, 15)
-        Me.grpSources.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.grpSources.Margin = New System.Windows.Forms.Padding(4)
         Me.grpSources.Name = "grpSources"
-        Me.grpSources.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.grpSources.Padding = New System.Windows.Forms.Padding(4)
         Me.grpSources.Size = New System.Drawing.Size(327, 519)
         Me.grpSources.TabIndex = 14
         Me.grpSources.TabStop = False
@@ -135,7 +135,7 @@ Partial Class frmPoint
                     Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lstPoints.FormattingEnabled = True
         Me.lstPoints.Location = New System.Drawing.Point(24, 96)
-        Me.lstPoints.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.lstPoints.Margin = New System.Windows.Forms.Padding(4)
         Me.lstPoints.Name = "lstPoints"
         Me.lstPoints.Size = New System.Drawing.Size(280, 395)
         Me.lstPoints.TabIndex = 17
@@ -154,7 +154,7 @@ Partial Class frmPoint
         '
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdCancel.Location = New System.Drawing.Point(183, 635)
-        Me.cmdCancel.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdCancel.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(135, 32)
         Me.cmdCancel.TabIndex = 18
@@ -165,7 +165,7 @@ Partial Class frmPoint
         '
         Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdOK.Location = New System.Drawing.Point(37, 635)
-        Me.cmdOK.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdOK.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdOK.Name = "cmdOK"
         Me.cmdOK.Size = New System.Drawing.Size(135, 32)
         Me.cmdOK.TabIndex = 17
@@ -182,20 +182,38 @@ Partial Class frmPoint
         Me.grpDetails.Controls.Add(Me.cmdList)
         Me.grpDetails.Controls.Add(Me.cmdGraph)
         Me.grpDetails.Location = New System.Drawing.Point(377, 15)
-        Me.grpDetails.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.grpDetails.Margin = New System.Windows.Forms.Padding(4)
         Me.grpDetails.Name = "grpDetails"
-        Me.grpDetails.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.grpDetails.Padding = New System.Windows.Forms.Padding(4)
         Me.grpDetails.Size = New System.Drawing.Size(1037, 519)
         Me.grpDetails.TabIndex = 19
         Me.grpDetails.TabStop = False
         Me.grpDetails.Text = "Details of <    >"
+        '
+        'agdPoint
+        '
+        Me.agdPoint.AllowHorizontalScrolling = True
+        Me.agdPoint.AllowNewValidValues = False
+        Me.agdPoint.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.agdPoint.CellBackColor = System.Drawing.Color.Empty
+        Me.agdPoint.Fixed3D = False
+        Me.agdPoint.LineColor = System.Drawing.Color.Empty
+        Me.agdPoint.LineWidth = 0.0!
+        Me.agdPoint.Location = New System.Drawing.Point(76, 20)
+        Me.agdPoint.Margin = New System.Windows.Forms.Padding(4)
+        Me.agdPoint.Name = "agdPoint"
+        Me.agdPoint.Size = New System.Drawing.Size(948, 479)
+        Me.agdPoint.Source = Nothing
+        Me.agdPoint.TabIndex = 25
         '
         'cmdDelete
         '
         Me.cmdDelete.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
         Me.cmdDelete.Image = CType(resources.GetObject("cmdDelete.Image"), System.Drawing.Image)
         Me.cmdDelete.Location = New System.Drawing.Point(8, 138)
-        Me.cmdDelete.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdDelete.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdDelete.Name = "cmdDelete"
         Me.cmdDelete.Size = New System.Drawing.Size(53, 43)
         Me.cmdDelete.TabIndex = 24
@@ -206,7 +224,7 @@ Partial Class frmPoint
         Me.cmdList.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
         Me.cmdList.Image = CType(resources.GetObject("cmdList.Image"), System.Drawing.Image)
         Me.cmdList.Location = New System.Drawing.Point(8, 87)
-        Me.cmdList.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdList.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdList.Name = "cmdList"
         Me.cmdList.Size = New System.Drawing.Size(53, 43)
         Me.cmdList.TabIndex = 23
@@ -217,7 +235,7 @@ Partial Class frmPoint
         Me.cmdGraph.BackgroundImage = CType(resources.GetObject("cmdGraph.BackgroundImage"), System.Drawing.Image)
         Me.cmdGraph.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
         Me.cmdGraph.Location = New System.Drawing.Point(8, 37)
-        Me.cmdGraph.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdGraph.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdGraph.Name = "cmdGraph"
         Me.cmdGraph.Size = New System.Drawing.Size(53, 43)
         Me.cmdGraph.TabIndex = 22
@@ -231,7 +249,7 @@ Partial Class frmPoint
         Me.cmdDetailsShow.ImageIndex = 1
         Me.cmdDetailsShow.ImageList = Me.ImageList1
         Me.cmdDetailsShow.Location = New System.Drawing.Point(209, 574)
-        Me.cmdDetailsShow.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdDetailsShow.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdDetailsShow.Name = "cmdDetailsShow"
         Me.cmdDetailsShow.Size = New System.Drawing.Size(133, 26)
         Me.cmdDetailsShow.TabIndex = 17
@@ -247,7 +265,7 @@ Partial Class frmPoint
         Me.cmdDetailsHide.ImageIndex = 0
         Me.cmdDetailsHide.ImageList = Me.ImageList1
         Me.cmdDetailsHide.Location = New System.Drawing.Point(377, 574)
-        Me.cmdDetailsHide.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdDetailsHide.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdDetailsHide.Name = "cmdDetailsHide"
         Me.cmdDetailsHide.Size = New System.Drawing.Size(133, 26)
         Me.cmdDetailsHide.TabIndex = 20
@@ -277,24 +295,6 @@ Partial Class frmPoint
         Me.agdMasterPoint.Source = Nothing
         Me.agdMasterPoint.TabIndex = 21
         '
-        'agdPoint
-        '
-        Me.agdPoint.AllowHorizontalScrolling = True
-        Me.agdPoint.AllowNewValidValues = False
-        Me.agdPoint.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.agdPoint.CellBackColor = System.Drawing.Color.Empty
-        Me.agdPoint.Fixed3D = False
-        Me.agdPoint.LineColor = System.Drawing.Color.Empty
-        Me.agdPoint.LineWidth = 0.0!
-        Me.agdPoint.Location = New System.Drawing.Point(76, 20)
-        Me.agdPoint.Margin = New System.Windows.Forms.Padding(4)
-        Me.agdPoint.Name = "agdPoint"
-        Me.agdPoint.Size = New System.Drawing.Size(948, 479)
-        Me.agdPoint.Source = Nothing
-        Me.agdPoint.TabIndex = 25
-        '
         'frmPoint
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
@@ -307,7 +307,8 @@ Partial Class frmPoint
         Me.Controls.Add(Me.cmdCancel)
         Me.Controls.Add(Me.cmdOK)
         Me.Controls.Add(Me.grpSources)
-        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.KeyPreview = True
+        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmPoint"
         Me.Text = "WinHSPF - Point Sources"
         Me.grpSources.ResumeLayout(False)

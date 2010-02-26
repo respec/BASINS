@@ -385,6 +385,13 @@ Public Class frmHspfParm
     Private Sub agdStarter_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdStarter.MouseDownCell
         DoLimits(aColumn, aRow)
     End Sub
+
+    Private Sub frmHspfParm_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pWinHSPFManualName)
+            ShowHelp("User's Guide\Detailed Functions\HSPFParm.html")
+        End If
+    End Sub
 End Class
 
 Public Class HSPFParameter

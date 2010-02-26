@@ -135,8 +135,8 @@ Partial Class frmSaveAs
         Me.atxName.SoftMax = -999
         Me.atxName.SoftMin = -999
         Me.atxName.TabIndex = 8
-        Me.atxName.ValueDouble = 1
-        Me.atxName.ValueInteger = 1
+        Me.atxName.ValueDouble = 0
+        Me.atxName.ValueInteger = 0
         '
         'cmdFile
         '
@@ -222,6 +222,7 @@ Partial Class frmSaveAs
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.Label1)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmSaveAs"
         Me.Text = "WinHSPF - Save As"

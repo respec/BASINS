@@ -28,14 +28,14 @@ Partial Class frmBMP
         Me.cmdDelete = New System.Windows.Forms.Button
         Me.fraBMPDet = New System.Windows.Forms.GroupBox
         Me.cmdBMPEffic = New System.Windows.Forms.Button
-        Me.atxBMPDesc = New atcControls.atcText
-        Me.atxBMPId = New atcControls.atcText
         Me.Label5 = New System.Windows.Forms.Label
         Me.Label4 = New System.Windows.Forms.Label
         Me.lblContributing = New System.Windows.Forms.Label
         Me.cmdClose = New System.Windows.Forms.Button
         Me.cmdUpdateUCI = New System.Windows.Forms.Button
         Me.agdSource = New atcControls.atcGrid
+        Me.atxBMPDesc = New atcControls.atcText
+        Me.atxBMPId = New atcControls.atcText
         Me.fraBMPDet.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -125,6 +125,76 @@ Partial Class frmBMP
         Me.cmdBMPEffic.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.cmdBMPEffic.UseVisualStyleBackColor = True
         '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(16, 66)
+        Me.Label5.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(79, 17)
+        Me.Label5.TabIndex = 2
+        Me.Label5.Text = "Description"
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(72, 32)
+        Me.Label4.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(21, 17)
+        Me.Label4.TabIndex = 1
+        Me.Label4.Text = "ID"
+        '
+        'lblContributing
+        '
+        Me.lblContributing.AutoSize = True
+        Me.lblContributing.Location = New System.Drawing.Point(12, 197)
+        Me.lblContributing.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblContributing.Name = "lblContributing"
+        Me.lblContributing.Size = New System.Drawing.Size(180, 17)
+        Me.lblContributing.TabIndex = 7
+        Me.lblContributing.Text = "Contributing Sources to < >"
+        '
+        'cmdClose
+        '
+        Me.cmdClose.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdClose.Location = New System.Drawing.Point(161, 561)
+        Me.cmdClose.Margin = New System.Windows.Forms.Padding(4)
+        Me.cmdClose.Name = "cmdClose"
+        Me.cmdClose.Size = New System.Drawing.Size(135, 32)
+        Me.cmdClose.TabIndex = 24
+        Me.cmdClose.Text = "&Close"
+        Me.cmdClose.UseVisualStyleBackColor = True
+        '
+        'cmdUpdateUCI
+        '
+        Me.cmdUpdateUCI.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdUpdateUCI.Location = New System.Drawing.Point(16, 561)
+        Me.cmdUpdateUCI.Margin = New System.Windows.Forms.Padding(4)
+        Me.cmdUpdateUCI.Name = "cmdUpdateUCI"
+        Me.cmdUpdateUCI.Size = New System.Drawing.Size(135, 32)
+        Me.cmdUpdateUCI.TabIndex = 23
+        Me.cmdUpdateUCI.Text = "&Update UCI"
+        Me.cmdUpdateUCI.UseVisualStyleBackColor = True
+        '
+        'agdSource
+        '
+        Me.agdSource.AllowHorizontalScrolling = True
+        Me.agdSource.AllowNewValidValues = False
+        Me.agdSource.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.agdSource.CellBackColor = System.Drawing.Color.Empty
+        Me.agdSource.Fixed3D = False
+        Me.agdSource.LineColor = System.Drawing.Color.Empty
+        Me.agdSource.LineWidth = 0.0!
+        Me.agdSource.Location = New System.Drawing.Point(16, 228)
+        Me.agdSource.Margin = New System.Windows.Forms.Padding(4)
+        Me.agdSource.Name = "agdSource"
+        Me.agdSource.Size = New System.Drawing.Size(1004, 305)
+        Me.agdSource.Source = Nothing
+        Me.agdSource.TabIndex = 6
+        '
         'atxBMPDesc
         '
         Me.atxBMPDesc.Alignment = System.Windows.Forms.HorizontalAlignment.Left
@@ -173,81 +243,11 @@ Partial Class frmBMP
         Me.atxBMPId.ValueDouble = 0
         Me.atxBMPId.ValueInteger = 0
         '
-        'Label5
-        '
-        Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(16, 66)
-        Me.Label5.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(79, 17)
-        Me.Label5.TabIndex = 2
-        Me.Label5.Text = "Description"
-        '
-        'Label4
-        '
-        Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(72, 32)
-        Me.Label4.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(21, 17)
-        Me.Label4.TabIndex = 1
-        Me.Label4.Text = "ID"
-        '
-        'lblContributing
-        '
-        Me.lblContributing.AutoSize = True
-        Me.lblContributing.Location = New System.Drawing.Point(12, 197)
-        Me.lblContributing.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
-        Me.lblContributing.Name = "lblContributing"
-        Me.lblContributing.Size = New System.Drawing.Size(180, 17)
-        Me.lblContributing.TabIndex = 7
-        Me.lblContributing.Text = "Contributing Sources to < >"
-        '
-        'cmdClose
-        '
-        Me.cmdClose.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdClose.Location = New System.Drawing.Point(161, 562)
-        Me.cmdClose.Margin = New System.Windows.Forms.Padding(4)
-        Me.cmdClose.Name = "cmdClose"
-        Me.cmdClose.Size = New System.Drawing.Size(135, 32)
-        Me.cmdClose.TabIndex = 24
-        Me.cmdClose.Text = "&Close"
-        Me.cmdClose.UseVisualStyleBackColor = True
-        '
-        'cmdUpdateUCI
-        '
-        Me.cmdUpdateUCI.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdUpdateUCI.Location = New System.Drawing.Point(16, 562)
-        Me.cmdUpdateUCI.Margin = New System.Windows.Forms.Padding(4)
-        Me.cmdUpdateUCI.Name = "cmdUpdateUCI"
-        Me.cmdUpdateUCI.Size = New System.Drawing.Size(135, 32)
-        Me.cmdUpdateUCI.TabIndex = 23
-        Me.cmdUpdateUCI.Text = "&Update UCI"
-        Me.cmdUpdateUCI.UseVisualStyleBackColor = True
-        '
-        'agdSource
-        '
-        Me.agdSource.AllowHorizontalScrolling = True
-        Me.agdSource.AllowNewValidValues = False
-        Me.agdSource.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.agdSource.CellBackColor = System.Drawing.Color.Empty
-        Me.agdSource.Fixed3D = False
-        Me.agdSource.LineColor = System.Drawing.Color.Empty
-        Me.agdSource.LineWidth = 0.0!
-        Me.agdSource.Location = New System.Drawing.Point(16, 228)
-        Me.agdSource.Margin = New System.Windows.Forms.Padding(4)
-        Me.agdSource.Name = "agdSource"
-        Me.agdSource.Size = New System.Drawing.Size(1004, 306)
-        Me.agdSource.Source = Nothing
-        Me.agdSource.TabIndex = 6
-        '
         'frmBMP
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1040, 609)
+        Me.ClientSize = New System.Drawing.Size(1040, 608)
         Me.Controls.Add(Me.cmdClose)
         Me.Controls.Add(Me.cmdUpdateUCI)
         Me.Controls.Add(Me.lblContributing)
@@ -257,6 +257,7 @@ Partial Class frmBMP
         Me.Controls.Add(Me.cmdAdd)
         Me.Controls.Add(Me.cboReach)
         Me.Controls.Add(Me.Label1)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmBMP"
         Me.Text = "WinHSPF - Best Management Practices Editor"

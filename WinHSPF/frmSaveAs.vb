@@ -69,4 +69,11 @@ Public Class frmSaveAs
         If Len(atxName.Text) > 8 Then atxName.Text = atxName.Text.Substring(0, 8)
         txtPath.Text = pCurrentDirectory & "\" & atxName.Text & ".uci"
     End Sub
+
+    Private Sub frmSaveAs_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pWinHSPFManualName)
+            ShowHelp("User's Guide\Tutorial.html")
+        End If
+    End Sub
 End Class

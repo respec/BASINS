@@ -98,6 +98,7 @@ Partial Class frmStarter
         Me.Controls.Add(Me.cmdStarter)
         Me.Controls.Add(Me.cmdApply)
         Me.Controls.Add(Me.agdStarter)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmStarter"
         Me.Text = "WinHSPF - Starting Values Manager"

@@ -180,14 +180,14 @@ Partial Class frmAddExpert
         Me.atxBase.OutsideHardLimitBackground = System.Drawing.Color.Coral
         Me.atxBase.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
         Me.atxBase.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.atxBase.SelLength = 4
+        Me.atxBase.SelLength = 0
         Me.atxBase.SelStart = 0
         Me.atxBase.Size = New System.Drawing.Size(107, 25)
         Me.atxBase.SoftMax = -999
         Me.atxBase.SoftMin = -999
         Me.atxBase.TabIndex = 17
-        Me.atxBase.ValueDouble = 1000
-        Me.atxBase.ValueInteger = 1000
+        Me.atxBase.ValueDouble = 0
+        Me.atxBase.ValueInteger = 0
         '
         'txtLoc
         '
@@ -216,6 +216,7 @@ Partial Class frmAddExpert
         Me.Controls.Add(Me.lblLoc)
         Me.Controls.Add(Me.lblGroup)
         Me.Controls.Add(Me.lblOperation)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmAddExpert"
         Me.Text = "WinHSPF - Add Output"
