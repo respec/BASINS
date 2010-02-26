@@ -1,6 +1,7 @@
 Imports atcUCI
 Imports atcData
 Imports atcControls
+Imports atcUtility
 Imports MapWinUtility
 
 Public Class frmOutput
@@ -785,5 +786,12 @@ Public Class frmOutput
             End If
         End If
 
+    End Sub
+
+    Private Sub frmOutput_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pWinHSPFManualName)
+            ShowHelp("User's Guide\Detailed Functions\Output Manager.html")
+        End If
     End Sub
 End Class

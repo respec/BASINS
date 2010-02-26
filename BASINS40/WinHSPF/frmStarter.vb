@@ -210,4 +210,11 @@ Public Class frmStarter
         pCurrentSelectedRow = aRow
         DoLimits()
     End Sub
+
+    Private Sub frmStarter_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pWinHSPFManualName)
+            ShowHelp("User's Guide\Detailed Functions\Starter Mapping.html")
+        End If
+    End Sub
 End Class

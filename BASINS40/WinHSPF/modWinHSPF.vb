@@ -41,6 +41,8 @@ Public Module WinHSPF
     Friend pfrmXSect As frmXSect
     Friend pWinHSPF As frmWinHSPF
 
+    Friend pWinHSPFManualName As String
+    Friend pHSPFManualName As String
     'Friend pIPC As ATCoIPC
 
     Sub Main()
@@ -52,6 +54,25 @@ Public Module WinHSPF
             If lLogFolder.EndsWith("Debug") Then lLogFolder = PathNameOnly(lLogFolder)
             lLogFolder = PathNameOnly(lLogFolder)
             Logger.StartToFile(IO.Path.Combine(IO.Path.Combine(lLogFolder, "logs"), "WinHSPF.log"))
+        End If
+
+        'set WinHSPF manual location
+        pWinHSPFManualName = lBasinsBinLoc & "\..\..\..\docs\WinHSPF.chm"
+        If Not FileExists(pWinHSPFManualName) Then
+            pWinHSPFManualName = "\BASINS\docs\WinHSPF.chm"
+            If Not FileExists(pWinHSPFManualName) Then
+                pWinHSPFManualName = FindFile("Please locate WinHSPF.chm", "WinHSPF.chm")
+            End If
+        End If
+        ShowHelp(pWinHSPFManualName)
+
+        'set HSPF manual location
+        pHSPFManualName = lBasinsBinLoc & "\..\..\..\docs\HSPF.chm"
+        If Not FileExists(pHSPFManualName) Then
+            pHSPFManualName = "\BASINS\docs\HSPF.chm"
+            If Not FileExists(pHSPFManualName) Then
+                pHSPFManualName = FindFile("Please locate HSPF.chm", "HSPF.chm")
+            End If
         End If
 
         'open hspf message mdb
@@ -414,33 +435,33 @@ Public Module WinHSPF
 
     Sub EditBlock(ByVal aParent As Windows.Forms.Form, ByVal aTableName As String)
         If aTableName = "GLOBAL" Then
-            UCIForms.Edit(aParent, pUCI.GlobalBlock)
+            UCIForms.Edit(aParent, pUCI.GlobalBlock, aTableName, pHSPFManualName)
         ElseIf aTableName = "OPN SEQUENCE" Then
-            UCIForms.Edit(aParent, pUCI.OpnSeqBlock)
+            UCIForms.Edit(aParent, pUCI.OpnSeqBlock, aTableName, pHSPFManualName)
         ElseIf aTableName = "FILES" Then
-            UCIForms.Edit(aParent, pUCI.FilesBlock)
+            UCIForms.Edit(aParent, pUCI.FilesBlock, aTableName, pHSPFManualName)
         ElseIf aTableName = "CATEGORY" Then
-            UCIForms.Edit(aParent, pUCI.CategoryBlock)
+            UCIForms.Edit(aParent, pUCI.CategoryBlock, aTableName, pHSPFManualName)
         ElseIf aTableName = "FTABLES" Then
             If pUCI.OpnBlks("RCHRES").Count > 0 Then
-                UCIForms.Edit(aParent, pUCI.OpnBlks("RCHRES").Ids(0).FTable)
+                UCIForms.Edit(aParent, pUCI.OpnBlks("RCHRES").Ids(0).FTable, aTableName, pHSPFManualName)
             Else
                 Logger.Message("The current project contains no reaches.", "FTable Editor Problem", MessageBoxButtons.OK, MessageBoxIcon.Information, Windows.Forms.DialogResult.OK)
             End If
         ElseIf aTableName = "MONTH-DATA" Then
-            UCIForms.Edit(aParent, pUCI.MonthData)
+            UCIForms.Edit(aParent, pUCI.MonthData, aTableName, pHSPFManualName)
         ElseIf aTableName = "EXT SOURCES" Then
-            UCIForms.Edit(aParent, pUCI.Connections(0), aTableName)
+            UCIForms.Edit(aParent, pUCI.Connections(0), aTableName, pHSPFManualName)
         ElseIf aTableName = "NETWORK" Then
-            UCIForms.Edit(aParent, pUCI.Connections(0), aTableName)
+            UCIForms.Edit(aParent, pUCI.Connections(0), aTableName, pHSPFManualName)
         ElseIf aTableName = "SCHEMATIC" Then
-            UCIForms.Edit(aParent, pUCI.Connections(0), aTableName)
+            UCIForms.Edit(aParent, pUCI.Connections(0), aTableName, pHSPFManualName)
         ElseIf aTableName = "EXT TARGETS" Then
-            UCIForms.Edit(aParent, pUCI.Connections(0), aTableName)
+            UCIForms.Edit(aParent, pUCI.Connections(0), aTableName, pHSPFManualName)
         ElseIf aTableName = "MASS-LINK" Then
-            UCIForms.Edit(aParent, pUCI.MassLinks(0), aTableName)
+            UCIForms.Edit(aParent, pUCI.MassLinks(0), aTableName, pHSPFManualName)
         ElseIf aTableName = "SPEC-ACTIONS" Then
-            UCIForms.Edit(aParent, pUCI.SpecialActionBlk, aTableName)
+            UCIForms.Edit(aParent, pUCI.SpecialActionBlk, aTableName, pHSPFManualName)
         Else
             Logger.Msg("Table/Block " & aTableName & " not found.", MsgBoxStyle.OkOnly, "Edit Problem")
         End If

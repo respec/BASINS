@@ -68,7 +68,7 @@ Partial Class frmPointScenario
         Me.atxNew.HardMin = -999
         Me.atxNew.InsideLimitsBackground = System.Drawing.Color.White
         Me.atxNew.Location = New System.Drawing.Point(197, 54)
-        Me.atxNew.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.atxNew.Margin = New System.Windows.Forms.Padding(4)
         Me.atxNew.MaxWidth = 20
         Me.atxNew.Name = "atxNew"
         Me.atxNew.NumericFormat = "0.#####"
@@ -88,7 +88,7 @@ Partial Class frmPointScenario
         Me.cboBase.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboBase.FormattingEnabled = True
         Me.cboBase.Location = New System.Drawing.Point(197, 17)
-        Me.cboBase.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cboBase.Margin = New System.Windows.Forms.Padding(4)
         Me.cboBase.Name = "cboBase"
         Me.cboBase.Size = New System.Drawing.Size(171, 24)
         Me.cboBase.TabIndex = 5
@@ -102,7 +102,7 @@ Partial Class frmPointScenario
         Me.atxMult.HardMin = -999
         Me.atxMult.InsideLimitsBackground = System.Drawing.Color.White
         Me.atxMult.Location = New System.Drawing.Point(197, 89)
-        Me.atxMult.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.atxMult.Margin = New System.Windows.Forms.Padding(4)
         Me.atxMult.MaxWidth = 20
         Me.atxMult.Name = "atxMult"
         Me.atxMult.NumericFormat = "0.#####"
@@ -121,7 +121,7 @@ Partial Class frmPointScenario
         '
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdCancel.Location = New System.Drawing.Point(216, 137)
-        Me.cmdCancel.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdCancel.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(135, 32)
         Me.cmdCancel.TabIndex = 20
@@ -132,7 +132,7 @@ Partial Class frmPointScenario
         '
         Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdOK.Location = New System.Drawing.Point(71, 137)
-        Me.cmdOK.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdOK.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdOK.Name = "cmdOK"
         Me.cmdOK.Size = New System.Drawing.Size(135, 32)
         Me.cmdOK.TabIndex = 19
@@ -152,7 +152,8 @@ Partial Class frmPointScenario
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.Label1)
-        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.KeyPreview = True
+        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmPointScenario"
         Me.Text = "WinHSPF - Create Point Source Scenario"
         Me.ResumeLayout(False)

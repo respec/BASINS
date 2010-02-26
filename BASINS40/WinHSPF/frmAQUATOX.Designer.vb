@@ -170,6 +170,7 @@ Partial Class frmAQUATOX
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.cmdWDMFile)
         Me.Controls.Add(Me.cmdWatershedFile)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmAQUATOX"
         Me.Text = "WinHSPF - AQUATOX Linkage"

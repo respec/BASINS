@@ -133,6 +133,7 @@ Partial Class frmBMPEffic
         Me.Controls.Add(Me.lblId)
         Me.Controls.Add(Me.cmbBmpName)
         Me.Controls.Add(Me.lblBmpName)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmBMPEffic"
         Me.Text = "WinHSPF - Best Management Practices Efficiency Editor"

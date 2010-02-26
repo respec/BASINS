@@ -239,6 +239,7 @@ Partial Class frmHspfParm
         Me.Controls.Add(Me.cmdClose)
         Me.Controls.Add(Me.fraResults)
         Me.Controls.Add(Me.cmdStart)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmHspfParm"
         Me.Text = "WinHSPF - HSPFParm Linkage"

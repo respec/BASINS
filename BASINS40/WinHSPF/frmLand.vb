@@ -2,6 +2,7 @@ Imports System.Drawing
 Imports MapWinUtility
 Imports atcUCI
 Imports atcControls
+Imports atcUtility
 Imports System.ComponentModel
 
 Public Class frmLand
@@ -435,4 +436,10 @@ Public Class frmLand
         WinHSPF.pUCI.Edited = True
     End Sub
 
+    Private Sub frmLand_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pWinHSPFManualName)
+            ShowHelp("User's Guide\Detailed Functions\Land Use Editor.html")
+        End If
+    End Sub
 End Class

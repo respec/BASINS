@@ -1,6 +1,7 @@
 Imports MapWinUtility
 Imports atcUCI
 Imports atcUCIForms
+Imports atcUtility
 
 Public Class frmInputDataEditor
 
@@ -136,7 +137,7 @@ Public Class frmInputDataEditor
                     End If
                     If lOpnBlk.TableExists(lTableName) Then
                         Dim lTable As HspfTable = lOpnBlk.Tables(lTableName)
-                        UCIForms.Edit(Me, lTable)
+                        UCIForms.Edit(Me, lTable, lName, pHSPFManualName)
                         'check for missing tables, add if needed
                         'CheckAndAddMissingTables(opname)
                         'CheckAndAddMassLinks()
@@ -162,5 +163,12 @@ notFound:
         pUCI.Source2MetSeg()
         pUCI.Source2Point()
         Me.Dispose()
+    End Sub
+
+    Private Sub frmInputDataEditor_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pWinHSPFManualName)
+            ShowHelp("User's Guide\Detailed Functions\Input Data Editor.html")
+        End If
     End Sub
 End Class

@@ -54,6 +54,10 @@ Partial Class frmWinHSPF
         Me.PESTToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.ToolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator
+        Me.ContentsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.HSPFManualToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.WebSupToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.RightToolStripPanel = New System.Windows.Forms.ToolStripPanel
         Me.LeftToolStripPanel = New System.Windows.Forms.ToolStripPanel
         Me.ContentPanel = New System.Windows.Forms.ToolStripContentPanel
@@ -74,11 +78,11 @@ Partial Class frmWinHSPF
         Me.cmdPoint = New System.Windows.Forms.ToolStripButton
         Me.cmdInputDataEditor = New System.Windows.Forms.ToolStripButton
         Me.cmdOutputManager = New System.Windows.Forms.ToolStripButton
-        Me.cmdViewOutput = New System.Windows.Forms.ToolStripButton
+        Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator
         Me.cmdRunHSPF = New System.Windows.Forms.ToolStripButton
+        Me.cmdViewOutput = New System.Windows.Forms.ToolStripButton
         Me.SchematicDiagram = New ctlSchematic
         Me.TopPanel = New System.Windows.Forms.FlowLayoutPanel
-        Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator
         Me.MenuMain.SuspendLayout()
         Me.ToolStrip2.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
@@ -278,7 +282,7 @@ Partial Class frmWinHSPF
         '
         'HelpToolStripMenuItem
         '
-        Me.HelpToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AboutToolStripMenuItem})
+        Me.HelpToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AboutToolStripMenuItem, Me.ToolStripSeparator5, Me.ContentsToolStripMenuItem, Me.HSPFManualToolStripMenuItem, Me.WebSupToolStripMenuItem})
         Me.HelpToolStripMenuItem.Name = "HelpToolStripMenuItem"
         Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(48, 22)
         Me.HelpToolStripMenuItem.Text = "Help"
@@ -286,8 +290,31 @@ Partial Class frmWinHSPF
         'AboutToolStripMenuItem
         '
         Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
-        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(129, 22)
+        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
         Me.AboutToolStripMenuItem.Text = "About"
+        '
+        'ToolStripSeparator5
+        '
+        Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
+        Me.ToolStripSeparator5.Size = New System.Drawing.Size(173, 6)
+        '
+        'ContentsToolStripMenuItem
+        '
+        Me.ContentsToolStripMenuItem.Name = "ContentsToolStripMenuItem"
+        Me.ContentsToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
+        Me.ContentsToolStripMenuItem.Text = "Contents"
+        '
+        'HSPFManualToolStripMenuItem
+        '
+        Me.HSPFManualToolStripMenuItem.Name = "HSPFManualToolStripMenuItem"
+        Me.HSPFManualToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
+        Me.HSPFManualToolStripMenuItem.Text = "HSPF Manual"
+        '
+        'WebSupToolStripMenuItem
+        '
+        Me.WebSupToolStripMenuItem.Name = "WebSupToolStripMenuItem"
+        Me.WebSupToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
+        Me.WebSupToolStripMenuItem.Text = "Web Support"
         '
         'RightToolStripPanel
         '
@@ -464,15 +491,10 @@ Partial Class frmWinHSPF
         Me.cmdOutputManager.Text = "Output"
         Me.cmdOutputManager.ToolTipText = "Output Manager"
         '
-        'cmdViewOutput
+        'ToolStripSeparator2
         '
-        Me.cmdViewOutput.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.cmdViewOutput.Image = CType(resources.GetObject("cmdViewOutput.Image"), System.Drawing.Image)
-        Me.cmdViewOutput.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.cmdViewOutput.Name = "cmdViewOutput"
-        Me.cmdViewOutput.Size = New System.Drawing.Size(23, 24)
-        Me.cmdViewOutput.Text = "ViewOutput"
-        Me.cmdViewOutput.ToolTipText = "View Output"
+        Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
+        Me.ToolStripSeparator2.Size = New System.Drawing.Size(6, 27)
         '
         'cmdRunHSPF
         '
@@ -482,6 +504,16 @@ Partial Class frmWinHSPF
         Me.cmdRunHSPF.Name = "cmdRunHSPF"
         Me.cmdRunHSPF.Size = New System.Drawing.Size(23, 24)
         Me.cmdRunHSPF.Text = "Run Simulation"
+        '
+        'cmdViewOutput
+        '
+        Me.cmdViewOutput.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.cmdViewOutput.Image = CType(resources.GetObject("cmdViewOutput.Image"), System.Drawing.Image)
+        Me.cmdViewOutput.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.cmdViewOutput.Name = "cmdViewOutput"
+        Me.cmdViewOutput.Size = New System.Drawing.Size(23, 24)
+        Me.cmdViewOutput.Text = "ViewOutput"
+        Me.cmdViewOutput.ToolTipText = "View Output"
         '
         'SchematicDiagram
         '
@@ -506,11 +538,6 @@ Partial Class frmWinHSPF
         Me.TopPanel.Size = New System.Drawing.Size(1181, 27)
         Me.TopPanel.TabIndex = 7
         '
-        'ToolStripSeparator2
-        '
-        Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
-        Me.ToolStripSeparator2.Size = New System.Drawing.Size(6, 27)
-        '
         'frmWinHSPF
         '
         Me.AllowDrop = True
@@ -521,6 +548,7 @@ Partial Class frmWinHSPF
         Me.Controls.Add(Me.TopPanel)
         Me.Controls.Add(Me.SchematicDiagram)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.KeyPreview = True
         Me.MainMenuStrip = Me.MenuMain
         Me.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.Name = "frmWinHSPF"
@@ -596,5 +624,9 @@ Partial Class frmWinHSPF
     Friend WithEvents SchematicDiagram As ctlSchematic
     Friend WithEvents TopPanel As System.Windows.Forms.FlowLayoutPanel
     Friend WithEvents ToolStripSeparator2 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents ContentsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator5 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents WebSupToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents HSPFManualToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 
 End Class

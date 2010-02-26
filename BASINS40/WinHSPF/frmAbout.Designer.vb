@@ -35,7 +35,7 @@ Partial Class frmAbout
         'cmdClose
         '
         Me.cmdClose.Location = New System.Drawing.Point(279, 513)
-        Me.cmdClose.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdClose.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdClose.Name = "cmdClose"
         Me.cmdClose.Size = New System.Drawing.Size(161, 38)
         Me.cmdClose.TabIndex = 3
@@ -52,7 +52,7 @@ Partial Class frmAbout
         'PictureBox1
         '
         Me.PictureBox1.Location = New System.Drawing.Point(19, 15)
-        Me.PictureBox1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.PictureBox1.Margin = New System.Windows.Forms.Padding(4)
         Me.PictureBox1.Name = "PictureBox1"
         Me.PictureBox1.Size = New System.Drawing.Size(333, 140)
         Me.PictureBox1.TabIndex = 4
@@ -61,7 +61,7 @@ Partial Class frmAbout
         'PictureBox2
         '
         Me.PictureBox2.Location = New System.Drawing.Point(373, 15)
-        Me.PictureBox2.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.PictureBox2.Margin = New System.Windows.Forms.Padding(4)
         Me.PictureBox2.Name = "PictureBox2"
         Me.PictureBox2.Size = New System.Drawing.Size(333, 140)
         Me.PictureBox2.TabIndex = 5
@@ -71,9 +71,9 @@ Partial Class frmAbout
         '
         Me.GroupBox1.Controls.Add(Me.txtLabel)
         Me.GroupBox1.Location = New System.Drawing.Point(19, 180)
-        Me.GroupBox1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.GroupBox1.Margin = New System.Windows.Forms.Padding(4)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(4)
         Me.GroupBox1.Size = New System.Drawing.Size(688, 316)
         Me.GroupBox1.TabIndex = 6
         Me.GroupBox1.TabStop = False
@@ -103,7 +103,8 @@ Partial Class frmAbout
         Me.Controls.Add(Me.PictureBox1)
         Me.Controls.Add(Me.cmdClose)
         Me.Controls.Add(Me.GroupBox1)
-        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.KeyPreview = True
+        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmAbout"
         Me.Text = "About WinHSPF"
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()

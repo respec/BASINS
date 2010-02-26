@@ -611,4 +611,10 @@ Public Class frmPollutant
         End If
     End Sub
 
+    Private Sub frmPollutant_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pWinHSPFManualName)
+            ShowHelp("User's Guide\Detailed Functions\Pollutant Selection.html")
+        End If
+    End Sub
 End Class

@@ -1,5 +1,6 @@
 Imports System.Collections.ObjectModel
 Imports atcUCI
+Imports atcUtility
 Imports MapWinUtility
 
 Public Class frmBMP
@@ -903,4 +904,10 @@ Public Class frmBMP
 
     End Sub
 
+    Private Sub frmBMP_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pWinHSPFManualName)
+            ShowHelp("User's Guide\Detailed Functions\Edit BMP.html")
+        End If
+    End Sub
 End Class

@@ -413,4 +413,11 @@ Public Class frmTime
             cmdApply.Enabled = False
         End If
     End Sub
+
+    Private Sub frmTime_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pWinHSPFManualName)
+            ShowHelp("User's Guide\Detailed Functions\Simulation Time.html")
+        End If
+    End Sub
 End Class

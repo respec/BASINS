@@ -107,6 +107,7 @@ Partial Class frmAddMet
         Me.Controls.Add(Me.agdMet)
         Me.Controls.Add(Me.cboName)
         Me.Controls.Add(Me.Label1)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmAddMet"
         Me.Text = "WinHSPF - Add Met Segment"

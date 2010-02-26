@@ -1,6 +1,7 @@
 Imports atcControls
 Imports atcData
 Imports atcUCI
+Imports atcUtility
 Imports MapWinUtility
 
 Public Class frmAddPoint
@@ -94,6 +95,13 @@ Public Class frmAddPoint
         End If
         If lReadyForCloseFlag Then
             Me.Dispose()
+        End If
+    End Sub
+
+    Private Sub frmAddPoint_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pWinHSPFManualName)
+            ShowHelp("User's Guide\Detailed Functions\Point Sources.html")
         End If
     End Sub
 End Class

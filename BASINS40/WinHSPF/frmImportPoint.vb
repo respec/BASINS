@@ -209,4 +209,10 @@ Public Class frmImportPoint
         End Try
     End Sub
 
+    Private Sub frmImportPoint_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pWinHSPFManualName)
+            ShowHelp("User's Guide\Detailed Functions\Point Sources.html")
+        End If
+    End Sub
 End Class

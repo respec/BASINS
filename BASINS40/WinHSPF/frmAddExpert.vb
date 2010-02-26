@@ -531,4 +531,10 @@ Public Class frmAddExpert
         Me.Dispose()
     End Sub
 
+    Private Sub frmAddExpert_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pWinHSPFManualName)
+            ShowHelp("User's Guide\Detailed Functions\Output Manager.html")
+        End If
+    End Sub
 End Class

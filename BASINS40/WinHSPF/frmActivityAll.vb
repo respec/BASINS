@@ -1,6 +1,6 @@
 Imports atcUCIForms
 Imports atcControls
-
+Imports atcUtility
 
 Public Class frmActivityAll
 
@@ -112,6 +112,14 @@ Public Class frmActivityAll
     End Sub
 
     Private Sub cmdHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdHelp.Click
+        ShowHelp(pHSPFManualName)
+        ShowHelp("")
+    End Sub
 
+    Private Sub frmActivityAll_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pHSPFManualName)
+            ShowHelp("")
+        End If
     End Sub
 End Class

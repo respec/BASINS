@@ -1,4 +1,5 @@
 Imports atcUCI
+Imports atcUtility
 Imports MapWinUtility
 
 Public Class frmControl
@@ -553,4 +554,10 @@ Public Class frmControl
 
     End Function
 
+    Private Sub frmControl_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pWinHSPFManualName)
+            ShowHelp("User's Guide\Detailed Functions\Control Cards.html")
+        End If
+    End Sub
 End Class

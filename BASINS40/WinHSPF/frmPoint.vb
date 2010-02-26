@@ -1,6 +1,7 @@
 Imports atcControls
 Imports atcData
 Imports atcUCI
+Imports atcUtility
 Imports MapWinUtility
 
 Public Class frmPoint
@@ -735,6 +736,13 @@ Public Class frmPoint
         'if there exists points and no point is selected, then choose the first entry
         If lstPoints.Items.Count > 0 AndAlso lstPoints.SelectedIndex = -1 Then lstPoints.SelectedIndex = 0
         ExpandedView(True)
+    End Sub
+
+    Private Sub frmPoint_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pWinHSPFManualName)
+            ShowHelp("User's Guide\Detailed Functions\Point Sources.html")
+        End If
     End Sub
 
     Private Sub frmPoint_Resized(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.ResizeEnd

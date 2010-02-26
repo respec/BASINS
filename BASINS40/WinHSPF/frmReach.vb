@@ -1,5 +1,6 @@
 Imports atcUCI
 Imports atcUCIForms
+Imports atcUtility
 Imports MapWinUtility
 
 Public Class frmReach
@@ -84,9 +85,9 @@ Public Class frmReach
 
     Private Sub FTables_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles FTables.Click
         If pSelectedRow > 0 Then
-            UCIForms.Edit(Me, pUCI.OpnBlks("RCHRES").NthOper(1).FTable)
+            UCIForms.Edit(Me, pUCI.OpnBlks("RCHRES").NthOper(1).FTable, "FTABLES", pHSPFManualName)
         Else
-            UCIForms.Edit(Me, pUCI.OpnBlks("RCHRES").NthOper(pSelectedRow).FTable)
+            UCIForms.Edit(Me, pUCI.OpnBlks("RCHRES").NthOper(pSelectedRow).FTable, "FTABLES", pHSPFManualName)
         End If
     End Sub
 
@@ -288,5 +289,12 @@ Public Class frmReach
 
     Private Sub cmdCancel_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
         Me.Dispose()
+    End Sub
+
+    Private Sub frmReach_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pWinHSPFManualName)
+            ShowHelp("User's Guide\Detailed Functions\Reach Editor.html")
+        End If
     End Sub
 End Class

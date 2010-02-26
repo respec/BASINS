@@ -1,6 +1,7 @@
 Imports atcUCIForms
 Imports MapWinUtility
 Imports atcUCI
+Imports atcUtility
 Imports System
 Imports atcControls
 
@@ -321,6 +322,13 @@ Public Class frmWinHSPF
         Return ""
     End Function
 
+    Private Sub frmWinHSPF_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pWinHSPFManualName)
+            ShowHelp("User's Guide\Detailed Functions\Main WinHSPF Window.html")
+        End If
+    End Sub
+
     Private Sub frmWinHSPF_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
         ResizeDiagram()
     End Sub
@@ -329,5 +337,19 @@ Public Class frmWinHSPF
         SchematicDiagram.Size = New Size(Me.ClientRectangle.Width, Me.ClientRectangle.Height - SchematicDiagram.Top)
         SchematicDiagram.RefreshDetails()
         SchematicDiagram.RefreshDetails()
+    End Sub
+
+    Private Sub ContentsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ContentsToolStripMenuItem.Click
+        ShowHelp(pWinHSPFManualName)
+        ShowHelp("")
+    End Sub
+
+    Private Sub HSPFManualToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HSPFManualToolStripMenuItem.Click
+        ShowHelp(pHSPFManualName)
+        ShowHelp("")
+    End Sub
+
+    Private Sub WebSupToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles WebSupToolStripMenuItem.Click
+        OpenFile("http://www.epa.gov/waterscience/BASINS/")
     End Sub
 End Class

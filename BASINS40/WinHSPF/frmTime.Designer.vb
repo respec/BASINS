@@ -490,6 +490,7 @@ Partial Class frmTime
         Me.Controls.Add(Me.Label9)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.Label2)
+        Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmTime"
         Me.Text = "WinHSPF - Simulation Time and Meteorologic Data"

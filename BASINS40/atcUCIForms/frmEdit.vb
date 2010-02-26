@@ -1,10 +1,13 @@
 Imports MapWinUtility
+Imports atcUtility
 
 Public Class frmEdit
     Private WithEvents pEditControl As ctlEdit
     Private pParent As Windows.Forms.Form
     Private pAddRemoveFlag As Boolean = True
     Private pEditFlag As Boolean = True
+    Private pUsersManualFileName As String = ""
+    Private pUsersManualPageName As String = ""
 
     Friend Property EditControl() As Windows.Forms.Control
         Get
@@ -79,19 +82,29 @@ Public Class frmEdit
         pEditControl.Remove()
     End Sub
 
-    Public Sub New(ByVal aParent As Windows.Forms.Form)
+    Public Sub New(ByVal aParent As Windows.Forms.Form, Optional ByVal aUsersManualFileName As String = "", _
+                   Optional ByVal aUsersManualPageName As String = "")
 
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
         pParent = aParent
+        pUsersManualFileName = aUsersManualFileName
+        pUsersManualPageName = aUsersManualPageName
     End Sub
 
     Private Sub pEditControl_Change(ByVal aChange As Boolean) Handles pEditControl.Change
         Me.Text = pEditControl.Caption
         If aChange Then
             Me.Text &= " *"
+        End If
+    End Sub
+
+    Private Sub frmEdit_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pUsersManualFileName)
+            ShowHelp(pUsersManualPageName)
         End If
     End Sub
 
@@ -103,5 +116,10 @@ Public Class frmEdit
             cmdAdd.Visible = False
             cmdRemove.Visible = False
         End If
+    End Sub
+
+    Private Sub cmdHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdHelp.Click
+        ShowHelp(pUsersManualFileName)
+        ShowHelp(pUsersManualPageName)
     End Sub
 End Class
