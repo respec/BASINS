@@ -122,27 +122,42 @@ Public Class atcDataSourceTimeseriesBinary
     End Function
 
     Public Overrides Function AddDatasets(ByVal aDataGroup As atcTimeseriesGroup) As Boolean
-        Logger.Status("Writing " & IO.Path.GetFileName(Specification), True)
+        Dim lLastIndex As Integer = aDataGroup.Count
+        Logger.Status("Writing " & Format(lLastIndex, "#,##0") & " datasets to " & IO.Path.GetFileName(Specification), True)
+        Dim lWriter As IO.BinaryWriter = OpenFileToWrite()
         Dim lIndex As Integer = 0
         For Each lDataSet As atcData.atcDataSet In aDataGroup
-            AddDataset(lDataSet)
+            WriteDataset(lDataSet, lWriter)
             lIndex += 1
-            Logger.Progress(lIndex, aDataGroup.Count)
+            Logger.Progress(lIndex, lLastIndex)
         Next
         Logger.Status("")
         Logger.Dbg("Wrote " & aDataGroup.Count & " Datasets")
+        lWriter.Close()
     End Function
 
     Public Overrides Function AddDataset(ByVal aDataSet As atcData.atcDataSet, _
                                 Optional ByVal aExistAction As atcData.atcTimeseriesSource.EnumExistAction = atcData.atcTimeseriesSource.EnumExistAction.ExistReplace) _
                                          As Boolean
+        Dim lWriter As IO.BinaryWriter = OpenFileToWrite()
+        WriteDataset(aDataSet, lWriter)
+        lWriter.Close()
+    End Function
+
+    Private Function OpenFileToWrite() As IO.BinaryWriter
         Dim lFileStream As New IO.FileStream(Specification, IO.FileMode.Append)
         Dim lWriter As New IO.BinaryWriter(lFileStream)
         If lFileStream.Position = 0 Then
             lWriter.Write(pVersion)
         End If
+        Return lWriter
+    End Function
 
-        For Each lAttribute As atcDefinedValue In aDataSet.Attributes
+    Private Sub WriteDataset(ByVal aDataSet As atcData.atcDataSet, ByVal aWriter As IO.BinaryWriter)
+        Dim lTimeseries As atcTimeseries = aDataSet
+        lTimeseries.EnsureValuesRead()
+
+        For Each lAttribute As atcDefinedValue In lTimeseries.Attributes
             If Not lAttribute.Definition.Calculated Then
                 Dim lName As String = lAttribute.Definition.Name
                 Select Case lName
@@ -151,51 +166,49 @@ Public Class atcDataSourceTimeseriesBinary
                         Dim lType As Byte = 0
                         Select Case lAttribute.Definition.TypeString
                             Case "String", "atcTimeUnit"
-                                lWriter.Write(lName)
-                                lWriter.Write(CByte(1))
-                                lWriter.Write(lAttribute.Value.ToString.TrimEnd)
+                                aWriter.Write(lName)
+                                aWriter.Write(CByte(1))
+                                aWriter.Write(lAttribute.Value.ToString.TrimEnd)
                             Case "Integer"
-                                lWriter.Write(lName)
-                                lWriter.Write(CByte(2))
-                                lWriter.Write(CInt(lAttribute.Value))
+                                aWriter.Write(lName)
+                                aWriter.Write(CByte(2))
+                                aWriter.Write(CInt(lAttribute.Value))
                             Case "Double"
-                                lWriter.Write(lName)
-                                lWriter.Write(CByte(3))
-                                lWriter.Write(CDbl(lAttribute.Value))
+                                aWriter.Write(lName)
+                                aWriter.Write(CByte(3))
+                                aWriter.Write(CDbl(lAttribute.Value))
                             Case "Single"
-                                lWriter.Write(lName)
-                                lWriter.Write(CByte(4))
-                                lWriter.Write(CSng(lAttribute.Value))
+                                aWriter.Write(lName)
+                                aWriter.Write(CByte(4))
+                                aWriter.Write(CSng(lAttribute.Value))
                             Case Else
                                 Debug.Print("AttributeTypeNotDefined:" & lAttribute.Definition.TypeString)
                         End Select
                 End Select
             End If
         Next
-        lWriter.Write("<done>")
+        aWriter.Write("<done>")
 
-        Dim lTimeseries As atcTimeseries = aDataSet
         Dim lTimeUnits As Integer = lTimeseries.Attributes.GetValue("tu", 4)
         Dim lTimeStep As Integer = lTimeseries.Attributes.GetValue("ts", 1)
         Dim lDateEndComputed As Double = TimAddJ(lTimeseries.Dates.Value(0), lTimeUnits, lTimeStep, lTimeseries.numValues)
         If Math.Abs(lDateEndComputed - lTimeseries.Dates.Value(lTimeseries.numValues)) < 0.00001 Then
-            lWriter.Write(-lTimeseries.numValues)
-            lWriter.Write(lTimeseries.Dates.Values(0))
+            aWriter.Write(-lTimeseries.numValues)
+            aWriter.Write(lTimeseries.Dates.Values(0))
         Else
-            lWriter.Write(lTimeseries.numValues)
+            aWriter.Write(lTimeseries.numValues)
             Dim lDates() As Double = lTimeseries.Dates.Values
             For lIndex As Integer = 0 To lTimeseries.numValues
-                lWriter.Write(lDates(lIndex))
+                aWriter.Write(lDates(lIndex))
             Next
         End If
         Dim lValues() As Double = lTimeseries.Values
         For lIndex As Integer = 0 To lTimeseries.numValues
-            lWriter.Write(lValues(lIndex))
+            aWriter.Write(lValues(lIndex))
         Next
         'todo: write value attributes (if any)
 
-        lWriter.Close()
-    End Function
+    End Sub
 
     Public Overrides Function Save(ByVal SaveFileName As String, _
                           Optional ByVal ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
