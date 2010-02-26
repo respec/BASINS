@@ -2,11 +2,17 @@ Public Class frmStatus
     Inherits System.Windows.Forms.Form
 
     Private pLevels As New Generic.List(Of ctlStatus)
+
+    Delegate Sub SetLevelCallback(ByVal aNewLevel As Integer)
+    Private pSetLevelCallback As New SetLevelCallback(AddressOf SetLevel)
+
     Private pMargin As Integer = 10
+    Private pDetailsVisible As Boolean = False
 
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents btnPause As System.Windows.Forms.Button
-    Friend WithEvents btnDetails As System.Windows.Forms.Button
+    Friend WithEvents btnLog As System.Windows.Forms.Button
+    Friend WithEvents lblBottom As System.Windows.Forms.Label
     Public Exiting As Boolean = False
 
 #Region " Windows Form Designer generated code "
@@ -38,27 +44,31 @@ Public Class frmStatus
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    Friend WithEvents txtLog As System.Windows.Forms.TextBox
+    Friend WithEvents txtDetails As System.Windows.Forms.TextBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmStatus))
-        Me.txtLog = New System.Windows.Forms.TextBox
+        Me.txtDetails = New System.Windows.Forms.TextBox
         Me.btnCancel = New System.Windows.Forms.Button
         Me.btnPause = New System.Windows.Forms.Button
-        Me.btnDetails = New System.Windows.Forms.Button
+        Me.btnLog = New System.Windows.Forms.Button
+        Me.lblBottom = New System.Windows.Forms.Label
         Me.SuspendLayout()
         '
-        'txtLog
+        'txtDetails
         '
-        Me.txtLog.Location = New System.Drawing.Point(8, 182)
-        Me.txtLog.Multiline = True
-        Me.txtLog.Name = "txtLog"
-        Me.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtLog.Size = New System.Drawing.Size(497, 244)
-        Me.txtLog.TabIndex = 2
+        Me.txtDetails.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtDetails.Location = New System.Drawing.Point(12, 54)
+        Me.txtDetails.Multiline = True
+        Me.txtDetails.Name = "txtDetails"
+        Me.txtDetails.ScrollBars = System.Windows.Forms.ScrollBars.Both
+        Me.txtDetails.Size = New System.Drawing.Size(490, 59)
+        Me.txtDetails.TabIndex = 2
         '
         'btnCancel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnCancel.AutoSize = True
         Me.btnCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnCancel.Location = New System.Drawing.Point(12, 14)
         Me.btnCancel.Name = "btnCancel"
@@ -70,6 +80,7 @@ Public Class frmStatus
         'btnPause
         '
         Me.btnPause.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnPause.AutoSize = True
         Me.btnPause.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnPause.Location = New System.Drawing.Point(83, 14)
         Me.btnPause.Name = "btnPause"
@@ -78,30 +89,44 @@ Public Class frmStatus
         Me.btnPause.Text = "Pause"
         Me.btnPause.UseVisualStyleBackColor = True
         '
-        'btnDetails
+        'btnLog
         '
-        Me.btnDetails.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnDetails.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnDetails.Location = New System.Drawing.Point(154, 14)
-        Me.btnDetails.Name = "btnDetails"
-        Me.btnDetails.Size = New System.Drawing.Size(65, 26)
-        Me.btnDetails.TabIndex = 9
-        Me.btnDetails.Text = "Details"
-        Me.btnDetails.UseVisualStyleBackColor = True
+        Me.btnLog.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnLog.AutoSize = True
+        Me.btnLog.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnLog.Location = New System.Drawing.Point(154, 14)
+        Me.btnLog.Name = "btnLog"
+        Me.btnLog.Size = New System.Drawing.Size(65, 26)
+        Me.btnLog.TabIndex = 9
+        Me.btnLog.Text = "Log"
+        Me.btnLog.UseVisualStyleBackColor = True
+        '
+        'lblBottom
+        '
+        Me.lblBottom.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lblBottom.AutoSize = True
+        Me.lblBottom.BackColor = System.Drawing.Color.Transparent
+        Me.lblBottom.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblBottom.Location = New System.Drawing.Point(225, 21)
+        Me.lblBottom.Name = "lblBottom"
+        Me.lblBottom.Size = New System.Drawing.Size(59, 13)
+        Me.lblBottom.TabIndex = 13
+        Me.lblBottom.Text = "lblBottom"
+        Me.lblBottom.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'frmStatus
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.ClientSize = New System.Drawing.Size(514, 52)
-        Me.Controls.Add(Me.btnDetails)
+        Me.Controls.Add(Me.lblBottom)
+        Me.Controls.Add(Me.btnLog)
         Me.Controls.Add(Me.btnPause)
         Me.Controls.Add(Me.btnCancel)
-        Me.Controls.Add(Me.txtLog)
+        Me.Controls.Add(Me.txtDetails)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmStatus"
         Me.Text = "Status "
         Me.TopMost = True
-        Me.WindowState = System.Windows.Forms.FormWindowState.Minimized
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -109,62 +134,118 @@ Public Class frmStatus
 
 #End Region
 
-    Friend ReadOnly LastLabel As Integer = 5
+    Friend Shared ReadOnly LastLabel As Integer = 5
 
     Public Property Level() As Integer
         Get
             Return pLevels.Count
         End Get
-        Set(ByVal value As Integer)
-            If value > 0 AndAlso value < 10 Then
-                While value > pLevels.Count
-                    Dim newLevel As New ctlStatus
-                    pLevels.Add(newLevel)
-                    Me.Controls.Add(newLevel)
-                    With newLevel
-                        .Top = pMargin + (pLevels.Count - 1) * (.Height + pMargin)
-                        .Left = pMargin
-                        .Width = Me.Width - pMargin * 2
-                        .Anchor = AnchorStyles.Top + AnchorStyles.Left + AnchorStyles.Right
-                        Me.Height += .Height + pMargin
-                    End With
-                End While
-                If Level < pLevels.Count Then
-                    pLevels.RemoveRange(Level, pLevels.Count - Level)
-                    Me.Height -= (pLevels(0).Height + pMargin) * (pLevels.Count - Level)
+        Set(ByVal aNewLevel As Integer)
+            If aNewLevel > 0 AndAlso aNewLevel < 10 AndAlso aNewLevel <> pLevels.Count Then
+                If Me.InvokeRequired Then
+                    Me.Invoke(pSetLevelCallback, aNewLevel)
+                Else
+                    SetLevel(aNewLevel)
                 End If
             End If
         End Set
     End Property
 
-    Public Property Label(ByVal aIndex As Integer) As String
+    Private Sub SetLevel(ByVal aNewLevel As Integer)
+        Dim lHeightChange As Integer = 0
+        If aNewLevel < pLevels.Count Then
+            lHeightChange = -(pLevels(0).Height + pMargin) * (pLevels.Count - aNewLevel)
+            txtDetails.Top += lHeightChange
+            For lRemoveIndex As Integer = pLevels.Count - 1 To aNewLevel Step -1
+                Dim lRemoveControl As ctlStatus = pLevels(lRemoveIndex)
+                Me.Controls.Remove(lRemoveControl)
+                pLevels.RemoveAt(lRemoveIndex)
+                lRemoveControl.Dispose()
+            Next
+        Else
+            While aNewLevel > pLevels.Count
+                Dim newLevel As New ctlStatus
+                pLevels.Add(newLevel)
+                Me.Controls.Add(newLevel)
+                With newLevel
+                    .Top = pMargin + (pLevels.Count - 1) * (.Height + pMargin)
+                    .Left = pMargin
+                    .Width = Me.ClientSize.Width - pMargin * 2
+                    .Anchor = AnchorStyles.Top + AnchorStyles.Left + AnchorStyles.Right
+                    lHeightChange += .Height + pMargin
+                    txtDetails.Top += lHeightChange
+                End With
+            End While
+        End If
+        If lHeightChange <> 0 Then Me.Height += lHeightChange
+    End Sub
+
+    Public Property Label(ByVal aIndex As Integer, Optional ByVal aLevel As Integer = 0) As String
         Get
-            If pLevels.Count < 1 Then
-                Return ""
-            Else
-                Return pLevels(pLevels.Count - 1).Label(aIndex)
-            End If
+            Select Case aIndex
+                Case 0 : Return Me.Text
+                Case 5 : Return lblBottom.Text
+                Case Else
+                    If aIndex < 1 OrElse aIndex > LastLabel Then
+                        Return ""
+                    Else
+                        If aLevel < 1 Then aLevel = pLevels.Count - 1
+                        Return pLevels(aLevel).Label(aIndex)
+                    End If
+            End Select
         End Get
         Set(ByVal aNewValue As String)
-            If pLevels.Count > 0 Then pLevels(pLevels.Count - 1).Label(aIndex) = aNewValue
+
+            Select Case aIndex
+                Case 0 : Me.Text = aNewValue
+                Case 5 : lblBottom.Text = aNewValue
+                Case Else
+                    If aIndex < 0 OrElse aIndex > LastLabel Then
+                        'Invalid index
+                    Else
+                        pLevels(pLevels.Count - 1).Label(aIndex) = aNewValue
+                    End If
+            End Select
         End Set
     End Property
 
-    Public ReadOnly Property Progress() As Windows.Forms.ProgressBar
+    Public ReadOnly Property Progress(Optional ByVal aLevel As Integer = 0) As Windows.Forms.ProgressBar
         Get
-            If pLevels.Count < 1 Then
-                Return Nothing
-            Else
-                Return pLevels(pLevels.Count - 1).Progress
-            End If
+            If aLevel < 1 Then aLevel = pLevels.Count - 1
+            Return pLevels(aLevel).Progress
         End Get
     End Property
 
+    Public Property LogVisible() As Boolean
+        Get
+            Return pDetailsVisible
+        End Get
+        Set(ByVal aNewValue As Boolean)
+            If aNewValue <> pDetailsVisible Then
+                pDetailsVisible = aNewValue
+                txtDetails.Visible = pDetailsVisible
+                If pDetailsVisible Then
+                    ShowLog()
+                Else
+                    txtDetails.Visible = False
+
+                    Dim lDetailsTop As Integer = pMargin
+                    If pLevels.Count > 0 Then
+                        Dim lLastLevel As ctlStatus = pLevels(pLevels.Count - 1)
+                        lDetailsTop = lLastLevel.Top + lLastLevel.Height + pMargin
+                    End If
+
+                    Me.Height -= (btnLog.Top - lDetailsTop)
+                End If
+            End If
+        End Set
+    End Property
+
     Public Sub Clear()
-        For lLabelIndex As Integer = 0 To LastLabel
+        For lLabelIndex As Integer = 1 To LastLabel
             Label(lLabelIndex) = ""
         Next
-        txtLog.Clear()
+        txtDetails.Clear()
         Progress.Visible = False
     End Sub
 
@@ -177,7 +258,7 @@ Public Class frmStatus
 
     Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
         Clear()
-        Label(1) = "Cancelling"
+        Label(1) = "Canceling..."
         Console.WriteLine("C")
     End Sub
 
@@ -191,25 +272,39 @@ Public Class frmStatus
         End If
     End Sub
 
-    Private Sub btnDetails_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDetails.Click
-        Dim lHeightHidingDetails As Integer = btnDetails.Top + btnDetails.Height + 46
-        If Me.Height > lHeightHidingDetails Then
-            Me.Height = lHeightHidingDetails
-        Else
-            Me.Height = 700
-        End If
+    Private Sub btnLog_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnLog.Click
+        LogVisible = Not LogVisible
     End Sub
 
     Private Sub frmStatus_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
         Try
-            If Me.Height > txtLog.Top + txtLog.Left * 3 Then
-                txtLog.Width = Me.ClientRectangle.Width - pMargin * 2
-                txtLog.Height = Me.ClientRectangle.Height - txtLog.Top - txtLog.Left
-                txtLog.Visible = True
+            If LogVisible Then
+                ShowLog()
             Else
-                txtLog.Visible = False
+                txtDetails.Visible = False
             End If
         Catch
         End Try
+    End Sub
+
+    Private Sub ShowLog()
+        If Me.WindowState = FormWindowState.Normal Then
+            Dim lDetailsTop As Integer = pMargin
+            If pLevels.Count > 0 Then
+                Dim lLastLevel As ctlStatus = pLevels(pLevels.Count - 1)
+                lDetailsTop = lLastLevel.Top + lLastLevel.Height + pMargin
+            End If
+            Dim lDetailsHeight As Integer = btnLog.Top - pMargin - lDetailsTop
+            If lDetailsHeight < pMargin * 2 Then
+                Me.Height += pMargin * 3 - lDetailsHeight
+            ElseIf ClientRectangle.Width < pMargin * 3 Then
+                Me.Width += pMargin * 4
+            Else
+                txtDetails.Top = lDetailsTop
+                txtDetails.Height = lDetailsHeight
+                txtDetails.Width = Me.ClientRectangle.Width - pMargin * 2
+                txtDetails.Visible = True
+            End If
+        End If
     End Sub
 End Class

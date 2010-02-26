@@ -19,26 +19,12 @@ Partial Class ctlStatus
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.lblBottom = New System.Windows.Forms.Label
         Me.lblRight = New System.Windows.Forms.Label
         Me.lblLeft = New System.Windows.Forms.Label
         Me.lblTop = New System.Windows.Forms.Label
         Me.Progress = New System.Windows.Forms.ProgressBar
         Me.lblMiddle = New System.Windows.Forms.Label
         Me.SuspendLayout()
-        '
-        'lblBottom
-        '
-        Me.lblBottom.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblBottom.BackColor = System.Drawing.Color.Transparent
-        Me.lblBottom.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblBottom.Location = New System.Drawing.Point(3, 65)
-        Me.lblBottom.Name = "lblBottom"
-        Me.lblBottom.Size = New System.Drawing.Size(556, 16)
-        Me.lblBottom.TabIndex = 12
-        Me.lblBottom.Text = "lblBottom"
-        Me.lblBottom.TextAlign = System.Drawing.ContentAlignment.TopCenter
         '
         'lblRight
         '
@@ -97,19 +83,17 @@ Partial Class ctlStatus
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.Controls.Add(Me.lblBottom)
         Me.Controls.Add(Me.lblRight)
         Me.Controls.Add(Me.lblLeft)
         Me.Controls.Add(Me.lblTop)
         Me.Controls.Add(Me.Progress)
         Me.Controls.Add(Me.lblMiddle)
         Me.Name = "ctlStatus"
-        Me.Size = New System.Drawing.Size(559, 86)
+        Me.Size = New System.Drawing.Size(559, 64)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents lblBottom As System.Windows.Forms.Label
     Friend WithEvents lblRight As System.Windows.Forms.Label
     Friend WithEvents lblLeft As System.Windows.Forms.Label
     Friend WithEvents lblTop As System.Windows.Forms.Label

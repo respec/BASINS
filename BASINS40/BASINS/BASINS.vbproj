@@ -157,7 +157,6 @@
     <Compile Include="atcBasinsPlugIn.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="clsLoggerStatusMonitor.vb" />
     <Compile Include="frmAbout.vb">
       <SubType>Form</SubType>
     </Compile>
