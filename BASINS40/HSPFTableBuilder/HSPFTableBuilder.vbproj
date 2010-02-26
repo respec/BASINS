@@ -57,11 +57,6 @@
       <HintPath>..\Bin\Plugins\BASINS\atcUtility.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MapWindow.Interfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=14ba77d91dae5597, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Bin\MapWindow.Interfaces.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="MapWinInterfaces, Version=4.7.2.26671, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>

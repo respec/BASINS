@@ -67,11 +67,6 @@
       <HintPath>..\..\..\..\Projects\WRDB 5.0\CsvReader20_src\LumenWorks.Framework.IO\bin\Release\LumenWorks.Framework.IO.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MapWindow.Interfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=14ba77d91dae5597, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Basins\bin\MapWindow.Interfaces.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="MapWinGeoProc, Version=1.0.0.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Basins\bin\MapWinGeoProc.dll</HintPath>
