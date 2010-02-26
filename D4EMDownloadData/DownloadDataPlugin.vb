@@ -201,6 +201,7 @@ Public Class DownloadDataPlugin
                         If lQuery.Equals(frmDownload.CancelString) Then
                             'User cancelled download form
                         Else
+                            g_MapWin.View.MapCursor = MapWinGIS.tkCursor.crsrWait
                             Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor 'Logger.Busy = True
                             Windows.Forms.Application.DoEvents() 'refresh main form to get rid of vestiges of download form
                             'Make sure all loaded plugins are available for DataManager
@@ -214,6 +215,7 @@ Public Class DownloadDataPlugin
                                 End Try
                             Next
                             Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
+                            Logger.Status("LABEL TITLE BASINS Data Download")
                             Dim lResult As String = lDownloadManager.Execute(lQuery)
                             If lResult Is Nothing Then
                                 Logger.Dbg("QueryResult:Nothing")
@@ -234,7 +236,9 @@ Public Class DownloadDataPlugin
                                 End If
                             End If
 
+                            g_MapWin.View.MapCursor = MapWinGIS.tkCursor.crsrMapDefault
                             Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default 'Logger.Busy = False
+                            Logger.Status("LABEL TITLE BASINS Status")
                         End If
                     End If
                 End If

@@ -6,11 +6,10 @@ Public Class clsMonitor
     Delegate Sub FormCallback()
     Private Shared pRedrawCallback As FormCallback
     Private Shared pShowCallback As FormCallback
-    Private Shared pHideCallback As FormCallback
+    'Private Shared pHideCallback As FormCallback
 
-    Private Shared pLabelText(frmStatus.LastLabel) As String
-    Private Shared pLabelLast(frmStatus.LastLabel) As String
-    Private Shared pLabelLogged(frmStatus.LastLabel) As String
+    Delegate Sub FormCallbackInt(ByVal aArg As Integer)
+    Private Shared pChangeLevelCallback As FormCallbackInt
 
     Private Const LogDisplayLines As Integer = 250
     Private Shared pLogDisplayBuffer(LogDisplayLines) As String 'Ring buffer of lines of log file to display
@@ -22,12 +21,8 @@ Public Class clsMonitor
     Private Shared pButtonVisibleDetails As Boolean = True
     Private Shared pButtonVisiblePause As Boolean = True
 
-    Private Shared pLabelNeedsUpdate As Boolean = False
-    Private Shared pProgressNeedsUpdate As Boolean = False
     Private Shared pProgressOpened As Boolean = False
     Private Shared pProgressStartTime As Double = Double.NaN
-    Private Shared pProgressCurrent As Integer
-    Private Shared pProgressFinal As Integer
     Private Shared pProgressPercentOption As String = ""
     Private Shared pProgressTimeOption As String = ""
 
@@ -44,6 +39,9 @@ Public Class clsMonitor
     Private Shared pInputBufferSize As Integer = 80
     Private Shared pInputBuffer(pInputBufferSize) As Byte
     Private Shared pInputString As String = ""
+
+    Private Shared pLevels As New Generic.List(Of clsLevel)
+    Private Shared pLevelsMutex As New Threading.Mutex
 
     Private Shared WithEvents pWindowTimer As System.Timers.Timer
 
@@ -62,12 +60,15 @@ Public Class clsMonitor
         pfrmStatus.Show()
         pfrmStatus.Visible = False
         pfrmStatus.Clear()
-        'Console.WriteLine("StatusMonitorFormCreated")
-        ClearLabels()
 
-        pRedrawCallback = New FormCallback(AddressOf Redraw)
-        pShowCallback = New FormCallback(AddressOf Show)
-        pHideCallback = New FormCallback(AddressOf Hide)
+        pLevels.Add(New clsLevel)
+
+        'Console.WriteLine("StatusMonitorFormCreated")
+
+        pChangeLevelCallback = New FormCallbackInt(AddressOf ChangeLevelUnsafe)
+        pRedrawCallback = New FormCallback(AddressOf RedrawUnsafe)
+        pShowCallback = New FormCallback(AddressOf ShowUnsafe)
+        'pHideCallback = New FormCallback(AddressOf HideUnsafe)
 
         Dim lParentID As Integer  'StrFirstInt(lCommandLine)
         If Integer.TryParse(lCommandLine, lParentID) AndAlso lParentID > 0 Then
@@ -80,6 +81,10 @@ Public Class clsMonitor
         If pParentProcess Is Nothing Then
             pfrmStatus.Exiting = True 'Let the user quit by closing the form
         Else
+            If pParentProcess.ProcessName = "atcStatusMonitorTester" Then
+                MsgBox("Pausing Status Monitor, Attach to process " & Process.GetCurrentProcess.Id)
+                Application.DoEvents()
+            End If
             Console.WriteLine("ParentProcess " & pParentProcess.ProcessName)
             pfrmStatus.Text = pParentProcess.ProcessName & " Status Monitor"
         End If
@@ -138,142 +143,213 @@ Public Class clsMonitor
         lInput.BeginRead(pInputBuffer, 0, pInputBufferSize, pReadInputCallback, lInput)
     End Sub
 
-    Public Shared Sub Redraw()
+    Private Shared Function InvokeRequired() As Boolean
+        Return pfrmStatus IsNot Nothing AndAlso pfrmStatus.lblBottom.InvokeRequired
+    End Function
+
+    Private Shared Sub ChangeLevel(ByVal aChange As Integer)
+        If pfrmStatus IsNot Nothing Then
+            If InvokeRequired() Then
+                pfrmStatus.Invoke(pChangeLevelCallback, aChange)
+            Else
+                ChangeLevelUnsafe(aChange)
+            End If
+        End If
+    End Sub
+
+    Private Shared Sub ChangeLevelUnsafe(ByVal aChange As Integer)
+        If aChange <> 0 Then
+            pLevelsMutex.WaitOne()
+            Dim lHide As Boolean = False
+            If aChange > 0 Then
+                'Inherit labels for Title=0 and Bottom=5 since those labels are shared by all levels
+                Dim lFormerLast As clsLevel = pLevels(pLevels.Count - 1)
+                For lNewLevelIndex As Integer = 1 To aChange
+                    Dim lNewLevel As New clsLevel
+                    lNewLevel.LabelLast(0) = lFormerLast.LabelLast(0)
+                    lNewLevel.LabelLast(5) = lFormerLast.LabelLast(5)
+                    lNewLevel.LabelLogged(0) = lFormerLast.LabelLogged(0)
+                    lNewLevel.LabelLogged(5) = lFormerLast.LabelLogged(5)
+                    lNewLevel.LabelText(0) = lFormerLast.LabelText(0)
+                    lNewLevel.LabelText(5) = lFormerLast.LabelText(5)
+                    pLevels.Add(lNewLevel)
+                Next
+            Else
+                If pLevels.Count + aChange < 1 Then 'Trying to remove only level = hide form
+                    aChange = 1 - pLevels.Count
+                    lHide = True
+                End If
+                'Remember last label set for Title=0 and Bottom=5 in case they need to be changed back
+                Dim lRemovingLast As clsLevel = pLevels(pLevels.Count - 1)
+                Dim lKeepingLast As clsLevel = pLevels(pLevels.Count + aChange - 1)
+                lKeepingLast.LabelLast(0) = lRemovingLast.LabelLast(0)
+                lKeepingLast.LabelLast(5) = lRemovingLast.LabelLast(5)
+                pLevels.RemoveRange(pLevels.Count + aChange, -aChange)
+                lKeepingLast.LabelNeedsUpdate = True
+            End If
+            pfrmStatus.Level = pLevels.Count
+            pLevelsMutex.ReleaseMutex()
+            If lHide Then HideUnsafe()
+        End If
+    End Sub
+
+    Private Shared Sub Redraw()
+        If pfrmStatus IsNot Nothing Then
+            If InvokeRequired() Then
+                pfrmStatus.Invoke(pRedrawCallback)
+            Else
+                RedrawUnsafe()
+            End If
+        End If
+    End Sub
+
+    Private Shared Sub RedrawUnsafe()
         If pfrmStatus IsNot Nothing Then
             Try
-                pfrmStatus.btnCancel.Visible = pButtonVisibleCancel
-                pfrmStatus.btnDetails.Visible = pButtonVisibleDetails
-                pfrmStatus.btnPause.Visible = pButtonVisiblePause
-                If pLabelNeedsUpdate Then
-                    Dim lAnyLabel As Boolean = False 'Becomes true if any label has content
-                    For lLabelIndex As Integer = 0 To frmStatus.LastLabel
-                        If Not pLabelText(lLabelIndex).Equals(pLabelLast(lLabelIndex)) Then
-                            'Console.WriteLine("UpdateLabel " & lLabelIndex)
-                            pfrmStatus.Label(lLabelIndex) = pLabelText(lLabelIndex)
-                            pLabelLast(lLabelIndex) = pLabelText(lLabelIndex)
-                            pLabelLogged(lLabelIndex) = pLabelText(lLabelIndex)
-                        End If
-                        If Not lAnyLabel AndAlso pfrmStatus.Label(lLabelIndex).Length > 0 Then lAnyLabel = True
-                    Next
-                    pfrmStatus.Visible = lAnyLabel
-                    pLabelNeedsUpdate = False
-                End If
-                If pLogDisplayNeedsUpdate Then
-                    With pfrmStatus.txtLog
-                        .Text = CurrentLogDisplay()
-                        .SelectionStart = pfrmStatus.txtLog.Text.Length
-                        .ScrollToCaret()
-                        pLogDisplayNeedsUpdate = False
-                    End With
-                End If
-
-                If pProgressNeedsUpdate Then
-                    'Console.WriteLine("UpdateProgress")
-                    If Double.IsNaN(pProgressStartTime) Then 'Progress is finished
-                        pfrmStatus.Progress.Visible = False
-                        pfrmStatus.Visible = False
-                        pProgressOpened = False
-                        For lLabelIndex As Integer = 2 To 5
-                            pfrmStatus.Label(lLabelIndex) = pLabelText(lLabelIndex)
-                        Next
-                    Else
-                        If Not pProgressOpened Then
-                            Show()
-                            pProgressOpened = True
-                        End If
-
-                        'If pfrmStatus.Progress.Visible Then
-                        With pfrmStatus
-                            .Progress.Maximum = pProgressFinal
-                            .Progress.Value = pProgressCurrent
-                            .Progress.Visible = True
-                            .Progress.Refresh()
-                            If pLabelLogged(2).Length = 0 AndAlso pLabelLogged(4).Length = 0 Then
-                                .Label(2) = "0"
-                                .Label(4) = Format(pProgressFinal, "#,###")
-                            End If
-
-                            If pLabelLogged(3).Length = 0 Then
-                                If pProgressFinal = 100 Then
-                                    .Label(3) = ""
-                                Else
-                                    .Label(3) = Format(pProgressCurrent, "#,###") & " of " & Format(pProgressFinal, "#,###")
+                With pfrmStatus
+                    .btnCancel.Visible = pButtonVisibleCancel
+                    .btnLog.Visible = pButtonVisibleDetails
+                    .btnPause.Visible = pButtonVisiblePause
+                    Dim lLevelIndex As Integer = 0
+                    pLevelsMutex.WaitOne()
+                    For Each lLevel As clsLevel In pLevels
+                        lLevelIndex += 1
+                        If lLevel.LabelNeedsUpdate Then
+                            lLevel.LabelNeedsUpdate = False
+                            Dim lAnyLabel As Boolean = False 'Becomes true if any label has content
+                            For lLabelIndex As Integer = 0 To frmStatus.LastLabel
+                                If Not lLevel.LabelText(lLabelIndex).Equals(lLevel.LabelLast(lLabelIndex)) Then
+                                    'Console.WriteLine("UpdateLabel " & lLabelIndex)
+                                    .Label(lLabelIndex) = lLevel.LabelText(lLabelIndex)
+                                    lLevel.LabelLast(lLabelIndex) = lLevel.LabelText(lLabelIndex)
+                                    lLevel.LabelLogged(lLabelIndex) = lLevel.LabelText(lLabelIndex)
                                 End If
+                                If Not lAnyLabel AndAlso lLabelIndex > 0 AndAlso lLevel.LabelText(lLabelIndex).Length > 0 Then lAnyLabel = True
+                            Next
+                            If lAnyLabel Then 'Make form visible if a label has something to say
+                                .Visible = True
+                            ElseIf lLevelIndex = 1 AndAlso lLevel.ProgressCurrent >= lLevel.ProgressFinal Then
+                                .Visible = False 'Hide form if all labels at top level are blank
                             End If
+                        End If
+                        If pLogDisplayNeedsUpdate Then
+                            pLogDisplayNeedsUpdate = False
+                            .txtDetails.Text = CurrentLogDisplay()
+                            .txtDetails.SelectionStart = .txtDetails.Text.Length
+                            .txtDetails.ScrollToCaret()
+                        End If
 
-                            If pLabelLogged(5).Length = 0 AndAlso _
-                               (pProgressPercentOption.Length > 0 OrElse pProgressTimeOption.Length > 0) Then
-                                .Label(5) = ""
-                                Dim lElapsedDays As Double = Date.Now.ToOADate - pProgressStartTime
-                                'If elapsed time is short, skip estimating time remaining and give integer progress percent
-                                If lElapsedDays * 86400 < 10 Then '86400 seconds per day
-                                    If pProgressPercentOption.Length > 0 Then
-                                        .Label(5) = CInt(pProgressCurrent * 100 / pProgressFinal) & pProgressPercentOption
+                        If lLevel.ProgressNeedsUpdate Then
+                            lLevel.ProgressNeedsUpdate = False
+
+                            If lLevel.ProgressCurrent >= lLevel.ProgressFinal Then 'Progress is finished
+                                .Progress.Visible = False
+                                If lLevelIndex = 1 Then
+                                    .Visible = False
+                                    pProgressStartTime = Double.NaN
+                                End If
+                                pProgressOpened = False
+                                'Refresh labels that may have been set to show progress
+                                For lLabelIndex As Integer = 2 To 5
+                                    .Label(lLabelIndex) = lLevel.LabelText(lLabelIndex)
+                                Next
+                            Else
+                                If lLevelIndex = 1 AndAlso Double.IsNaN(pProgressStartTime) Then
+                                    pProgressStartTime = Now.ToOADate
+                                End If
+                                If Not pProgressOpened Then
+                                    ShowUnsafe()
+                                    pProgressOpened = True
+                                End If
+
+                                .Progress.Maximum = lLevel.ProgressFinal
+                                .Progress.Value = lLevel.ProgressCurrent
+                                .Progress.Visible = True
+                                .Progress.Refresh()
+                                'If pLabelLogged(2).Length = 0 AndAlso pLabelLogged(4).Length = 0 Then
+                                '    .Label(2) = "0"
+                                '    .Label(4) = Format(pProgressFinal, "#,###")
+                                'End If
+
+                                If lLevel.LabelLogged(3).Length = 0 Then
+                                    If lLevel.ProgressFinal = 100 Then
+                                        .Label(3) = lLevel.ProgressCurrent & "%"
+                                    Else
+                                        .Label(3) = Format(lLevel.ProgressCurrent, "#,##0") & " of " & Format(lLevel.ProgressFinal, "#,###")
                                     End If
-                                Else
-                                    Dim lEstimateTotalTime As Double = lElapsedDays * pProgressFinal / pProgressCurrent
-                                    Dim lEstimateLeft As Double = (lEstimateTotalTime - lElapsedDays)
-                                    If lEstimateLeft * 1440 < 1 Then 'Less than one minute
+                                End If
+
+                                If lLevelIndex = 1 AndAlso lLevel.LabelLogged(5).Length = 0 AndAlso _
+                                   (pProgressPercentOption.Length > 0 OrElse pProgressTimeOption.Length > 0) Then
+                                    Dim lEstimateLabel As String = ""
+                                    Dim lElapsedDays As Double = Date.Now.ToOADate - pProgressStartTime
+                                    'If elapsed time is short, skip estimating time remaining but still give progress percent if requested
+                                    If lElapsedDays * 86400 < 10 Then '86400 seconds per day
                                         If pProgressPercentOption.Length > 0 Then
-                                            .Label(5) = CInt(pProgressCurrent * 100 / pProgressFinal) & pProgressPercentOption
-                                        End If
-                                        If pProgressTimeOption.Length > 0 Then
-                                            .Label(5) &= " (" & Format(lEstimateLeft * 86400, "0") & " seconds remaining)"
-                                        End If
-                                    ElseIf lEstimateLeft * 24 < 1 Then 'Less than one hour
-                                        Dim lMinutes As Integer = Math.Floor(lEstimateLeft * 1440)
-                                        If pProgressPercentOption.Length > 0 Then
-                                            .Label(5) = CInt(pProgressCurrent * 1000 / pProgressFinal) / 10 & "%"
-                                        End If
-                                        If pProgressTimeOption.Length > 0 Then
-                                            .Label(5) &= " (" & lMinutes & ":" & Format((lEstimateLeft - lMinutes / 1440.0) * 86400, "00") & " remaining)"
-                                        End If
-                                    ElseIf lEstimateLeft < 1 Then
-                                        Dim lEstimate As Date = Date.FromOADate(pProgressStartTime + lEstimateTotalTime)
-                                        If pProgressPercentOption.Length > 0 Then
-                                            .Label(5) = CInt(pProgressCurrent * 10000 / pProgressFinal) / 100 & pProgressPercentOption
-                                        End If
-                                        If pProgressTimeOption.Length > 0 Then
-                                            .Label(5) &= " (complete at " & lEstimate.ToShortTimeString & ")"
+                                            .Label(5) = CInt(lLevel.ProgressCurrent * 100 / lLevel.ProgressFinal) & pProgressPercentOption
                                         End If
                                     Else
-                                        Dim lEstimate As Date = Date.FromOADate(pProgressStartTime + lEstimateTotalTime)
-                                        If pProgressPercentOption.Length > 0 Then
-                                            .Label(5) = CInt(pProgressCurrent * 100000 / pProgressFinal) / 1000 & pProgressPercentOption
-                                        End If
-                                        If pProgressTimeOption.Length > 0 Then
-                                            .Label(5) &= " (complete on " & lEstimate.ToShortDateString & " at " & lEstimate.ToShortTimeString & ")"
+                                        Dim lEstimateTotalTime As Double = lElapsedDays * lLevel.ProgressFinal / lLevel.ProgressCurrent
+                                        Dim lEstimateLeft As Double = (lEstimateTotalTime - lElapsedDays)
+                                        If lEstimateLeft * 1440 < 1 Then 'Less than one minute
+                                            If pProgressPercentOption.Length > 0 Then
+                                                lEstimateLabel = CInt(lLevel.ProgressCurrent * 100 / lLevel.ProgressFinal) & pProgressPercentOption
+                                            End If
+                                            If pProgressTimeOption.Length > 0 Then
+                                                lEstimateLabel &= " (" & Format(lEstimateLeft * 86400, "0") & " seconds remaining)"
+                                            End If
+                                        ElseIf lEstimateLeft * 24 < 1 Then 'Less than one hour
+                                            Dim lMinutes As Integer = Math.Floor(lEstimateLeft * 1440)
+                                            If pProgressPercentOption.Length > 0 Then
+                                                lEstimateLabel = CInt(lLevel.ProgressCurrent * 1000 / lLevel.ProgressFinal) / 10 & "%"
+                                            End If
+                                            If pProgressTimeOption.Length > 0 Then
+                                                lEstimateLabel &= " (" & lMinutes & ":" & Format((lEstimateLeft - lMinutes / 1440.0) * 86400, "00") & " remaining)"
+                                            End If
+                                        ElseIf lEstimateLeft < 1 Then
+                                            Dim lEstimate As Date = Date.FromOADate(pProgressStartTime + lEstimateTotalTime)
+                                            If pProgressPercentOption.Length > 0 Then
+                                                lEstimateLabel = CInt(lLevel.ProgressCurrent * 10000 / lLevel.ProgressFinal) / 100 & pProgressPercentOption
+                                            End If
+                                            If pProgressTimeOption.Length > 0 Then
+                                                lEstimateLabel &= " (complete at " & lEstimate.ToShortTimeString & ")"
+                                            End If
+                                        Else
+                                            Dim lEstimate As Date = Date.FromOADate(pProgressStartTime + lEstimateTotalTime)
+                                            If pProgressPercentOption.Length > 0 Then
+                                                lEstimateLabel = CInt(lLevel.ProgressCurrent * 100000 / lLevel.ProgressFinal) / 1000 & pProgressPercentOption
+                                            End If
+                                            If pProgressTimeOption.Length > 0 Then
+                                                lEstimateLabel &= " (complete on " & lEstimate.ToShortDateString & " at " & lEstimate.ToShortTimeString & ")"
+                                            End If
                                         End If
                                     End If
+                                    .Label(5) = lEstimateLabel
                                 End If
+                                'End If
                             End If
-                        End With
-                        'End If
-                    End If
-                    pProgressNeedsUpdate = False
-                End If
-                If Not pParentProcess Is Nothing AndAlso _
-                   pParentProcess.HasExited AndAlso _
-                   Not pfrmStatus.Exiting Then
-                    With pfrmStatus
-                        .WindowState = FormWindowState.Normal
-                        pExiting = True
-                        .Exiting = True
-                        .Label(0) = "Parent Process Exited"
-                        .btnCancel.Visible = False
-                        .btnPause.Visible = False
-                        .btnDetails.Visible = True
-                        Show()
-                    End With
-                Else
-                    'pWindowTimer.Change(UpdateMilliseconds, Threading.Timeout.Infinite)
-                End If
-                'lNowDouble = Now.ToOADate
-                'TODO: Check for form button presses here?
+                        End If
+                        If pParentProcess IsNot Nothing AndAlso _
+                           pParentProcess.HasExited AndAlso _
+                           Not .Exiting Then
+                            .WindowState = FormWindowState.Normal
+                            pExiting = True
+                            .Exiting = True
+                            .Label(0) = "Parent Process Exited"
+                            .btnCancel.Visible = False
+                            .btnPause.Visible = False
+                            .btnLog.Visible = True
+                            ShowUnsafe()
+                        Else
+                            'pWindowTimer.Change(UpdateMilliseconds, Threading.Timeout.Infinite)
+                        End If
+                    Next
+                    pLevelsMutex.ReleaseMutex()
+                End With
             Catch e As Exception
                 'MsgBox(e.Message, MsgBoxStyle.Critical, "Exception in RefreshWindow")
             End Try
-            pfrmStatus.Refresh()
+            'pfrmStatus.Refresh()
         End If
         Application.DoEvents()
     End Sub
@@ -333,6 +409,10 @@ Public Class clsMonitor
                 End Select
             End If
 
+            pLevelsMutex.WaitOne()
+            Dim lLevel As clsLevel = pLevels(pLevels.Count - 1)
+            pLevelsMutex.ReleaseMutex()
+
             Select Case lWords(0).ToUpper
                 Case "BUTTON"
                     Select Case lWords(1).ToUpper
@@ -346,7 +426,7 @@ Public Class clsMonitor
                         Case "PAUSE" : pButtonVisiblePause = False
                         Case "DETAILS", "OUTPUT" : pButtonVisibleDetails = False
                     End Select
-                Case "CLEAR" : ClearLabels()
+                Case "CLEAR" : lLevel.ClearLabels()
                 Case "DBG" 'Debug message, just goes into log
                 Case "EXIT"
                     pExiting = True
@@ -375,22 +455,58 @@ Public Class clsMonitor
                     End If
                     'Console.WriteLine("LabelIndex " & lLabelIndex)
                     If lLabelIndex >= 0 And lLabelIndex <= frmStatus.LastLabel Then
-                        pLabelText(lLabelIndex) = lAfterFirstWord.Substring(lWords(1).Length + 2)
+                        If lAfterFirstWord.Length > lWords(1).Length + 2 Then
+                            lLevel.LabelText(lLabelIndex) = lAfterFirstWord.Substring(lWords(1).Length + 2)
+                        Else
+                            lLevel.LabelText(lLabelIndex) = ""
+                        End If
                     Else 'could not find valid label index, just put it all in top label
-                        pLabelText(1) = lAfterFirstWord.Trim
+                        lLevel.LabelText(1) = lAfterFirstWord.Trim
                     End If
-                    pLabelNeedsUpdate = True
+                    lLevel.LabelNeedsUpdate = True
+                Case "PROGRESSLEVEL"
+                    Select Case lWords(1).ToUpper
+                        Case "+", "PUSH" : ChangeLevel(1) 'Starting a deeper level of progress
+                        Case "-", "POP" : ChangeLevel(-1) 'Finished a deeper level of progress
+                        Case "-+", "POP-INCREMENT" 'Finish a deeper level of progress and increment progress above
+                            ChangeLevel(-1)
+                            pLevelsMutex.WaitOne()
+                            lLevel = pLevels(pLevels.Count - 1)
+                            lLevel.ProgressCurrent += 1
+                            lLevel.ProgressNeedsUpdate = True
+                            pLevelsMutex.ReleaseMutex()
+                        Case "-++", "POP-INCREMENT-PUSH" 'Finish a deeper level of progress, increment progress above, start new deeper level
+                            lLevel.ProgressCurrent = 0
+                            lLevel.ProgressFinal = 0
+                            lLevel.ProgressNeedsUpdate = True
+                            pLevelsMutex.WaitOne()
+                            If pLevels.Count > 1 Then
+                                Dim lLevelUp As clsLevel = pLevels(pLevels.Count - 2)
+                                lLevelUp.ProgressCurrent += 1
+                                lLevelUp.ProgressNeedsUpdate = True
+                            End If
+                            pLevelsMutex.ReleaseMutex()
+                    End Select
+
                 Case "PROGRESS"
                     Select Case lWords(1).ToUpper
                         Case "PERCENT"
-                            pProgressPercentOption = lWords(2)
+                            If lWords.Length > 2 Then
+                                pProgressPercentOption = lWords(2)
+                            Else
+                                pProgressPercentOption = " %"
+                            End If
                             If pProgressPercentOption.ToUpper = "OFF" Then
                                 pProgressPercentOption = ""
                             Else
                                 pProgressPercentOption = pProgressPercentOption.Replace("_", " ")
                             End If
                         Case "TIME"
-                            pProgressTimeOption = lWords(2)
+                            If lWords.Length > 2 Then
+                                pProgressTimeOption = lWords(2)
+                            Else
+                                pProgressTimeOption = "ON"
+                            End If
                             If pProgressTimeOption.ToUpper = "OFF" Then
                                 pProgressTimeOption = ""
                             Else
@@ -399,44 +515,45 @@ Public Class clsMonitor
                     End Select
                     If lWords.Length = 2 AndAlso IsNumeric(lWords(1)) Then
                         'Interpret legacy "PROGRESS 10" like new "PROGRESS 10 of 100"
-                        pProgressCurrent = CInt(lWords(1))
+                        lLevel.ProgressCurrent = CInt(lWords(1))
                         'If pProgressCurrent >= 0 AndAlso pProgressCurrent <= 100 Then
-                        pProgressFinal = 100
-                        GoTo FoundProgress
+                        lLevel.ProgressFinal = 100
+                        lLevel.ProgressNeedsUpdate = True
                         'End If
                     End If
                     If lWords.Length > 3 AndAlso IsNumeric(lWords(lWords.Length - 3)) AndAlso lWords(lWords.Length - 2).Equals("of") AndAlso IsNumeric(lWords(lWords.Length - 1)) Then
-                        pProgressCurrent = CInt(lWords(lWords.Length - 3))
-                        pProgressFinal = CInt(lWords(lWords.Length - 1))
-FoundProgress:
-                        If pProgressCurrent >= pProgressFinal Then
-                            pProgressStartTime = Double.NaN
-                        ElseIf Double.IsNaN(pProgressStartTime) Then
-                            pProgressStartTime = Now.ToOADate
-                        End If
-                        pProgressNeedsUpdate = True
+                        lLevel.ProgressCurrent = CInt(lWords(lWords.Length - 3))
+                        lLevel.ProgressFinal = CInt(lWords(lWords.Length - 1))
+                        lLevel.ProgressNeedsUpdate = True
                     End If
                 Case "SHOW"
                     If Not pIgnoringWindowCommands AndAlso pfrmStatus IsNot Nothing Then
                         If lAfterFirstWord.Length > 0 Then
-                            pLabelText(0) = lAfterFirstWord
-                            pLabelNeedsUpdate = True
+                            lLevel.LabelText(0) = lAfterFirstWord
+                            lLevel.LabelNeedsUpdate = True
                         End If
-                        pfrmStatus.Invoke(pShowCallback)
+                        If pfrmStatus IsNot Nothing Then
+                            If InvokeRequired() Then pfrmStatus.Invoke(pShowCallback) Else ShowUnsafe()
+                        End If
                     End If
                 Case "HIDE"
                     If Not pIgnoringWindowCommands AndAlso pfrmStatus IsNot Nothing Then
-                        pfrmStatus.Invoke(pHideCallback)
+                        If pLevels.Count = 1 Then lLevel.ClearLabels()
+                        ChangeLevel(-1)
+                        'If pfrmStatus IsNot Nothing Then
+                        '    lLevel.ClearLabels()
+                        '    If InvokeRequired() Then pfrmStatus.Invoke(pHideCallback) Else HideUnsafe()
+                        'End If
                     End If
                 Case Else
-                    pLabelText(1) = aInputLine
-                    pLabelNeedsUpdate = True
+                    lLevel.LabelText(1) = aInputLine
+                    lLevel.LabelNeedsUpdate = True
             End Select
         End If
         System.Threading.Thread.Sleep(0)
     End Sub
 
-    Private Shared Sub Show()
+    Private Shared Sub ShowUnsafe()
         If pfrmStatus IsNot Nothing Then
             With pfrmStatus
                 .Visible = True
@@ -446,29 +563,50 @@ FoundProgress:
         End If
     End Sub
 
-    Private Shared Sub Hide()
+    Private Shared Sub HideUnsafe()
         If pfrmStatus IsNot Nothing Then
-            ClearLabels()
+            pfrmStatus.Clear()
             pfrmStatus.Visible = False
-        End If
-    End Sub
-
-    'Clear our cached versions of the labels on the form
-    Private Shared Sub ClearLabels()
-        If pfrmStatus IsNot Nothing Then
-            For lLabelIndex As Integer = 0 To frmStatus.LastLabel
-                pLabelText(lLabelIndex) = ""
-                pLabelLogged(lLabelIndex) = ""
-            Next
-            pLabelNeedsUpdate = True
+            pProgressOpened = False
         End If
     End Sub
 
     Private Shared Sub pWindowTimer_Elapsed(ByVal sender As Object, ByVal e As System.Timers.ElapsedEventArgs) Handles pWindowTimer.Elapsed
         If pExiting Then
             pWindowTimer.Stop()
-        ElseIf pfrmStatus IsNot Nothing Then
-            pfrmStatus.Invoke(pRedrawCallback)
+        Else
+            Redraw()
         End If
     End Sub
+
+    Public Class clsLevel
+        Public LabelNeedsUpdate As Boolean = False
+        Public LabelText() As String
+        Public LabelLast() As String
+        Public LabelLogged() As String
+        Public ProgressNeedsUpdate As Boolean = False
+        Public ProgressCurrent As Integer
+        Public ProgressFinal As Integer
+
+        Public Sub New()
+            ClearLabels()
+        End Sub
+
+        'Clear our cached versions of the labels on the form
+        Public Sub ClearLabels()
+            If pfrmStatus IsNot Nothing Then
+                If LabelLast Is Nothing Then
+                    ReDim LabelLast(frmStatus.LastLabel)
+                    ReDim LabelText(frmStatus.LastLabel)
+                    ReDim LabelLogged(frmStatus.LastLabel)
+                End If
+                For lLabelIndex As Integer = 1 To frmStatus.LastLabel
+                    LabelText(lLabelIndex) = ""
+                    LabelLogged(lLabelIndex) = ""
+                Next
+                LabelNeedsUpdate = True
+            End If
+        End Sub
+    End Class
+
 End Class

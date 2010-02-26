@@ -689,6 +689,7 @@ StartOver:
         lProjectorXML.LoadXml(aInstructions)
         For Each lProjectorNode In lProjectorXML.FirstChild.ChildNodes
             Logger.Dbg("Processing XML: " & lProjectorNode.OuterXml)
+            Logger.Status(ReadableFromXML(lProjectorNode.OuterXml))
             Select Case LCase(lProjectorNode.Name.ToLower)
                 Case "add_data"
                     Dim lDataType As String = lProjectorNode.Attributes.GetNamedItem("type").InnerText
@@ -956,7 +957,7 @@ StartOver:
 
         g_MapWin.View.MapCursor = tkCursor.crsrMapDefault
         g_MapWin.View.UnlockLegend()
-
+        Logger.Status("")
     End Function
 
     Public Function CleanUpUserProjString(ByVal aProjString As String) As String

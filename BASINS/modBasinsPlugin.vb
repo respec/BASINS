@@ -46,6 +46,9 @@ Public Module modBasinsPlugin
     Friend Const CheckForUpdatesMenuName As String = "CheckForUpdates"
     Friend Const CheckForUpdatesMenuString As String = "Check For Updates"
 
+    Friend Const ShowStatusMenuName As String = "ShowStatus"
+    Friend Const ShowStatusMenuString As String = "Show Status Monitor"
+
     Friend Const HelpMenuName As String = "mnuHelp"
     Friend Const BasinsHelpMenuName As String = "BasinsHelp"
     Friend Const BasinsHelpMenuString As String = "BASINS Documentation"

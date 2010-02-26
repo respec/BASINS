@@ -47,7 +47,7 @@ Public Class atcBasinsPlugIn
     End Property
 #End Region
 
-    Private pStatusMonitor As clsLoggerStatusMonitor
+    Private pStatusMonitor As MonitorProgressStatus
 
     <CLSCompliant(False)> _
     Public ReadOnly Property MapWin() As MapWindow.Interfaces.IMapWin
@@ -96,11 +96,6 @@ Public Class atcBasinsPlugIn
                          & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & g_AppNameShort & ".log")
         Logger.Icon = g_MapWin.ApplicationInfo.FormIcon
 
-        'put our new seperate executable status monitor (StatusMonitor.exe) between the Logger and the default MW status monitor
-        pStatusMonitor = New clsLoggerStatusMonitor
-        pStatusMonitor.InnerProgressStatus = Logger.ProgressStatus
-        Logger.ProgressStatus = pStatusMonitor
-
         'Logger.MsgCustom("Test Message", "Test Title", "Button One", "2")
         'For i As Integer = 1 To 10
         '    If Logger.MsgCustom("Test Message " & i, "Test Title " & i, "Button One", "2", "All") = "All" Then Exit For
@@ -109,20 +104,22 @@ Public Class atcBasinsPlugIn
         '    If Logger.MsgCustomCheckbox("Test Message " & i, "Test Title " & i, g_AppNameShort, "Test", "Buttons", "Button One", "2", "All") = "All" Then Exit For
         'Next
 
-        'If LaunchMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), g_ProgramDir & "cache\log" & g_PathChar, System.Diagnostics.Process.GetCurrentProcess.Id) Then
-        '    Logger.ProgressStatus = New MonitorProgressStatus
-        '    SendMonitorMessage("Show")
-        '    Logger.Status("Testing")
-        '    'Logger.Status("LABEL 2 Two")
-        '    'Logger.Status("LABEL 3 Three")
-        '    'Logger.Status("LABEL 4 Four")
-        '    'Logger.Status("LABEL 5 Five")
-        '    Dim lSeconds As Integer = 30
-        '    For lIndex As Integer = 1 To lSeconds
-        '        SendMonitorMessage("PROGRESS " & lIndex & " of " & lSeconds)
-        '        System.Threading.Thread.Sleep(1000)
-        '    Next
-        'End If
+        If Logger.ProgressStatus Is Nothing OrElse Logger.ProgressStatus.GetType.Name <> "MonitorProgressStatus" Then
+            'Start running status monitor to give better progress and status indication during long-running processes
+            pStatusMonitor = New MonitorProgressStatus
+            If pStatusMonitor.StartMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), _
+                                            g_ProgramDir & "cache\log" & g_PathChar, _
+                                            System.Diagnostics.Process.GetCurrentProcess.Id) Then
+                'put our seperate executable status monitor (StatusMonitor.exe) between the Logger and the default MW status monitor
+                pStatusMonitor.InnerProgressStatus = Logger.ProgressStatus
+                Logger.ProgressStatus = pStatusMonitor
+                Logger.Status("LABEL TITLE " & g_AppNameShort & " Status")
+                Logger.Status("")
+            Else
+                pStatusMonitor.StopMonitor()
+                pStatusMonitor = Nothing
+            End If
+        End If
 
         CheckForUpdates(True)
 
@@ -161,7 +158,8 @@ Public Class atcBasinsPlugIn
         g_Menus.Remove("mnuFileBreak5")      'Remove MW separator after mnuCheckForUpdates
 
         atcDataManager.AddMenuIfMissing(CheckForUpdatesMenuName, HelpMenuName, CheckForUpdatesMenuString, RegisterMenuName)
-        atcDataManager.AddMenuIfMissing(SendFeedbackMenuName, HelpMenuName, SendFeedbackMenuString, CheckForUpdatesMenuName)
+        atcDataManager.AddMenuIfMissing(ShowStatusMenuName, HelpMenuName, ShowStatusMenuString, CheckForUpdatesMenuName)
+        atcDataManager.AddMenuIfMissing(SendFeedbackMenuName, HelpMenuName, SendFeedbackMenuString, ShowStatusMenuName)
 
         Dim lMenuItem As MapWindow.Interfaces.MenuItem
         For Each lDataDir As String In g_BasinsDataDirs
@@ -208,6 +206,7 @@ Public Class atcBasinsPlugIn
         g_MapWin.Menus.Remove(ProgramWebPageMenuName)
         g_MapWin.Menus.Remove(RegisterMenuName)
         g_MapWin.Menus.Remove(CheckForUpdatesMenuName)
+        g_MapWin.Menus.Remove(ShowStatusMenuName)
         g_MapWin.Menus.Remove(SendFeedbackMenuName)
 
         g_MapWin.Menus.Remove(atcDataManager.LaunchMenuName & "_ArcView3")
@@ -225,8 +224,10 @@ Public Class atcBasinsPlugIn
 
         CloseForms()
 
-        Logger.ProgressStatus = pStatusMonitor.InnerProgressStatus
-        pStatusMonitor.Dispose()
+        If pStatusMonitor IsNot Nothing Then
+            Logger.ProgressStatus = pStatusMonitor.InnerProgressStatus
+            pStatusMonitor.StopMonitor()
+        End If
 
         SaveSetting(g_AppNameRegistry, "DataManager", "SelectionAttributes", String.Join(vbTab, atcDataManager.SelectionAttributes.ToArray("".GetType)))
         SaveSetting(g_AppNameRegistry, "DataManager", "DisplayAttributes", String.Join(vbTab, atcDataManager.DisplayAttributes.ToArray("".GetType)))
@@ -259,6 +260,8 @@ Public Class atcBasinsPlugIn
                 OpenFile(g_URL_Home)
             Case SendFeedbackMenuName
                 SendFeedback()
+            Case ShowStatusMenuName
+                Logger.Status("SHOW")
             Case BasinsHelpMenuName
                 ShowHelp("")
             Case atcDataManager.LaunchMenuName & "_ArcView3"
