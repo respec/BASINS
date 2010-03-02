@@ -9,6 +9,8 @@ Public Class frmStatus
     Private pMargin As Integer = 10
     Private pDetailsVisible As Boolean = False
 
+    Friend Shared ReadOnly LastLabel As Integer = 4 'bottom label has index 5
+
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents btnPause As System.Windows.Forms.Button
     Friend WithEvents btnLog As System.Windows.Forms.Button
@@ -25,7 +27,6 @@ Public Class frmStatus
 
         'Add any initialization after the InitializeComponent() call
 
-        Me.Level = 1
     End Sub
 
     'Form overrides dispose to clean up the component list.
@@ -134,8 +135,6 @@ Public Class frmStatus
 
 #End Region
 
-    Friend Shared ReadOnly LastLabel As Integer = 5
-
     Public Property Level() As Integer
         Get
             Return pLevels.Count
@@ -168,9 +167,10 @@ Public Class frmStatus
                 pLevels.Add(newLevel)
                 Me.Controls.Add(newLevel)
                 With newLevel
+                    .Height = pLevels(0).Height
                     .Top = pMargin + (pLevels.Count - 1) * (.Height + pMargin)
                     .Left = pMargin
-                    .Width = Me.ClientSize.Width - pMargin * 2
+                    .Width = Me.ClientSize.Width - (pMargin * 2)
                     .Anchor = AnchorStyles.Top + AnchorStyles.Left + AnchorStyles.Right
                     lHeightChange += .Height + pMargin
                     txtDetails.Top += lHeightChange
@@ -189,21 +189,23 @@ Public Class frmStatus
                     If aIndex < 1 OrElse aIndex > LastLabel Then
                         Return ""
                     Else
-                        If aLevel < 1 Then aLevel = pLevels.Count - 1
-                        Return pLevels(aLevel).Label(aIndex)
+                        If aLevel < 1 Then aLevel = pLevels.Count
+                        If aLevel > 0 AndAlso aLevel <= pLevels.Count Then
+                            Return pLevels(aLevel - 1).Label(aIndex)
+                        Else
+                            Return ""
+                        End If
                     End If
             End Select
         End Get
         Set(ByVal aNewValue As String)
-
             Select Case aIndex
                 Case 0 : Me.Text = aNewValue
                 Case 5 : lblBottom.Text = aNewValue
                 Case Else
-                    If aIndex < 0 OrElse aIndex > LastLabel Then
-                        'Invalid index
-                    Else
-                        pLevels(pLevels.Count - 1).Label(aIndex) = aNewValue
+                    If aLevel < 1 Then aLevel = pLevels.Count
+                    If aLevel > 0 AndAlso aLevel <= pLevels.Count Then
+                        pLevels(aLevel - 1).Label(aIndex) = aNewValue
                     End If
             End Select
         End Set
@@ -211,8 +213,8 @@ Public Class frmStatus
 
     Public ReadOnly Property Progress(Optional ByVal aLevel As Integer = 0) As Windows.Forms.ProgressBar
         Get
-            If aLevel < 1 Then aLevel = pLevels.Count - 1
-            Return pLevels(aLevel).Progress
+            If aLevel < 1 Then aLevel = pLevels.Count
+            Return pLevels(aLevel - 1).Progress
         End Get
     End Property
 
