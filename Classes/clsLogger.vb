@@ -160,19 +160,19 @@ Public Class Logger
     '    End Get
     'End Property
 
-    '''' <summary>
-    '''' True if user has requested to cancel current operation
-    '''' </summary>
-    'Public Shared Property Canceled() As Boolean
-    '    Get
-    '        Return pCancelable AndAlso CType(pProgressStatus, IProgressStatusCancel).Canceled
-    '    End Get
-    '    Set(ByVal aSetCanceled As Boolean)
-    '        If pCancelable Then
-    '            CType(pProgressStatus, IProgressStatusCancel).Canceled = aSetCanceled
-    '        End If
-    '    End Set
-    'End Property
+    ''' <summary>
+    ''' True if user has requested to cancel current operation
+    ''' </summary>
+    Public Shared Property Canceled() As Boolean
+        Get
+            Return pCancelable AndAlso CType(pProgressStatus, IProgressStatusCancel).Canceled
+        End Get
+        Set(ByVal aSetCanceled As Boolean)
+            If pCancelable Then
+                CType(pProgressStatus, IProgressStatusCancel).Canceled = aSetCanceled
+            End If
+        End Set
+    End Property
 
     ''' <summary>Write any pending log messages to the log file (if logging to a file)</summary>
     Public Shared Sub Flush()
@@ -599,27 +599,33 @@ Public Class Logger
     ''' aLast is not 100.
     ''' </remarks>
     Public Shared Sub Progress(ByVal aCurrent As Integer, ByVal aLast As Integer)
+        If pCancelable AndAlso CType(pProgressStatus, IProgressStatusCancel).Canceled Then
+            Throw New ProgressCancelException
+        End If
         Try
-            If pCancelable AndAlso CType(pProgressStatus, IProgressStatusCancel).Canceled Then
-                Throw New ProgressCancelException
-            End If
             Dim lCurTime As Double = Now.ToOADate
             If aCurrent = aLast Then 'Reached end, stop showing progress bar
                 pProgressStatus.Progress(aCurrent, aLast)
                 pProgressStartTime = 0
                 pProgressLastUpdate = 0
+                'pProgressStatus.Status("Current = Last " & aCurrent & " " & aLast)
                 Flush()
             ElseIf pProgressStartTime = 0 Then 'Starting new progress display
                 pProgressStatus.Progress(aCurrent, aLast)
                 pProgressStartTime = lCurTime
                 pProgressLastUpdate = lCurTime
+                'pProgressStatus.Status("StartTimeZero " & aCurrent & " " & aLast)
+                Flush()
             ElseIf pProgressRefresh = 0 OrElse lCurTime - pProgressLastUpdate > pProgressRefresh Then
                 'Long enough interval since last progress update
                 pProgressStatus.Progress(aCurrent, aLast)
                 Application.DoEvents() 'Allow user interaction such as minimizing window
                 'Dbg("Progress " & aCurrent & " of " & aLast)
+                'pProgressStatus.Status("Long enough " & aCurrent & " " & aLast)
                 Flush()
                 pProgressLastUpdate = lCurTime
+                'Else
+                '    pProgressStatus.Status("Skipped " & aCurrent & " " & aLast)
             End If
         Catch ex As Exception 'Ignore any exceptions while processing progress messages
         End Try
