@@ -788,7 +788,7 @@ Public Class frmBMP
         End If
     End Sub
 
-    Private Sub GetMassLinkID(ByVal aSName As String, ByVal aTName As String, ByVal aMLId As Integer)
+    Private Sub GetMassLinkID(ByVal aSName As String, ByVal aTName As String, ByRef aMLId As Integer)
         Dim lConn As HspfConnection
 
         'determine mass link number
@@ -802,7 +802,7 @@ Public Class frmBMP
         Next lConn
     End Sub
 
-    Private Sub AddMassLink(ByVal aSName As String, ByVal aTName As String, ByVal aMLId As Integer)
+    Private Sub AddMassLink(ByVal aSName As String, ByVal aTName As String, ByRef aMLId As Integer)
         'need to add masslink, find an unused number
         Dim lFound As Boolean = True
         aMLId = 1
@@ -830,7 +830,8 @@ Public Class frmBMP
         End If
         If aMLId > 0 And lCopyId > 0 Then
             'now copy masslink
-            For Each lcMassLink As HspfMassLink In pUCI.MassLinks
+            For lIndex As Integer = 0 To pUCI.MassLinks.Count - 1
+                Dim lcMassLink As HspfMassLink = pUCI.MassLinks(lIndex)
                 If lcMassLink.MassLinkId = lCopyId Then
                     'copy this record
                     Dim lMassLink As New HspfMassLink
@@ -899,7 +900,7 @@ Public Class frmBMP
 
                     pUCI.MassLinks.Add(lMassLink)
                 End If
-            Next lcMassLink
+            Next
         End If
 
     End Sub

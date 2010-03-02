@@ -27,6 +27,7 @@ Public Class frmBMPEffic
         pOpnDesc = aOperationDesc
         lblId.Text = "BMP Operation # " & pOpnID
         cmdUpdateUCI.Enabled = False
+        RefreshGrid()
     End Sub
 
     Public Sub New()
@@ -98,7 +99,7 @@ Public Class frmBMPEffic
         End With
 
         pLoading = False
-        RefreshGrid()
+        'RefreshGrid()
     End Sub
 
     Private Sub cmdClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdClose.Click
@@ -156,15 +157,15 @@ Public Class frmBMPEffic
 
         For i As Integer = 1 To BMPParms.Count
             If Not lOper Is Nothing Then
-                Dim lTable As HspfTable = lOper.Tables(BMPParms(i).TableName)
+                Dim lTable As HspfTable = lOper.Tables(BMPParms(i - 1).TableName)
                 If Not lTable Is Nothing Then
                     Dim lParmIndex As Integer
                     If lTable.Name = "GQ-FRAC" Or lTable.Name = "CONS-FRAC" Then
-                        lParmIndex = Int(BMPParms(i).StartColumn / 10) - 1
+                        lParmIndex = Int(BMPParms(i - 1).StartColumn / 10) - 1
                     Else
-                        lParmIndex = Int(BMPParms(i).StartColumn / 10)
+                        lParmIndex = Int(BMPParms(i - 1).StartColumn / 10)
                     End If
-                    Dim lParm As HspfParm = lTable.Parms(lParmIndex)
+                    Dim lParm As HspfParm = lTable.Parms(lParmIndex - 1)
                     If Not lParm Is Nothing Then
                         agdBmpEfc.Source.CellValue(i, 1) = lParm.Value
                     Else
@@ -226,7 +227,7 @@ Public Class frmBMPEffic
                     Else
                         lParmIndex = Int(BMPParms(lIndex - 1).StartColumn / 10)
                     End If
-                    Dim lParm As HspfParm = lTable.Parms(lParmIndex)
+                    Dim lParm As HspfParm = lTable.Parms(lParmIndex - 1)
                     If Not lParm Is Nothing Then
                         lParm.Value = agdBmpEfc.Source.CellValue(lIndex, 1)
                     End If
