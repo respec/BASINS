@@ -104,7 +104,7 @@ Public Class atcBasinsPlugIn
         '    If Logger.MsgCustomCheckbox("Test Message " & i, "Test Title " & i, g_AppNameShort, "Test", "Buttons", "Button One", "2", "All") = "All" Then Exit For
         'Next
 
-        If Logger.ProgressStatus Is Nothing OrElse Logger.ProgressStatus.GetType.Name <> "MonitorProgressStatus" Then
+        If Logger.ProgressStatus Is Nothing OrElse Not (TypeOf (Logger.ProgressStatus) Is MonitorProgressStatus) Then
             'Start running status monitor to give better progress and status indication during long-running processes
             pStatusMonitor = New MonitorProgressStatus
             If pStatusMonitor.StartMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), _
@@ -114,6 +114,7 @@ Public Class atcBasinsPlugIn
                 pStatusMonitor.InnerProgressStatus = Logger.ProgressStatus
                 Logger.ProgressStatus = pStatusMonitor
                 Logger.Status("LABEL TITLE " & g_AppNameShort & " Status")
+                Logger.Status("PROGRESS TIME ON") 'Enable time-to-completion estimation
                 Logger.Status("")
             Else
                 pStatusMonitor.StopMonitor()
