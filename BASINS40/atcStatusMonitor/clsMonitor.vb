@@ -202,13 +202,13 @@ Public Class clsMonitor
 
     Private Shared Sub RedrawUnsafe()
         If pfrmStatus IsNot Nothing Then
+            pLevelsMutex.WaitOne()
             Try
                 With pfrmStatus
                     .btnCancel.Visible = pButtonVisibleCancel
                     .btnLog.Visible = pButtonVisibleDetails
                     .btnPause.Visible = pButtonVisiblePause
                     Dim lLevelIndex As Integer = 0
-                    pLevelsMutex.WaitOne()
                     For Each lLevel As clsLevel In pLevels
                         lLevelIndex += 1
                         If lLevel.LabelNeedsUpdate Then
@@ -331,8 +331,8 @@ Public Class clsMonitor
                                     End If
                                     .Label(5) = lEstimateLabel
                                 End If
-                                    'End If
-                                End If
+                                'End If
+                            End If
                         End If
                         If pParentProcess IsNot Nothing AndAlso _
                            pParentProcess.HasExited AndAlso _
@@ -349,11 +349,11 @@ Public Class clsMonitor
                             'pWindowTimer.Change(UpdateMilliseconds, Threading.Timeout.Infinite)
                         End If
                     Next
-                    pLevelsMutex.ReleaseMutex()
                 End With
             Catch e As Exception
                 'MsgBox(e.Message, MsgBoxStyle.Critical, "Exception in RefreshWindow")
             End Try
+            pLevelsMutex.ReleaseMutex()
             'pfrmStatus.Refresh()
         End If
         Application.DoEvents()
