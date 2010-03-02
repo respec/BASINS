@@ -581,7 +581,7 @@ Public Class frmBMP
                     Dim lTable As HspfTable
                     If lOpnBlk.Count > 1 Then
                         'already have some of this operation
-                        For Each lTable In lOpnBlk.Ids(1).Tables
+                        For Each lTable In lOpnBlk.Ids(0).Tables
                             'add this opn id to this table
                             pUCI.AddTable("BMPRAC", pBmps(lBmpIndex).Id, lTable.Name)
                         Next lTable
@@ -597,10 +597,10 @@ Public Class frmBMP
                             Next
                         Next
                     End If
-                    lTable = lOpnBlk.Tables("GEN-INFO")
+                    lTable = lOpn.Tables("GEN-INFO")
                     lTable.Parms("BMPID").Value = pBmps(lBmpIndex).Desc
                     lTable.Parms("NGQUAL").Value = 0   'assume no gquals
-                    lTable = lOpnBlk.Tables("GQ-FRAC")
+                    lTable = lOpn.Tables("GQ-FRAC")
                     lTable.Parms("GQID").Value = "unknown"
                 End If
 
@@ -627,6 +627,12 @@ Public Class frmBMP
 
         GetUciInfo(cboReach.SelectedIndex - 1) 'refresh with new data
         PopulateGrid()
+        With pWinHSPF.SchematicDiagram
+            .ClearTree()
+            .BuildTree()
+            .UpdateLegend()
+            .UpdateDetails()
+        End With
         cmdUpdateUCI.Enabled = False
     End Sub
 
