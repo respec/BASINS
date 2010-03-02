@@ -46,12 +46,8 @@ Public Class clsMonitor
     Private Shared WithEvents pWindowTimer As System.Timers.Timer
 
     Public Shared Sub Main()
-
-        ' loop to keep execution at start until we attach to process for debugging and set next statement outside
-        'While Not pExiting
-        '    Application.DoEvents()
-        '    System.Threading.Thread.Sleep(100)
-        'End While
+        'MsgBox("Pausing Status Monitor, Attach to process " & Process.GetCurrentProcess.Id)
+        'Application.DoEvents()
 
         Dim lCommandLine As String = Command()
         'Console.WriteLine("StatusMonitorEntryWith " & lCommandLine)
@@ -59,9 +55,10 @@ Public Class clsMonitor
         pfrmStatus = New frmStatus
         pfrmStatus.Show()
         pfrmStatus.Visible = False
-        pfrmStatus.Clear()
 
         pLevels.Add(New clsLevel)
+        pfrmStatus.Level = 1
+        pfrmStatus.Clear()
 
         'Console.WriteLine("StatusMonitorFormCreated")
 
@@ -167,11 +164,11 @@ Public Class clsMonitor
                 For lNewLevelIndex As Integer = 1 To aChange
                     Dim lNewLevel As New clsLevel
                     lNewLevel.LabelLast(0) = lFormerLast.LabelLast(0)
-                    lNewLevel.LabelLast(5) = lFormerLast.LabelLast(5)
+                    'lNewLevel.LabelLast(5) = lFormerLast.LabelLast(5)
                     lNewLevel.LabelLogged(0) = lFormerLast.LabelLogged(0)
-                    lNewLevel.LabelLogged(5) = lFormerLast.LabelLogged(5)
+                    'lNewLevel.LabelLogged(5) = lFormerLast.LabelLogged(5)
                     lNewLevel.LabelText(0) = lFormerLast.LabelText(0)
-                    lNewLevel.LabelText(5) = lFormerLast.LabelText(5)
+                    'lNewLevel.LabelText(5) = lFormerLast.LabelText(5)
                     pLevels.Add(lNewLevel)
                 Next
             Else
@@ -183,7 +180,7 @@ Public Class clsMonitor
                 Dim lRemovingLast As clsLevel = pLevels(pLevels.Count - 1)
                 Dim lKeepingLast As clsLevel = pLevels(pLevels.Count + aChange - 1)
                 lKeepingLast.LabelLast(0) = lRemovingLast.LabelLast(0)
-                lKeepingLast.LabelLast(5) = lRemovingLast.LabelLast(5)
+                'lKeepingLast.LabelLast(5) = lRemovingLast.LabelLast(5)
                 pLevels.RemoveRange(pLevels.Count + aChange, -aChange)
                 lKeepingLast.LabelNeedsUpdate = True
             End If
@@ -220,7 +217,7 @@ Public Class clsMonitor
                             For lLabelIndex As Integer = 0 To frmStatus.LastLabel
                                 If Not lLevel.LabelText(lLabelIndex).Equals(lLevel.LabelLast(lLabelIndex)) Then
                                     'Console.WriteLine("UpdateLabel " & lLabelIndex)
-                                    .Label(lLabelIndex) = lLevel.LabelText(lLabelIndex)
+                                    .Label(lLabelIndex, lLevelIndex) = lLevel.LabelText(lLabelIndex)
                                     lLevel.LabelLast(lLabelIndex) = lLevel.LabelText(lLabelIndex)
                                     lLevel.LabelLogged(lLabelIndex) = lLevel.LabelText(lLabelIndex)
                                 End If
@@ -241,17 +238,18 @@ Public Class clsMonitor
 
                         If lLevel.ProgressNeedsUpdate Then
                             lLevel.ProgressNeedsUpdate = False
+                            Dim lProgress As Windows.Forms.ProgressBar = .Progress(lLevelIndex)
 
                             If lLevel.ProgressCurrent >= lLevel.ProgressFinal Then 'Progress is finished
-                                .Progress.Visible = False
+                                lProgress.Visible = False
                                 If lLevelIndex = 1 Then
                                     .Visible = False
                                     pProgressStartTime = Double.NaN
                                 End If
                                 pProgressOpened = False
                                 'Refresh labels that may have been set to show progress
-                                For lLabelIndex As Integer = 2 To 5
-                                    .Label(lLabelIndex) = lLevel.LabelText(lLabelIndex)
+                                For lLabelIndex As Integer = 2 To frmStatus.LastLabel
+                                    .Label(lLabelIndex, lLevelIndex) = lLevel.LabelText(lLabelIndex)
                                 Next
                             Else
                                 If lLevelIndex = 1 AndAlso Double.IsNaN(pProgressStartTime) Then
@@ -262,31 +260,38 @@ Public Class clsMonitor
                                     pProgressOpened = True
                                 End If
 
-                                .Progress.Maximum = lLevel.ProgressFinal
-                                .Progress.Value = lLevel.ProgressCurrent
-                                .Progress.Visible = True
-                                .Progress.Refresh()
+                                lProgress.Maximum = lLevel.ProgressFinal
+                                lProgress.Value = lLevel.ProgressCurrent
+                                If lLevel.ProgressCurrent > 0 Then
+                                    lProgress.Visible = True
+                                End If
+                                If lProgress.Visible Then
+                                    lProgress.Refresh()
+                                End If
+
                                 'If pLabelLogged(2).Length = 0 AndAlso pLabelLogged(4).Length = 0 Then
-                                '    .Label(2) = "0"
-                                '    .Label(4) = Format(pProgressFinal, "#,###")
+                                '    .Label(2,lLevelIndex) = "0"
+                                '    .Label(4,lLevelIndex) = Format(pProgressFinal, "#,###")
                                 'End If
 
                                 If lLevel.LabelLogged(3).Length = 0 Then
-                                    If lLevel.ProgressFinal = 100 Then
-                                        .Label(3) = lLevel.ProgressCurrent & "%"
+                                    If lLevel.ProgressCurrent = 0 Then
+                                        .Label(3, lLevelIndex) = ""
+                                    ElseIf lLevel.ProgressFinal = 100 Then
+                                        .Label(3, lLevelIndex) = lLevel.ProgressCurrent & "%"
                                     Else
-                                        .Label(3) = Format(lLevel.ProgressCurrent, "#,##0") & " of " & Format(lLevel.ProgressFinal, "#,###")
+                                        .Label(3, lLevelIndex) = Format(lLevel.ProgressCurrent, "#,##0") & " of " & Format(lLevel.ProgressFinal, "#,###")
                                     End If
                                 End If
 
-                                If lLevelIndex = 1 AndAlso lLevel.LabelLogged(5).Length = 0 AndAlso _
-                                   (pProgressPercentOption.Length > 0 OrElse pProgressTimeOption.Length > 0) Then
+                                If lLevelIndex = 1 AndAlso _
+                                       (pProgressPercentOption.Length > 0 OrElse pProgressTimeOption.Length > 0) Then
                                     Dim lEstimateLabel As String = ""
                                     Dim lElapsedDays As Double = Date.Now.ToOADate - pProgressStartTime
                                     'If elapsed time is short, skip estimating time remaining but still give progress percent if requested
                                     If lElapsedDays * 86400 < 10 Then '86400 seconds per day
                                         If pProgressPercentOption.Length > 0 Then
-                                            .Label(5) = CInt(lLevel.ProgressCurrent * 100 / lLevel.ProgressFinal) & pProgressPercentOption
+                                            lEstimateLabel = CInt(lLevel.ProgressCurrent * 100 / lLevel.ProgressFinal) & pProgressPercentOption
                                         End If
                                     Else
                                         Dim lEstimateTotalTime As Double = lElapsedDays * lLevel.ProgressFinal / lLevel.ProgressCurrent
@@ -326,8 +331,8 @@ Public Class clsMonitor
                                     End If
                                     .Label(5) = lEstimateLabel
                                 End If
-                                'End If
-                            End If
+                                    'End If
+                                End If
                         End If
                         If pParentProcess IsNot Nothing AndAlso _
                            pParentProcess.HasExited AndAlso _
@@ -335,7 +340,7 @@ Public Class clsMonitor
                             .WindowState = FormWindowState.Normal
                             pExiting = True
                             .Exiting = True
-                            .Label(0) = "Parent Process Exited"
+                            .Label(0) = pParentProcess.ProcessName & " Exited"
                             .btnCancel.Visible = False
                             .btnPause.Visible = False
                             .btnLog.Visible = True
@@ -556,9 +561,11 @@ Public Class clsMonitor
     Private Shared Sub ShowUnsafe()
         If pfrmStatus IsNot Nothing Then
             With pfrmStatus
-                .Visible = True
-                .WindowState = FormWindowState.Normal
-                .Show()
+                Select Case .WindowState
+                    Case FormWindowState.Normal
+                        .Visible = True
+                        .Show()
+                End Select
             End With
         End If
     End Sub
@@ -575,7 +582,9 @@ Public Class clsMonitor
         If pExiting Then
             pWindowTimer.Stop()
         Else
+            pWindowTimer.Enabled = False
             Redraw()
+            pWindowTimer.Enabled = True
         End If
     End Sub
 
