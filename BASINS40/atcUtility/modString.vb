@@ -1146,6 +1146,7 @@ TryOldString:
     End Function
 
     Public Function ReadableFromXML(ByVal aXML As String) As String
+        Dim lHTML As Boolean = aXML.ToUpper.IndexOf("<HTML") > -1
         Dim lSB As New System.Text.StringBuilder
         Dim lIndex As Integer = 0
         While lIndex < aXML.Length
@@ -1155,6 +1156,7 @@ TryOldString:
                     Dim lClose As Integer = aXML.IndexOf(">", lIndex + 1)
                     If aXML.Chars(lIndex + 1) = "/" Then
                         lSB.Append(vbLf)
+                    ElseIf lHTML Then
                     Else
                         lSB.Append(aXML.Substring(lIndex + 1, lClose - lIndex - 1) & ": ")
                     End If
