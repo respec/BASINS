@@ -1165,7 +1165,7 @@ TryOldString:
             End Select
             lIndex += 1
         End While
-        Return lSB.ToString.Replace(vbLf & vbLf, vbLf).Replace(vbLf, vbCrLf)
+        Return lSB.ToString.Replace(vbLf & vbLf, vbLf).Replace(vbLf, vbCrLf).Replace("&nbsp;", " ")
     End Function
 
     Public Function ReplaceStringNoCase(ByRef Source As String, ByRef Find As String, ByRef ReplaceWith As String) As String
