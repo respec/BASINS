@@ -297,10 +297,10 @@ Public Class frmStatus
                 lDetailsTop = lLastLevel.Top + lLastLevel.Height + pMargin
             End If
             Dim lDetailsHeight As Integer = btnLog.Top - pMargin - lDetailsTop
-            If lDetailsHeight < pMargin * 2 Then
-                Me.Height += pMargin * 3 - lDetailsHeight
-            ElseIf ClientRectangle.Width < pMargin * 3 Then
-                Me.Width += pMargin * 4
+            If lDetailsHeight < pMargin * 8 Then
+                Me.Height += pMargin * 10 - lDetailsHeight
+            ElseIf ClientRectangle.Width < pMargin * 10 Then
+                Me.Width += pMargin * 10
             Else
                 txtDetails.Top = lDetailsTop
                 txtDetails.Height = lDetailsHeight
