@@ -340,7 +340,11 @@ Public Class clsMonitor
                             .WindowState = FormWindowState.Normal
                             pExiting = True
                             .Exiting = True
+                            .Level = 1
                             .Label(0) = pParentProcess.ProcessName & " Exited"
+                            For lLabelIndex As Integer = 1 To 5
+                                .Label(lLabelIndex) = ""
+                            Next
                             .btnCancel.Visible = False
                             .btnPause.Visible = False
                             .btnLog.Visible = True
@@ -579,10 +583,8 @@ Public Class clsMonitor
     End Sub
 
     Private Shared Sub pWindowTimer_Elapsed(ByVal sender As Object, ByVal e As System.Timers.ElapsedEventArgs) Handles pWindowTimer.Elapsed
-        If pExiting Then
-            pWindowTimer.Stop()
-        Else
-            pWindowTimer.Enabled = False
+        pWindowTimer.Enabled = False
+        If Not pExiting Then
             Redraw()
             pWindowTimer.Enabled = True
         End If
