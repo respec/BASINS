@@ -59,6 +59,7 @@ Public Class clsMonitor
         pLevels.Add(New clsLevel)
         pfrmStatus.Level = 1
         pfrmStatus.Clear()
+        pfrmStatus.Label(5) = ""
 
         'Console.WriteLine("StatusMonitorFormCreated")
 
@@ -82,7 +83,7 @@ Public Class clsMonitor
                 MsgBox("Pausing Status Monitor, Attach to process " & Process.GetCurrentProcess.Id)
                 Application.DoEvents()
             End If
-            Console.WriteLine("ParentProcess " & pParentProcess.ProcessName)
+            'Console.WriteLine("ParentProcess " & pParentProcess.ProcessName)
             pfrmStatus.Text = pParentProcess.ProcessName & " Status Monitor"
         End If
 
@@ -439,7 +440,7 @@ Public Class clsMonitor
                 Case "DBG" 'Debug message, just goes into log
                 Case "EXIT"
                     pExiting = True
-                    Console.WriteLine("pExitingNowTrue")
+                    'Console.WriteLine("pExitingNowTrue")
                     If pfrmStatus IsNot Nothing Then
                         pfrmStatus.Exiting = True
                         pfrmStatus.Close()
