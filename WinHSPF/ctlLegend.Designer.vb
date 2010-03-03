@@ -29,46 +29,38 @@ Partial Class ctlLegend
         '
         'btnScrollLegendUp
         '
-        Me.btnScrollLegendUp.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnScrollLegendUp.Location = New System.Drawing.Point(0, 0)
         Me.btnScrollLegendUp.Name = "btnScrollLegendUp"
-        Me.btnScrollLegendUp.Size = New System.Drawing.Size(300, 21)
+        Me.btnScrollLegendUp.Size = New System.Drawing.Size(400, 26)
         Me.btnScrollLegendUp.TabIndex = 7
         Me.btnScrollLegendUp.Text = "^"
         Me.btnScrollLegendUp.UseVisualStyleBackColor = True
         '
         'btnScrollLegendDown
         '
-        Me.btnScrollLegendDown.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnScrollLegendDown.Location = New System.Drawing.Point(0, 289)
+        Me.btnScrollLegendDown.Location = New System.Drawing.Point(0, 356)
         Me.btnScrollLegendDown.Name = "btnScrollLegendDown"
-        Me.btnScrollLegendDown.Size = New System.Drawing.Size(300, 21)
+        Me.btnScrollLegendDown.Size = New System.Drawing.Size(400, 26)
         Me.btnScrollLegendDown.TabIndex = 6
         Me.btnScrollLegendDown.Text = "v"
         Me.btnScrollLegendDown.UseVisualStyleBackColor = True
         '
         'pnlLegend
         '
-        Me.pnlLegend.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.pnlLegend.Location = New System.Drawing.Point(0, 22)
+        Me.pnlLegend.Location = New System.Drawing.Point(0, 27)
         Me.pnlLegend.Name = "pnlLegend"
-        Me.pnlLegend.Size = New System.Drawing.Size(300, 268)
+        Me.pnlLegend.Size = New System.Drawing.Size(400, 330)
         Me.pnlLegend.TabIndex = 8
         '
         'ctlLegend
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None
         Me.Controls.Add(Me.btnScrollLegendDown)
         Me.Controls.Add(Me.btnScrollLegendUp)
         Me.Controls.Add(Me.pnlLegend)
         Me.Margin = New System.Windows.Forms.Padding(0)
         Me.Name = "ctlLegend"
-        Me.Size = New System.Drawing.Size(300, 310)
+        Me.Size = New System.Drawing.Size(400, 382)
         Me.ResumeLayout(False)
 
     End Sub

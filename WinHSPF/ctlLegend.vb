@@ -107,8 +107,23 @@ Friend Class ctlLegend
     End Sub
 
     Private Sub ctlLegend_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
-        btnScrollLegendUp.Width = Me.Width - IconMargin * 2
-        btnScrollLegendDown.Width = Me.Width - IconMargin * 2
+        Dim lWidth As Integer = Me.Width
+        With btnScrollLegendUp
+            .Left = IconMargin
+            .Width = lWidth - IconMargin * 2
+        End With
+        With btnScrollLegendDown
+            .Left = IconMargin
+            .Width = lWidth - IconMargin * 2
+            .Top = Me.Height - .Height
+        End With
+
+        With pnlLegend
+            .Top = btnScrollLegendUp.Height
+            .Width = lWidth
+            .Height = Me.Height - btnScrollLegendUp.Height * 2
+        End With
+
         PlaceIcons()
         RaiseEvent Resized()
     End Sub
