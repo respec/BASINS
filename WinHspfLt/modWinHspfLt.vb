@@ -249,7 +249,7 @@ Friend Class StatusMonitor
                     .UseShellExecute = False
                     .RedirectStandardInput = True
                     .RedirectStandardOutput = True
-                    AddHandler pMonitorProcess.OutputDataReceived, AddressOf MonitorMessageHandler
+                    'AddHandler pMonitorProcess.OutputDataReceived, AddressOf MonitorMessageHandler
                     .RedirectStandardError = True
                     'AddHandler pMonitorProcess.ErrorDataReceived, AddressOf MonitorMessageHandler
                 End With
@@ -257,7 +257,7 @@ Friend Class StatusMonitor
                 '
                 'NOTE: to debug pMonitorProcess, in VS2005 (not Express) - choose Tools:AttachToProcess - StatusMonitor
                 '
-                pMonitorProcess.StandardInput.WriteLine("Show")
+                'pMonitorProcess.StandardInput.WriteLine("Show")
                 'pMonitorProcess.BeginErrorReadLine()
                 'pMonitorProcess.BeginOutputReadLine()
                 Logger.Dbg("MonitorLaunched")
@@ -306,12 +306,4 @@ Friend Class StatusMonitor
         End If
         Return True
     End Function
-
-    Private Sub MonitorMessageHandler(ByVal aSendingProcess As Object, _
-                                      ByVal aOutLine As DataReceivedEventArgs)
-        If Not String.IsNullOrEmpty(aOutLine.Data) Then
-            Logger.Dbg(aOutLine.Data.ToString)
-            Logger.Flush()
-        End If
-    End Sub
 End Class
