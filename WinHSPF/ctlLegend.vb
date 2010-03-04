@@ -39,7 +39,12 @@ Friend Class ctlLegend
 
     Public Sub Add(ByVal aIcon As clsIcon)
         Dim lY As Integer = IconMargin
-        If Icons.Count > 0 Then lY = Icons(Icons.Count - 1).Bottom + IconMargin * 2
+        Dim lVisibleIconsAbove As Integer = Icons.Count - TopIconIndex
+        If lVisibleIconsAbove < 0 Then
+            lY = -aIcon.Height - IconMargin
+        ElseIf lVisibleIconsAbove > 0 Then
+            lY = Icons(Icons.Count - 1).Bottom + IconMargin * 2
+        End If
         aIcon.Top = lY
         aIcon.Left = IconMargin
         aIcon.Width = IconWidth()

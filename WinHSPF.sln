@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Basic Express 2008
+# Visual Studio 2008
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcUCI", "atcUCI\atcUCI.vbproj", "{2FC4314B-792B-40A3-B540-ACA05B9EA86B}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcUtility", "atcUtility\atcUtility.vbproj", "{67027820-9036-481E-80F6-077E5085F59D}"
@@ -17,8 +17,6 @@ EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcSegmentation", "atcSegmentation\atcSegmentation.vbproj", "{813E3F46-36CA-4320-BB05-325EEC553D3D}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-MapWinUtility", "..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility.vbproj", "{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}"
-EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "WinHSPFplugin", "WinHSPF\WinHSPFplugin\WinHSPFplugin.vbproj", "{C49A6605-B48C-4E05-9F4B-7FB6BE2D6B22}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,10 +60,6 @@ Global
 		{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C49A6605-B48C-4E05-9F4B-7FB6BE2D6B22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C49A6605-B48C-4E05-9F4B-7FB6BE2D6B22}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C49A6605-B48C-4E05-9F4B-7FB6BE2D6B22}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C49A6605-B48C-4E05-9F4B-7FB6BE2D6B22}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
