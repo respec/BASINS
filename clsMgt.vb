@@ -489,7 +489,7 @@ Partial Class SwatInput
                                                & Format(lRowMgt2.Item(("CNOP")), "#####0.00000").PadLeft(20)
                                     Case Is = 7 ' Harvest only operation
                                         lLine &= Format(lRowMgt2.Item(("HARVEFF")), "#####0.00000").PadLeft(25) _
-                                               & Format(lRowMgt2.Item(("HI_OVR")), "##0.00").PadLeft(17)
+                                               & Format(lRowMgt2.Item(("HI_OVR")), "##0.00").PadLeft(7)
                                     Case Is = 8 'KILL OPERATION
 
                                     Case Is = 9 ' Grazing operation

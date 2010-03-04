@@ -280,23 +280,25 @@ TryExecute:
             Catch
             End Try
             If lValue IsNot Nothing Then
-                Select Case Type.GetTypeCode(lField.FieldType)
-                    Case TypeCode.Boolean : lField.SetValue(aObject, CBool(lValue))
-                    Case TypeCode.Byte : lField.SetValue(aObject, CByte(lValue))
-                    Case TypeCode.Char : lField.SetValue(aObject, CChar(lValue))
-                    Case TypeCode.DateTime : lField.SetValue(aObject, CDate(lValue))
-                    Case TypeCode.Decimal : lField.SetValue(aObject, CDec(lValue))
-                    Case TypeCode.Double : lField.SetValue(aObject, CDbl(lValue))
-                    Case TypeCode.Int16 : lField.SetValue(aObject, CShort(lValue))
-                    Case TypeCode.Int32 : lField.SetValue(aObject, CInt(lValue))
-                    Case TypeCode.Int64 : lField.SetValue(aObject, CLng(lValue))
-                    Case TypeCode.SByte : lField.SetValue(aObject, CSByte(lValue))
-                    Case TypeCode.Single : lField.SetValue(aObject, CSng(lValue))
-                    Case TypeCode.String : lField.SetValue(aObject, CStr(lValue))
-                    Case TypeCode.UInt16 : lField.SetValue(aObject, CUShort(lValue))
-                    Case TypeCode.UInt32 : lField.SetValue(aObject, CUInt(lValue))
-                    Case TypeCode.UInt64 : lField.SetValue(aObject, CULng(lValue))
-                End Select
+                If Not IsDBNull(lValue) Then
+                    Select Case Type.GetTypeCode(lField.FieldType)
+                        Case TypeCode.Boolean : lField.SetValue(aObject, CBool(lValue))
+                        Case TypeCode.Byte : lField.SetValue(aObject, CByte(lValue))
+                        Case TypeCode.Char : lField.SetValue(aObject, CChar(lValue))
+                        Case TypeCode.DateTime : lField.SetValue(aObject, CDate(lValue))
+                        Case TypeCode.Decimal : lField.SetValue(aObject, CDec(lValue))
+                        Case TypeCode.Double : lField.SetValue(aObject, CDbl(lValue))
+                        Case TypeCode.Int16 : lField.SetValue(aObject, CShort(lValue))
+                        Case TypeCode.Int32 : lField.SetValue(aObject, CInt(lValue))
+                        Case TypeCode.Int64 : lField.SetValue(aObject, CLng(lValue))
+                        Case TypeCode.SByte : lField.SetValue(aObject, CSByte(lValue))
+                        Case TypeCode.Single : lField.SetValue(aObject, CSng(lValue))
+                        Case TypeCode.String : lField.SetValue(aObject, CStr(lValue))
+                        Case TypeCode.UInt16 : lField.SetValue(aObject, CUShort(lValue))
+                        Case TypeCode.UInt32 : lField.SetValue(aObject, CUInt(lValue))
+                        Case TypeCode.UInt64 : lField.SetValue(aObject, CULng(lValue))
+                    End Select
+                End If
             End If
         Next
     End Sub
