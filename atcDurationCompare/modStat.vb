@@ -624,7 +624,7 @@ Public Module modStat
         Next
     End Function
 
-    Friend Class DurationReport
+    Public Class DurationReport
         Private pClassLimits As Generic.List(Of Double)
         Private pExceedPercents As Generic.List(Of Double)
 
@@ -636,7 +636,7 @@ Public Module modStat
             pExceedPercents = lExceedPercents.ToList
         End Sub
 
-        Friend Property ClassLimits() As Generic.List(Of Double)
+        Public Property ClassLimits() As Generic.List(Of Double)
             Get
                 Return pClassLimits
             End Get
