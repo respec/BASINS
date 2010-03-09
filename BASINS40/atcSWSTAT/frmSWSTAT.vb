@@ -1268,6 +1268,9 @@ Friend Class frmSWSTAT
         ClearAttributes()
         SeasonsYearsFromForm()
         Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
+        For Each lTs As atcTimeseries In pDataGroup
+            lTs.Attributes.SetValueIfMissing("CalcEMA", True)
+        Next
         Dim lArgs As New atcDataAttributes
         lArgs.SetValue("Timeseries", pDataGroup)
         lArgs.SetValue("NDay", ListToArray(lstNday))
