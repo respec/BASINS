@@ -131,11 +131,11 @@ Public Class frmWinHSPF
     End Sub
 
     Private Sub cmdViewOutput_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdViewOutput.Click
-        Logger.Msg("'View Output' Feature not yet implemented.", vbOKOnly, "WinHSPF Problem")
+        ViewOutput()
     End Sub
 
     Private Sub ViewOutputToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ViewOutputToolStripMenuItem.Click
-        Logger.Msg("'View Output' Feature not yet implemented.", vbOKOnly, "WinHSPF Problem")
+        ViewOutput()
     End Sub
 
     Private Sub AboutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AboutToolStripMenuItem.Click
