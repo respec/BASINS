@@ -34,12 +34,7 @@ Public Class frmWinHSPF
     End Sub
 
     Private Sub EditToolStripMenuItem_DropDownItemClicked(ByVal sender As Object, ByVal e As System.Windows.Forms.ToolStripItemClickedEventArgs) Handles EditToolStripMenuItem.DropDownItemClicked
-
-        If pUCI.Name.Length < 1 Then
-            Logger.Msg("No Project is active." & vbCrLf & vbCrLf & _
-                       "Open or Create a Project before selecting this menu item.", MsgBoxStyle.OkOnly, _
-                       "WinHSPF: Edit Problem")
-        Else
+        If CheckForOpenUCI() Then
             If pUCI.MetSegs.Count > 0 Then
                 pUCI.MetSeg2Source()
             End If
@@ -59,83 +54,123 @@ Public Class frmWinHSPF
     End Sub
 
     Private Sub ReachEditorToolStripMenuItem_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles ReachEditorToolStripMenuItem.Click
-        ReachEditor()
+        If CheckForOpenUCI() Then
+            ReachEditor()
+        End If
     End Sub
 
     Private Sub cmdReach_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdReach.Click
-        ReachEditor()
+        If CheckForOpenUCI() Then
+            ReachEditor()
+        End If
     End Sub
 
     Private Sub SimulationTimeAndMetDataEditorToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SimulationTimeAndMetDataEditorToolStripMenuItem.Click
-        SimulationTimeMetDataEditor()
+        If CheckForOpenUCI() Then
+            SimulationTimeMetDataEditor()
+        End If
     End Sub
 
     Private Sub cmdTime_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdTime.Click
-        SimulationTimeMetDataEditor()
+        If CheckForOpenUCI() Then
+            SimulationTimeMetDataEditor()
+        End If
     End Sub
 
     Private Sub LandUseEditorToolStripMenuItem_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles LandUseEditorToolStripMenuItem.Click
-        LandUseEditor()
+        If CheckForOpenUCI() Then
+            LandUseEditor()
+        End If
     End Sub
 
     Private Sub cmdLandUse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdLandUse.Click
-        LandUseEditor()
+        If CheckForOpenUCI() Then
+            LandUseEditor()
+        End If
     End Sub
 
     Private Sub TablesToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TablesToolStripMenuItem.Click
-        EditControlCardsWithTables()
+        If CheckForOpenUCI() Then
+            EditControlCardsWithTables()
+        End If
     End Sub
 
     Private Sub cmdControlCardsTables_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdControlCardsTables.Click
-        EditControlCardsWithTables()
+        If CheckForOpenUCI() Then
+            EditControlCardsWithTables()
+        End If
     End Sub
 
     Private Sub DescriptionsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DescriptionsToolStripMenuItem.Click
-        EditControlCardsWithDescriptions()
+        If CheckForOpenUCI() Then
+            EditControlCardsWithDescriptions()
+        End If
     End Sub
 
     Private Sub cmdControlCardsDescriptions_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdControlCardsDescriptions.Click
-        EditControlCardsWithDescriptions()
+        If CheckForOpenUCI() Then
+            EditControlCardsWithDescriptions()
+        End If
     End Sub
 
     Private Sub PollutantToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PollutantToolStripMenuItem.Click
-        PollutantSelector()
+        If CheckForOpenUCI() Then
+            PollutantSelector()
+        End If
     End Sub
 
     Private Sub cmdPollutant_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdPollutant.Click
-        PollutantSelector()
+        If CheckForOpenUCI() Then
+            PollutantSelector()
+        End If
     End Sub
 
     Private Sub PointSourceEditorToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PointSourceEditorToolStripMenuItem.Click
-        PointSourceEditor()
+        If CheckForOpenUCI() Then
+            PointSourceEditor()
+        End If
     End Sub
 
     Private Sub cmdPoint_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdPoint.Click
-        PointSourceEditor()
+        If CheckForOpenUCI() Then
+            PointSourceEditor()
+        End If
     End Sub
 
     Private Sub InputDataEditorToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles InputDataEditorToolStripMenuItem.Click
-        InputDataEditor()
+        If CheckForOpenUCI() Then
+            InputDataEditor()
+        End If
     End Sub
 
     Private Sub cmdToolStripInputEditor_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdInputDataEditor.Click
-        InputDataEditor()
+        If CheckForOpenUCI() Then
+            InputDataEditor()
+        End If
     End Sub
 
     Private Sub cmdOutputManager_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOutputManager.Click
-        OutputManager()
+        If CheckForOpenUCI() Then
+            OutputManager()
+        End If
     End Sub
 
     Private Sub OutputManagerToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OutputManagerToolStripMenuItem.Click
-        OutputManager()
+        If CheckForOpenUCI() Then
+            OutputManager()
+        End If
     End Sub
 
     Private Sub cmdViewOutput_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdViewOutput.Click
-        ViewOutput()
+        If CheckForOpenUCI() Then
+            ViewOutput()
+        End If
     End Sub
 
     Private Sub ViewOutputToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ViewOutputToolStripMenuItem.Click
-        ViewOutput()
+        If CheckForOpenUCI() Then
+            ViewOutput()
+        End If
     End Sub
 
     Private Sub AboutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AboutToolStripMenuItem.Click
@@ -157,33 +192,35 @@ Public Class frmWinHSPF
 
     Private Sub AQUATOXToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AQUATOXToolStripMenuItem.Click
 
-        Dim lAQlocCnt As Integer = 0
+        If CheckForOpenUCI() Then
+            Dim lAQlocCnt As Integer = 0
 
-        For Each lOper As HspfOperation In pUCI.OpnSeqBlock.Opns
-            If lOper.Name = "RCHRES" Then
-                If frmOutput.IsAQUATOXLocation(lOper.Name, lOper.Id) Then
-                    'this is an aquatox output location
-                    lAQlocCnt = lAQlocCnt + 1
+            For Each lOper As HspfOperation In pUCI.OpnSeqBlock.Opns
+                If lOper.Name = "RCHRES" Then
+                    If frmOutput.IsAQUATOXLocation(lOper.Name, lOper.Id) Then
+                        'this is an aquatox output location
+                        lAQlocCnt = lAQlocCnt + 1
+                    End If
                 End If
-            End If
-        Next
+            Next
 
-        If lAQlocCnt = 0 Then
-            Logger.Msg("At least one AQUATOX output location must be specified " & vbCrLf & "in the Output Manager " & _
-                       "before linking to AQUATOX.", "WinHSPF-AQUATOX Problem")
-        Else
-            If IsNothing(pfrmAQUATOX) Then
-                pfrmAQUATOX = New frmAQUATOX
-                pfrmAQUATOX.Init()
-                pfrmAQUATOX.Show()
+            If lAQlocCnt = 0 Then
+                Logger.Msg("At least one AQUATOX output location must be specified " & vbCrLf & "in the Output Manager " & _
+                           "before linking to AQUATOX.", "WinHSPF-AQUATOX Problem")
             Else
-                If pfrmAQUATOX.IsDisposed Then
+                If IsNothing(pfrmAQUATOX) Then
                     pfrmAQUATOX = New frmAQUATOX
                     pfrmAQUATOX.Init()
                     pfrmAQUATOX.Show()
                 Else
-                    pfrmAQUATOX.WindowState = FormWindowState.Normal
-                    pfrmAQUATOX.BringToFront()
+                    If pfrmAQUATOX.IsDisposed Then
+                        pfrmAQUATOX = New frmAQUATOX
+                        pfrmAQUATOX.Init()
+                        pfrmAQUATOX.Show()
+                    Else
+                        pfrmAQUATOX.WindowState = FormWindowState.Normal
+                        pfrmAQUATOX.BringToFront()
+                    End If
                 End If
             End If
         End If
@@ -192,16 +229,18 @@ Public Class frmWinHSPF
 
     Private Sub BMPToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BMPToolStripMenuItem.Click
 
-        If IsNothing(pfrmBMP) Then
-            pfrmBMP = New frmBMP
-            pfrmBMP.Show()
-        Else
-            If pfrmBMP.IsDisposed Then
+        If CheckForOpenUCI() Then
+            If IsNothing(pfrmBMP) Then
                 pfrmBMP = New frmBMP
                 pfrmBMP.Show()
             Else
-                pfrmBMP.WindowState = FormWindowState.Normal
-                pfrmBMP.BringToFront()
+                If pfrmBMP.IsDisposed Then
+                    pfrmBMP = New frmBMP
+                    pfrmBMP.Show()
+                Else
+                    pfrmBMP.WindowState = FormWindowState.Normal
+                    pfrmBMP.BringToFront()
+                End If
             End If
         End If
 
@@ -209,16 +248,18 @@ Public Class frmWinHSPF
 
     Private Sub HSPFparmToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HSPFparmToolStripMenuItem.Click
 
-        If IsNothing(pfrmHspfParm) Then
-            pfrmHspfParm = New frmHspfParm
-            pfrmHspfParm.Show()
-        Else
-            If pfrmHspfParm.IsDisposed Then
+        If CheckForOpenUCI() Then
+            If IsNothing(pfrmHspfParm) Then
                 pfrmHspfParm = New frmHspfParm
                 pfrmHspfParm.Show()
             Else
-                pfrmHspfParm.WindowState = FormWindowState.Normal
-                pfrmHspfParm.BringToFront()
+                If pfrmHspfParm.IsDisposed Then
+                    pfrmHspfParm = New frmHspfParm
+                    pfrmHspfParm.Show()
+                Else
+                    pfrmHspfParm.WindowState = FormWindowState.Normal
+                    pfrmHspfParm.BringToFront()
+                End If
             End If
         End If
 
@@ -226,16 +267,18 @@ Public Class frmWinHSPF
 
     Private Sub SaveAsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveAsToolStripMenuItem.Click
 
-        If IsNothing(pfrmSaveAs) Then
-            pfrmSaveAs = New frmSaveAs
-            pfrmSaveAs.Show()
-        Else
-            If pfrmSaveAs.IsDisposed Then
+        If CheckForOpenUCI() Then
+            If IsNothing(pfrmSaveAs) Then
                 pfrmSaveAs = New frmSaveAs
                 pfrmSaveAs.Show()
             Else
-                pfrmSaveAs.WindowState = FormWindowState.Normal
-                pfrmSaveAs.BringToFront()
+                If pfrmSaveAs.IsDisposed Then
+                    pfrmSaveAs = New frmSaveAs
+                    pfrmSaveAs.Show()
+                Else
+                    pfrmSaveAs.WindowState = FormWindowState.Normal
+                    pfrmSaveAs.BringToFront()
+                End If
             End If
         End If
 
@@ -243,16 +286,18 @@ Public Class frmWinHSPF
 
     Private Sub StarterToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles StarterToolStripMenuItem.Click
 
-        If IsNothing(pfrmStarter) Then
-            pfrmStarter = New frmStarter
-            pfrmStarter.Show()
-        Else
-            If pfrmStarter.IsDisposed Then
+        If CheckForOpenUCI() Then
+            If IsNothing(pfrmStarter) Then
                 pfrmStarter = New frmStarter
                 pfrmStarter.Show()
             Else
-                pfrmStarter.WindowState = FormWindowState.Normal
-                pfrmStarter.BringToFront()
+                If pfrmStarter.IsDisposed Then
+                    pfrmStarter = New frmStarter
+                    pfrmStarter.Show()
+                Else
+                    pfrmStarter.WindowState = FormWindowState.Normal
+                    pfrmStarter.BringToFront()
+                End If
             End If
         End If
 
@@ -279,11 +324,15 @@ Public Class frmWinHSPF
     End Sub
 
     Private Sub SaveToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveToolStripMenuItem.Click
-        SaveUCI()
+        If CheckForOpenUCI() Then
+            SaveUCI()
+        End If
     End Sub
 
     Private Sub SaveToolStripButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveToolStripButton.Click
-        SaveUCI()
+        If CheckForOpenUCI() Then
+            SaveUCI()
+        End If
     End Sub
 
     Private Sub NewToolStripButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles NewToolStripButton.Click
@@ -291,11 +340,15 @@ Public Class frmWinHSPF
     End Sub
 
     Private Sub RunHSPFToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RunHSPFToolStripMenuItem.Click
-        RunHSPF()
+        If CheckForOpenUCI() Then
+            RunHSPF()
+        End If
     End Sub
 
     Private Sub cmdRunHSPF_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdRunHSPF.Click
-        RunHSPF()
+        If CheckForOpenUCI() Then
+            RunHSPF()
+        End If
     End Sub
 
     Private Sub frmWinHSPF_DragDrop(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles Me.DragDrop
@@ -352,4 +405,15 @@ Public Class frmWinHSPF
     Private Sub WebSupToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles WebSupToolStripMenuItem.Click
         OpenFile("http://www.epa.gov/waterscience/BASINS/")
     End Sub
+
+    Private Function CheckForOpenUCI() As Boolean
+        Dim lReturn As Boolean = True
+        If pUCI Is Nothing Or pUCI.Name.Length = 0 Then
+            Logger.Msg("No project is active." & vbCrLf & vbCrLf & _
+                       "Open a project before using this feature.", _
+                       MsgBoxStyle.OkOnly, "WinHSPF Problem")
+            lReturn = False
+        End If
+        CheckForOpenUCI = lReturn
+    End Function
 End Class

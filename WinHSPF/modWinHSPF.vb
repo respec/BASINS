@@ -57,11 +57,11 @@ Public Module WinHSPF
         End If
 
         'set WinHSPF manual location
-        pWinHSPFManualName = lBasinsBinLoc & "\..\..\..\docs\WinHSPF.chm"
+        pWinHSPFManualName = lBasinsBinLoc & "\..\..\..\docs\WinHSPF30.chm"
         If Not FileExists(pWinHSPFManualName) Then
-            pWinHSPFManualName = "\BASINS\docs\WinHSPF.chm"
+            pWinHSPFManualName = "\BASINS\docs\WinHSPF30.chm"
             If Not FileExists(pWinHSPFManualName) Then
-                pWinHSPFManualName = FindFile("Please locate WinHSPF.chm", "WinHSPF.chm")
+                pWinHSPFManualName = FindFile("Please locate WinHSPF30.chm", "WinHSPF30.chm")
             End If
         End If
         ShowHelp(pWinHSPFManualName)
@@ -131,6 +131,7 @@ Public Module WinHSPF
                 .FilterIndex = 1
                 .DefaultExt = ".uci"
                 If .ShowDialog <> DialogResult.OK Then
+                    pUCI = New HspfUci
                     Exit Sub
                 End If
                 aFileName = .FileName
