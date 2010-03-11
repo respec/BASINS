@@ -433,6 +433,56 @@ Public Module WinHSPF
 
     End Sub
 
+    Sub ViewOutput()
+        'Logger.Msg("'View Output' Feature not yet implemented.", vbOKOnly, "WinHSPF Problem")
+
+        'If a mapwindow project exists (with the same base name), open it.
+
+        'If there is no mapwindow project, create a new one, add the wdm files from this HSPF 
+        'project to that new mapwindow project, and open that MapWindow project.
+
+        Dim myProcesses() As Process
+        myProcesses = Process.GetProcessesByName("MapWindow")
+        If myProcesses.Length = 0 Then
+            'open the mwprj if it exists, create it if not
+            Dim lWinHSPFBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+            Dim lMapWindowBinLoc As String = lWinHSPFBinLoc & "\..\..\..\bin\"
+            Dim lMapWindowProjectName As String = FilenameSetExt(pUCIFullFileName, "mwprj")
+
+            If FileExists(lMapWindowProjectName) Then
+                Process.Start(lMapWindowBinLoc & "MapWindow.exe", lMapWindowProjectName)
+            Else
+                'create a script to run from the mapwindow command line
+                Dim lStr As String = "Imports MapWindow.Interfaces" & vbCrLf & _
+                                     "Imports atcData" & vbCrLf & _
+                                     "Imports atcUtility" & vbCrLf & vbCrLf & _
+                                     "Module AutoLoad" & vbCrLf & vbCrLf & _
+                                     "    Public Sub ScriptMain(ByRef aMapWin As IMapWin)" & vbCrLf & _
+                                     "        Dim lFolder As String = " & """" & PathNameOnly(lMapWindowProjectName) & """" & vbCrLf & _
+                                     "        ChDriveDir(lFolder)" & vbCrLf & vbCrLf 
+
+                For lIndex As Integer = 0 To pUCI.FilesBlock.Count
+                    Dim lFile As HspfFile = pUCI.FilesBlock.Value(lIndex)
+                    If lFile.Typ.StartsWith("WDM") Then
+                        lStr = lStr & "        atcDataManager.OpenDataSource(" & """" & lFile.Name.Trim & """" & ")" & vbCrLf
+                    End If
+                Next
+                lStr = lStr & vbCrLf & "        aMapWin.Project.Save(" & """" & lMapWindowProjectName & """" & ")" & vbCrLf
+
+                lStr = lStr & vbCrLf & "    End Sub" & vbCrLf & _
+                                       "End Module"
+
+                Dim lScriptName As String = PathNameOnly(lMapWindowProjectName) & "\AutoLoad.vb"
+
+                IO.File.WriteAllText(lScriptName, lStr)
+                Process.Start(lMapWindowBinLoc & "MapWindow.exe", lScriptName)
+            End If
+        Else
+            Logger.Msg("A BASINS 4.0 MapWindow project is already open.", vbOKOnly, "WinHSPF View Output")
+        End If
+
+    End Sub
+
     Sub EditBlock(ByVal aParent As Windows.Forms.Form, ByVal aTableName As String)
         If aTableName = "GLOBAL" Then
             UCIForms.Edit(aParent, pUCI.GlobalBlock, aTableName, pHSPFManualName)
@@ -542,7 +592,7 @@ Public Module WinHSPF
     End Sub
 
     Public Function DefaultOpnId(ByVal aOpn As HspfOperation, ByVal aDefUCI As HspfUci) As Long
-        
+
         If aOpn.DefOpnId <> 0 Then
             DefaultOpnId = aOpn.DefOpnId
         Else
