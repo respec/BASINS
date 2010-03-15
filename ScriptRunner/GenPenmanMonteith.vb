@@ -9,17 +9,15 @@ Imports MapWinUtility
 Imports atcUtility
 Imports atcData
 Imports atcMetCmp
-'Imports atcDataTree
-'Imports atcEvents
 
 Public Module GenPenmanMonteithET
-    Private Const pOutputPath As String = "C:\TT_GCRP\WDM_Data\"
+    Private Const pOutputPath As String = "G:\TT_GCRP\WDM_Data\"
     Private Const pStationPath As String = "C:\BASINSMet\Stations\"
     Private pSWATStnFile As String = IO.Path.Combine(pOutputPath, "statwgn.txt")
 
-    Private pWriteSWATMet As Boolean = False
-    Private pdoPET As Boolean = True
-    Private pdoReport As Boolean = True
+    Private pWriteSWATMet As Boolean = True ' Switch to write SWAT met input file
+    Private pdoPET As Boolean = True ' Switch to do the actual PM PET calculation
+    Private pdoReport As Boolean = False
 
     'subroutine pmpevt(idmet,istyrZ,istdyZ,nbyrZ,sub_elevZ,sub_latZ,
     '&                 CO2Z,numdata,PrecipZ,TmaxZ,TminZ,PevtPMZ)
@@ -46,8 +44,7 @@ Public Module GenPenmanMonteithET
         Dim lSJD As Double
         Dim lEJD As Double
         Dim lsw As System.IO.StreamWriter
-        'lsw = New System.IO.StreamWriter(IO.Path.Combine(pOutputPath, "PMETReport.txt"), False)
-        lsw = New System.IO.StreamWriter(IO.Path.Combine(pOutputPath, "test1.txt"), False)
+        lsw = New System.IO.StreamWriter(IO.Path.Combine(pOutputPath, "PMETReport.txt"), False)
         Dim ldoneReport As Boolean = False
 
         Dim line As String = String.Empty
@@ -60,24 +57,7 @@ Public Module GenPenmanMonteithET
         Dim lNYrs As Integer
         Dim lCO2 As Double
 
-        Dim lCOOPIDs() As String = { _
-        "OR350595", _
-        "OR351735", _
-        "OR352325", _
-        "OR352348", _
-        "OR352493", _
-        "OR352693", _
-        "OR352997", _
-        "OR353908", _
-        "OR355384", _
-        "OR356151", _
-        "OR356334", _
-        "OR356749", _
-        "OR356751", _
-        "OR357127", _
-        "OR357572", _
-        "OR358466"}
-
+        'Create a station-number-keyed list of SWAT WGN parameters
         Dim lAllStnsList As Dictionary(Of String, String) = Nothing
         lAllStnsList = New Dictionary(Of String, String)
         Dim lsr As System.IO.StreamReader = Nothing
@@ -87,7 +67,6 @@ Public Module GenPenmanMonteithET
         While Not lsr.EndOfStream
             line = lsr.ReadLine()
             larr = line.Split(" ")
-            'lkey = larr(0) & " " & larr(3) ' e.g. AL 1
             lkey = larr(3) ' e.g. 249, but as a string
             lAllStnsList.Add(lkey, line)
             larr = Nothing
@@ -106,10 +85,10 @@ Public Module GenPenmanMonteithET
         Dim lkupFile As String = String.Empty
         For Each lFile As String In lFiles
 
-            'The current set up requires one StationList.txt be placed in the same folder as each wdm as look up guide
-            'as wdm holds pretty much all stations data, this should be manageable
+            'The current set up requires one StationList.txt be placed in the 
+            'same folder as each WDM file as look up guide
             lkupFile = IO.Path.Combine(IO.Path.GetDirectoryName(lFile), "StationList.txt")
-            'if a stationlist.txt is not there with the met.wdm, then skip it
+            'if a stationlist.txt is not there with a particular met.wdm, then skip it
             If Not IO.File.Exists(lkupFile) Then
                 Continue For
             End If
@@ -117,6 +96,8 @@ Public Module GenPenmanMonteithET
             Logger.Dbg("GenPenmanMonteith: Opening data file - " & lFile)
 
             If pdoPET Then
+
+                'Open WDM data file
                 Dim lWDMFile As atcWDM.atcDataSourceWDM = New atcWDM.atcDataSourceWDM
                 lWDMFile.Open(lFile)
 
@@ -141,7 +122,9 @@ Public Module GenPenmanMonteithET
 
                     Dim ltsTemp As atcTimeseries = Nothing
 
-                    'For report
+                    '************************
+                    'For report declaration
+                    '************************
                     Dim lAtemVals() As Double = Nothing
                     Dim lPrecValsMonthly() As Double = Nothing
                     Dim lPrecValsYearly() As Double = Nothing
@@ -159,7 +142,9 @@ Public Module GenPenmanMonteithET
                     Dim ldailyDates() As Double = Nothing
                     Dim lmonthDates() As Double = Nothing
                     Dim lyearDates() As Double = Nothing
-                    'End For report
+                    '***************************
+                    'End For report declaration
+                    '***************************
 
                     lswatStnKey = String.Empty
                     lswatStnKey = lPTPairList.Item(lStation).Split(",")(2)
@@ -194,14 +179,10 @@ Public Module GenPenmanMonteithET
                         lhasSWATParms = True
                     End If
 
-                    'For Each lCOOPID As String In lCOOPIDs
-                    '    If lStation = lCOOPID Then
-                    '        lhasSWATParms = True
-                    '        Exit For
-                    '    End If
-                    'Next
-
+                    'if there is no matching SWAT station, then bypass this station
                     If Not lhasSWATParms Then Continue For
+                    'write out SWAT parameter for SWAT fortran PMET routine to read
+                    'if fails, then bypass this station
                     If Not setSWATStn(lAllStnsList, lswatStnKey) Then Continue For
 
                     Logger.Dbg("GenPenmanMonteith:   For Station - " & lStation)
@@ -218,7 +199,8 @@ Public Module GenPenmanMonteithET
                         lTMinVals = Aggregate(ltsAtemSub, atcTimeUnit.TUDay, 1, atcTran.TranMin).Values
                         lTMaxVals = Aggregate(ltsAtemSub, atcTimeUnit.TUDay, 1, atcTran.TranMax).Values
 
-                        'More TS for report:
+                        'More timeseries for report purpose, set pdoReport to false to bypass these
+                        'as these are for debugging only
                         If pdoReport Then
                             lSJDText = ltsAtemSub.Attributes.GetFormattedValue("start date")
                             lEJDText = ltsAtemSub.Attributes.GetFormattedValue("end date")
@@ -257,6 +239,7 @@ Public Module GenPenmanMonteithET
                         lStationDBF.FindFirst(1, lStation.Substring(2))
                         lLat = lStationDBF.Value(4) 'in decimal degrees
                         lElev = lStationDBF.Value(6) 'in feet
+                        lElev = lElev * 0.3048 ' turn into meter
                         Dim lPMETValsSingle(lNVals) As Single
                         Dim lPrecValsSingle(lNVals) As Single
                         Dim lTMinValsSingle(lNVals) As Single
@@ -280,6 +263,7 @@ Public Module GenPenmanMonteithET
                         ltsPMET.Attributes.SetValue("description", "Daily SWAT PM ET mm")
                         ltsPMET.Attributes.SetValue("interval", 1.0)
                         ltsPMET.Attributes.SetValue("TSTYPE", "PMET")
+                        ltsPMET.Attributes.SetValue("Latitude", lLat)
                         J2Date(lSJD, lDate)
                         ltsPMET.Attributes.SetValue("TSBYR", lDate(0))
                         ltsPMET.Dates.Values = NewDates(lSJD, lEJD, atcTimeUnit.TUDay, 1)
@@ -303,16 +287,19 @@ Public Module GenPenmanMonteithET
                             Logger.Dbg("DEFAULT Latitiude")
                             lLatitude = 45
                         End If
+
+                        'Disaggragate the daily PMET timeseries into hourly timeseries
                         ltsPMETHour = atcMetCmp.DisSolPet(ltsPMET, Nothing, 2, lLatitude)
                         ltsPMETHour.Attributes.SetValue("Constituent", ltsPMET.Attributes.GetDefinedValue("Constituent").Value)
                         ltsPMETHour.Attributes.SetValue("TSTYPE", ltsPMET.Attributes.GetDefinedValue("TSTYPE").Value)
                         ltsPMETHour.Attributes.SetValue("ID", ltsPMET.Attributes.GetDefinedValue("ID").Value)
 
+                        'Add the newly calculated hourly PMET timeseries back into the current WDM, overwrite if already exists.
                         If lWDMFile.AddDataset(ltsPMETHour, atcDataSource.EnumExistAction.ExistReplace) Then
                             Logger.Dbg("GenPenmanMonteith:   Wrote Penman-Monteith PET to DSN " & ltsAtemID + 6 & " SumAnnual " & ltsPMETHour.Attributes.GetDefinedValue("SumAnnual").Value)
                             If pdoReport Then
-                                lPMETValsMonthly = Aggregate(ltsPMETHour, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv).Values ' For report
-                                lPMETValsYearly = Aggregate(ltsPMETHour, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv).Values  ' For report
+                                lPMETValsMonthly = Aggregate(ltsPMETHour, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv).Values ' For report only
+                                lPMETValsYearly = Aggregate(ltsPMETHour, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv).Values  ' For report only
                             End If
                         Else
 PMETTSPROBLEM:
@@ -322,6 +309,9 @@ PMETTSPROBLEM:
                         Logger.Dbg("GenPenmanMonteith:   No common period available for Precip and Air Temp data")
                     End If
 
+                    '******************************************
+                    'Do the actual debugging report STARTs
+                    '******************************************
                     If pdoReport Then
                         'Do report for just the Sherburn 3WSW station: MN217602
                         If lStation = "XX111111" Then
@@ -329,7 +319,7 @@ PMETTSPROBLEM:
                         Else
                             ldoneReport = True
                         End If
-                        If ldoneReport Then GoTo clearEnd
+                        If ldoneReport Then GoTo EndCleanUp
 
                         lsw.WriteLine("============================================================")
                         lsw.WriteLine("==============  " & lStation & " Starts ====================")
@@ -386,7 +376,9 @@ PMETTSPROBLEM:
 
                         ldoneReport = True
                     End If
-
+                    '******************************************
+                    'Do the actual debugging report ENDs
+                    '******************************************
 
                     'Write out SWAT met data for individual station
                     'Dim lprojectFolder As String = IO.Path.GetDirectoryName(lFile)
@@ -427,13 +419,13 @@ PMETTSPROBLEM:
                     '    Logger.Flush()
                     'End Try
 
-clearEnd:
+EndCleanUp:
                     'lstationWDMFile = Nothing
                     If ltsPrec IsNot Nothing Then ltsPrec.Clear()
                     If ltsAtem IsNot Nothing Then ltsAtem.Clear()
                     If ltsPEVT IsNot Nothing Then ltsPEVT.Clear() 'for report
                     If ltsPMET IsNot Nothing Then ltsPMET.Clear()
-                    If ltsPMETHour IsNot Nothing Then ltsPMETHour.clear()
+                    If ltsPMETHour IsNot Nothing Then ltsPMETHour.Clear()
                     If lAtemVals IsNot Nothing Then Array.Clear(lAtemVals, 0, lAtemVals.Length)
                     If lPrecValsMonthly IsNot Nothing Then Array.Clear(lPrecValsMonthly, 0, lPrecValsMonthly.Length)
                     If lPrecValsYearly IsNot Nothing Then Array.Clear(lPrecValsYearly, 0, lPrecValsYearly.Length)
@@ -465,23 +457,26 @@ clearEnd:
                     Logger.Dbg(MemUsage)
                 Next ' lPTPairList
                 'Close it to let the added dataset finalize
-                'lWDMFile.DataSets.Clear()
                 lWDMFile.Clear()
                 lWDMFile = Nothing
                 GC.Collect()
                 System.Threading.Thread.Sleep(30)
+                Debug.Print("Finished PM PMET Calculation for " & lFile)
             End If
 
+            'Write out SWAT met data for a group of stations in a given WDM
             If pWriteSWATMet Then
                 Dim lWDMFile As atcWDM.atcDataSourceWDM = New atcWDM.atcDataSourceWDM
                 lWDMFile.Open(lFile)
 
-                'Write out SWAT met data for a group of stations in a given WDM
                 Dim lprojectFolder As String = IO.Path.GetDirectoryName(lFile)
                 Dim lsaveInFolder As String = lprojectFolder
 
                 Logger.Dbg("GenPenmanMonteith: Write SWAT input: Opening WDM file - " & lFile)
 
+                'The start and ending dates allow user to specify duration
+                'currently, these are not used by the outputing routine, but could be 
+                'activated later on
                 lSJD = Jday(1970, 1, 1, 0, 0, 0)
                 lEJD = Jday(2006, 12, 31, 24, 0, 0)
                 Try
@@ -492,11 +487,11 @@ clearEnd:
                     Logger.Flush()
                 End Try
 
-                'lWDMFile.DataSets.Clear()
                 lWDMFile.Clear()
                 lWDMFile = Nothing
                 GC.Collect()
                 System.Threading.Thread.Sleep(30)
+                Debug.Print("Finished SWAT input file creation for " & lFile)
             End If
         Next ' lFiles
         lsw.Close()
@@ -538,6 +533,14 @@ clearEnd:
         Return aPTPairList.Count
     End Function
 
+    ''' <summary>
+    ''' This routine is to populate a list of matching precip and temperature timeseries in aWDM file
+    ''' </summary>
+    ''' <param name="aPTPairList">The resulting list of matching PREC and ATEM Timeseries</param>
+    ''' <param name="aWDMFile">The current WDM under processing</param>
+    ''' <param name="alkupFile">The list of SWAT WGN parameter, keyed by station numbers</param>
+    ''' <returns>List of matching PREC and ATEM timeseries IDs and correspoinding SWAT WGN station number</returns>
+    ''' <remarks></remarks>
     Public Function getRainTempPairs(ByRef aPTPairList As Dictionary(Of String, String), ByVal aWDMFile As atcWDM.atcDataSourceWDM, ByVal alkupFile As String) As Integer
         Dim lsr As System.IO.StreamReader = Nothing
         Dim locPrec As String = String.Empty
@@ -578,7 +581,7 @@ clearEnd:
             For i As Integer = 0 To aWDMFile.DataSets.Count - 1
                 If aWDMFile.DataSets.Item(i).Attributes.GetFormattedValue("Location") = lkey Then
                     If aWDMFile.DataSets.Item(i).Attributes.GetFormattedValue("Constituent") = "PEVT" Then
-                        line = line & "," & aWDMFile.DataSets.Item(i).Attributes.GetFormattedValue("ID").ToString
+                        line = line & "," & aWDMFile.DataSets.Item(i).Attributes.GetFormattedValue("ID").ToString.Replace(",", "")
                         Exit For
                     End If
                 End If
@@ -617,7 +620,16 @@ clearEnd:
         lsr.Close()
         Return lswatKey
     End Function
-    Public Function setSWATStn(ByRef aDictionary As Dictionary(Of String, String), ByVal aKey As String) As Boolean
+
+    ''' <summary>
+    ''' This function extract the SWAT parameters for a given station
+    ''' and write it out to a file, which is to be read by SWAT FORTRAN PMET routine
+    ''' </summary>
+    ''' <param name="aDictionary">The dictionary of SWAT WGN stations and its parameters</param>
+    ''' <param name="aKey">a SWAT station id</param>
+    ''' <returns>True, if process is successful; False, if failed during process</returns>
+    ''' <remarks></remarks>
+    Public Function setSWATStn(ByVal aDictionary As Dictionary(Of String, String), ByVal aKey As String) As Boolean
         Dim lhasStats As Boolean = False
         For Each lkey As String In aDictionary.Keys
             If lkey = aKey Then
