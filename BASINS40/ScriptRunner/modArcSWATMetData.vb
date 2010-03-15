@@ -29,6 +29,7 @@ Module modArcSWATMetData
         'Logger.Dbg(MemUsage(), "Before Writing TMP")
         GC.Collect()
         System.Threading.Thread.Sleep(30)
+
         'Logger.Dbg(MemUsage(), "Before Writing SLR")
         'WriteSLR(aWDMMetFile, aStationLkUpTable, aSaveInFolder, aDateStart, aDateEnd, True)
         'Logger.Dbg(MemUsage(), "Before Writing SLR")
@@ -46,11 +47,12 @@ Module modArcSWATMetData
         'Logger.Dbg(MemUsage(), "Before Writing PCP")
         'GC.Collect()
         'GC.WaitForPendingFinalizers()
+
         ''WriteDEWGroup(aWDMMetFile, aStationLkupTable, aSaveInFolder, aDateStart, aDateEnd)
         ''WriteCLOGroup(aWDMMetFile, aStationLkupTable, aSaveInFolder, aDateStart, aDateEnd)
     End Sub
 
-    'Write the SWAT precipitation file and return the timeseries used to write the file
+    'Writes the SWAT precipitation file and returns the timeseries used to write the file
     Public Function WritePCP(ByVal aWDM As atcDataSource, _
                               ByVal aStationLkUpTable As atcTableDBF, _
                               ByVal aSaveInFolder As String, _

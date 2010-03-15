@@ -167,7 +167,8 @@ DOGRAPH:
         'CreateChartErrorBar(lZgc)
         'CreateChartOHLC(lZgc)
         'CreateGraphCandlestick(lZgc)
-        CreateChartTD(lZgc)
+        'CreateChartTDBarOverlay(lZgc)
+        CreateChartTDHiLowBar(lZgc)
         lZgc.SaveAs(lfilename)
         OpenFile(lfilename)
     End Sub
@@ -194,7 +195,6 @@ DOGRAPH:
         myFill.SecondaryValueGradientColor = Color.Empty
         myFill.RangeMin = 1
         myFill.RangeMax = 2
-
 
         Dim lpaneBgcolor As Color = Color.White
         Dim lpaneBgfill As New Fill(lpaneBgcolor)
@@ -831,7 +831,7 @@ DOGRAPH:
     End Sub
 
     ' Call this method from the Form_Load method, passing your ZedGraphControl
-    Public Sub CreateChartTD(ByVal zgc As ZedGraphControl)
+    Public Sub CreateChartTDBarOverlay(ByVal zgc As ZedGraphControl)
         Dim myPane As GraphPane = zgc.GraphPane
 
         ' Set the title and axis labels
@@ -860,13 +860,12 @@ DOGRAPH:
         Dim myCurve As BarItem = myPane.AddBar("", x2, Nothing, Color.Blue)
         ' Fill the bar with a Blue-white-Blue color gradient for a 3d look
         myCurve.Bar.Fill = New Fill(Color.Red, Color.White, Color.Blue, 90.0F)
-        myCurve.Item(5).ColorValue = 0.0
+        myCurve.Item(5).ColorValue = 0.0 ' This is trying to get rid of the color for one data point, failed.
 
         ' Generate a red bar with "Curve 1" in the legend
         myCurve = myPane.AddBar("", x, Nothing, Color.Blue)
         ' Fill the bar with a red-white-red color gradient for a 3d look
         myCurve.Bar.Fill = New Fill(Color.Blue, Color.White, Color.Blue, 90.0F)
-
 
         ' Draw the Y tics between the labels instead of at the labels
         myPane.YAxis.MajorTic.IsBetweenLabels = True
@@ -875,6 +874,9 @@ DOGRAPH:
         myPane.YAxis.Scale.TextLabels = labels
         ' Set the YAxis to Text type
         myPane.YAxis.Type = AxisType.Text
+
+        myPane.XAxis.Scale.Min = -80
+        myPane.XAxis.Scale.Max = +80
 
         ' Set the bar type to stack, which stacks the bars by automatically accumulating the values
         myPane.BarSettings.Type = BarType.Overlay ' Important
@@ -888,5 +890,56 @@ DOGRAPH:
         ' Calculate the Axis Scale Ranges
         zgc.AxisChange()
     End Sub
+
+    Public Sub CreateChartTDHiLowBar(ByVal zgc As ZedGraphControl)
+        Dim myPane As GraphPane = zgc.GraphPane
+
+        ' Set the title and axis labels
+
+        myPane.Title.Text = "N Applied"
+        myPane.YAxis.Title.Text = "Scenarios"
+        myPane.XAxis.Title.Text = "Percent change from baseline value (%)"
+        myPane.Legend.Position = LegendPos.TopCenter
+        myPane.Legend.IsVisible = True
+        myPane.XAxis.MajorGrid.IsZeroLine = True
+
+        ' Make up some data points
+        Dim labels As String() = {"(8) RS", "(17) AFNSTRS", "(21) AFRate", "(27) PCP", "(59) AFEff", "(64) TMP"}
+
+        Dim xLow As Double() = {0, -1.96, -5.36, -6.38, -12.2, -39.03}
+        Dim xHigh As Double() = {7.62, 5.03, 3.58, 4.32, 12.7, -5.99}
+        Dim y As Double() = {0, 1, 2, 3, 4, 5}
+
+        ' Generate a blue bar with "Curve 2" in the legend
+        Dim myCurve As HiLowBarItem = myPane.AddHiLowBar("", xHigh, y, xLow, Color.Blue)
+        ' Fill the bar with a Blue-white-Blue color gradient for a 3d look
+
+        Bar.Default.IsBorderVisible = False
+
+        With myCurve
+            .Bar.Fill = New Fill(Color.Blue)
+            .Label.IsVisible = True
+            .Bar.Border.Color = Color.Blue
+            .Label.IsVisible = True
+        End With
+
+        ' Draw the Y tics between the labels instead of at the labels
+        myPane.YAxis.MajorTic.IsBetweenLabels = False
+
+        ' Set the YAxis labels
+        myPane.YAxis.Scale.TextLabels = labels
+        ' Set the YAxis to Text type
+        myPane.YAxis.Type = AxisType.Text
+
+        ' Make the bars horizontal by setting the BarBase to "Y"
+        myPane.BarSettings.Base = BarBase.Y  ' Important
+
+        ' Fill the chart background with a color gradient
+        myPane.Chart.Fill = New Fill(Color.White, Color.FromArgb(255, 255, 166), 45.0F)
+
+        ' Calculate the Axis Scale Ranges
+        zgc.AxisChange()
+    End Sub
+
 
 End Module
