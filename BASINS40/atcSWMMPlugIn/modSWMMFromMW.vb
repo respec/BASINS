@@ -640,7 +640,7 @@ Friend Module modSWMMFromMW
                 Logger.Dbg("LookThrough " & lDataSource.DataSets.Count & " Datasets")
                 For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
                     lCounter += 1
-                    Logger.Progress(lCounter, lDataSource.DataSets.Count)
+                    Logger.Progress("Building list of valid station names...", lCounter, lDataSource.DataSets.Count)
 
                     If (lDataSet.Attributes.GetValue("Scenario") = "OBSERVED" Or lDataSet.Attributes.GetValue("Scenario") = "COMPUTED") _
                         And lDataSet.Attributes.GetValue("Constituent") = aMetConstituent Then

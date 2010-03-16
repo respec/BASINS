@@ -96,7 +96,7 @@ Module modModelSetup
                 Dim lCounter As Integer = 0
                 For Each lDataSet As atcTimeseries In lDataSource.DataSets
                     lCounter += 1
-                    Logger.Progress(lCounter, lDataSource.DataSets.Count)
+                    Logger.Progress("Building List of Met Station Names", lCounter, lDataSource.DataSets.Count)
 
                     If (lDataSet.Attributes.GetValue("Scenario") = "OBSERVED" Or lDataSet.Attributes.GetValue("Scenario") = "COMPUTED") _
                         And lDataSet.Attributes.GetValue("Constituent") = "PREC" Then
