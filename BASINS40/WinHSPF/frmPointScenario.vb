@@ -15,7 +15,7 @@ Public Class frmPointScenario
         cboBase.Items.Clear()
         Dim lTs As Collection = pUCI.FindTimser("", "", "")
         For lIndex As Integer = 1 To lTs.Count
-            Dim lCtemp As String = lTs(lIndex).Header.sen
+            Dim lCtemp As String = lTs(lIndex).Attributes.GetValue("Scenario")
             If lCtemp.Length > 3 Then
                 If Mid(lCtemp, 1, 3) = "PT-" Then
                     lCtemp = Mid(lCtemp, 4)

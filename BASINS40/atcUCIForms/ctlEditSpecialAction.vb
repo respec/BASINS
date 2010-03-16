@@ -95,7 +95,7 @@ Public Class ctlEditSpecialAction
                     If atcgrid0.Source.CellValue(lRow, 0) = "Action" Then
                         'get next record from this tab
                         rowcount = rowcount + 1
-                        newText = "   "
+                        newText = "  "
                         newText = BlankPad(newText & .CellValue(rowcount, 0), 8)
                         ctemp = "   "
                         ctemp = RSet(.CellValue(rowcount, 1), Len(ctemp))
@@ -740,10 +740,13 @@ Public Class ctlEditSpecialAction
                             .CellValue(.Rows - 1, 14) = Mid(newText, 74, 5)
                         End If
                     Next
-                    If .Rows > 1 Then
-                        .Rows = .Rows - 1
-                    End If
+                    For j As Integer = 0 To .Columns - 1
+                        For k As Integer = 1 To .Rows - 1
+                            .CellEditable(k, j) = True
+                        Next
+                    Next
                     atcgrid2.SizeAllColumnsToContents(atcgrid2.Width - pVScrollColumnOffset, True)
+                    atcgrid2.Refresh()
                 End With
             ElseIf tabSpecial.SelectedIndex = 3 Then
                 'uvname
@@ -774,7 +777,13 @@ Public Class ctlEditSpecialAction
                             .CellValue(.Rows - 1, 13) = Mid(newText, 71, 4)
                         End If
                     Next
+                    For j As Integer = 0 To .Columns - 1
+                        For k As Integer = 1 To .Rows - 1
+                            .CellEditable(k, j) = True
+                        Next
+                    Next
                     atcgrid3.SizeAllColumnsToContents(atcgrid3.Width - pVScrollColumnOffset, True)
+                    atcgrid3.Refresh()
                 End With
             ElseIf tabSpecial.SelectedIndex = 4 Then
                 'User Defn Quan
@@ -813,17 +822,29 @@ Public Class ctlEditSpecialAction
                             .CellValue(.Rows - 1, 13) = Mid(newText, 67, 4)
                         End If
                     Next
+                    For j As Integer = 0 To .Columns - 1
+                        For k As Integer = 1 To .Rows - 1
+                            .CellEditable(k, j) = True
+                        Next
+                    Next
                     atcgrid4.SizeAllColumnsToContents(atcgrid4.Width - pVScrollColumnOffset, True)
+                    atcgrid4.Refresh()
                 End With
             ElseIf tabSpecial.SelectedIndex = 5 Then
                 'conditionals
                 With atcgrid5.Source
                     .Columns = 1
-                    .Rows = 2
+                    .Rows = 1
                     For lRow = 1 To atcgrid0.Source.Rows
                         If atcgrid0.Source.CellValue(lRow, 0) = "Condition" Then
+                            .Rows = .Rows + 1
                             .CellValue(.Rows - 1, 0) = atcgrid0.Source.CellValue(lRow, 1)
                         End If
+                    Next
+                    For j As Integer = 0 To .Columns - 1
+                        For k As Integer = 1 To .Rows - 1
+                            .CellEditable(k, j) = True
+                        Next
                     Next
                     atcgrid5.SizeAllColumnsToContents(atcgrid5.Width - pVScrollColumnOffset, True)
                     atcgrid5.Refresh()

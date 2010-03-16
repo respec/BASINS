@@ -167,10 +167,10 @@ Partial Class frmAddExpert
         'atxBase
         '
         Me.atxBase.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxBase.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
+        Me.atxBase.DataType = atcControls.atcText.ATCoDataType.ATCoInt
         Me.atxBase.DefaultValue = ""
         Me.atxBase.HardMax = -999
-        Me.atxBase.HardMin = -999
+        Me.atxBase.HardMin = 1
         Me.atxBase.InsideLimitsBackground = System.Drawing.Color.White
         Me.atxBase.Location = New System.Drawing.Point(224, 298)
         Me.atxBase.Margin = New System.Windows.Forms.Padding(4)
@@ -186,8 +186,8 @@ Partial Class frmAddExpert
         Me.atxBase.SoftMax = -999
         Me.atxBase.SoftMin = -999
         Me.atxBase.TabIndex = 17
-        Me.atxBase.ValueDouble = 0
-        Me.atxBase.ValueInteger = 0
+        Me.atxBase.ValueDouble = 1000
+        Me.atxBase.ValueInteger = 1000
         '
         'txtLoc
         '

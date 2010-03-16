@@ -328,16 +328,21 @@ Public Class ctlEditMassLinks
     End Sub
 
     Private Sub cmdAddNew_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAddNew.Click
-        Dim lOper As Integer
-
-        For lOper = 1 To cboID.Items.Count - 1
-            If Not cboID.Items.Contains(lOper) Then
-                cboID.Items.Insert(lOper - 1, lOper)
-                cboID.SelectedIndex = lOper - 1
-                Exit For
+        Dim lId As Integer, lFound As Boolean
+        'look for unused ml id
+        lId = 0
+        lFound = True
+        Do Until lFound = False
+            lId = lId + 1
+            lFound = False
+            If cboID.Items.Contains(lId) Then
+                lFound = True
             End If
-        Next
+        Loop
+        cboID.Items.Add(lId)
+        cboID.SelectedIndex = cboID.Items.Count - 1
 
+        lMassLinkIdStarter.Add(lId)
     End Sub
 
 End Class

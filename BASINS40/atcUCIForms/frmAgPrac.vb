@@ -33,7 +33,7 @@ Public Class frmAgPrac
         GroupLayers.Visible = True
         GroupPar.Visible = True
         GroupProps.Visible = True
-        Height = 555
+        'Height = 555
 
         comboRep.Items.Clear()
         comboRep.Items.Add("None")

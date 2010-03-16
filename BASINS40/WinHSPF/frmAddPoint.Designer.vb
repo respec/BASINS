@@ -99,27 +99,25 @@ Partial Class frmAddPoint
         Me.cboReach.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboReach.FormattingEnabled = True
         Me.cboReach.Location = New System.Drawing.Point(115, 46)
-        Me.cboReach.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cboReach.Margin = New System.Windows.Forms.Padding(4)
         Me.cboReach.Name = "cboReach"
         Me.cboReach.Size = New System.Drawing.Size(344, 24)
         Me.cboReach.TabIndex = 7
         '
         'cboPollutant
         '
-        Me.cboPollutant.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboPollutant.FormattingEnabled = True
         Me.cboPollutant.Location = New System.Drawing.Point(115, 79)
-        Me.cboPollutant.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cboPollutant.Margin = New System.Windows.Forms.Padding(4)
         Me.cboPollutant.Name = "cboPollutant"
         Me.cboPollutant.Size = New System.Drawing.Size(344, 24)
         Me.cboPollutant.TabIndex = 8
         '
         'cboFac
         '
-        Me.cboFac.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboFac.FormattingEnabled = True
         Me.cboFac.Location = New System.Drawing.Point(115, 112)
-        Me.cboFac.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cboFac.Margin = New System.Windows.Forms.Padding(4)
         Me.cboFac.Name = "cboFac"
         Me.cboFac.Size = New System.Drawing.Size(344, 24)
         Me.cboFac.TabIndex = 9
@@ -129,7 +127,7 @@ Partial Class frmAddPoint
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdCancel.Location = New System.Drawing.Point(245, 207)
-        Me.cmdCancel.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdCancel.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(135, 32)
         Me.cmdCancel.TabIndex = 20
@@ -140,7 +138,7 @@ Partial Class frmAddPoint
         '
         Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdOK.Location = New System.Drawing.Point(100, 207)
-        Me.cmdOK.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.cmdOK.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdOK.Name = "cmdOK"
         Me.cmdOK.Size = New System.Drawing.Size(135, 32)
         Me.cmdOK.TabIndex = 19
@@ -156,7 +154,7 @@ Partial Class frmAddPoint
         Me.atxValue.HardMin = -999
         Me.atxValue.InsideLimitsBackground = System.Drawing.Color.White
         Me.atxValue.Location = New System.Drawing.Point(115, 145)
-        Me.atxValue.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.atxValue.Margin = New System.Windows.Forms.Padding(4)
         Me.atxValue.MaxWidth = 20
         Me.atxValue.Name = "atxValue"
         Me.atxValue.NumericFormat = "0.#####"
@@ -181,7 +179,7 @@ Partial Class frmAddPoint
         Me.txtScen.HardMin = -999
         Me.txtScen.InsideLimitsBackground = System.Drawing.Color.White
         Me.txtScen.Location = New System.Drawing.Point(144, 14)
-        Me.txtScen.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.txtScen.Margin = New System.Windows.Forms.Padding(4)
         Me.txtScen.MaxWidth = 20
         Me.txtScen.Name = "txtScen"
         Me.txtScen.NumericFormat = "0.#####"
@@ -215,7 +213,7 @@ Partial Class frmAddPoint
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.Label1)
         Me.KeyPreview = True
-        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmAddPoint"
         Me.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide
         Me.Text = "WinHSPF - Create Point Source"
