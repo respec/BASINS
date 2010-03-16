@@ -55,7 +55,7 @@ Friend Class frmModelSegmentation
                 GisUtil.StartSetFeatureValue(lSubbasinLayerIndex)
                 For lSubBasinIndex As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
                     'do progress
-                    Logger.Progress(lSubBasinIndex, GisUtil.NumFeatures(lSubbasinLayerIndex))
+                    Logger.Progress("Assigning Nearest Met Station", lSubBasinIndex, GisUtil.NumFeatures(lSubbasinLayerIndex))
                     System.Windows.Forms.Application.DoEvents()
                     'get centroid of this subbasin
                     GisUtil.ShapeCentroid(lSubbasinLayerIndex, lSubBasinIndex - 1, lSubBasinX, lSubBasinY)

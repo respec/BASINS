@@ -1389,11 +1389,11 @@ Public Class GisUtil
                     End If
                 End If
                 lCellCount += 1
-                If pStatusShow Then Logger.Progress(lCellCount, lTotalCellCount)
+                If pStatusShow Then Logger.Progress("Tabulating Areas...", lCellCount, lTotalCellCount)
             Next lCol
         Next lRow
 
-        If pStatusShow Then Logger.Progress(lTotalCellCount, lTotalCellCount)
+        If pStatusShow Then Logger.Progress("Tabulating Areas...", lTotalCellCount, lTotalCellCount)
         lPolygonSf.EndPointInShapefile()
 
     End Sub
@@ -1449,10 +1449,10 @@ Public Class GisUtil
                         End If
                     End If
                     cellcount = cellcount + 1
-                    If pStatusShow Then Logger.Progress(cellcount, totalcellcount)
+                    If pStatusShow Then Logger.Progress("Finding max/min grid values in polygon", cellcount, totalcellcount)
                 Next lRow
             Next lCol
-            If pStatusShow Then Logger.Progress(totalcellcount, totalcellcount)
+            If pStatusShow Then Logger.Progress("Finding max/min grid values in polygon", totalcellcount, totalcellcount)
             lPolygonSf.EndPointInShapefile()
         End If
     End Sub
@@ -1752,7 +1752,7 @@ Public Class GisUtil
 
             lSf1Ext = Nothing
             lShape1 = Nothing
-            If pStatusShow Then Logger.Progress(lPolygonCount, lTotalPolygonCount)
+            If pStatusShow Then Logger.Progress("Overlay of Layer '" & lLayer1.Name & "' with Layer '" & lLayer2.Name & "'", lPolygonCount, lTotalPolygonCount)
         Next i
         If pStatusShow Then Logger.Progress(lTotalPolygonCount, lTotalPolygonCount)
 
@@ -1938,7 +1938,7 @@ Public Class GisUtil
             lSf1Ext = Nothing
             lShape1 = Nothing
 
-            If pStatusShow Then Logger.Progress(lPolygonCount, lTotalPolygonCount)
+            If pStatusShow Then Logger.Progress("Tabulating Polygon Areas...", lPolygonCount, lTotalPolygonCount)
         Next i
         If pStatusShow Then Logger.Progress(lTotalPolygonCount, lTotalPolygonCount)
 
@@ -1995,7 +1995,7 @@ Public Class GisUtil
             lShapeClip = lSfClip.Shape(i - 1)
             For j = 1 To lSf.NumShapes
                 lCount += 1
-                If pStatusShow Then Logger.Progress(lCount, lTotal)
+                If pStatusShow Then Logger.Progress("Clipping Shapes with Polygon...", lCount, lTotal)
                 If IsLineInPolygon(lSf.Shape(j - 1), lSfClip, i - 1) Then
                     'at least one point of the line is in the polygon
                     If IsLineEntirelyInPolygon(lSf.Shape(j - 1), lSfClip, i - 1) Then
@@ -2091,7 +2091,7 @@ Public Class GisUtil
         'merge together based on common endpoints
         Dim i As Integer = 0
         Do While i < lsf.NumShapes
-            If pStatusShow Then Logger.Progress(i, lsf.NumShapes)
+            If pStatusShow Then Logger.Progress("Merging Features...", i, lsf.NumShapes)
             lFound = False
             Dim lShape1 As MapWinGIS.Shape = lsf.Shape(i)
             Dim lTargetVal As Integer = FieldValue(aLayerIndex, i, aFieldIndex)
@@ -2135,7 +2135,7 @@ Public Class GisUtil
             Dim lEndY2 As Double
             i = 0
             Do While i < lsf.NumShapes
-                If pStatusShow Then Logger.Progress(i, lsf.NumShapes)
+                If pStatusShow Then Logger.Progress("Merging Features...", i, lsf.NumShapes)
                 lFound = False
                 Dim lShape1 As MapWinGIS.Shape = lsf.Shape(i)
                 Dim lTargetVal As Integer = FieldValue(aLayerIndex, i, aFieldIndex)

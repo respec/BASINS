@@ -59,21 +59,21 @@ Public Class frmStatus
         '
         Me.txtDetails.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtDetails.Location = New System.Drawing.Point(12, 54)
+        Me.txtDetails.Location = New System.Drawing.Point(14, 62)
         Me.txtDetails.Multiline = True
         Me.txtDetails.Name = "txtDetails"
         Me.txtDetails.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtDetails.Size = New System.Drawing.Size(490, 59)
+        Me.txtDetails.Size = New System.Drawing.Size(485, 68)
         Me.txtDetails.TabIndex = 2
         '
         'btnCancel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.AutoSize = True
-        Me.btnCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnCancel.Location = New System.Drawing.Point(12, 14)
+        Me.btnCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnCancel.Location = New System.Drawing.Point(14, 7)
         Me.btnCancel.Name = "btnCancel"
-        Me.btnCancel.Size = New System.Drawing.Size(65, 26)
+        Me.btnCancel.Size = New System.Drawing.Size(81, 31)
         Me.btnCancel.TabIndex = 7
         Me.btnCancel.Text = "Cancel"
         Me.btnCancel.UseVisualStyleBackColor = True
@@ -82,10 +82,10 @@ Public Class frmStatus
         '
         Me.btnPause.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnPause.AutoSize = True
-        Me.btnPause.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnPause.Location = New System.Drawing.Point(83, 14)
+        Me.btnPause.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnPause.Location = New System.Drawing.Point(100, 7)
         Me.btnPause.Name = "btnPause"
-        Me.btnPause.Size = New System.Drawing.Size(65, 26)
+        Me.btnPause.Size = New System.Drawing.Size(78, 31)
         Me.btnPause.TabIndex = 8
         Me.btnPause.Text = "Pause"
         Me.btnPause.UseVisualStyleBackColor = True
@@ -94,10 +94,10 @@ Public Class frmStatus
         '
         Me.btnLog.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnLog.AutoSize = True
-        Me.btnLog.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnLog.Location = New System.Drawing.Point(154, 14)
+        Me.btnLog.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnLog.Location = New System.Drawing.Point(185, 7)
         Me.btnLog.Name = "btnLog"
-        Me.btnLog.Size = New System.Drawing.Size(65, 26)
+        Me.btnLog.Size = New System.Drawing.Size(78, 31)
         Me.btnLog.TabIndex = 9
         Me.btnLog.Text = "Log"
         Me.btnLog.UseVisualStyleBackColor = True
@@ -107,17 +107,17 @@ Public Class frmStatus
         Me.lblBottom.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblBottom.AutoSize = True
         Me.lblBottom.BackColor = System.Drawing.Color.Transparent
-        Me.lblBottom.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblBottom.Location = New System.Drawing.Point(225, 21)
+        Me.lblBottom.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblBottom.Location = New System.Drawing.Point(270, 16)
         Me.lblBottom.Name = "lblBottom"
-        Me.lblBottom.Size = New System.Drawing.Size(59, 13)
+        Me.lblBottom.Size = New System.Drawing.Size(66, 17)
         Me.lblBottom.TabIndex = 13
         Me.lblBottom.Text = "lblBottom"
         Me.lblBottom.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'frmStatus
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
         Me.ClientSize = New System.Drawing.Size(514, 52)
         Me.Controls.Add(Me.lblBottom)
         Me.Controls.Add(Me.btnLog)
