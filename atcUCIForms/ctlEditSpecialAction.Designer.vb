@@ -54,19 +54,21 @@ Partial Class ctlEditSpecialAction
         Me.tabSpecial.Controls.Add(Me.TabPage4)
         Me.tabSpecial.Controls.Add(Me.TabPage5)
         Me.tabSpecial.Controls.Add(Me.TabPage6)
-        Me.tabSpecial.Location = New System.Drawing.Point(8, 5)
+        Me.tabSpecial.Location = New System.Drawing.Point(11, 6)
+        Me.tabSpecial.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.tabSpecial.Name = "tabSpecial"
         Me.tabSpecial.SelectedIndex = 0
-        Me.tabSpecial.Size = New System.Drawing.Size(924, 473)
+        Me.tabSpecial.Size = New System.Drawing.Size(1021, 297)
         Me.tabSpecial.TabIndex = 0
         '
         'REcords
         '
         Me.REcords.Controls.Add(Me.atcgrid0)
-        Me.REcords.Location = New System.Drawing.Point(4, 22)
+        Me.REcords.Location = New System.Drawing.Point(4, 25)
+        Me.REcords.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.REcords.Name = "REcords"
-        Me.REcords.Padding = New System.Windows.Forms.Padding(3)
-        Me.REcords.Size = New System.Drawing.Size(916, 447)
+        Me.REcords.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.REcords.Size = New System.Drawing.Size(1013, 268)
         Me.REcords.TabIndex = 0
         Me.REcords.Text = "Records"
         Me.REcords.UseVisualStyleBackColor = True
@@ -84,19 +86,21 @@ Partial Class ctlEditSpecialAction
         Me.atcgrid0.Fixed3D = False
         Me.atcgrid0.LineColor = System.Drawing.Color.Empty
         Me.atcgrid0.LineWidth = 0.0!
-        Me.atcgrid0.Location = New System.Drawing.Point(7, 10)
+        Me.atcgrid0.Location = New System.Drawing.Point(9, 12)
+        Me.atcgrid0.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.atcgrid0.Name = "atcgrid0"
-        Me.atcgrid0.Size = New System.Drawing.Size(901, 431)
+        Me.atcgrid0.Size = New System.Drawing.Size(990, 245)
         Me.atcgrid0.Source = Nothing
         Me.atcgrid0.TabIndex = 0
         '
         'TabPage2
         '
         Me.TabPage2.Controls.Add(Me.atcgrid1)
-        Me.TabPage2.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage2.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(915, 446)
+        Me.TabPage2.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.TabPage2.Size = New System.Drawing.Size(1224, 553)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Actions"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -112,19 +116,21 @@ Partial Class ctlEditSpecialAction
         Me.atcgrid1.Fixed3D = False
         Me.atcgrid1.LineColor = System.Drawing.Color.Empty
         Me.atcgrid1.LineWidth = 0.0!
-        Me.atcgrid1.Location = New System.Drawing.Point(7, 8)
+        Me.atcgrid1.Location = New System.Drawing.Point(9, 10)
+        Me.atcgrid1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.atcgrid1.Name = "atcgrid1"
-        Me.atcgrid1.Size = New System.Drawing.Size(900, 430)
+        Me.atcgrid1.Size = New System.Drawing.Size(1200, 529)
         Me.atcgrid1.Source = Nothing
         Me.atcgrid1.TabIndex = 1
         '
         'TabPage3
         '
         Me.TabPage3.Controls.Add(Me.atcgrid2)
-        Me.TabPage3.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage3.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage3.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage3.Size = New System.Drawing.Size(915, 446)
+        Me.TabPage3.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.TabPage3.Size = New System.Drawing.Size(1224, 553)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Distributes"
         Me.TabPage3.UseVisualStyleBackColor = True
@@ -140,19 +146,21 @@ Partial Class ctlEditSpecialAction
         Me.atcgrid2.Fixed3D = False
         Me.atcgrid2.LineColor = System.Drawing.Color.Empty
         Me.atcgrid2.LineWidth = 0.0!
-        Me.atcgrid2.Location = New System.Drawing.Point(7, 8)
+        Me.atcgrid2.Location = New System.Drawing.Point(9, 10)
+        Me.atcgrid2.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.atcgrid2.Name = "atcgrid2"
-        Me.atcgrid2.Size = New System.Drawing.Size(900, 430)
+        Me.atcgrid2.Size = New System.Drawing.Size(1200, 529)
         Me.atcgrid2.Source = Nothing
         Me.atcgrid2.TabIndex = 1
         '
         'TabPage4
         '
         Me.TabPage4.Controls.Add(Me.atcgrid3)
-        Me.TabPage4.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage4.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage4.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.TabPage4.Name = "TabPage4"
-        Me.TabPage4.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage4.Size = New System.Drawing.Size(915, 446)
+        Me.TabPage4.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.TabPage4.Size = New System.Drawing.Size(1224, 553)
         Me.TabPage4.TabIndex = 3
         Me.TabPage4.Text = "User Define Names"
         Me.TabPage4.UseVisualStyleBackColor = True
@@ -168,19 +176,21 @@ Partial Class ctlEditSpecialAction
         Me.atcgrid3.Fixed3D = False
         Me.atcgrid3.LineColor = System.Drawing.Color.Empty
         Me.atcgrid3.LineWidth = 0.0!
-        Me.atcgrid3.Location = New System.Drawing.Point(7, 8)
+        Me.atcgrid3.Location = New System.Drawing.Point(9, 10)
+        Me.atcgrid3.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.atcgrid3.Name = "atcgrid3"
-        Me.atcgrid3.Size = New System.Drawing.Size(900, 430)
+        Me.atcgrid3.Size = New System.Drawing.Size(1200, 529)
         Me.atcgrid3.Source = Nothing
         Me.atcgrid3.TabIndex = 1
         '
         'TabPage5
         '
         Me.TabPage5.Controls.Add(Me.atcgrid4)
-        Me.TabPage5.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage5.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage5.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.TabPage5.Name = "TabPage5"
-        Me.TabPage5.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage5.Size = New System.Drawing.Size(915, 446)
+        Me.TabPage5.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.TabPage5.Size = New System.Drawing.Size(1224, 553)
         Me.TabPage5.TabIndex = 4
         Me.TabPage5.Text = "User Define Quans"
         Me.TabPage5.UseVisualStyleBackColor = True
@@ -196,19 +206,21 @@ Partial Class ctlEditSpecialAction
         Me.atcgrid4.Fixed3D = False
         Me.atcgrid4.LineColor = System.Drawing.Color.Empty
         Me.atcgrid4.LineWidth = 0.0!
-        Me.atcgrid4.Location = New System.Drawing.Point(7, 8)
+        Me.atcgrid4.Location = New System.Drawing.Point(9, 10)
+        Me.atcgrid4.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.atcgrid4.Name = "atcgrid4"
-        Me.atcgrid4.Size = New System.Drawing.Size(900, 430)
+        Me.atcgrid4.Size = New System.Drawing.Size(1200, 529)
         Me.atcgrid4.Source = Nothing
         Me.atcgrid4.TabIndex = 1
         '
         'TabPage6
         '
         Me.TabPage6.Controls.Add(Me.atcgrid5)
-        Me.TabPage6.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage6.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage6.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.TabPage6.Name = "TabPage6"
-        Me.TabPage6.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage6.Size = New System.Drawing.Size(915, 446)
+        Me.TabPage6.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.TabPage6.Size = New System.Drawing.Size(1224, 553)
         Me.TabPage6.TabIndex = 5
         Me.TabPage6.Text = "Conditions"
         Me.TabPage6.UseVisualStyleBackColor = True
@@ -224,9 +236,10 @@ Partial Class ctlEditSpecialAction
         Me.atcgrid5.Fixed3D = False
         Me.atcgrid5.LineColor = System.Drawing.Color.Empty
         Me.atcgrid5.LineWidth = 0.0!
-        Me.atcgrid5.Location = New System.Drawing.Point(7, 8)
+        Me.atcgrid5.Location = New System.Drawing.Point(9, 10)
+        Me.atcgrid5.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.atcgrid5.Name = "atcgrid5"
-        Me.atcgrid5.Size = New System.Drawing.Size(900, 430)
+        Me.atcgrid5.Size = New System.Drawing.Size(1200, 529)
         Me.atcgrid5.Source = Nothing
         Me.atcgrid5.TabIndex = 1
         '
@@ -234,32 +247,34 @@ Partial Class ctlEditSpecialAction
         '
         Me.lblcounts.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblcounts.AutoSize = True
-        Me.lblcounts.Location = New System.Drawing.Point(13, 494)
+        Me.lblcounts.Location = New System.Drawing.Point(17, 323)
+        Me.lblcounts.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblcounts.Name = "lblcounts"
-        Me.lblcounts.Size = New System.Drawing.Size(39, 13)
+        Me.lblcounts.Size = New System.Drawing.Size(50, 17)
         Me.lblcounts.TabIndex = 2
         Me.lblcounts.Text = "counts"
         '
         'cmdAgPrac
         '
-        Me.cmdAgPrac.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdAgPrac.Location = New System.Drawing.Point(800, 483)
+        Me.cmdAgPrac.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdAgPrac.Location = New System.Drawing.Point(853, 310)
+        Me.cmdAgPrac.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.cmdAgPrac.Name = "cmdAgPrac"
-        Me.cmdAgPrac.Size = New System.Drawing.Size(131, 35)
+        Me.cmdAgPrac.Size = New System.Drawing.Size(175, 43)
         Me.cmdAgPrac.TabIndex = 3
         Me.cmdAgPrac.Text = "Pre-defined Practices"
         Me.cmdAgPrac.UseVisualStyleBackColor = True
         '
         'ctlEditSpecialAction
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.Controls.Add(Me.cmdAgPrac)
         Me.Controls.Add(Me.lblcounts)
         Me.Controls.Add(Me.tabSpecial)
-        Me.Margin = New System.Windows.Forms.Padding(2)
+        Me.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.Name = "ctlEditSpecialAction"
-        Me.Size = New System.Drawing.Size(940, 550)
+        Me.Size = New System.Drawing.Size(1042, 392)
         Me.tabSpecial.ResumeLayout(False)
         Me.REcords.ResumeLayout(False)
         Me.REcords.PerformLayout()

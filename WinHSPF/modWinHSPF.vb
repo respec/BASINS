@@ -145,6 +145,10 @@ Public Module WinHSPF
         pUCI = New HspfUci
         Dim lUCIName As String = IO.Path.GetFileName(aFileName)
         pUCI.FastReadUci(pMsg, lUCIName)
+        'Dim lFilesOK As Boolean
+        'Dim lFullFg As Integer = -3
+        'Dim lEchoFile As String = ""
+        'pUCI.ReadUci(pMsg, lUCIName, lFullFg, lFilesOK, lEchoFile)
         'set UCI name in caption
         If pWinHSPF IsNot Nothing Then
             pWinHSPF.Text = pWinHSPF.Tag & ": " & pUCI.Name
@@ -449,37 +453,47 @@ Public Module WinHSPF
             Dim lWinHSPFBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
             Dim lMapWindowBinLoc As String = lWinHSPFBinLoc & "\..\..\..\bin\"
             Dim lMapWindowProjectName As String = FilenameSetExt(pUCIFullFileName, "mwprj")
+            Dim lMapWindowExeName As String = lMapWindowBinLoc & "MapWindow.exe"
+
+            If Not FileExists(lMapWindowExeName) Then
+                lMapWindowExeName = FindFile("Please locate MapWindow.exe", "MapWindow.exe")
+            End If
 
             If FileExists(lMapWindowProjectName) Then
-                Process.Start(lMapWindowBinLoc & "MapWindow.exe", lMapWindowProjectName)
+                If FileExists(lMapWindowExeName) Then
+                    Process.Start(lMapWindowExeName, lMapWindowProjectName)
+                End If
             Else
                 'create a script to run from the mapwindow command line
-                Dim lStr As String = "Imports MapWindow.Interfaces" & vbCrLf & _
-                                     "Imports atcData" & vbCrLf & _
-                                     "Imports atcUtility" & vbCrLf & vbCrLf & _
-                                     "Module AutoLoad" & vbCrLf & vbCrLf & _
-                                     "    Public Sub ScriptMain(ByRef aMapWin As IMapWin)" & vbCrLf & _
-                                     "        Dim lFolder As String = " & """" & PathNameOnly(lMapWindowProjectName) & """" & vbCrLf & _
-                                     "        ChDriveDir(lFolder)" & vbCrLf & vbCrLf 
+                If FileExists(lMapWindowExeName) Then
+                    Dim lStr As String = "Imports MapWindow.Interfaces" & vbCrLf & _
+                                         "Imports atcData" & vbCrLf & _
+                                         "Imports atcUtility" & vbCrLf & vbCrLf & _
+                                         "Module AutoLoad" & vbCrLf & vbCrLf & _
+                                         "    Public Sub ScriptMain(ByRef aMapWin As IMapWin)" & vbCrLf & _
+                                         "        Dim lFolder As String = " & """" & PathNameOnly(lMapWindowProjectName) & """" & vbCrLf & _
+                                         "        ChDriveDir(lFolder)" & vbCrLf & vbCrLf
 
-                For lIndex As Integer = 0 To pUCI.FilesBlock.Count
-                    Dim lFile As HspfFile = pUCI.FilesBlock.Value(lIndex)
-                    If lFile.Typ.StartsWith("WDM") Then
-                        lStr = lStr & "        atcDataManager.OpenDataSource(" & """" & lFile.Name.Trim & """" & ")" & vbCrLf
-                    End If
-                Next
-                lStr = lStr & vbCrLf & "        aMapWin.Project.Save(" & """" & lMapWindowProjectName & """" & ")" & vbCrLf
+                    For lIndex As Integer = 0 To pUCI.FilesBlock.Count
+                        Dim lFile As HspfFile = pUCI.FilesBlock.Value(lIndex)
+                        If lFile.Typ.StartsWith("WDM") Then
+                            lStr = lStr & "        atcDataManager.OpenDataSource(" & """" & lFile.Name.Trim & """" & ")" & vbCrLf
+                        End If
+                    Next
+                    lStr = lStr & vbCrLf & "        aMapWin.Project.Save(" & """" & lMapWindowProjectName & """" & ")" & vbCrLf
 
-                lStr = lStr & vbCrLf & "    End Sub" & vbCrLf & _
-                                       "End Module"
+                    lStr = lStr & vbCrLf & "    End Sub" & vbCrLf & _
+                                           "End Module"
 
-                Dim lScriptName As String = PathNameOnly(lMapWindowProjectName) & "\AutoLoad.vb"
+                    Dim lScriptName As String = PathNameOnly(lMapWindowProjectName) & "\AutoLoad.vb"
 
-                IO.File.WriteAllText(lScriptName, lStr)
-                Process.Start(lMapWindowBinLoc & "MapWindow.exe", lScriptName)
+                    IO.File.WriteAllText(lScriptName, lStr)
+
+                    Process.Start(lMapWindowExeName, lScriptName)
+                End If
             End If
         Else
-            Logger.Msg("A BASINS 4.0 MapWindow project is already open.", vbOKOnly, "WinHSPF View Output")
+                Logger.Msg("A BASINS 4.0 MapWindow project is already open.", vbOKOnly, "WinHSPF View Output")
         End If
 
     End Sub

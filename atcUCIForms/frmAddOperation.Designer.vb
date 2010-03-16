@@ -107,6 +107,7 @@ Partial Class frmAddOperation
         Me.lstUp.Location = New System.Drawing.Point(25, 155)
         Me.lstUp.Margin = New System.Windows.Forms.Padding(4)
         Me.lstUp.Name = "lstUp"
+        Me.lstUp.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
         Me.lstUp.Size = New System.Drawing.Size(209, 180)
         Me.lstUp.TabIndex = 7
         '
@@ -117,6 +118,7 @@ Partial Class frmAddOperation
         Me.lstDown.Location = New System.Drawing.Point(257, 155)
         Me.lstDown.Margin = New System.Windows.Forms.Padding(4)
         Me.lstDown.Name = "lstDown"
+        Me.lstDown.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
         Me.lstDown.Size = New System.Drawing.Size(209, 180)
         Me.lstDown.TabIndex = 8
         '

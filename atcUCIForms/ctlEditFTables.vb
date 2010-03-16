@@ -385,6 +385,7 @@ Public Class ctlEditFTables
         'Else
         '      Call MsgBox("This option is not yet implemented.", , "FTable Problem")
         'End If
+        Logger.Msg("This option is not yet implemented.", "F-Curve")
     End Sub
     Public Sub UpdateFTablesFromXSect()
         Dim tempID, loper As Integer
