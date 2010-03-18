@@ -1417,25 +1417,28 @@ StartOver:
                 End If
                 g = New MapWinGIS.Grid
                 g.Open(aFilename)
-                Dim lSuccess As Boolean = False
-                If LCase(aFilename).IndexOf("\nlcd" & g_PathChar) > 0 Then
-                    g.Header.NodataValue = 0
-                    lSuccess = g.Save(aFilename)
-                    g.Close()
-                    g.Open(aFilename)
+                If aFilename.ToLower.Contains(g_PathChar & "nlcd" & g_PathChar) Then
+                    If g.Header.NodataValue <> 0 Then
+                        g.Header.NodataValue = 0
+                        Try
+                            g.Save(aFilename)
+                            g.Close()
+                            g.Open(aFilename)
+                        Catch e As Exception
+                            Logger.Msg(aFilename & vbLf & e.Message & vbLf & "This may cause unwanted display of areas with missing data", "Unable to set zero as NoData value")
+                        End Try
+                    End If
                 End If
 
                 MWlay = g_MapWin.Layers.Add(g, LayerName)
                 MWlay.Visible = Visible
                 MWlay.UseTransparentColor = True
 
-                'TODO: replace hard-coded SetLandUseColors and others with full renderer from defaults
+                'TODO: replace hard-coded SetElevationGridColors with full renderer from defaults
                 If LCase(aFilename).IndexOf("\demg" & g_PathChar) > 0 Then
                     SetElevationGridColors(MWlay, g)
                 ElseIf LCase(aFilename).IndexOf("\ned" & g_PathChar) > 0 Then
                     SetElevationGridColors(MWlay, g)
-                    'ElseIf LCase(aFilename).IndexOf("\nlcd" & g_PathChar) > 0 Then
-                    'SetLandUseColorsGrid(MWlay, g)
                 End If
             End If
 

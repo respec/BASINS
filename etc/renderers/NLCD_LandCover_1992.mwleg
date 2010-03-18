@@ -1,4 +1,4 @@
-<ColoringScheme SchemeType="Grid">
+<ColoringScheme SchemeType="Grid" GridName="NLCD 1992 Landcover" GroupName="Soil, Land Use/Cover">
   <GridColoringScheme AmbientIntensity="0.7" Key="" LightSourceAzimuth="90" LightSourceElevation="45" LightSourceIntensity="0.7" NoDataColor="-16777216">
     <Break Caption="Water" LowValue="10" HighValue="12" LowColor="-16776961" HighColor="-16776961" ColoringType="2" GradientModel="1" />
     <Break Caption="Urban" LowValue="20" HighValue="23" LowColor="-65281" HighColor="-65281" ColoringType="2" GradientModel="1" />
