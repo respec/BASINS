@@ -1147,25 +1147,29 @@ TryOldString:
 
     Public Function ReadableFromXML(ByVal aXML As String) As String
         Dim lHTML As Boolean = aXML.ToUpper.IndexOf("<HTML") > -1
+        Dim lXML As String = aXML.Replace("<BR>", vbLf).Replace("&nbsp;", " ")
         Dim lSB As New System.Text.StringBuilder
+        Dim lLastWasLF As Boolean = False
         Dim lIndex As Integer = 0
-        While lIndex < aXML.Length
-            Dim lChar As Char = aXML.Chars(lIndex)
+        While lIndex < lXML.Length
+            Dim lChar As Char = lXML.Chars(lIndex)
             Select Case lChar
                 Case "<"
-                    Dim lClose As Integer = aXML.IndexOf(">", lIndex + 1)
-                    If aXML.Chars(lIndex + 1) = "/" Then
-                        lSB.Append(vbLf)
+                    Dim lClose As Integer = lXML.IndexOf(">", lIndex + 1)
+                    If lXML.Chars(lIndex + 1) = "/" Then
+                        If Not lLastWasLF Then lSB.Append(vbLf)
+                        lLastWasLF = True
                     ElseIf lHTML Then
                     Else
-                        lSB.Append(aXML.Substring(lIndex + 1, lClose - lIndex - 1) & ": ")
+                        lSB.Append(lXML.Substring(lIndex + 1, lClose - lIndex - 1) & ": ")
+                        lLastWasLF = False
                     End If
                     lIndex = lClose
                 Case Else : lSB.Append(lChar)
             End Select
             lIndex += 1
         End While
-        Return lSB.ToString.Replace(vbLf & vbLf, vbLf).Replace(vbLf, vbCrLf).Replace("&nbsp;", " ")
+        Return lSB.ToString
     End Function
 
     Public Function ReplaceStringNoCase(ByRef Source As String, ByRef Find As String, ByRef ReplaceWith As String) As String
