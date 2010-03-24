@@ -405,7 +405,7 @@ Public Class frmReport
 
     Private Sub frmReport_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
         If e.KeyValue = Windows.Forms.Keys.F1 Then
-            ShowHelp("BASINS Details\Watershed Characterization Reports.html")
+            ShowHelp("BASINS Details\Analysis\Watershed Characterization Reports.html")
         End If
     End Sub
 End Class
