@@ -1,4 +1,5 @@
 ﻿Imports MapWinUtility
+Imports atcUtility
 
 Public Class frmWCS
 
@@ -233,6 +234,12 @@ Public Class frmWCS
         RemoveHandler GisUtil.Progress, AddressOf UpdProg
     End Sub
 
+    Private Sub frmWCS_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp("BASINS Details\Analysis\Watershed Characterization System.html")
+        End If
+    End Sub
+
     Private Sub frmWCS_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         GetWindowPos(REGAPP, Me)
         Project = New clsProject
@@ -386,7 +393,7 @@ Public Class frmWCS
     End Sub
 
     Private Sub btnHelp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnHelp.Click
-        Logger.Message("Help should be hooked up here.", "Help", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1)
+        ShowHelp("BASINS Details\Analysis\Watershed Characterization System.html")
     End Sub
 
     Private Sub lnkLandUseRefresh_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles lnkLandUseRefresh.Click
