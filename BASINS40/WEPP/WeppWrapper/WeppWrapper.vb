@@ -13,7 +13,7 @@ Public Module Main
             'begin set block (set things in here)
             '----------------------------------
             'give this particular run an ID
-            Dim lRunId As String = "16"
+            Dim lRunId As String = "4"
 
             'set the WDM file path
             Dim lWDMFilePath As String = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\ucis.wdms\FBmet.wdm"
@@ -25,7 +25,7 @@ Public Module Main
             End If
 
             'set the output file path
-            Dim lOutputFilePath As String = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\cli.met\" & lRunId & ".cli"
+            Dim lOutputFilePath As String = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\wepp.run\in.cli"
 
             'set the log file path
             Dim lLogFilePath As String = "Z:\Documents\filecabinet\employment\aquaterra\active.projects\SERDP\Roads\WEPP\cli.met\" & lRunId & "-log.txt"
@@ -36,8 +36,18 @@ Public Module Main
             '3: Kelvin
             Dim lTempUnits As Integer = 2
 
+            'set the option for daily (1)  or hourly (2) precip output
+            Dim lTimeStep As Integer = 1
+
+            Dim lNumBpts As Integer
+            If lTimeStep = 1 Then
+                lNumBpts = 2
+            ElseIf lTimeStep = 2 Then
+                lNumBpts = 24
+            End If
+
             'set the DSNs for constituents
-            Dim lDsnPREC As Integer = 11
+            Dim lDsnPREC As Integer = 107
             Dim lDsnATEM As Integer = 13
             Dim lDsnDEWP As Integer = 17
             Dim lDsnWIND As Integer = 14
@@ -214,6 +224,7 @@ Public Module Main
                 Dim lCurrentYear As Integer
                 Dim lYearCollection As New Collection
 
+		'Loop1
                 'Loop through every record (hour) in the timeseries.
                 '===================================================
                 For i = 0 To lHourIndexEnd - 25
@@ -289,7 +300,14 @@ Public Module Main
                             'Convert inches to millimeters
                             lTempRecord *= 25.4
                             lTempDayPrecipAccumulate += lTempRecord
-                            lDayOutString = lDayOutString & " " & j.ToString.PadLeft(2, " ") & " " & WEPPformatMoreDetail(lTempDayPrecipAccumulate)
+                            If lTimeStep = 2 Then ' hour
+                                lDayOutString = lDayOutString & " " & j.ToString.PadLeft(2, " ") & " " & WEPPformatMoreDetail(lTempDayPrecipAccumulate)
+                            ElseIf lTimeStep = 1 Then 'day
+                                If j = 24 Then
+                                    lDayOutString = lDayOutString & " " & "0   0." & vbCrLf & "1".PadLeft(2, " ") & " " & WEPPformatMoreDetail(lTempDayPrecipAccumulate)
+                                End If
+                            End If
+
 
                             'export this hour's values to the debug raw timeseries textfile (if lRawTsFlag is true)
                             If lRawTsFlag Then
@@ -302,14 +320,17 @@ Public Module Main
                                 lTempDayStatResults(5) = lTempDayStatResults(5) / 24
                                 lBigAccum += lTempDayPrecipAccumulate
                             Else
-                                lDayOutString &= vbCrLf
+                                'If lTimeStep = 2 Then
+                                If lTimeStep = 2 Then
+                                    lDayOutString &= vbCrLf
+                                End If
                             End If
                         Next
 
                         lDayOutString = " " & lDate(2).ToString.PadLeft(2, lTableDelimiter) _
                         & " " & lDate(1).ToString.PadLeft(2, lTableDelimiter) _
                         & " " & lDate(0) - lStrModelBegin(0) + 1 _
-                        & "24".PadLeft(lTableCellWidth, lTableDelimiter) _
+                        & lNumBpts.ToString.PadLeft(lTableCellWidth, lTableDelimiter) _
                         & WEPPformat(lTempDayStatResults(1)).PadLeft(lTableCellWidth, lTableDelimiter) _
                         & WEPPformat(lTempDayStatResults(0)).PadLeft(lTableCellWidth, lTableDelimiter) _
                         & WEPPformat(lTempDayStatResults(2)).PadLeft(lTableCellWidth, lTableDelimiter) _
