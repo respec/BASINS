@@ -41,6 +41,10 @@ Public Class frmGraphEditor
         If aZgc.MasterPane.PaneList.Count > 1 Then
             pPaneAux = aZgc.MasterPane.PaneList(0)
         End If
+        'Me.cboCurveStep.Items.Add("Smooth") 'Smooth looks pretty but makes the data look smoother than it really is
+        Me.cboCurveStep.Items.AddRange(System.Enum.GetNames(GetType(ZedGraph.StepType)))
+        Me.cboCurveSymbolType.Items.AddRange(System.Enum.GetNames(GetType(ZedGraph.SymbolType)))
+
         SetComboFromCurves()
         SetComboFromTexts()
         SetControlsFromPane()
@@ -282,6 +286,11 @@ Public Class frmGraphEditor
 
             chkCurveSymbolVisible.Checked = aCurve.Symbol.IsVisible
             txtCurveSymbolSize.Text = aCurve.Symbol.Size
+            If aCurve.Line.IsSmooth Then
+                cboCurveStep.Text = "Smooth"
+            Else
+                cboCurveStep.Text = System.Enum.GetName(GetType(ZedGraph.StepType), aCurve.Line.StepType)
+            End If
             cboCurveSymbolType.Text = System.Enum.GetName(GetType(ZedGraph.SymbolType), aCurve.Symbol.Type)
         End If
         pSettingControls -= 1
@@ -316,7 +325,12 @@ Public Class frmGraphEditor
 
             aCurve.Symbol.IsVisible = chkCurveSymbolVisible.Checked
             If Integer.TryParse(txtCurveSymbolSize.Text, lInt) Then aCurve.Symbol.Size = lInt
-
+            If cboCurveStep.Text = "Smooth" Then
+                aCurve.Line.IsSmooth = True
+            Else
+                aCurve.Line.IsSmooth = False
+                aCurve.Line.StepType = System.Enum.Parse(GetType(ZedGraph.StepType), cboCurveStep.Text)
+            End If
             aCurve.Symbol.Type = System.Enum.Parse(GetType(ZedGraph.SymbolType), cboCurveSymbolType.Text)
             'Select Case cboCurveSymbolType.Text
             '    Case "Square" : aCurve.Symbol.Type = SymbolType.Square
@@ -502,6 +516,10 @@ Public Class frmGraphEditor
         AddedLineItem()
     End Sub
 
+    Private Sub cboCurveStep_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboCurveStep.SelectedIndexChanged
+        If chkAutoApply.Checked Then ApplyAll()
+    End Sub
+
     Private Sub cboCurveSymbolType_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboCurveSymbolType.SelectedIndexChanged
         If chkAutoApply.Checked Then ApplyAll()
     End Sub
@@ -632,5 +650,4 @@ Public Class frmGraphEditor
         End If
         Return False
     End Function
-
 End Class
