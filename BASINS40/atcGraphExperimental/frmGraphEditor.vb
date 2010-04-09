@@ -613,6 +613,18 @@ Public Class frmGraphEditor
         End If
     End Sub
 
+    Private Sub btnAxisFont_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAxisFont.Click        
+        If UserEditFontSpec(AxisFromCombo.Title.FontSpec) Then
+            If chkAutoApply.Checked Then RaiseEvent Apply()
+        End If
+    End Sub
+
+    Private Sub btnScaleFont_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnScaleFont.Click
+        If UserEditFontSpec(AxisFromCombo.Scale.FontSpec) Then
+            If chkAutoApply.Checked Then RaiseEvent Apply()
+        End If
+    End Sub
+
     Private Sub btnLegendFont_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnLegendFont.Click
         If UserEditFontSpec(pPane.Legend.FontSpec) Then
             If chkAutoApply.Checked Then RaiseEvent Apply()
@@ -621,13 +633,12 @@ Public Class frmGraphEditor
 
     Private Sub btnTextFont_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTextFont.Click
         Dim lText As TextObj = FindTextObject(comboWhichText.Text)
-        If Not lText Is Nothing Then
+        If lText IsNot Nothing Then
             If UserEditFontSpec(lText.FontSpec) Then
                 If chkAutoApply.Checked Then RaiseEvent Apply()
             End If
         End If
     End Sub
-
 
     ''' <summary>
     ''' Use a FontDialog to edit a ZedGraph FontSpec
@@ -636,18 +647,27 @@ Public Class frmGraphEditor
     ''' <returns>True if font was edited, false if user cancelled</returns>
     Private Function UserEditFontSpec(ByRef aFontSpec As FontSpec) As Boolean
         Dim cdlg As New Windows.Forms.FontDialog
-        cdlg.Font = aFontSpec.GetFont(1)
+        With cdlg
+            .Font = aFontSpec.GetFont(1)
+            .AllowSimulations = True
+            .ShowEffects = True
+            .ShowColor = True
+            .Color = aFontSpec.FontColor            
+        End With
         If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
             With cdlg.Font
                 Dim lBorder As ZedGraph.Border = aFontSpec.Border.Clone
+                Dim lAngle As Single = aFontSpec.Angle
                 aFontSpec = New FontSpec( _
-                    .FontFamily.Name, .Size, aFontSpec.FontColor, _
+                    .FontFamily.Name, .Size * 4 / 3, cdlg.Color, _
                     .Bold, .Italic, .Underline, _
                     aFontSpec.Fill.Color, aFontSpec.Fill.Brush, aFontSpec.Fill.Type)
                 aFontSpec.Border = lBorder
+                aFontSpec.Angle = lAngle
             End With
             Return True
         End If
         Return False
     End Function
+
 End Class
