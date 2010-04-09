@@ -185,6 +185,7 @@ Public Class DownloadDataPlugin
                 atcMwGisUtility.GisUtil.MappingObject = g_MapWin
                 LoadPlugin("D4EM Data Download::BASINS")
                 LoadPlugin("D4EM Data Download::NHDPlus")
+                LoadPlugin("D4EM Data Download::NLDAS")
                 LoadPlugin("D4EM Data Download::NWIS")
                 LoadPlugin("D4EM Data Download::NLCD2001")
                 LoadPlugin("D4EM Data Download::STORET")
