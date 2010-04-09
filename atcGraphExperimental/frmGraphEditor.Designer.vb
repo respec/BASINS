@@ -76,6 +76,7 @@ Partial Class frmGraphEditor
         Me.radioAxisLinear = New System.Windows.Forms.RadioButton
         Me.radioAxisTime = New System.Windows.Forms.RadioButton
         Me.tabCurves = New System.Windows.Forms.TabPage
+        Me.cboCurveStep = New System.Windows.Forms.ComboBox
         Me.cboCurveSymbolType = New System.Windows.Forms.ComboBox
         Me.chkCurveLineVisible = New System.Windows.Forms.CheckBox
         Me.chkCurveSymbolVisible = New System.Windows.Forms.CheckBox
@@ -689,6 +690,7 @@ Partial Class frmGraphEditor
         '
         'tabCurves
         '
+        Me.tabCurves.Controls.Add(Me.cboCurveStep)
         Me.tabCurves.Controls.Add(Me.cboCurveSymbolType)
         Me.tabCurves.Controls.Add(Me.chkCurveLineVisible)
         Me.tabCurves.Controls.Add(Me.chkCurveSymbolVisible)
@@ -714,10 +716,18 @@ Partial Class frmGraphEditor
         Me.tabCurves.Text = "Curves"
         Me.tabCurves.UseVisualStyleBackColor = True
         '
+        'cboCurveStep
+        '
+        Me.cboCurveStep.FormattingEnabled = True
+        Me.cboCurveStep.Location = New System.Drawing.Point(208, 111)
+        Me.cboCurveStep.MaxDropDownItems = 11
+        Me.cboCurveStep.Name = "cboCurveStep"
+        Me.cboCurveStep.Size = New System.Drawing.Size(121, 21)
+        Me.cboCurveStep.TabIndex = 51
+        '
         'cboCurveSymbolType
         '
         Me.cboCurveSymbolType.FormattingEnabled = True
-        Me.cboCurveSymbolType.Items.AddRange(New Object() {"Square", "Diamond", "Triangle", "Circle", "XCross", "Plus", "Star", "TriangleDown", "HDash", "VDash", "None"})
         Me.cboCurveSymbolType.Location = New System.Drawing.Point(208, 138)
         Me.cboCurveSymbolType.MaxDropDownItems = 11
         Me.cboCurveSymbolType.Name = "cboCurveSymbolType"
@@ -1165,4 +1175,5 @@ Partial Class frmGraphEditor
     Private WithEvents chkRangeReverse As System.Windows.Forms.CheckBox
     Private WithEvents txtProbabilityDeviations As System.Windows.Forms.TextBox
     Private WithEvents lblProbabilityDeviations As System.Windows.Forms.Label
+    Friend WithEvents cboCurveStep As System.Windows.Forms.ComboBox
 End Class
