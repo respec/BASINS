@@ -1,0 +1,13 @@
+<SFRendering>
+  <Layer Name="NLDAS Grid Center" GroupName="Observed Data Stations" Type="1" Path="NLDAS\NLDAS_Grid_Center.shp" Tag="" LegendPicture="" Visible="True" LabelsVisible="True" Expanded="False">
+    <Image Type="">
+    </Image>
+    <ShapeFileProperties LabelsVisible="True" MapTooltipField="-1" MapTooltipsEnabled="False" VerticesVisible="True" Color="49152" DrawFill="True" TransparencyPercent="1" FillStipple="0" LineOrPointSize="9" LineStipple="0" OutLineColor="0" PointType="1" CustomLineStipple="0" UseTransparency="False" TransparencyColor="0" FillStippleTransparent="False" FillStippleLineColor="-1113600">
+      <CustomPointType>
+        <Image Type="">
+        </Image>
+      </CustomPointType>
+    </ShapeFileProperties>
+    <DynamicVisibility UseDynamicVisibility="False" Scale="0" />
+  </Layer>
+</SFRendering>

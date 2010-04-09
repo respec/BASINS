@@ -25,6 +25,7 @@ Partial Class frmDownload
         Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDownload))
         Me.grpBASINS = New System.Windows.Forms.GroupBox
+        Me.chkBASINS_MetData = New System.Windows.Forms.CheckBox
         Me.chkBASINS_303d = New System.Windows.Forms.CheckBox
         Me.chkBASINS_MetStations = New System.Windows.Forms.CheckBox
         Me.chkBASINS_NHD = New System.Windows.Forms.CheckBox
@@ -76,7 +77,9 @@ Partial Class frmDownload
         Me.chkSTORET_Stations = New System.Windows.Forms.CheckBox
         Me.grpNWISStations = New System.Windows.Forms.GroupBox
         Me.chkCacheOnly = New System.Windows.Forms.CheckBox
-        Me.chkBASINS_MetData = New System.Windows.Forms.CheckBox
+        Me.grpNLDAS = New System.Windows.Forms.GroupBox
+        Me.chkNLDAS_GetNLDASParameter = New System.Windows.Forms.CheckBox
+        Me.chkNLDAS_GetNLDASStations = New System.Windows.Forms.CheckBox
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
         Me.panelNWISnoStations.SuspendLayout()
@@ -85,6 +88,7 @@ Partial Class frmDownload
         Me.grpNHDplus.SuspendLayout()
         Me.grpSTORET.SuspendLayout()
         Me.grpNWISStations.SuspendLayout()
+        Me.grpNLDAS.SuspendLayout()
         Me.SuspendLayout()
         '
         'grpBASINS
@@ -107,6 +111,17 @@ Partial Class frmDownload
         Me.grpBASINS.TabIndex = 0
         Me.grpBASINS.TabStop = False
         Me.grpBASINS.Text = "BASINS"
+        '
+        'chkBASINS_MetData
+        '
+        Me.chkBASINS_MetData.AutoSize = True
+        Me.chkBASINS_MetData.Location = New System.Drawing.Point(356, 42)
+        Me.chkBASINS_MetData.Name = "chkBASINS_MetData"
+        Me.chkBASINS_MetData.Size = New System.Drawing.Size(70, 17)
+        Me.chkBASINS_MetData.TabIndex = 11
+        Me.chkBASINS_MetData.Text = "Met Data"
+        Me.ToolTip1.SetToolTip(Me.chkBASINS_MetData, "Weather station data in WDM format")
+        Me.chkBASINS_MetData.UseVisualStyleBackColor = True
         '
         'chkBASINS_303d
         '
@@ -324,7 +339,7 @@ Partial Class frmDownload
         'btnHelp
         '
         Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnHelp.Location = New System.Drawing.Point(266, 426)
+        Me.btnHelp.Location = New System.Drawing.Point(266, 482)
         Me.btnHelp.Name = "btnHelp"
         Me.btnHelp.Size = New System.Drawing.Size(59, 23)
         Me.btnHelp.TabIndex = 41
@@ -551,7 +566,7 @@ Partial Class frmDownload
         '
         Me.chkClip.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkClip.AutoSize = True
-        Me.chkClip.Location = New System.Drawing.Point(124, 430)
+        Me.chkClip.Location = New System.Drawing.Point(124, 486)
         Me.chkClip.Name = "chkClip"
         Me.chkClip.Size = New System.Drawing.Size(92, 17)
         Me.chkClip.TabIndex = 40
@@ -563,7 +578,7 @@ Partial Class frmDownload
         '
         Me.chkMerge.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkMerge.AutoSize = True
-        Me.chkMerge.Location = New System.Drawing.Point(17, 430)
+        Me.chkMerge.Location = New System.Drawing.Point(17, 486)
         Me.chkMerge.Name = "chkMerge"
         Me.chkMerge.Size = New System.Drawing.Size(56, 17)
         Me.chkMerge.TabIndex = 39
@@ -574,7 +589,7 @@ Partial Class frmDownload
         'btnDownload
         '
         Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDownload.Location = New System.Drawing.Point(396, 426)
+        Me.btnDownload.Location = New System.Drawing.Point(396, 482)
         Me.btnDownload.Name = "btnDownload"
         Me.btnDownload.Size = New System.Drawing.Size(75, 23)
         Me.btnDownload.TabIndex = 43
@@ -605,7 +620,7 @@ Partial Class frmDownload
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(331, 426)
+        Me.btnCancel.Location = New System.Drawing.Point(331, 482)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(59, 23)
         Me.btnCancel.TabIndex = 42
@@ -665,7 +680,7 @@ Partial Class frmDownload
         '
         Me.chkCacheOnly.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkCacheOnly.AutoSize = True
-        Me.chkCacheOnly.Location = New System.Drawing.Point(222, 430)
+        Me.chkCacheOnly.Location = New System.Drawing.Point(222, 486)
         Me.chkCacheOnly.Name = "chkCacheOnly"
         Me.chkCacheOnly.Size = New System.Drawing.Size(81, 17)
         Me.chkCacheOnly.TabIndex = 44
@@ -673,16 +688,41 @@ Partial Class frmDownload
         Me.chkCacheOnly.UseVisualStyleBackColor = True
         Me.chkCacheOnly.Visible = False
         '
-        'chkBASINS_MetData
+        'grpNLDAS
         '
-        Me.chkBASINS_MetData.AutoSize = True
-        Me.chkBASINS_MetData.Location = New System.Drawing.Point(356, 42)
-        Me.chkBASINS_MetData.Name = "chkBASINS_MetData"
-        Me.chkBASINS_MetData.Size = New System.Drawing.Size(70, 17)
-        Me.chkBASINS_MetData.TabIndex = 11
-        Me.chkBASINS_MetData.Text = "Met Data"
-        Me.ToolTip1.SetToolTip(Me.chkBASINS_MetData, "Weather station data in WDM format")
-        Me.chkBASINS_MetData.UseVisualStyleBackColor = True
+        Me.grpNLDAS.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpNLDAS.Controls.Add(Me.chkNLDAS_GetNLDASParameter)
+        Me.grpNLDAS.Controls.Add(Me.chkNLDAS_GetNLDASStations)
+        Me.grpNLDAS.Location = New System.Drawing.Point(12, 424)
+        Me.grpNLDAS.Name = "grpNLDAS"
+        Me.grpNLDAS.Size = New System.Drawing.Size(460, 42)
+        Me.grpNLDAS.TabIndex = 45
+        Me.grpNLDAS.TabStop = False
+        Me.grpNLDAS.Text = "North America Land Data Assimilation System"
+        '
+        'chkNLDAS_GetNLDASParameter
+        '
+        Me.chkNLDAS_GetNLDASParameter.AutoSize = True
+        Me.chkNLDAS_GetNLDASParameter.Enabled = False
+        Me.chkNLDAS_GetNLDASParameter.Location = New System.Drawing.Point(112, 19)
+        Me.chkNLDAS_GetNLDASParameter.Name = "chkNLDAS_GetNLDASParameter"
+        Me.chkNLDAS_GetNLDASParameter.Size = New System.Drawing.Size(84, 17)
+        Me.chkNLDAS_GetNLDASParameter.TabIndex = 23
+        Me.chkNLDAS_GetNLDASParameter.Text = "Precipitation"
+        Me.ToolTip1.SetToolTip(Me.chkNLDAS_GetNLDASParameter, "Hourly Precipitation for selected NLDAS grids")
+        Me.chkNLDAS_GetNLDASParameter.UseVisualStyleBackColor = True
+        '
+        'chkNLDAS_GetNLDASStations
+        '
+        Me.chkNLDAS_GetNLDASStations.AutoSize = True
+        Me.chkNLDAS_GetNLDASStations.Location = New System.Drawing.Point(6, 19)
+        Me.chkNLDAS_GetNLDASStations.Name = "chkNLDAS_GetNLDASStations"
+        Me.chkNLDAS_GetNLDASStations.Size = New System.Drawing.Size(64, 17)
+        Me.chkNLDAS_GetNLDASStations.TabIndex = 22
+        Me.chkNLDAS_GetNLDASStations.Text = "Stations"
+        Me.ToolTip1.SetToolTip(Me.chkNLDAS_GetNLDASStations, "NLDAS Grid Centers Point Layer")
+        Me.chkNLDAS_GetNLDASStations.UseVisualStyleBackColor = True
         '
         'frmDownload
         '
@@ -690,7 +730,8 @@ Partial Class frmDownload
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(484, 461)
+        Me.ClientSize = New System.Drawing.Size(484, 517)
+        Me.Controls.Add(Me.grpNLDAS)
         Me.Controls.Add(Me.grpNWISStations)
         Me.Controls.Add(Me.grpNLCD2001)
         Me.Controls.Add(Me.grpSTORET)
@@ -728,6 +769,8 @@ Partial Class frmDownload
         Me.grpSTORET.PerformLayout()
         Me.grpNWISStations.ResumeLayout(False)
         Me.grpNWISStations.PerformLayout()
+        Me.grpNLDAS.ResumeLayout(False)
+        Me.grpNLDAS.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -785,4 +828,7 @@ Partial Class frmDownload
     Friend WithEvents chkNLCD2001_NED30 As System.Windows.Forms.CheckBox
     Friend WithEvents chkCacheOnly As System.Windows.Forms.CheckBox
     Friend WithEvents chkBASINS_MetData As System.Windows.Forms.CheckBox
+    Friend WithEvents grpNLDAS As System.Windows.Forms.GroupBox
+    Friend WithEvents chkNLDAS_GetNLDASParameter As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNLDAS_GetNLDASStations As System.Windows.Forms.CheckBox
 End Class

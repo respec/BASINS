@@ -19,6 +19,9 @@
 <Layer Filename="Subwatershed.shp" Name="NHDPlus Subwatershed" Group="NHDPlus" Visible="yes" />
 <Layer Filename="Watershed.shp" Name="NHDPlus Watershed" Group="NHDPlus" Visible="yes" />
 
+<Layer Filename="NLDAS_Grid_Center.shp" Name="NLDAS Grid Center" Group="Observed Data Stations" />
+<Layer Filename="NLDAS_Grid.shp" Name="NLDAS Grid" Group="Observed Data Stations" />
+
 <Layer Filename="NLCD_LandCover_1992.tif" Name="NLCD 1992 Landcover" Group="Soil, Land Use/Cover" Visible="yes" />
 <Layer Filename="NLCD_LandCover_2001.tif" Name="NLCD 2001 Landcover" Group="Soil, Land Use/Cover" Visible="yes" />
 <Layer Filename="NLCD_Impervious_2001.tif" Name="NLCD 2001 Impervious" Group="Soil, Land Use/Cover" Visible="yes" />
