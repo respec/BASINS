@@ -109,6 +109,8 @@ Partial Class frmGraphEditor
         Me.btnTextAdd = New System.Windows.Forms.Button
         Me.txtText = New System.Windows.Forms.TextBox
         Me.chkAutoApply = New System.Windows.Forms.CheckBox
+        Me.btnAxisFont = New System.Windows.Forms.Button
+        Me.btnScaleFont = New System.Windows.Forms.Button
         Me.tabsCategory.SuspendLayout()
         Me.tabAxes.SuspendLayout()
         Me.panelProbability.SuspendLayout()
@@ -434,7 +436,7 @@ Partial Class frmGraphEditor
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtAxisLabel.Location = New System.Drawing.Point(81, 62)
         Me.txtAxisLabel.Name = "txtAxisLabel"
-        Me.txtAxisLabel.Size = New System.Drawing.Size(372, 20)
+        Me.txtAxisLabel.Size = New System.Drawing.Size(302, 20)
         Me.txtAxisLabel.TabIndex = 14
         '
         'lblWhichAxis
@@ -472,6 +474,8 @@ Partial Class frmGraphEditor
         '
         'tabAxes
         '
+        Me.tabAxes.Controls.Add(Me.btnScaleFont)
+        Me.tabAxes.Controls.Add(Me.btnAxisFont)
         Me.tabAxes.Controls.Add(Me.chkRangeReverse)
         Me.tabAxes.Controls.Add(Me.radioAxisAux)
         Me.tabAxes.Controls.Add(Me.radioAxisRight)
@@ -1052,6 +1056,28 @@ Partial Class frmGraphEditor
         Me.chkAutoApply.Text = "Apply Automatically"
         Me.chkAutoApply.UseVisualStyleBackColor = True
         '
+        'btnAxisFont
+        '
+        Me.btnAxisFont.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnAxisFont.Location = New System.Drawing.Point(389, 62)
+        Me.btnAxisFont.Name = "btnAxisFont"
+        Me.btnAxisFont.Size = New System.Drawing.Size(68, 20)
+        Me.btnAxisFont.TabIndex = 58
+        Me.btnAxisFont.Text = "Font"
+        Me.toolTip1.SetToolTip(Me.btnAxisFont, "Change Font of Text")
+        Me.btnAxisFont.UseVisualStyleBackColor = True
+        '
+        'btnScaleFont
+        '
+        Me.btnScaleFont.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnScaleFont.Location = New System.Drawing.Point(298, 130)
+        Me.btnScaleFont.Name = "btnScaleFont"
+        Me.btnScaleFont.Size = New System.Drawing.Size(68, 20)
+        Me.btnScaleFont.TabIndex = 59
+        Me.btnScaleFont.Text = "Font"
+        Me.toolTip1.SetToolTip(Me.btnScaleFont, "Change Font of Text")
+        Me.btnScaleFont.UseVisualStyleBackColor = True
+        '
         'frmGraphEditor
         '
         Me.AcceptButton = Me.btnApply
@@ -1176,4 +1202,6 @@ Partial Class frmGraphEditor
     Private WithEvents txtProbabilityDeviations As System.Windows.Forms.TextBox
     Private WithEvents lblProbabilityDeviations As System.Windows.Forms.Label
     Friend WithEvents cboCurveStep As System.Windows.Forms.ComboBox
+    Private WithEvents btnAxisFont As System.Windows.Forms.Button
+    Private WithEvents btnScaleFont As System.Windows.Forms.Button
 End Class
