@@ -256,14 +256,14 @@ Public Class clsMonitor
                                 If lLevelIndex = 1 AndAlso Double.IsNaN(pProgressStartTime) Then
                                     pProgressStartTime = Now.ToOADate
                                 End If
-                                If Not pProgressOpened Then
-                                    ShowUnsafe()
-                                    pProgressOpened = True
-                                End If
 
                                 lProgress.Maximum = lLevel.ProgressFinal
                                 lProgress.Value = lLevel.ProgressCurrent
                                 If lLevel.ProgressCurrent > 0 Then
+                                    If Not pProgressOpened Then
+                                        ShowUnsafe()
+                                        pProgressOpened = True
+                                    End If
                                     lProgress.Visible = True
                                 End If
                                 If lProgress.Visible Then
@@ -338,18 +338,22 @@ Public Class clsMonitor
                         If pParentProcess IsNot Nothing AndAlso _
                            pParentProcess.HasExited AndAlso _
                            Not .Exiting Then
-                            .WindowState = FormWindowState.Normal
-                            pExiting = True
                             .Exiting = True
-                            .Level = 1
-                            .Label(0) = pParentProcess.ProcessName & " Exited"
-                            For lLabelIndex As Integer = 1 To 5
-                                .Label(lLabelIndex) = ""
-                            Next
-                            .btnCancel.Visible = False
-                            .btnPause.Visible = False
-                            .btnLog.Visible = True
-                            ShowUnsafe()
+                            .Close()
+                            End
+                            'Open form with a message indicating that parent exited
+                            '.WindowState = FormWindowState.Normal
+                            'pExiting = True
+                            '.Exiting = True
+                            '.Level = 1
+                            '.Label(0) = pParentProcess.ProcessName & " Exited"
+                            'For lLabelIndex As Integer = 1 To 5
+                            '    .Label(lLabelIndex) = ""
+                            'Next
+                            '.btnCancel.Visible = False
+                            '.btnPause.Visible = False
+                            '.btnLog.Visible = True
+                            'ShowUnsafe()
                         Else
                             'pWindowTimer.Change(UpdateMilliseconds, Threading.Timeout.Infinite)
                         End If
