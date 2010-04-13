@@ -144,8 +144,26 @@ Public Module modBasinsPlugin
             g_Toolbar.PressToolbarButton("tbbSelect")
             pBuildFrm = New frmBuildNew
             pBuildFrm.Show()
-            pBuildFrm.Top = GetSetting(g_AppNameRegistry, "Window Positions", "BuildTop", "300")
-            pBuildFrm.Left = GetSetting(g_AppNameRegistry, "Window Positions", "BuildLeft", "0")
+            Try
+                pBuildFrm.Top = GetSetting(g_AppNameRegistry, "Window Positions", "BuildTop", "300")
+                If pBuildFrm.Top < 0 Then
+                    pBuildFrm.Top = 0
+                ElseIf pBuildFrm.Top + pBuildFrm.Height > Windows.Forms.Screen.PrimaryScreen.Bounds.Height Then
+                    pBuildFrm.Top = Windows.Forms.Screen.PrimaryScreen.Bounds.Height - pBuildFrm.Height
+                End If
+            Catch
+            End Try
+
+            Try
+                pBuildFrm.Left = GetSetting(g_AppNameRegistry, "Window Positions", "BuildLeft", "0")
+                If pBuildFrm.Left < 0 Then
+                    pBuildFrm.Left = 0
+                ElseIf pBuildFrm.Left + pBuildFrm.Width > Windows.Forms.Screen.PrimaryScreen.Bounds.Width Then
+                    pBuildFrm.Left = Windows.Forms.Screen.PrimaryScreen.Bounds.Width - pBuildFrm.Width
+                End If
+            Catch
+            End Try
+
             UpdateSelectedFeatures()
         Else
             Logger.Msg("Unable to open national project", "Open National")
