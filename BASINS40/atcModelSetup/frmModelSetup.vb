@@ -1183,14 +1183,24 @@ Public Class frmModelSetup
     End Sub
 
     Private Sub cboLanduse_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboLanduse.SelectedIndexChanged
-        If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
+        Dim lLandUseType As String = cboLanduse.Items(cboLanduse.SelectedIndex)
+        Dim lLayerNameLandUse As String = ""
+        If cboLandUseLayer.SelectedIndex > -1 Then
+            lLayerNameLandUse = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
+        End If
+        Dim lFieldNameLandUse As String = ""
+        If cboDescription.SelectedIndex > -1 Then
+            lFieldNameLandUse = cboDescription.Items(cboDescription.SelectedIndex)
+        End If
+
+        If lLandUseType = "USGS GIRAS Shapefile" Then
             cboLandUseLayer.Visible = False
             lblLandUseLayer.Visible = False
             cboDescription.Visible = False
             lblDescription.Visible = False
             lblClass.Text = "/BASINS/etc/giras.dbf"
-            SetPerviousGrid()
-        ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
+            SetPerviousGrid(AtcGridPervious, lblClass.Text, lLandUseType, lLayerNameLandUse, lFieldNameLandUse)
+        ElseIf lLandUseType = "Other Shapefile" Then
             cboLandUseLayer.Items.Clear()
             Dim lLayerDefaultIndex As Integer = 0
             For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
@@ -1210,8 +1220,8 @@ Public Class frmModelSetup
             cboDescription.Visible = True
             lblDescription.Visible = True
             lblClass.Text = "<none>"
-            SetPerviousGrid()
-        ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "NLCD Grid" Then
+            SetPerviousGrid(AtcGridPervious, lblClass.Text, lLandUseType, lLayerNameLandUse, lFieldNameLandUse)
+        ElseIf lLandUseType = "NLCD Grid" Then
             cboLandUseLayer.Items.Clear()
             For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
                 If GisUtil.LayerType(lLayerIndex) = 4 Then  'Grid 
@@ -1228,7 +1238,7 @@ Public Class frmModelSetup
             cboDescription.Visible = False
             lblDescription.Visible = False
             lblClass.Text = "/BASINS/etc/nlcd.dbf"
-            SetPerviousGrid()
+            SetPerviousGrid(AtcGridPervious, lblClass.Text, lLandUseType, lLayerNameLandUse, lFieldNameLandUse)
         Else 'grid
             cboLandUseLayer.Items.Clear()
             For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
@@ -1244,7 +1254,7 @@ Public Class frmModelSetup
             cboDescription.Visible = False
             lblDescription.Visible = False
             lblClass.Text = "<none>"
-            SetPerviousGrid()
+            SetPerviousGrid(AtcGridPervious, lblClass.Text, lLandUseType, lLayerNameLandUse, lFieldNameLandUse)
         End If
     End Sub
 
@@ -1276,243 +1286,18 @@ Public Class frmModelSetup
         End If
     End Sub
 
-    Private Sub SetPerviousGrid()
-        If AtcGridPervious.Source Is Nothing Then Exit Sub
-
-        AtcGridPervious.Clear()
-        With AtcGridPervious.Source
-            .Rows = 1
-            .Columns = 5
-            .CellValue(0, 0) = "Code"
-            .CellValue(0, 1) = "Group Description"
-            .CellValue(0, 2) = "Impervious Percent"
-            .CellValue(0, 3) = "Multiplier"
-            .CellValue(0, 4) = "Subbasin"
-            .ColorCells = True
-            .FixedRows = 1
-            .FixedColumns = 2
-        End With
-
-        If lblClass.Text <> "<none>" And _
-          (cboLandUseLayer.Visible = False Or _
-          (cboLandUseLayer.Visible And cboLandUseLayer.SelectedIndex > -1)) Then
-            'giras, nlcd, or other with reclass file set
-            Dim lReclassTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lblClass.Text)
-            'do pre-scan to set up grid
-            Dim lPrevCode As Integer = -1
-            Dim lShowMults As Boolean = False
-            Dim lShowCodes As Boolean = False
-            Dim lGroupNames As New Collection
-            Dim lGroupPercent As New Collection  'dont want to use atccollection because we may want to add mult times
-            Dim lGroupIndex As Integer
-            For lRecordIndex As Integer = 1 To lReclassTable.NumRecords
-                'scan to see if multiple records for the same code
-                lReclassTable.CurrentRecord = lRecordIndex
-                Dim lCode As Long = lReclassTable.Value(1)
-                If lCode = lPrevCode Then
-                    lShowMults = True
-                End If
-                lPrevCode = lCode
-                'scan to see if perv percent varies within a group
-                Dim lInCollection As Boolean = False
-                For lGroupIndex = 1 To lGroupNames.Count
-                    If lGroupNames(lGroupIndex) = lReclassTable.Value(2) Then
-                        lInCollection = True
-                        If lGroupPercent(lGroupIndex) <> lReclassTable.Value(3) Then
-                            lShowCodes = True
-                        End If
-                        Exit For
-                    End If
-                Next lGroupIndex
-
-                If Not lInCollection Then
-                    lGroupNames.Add(lReclassTable.Value(2))
-                    lGroupPercent.Add(lReclassTable.Value(3))
-                End If
-            Next lRecordIndex
-
-            If lShowMults Then
-                lShowCodes = True
-            End If
-
-            'sort list items
-            Dim llReclassTableSorted As New atcCollection
-            For lRecordIndex As Integer = 1 To lReclassTable.NumRecords
-                lReclassTable.CurrentRecord = lRecordIndex
-                llReclassTableSorted.Add(lRecordIndex, lReclassTable.Value(1))
-            Next lRecordIndex
-            llReclassTableSorted.SortByValue()
-
-            'now populate grid
-            With AtcGridPervious.Source
-                For Each lRow As Integer In llReclassTableSorted.Keys
-                    lReclassTable.CurrentRecord = lRow
-                    If Not lShowCodes Then
-                        'just show group desc and percent perv
-                        Dim lInCollection As Boolean = False
-                        For lRowIndex As Integer = 1 To .Rows
-                            If .CellValue(lRowIndex - 1, 1) = lReclassTable.Value(2) Then
-                                lInCollection = True
-                            End If
-                        Next
-                        If Not lInCollection Then
-                            .Rows += 1
-                            .CellValue(.Rows - 1, 1) = lReclassTable.Value(2)
-                            .CellValue(.Rows - 1, 2) = lReclassTable.Value(3)
-                            .CellEditable(.Rows - 1, 2) = True
-                            .CellColor(.Rows - 1, 1) = Me.BackColor
-                        End If
-                    Else 'need to show whole table
-                        If lReclassTable.Value(1) > 0 Then
-                            .Rows += 1
-                            .CellValue(.Rows - 1, 0) = lReclassTable.Value(1)
-                            .CellValue(.Rows - 1, 1) = lReclassTable.Value(2)
-                            .CellValue(.Rows - 1, 2) = lReclassTable.Value(3)
-                            .CellValue(.Rows - 1, 3) = lReclassTable.Value(4)
-                            .CellValue(.Rows - 1, 4) = lReclassTable.Value(5)
-                        End If
-                    End If
-                Next
-            End With
-
-            AtcGridPervious.SizeAllColumnsToContents()
-            If lShowMults Then
-                lShowCodes = True
-            Else
-                AtcGridPervious.ColumnWidth(3) = 0
-                AtcGridPervious.ColumnWidth(4) = 0
-            End If
-            If Not lShowCodes Then
-                AtcGridPervious.ColumnWidth(0) = 0
-            End If
-        ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
-            If cboLandUseLayer.SelectedIndex > -1 And cboDescription.SelectedIndex > -1 Then
-                Dim lLayerNameLandUse As String = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
-                Dim lFieldNameLandUse As String = cboDescription.Items(cboDescription.SelectedIndex)
-                'no reclass file, get unique landuse names
-                Dim lLayerIndex As Integer = GisUtil.LayerIndex(lLayerNameLandUse)
-                If lLayerIndex > -1 Then
-                    Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
-                    FillListUniqueLandUses(lLayerIndex, lFieldNameLandUse)
-                    Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
-                End If
-            End If
-        Else 'other grid types with no reclass file set
-            If cboLandUseLayer.SelectedIndex > -1 Then
-                Dim lLayerNameLandUse As String = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
-                'get unique landuse names
-                Dim lLayerIndex As Integer = GisUtil.LayerIndex(lLayerNameLandUse)
-                If GisUtil.LayerType(lLayerIndex) = 4 Then 'Grid
-                    Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
-                    For lGridX As Integer = Convert.ToInt32(GisUtil.GridLayerMinimum(lLayerIndex)) To Convert.ToInt32(GisUtil.GridLayerMaximum(lLayerIndex))
-                        AtcGridPervious.Source.Rows += 1
-                        AtcGridPervious.Source.CellValue(AtcGridPervious.Source.Rows - 1, 0) = lGridX
-                        AtcGridPervious.Source.CellValue(AtcGridPervious.Source.Rows - 1, 1) = lGridX
-                        AtcGridPervious.Source.CellValue(AtcGridPervious.Source.Rows - 1, 2) = 100
-                    Next lGridX
-                    Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
-                End If
-            End If
-            AtcGridPervious.SizeAllColumnsToContents()
-            AtcGridPervious.ColumnWidth(0) = 0
-            AtcGridPervious.ColumnWidth(3) = 0
-            AtcGridPervious.ColumnWidth(4) = 0
-        End If
-
-        With AtcGridPervious.Source
-            .CellColor(0, 0) = SystemColors.ControlDark
-            .CellColor(0, 1) = SystemColors.ControlDark
-            .CellColor(0, 2) = SystemColors.ControlDark
-            .CellColor(0, 3) = SystemColors.ControlDark
-            .CellColor(0, 4) = SystemColors.ControlDark
-            For lRowIndex As Integer = 1 To .Rows - 1
-                .CellEditable(lRowIndex, 2) = True
-                .CellEditable(lRowIndex, 3) = True
-                .CellEditable(lRowIndex, 4) = True
-                .CellColor(lRowIndex, 0) = SystemColors.ControlDark
-                .CellColor(lRowIndex, 1) = SystemColors.ControlDark
-            Next lRowIndex
-        End With
-        AtcGridPervious.Refresh()
-    End Sub
-
-    Private Sub SetMetSegmentGrid()
-
-        If AtcGridMet.Source Is Nothing Then Exit Sub
-
-        If cboSubbasins.SelectedIndex = -1 Or cboSub1.SelectedIndex = -1 Then Exit Sub
-
-        Dim lSubbasinsLayerName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
-        Dim lSubbasinsLayerIndex As Integer = GisUtil.LayerIndex(lSubbasinsLayerName)
-
-        Dim lSubbasinsFieldName As String = cboSub1.Items(cboSub1.SelectedIndex)
-        Dim lSubbasinsFieldIndex As Integer = GisUtil.FieldIndex(lSubbasinsLayerIndex, lSubbasinsFieldName)
-
-        pUniqueModelSegmentNames = New atcCollection
-        pUniqueModelSegmentIds = New atcCollection
-        Dim lUniqueModelSegmentIntegerIds As New atcCollection
-        If cboSub3.SelectedIndex > 0 Then
-            'see if we have some model segments in the subbasin dbf
-            Dim lModelSegmentFieldName As String = cboSub3.Items(cboSub3.SelectedIndex)
-            Dim lModelSegmentFieldIndex As Integer = GisUtil.FieldIndex(lSubbasinsLayerIndex, lModelSegmentFieldName)
-            Dim lIsInteger As Boolean = True
-            For lIndex As Integer = 1 To GisUtil.NumFeatures(lSubbasinsLayerIndex)
-                Dim lModelSegment As String = GisUtil.FieldValue(lSubbasinsLayerIndex, lIndex - 1, lModelSegmentFieldIndex)
-                If pUniqueModelSegmentNames.IndexFromKey(lModelSegment) = -1 Then
-                    pUniqueModelSegmentNames.Add(lModelSegment)
-                    lUniqueModelSegmentIntegerIds.Add(lUniqueModelSegmentIntegerIds.Count + 1)
-                    If IsInteger(lModelSegment) Then
-                        If Int(lModelSegment) > 0 Then
-                            pUniqueModelSegmentIds.Add(lModelSegment)   'can use this as the integer model segment id
-                        Else
-                            lIsInteger = False
-                        End If
-                    Else
-                        lIsInteger = False
-                    End If
-                End If
-            Next
-            If Not lIsInteger Then
-                'one or more segment names are not valid integers
-                pUniqueModelSegmentIds = lUniqueModelSegmentIntegerIds
-            End If
-        End If
-
-        If pUniqueModelSegmentIds.Count = 0 Then
-            lstMet.Visible = True
-            AtcGridMet.Visible = False
-        Else
-            lstMet.Visible = False
-            AtcGridMet.Visible = True
-            AtcGridMet.Clear()
-            With AtcGridMet.Source
-                .Columns = 2
-                .ColorCells = True
-                .FixedRows = 1
-                .FixedColumns = 1
-                .CellColor(0, 0) = SystemColors.ControlDark
-                .CellColor(0, 1) = SystemColors.ControlDark
-                .Rows = 1 + pUniqueModelSegmentNames.Count
-                .CellValue(0, 0) = "Model Segment"
-                .CellValue(0, 1) = "Met Station"
-                For lIndex As Integer = 1 To pUniqueModelSegmentNames.Count
-                    .CellValue(lIndex, 0) = pUniqueModelSegmentNames(lIndex - 1)
-                    .CellColor(lIndex, 0) = SystemColors.ControlDark
-                    If pMetStations.Count > 0 Then
-                        .CellValue(lIndex, 1) = pMetStations(0)
-                        .CellEditable(lIndex, 1) = True
-                    End If
-                Next
-            End With
-            AtcGridMet.ValidValues = pMetStations
-            AtcGridMet.SizeAllColumnsToContents()
-            AtcGridMet.Refresh()
-        End If
-
-    End Sub
-
     Private Sub cboDescription_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboDescription.SelectedIndexChanged
-        SetPerviousGrid()
+        Dim lLandUseType As String = cboLanduse.Items(cboLanduse.SelectedIndex)
+        Dim lLayerNameLandUse As String = ""
+        If cboLandUseLayer.SelectedIndex > -1 Then
+            lLayerNameLandUse = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
+        End If
+        Dim lFieldNameLandUse As String = ""
+        If cboDescription.SelectedIndex > -1 Then
+            lFieldNameLandUse = cboDescription.Items(cboDescription.SelectedIndex)
+        End If
+
+        SetPerviousGrid(AtcGridPervious, lblClass.Text, lLandUseType, lLayerNameLandUse, lFieldNameLandUse)
     End Sub
 
     Private Sub cmdAbout_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAbout.Click
@@ -1529,37 +1314,6 @@ Public Class frmModelSetup
 
     Private Sub cmdHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdHelp.Click
         ShowHelp("BASINS Details\Watershed and Instream Model Setup\HSPF.html")
-    End Sub
-
-    Private Sub FillListUniqueLandUses(ByVal aLayerIndex As Long, ByVal aFieldName As String)
-        Dim lFieldIndex As Integer = GisUtil.FieldIndex(aLayerIndex, aFieldName)
-        If lFieldIndex > -1 Then 'this is the field we want, get land use types
-            Dim lUnique As New atcCollection
-            For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(aLayerIndex) - 1
-                Dim lFieldValue As String = GisUtil.FieldValue(aLayerIndex, lFeatureIndex, lFieldIndex)
-                If lUnique.IndexFromKey(lFieldValue) = -1 Then 'new land use
-                    With AtcGridPervious.Source
-                        .Rows += 1
-                        .CellValue(.Rows - 1, 1) = lFieldValue
-                        .CellValue(.Rows - 1, 0) = lFieldValue
-                        If lFieldValue.ToUpper.StartsWith("URBAN") Then
-                            .CellValue(.Rows - 1, 2) = 50
-                        Else
-                            .CellValue(.Rows - 1, 2) = 0
-                        End If
-                        .CellEditable(.Rows - 1, 2) = True
-                        lUnique.Add(lFieldValue)
-                    End With
-                End If
-            Next lFeatureIndex
-
-            With AtcGridPervious
-                .SizeAllColumnsToContents()
-                .ColumnWidth(0) = 0 'hide
-                .ColumnWidth(3) = 0
-                .ColumnWidth(4) = 0
-            End With
-        End If
     End Sub
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
@@ -1596,7 +1350,15 @@ Public Class frmModelSetup
         Me.Refresh()
         EnableControls(False)
 
-        If Not PreProcessChecking(aOutputPath, aBaseOutputName) Then 'failed early checks
+        Dim lSubbasinThemeName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
+        Dim lLandUseThemeName As String = ""
+        If cboLandUseLayer.SelectedIndex > -1 Then
+            lLandUseThemeName = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
+        End If
+
+        If Not PreProcessChecking(aOutputPath, aBaseOutputName, pModelName, cboLanduse.SelectedIndex, _
+                                  pMetStations.Count, lSubbasinThemeName, lLandUseThemeName) Then 'failed early checks
+            EnableControls(True)
             Exit Function
         End If
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
@@ -1606,7 +1368,7 @@ Public Class frmModelSetup
         Dim lSubbasinsSlopes As New atcCollection    'key is subbasin id, value is slope
         Dim lSubbasinId As Integer
         Dim lSubbasinSlope As Double
-        Dim lSubbasinThemeName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
+
         Dim lSubbasinLayerIndex As Long = GisUtil.LayerIndex(lSubbasinThemeName)
         Dim lSubbasinFieldName As String = cboSub1.Items(cboSub1.SelectedIndex)
         Dim lSubbasinFieldIndex As Long = GisUtil.FieldIndex(lSubbasinLayerIndex, lSubbasinFieldName)
@@ -1653,7 +1415,7 @@ Public Class frmModelSetup
 
         If cboLanduse.SelectedIndex = 0 Then
             'usgs giras is the selected land use type
-            CreateLanduseRecordsGIRAS(lSubbasinsSelected, lLucodes, lSubids, lAreas)
+            CreateLanduseRecordsGIRAS(lSubbasinsSelected, lLucodes, lSubids, lAreas, lSubbasinThemeName, lSubbasinFieldName)
 
             If lLucodes.Count = 0 Then
                 'TODO: report problem?
@@ -1671,7 +1433,7 @@ Public Class frmModelSetup
 
         ElseIf cboLanduse.SelectedIndex = 1 Or cboLanduse.SelectedIndex = 3 Then
             'nlcd grid or other grid is the selected land use type
-            CreateLanduseRecordsGrid(lSubbasinsSelected, lLucodes, lSubids, lAreas)
+            CreateLanduseRecordsGrid(lSubbasinsSelected, lLucodes, lSubids, lAreas, lSubbasinThemeName, lLandUseThemeName)
 
             If cboLanduse.SelectedIndex = 1 Then 'nlcd grid
                 Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
@@ -1689,114 +1451,128 @@ Public Class frmModelSetup
 
         ElseIf cboLanduse.SelectedIndex = 2 Then
             'other shape
-            CreateLanduseRecordsShapefile(lSubbasinsSelected, lLucodes, lSubids, lAreas)
+            Dim lLanduseFieldName As String = ""
+            If cboDescription.SelectedIndex > -1 Then
+                lLanduseFieldName = cboDescription.Items(cboDescription.SelectedIndex)
+            End If
+            CreateLanduseRecordsShapefile(lSubbasinsSelected, lLucodes, lSubids, lAreas, lSubbasinThemeName, lSubbasinFieldName, lLandUseThemeName, lLanduseFieldName)
 
             lReclassifyFileName = ""
             If lblClass.Text <> "<none>" Then
                 lReclassifyFileName = lblClass.Text
             End If
 
-        End If
+            End If
 
-        lblStatus.Text = "Completed overlay of subbasins and land use layers"
-        Me.Refresh()
-
-        'Create Reach Segments
-        Dim lReaches As Reaches = CreateReachSegments(lSubbasinsSelected, lSubbasinsModelSegmentIds)
-
-        'Create Stream Channels
-        Dim lChannels As Channels = CreateStreamChannels(lReaches)
-
-        'Create LandUses
-        Dim lLandUses As LandUses = CreateLanduses(lSubbasinsSlopes, lLucodes, lSubids, lAreas, lReaches)
-
-        'figure out which outlets are in which subbasins
-        Dim lOutletsThemeName As String = cboOutlets.Items(cboOutlets.SelectedIndex)
-        Dim lOutSubs As New Collection
-        If lOutletsThemeName <> "<none>" Then
-            lblStatus.Text = "Joining point sources to subbasins"
+            lblStatus.Text = "Completed overlay of subbasins and land use layers"
             Me.Refresh()
-            Dim i As Integer = GisUtil.LayerIndex(lOutletsThemeName)
-            For j As Integer = 1 To GisUtil.NumFeatures(i)
-                Dim k As Integer = GisUtil.PointInPolygon(i, j - 1, lSubbasinLayerIndex)
-                If k > -1 Then
-                    lOutSubs.Add(GisUtil.FieldValue(lSubbasinLayerIndex, k, lSubbasinFieldIndex))
-                Else
-                    lOutSubs.Add(-1)
-                End If
-            Next j
-        End If
 
-        'make output folder
-        MkDirPath(aOutputPath)
-        Dim lBaseFileName As String = aOutputPath & "\" & aBaseOutputName
+            'Create Reach Segments
+            Dim lStreamsLayerName As String = cboStreams.Items(cboStreams.SelectedIndex)
+            Dim lStreamFields() As String = {cboStream1.Items(cboStream1.SelectedIndex), _
+                                             cboStream2.Items(cboStream2.SelectedIndex), _
+                                             cboStream3.Items(cboStream3.SelectedIndex), _
+                                             cboStream4.Items(cboStream4.SelectedIndex), _
+                                             cboStream5.Items(cboStream5.SelectedIndex), _
+                                             cboStream6.Items(cboStream6.SelectedIndex), _
+                                             cboStream7.Items(cboStream7.SelectedIndex), _
+                                             cboStream8.Items(cboStream8.SelectedIndex), _
+                                             cboStream9.Items(cboStream9.SelectedIndex)}
+            Dim lReaches As Reaches = CreateReachSegments(lSubbasinsSelected, lSubbasinsModelSegmentIds, lStreamsLayerName, lStreamFields)
 
-        'write wsd file
-        lblStatus.Text = "Writing WSD file"
-        Me.Refresh()
-        Dim lReclassifyLanduses As LandUses = ReclassifyLandUses(lReclassifyFileName, AtcGridPervious, lLandUses)
-        WriteWSDFile(lBaseFileName & ".wsd", lReclassifyLanduses)
-        'WriteWSDFile(lBaseFileName & ".wsd", lAreas, lLucodes, lSubids, cSubSlope, lReclassifyFileName, AtcGridPervious)
+            'Create Stream Channels
+            Dim lChannels As Channels = CreateStreamChannels(lReaches)
 
-        'write rch file 
-        lblStatus.Text = "Writing RCH file"
-        Me.Refresh()
-        WriteRCHFile(lBaseFileName & ".rch", lReaches)
+            'Create LandUses
+            Dim lLandUses As LandUses = CreateLanduses(lSubbasinsSlopes, lLucodes, lSubids, lAreas, lReaches)
 
-        'write ptf file
-        lblStatus.Text = "Writing PTF file"
-        Me.Refresh()
-        WritePTFFile(lBaseFileName & ".ptf", lChannels)
+            'figure out which outlets are in which subbasins
+            Dim lOutletsThemeName As String = cboOutlets.Items(cboOutlets.SelectedIndex)
+            Dim lOutSubs As New Collection
+            If lOutletsThemeName <> "<none>" Then
+                lblStatus.Text = "Joining point sources to subbasins"
+                Me.Refresh()
+                Dim i As Integer = GisUtil.LayerIndex(lOutletsThemeName)
+                For j As Integer = 1 To GisUtil.NumFeatures(i)
+                    Dim k As Integer = GisUtil.PointInPolygon(i, j - 1, lSubbasinLayerIndex)
+                    If k > -1 Then
+                        lOutSubs.Add(GisUtil.FieldValue(lSubbasinLayerIndex, k, lSubbasinFieldIndex))
+                    Else
+                        lOutSubs.Add(-1)
+                    End If
+                Next j
+            End If
 
-        'write psr file
-        lblStatus.Text = "Writing PSR file"
-        Me.Refresh()
-        Dim lOutletsLayerIndex As Integer
-        Dim lPointLayerIndex As Integer
-        Dim lYear As String = ""
-        If lOutSubs.Count > 0 Then
-            lOutletsLayerIndex = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
-            lPointLayerIndex = GisUtil.FieldIndex(lOutletsLayerIndex, cboPoint.Items(cboPoint.SelectedIndex))
-            lYear = cboYear.Items(cboYear.SelectedIndex)
-        End If
-        WritePSRFile(lBaseFileName & ".psr", lSubbasinsSelected, lOutSubs, lOutletsLayerIndex, lPointLayerIndex, _
-                        chkCustom.Checked, lblCustom.Text, chkCalculate.Checked, lYear)
+            'make output folder
+            MkDirPath(aOutputPath)
+            Dim lBaseFileName As String = aOutputPath & "\" & aBaseOutputName
 
-        'write seg file
-        lblStatus.Text = "Writing SEG file"
-        Me.Refresh()
-        Dim lMetIndices As New atcCollection
-        Dim lUniqueModelSegmentIds As New atcCollection
-        If pUniqueModelSegmentIds.Count = 0 Then
-            'use a single met station
-            lMetIndices.Add(lstMet.SelectedIndex)
-            lUniqueModelSegmentIds.Add(1)
-        Else
-            'use the specified segmentation scheme
-            For lRow As Integer = 1 To AtcGridMet.Source.Rows - 1
-                lMetIndices.Add(pMetStations.IndexFromKey(AtcGridMet.Source.CellValue(lRow, 1)))
-            Next
-            lUniqueModelSegmentIds = pUniqueModelSegmentIds
-        End If
-        WriteSEGFile(lBaseFileName & ".seg", lUniqueModelSegmentIds, lMetIndices, pMetBaseDsns)
+            'write wsd file
+            lblStatus.Text = "Writing WSD file"
+            Me.Refresh()
+            Dim lReclassifyLanduses As LandUses = ReclassifyLandUses(lReclassifyFileName, AtcGridPervious, lLandUses)
+            WriteWSDFile(lBaseFileName & ".wsd", lReclassifyLanduses)
+            'WriteWSDFile(lBaseFileName & ".wsd", lAreas, lLucodes, lSubids, cSubSlope, lReclassifyFileName, AtcGridPervious)
 
-        'write map file
-        lblStatus.Text = "Writing MAP file"
-        Me.Refresh()
-        WriteMAPFile(lBaseFileName & ".map")
+            'write rch file 
+            lblStatus.Text = "Writing RCH file"
+            Me.Refresh()
+            WriteRCHFile(lBaseFileName & ".rch", lReaches)
 
-        lblStatus.Text = ""
-        Me.Refresh()
-        Me.Dispose()
-        Me.Close()
+            'write ptf file
+            lblStatus.Text = "Writing PTF file"
+            Me.Refresh()
+            WritePTFFile(lBaseFileName & ".ptf", lChannels)
 
-        Return True
-        'Catch
-        '    Logger.Msg("An error occurred: " & Err.Description, vbOKOnly, "BASINS " & pModelName & " Error")
-        '    Me.Dispose()
-        '    Me.Close()
-        '    Return False
-        'End Try
+            'write psr file
+            lblStatus.Text = "Writing PSR file"
+            Me.Refresh()
+            Dim lOutletsLayerIndex As Integer
+            Dim lPointLayerIndex As Integer
+            Dim lYear As String = ""
+            If lOutSubs.Count > 0 Then
+                lOutletsLayerIndex = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
+                lPointLayerIndex = GisUtil.FieldIndex(lOutletsLayerIndex, cboPoint.Items(cboPoint.SelectedIndex))
+                lYear = cboYear.Items(cboYear.SelectedIndex)
+            End If
+            WritePSRFile(lBaseFileName & ".psr", lSubbasinsSelected, lOutSubs, lOutletsLayerIndex, lPointLayerIndex, _
+                         chkCustom.Checked, lblCustom.Text, chkCalculate.Checked, lYear)
+
+            'write seg file
+            lblStatus.Text = "Writing SEG file"
+            Me.Refresh()
+            Dim lMetIndices As New atcCollection
+            Dim lUniqueModelSegmentIds As New atcCollection
+            If pUniqueModelSegmentIds.Count = 0 Then
+                'use a single met station
+                lMetIndices.Add(lstMet.SelectedIndex)
+                lUniqueModelSegmentIds.Add(1)
+            Else
+                'use the specified segmentation scheme
+                For lRow As Integer = 1 To AtcGridMet.Source.Rows - 1
+                    lMetIndices.Add(pMetStations.IndexFromKey(AtcGridMet.Source.CellValue(lRow, 1)))
+                Next
+                lUniqueModelSegmentIds = pUniqueModelSegmentIds
+            End If
+            WriteSEGFile(lBaseFileName & ".seg", lUniqueModelSegmentIds, lMetIndices, pMetBaseDsns)
+
+            'write map file
+            lblStatus.Text = "Writing MAP file"
+            Me.Refresh()
+            WriteMAPFile(lBaseFileName & ".map")
+
+            lblStatus.Text = ""
+            Me.Refresh()
+            Me.Dispose()
+            Me.Close()
+
+            Return True
+            'Catch
+            '    Logger.Msg("An error occurred: " & Err.Description, vbOKOnly, "BASINS " & pModelName & " Error")
+            '    Me.Dispose()
+            '    Me.Close()
+            '    Return False
+            'End Try
     End Function
 
     Private Function SetupAQUATOX(ByVal aOutputPath As String, ByVal aBaseOutputName As String) As Boolean
@@ -1805,8 +1581,19 @@ Public Class frmModelSetup
             Me.Refresh()
             EnableControls(False)
 
-            If Not PreProcessChecking(aOutputPath, aBaseOutputName) Then 'failed early checks
-                Return False
+            Dim lSubbasinThemeName As String = ""
+            If cboSubbasins.SelectedIndex > -1 Then
+                lSubbasinThemeName = cboSubbasins.Items(cboSubbasins.SelectedIndex)
+            End If
+            Dim lLandUseThemeName As String = ""
+            If cboLandUseLayer.SelectedIndex > -1 Then
+                lLandUseThemeName = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
+            End If
+
+            If Not PreProcessChecking(aOutputPath, aBaseOutputName, pModelName, cboLanduse.SelectedIndex, _
+                                  pMetStations.Count, lSubbasinThemeName, lLandUseThemeName) Then 'failed early checks
+                EnableControls(True)
+                Exit Function
             End If
             Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
 
@@ -1832,7 +1619,17 @@ Public Class frmModelSetup
             lModelSegmentIds.Add(1)
 
             'Create Reach Segments
-            Dim lReaches As Reaches = CreateReachSegments(lUniqueStreamIds, lModelSegmentIds)
+            Dim lStreamsLayerName As String = cboStreams.Items(cboStreams.SelectedIndex)
+            Dim lStreamFields() As String = {cboStream1.Items(cboStream1.SelectedIndex), _
+                                             cboStream2.Items(cboStream2.SelectedIndex), _
+                                             cboStream3.Items(cboStream3.SelectedIndex), _
+                                             cboStream4.Items(cboStream4.SelectedIndex), _
+                                             cboStream5.Items(cboStream5.SelectedIndex), _
+                                             cboStream6.Items(cboStream6.SelectedIndex), _
+                                             cboStream7.Items(cboStream7.SelectedIndex), _
+                                             cboStream8.Items(cboStream8.SelectedIndex), _
+                                             cboStream9.Items(cboStream9.SelectedIndex)}
+            Dim lReaches As Reaches = CreateReachSegments(lUniqueStreamIds, lModelSegmentIds, lStreamsLayerName, lStreamFields)
 
             'Create Stream Channels
             Dim lChannels As Channels = CreateStreamChannels(lReaches)
@@ -1876,305 +1673,6 @@ Public Class frmModelSetup
         End Try
     End Function
 
-    Private Function CreateReachSegments(ByVal aSubbasinsSelected As atcCollection, ByVal aSubbasinsModelSegmentIds As atcCollection) As Reaches
-
-        'for reaches in selected subbasins, populate reach class from dbf
-        Dim lReaches As New Reaches
-        Dim lStreamsLayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
-        Dim lStreamsFieldIndex As Integer = GisUtil.FieldIndex(lStreamsLayerIndex, cboStream1.Items(cboStream1.SelectedIndex))
-        Dim lStreamsRIndex As Integer = GisUtil.FieldIndex(lStreamsLayerIndex, cboStream2.Items(cboStream2.SelectedIndex))
-        Dim lLen2Index As Integer = GisUtil.FieldIndex(lStreamsLayerIndex, cboStream3.Items(cboStream3.SelectedIndex))
-        Dim lSlo2Index As Integer = GisUtil.FieldIndex(lStreamsLayerIndex, cboStream4.Items(cboStream4.SelectedIndex))
-        Dim lWid2Index As Integer = GisUtil.FieldIndex(lStreamsLayerIndex, cboStream5.Items(cboStream5.SelectedIndex))
-        Dim lDep2Index As Integer = GisUtil.FieldIndex(lStreamsLayerIndex, cboStream6.Items(cboStream6.SelectedIndex))
-        Dim lMinelIndex As Integer = GisUtil.FieldIndex(lStreamsLayerIndex, cboStream7.Items(cboStream7.SelectedIndex))
-        Dim lMaxelIndex As Integer = GisUtil.FieldIndex(lStreamsLayerIndex, cboStream8.Items(cboStream8.SelectedIndex))
-        Dim lSnameIndex As Integer = GisUtil.FieldIndex(lStreamsLayerIndex, cboStream9.Items(cboStream9.SelectedIndex))
-
-        For lStreamIndex As Integer = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
-            For Each lSubbasinId As Integer In aSubbasinsSelected
-                If lSubbasinId = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lStreamsFieldIndex) Then
-                    'this is one we want
-                    Dim lReach As New Reach
-                    With lReach
-                        .Id = lSubbasinId
-                        .Name = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lSnameIndex)
-                        If Len(Trim(.Name)) = 0 Then
-                            .Name = "STREAM " + lSubbasinId.ToString
-                        End If
-                        .WsId = lSubbasinId
-                        .NExits = 1
-                        .Type = "S"
-                        .DownID = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lStreamsRIndex)
-                        .Manning = 0.05
-                        .Order = lReaches.Count + 1
-                        If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lLen2Index)) Then
-                            .Length = (CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lLen2Index)) * 3.28) / 5280
-                        Else
-                            .Length = 0.0#
-                        End If
-                        If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lDep2Index)) Then
-                            .Depth = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lDep2Index)) * 3.28
-                        Else
-                            .Depth = 0.0#
-                        End If
-                        If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lWid2Index)) Then
-                            .Width = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lWid2Index)) * 3.28
-                        Else
-                            .Width = 0.0#
-                        End If
-                        Dim lMinEl As Single
-                        If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMinelIndex)) Then
-                            lMinEl = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMinelIndex)) * 3.28
-                        Else
-                            lMinEl = 0.0#
-                        End If
-                        Dim lMaxEl As Single
-                        If IsNumeric(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMaxelIndex)) Then
-                            lMaxEl = CSng(GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lMaxelIndex)) * 3.28
-                        Else
-                            lMaxEl = 0.0#
-                        End If
-                        .Elev = ((lMaxEl + lMinEl) / 2)
-                        .DeltH = lMaxEl - lMinEl
-                        .SegmentId = aSubbasinsModelSegmentIds.ItemByKey(lSubbasinId)
-                    End With
-                    If Not lReaches.Contains(lReach.Id) Then
-                        lReaches.Add(lReach)
-                    End If
-                End If
-            Next
-        Next
-        Return lReaches
-    End Function
-
-    Private Function CreateStreamChannels(ByVal aReaches As Reaches) As Channels
-
-        'for reaches in selected subbasins, populate channel class from dbf
-        Dim lChannels As New Channels
-
-        For Each lReach As Reach In aReaches
-            Dim lChannel As New Channel
-            With lChannel
-                .Reach = lReach
-                .Length = lReach.Length * 5280
-                .DepthMean = lReach.Depth
-                .WidthMean = lReach.Width
-                .ManningN = 0.05
-                .SlopeProfile = Math.Abs(lReach.DeltH / (lReach.Length * 5280))
-                If .SlopeProfile < 0.0001 Then
-                    .SlopeProfile = 0.001
-                End If
-                .SlopeSideUpperFPLeft = 0.5
-                .SlopeSideLowerFPLeft = 0.5
-                .WidthZeroSlopeLeft = lReach.Width
-                .SlopeSideLeft = 1
-                .SlopeSideRight = 1
-                .WidthZeroSlopeRight = lReach.Width
-                .SlopeSideLowerFPRight = 0.5
-                .SlopeSideUpperFPRight = 0.5
-                .DepthChannel = lReach.Depth * 1.25
-                .DepthSlopeChange = lReach.Depth * 1.875
-                .DepthMax = lReach.Depth * 62.5
-            End With
-            If Not lChannels.Contains(lChannel.Reach.Id) Then
-                lChannels.Add(lChannel)
-            End If
-        Next
-        Return lChannels
-    End Function
-
-    Private Sub CreateLanduseRecordsGIRAS(ByVal aSubbasinsSelected As atcCollection, ByRef aLucode As Collection, ByRef aSubid As Collection, ByRef aArea As Collection)
-
-        'perform overlay for GIRAS 
-        Dim lSubbasinThemeName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
-        Dim lSubbasinLayerIndex As Long = GisUtil.LayerIndex(lSubbasinThemeName)
-        Dim lSubbasinFieldName As String = cboSub1.Items(cboSub1.SelectedIndex)
-
-        lblStatus.Text = "Selecting land use tiles for overlay"
-        Me.Refresh()
-
-        'set land use index layer
-        Dim lLandUseThemeName As String = "Land Use Index"
-        Dim lLanduseFieldName As String = "COVNAME"
-        Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(lLandUseThemeName)
-        Dim lLandUseFieldIndex As Integer = GisUtil.FieldIndex(lLanduseLayerIndex, lLanduseFieldName)
-        Dim lLandUsePathName As String = PathNameOnly(GisUtil.LayerFileName(lLanduseLayerIndex)) & "\landuse"
-
-        'figure out which land use tiles to overlay
-        Dim lLandUseTiles As New atcCollection
-        For i As Integer = 1 To GisUtil.NumFeatures(lLanduseLayerIndex)
-            'loop thru each shape of land use index shapefile
-            For j As Integer = 0 To aSubbasinsSelected.Count - 1
-                'loop thru each selected subbasin (or all if none selected)
-                Dim lShapeIndex As Long = aSubbasinsSelected.Keys(j)
-                If GisUtil.OverlappingPolygons(lLanduseLayerIndex, i - 1, lSubbasinLayerIndex, lShapeIndex) Then
-                    'add this to collection of tiles we'll need
-                    lLandUseTiles.Add(GisUtil.FieldValue(lLanduseLayerIndex, i - 1, lLandUseFieldIndex))
-                End If
-            Next j
-        Next i
-
-        'add tiles if not already on map
-        'figure out how many polygons to overlay, for status message
-        Dim lTotalPolygonCount As Integer = 0
-        Dim lTileFileNames As New atcCollection
-        For Each lLandUseTile As String In lLandUseTiles
-            Dim lNewFileName As String = lLandUsePathName & "\" & lLandUseTile & ".shp"
-            lTileFileNames.Add(lNewFileName)
-            If Not GisUtil.IsLayerByFileName(lNewFileName) Then
-                If Not GisUtil.AddLayer(lNewFileName, lLandUseTile) Then
-                    Logger.Msg("The GIRAS Landuse Shapefile " & lNewFileName & "does not exist." & _
-                                vbCrLf & "Run the Download tool to bring this data into your project.", vbOKOnly, "HSPF Problem")
-                    EnableControls(True)
-                    Exit Sub
-                End If
-            End If
-            lTotalPolygonCount += GisUtil.NumFeatures(GisUtil.LayerIndex(lNewFileName))
-        Next
-        lTotalPolygonCount *= aSubbasinsSelected.Count
-
-        'reset selected features since they may have become unselected
-        If aSubbasinsSelected.Count < GisUtil.NumFeatures(lSubbasinLayerIndex) Then
-            GisUtil.ClearSelectedFeatures(lSubbasinLayerIndex)
-            For Each lSubbasin As Integer In aSubbasinsSelected.Keys
-                GisUtil.SetSelectedFeature(lSubbasinLayerIndex, lSubbasin)
-            Next
-        End If
-
-        lLanduseFieldName = "LUCODE"
-        Dim lFirst As Boolean = True
-        Dim lTileIndex As Integer = 0
-        For Each lTileFileName As String In lTileFileNames
-            lTileIndex += 1
-            lblStatus.Text = "Overlaying Land Use and Subbasins (Tile " & lTileIndex & " of " & lTileFileNames.Count & ")"
-            Me.Refresh()
-            'do overlay
-            GisUtil.Overlay(lTileFileName, lLanduseFieldName, lSubbasinThemeName, lSubbasinFieldName, _
-                            lLandUsePathName & "\overlay.shp", lFirst)
-            lFirst = False
-        Next
-
-        'compile areas, slopes and lengths
-        lblStatus.Text = "Compiling Overlay Results"
-        Me.Refresh()
-
-        Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
-        For i As Integer = 1 To lTable.NumRecords
-            lTable.CurrentRecord = i
-            aLucode.Add(lTable.Value(1))
-            aSubid.Add(lTable.Value(2))
-            aArea.Add(CDbl(lTable.Value(3)))
-        Next i
-    End Sub
-
-    Private Sub CreateLanduseRecordsShapefile(ByVal aSubbasinsSelected As atcCollection, ByRef aLucode As Collection, ByRef aSubid As Collection, ByRef aArea As Collection)
-
-        'perform overlay for other shapefiles (not GIRAS) 
-        Dim lSubbasinThemeName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
-        Dim lSubbasinFieldName As String = cboSub1.Items(cboSub1.SelectedIndex)
-
-        lblStatus.Text = "Overlaying Land Use and Subbasins"
-        Me.Refresh()
-
-        Dim lLandUseThemeName As String = ""
-        If cboLandUseLayer.SelectedIndex > -1 Then
-            lLandUseThemeName = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
-        End If
-        Dim lLanduseFieldName As String = ""
-        If cboDescription.SelectedIndex > -1 Then
-            lLanduseFieldName = cboDescription.Items(cboDescription.SelectedIndex)
-        End If
-        Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(lLandUseThemeName)
-        Dim lLandUsePathName As String = PathNameOnly(GisUtil.LayerFileName(lLanduseLayerIndex))
-
-        'do overlay
-        GisUtil.Overlay(lLandUseThemeName, lLanduseFieldName, lSubbasinThemeName, lSubbasinFieldName, _
-                     lLandUsePathName & "\overlay.shp", True)
-
-        'compile areas and slopes
-        lblStatus.Text = "Compiling Overlay Results"
-        Me.Refresh()
-
-        Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
-        For i As Integer = 1 To lTable.NumRecords
-            lTable.CurrentRecord = i
-            aLucode.Add(lTable.Value(1))
-            aSubid.Add(lTable.Value(2))
-            aArea.Add(CDbl(lTable.Value(3)))
-        Next i
-    End Sub
-
-    Private Sub CreateLanduseRecordsGrid(ByVal aSubbasinsSelected As atcCollection, ByRef aLucode As Collection, ByRef aSubid As Collection, ByRef aArea As Collection)
-
-        'perform overlay for land use grid
-        Dim lSubbasinThemeName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
-        Dim lSubbasinLayerIndex As Long = GisUtil.LayerIndex(lSubbasinThemeName)
-
-        lblStatus.Text = "Overlaying Land Use and Subbasins"
-        Me.Refresh()
-
-        Dim lLandUseThemeName As String = ""
-        If cboLandUseLayer.SelectedIndex > -1 Then
-            lLandUseThemeName = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
-        End If
-        Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(lLandUseThemeName)
-        If GisUtil.LayerType(lLanduseLayerIndex) = 4 Then
-            'the landuse layer is a grid
-
-            Dim k As Integer = Convert.ToInt32(GisUtil.GridLayerMaximum(lLanduseLayerIndex))
-            Dim lAreaLS(k, GisUtil.NumFeatures(lSubbasinLayerIndex)) As Double
-            GisUtil.TabulateAreas(lLanduseLayerIndex, lSubbasinLayerIndex, lAreaLS)
-
-            For Each lShapeindex As String In aSubbasinsSelected.Keys
-                'loop thru each selected subbasin (or all if none selected)
-                Dim lSubid As String = aSubbasinsSelected.ItemByKey(CInt(lShapeindex)).ToString
-                For i As Integer = 1 To Convert.ToInt32(GisUtil.GridLayerMaximum(lLanduseLayerIndex))
-                    If lAreaLS(i, lShapeindex) > 0 Then
-                        aLucode.Add(i)
-                        aArea.Add(lAreaLS(i, lShapeindex))
-                        aSubid.Add(lSubid)
-                    End If
-                Next i
-            Next
-
-        End If
-
-    End Sub
-
-    Private Function CreateLanduses(ByVal aSubbasinsSlopes As atcCollection, ByVal aLucodes As Collection, _
-                                    ByVal aSubids As Collection, ByVal aAreas As Collection, ByVal aReaches As Reaches) As LandUses
-
-        Dim lLandUses As New LandUses
-        For lIndex As Integer = 1 To aLucodes.Count
-            Dim lLandUse As New LandUse
-            With lLandUse
-                .Code = aLucodes(lIndex)
-                .ModelID = aSubids(lIndex)
-                .Area = aAreas(lIndex)
-                .Slope = aSubbasinsSlopes.ItemByKey(CInt(aSubids(lIndex)))
-                .Description = .Code
-                '.Distance()
-                '.ImperviousFraction()
-                For Each lReach As Reach In aReaches
-                    If lReach.Id = aSubids(lIndex) Then
-                        .Reach = lReach
-                        Exit For
-                    End If
-                Next
-                .Type = "COMPOSITE"
-            End With
-            Dim lExistIndex As Integer = lLandUses.IndexOf(lLandUse)
-            If lLandUses.Contains(lLandUse.Description & ":" & lLandUse.Reach.Id) Then  'already have, add area
-                lLandUses.Item(lLandUse.Description & ":" & lLandUse.Reach.Id).Area += lLandUse.Area
-            Else 'new
-                lLandUses.Add(lLandUse)
-            End If
-        Next
-
-        Return lLandUses
-    End Function
-
     Private Sub EnableControls(ByVal aEnabled As Boolean)
         cmdOK.Enabled = aEnabled
         cmdExisting.Enabled = aEnabled
@@ -2183,54 +1681,6 @@ Public Class frmModelSetup
         cmdAbout.Enabled = aEnabled
         TabControl1.Enabled = aEnabled
     End Sub
-
-    Private Function PreProcessChecking(ByVal OutputPath As String, ByVal BaseOutputName As String) As Boolean
-        If pModelName <> "AQUATOX" Then
-            If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
-                If GisUtil.LayerIndex("Land Use Index") = -1 Then
-                    'cant do giras without land use index layer
-                    Logger.Msg("When using GIRAS Landuse, the 'Land Use Index' layer must exist and be named as such.", vbOKOnly, "HSPF GIRAS Problem")
-                    EnableControls(True)
-                    Return False
-                End If
-            End If
-
-            If cboLanduse.SelectedIndex <> 0 Then
-                'not giras, make sure subbasins and land use layers aren't the same
-                If cboSubbasins.Items(cboSubbasins.SelectedIndex) = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex) Then
-                    'same layer cannot be used for both
-                    Logger.Msg("The same layer cannot be used for the subbasins layer and the landuse layer.", vbOKOnly, "BASINS HSPF Problem")
-                    EnableControls(True)
-                    Return False
-                End If
-            End If
-
-            If pMetStations.Count = 0 Then
-                'cannot proceed if there are no met stations, need to specify a met wdm
-                Logger.Msg("No met stations are available.  Use the 'Met Stations' tab to specify a WDM file with valid met stations.", vbOKOnly, "BASINS HSPF Problem")
-                EnableControls(True)
-                Return False
-            End If
-
-            'see if these files already exist
-            Dim lWsdFileName As String = OutputPath & "\" & BaseOutputName & ".wsd"
-            If FileExists(lWsdFileName) Then  'already exists
-                If Logger.Msg("HSPF Project '" & BaseOutputName & "' already exists.  Do you want to overwrite it?", vbOKCancel, "Overwrite?") = MsgBoxResult.Cancel Then
-                    EnableControls(True)
-                    Return False
-                End If
-            End If
-        Else 'in AQUATOX, see if these files already exist
-            Dim lRchFileName As String = OutputPath & "\" & BaseOutputName & ".rch"
-            If FileExists(lRchFileName) Then 'already exists
-                If Logger.Msg("AQUATOX Project '" & BaseOutputName & "' already exists.  Do you want to overwrite it?", vbOKCancel, "Overwrite?") = MsgBoxResult.Cancel Then
-                    EnableControls(True)
-                    Return False
-                End If
-            End If
-        End If
-        Return True
-    End Function
 
     Private Sub chkCustom_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkCustom.CheckedChanged
         If chkCustom.Checked Then
@@ -2359,8 +1809,18 @@ Public Class frmModelSetup
 
     Private Sub cmdChange_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdChange.Click
         If ofdClass.ShowDialog() = Windows.Forms.DialogResult.OK Then
+            Dim lLandUseType As String = cboLanduse.Items(cboLanduse.SelectedIndex)
+            Dim lLayerNameLandUse As String = ""
+            If cboLandUseLayer.SelectedIndex > -1 Then
+                lLayerNameLandUse = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
+            End If
+            Dim lFieldNameLandUse As String = ""
+            If cboDescription.SelectedIndex > -1 Then
+                lFieldNameLandUse = cboDescription.Items(cboDescription.SelectedIndex)
+            End If
+
             lblClass.Text = ofdClass.FileName
-            SetPerviousGrid()
+            SetPerviousGrid(AtcGridPervious, lblClass.Text, lLandUseType, lLayerNameLandUse, lFieldNameLandUse)
         End If
     End Sub
 
@@ -2425,7 +1885,8 @@ Public Class frmModelSetup
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
 
         BuildListofMetStationNames(txtMetWDMName.Text, pMetStations, pMetBaseDsns)
-        SetMetSegmentGrid()
+        CheckAndSetMetSegmentGrid()
+
         lstMet.Items.Clear()
         For Each lMetStation As String In pMetStations
             lstMet.Items.Add(lMetStation)
@@ -2440,10 +1901,30 @@ Public Class frmModelSetup
     End Sub
 
     Private Sub cboSub1_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSub1.SelectedIndexChanged
-        SetMetSegmentGrid()
+        CheckAndSetMetSegmentGrid
     End Sub
 
     Private Sub cboSub3_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSub3.SelectedIndexChanged
-        SetMetSegmentGrid()
+        CheckAndSetMetSegmentGrid
+    End Sub
+
+    Private Sub CheckAndSetMetSegmentGrid()
+        If cboSubbasins.SelectedIndex = -1 Or cboSub1.SelectedIndex = -1 Then
+            Dim lSubbasinsLayerName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
+            Dim lSubbasinsFieldName As String = cboSub1.Items(cboSub1.SelectedIndex)
+            Dim lModelSegmentFieldName As String = ""
+            If cboSub3.SelectedIndex > 0 Then
+                lModelSegmentFieldName = cboSub3.Items(cboSub3.SelectedIndex)
+            End If
+            SetMetSegmentGrid(AtcGridMet, pMetStations, pUniqueModelSegmentNames, pUniqueModelSegmentIds, _
+                              lSubbasinsLayerName, lSubbasinsFieldName, lModelSegmentFieldName)
+            If pUniqueModelSegmentIds.Count = 0 Then
+                lstMet.Visible = True
+                AtcGridMet.Visible = False
+            Else
+                lstMet.Visible = False
+                AtcGridMet.Visible = True
+            End If
+        End If
     End Sub
 End Class
