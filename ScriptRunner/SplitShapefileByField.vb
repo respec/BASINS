@@ -15,11 +15,13 @@ Public Module SplitShapefileByField
         Dim lOriginalShapefileName As String = ""
         Dim lSplitFieldName As String = "HUC_8"
         Dim lSplitFilenamePattern As String = "split\$SPLIT$\huc12.shp"
+        Dim lSplitOnlyValue As String = "03060103"
         Dim lUserParms As New atcCollection
         With lUserParms
             .Add("Shape File To Split", lOriginalShapefileName)
             .Add("Split Field Name", lSplitFieldName)
             .Add("Split Filename Pattern", lSplitFilenamePattern)
+            .Add("Only do this split file", lSplitOnlyValue)
         End With
         Dim lAsk As New frmArgs
         If lAsk.AskUser("Specify full path of shape file to split and pattern of split file names to write into", lUserParms) Then
@@ -27,6 +29,7 @@ Public Module SplitShapefileByField
                 lOriginalShapefileName = .ItemByKey("Shape File To Split")
                 lSplitFieldName = .ItemByKey("Split Field Name")
                 lSplitFilenamePattern = .ItemByKey("Split Filename Pattern")
+                lSplitOnlyValue = .ItemByKey("Only do this split file")
             End With
             Dim lOriginalShapefile As New MapWinGIS.Shapefile
             Dim lOriginalDBF As New atcTableDBF
@@ -40,8 +43,8 @@ Public Module SplitShapefileByField
                     End If
                     Dim lCurrentRecord As Integer
                     Dim lNumRecords As Integer = lOriginalDBF.NumRecords
-                    Dim lSplitValue As String
                     Dim lSplitValues As New atcCollection
+                    Dim lSplitValue As String = "03060103"
 
                     Logger.Status("Finding unique values for " & lSplitFieldName)
 
@@ -57,43 +60,45 @@ Public Module SplitShapefileByField
 
                     For lSplitValueIndex As Integer = 0 To lNumSplitValues - 1
                         lSplitValue = lSplitValues.Keys(lSplitValueIndex)
-                        Logger.Status("MSG2 " & lSplitValue)
-                        Dim lNewShapefileName As String = lSplitFilenamePattern.Replace("$SPLIT$", lSplitValue)
-                        If Not IO.Path.IsPathRooted(lNewShapefileName) Then
-                            lNewShapefileName = IO.Path.Combine(IO.Path.GetDirectoryName(lOriginalShapefileName), lNewShapefileName)
+                        If lSplitOnlyValue.Length = 0 OrElse lSplitValue = lSplitOnlyValue Then
+                            Logger.Status("MSG2 " & lSplitValue)
+                            Dim lNewShapefileName As String = lSplitFilenamePattern.Replace("$SPLIT$", lSplitValue)
+                            If Not IO.Path.IsPathRooted(lNewShapefileName) Then
+                                lNewShapefileName = IO.Path.Combine(IO.Path.GetDirectoryName(lOriginalShapefileName), lNewShapefileName)
+                            End If
+                            IO.Directory.CreateDirectory(IO.Path.GetDirectoryName(lNewShapefileName))
+                            Dim lNewShapefile As New MapWinGIS.Shapefile
+                            lNewShapefile.CreateNewWithShapeID(lNewShapefileName, lOriginalShapefile.ShapefileType)
+                            lNewShapefile.StartEditingShapes()
+
+                            Dim lNewShapeIndex As Integer = 0
+
+                            Dim lNewDBF As atcTableDBF = lOriginalDBF.Cousin
+                            lNewDBF.NumRecords = lSplitValues.ItemByIndex(lSplitValueIndex)
+                            lNewDBF.InitData()
+
+                            If lOriginalDBF.FindFirst(lSplitField, lSplitValue) Then
+                                Do
+                                    lNewShapefile.EditInsertShape(lOriginalShapefile.Shape(lOriginalDBF.CurrentRecord - 1), lNewShapeIndex)
+                                    lNewShapeIndex += 1
+                                    lNewDBF.CurrentRecord = lNewShapeIndex
+                                    lNewDBF.RawRecord = lOriginalDBF.RawRecord
+                                Loop While lOriginalDBF.FindNext(lSplitField, lSplitValue)
+                            End If
+                            lNewShapefile.StopEditingShapes()
+                            lNewShapefile.Save()
+                            lNewShapefile.Close()
+
+                            If lProjectionFile.Length > 0 Then
+                                lProjectionFilename = IO.Path.ChangeExtension(lNewShapefileName, "prj")
+                                atcUtility.SaveFileString(lProjectionFilename, lProjectionFile)
+                            End If
+
+                            lNewDBF.WriteFile(IO.Path.ChangeExtension(lNewShapefileName, "dbf"))
+                            lNewDBF.Clear()
+
+                            Logger.Progress(lSplitValueIndex + 1, lNumSplitValues)
                         End If
-                        IO.Directory.CreateDirectory(IO.Path.GetDirectoryName(lNewShapefileName))
-                        Dim lNewShapefile As New MapWinGIS.Shapefile
-                        lNewShapefile.CreateNewWithShapeID(lNewShapefileName, lOriginalShapefile.ShapefileType)
-                        lNewShapefile.StartEditingShapes()
-
-                        Dim lNewShapeIndex As Integer = 0
-
-                        Dim lNewDBF As atcTableDBF = lOriginalDBF.Cousin
-                        lNewDBF.NumRecords = lSplitValues.ItemByIndex(lSplitValueIndex)
-                        lNewDBF.InitData()
-
-                        If lOriginalDBF.FindFirst(lSplitField, lSplitValue) Then
-                            Do
-                                lNewShapefile.EditInsertShape(lOriginalShapefile.Shape(lOriginalDBF.CurrentRecord - 1), lNewShapeIndex)
-                                lNewShapeIndex += 1
-                                lNewDBF.CurrentRecord = lNewShapeIndex
-                                lNewDBF.RawRecord = lOriginalDBF.RawRecord
-                            Loop While lOriginalDBF.FindNext(lSplitField, lSplitValue)
-                        End If
-                        lNewShapefile.StopEditingShapes()
-                        lNewShapefile.Save()
-                        lNewShapefile.Close()
-
-                        If lProjectionFile.Length > 0 Then
-                            lProjectionFilename = IO.Path.ChangeExtension(lNewShapefileName, "prj")
-                            atcUtility.SaveFileString(lProjectionFilename, lProjectionFile)
-                        End If
-
-                        lNewDBF.WriteFile(IO.Path.ChangeExtension(lNewShapefileName, "dbf"))
-                        lNewDBF.Clear()
-
-                        Logger.Progress(lSplitValueIndex + 1, lNumSplitValues)
                     Next
                 End If
                 Logger.Status("")

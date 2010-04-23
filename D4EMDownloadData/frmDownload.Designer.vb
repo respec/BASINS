@@ -79,7 +79,7 @@ Partial Class frmDownload
         Me.chkCacheOnly = New System.Windows.Forms.CheckBox
         Me.grpNLDAS = New System.Windows.Forms.GroupBox
         Me.chkNLDAS_GetNLDASParameter = New System.Windows.Forms.CheckBox
-        Me.chkNLDAS_GetNLDASStations = New System.Windows.Forms.CheckBox
+        Me.chkNLDAS_GetNLDASGrid = New System.Windows.Forms.CheckBox
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
         Me.panelNWISnoStations.SuspendLayout()
@@ -693,7 +693,7 @@ Partial Class frmDownload
         Me.grpNLDAS.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpNLDAS.Controls.Add(Me.chkNLDAS_GetNLDASParameter)
-        Me.grpNLDAS.Controls.Add(Me.chkNLDAS_GetNLDASStations)
+        Me.grpNLDAS.Controls.Add(Me.chkNLDAS_GetNLDASGrid)
         Me.grpNLDAS.Location = New System.Drawing.Point(12, 424)
         Me.grpNLDAS.Name = "grpNLDAS"
         Me.grpNLDAS.Size = New System.Drawing.Size(460, 42)
@@ -709,20 +709,20 @@ Partial Class frmDownload
         Me.chkNLDAS_GetNLDASParameter.Name = "chkNLDAS_GetNLDASParameter"
         Me.chkNLDAS_GetNLDASParameter.Size = New System.Drawing.Size(84, 17)
         Me.chkNLDAS_GetNLDASParameter.TabIndex = 23
-        Me.chkNLDAS_GetNLDASParameter.Text = "Precipitation"
+        Me.chkNLDAS_GetNLDASParameter.Text = "Precipitation (available after grid selection on map)"
         Me.ToolTip1.SetToolTip(Me.chkNLDAS_GetNLDASParameter, "Hourly Precipitation for selected NLDAS grids")
         Me.chkNLDAS_GetNLDASParameter.UseVisualStyleBackColor = True
         '
         'chkNLDAS_GetNLDASStations
         '
-        Me.chkNLDAS_GetNLDASStations.AutoSize = True
-        Me.chkNLDAS_GetNLDASStations.Location = New System.Drawing.Point(6, 19)
-        Me.chkNLDAS_GetNLDASStations.Name = "chkNLDAS_GetNLDASStations"
-        Me.chkNLDAS_GetNLDASStations.Size = New System.Drawing.Size(64, 17)
-        Me.chkNLDAS_GetNLDASStations.TabIndex = 22
-        Me.chkNLDAS_GetNLDASStations.Text = "Stations"
-        Me.ToolTip1.SetToolTip(Me.chkNLDAS_GetNLDASStations, "NLDAS Grid Centers Point Layer")
-        Me.chkNLDAS_GetNLDASStations.UseVisualStyleBackColor = True
+        Me.chkNLDAS_GetNLDASGrid.AutoSize = True
+        Me.chkNLDAS_GetNLDASGrid.Location = New System.Drawing.Point(6, 19)
+        Me.chkNLDAS_GetNLDASGrid.Name = "chkNLDAS_GetNLDASGrid"
+        Me.chkNLDAS_GetNLDASGrid.Size = New System.Drawing.Size(64, 17)
+        Me.chkNLDAS_GetNLDASGrid.TabIndex = 22
+        Me.chkNLDAS_GetNLDASGrid.Text = "Grid"
+        Me.ToolTip1.SetToolTip(Me.chkNLDAS_GetNLDASGrid, "NLDAS Grid Layer")
+        Me.chkNLDAS_GetNLDASGrid.UseVisualStyleBackColor = True
         '
         'frmDownload
         '
@@ -830,5 +830,5 @@ Partial Class frmDownload
     Friend WithEvents chkBASINS_MetData As System.Windows.Forms.CheckBox
     Friend WithEvents grpNLDAS As System.Windows.Forms.GroupBox
     Friend WithEvents chkNLDAS_GetNLDASParameter As System.Windows.Forms.CheckBox
-    Friend WithEvents chkNLDAS_GetNLDASStations As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNLDAS_GetNLDASGrid As System.Windows.Forms.CheckBox
 End Class

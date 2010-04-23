@@ -600,6 +600,10 @@ StartOver:
                 'regular case, not coming from existing mapwindow project
                 'set mapwindow project projection to projection of first layer
                 g_Project.ProjectProjection = lProjection
+
+                Dim lKey As String = g_MapWin.Plugins.GetPluginKey("Tiled Map")
+                If Not String.IsNullOrEmpty(lKey) Then g_MapWin.Plugins.StopPlugin(lKey)
+
                 If Not (g_Project.Save(aProjectFileName)) Then
                     Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save2Failed:" & g_MapWin.LastError)
                 End If
