@@ -1199,7 +1199,7 @@ Public Class frmModelSetup
             cboDescription.Visible = False
             lblDescription.Visible = False
             lblClass.Text = "/BASINS/etc/giras.dbf"
-            SetPerviousGrid(AtcGridPervious, lblClass.Text, lLandUseType, lLayerNameLandUse, lFieldNameLandUse)
+            SetPerviousGrid(AtcGridPervious, lblClass.Text, cboLanduse.SelectedIndex, lLayerNameLandUse, lFieldNameLandUse)
         ElseIf lLandUseType = "Other Shapefile" Then
             cboLandUseLayer.Items.Clear()
             Dim lLayerDefaultIndex As Integer = 0
@@ -1220,7 +1220,7 @@ Public Class frmModelSetup
             cboDescription.Visible = True
             lblDescription.Visible = True
             lblClass.Text = "<none>"
-            SetPerviousGrid(AtcGridPervious, lblClass.Text, lLandUseType, lLayerNameLandUse, lFieldNameLandUse)
+            SetPerviousGrid(AtcGridPervious, lblClass.Text, cboLanduse.SelectedIndex, lLayerNameLandUse, lFieldNameLandUse)
         ElseIf lLandUseType = "NLCD Grid" Then
             cboLandUseLayer.Items.Clear()
             For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
@@ -1238,7 +1238,7 @@ Public Class frmModelSetup
             cboDescription.Visible = False
             lblDescription.Visible = False
             lblClass.Text = "/BASINS/etc/nlcd.dbf"
-            SetPerviousGrid(AtcGridPervious, lblClass.Text, lLandUseType, lLayerNameLandUse, lFieldNameLandUse)
+            SetPerviousGrid(AtcGridPervious, lblClass.Text, cboLanduse.SelectedIndex, lLayerNameLandUse, lFieldNameLandUse)
         Else 'grid
             cboLandUseLayer.Items.Clear()
             For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
@@ -1254,7 +1254,7 @@ Public Class frmModelSetup
             cboDescription.Visible = False
             lblDescription.Visible = False
             lblClass.Text = "<none>"
-            SetPerviousGrid(AtcGridPervious, lblClass.Text, lLandUseType, lLayerNameLandUse, lFieldNameLandUse)
+            SetPerviousGrid(AtcGridPervious, lblClass.Text, cboLanduse.SelectedIndex, lLayerNameLandUse, lFieldNameLandUse)
         End If
     End Sub
 
@@ -1297,7 +1297,7 @@ Public Class frmModelSetup
             lFieldNameLandUse = cboDescription.Items(cboDescription.SelectedIndex)
         End If
 
-        SetPerviousGrid(AtcGridPervious, lblClass.Text, lLandUseType, lLayerNameLandUse, lFieldNameLandUse)
+        SetPerviousGrid(AtcGridPervious, lblClass.Text, cboLanduse.SelectedIndex, lLayerNameLandUse, lFieldNameLandUse)
     End Sub
 
     Private Sub cmdAbout_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAbout.Click
@@ -1820,7 +1820,7 @@ Public Class frmModelSetup
             End If
 
             lblClass.Text = ofdClass.FileName
-            SetPerviousGrid(AtcGridPervious, lblClass.Text, lLandUseType, lLayerNameLandUse, lFieldNameLandUse)
+            SetPerviousGrid(AtcGridPervious, lblClass.Text, cboLanduse.SelectedIndex, lLayerNameLandUse, lFieldNameLandUse)
         End If
     End Sub
 
@@ -1909,7 +1909,7 @@ Public Class frmModelSetup
     End Sub
 
     Private Sub CheckAndSetMetSegmentGrid()
-        If cboSubbasins.SelectedIndex = -1 Or cboSub1.SelectedIndex = -1 Then
+        If cboSubbasins.SelectedIndex > -1 And cboSub1.SelectedIndex > -1 Then
             Dim lSubbasinsLayerName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
             Dim lSubbasinsFieldName As String = cboSub1.Items(cboSub1.SelectedIndex)
             Dim lModelSegmentFieldName As String = ""
