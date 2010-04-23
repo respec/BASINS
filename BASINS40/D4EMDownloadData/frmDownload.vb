@@ -204,6 +204,10 @@ Public Class frmDownload
                         chkSTORET_Results.Enabled = True
                         chkSTORET_Results.Text = "Results"
                         chkSTORET_Results.Checked = True
+                    Case "nldas_grid", "nldas_grid_center"
+                        chkNLDAS_GetNLDASParameter.Enabled = True
+                        chkNLDAS_GetNLDASParameter.Text = "Precipitation"
+                        chkNLDAS_GetNLDASParameter.Checked = True
                     Case Else
                         If lFilename.StartsWith("met") Then
                             chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
