@@ -105,16 +105,14 @@ Public Module modModelSetup
         Return lReaches
     End Function
 
-    Public Sub CreateLanduseRecordsGIRAS(ByVal aSubbasinsSelected As atcCollection, ByRef aLucode As Collection, _
-                                         ByRef aSubid As Collection, ByRef aArea As Collection, _
-                                         ByVal aSubbasinThemeName As String, ByVal aSubbasinFieldName As String)
+    Public Function CreateLanduseRecordsGIRAS(ByVal aSubbasinsSelected As atcCollection, ByRef aLucode As Collection, _
+                                              ByRef aSubid As Collection, ByRef aArea As Collection, _
+                                              ByVal aSubbasinThemeName As String, ByVal aSubbasinFieldName As String) As Boolean
 
         'perform overlay for GIRAS 
         Dim lSubbasinLayerIndex As Long = GisUtil.LayerIndex(aSubbasinThemeName)
 
-        'todo: replace below with logger/status message on main BASINS form?
-        'lblStatus.Text = "Selecting land use tiles for overlay"
-        'Me.Refresh()
+        Logger.Status("Selecting land use tiles for overlay")
 
         'set land use index layer
         Dim lLandUseThemeName As String = "Land Use Index"
@@ -148,8 +146,7 @@ Public Module modModelSetup
                 If Not GisUtil.AddLayer(lNewFileName, lLandUseTile) Then
                     Logger.Msg("The GIRAS Landuse Shapefile " & lNewFileName & "does not exist." & _
                                 vbCrLf & "Run the Download tool to bring this data into your project.", vbOKOnly, "HSPF Problem")
-                    'EnableControls(True)   'todo: fix this somehow
-                    Exit Sub
+                    Return False
                 End If
             End If
             lTotalPolygonCount += GisUtil.NumFeatures(GisUtil.LayerIndex(lNewFileName))
@@ -169,19 +166,15 @@ Public Module modModelSetup
         Dim lTileIndex As Integer = 0
         For Each lTileFileName As String In lTileFileNames
             lTileIndex += 1
-            'todo: replace below with logger/status message on main BASINS form?
-            'lblStatus.Text = "Overlaying Land Use and Subbasins (Tile " & lTileIndex & " of " & lTileFileNames.Count & ")"
-            'Me.Refresh()
+            Logger.Status("Overlaying Land Use and Subbasins (Tile " & lTileIndex & " of " & lTileFileNames.Count & ")")
             'do overlay
             GisUtil.Overlay(lTileFileName, lLanduseFieldName, aSubbasinThemeName, aSubbasinFieldName, _
                             lLandUsePathName & "\overlay.shp", lFirst)
             lFirst = False
         Next
 
-        'todo: replace below with logger/status message on main BASINS form?
         'compile areas, slopes and lengths
-        'lblStatus.Text = "Compiling Overlay Results"
-        'Me.Refresh()
+        Logger.Status("Compiling Overlay Results")
 
         Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
         For i As Integer = 1 To lTable.NumRecords
@@ -190,7 +183,9 @@ Public Module modModelSetup
             aSubid.Add(lTable.Value(2))
             aArea.Add(CDbl(lTable.Value(3)))
         Next i
-    End Sub
+
+        Return True
+    End Function
 
     Public Sub CreateLanduseRecordsShapefile(ByVal aSubbasinsSelected As atcCollection, ByRef aLucode As Collection, _
                                               ByRef aSubid As Collection, ByRef aArea As Collection, _
@@ -199,9 +194,7 @@ Public Module modModelSetup
 
         'perform overlay for other shapefiles (not GIRAS) 
 
-        'todo: replace below with logger/status message on main BASINS form?
-        'lblStatus.Text = "Overlaying Land Use and Subbasins"
-        'Me.Refresh()
+        Logger.Status("Overlaying Land Use and Subbasins")
 
         Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(aLandUseThemeName)
         Dim lLandUsePathName As String = PathNameOnly(GisUtil.LayerFileName(lLanduseLayerIndex))
@@ -210,10 +203,8 @@ Public Module modModelSetup
         GisUtil.Overlay(aLandUseThemeName, aLandUseFieldName, aSubbasinThemeName, aSubbasinFieldName, _
                         lLandUsePathName & "\overlay.shp", True)
 
-        'todo: replace below with logger/status message on main BASINS form?
         'compile areas and slopes
-        'lblStatus.Text = "Compiling Overlay Results"
-        'Me.Refresh()
+        Logger.Status("Compiling Overlay Results")
 
         Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
         For i As Integer = 1 To lTable.NumRecords
@@ -231,9 +222,7 @@ Public Module modModelSetup
         'perform overlay for land use grid
         Dim lSubbasinLayerIndex As Long = GisUtil.LayerIndex(aSubbasinThemeName)
 
-        'todo: replace below with logger/status message on main BASINS form?
-        'lblStatus.Text = "Overlaying Land Use and Subbasins"
-        'Me.Refresh()
+        Logger.Status("Overlaying Land Use and Subbasins")
 
         Dim lLanduseLayerIndex As Integer = GisUtil.LayerIndex(aLandUseThemeName)
         If GisUtil.LayerType(lLanduseLayerIndex) = 4 Then
