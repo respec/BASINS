@@ -112,6 +112,7 @@ Friend Class HspfBinary
     End Property
 
     Friend Sub ReadNewRecords()
+        Logger.Dbg("ReadNewRecords")
         pFile.ReadRestOfRecordsInFile()
         While pFileRecordIndex < pFile.RecordCount
             Dim lCurrentRecord() As Byte = pFile.Record(pFileRecordIndex)
@@ -157,7 +158,7 @@ Friend Class HspfBinary
                             ReDim .Value(lVariableCount - 1)
                             For lVariableIndex As Integer = 0 To lVariableCount - 1
                                 Dim lValue As Double = BitConverter.ToSingle(lCurrentRecord, 52 + (lVariableIndex * 4))
-                                If lValue < -1.0E+29 Then lValue = Double.NaN
+                                If lValue < -1.0E+29 Then lValue = GetNaN()
                                 .Value(lVariableIndex) = lValue
                             Next lVariableIndex
                             Dim lDataKey As String = .OutLev & ":" & Date2J(.DateArray)

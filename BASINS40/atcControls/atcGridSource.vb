@@ -268,35 +268,45 @@ Public Class atcGridSource
     End Sub
 
     Public Overrides Function ToString() As String
-        Dim lBuilder As New System.Text.StringBuilder
-        Dim lCellValue As String
-        Dim lAddTabs() As Boolean
-        ReDim lAddTabs(Me.Columns - 1)
-        Dim lMaxCol As Integer = Columns - 1
-        Dim lMaxRow As Integer = Rows - 1
-
-        For iCol As Integer = 0 To lMaxCol
-            For iRow As Integer = 0 To lMaxRow
-                lCellValue = CellValue(iRow, iCol)
-                If lCellValue IsNot Nothing AndAlso lCellValue.Contains(vbTab) Then
-                    lAddTabs(iCol) = True
-                    Exit For
-                End If
+        Try
+            Dim lCellValue As String
+            Dim lAddTabs() As Boolean
+            ReDim lAddTabs(Me.Columns - 1)
+            Dim lMaxCol As Integer = Columns - 1
+            Dim lMaxRow As Integer = Rows - 1
+            Dim lCheckRowsForTab As Integer = Math.Min(lMaxRow, 100) 'Check at most this many rows for tabs
+            MapWinUtility.Logger.Status("Reading " & Format(lMaxRow, "#,###") & " Rows")
+            Dim lBuilder As New System.Text.StringBuilder(lMaxCol * lMaxRow * 5)
+            Dim lRow As Integer
+            Dim lCol As Integer
+            For lCol = 0 To lMaxCol
+                For lRow = 0 To lCheckRowsForTab
+                    lCellValue = CellValue(lRow, lCol)
+                    If lCellValue IsNot Nothing AndAlso lCellValue.Contains(vbTab) Then
+                        lAddTabs(lCol) = True
+                        Exit For
+                    End If
+                Next
             Next
-        Next
 
-        For iRow As Integer = 0 To lMaxRow
-            For iCol As Integer = 0 To lMaxCol
-                lCellValue = CellValue(iRow, iCol)
-                If lCellValue Is Nothing Then lCellValue = ""
-                lBuilder.Append(lCellValue)
-                'Some modified values contain "<tab>(+10%)", add a tab to those that don't
-                If lAddTabs(iCol) AndAlso lCellValue.IndexOf(vbTab) < 0 Then lBuilder.Append(vbTab)
-                If iCol < lMaxCol Then lBuilder.Append(vbTab) 'Add tab afer each column except for last 
+            For lRow = 0 To lMaxRow
+                For lCol = 0 To lMaxCol
+                    lCellValue = CellValue(lRow, lCol)
+                    If lCellValue Is Nothing Then lCellValue = ""
+                    lBuilder.Append(lCellValue)
+                    'Some modified values contain "<tab>(+10%)", add a tab to those that don't
+                    If lAddTabs(lCol) AndAlso lCellValue.IndexOf(vbTab) < 0 Then lBuilder.Append(vbTab)
+                    If lCol < lMaxCol Then lBuilder.Append(vbTab) 'Add tab afer each column except for last 
+                Next
+                lBuilder.Append(vbCrLf)
+                MapWinUtility.Logger.Progress(lRow, lMaxRow)
             Next
-            lBuilder.Append(vbCrLf)
-        Next
-        Return lBuilder.ToString
+            MapWinUtility.Logger.Status("")
+            Return lBuilder.ToString
+        Catch e As Exception
+            MapWinUtility.Logger.Progress("", 0, 0)
+            Return e.Message & vbCrLf & e.StackTrace
+        End Try
     End Function
 
     Public Overridable Function AppendColumns(ByVal aRightColumns As atcGridSource) As atcGridSource
