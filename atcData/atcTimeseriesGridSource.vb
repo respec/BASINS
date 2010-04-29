@@ -232,12 +232,20 @@ Public Class atcTimeseriesGridSource
                                 If lTs.Dates IsNot Nothing Then
                                     Dim lDateDisplayed As Double = pAllDates.Value(aRow - lAttributeRows + 1)
                                     Dim lIndex As Integer = Array.BinarySearch(lTs.Dates.Values, lDateDisplayed)
+
                                     If lIsValue Then
-                                        Dim lMaxWidth As Integer = lTs.Attributes.GetValue("FormatMaxWidth", pMaxWidth)
-                                        Dim lFormat As String = lTs.Attributes.GetValue("FormatNumeric", pFormat)
-                                        Dim lExpFormat As String = lTs.Attributes.GetValue("FormatExp", pExpFormat)
-                                        Dim lCantFit As String = lTs.Attributes.GetValue("FormatCantFit", pCantFit)
-                                        Dim lSignificantDigits As Integer = lTs.Attributes.GetValue("FormatSignificantDigits", pSignificantDigits)
+                                        Dim lMaxWidth As Integer = pMaxWidth
+                                        Dim lFormat As String = pFormat
+                                        Dim lExpFormat As String = pExpFormat
+                                        Dim lCantFit As String = pCantFit
+                                        Dim lSignificantDigits As Integer = pSignificantDigits
+                                        With lTs.Attributes
+                                            If .ContainsAttribute("FormatMaxWidth") Then lMaxWidth = .GetValue("FormatMaxWidth")
+                                            If .ContainsAttribute("FormatNumeric") Then lFormat = .GetValue("FormatNumeric")
+                                            If .ContainsAttribute("FormatExp") Then lExpFormat = .GetValue("FormatExp")
+                                            If .ContainsAttribute("FormatCantFit") Then lCantFit = .GetValue("FormatCantFit")
+                                            If .ContainsAttribute("FormatSignificantDigits") Then lSignificantDigits = .GetValue("FormatSignificantDigits")
+                                        End With
 
                                         If lIndex < 0 Then 'Did not find this exact date in this TS
                                             lIndex = Not (lIndex) 'BinarySearch returned not(index of next greater value)
