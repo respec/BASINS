@@ -1415,10 +1415,13 @@ Public Class frmModelSetup
 
         If cboLanduse.SelectedIndex = 0 Then
             'usgs giras is the selected land use type
-            CreateLanduseRecordsGIRAS(lSubbasinsSelected, lLucodes, lSubids, lAreas, lSubbasinThemeName, lSubbasinFieldName)
-
-            If lLucodes.Count = 0 Then
+            lblStatus.Text = "Performing overlay for GIRAS landuse"
+            Me.Refresh()
+            Dim lSuccess As Boolean = CreateLanduseRecordsGIRAS(lSubbasinsSelected, lLucodes, lSubids, lAreas, lSubbasinThemeName, lSubbasinFieldName)
+            
+            If lLucodes.Count = 0 Or Not lSuccess Then
                 'TODO: report problem?
+                EnableControls(True)
                 Exit Function
             End If
             'set reclassify file name for giras
@@ -1433,6 +1436,8 @@ Public Class frmModelSetup
 
         ElseIf cboLanduse.SelectedIndex = 1 Or cboLanduse.SelectedIndex = 3 Then
             'nlcd grid or other grid is the selected land use type
+            lblStatus.Text = "Overlaying Land Use and Subbasins"
+            Me.Refresh()
             CreateLanduseRecordsGrid(lSubbasinsSelected, lLucodes, lSubids, lAreas, lSubbasinThemeName, lLandUseThemeName)
 
             If cboLanduse.SelectedIndex = 1 Then 'nlcd grid
@@ -1455,6 +1460,8 @@ Public Class frmModelSetup
             If cboDescription.SelectedIndex > -1 Then
                 lLanduseFieldName = cboDescription.Items(cboDescription.SelectedIndex)
             End If
+            lblStatus.Text = "Overlaying Land Use and Subbasins"
+            Me.Refresh()
             CreateLanduseRecordsShapefile(lSubbasinsSelected, lLucodes, lSubids, lAreas, lSubbasinThemeName, lSubbasinFieldName, lLandUseThemeName, lLanduseFieldName)
 
             lReclassifyFileName = ""
@@ -1462,117 +1469,117 @@ Public Class frmModelSetup
                 lReclassifyFileName = lblClass.Text
             End If
 
-            End If
+        End If
 
-            lblStatus.Text = "Completed overlay of subbasins and land use layers"
+        lblStatus.Text = "Completed overlay of subbasins and land use layers"
+        Me.Refresh()
+
+        'Create Reach Segments
+        Dim lStreamsLayerName As String = cboStreams.Items(cboStreams.SelectedIndex)
+        Dim lStreamFields() As String = {cboStream1.Items(cboStream1.SelectedIndex), _
+                                         cboStream2.Items(cboStream2.SelectedIndex), _
+                                         cboStream3.Items(cboStream3.SelectedIndex), _
+                                         cboStream4.Items(cboStream4.SelectedIndex), _
+                                         cboStream5.Items(cboStream5.SelectedIndex), _
+                                         cboStream6.Items(cboStream6.SelectedIndex), _
+                                         cboStream7.Items(cboStream7.SelectedIndex), _
+                                         cboStream8.Items(cboStream8.SelectedIndex), _
+                                         cboStream9.Items(cboStream9.SelectedIndex)}
+        Dim lReaches As Reaches = CreateReachSegments(lSubbasinsSelected, lSubbasinsModelSegmentIds, lStreamsLayerName, lStreamFields)
+
+        'Create Stream Channels
+        Dim lChannels As Channels = CreateStreamChannels(lReaches)
+
+        'Create LandUses
+        Dim lLandUses As LandUses = CreateLanduses(lSubbasinsSlopes, lLucodes, lSubids, lAreas, lReaches)
+
+        'figure out which outlets are in which subbasins
+        Dim lOutletsThemeName As String = cboOutlets.Items(cboOutlets.SelectedIndex)
+        Dim lOutSubs As New Collection
+        If lOutletsThemeName <> "<none>" Then
+            lblStatus.Text = "Joining point sources to subbasins"
             Me.Refresh()
+            Dim i As Integer = GisUtil.LayerIndex(lOutletsThemeName)
+            For j As Integer = 1 To GisUtil.NumFeatures(i)
+                Dim k As Integer = GisUtil.PointInPolygon(i, j - 1, lSubbasinLayerIndex)
+                If k > -1 Then
+                    lOutSubs.Add(GisUtil.FieldValue(lSubbasinLayerIndex, k, lSubbasinFieldIndex))
+                Else
+                    lOutSubs.Add(-1)
+                End If
+            Next j
+        End If
 
-            'Create Reach Segments
-            Dim lStreamsLayerName As String = cboStreams.Items(cboStreams.SelectedIndex)
-            Dim lStreamFields() As String = {cboStream1.Items(cboStream1.SelectedIndex), _
-                                             cboStream2.Items(cboStream2.SelectedIndex), _
-                                             cboStream3.Items(cboStream3.SelectedIndex), _
-                                             cboStream4.Items(cboStream4.SelectedIndex), _
-                                             cboStream5.Items(cboStream5.SelectedIndex), _
-                                             cboStream6.Items(cboStream6.SelectedIndex), _
-                                             cboStream7.Items(cboStream7.SelectedIndex), _
-                                             cboStream8.Items(cboStream8.SelectedIndex), _
-                                             cboStream9.Items(cboStream9.SelectedIndex)}
-            Dim lReaches As Reaches = CreateReachSegments(lSubbasinsSelected, lSubbasinsModelSegmentIds, lStreamsLayerName, lStreamFields)
+        'make output folder
+        MkDirPath(aOutputPath)
+        Dim lBaseFileName As String = aOutputPath & "\" & aBaseOutputName
 
-            'Create Stream Channels
-            Dim lChannels As Channels = CreateStreamChannels(lReaches)
+        'write wsd file
+        lblStatus.Text = "Writing WSD file"
+        Me.Refresh()
+        Dim lReclassifyLanduses As LandUses = ReclassifyLandUses(lReclassifyFileName, AtcGridPervious, lLandUses)
+        WriteWSDFile(lBaseFileName & ".wsd", lReclassifyLanduses)
+        'WriteWSDFile(lBaseFileName & ".wsd", lAreas, lLucodes, lSubids, cSubSlope, lReclassifyFileName, AtcGridPervious)
 
-            'Create LandUses
-            Dim lLandUses As LandUses = CreateLanduses(lSubbasinsSlopes, lLucodes, lSubids, lAreas, lReaches)
+        'write rch file 
+        lblStatus.Text = "Writing RCH file"
+        Me.Refresh()
+        WriteRCHFile(lBaseFileName & ".rch", lReaches)
 
-            'figure out which outlets are in which subbasins
-            Dim lOutletsThemeName As String = cboOutlets.Items(cboOutlets.SelectedIndex)
-            Dim lOutSubs As New Collection
-            If lOutletsThemeName <> "<none>" Then
-                lblStatus.Text = "Joining point sources to subbasins"
-                Me.Refresh()
-                Dim i As Integer = GisUtil.LayerIndex(lOutletsThemeName)
-                For j As Integer = 1 To GisUtil.NumFeatures(i)
-                    Dim k As Integer = GisUtil.PointInPolygon(i, j - 1, lSubbasinLayerIndex)
-                    If k > -1 Then
-                        lOutSubs.Add(GisUtil.FieldValue(lSubbasinLayerIndex, k, lSubbasinFieldIndex))
-                    Else
-                        lOutSubs.Add(-1)
-                    End If
-                Next j
-            End If
+        'write ptf file
+        lblStatus.Text = "Writing PTF file"
+        Me.Refresh()
+        WritePTFFile(lBaseFileName & ".ptf", lChannels)
 
-            'make output folder
-            MkDirPath(aOutputPath)
-            Dim lBaseFileName As String = aOutputPath & "\" & aBaseOutputName
+        'write psr file
+        lblStatus.Text = "Writing PSR file"
+        Me.Refresh()
+        Dim lOutletsLayerIndex As Integer
+        Dim lPointLayerIndex As Integer
+        Dim lYear As String = ""
+        If lOutSubs.Count > 0 Then
+            lOutletsLayerIndex = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
+            lPointLayerIndex = GisUtil.FieldIndex(lOutletsLayerIndex, cboPoint.Items(cboPoint.SelectedIndex))
+            lYear = cboYear.Items(cboYear.SelectedIndex)
+        End If
+        WritePSRFile(lBaseFileName & ".psr", lSubbasinsSelected, lOutSubs, lOutletsLayerIndex, lPointLayerIndex, _
+                     chkCustom.Checked, lblCustom.Text, chkCalculate.Checked, lYear)
 
-            'write wsd file
-            lblStatus.Text = "Writing WSD file"
-            Me.Refresh()
-            Dim lReclassifyLanduses As LandUses = ReclassifyLandUses(lReclassifyFileName, AtcGridPervious, lLandUses)
-            WriteWSDFile(lBaseFileName & ".wsd", lReclassifyLanduses)
-            'WriteWSDFile(lBaseFileName & ".wsd", lAreas, lLucodes, lSubids, cSubSlope, lReclassifyFileName, AtcGridPervious)
+        'write seg file
+        lblStatus.Text = "Writing SEG file"
+        Me.Refresh()
+        Dim lMetIndices As New atcCollection
+        Dim lUniqueModelSegmentIds As New atcCollection
+        If pUniqueModelSegmentIds.Count = 0 Then
+            'use a single met station
+            lMetIndices.Add(lstMet.SelectedIndex)
+            lUniqueModelSegmentIds.Add(1)
+        Else
+            'use the specified segmentation scheme
+            For lRow As Integer = 1 To AtcGridMet.Source.Rows - 1
+                lMetIndices.Add(pMetStations.IndexFromKey(AtcGridMet.Source.CellValue(lRow, 1)))
+            Next
+            lUniqueModelSegmentIds = pUniqueModelSegmentIds
+        End If
+        WriteSEGFile(lBaseFileName & ".seg", lUniqueModelSegmentIds, lMetIndices, pMetBaseDsns)
 
-            'write rch file 
-            lblStatus.Text = "Writing RCH file"
-            Me.Refresh()
-            WriteRCHFile(lBaseFileName & ".rch", lReaches)
+        'write map file
+        lblStatus.Text = "Writing MAP file"
+        Me.Refresh()
+        WriteMAPFile(lBaseFileName & ".map")
 
-            'write ptf file
-            lblStatus.Text = "Writing PTF file"
-            Me.Refresh()
-            WritePTFFile(lBaseFileName & ".ptf", lChannels)
+        lblStatus.Text = ""
+        Me.Refresh()
+        Me.Dispose()
+        Me.Close()
 
-            'write psr file
-            lblStatus.Text = "Writing PSR file"
-            Me.Refresh()
-            Dim lOutletsLayerIndex As Integer
-            Dim lPointLayerIndex As Integer
-            Dim lYear As String = ""
-            If lOutSubs.Count > 0 Then
-                lOutletsLayerIndex = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
-                lPointLayerIndex = GisUtil.FieldIndex(lOutletsLayerIndex, cboPoint.Items(cboPoint.SelectedIndex))
-                lYear = cboYear.Items(cboYear.SelectedIndex)
-            End If
-            WritePSRFile(lBaseFileName & ".psr", lSubbasinsSelected, lOutSubs, lOutletsLayerIndex, lPointLayerIndex, _
-                         chkCustom.Checked, lblCustom.Text, chkCalculate.Checked, lYear)
-
-            'write seg file
-            lblStatus.Text = "Writing SEG file"
-            Me.Refresh()
-            Dim lMetIndices As New atcCollection
-            Dim lUniqueModelSegmentIds As New atcCollection
-            If pUniqueModelSegmentIds.Count = 0 Then
-                'use a single met station
-                lMetIndices.Add(lstMet.SelectedIndex)
-                lUniqueModelSegmentIds.Add(1)
-            Else
-                'use the specified segmentation scheme
-                For lRow As Integer = 1 To AtcGridMet.Source.Rows - 1
-                    lMetIndices.Add(pMetStations.IndexFromKey(AtcGridMet.Source.CellValue(lRow, 1)))
-                Next
-                lUniqueModelSegmentIds = pUniqueModelSegmentIds
-            End If
-            WriteSEGFile(lBaseFileName & ".seg", lUniqueModelSegmentIds, lMetIndices, pMetBaseDsns)
-
-            'write map file
-            lblStatus.Text = "Writing MAP file"
-            Me.Refresh()
-            WriteMAPFile(lBaseFileName & ".map")
-
-            lblStatus.Text = ""
-            Me.Refresh()
-            Me.Dispose()
-            Me.Close()
-
-            Return True
-            'Catch
-            '    Logger.Msg("An error occurred: " & Err.Description, vbOKOnly, "BASINS " & pModelName & " Error")
-            '    Me.Dispose()
-            '    Me.Close()
-            '    Return False
-            'End Try
+        Return True
+        'Catch
+        '    Logger.Msg("An error occurred: " & Err.Description, vbOKOnly, "BASINS " & pModelName & " Error")
+        '    Me.Dispose()
+        '    Me.Close()
+        '    Return False
+        'End Try
     End Function
 
     Private Function SetupAQUATOX(ByVal aOutputPath As String, ByVal aBaseOutputName As String) As Boolean

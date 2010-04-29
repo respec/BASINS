@@ -132,7 +132,7 @@ Public Class atcBasinsPlugIn
             Logger.Dbg("Exception loading Timeseries::Statistics - " & lEx.Message)
         End Try
 
-        Dim lHelpFilename As String = FindFile("", g_ProgramDir & "docs\Basins4.0.chm")
+        Dim lHelpFilename As String = FindFile("", g_ProgramDir & "docs\BASINS4.0.chm")
         If FileExists(lHelpFilename) Then
             ShowHelp(lHelpFilename)
         Else

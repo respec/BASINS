@@ -157,9 +157,9 @@ Module UCIBuilder
 
         If aLUType = 0 Then ' cboLanduse.SelectedIndex = 0 Then
             'usgs giras is the selected land use type
-            CreateLanduseRecordsGIRAS(lSubbasinsSelected, lLucodes, lSubids, lAreas, aSubbasinThemeName, aSubbasinFieldName)
+            Dim lSuccess As Boolean = CreateLanduseRecordsGIRAS(lSubbasinsSelected, lLucodes, lSubids, lAreas, aSubbasinThemeName, aSubbasinFieldName)
 
-            If lLucodes.Count = 0 Then
+            If lLucodes.Count = 0 Or Not lSuccess Then
                 'TODO: report problem?
                 Exit Function
             End If
