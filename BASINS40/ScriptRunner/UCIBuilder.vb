@@ -25,13 +25,17 @@ Module UCIBuilder
     Private pLUType As Integer = 3
     'Private pLandUseThemeName As String = "nlcd_landcover_2001"
     Private pLandUseThemeName As String = "hru_mnriv"
+    Private pLandUseFieldName As String = ""
     Private pFieldNameLandUse As String = ""
     Private pMetWDM As String = pInputPath & "met\MNRV_MET.wdm"
     Private pPointThemeName As String = ""
     Private pPointYear As String = ""
     Private pStreamLayerName As String = "streams"
     Private pStreamFields() As String = {"SUBBASIN", "SUBBASINR", "LEN2", "SLO2", "WID2", "DEP2", "MINEL", "MAXEL", "SNAME"}
-
+    Private pOutletsThemeName As String = "<none>"
+    Private pPSRCustom As Boolean = False
+    Private pPSRCustomFile As String = ""
+    Private pPSRCalculate As Boolean = False
 
     Friend AtcGridMet As atcControls.atcGrid
     Friend AtcGridPervious As atcControls.atcGrid
@@ -40,20 +44,10 @@ Module UCIBuilder
     Friend pUniqueModelSegmentNames As atcCollection
     Friend pMetStations As atcCollection
 
-
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Logger.Dbg("Start")
         ChDriveDir(pOutputPath)  'change to the directory of the current project
         Logger.Dbg(" CurDir:" & CurDir())
-
-        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-        Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\"
-        If FileExists(lOutputPath) Then
-            lOutputPath &= pBaseOutputName 'tbxName.Text
-        Else
-            Dim lDriveLetter As String = CurDir().Substring(0, 1)
-            lOutputPath = lDriveLetter & ":\BASINS\modelout\" & pBaseOutputName 'tbxName.Text
-        End If
 
         AtcGridPervious = New atcControls.atcGrid
         AtcGridPervious.Source = New atcControls.atcGridSource
@@ -65,42 +59,44 @@ Module UCIBuilder
         AtcGridMet.Source = New atcControls.atcGridSource
         SetMetSegmentGrid(AtcGridMet, pMetStations, pUniqueModelSegmentNames, pUniqueModelSegmentIds, _
                           pSubbasinThemeName, pSubbasinFieldName, pSubbasinSegmentName)
+        Dim lOutputPath As String = pOutputPath & pBaseOutputName
 
-        If PreProcessChecking(pOutputPath, pBaseOutputName, "HSPF", pLUType, pMetStations.Count, _
+        If PreProcessChecking(lOutputPath, pBaseOutputName, "HSPF", pLUType, pMetStations.Count, _
                               pSubbasinThemeName, pLandUseThemeName) Then 'early checks OK
-            If SetupHSPFGen(lOutputPath, pBaseOutputName, pSubbasinThemeName, pSubbasinFieldName, pSubbasinSlopeName, _
-                                    pStreamLayerName, pStreamFields, pLUType, pLandUseThemeName, , , , , pSubbasinSegmentName) Then
+            If SetupHSPF(lOutputPath, pBaseOutputName, _
+                         pSubbasinThemeName, pSubbasinFieldName, pSubbasinSlopeName, _
+                         pStreamLayerName, pStreamFields, _
+                         pLUType, pLandUseThemeName, _
+                         pOutletsThemeName, pPointThemeName, pPointYear, _
+                         pLandUseFieldName, pLandUseClassFile, _
+                         pSubbasinSegmentName, _
+                         pPSRCustom, pPSRCustomFile, pPSRCalculate) Then
                 If CreateUCI(lOutputPath & "\" & pBaseOutputName & ".uci", pMetWDM) Then
                     Logger.Dbg("UCIBuilder:  Created UCI file " & lOutputPath & "\" & pBaseOutputName & ".uci")
-                    'Else 'old way of creating a uci, in WinHSPF
-                    '    StartWinHSPF(lOutputPath & "\" & lBaseOutputName & ".wsd")
                 End If
             End If
         End If
     End Sub
 
     'aLUType - Land use layer type (0 - USGS GIRAS Shape, 1 - NLCD grid, 2 - Other shape, 3 - Other grid)
-    Public Function SetupHSPFGen(ByVal aOutputPath As String, ByVal aBaseOutputName As String, _
-                                 ByVal aSubbasinThemeName As String, ByVal aSubbasinFieldName As String, ByVal aSubbasinSlopeName As String, _
-                                 ByVal aStreamLayerName As String, ByVal aStreamFields() As String, _
-                                 ByVal aLUType As Integer, ByVal aLandUseThemeName As String, _
-                                 Optional ByVal aOutletsThemeName As String = "<none>", _
-                                 Optional ByVal aPointThemeName As String = "", _
-                                 Optional ByVal aPointYear As String = "", _
-                                 Optional ByVal aLandUseClassFile As String = "<none>", _
-                                 Optional ByVal aSubbasinSegmentName As String = "", _
-                                 Optional ByVal aPSRCustom As Boolean = False, _
-                                 Optional ByVal aPSRCustomFile As String = "", _
-                                 Optional ByVal aPSRCalculate As Boolean = False) As Boolean
+    Public Function SetupHSPF(ByVal aOutputPath As String, ByVal aBaseOutputName As String, _
+                              ByVal aSubbasinThemeName As String, ByVal aSubbasinFieldName As String, ByVal aSubbasinSlopeName As String, _
+                              ByVal aStreamLayerName As String, ByVal aStreamFields() As String, _
+                              ByVal aLUType As Integer, ByVal aLandUseThemeName As String, _
+                              ByVal aOutletsThemeName As String, _
+                              ByVal aPointThemeName As String, _
+                              ByVal aPointYear As String, _
+                              ByVal aLandUseFieldName As String, ByVal aLandUseClassFile As String, _
+                              ByVal aSubbasinSegmentName As String, _
+                              ByVal aPSRCustom As Boolean, _
+                              ByVal aPSRCustomFile As String, _
+                              ByVal aPSRCalculate As Boolean) As Boolean
 
         'todo: replace below with logger/status message on main BASINS form?
         'lblStatus.Text = "Preparing to process"
         'Me.Refresh()
         'EnableControls(False)
 
-        'If Not PreProcessChecking(aOutputPath, aBaseOutputName) Then 'failed early checks
-        '    Exit Function
-        'End If
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
 
         'build collection of selected subbasins 
@@ -108,11 +104,8 @@ Module UCIBuilder
         Dim lSubbasinsSlopes As New atcCollection    'key is subbasin id, value is slope
         Dim lSubbasinId As Integer
         Dim lSubbasinSlope As Double
-        'Dim lSubbasinThemeName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
         Dim lSubbasinLayerIndex As Long = GisUtil.LayerIndex(aSubbasinThemeName)
-        'Dim lSubbasinFieldName As String = cboSub1.Items(cboSub1.SelectedIndex)
         Dim lSubbasinFieldIndex As Long = GisUtil.FieldIndex(lSubbasinLayerIndex, aSubbasinFieldName)
-        'Dim lSubbasinSlopeIndex As Long = GisUtil.FieldIndex(lSubbasinLayerIndex, cboSub2.Items(cboSub2.SelectedIndex))
         Dim lSubbasinSlopeIndex As Long = GisUtil.FieldIndex(lSubbasinLayerIndex, aSubbasinSlopeName)
         For i As Integer = 1 To GisUtil.NumSelectedFeatures(lSubbasinLayerIndex)
             Dim lSelectedIndex As Integer = GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, lSubbasinLayerIndex)
@@ -134,7 +127,6 @@ Module UCIBuilder
         'build collection of model segment ids for each subbasin
         Dim lSubbasinsModelSegmentIds As New atcCollection    'key is subbasin id, value is model segment id
         Dim lSubbasinSegmentFieldIndex As Integer = -1
-        'If cboSub3.SelectedIndex > 0 Then 'see if we have some model segments in the subbasin dbf
         If aSubbasinSegmentName.Length > 0 Then 'see if we have some model segments in the subbasin dbf
             lSubbasinSegmentFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, aSubbasinSegmentName)
         End If
@@ -155,7 +147,7 @@ Module UCIBuilder
         Dim lAreas As New Collection
         Dim lReclassifyFileName As String = ""
 
-        If aLUType = 0 Then ' cboLanduse.SelectedIndex = 0 Then
+        If aLUType = 0 Then
             'usgs giras is the selected land use type
             Dim lSuccess As Boolean = CreateLanduseRecordsGIRAS(lSubbasinsSelected, lLucodes, lSubids, lAreas, aSubbasinThemeName, aSubbasinFieldName)
 
@@ -173,12 +165,11 @@ Module UCIBuilder
                 lReclassifyFileName = lLandUsePathName.Substring(0, 1) & ":\basins\etc\giras.dbf"
             End If
 
-        ElseIf aLUType = 1 Or aLUType = 3 Then 'cboLanduse.SelectedIndex = 1 Or cboLanduse.SelectedIndex = 3 Then
+        ElseIf aLUType = 1 Or aLUType = 3 Then
             'nlcd grid or other grid is the selected land use type
             CreateLanduseRecordsGrid(lSubbasinsSelected, lLucodes, lSubids, lAreas, aSubbasinThemeName, aLandUseThemeName)
 
-            If aLUType = 1 Then 'cboLanduse.SelectedIndex = 1 Then 
-                'nlcd grid
+            If aLUType = 1 Then 'nlcd grid
                 Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
                 lReclassifyFileName = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "etc\"
                 If FileExists(lReclassifyFileName) Then
@@ -187,18 +178,18 @@ Module UCIBuilder
                     lReclassifyFileName = "\BASINS\etc\nlcd.dbf"
                 End If
             Else
-                If aLandUseClassFile <> "<none>" Then 'lblClass.Text <> "<none>" Then
-                    lReclassifyFileName = aLandUseClassFile 'lblClass.Text
+                If aLandUseClassFile <> "<none>" Then
+                    lReclassifyFileName = aLandUseClassFile
                 End If
             End If
 
-        ElseIf aLUType = 2 Then 'cboLanduse.SelectedIndex = 2 Then
+        ElseIf aLUType = 2 Then
             'other shape
-            CreateLanduseRecordsShapefile(lSubbasinsSelected, lLucodes, lSubids, lAreas, aSubbasinThemeName, aSubbasinFieldName, aLandUseThemeName, "")
+            CreateLanduseRecordsShapefile(lSubbasinsSelected, lLucodes, lSubids, lAreas, aSubbasinThemeName, aSubbasinFieldName, aLandUseThemeName, aLandUseFieldName)
 
             lReclassifyFileName = ""
-            If aLandUseClassFile <> "none" Then 'lblClass.Text <> "<none>" Then
-                lReclassifyFileName = aLandUseClassFile 'lblClass.Text
+            If aLandUseClassFile <> "<none>" Then
+                lReclassifyFileName = aLandUseClassFile
             End If
 
         End If
@@ -242,16 +233,14 @@ Module UCIBuilder
         Dim lLandUses As LandUses = CreateLanduses(lSubbasinsSlopes, lLucodes, lSubids, lAreas, lReaches)
 
         'figure out which outlets are in which subbasins
-        'Dim lOutletsThemeName As String = cboOutlets.Items(cboOutlets.SelectedIndex)
         Dim lOutSubs As New Collection
-        'If lOutletsThemeName <> "<none>" Then
         If aOutletsThemeName <> "<none>" Then
             'todo: replace below with logger/status message on main BASINS form?
             'lblStatus.Text = "Joining point sources to subbasins"
             'Me.Refresh()
             Dim i As Integer = GisUtil.LayerIndex(aOutletsThemeName)
             For j As Integer = 1 To GisUtil.NumFeatures(i)
-                Dim k As Integer = GisUtil.PointInPolygon(i, j, lSubbasinLayerIndex)
+                Dim k As Integer = GisUtil.PointInPolygon(i, j - 1, lSubbasinLayerIndex)
                 If k > -1 Then
                     lOutSubs.Add(GisUtil.FieldValue(lSubbasinLayerIndex, k, lSubbasinFieldIndex))
                 Else
@@ -290,15 +279,12 @@ Module UCIBuilder
         'Me.Refresh()
         Dim lOutletsLayerIndex As Integer
         Dim lPointLayerIndex As Integer
-        'Dim lYear As String = ""
         If lOutSubs.Count > 0 Then
-            lOutletsLayerIndex = GisUtil.LayerIndex(aOutletsThemeName) '(cboOutlets.Items(cboOutlets.SelectedIndex))
+            lOutletsLayerIndex = GisUtil.LayerIndex(aOutletsThemeName)
             lPointLayerIndex = GisUtil.FieldIndex(lOutletsLayerIndex, aPointThemeName) 'cboPoint.Items(cboPoint.SelectedIndex))
-            'lYear = cboYear.Items(cboYear.SelectedIndex)
         End If
         WritePSRFile(lBaseFileName & ".psr", lSubbasinsSelected, lOutSubs, lOutletsLayerIndex, lPointLayerIndex, _
                         aPSRCustom, aPSRCustomFile, aPSRCalculate, aPointYear)
-        'chkCustom.Checked, lblCustom.Text, chkCalculate.Checked, aPointYear)
 
         'write seg file
         'todo: replace below with logger/status message on main BASINS form?

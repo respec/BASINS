@@ -790,7 +790,7 @@ Public Module modModelSetup
         End If
     End Sub
 
-    Public Function PreProcessChecking(ByVal OutputPath As String, ByVal BaseOutputName As String, _
+    Public Function PreProcessChecking(ByVal aOutputPath As String, ByVal aBaseOutputName As String, _
                                        ByVal aModelName As String, ByVal aLUType As Integer, ByVal aMetStationsCount As Integer, _
                                        ByVal aSubbasinThemeName As String, ByVal aLandUseThemename As String) As Boolean
         If aModelName <> "AQUATOX" Then
@@ -820,16 +820,16 @@ Public Module modModelSetup
             End If
 
             'see if these files already exist
-            Dim lWsdFileName As String = OutputPath & "\" & BaseOutputName & ".wsd"
+            Dim lWsdFileName As String = aOutputPath & "\" & aBaseOutputName & ".wsd"
             If FileExists(lWsdFileName) Then  'already exists
-                If Logger.Msg("HSPF Project '" & BaseOutputName & "' already exists.  Do you want to overwrite it?", vbOKCancel, "Overwrite?") = MsgBoxResult.Cancel Then
+                If Logger.Msg("HSPF Project '" & aBaseOutputName & "' already exists.  Do you want to overwrite it?", vbOKCancel, "Overwrite?") = MsgBoxResult.Cancel Then
                     Return False
                 End If
             End If
         Else 'in AQUATOX, see if these files already exist
-            Dim lRchFileName As String = OutputPath & "\" & BaseOutputName & ".rch"
+            Dim lRchFileName As String = aOutputPath & "\" & aBaseOutputName & ".rch"
             If FileExists(lRchFileName) Then 'already exists
-                If Logger.Msg("AQUATOX Project '" & BaseOutputName & "' already exists.  Do you want to overwrite it?", vbOKCancel, "Overwrite?") = MsgBoxResult.Cancel Then
+                If Logger.Msg("AQUATOX Project '" & aBaseOutputName & "' already exists.  Do you want to overwrite it?", vbOKCancel, "Overwrite?") = MsgBoxResult.Cancel Then
                     Return False
                 End If
             End If
