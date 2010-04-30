@@ -36,12 +36,19 @@ Public Module HeadwaterCheck
                 lHucFieldName = .ItemByKey("HUC Field Name")
                 lDownstreamFieldName = .ItemByKey("Downstream Field Name")
             End With
-            Dim lCopyStatus As Boolean = TryCopyShapefile(lOriginalShapefileName, lNewShapefileFolder)
+            Dim lNewShapeFileName As String = IO.Path.Combine(lNewShapefileFolder, IO.Path.GetFileNameWithoutExtension(lOriginalShapefileName)) & ".shp"
+            Dim lCopyStatus As Boolean
+            If IO.File.Exists(lNewShapeFileName) Then
+                lCopyStatus = TryCopy(IO.Path.ChangeExtension(lOriginalShapefileName, "dbf"), _
+                                      IO.Path.ChangeExtension(lNewShapeFileName, "dbf"))
+            Else
+                lCopyStatus = TryCopyShapefile(lOriginalShapefileName, lNewShapefileFolder)
+            End If
             If lCopyStatus Then
                 Dim lHucField As Integer = -1
                 Dim lDownstreamField As Integer = -1
-                Dim lNewShapeFileName As String = IO.Path.Combine(lNewShapefileFolder, IO.Path.GetFileNameWithoutExtension(lOriginalShapefileName)) & ".shp"
                 Dim lNewShapefile As New MapWinGIS.Shapefile
+                Dim lCircularExit As New SortedList(Of String, String)
                 If lNewShapefile.Open(lNewShapeFileName) Then
                     lNewShapefile.StartEditingTable()
                     Dim lCurField As Integer
@@ -106,10 +113,17 @@ Public Module HeadwaterCheck
                                 lNewShapefile.EditCellValue(lHeadwaterFieldIndex, lShapeIndex, "N")
                             End If
                             lHuc12DS = lNewShapefile.CellValue(lDownstreamField, lShapeIndex)
+                            lDownstreamIndex = lShapeIndex
+
                             Dim lHuc12Chain As New SortedList(Of String, Integer)
                             While lHuc12DS IsNot Nothing AndAlso lHuc12DS.ToString.Length > 0
                                 If lHuc12Chain.ContainsKey(lHuc12DS) Then
-                                    Logger.Dbg("CircularExitFor " & lHuc12 & " at " & lHuc12DS & " count " & lHuc12Chain.Count)
+                                    lNewShapefile.EditCellValue(lHeadwaterFieldIndex, lDownstreamIndex, "?")
+                                    lNewShapefile.EditCellValue(lHeadwaterFieldIndex, lShapeIndex, "X")
+                                    'Logger.Dbg("CircularExitFor " & lHuc12 & " at " & lHuc12DS & " count " & lHuc12Chain.Count)
+                                    If Not lCircularExit.ContainsKey(lHuc12DS) Then
+                                        lCircularExit.Add(lHuc12DS, lDownstreamIndex)
+                                    End If
                                     Exit While
                                 Else
                                     lHuc12Chain.Add(lHuc12DS, Nothing)
@@ -123,6 +137,16 @@ Public Module HeadwaterCheck
                         Next
                         lNewShapefile.StopEditingTable()
                         lNewShapefile.Save()
+                        If lCircularExit.Count > 0 Then
+                            Logger.Dbg("CircularCount " & lCircularExit.Count)
+                            Dim lCountTotal As Integer = 0
+                            For Each lCircularItem As String In lCircularExit.Keys
+                                Dim lCount As Integer = lNewShapefile.CellValue(lUpstreamCountFieldIndex, lCircularExit.Item(lCircularItem))
+                                lCountTotal += lCount
+                                Logger.Dbg(lCircularItem & " " & lCount)
+                            Next
+                            Logger.Dbg("TotalImpacted " & lCountTotal)
+                        End If
                     End If
                     lNewShapefile.Close()
                 End If
