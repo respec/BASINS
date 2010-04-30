@@ -20,91 +20,114 @@ Public Module HeadwaterCheck
         Dim lOriginalShapefileName As String = ""
         Dim lHucFieldName As String = "HUC_12"
         Dim lDownstreamFieldName As String = "HU_12_DS"
-        Dim lNumUpstreamFieldName As String = "HU_12_UPCNT"
-        Dim lNewShapefileName As String = ""
+        Dim lNewShapefileFolder As String = ""
         Dim lUserParms As New atcCollection
         With lUserParms
             .Add("Original Shape File", lOriginalShapefileName)
-            .Add("New Shape File", lNewShapefileName)
+            .Add("New Shape File Folder", lNewShapefileFolder)
             .Add("HUC Field Name", lHucFieldName)
             .Add("Downstream Field Name", lDownstreamFieldName)
-            .Add("New Upstream Count Field Name", lNumUpstreamFieldName)
         End With
         Dim lAsk As New frmArgs
-        If lAsk.AskUser("Specify full path of text file to import and WDM file to write into", lUserParms) Then
+        If lAsk.AskUser("HUC Shapefile Specifications", lUserParms) Then
             With lUserParms
                 lOriginalShapefileName = .ItemByKey("Original Shape File")
-                lNewShapefileName = .ItemByKey("New Shape File")
+                lNewShapefileFolder = .ItemByKey("New Shape File Folder")
                 lHucFieldName = .ItemByKey("HUC Field Name")
                 lDownstreamFieldName = .ItemByKey("Downstream Field Name")
-                lNumUpstreamFieldName = .ItemByKey("New Upstream Count Field Name")
             End With
-            Dim lOriginalDBF As New atcTableDBF
-            If lOriginalDBF.OpenFile(IO.Path.ChangeExtension(lOriginalShapefileName, ".dbf")) Then
-                Dim lLastOriginalField As Integer = lOriginalDBF.NumFields
-                Dim lHucField As Integer = lOriginalDBF.FieldNumber(lHucFieldName)
-                Dim lDownstreamField As Integer = lOriginalDBF.FieldNumber(lDownstreamFieldName)
-                If lHucField < 1 Then
-                    lOriginalDBF.Clear()
-                    Logger.Msg("Could not find field '" & lHucFieldName & "'")
-                ElseIf lDownstreamField < 1 Then
-                    lOriginalDBF.Clear()
-                    Logger.Msg("Could not find field '" & lDownstreamFieldName & "'")
-                Else
-                    Dim lNumRecords As Integer = lOriginalDBF.NumRecords
-                    Dim lNewDBF As New atcTableDBF
-                    lNewDBF.NumFields = lOriginalDBF.NumFields + 1
+            Dim lCopyStatus As Boolean = TryCopyShapefile(lOriginalShapefileName, lNewShapefileFolder)
+            If lCopyStatus Then
+                Dim lHucField As Integer = -1
+                Dim lDownstreamField As Integer = -1
+                Dim lNewShapeFileName As String = IO.Path.Combine(lNewShapefileFolder, IO.Path.GetFileNameWithoutExtension(lOriginalShapefileName)) & ".shp"
+                Dim lNewShapefile As New MapWinGIS.Shapefile
+                If lNewShapefile.Open(lNewShapeFileName) Then
+                    lNewShapefile.StartEditingTable()
                     Dim lCurField As Integer
-                    For lCurField = 1 To lLastOriginalField
-                        lNewDBF.FieldName(lCurField) = lOriginalDBF.FieldName(lCurField)
-                        lNewDBF.FieldLength(lCurField) = lOriginalDBF.FieldLength(lCurField)
-                        lNewDBF.FieldType(lCurField) = lOriginalDBF.FieldType(lCurField)
-                        lNewDBF.FieldLength(lCurField) = lOriginalDBF.FieldLength(lCurField)
-                        lNewDBF.FieldDecimalCount(lCurField) = lOriginalDBF.FieldDecimalCount(lCurField)
-                    Next
-                    Dim lNumUpstreamField As Integer = lLastOriginalField + 1
-                    lNewDBF.FieldName(lNumUpstreamField) = lNumUpstreamFieldName
-                    lNewDBF.FieldLength(lNumUpstreamField) = 3
-                    lNewDBF.FieldType(lNumUpstreamField) = "N"
-                    lNewDBF.NumRecords = lNumRecords
-                    lNewDBF.InitData()
+                    For lCurField = 0 To lNewShapefile.NumFields - 1
+                        Select Case lNewShapefile.Field(lCurField).Name
+                            Case lHucFieldName : lHucField = lCurField
+                            Case lDownstreamFieldName : lDownstreamField = lCurField
 
-                    Dim lDownstreamHUCs As New atcCollection
-                    Logger.Status("Creating new DBF")
-                    Dim lCurrentRecord As Integer
-                    For lCurrentRecord = 1 To lNumRecords
-                        lOriginalDBF.CurrentRecord = lCurrentRecord
-                        lNewDBF.CurrentRecord = lCurrentRecord
-                        For lCurField = 0 To lLastOriginalField
-                            Dim lCellValue As String = lOriginalDBF.Value(lCurField)
-                            lNewDBF.Value(lCurField) = lCellValue
-                            If lCurField = lDownstreamField Then
-                                lDownstreamHUCs.Increment(lCellValue)
+                        End Select
+                    Next
+                    If lHucField < 0 Then
+                        Logger.Msg("Could not find field '" & lHucFieldName & "'")
+                    ElseIf lDownstreamField < 0 Then
+                        Logger.Msg("Could not find field '" & lDownstreamFieldName & "'")
+                    Else
+                        Dim lHeadwaterField As New MapWinGIS.Field
+                        lHeadwaterField.Name = "headwater"
+                        lHeadwaterField.Width = 1
+                        lHeadwaterField.Type = MapWinGIS.FieldType.STRING_FIELD
+                        lNewShapefile.EditInsertField(lHeadwaterField, lNewShapefile.NumFields)
+                        Dim lHeadwaterFieldIndex As Integer = lNewShapefile.NumFields - 1
+
+                        Dim lUpstreamCountField As New MapWinGIS.Field
+                        lUpstreamCountField.Name = "upstreamCnt"
+                        lUpstreamCountField.Width = 1
+                        lUpstreamCountField.Type = MapWinGIS.FieldType.INTEGER_FIELD
+                        lNewShapefile.EditInsertField(lUpstreamCountField, lNewShapefile.NumFields)
+                        Dim lUpstreamCountFieldIndex As Integer = lNewShapefile.NumFields - 1
+
+                        Dim lDownstreamHUCs As New SortedList(Of String, String)
+                        Dim lLastShape As Integer = lNewShapefile.NumShapes - 1
+                        Logger.Status("Editing fields in shapefile " & lNewShapeFileName)
+                        lNewShapefile.StartEditingTable()
+                        For lShapeIndex As Integer = 0 To lLastShape
+                            Dim lCellValue As Object = lNewShapefile.CellValue(lDownstreamField, lShapeIndex)
+                            If Not lDownstreamHUCs.ContainsKey(lCellValue) Then
+                                lDownstreamHUCs.Add(lCellValue, -1)
+                            End If
+                            lNewShapefile.EditCellValue(lHeadwaterFieldIndex, lShapeIndex, "Y")
+                            lNewShapefile.EditCellValue(lUpstreamCountFieldIndex, lShapeIndex, 0)
+                            If lDownstreamHUCs.Count Mod 100 = 0 Then
+                                Logger.Progress("DSHucCnt " & lDownstreamHUCs.Count, lShapeIndex, lLastShape)
                             End If
                         Next
-                        'lNewDBF.Value(lCurField) = "0"
-                        'Logger.Progress("DSHucCnt " & lDownstreamHUCs.Count, lCurrentRecord, lNumRecords)
-                        Logger.Progress(lCurrentRecord, lNumRecords)
-                    Next
+                        Logger.Status("Setting Indexes of DSHucs")
+                        Dim lHuc12 As Object
+                        Dim lHuc12DS As Object
+                        Dim lDownstreamIndex As Integer = 0
+                        For lShapeIndex As Integer = 0 To lLastShape
+                            lHuc12 = lNewShapefile.CellValue(lHucField, lShapeIndex)
+                            lDownstreamIndex = lDownstreamHUCs.IndexOfKey(lHuc12)
+                            If lDownstreamIndex > -1 Then
+                                lDownstreamHUCs.Item(lHuc12) = lShapeIndex
+                            End If
+                        Next
 
-                    lOriginalDBF.Clear()
-                    Logger.Status("Setting " & lNumUpstreamFieldName)
-                    For lCurrentRecord = 1 To lNumRecords
-                        lNewDBF.CurrentRecord = lCurrentRecord
-                        Dim lUpstreamCountIndex As Integer = lDownstreamHUCs.IndexFromKey(lNewDBF.Value(lHucField))
-                        If lUpstreamCountIndex < 0 Then
-                            lNewDBF.Value(lNumUpstreamField) = "0"
-                        Else
-                            lNewDBF.Value(lNumUpstreamField) = lDownstreamHUCs.ItemByIndex(lUpstreamCountIndex)
-                        End If
-                        Logger.Progress(lCurrentRecord, lNumRecords)
-                    Next
-                    'TryCopyShapefile(lOriginalShapefileName, lNewShapefileName)
-                    lNewDBF.WriteFile(IO.Path.ChangeExtension(lNewShapefileName, ".dbf"))
+                        Logger.Status("Setting Headwater Field and Counting Downstream")
+                        Dim lHuc12CountUpstream As Integer = 0
+                        For lShapeIndex As Integer = 0 To lLastShape
+                            lHuc12 = lNewShapefile.CellValue(lHucField, lShapeIndex)
+                            If lDownstreamHUCs.ContainsKey(lHuc12) Then
+                                lNewShapefile.EditCellValue(lHeadwaterFieldIndex, lShapeIndex, "N")
+                            End If
+                            lHuc12DS = lNewShapefile.CellValue(lDownstreamField, lShapeIndex)
+                            Dim lHuc12Chain As New SortedList(Of String, Integer)
+                            While lHuc12DS IsNot Nothing AndAlso lHuc12DS.ToString.Length > 0
+                                If lHuc12Chain.ContainsKey(lHuc12DS) Then
+                                    Logger.Dbg("CircularExitFor " & lHuc12 & " at " & lHuc12DS & " count " & lHuc12Chain.Count)
+                                    Exit While
+                                Else
+                                    lHuc12Chain.Add(lHuc12DS, Nothing)
+                                End If
+                                lDownstreamIndex = lDownstreamHUCs.Item(lHuc12DS)
+                                lHuc12CountUpstream = lNewShapefile.CellValue(lUpstreamCountFieldIndex, lDownstreamIndex) + 1
+                                lNewShapefile.EditCellValue(lUpstreamCountFieldIndex, lDownstreamIndex, lHuc12CountUpstream)
+                                lHuc12DS = lNewShapefile.CellValue(lDownstreamField, lDownstreamIndex)
+                            End While
+                            If lShapeIndex Mod 100 = 0 Then Logger.Progress(lShapeIndex, lLastShape)
+                        Next
+                        lNewShapefile.StopEditingTable()
+                        lNewShapefile.Save()
+                    End If
+                    lNewShapefile.Close()
                 End If
                 Logger.Status("")
             End If
         End If
     End Sub
-
 End Module
