@@ -106,6 +106,14 @@ Public Class Metadata
         aSouthBC = lSouthBC.InnerText
     End Sub
 
+    Private Function GetLineage() As Xml.XmlNode
+        Dim lMetaData As XmlNode = FindOrAddChild(pXML, "metadata")
+        Dim lDataQual As XmlNode = FindOrAddChild(lMetaData, "dataqual", "idinfo")
+        Dim lLogic As XmlNode = FindOrAddChild(lDataQual, "logic")
+        Dim lComplete As XmlNode = FindOrAddChild(lDataQual, "complete")
+        Return FindOrAddChild(lDataQual, "lineage")
+    End Function
+
     ''' <summary>
     ''' Add a processing step to lineage within dataqual
     ''' </summary>
@@ -120,19 +128,36 @@ Public Class Metadata
     ''' <param name="aDescription">Description of the processing step</param>
     ''' <param name="aDate">Date of the processing step, defaults to current date and time if omitted</param>
     Public Sub AddProcessStep(ByVal aDescription As String, ByVal aDate As Date)
-        Dim lMetaData As XmlNode = FindOrAddChild(pXML, "metadata")
-        Dim lDataQual As XmlNode = FindOrAddChild(lMetaData, "dataqual", "idinfo")
-        Dim lLogic As XmlNode = FindOrAddChild(lDataQual, "logic")
-        Dim lComplete As XmlNode = FindOrAddChild(lDataQual, "complete")
-        Dim lLineage As XmlNode = FindOrAddChild(lDataQual, "lineage")
-
         Dim lProcStep As XmlNode = pXML.CreateNode(XmlNodeType.Element, "procstep", Nothing)
         AppendTextNode(lProcStep, "procdesc", aDescription)
         AppendTextNode(lProcStep, "procdate", Format(aDate, "yyyyMMdd"))
         AppendTextNode(lProcStep, "proctime", Format(aDate, "HHmmssss"))
-        lLineage.AppendChild(lProcStep)
+        GetLineage.AppendChild(lProcStep)
         ModifiedDate = Now
     End Sub
+
+    ''' <summary>
+    ''' Add processing steps to lineage within dataqual
+    ''' </summary>
+    ''' <param name="aProcessSteps">Processing steps to add</param>
+    Public Sub AddProcessSteps(ByVal aProcessSteps As Generic.List(Of String))
+        Dim lLineage As Xml.XmlNode = Me.GetLineage
+        For Each lProcessStepString As String In aProcessSteps
+            Dim lXML As New Xml.XmlDocument
+            lXML.LoadXml(lProcessStepString)
+            lLineage.AppendChild(pXML.ImportNode(lXML.FirstChild, True))
+        Next
+    End Sub
+
+    Public Function GetProcessSteps() As Generic.List(Of String)
+        Dim lSteps As New Generic.List(Of String)
+
+        For Each lProcStep As XmlNode In GetLineage.ChildNodes
+            lSteps.Add(lProcStep.OuterXml)
+        Next
+
+        Return lSteps
+    End Function
 
     Public Property ModifiedDate() As Date
         Get
@@ -227,7 +252,7 @@ Public Class Metadata
     ''' <param name="aXML">New metadata XML string to use instead of current metadata</param>
     Public Sub FromString(ByVal aXML As String)
         If aXML.Contains(DTD_URL) Then
-            If HaveDTDFile Then
+            If HaveDTDFile() Then
                 aXML = aXML.Replace(DTD_URL, "file://" & DTD_Filename.Replace("\", "/"))
             End If
         End If
