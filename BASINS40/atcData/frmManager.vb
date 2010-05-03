@@ -166,6 +166,7 @@ Friend Class frmManager
         Me.SaveInToolStripMenuItem.Name = "SaveInToolStripMenuItem"
         Me.SaveInToolStripMenuItem.Size = New System.Drawing.Size(195, 24)
         Me.SaveInToolStripMenuItem.Text = "Save In..."
+        Me.SaveInToolStripMenuItem.Visible = False
         '
         'toolStripSeparator1
         '
@@ -207,12 +208,14 @@ Friend Class frmManager
         Me.AddDatasetsToolStripMenuItem.Name = "AddDatasetsToolStripMenuItem"
         Me.AddDatasetsToolStripMenuItem.Size = New System.Drawing.Size(231, 24)
         Me.AddDatasetsToolStripMenuItem.Text = "Add Datasets"
+        Me.AddDatasetsToolStripMenuItem.Visible = False
         '
         'RenumberDatasetsToolStripMenuItem
         '
         Me.RenumberDatasetsToolStripMenuItem.Name = "RenumberDatasetsToolStripMenuItem"
         Me.RenumberDatasetsToolStripMenuItem.Size = New System.Drawing.Size(231, 24)
         Me.RenumberDatasetsToolStripMenuItem.Text = "Renumber Datasets"
+        Me.RenumberDatasetsToolStripMenuItem.Visible = False
         '
         'RemoveDatasetsToolStripMenuItem
         '
@@ -230,13 +233,13 @@ Friend Class frmManager
         'DisplayToolStripMenuItem
         '
         Me.DisplayToolStripMenuItem.Name = "DisplayToolStripMenuItem"
-        Me.DisplayToolStripMenuItem.Size = New System.Drawing.Size(145, 24)
+        Me.DisplayToolStripMenuItem.Size = New System.Drawing.Size(152, 24)
         Me.DisplayToolStripMenuItem.Text = "Display"
         '
         'NativeToolStripMenuItem
         '
         Me.NativeToolStripMenuItem.Name = "NativeToolStripMenuItem"
-        Me.NativeToolStripMenuItem.Size = New System.Drawing.Size(145, 24)
+        Me.NativeToolStripMenuItem.Size = New System.Drawing.Size(152, 24)
         Me.NativeToolStripMenuItem.Text = "Native"
         '
         'AnalysisToolStripMenuItem
@@ -649,7 +652,7 @@ Friend Class frmManager
         ShowHelp("")
     End Sub
 
-    Private Sub SaveAsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveInToolStripMenuItem.Click
+    Private Sub SaveInToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveInToolStripMenuItem.Click
         Logger.Msg("TODO: implement this")
     End Sub
 
