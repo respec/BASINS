@@ -646,27 +646,24 @@ StartOver:
     End Sub
 
     Public Sub ProcessDownloadResults(ByVal aInstructions As String)
+        Dim lXmlInstructions As New Xml.XmlDocument
+        lXmlInstructions.LoadXml("<AllInstructions>" & aInstructions & "</AllInstructions>")
         Dim lMessage As String = ""
-        Dim lEndFunction As Integer = aInstructions.ToLower.IndexOf("</success>")
-        While lEndFunction > 0
-            Dim lInstructions As String = aInstructions.Substring(0, lEndFunction + 10)
-            lMessage &= ProcessDownloadResult(lInstructions) & vbCrLf
-            aInstructions = aInstructions.Substring(lEndFunction + 10)
-            lEndFunction = aInstructions.ToLower.IndexOf("</success>")
-        End While
-
-        If lMessage.Length > 0 Then
+        Application.DoEvents()
+        For Each lInstructionNode As Xml.XmlNode In lXmlInstructions.ChildNodes(0).ChildNodes
+            lMessage &= ProcessDownloadResult(lInstructionNode.OuterXml) & vbCrLf
             Application.DoEvents()
-            Logger.Msg(lMessage, "Download Complete")
-        End If
-
-        If Logger.DisplayMessageBoxes AndAlso lMessage.Contains(" Data file") Then
-            atcDataManager.UserManage()
+        Next
+        If lMessage.Length > 2 Then
+            Logger.Msg(lMessage, "Data Download")
+            If Logger.DisplayMessageBoxes AndAlso lMessage.Contains(" Data file") Then
+                atcDataManager.UserManage()
+            End If
         End If
     End Sub
 
     Private Function ProcessDownloadResult(ByVal aInstructions As String) As String
-        Dim lProjectorXML As New Xml.XmlDocument
+        Logger.Dbg("ProcessDownloadResult: " & aInstructions)
         Dim lProjectorNode As Xml.XmlNode
         Dim lInputDirName As String
         Dim lOutputDirName As String
@@ -698,280 +695,285 @@ StartOver:
             End If
         End If
 
-        g_MapWin.View.LockLegend()
-        g_MapWin.View.MapCursor = tkCursor.crsrWait
-
-        lProjectorXML.LoadXml(aInstructions)
-        For Each lProjectorNode In lProjectorXML.FirstChild.ChildNodes
-            Logger.Dbg("Processing XML: " & lProjectorNode.OuterXml)
-            Logger.Status(ReadableFromXML(lProjectorNode.OuterXml))
-            Select Case LCase(lProjectorNode.Name.ToLower)
-                Case "add_data"
-                    Dim lDataType As String = lProjectorNode.Attributes.GetNamedItem("type").InnerText
-                    lOutputFileName = lProjectorNode.InnerText
-                    If lDataType.Length = 0 Then
-                        Logger.Dbg("Could not add data from '" & lOutputFileName & "' - no type specified")
-                    Else
-                        Dim lNewDataSource As atcData.atcTimeseriesSource = atcData.atcDataManager.DataSourceByName(lDataType)
-                        If lNewDataSource Is Nothing Then 'Try loading needed plugin for this data type
-                            If atcData.atcDataManager.LoadPlugin("Timeseries::" & lDataType) Then
-                                'Try again with newly loaded plugin
-                                lNewDataSource = atcData.atcDataManager.DataSourceByName(lDataType)
-                                If lNewDataSource IsNot Nothing Then Logger.Dbg("Successfully loaded plugin " & lDataType & " to read " & lOutputFileName)
-                            Else
-                                Logger.Dbg("Could not add data from '" & lOutputFileName & "' - unknown type '" & lDataType & "'")
+        Dim lInstructionsXML As New Xml.XmlDocument
+        lInstructionsXML.LoadXml(aInstructions)
+        Dim lInstructionsNode As Xml.XmlNode = lInstructionsXML.FirstChild
+        If lInstructionsNode.Name.ToLower = "success" Then
+            g_MapWin.View.LockLegend()
+            g_MapWin.View.MapCursor = tkCursor.crsrWait
+            For Each lProjectorNode In lInstructionsNode.ChildNodes
+                Logger.Dbg("Processing XML: " & lProjectorNode.OuterXml)
+                If lProjectorNode.Name <> "message" Then Logger.Status(ReadableFromXML(lProjectorNode.OuterXml))
+                Select Case LCase(lProjectorNode.Name.ToLower)
+                    Case "add_data"
+                        Dim lDataType As String = lProjectorNode.Attributes.GetNamedItem("type").InnerText
+                        lOutputFileName = lProjectorNode.InnerText
+                        If lDataType.Length = 0 Then
+                            Logger.Dbg("Could not add data from '" & lOutputFileName & "' - no type specified")
+                        Else
+                            Dim lNewDataSource As atcData.atcTimeseriesSource = atcData.atcDataManager.DataSourceByName(lDataType)
+                            If lNewDataSource Is Nothing Then 'Try loading needed plugin for this data type
+                                If atcData.atcDataManager.LoadPlugin("Timeseries::" & lDataType) Then
+                                    'Try again with newly loaded plugin
+                                    lNewDataSource = atcData.atcDataManager.DataSourceByName(lDataType)
+                                    If lNewDataSource IsNot Nothing Then Logger.Dbg("Successfully loaded plugin " & lDataType & " to read " & lOutputFileName)
+                                Else
+                                    Logger.Dbg("Could not add data from '" & lOutputFileName & "' - unknown type '" & lDataType & "'")
+                                End If
+                            End If
+                            If lNewDataSource IsNot Nothing Then
+                                If atcData.atcDataManager.OpenDataSource(lNewDataSource, lOutputFileName, Nothing) Then
+                                    lDataAdded.Add(lNewDataSource.Specification)
+                                End If
                             End If
                         End If
-                        If lNewDataSource IsNot Nothing Then
-                            If atcData.atcDataManager.OpenDataSource(lNewDataSource, lOutputFileName, Nothing) Then
-                                lDataAdded.Add(lNewDataSource.Specification)
-                            End If
+                    Case "add_shape"
+                        lOutputFileName = lProjectorNode.InnerText
+                        If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
+                        Dim lLayer As MapWindow.Interfaces.Layer = AddShapeToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
+                        If lLayer Is Nothing Then
+                            Logger.Msg("Failed add shape layer '" & lOutputFileName & "'")
+                        Else
+                            lLayersAdded.Add(lLayer.Name)
                         End If
-                    End If
-                Case "add_shape"
-                    lOutputFileName = lProjectorNode.InnerText
-                    If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
-                    Dim lLayer As MapWindow.Interfaces.Layer = AddShapeToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
-                    If lLayer Is Nothing Then
-                        Logger.Msg("Failed add shape layer '" & lOutputFileName & "'")
-                    Else
-                        lLayersAdded.Add(lLayer.Name)
-                    End If
-                Case "add_grid"
-                    lOutputFileName = lProjectorNode.InnerText
-                    '    Select Case IO.Path.GetFileName(lOutputFileName).ToLower
-                    '        Case "fac.tif", "fdr.tif", "cat.tif"
-                    '            Logger.Dbg("Skipping adding grid to MapWindow: " & lOutputFileName)
-                    '            GetDefaultRenderer(lOutputFileName)
-                    '            lMessage &= IO.Path.GetFileName(lOutputFileName) & " available, not added to map" & vbCrLf
-                    '        Case Else
-                    If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
-                    Dim lLayer As MapWindow.Interfaces.Layer = AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
-                    If lLayer Is Nothing Then
-                        Logger.Msg(lOutputFileName, "Failed add grid layer")
-                    Else
-                        lLayersAdded.Add(lLayer.Name)
-                    End If
-                    If Not FileExists(FilenameNoExt(lOutputFileName) & ".prj") Then
-                        'create .prj file as work-around for bug
-                        SaveFileString(FilenameNoExt(lOutputFileName) & ".prj", "")
-                    End If
-                    '    End Select
-                Case "add_allshapes"
-                    lOutputFileName = lProjectorNode.InnerText
-                    lLayersAdded.AddRange(AddAllShapesInDir(lOutputFileName, lProjectDir))
-                Case "remove_data"
-                    atcDataManager.RemoveDataSource(lProjectorNode.InnerText.ToLower)
-                Case "remove_layer", "remove_shape", "remove_grid"
-                    Try
-                        atcMwGisUtility.GisUtil.RemoveLayer(atcMwGisUtility.GisUtil.LayerIndex(lProjectorNode.InnerText))
-                    Catch ex As Exception
-                        Logger.Dbg("Error removing layer '" & lProjectorNode.InnerText & "': " & ex.Message)
-                    End Try
-                Case "clip_grid"
-                    lOutputFileName = lProjectorNode.Attributes.GetNamedItem("output").InnerText
-                    lCurFilename = lProjectorNode.InnerText
-                    'create extents shape to clip to, at the extents of the cat unit
-                    Dim lShape As New MapWinGIS.Shape
-                    Dim lExtentsSf As New MapWinGIS.Shapefile
-                    lShape.Create(ShpfileType.SHP_POLYGON)
-                    Dim lSf As New MapWinGIS.Shapefile
-                    lSf.Open(lProjectDir & "cat.shp")
-                    Dim lPoint1 As New MapWinGIS.Point
-                    lPoint1.x = lSf.Extents.xMin
-                    lPoint1.y = lSf.Extents.yMin
-                    lSuccess = lShape.InsertPoint(lPoint1, 0)
-                    Dim lPoint2 As New MapWinGIS.Point
-                    lPoint2.x = lSf.Extents.xMax
-                    lPoint2.y = lSf.Extents.yMin
-                    lSuccess = lShape.InsertPoint(lPoint2, 0)
-                    Dim lPoint3 As New MapWinGIS.Point
-                    lPoint3.x = lSf.Extents.xMax
-                    lPoint3.y = lSf.Extents.yMax
-                    lSuccess = lShape.InsertPoint(lPoint3, 0)
-                    Dim lPoint4 As New MapWinGIS.Point
-                    lPoint4.x = lSf.Extents.xMin
-                    lPoint4.y = lSf.Extents.yMax
-                    lSuccess = lShape.InsertPoint(lPoint4, 0)
-                    Dim lPoint5 As New MapWinGIS.Point
-                    lPoint5.x = lSf.Extents.xMin
-                    lPoint5.y = lSf.Extents.yMin
-                    lSuccess = lShape.InsertPoint(lPoint5, 0)
-                    If InStr(lOutputFileName, "\nlcd" & g_PathChar) > 0 Then
-                        'project the extents into the albers projection for nlcd
-                        MkDirPath(lProjectDir & "nlcd")
-                        TryDeleteShapefile(lProjectDir & "nlcd\catextent.shp")
-                        lSuccess = lExtentsSf.CreateNew(lProjectDir & "nlcd\catextent.shp", ShpfileType.SHP_POLYGON)
-                        lSuccess = lExtentsSf.StartEditingShapes(True)
-                        lSuccess = lExtentsSf.EditInsertShape(lShape, 0)
-                        lSuccess = lExtentsSf.Close()
-                        lInputProjection = WholeFileString(lProjectDir & "prj.proj")
-                        lInputProjection = CleanUpUserProjString(lInputProjection)
-                        lOutputProjection = "+proj=aea +ellps=GRS80 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
-                        If lInputProjection <> lOutputProjection Then
-                            lSuccess = MapWinGeoProc.SpatialReference.ProjectShapefile(lInputProjection, lOutputProjection, lExtentsSf)
-                            lSuccess = lExtentsSf.Open(lProjectDir & "nlcd\catextent.shp")
-                            lShape = lExtentsSf.Shape(0)
+                    Case "add_grid"
+                        lOutputFileName = lProjectorNode.InnerText
+                        '    Select Case IO.Path.GetFileName(lOutputFileName).ToLower
+                        '        Case "fac.tif", "fdr.tif", "cat.tif"
+                        '            Logger.Dbg("Skipping adding grid to MapWindow: " & lOutputFileName)
+                        '            GetDefaultRenderer(lOutputFileName)
+                        '            lMessage &= IO.Path.GetFileName(lOutputFileName) & " available, not added to map" & vbCrLf
+                        '        Case Else
+                        If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
+                        Dim lLayer As MapWindow.Interfaces.Layer = AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
+                        If lLayer Is Nothing Then
+                            Logger.Msg(lOutputFileName, "Failed add grid layer")
+                        Else
+                            lLayersAdded.Add(lLayer.Name)
                         End If
-                    End If
-                    'clip to cat extents
-                    g_StatusBar(1).Text = "Clipping Grid..."
-                    RefreshView()
-                    DoEvents()
-                    If Not FileExists(FilenameNoExt(lCurFilename) & ".prj") Then
-                        'create .prj file as work-around for clipping bug
-                        SaveFileString(FilenameNoExt(lCurFilename) & ".prj", "")
-                    End If
-                    Logger.Dbg("ClipGridWithPolygon: " & lCurFilename & " " & lProjectDir & "nlcd\catextent.shp" & " " & lOutputFileName & " " & "True")
-                    lSuccess = MapWinGeoProc.SpatialOperations.ClipGridWithPolygon(lCurFilename, lShape, lOutputFileName, True)
-                    lSuccess = lExtentsSf.Close
-                    g_StatusBar(1).Text = ""
-                Case "project_dir"
-                    lProjectDir = lProjectorNode.InnerText
-                    If Not lProjectDir.EndsWith(g_PathChar) Then lProjectDir &= g_PathChar
-                Case "convert_shape"
-                    lOutputFileName = lProjectorNode.Attributes.GetNamedItem("output").InnerText
-                    lCurFilename = lProjectorNode.InnerText
-                    ShapeUtilMerge(lCurFilename, lOutputFileName, lProjectDir & "prj.proj")
-                    'attempt to assign prj file
-                    lOutputProjection = WholeFileString(lProjectDir & "prj.proj")
-                    lOutputProjection = CleanUpUserProjString(lOutputProjection)
-                    Dim sf As New MapWinGIS.Shapefile
-                    sf.Open(lOutputFileName, Nothing)
-                    sf.Projection = lOutputProjection
-                    sf.Close()
-                    'if adding to some specific point layers in basins we need to refresh that map layer
-                    If Right(lOutputFileName, 8) = "pcs3.shp" Or _
-                       Right(lOutputFileName, 8) = "gage.shp" Or _
-                       Right(lOutputFileName, 9) = "wqobs.shp" Then
-                        'get handle of this layer
-                        Dim lLayerHandle As Integer = -1
-                        For i As Integer = 0 To g_MapWin.Layers.NumLayers
-                            Dim lLayer As Layer = g_MapWin.Layers(g_MapWin.Layers.GetHandle(i))
-                            If Not (lLayer Is Nothing) AndAlso lLayer.FileName = lOutputFileName Then
-                                lLayerHandle = g_MapWin.Layers.GetHandle(i)
-                            End If
-                        Next
-                        If lLayerHandle > -1 Then
-                            Dim llayername As String = g_MapWin.Layers(lLayerHandle).Name
-                            Dim lRGBcolor As Integer = RGB(g_MapWin.Layers(lLayerHandle).Color.R, g_MapWin.Layers(lLayerHandle).Color.G, g_MapWin.Layers(lLayerHandle).Color.B)
-                            Dim lmarkersize As Integer = g_MapWin.Layers(lLayerHandle).LineOrPointSize
-                            Dim ltargroup As Integer = g_MapWin.Layers(lLayerHandle).GroupHandle
-                            Dim lnewpos As Integer = g_MapWin.Layers(lLayerHandle).GroupPosition
-                            Dim MWlay As MapWindow.Interfaces.Layer
-                            Dim shpFile As MapWinGIS.Shapefile
-                            g_MapWin.Layers.Remove(lLayerHandle)
-                            shpFile = New MapWinGIS.Shapefile
-                            shpFile.Open(lOutputFileName)
-                            MWlay = g_MapWin.Layers.Add(shpFile, llayername, lRGBcolor, lRGBcolor, lmarkersize)
-                            g_MapWin.Layers.MoveLayer(MWlay.Handle, lnewpos, ltargroup)
-                        End If
-                    End If
-                Case "convert_grid"
-                    lOutputFileName = lProjectorNode.Attributes.GetNamedItem("output").InnerText
-                    lCurFilename = lProjectorNode.InnerText
-                    'remove output file
-                    TryDelete(lOutputFileName)
-                    lOutputProjection = WholeFileString(lProjectDir & "prj.proj")
-                    lOutputProjection = CleanUpUserProjString(lOutputProjection)
-                    If InStr(lOutputFileName, "\nlcd" & g_PathChar) > 0 Then
-                        'exception for nlcd data, already in albers
-                        lInputProjection = "+proj=aea +ellps=GRS80 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
-                        If lOutputProjection = "+proj=aea +ellps=clrk66 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m" Then
-                            'special exception, don't bother to reproject with only this slight datum shift
-                            lInputProjection = "+proj=aea +ellps=clrk66 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
-                        End If
-                    Else
-                        lInputProjection = "+proj=longlat +datum=NAD83"
-                    End If
-                    If lInputProjection = lOutputProjection Then
-                        System.IO.File.Copy(lCurFilename, lOutputFileName)
-                    Else
-                        'project it
-                        g_StatusBar(1).Text = "Projecting Grid..."
-                        RefreshView()
-                        DoEvents()
-                        lSuccess = MapWinGeoProc.SpatialReference.ProjectGrid(lInputProjection, lOutputProjection, lCurFilename, lOutputFileName, True)
-                        g_StatusBar(1).Text = ""
                         If Not FileExists(FilenameNoExt(lOutputFileName) & ".prj") Then
                             'create .prj file as work-around for bug
                             SaveFileString(FilenameNoExt(lOutputFileName) & ".prj", "")
                         End If
-                        If Not lSuccess Then
-                            Logger.Msg("Failed to project grid" & vbCrLf & MapWinGeoProc.Error.GetLastErrorMsg, "ProcessProjectorFile")
-                            System.IO.File.Copy(lCurFilename, lOutputFileName)
-                        End If
-                    End If
-                Case "convert_dir"
-                    'loop through a directory, projecting all files in it
-                    lInputDirName = lProjectorNode.InnerText
-                    lOutputDirName = lProjectorNode.Attributes.GetNamedItem("output").InnerText
-                    If lOutputDirName Is Nothing OrElse lOutputDirName.Length = 0 Then
-                        lOutputDirName = lInputDirName
-                    End If
-                    If Right(lOutputDirName, 1) <> g_PathChar Then lOutputDirName &= g_PathChar
-
-                    InputFileList.Clear()
-
-                    AddFilesInDir(InputFileList, lInputDirName, False, "*.shp")
-
-                    lOutputProjection = WholeFileString(lProjectDir & "prj.proj")
-                    lOutputProjection = CleanUpUserProjString(lOutputProjection)
-                    Dim sf As New MapWinGIS.Shapefile
-
-                    For Each lFileObject In InputFileList
-                        lCurFilename = lFileObject
-                        If (FileExt(lCurFilename) = "shp") Then
-                            'this is a shapefile
-                            lOutputFileName = lOutputDirName & FilenameNoPath(lCurFilename)
-                            'change projection and merge
-                            If (FileExists(lOutputFileName) And (InStr(1, lOutputFileName, "\landuse" & g_PathChar) > 0)) Then
-                                'if the output file exists and it is a landuse shape, dont bother
-                            Else
-                                ShapeUtilMerge(lCurFilename, lOutputFileName, lProjectDir & "prj.proj")
-                                'attempt to assign prj file
-                                sf.Open(lOutputFileName, Nothing)
-                                sf.Projection = lOutputProjection
-                                sf.Close()
+                        '    End Select
+                    Case "add_allshapes"
+                        lOutputFileName = lProjectorNode.InnerText
+                        lLayersAdded.AddRange(AddAllShapesInDir(lOutputFileName, lProjectDir))
+                    Case "remove_data"
+                        atcDataManager.RemoveDataSource(lProjectorNode.InnerText.ToLower)
+                    Case "remove_layer", "remove_shape", "remove_grid"
+                        Try
+                            atcMwGisUtility.GisUtil.RemoveLayer(atcMwGisUtility.GisUtil.LayerIndex(lProjectorNode.InnerText))
+                        Catch ex As Exception
+                            Logger.Dbg("Error removing layer '" & lProjectorNode.InnerText & "': " & ex.Message)
+                        End Try
+                    Case "clip_grid"
+                        lOutputFileName = lProjectorNode.Attributes.GetNamedItem("output").InnerText
+                        lCurFilename = lProjectorNode.InnerText
+                        'create extents shape to clip to, at the extents of the cat unit
+                        Dim lShape As New MapWinGIS.Shape
+                        Dim lExtentsSf As New MapWinGIS.Shapefile
+                        lShape.Create(ShpfileType.SHP_POLYGON)
+                        Dim lSf As New MapWinGIS.Shapefile
+                        lSf.Open(lProjectDir & "cat.shp")
+                        Dim lPoint1 As New MapWinGIS.Point
+                        lPoint1.x = lSf.Extents.xMin
+                        lPoint1.y = lSf.Extents.yMin
+                        lSuccess = lShape.InsertPoint(lPoint1, 0)
+                        Dim lPoint2 As New MapWinGIS.Point
+                        lPoint2.x = lSf.Extents.xMax
+                        lPoint2.y = lSf.Extents.yMin
+                        lSuccess = lShape.InsertPoint(lPoint2, 0)
+                        Dim lPoint3 As New MapWinGIS.Point
+                        lPoint3.x = lSf.Extents.xMax
+                        lPoint3.y = lSf.Extents.yMax
+                        lSuccess = lShape.InsertPoint(lPoint3, 0)
+                        Dim lPoint4 As New MapWinGIS.Point
+                        lPoint4.x = lSf.Extents.xMin
+                        lPoint4.y = lSf.Extents.yMax
+                        lSuccess = lShape.InsertPoint(lPoint4, 0)
+                        Dim lPoint5 As New MapWinGIS.Point
+                        lPoint5.x = lSf.Extents.xMin
+                        lPoint5.y = lSf.Extents.yMin
+                        lSuccess = lShape.InsertPoint(lPoint5, 0)
+                        If InStr(lOutputFileName, "\nlcd" & g_PathChar) > 0 Then
+                            'project the extents into the albers projection for nlcd
+                            MkDirPath(lProjectDir & "nlcd")
+                            TryDeleteShapefile(lProjectDir & "nlcd\catextent.shp")
+                            lSuccess = lExtentsSf.CreateNew(lProjectDir & "nlcd\catextent.shp", ShpfileType.SHP_POLYGON)
+                            lSuccess = lExtentsSf.StartEditingShapes(True)
+                            lSuccess = lExtentsSf.EditInsertShape(lShape, 0)
+                            lSuccess = lExtentsSf.Close()
+                            lInputProjection = WholeFileString(lProjectDir & "prj.proj")
+                            lInputProjection = CleanUpUserProjString(lInputProjection)
+                            lOutputProjection = "+proj=aea +ellps=GRS80 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
+                            If lInputProjection <> lOutputProjection Then
+                                lSuccess = MapWinGeoProc.SpatialReference.ProjectShapefile(lInputProjection, lOutputProjection, lExtentsSf)
+                                lSuccess = lExtentsSf.Open(lProjectDir & "nlcd\catextent.shp")
+                                lShape = lExtentsSf.Shape(0)
                             End If
                         End If
-                    Next lFileObject
-                Case "message"
-                    Logger.Msg(lProjectorNode.InnerText)
-                Case "select_layer"
-                    Dim lLayerName As String = lProjectorNode.InnerText
-                    Try
-                        Dim lLayerIndex As Integer = atcMwGisUtility.GisUtil.LayerIndex(lLayerName)
-                        atcMwGisUtility.GisUtil.CurrentLayer = lLayerIndex
-                        Logger.Dbg("Selected layer '" & lLayerName & "'")
-                    Catch
-                        Logger.Dbg("Failed to select layer '" & lLayerName & "'")
-                    End Try
-                Case Else
-                    Logger.Msg("Cannot yet follow directive:" & vbCr & lProjectorNode.Name, "ProcessProjectorFile")
-            End Select
-        Next
+                        'clip to cat extents
+                        g_StatusBar(1).Text = "Clipping Grid..."
+                        RefreshView()
+                        DoEvents()
+                        If Not FileExists(FilenameNoExt(lCurFilename) & ".prj") Then
+                            'create .prj file as work-around for clipping bug
+                            SaveFileString(FilenameNoExt(lCurFilename) & ".prj", "")
+                        End If
+                        Logger.Dbg("ClipGridWithPolygon: " & lCurFilename & " " & lProjectDir & "nlcd\catextent.shp" & " " & lOutputFileName & " " & "True")
+                        lSuccess = MapWinGeoProc.SpatialOperations.ClipGridWithPolygon(lCurFilename, lShape, lOutputFileName, True)
+                        lSuccess = lExtentsSf.Close
+                        g_StatusBar(1).Text = ""
+                    Case "project_dir"
+                        lProjectDir = lProjectorNode.InnerText
+                        If Not lProjectDir.EndsWith(g_PathChar) Then lProjectDir &= g_PathChar
+                    Case "convert_shape"
+                        lOutputFileName = lProjectorNode.Attributes.GetNamedItem("output").InnerText
+                        lCurFilename = lProjectorNode.InnerText
+                        ShapeUtilMerge(lCurFilename, lOutputFileName, lProjectDir & "prj.proj")
+                        'attempt to assign prj file
+                        lOutputProjection = WholeFileString(lProjectDir & "prj.proj")
+                        lOutputProjection = CleanUpUserProjString(lOutputProjection)
+                        Dim sf As New MapWinGIS.Shapefile
+                        sf.Open(lOutputFileName, Nothing)
+                        sf.Projection = lOutputProjection
+                        sf.Close()
+                        'if adding to some specific point layers in basins we need to refresh that map layer
+                        If Right(lOutputFileName, 8) = "pcs3.shp" Or _
+                           Right(lOutputFileName, 8) = "gage.shp" Or _
+                           Right(lOutputFileName, 9) = "wqobs.shp" Then
+                            'get handle of this layer
+                            Dim lLayerHandle As Integer = -1
+                            For i As Integer = 0 To g_MapWin.Layers.NumLayers
+                                Dim lLayer As Layer = g_MapWin.Layers(g_MapWin.Layers.GetHandle(i))
+                                If Not (lLayer Is Nothing) AndAlso lLayer.FileName = lOutputFileName Then
+                                    lLayerHandle = g_MapWin.Layers.GetHandle(i)
+                                End If
+                            Next
+                            If lLayerHandle > -1 Then
+                                Dim llayername As String = g_MapWin.Layers(lLayerHandle).Name
+                                Dim lRGBcolor As Integer = RGB(g_MapWin.Layers(lLayerHandle).Color.R, g_MapWin.Layers(lLayerHandle).Color.G, g_MapWin.Layers(lLayerHandle).Color.B)
+                                Dim lmarkersize As Integer = g_MapWin.Layers(lLayerHandle).LineOrPointSize
+                                Dim ltargroup As Integer = g_MapWin.Layers(lLayerHandle).GroupHandle
+                                Dim lnewpos As Integer = g_MapWin.Layers(lLayerHandle).GroupPosition
+                                Dim MWlay As MapWindow.Interfaces.Layer
+                                Dim shpFile As MapWinGIS.Shapefile
+                                g_MapWin.Layers.Remove(lLayerHandle)
+                                shpFile = New MapWinGIS.Shapefile
+                                shpFile.Open(lOutputFileName)
+                                MWlay = g_MapWin.Layers.Add(shpFile, llayername, lRGBcolor, lRGBcolor, lmarkersize)
+                                g_MapWin.Layers.MoveLayer(MWlay.Handle, lnewpos, ltargroup)
+                            End If
+                        End If
+                    Case "convert_grid"
+                        lOutputFileName = lProjectorNode.Attributes.GetNamedItem("output").InnerText
+                        lCurFilename = lProjectorNode.InnerText
+                        'remove output file
+                        TryDelete(lOutputFileName)
+                        lOutputProjection = WholeFileString(lProjectDir & "prj.proj")
+                        lOutputProjection = CleanUpUserProjString(lOutputProjection)
+                        If InStr(lOutputFileName, "\nlcd" & g_PathChar) > 0 Then
+                            'exception for nlcd data, already in albers
+                            lInputProjection = "+proj=aea +ellps=GRS80 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
+                            If lOutputProjection = "+proj=aea +ellps=clrk66 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m" Then
+                                'special exception, don't bother to reproject with only this slight datum shift
+                                lInputProjection = "+proj=aea +ellps=clrk66 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
+                            End If
+                        Else
+                            lInputProjection = "+proj=longlat +datum=NAD83"
+                        End If
+                        If lInputProjection = lOutputProjection Then
+                            System.IO.File.Copy(lCurFilename, lOutputFileName)
+                        Else
+                            'project it
+                            g_StatusBar(1).Text = "Projecting Grid..."
+                            RefreshView()
+                            DoEvents()
+                            lSuccess = MapWinGeoProc.SpatialReference.ProjectGrid(lInputProjection, lOutputProjection, lCurFilename, lOutputFileName, True)
+                            g_StatusBar(1).Text = ""
+                            If Not FileExists(FilenameNoExt(lOutputFileName) & ".prj") Then
+                                'create .prj file as work-around for bug
+                                SaveFileString(FilenameNoExt(lOutputFileName) & ".prj", "")
+                            End If
+                            If Not lSuccess Then
+                                Logger.Msg("Failed to project grid" & vbCrLf & MapWinGeoProc.Error.GetLastErrorMsg, "ProcessProjectorFile")
+                                System.IO.File.Copy(lCurFilename, lOutputFileName)
+                            End If
+                        End If
+                    Case "convert_dir"
+                        'loop through a directory, projecting all files in it
+                        lInputDirName = lProjectorNode.InnerText
+                        lOutputDirName = lProjectorNode.Attributes.GetNamedItem("output").InnerText
+                        If lOutputDirName Is Nothing OrElse lOutputDirName.Length = 0 Then
+                            lOutputDirName = lInputDirName
+                        End If
+                        If Right(lOutputDirName, 1) <> g_PathChar Then lOutputDirName &= g_PathChar
 
-        RemoveEmptyGroups()
+                        InputFileList.Clear()
 
-        If lLayersAdded.Count = 1 Then
-            ProcessDownloadResult &= "Downloaded Layer: " & lLayersAdded(0).ToString
-        ElseIf lLayersAdded.Count > 1 Then
-            ProcessDownloadResult &= "Downloaded " & lLayersAdded.Count & " Layers"
+                        AddFilesInDir(InputFileList, lInputDirName, False, "*.shp")
+
+                        lOutputProjection = WholeFileString(lProjectDir & "prj.proj")
+                        lOutputProjection = CleanUpUserProjString(lOutputProjection)
+                        Dim sf As New MapWinGIS.Shapefile
+
+                        For Each lFileObject In InputFileList
+                            lCurFilename = lFileObject
+                            If (FileExt(lCurFilename) = "shp") Then
+                                'this is a shapefile
+                                lOutputFileName = lOutputDirName & FilenameNoPath(lCurFilename)
+                                'change projection and merge
+                                If (FileExists(lOutputFileName) And (InStr(1, lOutputFileName, "\landuse" & g_PathChar) > 0)) Then
+                                    'if the output file exists and it is a landuse shape, dont bother
+                                Else
+                                    ShapeUtilMerge(lCurFilename, lOutputFileName, lProjectDir & "prj.proj")
+                                    'attempt to assign prj file
+                                    sf.Open(lOutputFileName, Nothing)
+                                    sf.Projection = lOutputProjection
+                                    sf.Close()
+                                End If
+                            End If
+                        Next lFileObject
+                    Case "message"
+                        Logger.Msg(lProjectorNode.InnerText)
+                    Case "select_layer"
+                        Dim lLayerName As String = lProjectorNode.InnerText
+                        Try
+                            Dim lLayerIndex As Integer = atcMwGisUtility.GisUtil.LayerIndex(lLayerName)
+                            atcMwGisUtility.GisUtil.CurrentLayer = lLayerIndex
+                            Logger.Dbg("Selected layer '" & lLayerName & "'")
+                        Catch
+                            Logger.Dbg("Failed to select layer '" & lLayerName & "'")
+                        End Try
+                    Case Else
+                        Logger.Msg("Cannot yet follow directive:" & vbCr & lProjectorNode.Name, "ProcessProjectorFile")
+                End Select
+            Next
+
+            RemoveEmptyGroups()
+
+            If lLayersAdded.Count = 1 Then
+                ProcessDownloadResult &= "Downloaded Layer: " & lLayersAdded(0).ToString
+            ElseIf lLayersAdded.Count > 1 Then
+                ProcessDownloadResult &= "Downloaded " & lLayersAdded.Count & " Layers"
+            End If
+
+            If lLayersAdded.Count > 0 AndAlso lDataAdded.Count > 0 Then
+                ProcessDownloadResult &= vbCrLf
+            End If
+
+            If lDataAdded.Count = 1 Then
+                ProcessDownloadResult &= "Downloaded Data file: " & lDataAdded(0).ToString
+            ElseIf lDataAdded.Count > 1 Then
+                ProcessDownloadResult &= "Downloaded " & lDataAdded.Count & " Data files"
+            End If
+
+            g_MapWin.View.MapCursor = tkCursor.crsrMapDefault
+            g_MapWin.View.UnlockLegend()
+        Else
+            ProcessDownloadResult &= lInstructionsNode.Name & ": " & lInstructionsNode.InnerXml
         End If
-
-        If lLayersAdded.Count > 0 AndAlso lDataAdded.Count > 0 Then
-            ProcessDownloadResult &= vbCrLf
-        End If
-
-        If lDataAdded.Count = 1 Then
-            ProcessDownloadResult &= "Downloaded Data file: " & lDataAdded(0).ToString
-        ElseIf lDataAdded.Count > 1 Then
-            ProcessDownloadResult &= "Downloaded " & lDataAdded.Count & " Data files"
-        End If
-
-        g_MapWin.View.MapCursor = tkCursor.crsrMapDefault
-        g_MapWin.View.UnlockLegend()
         Logger.Status("")
     End Function
 
@@ -1432,18 +1434,19 @@ StartOver:
                 End If
                 g = New MapWinGIS.Grid
                 g.Open(aFilename)
-                If aFilename.ToLower.Contains(g_PathChar & "nlcd" & g_PathChar) Then
-                    If g.Header.NodataValue <> 0 Then
-                        g.Header.NodataValue = 0
-                        Try
-                            g.Save(aFilename)
-                            g.Close()
-                            g.Open(aFilename)
-                        Catch e As Exception
-                            Logger.Msg(aFilename & vbLf & e.Message & vbLf & "This may cause unwanted display of areas with missing data", "Unable to set zero as NoData value")
-                        End Try
-                    End If
-                End If
+                'TODO: ensure correct Nodata value is set in NLCD grids
+                'If aFilename.ToLower.Contains(g_PathChar & "nlcd" & g_PathChar) Then
+                '    If g.Header.NodataValue <> 0 Then
+                '        g.Header.NodataValue = 0
+                '        Try
+                '            g.Save(aFilename)
+                '            g.Close()
+                '            g.Open(aFilename)
+                '        Catch e As Exception
+                '            Logger.Msg(aFilename & vbLf & e.Message & vbLf & "This may cause unwanted display of areas with missing data", "Unable to set zero as NoData value")
+                '        End Try
+                '    End If
+                'End If
 
                 MWlay = g_MapWin.Layers.Add(g, LayerName)
                 MWlay.Visible = Visible

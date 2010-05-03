@@ -22,8 +22,7 @@ Public Class frmDownload
         cboRegion.Items.Add(pRegionExtentSelectedLayer)
         cboRegion.Items.Add(pRegionExtentSelectedShapes)
         cboRegion.Items.Add(pRegionEnterCoordinates)
-        Dim lHucIndex As Integer = HUC8Index()
-        If lHucIndex >= 0 Then
+        If HUC8Layer() IsNot Nothing Then
             Dim lHUC8s As Generic.List(Of String) = HUC8s()
             If lHUC8s.Count = 1 Then
                 cboRegion.Items.Add(pRegionHydrologicUnit & " " & lHUC8s(0))
@@ -129,9 +128,10 @@ Public Class frmDownload
                 Case pRegionEnterCoordinates
                     lRegion = frmSpecifyRegion.AskUser(Me.Icon)
                 Case Else
-                    Dim lHucIndex As Integer = HUC8Index()
-                    If lHucIndex > 0 Then
-                        lExtents = pMapWin.Layers(lHucIndex).Extents : lPreferredFormat = "huc8"
+                    Dim lHuc8Layer As MapWindow.Interfaces.Layer = HUC8Layer()
+                    If lHuc8Layer IsNot Nothing Then
+                        lExtents = lHuc8Layer.Extents
+                        lPreferredFormat = "huc8"
                     End If
             End Select
 
@@ -377,20 +377,16 @@ Public Class frmDownload
     ''' <summary>
     ''' Returns index in pMapWin.Layers of the HUC8 layer cat.shp, or -1 if not found
     ''' </summary>
-    Private Function HUC8Index() As Integer
+    Private Function HUC8Layer() As MapWindow.Interfaces.Layer
         If Not pMapWin Is Nothing AndAlso Not pMapWin.Layers Is Nothing Then
             Dim lIndex As Integer = 0
-            While lIndex < pMapWin.Layers.NumLayers
-                Try
-                    If pMapWin.Layers(lIndex).FileName.ToLower.EndsWith(g_PathChar & "cat.shp") Then
-                        Return lIndex
-                    End If
-                Catch ex As Exception
-                End Try
-                lIndex += 1
-            End While
+            For Each lLayer As Object In pMapWin.Layers
+                If lLayer IsNot Nothing AndAlso lLayer.FileName.ToLower.EndsWith(g_PathChar & "cat.shp") Then
+                    Return lLayer
+                End If
+            Next
         End If
-        Return -1
+        Return Nothing
     End Function
 
     Private Function HUC8s() As Generic.List(Of String)
@@ -549,7 +545,7 @@ Public Class frmDownload
                     End If
                 Case Else
                     If aRegionType.StartsWith(pRegionHydrologicUnit) Then
-                        If HUC8Index() = -1 Then
+                        If HUC8Layer() Is Nothing Then
                             aReason = "Could not find hydrologic unit layer 'cat.shp' in project"
                             Return False
                         Else
