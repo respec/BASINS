@@ -43,13 +43,16 @@ Public Class atcTableRDB
                 Dim lFieldSpecs() As String = (Delimiter & lCurrentLine).Split(Delimiter)
                 For lField As Integer = 1 To NumFields
                     Me.FieldLength(lField) = StrFirstInt(lFieldSpecs(lField))
-                    Me.FieldType(lField) = lFieldSpecs(lField).Trim
-                    'When a field is missing width/type header, default to 10 wide string
-                    If Me.FieldLength(lField) = 0 Then
+                    Me.FieldType(lField) = lFieldSpecs(lField).Trim                    
+                    If Me.FieldLength(lField) = 0 Then 'Field width is missing, default to 10 wide
                         Me.FieldLength(lField) = 10
                     End If
-                    If Me.FieldType(lField).Length = 0 Then
-                        Me.FieldType(lField) = "s"
+                    If Me.FieldType(lField).Length = 0 Then 'Field type is missing, assume string type unless it is a count
+                        If Me.FieldName(lField).Contains("_count") Then
+                            Me.FieldType(lField) = "n"
+                        Else
+                            Me.FieldType(lField) = "s"
+                        End If
                     End If
                 Next
                 lGotFieldSpecs = True
@@ -101,14 +104,25 @@ TryAgain:
         End Select
     End Function
 
-    'on set translate to match DBF: s = string into C = Character, n = numeric into N = Numeric
+
+    ''' <summary>
+    ''' Overriding default FieldType to translate from RDB to DBF version of type character
+    ''' </summary>
+    ''' <param name="aFieldNumber"></param>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' RDB s = string  -> DBF C = Character
+    ''' RDB d = date    -> DBF C = Character
+    ''' RDB n = numeric -> DBF N = Numeric
+    ''' </remarks>
     Public Overrides Property FieldType(ByVal aFieldNumber As Integer) As String
         Get
             Return MyBase.FieldType(aFieldNumber)
         End Get
         Set(ByVal newValue As String)
             Select Case newValue
-                Case "s" : newValue = "C"
+                Case "s", "d" : newValue = "C"
                 Case "n" : newValue = "N"
             End Select
             MyBase.FieldType(aFieldNumber) = newValue
