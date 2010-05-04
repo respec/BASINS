@@ -1335,10 +1335,10 @@ Public Class frmModelSetup
             End If
         Else
             'TODO: make all the variables below part of a class to pass into SetupHSPF
-            Dim lSubbasinThemeName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
-            Dim lLandUseThemeName As String = ""
+            Dim lSubbasinLayerName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
+            Dim lLandUseLayerName As String = ""
             If cboLandUseLayer.SelectedIndex > -1 Then
-                lLandUseThemeName = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
+                lLandUseLayerName = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
             End If
             Dim lLanduseFieldName As String = ""
             If cboDescription.SelectedIndex > -1 Then
@@ -1349,8 +1349,8 @@ Public Class frmModelSetup
             Dim lSubbasinSegmentName As String = cboSub3.Items(cboSub3.SelectedIndex)
             Dim lLUType As Integer = cboLanduse.SelectedIndex
             Dim lLandUseClassFile As String = lblClass.Text
-            Dim lOutletsThemeName As String = cboOutlets.Items(cboOutlets.SelectedIndex)
-            Dim lPointThemeName As String = cboPoint.Items(cboPoint.SelectedIndex)
+            Dim lOutletsLayerName As String = cboOutlets.Items(cboOutlets.SelectedIndex)
+            Dim lPointFieldName As String = cboPoint.Items(cboPoint.SelectedIndex)
             Dim lPointYear As String = cboYear.Items(cboYear.SelectedIndex)
             Dim lPSRCustom As Boolean = chkCustom.Checked
             Dim lPSRCustomFile As String = lblCustom.Text
@@ -1370,17 +1370,17 @@ Public Class frmModelSetup
 
             EnableControls(False)
             If PreProcessChecking(lOutputPath, lBaseOutputName, pModelName, cboLanduse.SelectedIndex, _
-                                  pMetStations.Count, lSubbasinThemeName, lLandUseThemeName) Then 'early checks OK
+                                  pMetStations.Count, lSubbasinLayerName, lLandUseLayerName) Then 'early checks OK
                 lblStatus.Text = "Preparing HSPF Setup"
                 Me.Refresh()
                 If SetupHSPF(AtcGridMet, lstMet.SelectedIndex, AtcGridPervious, _
                              pMetStations, pMetBaseDsns, _
                              pUniqueModelSegmentNames, pUniqueModelSegmentIds, _
                              lOutputPath, lBaseOutputName, _
-                             lSubbasinThemeName, lSubbasinFieldName, lSubbasinSlopeName, _
+                             lSubbasinLayerName, lSubbasinFieldName, lSubbasinSlopeName, _
                              lStreamLayerName, lStreamFields, _
-                             lLUType, lLandUseThemeName, lLUInclude, _
-                             lOutletsThemeName, lPointThemeName, lPointYear, _
+                             lLUType, lLandUseLayerName, lLUInclude, _
+                             lOutletsLayerName, lPointFieldName, lPointYear, _
                              lLanduseFieldName, lLandUseClassFile, _
                              lSubbasinSegmentName, _
                              lPSRCustom, lPSRCustomFile, lPSRCalculate) Then

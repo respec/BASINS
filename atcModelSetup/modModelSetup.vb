@@ -38,12 +38,12 @@ Public Module modModelSetup
                               ByVal aUniqueModelSegmentNames As atcCollection, _
                               ByVal aUniqueModelSegmentIds As atcCollection, _
                               ByVal aOutputPath As String, ByVal aBaseOutputName As String, _
-                              ByVal aSubbasinThemeName As String, ByVal aSubbasinFieldName As String, ByVal aSubbasinSlopeName As String, _
+                              ByVal aSubbasinLayerName As String, ByVal aSubbasinFieldName As String, ByVal aSubbasinSlopeName As String, _
                               ByVal aStreamLayerName As String, ByVal aStreamFields() As String, _
                               ByVal aLUType As Integer, ByVal aLandUseThemeName As String, _
                               ByVal aLUInclude() As Integer, _
-                              ByVal aOutletsThemeName As String, _
-                              ByVal aPointThemeName As String, _
+                              ByVal aOutletsLayerName As String, _
+                              ByVal aPointFieldName As String, _
                               ByVal aPointYear As String, _
                               ByVal aLandUseFieldName As String, ByVal aLandUseClassFile As String, _
                               ByVal aSubbasinSegmentName As String, _
@@ -59,7 +59,7 @@ Public Module modModelSetup
         Dim lSubbasinsSlopes As New atcCollection    'key is subbasin id, value is slope
         Dim lSubbasinId As Integer
         Dim lSubbasinSlope As Double
-        Dim lSubbasinLayerIndex As Long = GisUtil.LayerIndex(aSubbasinThemeName)
+        Dim lSubbasinLayerIndex As Long = GisUtil.LayerIndex(aSubbasinLayerName)
         Dim lSubbasinFieldIndex As Long = GisUtil.FieldIndex(lSubbasinLayerIndex, aSubbasinFieldName)
         Dim lSubbasinSlopeIndex As Long = GisUtil.FieldIndex(lSubbasinLayerIndex, aSubbasinSlopeName)
         For i As Integer = 1 To GisUtil.NumSelectedFeatures(lSubbasinLayerIndex)
@@ -82,7 +82,7 @@ Public Module modModelSetup
         'build collection of model segment ids for each subbasin
         Dim lSubbasinsModelSegmentIds As New atcCollection    'key is subbasin id, value is model segment id
         Dim lSubbasinSegmentFieldIndex As Integer = -1
-        If aSubbasinSegmentName <> "<none>" Then 'see if we have some model segments in the subbasin dbf
+        If aSubbasinSegmentName <> "<none>" And aSubbasinSegmentName <> "" Then 'see if we have some model segments in the subbasin dbf
             lSubbasinSegmentFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, aSubbasinSegmentName)
         End If
         For Each lSubbasinIndex As Integer In lSubbasinsSelected.Keys
@@ -105,7 +105,7 @@ Public Module modModelSetup
         If aLUType = 0 Then
             'usgs giras is the selected land use type
             Logger.Status("Performing overlay for GIRAS landuse")
-            Dim lSuccess As Boolean = CreateLanduseRecordsGIRAS(lSubbasinsSelected, lLucodes, lSubids, lAreas, aSubbasinThemeName, aSubbasinFieldName)
+            Dim lSuccess As Boolean = CreateLanduseRecordsGIRAS(lSubbasinsSelected, lLucodes, lSubids, lAreas, aSubbasinLayerName, aSubbasinFieldName)
 
             If lLucodes.Count = 0 Or Not lSuccess Then
                 'problem occurred, get out
@@ -125,7 +125,7 @@ Public Module modModelSetup
         ElseIf aLUType = 1 Or aLUType = 3 Then
             'nlcd grid or other grid is the selected land use type
             Logger.Status("Overlaying Land Use and Subbasins")
-            CreateLanduseRecordsGrid(lSubbasinsSelected, lLucodes, lSubids, lAreas, aSubbasinThemeName, aLandUseThemeName)
+            CreateLanduseRecordsGrid(lSubbasinsSelected, lLucodes, lSubids, lAreas, aSubbasinLayerName, aLandUseThemeName)
 
             If aLUType = 1 Then 'nlcd grid
                 Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
@@ -144,7 +144,7 @@ Public Module modModelSetup
         ElseIf aLUType = 2 Then
             'other shape
             Logger.Status("Overlaying Land Use and Subbasins")
-            CreateLanduseRecordsShapefile(lSubbasinsSelected, lLucodes, lSubids, lAreas, aSubbasinThemeName, aSubbasinFieldName, aLandUseThemeName, aLandUseFieldName)
+            CreateLanduseRecordsShapefile(lSubbasinsSelected, lLucodes, lSubids, lAreas, aSubbasinLayerName, aSubbasinFieldName, aLandUseThemeName, aLandUseFieldName)
 
             lReclassifyFileName = ""
             If aLandUseClassFile <> "<none>" Then
@@ -190,9 +190,9 @@ Public Module modModelSetup
 
         'figure out which outlets are in which subbasins
         Dim lOutSubs As New Collection
-        If aOutletsThemeName <> "<none>" Then
+        If aOutletsLayerName <> "<none>" Then
             Logger.Status("Joining point sources to subbasins")
-            Dim i As Integer = GisUtil.LayerIndex(aOutletsThemeName)
+            Dim i As Integer = GisUtil.LayerIndex(aOutletsLayerName)
             For j As Integer = 1 To GisUtil.NumFeatures(i)
                 Dim k As Integer = GisUtil.PointInPolygon(i, j - 1, lSubbasinLayerIndex)
                 If k > -1 Then
@@ -225,8 +225,8 @@ Public Module modModelSetup
         Dim lOutletsLayerIndex As Integer
         Dim lPointLayerIndex As Integer
         If lOutSubs.Count > 0 Then
-            lOutletsLayerIndex = GisUtil.LayerIndex(aOutletsThemeName)
-            lPointLayerIndex = GisUtil.FieldIndex(lOutletsLayerIndex, aPointThemeName)
+            lOutletsLayerIndex = GisUtil.LayerIndex(aOutletsLayerName)
+            lPointLayerIndex = GisUtil.FieldIndex(lOutletsLayerIndex, aPointFieldName)
         End If
         WritePSRFile(lBaseFileName & ".psr", lSubbasinsSelected, lOutSubs, lOutletsLayerIndex, lPointLayerIndex, _
                      aPSRCustom, aPSRCustomFile, aPSRCalculate, aPointYear)
