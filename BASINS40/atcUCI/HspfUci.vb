@@ -2730,7 +2730,9 @@ x:
                        lConnection.Source.VolName = "IMPLND" Then
                         lFieldIndex = 2
                         While lFieldIndex < .NumFields
-                            If .FieldName(lFieldIndex).Substring(2) = lConnection.Source.VolId Then
+                            If .FieldName(lFieldIndex).Substring(2) = lConnection.Source.VolId And _
+                               ((.FieldName(lFieldIndex).StartsWith("P") And lConnection.Source.VolName = "PERLND") Or _
+                                (.FieldName(lFieldIndex).StartsWith("I") And lConnection.Source.VolName = "IMPLND")) Then
                                 If .FieldName(lFieldIndex) = "P:101" And .Value(1) = "R:1" Then
                                     Logger.Dbg(.FieldName(lFieldIndex) & " " & lConnection.MFact)
                                 End If
