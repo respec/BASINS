@@ -1066,15 +1066,16 @@ Public Class HspfUci
 
     Public Sub AddExpertSystem(ByRef aId As Integer, _
                                ByRef aLocn As String, _
-                               ByVal aWdmId As atcWDM.atcDataSourceWDM, _
+                               ByVal aWdm As atcWDM.atcDataSourceWDM, _
+                               ByVal aWdmID As Integer, _
                                ByRef aBaseDsn As Integer, _
                                ByRef aDsns() As Integer, _
                                ByRef aOstr() As String, _
                                Optional ByRef aUpstreamArea As Double = 0.0)
         'TODO: think this through with PaulDuda!!!!!
         If pWdmCount = 0 Then
-            pWDMObj(1) = aWdmId
-            AddExpertSystem(aId, aLocn, 1, aBaseDsn, aDsns, aOstr, aUpstreamArea)
+            pWDMObj(aWdmID) = aWdm
+            AddExpertSystem(aId, aLocn, aWdmID, aBaseDsn, aDsns, aOstr, aUpstreamArea)
         End If
     End Sub
 
@@ -1100,7 +1101,7 @@ Public Class HspfUci
         If aUpstreamArea < 0.001 Then
             lContribArea = UpstreamArea(OpnBlks.Item("RCHRES").OperFromID(aId))
         End If
-        AddExpertExtTargets(aId, lCopyId, lContribArea, aDsns, aOstr)
+        AddExpertExtTargets(aId, lCopyId, aWdmId, lContribArea, aDsns, aOstr)
         'add mass-link and schematic copy records
         AddExpertSchematic(aId, lCopyId)
     End Sub
@@ -1338,6 +1339,7 @@ Public Class HspfUci
 
     Public Sub AddExpertExtTargets(ByRef reachid As Integer, _
                                    ByRef copyid As Integer, _
+                                   ByVal aWdmId As Integer, _
                                    ByRef ContribArea As Single, _
                                    ByRef adsn() As Integer, _
                                    ByRef ostr() As String)
@@ -1347,7 +1349,7 @@ Public Class HspfUci
 
         MFact = 12.0# / ContribArea
         'mfact = Format(mfact, "0.#######")
-        AddExtTarget("RCHRES", reachid, "ROFLOW", "ROVOL", 1, 1, MFact, "    ", "WDM", adsn(1), ostr(1), 1, "ENGL", "AGGR", "REPL")
+        AddExtTarget("RCHRES", reachid, "ROFLOW", "ROVOL", 1, 1, MFact, "    ", "WDM" & aWdmId, adsn(1), ostr(1), 1, "ENGL", "AGGR", "REPL")
 
         If copyid > 0 Then
             MFact = 1.0# / ContribArea
@@ -1364,7 +1366,7 @@ Public Class HspfUci
                 gap = "AGGR"
                 'End If
 
-                AddExtTarget("COPY", copyid, "OUTPUT", "MEAN", i - 1, 1, MFact, Tran, "WDM", adsn(i), ostr(i), 1, "ENGL", gap, "REPL")
+                AddExtTarget("COPY", copyid, "OUTPUT", "MEAN", i - 1, 1, MFact, Tran, "WDM" & aWdmId, adsn(i), ostr(i), 1, "ENGL", gap, "REPL")
             Next i
         End If
 
@@ -2676,6 +2678,21 @@ x:
     End Sub
 
     Public Function AreaReport(ByVal aReachColumns As Boolean) As String
+        Dim lTable As atcTableDelimited = AreaTable()
+        Dim lStr As String
+        If aReachColumns Then
+            Dim lGridSource As New atcControls.atcGridSourceTable
+            lGridSource.Table = lTable
+            Dim lGridSourceRowColSwapper As New atcControls.atcGridSourceRowColumnSwapper(lGridSource)
+            lGridSourceRowColSwapper.SwapRowsColumns = True
+            lStr = lGridSourceRowColSwapper.ToString()
+        Else
+            lStr = lTable.ToString
+        End If
+        Return lStr
+    End Function
+
+    Public Function AreaTable() As atcTableDelimited
         Dim lTable As New atcUtility.atcTableDelimited
         With lTable
             .Delimiter = vbTab
@@ -2771,18 +2788,7 @@ x:
                 .Value(lFieldIndex) = lFieldTotals(lFieldIndex)
             Next
         End With
-
-        Dim lStr As String
-        If aReachColumns Then
-            Dim lGridSource As New atcControls.atcGridSourceTable
-            lGridSource.Table = lTable
-            Dim lGridSourceRowColSwapper As New atcControls.atcGridSourceRowColumnSwapper(lGridSource)
-            lGridSourceRowColSwapper.SwapRowsColumns = True
-            lStr = lGridSourceRowColSwapper.ToString()
-        Else
-            lStr = lTable.ToString
-        End If
-        Return lStr
+        Return lTable
     End Function
 
     Public Sub SetDefault(ByVal aDefaultUci As HspfUci)
