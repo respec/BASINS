@@ -207,26 +207,33 @@ Public Class atcTimeseriesStatistics
             Dim lCvr As Double = pNaN
 
             For lIndex = 1 To lLastValueIndex
-                lVal = aTimeseries.Value(lIndex)
-                If Not Double.IsNaN(lVal) Then
-                    lCount += 1
-                    If lVal > lMax Then
-                        lMax = lVal
-                        lMaxDate = aTimeseries.Dates.Value(lIndex)
-                    End If
-                    If lVal < lMin Then
-                        lMin = lVal
-                        lMinDate = aTimeseries.Dates.Value(lIndex)
-                    End If
-                    lSum += lVal
-                    If lMin > 0 Then lGeoMean += Math.Log(lVal)
+                Dim lIsNaN As Boolean = True
+                Try
+                    lVal = aTimeseries.Value(lIndex)
+                    lIsNaN = Double.IsNaN(lVal)
+                    If Not lIsNaN Then
+                        lCount += 1
+                        If lVal > lMax Then
+                            lMax = lVal
+                            lMaxDate = aTimeseries.Dates.Value(lIndex)
+                        End If
+                        If lVal < lMin Then
+                            lMin = lVal
+                            lMinDate = aTimeseries.Dates.Value(lIndex)
+                        End If
+                        lSum += lVal
+                        If lMin > 0 Then lGeoMean += Math.Log(lVal)
 
-                    If Math.Abs(lVal) < 1.0E-30 Then
-                        lCountZero += 1
-                    ElseIf lVal > 0 Then
-                        lCountPositive += 1
+                        If Math.Abs(lVal) < 1.0E-30 Then
+                            lCountZero += 1
+                        ElseIf lVal > 0 Then
+                            lCountPositive += 1
+                        End If
                     End If
-                ElseIf aTimeseries.ValueAttributesGetValue(lIndex, "Was Zero", False) Then
+                Catch e As Exception
+                    Logger.Dbg("ComputeStatistics: caught exception: " & e.Message & vbCrLf & e.StackTrace)
+                End Try
+                If lIsNaN AndAlso aTimeseries.ValueAttributesGetValue(lIndex, "Was Zero", False) Then
                     lCount += 1
                     lCountZero += 1
                 End If
