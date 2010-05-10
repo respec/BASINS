@@ -285,6 +285,7 @@ Public Class frmGraphEditor
             txtCurveWidth.Text = aCurve.Line.Width.ToString()
 
             chkCurveSymbolVisible.Checked = aCurve.Symbol.IsVisible
+            chkCurveSymbolFillVisible.Checked = aCurve.Symbol.Fill.IsVisible
             txtCurveSymbolSize.Text = aCurve.Symbol.Size
             If aCurve.Line.IsSmooth Then
                 cboCurveStep.Text = "Smooth"
@@ -324,6 +325,7 @@ Public Class frmGraphEditor
             If Integer.TryParse(txtCurveWidth.Text, lInt) Then aCurve.Line.Width = lInt
 
             aCurve.Symbol.IsVisible = chkCurveSymbolVisible.Checked
+            aCurve.Symbol.Fill.IsVisible = chkCurveSymbolFillVisible.Checked
             If Integer.TryParse(txtCurveSymbolSize.Text, lInt) Then aCurve.Symbol.Size = lInt
             If cboCurveStep.Text = "Smooth" Then
                 aCurve.Line.IsSmooth = True
@@ -428,6 +430,7 @@ Public Class frmGraphEditor
         chkAxisMinorTicsVisible.CheckedChanged, _
         chkCurveLineVisible.CheckedChanged, _
         chkCurveSymbolVisible.CheckedChanged, _
+        chkCurveSymbolFillVisible.CheckedChanged, _
         chkLegendOutline.CheckedChanged, _
         chkRangeReverse.CheckedChanged
 
