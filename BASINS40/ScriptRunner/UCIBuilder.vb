@@ -37,6 +37,7 @@ Module UCIBuilder
     '                                                           otherwise pSubbasinSegmentName data is used 
     '                                                           to match model segments to met stations.
 
+    'Stream Specs
     Private pStreamLayerName As String = "Streams"     'name of layer as displayed on legend, or file name
     Private pStreamFields() As String = {"SUBBASIN", "SUBBASINR", "LEN2", "SLO2", "WID2", "DEP2", "MINEL", "MAXEL", "SNAME"}
     '                                                   array of field names containing required data for each stream
@@ -51,6 +52,8 @@ Module UCIBuilder
     Private pPSRCalculate As Boolean = False           'flag indicating if distance on stream is to be calculated,
     '                                                   not implemented at this time
 
+    'Water Quality Constituents to Add
+    Private pWQConstituents() As String = {"NH3+NH4", "NO3", "ORTHO P", "BOD", "SEDIMENT"}
 
     'the following parameters are for the Tt GCRP Setup:
     'Private pOutputPath As String = "C:\BASINS\modelout\"
@@ -101,7 +104,7 @@ Module UCIBuilder
                          pLandUseFieldName, pLandUseClassFile, _
                          pSubbasinSegmentName, _
                          pPSRCustom, pPSRCustomFile, pPSRCalculate) Then
-                If CreateUCI(lOutputPath & "\" & pBaseOutputName & ".uci", pMetWDM) Then
+                If CreateUCI(lOutputPath & "\" & pBaseOutputName & ".uci", pMetWDM, pWQConstituents) Then
                     Logger.Status("Completed HSPF Setup")
                     Logger.Dbg("UCIBuilder:  Created UCI file " & lOutputPath & "\" & pBaseOutputName & ".uci")
                 Else

@@ -26,6 +26,7 @@ Module CreateUCITest
 
         Dim lMetBaseDsn As Integer = 11
         Dim lMetWdmId As String = "WDM2"
+        Dim lWQConstituents() As String = {}
 
         Dim lWatershedName As String = "UCICreation"
         Dim lWatershed As New Watershed
@@ -34,7 +35,9 @@ Module CreateUCITest
             lHspfUci.Msg = lMsg
             lHspfUci.CreateUciFromBASINS(lWatershed, _
                                          lDataSources, _
-                                         lStarterUciName, lPollutantListFileName)
+                                         lStarterUciName, _
+                                         lWQConstituents, _
+                                         lPollutantListFileName)
             lHspfUci.Save()
         End If
     End Sub
