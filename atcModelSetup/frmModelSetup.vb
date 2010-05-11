@@ -1355,6 +1355,7 @@ Public Class frmModelSetup
             Dim lPSRCustom As Boolean = chkCustom.Checked
             Dim lPSRCustomFile As String = lblCustom.Text
             Dim lPSRCalculate As Boolean = chkCalculate.Checked
+            Dim lWQConstituents() As String = {}
             Dim lLUInclude() As Integer = {} ' = {61, 71, 81, 91}
 
             Dim lStreamLayerName As String = cboStreams.Items(cboStreams.SelectedIndex)
@@ -1386,7 +1387,7 @@ Public Class frmModelSetup
                              lPSRCustom, lPSRCustomFile, lPSRCalculate) Then
                     Me.Dispose()
                     Me.Close()
-                    If CreateUCI(lOutputPath & "\" & lBaseOutputName & ".uci", lMetWDM) Then
+                    If CreateUCI(lOutputPath & "\" & lBaseOutputName & ".uci", lMetWDM, lWQConstituents) Then
                         lblStatus.Text = "Completed HSPF Setup"
                         Me.Refresh()
                         StartWinHSPF(lOutputPath & "\" & lBaseOutputName & ".uci")

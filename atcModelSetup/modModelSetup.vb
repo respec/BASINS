@@ -662,7 +662,8 @@ Public Module modModelSetup
     End Sub
 
     Public Function CreateUCI(ByVal aUciName As String, _
-                              ByVal aMetWDMName As String) As Boolean
+                              ByVal aMetWDMName As String, _
+                              ByVal aWQConstituents() As String) As Boolean
         ChDriveDir(PathNameOnly(aUciName))
         'get message file ready
         Dim lMsg As New atcUCI.HspfMsg("hspfmsg.mdb")
@@ -728,7 +729,9 @@ Public Module modModelSetup
             lHspfUci.Msg = lMsg
             lHspfUci.CreateUciFromBASINS(lWatershed, _
                                          lDataSources, _
-                                         lStarterUciName, lPollutantListFileName)
+                                         lStarterUciName, _
+                                         aWQConstituents, _
+                                         lPollutantListFileName)
             lHspfUci.Save()
             lCreateUCI = True
         End If
