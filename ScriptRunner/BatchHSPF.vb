@@ -45,7 +45,7 @@ Module BatchHSPF
     '                                                   array of field names containing required data for each stream
 
     'Point Source Specs
-    Private pOutletsLayerName As String = "Outlets"    'name of outlets layer from legend, or file name
+    Private pOutletsLayerName As String = "<none>"     'name of outlets layer from legend, or file name
     Private pPointFieldName As String = "PCSID"        'name of field within outlets layer containing unique 
     '                                                     point source identifier (like pcs station id)
     Private pPointYear As String = "1999"              'year of pcs data to use
@@ -66,18 +66,31 @@ Module BatchHSPF
 
         'assuming we've downloaded:
         '  NHDPlus
+        pSubbasinLayerName = "C:\BASINS\data\02060006-16\nhdplus02060006\drainage\catchment_subset.shp"
+        pStreamLayerName = "C:\BASINS\data\02060006-16\nhdplus02060006\hydrography\nhdflowline_subset.shp"
         '  NLCD 2001
-        '  Met Data
-        '  DEM
-
         pLUType = 1
         pLandUseClassFile = "C:\BASINS\etc\nlcd.dbf"
         pLandUseLayerName = "C:\BASINS\data\02060006-16\NLCD\nlcd_landcover_2001.tif"
-        pSubbasinLayerName = "C:\BASINS\data\02060006-16\nhdplus02060006\drainage\catchment_subset.shp"
-        pStreamLayerName = "C:\BASINS\data\02060006-16\nhdplus02060006\hydrography\nhdflowline_subset.shp"
-        pOutletsLayerName = "<none>"
-        Dim lElevationLayerName As String = "Digital Elevation Model"
+        '  DEM
+        Dim lElevationLayerName As String = "C:\BASINS\data\02060006-16\dem\02060006demg.tif"
         Dim lElevationUnitsName As String = "Meters"
+        '  Met Data
+        pMetWDM = "C:\BASINS\data\02060006-16\met\met.wdm"
+
+        'add layers if not already on the map
+        If Not GisUtil.IsLayerByFileName(pSubbasinLayerName) Then
+            GisUtil.AddLayer(pSubbasinLayerName, "Catchments")
+        End If
+        If Not GisUtil.IsLayerByFileName(pStreamLayerName) Then
+            GisUtil.AddLayer(pStreamLayerName, "Flowlines")
+        End If
+        If Not GisUtil.IsLayerByFileName(pLandUseLayerName) Then
+            GisUtil.AddLayer(pLandUseLayerName, "NLCD 2001 Landuse")
+        End If
+        If Not GisUtil.IsLayerByFileName(lElevationLayerName) Then
+            GisUtil.AddLayer(lElevationLayerName, "Digital Elevation Model")
+        End If
 
         'if subbasins layer does not have subbasin id and slope fields, calculate them
         If Not GisUtil.IsField(GisUtil.LayerIndex(pSubbasinLayerName), pSubbasinFieldName) Then
@@ -96,10 +109,14 @@ Module BatchHSPF
             pStreamLayerName = "Streams"
         End If
 
+        'if subbasins layer does not have model segment id field, add it
+
+        'get land use data ready
         Dim AtcGridPervious As New atcControls.atcGrid
         AtcGridPervious.Source = New atcControls.atcGridSource
         SetPerviousGrid(AtcGridPervious, pLandUseClassFile, pLUType, pLandUseLayerName, pLandUseFieldName)
 
+        'get met data ready
         Dim pMetStations As New atcCollection
         Dim pMetBaseDsns As New atcCollection
         BuildListofMetStationNames(pMetWDM, pMetStations, pMetBaseDsns)
@@ -113,6 +130,7 @@ Module BatchHSPF
 
         Dim lOutputPath As String = pOutputPath & pBaseOutputName
 
+        'now start the processing
         If PreProcessChecking(lOutputPath, pBaseOutputName, "HSPF", pLUType, pMetStations.Count, _
                               pSubbasinLayerName, pLandUseLayerName) Then 'early checks OK
             Logger.Status("Preparing HSPF Setup")
