@@ -158,7 +158,7 @@ Public Class frmStarter
                                 lDesc = ldOpn.Description
                                 .CellValue(lRow, 1) = lDesc & " (" & ldOpn.Name & " " & ldOpn.Id & ")"
                             Else
-                                Dim lId As Integer = DefaultOpnId(lOpn, pDefUCI)
+                                Dim lId As Integer = pUCI.DefaultOpnId(lOpn, pDefUCI)
                                 Dim ldOpn As HspfOperation = pDefUCI.OpnBlks(lOpn.Name).OperFromID(lId)
                                 If Not ldOpn Is Nothing Then
                                     lDesc = ldOpn.Description

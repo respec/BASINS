@@ -580,7 +580,7 @@ Public Module WinHSPF
         If aUCI.OpnBlks(aOpName).Count > 0 Then
             Dim lOptyp As HspfOpnBlk = aUCI.OpnBlks(aOpName)
             For Each lOpn As HspfOperation In lOptyp.Ids
-                Dim lId As Integer = DefaultOpnId(lOpn, aDefUCI)
+                Dim lId As Integer = aUCI.DefaultOpnId(lOpn, aDefUCI)
                 If lId > 0 Then
                     Dim lDOpn As HspfOperation = aDefUCI.OpnBlks(lOpn.Name).OperFromID(lId)
                     If Not lDOpn Is Nothing Then
@@ -605,21 +605,6 @@ Public Module WinHSPF
         End If
 
     End Sub
-
-    Public Function DefaultOpnId(ByVal aOpn As HspfOperation, ByVal aDefUCI As HspfUci) As Long
-
-        If aOpn.DefOpnId <> 0 Then
-            DefaultOpnId = aOpn.DefOpnId
-        Else
-            Dim lDOpn As HspfOperation = matchOperWithDefault(aOpn.Name, aOpn.Description, aDefUCI)
-            If lDOpn Is Nothing Then
-                DefaultOpnId = 0
-            Else
-                DefaultOpnId = lDOpn.Id
-            End If
-        End If
-
-    End Function
 
     Private Function DefaultThisTable(ByVal aOperName As String, ByVal aTableName As String) As Boolean
         If aOperName = "PERLND" Or aOperName = "IMPLND" Then
@@ -686,46 +671,6 @@ Public Module WinHSPF
         End If
     End Function
 
-    Public Function matchOperWithDefault(ByVal aOpTypName As String, ByVal aOpnDesc As String, ByVal aDefUCI As HspfUci) As HspfOperation
-
-        For Each lOpn As HspfOperation In aDefUCI.OpnBlks(aOpTypName).Ids
-            If lOpn.Description = aOpnDesc Then
-                matchOperWithDefault = lOpn
-                Exit Function
-            End If
-        Next
-        'a complete match not found, look for partial
-        Dim lTempString As String
-        For Each lOpn As HspfOperation In aDefUCI.OpnBlks(aOpTypName).Ids
-            If Len(lOpn.Description) > Len(aOpnDesc) Then
-                lTempString = Microsoft.VisualBasic.Left(lOpn.Description, Len(aOpnDesc))
-                If lTempString = aOpnDesc Then
-                    matchOperWithDefault = lOpn
-                    Exit Function
-                End If
-            ElseIf Len(lOpn.Description) < Len(aOpnDesc) Then
-                lTempString = Microsoft.VisualBasic.Left(aOpnDesc, Len(lOpn.Description))
-                If lOpn.Description = lTempString Then
-                    matchOperWithDefault = lOpn
-                    Exit Function
-                End If
-            End If
-            If Len(aOpnDesc) > 4 And Len(lOpn.Description) > 4 Then
-                lTempString = Microsoft.VisualBasic.Left(aOpnDesc, 4)
-                If Microsoft.VisualBasic.Left(lOpn.Description, 4) = lTempString Then
-                    matchOperWithDefault = lOpn
-                    Exit Function
-                End If
-            End If
-        Next
-        'not found, use first one
-        If aDefUCI.OpnBlks(aOpTypName).Count > 0 Then
-            matchOperWithDefault = aDefUCI.OpnBlks(aOpTypName).Ids(0)
-        Else
-            matchOperWithDefault = Nothing
-        End If
-    End Function
-
     Public Sub UpdateFlagDependencies(ByVal aOpName As String)
 
         Dim lOpnBlk As HspfOpnBlk = pUCI.OpnBlks(aOpName)
@@ -757,7 +702,7 @@ Public Module WinHSPF
             If aUCI.OpnBlks(lOpTypName).Count > 0 Then
                 Dim lOptyp As HspfOpnBlk = aUCI.OpnBlks(lOpTypName)
                 For Each lOpn As HspfOperation In lOptyp.Ids
-                    Dim lId = DefaultOpnId(lOpn, aDefUCI)
+                    Dim lId = aUCI.DefaultOpnId(lOpn, aDefUCI)
                     If lId > 0 Then
                         Dim lDOpn As HspfOperation = aDefUCI.OpnBlks(lOpn.Name).OperFromID(lId)
                         If Not lDOpn Is Nothing Then

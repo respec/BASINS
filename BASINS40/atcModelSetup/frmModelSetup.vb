@@ -1350,7 +1350,10 @@ Public Class frmModelSetup
             Dim lLUType As Integer = cboLanduse.SelectedIndex
             Dim lLandUseClassFile As String = lblClass.Text
             Dim lOutletsLayerName As String = cboOutlets.Items(cboOutlets.SelectedIndex)
-            Dim lPointFieldName As String = cboPoint.Items(cboPoint.SelectedIndex)
+            Dim lPointFieldName As String = ""
+            If cboPoint.SelectedIndex > -1 Then
+                lPointFieldName = cboPoint.Items(cboPoint.SelectedIndex)
+            End If
             Dim lPointYear As String = cboYear.Items(cboYear.SelectedIndex)
             Dim lPSRCustom As Boolean = chkCustom.Checked
             Dim lPSRCustomFile As String = lblCustom.Text
