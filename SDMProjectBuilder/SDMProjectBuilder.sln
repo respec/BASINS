@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Basic Express 2008
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SDMProjectBuilder", "SDMProjectBuilder.vbproj", "{D92BED39-A1E0-42D3-AC79-643D16CC1500}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-MapWinUtility", "..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility.vbproj", "{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcMwGisUtility", "..\atcMwGisUtility\atcMwGisUtility.vbproj", "{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcUtility", "..\atcUtility\atcUtility.vbproj", "{67027820-9036-481E-80F6-077E5085F59D}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcData", "..\atcData\atcData.vbproj", "{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcControls", "..\atcControls\atcControls.vbproj", "{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMDataManager", "..\..\D4EM\DataManager\DataManager\BASINS-D4EMDataManager.vbproj", "{59E61F35-B014-4D34-8277-63FF6BE40DD6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D92BED39-A1E0-42D3-AC79-643D16CC1500}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D92BED39-A1E0-42D3-AC79-643D16CC1500}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D92BED39-A1E0-42D3-AC79-643D16CC1500}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D92BED39-A1E0-42D3-AC79-643D16CC1500}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67027820-9036-481E-80F6-077E5085F59D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67027820-9036-481E-80F6-077E5085F59D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67027820-9036-481E-80F6-077E5085F59D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67027820-9036-481E-80F6-077E5085F59D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59E61F35-B014-4D34-8277-63FF6BE40DD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59E61F35-B014-4D34-8277-63FF6BE40DD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59E61F35-B014-4D34-8277-63FF6BE40DD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59E61F35-B014-4D34-8277-63FF6BE40DD6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
