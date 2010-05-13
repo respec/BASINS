@@ -13,12 +13,10 @@ Friend Class frmModelSegmentation
 
     Private Sub cmdAssign_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAssign.Click
         Dim lSubbasinLayerName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
+        Dim lMetLayerName As String = cboMetStations.Items(cboMetStations.SelectedIndex)
         If lSubbasinLayerName = pSubbasinLayerNameUserPrompt Then
             Logger.Msg(pSubbasinLayerNameUserPrompt, MsgBoxStyle.Critical, pTitle)
         Else
-            Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(lSubbasinLayerName)
-
-            Dim lMetLayerName As String = cboMetStations.Items(cboMetStations.SelectedIndex)
             If lMetLayerName = pMetStationsLayerNameUserPrompt Then
                 Logger.Msg(pMetStationsLayerNameUserPrompt, MsgBoxStyle.Critical, pTitle)
             Else
@@ -33,84 +31,11 @@ Friend Class frmModelSegmentation
                 'change to hourglass cursor
                 Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
 
-                Dim lModelSegFieldIndex As Integer = MetSegFieldIndex(lSubbasinLayerIndex)
-
-                'build local collection of selected features in met station layer
-                Dim lMetStationsSelected As New atcCollection
-                If cbxUseSelected.Checked Then
-                    For lIndex As Integer = 1 To GisUtil.NumSelectedFeatures(lMetLayerIndex)
-                        lMetStationsSelected.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex - 1, lMetLayerIndex))
-                    Next
-                End If
-                If lMetStationsSelected.Count = 0 Then
-                    'no met stations selected, act as if all are selected
-                    For lIndex As Integer = 1 To GisUtil.NumFeatures(lMetLayerIndex)
-                        lMetStationsSelected.Add(lIndex - 1)
-                    Next
-                End If
-
-                'loop through each subbasin and assign to nearest met station
-                Dim lSubBasinX As Double, lSubBasinY As Double
-                Dim lMetSegX As Double, lMetSegY As Double
-                GisUtil.StartSetFeatureValue(lSubbasinLayerIndex)
-                For lSubBasinIndex As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
-                    'do progress
-                    Logger.Progress("Assigning Nearest Met Station", lSubBasinIndex, GisUtil.NumFeatures(lSubbasinLayerIndex))
-                    System.Windows.Forms.Application.DoEvents()
-                    'get centroid of this subbasin
-                    GisUtil.ShapeCentroid(lSubbasinLayerIndex, lSubBasinIndex - 1, lSubBasinX, lSubBasinY)
-                    'now find the closest met station
-                    Dim lShortestDistance As Double = Double.MaxValue
-                    Dim lClosestMetStationIndex As Integer = -1
-                    Dim lDistance As Double = 0.0
-                    For lMetStationIndex As Integer = 0 To lMetStationsSelected.Count - 1
-                        GisUtil.PointXY(lMetLayerIndex, lMetStationsSelected(lMetStationIndex), lMetSegX, lMetSegY)
-                        'calculate the distance
-                        'lDistance = Math.Sqrt(((Math.Abs(lSubBasinX) - Math.Abs(lMetSegX)) ^ 2) + _
-                        '                      ((Math.Abs(lSubBasinY) - Math.Abs(lMetSegY)) ^ 2))
-                        lDistance = Math.Sqrt(((lSubBasinX - lMetSegX) ^ 2) + _
-                                              ((lSubBasinY - lMetSegY) ^ 2))
-                        If lDistance < lShortestDistance Then
-                            lShortestDistance = lDistance
-                            lClosestMetStationIndex = lMetStationsSelected(lMetStationIndex)
-                        End If
-                    Next
-                    If lClosestMetStationIndex > -1 Then 'set ModelSeg attribute
-                        Dim lModelSegText As String = ""
-                        Dim lLocationFieldIndex As Integer = -1
-                        If GisUtil.IsField(lMetLayerIndex, "Location") Then
-                            lLocationFieldIndex = GisUtil.FieldIndex(lMetLayerIndex, "Location")
-                            lModelSegText = GisUtil.FieldValue(lMetLayerIndex, lClosestMetStationIndex, lLocationFieldIndex)
-                        End If
-                        If GisUtil.IsField(lMetLayerIndex, "Stanam") Then
-                            lLocationFieldIndex = GisUtil.FieldIndex(lMetLayerIndex, "Stanam")
-                            If lModelSegText.Length > 0 Then
-                                lModelSegText = lModelSegText & ":"
-                            End If
-                            lModelSegText = lModelSegText & GisUtil.FieldValue(lMetLayerIndex, lClosestMetStationIndex, lLocationFieldIndex)
-                        End If
-                        If lModelSegText.Length = 0 Then
-                            lModelSegText = CStr(lClosestMetStationIndex)
-                        End If
-                        GisUtil.SetFeatureValueNoStartStop(lSubbasinLayerIndex, lModelSegFieldIndex, lSubBasinIndex - 1, lModelSegText)
-                    End If
-                Next
-                GisUtil.StopSetFeatureValue(lSubbasinLayerIndex)
+                ModelSegmentationPlugIn.AssignMetStationsByProximity(lSubbasinLayerName, lMetLayerName, cbxUseSelected.Checked)
                 RaiseEvent TableEdited()
             End If
         End If
     End Sub
-
-    Private Function MetSegFieldIndex(ByVal aSubbasinLayerIndex As Integer) As Integer
-        'check to see if modelseg field is on subbasins layer, add if not 
-        Dim lModelSegFieldIndex As Integer = -1
-        If GisUtil.IsField(aSubbasinLayerIndex, "ModelSeg") Then
-            lModelSegFieldIndex = GisUtil.FieldIndex(aSubbasinLayerIndex, "ModelSeg")
-        Else  'need to add it
-            lModelSegFieldIndex = GisUtil.AddField(aSubbasinLayerIndex, "ModelSeg", 0, 40)
-        End If
-        Return lModelSegFieldIndex
-    End Function
 
     Private Sub frmModelSegmentation_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = Windows.Forms.Keys.F1 Then
@@ -185,7 +110,7 @@ Friend Class frmModelSegmentation
     Private Sub cmdEditTable_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdEditTable.Click
         Dim lSubbasinLayerName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
         Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(lSubbasinLayerName)
-        Dim lModelSegFieldIndex As Integer = MetSegFieldIndex(lSubbasinLayerIndex)  'add field if is does not yet exist
+        Dim lModelSegFieldIndex As Integer = ModelSegmentationPlugIn.MetSegFieldIndex(lSubbasinLayerIndex)  'add field if is does not yet exist
 
         If lSubbasinLayerName <> pSubbasinLayerNameUserPrompt Then
             RaiseEvent OpenTableEditor(lSubbasinLayerName)
@@ -199,7 +124,7 @@ Friend Class frmModelSegmentation
             Logger.Msg(pSubbasinLayerNameUserPrompt, MsgBoxStyle.Critical, "BASINS Model Segmentation")
         Else
             Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(lSubbasinLayerName)
-            Dim lModelSegFieldIndex As Integer = MetSegFieldIndex(lSubbasinLayerIndex)
+            Dim lModelSegFieldIndex As Integer = ModelSegmentationPlugIn.MetSegFieldIndex(lSubbasinLayerIndex)
 
             'save original coloring scheme in case we want to return to it
             'TODO: figure out why this returns Nothing - does not store OutlineColor, etc?

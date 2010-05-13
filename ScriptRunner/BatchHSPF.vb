@@ -1,6 +1,7 @@
 Imports atcUtility
 Imports atcManDelin
 Imports atcMwGisUtility
+Imports atcModelSegmentation
 Imports atcModelSetup
 Imports MapWindow.Interfaces
 Imports MapWinUtility
@@ -34,7 +35,7 @@ Module BatchHSPF
 
     'Met Data Specs
     Private pMetWDM As String = pInputPath & "met\met.wdm"   'name of met wdm file
-    Private pSingleMetStationSelected As Integer = 3         'index of met station to use (zero based) if using a single station,
+    Private pSingleMetStationSelected As Integer = 0         'index of met station to use (zero based) if using a single station,
     '                                                           used only if pSubbasinSegmentName is "<none>".
     '                                                           otherwise pSubbasinSegmentName data is used 
     '                                                           to match model segments to met stations.
@@ -109,7 +110,11 @@ Module BatchHSPF
             pStreamLayerName = "Streams"
         End If
 
+        'for now assume that the met wdm only has one station in it
         'if subbasins layer does not have model segment id field, add it
+        'pSubbasinSegmentName = "ModelSeg"
+        'Dim lMetLayerName As String = "C:\BASINS\data\02060006-16\met\met.shp"
+        'ModelSegmentationPlugIn.AssignMetStationsByProximity(pSubbasinLayerName, lMetLayerName, False)
 
         'get land use data ready
         Dim AtcGridPervious As New atcControls.atcGrid
