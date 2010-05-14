@@ -184,7 +184,7 @@ Public Module modDownload
         Dim lMyProjection As String
 
 StartOver:
-        lDataPath = IO.Path.Combine(g_ProgramDir, "data") 'TODO: save in desired location for FRAMES
+        lDataPath = IO.Path.Combine(g_ProgramDir, "data\") 'TODO: save in desired location for FRAMES
 
         If aRegion.Length > 0 Then
             Dim lRegionXML As New Xml.XmlDocument
@@ -281,8 +281,8 @@ StartOver:
                     g_MapWin.Project.Save(lProjectFileName)
                     g_MapWin.Project.Modified = False
                 Else
-                    'download and project core data
-                    CreateNewProjectAndDownloadCoreData(aRegion, lDataPath, lNewDataDir, lProjectFileName)
+                    'download and project batch data
+                    CreateNewProjectAndDownloadBatchData(aRegion, lDataPath, lNewDataDir, lProjectFileName)
                 End If
                 Return lProjectFileName
             End If
@@ -300,24 +300,14 @@ StartOver:
     End Sub
 
     'Returns file name of new project or "" if not built
-    Public Sub CreateNewProjectAndDownloadCoreData(ByVal aRegion As String, _
-                                                   ByVal aDataPath As String, _
-                                                   ByVal aNewDataDir As String, _
-                                                   ByVal aProjectFileName As String, _
-                                                   Optional ByVal aExistingMapWindowProject As Boolean = False, _
-                                                   Optional ByVal aCacheFolder As String = "")
+    Public Sub CreateNewProjectAndDownloadBatchData(ByVal aRegion As String, _
+                                                    ByVal aDataPath As String, _
+                                                    ByVal aNewDataDir As String, _
+                                                    ByVal aProjectFileName As String, _
+                                                    Optional ByVal aExistingMapWindowProject As Boolean = False, _
+                                                    Optional ByVal aCacheFolder As String = "")
         Dim lQuery As String
         Dim lProjection As String = CleanUpUserProjString(IO.File.ReadAllText(aNewDataDir & "prj.proj"))
-        Dim lNationalDir As String = IO.Path.Combine(g_ProgramDir, "Data\national" & g_PathChar)
-        If Not IO.Directory.Exists(lNationalDir) Then
-            lNationalDir = IO.Path.Combine(aDataPath, "national" & g_PathChar)
-        End If
-        If IO.Directory.Exists(lNationalDir) Then
-            CopyFromIfNeeded("sic.dbf", lNationalDir, aNewDataDir)
-            CopyFromIfNeeded("storetag.dbf", lNationalDir, aNewDataDir)
-            CopyFromIfNeeded("wqcriter.dbf", lNationalDir, aNewDataDir)
-            CopyFromIfNeeded("wqobs_prm.dbf", lNationalDir, aNewDataDir)
-        End If
 
         Dim lCacheFolder As String = IO.Path.Combine(aDataPath, "cache")
         If aCacheFolder.Length > 0 Then

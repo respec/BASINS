@@ -5,7 +5,7 @@ Imports MapWinUtility
 Public Class SDMplugin
     Inherits atcDataPlugin
 
-    Private Const NationalProjectFilename As String = "sdm.mwprj"
+    Private Const NationalProjectFilename As String = "Project Builder.mwprj"
 
     Public Overrides ReadOnly Property Name() As String
         Get
@@ -58,7 +58,7 @@ Public Class SDMplugin
     End Sub
 
     Public Overrides Sub ProjectLoading(ByVal aProjectFile As String, ByVal aSettingsString As String)
-        If pBuildFrm Is Nothing AndAlso aProjectFile IsNot Nothing AndAlso aProjectFile.EndsWith("sdm.mwprj") Then LoadNationalProject()
+        If pBuildFrm Is Nothing AndAlso aProjectFile IsNot Nothing AndAlso aProjectFile.EndsWith("Builder.mwprj") Then LoadNationalProject()
     End Sub
 
     Public Overrides Sub ShapesSelected(ByVal aHandle As Integer, ByVal aSelectInfo As MapWindow.Interfaces.SelectInfo)
@@ -137,7 +137,7 @@ Public Class SDMplugin
     Public Function NationalProjectIsOpen() As Boolean
         If (Not g_MapWin.Project Is Nothing) _
             AndAlso (Not g_MapWin.Project.FileName Is Nothing) _
-            AndAlso g_MapWin.Project.FileName.ToLower.EndsWith(NationalProjectFilename) Then
+            AndAlso g_MapWin.Project.FileName.EndsWith(NationalProjectFilename) Then
             Return True
         Else
             Return False
