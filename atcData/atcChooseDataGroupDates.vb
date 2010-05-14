@@ -1,4 +1,5 @@
 Imports atcUtility
+Imports System.ComponentModel
 
 Public Class atcChooseDataGroupDates
 
@@ -13,6 +14,17 @@ Public Class atcChooseDataGroupDates
     Private pCommonStart As Double = GetNaN()
     Private pCommonEnd As Double = GetNaN()
 
+    Public Overrides Property Text() As String
+        Get
+            Return grpYears.Text
+        End Get
+        Set(ByVal aNewText As String)
+            grpYears.Text = aNewText
+        End Set
+    End Property
+
+    <Browsable(False)> _
+    <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)> _
     Public Property OmitBefore() As Double
         Get
             Dim lJdate As Double = StringToJdate(txtOmitBefore.Text, True)
@@ -24,6 +36,8 @@ Public Class atcChooseDataGroupDates
         End Set
     End Property
 
+    <Browsable(False)> _
+    <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)> _
     Public Property OmitAfter() As Double
         Get
             Dim lJdate As Double = StringToJdate(txtOmitAfter.Text, False)
@@ -35,6 +49,8 @@ Public Class atcChooseDataGroupDates
         End Set
     End Property
 
+    <Browsable(False)> _
+    <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)> _
     Public Property CommonStart() As Double
         Get
             Return pCommonStart
@@ -44,6 +60,8 @@ Public Class atcChooseDataGroupDates
         End Set
     End Property
 
+    <Browsable(False)> _
+    <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)> _
     Public Property CommonEnd() As Double
         Get
             Return pCommonEnd
@@ -53,6 +71,8 @@ Public Class atcChooseDataGroupDates
         End Set
     End Property
 
+    <Browsable(False)> _
+    <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)> _
     Public Property FirstStart() As Double
         Get
             Return pFirstStart
@@ -62,6 +82,8 @@ Public Class atcChooseDataGroupDates
         End Set
     End Property
 
+    <Browsable(False)> _
+    <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)> _
     Public Property LastEnd() As Double
         Get
             Return pLastEnd
@@ -71,6 +93,8 @@ Public Class atcChooseDataGroupDates
         End Set
     End Property
 
+    <Browsable(False)> _
+    <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)> _
     Public Property DataGroup() As atcTimeseriesGroup
         Get
             Return pDataGroup
@@ -108,7 +132,7 @@ Public Class atcChooseDataGroupDates
         pCommonStart = GetMinValue()
         pCommonEnd = GetMaxValue()
 
-        If Not pDataGroup Is Nothing Then
+        If pDataGroup IsNot Nothing Then
             For Each lTs As atcData.atcTimeseries In pDataGroup
                 If lTs.Dates.numValues > 0 Then
                     Dim lThisDate As Double = lTs.Dates.Value(1)
