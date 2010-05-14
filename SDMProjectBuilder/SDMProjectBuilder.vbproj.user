@@ -20,7 +20,7 @@
     <RemoteDebugMachine>
     </RemoteDebugMachine>
     <StartAction>Program</StartAction>
-    <StartArguments>C:\BASINS\data\national\sdm.mwprj</StartArguments>
+    <StartArguments>C:\BASINS\data\national\Project Builder.mwprj</StartArguments>
     <StartPage>
     </StartPage>
     <StartProgram>\dev\BASINS40\Bin\MapWindow.exe</StartProgram>
@@ -39,7 +39,7 @@
     <RemoteDebugMachine>
     </RemoteDebugMachine>
     <StartAction>Program</StartAction>
-    <StartArguments>C:\BASINS\data\national\sdm.mwprj</StartArguments>
+    <StartArguments>C:\BASINS\data\national\Project Builder.mwprj</StartArguments>
     <StartPage>
     </StartPage>
     <StartProgram>\dev\BASINS40\Bin\MapWindow.exe</StartProgram>
