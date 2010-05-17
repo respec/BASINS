@@ -307,24 +307,74 @@ StartOver:
                                                     Optional ByVal aExistingMapWindowProject As Boolean = False, _
                                                     Optional ByVal aCacheFolder As String = "")
         Dim lQuery As String
+        Dim lQueries As New Generic.List(Of String)
         Dim lProjection As String = CleanUpUserProjString(IO.File.ReadAllText(aNewDataDir & "prj.proj"))
 
         Dim lCacheFolder As String = IO.Path.Combine(aDataPath, "cache")
         If aCacheFolder.Length > 0 Then
             lCacheFolder = aCacheFolder
         End If
-        lQuery = "<function name='GetBASINS'>" _
+
+        lQuery = "<function name='GetNHDplus'>" _
                & "<arguments>" _
-               & "<DataType>core31</DataType>" _
+               & "<DataType>hydrography</DataType>" _
+               & "<DataType>Catchment</DataType>" _
                & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
                & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
                & "<DesiredProjection>" & lProjection & "</DesiredProjection>" _
                & aRegion _
                & "<clip>False</clip>" _
-               & "<merge>True</merge>" _
+               & "<merge>False</merge>" _
                & "<joinattributes>true</joinattributes>" _
                & "</arguments>" _
                & "</function>"
+        lQueries.Add(lQuery)
+
+        'lQuery = "<function name='GetNLCD2001'>" _
+        '       & "<arguments>" _
+        '       & "<DataType>LandCover</DataType>" _
+        '       & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
+        '       & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
+        '       & "<DesiredProjection>" & lProjection & "</DesiredProjection>" _
+        '       & aRegion _
+        '       & "<clip>False</clip>" _
+        '       & "<merge>False</merge>" _
+        '       & "<joinattributes>true</joinattributes>" _
+        '       & "</arguments>" _
+        '       & "</function>"
+        'lQueries.Add(lQuery)
+
+        'lQuery = "<function name='GetBASINS'>" _
+        '       & "<arguments>" _
+        '       & "<DataType>DEMG</DataType>" _
+        '       & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
+        '       & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
+        '       & "<DesiredProjection>" & lProjection & "</DesiredProjection>" _
+        '       & aRegion _
+        '       & "<clip>False</clip>" _
+        '       & "<merge>False</merge>" _
+        '       & "<joinattributes>true</joinattributes>" _
+        '       & "</arguments>" _
+        '       & "</function>"
+        'lQueries.Add(lQuery)
+
+        Dim lRegion As String = aRegion
+        lRegion = aRegion.Substring(0, aRegion.IndexOf("<projection>")) & "<preferredformat>" & "Closest" & "</preferredformat>" & aRegion.Substring(aRegion.IndexOf("<projection>"))
+        lQuery = "<function name='GetBASINS'>" _
+               & "<arguments>" _
+               & "<DataType>met</DataType>" _
+               & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
+               & "<SaveWDM>met.wdm</SaveWDM>" _
+               & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
+               & "<DesiredProjection>" & lProjection & "</DesiredProjection>" _
+               & lRegion _
+               & "<clip>True</clip>" _
+               & "<merge>False</merge>" _
+               & "</arguments>" _
+               & "</function>"
+        lQueries.Add(lQuery)
+
+        Dim lResult As String = ""
 
         LoadPlugin("D4EM Data Download::BASINS")
         Dim lPlugins As New ArrayList
@@ -337,7 +387,11 @@ StartOver:
             End Try
         Next
         Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
-        Dim lResult As String = lDownloadManager.Execute(lQuery)
+
+        For Each lQuery In lQueries
+            lResult &= lDownloadManager.Execute(lQuery)
+        Next
+
         'Logger.Msg(lResult, "Result of Query from DataManager")
 
         If Not lResult Is Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
@@ -345,7 +399,7 @@ StartOver:
                 'regular case, not coming from existing mapwindow project
                 ClearLayers()
                 If Not (g_MapWin.Project.Save(aProjectFileName)) Then
-                    Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save1Failed:" & g_MapWin.LastError)
+                    Logger.Dbg("CreateNewProjectAndDownloadBatchData:Save1Failed:" & g_MapWin.LastError)
                 End If
             Else
                 'open existing mapwindow project again
@@ -368,7 +422,7 @@ StartOver:
                 If Not String.IsNullOrEmpty(lKey) Then g_MapWin.Plugins.StopPlugin(lKey)
 
                 If Not (g_MapWin.Project.Save(aProjectFileName)) Then
-                    Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save2Failed:" & g_MapWin.LastError)
+                    Logger.Dbg("CreateNewProjectAndDownloadBatchData:Save2Failed:" & g_MapWin.LastError)
                 End If
             End If
         End If
