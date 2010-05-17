@@ -63,6 +63,10 @@ Friend Class frmSelectData
     Friend WithEvents atcSelectedDates As atcData.atcChooseDataGroupDates
     Friend WithEvents mnuSelectSep1 As System.Windows.Forms.MenuItem
     Friend WithEvents mnuSelectMap As System.Windows.Forms.MenuItem
+    Friend WithEvents cboTimeUnits As System.Windows.Forms.ComboBox
+    Friend WithEvents cboAggregate As System.Windows.Forms.ComboBox
+    Friend WithEvents txtTimeStep As System.Windows.Forms.TextBox
+    Friend WithEvents chkTimeStep As System.Windows.Forms.CheckBox
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -90,11 +94,15 @@ Friend Class frmSelectData
         Me.mnuSelectClear = New System.Windows.Forms.MenuItem
         Me.mnuSelectAllMatching = New System.Windows.Forms.MenuItem
         Me.mnuSelectNoMatching = New System.Windows.Forms.MenuItem
-        Me.mnuHelp = New System.Windows.Forms.MenuItem
-        Me.pnlButtons = New System.Windows.Forms.Panel
-        Me.atcSelectedDates = New atcData.atcChooseDataGroupDates
         Me.mnuSelectSep1 = New System.Windows.Forms.MenuItem
         Me.mnuSelectMap = New System.Windows.Forms.MenuItem
+        Me.mnuHelp = New System.Windows.Forms.MenuItem
+        Me.pnlButtons = New System.Windows.Forms.Panel
+        Me.cboTimeUnits = New System.Windows.Forms.ComboBox
+        Me.cboAggregate = New System.Windows.Forms.ComboBox
+        Me.txtTimeStep = New System.Windows.Forms.TextBox
+        Me.chkTimeStep = New System.Windows.Forms.CheckBox
+        Me.atcSelectedDates = New atcData.atcChooseDataGroupDates
         Me.groupTop.SuspendLayout()
         Me.groupSelected.SuspendLayout()
         Me.pnlButtons.SuspendLayout()
@@ -116,6 +124,7 @@ Friend Class frmSelectData
         Me.pMatchingGrid.AllowNewValidValues = False
         Me.pMatchingGrid.CellBackColor = System.Drawing.Color.Empty
         resources.ApplyResources(Me.pMatchingGrid, "pMatchingGrid")
+        Me.pMatchingGrid.Fixed3D = False
         Me.pMatchingGrid.LineColor = System.Drawing.Color.Empty
         Me.pMatchingGrid.LineWidth = 0.0!
         Me.pMatchingGrid.Name = "pMatchingGrid"
@@ -167,6 +176,7 @@ Friend Class frmSelectData
         Me.pSelectedGrid.AllowNewValidValues = False
         Me.pSelectedGrid.CellBackColor = System.Drawing.Color.Empty
         resources.ApplyResources(Me.pSelectedGrid, "pSelectedGrid")
+        Me.pSelectedGrid.Fixed3D = False
         Me.pSelectedGrid.LineColor = System.Drawing.Color.Empty
         Me.pSelectedGrid.LineWidth = 0.0!
         Me.pSelectedGrid.Name = "pSelectedGrid"
@@ -239,31 +249,6 @@ Friend Class frmSelectData
         Me.mnuSelectNoMatching.Index = 3
         resources.ApplyResources(Me.mnuSelectNoMatching, "mnuSelectNoMatching")
         '
-        'mnuHelp
-        '
-        Me.mnuHelp.Index = 3
-        resources.ApplyResources(Me.mnuHelp, "mnuHelp")
-        '
-        'pnlButtons
-        '
-        Me.pnlButtons.Controls.Add(Me.atcSelectedDates)
-        Me.pnlButtons.Controls.Add(Me.btnCancel)
-        Me.pnlButtons.Controls.Add(Me.btnOk)
-        resources.ApplyResources(Me.pnlButtons, "pnlButtons")
-        Me.pnlButtons.Name = "pnlButtons"
-        '
-        'atcSelectedDates
-        '
-        resources.ApplyResources(Me.atcSelectedDates, "atcSelectedDates")
-        Me.atcSelectedDates.CommonEnd = 1.7976931348623157E+308
-        Me.atcSelectedDates.CommonStart = -1.7976931348623157E+308
-        Me.atcSelectedDates.DataGroup = Nothing
-        Me.atcSelectedDates.FirstStart = 1.7976931348623157E+308
-        Me.atcSelectedDates.LastEnd = -1.7976931348623157E+308
-        Me.atcSelectedDates.Name = "atcSelectedDates"
-        Me.atcSelectedDates.OmitAfter = 0
-        Me.atcSelectedDates.OmitBefore = 0
-        '
         'mnuSelectSep1
         '
         Me.mnuSelectSep1.Index = 4
@@ -274,6 +259,54 @@ Friend Class frmSelectData
         Me.mnuSelectMap.Checked = True
         Me.mnuSelectMap.Index = 5
         resources.ApplyResources(Me.mnuSelectMap, "mnuSelectMap")
+        '
+        'mnuHelp
+        '
+        Me.mnuHelp.Index = 3
+        resources.ApplyResources(Me.mnuHelp, "mnuHelp")
+        '
+        'pnlButtons
+        '
+        Me.pnlButtons.Controls.Add(Me.cboTimeUnits)
+        Me.pnlButtons.Controls.Add(Me.cboAggregate)
+        Me.pnlButtons.Controls.Add(Me.txtTimeStep)
+        Me.pnlButtons.Controls.Add(Me.chkTimeStep)
+        Me.pnlButtons.Controls.Add(Me.atcSelectedDates)
+        Me.pnlButtons.Controls.Add(Me.btnCancel)
+        Me.pnlButtons.Controls.Add(Me.btnOk)
+        resources.ApplyResources(Me.pnlButtons, "pnlButtons")
+        Me.pnlButtons.Name = "pnlButtons"
+        '
+        'cboTimeUnits
+        '
+        Me.cboTimeUnits.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboTimeUnits.FormattingEnabled = True
+        Me.cboTimeUnits.Items.AddRange(New Object() {resources.GetString("cboTimeUnits.Items"), resources.GetString("cboTimeUnits.Items1"), resources.GetString("cboTimeUnits.Items2"), resources.GetString("cboTimeUnits.Items3"), resources.GetString("cboTimeUnits.Items4"), resources.GetString("cboTimeUnits.Items5")})
+        resources.ApplyResources(Me.cboTimeUnits, "cboTimeUnits")
+        Me.cboTimeUnits.Name = "cboTimeUnits"
+        '
+        'cboAggregate
+        '
+        Me.cboAggregate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboAggregate.Items.AddRange(New Object() {resources.GetString("cboAggregate.Items"), resources.GetString("cboAggregate.Items1"), resources.GetString("cboAggregate.Items2"), resources.GetString("cboAggregate.Items3"), resources.GetString("cboAggregate.Items4")})
+        resources.ApplyResources(Me.cboAggregate, "cboAggregate")
+        Me.cboAggregate.Name = "cboAggregate"
+        '
+        'txtTimeStep
+        '
+        resources.ApplyResources(Me.txtTimeStep, "txtTimeStep")
+        Me.txtTimeStep.Name = "txtTimeStep"
+        '
+        'chkTimeStep
+        '
+        resources.ApplyResources(Me.chkTimeStep, "chkTimeStep")
+        Me.chkTimeStep.Name = "chkTimeStep"
+        Me.chkTimeStep.UseVisualStyleBackColor = True
+        '
+        'atcSelectedDates
+        '
+        resources.ApplyResources(Me.atcSelectedDates, "atcSelectedDates")
+        Me.atcSelectedDates.Name = "atcSelectedDates"
         '
         'frmSelectData
         '
@@ -324,6 +357,12 @@ Friend Class frmSelectData
     Private pTotalTS As Integer = 0
 
     Private pAvailableData As atcTimeseriesGroup = Nothing
+
+    Private pTranSumDivLabel As String = "Accumulate/Divide"
+    Private pTranAverSameLabel As String = "Average/Same"
+    Private pTranMaxLabel As String = "Maximum"
+    Private pTranMinLabel As String = "Minimum"
+    Private pTranCountMissingLabel As String = "Count Missing"
 
     ''' <summary>
     ''' The datasets available for selection. 
@@ -411,6 +450,45 @@ Friend Class frmSelectData
                 If Not atcSelectedDates.SelectedAll Then 'Change to date subset if needed
                     pSelectedGroup.ChangeTo(atcSelectedDates.CreateSelectedDataGroupSubset)
                 End If
+                If chkTimeStep.Checked Then
+
+                    Dim lAggregatedGroup As New atcTimeseriesGroup
+
+                    Dim lTimeStep As Integer
+
+                    Dim lTU As atcTimeUnit = atcTimeUnit.TUUnknown
+                    For Each lTimeUnit As atcTimeUnit In [Enum].GetValues(lTU.GetType)
+                        If [Enum].GetName(lTU.GetType, lTimeUnit) = "TU" & cboTimeUnits.Text Then
+                            lTU = lTimeUnit
+                        End If
+                    Next
+
+                    Dim lTran As atcTran = atcTran.TranNative
+                    Select Case cboAggregate.Text
+                        Case pTranSumDivLabel : lTran = atcTran.TranSumDiv
+                        Case pTranAverSameLabel : lTran = atcTran.TranAverSame
+                        Case pTranMaxLabel : lTran = atcTran.TranMax
+                        Case pTranMinLabel : lTran = atcTran.TranMin
+                        Case pTranCountMissingLabel : lTran = atcTran.TranCountMissing
+                        Case Else : lTran = atcTran.TranNative
+                    End Select
+
+                    If Not Integer.TryParse(txtTimeStep.Text, lTimeStep) Then
+                        Logger.Msg("Time step must be specified as an integer.", "Time Step Not Specified")
+                    ElseIf lTimeStep < 1 Then
+                        Logger.Msg("Time step must be >= 1.", "Time Step Less Than One")
+                    ElseIf lTU = atcTimeUnit.TUUnknown Then
+                        Logger.Msg("Time Units must be selected to change time step.", "Time Units Not Selected")
+                    ElseIf lTran = atcTran.TranNative Then
+                        Logger.Msg("Aggregation type must be selected to change time step.", "Type of Aggregation Not Selected")
+                    Else
+                        For Each lTimeseries As atcTimeseries In pSelectedGroup
+                            lAggregatedGroup.Add(Aggregate(lTimeseries, lTU, lTimeStep, lTran))
+                        Next
+                    End If
+
+                    pSelectedGroup.ChangeTo(lAggregatedGroup)
+                End If
             Else 'User clicked Cancel or closed dialog
                 If Not pRevertedToSaved Then pSelectedGroup.ChangeTo(pSaveGroup)
             End If
@@ -423,6 +501,54 @@ Friend Class frmSelectData
             Return Nothing
         End If
     End Function
+
+    Public Function CreateSelectedGroupWithTimeStep() As atcTimeseriesGroup
+        If pSelectedGroup Is Nothing Then
+            'nothing to aggregate, return empty group
+            Return New atcTimeseriesGroup
+        ElseIf Not chkTimeStep.Checked Then
+            'No need to aggregate
+            Return pSelectedGroup
+        Else
+            Dim lAggregatedData As New atcTimeseriesGroup
+
+            Dim lTimeStep As Integer
+
+            Dim lTU As atcTimeUnit = atcTimeUnit.TUUnknown
+            For Each lTimeUnit As atcTimeUnit In [Enum].GetValues(lTU.GetType)
+                If [Enum].GetName(lTU.GetType, lTimeUnit) = "TU" & cboTimeUnits.Text Then
+                    lTU = lTimeUnit
+                End If
+            Next
+
+            Dim lTran As atcTran = atcTran.TranNative
+            Select Case cboAggregate.Text
+                Case pTranSumDivLabel : lTran = atcTran.TranSumDiv
+                Case pTranAverSameLabel : lTran = atcTran.TranAverSame
+                Case pTranMaxLabel : lTran = atcTran.TranMax
+                Case pTranMinLabel : lTran = atcTran.TranMin
+                Case pTranCountMissingLabel : lTran = atcTran.TranCountMissing
+                Case Else : lTran = atcTran.TranNative
+            End Select
+
+            If Not Integer.TryParse(txtTimeStep.Text, lTimeStep) Then
+                Logger.Msg("Time step must be specified as an integer.", "Time Step Not Specified")
+            ElseIf lTimeStep < 1 Then
+                Logger.Msg("Time step must be >= 1.", "Time Step Less Than One")
+            ElseIf lTU = atcTimeUnit.TUUnknown Then
+                Logger.Msg("Time Units must be selected to change time step.", "Time Units Not Selected")
+            ElseIf lTran = atcTran.TranNative Then
+                Logger.Msg("Aggregation type must be selected to change time step.", "Type of Aggregation Not Selected")
+            Else
+                lAggregatedData = New atcTimeseriesGroup
+                For Each lTimeseries As atcTimeseries In pSelectedGroup
+                    lAggregatedData.Add(Aggregate(lTimeseries, lTU, lTimeStep, lTran))
+                Next
+            End If
+            Return lAggregatedData
+        End If
+    End Function
+
 
     Private Sub Populate()
         pInitializing = True

@@ -75,7 +75,7 @@ Public Module WatershedSummaryOverland
 
         Dim lAllYearsToDo As New Generic.Dictionary(Of String, atcTimeseriesGroup)
         If aEachYear Then
-            Dim lSplitter As atcSeasons.atcSeasonBase
+            Dim lSplitter As atcSeasonBase
             If aWaterYears Then
                 lSplitter = New atcSeasonsWaterYear
             Else

@@ -36,7 +36,7 @@ Public Module MonthlyAverageCompareStats
             lStr &= "   SimCount " & lNewSimTSer.numValues & " ObsCount " & lNewObsTSer.numValues & vbCrLf & vbCrLf
         End If
 
-        Dim lSeasons As New atcSeasons.atcSeasonsMonth
+        Dim lSeasons As New atcSeasonsMonth
         Dim lSeasonalAttributes As New atcDataAttributes
         lSeasonalAttributes.SetValue("Mean", 0) 'fluxes are summed from daily, monthly or annual to annual
 

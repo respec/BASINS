@@ -158,6 +158,17 @@
     <Compile Include="atcDataSource.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="atcSeasonBase.vb" />
+    <Compile Include="atcSeasonsAMorPM.vb" />
+    <Compile Include="atcSeasonsCalendarYear.vb" />
+    <Compile Include="atcSeasonsDayOfMonth.vb" />
+    <Compile Include="atcSeasonsDayOfWeek.vb" />
+    <Compile Include="atcSeasonsDayOfYear.vb" />
+    <Compile Include="atcSeasonsHour.vb" />
+    <Compile Include="atcSeasonsMonth.vb" />
+    <Compile Include="atcSeasonsTraditional.vb" />
+    <Compile Include="atcSeasonsWaterYear.vb" />
+    <Compile Include="atcSeasonsYearSubset.vb" />
     <Compile Include="atcSeasonYears.Designer.vb">
       <DependentUpon>atcSeasonYears.vb</DependentUpon>
     </Compile>
@@ -188,6 +199,12 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmSelectDisplay.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSpecifySeasonalAttributes.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSpecifyYearSubset.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="modMetData.vb" />
@@ -225,6 +242,14 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmSelectDisplay.resx">
       <DependentUpon>frmSelectDisplay.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSpecifySeasonalAttributes.resx">
+      <DependentUpon>frmSpecifySeasonalAttributes.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSpecifyYearSubset.resx">
+      <DependentUpon>frmSpecifyYearSubset.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">

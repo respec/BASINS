@@ -103,13 +103,18 @@ Public Class atcSeasonPlugin
     Public Shared ReadOnly Property AllSeasonTypes() As atcCollection
         Get
             Dim lAllTypes As New atcCollection
-            Dim lAssembly As [Assembly] = Reflection.Assembly.GetExecutingAssembly
-            Dim lAssemblyTypes As Type() = lAssembly.GetTypes()
-            For Each lType As Type In lAssemblyTypes
-                If lType.Name.StartsWith("atcSeasons") Then
-                    lAllTypes.Add(lType)
-                End If
-            Next
+            Try
+                Dim lBase As New atcSeasonBase
+                Dim lAssembly As [Assembly] = Reflection.Assembly.GetAssembly(lBase.GetType)
+                Dim lAssemblyTypes As Type() = lAssembly.GetTypes()
+                For Each lType As Type In lAssemblyTypes
+                    If lType.Name.StartsWith("atcSeasons") Then
+                        lAllTypes.Add(lType)
+                    End If
+                Next
+            Catch e As Exception
+                Logger.Dbg("atcSeasonPlugin.AllSeasonTypes: " & e.Message & vbCrLf & e.StackTrace)
+            End Try
             Return lAllTypes
         End Get
     End Property

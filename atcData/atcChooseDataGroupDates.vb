@@ -168,7 +168,7 @@ Public Class atcChooseDataGroupDates
 
     Public ReadOnly Property SelectedAll() As Boolean
         Get
-            Return txtOmitBefore.Text = lblDataStart.Text AndAlso txtOmitAfter.Text = lblDataEnd.Text
+            Return (Not chkYearly.Checked) AndAlso txtOmitBefore.Text = lblDataStart.Text AndAlso txtOmitAfter.Text = lblDataEnd.Text
         End Get
     End Property
 
@@ -185,8 +185,25 @@ Public Class atcChooseDataGroupDates
             Dim lEndDate As Double = OmitAfter
             If lStartDate <= lEndDate Then
                 For Each lTs As atcData.atcTimeseries In pDataGroup
+                    Dim lAddTs As atcTimeseries = Nothing
                     If lTs.Dates.numValues > 0 Then
-                        lSubsetGroup.Add(SubsetByDate(lTs, lStartDate, lEndDate, Nothing))
+                        If chkYearly.Checked Then
+                            Dim lStartDateArray(5) As Integer
+                            Dim lEndDateArray(5) As Integer
+                            atcUtility.J2Date(lStartDate, lStartDateArray)
+                            atcUtility.J2Date(lEndDate, lEndDateArray)
+                            lAddTs = SubsetByDateBoundary(lTs, lStartDateArray(1), lStartDateArray(2), Nothing, lStartDateArray(0), lEndDateArray(0), lEndDateArray(1), lEndDateArray(2))
+
+                            Dim lSeasons As New atcSeasonsYearSubset(lStartDateArray(1), lStartDateArray(2), lEndDateArray(1), lEndDateArray(2))
+                            lSeasons.SeasonSelected(0) = True
+                            lAddTs = lSeasons.SplitBySelected(lAddTs, Nothing).ItemByIndex(1)
+                            lAddTs.Attributes.SetValue("ID", lTs.OriginalParent.Attributes.GetValue("ID"))
+                        Else
+                            lAddTs = SubsetByDate(lTs, lStartDate, lEndDate, Nothing)
+                        End If
+                        If lAddTs.numValues > 0 Then                            
+                            lSubsetGroup.Add(lAddTs)
+                        End If
                     End If
                 Next
             End If

@@ -835,7 +835,7 @@ Friend Class frmTrend
                     lTsB = lTs
                 End If
 
-                Dim lSeasons As New atcSeasons.atcSeasonsYearSubset(pYearStartMonth, pYearStartDay, pYearEndMonth, pYearEndDay)
+                Dim lSeasons As New atcSeasonsYearSubset(pYearStartMonth, pYearStartDay, pYearEndMonth, pYearEndDay)
                 lSeasons.SeasonSelected(0) = True
                 lTsB = lSeasons.SplitBySelected(lTsB, Nothing).ItemByIndex(1)
                 lTsB.Attributes.SetValue("ID", lTs.OriginalParent.Attributes.GetValue("ID"))
