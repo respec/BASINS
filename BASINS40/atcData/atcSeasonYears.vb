@@ -1,14 +1,17 @@
 Imports atcData
 Imports atcUtility
+Imports System.ComponentModel
 
 Public Class atcSeasonYears
-
-    Private Const pNoDatesInCommon As String = ": No dates in common"
 
     Private WithEvents pDataGroup As atcTimeseriesGroup
 
     Private pShowBoundaries As Boolean = True
     Private pDateFormat As atcDateFormat
+
+    Private pFirstDate As Double = GetMaxValue()
+    Private pLastDate As Double = GetMinValue()
+
     Private pCommonStart As Double = GetNaN()
     Private pCommonEnd As Double = GetNaN()
 
@@ -70,23 +73,25 @@ Public Class atcSeasonYears
         End Set
     End Property
 
+    <Browsable(False)> _
+    <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)> _
     Public Property OmitBeforeYear() As Integer
         Get
             Return GetTextbox(txtOmitBeforeYear)
         End Get
         Set(ByVal aYear As Integer)
             SetTextbox(txtOmitBeforeYear, aYear)
-            If aYear > 0 Then ShowCustomYears(True)
         End Set
     End Property
 
+    <Browsable(False)> _
+    <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)> _
     Public Property OmitAfterYear() As Integer
         Get
             Return GetTextbox(txtOmitAfterYear)
         End Get
         Set(ByVal aYear As Integer)
             SetTextbox(txtOmitAfterYear, aYear)
-            If aYear > 0 Then ShowCustomYears(True)
         End Set
     End Property
 
@@ -106,6 +111,8 @@ Public Class atcSeasonYears
         End If
     End Sub
 
+    <Browsable(False)> _
+    <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)> _
     Public Property DataGroup() As atcTimeseriesGroup
         Get
             Return pDataGroup
@@ -127,46 +134,38 @@ Public Class atcSeasonYears
             .IncludeSeconds = False
         End With
 
-        Dim lFirstDate As Double = GetMaxValue()
-        Dim lLastDate As Double = GetMinValue()
-
         pCommonStart = GetMinValue()
         pCommonEnd = GetMaxValue()
-
-        Dim lAllText As String = "All"
-        Dim lCommonText As String = "Common"
 
         For Each lDataset As atcData.atcTimeseries In pDataGroup
             If lDataset.Dates.numValues > 0 Then
                 Dim lThisDate As Double = lDataset.Dates.Value(1)
-                If lThisDate < lFirstDate Then lFirstDate = lThisDate
+                If lThisDate < pFirstDate Then pFirstDate = lThisDate
                 If lThisDate > pCommonStart Then pCommonStart = lThisDate
                 lThisDate = lDataset.Dates.Value(lDataset.Dates.numValues)
-                If lThisDate > lLastDate Then lLastDate = lThisDate
+                If lThisDate > pLastDate Then pLastDate = lThisDate
                 If lThisDate < pCommonEnd Then pCommonEnd = lThisDate
             End If
         Next
-        If lFirstDate < GetMaxValue() AndAlso lLastDate > GetMinValue() Then
-            lblDataStart.Text = lblDataStart.Tag & " " & pDateFormat.JDateToString(lFirstDate)
-            lblDataEnd.Text = lblDataEnd.Tag & " " & pDateFormat.JDateToString(lLastDate)
-            lAllText &= ": " & pDateFormat.JDateToString(lFirstDate) & " to " & pDateFormat.JDateToString(lLastDate)
+        If pFirstDate < pLastDate Then
+            lblDataStart.Text = lblDataStart.Tag & " " & pDateFormat.JDateToString(pFirstDate)
+            lblDataEnd.Text = lblDataEnd.Tag & " " & pDateFormat.JDateToString(pLastDate)
+            btnAll.Enabled = True
+        Else
+            btnAll.Enabled = False
         End If
 
         If pCommonStart > GetMinValue() AndAlso pCommonEnd < GetMaxValue() AndAlso pCommonStart < pCommonEnd Then
-            lCommonText &= ": " & pDateFormat.JDateToString(pCommonStart) & " to " & pDateFormat.JDateToString(pCommonEnd)
+            btnCommon.Enabled = True
         Else
-            lCommonText &= pNoDatesInCommon
+            btnCommon.Text = "No common dates"
+            btnCommon.Enabled = False
         End If
 
-        With cboYears.Items
-            .Clear()
-            .Add(lAllText)
-            .Add(lCommonText)
-            .Add("Custom")
-        End With
-        cboYears.SelectedIndex = 0
     End Sub
 
+    <Browsable(False)> _
+    <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)> _
     Public Property CommonStart() As Double
         Get
             Return pCommonStart
@@ -176,6 +175,8 @@ Public Class atcSeasonYears
         End Set
     End Property
 
+    <Browsable(False)> _
+    <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)> _
     Public Property CommonEnd() As Double
         Get
             Return pCommonEnd
@@ -185,34 +186,46 @@ Public Class atcSeasonYears
         End Set
     End Property
 
-    Private Sub cboYears_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboYears.SelectedIndexChanged
-        Select Case cboYears.SelectedIndex
-            Case 0 'All
-                txtOmitBeforeYear.Text = ""
-                txtOmitAfterYear.Text = ""
-            Case 1 'Common
-                If cboYears.Text.EndsWith(pNoDatesInCommon) Then
-                    cboYears.SelectedIndex = 0
-                Else
-                    Dim lCurDate(5) As Integer
-                    J2Date(pCommonStart, lCurDate)
-                    txtOmitBeforeYear.Text = Format(lCurDate(0), "0000")
-                    J2Date(pCommonEnd, lCurDate)
-                    txtOmitAfterYear.Text = Format(lCurDate(0), "0000")
-                End If
-            Case 2 'Custom
-                ShowCustomYears(True)
-        End Select
+    Private Sub btnCalendarYear_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCalendarYear.Click
+        cboStartMonth.SelectedIndex = 0
+        txtStartDay.Text = "1"
+        cboEndMonth.SelectedIndex = 11
+        txtEndDay.Text = "31"
     End Sub
 
-    Private Sub ShowCustomYears(ByVal aShowCustom As Boolean)
-        cboYears.Visible = Not aShowCustom
-        txtOmitBeforeYear.Visible = aShowCustom
-        txtOmitAfterYear.Visible = aShowCustom
-        lblDataStart.Visible = aShowCustom
-        lblDataEnd.Visible = aShowCustom
-        lblOmitBefore.Visible = aShowCustom
-        lblOmitAfter.Visible = aShowCustom
+    Private Sub btnWaterYear_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnWaterYear.Click
+        cboStartMonth.SelectedIndex = 9
+        txtStartDay.Text = "1"
+        cboEndMonth.SelectedIndex = 8
+        txtEndDay.Text = "30"
     End Sub
 
+    Private Sub btnCommonYears_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        Dim lCurDate(5) As Integer
+        J2Date(pCommonStart, lCurDate)
+        'TODO: shift by one year when required to follow water/drought year convention
+        txtOmitBeforeYear.Text = Format(lCurDate(0), "0000")
+        J2Date(pCommonEnd, lCurDate)
+        txtOmitAfterYear.Text = Format(lCurDate(0), "0000")
+    End Sub
+
+    Private Sub btnAllYears_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        Dim lCurDate(5) As Integer
+        J2Date(pFirstDate, lCurDate)
+        'TODO: shift by one year when required to follow water/drought year convention
+        txtOmitBeforeYear.Text = Format(lCurDate(0), "0000")
+        J2Date(pLastDate, lCurDate)
+        txtOmitAfterYear.Text = Format(lCurDate(0), "0000")
+    End Sub
+
+
+    Private Sub btnAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAll.Click
+        txtOmitBeforeYear.Text = lblDataStart.Text
+        txtOmitAfterYear.Text = lblDataEnd.Text
+    End Sub
+
+    Private Sub btnCommon_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCommon.Click
+        txtOmitBeforeYear.Text = lblCommonStart.Text
+        txtOmitAfterYear.Text = lblCommonEnd.Text
+    End Sub
 End Class

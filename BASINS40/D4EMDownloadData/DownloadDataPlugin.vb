@@ -230,7 +230,7 @@ Public Class DownloadDataPlugin
                                 End If
                                 If lResult.Length = 0 Then
                                     If lSilentSuccess Then Logger.Msg("Download Complete", "Data Download")
-                                ElseIf lResult.StartsWith("<success>") Then
+                                ElseIf lResult.Contains("<success>") Then
                                     BASINS.ProcessDownloadResults(lResult)
                                 Else
                                     Logger.Msg(atcUtility.ReadableFromXML(lResult), "Data Download")

@@ -25,7 +25,7 @@ Public Class atcVariation
     Private pSelected As Boolean
 
     'TODO: make rest of public variables into properties
-    Public Seasons As atcSeasons.atcSeasonBase
+    Public Seasons As atcSeasonBase
     Public Min As Double
     Public Max As Double
     Public Increment As Double

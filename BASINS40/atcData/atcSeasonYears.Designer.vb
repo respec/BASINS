@@ -20,6 +20,8 @@ Partial Class atcSeasonYears
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.grpBoundaries = New System.Windows.Forms.GroupBox
+        Me.btnWaterYear = New System.Windows.Forms.Button
+        Me.btnCalendarYear = New System.Windows.Forms.Button
         Me.cboStartMonth = New System.Windows.Forms.ComboBox
         Me.lblYearStart = New System.Windows.Forms.Label
         Me.txtEndDay = New System.Windows.Forms.TextBox
@@ -28,19 +30,24 @@ Partial Class atcSeasonYears
         Me.lblYearEnd = New System.Windows.Forms.Label
         Me.Splitter1 = New System.Windows.Forms.Splitter
         Me.grpYears = New System.Windows.Forms.GroupBox
+        Me.btnCommon = New System.Windows.Forms.Button
+        Me.btnAll = New System.Windows.Forms.Button
+        Me.lblCommonStart = New System.Windows.Forms.Label
+        Me.lblCommonEnd = New System.Windows.Forms.Label
         Me.lblDataStart = New System.Windows.Forms.Label
         Me.lblDataEnd = New System.Windows.Forms.Label
         Me.lblOmitBefore = New System.Windows.Forms.Label
         Me.lblOmitAfter = New System.Windows.Forms.Label
         Me.txtOmitAfterYear = New System.Windows.Forms.TextBox
         Me.txtOmitBeforeYear = New System.Windows.Forms.TextBox
-        Me.cboYears = New System.Windows.Forms.ComboBox
         Me.grpBoundaries.SuspendLayout()
         Me.grpYears.SuspendLayout()
         Me.SuspendLayout()
         '
         'grpBoundaries
         '
+        Me.grpBoundaries.Controls.Add(Me.btnWaterYear)
+        Me.grpBoundaries.Controls.Add(Me.btnCalendarYear)
         Me.grpBoundaries.Controls.Add(Me.cboStartMonth)
         Me.grpBoundaries.Controls.Add(Me.lblYearStart)
         Me.grpBoundaries.Controls.Add(Me.txtEndDay)
@@ -50,25 +57,46 @@ Partial Class atcSeasonYears
         Me.grpBoundaries.Dock = System.Windows.Forms.DockStyle.Left
         Me.grpBoundaries.Location = New System.Drawing.Point(0, 0)
         Me.grpBoundaries.Name = "grpBoundaries"
-        Me.grpBoundaries.Size = New System.Drawing.Size(176, 80)
+        Me.grpBoundaries.Size = New System.Drawing.Size(176, 107)
         Me.grpBoundaries.TabIndex = 67
         Me.grpBoundaries.TabStop = False
-        Me.grpBoundaries.Text = "Year / Season Boundaries"
+        Me.grpBoundaries.Text = "Year or Season Boundaries"
+        '
+        'btnWaterYear
+        '
+        Me.btnWaterYear.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnWaterYear.AutoSize = True
+        Me.btnWaterYear.Location = New System.Drawing.Point(89, 19)
+        Me.btnWaterYear.Name = "btnWaterYear"
+        Me.btnWaterYear.Size = New System.Drawing.Size(70, 23)
+        Me.btnWaterYear.TabIndex = 1
+        Me.btnWaterYear.Text = "Water"
+        Me.btnWaterYear.UseVisualStyleBackColor = True
+        '
+        'btnCalendarYear
+        '
+        Me.btnCalendarYear.AutoSize = True
+        Me.btnCalendarYear.Location = New System.Drawing.Point(9, 19)
+        Me.btnCalendarYear.Name = "btnCalendarYear"
+        Me.btnCalendarYear.Size = New System.Drawing.Size(74, 23)
+        Me.btnCalendarYear.TabIndex = 0
+        Me.btnCalendarYear.Text = "Calendar"
+        Me.btnCalendarYear.UseVisualStyleBackColor = True
         '
         'cboStartMonth
         '
         Me.cboStartMonth.Items.AddRange(New Object() {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"})
-        Me.cboStartMonth.Location = New System.Drawing.Point(41, 19)
+        Me.cboStartMonth.Location = New System.Drawing.Point(41, 48)
         Me.cboStartMonth.MaxDropDownItems = 12
         Me.cboStartMonth.Name = "cboStartMonth"
         Me.cboStartMonth.Size = New System.Drawing.Size(88, 21)
-        Me.cboStartMonth.TabIndex = 3
+        Me.cboStartMonth.TabIndex = 2
         Me.cboStartMonth.Text = "January"
         '
         'lblYearStart
         '
         Me.lblYearStart.AutoSize = True
-        Me.lblYearStart.Location = New System.Drawing.Point(6, 22)
+        Me.lblYearStart.Location = New System.Drawing.Point(6, 51)
         Me.lblYearStart.Name = "lblYearStart"
         Me.lblYearStart.Size = New System.Drawing.Size(29, 13)
         Me.lblYearStart.TabIndex = 23
@@ -76,36 +104,36 @@ Partial Class atcSeasonYears
         '
         'txtEndDay
         '
-        Me.txtEndDay.Location = New System.Drawing.Point(135, 46)
+        Me.txtEndDay.Location = New System.Drawing.Point(135, 75)
         Me.txtEndDay.Name = "txtEndDay"
         Me.txtEndDay.Size = New System.Drawing.Size(24, 20)
-        Me.txtEndDay.TabIndex = 63
+        Me.txtEndDay.TabIndex = 5
         Me.txtEndDay.Text = "31"
         Me.txtEndDay.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'txtStartDay
         '
-        Me.txtStartDay.Location = New System.Drawing.Point(135, 19)
+        Me.txtStartDay.Location = New System.Drawing.Point(135, 48)
         Me.txtStartDay.Name = "txtStartDay"
         Me.txtStartDay.Size = New System.Drawing.Size(24, 20)
-        Me.txtStartDay.TabIndex = 4
+        Me.txtStartDay.TabIndex = 3
         Me.txtStartDay.Text = "1"
         Me.txtStartDay.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'cboEndMonth
         '
         Me.cboEndMonth.Items.AddRange(New Object() {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"})
-        Me.cboEndMonth.Location = New System.Drawing.Point(41, 46)
+        Me.cboEndMonth.Location = New System.Drawing.Point(41, 75)
         Me.cboEndMonth.MaxDropDownItems = 12
         Me.cboEndMonth.Name = "cboEndMonth"
         Me.cboEndMonth.Size = New System.Drawing.Size(88, 21)
-        Me.cboEndMonth.TabIndex = 11
+        Me.cboEndMonth.TabIndex = 4
         Me.cboEndMonth.Text = "December"
         '
         'lblYearEnd
         '
         Me.lblYearEnd.AutoSize = True
-        Me.lblYearEnd.Location = New System.Drawing.Point(6, 49)
+        Me.lblYearEnd.Location = New System.Drawing.Point(6, 78)
         Me.lblYearEnd.Name = "lblYearEnd"
         Me.lblYearEnd.Size = New System.Drawing.Size(26, 13)
         Me.lblYearEnd.TabIndex = 61
@@ -116,53 +144,88 @@ Partial Class atcSeasonYears
         Me.Splitter1.BackColor = System.Drawing.SystemColors.Control
         Me.Splitter1.Location = New System.Drawing.Point(176, 0)
         Me.Splitter1.Name = "Splitter1"
-        Me.Splitter1.Size = New System.Drawing.Size(10, 80)
-        Me.Splitter1.TabIndex = 68
+        Me.Splitter1.Size = New System.Drawing.Size(10, 107)
+        Me.Splitter1.TabIndex = 6
         Me.Splitter1.TabStop = False
         '
         'grpYears
         '
+        Me.grpYears.Controls.Add(Me.btnCommon)
+        Me.grpYears.Controls.Add(Me.btnAll)
+        Me.grpYears.Controls.Add(Me.lblCommonStart)
+        Me.grpYears.Controls.Add(Me.lblCommonEnd)
         Me.grpYears.Controls.Add(Me.lblDataStart)
         Me.grpYears.Controls.Add(Me.lblDataEnd)
         Me.grpYears.Controls.Add(Me.lblOmitBefore)
         Me.grpYears.Controls.Add(Me.lblOmitAfter)
         Me.grpYears.Controls.Add(Me.txtOmitAfterYear)
         Me.grpYears.Controls.Add(Me.txtOmitBeforeYear)
-        Me.grpYears.Controls.Add(Me.cboYears)
         Me.grpYears.Dock = System.Windows.Forms.DockStyle.Left
         Me.grpYears.Location = New System.Drawing.Point(186, 0)
         Me.grpYears.Name = "grpYears"
-        Me.grpYears.Size = New System.Drawing.Size(212, 80)
+        Me.grpYears.Size = New System.Drawing.Size(212, 107)
         Me.grpYears.TabIndex = 69
         Me.grpYears.TabStop = False
-        Me.grpYears.Text = "Years to Include in Analysis"
+        Me.grpYears.Text = "Years to Include"
+        '
+        'btnCommon
+        '
+        Me.btnCommon.Location = New System.Drawing.Point(103, 19)
+        Me.btnCommon.Name = "btnCommon"
+        Me.btnCommon.Size = New System.Drawing.Size(64, 20)
+        Me.btnCommon.TabIndex = 56
+        Me.btnCommon.Text = "Common"
+        Me.btnCommon.UseVisualStyleBackColor = True
+        '
+        'btnAll
+        '
+        Me.btnAll.Location = New System.Drawing.Point(44, 19)
+        Me.btnAll.Name = "btnAll"
+        Me.btnAll.Size = New System.Drawing.Size(53, 20)
+        Me.btnAll.TabIndex = 55
+        Me.btnAll.Text = "All"
+        Me.btnAll.UseVisualStyleBackColor = True
+        '
+        'lblCommonStart
+        '
+        Me.lblCommonStart.AutoSize = True
+        Me.lblCommonStart.Location = New System.Drawing.Point(119, 42)
+        Me.lblCommonStart.Name = "lblCommonStart"
+        Me.lblCommonStart.Size = New System.Drawing.Size(0, 13)
+        Me.lblCommonStart.TabIndex = 54
+        Me.lblCommonStart.Tag = ""
+        '
+        'lblCommonEnd
+        '
+        Me.lblCommonEnd.AutoSize = True
+        Me.lblCommonEnd.Location = New System.Drawing.Point(119, 65)
+        Me.lblCommonEnd.Name = "lblCommonEnd"
+        Me.lblCommonEnd.Size = New System.Drawing.Size(0, 13)
+        Me.lblCommonEnd.TabIndex = 53
+        Me.lblCommonEnd.Tag = ""
         '
         'lblDataStart
         '
         Me.lblDataStart.AutoSize = True
-        Me.lblDataStart.Location = New System.Drawing.Point(84, 22)
+        Me.lblDataStart.Location = New System.Drawing.Point(41, 42)
         Me.lblDataStart.Name = "lblDataStart"
-        Me.lblDataStart.Size = New System.Drawing.Size(121, 13)
-        Me.lblDataStart.TabIndex = 45
+        Me.lblDataStart.Size = New System.Drawing.Size(0, 13)
+        Me.lblDataStart.TabIndex = 52
         Me.lblDataStart.Tag = "Data Starts"
-        Me.lblDataStart.Text = "Data Starts 11/22/1934"
-        Me.lblDataStart.Visible = False
         '
         'lblDataEnd
         '
         Me.lblDataEnd.AutoSize = True
-        Me.lblDataEnd.Location = New System.Drawing.Point(84, 48)
+        Me.lblDataEnd.Location = New System.Drawing.Point(41, 65)
         Me.lblDataEnd.Name = "lblDataEnd"
-        Me.lblDataEnd.Size = New System.Drawing.Size(118, 13)
-        Me.lblDataEnd.TabIndex = 1
-        Me.lblDataEnd.Tag = "Data Ends"
-        Me.lblDataEnd.Text = "Data Ends 11/22/1934"
-        Me.lblDataEnd.Visible = False
+        Me.lblDataEnd.Size = New System.Drawing.Size(0, 13)
+        Me.lblDataEnd.TabIndex = 51
+        Me.lblDataEnd.Tag = ""
         '
         'lblOmitBefore
         '
         Me.lblOmitBefore.AutoSize = True
-        Me.lblOmitBefore.Location = New System.Drawing.Point(6, 22)
+        Me.lblOmitBefore.Location = New System.Drawing.Point(6, 42)
         Me.lblOmitBefore.Name = "lblOmitBefore"
         Me.lblOmitBefore.Size = New System.Drawing.Size(29, 13)
         Me.lblOmitBefore.TabIndex = 40
@@ -172,7 +235,7 @@ Partial Class atcSeasonYears
         'lblOmitAfter
         '
         Me.lblOmitAfter.AutoSize = True
-        Me.lblOmitAfter.Location = New System.Drawing.Point(6, 48)
+        Me.lblOmitAfter.Location = New System.Drawing.Point(6, 65)
         Me.lblOmitAfter.Name = "lblOmitAfter"
         Me.lblOmitAfter.Size = New System.Drawing.Size(26, 13)
         Me.lblOmitAfter.TabIndex = 43
@@ -181,31 +244,19 @@ Partial Class atcSeasonYears
         '
         'txtOmitAfterYear
         '
-        Me.txtOmitAfterYear.Location = New System.Drawing.Point(41, 45)
+        Me.txtOmitAfterYear.Location = New System.Drawing.Point(169, 74)
         Me.txtOmitAfterYear.Name = "txtOmitAfterYear"
         Me.txtOmitAfterYear.Size = New System.Drawing.Size(37, 20)
-        Me.txtOmitAfterYear.TabIndex = 6
+        Me.txtOmitAfterYear.TabIndex = 10
         Me.txtOmitAfterYear.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        Me.txtOmitAfterYear.Visible = False
         '
         'txtOmitBeforeYear
         '
-        Me.txtOmitBeforeYear.Location = New System.Drawing.Point(41, 19)
+        Me.txtOmitBeforeYear.Location = New System.Drawing.Point(169, 48)
         Me.txtOmitBeforeYear.Name = "txtOmitBeforeYear"
         Me.txtOmitBeforeYear.Size = New System.Drawing.Size(37, 20)
-        Me.txtOmitBeforeYear.TabIndex = 5
+        Me.txtOmitBeforeYear.TabIndex = 9
         Me.txtOmitBeforeYear.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        Me.txtOmitBeforeYear.Visible = False
-        '
-        'cboYears
-        '
-        Me.cboYears.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboYears.FormattingEnabled = True
-        Me.cboYears.Location = New System.Drawing.Point(6, 18)
-        Me.cboYears.Name = "cboYears"
-        Me.cboYears.Size = New System.Drawing.Size(201, 21)
-        Me.cboYears.TabIndex = 44
         '
         'atcSeasonYears
         '
@@ -215,7 +266,7 @@ Partial Class atcSeasonYears
         Me.Controls.Add(Me.Splitter1)
         Me.Controls.Add(Me.grpBoundaries)
         Me.Name = "atcSeasonYears"
-        Me.Size = New System.Drawing.Size(401, 80)
+        Me.Size = New System.Drawing.Size(401, 107)
         Me.grpBoundaries.ResumeLayout(False)
         Me.grpBoundaries.PerformLayout()
         Me.grpYears.ResumeLayout(False)
@@ -232,12 +283,17 @@ Partial Class atcSeasonYears
     Friend WithEvents lblYearEnd As System.Windows.Forms.Label
     Friend WithEvents Splitter1 As System.Windows.Forms.Splitter
     Friend WithEvents grpYears As System.Windows.Forms.GroupBox
-    Friend WithEvents lblDataStart As System.Windows.Forms.Label
-    Friend WithEvents lblDataEnd As System.Windows.Forms.Label
     Friend WithEvents lblOmitBefore As System.Windows.Forms.Label
     Friend WithEvents lblOmitAfter As System.Windows.Forms.Label
     Friend WithEvents txtOmitAfterYear As System.Windows.Forms.TextBox
     Friend WithEvents txtOmitBeforeYear As System.Windows.Forms.TextBox
-    Friend WithEvents cboYears As System.Windows.Forms.ComboBox
+    Friend WithEvents btnWaterYear As System.Windows.Forms.Button
+    Friend WithEvents btnCalendarYear As System.Windows.Forms.Button
+    Friend WithEvents btnCommon As System.Windows.Forms.Button
+    Friend WithEvents btnAll As System.Windows.Forms.Button
+    Friend WithEvents lblCommonStart As System.Windows.Forms.Label
+    Friend WithEvents lblCommonEnd As System.Windows.Forms.Label
+    Friend WithEvents lblDataStart As System.Windows.Forms.Label
+    Friend WithEvents lblDataEnd As System.Windows.Forms.Label
 
 End Class
