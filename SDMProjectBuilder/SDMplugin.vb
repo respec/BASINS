@@ -6,6 +6,7 @@ Public Class SDMplugin
     Inherits atcDataPlugin
 
     Private Const NationalProjectFilename As String = "Project Builder.mwprj"
+    Private pStatusMonitor As MonitorProgressStatus
 
     Public Overrides ReadOnly Property Name() As String
         Get
@@ -51,6 +52,24 @@ Public Class SDMplugin
 
         atcDataManager.LoadPlugin("Timeseries::Statistics")
         atcDataManager.LoadPlugin("D4EM Data Download::Main")
+
+        If Logger.ProgressStatus Is Nothing OrElse Not (TypeOf (Logger.ProgressStatus) Is MonitorProgressStatus) Then
+            'Start running status monitor to give better progress and status indication during long-running processes
+            pStatusMonitor = New MonitorProgressStatus
+            If pStatusMonitor.StartMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), _
+                                            g_ProgramDir & "cache\log" & g_PathChar, _
+                                            System.Diagnostics.Process.GetCurrentProcess.Id) Then
+                'put our seperate executable status monitor (StatusMonitor.exe) between the Logger and the default MW status monitor
+                pStatusMonitor.InnerProgressStatus = Logger.ProgressStatus
+                Logger.ProgressStatus = pStatusMonitor
+                Logger.Status("LABEL TITLE " & g_AppNameShort & " Status")
+                Logger.Status("PROGRESS TIME ON") 'Enable time-to-completion estimation
+                Logger.Status("")
+            Else
+                pStatusMonitor.StopMonitor()
+                pStatusMonitor = Nothing
+            End If
+        End If
 
     End Sub
 

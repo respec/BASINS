@@ -315,6 +315,11 @@ StartOver:
             lCacheFolder = aCacheFolder
         End If
 
+        Dim lParms(2) As Object
+        lParms(0) = GetSelectedHUC()
+        lParms(1) = GetSelectedShape()
+        lParms(2) = aNewDataDir
+
         lQuery = "<function name='GetNHDplus'>" _
                & "<arguments>" _
                & "<DataType>hydrography</DataType>" _
@@ -328,25 +333,12 @@ StartOver:
                & "<joinattributes>true</joinattributes>" _
                & "</arguments>" _
                & "</function>"
+        '& "<DataType>elev_cm</DataType>" _
         lQueries.Add(lQuery)
 
         'lQuery = "<function name='GetNLCD2001'>" _
         '       & "<arguments>" _
         '       & "<DataType>LandCover</DataType>" _
-        '       & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
-        '       & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
-        '       & "<DesiredProjection>" & lProjection & "</DesiredProjection>" _
-        '       & aRegion _
-        '       & "<clip>False</clip>" _
-        '       & "<merge>False</merge>" _
-        '       & "<joinattributes>true</joinattributes>" _
-        '       & "</arguments>" _
-        '       & "</function>"
-        'lQueries.Add(lQuery)
-
-        'lQuery = "<function name='GetBASINS'>" _
-        '       & "<arguments>" _
-        '       & "<DataType>DEMG</DataType>" _
         '       & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
         '       & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
         '       & "<DesiredProjection>" & lProjection & "</DesiredProjection>" _
@@ -425,6 +417,10 @@ StartOver:
                     Logger.Dbg("CreateNewProjectAndDownloadBatchData:Save2Failed:" & g_MapWin.LastError)
                 End If
             End If
+
+            'process the network 
+            ProcessNetwork(lParms)
+
         End If
     End Sub
 
@@ -471,12 +467,12 @@ StartOver:
             lMessage &= ProcessDownloadResult(lInstructionNode.OuterXml) & vbCrLf
             Windows.Forms.Application.DoEvents()
         Next
-        If lMessage.Length > 2 Then
-            Logger.Msg(lMessage, "Data Download")
-            If Logger.DisplayMessageBoxes AndAlso lMessage.Contains(" Data file") Then
-                atcDataManager.UserManage()
-            End If
-        End If
+        'If lMessage.Length > 2 Then
+        '    Logger.Msg(lMessage, "Data Download")
+        '    If Logger.DisplayMessageBoxes AndAlso lMessage.Contains(" Data file") Then
+        '        atcDataManager.UserManage()
+        '    End If
+        'End If
     End Sub
 
     Private Function ProcessDownloadResult(ByVal aInstructions As String) As String
@@ -1667,6 +1663,60 @@ StartOver:
                 End If
             Next
         End If
+        Return Nothing
+    End Function
+
+    Private Function GetSelectedHUC() As String
+        Try
+            Dim lNumSelected As Integer = g_MapWin.View.SelectedShapes.NumSelected
+            If lNumSelected > 0 Then
+                Dim lFieldName As String = ""
+                Dim lFieldMatch As Integer = -1
+                Dim lCurLayer As MapWinGIS.Shapefile
+                lCurLayer = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
+
+                Select Case IO.Path.GetFileNameWithoutExtension(lCurLayer.Filename).ToLower
+                    Case "cat", "huc", "huc250d3"
+                        lFieldName = "CU"
+                    Case "cnty"
+                        lFieldName = "FIPS"
+                    Case "st"
+                        lFieldName = "ST"
+                End Select
+
+                lFieldName = lFieldName.ToLower
+                For lField = 0 To lCurLayer.NumFields - 1
+                    If lCurLayer.Field(lField).Name.ToLower = lFieldName Then
+                        lFieldMatch = lField
+                    End If
+                Next
+
+                If lFieldMatch >= 0 Then
+                    For lSelected As Integer = 0 To lNumSelected - 1
+                        Dim lShapeIndex As Integer = g_MapWin.View.SelectedShapes.Item(lSelected).ShapeIndex()
+                        Return lCurLayer.CellValue(lFieldMatch, lShapeIndex)
+                    Next
+                End If
+            End If
+        Catch e As Exception
+            Logger.Dbg("Exception getting selected huc: " & e.Message)
+        End Try
+        Return ""
+    End Function
+
+    Private Function GetSelectedShape() As MapWinGIS.Shape
+        Try
+            Dim lNumSelected As Integer = g_MapWin.View.SelectedShapes.NumSelected
+            If lNumSelected > 0 Then
+                For lSelected As Integer = 0 To lNumSelected - 1
+                    Dim lShapeIndex As Integer = g_MapWin.View.SelectedShapes.Item(lSelected).ShapeIndex()
+                    Dim lCurLayer As MapWinGIS.Shapefile = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
+                    Return lCurLayer.Shape(lShapeIndex)
+                Next
+            End If
+        Catch e As Exception
+            Logger.Dbg("Exception getting selected shape: " & e.Message)
+        End Try
         Return Nothing
     End Function
 End Module
