@@ -23,290 +23,93 @@ Partial Class frmCompare
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
-        Me.lblObserved = New System.Windows.Forms.Label
-        Me.txtObserved = New System.Windows.Forms.TextBox
-        Me.btnObserved = New System.Windows.Forms.Button
-        Me.btnSimulated = New System.Windows.Forms.Button
-        Me.txtSimulated = New System.Windows.Forms.TextBox
-        Me.lblSimulated = New System.Windows.Forms.Label
-        Me.DateChooser = New atcData.atcChooseDataGroupDates
-        Me.txtTitle = New System.Windows.Forms.TextBox
-        Me.lblTitle = New System.Windows.Forms.Label
-        Me.lblTimeUnit = New System.Windows.Forms.Label
-        Me.radioTUDaily = New System.Windows.Forms.RadioButton
-        Me.radioTUMonthly = New System.Windows.Forms.RadioButton
-        Me.radioTUYearly = New System.Windows.Forms.RadioButton
-        Me.btnCompare = New System.Windows.Forms.Button
-        Me.gbClassLimits = New System.Windows.Forms.GroupBox
-        Me.TextBox1 = New System.Windows.Forms.TextBox
-        Me.lblNumClassLimits = New System.Windows.Forms.Label
-        Me.radioLogrithmic = New System.Windows.Forms.RadioButton
-        Me.radioArithmetic = New System.Windows.Forms.RadioButton
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmCompare))
         Me.MainMenu1 = New System.Windows.Forms.MainMenu(Me.components)
         Me.mnuFile = New System.Windows.Forms.MenuItem
+        Me.MenuItem3 = New System.Windows.Forms.MenuItem
+        Me.MenuItem4 = New System.Windows.Forms.MenuItem
+        Me.MenuItem1 = New System.Windows.Forms.MenuItem
+        Me.MenuItem2 = New System.Windows.Forms.MenuItem
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
-        Me.gbClassLimits.SuspendLayout()
+        Me.txtReport = New System.Windows.Forms.TextBox
         Me.SuspendLayout()
-        '
-        'lblObserved
-        '
-        Me.lblObserved.AutoSize = True
-        Me.lblObserved.Location = New System.Drawing.Point(12, 58)
-        Me.lblObserved.Name = "lblObserved"
-        Me.lblObserved.Size = New System.Drawing.Size(95, 13)
-        Me.lblObserved.TabIndex = 0
-        Me.lblObserved.Text = "Observed (or DS1)"
-        '
-        'txtObserved
-        '
-        Me.txtObserved.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtObserved.Location = New System.Drawing.Point(125, 55)
-        Me.txtObserved.Name = "txtObserved"
-        Me.txtObserved.Size = New System.Drawing.Size(389, 20)
-        Me.txtObserved.TabIndex = 1
-        '
-        'btnObserved
-        '
-        Me.btnObserved.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnObserved.Location = New System.Drawing.Point(520, 55)
-        Me.btnObserved.Name = "btnObserved"
-        Me.btnObserved.Size = New System.Drawing.Size(30, 23)
-        Me.btnObserved.TabIndex = 2
-        Me.btnObserved.Text = "..."
-        Me.btnObserved.UseVisualStyleBackColor = True
-        '
-        'btnSimulated
-        '
-        Me.btnSimulated.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSimulated.Location = New System.Drawing.Point(520, 81)
-        Me.btnSimulated.Name = "btnSimulated"
-        Me.btnSimulated.Size = New System.Drawing.Size(30, 23)
-        Me.btnSimulated.TabIndex = 5
-        Me.btnSimulated.Text = "..."
-        Me.btnSimulated.UseVisualStyleBackColor = True
-        '
-        'txtSimulated
-        '
-        Me.txtSimulated.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtSimulated.Location = New System.Drawing.Point(125, 81)
-        Me.txtSimulated.Name = "txtSimulated"
-        Me.txtSimulated.Size = New System.Drawing.Size(389, 20)
-        Me.txtSimulated.TabIndex = 4
-        '
-        'lblSimulated
-        '
-        Me.lblSimulated.AutoSize = True
-        Me.lblSimulated.Location = New System.Drawing.Point(12, 84)
-        Me.lblSimulated.Name = "lblSimulated"
-        Me.lblSimulated.Size = New System.Drawing.Size(95, 13)
-        Me.lblSimulated.TabIndex = 3
-        Me.lblSimulated.Text = "Simulated (or DS2)"
-        '
-        'DateChooser
-        '
-        Me.DateChooser.CommonEnd = 1.7976931348623157E+308
-        Me.DateChooser.CommonStart = -1.7976931348623157E+308
-        Me.DateChooser.DataGroup = Nothing
-        Me.DateChooser.FirstStart = Double.NaN
-        Me.DateChooser.LastEnd = Double.NaN
-        Me.DateChooser.Location = New System.Drawing.Point(12, 110)
-        Me.DateChooser.Name = "DateChooser"
-        Me.DateChooser.OmitAfter = 0
-        Me.DateChooser.OmitBefore = 0
-        Me.DateChooser.Size = New System.Drawing.Size(285, 88)
-        Me.DateChooser.TabIndex = 6
-        '
-        'txtTitle
-        '
-        Me.txtTitle.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtTitle.Location = New System.Drawing.Point(125, 12)
-        Me.txtTitle.Name = "txtTitle"
-        Me.txtTitle.Size = New System.Drawing.Size(425, 20)
-        Me.txtTitle.TabIndex = 8
-        '
-        'lblTitle
-        '
-        Me.lblTitle.AutoSize = True
-        Me.lblTitle.Location = New System.Drawing.Point(12, 15)
-        Me.lblTitle.Name = "lblTitle"
-        Me.lblTitle.Size = New System.Drawing.Size(62, 13)
-        Me.lblTitle.TabIndex = 7
-        Me.lblTitle.Text = "Report Title"
-        '
-        'lblTimeUnit
-        '
-        Me.lblTimeUnit.AutoSize = True
-        Me.lblTimeUnit.Location = New System.Drawing.Point(12, 232)
-        Me.lblTimeUnit.Name = "lblTimeUnit"
-        Me.lblTimeUnit.Size = New System.Drawing.Size(52, 13)
-        Me.lblTimeUnit.TabIndex = 9
-        Me.lblTimeUnit.Text = "Time Unit"
-        '
-        'radioTUDaily
-        '
-        Me.radioTUDaily.AutoSize = True
-        Me.radioTUDaily.Checked = True
-        Me.radioTUDaily.Location = New System.Drawing.Point(71, 230)
-        Me.radioTUDaily.Name = "radioTUDaily"
-        Me.radioTUDaily.Size = New System.Drawing.Size(48, 17)
-        Me.radioTUDaily.TabIndex = 10
-        Me.radioTUDaily.TabStop = True
-        Me.radioTUDaily.Text = "Daily"
-        Me.radioTUDaily.UseVisualStyleBackColor = True
-        '
-        'radioTUMonthly
-        '
-        Me.radioTUMonthly.AutoSize = True
-        Me.radioTUMonthly.Location = New System.Drawing.Point(125, 230)
-        Me.radioTUMonthly.Name = "radioTUMonthly"
-        Me.radioTUMonthly.Size = New System.Drawing.Size(62, 17)
-        Me.radioTUMonthly.TabIndex = 11
-        Me.radioTUMonthly.Text = "Monthly"
-        Me.radioTUMonthly.UseVisualStyleBackColor = True
-        '
-        'radioTUYearly
-        '
-        Me.radioTUYearly.AutoSize = True
-        Me.radioTUYearly.Location = New System.Drawing.Point(193, 230)
-        Me.radioTUYearly.Name = "radioTUYearly"
-        Me.radioTUYearly.Size = New System.Drawing.Size(54, 17)
-        Me.radioTUYearly.TabIndex = 12
-        Me.radioTUYearly.Text = "Yearly"
-        Me.radioTUYearly.UseVisualStyleBackColor = True
-        '
-        'btnCompare
-        '
-        Me.btnCompare.Location = New System.Drawing.Point(15, 262)
-        Me.btnCompare.Name = "btnCompare"
-        Me.btnCompare.Size = New System.Drawing.Size(75, 23)
-        Me.btnCompare.TabIndex = 13
-        Me.btnCompare.Text = "Compare"
-        Me.btnCompare.UseVisualStyleBackColor = True
-        '
-        'gbClassLimits
-        '
-        Me.gbClassLimits.Controls.Add(Me.TextBox1)
-        Me.gbClassLimits.Controls.Add(Me.lblNumClassLimits)
-        Me.gbClassLimits.Controls.Add(Me.radioLogrithmic)
-        Me.gbClassLimits.Controls.Add(Me.radioArithmetic)
-        Me.gbClassLimits.Location = New System.Drawing.Point(306, 110)
-        Me.gbClassLimits.Name = "gbClassLimits"
-        Me.gbClassLimits.Size = New System.Drawing.Size(239, 88)
-        Me.gbClassLimits.TabIndex = 15
-        Me.gbClassLimits.TabStop = False
-        Me.gbClassLimits.Text = "Class Limits"
-        '
-        'TextBox1
-        '
-        Me.TextBox1.Location = New System.Drawing.Point(130, 63)
-        Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.Size = New System.Drawing.Size(100, 20)
-        Me.TextBox1.TabIndex = 3
-        '
-        'lblNumClassLimits
-        '
-        Me.lblNumClassLimits.AutoSize = True
-        Me.lblNumClassLimits.Location = New System.Drawing.Point(11, 63)
-        Me.lblNumClassLimits.Name = "lblNumClassLimits"
-        Me.lblNumClassLimits.Size = New System.Drawing.Size(113, 13)
-        Me.lblNumClassLimits.TabIndex = 2
-        Me.lblNumClassLimits.Text = "Number of Class Limits"
-        '
-        'radioLogrithmic
-        '
-        Me.radioLogrithmic.AutoSize = True
-        Me.radioLogrithmic.Location = New System.Drawing.Point(134, 32)
-        Me.radioLogrithmic.Name = "radioLogrithmic"
-        Me.radioLogrithmic.Size = New System.Drawing.Size(79, 17)
-        Me.radioLogrithmic.TabIndex = 1
-        Me.radioLogrithmic.TabStop = True
-        Me.radioLogrithmic.Text = "Logarithmic"
-        Me.radioLogrithmic.UseVisualStyleBackColor = True
-        '
-        'radioArithmetic
-        '
-        Me.radioArithmetic.AutoSize = True
-        Me.radioArithmetic.Location = New System.Drawing.Point(14, 32)
-        Me.radioArithmetic.Name = "radioArithmetic"
-        Me.radioArithmetic.Size = New System.Drawing.Size(71, 17)
-        Me.radioArithmetic.TabIndex = 0
-        Me.radioArithmetic.TabStop = True
-        Me.radioArithmetic.Text = "Arithmetic"
-        Me.radioArithmetic.UseVisualStyleBackColor = True
         '
         'MainMenu1
         '
-        Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuAnalysis, Me.mnuHelp})
+        Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.MenuItem1, Me.mnuAnalysis, Me.mnuHelp})
         '
         'mnuFile
         '
         Me.mnuFile.Index = 0
+        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.MenuItem3, Me.MenuItem4})
         Me.mnuFile.Text = "File"
+        '
+        'MenuItem3
+        '
+        Me.MenuItem3.Index = 0
+        Me.MenuItem3.Text = "Select Data"
+        '
+        'MenuItem4
+        '
+        Me.MenuItem4.Index = 1
+        Me.MenuItem4.Text = "Save"
+        '
+        'MenuItem1
+        '
+        Me.MenuItem1.Index = 1
+        Me.MenuItem1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.MenuItem2})
+        Me.MenuItem1.Text = "Edit"
+        '
+        'MenuItem2
+        '
+        Me.MenuItem2.Index = 0
+        Me.MenuItem2.Text = "Copy"
         '
         'mnuAnalysis
         '
-        Me.mnuAnalysis.Index = 1
+        Me.mnuAnalysis.Index = 2
         Me.mnuAnalysis.Text = "Analysis"
         '
         'mnuHelp
         '
-        Me.mnuHelp.Index = 2
+        Me.mnuHelp.Index = 3
         Me.mnuHelp.Text = "Help"
+        '
+        'txtReport
+        '
+        Me.txtReport.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.txtReport.Font = New System.Drawing.Font("Courier New", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txtReport.Location = New System.Drawing.Point(0, 0)
+        Me.txtReport.Multiline = True
+        Me.txtReport.Name = "txtReport"
+        Me.txtReport.ReadOnly = True
+        Me.txtReport.ScrollBars = System.Windows.Forms.ScrollBars.Both
+        Me.txtReport.Size = New System.Drawing.Size(739, 610)
+        Me.txtReport.TabIndex = 0
+        Me.txtReport.WordWrap = False
         '
         'frmCompare
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(562, 296)
-        Me.Controls.Add(Me.gbClassLimits)
-        Me.Controls.Add(Me.btnCompare)
-        Me.Controls.Add(Me.radioTUYearly)
-        Me.Controls.Add(Me.radioTUMonthly)
-        Me.Controls.Add(Me.radioTUDaily)
-        Me.Controls.Add(Me.lblTimeUnit)
-        Me.Controls.Add(Me.txtTitle)
-        Me.Controls.Add(Me.lblTitle)
-        Me.Controls.Add(Me.DateChooser)
-        Me.Controls.Add(Me.btnSimulated)
-        Me.Controls.Add(Me.txtSimulated)
-        Me.Controls.Add(Me.lblSimulated)
-        Me.Controls.Add(Me.btnObserved)
-        Me.Controls.Add(Me.txtObserved)
-        Me.Controls.Add(Me.lblObserved)
+        Me.ClientSize = New System.Drawing.Size(739, 610)
+        Me.Controls.Add(Me.txtReport)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Menu = Me.MainMenu1
         Me.Name = "frmCompare"
         Me.Text = "Compare"
-        Me.gbClassLimits.ResumeLayout(False)
-        Me.gbClassLimits.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents lblObserved As System.Windows.Forms.Label
-    Friend WithEvents txtObserved As System.Windows.Forms.TextBox
-    Friend WithEvents btnObserved As System.Windows.Forms.Button
-    Friend WithEvents btnSimulated As System.Windows.Forms.Button
-    Friend WithEvents txtSimulated As System.Windows.Forms.TextBox
-    Friend WithEvents lblSimulated As System.Windows.Forms.Label
-    Friend WithEvents DateChooser As atcData.atcChooseDataGroupDates
-    Friend WithEvents txtTitle As System.Windows.Forms.TextBox
-    Friend WithEvents lblTitle As System.Windows.Forms.Label
-    Friend WithEvents lblTimeUnit As System.Windows.Forms.Label
-    Friend WithEvents radioTUDaily As System.Windows.Forms.RadioButton
-    Friend WithEvents radioTUMonthly As System.Windows.Forms.RadioButton
-    Friend WithEvents radioTUYearly As System.Windows.Forms.RadioButton
-    Friend WithEvents btnCompare As System.Windows.Forms.Button
-    Friend WithEvents gbClassLimits As System.Windows.Forms.GroupBox
-    Friend WithEvents radioLogrithmic As System.Windows.Forms.RadioButton
-    Friend WithEvents radioArithmetic As System.Windows.Forms.RadioButton
-    Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
-    Friend WithEvents lblNumClassLimits As System.Windows.Forms.Label
     Friend WithEvents MainMenu1 As System.Windows.Forms.MainMenu
     Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
     Public WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
+    Friend WithEvents txtReport As System.Windows.Forms.TextBox
+    Friend WithEvents MenuItem3 As System.Windows.Forms.MenuItem
+    Friend WithEvents MenuItem4 As System.Windows.Forms.MenuItem
+    Friend WithEvents MenuItem1 As System.Windows.Forms.MenuItem
+    Friend WithEvents MenuItem2 As System.Windows.Forms.MenuItem
 End Class

@@ -199,7 +199,8 @@ Public Module modStat
             Try
                 Dim lNonExceedPercent As Double = 100 - lExceedPercent
                 Dim lNonExceedPercentString As String = (lNonExceedPercent).ToString.PadLeft(2, "0")
-                Dim lNonExceedValue As Double = aTimeseries.Attributes.GetDefinedValue("%" & lNonExceedPercentString).Value
+                'Dim lNonExceedValue As Double = aTimeseries.Attributes.GetDefinedValue("%" & lNonExceedPercentString).Value
+                Dim lNonExceedValue As Double = aTimeseries.Attributes.GetValue("%" & lNonExceedPercentString)
                 lStr &= DecimalAlign(lNonExceedValue, 10, 2) & lExceedPercent.ToString.PadLeft(4) & vbCrLf
             Catch lEx As Exception
                 Logger.Dbg("At ExceedPercent " & lExceedPercent & " Exception " & lEx.ToString)
@@ -255,7 +256,14 @@ Public Module modStat
 
 
         If aClassLimits Is Nothing Then
-            Logger.Msg("aClassLimits is nothing")
+            Dim lErr As String = "Class limits are not defined, unable to conduct compare analysis."
+            Logger.Msg(lErr)
+            Return lErr
+        ElseIf aClassLimits.Count = 0 Then
+            Dim lErr As String = "There are no values within the specified class limits." & vbNewLine & _
+                                 "Select more class limits and try again."
+            Logger.Msg(lErr)
+            Return lErr
         End If
         For lIndex As Integer = 1 To aTSer1.numValues
             lVal1 = aTSer1.Values(lIndex)
@@ -396,8 +404,8 @@ Public Module modStat
         If aClassLimits IsNot Nothing Then
             'lStr &= "Time Series 1" & vbCrLf & "Time Series 2" & vbCrLf
 
-            lStr &= "            Data Series 1 - " & TimeserIdString(aTSer1) & vbCrLf
-            lStr &= "            Data Series 2 - " & TimeserIdString(aTSer2) & vbCrLf & vbCrLf
+            lStr &= "            TS 1 - " & TimeserIdString(aTSer1) & vbCrLf
+            lStr &= "            TS 2 - " & TimeserIdString(aTSer2) & vbCrLf & vbCrLf
             lStr &= "                           Mean               Root mean" & vbCrLf
             lStr &= "Lower    Number    absolute error(1)     square error(2)        Bias(3)      " & vbCrLf
             lStr &= "class      of     ------------------- ------------------- -------------------" & vbCrLf
@@ -458,7 +466,7 @@ Public Module modStat
         lStr &= "         = square root((n/n-1)*((tot.col.5)**2-(tot.col.7)**2))" & vbCrLf
 
 
-        lStr &= "(1) Average = sum(|TS2-TS1|/TS1)" & vbCrLf
+        lStr &= "(1) Average = sum(|TS2-TS1|/n)" & vbCrLf
         lStr &= "    Percent = 100 * (sum(|TS2-TS1|/TS1))/n for all TS1 > 0" & vbCrLf
         lStr &= "(2) Average = square root(sum((TS2-TS1)**2)/n)" & vbCrLf
         lStr &= "    Percent = 100 * square root(sum(((TS2-TS1)/TS1)**2)/n) for all TS1 > 0" & vbCrLf
@@ -474,8 +482,8 @@ Public Module modStat
             'lStr &= "Time Series 1" & vbCrLf & "Time Series 2" & vbCrLf
             'lStr &="             Simulated - 11519500 Scott River near Fort Jones, CA.             " & vbCrLf 
             'lStr &="               Observed  - 11517500 Shasta River near Yreka, CA.               " & vbCrLf 
-            lStr &= "            Data Series 1 - " & TimeserIdString(aTSer1) & vbCrLf
-            lStr &= "            Data Series 2 - " & TimeserIdString(aTSer2) & vbCrLf & vbCrLf
+            lStr &= "            TS 1 - " & TimeserIdString(aTSer1) & vbCrLf
+            lStr &= "            TS 2 - " & TimeserIdString(aTSer2) & vbCrLf & vbCrLf
 
             lStr &= "" & vbCrLf
             lStr &= "         Cases equal or exceeding lower" & vbCrLf
@@ -543,8 +551,8 @@ Public Module modStat
         If aClassLimits IsNot Nothing Then
             'lStr &= "Time Series 1" & vbCrLf & "Time Series 2" & vbCrLf
             'lStr &= "   Time Series 1 " & vbCrLf & "   Time Series 2 " & vbCrLf
-            lStr &= "            Data Series 1 - " & TimeserIdString(aTSer1) & vbCrLf
-            lStr &= "            Data Series 2 - " & TimeserIdString(aTSer2) & vbCrLf & vbCrLf
+            lStr &= "            TS 1 - " & TimeserIdString(aTSer1) & vbCrLf
+            lStr &= "            TS 2 - " & TimeserIdString(aTSer2) & vbCrLf & vbCrLf
 
             lStr &= "   Lower         Number of occurrences between indicated deviations    " & vbCrLf
             lStr &= "   class    -------------------------------------------------------------" & vbCrLf
@@ -592,6 +600,32 @@ Public Module modStat
             lStr &= CStr(lErrTot).PadLeft(7)
         Next
 
+        lStr &= vbCrLf
+        lStr &= "Percent time value was exceeded" & vbCrLf
+        lStr &= vbCrLf
+        lStr &= "    Flow     %" & vbCrLf
+        lStr &= "     TS1        TS2   %Exceedance" & vbNewLine
+        lStr &= "---------- ---------- ------------" & vbNewLine
+
+        Dim lDurationReport As New DurationReport
+        For Each lExceedPercent As Double In lDurationReport.ExceedPercents
+            Try
+                Dim lNonExceedPercent As Double = 100 - lExceedPercent
+                Dim lNonExceedPercentString As String = (lNonExceedPercent).ToString.PadLeft(2, "0")
+                Dim lNonExceedValue1 As Double = aTSer1.Attributes.GetValue("%" & lNonExceedPercentString)
+                Dim lNonExceedValue2 As Double = aTSer2.Attributes.GetValue("%" & lNonExceedPercentString)
+                lStr &= DecimalAlign(lNonExceedValue1, 10, 2) & DecimalAlign(lNonExceedValue2, 10, 2) & lExceedPercent.ToString.PadLeft(4) & vbCrLf
+            Catch lEx As Exception
+                Logger.Dbg("At ExceedPercent " & lExceedPercent & " Exception " & lEx.ToString)
+            End Try
+        Next
+
+        lStr &= vbCrLf
+        'If lNote.Length > 0 Then
+        '    lStr &= lNote
+        'End If
+        lStr &= vbCrLf
+
         lStr &= vbCrLf & vbCrLf & vbFormFeed & vbCrLf
 
         If lNote.Length > 0 Then
@@ -628,11 +662,15 @@ Public Module modStat
         Private pClassLimits As Generic.List(Of Double)
         Private pExceedPercents As Generic.List(Of Double)
 
-        Public Sub New()
+        Public Sub New(Optional ByVal aClassLimits As Double() = Nothing)
             'Dim lClassLimits() As Double = {1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000, 10000, 20000, 25000, 50000, 100000}
             Dim lClassLimits() As Double = {0, 1, 1.4, 2, 2.8, 4, 5.7, 8.1, 11, 16, 23, 33, 46, 66, 93, 130, 190, 270, 380, 530, 760, 1100, 1500, 2200, 3100, 4300, 6100, 8700, 12000, 17000, 25000, 35000, 50000, 71000, 100000}
+            If aClassLimits IsNot Nothing Then
+                lClassLimits = aClassLimits
+            End If
+
             pClassLimits = lClassLimits.ToList
-            Dim lExceedPercents() As Double = {99, 98, 95, 90, 85, 80, 75, 70, 65, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 2, 1}
+            Dim lExceedPercents() As Double = {99, 98, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 2, 1}
             pExceedPercents = lExceedPercents.ToList
         End Sub
 
@@ -763,5 +801,58 @@ Public Module modStat
                   & DecimalAlign(100 * lResidual / lValue2, 11, 2).PadLeft(11) & "%"
         End If
         Return lStr & vbCrLf
+    End Function
+
+    Public Function GenerateClasses(ByVal aNumFDclasses As Integer, ByVal fddat As atcDataGroup) As Double()
+
+        'determine bounds for duration analysis
+        Dim lMin As Double = 1000000.0#
+        Dim lMax As Double = -1000000.0#
+        Dim vmin(fddat.Count - 1) As Double
+        Dim vmax(fddat.Count - 1) As Double
+        Dim i, j, iexp, l, nci As Long
+        Dim bound(1) As Single
+        Dim cr, clog As Single
+        Dim clas(aNumFDclasses) As Double
+        Dim c As Double
+
+        For j = 0 To fddat.Count - 1
+            vmin(j) = fddat(j).Attributes.GetValue("Min")
+            vmax(j) = fddat(j).Attributes.GetValue("Max")
+            If vmin(j) < lMin Then lMin = vmin(j)
+            If vmax(j) > lMax Then lMax = vmax(j)
+        Next j
+
+        iexp = Fix(Log10(lMax))
+        bound(1) = 10.0# ^ (iexp + 1)
+        If lMin <= 0.0# Then lMin = lMax / 1000.0#
+        iexp = Int(Log10(lMin))
+        bound(0) = 10.0# ^ (iexp)
+
+        'set up class intervals
+
+        cr = (bound(0) / bound(1)) ^ (1.0# / (aNumFDclasses + 1))
+        clas(0) = 0.0#
+        clas(1) = bound(0)
+        clas(aNumFDclasses) = bound(1)
+
+        For j = 1 To aNumFDclasses - 2
+            i = aNumFDclasses - j
+            clas(i) = clas(i + 1) * cr
+        Next j
+
+        'round off class intervals
+
+        For i = 1 To aNumFDclasses
+            c = clas(i)
+            clog = Log10(c) + 0.001
+            If clog < 0.0# Then clog = clog - 1
+            l = Fix(clog)
+            l = l - 1
+            c = (c / (10.0# ^ l)) + 0.5
+            clas(i) = (Fix(c)) * (10.0# ^ l)
+        Next i
+        'nci = aNumFDclasses + 1
+        Return clas
     End Function
 End Module
