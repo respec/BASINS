@@ -51,7 +51,12 @@
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="SwatObject, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\D4EM\Bin\SwatObject.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing">
       <Name>System.Drawing</Name>
     </Reference>
@@ -68,13 +73,18 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SWAT\modArcSWAT.vb" />
     <Compile Include="modBatchHSPF.vb" />
+    <Compile Include="SWAT\modDefaults.vb" />
     <Compile Include="modDownload.vb" />
     <Compile Include="modNetwork.vb" />
+    <Compile Include="SWAT\modOutputSummarize.vb" />
+    <Compile Include="SWAT\modReclassify.vb" />
     <Compile Include="modSDM.vb" />
     <Compile Include="frmBuildNew.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="SWAT\modSwatDatabase.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -91,6 +101,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="SDMplugin.vb" />
+    <Compile Include="SWAT\modSwatMetData.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="frmBuildNew.resx">
@@ -111,6 +122,7 @@
     <ProjectReference Include="..\..\D4EM\DataManager\DataManager\BASINS-D4EMDataManager.vbproj">
       <Project>{59E61F35-B014-4D34-8277-63FF6BE40DD6}</Project>
       <Name>BASINS-D4EMDataManager</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility.vbproj">
       <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
@@ -147,9 +159,39 @@
       <Name>atcMwGisUtility</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesBinary\atcTimeseriesBinary.vbproj">
+      <Project>{DE17DC53-80E6-45C1-839E-0BF106D914D6}</Project>
+      <Name>atcTimeseriesBinary</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesD4EM\atcTimeseriesD4EM.vbproj">
+      <Project>{31440B87-261C-4E1C-ADAB-76DA74B0A0FE}</Project>
+      <Name>atcTimeseriesD4EM</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath.vbproj">
+      <Project>{BD299EB7-7A62-4EF9-8806-86E9288C498F}</Project>
+      <Name>atcTimeseriesMath</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesStatistics\atcTimeseriesStatistics.vbproj">
+      <Project>{7E40E3E6-BF8E-45B5-99AF-4E11DAF039FD}</Project>
+      <Name>atcTimeseriesStatistics</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesSWAT\atcTimeseriesSWAT.vbproj">
+      <Project>{8157C92A-68A6-498D-84B7-EF2A299AB7BA}</Project>
+      <Name>atcTimeseriesSWAT</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Name>atcUtility</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcWDM\atcWDM.vbproj">
+      <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
+      <Name>atcWDM</Name>
       <Private>False</Private>
     </ProjectReference>
     <None Include="My Project\Settings.settings">
