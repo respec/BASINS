@@ -182,6 +182,7 @@ Public Module modDownload
         Dim lNoData As Boolean = False
         Dim lDefDirName As String = "NewProject"
         Dim lMyProjection As String
+        Dim lAreaOfInterestProjection As String = ""
 
 StartOver:
         lDataPath = IO.Path.Combine(g_ProgramDir, "data\") 'TODO: save in desired location for FRAMES
@@ -199,6 +200,7 @@ StartOver:
                             Case "westbc", "left"
                             Case "eastbc", "right"
                             Case "projection", "boxprojection"
+                                lAreaOfInterestProjection = lChild.InnerText
                             Case Else
                                 If lDefDirName = "NewProject" Then
                                     lDefDirName = lChild.InnerText
@@ -282,7 +284,7 @@ StartOver:
                     g_MapWin.Project.Modified = False
                 Else
                     'download and project batch data
-                    CreateNewProjectAndDownloadBatchData(aRegion, lDataPath, lNewDataDir, lProjectFileName)
+                    CreateNewProjectAndDownloadBatchData(aRegion, lDataPath, lNewDataDir, lProjectFileName, lAreaOfInterestProjection)
                 End If
                 Return lProjectFileName
             End If
@@ -304,11 +306,12 @@ StartOver:
                                                     ByVal aDataPath As String, _
                                                     ByVal aNewDataDir As String, _
                                                     ByVal aProjectFileName As String, _
+                                                    ByVal aAreaOfInterestProjection As String, _
                                                     Optional ByVal aExistingMapWindowProject As Boolean = False, _
                                                     Optional ByVal aCacheFolder As String = "")
         Dim lQuery As String
         Dim lQueries As New Generic.List(Of String)
-        Dim lProjection As String = CleanUpUserProjString(IO.File.ReadAllText(aNewDataDir & "prj.proj"))
+        Dim lDesiredProjection As String = CleanUpUserProjString(IO.File.ReadAllText(aNewDataDir & "prj.proj"))
 
         Dim lCacheFolder As String = IO.Path.Combine(aDataPath, "cache")
         If aCacheFolder.Length > 0 Then
@@ -324,31 +327,31 @@ StartOver:
                & "<arguments>" _
                & "<DataType>hydrography</DataType>" _
                & "<DataType>Catchment</DataType>" _
+               & "<DataType>elev_cm</DataType>" _
                & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
                & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
-               & "<DesiredProjection>" & lProjection & "</DesiredProjection>" _
+               & "<DesiredProjection>" & lDesiredProjection & "</DesiredProjection>" _
                & aRegion _
                & "<clip>False</clip>" _
                & "<merge>False</merge>" _
                & "<joinattributes>true</joinattributes>" _
                & "</arguments>" _
                & "</function>"
-        '& "<DataType>elev_cm</DataType>" _
         lQueries.Add(lQuery)
 
-        'lQuery = "<function name='GetNLCD2001'>" _
-        '       & "<arguments>" _
-        '       & "<DataType>LandCover</DataType>" _
-        '       & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
-        '       & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
-        '       & "<DesiredProjection>" & lProjection & "</DesiredProjection>" _
-        '       & aRegion _
-        '       & "<clip>False</clip>" _
-        '       & "<merge>False</merge>" _
-        '       & "<joinattributes>true</joinattributes>" _
-        '       & "</arguments>" _
-        '       & "</function>"
-        'lQueries.Add(lQuery)
+        lQuery = "<function name='GetNLCD2001'>" _
+               & "<arguments>" _
+               & "<DataType>LandCover</DataType>" _
+               & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
+               & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
+               & "<DesiredProjection>" & lDesiredProjection & "</DesiredProjection>" _
+               & aRegion _
+               & "<clip>False</clip>" _
+               & "<merge>False</merge>" _
+               & "<joinattributes>true</joinattributes>" _
+               & "</arguments>" _
+               & "</function>"
+        lQueries.Add(lQuery)
 
         Dim lRegion As String = aRegion
         lRegion = aRegion.Substring(0, aRegion.IndexOf("<projection>")) & "<preferredformat>" & "Closest" & "</preferredformat>" & aRegion.Substring(aRegion.IndexOf("<projection>"))
@@ -358,7 +361,7 @@ StartOver:
                & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
                & "<SaveWDM>met.wdm</SaveWDM>" _
                & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
-               & "<DesiredProjection>" & lProjection & "</DesiredProjection>" _
+               & "<DesiredProjection>" & lDesiredProjection & "</DesiredProjection>" _
                & lRegion _
                & "<clip>True</clip>" _
                & "<merge>False</merge>" _
@@ -408,7 +411,7 @@ StartOver:
             If Not aExistingMapWindowProject Then
                 'regular case, not coming from existing mapwindow project
                 'set mapwindow project projection to projection of first layer
-                g_MapWin.Project.ProjectProjection = lProjection
+                g_MapWin.Project.ProjectProjection = lDesiredProjection
 
                 Dim lKey As String = g_MapWin.Plugins.GetPluginKey("Tiled Map")
                 If Not String.IsNullOrEmpty(lKey) Then g_MapWin.Plugins.StopPlugin(lKey)
@@ -418,8 +421,57 @@ StartOver:
                 End If
             End If
 
+            're-project selected shape aoi if necessary
+            Dim lSelectedShape As MapWinGIS.Shape = lParms(1)
+            Dim lSelectedSf As New MapWinGIS.Shapefile
+            TryDeleteShapefile(aNewDataDir & "aoi.shp")
+            If lSelectedSf.CreateNew(aNewDataDir & "aoi.shp", ShpfileType.SHP_POLYGON) Then
+                If lSelectedSf.StartEditingShapes(True) Then
+                    If lSelectedSf.EditInsertShape(lSelectedShape, 0) Then
+                        If aAreaOfInterestProjection <> lDesiredProjection Then
+                            If MapWinGeoProc.SpatialReference.ProjectShapefile(aAreaOfInterestProjection, lDesiredProjection, lSelectedSf) Then
+                                If lSelectedSf.Open(aNewDataDir & "aoi.shp") Then
+                                    lParms(1) = lSelectedSf.Shape(0)
+                                End If
+                            End If
+                        End If
+                    End If
+                End If
+            End If
+
             'process the network 
-            ProcessNetwork(lParms)
+            Dim lSimplifiedFlowlinesFileName As String = ""
+            Dim lSimplifiedCatchmentsFileName As String = ""
+            ProcessNetwork(lParms, lSimplifiedFlowlinesFileName, lSimplifiedCatchmentsFileName)
+            If lSimplifiedFlowlinesFileName.Length > 0 Then
+                Dim shpFile As MapWinGIS.Shapefile
+                shpFile = New MapWinGIS.Shapefile
+                shpFile.Open(lSimplifiedFlowlinesFileName)
+                g_MapWin.Layers.Add(shpFile, "Simplified Flowlines")
+                shpFile.Close()
+            Else
+                lSimplifiedFlowlinesFileName = GisUtil.LayerFileName("Flowline Features")
+            End If
+            If lSimplifiedCatchmentsFileName.Length > 0 Then
+                Dim shpFile As MapWinGIS.Shapefile
+                shpFile = New MapWinGIS.Shapefile
+                shpFile.Open(lSimplifiedCatchmentsFileName)
+                g_MapWin.Layers.Add(shpFile, "Simplified Catchments")
+                shpFile.Close()
+            Else
+                lSimplifiedCatchmentsFileName = GisUtil.LayerFileName("Catchment")
+            End If
+
+            'if building hspf project, do this:
+            Dim lMetWDMFileName As String = GisUtil.LayerFileName("Weather Station Sites 2006")
+            Dim lLandUseFileName As String = GisUtil.LayerFileName("NLCD 2001")
+            Dim lElevationFileName As String = GisUtil.LayerFileName("Elevation")
+            BatchHSPF.BatchHSPF(lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName, _
+                                lLandUseFileName, lElevationFileName, _
+                                lMetWDMFileName, aNewDataDir, lParms(0))
+
+            'if building swat project, do this:
+
 
         End If
     End Sub

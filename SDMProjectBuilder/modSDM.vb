@@ -83,16 +83,18 @@ Public Module modSDM
         g_MapWin.Refresh()
     End Sub
 
-    Friend Sub ProcessNetwork(ByVal aParms() As Object)
+    Friend Sub ProcessNetwork(ByVal aParms() As Object, _
+                              ByRef aSimplifiedFlowlinesFileName As String, _
+                              ByRef aSimplifiedCatchmentsFileName As String)
         Dim lHuc As String = aParms(0)
         Dim lShapeOfInterest As MapWinGIS.Shape = aParms(1)
         Dim lProjectFolder As String = aParms(2)
         Dim lProblem As String = ""
 
-        Try
-            Dim lSimplifiedFlowlinesFileName As String
-            Dim lSimplifiedCatchmentsFileName As String
+        aSimplifiedFlowlinesFileName = ""
+        aSimplifiedCatchmentsFileName = ""
 
+        Try
             Dim lCatchmentsToUseFilename As String
             Dim lFlowLinesToUseFilename As String
 
@@ -126,8 +128,8 @@ Public Module modSDM
             Logger.Status("CombineShortOrBraidedFlowlines for " & lHuc & " with MinCatchment " & g_MinCatchmentKM2)
             CombineShortOrBraidedFlowlines(lFlowLinesToUseFilename, lCatchmentsToUseFilename, _
                                            g_MinCatchmentKM2, g_MinFlowlineKM)
-            lSimplifiedFlowlinesFileName = lFlowLinesToUseFilename.Replace("flowline", "flowlineNoShort")
-            lSimplifiedCatchmentsFileName = lCatchmentsToUseFilename.Replace("catchment", "catchmentNoShort")
+            aSimplifiedFlowlinesFileName = lFlowLinesToUseFilename.Replace("flowline", "flowlineNoShort")
+            aSimplifiedCatchmentsFileName = lCatchmentsToUseFilename.Replace("catchment", "catchmentNoShort")
 
             Logger.Status("DoneSimplifyHydrography")
             My.Computer.FileSystem.CurrentDirectory = lProjectFolder
