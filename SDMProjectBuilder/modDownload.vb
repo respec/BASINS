@@ -318,10 +318,8 @@ StartOver:
             lCacheFolder = aCacheFolder
         End If
 
-        Dim lParms(2) As Object
-        lParms(0) = GetSelectedHUC()
-        lParms(1) = GetSelectedShape()
-        lParms(2) = aNewDataDir
+        Dim lSelectedHuc As String = GetSelectedHUC()
+        Dim lSelectedShape As MapWinGIS.Shape = GetSelectedShape()
 
         lQuery = "<function name='GetNHDplus'>" _
                & "<arguments>" _
@@ -422,7 +420,6 @@ StartOver:
             End If
 
             're-project selected shape aoi if necessary
-            Dim lSelectedShape As MapWinGIS.Shape = lParms(1)
             Dim lSelectedSf As New MapWinGIS.Shapefile
             TryDeleteShapefile(aNewDataDir & "aoi.shp")
             If lSelectedSf.CreateNew(aNewDataDir & "aoi.shp", ShpfileType.SHP_POLYGON) Then
@@ -431,7 +428,7 @@ StartOver:
                         If aAreaOfInterestProjection <> lDesiredProjection Then
                             If MapWinGeoProc.SpatialReference.ProjectShapefile(aAreaOfInterestProjection, lDesiredProjection, lSelectedSf) Then
                                 If lSelectedSf.Open(aNewDataDir & "aoi.shp") Then
-                                    lParms(1) = lSelectedSf.Shape(0)
+                                    lSelectedShape = lSelectedSf.Shape(0)
                                 End If
                             End If
                         End If
@@ -442,7 +439,7 @@ StartOver:
             'process the network 
             Dim lSimplifiedFlowlinesFileName As String = ""
             Dim lSimplifiedCatchmentsFileName As String = ""
-            ProcessNetwork(lParms, lSimplifiedFlowlinesFileName, lSimplifiedCatchmentsFileName)
+            ProcessNetwork(lSelectedHuc, lSelectedShape, aNewDataDir, lSimplifiedFlowlinesFileName, lSimplifiedCatchmentsFileName)
             If lSimplifiedFlowlinesFileName.Length > 0 Then
                 Dim shpFile As MapWinGIS.Shapefile
                 shpFile = New MapWinGIS.Shapefile
@@ -463,15 +460,19 @@ StartOver:
             End If
 
             'if building hspf project, do this:
-            Dim lMetWDMFileName As String = GisUtil.LayerFileName("Weather Station Sites 2006")
-            Dim lLandUseFileName As String = GisUtil.LayerFileName("NLCD 2001")
-            Dim lElevationFileName As String = GisUtil.LayerFileName("Elevation")
-            BatchHSPF.BatchHSPF(lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName, _
-                                lLandUseFileName, lElevationFileName, _
-                                lMetWDMFileName, aNewDataDir, lParms(0))
+            If g_DoHSPF Then
+                Dim lMetWDMFileName As String = GisUtil.LayerFileName("Weather Station Sites 2006")
+                Dim lLandUseFileName As String = GisUtil.LayerFileName("NLCD 2001 Landcover")
+                Dim lElevationFileName As String = GisUtil.LayerFileName("NHDPlus Elevation")
+                BatchHSPF.BatchHSPF(lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName, _
+                                    lLandUseFileName, lElevationFileName, _
+                                    lMetWDMFileName, aNewDataDir, lSelectedHuc)
+            End If
 
             'if building swat project, do this:
-
+            If g_DoSWAT Then
+                BatchSWAT(lSelectedHuc, aNewDataDir, lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName)
+            End If
 
         End If
     End Sub
