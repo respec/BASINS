@@ -406,6 +406,7 @@ Public Class frmManDelin
         pStatusShowOriginal = GisUtil.StatusShow
         GisUtil.MappingObject = aMapWin
 
+        pProgressStatus.ProgressLabel = lblDelin
         pProgressStatusOriginal = Logger.ProgressStatus
         pProgressStatus.ProgressStatusOther = Logger.ProgressStatus
         Logger.ProgressStatus = pProgressStatus
@@ -476,6 +477,8 @@ Public Class frmManDelin
         cboLayer.Enabled = False
         cmdCommit.Enabled = True
         cmdCancel.Enabled = True
+        lblDelin.Text = "Click points on the map to delineate a new subbasin boundary.  When completed cli" & _
+                        "ck 'Commit' or right click on the map."
         lblDelin.Visible = True
         If pOperatingShapefileName.Length = 0 Then
             'first time to delineate
