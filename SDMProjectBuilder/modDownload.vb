@@ -444,7 +444,7 @@ StartOver:
                 Dim shpFile As MapWinGIS.Shapefile
                 shpFile = New MapWinGIS.Shapefile
                 shpFile.Open(lSimplifiedFlowlinesFileName)
-                g_MapWin.Layers.Add(shpFile, "Simplified Flowlines")
+                g_MapWin.Layers.Add(shpFile, "Simplified_Flowlines")
                 shpFile.Close()
             Else
                 lSimplifiedFlowlinesFileName = GisUtil.LayerFileName("Flowline Features")
@@ -453,7 +453,7 @@ StartOver:
                 Dim shpFile As MapWinGIS.Shapefile
                 shpFile = New MapWinGIS.Shapefile
                 shpFile.Open(lSimplifiedCatchmentsFileName)
-                g_MapWin.Layers.Add(shpFile, "Simplified Catchments")
+                g_MapWin.Layers.Add(shpFile, "Simplified_Catchments")
                 shpFile.Close()
             Else
                 lSimplifiedCatchmentsFileName = GisUtil.LayerFileName("Catchment")
@@ -461,7 +461,7 @@ StartOver:
 
             'if building hspf project, do this:
             If g_DoHSPF Then
-                Dim lMetWDMFileName As String = GisUtil.LayerFileName("Weather Station Sites 2006")
+                Dim lMetWDMFileName As String = PathNameOnly(GisUtil.LayerFileName("Weather Station Sites 2006")) & "\met.wdm"
                 Dim lLandUseFileName As String = GisUtil.LayerFileName("NLCD 2001 Landcover")
                 Dim lElevationFileName As String = GisUtil.LayerFileName("NHDPlus Elevation")
                 BatchHSPF.BatchHSPF(lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName, _

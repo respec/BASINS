@@ -103,14 +103,20 @@ Module BatchHSPF
 
         'if streams layer does not have required fields, calculate them
         If Not GisUtil.IsField(GisUtil.LayerIndex(pStreamLayerName), pStreamFields(1)) Then
-            If GisUtil.IsLayer("Streams") Then
-                'the calc reaches step adds a new streams layer, so remove any old one 
-                GisUtil.RemoveLayer(GisUtil.LayerIndex("Streams"))
-            End If
-            Dim lTempOutlets As String = ""
-            ManDelinPlugIn.CalculateReaches(pSubbasinLayerName, pStreamLayerName, aElevationLayerName, _
-                                            False, False, lTempOutlets, lElevationUnitsName)
-            pStreamLayerName = "Streams"
+            'assign subbasin numbers to each reach segment
+            Dim lMinField As Integer = 9999
+            ManDelinPlugIn.CalculateReachSubbasinIds(pStreamLayerName, _
+                                                     pSubbasinLayerName, _
+                                                     lMinField)
+            'add downstream subbasin ids
+            ManDelinPlugIn.CalculateReachDownstreamSubbasinIds(pStreamLayerName, _
+                                                               lMinField)
+            'calculate required reach parameters
+            ManDelinPlugIn.CalculateReachParameters(pStreamLayerName, _
+                                                    pSubbasinLayerName, _
+                                                    aElevationLayerName, _
+                                                    lElevationUnitsName, _
+                                                    lMinField)
         End If
 
         'for now assume that the met wdm only has one station in it

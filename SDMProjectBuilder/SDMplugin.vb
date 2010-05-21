@@ -1,5 +1,6 @@
 ﻿Imports atcData
 Imports atcUtility
+Imports atcMwGisUtility
 Imports MapWinUtility
 
 Public Class SDMplugin
@@ -83,6 +84,19 @@ Public Class SDMplugin
     Public Overrides Sub ShapesSelected(ByVal aHandle As Integer, ByVal aSelectInfo As MapWindow.Interfaces.SelectInfo)
         If NationalProjectIsOpen() Then
             UpdateSelectedFeatures()
+        Else
+            'for debugging
+            'Dim lMetWDMFileName As String = PathNameOnly(GisUtil.LayerFileName("Weather Station Sites 2006")) & "\met.wdm"
+            'Dim lLandUseFileName As String = GisUtil.LayerFileName("NLCD 2001 Landcover")
+            'Dim lElevationFileName As String = GisUtil.LayerFileName("NHDPlus Elevation")
+            'Dim lSimplifiedCatchmentsFileName As String = GisUtil.LayerFileName("Simplified_Catchments")
+            'Dim lSimplifiedFlowlinesFileName As String = GisUtil.LayerFileName("Simplified_Flowlines")
+            'Dim lDataDir As String = "C:\dev\BASINS40\data\02060006-11\"
+            'Dim lSelectedHuc As String = "02060006"
+            ''BatchHSPF.BatchHSPF(lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName, _
+            ''                    lLandUseFileName, lElevationFileName, _
+            ''                    lMetWDMFileName, lDataDir, lSelectedHuc)
+            'BatchSWAT(lSelectedHuc, lDataDir, lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName)
         End If
     End Sub
 
