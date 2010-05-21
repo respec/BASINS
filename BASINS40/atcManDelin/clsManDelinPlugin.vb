@@ -375,9 +375,8 @@ Public Class ManDelinPlugIn
         Logger.Status("Indexing...")
 
         Dim lMinField As Integer = 9999
-        'identify which fields contain the upstream and downstream reach ids
+        'identify which fields contain the reach ids
         Dim lReachField As Integer
-        Dim lDownReachField As Integer
         If GisUtil.IsField(lStreamsLayerIndex, "RIVRCH") Then
             lReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "RIVRCH")
         ElseIf GisUtil.IsField(lStreamsLayerIndex, "RCHID") Then
@@ -386,15 +385,6 @@ Public Class ManDelinPlugIn
             lReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "COMID")
         ElseIf GisUtil.IsField(lStreamsLayerIndex, "SUBBASIN") Then
             lReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "SUBBASIN")
-        End If
-        If GisUtil.IsField(lStreamsLayerIndex, "DSCSM") Then
-            lDownReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "DSCSM")
-        ElseIf GisUtil.IsField(lStreamsLayerIndex, "DSRCHID") Then
-            lDownReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "DSRCHID")
-        ElseIf GisUtil.IsField(lStreamsLayerIndex, "TOCOMID") Then
-            lDownReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "TOCOMID")
-        ElseIf GisUtil.IsField(lStreamsLayerIndex, "SUBBASINR") Then
-            lDownReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "SUBBASINR")
         End If
 
         'temporarily flag segments that have been clipped -- we'll want to know this later
@@ -423,30 +413,17 @@ Public Class ManDelinPlugIn
         GisUtil.StopSetFeatureValue(lStreamsLayerIndex)
 
         'assign subbasin numbers to each reach segment
-        Dim aIndex(GisUtil.NumFeatures(lStreamsLayerIndex)) As Integer
-        GisUtil.AssignContainingPolygons(lStreamsLayerIndex, lSubbasinLayerIndex, aIndex)
-        Dim ReachSubbasinFieldIndex As Integer
-        Dim SubbasinFieldIndex As Integer
-        SubbasinFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, "SUBBASIN")
-        ReachSubbasinFieldIndex = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "SUBBASIN", 1, 10)
-        If ReachSubbasinFieldIndex < lMinField Then lMinField = ReachSubbasinFieldIndex
-        GisUtil.StartSetFeatureValue(lStreamsLayerIndex)
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
-            Dim j As Integer
-            If aIndex(i) > -1 Then
-                j = GisUtil.FieldValue(lSubbasinLayerIndex, aIndex(i), SubbasinFieldIndex)
-            Else
-                j = aIndex(i)
-            End If
-            GisUtil.SetFeatureValueNoStartStop(lStreamsLayerIndex, ReachSubbasinFieldIndex, i - 1, j)
-        Next i
-        GisUtil.StopSetFeatureValue(lStreamsLayerIndex)
+        CalculateReachSubbasinIds("Streams", _
+                                  aSubbasinThemeName, _
+                                  lMinField)
 
         'clean out segments that are not within any subbasin, fix to clean up outliers in containing polygons
+        Dim lSubbasinFieldIndex As Integer = GisUtil.FieldIndex(lSubbasinLayerIndex, "SUBBASIN")
+        Dim lReachSubbasinFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "SUBBASIN", 1, 10)
         GisUtil.StartRemoveFeature(lStreamsLayerIndex)
         i = 0
         Do While i < GisUtil.NumFeatures(lStreamsLayerIndex)
-            If GisUtil.FieldValue(lStreamsLayerIndex, i, ReachSubbasinFieldIndex) < 0 Then
+            If GisUtil.FieldValue(lStreamsLayerIndex, i, lReachSubbasinFieldIndex) < 0 Then
                 'remove this feature
                 GisUtil.RemoveFeatureNoStartStop(lStreamsLayerIndex, i)
             Else
@@ -463,7 +440,7 @@ Public Class ManDelinPlugIn
             System.Windows.Forms.Application.DoEvents()
             Dim lLowestLevel As Integer = 999999
             For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
-                If GisUtil.FieldValue(lStreamsLayerIndex, i - 1, ReachSubbasinFieldIndex) = GisUtil.FieldValue(lSubbasinLayerIndex, lSubBasinIndex - 1, SubbasinFieldIndex) Then
+                If GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lReachSubbasinFieldIndex) = GisUtil.FieldValue(lSubbasinLayerIndex, lSubBasinIndex - 1, lSubbasinFieldIndex) Then
                     'this is in the subbasin of interest
                     Dim lLevel As Integer = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lLevelFieldIndex)
                     If lLevel < lLowestLevel And lLevel > 0 Then
@@ -476,7 +453,7 @@ Public Class ManDelinPlugIn
             GisUtil.StartRemoveFeature(lStreamsLayerIndex)
             i = 0
             Do While i < GisUtil.NumFeatures(lStreamsLayerIndex)
-                If GisUtil.FieldValue(lStreamsLayerIndex, i, ReachSubbasinFieldIndex) = GisUtil.FieldValue(lSubbasinLayerIndex, lSubBasinIndex - 1, SubbasinFieldIndex) Then
+                If GisUtil.FieldValue(lStreamsLayerIndex, i, lReachSubbasinFieldIndex) = GisUtil.FieldValue(lSubbasinLayerIndex, lSubBasinIndex - 1, lSubbasinFieldIndex) Then
                     'this is in the subbasin of interest
                     Dim lLevel As Integer = GisUtil.FieldValue(lStreamsLayerIndex, i, lLevelFieldIndex)
                     If lLevel <> lLowestLevel Then 'remove this feature
@@ -491,238 +468,20 @@ Public Class ManDelinPlugIn
             GisUtil.StopRemoveFeature(lStreamsLayerIndex)
         Next lSubBasinIndex
 
-        Logger.Status("Merging...")
-
         'add downstream subbasin ids
-        Dim lDownstreamFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "SUBBASINR", 1, 10)
-        If lDownstreamFieldIndex < lMinField Then lMinField = lDownstreamFieldIndex
-
-        Dim rval As String
-        Dim dval As String
-        Dim dsubbasin As String
-        Dim rsubbasin As String
-        GisUtil.StartSetFeatureValue(lStreamsLayerIndex)
-        'populate the downstream subbasin ids
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
-            Logger.Progress(i, GisUtil.NumFeatures(lStreamsLayerIndex))
-            System.Windows.Forms.Application.DoEvents()
-            dval = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lDownReachField)
-            'find what is downstream of rval
-            For lSteamIndexDown As Integer = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
-                rval = GisUtil.FieldValue(lStreamsLayerIndex, lSteamIndexDown - 1, lReachField)
-                If rval = dval Then
-                    'this is the downstream segment
-                    dsubbasin = GisUtil.FieldValue(lStreamsLayerIndex, lSteamIndexDown - 1, ReachSubbasinFieldIndex)
-                    rsubbasin = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, ReachSubbasinFieldIndex)
-                    'if the downstream subbasin id is different that this subbasin id
-                    'set it, and make the same change to all segments of this subbasin id
-                    If dsubbasin <> rsubbasin Then
-                        GisUtil.SetFeatureValueNoStartStop(lStreamsLayerIndex, lDownstreamFieldIndex, i - 1, dsubbasin)
-                        'make another pass to set each stream within a subbasin to the same subbasinr
-                        For lStreamIndex As Integer = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
-                            If GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, ReachSubbasinFieldIndex) = rsubbasin Then
-                                GisUtil.SetFeatureValueNoStartStop(lStreamsLayerIndex, lDownstreamFieldIndex, lStreamIndex - 1, dsubbasin)
-                            End If
-                        Next lStreamIndex
-                    End If
-                    'exit once we found what is downstream of this segment
-                    Exit For
-                End If
-            Next lSteamIndexDown
-        Next i
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
-            Logger.Progress(i, GisUtil.NumFeatures(lStreamsLayerIndex))
-            System.Windows.Forms.Application.DoEvents()
-            dval = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lDownstreamFieldIndex)
-            If dval = 0 Then
-                GisUtil.SetFeatureValueNoStartStop(lStreamsLayerIndex, lDownstreamFieldIndex, i - 1, -999)
-            End If
-        Next i
-        Logger.Progress(GisUtil.NumFeatures(lStreamsLayerIndex), GisUtil.NumFeatures(lStreamsLayerIndex))
-        GisUtil.StopSetFeatureValue(lStreamsLayerIndex)
+        CalculateReachDownstreamSubbasinIds("Streams", _
+                                            lMinField)
 
         'merge reach segments together within subbasin
-        GisUtil.MergeFeaturesBasedOnAttribute(lStreamsLayerIndex, ReachSubbasinFieldIndex, aCombine)
+        Logger.Status("Merging...")
+        GisUtil.MergeFeaturesBasedOnAttribute(lStreamsLayerIndex, lReachSubbasinFieldIndex, aCombine)
 
-        'create and populate fields
-        Logger.Status("Calculating attributes...")
-
-        'set length of stream reach
-        Dim lLengthFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "LEN2", 2, 10)
-        If lLengthFieldIndex < lMinField Then lMinField = lLengthFieldIndex
-        Dim r As Double
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
-            r = GisUtil.FeatureLength(lStreamsLayerIndex, i - 1)
-            GisUtil.SetFeatureValue(lStreamsLayerIndex, lLengthFieldIndex, i - 1, r)
-        Next i
-
-        'set local contributing area of stream reach
-        Dim AreaFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "LAREA", 2, 10)
-        If AreaFieldIndex < lMinField Then lMinField = AreaFieldIndex
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
-            rval = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, ReachSubbasinFieldIndex)
-            For lSubbasinIndex As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
-                dval = GisUtil.FieldValue(lSubbasinLayerIndex, lSubbasinIndex - 1, SubbasinFieldIndex)
-                If dval = rval Then
-                    r = GisUtil.FeatureArea(lSubbasinLayerIndex, lSubbasinIndex - 1)
-                    GisUtil.SetFeatureValue(lStreamsLayerIndex, AreaFieldIndex, i - 1, r)
-                    Exit For
-                End If
-            Next lSubbasinIndex
-        Next i
-
-        'set total contributing area of stream reach
-        Dim bfound As Boolean
-        Dim r2 As Double
-        Dim tAreaFieldIndex As Integer
-        tAreaFieldIndex = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "TAREA", 2, 20)
-        If tAreaFieldIndex < lMinField Then lMinField = tAreaFieldIndex
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
-            r = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, AreaFieldIndex)
-            GisUtil.SetFeatureValue(lStreamsLayerIndex, tAreaFieldIndex, i - 1, r)
-        Next i
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
-            Logger.Progress(i, GisUtil.NumFeatures(lStreamsLayerIndex))
-            System.Windows.Forms.Application.DoEvents()
-            r2 = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, AreaFieldIndex)                        'local area of this one
-            rval = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, ReachSubbasinFieldIndex)
-            'Logger.Dbg("ManDelin:adding area from feature " & rval)
-            'is there anything downstream of this one?
-            dval = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lDownstreamFieldIndex)
-            Do While dval > 0
-                'Logger.Dbg("ManDelin:" & dval & " downstream of " & rval)
-                bfound = False
-                For lStreamIndexDownstream As Integer = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
-                    rval = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndexDownstream - 1, ReachSubbasinFieldIndex)
-                    If rval = dval Then 'this is the one
-                        r = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndexDownstream - 1, tAreaFieldIndex)   'total area of downstream one
-                        GisUtil.SetFeatureValue(lStreamsLayerIndex, tAreaFieldIndex, lStreamIndexDownstream - 1, r + r2)
-                        'Logger.Dbg("ManDelin:" & rval & " area now " & r + r2)
-                        dval = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndexDownstream - 1, lDownstreamFieldIndex)
-                        bfound = True
-                        Exit For
-                    End If
-                Next lStreamIndexDownstream
-                If Not bfound Then
-                    dval = 0
-                End If
-            Loop
-        Next i
-        'add total contributing area in acres and square miles
-        Dim AreaAcresFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "TAREAACRES", 2, 20)
-        Dim AreaMi2FieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "TAREAMI2", 2, 10)
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
-            r = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, tAreaFieldIndex)
-            GisUtil.SetFeatureValue(lStreamsLayerIndex, AreaAcresFieldIndex, i - 1, r / 4046.86)
-            GisUtil.SetFeatureValue(lStreamsLayerIndex, AreaMi2FieldIndex, i - 1, r / 2589988)
-        Next i
-
-        'set stream width based on upstream area
-        Dim lFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "WID2", 2, 10)
-        If lFieldIndex < lMinField Then lMinField = lFieldIndex
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
-            r = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, tAreaFieldIndex)
-            r2 = (1.29) * ((r / 1000000) ^ (0.6))
-            GisUtil.SetFeatureValue(lStreamsLayerIndex, lFieldIndex, i - 1, r2)
-        Next i
-
-        'set depth based on upstream area
-        lFieldIndex = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "DEP2", 2, 10)
-        If lFieldIndex < lMinField Then lMinField = lFieldIndex
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
-            r = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, tAreaFieldIndex)
-            r2 = (0.13) * ((r / 1000000) ^ (0.4))
-            GisUtil.SetFeatureValue(lStreamsLayerIndex, lFieldIndex, i - 1, r2)
-        Next i
-
-        'set min elev
-        Dim lMinElevFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "MINEL", 1, 10)
-        If lMinElevFieldIndex < lMinField Then lMinField = lMinElevFieldIndex
-        'set max elev
-        Dim lMaxElevFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "MAXEL", 1, 10)
-        If lMaxElevFieldIndex < lMinField Then lMinField = lMaxElevFieldIndex
-
-        Dim x1 As Double
-        Dim x2 As Double
-        Dim y1 As Double
-        Dim y2 As Double
-        Dim gmin As Integer
-        Dim gmax As Integer
-        Dim gtemp As Integer
-        Dim lElevationLayerIndex As Integer = GisUtil.LayerIndex(aElevationThemeName)
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
-            'return end points of stream segment
-            GisUtil.EndPointsOfLine(lStreamsLayerIndex, i - 1, x1, y1, x2, y2)
-            If GisUtil.LayerType(lElevationLayerIndex) = 3 Then
-                'get shapefile value at point
-                Dim lElevation As Integer = GisUtil.PointInPolygonXY(x1, y1, lElevationLayerIndex)
-                Dim lElevationFieldIndex As Integer = GisUtil.FieldIndex(lElevationLayerIndex, "ELEV_M")
-                gmin = GisUtil.FieldValue(lElevationLayerIndex, lElevation, lElevationFieldIndex)
-                lElevation = GisUtil.PointInPolygonXY(x2, y2, lElevationLayerIndex)
-                gmax = GisUtil.FieldValue(lElevationLayerIndex, lElevation, lElevationFieldIndex)
-            Else 'get grid value at point
-                gmin = GisUtil.GridValueAtPoint(lElevationLayerIndex, x1, y1)
-                gmax = GisUtil.GridValueAtPoint(lElevationLayerIndex, x2, y2)
-            End If
-            If aElevUnits = "Centimeters" Then
-                gmin /= 100  'this is an ned grid (in cm), convert to meters
-                gmax /= 100
-            ElseIf aElevUnits = "Feet" Then
-                gmin /= 3.281  'this is a grid in ft, convert to meters
-                gmax /= 3.281
-            End If
-            If gmax < gmin Then
-                gtemp = gmin
-                gmin = gmax
-                gmax = gtemp
-            End If
-            GisUtil.SetFeatureValue(lStreamsLayerIndex, lMinElevFieldIndex, i - 1, gmin)
-            GisUtil.SetFeatureValue(lStreamsLayerIndex, lMaxElevFieldIndex, i - 1, gmax)
-        Next i
-
-        'set slope of stream reach
-        lFieldIndex = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "SLO2", 2, 10)
-        If lFieldIndex < lMinField Then lMinField = lFieldIndex
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
-            gmin = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lMinElevFieldIndex)
-            gmax = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lMaxElevFieldIndex)
-            gtemp = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lLengthFieldIndex)
-            GisUtil.SetFeatureValue(lStreamsLayerIndex, lFieldIndex, i - 1, (gmax - gmin) * 100 / gtemp)
-        Next i
-
-        'set name of each stream reach
-        lFieldIndex = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "SNAME", 0, 20)
-        If lFieldIndex < lMinField Then lMinField = lFieldIndex
-        Dim NameFieldIndex As Integer
-        Dim Name As String
-        If GisUtil.IsField(lStreamsLayerIndex, "PNAME") Then
-            NameFieldIndex = GisUtil.FieldIndex(lStreamsLayerIndex, "PNAME")
-        ElseIf GisUtil.IsField(lStreamsLayerIndex, "NAME") Then
-            NameFieldIndex = GisUtil.FieldIndex(lStreamsLayerIndex, "NAME")
-        ElseIf GisUtil.IsField(lStreamsLayerIndex, "GNIS_NAME") Then
-            NameFieldIndex = GisUtil.FieldIndex(lStreamsLayerIndex, "GNIS_NAME")
-        End If
-        If NameFieldIndex > -1 Then
-            For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
-                Name = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, NameFieldIndex)
-                GisUtil.SetFeatureValue(lStreamsLayerIndex, lFieldIndex, i - 1, Name)
-            Next i
-        End If
-        'add name to subbasin layer as well
-        NameFieldIndex = GisUtil.FieldIndexAddIfMissing(lSubbasinLayerIndex, "BNAME", 0, 20)
-        For i = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
-            dval = GisUtil.FieldValue(lSubbasinLayerIndex, i - 1, SubbasinFieldIndex)
-            For lSteamIndex As Integer = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
-                rval = GisUtil.FieldValue(lStreamsLayerIndex, lSteamIndex - 1, ReachSubbasinFieldIndex)
-                If rval = dval Then
-                    'this is the one
-                    If Len(Trim(GisUtil.FieldValue(lSubbasinLayerIndex, i - 1, NameFieldIndex))) = 0 Then
-                        GisUtil.SetFeatureValue(lSubbasinLayerIndex, NameFieldIndex, i - 1, GisUtil.FieldValue(lStreamsLayerIndex, lSteamIndex - 1, lFieldIndex))
-                        Exit For
-                    End If
-                End If
-            Next lSteamIndex
-        Next i
+        'calculate required reach parameters
+        CalculateReachParameters("Streams", _
+                                 aSubbasinThemeName, _
+                                 aElevationThemeName, _
+                                 aElevUnits, _
+                                 lMinField)
 
         'remove unwanted fields
         For i = 1 To lMinField
@@ -777,6 +536,10 @@ Public Class ManDelinPlugIn
         of4.Width = 10
         success = lShapefile.EditInsertField(of4, lShapefile.NumFields)
 
+        Dim x1 As Double
+        Dim x2 As Double
+        Dim y1 As Double
+        Dim y2 As Double
         'add points at each stream outlet
         For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
             Dim lShape As New MapWinGIS.Shape
@@ -835,6 +598,309 @@ Public Class ManDelinPlugIn
 
         Logger.Status("")
     End Sub
+
+    Public Shared Sub CalculateReachSubbasinIds(ByVal aStreamsLayerName As String, _
+                                                ByVal aSubbasinLayerName As String, _
+                                                ByRef aMinField As Integer)
+
+        'assign subbasin numbers to each reach segment
+        Dim lStreamsLayerIndex As Integer = GisUtil.LayerIndex(aStreamsLayerName)
+        Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(aSubbasinLayerName)
+
+        Dim aIndex(GisUtil.NumFeatures(lStreamsLayerIndex)) As Integer
+        GisUtil.AssignContainingPolygons(lStreamsLayerIndex, lSubbasinLayerIndex, aIndex)
+
+        Dim lSubbasinFieldIndex As Integer = GisUtil.FieldIndex(lSubbasinLayerIndex, "SUBBASIN")
+        Dim lReachSubbasinFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "SUBBASIN", 1, 10)
+        If lReachSubbasinFieldIndex < aMinField Then aMinField = lReachSubbasinFieldIndex
+        GisUtil.StartSetFeatureValue(lStreamsLayerIndex)
+        For i As Integer = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+            Dim j As Integer
+            If aIndex(i) > -1 Then
+                j = GisUtil.FieldValue(lSubbasinLayerIndex, aIndex(i), lSubbasinFieldIndex)
+            Else
+                j = aIndex(i)
+            End If
+            GisUtil.SetFeatureValueNoStartStop(lStreamsLayerIndex, lReachSubbasinFieldIndex, i - 1, j)
+        Next i
+        GisUtil.StopSetFeatureValue(lStreamsLayerIndex)
+    End Sub
+
+    Public Shared Sub CalculateReachDownstreamSubbasinIds(ByVal aStreamsLayerName As String, _
+                                                          ByRef aMinField As Integer)
+
+        'add downstream subbasin ids
+        Dim lStreamsLayerIndex As Integer = GisUtil.LayerIndex(aStreamsLayerName)
+        Dim lReachSubbasinFieldIndex As Integer = GisUtil.FieldIndex(lStreamsLayerIndex, "SUBBASIN")
+
+        Dim lReachField As Integer
+        If GisUtil.IsField(lStreamsLayerIndex, "RIVRCH") Then
+            lReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "RIVRCH")
+        ElseIf GisUtil.IsField(lStreamsLayerIndex, "RCHID") Then
+            lReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "RCHID")
+        ElseIf GisUtil.IsField(lStreamsLayerIndex, "COMID") Then
+            lReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "COMID")
+        ElseIf GisUtil.IsField(lStreamsLayerIndex, "SUBBASIN") Then
+            lReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "SUBBASIN")
+        End If
+        Dim lDownReachField As Integer
+        If GisUtil.IsField(lStreamsLayerIndex, "DSCSM") Then
+            lDownReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "DSCSM")
+        ElseIf GisUtil.IsField(lStreamsLayerIndex, "DSRCHID") Then
+            lDownReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "DSRCHID")
+        ElseIf GisUtil.IsField(lStreamsLayerIndex, "TOCOMID") Then
+            lDownReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "TOCOMID")
+        ElseIf GisUtil.IsField(lStreamsLayerIndex, "SUBBASINR") Then
+            lDownReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "SUBBASINR")
+        End If
+
+        Dim lDownstreamFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "SUBBASINR", 1, 10)
+        If lDownstreamFieldIndex < aMinField Then aMinField = lDownstreamFieldIndex
+
+        Dim rval As String
+        Dim dval As String
+        Dim dsubbasin As String
+        Dim rsubbasin As String
+        Dim i As Integer
+        GisUtil.StartSetFeatureValue(lStreamsLayerIndex)
+        'populate the downstream subbasin ids
+        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+            Logger.Progress(i, GisUtil.NumFeatures(lStreamsLayerIndex))
+            System.Windows.Forms.Application.DoEvents()
+            dval = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lDownReachField)
+            'find what is downstream of rval
+            For lSteamIndexDown As Integer = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+                rval = GisUtil.FieldValue(lStreamsLayerIndex, lSteamIndexDown - 1, lReachField)
+                If rval = dval Then
+                    'this is the downstream segment
+                    dsubbasin = GisUtil.FieldValue(lStreamsLayerIndex, lSteamIndexDown - 1, lReachSubbasinFieldIndex)
+                    rsubbasin = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lReachSubbasinFieldIndex)
+                    'if the downstream subbasin id is different that this subbasin id
+                    'set it, and make the same change to all segments of this subbasin id
+                    If dsubbasin <> rsubbasin Then
+                        GisUtil.SetFeatureValueNoStartStop(lStreamsLayerIndex, lDownstreamFieldIndex, i - 1, dsubbasin)
+                        'make another pass to set each stream within a subbasin to the same subbasinr
+                        For lStreamIndex As Integer = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+                            If GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndex - 1, lReachSubbasinFieldIndex) = rsubbasin Then
+                                GisUtil.SetFeatureValueNoStartStop(lStreamsLayerIndex, lDownstreamFieldIndex, lStreamIndex - 1, dsubbasin)
+                            End If
+                        Next lStreamIndex
+                    End If
+                    'exit once we found what is downstream of this segment
+                    Exit For
+                End If
+            Next lSteamIndexDown
+        Next i
+        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+            Logger.Progress(i, GisUtil.NumFeatures(lStreamsLayerIndex))
+            System.Windows.Forms.Application.DoEvents()
+            dval = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lDownstreamFieldIndex)
+            If dval = 0 Then
+                GisUtil.SetFeatureValueNoStartStop(lStreamsLayerIndex, lDownstreamFieldIndex, i - 1, -999)
+            End If
+        Next i
+        Logger.Progress(GisUtil.NumFeatures(lStreamsLayerIndex), GisUtil.NumFeatures(lStreamsLayerIndex))
+        GisUtil.StopSetFeatureValue(lStreamsLayerIndex)
+    End Sub
+
+    Public Shared Sub CalculateReachParameters(ByVal aStreamsLayerName As String, _
+                                               ByVal aSubbasinThemeName As String, _
+                                               ByVal aElevationThemeName As String, _
+                                               ByVal aElevUnits As String, _
+                                               ByRef aMinField As Integer)
+
+        'create and populate fields
+        Logger.Status("Calculating attributes...")
+
+        Dim lStreamsLayerIndex As Integer = GisUtil.LayerIndex(aStreamsLayerName)
+        Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(aSubbasinThemeName)
+
+        Dim lSubbasinFieldIndex As Integer = GisUtil.FieldIndex(lSubbasinLayerIndex, "SUBBASIN")
+        Dim lReachSubbasinFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "SUBBASIN", 1, 10)
+        Dim lDownstreamFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "SUBBASINR", 1, 10)
+
+        'set length of stream reach
+        Dim lLengthFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "LEN2", 2, 10)
+        If lLengthFieldIndex < aMinField Then aMinField = lLengthFieldIndex
+        Dim r As Double
+        Dim i As Integer
+        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+            r = GisUtil.FeatureLength(lStreamsLayerIndex, i - 1)
+            GisUtil.SetFeatureValue(lStreamsLayerIndex, lLengthFieldIndex, i - 1, r)
+        Next i
+
+        'set local contributing area of stream reach
+        Dim rval As String
+        Dim dval As String
+        Dim AreaFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "LAREA", 2, 10)
+        If AreaFieldIndex < aMinField Then aMinField = AreaFieldIndex
+        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+            rval = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lReachSubbasinFieldIndex)
+            For lSubbasinIndex As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
+                dval = GisUtil.FieldValue(lSubbasinLayerIndex, lSubbasinIndex - 1, lSubbasinFieldIndex)
+                If dval = rval Then
+                    r = GisUtil.FeatureArea(lSubbasinLayerIndex, lSubbasinIndex - 1)
+                    GisUtil.SetFeatureValue(lStreamsLayerIndex, AreaFieldIndex, i - 1, r)
+                    Exit For
+                End If
+            Next lSubbasinIndex
+        Next i
+
+        'set total contributing area of stream reach
+        Dim bfound As Boolean
+        Dim r2 As Double
+        Dim tAreaFieldIndex As Integer
+        tAreaFieldIndex = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "TAREA", 2, 20)
+        If tAreaFieldIndex < aMinField Then aMinField = tAreaFieldIndex
+        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+            r = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, AreaFieldIndex)
+            GisUtil.SetFeatureValue(lStreamsLayerIndex, tAreaFieldIndex, i - 1, r)
+        Next i
+        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+            Logger.Progress(i, GisUtil.NumFeatures(lStreamsLayerIndex))
+            System.Windows.Forms.Application.DoEvents()
+            r2 = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, AreaFieldIndex)                        'local area of this one
+            rval = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lReachSubbasinFieldIndex)
+            'Logger.Dbg("ManDelin:adding area from feature " & rval)
+            'is there anything downstream of this one?
+            dval = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lDownstreamFieldIndex)
+            Do While dval > 0
+                'Logger.Dbg("ManDelin:" & dval & " downstream of " & rval)
+                bfound = False
+                For lStreamIndexDownstream As Integer = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+                    rval = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndexDownstream - 1, lReachSubbasinFieldIndex)
+                    If rval = dval Then 'this is the one
+                        r = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndexDownstream - 1, tAreaFieldIndex)   'total area of downstream one
+                        GisUtil.SetFeatureValue(lStreamsLayerIndex, tAreaFieldIndex, lStreamIndexDownstream - 1, r + r2)
+                        'Logger.Dbg("ManDelin:" & rval & " area now " & r + r2)
+                        dval = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndexDownstream - 1, lDownstreamFieldIndex)
+                        bfound = True
+                        Exit For
+                    End If
+                Next lStreamIndexDownstream
+                If Not bfound Then
+                    dval = 0
+                End If
+            Loop
+        Next i
+        'add total contributing area in acres and square miles
+        Dim AreaAcresFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "TAREAACRES", 2, 20)
+        Dim AreaMi2FieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "TAREAMI2", 2, 10)
+        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+            r = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, tAreaFieldIndex)
+            GisUtil.SetFeatureValue(lStreamsLayerIndex, AreaAcresFieldIndex, i - 1, r / 4046.86)
+            GisUtil.SetFeatureValue(lStreamsLayerIndex, AreaMi2FieldIndex, i - 1, r / 2589988)
+        Next i
+
+        'set stream width based on upstream area
+        Dim lFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "WID2", 2, 10)
+        If lFieldIndex < aMinField Then aMinField = lFieldIndex
+        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+            r = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, tAreaFieldIndex)
+            r2 = (1.29) * ((r / 1000000) ^ (0.6))
+            GisUtil.SetFeatureValue(lStreamsLayerIndex, lFieldIndex, i - 1, r2)
+        Next i
+
+        'set depth based on upstream area
+        lFieldIndex = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "DEP2", 2, 10)
+        If lFieldIndex < aMinField Then aMinField = lFieldIndex
+        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+            r = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, tAreaFieldIndex)
+            r2 = (0.13) * ((r / 1000000) ^ (0.4))
+            GisUtil.SetFeatureValue(lStreamsLayerIndex, lFieldIndex, i - 1, r2)
+        Next i
+
+        'set min elev
+        Dim lMinElevFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "MINEL", 1, 10)
+        If lMinElevFieldIndex < aMinField Then aMinField = lMinElevFieldIndex
+        'set max elev
+        Dim lMaxElevFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "MAXEL", 1, 10)
+        If lMaxElevFieldIndex < aMinField Then aMinField = lMaxElevFieldIndex
+
+        Dim x1 As Double
+        Dim x2 As Double
+        Dim y1 As Double
+        Dim y2 As Double
+        Dim gmin As Integer
+        Dim gmax As Integer
+        Dim gtemp As Integer
+        Dim lElevationLayerIndex As Integer = GisUtil.LayerIndex(aElevationThemeName)
+        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+            'return end points of stream segment
+            GisUtil.EndPointsOfLine(lStreamsLayerIndex, i - 1, x1, y1, x2, y2)
+            If GisUtil.LayerType(lElevationLayerIndex) = 3 Then
+                'get shapefile value at point
+                Dim lElevation As Integer = GisUtil.PointInPolygonXY(x1, y1, lElevationLayerIndex)
+                Dim lElevationFieldIndex As Integer = GisUtil.FieldIndex(lElevationLayerIndex, "ELEV_M")
+                gmin = GisUtil.FieldValue(lElevationLayerIndex, lElevation, lElevationFieldIndex)
+                lElevation = GisUtil.PointInPolygonXY(x2, y2, lElevationLayerIndex)
+                gmax = GisUtil.FieldValue(lElevationLayerIndex, lElevation, lElevationFieldIndex)
+            Else 'get grid value at point
+                gmin = GisUtil.GridValueAtPoint(lElevationLayerIndex, x1, y1)
+                gmax = GisUtil.GridValueAtPoint(lElevationLayerIndex, x2, y2)
+            End If
+            If aElevUnits = "Centimeters" Then
+                gmin /= 100  'this is an ned grid (in cm), convert to meters
+                gmax /= 100
+            ElseIf aElevUnits = "Feet" Then
+                gmin /= 3.281  'this is a grid in ft, convert to meters
+                gmax /= 3.281
+            End If
+            If gmax < gmin Then
+                gtemp = gmin
+                gmin = gmax
+                gmax = gtemp
+            End If
+            GisUtil.SetFeatureValue(lStreamsLayerIndex, lMinElevFieldIndex, i - 1, gmin)
+            GisUtil.SetFeatureValue(lStreamsLayerIndex, lMaxElevFieldIndex, i - 1, gmax)
+        Next i
+
+        'set slope of stream reach
+        lFieldIndex = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "SLO2", 2, 10)
+        If lFieldIndex < aMinField Then aMinField = lFieldIndex
+        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+            gmin = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lMinElevFieldIndex)
+            gmax = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lMaxElevFieldIndex)
+            gtemp = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lLengthFieldIndex)
+            GisUtil.SetFeatureValue(lStreamsLayerIndex, lFieldIndex, i - 1, (gmax - gmin) * 100 / gtemp)
+        Next i
+
+        'set name of each stream reach
+        lFieldIndex = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "SNAME", 0, 20)
+        If lFieldIndex < aMinField Then aMinField = lFieldIndex
+        Dim NameFieldIndex As Integer
+        Dim Name As String
+        If GisUtil.IsField(lStreamsLayerIndex, "PNAME") Then
+            NameFieldIndex = GisUtil.FieldIndex(lStreamsLayerIndex, "PNAME")
+        ElseIf GisUtil.IsField(lStreamsLayerIndex, "NAME") Then
+            NameFieldIndex = GisUtil.FieldIndex(lStreamsLayerIndex, "NAME")
+        ElseIf GisUtil.IsField(lStreamsLayerIndex, "GNIS_NAME") Then
+            NameFieldIndex = GisUtil.FieldIndex(lStreamsLayerIndex, "GNIS_NAME")
+        End If
+        If NameFieldIndex > -1 Then
+            For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+                Name = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, NameFieldIndex)
+                GisUtil.SetFeatureValue(lStreamsLayerIndex, lFieldIndex, i - 1, Name)
+            Next i
+        End If
+        'add name to subbasin layer as well
+        NameFieldIndex = GisUtil.FieldIndexAddIfMissing(lSubbasinLayerIndex, "BNAME", 0, 20)
+        For i = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
+            dval = GisUtil.FieldValue(lSubbasinLayerIndex, i - 1, lSubbasinFieldIndex)
+            For lSteamIndex As Integer = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+                rval = GisUtil.FieldValue(lStreamsLayerIndex, lSteamIndex - 1, lReachSubbasinFieldIndex)
+                If rval = dval Then
+                    'this is the one
+                    If Len(Trim(GisUtil.FieldValue(lSubbasinLayerIndex, i - 1, NameFieldIndex))) = 0 Then
+                        GisUtil.SetFeatureValue(lSubbasinLayerIndex, NameFieldIndex, i - 1, GisUtil.FieldValue(lStreamsLayerIndex, lSteamIndex - 1, lFieldIndex))
+                        Exit For
+                    End If
+                End If
+            Next lSteamIndex
+        Next i
+
+        Logger.Status("")
+    End Sub
 End Class
 
 Public Class clsProgressStatus
@@ -842,7 +908,7 @@ Public Class clsProgressStatus
 
     Private pLabel As Windows.Forms.Label
     Private pForm As Windows.Forms.Form
-    Private pMessage As String
+    Private pMessage As String = ""
     Private pProgressStatusOther As MapWinUtility.IProgressStatus
 
     Friend WriteOnly Property ProgressLabel() As Windows.Forms.Label
