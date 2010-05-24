@@ -31,6 +31,22 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\..\D4EM\Bin\</OutputPath>
@@ -61,14 +77,14 @@
     </DefineConstants>
     <DefineDebug>false</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <DebugSymbols>false</DebugSymbols>
+    <DebugSymbols>true</DebugSymbols>
     <Optimize>true</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032</NoWarn>
-    <DebugType>none</DebugType>
+    <DebugType>pdbonly</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MapWinInterfaces, Version=4.6.3175.34926, Culture=neutral, processorArchitecture=MSIL">
@@ -132,6 +148,17 @@
     <Compile Include="atcDataSource.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="atcSeasonBase.vb" />
+    <Compile Include="atcSeasonsAMorPM.vb" />
+    <Compile Include="atcSeasonsCalendarYear.vb" />
+    <Compile Include="atcSeasonsDayOfMonth.vb" />
+    <Compile Include="atcSeasonsDayOfWeek.vb" />
+    <Compile Include="atcSeasonsDayOfYear.vb" />
+    <Compile Include="atcSeasonsHour.vb" />
+    <Compile Include="atcSeasonsMonth.vb" />
+    <Compile Include="atcSeasonsTraditional.vb" />
+    <Compile Include="atcSeasonsWaterYear.vb" />
+    <Compile Include="atcSeasonsYearSubset.vb" />
     <Compile Include="atcSeasonYears.Designer.vb">
       <DependentUpon>atcSeasonYears.vb</DependentUpon>
     </Compile>
@@ -162,6 +189,12 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmSelectDisplay.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSpecifySeasonalAttributes.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSpecifyYearSubset.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="modMetData.vb" />
@@ -199,6 +232,14 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmSelectDisplay.resx">
       <DependentUpon>frmSelectDisplay.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSpecifySeasonalAttributes.resx">
+      <DependentUpon>frmSpecifySeasonalAttributes.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSpecifyYearSubset.resx">
+      <DependentUpon>frmSpecifyYearSubset.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
