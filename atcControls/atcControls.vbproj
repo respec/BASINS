@@ -123,6 +123,12 @@
     <Compile Include="atcGridSourceTable.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="atcManagedList.Designer.vb">
+      <DependentUpon>atcManagedList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="atcManagedList.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="atcSelectList.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -145,6 +151,9 @@
     <EmbeddedResource Include="atcGrid.resx">
       <DependentUpon>atcGrid.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="atcManagedList.resx">
+      <DependentUpon>atcManagedList.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="atcSelectList.resx">
       <DependentUpon>atcSelectList.vb</DependentUpon>
