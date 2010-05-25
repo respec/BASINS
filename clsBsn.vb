@@ -96,29 +96,34 @@ Partial Class SwatInput
                        & " ) Values ('" & atcUtility.FieldValues(Me, "', '") & "'  )"
         End Function
 
-        Public Function Units() As Dictionary(Of String, String)
+        Public Shared ReadOnly Property Units() As Dictionary(Of String, String)
 
-            Dim unitsDictionary As New Dictionary(Of String, String)
+            Get
+                Dim unitsDictionary As New Dictionary(Of String, String)
 
-            unitsDictionary.Add("SFTMP", "C")
-            unitsDictionary.Add("SMTMP", "C")
-            unitsDictionary.Add("SMFMX", "mm H2O/degC-day")
-            unitsDictionary.Add("SMFMN", "mm H2O/degC-day")
-            unitsDictionary.Add("SNOCOVMX", "mm")
-            unitsDictionary.Add("EVLAI", "m2/m2")
-            unitsDictionary.Add("SURLAG", "days")
-            unitsDictionary.Add("RCN", "mg N/l")
-            unitsDictionary.Add("WDPQ", "1/day")
-            unitsDictionary.Add("WGPQ", "1/day")
-            unitsDictionary.Add("WDLPQ", "1/day")
-            unitsDictionary.Add("WGLPQ", "1/day")
-            unitsDictionary.Add("WDPS", "1/day")
-            unitsDictionary.Add("WGPS", "1/day")
-            unitsDictionary.Add("WDLPS", "1/day")
-            unitsDictionary.Add("WGLPS", "1/day")
+                unitsDictionary.Add("SFTMP", "C")
+                unitsDictionary.Add("SMTMP", "C")
+                unitsDictionary.Add("SMFMX", "mm H2O/degC-day")
+                unitsDictionary.Add("SMFMN", "mm H2O/degC-day")
+                unitsDictionary.Add("SNOCOVMX", "mm")
+                unitsDictionary.Add("EVLAI", "m2/m2")
+                unitsDictionary.Add("SURLAG", "days")
+                unitsDictionary.Add("RCN", "mg N/l")
+                unitsDictionary.Add("WDPQ", "1/day")
+                unitsDictionary.Add("WGPQ", "1/day")
+                unitsDictionary.Add("WDLPQ", "1/day")
+                unitsDictionary.Add("WGLPQ", "1/day")
+                unitsDictionary.Add("WDPS", "1/day")
+                unitsDictionary.Add("WGPS", "1/day")
+                unitsDictionary.Add("WDLPS", "1/day")
+                unitsDictionary.Add("WGLPS", "1/day")
 
-            Return unitsDictionary
-        End Function
+                Return unitsDictionary
+
+            End Get
+
+        End Property
+
     End Class
 
     ''' <summary>
