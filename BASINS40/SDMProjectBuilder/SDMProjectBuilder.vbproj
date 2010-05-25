@@ -209,6 +209,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>copy "C:\Documents and Settings\duda\Application Data\MapWindow\framessdm.mwcfg" "C:\Documents and Settings\duda\Application Data\MapWindow\mapwindow.mwcfg"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
