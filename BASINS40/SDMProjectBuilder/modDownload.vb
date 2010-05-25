@@ -444,20 +444,12 @@ StartOver:
             Dim lSimplifiedCatchmentsFileName As String = ""
             ProcessNetwork(lSelectedHuc, lSelectedShape, aNewDataDir, lSimplifiedFlowlinesFileName, lSimplifiedCatchmentsFileName)
             If lSimplifiedFlowlinesFileName.Length > 0 Then
-                Dim shpFile As MapWinGIS.Shapefile
-                shpFile = New MapWinGIS.Shapefile
-                shpFile.Open(lSimplifiedFlowlinesFileName)
-                g_MapWin.Layers.Add(shpFile, "Simplified_Flowlines")
-                shpFile.Close()
+                GisUtil.AddLayer(lSimplifiedFlowlinesFileName, "Simplified_Flowlines")
             Else
                 lSimplifiedFlowlinesFileName = GisUtil.LayerFileName("Flowline Features")
             End If
             If lSimplifiedCatchmentsFileName.Length > 0 Then
-                Dim shpFile As MapWinGIS.Shapefile
-                shpFile = New MapWinGIS.Shapefile
-                shpFile.Open(lSimplifiedCatchmentsFileName)
-                g_MapWin.Layers.Add(shpFile, "Simplified_Catchments")
-                shpFile.Close()
+                GisUtil.AddLayer(lSimplifiedCatchmentsFileName, "Simplified_Catchments")
             Else
                 lSimplifiedCatchmentsFileName = GisUtil.LayerFileName("Catchment")
             End If
