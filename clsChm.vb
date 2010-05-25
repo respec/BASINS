@@ -59,6 +59,30 @@ Partial Class SwatInput
                                & ArrayToString(PSTENR, "', '") & "' )"
             Return lSQL
         End Function
+
+        Public Shared ReadOnly Property Units() As Dictionary(Of String, String)
+
+            Get
+
+                Dim unitsDictionary As New Dictionary(Of String, String)
+
+                unitsDictionary.Add("SUBBASIN", "")
+                unitsDictionary.Add("HRU", "")
+                unitsDictionary.Add("LANDUSE", "")
+                unitsDictionary.Add("SOIL", "")
+                unitsDictionary.Add("SLOPE_CD", "")
+                unitsDictionary.Add("SOL_NO3(9)", "mg/kg")
+                unitsDictionary.Add("SOL_ORGN(9)", "mg/kg")
+                unitsDictionary.Add("SOL_LABP(9)", "mg/kg")
+                unitsDictionary.Add("SOL_ORGP(9)", "mg/kg")
+                unitsDictionary.Add("PESTNAME(9)", "")
+                unitsDictionary.Add("PLTPST(9)", "kg/ha")
+                unitsDictionary.Add("SOLPST(9)", "kg/ha")
+                unitsDictionary.Add("PSTENR(9)", "kg/ha")
+
+                Return unitsDictionary
+            End Get
+        End Property
     End Class
 
     ''' <summary>
