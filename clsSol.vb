@@ -86,6 +86,44 @@ Partial Class SwatInput
             Next
             Return lSQL & "')"
         End Function
+
+        Public Shared ReadOnly Property Units() As Dictionary(Of String, String)
+
+            Get
+                Dim unitsDictionary As New Dictionary(Of String, String)
+
+                unitsDictionary.Add("SUBBASIN", "")
+                unitsDictionary.Add("HRU", "")
+                unitsDictionary.Add("LANDUSE", "")
+                unitsDictionary.Add("SOIL", "")
+                unitsDictionary.Add("SLOPE_CD", "")
+                unitsDictionary.Add("SNAM", "")
+                unitsDictionary.Add("NLAYERS", "")
+                unitsDictionary.Add("HYDGRP", "")
+                unitsDictionary.Add("SOL_ZMX", "m")
+                unitsDictionary.Add("ANION_EXCL", "fraction")
+                unitsDictionary.Add("SOL_CRK", "")
+                unitsDictionary.Add("TEXTURE", "")
+                unitsDictionary.Add("SOL_Z", "mm")
+                unitsDictionary.Add("SOL_BD", "g/cc")
+                unitsDictionary.Add("SOL_AWC", "")
+                unitsDictionary.Add("SOL_K", "mm/hr")
+                unitsDictionary.Add("SOL_CBN", "percent")
+                unitsDictionary.Add("CLAY", "percent")
+                unitsDictionary.Add("SILT", "percent")
+                unitsDictionary.Add("SAND", "percent")
+                unitsDictionary.Add("ROCK", "percent")
+                unitsDictionary.Add("SOL_ALB", "")
+                unitsDictionary.Add("USLE_K", "")
+                unitsDictionary.Add("SOL_EC", "")
+
+                Return unitsDictionary
+
+            End Get
+
+        End Property
+
+
     End Class
 
     ''' <summary>
