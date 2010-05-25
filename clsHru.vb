@@ -60,6 +60,44 @@ Partial Class SwatInput
                  & ERORGN & "', '" & ERORGP & "', '" & POT_FR & "', '" & FLD_FR & "', '" & RIP_FR & "', '" _
                  & POT_TILE & "', '" & POT_VOLX & "', '" & POT_VOL & "', '" & POT_NSED & "', '" & POT_NO3L & "', '" & DEP_IMP & "', '" & DIS_STREAM & "'  )"
         End Function
+
+        Public Shared ReadOnly Property Units() As Dictionary(Of String, String)
+
+            Get
+
+                Dim unitsDictionary As New Dictionary(Of String, String)
+
+                unitsDictionary.Add("SUBBASIN", "")
+                unitsDictionary.Add("HRU", "")
+                unitsDictionary.Add("LANDUSE", "")
+                unitsDictionary.Add("SOIL", "")
+                unitsDictionary.Add("SLOPE_CD", "")
+                unitsDictionary.Add("HRU_FR", "")
+                unitsDictionary.Add("SLSUBBSN", "m")
+                unitsDictionary.Add("HRU_SLP", "m/m")
+                unitsDictionary.Add("OV_N", "")
+                unitsDictionary.Add("LAT_TTIME", "days")
+                unitsDictionary.Add("LAT_SED", "mg/l")
+                unitsDictionary.Add("SLSOIL", "m")
+                unitsDictionary.Add("CANMX", "mm")
+                unitsDictionary.Add("ESCO", "")
+                unitsDictionary.Add("EPCO", "")
+                unitsDictionary.Add("RSDIN", "kg/ha")
+                unitsDictionary.Add("ERORGN", "")
+                unitsDictionary.Add("ERORGP", "")
+                unitsDictionary.Add("POT_FR", "")
+                unitsDictionary.Add("FLD_FR", "")
+                unitsDictionary.Add("RIP_FR", "")
+                unitsDictionary.Add("POT_TILE", "m3/s")
+                unitsDictionary.Add("POT_VOLX", "m3")
+                unitsDictionary.Add("POT_VOL", "m3")
+                unitsDictionary.Add("POT_NSED", "mg/l")
+                unitsDictionary.Add("POT_NO3L", "1/day")
+                unitsDictionary.Add("DEP_IMP", "mm")
+
+                Return unitsDictionary
+            End Get
+        End Property
     End Class
 
     ''' <summary>
