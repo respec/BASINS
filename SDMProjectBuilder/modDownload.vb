@@ -287,7 +287,7 @@ StartOver:
                     g_MapWin.Project.Modified = False
                 Else
                     'download and project batch data
-                    CreateNewProjectAndDownloadBatchData(aRegion, lDataPath, lNewDataDir, lProjectFileName, lAreaOfInterestProjection)
+                    CreateNewProjectAndDownloadBatchData(aRegion, lDataPath, lNewDataDir, lProjectFileName, lAreaOfInterestProjection, lMyProjection)
                 End If
                 Return lProjectFileName
             End If
@@ -310,11 +310,11 @@ StartOver:
                                                     ByVal aNewDataDir As String, _
                                                     ByVal aProjectFileName As String, _
                                                     ByVal aAreaOfInterestProjection As String, _
+                                                    ByVal aDesiredProjection As String, _
                                                     Optional ByVal aExistingMapWindowProject As Boolean = False, _
                                                     Optional ByVal aCacheFolder As String = "")
         Dim lQuery As String
         Dim lQueries As New Generic.List(Of String)
-        Dim lDesiredProjection As String = CleanUpUserProjString(IO.File.ReadAllText(aNewDataDir & "prj.proj"))
 
         Dim lCacheFolder As String = IO.Path.Combine(aDataPath, "cache")
         If aCacheFolder.Length > 0 Then
@@ -331,7 +331,7 @@ StartOver:
                & "<DataType>elev_cm</DataType>" _
                & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
                & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
-               & "<DesiredProjection>" & lDesiredProjection & "</DesiredProjection>" _
+               & "<DesiredProjection>" & aDesiredProjection & "</DesiredProjection>" _
                & aRegion _
                & "<clip>False</clip>" _
                & "<merge>False</merge>" _
@@ -345,7 +345,7 @@ StartOver:
                & "<DataType>LandCover</DataType>" _
                & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
                & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
-               & "<DesiredProjection>" & lDesiredProjection & "</DesiredProjection>" _
+               & "<DesiredProjection>" & aDesiredProjection & "</DesiredProjection>" _
                & aRegion _
                & "<clip>False</clip>" _
                & "<merge>False</merge>" _
@@ -362,7 +362,7 @@ StartOver:
                & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
                & "<SaveWDM>met.wdm</SaveWDM>" _
                & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
-               & "<DesiredProjection>" & lDesiredProjection & "</DesiredProjection>" _
+               & "<DesiredProjection>" & aDesiredProjection & "</DesiredProjection>" _
                & lRegion _
                & "<clip>True</clip>" _
                & "<merge>False</merge>" _
@@ -412,7 +412,7 @@ StartOver:
             If Not aExistingMapWindowProject Then
                 'regular case, not coming from existing mapwindow project
                 'set mapwindow project projection to projection of first layer
-                g_MapWin.Project.ProjectProjection = lDesiredProjection
+                g_MapWin.Project.ProjectProjection = aDesiredProjection
 
                 Dim lKey As String = g_MapWin.Plugins.GetPluginKey("Tiled Map")
                 If Not String.IsNullOrEmpty(lKey) Then g_MapWin.Plugins.StopPlugin(lKey)
@@ -428,8 +428,8 @@ StartOver:
             If lSelectedSf.CreateNew(aNewDataDir & "aoi.shp", ShpfileType.SHP_POLYGON) Then
                 If lSelectedSf.StartEditingShapes(True) Then
                     If lSelectedSf.EditInsertShape(lSelectedShape, 0) Then
-                        If aAreaOfInterestProjection <> lDesiredProjection Then
-                            If MapWinGeoProc.SpatialReference.ProjectShapefile(aAreaOfInterestProjection, lDesiredProjection, lSelectedSf) Then
+                        If aAreaOfInterestProjection <> aDesiredProjection Then
+                            If MapWinGeoProc.SpatialReference.ProjectShapefile(aAreaOfInterestProjection, aDesiredProjection, lSelectedSf) Then
                                 If lSelectedSf.Open(aNewDataDir & "aoi.shp") Then
                                     lSelectedShape = lSelectedSf.Shape(0)
                                 End If
@@ -1736,6 +1736,8 @@ StartOver:
                 Select Case IO.Path.GetFileNameWithoutExtension(lCurLayer.Filename).ToLower
                     Case "cat", "huc", "huc250d3"
                         lFieldName = "CU"
+                    Case "huc12"
+                        lFieldName = "HUC_12"
                     Case "cnty"
                         lFieldName = "FIPS"
                     Case "st"
