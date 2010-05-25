@@ -33,6 +33,9 @@ Public Class SDMplugin
         g_MapWin.ApplicationInfo.WelcomePlugin = "plugin" 'tell the main app to Plugins.BroadcastMessage("WELCOME_SCREEN") instead of showing default MW welcome screen
         'Set g_ProgramDir to folder above the Bin folder where the app and plugins live
         g_ProgramDir = PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)) & g_PathChar
+
+        Logger.StartToFile(g_ProgramDir & "cache\log" & g_PathChar _
+                         & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & g_AppNameShort & ".log")
         Logger.Icon = g_MapWin.ApplicationInfo.FormIcon
 
         'Logger.MsgCustom("Test Message", "Test Title", "Button One", "2")
@@ -158,6 +161,8 @@ Public Class SDMplugin
             End Try
 
             UpdateSelectedFeatures()
+            g_MapWin.Toolbar.PressToolbarButton("tbbSelect")
+
         Else
             Logger.Msg("Unable to open national project", "Open National")
         End If
