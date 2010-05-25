@@ -46,6 +46,36 @@ Partial Class SwatInput
             Return "INSERT INTO gw ( SUBBASIN , HRU , LANDUSE , SOIL , SLOPE_CD , SHALLST , DEEPST , GW_DELAY , ALPHA_BF , GWQMN , GW_REVAP , REVAPMN , RCHRG_DP , GWHT , GW_SPYLD , SHALLST_N , GWSOLP , HLIFE_NGW  ) " _
                  & "Values ('" & SUBBASIN & "', '" & HRU & "', '" & LANDUSE & "', '" & SOIL & "', '" & SLOPE_CD & "', '" & SHALLST & "', '" & DEEPST & "', '" & GW_DELAY & "', '" & ALPHA_BF & "', '" & GWQMN & "', '" & GW_REVAP & "', '" & REVAPMN & "', '" & RCHRG_DP & "', '" & GWHT & "', '" & GW_SPYLD & "', '" & SHALLST_N & "', '" & GWSOLP & "', '" & HLIFE_NGW & "'  )"
         End Function
+
+        Public Shared ReadOnly Property Units() As Dictionary(Of String, String)
+
+            Get
+                Dim unitsDictionary As New Dictionary(Of String, String)
+
+                unitsDictionary.Add("SUBBASIN", "")
+                unitsDictionary.Add("HRU", "")
+                unitsDictionary.Add("LANDUSE", "")
+                unitsDictionary.Add("SOIL", "")
+                unitsDictionary.Add("SLOPE_CD", "")
+                unitsDictionary.Add("SHALLST", "mm")
+                unitsDictionary.Add("DEEPST", "mm")
+                unitsDictionary.Add("GW_DELAY", "days")
+                unitsDictionary.Add("ALPHA_BF", "days")
+                unitsDictionary.Add("GWQMN", "mm")
+                unitsDictionary.Add("GW_REVAP", "")
+                unitsDictionary.Add("REVAPMN", "mm")
+                unitsDictionary.Add("RCHRG_DP", "")
+                unitsDictionary.Add("GWHT", "m")
+                unitsDictionary.Add("GW_SPYLD", "m3/m3")
+                unitsDictionary.Add("SHALLST_N", "mg/L")
+                unitsDictionary.Add("GWSOLP", "mg/L")
+                unitsDictionary.Add("HLIFE_NGW", "days")
+
+                Return unitsDictionary
+
+            End Get
+        End Property
+
     End Class
 
     ''' <summary>
