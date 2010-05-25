@@ -163,17 +163,19 @@ Public Module modSDM
         aSimplifiedFlowlinesFileName = ""
         aSimplifiedCatchmentsFileName = ""
 
+        Dim lNHDPlusFolder As String = IO.Path.Combine(aNewDataDir, "nhdplus" & SafeSubstring(aSelectedHuc, 0, 8))
+
         Try
             Dim lCatchmentsToUseFilename As String
             Dim lFlowLinesToUseFilename As String
 
-            lCatchmentsToUseFilename = IO.Path.Combine(aNewDataDir, "nhdplus" & aSelectedHuc & "\drainage\catchment.shp")
-            lFlowLinesToUseFilename = IO.Path.Combine(aNewDataDir, "nhdplus" & aSelectedHuc & "\hydrography\nhdflowline.shp")
+            lCatchmentsToUseFilename = lNHDPlusFolder & "\drainage\catchment.shp"
+            lFlowLinesToUseFilename = lNHDPlusFolder & "\hydrography\nhdflowline.shp"
 
             Dim lFlowLinesShapeFilename As String = lFlowLinesToUseFilename
             Dim lCatchmentsShapeFilename As String = lCatchmentsToUseFilename
-            lCatchmentsToUseFilename = IO.Path.Combine(aNewDataDir, "nhdplus" & aSelectedHuc & "\drainage\usecatchment.shp")
-            lFlowLinesToUseFilename = IO.Path.Combine(aNewDataDir, "nhdplus" & aSelectedHuc & "\hydrography\usenhdflowline.shp")
+            lCatchmentsToUseFilename = lNHDPlusFolder & "\drainage\usecatchment.shp"
+            lFlowLinesToUseFilename = lNHDPlusFolder & "\hydrography\usenhdflowline.shp"
 
             Dim lCatchments As New MapWinGIS.Shapefile
             If lCatchments.Open(lCatchmentsShapeFilename) Then
