@@ -311,14 +311,21 @@ StartOver:
                                                     ByVal aProjectFileName As String, _
                                                     ByVal aAreaOfInterestProjection As String, _
                                                     ByVal aDesiredProjection As String, _
-                                                    Optional ByVal aExistingMapWindowProject As Boolean = False, _
-                                                    Optional ByVal aCacheFolder As String = "")
+                                                    Optional ByVal aExistingMapWindowProject As Boolean = False)
         Dim lQuery As String
         Dim lQueries As New Generic.List(Of String)
 
-        Dim lCacheFolder As String = IO.Path.Combine(aDataPath, "cache")
-        If aCacheFolder.Length > 0 Then
-            lCacheFolder = aCacheFolder
+        If g_CacheFolder Is Nothing OrElse g_CacheFolder.Length = 0 Then
+            g_CacheFolder = aDataPath
+            g_CacheFolder = g_CacheFolder.TrimEnd(g_PathChar)
+            If IsNumeric(IO.Path.GetFileName(g_CacheFolder)) Then
+                g_CacheFolder = IO.Path.GetDirectoryName(g_CacheFolder)
+            End If
+            If IO.Directory.Exists(IO.Path.Combine(IO.Path.GetDirectoryName(g_CacheFolder), "cache")) Then
+                g_CacheFolder = IO.Path.Combine(IO.Path.GetDirectoryName(g_CacheFolder), "cache")
+            Else
+                g_CacheFolder = IO.Path.Combine(g_CacheFolder, "cache")
+            End If
         End If
 
         Dim lSelectedHuc As String = GetSelectedHUC()
@@ -330,7 +337,7 @@ StartOver:
                & "<DataType>Catchment</DataType>" _
                & "<DataType>elev_cm</DataType>" _
                & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
-               & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
+               & "<CacheFolder>" & g_CacheFolder & "</CacheFolder>" _
                & "<DesiredProjection>" & aDesiredProjection & "</DesiredProjection>" _
                & aRegion _
                & "<clip>False</clip>" _
@@ -344,7 +351,7 @@ StartOver:
                & "<arguments>" _
                & "<DataType>LandCover</DataType>" _
                & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
-               & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
+               & "<CacheFolder>" & g_CacheFolder & "</CacheFolder>" _
                & "<DesiredProjection>" & aDesiredProjection & "</DesiredProjection>" _
                & aRegion _
                & "<clip>False</clip>" _
@@ -361,7 +368,7 @@ StartOver:
                & "<DataType>met</DataType>" _
                & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
                & "<SaveWDM>met.wdm</SaveWDM>" _
-               & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
+               & "<CacheFolder>" & g_CacheFolder & "</CacheFolder>" _
                & "<DesiredProjection>" & aDesiredProjection & "</DesiredProjection>" _
                & lRegion _
                & "<clip>True</clip>" _
@@ -372,6 +379,7 @@ StartOver:
 
         Dim lResult As String = ""
 
+        UnloadPlugin("Tiled Map")
         LoadPlugin("D4EM Data Download::BASINS")
         Dim lPlugins As New ArrayList
         For lPluginIndex As Integer = 0 To g_MapWin.Plugins.Count
@@ -413,9 +421,6 @@ StartOver:
                 'regular case, not coming from existing mapwindow project
                 'set mapwindow project projection to projection of first layer
                 g_MapWin.Project.ProjectProjection = aDesiredProjection
-
-                Dim lKey As String = g_MapWin.Plugins.GetPluginKey("Tiled Map")
-                If Not String.IsNullOrEmpty(lKey) Then g_MapWin.Plugins.StopPlugin(lKey)
 
                 If Not (g_MapWin.Project.Save(aProjectFileName)) Then
                     Logger.Dbg("CreateNewProjectAndDownloadBatchData:Save2Failed:" & g_MapWin.LastError)
@@ -482,6 +487,11 @@ StartOver:
         Catch e As Exception
             Logger.Dbg("Exception loading " & aPluginName & ": " & e.Message)
         End Try
+    End Sub
+
+    Private Sub UnloadPlugin(ByVal aPluginName As String)
+        Dim lKey As String = g_MapWin.Plugins.GetPluginKey(aPluginName)
+        If Not String.IsNullOrEmpty(lKey) Then g_MapWin.Plugins.StopPlugin(lKey)
     End Sub
 
     'Download new data for an existing project

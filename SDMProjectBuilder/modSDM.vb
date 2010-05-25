@@ -23,7 +23,7 @@ Public Module modSDM
     'Private g_BaseDrive As String = "g"
     'Private g_Project As String = "apes" '"0401" '
     Public g_BaseFolder As String
-    Private g_CacheFolder As String '= "d:\Basins\Cache\" 'Downloaded data is kept here to avoid downloading the same thing again later
+    Public g_CacheFolder As String '= "d:\Basins\Cache\" 'Downloaded data is kept here to avoid downloading the same thing again later
     Private g_SWATProgramBase As String = "C:\dev\BASINS40\Bin\Plugins\SWAT"
     Private g_SWATDatabaseName As String = g_SWATProgramBase & "\Databases\SWAT2005.mdb"
     'Private g_PresetCatchments As String = "" '"G:\Project\APES-Kraemer\ms_30m_01\Watershed\Shapes"
