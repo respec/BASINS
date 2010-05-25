@@ -1373,6 +1373,7 @@ Public Class GisUtil
         Dim lInsideId As Integer
         Dim lGridValue As Integer
 
+        If pStatusShow Then Logger.Status("Tabulating Areas...")
         For lRow As Integer = lStartingRow To lEndingRow
             For lCol As Integer = lStartingColumn To lEndingColumn
                 lInputGrid.CellToProj(lCol, lRow, lXPos, lYPos)
@@ -1389,7 +1390,7 @@ Public Class GisUtil
                     End If
                 End If
                 lCellCount += 1
-                If pStatusShow Then Logger.Progress("Tabulating Areas...", lCellCount, lTotalCellCount)
+                If pStatusShow Then Logger.Progress(lCellCount, lTotalCellCount)
             Next lCol
         Next lRow
 
