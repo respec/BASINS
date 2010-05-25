@@ -10,7 +10,7 @@ Public Module modSDM
     Friend g_DoHSPF As Boolean = True
     Friend g_DoSWAT As Boolean = True
     Private g_MinCatchmentKM2 As Double = 1.0 'Minimum catchment size
-    Private g_MinFlowlineKM As Double = 15.0 'Minimum flowline length
+    Private g_MinFlowlineKM As Double = 5.0 'Minimum flowline length
 
     Friend g_MapWinWindowHandle As Integer
     Friend g_ProgramDir As String = ""
@@ -299,15 +299,15 @@ Public Module modSDM
                 Logger.Status("CalculateFlowlinePropertyDone " & MemUsage())
 
                 Dim lSoilsLayer As String = g_BaseFolder & "soils\statsgoExcerpt.tif"
-                'Dim lLayers() As String = { _
-                ' aLandUseFileName & "|Tag=LandUse", _
-                ' lSoilsLayer & "|Tag=Soil", _
-                ' lSlopeReclassifyGridFileName & "|Tag=SlopeReclass", _
-                ' aSimplifiedCatchmentsFileName & "|IdField=0|IdName=COMID|Required=True|Tag=SubBasin"}
                 Dim lLayers() As String = { _
                  aLandUseFileName & "|Tag=LandUse", _
+                 lSoilsLayer & "|Tag=Soil", _
                  lSlopeReclassifyGridFileName & "|Tag=SlopeReclass", _
                  aSimplifiedCatchmentsFileName & "|IdField=0|IdName=COMID|Required=True|Tag=SubBasin"}
+                'Dim lLayers() As String = { _
+                ' aLandUseFileName & "|Tag=LandUse", _
+                ' lSlopeReclassifyGridFileName & "|Tag=SlopeReclass", _
+                ' aSimplifiedCatchmentsFileName & "|IdField=0|IdName=COMID|Required=True|Tag=SubBasin"}
                 pLayerFilenames = lLayers
 
                 If g_GeoProcess AndAlso pLayerFilenames Is Nothing OrElse pLayerFilenames.Length < 1 Then
@@ -316,15 +316,15 @@ Public Module modSDM
                 End If
 
                 If Not IO.File.Exists(lSoilsLayer) Then
-                    If Logger.Msg("Soils Layer " & lSoilsLayer & " does not exist.  Create an empty soils layer?", MsgBoxStyle.YesNo, "Soils Layer Problem") = MsgBoxResult.Yes Then
-                        Dim lSlopeGrid As New MapWinGIS.Grid
-                        Dim lSoilsGrid As New MapWinGIS.Grid
-                        MkDirPath(PathNameOnly(lSoilsLayer))
-                        lSlopeGrid.Open(lSlopeReclassifyGridFileName)
-                        lSoilsGrid.CreateNew(lSoilsLayer, lSlopeGrid.Header, MapWinGIS.GridDataType.LongDataType, 1)
-                        lSlopeGrid.Close()
-                        lSoilsGrid.Close()
-                    End If
+                    'If Logger.Msg("Soils Layer " & lSoilsLayer & " does not exist.  Create an empty soils layer?", MsgBoxStyle.YesNo, "Soils Layer Problem") = MsgBoxResult.Yes Then
+                    Dim lSlopeGrid As New MapWinGIS.Grid
+                    Dim lSoilsGrid As New MapWinGIS.Grid
+                    MkDirPath(PathNameOnly(lSoilsLayer))
+                    lSlopeGrid.Open(lSlopeReclassifyGridFileName)
+                    lSoilsGrid.CreateNew(lSoilsLayer, lSlopeGrid.Header, MapWinGIS.GridDataType.LongDataType, 1)
+                    lSlopeGrid.Close()
+                    lSoilsGrid.Close()
+                    'End If
                 End If
 
                 If g_GeoProcess Then 'Check for layer that does not exist (e.g. soils)

@@ -450,11 +450,13 @@ StartOver:
             ProcessNetwork(lSelectedHuc, lSelectedShape, aNewDataDir, lSimplifiedFlowlinesFileName, lSimplifiedCatchmentsFileName)
             If lSimplifiedFlowlinesFileName.Length > 0 Then
                 GisUtil.AddLayer(lSimplifiedFlowlinesFileName, "Simplified_Flowlines")
+                GisUtil.LayerVisible(GisUtil.LayerIndex(lSimplifiedFlowlinesFileName)) = True
             Else
                 lSimplifiedFlowlinesFileName = GisUtil.LayerFileName("Flowline Features")
             End If
             If lSimplifiedCatchmentsFileName.Length > 0 Then
                 GisUtil.AddLayer(lSimplifiedCatchmentsFileName, "Simplified_Catchments")
+                GisUtil.LayerVisible(GisUtil.LayerIndex(lSimplifiedCatchmentsFileName)) = True
             Else
                 lSimplifiedCatchmentsFileName = GisUtil.LayerFileName("Catchment")
             End If
