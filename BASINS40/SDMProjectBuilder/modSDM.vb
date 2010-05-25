@@ -24,7 +24,7 @@ Public Module modSDM
     'Private g_Project As String = "apes" '"0401" '
     Public g_BaseFolder As String
     Private g_CacheFolder As String '= "d:\Basins\Cache\" 'Downloaded data is kept here to avoid downloading the same thing again later
-    Private g_SWATProgramBase As String = "G:\BASINS"
+    Private g_SWATProgramBase As String = "C:\dev\BASINS40\Bin\Plugins\SWAT"
     Private g_SWATDatabaseName As String = g_SWATProgramBase & "\Databases\SWAT2005.mdb"
     'Private g_PresetCatchments As String = "" '"G:\Project\APES-Kraemer\ms_30m_01\Watershed\Shapes"
     'Private g_UseNhdPlus As Boolean = False
@@ -70,7 +70,7 @@ Public Module modSDM
     'Private pSlopeGridReclassFileName As String
     'Private pSubBasinFileName As String
     Private pLayerFilenames() As String
-    Private pResume As Boolean = True  'True to use existing full or partially complete overlay, False to do overlay from the start
+    Private pResume As Boolean = False  'True to use existing full or partially complete overlay, False to do overlay from the start
 
     Private pLastPrivateMemory As Integer = 0
     Private pLastGcMemory As Integer = 0
@@ -217,7 +217,9 @@ Public Module modSDM
 
     Friend Sub BatchSWAT(ByVal aHuc As String, ByVal aProjectFolder As String, _
                          ByVal aSimplifiedCatchmentsFileName As String, _
-                         ByVal aSimplifiedFlowlinesFileName As String)
+                         ByVal aSimplifiedFlowlinesFileName As String, _
+                         ByVal aLandUseFileName As String, _
+                         ByVal aDemGridFileName As String)
         Dim lProblem As String = ""
 
         Try
@@ -234,6 +236,12 @@ Public Module modSDM
             'Dim numRecs As Integer = modArcSWAT.ConvertFlowLineFile(lSimplifiedFlowlinesFileName, arcSwatFlowlines)
             ' End Generate files for running ArcSWAT
 
+            g_BaseFolder = aProjectFolder
+            If g_BuildDatabase AndAlso Not FileExists(g_SWATDatabaseName) Then
+                Logger.Msg("SWAT Database not found: '" & g_SWATDatabaseName & "'", "SWAT2005.mdb Required")
+                Exit Sub
+            End If
+
             Dim lHRUGridFileName As String = IO.Path.Combine(aProjectFolder, "HRUs.tif")
             Dim lHruTableFilename As String = IO.Path.ChangeExtension(lHRUGridFileName, ".table.txt")
             Dim lHruTable As D4EMDataManager.clsHruTable = Nothing
@@ -247,20 +255,19 @@ Public Module modSDM
 
             If g_GeoProcess Then
                 'Slope - Elevation
-                Dim lDemGridFilename As String = IO.Path.Combine(aProjectFolder, "nhdplus\elev_cm.tif")
-                Dim lSlopeGridFileName As String = IO.Path.Combine(aProjectFolder, "nhdplus\slope.tif")
+                Dim lSlopeGridFileName As String = PathNameOnly(aDemGridFileName) & "\slope.tif"
                 If IO.File.Exists(lSlopeGridFileName) Then
                     Logger.Status("UsingExisting " & lSlopeGridFileName)
                 Else
                     'z factor - cm to m
-                    If MapWinGeoProc.TerrainAnalysis.Slope(lDemGridFilename, 0.01, lSlopeGridFileName, True, Nothing) Then
+                    If MapWinGeoProc.TerrainAnalysis.Slope(aDemGridFileName, 0.01, lSlopeGridFileName, True, Nothing) Then
                         Logger.Status("Calculated Slopes " & MemUsage())
                     Else
-                        Logger.Status("Unable to calculate slope in  '" & lDemGridFilename & "'")
+                        Logger.Status("Unable to calculate slope in  '" & aDemGridFileName & "'")
                     End If
                 End If
 
-                Dim lSlopeReclassifyGridFileName As String = IO.Path.Combine(aProjectFolder, "nhdplus\slopeReclassify.tif")
+                Dim lSlopeReclassifyGridFileName As String = PathNameOnly(aDemGridFileName) & "\slopeReclassify.tif"
                 If IO.File.Exists(lSlopeReclassifyGridFileName) Then
                     Logger.Status("UsingExisting " & lSlopeReclassifyGridFileName)
                 Else
@@ -280,16 +287,56 @@ Public Module modSDM
 
                 'subbasin gis properties
                 Logger.Status("CalculateCatchmentProperty " & MemUsage())
-                CalculateCatchmentProperty(aSimplifiedCatchmentsFileName, lDemGridFilename)
+                CalculateCatchmentProperty(aSimplifiedCatchmentsFileName, aDemGridFileName)
                 Logger.Status("CalculateCatchmentPropertyDone " & MemUsage())
                 'flowline gis properties 
-                CalculateFlowlineProperty(aSimplifiedFlowlinesFileName, lDemGridFilename)
+                CalculateFlowlineProperty(aSimplifiedFlowlinesFileName, aDemGridFileName)
                 Logger.Status("CalculateFlowlinePropertyDone " & MemUsage())
+
+                Dim lSoilsLayer As String = g_BaseFolder & "soils\statsgoExcerpt.tif"
+                'Dim lLayers() As String = { _
+                ' aLandUseFileName & "|Tag=LandUse", _
+                ' lSoilsLayer & "|Tag=Soil", _
+                ' lSlopeReclassifyGridFileName & "|Tag=SlopeReclass", _
+                ' aSimplifiedCatchmentsFileName & "|IdField=0|IdName=COMID|Required=True|Tag=SubBasin"}
+                Dim lLayers() As String = { _
+                 aLandUseFileName & "|Tag=LandUse", _
+                 lSlopeReclassifyGridFileName & "|Tag=SlopeReclass", _
+                 aSimplifiedCatchmentsFileName & "|IdField=0|IdName=COMID|Required=True|Tag=SubBasin"}
+                pLayerFilenames = lLayers
+
+                If g_GeoProcess AndAlso pLayerFilenames Is Nothing OrElse pLayerFilenames.Length < 1 Then
+                    Logger.Msg("No layers specified for overlay", "Geoprocessing Overlay Requires Layers")
+                    Exit Sub
+                End If
+
+                If Not IO.File.Exists(lSoilsLayer) Then
+                    If Logger.Msg("Soils Layer " & lSoilsLayer & " does not exist.  Create an empty soils layer?", MsgBoxStyle.YesNo, "Soils Layer Problem") = MsgBoxResult.Yes Then
+                        Dim lSlopeGrid As New MapWinGIS.Grid
+                        Dim lSoilsGrid As New MapWinGIS.Grid
+                        MkDirPath(PathNameOnly(lSoilsLayer))
+                        lSlopeGrid.Open(lSlopeReclassifyGridFileName)
+                        lSoilsGrid.CreateNew(lSoilsLayer, lSlopeGrid.Header, MapWinGIS.GridDataType.LongDataType, 1)
+                        lSlopeGrid.Close()
+                        lSoilsGrid.Close()
+                    End If
+                End If
+
+                If g_GeoProcess Then 'Check for layer that does not exist (e.g. soils)
+                    For Each lLayerName As String In pLayerFilenames
+                        Dim lFileName As String = StrSplit(lLayerName, "|", "")
+                        If Not IO.File.Exists(lFileName) Then
+                            Logger.Msg(lFileName, "Layer for overlay does not exist")
+                            Exit Sub
+                        End If
+                    Next
+                End If
 
                 If pResume AndAlso IO.File.Exists(lHruTableFilename) Then
                     lHruTable = New D4EMDataManager.clsHruTable(lHruTableFilename)
                 End If
                 If lHruTable Is Nothing OrElse lHruTable.Count = 0 Then
+                    Logger.Status("Doing Overlay")
                     lHruTable = D4EMDataManager.clsOverlayReclassify.Overlay(lHRUGridFileName, _
                                                               lSlopeGridFileName, _
                                                               pResume, _

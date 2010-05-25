@@ -96,7 +96,8 @@ Public Class SDMplugin
             ''BatchHSPF.BatchHSPF(lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName, _
             ''                    lLandUseFileName, lElevationFileName, _
             ''                    lMetWDMFileName, lDataDir, lSelectedHuc)
-            'BatchSWAT(lSelectedHuc, lDataDir, lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName)
+            'BatchSWAT(lSelectedHuc, lDataDir, lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName, _
+            '          lLandUseFileName, lElevationFileName)
         End If
     End Sub
 

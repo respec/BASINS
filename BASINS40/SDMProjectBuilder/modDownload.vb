@@ -459,11 +459,12 @@ StartOver:
                 lSimplifiedCatchmentsFileName = GisUtil.LayerFileName("Catchment")
             End If
 
+            Dim lElevationFileName As String = GisUtil.LayerFileName("NHDPlus Elevation")
+            Dim lLandUseFileName As String = GisUtil.LayerFileName("NLCD 2001 Landcover")
+
             'if building hspf project, do this:
             If g_DoHSPF Then
                 Dim lMetWDMFileName As String = PathNameOnly(GisUtil.LayerFileName("Weather Station Sites 2006")) & "\met.wdm"
-                Dim lLandUseFileName As String = GisUtil.LayerFileName("NLCD 2001 Landcover")
-                Dim lElevationFileName As String = GisUtil.LayerFileName("NHDPlus Elevation")
                 BatchHSPF.BatchHSPF(lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName, _
                                     lLandUseFileName, lElevationFileName, _
                                     lMetWDMFileName, aNewDataDir, lSelectedHuc)
@@ -471,7 +472,8 @@ StartOver:
 
             'if building swat project, do this:
             If g_DoSWAT Then
-                BatchSWAT(lSelectedHuc, aNewDataDir, lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName)
+                BatchSWAT(lSelectedHuc, aNewDataDir, lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName, _
+                          lLandUseFileName, lElevationFileName)
             End If
 
         End If
