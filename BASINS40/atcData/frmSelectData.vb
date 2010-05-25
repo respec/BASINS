@@ -36,77 +36,229 @@ Friend Class frmSelectData
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    Friend WithEvents groupTop As System.Windows.Forms.GroupBox
     Friend WithEvents btnOk As System.Windows.Forms.Button
     Friend WithEvents btnCancel As System.Windows.Forms.Button
-    Friend WithEvents splitAboveSelected As System.Windows.Forms.Splitter
-    Friend WithEvents groupSelected As System.Windows.Forms.GroupBox
-    Friend WithEvents panelCriteria As System.Windows.Forms.Panel
-    Friend WithEvents splitAboveMatching As System.Windows.Forms.Splitter
-    Friend WithEvents lblMatching As System.Windows.Forms.Label
-    Friend WithEvents pMatchingGrid As atcControls.atcGrid
-    Friend WithEvents pSelectedGrid As atcControls.atcGrid
-    Friend WithEvents MainMenu1 As System.Windows.Forms.MainMenu
-    Friend WithEvents mnuAttributes As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuSelect As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuAttributesAdd As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuAttributesRemove As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuAttributesMove As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuSelectAllMatching As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuSelectClear As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuSelectNoMatching As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuFileManage As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuSelectAll As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuOpenData As System.Windows.Forms.MenuItem
     Friend WithEvents pnlButtons As System.Windows.Forms.Panel
     Friend WithEvents atcSelectedDates As atcData.atcChooseDataGroupDates
-    Friend WithEvents mnuSelectSep1 As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuSelectMap As System.Windows.Forms.MenuItem
     Friend WithEvents cboTimeUnits As System.Windows.Forms.ComboBox
     Friend WithEvents cboAggregate As System.Windows.Forms.ComboBox
     Friend WithEvents txtTimeStep As System.Windows.Forms.TextBox
+    Friend WithEvents MenuStrip1 As System.Windows.Forms.MenuStrip
+    Friend WithEvents mnuFile As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuOpenData As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuFileManage As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuSaveFilters As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuLoadFilters As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuAttributes As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuAttributesAdd As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuAttributesRemove As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuAttributesMove As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuSelect As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuSelectAll As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuSelectClear As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuSelectAllMatching As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuSelectNoMatching As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuSelectSep1 As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuSelectMap As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuHelp As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents groupTop As System.Windows.Forms.GroupBox
+    Friend WithEvents pMatchingGrid As atcControls.atcGrid
+    Friend WithEvents lblMatching As System.Windows.Forms.Label
+    Friend WithEvents splitAboveMatching As System.Windows.Forms.Splitter
+    Friend WithEvents panelCriteria As System.Windows.Forms.Panel
+    Friend WithEvents splitAboveSelected As System.Windows.Forms.Splitter
+    Friend WithEvents groupSelected As System.Windows.Forms.GroupBox
+    Friend WithEvents pSelectedGrid As atcControls.atcGrid
     Friend WithEvents chkTimeStep As System.Windows.Forms.CheckBox
-    Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSelectData))
-        Me.groupTop = New System.Windows.Forms.GroupBox
-        Me.pMatchingGrid = New atcControls.atcGrid
-        Me.lblMatching = New System.Windows.Forms.Label
-        Me.splitAboveMatching = New System.Windows.Forms.Splitter
-        Me.panelCriteria = New System.Windows.Forms.Panel
         Me.btnCancel = New System.Windows.Forms.Button
         Me.btnOk = New System.Windows.Forms.Button
-        Me.splitAboveSelected = New System.Windows.Forms.Splitter
-        Me.groupSelected = New System.Windows.Forms.GroupBox
-        Me.pSelectedGrid = New atcControls.atcGrid
-        Me.MainMenu1 = New System.Windows.Forms.MainMenu(Me.components)
-        Me.mnuFile = New System.Windows.Forms.MenuItem
-        Me.mnuOpenData = New System.Windows.Forms.MenuItem
-        Me.mnuFileManage = New System.Windows.Forms.MenuItem
-        Me.mnuAttributes = New System.Windows.Forms.MenuItem
-        Me.mnuAttributesAdd = New System.Windows.Forms.MenuItem
-        Me.mnuAttributesRemove = New System.Windows.Forms.MenuItem
-        Me.mnuAttributesMove = New System.Windows.Forms.MenuItem
-        Me.mnuSelect = New System.Windows.Forms.MenuItem
-        Me.mnuSelectAll = New System.Windows.Forms.MenuItem
-        Me.mnuSelectClear = New System.Windows.Forms.MenuItem
-        Me.mnuSelectAllMatching = New System.Windows.Forms.MenuItem
-        Me.mnuSelectNoMatching = New System.Windows.Forms.MenuItem
-        Me.mnuSelectSep1 = New System.Windows.Forms.MenuItem
-        Me.mnuSelectMap = New System.Windows.Forms.MenuItem
-        Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.pnlButtons = New System.Windows.Forms.Panel
         Me.cboTimeUnits = New System.Windows.Forms.ComboBox
         Me.cboAggregate = New System.Windows.Forms.ComboBox
         Me.txtTimeStep = New System.Windows.Forms.TextBox
         Me.chkTimeStep = New System.Windows.Forms.CheckBox
         Me.atcSelectedDates = New atcData.atcChooseDataGroupDates
+        Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
+        Me.mnuFile = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuOpenData = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuFileManage = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuSaveFilters = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuLoadFilters = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuAttributes = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuAttributesAdd = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuAttributesRemove = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuAttributesMove = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuSelect = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuSelectAll = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuSelectClear = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuSelectAllMatching = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuSelectNoMatching = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuSelectSep1 = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuSelectMap = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem
+        Me.groupTop = New System.Windows.Forms.GroupBox
+        Me.pMatchingGrid = New atcControls.atcGrid
+        Me.lblMatching = New System.Windows.Forms.Label
+        Me.splitAboveMatching = New System.Windows.Forms.Splitter
+        Me.panelCriteria = New System.Windows.Forms.Panel
+        Me.splitAboveSelected = New System.Windows.Forms.Splitter
+        Me.groupSelected = New System.Windows.Forms.GroupBox
+        Me.pSelectedGrid = New atcControls.atcGrid
+        Me.pnlButtons.SuspendLayout()
+        Me.MenuStrip1.SuspendLayout()
         Me.groupTop.SuspendLayout()
         Me.groupSelected.SuspendLayout()
-        Me.pnlButtons.SuspendLayout()
         Me.SuspendLayout()
+        '
+        'btnCancel
+        '
+        resources.ApplyResources(Me.btnCancel, "btnCancel")
+        Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.btnCancel.Name = "btnCancel"
+        '
+        'btnOk
+        '
+        resources.ApplyResources(Me.btnOk, "btnOk")
+        Me.btnOk.Name = "btnOk"
+        '
+        'pnlButtons
+        '
+        Me.pnlButtons.Controls.Add(Me.cboTimeUnits)
+        Me.pnlButtons.Controls.Add(Me.cboAggregate)
+        Me.pnlButtons.Controls.Add(Me.txtTimeStep)
+        Me.pnlButtons.Controls.Add(Me.chkTimeStep)
+        Me.pnlButtons.Controls.Add(Me.atcSelectedDates)
+        Me.pnlButtons.Controls.Add(Me.btnCancel)
+        Me.pnlButtons.Controls.Add(Me.btnOk)
+        resources.ApplyResources(Me.pnlButtons, "pnlButtons")
+        Me.pnlButtons.Name = "pnlButtons"
+        '
+        'cboTimeUnits
+        '
+        Me.cboTimeUnits.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboTimeUnits.FormattingEnabled = True
+        resources.ApplyResources(Me.cboTimeUnits, "cboTimeUnits")
+        Me.cboTimeUnits.Name = "cboTimeUnits"
+        '
+        'cboAggregate
+        '
+        Me.cboAggregate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        resources.ApplyResources(Me.cboAggregate, "cboAggregate")
+        Me.cboAggregate.Name = "cboAggregate"
+        '
+        'txtTimeStep
+        '
+        resources.ApplyResources(Me.txtTimeStep, "txtTimeStep")
+        Me.txtTimeStep.Name = "txtTimeStep"
+        '
+        'chkTimeStep
+        '
+        resources.ApplyResources(Me.chkTimeStep, "chkTimeStep")
+        Me.chkTimeStep.Name = "chkTimeStep"
+        Me.chkTimeStep.UseVisualStyleBackColor = True
+        '
+        'atcSelectedDates
+        '
+        resources.ApplyResources(Me.atcSelectedDates, "atcSelectedDates")
+        Me.atcSelectedDates.Name = "atcSelectedDates"
+        '
+        'MenuStrip1
+        '
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFile, Me.mnuAttributes, Me.mnuSelect, Me.mnuHelp})
+        resources.ApplyResources(Me.MenuStrip1, "MenuStrip1")
+        Me.MenuStrip1.Name = "MenuStrip1"
+        '
+        'mnuFile
+        '
+        Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOpenData, Me.mnuFileManage, Me.mnuSaveFilters, Me.mnuLoadFilters})
+        Me.mnuFile.Name = "mnuFile"
+        resources.ApplyResources(Me.mnuFile, "mnuFile")
+        '
+        'mnuOpenData
+        '
+        Me.mnuOpenData.Name = "mnuOpenData"
+        resources.ApplyResources(Me.mnuOpenData, "mnuOpenData")
+        '
+        'mnuFileManage
+        '
+        Me.mnuFileManage.Name = "mnuFileManage"
+        resources.ApplyResources(Me.mnuFileManage, "mnuFileManage")
+        '
+        'mnuSaveFilters
+        '
+        Me.mnuSaveFilters.Name = "mnuSaveFilters"
+        resources.ApplyResources(Me.mnuSaveFilters, "mnuSaveFilters")
+        '
+        'mnuLoadFilters
+        '
+        Me.mnuLoadFilters.Name = "mnuLoadFilters"
+        resources.ApplyResources(Me.mnuLoadFilters, "mnuLoadFilters")
+        '
+        'mnuAttributes
+        '
+        Me.mnuAttributes.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuAttributesAdd, Me.mnuAttributesRemove, Me.mnuAttributesMove})
+        Me.mnuAttributes.Name = "mnuAttributes"
+        resources.ApplyResources(Me.mnuAttributes, "mnuAttributes")
+        '
+        'mnuAttributesAdd
+        '
+        Me.mnuAttributesAdd.Name = "mnuAttributesAdd"
+        resources.ApplyResources(Me.mnuAttributesAdd, "mnuAttributesAdd")
+        '
+        'mnuAttributesRemove
+        '
+        Me.mnuAttributesRemove.Name = "mnuAttributesRemove"
+        resources.ApplyResources(Me.mnuAttributesRemove, "mnuAttributesRemove")
+        '
+        'mnuAttributesMove
+        '
+        Me.mnuAttributesMove.Name = "mnuAttributesMove"
+        resources.ApplyResources(Me.mnuAttributesMove, "mnuAttributesMove")
+        '
+        'mnuSelect
+        '
+        Me.mnuSelect.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuSelectAll, Me.mnuSelectClear, Me.mnuSelectAllMatching, Me.mnuSelectNoMatching, Me.mnuSelectSep1, Me.mnuSelectMap})
+        Me.mnuSelect.Name = "mnuSelect"
+        resources.ApplyResources(Me.mnuSelect, "mnuSelect")
+        '
+        'mnuSelectAll
+        '
+        Me.mnuSelectAll.Name = "mnuSelectAll"
+        resources.ApplyResources(Me.mnuSelectAll, "mnuSelectAll")
+        '
+        'mnuSelectClear
+        '
+        Me.mnuSelectClear.Name = "mnuSelectClear"
+        resources.ApplyResources(Me.mnuSelectClear, "mnuSelectClear")
+        '
+        'mnuSelectAllMatching
+        '
+        Me.mnuSelectAllMatching.Name = "mnuSelectAllMatching"
+        resources.ApplyResources(Me.mnuSelectAllMatching, "mnuSelectAllMatching")
+        '
+        'mnuSelectNoMatching
+        '
+        Me.mnuSelectNoMatching.Name = "mnuSelectNoMatching"
+        resources.ApplyResources(Me.mnuSelectNoMatching, "mnuSelectNoMatching")
+        '
+        'mnuSelectSep1
+        '
+        Me.mnuSelectSep1.Name = "mnuSelectSep1"
+        resources.ApplyResources(Me.mnuSelectSep1, "mnuSelectSep1")
+        '
+        'mnuSelectMap
+        '
+        Me.mnuSelectMap.Checked = True
+        Me.mnuSelectMap.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.mnuSelectMap.Name = "mnuSelectMap"
+        resources.ApplyResources(Me.mnuSelectMap, "mnuSelectMap")
+        '
+        'mnuHelp
+        '
+        Me.mnuHelp.Name = "mnuHelp"
+        resources.ApplyResources(Me.mnuHelp, "mnuHelp")
         '
         'groupTop
         '
@@ -146,17 +298,6 @@ Friend Class frmSelectData
         resources.ApplyResources(Me.panelCriteria, "panelCriteria")
         Me.panelCriteria.Name = "panelCriteria"
         '
-        'btnCancel
-        '
-        resources.ApplyResources(Me.btnCancel, "btnCancel")
-        Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Name = "btnCancel"
-        '
-        'btnOk
-        '
-        resources.ApplyResources(Me.btnOk, "btnOk")
-        Me.btnOk.Name = "btnOk"
-        '
         'splitAboveSelected
         '
         resources.ApplyResources(Me.splitAboveSelected, "splitAboveSelected")
@@ -182,132 +323,6 @@ Friend Class frmSelectData
         Me.pSelectedGrid.Name = "pSelectedGrid"
         Me.pSelectedGrid.Source = Nothing
         '
-        'MainMenu1
-        '
-        Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuAttributes, Me.mnuSelect, Me.mnuHelp})
-        '
-        'mnuFile
-        '
-        Me.mnuFile.Index = 0
-        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuOpenData, Me.mnuFileManage})
-        resources.ApplyResources(Me.mnuFile, "mnuFile")
-        '
-        'mnuOpenData
-        '
-        Me.mnuOpenData.Index = 0
-        resources.ApplyResources(Me.mnuOpenData, "mnuOpenData")
-        '
-        'mnuFileManage
-        '
-        Me.mnuFileManage.Index = 1
-        resources.ApplyResources(Me.mnuFileManage, "mnuFileManage")
-        '
-        'mnuAttributes
-        '
-        Me.mnuAttributes.Index = 1
-        Me.mnuAttributes.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributesAdd, Me.mnuAttributesRemove, Me.mnuAttributesMove})
-        resources.ApplyResources(Me.mnuAttributes, "mnuAttributes")
-        '
-        'mnuAttributesAdd
-        '
-        Me.mnuAttributesAdd.Index = 0
-        resources.ApplyResources(Me.mnuAttributesAdd, "mnuAttributesAdd")
-        '
-        'mnuAttributesRemove
-        '
-        Me.mnuAttributesRemove.Index = 1
-        resources.ApplyResources(Me.mnuAttributesRemove, "mnuAttributesRemove")
-        '
-        'mnuAttributesMove
-        '
-        Me.mnuAttributesMove.Index = 2
-        resources.ApplyResources(Me.mnuAttributesMove, "mnuAttributesMove")
-        '
-        'mnuSelect
-        '
-        Me.mnuSelect.Index = 2
-        Me.mnuSelect.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuSelectAll, Me.mnuSelectClear, Me.mnuSelectAllMatching, Me.mnuSelectNoMatching, Me.mnuSelectSep1, Me.mnuSelectMap})
-        resources.ApplyResources(Me.mnuSelect, "mnuSelect")
-        '
-        'mnuSelectAll
-        '
-        Me.mnuSelectAll.Index = 0
-        resources.ApplyResources(Me.mnuSelectAll, "mnuSelectAll")
-        '
-        'mnuSelectClear
-        '
-        Me.mnuSelectClear.Index = 1
-        resources.ApplyResources(Me.mnuSelectClear, "mnuSelectClear")
-        '
-        'mnuSelectAllMatching
-        '
-        Me.mnuSelectAllMatching.Index = 2
-        resources.ApplyResources(Me.mnuSelectAllMatching, "mnuSelectAllMatching")
-        '
-        'mnuSelectNoMatching
-        '
-        Me.mnuSelectNoMatching.Index = 3
-        resources.ApplyResources(Me.mnuSelectNoMatching, "mnuSelectNoMatching")
-        '
-        'mnuSelectSep1
-        '
-        Me.mnuSelectSep1.Index = 4
-        resources.ApplyResources(Me.mnuSelectSep1, "mnuSelectSep1")
-        '
-        'mnuSelectMap
-        '
-        Me.mnuSelectMap.Checked = True
-        Me.mnuSelectMap.Index = 5
-        resources.ApplyResources(Me.mnuSelectMap, "mnuSelectMap")
-        '
-        'mnuHelp
-        '
-        Me.mnuHelp.Index = 3
-        resources.ApplyResources(Me.mnuHelp, "mnuHelp")
-        '
-        'pnlButtons
-        '
-        Me.pnlButtons.Controls.Add(Me.cboTimeUnits)
-        Me.pnlButtons.Controls.Add(Me.cboAggregate)
-        Me.pnlButtons.Controls.Add(Me.txtTimeStep)
-        Me.pnlButtons.Controls.Add(Me.chkTimeStep)
-        Me.pnlButtons.Controls.Add(Me.atcSelectedDates)
-        Me.pnlButtons.Controls.Add(Me.btnCancel)
-        Me.pnlButtons.Controls.Add(Me.btnOk)
-        resources.ApplyResources(Me.pnlButtons, "pnlButtons")
-        Me.pnlButtons.Name = "pnlButtons"
-        '
-        'cboTimeUnits
-        '
-        Me.cboTimeUnits.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboTimeUnits.FormattingEnabled = True
-        Me.cboTimeUnits.Items.AddRange(New Object() {resources.GetString("cboTimeUnits.Items"), resources.GetString("cboTimeUnits.Items1"), resources.GetString("cboTimeUnits.Items2"), resources.GetString("cboTimeUnits.Items3"), resources.GetString("cboTimeUnits.Items4"), resources.GetString("cboTimeUnits.Items5")})
-        resources.ApplyResources(Me.cboTimeUnits, "cboTimeUnits")
-        Me.cboTimeUnits.Name = "cboTimeUnits"
-        '
-        'cboAggregate
-        '
-        Me.cboAggregate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboAggregate.Items.AddRange(New Object() {resources.GetString("cboAggregate.Items"), resources.GetString("cboAggregate.Items1"), resources.GetString("cboAggregate.Items2"), resources.GetString("cboAggregate.Items3"), resources.GetString("cboAggregate.Items4")})
-        resources.ApplyResources(Me.cboAggregate, "cboAggregate")
-        Me.cboAggregate.Name = "cboAggregate"
-        '
-        'txtTimeStep
-        '
-        resources.ApplyResources(Me.txtTimeStep, "txtTimeStep")
-        Me.txtTimeStep.Name = "txtTimeStep"
-        '
-        'chkTimeStep
-        '
-        resources.ApplyResources(Me.chkTimeStep, "chkTimeStep")
-        Me.chkTimeStep.Name = "chkTimeStep"
-        Me.chkTimeStep.UseVisualStyleBackColor = True
-        '
-        'atcSelectedDates
-        '
-        resources.ApplyResources(Me.atcSelectedDates, "atcSelectedDates")
-        Me.atcSelectedDates.Name = "atcSelectedDates"
-        '
         'frmSelectData
         '
         Me.AcceptButton = Me.btnOk
@@ -315,16 +330,19 @@ Friend Class frmSelectData
         Me.CancelButton = Me.btnCancel
         Me.Controls.Add(Me.groupSelected)
         Me.Controls.Add(Me.splitAboveSelected)
-        Me.Controls.Add(Me.pnlButtons)
         Me.Controls.Add(Me.groupTop)
+        Me.Controls.Add(Me.MenuStrip1)
+        Me.Controls.Add(Me.pnlButtons)
         Me.KeyPreview = True
-        Me.Menu = Me.MainMenu1
         Me.Name = "frmSelectData"
-        Me.groupTop.ResumeLayout(False)
-        Me.groupSelected.ResumeLayout(False)
         Me.pnlButtons.ResumeLayout(False)
         Me.pnlButtons.PerformLayout()
+        Me.MenuStrip1.ResumeLayout(False)
+        Me.MenuStrip1.PerformLayout()
+        Me.groupTop.ResumeLayout(False)
+        Me.groupSelected.ResumeLayout(False)
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
@@ -347,7 +365,7 @@ Friend Class frmSelectData
     Private pMatchingSource As GridSource
     Private pSelectedSource As GridSource
 
-    Private pInitializing As Boolean = False
+    Private pInitializing As Boolean = True
     Private pPopulatingMatching As Boolean = False
     Private pRestartPopulatingMatching As Boolean = False
 
@@ -381,6 +399,7 @@ Friend Class frmSelectData
     End Property
 
     Public Function AskUser(Optional ByVal aGroup As atcTimeseriesGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcTimeseriesGroup
+        pInitializing = True 'Gets set back to False in Populate below
         mnuSelectMap.Checked = False
 
         If aGroup IsNot Nothing AndAlso aGroup.Count > 10 Then
@@ -409,6 +428,40 @@ Friend Class frmSelectData
         pSelectedGrid.Initialize(pSelectedSource)
 
         mnuSelectMap.Checked = GetSetting("BASINS", "Select Data", "SelectMap", "True").ToLower <> "false"
+
+        LoadFiltersMenu()
+
+        With cboTimeUnits.Items
+            .Clear()
+            Dim lDefaultUnit As String = "TU" & GetSetting("BASINS", "Select Data", "TimeUnits", "Day")
+            For Each lUnitName As String In [Enum].GetNames(GetType(atcTimeUnit))
+                If lUnitName <> "TUUnknown" Then
+                    .Add(lUnitName.Substring(2))
+                    If lUnitName = lDefaultUnit Then
+                        cboTimeUnits.SelectedItem = cboTimeUnits.Items(cboTimeUnits.Items.Count - 1)
+                    End If
+                End If
+            Next
+        End With
+
+        With cboAggregate.Items
+            Dim lDefaultTransformation As String = GetSetting("BASINS", "Select Data", "Transformation", pTranSumDivLabel)
+            .Clear()
+            .Add(pTranSumDivLabel)
+            .Add(pTranAverSameLabel)
+            .Add(pTranMaxLabel)
+            .Add(pTranMinLabel)
+            .Add(pTranCountMissingLabel)
+
+            For lIndex As Integer = 0 To .Count - 1
+                If .Item(lIndex).ToString = lDefaultTransformation Then
+                    cboAggregate.SelectedItem = cboAggregate.Items(lIndex)
+                    Exit For
+                End If
+            Next
+        End With
+
+        txtTimeStep.Text = GetSetting("BASINS", "Select Data", "TimeStep", "1")
 
         Me.Show()
         Populate()
@@ -485,10 +538,14 @@ Friend Class frmSelectData
                         For Each lTimeseries As atcTimeseries In pSelectedGroup
                             lAggregatedGroup.Add(Aggregate(lTimeseries, lTU, lTimeStep, lTran))
                         Next
+                        SaveSetting("BASINS", "Select Data", "TimeUnits", cboTimeUnits.Text)
+                        SaveSetting("BASINS", "Select Data", "TimeStep", lTimeStep)
+                        SaveSetting("BASINS", "Select Data", "Transformation", cboAggregate.Text)
                     End If
 
                     pSelectedGroup.ChangeTo(lAggregatedGroup)
                 End If
+
             Else 'User clicked Cancel or closed dialog
                 If Not pRevertedToSaved Then pSelectedGroup.ChangeTo(pSaveGroup)
             End If
@@ -549,10 +606,7 @@ Friend Class frmSelectData
         End If
     End Function
 
-
-    Private Sub Populate()
-        pInitializing = True
-
+    Private Sub RemoveAllCriteria()
         If Not pcboCriteria Is Nothing Then
             Try
                 For iCriteria As Integer = pcboCriteria.GetUpperBound(0) To 0 Step -1
@@ -566,6 +620,12 @@ Friend Class frmSelectData
         ReDim pcboCriteria(0)
         ReDim plstCriteria(0)
         ReDim pCriteriaFraction(0)
+    End Sub
+
+    Private Sub Populate()
+        pInitializing = True
+
+        RemoveAllCriteria()
 
         For Each lAttribName As String In atcDataManager.SelectionAttributes
             AddCriteria(lAttribName)
@@ -814,28 +874,28 @@ NextTS:
 
     Private Sub UpdatedCriteria()
         If Not pInitializing Then
-            Dim mnu As MenuItem
+            'Dim mnu As ToolStripMenuItem
             Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
 
             UpdateManagerSelectionAttributes()
             PopulateMatching()
 
-            For Each mnu In mnuAttributesRemove.MenuItems
-                RemoveHandler mnu.Click, AddressOf mnuRemove_Click
-            Next
-            For Each mnu In mnuAttributesMove.MenuItems
-                RemoveHandler mnu.Click, AddressOf mnuMove_Click
-            Next
+            'For Each mnu In mnuAttributesRemove.DropDownItems
+            '    RemoveHandler mnu.Click, AddressOf mnuRemove_Click
+            'Next
+            'For Each mnu In mnuAttributesMove.DropDownItems
+            '    RemoveHandler mnu.Click, AddressOf mnuMove_Click
+            'Next
 
-            mnuAttributesRemove.MenuItems.Clear()
-            mnuAttributesMove.MenuItems.Clear()
+            mnuAttributesRemove.DropDownItems.Clear()
+            mnuAttributesMove.DropDownItems.Clear()
 
             If iLastCriteria > 0 Then 'Only allow moving/removing if more than one exists
                 For iCriteria As Integer = 0 To iLastCriteria
-                    mnu = mnuAttributesRemove.MenuItems.Add("&" & iCriteria + 1 & " " & pcboCriteria(iCriteria).SelectedItem)
-                    AddHandler mnu.Click, AddressOf mnuRemove_Click
-                    mnu = mnuAttributesMove.MenuItems.Add("&" & iCriteria + 1 & " " & pcboCriteria(iCriteria).SelectedItem)
-                    AddHandler mnu.Click, AddressOf mnuMove_Click
+                    mnuAttributesRemove.DropDownItems.Add("&" & iCriteria + 1 & " " & pcboCriteria(iCriteria).SelectedItem, Nothing, _
+                                                          AddressOf mnuRemove_Click)
+                    mnuAttributesMove.DropDownItems.Add("&" & iCriteria + 1 & " " & pcboCriteria(iCriteria).SelectedItem, Nothing, _
+                                                        AddressOf mnuMove_Click)
                 Next
             End If
         End If
@@ -1223,6 +1283,102 @@ NextName:
 
     Private Sub mnuSelectMap_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuSelectMap.Click
         SaveSetting("BASINS", "Select Data", "SelectMap", CStr(mnuSelectMap.Checked))
+    End Sub
+
+    Private Sub mnuSaveFilters_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSaveFilters.Click
+        Dim lSaveDialog As New Windows.Forms.SaveFileDialog
+        With lSaveDialog
+            .Title = "Save filters as..."
+            .DefaultExt = "txt"
+            .Filter = "Text Files|*.txt|All Files|*.*"
+            .FilterIndex = 0
+            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+                Dim lFileContents As New Text.StringBuilder
+
+                Dim attrName As String
+                Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
+                Dim lCriteriaSelectedItems(iLastCriteria) As atcCollection
+                Dim lCriteriaName(iLastCriteria) As String
+                'Find attribute names that have selected values to match
+                For iCriteria As Integer = 0 To iLastCriteria
+                    attrName = pcboCriteria(iCriteria).SelectedItem
+                    Select Case attrName
+                        Case Nothing, CALCULATED_LABEL, BLANK_LABEL
+                            'can't use this criteria
+                        Case Else
+                            lFileContents.AppendLine(attrName)
+                            For Each lSelectedValue As String In CType(plstCriteria(iCriteria).Source, ListSource).SelectedItems
+                                lFileContents.AppendLine(vbTab & lSelectedValue)
+                            Next
+                    End Select
+                Next
+
+                SaveFileString(.FileName, lFileContents.ToString)
+                SaveSetting("BASINS", "Select Data Filters", .FileName.ToLower, IO.Path.GetFileNameWithoutExtension(.FileName))
+                LoadFiltersMenu()
+            End If
+        End With
+    End Sub
+
+    Private Sub LoadFiltersMenu()
+        Dim lAllSavedFilters(,) As String = GetAllSettings("BASINS", "Select Data Filters")
+        If lAllSavedFilters IsNot Nothing Then
+            mnuLoadFilters.DropDownItems.Clear()
+            For lIndex As Integer = lAllSavedFilters.GetUpperBound(0) To 0 Step -1
+                If IO.File.Exists(lAllSavedFilters(lIndex, 0)) Then
+                    Dim lFilterMenuItem As New ToolStripMenuItem(lAllSavedFilters(lIndex, 1), Nothing, AddressOf LoadFilterClick)
+                    lFilterMenuItem.Tag = lAllSavedFilters(lIndex, 0)
+                    mnuLoadFilters.DropDownItems.Add(lFilterMenuItem)
+                End If
+            Next
+        End If
+    End Sub
+
+    Private Sub LoadFilters(ByVal aFilename As String)
+        pInitializing = True
+        RemoveAllCriteria()
+        For Each lLine As String In LinesInFile(aFilename)
+            If lLine.StartsWith(vbTab) Then
+                lLine = lLine.Substring(1)
+                With plstCriteria(plstCriteria.Length - 1).Source
+                    For lRow As Integer = 0 To .Rows - 1
+                        If .CellValue(lRow, 0) = lLine Then
+                            .CellSelected(lRow, 0) = True
+                            Exit For
+                        End If
+                    Next
+                End With
+            Else
+                AddCriteria(lLine)
+            End If
+        Next
+        pInitializing = False
+        SizeCriteria()
+        Application.DoEvents()
+        UpdatedCriteria()
+    End Sub
+
+    Private Sub LoadFilterClick(ByVal sender As Object, ByVal e As EventArgs)
+        If IO.File.Exists(sender.tag) Then LoadFilters(sender.tag)
+    End Sub
+
+    Private Sub mnuLoadFilters_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuLoadFilters.Click
+        Dim lOpenDialog As New Windows.Forms.OpenFileDialog
+        With lOpenDialog
+            .Title = "Load filters from..."
+            .DefaultExt = "txt"
+            .Filter = "Text Files|*.txt|All Files|*.*"
+            .FilterIndex = 0
+            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+                LoadFilters(.FileName)
+            End If
+        End With
+    End Sub
+
+    Private Sub TimeUnits_Changed(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboTimeUnits.SelectedIndexChanged, _
+                                                                                                      cboAggregate.SelectedIndexChanged, _
+                                                                                                      txtTimeStep.TextChanged
+        If Not pInitializing AndAlso Not chkTimeStep.Checked Then chkTimeStep.Checked = True
     End Sub
 End Class
 
