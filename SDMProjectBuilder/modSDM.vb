@@ -9,8 +9,8 @@ Public Module modSDM
 
     Friend g_DoHSPF As Boolean = True
     Friend g_DoSWAT As Boolean = True
-    Private g_MinCatchmentKM2 As Double = 1.0 'Minimum catchment size
-    Private g_MinFlowlineKM As Double = 5.0 'Minimum flowline length
+    Friend g_MinCatchmentKM2 As Double = 1.0 'Minimum catchment size
+    Friend g_MinFlowlineKM As Double = 5.0 'Minimum flowline length
 
     Friend g_MapWinWindowHandle As Integer
     Friend g_ProgramDir As String = ""
@@ -25,7 +25,7 @@ Public Module modSDM
     Public g_BaseFolder As String
     Public g_CacheFolder As String '= "d:\Basins\Cache\" 'Downloaded data is kept here to avoid downloading the same thing again later
     Private g_SWATProgramBase As String = "C:\dev\BASINS40\Bin\Plugins\SWAT"
-    Private g_SWATDatabaseName As String = g_SWATProgramBase & "\Databases\SWAT2005.mdb"
+    Friend g_SWATDatabaseName As String = g_SWATProgramBase & "\Databases\SWAT2005.mdb"
     'Private g_PresetCatchments As String = "" '"G:\Project\APES-Kraemer\ms_30m_01\Watershed\Shapes"
     'Private g_UseNhdPlus As Boolean = False
     'Private g_NHDPlusInProjectFolder As Boolean = False
@@ -43,7 +43,7 @@ Public Module modSDM
     'Simplification parameters: dissolve some HRUs and spread their area among other HRUs in the subbasin
     Private g_AreaIgnoreBelowFraction As Double = 0       'HRUs smaller than this fraction of their subbasin will be dissolved 
     Private g_AreaIgnoreBelowAbsolute As Double = 0       'HRUs smaller than this will be dissolved
-    Private g_LandUseIgnoreBelowFraction As Double = 0.07 'Land uses covering less than this much of a subbasin will have all their HRUs in that subbasin dissolved
+    Friend g_LandUseIgnoreBelowFraction As Double = 0.07 'Land uses covering less than this much of a subbasin will have all their HRUs in that subbasin dissolved
     Private g_LandUseIgnoreBelowAbsolute As Double = 0    'Absolute total area of a land use within a subbasin below which to dissolve its HRUs
 
     Private g_WhichSoilIndex As WhichSoilIndex = WhichSoilIndex.SWATSTATSGO
