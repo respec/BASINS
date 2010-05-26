@@ -76,7 +76,7 @@ Public Class frmBuildNew
         '
         Me.btnBuild.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnBuild.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnBuild.Location = New System.Drawing.Point(213, 386)
+        Me.btnBuild.Location = New System.Drawing.Point(342, 339)
         Me.btnBuild.Name = "btnBuild"
         Me.btnBuild.Size = New System.Drawing.Size(96, 33)
         Me.btnBuild.TabIndex = 1
@@ -92,7 +92,7 @@ Public Class frmBuildNew
         Me.txtInstructions.Location = New System.Drawing.Point(16, 16)
         Me.txtInstructions.Multiline = True
         Me.txtInstructions.Name = "txtInstructions"
-        Me.txtInstructions.Size = New System.Drawing.Size(392, 96)
+        Me.txtInstructions.Size = New System.Drawing.Size(524, 75)
         Me.txtInstructions.TabIndex = 2
         Me.txtInstructions.TabStop = False
         '
@@ -102,10 +102,10 @@ Public Class frmBuildNew
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtSelected.BackColor = System.Drawing.SystemColors.Menu
-        Me.txtSelected.Location = New System.Drawing.Point(16, 112)
+        Me.txtSelected.Location = New System.Drawing.Point(16, 88)
         Me.txtSelected.Multiline = True
         Me.txtSelected.Name = "txtSelected"
-        Me.txtSelected.Size = New System.Drawing.Size(392, 86)
+        Me.txtSelected.Size = New System.Drawing.Size(524, 62)
         Me.txtSelected.TabIndex = 3
         Me.txtSelected.TabStop = False
         Me.txtSelected.Text = "Selected Features:"
@@ -115,7 +115,7 @@ Public Class frmBuildNew
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnCancel.Location = New System.Drawing.Point(315, 386)
+        Me.btnCancel.Location = New System.Drawing.Point(444, 339)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(96, 33)
         Me.btnCancel.TabIndex = 4
@@ -127,7 +127,7 @@ Public Class frmBuildNew
         Me.cbxHSPF.AutoSize = True
         Me.cbxHSPF.Checked = True
         Me.cbxHSPF.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.cbxHSPF.Location = New System.Drawing.Point(17, 213)
+        Me.cbxHSPF.Location = New System.Drawing.Point(14, 166)
         Me.cbxHSPF.Name = "cbxHSPF"
         Me.cbxHSPF.Size = New System.Drawing.Size(63, 21)
         Me.cbxHSPF.TabIndex = 5
@@ -140,7 +140,7 @@ Public Class frmBuildNew
         Me.cbxSWAT.AutoSize = True
         Me.cbxSWAT.Checked = True
         Me.cbxSWAT.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.cbxSWAT.Location = New System.Drawing.Point(86, 213)
+        Me.cbxSWAT.Location = New System.Drawing.Point(83, 166)
         Me.cbxSWAT.Name = "cbxSWAT"
         Me.cbxSWAT.Size = New System.Drawing.Size(67, 21)
         Me.cbxSWAT.TabIndex = 6
@@ -156,7 +156,7 @@ Public Class frmBuildNew
         Me.atxSize.HardMax = -999
         Me.atxSize.HardMin = 0
         Me.atxSize.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxSize.Location = New System.Drawing.Point(20, 246)
+        Me.atxSize.Location = New System.Drawing.Point(17, 199)
         Me.atxSize.MaxWidth = 20
         Me.atxSize.Name = "atxSize"
         Me.atxSize.NumericFormat = "0.#####"
@@ -175,7 +175,7 @@ Public Class frmBuildNew
         '
         Me.lblSize.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblSize.AutoSize = True
-        Me.lblSize.Location = New System.Drawing.Point(82, 250)
+        Me.lblSize.Location = New System.Drawing.Point(79, 203)
         Me.lblSize.Name = "lblSize"
         Me.lblSize.Size = New System.Drawing.Size(172, 17)
         Me.lblSize.TabIndex = 8
@@ -185,7 +185,7 @@ Public Class frmBuildNew
         '
         Me.lblLength.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblLength.AutoSize = True
-        Me.lblLength.Location = New System.Drawing.Point(83, 277)
+        Me.lblLength.Location = New System.Drawing.Point(80, 230)
         Me.lblLength.Name = "lblLength"
         Me.lblLength.Size = New System.Drawing.Size(164, 17)
         Me.lblLength.TabIndex = 10
@@ -200,7 +200,7 @@ Public Class frmBuildNew
         Me.atxLength.HardMax = -999
         Me.atxLength.HardMin = 0
         Me.atxLength.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxLength.Location = New System.Drawing.Point(21, 273)
+        Me.atxLength.Location = New System.Drawing.Point(18, 226)
         Me.atxLength.MaxWidth = 20
         Me.atxLength.Name = "atxLength"
         Me.atxLength.NumericFormat = "0.#####"
@@ -219,7 +219,7 @@ Public Class frmBuildNew
         '
         Me.lblLU.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblLU.AutoSize = True
-        Me.lblLU.Location = New System.Drawing.Point(86, 304)
+        Me.lblLU.Location = New System.Drawing.Point(83, 257)
         Me.lblLU.Name = "lblLU"
         Me.lblLU.Size = New System.Drawing.Size(244, 17)
         Me.lblLU.TabIndex = 12
@@ -234,7 +234,7 @@ Public Class frmBuildNew
         Me.atxLU.HardMax = 1
         Me.atxLU.HardMin = 0
         Me.atxLU.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxLU.Location = New System.Drawing.Point(21, 300)
+        Me.atxLU.Location = New System.Drawing.Point(18, 253)
         Me.atxLU.MaxWidth = 20
         Me.atxLU.Name = "atxLU"
         Me.atxLU.NumericFormat = "0.#####"
@@ -252,7 +252,7 @@ Public Class frmBuildNew
         'cmdSet
         '
         Me.cmdSet.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdSet.Location = New System.Drawing.Point(373, 336)
+        Me.cmdSet.Location = New System.Drawing.Point(502, 289)
         Me.cmdSet.Name = "cmdSet"
         Me.cmdSet.Size = New System.Drawing.Size(35, 23)
         Me.cmdSet.TabIndex = 13
@@ -263,7 +263,7 @@ Public Class frmBuildNew
         '
         Me.lblSWAT.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblSWAT.AutoSize = True
-        Me.lblSWAT.Location = New System.Drawing.Point(24, 339)
+        Me.lblSWAT.Location = New System.Drawing.Point(21, 292)
         Me.lblSWAT.Name = "lblSWAT"
         Me.lblSWAT.Size = New System.Drawing.Size(139, 17)
         Me.lblSWAT.TabIndex = 14
@@ -271,12 +271,13 @@ Public Class frmBuildNew
         '
         'lblFile
         '
-        Me.lblFile.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lblFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblFile.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
-        Me.lblFile.Location = New System.Drawing.Point(170, 339)
+        Me.lblFile.Location = New System.Drawing.Point(167, 292)
         Me.lblFile.Name = "lblFile"
         Me.lblFile.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.lblFile.Size = New System.Drawing.Size(197, 17)
+        Me.lblFile.Size = New System.Drawing.Size(329, 17)
         Me.lblFile.TabIndex = 15
         Me.lblFile.Text = "SWAT2005.mdb"
         Me.lblFile.TextAlign = System.Drawing.ContentAlignment.MiddleRight
@@ -292,7 +293,7 @@ Public Class frmBuildNew
         Me.AcceptButton = Me.btnBuild
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(423, 431)
+        Me.ClientSize = New System.Drawing.Size(555, 384)
         Me.Controls.Add(Me.lblFile)
         Me.Controls.Add(Me.lblSWAT)
         Me.Controls.Add(Me.cmdSet)
@@ -313,7 +314,7 @@ Public Class frmBuildNew
         Me.MinimizeBox = False
         Me.Name = "frmBuildNew"
         Me.Opacity = 0.8
-        Me.Text = "Build New BASINS 4 Project"
+        Me.Text = "Build Project"
         Me.TopMost = True
         Me.ResumeLayout(False)
         Me.PerformLayout()
@@ -325,7 +326,6 @@ Public Class frmBuildNew
     Private Sub cmdBuild_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBuild.Click
         SaveSetting(g_AppNameRegistry, "Window Positions", "BuildTop", Me.Top)
         SaveSetting(g_AppNameRegistry, "Window Positions", "BuildLeft", Me.Left)
-        Me.Close()
 
         g_DoHSPF = cbxHSPF.Checked
         g_DoSWAT = cbxSWAT.Checked
@@ -334,6 +334,7 @@ Public Class frmBuildNew
         g_LandUseIgnoreBelowFraction = atxLU.Text
         g_SWATDatabaseName = lblFile.Text
 
+        Me.Close()
         SpecifyAndCreateNewProject()
     End Sub
 
@@ -357,7 +358,7 @@ Public Class frmBuildNew
 
     Private Sub frmBuildNew_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Me.Icon = g_MapWin.ApplicationInfo.FormIcon
-        Me.Text = "Build New " & g_AppNameLong & " Project"
+        Me.Text = "Build " & g_AppNameLong & " Project"
 
         cbxHSPF.Checked = g_DoHSPF
         cbxSWAT.Checked = g_DoSWAT
