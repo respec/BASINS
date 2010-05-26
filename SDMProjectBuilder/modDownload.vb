@@ -392,6 +392,9 @@ StartOver:
         Next
         Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
 
+        Dim lStepCount As Integer = lQueries.Count + 5
+        Dim lStepIndex As Integer = 0
+        Dim lLevel As New MapWinUtility.ProgressLevel
         For Each lQuery In lQueries
             lResult &= lDownloadManager.Execute(lQuery)
         Next
@@ -426,6 +429,7 @@ StartOver:
                     Logger.Dbg("CreateNewProjectAndDownloadBatchData:Save2Failed:" & g_MapWin.LastError)
                 End If
             End If
+            g_MapWin.Project.Save(aProjectFileName)
 
             're-project selected shape aoi if necessary
             Dim lSelectedSf As New MapWinGIS.Shapefile
@@ -460,6 +464,7 @@ StartOver:
             Else
                 lSimplifiedCatchmentsFileName = GisUtil.LayerFileName("Catchment")
             End If
+            g_MapWin.Project.Save(aProjectFileName)
 
             Dim lElevationFileName As String = GisUtil.LayerFileName("NHDPlus Elevation")
             Dim lLandUseFileName As String = GisUtil.LayerFileName("NLCD 2001 Landcover")
@@ -477,6 +482,7 @@ StartOver:
                 BatchSWAT(lSelectedHuc, aNewDataDir, lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName, _
                           lLandUseFileName, lElevationFileName)
             End If
+            g_MapWin.Project.Save(aProjectFileName)
 
         End If
     End Sub
