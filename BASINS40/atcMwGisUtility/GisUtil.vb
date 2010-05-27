@@ -2949,6 +2949,15 @@ Public Class GisUtil
         End Get
     End Property
 
+    Public Shared Property DrawFill(Optional ByVal aLayerIndex As Integer = UseCurrent) As Boolean
+        Get
+            Return LayerFromIndex(aLayerIndex).DrawFill
+        End Get
+        Set(ByVal aDrawFill As Boolean)
+            LayerFromIndex(aLayerIndex).DrawFill = aDrawFill
+        End Set
+    End Property
+
     Public Shared ReadOnly Property MapExtentXmax() As Double
         Get
             Return GetMappingObject.View.Extents.xMax

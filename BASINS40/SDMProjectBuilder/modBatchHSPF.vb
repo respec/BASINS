@@ -142,7 +142,7 @@ Module BatchHSPF
         SetMetSegmentGrid(AtcGridMet, pMetStations, pUniqueModelSegmentNames, pUniqueModelSegmentIds, _
                           pSubbasinLayerName, pSubbasinFieldName, pSubbasinSegmentName)
 
-        Dim lOutputPath As String = pOutputPath & pBaseOutputName
+        Dim lOutputPath As String = pOutputPath & "HSPF"
 
         'now start the processing
         If PreProcessChecking(lOutputPath, pBaseOutputName, "HSPF", pLUType, pMetStations.Count, _
