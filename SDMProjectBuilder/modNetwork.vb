@@ -1832,7 +1832,7 @@ Friend Module modNetwork
                 If lCatchmentArea > 0 Then
                     Dim lIntersectionArea As Double = MapWinGeoProc.Utils.Area(lIntersection)
                     Dim lFractionInside As Double = lIntersectionArea / lCatchmentArea
-                    If lFractionInside > 0.01 Then '0.01 = 1%
+                    If lFractionInside > 0.5 Then '0.5 = 50%
                         lCatchmentsToUse.EditInsertShape(lCatchmentShape, lCatchmentsToUse.NumShapes)
 
                         lCatchmentsDBF.CurrentRecord = lCatchmentShapeIndex + 1
