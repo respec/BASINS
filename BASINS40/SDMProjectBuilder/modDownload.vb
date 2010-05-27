@@ -166,6 +166,13 @@ Public Module modDownload
     Public Sub SpecifyAndCreateNewProject()
         pBuildFrm = Nothing
 
+        Logger.Dbg("SpecifyAndCreateNewProject")
+        Logger.Dbg("  MinCatchmentKM2 " & g_MinCatchmentKM2)
+        Logger.Dbg("  MinFlowlineKM " & g_MinFlowlineKM)
+        Logger.Dbg("  IgnoreBelowFrac " & g_LandUseIgnoreBelowFraction)
+        Logger.Dbg("  SWATDatabaseName " & g_SWATDatabaseName)
+        Logger.Dbg("  DoHSPF,SWAT " & g_DoHSPF & " " & g_DoSWAT)
+
         Dim lRegion As String = GetSelectedRegion()
         If lRegion.Length > 0 Then
             'Save national project as the user has zoomed it
@@ -187,6 +194,7 @@ Public Module modDownload
         Dim lMyProjection As String
         Dim lAreaOfInterestProjection As String = ""
 
+        Logger.Dbg("Region " & aRegion)
 StartOver:
         lDataPath = IO.Path.Combine(g_ProgramDir, "data\") 'TODO: save in desired location for FRAMES
 
