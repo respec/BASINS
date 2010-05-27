@@ -20,11 +20,10 @@ Public Module modSDM
     Friend pBuildFrm As frmBuildNew
 
     'Private g_Clip As String = "" 'if using old style clip = "Clip"
-    'Private g_BaseDrive As String = "g"
     'Private g_Project As String = "apes" '"0401" '
     Public g_BaseFolder As String
     Public g_CacheFolder As String '= "d:\Basins\Cache\" 'Downloaded data is kept here to avoid downloading the same thing again later
-    Private g_SWATProgramBase As String = "C:\dev\BASINS40\Bin\Plugins\SWAT"
+    Private g_SWATProgramBase As String = IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath) & "\Plugins\SWAT"
     Friend g_SWATDatabaseName As String = g_SWATProgramBase & "\Databases\SWAT2005.mdb"
     'Private g_PresetCatchments As String = "" '"G:\Project\APES-Kraemer\ms_30m_01\Watershed\Shapes"
     'Private g_UseNhdPlus As Boolean = False
