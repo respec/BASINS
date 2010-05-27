@@ -439,16 +439,33 @@ StartOver:
             End If
             g_MapWin.Project.Save(aProjectFileName)
 
-            're-project selected shape aoi if necessary
+            're-project selected shape aoi if necessary, and add it to the map
             Dim lSelectedSf As New MapWinGIS.Shapefile
-            TryDeleteShapefile(aNewDataDir & "aoi.shp")
-            If lSelectedSf.CreateNew(aNewDataDir & "aoi.shp", ShpfileType.SHP_POLYGON) Then
+            Dim lAOIName As String = aNewDataDir & "aoi.shp"
+            TryDeleteShapefile(lAOIName)
+            If lSelectedSf.CreateNew(lAOIName, ShpfileType.SHP_POLYGON) Then
+                'add an id field to the new shapefile
+                Dim lField As New MapWinGIS.Field
+                lField.Name = "ID"
+                lField.Type = MapWinGIS.FieldType.STRING_FIELD
+                lField.Width = 10
+                lSelectedSf.StartEditingTable()
+                Dim lBsuc As Boolean = lSelectedSf.EditInsertField(lField, 0)
+                lSelectedSf.StopEditingTable()
+                'now insert the shape
                 If lSelectedSf.StartEditingShapes(True) Then
                     If lSelectedSf.EditInsertShape(lSelectedShape, 0) Then
                         If aAreaOfInterestProjection <> aDesiredProjection Then
                             If MapWinGeoProc.SpatialReference.ProjectShapefile(aAreaOfInterestProjection, aDesiredProjection, lSelectedSf) Then
-                                If lSelectedSf.Open(aNewDataDir & "aoi.shp") Then
+                                If lSelectedSf.Open(lAOIName) Then
                                     lSelectedShape = lSelectedSf.Shape(0)
+                                    GisUtil.AddLayer(lAOIName, "Area_of_Interest")
+                                    Dim lAOIIndex As Integer = GisUtil.LayerIndex(lAOIName)
+                                    GisUtil.DrawFill(lAOIIndex) = False
+                                    GisUtil.LayerVisible(lAOIIndex) = True
+                                    GisUtil.ZoomToLayerExtents(lAOIIndex)
+                                    RefreshView()
+                                    DoEvents()
                                 End If
                             End If
                         End If
@@ -483,13 +500,16 @@ StartOver:
                 BatchHSPF.BatchHSPF(lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName, _
                                     lLandUseFileName, lElevationFileName, _
                                     lMetWDMFileName, aNewDataDir, lSelectedHuc)
+                Logger.Status("Finished BatchHSPF")
             End If
 
             'if building swat project, do this:
             If g_DoSWAT Then
                 BatchSWAT(lSelectedHuc, aNewDataDir, lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName, _
                           lLandUseFileName, lElevationFileName)
+                Logger.Status("Finished BatchSWAT")
             End If
+            Logger.Status("**** Done HUC12 " & lSelectedHuc)
             g_MapWin.Project.Save(aProjectFileName)
 
         End If
