@@ -116,7 +116,7 @@ Public Module modModelSetup
             Dim lLandUsePathName As String = PathNameOnly(GisUtil.LayerFileName(GisUtil.LayerIndex("Land Use Index"))) & "\landuse"
             Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
             lReclassifyFileName = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "etc\"
-            If FileExists(lReclassifyFileName) Then
+            If IO.Directory.Exists(lReclassifyFileName) Then
                 lReclassifyFileName &= "giras.dbf"
             Else
                 lReclassifyFileName = lLandUsePathName.Substring(0, 1) & ":\basins\etc\giras.dbf"
@@ -130,7 +130,7 @@ Public Module modModelSetup
             If aLUType = 1 Then 'nlcd grid
                 Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
                 lReclassifyFileName = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "etc\"
-                If FileExists(lReclassifyFileName) Then
+                If IO.Directory.Exists(lReclassifyFileName) Then
                     lReclassifyFileName &= "nlcd.dbf"
                 Else
                     lReclassifyFileName = "\BASINS\etc\nlcd.dbf"
