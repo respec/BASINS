@@ -128,12 +128,17 @@ Public Module modModelSetup
             CreateLanduseRecordsGrid(lSubbasinsSelected, lLucodes, lSubids, lAreas, aSubbasinLayerName, aLandUseThemeName)
 
             If aLUType = 1 Then 'nlcd grid
-                Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-                lReclassifyFileName = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "etc\"
-                If IO.Directory.Exists(lReclassifyFileName) Then
-                    lReclassifyFileName &= "nlcd.dbf"
+                If IO.File.Exists(aLandUseClassFile) Then
+                    lReclassifyFileName = aLandUseClassFile
                 Else
-                    lReclassifyFileName = "\BASINS\etc\nlcd.dbf"
+                    'try to default if not set
+                    Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+                    lReclassifyFileName = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "etc\"
+                    If IO.Directory.Exists(lReclassifyFileName) Then
+                        lReclassifyFileName &= "nlcd.dbf"
+                    Else
+                        lReclassifyFileName = "\BASINS\etc\nlcd.dbf"
+                    End If
                 End If
             Else
                 If aLandUseClassFile <> "<none>" Then
