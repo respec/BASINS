@@ -453,7 +453,7 @@ Friend Module modSwatDatabase
                 Else
                     lNumericSTMUID = aSoilId
                 End If
-                Dim lFindStateTxt As DataTable = aSwatInput.QuerySoils("Select StateTxt From tblStmuidLu Where StateNum='" & lNumericSTMUID.Substring(0, 2) & "';")
+                Dim lFindStateTxt As DataTable = aSwatInput.QuerySoils("Select StateTxt From tblStmuidLu Where StateNum='" & SafeSubstring(lNumericSTMUID, 0, 2) & "';")
                 If lFindStateTxt.Rows.Count > 0 Then
                     Return lFindStateTxt.Rows(0).Item(0) & lNumericSTMUID.Substring(2)
                 End If

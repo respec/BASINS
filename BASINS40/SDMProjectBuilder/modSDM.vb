@@ -23,8 +23,7 @@ Public Module modSDM
     'Private g_Project As String = "apes" '"0401" '
     Public g_BaseFolder As String
     Public g_CacheFolder As String '= "d:\Basins\Cache\" 'Downloaded data is kept here to avoid downloading the same thing again later
-    Private g_SWATProgramBase As String = IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath) & "\Plugins\SWAT"
-    Friend g_SWATDatabaseName As String = g_SWATProgramBase & "\Databases\SWAT2005.mdb"
+    Friend g_SWATDatabaseName As String
     'Private g_PresetCatchments As String = "" '"G:\Project\APES-Kraemer\ms_30m_01\Watershed\Shapes"
     'Private g_UseNhdPlus As Boolean = False
     'Private g_NHDPlusInProjectFolder As Boolean = False
@@ -47,27 +46,11 @@ Public Module modSDM
 
     Private g_WhichSoilIndex As WhichSoilIndex = WhichSoilIndex.SWATSTATSGO
 
-    'Private g_Download As Boolean = False 'True = replace exisiting project folder with fresh copy of downloaded data, False = use existing project folder if present
-    'Private g_GetMetData As Boolean = True
-    'Private g_GetNLCDData As Boolean = True
-    'Private g_GetNHDPlusData As Boolean = True
-    'Private g_SimplifyCatchmentsAndStreams As Boolean = True
     Private g_GeoProcess As Boolean = True
     Private g_BuildDatabase As Boolean = True
     Private g_RunModel As Boolean = False
     Private g_OutputSummarize As Boolean = False
 
-    'Private g_Huc8Shapefilename As String = ""
-    'Private g_HucShapefilename As String
-    'Private g_SkipUntilHuc As String = ""   '"030101010803" '"030102050302" ' "030102030502"
-    'Private g_ProcessOnlyHuc As String '= "04010201" '"030101020501" '"030101010803" ' "030102050901" "030202030604" '"030102050302"
-    'Private g_HucFieldId As Integer = -1
-
-    'Private g_Statistics As New atcTimeseriesStatistics.atcTimeseriesStatistics
-
-    'Private pSlopeGridFileName As String
-    'Private pSlopeGridReclassFileName As String
-    'Private pSubBasinFileName As String
     Private pLayerFilenames() As String
     Private pResume As Boolean = False  'True to use existing full or partially complete overlay, False to do overlay from the start
 
@@ -242,8 +225,11 @@ Public Module modSDM
 
             g_BaseFolder = aProjectFolder
             If g_BuildDatabase AndAlso Not FileExists(g_SWATDatabaseName) Then
-                Logger.Msg("SWAT Database not found: '" & g_SWATDatabaseName & "'", "SWAT2005.mdb Required")
-                Exit Sub
+                g_SWATDatabaseName = FindFile("Please locate SWAT2005.mdb", "SWAT2005.mdb")
+                If Not FileExists(g_SWATDatabaseName) Then
+                    Logger.Msg("SWAT Database not found: '" & g_SWATDatabaseName & "'", "SWAT2005.mdb Required")
+                    Exit Sub
+                End If
             End If
 
             Dim lHRUGridFileName As String = IO.Path.Combine(aProjectFolder, "HRUs.tif")
@@ -264,6 +250,7 @@ Public Module modSDM
                     Logger.Status("UsingExisting " & lSlopeGridFileName)
                 Else
                     'z factor - cm to m
+                    Logger.Status("Calculating Slopes from DEM")
                     If MapWinGeoProc.TerrainAnalysis.Slope(aDemGridFileName, 0.01, lSlopeGridFileName, True, Nothing) Then
                         Logger.Status("Calculated Slopes " & MemUsage())
                     Else
@@ -413,10 +400,16 @@ Public Module modSDM
                         Logger.Status("Cannot start model, input folder does not exist: " & lInputFilePath)
                         lExitCode = -1
                     Else
-                        Logger.Status("StartModel")
-                        MapWinUtility.LaunchProgram(IO.Path.Combine(g_SWATProgramBase, "Swat2005.exe"), lInputFilePath)
-                        'lExitCode = MapWinUtility.LaunchProgram(IO.Path.Combine(g_SWATProgramBase, "Swat2005.exe"), lInputFilePath)
-                        Logger.Status("DoneModelRunExitCode " & lExitCode & " " & MemUsage())
+                        Dim lExePath As String = FindFile("SWAT Model", "Swat2005.exe")
+                        If IO.File.Exists(lExePath) Then
+                            Logger.Status("StartModel " & lExePath)
+                            MapWinUtility.LaunchProgram(lExePath, lInputFilePath)
+                            'lExitCode = MapWinUtility.LaunchProgram(IO.Path.Combine(g_SWATProgramBase, "Swat2005.exe"), lInputFilePath)
+                            Logger.Status("DoneModelRunExitCode " & lExitCode & " " & MemUsage())
+                        Else
+                            Logger.Msg("Could not launch SWAT model", "Swat2005.exe not found")
+                            lExitCode = -1
+                        End If
                     End If
                 End If
 

@@ -385,7 +385,6 @@ StartOver:
                & "</function>"
         lQueries.Add(lQuery)
 
-        Dim lResult As String = ""
 
         UnloadPlugin("Tiled Map")
         LoadPlugin("D4EM Data Download::BASINS")
@@ -401,10 +400,17 @@ StartOver:
         Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
 
         Dim lStepCount As Integer = lQueries.Count + 5
-        Dim lStepIndex As Integer = 0
-        Dim lLevel As New MapWinUtility.ProgressLevel
+        If g_DoHSPF Then lStepCount += 1
+        If g_DoSWAT Then lStepCount += 1
+
+        Logger.Progress(0, lStepCount)
+        Dim lResult As String = ""
         For Each lQuery In lQueries
-            lResult &= lDownloadManager.Execute(lQuery)
+            Dim lLabelStart As Integer = lQuery.IndexOf("'Get") + 4
+            Logger.Status("Downloading and processing " & lQuery.Substring(lLabelStart, lQuery.IndexOf("'>") - lLabelStart))
+            Using lLevel As New ProgressLevel(True)
+                lResult &= lDownloadManager.Execute(lQuery)
+            End Using
         Next
 
         'Logger.Msg(lResult, "Result of Query from DataManager")
@@ -424,8 +430,9 @@ StartOver:
                 TryDeleteShapefile(lNewShapeName)
             End If
             g_MapWin.Project.Modified = True
-            ProcessDownloadResults(lResult) 'TODO: skip message box describing what has been downloaded?
-
+            Using lLevel As New ProgressLevel(True)
+                ProcessDownloadResults(lResult) 'TODO: skip message box describing what has been downloaded?
+            End Using
             AddAllShapesInDir(aNewDataDir, aNewDataDir)
             g_MapWin.PreviewMap.Update(MapWindow.Interfaces.ePreviewUpdateExtents.CurrentMapView)
             If Not aExistingMapWindowProject Then
@@ -497,19 +504,22 @@ StartOver:
             'if building hspf project, do this:
             If g_DoHSPF Then
                 Dim lMetWDMFileName As String = PathNameOnly(GisUtil.LayerFileName("Weather Station Sites 2006")) & "\met.wdm"
-                BatchHSPF.BatchHSPF(lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName, _
-                                    lLandUseFileName, lElevationFileName, _
-                                    lMetWDMFileName, aNewDataDir, lSelectedHuc)
-                Logger.Status("Finished BatchHSPF")
+                Logger.Status("Creating HSPF input sequence")
+                Using lLevel As New ProgressLevel(True)
+                    BatchHSPF.BatchHSPF(lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName, _
+                                        lLandUseFileName, lElevationFileName, _
+                                        lMetWDMFileName, aNewDataDir, lSelectedHuc)
+                End Using
             End If
 
             'if building swat project, do this:
             If g_DoSWAT Then
-                BatchSWAT(lSelectedHuc, aNewDataDir, lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName, _
-                          lLandUseFileName, lElevationFileName)
-                Logger.Status("Finished BatchSWAT")
+                Logger.Status("Creating SWAT input sequence")
+                Using lLevel As New ProgressLevel(True)
+                    BatchSWAT(lSelectedHuc, aNewDataDir, lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName, _
+                              lLandUseFileName, lElevationFileName)
+                End Using
             End If
-            Logger.Status("**** Done HUC12 " & lSelectedHuc)
             g_MapWin.Project.Save(aProjectFileName)
 
         End If
