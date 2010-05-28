@@ -74,7 +74,15 @@ Public Class SDMplugin
                 pStatusMonitor = Nothing
             End If
         End If
+        g_MapWin.Toolbar.PressToolbarButton("tbbSelect")
 
+    End Sub
+
+    Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
+        Select Case aItemName
+            Case "mnuNew", "tbbNew"  'Override new project behavior
+                LoadNationalProject()
+        End Select
     End Sub
 
     Public Overrides Sub Terminate()
@@ -161,7 +169,6 @@ Public Class SDMplugin
             End Try
 
             UpdateSelectedFeatures()
-            g_MapWin.Toolbar.PressToolbarButton("tbbSelect")
 
         Else
             Logger.Msg("Unable to open national project", "Open National")
