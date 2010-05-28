@@ -1,4 +1,5 @@
 ﻿Imports atcUtility
+Imports atcMwGisUtility
 Imports MapWinUtility
 
 Public Module modSDM
@@ -206,7 +207,8 @@ Public Module modSDM
                          ByVal aSimplifiedCatchmentsFileName As String, _
                          ByVal aSimplifiedFlowlinesFileName As String, _
                          ByVal aLandUseFileName As String, _
-                         ByVal aDemGridFileName As String)
+                         ByVal aDemGridFileName As String, _
+                         ByVal aSelectedShape As MapWinGIS.Shape)
         Dim lProblem As String = ""
 
         Try
@@ -226,6 +228,7 @@ Public Module modSDM
             g_BaseFolder = aProjectFolder
             If g_BuildDatabase AndAlso Not FileExists(g_SWATDatabaseName) Then
                 g_SWATDatabaseName = FindFile("Please locate SWAT2005.mdb", "SWAT2005.mdb")
+                g_SWATDatabaseName = g_SWATDatabaseName.Replace("swat", "SWAT")
                 If Not FileExists(g_SWATDatabaseName) Then
                     Logger.Msg("SWAT Database not found: '" & g_SWATDatabaseName & "'", "SWAT2005.mdb Required")
                     Exit Sub
@@ -251,7 +254,12 @@ Public Module modSDM
                 Else
                     'z factor - cm to m
                     Logger.Status("Calculating Slopes from DEM")
-                    If MapWinGeoProc.TerrainAnalysis.Slope(aDemGridFileName, 0.01, lSlopeGridFileName, True, Nothing) Then
+
+                    'clip grid to extents
+                    Dim lDEMGrid As String = PathNameOnly(aDemGridFileName) & "\tempdem.tif"
+                    Dim lSuccess As Boolean = MapWinGeoProc.SpatialOperations.ClipGridWithPolygon(aDemGridFileName, aSelectedShape, lDEMGrid, True)
+
+                    If MapWinGeoProc.TerrainAnalysis.Slope(lDEMGrid, 0.01, lSlopeGridFileName, True, Nothing) Then
                         Logger.Status("Calculated Slopes " & MemUsage())
                     Else
                         Logger.Status("Unable to calculate slope in  '" & aDemGridFileName & "'")
@@ -284,10 +292,10 @@ Public Module modSDM
                 CalculateFlowlineProperty(aSimplifiedFlowlinesFileName, aDemGridFileName)
                 Logger.Status("CalculateFlowlinePropertyDone " & MemUsage())
 
-                Dim lSoilsLayer As String = g_BaseFolder & "soils\statsgoExcerpt.tif"
+                Dim lSoilsLayer As String = GisUtil.LayerFileName("State Soil")
                 Dim lLayers() As String = { _
                  aLandUseFileName & "|Tag=LandUse", _
-                 lSoilsLayer & "|Tag=Soil", _
+                 lSoilsLayer & "|Tag=Soil|IdField=2|Idname=MUID", _
                  lSlopeReclassifyGridFileName & "|Tag=SlopeReclass", _
                  aSimplifiedCatchmentsFileName & "|IdField=0|IdName=COMID|Required=True|Tag=SubBasin"}
                 'Dim lLayers() As String = { _
@@ -299,18 +307,6 @@ Public Module modSDM
                 If g_GeoProcess AndAlso pLayerFilenames Is Nothing OrElse pLayerFilenames.Length < 1 Then
                     Logger.Msg("No layers specified for overlay", "Geoprocessing Overlay Requires Layers")
                     Exit Sub
-                End If
-
-                If Not IO.File.Exists(lSoilsLayer) Then
-                    'If Logger.Msg("Soils Layer " & lSoilsLayer & " does not exist.  Create an empty soils layer?", MsgBoxStyle.YesNo, "Soils Layer Problem") = MsgBoxResult.Yes Then
-                    Dim lSlopeGrid As New MapWinGIS.Grid
-                    Dim lSoilsGrid As New MapWinGIS.Grid
-                    MkDirPath(PathNameOnly(lSoilsLayer))
-                    lSlopeGrid.Open(lSlopeReclassifyGridFileName)
-                    lSoilsGrid.CreateNew(lSoilsLayer, lSlopeGrid.Header, MapWinGIS.GridDataType.LongDataType, 1)
-                    lSlopeGrid.Close()
-                    lSoilsGrid.Close()
-                    'End If
                 End If
 
                 If g_GeoProcess Then 'Check for layer that does not exist (e.g. soils)

@@ -339,6 +339,20 @@ StartOver:
         Dim lSelectedHuc As String = GetSelectedHUC()
         Dim lSelectedShape As MapWinGIS.Shape = GetSelectedShape()
 
+        lQuery = "<function name='GetBASINS'>" _
+               & "<arguments>" _
+               & "<DataType>core31</DataType>" _
+               & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
+               & "<CacheFolder>" & g_CacheFolder & "</CacheFolder>" _
+               & "<DesiredProjection>" & aDesiredProjection & "</DesiredProjection>" _
+               & aRegion _
+               & "<clip>False</clip>" _
+               & "<merge>True</merge>" _
+               & "<joinattributes>true</joinattributes>" _
+               & "</arguments>" _
+               & "</function>"
+        lQueries.Add(lQuery)
+
         lQuery = "<function name='GetNHDplus'>" _
                & "<arguments>" _
                & "<DataType>hydrography</DataType>" _
@@ -517,7 +531,7 @@ StartOver:
                 Logger.Status("Creating SWAT input sequence")
                 Using lLevel As New ProgressLevel(True)
                     BatchSWAT(lSelectedHuc, aNewDataDir, lSimplifiedCatchmentsFileName, lSimplifiedFlowlinesFileName, _
-                              lLandUseFileName, lElevationFileName)
+                              lLandUseFileName, lElevationFileName, lSelectedShape)
                 End Using
             End If
             g_MapWin.Project.Save(aProjectFileName)
