@@ -443,22 +443,6 @@ StartOver:
                 Dim lNewShapeName As String = lProjectDir & "\temp\tempextent.shp"
                 TryDeleteShapefile(lNewShapeName)
             End If
-            g_MapWin.Project.Modified = True
-            Using lLevel As New ProgressLevel(True)
-                ProcessDownloadResults(lResult) 'TODO: skip message box describing what has been downloaded?
-            End Using
-            AddAllShapesInDir(aNewDataDir, aNewDataDir)
-            g_MapWin.PreviewMap.Update(MapWindow.Interfaces.ePreviewUpdateExtents.CurrentMapView)
-            If Not aExistingMapWindowProject Then
-                'regular case, not coming from existing mapwindow project
-                'set mapwindow project projection to projection of first layer
-                g_MapWin.Project.ProjectProjection = aDesiredProjection
-
-                If Not (g_MapWin.Project.Save(aProjectFileName)) Then
-                    Logger.Dbg("CreateNewProjectAndDownloadBatchData:Save2Failed:" & g_MapWin.LastError)
-                End If
-            End If
-            g_MapWin.Project.Save(aProjectFileName)
 
             're-project selected shape aoi if necessary, and add it to the map
             Dim lSelectedSf As New MapWinGIS.Shapefile
@@ -486,6 +470,7 @@ StartOver:
                                     GisUtil.LayerVisible(lAOIIndex) = True
                                     GisUtil.ZoomToLayerExtents(lAOIIndex)
                                     RefreshView()
+                                    g_MapWin.PreviewMap.Update(MapWindow.Interfaces.ePreviewUpdateExtents.CurrentMapView)
                                     DoEvents()
                                 End If
                             End If
@@ -493,6 +478,23 @@ StartOver:
                     End If
                 End If
             End If
+
+            g_MapWin.Project.Modified = True
+            Using lLevel As New ProgressLevel(True)
+                ProcessDownloadResults(lResult) 'TODO: skip message box describing what has been downloaded?
+            End Using
+            AddAllShapesInDir(aNewDataDir, aNewDataDir)
+            g_MapWin.PreviewMap.Update(MapWindow.Interfaces.ePreviewUpdateExtents.CurrentMapView)
+            If Not aExistingMapWindowProject Then
+                'regular case, not coming from existing mapwindow project
+                'set mapwindow project projection to projection of first layer
+                g_MapWin.Project.ProjectProjection = aDesiredProjection
+
+                If Not (g_MapWin.Project.Save(aProjectFileName)) Then
+                    Logger.Dbg("CreateNewProjectAndDownloadBatchData:Save2Failed:" & g_MapWin.LastError)
+                End If
+            End If
+            g_MapWin.Project.Save(aProjectFileName)
 
             'process the network 
             Dim lSimplifiedFlowlinesFileName As String = ""
