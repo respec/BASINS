@@ -77,7 +77,7 @@ Module BatchHSPF
         '  NHDPlus
         '  NLCD 2001
         pLUType = 1
-        pLandUseClassFile = "C:\BASINS\etc\nlcd.dbf"
+        pLandUseClassFile = FindFile("Land Use Reclassification File", "nlcd.dbf", "dbf")
         '  DEM
         Dim lElevationUnitsName As String = "Centimeters"
         '  Met Data
