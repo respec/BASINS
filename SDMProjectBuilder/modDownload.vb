@@ -501,13 +501,13 @@ StartOver:
             Dim lSimplifiedCatchmentsFileName As String = ""
             ProcessNetwork(lSelectedHuc, lSelectedShape, aNewDataDir, lSimplifiedFlowlinesFileName, lSimplifiedCatchmentsFileName)
             If lSimplifiedFlowlinesFileName.Length > 0 Then
-                GisUtil.AddLayer(lSimplifiedFlowlinesFileName, "Simplified_Flowlines")
+                GisUtil.AddLayerToGroup(lSimplifiedFlowlinesFileName, "Simplified_Flowlines", "Data Layers")
                 GisUtil.LayerVisible(GisUtil.LayerIndex(lSimplifiedFlowlinesFileName)) = True
             Else
                 lSimplifiedFlowlinesFileName = GisUtil.LayerFileName("Flowline Features")
             End If
             If lSimplifiedCatchmentsFileName.Length > 0 Then
-                GisUtil.AddLayer(lSimplifiedCatchmentsFileName, "Simplified_Catchments")
+                GisUtil.AddLayerToGroup(lSimplifiedCatchmentsFileName, "Simplified_Catchments", "Data Layers")
                 GisUtil.LayerVisible(GisUtil.LayerIndex(lSimplifiedCatchmentsFileName)) = True
             Else
                 lSimplifiedCatchmentsFileName = GisUtil.LayerFileName("Catchment")
