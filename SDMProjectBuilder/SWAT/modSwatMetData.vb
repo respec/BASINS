@@ -17,18 +17,18 @@ Module modSwatMetData
                                  ByVal aDateEnd As Double)
 
         Dim lMetWDMfilename As String = IO.Path.Combine(aProjectFolder, "met\met.wdm")
-        Dim lMetWDM As New atcDataSourceWDM ' open met.wdm created by download
-        If lMetWDM.Open(lMetWDMfilename) Then
+        Dim lMetWDM As New atcDataSourceWDM
+        If atcDataManager.OpenDataSource(lMetWDM, lMetWDMfilename, Nothing) Then
             If lMetWDM.DataSets.Count > 0 Then
                 WriteSwatMetInput(lMetWDM, Nothing, aProjectFolder, aSaveInFolder, aDateStart, aDateEnd)
-                lMetWDM.Clear()
             Else
                 MapWinUtility.Logger.Dbg("No data found in met wdm: " & lMetWDMfilename)
             End If
+            lMetWDM.Clear()
+            atcDataManager.DataSources.Remove(lMetWDM)
         Else
             MapWinUtility.Logger.Dbg("Could not open met wdm: " & lMetWDMfilename)
         End If
-
     End Sub
 
     Public Sub WriteSwatMetInput(ByVal aOriginalData As atcDataSource, _
