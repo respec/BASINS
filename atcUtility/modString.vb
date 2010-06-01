@@ -367,7 +367,11 @@ Public Module modString
                 Case aMaxWidth, aMaxWidth - 1 'string contains decimal point at end of max width, format without decimal places
                     lString = Format(lValue, "0")
                 Case Is < aMaxWidth 'string contains a decimal before max width, format with fewer decimal places
-                    lString = Format(lValue, "0." & StrDup(aMaxWidth - lDecimalPos, "#"))
+                    If lValue >= 0 Then
+                        lString = Format(lValue, "0." & StrDup(aMaxWidth - lDecimalPos, "#"))
+                    Else
+                        lString = Format(lValue, "0." & StrDup(aMaxWidth - lDecimalPos - 1, "#"))
+                    End If
             End Select
         End If
 
