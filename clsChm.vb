@@ -71,14 +71,14 @@ Partial Class SwatInput
                 unitsDictionary.Add("LANDUSE", "")
                 unitsDictionary.Add("SOIL", "")
                 unitsDictionary.Add("SLOPE_CD", "")
-                unitsDictionary.Add("SOL_NO3(9)", "mg/kg")
-                unitsDictionary.Add("SOL_ORGN(9)", "mg/kg")
-                unitsDictionary.Add("SOL_LABP(9)", "mg/kg")
-                unitsDictionary.Add("SOL_ORGP(9)", "mg/kg")
-                unitsDictionary.Add("PESTNAME(9)", "")
-                unitsDictionary.Add("PLTPST(9)", "kg/ha")
-                unitsDictionary.Add("SOLPST(9)", "kg/ha")
-                unitsDictionary.Add("PSTENR(9)", "kg/ha")
+                unitsDictionary.Add("SOL_NO3", "mg/kg")
+                unitsDictionary.Add("SOL_ORGN", "mg/kg")
+                unitsDictionary.Add("SOL_LABP", "mg/kg")
+                unitsDictionary.Add("SOL_ORGP", "mg/kg")
+                unitsDictionary.Add("PESTNAME", "")
+                unitsDictionary.Add("PLTPST", "kg/ha")
+                unitsDictionary.Add("SOLPST", "kg/ha")
+                unitsDictionary.Add("PSTENR", "kg/ha")
 
                 Return unitsDictionary
             End Get
