@@ -182,6 +182,7 @@ Public Module modDownload
             'prompt about creating a project with no data
             CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
         End If
+        Logger.Status("Done " & g_MapWin.Project.FileName)
 
     End Sub
 
@@ -399,7 +400,6 @@ StartOver:
                & "</function>"
         lQueries.Add(lQuery)
 
-
         UnloadPlugin("Tiled Map")
         LoadPlugin("D4EM Data Download::BASINS")
         Dim lPlugins As New ArrayList
@@ -413,15 +413,15 @@ StartOver:
         Next
         Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
 
-        Dim lStepCount As Integer = lQueries.Count + 5
+        Dim lStepCount As Integer = lQueries.Count + 4
         If g_DoHSPF Then lStepCount += 1
         If g_DoSWAT Then lStepCount += 1
 
-        Logger.Progress(0, lStepCount)
+        Logger.Progress(1, lStepCount)
         Dim lResult As String = ""
         For Each lQuery In lQueries
             Dim lLabelStart As Integer = lQuery.IndexOf("'Get") + 4
-            Logger.Status("Downloading and processing " & lQuery.Substring(lLabelStart, lQuery.IndexOf("'>") - lLabelStart))
+            Logger.Status("Downloading " & lQuery.Substring(lLabelStart, lQuery.IndexOf("'>") - lLabelStart))
             Using lLevel As New ProgressLevel(True)
                 lResult &= lDownloadManager.Execute(lQuery)
             End Using
@@ -430,56 +430,60 @@ StartOver:
         'Logger.Msg(lResult, "Result of Query from DataManager")
 
         If Not lResult Is Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
-            If Not aExistingMapWindowProject Then
-                'regular case, not coming from existing mapwindow project
-                ClearLayers()
-                If Not (g_MapWin.Project.Save(aProjectFileName)) Then
-                    Logger.Dbg("CreateNewProjectAndDownloadBatchData:Save1Failed:" & g_MapWin.LastError)
+            Logger.Status("Download Successful, Building Project")
+            Using lLevel As New ProgressLevel(True)
+                If Not aExistingMapWindowProject Then
+                    'regular case, not coming from existing mapwindow project
+                    ClearLayers()
+                    If Not (g_MapWin.Project.Save(aProjectFileName)) Then
+                        Logger.Dbg("CreateNewProjectAndDownloadBatchData:Save1Failed:" & g_MapWin.LastError)
+                    End If
+                Else
+                    'open existing mapwindow project again
+                    g_MapWin.Project.Load(aProjectFileName)
+                    Dim lProjectDir As String = PathNameOnly(aProjectFileName)
+                    Dim lNewShapeName As String = lProjectDir & "\temp\tempextent.shp"
+                    TryDeleteShapefile(lNewShapeName)
                 End If
-            Else
-                'open existing mapwindow project again
-                g_MapWin.Project.Load(aProjectFileName)
-                Dim lProjectDir As String = PathNameOnly(aProjectFileName)
-                Dim lNewShapeName As String = lProjectDir & "\temp\tempextent.shp"
-                TryDeleteShapefile(lNewShapeName)
-            End If
 
-            're-project selected shape aoi if necessary, and add it to the map
-            Dim lSelectedSf As New MapWinGIS.Shapefile
-            Dim lAOIName As String = aNewDataDir & "aoi.shp"
-            TryDeleteShapefile(lAOIName)
-            If lSelectedSf.CreateNew(lAOIName, ShpfileType.SHP_POLYGON) Then
-                'add an id field to the new shapefile
-                Dim lField As New MapWinGIS.Field
-                lField.Name = "ID"
-                lField.Type = MapWinGIS.FieldType.STRING_FIELD
-                lField.Width = 10
-                lSelectedSf.StartEditingTable()
-                Dim lBsuc As Boolean = lSelectedSf.EditInsertField(lField, 0)
-                lSelectedSf.StopEditingTable()
-                'now insert the shape
-                If lSelectedSf.StartEditingShapes(True) Then
-                    If lSelectedSf.EditInsertShape(lSelectedShape, 0) Then
-                        If aAreaOfInterestProjection <> aDesiredProjection Then
-                            If MapWinGeoProc.SpatialReference.ProjectShapefile(aAreaOfInterestProjection, aDesiredProjection, lSelectedSf) Then
-                                If lSelectedSf.Open(lAOIName) Then
-                                    lSelectedShape = lSelectedSf.Shape(0)
-                                    GisUtil.AddLayer(lAOIName, "Area_of_Interest")
-                                    Dim lAOIIndex As Integer = GisUtil.LayerIndex(lAOIName)
-                                    GisUtil.DrawFill(lAOIIndex) = False
-                                    GisUtil.LayerVisible(lAOIIndex) = True
-                                    GisUtil.ZoomToLayerExtents(lAOIIndex)
-                                    RefreshView()
-                                    g_MapWin.PreviewMap.Update(MapWindow.Interfaces.ePreviewUpdateExtents.CurrentMapView)
-                                    DoEvents()
+                're-project selected shape aoi if necessary, and add it to the map
+                Dim lSelectedSf As New MapWinGIS.Shapefile
+                Dim lAOIName As String = aNewDataDir & "aoi.shp"
+                TryDeleteShapefile(lAOIName)
+                If lSelectedSf.CreateNew(lAOIName, ShpfileType.SHP_POLYGON) Then
+                    'add an id field to the new shapefile
+                    Dim lField As New MapWinGIS.Field
+                    lField.Name = "ID"
+                    lField.Type = MapWinGIS.FieldType.STRING_FIELD
+                    lField.Width = 10
+                    lSelectedSf.StartEditingTable()
+                    Dim lBsuc As Boolean = lSelectedSf.EditInsertField(lField, 0)
+                    lSelectedSf.StopEditingTable()
+                    'now insert the shape
+                    If lSelectedSf.StartEditingShapes(True) Then
+                        If lSelectedSf.EditInsertShape(lSelectedShape, 0) Then
+                            If aAreaOfInterestProjection <> aDesiredProjection Then
+                                If MapWinGeoProc.SpatialReference.ProjectShapefile(aAreaOfInterestProjection, aDesiredProjection, lSelectedSf) Then
+                                    If lSelectedSf.Open(lAOIName) Then
+                                        lSelectedShape = lSelectedSf.Shape(0)
+                                        GisUtil.AddLayer(lAOIName, "Area_of_Interest")
+                                        Dim lAOIIndex As Integer = GisUtil.LayerIndex(lAOIName)
+                                        GisUtil.DrawFill(lAOIIndex) = False
+                                        GisUtil.LayerVisible(lAOIIndex) = True
+                                        GisUtil.ZoomToLayerExtents(lAOIIndex)
+                                        RefreshView()
+                                        g_MapWin.PreviewMap.Update(MapWindow.Interfaces.ePreviewUpdateExtents.CurrentMapView)
+                                        DoEvents()
+                                    End If
                                 End If
                             End If
                         End If
                     End If
                 End If
-            End If
+            End Using
 
             g_MapWin.Project.Modified = True
+            Logger.Status("Processing Downloaded Data")
             Using lLevel As New ProgressLevel(True)
                 ProcessDownloadResults(lResult) 'TODO: skip message box describing what has been downloaded?
             End Using
@@ -497,21 +501,24 @@ StartOver:
             g_MapWin.Project.Save(aProjectFileName)
 
             'process the network 
+            Logger.Status("Processing Network")
             Dim lSimplifiedFlowlinesFileName As String = ""
             Dim lSimplifiedCatchmentsFileName As String = ""
-            ProcessNetwork(lSelectedHuc, lSelectedShape, aNewDataDir, lSimplifiedFlowlinesFileName, lSimplifiedCatchmentsFileName)
-            If lSimplifiedFlowlinesFileName.Length > 0 Then
-                GisUtil.AddLayerToGroup(lSimplifiedFlowlinesFileName, "Simplified_Flowlines", "Data Layers")
-                GisUtil.LayerVisible(GisUtil.LayerIndex(lSimplifiedFlowlinesFileName)) = True
-            Else
-                lSimplifiedFlowlinesFileName = GisUtil.LayerFileName("Flowline Features")
-            End If
-            If lSimplifiedCatchmentsFileName.Length > 0 Then
-                GisUtil.AddLayerToGroup(lSimplifiedCatchmentsFileName, "Simplified_Catchments", "Data Layers")
-                GisUtil.LayerVisible(GisUtil.LayerIndex(lSimplifiedCatchmentsFileName)) = True
-            Else
-                lSimplifiedCatchmentsFileName = GisUtil.LayerFileName("Catchment")
-            End If
+            Using lLevel As New ProgressLevel(True)
+                ProcessNetwork(lSelectedHuc, lSelectedShape, aNewDataDir, lSimplifiedFlowlinesFileName, lSimplifiedCatchmentsFileName)
+                If lSimplifiedFlowlinesFileName.Length > 0 Then
+                    GisUtil.AddLayerToGroup(lSimplifiedFlowlinesFileName, "Simplified_Flowlines", "Data Layers")
+                    GisUtil.LayerVisible(GisUtil.LayerIndex(lSimplifiedFlowlinesFileName)) = True
+                Else
+                    lSimplifiedFlowlinesFileName = GisUtil.LayerFileName("Flowline Features")
+                End If
+                If lSimplifiedCatchmentsFileName.Length > 0 Then
+                    GisUtil.AddLayerToGroup(lSimplifiedCatchmentsFileName, "Simplified_Catchments", "Data Layers")
+                    GisUtil.LayerVisible(GisUtil.LayerIndex(lSimplifiedCatchmentsFileName)) = True
+                Else
+                    lSimplifiedCatchmentsFileName = GisUtil.LayerFileName("Catchment")
+                End If
+            End Using
             g_MapWin.Project.Save(aProjectFileName)
 
             Dim lElevationFileName As String = GisUtil.LayerFileName("NHDPlus Elevation")
