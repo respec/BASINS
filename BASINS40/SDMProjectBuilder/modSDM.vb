@@ -248,7 +248,7 @@ Public Module modSDM
 
             If g_GeoProcess Then
                 'Slope - Elevation
-                Dim lSlopeGridFileName As String = PathNameOnly(aDemGridFileName) & "\slope.tif"
+                Dim lSlopeGridFileName As String = PathNameOnly(aDemGridFileName) & "\slopeswat.tif"
                 If IO.File.Exists(lSlopeGridFileName) Then
                     Logger.Status("UsingExisting " & lSlopeGridFileName)
                 Else
