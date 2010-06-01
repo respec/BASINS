@@ -1304,8 +1304,6 @@ StartOver:
                     SetCensusColors(MWlay, shpFile)
                 ElseIf LCase(aFilename).IndexOf("\dem" & g_PathChar) > 0 Then
                     SetDemColors(MWlay, shpFile)
-                ElseIf LCase(aFilename).EndsWith("cat.shp") Then
-                    MWlay.ZoomTo()
                 End If
                 If Group.Length > 0 Then
                     AddLayerToGroup(MWlay, Group)
