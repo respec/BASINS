@@ -59,6 +59,46 @@ Partial Class SwatInput
             Return "INSERT INTO mgt1 ( SUBBASIN , HRU , LANDUSE , SOIL , SLOPE_CD , IGRO , PLANT_ID , LAI_INIT , BIO_INIT , PHU_PLT , BIOMIX , CN2 , USLE_P , BIO_MIN , FILTERW , IURBAN , URBLU , IRRSC , IRRNO , FLOWMIN , DIVMAX , FLOWFR , DDRAIN , TDRAIN , GDRAIN , NROT , HUSC , ISCROP  ) " _
                  & "Values ('" & SUBBASIN & "', '" & Hru & "', '" & LANDUSE & "', '" & SOIL & "', '" & SLOPE_CD & "', '" & IGRO & "', '" & PLANT_ID & "', '" & LAI_INIT & "', '" & BIO_INIT & "', '" & PHU_PLT & "', '" & BIOMIX & "', '" & CN2 & "', '" & USLE_P & "', '" & BIO_MIN & "', '" & FILTERW & "', '" & IURBAN & "', '" & URBLU & "', '" & IRRSC & "', '" & IRRNO & "', '" & FLOWMIN & "', '" & DIVMAX & "', '" & FLOWFR & "', '" & DDRAIN & "', '" & TDRAIN & "', '" & GDRAIN & "', '" & NROT & "', '" & HUSC & "', '" & ISCROP & "'  )"
         End Function
+
+        Public Shared ReadOnly Property Units() As Dictionary(Of String, String)
+
+            Get
+                Dim unitsDictionary As New Dictionary(Of String, String)
+
+                unitsDictionary.Add("SUBBASIN", "")
+                unitsDictionary.Add("HRU", "")
+                unitsDictionary.Add("LANDUSE", "")
+                unitsDictionary.Add("SOIL", "")
+                unitsDictionary.Add("SLOPE_CD", "")
+                unitsDictionary.Add("IGRO", "N/A")
+                unitsDictionary.Add("PLANT_ID", "N/A")
+                unitsDictionary.Add("LAI_INIT", "N/A")
+                unitsDictionary.Add("BIO_INIT", "kg/ha")
+                unitsDictionary.Add("PHU_PLT", "none")
+                unitsDictionary.Add("BIOMIX", "fraction")
+                unitsDictionary.Add("CN2", "none")
+                unitsDictionary.Add("USLE_P", "none")
+                unitsDictionary.Add("BIO_MIN", "kg/ha")
+                unitsDictionary.Add("FILTERW", "m")
+                unitsDictionary.Add("IURBAN", "N/A")
+                unitsDictionary.Add("URBLU", "N/A")
+                unitsDictionary.Add("IRRSC", "N/A")
+                unitsDictionary.Add("IRRNO", "N/A")
+                unitsDictionary.Add("FLOWMIN", "m3/s")
+                unitsDictionary.Add("DIVMAX", "number")
+                unitsDictionary.Add("FLOWFR", "fraction")
+                unitsDictionary.Add("DDRAIN", "mm")
+                unitsDictionary.Add("TDRAIN", "hr")
+                unitsDictionary.Add("GDRAIN", "hr")
+                unitsDictionary.Add("NROT", "N/A")
+                unitsDictionary.Add("HUSC", "")
+                unitsDictionary.Add("ISCROP", "")
+
+                Return unitsDictionary
+
+            End Get                  
+        End Property
+
     End Class
 
     Public Class clsMgtItem2
@@ -139,6 +179,28 @@ Partial Class SwatInput
             Return mgt2
 
         End Function
+
+        Public Shared ReadOnly Property Units() As Dictionary(Of String, String)
+
+            Get
+                Dim unitsDictionary As New Dictionary(Of String, String)
+
+                unitsDictionary.Add("SUBBASIN", "")
+                unitsDictionary.Add("HRU", "")
+                unitsDictionary.Add("LANDUSE", "")
+                unitsDictionary.Add("SOIL", "")
+                unitsDictionary.Add("SLOPE", "")
+
+                unitsDictionary.Add("CROP", "")
+                unitsDictionary.Add("YEAR", "year")
+                unitsDictionary.Add("MONTH", "")
+                unitsDictionary.Add("DAY", "")
+
+                Return unitsDictionary
+            End Get
+
+        End Property
+
 
     End Class
 
