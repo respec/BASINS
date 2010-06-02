@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Basic Express 2008
+# Visual Studio 2008
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SDMProjectBuilder", "SDMProjectBuilder.vbproj", "{D92BED39-A1E0-42D3-AC79-643D16CC1500}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-MapWinUtility", "..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility.vbproj", "{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}"
@@ -36,6 +36,8 @@ EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimeseriesD4EM", "..\atcTimeseriesD4EM\atcTimeseriesD4EM.vbproj", "{31440B87-261C-4E1C-ADAB-76DA74B0A0FE}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimeseriesStatistics", "..\atcTimeseriesStatistics\atcTimeseriesStatistics.vbproj", "{7E40E3E6-BF8E-45B5-99AF-4E11DAF039FD}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SwatObject", "..\..\SwatObject\SwatObject.vbproj", "{724F2B12-E252-4493-BE02-708FF8C5D56E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -115,6 +117,10 @@ Global
 		{7E40E3E6-BF8E-45B5-99AF-4E11DAF039FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E40E3E6-BF8E-45B5-99AF-4E11DAF039FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E40E3E6-BF8E-45B5-99AF-4E11DAF039FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{724F2B12-E252-4493-BE02-708FF8C5D56E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{724F2B12-E252-4493-BE02-708FF8C5D56E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{724F2B12-E252-4493-BE02-708FF8C5D56E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{724F2B12-E252-4493-BE02-708FF8C5D56E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
