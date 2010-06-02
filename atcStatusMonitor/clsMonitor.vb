@@ -553,7 +553,7 @@ Public Class clsMonitor
                 Case "HIDE"
                     If Not pIgnoringWindowCommands AndAlso pfrmStatus IsNot Nothing Then
                         If pLevels.Count = 1 Then lLevel.ClearLabels()
-                        ChangeLevel(-1)
+                        'ChangeLevel(-1)
                         'If pfrmStatus IsNot Nothing Then
                         '    lLevel.ClearLabels()
                         '    If InvokeRequired() Then pfrmStatus.Invoke(pHideCallback) Else HideUnsafe()
