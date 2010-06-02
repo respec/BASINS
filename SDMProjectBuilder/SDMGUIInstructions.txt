@@ -1,0 +1,18 @@
+Make sure that you have Tortoise svn installed on your machine.  You may download and install the latest version of Tortoise svn from http://tortoisesvn.net/downloads
+Create C:\dev folder.  Use tortoise to ckeck out the following folders in C:\dev as follows:
+Checkout http://svn.mapwindow.org/svnroot/D4EM/DataManager into c:\dev\D4EM\DataManager.
+Checkout http://svn.mapwindow.org/svnroot/BASINS40 into C:\Dev\BASINS40.
+Checkout http://svn.mapwindow.org/svnroot/MapWindow4Plugins/MapWinUtility into c:\dev\MapWindow4Plugins\MapWinUtility.
+Checkout http://svn.mapwindow.org/svnroot/SwatObject into c:\dev\SwatObject.
+
+open http://www.epa.gov/waterscience/ftp/basins/system/BASINS4 web page and download BASINS4 into any directory on your macine.  You may also download it directly from from http://www.epa.gov/waterscience/ftp/basins/system/BASINS4/basins.zip.
+Install BASINS4 on your machine.  Take default options during installations.
+
+Copy all files and folders from C:\Basins\bin into C:\Dev\BASINS40\Bin.  Overwrite any existing files.
+
+Make a copy of C:\Dev\BASINS40\Bin\MapWindow.exe into the same directory and rename it to SDMProjectBuilder.exe.
+
+Open solution file (SDMProjectBuilder.sln) in C:\Dev\BASINS40\SDMProjectBuilder. 
+
+
+
