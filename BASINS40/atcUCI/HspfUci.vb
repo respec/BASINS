@@ -1921,7 +1921,7 @@ x:
         Return lTotalArea
     End Function
 
-    Private Function LocalUpstreamArea(ByRef aOperation As HspfOperation) As Double
+    Public Function LocalUpstreamArea(ByRef aOperation As HspfOperation) As Double
         Dim lUpArea As Double = 0.0
         For Each lConnection As HspfConnection In aOperation.Sources
             If lConnection.Source.VolName = "PERLND" Or _
