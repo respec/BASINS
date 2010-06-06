@@ -36,15 +36,12 @@ Public Module Main
             '3: Kelvin
             Dim lTempUnits As Integer = 2
 
-            'set the option for daily (1)  or hourly (2) precip output
-            Dim lTimeStep As Integer = 1
+            'set the option for daily (1), hourly (2) or compressed hourly (3) precip output
+            Dim lTimeStep As Integer = 3
+            'set the number of minutes to compress the hours into (if lTimeStep = 3)
+            Dim lTimeSkip As Integer = 6
 
             Dim lNumBpts As Integer
-            If lTimeStep = 1 Then
-                lNumBpts = 2
-            ElseIf lTimeStep = 2 Then
-                lNumBpts = 24
-            End If
 
             'set the DSNs for constituents
             Dim lDsnPREC As Integer = 107
@@ -256,6 +253,8 @@ Public Module Main
                         lTempDayStatResults(5) = 0
                         lTempDayPrecipAccumulate = 0
 
+                        lNumBpts = 0
+
                         For j = 1 To 24
                             'ATEM: min and max temperature for the current day
                             lTempRecord = lTSATEM.Values(i + j)
@@ -300,14 +299,27 @@ Public Module Main
                             'Convert inches to millimeters
                             lTempRecord *= 25.4
                             lTempDayPrecipAccumulate += lTempRecord
+
                             If lTimeStep = 2 Then ' hour
                                 lDayOutString = lDayOutString & " " & j.ToString.PadLeft(2, " ") & " " & WEPPformatMoreDetail(lTempDayPrecipAccumulate)
                             ElseIf lTimeStep = 1 Then 'day
                                 If j = 24 Then
                                     lDayOutString = lDayOutString & " " & "0   0." & vbCrLf & "1".PadLeft(2, " ") & " " & WEPPformatMoreDetail(lTempDayPrecipAccumulate)
                                 End If
-                            End If
+                            ElseIf lTimeStep = 3 Then 'compressed hourly
+                                lNumBpts += 1
+                                If lTempRecord > 0 Then
+                                    lNumBpts += 1
+                                    If j > 9 Then 'formatting and padding to make the output uniform and pretty'
+                                        lDayOutString = lDayOutString & "   " & j.ToString.PadLeft(2, " ") & " " & WEPPformatMoreDetail((lTempDayPrecipAccumulate - lTempRecord)).ToString.PadLeft(2, " ") & vbCrLf & " " & (j + lTimeSkip / 60).ToString.PadLeft(2, " ") & " " & WEPPformatMoreDetail(lTempDayPrecipAccumulate)
+                                    Else
+                                        lDayOutString = lDayOutString & "   " & j.ToString.PadLeft(2, " ") & " " & WEPPformatMoreDetail((lTempDayPrecipAccumulate - lTempRecord)).ToString.PadLeft(2, " ") & vbCrLf & "  " & (j + lTimeSkip / 60).ToString.PadLeft(2, " ") & " " & WEPPformatMoreDetail(lTempDayPrecipAccumulate)
+                                    End If
 
+                                Else
+                                    lDayOutString = lDayOutString & "   " & j.ToString.PadLeft(2, " ") & " " & WEPPformatMoreDetail(lTempDayPrecipAccumulate)
+                                End If
+                            End If
 
                             'export this hour's values to the debug raw timeseries textfile (if lRawTsFlag is true)
                             If lRawTsFlag Then
@@ -320,8 +332,12 @@ Public Module Main
                                 lTempDayStatResults(5) = lTempDayStatResults(5) / 24
                                 lBigAccum += lTempDayPrecipAccumulate
                             Else
-                                'If lTimeStep = 2 Then
-                                If lTimeStep = 2 Then
+                                If lTimeStep = 1 Then
+                                    lNumBpts = 2
+                                ElseIf lTimeStep = 2 Then
+                                    lNumBpts = 24
+                                    lDayOutString &= vbCrLf
+                                ElseIf lTimeStep = 3 Then
                                     lDayOutString &= vbCrLf
                                 End If
                             End If
