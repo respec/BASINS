@@ -173,17 +173,23 @@ Public Module modDownload
         Logger.Dbg("  SWATDatabaseName " & g_SWATDatabaseName)
         Logger.Dbg("  DoHSPF,SWAT " & g_DoHSPF & " " & g_DoSWAT)
 
+        Dim lParametersFilename As String = IO.Path.Combine(IO.Path.GetDirectoryName(g_MapWin.Project.FileName), PARAMETER_FILE)
+        Dim lCreatedMapWindowProjectFilename As String = ""
+
         Dim lRegion As String = GetSelectedRegion()
         If lRegion.Length > 0 Then
             'Save national project as the user has zoomed it
             g_MapWin.Project.Save(g_MapWin.Project.FileName)
-            SpecifyAndCreateNewProject = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
+            lCreatedMapWindowProjectFilename = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
         Else
             'prompt about creating a project with no data
-            SpecifyAndCreateNewProject = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
+            lCreatedMapWindowProjectFilename = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
+        End If
+        If IO.File.Exists(lCreatedMapWindowProjectFilename) Then
+            WriteParametersTextFile(lParametersFilename, lCreatedMapWindowProjectFilename)
         End If
         Logger.Status("Done " & g_MapWin.Project.FileName)
-
+        Return lCreatedMapWindowProjectFilename
     End Function
 
     'Returns file name of new project or "" if not built
@@ -239,7 +245,7 @@ StartOver:
         lDefaultProjectFileName = CreateDefaultNewProjectFileName(lDataPath, lDefDirName)
         lDefDirName = PathNameOnly(lDefaultProjectFileName)
         Logger.Dbg("CreateNewProjectDirectory:" & lDefDirName)
-        System.IO.Directory.CreateDirectory(lDefDirName)
+        IO.Directory.CreateDirectory(lDefDirName)
 
         Dim lProjectFileName As String = PromptForNewProjectFileName(lDefDirName, lDefaultProjectFileName)
         If lProjectFileName.Length = 0 Then
@@ -285,7 +291,6 @@ StartOver:
             Else
                 Logger.Dbg("Projection:" & lMyProjection)
                 SaveFileString(lNewDataDir & "prj.proj", lMyProjection) 'Side effect: makes data directory
-
                 If lNoData Then
                     Logger.Dbg("EmptyProjectCreated")
                     ClearLayers()

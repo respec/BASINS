@@ -155,6 +155,8 @@ Public Class SDMplugin
                 End If
             End If
 
+            ReadParametersTextFile(IO.Path.Combine(IO.Path.GetDirectoryName(NationalProjectFullPath), PARAMETER_FILE))
+
             pBuildFrm = New frmBuildNew
             pBuildFrm.Show()
             Try

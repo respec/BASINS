@@ -60,7 +60,7 @@ Public Module modSDM
     Private pThreadCount As Integer = 0
 
     'Const SDM_REGISTRY_KEY As String = "SOFTWARE\\US EPA\\D4EM\\SDMProjectBuilder"
-    Const PARAMETER_FILE As String = "SDMParameters"
+    Friend Const PARAMETER_FILE As String = "SDMParameters"
 
     Private _sdmBaseDirectory As String = ""
     Private _parametersFile As String = ""
@@ -70,17 +70,15 @@ Public Module modSDM
     '    Private _swatSoilsDB As String = ""
     Private _simulationStartYear As Integer = 0
     Private _simulationEndYear As Integer = 0
-    Private _runSWAT As Boolean = False
-    Private _runHSPF As Boolean = False
 
     'private bool _defaultUnitChanged = false;
     'private bool _flagDefaultUnitChanged = false;
 
 
-    Private Sub WriteParametersTextFile(ByVal aFilename As String)
+    Friend Sub WriteParametersTextFile(ByVal aFilename As String, ByVal aMapWindowProjectFilename As String)
         Dim sb As New Text.StringBuilder
-        sb.AppendLine("ProjectsPath," + _projFolder)
-        sb.AppendLine("DefaultUnit," + _defaultUnit)
+        sb.AppendLine("ProjectsPath," + IO.Path.GetDirectoryName(IO.Path.GetDirectoryName(aMapWindowProjectFilename)))
+        sb.AppendLine("DefaultUnit," + IO.Path.GetFileName(IO.Path.GetDirectoryName(aMapWindowProjectFilename)))
         sb.AppendLine("SWAT2005Database," + g_SWATDatabaseName)
         'sb.AppendLine("SWATSoilsDatabase," + _swatSoilsDB)
         sb.AppendLine("MinimumStreamLength," + g_MinFlowlineKM)
@@ -88,12 +86,12 @@ Public Module modSDM
         sb.AppendLine("MinumumLandUsePercent," + g_LandUseIgnoreBelowFraction * 100)
         sb.AppendLine("SimulationStartYear," + _simulationStartYear)
         sb.AppendLine("SimulationEndYear," + _simulationEndYear)
-        sb.AppendLine("RunSWAT," + _runSWAT)
-        sb.AppendLine("RunHSPF," + _runHSPF)
+        sb.AppendLine("RunSWAT," + g_DoSWAT)
+        sb.AppendLine("RunHSPF," + g_DoHSPF)
         IO.File.WriteAllText(aFilename, sb.ToString)
     End Sub
 
-    Private Sub ReadParametersTextFile(ByVal aFilename As String)
+    Friend Sub ReadParametersTextFile(ByVal aFilename As String)
         For Each line As String In LinesInFile(aFilename)
             If (line IsNot Nothing) AndAlso (line <> "") Then
                 Dim items() As String = line.Split(",")
@@ -108,8 +106,8 @@ Public Module modSDM
                         Case "MinumumLandUsePercent" : g_LandUseIgnoreBelowFraction = Convert.ToDouble(items(1)) / 100
                         Case "SimulationStartYear" : _simulationStartYear = Convert.ToInt32(items(1))
                         Case "SimulationEndYear" : _simulationEndYear = Convert.ToInt32(items(1))
-                        Case "RunSWAT" : _runSWAT = Convert.ToBoolean(items(1))
-                        Case "RunHSPF" : _runHSPF = Convert.ToBoolean(items(1))
+                        Case "RunSWAT" : g_DoSWAT = Convert.ToBoolean(items(1))
+                        Case "RunHSPF" : g_DoHSPF = Convert.ToBoolean(items(1))
                         Case Else
                             'Log something here?
                     End Select
