@@ -3,8 +3,8 @@ Imports atcData
 Imports atcTimeseriesBinary
 
 Module modOutputSummarize
-    Sub OutputSummarize(ByVal aProjectFolder As String, ByVal aInputFilePath As String, ByVal aHuc12 As String)
-        Dim lReportFilePath As String = IO.Path.Combine(aProjectFolder, "Scenarios\" & aHuc12 & "\TablesOut")
+    Sub OutputSummarize(ByVal aProjectFolder As String, ByVal aInputFilePath As String, ByVal aHuc As String)
+        Dim lReportFilePath As String = IO.Path.Combine(aProjectFolder, "Scenarios\" & aHuc & "\TablesOut")
 
         Dim lOutputHruFileName As String = aInputFilePath & "\output.hru"
         If FileExists(lOutputHruFileName) Then
