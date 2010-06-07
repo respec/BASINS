@@ -163,7 +163,7 @@ Public Module modDownload
         RefreshView()
     End Sub
 
-    Public Sub SpecifyAndCreateNewProject()
+    Public Function SpecifyAndCreateNewProject() As String
         pBuildFrm = Nothing
 
         Logger.Dbg("SpecifyAndCreateNewProject")
@@ -177,14 +177,14 @@ Public Module modDownload
         If lRegion.Length > 0 Then
             'Save national project as the user has zoomed it
             g_MapWin.Project.Save(g_MapWin.Project.FileName)
-            CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
+            SpecifyAndCreateNewProject = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
         Else
             'prompt about creating a project with no data
-            CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
+            SpecifyAndCreateNewProject = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
         End If
         Logger.Status("Done " & g_MapWin.Project.FileName)
 
-    End Sub
+    End Function
 
     'Returns file name of new project or "" if not built
     Friend Function CreateNewProjectAndDownloadCoreDataInteractive(ByVal aRegion As String) As String
@@ -245,9 +245,9 @@ StartOver:
         If lProjectFileName.Length = 0 Then
             Return ""
         Else
-            'If the user did not choose the default folder or a subfolder of it
             Dim lNewDataDir As String = PathNameOnly(lProjectFileName) & g_PathChar
             If Not lNewDataDir.ToLower.StartsWith(lDefDirName.ToLower) Then
+                'If the user did not choose the default folder or a subfolder of it
                 'Remove speculatively created folder since they chose something else
                 Try
                     System.IO.Directory.Delete(lDefDirName, False) 'Cancelled save dialog or changed directory
@@ -313,6 +313,25 @@ StartOver:
         End If
     End Sub
 
+    Public Sub EnsureGlobalCacheSet(ByVal aDataPath As String)
+        If g_CacheFolder Is Nothing OrElse g_CacheFolder.Length = 0 OrElse Not IO.Directory.Exists(g_CacheFolder) Then
+            g_CacheFolder = aDataPath.TrimEnd(g_PathChar)
+            Dim lDataPos As Integer = g_CacheFolder.IndexOf(g_PathChar & "data" & g_PathChar)
+            If lDataPos >= 0 Then
+                g_CacheFolder = IO.Path.Combine(g_CacheFolder.Substring(0, lDataPos), "cache")
+            Else
+                If IsNumeric(IO.Path.GetFileName(g_CacheFolder)) Then
+                    g_CacheFolder = IO.Path.GetDirectoryName(g_CacheFolder)
+                End If
+                If IO.Directory.Exists(IO.Path.Combine(IO.Path.GetDirectoryName(g_CacheFolder), "cache")) Then
+                    g_CacheFolder = IO.Path.Combine(IO.Path.GetDirectoryName(g_CacheFolder), "cache")
+                Else
+                    g_CacheFolder = IO.Path.Combine(g_CacheFolder, "cache")
+                End If
+            End If
+        End If
+    End Sub
+
     'Returns file name of new project or "" if not built
     Public Sub CreateNewProjectAndDownloadBatchData(ByVal aRegion As String, _
                                                     ByVal aDataPath As String, _
@@ -324,18 +343,7 @@ StartOver:
         Dim lQuery As String
         Dim lQueries As New Generic.List(Of String)
 
-        If g_CacheFolder Is Nothing OrElse g_CacheFolder.Length = 0 Then
-            g_CacheFolder = aDataPath
-            g_CacheFolder = g_CacheFolder.TrimEnd(g_PathChar)
-            If IsNumeric(IO.Path.GetFileName(g_CacheFolder)) Then
-                g_CacheFolder = IO.Path.GetDirectoryName(g_CacheFolder)
-            End If
-            If IO.Directory.Exists(IO.Path.Combine(IO.Path.GetDirectoryName(g_CacheFolder), "cache")) Then
-                g_CacheFolder = IO.Path.Combine(IO.Path.GetDirectoryName(g_CacheFolder), "cache")
-            Else
-                g_CacheFolder = IO.Path.Combine(g_CacheFolder, "cache")
-            End If
-        End If
+        EnsureGlobalCacheSet(aDataPath)
 
         Dim lSelectedHuc As String = GetSelectedHUC()
         Dim lSelectedShape As MapWinGIS.Shape = GetSelectedShape()
@@ -343,6 +351,7 @@ StartOver:
         lQuery = "<function name='GetBASINS'>" _
                & "<arguments>" _
                & "<DataType>core31</DataType>" _
+               & "<DataType>huc12</DataType>" _
                & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
                & "<CacheFolder>" & g_CacheFolder & "</CacheFolder>" _
                & "<DesiredProjection>" & aDesiredProjection & "</DesiredProjection>" _
@@ -401,18 +410,7 @@ StartOver:
         lQueries.Add(lQuery)
 
         UnloadPlugin("Tiled Map")
-        LoadPlugin("D4EM Data Download::BASINS")
-        Dim lPlugins As New ArrayList
-        For lPluginIndex As Integer = 0 To g_MapWin.Plugins.Count
-            Try
-                If Not g_MapWin.Plugins.Item(lPluginIndex) Is Nothing Then
-                    lPlugins.Add(g_MapWin.Plugins.Item(lPluginIndex))
-                End If
-            Catch ex As Exception
-            End Try
-        Next
-        Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
-
+        Dim lDownloadManager As D4EMDataManager.DataManager = CreateDataManager()
         Dim lStepCount As Integer = lQueries.Count + 4
         If g_DoHSPF Then lStepCount += 1
         If g_DoSWAT Then lStepCount += 1
@@ -547,6 +545,22 @@ StartOver:
 
         End If
     End Sub
+
+    Friend Function CreateDataManager() As D4EMDataManager.DataManager
+        LoadPlugin("D4EM Data Download::BASINS")
+        LoadPlugin("D4EM Data Download::NHDPlus")
+        LoadPlugin("D4EM Data Download::NLCD2001")
+        Dim lPlugins As New ArrayList
+        For lPluginIndex As Integer = 0 To g_MapWin.Plugins.Count
+            Try
+                If Not g_MapWin.Plugins.Item(lPluginIndex) Is Nothing Then
+                    lPlugins.Add(g_MapWin.Plugins.Item(lPluginIndex))
+                End If
+            Catch ex As Exception
+            End Try
+        Next
+        Return New D4EMDataManager.DataManager(lPlugins)
+    End Function
 
     Private Sub LoadPlugin(ByVal aPluginName As String)
         Try

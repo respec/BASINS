@@ -85,4 +85,6 @@
 <Layer Filename="_l.shp" Name="303d List - Lines" Group="Regulatory" />
 <Layer Filename="_a.shp" Name="303d List - Areas" Group="Regulatory" />
 
+<Layer Filename="huc12.shp" Name="12-digit Cataloging Unit Boundaries" Group="Hydrology" Visible="yes" />
+
 </BasinsDefaultLayers>

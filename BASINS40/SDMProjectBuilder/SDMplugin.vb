@@ -6,7 +6,8 @@ Imports MapWinUtility
 Public Class SDMplugin
     Inherits atcDataPlugin
 
-    Private Const NationalProjectFilename As String = "Project Builder.mwprj"
+    Private Const NationalProjectFilename As String = "ProjectBuilder.mwprj"
+    Private NationalProjectFullPath As String = ""
     Private pStatusMonitor As MonitorProgressStatus
 
     Public Overrides ReadOnly Property Name() As String
@@ -67,7 +68,7 @@ Public Class SDMplugin
                 pStatusMonitor.InnerProgressStatus = Logger.ProgressStatus
                 Logger.ProgressStatus = pStatusMonitor
                 Logger.Status("LABEL TITLE " & g_AppNameShort & " Status")
-                Logger.Status("PROGRESS TIME ON") 'Enable time-to-completion estimation
+                'Logger.Status("PROGRESS TIME ON") 'Enable time-to-completion estimation
                 Logger.Status("")
             Else
                 pStatusMonitor.StopMonitor()
@@ -89,7 +90,10 @@ Public Class SDMplugin
     End Sub
 
     Public Overrides Sub ProjectLoading(ByVal aProjectFile As String, ByVal aSettingsString As String)
-        If pBuildFrm Is Nothing AndAlso aProjectFile IsNot Nothing AndAlso aProjectFile.EndsWith("Builder.mwprj") Then LoadNationalProject()
+        If pBuildFrm Is Nothing AndAlso aProjectFile IsNot Nothing AndAlso aProjectFile.EndsWith(NationalProjectFilename) Then
+            If FileExists(aProjectFile) Then NationalProjectFullPath = aProjectFile
+            LoadNationalProject()
+        End If
     End Sub
 
     Public Overrides Sub ShapesSelected(ByVal aHandle As Integer, ByVal aSelectInfo As MapWindow.Interfaces.SelectInfo)
@@ -118,13 +122,15 @@ Public Class SDMplugin
     ''' <remarks></remarks>
     Public Sub LoadNationalProject()
         If Not NationalProjectIsOpen() Then
-            Dim lFileName As String = IO.Path.Combine(CurDir, "Data\national" & g_PathChar & NationalProjectFilename)
-            If FileExists(lFileName) Then  'load national project
+            If Not FileExists(NationalProjectFullPath) Then
+                NationalProjectFullPath = FindFile("Open " & NationalProjectFilename, IO.Path.Combine(CurDir, "Data\national" & g_PathChar & NationalProjectFilename))
+            End If
+            If FileExists(NationalProjectFullPath) Then  'load national project
 
-                g_MapWin.Project.Load(lFileName)
+                g_MapWin.Project.Load(NationalProjectFullPath)
 
                 'See if we need to also process and load place names
-                Dim lInstructions As String = D4EMDataManager.SpatialOperations.CheckPlaceNames(IO.Path.GetDirectoryName(lFileName), g_MapWin.Project.ProjectProjection)
+                Dim lInstructions As String = D4EMDataManager.SpatialOperations.CheckPlaceNames(IO.Path.GetDirectoryName(NationalProjectFullPath), g_MapWin.Project.ProjectProjection)
                 If lInstructions.Length > 0 Then
                     Dim lDisplayMessageBoxes As Boolean = Logger.DisplayMessageBoxes
                     Logger.DisplayMessageBoxes = False 'Don't show a message box after adding these layers
@@ -138,14 +144,17 @@ Public Class SDMplugin
         End If
 
         If NationalProjectIsOpen() Then
-            'Select the Cataloging Units layer by default 
-            For iLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
-                If g_MapWin.Layers(g_MapWin.Layers.GetHandle(iLayer)).Name = "Cataloging Units" Then
-                    g_MapWin.Layers.CurrentLayer = g_MapWin.Layers.GetHandle(iLayer)
-                    Exit For
+            'Select HUC-12 layer by default, or HUC-8 if no HUC-12 is on map
+            Dim lHuc12Layer As Integer = Huc12Layer()
+            If lHuc12Layer > -1 Then
+                g_MapWin.Layers.CurrentLayer = lHuc12Layer
+            Else
+                Dim lHuc8Layer As Integer = Huc8Layer()
+                If lHuc8Layer > -1 Then
+                    g_MapWin.Layers.CurrentLayer = lHuc8Layer
                 End If
-            Next
-            g_MapWin.Toolbar.PressToolbarButton("tbbSelect")
+            End If
+
             pBuildFrm = New frmBuildNew
             pBuildFrm.Show()
             Try
@@ -169,6 +178,7 @@ Public Class SDMplugin
             End Try
 
             UpdateSelectedFeatures()
+            g_MapWin.Toolbar.PressToolbarButton("tbbSelect")
 
         Else
             Logger.Msg("Unable to open national project", "Open National")

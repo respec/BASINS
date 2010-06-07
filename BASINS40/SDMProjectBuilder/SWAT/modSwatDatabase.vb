@@ -531,7 +531,7 @@ Friend Module modSwatDatabase
 
                 If (SWATParamsXmlDoc Is Nothing) Then
                     SWATParamsXmlDoc = New Xml.XmlDocument
-                    Dim paramsFile = IO.Path.Combine(g_BaseFolder, "CropLandcover\SWATParams.xml")
+                    Dim paramsFile = IO.Path.Combine(aProjectFolder, "CropLandcover\SWATParams.xml")
                     SWATParamsXmlDoc.Load(paramsFile)
                 End If
 

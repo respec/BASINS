@@ -22,9 +22,8 @@ Public Module modSDM
 
     'Private g_Clip As String = "" 'if using old style clip = "Clip"
     'Private g_Project As String = "apes" '"0401" '
-    Public g_BaseFolder As String
     Public g_CacheFolder As String '= "d:\Basins\Cache\" 'Downloaded data is kept here to avoid downloading the same thing again later
-    Friend g_SWATDatabaseName As String
+    Friend g_SWATDatabaseName As String = FindFile("", "SWAT2005.mdb")
     'Private g_PresetCatchments As String = "" '"G:\Project\APES-Kraemer\ms_30m_01\Watershed\Shapes"
     'Private g_UseNhdPlus As Boolean = False
     'Private g_NHDPlusInProjectFolder As Boolean = False
@@ -60,8 +59,64 @@ Public Module modSDM
     'Private pThreadMax As Integer = 2
     Private pThreadCount As Integer = 0
 
-    'Delegate Sub StatusCallback(ByVal aStatus As String)
-    'Private pStatusCallback As New StatusCallback(AddressOf SetStatus)
+    'Const SDM_REGISTRY_KEY As String = "SOFTWARE\\US EPA\\D4EM\\SDMProjectBuilder"
+    Const PARAMETER_FILE As String = "SDMParameters"
+
+    Private _sdmBaseDirectory As String = ""
+    Private _parametersFile As String = ""
+
+    Private _projFolder As String = ""
+    Private _defaultUnit As String = ""
+    '    Private _swatSoilsDB As String = ""
+    Private _simulationStartYear As Integer = 0
+    Private _simulationEndYear As Integer = 0
+    Private _runSWAT As Boolean = False
+    Private _runHSPF As Boolean = False
+
+    'private bool _defaultUnitChanged = false;
+    'private bool _flagDefaultUnitChanged = false;
+
+
+    Private Sub WriteParametersTextFile(ByVal aFilename As String)
+        Dim sb As New Text.StringBuilder
+        sb.AppendLine("ProjectsPath," + _projFolder)
+        sb.AppendLine("DefaultUnit," + _defaultUnit)
+        sb.AppendLine("SWAT2005Database," + g_SWATDatabaseName)
+        'sb.AppendLine("SWATSoilsDatabase," + _swatSoilsDB)
+        sb.AppendLine("MinimumStreamLength," + g_MinFlowlineKM)
+        sb.AppendLine("MinimumCatchmentArea," + g_MinCatchmentKM2)
+        sb.AppendLine("MinumumLandUsePercent," + g_LandUseIgnoreBelowFraction * 100)
+        sb.AppendLine("SimulationStartYear," + _simulationStartYear)
+        sb.AppendLine("SimulationEndYear," + _simulationEndYear)
+        sb.AppendLine("RunSWAT," + _runSWAT)
+        sb.AppendLine("RunHSPF," + _runHSPF)
+        IO.File.WriteAllText(aFilename, sb.ToString)
+    End Sub
+
+    Private Sub ReadParametersTextFile(ByVal aFilename As String)
+        For Each line As String In LinesInFile(aFilename)
+            If (line IsNot Nothing) AndAlso (line <> "") Then
+                Dim items() As String = line.Split(",")
+                If items.Length = 2 Then
+                    Select Case items(0)
+                        Case "ProjectsPath" : _projFolder = items(1)
+                        Case "DefaultUnit" : _defaultUnit = items(1)
+                        Case "SWAT2005Database" : g_SWATDatabaseName = items(1)
+                            'Case "SWATSoilsDatabase" : _swatSoilsDB = items(1)
+                        Case "MinimumStreamLength" : g_MinFlowlineKM = Convert.ToDouble(items(1))
+                        Case "MinimumCatchmentArea" : g_MinCatchmentKM2 = Convert.ToDouble(items(1))
+                        Case "MinumumLandUsePercent" : g_LandUseIgnoreBelowFraction = Convert.ToDouble(items(1)) / 100
+                        Case "SimulationStartYear" : _simulationStartYear = Convert.ToInt32(items(1))
+                        Case "SimulationEndYear" : _simulationEndYear = Convert.ToInt32(items(1))
+                        Case "RunSWAT" : _runSWAT = Convert.ToBoolean(items(1))
+                        Case "RunHSPF" : _runHSPF = Convert.ToBoolean(items(1))
+                        Case Else
+                            'Log something here?
+                    End Select
+                End If
+            End If
+        Next
+    End Sub
 
     Friend Sub UpdateSelectedFeatures()
         If Not pBuildFrm Is Nothing AndAlso g_MapWin.Layers.NumLayers > 0 AndAlso g_MapWin.Layers.CurrentLayer > -1 Then
@@ -107,26 +162,110 @@ Public Module modSDM
 
                     Dim lSelected As Integer
                     Dim lShape As Integer
-                    Dim lname As String
-                    Dim ldesc As String
+                    Dim lName As String
+                    Dim lDesc As String
                     Dim lSf As MapWinGIS.Shapefile = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
                     For lSelected = 0 To g_MapWin.View.SelectedShapes.NumSelected - 1
                         lShape = g_MapWin.View.SelectedShapes.Item(lSelected).ShapeIndex()
-                        lname = ""
-                        ldesc = ""
+                        lName = ""
+                        lDesc = ""
                         If lNameIndex > -1 Then
-                            lname = lSf.CellValue(lNameIndex, lShape)
+                            lName = lSf.CellValue(lNameIndex, lShape)
+                            If lFieldName = "cu" Then 'Make sure HUC-12 layer matching this HUC-8 layer is on the map
+                                LoadHUC12(lName)
+                            End If
                         End If
                         If lDescIndex > -1 Then
-                            ldesc = lSf.CellValue(lDescIndex, lShape)
+                            lDesc = lSf.CellValue(lDescIndex, lShape)
                         End If
-                        ctext = ctext & vbCrLf & "  " & lname & " : " & ldesc
+                        If (lName & lDesc).Length = 0 Then
+                            ctext &= vbCrLf & "  " & lShape
+                        Else
+                            ctext &= vbCrLf & "  " & lName & " : " & lDesc
+                        End If
                     Next
                 End If
                 pBuildFrm.txtSelected.Text = ctext
             End If
         End If
     End Sub
+
+    ''' <summary>
+    ''' Layer Handle of first 8-digit HUC layer found or -1 if no HUC-8 layer is on the map
+    ''' </summary>
+    Friend Function Huc8Layer() As Integer
+        Dim lHuc8Layer As Integer = -1
+        For iLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
+            Dim lLayerHandle As Integer = g_MapWin.Layers.GetHandle(iLayer)
+            If g_MapWin.Layers(lLayerHandle).FileName.ToLower.EndsWith("cat.shp") Then
+                lHuc8Layer = lLayerHandle
+            End If
+        Next
+        Return lHuc8Layer
+    End Function
+
+    ''' <summary>
+    ''' Layer Handle of first 12-digit HUC layer found or -1 if no HUC-12 layer is on the map
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Friend Function Huc12Layer() As Integer
+        Dim lHuc12Layer As Integer = -1
+        For iLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
+            Dim lLayerHandle As Integer = g_MapWin.Layers.GetHandle(iLayer)
+            If g_MapWin.Layers(lLayerHandle).FileName.ToLower.Contains("huc12") Then
+                lHuc12Layer = lLayerHandle
+            End If
+        Next
+        Return lHuc12Layer
+    End Function
+
+    Private Sub LoadHUC12(ByVal aHUC8 As String)
+        Dim lHUC12ShapeFileName As String = HUC12ShapeFilename(aHUC8).ToLower
+        If IO.File.Exists(lHUC12ShapeFileName) Then
+            'See if layer is already on map
+            Dim lHuc12Layer As Integer = -1
+            For iLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
+                Dim lLayerHandle As Integer = g_MapWin.Layers.GetHandle(iLayer)
+                If g_MapWin.Layers(lLayerHandle).FileName.ToLower.Equals(lHUC12ShapeFileName) Then
+                    Exit Sub 'Layer is already on the map
+                End If
+            Next
+        Else 'download HUC-12 layer and add to map
+            EnsureGlobalCacheSet(IO.Path.GetDirectoryName(g_MapWin.Project.FileName))
+            Dim lQuery As String = "<function name='GetBASINS'>" _
+                                 & "<arguments>" _
+                                 & "<DataType>huc12</DataType>" _
+                                 & "<SaveIn>" & IO.Path.GetDirectoryName(lHUC12ShapeFileName) & "</SaveIn>" _
+                                 & "<CacheFolder>" & g_CacheFolder & "</CacheFolder>" _
+                                 & "<DesiredProjection>" & g_MapWin.Project.ProjectProjection & "</DesiredProjection>" _
+                                 & "<region>" & vbCrLf _
+                                 & "  <HUC8>" & aHUC8 & "</HUC8>" & vbCrLf _
+                                 & "</region>" & vbCrLf _
+                                 & "<clip>False</clip>" _
+                                 & "<merge>True</merge>" _
+                                 & "<joinattributes>true</joinattributes>" _
+                                 & "</arguments>" _
+                                 & "</function>"
+            Dim lDownloadManager As D4EMDataManager.DataManager = CreateDataManager()
+            Dim lResult As String = lDownloadManager.Execute(lQuery)
+            'If Not lResult Is Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
+            '    ProcessDownloadResults(lResult)
+            'End If
+            'Dim lCacheFilename As String = "S:\Scratch\Downloads\Data\HUC-12\split\" & aHUC8 & "\huc12.shp"
+            'If IO.File.Exists(lCacheFilename) Then
+            '    TryCopyShapefile(lCacheFilename, lHUC12ShapeFileName)
+            'End If
+        End If
+
+        If IO.File.Exists(lHUC12ShapeFileName) Then
+            ProcessDownloadResults("<success><add_shape>" & lHUC12ShapeFileName & "</add_shape></success>")
+        End If
+    End Sub
+
+    Private Function HUC12ShapeFilename(ByVal aHUC8) As String
+        Return IO.Path.GetDirectoryName(g_MapWin.Project.FileName) & g_PathChar & "huc12" & g_PathChar & aHUC8 & g_PathChar & "huc12.shp"
+    End Function
 
     Friend Sub ClearLayers()
         g_MapWin.Layers.Clear()
@@ -225,10 +364,8 @@ Public Module modSDM
             'Dim numRecs As Integer = modArcSWAT.ConvertFlowLineFile(lSimplifiedFlowlinesFileName, arcSwatFlowlines)
             ' End Generate files for running ArcSWAT
 
-            g_BaseFolder = aProjectFolder
             If g_BuildDatabase AndAlso Not FileExists(g_SWATDatabaseName) Then
-                g_SWATDatabaseName = FindFile("Please locate SWAT2005.mdb", "SWAT2005.mdb")
-                g_SWATDatabaseName = g_SWATDatabaseName.Replace("swat", "SWAT")
+                g_SWATDatabaseName = FindFile("Please locate SWAT2005.mdb", "SWAT2005.mdb").Replace("swat", "SWAT")
                 If Not FileExists(g_SWATDatabaseName) Then
                     Logger.Msg("SWAT Database not found: '" & g_SWATDatabaseName & "'", "SWAT2005.mdb Required")
                     Exit Sub
@@ -353,7 +490,7 @@ Public Module modSDM
 
                 'Look for any files like g_BaseFolder\ReclassifyLandUse.csv, follow the table if such files exist
                 For Each lTag As String In lDisplayTags
-                    Dim lReclassifyFileName As String = IO.Path.Combine(g_BaseFolder, "Reclassify") & lTag & ".csv"
+                    Dim lReclassifyFileName As String = IO.Path.Combine(aProjectFolder, "Reclassify") & lTag & ".csv"
                     If IO.File.Exists(lReclassifyFileName) Then
                         lHruTable.ReadReclassifyCSV(lReclassifyFileName, lOriginalIDs, lNewIds, ":")
                         lHruTable.Reclassify(lTag, lOriginalIDs, lNewIds)
@@ -414,7 +551,7 @@ Public Module modSDM
                     OutputSummarize(aProjectFolder, lInputFilePath, aHuc)
                     Logger.Status("DoneOutputSummarize " & MemUsage())
                 End If
-                Logger.Status("**** Done HUC12 " & aHuc)
+                Logger.Status("**** Finished " & aHuc)
             End If
         Catch lEx As Exception
             lProblem = "Exception " & lEx.Message & vbCrLf & lEx.StackTrace
