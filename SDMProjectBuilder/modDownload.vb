@@ -182,19 +182,16 @@ Public Module modDownload
         Dim lParametersFilename As String = IO.Path.Combine(IO.Path.GetDirectoryName(g_MapWin.Project.FileName), PARAMETER_FILE)
         Dim lCreatedMapWindowProjectFilename As String = ""
 
+        'Save national project as the user has adjusted it
+        g_MapWin.Project.Save(g_MapWin.Project.FileName)
+
         Dim lRegion As String = GetSelectedRegion()
-        If lRegion.Length > 0 Then
-            'Save national project as the user has zoomed it
-            g_MapWin.Project.Save(g_MapWin.Project.FileName)
-            lCreatedMapWindowProjectFilename = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
-        Else
-            'prompt about creating a project with no data
-            lCreatedMapWindowProjectFilename = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
-        End If
+        lCreatedMapWindowProjectFilename = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
+
         If IO.File.Exists(lCreatedMapWindowProjectFilename) Then
+            Logger.Status("Finished Building " & g_MapWin.Project.FileName)
             WriteParametersTextFile(lParametersFilename, lCreatedMapWindowProjectFilename)
         End If
-        Logger.Status("Done " & g_MapWin.Project.FileName)
         Return lCreatedMapWindowProjectFilename
     End Function
 
