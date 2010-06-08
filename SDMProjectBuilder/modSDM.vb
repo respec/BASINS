@@ -60,7 +60,7 @@ Public Module modSDM
     Private pThreadCount As Integer = 0
 
     'Const SDM_REGISTRY_KEY As String = "SOFTWARE\\US EPA\\D4EM\\SDMProjectBuilder"
-    Friend Const PARAMETER_FILE As String = "SDMParameters"
+    Friend Const PARAMETER_FILE As String = "SDMParameters.txt"
 
     Private _sdmBaseDirectory As String = ""
     Private _parametersFile As String = ""
