@@ -3,13 +3,13 @@ Imports SwatObject
 ''' <summary>
 ''' Default values for tables
 ''' </summary>
-''' <remarks>TODO: make these come from FRAMES!!!</remarks>
+''' <remarks>TODO: make more of these come from FRAMES</remarks>
 Module modDefaults
     Friend Function CioDefault() As SwatInput.clsCIOItem
         Dim lCioItem As New SwatInput.clsCIOItem
         With lCioItem
-            .NBYR = 21
-            .IYR = 1983
+            .NBYR = g_SimulationEndYear - g_SimulationStartYear + 1
+            .IYR = g_SimulationStartYear
             .IDAF = 1
             .IDAL = 365
             .IGEN = 0
@@ -33,8 +33,8 @@ Module modDefaults
             .FCSTYR = 0
             .FCSTDAY = 0
             .FCSTCYCLES = 0
-            .DATES = "1/1/1995"
-            .DATEF = "12/31/2007"
+            .DATES = "1/1/" & g_SimulationStartYear
+            .DATEF = "12/31/" & g_SimulationEndYear
             .FDATES = ""
             .ISPROJ = 0
             .ICLB = 0

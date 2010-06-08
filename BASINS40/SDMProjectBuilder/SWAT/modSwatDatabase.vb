@@ -348,16 +348,12 @@ Friend Module modSwatDatabase
                         Stop
                     End If
                     Dim lCioItem As SwatInput.clsCIOItem = lSwatInput.CIO.Item
-                    lCioItem.NBYR = 3 'three year test
-                    'lCioItem.NBYR = 6 'six year test for prototype HUCs
-                    lSwatInput.CIO.Update(lCioItem)
                     Dim lDate(5) As Integer
                     lDate(0) = lCioItem.IYR
                     lDate(1) = 1
                     lDate(2) = 1
                     Dim lDateStart As Double = Date2J(lDate)
-                    lDate(0) = lDate(0) + lCioItem.NBYR
-                    'TODO: use start and end julian date from CIO
+                    lDate(0) += lCioItem.NBYR
                     Dim lDateEnd As Double = Date2J(lDate)
                     Logger.Dbg("Writing " & timdifJ(lDateStart, lDateEnd, 6, 1) & " years of data " & MemUsage())
 

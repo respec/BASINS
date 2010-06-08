@@ -42,7 +42,9 @@ Public Module modSDM
     Private g_AreaIgnoreBelowFraction As Double = 0       'HRUs smaller than this fraction of their subbasin will be dissolved 
     Private g_AreaIgnoreBelowAbsolute As Double = 0       'HRUs smaller than this will be dissolved
     Friend g_LandUseIgnoreBelowFraction As Double = 0.07 'Land uses covering less than this much of a subbasin will have all their HRUs in that subbasin dissolved
-    Private g_LandUseIgnoreBelowAbsolute As Double = 0    'Absolute total area of a land use within a subbasin below which to dissolve its HRUs
+    Friend g_LandUseIgnoreBelowAbsolute As Double = 0    'Absolute total area of a land use within a subbasin below which to dissolve its HRUs
+    Friend g_SimulationStartYear As Integer = 1990
+    Friend g_SimulationEndYear As Integer = 2000
 
     Private g_WhichSoilIndex As WhichSoilIndex = WhichSoilIndex.SWATSTATSGO
 
@@ -68,8 +70,6 @@ Public Module modSDM
     Private _projFolder As String = ""
     Private _defaultUnit As String = ""
     '    Private _swatSoilsDB As String = ""
-    Private _simulationStartYear As Integer = 0
-    Private _simulationEndYear As Integer = 0
 
     'private bool _defaultUnitChanged = false;
     'private bool _flagDefaultUnitChanged = false;
@@ -84,8 +84,8 @@ Public Module modSDM
         sb.AppendLine("MinimumStreamLength," & g_MinFlowlineKM)
         sb.AppendLine("MinimumCatchmentArea," & g_MinCatchmentKM2)
         sb.AppendLine("MinumumLandUsePercent," & g_LandUseIgnoreBelowFraction * 100)
-        sb.AppendLine("SimulationStartYear," & _simulationStartYear)
-        sb.AppendLine("SimulationEndYear," & _simulationEndYear)
+        sb.AppendLine("SimulationStartYear," & g_SimulationStartYear)
+        sb.AppendLine("SimulationEndYear," & g_SimulationEndYear)
         sb.AppendLine("RunSWAT," & g_DoSWAT)
         sb.AppendLine("RunHSPF," & g_DoHSPF)
         IO.File.WriteAllText(aFilename, sb.ToString)
@@ -105,8 +105,8 @@ Public Module modSDM
                             Case "MinimumStreamLength" : g_MinFlowlineKM = Convert.ToDouble(items(1))
                             Case "MinimumCatchmentArea" : g_MinCatchmentKM2 = Convert.ToDouble(items(1))
                             Case "MinumumLandUsePercent" : g_LandUseIgnoreBelowFraction = Convert.ToDouble(items(1)) / 100
-                            Case "SimulationStartYear" : _simulationStartYear = Convert.ToInt32(items(1))
-                            Case "SimulationEndYear" : _simulationEndYear = Convert.ToInt32(items(1))
+                            Case "SimulationStartYear" : g_SimulationStartYear = Convert.ToInt32(items(1))
+                            Case "SimulationEndYear" : g_SimulationEndYear = Convert.ToInt32(items(1))
                             Case "RunSWAT" : g_DoSWAT = Convert.ToBoolean(items(1))
                             Case "RunHSPF" : g_DoHSPF = Convert.ToBoolean(items(1))
                             Case Else
