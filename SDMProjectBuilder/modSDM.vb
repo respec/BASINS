@@ -77,17 +77,17 @@ Public Module modSDM
 
     Friend Sub WriteParametersTextFile(ByVal aFilename As String, ByVal aMapWindowProjectFilename As String)
         Dim sb As New Text.StringBuilder
-        sb.AppendLine("ProjectsPath," + IO.Path.GetDirectoryName(IO.Path.GetDirectoryName(aMapWindowProjectFilename)))
-        sb.AppendLine("DefaultUnit," + IO.Path.GetFileName(IO.Path.GetDirectoryName(aMapWindowProjectFilename)))
-        sb.AppendLine("SWAT2005Database," + g_SWATDatabaseName)
-        'sb.AppendLine("SWATSoilsDatabase," + _swatSoilsDB)
-        sb.AppendLine("MinimumStreamLength," + g_MinFlowlineKM)
-        sb.AppendLine("MinimumCatchmentArea," + g_MinCatchmentKM2)
-        sb.AppendLine("MinumumLandUsePercent," + g_LandUseIgnoreBelowFraction * 100)
-        sb.AppendLine("SimulationStartYear," + _simulationStartYear)
-        sb.AppendLine("SimulationEndYear," + _simulationEndYear)
-        sb.AppendLine("RunSWAT," + g_DoSWAT)
-        sb.AppendLine("RunHSPF," + g_DoHSPF)
+        sb.AppendLine("ProjectsPath," & IO.Path.GetDirectoryName(IO.Path.GetDirectoryName(aMapWindowProjectFilename)))
+        sb.AppendLine("DefaultUnit," & IO.Path.GetFileName(IO.Path.GetDirectoryName(aMapWindowProjectFilename)))
+        sb.AppendLine("SWAT2005Database," & g_SWATDatabaseName)
+        'sb.AppendLine("SWATSoilsDatabase," & _swatSoilsDB)
+        sb.AppendLine("MinimumStreamLength," & g_MinFlowlineKM)
+        sb.AppendLine("MinimumCatchmentArea," & g_MinCatchmentKM2)
+        sb.AppendLine("MinumumLandUsePercent," & g_LandUseIgnoreBelowFraction * 100)
+        sb.AppendLine("SimulationStartYear," & _simulationStartYear)
+        sb.AppendLine("SimulationEndYear," & _simulationEndYear)
+        sb.AppendLine("RunSWAT," & g_DoSWAT)
+        sb.AppendLine("RunHSPF," & g_DoHSPF)
         IO.File.WriteAllText(aFilename, sb.ToString)
     End Sub
 
