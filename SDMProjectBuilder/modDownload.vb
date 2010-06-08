@@ -359,10 +359,11 @@ StartOver:
         Dim lSelectedHuc As String = GetSelectedHUC()
         Dim lSelectedShape As MapWinGIS.Shape = GetSelectedShape()
 
+        'TODO: & "<DataType>huc12</DataType>" _
+
         lQuery = "<function name='GetBASINS'>" _
                & "<arguments>" _
                & "<DataType>core31</DataType>" _
-               & "<DataType>huc12</DataType>" _
                & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
                & "<CacheFolder>" & g_CacheFolder & "</CacheFolder>" _
                & "<DesiredProjection>" & aDesiredProjection & "</DesiredProjection>" _
