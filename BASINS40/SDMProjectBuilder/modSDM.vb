@@ -92,28 +92,32 @@ Public Module modSDM
     End Sub
 
     Friend Sub ReadParametersTextFile(ByVal aFilename As String)
-        For Each line As String In LinesInFile(aFilename)
-            If (line IsNot Nothing) AndAlso (line <> "") Then
-                Dim items() As String = line.Split(",")
-                If items.Length = 2 Then
-                    Select Case items(0)
-                        Case "ProjectsPath" : _projFolder = items(1)
-                        Case "DefaultUnit" : _defaultUnit = items(1)
-                        Case "SWAT2005Database" : g_SWATDatabaseName = items(1)
-                            'Case "SWATSoilsDatabase" : _swatSoilsDB = items(1)
-                        Case "MinimumStreamLength" : g_MinFlowlineKM = Convert.ToDouble(items(1))
-                        Case "MinimumCatchmentArea" : g_MinCatchmentKM2 = Convert.ToDouble(items(1))
-                        Case "MinumumLandUsePercent" : g_LandUseIgnoreBelowFraction = Convert.ToDouble(items(1)) / 100
-                        Case "SimulationStartYear" : _simulationStartYear = Convert.ToInt32(items(1))
-                        Case "SimulationEndYear" : _simulationEndYear = Convert.ToInt32(items(1))
-                        Case "RunSWAT" : g_DoSWAT = Convert.ToBoolean(items(1))
-                        Case "RunHSPF" : g_DoHSPF = Convert.ToBoolean(items(1))
-                        Case Else
-                            'Log something here?
-                    End Select
+        If IO.File.Exists(aFilename) Then
+            For Each line As String In LinesInFile(aFilename)
+                If (line IsNot Nothing) AndAlso (line <> "") Then
+                    Dim items() As String = line.Split(",")
+                    If items.Length = 2 Then
+                        Select Case items(0)
+                            Case "ProjectsPath" : _projFolder = items(1)
+                            Case "DefaultUnit" : _defaultUnit = items(1)
+                            Case "SWAT2005Database" : g_SWATDatabaseName = items(1)
+                                'Case "SWATSoilsDatabase" : _swatSoilsDB = items(1)
+                            Case "MinimumStreamLength" : g_MinFlowlineKM = Convert.ToDouble(items(1))
+                            Case "MinimumCatchmentArea" : g_MinCatchmentKM2 = Convert.ToDouble(items(1))
+                            Case "MinumumLandUsePercent" : g_LandUseIgnoreBelowFraction = Convert.ToDouble(items(1)) / 100
+                            Case "SimulationStartYear" : _simulationStartYear = Convert.ToInt32(items(1))
+                            Case "SimulationEndYear" : _simulationEndYear = Convert.ToInt32(items(1))
+                            Case "RunSWAT" : g_DoSWAT = Convert.ToBoolean(items(1))
+                            Case "RunHSPF" : g_DoHSPF = Convert.ToBoolean(items(1))
+                            Case Else
+                                'Log something here?
+                        End Select
+                    Else
+                        Logger.Dbg("Found " & items.Length & " but expected 2 comma-separated values in line '" & line & "' in file '" & aFilename & "'")
+                    End If
                 End If
-            End If
-        Next
+            Next
+        End If
     End Sub
 
     Friend Sub UpdateSelectedFeatures()
@@ -132,7 +136,9 @@ Public Module modSDM
                 lCurLayer = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
                 If g_MapWin.View.SelectedShapes.NumSelected > 0 Then
                     ctext = "Selected Features:"
-                    Select Case IO.Path.GetFileNameWithoutExtension(lCurLayer.Filename).ToLower
+
+                    Dim lLayerFilenameOnly As String = IO.Path.GetFileNameWithoutExtension(lCurLayer.Filename).ToLower
+                    Select  Case IO.Path.GetFileNameWithoutExtension(lCurLayer.Filename).ToLower
                         Case "cat", "huc", "huc250d3"
                             lFieldName = "CU"
                             lFieldDesc = "catname"
@@ -145,6 +151,11 @@ Public Module modSDM
                         Case "st"
                             lFieldName = "ST"
                             lFieldDesc = "name"
+                        Case Else
+                            If lLayerFilenameOnly.StartsWith("wbdhu8") Then
+                                lFieldName = "HUC_8"
+                                lFieldDesc = "SUBBASIN"
+                            End If
                     End Select
 
                     lFieldName = lFieldName.ToLower
@@ -169,7 +180,7 @@ Public Module modSDM
                         lDesc = ""
                         If lNameIndex > -1 Then
                             lName = lSf.CellValue(lNameIndex, lShape)
-                            If lFieldName = "cu" Then 'Make sure HUC-12 layer matching this HUC-8 layer is on the map
+                            If lName.Length = 8 AndAlso (lFieldName = "cu" OrElse lFieldName = "huc_8") Then 'Make sure HUC-12 layer matching this HUC-8 layer is on the map
                                 LoadHUC12(lName)
                             End If
                         End If

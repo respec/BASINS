@@ -30,9 +30,10 @@ Public Module modDownload
                 Dim lCurLayer As MapWinGIS.Shapefile
                 lCurLayer = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
 
-                Select Case IO.Path.GetFileNameWithoutExtension(lCurLayer.Filename).ToLower
+                Dim lLayerFilenameOnly As String = IO.Path.GetFileNameWithoutExtension(lCurLayer.Filename).ToLower
+                Select Case lLayerFilenameOnly
                     Case "cat", "huc", "huc250d3"
-                        lThemeTag = "HUC8" '"huc_cd"
+                        lThemeTag = "HUC8"
                         lFieldName = "CU"
                     Case "huc12"
                         lThemeTag = "HUC12"
@@ -43,6 +44,11 @@ Public Module modDownload
                     Case "st"
                         lThemeTag = "state_abbrev"
                         lFieldName = "ST"
+                    Case Else
+                        If lLayerFilenameOnly.StartsWith("wbdhu8") Then
+                            lThemeTag = "HUC8"
+                            lFieldName = "HUC_8"
+                        End If
                 End Select
 
                 lFieldName = lFieldName.ToLower
@@ -1821,7 +1827,8 @@ StartOver:
                 Dim lCurLayer As MapWinGIS.Shapefile
                 lCurLayer = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
 
-                Select Case IO.Path.GetFileNameWithoutExtension(lCurLayer.Filename).ToLower
+                Dim lLayerFilenameOnly As String = IO.Path.GetFileNameWithoutExtension(lCurLayer.Filename).ToLower
+                Select Case lLayerFilenameOnly
                     Case "cat", "huc", "huc250d3"
                         lFieldName = "CU"
                     Case "huc12"
@@ -1830,6 +1837,10 @@ StartOver:
                         lFieldName = "FIPS"
                     Case "st"
                         lFieldName = "ST"
+                    Case Else
+                        If lLayerFilenameOnly.StartsWith("wbdhu8") Then
+                            lFieldName = "HUC_8"
+                        End If
                 End Select
 
                 lFieldName = lFieldName.ToLower
