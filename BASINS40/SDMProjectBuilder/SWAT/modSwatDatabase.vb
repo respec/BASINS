@@ -105,9 +105,6 @@ Friend Module modSwatDatabase
                                         End If
 
                                         Dim lLandUseStr As String = LuId2Str(lLuId)
-                                        'Dim lLuId As Integer = lHru.Ids(lHruLandUseIndex)
-
-
 
                                         'Check the new soil class with the old soil class
                                         If lSolItem Is Nothing OrElse lSoilClassOld <> lSoilClass Then
@@ -143,7 +140,7 @@ Friend Module modSwatDatabase
                                             '    Case 4.0 To 5.0 : .SLSUBBSN = 45
                                             '    Case Else : .SLSUBBSN = 25
                                             'End Select
-                                            'New slope values from Srini: 
+                                            'New slope values from Srini 12-1-2009: 
                                             'for slope length if the slope of the HRU is:
                                             '< 1% then use 120m
                                             ' 1-2% - 100m

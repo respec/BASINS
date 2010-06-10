@@ -104,7 +104,7 @@ Friend Module modNetwork
                 Dim lDeletingDownstream As Boolean = False
                 If lBaseDownStreamComId = lDeletedComId Then
                     Dim lNewDownstreamComId = .CellValue(pFlowlinesDownstreamComIdFieldIndex, aSourceDeletingIndex)
-                    Logger.Status("ChangeDownFor " & lBaseComId & " From " & lDeletedComId & " to " & lNewDownstreamComId)
+                    Logger.Dbg("ChangeDownFor " & lBaseComId & " From " & lDeletedComId & " to " & lNewDownstreamComId)
                     .EditCellValue(pFlowlinesDownstreamComIdFieldIndex, lSourceBaseIndex, lNewDownstreamComId)
                     lDeletingDownstream = True
                 End If
@@ -250,7 +250,7 @@ Friend Module modNetwork
                                         lSlope = (lMaxElev - lMinElev) / (lLength * 1000)
                                     Else
                                         lSlope = 0.001 'TODO: estimate this!
-                                        Logger.Status("SlopeEstimatedAs " & lSlope & " MaxElev " & lMaxElev & " MinElev " & lMinElev & " Length " & lLength)
+                                        Logger.Dbg("SlopeEstimatedAs " & lSlope & " MaxElev " & lMaxElev & " MinElev " & lMinElev & " Length " & lLength)
                                     End If
                                     lNewFieldValues.Add(lSlope)
                                 Case Else
@@ -275,29 +275,29 @@ Friend Module modNetwork
                             End Select
                         End If
                     Catch
-                        Logger.Status("FailedToSetFieldValueFor " & lFieldIndex & " " & lFieldName.ToUpper)
+                        Logger.Dbg("FailedToSetFieldValueFor " & lFieldIndex & " " & lFieldName.ToUpper)
                         lNewFieldValues.Add("")
                     End Try
                     'LogMessage(aLog,lFieldName & ": " & aFlowlinesShapeFile.CellValue(lFieldIndex, aSourceDeletingIndex) & ", " & aFlowlinesShapeFile.CellValue(lFieldIndex, lSourceBaseIndex) & " -> " & lNewFieldValues(lNewFieldValues.Count - 1))
                 Next
                 If aMergeShapes Then
                     Dim lMergedShape As New MapWinGIS.Shape
-                    Logger.Status("FlowlineMerge " & lSourceBaseIndex & " and " & aSourceDeletingIndex)
+                    Logger.Dbg("FlowlineMerge " & lSourceBaseIndex & " and " & aSourceDeletingIndex)
                     MapWinGeoProc.SpatialOperations.MergeShapes(aFlowlinesShapeFile, lSourceBaseIndex, aSourceDeletingIndex, lMergedShape)
                     .EditDeleteShape(lSourceBaseIndex)
                     .EditInsertShape(lMergedShape, lSourceBaseIndex)
                 Else
-                    Logger.Status("FlowlineKeep " & lSourceBaseIndex & " Discard " & aSourceDeletingIndex)
+                    Logger.Dbg("FlowlineKeep " & lSourceBaseIndex & " Discard " & aSourceDeletingIndex)
                 End If
                 For lFieldIndex As Integer = 0 To .NumFields - 1
                     Try
                         .EditCellValue(lFieldIndex, lSourceBaseIndex, lNewFieldValues(lFieldIndex))
                     Catch
-                        Logger.Status("FailedToEditFieldValueFor " & lFieldIndex)
+                        Logger.Dbg("FailedToEditFieldValueFor " & lFieldIndex)
                     End Try
                 Next
                 If Not aMergeShapes AndAlso aKeepCosmeticRemovedLine Then
-                    Logger.Status("Moving cosmetic line to end of file")
+                    Logger.Dbg("Moving cosmetic line to end of file")
                     Dim lMoveTo As Integer = .NumShapes
                     .EditInsertShape(.Shape(aSourceDeletingIndex), lMoveTo)
                     For lFieldIndex As Integer = 0 To .NumFields - 1
@@ -316,7 +316,7 @@ Friend Module modNetwork
 
                 ReconnectUpstreamToDownstream(aFlowlinesShapeFile, lDeletedComId, lBaseComId)
 
-                Logger.Status("Kept " & DumpComid(aFlowlinesShapeFile, lBaseComId))
+                Logger.Dbg("Kept " & DumpComid(aFlowlinesShapeFile, lBaseComId))
             End With
             Return True
         Catch e As Exception
@@ -337,11 +337,11 @@ Friend Module modNetwork
                         Dim lComId As Long = .CellValue(pFlowlinesComIdFieldIndex, lFlowlinesRecord)
                         'LogMessage(aLog,"ChangeDownFor " & lComId & " From " & lDeletedComId & " to " & lNewDownstreamComId)
                         '.EditCellValue(lFlowlinesDownstreamFieldIndex, lFlowlinesRecord, lNewDownstreamComId)
-                        Logger.Status("ChangeDownFor " & lComId & " From " & aDeletedComId & " to " & aDownstreamComId & " at " & lFlowlinesRecord)
+                        Logger.Dbg("ChangeDownFor " & lComId & " From " & aDeletedComId & " to " & aDownstreamComId & " at " & lFlowlinesRecord)
                         .EditCellValue(pFlowlinesDownstreamComIdFieldIndex, lFlowlinesRecord, aDownstreamComId)
                     End If
                 Catch lEx As Exception
-                    Logger.Status("ChangeFailedAt " & lFlowlinesRecord)
+                    Logger.Status("ChangeFailedAt " & lFlowlinesRecord, True)
                 End Try
                 lFlowlinesRecord += 1
             End While
@@ -381,7 +381,7 @@ Friend Module modNetwork
         Dim lResult As Integer
         Math.DivRem(pCheckCount, 100, lResult)
         If lResult = 0 Then
-            Logger.Status("*** CheckConnectivity Begin")
+            Logger.Dbg("*** CheckConnectivity Begin")
             Dim lRemoveCount As Integer = 0
             Dim lMissingCount As Integer = 0
             Dim lLargestContribAreaComId As Long = 0
@@ -397,26 +397,26 @@ Friend Module modNetwork
                        AndAlso lLargestContribArea < lContribArea Then
                         lLargestContribArea = lContribArea
                         lLargestContribAreaComId = lComId
-                        Logger.Status("NewLargestContribArea " & DumpComid(aFlowlinesShapeFile, lComId))
+                        Logger.Dbg("NewLargestContribArea " & DumpComid(aFlowlinesShapeFile, lComId))
                     End If
                     Dim lDownstreamComId As Long = -1
 
                     If UpdateValueIfNotNull(lDownstreamComId, .CellValue(pFlowlinesDownstreamComIdFieldIndex, lFlowlinesRecord)) AndAlso lDownstreamComId > -1 Then
                         If lDownstreamComId = 0 Then
-                            Logger.Status("ZeroDownstreamComID, add outlet " & DumpComid(aFlowlinesShapeFile, lComId))
+                            Logger.Dbg("ZeroDownstreamComID, add outlet " & DumpComid(aFlowlinesShapeFile, lComId))
                             lMissingCount += 1
                             If Not pOutletComIds.Contains(lComId) Then
                                 pOutletComIds.Add(lComId)
                             End If
                         ElseIf FindRecord(aFlowlinesShapeFile, pFlowlinesComIdFieldIndex, lDownstreamComId) < 0 Then
-                            Logger.Status("MissingDownstreamComID " & lDownstreamComId & ", add outlet " & DumpComid(aFlowlinesShapeFile, lComId))
+                            Logger.Dbg("MissingDownstreamComID " & lDownstreamComId & ", add outlet " & DumpComid(aFlowlinesShapeFile, lComId))
                             lMissingCount += 1
                             If Not pOutletComIds.Contains(lComId) Then
                                 pOutletComIds.Add(lComId)
                             End If
                         End If
                     ElseIf lSkipThisRecord = False Then
-                        Logger.Status("FlowLineRecordNotNumericDown, add outlet " & DumpComid(aFlowlinesShapeFile, lComId))
+                        Logger.Dbg("FlowLineRecordNotNumericDown, add outlet " & DumpComid(aFlowlinesShapeFile, lComId))
                         lMissingCount += 1
                         If Not pOutletComIds.Contains(lComId) Then
                             pOutletComIds.Add(lComId)
@@ -425,9 +425,9 @@ Friend Module modNetwork
                     lFlowlinesRecord -= 1
                 End While
             End With
-            Logger.Status(" ** CheckConnectivityEnd, MissingOutletsAdded " & lMissingCount)
+            Logger.Dbg(" ** CheckConnectivityEnd, MissingOutletsAdded " & lMissingCount)
             If Not pOutletComIds.Contains(lLargestContribAreaComId) Then
-                Logger.Status(" ** AddMainChannelToOutletComIds")
+                Logger.Dbg(" ** AddMainChannelToOutletComIds")
                 pOutletComIds.Add(lLargestContribAreaComId)
             End If
         End If
@@ -441,7 +441,7 @@ Friend Module modNetwork
         Try
             Dim lRecordKeptIndex As Integer = FindRecord(aCatchmentShapeFile, pCatchmentComIdFieldIndex, aKeptComId)
             Dim lRecordAddingIndex As Integer = FindRecord(aCatchmentShapeFile, pCatchmentComIdFieldIndex, aAddingComId)
-            Logger.Status("CatchmentKeep " & aKeptComId & "(" & lRecordKeptIndex & ") Merge " & aAddingComId & "(" & lRecordAddingIndex & ")")
+            Logger.Dbg("CatchmentKeep " & aKeptComId & "(" & lRecordKeptIndex & ") Merge " & aAddingComId & "(" & lRecordAddingIndex & ")")
             If lRecordAddingIndex > -1 AndAlso lRecordKeptIndex > -1 Then
                 With aCatchmentShapeFile
                     Dim lNewFieldValues As New ArrayList
@@ -548,7 +548,7 @@ Friend Module modNetwork
                                 End Select
                             End If
                         Catch exField As Exception
-                            Logger.Status("Exception setting " & .Field(lFieldIndex).Name & ": " & exField.Message)
+                            Logger.Status("Exception setting " & .Field(lFieldIndex).Name & ": " & exField.Message, True)
                             lNewFieldValues.Add("")
                         End Try
                     Next
@@ -557,18 +557,18 @@ Friend Module modNetwork
                     Try
                         lTargetShape = aCatchmentShapeFile.Shape(lRecordKeptIndex).Clip(aCatchmentShapeFile.Shape(lRecordAddingIndex), MapWinGIS.tkClipOperation.clUnion)
                     Catch e As Exception
-                        Logger.Status("Error: CombineCatchments:ClipTargetShape  " & e.Message)
+                        Logger.Status("Error: CombineCatchments:ClipTargetShape  " & e.Message, True)
                         Try
                             MapWinGeoProc.SpatialOperations.MergeShapes(aCatchmentShapeFile, lRecordKeptIndex, lRecordAddingIndex, lTargetShape)
                         Catch ex As Exception
-                            Logger.Status("Error: CombineCatchments:MergeShapes  " & ex.Message)
+                            Logger.Status("Error: CombineCatchments:MergeShapes  " & ex.Message, True)
                         End Try
                     End Try
                     If lTargetShape IsNot Nothing Then
                         .EditDeleteShape(lRecordKeptIndex)
                         .EditInsertShape(lTargetShape, lRecordKeptIndex)
                     Else
-                        Logger.Status("Shape Union Failed, merging by adding parts " & aCatchmentShapeFile.Shape(lRecordKeptIndex).LastErrorCode & " " & aCatchmentShapeFile.LastErrorCode)
+                        Logger.Dbg("Shape Union Failed, merging by adding parts " & aCatchmentShapeFile.Shape(lRecordKeptIndex).LastErrorCode & " " & aCatchmentShapeFile.LastErrorCode)
                         'Throw New ApplicationException("Shape Union Failed " & aCatchmentShapeFile.Shape(lRecordKeptIndex).LastErrorCode & " " & aCatchmentShapeFile.LastErrorCode)
                         Dim lToPointIndex As Integer = aCatchmentShapeFile.Shape(lRecordKeptIndex).numPoints
                         For lFromPartIndex As Integer = 0 To aCatchmentShapeFile.Shape(lRecordAddingIndex).NumParts - 1
@@ -591,13 +591,61 @@ Friend Module modNetwork
                     .EditDeleteShape(lRecordAddingIndex)
                 End With
             Else
-                Logger.Status("SkipMerge " & lRecordKeptIndex & " " & lRecordAddingIndex)
+                Logger.Dbg("SkipMerge " & lRecordKeptIndex & " " & lRecordAddingIndex)
             End If
             Return True
         Catch e As Exception
-            Logger.Status("Error: CombineCatchments:  " & e.Message)
+            Logger.Status("Error: CombineCatchments:  " & e.Message, True)
             Return False
         End Try
+    End Function
+
+    Private Function SortCatchmentsToMatchFlowlines( _
+                ByVal aFlowlines As MapWinGIS.Shapefile, _
+                ByVal aCatchments As MapWinGIS.Shapefile) As String
+        Dim lSortedCatchmentsFilename As String = atcUtility.GetTemporaryFileName(IO.Path.GetFileNameWithoutExtension(aCatchments.Filename), "shp")
+        atcUtility.TryCopyShapefile(aCatchments.Filename, lSortedCatchmentsFilename)
+        Dim lNewCatchments As New MapWinGIS.Shapefile
+        lNewCatchments.Open(lSortedCatchmentsFilename)
+        lNewCatchments.StartEditingShapes()
+        lNewCatchments.StartEditingTable()
+
+        For lCatchmentShape As Integer = lNewCatchments.NumShapes - 1 To 0 Step -1
+            lNewCatchments.EditDeleteShape(lCatchmentShape)
+        Next
+
+        Dim lLastFlowlineIndex As Integer = aFlowlines.NumShapes - 1
+        Dim llLastCatchmentIndex As Integer = aCatchments.NumShapes - 1
+        Dim llLastCatchmentFieldIndex As Integer = aCatchments.NumFields - 1
+        Dim lFieldIndex As Integer
+
+        For lFlowlineIndex As Integer = 0 To lLastFlowlineIndex
+            Dim lCOMID As String = aFlowlines.CellValue(pFlowlinesComIdFieldIndex, lFlowlineIndex).ToString.Trim
+            If lCOMID.Length > 1 Then
+                Dim lCatchmentsIndex As Integer
+                For lCatchmentsIndex = 0 To llLastCatchmentIndex
+                    If lCOMID = aCatchments.CellValue(pCatchmentComIdFieldIndex, lCatchmentsIndex).ToString.Trim Then
+                        Exit For
+                    End If
+                Next
+                If lCatchmentsIndex <= llLastCatchmentIndex Then
+                    lNewCatchments.EditInsertShape(aCatchments.Shape(lCatchmentsIndex), lFlowlineIndex)
+                    For lFieldIndex = 0 To llLastCatchmentFieldIndex
+                        lNewCatchments.EditCellValue(lFieldIndex, lFlowlineIndex, aCatchments.CellValue(lFieldIndex, lCatchmentsIndex))
+                    Next
+                Else
+                    Logger.Dbg("Warning: Inserting dummy shape in catchments to align with flowlines because could not find COMID " & lCOMID)
+                    lNewCatchments.EditInsertShape(aCatchments.Shape(0), lFlowlineIndex)
+                    lNewCatchments.EditCellValue(0, lFlowlineIndex, "0")
+                End If
+            End If
+        Next
+
+        lNewCatchments.StopEditingShapes()
+        lNewCatchments.StopEditingTable()
+        lNewCatchments.Close()
+
+        Return lSortedCatchmentsFilename
     End Function
 
     ''' <summary>
@@ -622,7 +670,7 @@ Friend Module modNetwork
 
         Dim lSimplifiedFlowlines As New MapWinGIS.Shapefile
         If Not lSimplifiedFlowlines.Open(lSimplifiedFlowlinesFileName) Then
-            Logger.Status("Could not open '" & lSimplifiedFlowlinesFileName & "'")
+            Logger.Status("Could not open '" & lSimplifiedFlowlinesFileName & "'", True)
             Exit Function
         End If
         lSimplifiedFlowlines.StartEditingShapes()
@@ -634,7 +682,7 @@ Friend Module modNetwork
 
         Dim lSimplifiedCatchment As New MapWinGIS.Shapefile
         If Not lSimplifiedCatchment.Open(lSimplifiedCatchmentFileName) Then
-            Logger.Status("Could not open '" & lSimplifiedCatchmentFileName & "'")
+            Logger.Status("Could not open '" & lSimplifiedCatchmentFileName & "'", True)
             Exit Function
         End If
         lSimplifiedCatchment.StartEditingShapes()
@@ -679,7 +727,7 @@ Friend Module modNetwork
         pCatchmentAreaIndex = FieldIndex(lSimplifiedCatchment, "AREASQKM")
 
         Logger.Status("Process " & lSimplifiedFlowlines.NumShapes & " Flowlines " _
-                              & lSimplifiedCatchment.NumShapes & " Catchments ")
+                                 & lSimplifiedCatchment.NumShapes & " Catchments ", True)
 
         Dim lOldFlowlineCatchmentDelta As Integer
         Dim lBraidedFlowlinesCombinedCount As Integer = 0
@@ -691,7 +739,7 @@ Friend Module modNetwork
             UpdateValueIfNotNull(lComId, lSimplifiedFlowlines.CellValue(pFlowlinesComIdFieldIndex, lFlowlinesRecord))
             Dim lCatchmentRecord As Integer = FindRecord(lSimplifiedCatchment, pCatchmentComIdFieldIndex, lComId)
             If lCatchmentRecord = -1 Then 'missing catchment
-                Logger.Status("RemoveFlowline " & DumpComid(lSimplifiedFlowlines, lComId) & " without catchment")
+                Logger.Dbg("RemoveFlowline " & DumpComid(lSimplifiedFlowlines, lComId) & " without catchment")
                 If pOutletComIds.Contains(lComId) Then
                     pOutletComIds.Remove(lComId)
                 End If
@@ -701,7 +749,7 @@ Friend Module modNetwork
                 If lToNode > 0 AndAlso lRecordCombineIndex > -1 Then
                     Dim lToComId As Long = -1
                     UpdateValueIfNotNull(lToComId, lSimplifiedFlowlines.CellValue(pFlowlinesComIdFieldIndex, lRecordCombineIndex))
-                    Logger.Status("MergeDownWith " & DumpComid(lSimplifiedFlowlines, lToComId))
+                    Logger.Dbg("MergeDownWith " & DumpComid(lSimplifiedFlowlines, lToComId))
                     CombineFlowlines(lSimplifiedFlowlines, lRecordCombineIndex, lFlowlinesRecord, True, False)
                 Else
                     Dim lFromNode As Int64 = -1
@@ -709,14 +757,14 @@ Friend Module modNetwork
                     Dim lFromNodeCount As Integer = Count(lSimplifiedFlowlines, pFlowlinesFromNodeIndex, lFromNode)
                     lRecordCombineIndex = FindRecord(lSimplifiedFlowlines, pFlowlinesToNodeIndex, lFromNode)
                     If lFromNode > 0 AndAlso lRecordCombineIndex > -1 Then
-                        Logger.Status("MergeUpWith " & DumpComid(lSimplifiedFlowlines, lSimplifiedFlowlines.CellValue(pFlowlinesComIdFieldIndex, lRecordCombineIndex)))
+                        Logger.Dbg("MergeUpWith " & DumpComid(lSimplifiedFlowlines, lSimplifiedFlowlines.CellValue(pFlowlinesComIdFieldIndex, lRecordCombineIndex)))
                         CombineFlowlines(lSimplifiedFlowlines, lRecordCombineIndex, lFlowlinesRecord, True, False)
                     Else
-                        Logger.Status("OrphanFlowLine - no connections")
+                        Logger.Status("OrphanFlowLine - no connections", True)
                         If lSimplifiedFlowlines.EditDeleteShape(lFlowlinesRecord) Then
-                            Logger.Status("Removed " & lComId & " at " & lFlowlinesRecord & " of " & lSimplifiedFlowlines.NumShapes)
+                            Logger.Dbg("Removed " & lComId & " at " & lFlowlinesRecord & " of " & lSimplifiedFlowlines.NumShapes)
                         Else
-                            Logger.Status("RemoveFailed")
+                            Logger.Dbg("RemoveFailed")
                         End If
                     End If
                 End If
@@ -724,7 +772,7 @@ Friend Module modNetwork
                 lFlowlinesRecord += 1
             End If
         End While
-        Logger.Status("========RemovedFlowlinesWithoutCatchments " & lSimplifiedFlowlines.NumShapes & " " & lSimplifiedCatchment.NumShapes)
+        Logger.Status("Removed Flowlines Without Catchments, now " & lSimplifiedFlowlines.NumShapes & " flowlines, " & lSimplifiedCatchment.NumShapes & " catchments", True)
 
         pCheckCount = 0
         CheckConnectivity(lSimplifiedFlowlines)
@@ -740,12 +788,12 @@ Friend Module modNetwork
                 'Dim lDownstreamCount As Integer = Count(lSimplifiedFlowlines, lFlowlinesDownstreamComIdFieldIndex, lComId)
                 Dim lDownstreamRecords As Generic.List(Of Integer) = FindRecords(lSimplifiedFlowlines, pFlowlinesDownstreamComIdFieldIndex, lComId)
                 Dim lDownstreamCount As Integer = lDownstreamRecords.Count
-                Logger.Status("BraidedChannel at " & lFlowlinesRecord & " of " & lSimplifiedFlowlines.NumShapes & " DownstreamCount " & lDownstreamCount)
+                Logger.Dbg("BraidedChannel at " & lFlowlinesRecord & " of " & lSimplifiedFlowlines.NumShapes & " DownstreamCount " & lDownstreamCount)
                 For Each lDownstreamRecord As Integer In lDownstreamRecords
-                    Logger.Status("Downstream" & DumpComid(lSimplifiedFlowlines, lSimplifiedFlowlines.CellValue(pFlowlinesComIdFieldIndex, lDownstreamRecord)))
+                    Logger.Dbg("Downstream" & DumpComid(lSimplifiedFlowlines, lSimplifiedFlowlines.CellValue(pFlowlinesComIdFieldIndex, lDownstreamRecord)))
                 Next
                 If lDownstreamCount > 0 Then '
-                    Logger.Status("PreferredChannel Keep " & lComId)
+                    Logger.Dbg("PreferredChannel Keep " & lComId)
                 Else ' not preferred(branch - remove)
                     Dim lCumAreaLarge As Double = 0
                     Dim lFindRecordKeep As Integer = -1
@@ -754,7 +802,7 @@ Friend Module modNetwork
                     For Each lFindRecord As Integer In lFindRecords
                         Dim lCumArea As Double = -1
                         UpdateValueIfNotNull(lCumArea, lSimplifiedFlowlines.CellValue(pFlowlinesCumDrainAreaIndex, lFindRecord))
-                        Logger.Status(" Found " & DumpComid(lSimplifiedFlowlines, lSimplifiedFlowlines.CellValue(pFlowlinesComIdFieldIndex, lFindRecord)))
+                        Logger.Dbg(" Found " & DumpComid(lSimplifiedFlowlines, lSimplifiedFlowlines.CellValue(pFlowlinesComIdFieldIndex, lFindRecord)))
                         If lCumAreaLarge < lCumArea Then
                             lCumAreaLarge = lCumArea
                             lFindRecordRemove = lFindRecordKeep
@@ -768,42 +816,43 @@ Friend Module modNetwork
                     If CombineCatchments(lSimplifiedCatchment, lCombineWithComId, lRemoveComId) Then
                         CombineFlowlines(lSimplifiedFlowlines, lFindRecordKeep, lFindRecordRemove, False, False)
                     Else
-                        Logger.Status("Failed to merge braided catchment " & lRemoveComId & " into " & lCombineWithComId)
+                        Logger.Status("Failed to merge braided catchment " & lRemoveComId & " into " & lCombineWithComId, True)
                     End If
                     lFlowlinesRecord -= 1
                     lBraidedFlowlinesCombinedCount += 1
                     lOldFlowlineCatchmentDelta = lFlowlineCatchmentDelta
                     lFlowlineCatchmentDelta = lSimplifiedFlowlines.NumShapes - lSimplifiedCatchment.NumShapes
-                    Logger.Status("CountsFlowlines " & lSimplifiedFlowlines.NumShapes _
+                    Logger.Dbg("CountsFlowlines " & lSimplifiedFlowlines.NumShapes _
                             & " Catchments " & lSimplifiedCatchment.NumShapes _
                             & " Delta " & lFlowlineCatchmentDelta _
                             & " Removed " & lBraidedFlowlinesCombinedCount)
                 End If
                 If lFlowlineCatchmentDelta <> lOldFlowlineCatchmentDelta Then
-                    Logger.Status("Error: ************* Delta Change - WHY ***********************")
+                    Logger.Status("Error: ************* Delta Change ***********************", True)
                 End If
                 SaveIntermediate(lSimplifiedCatchment, lSimplifiedFlowlines)
             End If
             lFlowlinesRecord += 1
         End While
-        Logger.Status("======== " & lBraidedFlowlinesCombinedCount & " Braided Flowlines Combined ========")
+        Logger.Status("======== " & lBraidedFlowlinesCombinedCount & " Braided Flowlines Combined ========", True)
 
-        Logger.Status("-------- FillMissingFlowlineCUMDRAINAG Start")
+        Logger.Status("Filling Missing Flowline CUMDRAINAG", True)
         FillMissingFlowlineCUMDRAINAG(lSimplifiedFlowlines, lSimplifiedCatchment)
-        Logger.Status("-------- FillMissingFlowlineCUMDRAINAG Done")
 
+        Logger.Status("Enforcing Minimum Catchment Size", True)
         'Merge short lines and/or small catchments
         For Each lOutletComID As Long In pOutletComIds
             EnforceMinimumSize(lSimplifiedFlowlines, lSimplifiedCatchment, aMinCatchmentKM2, aMinLengthKM, lOutletComID)
-            Logger.Status("====AfterOutlet " & lOutletComID & " Flowlines " & lSimplifiedFlowlines.NumShapes & " Catchments " & lSimplifiedCatchment.NumShapes)
+            Logger.Dbg("====AfterOutlet " & lOutletComID & " Flowlines " & lSimplifiedFlowlines.NumShapes & " Catchments " & lSimplifiedCatchment.NumShapes)
         Next
-        Logger.Status("======== EnforceMinimumSizeDone OutletCount " & pOutletComIds.Count & " ShapeCount " & lSimplifiedFlowlines.NumShapes)
+        Logger.Dbg("======== EnforceMinimumSizeDone OutletCount " & pOutletComIds.Count & " ShapeCount " & lSimplifiedFlowlines.NumShapes)
 
         CombineMissingOutletCatchments(lSimplifiedFlowlines, lSimplifiedCatchment, aMinCatchmentKM2, aMinLengthKM)
-        Logger.Status("======== CombineMissingOutletCatchments OutletCount " & pOutletComIds.Count & " ShapeCount " & lSimplifiedFlowlines.NumShapes & " " & lSimplifiedCatchment.NumShapes)
+        Logger.Dbg("Combined Missing Outlet Catchments OutletCount " & pOutletComIds.Count & " ShapeCount " & lSimplifiedFlowlines.NumShapes & " " & lSimplifiedCatchment.NumShapes)
 
         lSimplifiedCatchment.StopEditingShapes()
         lSimplifiedCatchment.StopEditingTable()
+        Dim lSortedCatchmentsFilename As String = SortCatchmentsToMatchFlowlines(lSimplifiedFlowlines, lSimplifiedCatchment)
         lSimplifiedCatchment.Close()
 
         lSimplifiedFlowlines.StopEditingShapes()
@@ -811,6 +860,10 @@ Friend Module modNetwork
         lSimplifiedFlowlines.Close()
 
         pOutletComIds.Clear()
+
+        If IO.File.Exists(lSortedCatchmentsFilename) Then
+            atcUtility.TryMoveShapefile(lSortedCatchmentsFilename, lSimplifiedCatchmentFileName)
+        End If
         Return True
     End Function
 
@@ -818,13 +871,13 @@ Friend Module modNetwork
                                                ByVal aCatchments As MapWinGIS.Shapefile, _
                                                ByVal aMinCatchmentKM2 As Double, _
                                                ByVal aMinLengthKM As Double)
-        Logger.Status("CombineMissingOutletCatchments Count " & pOutletComIds.Count)
+        Logger.Dbg("CombineMissingOutletCatchments Count " & pOutletComIds.Count)
         Dim lCheckArea As Boolean = (aMinCatchmentKM2 > 0)
         Dim lCheckLength As Boolean = (aMinLengthKM > 0)
         Dim lMergedThese As New Generic.List(Of Long)
         Dim lOutletComID As Long
         For Each lOutletComID In pOutletComIds
-            Logger.Status("Process " & lOutletComID)
+            Logger.Dbg("Process " & lOutletComID)
             Dim lFlowlineIndex As Integer = FindRecord(aFlowlines, pFlowlinesComIdFieldIndex, lOutletComID)
             'Dim lOutletComIdRecordIndex As Integer = FindRecord(aFlowlines, pFlowlinesComIdFieldIndex, lOutletComID)
             If lFlowlineIndex > -1 Then
@@ -836,26 +889,26 @@ Friend Module modNetwork
                     With aFlowlines.Shape(lFlowlineIndex).Point(lFlowLineNumPoints - 1)
                         Dim lNearestIndex As Integer = NearestNeighbor(.x, .y, lOutletComID, aCatchments)
                         Dim lMergeWithComid As Long = aCatchments.CellValue(pCatchmentComIdFieldIndex, lNearestIndex)
-                        Logger.Status("MergeWith " & DumpComid(aFlowlines, lMergeWithComid))
+                        Logger.Dbg("MergeWith " & DumpComid(aFlowlines, lMergeWithComid))
                         Dim lMainFlowLineIndex As Integer = FindRecord(aFlowlines, pFlowlinesComIdFieldIndex, lMergeWithComid)
                         If CombineCatchments(aCatchments, lMergeWithComid, lOutletComID) Then
                             CombineFlowlines(aFlowlines, lMainFlowLineIndex, lFlowlineIndex, False, False)
                             lMergedThese.Add(lOutletComID)
                         Else
-                            Logger.Status("Failed to merge missing outlet catchment " & lOutletComID & " into " & lMergeWithComid)
+                            Logger.Status("Failed to merge missing outlet catchment " & lOutletComID & " into " & lMergeWithComid, True)
                         End If
                     End With
                 Else
                     'LogMessage(aLog, "Big Enough " & lOutletComID & " Area " & lOutletCumArea)
                 End If
             Else
-                Logger.Status("Missing " & lOutletComID)
+                Logger.Status("Missing " & lOutletComID, True)
             End If
         Next
         For Each lOutletComID In lMergedThese
             pOutletComIds.Remove(lOutletComID)
         Next
-        Logger.Status("CombineMissingOutletCatchments Complete: " & pOutletComIds.Count & " outlets remain")
+        Logger.Status("CombineMissingOutletCatchments Complete: " & pOutletComIds.Count & " outlets remain", True)
     End Sub
 
     Private Function NearestNeighbor(ByVal aX As Double, ByVal aY As Double, _
@@ -904,7 +957,7 @@ Friend Module modNetwork
                                                 lNearestNeighbor = lIntersectingPolygonIndices(lIndex)
                                             End If
                                         Else
-                                            Logger.Status("NoNearestPointAt " & lIndex)
+                                            Logger.Status("NoNearestPointAt " & lIndex, True)
                                         End If
                                     End If
                                 End If
@@ -928,17 +981,17 @@ Friend Module modNetwork
                 lComId = -1
                 If UpdateValueIfNotNull(lComId, aFlowlines.CellValue(pFlowlinesComIdFieldIndex, lFlowlineIndex)) Then
                     If lComId = aOutletComId Then
-                        Logger.Status("Error: ComIDProblem: upstream of itself: " & lComId)
+                        Logger.Status("Error: ComIDProblem: upstream of itself: " & lComId, True)
                         Return lFlowLinesUpstreamComIds
                     Else
-                        Logger.Status("Upstream " & DumpComid(aFlowlines, lComId))
+                        Logger.Dbg("Upstream " & DumpComid(aFlowlines, lComId))
                         lFlowLinesUpstreamComIds.Add(lComId)
                     End If
                 Else
-                    Logger.Status("Error: NoComIdFor " & lFlowlineIndex)
+                    Logger.Status("Error: NoComIdFor " & lFlowlineIndex, True)
                 End If
             Catch lEx As Exception
-                Logger.Status("Error: ProblemUpstream index " & lFlowlineIndex & ": " & lEx.Message)
+                Logger.Status("Error: ProblemUpstream index " & lFlowlineIndex & ": " & lEx.Message, True)
             End Try
         Next
         Return lFlowLinesUpstreamComIds
@@ -963,29 +1016,29 @@ Friend Module modNetwork
                 lContribArea = 0
                 Dim lComId As Long = 0
                 If Not UpdateValueIfNotNull(lComId, aFlowlines.CellValue(pFlowlinesComIdFieldIndex, lFlowlineIndex)) Then
-                    Logger.Status("Error: COMID and CUMDRAINAG missing at record " & lFlowlineIndex & " of " & aFlowlines.Filename)
+                    Logger.Status("Error: COMID and CUMDRAINAG missing at record " & lFlowlineIndex & " of " & aFlowlines.Filename, True)
                 Else
-                    Logger.Status("CUMDRAINAG missing for " & lComId & ", attempting to compute value")
+                    Logger.Dbg("CUMDRAINAG missing for " & lComId & ", attempting to compute value")
                     'Find local drainage area from area of associated catchment
                     Dim lCatchmentIndex As Integer = FindRecord(aCatchments, pCatchmentComIdFieldIndex, lComId)
                     If lCatchmentIndex < 0 Then
-                        Logger.Status("Could not find catchment associated with this outlet: " & lComId)
+                        Logger.Status("Could not find catchment associated with this outlet: " & lComId, True)
                     Else
                         If UpdateValueIfNotNull(lContribArea, aCatchments.CellValue(pCatchmentAreaIndex, lCatchmentIndex)) Then
                             aFlowlines.EditCellValue(pFlowlinesLocDrainAreaIndex, lFlowlineIndex, lContribArea)
-                            Logger.Status("Catchment Area = " & lContribArea)
+                            Logger.Dbg("Catchment Area = " & lContribArea)
                         Else
-                            Logger.Status("Catchment Area not available for " & lComId)
+                            Logger.Status("Catchment Area not available for " & lComId, True)
                         End If
                     End If
                 End If
 
                 Dim lUpstreamComIds As Generic.List(Of Long) = FindUpstreamComIDs(aFlowlines, lComId)
                 If lUpstreamComIds.Count = 0 Then
-                    Logger.Status("FillMissingFlowlineCUMDRAINAG: No Upstream flowlines to search from " & lComId)
+                    Logger.Dbg("FillMissingFlowlineCUMDRAINAG: No Upstream flowlines to search from " & lComId)
                     'lThisChannelCumLen = Math.Max(0, lThisChannelCumLen)
                 Else
-                    Logger.Status("FillMissingFlowlineCUMDRAINAG: Count Upstream = " & lUpstreamComIds.Count)
+                    Logger.Dbg("FillMissingFlowlineCUMDRAINAG: Count Upstream = " & lUpstreamComIds.Count)
                     For Each lUpComId As Long In lUpstreamComIds
                         Dim lUpIndex As Integer = FindRecord(aFlowlines, pFlowlinesComIdFieldIndex, lUpComId)
                         FillMissingFlowlineCUMDRAINAG(aFlowlines, aCatchments, lUpIndex)
@@ -997,7 +1050,7 @@ Friend Module modNetwork
                     'lThisChannelCumLen = Math.Max(lUpCumLen, lThisChannelCumLen)
                 End If
 
-                Logger.Status("FillMissingFlowlineCUMDRAINAG: Computed CumDrainArea = " & lContribArea & " at " & lComId) '& " CumLen=" & lThisChannelCumLen)
+                Logger.Dbg("FillMissingFlowlineCUMDRAINAG: Computed CumDrainArea = " & lContribArea & " at " & lComId) '& " CumLen=" & lThisChannelCumLen)
                 aFlowlines.EditCellValue(pFlowlinesCumDrainAreaIndex, lFlowlineIndex, lContribArea)
             End If
         Next
@@ -1030,7 +1083,7 @@ Friend Module modNetwork
                 Dim lThisChannelCumLen As Double = -2
                 UpdateValueIfNotNull(lThisChannelCumLen, aFlowlines.CellValue(pFlowlinesCumLenFieldIndex, lFlowlineIndex))
                 If lContribArea <= 0 OrElse lThisChannelCumLen <= 0 Then 'Look upstream for valid values
-                    Logger.Status("Warning: FindMainChannel " & lComId & " CumDrainArea=" & lContribArea & " CumLen=" & lThisChannelCumLen & " (both should be > 0)")
+                    Logger.Status("Warning: FindMainChannel " & lComId & " CumDrainArea=" & lContribArea & " CumLen=" & lThisChannelCumLen & " (both should be > 0)", True)
                 End If
 
                 'Moved most of this block into FillMissingFlowlineCUMDRAINAG
@@ -1064,7 +1117,7 @@ Friend Module modNetwork
                     End If
                 End If
             Catch lEx As Exception
-                Logger.Status("Error: ProblemUpstream " & lEx.Message)
+                Logger.Status("Error: ProblemUpstream " & lEx.Message, True)
             End Try
         Next
         Return lMainLocalChannelComId
@@ -1086,7 +1139,7 @@ Friend Module modNetwork
                                    ByVal aOutletComId As Long)
         Dim lCheckArea As Boolean = (aMinCatchmentKM2 > 0)
         Dim lCheckLength As Boolean = (aMinLengthKM > 0)
-        Logger.Status("EnforceMinimumSizeEntry  " & DumpComid(aFlowlines, aOutletComId) _
+        Logger.Dbg("EnforceMinimumSizeEntry  " & DumpComid(aFlowlines, aOutletComId) _
                        & " Flowlines: " & aFlowlines.NumShapes _
                        & " Catchments: " & aCatchments.NumShapes)
 
@@ -1096,9 +1149,9 @@ Friend Module modNetwork
         Dim lFlowlineIndex As Integer
         Dim lUpstreamComIds As Generic.List(Of Long) = FindUpstreamComIDs(aFlowlines, aOutletComId)
 
-        Logger.Status("Count Upstream = " & lUpstreamComIds.Count)
+        Logger.Dbg("Count Upstream = " & lUpstreamComIds.Count)
         For Each lComIdUp In lUpstreamComIds
-            Logger.Status("Upstream EnforceMinimumSize " & DumpComid(aFlowlines, lComIdUp))
+            Logger.Dbg("Upstream EnforceMinimumSize " & DumpComid(aFlowlines, lComIdUp))
             EnforceMinimumSize(aFlowlines, aCatchments, aMinCatchmentKM2, aMinLengthKM, lComIdUp)
         Next
 
@@ -1108,7 +1161,7 @@ Friend Module modNetwork
 
         Dim lOutletFlowlineIndex As Integer = FindRecord(aFlowlines, pFlowlinesComIdFieldIndex, aOutletComId)
         If lOutletFlowlineIndex = -1 Then
-            Logger.Status("OutletNotInLayer " & DumpComid(aFlowlines, aOutletComId))
+            Logger.Status("OutletNotInLayer " & DumpComid(aFlowlines, aOutletComId), True)
             Return
         End If
 
@@ -1127,13 +1180,13 @@ Friend Module modNetwork
         If lContribArea = 0 Then 'Local drainage area not yet set, so set it to difference of outlet cum - main channel cum
             If lContribArea <= 0 Then 'Find local drainage area from FlowlinesCumDrainArea
                 If Not UpdateValueIfNotNull(lContribArea, aFlowlines.CellValue(pFlowlinesCumDrainAreaIndex, lOutletFlowlineIndex)) Then
-                    Logger.Status("Could not set local drainage area, no value for FlowlinesCumDrainArea")
+                    Logger.Status("Could not set local drainage area, no value for FlowlinesCumDrainArea", True)
                 End If
             End If
             If lContribArea >= lTotalContribArea Then
                 aFlowlines.EditCellValue(pFlowlinesLocDrainAreaIndex, lOutletFlowlineIndex, lContribArea - lTotalContribArea)
             Else
-                Logger.Status("Could not set local drainage area, local+upstream < upstream, (" & lContribArea & " < " & lTotalContribArea & ")")
+                Logger.Status("Could not set local drainage area, local+upstream < upstream, (" & lContribArea & " < " & lTotalContribArea & ")", True)
             End If
         End If
 
@@ -1141,24 +1194,24 @@ Friend Module modNetwork
         UpdateValueIfNotNull(lCumDrainAreaDown, aFlowlines.CellValue(pFlowlinesCumDrainAreaIndex, lOutletFlowlineIndex))
 
         If lMainUpstreamChannelComId > 0 Then
-            Logger.Status("MainUpstream from " & aOutletComId & " is " & DumpComid(aFlowlines, lMainUpstreamChannelComId))
+            Logger.Dbg("MainUpstream from " & aOutletComId & " is " & DumpComid(aFlowlines, lMainUpstreamChannelComId))
         ElseIf lUpstreamComIds.Count > 0 Then
-            Logger.Status("Error: NoMainUpstream from " & aOutletComId)
+            Logger.Status("Error: NoMainUpstream from " & aOutletComId, True)
         Else
-            Logger.Status("      TopOfStream at " & aOutletComId)
+            Logger.Dbg("      TopOfStream at " & aOutletComId)
         End If
 
         For Each lComIdUp In lUpstreamComIds
             'Need to update each time through, index may change while merging
             lOutletFlowlineIndex = FindRecord(aFlowlines, pFlowlinesComIdFieldIndex, aOutletComId)
             If lOutletFlowlineIndex = -1 Then
-                Logger.Status("Error: OutletLostFromLayer " & DumpComid(aFlowlines, aOutletComId))
+                Logger.Status("Error: OutletLostFromLayer " & DumpComid(aFlowlines, aOutletComId), True)
                 Return
             Else
                 'Find contributing area and/or length of upstream segment
                 lFlowlineIndex = FindRecord(aFlowlines, pFlowlinesComIdFieldIndex, lComIdUp)
                 If lFlowlineIndex < 0 Then
-                    Logger.Status("UpstreamFlowlineNotFound: " & lComIdUp)
+                    Logger.Dbg("UpstreamFlowlineNotFound: " & lComIdUp)
                 Else
                     If IsTooSmall(aFlowlines, lFlowlineIndex, aMinCatchmentKM2, aMinLengthKM, lCheckArea, lCheckLength, False) Then
                         'this upstream segment is too small/short, need to merge it with something
@@ -1190,26 +1243,26 @@ Friend Module modNetwork
                                 If lCumDrainAreaDown > (aMinCatchmentKM2 / 2) Then 'only keep large enough segments even if on main channel 
                                     lKeepBothFlowlines = True
                                 Else
-                                    Logger.Status("Discarding main channel small upstream segment " & lCumDrainAreaDown & " < " & (aMinCatchmentKM2 / 2) & " " & DumpComid(aFlowlines, lMainUpstreamChannelComId))
+                                    Logger.Dbg("Discarding main channel small upstream segment " & lCumDrainAreaDown & " < " & (aMinCatchmentKM2 / 2) & " " & DumpComid(aFlowlines, lMainUpstreamChannelComId))
                                 End If
                             End If
 
-                            Logger.Status("FlowlineMergeDownstream Keep=" & lKeepBothFlowlines & " " & DumpComid(aFlowlines, aOutletComId) & _
+                            Logger.Dbg("FlowlineMergeDownstream Keep=" & lKeepBothFlowlines & " " & DumpComid(aFlowlines, aOutletComId) & _
                                                            " with upstream " & DumpComid(aFlowlines, lComIdUp))
                             Try
                                 If CombineCatchments(aCatchments, aOutletComId, lComIdUp) Then
                                     CombineFlowlines(aFlowlines, lOutletFlowlineIndex, lFlowlineIndex, lKeepBothFlowlines, lCumulativeBigEnough AndAlso g_KeepConnectingRemovedFlowLines)
                                 Else
-                                    Logger.Status("Failed to merge missing outlet catchment " & lComIdUp & " into " & aOutletComId)
+                                    Logger.Status("Failed to merge missing outlet catchment " & lComIdUp & " into " & aOutletComId, True)
                                 End If
                                 If lKeepBothFlowlines Then
-                                    Logger.Status("AfterCombineWithMerge " & DumpComid(aFlowlines, aOutletComId))
+                                    Logger.Dbg("AfterCombineWithMerge " & DumpComid(aFlowlines, aOutletComId))
                                 Else
-                                    Logger.Status("AfterCombineNoMerge " & DumpComid(aFlowlines, aOutletComId))
+                                    Logger.Dbg("AfterCombineNoMerge " & DumpComid(aFlowlines, aOutletComId))
                                 End If
 
                             Catch e As Exception
-                                Logger.Status("Error, did not combine: " & e.Message)
+                                Logger.Status("Error, did not combine: " & e.Message, True)
                             End Try
                         End If
                         SaveIntermediate(aCatchments, aFlowlines)
@@ -1227,14 +1280,14 @@ Friend Module modNetwork
             If lCheckLength Then UpdateValueIfNotNull(lLength, aFlowlines.CellValue(pFlowlinesLengthFieldIndex, lFlowlineIndex))
             If (lCheckArea AndAlso lContribArea < aMinCatchmentKM2) OrElse (lCheckLength AndAlso lLength < aMinLengthKM) Then
                 If MergeUpstream(aFlowlines, aCatchments, FindUpstreamComIDs(aFlowlines, aOutletComId), aOutletComId) Then
-                    Logger.Status("Merged small outlet upstream " & aOutletComId)
+                    Logger.Dbg("Merged small outlet upstream " & aOutletComId)
                 Else
-                    Logger.Status("Failed to merge small outlet upstream " & aOutletComId)
+                    Logger.Status("Failed to merge small outlet upstream " & aOutletComId, True)
                 End If
             End If
         End If
 
-        Logger.Status("AllDone " & DumpComid(aFlowlines, aOutletComId) & " " & aFlowlines.NumShapes & " " & aCatchments.NumShapes)
+        Logger.Dbg("AllDone " & DumpComid(aFlowlines, aOutletComId) & " " & aFlowlines.NumShapes & " " & aCatchments.NumShapes)
 
     End Sub
 
@@ -1290,14 +1343,14 @@ Friend Module modNetwork
                                    ByVal aOutletComId As Long) As Boolean
         Dim lSuccess As Boolean = False
         Try
-            Logger.Status("Merging upstream of " & DumpComid(aFlowlines, aOutletComId))
+            Logger.Dbg("Merging upstream of " & DumpComid(aFlowlines, aOutletComId))
             Dim lMainChannelIndex As Integer
             If aUpstreamComIds.Count < 1 Then
-                Logger.Status("Nothing upstream to merge with")
+                Logger.Dbg("Nothing upstream to merge with")
             Else
                 Dim lMainUpstreamChannelComId As Long = FindMainChannel(aFlowlines, aUpstreamComIds, 0, 0, lMainChannelIndex)
                 If lMainUpstreamChannelComId > 0 Then
-                    Logger.Status("Merging upstream with " & DumpComid(aFlowlines, lMainUpstreamChannelComId))
+                    Logger.Dbg("Merging upstream with " & DumpComid(aFlowlines, lMainUpstreamChannelComId))
                     Dim lOutletFlowlineIndex As Integer = FindRecord(aFlowlines, pFlowlinesComIdFieldIndex, aOutletComId)
                     lSuccess = CombineCatchments(aCatchments, aOutletComId, lMainUpstreamChannelComId)
                     If lSuccess Then
@@ -1309,11 +1362,11 @@ Friend Module modNetwork
                         Logger.Msg("Error: Could not merge flowlines up " & lMainUpstreamChannelComId & "-" & aOutletComId)
                     End If
                 Else
-                    Logger.Status("No Main Channel upstream to merge with")
+                    Logger.Dbg("No Main Channel upstream to merge with")
                 End If
             End If
         Catch e As Exception
-            Logger.Status("Error, did not combine: " & e.Message)
+            Logger.Status("Error, did not combine: " & e.Message, True)
         End Try
         Return lSuccess
     End Function
@@ -1325,7 +1378,7 @@ Friend Module modNetwork
         lCount += 1
         Math.DivRem(lCount, 500, lResult) 'every 500 write intermediate shapes
         If lResult = 0 Then
-            Logger.Status("SaveIntermediate " & lCount & " " & aCatchments.NumShapes)
+            Logger.Dbg("SaveIntermediate " & lCount & " " & aCatchments.NumShapes)
             aFlowlines.StopEditingShapes()
             aFlowlines.StopEditingTable()
             aCatchments.StopEditingShapes()
@@ -1688,30 +1741,21 @@ Friend Module modNetwork
                             lDemGrid.ProjToCell(lCentroid.x, lCentroid.y, lCol, lRow)
                             Dim lElevation As Double = lDemGrid.Value(lCol, lRow) / 100.0 'cm to m
                             Dim lAreaContrib As Double
-                            Try
-                                lAreaContrib = lFlowlines.CellValue(pFlowlinesCumDrainAreaIndex, lShapeIndex) 'km
-                            Catch
-                                lAreaContrib = 0
+                            If Not ObjectToDouble(lFlowlines.CellValue(pFlowlinesCumDrainAreaIndex, lShapeIndex), lAreaContrib) Then 'km
                                 Logger.Dbg("Missing contributing area in flowline record " & lShapeIndex & " field " & pFlowlinesCumDrainAreaIndex & " of " & aFlowLineFileName)
-                            End Try
+                            End If
                             'Dim lQMean As Double = lFlowlines.CellValue(lQMeanFieldIndex, lShapeIndex) 'cfs
                             'Dim lQPk2 As Double = lQMean * 5 'TODO: WAG UGH - get BASINS neural network code !!!!!!!!!
                             'lWidth = 1.22 * (lQPk2 ^ 0.557) 'from BASINS FAQ
                             'lDepth = 0.34 * (lQPk2 ^ 0.341)
                             lWidth = 1.29 * (lAreaContrib ^ 0.6) 'from BASINS avenue script
                             lDepth = 0.13 * (lAreaContrib ^ 0.4)
-                            Try
-                                lSlope = lFlowlines.CellValue(lSlopeFieldIndex, lShapeIndex)
-                            Catch
-                                lSlope = 0
+                            If Not ObjectToDouble(lFlowlines.CellValue(lSlopeFieldIndex, lShapeIndex), lSlope) Then
                                 Logger.Dbg("Missing slope in flowline record " & lShapeIndex & " field " & lSlopeFieldIndex & " of " & aFlowLineFileName)
-                            End Try
-                            Try
-                                lLength = lFlowlines.CellValue(lLengthFieldIndex, lShapeIndex)
-                            Catch
-                                lLength = 0
+                            End If
+                            If Not ObjectToDouble(lFlowlines.CellValue(lLengthFieldIndex, lShapeIndex), lLength) Then
                                 Logger.Dbg("Missing length in flowline record " & lShapeIndex & " field " & lLengthFieldIndex & " of " & aFlowLineFileName)
-                            End Try
+                            End If
                         End If
                     End If
                     If lSB.Length > 1000000 Then
@@ -1728,6 +1772,16 @@ Friend Module modNetwork
             IO.File.AppendAllText(lOutputFilename, lSB.ToString)
         End If
     End Sub
+
+    Private Function ObjectToDouble(ByVal aObject As Object, ByRef aDouble As Double) As Boolean
+        If DBNull.Value.Equals(aObject) Then
+            aDouble = 0
+            Return False
+        Else
+            aDouble = CDbl(aObject)
+            Return True
+        End If
+    End Function
 
     Friend Function ClipFlowLinesToCatchments(ByVal aCatchmentsToUseFilename As String, _
                                               ByVal aFlowLinesShapeFilename As String, _
@@ -1749,12 +1803,12 @@ Friend Module modNetwork
             Dim lFlowLines As New MapWinGIS.Shapefile
             lFlowLines.Open(aFlowLinesShapeFilename)
             If Not (lFlowLinesToUse.CreateNew(aFlowLinesToUseFilename, lFlowLines.ShapefileType)) Then
-                Logger.Status("ProblemCreating " & aFlowLinesToUseFilename & " Message " & lFlowLinesToUse.ErrorMsg(lFlowLinesToUse.LastErrorCode))
+                Logger.Status("ProblemCreating " & aFlowLinesToUseFilename & " Message " & lFlowLinesToUse.ErrorMsg(lFlowLinesToUse.LastErrorCode), True)
             End If
             If Not lFlowLinesToUse.StartEditingShapes() Then
-                Logger.Status("ProblemBeginingToEdit " & lFlowLinesToUse.Filename)
+                Logger.Status("ProblemBeginingToEdit " & lFlowLinesToUse.Filename, True)
             End If
-            Logger.Status("FlowlineCountInitial " & lFlowLines.NumShapes)
+            Logger.Dbg("FlowlineCountInitial " & lFlowLines.NumShapes)
 
             Dim lReconnectIndex As Integer
             Dim lLastIndex As Integer = lFlowLines.NumShapes - 1
@@ -1769,7 +1823,7 @@ Friend Module modNetwork
                         lFlowLinesToUseDBF.CurrentRecord = lFlowLinesToUseDBF.NumRecords + 1
                         lFlowLinesToUseDBF.RawRecord = lFlowLinesDBF.RawRecord
                     Else
-                        Logger.Status("FlowLine " & lComId & " not added, does not have associated catchment")
+                        Logger.Dbg("FlowLine " & lComId & " not added, does not have associated catchment")
                         Dim lDownstreamComID As String = lFlowLinesDBF.Value(lFlowLinesDownstreamField)
                         'Reconnect flowlines not yet reached in lFlowLinesDBF
                         For lReconnectIndex = lFlowLinesDBF.CurrentRecord + 1 To lLastIndex + 1
@@ -1788,7 +1842,7 @@ Friend Module modNetwork
 
                     End If
                 Else
-                    Logger.Status("Error: Non-numeric COMID '" & lComId & "' at index " & lFlowLinesShapeIndex)
+                    Logger.Status("Error: Non-numeric COMID '" & lComId & "' at index " & lFlowLinesShapeIndex, True)
                 End If
             Next
             Logger.Status("Writing '" & lFlowLinesToUse.NumShapes & "' flowlines, leaving out " & lFlowLines.NumShapes - lFlowLinesToUse.NumShapes)
@@ -1802,7 +1856,7 @@ Friend Module modNetwork
 
             Return True
         Catch lEx As Exception
-            Logger.Status("***** Problem: " & lEx.ToString)
+            Logger.Status("ClipFlowLinesToCatchments Problem: " & lEx.ToString, True)
             Return False
         End Try
     End Function
@@ -1854,10 +1908,10 @@ Friend Module modNetwork
                 'LogMessage(aLog,"Catchment " & lCatchmentShapeIndex & " skipped, does not intersect shape of interest")
             End If
         Next
-        Logger.Status("Writing '" & lCatchmentsToUse.NumShapes & "' catchments inside shape of interest, leaving out " & aCatchments.NumShapes - lCatchmentsToUse.NumShapes)
-        Logger.Status("Smallest catchment (" & lSmallestToUse.ToString("#,###") & ") is " & (lSmallestToUse / lLargestToUse).ToString("0.0000%") & " of area of largest (" & lLargestToUse.ToString("#,###") & ")")
-        If lLargestFractionInsideLeftOut > 0.001 Then Logger.Status("Largest percent inside left out = " & lLargestFractionInsideLeftOut.ToString("0.0000%"))
-        If lSmallestFractionInsideKept < 0.999 Then Logger.Status("Smallest percent inside kept = " & lSmallestFractionInsideKept.ToString("0.0000%"))
+        Logger.Status("Writing '" & lCatchmentsToUse.NumShapes & "' catchments inside shape of interest, leaving out " & aCatchments.NumShapes - lCatchmentsToUse.NumShapes, True)
+        Logger.Dbg("Smallest catchment (" & lSmallestToUse.ToString("#,###") & ") is " & (lSmallestToUse / lLargestToUse).ToString("0.0000%") & " of area of largest (" & lLargestToUse.ToString("#,###") & ")")
+        If lLargestFractionInsideLeftOut > 0.001 Then Logger.Dbg("Largest percent inside left out = " & lLargestFractionInsideLeftOut.ToString("0.0000%"))
+        If lSmallestFractionInsideKept < 0.999 Then Logger.Dbg("Smallest percent inside kept = " & lSmallestFractionInsideKept.ToString("0.0000%"))
         lCatchmentsToUse.StopEditingShapes()
         lCatchmentsToUse.Projection = aCatchments.Projection
         lCatchmentsToUse.StopEditingTable()
