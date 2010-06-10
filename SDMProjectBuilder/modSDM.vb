@@ -416,12 +416,12 @@ Public Module modSDM
                 If IO.File.Exists(lSlopeReclassifyGridFileName) Then
                     Logger.Status("UsingExisting " & lSlopeReclassifyGridFileName)
                 Else
-                    Dim lReclassiflyScheme As New ArrayList
+                    Dim lReclassiflyScheme As New Generic.List(Of Double)
                     With lReclassiflyScheme
                         .Add(-0.00001) 'no slope data
                         .Add(0.5)
                         .Add(2)
-                        .Add(9999)
+                        .Add(GetMaxValue) 'All values above previous category. Note: may include some "bad" slope values
                     End With
                     If ReclassifySlope(lSlopeGridFileName, lReclassiflyScheme, lSlopeReclassifyGridFileName) Then
                         Logger.Status("Slopes Reclassified " & MemUsage())

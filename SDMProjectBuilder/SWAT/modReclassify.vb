@@ -10,8 +10,8 @@ Friend Module modReclassify
     ''' <returns></returns>
     ''' <remarks>based on code from frmReclassifySlope in frmLUSoilsSlope in mwSWATPluginBASINS40</remarks>
     Friend Function ReclassifySlope(ByVal aSlopeInputGridName As String, _
-                             ByVal aReclassiflyScheme As ArrayList, _
-                             ByVal aSlopeReclassifyGridName As String) As Boolean
+                                    ByVal aReclassiflyScheme As Generic.List(Of Double), _
+                                    ByVal aSlopeReclassifyGridName As String) As Boolean
         Dim lResult As Boolean = False
         Dim lGrid As New MapWinGIS.Grid
         If lGrid.Open(aSlopeInputGridName) Then
