@@ -580,7 +580,7 @@ Friend Class ctlSchematic
                 Dim lKey As String = OperationKey(lTarOperation)
                 If aAlreadyInPath.Contains(lKey & vbCrLf) AndAlso Not TreeLoopMessageDisplayed Then
                     Dim lMessage As String = aAlreadyInPath
-                    Logger.Msg(aAlreadyInPath, "Detected loop in operations")
+                    Logger.Msg(aAlreadyInPath, "Detected possible loop in operations")
                     TreeLoopMessageDisplayed = True
                 Else
                     If pIcons.Contains(lKey) Then
