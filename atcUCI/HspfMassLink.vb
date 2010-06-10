@@ -83,16 +83,19 @@ Public Class HspfMassLink
             Do
                 If aUci.FastFlag Then
                     GetNextRecordFromBlock("MASS-LINK", lReturnKey, lString, lRecordType, lReturnCode)
-                    If lString Is Nothing Then
-                        Exit Do
-                    ElseIf lString.StartsWith("  MASS-LINK") Then
-                        'start of a new mass link
-                        lMassLinkId = CShort(Mid(lString, 16, 5))
-                        lPastHeader = False
-                        GetNextRecordFromBlock("MASS-LINK", lReturnKey, lString, lRecordType, lReturnCode)
-                    ElseIf lString.StartsWith("  END MASS-LINK") Then
-                        'end of a mass link
-                        lRecordType = -2
+                    If lRecordType = -1 Then 'this is a comment
+                    Else
+                        If lString Is Nothing Then
+                            Exit Do
+                        ElseIf lString.StartsWith("  MASS-LINK") Then
+                            'start of a new mass link
+                            lMassLinkId = CShort(Mid(lString, 16, 5))
+                            lPastHeader = False
+                            GetNextRecordFromBlock("MASS-LINK", lReturnKey, lString, lRecordType, lReturnCode)
+                        ElseIf lString.StartsWith("  END MASS-LINK") Then
+                            'end of a mass link
+                            lRecordType = -2
+                        End If
                     End If
                 Else
                     lReturnKey = -1

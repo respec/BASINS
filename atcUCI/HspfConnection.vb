@@ -520,9 +520,9 @@ Public Class HspfConnection
                                     End If
                                     lHeaderPending = False
                                     Dim lStr As New System.Text.StringBuilder
-                                    lStr.Append(lConnection.Source.Opn.Name.Trim)
+                                    lStr.Append(lConnection.Source.VolName.Trim)
                                     lStr.Append(Space(lColumn(1) - lStr.Length - 1)) 'pad prev field
-                                    lStr.Append(CStr(lConnection.Source.Opn.Id).PadLeft(lLength(1)))
+                                    lStr.Append(CStr(lConnection.Source.VolId).PadLeft(lLength(1)))
                                     lStr.Append(Space(lColumn(2) - lStr.Length - 1))
                                     lStr.Append(lConnection.Source.Group)
                                     lStr.Append(Space(lColumn(3) - lStr.Length - 1))

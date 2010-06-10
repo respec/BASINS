@@ -72,8 +72,14 @@ Public Class HspfMonthData
                         Exit Do
                     Else 'this is a regular record
                         lMonthDataTable.Comment = lComment
+                        Dim lTmpStr As String
                         For lMonthIndex As Integer = 1 To 12
-                            lMonthDataTable.MonthValue(lMonthIndex) = CSng(Mid(lBuff, 1 + (lMonthIndex - 1) * 6, 6))
+                            lTmpStr = Mid(lBuff, 1 + (lMonthIndex - 1) * 6, 6)
+                            If IsNumeric(lTmpStr) Then
+                                lMonthDataTable.MonthValue(lMonthIndex) = CSng(lTmpStr)
+                            ElseIf lTmpStr.Trim.Length = 0 Then
+                                lMonthDataTable.MonthValue(lMonthIndex) = 0.0
+                            End If
                         Next lMonthIndex
                         pMonthDataTables.Add(lMonthDataTable)
                     End If
