@@ -11,7 +11,7 @@ Module modDefaults
             .NBYR = g_SimulationEndYear - g_SimulationStartYear + 1
             .IYR = g_SimulationStartYear
             .IDAF = 1
-            .IDAL = 365
+            .IDAL = IIf(DateTime.IsLeapYear(g_SimulationEndYear), 366, 365)
             .IGEN = 0
             .PCPSIM = 1 'measured precip
             .IDT = 0
