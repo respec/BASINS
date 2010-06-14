@@ -170,6 +170,7 @@ Public Module modDownload
     End Sub
 
     Public Function SpecifyAndCreateNewProject() As String
+        Logger.Status("LABEL TITLE " & g_AppNameShort & " Status")
         pBuildFrm = Nothing
 
         Logger.Dbg("SpecifyAndCreateNewProject")
@@ -1184,20 +1185,18 @@ StartOver:
     'Given a file name and the XML describing how to render it, add a shape layer to MapWindow
     Private Function AddShapeToMW(ByVal aFilename As String, _
                                   ByRef layerXml As Xml.XmlNode) As MapWindow.Interfaces.Layer
+        Dim lFileName As String = aFilename.ToLower
         Dim LayerName As String
         Dim Group As String = ""
         Dim Visible As Boolean
-        'Dim Style As atcRenderStyle = Nothing
 
         Dim MWlay As MapWindow.Interfaces.Layer
         Dim shpFile As MapWinGIS.Shapefile
-        'Dim RGBcolor As Int32
-        'Dim RGBoutline As Int32
 
         'Don't add layer again if we already have it
         For lLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
             MWlay = g_MapWin.Layers(g_MapWin.Layers.GetHandle(lLayer))
-            If MWlay.FileName.ToLower = aFilename.ToLower Then
+            If MWlay.FileName.ToLower = lFileName Then
                 Return MWlay
             End If
         Next
@@ -1222,90 +1221,15 @@ StartOver:
                         Case "visible" : Visible = (lAttribute.InnerText.ToLower = "yes") OrElse (lAttribute.InnerText.ToLower = "true")
                     End Select
                 Next
-
-                'If Not layerXml.FirstChild Is Nothing Then
-                '    Style = New atcRenderStyle
-                '    Style.xml = layerXml.FirstChild
-                'End If
             End If
 
             Logger.Status("Opening " & aFilename)
             shpFile = New MapWinGIS.Shapefile
-            shpFile.Open(aFilename)
-
-            Select Case shpFile.ShapefileType
-                Case MapWinGIS.ShpfileType.SHP_POINT, _
-                        MapWinGIS.ShpfileType.SHP_POINTM, _
-                        MapWinGIS.ShpfileType.SHP_POINTZ, _
-                        MapWinGIS.ShpfileType.SHP_MULTIPOINT
-                    'If Style Is Nothing Then
-                    MWlay = g_MapWin.Layers.Add(shpFile, LayerName)
-                    'Else
-                    'RGBcolor = RGB(Style.MarkColor.R, Style.MarkColor.G, Style.MarkColor.B)
-                    'MWlay = g_MapWin.Layers.Add(shpFile, LayerName, RGBcolor, RGBcolor, Style.MarkSize)
-                    'Select Case Style.MarkStyle                        'TODO: translate Cross, X, Bitmap properly
-                    '    Case "Circle" : MWlay.PointType = MapWinGIS.tkPointType.ptCircle
-                    '    Case "Square" : MWlay.PointType = MapWinGIS.tkPointType.ptSquare
-                    '    Case "Cross" : MWlay.PointType = MapWinGIS.tkPointType.ptTriangleRight
-                    '    Case "X" : MWlay.PointType = MapWinGIS.tkPointType.ptTriangleLeft
-                    '    Case "Diamond" : MWlay.PointType = MapWinGIS.tkPointType.ptDiamond
-                    '    Case "Bitmap"
-                    '        Select Case Style.MarkBitsAsHex
-                    '            Case "3C 42 81 99 99 81 42 3C" : MWlay.PointType = MapWinGIS.tkPointType.ptCircle
-                    '            Case "00 7E 7E 7E 7E 7E 7E 00" : MWlay.PointType = MapWinGIS.tkPointType.ptSquare
-                    '            Case "0000 0000 0000 3FF8 3FF8 1FF0 1FF0 0FE0 0FE0 07C0 07C0 0380 0380 0100 0000 0000"
-                    '                MWlay.PointType = MapWinGIS.tkPointType.ptTriangleDown
-                    '            Case Else
-                    '                MWlay.PointType = MapWinGIS.tkPointType.ptDiamond
-                    '        End Select
-                    '        'MWlay.PointType = MapWinGIS.tkPointType.ptUserDefined
-                    '        'mwlay.UserPointType = 'TODO: translate bitmap into Image
-                    'End Select
-                    'End If
-
-                Case MapWinGIS.ShpfileType.SHP_POLYLINE, MapWinGIS.ShpfileType.SHP_POLYLINEM, MapWinGIS.ShpfileType.SHP_POLYLINEZ
-                    'If Style Is Nothing Then
-                    MWlay = g_MapWin.Layers.Add(shpFile, LayerName)
-                    'Else
-                    'RGBcolor = RGB(Style.LineColor.R, Style.LineColor.G, Style.LineColor.B)
-                    'MWlay = g_MapWin.Layers.Add(shpFile, LayerName, RGBcolor, RGBcolor, Style.LineWidth)
-                    'End If
-                Case MapWinGIS.ShpfileType.SHP_POLYGON, MapWinGIS.ShpfileType.SHP_POLYGONM, MapWinGIS.ShpfileType.SHP_POLYGONZ
-                    'If Style Is Nothing Then
-                    MWlay = g_MapWin.Layers.Add(shpFile, LayerName)
-                    'Else
-                    'RGBcolor = RGB(Style.FillColor.R, Style.FillColor.G, Style.FillColor.B)
-                    'RGBoutline = RGB(Style.LineColor.R, Style.LineColor.G, Style.LineColor.B)
-                    'MWlay = g_MapWin.Layers.Add(shpFile, LayerName, RGBcolor, RGBoutline, Style.LineWidth)
-                    'Select Case LCase(Style.FillStyle)
-                    '    Case "none"
-                    '        MWlay.FillStipple = MapWinGIS.tkFillStipple.fsNone
-                    '        If MWlay.Color.Equals(System.Drawing.Color.Black) Then
-                    '            MWlay.Color = System.Drawing.Color.White
-                    '        End If
-                    '        MWlay.DrawFill = False
-                    '    Case "solid" '"Solid"
-                    '    Case "horizontal" : MWlay.FillStipple = MapWinGIS.tkFillStipple.fsHorizontalBars
-                    '    Case "vertical" : MWlay.FillStipple = MapWinGIS.tkFillStipple.fsVerticalBars
-                    '    Case "down" : MWlay.FillStipple = MapWinGIS.tkFillStipple.fsDiagonalDownRight
-                    '    Case "up" : MWlay.FillStipple = MapWinGIS.tkFillStipple.fsDiagonalDownLeft
-                    '    Case "cross"
-                    '    Case "diagcross"
-                    'End Select
-                    'End If
-            End Select
-            'If Not Style Is Nothing Then
-            '    Select Case Style.LineStyle.ToLower
-            '        Case "solid" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsNone
-            '        Case "dash" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsDashed
-            '        Case "dot" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsDotted
-            '        Case "dashdot" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsDashDotDash
-            '        Case "dashdotdot" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsDashDotDash
-            '            'Case "alternate" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsCustom
-            '            '    MWlay.UserLineStipple = 
-            '    End Select
-            'End If
-
+            If shpFile.Open(aFilename) Then
+                MWlay = g_MapWin.Layers.Add(shpFile, LayerName)
+            Else
+                Logger.Dbg("Could not open shape file '" & aFilename & "' (" & shpFile.ErrorMsg(shpFile.LastErrorCode) & ")")
+            End If
             If Not MWlay Is Nothing Then
                 If lRendererName.Length > 0 Then
                     MWlay.LoadShapeLayerProps(lRendererName)
@@ -1322,18 +1246,21 @@ StartOver:
                 MWlay.Visible = Visible
 
                 'TODO: replace hard-coded SetLandUseColors and others with full renderer from defaults
-                If LCase(aFilename).IndexOf("\landuse" & g_PathChar) > 0 Then
+                If lFileName.IndexOf(g_PathChar & "landuse" & g_PathChar) > 0 Then
                     SetLandUseColors(MWlay, shpFile)
-                ElseIf LCase(aFilename).IndexOf("\nhd" & g_PathChar) > 0 Then
+                ElseIf lFileName.IndexOf(g_PathChar & "nhd" & g_PathChar) > 0 Then
                     If InStr(IO.Path.GetFileNameWithoutExtension(shpFile.Filename), "NHD") > 0 Then
                         MWlay.Name = IO.Path.GetFileNameWithoutExtension(shpFile.Filename)
                     Else
                         MWlay.Name &= " " & IO.Path.GetFileNameWithoutExtension(shpFile.Filename)
                     End If
-                ElseIf LCase(aFilename).IndexOf("\census" & g_PathChar) > 0 Then
+                ElseIf lFileName.IndexOf(g_PathChar & "census" & g_PathChar) > 0 Then
                     SetCensusColors(MWlay, shpFile)
-                ElseIf LCase(aFilename).IndexOf("\dem" & g_PathChar) > 0 Then
+                ElseIf lFileName.IndexOf(g_PathChar & "dem" & g_PathChar) > 0 Then
                     SetDemColors(MWlay, shpFile)
+                ElseIf lFileName.EndsWith("huc12.shp") Then
+                    Dim lHUC8 As String = IO.Path.GetFileName(IO.Path.GetDirectoryName(shpFile.Filename))
+                    If lHUC8.Length = 8 Then MWlay.Name &= " in " & lHUC8
                 End If
                 If Group.Length > 0 Then
                     AddLayerToGroup(MWlay, Group)

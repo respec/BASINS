@@ -361,16 +361,16 @@ Public Module modSDM
 
         Try
             'KLW 12/21/2009 Generate files for running ArcSWAT
-            'If (g_CreateArcSWATFiles) Then
-            '    modArcSWAT.CopyShapeFiles(lSimplifiedFlowlinesFileName, lProjectFolder + "\ArcSwat\")
-            '    modArcSWAT.CopyShapeFiles(lSimplifiedCatchmentsFileName, lProjectFolder + "\ArcSwat\")
-            '    Dim sfile As String = IO.Path.GetFileNameWithoutExtension(lSimplifiedFlowlinesFileName)
-            '    Dim numRecs As Integer
-            '    numRecs = modArcSWAT.ConvertFlowLineFile(lProjectFolder + "\ArcSwat\" + sfile + ".dbf", lProjectFolder + "\ArcSwat\" + sfile + ".dbf")
-            '    sfile = IO.Path.GetFileNameWithoutExtension(lSimplifiedCatchmentsFileName)
-            '    modArcSWAT.FillCatchmentFile(lProjectFolder + "\ArcSwat\" + sfile + ".dbf", numRecs)
-            'End If
-            'Dim numRecs As Integer = modArcSWAT.ConvertFlowLineFile(lSimplifiedFlowlinesFileName, arcSwatFlowlines)
+            If (g_CreateArcSWATFiles) Then
+                modArcSWAT.CopyShapeFiles(aSimplifiedFlowlinesFileName, aProjectFolder & "\ArcSwat\")
+                modArcSWAT.CopyShapeFiles(aSimplifiedCatchmentsFileName, aProjectFolder & "\ArcSwat\")
+                Dim sfile As String = IO.Path.GetFileNameWithoutExtension(aSimplifiedFlowlinesFileName)
+                Dim numRecs As Integer
+                numRecs = modArcSWAT.ConvertFlowLineFile(aProjectFolder & "\ArcSwat\" & sfile & ".dbf", _
+                                                         aProjectFolder + "\ArcSwat\" & sfile & ".dbf")
+                sfile = IO.Path.GetFileNameWithoutExtension(aSimplifiedCatchmentsFileName)
+                modArcSWAT.FillCatchmentFile(aProjectFolder & "\ArcSwat\" & sfile & ".dbf", numRecs)
+            End If
             ' End Generate files for running ArcSWAT
 
             If g_BuildDatabase AndAlso Not FileExists(g_SWATDatabaseName) Then
@@ -574,8 +574,8 @@ Public Module modSDM
         System.GC.WaitForPendingFinalizers()
         Dim lPrivateMemory As Integer = System.Diagnostics.Process.GetCurrentProcess.PrivateMemorySize64 / (2 ^ 20)
         Dim lGcMemory As Integer = System.GC.GetTotalMemory(True) / (2 ^ 20)
-        MemUsage = "Megabytes: " & lPrivateMemory & " (" & Format((lPrivateMemory - pLastPrivateMemory), "+0;-0") & ") " _
-                   & " GC: " & lGcMemory & " (" & Format((lGcMemory - pLastGcMemory), "+0;-0") & ") "
+        MemUsage = "Megabytes: " & lPrivateMemory & " " & Format((lPrivateMemory - pLastPrivateMemory), "+0;-0") & " " _
+                   & " GC: " & lGcMemory & " " & Format((lGcMemory - pLastGcMemory), "+0;-0")
         pLastPrivateMemory = lPrivateMemory
         pLastGcMemory = lGcMemory
     End Function
