@@ -15,9 +15,9 @@ Public Class frmBuildNew
         'Add any initialization after the InitializeComponent() call
         txtInstructions.Text = "To Build a New " & g_AppNameShort & " Project, " & _
            "zoom/pan to your geographic area of interest, select (highlight) it, " & _
-           "and then click 'Build'.  " & _
-           "If your area is outside the US, then click 'Build' " & _
-           "with no features selected to create an international project."
+           "and then click 'Build'.  " '& _
+        '"If your area is outside the US, then click 'Build' " & _
+        '"with no features selected to create an international project."
 
     End Sub
 

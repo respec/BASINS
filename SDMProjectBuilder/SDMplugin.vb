@@ -67,7 +67,6 @@ Public Class SDMplugin
                 'put our seperate executable status monitor (StatusMonitor.exe) between the Logger and the default MW status monitor
                 pStatusMonitor.InnerProgressStatus = Logger.ProgressStatus
                 Logger.ProgressStatus = pStatusMonitor
-                Logger.Status("LABEL TITLE " & g_AppNameShort & " Status")
                 'Logger.Status("PROGRESS TIME ON") 'Enable time-to-completion estimation
                 Logger.Status("")
             Else
@@ -75,6 +74,7 @@ Public Class SDMplugin
                 pStatusMonitor = Nothing
             End If
         End If
+        Logger.Status("LABEL TITLE " & g_AppNameShort & " Status")
         g_MapWin.Toolbar.PressToolbarButton("tbbSelect")
 
     End Sub

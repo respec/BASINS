@@ -1571,6 +1571,9 @@ Friend Module modNetwork
             Else
                 lSB.AppendLine("Index" & vbTab & "ComID" & vbTab & "Lat" & vbTab & "Long" & vbTab & "Elev")
             End If
+            Dim lCatchmentProjection As String = lCatchments.Projection
+            Dim lElevationProjection As String = lDemGrid.Header.Projection
+            Dim lSameProjection As Boolean = D4EMDataManager.SpatialOperations.SameProjection(lCatchmentProjection, lElevationProjection)
             For lShapeIndex As Integer = 0 To lCatchments.NumShapes - 1
                 If lArcSwatShapeFile Then
                     lSB.AppendLine(lShapeIndex & vbTab & _
@@ -1581,20 +1584,24 @@ Friend Module modNetwork
                 Else
                     Dim lCatchmentShape As MapWinGIS.Shape = lCatchments.Shape(lShapeIndex)
                     Dim lCentroid As MapWinGIS.Point = MapWinGeoProc.Statistics.Centroid(lCatchmentShape)
-                    If lCentroid.x = 0 OrElse lCentroid.x > 1.0E+30 OrElse _
-                       lCentroid.y = 0 OrElse lCentroid.y > 1.0E+30 Then 'Could not compute centroid, probably a multi-polygon
-                        With lCatchmentShape.Extents 'Use elevation at middle of bounding box
-                            lCentroid.y = (.yMax + .yMin) / 2
-                            lCentroid.x = (.xMax + .xMin) / 2
-                        End With
-                    End If
-                    Dim lY As Double = lCentroid.y
                     Dim lX As Double = lCentroid.x
-                    MapWinGeoProc.SpatialReference.ProjectPoint(lX, lY, lCatchments.Projection, D4EMDataManager.SpatialOperations.GeographicProjection)
+                    Dim lY As Double = lCentroid.y
+                    With lCatchmentShape.Extents
+                        If lX < .xMin OrElse lX > .xMax OrElse _
+                           lY < .yMin OrElse lY > .yMax Then
+                            'MapWinGeoProc.Statistics.Centroid failed, probably a multi-polygon
+                            'Use elevation at middle of bounding box
+                            lX = (.xMax + .xMin) / 2
+                            lY = (.yMax + .yMin) / 2
+                        End If
+                    End With
+                    If Not lSameProjection Then
+                        MapWinGeoProc.SpatialReference.ProjectPoint(lX, lY, lCatchmentProjection, lElevationProjection)
+                    End If
                     'TODO - update to use average elevation for whole shape
                     Dim lRow As Integer
                     Dim lCol As Integer
-                    lDemGrid.ProjToCell(lCentroid.x, lCentroid.y, lCol, lRow)
+                    lDemGrid.ProjToCell(lX, lY, lCol, lRow)
                     If lRow < 0 Then lRow = 0
                     If lCol < 0 Then lCol = 0
                     lRow = Math.Min(lRow, lDemGrid.Header.NumberRows - 1)
@@ -1606,8 +1613,10 @@ Friend Module modNetwork
                         Dim lDistance As Integer = 1
                         Dim dx As Integer = 0
                         Dim dy As Integer = 0
-                        Dim lSpiralRow As Integer
-                        Dim lSpiralCol As Integer
+                        Dim lSpiralRow As Integer = lRow
+                        Dim lSpiralCol As Integer = lCol
+                        Dim lMaxRow As Integer = lDemGrid.Header.NumberRows - 1
+                        Dim lMaxCol As Integer = lDemGrid.Header.NumberCols - 1
                         Do
                             lRemainingDistance -= 1
                             If lRemainingDistance = 0 Then
@@ -1627,18 +1636,34 @@ Friend Module modNetwork
                             End If
                             Select Case lDirection
                                 Case 0 'Up
-                                    dy -= 1
+                                    If lSpiralRow > 0 Then
+                                        dy -= 1
+                                    Else
+                                        lRemainingDistance = 1
+                                    End If
                                 Case 1 'Right
-                                    dx += 1
+                                    If lSpiralCol < lMaxCol Then
+                                        dx += 1
+                                    Else
+                                        lRemainingDistance = 1
+                                    End If
                                 Case 2 ' Down
-                                    dy += 1
+                                    If lSpiralRow < lMaxRow Then
+                                        dy += 1
+                                    Else
+                                        lRemainingDistance = 1
+                                    End If
                                 Case 3 'Left
-                                    dx -= 1
+                                    If lSpiralCol > 0 Then
+                                        dx -= 1
+                                    Else
+                                        lRemainingDistance = 1
+                                    End If
                             End Select
                             lSpiralRow = lRow + dy
-                            If lSpiralRow >= 0 AndAlso lSpiralRow < lDemGrid.Header.NumberRows Then
+                            If lSpiralRow >= 0 AndAlso lSpiralRow <= lMaxRow Then
                                 lSpiralCol = lCol + dx
-                                If lSpiralCol >= 0 AndAlso lSpiralCol < lDemGrid.Header.NumberCols Then
+                                If lSpiralCol >= 0 AndAlso lSpiralCol < lMaxCol Then
                                     lElevation = lDemGrid.Value(lSpiralCol, lSpiralRow)
                                 End If
                             End If
