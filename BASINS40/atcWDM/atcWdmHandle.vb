@@ -10,7 +10,7 @@ Friend Class atcWdmHandle
 
     Dim pUnit As Integer 'fortran unit number of wdm file
     Dim pNeedToClose As Boolean = True
-    Private Const pMaxFileNameLength As Integer = 64 'TODO: make this bigger in the fortran
+    Private Const pMaxFileNameLength As Integer = 256
 
     Public ReadOnly Property Unit() As Integer
         Get
@@ -39,7 +39,7 @@ TestFileName:
             End If
 
             If lShortFileName.Length > pMaxFileNameLength Then
-                If Logger.Msg("Cannot open WDM file with total path greater than 64 characters." & vbCrLf _
+                If Logger.Msg("Cannot open WDM file with total path greater than " & pMaxFileNameLength & " characters." & vbCrLf _
                              & aFileName & vbCrLf _
                              & "Browse for file in another folder?" & vbCrLf _
                              & "(Hint: you could copy the file to a folder with a shorter path.)", MsgBoxStyle.YesNo, "WDM Path Too Long") = MsgBoxResult.Yes Then
