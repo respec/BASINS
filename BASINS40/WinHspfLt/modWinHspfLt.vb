@@ -81,7 +81,7 @@ Module modWinHSPFLt
                 Logger.Msg("Pause to attach to process")
             End If
 
-            Logger.Dbg("ExeName '" & StrRetRem(lExeCmd) & "'")
+            Logger.Dbg("ExeName '" & StrSplit(lExeCmd, " ", """") & "'")
             Logger.Dbg("CommandLineArgs '" & lExeCmd & "'")
 
             If StringFindAndRemove(lExeCmd, "/batch") Then
