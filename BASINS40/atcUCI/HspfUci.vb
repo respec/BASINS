@@ -71,11 +71,9 @@ Public Class HspfUci
     End Property
 
     Private pOpnBlks As HspfOpnBlks
-    Public ReadOnly Property OpnBlks() As KeyedCollection(Of String, HspfOpnBlk)
-        Get
-            Return pOpnBlks
-        End Get
-    End Property
+    Public Function OpnBlks() As KeyedCollection(Of String, HspfOpnBlk)
+        Return pOpnBlks
+    End Function
 
     Private pConnections As Collection(Of HspfConnection)
     Public ReadOnly Property Connections() As Collection(Of HspfConnection)
@@ -274,8 +272,8 @@ Public Class HspfUci
     Public Sub SaveAs(ByRef aOldName As String, ByRef aNewName As String, _
                       ByRef aBaseDsn As Integer, ByRef aRelAbs As Integer)
         If aOldName <> aNewName Then
-            pFilesBlk.NewName(aOldName, aNewName)
-            newOutputDsns(aOldName, aNewName, aBaseDsn, aRelAbs)
+            pFilesBlk.newName(aOldName, aNewName)
+            NewOutputDsns(aOldName, aNewName, aBaseDsn, aRelAbs)
         End If
         Save()
     End Sub
@@ -450,7 +448,7 @@ Public Class HspfUci
 
                 pMassLinks.Clear()
                 Dim lMassLink As New HspfMassLink
-                lMassLink.readMassLinks(Me)
+                lMassLink.ReadMassLinks(Me)
                 Logger.Dbg("MassLinkBlockRead")
 
                 'look for met segments
@@ -3183,7 +3181,7 @@ x:
         If aOpn.DefOpnId <> 0 Then
             DefaultOpnId = aOpn.DefOpnId
         Else
-            Dim lDOpn As HspfOperation = matchOperWithDefault(aOpn.Name, aOpn.Description, aDefUCI)
+            Dim lDOpn As HspfOperation = MatchOperWithDefault(aOpn.Name, aOpn.Description, aDefUCI)
             If lDOpn Is Nothing Then
                 DefaultOpnId = 0
             Else
