@@ -52,7 +52,7 @@ Public Class frmAbout
         lS = lS & "-----------" & vbCrLf
 
         lS = lS & Space(2) & "Current Directory: " & CurDir() & vbCrLf & vbCrLf
-        If Len(pUCI.Name) = 0 Then
+        If pUCI Is Nothing OrElse Len(pUCI.Name) = 0 Then
             lS = lS & Space(2) & "No Project Active" & vbCrLf
         Else
             lS = lS & Space(2) & "Project File: " & pUCI.Name & vbCrLf
