@@ -1,12 +1,12 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{BD299EB7-7A62-4EF9-8806-86E9288C498F}</ProjectGuid>
+    <ProjectGuid>{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <AssemblyName>atcTimeseriesMath</AssemblyName>
+    <AssemblyName>atcGraph</AssemblyName>
     <AssemblyOriginatorKeyMode>None</AssemblyOriginatorKeyMode>
     <DefaultClientScript>JScript</DefaultClientScript>
     <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
@@ -16,33 +16,19 @@
     <OptionCompare>Binary</OptionCompare>
     <OptionExplicit>On</OptionExplicit>
     <OptionStrict>Off</OptionStrict>
-    <RootNamespace>atcTimeseriesMath</RootNamespace>
-    <StartupObject>atcTimeseriesMath.%2528None%2529</StartupObject>
+    <RootNamespace>atcGraph</RootNamespace>
+    <StartupObject>atcGraph.%2528None%2529</StartupObject>
     <MyType>Windows</MyType>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
-    <OldToolsVersion>2.0</OldToolsVersion>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\..\D4EM\Bin\</OutputPath>
-    <DocumentationFile>atcTimeseriesMath.xml</DocumentationFile>
+    <DocumentationFile>atcGraph.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
@@ -57,18 +43,18 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>..\..\D4EM\Bin\</OutputPath>
-    <DocumentationFile>atcTimeseriesMath.xml</DocumentationFile>
+    <DocumentationFile>atcGraph.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <DefineDebug>false</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <DebugSymbols>false</DebugSymbols>
+    <DebugSymbols>true</DebugSymbols>
     <Optimize>true</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032</NoWarn>
-    <DebugType>none</DebugType>
+    <DebugType>pdbonly</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">
@@ -81,9 +67,14 @@
       <Name>System.Windows.Forms</Name>
     </Reference>
     <Reference Include="MapWinInterfaces">
-      <HintPath>..\..\D4EM\Bin\MapWinInterfaces.dll</HintPath>
+      <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="ZedGraph, Version=5.1.3.0, Culture=neutral, PublicKeyToken=02a83cbd123fcd60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+      <HintPath>..\Bin\ZedGraph.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -96,52 +87,73 @@
     <Compile Include="AssemblyInfo.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="atcTimeseriesMath.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="frmSpecifyComputation.vb">
+    <Compile Include="atcGraphForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <EmbeddedResource Include="frmSpecifyComputation.resx">
-      <DependentUpon>frmSpecifyComputation.vb</DependentUpon>
+    <Compile Include="atcGraphPlugin.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="atcTimeseriesPointList.vb" />
+    <Compile Include="clsGraphBase.vb" />
+    <Compile Include="clsGraphCumulativeDifference.vb" />
+    <Compile Include="clsGraphFrequency.vb" />
+    <Compile Include="clsGraphProbability.vb" />
+    <Compile Include="clsGraphResidual.vb" />
+    <Compile Include="clsGraphRunningSum.vb" />
+    <Compile Include="clsGraphScatter.vb" />
+    <Compile Include="clsGraphTime.vb" />
+    <Compile Include="frmChooseGraphs.Designer.vb">
+      <DependentUpon>frmChooseGraphs.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmChooseGraphs.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmGraphEditor.Designer.vb">
+      <DependentUpon>frmGraphEditor.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmGraphEditor.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="modGraph.vb" />
+    <EmbeddedResource Include="atcGraphForm.resx">
+      <DependentUpon>atcGraphForm.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmChooseGraphs.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmChooseGraphs.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmGraphEditor.resx">
+      <DependentUpon>frmGraphEditor.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\atcControls\atcControls-D4EM.vbproj">
-      <Name>atcControls-D4EM</Name>
-      <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
-      <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
+    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility.vbproj">
+      <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
+      <Name>BASINS-MapWinUtility</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcData\atcData-D4EM.vbproj">
-      <Name>atcData-D4EM</Name>
+    <ProjectReference Include="..\atcData\atcData.vbproj">
+      <Name>atcData</Name>
       <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
       <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcUtility\atcUtility-D4EM.vbproj">
+    <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath-D4EM.vbproj">
+      <Project>{BD299EB7-7A62-4EF9-8806-86E9288C498F}</Project>
+      <Name>atcTimeseriesMath-D4EM</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
+      <Name>atcUtility</Name>
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
-      <Name>atcUtility-D4EM</Name>
+      <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
+    <Service Include="{94E38DFF-614B-4CBD-B67C-F211BB35CE8B}" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="My Project\" />
