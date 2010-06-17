@@ -1,6 +1,7 @@
 Imports atcUtility
 Imports atcData
 Imports MapWinUtility
+Imports System.Text
 
 Public Module modStat
     Public Function IntervalReport(ByVal aSite As String, ByVal aTimeUnit As atcTimeUnit, _
@@ -634,6 +635,357 @@ Public Module modStat
         Return lStr
     End Function
 
+    'Public Function DurationHydrograph(ByVal aTS As atcTimeseries) As String
+    '    Dim lStr As StringBuilder = New StringBuilder()
+    '    Dim lExceedancePcts As Double() = {10, 20, 30, 50, 70, 80, 90}
+    '    Dim lExceedanceMeans(lExceedancePcts.Count - 1) As Double
+    '    Dim lSumMax As Double
+    '    Dim lSumMin As Double
+    '    Dim lLastDayOfMonth As New Dictionary(Of Integer, Integer)
+    '    lLastDayOfMonth.Add(1, 31)
+    '    lLastDayOfMonth.Add(2, 28)
+    '    lLastDayOfMonth.Add(3, 31)
+    '    lLastDayOfMonth.Add(4, 30)
+    '    lLastDayOfMonth.Add(5, 31)
+    '    lLastDayOfMonth.Add(6, 30)
+    '    lLastDayOfMonth.Add(7, 31)
+    '    lLastDayOfMonth.Add(8, 31)
+    '    lLastDayOfMonth.Add(9, 30)
+    '    lLastDayOfMonth.Add(10, 31)
+    '    lLastDayOfMonth.Add(11, 30)
+    '    lLastDayOfMonth.Add(12, 31)
+
+    '    'Make sure it is daily timeseries
+    '    Select Case aTS.Attributes.GetValue("Time Unit")
+    '        Case atcTimeUnit.TUDay
+    '        Case Else
+    '            aTS = Aggregate(aTS, atcTimeUnit.TUDay, 1, atcTran.TranAverSame) 'trans aver same for flow
+    '    End Select
+
+    '    Dim lSeasonDay As New atcSeasonsDayOfYear
+    '    Dim lSplit As atcTimeseriesGroup = lSeasonDay.Split(aTS, Nothing)
+
+    '    Dim lDateFormat As New atcDateFormat
+    '    Dim lStartDate As String = lDateFormat.JDateToString(aTS.Attributes.GetValue("Start Date"))
+    '    Dim lEndDate As String = lDateFormat.JDateToString(aTS.Attributes.GetValue("End Date"))
+
+    '    Dim lHeaderLines As String = "1" & vbCrLf
+    '    lHeaderLines &= Space(10) & "Duration hydrograph for " & aTS.Attributes.GetValue("STANAM", "") & vbCrLf
+    '    lHeaderLines &= Space(30) & "Station id  " & aTS.Attributes.GetValue("ISTAID", "") & vbCrLf
+    '    lHeaderLines &= Space(22) & "For period " & lStartDate & " to " & lEndDate & vbCrLf
+    '    lHeaderLines &= Space(6) & "Num" & Space(30) & "Percentile" & vbCrLf
+    '    lHeaderLines &= " ZZZ  yrs     Max    0.10    0.20    0.30    0.50    0.70    0.80    0.90     Min" 'TODO: Check if always starts with Oct!
+
+    '    Dim lYrs As Integer = 0
+    '    Dim lTempVal As Double = 0
+    '    Dim lprevTimeStep As Integer = -99
+    '    For Each lTS As atcTimeseries In lSplit
+    '        lYrs = lTS.Attributes.GetValue("count")
+    '        Dim ldates(5) As Integer
+    '        J2Date(lTS.Dates.Values(0), ldates)
+    '        If ldates(1) <> lprevTimeStep Then
+    '            Dim lHeader As String = lHeaderLines.Replace("ZZZ", MonthName3(ldates(1)))
+    '            lStr.AppendLine(lHeader) : lStr.AppendLine()
+    '            lprevTimeStep = ldates(1)
+    '        End If
+
+    '        lStr.Append(ldates(2).ToString.PadLeft(4) & lYrs.ToString.PadLeft(5))
+    '        lTempVal = lTS.Attributes.GetValue("Max")
+    '        lStr.Append(lTempVal.ToString.PadLeft(9))
+    '        lSumMax += lTempVal
+    '        For Each lExceedPercent As Double In lExceedancePcts
+    '            Dim I As Integer = Array.IndexOf(lExceedancePcts, lExceedPercent)
+    '            Try
+    '                Dim lNonExceedPercent As Double = 100 - lExceedPercent
+    '                Dim lNonExceedPercentString As String = (lNonExceedPercent).ToString.PadLeft(2, "0")
+    '                Dim lNonExceedValue1 As Double = lTS.Attributes.GetValue("%" & lNonExceedPercentString)
+    '                lStr.Append(DecimalAlign(lNonExceedValue1.ToString, 8, 0).Replace(",", ""))
+    '                lExceedanceMeans(I) += lNonExceedValue1
+    '            Catch lEx As Exception
+    '                Logger.Dbg("At ExceedPercent " & lExceedPercent & " Exception " & lEx.ToString)
+    '            End Try
+    '        Next
+    '        lTempVal = lTS.Attributes.GetValue("Min")
+    '        lStr.AppendLine(DecimalAlign(lTempVal.ToString, 8, 0).Replace(",", ""))
+    '        lSumMin += lTempVal
+    '        If ldates(2) = lLastDayOfMonth(ldates(1)) Then
+    '            lStr.AppendLine()
+    '            lStr.Append("    Mean ")
+    '            lStr.Append(DecimalAlign((lSumMax / ldates(2)).ToString, 9, 0).Replace(",", ""))
+    '            For I As Integer = 0 To lExceedanceMeans.Count - 1
+    '                lStr.Append(DecimalAlign((lExceedanceMeans(I) / ldates(2)).ToString, 8, 0).Replace(",", ""))
+    '                lExceedanceMeans(I) = 0.0
+    '            Next
+    '            lStr.Append(DecimalAlign((lSumMin / ldates(2)).ToString, 8, 0).Replace(",", ""))
+    '            lStr.AppendLine()
+    '            lSumMax = 0.0 : lSumMin = 0.0
+    '        End If
+    '    Next
+    '    Return lStr.ToString
+    'End Function
+
+    Public Function DurationHydrograph(ByVal aTS As atcTimeseries) As String
+        Dim lStr As StringBuilder = New StringBuilder()
+        Dim lExceedancePcts As Double() = {0, 10, 20, 30, 50, 70, 80, 90, 100}
+        Dim lExceedanceMeans(lExceedancePcts.Count - 1) As Double
+        Dim lLastDayOfMonth As New Dictionary(Of Integer, Integer)
+        lLastDayOfMonth.Add(1, 31)
+        lLastDayOfMonth.Add(2, 28)
+        lLastDayOfMonth.Add(3, 31)
+        lLastDayOfMonth.Add(4, 30)
+        lLastDayOfMonth.Add(5, 31)
+        lLastDayOfMonth.Add(6, 30)
+        lLastDayOfMonth.Add(7, 31)
+        lLastDayOfMonth.Add(8, 31)
+        lLastDayOfMonth.Add(9, 30)
+        lLastDayOfMonth.Add(10, 31)
+        lLastDayOfMonth.Add(11, 30)
+        lLastDayOfMonth.Add(12, 31)
+
+        'Make sure it is daily timeseries
+        Select Case aTS.Attributes.GetValue("Time Unit")
+            Case atcTimeUnit.TUDay
+            Case Else
+                aTS = Aggregate(aTS, atcTimeUnit.TUDay, 1, atcTran.TranAverSame) 'trans aver same for flow
+        End Select
+
+        Dim lSeasonDay As New atcSeasonsDayOfYear
+        Dim lSplit As atcTimeseriesGroup = lSeasonDay.Split(aTS, Nothing)
+
+        Dim lDateFormat As New atcDateFormat
+        Dim lStartDate As String = lDateFormat.JDateToString(aTS.Attributes.GetValue("Start Date"))
+        Dim lEndDate As String = lDateFormat.JDateToString(aTS.Attributes.GetValue("End Date"))
+
+        Dim lHeaderLines As String = "1" & vbCrLf
+        lHeaderLines &= Space(10) & "Duration hydrograph for " & aTS.Attributes.GetValue("STANAM", "") & vbCrLf
+        lHeaderLines &= Space(30) & "Station id  " & aTS.Attributes.GetValue("ISTAID", "") & vbCrLf
+        lHeaderLines &= Space(22) & "For period " & lStartDate & " to " & lEndDate & vbCrLf
+        lHeaderLines &= Space(6) & "Num" & Space(30) & "Percentile" & vbCrLf
+        lHeaderLines &= " ZZZ  yrs     Max    0.10    0.20    0.30    0.50    0.70    0.80    0.90     Min" 'TODO: Check if always starts with Oct!
+
+        Dim lYrs As Integer = 0
+        Dim lTempVal As Double = 0
+        Dim lprevTimeStep As Integer = -99
+        For Each lTS As atcTimeseries In lSplit
+            lYrs = lTS.Attributes.GetValue("count")
+            Dim ldates(5) As Integer
+            J2Date(lTS.Dates.Values(0), ldates)
+            If ldates(1) <> lprevTimeStep Then
+                Dim lHeader As String = lHeaderLines.Replace("ZZZ", MonthName3(ldates(1)))
+                lStr.AppendLine(lHeader) : lStr.AppendLine()
+                lprevTimeStep = ldates(1)
+            End If
+
+            lStr.Append(ldates(2).ToString.PadLeft(4) & lYrs.ToString.PadLeft(5))
+            For Each lExceedPercent As Double In lExceedancePcts
+                Dim I As Integer = Array.IndexOf(lExceedancePcts, lExceedPercent)
+                Try
+                    Dim lNonExceedPercent As Double = 100 - lExceedPercent
+                    Dim lNonExceedPercentString As String = (lNonExceedPercent).ToString.PadLeft(2, "0")
+                    Dim lNonExceedValue1 As Double = lTS.Attributes.GetValue("%" & lNonExceedPercentString)
+                    Dim lWidth As Integer = 8
+                    If I = 0 Then lWidth = 9
+                    lStr.Append(DecimalAlign(lNonExceedValue1.ToString, 8, 0).Replace(",", ""))
+                    lExceedanceMeans(I) += lNonExceedValue1
+                Catch lEx As Exception
+                    Logger.Dbg("At ExceedPercent " & lExceedPercent & " Exception " & lEx.ToString)
+                End Try
+            Next
+            If ldates(2) = lLastDayOfMonth(ldates(1)) Then
+                lStr.AppendLine()
+                lStr.Append("    Mean ")
+                For I As Integer = 0 To lExceedanceMeans.Count - 1
+                    lStr.Append(DecimalAlign((lExceedanceMeans(I) / ldates(2)).ToString, 8, 0).Replace(",", ""))
+                    lExceedanceMeans(I) = 0.0
+                Next
+                lStr.AppendLine()
+            End If
+        Next
+        Return lStr.ToString
+    End Function
+
+    Public Function doDurHydPlot(ByVal aTS As atcTimeseries) As Boolean
+        Dim doneIt As Boolean = True
+        Dim lp As String = ""
+        Dim lgraphForm As New atcGraph.atcGraphForm()
+
+        Dim lSeasonDay As New atcSeasonsDayOfYear
+        Dim lSplit As atcTimeseriesGroup = lSeasonDay.Split(aTS, Nothing)
+        Dim lDataGroup As New atcDataGroup
+        Dim lExceedancePcts As Double() = {0, 10, 20, 30, 50, 70, 80, 90, 100}
+        For Each lExceedPct As Double In lExceedancePcts
+
+
+        Next
+
+
+        'Dim lZgc As ZedGraphControl = lgraphForm.ZedGraphCtrl
+        'Dim lGraphDur As New clsGraphProbability(aDatagroup, lZgc)
+        'lgraphForm.Grapher = lGraphDur
+
+        'With lGraphDur.ZedGraphCtrl.GraphPane
+        '    With .XAxis
+        '        .Scale.MaxAuto = False
+        '        .Scale.MinAuto = False
+        '        .MinorGrid.IsVisible = False
+        '        .MajorGrid.IsVisible = False
+        '        .Scale.Min = 0.001
+        '    End With
+        '    '.YAxis.Type = AxisType.Linear
+        '    .YAxis.MinorGrid.IsVisible = False
+        '    .YAxis.MajorGrid.IsVisible = False
+
+        '    If .YAxis.Scale.Min < 1 Then
+        '        .YAxis.Scale.MinAuto = False
+        '        .YAxis.Scale.Min = 1
+        '        '.YAxis.Scale.Max = 1000000
+        '        .AxisChange()
+        '    End If
+
+        '    '.Legend.Position = LegendPos.TopFlushLeft
+        '    '.IsPenWidthScaled = True
+        '    '.LineType = LineType.Stack
+        '    '.ScaledPenWidth(50, 2)
+        '    .CurveList.Item(0).Color = Drawing.ColorTranslator.FromHtml("#FF0000") 'Base condition: red
+        '    '.CurveList.Item(1).Color = Drawing.ColorTranslator.FromHtml("#00FF00") 'Natural condition: green
+
+        '    For Each li As LineItem In .CurveList
+        '        li.Line.Width = 2
+        '        Dim lFS As New FontSpec
+        '        lFS.FontColor = li.Line.Color
+        '        li.Label.FontSpec = lFS
+        '        li.Label.FontSpec.Border.IsVisible = False
+        '    Next
+        'End With
+
+        lgraphForm.Show()
+
+        Return doneIt
+    End Function
+
+    Public Function DRNHYD(ByVal aTS As atcTimeseries, _
+                           ByVal aSTMO As Integer, _
+                           ByVal aEDMO As Integer, _
+                           ByVal aDECPLA As Integer, _
+                           ByVal aSIGDIG As Integer, _
+                           ByVal aFLDWID As Integer, _
+                           ByVal aNCI As Integer, _
+                           ByVal aPCTILE() As Double) As String
+        Dim lStr As String = String.Empty
+        Dim MXYR As Integer = 150
+
+        Dim lNCNT(365) As Integer
+        Dim lNMIS(365) As Integer
+        Dim lFLOW(366) As Double
+        Dim lFLDR(MXYR, 365) As Double
+        Dim lFPCT(365, 12) As Double
+        Dim lPYRS, LPYEAR, lPDAY, lIPT, lNPTS As Integer
+        Dim lSDATIM(5), lEDATTIM(5), TEMP(11), TEMPX(5), TEMPY(5) As Integer
+        Dim lTUNITS As Integer = 4
+        Dim lTSTEP As Integer = 1
+
+        Dim lDateFormat As New atcDateFormat
+        Dim lStartDate As String = lDateFormat.JDateToString(aTS.Attributes.GetValue("Start Date"))
+        Dim lEndDate As String = lDateFormat.JDateToString(aTS.Attributes.GetValue("End Date"))
+
+        'Construct Title Lines
+        lStr = Space(10) & "Duration hydrograph for " & aTS.Attributes.GetValue("STANAM", "") & vbCrLf
+        lStr &= Space(30) & "Station id  " & aTS.Attributes.GetValue("ISTAID", "") & vbCrLf
+        lStr &= Space(22) & "For period " & lStartDate & " to " & lEndDate & vbCrLf & vbCrLf
+        lStr &= Space(6) & "Num" & Space(30) & "Percentile" & vbCrLf
+        lStr &= " Oct  yrs     Max    0.10    0.20    0.30    0.50    0.70    0.80    0.90     Min" 'TODO: Check if always starts with Oct!
+
+        'Initialize arrays and counters
+        For I As Integer = 1 To 365
+            lNCNT(I) = 0 : lNMIS(I) = 0 : lFLOW(I) = 0
+            For J As Integer = 1 To MXYR
+                lFLDR(I, J) = 0.0 'for each day, multiple years
+            Next
+        Next
+
+        'TEMP is available begin date and end date for first season
+        'TEMPX is start date for first season
+        'TEMPY is start date for last season
+
+        DHBEGN(lSDATIM, lEDATTIM, aSTMO, aEDMO, TEMP, TEMPX, TEMPY, lIPT)
+        DHLEAP(TEMPX, aSTMO, aEDMO, lPDAY, LPYEAR)
+        'get period in 1st season, start dates of 1st and last season
+        'find leap day and index to first leap year
+        lPYRS = 4 - LPYEAR
+        Dim lavailDateBegin1stSeason(5) As Integer
+        Dim lavailDateEnd1stSeason(5) As Integer
+        For I As Integer = 0 To 5
+            lavailDateBegin1stSeason(I) = TEMP(I)
+        Next
+        For I As Integer = 6 To 11
+            lavailDateEnd1stSeason(I) = TEMP(I)
+        Next
+        TimDif(lavailDateBegin1stSeason, lavailDateEnd1stSeason, lTUNITS, lTSTEP, lNPTS)
+
+G200:
+        'retrieve data (modDate:TimDif, atcDataSourceWDM.ReadData
+        lNPTS = lNPTS + lIPT - 1
+        lIPT = 1
+
+        If lPYRS = 4 Or lPYRS = 0 Then
+            'leap year, send status report
+            If lPDAY > 0 And lPDAY <= lNPTS Then
+                'leap day needs to be removed
+                lNPTS = lNPTS - 1
+                For J As Integer = lPDAY To lNPTS
+                    lFLOW(J) = lFLOW(J + 1)
+                Next
+                lFLOW(lNPTS + 1) = -999.0
+            End If
+            lPYRS = 1
+        Else
+            'don't need status or to remove leap day
+            lPYRS = lPYRS + 1
+        End If
+
+        Dim K As Integer
+        For J As Integer = 1 To lNPTS
+            If lFLOW(J) >= 0.0 Then
+                lNCNT(J) = lNCNT(J) + 1
+                K = lNCNT(J)
+                lFLDR(K, J) = lFLOW(J)
+            Else
+                lNMIS(J) = lNMIS(J) + 1
+            End If
+        Next
+
+        'adjust dates for next year of data
+        lIPT = 1
+        Dim lproblem As Integer
+        If lproblem Then GoTo G200
+
+        Dim lFMIN As Double = Double.MaxValue
+        Dim lFMAX As Double = Double.MinValue
+
+        For I As Integer = 1 To 365
+            'sort the flows
+            'CALL ASRTRP(NCNT(I), FLDR(1, I))
+            For J As Integer = 1 To aNCI
+                If lNCNT(I) < 2 Then
+                    'no data, or only 1 good value
+                    lFPCT(I, J) = -999.0
+                Else
+                    'compute the percentiles
+                    If aPCTILE(J) < 0.00001 Then
+                        'must be 0, use maximum
+                        lFPCT(I, J) = lFLDR(1, I)
+                    Else
+                        'compute via linear interpolation
+                        'get base location in sorted array for the
+                        'percentile (flip-flop percentiles)
+                    End If
+                End If
+            Next
+        Next
+
+        Return lStr
+    End Function
+
     Private Function TimeserIdString(ByVal aTSer As atcTimeseries) As String
         Dim lStr As String = aTSer.Attributes.GetValue("ISTAID", "")
         If lStr.Trim = "0" Then lStr = ""
@@ -657,6 +1009,135 @@ Public Module modStat
             End If
         Next
     End Function
+
+    Public Function DHLPYR(ByVal aYEAR As Integer) As Integer
+        Dim lYear1 As Integer = aYEAR + 1
+        Dim lYear2 As Integer = aYEAR + 2
+        Dim lYear3 As Integer = aYEAR + 3
+        If (aYEAR Mod 4 = 0 And Not aYEAR Mod 100 = 0) Or aYEAR Mod 400 = 0 Then
+            Return 0 'the current year is leap
+        ElseIf (lYear1 Mod 4 = 0 And Not lYear1 Mod 100 = 0) Or lYear1 Mod 400 = 0 Then
+            Return 1 'next year is leap year
+        ElseIf (lYear2 Mod 4 = 0 And Not lYear2 Mod 100 = 0) Or lYear2 Mod 400 = 0 Then
+            Return 2 'leap year is two years later
+        ElseIf (lYear3 Mod 4 = 0 And Not lYear3 Mod 100 = 0) Or lYear3 Mod 400 = 0 Then
+            Return 3 'leap year is three years later
+        End If
+    End Function
+
+    Public Sub DHLEAP(ByVal aDATBGN() As Integer, _
+                      ByVal aSTMO As Integer, _
+                      ByVal aEDMO As Integer, _
+                      ByRef aLPDAY As Integer, ByRef aLPYRS As Integer)
+
+        Dim lDATLEP() As Integer = {0, 2, 28, 24, 0, 0} 'year,month,day,hour,minute,second
+        Dim lTUNITS As Integer = 4
+        Dim lTSSTEP As Integer = 1
+
+        If (aSTMO = 2 Or aEDMO = 2) Or _
+           (aSTMO > 2 And aEDMO >= 2 And aSTMO > aEDMO) Or _
+           (aSTMO = 1 And aEDMO >= 2) Then
+            'February is included in season, which position is leap day
+            If aSTMO <= 2 Then
+                'February in starting year of season
+                lDATLEP(0) = aDATBGN(0)
+                aLPYRS = DHLPYR(aDATBGN(0))
+            Else
+                'February in second year of season
+                lDATLEP(0) = aDATBGN(0) + 1
+                aLPYRS = DHLPYR(aDATBGN(0) + 1)
+            End If
+            'find Feb 28 and increment by 1 to the 29th
+            TimDif(aDATBGN, lDATLEP, lTUNITS, lTSSTEP, aLPDAY)
+            aLPDAY += 1
+        Else
+            'February is not included in season
+            aLPDAY = 0
+            aLPYRS = DHLPYR(aDATBGN(0))
+        End If
+    End Sub
+
+    Public Sub DHBEGN(ByVal aDATBGN() As Integer, _
+                      ByVal aDATEND() As Integer, _
+                      ByVal aSTMO As Integer, _
+                      ByVal aEDMO As Integer, _
+                      ByRef aSEASON() As Integer, _
+                      ByRef aSEASBG() As Integer, _
+                      ByRef aSEASND() As Integer, _
+                      ByRef aIPT As Integer)
+        'C     + + + DUMMY ARGUMENTS + + +
+        'INTEGER   DATBGN(6), DATEND(6), STMO, EDMO,
+        '$         SEASON(12), SEASBG(6), SEASND(6), IPT
+
+        Dim lTUNITS As Integer = 4
+        Dim lTSSTEP As Integer = 1
+        Dim lI6 As Integer = 6
+
+        'COPYI(I6, DATBGN, SEASON)
+        For I As Integer = 0 To 5
+            aSEASON(I) = aDATBGN(I)
+        Next
+        aSEASON(7) = aEDMO
+        aSEASON(9) = 24
+        aSEASON(10) = 0
+        aSEASON(11) = 0
+        aSEASBG(1) = aSTMO
+        aSEASBG(2) = 1
+        aSEASBG(3) = 0
+        aSEASBG(4) = 0
+        aSEASBG(5) = 0
+        aSEASND(1) = aSTMO
+        aSEASND(2) = 1
+        aSEASND(3) = 0
+        aSEASND(4) = 0
+        aSEASND(5) = 0
+
+        If aSTMO <= aEDMO Then
+            'season begins and ends in same calendar year
+            If aDATBGN(1) <= aEDMO Then
+                'start date begins before end of season
+                aSEASON(6) = aDATBGN(0)
+                aSEASBG(0) = aDATBGN(0)
+            Else
+                'start date begins after end of season, next year
+                aSEASON(0) = aDATBGN(0) + 1
+                aSEASON(1) = aSTMO
+                aSEASON(6) = aDATBGN(0) + 1
+                aSEASBG(0) = aDATBGN(0) + 1
+            End If
+            If aDATEND(1) >= aSTMO Then
+                'end date ends after end of season
+                aSEASND(0) = aDATEND(0)
+            Else
+                'end date ends before beginning of season, previous year
+                aSEASND(0) = aDATEND(0) - 1
+            End If
+        Else
+            'season span calendar years
+            If aDATBGN(1) >= aSTMO Then
+                'start date begins before jan 1, season ends in next year
+                aSEASON(6) = aDATBGN(0) + 1
+                aSEASBG(0) = aDATBGN(0)
+            Else
+                'start date begins after jan 1, season ends in same year
+                aSEASON(6) = aDATBGN(0)
+                aSEASBG(0) = aDATBGN(0) - 1
+            End If
+
+            If aDATEND(1) <= aEDMO Then
+                'end date is after jan 1, last season begins in previous year
+                aSEASND(0) = aDATEND(0) - 1
+            Else
+                'end date is before jan 1, last season begins in same year
+                aSEASND(0) = aDATEND(0)
+            End If
+        End If
+        aSEASON(8) = daymon(aSEASON(6), aSEASON(7))
+
+        'where in season does data begin
+        TimDif(aSEASBG, aSEASON, lTUNITS, lTSSTEP, aIPT)
+        aIPT += 1
+    End Sub
 
     Public Class DurationReport
         Private pClassLimits As Generic.List(Of Double)

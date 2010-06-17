@@ -1,4 +1,5 @@
 Imports atcData
+Imports atcUtility
 
 Public Class clsHspfSupportPlugin
     Inherits atcDataPlugin
@@ -21,6 +22,7 @@ Public Class clsHspfSupportPlugin
         'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_Duration", atcDataManager.AnalysisMenuName, "Duration", Me.Icon, , , True))
         'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_Compare", atcDataManager.AnalysisMenuName, "Compare", Me.Icon, , , True))
         pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_DurationCompare", atcDataManager.AnalysisMenuName, "Duration/Compare", Me.Icon, , , True))
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_DurationHydrograph", atcDataManager.AnalysisMenuName, "DurationHydrograph", Me.Icon, , , True))
     End Sub
 
     'Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
@@ -60,6 +62,13 @@ Public Class clsHspfSupportPlugin
                 lFrmClassLimts = New frmAnalysis(lTimeseriesGroup)
                 If pMapWin IsNot Nothing AndAlso pMapWin.ApplicationInfo.FormIcon IsNot Nothing Then lFrmClassLimts.Icon = pMapWin.ApplicationInfo.FormIcon
                 lFrmClassLimts.Show()
+            End If
+        ElseIf aItemName = atcDataManager.AnalysisMenuName & "_DurationHydrograph" Then
+            Dim lTimeseriesGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Data For " & aItemName.Substring(atcDataManager.AnalysisMenuName.Length + 1))
+            If lTimeseriesGroup.Count > 0 Then
+                Dim lStr As String = DurationHydrograph(lTimeseriesGroup(0))
+                'MsgBox(lStr)
+                SaveFileString("G:\Admin\USGS20801_DO11-SWSTAT\DurationHydrograph\Test8.txt", lStr)
             End If
         End If
     End Sub
