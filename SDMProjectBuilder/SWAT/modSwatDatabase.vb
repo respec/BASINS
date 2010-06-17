@@ -34,6 +34,7 @@ Friend Module modSwatDatabase
             End If
 
             Try
+                Logger.Dbg("AboutToCreateSwatInputObject " & aSwatDatabaseName)
                 Dim lSwatInput As New SwatInput(aSwatDatabaseName, lProjectDataBaseName, aProjectFolder, aHuc12)
                 With lSwatInput
                     Dim lTxtInOutFolder As String = IO.Path.Combine(aProjectFolder, "Scenarios\" & aHuc12 & "\TxtInOut")
@@ -265,7 +266,7 @@ Friend Module modSwatDatabase
                                             End With
                                             lSwatInput.Mgt.Add1(lMgtItem1)
                                         End If
-                                        End If
+                                    End If
                                 End If
                             End If
                         Next
@@ -372,7 +373,14 @@ Friend Module modSwatDatabase
                     Logger.Dbg("SWATInputSaved")
                 End With
             Catch lEx As Exception
-                Logger.Dbg(lEx.Message)
+                Logger.Dbg(lEx.ToString)
+                Dim lTex As Exception = lEx
+                Dim lCount As Integer = 1
+                While lTex.InnerException IsNot Nothing AndAlso lCount < 3
+                    lCount += 1
+                    Logger.Dbg("Details " & lTex.InnerException.Message)
+                    lTex = lTex.InnerException
+                End While
             End Try
         End If
     End Sub
