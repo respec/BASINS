@@ -16,7 +16,16 @@ Imports atcMwGisUtility
 ''' <remarks></remarks>
 Public Module modDownload
 
-    Private Const XMLappName As String = "BASINS System Application"
+    Private Const XMLappName As String = "SDMProjectBuilder"
+    Private SDMPluginNames() As String = {"SDMProjectBuilder", _
+                                          "Tiled Map", _
+                                          "Timeseries::Statistics", _
+                                          "Timeseries::WDM", _
+                                          "D4EM Data Download::Main", _
+                                          "D4EM Data Download::BASINS", _
+                                          "D4EM Data Download::NHDPlus", _
+                                          "D4EM Data Download::NLCD2001" _
+                                          }
 
     Private Function GetSelectedRegion() As String
         Try
@@ -236,14 +245,15 @@ StartOver:
         End If
 
         If lDefDirName = "NewProject" Then
-            If lNoData Then
-                'Already came through here, don't ask again
-            Else
-                lNoData = True
-                If Logger.Msg("No features have been selected.  Do you wish to create a project with no data?", MsgBoxStyle.YesNo, "Data Extraction") = MsgBoxResult.No Then
-                    Return ""
-                End If
-            End If
+            'If lNoData Then
+            '    'Already came through here, don't ask again
+            'Else
+            '    lNoData = True
+            '    If Logger.Msg("No features have been selected.  Do you wish to create a project with no data?", MsgBoxStyle.YesNo, "Data Extraction") = MsgBoxResult.No Then
+            Logger.Msg("Choose Build only after selecting a HUC-12 or HUC-8", MsgBoxStyle.OkOnly, "Build")
+            Return ""
+            '    End If
+            'End If
         End If
 
         lDefaultProjectFileName = CreateDefaultNewProjectFileName(lDataPath, lDefDirName)
@@ -454,6 +464,8 @@ StartOver:
                     TryDeleteShapefile(lNewShapeName)
                 End If
 
+                UnloadPlugin("Tiled Map")
+
                 're-project selected shape aoi if necessary, and add it to the map
                 Dim lSelectedSf As New MapWinGIS.Shapefile
                 Dim lAOIName As String = aNewDataDir & "aoi.shp"
@@ -557,9 +569,8 @@ StartOver:
     End Sub
 
     Friend Function CreateDataManager() As D4EMDataManager.DataManager
-        LoadPlugin("D4EM Data Download::BASINS")
-        LoadPlugin("D4EM Data Download::NHDPlus")
-        LoadPlugin("D4EM Data Download::NLCD2001")
+        UnloadNonSDMPlugins()
+        LoadSDMPlugins()
         Dim lPlugins As New ArrayList
         For lPluginIndex As Integer = 0 To g_MapWin.Plugins.Count
             Try
@@ -572,19 +583,27 @@ StartOver:
         Return New D4EMDataManager.DataManager(lPlugins)
     End Function
 
-    Private Sub LoadPlugin(ByVal aPluginName As String)
-        Try
-            Dim lKey As String = g_MapWin.Plugins.GetPluginKey(aPluginName)
-            'If Not g_MapWin.Plugins.PluginIsLoaded(lKey) Then 
-            g_MapWin.Plugins.StartPlugin(lKey)
-        Catch e As Exception
-            Logger.Dbg("Exception loading " & aPluginName & ": " & e.Message)
-        End Try
+    Friend Sub UnloadPlugin(ByVal aPluginName As String)
+        Dim lKey As String = g_MapWin.Plugins.GetPluginKey(aPluginName)
+        If Not String.IsNullOrEmpty(lKey) Then
+            Logger.Dbg("Unloading " & aPluginName & "=" & lKey)
+            g_MapWin.Plugins.StopPlugin(lKey)
+        End If
     End Sub
 
-    Private Sub UnloadPlugin(ByVal aPluginName As String)
-        Dim lKey As String = g_MapWin.Plugins.GetPluginKey(aPluginName)
-        If Not String.IsNullOrEmpty(lKey) Then g_MapWin.Plugins.StopPlugin(lKey)
+    Friend Sub UnloadNonSDMPlugins()
+        For lPluginIndex As Integer = g_MapWin.Plugins.Count - 1 To 0 Step -1
+            Dim lPlugin As MapWindow.Interfaces.IPlugin = g_MapWin.Plugins.Item(lPluginIndex)
+            If lPlugin IsNot Nothing AndAlso Array.IndexOf(SDMPluginNames, lPlugin.Name) < 0 Then
+                UnloadPlugin(lPlugin.Name)
+            End If
+        Next
+    End Sub
+
+    Friend Sub LoadSDMPlugins()
+        For lPluginIndex As Integer = SDMPluginNames.GetUpperBound(0) To 0 Step -1
+            atcDataManager.LoadPlugin(SDMPluginNames(lPluginIndex))
+        Next
     End Sub
 
     'Download new data for an existing project
