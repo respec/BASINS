@@ -1870,7 +1870,7 @@ Friend Module modNetwork
                     Logger.Status("Error: Non-numeric COMID '" & lComId & "' at index " & lFlowLinesShapeIndex, True)
                 End If
             Next
-            Logger.Status("Writing '" & lFlowLinesToUse.NumShapes & "' flowlines, leaving out " & lFlowLines.NumShapes - lFlowLinesToUse.NumShapes)
+            Logger.Status("Writing " & lFlowLinesToUse.NumShapes & " flowlines, leaving out " & lFlowLines.NumShapes - lFlowLinesToUse.NumShapes)
             lFlowLinesToUse.StopEditingShapes()
             lFlowLinesToUse.Projection = lFlowLines.Projection
             lFlowLinesToUse.StopEditingTable()
