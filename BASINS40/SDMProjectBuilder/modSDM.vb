@@ -120,8 +120,19 @@ Public Module modSDM
         End If
     End Sub
 
+    Friend Function BuildFormIsOpen() As Boolean
+        If pBuildFrm Is Nothing Then
+            Return False
+        ElseIf pBuildFrm.IsDisposed Then
+            pBuildFrm = Nothing
+            Return False
+        Else
+            Return True
+        End If
+    End Function
+
     Friend Sub UpdateSelectedFeatures()
-        If Not pBuildFrm Is Nothing AndAlso g_MapWin.Layers.NumLayers > 0 AndAlso g_MapWin.Layers.CurrentLayer > -1 Then
+        If BuildFormIsOpen() AndAlso g_MapWin.Layers.NumLayers > 0 AndAlso g_MapWin.Layers.CurrentLayer > -1 Then
             Dim lFieldName As String = ""
             Dim lFieldDesc As String = ""
             Dim lField As Integer
@@ -138,7 +149,7 @@ Public Module modSDM
                     ctext = "Selected Features:"
 
                     Dim lLayerFilenameOnly As String = IO.Path.GetFileNameWithoutExtension(lCurLayer.Filename).ToLower
-                    Select  Case IO.Path.GetFileNameWithoutExtension(lCurLayer.Filename).ToLower
+                    Select Case IO.Path.GetFileNameWithoutExtension(lCurLayer.Filename).ToLower
                         Case "cat", "huc", "huc250d3"
                             lFieldName = "CU"
                             lFieldDesc = "catname"
@@ -398,13 +409,11 @@ Public Module modSDM
                 If IO.File.Exists(lSlopeGridFileName) Then
                     Logger.Status("UsingExisting " & lSlopeGridFileName)
                 Else
-                    'z factor - cm to m
-                    Logger.Status("Calculating Slopes from DEM")
-
                     'clip grid to extents
                     Dim lDEMGrid As String = PathNameOnly(aDemGridFileName) & "\tempdem.tif"
                     Dim lSuccess As Boolean = MapWinGeoProc.SpatialOperations.ClipGridWithPolygon(aDemGridFileName, aSelectedShape, lDEMGrid, True)
 
+                    'z factor - 0.01 = cm to m
                     If MapWinGeoProc.TerrainAnalysis.Slope(lDEMGrid, 0.01, lSlopeGridFileName, True, Nothing) Then
                         Logger.Status("Calculated Slopes " & MemUsage())
                     Else

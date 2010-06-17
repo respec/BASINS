@@ -7,7 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{D92BED39-A1E0-42D3-AC79-643D16CC1500}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>ClassLibrary1</RootNamespace>
+    <RootNamespace>SDMProjectBuilder</RootNamespace>
     <AssemblyName>SDMProjectBuilder</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>

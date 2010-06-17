@@ -12,15 +12,15 @@ Public Class SDMplugin
 
     Public Overrides ReadOnly Property Name() As String
         Get
-            Return "SDM"
+            Return "SDMProjectBuilder"
         End Get
     End Property
 
-    Public Overrides Sub Message(ByVal aMsg As String, ByRef aHandled As Boolean)
-        If aMsg.StartsWith("WELCOME_SCREEN") Then
-            Stop
-        End If
-    End Sub
+    'Public Overrides Sub Message(ByVal aMsg As String, ByRef aHandled As Boolean)
+    '    If aMsg.StartsWith("WELCOME_SCREEN") Then
+    '        Stop
+    '    End If
+    'End Sub
 
     <CLSCompliant(False)> _
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
@@ -39,24 +39,8 @@ Public Class SDMplugin
                          & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & g_AppNameShort & ".log")
         Logger.Icon = g_MapWin.ApplicationInfo.FormIcon
 
-        'Logger.MsgCustom("Test Message", "Test Title", "Button One", "2")
-        'For i As Integer = 1 To 10
-        '    If Logger.MsgCustom("Test Message " & i, "Test Title " & i, "Button One", "2", "All") = "All" Then Exit For
-        'Next
-        'For i As Integer = 1 To 10
-        '    If Logger.MsgCustomCheckbox("Test Message " & i, "Test Title " & i, g_AppNameShort, "Test", "Buttons", "Button One", "2", "All") = "All" Then Exit For
-        'Next
-
-        Try
-            Dim lKey As String = g_MapWin.Plugins.GetPluginKey("Timeseries::Statistics")
-            'If Not g_MapWin.Plugins.PluginIsLoaded(lKey) Then 
-            g_MapWin.Plugins.StartPlugin(lKey)
-        Catch lEx As Exception
-            Logger.Dbg("Exception loading Timeseries::Statistics - " & lEx.Message)
-        End Try
-
-        atcDataManager.LoadPlugin("Timeseries::Statistics")
-        atcDataManager.LoadPlugin("D4EM Data Download::Main")
+        UnloadNonSDMPlugins()
+        LoadSDMPlugins()
 
         If Logger.ProgressStatus Is Nothing OrElse Not (TypeOf (Logger.ProgressStatus) Is MonitorProgressStatus) Then
             'Start running status monitor to give better progress and status indication during long-running processes
@@ -82,15 +66,19 @@ Public Class SDMplugin
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         Select Case aItemName
             Case "mnuNew", "tbbNew"  'Override new project behavior
+                aHandled = True
                 LoadNationalProject()
         End Select
     End Sub
 
+    ''' <summary>
+    ''' Skip default behavior of atcDataPlugin.Terminate
+    ''' </summary>
     Public Overrides Sub Terminate()
     End Sub
 
     Public Overrides Sub ProjectLoading(ByVal aProjectFile As String, ByVal aSettingsString As String)
-        If pBuildFrm Is Nothing AndAlso aProjectFile IsNot Nothing AndAlso aProjectFile.EndsWith(NationalProjectFilename) Then
+        If Not BuildFormIsOpen() AndAlso aProjectFile IsNot Nothing AndAlso aProjectFile.ToLower.EndsWith(NationalProjectFilename.ToLower) Then
             If FileExists(aProjectFile) Then NationalProjectFullPath = aProjectFile
             LoadNationalProject()
         End If
@@ -121,6 +109,8 @@ Public Class SDMplugin
     ''' </summary>
     ''' <remarks></remarks>
     Public Sub LoadNationalProject()
+        UnloadNonSDMPlugins()
+        LoadSDMPlugins()
         If Not NationalProjectIsOpen() Then
             If Not FileExists(NationalProjectFullPath) Then
                 NationalProjectFullPath = FindFile("Open " & NationalProjectFilename, IO.Path.Combine(CurDir, "Data\national" & g_PathChar & NationalProjectFilename))
@@ -138,7 +128,7 @@ Public Class SDMplugin
                     Logger.DisplayMessageBoxes = lDisplayMessageBoxes
                 End If
             Else
-                Logger.Msg("Unable to find '" & NationalProjectFilename & "'", "Open National")
+                Logger.Msg("Unable to find '" & NationalProjectFilename & "'", "LoadNationalProject")
                 Exit Sub
             End If
         End If
