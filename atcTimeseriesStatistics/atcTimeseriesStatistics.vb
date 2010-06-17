@@ -57,9 +57,9 @@ Public Class atcTimeseriesStatistics
                     .TypeString = "atcTimeseries"
                 End With
 
-                AddOperation("Date Created", "Date Timeseries Created", defTimeSeriesOne, lCategory)
+                AddOperation("Date Created", "Date Timeseries Created", defTimeSeriesOne, lCategory, "Double", pNaN)
 
-                AddOperation("Date Modified", "Date Timeseries Last Modified", defTimeSeriesOne, lCategory)
+                AddOperation("Date Modified", "Date Timeseries Last Modified", defTimeSeriesOne, lCategory, "Double", pNaN)
 
                 AddOperation("Count", "Count of non missing values", defTimeSeriesOne, lCategory, "Integer", 0)
 
@@ -69,48 +69,48 @@ Public Class atcTimeseriesStatistics
 
                 AddOperation("Count Missing", "Count of values that are undefined", defTimeSeriesOne, lCategory, "Integer", 0)
 
-                AddOperation("Start Date", "Starting Julian Date", defTimeSeriesOne, lCategory)
+                AddOperation("Start Date", "Starting Julian Date", defTimeSeriesOne, lCategory, "Double", pNaN)
 
-                AddOperation("End Date", "Ending Julian Date", defTimeSeriesOne, lCategory)
+                AddOperation("End Date", "Ending Julian Date", defTimeSeriesOne, lCategory, "Double", pNaN)
 
-                AddOperation("Last", "Last value", defTimeSeriesOne, lCategory)
+                AddOperation("Last", "Last value", defTimeSeriesOne, lCategory, "Double", pNaN)
 
-                AddOperation("Max", "Maximum value", defTimeSeriesOne, lCategory)
-                AddOperation("MaxDate", "Date of maximum value", defTimeSeriesOne, lCategory)
+                AddOperation("Max", "Maximum value", defTimeSeriesOne, lCategory, "Double", pNaN)
+                AddOperation("MaxDate", "Date of maximum value", defTimeSeriesOne, lCategory, "Double", pNaN)
 
-                AddOperation("Min", "Minimum value", defTimeSeriesOne, lCategory)
-                AddOperation("MinDate", "Date of minimum value", defTimeSeriesOne, lCategory)
+                AddOperation("Min", "Minimum value", defTimeSeriesOne, lCategory, "Double", pNaN)
+                AddOperation("MinDate", "Date of minimum value", defTimeSeriesOne, lCategory, "Double", pNaN)
 
-                AddOperation("Sum", "Summation of all values", defTimeSeriesOne, lCategory)
+                AddOperation("Sum", "Summation of all values", defTimeSeriesOne, lCategory, "Double", pNaN)
 
-                AddOperation("SumAnnual", "Average annual value from summation of all values", defTimeSeriesOne, lCategory)
+                AddOperation("SumAnnual", "Average annual value from summation of all values", defTimeSeriesOne, lCategory, "Double", pNaN)
 
                 AddOperation("Mean", "Sum of all values divided by number of values", _
-                             defTimeSeriesOne, lCategory)
+                             defTimeSeriesOne, lCategory, "Double", pNaN)
 
                 AddOperation("Geometric Mean", "10 ^ Mean of log(each value)", _
-                             defTimeSeriesOne, lCategory)
+                             defTimeSeriesOne, lCategory, "Double", pNaN)
 
                 AddOperation("Variance", "Statistical variance", _
-                             defTimeSeriesOne, lCategory)
+                             defTimeSeriesOne, lCategory, "Double", pNaN)
 
                 AddOperation("Standard Deviation", "Standard deviation", _
-                             defTimeSeriesOne, lCategory)
+                             defTimeSeriesOne, lCategory, "Double", pNaN)
 
                 AddOperation("Skew", "Skewness", _
-                             defTimeSeriesOne, lCategory)
+                             defTimeSeriesOne, lCategory, "Double", pNaN)
 
                 AddOperation("Standard Error of Skew", "Standard Error of Skewness", _
-                             defTimeSeriesOne, lCategory)
+                             defTimeSeriesOne, lCategory, "Double", pNaN)
 
                 AddOperation("Serial Correlation Coefficient", "Serial Correlation Coefficient", _
-                             defTimeSeriesOne, lCategory)
+                             defTimeSeriesOne, lCategory, "Double", pNaN)
 
                 AddOperation("Coefficient of Variation", "Coefficient of Variation", _
-                             defTimeSeriesOne, lCategory)
+                             defTimeSeriesOne, lCategory, "Double", pNaN)
 
                 lCategory = "Percentile"
-                AddOperation("%*", "percentile value", defTimeSeriesOne, lCategory)
+                AddOperation("%*", "percentile value", defTimeSeriesOne, lCategory, "Double", pNaN)
                 'AddOperation("%01", "1st percentile value", defTimeSeriesOne, lCategory)
                 'AddOperation("%02", "2nd percentile value", defTimeSeriesOne, lCategory)
                 'AddOperation("%05", "5th percentile value", defTimeSeriesOne, lCategory)
@@ -129,7 +129,7 @@ Public Class atcTimeseriesStatistics
                 'AddOperation("%98", "98th percentile value", defTimeSeriesOne, lCategory)
                 'AddOperation("%99", "99th percentile value", defTimeSeriesOne, lCategory)
 
-                AddOperation("%sum*", "percentile sum", defTimeSeriesOne, lCategory)
+                AddOperation("%sum*", "percentile sum", defTimeSeriesOne, lCategory, "Double", pNaN)
 
                 'Dim lBinsDefinition As atcAttributeDefinition = atcDataAttributes.AllDefinitions.ItemByKey("bins")
                 'If lBinsDefinition Is Nothing Then
@@ -157,8 +157,8 @@ Public Class atcTimeseriesStatistics
                              ByVal aDescription As String, _
                              ByVal aArg As atcAttributeDefinition, _
                              ByVal aCategory As String, _
-                    Optional ByVal aTypeString As String = "Double", _
-                    Optional ByVal aDefaultValue As Object = Double.NaN)
+                     ByVal aTypeString As String, _
+                     ByVal aDefaultValue As Object)
         Dim lResult As New atcAttributeDefinition
         With lResult
             .Name = aName
@@ -208,7 +208,7 @@ Public Class atcTimeseriesStatistics
 
             For lIndex = 1 To lLastValueIndex
                 Dim lIsNaN As Boolean = True
-                Try
+                Try 'for unexpected overflow exception when IsNaN should return True
                     lVal = aTimeseries.Value(lIndex)
                     lIsNaN = Double.IsNaN(lVal)
                     If Not lIsNaN Then
