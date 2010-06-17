@@ -86,7 +86,7 @@ Public Class SwatInput
 
         CnSwatParm = OpenOleDB(aSwatGDB)
 
-        Dim lSwatSoilsDBFileName As String = aSwatGDB.Replace("SWAT2005.mdb", "SWAT_US_Soils.mdb")
+        Dim lSwatSoilsDBFileName As String = aSwatGDB.ToUpper.Replace("SWAT2005.MDB", "SWAT_US_Soils.mdb")
         CnSwatSoils = OpenOleDB(lSwatSoilsDBFileName)
 
         If Not IO.File.Exists(aOutGDB) Then
