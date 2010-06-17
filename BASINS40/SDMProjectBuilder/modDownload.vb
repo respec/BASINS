@@ -441,13 +441,30 @@ StartOver:
             Dim lLabelStart As Integer = lQuery.IndexOf("'Get") + 4
             Logger.Status("Downloading " & lQuery.Substring(lLabelStart, lQuery.IndexOf("'>") - lLabelStart))
             Using lLevel As New ProgressLevel(True)
-                lResult &= lDownloadManager.Execute(lQuery)
+RetryQuery:
+                Dim lThisResult As String = lDownloadManager.Execute(lQuery)
+                If lThisResult.Contains("<error>") Then
+                    Select Case Logger.Msg(lThisResult.Replace("<error>", "").Replace("</error>", "") & vbCrLf _
+                                           & vbCrLf _
+                                           & "Abort building this project" & vbCrLf _
+                                           & "Retry this download" & vbCrLf _
+                                           & "or Ignore the error and continue to build an incomplete project", MsgBoxStyle.AbortRetryIgnore, "Download Error")
+                        Case MsgBoxResult.Abort
+                            Logger.Progress("", 0, 0)
+                            lResult = Nothing
+                            Exit For
+                        Case MsgBoxResult.Retry
+                            GoTo RetryQuery
+                    End Select
+                Else
+                    lResult &= lThisResult
+                End If
             End Using
         Next
 
         'Logger.Msg(lResult, "Result of Query from DataManager")
 
-        If Not lResult Is Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
+        If lResult IsNot Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
             Logger.Status("Download Successful, Building Project")
             Using lLevel As New ProgressLevel(True)
                 If Not aExistingMapWindowProject Then
