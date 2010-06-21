@@ -749,8 +749,30 @@ Public Module modStat
                 aTS = Aggregate(aTS, atcTimeUnit.TUDay, 1, atcTran.TranAverSame) 'trans aver same for flow
         End Select
 
-        Dim lSeasonDay As New atcSeasonsDayOfYear
+        Dim lSeasonDay As New atcSeasonsMonthDay
         Dim lSplit As atcTimeseriesGroup = lSeasonDay.Split(aTS, Nothing)
+
+        ''For debugging ------------
+        'Dim lsw As IO.StreamWriter = New IO.StreamWriter("G:\Admin\USGS20801_DO11-SWSTAT\DurationHydrograph\zSeasonValues.txt", False)
+        'For I As Integer = 0 To lSplit(0).Values.Length - 1
+        '    Dim ldates(5) As Integer
+        '    J2Date(lSplit(0).Dates.Value(I), ldates)
+        '    Dim lval As Double = lSplit(0).Value(I)
+        '    If Not Double.IsNaN(lval) Then lsw.WriteLine(ldates(1) & "/" & ldates(2) & "/" & ldates(0) & "," & lval)
+        'Next
+        'lsw.Close()
+
+        'lsw = New IO.StreamWriter("G:\Admin\USGS20801_DO11-SWSTAT\DurationHydrograph\zSeasonValuesOriginal.txt", False)
+        'For I As Integer = 0 To aTS.Values.Length - 1
+        '    Dim ldates(5) As Integer
+        '    J2Date(aTS.Dates.Value(I), ldates)
+        '    If ldates(1) = 10 And ldates(2) = 2 Then
+        '        Dim lval As Double = aTS.Value(I)
+        '        lsw.WriteLine(ldates(1) & "/" & ldates(2) & "/" & ldates(0) & "," & lval)
+        '    End If
+        'Next
+        'lsw.Close()
+        ''For debugging -------------
 
         Dim lDateFormat As New atcDateFormat
         Dim lStartDate As String = lDateFormat.JDateToString(aTS.Attributes.GetValue("Start Date"))
@@ -759,7 +781,7 @@ Public Module modStat
         Dim lHeaderLines As String = "1" & vbCrLf
         lHeaderLines &= Space(10) & "Duration hydrograph for " & aTS.Attributes.GetValue("STANAM", "") & vbCrLf
         lHeaderLines &= Space(30) & "Station id  " & aTS.Attributes.GetValue("ISTAID", "") & vbCrLf
-        lHeaderLines &= Space(22) & "For period " & lStartDate & " to " & lEndDate & vbCrLf
+        lHeaderLines &= Space(22) & "For period " & lStartDate & " to " & lEndDate & vbCrLf & vbCrLf
         lHeaderLines &= Space(6) & "Num" & Space(30) & "Percentile" & vbCrLf
         lHeaderLines &= " ZZZ  yrs     Max    0.10    0.20    0.30    0.50    0.70    0.80    0.90     Min" 'TODO: Check if always starts with Oct!
 
@@ -768,15 +790,19 @@ Public Module modStat
         Dim lprevTimeStep As Integer = -99
         For Each lTS As atcTimeseries In lSplit
             lYrs = lTS.Attributes.GetValue("count")
-            Dim ldates(5) As Integer
-            J2Date(lTS.Dates.Values(0), ldates)
-            If ldates(1) <> lprevTimeStep Then
-                Dim lHeader As String = lHeaderLines.Replace("ZZZ", MonthName3(ldates(1)))
+            'Dim ldates(5) As Integer
+            'J2Date(lTS.Dates.Values(0), ldates)
+            'timcnv(ldates)
+            Dim lMonthDay() As String = lTS.Attributes.GetValue("seasonname").split("/")
+            Dim lMonth As Integer = CInt(lMonthDay(0))
+            Dim lDay As Integer = CInt(lMonthDay(1))
+            If lMonth <> lprevTimeStep Then
+                Dim lHeader As String = lHeaderLines.Replace("ZZZ", MonthName3(lMonth))
                 lStr.AppendLine(lHeader) : lStr.AppendLine()
-                lprevTimeStep = ldates(1)
+                lprevTimeStep = lMonth
             End If
 
-            lStr.Append(ldates(2).ToString.PadLeft(4) & lYrs.ToString.PadLeft(5))
+            lStr.Append(lDay.ToString.PadLeft(4) & lYrs.ToString.PadLeft(5))
             For Each lExceedPercent As Double In lExceedancePcts
                 Dim I As Integer = Array.IndexOf(lExceedancePcts, lExceedPercent)
                 Try
@@ -785,17 +811,21 @@ Public Module modStat
                     Dim lNonExceedValue1 As Double = lTS.Attributes.GetValue("%" & lNonExceedPercentString)
                     Dim lWidth As Integer = 8
                     If I = 0 Then lWidth = 9
-                    lStr.Append(DecimalAlign(lNonExceedValue1.ToString, 8, 0).Replace(",", ""))
+                    lStr.Append(DecimalAlign(lNonExceedValue1.ToString, lWidth, 0).Replace(",", ""))
                     lExceedanceMeans(I) += lNonExceedValue1
                 Catch lEx As Exception
                     Logger.Dbg("At ExceedPercent " & lExceedPercent & " Exception " & lEx.ToString)
                 End Try
             Next
-            If ldates(2) = lLastDayOfMonth(ldates(1)) Then
+            lStr.AppendLine()
+
+            If lDay = lLastDayOfMonth(lMonth) Then
                 lStr.AppendLine()
                 lStr.Append("    Mean ")
                 For I As Integer = 0 To lExceedanceMeans.Count - 1
-                    lStr.Append(DecimalAlign((lExceedanceMeans(I) / ldates(2)).ToString, 8, 0).Replace(",", ""))
+                    Dim lWidth As Integer = 8
+                    If I = 0 Then lWidth = 9
+                    lStr.Append(DecimalAlign((lExceedanceMeans(I) / lDay).ToString, lWidth, 0).Replace(",", ""))
                     lExceedanceMeans(I) = 0.0
                 Next
                 lStr.AppendLine()
@@ -803,6 +833,8 @@ Public Module modStat
         Next
         Return lStr.ToString
     End Function
+
+
 
     Public Function doDurHydPlot(ByVal aTS As atcTimeseries) As Boolean
         Dim doneIt As Boolean = True
@@ -814,6 +846,20 @@ Public Module modStat
         Dim lDataGroup As New atcDataGroup
         Dim lExceedancePcts As Double() = {0, 10, 20, 30, 50, 70, 80, 90, 100}
         For Each lExceedPct As Double In lExceedancePcts
+            Dim lNewTS As atcTimeseries
+            'lNewTS = lSplit.ItemByKey(lSeasonIndex)
+            'If lNewTS Is Nothing Then
+            '    lNewTS = New atcTimeseries(aSource)
+            '    CopyBaseAttributes(aTS, lNewTS)
+            '    lNewTS.Dates = New atcTimeseries(aSource)
+            '    lNewTS.numValues = aTS.numValues
+            '    lNewTS.Dates.numValues = aTS.numValues
+            '    lNewTS.Attributes.AddHistory("Split by " & ToString() & " " & SeasonName(lSeasonIndex))
+            '    lNewTS.Attributes.Add("SeasonDefinition", Me)
+            '    lNewTS.Attributes.Add("SeasonIndex", lSeasonIndex)
+            '    lNewTS.Attributes.Add("SeasonName", SeasonName(lSeasonIndex))
+            '    lNewGroup.Add(lSeasonIndex, lNewTS)
+            'End If
 
 
         Next
