@@ -40,8 +40,8 @@ Public Class frmBuildNew
     Friend WithEvents btnBuild As System.Windows.Forms.Button
     Friend WithEvents txtInstructions As System.Windows.Forms.TextBox
     Friend WithEvents btnCancel As System.Windows.Forms.Button
-    Friend WithEvents cbxHSPF As System.Windows.Forms.CheckBox
-    Friend WithEvents cbxSWAT As System.Windows.Forms.CheckBox
+    Friend WithEvents chkHSPF As System.Windows.Forms.CheckBox
+    Friend WithEvents chkSWAT As System.Windows.Forms.CheckBox
     Friend WithEvents atxSize As atcControls.atcText
     Friend WithEvents lblSize As System.Windows.Forms.Label
     Friend WithEvents lblLength As System.Windows.Forms.Label
@@ -55,14 +55,19 @@ Public Class frmBuildNew
     Friend WithEvents txtSimulationStartYear As atcControls.atcText
     Friend WithEvents lblSimulationEndYear As System.Windows.Forms.Label
     Friend WithEvents txtSimulationEndYear As atcControls.atcText
+    Friend WithEvents lblProjectSize As System.Windows.Forms.Label
+    Friend WithEvents btnFind As System.Windows.Forms.Button
+    Friend WithEvents txtFind As System.Windows.Forms.TextBox
+    Friend WithEvents rdoHUC8 As System.Windows.Forms.RadioButton
+    Friend WithEvents rdoHUC12 As System.Windows.Forms.RadioButton
     Friend WithEvents txtSelected As System.Windows.Forms.TextBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.btnBuild = New System.Windows.Forms.Button
         Me.txtInstructions = New System.Windows.Forms.TextBox
         Me.txtSelected = New System.Windows.Forms.TextBox
         Me.btnCancel = New System.Windows.Forms.Button
-        Me.cbxHSPF = New System.Windows.Forms.CheckBox
-        Me.cbxSWAT = New System.Windows.Forms.CheckBox
+        Me.chkHSPF = New System.Windows.Forms.CheckBox
+        Me.chkSWAT = New System.Windows.Forms.CheckBox
         Me.atxSize = New atcControls.atcText
         Me.lblSize = New System.Windows.Forms.Label
         Me.lblLength = New System.Windows.Forms.Label
@@ -76,6 +81,11 @@ Public Class frmBuildNew
         Me.txtSimulationStartYear = New atcControls.atcText
         Me.lblSimulationEndYear = New System.Windows.Forms.Label
         Me.txtSimulationEndYear = New atcControls.atcText
+        Me.lblProjectSize = New System.Windows.Forms.Label
+        Me.btnFind = New System.Windows.Forms.Button
+        Me.txtFind = New System.Windows.Forms.TextBox
+        Me.rdoHUC8 = New System.Windows.Forms.RadioButton
+        Me.rdoHUC12 = New System.Windows.Forms.RadioButton
         Me.SuspendLayout()
         '
         'btnBuild
@@ -98,7 +108,7 @@ Public Class frmBuildNew
         Me.txtInstructions.Location = New System.Drawing.Point(13, 14)
         Me.txtInstructions.Multiline = True
         Me.txtInstructions.Name = "txtInstructions"
-        Me.txtInstructions.Size = New System.Drawing.Size(507, 65)
+        Me.txtInstructions.Size = New System.Drawing.Size(507, 32)
         Me.txtInstructions.TabIndex = 2
         Me.txtInstructions.TabStop = False
         '
@@ -114,7 +124,7 @@ Public Class frmBuildNew
         Me.txtSelected.Size = New System.Drawing.Size(508, 67)
         Me.txtSelected.TabIndex = 3
         Me.txtSelected.TabStop = False
-        Me.txtSelected.Text = "Selected Features:"
+        Me.txtSelected.Text = "Selected:"
         '
         'btnCancel
         '
@@ -127,31 +137,31 @@ Public Class frmBuildNew
         Me.btnCancel.TabIndex = 4
         Me.btnCancel.Text = "Cancel"
         '
-        'cbxHSPF
+        'chkHSPF
         '
-        Me.cbxHSPF.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cbxHSPF.AutoSize = True
-        Me.cbxHSPF.Checked = True
-        Me.cbxHSPF.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.cbxHSPF.Location = New System.Drawing.Point(12, 149)
-        Me.cbxHSPF.Name = "cbxHSPF"
-        Me.cbxHSPF.Size = New System.Drawing.Size(54, 17)
-        Me.cbxHSPF.TabIndex = 5
-        Me.cbxHSPF.Text = "HSPF"
-        Me.cbxHSPF.UseVisualStyleBackColor = True
+        Me.chkHSPF.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.chkHSPF.AutoSize = True
+        Me.chkHSPF.Checked = True
+        Me.chkHSPF.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkHSPF.Location = New System.Drawing.Point(12, 149)
+        Me.chkHSPF.Name = "chkHSPF"
+        Me.chkHSPF.Size = New System.Drawing.Size(54, 17)
+        Me.chkHSPF.TabIndex = 5
+        Me.chkHSPF.Text = "HSPF"
+        Me.chkHSPF.UseVisualStyleBackColor = True
         '
-        'cbxSWAT
+        'chkSWAT
         '
-        Me.cbxSWAT.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cbxSWAT.AutoSize = True
-        Me.cbxSWAT.Checked = True
-        Me.cbxSWAT.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.cbxSWAT.Location = New System.Drawing.Point(72, 149)
-        Me.cbxSWAT.Name = "cbxSWAT"
-        Me.cbxSWAT.Size = New System.Drawing.Size(58, 17)
-        Me.cbxSWAT.TabIndex = 6
-        Me.cbxSWAT.Text = "SWAT"
-        Me.cbxSWAT.UseVisualStyleBackColor = True
+        Me.chkSWAT.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.chkSWAT.AutoSize = True
+        Me.chkSWAT.Checked = True
+        Me.chkSWAT.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkSWAT.Location = New System.Drawing.Point(72, 149)
+        Me.chkSWAT.Name = "chkSWAT"
+        Me.chkSWAT.Size = New System.Drawing.Size(58, 17)
+        Me.chkSWAT.TabIndex = 6
+        Me.chkSWAT.Text = "SWAT"
+        Me.chkSWAT.UseVisualStyleBackColor = True
         '
         'atxSize
         '
@@ -356,12 +366,68 @@ Public Class frmBuildNew
         Me.txtSimulationEndYear.ValueDouble = 2000
         Me.txtSimulationEndYear.ValueInteger = 2000
         '
+        'lblProjectSize
+        '
+        Me.lblProjectSize.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lblProjectSize.AutoSize = True
+        Me.lblProjectSize.Location = New System.Drawing.Point(12, 54)
+        Me.lblProjectSize.Name = "lblProjectSize"
+        Me.lblProjectSize.Size = New System.Drawing.Size(66, 13)
+        Me.lblProjectSize.TabIndex = 21
+        Me.lblProjectSize.Text = "Project Size:"
+        '
+        'btnFind
+        '
+        Me.btnFind.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnFind.Location = New System.Drawing.Point(445, 51)
+        Me.btnFind.Name = "btnFind"
+        Me.btnFind.Size = New System.Drawing.Size(75, 19)
+        Me.btnFind.TabIndex = 22
+        Me.btnFind.Text = "Find"
+        Me.btnFind.UseVisualStyleBackColor = True
+        '
+        'txtFind
+        '
+        Me.txtFind.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtFind.Location = New System.Drawing.Point(216, 50)
+        Me.txtFind.Name = "txtFind"
+        Me.txtFind.Size = New System.Drawing.Size(223, 20)
+        Me.txtFind.TabIndex = 25
+        '
+        'rdoHUC8
+        '
+        Me.rdoHUC8.AutoSize = True
+        Me.rdoHUC8.Location = New System.Drawing.Point(84, 51)
+        Me.rdoHUC8.Name = "rdoHUC8"
+        Me.rdoHUC8.Size = New System.Drawing.Size(57, 17)
+        Me.rdoHUC8.TabIndex = 26
+        Me.rdoHUC8.Text = "HUC-8"
+        Me.rdoHUC8.UseVisualStyleBackColor = True
+        '
+        'rdoHUC12
+        '
+        Me.rdoHUC12.AutoSize = True
+        Me.rdoHUC12.Checked = True
+        Me.rdoHUC12.Location = New System.Drawing.Point(147, 52)
+        Me.rdoHUC12.Name = "rdoHUC12"
+        Me.rdoHUC12.Size = New System.Drawing.Size(63, 17)
+        Me.rdoHUC12.TabIndex = 27
+        Me.rdoHUC12.TabStop = True
+        Me.rdoHUC12.Text = "HUC-12"
+        Me.rdoHUC12.UseVisualStyleBackColor = True
+        '
         'frmBuildNew
         '
         Me.AcceptButton = Me.btnBuild
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(532, 363)
+        Me.Controls.Add(Me.rdoHUC12)
+        Me.Controls.Add(Me.rdoHUC8)
+        Me.Controls.Add(Me.txtFind)
+        Me.Controls.Add(Me.btnFind)
+        Me.Controls.Add(Me.lblProjectSize)
         Me.Controls.Add(Me.lblSimulationEndYear)
         Me.Controls.Add(Me.txtSimulationEndYear)
         Me.Controls.Add(Me.lblSimulationStartYear)
@@ -375,15 +441,14 @@ Public Class frmBuildNew
         Me.Controls.Add(Me.atxLength)
         Me.Controls.Add(Me.lblSize)
         Me.Controls.Add(Me.atxSize)
-        Me.Controls.Add(Me.cbxSWAT)
-        Me.Controls.Add(Me.cbxHSPF)
+        Me.Controls.Add(Me.chkSWAT)
+        Me.Controls.Add(Me.chkHSPF)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.txtSelected)
         Me.Controls.Add(Me.txtInstructions)
         Me.Controls.Add(Me.btnBuild)
         Me.KeyPreview = True
         Me.MaximizeBox = False
-        Me.MinimizeBox = False
         Me.Name = "frmBuildNew"
         Me.Opacity = 0.8
         Me.Text = "Build Project"
@@ -395,12 +460,14 @@ Public Class frmBuildNew
 
 #End Region
 
+    Private pLayerDBFs As New Generic.List(Of atcUtility.atcTableDBF)
+
     Private Sub cmdBuild_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBuild.Click
         SaveSetting(g_AppNameRegistry, "Window Positions", "BuildTop", Me.Top)
         SaveSetting(g_AppNameRegistry, "Window Positions", "BuildLeft", Me.Left)
 
-        g_DoHSPF = cbxHSPF.Checked
-        g_DoSWAT = cbxSWAT.Checked
+        g_DoHSPF = chkHSPF.Checked
+        g_DoSWAT = chkSWAT.Checked
         g_MinCatchmentKM2 = atxSize.Text
         g_MinFlowlineKM = atxLength.Text
         g_LandUseIgnoreBelowFraction = atxLU.Text
@@ -442,8 +509,8 @@ Public Class frmBuildNew
         Me.Icon = g_MapWin.ApplicationInfo.FormIcon
         Me.Text = "Build " & g_AppNameLong & " Project"
 
-        cbxHSPF.Checked = g_DoHSPF
-        cbxSWAT.Checked = g_DoSWAT
+        chkHSPF.Checked = g_DoHSPF
+        chkSWAT.Checked = g_DoSWAT
         atxSize.Text = g_MinCatchmentKM2
         atxLength.Text = g_MinFlowlineKM
         atxLU.Text = g_LandUseIgnoreBelowFraction
@@ -455,5 +522,87 @@ Public Class frmBuildNew
     Private Sub cmdSet_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSet.Click
         g_SWATDatabaseName = FindFile("Please locate SWAT2005.mdb", "SWAT2005.mdb").Replace("swat", "SWAT")
         lblFile.Text = g_SWATDatabaseName
+    End Sub
+
+    Private Sub btnFind_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnFind.Click
+        Dim lText As String = txtFind.Text
+        If lText.Length > 0 Then
+            Dim lMatchingRecord As Integer = -1
+            Dim lLayerHandle As Integer = -1
+            If IsNumeric(lText) Then
+                Select Case lText.Length
+                    Case 8 : lLayerHandle = Huc8Layer()
+                    Case 12 : lLayerHandle = Huc12Layer()
+                End Select
+            Else
+
+            End If
+            If lLayerHandle > -1 Then
+                lMatchingRecord = MatchingRecord(g_MapWin.Layers(lLayerHandle).FileName, lText)
+            End If
+            If lMatchingRecord >= 0 Then
+                g_MapWin.Layers.CurrentLayer = lLayerHandle
+                Dim lShapefile As MapWinGIS.Shapefile = g_MapWin.Layers.Item(lLayerHandle).GetObject
+                lShapefile.ShapeSelected(lMatchingRecord) = True
+                g_MapWin.View.Extents = lShapefile.Shape(lMatchingRecord).Extents
+            End If
+        End If
+    End Sub
+
+    Private Function MatchingRecord(ByVal aShapeFilename As String, ByVal aText As String) As Integer
+        Dim lDBF As atcTableDBF = LayerDBF(aShapeFilename)
+
+        Dim lKeyFieldName As String = DBFKeyFieldName(aShapeFilename).ToLower
+        Dim lKeyFieldNum As Integer = lDBF.FieldNumber(lKeyFieldName)
+        If lKeyFieldNum > 0 AndAlso lDBF.FindFirst(lKeyFieldNum, aText) Then
+            Return lDBF.CurrentRecord - 1
+        Else
+            Dim lDescFieldName As String = DBFDescriptionFieldName(aShapeFilename).ToLower
+            Dim lDescFieldNum As Integer = lDBF.FieldNumber(lDescFieldName)
+            If lDescFieldNum > 0 AndAlso lDBF.FindFirst(lDescFieldNum, aText) Then
+                Return lDBF.CurrentRecord - 1
+            End If
+        End If
+        Return -1
+    End Function
+
+    Private Function LayerDBF(ByVal aShapeFileName As String) As atcTableDBF
+        Dim lDBFFileName As String = IO.Path.ChangeExtension(aShapeFileName, "dbf").ToLower
+        Dim lLayer As atcTableDBF
+        For Each lLayer In pLayerDBFs
+            If lLayer.FileName = lDBFFileName Then
+                Return lLayer
+            End If
+        Next
+        If IO.File.Exists(lDBFFileName) Then
+            lLayer = New atcTableDBF
+            If lLayer.OpenFile(lDBFFileName) Then
+                pLayerDBFs.Add(lLayer)
+                Return lLayer
+            End If
+        End If
+        Return Nothing
+    End Function
+
+    Private Sub rdoHUC8_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoHUC8.CheckedChanged
+        If rdoHUC8.Checked Then
+            chkHSPF.Checked = False
+
+            'Remove HUC-12 layers from map
+            For iLayer As Integer = g_MapWin.Layers.NumLayers - 1 To 0 Step -1
+                Dim lLayerHandle As Integer = g_MapWin.Layers.GetHandle(iLayer)
+                If g_MapWin.Layers(lLayerHandle).FileName.ToLower.EndsWith("huc12.shp") Then
+                    g_MapWin.Layers.Remove(lLayerHandle)
+                End If
+            Next
+
+        Else
+        End If
+    End Sub
+
+    Private Sub chkHSPF_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkHSPF.CheckedChanged
+        If chkHSPF.Checked AndAlso rdoHUC8.Checked Then
+            rdoHUC12.Checked = True
+        End If
     End Sub
 End Class

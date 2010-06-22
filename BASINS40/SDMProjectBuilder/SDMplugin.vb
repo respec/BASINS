@@ -77,6 +77,12 @@ Public Class SDMplugin
     Public Overrides Sub Terminate()
     End Sub
 
+    Public Overrides Sub LayerSelected(ByVal aHandle As Integer)
+        If NationalProjectIsOpen() Then
+            UpdateSelectedFeatures()
+        End If
+    End Sub
+
     Public Overrides Sub ProjectLoading(ByVal aProjectFile As String, ByVal aSettingsString As String)
         If Not BuildFormIsOpen() AndAlso aProjectFile IsNot Nothing AndAlso aProjectFile.ToLower.EndsWith(NationalProjectFilename.ToLower) Then
             If FileExists(aProjectFile) Then NationalProjectFullPath = aProjectFile
