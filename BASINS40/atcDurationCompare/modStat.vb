@@ -724,9 +724,15 @@ Public Module modStat
     '    Return lStr.ToString
     'End Function
 
-    Public Function DurationHydrograph(ByVal aTS As atcTimeseries) As String
+    Public Function DurationHydrograph(ByVal aTS As atcTimeseries, ByVal aPcts As Double()) As String
         Dim lStr As StringBuilder = New StringBuilder()
-        Dim lExceedancePcts As Double() = {0, 10, 20, 30, 50, 70, 80, 90, 100}
+        Dim lExceedancePcts(aPcts.Length - 1) As Double
+        For I As Integer = 0 To aPcts.Length - 1
+            lExceedancePcts(I) = aPcts(I)
+        Next
+        For I As Integer = 0 To lExceedancePcts.Length - 1
+            lExceedancePcts(I) = lExceedancePcts(I) * 100
+        Next
         Dim lExceedanceMeans(lExceedancePcts.Count - 1) As Double
         Dim lLastDayOfMonth As New Dictionary(Of Integer, Integer)
         lLastDayOfMonth.Add(1, 31)
@@ -783,7 +789,13 @@ Public Module modStat
         lHeaderLines &= Space(30) & "Station id  " & aTS.Attributes.GetValue("ISTAID", "") & vbCrLf
         lHeaderLines &= Space(22) & "For period " & lStartDate & " to " & lEndDate & vbCrLf & vbCrLf
         lHeaderLines &= Space(6) & "Num" & Space(30) & "Percentile" & vbCrLf
-        lHeaderLines &= " ZZZ  yrs     Max    0.10    0.20    0.30    0.50    0.70    0.80    0.90     Min" 'TODO: Check if always starts with Oct!
+        lHeaderLines &= " ZZZ  yrs     Max"
+        For Each lpct As Double In aPcts
+            If lpct > 0 And lpct < 1 Then
+                lHeaderLines &= DecimalAlign(lpct.ToString, 8, 2)
+            End If
+        Next
+        lHeaderLines &= "     Min"
 
         Dim lYrs As Integer = 0
         Dim lTempVal As Double = 0
