@@ -54,21 +54,24 @@ Public Class clsHspfSupportPlugin
     'End Sub
 
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
-        Dim lFrmClassLimts As frmAnalysis = Nothing
+        Dim lFrmClassLimits As frmAnalysis = Nothing
 
         If aItemName = atcDataManager.AnalysisMenuName & "_DurationCompare" Then
             Dim lTimeseriesGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Data For " & aItemName.Substring(atcDataManager.AnalysisMenuName.Length + 1))
             If lTimeseriesGroup.Count > 0 Then
-                lFrmClassLimts = New frmAnalysis(lTimeseriesGroup)
-                If pMapWin IsNot Nothing AndAlso pMapWin.ApplicationInfo.FormIcon IsNot Nothing Then lFrmClassLimts.Icon = pMapWin.ApplicationInfo.FormIcon
-                lFrmClassLimts.Show()
+                lFrmClassLimits = New frmAnalysis(lTimeseriesGroup)
+                If pMapWin IsNot Nothing AndAlso pMapWin.ApplicationInfo.FormIcon IsNot Nothing Then lFrmClassLimits.Icon = pMapWin.ApplicationInfo.FormIcon
+                lFrmClassLimits.Show()
             End If
         ElseIf aItemName = atcDataManager.AnalysisMenuName & "_DurationHydrograph" Then
             Dim lTimeseriesGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Data For " & aItemName.Substring(atcDataManager.AnalysisMenuName.Length + 1))
             If lTimeseriesGroup.Count > 0 Then
-                Dim lStr As String = DurationHydrograph(lTimeseriesGroup(0))
-                'MsgBox(lStr)
-                SaveFileString("G:\Admin\USGS20801_DO11-SWSTAT\DurationHydrograph\Test8.txt", lStr)
+                Dim lfrmDHControl As New frmDurationHydrographControl(lTimeseriesGroup)
+                lfrmDHControl.Show()
+
+                'Dim lStr As String = DurationHydrograph(lTimeseriesGroup(0))
+                ''MsgBox(lStr)
+                'SaveFileString("C:\Temp\DurationHydrograph\Test8.txt", lStr)
             End If
         End If
     End Sub

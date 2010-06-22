@@ -104,6 +104,12 @@
     <Compile Include="frmDurationHydrographControl.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmResult.Designer.vb">
+      <DependentUpon>frmResult.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmResult.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="modStat.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -137,6 +143,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmDurationHydrographControl.resx">
       <DependentUpon>frmDurationHydrographControl.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmResult.resx">
+      <DependentUpon>frmResult.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

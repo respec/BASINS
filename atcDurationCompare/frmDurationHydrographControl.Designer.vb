@@ -23,56 +23,91 @@ Partial Class frmDurationHydrographControl
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDurationHydrographControl))
-        Me.AtcManagedList1 = New atcControls.atcManagedList
+        Me.lstPctExceed = New atcControls.atcManagedList
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.SelectDataToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuSelectData = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuExit = New System.Windows.Forms.ToolStripMenuItem
+        Me.lblExceedance = New System.Windows.Forms.Label
+        Me.btnReport = New System.Windows.Forms.Button
+        Me.btnGraph = New System.Windows.Forms.Button
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
-        'AtcManagedList1
+        'lstPctExceed
         '
-        Me.AtcManagedList1.CurrentValues = New Double(-1) {}
-        Me.AtcManagedList1.Location = New System.Drawing.Point(12, 87)
-        Me.AtcManagedList1.Name = "AtcManagedList1"
-        Me.AtcManagedList1.Size = New System.Drawing.Size(202, 227)
-        Me.AtcManagedList1.TabIndex = 0
+        Me.lstPctExceed.CurrentValues = New Double(-1) {}
+        Me.lstPctExceed.Location = New System.Drawing.Point(12, 44)
+        Me.lstPctExceed.Name = "lstPctExceed"
+        Me.lstPctExceed.Size = New System.Drawing.Size(202, 294)
+        Me.lstPctExceed.TabIndex = 0
         '
         'MenuStrip1
         '
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(512, 24)
+        Me.MenuStrip1.Size = New System.Drawing.Size(230, 24)
         Me.MenuStrip1.TabIndex = 1
         Me.MenuStrip1.Text = "MenuStrip1"
         '
         'FileToolStripMenuItem
         '
-        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SelectDataToolStripMenuItem, Me.ExitToolStripMenuItem})
+        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuSelectData, Me.mnuExit})
         Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
-        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(35, 20)
+        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(37, 20)
         Me.FileToolStripMenuItem.Text = "File"
         '
-        'SelectDataToolStripMenuItem
+        'mnuSelectData
         '
-        Me.SelectDataToolStripMenuItem.Name = "SelectDataToolStripMenuItem"
-        Me.SelectDataToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.SelectDataToolStripMenuItem.Text = "Select Data"
+        Me.mnuSelectData.Name = "mnuSelectData"
+        Me.mnuSelectData.Size = New System.Drawing.Size(152, 22)
+        Me.mnuSelectData.Text = "Select Data"
         '
-        'ExitToolStripMenuItem
+        'mnuExit
         '
-        Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.ExitToolStripMenuItem.Text = "Exit"
+        Me.mnuExit.Name = "mnuExit"
+        Me.mnuExit.Size = New System.Drawing.Size(152, 22)
+        Me.mnuExit.Text = "Exit"
+        '
+        'lblExceedance
+        '
+        Me.lblExceedance.AutoSize = True
+        Me.lblExceedance.Location = New System.Drawing.Point(13, 28)
+        Me.lblExceedance.Name = "lblExceedance"
+        Me.lblExceedance.Size = New System.Drawing.Size(140, 13)
+        Me.lblExceedance.TabIndex = 2
+        Me.lblExceedance.Text = "Select Percent Exceedance"
+        '
+        'btnReport
+        '
+        Me.btnReport.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnReport.Location = New System.Drawing.Point(143, 376)
+        Me.btnReport.Name = "btnReport"
+        Me.btnReport.Size = New System.Drawing.Size(75, 23)
+        Me.btnReport.TabIndex = 3
+        Me.btnReport.Text = "Report"
+        Me.btnReport.UseVisualStyleBackColor = True
+        '
+        'btnGraph
+        '
+        Me.btnGraph.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnGraph.Location = New System.Drawing.Point(62, 376)
+        Me.btnGraph.Name = "btnGraph"
+        Me.btnGraph.Size = New System.Drawing.Size(75, 23)
+        Me.btnGraph.TabIndex = 4
+        Me.btnGraph.Text = "Graph"
+        Me.btnGraph.UseVisualStyleBackColor = True
         '
         'frmDurationHydrographControl
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(512, 431)
-        Me.Controls.Add(Me.AtcManagedList1)
+        Me.ClientSize = New System.Drawing.Size(230, 411)
+        Me.Controls.Add(Me.btnGraph)
+        Me.Controls.Add(Me.btnReport)
+        Me.Controls.Add(Me.lblExceedance)
+        Me.Controls.Add(Me.lstPctExceed)
         Me.Controls.Add(Me.MenuStrip1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MainMenuStrip = Me.MenuStrip1
@@ -84,9 +119,12 @@ Partial Class frmDurationHydrographControl
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents AtcManagedList1 As atcControls.atcManagedList
+    Friend WithEvents lstPctExceed As atcControls.atcManagedList
     Friend WithEvents MenuStrip1 As System.Windows.Forms.MenuStrip
     Friend WithEvents FileToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents SelectDataToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents ExitToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuSelectData As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuExit As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents lblExceedance As System.Windows.Forms.Label
+    Friend WithEvents btnReport As System.Windows.Forms.Button
+    Friend WithEvents btnGraph As System.Windows.Forms.Button
 End Class
