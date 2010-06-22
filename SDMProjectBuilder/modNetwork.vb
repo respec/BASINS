@@ -20,7 +20,7 @@ Friend Module modNetwork
                 Return lFieldIndex
             End If
         Next
-        Logger.Dbg("FieldIndex:Error:FieldName:" & aFieldName & ":IsNotRecognized")
+        Logger.Dbg("Field " & aFieldName & " not found in " & aShapeFile.Filename)
         Return -1
     End Function
 
@@ -1428,6 +1428,7 @@ Friend Module modNetwork
                 .Type = MapWinGIS.FieldType.INTEGER_FIELD
             End With
             lFlowlinesShapefile.EditInsertField(lSubBasinField, lFlowlinesSubBasinFieldIndex)
+            Logger.Dbg("Added field " & lSwatSubbasinFieldname & " to " & lFlowlinesShapefile.Filename)
         End If
 
         Dim fig As New IO.StreamWriter(aFigFilename)
@@ -1464,6 +1465,8 @@ Friend Module modNetwork
                 CreateSWATFig.Add(lComId.ToString, Hyd_Stor_Num)
             End If
         Next
+
+        Logger.Dbg("CreateSWATFig: Wrote Subbasins " & Hyd_Stor_Num)
 
         'Write the rest
         Dim curridx As Integer
@@ -1548,6 +1551,7 @@ Friend Module modNetwork
         fig.Close()
         lFlowlinesShapefile.StopEditingTable()
         lFlowlinesShapefile.Close()
+        Logger.Dbg("CreateSWATFig: Finished " & Hyd_Stor_Num)
         Logger.Status("")
     End Function
 

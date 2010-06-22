@@ -131,6 +131,51 @@ Public Module modSDM
         End If
     End Function
 
+    Friend Function DBFKeyFieldName(ByVal aDBFFileName As String) As String
+        Dim lFileNameOnly As String = IO.Path.GetFileNameWithoutExtension(aDBFFileName).ToLower
+        Select Case lFileNameOnly
+            Case "cat", "huc", "huc250d3" : Return "CU"
+            Case "huc12" : Return "HUC_12"
+            Case "cnty" : Return "FIPS"
+            Case "st" : Return "ST"
+            Case Else
+                If lFileNameOnly.StartsWith("wbdhu8") Then
+                    Return "HUC_8"
+                End If
+        End Select
+        Return ""
+    End Function
+
+    Friend Function DBFDescriptionFieldName(ByVal aDBFFileName As String) As String
+        Dim lFileNameOnly As String = IO.Path.GetFileNameWithoutExtension(aDBFFileName).ToLower
+        Select Case lFileNameOnly
+            Case "cat", "huc", "huc250d3" : Return "catname"
+            Case "huc12" : Return "HU_12_NAME"
+            Case "cnty" : Return "cntyname"
+            Case "st" : Return "ST"
+            Case Else
+                If lFileNameOnly.StartsWith("wbdhu8") Then
+                    Return "SUBBASIN"
+                End If
+        End Select
+        Return ""
+    End Function
+
+    Friend Function DBFThemeFieldName(ByVal aDBFFileName As String) As String
+        Dim lFileNameOnly As String = IO.Path.GetFileNameWithoutExtension(aDBFFileName).ToLower
+        Select Case lFileNameOnly
+            Case "cat", "huc", "huc250d3" : Return "HUC8"
+            Case "huc12" : Return "HUC12"
+            Case "cnty" : Return "county_cd"
+            Case "st" : Return "state_abbrev"
+            Case Else
+                If lFileNameOnly.StartsWith("wbdhu8") Then
+                    Return "HUC8"
+                End If
+        End Select
+        Return ""
+    End Function
+
     Friend Sub UpdateSelectedFeatures()
         If BuildFormIsOpen() AndAlso g_MapWin.Layers.NumLayers > 0 AndAlso g_MapWin.Layers.CurrentLayer > -1 Then
             Dim lFieldName As String = ""
@@ -142,35 +187,15 @@ Public Module modSDM
             Dim ctext As String
 
             RefreshView()
-            ctext = "Selected Features:" & vbCrLf & "  <none>"
+            ctext = "Selected:" & vbCrLf & "  <none>"
             If g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).LayerType = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
                 lCurLayer = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
                 If g_MapWin.View.SelectedShapes.NumSelected > 0 Then
-                    ctext = "Selected Features:"
+                    ctext = "Selected:"
 
-                    Dim lLayerFilenameOnly As String = IO.Path.GetFileNameWithoutExtension(lCurLayer.Filename).ToLower
-                    Select Case IO.Path.GetFileNameWithoutExtension(lCurLayer.Filename).ToLower
-                        Case "cat", "huc", "huc250d3"
-                            lFieldName = "CU"
-                            lFieldDesc = "catname"
-                        Case "huc12"
-                            lFieldName = "HUC_12"
-                            lFieldDesc = "HU_12_NAME"
-                        Case "cnty"
-                            lFieldName = "FIPS"
-                            lFieldDesc = "cntyname"
-                        Case "st"
-                            lFieldName = "ST"
-                            lFieldDesc = "name"
-                        Case Else
-                            If lLayerFilenameOnly.StartsWith("wbdhu8") Then
-                                lFieldName = "HUC_8"
-                                lFieldDesc = "SUBBASIN"
-                            End If
-                    End Select
+                    lFieldName = DBFKeyFieldName(lCurLayer.Filename).ToLower
+                    lFieldDesc = DBFDescriptionFieldName(lCurLayer.Filename).ToLower
 
-                    lFieldName = lFieldName.ToLower
-                    lFieldDesc = lFieldDesc.ToLower
                     For lField = 0 To lCurLayer.NumFields - 1
                         If lCurLayer.Field(lField).Name.ToLower = lFieldName Then
                             lNameIndex = lField
@@ -189,19 +214,23 @@ Public Module modSDM
                         lShape = g_MapWin.View.SelectedShapes.Item(lSelected).ShapeIndex()
                         lName = ""
                         lDesc = ""
+                        Dim lLoadingHUC12 As Boolean = False
                         If lNameIndex > -1 Then
                             lName = lSf.CellValue(lNameIndex, lShape)
-                            If lName.Length = 8 AndAlso (lFieldName = "cu" OrElse lFieldName = "huc_8") Then 'Make sure HUC-12 layer matching this HUC-8 layer is on the map
-                                LoadHUC12(lName)
+                            If lName.Length = 8 AndAlso (lFieldName = "cu" OrElse lFieldName = "huc_8") AndAlso pBuildFrm.rdoHUC12.Checked Then
+                                lLoadingHUC12 = True
+                                LoadHUC12(lName) 'Make sure HUC-12 layer matching this HUC-8 layer is on the map
                             End If
                         End If
-                        If lDescIndex > -1 Then
-                            lDesc = lSf.CellValue(lDescIndex, lShape)
-                        End If
-                        If (lName & lDesc).Length = 0 Then
-                            ctext &= vbCrLf & "  " & lShape
-                        Else
-                            ctext &= vbCrLf & "  " & lName & " : " & lDesc
+                        If Not lLoadingHUC12 Then
+                            If lDescIndex > -1 Then
+                                lDesc = lSf.CellValue(lDescIndex, lShape)
+                            End If
+                            If (lName & lDesc).Length = 0 Then
+                                ctext &= vbCrLf & "  " & lShape
+                            Else
+                                ctext &= vbCrLf & "  " & lName & " : " & lDesc
+                            End If
                         End If
                     Next
                 End If
@@ -217,11 +246,13 @@ Public Module modSDM
         Dim lHuc8Layer As Integer = -1
         For iLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
             Dim lLayerHandle As Integer = g_MapWin.Layers.GetHandle(iLayer)
-            If g_MapWin.Layers(lLayerHandle).FileName.ToLower.EndsWith("cat.shp") Then
-                lHuc8Layer = lLayerHandle
-            End If
+            Dim lFileNameOnly As String = IO.Path.GetFileName(g_MapWin.Layers(lLayerHandle).FileName).ToLower
+            Select Case lFileNameOnly
+                Case "cat.shp", "huc250d3.shp", "wbdhu8.shp"
+                    Return lLayerHandle
+            End Select
         Next
-        Return lHuc8Layer
+        Return -1
     End Function
 
     ''' <summary>
@@ -234,24 +265,19 @@ Public Module modSDM
         For iLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
             Dim lLayerHandle As Integer = g_MapWin.Layers.GetHandle(iLayer)
             If g_MapWin.Layers(lLayerHandle).FileName.ToLower.Contains("huc12") Then
-                lHuc12Layer = lLayerHandle
+                Return lLayerHandle
             End If
         Next
-        Return lHuc12Layer
+        Return -1
     End Function
 
     Private Sub LoadHUC12(ByVal aHUC8 As String)
         Dim lHUC12ShapeFileName As String = HUC12ShapeFilename(aHUC8).ToLower
         If IO.File.Exists(lHUC12ShapeFileName) Then
-            'See if layer is already on map
-            Dim lHuc12Layer As Integer = -1
-            For iLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
-                Dim lLayerHandle As Integer = g_MapWin.Layers.GetHandle(iLayer)
-                If g_MapWin.Layers(lLayerHandle).FileName.ToLower.Equals(lHUC12ShapeFileName) Then
-                    Exit Sub 'Layer is already on the map
-                End If
-            Next
-        Else 'download HUC-12 layer and add to map
+            If LayerHandle(lHUC12ShapeFileName) >= 0 Then
+                Exit Sub 'Layer is already on the map
+            End If
+        Else 'download HUC-12 layer
             EnsureGlobalCacheSet(IO.Path.GetDirectoryName(g_MapWin.Project.FileName))
             Dim lQuery As String = "<function name='GetBASINS'>" _
                                  & "<arguments>" _

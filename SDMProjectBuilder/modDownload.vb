@@ -39,28 +39,9 @@ Public Module modDownload
                 Dim lCurLayer As MapWinGIS.Shapefile
                 lCurLayer = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
 
-                Dim lLayerFilenameOnly As String = IO.Path.GetFileNameWithoutExtension(lCurLayer.Filename).ToLower
-                Select Case lLayerFilenameOnly
-                    Case "cat", "huc", "huc250d3"
-                        lThemeTag = "HUC8"
-                        lFieldName = "CU"
-                    Case "huc12"
-                        lThemeTag = "HUC12"
-                        lFieldName = "HUC_12"
-                    Case "cnty"
-                        lThemeTag = "county_cd"
-                        lFieldName = "FIPS"
-                    Case "st"
-                        lThemeTag = "state_abbrev"
-                        lFieldName = "ST"
-                    Case Else
-                        If lLayerFilenameOnly.StartsWith("wbdhu8") Then
-                            lThemeTag = "HUC8"
-                            lFieldName = "HUC_8"
-                        End If
-                End Select
+                lFieldName = DBFKeyFieldName(lCurLayer.Filename).ToLower
+                lThemeTag = DBFThemeFieldName(lCurLayer.Filename).ToLower
 
-                lFieldName = lFieldName.ToLower
                 For lField = 0 To lCurLayer.NumFields - 1
                     If lCurLayer.Field(lField).Name.ToLower = lFieldName Then
                         lFieldMatch = lField
@@ -618,9 +599,15 @@ RetryQuery:
     End Sub
 
     Friend Sub LoadSDMPlugins()
-        For lPluginIndex As Integer = SDMPluginNames.GetUpperBound(0) To 0 Step -1
+        Dim lNumSDMPlugins As Integer = SDMPluginNames.Length
+        Logger.Dbg("Load " & lNumSDMPlugins & " SDM Plugins")
+        For lPluginIndex As Integer = 0 To lNumSDMPlugins - 1
+            Logger.Dbg("LoadSDMPlugin " & lPluginIndex)
+            Logger.Dbg("LoadSDMPlugin " & SDMPluginNames(lPluginIndex))
             atcDataManager.LoadPlugin(SDMPluginNames(lPluginIndex))
+            Logger.Dbg("LoadedSDMPlugin " & SDMPluginNames(lPluginIndex))
         Next
+        Logger.Dbg("LoadedSDMPlugins")
     End Sub
 
     'Download new data for an existing project
@@ -846,13 +833,7 @@ RetryQuery:
                            Right(lOutputFileName, 8) = "gage.shp" Or _
                            Right(lOutputFileName, 9) = "wqobs.shp" Then
                             'get handle of this layer
-                            Dim lLayerHandle As Integer = -1
-                            For i As Integer = 0 To g_MapWin.Layers.NumLayers
-                                Dim lLayer As Layer = g_MapWin.Layers(g_MapWin.Layers.GetHandle(i))
-                                If Not (lLayer Is Nothing) AndAlso lLayer.FileName = lOutputFileName Then
-                                    lLayerHandle = g_MapWin.Layers.GetHandle(i)
-                                End If
-                            Next
+                            Dim lLayerHandle As Integer = LayerHandle(lOutputFileName)
                             If lLayerHandle > -1 Then
                                 Dim llayername As String = g_MapWin.Layers(lLayerHandle).Name
                                 Dim lRGBcolor As Integer = RGB(g_MapWin.Layers(lLayerHandle).Color.R, g_MapWin.Layers(lLayerHandle).Color.G, g_MapWin.Layers(lLayerHandle).Color.B)
@@ -977,6 +958,18 @@ RetryQuery:
             ProcessDownloadResult &= lInstructionsNode.Name & ": " & lInstructionsNode.InnerXml
         End If
         Logger.Status("")
+    End Function
+
+    Public Function LayerHandle(ByVal aLayerFilename As String) As Integer
+        aLayerFilename = aLayerFilename.ToLower
+        For lLayerIndex As Integer = g_MapWin.Layers.NumLayers - 1 To 0 Step -1
+            Dim lLayerHandle As Integer = g_MapWin.Layers.GetHandle(lLayerIndex)
+            Dim lLayer As Layer = g_MapWin.Layers(lLayerHandle)
+            If Not (lLayer Is Nothing) AndAlso lLayer.FileName.ToLower = aLayerFilename Then
+                Return lLayerHandle
+            End If
+        Next
+        Return -1
     End Function
 
     Public Function CleanUpUserProjString(ByVal aProjString As String) As String
@@ -1226,17 +1219,12 @@ RetryQuery:
         Dim Group As String = ""
         Dim Visible As Boolean
 
-        Dim MWlay As MapWindow.Interfaces.Layer
-        Dim shpFile As MapWinGIS.Shapefile
-
         'Don't add layer again if we already have it
-        For lLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
-            MWlay = g_MapWin.Layers(g_MapWin.Layers.GetHandle(lLayer))
-            If MWlay.FileName.ToLower = lFileName Then
-                Return MWlay
-            End If
-        Next
-        MWlay = Nothing
+        Dim lLayerHandle As Integer = LayerHandle(lFileName)
+        If lLayerHandle >= 0 Then Return g_MapWin.Layers(lLayerHandle)
+
+        Dim MWlay As MapWindow.Interfaces.Layer = Nothing
+        Dim shpFile As MapWinGIS.Shapefile
 
         Try
             Dim lRendererName As String = GetDefaultRenderer(aFilename)
@@ -1296,7 +1284,7 @@ RetryQuery:
                     SetDemColors(MWlay, shpFile)
                 ElseIf lFileName.EndsWith("huc12.shp") Then
                     Dim lHUC8 As String = IO.Path.GetFileName(IO.Path.GetDirectoryName(shpFile.Filename))
-                    If lHUC8.Length = 8 Then MWlay.Name &= " in " & lHUC8
+                    If lHUC8.Length = 8 AndAlso Not MWlay.Name.Contains(lHUC8) Then MWlay.Name &= " in " & lHUC8
                 End If
                 If Group.Length > 0 Then
                     AddLayerToGroup(MWlay, Group)
@@ -1324,17 +1312,12 @@ RetryQuery:
         Dim Visible As Boolean
         'Dim Style As atcRenderStyle = New atcRenderStyle
 
-        Dim MWlay As MapWindow.Interfaces.Layer
-        Dim g As MapWinGIS.Grid
-
         'Don't add layer again if we already have it
-        For lLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
-            MWlay = g_MapWin.Layers(g_MapWin.Layers.GetHandle(lLayer))
-            If MWlay.FileName.ToLower = aFilename.ToLower Then
-                Return MWlay
-            End If
-        Next
-        MWlay = Nothing
+        Dim lLayerHandle As Integer = LayerHandle(aFilename)
+        If lLayerHandle >= 0 Then Return g_MapWin.Layers(lLayerHandle)
+
+        Dim MWlay As MapWindow.Interfaces.Layer = Nothing
+        Dim g As MapWinGIS.Grid
 
         Try
             GetDefaultRenderer(aFilename)
