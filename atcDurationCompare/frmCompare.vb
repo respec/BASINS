@@ -18,6 +18,13 @@ Public Class frmCompare
             End If
         End If
 
+        'Check if the two timeseries has common starting and ending dates
+        If aTimeseriesGroup(0).Attributes.GetValue("Start Date") <> aTimeseriesGroup(1).Attributes.GetValue("Start Date") Or _
+           aTimeseriesGroup(0).Attributes.GetValue("End Date") <> aTimeseriesGroup(1).Attributes.GetValue("End Date") Then
+            txtReport.Text = "The two timeseries needs to have common start and end dates."
+            Exit Sub
+        End If
+
         Dim lReport As New DurationReport(aClassLimits)
         With txtReport
             .Text = ""
