@@ -51,10 +51,10 @@ Public Class frmAnalysis
 
     Private Sub frmAnalysis_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         lblAnalysisInfo.Text = ""
-        lblAnalysisInfo.Text = "Step1. Select timeseries data" & vbNewLine & _
-                               "Step2. Examine the class limits (use default or create anew)" & vbNewLine & _
-                               "Step3. Choose an anlysis" & vbNewLine & _
-                               "Step4. Click either Graph or Report to carry out analysis and see results"
+        'lblAnalysisInfo.Text = "Step1. Select timeseries data" & vbNewLine & _
+        '                       "Step2. Examine the class limits (use default or create anew)" & vbNewLine & _
+        '                       "Step3. Choose an analysis" & vbNewLine & _
+        '                       "Step4. Click either Graph or Report to carry out analysis and see results"
         lstClassLimits.CurrentValues = DefaultClasses
     End Sub
 
@@ -80,7 +80,6 @@ Public Class frmAnalysis
                 .Text &= Space(2) & "Need to select an additional timeseries."
             End If
         End With
-
 
         ResultForm = CreateForm("compare")
     End Sub

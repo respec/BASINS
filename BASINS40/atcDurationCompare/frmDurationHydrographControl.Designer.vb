@@ -36,10 +36,13 @@ Partial Class frmDurationHydrographControl
         '
         'lstPctExceed
         '
+        Me.lstPctExceed.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstPctExceed.CurrentValues = New Double(-1) {}
         Me.lstPctExceed.Location = New System.Drawing.Point(12, 44)
         Me.lstPctExceed.Name = "lstPctExceed"
-        Me.lstPctExceed.Size = New System.Drawing.Size(202, 294)
+        Me.lstPctExceed.Size = New System.Drawing.Size(213, 292)
         Me.lstPctExceed.TabIndex = 0
         '
         'MenuStrip1
@@ -47,7 +50,7 @@ Partial Class frmDurationHydrographControl
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(230, 24)
+        Me.MenuStrip1.Size = New System.Drawing.Size(237, 24)
         Me.MenuStrip1.TabIndex = 1
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -55,19 +58,19 @@ Partial Class frmDurationHydrographControl
         '
         Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuSelectData, Me.mnuExit})
         Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
-        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(37, 20)
+        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(35, 20)
         Me.FileToolStripMenuItem.Text = "File"
         '
         'mnuSelectData
         '
         Me.mnuSelectData.Name = "mnuSelectData"
-        Me.mnuSelectData.Size = New System.Drawing.Size(152, 22)
+        Me.mnuSelectData.Size = New System.Drawing.Size(140, 22)
         Me.mnuSelectData.Text = "Select Data"
         '
         'mnuExit
         '
         Me.mnuExit.Name = "mnuExit"
-        Me.mnuExit.Size = New System.Drawing.Size(152, 22)
+        Me.mnuExit.Size = New System.Drawing.Size(140, 22)
         Me.mnuExit.Text = "Exit"
         '
         'lblExceedance
@@ -82,7 +85,7 @@ Partial Class frmDurationHydrographControl
         'btnReport
         '
         Me.btnReport.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnReport.Location = New System.Drawing.Point(143, 376)
+        Me.btnReport.Location = New System.Drawing.Point(150, 342)
         Me.btnReport.Name = "btnReport"
         Me.btnReport.Size = New System.Drawing.Size(75, 23)
         Me.btnReport.TabIndex = 3
@@ -92,7 +95,7 @@ Partial Class frmDurationHydrographControl
         'btnGraph
         '
         Me.btnGraph.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnGraph.Location = New System.Drawing.Point(62, 376)
+        Me.btnGraph.Location = New System.Drawing.Point(69, 342)
         Me.btnGraph.Name = "btnGraph"
         Me.btnGraph.Size = New System.Drawing.Size(75, 23)
         Me.btnGraph.TabIndex = 4
@@ -103,7 +106,7 @@ Partial Class frmDurationHydrographControl
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(230, 411)
+        Me.ClientSize = New System.Drawing.Size(237, 377)
         Me.Controls.Add(Me.btnGraph)
         Me.Controls.Add(Me.btnReport)
         Me.Controls.Add(Me.lblExceedance)

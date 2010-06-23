@@ -70,22 +70,29 @@ Public Class frmDurationHydrographControl
             Logger.Dbg("Duration Hydrograph analysis failed to initialize result form")
             Exit Sub
         End If
-        If Not ListOK() Then
-            Logger.Dbg("List of percent exceedance levels contains invalid entries")
-            Exit Sub
-        End If
+
+        Dim lListPct As List(Of Double) = ListOK()
+
         If DataGroup.Count = 0 Then
             mnuSelectData_Click(Nothing, Nothing)
         End If
+        Dim ltxtBox As Windows.Forms.TextBox = Nothing
         Select Case ResultForm.Name
             Case "frmResult"
                 If ResultForm.IsDisposed Then
                     ResultForm = Nothing
                     ResultForm = CreateForm("durationhydrograph")
                 End If
-                CType(ResultForm, frmResult).Initialize("DurationHydrograph", DataGroup, lstPctExceed.CurrentValues)
+                With CType(ResultForm, frmResult)
+                    .Initialize("DurationHydrograph", DataGroup, lListPct.ToArray())
+                    ltxtBox = .txtReport
+                End With
+
         End Select
         ResultForm.Show()
+        If ltxtBox IsNot Nothing Then
+            ltxtBox.SelectionLength = 0
+        End If
     End Sub
 
     Private Sub mnuSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectData.Click
@@ -93,8 +100,11 @@ Public Class frmDurationHydrographControl
     End Sub
 
     Private Sub mnuExit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuExit.Click
-        pDataGroup.Clear()
-        pDataGroup = Nothing
+        If pDataGroup IsNot Nothing Then
+            pDataGroup.Clear()
+            pDataGroup = Nothing
+        End If
+        Me.Close()
     End Sub
 
 #Region "Util"
@@ -121,26 +131,20 @@ Public Class frmDurationHydrographControl
         Return lFrm
     End Function
 
-    Private Function ListOK() As Boolean
+    Private Function ListOK() As List(Of Double)
         Dim lDict As New Dictionary(Of Double, Integer)
-
+        Dim lList As New List(Of Double)
         For Each lPct As Double In lstPctExceed.CurrentValues
-            If lPct < 0.0 Or lPct > 1.0 Then
-                Return False
-            End If
-            If lDict.Keys.Contains(lPct) Then
-                lDict(lPct) = 2
-            Else
-                lDict.Add(lPct, 1)
+            If lPct >= 0.0 AndAlso lPct <= 1.0 Then
+                If Not lList.Contains(lPct) Then
+                    lList.Add(lPct)
+                End If
             End If
         Next
-        For Each lKey As Double In lDict.Keys
-            If lDict(lKey) = 2 Then
-                lstPctExceed.CurrentValues = lDict.Keys.ToArray()
-                Return True
-            End If
-        Next
-        Return True
+        If Not lList.Contains(0) Then lList.Add(0)
+        If Not lList.Contains(1) Then lList.Add(1)
+        lList.Sort()
+        Return lList
     End Function
 
 #End Region

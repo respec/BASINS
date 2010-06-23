@@ -7,7 +7,7 @@ Public Class atcSeasonsMonthDay
     Shared ndaymon() As Integer = {0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 
     Public Overrides Function Clone() As atcSeasonBase
-        Dim lNewSeason As New atcSeasonsDayOfYear
+        Dim lNewSeason As New atcSeasonsMonthDay
         lNewSeason.SeasonsSelected = SeasonsSelected
         Return lNewSeason
     End Function

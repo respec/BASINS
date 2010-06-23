@@ -112,7 +112,6 @@ Public Class frmDuration
     End Sub
 
     Private Sub frmDuration_Disposed(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Disposed
-        pDataGroup.Clear()
         pDataGroup = Nothing
         pClassLimits = Nothing
     End Sub
