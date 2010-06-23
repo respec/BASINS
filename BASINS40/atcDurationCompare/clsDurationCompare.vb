@@ -22,7 +22,7 @@ Public Class clsHspfSupportPlugin
         'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_Duration", atcDataManager.AnalysisMenuName, "Duration", Me.Icon, , , True))
         'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_Compare", atcDataManager.AnalysisMenuName, "Compare", Me.Icon, , , True))
         pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_DurationCompare", atcDataManager.AnalysisMenuName, "Duration/Compare", Me.Icon, , , True))
-        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_DurationHydrograph", atcDataManager.AnalysisMenuName, "DurationHydrograph", Me.Icon, , , True))
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_DurationHydrograph", atcDataManager.AnalysisMenuName, "Duration Hydrograph", Me.Icon, , , True))
     End Sub
 
     'Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
@@ -68,10 +68,6 @@ Public Class clsHspfSupportPlugin
             If lTimeseriesGroup.Count > 0 Then
                 Dim lfrmDHControl As New frmDurationHydrographControl(lTimeseriesGroup)
                 lfrmDHControl.Show()
-
-                'Dim lStr As String = DurationHydrograph(lTimeseriesGroup(0))
-                ''MsgBox(lStr)
-                'SaveFileString("C:\Temp\DurationHydrograph\Test8.txt", lStr)
             End If
         End If
     End Sub

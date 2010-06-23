@@ -83,6 +83,12 @@ Public Class frmResult
     End Sub
 
     Public Overridable Function doPlot(ByRef aDatagroup As atcDataGroup) As Boolean
+        Select Case pAnalysis.ToLower
+            Case "duration"
+            Case "compare"
+            Case "durationhydrograph"
+                doPlotDH(aDatagroup)
+        End Select
         Return True
     End Function
 
