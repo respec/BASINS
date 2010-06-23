@@ -229,7 +229,7 @@ Public Class atcSeasonBase
     ''' <summary>
     ''' Integer ArrayList containing SeasonIndex of selected seasons
     ''' </summary>
-    Protected Overridable Property SeasonsSelected() As ArrayList
+    Public Overridable Property SeasonsSelected() As ArrayList
         Get
             Return pSeasonsSelected.Clone
         End Get

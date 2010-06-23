@@ -87,11 +87,15 @@ Public Class frmResult
     End Function
 
     Public Overridable Sub doReportDH(ByVal aTimeseriesGroup As atcDataGroup, ByVal aClassLimits As Double())
+        Dim lStrbuilder As New Text.StringBuilder
         For Each lTS In aTimeseriesGroup
-            txtReport.Text &= DurationHydrograph(lTS, aClassLimits)
+            lStrbuilder.AppendLine(DurationHydrograph(lTS, aClassLimits))
         Next
+        txtReport.Text = lStrbuilder.ToString
     End Sub
+
     Private Sub DataGroupChanged() Handles pDataGroup.Added, pDataGroup.Removed
+        doReportDH(pDataGroup, pClassLimits)
     End Sub
 
     Private Sub mnuSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectData.Click
@@ -99,8 +103,10 @@ Public Class frmResult
     End Sub
 
     Private Sub frmResult_Disposed(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Disposed
-        pDataGroup.Clear()
         pDataGroup = Nothing
         pClassLimits = Nothing
+    End Sub
+
+    Private Sub frmResult_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
     End Sub
 End Class

@@ -28,6 +28,7 @@ Partial Class frmAnalysis
         Me.gbClassLimits = New System.Windows.Forms.GroupBox
         Me.lstClassLimits = New atcControls.atcManagedList
         Me.gbChooseAnalysis = New System.Windows.Forms.GroupBox
+        Me.lblAnalysisInfo = New System.Windows.Forms.TextBox
         Me.rdoAnalysisCompare = New System.Windows.Forms.RadioButton
         Me.rdoAnalysisDuration = New System.Windows.Forms.RadioButton
         Me.menuStrip = New System.Windows.Forms.MenuStrip
@@ -35,7 +36,6 @@ Partial Class frmAnalysis
         Me.SelectDataToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.CtlClassLimits1 = New atcDurationCompare.ctlClassLimits
-        Me.lblAnalysisInfo = New System.Windows.Forms.TextBox
         Me.gbClassLimits.SuspendLayout()
         Me.gbChooseAnalysis.SuspendLayout()
         Me.menuStrip.SuspendLayout()
@@ -53,7 +53,7 @@ Partial Class frmAnalysis
         '
         Me.btnReport.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnReport.DialogResult = System.Windows.Forms.DialogResult.OK
-        Me.btnReport.Location = New System.Drawing.Point(303, 365)
+        Me.btnReport.Location = New System.Drawing.Point(307, 365)
         Me.btnReport.Name = "btnReport"
         Me.btnReport.Size = New System.Drawing.Size(75, 23)
         Me.btnReport.TabIndex = 4
@@ -64,7 +64,7 @@ Partial Class frmAnalysis
         '
         Me.btnGraph.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnGraph.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnGraph.Location = New System.Drawing.Point(222, 365)
+        Me.btnGraph.Location = New System.Drawing.Point(226, 365)
         Me.btnGraph.Name = "btnGraph"
         Me.btnGraph.Size = New System.Drawing.Size(75, 23)
         Me.btnGraph.TabIndex = 3
@@ -73,23 +73,22 @@ Partial Class frmAnalysis
         '
         'gbClassLimits
         '
+        Me.gbClassLimits.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.gbClassLimits.Controls.Add(Me.lstClassLimits)
-        Me.gbClassLimits.Location = New System.Drawing.Point(165, 29)
+        Me.gbClassLimits.Location = New System.Drawing.Point(165, 27)
         Me.gbClassLimits.Name = "gbClassLimits"
-        Me.gbClassLimits.Size = New System.Drawing.Size(219, 200)
+        Me.gbClassLimits.Size = New System.Drawing.Size(217, 200)
         Me.gbClassLimits.TabIndex = 5
         Me.gbClassLimits.TabStop = False
         Me.gbClassLimits.Text = "Class Limits"
         '
         'lstClassLimits
         '
-        Me.lstClassLimits.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstClassLimits.CurrentValues = New Double(-1) {}
-        Me.lstClassLimits.Location = New System.Drawing.Point(7, 20)
+        Me.lstClassLimits.Location = New System.Drawing.Point(6, 19)
         Me.lstClassLimits.Name = "lstClassLimits"
-        Me.lstClassLimits.Size = New System.Drawing.Size(202, 174)
+        Me.lstClassLimits.Size = New System.Drawing.Size(207, 175)
         Me.lstClassLimits.TabIndex = 0
         '
         'gbChooseAnalysis
@@ -100,12 +99,27 @@ Partial Class frmAnalysis
         Me.gbChooseAnalysis.Controls.Add(Me.lblAnalysisInfo)
         Me.gbChooseAnalysis.Controls.Add(Me.rdoAnalysisCompare)
         Me.gbChooseAnalysis.Controls.Add(Me.rdoAnalysisDuration)
-        Me.gbChooseAnalysis.Location = New System.Drawing.Point(12, 235)
+        Me.gbChooseAnalysis.Location = New System.Drawing.Point(12, 233)
         Me.gbChooseAnalysis.Name = "gbChooseAnalysis"
-        Me.gbChooseAnalysis.Size = New System.Drawing.Size(372, 119)
+        Me.gbChooseAnalysis.Size = New System.Drawing.Size(370, 126)
         Me.gbChooseAnalysis.TabIndex = 8
         Me.gbChooseAnalysis.TabStop = False
         Me.gbChooseAnalysis.Text = "Choose Analysis"
+        '
+        'lblAnalysisInfo
+        '
+        Me.lblAnalysisInfo.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblAnalysisInfo.BackColor = System.Drawing.SystemColors.Control
+        Me.lblAnalysisInfo.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.lblAnalysisInfo.Location = New System.Drawing.Point(7, 43)
+        Me.lblAnalysisInfo.Multiline = True
+        Me.lblAnalysisInfo.Name = "lblAnalysisInfo"
+        Me.lblAnalysisInfo.ReadOnly = True
+        Me.lblAnalysisInfo.Size = New System.Drawing.Size(357, 77)
+        Me.lblAnalysisInfo.TabIndex = 5
+        Me.lblAnalysisInfo.Text = "lblAnalysisInfo"
         '
         'rdoAnalysisCompare
         '
@@ -135,7 +149,7 @@ Partial Class frmAnalysis
         Me.menuStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFile})
         Me.menuStrip.Location = New System.Drawing.Point(0, 0)
         Me.menuStrip.Name = "menuStrip"
-        Me.menuStrip.Size = New System.Drawing.Size(390, 24)
+        Me.menuStrip.Size = New System.Drawing.Size(394, 24)
         Me.menuStrip.TabIndex = 11
         Me.menuStrip.Text = "MenuStrip1"
         '
@@ -160,33 +174,18 @@ Partial Class frmAnalysis
         '
         'CtlClassLimits1
         '
-        Me.CtlClassLimits1.Location = New System.Drawing.Point(12, 29)
+        Me.CtlClassLimits1.Location = New System.Drawing.Point(12, 27)
         Me.CtlClassLimits1.Name = "CtlClassLimits1"
         Me.CtlClassLimits1.NumClasses = 0
         Me.CtlClassLimits1.Size = New System.Drawing.Size(147, 200)
         Me.CtlClassLimits1.TabIndex = 9
-        '
-        'txtAnalysisInfo
-        '
-        Me.lblAnalysisInfo.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblAnalysisInfo.BackColor = System.Drawing.SystemColors.Control
-        Me.lblAnalysisInfo.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.lblAnalysisInfo.Location = New System.Drawing.Point(7, 43)
-        Me.lblAnalysisInfo.Multiline = True
-        Me.lblAnalysisInfo.Name = "txtAnalysisInfo"
-        Me.lblAnalysisInfo.ReadOnly = True
-        Me.lblAnalysisInfo.Size = New System.Drawing.Size(352, 70)
-        Me.lblAnalysisInfo.TabIndex = 5
-        Me.lblAnalysisInfo.Text = "test see how it looks"
         '
         'frmAnalysis
         '
         Me.AcceptButton = Me.btnReport
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(390, 400)
+        Me.ClientSize = New System.Drawing.Size(394, 400)
         Me.Controls.Add(Me.CtlClassLimits1)
         Me.Controls.Add(Me.gbChooseAnalysis)
         Me.Controls.Add(Me.btnGraph)

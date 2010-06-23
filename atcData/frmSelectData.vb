@@ -1274,7 +1274,7 @@ NextName:
             groupSelected.Text = "Selected Data (" & pSelectedGroup.Count & ")"
         End If
         Try
-            If mnuSelectMap IsNot Nothing AndAlso mnuSelectMap.Checked AndAlso pSelectedGroup IsNot Nothing Then
+            If mnuSelectMap IsNot Nothing AndAlso mnuSelectMap.Name.Length > 0 AndAlso mnuSelectMap.Checked AndAlso pSelectedGroup IsNot Nothing Then
                 atcDataManager.SelectLocationsOnMap(pSelectedGroup.SortedAttributeValues("Location"), True)
             End If
         Catch

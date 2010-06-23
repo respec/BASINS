@@ -1349,7 +1349,7 @@ G200:
         Dim lMax As Double = -1000000.0#
         Dim vmin(fddat.Count - 1) As Double
         Dim vmax(fddat.Count - 1) As Double
-        Dim i, j, iexp, l, nci As Long
+        Dim i, j, iexp, l As Long
         Dim bound(1) As Single
         Dim cr, clog As Single
         Dim clas(aNumFDclasses) As Double

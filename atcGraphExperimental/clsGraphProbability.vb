@@ -43,27 +43,29 @@ Public Class clsGraphProbability
     End Sub
 
     Overrides Sub pDataGroup_Removed(ByVal aRemoved As atcUtility.atcCollection)
-        Dim lCurveList As ZedGraph.CurveList = MyBase.pZgc.MasterPane.PaneList.Item(0).CurveList
+        If aRemoved IsNot Nothing Then
+            Dim lCurveList As ZedGraph.CurveList = MyBase.pZgc.MasterPane.PaneList.Item(0).CurveList
 
-        Dim lCurveListAux As ZedGraph.CurveList = Nothing
-        If MyBase.pZgc.MasterPane.PaneList.Count > 1 Then
-            lCurveListAux = MyBase.pZgc.MasterPane.PaneList.Item(1).CurveList
-        End If
-        Dim lCurve As ZedGraph.CurveItem
-        For Each lTs As atcTimeseries In aRemoved
-            lCurve = lCurveList.Item(TSCurveLabel(lTs))
-            If lCurve Is Nothing Then
-                If Not lCurveListAux Is Nothing Then
-                    lCurve = lCurveListAux.Item(TSCurveLabel(lTs))
-                    If Not lCurve Is Nothing Then
-                        lCurveListAux.Remove(lCurve)
-                    End If
-                End If
-            Else
-                lCurveList.Remove(lCurve)
+            Dim lCurveListAux As ZedGraph.CurveList = Nothing
+            If MyBase.pZgc.MasterPane.PaneList.Count > 1 Then
+                lCurveListAux = MyBase.pZgc.MasterPane.PaneList.Item(1).CurveList
             End If
-        Next
-        pZgc.Refresh()
+            Dim lCurve As ZedGraph.CurveItem
+            For Each lTs As atcTimeseries In aRemoved
+                lCurve = lCurveList.Item(TSCurveLabel(lTs))
+                If lCurve Is Nothing Then
+                    If Not lCurveListAux Is Nothing Then
+                        lCurve = lCurveListAux.Item(TSCurveLabel(lTs))
+                        If Not lCurve Is Nothing Then
+                            lCurveListAux.Remove(lCurve)
+                        End If
+                    End If
+                Else
+                    lCurveList.Remove(lCurve)
+                End If
+            Next
+            pZgc.Refresh()
+        End If
     End Sub
 
     Private Sub AddDatasetCurve(ByVal aTimeseries As atcTimeseries, _
