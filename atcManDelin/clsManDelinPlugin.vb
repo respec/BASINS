@@ -157,7 +157,8 @@ Public Class ManDelinPlugIn
 
     Public Shared Sub CalculateSubbasinParameters(ByVal aSubBasinThemeName As String, ByVal aElevationThemeName As String, _
                                            Optional ByVal aElevUnits As String = "Meters")
-        Logger.Status("Calculating...")
+        Logger.Progress("Calculating SubbasinParameters", 0, 3)
+
         Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(aSubBasinThemeName)
         Dim lElevationLayerIndex As Integer = GisUtil.LayerIndex(aElevationThemeName)
 
@@ -207,64 +208,65 @@ Public Class ManDelinPlugIn
             lSlopeFieldIndex = GisUtil.AddField(lSubbasinLayerIndex, "SLO1", 2, 10)
         End If
 
-        Dim lSlope As Double
-        If GisUtil.LayerType(lElevationLayerIndex) = 3 Then 'shapefile
-            Logger.Status("Calculating Slope from Elevation Shapefile")
-            Dim lSubbasinCount As Integer = GisUtil.NumFeatures(lSubbasinLayerIndex)
-            Dim lElevationShapeCount As Integer = GisUtil.NumFeatures(lElevationLayerIndex)
-            Dim lElevationFieldIndex As Integer = GisUtil.FieldIndex(lElevationLayerIndex, "ELEV_M")
-            Dim lElevationIndex(lElevationShapeCount) As Integer
-            GisUtil.AssignContainingPolygons(lElevationLayerIndex, lSubbasinLayerIndex, lElevationIndex)
-            For lSubbasinIndex As Integer = 1 To lSubbasinCount
-                Logger.Progress(lSubbasinIndex, lSubbasinCount)
-                Dim lElevMin As Double = 99999999
-                Dim lElevMax As Double = -99999999
-                Dim lElev As Double
-                For lElevationShapeIndex As Integer = 1 To lElevationShapeCount
-                    'npercent = 100 * i * j / ntot
-                    'If npercent > lastpercent Then
-                    '  lblCalc.Text = "Calculating (" & npercent & "%)"
-                    '  lastpercent = npercent
-                    '  Me.Refresh()
-                    'End If
-                    If lElevationIndex(lElevationShapeIndex) = lSubbasinIndex - 1 Then
-                        lElev = GisUtil.FieldValue(lElevationLayerIndex, lElevationShapeIndex - 1, lElevationFieldIndex)
-                        If lElev > lElevMax Then
-                            lElevMax = lElev
+        Using lLevel As New ProgressLevel(True)
+            Dim lSlope As Double
+            If GisUtil.LayerType(lElevationLayerIndex) = 3 Then 'shapefile
+                Logger.Status("Calculating Slope from Elevation Shapefile")
+                Dim lSubbasinCount As Integer = GisUtil.NumFeatures(lSubbasinLayerIndex)
+                Dim lElevationShapeCount As Integer = GisUtil.NumFeatures(lElevationLayerIndex)
+                Dim lElevationFieldIndex As Integer = GisUtil.FieldIndex(lElevationLayerIndex, "ELEV_M")
+                Dim lElevationIndex(lElevationShapeCount) As Integer
+                GisUtil.AssignContainingPolygons(lElevationLayerIndex, lSubbasinLayerIndex, lElevationIndex)
+                For lSubbasinIndex As Integer = 1 To lSubbasinCount
+                    Logger.Progress(lSubbasinIndex, lSubbasinCount)
+                    Dim lElevMin As Double = 99999999
+                    Dim lElevMax As Double = -99999999
+                    Dim lElev As Double
+                    For lElevationShapeIndex As Integer = 1 To lElevationShapeCount
+                        'npercent = 100 * i * j / ntot
+                        'If npercent > lastpercent Then
+                        '  lblCalc.Text = "Calculating (" & npercent & "%)"
+                        '  lastpercent = npercent
+                        '  Me.Refresh()
+                        'End If
+                        If lElevationIndex(lElevationShapeIndex) = lSubbasinIndex - 1 Then
+                            lElev = GisUtil.FieldValue(lElevationLayerIndex, lElevationShapeIndex - 1, lElevationFieldIndex)
+                            If lElev > lElevMax Then
+                                lElevMax = lElev
+                            End If
+                            If lElev < lElevMin Then
+                                lElevMin = lElev
+                            End If
                         End If
-                        If lElev < lElevMin Then
-                            lElevMin = lElev
-                        End If
-                    End If
-                Next lElevationShapeIndex
-                'store in slope field as percent
-                'estimate slope as the difference between max and min elevations / square root of subbasin area -- better approx?
-                lSlope = (lElevMax - lElevMin) / ((GisUtil.FeatureArea(lSubbasinLayerIndex, lSubbasinIndex - 1)) ^ 0.5)
-                If aElevUnits = "Meters" Then
-                    lSlope *= 100
-                ElseIf aElevUnits = "Feet" Then
-                    lSlope = lSlope * 100 / 3.281
-                End If
-                GisUtil.SetFeatureValue(lSubbasinLayerIndex, lSlopeFieldIndex, lSubbasinIndex - 1, lSlope)
-            Next lSubbasinIndex
-        Else 'grid
-            Logger.Status("Calculating Slope from Elevation Grid")
-            Dim lSubbasinCount As Integer = GisUtil.NumFeatures(lSubbasinLayerIndex)
-            For lSubbasinIndex As Integer = 1 To lSubbasinCount
-                Logger.Status("Calculating Slope from Elevation Grid")
-                Logger.Progress(lSubbasinIndex, lSubbasinCount)
-                'store in slope field as percent
-                If GisUtil.FieldValue(lSubbasinLayerIndex, lSubbasinIndex - 1, lSlopeFieldIndex) <= 0 Then
-                    lSlope = GisUtil.GridSlopeInPolygon(lElevationLayerIndex, lSubbasinLayerIndex, lSubbasinIndex - 1)
+                    Next lElevationShapeIndex
+                    'store in slope field as percent
+                    'estimate slope as the difference between max and min elevations / square root of subbasin area -- better approx?
+                    lSlope = (lElevMax - lElevMin) / ((GisUtil.FeatureArea(lSubbasinLayerIndex, lSubbasinIndex - 1)) ^ 0.5)
                     If aElevUnits = "Meters" Then
                         lSlope *= 100
                     ElseIf aElevUnits = "Feet" Then
                         lSlope = lSlope * 100 / 3.281
                     End If
                     GisUtil.SetFeatureValue(lSubbasinLayerIndex, lSlopeFieldIndex, lSubbasinIndex - 1, lSlope)
-                End If
-            Next lSubbasinIndex
-        End If
+                Next lSubbasinIndex
+            Else 'grid
+                Logger.Status("Calculating Slope from Elevation Grid")
+                Dim lSubbasinCount As Integer = GisUtil.NumFeatures(lSubbasinLayerIndex)
+                For lSubbasinIndex As Integer = 1 To lSubbasinCount
+                    Logger.Progress(lSubbasinIndex, lSubbasinCount)
+                    'store in slope field as percent
+                    If GisUtil.FieldValue(lSubbasinLayerIndex, lSubbasinIndex - 1, lSlopeFieldIndex) <= 0 Then
+                        lSlope = GisUtil.GridSlopeInPolygon(lElevationLayerIndex, lSubbasinLayerIndex, lSubbasinIndex - 1)
+                        If aElevUnits = "Meters" Then
+                            lSlope *= 100
+                        ElseIf aElevUnits = "Feet" Then
+                            lSlope = lSlope * 100 / 3.281
+                        End If
+                        GisUtil.SetFeatureValue(lSubbasinLayerIndex, lSlopeFieldIndex, lSubbasinIndex - 1, lSlope)
+                    End If
+                Next lSubbasinIndex
+            End If
+        End Using
 
         'calculate length of overland flow plane
         'this is computed in WinHSPF based on slope, no need to compute here
@@ -301,25 +303,27 @@ Public Class ManDelinPlugIn
         '  GisUtil.SetFeatureValue(SubbasinLayerIndex, LengthFieldIndex, i - 1, sl)
         'Next i
 
-        'set area of each subbasin
-        Logger.Status("Calculating Areas")
-        Dim lAreaAcresFieldIndex As Integer
-        If GisUtil.IsField(lSubbasinLayerIndex, "AREAACRES") Then
-            lAreaAcresFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, "AREAACRES")
-        Else 'need to add it
-            lAreaAcresFieldIndex = GisUtil.AddField(lSubbasinLayerIndex, "AREAACRES", 2, 10)
-        End If
-        Dim lAreaMi2FieldIndex As Integer
-        If GisUtil.IsField(lSubbasinLayerIndex, "AREAMI2") Then
-            lAreaMi2FieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, "AREAMI2")
-        Else 'need to add it
-            lAreaMi2FieldIndex = GisUtil.AddField(lSubbasinLayerIndex, "AREAMI2", 2, 10)
-        End If
-        For lSubbasinsIndex As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
-            Dim lArea As Double = GisUtil.FeatureArea(lSubbasinLayerIndex, lSubbasinsIndex - 1)
-            GisUtil.SetFeatureValue(lSubbasinLayerIndex, lAreaAcresFieldIndex, lSubbasinsIndex - 1, lArea / 4046.86)
-            GisUtil.SetFeatureValue(lSubbasinLayerIndex, lAreaMi2FieldIndex, lSubbasinsIndex - 1, lArea / 2589988)
-        Next lSubbasinsIndex
+        Using lLevel As New ProgressLevel(True)
+            'set area of each subbasin
+            Logger.Status("Calculating Areas")
+            Dim lAreaAcresFieldIndex As Integer
+            If GisUtil.IsField(lSubbasinLayerIndex, "AREAACRES") Then
+                lAreaAcresFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, "AREAACRES")
+            Else 'need to add it
+                lAreaAcresFieldIndex = GisUtil.AddField(lSubbasinLayerIndex, "AREAACRES", 2, 10)
+            End If
+            Dim lAreaMi2FieldIndex As Integer
+            If GisUtil.IsField(lSubbasinLayerIndex, "AREAMI2") Then
+                lAreaMi2FieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, "AREAMI2")
+            Else 'need to add it
+                lAreaMi2FieldIndex = GisUtil.AddField(lSubbasinLayerIndex, "AREAMI2", 2, 10)
+            End If
+            For lSubbasinsIndex As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
+                Dim lArea As Double = GisUtil.FeatureArea(lSubbasinLayerIndex, lSubbasinsIndex - 1)
+                GisUtil.SetFeatureValue(lSubbasinLayerIndex, lAreaAcresFieldIndex, lSubbasinsIndex - 1, lArea / 4046.86)
+                GisUtil.SetFeatureValue(lSubbasinLayerIndex, lAreaMi2FieldIndex, lSubbasinsIndex - 1, lArea / 2589988)
+            Next lSubbasinsIndex
+        End Using
         Logger.Status("")
     End Sub
 
@@ -719,12 +723,14 @@ Public Class ManDelinPlugIn
         Dim lReachSubbasinFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "SUBBASIN", 1, 10)
         Dim lDownstreamFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "SUBBASINR", 1, 10)
 
+        Dim lNumStreams As Integer = GisUtil.NumFeatures(lStreamsLayerIndex)
+
         'set length of stream reach
         Dim lLengthFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "LEN2", 2, 10)
         If lLengthFieldIndex < aMinField Then aMinField = lLengthFieldIndex
         Dim r As Double
         Dim i As Integer
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+        For i = 1 To lNumStreams
             r = GisUtil.FeatureLength(lStreamsLayerIndex, i - 1)
             GisUtil.SetFeatureValue(lStreamsLayerIndex, lLengthFieldIndex, i - 1, r)
         Next i
@@ -734,7 +740,7 @@ Public Class ManDelinPlugIn
         Dim dval As String
         Dim AreaFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "LAREA", 2, 10)
         If AreaFieldIndex < aMinField Then aMinField = AreaFieldIndex
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+        For i = 1 To lNumStreams
             rval = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lReachSubbasinFieldIndex)
             For lSubbasinIndex As Integer = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
                 dval = GisUtil.FieldValue(lSubbasinLayerIndex, lSubbasinIndex - 1, lSubbasinFieldIndex)
@@ -752,12 +758,12 @@ Public Class ManDelinPlugIn
         Dim tAreaFieldIndex As Integer
         tAreaFieldIndex = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "TAREA", 2, 20)
         If tAreaFieldIndex < aMinField Then aMinField = tAreaFieldIndex
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+        For i = 1 To lNumStreams
             r = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, AreaFieldIndex)
             GisUtil.SetFeatureValue(lStreamsLayerIndex, tAreaFieldIndex, i - 1, r)
         Next i
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
-            Logger.Progress(i, GisUtil.NumFeatures(lStreamsLayerIndex))
+        For i = 1 To lNumStreams
+            Logger.Progress(i, lNumStreams)
             System.Windows.Forms.Application.DoEvents()
             r2 = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, AreaFieldIndex)                        'local area of this one
             rval = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lReachSubbasinFieldIndex)
@@ -767,7 +773,7 @@ Public Class ManDelinPlugIn
             Do While dval > 0
                 'Logger.Dbg("ManDelin:" & dval & " downstream of " & rval)
                 bfound = False
-                For lStreamIndexDownstream As Integer = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+                For lStreamIndexDownstream As Integer = 1 To lNumStreams
                     rval = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndexDownstream - 1, lReachSubbasinFieldIndex)
                     If rval = dval Then 'this is the one
                         r = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndexDownstream - 1, tAreaFieldIndex)   'total area of downstream one
@@ -786,7 +792,7 @@ Public Class ManDelinPlugIn
         'add total contributing area in acres and square miles
         Dim AreaAcresFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "TAREAACRES", 2, 20)
         Dim AreaMi2FieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "TAREAMI2", 2, 10)
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+        For i = 1 To lNumStreams
             r = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, tAreaFieldIndex)
             GisUtil.SetFeatureValue(lStreamsLayerIndex, AreaAcresFieldIndex, i - 1, r / 4046.86)
             GisUtil.SetFeatureValue(lStreamsLayerIndex, AreaMi2FieldIndex, i - 1, r / 2589988)
@@ -795,7 +801,7 @@ Public Class ManDelinPlugIn
         'set stream width based on upstream area
         Dim lFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "WID2", 2, 10)
         If lFieldIndex < aMinField Then aMinField = lFieldIndex
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+        For i = 1 To lNumStreams
             r = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, tAreaFieldIndex)
             r2 = (1.29) * ((r / 1000000) ^ (0.6))
             GisUtil.SetFeatureValue(lStreamsLayerIndex, lFieldIndex, i - 1, r2)
@@ -804,7 +810,7 @@ Public Class ManDelinPlugIn
         'set depth based on upstream area
         lFieldIndex = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "DEP2", 2, 10)
         If lFieldIndex < aMinField Then aMinField = lFieldIndex
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+        For i = 1 To lNumStreams
             r = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, tAreaFieldIndex)
             r2 = (0.13) * ((r / 1000000) ^ (0.4))
             GisUtil.SetFeatureValue(lStreamsLayerIndex, lFieldIndex, i - 1, r2)
@@ -825,7 +831,7 @@ Public Class ManDelinPlugIn
         Dim gmax As Integer
         Dim gtemp As Integer
         Dim lElevationLayerIndex As Integer = GisUtil.LayerIndex(aElevationThemeName)
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+        For i = 1 To lNumStreams
             'return end points of stream segment
             GisUtil.EndPointsOfLine(lStreamsLayerIndex, i - 1, x1, y1, x2, y2)
             If GisUtil.LayerType(lElevationLayerIndex) = 3 Then
@@ -858,11 +864,16 @@ Public Class ManDelinPlugIn
         'set slope of stream reach
         lFieldIndex = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "SLO2", 2, 10)
         If lFieldIndex < aMinField Then aMinField = lFieldIndex
-        For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+        For i = 1 To lNumStreams
             gmin = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lMinElevFieldIndex)
             gmax = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lMaxElevFieldIndex)
             gtemp = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lLengthFieldIndex)
-            GisUtil.SetFeatureValue(lStreamsLayerIndex, lFieldIndex, i - 1, (gmax - gmin) * 100 / gtemp)
+            Try
+                GisUtil.SetFeatureValue(lStreamsLayerIndex, lFieldIndex, i - 1, (gmax - gmin) * 100 / gtemp)
+            Catch e As Exception
+                Logger.Dbg("Unable to calculate slope for stream index " & lStreamsLayerIndex & " " & e.Message)
+                GisUtil.SetFeatureValue(lStreamsLayerIndex, lFieldIndex, i - 1, 100)
+            End Try
         Next i
 
         'set name of each stream reach
@@ -878,7 +889,7 @@ Public Class ManDelinPlugIn
             NameFieldIndex = GisUtil.FieldIndex(lStreamsLayerIndex, "GNIS_NAME")
         End If
         If NameFieldIndex > -1 Then
-            For i = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+            For i = 1 To lNumStreams
                 Name = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, NameFieldIndex)
                 GisUtil.SetFeatureValue(lStreamsLayerIndex, lFieldIndex, i - 1, Name)
             Next i
@@ -887,7 +898,7 @@ Public Class ManDelinPlugIn
         NameFieldIndex = GisUtil.FieldIndexAddIfMissing(lSubbasinLayerIndex, "BNAME", 0, 20)
         For i = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
             dval = GisUtil.FieldValue(lSubbasinLayerIndex, i - 1, lSubbasinFieldIndex)
-            For lSteamIndex As Integer = 1 To GisUtil.NumFeatures(lStreamsLayerIndex)
+            For lSteamIndex As Integer = 1 To lNumStreams
                 rval = GisUtil.FieldValue(lStreamsLayerIndex, lSteamIndex - 1, lReachSubbasinFieldIndex)
                 If rval = dval Then
                     'this is the one

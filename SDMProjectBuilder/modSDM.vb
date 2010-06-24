@@ -261,7 +261,6 @@ Public Module modSDM
     ''' <returns></returns>
     ''' <remarks></remarks>
     Friend Function Huc12Layer() As Integer
-        Dim lHuc12Layer As Integer = -1
         For iLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
             Dim lLayerHandle As Integer = g_MapWin.Layers.GetHandle(iLayer)
             If g_MapWin.Layers(lLayerHandle).FileName.ToLower.Contains("huc12") Then
@@ -271,7 +270,7 @@ Public Module modSDM
         Return -1
     End Function
 
-    Private Sub LoadHUC12(ByVal aHUC8 As String)
+    Friend Sub LoadHUC12(ByVal aHUC8 As String)
         Dim lHUC12ShapeFileName As String = HUC12ShapeFilename(aHUC8).ToLower
         If IO.File.Exists(lHUC12ShapeFileName) Then
             If LayerHandle(lHUC12ShapeFileName) >= 0 Then
@@ -307,6 +306,7 @@ Public Module modSDM
         If IO.File.Exists(lHUC12ShapeFileName) Then
             ProcessDownloadResults("<success><add_shape>" & lHUC12ShapeFileName & "</add_shape></success>")
         End If
+        Logger.Status("")
     End Sub
 
     Private Function HUC12ShapeFilename(ByVal aHUC8) As String

@@ -110,7 +110,7 @@ Public Class atcBasinsPlugIn
             If pStatusMonitor.StartMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), _
                                             g_ProgramDir & "cache\log" & g_PathChar, _
                                             System.Diagnostics.Process.GetCurrentProcess.Id) Then
-                'put our seperate executable status monitor (StatusMonitor.exe) between the Logger and the default MW status monitor
+                'put our status monitor (StatusMonitor.exe) between the Logger and the default MW status monitor
                 pStatusMonitor.InnerProgressStatus = Logger.ProgressStatus
                 Logger.ProgressStatus = pStatusMonitor
                 Logger.Status("LABEL TITLE " & g_AppNameShort & " Status")

@@ -73,7 +73,7 @@ Public Class ModelSegmentationPlugIn
             If pFrmModelSegmentation Is Nothing OrElse pFrmModelSegmentation.IsDisposed Then
                 pFrmModelSegmentation = New frmModelSegmentation
             End If
-            pFrmModelSegmentation.Show()
+            pFrmModelSegmentation.Show(pMapWinForm)
             aHandled = True
         End If
     End Sub

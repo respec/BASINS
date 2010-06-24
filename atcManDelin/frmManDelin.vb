@@ -640,10 +640,14 @@ Public Class frmManDelin
         'add output layer to the view
         Dim lOperatingShapeFile As New MapWinGIS.Shapefile
         lOperatingShapeFile.Open(pOperatingShapefileName)
-        pMapWin.Layers.Add(lOperatingShapeFile, "Subbasins")
-        pMapWin.Layers(pMapWin.Layers.GetHandle(pMapWin.Layers.NumLayers - 1)).Color = System.Drawing.Color.Transparent
-        pMapWin.Layers(pMapWin.Layers.GetHandle(pMapWin.Layers.NumLayers - 1)).OutlineColor = System.Drawing.Color.Red
-        pMapWin.Layers(pMapWin.Layers.GetHandle(pMapWin.Layers.NumLayers - 1)).DrawFill = False
+        Dim lLayer As MapWindow.Interfaces.Layer = pMapWin.Layers.Add(lOperatingShapeFile, "Subbasins")
+        If lLayer IsNot Nothing Then
+            With lLayer
+                .Color = System.Drawing.Color.Transparent
+                .OutlineColor = System.Drawing.Color.Red
+                .DrawFill = False
+            End With
+        End If
 
         'remove old points
         For lPointIndex As Integer = 0 To pXPts.Count
@@ -717,10 +721,14 @@ Public Class frmManDelin
         If GisUtil.IsLayer("Outlets") Then
             GisUtil.RemoveLayer(GisUtil.LayerIndex("Outlets"))
         End If
-        GisUtil.AddLayer(lOutletShapeFileName, "Outlets")
-        pMapWin.Layers(pMapWin.Layers.GetHandle(pMapWin.Layers.NumLayers - 1)).Color = System.Drawing.Color.Cyan
-        pMapWin.Layers(pMapWin.Layers.GetHandle(pMapWin.Layers.NumLayers - 1)).OutlineColor = System.Drawing.Color.Cyan
-        pMapWin.Layers(pMapWin.Layers.GetHandle(pMapWin.Layers.NumLayers - 1)).LineOrPointSize = 5
+        Dim lLayer As MapWindow.Interfaces.Layer = pMapWin.Layers.Add(lOutletShapeFileName, "Outlets")
+        If lLayer IsNot Nothing Then
+            With lLayer
+                .Color = System.Drawing.Color.Cyan
+                .OutlineColor = System.Drawing.Color.Cyan
+                .LineOrPointSize = 5
+            End With
+        End If
     End Sub
 
     Private Sub frmManDelin_Disposed(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Disposed
@@ -835,10 +843,14 @@ Public Class frmManDelin
                 'add output layer to the view
                 Dim lOperatingShapeFile As New MapWinGIS.Shapefile
                 lOperatingShapeFile.Open(lOutputFileName)
-                pMapWin.Layers.Add(lOperatingShapeFile, "Subbasins")
-                pMapWin.Layers(pMapWin.Layers.GetHandle(pMapWin.Layers.NumLayers - 1)).Color = System.Drawing.Color.Transparent
-                pMapWin.Layers(pMapWin.Layers.GetHandle(pMapWin.Layers.NumLayers - 1)).OutlineColor = System.Drawing.Color.Red
-                pMapWin.Layers(pMapWin.Layers.GetHandle(pMapWin.Layers.NumLayers - 1)).DrawFill = False
+                Dim lLayer As MapWindow.Interfaces.Layer = pMapWin.Layers.Add(lOperatingShapeFile, "Subbasins")
+                If lLayer IsNot Nothing Then
+                    With lLayer
+                        .Color = System.Drawing.Color.Transparent
+                        .OutlineColor = System.Drawing.Color.Red
+                        .DrawFill = False
+                    End With
+                End If
             End If
         End If
 
