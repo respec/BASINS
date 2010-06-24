@@ -379,18 +379,20 @@ Public Class frmBuildNew
         'btnFind
         '
         Me.btnFind.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnFind.Location = New System.Drawing.Point(445, 51)
+        Me.btnFind.Location = New System.Drawing.Point(445, 50)
         Me.btnFind.Name = "btnFind"
-        Me.btnFind.Size = New System.Drawing.Size(75, 19)
+        Me.btnFind.Size = New System.Drawing.Size(75, 21)
         Me.btnFind.TabIndex = 22
         Me.btnFind.Text = "Find"
         Me.btnFind.UseVisualStyleBackColor = True
         '
         'txtFind
         '
+        Me.txtFind.AcceptsReturn = True
         Me.txtFind.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtFind.Location = New System.Drawing.Point(216, 50)
+        Me.txtFind.Multiline = True
         Me.txtFind.Name = "txtFind"
         Me.txtFind.Size = New System.Drawing.Size(223, 20)
         Me.txtFind.TabIndex = 25
@@ -450,7 +452,6 @@ Public Class frmBuildNew
         Me.KeyPreview = True
         Me.MaximizeBox = False
         Me.Name = "frmBuildNew"
-        Me.Opacity = 0.8
         Me.Text = "Build Project"
         Me.TopMost = True
         Me.ResumeLayout(False)
@@ -488,11 +489,11 @@ Public Class frmBuildNew
     End Sub
 
     Private Sub frmBuildNew_Activated(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Activated
-        Me.Opacity = 1
+        'Me.Opacity = 1
     End Sub
 
     Private Sub frmBuildNew_Deactivate(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Deactivate
-        Me.Opacity = 0.8
+        'Me.Opacity = 0.8
     End Sub
 
     Private Sub frmBuildNew_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
@@ -525,46 +526,124 @@ Public Class frmBuildNew
     End Sub
 
     Private Sub btnFind_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnFind.Click
+        Find()
+    End Sub
+
+    Private Sub Find()
         Dim lText As String = txtFind.Text
         If lText.Length > 0 Then
             Dim lMatchingRecord As Integer = -1
             Dim lLayerHandle As Integer = -1
-            If IsNumeric(lText) Then
+            Dim lLoadedHuc12 As Boolean = False
+            If IsNumeric(lText) Then 'Numeric search
                 Select Case lText.Length
                     Case 8 : lLayerHandle = Huc8Layer()
-                    Case 12 : lLayerHandle = Huc12Layer()
-                End Select
-            Else
+                    Case 12
+FindHuc12:
+                        Dim lHuc8 As String = SafeSubstring(lText, 0, 8)
+                        For iLayer As Integer = g_MapWin.Layers.NumLayers - 1 To 0 Step -1
+                            Dim lSearchLayerHandle As Integer = g_MapWin.Layers.GetHandle(iLayer)
+                            If lSearchLayerHandle >= 0 Then
+                                Dim lSearchLayer As MapWindow.Interfaces.Layer = g_MapWin.Layers(lSearchLayerHandle)
+                                If lSearchLayer IsNot Nothing AndAlso lSearchLayer.FileName.ToLower.Contains(lHuc8 & g_PathChar & "huc12") Then
+                                    lLayerHandle = lSearchLayerHandle
+                                    Exit For
+                                End If
+                            End If
+                        Next
 
+                        If lLayerHandle < 0 AndAlso Not lLoadedHuc12 Then
+                            lLoadedHuc12 = True
+                            LoadHUC12(lHuc8)
+                            GoTo FindHuc12
+                        End If
+
+                        If lLayerHandle < 0 Then
+                            lLayerHandle = Huc8Layer()
+                            If lLayerHandle >= 0 Then
+                                lText = lHuc8
+                            End If
+                        End If
+                    Case Else
+                        'TODO: partial search for number that is not 8 or 12 digits?
+                End Select
+                If lLayerHandle > -1 Then
+                    lMatchingRecord = MatchingKeyRecord(g_MapWin.Layers(lLayerHandle).FileName, lText)
+                    If lText.Length = 8 AndAlso Not lLoadedHuc12 AndAlso pBuildFrm.rdoHUC12.Checked Then
+                        lLoadedHuc12 = True
+                        LoadHUC12(lText)
+                    End If
+                End If
+            Else
+                For iLayer As Integer = g_MapWin.Layers.NumLayers - 1 To 0 Step -1
+                    Dim lSearchLayerHandle As Integer = g_MapWin.Layers.GetHandle(iLayer)
+                    If lSearchLayerHandle >= 0 Then
+                        Dim lSearchLayer As MapWindow.Interfaces.Layer = g_MapWin.Layers(lSearchLayerHandle)
+                        If lSearchLayer IsNot Nothing Then
+                            lLayerHandle = lSearchLayerHandle
+
+                            Dim lDescFieldName As String = DBFDescriptionFieldName(lSearchLayer.FileName).ToLower
+                            If lDescFieldName.Length > 0 Then
+                                Dim lDBF As atcTableDBF = LayerDBF(lSearchLayer.FileName)
+                                Dim lDescFieldNum As Integer = lDBF.FieldNumber(lDescFieldName)
+                                If lDescFieldNum > 0 Then
+                                    For lMatchingRecord = 1 To lDBF.NumRecords
+                                        If lMatchingRecord >= 0 Then
+                                            Exit For
+                                        End If
+                                    Next
+                                End If
+                            End If
+
+                        End If
+                    End If
+                Next
             End If
-            If lLayerHandle > -1 Then
-                lMatchingRecord = MatchingRecord(g_MapWin.Layers(lLayerHandle).FileName, lText)
-            End If
+
             If lMatchingRecord >= 0 Then
                 g_MapWin.Layers.CurrentLayer = lLayerHandle
-                Dim lShapefile As MapWinGIS.Shapefile = g_MapWin.Layers.Item(lLayerHandle).GetObject
-                lShapefile.ShapeSelected(lMatchingRecord) = True
-                g_MapWin.View.Extents = lShapefile.Shape(lMatchingRecord).Extents
+                g_MapWin.View.ClearSelectedShapes()
+                g_MapWin.View.SelectedShapes.AddByIndex(lMatchingRecord, g_MapWin.View.SelectColor)
+                g_MapWin.Layers(lLayerHandle).Shapes(lMatchingRecord).ZoomTo()
             End If
         End If
+        UpdateSelectedFeatures()
     End Sub
 
-    Private Function MatchingRecord(ByVal aShapeFilename As String, ByVal aText As String) As Integer
-        Dim lDBF As atcTableDBF = LayerDBF(aShapeFilename)
-
+    Private Function MatchingKeyRecord(ByVal aShapeFilename As String, ByVal aText As String) As Integer
         Dim lKeyFieldName As String = DBFKeyFieldName(aShapeFilename).ToLower
-        Dim lKeyFieldNum As Integer = lDBF.FieldNumber(lKeyFieldName)
-        If lKeyFieldNum > 0 AndAlso lDBF.FindFirst(lKeyFieldNum, aText) Then
-            Return lDBF.CurrentRecord - 1
-        Else
-            Dim lDescFieldName As String = DBFDescriptionFieldName(aShapeFilename).ToLower
-            Dim lDescFieldNum As Integer = lDBF.FieldNumber(lDescFieldName)
-            If lDescFieldNum > 0 AndAlso lDBF.FindFirst(lDescFieldNum, aText) Then
+        If lKeyFieldName.Length > 0 Then
+            Dim lDBF As atcTableDBF = LayerDBF(aShapeFilename)
+            Dim lKeyFieldNum As Integer = lDBF.FieldNumber(lKeyFieldName)
+            If lKeyFieldNum > 0 AndAlso lDBF.FindFirst(lKeyFieldNum, aText) Then
                 Return lDBF.CurrentRecord - 1
             End If
         End If
         Return -1
     End Function
+
+    'Private Function MatchingDescriptionRecord(ByVal aShapeFilename As String, ByVal aText As String) As Integer
+    '    Dim lDescriptionFieldName As String = DBFDescriptionFieldName(aShapeFilename).ToLower
+    '    If lDescriptionFieldName.Length > 0 Then
+    '        Dim lDBF As atcTableDBF = LayerDBF(aShapeFilename)
+    '        Dim lDescriptionFieldNum As Integer = lDBF.FieldNumber(lDescriptionFieldName)
+    '        If lDescriptionFieldNum > 0 Then
+    '            aText = aText.Trim.ToLower
+    '            Dim lLastRecord As Integer = lDBF.NumRecords
+    '            While lDBF.CurrentRecord <= lLastRecord
+    '                If lDBF.Value(lDescriptionFieldNum).ToLower.Contains(aText) Then
+    '                    Return lDBF.CurrentRecord - 1
+    '                End If
+    '                If lDBF.CurrentRecord < lLastRecord Then
+    '                    lDBF.CurrentRecord += 1
+    '                Else 'force exit since attempting to set CurrentRecord beyond NumRecords sets it back to 1
+    '                    Exit While
+    '                End If
+    '            End While
+    '        End If
+    '    End If
+    '    Return -1
+    'End Function
 
     Private Function LayerDBF(ByVal aShapeFileName As String) As atcTableDBF
         Dim lDBFFileName As String = IO.Path.ChangeExtension(aShapeFileName, "dbf").ToLower
@@ -587,7 +666,6 @@ Public Class frmBuildNew
     Private Sub rdoHUC8_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoHUC8.CheckedChanged
         If rdoHUC8.Checked Then
             chkHSPF.Checked = False
-
             'Remove HUC-12 layers from map
             For iLayer As Integer = g_MapWin.Layers.NumLayers - 1 To 0 Step -1
                 Dim lLayerHandle As Integer = g_MapWin.Layers.GetHandle(iLayer)
@@ -595,14 +673,33 @@ Public Class frmBuildNew
                     g_MapWin.Layers.Remove(lLayerHandle)
                 End If
             Next
-
         Else
         End If
+        UpdateSelectedFeatures
     End Sub
 
     Private Sub chkHSPF_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkHSPF.CheckedChanged
         If chkHSPF.Checked AndAlso rdoHUC8.Checked Then
             rdoHUC12.Checked = True
+        End If
+    End Sub
+
+    Private Sub txtFind_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles txtFind.KeyDown
+        If e.KeyCode = Windows.Forms.Keys.Enter Then
+            e.Handled = True
+            Find()
+        End If
+    End Sub
+
+    Private Sub txtFind_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles txtFind.KeyPress
+        If e.KeyChar = vbCr Then
+            e.Handled = True
+        End If
+    End Sub
+
+    Private Sub txtFind_KeyUp(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles txtFind.KeyUp
+        If e.KeyCode = Windows.Forms.Keys.Enter Then
+            e.Handled = True
         End If
     End Sub
 End Class

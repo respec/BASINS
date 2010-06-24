@@ -185,7 +185,7 @@ Public Class GisUtil
                 aLayerIndex = CurrentLayer
             End If
 
-            If aLayerIndex >= 0 And aLayerIndex < GetMappingObject.Layers.NumLayers Then
+            If aLayerIndex >= 0 AndAlso aLayerIndex < GetMappingObject.Layers.NumLayers Then
                 'Return (GetMappingObject.Layers(aLayerIndex))  'this is a bad idea
                 Return (GetMappingObject.Layers.Item(GetMappingObject.Layers.GetHandle(aLayerIndex)))
             Else
