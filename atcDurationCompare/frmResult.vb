@@ -6,18 +6,22 @@ Imports ZedGraph
 Public Class frmResult
     Private WithEvents pDataGroup As atcTimeseriesGroup
     Private pClassLimits As Double()
-
     Private pAnalysis As String = String.Empty
+    Private pListPEGroups As New List(Of atcTimeseriesGroup)
 
-    Public Sub Initialize(ByVal aAnalysis As String, ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup, ByVal aClassLimits As Double())
+    Public Sub Initialize(ByVal aAnalysis As String, ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup, ByVal aClassLimits As Double(), ByVal aOperation As String)
         pAnalysis = aAnalysis
         pDataGroup = aTimeseriesGroup
         pClassLimits = aClassLimits
 
         Select Case pAnalysis.ToLower
             Case "durationhydrograph"
-                doReportDH(pDataGroup, pClassLimits)
                 Me.Text = "Duration Hydrograph Analysis Result"
+                If aOperation.ToLower() = "report" Then
+                    doReportDH(pDataGroup, pClassLimits)
+                ElseIf aOperation.ToLower() = "graph" Then
+                    doPlot(pDataGroup)
+                End If
             Case "duration"
                 Me.Text = "Duration Analysis Result"
             Case "compare"
@@ -87,7 +91,7 @@ Public Class frmResult
             Case "duration"
             Case "compare"
             Case "durationhydrograph"
-                doPlotDH(aDatagroup)
+                doPlotDH(aDatagroup, pClassLimits)
         End Select
         Return True
     End Function
@@ -98,6 +102,17 @@ Public Class frmResult
             lStrbuilder.AppendLine(DurationHydrograph(lTS, aClassLimits))
         Next
         txtReport.Text = lStrbuilder.ToString
+    End Sub
+
+    Public Sub doPlotDH(ByVal aTimeseriesGroup As atcDataGroup, ByVal aClassLimits As Double())
+        If pListPEGroups.Count = 0 Then
+            For Each lTS As atcTimeseries In aTimeseriesGroup
+                pListPEGroups.Add(DurationHydrographSeasons(lTS, aClassLimits))
+            Next
+        End If
+        For Each lTSgroup As atcTimeseriesGroup In pListPEGroups
+            DurationHydrographPlot(lTSgroup)
+        Next
     End Sub
 
     Private Sub DataGroupChanged() Handles pDataGroup.Added, pDataGroup.Removed
@@ -115,4 +130,73 @@ Public Class frmResult
 
     Private Sub frmResult_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
     End Sub
+
+    Public Function DurationHydrographPlot(ByVal aDataGroup As atcTimeseriesGroup) As Boolean
+        Dim doneIt As Boolean = True
+        Dim lp As String = ""
+        Dim lgraphForm As New atcGraph.atcGraphForm()
+
+        Dim lZgc As ZedGraphControl = lgraphForm.ZedGraphCtrl
+        Dim lGraphDurHyd As New clsGraphTime(aDataGroup, lZgc)
+        lgraphForm.Grapher = lGraphDurHyd
+
+        Dim lXTitle As String = "Duration hydrograph for " & aDataGroup(0).Attributes.GetValue("stanam") & vbCrLf
+        lXTitle &= "For period " & aDataGroup(0).Attributes.GetValue("StartYMD") & " to " & aDataGroup(0).Attributes.GetValue("EndYMD")
+        Dim lYTitle As String = "STREAMFLOW IN CUBIC FEET PER SECOND"
+        With lGraphDurHyd.ZedGraphCtrl.GraphPane
+
+            With .XAxis
+                .MinorGrid.IsVisible = False
+                .MajorGrid.IsVisible = False
+                .Title.Text = lXTitle
+            End With
+            With .YAxis
+                .Type = AxisType.Log
+                .Scale.IsUseTenPower = True
+                .MinorGrid.IsVisible = False
+                .MajorGrid.IsVisible = False
+                .Title.Text = lYTitle
+            End With
+            .AxisChange()
+
+            '.Legend.Position = LegendPos.TopFlushLeft
+            '.IsPenWidthScaled = True
+            '.LineType = LineType.Stack
+            '.ScaledPenWidth(50, 2)
+            '.CurveList.Item(0).Color = Drawing.ColorTranslator.FromHtml("#FF0000") 'Base condition: red
+            '.CurveList.Item(1).Color = Drawing.ColorTranslator.FromHtml("#00FF00") 'Natural condition: green
+
+            'For Each li As LineItem In .CurveList
+            '    li.Line.Width = 2
+            '    Dim lFS As New FontSpec
+            '    lFS.FontColor = li.Line.Color
+            '    li.Label.FontSpec = lFS
+            '    li.Label.FontSpec.Border.IsVisible = False
+            'Next
+
+            .Legend.IsVisible = False
+        End With
+        Dim lPEDecimals As String = "Percentiles" & vbCrLf
+        For I As Integer = 0 To aDataGroup.Count - 1
+            lPEDecimals &= aDataGroup(I).Attributes.GetValue("PEDecimal")
+            If I + 1 Mod 5 = 0 Then
+                lPEDecimals &= Environment.NewLine
+            End If
+        Next
+        Dim lText As New TextObj(lPEDecimals, 0.45F, 0.05F)
+        With lText
+            .Location.CoordinateFrame = CoordType.ChartFraction
+            .Location.AlignH = AlignH.Left
+            .FontSpec.Family = "Courier"
+            .FontSpec.Border.IsVisible = False
+            .FontSpec.StringAlignment = Drawing.StringAlignment.Near
+        End With
+
+        lGraphDurHyd.ZedGraphCtrl.GraphPane.GraphObjList.Add(lText)
+        lgraphForm.Width = 720
+        lgraphForm.Height = 560
+        lgraphForm.Show()
+
+        Return doneIt
+    End Function
 End Class
