@@ -84,7 +84,7 @@ Public Class frmDurationHydrographControl
                     ResultForm = CreateForm("durationhydrograph")
                 End If
                 With CType(ResultForm, frmResult)
-                    .Initialize("DurationHydrograph", DataGroup, lListPct.ToArray())
+                    .Initialize("DurationHydrograph", DataGroup, lListPct.ToArray(), "report")
                     ltxtBox = .txtReport
                 End With
 
@@ -93,6 +93,43 @@ Public Class frmDurationHydrographControl
         If ltxtBox IsNot Nothing Then
             ltxtBox.SelectionLength = 0
         End If
+    End Sub
+
+    Private Sub btnGraph_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGraph.Click
+        If ResultForm Is Nothing Then
+            Logger.Dbg("Duration/Compare analysis failed to initialize proper form")
+            Exit Sub
+        End If
+
+        Select Case ResultForm.Name
+            Case "frmDuration"
+                CType(ResultForm, frmDuration).doDurPlot(DataGroup)
+            Case "frmCompare"
+                If DataGroup.Count < 2 Then
+                    Logger.Msg("Need to select two timeseries to conduct compare analysis.")
+                    'If txtDS1.Text = "" Then
+                    '    txtDS1.Focus()
+                    'ElseIf txtDS2.Text = "" Then
+                    '    txtDS2.Focus()
+                    'End If
+                    Exit Sub
+                End If
+                CType(ResultForm, frmCompare).doComparePlot(DataGroup)
+            Case "frmResult"
+                Dim lListPct As List(Of Double) = ListOK()
+
+                If DataGroup.Count = 0 Then
+                    mnuSelectData_Click(Nothing, Nothing)
+                End If
+
+                If ResultForm.IsDisposed Then
+                    ResultForm = Nothing
+                    ResultForm = CreateForm("durationhydrograph")
+                End If
+                With CType(ResultForm, frmResult)
+                    .Initialize("DurationHydrograph", DataGroup, lListPct.ToArray(), "graph")
+                End With
+        End Select
     End Sub
 
     Private Sub mnuSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectData.Click

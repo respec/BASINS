@@ -846,79 +846,93 @@ Public Module modStat
         Return lStr.ToString
     End Function
 
-
-
-    Public Function doDurHydPlot(ByVal aTS As atcTimeseries) As Boolean
-        Dim doneIt As Boolean = True
-        Dim lp As String = ""
-        Dim lgraphForm As New atcGraph.atcGraphForm()
-
-        Dim lSeasonDay As New atcSeasonsDayOfYear
-        Dim lSplit As atcTimeseriesGroup = lSeasonDay.Split(aTS, Nothing)
-        Dim lDataGroup As New atcDataGroup
-        Dim lExceedancePcts As Double() = {0, 10, 20, 30, 50, 70, 80, 90, 100}
-        For Each lExceedPct As Double In lExceedancePcts
-            Dim lNewTS As atcTimeseries
-            'lNewTS = lSplit.ItemByKey(lSeasonIndex)
-            'If lNewTS Is Nothing Then
-            '    lNewTS = New atcTimeseries(aSource)
-            '    CopyBaseAttributes(aTS, lNewTS)
-            '    lNewTS.Dates = New atcTimeseries(aSource)
-            '    lNewTS.numValues = aTS.numValues
-            '    lNewTS.Dates.numValues = aTS.numValues
-            '    lNewTS.Attributes.AddHistory("Split by " & ToString() & " " & SeasonName(lSeasonIndex))
-            '    lNewTS.Attributes.Add("SeasonDefinition", Me)
-            '    lNewTS.Attributes.Add("SeasonIndex", lSeasonIndex)
-            '    lNewTS.Attributes.Add("SeasonName", SeasonName(lSeasonIndex))
-            '    lNewGroup.Add(lSeasonIndex, lNewTS)
-            'End If
-
-
+    Public Function DurationHydrographSeasons(ByVal aTS As atcTimeseries, ByVal aPcts As Double()) As atcTimeseriesGroup
+        Dim lDataGroup As New atcTimeseriesGroup
+        Dim lExceedancePcts(aPcts.Length - 1) As Double
+        For I As Integer = 0 To aPcts.Length - 1
+            lExceedancePcts(I) = aPcts(I)
         Next
+        For I As Integer = 0 To lExceedancePcts.Length - 1
+            lExceedancePcts(I) = lExceedancePcts(I) * 100
+        Next
+        'Make sure it is daily timeseries
+        Select Case aTS.Attributes.GetValue("Time Unit")
+            Case atcTimeUnit.TUDay
+            Case Else
+                aTS = Aggregate(aTS, atcTimeUnit.TUDay, 1, atcTran.TranAverSame) 'trans aver same for flow
+        End Select
 
 
-        'Dim lZgc As ZedGraphControl = lgraphForm.ZedGraphCtrl
-        'Dim lGraphDur As New clsGraphProbability(aDatagroup, lZgc)
-        'lgraphForm.Grapher = lGraphDur
+        Dim lStartYMD As String = String.Empty
+        Dim lEndYMD As String = String.Empty
 
-        'With lGraphDur.ZedGraphCtrl.GraphPane
-        '    With .XAxis
-        '        .Scale.MaxAuto = False
-        '        .Scale.MinAuto = False
-        '        .MinorGrid.IsVisible = False
-        '        .MajorGrid.IsVisible = False
-        '        .Scale.Min = 0.001
-        '    End With
-        '    '.YAxis.Type = AxisType.Linear
-        '    .YAxis.MinorGrid.IsVisible = False
-        '    .YAxis.MajorGrid.IsVisible = False
+        Dim lDateYMD(5) As Integer
+        J2Date(aTS.Attributes.GetValue("start date"), lDateYMD)
+        lStartYMD = lDateYMD(0) & "/" & DoubleToString(lDateYMD(1) * 1.0, 2, "##").PadLeft(2) & "/" & DoubleToString(lDateYMD(2) * 1.0, 2, "##").PadLeft(2)
+        J2Date(aTS.Attributes.GetValue("end date"), lDateYMD)
+        lEndYMD = lDateYMD(0) & "/" & DoubleToString(lDateYMD(1) * 1.0, 2, "##").PadLeft(2) & "/" & DoubleToString(lDateYMD(2) * 1.0, 2, "##").PadLeft(2)
 
-        '    If .YAxis.Scale.Min < 1 Then
-        '        .YAxis.Scale.MinAuto = False
-        '        .YAxis.Scale.Min = 1
-        '        '.YAxis.Scale.Max = 1000000
-        '        .AxisChange()
-        '    End If
+        Dim lSeasonDay As New atcSeasonsMonthDay
+        Dim lSplit As atcTimeseriesGroup = lSeasonDay.Split(aTS, Nothing)
+        'Get timeseries dates
+        Dim lDates As New List(Of Double)
+        Dim lFakeYear As Integer = 0
+        For Each lts As atcTimeseries In lSplit
+            Dim lMonthDay() As String = lts.Attributes.GetValue("seasonname").split("/")
+            Dim lMonth As Integer = CInt(lMonthDay(0))
+            Dim lDay As Integer = CInt(lMonthDay(1))
+            If lFakeYear = 0 Then
+                If lMonth > 2 Then
+                    lFakeYear = 1999
+                Else
+                    lFakeYear = 2000
+                End If
+            ElseIf lMonth = 1 AndAlso lDay = 1 Then
+                lFakeYear += 1
+            End If
+            lDates.Add(Jday(lFakeYear, lMonth, lDay, 24, 0, 0))
+        Next
+        lDates.Sort()
+        lDates.Insert(0, atcUtility.GetNaN)
 
-        '    '.Legend.Position = LegendPos.TopFlushLeft
-        '    '.IsPenWidthScaled = True
-        '    '.LineType = LineType.Stack
-        '    '.ScaledPenWidth(50, 2)
-        '    .CurveList.Item(0).Color = Drawing.ColorTranslator.FromHtml("#FF0000") 'Base condition: red
-        '    '.CurveList.Item(1).Color = Drawing.ColorTranslator.FromHtml("#00FF00") 'Natural condition: green
+        For Each lExceedPercent As Double In lExceedancePcts
+            Dim lNonExceedPercent As Double = 100 - lExceedPercent
+            Dim lNonExceedPercentString As String = (lNonExceedPercent).ToString.PadLeft(2, "0")
+            Dim lPEDecimal As String = DoubleToString(lExceedPercent / 100.0, 5, "#0.00").PadLeft(5)
 
-        '    For Each li As LineItem In .CurveList
-        '        li.Line.Width = 2
-        '        Dim lFS As New FontSpec
-        '        lFS.FontColor = li.Line.Color
-        '        li.Label.FontSpec = lFS
-        '        li.Label.FontSpec.Border.IsVisible = False
-        '    Next
-        'End With
+            Dim lNewPETS As New atcTimeseries(Nothing)
+            lNewPETS.Dates = New atcTimeseries(Nothing)
+            lNewPETS.numValues = lDates.Count - 1
+            lNewPETS.Dates.Values = lDates.ToArray()
+            lNewPETS.Attributes.SetValue("STAID", aTS.Attributes.GetValue("staid"))
+            lNewPETS.Attributes.SetValue("STANAM", aTS.Attributes.GetValue("stanam"))
+            lNewPETS.Attributes.SetValue("StartYMD", lStartYMD)
+            lNewPETS.Attributes.SetValue("EndYMD", lEndYMD)
+            If Not aTS.Attributes.GetValue("Constituent").ToString.Trim = "" Then
+                lNewPETS.Attributes.SetValue("Constituent", aTS.Attributes.GetValue("Constituent"))
+            ElseIf Not aTS.Attributes.GetValue("TSTYPE").ToString.Trim = "" Then
+                lNewPETS.Attributes.SetValue("TSTYPE", aTS.Attributes.GetValue("TSTYPE"))
+            End If
+            lNewPETS.Attributes.SetValue("PEDecimal", lPEDecimal)
 
-        lgraphForm.Show()
-
-        Return doneIt
+            For J As Integer = 1 To lNewPETS.Dates.numValues
+                Dim lDateArray(5) As Integer
+                J2Date(lNewPETS.Dates.Value(J), lDateArray)
+                Dim lSeasonName As String = lDateArray(1) & "/" & lDateArray(2)
+                For Each lTS As atcTimeseries In lSplit
+                    If lTS.Attributes.GetValue("seasonname") = lSeasonName Then
+                        Try
+                            lNewPETS.Value(J) = lTS.Attributes.GetValue("%" & lNonExceedPercentString)
+                        Catch lEx As Exception
+                            Logger.Dbg("At ExceedPercent " & lExceedPercent & " Exception " & lEx.ToString)
+                        End Try
+                        Exit For
+                    End If
+                Next 'lTS in lSplit
+            Next ' J date
+            lDataGroup.Add(lNewPETS)
+        Next ' lExccedPercent
+        Return lDataGroup
     End Function
 
     Public Function DRNHYD(ByVal aTS As atcTimeseries, _
