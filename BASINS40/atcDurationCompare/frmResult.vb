@@ -13,6 +13,7 @@ Public Class frmResult
         pAnalysis = aAnalysis
         pDataGroup = aTimeseriesGroup
         pClassLimits = aClassLimits
+        pListPEGroups.Clear()
 
         Select Case pAnalysis.ToLower
             Case "durationhydrograph"
@@ -116,7 +117,11 @@ Public Class frmResult
     End Sub
 
     Private Sub DataGroupChanged() Handles pDataGroup.Added, pDataGroup.Removed
-        doReportDH(pDataGroup, pClassLimits)
+        If pDataGroup IsNot Nothing And pClassLimits IsNot Nothing Then
+            If pDataGroup.Count > 0 Then
+                doReportDH(pDataGroup, pClassLimits)
+            End If
+        End If
     End Sub
 
     Private Sub mnuSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectData.Click
