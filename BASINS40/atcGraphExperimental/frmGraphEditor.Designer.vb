@@ -78,6 +78,7 @@ Partial Class frmGraphEditor
         Me.radioAxisLinear = New System.Windows.Forms.RadioButton
         Me.radioAxisTime = New System.Windows.Forms.RadioButton
         Me.tabCurves = New System.Windows.Forms.TabPage
+        Me.chkCurveSymbolFillVisible = New System.Windows.Forms.CheckBox
         Me.cboCurveStep = New System.Windows.Forms.ComboBox
         Me.cboCurveSymbolType = New System.Windows.Forms.ComboBox
         Me.chkCurveLineVisible = New System.Windows.Forms.CheckBox
@@ -111,7 +112,6 @@ Partial Class frmGraphEditor
         Me.btnTextAdd = New System.Windows.Forms.Button
         Me.txtText = New System.Windows.Forms.TextBox
         Me.chkAutoApply = New System.Windows.Forms.CheckBox
-        Me.chkCurveSymbolFillVisible = New System.Windows.Forms.CheckBox
         Me.tabsCategory.SuspendLayout()
         Me.tabAxes.SuspendLayout()
         Me.panelProbability.SuspendLayout()
@@ -132,7 +132,7 @@ Partial Class frmGraphEditor
         Me.txtAxisMaximum.Location = New System.Drawing.Point(201, 86)
         Me.txtAxisMaximum.Name = "txtAxisMaximum"
         Me.txtAxisMaximum.Size = New System.Drawing.Size(91, 20)
-        Me.txtAxisMaximum.TabIndex = 17
+        Me.txtAxisMaximum.TabIndex = 45
         Me.toolTip1.SetToolTip(Me.txtAxisMaximum, "Maximum data value in any dataset using this axis")
         Me.txtAxisMaximum.Visible = False
         '
@@ -143,7 +143,7 @@ Partial Class frmGraphEditor
         Me.txtAxisMinimum.Location = New System.Drawing.Point(81, 86)
         Me.txtAxisMinimum.Name = "txtAxisMinimum"
         Me.txtAxisMinimum.Size = New System.Drawing.Size(91, 20)
-        Me.txtAxisMinimum.TabIndex = 16
+        Me.txtAxisMinimum.TabIndex = 44
         Me.toolTip1.SetToolTip(Me.txtAxisMinimum, "Minimum data value in any dataset using this axis")
         Me.txtAxisMinimum.Visible = False
         '
@@ -164,7 +164,7 @@ Partial Class frmGraphEditor
         Me.txtCurveColor.Location = New System.Drawing.Point(81, 86)
         Me.txtCurveColor.Name = "txtCurveColor"
         Me.txtCurveColor.Size = New System.Drawing.Size(91, 20)
-        Me.txtCurveColor.TabIndex = 28
+        Me.txtCurveColor.TabIndex = 41
         Me.toolTip1.SetToolTip(Me.txtCurveColor, "Color of curve")
         '
         'lblCurveColor
@@ -194,7 +194,7 @@ Partial Class frmGraphEditor
         Me.txtAxisMinorGridColor.Location = New System.Drawing.Point(201, 152)
         Me.txtAxisMinorGridColor.Name = "txtAxisMinorGridColor"
         Me.txtAxisMinorGridColor.Size = New System.Drawing.Size(91, 20)
-        Me.txtAxisMinorGridColor.TabIndex = 29
+        Me.txtAxisMinorGridColor.TabIndex = 55
         Me.txtAxisMinorGridColor.Text = "Grid Color"
         Me.toolTip1.SetToolTip(Me.txtAxisMinorGridColor, "Color of Minor Grid")
         '
@@ -204,7 +204,7 @@ Partial Class frmGraphEditor
         Me.txtAxisMajorGridColor.Location = New System.Drawing.Point(201, 130)
         Me.txtAxisMajorGridColor.Name = "txtAxisMajorGridColor"
         Me.txtAxisMajorGridColor.Size = New System.Drawing.Size(91, 20)
-        Me.txtAxisMajorGridColor.TabIndex = 26
+        Me.txtAxisMajorGridColor.TabIndex = 51
         Me.txtAxisMajorGridColor.Text = "Grid Color"
         Me.toolTip1.SetToolTip(Me.txtAxisMajorGridColor, "Color of Major Grid")
         '
@@ -213,7 +213,7 @@ Partial Class frmGraphEditor
         Me.txtAxisDisplayMaximum.Location = New System.Drawing.Point(201, 106)
         Me.txtAxisDisplayMaximum.Name = "txtAxisDisplayMaximum"
         Me.txtAxisDisplayMaximum.Size = New System.Drawing.Size(91, 20)
-        Me.txtAxisDisplayMaximum.TabIndex = 21
+        Me.txtAxisDisplayMaximum.TabIndex = 47
         Me.toolTip1.SetToolTip(Me.txtAxisDisplayMaximum, "Maximum value currently displayed on this axis")
         '
         'txtAxisDisplayMinimum
@@ -221,7 +221,7 @@ Partial Class frmGraphEditor
         Me.txtAxisDisplayMinimum.Location = New System.Drawing.Point(81, 106)
         Me.txtAxisDisplayMinimum.Name = "txtAxisDisplayMinimum"
         Me.txtAxisDisplayMinimum.Size = New System.Drawing.Size(91, 20)
-        Me.txtAxisDisplayMinimum.TabIndex = 20
+        Me.txtAxisDisplayMinimum.TabIndex = 46
         Me.toolTip1.SetToolTip(Me.txtAxisDisplayMinimum, "Minimum value currently displayed on this axis")
         '
         'lblAxisRange
@@ -239,7 +239,7 @@ Partial Class frmGraphEditor
         Me.txtCurveWidth.Location = New System.Drawing.Point(125, 112)
         Me.txtCurveWidth.Name = "txtCurveWidth"
         Me.txtCurveWidth.Size = New System.Drawing.Size(47, 20)
-        Me.txtCurveWidth.TabIndex = 29
+        Me.txtCurveWidth.TabIndex = 51
         Me.toolTip1.SetToolTip(Me.txtCurveWidth, "Width of curve")
         '
         'txtCurveSymbolSize
@@ -247,7 +247,7 @@ Partial Class frmGraphEditor
         Me.txtCurveSymbolSize.Location = New System.Drawing.Point(125, 138)
         Me.txtCurveSymbolSize.Name = "txtCurveSymbolSize"
         Me.txtCurveSymbolSize.Size = New System.Drawing.Size(47, 20)
-        Me.txtCurveSymbolSize.TabIndex = 47
+        Me.txtCurveSymbolSize.TabIndex = 54
         Me.toolTip1.SetToolTip(Me.txtCurveSymbolSize, "Width of curve")
         '
         'comboWhichText
@@ -263,6 +263,7 @@ Partial Class frmGraphEditor
         '
         'txtLegendFontColor
         '
+        Me.txtLegendFontColor.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtLegendFontColor.BackColor = System.Drawing.Color.LightGray
         Me.txtLegendFontColor.Location = New System.Drawing.Point(221, 158)
         Me.txtLegendFontColor.Name = "txtLegendFontColor"
@@ -272,11 +273,12 @@ Partial Class frmGraphEditor
         '
         'txtTextColor
         '
+        Me.txtTextColor.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtTextColor.BackColor = System.Drawing.Color.Black
         Me.txtTextColor.Location = New System.Drawing.Point(221, 158)
         Me.txtTextColor.Name = "txtTextColor"
         Me.txtTextColor.Size = New System.Drawing.Size(74, 20)
-        Me.txtTextColor.TabIndex = 56
+        Me.txtTextColor.TabIndex = 15
         Me.toolTip1.SetToolTip(Me.txtTextColor, "Color of Text")
         '
         'btnTextFont
@@ -297,7 +299,7 @@ Partial Class frmGraphEditor
         Me.txtProbabilityDeviations.Location = New System.Drawing.Point(328, 4)
         Me.txtProbabilityDeviations.Name = "txtProbabilityDeviations"
         Me.txtProbabilityDeviations.Size = New System.Drawing.Size(48, 20)
-        Me.txtProbabilityDeviations.TabIndex = 22
+        Me.txtProbabilityDeviations.TabIndex = 41
         Me.toolTip1.SetToolTip(Me.txtProbabilityDeviations, "Minimum value currently displayed on this axis")
         '
         'lblProbabilityDeviations
@@ -316,7 +318,7 @@ Partial Class frmGraphEditor
         Me.btnAxisFont.Location = New System.Drawing.Point(389, 62)
         Me.btnAxisFont.Name = "btnAxisFont"
         Me.btnAxisFont.Size = New System.Drawing.Size(68, 20)
-        Me.btnAxisFont.TabIndex = 58
+        Me.btnAxisFont.TabIndex = 43
         Me.btnAxisFont.Text = "Font"
         Me.toolTip1.SetToolTip(Me.btnAxisFont, "Change Font of Text")
         Me.btnAxisFont.UseVisualStyleBackColor = True
@@ -327,7 +329,7 @@ Partial Class frmGraphEditor
         Me.btnScaleFont.Location = New System.Drawing.Point(298, 130)
         Me.btnScaleFont.Name = "btnScaleFont"
         Me.btnScaleFont.Size = New System.Drawing.Size(68, 20)
-        Me.btnScaleFont.TabIndex = 59
+        Me.btnScaleFont.TabIndex = 52
         Me.btnScaleFont.Text = "Font"
         Me.toolTip1.SetToolTip(Me.btnScaleFont, "Change Font of Text")
         Me.btnScaleFont.UseVisualStyleBackColor = True
@@ -402,7 +404,7 @@ Partial Class frmGraphEditor
         Me.chkAxisMinorGridVisible.Location = New System.Drawing.Point(129, 154)
         Me.chkAxisMinorGridVisible.Name = "chkAxisMinorGridVisible"
         Me.chkAxisMinorGridVisible.Size = New System.Drawing.Size(43, 17)
-        Me.chkAxisMinorGridVisible.TabIndex = 27
+        Me.chkAxisMinorGridVisible.TabIndex = 54
         Me.chkAxisMinorGridVisible.Text = "grid"
         Me.chkAxisMinorGridVisible.UseVisualStyleBackColor = True
         '
@@ -412,7 +414,7 @@ Partial Class frmGraphEditor
         Me.btnApply.Location = New System.Drawing.Point(405, 236)
         Me.btnApply.Name = "btnApply"
         Me.btnApply.Size = New System.Drawing.Size(75, 23)
-        Me.btnApply.TabIndex = 10
+        Me.btnApply.TabIndex = 60
         Me.btnApply.Text = "Apply"
         Me.btnApply.UseVisualStyleBackColor = True
         '
@@ -422,7 +424,7 @@ Partial Class frmGraphEditor
         Me.chkAxisMajorGridVisible.Location = New System.Drawing.Point(129, 132)
         Me.chkAxisMajorGridVisible.Name = "chkAxisMajorGridVisible"
         Me.chkAxisMajorGridVisible.Size = New System.Drawing.Size(43, 17)
-        Me.chkAxisMajorGridVisible.TabIndex = 23
+        Me.chkAxisMajorGridVisible.TabIndex = 50
         Me.chkAxisMajorGridVisible.Text = "grid"
         Me.chkAxisMajorGridVisible.UseVisualStyleBackColor = True
         '
@@ -460,7 +462,7 @@ Partial Class frmGraphEditor
         Me.txtAxisLabel.Location = New System.Drawing.Point(81, 62)
         Me.txtAxisLabel.Name = "txtAxisLabel"
         Me.txtAxisLabel.Size = New System.Drawing.Size(302, 20)
-        Me.txtAxisLabel.TabIndex = 14
+        Me.txtAxisLabel.TabIndex = 42
         '
         'lblWhichAxis
         '
@@ -540,7 +542,7 @@ Partial Class frmGraphEditor
         Me.chkRangeReverse.Location = New System.Drawing.Point(298, 108)
         Me.chkRangeReverse.Name = "chkRangeReverse"
         Me.chkRangeReverse.Size = New System.Drawing.Size(66, 17)
-        Me.chkRangeReverse.TabIndex = 40
+        Me.chkRangeReverse.TabIndex = 48
         Me.chkRangeReverse.Text = "Reverse"
         Me.chkRangeReverse.UseVisualStyleBackColor = True
         '
@@ -592,7 +594,7 @@ Partial Class frmGraphEditor
         Me.chkAxisMinorTicsVisible.Location = New System.Drawing.Point(81, 155)
         Me.chkAxisMinorTicsVisible.Name = "chkAxisMinorTicsVisible"
         Me.chkAxisMinorTicsVisible.Size = New System.Drawing.Size(42, 17)
-        Me.chkAxisMinorTicsVisible.TabIndex = 33
+        Me.chkAxisMinorTicsVisible.TabIndex = 53
         Me.chkAxisMinorTicsVisible.Text = "tics"
         Me.chkAxisMinorTicsVisible.UseVisualStyleBackColor = True
         '
@@ -602,7 +604,7 @@ Partial Class frmGraphEditor
         Me.chkAxisMajorTicsVisible.Location = New System.Drawing.Point(81, 133)
         Me.chkAxisMajorTicsVisible.Name = "chkAxisMajorTicsVisible"
         Me.chkAxisMajorTicsVisible.Size = New System.Drawing.Size(42, 17)
-        Me.chkAxisMajorTicsVisible.TabIndex = 31
+        Me.chkAxisMajorTicsVisible.TabIndex = 49
         Me.chkAxisMajorTicsVisible.Text = "tics"
         Me.chkAxisMajorTicsVisible.UseVisualStyleBackColor = True
         '
@@ -627,7 +629,7 @@ Partial Class frmGraphEditor
         Me.radioProbablilityReturnPeriod.Location = New System.Drawing.Point(150, 5)
         Me.radioProbablilityReturnPeriod.Name = "radioProbablilityReturnPeriod"
         Me.radioProbablilityReturnPeriod.Size = New System.Drawing.Size(90, 17)
-        Me.radioProbablilityReturnPeriod.TabIndex = 2
+        Me.radioProbablilityReturnPeriod.TabIndex = 40
         Me.radioProbablilityReturnPeriod.TabStop = True
         Me.radioProbablilityReturnPeriod.Text = "Return Period"
         Me.radioProbablilityReturnPeriod.UseVisualStyleBackColor = True
@@ -638,7 +640,7 @@ Partial Class frmGraphEditor
         Me.radioProbablilityFraction.Location = New System.Drawing.Point(81, 5)
         Me.radioProbablilityFraction.Name = "radioProbablilityFraction"
         Me.radioProbablilityFraction.Size = New System.Drawing.Size(63, 17)
-        Me.radioProbablilityFraction.TabIndex = 1
+        Me.radioProbablilityFraction.TabIndex = 39
         Me.radioProbablilityFraction.TabStop = True
         Me.radioProbablilityFraction.Text = "Fraction"
         Me.radioProbablilityFraction.UseVisualStyleBackColor = True
@@ -649,7 +651,7 @@ Partial Class frmGraphEditor
         Me.radioProbablilityPercent.Location = New System.Drawing.Point(7, 5)
         Me.radioProbablilityPercent.Name = "radioProbablilityPercent"
         Me.radioProbablilityPercent.Size = New System.Drawing.Size(62, 17)
-        Me.radioProbablilityPercent.TabIndex = 0
+        Me.radioProbablilityPercent.TabIndex = 38
         Me.radioProbablilityPercent.TabStop = True
         Me.radioProbablilityPercent.Text = "Percent"
         Me.radioProbablilityPercent.UseVisualStyleBackColor = True
@@ -744,6 +746,16 @@ Partial Class frmGraphEditor
         Me.tabCurves.Text = "Curves"
         Me.tabCurves.UseVisualStyleBackColor = True
         '
+        'chkCurveSymbolFillVisible
+        '
+        Me.chkCurveSymbolFillVisible.AutoSize = True
+        Me.chkCurveSymbolFillVisible.Location = New System.Drawing.Point(335, 140)
+        Me.chkCurveSymbolFillVisible.Name = "chkCurveSymbolFillVisible"
+        Me.chkCurveSymbolFillVisible.Size = New System.Drawing.Size(38, 17)
+        Me.chkCurveSymbolFillVisible.TabIndex = 56
+        Me.chkCurveSymbolFillVisible.Text = "Fill"
+        Me.chkCurveSymbolFillVisible.UseVisualStyleBackColor = True
+        '
         'cboCurveStep
         '
         Me.cboCurveStep.FormattingEnabled = True
@@ -751,7 +763,7 @@ Partial Class frmGraphEditor
         Me.cboCurveStep.MaxDropDownItems = 11
         Me.cboCurveStep.Name = "cboCurveStep"
         Me.cboCurveStep.Size = New System.Drawing.Size(121, 21)
-        Me.cboCurveStep.TabIndex = 51
+        Me.cboCurveStep.TabIndex = 52
         '
         'cboCurveSymbolType
         '
@@ -760,7 +772,7 @@ Partial Class frmGraphEditor
         Me.cboCurveSymbolType.MaxDropDownItems = 11
         Me.cboCurveSymbolType.Name = "cboCurveSymbolType"
         Me.cboCurveSymbolType.Size = New System.Drawing.Size(121, 21)
-        Me.cboCurveSymbolType.TabIndex = 51
+        Me.cboCurveSymbolType.TabIndex = 55
         '
         'chkCurveLineVisible
         '
@@ -778,7 +790,7 @@ Partial Class frmGraphEditor
         Me.chkCurveSymbolVisible.Location = New System.Drawing.Point(9, 137)
         Me.chkCurveSymbolVisible.Name = "chkCurveSymbolVisible"
         Me.chkCurveSymbolVisible.Size = New System.Drawing.Size(65, 17)
-        Me.chkCurveSymbolVisible.TabIndex = 49
+        Me.chkCurveSymbolVisible.TabIndex = 53
         Me.chkCurveSymbolVisible.Text = "Symbols"
         Me.chkCurveSymbolVisible.UseVisualStyleBackColor = True
         '
@@ -1034,6 +1046,7 @@ Partial Class frmGraphEditor
         '
         'lblTextClickToPlace
         '
+        Me.lblTextClickToPlace.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblTextClickToPlace.AutoSize = True
         Me.lblTextClickToPlace.Location = New System.Drawing.Point(3, 161)
         Me.lblTextClickToPlace.Name = "lblTextClickToPlace"
@@ -1047,7 +1060,7 @@ Partial Class frmGraphEditor
         Me.btnTextRemove.Location = New System.Drawing.Point(301, 156)
         Me.btnTextRemove.Name = "btnTextRemove"
         Me.btnTextRemove.Size = New System.Drawing.Size(75, 23)
-        Me.btnTextRemove.TabIndex = 13
+        Me.btnTextRemove.TabIndex = 16
         Me.btnTextRemove.Text = "Remove"
         Me.btnTextRemove.UseVisualStyleBackColor = True
         '
@@ -1057,17 +1070,20 @@ Partial Class frmGraphEditor
         Me.btnTextAdd.Location = New System.Drawing.Point(382, 156)
         Me.btnTextAdd.Name = "btnTextAdd"
         Me.btnTextAdd.Size = New System.Drawing.Size(75, 23)
-        Me.btnTextAdd.TabIndex = 11
+        Me.btnTextAdd.TabIndex = 17
         Me.btnTextAdd.Text = "Add"
         Me.btnTextAdd.UseVisualStyleBackColor = True
         '
         'txtText
         '
+        Me.txtText.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtText.Location = New System.Drawing.Point(3, 36)
         Me.txtText.Multiline = True
         Me.txtText.Name = "txtText"
         Me.txtText.Size = New System.Drawing.Size(454, 114)
-        Me.txtText.TabIndex = 0
+        Me.txtText.TabIndex = 13
         '
         'chkAutoApply
         '
@@ -1076,19 +1092,9 @@ Partial Class frmGraphEditor
         Me.chkAutoApply.Location = New System.Drawing.Point(282, 240)
         Me.chkAutoApply.Name = "chkAutoApply"
         Me.chkAutoApply.Size = New System.Drawing.Size(117, 17)
-        Me.chkAutoApply.TabIndex = 34
+        Me.chkAutoApply.TabIndex = 59
         Me.chkAutoApply.Text = "Apply Automatically"
         Me.chkAutoApply.UseVisualStyleBackColor = True
-        '
-        'chkCurveSymbolFillVisible
-        '
-        Me.chkCurveSymbolFillVisible.AutoSize = True
-        Me.chkCurveSymbolFillVisible.Location = New System.Drawing.Point(335, 140)
-        Me.chkCurveSymbolFillVisible.Name = "chkCurveSymbolFillVisible"
-        Me.chkCurveSymbolFillVisible.Size = New System.Drawing.Size(38, 17)
-        Me.chkCurveSymbolFillVisible.TabIndex = 52
-        Me.chkCurveSymbolFillVisible.Text = "Fill"
-        Me.chkCurveSymbolFillVisible.UseVisualStyleBackColor = True
         '
         'frmGraphEditor
         '
