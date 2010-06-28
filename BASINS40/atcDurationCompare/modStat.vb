@@ -904,8 +904,8 @@ Public Module modStat
             lNewPETS.Dates = New atcTimeseries(Nothing)
             lNewPETS.numValues = lDates.Count - 1
             lNewPETS.Dates.Values = lDates.ToArray()
-            lNewPETS.Attributes.SetValue("STAID", aTS.Attributes.GetValue("staid"))
-            lNewPETS.Attributes.SetValue("STANAM", aTS.Attributes.GetValue("stanam"))
+            lNewPETS.Attributes.SetValue("STAID", aTS.Attributes.GetValue("staid", ""))
+            lNewPETS.Attributes.SetValue("STANAM", aTS.Attributes.GetValue("stanam", ""))
             lNewPETS.Attributes.SetValue("StartYMD", lStartYMD)
             lNewPETS.Attributes.SetValue("EndYMD", lEndYMD)
             If Not aTS.Attributes.GetValue("Constituent").ToString.Trim = "" Then
