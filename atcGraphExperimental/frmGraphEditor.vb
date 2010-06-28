@@ -234,7 +234,7 @@ Public Class frmGraphEditor
                     .Scale.MaxAuto = False
                     .Scale.Max = lTemp
                 End If
-                If aAxis IsNot pPaneAux.XAxis Then
+                If pPaneAux Is Nothing OrElse aAxis IsNot pPaneAux.XAxis Then
                     .Title.Text = txtAxisLabel.Text
                     If aAxis Is pPane.XAxis AndAlso pPaneAux IsNot Nothing Then
                         SetAxisFromControls(pPaneAux.XAxis)
