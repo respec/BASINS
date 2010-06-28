@@ -53,50 +53,50 @@ Partial Class frmResult
         '
         Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuSelectData, Me.mnuSave, Me.mnuExit})
         Me.mnuFile.Name = "mnuFile"
-        Me.mnuFile.Size = New System.Drawing.Size(37, 20)
+        Me.mnuFile.Size = New System.Drawing.Size(35, 20)
         Me.mnuFile.Text = "File"
         '
         'mnuSelectData
         '
         Me.mnuSelectData.Name = "mnuSelectData"
-        Me.mnuSelectData.Size = New System.Drawing.Size(132, 22)
+        Me.mnuSelectData.Size = New System.Drawing.Size(152, 22)
         Me.mnuSelectData.Text = "Select Data"
         '
         'mnuSave
         '
         Me.mnuSave.Name = "mnuSave"
-        Me.mnuSave.Size = New System.Drawing.Size(132, 22)
+        Me.mnuSave.Size = New System.Drawing.Size(152, 22)
         Me.mnuSave.Text = "Save"
         '
         'mnuExit
         '
         Me.mnuExit.Name = "mnuExit"
-        Me.mnuExit.Size = New System.Drawing.Size(132, 22)
+        Me.mnuExit.Size = New System.Drawing.Size(152, 22)
         Me.mnuExit.Text = "Exit"
         '
         'mnuEdit
         '
         Me.mnuEdit.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuCopy})
         Me.mnuEdit.Name = "mnuEdit"
-        Me.mnuEdit.Size = New System.Drawing.Size(39, 20)
+        Me.mnuEdit.Size = New System.Drawing.Size(37, 20)
         Me.mnuEdit.Text = "Edit"
         '
         'mnuCopy
         '
         Me.mnuCopy.Name = "mnuCopy"
-        Me.mnuCopy.Size = New System.Drawing.Size(102, 22)
+        Me.mnuCopy.Size = New System.Drawing.Size(110, 22)
         Me.mnuCopy.Text = "Copy"
         '
         'mnuAnalysis
         '
         Me.mnuAnalysis.Name = "mnuAnalysis"
-        Me.mnuAnalysis.Size = New System.Drawing.Size(62, 20)
+        Me.mnuAnalysis.Size = New System.Drawing.Size(58, 20)
         Me.mnuAnalysis.Text = "Analysis"
         '
         'mnuHelp
         '
         Me.mnuHelp.Name = "mnuHelp"
-        Me.mnuHelp.Size = New System.Drawing.Size(44, 20)
+        Me.mnuHelp.Size = New System.Drawing.Size(40, 20)
         Me.mnuHelp.Text = "Help"
         '
         'MenuStrip1

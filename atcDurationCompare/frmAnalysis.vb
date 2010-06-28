@@ -4,11 +4,12 @@ Imports MapWinUtility
 
 Public Class frmAnalysis
 
-    Private pDataGroup As atcTimeseriesGroup
+    Private WithEvents pDataGroup As atcTimeseriesGroup
     Private pResultForm As System.Windows.Forms.Form
 
     Private pDefaultNumClasses As Integer = 35
     Private pDefaultClasses As Double() = {0}
+    Private pAnalysis As String = String.Empty
 
     Public Property DataGroup() As atcTimeseriesGroup
         Get
@@ -19,11 +20,11 @@ Public Class frmAnalysis
         End Set
     End Property
 
-    Public Property ResultForm() As System.Windows.Forms.Form
+    Public Property ResultForm() As frmResult
         Get
             Return pResultForm
         End Get
-        Set(ByVal value As System.Windows.Forms.Form)
+        Set(ByVal value As frmResult)
             pResultForm = value
         End Set
     End Property
@@ -49,6 +50,9 @@ Public Class frmAnalysis
         'lstClassLimits.CurrentValues = DefaultClasses
     End Sub
 
+    Private Sub DataChanged() Handles pDataGroup.Added, pDataGroup.Removed
+        DefaultClasses = GenerateClasses(pDefaultNumClasses, DataGroup)
+    End Sub
     Private Sub frmAnalysis_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         lblAnalysisInfo.Text = ""
         'lblAnalysisInfo.Text = "Step1. Select timeseries data" & vbNewLine & _
@@ -81,7 +85,8 @@ Public Class frmAnalysis
             End If
         End With
 
-        ResultForm = CreateForm("compare")
+        'ResultForm = CreateForm()
+        pAnalysis = "Compare"
     End Sub
 
     Private Sub rdoAnalysisDuration_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles rdoAnalysisDuration.CheckedChanged
@@ -100,63 +105,59 @@ Public Class frmAnalysis
             .Text &= Space(2) & DataGroup.Count & " timeseries are included."
         End With
 
-        ResultForm = CreateForm("duration")
+        'ResultForm = CreateForm()
+        pAnalysis = "Duration"
     End Sub
 
     Private Sub btnReport_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnReport.Click
         If ResultForm Is Nothing Then
-            Logger.Dbg("Duration/Compare analysis failed to initialize proper form")
+            ResultForm = CreateForm()
+        ElseIf ResultForm.IsDisposed Then
+            ResultForm = Nothing
+            ResultForm = CreateForm()
+        ElseIf pAnalysis = String.Empty Then
             Exit Sub
         End If
-        Select Case ResultForm.Name
-            Case "frmDuration"
-                If ResultForm.IsDisposed Then
-                    ResultForm = Nothing
-                    ResultForm = CreateForm("duration")
-                End If
-                CType(ResultForm, frmDuration).Initialize(DataGroup, lstClassLimits.CurrentValues)
-                'CType(ResultForm, frmDuration).Initialize(DataGroup, Nothing)
-            Case "frmCompare"
-                If DataGroup.Count < 2 Then
-                    Logger.Msg("Need to select two timeseries to conduct compare analysis.")
-                    'If txtDS1.Text = "" Then
-                    '    txtDS1.Focus()
-                    'ElseIf txtDS2.Text = "" Then
-                    '    txtDS2.Focus()
-                    'End If
-                    Exit Sub
-                End If
-                If ResultForm.IsDisposed Then
-                    ResultForm = Nothing
-                    ResultForm = CreateForm("compare")
-                End If
-                CType(ResultForm, frmCompare).Initialize(DataGroup, lstClassLimits.CurrentValues)
-                'CType(ResultForm, frmCompare).Initialize(DataGroup, Nothing)
-        End Select
+
+        If pAnalysis = "Compare" Then
+            If DataGroup.Count < 2 Then
+                Logger.Msg("Need to select two timeseries to conduct compare analysis.")
+                'If txtDS1.Text = "" Then
+                '    txtDS1.Focus()
+                'ElseIf txtDS2.Text = "" Then
+                '    txtDS2.Focus()
+                'End If
+                Exit Sub
+            End If
+        End If
+        ResultForm.Initialize(pAnalysis, DataGroup, lstClassLimits.CurrentValues, "Report")
         ResultForm.Show()
+        ResultForm.txtReport.SelectionLength = 0
     End Sub
 
     Private Sub btnGraph_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGraph.Click
         If ResultForm Is Nothing Then
-            Logger.Dbg("Duration/Compare analysis failed to initialize proper form")
+            ResultForm = CreateForm()
+        ElseIf ResultForm.IsDisposed Then
+            ResultForm = Nothing
+            ResultForm = CreateForm()
+        ElseIf pAnalysis = String.Empty Then
             Exit Sub
         End If
 
-        Select Case ResultForm.Name
-            Case "frmDuration"
-                CType(ResultForm, frmDuration).doDurPlot(DataGroup)
-            Case "frmCompare"
-                If DataGroup.Count < 2 Then
-                    Logger.Msg("Need to select two timeseries to conduct compare analysis.")
-                    'If txtDS1.Text = "" Then
-                    '    txtDS1.Focus()
-                    'ElseIf txtDS2.Text = "" Then
-                    '    txtDS2.Focus()
-                    'End If
-                    Exit Sub
-                End If
-                CType(ResultForm, frmCompare).doComparePlot(DataGroup)
-        End Select
+        If pAnalysis = "Compare" Then
+            If DataGroup.Count < 2 Then
+                Logger.Msg("Need to select two timeseries to conduct compare analysis.")
+                'If txtDS1.Text = "" Then
+                '    txtDS1.Focus()
+                'ElseIf txtDS2.Text = "" Then
+                '    txtDS2.Focus()
+                'End If
+                Exit Sub
+            End If
+        End If
+
+        ResultForm.Initialize(pAnalysis, DataGroup, lstClassLimits.CurrentValues, "Graph")
     End Sub
 
     'Private Sub txtDS1_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtDS1.Click
@@ -175,26 +176,27 @@ Public Class frmAnalysis
     '    End If
     'End Sub
 
-    Private Sub ChangedNumClasses() Handles CtlClassLimits1.ChangedNumClasses
-        lstClassLimits.CurrentValues = GenerateClasses(CtlClassLimits1.NumClasses, DataGroup)
+    Private Sub SettingChanged() Handles CtlClassLimits1.SettingChanged
+        If CtlClassLimits1.UsePresetClasses Then
+            lstClassLimits.CurrentValues = GenerateClasses()
+        ElseIf CtlClassLimits1.UpperBound < 0 Or CtlClassLimits1.LowerBound < 0 Then
+            lstClassLimits.CurrentValues = GenerateClasses(CtlClassLimits1.NumClasses, DataGroup)
+        ElseIf CtlClassLimits1.LowerBound < CtlClassLimits1.UpperBound Then
+            lstClassLimits.CurrentValues = GenerateClasses(CtlClassLimits1.NumClasses, DataGroup, CtlClassLimits1.LowerBound, CtlClassLimits1.UpperBound)
+        End If
     End Sub
 
     Private Sub DisplayDefault() Handles lstClassLimits.DefaultRequested
         lstClassLimits.CurrentValues = DefaultClasses
     End Sub
 
-    Private Function CreateForm(ByVal Analysis As String) As Object
+    Private Function CreateForm() As frmResult
         Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
-        Dim lFrm As Object = Nothing
-        If Analysis = "duration" Then
-            lFrm = New frmDuration
-        ElseIf Analysis = "compare" Then
-            lFrm = New frmCompare
-        End If
+        Dim lFrm As New frmResult
         For Each lDisp As atcDataDisplay In DisplayPlugins
             Dim lMenuText As String = lDisp.Name
             If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
-            lFrm.mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf lFrm.mnuAnalysis_Click))
+            lFrm.mnuAnalysis.DropDownItems().Add(lMenuText, Nothing, New EventHandler(AddressOf lFrm.mnuAnalysis_Click))
         Next
         Return lFrm
     End Function

@@ -8,6 +8,7 @@ Public Class frmResult
     Private pClassLimits As Double()
     Private pAnalysis As String = String.Empty
     Private pListPEGroups As New List(Of atcTimeseriesGroup)
+    Public pOpened As Boolean = False
 
     Public Sub Initialize(ByVal aAnalysis As String, ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup, ByVal aClassLimits As Double(), ByVal aOperation As String)
         pAnalysis = aAnalysis
@@ -15,52 +16,19 @@ Public Class frmResult
         pClassLimits = aClassLimits
         pListPEGroups.Clear()
 
-        Select Case pAnalysis.ToLower
-            Case "durationhydrograph"
-                Me.Text = "Duration Hydrograph Analysis Result"
-                If aOperation.ToLower() = "report" Then
-                    doReportDH(pDataGroup, pClassLimits)
-                ElseIf aOperation.ToLower() = "graph" Then
-                    doPlot(pDataGroup)
-                End If
-            Case "duration"
-                Me.Text = "Duration Analysis Result"
-            Case "compare"
-                Me.Text = "Compare Analysis Result"
-            Case Else
-        End Select
-    End Sub
-
-    Private Sub mnuSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-        Dim lSaveFileDialog As New Windows.Forms.SaveFileDialog
-        Dim lFileDialogTitle As String
-        Select Case pAnalysis.ToLower
-            Case "duration"
-                lFileDialogTitle = "Save Duration Report As..."
-            Case "compare"
-                lFileDialogTitle = "Save Compare Report As..."
-            Case "durationhydrograph"
-                lFileDialogTitle = "Save Duration Hydrograph Report As..."
-            Case Else
-                lFileDialogTitle = "Save Report As..."
-        End Select
-        With lSaveFileDialog
-            .Title = lFileDialogTitle
-            .DefaultExt = "txt"
-            .Filter = "Text Files|*.txt|All Files|*.*"
-            .FilterIndex = 0
-            If .ShowDialog = Windows.Forms.DialogResult.OK Then
-                IO.File.WriteAllText(.FileName, txtReport.Text)
-                OpenFile(.FileName)
-            End If
-        End With
-    End Sub
-
-    Public Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-        If sender.text = "Graph" Then
+        If aOperation.ToLower = "graph" Then
             doPlot(pDataGroup)
-        Else
-            atcDataManager.ShowDisplay(sender.Text, pDataGroup)
+        ElseIf aOperation.ToLower = "report" Then
+            Select Case pAnalysis.ToLower
+                Case "durationhydrograph"
+                    Me.Text = "Duration Hydrograph Analysis Result"
+                Case "duration"
+                    Me.Text = "Duration Analysis Result"
+                Case "compare"
+                    Me.Text = "Compare Analysis Result"
+                Case Else
+            End Select
+            doReport(pDataGroup)
         End If
     End Sub
 
@@ -83,18 +51,27 @@ Public Class frmResult
         End Get
     End Property
 
-    Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        ShowHelp(HelpLocation)
-    End Sub
-
-    Public Overridable Function doPlot(ByRef aDatagroup As atcDataGroup) As Boolean
+    Public Overridable Function doPlot(ByVal aDatagroup As atcDataGroup) As Boolean
         Select Case pAnalysis.ToLower
-            Case "duration"
-            Case "compare"
+            Case "duration", "compare"
+                doPlotDurCompare(aDatagroup)
             Case "durationhydrograph"
                 doPlotDH(aDatagroup, pClassLimits)
         End Select
         Return True
+    End Function
+
+    Public Overridable Function doReport(ByVal adatagroup As atcDataGroup) As Boolean
+        Select Case pAnalysis.ToLower
+            Case "duration"
+                doReportDur(adatagroup, pClassLimits)
+            Case "compare"
+                doReportCompare(adatagroup, pClassLimits)
+            Case "durationhydrograph"
+                doReportDH(adatagroup, pClassLimits)
+        End Select
+        Return True
+
     End Function
 
     Public Overridable Sub doReportDH(ByVal aTimeseriesGroup As atcDataGroup, ByVal aClassLimits As Double())
@@ -103,6 +80,44 @@ Public Class frmResult
             lStrbuilder.AppendLine(DurationHydrograph(lTS, aClassLimits))
         Next
         txtReport.Text = lStrbuilder.ToString
+    End Sub
+
+    Private Sub doReportDur(ByVal aTimeseriesGroup As atcDataGroup, ByVal aClassLimits As Double())
+        Dim lReport As New DurationReport(aClassLimits)
+        With txtReport
+            .Text = ""
+            For Each lTs As atcTimeseries In aTimeseriesGroup
+                .Text &= "Duration Report for " & lTs.ToString & vbCrLf & vbCrLf & DurationStats(lTs, lReport)
+            Next
+            .SelectionStart = 0
+            .SelectionLength = 0
+        End With
+    End Sub
+
+    Private Sub doReportCompare(ByVal aTimeseriesGroup As atcDataGroup, ByVal aClassLimits As Double())
+        Dim lObserved As atcTimeseries = Nothing
+        Dim lSimulated As atcTimeseries = Nothing
+        If aTimeseriesGroup.Count > 0 Then
+            lObserved = aTimeseriesGroup(0)
+            If aTimeseriesGroup.Count > 1 Then
+                lSimulated = aTimeseriesGroup(1)
+            End If
+        End If
+
+        'Check if the two timeseries has common starting and ending dates
+        If aTimeseriesGroup(0).Attributes.GetValue("Start Date") <> aTimeseriesGroup(1).Attributes.GetValue("Start Date") Or _
+           aTimeseriesGroup(0).Attributes.GetValue("End Date") <> aTimeseriesGroup(1).Attributes.GetValue("End Date") Then
+            txtReport.Text = "The two timeseries needs to have common start and end dates."
+            Exit Sub
+        End If
+
+        Dim lReport As New DurationReport(aClassLimits)
+        With txtReport
+            .Text = ""
+            .Text &= "Compare Report:" & vbCrLf & vbCrLf & CompareStats(lObserved, lSimulated, lReport.ClassLimitsNeeded(lObserved))
+            .SelectionStart = 0
+            .SelectionLength = 0
+        End With
     End Sub
 
     Public Sub doPlotDH(ByVal aTimeseriesGroup As atcDataGroup, ByVal aClassLimits As Double())
@@ -116,25 +131,18 @@ Public Class frmResult
         Next
     End Sub
 
-    Private Sub DataGroupChanged() Handles pDataGroup.Added, pDataGroup.Removed
-        If pDataGroup IsNot Nothing And pClassLimits IsNot Nothing Then
-            If pDataGroup.Count > 0 Then
-                doReportDH(pDataGroup, pClassLimits)
-            End If
-        End If
-    End Sub
+    Public Function doPlotDurCompare(ByRef aDatagroup As atcDataGroup) As Boolean
+        Dim doneIt As Boolean = True
+        Dim lp As String = ""
+        Dim lgraphForm As New atcGraph.atcGraphForm()
 
-    Private Sub mnuSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectData.Click
-        pDataGroup = atcDataManager.UserSelectData("Select Data For Analysis", pDataGroup)
-    End Sub
+        Dim lZgc As ZedGraphControl = lgraphForm.ZedGraphCtrl
+        Dim lGraphDur As New clsGraphProbability(aDatagroup, lZgc)
+        lgraphForm.Grapher = lGraphDur
+        lgraphForm.Show()
 
-    Private Sub frmResult_Disposed(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Disposed
-        pDataGroup = Nothing
-        pClassLimits = Nothing
-    End Sub
-
-    Private Sub frmResult_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-    End Sub
+        Return doneIt
+    End Function
 
     Public Function DurationHydrographPlot(ByVal aDataGroup As atcTimeseriesGroup) As Boolean
         Dim doneIt As Boolean = True
@@ -204,4 +212,73 @@ Public Class frmResult
 
         Return doneIt
     End Function
+
+    Private Sub DataGroupChanged() Handles pDataGroup.Added, pDataGroup.Removed
+        If Not pOpened Then Exit Sub
+        If pDataGroup IsNot Nothing And pClassLimits IsNot Nothing Then
+            If pDataGroup.Count > 0 Then
+                doReport(pDataGroup)
+            End If
+        End If
+    End Sub
+
+    Private Sub frmResult_Disposed(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Disposed
+        pDataGroup = Nothing
+        pClassLimits = Nothing
+        pOpened = False
+    End Sub
+
+    Private Sub frmResult_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        pOpened = True
+    End Sub
+
+    Private Sub mnuSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSave.Click
+        Dim lSaveFileDialog As New Windows.Forms.SaveFileDialog
+        Dim lFileDialogTitle As String
+        Select Case pAnalysis.ToLower
+            Case "duration"
+                lFileDialogTitle = "Save Duration Report As..."
+            Case "compare"
+                lFileDialogTitle = "Save Compare Report As..."
+            Case "durationhydrograph"
+                lFileDialogTitle = "Save Duration Hydrograph Report As..."
+            Case Else
+                lFileDialogTitle = "Save Report As..."
+        End Select
+        With lSaveFileDialog
+            .Title = lFileDialogTitle
+            .DefaultExt = "txt"
+            .Filter = "Text Files|*.txt|All Files|*.*"
+            .FilterIndex = 0
+            If .ShowDialog = Windows.Forms.DialogResult.OK Then
+                IO.File.WriteAllText(.FileName, txtReport.Text)
+                OpenFile(.FileName)
+            End If
+        End With
+    End Sub
+
+    Public Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
+        If sender.text = "Graph" Then
+            doPlot(pDataGroup)
+        Else
+            atcDataManager.ShowDisplay(sender.Text, pDataGroup)
+        End If
+    End Sub
+
+    Private Sub mnuSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectData.Click
+        pDataGroup = atcDataManager.UserSelectData("Select Data For Analysis", pDataGroup)
+    End Sub
+
+    Private Sub mnuExit_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuExit.Click
+        frmResult_Disposed(sender, e)
+        Me.Close()
+    End Sub
+
+    Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
+        ShowHelp(HelpLocation)
+    End Sub
+
+    Private Sub txtReport_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtReport.TextChanged
+        txtReport.SelectionLength = 0
+    End Sub
 End Class
