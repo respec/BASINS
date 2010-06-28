@@ -196,7 +196,7 @@ Partial Class frmAnalysis
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MainMenuStrip = Me.menuStrip
         Me.Name = "frmAnalysis"
-        Me.Text = "Choose Graphs to Create"
+        Me.Text = "Duration/Compare Analysis"
         Me.gbClassLimits.ResumeLayout(False)
         Me.gbChooseAnalysis.ResumeLayout(False)
         Me.gbChooseAnalysis.PerformLayout()

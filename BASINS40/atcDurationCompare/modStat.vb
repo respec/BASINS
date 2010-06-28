@@ -1356,7 +1356,17 @@ G200:
         Return lStr & vbCrLf
     End Function
 
-    Public Function GenerateClasses(ByVal aNumFDclasses As Integer, ByVal fddat As atcDataGroup) As Double()
+    ''' <summary>
+    ''' Default SWSTAT4.1 class limits
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Function GenerateClasses() As Double()
+        Dim lClassLimits() As Double = {0, 1, 1.4, 2, 2.8, 4, 5.7, 8.1, 11, 16, 23, 33, 46, 66, 93, 130, 190, 270, 380, 530, 760, 1100, 1500, 2200, 3100, 4300, 6100, 8700, 12000, 17000, 25000, 35000, 50000, 71000, 100000}
+        Return lClassLimits
+    End Function
+
+    Public Function GenerateClasses(ByVal aNumFDclasses As Integer, ByVal fddat As atcDataGroup, Optional ByVal aMin As Double = -9999.0, Optional ByVal aMax As Double = -9999.0) As Double()
 
         'determine bounds for duration analysis
         Dim lMin As Double = 1000000.0#
@@ -1369,12 +1379,17 @@ G200:
         Dim clas(aNumFDclasses) As Double
         Dim c As Double
 
-        For j = 0 To fddat.Count - 1
-            vmin(j) = fddat(j).Attributes.GetValue("Min")
-            vmax(j) = fddat(j).Attributes.GetValue("Max")
-            If vmin(j) < lMin Then lMin = vmin(j)
-            If vmax(j) > lMax Then lMax = vmax(j)
-        Next j
+        If aMax < 0 AndAlso aMin < 0 Then
+            For j = 0 To fddat.Count - 1
+                vmin(j) = fddat(j).Attributes.GetValue("Min")
+                vmax(j) = fddat(j).Attributes.GetValue("Max")
+                If vmin(j) < lMin Then lMin = vmin(j)
+                If vmax(j) > lMax Then lMax = vmax(j)
+            Next j
+        Else
+            lMin = aMin
+            lMax = aMax
+        End If
 
         iexp = Fix(Log10(lMax))
         bound(1) = 10.0# ^ (iexp + 1)

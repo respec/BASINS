@@ -57,7 +57,7 @@ Partial Class atcManagedList
         Me.lstValues.IntegralHeight = False
         Me.lstValues.Location = New System.Drawing.Point(0, 0)
         Me.lstValues.Name = "lstValues"
-        Me.lstValues.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
+        Me.lstValues.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
         Me.lstValues.Size = New System.Drawing.Size(202, 413)
         Me.lstValues.TabIndex = 29
         Me.lstValues.Tag = ""

@@ -18,11 +18,11 @@ Public Class frmDurationHydrographControl
         End Set
     End Property
 
-    Public Property ResultForm() As System.Windows.Forms.Form
+    Public Property ResultForm() As frmResult
         Get
             Return pResultForm
         End Get
-        Set(ByVal value As System.Windows.Forms.Form)
+        Set(ByVal value As frmResult)
             pResultForm = value
         End Set
     End Property
@@ -47,7 +47,10 @@ Public Class frmDurationHydrographControl
     End Sub
 
     Private Sub frmDurationHydrographControl_Disposed(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Disposed
-        pDataGroup.Clear()
+        If pDataGroup IsNot Nothing Then
+            pDataGroup.Clear()
+        End If
+
         pDataGroup = Nothing
     End Sub
 
@@ -58,7 +61,7 @@ Public Class frmDurationHydrographControl
         '                       "Step3. Choose an anlysis" & vbNewLine & _
         '                       "Step4. Click either Graph or Report to carry out analysis and see results"
         lstPctExceed.CurrentValues = DefaultClasses
-        ResultForm = CreateForm("durationhydrograph")
+        ResultForm = CreateForm()
     End Sub
 
     Private Sub DisplayDefault() Handles lstPctExceed.DefaultRequested
@@ -69,6 +72,9 @@ Public Class frmDurationHydrographControl
         If ResultForm Is Nothing Then
             Logger.Dbg("Duration Hydrograph analysis failed to initialize result form")
             Exit Sub
+        ElseIf ResultForm.IsDisposed Then
+            ResultForm = Nothing
+            ResultForm = CreateForm()
         End If
 
         Dim lListPct As List(Of Double) = ListOK()
@@ -76,60 +82,28 @@ Public Class frmDurationHydrographControl
         If DataGroup.Count = 0 Then
             mnuSelectData_Click(Nothing, Nothing)
         End If
-        Dim ltxtBox As Windows.Forms.TextBox = Nothing
-        Select Case ResultForm.Name
-            Case "frmResult"
-                If ResultForm.IsDisposed Then
-                    ResultForm = Nothing
-                    ResultForm = CreateForm("durationhydrograph")
-                End If
-                With CType(ResultForm, frmResult)
-                    .Initialize("DurationHydrograph", DataGroup, lListPct.ToArray(), "report")
-                    ltxtBox = .txtReport
-                End With
 
-        End Select
+        ResultForm.Initialize("DurationHydrograph", DataGroup, lListPct.ToArray(), "report")
         ResultForm.Show()
-        If ltxtBox IsNot Nothing Then
-            ltxtBox.SelectionLength = 0
-        End If
+        ResultForm.txtReport.SelectionLength = 0
     End Sub
 
     Private Sub btnGraph_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGraph.Click
         If ResultForm Is Nothing Then
             Logger.Dbg("Duration/Compare analysis failed to initialize proper form")
             Exit Sub
+        ElseIf ResultForm.IsDisposed Then
+            ResultForm = Nothing
+            ResultForm = CreateForm()
         End If
 
-        Select Case ResultForm.Name
-            Case "frmDuration"
-                CType(ResultForm, frmDuration).doDurPlot(DataGroup)
-            Case "frmCompare"
-                If DataGroup.Count < 2 Then
-                    Logger.Msg("Need to select two timeseries to conduct compare analysis.")
-                    'If txtDS1.Text = "" Then
-                    '    txtDS1.Focus()
-                    'ElseIf txtDS2.Text = "" Then
-                    '    txtDS2.Focus()
-                    'End If
-                    Exit Sub
-                End If
-                CType(ResultForm, frmCompare).doComparePlot(DataGroup)
-            Case "frmResult"
-                Dim lListPct As List(Of Double) = ListOK()
+        Dim lListPct As List(Of Double) = ListOK()
 
-                If DataGroup.Count = 0 Then
-                    mnuSelectData_Click(Nothing, Nothing)
-                End If
+        If DataGroup.Count = 0 Then
+            mnuSelectData_Click(Nothing, Nothing)
+        End If
 
-                If ResultForm.IsDisposed Then
-                    ResultForm = Nothing
-                    ResultForm = CreateForm("durationhydrograph")
-                End If
-                With CType(ResultForm, frmResult)
-                    .Initialize("DurationHydrograph", DataGroup, lListPct.ToArray(), "graph")
-                End With
-        End Select
+        ResultForm.Initialize("DurationHydrograph", DataGroup, lListPct.ToArray(), "graph")
     End Sub
 
     Private Sub mnuSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectData.Click
@@ -145,24 +119,16 @@ Public Class frmDurationHydrographControl
     End Sub
 
 #Region "Util"
-    Private Function CreateForm(ByVal Analysis As String) As Object
+    Private Function CreateForm() As frmResult
         Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
-        Dim lFrm As Object = Nothing
-        Analysis = Analysis.ToLower()
-        If Analysis = "duration" Then
-            lFrm = New frmDuration
-        ElseIf Analysis = "compare" Then
-            lFrm = New frmCompare
-        ElseIf Analysis = "durationhydrograph" Then
-            lFrm = New frmResult
-        End If
+        Dim lFrm As New frmResult
         For Each lDisp As atcDataDisplay In DisplayPlugins
             Dim lMenuText As String = lDisp.Name
             If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
             If TypeOf (lFrm) Is frmResult Then
                 CType(lFrm, frmResult).mnuAnalysis.DropDownItems().Add(lMenuText, Nothing, New EventHandler(AddressOf lFrm.mnuAnalysis_Click))
             Else
-                lFrm.mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf lFrm.mnuAnalysis_Click))
+                lFrm.mnuAnalysis.DropDownItems().Add(lMenuText, Nothing, New EventHandler(AddressOf lFrm.mnuAnalysis_Click))
             End If
         Next
         Return lFrm
@@ -183,7 +149,6 @@ Public Class frmDurationHydrographControl
         lList.Sort()
         Return lList
     End Function
-
 #End Region
 
 End Class
