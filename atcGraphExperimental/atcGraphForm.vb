@@ -308,21 +308,23 @@ Public Class atcGraphForm
     End Sub
 
     Private Sub mnuFilePrint_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFilePrint.Click
-        Dim printdlg As New PrintDialog
-        Dim printdoc As New Printing.PrintDocument
-        AddHandler printdoc.PrintPage, AddressOf Me.PrintPage
+        Dim lPrintDialog As New PrintDialog
+        Dim lPrintDocument As New Printing.PrintDocument
+        AddHandler lPrintDocument.PrintPage, AddressOf Me.PrintPage
 
-        With printdlg
-            .Document = printdoc
+        With lPrintDialog
+            .Document = lPrintDocument
             .AllowSelection = False
             .ShowHelp = True
+            .UseEXDialog = True
             'TODO: default to landscape if graph is wider than tall
             ' If the result is OK then print the document.
-            If (.ShowDialog = Windows.Forms.DialogResult.OK) Then
-                Dim saveRect As RectangleF = pMaster.Rect
-                printdoc.Print()
+            Dim lDialogResult As Windows.Forms.DialogResult = .ShowDialog(Me)
+            If (lDialogResult = Windows.Forms.DialogResult.OK) Then
+                Dim lSaveRectangle As RectangleF = pMaster.Rect
+                lPrintDocument.Print()
                 ' Restore graph size to fit form's bounds. 
-                pMaster.ReSize(Me.CreateGraphics, saveRect)
+                pMaster.ReSize(Me.CreateGraphics, lSaveRectangle)
             End If
         End With
     End Sub
