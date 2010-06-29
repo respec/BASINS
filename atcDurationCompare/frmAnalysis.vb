@@ -129,6 +129,8 @@ Public Class frmAnalysis
                 'End If
                 Exit Sub
             End If
+        ElseIf pAnalysis = "" Then
+            Exit Sub
         End If
         ResultForm.Initialize(pAnalysis, DataGroup, lstClassLimits.CurrentValues, "Report")
         ResultForm.Show()

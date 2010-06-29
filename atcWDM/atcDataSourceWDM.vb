@@ -858,7 +858,7 @@ CaseExistRenumber:
                                 If Math.Abs((lV(iVal - 1) - lTsFill)) < 1.0E-20 Then 'pEpsilon Then
                                     lVd(iVal) = pNan
                                 Else
-                                    lVd(iVal) = lV(iVal - 1) 'TODO: test speed of this vs. using ReadDataset.Value(iVal) = v(iVal)
+                                    lVd(iVal) = Double.Parse(lV(iVal - 1).ToString) 'TODO: test speed of this vs. using ReadDataset.Value(iVal) = v(iVal)
                                 End If
                                 If lConstInterval Then
                                     lJd(iVal) = lSJDay + iVal * lInterval
