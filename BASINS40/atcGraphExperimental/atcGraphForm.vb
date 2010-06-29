@@ -311,14 +311,13 @@ Public Class atcGraphForm
         Dim lPrintDialog As New PrintDialog
         Dim lPrintDocument As New Printing.PrintDocument
         AddHandler lPrintDocument.PrintPage, AddressOf Me.PrintPage
+        AddHandler lPrintDocument.QueryPageSettings, AddressOf Me.PageSettings
 
         With lPrintDialog
             .Document = lPrintDocument
             .AllowSelection = False
             .ShowHelp = True
             .UseEXDialog = True
-            'TODO: default to landscape if graph is wider than tall
-            ' If the result is OK then print the document.
             Dim lDialogResult As Windows.Forms.DialogResult = .ShowDialog(Me)
             If (lDialogResult = Windows.Forms.DialogResult.OK) Then
                 Dim lSaveRectangle As RectangleF = pMaster.Rect
@@ -327,6 +326,14 @@ Public Class atcGraphForm
                 pMaster.ReSize(Me.CreateGraphics, lSaveRectangle)
             End If
         End With
+    End Sub
+
+    Private Sub PageSettings(ByVal sender As System.Object, ByVal e As Printing.QueryPageSettingsEventArgs)
+        If pMaster.Rect.Width > pMaster.Rect.Height Then
+            e.PageSettings.Landscape = True
+        Else
+            e.PageSettings.Landscape = False
+        End If
     End Sub
 
     '' <summary> Prints the displayed graph. </summary> 
