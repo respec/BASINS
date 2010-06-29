@@ -269,6 +269,7 @@ Friend Class frmSelectData
         resources.ApplyResources(Me.groupTop, "groupTop")
         Me.groupTop.Name = "groupTop"
         Me.groupTop.TabStop = False
+        Me.groupTop.ForeColor = System.Drawing.SystemColors.ControlText
         '
         'pMatchingGrid
         '
@@ -310,6 +311,7 @@ Friend Class frmSelectData
         resources.ApplyResources(Me.groupSelected, "groupSelected")
         Me.groupSelected.Name = "groupSelected"
         Me.groupSelected.TabStop = False
+        Me.groupSelected.ForeColor = System.Drawing.SystemColors.ControlText
         '
         'pSelectedGrid
         '
@@ -874,28 +876,32 @@ NextTS:
 
     Private Sub UpdatedCriteria()
         If Not pInitializing Then
-            'Dim mnu As ToolStripMenuItem
+            Dim lToolStripMenuItem As ToolStripMenuItem
             Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
 
             UpdateManagerSelectionAttributes()
             PopulateMatching()
 
-            'For Each mnu In mnuAttributesRemove.DropDownItems
-            '    RemoveHandler mnu.Click, AddressOf mnuRemove_Click
-            'Next
-            'For Each mnu In mnuAttributesMove.DropDownItems
-            '    RemoveHandler mnu.Click, AddressOf mnuMove_Click
-            'Next
+            For Each lToolStripMenuItem In mnuAttributesRemove.DropDownItems
+                RemoveHandler lToolStripMenuItem.Click, AddressOf mnuRemove_Click
+            Next
+            For Each lToolStripMenuItem In mnuAttributesMove.DropDownItems
+                RemoveHandler lToolStripMenuItem.Click, AddressOf mnuMove_Click
+            Next
 
             mnuAttributesRemove.DropDownItems.Clear()
             mnuAttributesMove.DropDownItems.Clear()
 
             If iLastCriteria > 0 Then 'Only allow moving/removing if more than one exists
                 For iCriteria As Integer = 0 To iLastCriteria
-                    mnuAttributesRemove.DropDownItems.Add("&" & iCriteria + 1 & " " & pcboCriteria(iCriteria).SelectedItem, Nothing, _
-                                                          AddressOf mnuRemove_Click)
-                    mnuAttributesMove.DropDownItems.Add("&" & iCriteria + 1 & " " & pcboCriteria(iCriteria).SelectedItem, Nothing, _
-                                                        AddressOf mnuMove_Click)
+                    lToolStripMenuItem = _
+                        mnuAttributesRemove.DropDownItems.Add("&" & iCriteria + 1 & " " & pcboCriteria(iCriteria).SelectedItem, Nothing, _
+                                                              AddressOf mnuRemove_Click)
+                    lToolStripMenuItem.Tag = iCriteria 'mnuAttributesRemove.DropDownItems.Count
+                    lToolStripMenuItem = _
+                        mnuAttributesMove.DropDownItems.Add("&" & iCriteria + 1 & " " & pcboCriteria(iCriteria).SelectedItem, Nothing, _
+                                                            AddressOf mnuMove_Click)
+                    lToolStripMenuItem.Tag = iCriteria 'mnuAttributesMove.DropDownItems.Count
                 Next
             End If
         End If
@@ -1218,8 +1224,8 @@ NextName:
     End Sub
 
     Private Sub mnuRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-        Dim mnu As MenuItem = sender
-        Dim index As Integer = mnu.Index
+        Dim mnu As ToolStripMenuItem = sender
+        Dim index As Integer = mnu.Tag 
         RemoveCriteria(pcboCriteria(index), plstCriteria(index))
     End Sub
 
