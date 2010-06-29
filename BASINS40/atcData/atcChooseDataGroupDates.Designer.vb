@@ -22,20 +22,20 @@ Partial Class atcChooseDataGroupDates
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
+        Me.components = New System.ComponentModel.Container()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.lblCommonStart = New System.Windows.Forms.Label
-        Me.lblCommonEnd = New System.Windows.Forms.Label
-        Me.lblDataStart = New System.Windows.Forms.Label
-        Me.lblDataEnd = New System.Windows.Forms.Label
-        Me.btnAll = New System.Windows.Forms.Button
-        Me.btnCommon = New System.Windows.Forms.Button
-        Me.grpYears = New System.Windows.Forms.GroupBox
-        Me.txtOmitBefore = New System.Windows.Forms.TextBox
-        Me.lblOmitBefore = New System.Windows.Forms.Label
-        Me.lblOmitAfter = New System.Windows.Forms.Label
-        Me.txtOmitAfter = New System.Windows.Forms.TextBox
-        Me.chkYearly = New System.Windows.Forms.CheckBox
+        Me.lblCommonStart = New System.Windows.Forms.Label()
+        Me.lblCommonEnd = New System.Windows.Forms.Label()
+        Me.lblDataStart = New System.Windows.Forms.Label()
+        Me.lblDataEnd = New System.Windows.Forms.Label()
+        Me.btnAll = New System.Windows.Forms.Button()
+        Me.btnCommon = New System.Windows.Forms.Button()
+        Me.grpYears = New System.Windows.Forms.GroupBox()
+        Me.txtOmitBefore = New System.Windows.Forms.TextBox()
+        Me.lblOmitBefore = New System.Windows.Forms.Label()
+        Me.lblOmitAfter = New System.Windows.Forms.Label()
+        Me.txtOmitAfter = New System.Windows.Forms.TextBox()
+        Me.chkYearly = New System.Windows.Forms.CheckBox()
         Me.grpYears.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -114,6 +114,7 @@ Partial Class atcChooseDataGroupDates
         Me.grpYears.Controls.Add(Me.txtOmitAfter)
         Me.grpYears.Controls.Add(Me.chkYearly)
         Me.grpYears.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.grpYears.ForeColor = System.Drawing.SystemColors.ControlText
         Me.grpYears.Location = New System.Drawing.Point(0, 0)
         Me.grpYears.Name = "grpYears"
         Me.grpYears.Size = New System.Drawing.Size(274, 105)
