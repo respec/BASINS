@@ -171,7 +171,7 @@ Public Module modStat
         Dim lNumExceedPct As Double = 0.0
         Dim lAvgClass As Double = 0.0
         For Each lLimit As Double In aDurationReport.ClassLimitsNeeded(aTimeseries)
-            lStr &= DecimalAlign(lLimit, 12, 0)
+            lStr &= DecimalAlign(lLimit, 12, 1)
             If lClassBuckets.Keys.Contains(lLimit) Then
                 lClassBucket = lClassBuckets.ItemByKey(lLimit)
                 With lClassBucket
@@ -225,6 +225,7 @@ Public Module modStat
                                  ByVal aTSer2 As atcTimeseries, _
                         Optional ByVal aClassLimits As Generic.List(Of Double) = Nothing) As String
         Dim lStr As String = ""
+        Dim lStrBuilder As New Text.StringBuilder
         Dim lNote As String = ""
         Dim lMeanError As Double = 0.0#
         Dim lMeanAbsoluteError As Double = 0.0#
@@ -392,33 +393,38 @@ Public Module modStat
             lNashSutcliffe = lNashSutcliffeNumerator / lNashSutcliffe
         End If
 
-        lStr &= "Note: TS, Time Series" & vbCrLf & vbCrLf
-        lStr &= "Correlation Coefficient".PadLeft(36) & DecimalAlign(lCorrelationCoefficient, 18) & vbCrLf
-        lStr &= "Coefficient of Determination".PadLeft(36) & DecimalAlign(lCorrelationCoefficient ^ 2, 18) & vbCrLf
-        lStr &= "Mean Error".PadLeft(36) & DecimalAlign(lMeanError, 18) & vbCrLf
-        lStr &= "Mean Absolute Error".PadLeft(36) & DecimalAlign(lMeanAbsoluteError, 18) & vbCrLf
-        lStr &= "RMS Error".PadLeft(36) & DecimalAlign(lRmsError, 18) & vbCrLf
-        lStr &= "Model Fit Efficiency".PadLeft(36) & DecimalAlign(1 - lNashSutcliffe, 18) & vbCrLf
-        lStr &= vbCrLf & vbCrLf & vbFormFeed & vbCrLf
-
+        lStrBuilder.AppendLine("1")
+        lStrBuilder.AppendLine("Note: TS, Time Series")
+        lStrBuilder.AppendLine()
+        lStrBuilder.AppendLine("Correlation Coefficient".PadLeft(36) & DecimalAlign(lCorrelationCoefficient, 18))
+        lStrBuilder.AppendLine("Coefficient of Determination".PadLeft(36) & DecimalAlign(lCorrelationCoefficient ^ 2, 18))
+        lStrBuilder.AppendLine("Mean Error".PadLeft(36) & DecimalAlign(lMeanError, 18))
+        lStrBuilder.AppendLine("Mean Absolute Error".PadLeft(36) & DecimalAlign(lMeanAbsoluteError, 18))
+        lStrBuilder.AppendLine("RMS Error".PadLeft(36) & DecimalAlign(lRmsError, 18))
+        lStrBuilder.AppendLine("Model Fit Efficiency".PadLeft(36) & DecimalAlign(1 - lNashSutcliffe, 18))
+        lStrBuilder.AppendLine()
+        lStrBuilder.AppendLine()
+        lStrBuilder.AppendLine()
 
         If aClassLimits IsNot Nothing Then
             'lStr &= "Time Series 1" & vbCrLf & "Time Series 2" & vbCrLf
 
-            lStr &= "            TS 1 - " & TimeserIdString(aTSer1) & vbCrLf
-            lStr &= "            TS 2 - " & TimeserIdString(aTSer2) & vbCrLf & vbCrLf
-            lStr &= "                           Mean               Root mean" & vbCrLf
-            lStr &= "Lower    Number    absolute error(1)     square error(2)        Bias(3)      " & vbCrLf
-            lStr &= "class      of     ------------------- ------------------- -------------------" & vbCrLf
-            lStr &= "limit     cases   Average    Percent   Average    Percent  Average   Percent " & vbCrLf
-            lStr &= "--------- --------- --------- --------- --------- --------- --------- ---------" & vbCrLf
+            lStrBuilder.AppendLine("            TS 1 - " & TimeserIdString(aTSer1))
+            lStrBuilder.AppendLine("            TS 2 - " & TimeserIdString(aTSer2))
+            lStrBuilder.AppendLine()
+            lStrBuilder.AppendLine("                           Mean               Root mean")
+            lStrBuilder.AppendLine("   Lower    Number    absolute error(1)     square error(2)        Bias(3)      ")
+            lStrBuilder.AppendLine("   class      of     ------------------- ------------------- -------------------")
+            lStrBuilder.AppendLine("   limit     cases   Average    Percent   Average    Percent  Average   Percent ")
+            lStrBuilder.AppendLine(" --------- --------- --------- --------- --------- --------- --------- ---------")
+
             For Each lLimit As Double In aClassLimits
-                lStr &= DecimalAlign(lLimit, 12, 0)
+                lStrBuilder.Append(DoubleToString(lLimit, 10, "0.00").PadLeft(10)) 'lower class limit
                 Dim lCount As Integer = 0
                 If lClassBuckets.Keys.Contains(lLimit) Then
                     lClassBucket = lClassBuckets.ItemByKey(lLimit)
                     With lClassBucket
-                        lStr &= CStr(.Count1).PadLeft(8)
+                        lStrBuilder.Append(CStr(.Count1).PadLeft(9).PadRight(10)) ' number of cases
                         If Double.IsNaN(.TotalDifference) Then .TotalDifference = 0.0
                         If Double.IsNaN(.TotalDifferencePCT) Then .TotalDifferencePCT = 0.0
                         If Double.IsNaN(.TotalSS) Then .TotalSS = 0.0
@@ -426,27 +432,27 @@ Public Module modStat
                         If Double.IsNaN(.TotalBias) Then .TotalBias = 0.0
                         If Double.IsNaN(.TotalBiasPCT) Then .TotalBiasPCT = 0.0
 
-                        lStr &= DecimalAlign(.TotalDifference, 12, 3)
-                        lStr &= DecimalAlign(.TotalDifferencePCT, 12, 1)
-                        lStr &= DecimalAlign(.TotalSS, 12, 3)
-                        lStr &= DecimalAlign(.TotalSSPCT, 12, 1)
-                        lStr &= DecimalAlign(.TotalBias, 12, 3)
-                        lStr &= DecimalAlign(.TotalBiasPCT, 12, 1)
+                        lStrBuilder.Append(DoubleToString(.TotalDifference, 10, "0.000").PadLeft(10)) 'mean average
+                        lStrBuilder.Append(DoubleToString(.TotalDifferencePCT, 10, "0.0").PadLeft(10)) 'mean percent
+                        lStrBuilder.Append(DoubleToString(.TotalSS, 10, "0.000").PadLeft(10)) 'root mean average
+                        lStrBuilder.Append(DoubleToString(.TotalSSPCT, 10, "0.0").PadLeft(10)) 'root mean percent
+                        lStrBuilder.Append(DoubleToString(.TotalBias, 10, "0.000").PadLeft(10)) 'bias average
+                        lStrBuilder.Append(DoubleToString(.TotalBiasPCT, 10, "0.0").PadLeft(10)) 'bias percent
                     End With
                 Else
                     Logger.Dbg("No Bucket for " & lLimit)
                 End If
-                lStr &= vbCrLf
+                lStrBuilder.AppendLine()
             Next
         End If
 
-        lStr &= "--------- --------- --------- --------- --------- --------- --------- ---------" & vbCrLf
-        lStr &= CStr(lGoodCount).PadLeft(18)
-        lStr &= DecimalAlign(lMeanAbsoluteError, 15)
+        lStrBuilder.AppendLine(" --------- --------- --------- --------- --------- --------- --------- ---------")
+        lStrBuilder.Append(CStr(lGoodCount).PadLeft(19).PadRight(20)) 'total count of values
+        lStrBuilder.Append(DoubleToString(lMeanAbsoluteError, 10, "0.000").PadLeft(10)) 'mean abs error
         lTPDIF *= 100.0
         lTPDIF /= lGoodCount
-        lStr &= DecimalAlign(lTPDIF, 10, 2) 'Average Percent Difference: TotalDiffPercent/Total#ofObs
-        lStr &= DecimalAlign(lRmsError, 12)
+        lStrBuilder.Append(DoubleToString(lTPDIF, 10, "0.0").PadLeft(10)) 'Average Percent Difference: TotalDiffPercent/Total#ofObs
+        lStrBuilder.Append(DoubleToString(lRmsError, 10, "0.000").PadLeft(10)) 'mean rms error
         'Logger.Msg("lRmsError = " & CStr(lRmsError))
         'Logger.Msg("TPDIF2 = " & CStr(TPDIF2))
         lTPDIF2 /= lGoodCount
@@ -454,142 +460,140 @@ Public Module modStat
         lTPDIF2 *= 100.0
 
         'Logger.Msg("TPDIF2 * 100 / lGoodcount = " & CStr(TPDIF2))
-        lStr &= DecimalAlign(lTPDIF2, 10, 2) 'Average Percent for Square of Difference: TotalSquareDifference/Total#ofObs
+        lStrBuilder.Append(DoubleToString(lTPDIF2, 10, "0.0").PadLeft(10)) 'Average Percent for Square of Difference: TotalSquareDifference/Total#ofObs
         'lStr &= DecimalAlign(Math.Abs(lMeanAbsoluteError), 15)
-        lStr &= DecimalAlign(Math.Abs(lMeanSMO2M1), 15)
+        lStrBuilder.Append(DoubleToString(Math.Abs(lMeanSMO2M1), 10, "0.000").PadLeft(10)) 'mean bias
         lTPBias *= 100.0
         lTPBias /= lGoodCount
-        lStr &= DecimalAlign(lTPBias, 10, 2) 'Average Percent Bias: TotalPercentBias/Total#ofObs
-        lStr &= vbCrLf & vbCrLf
+        lStrBuilder.AppendLine(DoubleToString(lTPBias, 10, "0.0").PadLeft(10)) 'Average Percent Bias: TotalPercentBias/Total#ofObs
+        lStrBuilder.AppendLine()
         Dim STEST As Double
         STEST = Math.Sqrt(lGoodCount / (lGoodCount - 1) * (lRmsError ^ 2 - Math.Abs(lMeanSMO2M1) ^ 2))
-        lStr &= "Standard error of estimate = " & DecimalAlign(STEST, 8, 2) & vbCrLf 'Standard error of estimate
-        lStr &= "         = square root((n/n-1)*((tot.col.5)**2-(tot.col.7)**2))" & vbCrLf
+        lStrBuilder.AppendLine("Standard error of estimate = " & DecimalAlign(STEST, 8, 2)) 'Standard error of estimate
+        lStrBuilder.AppendLine("         = square root((n/n-1)*((tot.col.5)**2-(tot.col.7)**2))")
 
-
-        lStr &= "(1) Average = sum(|TS2-TS1|/n)" & vbCrLf
-        lStr &= "    Percent = 100 * (sum(|TS2-TS1|/TS1))/n for all TS1 > 0" & vbCrLf
-        lStr &= "(2) Average = square root(sum((TS2-TS1)**2)/n)" & vbCrLf
-        lStr &= "    Percent = 100 * square root(sum(((TS2-TS1)/TS1)**2)/n) for all TS1 > 0" & vbCrLf
-        lStr &= "(3) Average = sum(TS2-TS1)/n" & vbCrLf
-        lStr &= "    Percent = 100 * sum(((TS2-TS1)/TS1)/n) for all TS1 > 0" & vbCrLf
-        lStr &= vbCrLf & vbCrLf & vbFormFeed & vbCrLf
-
+        lStrBuilder.AppendLine("(1) Average = sum(|TS2-TS1|/n)")
+        lStrBuilder.AppendLine("    Percent = 100 * (sum(|TS2-TS1|/TS1))/n for all TS1 > 0")
+        lStrBuilder.AppendLine("(2) Average = square root(sum((TS2-TS1)**2)/n)")
+        lStrBuilder.AppendLine("    Percent = 100 * square root(sum(((TS2-TS1)/TS1)**2)/n) for all TS1 > 0")
+        lStrBuilder.AppendLine("(3) Average = sum(TS2-TS1)/n")
+        lStrBuilder.AppendLine("    Percent = 100 * sum(((TS2-TS1)/TS1)/n) for all TS1 > 0")
+        lStrBuilder.AppendLine()
+        lStrBuilder.AppendLine()
+        lStrBuilder.AppendLine()
 
         'Table nubmer 2
 
         If aClassLimits IsNot Nothing Then
-            lStr &= "Table 2" & vbCrLf
-            'lStr &= "Time Series 1" & vbCrLf & "Time Series 2" & vbCrLf
-            'lStr &="             Simulated - 11519500 Scott River near Fort Jones, CA.             " & vbCrLf 
-            'lStr &="               Observed  - 11517500 Shasta River near Yreka, CA.               " & vbCrLf 
-            lStr &= "            TS 1 - " & TimeserIdString(aTSer1) & vbCrLf
-            lStr &= "            TS 2 - " & TimeserIdString(aTSer2) & vbCrLf & vbCrLf
+            lStrBuilder.AppendLine("1")
+            lStrBuilder.AppendLine("Table 2")
+            lStrBuilder.AppendLine("            TS 1 - " & TimeserIdString(aTSer1))
+            lStrBuilder.AppendLine("            TS 2 - " & TimeserIdString(aTSer2))
+            lStrBuilder.AppendLine()
 
-            lStr &= "" & vbCrLf
-            lStr &= "         Cases equal or exceeding lower" & vbCrLf
-            lStr &= "          limit & less then upper limit     Percent cases" & vbCrLf
-            lStr &= "           ----------------------------       equal or        Average of cases" & vbCrLf
-            lStr &= "   Lower     Cases         Percent         exceeding limit   within class limits" & vbCrLf
-            lStr &= "   class   --------- ------------------- ------------------- -------------------" & vbCrLf
-            lStr &= "   limit   Sim   Obs Simulated  Observed Simulated  Observed Simulated  Observed" & vbCrLf
-            lStr &= " --------- ---- ---- --------- --------- --------- --------- --------- ---------" & vbCrLf
+            lStrBuilder.AppendLine("         Cases equal or exceeding lower")
+            lStrBuilder.AppendLine("          limit & less then upper limit     Percent cases")
+            lStrBuilder.AppendLine("           ----------------------------       equal or        Average of cases")
+            lStrBuilder.AppendLine("   Lower     Cases         Percent         exceeding limit   within class limits")
+            lStrBuilder.AppendLine("   class   --------- ------------------- ------------------- -------------------")
+            'lStrBuilder.AppendLine("   limit   Sim   Obs Simulated  Observed Simulated  Observed Simulated  Observed")
+            lStrBuilder.AppendLine("   limit   TS1   TS2       TS1       TS2       TS1       TS2       TS1       TS2")
+            lStrBuilder.AppendLine(" --------- ---- ---- --------- --------- --------- --------- --------- ---------")
             Dim pctfrac As Double = 0.0
             Dim numExceedPct As Double = 0.0
             Dim avgClass As Double = 0.0
             For Each lLimit As Double In aClassLimits
-                lStr &= DecimalAlign(lLimit, 12, 0)
+                lStrBuilder.Append(DoubleToString(lLimit, 10, "0.00").PadLeft(10)) 'class limit
                 If lClassBuckets.Keys.Contains(lLimit) Then
                     lClassBucket = lClassBuckets.ItemByKey(lLimit)
                     With lClassBucket
-                        lStr &= CStr(.Count1).PadLeft(5)
-                        lStr &= CStr(.Count2).PadLeft(5)
+                        lStrBuilder.Append(CStr(.Count1).PadLeft(5)) 'count 1
+                        lStrBuilder.Append(CStr(.Count2).PadLeft(5)) 'count 2
                         pctfrac = .Count1 * 100.0 / lGoodCount
-                        lStr &= DecimalAlign(CStr(pctfrac), 15, 2)
+                        lStrBuilder.Append(DoubleToString(pctfrac, 10, "0.00").PadLeft(10)) 'pct fraction 1
                         pctfrac = .Count2 * 100.0 / lGoodCount
-                        lStr &= DecimalAlign(CStr(pctfrac), 15, 2)
+                        lStrBuilder.Append(DoubleToString(pctfrac, 10, "0.00").PadLeft(10)) 'pct fraction 2
                         numExceedPct = NumberExceeding(lLimit, lClassBuckets, False) * 100.0 / lGoodCount
-                        lStr &= DecimalAlign(numExceedPct, 15, 2)
+                        lStrBuilder.Append(DoubleToString(numExceedPct, 10, "0.00").PadLeft(10)) 'pe 1
                         numExceedPct = NumberExceeding(lLimit, lClassBuckets, True) * 100.0 / lGoodCount
-                        lStr &= DecimalAlign(numExceedPct, 15, 2)
+                        lStrBuilder.Append(DoubleToString(numExceedPct, 10, "0.00").PadLeft(10)) 'pe 2
 
-                        avgClass = .Total1 / .Count1
+                        avgClass = .Total1 / .Count1 '1 average within class
                         If Double.IsNaN(avgClass) Then
-                            lStr &= DecimalAlign(0.0, 15, 2)
+                            lStrBuilder.Append(DoubleToString(0.0, 10, "0.00").PadLeft(10))
                         Else
-                            lStr &= DecimalAlign(avgClass, 15, 2)
+                            lStrBuilder.Append(DoubleToString(avgClass, 10, "0.00").PadLeft(10))
                         End If
 
-                        avgClass = .Total2 / .Count2
+                        avgClass = .Total2 / .Count2 '2 average within class
                         If Double.IsNaN(avgClass) Then
-                            lStr &= DecimalAlign(0.0, 15, 2)
+                            lStrBuilder.Append(DoubleToString(0.0, 10, "0.00").PadLeft(10))
                         Else
-                            lStr &= DecimalAlign(avgClass, 15, 2)
+                            lStrBuilder.Append(DoubleToString(avgClass, 10, "0.00").PadLeft(10))
                         End If
 
                     End With
                 Else
                     Logger.Dbg("No Bucket for " & lLimit)
                 End If
-                lStr &= vbCrLf
+                lStrBuilder.AppendLine()
             Next
         End If
 
-        lStr &= " --------- ---- ---- --------- --------- ---------- --------- --------- ---------" & vbCrLf
-        lStr &= CStr(lGoodCount).PadLeft(30) & CStr(lGoodCount).PadLeft(8)
-        lStr &= "100.00".PadLeft(10) 'total percentage of TS1
-        lStr &= "100.00".PadLeft(10) 'total percentage of TS2
+        lStrBuilder.AppendLine(" --------- ---- ---- --------- --------- ---------- --------- --------- ---------")
+        lStrBuilder.Append(CStr(lGoodCount).PadLeft(15) & CStr(lGoodCount).PadLeft(6))
+        lStrBuilder.Append("100.00".PadLeft(9)) 'total percentage of TS1
+        lStrBuilder.Append("100.00".PadLeft(10)) 'total percentage of TS2
         lTSUMA /= lGoodCount
         lTSUMB /= lGoodCount
-        lStr &= DecimalAlign(lTSUMA, 12, 2) ' Avg of TS1 raw value
-        lStr &= DecimalAlign(lTSUMB, 12, 2) ' Avg of TS2 raw value
-        lStr &= vbCrLf & vbCrLf & vbFormFeed & vbCrLf
-
+        lStrBuilder.Append(DoubleToString(lTSUMA, 10, "0.00").PadLeft(30)) ' Avg of TS1 raw value
+        lStrBuilder.Append(DoubleToString(lTSUMB, 10, "0.00").PadLeft(10)) ' Avg of TS2 raw value
+        lStrBuilder.AppendLine()
+        lStrBuilder.AppendLine()
+        lStrBuilder.AppendLine()
 
         'Table Number 3
 
         Dim lEdIndex As Integer
         If aClassLimits IsNot Nothing Then
-            'lStr &= "Time Series 1" & vbCrLf & "Time Series 2" & vbCrLf
-            'lStr &= "   Time Series 1 " & vbCrLf & "   Time Series 2 " & vbCrLf
-            lStr &= "            TS 1 - " & TimeserIdString(aTSer1) & vbCrLf
-            lStr &= "            TS 2 - " & TimeserIdString(aTSer2) & vbCrLf & vbCrLf
-
-            lStr &= "   Lower         Number of occurrences between indicated deviations    " & vbCrLf
-            lStr &= "   class    -------------------------------------------------------------" & vbCrLf
-            lStr &= "   limit          -60%    -30%    -10%      0%     10%     30%     60%" & vbCrLf
-            lStr &= " ---------  -------------------------------------------------------------" & vbCrLf
+            lStrBuilder.AppendLine("1")
+            lStrBuilder.AppendLine("            TS 1 - " & TimeserIdString(aTSer1))
+            lStrBuilder.AppendLine("            TS 2 - " & TimeserIdString(aTSer2))
+            lStrBuilder.AppendLine()
+            lStrBuilder.AppendLine("   Lower         Number of occurrences between indicated deviations    ")
+            lStrBuilder.AppendLine("   class    -------------------------------------------------------------")
+            lStrBuilder.AppendLine("   limit          -60%    -30%    -10%      0%     10%     30%     60%")
+            lStrBuilder.AppendLine(" ---------  -------------------------------------------------------------")
             For Each lLimit As Double In aClassLimits
-                lStr &= DecimalAlign(lLimit, 12, 2)
+                lStrBuilder.Append(DoubleToString(lLimit, 10, "0.00").PadLeft(10))
                 'Dim lCount As Integer = 0
                 If lClassBuckets.Keys.Contains(lLimit) Then
                     lClassBucket = lClassBuckets.ItemByKey(lLimit)
                     With lClassBucket
                         For lEdIndex = 0 To .ErrDevCount.Length - 1
                             If lEdIndex > 0 Then
-                                lStr &= CStr(.ErrDevCount(lEdIndex)).PadLeft(8)
+                                lStrBuilder.Append(CStr(.ErrDevCount(lEdIndex)).PadLeft(8))
                             ElseIf lEdIndex > 3 Then
-                                lStr &= CStr(.ErrDevCount(lEdIndex)).PadLeft(10)
+                                lStrBuilder.Append(CStr(.ErrDevCount(lEdIndex)).PadLeft(10))
                             ElseIf lEdIndex > 5 Then
-                                lStr &= CStr(.ErrDevCount(lEdIndex)).PadLeft(14)
+                                lStrBuilder.Append(CStr(.ErrDevCount(lEdIndex)).PadLeft(14))
                             Else
-                                lStr &= CStr(.ErrDevCount(lEdIndex)).PadLeft(6)
+                                lStrBuilder.Append(CStr(.ErrDevCount(lEdIndex)).PadLeft(6))
                             End If
-
                         Next
                     End With
                 Else
                     Logger.Dbg("No Bucket for " & lLimit)
                 End If
-                lStr &= vbCrLf
+                lStrBuilder.AppendLine()
             Next
         End If
 
-        lStr &= " ---------  -------------------------------------------------------------" & vbCrLf
+        lStrBuilder.AppendLine(" ---------  -------------------------------------------------------------")
         'Loop through ErrIntv then loop through classlimit to sum up total entry in each errintv
         Dim i As Integer
         Dim lErrTot As Integer = 0
-        lStr &= "          "
+        lStrBuilder.Append(Space(10))
         For i = 0 To lErrInt.Length
             lErrTot = 0
             For Each lLimit As Double In aClassLimits
@@ -598,16 +602,22 @@ Public Module modStat
                     lErrTot += lClassBucket.ErrDevCount(i)
                 End If
             Next
-            lStr &= CStr(lErrTot).PadLeft(7)
+            If i = 0 Then
+                lStrBuilder.Append(CStr(lErrTot).PadLeft(7))
+            Else
+                lStrBuilder.Append(CStr(lErrTot).PadLeft(8))
+            End If
         Next
+        lStrBuilder.AppendLine()
+        lStrBuilder.AppendLine()
 
-        lStr &= vbCrLf
-        lStr &= "Percent time value was exceeded" & vbCrLf
-        lStr &= vbCrLf
-        lStr &= "    Flow     %" & vbCrLf
-        lStr &= "     TS1        TS2   %Exceedance" & vbNewLine
-        lStr &= "---------- ---------- ------------" & vbNewLine
-
+        'Table 3
+        lStrBuilder.AppendLine("1")
+        lStrBuilder.AppendLine(" Percent time value was exceeded")
+        lStrBuilder.AppendLine()
+        lStrBuilder.AppendLine("     Flow      Flow")
+        lStrBuilder.AppendLine("      TS1       TS2   %Exceedance")
+        lStrBuilder.AppendLine(" --------- ---------- -----------")
         Dim lDurationReport As New DurationReport
         For Each lExceedPercent As Double In lDurationReport.ExceedPercents
             Try
@@ -615,24 +625,22 @@ Public Module modStat
                 Dim lNonExceedPercentString As String = (lNonExceedPercent).ToString.PadLeft(2, "0")
                 Dim lNonExceedValue1 As Double = aTSer1.Attributes.GetValue("%" & lNonExceedPercentString)
                 Dim lNonExceedValue2 As Double = aTSer2.Attributes.GetValue("%" & lNonExceedPercentString)
-                lStr &= DecimalAlign(lNonExceedValue1, 10, 2) & DecimalAlign(lNonExceedValue2, 10, 2) & lExceedPercent.ToString.PadLeft(4) & vbCrLf
+                lStrBuilder.Append(DoubleToString(lNonExceedValue1, 10, "0.0").PadLeft(10))
+                lStrBuilder.Append(DoubleToString(lNonExceedValue2, 10, "0.0").PadLeft(10))
+                lStrBuilder.AppendLine(lExceedPercent.ToString.PadLeft(6))
             Catch lEx As Exception
                 Logger.Dbg("At ExceedPercent " & lExceedPercent & " Exception " & lEx.ToString)
             End Try
         Next
 
-        lStr &= vbCrLf
-        'If lNote.Length > 0 Then
-        '    lStr &= lNote
-        'End If
-        lStr &= vbCrLf
-
-        lStr &= vbCrLf & vbCrLf & vbFormFeed & vbCrLf
+        lStrBuilder.AppendLine()
+        lStrBuilder.AppendLine()
+        lStrBuilder.AppendLine()
 
         If lNote.Length > 0 Then
-            lStr &= lNote
+            lStrBuilder.AppendLine(lNote)
         End If
-        Return lStr
+        Return lStrBuilder.ToString
     End Function
 
     'Public Function DurationHydrograph(ByVal aTS As atcTimeseries) As String
@@ -1421,6 +1429,18 @@ G200:
             clas(i) = (Fix(c)) * (10.0# ^ l)
         Next i
         'nci = aNumFDclasses + 1
-        Return clas
+
+        If aMax < 0 AndAlso aMin < 0 Then
+            Return clas
+        Else
+            'Screen the class limits to cut off at aMin and aMax
+            Dim lNewClassLimits As New List(Of Double)
+            For i = 0 To clas.Length - 1
+                If clas(i) >= aMin And clas(i) <= aMax Then
+                    lNewClassLimits.Add(clas(i))
+                End If
+            Next
+            Return lNewClassLimits.ToArray()
+        End If
     End Function
 End Module
