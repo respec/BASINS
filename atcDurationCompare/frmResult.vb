@@ -114,7 +114,7 @@ Public Class frmResult
         Dim lReport As New DurationReport(aClassLimits)
         With txtReport
             .Text = ""
-            .Text &= "Compare Report:" & vbCrLf & vbCrLf & CompareStats(lObserved, lSimulated, lReport.ClassLimitsNeeded(lObserved))
+            .Text &= "Compare Report:" & vbCrLf & vbCrLf & CompareStats(lObserved, lSimulated, lReport.ClassLimitsNeeded(lObserved, lSimulated))
             .SelectionStart = 0
             .SelectionLength = 0
         End With
