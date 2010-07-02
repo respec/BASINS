@@ -182,8 +182,9 @@ Public MustInherit Class atcTable
     ''' <param name="aType">Type character, N = Numeric</param>
     Public Overridable Function TrimValue(ByVal aValue As String, ByVal aType As String) As String
         If aValue Is Nothing Then Return ""
+        'First trim surrounding null and space characters
+        aValue = aValue.Trim(ControlChars.NullChar, " "c)
         If aType = "N" Then
-            aValue = aValue.Trim
             Dim lDecimalPos As Integer = aValue.IndexOf("."c)
             Select Case lDecimalPos
                 Case -1 'No decimal, no need to trim trailing zeroes
@@ -193,8 +194,6 @@ Public MustInherit Class atcTable
                 Case Else 'Decimal is after first character, trim trailing zeroes, trim decimal if it is then last
                     aValue = aValue.TrimEnd("0"c).TrimEnd("."c)
             End Select
-        Else
-            aValue = aValue.Trim
         End If
         Return aValue
     End Function

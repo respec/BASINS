@@ -384,7 +384,7 @@ AllKeys:
                 Else
                     pEOF = False
                 End If
-                If Value < 1 Or Value > pHeader.NumRecs Then
+                If Value < 1 OrElse Value > pHeader.NumRecs Then
                     pCurrentRecord = 1
                 Else
                     pCurrentRecord = Value
@@ -501,17 +501,16 @@ AllKeys:
             ElseIf aFieldNumber < 1 Or aFieldNumber > pNumFields Then
                 Return "Invalid Field Number"
             Else
-                Dim lFirstByte As Integer = pCurrentRecordStart + pFields(aFieldNumber).DataAddress
-                Dim lLastByte As Integer = lFirstByte + pFields(aFieldNumber).FieldLength - 1
-                Dim strRet As String = ""
-                For lByte As Integer = lFirstByte To lLastByte
-                    If pData(lByte) > 0 Then
-                        strRet &= Chr(pData(lByte))
-                    Else
-                        Exit For
-                    End If
-                Next
-                Return TrimValue(strRet, FieldType(aFieldNumber))
+                'Dim lFirstByte As Integer = pCurrentRecordStart + pFields(aFieldNumber).DataAddress
+                'Dim lLength As Integer = pFields(aFieldNumber).FieldLength
+                'While lLength > 0 AndAlso pData(lFirstByte + lLength - 1) = 0
+                '    lLength -= 1
+                'End While
+                Return TrimValue(System.Text.Encoding.ASCII.GetString( _
+                                       pData, _
+                                       pCurrentRecordStart + pFields(aFieldNumber).DataAddress, _
+                                       pFields(aFieldNumber).FieldLength), _
+                                 FieldType(aFieldNumber))
             End If
         End Get
         Set(ByVal Value As String)
@@ -567,6 +566,49 @@ AllKeys:
     '  Next
     '  CurrentRecordAsDelimitedString = retval
     'End Function
+
+    Public Overrides Function FindFirst(ByVal aFieldNumber As Integer, ByVal aFindValue As String, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean
+        'Dim lBaseFound As Boolean = MyBase.FindFirst(aFieldNumber, aFindValue, aStartRecord, aEndRecord)
+        'Dim lBaseFoundRecord As Integer = -1
+        'If lBaseFound Then lBaseFoundRecord = CurrentRecord
+        If NumRecords < aStartRecord Then 'don't look past end
+            Return False
+        Else
+            Dim lNumBytesRec As Integer = pHeader.NumBytesRec
+            Dim lFieldStart As Integer = pFields(aFieldNumber).DataAddress
+            Dim lFieldLength As Integer = pFields(aFieldNumber).FieldLength
+            If aEndRecord < 1 Then aEndRecord = NumRecords
+            Dim lEndSearchByte As Integer = lNumBytesRec * aEndRecord
+
+            Dim lFindBytes() As Byte = System.Text.Encoding.ASCII.GetBytes(TrimValue(aFindValue, FieldType(aFieldNumber)))
+            Dim lLastFindByte As Integer = lFindBytes.GetUpperBound(0)
+
+            Dim lStartRecord As Integer = aStartRecord
+            While lStartRecord <= aEndRecord
+                Dim lFoundIndex As Integer = findBytes(lFindBytes, 0, lFindBytes.Length, _
+                                                       pData, _
+                                                       lNumBytesRec * (lStartRecord - 1) + 1 + lFieldStart, _
+                                                       lNumBytesRec, lEndSearchByte, lFieldLength)
+                If lFoundIndex = 0 Then 'Did not find
+                    Exit While
+                Else
+                    CurrentRecord = lStartRecord + lFoundIndex - 1
+                    'Found aFindValue using findBytes, but still need to make sure whole value matches
+                    If Value(aFieldNumber) = aFindValue Then
+                        'If Not lBaseFound Then Stop
+                        'If lBaseFoundRecord <> CurrentRecord Then Stop
+                        Return True
+                    Else
+                        lStartRecord += lFoundIndex
+                    End If
+                End If
+            End While
+
+            'If lBaseFound Then Stop
+            CurrentRecord = aStartRecord
+            Return False
+        End If
+    End Function
 
     'Returns True if found, moves CurrentRecord to first record with .Record = FindValue
     'If not found, returns False and moves CurrentRecord to aStartRecord
@@ -1142,35 +1184,65 @@ TryAgain:
 
     'find(aRawRecord() as Byte())
 
-    'Search for the set of bytes in aFindThis starting at index aThisFirstByte for aFindNumBytes
-    'Search through aSearchIn starting at aSearchStart and advancing aSearchStride bytes.
-    'Returns how many times the pattern was searched for if found, or 0 if not found
-    'Example:
-    'findBytes( aFindThis = {0, 1, 2, 3}, 
-    '           aFindFirstByte = 1,
-    '           aFindNumBytes = 2,
-    '           aSearchIn = { 0, 0, 1, 2, 4, 1, 2, 0, 0},
-    '           aSearchStart = 1,
-    '           aSearchStride = 4)
-    ' searches for the pattern {1, 2} (the two bytes starting at 1 of aFindThis)
-    ' does not match at the first comparison with bytes {0, 1} in aSearchIn
-    ' (does not match first instance of {1, 2} in aSearchIn because search strides past)
-    ' strides 4, matches {1, 2} after the 4, and returns 2 because it was found on the second comparison
+    ''' <summary>
+    ''' Search for the set of bytes in aFindThis starting at index aThisFirstByte for aFindNumBytes
+    ''' Search through aSearchIn starting at aSearchStart and advancing aSearchStride bytes.
+    ''' </summary>
+    ''' <param name="aFindThis">Sequence of bytes to find</param>
+    ''' <param name="aFindFirstByte">First position in aFindThis to include in search</param>
+    ''' <param name="aFindNumBytes">Number of bytes in aFindThis to include in search</param>
+    ''' <param name="aSearchIn">Array to search</param>
+    ''' <param name="aSearchStart">Index in aSearchIn to start search</param>
+    ''' <param name="aSearchStride">Record length in aSearchIn, move this many bytes from aSearchStart to search for next possible match</param>
+    ''' <param name="aSearchStop">End the search when we reach this position in aSearchIn</param>
+    ''' <param name="aFieldLength">Search this section of each record for aFindThis, skipping zero or space padding. If zero, only check for value that starts exactly at aSearchStart [plus stride * n]</param>
+    ''' <returns>
+    ''' Number of times the pattern was searched for if found
+    ''' 0 = pattern was not found
+    ''' 1 = pattern was found in first place searched
+    ''' n = pattern was found (n-1) strides after first place searched
+    ''' </returns>
+    ''' <remarks>
+    ''' Example:
+    ''' findBytes(aFindThis = {0, 1, 2, 3}, 
+    '''           aFindFirstByte = 1,
+    '''           aFindNumBytes = 2,
+    '''           aSearchIn = { 0, 0, 1, 2, 4, 1, 2, 0, 0},
+    '''           aSearchStart = 1,
+    '''           aSearchStride = 4)
+    ''' searches for the pattern {1, 2} (the two bytes starting at 1 of aFindThis)
+    ''' does not match at the first comparison with bytes {0, 1} in aSearchIn
+    ''' (does not match first instance of {1, 2} in aSearchIn because search strides past)
+    ''' strides 4, matches {1, 2} after the 4, and returns 2 because it was found on the second comparison
+    ''' </remarks>
     Private Function findBytes(ByVal aFindThis As Byte(), _
                                ByVal aFindFirstByte As Integer, _
                                ByVal aFindNumBytes As Integer, _
                                ByVal aSearchIn As Byte(), _
                                ByVal aSearchStart As Integer, _
                                ByVal aSearchStride As Integer, _
-                               ByVal aSearchStop As Integer) As Integer
-        Dim lFindLastByte As Integer = aFindFirstByte + aFindNumBytes
+                               ByVal aSearchStop As Integer, _
+                               ByVal aFieldLength As Integer) As Integer
+        Dim lFindLastByte As Integer = aFindFirstByte + aFindNumBytes - 1
         Dim lFindByte As Integer
         Dim lSearchPos As Integer
         Dim lNumSearches As Integer = 0
+        Dim lPaddingRoom As Integer = aFieldLength - aFindNumBytes 'How much room is in the field for padding before the value we are searching for
+        Dim lSkipPad As Integer
 
         While aSearchStart < aSearchStop
             lNumSearches += 1
             lFindByte = aFindFirstByte
+            lSearchPos = aSearchStart
+
+            'First skip any padding characters (NUL or Space) at beginning of field
+            For lSkipPad = 1 To lPaddingRoom
+                Select Case aSearchIn(lSearchPos)
+                    Case 0, 32 : lSearchPos += 1
+                    Case Else : Exit For
+                End Select
+            Next
+
             While lFindByte <= lFindLastByte AndAlso aSearchIn(lSearchPos) = aFindThis(lFindByte)
                 lFindByte += 1
                 lSearchPos += 1
@@ -1218,7 +1290,7 @@ TryAgain:
                 lOtherStart = aOtherTable.RawValueStart(aField)
             End If
 
-            If findBytes(lOtherData, lOtherStart, lOtherBytes, pData, 0, lStride, lStop) = 0 Then
+            If findBytes(lOtherData, lOtherStart, lOtherBytes, pData, 0, lStride, lStop, 0) = 0 Then
                 lNewRecords.Add(lOtherRecord)
             End If
         Next
