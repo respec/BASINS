@@ -1089,6 +1089,7 @@ Public Class frmAutomatic_v2
     ' 08/08/2006    ARA             Moved edge cont checkbox to options form
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Sub SaveToChoices()
+        Logger.Dbg("SaveToChoices:Entry")
         tdbChoiceList.useOutlets = chkbxUseOutlet.Checked
         tdbChoiceList.useMaskFileOrExtents = chkbxMask.Checked
         tdbChoiceList.useExtentMask = rdobtnUseExtents.Checked
@@ -1117,6 +1118,7 @@ Public Class frmAutomatic_v2
     ' 08/08/2006    ARA             Moved edge cont checkbox to options form
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Sub LoadFromChoices()
+        Logger.Dbg("LoadFromChoices:Entry")
         chkbxUseOutlet.Checked = tdbChoiceList.useOutlets
         chkbxBurnStream.Checked = tdbChoiceList.useBurnIn
         chkbxMask.Checked = tdbChoiceList.useMaskFileOrExtents
@@ -1142,6 +1144,7 @@ Public Class frmAutomatic_v2
     ' 05/27/2006    ARA             Created
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Sub loadCombosToLast()
+        Logger.Dbg("LoadCombosToLast:Entry")
         If Not lastDem = "" Then
             cmbxSelDem.SelectedIndex = cmbxSelDem.Items.IndexOf(lastDem)
             If cmbxSelDem.SelectedIndex = -1 Then
@@ -1467,6 +1470,8 @@ Public Class frmAutomatic_v2
     ' 07/05/2006    ARA             Added square miles
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Function validateCellThreshAndSet() As Boolean
+        Logger.Dbg("ValidateCellThreshAndSet:Entry")
+        Dim lValidateCellThreshAndSet As Boolean
         Dim numCells As Int32
         Dim minVal, maxVal, currVal, defaultVal As Int32
         Dim demGrid As New MapWinGIS.Grid
@@ -1552,13 +1557,15 @@ Public Class frmAutomatic_v2
                 threshDelinHasRan = False
             End If
             lastThresh = txtbxThreshold.Text
-            validateCellThreshAndSet = True
+            lValidateCellThreshAndSet = True
         Else
             txtbxThreshold.Text = ""
             tdbChoiceList.Threshold = 0
-            validateCellThreshAndSet = False
+            lValidateCellThreshAndSet = False
         End If
         demGrid.Close()
+        Logger.Dbg("ValidateCellThreshAndSet:Exit:" & validateCellThreshAndSet)
+        Return lValidateCellThreshAndSet
     End Function
 
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1580,6 +1587,7 @@ Public Class frmAutomatic_v2
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Function validateConvThreshAndSet() As Boolean
         Logger.Dbg("ValidateConvThreshAndSet:Entry")
+        Dim lValidateConvThreshAndSet As Boolean
         Dim numCells As Int32
         Dim minVal, maxVal, currVal, defaultVal As Double
         Dim demGrid As New MapWinGIS.Grid
@@ -1721,13 +1729,13 @@ Public Class frmAutomatic_v2
                 validateCellThreshAndSet()
             End If
 
-            validateConvThreshAndSet = True
+            lValidateConvThreshAndSet = True
         Else
             txtbxThreshConv.Text = ""
-            validateConvThreshAndSet = False
+            lValidateConvThreshAndSet = False
         End If
         demGrid.Close()
-        Logger.Dbg("ValidateConvThreshAndSet:Exit")
+        Logger.Dbg("ValidateConvThreshAndSet:Exit:" & lValidateConvThreshAndSet)
     End Function
 
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1748,8 +1756,9 @@ Public Class frmAutomatic_v2
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Public Sub setMaskSelected()
         Logger.Dbg("SetMaskSelected:Entry")
-        Dim sf As New MapWinGIS.Shapefile
         If g_DrawingMask Then
+            Logger.Dbg("  UsingDrawingMask")
+            Dim sf As New MapWinGIS.Shapefile
             sf.Open(currDrawPath)
             g_MapWin.View.SelectedShapes.ClearSelectedShapes()
             For i As Integer = 0 To sf.NumShapes - 1
@@ -1859,12 +1868,15 @@ Public Class frmAutomatic_v2
     End Function
 
     Private Function RemoveLayer(ByVal fname As String, Optional ByVal toPrompt As Boolean = True) As Boolean
-        'dpa 4/22/05 - I'm not proud of this next line, but for some reason this callback object loses context sometimes.
-        'So for now, we'll just skip past the errors and assume it won't be a problem.
-        On Error Resume Next
-        'myWrapper.Progress("Remove", 0, fname)
+        Logger.Dbg("RemoveLayer:" & fname)
+        Dim lIndex As Integer = getIndexByPath(fname)
+        If lIndex >= 0 Then
+            g_MapWin.Layers.Remove(lIndex)
+            Logger.Dbg("  Removed")
+        Else
+            Logger.Dbg("  NotFound")
+        End If
         RemoveLayer = True
-        On Error GoTo 0
     End Function
 
     Private Sub closingCleanup()
@@ -1911,6 +1923,7 @@ Public Class frmAutomatic_v2
     ' 05/30/2006    ARA             Created
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Sub runFormInit()
+        Logger.Dbg("RunFormInit:Entry")
         Cursor = Windows.Forms.Cursors.WaitCursor
         btnRunAll.Enabled = False
         btnCancel.Enabled = False
@@ -3301,7 +3314,7 @@ Public Class frmAutomatic_v2
             'myWrapper.Progress("Status", 0, "Preparing Grid")
             g_BaseDEM = getPathByName(cmbxSelDem.Items(cmbxSelDem.SelectedIndex))
             tdbFileList.formFileNames(g_BaseDEM, tdbChoiceList.OutputPath, True)
-            'g_Taudem.SetBASEDEM(tdbFileList.dem)
+            g_Taudem.SetBASEDEM(tdbFileList.dem)
 
             If tdbChoiceList.FillGridPath <> "" And tdbChoiceList.D8SlopePath <> "" And tdbChoiceList.D8Path <> "" Then
                 tdbFileList.fel = tdbChoiceList.FillGridPath
@@ -3320,12 +3333,15 @@ Public Class frmAutomatic_v2
             runFormCleanup()
             preProcHasRan = False
             runPreprocessing = False
-            Logger.Msg(e.Message, MsgBoxStyle.OkOnly, "Automatic Watershed Delineation Error")
+            Logger.Msg(e.Message & vbCrLf & e.StackTrace, MsgBoxStyle.OkOnly, "Automatic Watershed Delineation Error")
+            Logger.Dbg("RunPreprocessing:ExitProblem")
+            Return False
         End Try
 
         runFormCleanup()
         preProcHasRan = True
         runPreprocessing = True
+        Logger.Dbg("RunPreprocessing:ExitOK")
     End Function
 
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -3344,14 +3360,15 @@ Public Class frmAutomatic_v2
     ' 05/30/2006    ARA             Created
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Function validatePreprocessing() As Boolean
+        Logger.Dbg("ValidatePreprocessing:Entry")
         If cmbxSelDem.SelectedIndex = 0 Then
-            MsgBox("You need to select a DEM grid from the Base Elevation Grid drop-down list. If no layers are available to select, you can use the browse button beside the list to open an existing DEM.", MsgBoxStyle.OkOnly, "Automatic Watershed Delineation Error")
+            Logger.Msg("You need to select a DEM grid from the Base Elevation Grid drop-down list. If no layers are available to select, you can use the browse button beside the list to open an existing DEM.", MsgBoxStyle.OkOnly, "Automatic Watershed Delineation Error")
             Return False
         End If
 
         If chkbxBurnStream.Checked Then
             If cmbxStream.SelectedIndex = 0 Then
-                MsgBox("You need to select a stream polyline to burn-in from the Burn-in drop-down list. If no layers are available, then you can use the browse button beside the list to open an existing polyline shapefile.", MsgBoxStyle.OkOnly, "Automatic Watershed Delineation Error")
+                Logger.Msg("You need to select a stream polyline to burn-in from the Burn-in drop-down list. If no layers are available, then you can use the browse button beside the list to open an existing polyline shapefile.", MsgBoxStyle.OkOnly, "Automatic Watershed Delineation Error")
                 Return False
             End If
         End If
@@ -3359,21 +3376,21 @@ Public Class frmAutomatic_v2
         If chkbxMask.Checked Then
             If Not rdobtnUseExtents.Checked Then
                 If cmbxMask.SelectedIndex = 0 Then
-                    MsgBox("You need to select a layer from the Mask drop-down list. If no layers are available, then you can use the browse button beside the list to open an existing polygon shapefile or focus mask grid.", MsgBoxStyle.OkOnly, "Automatic Watershed Delineation Error")
+                    Logger.Msg("You need to select a layer from the Mask drop-down list. If no layers are available, then you can use the browse button beside the list to open an existing polygon shapefile or focus mask grid.", MsgBoxStyle.OkOnly, "Automatic Watershed Delineation Error")
                     Return False
                 Else
-                    Dim strpath As String
-                    strpath = getPathByName(cmbxMask.Items(cmbxMask.SelectedIndex))
+                    Dim strpath As String= getPathByName(cmbxMask.Items(cmbxMask.SelectedIndex))
                     If IO.Path.GetExtension(strpath) = ".shp" Then
                         If myWrapper.maskShapesIdx.Count = 0 Then
-                            MsgBox("You must select at least one polygon from the mask using Select Mask.", MsgBoxStyle.OkOnly, "Automatic Watershed Delineation Error")
+                            Logger.Msg("You must select at least one polygon from the mask using Select Mask.", MsgBoxStyle.OkOnly, "Automatic Watershed Delineation Error")
                             Return False
                         End If
                     End If
                 End If
             End If
         End If
-        validatePreprocessing = True
+        Logger.Dbg("ValidatePreprocessing:Exit")
+        Return True
     End Function
 
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -3393,6 +3410,7 @@ Public Class frmAutomatic_v2
     ' 05/30/2006    ARA             Created
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Function runDelinByThresh() As Boolean
+        Logger.Dbg("RunDelinByThresh:Entry")
         runFormInit()
         threshDelinHasRan = False
         snapHasRan = False
@@ -3440,12 +3458,13 @@ Public Class frmAutomatic_v2
             runFormCleanup()
             threshDelinHasRan = False
             runDelinByThresh = False
-            MsgBox(e.Message, MsgBoxStyle.OkOnly, "Automatic Watershed Delineation Error")
+            Logger.Msg(e.Message & vbCrLf & e.StackTrace, MsgBoxStyle.OkOnly, "Automatic Watershed Delineation Error")
         End Try
 
         runFormCleanup()
         threshDelinHasRan = True
-        runDelinByThresh = True
+        Logger.Dbg("RunDelinByThresh:Exit")
+        Return True
     End Function
 
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -3464,7 +3483,10 @@ Public Class frmAutomatic_v2
     ' 05/30/2006    ARA             Created
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Function validateDelinByThresh() As Boolean
-        validateDelinByThresh = validateCellThreshAndSet()
+        Logger.Dbg("ValidateDelinByThresh:Entry")
+        Dim lValidateDelinByThresh As Boolean = validateCellThreshAndSet()
+        Logger.Dbg("ValidateDelinByThresh:Exit:" & lValidateDelinByThresh)
+        Return lValidateDelinByThresh
     End Function
 
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -3487,6 +3509,7 @@ Public Class frmAutomatic_v2
     ' 05/30/2006    ARA             Created
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Function runOutletsAndFinish() As Boolean
+        Logger.Dbg("RunOutletsAndFinish:Entry")
         runFormInit()
         runOutletsAndFinish = False
         Try
@@ -3512,6 +3535,7 @@ Public Class frmAutomatic_v2
             Me.Refresh()
             'If using outlets, have to rerun many of the steps as outlets change the output of them
             If tdbChoiceList.useOutlets Then
+                Logger.Dbg("  UsingOutlets")
                 tdbFileList.outletshpfile = getPathByName(cmbxOutlets.Items.Item(cmbxOutlets.SelectedIndex))
 
                 If Not runClipSelectedOutlets() Then runFormCleanup() : Return False
@@ -3546,11 +3570,13 @@ Public Class frmAutomatic_v2
         Catch e As Exception
             runFormCleanup()
             outletHasRan = False
-            MsgBox(e.Message, MsgBoxStyle.OkOnly, "Automatic Watershed Delineation Error")
+            Logger.Msg(e.Message & vbCrLf & e.StackTrace, MsgBoxStyle.OkOnly, "Automatic Watershed Delineation Error")
+            Return False
         End Try
         runFormCleanup()
         outletHasRan = True
-        runOutletsAndFinish = True
+        Logger.Dbg("RunOutletsAndFinish:Exit")
+        Return True
     End Function
 
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -3569,19 +3595,20 @@ Public Class frmAutomatic_v2
     ' 05/30/2006    ARA             Created
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Function validateOutlets() As Boolean
+        Logger.Dbg("ValidateOutlets:Entry")
         If chkbxUseOutlet.Checked Then
             If cmbxOutlets.SelectedIndex > 0 Then
                 If myWrapper.outletShapesIdx.Count = 0 Then
-                    MsgBox("There are no outlets/inlets currently selected. Please click the Select Outlets/Inlets button to select outlets and inlets.", MsgBoxStyle.OkOnly, "Automatic Watershed Delineation Error")
+                    Logger.Msg("There are no outlets/inlets currently selected. Please click the Select Outlets/Inlets button to select outlets and inlets.", MsgBoxStyle.OkOnly, "Automatic Watershed Delineation Error")
                     Return False
                 End If
             Else
-                MsgBox("There is no outlets/Inlets shapefile selected. Please select an outlets/inlets shapefile from the Outlets/Inlets drop down list or add a new one using the button beside it.", MsgBoxStyle.OkOnly, "Automatic Watershed Delineation Error")
+                Logger.Msg("There is no outlets/Inlets shapefile selected. Please select an outlets/inlets shapefile from the Outlets/Inlets drop down list or add a new one using the button beside it.", MsgBoxStyle.OkOnly, "Automatic Watershed Delineation Error")
                 Return False
             End If
         End If
-
-        validateOutlets = True
+        Logger.Dbg("ValidateOutlets:Exit")
+        Return True
     End Function
 
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -3607,6 +3634,7 @@ Public Class frmAutomatic_v2
         runningAll = True
         runAll = runOutletsAndFinish()
         runningAll = False
+        Logger.Dbg("RunAll:Exit")
     End Function
 
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -3627,17 +3655,13 @@ Public Class frmAutomatic_v2
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Function runMask() As Boolean
         Logger.Dbg("RunMask:Entry")
-        Dim maskedPath, strmask As String
-        Dim sf As New MapWinGIS.Shapefile
-        Dim g As New MapWinGIS.Grid
-        Dim gMasked As New MapWinGIS.Grid
-        Dim u As New MapWinGIS.Utils
 
         runMask = False
         If doTicks Then
             tickb = Now().Ticks
         End If
         If tdbChoiceList.useMaskFileOrExtents Then
+            Dim maskedPath, strmask As String
             If IO.Path.GetFileName(g_BaseDEM) = "sta.adf" Then
                 maskedPath = tdbFileList.getAbsolutePath(tdbChoiceList.OutputPath, IO.Path.GetDirectoryName(g_BaseDEM) + ".bgd") + IO.Path.GetFileNameWithoutExtension(g_BaseDEM) + "_masked.bgd"
             Else
@@ -3671,11 +3695,12 @@ Public Class frmAutomatic_v2
             tickd = ticka - tickb
             os.WriteLine(tickd.ToString + " - Mask ")
         End If
-        runMask = True
+        Return True
     End Function
 
     Private Function runBurn(ByVal strDEM As String) As String
-        Logger.Dbg("RunBurn:Entry")
+        Logger.Dbg("RunBurn:EntryWithFile:")
+        Logger.Dbg("  DEM:" & strDEM)
         Dim strBurn, strBurnResult As String
         runBurn = strDEM
         If tdbChoiceList.useBurnIn Then
@@ -3685,10 +3710,12 @@ Public Class frmAutomatic_v2
             Else
                 strBurnResult = tdbFileList.getAbsolutePath(tdbChoiceList.OutputPath, g_BaseDEM) + IO.Path.GetFileNameWithoutExtension(g_BaseDEM) + "_burn.bgd"
             End If
+            Logger.Dbg("  Burn:" & strBurn)
             If MapWinGeoProc.Hydrology.CanyonBurnin(strBurn, strDEM, strBurnResult, Me) = 0 Then
                 runBurn = strBurnResult
+                Logger.Dbg("RunBurn:Result:" & runBurn)
             Else
-                MsgBox("An error occured while burning in the stream polyline.", MsgBoxStyle.OkOnly, "Automatic Watershed Delineation Error")
+                Logger.Msg("An error occured while burning in the stream polyline.", MsgBoxStyle.OkOnly, "Automatic Watershed Delineation Error")
             End If
         End If
     End Function
@@ -3712,7 +3739,6 @@ Public Class frmAutomatic_v2
     Private Function runPitFill() As Boolean
         Logger.Dbg("RunPitFill:Entry")
         Dim usefdrfile As Long = 0
-        Dim i As Integer
         Dim inRam As Boolean = True
         Dim strToFill As String
         Dim burnFirst As Boolean
@@ -3763,10 +3789,12 @@ Public Class frmAutomatic_v2
             os.WriteLine(tickd.ToString + " - Pit Fill ")
         End If
 
-        If tdbChoiceList.AddPitfillLayer And i = 0 Then
+        If tdbChoiceList.AddPitfillLayer Then
             AddMap(tdbFileList.fel, LayerType.fel)
         End If
-        runPitFill = True
+
+        Logger.Dbg("RunPitFill:Exit")
+        Return True
     End Function
 
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -3786,8 +3814,10 @@ Public Class frmAutomatic_v2
     ' 07/18/2006    ARA             Changed to call geoproc.hydrology instead of taudem
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Function runD8() As Boolean
-        Dim i As Integer
-        runD8 = False
+        Logger.Dbg("RunD8:EntryWithFiles:" & vbCrLf & _
+                   tdbFileList.fel & vbCrLf & _
+                   tdbFileList.p & vbCrLf & _
+                   tdbFileList.sd8)
 
         RemoveLayer(tdbFileList.sd8, False)
         RemoveLayer(tdbFileList.p, False)
@@ -3796,20 +3826,23 @@ Public Class frmAutomatic_v2
             tickb = Now().Ticks
         End If
 
-        i = MapWinGeoProc.Hydrology.D8(tdbFileList.fel, tdbFileList.p, tdbFileList.sd8, myWrapper)
-        If i <> 0 Then Return False
-
-        If doTicks Then
-            ticka = Now().Ticks
-            tickd = ticka - tickb
-            os.WriteLine(tickd.ToString + " - D8 ")
+        Dim lResult As Integer = MapWinGeoProc.Hydrology.D8(tdbFileList.fel, tdbFileList.p, tdbFileList.sd8, Nothing)
+        If lResult <> 0 Then
+            Logger.Dbg("RunD8:ExitWithErrorCode " & lResult)
+            Return False
+        Else
+            If doTicks Then
+                ticka = Now().Ticks
+                tickd = ticka - tickb
+                os.WriteLine(tickd.ToString + " - D8 ")
+            End If
+            If tdbChoiceList.AddD8Layer And lResult = 0 Then
+                AddMap(tdbFileList.sd8, LayerType.sd8)
+                AddMap(tdbFileList.p, LayerType.p)
+            End If
+            Logger.Dbg("RunD8:Exit")
+            Return True
         End If
-        If tdbChoiceList.AddD8Layer And i = 0 Then
-            AddMap(tdbFileList.sd8, LayerType.sd8)
-            AddMap(tdbFileList.p, LayerType.p)
-        End If
-
-        runD8 = True
     End Function
 
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -3829,27 +3862,29 @@ Public Class frmAutomatic_v2
     ' 07/19/2006    ARA             Changed to call geoproc.hydrology instead of taudem
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Function runAreaD8() As Boolean
-        Dim i As Integer
+        Logger.Dbg("RunAreaD8:Entry")
 
-        runAreaD8 = False
         RemoveLayer(tdbFileList.ad8, False)
-
         If doTicks Then
             tickb = Now().Ticks
         End If
         Progress("Message", 0, "Area D8")
-        i = MapWinGeoProc.Hydrology.AreaD8(tdbFileList.p, tdbFileList.outletshpfile, tdbFileList.ad8, tdbChoiceList.useOutlets, tdbChoiceList.EdgeContCheck, myWrapper)
-        If i <> 0 Then Return False
-
-        If doTicks Then
-            ticka = Now().Ticks
-            tickd = ticka - tickb
-            os.WriteLine(tickd.ToString + " - Area D8 ")
+        Dim lResult As Integer= MapWinGeoProc.Hydrology.AreaD8(tdbFileList.p, tdbFileList.outletshpfile, tdbFileList.ad8, tdbChoiceList.useOutlets, tdbChoiceList.EdgeContCheck, Nothing)
+        If lResult <> 0 Then
+            Logger.Dbg("RunAreaD8:ExitWithErrorCode " & lResult)
+            Return False
+        Else
+            If doTicks Then
+                ticka = Now().Ticks
+                tickd = ticka - tickb
+                os.WriteLine(tickd.ToString + " - Area D8 ")
+            End If
+            If tdbChoiceList.AddD8AreaLayer Then
+                AddMap(tdbFileList.ad8, LayerType.ad8)
+            End If
+            Logger.Dbg("RunAreaD8:Exit")
+            Return True
         End If
-        If tdbChoiceList.AddD8AreaLayer Then
-            AddMap(tdbFileList.ad8, LayerType.ad8)
-        End If
-        runAreaD8 = True
     End Function
 
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -3868,7 +3903,8 @@ Public Class frmAutomatic_v2
     ' 08/23/2006    ARA             Created
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Function runDinf() As Boolean
-        Dim i As Integer
+        Logger.Dbg("RunDinf:Entry")
+
         runDinf = False
 
         RemoveLayer(tdbFileList.slp, False)
@@ -3878,20 +3914,24 @@ Public Class frmAutomatic_v2
             tickb = Now().Ticks
         End If
 
-        i = MapWinGeoProc.Hydrology.DInf(tdbFileList.fel, tdbFileList.ang, tdbFileList.slp, myWrapper)
-        If i <> 0 Then Return False
+        Dim lResult As Integer = MapWinGeoProc.Hydrology.DInf(tdbFileList.fel, tdbFileList.ang, tdbFileList.slp, myWrapper)
+        If lResult <> 0 Then
+            Logger.Dbg("RunDinf:ExitWithErrorCode " & lResult)
+            Return False
+        Else
+            If doTicks Then
+                ticka = Now().Ticks
+                tickd = ticka - tickb
+                os.WriteLine(tickd.ToString + " - Dinf ")
+            End If
+            If tdbChoiceList.AddD8Layer Then
+                AddMap(tdbFileList.slp, LayerType.slp)
+                AddMap(tdbFileList.ang, LayerType.ang)
+            End If
 
-        If doTicks Then
-            ticka = Now().Ticks
-            tickd = ticka - tickb
-            os.WriteLine(tickd.ToString + " - Dinf ")
+            Logger.Dbg("RunDinf:Exit")
+            Return True
         End If
-        If tdbChoiceList.AddD8Layer And i = 0 Then
-            AddMap(tdbFileList.slp, LayerType.slp)
-            AddMap(tdbFileList.ang, LayerType.ang)
-        End If
-
-        runDinf = True
     End Function
 
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -3910,27 +3950,32 @@ Public Class frmAutomatic_v2
     ' 08/23/2006    ARA             Created
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Function runAreaDinf() As Boolean
-        Dim i As Integer
+        Logger.Dbg("RunAreaDinf:Entry")
 
-        runAreaDinf = False
+
         RemoveLayer(tdbFileList.sca, False)
 
         If doTicks Then
             tickb = Now().Ticks
         End If
 
-        i = MapWinGeoProc.Hydrology.AreaDInf(tdbFileList.ang, tdbFileList.outletshpfile, tdbFileList.sca, tdbChoiceList.useOutlets, tdbChoiceList.EdgeContCheck, myWrapper)
-        If i <> 0 Then Return False
+        Dim lResult As Integer = MapWinGeoProc.Hydrology.AreaDInf(tdbFileList.ang, tdbFileList.outletshpfile, tdbFileList.sca, tdbChoiceList.useOutlets, tdbChoiceList.EdgeContCheck, myWrapper)
+        If lResult <> 0 Then
+            Logger.Dbg("RunAreaDinf:ExitWithErrorCode " & lResult)
+            Return False
+        Else
+            If doTicks Then
+                ticka = Now().Ticks
+                tickd = ticka - tickb
+                os.WriteLine(tickd.ToString + " - Area Dinf ")
+            End If
+            If tdbChoiceList.AddD8AreaLayer Then
+                AddMap(tdbFileList.sca, LayerType.sca)
+            End If
 
-        If doTicks Then
-            ticka = Now().Ticks
-            tickd = ticka - tickb
-            os.WriteLine(tickd.ToString + " - Area Dinf ")
+            Logger.Dbg("RunAreaDinf:Exit")
+            Return True
         End If
-        If tdbChoiceList.AddD8AreaLayer Then
-            AddMap(tdbFileList.sca, LayerType.sca)
-        End If
-        runAreaDinf = True
     End Function
 
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -3952,6 +3997,8 @@ Public Class frmAutomatic_v2
     ' 08/08/2006    ARA             Updated to copy attributes when 'clipping'
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Function runClipSelectedOutlets() As Boolean
+        Logger.Dbg("RunClipSelectedOutlets:Entry")
+
         Dim strClipShapePath As String
 
         If IO.Path.GetFileName(g_BaseDEM) = "sta.adf" Then
@@ -3966,7 +4013,8 @@ Public Class frmAutomatic_v2
             tdbFileList.outletshpfile = strClipShapePath
         End If
 
-        runClipSelectedOutlets = True
+        Logger.Dbg("RunClipSelectedOutlets:Exit")
+        Return True
     End Function
 
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -3992,6 +4040,8 @@ Public Class frmAutomatic_v2
     ' 08/07/2006    ARA             Moved code out to geoproc.utils.SnapPointsToLines
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Function runAutoSnap() As Boolean
+        Logger.Dbg("RunAutoSnap:Entry")
+
         Dim newPointPath As String
         If IO.Path.GetFileName(g_BaseDEM) = "sta.adf" Then
             newPointPath = tdbFileList.getAbsolutePath(tdbChoiceList.OutputPath, IO.Path.GetDirectoryName(g_BaseDEM) + ".bgd") + IO.Path.GetFileNameWithoutExtension(g_BaseDEM) + "_snap.shp"
@@ -4009,6 +4059,7 @@ Public Class frmAutomatic_v2
         If runAutoSnap Then
             tdbFileList.outletshpfile = newPointPath
         End If
+        Logger.Dbg("RunAutoSnap:Exit")
     End Function
 
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -4028,10 +4079,10 @@ Public Class frmAutomatic_v2
     ' 07/20/2006    ARA             Created
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Function runDefineStreamGrids() As Boolean
-        Dim i As Integer
+        Logger.Dbg("RunDefineStreamGrids:Entry")
 
         runDefineStreamGrids = False
-        RemoveLayer(tdbFileList.gord, False)
+        If Not RemoveLayer(tdbFileList.gord, False) Then Logger.Dbg("ProblemRemovingLayer " & tdbFileList.gord)
         RemoveLayer(tdbFileList.plen, False)
         RemoveLayer(tdbFileList.tlen, False)
         RemoveLayer(tdbFileList.src, False)
@@ -4041,15 +4092,16 @@ Public Class frmAutomatic_v2
             tickb = Now().Ticks
         End If
 
-        i = MapWinGeoProc.Hydrology.DelinStreamGrids(tdbFileList.dem, tdbFileList.fel, tdbFileList.p, tdbFileList.sd8, tdbFileList.ad8, tdbFileList.ang, tdbFileList.outletshpfile, tdbFileList.gord, tdbFileList.plen, tdbFileList.tlen, tdbFileList.src, tdbFileList.ord, tdbFileList.tree, tdbFileList.coord, tdbChoiceList.Threshold, tdbChoiceList.useOutlets, tdbChoiceList.EdgeContCheck, tdbChoiceList.useDinf, myWrapper)
-        If i <> 0 Then Return False
+        Dim lResult As Integer = MapWinGeoProc.Hydrology.DelinStreamGrids(tdbFileList.dem, tdbFileList.fel, tdbFileList.p, tdbFileList.sd8, tdbFileList.ad8, tdbFileList.ang, tdbFileList.outletshpfile, tdbFileList.gord, tdbFileList.plen, tdbFileList.tlen, tdbFileList.src, tdbFileList.ord, tdbFileList.tree, tdbFileList.coord, tdbChoiceList.Threshold, tdbChoiceList.useOutlets, tdbChoiceList.EdgeContCheck, tdbChoiceList.useDinf, Nothing)
+        Logger.Dbg("RunDefineStreamGrids:BackFrom:DelinStreamGrids")
+        If lResult <> 0 Then Return False
 
         If doTicks Then
             ticka = Now().Ticks
             tickd = ticka - tickb
             os.WriteLine(tickd.ToString + " - Source Definition ")
         End If
-        If tdbChoiceList.AddGridNetLayer And i = 0 Then
+        If tdbChoiceList.AddGridNetLayer And lResult = 0 Then
             AddMap(tdbFileList.gord, LayerType.gord)
             AddMap(tdbFileList.plen, LayerType.plen)
             AddMap(tdbFileList.tlen, LayerType.tlen)
@@ -4061,7 +4113,8 @@ Public Class frmAutomatic_v2
             AddMap(tdbFileList.ord, LayerType.ord)
         End If
 
-        runDefineStreamGrids = True
+        Logger.Dbg("RunDefineStreamGrids:Exit")
+        Return True
     End Function
 
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -4081,6 +4134,8 @@ Public Class frmAutomatic_v2
     ' 07/20/2006    ARA             Updated to call geoproc.hydrology instead of taudem
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Function runStreamShapeWshedGrid() As Boolean
+        Logger.Dbg("RunStreamShapeWshedGrid:Entry")
+
         Dim i As Integer
         runStreamShapeWshedGrid = False
 
@@ -4091,7 +4146,7 @@ Public Class frmAutomatic_v2
             tickb = Now().Ticks
         End If
 
-        i = MapWinGeoProc.Hydrology.DelinStreamsAndSubBasins(tdbFileList.p, tdbFileList.tree, tdbFileList.coord, tdbFileList.net, tdbFileList.w, myWrapper)
+        i = MapWinGeoProc.Hydrology.DelinStreamsAndSubBasins(tdbFileList.p, tdbFileList.tree, tdbFileList.coord, tdbFileList.net, tdbFileList.w, Nothing)
         If i <> 0 Then Return False
 
         If doTicks Then
@@ -4105,7 +4160,8 @@ Public Class frmAutomatic_v2
         If tdbChoiceList.AddStreamShapeLayer Then
             AddMap(tdbFileList.net, LayerType.ReachShapefile) '15 is a reach shapefile
         End If
-        runStreamShapeWshedGrid = True
+        Logger.Dbg("RunStreamShapeWshedGrid:Exit")
+        Return True
     End Function
 
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -4124,6 +4180,8 @@ Public Class frmAutomatic_v2
     ' 05/26/2006    ARA             Reset change logs for new version when copying over functionality
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Function runWshedToShape() As Boolean
+        Logger.Dbg("RunWshedToShape:Entry")
+
         If doTicks Then
             tickb = Now().Ticks
         End If
@@ -4139,7 +4197,9 @@ Public Class frmAutomatic_v2
             tickd = ticka - tickb
             os.WriteLine(tickd.ToString + " - Watershed to Shapefile ")
         End If
-        runWshedToShape = True
+
+        Logger.Dbg("RunWshedToShape:Exit")
+        Return True
     End Function
 
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -4161,6 +4221,8 @@ Public Class frmAutomatic_v2
     ' 05/26/2006    ARA             Reset change logs for new version when copying over functionality
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Function runApplyStreamAttributes() As Boolean
+        Logger.Dbg("RunApplyStreamAttributes:Entry")
+
         runApplyStreamAttributes = False
         RemoveLayer(tdbFileList.net, False)
         If doTicks Then
@@ -4168,7 +4230,7 @@ Public Class frmAutomatic_v2
         End If
         'myWrapper.Progress("Status", 0, "Calculating Stream Parameters")
         If tdbChoiceList.CalcSpecialStreamFields Then
-            runApplyStreamAttributes = MapWinGeoProc.Hydrology.ApplyStreamAttributes(tdbFileList.net, tdbFileList.dem, tdbFileList.wshed, cmbxElevUnits.SelectedIndex, Me)
+            runApplyStreamAttributes = MapWinGeoProc.Hydrology.ApplyStreamAttributes(tdbFileList.net, tdbFileList.dem, tdbFileList.wshed, cmbxElevUnits.SelectedIndex, Nothing)
         Else
             runApplyStreamAttributes = True
         End If
@@ -4188,6 +4250,7 @@ Public Class frmAutomatic_v2
             AddMap(tdbFileList.net, LayerType.ReachShapefile) '15 is a reach shapefile
         End If
         Progress("", 0, "")
+        Logger.Dbg("RunApplyStreamAttributes:Exit")
     End Function
 
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -4212,6 +4275,7 @@ Public Class frmAutomatic_v2
     ' 02/20/2006    CM              Added precision and moved begineditings
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Private Function runApplyWatershedAttributes() As Boolean
+        Logger.Dbg("RunApplyWatershedAttributes:Entry")
 
         runApplyWatershedAttributes = False
         If doTicks Then
@@ -4237,6 +4301,7 @@ Public Class frmAutomatic_v2
         If tdbChoiceList.AddWShedShapeLayer Then
             AddMap(tdbFileList.wshed, LayerType.WatershedShapefile)
         End If
+        Logger.Dbg("RunApplyWatershedAttributes:Exit")
     End Function
 
     Private Function runBuildJoinedBasins() As Boolean

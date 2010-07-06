@@ -4,7 +4,7 @@ Module Globals_v2
     '3/16/2005 - dpa - Includes a global declaration of the mwTauDem.mwTaudemInterfacesClass
     Public g_MapWin As MapWindow.Interfaces.IMapWin
     Public g_handle As Integer
-    'Public g_Taudem As New mwTauDem.mwTaudemInterfaceClass
+    Public g_Taudem As New mwTauDem.mwTaudemInterfaceClass
     Public g_BaseDEM As String
     Public g_AutoForm As New frmAutomatic_v2
     'Public g_TaudemLib As New TKTAUDEMLib.TauDEM
