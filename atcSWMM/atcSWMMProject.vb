@@ -72,6 +72,123 @@ Public Class SWMMProject
         End Set
     End Property
 
+    Public Function Run() As Boolean
+        Dim lSWMMExeName As String = GetSetting("BASINS4", "SWMM", "ExeFileName", "")
+        If Not IO.File.Exists(lSWMMExeName) Then
+            lSWMMExeName = FindFile("Please locate SWMM Exe File", "Epaswmm5.exe", "*.exe")
+        End If
+        If IO.File.Exists(lSWMMExeName) Then
+            Dim lProcess As New System.Diagnostics.Process
+            With lProcess.StartInfo
+
+                .FileName = lSWMMExeName
+                .WorkingDirectory = "" 'lWorkingDirectory
+                .Arguments = FileName
+                .CreateNoWindow = True
+                .UseShellExecute = False
+                .RedirectStandardInput = True
+                .RedirectStandardOutput = True
+                AddHandler lProcess.OutputDataReceived, AddressOf MonitorMessageHandler
+                .RedirectStandardError = True
+                AddHandler lProcess.ErrorDataReceived, AddressOf MonitorMessageHandler
+            End With
+            lProcess.Start()
+            '
+            'NOTE: to debug pMonitorProcess, need Visual Studio (not Express) - choose Tools:AttachToProcess - StatusMonitor
+            '
+            lProcess.BeginErrorReadLine()
+            lProcess.BeginOutputReadLine()
+            Logger.Dbg("SWMM Started")
+            lProcess.WaitForExit()
+        End If
+    End Function
+
+    Private Sub MonitorMessageHandler(ByVal aSendingProcess As Object, _
+                                  ByVal aOutLine As DataReceivedEventArgs)
+        If Not String.IsNullOrEmpty(aOutLine.Data) Then
+            Dim lMessage As String = aOutLine.Data.ToString
+            Logger.Dbg("MsgFromStatusMonitor " & lMessage)
+        End If
+    End Sub
+
+    Public Function Load(ByVal aFileName As String) As Boolean
+        If Not IO.File.Exists(aFileName) Then
+            Logger.Msg("File '" & aFileName & "' not found", "SWMMProjectLoadProblem")
+            Return False
+        Else
+            Dim lSW As New IO.StreamReader(aFileName)
+            While Not lSW.EndOfStream
+                Dim lStr As String = lSW.ReadLine
+                Select Case lStr.ToUpper
+                    Case "[TITLE]"
+                        Title = lSW.ReadLine
+                    Case "[OPTIONS]"
+                        'TODO:parse block
+
+                    Case "[EVAPORATION]", "[TEMPERATURE]"
+                        'TODO:parse block
+
+                    Case "[RAINGAGES]"
+                        'TODO:parse block
+
+                    Case "[SUBCATCHMENTS]"
+                        'TODO:parse block
+
+                    Case "[SUBAREAS]"
+                        'TODO:parse block
+
+                    Case "[INFILTRATION]"
+                        'TODO:parse block
+
+                    Case "[JUNCTIONS]", "[OUTFALLS]"
+                        'TODO:parse block
+
+                    Case "[CONDUITS]", "[XSECTIONS]"
+                        'TODO:parse block
+
+                    Case "[LOSSES]"
+                        'TODO:parse block
+
+                    Case "[Landuses]"
+                        'TODO:parse block
+
+                    Case "[COVERAGES]"
+                        'TODO:parse block
+
+                    Case "[TIMESERIES]"
+                        'TODO:parse block
+
+                    Case "[REPORT]"
+                        'TODO:parse block
+
+                    Case "[TAGS]"
+                        'TODO:parse block
+
+                    Case "[MAP]"
+                        'TODO:parse block
+
+                    Case "[COORDINATES]"
+                        'TODO:parse block
+
+                    Case "[VERTICES]"
+                        'TODO:parse block
+
+                    Case "[POLYGONS]"
+                        'TODO:parse block
+
+                    Case "[SYMBOLS]"
+                        'TODO:parse block
+
+                    Case "[BACKDROP]"
+                        'TODO:parse block
+
+                    Case Else
+                        Logger.Dbg("'" & lStr & "' is not a known input block  ")
+                End Select
+            End While
+        End If
+    End Function
+
     Public Function Save(ByVal aFileName As String) As Boolean
         Dim lSW As New IO.StreamWriter(aFileName)
         FileName = aFileName
