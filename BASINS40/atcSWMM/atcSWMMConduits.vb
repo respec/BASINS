@@ -7,12 +7,20 @@ Imports atcData
 
 Public Class Conduits
     Inherits KeyedCollection(Of String, Conduit)
+    Implements IBlock
+
+    Property Name As String Implements IBlock.Name
+
     Protected Overrides Function GetKeyForItem(ByVal aConduit As Conduit) As String
-        Dim lKey As String = aConduit.Name
-        Return lKey
+        Return aConduit.Name
     End Function
 
-    Public SWMMProject As SWMMProject
+    Private SWMMProject As SWMMProject
+
+    Public Sub New(ByVal aSWMMPRoject As SWMMProject)
+        Name = "[CONDUITS]"
+        SWMMProject = aSWMMPRoject
+    End Sub
 
     Public Sub AddRange(ByVal aEnumerable As IEnumerable)
         For Each lConduit As Conduit In aEnumerable
@@ -20,11 +28,15 @@ Public Class Conduits
         Next
     End Sub
 
+    Public Sub FromString(ByVal aContents As String) Implements IBlock.FromString
+      'TODO: fill this in
+    End Sub
+
     Public Overrides Function ToString() As String
         Dim lString As New StringBuilder
         Dim lConduit As Conduit
 
-        lString.Append("[CONDUITS]" & vbCrLf & _
+        lString.Append(Name & vbCrLf & _
                        ";;               Inlet            Outlet                      Manning    Inlet      Outlet     Init.      Max.      " & vbCrLf & _
                        ";;Name           Node             Node             Length     N          Offset     Offset     Flow       Flow      " & vbCrLf)
         If Me.Count > 0 Then

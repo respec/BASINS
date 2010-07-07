@@ -6,12 +6,21 @@ Imports System.Text
 
 Public Class Catchments
     Inherits KeyedCollection(Of String, Catchment)
+    Implements IBlock
+
+    Property Name As String Implements IBlock.Name
+
     Protected Overrides Function GetKeyForItem(ByVal aCatchment As Catchment) As String
         Dim lKey As String = aCatchment.Name
         Return lKey
     End Function
 
-    Public SWMMProject As SWMMProject
+    Private SWMMProject As SWMMProject
+
+    Public Sub New(ByVal aSWMMPRoject As SWMMProject)
+        Name = "[SUBCATCHMENTS]"
+        SWMMProject = aSWMMPRoject
+    End Sub
 
     Public Sub AddRange(ByVal aEnumerable As IEnumerable)
         For Each lCatchment As Catchment In aEnumerable
@@ -19,10 +28,14 @@ Public Class Catchments
         Next
     End Sub
 
+    Public Sub FromString(ByVal aContents As String) Implements IBlock.FromString
+        'TODO: fill this in
+    End Sub
+
     Public Overrides Function ToString() As String
         Dim lSB As New StringBuilder
 
-        lSB.Append("[SUBCATCHMENTS]" & vbCrLf & _
+        lSB.Append(Name & vbCrLf & _
                        ";;                                                 Total    Pcnt.             Pcnt.    Curb     Snow    " & vbCrLf & _
                        ";;Name           Raingage         Outlet           Area     Imperv   Width    Slope    Length   Pack    " & vbCrLf & _
                        ";;-------------- ---------------- ---------------- -------- -------- -------- -------- -------- --------" & vbCrLf)

@@ -6,17 +6,29 @@ Imports System.Text
 
 Public Class RainGages
     Inherits KeyedCollection(Of String, RainGage)
+    Implements IBlock
+
+    Property Name As String Implements IBlock.Name
     Protected Overrides Function GetKeyForItem(ByVal aRainGage As RainGage) As String
         Dim lKey As String = aRainGage.Name
         Return lKey
     End Function
 
-    Public SWMMProject As SWMMProject
+    Private SWMMProject As SWMMProject
+
+    Public Sub New(ByVal aSWMMPRoject As SWMMProject)
+        Name = "[RAINGAGES]"
+        SWMMProject = aSWMMPRoject
+    End Sub
+
+    Public Sub FromString(ByVal aContents As String) Implements IBlock.FromString
+        'TODO: fill this in
+    End Sub
 
     Public Overrides Function ToString() As String
         Dim lSB As New StringBuilder
 
-        lSB.Append("[RAINGAGES]" & vbCrLf & _
+        lSB.Append(Name & vbCrLf & _
                    ";;               Rain      Recd.  Snow   Data      " & vbCrLf & _
                    ";;Name           Type      Freq.  Catch  Source    " & vbCrLf & _
                    ";;-------------- --------- ------ ------ ----------" & vbCrLf)

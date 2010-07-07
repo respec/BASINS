@@ -8,7 +8,8 @@ Imports atcUtility
 Public Class SWMMProject
     Private pIsMetric As Boolean
 
-    Public Blocks As NameValueCollection
+    Public Blocks As Blocks
+
     Public Catchments As Catchments
     Public Conduits As Conduits
     Public Nodes As Nodes
@@ -19,6 +20,7 @@ Public Class SWMMProject
     Public Name As String = ""
     Public FileName As String = ""
     Public Title As String = ""
+    'TODO: make these members of a new class
     Public FlowUnits As String = "CFS"
     Public InfiltrationMethod As String = "HORTON"
     Public FlowRouting As String = "KINWAVE"
@@ -50,19 +52,17 @@ Public Class SWMMProject
     Public MapUnits As String = "METERS"
 
     Public Sub New()
+        Blocks = New Blocks
         Name = ""
         FileName = ""
         Title = ""
-        Catchments = New Catchments
-        Catchments.SWMMProject = Me
-        Conduits = New Conduits
-        Conduits.SWMMProject = Me
+        Catchments = New Catchments(Me)
+        Conduits = New Conduits(Me)
+        Blocks.Add(Conduits)
         Nodes = New Nodes
         Landuses = New Landuses
-        RainGages = New RainGages
-        RainGages.SWMMProject = Me
-        MetConstituents = New MetConstituents
-        MetConstituents.SWMMProject = Me
+        RainGages = New RainGages(Me)
+        MetConstituents = New MetConstituents(Me)
         BackdropFile = ""
     End Sub
 
@@ -127,10 +127,11 @@ Public Class SWMMProject
             Logger.Msg("File '" & aFileName & "' not found", "SWMMProjectLoadProblem")
             Return False
         Else
+            Blocks.Clear()
+            'TODO: clear other classes
             FileName = aFileName
             Dim lSR As New IO.StreamReader(aFileName)
             Dim lNextLine As String = ""
-            Blocks = New NameValueCollection
             While Not lSR.EndOfStream
                 Dim lBlockName As String = lSR.ReadLine.ToUpper
                 Dim lContents As String = ""
@@ -140,7 +141,9 @@ Public Class SWMMProject
                         Title = LoadGenericDummy(lBlockName, lSR, lNextLine)
                     Case "[OPTIONS]"
                         LoadOptions(lSR, lNextLine)
-                    Case "[EVAPORATION]", "[TEMPERATURE]", "[RAINFALL]"
+                    Case "[EVAPORATION]", "[TEMPERATURE]"
+                        Blocks.Add(New MetConstituents(Me, lBlockName, LoadGenericDummy(lBlockName, lSR, lNextLine)))
+                    Case "[RAINFALL]"
                         lContents = LoadGenericDummy(lBlockName, lSR, lNextLine)
                         'TODO:parse block
 
@@ -164,7 +167,7 @@ Public Class SWMMProject
                         Logger.Dbg("'" & lBlockName & "' is not a known input block  ")
                 End Select
                 If lContents.Length > 0 Then
-                    Blocks.Add(lBlockName, lContents)
+                    Blocks.Add(New Block(lBlockName, lContents))
                 End If
             End While
         End If
@@ -256,10 +259,8 @@ Public Class SWMMProject
         lSW.WriteLine("")
 
         If Blocks.Count > 0 Then
-            For Each lBlockKey As String In Blocks.Keys
-                lSW.WriteLine(lBlockKey)
-                lSW.WriteLine(Blocks(lBlockKey))
-                lSW.WriteLine("")
+            For Each lBlock As Block In Blocks
+                lSW.WriteLine(lBlock.ToString)
             Next
         Else
             '[EVAPORATION] and [TEMPERATURE]
