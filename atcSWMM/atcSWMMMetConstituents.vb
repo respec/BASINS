@@ -6,12 +6,30 @@ Imports System.Text
 
 Public Class MetConstituents
     Inherits KeyedCollection(Of String, MetConstituent)
+    Implements IBlock
+
     Protected Overrides Function GetKeyForItem(ByVal aMetConstituent As MetConstituent) As String
         Dim lKey As String = aMetConstituent.Type
         Return lKey
     End Function
 
-    Public SWMMProject As SWMMProject
+    Property Name As String Implements IBlock.Name
+    Private SWMMProject As SWMMProject
+
+    Public Sub New(ByVal aSWMMPRoject As SWMMProject, ByVal aName As String)
+        SWMMProject = aSWMMPRoject
+        Name = aName
+    End Sub
+
+    Public Sub New(ByVal aSWMMPRoject As SWMMProject, ByVal aName As String, ByVal aContents As String)
+        SWMMProject = aSWMMPRoject
+        Name = aName
+        FromString(aContents)
+    End Sub
+
+    Public Sub FromString(ByVal aContents As String) Implements IBlock.FromString
+        'TODO: fill this in
+    End Sub
 
     Public Overrides Function ToString() As String
         Dim lSB As New StringBuilder
