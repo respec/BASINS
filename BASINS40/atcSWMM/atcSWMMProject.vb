@@ -72,42 +72,49 @@ Public Class SWMMProject
         End Set
     End Property
 
-    Public Function Run() As Boolean
+    Public Function RunSimulation() As Boolean
+        Dim lRunSimulation As Boolean = False
         Dim lSWMMExeName As String = GetSetting("BASINS4", "SWMM", "ExeFileName", "")
         If Not IO.File.Exists(lSWMMExeName) Then
-            lSWMMExeName = FindFile("Please locate SWMM Exe File", "Epaswmm5.exe", "*.exe")
+            lSWMMExeName = FindFile("Please locate SWMM5 Exe File", "swmm5.exe", "exe")
+            If IO.File.Exists(lSWMMExeName) Then
+                SaveSetting("BASINS4", "SWMM", "SimulationExeFileName", "")
+            End If
         End If
         If IO.File.Exists(lSWMMExeName) Then
             Dim lProcess As New System.Diagnostics.Process
-            With lProcess.StartInfo
-
-                .FileName = lSWMMExeName
-                .WorkingDirectory = "" 'lWorkingDirectory
-                .Arguments = FileName
-                .CreateNoWindow = True
-                .UseShellExecute = False
-                .RedirectStandardInput = True
-                .RedirectStandardOutput = True
-                AddHandler lProcess.OutputDataReceived, AddressOf MonitorMessageHandler
-                .RedirectStandardError = True
-                AddHandler lProcess.ErrorDataReceived, AddressOf MonitorMessageHandler
+            With lProcess
+                With .StartInfo
+                    .FileName = lSWMMExeName
+                    .WorkingDirectory = IO.Path.GetDirectoryName(FileName)
+                    Dim lFileNameNoExt As String = IO.Path.GetFileNameWithoutExtension(FileName)
+                    .Arguments = lFileNameNoExt & ".inp " & lFileNameNoExt & ".rpt " & lFileNameNoExt & ".out"
+                    .CreateNoWindow = True
+                    .UseShellExecute = False
+                    .RedirectStandardInput = True
+                    .RedirectStandardOutput = True
+                    AddHandler lProcess.OutputDataReceived, AddressOf ProcessMessageHandler
+                    .RedirectStandardError = True
+                    AddHandler lProcess.ErrorDataReceived, AddressOf ProcessMessageHandler
+                End With
+                .Start()
+                .BeginErrorReadLine()
+                .BeginOutputReadLine()
+                Logger.Dbg("SWMM Started")
+                .WaitForExit()
+                If .ExitCode = 0 Then
+                    lRunSimulation = True
+                End If
             End With
-            lProcess.Start()
-            '
-            'NOTE: to debug pMonitorProcess, need Visual Studio (not Express) - choose Tools:AttachToProcess - StatusMonitor
-            '
-            lProcess.BeginErrorReadLine()
-            lProcess.BeginOutputReadLine()
-            Logger.Dbg("SWMM Started")
-            lProcess.WaitForExit()
         End If
+        Return lRunSimulation
     End Function
 
-    Private Sub MonitorMessageHandler(ByVal aSendingProcess As Object, _
-                                  ByVal aOutLine As DataReceivedEventArgs)
+    Private Sub ProcessMessageHandler(ByVal aSendingProcess As Object, _
+                                      ByVal aOutLine As DataReceivedEventArgs)
         If Not String.IsNullOrEmpty(aOutLine.Data) Then
             Dim lMessage As String = aOutLine.Data.ToString
-            Logger.Dbg("MsgFromStatusMonitor " & lMessage)
+            Logger.Dbg("MsgFromSWMM5 " & lMessage)
         End If
     End Sub
 
