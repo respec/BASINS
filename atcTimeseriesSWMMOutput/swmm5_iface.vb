@@ -1,17 +1,10 @@
 Imports System.IO
 Imports MapWinUtility
 
-Module swmm5_iface
-
-    ' SWMM5_IFACE.BAS
-    '
-    ' Example code for interfacing SWMM 5
-    ' with Visual Basic Applications
-    '
+Public Class SWMM5_OutputFile
     Dim pBinaryFileStream As FileStream
     Dim pBinaryReader As BinaryReader
 
-    '
     Private Const SUBCATCH = 0
     Private Const NODE = 1
     Private Const LINK = 2
@@ -33,11 +26,15 @@ Module swmm5_iface
     Private LinkPropValues(,) As Single
 
     Private SysVars As Integer             ' number of system reporting variables
-    Private Fout As Integer                ' file handle
-    Private StartPos As Integer            ' file position where results start
-    Private BytesPerPeriod As Integer      ' number of bytes used for storing
-    ' results in file each reporting period
 
+    Public TimeStarts() As Double
+
+    Public OffsetObjectIdNames As Integer
+    Public OffsetObjectProperties As Integer
+    Public OffsetComputedResults As Integer  ' file position where results start
+    Private BytesPerPeriod As Integer         ' number of bytes used for storing results in file each reporting period
+ 
+    Public Version As Integer
     Public SWMM_Nperiods As Integer        ' number of reporting periods
     Public SWMM_FlowUnits As Integer       ' flow units code
     Public SWMM_Nsubcatch As Integer       ' number of subcatchments
@@ -83,16 +80,13 @@ Module swmm5_iface
 
         With pBinaryReader
             Try
-                'debug code to look at bytes read from current position
-                pBinaryFileStream.Seek(pBinaryFileStream.Length - (5 * RECORDSIZE), SeekOrigin.Begin)
-                Dim lFilePosition As Integer = pBinaryFileStream.Position
-                Dim lBytes() As Byte = .ReadBytes(20)
-
                 ' --- read parameters from end of file
-                pBinaryFileStream.Seek(pBinaryFileStream.Length - (5 * RECORDSIZE), SeekOrigin.Begin)
-                Dim offset0 As Integer = .ReadInt32
-                StartPos = .ReadInt32
+                pBinaryFileStream.Seek(pBinaryFileStream.Length - (6 * RECORDSIZE), SeekOrigin.Begin)
+                OffsetObjectIdNames = .ReadInt32
+                OffsetObjectProperties = .ReadInt32
+                OffsetComputedResults = .ReadInt32
                 SWMM_Nperiods = .ReadInt32
+                ReDim TimeStarts(SWMM_Nperiods)
                 Dim errCode As Integer = .ReadInt32
                 Dim magic2 As Integer = .ReadInt32
 
@@ -118,7 +112,7 @@ Module swmm5_iface
                 End If
 
                 ' --- otherwise read additional parameters from start of file
-                Dim version As Integer = .ReadInt32
+                Version = .ReadInt32
                 SWMM_FlowUnits = .ReadInt32
                 SWMM_Nsubcatch = .ReadInt32
                 SWMM_Nnodes = .ReadInt32
@@ -209,19 +203,28 @@ Module swmm5_iface
                 SysVars = .ReadInt32
 
                 ' --- read data just before start of output results
-                '
-                'TODO: update and test the rest!
-                '
-                'FileSeek(Fout, StartPos - 3 * RECORDSIZE + 1)
-                FileGet(Fout, SWMM_StartDate)
-                FileGet(Fout, SWMM_ReportStep)
+                pBinaryFileStream.Seek(OffsetComputedResults - 12, SeekOrigin.Begin)
+                SWMM_StartDate = .ReadDouble
+                TimeStarts(0) = SWMM_StartDate
+                SWMM_ReportStep = .ReadInt32
 
                 ' --- compute number of bytes stored per reporting period
-                BytesPerPeriod = RECORDSIZE * 2
-                BytesPerPeriod = BytesPerPeriod + RECORDSIZE * SWMM_Nsubcatch * SubcatchVars
-                BytesPerPeriod = BytesPerPeriod + RECORDSIZE * SWMM_Nnodes * NodeVars
-                BytesPerPeriod = BytesPerPeriod + RECORDSIZE * SWMM_Nlinks * LinkVars
-                BytesPerPeriod = BytesPerPeriod + RECORDSIZE * SysVars
+                BytesPerPeriod = RECORDSIZE * 3 'datestamp
+                BytesPerPeriod += RECORDSIZE * SWMM_Nsubcatch * SubcatchVars
+                BytesPerPeriod += RECORDSIZE * SWMM_Nnodes * NodeVars
+                BytesPerPeriod += RECORDSIZE * SWMM_Nlinks * LinkVars
+                BytesPerPeriod += RECORDSIZE * SysVars
+
+                Dim lBytesPerRecord As Integer = (pBinaryFileStream.Length - OffsetComputedResults - 24) / SWMM_Nperiods  'TODO: why 24????
+                If BytesPerPeriod <> lBytesPerRecord Then
+                    Logger.Dbg("Why!")
+                    BytesPerPeriod = lBytesPerRecord
+                End If
+
+                For lTimeIndex As Integer = 1 To SWMM_Nperiods
+                    pBinaryFileStream.Seek(OffsetComputedResults + ((lTimeIndex - 1) * BytesPerPeriod), SeekOrigin.Begin)
+                    TimeStarts(lTimeIndex) = .ReadDouble
+                Next
 
                 ' --- return with file left open
                 Return lReturnCode
@@ -235,7 +238,8 @@ Module swmm5_iface
     End Function
 
     Function GetSwmmResult(ByVal iType As Integer, ByVal iIndex As Integer, _
-             ByVal vIndex As Integer, ByVal period As Integer, ByVal Value As Single) As Integer
+                           ByVal vIndex As Integer, ByVal period As Integer, _
+                           ByRef Value As Single) As Integer
         '------------------------------------------------------------------------------
         '  Input:   iType = type of object whose value is being sought
         '                   (0 = subcatchment, 1 = node, 2 = link, 3 = system
@@ -247,16 +251,9 @@ Module swmm5_iface
         '  Purpose: finds the result of a specific variable for a given object
         '           at a specified time period.
         '------------------------------------------------------------------------------
-        Dim offset As Integer
-        Dim offset1 As Integer
-        Dim offset2 As Integer
-        Dim X As Single
-
         '// --- compute offset into output file
-        Value = 0.0#
-        GetSwmmResult = 0
-        offset1 = StartPos + (period - 1) * BytesPerPeriod + 2 * RECORDSIZE + 1
-        offset2 = 0
+        Dim offset1 As Integer = OffsetComputedResults + ((period - 1) * BytesPerPeriod) + (3 * RECORDSIZE) ' + 1
+        Dim offset2 As Integer = 0
         If iType = SUBCATCH Then
             offset2 = iIndex * SubcatchVars + vIndex
         ElseIf iType = NODE Then
@@ -265,14 +262,15 @@ Module swmm5_iface
             offset2 = SWMM_Nsubcatch * SubcatchVars + SWMM_Nnodes * NodeVars + iIndex * LinkVars + vIndex
         ElseIf iType = SYS Then
             offset2 = SWMM_Nsubcatch * SubcatchVars + SWMM_Nnodes * NodeVars + SWMM_Nlinks * LinkVars + vIndex
-        Else : Exit Function
+        Else
+            Value = 0.0#
+            Return 0
         End If
 
         '// --- re-position the file and read result
-        offset = offset1 + RECORDSIZE * offset2
-        'FileSeek #Fout, offset
-        FileGet(Fout, X)
-        Value = X
+        Dim offset As Integer = offset1 + RECORDSIZE * offset2
+        pBinaryFileStream.Seek(offset, SeekOrigin.Begin)
+        Value = pBinaryReader.ReadSingle()
         Return 1
     End Function
 
@@ -285,5 +283,5 @@ Module swmm5_iface
         pBinaryReader.Close()
         pBinaryFileStream.Close()
     End Sub
-End Module
+End Class
 

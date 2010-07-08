@@ -7,7 +7,7 @@ Public Class atcDataSourceTimeseriesSWMM5Output
     '##MODULE_REMARKS Copyright 2010 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private Shared pFilter As String = "SWMM5 Output Files (*.out)|*.out"
-    Private pColDefs As Hashtable
+    Private pSWMM5_OutputFile As SWMM5_OutputFile
 
     Public Overrides ReadOnly Property Description() As String
         Get
@@ -41,7 +41,9 @@ Public Class atcDataSourceTimeseriesSWMM5Output
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
         If MyBase.Open(aFileName, aAttributes) Then
-            OpenSwmmOutFile(MyBase.Specification)
+            pSWMM5_OutputFile = New SWMM5_OutputFile
+            pSWMM5_OutputFile.OpenSwmmOutFile(MyBase.Specification)
+
             Dim lData As atcTimeseries = Nothing
             'TODO: fill in parsing of output file here!
             DataSets.Add(lData)
