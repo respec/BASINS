@@ -21,8 +21,17 @@ Module swmm5_iface
     Private Const RECORDSIZE = 4           ' number of bytes per file record
 
     Private SubcatchVars As Integer        ' number of subcatch reporting variable
+    Private SubcatchPropCodes() As Integer
+    Private SubcatchPropValues(,) As Single
+
     Private NodeVars As Integer            ' number of node reporting variables
+    Private NodePropCodes() As Integer
+    Private NodePropValues(,) As Single
+
     Private LinkVars As Integer            ' number of link reporting variables
+    Private LinkPropCodes() As Integer
+    Private LinkPropValues(,) As Single
+
     Private SysVars As Integer             ' number of system reporting variables
     Private Fout As Integer                ' file handle
     Private StartPos As Integer            ' file position where results start
@@ -32,9 +41,14 @@ Module swmm5_iface
     Public SWMM_Nperiods As Integer        ' number of reporting periods
     Public SWMM_FlowUnits As Integer       ' flow units code
     Public SWMM_Nsubcatch As Integer       ' number of subcatchments
+    Public SWMM_SubcatchId() As String
     Public SWMM_Nnodes As Integer          ' number of drainage system nodes
+    Public SWMM_NodeId() As String
     Public SWMM_Nlinks As Integer          ' number of drainage system links
+    Public SWMM_LinkId() As String
     Public SWMM_Npolluts As Integer        ' number of pollutants tracked
+    Public SWMM_PollutId() As String
+    Public SWMM_PollutConcCode() As String
     Public SWMM_StartDate As Double        ' start date of simulation
     Public SWMM_ReportStep As Integer      ' reporting time step (seconds)
 
@@ -111,21 +125,87 @@ Module swmm5_iface
                 SWMM_Nlinks = .ReadInt32
                 SWMM_Npolluts = .ReadInt32
 
-                ' --- skip over saved subcatch/node/link input values
-                Dim offset As Integer = (SWMM_Nsubcatch + 2) * RECORDSIZE
-                offset = offset + (3 * SWMM_Nnodes + 4) * RECORDSIZE
-                offset = offset + (5 * SWMM_Nlinks + 6) * RECORDSIZE
-                offset = offset0 + offset + 1
-                pBinaryFileStream.Seek(offset, SeekOrigin.Begin)
+                ' --- save details about output locations
+                Dim lLength As Integer
+                If SWMM_Nsubcatch > 0 Then
+                    ReDim SWMM_SubcatchId(SWMM_Nsubcatch - 1)
+                    For lIndex As Integer = 0 To SWMM_Nsubcatch - 1
+                        lLength = .ReadInt32
+                        Dim lChars() As Char = New String(.ReadChars(lLength))
+                        SWMM_SubcatchId(lIndex) = New String(lChars)
+                    Next
+                End If
+                If SWMM_Nnodes > 0 Then
+                    ReDim SWMM_NodeId(SWMM_Nnodes - 1)
+                    For lIndex As Integer = 0 To SWMM_Nnodes - 1
+                        lLength = .ReadInt32
+                        SWMM_NodeId(lIndex) = New String(.ReadChars(lLength))
+                    Next
+                End If
+                If SWMM_Nlinks > 0 Then
+                    ReDim SWMM_LinkId(SWMM_Nlinks - 1)
+                    For lIndex As Integer = 0 To SWMM_Nlinks - 1
+                        lLength = .ReadInt32
+                        SWMM_LinkId(lIndex) = New String(.ReadChars(lLength))
+                    Next
+                End If
+                If SWMM_Npolluts > 0 Then
+                    ReDim SWMM_PollutId(SWMM_Npolluts - 1)
+                    For lIndex As Integer = 0 To SWMM_Npolluts - 1
+                        lLength = .ReadInt32
+                        SWMM_PollutId(lIndex) = New String(.ReadChars(lLength))
+                    Next
+                    ReDim SWMM_PollutConcCode(SWMM_Npolluts - 1)
+                    For lIndex As Integer = 0 To SWMM_Npolluts - 1
+                        lLength = .ReadInt32
+                        SWMM_PollutConcCode(lIndex) = New String(.ReadChars(lLength))
+                    Next
+                End If
 
                 ' --- read number & codes of computed variables
                 SubcatchVars = .ReadInt32
-                If SubcatchVars > 0 Then pBinaryFileStream.Seek((SubcatchVars * RECORDSIZE), SeekOrigin.Current)
-                'TODO: this is coming back wrong!
+                ReDim SubcatchPropCodes(SubcatchVars - 1)
+                For lVarIndex As Integer = 0 To SubcatchVars - 1
+                    SubcatchPropCodes(lVarIndex) = .ReadInt32
+                Next
+                If SWMM_Nsubcatch > 0 Then
+                    ReDim SubcatchPropValues(SubcatchVars - 1, SWMM_Nsubcatch - 1)
+                    For lVarIndex As Integer = 0 To SubcatchVars - 1
+                        For lSubcatchIndex As Integer = 0 To SWMM_Nsubcatch - 1
+                            NodePropValues(lVarIndex, lSubcatchIndex) = .ReadSingle
+                        Next
+                    Next
+                End If
+
                 NodeVars = .ReadInt32
-                If NodeVars > 0 Then pBinaryFileStream.Seek((NodeVars * RECORDSIZE), SeekOrigin.Current)
+                ReDim NodePropCodes(NodeVars - 1)
+                For lVarIndex As Integer = 0 To NodeVars - 1
+                    NodePropCodes(lVarIndex) = .ReadInt32
+                Next
+
+                If SWMM_Nnodes > 0 Then
+                    ReDim NodePropValues(NodeVars - 1, SWMM_Nnodes - 1)
+                    For lVarIndex As Integer = 0 To NodeVars - 1
+                        For lNodeIndex As Integer = 0 To SWMM_Nnodes - 1
+                            NodePropValues(lVarIndex, lNodeIndex) = .ReadSingle
+                        Next
+                    Next
+                End If
+
                 LinkVars = .ReadInt32
-                If LinkVars > 0 Then pBinaryFileStream.Seek((LinkVars * RECORDSIZE), SeekOrigin.Current)
+                ReDim LinkPropCodes(LinkVars - 1)
+                For lVarIndex As Integer = 0 To LinkVars - 1
+                    LinkPropCodes(lVarIndex) = .ReadInt32
+                Next
+                If SWMM_Nlinks > 0 Then
+                    ReDim LinkPropValues(LinkVars - 1, SWMM_Nlinks - 1)
+                End If
+                For lVarIndex As Integer = 0 To LinkVars - 1
+                    For lLinkIndex As Integer = 0 To SWMM_Nlinks - 1
+                        LinkPropValues(lVarIndex, lLinkIndex) = .ReadSingle
+                    Next
+                Next
+
                 SysVars = .ReadInt32
 
                 ' --- read data just before start of output results
