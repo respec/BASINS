@@ -20,25 +20,25 @@ Module swmm5_iface
     Private Const SW_SHOWNORMAL = 1&
     Private Const RECORDSIZE = 4           ' number of bytes per file record
 
-    Private SubcatchVars As Long           ' number of subcatch reporting variable
-    Private NodeVars As Long               ' number of node reporting variables
-    Private LinkVars As Long               ' number of link reporting variables
-    Private SysVars As Long                ' number of system reporting variables
+    Private SubcatchVars As Integer        ' number of subcatch reporting variable
+    Private NodeVars As Integer            ' number of node reporting variables
+    Private LinkVars As Integer            ' number of link reporting variables
+    Private SysVars As Integer             ' number of system reporting variables
     Private Fout As Integer                ' file handle
-    Private StartPos As Long               ' file position where results start
-    Private BytesPerPeriod As Long         ' number of bytes used for storing
+    Private StartPos As Integer            ' file position where results start
+    Private BytesPerPeriod As Integer      ' number of bytes used for storing
     ' results in file each reporting period
 
-    Public SWMM_Nperiods As Long           ' number of reporting periods
-    Public SWMM_FlowUnits As Long          ' flow units code
-    Public SWMM_Nsubcatch As Long          ' number of subcatchments
-    Public SWMM_Nnodes As Long             ' number of drainage system nodes
-    Public SWMM_Nlinks As Long             ' number of drainage system links
-    Public SWMM_Npolluts As Long           ' number of pollutants tracked
+    Public SWMM_Nperiods As Integer        ' number of reporting periods
+    Public SWMM_FlowUnits As Integer       ' flow units code
+    Public SWMM_Nsubcatch As Integer       ' number of subcatchments
+    Public SWMM_Nnodes As Integer          ' number of drainage system nodes
+    Public SWMM_Nlinks As Integer          ' number of drainage system links
+    Public SWMM_Npolluts As Integer        ' number of pollutants tracked
     Public SWMM_StartDate As Double        ' start date of simulation
-    Public SWMM_ReportStep As Long         ' reporting time step (seconds)
+    Public SWMM_ReportStep As Integer      ' reporting time step (seconds)
 
-    Function OpenSwmmOutFile(ByVal OutFile As String) As Long
+    Function OpenSwmmOutFile(ByVal OutFile As String) As Integer
         '------------------------------------------------------------------------------
         '  Input:   outFile = name of binary output file
         '  Output:  returns 0 if successful, 1 if binary file invalid because
@@ -121,6 +121,7 @@ Module swmm5_iface
                 ' --- read number & codes of computed variables
                 SubcatchVars = .ReadInt32
                 If SubcatchVars > 0 Then pBinaryFileStream.Seek((SubcatchVars * RECORDSIZE), SeekOrigin.Current)
+                'TODO: this is coming back wrong!
                 NodeVars = .ReadInt32
                 If NodeVars > 0 Then pBinaryFileStream.Seek((NodeVars * RECORDSIZE), SeekOrigin.Current)
                 LinkVars = .ReadInt32
@@ -153,8 +154,8 @@ Module swmm5_iface
         End With
     End Function
 
-    Function GetSwmmResult(ByVal iType As Long, ByVal iIndex As Long, _
-             ByVal vIndex As Long, ByVal period As Long, ByVal Value As Single) As Integer
+    Function GetSwmmResult(ByVal iType As Integer, ByVal iIndex As Integer, _
+             ByVal vIndex As Integer, ByVal period As Integer, ByVal Value As Single) As Integer
         '------------------------------------------------------------------------------
         '  Input:   iType = type of object whose value is being sought
         '                   (0 = subcatchment, 1 = node, 2 = link, 3 = system
@@ -166,9 +167,9 @@ Module swmm5_iface
         '  Purpose: finds the result of a specific variable for a given object
         '           at a specified time period.
         '------------------------------------------------------------------------------
-        Dim offset As Long
-        Dim offset1 As Long
-        Dim offset2 As Long
+        Dim offset As Integer
+        Dim offset1 As Integer
+        Dim offset2 As Integer
         Dim X As Single
 
         '// --- compute offset into output file

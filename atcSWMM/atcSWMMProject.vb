@@ -62,7 +62,7 @@ Public Class SWMMProject
         Nodes = New Nodes
         Landuses = New Landuses
         RainGages = New RainGages(Me)
-        MetConstituents = New MetConstituents(Me)
+        MetConstituents = New MetConstituents(Me, Nothing)
         BackdropFile = ""
     End Sub
 
@@ -259,7 +259,7 @@ Public Class SWMMProject
         lSW.WriteLine("")
 
         If Blocks.Count > 0 Then
-            For Each lBlock As Block In Blocks
+            For Each lBlock As IBlock In Blocks
                 lSW.WriteLine(lBlock.ToString)
             Next
         Else
