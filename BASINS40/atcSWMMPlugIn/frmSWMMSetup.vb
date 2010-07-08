@@ -2068,7 +2068,7 @@ Public Class frmSWMMSetup
                 End If
             Next
 
-            Dim lTempCatchments As New atcSWMM.Catchments
+            Dim lTempCatchments As New atcSWMM.Catchments(Nothing)
             Dim lTable As New atcUtility.atcTableDBF
             If lTable.OpenFile(FilenameSetExt(lCatchmentShapefileName, "dbf")) Then
                 lTempCatchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, lCatchmentFieldMap))
