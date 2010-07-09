@@ -42,11 +42,38 @@ Public Class atcDataSourceTimeseriesSWMM5Output
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
         If MyBase.Open(aFileName, aAttributes) Then
             pSWMM5_OutputFile = New SWMM5_OutputFile
-            pSWMM5_OutputFile.OpenSwmmOutFile(MyBase.Specification)
+            If pSWMM5_OutputFile.OpenSwmmOutFile(MyBase.Specification) = 0 Then
+                Dim lLink As Integer = 2 'TODO: how to get this constants -> pSWMM5_OutputFile.LINK
+                Dim lNumValues As Int16 = pSWMM5_OutputFile.TimeStarts.GetUpperBound(0)
+                Dim lValue As Single
 
-            Dim lData As atcTimeseries = Nothing
-            'TODO: fill in parsing of output file here!
-            DataSets.Add(lData)
+                'TODO: build timeseries for each possible output timeseries
+                'TODO: set attributes appropriately
+                'TODO: should these be filled yet or as needed?
+
+                'this is a sample filled timeseries
+                Dim lData As New atcTimeseries(Me)
+                lData.numValues = lNumValues
+                lData.Dates = New atcTimeseries(Me)
+                With lData.Dates
+                    .numValues = lNumValues
+                    Dim lIndex As Integer = 0
+                    For Each lDateValue As Double In pSWMM5_OutputFile.TimeStarts
+                        'SWMM Julian date conventions match ours!!
+                        .Value(lIndex) = lDateValue
+                        pSWMM5_OutputFile.GetSwmmResult(lLink, 1, 1, lIndex, lValue)
+                        lData.Values(lIndex) = lValue
+                        lIndex += 1
+                    Next
+                End With
+                'TODO: fill in parsing of output file here!
+                DataSets.Add(lData)
+                Return True
+            Else
+                Return False
+            End If
+        Else
+            Return False
         End If
     End Function
 
