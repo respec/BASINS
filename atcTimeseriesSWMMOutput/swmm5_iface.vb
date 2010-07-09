@@ -5,13 +5,16 @@ Public Class SWMM5_OutputFile
     Dim pBinaryFileStream As FileStream
     Dim pBinaryReader As BinaryReader
 
-    Private Const SUBCATCH = 0
-    Private Const NODE = 1
-    Private Const LINK = 2
-    Private Const SYS = 3
-    Private Const INFINITE = -1&
-    Private Const SW_SHOWNORMAL = 1&
+    Public Const SUBCATCH = 0
+    Public Const NODE = 1
+    Public Const LINK = 2
+    Public Const SYS = 3
+
     Private Const RECORDSIZE = 4           ' number of bytes per file record
+    Private Const MAX_SUBCATCH_RESULTS = 7
+    Private Const MAX_NODE_RESULTS = 7
+    Private Const MAX_LINK_RESULTS = 6
+    Private Const MAX_SYS_RESULTS = 14
 
     Private SubcatchVars As Integer        ' number of subcatch reporting variable
     Private SubcatchPropCodes() As Integer
@@ -156,8 +159,14 @@ Public Class SWMM5_OutputFile
                     Next
                 End If
 
+                'TODO: there seems to be an issue with variables written at the start of the run and those written each time step!!!
+                'TODO: that may be why the counts are wrong - need to check c code and make consistant!
+
                 ' --- read number & codes of computed variables
                 SubcatchVars = .ReadInt32
+                If SubcatchVars <> MAX_SUBCATCH_RESULTS - 1 + SWMM_Npolluts Then
+                    Logger.Dbg("SubcatchVarCountProblem? " & SubcatchVars & " " & MAX_SUBCATCH_RESULTS)
+                End If
                 ReDim SubcatchPropCodes(SubcatchVars - 1)
                 For lVarIndex As Integer = 0 To SubcatchVars - 1
                     SubcatchPropCodes(lVarIndex) = .ReadInt32
@@ -172,11 +181,13 @@ Public Class SWMM5_OutputFile
                 End If
 
                 NodeVars = .ReadInt32
+                If NodeVars <> MAX_NODE_RESULTS Then
+                    Logger.Dbg("NodeVarCountProblem? " & NodeVars & " " & MAX_NODE_RESULTS)
+                End If
                 ReDim NodePropCodes(NodeVars - 1)
                 For lVarIndex As Integer = 0 To NodeVars - 1
                     NodePropCodes(lVarIndex) = .ReadInt32
                 Next
-
                 If SWMM_Nnodes > 0 Then
                     ReDim NodePropValues(NodeVars - 1, SWMM_Nnodes - 1)
                     For lVarIndex As Integer = 0 To NodeVars - 1
@@ -187,6 +198,9 @@ Public Class SWMM5_OutputFile
                 End If
 
                 LinkVars = .ReadInt32
+                If LinkVars <> MAX_LINK_RESULTS Then
+                    Logger.Dbg("LinkVarCountProblem? " & LinkVars & " " & MAX_LINK_RESULTS)
+                End If
                 ReDim LinkPropCodes(LinkVars - 1)
                 For lVarIndex As Integer = 0 To LinkVars - 1
                     LinkPropCodes(lVarIndex) = .ReadInt32
@@ -201,6 +215,9 @@ Public Class SWMM5_OutputFile
                 Next
 
                 SysVars = .ReadInt32
+                If SysVars <> MAX_SYS_RESULTS Then
+                    Logger.Dbg("SysVarCountProblem? " & SysVars & " " & MAX_SYS_RESULTS)
+                End If
 
                 ' --- read data just before start of output results
                 pBinaryFileStream.Seek(OffsetComputedResults - 12, SeekOrigin.Begin)
@@ -209,16 +226,14 @@ Public Class SWMM5_OutputFile
                 SWMM_ReportStep = .ReadInt32
 
                 ' --- compute number of bytes stored per reporting period
-                BytesPerPeriod = RECORDSIZE * 3 'datestamp
-                BytesPerPeriod += RECORDSIZE * SWMM_Nsubcatch * SubcatchVars
-                BytesPerPeriod += RECORDSIZE * SWMM_Nnodes * NodeVars
-                BytesPerPeriod += RECORDSIZE * SWMM_Nlinks * LinkVars
-                BytesPerPeriod += RECORDSIZE * SysVars
-
+                BytesPerPeriod = RECORDSIZE * 2 'datestamp
+                BytesPerPeriod += RECORDSIZE * SWMM_Nsubcatch * (MAX_SUBCATCH_RESULTS - 1 + SWMM_Npolluts)
+                BytesPerPeriod += RECORDSIZE * SWMM_Nnodes * (MAX_NODE_RESULTS - 1 + SWMM_Npolluts)
+                BytesPerPeriod += RECORDSIZE * SWMM_Nlinks * (MAX_LINK_RESULTS - 1 + SWMM_Npolluts)
+                BytesPerPeriod += RECORDSIZE * MAX_SYS_RESULTS
                 Dim lBytesPerRecord As Integer = (pBinaryFileStream.Length - OffsetComputedResults - 24) / SWMM_Nperiods  'TODO: why 24????
                 If BytesPerPeriod <> lBytesPerRecord Then
                     Logger.Dbg("Why!")
-                    BytesPerPeriod = lBytesPerRecord
                 End If
 
                 For lTimeIndex As Integer = 1 To SWMM_Nperiods
@@ -255,13 +270,16 @@ Public Class SWMM5_OutputFile
         Dim offset1 As Integer = OffsetComputedResults + ((period - 1) * BytesPerPeriod) + (3 * RECORDSIZE) ' + 1
         Dim offset2 As Integer = 0
         If iType = SUBCATCH Then
-            offset2 = iIndex * SubcatchVars + vIndex
+            offset2 = iIndex * (MAX_SUBCATCH_RESULTS - 1 + SWMM_Npolluts) + vIndex
         ElseIf iType = NODE Then
-            offset2 = SWMM_Nsubcatch * SubcatchVars + iIndex * NodeVars + vIndex
+            offset2 = SWMM_Nsubcatch * (MAX_SUBCATCH_RESULTS - 1 + SWMM_Npolluts) + _
+                      iIndex * (MAX_NODE_RESULTS - 1 + SWMM_Npolluts) + vIndex
         ElseIf iType = LINK Then
-            offset2 = SWMM_Nsubcatch * SubcatchVars + SWMM_Nnodes * NodeVars + iIndex * LinkVars + vIndex
+            offset2 = SWMM_Nsubcatch * (MAX_SUBCATCH_RESULTS - 1 + SWMM_Npolluts) + SWMM_Nnodes * NodeVars + iIndex * LinkVars + vIndex
         ElseIf iType = SYS Then
-            offset2 = SWMM_Nsubcatch * SubcatchVars + SWMM_Nnodes * NodeVars + SWMM_Nlinks * LinkVars + vIndex
+            offset2 = SWMM_Nsubcatch * (MAX_SUBCATCH_RESULTS - 1 + SWMM_Npolluts) + _
+                      SWMM_Nnodes * (MAX_NODE_RESULTS - 1 + SWMM_Npolluts) + _
+                      SWMM_Nlinks * (MAX_LINK_RESULTS - 1 + SWMM_Npolluts) + vIndex
         Else
             Value = 0.0#
             Return 0
