@@ -267,7 +267,7 @@ Public Class SWMM5_OutputFile
         '           at a specified time period.
         '------------------------------------------------------------------------------
         '// --- compute offset into output file
-        Dim offset1 As Integer = OffsetComputedResults + ((period - 1) * BytesPerPeriod) + (3 * RECORDSIZE) ' + 1
+        Dim offset1 As Integer = OffsetComputedResults + ((period - 1) * BytesPerPeriod) + (2 * RECORDSIZE) ' + 1
         Dim offset2 As Integer = 0
         If iType = SUBCATCH Then
             offset2 = iIndex * (MAX_SUBCATCH_RESULTS - 1 + SWMM_Npolluts) + vIndex

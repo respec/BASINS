@@ -43,6 +43,7 @@ Public Class atcDataSourceTimeseriesSWMM5Output
         If MyBase.Open(aFileName, aAttributes) Then
             pSWMM5_OutputFile = New SWMM5_OutputFile
             If pSWMM5_OutputFile.OpenSwmmOutFile(MyBase.Specification) = 0 Then
+                Dim lLinkParmNames() As String = {"Flow", "Depth", "Velocity", "Froude#"}
                 Dim lLink As Integer = 2 'TODO: how to get this constants -> pSWMM5_OutputFile.LINK
                 Dim lNumValues As Int16 = pSWMM5_OutputFile.TimeStarts.GetUpperBound(0)
                 Dim lValue As Single
@@ -52,22 +53,35 @@ Public Class atcDataSourceTimeseriesSWMM5Output
                 'TODO: should these be filled yet or as needed?
 
                 'this is a sample filled timeseries
-                Dim lData As New atcTimeseries(Me)
-                lData.numValues = lNumValues
-                lData.Dates = New atcTimeseries(Me)
-                With lData.Dates
+                Dim lDates As atcTimeseries = New atcTimeseries(Me)
+                With lDates
                     .numValues = lNumValues
                     Dim lIndex As Integer = 0
                     For Each lDateValue As Double In pSWMM5_OutputFile.TimeStarts
                         'SWMM Julian date conventions match ours!!
                         .Value(lIndex) = lDateValue
-                        pSWMM5_OutputFile.GetSwmmResult(lLink, 1, 1, lIndex, lValue)
-                        lData.Values(lIndex) = lValue
                         lIndex += 1
                     Next
                 End With
-                'TODO: fill in parsing of output file here!
-                DataSets.Add(lData)
+
+                For lParmIndex As Integer = 1 To 4
+                    Dim lData As New atcTimeseries(Me)
+                    lData.Attributes.SetValue("Location", "getFromFileObject")
+                    lData.Attributes.SetValue("Constituent", lLinkParmNames(lParmIndex - 1))
+                    lData.numValues = lNumValues
+                    lData.Dates = lDates
+                    DataSets.Add(lData)
+                Next
+
+                For lParmIndex As Integer = 1 To 4
+                    Dim lData As atcTimeseries = DataSets(lParmIndex - 1)
+                    Dim lIndex As Integer = 0
+                    For Each lDateValue As Double In pSWMM5_OutputFile.TimeStarts
+                        pSWMM5_OutputFile.GetSwmmResult(lLink, 1, lParmIndex, lIndex, lValue)
+                        lData.Values(lIndex) = lValue
+                        lIndex += 1
+                    Next
+                Next
                 Return True
             Else
                 Return False
