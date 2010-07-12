@@ -9,17 +9,25 @@ Public Class Conduits
     Inherits KeyedCollection(Of String, Conduit)
     Implements IBlock
 
-    Property Name As String Implements IBlock.Name
+    Private pName As String
+    Private pSWMMProject As SWMMProject
+
+    Property Name() As String Implements IBlock.Name
+        Get
+            Return pName
+        End Get
+        Set(ByVal value As String)
+            pName = value
+        End Set
+    End Property
 
     Protected Overrides Function GetKeyForItem(ByVal aConduit As Conduit) As String
         Return aConduit.Name
     End Function
 
-    Private SWMMProject As SWMMProject
-
     Public Sub New(ByVal aSWMMPRoject As SWMMProject)
         Name = "[CONDUITS]"
-        SWMMProject = aSWMMPRoject
+        pSWMMProject = aSWMMPRoject
     End Sub
 
     Public Sub AddRange(ByVal aEnumerable As IEnumerable)
@@ -29,7 +37,7 @@ Public Class Conduits
     End Sub
 
     Public Sub FromString(ByVal aContents As String) Implements IBlock.FromString
-      'TODO: fill this in
+        'TODO: fill this in
     End Sub
 
     Public Overrides Function ToString() As String
@@ -41,7 +49,7 @@ Public Class Conduits
                        ";;Name           Node             Node             Length     N          Offset     Offset     Flow       Flow      " & vbCrLf)
         If Me.Count > 0 Then
             lConduit = Me.Items(0)
-            Dim lIsMetric As Boolean = SWMMProject.IsMetric
+            Dim lIsMetric As Boolean = pSWMMProject.IsMetric
             lString.Append(";;" & Space(15) _
                                 & Space(17) _
                                 & Space(17) _

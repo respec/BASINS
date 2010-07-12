@@ -54,6 +54,7 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="atcSWMMBlock.vb" />
     <Compile Include="atcSWMMCatchments.vb" />
     <Compile Include="atcSWMMRainGages.vb" />
     <Compile Include="atcSWMMConduits.vb" />

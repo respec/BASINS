@@ -8,17 +8,26 @@ Public Class RainGages
     Inherits KeyedCollection(Of String, RainGage)
     Implements IBlock
 
-    Property Name As String Implements IBlock.Name
+    Private pName As String
+    Private pSWMMProject As SWMMProject
+
+    Property Name() As String Implements IBlock.Name
+        Get
+            Return pName
+        End Get
+        Set(ByVal value As String)
+            pName = value
+        End Set
+    End Property
+
     Protected Overrides Function GetKeyForItem(ByVal aRainGage As RainGage) As String
         Dim lKey As String = aRainGage.Name
         Return lKey
     End Function
 
-    Private SWMMProject As SWMMProject
-
     Public Sub New(ByVal aSWMMPRoject As SWMMProject)
         Name = "[RAINGAGES]"
-        SWMMProject = aSWMMPRoject
+        pSWMMProject = aSWMMPRoject
     End Sub
 
     Public Sub FromString(ByVal aContents As String) Implements IBlock.FromString
@@ -45,7 +54,7 @@ Public Class RainGages
                 lSB.Append(" ")
                 lSB.Append(StrPad(.Type, 10, " ", False))
                 lSB.Append(" ")
-                lSB.Append(StrPad("""" & PathNameOnly(Me.SWMMProject.FileName) & g_PathChar & .Name & "P.DAT" & """", 16, " ", False))
+                lSB.Append(StrPad("""" & PathNameOnly(Me.pSWMMProject.FileName) & g_PathChar & .Name & "P.DAT" & """", 16, " ", False))
                 lSB.Append(" ")
                 lSB.Append(StrPad(.Name, 10, " ", False))
                 lSB.Append(" ")
@@ -81,9 +90,9 @@ Public Class RainGages
     Public Function TimeSeriesToFile() As Boolean
 
         For Each lRaingage As RainGage In Me
-            Dim lFileName As String = PathNameOnly(Me.SWMMProject.FileName) & g_PathChar & lRaingage.Name & "P.DAT"
+            Dim lFileName As String = PathNameOnly(Me.pSWMMProject.FileName) & g_PathChar & lRaingage.Name & "P.DAT"
             Dim lSB As New StringBuilder
-            lSB.Append(Me.SWMMProject.TimeSeriesToString(lRaingage.TimeSeries, lRaingage.Name))
+            lSB.Append(Me.pSWMMProject.TimeSeriesToString(lRaingage.TimeSeries, lRaingage.Name))
             SaveFileString(lFileName, lSB.ToString)
         Next
 
