@@ -8,18 +8,26 @@ Public Class Catchments
     Inherits KeyedCollection(Of String, Catchment)
     Implements IBlock
 
-    Property Name As String Implements IBlock.Name
+    Private pName As String
+    Private pSWMMProject As SWMMProject
+
+    Property Name() As String Implements IBlock.Name
+        Get
+            Return pName
+        End Get
+        Set(ByVal value As String)
+            pName = value
+        End Set
+    End Property
 
     Protected Overrides Function GetKeyForItem(ByVal aCatchment As Catchment) As String
         Dim lKey As String = aCatchment.Name
         Return lKey
     End Function
 
-    Private SWMMProject As SWMMProject
-
     Public Sub New(ByVal aSWMMPRoject As SWMMProject)
         Name = "[SUBCATCHMENTS]"
-        SWMMProject = aSWMMPRoject
+        pSWMMProject = aSWMMPRoject
     End Sub
 
     Public Sub AddRange(ByVal aEnumerable As IEnumerable)
@@ -112,7 +120,7 @@ Public Class Catchments
     Public Function InfiltrationToString() As String
         Dim lSB As New StringBuilder
 
-        If Me.SWMMProject.InfiltrationMethod = "HORTON" Then
+        If Me.pSWMMProject.InfiltrationMethod = "HORTON" Then
 
             lSB.Append("[INFILTRATION]" & vbCrLf & _
                        ";;Subcatchment   MaxRate    MinRate    Decay      DryTime    MaxInfil  " & vbCrLf & _
@@ -135,7 +143,7 @@ Public Class Catchments
                 End With
             Next
 
-        ElseIf Me.SWMMProject.InfiltrationMethod = "GREEN_AMPT" Then
+        ElseIf Me.pSWMMProject.InfiltrationMethod = "GREEN_AMPT" Then
 
             lSB.Append("[INFILTRATION]" & vbCrLf & _
                        ";;Subcatchment   Suction    HydCon     IMDmax    " & vbCrLf & _
@@ -154,7 +162,7 @@ Public Class Catchments
                 End With
             Next
 
-        ElseIf Me.SWMMProject.InfiltrationMethod = "CURVE_NUMBER" Then
+        ElseIf Me.pSWMMProject.InfiltrationMethod = "CURVE_NUMBER" Then
 
             lSB.Append("[INFILTRATION]" & vbCrLf & _
                        ";;Subcatchment   CurveNum   HydCon     DryTime   " & vbCrLf & _
