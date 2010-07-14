@@ -4,12 +4,12 @@ Imports MapWinUtility
 Imports atcUtility
 Imports System.Text
 
-Public Class Catchments
-    Inherits KeyedCollection(Of String, Catchment)
+Public Class atcSWMMCatchments
+    Inherits KeyedCollection(Of String, atcSWMMCatchment)
     Implements IBlock
 
     Private pName As String
-    Private pSWMMProject As SWMMProject
+    Private pSWMMProject As atcSWMMProject
 
     Property Name() As String Implements IBlock.Name
         Get
@@ -20,18 +20,18 @@ Public Class Catchments
         End Set
     End Property
 
-    Protected Overrides Function GetKeyForItem(ByVal aCatchment As Catchment) As String
+    Protected Overrides Function GetKeyForItem(ByVal aCatchment As atcSWMMCatchment) As String
         Dim lKey As String = aCatchment.Name
         Return lKey
     End Function
 
-    Public Sub New(ByVal aSWMMPRoject As SWMMProject)
+    Public Sub New(ByVal aSWMMPRoject As atcSWMMProject)
         Name = "[SUBCATCHMENTS]"
         pSWMMProject = aSWMMPRoject
     End Sub
 
     Public Sub AddRange(ByVal aEnumerable As IEnumerable)
-        For Each lCatchment As Catchment In aEnumerable
+        For Each lCatchment As atcSWMMCatchment In aEnumerable
             Me.Add(lCatchment)
         Next
     End Sub
@@ -48,7 +48,7 @@ Public Class Catchments
                        ";;Name           Raingage         Outlet           Area     Imperv   Width    Slope    Length   Pack    " & vbCrLf & _
                        ";;-------------- ---------------- ---------------- -------- -------- -------- -------- -------- --------" & vbCrLf)
 
-        For Each lCatchment As Catchment In Me
+        For Each lCatchment As atcSWMMCatchment In Me
             With lCatchment
                 lSB.Append(StrPad(.Name, 16, " ", False))
                 lSB.Append(" ")
@@ -89,7 +89,7 @@ Public Class Catchments
                    ";;Subcatchment   N-Imperv   N-Perv     S-Imperv   S-Perv     PctZero    RouteTo    PctRouted " & vbCrLf & _
                    ";;-------------- ---------- ---------- ---------- ---------- ---------- ---------- ----------" & vbCrLf)
 
-        For Each lCatchment As Catchment In Me
+        For Each lCatchment As atcSWMMCatchment In Me
             With lCatchment
                 lSB.Append(StrPad(.Name, 16, " ", False))
                 lSB.Append(" ")
@@ -120,13 +120,13 @@ Public Class Catchments
     Public Function InfiltrationToString() As String
         Dim lSB As New StringBuilder
 
-        If Me.pSWMMProject.InfiltrationMethod = "HORTON" Then
+        If pSWMMProject.Options.InfiltrationMethod = "HORTON" Then
 
             lSB.Append("[INFILTRATION]" & vbCrLf & _
                        ";;Subcatchment   MaxRate    MinRate    Decay      DryTime    MaxInfil  " & vbCrLf & _
                        ";;-------------- ---------- ---------- ---------- ---------- ----------" & vbCrLf)
 
-            For Each lCatchment As Catchment In Me
+            For Each lCatchment As atcSWMMCatchment In Me
                 With lCatchment
                     lSB.Append(StrPad(.Name, 16, " ", False))
                     lSB.Append(" ")
@@ -143,13 +143,13 @@ Public Class Catchments
                 End With
             Next
 
-        ElseIf Me.pSWMMProject.InfiltrationMethod = "GREEN_AMPT" Then
+        ElseIf pSWMMProject.Options.InfiltrationMethod = "GREEN_AMPT" Then
 
             lSB.Append("[INFILTRATION]" & vbCrLf & _
                        ";;Subcatchment   Suction    HydCon     IMDmax    " & vbCrLf & _
                        ";;-------------- ---------- ---------- ----------" & vbCrLf)
 
-            For Each lCatchment As Catchment In Me
+            For Each lCatchment As atcSWMMCatchment In Me
                 With lCatchment
                     lSB.Append(StrPad(.Name, 16, " ", False))
                     lSB.Append(" ")
@@ -162,13 +162,13 @@ Public Class Catchments
                 End With
             Next
 
-        ElseIf Me.pSWMMProject.InfiltrationMethod = "CURVE_NUMBER" Then
+        ElseIf pSWMMProject.Options.InfiltrationMethod = "CURVE_NUMBER" Then
 
             lSB.Append("[INFILTRATION]" & vbCrLf & _
                        ";;Subcatchment   CurveNum   HydCon     DryTime   " & vbCrLf & _
                        ";;-------------- ---------- ---------- ----------" & vbCrLf)
 
-            For Each lCatchment As Catchment In Me
+            For Each lCatchment As atcSWMMCatchment In Me
                 With lCatchment
                     lSB.Append(StrPad(.Name, 16, " ", False))
                     lSB.Append(" ")
@@ -191,7 +191,7 @@ Public Class Catchments
                        ";;Subcatchment   X-Coord            Y-Coord           " & vbCrLf & _
                        ";;-------------- ------------------ ------------------" & vbCrLf)
 
-        For Each lCatchment As Catchment In Me
+        For Each lCatchment As atcSWMMCatchment In Me
             With lCatchment
                 For lIndex As Integer = 0 To .X.GetUpperBound(0) - 1
                     lSB.Append(StrPad(.Name, 16, " ", False))
@@ -208,10 +208,10 @@ Public Class Catchments
     End Function
 End Class
 
-Public Class Catchment
+Public Class atcSWMMCatchment
     Public Name As String
-    Public RainGage As RainGage
-    Public OutletNode As Node
+    Public RainGage As atcSWMMRainGage
+    Public OutletNode As atcSWMMNode
     Public OutletNodeID As String
     Public Area As Double = -1.0 'in acres or hectares
     Public PercentImpervious As Double = -1.0

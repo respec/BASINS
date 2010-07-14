@@ -56,12 +56,14 @@
   <ItemGroup>
     <Compile Include="atcSWMMBlock.vb" />
     <Compile Include="atcSWMMCatchments.vb" />
+    <Compile Include="atcSWMMEvaporation.vb" />
+    <Compile Include="atcSWMMOptions.vb" />
     <Compile Include="atcSWMMRainGages.vb" />
     <Compile Include="atcSWMMConduits.vb" />
     <Compile Include="atcSWMMLanduses.vb" />
-    <Compile Include="atcSWMMMetConstituents.vb" />
     <Compile Include="atcSWMMProject.vb" />
     <Compile Include="atcSWMMNodes.vb" />
+    <Compile Include="atcSWMMTemperature.vb" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility.vbproj">

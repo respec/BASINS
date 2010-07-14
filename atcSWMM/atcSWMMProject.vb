@@ -5,44 +5,27 @@ Imports MapWinUtility
 
 Imports atcUtility
 
-Public Class SWMMProject
+Public Class atcSWMMProject
     Private pIsMetric As Boolean
 
-    Public Blocks As Blocks
+    Public Blocks As atcSWMMBlocks
 
-    Public Catchments As Catchments
-    Public Conduits As Conduits
-    Public Nodes As Nodes
-    Public Landuses As Landuses
-    Public RainGages As RainGages
-    Public MetConstituents As MetConstituents
+    Public Options As atcSWMMOptions
+    Public Catchments As atcSWMMCatchments
+    Public Conduits As atcSWMMConduits
+    Public Losses As atcSWMMBlock 'TODO: create class
+    Public Report As atcSWMMBlock 'TODO: create class
+    Public Tags As atcSWMMBlock 'TODO: create class
+    Public Map As atcSWMMBlock 'TODO: create class
+    Public Nodes As atcSWMMNodes
+    Public Landuses As atcSWMMLanduses
+    Public RainGages As atcSWMMRainGages
+    Public Evaporation As atcSWMMEvaporation
+    Public Temperature As atcSWMMTemperature
 
     Public Name As String = ""
     Public FileName As String = ""
     Public Title As String = ""
-    'TODO: make these members of a new class
-    Public FlowUnits As String = "CFS"
-    Public InfiltrationMethod As String = "HORTON"
-    Public FlowRouting As String = "KINWAVE"
-    Public SJDate As Double = 0.0
-    Public EJDate As Double = 0.0
-    Public SweepStart As String = "1/1"
-    Public SweepEnd As String = "12/31"
-    Public DryDays As Integer = 0
-    Public ReportStep As String = "00:15:00"
-    Public WetStep As String = "00:15:00"
-    Public DryStep As String = "01:00:00"
-    Public RoutingStep As String = "0:00:30"
-    Public AllowPonding As String = "NO"
-    Public InertialDamping As String = "PARTIAL"
-    Public VariableStep As Double = 0.75
-    Public LengtheningStep As Integer = 0
-    Public MinSurfArea As Integer = 0
-    Public NormalFlowLimited As String = "BOTH"
-    Public SkipSteadyState As String = "NO"
-    Public IgnoreRainfall As String = "NO"
-    Public ForceMainEquation As String = "H-W"
-    Public LinkOffsets As String = "DEPTH"
 
     Public BackdropFile As String = ""
     Public BackdropX1 As Double = 0.0
@@ -52,18 +35,46 @@ Public Class SWMMProject
     Public MapUnits As String = "METERS"
 
     Public Sub New()
-        Blocks = New Blocks
+        Me.Clear()
+    End Sub
+
+    Public Sub Clear()
         Name = ""
         FileName = ""
         Title = ""
-        Catchments = New Catchments(Me)
-        Conduits = New Conduits(Me)
-        Blocks.Add(Conduits)
-        Nodes = New Nodes
-        Landuses = New Landuses
-        RainGages = New RainGages(Me)
-        MetConstituents = New MetConstituents(Me, Nothing)
         BackdropFile = ""
+
+        Options = New atcSWMMOptions
+        Catchments = New atcSWMMCatchments(Me)
+        Conduits = New atcSWMMConduits(Me)
+        Losses = New atcSWMMBlock("[LOSSES]", _
+                                  ";;Link           Inlet      Outlet     Average    Flap Gate " & vbCrLf _
+                                & ";;-------------- ---------- ---------- ---------- ----------" & vbCrLf)
+        Report = New atcSWMMBlock("[REPORT]", _
+                                  "INPUT      NO" & vbCrLf _
+                                & "CONTROLS   NO" & vbCrLf)
+        Tags = New atcSWMMBlock("[TAGS]", vbCrLf)
+        Map = New atcSWMMBlock("[MAP]", _
+                               "UNITS      " & MapUnits & vbCrLf)
+        Nodes = New atcSWMMNodes
+        Landuses = New atcSWMMLanduses
+        RainGages = New atcSWMMRainGages(Me)
+        Evaporation = New atcSWMMEvaporation(Me)
+        Temperature = New atcSWMMTemperature(Me)
+
+        Blocks = New atcSWMMBlocks
+        Blocks.Add(Options)
+        Blocks.Add(Catchments)
+        Blocks.Add(Conduits)
+        Blocks.Add(Losses)
+        Blocks.Add(Report)
+        Blocks.Add(Tags)
+        Blocks.Add(Map)
+        Blocks.Add(Nodes)
+        Blocks.Add(Landuses)
+        Blocks.Add(RainGages)
+        Blocks.Add(Evaporation)
+        Blocks.Add(Temperature)
     End Sub
 
     Public Property IsMetric() As Boolean
@@ -72,7 +83,7 @@ Public Class SWMMProject
         End Get
         Set(ByVal aIsMetric As Boolean)
             pIsMetric = aIsMetric
-            Conduit.IsMetric = aIsMetric
+            atcSWMMConduit.IsMetric = aIsMetric
         End Set
     End Property
 
@@ -127,71 +138,59 @@ Public Class SWMMProject
             Logger.Msg("File '" & aFileName & "' not found", "SWMMProjectLoadProblem")
             Return False
         Else
-            Blocks.Clear()
-            'TODO: clear other classes
+            Clear()
             FileName = aFileName
             Dim lSR As New IO.StreamReader(aFileName)
-            Dim lNextLine As String = ""
             While Not lSR.EndOfStream
                 Dim lBlockName As String = lSR.ReadLine.ToUpper
-                Dim lContents As String = ""
-                lNextLine = lSR.ReadLine
+                Dim lBlockContents As String = ReadBlockContents(lBlockName, lSR)
+
                 Select Case lBlockName
-                    Case "[TITLE]"
-                        Title = LoadGenericDummy(lBlockName, lSR, lNextLine)
-                    Case "[OPTIONS]"
-                        LoadOptions(lSR, lNextLine)
-                    Case "[EVAPORATION]", "[TEMPERATURE]"
-                        Blocks.Add(New MetConstituents(Me, lBlockName, LoadGenericDummy(lBlockName, lSR, lNextLine)))
-                    Case "[RAINFALL]"
-                        lContents = LoadGenericDummy(lBlockName, lSR, lNextLine)
-                        'TODO:parse block
-
-                    Case "[TIMESERIES]"
-                        lContents = LoadGenericDummy(lBlockName, lSR, lNextLine)
-                        'TODO:parse block
-
-                    Case "[RAINGAGES]"
-                        lContents = LoadGenericDummy(lBlockName, lSR, lNextLine)
-                        'TODO:parse block
-
-                    Case "[SUBCATCHMENTS]", "[SUBAREAS]", "[INFILTRATION]", "[JUNCTIONS]", "[OUTFALLS]", _
+                    Case "[TITLE]" : Title = lBlockContents
+                    Case "[OPTIONS]" : Options.FromString(lBlockContents)
+                        'Case "[EVAPORATION]" : Evaporation.FromString(lBlockContents)
+                        'Case "[TEMPERATURE]" : Temperature.FromString(lBlockContents)
+                        'Case "[TIMESERIES]"   'TODO:parse into Evaporation or Temperature block
+                        'Case "[RAINGAGES]" : RainGages.FromString(lBlockContents)
+                        'Case "[CONDUITS]" : Conduits.FromString(lBlockContents)
+                    Case "[RAINFALL]", "[SUBCATCHMENTS]", "[SUBAREAS]", "[INFILTRATION]", _
                          "[CONDUITS]", "[XSECTIONS]", "[INFLOWS]", "[POLLUTANTS]", "[LOADINGS]", _
                          "[BUILDUP]", "[WASHOFF]", "[LOSSES]", "[LANDUSES]", "[COVERAGES]", _
                          "[REPORT]", "[TAGS]", "[MAP]", "[COORDINATES]", "[VERTICES]", _
                          "[POLYGONS]", "[SYMBOLS]", "[BACKDROP]", "[TAGS]", "[LABELS]", _
                          "[STORAGE]", "[PUMPS]", "[CONTROLS]", "[DWF]", "[CURVES]", "[PATTERNS]"
-                        lContents = LoadGenericDummy(lBlockName, lSR, lNextLine)
-                        'TODO:SOMEDAY:parse these into better objects!
+                        Blocks.Add(New atcSWMMBlock(lBlockName, lBlockContents))
+                        'TODO: parse these into better objects!
+                        'TODO: [JUNCTIONS] and [OUTFALLS] currently live inside Nodes
+                        'TODO: [XSECTIONS] lives inside Conduits
+
                     Case Else
                         Logger.Dbg("'" & lBlockName & "' is not a known input block  ")
                 End Select
-                If lContents.Length > 0 Then
-                    Blocks.Add(New Block(lBlockName, lContents))
-                End If
             End While
         End If
     End Function
 
-    Function LoadGenericDummy(ByVal aBlockName As String, ByVal aSR As IO.StreamReader, ByRef aNextLine As String) As String
+    Shared Function ReadBlockContents(ByVal aBlockName As String, ByVal aSR As IO.StreamReader) As String
         Logger.Dbg("LoadGenericDummy " & aBlockName)
         Dim lBlockComplete As Boolean = False
         Dim lContents As String = ""
+        Dim lNextLine As String = aSR.ReadLine
         While Not lBlockComplete
-            lContents &= (aNextLine & vbCrLf)
-            If Not aSR.EndOfStream Then
-                aNextLine = aSR.ReadLine
-                If aNextLine.Length = 0 Then
+            lContents &= (lNextLine & vbCrLf)
+            If aSR.EndOfStream Then
+                lBlockComplete = True
+                lNextLine = ""
+            Else
+                lNextLine = aSR.ReadLine
+                If lNextLine.Length = 0 Then
                     If aSR.Peek = Asc("[") Then
                         lBlockComplete = True
                     End If
                 End If
-            Else
-                lBlockComplete = True
-                aNextLine = ""
             End If
         End While
-        If lContents.Length = 0 Then
+        If lContents.Length < 2 Then
             Logger.Dbg("  EmptyBlockFor '" & aBlockName & "'")
             lContents = vbCrLf
         Else
@@ -200,149 +199,102 @@ Public Class SWMMProject
         Return lContents
     End Function
 
-    Sub LoadOptions(ByVal aSR As IO.StreamReader, ByRef aNextLine As String)
-        While aNextLine.Length > 0
-            Dim lOption As String = aNextLine.Substring(1, 20).Trim.ToUpper
-            Select Case lOption
-                Case "FLOW_UNITS"
-                    FlowUnits = aNextLine.Substring(23)
-                Case Else
-                    Logger.Dbg("Option '" & lOption & "' is unknown")
-            End Select
-            aNextLine = aSR.ReadLine
-        End While
-    End Sub
-
     Public Function Save(ByVal aFileName As String) As Boolean
         Dim lSW As New IO.StreamWriter(aFileName)
+        Dim lBlocksWritten As New StringBuilder
         FileName = aFileName
 
-        '[TITLE]
+        lBlocksWritten.Append("[TITLE]")
         lSW.WriteLine("[TITLE]")
         lSW.WriteLine(Title)
-        lSW.WriteLine("")
+        lSW.WriteLine()
 
-        '[OPTIONS]
-        Dim lSDate(6) As Integer
-        J2Date(SJDate, lSDate)
-        Dim lEDate(6) As Integer
-        J2Date(EJDate, lEDate)
-        Dim lStartDateString As String = lSDate(1) & "/" & lSDate(2) & "/" & lSDate(0)
-        Dim lStartTimeString As String = Format(lSDate(3), "00") & ":" & Format(lSDate(4), "00") & ":00"
-        lSW.WriteLine("[OPTIONS]")
-        lSW.WriteLine("FLOW_UNITS           " & FlowUnits)
-        lSW.WriteLine("INFILTRATION         " & InfiltrationMethod)
-        lSW.WriteLine("FLOW_ROUTING         " & FlowRouting)
-        lSW.WriteLine("START_DATE           " & lStartDateString)
-        lSW.WriteLine("START_TIME           " & lStartTimeString)
-        lSW.WriteLine("REPORT_START_DATE    " & lStartDateString)
-        lSW.WriteLine("REPORT_START_TIME    " & lStartTimeString)
-        lSW.WriteLine("END_DATE             " & lEDate(1) & "/" & lEDate(2) & "/" & lEDate(0))
-        lSW.WriteLine("END_TIME             " & Format(lEDate(3), "00") & ":" & Format(lEDate(4), "00") & ":00")
-        lSW.WriteLine("SWEEP_START          " & SweepStart)
-        lSW.WriteLine("SWEEP_END            " & SweepEnd)
-        lSW.WriteLine("DRY_DAYS             " & DryDays)
-        lSW.WriteLine("REPORT_STEP          " & ReportStep)
-        lSW.WriteLine("WET_STEP             " & WetStep)
-        lSW.WriteLine("DRY_STEP             " & DryStep)
-        lSW.WriteLine("ROUTING_STEP         " & RoutingStep)
-        lSW.WriteLine("ALLOW_PONDING        " & AllowPonding)
-        lSW.WriteLine("INERTIAL_DAMPING     " & InertialDamping)
-        lSW.WriteLine("VARIABLE_STEP        " & VariableStep)
-        lSW.WriteLine("LENGTHENING_STEP     " & LengtheningStep)
-        lSW.WriteLine("MIN_SURFAREA         " & MinSurfArea)
-        lSW.WriteLine("NORMAL_FLOW_LIMITED  " & NormalFlowLimited)
-        lSW.WriteLine("SKIP_STEADY_STATE    " & SkipSteadyState)
-        lSW.WriteLine("IGNORE_RAINFALL      " & IgnoreRainfall)
-        lSW.WriteLine("FORCE_MAIN_EQUATION  " & ForceMainEquation)
-        lSW.WriteLine("LINK_OFFSETS         " & LinkOffsets)
-        lSW.WriteLine("")
+        lBlocksWritten.Append("[OPTIONS]")
+        lSW.WriteLine(Options.ToString)
 
-        If Blocks.Count > 0 Then
-            For Each lBlock As IBlock In Blocks
-                lSW.WriteLine(lBlock.ToString)
-            Next
+        lBlocksWritten.Append("[EVAPORATION]")
+        lSW.WriteLine(Evaporation.ToString)
+
+        lBlocksWritten.Append("[TEMPERATURE]")
+        lSW.WriteLine(Temperature.ToString)
+
+        lBlocksWritten.Append("[RAINGAGES]")
+        lSW.WriteLine(RainGages.ToString)
+        RainGages.TimeSeriesToFile()
+
+        lBlocksWritten.Append("[SUBCATCHMENTS]")
+        lSW.WriteLine(Catchments.ToString)
+
+        lBlocksWritten.Append("[SUBAREAS]")
+        lSW.WriteLine(Catchments.SubareasToString)
+
+        lBlocksWritten.Append("[INFILTRATION]")
+        lSW.WriteLine(Catchments.InfiltrationToString)
+
+        lBlocksWritten.Append("[JUNCTIONS][OUTFALLS]")
+        lSW.WriteLine(Nodes.ToString)
+
+        lBlocksWritten.Append("[CONDUITS][XSECTIONS]")
+        lSW.WriteLine(Conduits.ToString)
+
+        lBlocksWritten.Append("[LOSSES]")
+        lSW.WriteLine(Losses.ToString)
+
+        lBlocksWritten.Append("[LANDUSES]")
+        lSW.WriteLine(Landuses.ToString)
+
+        lBlocksWritten.Append("[COVERAGES]")
+        lSW.WriteLine(Landuses.CoveragesToString)
+
+        lBlocksWritten.Append("[TIMESERIES]")
+        lSW.WriteLine(atcSWMMEvaporation.TimeSeriesHeaderToString)
+        If Options.EJDate - Options.SJDate < 30 Then
+            Evaporation.TimeSeriesToStream(lSW)
+            Temperature.TimeSeriesToStream(lSW)
         Else
-            '[EVAPORATION] and [TEMPERATURE]
-            lSW.WriteLine(MetConstituents.ToString)
-
-            '[RAINGAGES]
-            lSW.WriteLine(RainGages.ToString)
-            RainGages.TimeSeriesToFile()
-
-            '[SUBCATCHMENTS]
-            lSW.WriteLine(Catchments.ToString)
-
-            '[SUBAREAS]
-            lSW.WriteLine(Catchments.SubareasToString)
-
-            '[INFILTRATION]
-            lSW.WriteLine(Catchments.InfiltrationToString)
-
-            '[JUNCTIONS] and [OUTFALLS]
-            lSW.WriteLine(Nodes.ToString)
-
-            '[CONDUITS] and [XSECTIONS]
-            lSW.WriteLine(Conduits.ToString)
-
-            '[LOSSES]
-            lSW.WriteLine("[LOSSES]")
-            lSW.WriteLine(";;Link           Inlet      Outlet     Average    Flap Gate ")
-            lSW.WriteLine(";;-------------- ---------- ---------- ---------- ----------")
-            lSW.WriteLine("")
-
-            '[LANDUSES]
-            lSW.WriteLine(Landuses.ToString)
-
-            '[COVERAGES]
-            lSW.WriteLine(Landuses.CoveragesToString)
-
-            '[TIMESERIES]
-            lSW.WriteLine(MetConstituents.TimeSeriesHeaderToString)
-            If EJDate - SJDate < 30 Then
-                MetConstituents.TimeSeriesToStream(lSW)
-            Else
-                'more than 30 days, write to file
-                lSW.WriteLine(MetConstituents.TimeSeriesFileNamesToString)
-                MetConstituents.TimeSeriesToFile()
-            End If
-            lSW.WriteLine()
-
-            '[REPORT]
-            lSW.WriteLine("[REPORT]")
-            lSW.WriteLine("INPUT      NO")
-            lSW.WriteLine("CONTROLS   NO")
-            lSW.WriteLine("")
-
-            '[TAGS]
-            lSW.WriteLine("[TAGS]")
-            lSW.WriteLine("")
-
-            '[MAP]
-            lSW.WriteLine("[MAP]")
-            lSW.WriteLine("UNITS      " & MapUnits)
-            lSW.WriteLine("")
-
-            '[COORDINATES]
-            lSW.WriteLine(Nodes.CoordinatesToString)
-
-            '[VERTICES]
-            lSW.WriteLine(Conduits.VerticesToString)
-
-            '[Polygons]
-            lSW.WriteLine(Catchments.PolygonsToString)
-
-            '[SYMBOLS]
-            lSW.WriteLine(RainGages.CoordinatesToString)
-
-            '[BACKDROP]
-            If BackdropFile.Length > 0 Then
-                lSW.WriteLine("")
-                lSW.WriteLine("[BACKDROP]")
-                lSW.WriteLine("FILE       " & """" & BackdropFile & """")
-                lSW.WriteLine("DIMENSIONS " & Format(BackdropX1, "0.000") & " " & Format(BackdropY1, "0.000") & " " & Format(BackdropX2, "0.000") & " " & Format(BackdropY2, "0.000"))
-            End If
+            'more than 30 days, write to file
+            lSW.WriteLine(Evaporation.TimeSeriesFileNamesToString)
+            lSW.WriteLine(Temperature.TimeSeriesFileNamesToString)
+            Evaporation.TimeSeriesToFile()
+            Temperature.TimeSeriesToFile()
         End If
+        lSW.WriteLine()
+
+        lBlocksWritten.Append("[REPORT]")
+        lSW.WriteLine(Report.ToString)
+
+        lBlocksWritten.Append("[TAGS]")
+        lSW.WriteLine(Tags.ToString)
+
+        lBlocksWritten.Append("[MAP]")
+        lSW.WriteLine(Map.ToString)
+
+        lBlocksWritten.Append("[COORDINATES]")
+        lSW.WriteLine(Nodes.CoordinatesToString)
+
+        lBlocksWritten.Append("[VERTICES]")
+        lSW.WriteLine(Conduits.VerticesToString)
+
+        lBlocksWritten.Append("[POLYGONS]")
+        lSW.WriteLine(Catchments.PolygonsToString)
+
+        lBlocksWritten.Append("[SYMBOLS]")
+        lSW.WriteLine(RainGages.CoordinatesToString)
+
+        lBlocksWritten.Append("[BACKDROP]")
+        If BackdropFile.Length > 0 Then
+            lSW.WriteLine("")
+            lSW.WriteLine("[BACKDROP]")
+            lSW.WriteLine("FILE       " & """" & BackdropFile & """")
+            lSW.WriteLine("DIMENSIONS " & Format(BackdropX1, "0.000") & " " & Format(BackdropY1, "0.000") & " " & Format(BackdropX2, "0.000") & " " & Format(BackdropY2, "0.000"))
+        End If
+
+        'Write any blocks not already written above
+        For Each lBlock As IBlock In Blocks
+            If Not lBlocksWritten.ToString.Contains(lBlock.Name.ToUpper) Then
+                lSW.WriteLine(lBlock.ToString)
+            End If
+        Next
 
         lSW.Close()
 
@@ -352,11 +304,11 @@ Public Class SWMMProject
     Public Function TimeSeriesToString(ByVal aTimeSeries As atcData.atcTimeseries, _
                                        ByVal aTimeseriesTag As String, _
                                        Optional ByVal aType As String = "PREC") As String
-        Dim lStartIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.SJDate, True)
-        If Me.SJDate = aTimeSeries.Dates.Values(0) Or lStartIndex < 0 Then
+        Dim lStartIndex As Integer = aTimeSeries.Dates.IndexOfValue(Options.SJDate, True)
+        If Options.SJDate = aTimeSeries.Dates.Values(0) Or lStartIndex < 0 Then
             lStartIndex = 0
         End If
-        Dim lEndIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.EJDate, True)
+        Dim lEndIndex As Integer = aTimeSeries.Dates.IndexOfValue(Options.EJDate, True)
         Dim lSB As New StringBuilder
         For lIndex As Integer = lStartIndex To lEndIndex - 1
             If aType = "PREC" Then
@@ -385,11 +337,11 @@ Public Class SWMMProject
                                   ByVal aTimeseriesTag As String, _
                                   ByVal aSW As IO.StreamWriter)
 
-        Dim lStartIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.SJDate, True)
-        If Me.SJDate = aTimeSeries.Dates.Values(0) Or lStartIndex < 0 Then
+        Dim lStartIndex As Integer = aTimeSeries.Dates.IndexOfValue(Options.SJDate, True)
+        If Options.SJDate = aTimeSeries.Dates.Values(0) Or lStartIndex < 0 Then
             lStartIndex = 0
         End If
-        Dim lEndIndex As Integer = aTimeSeries.Dates.IndexOfValue(Me.EJDate, True)
+        Dim lEndIndex As Integer = aTimeSeries.Dates.IndexOfValue(Options.EJDate, True)
         For lIndex As Integer = lStartIndex To lEndIndex - 1
             aSW.Write(StrPad(aTimeseriesTag, 16, " ", False))
             aSW.Write(" ")

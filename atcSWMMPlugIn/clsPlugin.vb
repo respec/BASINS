@@ -5,7 +5,7 @@ Imports atcData.atcDataManager
 Public Class PlugIn
     Inherits atcData.atcDataPlugin
 
-    Private pSWMMProject As SWMMProject
+    Private pSWMMProject As atcSWMMProject
 
     Public Overrides ReadOnly Property Name() As String
         Get
@@ -31,7 +31,7 @@ Public Class PlugIn
         atcMwGisUtility.GisUtil.MappingObject = aMapWin
         AddMenuIfMissing(ModelsMenuName, "", ModelsMenuString, "mnuFile")
         AddMenuIfMissing(ModelsMenuName & "_SWMM", ModelsMenuName, "SWMM")
-        pSWMMProject = New SWMMProject
+        pSWMMProject = New atcSWMMProject
         pSWMMProject.IsMetric = False
     End Sub
 
@@ -42,7 +42,7 @@ Public Class PlugIn
 
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         If aItemName = ModelsMenuName & "_SWMM" Then
-            pSWMMProject = New SWMMProject
+            pSWMMProject = New atcSWMMProject
             pSWMMProject.IsMetric = False
             Dim lfrmSWMMSetup As New frmSWMMSetup
             With lfrmSWMMSetup
@@ -57,7 +57,7 @@ Public Class PlugIn
         End If
     End Sub
 
-    Public ReadOnly Property SWMMProject() As SWMMProject
+    Public ReadOnly Property SWMMProject() As atcSWMMProject
         Get
             Return pSWMMProject
         End Get

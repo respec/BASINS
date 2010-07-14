@@ -4,12 +4,12 @@ Imports MapWinUtility
 Imports atcUtility
 Imports System.Text
 
-Public Class RainGages
-    Inherits KeyedCollection(Of String, RainGage)
+Public Class atcSWMMRainGages
+    Inherits KeyedCollection(Of String, atcSWMMRainGage)
     Implements IBlock
 
     Private pName As String
-    Private pSWMMProject As SWMMProject
+    Private pSWMMProject As atcSWMMProject
 
     Property Name() As String Implements IBlock.Name
         Get
@@ -20,12 +20,12 @@ Public Class RainGages
         End Set
     End Property
 
-    Protected Overrides Function GetKeyForItem(ByVal aRainGage As RainGage) As String
+    Protected Overrides Function GetKeyForItem(ByVal aRainGage As atcSWMMRainGage) As String
         Dim lKey As String = aRainGage.Name
         Return lKey
     End Function
 
-    Public Sub New(ByVal aSWMMPRoject As SWMMProject)
+    Public Sub New(ByVal aSWMMPRoject As atcSWMMProject)
         Name = "[RAINGAGES]"
         pSWMMProject = aSWMMPRoject
     End Sub
@@ -42,7 +42,7 @@ Public Class RainGages
                    ";;Name           Type      Freq.  Catch  Source    " & vbCrLf & _
                    ";;-------------- --------- ------ ------ ----------" & vbCrLf)
 
-        For Each lRaingage As RainGage In Me
+        For Each lRaingage As atcSWMMRainGage In Me
             With lRaingage
                 lSB.Append(StrPad(.Name, 16, " ", False))
                 lSB.Append(" ")
@@ -73,7 +73,7 @@ Public Class RainGages
                    ";;Gage           X-Coord            Y-Coord           " & vbCrLf & _
                    ";;-------------- ------------------ ------------------" & vbCrLf)
 
-        For Each lRaingage As RainGage In Me
+        For Each lRaingage As atcSWMMRainGage In Me
             With lRaingage
                 lSB.Append(StrPad(.Name, 16, " ", False))
                 lSB.Append(" ")
@@ -89,7 +89,7 @@ Public Class RainGages
 
     Public Function TimeSeriesToFile() As Boolean
 
-        For Each lRaingage As RainGage In Me
+        For Each lRaingage As atcSWMMRainGage In Me
             Dim lFileName As String = PathNameOnly(Me.pSWMMProject.FileName) & g_PathChar & lRaingage.Name & "P.DAT"
             Dim lSB As New StringBuilder
             lSB.Append(Me.pSWMMProject.TimeSeriesToString(lRaingage.TimeSeries, lRaingage.Name))
@@ -99,7 +99,7 @@ Public Class RainGages
     End Function
 End Class
 
-Public Class RainGage
+Public Class atcSWMMRainGage
     Public Name As String
     Public Form As String = "INTENSITY" 'intensity (or volume or cumulative)
     Public Interval As String = "1:00"

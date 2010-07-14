@@ -4,28 +4,46 @@ Imports MapWinUtility
 Imports atcUtility
 Imports System.Text
 
-Public Class Nodes
-    Inherits KeyedCollection(Of String, Node)
-    Protected Overrides Function GetKeyForItem(ByVal aNode As Node) As String
+Public Class atcSWMMNodes
+    Inherits KeyedCollection(Of String, atcSWMMNode)
+    Implements IBlock
+
+    Protected Overrides Function GetKeyForItem(ByVal aNode As atcSWMMNode) As String
         Dim lKey As String = aNode.Name
         Return lKey
     End Function
 
+    Private pName As String = "[JUNCTIONS]" 'Note: also contains [OUTFALLS]
+    Private pSWMMProject As atcSWMMProject
+
+    Property Name() As String Implements IBlock.Name
+        Get
+            Return pName
+        End Get
+        Set(ByVal value As String)
+            pName = value
+        End Set
+    End Property
+
     Public Sub AddRange(ByVal aEnumerable As IEnumerable)
-        For Each lNode As Node In aEnumerable
+        For Each lNode As atcSWMMNode In aEnumerable
             Me.Add(lNode)
         Next
+    End Sub
+
+    Public Sub FromString(ByVal aContents As String) Implements IBlock.FromString
+        'TODO: fill this in
     End Sub
 
     Public Overrides Function ToString() As String
         Dim lString As New StringBuilder
 
-        lString.Append("[JUNCTIONS]" & vbCrLf & _
+        lString.Append(pName & vbCrLf & _
                        ";;               Invert     Max.       Init.      Surcharge  Ponded    " & vbCrLf & _
                        ";;Name           Elev.      Depth      Depth      Depth      Area      " & vbCrLf & _
                        ";;-------------- ---------- ---------- ---------- ---------- ----------" & vbCrLf)
 
-        For Each lNode As Node In Me
+        For Each lNode As atcSWMMNode In Me
             If lNode.Type = "JUNCTION" Then
                 With lNode
                     lString.Append(StrPad(.Name, 16, " ", False))
@@ -50,7 +68,7 @@ Public Class Nodes
                        ";;Name           Elev.      Type       Time Series      Gate" & vbCrLf & _
                        ";;-------------- ---------- ---------- ---------------- ----" & vbCrLf)
 
-        For Each lNode As Node In Me
+        For Each lNode As atcSWMMNode In Me
             If lNode.Type = "OUTFALL" Then
                 With lNode
                     lString.Append(StrPad(.Name, 16, " ", False))
@@ -77,7 +95,7 @@ Public Class Nodes
                        ";;Node           X-Coord            Y-Coord           " & vbCrLf & _
                        ";;-------------- ------------------ ------------------" & vbCrLf)
 
-        For Each lNode As Node In Me
+        For Each lNode As atcSWMMNode In Me
             With lNode
                 lString.Append(StrPad(.Name, 16, " ", False))
                 lString.Append(" ")
@@ -92,7 +110,7 @@ Public Class Nodes
     End Function
 End Class
 
-Public Class Node
+Public Class atcSWMMNode
     Public Name As String = ""
     Public Type As String = "" 'junction or outfall
     Public InvertElevation As Double = -1.0 'in feet or meters

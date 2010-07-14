@@ -1391,7 +1391,7 @@ Public Class frmSWMMSetup
             AtcConnectFields.lstTarget.Items.Clear()
 
             If cboOutlets.SelectedIndex > 0 Then
-                Dim lNode As New atcSWMM.Node
+                Dim lNode As New atcSWMM.atcSWMMNode
                 For Each lField As Reflection.FieldInfo In lNode.GetType.GetFields
                     If lField.FieldType.Name = "String" Or lField.FieldType.Name = "Double" Or lField.FieldType.Name = "Integer" Or lField.FieldType.Name = "Int32" Or lField.FieldType.Name = "atcDefinedValue" Then
                         AtcConnectFields.lstTarget.Items.Add("Node:" & lField.Name)
@@ -1400,7 +1400,7 @@ Public Class frmSWMMSetup
             End If
 
             If cboStreams.SelectedIndex > -1 Then
-                Dim lConduit As New atcSWMM.Conduit
+                Dim lConduit As New atcSWMM.atcSWMMConduit
                 For Each lField As Reflection.FieldInfo In lConduit.GetType.GetFields
                     If lField.FieldType.Name = "String" Or lField.FieldType.Name = "Double" Or lField.FieldType.Name = "Integer" Or lField.FieldType.Name = "Int32" Or lField.FieldType.Name = "atcDefinedValue" Then
                         If cboOutlets.SelectedIndex > 0 And (lField.Name = "DownConduitID" Or lField.Name = "ElevationHigh" Or lField.Name = "ElevationLow") Then
@@ -1413,7 +1413,7 @@ Public Class frmSWMMSetup
             End If
 
             If cboSubbasins.SelectedIndex > -1 Then
-                Dim lCatchment As New atcSWMM.Catchment
+                Dim lCatchment As New atcSWMM.atcSWMMCatchment
                 For Each lField As Reflection.FieldInfo In lCatchment.GetType.GetFields
                     If lField.FieldType.Name = "String" Or lField.FieldType.Name = "Double" Or lField.FieldType.Name = "Integer" Or lField.FieldType.Name = "Int32" Or lField.FieldType.Name = "atcDefinedValue" Then
                         AtcConnectFields.lstTarget.Items.Add("Subcatchment:" & lField.Name)
@@ -1557,7 +1557,8 @@ Public Class frmSWMMSetup
                 .Name = lName
                 .Title = "SWMM Project Written from BASINS"
                 .RainGages.Clear()
-                .MetConstituents.Clear()
+                .Evaporation.Timeseries = Nothing
+                .Temperature.Timeseries = Nothing
 
                 Dim lPrecGageNamesByCatchment As New Collection
                 Dim lSelectedStation As StationDetails
@@ -1611,10 +1612,9 @@ Public Class frmSWMMSetup
                     lMetGageName = lSelectedStation.Name
                 End If
 
-                'create met constituents from wdm file and selected station
-                CreateMetConstituent(lMetWDMFileName, lMetGageName, "ATEM", .MetConstituents)
-                CreateMetConstituent(lMetWDMFileName, lMetGageName, "PEVT", .MetConstituents)
-
+                'find met constituents in wdm file by selected station
+                .Evaporation.Timeseries = FindTimeseries(lMetWDMFileName, lMetGageName, "PEVT")
+                .Temperature.Timeseries = FindTimeseries(lMetWDMFileName, lMetGageName, "ATEM")
 
                 Dim lSJDate As Double = 0.0
                 Dim lEJDate As Double = 0.0
@@ -1655,8 +1655,8 @@ Public Class frmSWMMSetup
                 Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
 
                 'set start and end dates
-                .SJDate = lSJDate
-                .EJDate = lEJDate
+                .Options.SJDate = lSJDate
+                .Options.EJDate = lEJDate
 
                 'populate the SWMM classes from the shapefiles
                 .Nodes.Clear()
@@ -1667,21 +1667,21 @@ Public Class frmSWMMSetup
                 If lTable.OpenFile(FilenameSetExt(lNodesShapefileName, "dbf")) Then
                     'populate nodes from shapefile attribute table
                     Logger.Dbg("Add " & lTable.NumRecords & " NodesFrom " & lNodesShapefileName)
-                    .Nodes.AddRange(lTable.PopulateObjects((New atcSWMM.Node).GetType, lNodeFieldMap))
+                    .Nodes.AddRange(lTable.PopulateObjects((New atcSWMM.atcSWMMNode).GetType, lNodeFieldMap))
                 End If
                 CompleteNodesFromShapefile(lNodesShapefileName, .Nodes)
 
                 If lTable.OpenFile(FilenameSetExt(lConduitShapefileName, "dbf")) Then
                     'populate conduits from shapefile attribute table
                     Logger.Dbg("Add " & lTable.NumRecords & " ConduitsFrom " & lConduitShapefileName)
-                    .Conduits.AddRange(NumberObjects(lTable.PopulateObjects((New atcSWMM.Conduit).GetType, lConduitFieldMap), "Name", "C", 1))
+                    .Conduits.AddRange(NumberObjects(lTable.PopulateObjects((New atcSWMM.atcSWMMConduit).GetType, lConduitFieldMap), "Name", "C", 1))
                 End If
                 CompleteConduitsFromShapefile(lConduitShapefileName, pPlugIn.SWMMProject, .Conduits)
 
                 If lTable.OpenFile(FilenameSetExt(lCatchmentShapefileName, "dbf")) Then
                     'populate subcatchments from shapefile attribute table
                     Logger.Dbg("Add " & lTable.NumRecords & " CatchmentsFrom " & lCatchmentShapefileName)
-                    .Catchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, lCatchmentFieldMap))
+                    .Catchments.AddRange(lTable.PopulateObjects((New atcSWMM.atcSWMMCatchment).GetType, lCatchmentFieldMap))
                 End If
                 CompleteCatchmentsFromShapefile(lCatchmentShapefileName, lPrecGageNamesByCatchment, pPlugIn.SWMMProject, .Catchments)
 
@@ -1721,7 +1721,7 @@ Public Class frmSWMMSetup
                 End If
 
                 'now reclassify the landuses 
-                Dim lReclassifyLanduses As atcSWMM.Landuses = ReclassifyLandUses(lReclassificationRecords, .Landuses)
+                Dim lReclassifyLanduses As atcSWMM.atcSWMMLanduses = ReclassifyLandUses(lReclassificationRecords, .Landuses)
                 .Landuses = lReclassifyLanduses
 
                 Logger.Dbg(lblStatus.Text)
@@ -2068,10 +2068,10 @@ Public Class frmSWMMSetup
                 End If
             Next
 
-            Dim lTempCatchments As New atcSWMM.Catchments(Nothing)
+            Dim lTempCatchments As New atcSWMM.atcSWMMCatchments(Nothing)
             Dim lTable As New atcUtility.atcTableDBF
             If lTable.OpenFile(FilenameSetExt(lCatchmentShapefileName, "dbf")) Then
-                lTempCatchments.AddRange(lTable.PopulateObjects((New atcSWMM.Catchment).GetType, lCatchmentFieldMap))
+                lTempCatchments.AddRange(lTable.PopulateObjects((New atcSWMM.atcSWMMCatchment).GetType, lCatchmentFieldMap))
             End If
             Logger.Dbg("CatchmentsCount " & lTempCatchments.Count)
 
