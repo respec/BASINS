@@ -5,14 +5,14 @@ Public Interface IBlock
     Sub FromString(ByVal aContents As String)
 End Interface
 
-Public Class Blocks
+Public Class atcSWMMBlocks
     Inherits KeyedCollection(Of String, IBlock)
     Protected Overrides Function GetKeyForItem(ByVal aBlock As IBlock) As String
         Return aBlock.Name
     End Function
 End Class
 
-Public Class Block
+Public Class atcSWMMBlock
     Implements IBlock
     Private pName As String
     Private pContents As String

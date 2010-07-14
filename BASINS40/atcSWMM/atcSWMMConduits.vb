@@ -5,12 +5,12 @@ Imports atcUtility
 Imports System.Text
 Imports atcData
 
-Public Class Conduits
-    Inherits KeyedCollection(Of String, Conduit)
+Public Class atcSWMMConduits
+    Inherits KeyedCollection(Of String, atcSWMMConduit)
     Implements IBlock
 
-    Private pName As String
-    Private pSWMMProject As SWMMProject
+    Private pName As String = "[CONDUITS]"
+    Private pSWMMProject As atcSWMMProject
 
     Property Name() As String Implements IBlock.Name
         Get
@@ -21,17 +21,16 @@ Public Class Conduits
         End Set
     End Property
 
-    Protected Overrides Function GetKeyForItem(ByVal aConduit As Conduit) As String
+    Protected Overrides Function GetKeyForItem(ByVal aConduit As atcSWMMConduit) As String
         Return aConduit.Name
     End Function
 
-    Public Sub New(ByVal aSWMMPRoject As SWMMProject)
-        Name = "[CONDUITS]"
+    Public Sub New(ByVal aSWMMPRoject As atcSWMMProject)
         pSWMMProject = aSWMMPRoject
     End Sub
 
     Public Sub AddRange(ByVal aEnumerable As IEnumerable)
-        For Each lConduit As Conduit In aEnumerable
+        For Each lConduit As atcSWMMConduit In aEnumerable
             Me.Add(lConduit)
         Next
     End Sub
@@ -42,7 +41,7 @@ Public Class Conduits
 
     Public Overrides Function ToString() As String
         Dim lString As New StringBuilder
-        Dim lConduit As Conduit
+        Dim lConduit As atcSWMMConduit
 
         lString.Append(Name & vbCrLf & _
                        ";;               Inlet            Outlet                      Manning    Inlet      Outlet     Init.      Max.      " & vbCrLf & _
@@ -122,7 +121,7 @@ Public Class Conduits
                        ";;Link           X-Coord            Y-Coord           " & vbCrLf & _
                        ";;-------------- ------------------ ------------------" & vbCrLf)
 
-        For Each lConduit As Conduit In Me
+        For Each lConduit As atcSWMMConduit In Me
             With lConduit
                 For lIndex As Integer = 0 To .X.GetUpperBound(0) - 1
                     lSB.Append(StrPad(.Name, 16, " ", False))
@@ -139,10 +138,10 @@ Public Class Conduits
     End Function
 End Class
 
-Public Class Conduit
+Public Class atcSWMMConduit
     Public Name As String = ""
-    Public InletNode As Node
-    Public OutletNode As Node
+    Public InletNode As atcSWMMNode
+    Public OutletNode As atcSWMMNode
     Public InletNodeName As String = ""
     Public OutletNodeName As String = ""
     Public DownConduitID As String = ""

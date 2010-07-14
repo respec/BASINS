@@ -8,8 +8,8 @@ Friend Module modSWMMFromMW
 
     Public Function CompleteCatchmentsFromShapefile(ByVal aCatchmentShapefileName As String, _
                                                     ByVal aPrecGageNamesByCatchment As Collection, _
-                                                    ByVal aSWMMProject As SWMMProject, _
-                                                    ByRef aCatchments As Catchments) As Boolean
+                                                    ByVal aSWMMProject As atcSWMMProject, _
+                                                    ByRef aCatchments As atcSWMMCatchments) As Boolean
 
         Logger.Dbg("ShapefileName " & aCatchmentShapefileName)
         If Not GisUtil.IsLayerByFileName(aCatchmentShapefileName) Then
@@ -22,7 +22,7 @@ Friend Module modSWMMFromMW
         Dim lLayerIndex As Integer = GisUtil.LayerIndex(aCatchmentShapefileName)
 
         For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
-            Dim lCatchment As Catchment = aCatchments(lFeatureIndex)
+            Dim lCatchment As atcSWMMCatchment = aCatchments(lFeatureIndex)
 
             If Not lCatchment.Name Is Nothing Then
                 If lCatchment.Name.Length = 0 Then
@@ -58,7 +58,7 @@ Friend Module modSWMMFromMW
 
             If lCatchment.OutletNode Is Nothing Then
                 'find node through associated conduit
-                For Each lConduit As Conduit In aSWMMProject.Conduits
+                For Each lConduit As atcSWMMConduit In aSWMMProject.Conduits
                     If lConduit.Name.Substring(1) = lCatchment.Name Then
                         lCatchment.OutletNode = lConduit.OutletNode
                         Exit For
@@ -81,8 +81,8 @@ Friend Module modSWMMFromMW
     End Function
 
     Public Function CompleteConduitsFromShapefile(ByVal aConduitShapefilename As String, _
-                                                  ByVal aSWMMProject As SWMMProject, _
-                                                  ByRef aConduits As Conduits) As Boolean
+                                                  ByVal aSWMMProject As atcSWMMProject, _
+                                                  ByRef aConduits As atcSWMMConduits) As Boolean
         Logger.Dbg("ShapefileName " & aConduitShapefilename)
 
         Dim lNeedNodes As Boolean = False
@@ -100,7 +100,7 @@ Friend Module modSWMMFromMW
         Dim lLayerIndex As Integer = GisUtil.LayerIndex(aConduitShapefilename)
 
         For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
-            Dim lConduit As Conduit = aConduits(lFeatureIndex)
+            Dim lConduit As atcSWMMConduit = aConduits(lFeatureIndex)
 
             'calculate the actual feature length
             If lConduit.Length.Value Is Nothing Then
@@ -132,7 +132,7 @@ Friend Module modSWMMFromMW
                 'todo: may need to verify which way the line is digitized
 
                 'create node at upstream end
-                Dim lUpNode As New Node
+                Dim lUpNode As New atcSWMMNode
                 lUpNode.Name = "J" & lConduit.Name
                 lUpNode.Type = "JUNCTION"
                 lUpNode.InvertElevation = lConduit.ElevationHigh
@@ -146,7 +146,7 @@ Friend Module modSWMMFromMW
                 End If
 
                 'create node at downstream end
-                Dim lNode As New Node
+                Dim lNode As New atcSWMMNode
                 If lConduit.DownConduitID.Length > 0 AndAlso CInt(lConduit.DownConduitID) > 0 Then
                     lNode.Name = "J" & lConduit.DownConduitID
                     lNode.Type = "JUNCTION"
@@ -191,7 +191,7 @@ Friend Module modSWMMFromMW
     End Function
 
     Public Function CompleteNodesFromShapefile(ByVal aNodeShapefileName As String, _
-                                               ByRef aNodes As Nodes) As Boolean
+                                               ByRef aNodes As atcSWMMNodes) As Boolean
 
         Logger.Dbg("ShapefileName " & aNodeShapefileName & " NodeCount " & aNodes.Count)
         If aNodes.Count > 0 Then
@@ -205,7 +205,7 @@ Friend Module modSWMMFromMW
             Dim lLayerIndex As Integer = GisUtil.LayerIndex(aNodeShapefileName)
 
             For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
-                Dim lNode As Node = aNodes(lFeatureIndex)
+                Dim lNode As atcSWMMNode = aNodes(lFeatureIndex)
                 'if it doesnt have a name yet, assign it one
                 If lNode.Name.Length = 0 Then
                     lNode.Name = "N" & CInt(lFeatureIndex)
@@ -219,7 +219,7 @@ Friend Module modSWMMFromMW
 
     Public Function CreateRaingageFromShapefile(ByVal aShapefileName As String, _
                                                 ByVal aGageId As String, _
-                                                ByRef aRainGages As RainGages) As Boolean
+                                                ByRef aRainGages As atcSWMMRainGages) As Boolean
         Logger.Dbg("ShapefileName " & aShapefileName & " GageID " & aGageId)
         If Not GisUtil.IsLayerByFileName(aShapefileName) Then
             If GisUtil.AddLayer(aShapefileName, "Raingages") Then
@@ -234,7 +234,7 @@ Friend Module modSWMMFromMW
         Dim lWDMFileName As String = FilenameNoExt(aShapefileName) & ".wdm"
         For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
             If GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lGageIDFieldIndex) = aGageId Then
-                Dim lRaingage As New RainGage
+                Dim lRaingage As New atcSWMMRainGage
                 lRaingage.Name = aGageId
                 'lRaingage.Form
                 'lRaingage.Interval()
@@ -256,8 +256,8 @@ Friend Module modSWMMFromMW
 
     Friend Function CreateLandusesFromGrid(ByVal aLanduseGridFileName As String, _
                                            ByVal aSubbasinShapefileName As String, _
-                                           ByVal aCatchments As Catchments, _
-                                           ByRef aLanduses As Landuses) As Boolean
+                                           ByVal aCatchments As atcSWMMCatchments, _
+                                           ByRef aLanduses As atcSWMMLanduses) As Boolean
         Logger.Dbg("GridFile " & aLanduseGridFileName & _
                    " Catchment " & aSubbasinShapefileName & _
                    " CatchmentCount " & aCatchments.Count)
@@ -288,7 +288,7 @@ Friend Module modSWMMFromMW
         For lCatchmentIndex As Integer = 0 To aCatchments.Count - 1
             For lLanduseCategory As Integer = 1 To lMaxLanduseCategory
                 If lAreaLS(lLanduseCategory, lCatchmentIndex) > 0 Then
-                    Dim lLanduse As New Landuse
+                    Dim lLanduse As New atcSWMMLanduse
                     lLanduse.Area = lAreaLS(lLanduseCategory, lCatchmentIndex)
                     lLanduse.Name = lLanduseCategory
                     lLanduse.Catchment = aCatchments(lCatchmentIndex)
@@ -301,8 +301,8 @@ Friend Module modSWMMFromMW
 
     Friend Function CreateLandusesFromGIRAS(ByVal aSubbasinShapefileName As String, _
                                             ByVal aSubbasinFieldName As String, _
-                                            ByVal aCatchments As Catchments, _
-                                            ByRef aLanduses As Landuses) As Boolean
+                                            ByVal aCatchments As atcSWMMCatchments, _
+                                            ByRef aLanduses As atcSWMMLanduses) As Boolean
         'perform overlay for GIRAS shapefiles
         Logger.Dbg("Begin")
         aLanduses.Clear()
@@ -367,11 +367,11 @@ Friend Module modSWMMFromMW
         Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
         For lRecordIndex As Integer = 1 To lTable.NumRecords
             lTable.CurrentRecord = lRecordIndex
-            Dim lLanduse As New Landuse
+            Dim lLanduse As New atcSWMMLanduse
             lLanduse.Area = CDbl(lTable.Value(3))
             lLanduse.Name = lTable.Value(1)
             'find associated catchment
-            For Each lCatchment As Catchment In aCatchments
+            For Each lCatchment As atcSWMMCatchment In aCatchments
                 If lCatchment.Name = lTable.Value(2) Or lCatchment.Name = "S" & lTable.Value(2) Then
                     lLanduse.Catchment = lCatchment
                 End If
@@ -390,8 +390,8 @@ Friend Module modSWMMFromMW
                                                 ByVal aLanduseFieldName As String, _
                                                 ByVal aSubbasinShapefileName As String, _
                                                 ByVal aSubbasinFieldName As String, _
-                                                ByVal aCatchments As Catchments, _
-                                                ByRef aLanduses As Landuses) As Boolean
+                                                ByVal aCatchments As atcSWMMCatchments, _
+                                                ByRef aLanduses As atcSWMMLanduses) As Boolean
         'perform overlay for other shapefiles (not GIRAS) 
         Logger.Dbg("Begin")
         aLanduses.Clear()
@@ -414,11 +414,11 @@ Friend Module modSWMMFromMW
         Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
         For lRecordIndex As Integer = 1 To lTable.NumRecords
             lTable.CurrentRecord = lRecordIndex
-            Dim lLanduse As New Landuse
+            Dim lLanduse As New atcSWMMLanduse
             lLanduse.Area = CDbl(lTable.Value(3))
             lLanduse.Name = lTable.Value(1)
             'find associated catchment
-            For Each lCatchment As Catchment In aCatchments
+            For Each lCatchment As atcSWMMCatchment In aCatchments
                 If lCatchment.Name = lTable.Value(2) Or lCatchment.Name = "S" & lTable.Value(2) Then
                     lLanduse.Catchment = lCatchment
                 End If
@@ -432,20 +432,15 @@ Friend Module modSWMMFromMW
         Next lRecordIndex
     End Function
 
-    Public Function CreateMetConstituent(ByVal aWDMFileName As String, _
-                                         ByVal aGageId As String, _
-                                         ByVal aConstituentID As String, _
-                                         ByRef aMetConstituents As MetConstituents) As Boolean
+    Public Function FindTimeseries(ByVal aWDMFileName As String, _
+                                   ByVal aGageId As String, _
+                                   ByVal aConstituentID As String) As atcTimeseries
         Logger.Dbg("Begin")
-        Dim lMetConstituent As New MetConstituent
-        lMetConstituent.TimeSeries = GetTimeseries(aWDMFileName, "OBSERVED", aGageId, aConstituentID)
-        If lMetConstituent.TimeSeries = Nothing Then
-            lMetConstituent.TimeSeries = GetTimeseries(aWDMFileName, "COMPUTED", aGageId, aConstituentID)
+        Dim lMetConstituent As atcData.atcTimeseries = GetTimeseries(aWDMFileName, "OBSERVED", aGageId, aConstituentID)
+        If lMetConstituent Is Nothing Then
+            lMetConstituent = GetTimeseries(aWDMFileName, "COMPUTED", aGageId, aConstituentID)
         End If
-        lMetConstituent.Type = aConstituentID
-        If Not aMetConstituents.Contains(aConstituentID) Then
-            aMetConstituents.Add(lMetConstituent)
-        End If
+        Return lMetConstituent
     End Function
 
     Private Function GetTimeseries(ByRef aMetWDMName As String, _
@@ -481,13 +476,13 @@ Friend Module modSWMMFromMW
     End Function
 
     Friend Function ReclassifyLandUses(ByVal aReclassificationRecords As atcCollection, _
-                                       ByVal aLandUses As Landuses) As Landuses
+                                       ByVal aLandUses As atcSWMMLanduses) As atcSWMMLanduses
         Logger.Dbg("Begin")
-        Dim lReclassifyLandUses As New Landuses
+        Dim lReclassifyLandUses As New atcSWMMLanduses
 
         'build collection of unique subbasin ids
         Dim lUniqueSubids As New atcCollection
-        For Each lLandUse As Landuse In aLandUses
+        For Each lLandUse As atcSWMMLanduse In aLandUses
             lUniqueSubids.Add(lLandUse.Catchment.Name)
         Next
 
@@ -501,7 +496,7 @@ Friend Module modSWMMFromMW
         Dim lPerArea(lUniqueSubids.Count, lUniqueLugroups.Count) As Double
         Dim lImpArea(lUniqueSubids.Count, lUniqueLugroups.Count) As Double
 
-        For Each lLandUse As Landuse In aLandUses
+        For Each lLandUse As atcSWMMLanduse In aLandUses
             'loop through each polygon (or grid subid/lucode combination)
             'find subbasin position in the area array
             Dim lSpos As Integer
@@ -594,11 +589,11 @@ Friend Module modSWMMFromMW
                 lImpAreaBySubbasin = lImpAreaBySubbasin + lImpArea(lSpos, lLpos)
                 Dim lArea As Double = lPerArea(lSpos, lLpos) + lImpArea(lSpos, lLpos)
                 If lArea > 0 Then
-                    Dim lLandUse As New Landuse
+                    Dim lLandUse As New atcSWMMLanduse
                     With lLandUse
                         .Name = lUniqueLugroups(lLpos)
                         .Area = lArea
-                        For Each lOrigLandUse As Landuse In aLandUses
+                        For Each lOrigLandUse As atcSWMMLanduse In aLandUses
                             If lOrigLandUse.Catchment.Name = lUniqueSubids(lSpos) Then
                                 .Catchment = lOrigLandUse.Catchment
                                 .Catchment.PercentImpervious = lImpAreaBySubbasin / (lPerAreaBySubbasin + lImpAreaBySubbasin) * 100
