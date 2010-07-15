@@ -50,10 +50,10 @@ Public Class atcSWMMOptions
         Dim lEndTimeString As String = Format(lEDate(3), "00") & ":" & Format(lEDate(4), "00") & ":00"
 
         For Each lLine As String In aContents.Split(vbCrLf)
-            Dim lOption As String = lLine.Substring(1, 20).Trim.ToUpper
+            Dim lOption As String = lLine.Substring(1, 21).ToUpper
             Dim lValue As String = lLine.Substring(23).Trim
             Select Case lOption
-                Case "FLOW_UNITS" : FlowUnits = lValue
+                Case "FLOW_UNITS           " : FlowUnits = lValue
                 Case "INFILTRATION         " : InfiltrationMethod = lValue
                 Case "FLOW_ROUTING         " : FlowRouting = lValue
                 Case "START_DATE           " : lStartDateString = lValue
