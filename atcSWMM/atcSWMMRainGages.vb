@@ -8,7 +8,7 @@ Public Class atcSWMMRainGages
     Inherits KeyedCollection(Of String, atcSWMMRainGage)
     Implements IBlock
 
-    Private pName As String
+    Private pName As String = "[RAINGAGES]"
     Private pSWMMProject As atcSWMMProject
 
     Property Name() As String Implements IBlock.Name
@@ -26,7 +26,6 @@ Public Class atcSWMMRainGages
     End Function
 
     Public Sub New(ByVal aSWMMPRoject As atcSWMMProject)
-        Name = "[RAINGAGES]"
         pSWMMProject = aSWMMPRoject
     End Sub
 

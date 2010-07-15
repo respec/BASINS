@@ -82,6 +82,19 @@ Public Class atcSWMMCatchments
         Return lSB.ToString
     End Function
 
+    Public Sub SubareaFromString(ByVal aContents As String)
+        Dim lSubcatchmentName As String 'Parse this from aContents
+        Dim lCatchment As atcSWMMCatchment = Me(lSubcatchmentName)
+        With lCatchment
+            '.ManningsNImperv=
+            '.ManningsNPerv=
+            '.DepressionStorageImperv=
+            '.PercentZeroStorage=
+            '.RouteTo=
+            '.PercentRouted=
+        End With
+    End Sub
+
     Public Function SubareasToString() As String
         Dim lSB As New StringBuilder
 
