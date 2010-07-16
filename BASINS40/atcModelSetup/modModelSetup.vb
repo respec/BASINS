@@ -536,10 +536,12 @@ Public Module modModelSetup
                 .Type = "COMPOSITE"
             End With
             Dim lExistIndex As Integer = lLandUses.IndexOf(lLandUse)
-            If lLandUses.Contains(lLandUse.Description & ":" & lLandUse.Reach.Id) Then  'already have, add area
-                lLandUses.Item(lLandUse.Description & ":" & lLandUse.Reach.Id).Area += lLandUse.Area
-            Else 'new
-                lLandUses.Add(lLandUse)
+            If Not lLandUse.Reach Is Nothing Then
+                If lLandUses.Contains(lLandUse.Description & ":" & lLandUse.Reach.Id) Then  'already have, add area
+                    lLandUses.Item(lLandUse.Description & ":" & lLandUse.Reach.Id).Area += lLandUse.Area
+                Else 'new
+                    lLandUses.Add(lLandUse)
+                End If
             End If
         Next
 
@@ -856,6 +858,7 @@ Public Module modModelSetup
           (aLandUseType = 0 Or aLayerNameLandUse.Length > 0) Then
             'giras, nlcd, or other with reclass file set
             Dim lReclassTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(aLandUseTableName)
+            Logger.Dbg("Opened reclass file " & aLandUseTableName & " with record count " & lReclassTable.NumRecords)
             'do pre-scan to set up grid
             Dim lPrevCode As Integer = -1
             Dim lShowMults As Boolean = False
@@ -886,6 +889,7 @@ Public Module modModelSetup
                 If Not lInCollection Then
                     lGroupNames.Add(lReclassTable.Value(2))
                     lGroupPercent.Add(lReclassTable.Value(3))
+                    Logger.Dbg("Found landuse classification " & lReclassTable.Value(2))
                 End If
             Next lRecordIndex
 
@@ -918,6 +922,7 @@ Public Module modModelSetup
                             .CellValue(.Rows - 1, 1) = lReclassTable.Value(2)
                             .CellValue(.Rows - 1, 2) = lReclassTable.Value(3)
                             .CellEditable(.Rows - 1, 2) = True
+                            Logger.Dbg("Adding to pervious grid landuse classification " & lReclassTable.Value(2))
                         End If
                     Else 'need to show whole table
                         If lReclassTable.Value(1) > 0 Then
