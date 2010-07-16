@@ -324,33 +324,6 @@
   <metadata name="MenuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>0, 0</value>
   </metadata>
-  <data name="MenuStrip1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="MenuStrip1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>632, 27</value>
-  </data>
-  <data name="MenuStrip1.TabIndex" type="System.Int32, mscorlib">
-    <value>19</value>
-  </data>
-  <data name="&gt;&gt;MenuStrip1.Name" xml:space="preserve">
-    <value>MenuStrip1</value>
-  </data>
-  <data name="&gt;&gt;MenuStrip1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.MenuStrip, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;MenuStrip1.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;MenuStrip1.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <data name="mnuFile.Size" type="System.Drawing.Size, System.Drawing">
-    <value>45, 23</value>
-  </data>
-  <data name="mnuFile.Text" xml:space="preserve">
-    <value>File</value>
-  </data>
   <data name="mnuOpenData.Size" type="System.Drawing.Size, System.Drawing">
     <value>245, 24</value>
   </data>
@@ -375,35 +348,38 @@
   <data name="mnuLoadFilters.Text" xml:space="preserve">
     <value>Load Filters</value>
   </data>
-  <data name="mnuAttributes.Size" type="System.Drawing.Size, System.Drawing">
-    <value>90, 23</value>
+  <data name="mnuFile.Size" type="System.Drawing.Size, System.Drawing">
+    <value>45, 23</value>
   </data>
-  <data name="mnuAttributes.Text" xml:space="preserve">
-    <value>Attributes</value>
+  <data name="mnuFile.Text" xml:space="preserve">
+    <value>File</value>
   </data>
   <data name="mnuAttributesAdd.Size" type="System.Drawing.Size, System.Drawing">
-    <value>151, 24</value>
+    <value>152, 24</value>
   </data>
   <data name="mnuAttributesAdd.Text" xml:space="preserve">
     <value>A&amp;dd</value>
   </data>
   <data name="mnuAttributesRemove.Size" type="System.Drawing.Size, System.Drawing">
-    <value>151, 24</value>
+    <value>152, 24</value>
   </data>
   <data name="mnuAttributesRemove.Text" xml:space="preserve">
     <value>&amp;Remove</value>
   </data>
   <data name="mnuAttributesMove.Size" type="System.Drawing.Size, System.Drawing">
-    <value>151, 24</value>
+    <value>152, 24</value>
   </data>
   <data name="mnuAttributesMove.Text" xml:space="preserve">
     <value>&amp;Move</value>
   </data>
-  <data name="mnuSelect.Size" type="System.Drawing.Size, System.Drawing">
-    <value>62, 23</value>
+  <data name="mnuAttributesMove.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
   </data>
-  <data name="mnuSelect.Text" xml:space="preserve">
-    <value>Select</value>
+  <data name="mnuAttributes.Size" type="System.Drawing.Size, System.Drawing">
+    <value>90, 23</value>
+  </data>
+  <data name="mnuAttributes.Text" xml:space="preserve">
+    <value>Attributes</value>
   </data>
   <data name="mnuSelectAll.Size" type="System.Drawing.Size, System.Drawing">
     <value>266, 24</value>
@@ -429,11 +405,8 @@
   <data name="mnuSelectNoMatching.Text" xml:space="preserve">
     <value>Un-select Matching</value>
   </data>
-  <data name="mnuSelectSep1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>266, 24</value>
-  </data>
-  <data name="mnuSelectSep1.Text" xml:space="preserve">
-    <value>-</value>
+  <data name="mnuSelectSeparator1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>263, 6</value>
   </data>
   <data name="mnuSelectMap.Size" type="System.Drawing.Size, System.Drawing">
     <value>266, 24</value>
@@ -441,86 +414,38 @@
   <data name="mnuSelectMap.Text" xml:space="preserve">
     <value>Select Locations On Map</value>
   </data>
+  <data name="mnuSelect.Size" type="System.Drawing.Size, System.Drawing">
+    <value>62, 23</value>
+  </data>
+  <data name="mnuSelect.Text" xml:space="preserve">
+    <value>Select</value>
+  </data>
   <data name="mnuHelp.Size" type="System.Drawing.Size, System.Drawing">
     <value>53, 23</value>
   </data>
   <data name="mnuHelp.Text" xml:space="preserve">
     <value>Help</value>
   </data>
-  <data name="&gt;&gt;pMatchingGrid.Name" xml:space="preserve">
-    <value>pMatchingGrid</value>
+  <data name="MenuStrip1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
   </data>
-  <data name="&gt;&gt;pMatchingGrid.Type" xml:space="preserve">
-    <value>atcControls.atcGrid, atcControls, Version=3.1.1.0, Culture=neutral, PublicKeyToken=null</value>
+  <data name="MenuStrip1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>632, 27</value>
   </data>
-  <data name="&gt;&gt;pMatchingGrid.Parent" xml:space="preserve">
-    <value>groupTop</value>
+  <data name="MenuStrip1.TabIndex" type="System.Int32, mscorlib">
+    <value>19</value>
   </data>
-  <data name="&gt;&gt;pMatchingGrid.ZOrder" xml:space="preserve">
-    <value>0</value>
+  <data name="&gt;&gt;MenuStrip1.Name" xml:space="preserve">
+    <value>MenuStrip1</value>
   </data>
-  <data name="&gt;&gt;lblMatching.Name" xml:space="preserve">
-    <value>lblMatching</value>
+  <data name="&gt;&gt;MenuStrip1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.MenuStrip, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;lblMatching.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;lblMatching.Parent" xml:space="preserve">
-    <value>groupTop</value>
-  </data>
-  <data name="&gt;&gt;lblMatching.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="&gt;&gt;splitAboveMatching.Name" xml:space="preserve">
-    <value>splitAboveMatching</value>
-  </data>
-  <data name="&gt;&gt;splitAboveMatching.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Splitter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;splitAboveMatching.Parent" xml:space="preserve">
-    <value>groupTop</value>
-  </data>
-  <data name="&gt;&gt;splitAboveMatching.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="&gt;&gt;panelCriteria.Name" xml:space="preserve">
-    <value>panelCriteria</value>
-  </data>
-  <data name="&gt;&gt;panelCriteria.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;panelCriteria.Parent" xml:space="preserve">
-    <value>groupTop</value>
-  </data>
-  <data name="&gt;&gt;panelCriteria.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <data name="groupTop.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Top</value>
-  </data>
-  <data name="groupTop.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 27</value>
-  </data>
-  <data name="groupTop.Size" type="System.Drawing.Size, System.Drawing">
-    <value>632, 352</value>
-  </data>
-  <data name="groupTop.TabIndex" type="System.Int32, mscorlib">
-    <value>20</value>
-  </data>
-  <data name="groupTop.Text" xml:space="preserve">
-    <value>Select Attribute Values to Filter Available Data</value>
-  </data>
-  <data name="&gt;&gt;groupTop.Name" xml:space="preserve">
-    <value>groupTop</value>
-  </data>
-  <data name="&gt;&gt;groupTop.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;groupTop.Parent" xml:space="preserve">
+  <data name="&gt;&gt;MenuStrip1.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
-  <data name="&gt;&gt;groupTop.ZOrder" xml:space="preserve">
-    <value>2</value>
+  <data name="&gt;&gt;MenuStrip1.ZOrder" xml:space="preserve">
+    <value>3</value>
   </data>
   <data name="pMatchingGrid.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
@@ -627,6 +552,33 @@
   <data name="&gt;&gt;panelCriteria.ZOrder" xml:space="preserve">
     <value>3</value>
   </data>
+  <data name="groupTop.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Top</value>
+  </data>
+  <data name="groupTop.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 27</value>
+  </data>
+  <data name="groupTop.Size" type="System.Drawing.Size, System.Drawing">
+    <value>632, 352</value>
+  </data>
+  <data name="groupTop.TabIndex" type="System.Int32, mscorlib">
+    <value>20</value>
+  </data>
+  <data name="groupTop.Text" xml:space="preserve">
+    <value>Select Attribute Values to Filter Available Data</value>
+  </data>
+  <data name="&gt;&gt;groupTop.Name" xml:space="preserve">
+    <value>groupTop</value>
+  </data>
+  <data name="&gt;&gt;groupTop.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;groupTop.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;groupTop.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
   <data name="splitAboveSelected.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Top</value>
   </data>
@@ -653,6 +605,18 @@
   </data>
   <data name="&gt;&gt;splitAboveSelected.ZOrder" xml:space="preserve">
     <value>1</value>
+  </data>
+  <data name="pSelectedGrid.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="pSelectedGrid.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 16</value>
+  </data>
+  <data name="pSelectedGrid.Size" type="System.Drawing.Size, System.Drawing">
+    <value>626, 74</value>
+  </data>
+  <data name="pSelectedGrid.TabIndex" type="System.Int32, mscorlib">
+    <value>17</value>
   </data>
   <data name="&gt;&gt;pSelectedGrid.Name" xml:space="preserve">
     <value>pSelectedGrid</value>
@@ -691,30 +655,6 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;groupSelected.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="pSelectedGrid.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="pSelectedGrid.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 16</value>
-  </data>
-  <data name="pSelectedGrid.Size" type="System.Drawing.Size, System.Drawing">
-    <value>626, 74</value>
-  </data>
-  <data name="pSelectedGrid.TabIndex" type="System.Int32, mscorlib">
-    <value>17</value>
-  </data>
-  <data name="&gt;&gt;pSelectedGrid.Name" xml:space="preserve">
-    <value>pSelectedGrid</value>
-  </data>
-  <data name="&gt;&gt;pSelectedGrid.Type" xml:space="preserve">
-    <value>atcControls.atcGrid, atcControls, Version=3.1.1.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;pSelectedGrid.Parent" xml:space="preserve">
-    <value>groupSelected</value>
-  </data>
-  <data name="&gt;&gt;pSelectedGrid.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
@@ -855,12 +795,6 @@
   <data name="&gt;&gt;mnuSelectNoMatching.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;mnuSelectSep1.Name" xml:space="preserve">
-    <value>mnuSelectSep1</value>
-  </data>
-  <data name="&gt;&gt;mnuSelectSep1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="&gt;&gt;mnuSelectMap.Name" xml:space="preserve">
     <value>mnuSelectMap</value>
   </data>
@@ -872,6 +806,12 @@
   </data>
   <data name="&gt;&gt;mnuHelp.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;mnuSelectSeparator1.Name" xml:space="preserve">
+    <value>mnuSelectSeparator1</value>
+  </data>
+  <data name="&gt;&gt;mnuSelectSeparator1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>frmSelectData</value>

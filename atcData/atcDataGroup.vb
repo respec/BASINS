@@ -26,14 +26,14 @@ Public Class atcDataGroup
 
     Private Sub RaiseAddedOne(ByVal aDataSet As atcDataSet)
         Dim lDataSets As New atcCollection
-        lDataSets.Add(aDataSet)
+        If aDataSet IsNot Nothing Then lDataSets.Add(aDataSet)
         RaiseEvent Added(lDataSets)
     End Sub
 
     Private Sub RaiseRemovedOne(ByVal aDataSet As atcDataSet)
         Dim lDataSets As New atcCollection
-        lDataSets.Add(aDataSet)
-        RaiseEvent Removed(lDataSets)
+        If aDataSet IsNot Nothing Then lDataSets.Add(aDataSet)
+        RaiseEvent Removed(lDataSets)        
     End Sub
 
     ''' <summary>atcDataSet by index</summary>
@@ -130,7 +130,7 @@ Public Class atcDataGroup
         If pSelectedData IsNot Nothing Then pSelectedData.Clear()
         If lNeedEvent Then
             MyBase.Clear()
-            RaiseEvent Removed(Nothing)
+            RaiseEvent Removed(New atcCollection)
         End If
     End Sub
 
