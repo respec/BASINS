@@ -421,6 +421,38 @@ Public Class atcGrid
         End If
     End Sub
 
+    Public Overrides Function GetPreferredSize(ByVal aProposedSize As System.Drawing.Size) As System.Drawing.Size
+        Dim lPreferredSize As New Drawing.Size
+        If pSource IsNot Nothing Then
+            Dim lMaxColumn As Integer = pSource.Columns - 1
+            Dim lContentsWidth As Integer = 0
+            For lCol As Integer = 0 To lMaxColumn
+                lContentsWidth += ColumnWidth(lCol)
+            Next
+            lPreferredSize.Width = lContentsWidth
+
+            Dim lContentsHeight As Integer = 0
+            Dim lRow As Integer
+            Dim lRows As Integer = pSource.Rows
+            Dim lFixedRows As Integer = pSource.FixedRows
+            Dim lMaxHeight As Integer = Screen.PrimaryScreen.Bounds.Height * 0.9
+
+            Dim y As Integer = 0
+            For lRow = 0 To lFixedRows - 1
+                y += RowHeight(lRow)
+            Next
+            lPreferredSize.Height = y
+            For lRow = lRows - 1 To lFixedRows Step -1
+                y += RowHeight(lRow)
+                If y > lMaxHeight Then Exit For
+                lPreferredSize.Height = y
+            Next
+            Return lPreferredSize
+        Else
+            Return aProposedSize
+        End If
+    End Function
+
     Private Sub Render(ByVal g As Graphics)
         Try
             If Me.Visible And Not pSource Is Nothing Then
@@ -744,7 +776,7 @@ Public Class atcGrid
     ' if aShrinkToTotalWidth is false, columns will not be resized smaller to match aTotalWidth
     Public Sub SizeAllColumnsToContents(Optional ByVal aTotalWidth As Integer = 0, _
                                         Optional ByVal aShrinkToTotalWidth As Boolean = False)
-        If Not pSource Is Nothing Then
+        If pSource IsNot Nothing Then
             Dim lMaxColumn As Integer = pSource.Columns - 1
             Dim lContentsWidth As Integer = 0
             For lCol As Integer = 0 To lMaxColumn

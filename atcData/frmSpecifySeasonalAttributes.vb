@@ -315,7 +315,7 @@ Public Class frmSpecifySeasonalAttributes
 
             For Each lSeasonalAttribute As atcDefinedValue In CalculateAttributes(lAttributes, False)
                 Dim lSeasonName As String = lSeasonalAttribute.Arguments.GetValue("SeasonName") 'Definition.Name
-                If Not lstSeasons.Items.Contains(lSeasonName) Then
+                If lSeasonName IsNot Nothing AndAlso Not lstSeasons.Items.Contains(lSeasonName) Then
                     lstSeasons.Items.Add(lSeasonName)
                     lstSeasons.SetSelected(lstSeasons.Items.Count - 1, True)
                 End If
@@ -351,8 +351,7 @@ Public Class frmSpecifySeasonalAttributes
 
             For Each lTimeseries As atcTimeseries In pTimseriesGroup
                 lArguments.SetValue("Timeseries", lTimeseries)
-                lSeasonSource.Open(cboSeasons.Text & "::SeasonalAttributes", lArguments)
-                If aSetInTimeseries Then
+                If lSeasonSource.Open(cboSeasons.Text & "::SeasonalAttributes", lArguments) AndAlso aSetInTimeseries Then
                     For Each lAtt As atcDefinedValue In lCalculatedAttributes 'Seasonal Attribute
                         Dim lSeasonName As String = lAtt.Arguments.GetValue("SeasonName")
                         If lstSeasons.SelectedItems.Contains(lSeasonName) Then 'This season is selected, set the attribute
