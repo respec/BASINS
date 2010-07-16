@@ -44,19 +44,17 @@ Public Class atcSeasonPlugin
                           Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
         Dim lSeasonName As String = ""
         Dim lTimeSeriesGroup As atcTimeseriesGroup = Nothing
-
+        MyBase.DataSets.Clear()
         If aArgs IsNot Nothing Then
             lTimeSeriesGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
         End If
         If lTimeSeriesGroup Is Nothing Then
             lTimeSeriesGroup = atcDataManager.UserSelectData("Select data for " & aOperationName)
         End If
-        If lTimeSeriesGroup IsNot Nothing Then
+        If lTimeSeriesGroup IsNot Nothing AndAlso lTimeSeriesGroup.Count > 0 Then
             If aOperationName.IndexOf("::") > 0 Then
-                Dim a As [Assembly] = Reflection.Assembly.GetExecutingAssembly
-                Dim lassyTypes As Type() = a.GetTypes()
                 lSeasonName = StrSplit(aOperationName, "::", "")
-                For Each typ As Type In lassyTypes
+                For Each typ As Type In AllSeasonTypes
                     If SeasonClassNameToLabel(typ.Name).Equals(lSeasonName) Then
                         Try
                             pSeasons = typ.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
@@ -90,10 +88,12 @@ Public Class atcSeasonPlugin
                             Next
                         End If
                         Return True
+                    Case Else
+                        Logger.Msg("Operation '" & aOperationName & "' not recognized", "Season Plugin Open")
                 End Select
             End If
         End If
-
+        Return False
     End Function
 
     Public Overrides Function ToString() As String

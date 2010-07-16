@@ -229,6 +229,25 @@ Friend Class frmDisplaySeasonalAttributes
         agdMain.Initialize(pSwapperSource)
         agdMain.SizeAllColumnsToContents()
         agdMain.Refresh()
+        SizeToGrid()
+    End Sub
+
+    Private Sub SizeToGrid()
+        Dim lPreferredSize As Drawing.Size = agdMain.GetPreferredSize(Drawing.Size.Empty)
+        If lPreferredSize.Width > 0 AndAlso lPreferredSize.Height > 0 Then
+            With Screen.PrimaryScreen.Bounds
+                'Add difference between window size and grid size,
+                'Add 20 for scrollbar even though we might not need it
+                lPreferredSize.Width += Me.Width - agdMain.Width + 20
+                lPreferredSize.Height += Me.Height - agdMain.Height + 20
+                If lPreferredSize.Width < .Width Then
+                    Me.Width = Math.Max(400, lPreferredSize.Width)
+                End If
+                If PreferredSize.Height < .Height Then
+                    Me.Height = Math.Max(300, lPreferredSize.Height)
+                End If
+            End With
+        End If
     End Sub
 
     Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
@@ -251,10 +270,12 @@ Friend Class frmDisplaySeasonalAttributes
 
     Private Sub mnuViewSeasonColumns_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewSeasonColumns.Click
         SwapRowsColumns = False
+        SizeToGrid()
     End Sub
 
     Private Sub mnuViewSeasonRows_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewSeasonRows.Click
         SwapRowsColumns = True
+        SizeToGrid()
     End Sub
 
     Private Sub mnuFileSelectAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectAttributes.Click
