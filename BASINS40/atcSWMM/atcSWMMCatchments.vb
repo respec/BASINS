@@ -130,6 +130,28 @@ Public Class atcSWMMCatchments
         Return lSB.ToString
     End Function
 
+    Public Sub InfiltrationFromString(ByVal aContents As String)
+        Dim lSubcatchmentName As String 'Parse this from aContents
+        Dim lCatchment As atcSWMMCatchment = Me(lSubcatchmentName)
+        With lCatchment
+            'Three different methods set different fields
+            'HORTON:
+            '.MaxInfiltRate=
+            '.MinInfiltRate=
+            '.DecayRateConstant=
+            '.DryTime=
+            '.MaxInfiltVolume=
+            'GREEN_AMPT
+            'Suction=
+            'Conductivity
+            'InitialDeficit
+            'CURVE_NUMBER
+            '.CurveNumber=
+            '.Conductivity
+            '.DryTime
+        End With
+    End Sub
+
     Public Function InfiltrationToString() As String
         Dim lSB As New StringBuilder
 
@@ -197,6 +219,15 @@ Public Class atcSWMMCatchments
         End If
         Return lSB.ToString
     End Function
+
+    Public Sub PolygonsFromString(ByVal aContents As String)
+        Dim lSubcatchmentName As String 'Parse this from aContents
+        Dim lCatchment As atcSWMMCatchment = Me(lSubcatchmentName)
+        With lCatchment
+            '.X(lIndex)=
+            '.Y(lIndex)=
+        End With
+    End Sub
 
     Public Function PolygonsToString() As String
         Dim lSB As New StringBuilder

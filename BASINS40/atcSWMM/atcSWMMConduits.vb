@@ -115,6 +115,19 @@ Public Class atcSWMMConduits
         Return lString.ToString
     End Function
 
+    Public Sub VerticesFromString(ByVal aContents As String)
+        Dim lSubcatchmentName As String 'Parse this from aContents
+        Dim lCatchment As atcSWMMCatchment = Me(lSubcatchmentName)
+        With lCatchment
+            '.ManningsNImperv=
+            '.ManningsNPerv=
+            '.DepressionStorageImperv=
+            '.PercentZeroStorage=
+            '.RouteTo=
+            '.PercentRouted=
+        End With
+    End Sub
+
     Public Function VerticesToString() As String
         Dim lSB As New StringBuilder
         lSB.Append("[VERTICES]" & vbCrLf & _
