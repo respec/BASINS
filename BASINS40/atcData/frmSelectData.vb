@@ -58,7 +58,6 @@ Friend Class frmSelectData
     Friend WithEvents mnuSelectClear As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuSelectAllMatching As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuSelectNoMatching As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents mnuSelectSep1 As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuSelectMap As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents groupTop As System.Windows.Forms.GroupBox
@@ -69,6 +68,7 @@ Friend Class frmSelectData
     Friend WithEvents splitAboveSelected As System.Windows.Forms.Splitter
     Friend WithEvents groupSelected As System.Windows.Forms.GroupBox
     Friend WithEvents pSelectedGrid As atcControls.atcGrid
+    Friend WithEvents mnuSelectSeparator1 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents chkTimeStep As System.Windows.Forms.CheckBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSelectData))
@@ -95,7 +95,6 @@ Friend Class frmSelectData
         Me.mnuSelectClear = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuSelectAllMatching = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuSelectNoMatching = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuSelectSep1 = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuSelectMap = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem
         Me.groupTop = New System.Windows.Forms.GroupBox
@@ -106,6 +105,7 @@ Friend Class frmSelectData
         Me.splitAboveSelected = New System.Windows.Forms.Splitter
         Me.groupSelected = New System.Windows.Forms.GroupBox
         Me.pSelectedGrid = New atcControls.atcGrid
+        Me.mnuSelectSeparator1 = New System.Windows.Forms.ToolStripSeparator
         Me.pnlButtons.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.groupTop.SuspendLayout()
@@ -219,7 +219,7 @@ Friend Class frmSelectData
         '
         'mnuSelect
         '
-        Me.mnuSelect.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuSelectAll, Me.mnuSelectClear, Me.mnuSelectAllMatching, Me.mnuSelectNoMatching, Me.mnuSelectSep1, Me.mnuSelectMap})
+        Me.mnuSelect.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuSelectAll, Me.mnuSelectClear, Me.mnuSelectAllMatching, Me.mnuSelectNoMatching, Me.mnuSelectSeparator1, Me.mnuSelectMap})
         Me.mnuSelect.Name = "mnuSelect"
         resources.ApplyResources(Me.mnuSelect, "mnuSelect")
         '
@@ -243,11 +243,6 @@ Friend Class frmSelectData
         Me.mnuSelectNoMatching.Name = "mnuSelectNoMatching"
         resources.ApplyResources(Me.mnuSelectNoMatching, "mnuSelectNoMatching")
         '
-        'mnuSelectSep1
-        '
-        Me.mnuSelectSep1.Name = "mnuSelectSep1"
-        resources.ApplyResources(Me.mnuSelectSep1, "mnuSelectSep1")
-        '
         'mnuSelectMap
         '
         Me.mnuSelectMap.Checked = True
@@ -267,9 +262,9 @@ Friend Class frmSelectData
         Me.groupTop.Controls.Add(Me.splitAboveMatching)
         Me.groupTop.Controls.Add(Me.panelCriteria)
         resources.ApplyResources(Me.groupTop, "groupTop")
+        Me.groupTop.ForeColor = System.Drawing.SystemColors.ControlText
         Me.groupTop.Name = "groupTop"
         Me.groupTop.TabStop = False
-        Me.groupTop.ForeColor = System.Drawing.SystemColors.ControlText
         '
         'pMatchingGrid
         '
@@ -309,9 +304,9 @@ Friend Class frmSelectData
         '
         Me.groupSelected.Controls.Add(Me.pSelectedGrid)
         resources.ApplyResources(Me.groupSelected, "groupSelected")
+        Me.groupSelected.ForeColor = System.Drawing.SystemColors.ControlText
         Me.groupSelected.Name = "groupSelected"
         Me.groupSelected.TabStop = False
-        Me.groupSelected.ForeColor = System.Drawing.SystemColors.ControlText
         '
         'pSelectedGrid
         '
@@ -324,6 +319,11 @@ Friend Class frmSelectData
         Me.pSelectedGrid.LineWidth = 0.0!
         Me.pSelectedGrid.Name = "pSelectedGrid"
         Me.pSelectedGrid.Source = Nothing
+        '
+        'mnuSelectSeparator1
+        '
+        Me.mnuSelectSeparator1.Name = "mnuSelectSeparator1"
+        resources.ApplyResources(Me.mnuSelectSeparator1, "mnuSelectSeparator1")
         '
         'frmSelectData
         '
@@ -1225,7 +1225,7 @@ NextName:
 
     Private Sub mnuRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         Dim mnu As ToolStripMenuItem = sender
-        Dim index As Integer = mnu.Tag 
+        Dim index As Integer = mnu.Tag
         RemoveCriteria(pcboCriteria(index), plstCriteria(index))
     End Sub
 
