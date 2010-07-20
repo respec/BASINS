@@ -117,8 +117,8 @@ Public Class atcSWMMConduits
 
     Public Sub VerticesFromString(ByVal aContents As String)
         Dim lSubcatchmentName As String 'Parse this from aContents
-        Dim lCatchment As atcSWMMCatchment = Me(lSubcatchmentName)
-        With lCatchment
+        Dim lConduit As atcSWMMConduit = Me(lSubcatchmentName)
+        With lConduit
             '.ManningsNImperv=
             '.ManningsNPerv=
             '.DepressionStorageImperv=

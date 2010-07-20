@@ -1325,7 +1325,7 @@ AtEndOfStream:
     Public Function NextLine(ByVal aReader As IO.BinaryReader) As String
         Dim lChar As Char
         'TODO: test a StringBuilder in place of &= for each character
-        Dim lNextLine As String = ""
+        Dim lNextLine As New StringBuilder
         Try
 ReadCharacter:
             lChar = aReader.ReadChar
@@ -1334,7 +1334,7 @@ ReadCharacter:
                     If aReader.PeekChar = 10 Then aReader.ReadChar()
                 Case ControlChars.Lf 'Unix-style line ends without carriage return
                 Case Else 'Found a character that does not end the line
-                    lNextLine &= lChar
+                    lNextLine.Append(lChar)
                     GoTo ReadCharacter
             End Select
         Catch lExEndofStream As IO.EndOfStreamException
@@ -1344,7 +1344,7 @@ ReadCharacter:
                 'Reaching the end of file is fine, we are returning the last line now
             End If
         End Try
-        Return lNextLine
+        Return lNextLine.ToString
     End Function
 
     ''' <summary>

@@ -132,10 +132,9 @@ Public Class frmSynoptic
                 If mnuReverseGroupOrder.Checked Then
                     SaveSetting("Synoptic", "Defaults", "ReverseGroupOrder", "True")
                 Else
-                    Try
+                    If GetSetting("Synoptic", "Defaults", "ReverseGroupOrder").Length > 0 Then
                         DeleteSetting("Synoptic", "Defaults", "ReverseGroupOrder")
-                    Catch 'ignore error if setting is already not there
-                    End Try
+                    End If
                 End If
             Catch 'Saving setting is not critical, ignore errors
             End Try
