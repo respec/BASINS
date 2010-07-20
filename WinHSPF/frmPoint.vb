@@ -176,6 +176,7 @@ Public Class frmPoint
                     lValidValuesCollection.Add("Yes")
                     lValidValuesCollection.Add("No")
                     agdPoint.ValidValues = lValidValuesCollection
+                    agdPoint.AllowNewValidValues = False
                 End If
             Case 3
                 'Set valid values for all but the header cell (row=0)
@@ -183,6 +184,7 @@ Public Class frmPoint
                     'Get the target member names and set them as lValidValuesCollection. Collection is passed as argument via ByRef.
                     TargetMemberNames2Collection(lValidValuesCollection, pAgdPointRowReference(aRow))
                     agdPoint.ValidValues = lValidValuesCollection
+                    agdPoint.AllowNewValidValues = False
                 End If
         End Select
 

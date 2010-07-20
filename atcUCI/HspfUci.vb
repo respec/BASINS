@@ -510,7 +510,7 @@ Public Class HspfUci
                     If lConnection.Typ = 1 Then
                         If lMetSeg.Add(lConnection) Then
                             lOperation.Sources.RemoveAt(lSourceIndex)
-                            If lComment.Length = 0 Then
+                            If lComment.Length = 0 And Not lConnection.Comment Is Nothing Then
                                 lComment = lConnection.Comment
                             End If
                         Else

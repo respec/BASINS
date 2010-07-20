@@ -130,7 +130,7 @@ Public Class frmAddExpert
                         End If
                     Next lWdmIndex
 
-                    pUCI.AddExpertSystem(lId, lblOperation.Text, lWDMId, atxBase.Text, lDsns, lOstr)
+                    pUCI.AddExpertSystem(lId, txtLoc.Text, lWDMId, atxBase.Text, lDsns, lOstr)
                     pUCI.Edited = True
                     Me.Cursor = Cursors.Arrow
                 End If
@@ -140,7 +140,7 @@ Public Class frmAddExpert
                 lId = pListBox1DataItems.Item(lstOperation.SelectedIndex + 1)
                 Dim lWDMId As Integer
                 Dim lNewDsn As Integer
-                pUCI.AddOutputWDMDataSetExt(lblOperation.Text, "FLOW", atxBase.Text, lWDMId, lOutTu, "", lNewDsn)
+                pUCI.AddOutputWDMDataSetExt(txtLoc.Text, "FLOW", atxBase.Text, lWDMId, lOutTu, "", lNewDsn)
                 pUCI.AddExtTarget("RCHRES", lId, "HYDR", "RO", 1, 1, 1.0#, "AVER", _
                        "WDM" & CStr(lWDMId), lNewDsn, "FLOW", 1, "ENGL", "AGGR", "REPL")
                 pUCI.Edited = True
@@ -198,7 +198,7 @@ Public Class frmAddExpert
                         End If
                         Dim lWDMId As Integer
                         Dim lNewDsn As Integer
-                        pUCI.AddOutputWDMDataSetExt(lblOperation.Text, lTempMem, atxBase.Text, lWDMId, lOutTu, "", lNewDsn)
+                        pUCI.AddOutputWDMDataSetExt(txtLoc.Text, lTempMem, atxBase.Text, lWDMId, lOutTu, "", lNewDsn)
                         pUCI.AddExtTarget(lOpName, lId, lGroup, lMem, lSub1, lSub2, 1.0#, lTrans, _
                              "WDM" & CStr(lWDMId), lNewDsn, lTempMem, 1, "ENGL", "AGGR", "REPL")
                         pUCI.Edited = True
@@ -246,7 +246,7 @@ Public Class frmAddExpert
                                     'now add it
                                     Dim lWDMId As Integer
                                     Dim lNewDsn As Integer
-                                    Call pUCI.AddOutputWDMDataSet(lblOperation.Text, lConn.Target.Member, atxBase.Text, lWDMId, lNewDsn)
+                                    Call pUCI.AddOutputWDMDataSet(txtLoc.Text, lConn.Target.Member, atxBase.Text, lWDMId, lNewDsn)
                                     pUCI.AddExtTarget(lToOper.Name, lToOper.Id, lConn.Source.Group, lConn.Source.Member, _
                                        lConn.Source.MemSub1, lConn.Source.MemSub2, lConn.MFact, lConn.Tran, _
                                        "WDM" & CStr(lWDMId), lNewDsn, lConn.Target.Member, lConn.Target.MemSub1, _
@@ -278,7 +278,7 @@ Public Class frmAddExpert
                         Dim lMember(28) As String
                         Dim ltGroup(28) As String
                         Dim lMSub1(28) As Integer
-                        pUCI.AddAQUATOXDsnsExt(lId, lblOperation.Text, atxBase.Text, lTable.Parms(8).Value, lGqualFg, lWDMId, lMember, lMSub1, ltGroup, lDsns, lOstr, lOutTu)
+                        pUCI.AddAQUATOXDsnsExt(lId, txtLoc.Text, atxBase.Text, lTable.Parms(8).Value, lGqualFg, lWDMId, lMember, lMSub1, ltGroup, lDsns, lOstr, lOutTu)
                         'add to ext targets block
                         pUCI.AddAQUATOXExtTargetsExt(lId, lWDMId, lMember, lMSub1, ltGroup, lDsns, lOstr, lOutTu)
                         pUCI.Edited = True

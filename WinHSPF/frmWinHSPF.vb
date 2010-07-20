@@ -320,7 +320,19 @@ Public Class frmWinHSPF
     End Sub
 
     Private Sub ExitToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExitToolStripMenuItem.Click
-        Me.Dispose()
+        Dim lCloseMe As Boolean = True
+        If Not pUCI Is Nothing Then
+            If pUCI.Edited Then
+                If Logger.Msg("Changes have been made since your last Save." & vbCrLf & vbCrLf & _
+                              "Are you sure you want to Exit?", _
+                              MsgBoxStyle.OkCancel, "WinHSPF Confirm Exit") = MsgBoxResult.Cancel Then
+                    lCloseMe = False
+                End If
+            End If
+        End If
+        If lCloseMe Then
+            Me.Dispose()
+        End If
     End Sub
 
     Private Sub SaveToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveToolStripMenuItem.Click

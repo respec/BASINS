@@ -159,6 +159,7 @@ Public Class frmTime
         Next i
 
         'remove unused met segments
+        Dim lMetSegsToRemove As New Collection(Of atcUCI.HspfMetSeg)
         For Each lMetseg As HspfMetSeg In pUCI.MetSegs
             Dim lInuse As Boolean = False
             For i As Integer = 1 To agdMet.Source.Rows - 1
@@ -167,8 +168,11 @@ Public Class frmTime
                 End If
             Next i
             If Not lInuse Then
-                pUCI.MetSegs.Remove(lMetseg)
+                lMetSegsToRemove.Add(lMetseg)
             End If
+        Next
+        For Each lMetseg As HspfMetSeg In lMetSegsToRemove
+            pUCI.MetSegs.Remove(lMetseg)
         Next
 
         pWinHSPF.SchematicDiagram.ClearTree()

@@ -1,6 +1,7 @@
 Imports MapWinUtility
 Imports atcUCI
 Imports atcControls
+Imports System.Drawing
 Imports System.Windows.Forms
 
 Public Class ctlEditFTables
@@ -225,7 +226,25 @@ Public Class ctlEditFTables
     End Sub
 
     Private Sub grdEdit_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles grdEdit.CellEdited
-        Changed = True
+        pChanged = True
+        RaiseEvent Change(True)
+
+        Dim lMinValue As Single = 0
+        Dim lMaxValue As Single = -999
+
+        Dim lNewValue As String = aGrid.Source.CellValue(aRow, aColumn)
+        Dim lNewValueNumeric As Double = -999
+        If IsNumeric(lNewValue) Then lNewValueNumeric = CDbl(lNewValue)
+        Dim lNewColor As Color = aGrid.Source.CellColor(aRow, aColumn)
+        If ((lNewValueNumeric >= lMinValue And lMinValue <> -999) Or lMinValue = -999) AndAlso _
+           ((lNewValueNumeric <= lMaxValue And lMaxValue <> -999) Or lMaxValue = -999) Then
+            lNewColor = aGrid.CellBackColor
+        Else
+            lNewColor = Color.Pink
+        End If
+        If Not lNewColor.Equals(aGrid.Source.CellColor(aRow, aColumn)) Then
+            aGrid.Source.CellColor(aRow, aColumn) = lNewColor
+        End If
     End Sub
 
     Private Sub cboID_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboID.SelectedIndexChanged

@@ -82,6 +82,7 @@ Public Class frmAddOperation
                         Call AddConnection(lOperationName, lOperationId, lName, lNum)
                     Next
                 End If
+                pUci.Edited = True
             Else
                 'this oper already exists!
                 Logger.Msg("This operation already exists." & vbCrLf & vbCrLf & _
