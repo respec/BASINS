@@ -48,10 +48,22 @@ Public Class atcDataSourceTimeseriesSWMM5Output
                 'TODO: set attributes appropriately
                 'TODO: should these be filled yet or as needed?
 
-                Dim lSubParmNames() As String = {"Precipitation", "Snow Depth", "Losses", "Runoff", "GW Flow", "GW Elev."}
-                Dim lLinkParmNames() As String = {"Flow", "Depth", "Velocity", "Froude#", "Capacity"}
-                Dim lNodeParmNames() As String = {"Depth", "Head", "Volume", "Lateral Inflow", "Total Inflow", "Flooding"}
+                Dim lSubParmNamesBasic() As String = {"Precipitation", "Snow Depth", "Losses", "Runoff", "GW Flow", "GW Elev."}
+                Dim lLinkParmNamesBasic() As String = {"Flow", "Depth", "Velocity", "Froude#", "Capacity"}
+                Dim lNodeParmNamesBasic() As String = {"Depth", "Head", "Volume", "Lateral Inflow", "Total Inflow", "Flooding"}
                 Dim lSysParmNames() As String = {"Temperature", "Precipitation", "Snow Depth", "Losses", "Runoff", "DW Inflow", "GW Inflow", "I&I Inflow", "Direct Inflow", "Total Inflow", "Flooding", "Outflow", "Storage", "Evaporation"}
+
+                Dim lSubParmNames As New ArrayList(lSubParmNamesBasic)
+                Dim lLinkParmNames As New ArrayList(lLinkParmNamesBasic)
+                Dim lNodeParmNames As New ArrayList(lNodeParmNamesBasic)
+
+                If pSWMM5_OutputFile.SWMM_Npolluts > 0 Then
+                    For i As Integer = 1 To pSWMM5_OutputFile.SWMM_Npolluts
+                        lSubParmNames.Add(pSWMM5_OutputFile.SWMM_PollutId(i - 1))
+                        lLinkParmNames.Add(pSWMM5_OutputFile.SWMM_PollutId(i - 1))
+                        lNodeParmNames.Add(pSWMM5_OutputFile.SWMM_PollutId(i - 1))
+                    Next
+                End If
 
                 Dim lNumValues As Int16 = pSWMM5_OutputFile.TimeStarts.GetUpperBound(0)
 
@@ -68,7 +80,7 @@ Public Class atcDataSourceTimeseriesSWMM5Output
                 End With
 
                 For lLocationIndex As Integer = 0 To pSWMM5_OutputFile.SWMM_Nsubcatch - 1
-                    For lParmIndex As Integer = 0 To lSubParmNames.Length - 1
+                    For lParmIndex As Integer = 0 To lSubParmNames.Count - 1
                         Dim lData As New atcTimeseries(Me)
                         lData.Attributes.SetValue("LocationName", pSWMM5_OutputFile.SWMM_SubcatchId(lLocationIndex))
                         lData.Attributes.SetValue("LocationIndex", lLocationIndex)
@@ -83,7 +95,7 @@ Public Class atcDataSourceTimeseriesSWMM5Output
                 Next
 
                 For lLocationIndex As Integer = 0 To pSWMM5_OutputFile.SWMM_Nlinks - 1
-                    For lParmIndex As Integer = 0 To lLinkParmNames.Length - 1
+                    For lParmIndex As Integer = 0 To lLinkParmNames.Count - 1
                         Dim lData As New atcTimeseries(Me)
                         lData.Attributes.SetValue("LocationName", pSWMM5_OutputFile.SWMM_LinkId(lLocationIndex))
                         lData.Attributes.SetValue("LocationIndex", lLocationIndex)
@@ -98,7 +110,7 @@ Public Class atcDataSourceTimeseriesSWMM5Output
                 Next
 
                 For lLocationIndex As Integer = 0 To pSWMM5_OutputFile.SWMM_Nnodes - 1
-                    For lParmIndex As Integer = 0 To lNodeParmNames.Length - 1
+                    For lParmIndex As Integer = 0 To lNodeParmNames.Count - 1
                         Dim lData As New atcTimeseries(Me)
                         lData.Attributes.SetValue("LocationName", pSWMM5_OutputFile.SWMM_NodeId(lLocationIndex))
                         lData.Attributes.SetValue("LocationIndex", lLocationIndex)
