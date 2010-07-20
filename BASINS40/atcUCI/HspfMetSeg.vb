@@ -19,7 +19,7 @@ Public Class HspfMetSeg
     Public Function Add(ByRef aConnection As HspfConnection) As Boolean
         Dim lResult As Boolean = True
         If Str2Name(aConnection.Target.Member).Length > 0 Then
-            If aConnection.Comment.Length > 0 Then
+            If Not aConnection.Comment Is Nothing AndAlso aConnection.Comment.Length > 0 Then
                 If pMetSegRecs.Count = 0 Then
                     Comment = aConnection.Comment
                     aConnection.Comment = ""

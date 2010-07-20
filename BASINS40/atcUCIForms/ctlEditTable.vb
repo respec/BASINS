@@ -27,10 +27,10 @@ Public Class ctlEditTable
         End If
         Dim lUnitfg As Integer = pHspfTable.Opn.OpnBlk.Uci.GlobalBlock.EmFg
 
-        Dim lMinValue As Integer = -999
-        Dim lMaxValue As Integer = -999
+        Dim lMinValue As Single = -999
+        Dim lMaxValue As Single = -999
 
-        Dim lParm As HspfParm = pHspfTable.Parms(aColumn - lchkDescInteger)
+        Dim lParm As HspfParm = pHspfTable.Parms(aColumn - lchkDescInteger - 1)
 
         If lParm.Def.Typ = 1 Or lParm.Def.Typ = 2 Then
             'this is a numeric field
@@ -47,7 +47,8 @@ Public Class ctlEditTable
                 Dim lNewValueNumeric As Double = -999
                 If IsNumeric(lNewValue) Then lNewValueNumeric = CDbl(lNewValue)
                 Dim lNewColor As Color = aGrid.Source.CellColor(aRow, aColumn)
-                If (lNewValueNumeric >= lMinValue And lMinValue <> -999) AndAlso (lNewValueNumeric <= lMaxValue And lMaxValue <> -999) Then
+                If ((lNewValueNumeric >= lMinValue And lMinValue <> -999) Or lMinValue = -999) AndAlso _
+                   ((lNewValueNumeric <= lMaxValue And lMaxValue <> -999) Or lMaxValue = -999) Then
                     lNewColor = aGrid.CellBackColor
                 Else
                     lNewColor = Color.Pink

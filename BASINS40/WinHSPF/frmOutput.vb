@@ -420,6 +420,18 @@ Public Class frmOutput
     Private Sub agdOutput_Click(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdOutput.MouseDownCell
         pSelectedCell(0) = aRow
         pSelectedCell(1) = aColumn
+
+        For lRow As Integer = 1 To agdOutput.Source.Rows - 1
+            For lCol As Integer = 0 To agdOutput.Source.Columns - 1
+                agdOutput.Source.CellSelected(lRow, lCol) = False
+                agdOutput.Source.CellSelected(lRow, lCol) = False
+            Next
+        Next
+        For lCol As Integer = 0 To agdOutput.Source.Columns - 1
+            agdOutput.Source.CellSelected(aRow, lCol) = True
+        Next
+        Refresh()
+
     End Sub
 
     Private Sub cmdRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdRemove.Click

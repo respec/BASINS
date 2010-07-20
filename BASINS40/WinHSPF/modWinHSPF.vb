@@ -413,8 +413,8 @@ Public Module WinHSPF
                           "WinHSPF will save the changes before running.", MsgBoxStyle.OkCancel, _
                           "Confirm Save UCI") = MsgBoxResult.Cancel Then
                 Exit Sub
-                pUCI.Save()
             End If
+            pUCI.Save()
         End If
 
         'DisableAll(True)
