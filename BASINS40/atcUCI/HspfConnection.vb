@@ -440,7 +440,7 @@ Public Class HspfConnection
                         For Each lOperation As HspfOperation In Uci.OpnSeqBlock.Opns
                             For Each lConnection As HspfConnection In lOperation.Sources
                                 If lConnection.Typ = lTypeIndex Then
-                                    If lConnection.Comment.Length > 0 Then
+                                    If Not lConnection.Comment Is Nothing AndAlso lConnection.Comment.Length > 0 Then
                                         If lConnection.Comment.Contains("<-Volume->") AndAlso Not lHeaderPending Then
                                             'Logger.Dbg("Skip")
                                         Else
@@ -508,7 +508,7 @@ Public Class HspfConnection
                         For Each lOperation As HspfOperation In Uci.OpnSeqBlock.Opns
                             For Each lConnection As HspfConnection In lOperation.Sources 'used to go thru targets, misses range
                                 If lConnection.Typ = lTypeIndex Then
-                                    If lConnection.Comment.Length > 0 Then
+                                    If Not lConnection.Comment Is Nothing AndAlso lConnection.Comment.Length > 0 Then
                                         If lConnection.Comment.Contains("<-Volume->") AndAlso Not lHeaderPending Then
                                             'Logger.Dbg("Skip")
                                         Else
@@ -586,7 +586,7 @@ Public Class HspfConnection
                         For Each lOperation As HspfOperation In Uci.OpnSeqBlock.Opns
                             For Each lConnection As HspfConnection In lOperation.Sources
                                 If lConnection.Typ = lTypeIndex Then
-                                    If lConnection.Comment.Length > 0 Then
+                                    If Not lConnection.Comment Is Nothing AndAlso lConnection.Comment.Length > 0 Then
                                         lSB.AppendLine(lConnection.Comment)
                                     ElseIf lHeaderPending Then
                                         lSB.AppendLine("<-Volume->                  <--Area-->     <-Volume->  <ML#> ***       <sb>")
@@ -641,7 +641,7 @@ Public Class HspfConnection
                         For Each lOperation As HspfOperation In Uci.OpnSeqBlock.Opns
                             For Each lConnection As HspfConnection In lOperation.Targets
                                 If lConnection.Typ = lTypeIndex Then
-                                    If lConnection.Comment.Length > 0 Then
+                                    If Not lConnection.Comment Is Nothing AndAlso lConnection.Comment.Length > 0 Then
                                         If lConnection.Comment.Contains("<-Volume->") AndAlso Not lHeaderPending Then
                                             'Logger.Dbg("Skip")
                                         Else

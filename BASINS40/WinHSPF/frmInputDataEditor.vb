@@ -128,10 +128,10 @@ Public Class frmInputDataEditor
                 If lOpnBlk.Count > 0 Then
                     'check to see if this table exists
                     If Not lOpnBlk.TableExists(lTableName) Then
-                        If Logger.Msg("Table " & lTableName & " does not exist.  Do you want to add it?", MsgBoxStyle.YesNo, "WinHSPF - Input Data Editor") = MsgBoxResult.Ok Then
+                        If Logger.Msg("Table " & lTableName & " does not exist.  Do you want to add it?", MsgBoxStyle.YesNo, "WinHSPF - Input Data Editor") = MsgBoxResult.Yes Then
                             lOpnBlk.AddTableForAll(lTableName, lOperationName)
-                            'setDefaultsForTable(pUci, defUci, opname, tabname)
-                            'SetMissingValuesToDefaults(pUci, defUci)
+                            SetDefaultsForTable(pUCI, pDefUCI, lOperationName, lTableName)
+                            SetMissingValuesToDefaults(pUCI, pDefUCI)
                             BoldActive()
                         End If
                     End If
@@ -139,9 +139,9 @@ Public Class frmInputDataEditor
                         Dim lTable As HspfTable = lOpnBlk.Tables(lTableName)
                         UCIForms.Edit(Me, lTable, lName, pHSPFManualName)
                         'check for missing tables, add if needed
-                        'CheckAndAddMissingTables(opname)
-                        'CheckAndAddMassLinks()
-                        'SetMissingValuesToDefaults(pUci, defUci)
+                        CheckAndAddMissingTables(lOperationName)
+                        CheckAndAddMassLinks()
+                        SetMissingValuesToDefaults(pUCI, pDefUCI)
                         BoldActive()
                     End If
                 Else

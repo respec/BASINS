@@ -3,5 +3,5 @@ Option Strict Off
 Option Explicit On
 
 Module modClsTserFile
-    Public pTserFiles As New atcData.atcTimeseriesGroup
+    Public pTserFiles As New atcData.atcTimeseriesGroup   'not fully implemented, pWDMObj(4) used instead
 End Module

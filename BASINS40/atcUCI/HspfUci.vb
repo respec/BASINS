@@ -290,7 +290,7 @@ Public Class HspfUci
         pPollutants = New Collection(Of HspfPollutant)
 
         pOrder = DefaultBlockOrder()
-        pTserFiles = New atcData.atcTimeseriesGroup
+        pTserFiles = New atcData.atcTimeseriesGroup   'not fully implemented, pWDMObj(4) used instead
     End Sub
 
     Public Sub FastReadUciForStarter(ByRef aMsg As HspfMsg, ByRef aNewName As String)
@@ -1126,7 +1126,6 @@ Public Class HspfUci
             Dim lScenario As String = IO.Path.GetFileNameWithoutExtension(Name)
 
             For lIndex As Integer = 1 To 9 'create each of the expert system dsns if missing
-                'TODO: debug this!
                 Dim lMatchTimser As Collection = FindTimser(lScenario, aLocn, aOstr(lIndex).ToUpper)
                 If lMatchTimser.Count > 0 Then
                     lDsn = CType(lMatchTimser(0), atcTimeseries).Attributes.GetValue("ID", 0).Value
@@ -1141,6 +1140,7 @@ Public Class HspfUci
                         .SetValue("TU", 4)
                         .SetValue("TS", 1)
                         .SetValue("TSTYPE", aOstr(lIndex).ToUpper)
+                        .SetValue("Data Source", pWDMObj(aWdmId).Specification)
                     End With
                     Dim lTsDate As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
                     lGenTs.Dates = lTsDate
@@ -1320,6 +1320,7 @@ Public Class HspfUci
                         .SetValue("TSTYPE", aOstr(lIndex).ToUpper)
                         .SetValue("TU", aOutTu)
                         .SetValue("TS", 1)
+                        .SetValue("Data Source", pWDMObj(aWdmId).Specification)
                     End With
 
                     Dim lTsDate As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
@@ -1612,6 +1613,7 @@ Public Class HspfUci
                 .SetValue("TU", aTUnit)
                 .SetValue("TS", 1)
                 .SetValue("TSTYPE", aConstituent.ToUpper)
+                .SetValue("Data Source", pWDMObj(aWdmId).Specification)
             End With
             Dim lTsDate As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
             lGenericTs.Dates = lTsDate
@@ -1852,15 +1854,20 @@ x:
                                ByRef aLocation As String, _
                                ByRef aConstituent As String) As Collection
         Dim lFindTimser As New Collection
-        For Each lTser As atcData.atcTimeseries In pTserFiles
-            With lTser.Attributes
-                If (aScenario = .GetValue("Scenario") _
-                  Or aScenario.Trim.Length = 0) And (aLocation = .GetValue("Location") _
-                  Or aLocation.Trim.Length = 0) And (aConstituent = .GetValue("Constituent") _
-                  Or aConstituent.Trim.Length = 0) Then 'need this timser
-                    lFindTimser.Add(lTser)
-                End If
-            End With
+
+        For lWdmIndex As Integer = 0 To 4
+            If Not pWDMObj(lWdmIndex) Is Nothing Then
+                For Each lTser As atcData.atcTimeseries In pWDMObj(lWdmIndex).DataSets   'TODO: upgrade to use pTserFiles everywhere
+                    With lTser.Attributes
+                        If (aScenario = .GetValue("Scenario") _
+                          Or aScenario.Trim.Length = 0) And (aLocation = .GetValue("Location") _
+                          Or aLocation.Trim.Length = 0) And (aConstituent = .GetValue("Constituent") _
+                          Or aConstituent.Trim.Length = 0) Then 'need this timser
+                            lFindTimser.Add(lTser)
+                        End If
+                    End With
+                Next
+            End If
         Next
         Return lFindTimser
     End Function
@@ -2228,6 +2235,7 @@ x:
                 .SetValue("TU", 4)  'assume daily
                 .SetValue("TS", 1)
                 .SetValue("TSTYPE", aTsType)
+                .SetValue("Data Source", pWDMObj(aWdmid).Specification)
             End With
 
             'set the dates

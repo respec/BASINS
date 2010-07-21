@@ -309,7 +309,11 @@ Public Class frmPoint
                                     .CellValue(lRowIndex, 1) = lScenario
                                     .CellValue(lRowIndex, 2) = lLocation
                                     .CellValue(lRowIndex, 3) = lTS.Attributes.GetValue("STANAM").ToString.ToUpper
-                                    .CellValue(lRowIndex, 5) = pUCI.GetWDMIdFromName(lTS.Attributes.GetValue("Data Source"))  'save assoc src vol name
+                                    If lTS.Attributes.GetValue("Data Source") Is Nothing Then
+                                        .CellValue(lRowIndex, 5) = "WDM"
+                                    Else
+                                        .CellValue(lRowIndex, 5) = pUCI.GetWDMIdFromName(lTS.Attributes.GetValue("Data Source"))  'save assoc src vol name
+                                    End If
                                     .CellValue(lRowIndex, 6) = lTS.Attributes.GetValue("Id")     'save assoc src vol id
                                     .CellValue(lRowIndex, 7) = lOper.Name     'save assoc tar vol name
                                     .CellValue(lRowIndex, 8) = lOper.Id         'save assoc tar vol id

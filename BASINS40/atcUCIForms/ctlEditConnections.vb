@@ -167,6 +167,7 @@ Public Class ctlEditConnections
             ElseIf pConnectionType = "EXT SOURCES" Then
                 'put external sources back
                 RemoveSourcesFromOperations()
+                RemoveTargetsFromOperations()
                 pConnection.Uci.RemoveConnectionsFromCollection(1)
                 'create new connections
                 For lRow As Integer = 1 To .Rows - 1
@@ -216,6 +217,7 @@ Public Class ctlEditConnections
                 'put ext targets back
                 If CheckDataSetExistance(pConnection.Uci) Then
                     'data sets have all been created, go ahead and refresh
+                    RemoveSourcesFromOperations()
                     RemoveTargetsFromOperations()
                     pConnection.Uci.RemoveConnectionsFromCollection(4)
                     'create new connections

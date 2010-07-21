@@ -723,6 +723,167 @@ Public Module WinHSPF
         Next
     End Sub
 
+    Public Sub CheckAndAddMassLinks()
+
+        'find the number of quals to be in the masslink block
+
+        'pquals, npest
+        Dim lOpnBlk As HspfOpnBlk = pUCI.OpnBlks("PERLND")
+        Dim lPQuals As Integer = 0
+        Dim lNPest As Integer = 0
+        Dim i As Integer
+        For Each lId As HspfOperation In lOpnBlk.Ids
+            If lId.TableExists("ACTIVITY") Then
+                Dim lTable As HspfTable = lId.Tables("ACTIVITY")
+                If lTable.Parms("PQALFG").Value = 1 Then
+                    lPQuals = 1
+                End If
+                If lTable.Parms("PESTFG").Value = 1 Then
+                    lNPest = 1
+                End If
+            End If
+            If lId.TableExists("NQUALS") Then
+                i = lId.Tables("NQUALS").Parms("NQUAL").Value
+                If i > lPQuals Then
+                    lPQuals = i
+                End If
+            End If
+            If lId.TableExists("PEST-FLAGS") Then
+                i = lId.Tables("PEST-FLAGS").Parms("NPST").Value
+                If i > lNPest Then
+                    lNPest = i
+                End If
+            End If
+        Next
+
+        'iquals
+        lOpnBlk = pUCI.OpnBlks("IMPLND")
+        Dim lIQuals As Integer = 0
+        For Each lId As HspfOperation In lOpnBlk.Ids
+            If lId.TableExists("ACTIVITY") Then
+                Dim lTable As HspfTable = lId.Tables("ACTIVITY")
+                If lTable.Parms("IQALFG").Value = 1 Then
+                    lIQuals = 1
+                End If
+            End If
+            If lId.TableExists("NQUALS") Then
+                i = lId.Tables("NQUALS").Parms("NQUAL").Value
+                If i > lIQuals Then
+                    lIQuals = i
+                End If
+            End If
+        Next
+        lOpnBlk = pUCI.OpnBlks("RCHRES")
+
+        'gquals
+        Dim lGQuals As Integer = 0
+        For Each lId As HspfOperation In lOpnBlk.Ids
+            If lId.TableExists("ACTIVITY") Then
+                Dim lTable As HspfTable = lId.Tables("ACTIVITY")
+                If lTable.Parms("GQALFG").Value = 1 Then
+                    lGQuals = 1
+                End If
+            End If
+            If lId.TableExists("GQ-GENDATA") Then
+                i = lId.Tables("GQ-GENDATA").Parms("NGQUAL").Value
+                If i > lGQuals Then
+                    lGQuals = i
+                End If
+            End If
+        Next
+
+        Dim lNQuals As Integer = 0
+        If lPQuals > 1 And lGQuals > 1 Then
+            If lPQuals >= lGQuals Then
+                lNQuals = lGQuals
+            Else
+                lNQuals = lPQuals
+            End If
+            'make sure we have the masslinks for these p to r connections
+            CopyMLsForAdditionalQuals("PERLND", "PQUAL", lNQuals)
+        End If
+
+        If lIQuals > 1 And lGQuals > 1 Then
+            If lIQuals >= lGQuals Then
+                lNQuals = lGQuals
+            Else
+                lNQuals = lIQuals
+            End If
+            'make sure we have the masslinks for these i to r connections
+            CopyMLsForAdditionalQuals("IMPLND", "IQUAL", lNQuals)
+        End If
+
+        If lNPest > 1 And lGQuals > 1 Then
+            If lNPest >= lGQuals Then
+                lNQuals = lGQuals
+            Else
+                lNQuals = lNPest
+            End If
+            'make sure we have the masslinks for these p to r connections
+            CopyMLsForAdditionalQuals("PERLND", "PEST", lNQuals)
+        End If
+
+    End Sub
+
+    Private Sub CopyMLsForAdditionalQuals(ByVal aOpName As String, ByVal aOpGroup As String, ByVal lNQuals As Integer)
+
+        'copy the masslinks for 1 pqual/iqual to all additional pqual/iquals
+        For Each lML As HspfMassLink In pUCI.MassLinks
+            If lML.Source.VolName = aOpName And lML.Source.Group = aOpGroup And _
+               lML.Target.VolName = "RCHRES" Then
+                If (lML.Source.MemSub2 = 0 And lML.Source.MemSub1 = 1) Or _
+                   lML.Source.MemSub2 = 1 Then
+                    'need this record for each nqual
+                    For i As Integer = 2 To lNQuals
+                        Dim lFound As Boolean = False
+                        For Each lML2 As HspfMassLink In pUCI.MassLinks 'see if we already have it
+                            If lML2.Source.VolName = lML.Source.VolName And _
+                               lML2.Source.Group = lML.Source.Group And _
+                               lML2.Source.Member = lML.Source.Member And _
+                               lML2.MFact = lML.MFact And _
+                               lML2.Target.VolName = lML.Target.VolName And _
+                               lML2.Target.Group = lML.Target.Group And _
+                               lML2.Target.Member = lML.Target.Member And _
+                               lML2.Source.MemSub1 = i Then
+                                If lML.Target.MemSub2 > 0 Then
+                                    If lML2.Target.MemSub1 = lML.Target.MemSub1 And _
+                                      lML2.Target.MemSub2 = i Then
+                                        lFound = True
+                                    End If
+                                Else
+                                    If lML2.Target.MemSub1 = i Then
+                                        lFound = True
+                                    End If
+                                End If
+                            End If
+                        Next
+                        If lFound = False Then  'dont have it yet, so add it
+                            Dim lNewML = New HspfMassLink
+                            lNewML.MassLinkId = lML.MassLinkId
+                            lNewML.MFact = lML.MFact
+                            lNewML.Tran = lML.Tran
+                            lNewML.Uci = lML.Uci
+                            lNewML.Source.VolName = lML.Source.VolName
+                            lNewML.Source.Group = lML.Source.Group
+                            lNewML.Source.Member = lML.Source.Member
+                            lNewML.Target.VolName = lML.Target.VolName
+                            lNewML.Target.Group = lML.Target.Group
+                            lNewML.Target.Member = lML.Target.Member
+                            lNewML.Target.MemSub1 = lML.Target.MemSub1
+                            lNewML.Source.MemSub1 = i
+                            If lML.Target.MemSub2 > 0 Then
+                                lNewML.Target.MemSub2 = i
+                            Else
+                                lNewML.Target.MemSub1 = i
+                            End If
+                            pUCI.MassLinks.Add(lNewML)
+                        End If
+                    Next i
+                End If
+            End If
+        Next
+    End Sub
+
     Private Sub ReadPollutantList()
         Dim lPollutantFileName As String = Nothing
         Dim lLineNumber As Integer = 0
