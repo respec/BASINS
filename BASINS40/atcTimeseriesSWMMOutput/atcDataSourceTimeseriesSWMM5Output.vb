@@ -43,25 +43,39 @@ Public Class atcDataSourceTimeseriesSWMM5Output
         If MyBase.Open(aFileName, aAttributes) Then
             pSWMM5_OutputFile = New SWMM5_OutputFile
             If pSWMM5_OutputFile.OpenSwmmOutFile(MyBase.Specification) = 0 Then
+                Dim lScenario As String = IO.Path.GetFileNameWithoutExtension(MyBase.Specification)
 
-                'TODO: build timeseries for each possible output timeseries
                 'TODO: set attributes appropriately
-                'TODO: should these be filled yet or as needed?
+                '      need to set the units for each parameter of each object
 
                 Dim lSubParmNamesBasic() As String = {"Precipitation", "Snow Depth", "Losses", "Runoff", "GW Flow", "GW Elev."}
                 Dim lLinkParmNamesBasic() As String = {"Flow", "Depth", "Velocity", "Froude#", "Capacity"}
                 Dim lNodeParmNamesBasic() As String = {"Depth", "Head", "Volume", "Lateral Inflow", "Total Inflow", "Flooding"}
                 Dim lSysParmNames() As String = {"Temperature", "Precipitation", "Snow Depth", "Losses", "Runoff", "DW Inflow", "GW Inflow", "I&I Inflow", "Direct Inflow", "Total Inflow", "Flooding", "Outflow", "Storage", "Evaporation"}
 
+                Dim lSubParmUnitsUS() As String = {"in/hr", "in", "in/hr", "cfs", "cfs", "ft"} 'pollutants' units are from .inp
+                Dim lLinkParmUnitsUS() As String = {"cfs", "ft", "fps", "unitless", "unitless"} 'pollutants' units are from .inp
+                Dim lNodeParmUnitsUS() As String = {"ft", "ft", "ft3", "cfs", "cfs", "cfs"} 'pollutants' units are from .inp
+                Dim lSysParmUnitsUS() As String = {"deg F", "in/hr", "in", "in/hr", "cfs", "cfs", "cfs", "cfs", "cfs", "cfs", "cfs", "cfs", "?cfs?", "in/day"}
+
                 Dim lSubParmNames As New ArrayList(lSubParmNamesBasic)
                 Dim lLinkParmNames As New ArrayList(lLinkParmNamesBasic)
                 Dim lNodeParmNames As New ArrayList(lNodeParmNamesBasic)
+
+                Dim lSubParmUnits As New ArrayList(lSubParmUnitsUS)
+                Dim lLinkParmUnits As New ArrayList(lLinkParmUnitsUS)
+                Dim lNodeParmUnits As New ArrayList(lNodeParmUnitsUS)
+                Dim lSysParmUnits As New ArrayList(lSysParmUnitsUS)
 
                 If pSWMM5_OutputFile.SWMM_Npolluts > 0 Then
                     For i As Integer = 1 To pSWMM5_OutputFile.SWMM_Npolluts
                         lSubParmNames.Add(pSWMM5_OutputFile.SWMM_PollutId(i - 1))
                         lLinkParmNames.Add(pSWMM5_OutputFile.SWMM_PollutId(i - 1))
                         lNodeParmNames.Add(pSWMM5_OutputFile.SWMM_PollutId(i - 1))
+
+                        lSubParmUnits.Add("FromInput")
+                        lLinkParmUnits.Add("FromInput")
+                        lNodeParmUnits.Add("FromInput")
                     Next
                 End If
 
@@ -82,11 +96,13 @@ Public Class atcDataSourceTimeseriesSWMM5Output
                 For lLocationIndex As Integer = 0 To pSWMM5_OutputFile.SWMM_Nsubcatch - 1
                     For lParmIndex As Integer = 0 To lSubParmNames.Count - 1
                         Dim lData As New atcTimeseries(Me)
-                        lData.Attributes.SetValue("LocationName", pSWMM5_OutputFile.SWMM_SubcatchId(lLocationIndex))
+                        lData.Attributes.SetValue("Location", pSWMM5_OutputFile.SWMM_SubcatchId(lLocationIndex))
                         lData.Attributes.SetValue("LocationIndex", lLocationIndex)
                         lData.Attributes.SetValue("Constituent", lSubParmNames(lParmIndex))
                         lData.Attributes.SetValue("ObjectType", SWMM5_OutputFile.SUBCATCH)
                         lData.Attributes.SetValue("ParmIndex", lParmIndex)
+                        lData.Attributes.SetValue("Scenario", lScenario)
+                        lData.Attributes.SetValue("Units", lSubParmUnits(lParmIndex))
                         lData.ValuesNeedToBeRead = True
                         lData.numValues = lNumValues
                         lData.Dates = lDates
@@ -97,11 +113,13 @@ Public Class atcDataSourceTimeseriesSWMM5Output
                 For lLocationIndex As Integer = 0 To pSWMM5_OutputFile.SWMM_Nlinks - 1
                     For lParmIndex As Integer = 0 To lLinkParmNames.Count - 1
                         Dim lData As New atcTimeseries(Me)
-                        lData.Attributes.SetValue("LocationName", pSWMM5_OutputFile.SWMM_LinkId(lLocationIndex))
+                        lData.Attributes.SetValue("Location", pSWMM5_OutputFile.SWMM_LinkId(lLocationIndex))
                         lData.Attributes.SetValue("LocationIndex", lLocationIndex)
                         lData.Attributes.SetValue("Constituent", lLinkParmNames(lParmIndex))
                         lData.Attributes.SetValue("ObjectType", SWMM5_OutputFile.LINK)
                         lData.Attributes.SetValue("ParmIndex", lParmIndex)
+                        lData.Attributes.SetValue("Scenario", lScenario)
+                        lData.Attributes.SetValue("Units", lLinkParmUnits(lParmIndex))
                         lData.ValuesNeedToBeRead = True
                         lData.numValues = lNumValues
                         lData.Dates = lDates
@@ -112,11 +130,13 @@ Public Class atcDataSourceTimeseriesSWMM5Output
                 For lLocationIndex As Integer = 0 To pSWMM5_OutputFile.SWMM_Nnodes - 1
                     For lParmIndex As Integer = 0 To lNodeParmNames.Count - 1
                         Dim lData As New atcTimeseries(Me)
-                        lData.Attributes.SetValue("LocationName", pSWMM5_OutputFile.SWMM_NodeId(lLocationIndex))
+                        lData.Attributes.SetValue("Location", pSWMM5_OutputFile.SWMM_NodeId(lLocationIndex))
                         lData.Attributes.SetValue("LocationIndex", lLocationIndex)
                         lData.Attributes.SetValue("Constituent", lNodeParmNames(lParmIndex))
                         lData.Attributes.SetValue("ObjectType", SWMM5_OutputFile.NODE)
                         lData.Attributes.SetValue("ParmIndex", lParmIndex)
+                        lData.Attributes.SetValue("Scenario", lScenario)
+                        lData.Attributes.SetValue("Units", lNodeParmUnits(lParmIndex))
                         lData.ValuesNeedToBeRead = True
                         lData.numValues = lNumValues
                         lData.Dates = lDates
@@ -126,11 +146,13 @@ Public Class atcDataSourceTimeseriesSWMM5Output
 
                 For lParmIndex As Integer = 0 To lSysParmNames.Length - 1
                     Dim lData As New atcTimeseries(Me)
-                    lData.Attributes.SetValue("LocationName", "WHOLESYS")
+                    lData.Attributes.SetValue("Location", "WHOLESYS")
                     lData.Attributes.SetValue("LocationIndex", 0)
                     lData.Attributes.SetValue("Constituent", lSysParmNames(lParmIndex))
                     lData.Attributes.SetValue("ObjectType", SWMM5_OutputFile.SYS)
                     lData.Attributes.SetValue("ParmIndex", lParmIndex)
+                    lData.Attributes.SetValue("Scenario", lScenario)
+                    lData.Attributes.SetValue("Units", lSysParmUnits(lParmIndex))
                     lData.ValuesNeedToBeRead = True
                     lData.numValues = lNumValues
                     lData.Dates = lDates
