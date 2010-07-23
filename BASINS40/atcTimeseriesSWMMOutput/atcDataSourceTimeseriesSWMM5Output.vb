@@ -79,7 +79,7 @@ Public Class atcDataSourceTimeseriesSWMM5Output
                     Next
                 End If
 
-                Dim lNumValues As Int16 = pSWMM5_OutputFile.TimeStarts.GetUpperBound(0)
+                Dim lNumValues As Int32 = pSWMM5_OutputFile.TimeStarts.GetUpperBound(0)
 
                 'Set up common date array
                 Dim lDates As atcTimeseries = New atcTimeseries(Me)
