@@ -7,8 +7,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{4E255558-180A-4516-A342-EC7AA1D3BE92}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>atcTimeseriesDbf</RootNamespace>
-    <AssemblyName>atcTimeseriesDbf</AssemblyName>
+    <RootNamespace>atcTimeseriesSWMM5Output</RootNamespace>
+    <AssemblyName>atcTimeseriesSWMM5Output</AssemblyName>
     <MyType>Windows</MyType>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -23,7 +23,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
-    <DocumentationFile>atcTimeseriesDbf.xml</DocumentationFile>
+    <DocumentationFile>atcTimeseriesSWMM5Output.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -33,7 +33,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
-    <DocumentationFile>atcTimeseriesDbf.xml</DocumentationFile>
+    <DocumentationFile>atcTimeseriesSWMM5Output.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
   </PropertyGroup>
   <ItemGroup>
