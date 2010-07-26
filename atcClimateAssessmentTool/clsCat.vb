@@ -181,6 +181,8 @@ StartOver:
                 Case "hru" : lDataSource = New atcTimeseriesSWAT.atcTimeseriesSWAT
                 Case "rch" : lDataSource = New atcTimeseriesSWAT.atcTimeseriesSWAT
                 Case "sub" : lDataSource = New atcTimeseriesSWAT.atcTimeseriesSWAT
+                Case "out" : lDataSource = New atcTimeseriesSWMM5Output.atcDataSourceTimeseriesSWMM5Output
+                Case "inp" : lDataSource = New atcSWMM.atcSWMMProject
                 Case Else
                     Throw New ApplicationException("Could not open '" & aFilename & "' in frmCAT:OpenDataSource")
             End Select
