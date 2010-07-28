@@ -288,8 +288,11 @@ Public Class HspfTable
                                 If lTableName = "REPORT-CON" Then 'special case for this table
                                     Dim lNCon As Integer = Me.Opn.Tables.Item("REPORT-FLAGS").ParmValue("NCON")
                                     lOutPend = Mid(lOutPend, 1, 10 + (lNCon * 70))
+                                ElseIf lTableName = "REPORT-SRC" Then 'special case for this table
+                                    Dim lNSrc As Integer = Me.Opn.Tables.Item("REPORT-FLAGS").ParmValue("NSRC")
+                                    lOutPend = Mid(lOutPend, 1, 10 + (lNSrc * 70))
                                 End If
-                                lSB.AppendLine(lOutPend.TrimEnd)
+                                PrintMultiLine(lSB, lOutPend)
                             Else
                                 lSB.AppendLine(lOutPend.TrimEnd)
                                 If Not lTable.Comment Is Nothing AndAlso lTable.Comment.Length > 0 Then
@@ -321,6 +324,9 @@ Public Class HspfTable
                         If lTableName = "REPORT-CON" Then 'special case for this table
                             Dim lNCon As Integer = Me.Opn.Tables.Item("REPORT-FLAGS").ParmValue("NCON")
                             lOutPend = Mid(lOutPend, 1, 10 + (lNCon * 70))
+                        ElseIf lTableName = "REPORT-SRC" Then 'special case for this table
+                            Dim lNSrc As Integer = Me.Opn.Tables.Item("REPORT-FLAGS").ParmValue("NSRC")
+                            lOutPend = Mid(lOutPend, 1, 10 + (lNSrc * 70))
                         End If
                         PrintMultiLine(lSB, lOutPend)
                     Else
@@ -336,6 +342,9 @@ notMissingTableForThisOper:
                     If lTableName = "REPORT-CON" Then 'special case for this table
                         Dim lNCon As Integer = Me.Opn.Tables.Item("REPORT-FLAGS").ParmValue("NCON")
                         lOutPend = Mid(lOutPend, 1, 10 + (lNCon * 70))
+                    ElseIf lTableName = "REPORT-SRC" Then 'special case for this table
+                        Dim lNSrc As Integer = Me.Opn.Tables.Item("REPORT-FLAGS").ParmValue("NSRC")
+                        lOutPend = Mid(lOutPend, 1, 10 + (lNSrc * 70))
                     End If
                     PrintMultiLine(lSB, lOutPend)
                 Else

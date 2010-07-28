@@ -506,7 +506,7 @@ Public Class HspfOpnBlk
                 Next lOperation
             Else 'this is a multiple occurence group (like pqual, iqual, gqual)
                 If lInGroup Then
-                    If lTableDef.OccurGroup <> lCurrentOccurGroup Or lTableDefIndex > lBlockDef.TableDefs.Count Then
+                    If lTableDef.OccurGroup <> lCurrentOccurGroup Or lTableDefIndex >= lBlockDef.TableDefs.Count Then
                         'we were in a multiple occurence group but have reached end of group
                         lGroupIndex += 1 'look for next occurence
                         If lGroupIndex > lLastGroupIndex Then
