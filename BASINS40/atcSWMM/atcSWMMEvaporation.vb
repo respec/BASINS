@@ -30,7 +30,31 @@ Public Class atcSWMMEvaporation
     End Sub
 
     Public Sub FromString(ByVal aContents As String) Implements IBlock.FromString
-        'TODO: fill this in
+        Timeseries = New atcData.atcTimeseries(pSWMMProject)
+        Timeseries.Attributes.SetValue("Location", "")
+        Timeseries.Attributes.SetValue("Constituent", "PEVT")
+
+        'TODO: populate Timeseries
+        'Need to do a delayed action here
+
+        'Break it up into multiple lines
+        Dim lLines() As String = aContents.Split(vbCrLf)
+        Dim lWord As String = "TIMESERIES"
+        Dim laTSFile As String = String.Empty
+        For I As Integer = 0 To lLines.Length - 1
+            If Not lLines(I).StartsWith(";") Then
+                laTSFile = lLines(I).Substring(lWord.Length)
+                'Assuming there is only one TS for Evap
+                If laTSFile.Length > 0 And laTSFile.EndsWith("E") Then
+                    Timeseries.Attributes.SetValue("Location", laTSFile)
+                    Exit For
+                End If
+            End If
+        Next
+    End Sub
+
+    Public Sub ReadDataExternal(ByVal aFilename As String, ByVal aTS As atcData.atcTimeseries)
+
     End Sub
 
     Public Overrides Function ToString() As String
