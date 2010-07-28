@@ -1629,7 +1629,7 @@ Public Class HspfUci
         If aWdmId.Length < 4 Then
             lId = 1
         Else
-            lId = CShort(aWdmId.Substring(4, 1))
+            lId = CShort(aWdmId.Substring(3, 1))
         End If
         Dim NewGenTs As New atcData.atcTimeseries(Nothing)
         If Not pWDMObj(lId) Is Nothing Then
@@ -1674,7 +1674,7 @@ Public Class HspfUci
     Public Sub ClearAllOutputDsns()
         For Each lConnection As HspfConnection In pConnections
             If lConnection.Typ = 4 Then
-                If lConnection.Target.VolName.Substring(1, 3) = "WDM" Then 'clear this dsn
+                If lConnection.Target.VolName.Substring(0, 3) = "WDM" Then 'clear this dsn
                     ClearWDMDataSet(lConnection.Target.VolName, lConnection.Target.VolId)
                 End If
             End If

@@ -142,9 +142,9 @@ Public Class ctlEditTable
                             lTempString = "GQ-QALDATA"
                         End If
                         If lOper > 1 Then
-                            lOccurIndex = pHspfTable.Opn.OpnBlk.Ids(1).Tables(pHspfTable.Name & ":" & lOper).OccurIndex
+                            lOccurIndex = pHspfTable.Opn.OpnBlk.Ids(0).Tables(pHspfTable.Name & ":" & lOper).OccurIndex
                         Else
-                            lOccurIndex = pHspfTable.Opn.OpnBlk.Ids(1).Tables(pHspfTable.Name).OccurIndex
+                            lOccurIndex = pHspfTable.Opn.OpnBlk.Ids(0).Tables(pHspfTable.Name).OccurIndex
                         End If
                         If lOccurIndex = 0 Then
                             lOccurIndex = lOper
@@ -152,8 +152,8 @@ Public Class ctlEditTable
                         If lOccurIndex > 1 Then
                             lTempString = lTempString & ":" & lOccurIndex
                         End If
-                        If pHspfTable.Opn.OpnBlk.Ids(1).TableExists(lTempString) Then
-                            cboOccur.Items.Add(lOper & " - " & pHspfTable.Opn.OpnBlk.Ids(1).Tables(lTempString).Parms(0).Value)
+                        If pHspfTable.Opn.OpnBlk.Ids(0).TableExists(lTempString) Then
+                            cboOccur.Items.Add(lOper & " - " & pHspfTable.Opn.OpnBlk.Ids(0).Tables(lTempString).Parms(0).Value)
                         Else
                             cboOccur.Items.Add(lOper)
                         End If
@@ -204,7 +204,6 @@ Public Class ctlEditTable
                 .CellValue(0, 1) = "Description"
                 lchkDescInteger = 1
             Else
-                .Columns += 1
                 lchkDescInteger = 0
             End If
 
@@ -246,8 +245,8 @@ Public Class ctlEditTable
                     more = False
                 End If
 
-                .Rows = .Rows + 1
                 If skip = False Then
+                    .Rows = .Rows + 1
                     .CellValue(.Rows - 1, 0) = ltable.Opn.Id
                     If chkDesc.Checked = True Then
                         .CellValue(.Rows - 1, 1) = ltable.Opn.Description
