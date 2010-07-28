@@ -11,6 +11,9 @@ Public Class atcSWMMTemperature
     Private pSWMMProject As atcSWMMProject
     Public Timeseries As atcData.atcTimeseries
 
+    'Public AuxiParms As New atcData.atcDataAttributes
+    Public AuxiParms As New Dictionary(Of String, String)
+
     Property Name() As String Implements IBlock.Name
         Get
             Return pName
@@ -30,7 +33,52 @@ Public Class atcSWMMTemperature
     End Sub
 
     Public Sub FromString(ByVal aContents As String) Implements IBlock.FromString
-        'TODO: fill this in
+        Timeseries = New atcData.atcTimeseries(pSWMMProject)
+        Timeseries.Attributes.SetValue("Location", "")
+        Timeseries.Attributes.SetValue("Constituent", "ATEM")
+
+        'TODO: populate Timeseries
+        'Need to do a delayed action here
+
+        'Break it up into multiple lines
+        Dim lLines() As String = aContents.Split(vbCrLf)
+        Dim lWord As String = "TIMESERIES"
+        Dim laTSFile As String = String.Empty
+        For I As Integer = 0 To lLines.Length - 1
+            If Not lLines(I).StartsWith(";") Then
+                laTSFile = lLines(I).Substring(lWord.Length).Trim()
+                'Assuming there is only one TS for Temp
+                If laTSFile.Length > 0 And laTSFile.EndsWith("T") Then
+                    Timeseries.Attributes.SetValue("Location", laTSFile)
+                Else
+                    'Dim lDef As New atcData.atcDefinedValue
+                    'With lDef
+                    '    .Definition = New atcData.atcAttributeDefinition()
+                    '    .Definition.Name = lparms(0) 'Parm name such as WINDSPEED
+                    '    If lparms.Length > 2 Then
+                    '        .Definition.Description = lparms(1) 'specification eg monthly
+                    '        .Value = lparms(2) 'Parm values as a string
+                    '    Else
+                    '        .Value = lparms(1) 'sometimes, there is no description
+                    '    End If
+                    '    .Definition.TypeString = "String"
+                    'End With
+                    'AuxiParms.Add(lDef)
+
+                    Dim lLine As String = lLines(I)
+                    Dim laKey As String = StrSplit(lLine, " ", "")
+                    If AuxiParms.ContainsKey(laKey.Trim()) Then
+                        AuxiParms.Item(laKey) &= vbCrLf & lLine.Trim()
+                    Else
+                        AuxiParms.Add(laKey, lLine.Trim())
+                    End If
+                End If
+            End If
+        Next
+    End Sub
+
+    Public Sub ReadDataExternal(ByVal aFilename As String, ByVal aTS As atcData.atcTimeseries)
+
     End Sub
 
     Public Overrides Function ToString() As String

@@ -6,6 +6,8 @@ Imports MapWinUtility
 Imports atcUtility
 
 Public Class atcSWMMProject
+    Inherits atcData.atcTimeseriesSource
+
     Private pIsMetric As Boolean
 
     Public Blocks As atcSWMMBlocks
@@ -23,7 +25,6 @@ Public Class atcSWMMProject
     Public Evaporation As atcSWMMEvaporation
     Public Temperature As atcSWMMTemperature
 
-    Public Name As String = ""
     Public FileName As String = ""
     Public Title As String = ""
 
@@ -38,8 +39,8 @@ Public Class atcSWMMProject
         Me.Clear()
     End Sub
 
-    Public Sub Clear()
-        Name = ""
+    Public Overrides Sub Clear()
+        MyBase.Clear()
         FileName = ""
         Title = ""
         BackdropFile = ""
@@ -141,17 +142,50 @@ Public Class atcSWMMProject
             Clear()
             FileName = aFileName
             Dim lSR As New IO.StreamReader(aFileName)
+            'First set up a lookup using Blocks
             While Not lSR.EndOfStream
                 Dim lBlockName As String = lSR.ReadLine.ToUpper
                 Dim lBlockContents As String = ReadBlockContents(lBlockName, lSR)
+                Blocks.Add(New atcSWMMBlock(lBlockName, lBlockContents))
+            End While
 
-                Select Case lBlockName
-                    Case "[TITLE]" : Title = lBlockContents
-                    Case "[OPTIONS]" : Options.FromString(lBlockContents)
-                        'Case "[EVAPORATION]" : Evaporation.FromString(lBlockContents)
-                        'Case "[TEMPERATURE]" : Temperature.FromString(lBlockContents)
-                        'Case "[TIMESERIES]"   'TODO:parse into Evaporation or Temperature block
-                        'Case "[RAINGAGES]" : RainGages.FromString(lBlockContents)
+            'Then create classes using their contents
+            For Each lBlock As atcSWMMBlock In Blocks
+                Select Case lBlock.Name
+                    Case "[TITLE]" : Title = lBlock.Content
+                    Case "[OPTIONS]" : Options.FromString(lBlock.Content)
+                    Case "[EVAPORATION]" : Evaporation.FromString(lBlock.Content)
+                    Case "[TEMPERATURE]" : Temperature.FromString(lBlock.Content)
+                    Case "[TIMESERIES]"
+                        'TODO:parse into Evaporation or Temperature block
+                        Dim lLines() As String = lBlock.Content.Split(vbCrLf)
+                        Dim laTSFile As String = String.Empty
+                        Dim lLine As String = String.Empty
+                        For I As Integer = 0 To lLines.Length - 1
+                            If Not lLines(I).StartsWith(";") And lLines(I).Length > 0 Then
+                                lLine = lLines(I)
+                                Dim lItems() As String = lLine.Split(" ")
+                                If lLine.Contains("FILE") Then
+                                    If Temperature.Timeseries.Attributes.GetValue("Location") = lItems(0) Then
+                                        If lItems(0).Contains(":T") Then
+                                            Temperature.ReadDataExternal(lItems(2).Trim().Trim(""""), Temperature.Timeseries)
+                                        ElseIf lItems(0).Contains(":E") Then
+                                            Evaporation.ReadDataExternal(lItems(2).Trim().Trim(""""), Evaporation.Timeseries)
+                                        End If
+                                    End If
+                                Else
+
+                                    For Each lGage As atcSWMMRainGage In RainGages
+                                        If lGage.TimeSeries.Attributes.GetValue("Scenario") = lItems(0) Then
+
+                                        End If
+                                    Next
+                                End If
+                            End If
+                        Next
+
+
+                    Case "[RAINGAGES]" : RainGages.FromString(lBlock.Content)
                         'Case "[CONDUITS]" : Conduits.FromString(lBlockContents)
                     Case "[RAINFALL]", "[SUBCATCHMENTS]", "[SUBAREAS]", "[INFILTRATION]", _
                          "[CONDUITS]", "[XSECTIONS]", "[INFLOWS]", "[POLLUTANTS]", "[LOADINGS]", _
@@ -159,15 +193,19 @@ Public Class atcSWMMProject
                          "[REPORT]", "[TAGS]", "[MAP]", "[COORDINATES]", "[VERTICES]", _
                          "[POLYGONS]", "[SYMBOLS]", "[BACKDROP]", "[TAGS]", "[LABELS]", _
                          "[STORAGE]", "[PUMPS]", "[CONTROLS]", "[DWF]", "[CURVES]", "[PATTERNS]"
-                        Blocks.Add(New atcSWMMBlock(lBlockName, lBlockContents))
+
+                        'Class.FromString(lBlock.Content)
+
                         'TODO: parse these into better objects!
                         'TODO: [JUNCTIONS] and [OUTFALLS] currently live inside Nodes
                         'TODO: [XSECTIONS] lives inside Conduits
-
                     Case Else
-                        Logger.Dbg("'" & lBlockName & "' is not a known input block  ")
+                        Logger.Dbg("'" & lBlock.Name & "' is not a known input block  ")
                 End Select
-            End While
+
+            Next
+
+
         End If
     End Function
 
@@ -199,7 +237,8 @@ Public Class atcSWMMProject
         Return lContents
     End Function
 
-    Public Function Save(ByVal aFileName As String) As Boolean
+    Public Overrides Function Save(ByVal aFileName As String, _
+                          Optional ByVal ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
         Dim lSW As New IO.StreamWriter(aFileName)
         Dim lBlocksWritten As New StringBuilder
         FileName = aFileName

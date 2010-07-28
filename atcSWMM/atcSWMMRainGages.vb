@@ -30,7 +30,82 @@ Public Class atcSWMMRainGages
     End Sub
 
     Public Sub FromString(ByVal aContents As String) Implements IBlock.FromString
-        'TODO: fill this in
+        'TODO: populate Timeseries
+        'Need to do a delayed action here if the Form is TIMESERIES
+
+        'Break it up into multiple lines
+        Dim lLines() As String = aContents.Split(vbCrLf)
+        Dim laTSFile As String = String.Empty
+        Dim lLine As String = String.Empty
+        For I As Integer = 0 To lLines.Length - 1
+            If Not lLines(I).StartsWith(";") And lLines(I).Length > 0 Then
+                lLine = lLines(I)
+                Dim lRainGage As New atcSWMMRainGage
+                With lRainGage
+                    Dim lItem As String = StrSplit(lLine, " ", "")
+                    Dim lIndex As Integer = 0
+                    While lItem.Length > 0
+                        Select Case lIndex
+                            Case 0 : .Name = lItem.Trim
+                            Case 1 : .Form = lItem.Trim
+                            Case 2 : .Interval = lItem.Trim
+                            Case 3 : .SnowCatchFactor = lItem.Trim
+                            Case 4 : .Type = lItem.Trim
+                            Case 5
+                                .TimeSeries = New atcData.atcTimeseries(pSWMMProject)
+                                .TimeSeries.Attributes.SetValue("Location", .Name)
+                                .TimeSeries.Attributes.SetValue("Constituent", "PREC")
+                                lItem = lItem.Trim()
+                                lItem = lItem.Trim("""")
+                                .TimeSeries.Attributes.SetValue("Scenario", lItem)
+
+                                If .Type.ToLower() = "file" Then
+                                    Dim lpath As String = FindFile("Rain Gage Data File", lItem, lItem.Substring(lItem.LastIndexOf(".")))
+                                    ReadDataExternal(lpath, .TimeSeries)
+                                ElseIf .Type.ToLower() = "timeseries" Then
+                                    .TimeSeries.ValuesNeedToBeRead = True
+                                End If
+                        End Select
+
+                        lItem = StrSplit(lLine, " ", "")
+                        lIndex += 1
+                    End While
+                End With
+                Me.Add(lRainGage)
+            End If
+        Next
+    End Sub
+
+    Public Sub ReadDataExternal(ByVal aFilename As String, ByVal aTS As atcData.atcTimeseries)
+        If Not aTS.ValuesNeedToBeRead Then
+            Exit Sub
+        End If
+        Dim lStn As String = aTS.Attributes.GetValue("Location")
+        Dim lDates As New List(Of Double)
+        Dim lValues As New List(Of Double)
+
+        'Set up common date array
+
+        Dim lSR As System.IO.StreamReader = New System.IO.StreamReader(aFilename)
+        While Not lSR.EndOfStream
+            Dim line As String = lSR.ReadLine()
+            Dim lItems() As String = line.Split(" ")
+            'There should be 7 columns
+            'Stn Y M D H M Value
+            If lItems(0) <> lStn Then
+                Continue While
+            End If
+            Dim ldate As Double = Jday(Integer.Parse(lItems(1)), Integer.Parse(lItems(2)), Integer.Parse(lItems(3)), Integer.Parse(lItems(4)), Integer.Parse(lItems(5)), 0)
+            lDates.Add(ldate)
+            lValues.Add(Double.Parse(lItems(lItems.Length - 1)))
+        End While
+
+        aTS.ValuesNeedToBeRead = False
+        aTS.Dates.numValues = lDates.Count
+        aTS.numValues = lDates.Count
+        aTS.Dates.Values = lDates.ToArray
+        aTS.Values = lValues.ToArray
+        lSR.Close()
     End Sub
 
     Public Overrides Function ToString() As String
