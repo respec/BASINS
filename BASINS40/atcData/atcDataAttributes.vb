@@ -430,38 +430,43 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
     End Sub
 
     Public Function GetDefinedValue(ByVal aAttributeName As String) As atcDefinedValue
-        Dim lKey As String = AttributeNameToKey(aAttributeName)
-        Dim lAttribute As atcDefinedValue = ItemByKey(lKey)
+        Dim lAttribute As atcDefinedValue = Nothing
+        Try
+            Dim lKey As String = AttributeNameToKey(aAttributeName)
+            lAttribute = ItemByKey(lKey)
 
-        If lAttribute Is Nothing Then  'Did not find the named attribute
-            If Not Owner Is Nothing Then   'Need an owner to calculate an attribute
-                Try
-                    Dim lDef As atcAttributeDefinition = GetDefinition(aAttributeName)
-                    If Not lDef Is Nothing Then
-                        Dim lOperation As atcDefinedValue = Nothing
-                        If lDef.Calculated Then
-                            If lDef.Calculator.Name.Contains("n-day") Then
-                                lOperation = lDef.Calculator.AvailableOperations.ItemByKey(lDef.Name)
-                                Dim lArgs As New atcDataAttributes
-                                lArgs.SetValue("Timeseries", New atcTimeseriesGroup(CType(Owner, atcTimeseries)))
-                                lDef.Calculator.Open(lKey, lArgs)
-                                lAttribute = ItemByKey(lKey)
-                            ElseIf IsSimple(lDef, lKey, lOperation) Then
-                                Dim lArg As atcDefinedValue = lOperation.Arguments.ItemByIndex(0)
-                                Dim lArgs As atcDataAttributes = lOperation.Arguments.Clone
-                                lArgs.SetValue(lArg.Definition, New atcTimeseriesGroup(CType(Owner, atcTimeseries)))
-                                lDef.Calculator.Open(lKey, lArgs)
-                                lAttribute = ItemByKey(lKey)
+            If lAttribute Is Nothing Then  'Did not find the named attribute
+                If Not Owner Is Nothing Then   'Need an owner to calculate an attribute
+                    Try
+                        Dim lDef As atcAttributeDefinition = GetDefinition(aAttributeName)
+                        If Not lDef Is Nothing Then
+                            Dim lOperation As atcDefinedValue = Nothing
+                            If lDef.Calculated Then
+                                If lDef.Calculator.Name.Contains("n-day") Then
+                                    lOperation = lDef.Calculator.AvailableOperations.ItemByKey(lDef.Name)
+                                    Dim lArgs As New atcDataAttributes
+                                    lArgs.SetValue("Timeseries", New atcTimeseriesGroup(CType(Owner, atcTimeseries)))
+                                    lDef.Calculator.Open(lKey, lArgs)
+                                    lAttribute = ItemByKey(lKey)
+                                ElseIf IsSimple(lDef, lKey, lOperation) Then
+                                    Dim lArg As atcDefinedValue = lOperation.Arguments.ItemByIndex(0)
+                                    Dim lArgs As atcDataAttributes = lOperation.Arguments.Clone
+                                    lArgs.SetValue(lArg.Definition, New atcTimeseriesGroup(CType(Owner, atcTimeseries)))
+                                    lDef.Calculator.Open(lKey, lArgs)
+                                    lAttribute = ItemByKey(lKey)
+                                End If
                             End If
                         End If
-                    End If
-                Catch NullExcep As NullReferenceException
-                    'Ignore these
-                Catch CalcExcep As Exception
-                    Logger.Dbg("Exception calculating " & aAttributeName & ": " & CalcExcep.Message)
-                End Try
+                    Catch NullExcep As NullReferenceException
+                        'Ignore these
+                    Catch CalcExcep As Exception
+                        Logger.Dbg("Exception calculating " & aAttributeName & ": " & CalcExcep.Message)
+                    End Try
+                End If
             End If
-        End If
+        Catch e As Exception
+            Logger.Dbg("GetDefinedValue(" & aAttributeName & ") Exception: " & e.Message)
+        End Try
         Return lAttribute
     End Function
 

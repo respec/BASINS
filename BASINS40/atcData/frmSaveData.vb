@@ -21,7 +21,7 @@ Public Class frmSaveData
                     End If
                     Return lDataSource
                 Case Is > 0 'Already-open file
-                    Dim lDataSource As atcDataSource = atcDataManager.DataSourceByName(lstDataSources.SelectedItem)
+                    Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lstDataSources.SelectedItem)
                     If lDataSource IsNot Nothing AndAlso lDataSource.CanSave Then
                         Return lDataSource
                     End If

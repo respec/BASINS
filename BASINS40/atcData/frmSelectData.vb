@@ -376,7 +376,7 @@ Friend Class frmSelectData
 
     Private pTotalTS As Integer = 0
 
-    Private pAvailableData As atcTimeseriesGroup = Nothing
+    Private pAvailableData As atcDataGroup = Nothing
 
     Private pTranSumDivLabel As String = "Accumulate/Divide"
     Private pTranAverSameLabel As String = "Average/Same"
@@ -388,14 +388,14 @@ Friend Class frmSelectData
     ''' The datasets available for selection. 
     ''' Set this property before calling AskUser or by default all datasets in all open data sources will be available.
     ''' </summary>
-    Public Property AvailableData() As atcTimeseriesGroup
+    Public Property AvailableData() As atcDataGroup
         Get
             If pAvailableData Is Nothing Then
                 pAvailableData = atcDataManager.DataSets
             End If
             Return pAvailableData
         End Get
-        Set(ByVal newValue As atcTimeseriesGroup)
+        Set(ByVal newValue As atcDataGroup)
             pAvailableData = newValue
         End Set
     End Property
@@ -476,22 +476,22 @@ Friend Class frmSelectData
                     lCriteriaIndex = pcboCriteria(0).Items.Count
                 Case Else
                     Dim lHasValues As Boolean = False
-                    For Each ts As atcDataSet In AvailableData
+                    For Each lDataSet As atcDataSet In AvailableData
                         Application.DoEvents()
-                        If ts.Attributes.ContainsAttribute(lAttributeName) Then
+                        If lDataSet.Attributes.ContainsAttribute(lAttributeName) Then
                             lHasValues = True
                             Exit For
                         End If
                     Next
 
-                    If Not lHasValues Then
+                    If lHasValues Then
+                        Logger.Dbg("Keeping " & lAttributeName)
+                        lCriteriaIndex += 1
+                    Else
                         Logger.Dbg("Removing " & lAttributeName)
                         For lComboIndex As Integer = 0 To pcboCriteria.GetUpperBound(0)
                             pcboCriteria(lComboIndex).Items.RemoveAt(lCriteriaIndex)
                         Next
-                    Else
-                        Logger.Dbg("Keeping " & lAttributeName)
-                        lCriteriaIndex += 1
                     End If
             End Select
         End While
@@ -733,7 +733,7 @@ Friend Class frmSelectData
         Else
             Dim lSaveCursor As Cursor = Me.Cursor
             pPopulatingMatching = True
-            Dim lAllDatasets As atcTimeseriesGroup = AvailableData
+            Dim lAllDatasets As atcDataGroup = AvailableData
             pTotalTS = lAllDatasets.Count
             Logger.Status("Matching " & Format(pTotalTS, "#,###") & " timeseries")
 Restart:
