@@ -180,7 +180,8 @@ Public Module modDownload
         lCreatedMapWindowProjectFilename = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
 
         If IO.File.Exists(lCreatedMapWindowProjectFilename) Then
-            Logger.Status("Finished Building " & g_MapWin.Project.FileName)
+            Logger.Status("")
+            Logger.Msg("Finished Building " & g_MapWin.Project.FileName, g_AppNameLong)
             WriteParametersTextFile(lParametersFilename, lCreatedMapWindowProjectFilename)
         End If
         Return lCreatedMapWindowProjectFilename
