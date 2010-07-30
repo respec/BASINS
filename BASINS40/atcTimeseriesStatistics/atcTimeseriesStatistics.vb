@@ -194,8 +194,8 @@ Public Class atcTimeseriesStatistics
             Dim lGeoMean As Double = 0
             Dim lStdDev As Double = pNaN
             Dim lCount As Double = 0
-            Dim lCountPositive As Double = 0
-            Dim lCountZero As Double = 0
+            Dim lCountPositive As Integer = 0
+            Dim lCountZero As Integer = 0
             Dim lMean As Double = pNaN
             Dim lSum As Double = 0
             Dim lSumDevSquares As Double = 0
@@ -215,11 +215,11 @@ Public Class atcTimeseriesStatistics
                         lCount += 1
                         If lVal > lMax Then
                             lMax = lVal
-                            lMaxDate = aTimeseries.Dates.Value(lIndex)
+                            If aTimeseries.Dates IsNot Nothing Then lMaxDate = aTimeseries.Dates.Value(lIndex)
                         End If
                         If lVal < lMin Then
                             lMin = lVal
-                            lMinDate = aTimeseries.Dates.Value(lIndex)
+                            If aTimeseries.Dates IsNot Nothing Then lMinDate = aTimeseries.Dates.Value(lIndex)
                         End If
                         lSum += lVal
                         If lMin > 0 Then lGeoMean += Math.Log(lVal)
@@ -242,15 +242,23 @@ Public Class atcTimeseriesStatistics
             aTimeseries.Attributes.SetValue("Count", CInt(lCount))
             aTimeseries.Attributes.SetValue("Count Positive", CInt(lCountPositive))
             aTimeseries.Attributes.SetValue("Count Missing", CInt(lLastValueIndex - lCount))
-            aTimeseries.Attributes.SetValue("Count Zero", CInt(lCountZero))
+            aTimeseries.Attributes.SetValue("Count Zero", lCountZero)
             If lCount > 0 Then
                 aTimeseries.Attributes.SetValue("Last", aTimeseries.Value(lLastValueIndex))
-                aTimeseries.Attributes.SetValue("Max", lMax)
-                aTimeseries.Attributes.SetValue("MaxDate", lMaxDate)
-                aTimeseries.Attributes.SetValue("Min", lMin)
-                aTimeseries.Attributes.SetValue("MinDate", lMinDate)
+                If Not Double.IsNaN(lMax) Then
+                    aTimeseries.Attributes.SetValue("Max", lMax)
+                End If
+                If Not Double.IsNaN(lMin) Then
+                    aTimeseries.Attributes.SetValue("Min", lMin)
+                End If
                 aTimeseries.Attributes.SetValue("Sum", lSum)
-                If Not aTimeseries.Dates Is Nothing Then
+                If aTimeseries.Dates IsNot Nothing Then
+                    If Not Double.IsNaN(lMaxDate) Then
+                        aTimeseries.Attributes.SetValue("MaxDate", lMaxDate)
+                    End If
+                    If Not Double.IsNaN(lMinDate) Then
+                        aTimeseries.Attributes.SetValue("MinDate", lMinDate)
+                    End If
                     With aTimeseries.Dates
                         Dim lSJDate As Double = .FirstNumeric
                         Dim lEJDate As Double = .Value(lLastValueIndex)
