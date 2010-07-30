@@ -57,6 +57,7 @@ Public Class atcTimeseriesGDS
             Me.Specification = aFileName
 
             Try
+                Dim lNaN As Double = GetNaN()
                 Dim lCurLine() As String
 
                 Dim lInputStream As New FileStream(aFileName, FileMode.Open, FileAccess.Read)
@@ -87,6 +88,7 @@ Public Class atcTimeseriesGDS
                                     lTs.Attributes.SetValue("Constituent", lConstituent)
                                     lTs.Attributes.AddHistory("Read from " & Specification)
                                     lTs.numValues = lNumTimesteps
+                                    lTs.Value(0) = lNaN
                                     lData(lX, lY) = lTs
                                     pData.Add(lTs)
                                 End If
@@ -110,6 +112,11 @@ Public Class atcTimeseriesGDS
                             For lDateIndex As Integer = 1 To lNumTimesteps
                                 lDates.Value(lDateIndex) = Double.Parse(lCurLine(lDateIndex - 1).Trim) - pJulianOffset
                             Next
+                            If lNumTimesteps > 1 Then
+                                lDates.Value(0) = lDates.Value(1) - (lDates.Value(2) - lDates.Value(1))
+                            Else
+                                lDates.Value(0) = lNaN
+                            End If
                             For Each lTs In pData
                                 lTs.Dates = lDates
                             Next
