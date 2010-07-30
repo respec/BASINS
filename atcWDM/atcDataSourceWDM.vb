@@ -168,14 +168,14 @@ Public Class atcDataSourceWDM
             Dim lTGroup As Integer = aDataSet.Attributes.GetValue("tgroup", 6)
             Dim lTSBYr As Integer = aDataSet.Attributes.GetValue("tsbyr", 1900)
 
-            If lTs = 0 Or lTu = atcTimeUnit.TUUnknown Then ' sparse dataset - fill in dummy values for write
+            If lTs = 0 OrElse lTu = atcTimeUnit.TUUnknown Then ' sparse dataset - fill in dummy values for write
                 If pAskAboutMissingTuTs Then
                     Dim lFrmDefaultTimeInterval As New frmDefaultTimeInterval
                     pAskAboutMissingTuTs = lFrmDefaultTimeInterval.AskUser(lTimser.ToString & " #" & lDsn, pTu, pTs, lAggr)
                 End If
                 lTs = pTs
                 lTu = pTu
-                If pTs > 0 And pTu <> atcTimeUnit.TUUnknown Then
+                If pTs > 0 AndAlso pTu <> atcTimeUnit.TUUnknown Then
                     Dim lJulianInterval As Double
                     Select Case pTu
                         Case 2 : lJulianInterval = JulianMinute * lTs 'minute
