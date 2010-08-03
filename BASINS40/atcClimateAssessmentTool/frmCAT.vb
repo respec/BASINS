@@ -97,6 +97,7 @@ Public Class frmCAT
     Friend WithEvents btnPlot As System.Windows.Forms.Button
     Friend WithEvents mnuOpenSWAT As System.Windows.Forms.MenuItem
     Friend WithEvents lblOpen As System.Windows.Forms.Label
+    Friend WithEvents mnuOpenSWMM As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -130,7 +131,9 @@ Public Class frmCAT
         Me.btnEndpointModify = New System.Windows.Forms.Button
         Me.btnEndpointAdd = New System.Windows.Forms.Button
         Me.tabResults = New System.Windows.Forms.TabPage
+        Me.agdResults = New atcControls.atcGrid
         Me.tabPivot = New System.Windows.Forms.TabPage
+        Me.agdPivot = New atcControls.atcGrid
         Me.lblPivotColumns = New System.Windows.Forms.Label
         Me.lblPivotCells = New System.Windows.Forms.Label
         Me.lblPivotRows = New System.Windows.Forms.Label
@@ -141,6 +144,7 @@ Public Class frmCAT
         Me.MainMenu1 = New System.Windows.Forms.MainMenu(Me.components)
         Me.mnuFile = New System.Windows.Forms.MenuItem
         Me.mnuOpenUCI = New System.Windows.Forms.MenuItem
+        Me.mnuOpenSWAT = New System.Windows.Forms.MenuItem
         Me.mnuLoadVariations = New System.Windows.Forms.MenuItem
         Me.mnuSaveVariations = New System.Windows.Forms.MenuItem
         Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
@@ -158,11 +162,9 @@ Public Class frmCAT
         Me.lblTop = New System.Windows.Forms.Label
         Me.btnStop = New System.Windows.Forms.Button
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.agdResults = New atcControls.atcGrid
-        Me.agdPivot = New atcControls.atcGrid
         Me.btnPlot = New System.Windows.Forms.Button
-        Me.mnuOpenSWAT = New System.Windows.Forms.MenuItem
         Me.lblOpen = New System.Windows.Forms.Label
+        Me.mnuOpenSWMM = New System.Windows.Forms.MenuItem
         Me.myTabs.SuspendLayout()
         Me.tabInputs.SuspendLayout()
         Me.tabEndpoints.SuspendLayout()
@@ -340,7 +342,7 @@ Public Class frmCAT
         Me.tabEndpoints.Controls.Add(Me.btnEndpointAdd)
         Me.tabEndpoints.Location = New System.Drawing.Point(4, 22)
         Me.tabEndpoints.Name = "tabEndpoints"
-        Me.tabEndpoints.Size = New System.Drawing.Size(512, 263)
+        Me.tabEndpoints.Size = New System.Drawing.Size(512, 242)
         Me.tabEndpoints.TabIndex = 1
         Me.tabEndpoints.Text = "Assessment Endpoints"
         Me.tabEndpoints.UseVisualStyleBackColor = True
@@ -406,7 +408,7 @@ Public Class frmCAT
         Me.lstEndpoints.IntegralHeight = False
         Me.lstEndpoints.Location = New System.Drawing.Point(8, 94)
         Me.lstEndpoints.Name = "lstEndpoints"
-        Me.lstEndpoints.Size = New System.Drawing.Size(496, 160)
+        Me.lstEndpoints.Size = New System.Drawing.Size(496, 139)
         Me.lstEndpoints.TabIndex = 22
         '
         'btnEndpointDown
@@ -456,10 +458,28 @@ Public Class frmCAT
         Me.tabResults.Controls.Add(Me.agdResults)
         Me.tabResults.Location = New System.Drawing.Point(4, 22)
         Me.tabResults.Name = "tabResults"
-        Me.tabResults.Size = New System.Drawing.Size(512, 263)
+        Me.tabResults.Size = New System.Drawing.Size(512, 242)
         Me.tabResults.TabIndex = 2
         Me.tabResults.Text = "Results Table"
         Me.tabResults.UseVisualStyleBackColor = True
+        '
+        'agdResults
+        '
+        Me.agdResults.AllowHorizontalScrolling = True
+        Me.agdResults.AllowNewValidValues = False
+        Me.agdResults.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.agdResults.BackColor = System.Drawing.SystemColors.Control
+        Me.agdResults.CellBackColor = System.Drawing.Color.Empty
+        Me.agdResults.Fixed3D = False
+        Me.agdResults.LineColor = System.Drawing.Color.Empty
+        Me.agdResults.LineWidth = 0.0!
+        Me.agdResults.Location = New System.Drawing.Point(8, 8)
+        Me.agdResults.Name = "agdResults"
+        Me.agdResults.Size = New System.Drawing.Size(496, 225)
+        Me.agdResults.Source = Nothing
+        Me.agdResults.TabIndex = 21
         '
         'tabPivot
         '
@@ -472,10 +492,27 @@ Public Class frmCAT
         Me.tabPivot.Controls.Add(Me.cboPivotRows)
         Me.tabPivot.Location = New System.Drawing.Point(4, 22)
         Me.tabPivot.Name = "tabPivot"
-        Me.tabPivot.Size = New System.Drawing.Size(512, 263)
+        Me.tabPivot.Size = New System.Drawing.Size(512, 242)
         Me.tabPivot.TabIndex = 3
         Me.tabPivot.Text = "Pivot Table"
         Me.tabPivot.UseVisualStyleBackColor = True
+        '
+        'agdPivot
+        '
+        Me.agdPivot.AllowHorizontalScrolling = True
+        Me.agdPivot.AllowNewValidValues = False
+        Me.agdPivot.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.agdPivot.CellBackColor = System.Drawing.Color.Empty
+        Me.agdPivot.Fixed3D = False
+        Me.agdPivot.LineColor = System.Drawing.Color.Empty
+        Me.agdPivot.LineWidth = 0.0!
+        Me.agdPivot.Location = New System.Drawing.Point(8, 89)
+        Me.agdPivot.Name = "agdPivot"
+        Me.agdPivot.Size = New System.Drawing.Size(496, 144)
+        Me.agdPivot.Source = Nothing
+        Me.agdPivot.TabIndex = 28
         '
         'lblPivotColumns
         '
@@ -551,7 +588,7 @@ Public Class frmCAT
         'mnuFile
         '
         Me.mnuFile.Index = 0
-        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuOpenUCI, Me.mnuOpenSWAT, Me.mnuLoadVariations, Me.mnuSaveVariations, Me.mnuFileSep1, Me.mnuLoadResults, Me.mnuSaveResults, Me.mnuFileSep2, Me.mnuSavePivot})
+        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuOpenUCI, Me.mnuOpenSWAT, Me.mnuOpenSWMM, Me.mnuLoadVariations, Me.mnuSaveVariations, Me.mnuFileSep1, Me.mnuLoadResults, Me.mnuSaveResults, Me.mnuFileSep2, Me.mnuSavePivot})
         Me.mnuFile.Text = "File"
         '
         'mnuOpenUCI
@@ -559,39 +596,44 @@ Public Class frmCAT
         Me.mnuOpenUCI.Index = 0
         Me.mnuOpenUCI.Text = "Open HSPF scenario"
         '
+        'mnuOpenSWAT
+        '
+        Me.mnuOpenSWAT.Index = 1
+        Me.mnuOpenSWAT.Text = "Open SWAT scenario"
+        '
         'mnuLoadVariations
         '
-        Me.mnuLoadVariations.Index = 2
+        Me.mnuLoadVariations.Index = 3
         Me.mnuLoadVariations.Text = "Load Climate and Endpoints"
         '
         'mnuSaveVariations
         '
-        Me.mnuSaveVariations.Index = 3
+        Me.mnuSaveVariations.Index = 4
         Me.mnuSaveVariations.Text = "Save Climate and Endpoints"
         '
         'mnuFileSep1
         '
-        Me.mnuFileSep1.Index = 4
+        Me.mnuFileSep1.Index = 5
         Me.mnuFileSep1.Text = "-"
         '
         'mnuLoadResults
         '
-        Me.mnuLoadResults.Index = 5
+        Me.mnuLoadResults.Index = 6
         Me.mnuLoadResults.Text = "Load Results"
         '
         'mnuSaveResults
         '
-        Me.mnuSaveResults.Index = 6
+        Me.mnuSaveResults.Index = 7
         Me.mnuSaveResults.Text = "Save Results"
         '
         'mnuFileSep2
         '
-        Me.mnuFileSep2.Index = 7
+        Me.mnuFileSep2.Index = 8
         Me.mnuFileSep2.Text = "-"
         '
         'mnuSavePivot
         '
-        Me.mnuSavePivot.Index = 8
+        Me.mnuSavePivot.Index = 9
         Me.mnuSavePivot.Text = "Save Pivot"
         '
         'mnuEdit
@@ -654,41 +696,6 @@ Public Class frmCAT
         Me.btnStop.Text = "Stop"
         Me.btnStop.Visible = False
         '
-        'agdResults
-        '
-        Me.agdResults.AllowHorizontalScrolling = True
-        Me.agdResults.AllowNewValidValues = False
-        Me.agdResults.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.agdResults.BackColor = System.Drawing.SystemColors.Control
-        Me.agdResults.CellBackColor = System.Drawing.Color.Empty
-        Me.agdResults.Fixed3D = False
-        Me.agdResults.LineColor = System.Drawing.Color.Empty
-        Me.agdResults.LineWidth = 0.0!
-        Me.agdResults.Location = New System.Drawing.Point(8, 8)
-        Me.agdResults.Name = "agdResults"
-        Me.agdResults.Size = New System.Drawing.Size(496, 246)
-        Me.agdResults.Source = Nothing
-        Me.agdResults.TabIndex = 21
-        '
-        'agdPivot
-        '
-        Me.agdPivot.AllowHorizontalScrolling = True
-        Me.agdPivot.AllowNewValidValues = False
-        Me.agdPivot.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.agdPivot.CellBackColor = System.Drawing.Color.Empty
-        Me.agdPivot.Fixed3D = False
-        Me.agdPivot.LineColor = System.Drawing.Color.Empty
-        Me.agdPivot.LineWidth = 0.0!
-        Me.agdPivot.Location = New System.Drawing.Point(8, 89)
-        Me.agdPivot.Name = "agdPivot"
-        Me.agdPivot.Size = New System.Drawing.Size(496, 165)
-        Me.agdPivot.Source = Nothing
-        Me.agdPivot.TabIndex = 28
-        '
         'btnPlot
         '
         Me.btnPlot.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -699,12 +706,6 @@ Public Class frmCAT
         Me.btnPlot.Text = "Plot"
         Me.btnPlot.Visible = False
         '
-        'mnuOpenSWAT
-        '
-        Me.mnuOpenSWAT.Index = 1
-        Me.mnuOpenSWAT.Text = "Open SWAT scenario"
-        '
-        '
         'lblOpen
         '
         Me.lblOpen.AutoSize = True
@@ -714,6 +715,11 @@ Public Class frmCAT
         Me.lblOpen.Size = New System.Drawing.Size(444, 24)
         Me.lblOpen.TabIndex = 5
         Me.lblOpen.Text = "Open a scenario or load results using the File menu"
+        '
+        'mnuOpenSWMM
+        '
+        Me.mnuOpenSWMM.Index = 2
+        Me.mnuOpenSWMM.Text = "Open SWMM Scenario"
         '
         'frmCAT
         '
@@ -1562,6 +1568,11 @@ Public Class frmCAT
 
     Private Sub mnuOpenSWAT_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenSWAT.Click
         pCat.Model = New clsCatModelSWAT
+        pCat.Model.BaseScenario = ""
+    End Sub
+
+    Private Sub mnuOpenSWMM_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenSWMM.Click
+        pCat.Model = New clsCatModelSWMM
         pCat.Model.BaseScenario = ""
     End Sub
 

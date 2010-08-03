@@ -46,7 +46,8 @@ Public Class clsCatModelSWMM
             pBaseProject = clsCat.OpenDataSource(aFilename)
 
             'Open the output file
-            Dim lBinOutFilename As String = IO.Path.Combine(IO.Path.GetFileNameWithoutExtension(aFilename), ".out")
+            'Dim lBinOutFilename As String = IO.Path.Combine(IO.Path.GetFileNameWithoutExtension(aFilename), ".out")
+            Dim lBinOutFilename As String = IO.Path.ChangeExtension(aFilename, ".out")
             clsCat.OpenDataSource(lBinOutFilename)
         End If
     End Sub

@@ -177,6 +177,11 @@
       <Name>atcTimeseriesSWAT</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesSWMMOutput\atcTimeserieSWMM5Output.vbproj">
+      <Project>{4E255558-180A-4516-A342-EC7AA1D3BE92}</Project>
+      <Name>atcTimeserieSWMM5Output</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
       <Name>atcUtility</Name>
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
