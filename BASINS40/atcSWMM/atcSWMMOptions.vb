@@ -1,5 +1,6 @@
 ﻿Imports atcUtility
 Imports MapWinUtility
+Imports System.Text.RegularExpressions
 
 Public Class atcSWMMOptions
     Implements IBlock
@@ -50,35 +51,37 @@ Public Class atcSWMMOptions
         Dim lEndTimeString As String = Format(lEDate(3), "00") & ":" & Format(lEDate(4), "00") & ":00"
 
         For Each lLine As String In aContents.Split(vbCrLf)
-            Dim lOption As String = lLine.Substring(1, 21).ToUpper
-            Dim lValue As String = lLine.Substring(23).Trim
+            lLine = lLine.Trim()
+            Dim lItems() As String = Regex.Split(lLine, "\s+")
+            Dim lOption As String = lItems(0).ToUpper.PadRight(19)
+            Dim lValue As String = lItems(1)
             Select Case lOption
-                Case "FLOW_UNITS           " : FlowUnits = lValue
-                Case "INFILTRATION         " : InfiltrationMethod = lValue
-                Case "FLOW_ROUTING         " : FlowRouting = lValue
-                Case "START_DATE           " : lStartDateString = lValue
-                Case "START_TIME           " : lStartTimeString = lValue
-                Case "REPORT_START_DATE    " 'lStartDateString = lValue
-                Case "REPORT_START_TIME    " 'lStartTimeString = lValue
-                Case "END_DATE             " : lEndDateString = lValue
-                Case "END_TIME             " : lEndTimeString = lValue
-                Case "SWEEP_START          " : SweepStart = lValue
-                Case "SWEEP_END            " : SweepEnd = lValue
-                Case "DRY_DAYS             " : DryDays = lValue
-                Case "REPORT_STEP          " : ReportStep = lValue
-                Case "WET_STEP             " : WetStep = lValue
-                Case "DRY_STEP             " : DryStep = lValue
-                Case "ROUTING_STEP         " : RoutingStep = lValue
-                Case "ALLOW_PONDING        " : AllowPonding = lValue
-                Case "INERTIAL_DAMPING     " : InertialDamping = lValue
-                Case "VARIABLE_STEP        " : VariableStep = lValue
-                Case "LENGTHENING_STEP     " : LengtheningStep = lValue
-                Case "MIN_SURFAREA         " : MinSurfArea = lValue
-                Case "NORMAL_FLOW_LIMITED  " : NormalFlowLimited = lValue
-                Case "SKIP_STEADY_STATE    " : SkipSteadyState = lValue
-                Case "IGNORE_RAINFALL      " : IgnoreRainfall = lValue
-                Case "FORCE_MAIN_EQUATION  " : ForceMainEquation = lValue
-                Case "LINK_OFFSETS         " : LinkOffsets = lValue
+                Case "FLOW_UNITS         " : FlowUnits = lValue
+                Case "INFILTRATION       " : InfiltrationMethod = lValue
+                Case "FLOW_ROUTING       " : FlowRouting = lValue
+                Case "START_DATE         " : lStartDateString = lValue
+                Case "START_TIME         " : lStartTimeString = lValue
+                Case "REPORT_START_DATE  " 'lStartDateString = lValue
+                Case "REPORT_START_TIME  " 'lStartTimeString = lValue
+                Case "END_DATE           " : lEndDateString = lValue
+                Case "END_TIME           " : lEndTimeString = lValue
+                Case "SWEEP_START        " : SweepStart = lValue
+                Case "SWEEP_END          " : SweepEnd = lValue
+                Case "DRY_DAYS           " : DryDays = Integer.Parse(lValue)
+                Case "REPORT_STEP        " : ReportStep = lValue
+                Case "WET_STEP           " : WetStep = lValue
+                Case "DRY_STEP           " : DryStep = lValue
+                Case "ROUTING_STEP       " : RoutingStep = lValue
+                Case "ALLOW_PONDING      " : AllowPonding = lValue
+                Case "INERTIAL_DAMPING   " : InertialDamping = lValue
+                Case "VARIABLE_STEP      " : VariableStep = lValue
+                Case "LENGTHENING_STEP   " : LengtheningStep = lValue
+                Case "MIN_SURFAREA       " : MinSurfArea = lValue
+                Case "NORMAL_FLOW_LIMITED" : NormalFlowLimited = lValue
+                Case "SKIP_STEADY_STATE  " : SkipSteadyState = lValue
+                Case "IGNORE_RAINFALL    " : IgnoreRainfall = lValue
+                Case "FORCE_MAIN_EQUATION" : ForceMainEquation = lValue
+                Case "LINK_OFFSETS       " : LinkOffsets = lValue
                 Case Else
                     Logger.Dbg("Option '" & lOption & "' is unknown")
             End Select

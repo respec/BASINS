@@ -3,6 +3,8 @@ Imports System.IO
 Imports MapWinUtility
 Imports atcUtility
 Imports System.Text
+Imports System.Text.RegularExpressions
+
 
 Public Class atcSWMMTemperature
     Implements IBlock
@@ -36,6 +38,7 @@ Public Class atcSWMMTemperature
         Timeseries = New atcData.atcTimeseries(pSWMMProject)
         Timeseries.Attributes.SetValue("Location", "")
         Timeseries.Attributes.SetValue("Constituent", "ATEM")
+        Timeseries.ValuesNeedToBeRead = True
 
         'TODO: populate Timeseries
         'Need to do a delayed action here
@@ -45,12 +48,16 @@ Public Class atcSWMMTemperature
         Dim lWord As String = "TIMESERIES"
         Dim laTSFile As String = String.Empty
         For I As Integer = 0 To lLines.Length - 1
-            If Not lLines(I).StartsWith(";") Then
-                laTSFile = lLines(I).Substring(lWord.Length).Trim()
-                'Assuming there is only one TS for Temp
-                If laTSFile.Length > 0 And laTSFile.EndsWith("T") Then
-                    Timeseries.Attributes.SetValue("Location", laTSFile)
+            If Not lLines(I).Trim().StartsWith(";") Then
+                If lLines(I).StartsWith(lWord) Then
+                    laTSFile = lLines(I).Trim().Substring(lWord.Length).Trim()
+                    If laTSFile.Length > 0 Then
+                        Timeseries.Attributes.SetValue("Scenario", laTSFile)
+                        Timeseries.Attributes.SetValue("Location", pSWMMProject.FilterFileName(laTSFile.TrimEnd("T")))
+                    End If
                 Else
+                    'Assuming there is only one TS for Temp
+
                     'Dim lDef As New atcData.atcDefinedValue
                     'With lDef
                     '    .Definition = New atcData.atcAttributeDefinition()
@@ -68,23 +75,19 @@ Public Class atcSWMMTemperature
                     Dim lLine As String = lLines(I)
                     Dim laKey As String = StrSplit(lLine, " ", "")
                     If AuxiParms.ContainsKey(laKey.Trim()) Then
-                        AuxiParms.Item(laKey) &= vbCrLf & lLine.Trim()
+                        AuxiParms.Item(laKey.Trim()) &= vbCrLf & lLine.Trim()
                     Else
-                        AuxiParms.Add(laKey, lLine.Trim())
+                        AuxiParms.Add(laKey.Trim(), lLine.Trim())
                     End If
                 End If
             End If
         Next
     End Sub
 
-    Public Sub ReadDataExternal(ByVal aFilename As String, ByVal aTS As atcData.atcTimeseries)
-
-    End Sub
-
     Public Overrides Function ToString() As String
         Dim lSB As New StringBuilder
 
-        If TimeSeries IsNot Nothing Then
+        If Timeseries IsNot Nothing Then
             lSB.AppendLine(pName)
             lSB.Append(StrPad("TIMESERIES", 12, " ", False))
             lSB.Append(" ")
@@ -92,7 +95,7 @@ Public Class atcSWMMTemperature
             lSB.Append(" ")
             lSB.AppendLine()
         End If
-        
+
         Return lSB.ToString
     End Function
 
@@ -122,7 +125,6 @@ Public Class atcSWMMTemperature
     End Function
 
     Public Function TimeSeriesToFile() As Boolean
-
         If Timeseries IsNot Nothing Then
             Dim lFileName As String = PathNameOnly(Me.pSWMMProject.FileName) & g_PathChar & Timeseries.Attributes.GetValue("Location") & "T.DAT"
             Dim lSB As New StringBuilder
@@ -131,4 +133,44 @@ Public Class atcSWMMTemperature
         End If
 
     End Function
+
+    Public Sub TimeseriesFromFile(ByVal aFilename As String, ByVal aTS As atcData.atcTimeseries)
+        If Not aTS.ValuesNeedToBeRead Then
+            Exit Sub
+        End If
+        Dim lStn As String = aTS.Attributes.GetValue("Location")
+        Dim lDates As New List(Of Double)
+        Dim lValues As New List(Of Double)
+
+        'Set up common date array
+
+        Dim lSR As System.IO.StreamReader = New System.IO.StreamReader(aFilename)
+        While Not lSR.EndOfStream
+            Dim line As String = lSR.ReadLine()
+            Dim lItems() As String = Regex.Split(line.Trim(), "\s+")
+            Dim lDateParts() As String = lItems(0).Split("/")
+            Dim lTimeParts() As String = lItems(1).Split(":")
+
+            'If lItems(0) <> lStn Then
+            '    Continue While
+            'End If
+
+            'SWMM5 denote a day has 0 hour to 23 hour, but atcTimeseries denote a day as 1 ~ 24 hour
+            Dim ldate As Double = Jday(Integer.Parse(lDateParts(2)), Integer.Parse(lDateParts(0)), Integer.Parse(lDateParts(1)), Integer.Parse(lTimeParts(0)) + 1, Integer.Parse(lTimeParts(1)), 0)
+            lDates.Add(ldate)
+            lValues.Add(Double.Parse(lItems(lItems.Length - 1)))
+        End While
+
+        aTS.ValuesNeedToBeRead = False
+
+        Dim lDates1 As New atcData.atcTimeseries(Nothing)
+        lDates1.numValues = lDates.Count
+        lDates1.Values = lDates.ToArray()
+
+        aTS.numValues = lDates.Count
+        aTS.Dates = lDates1
+        aTS.Values = lValues.ToArray
+        lSR.Close()
+
+    End Sub
 End Class
