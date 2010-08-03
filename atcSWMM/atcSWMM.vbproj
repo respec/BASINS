@@ -56,13 +56,18 @@
   <ItemGroup>
     <Compile Include="atcSWMMBlock.vb" />
     <Compile Include="atcSWMMCatchments.vb" />
+    <Compile Include="atcSWMMControls.vb" />
     <Compile Include="atcSWMMEvaporation.vb" />
     <Compile Include="atcSWMMOptions.vb" />
+    <Compile Include="atcSWMMPollutants.vb" />
+    <Compile Include="atcSWMMPumps.vb" />
     <Compile Include="atcSWMMRainGages.vb" />
     <Compile Include="atcSWMMConduits.vb" />
     <Compile Include="atcSWMMLanduses.vb" />
     <Compile Include="atcSWMMProject.vb" />
     <Compile Include="atcSWMMNodes.vb" />
+    <Compile Include="atcSWMMReport.vb" />
+    <Compile Include="atcSWMMTags.vb" />
     <Compile Include="atcSWMMTemperature.vb" />
   </ItemGroup>
   <ItemGroup>

@@ -3,6 +3,7 @@ Imports System.IO
 Imports MapWinUtility
 Imports atcUtility
 Imports System.Text
+Imports System.Text.RegularExpressions
 Imports atcData
 
 Public Class atcSWMMConduits
@@ -36,7 +37,64 @@ Public Class atcSWMMConduits
     End Sub
 
     Public Sub FromString(ByVal aContents As String) Implements IBlock.FromString
-        'TODO: fill this in
+        'Break it up into multiple lines
+        Dim lLines() As String = aContents.Split(vbCrLf)
+        For I As Integer = 1 To lLines.Length - 1
+            If Not lLines(I).StartsWith(";") And lLines(I).Length > 2 Then
+                Dim lItems() As String = Regex.Split(lLines(I).Trim(), "\s+")
+                Dim lConduit As atcSWMMConduit = Me(lItems(0))
+                If lConduit Is Nothing Then
+                    lConduit = New atcSWMMConduit
+                End If
+                For J As Integer = 0 To lItems.Length - 1
+                    Select Case J
+                        Case 0 : lConduit.Name = lItems(J)
+                        Case 1
+                            If pSWMMProject.Nodes(lItems(J)) Is Nothing Then
+                                Dim lnewNode As New atcSWMMNode
+                                With lnewNode
+                                    .Name = lItems(J).Trim()
+                                End With
+                                lConduit.InletNode = lnewNode
+                            Else
+                                lConduit.InletNode = pSWMMProject.Nodes(lItems(J))
+                            End If
+                        Case 2
+                            If pSWMMProject.Nodes(lItems(J)) Is Nothing Then
+                                Dim lnewNode As New atcSWMMNode
+                                With lnewNode
+                                    .Name = lItems(J).Trim()
+                                End With
+                                lConduit.OutletNode = lnewNode
+                            Else
+                                lConduit.OutletNode = pSWMMProject.Nodes(lItems(J))
+                            End If
+                        Case 3
+                            Dim lnewDef As New atcData.atcDefinedValue
+                            With lnewDef
+                                .Definition = New atcData.atcAttributeDefinition
+                                .Definition.Name = lItems(0)
+                                .Value = Double.Parse(lItems(J))
+                            End With
+                            lConduit.Length = lnewDef
+                        Case 4
+                            lConduit.ManningsN = Double.Parse(lItems(J))
+                        Case 5
+                            lConduit.InletOffset = Double.Parse(lItems(J))
+                        Case 6
+                            lConduit.OutletOffset = Double.Parse(lItems(J))
+                        Case 7
+                            lConduit.InitialFlow = Double.Parse(lItems(J))
+                        Case 8
+                            lConduit.MaxFlow = Double.Parse(lItems(J))
+                    End Select
+                Next
+                If Not Me.Contains(lItems(0)) Then
+                    Me.Add(lConduit)
+                    Me.ChangeItemKey(lConduit, lItems(0))
+                End If
+            End If
+        Next
     End Sub
 
     Public Overrides Function ToString() As String

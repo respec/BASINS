@@ -3,6 +3,7 @@ Imports System.IO
 Imports MapWinUtility
 Imports atcUtility
 Imports System.Text
+Imports System.Text.RegularExpressions
 
 Public Class atcSWMMCatchments
     Inherits KeyedCollection(Of String, atcSWMMCatchment)
@@ -37,7 +38,92 @@ Public Class atcSWMMCatchments
     End Sub
 
     Public Sub FromString(ByVal aContents As String) Implements IBlock.FromString
-        'TODO: fill this in
+        'Break it up into multiple lines
+        Dim lLines() As String = aContents.Split(vbCrLf)
+        Dim lSectionName As String = lLines(0)
+        For I As Integer = 1 To lLines.Length - 1
+            If Not lLines(I).StartsWith(";") And lLines(I).Length > 2 Then
+                Dim lItems() As String = Regex.Split(lLines(I).Trim(), "\s+")
+                Dim lSub As atcSWMMCatchment = Me(lItems(0))
+                If lSub Is Nothing Then
+                    lSub = New atcSWMMCatchment
+                End If
+                For J As Integer = 0 To lItems.Length - 1
+                    Select Case J
+                        Case 0 : lSub.Name = lItems(J)
+                        Case 1
+                            If lSectionName = "[SUBCATCHMENTS]" Then
+                                lSub.RainGage = pSWMMProject.RainGages(lItems(J))
+                            ElseIf lSectionName = "[SUBAREAS]" Then
+                                lSub.ManningsNImperv = Double.Parse(lItems(J))
+                            ElseIf lSectionName = "[INFILTRATION]" Then
+                                lSub.MaxInfiltRate = Double.Parse(lItems(J))
+                            ElseIf lSectionName = "[COVERAGES]" Then
+                                If Not lSub.Landuses.ContainsKey(lItems(J)) Then
+                                    lSub.Landuses.Add(lItems(J), 0.0)
+                                End If
+                            ElseIf lSectionName = "[LOADINGS]" Then
+                                If Not lSub.PollutantLoads.ContainsKey(lItems(J)) Then
+                                    lSub.PollutantLoads.Add(lItems(J), 0.0)
+                                End If
+                            End If
+                        Case 2
+                            If lSectionName = "[SUBCATCHMENTS]" Then
+                                lSub.OutletNode = pSWMMProject.Nodes(lItems(J))
+                            ElseIf lSectionName = "[SUBAREAS]" Then
+                                lSub.ManningsNPerv = Double.Parse(lItems(J))
+                            ElseIf lSectionName = "[INFILTRATION]" Then
+                                lSub.MinInfiltRate = Double.Parse(lItems(J))
+                            ElseIf lSectionName = "[COVERAGES]" Then
+                                lSub.Landuses(lItems(1)) = Double.Parse(lItems(J))
+                            ElseIf lSectionName = "[LOADINGS]" Then
+                                lSub.PollutantLoads(lItems(1)) = Double.Parse(lItems(J))
+                            End If
+                        Case 3
+                            If lSectionName = "[SUBCATCHMENTS]" Then
+                                lSub.Area = Double.Parse(lItems(J))
+                            ElseIf lSectionName = "[SUBAREAS]" Then
+                                lSub.SlopeImperv = Double.Parse(lItems(J))
+                            ElseIf lSectionName = "[INFILTRATION]" Then
+                                lSub.DecayRateConstant = Double.Parse(lItems(J))
+                            End If
+                        Case 4
+                            If lSectionName = "[SUBCATCHMENTS]" Then
+                                lSub.DepressionStorageImperv = Double.Parse(lItems(J))
+                            ElseIf lSectionName = "[SUBAREAS]" Then
+                                lSub.SlopePerv = Double.Parse(lItems(J))
+                            ElseIf lSectionName = "[INFILTRATION]" Then
+                                lSub.DryTime = Double.Parse(lItems(J))
+                            End If
+                        Case 5
+                            If lSectionName = "[SUBCATCHMENTS]" Then
+                                lSub.Width = Double.Parse(lItems(J))
+                            ElseIf lSectionName = "[SUBAREAS]" Then
+                                lSub.PercentZeroStorage = Double.Parse(lItems(J))
+                            ElseIf lSectionName = "[INFILTRATION]" Then
+                                lSub.MaxInfiltRate = Double.Parse(lItems(J))
+                            End If
+                        Case 6
+                            If lSectionName = "[SUBCATCHMENTS]" Then
+                                lSub.Slope = Double.Parse(lItems(J))
+                            ElseIf lSectionName = "[SUBAREAS]" Then
+                                lSub.OutletNodeID = lItems(J) 'Route To??
+                            End If
+                        Case 7
+                            If lSectionName = "[SUBCATCHMENTS]" Then
+                                lSub.CurbLength = Double.Parse(lItems(J))
+                            ElseIf lSectionName = "[SUBAREAS]" Then
+                                lSub.PercentRouted = Double.Parse(lItems(J))
+                            End If
+                        Case 8 : lSub.SnowPackName = lItems(J)
+                    End Select
+                Next
+                If Not Me.Contains(lItems(0).Trim()) Then
+                    Me.Add(lSub)
+                    Me.ChangeItemKey(lSub, lItems(0).Trim())
+                End If
+            End If
+        Next
     End Sub
 
     Public Overrides Function ToString() As String
@@ -282,7 +368,15 @@ Public Class atcSWMMCatchment
     Public InitialDeficit As Double = -1.0                     'used if Infiltration Method is "GREEN_AMPT"
     Public CurveNumber As Double = -1.0                        'used if Infiltration Method is "CURVE_NUMBER"
 
+    Public SlopeImperv As Double = 0.05
+    Public SlopePerv As Double = 0.05
+    Public Landuses As New Dictionary(Of String, Double)
+    Public PollutantLoads As New Dictionary(Of String, Double)
     Public X() As Double
     Public Y() As Double
 End Class
+
+
+
+
 

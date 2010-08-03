@@ -1,8 +1,9 @@
 Imports System.Text
+Imports System.Text.RegularExpressions
 Imports System.Collections.Specialized
 
 Imports MapWinUtility
-
+Imports atcData
 Imports atcUtility
 
 Public Class atcSWMMProject
@@ -24,6 +25,9 @@ Public Class atcSWMMProject
     Public RainGages As atcSWMMRainGages
     Public Evaporation As atcSWMMEvaporation
     Public Temperature As atcSWMMTemperature
+    'Public Pollutants As atcSWMMPollutants
+    'Public Pumps As atcSWMMPumps
+    'Public Controls As atcSWMMControls
 
     Public FileName As String = ""
     Public Title As String = ""
@@ -76,6 +80,10 @@ Public Class atcSWMMProject
         Blocks.Add(RainGages)
         Blocks.Add(Evaporation)
         Blocks.Add(Temperature)
+
+        'Blocks.Add(Controls)
+        'Blocks.Add(Pumps)
+        'Blocks.Add(Pollutants)
     End Sub
 
     Public Property IsMetric() As Boolean
@@ -134,12 +142,12 @@ Public Class atcSWMMProject
         End If
     End Sub
 
-    Public Function Load(ByVal aFileName As String) As Boolean
-        If Not IO.File.Exists(aFileName) Then
-            Logger.Msg("File '" & aFileName & "' not found", "SWMMProjectLoadProblem")
+    Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
+        Clear()
+        If Not MyBase.Open(aFileName, aAttributes) Then
             Return False
         Else
-            Clear()
+            Blocks.Clear()
             FileName = aFileName
             Dim lSR As New IO.StreamReader(aFileName)
             'First set up a lookup using Blocks
@@ -160,52 +168,81 @@ Public Class atcSWMMProject
                         'TODO:parse into Evaporation or Temperature block
                         Dim lLines() As String = lBlock.Content.Split(vbCrLf)
                         Dim laTSFile As String = String.Empty
-                        Dim lLine As String = String.Empty
+
                         For I As Integer = 0 To lLines.Length - 1
-                            If Not lLines(I).StartsWith(";") And lLines(I).Length > 0 Then
-                                lLine = lLines(I)
-                                Dim lItems() As String = lLine.Split(" ")
-                                If lLine.Contains("FILE") Then
-                                    If Temperature.Timeseries.Attributes.GetValue("Location") = lItems(0) Then
-                                        If lItems(0).Contains(":T") Then
-                                            Temperature.ReadDataExternal(lItems(2).Trim().Trim(""""), Temperature.Timeseries)
-                                        ElseIf lItems(0).Contains(":E") Then
-                                            Evaporation.ReadDataExternal(lItems(2).Trim().Trim(""""), Evaporation.Timeseries)
-                                        End If
-                                    End If
+                            If Not lLines(I).Trim().StartsWith(";") And lLines(I).Trim().Length > 0 Then
+
+                                Dim lItems() As String = Regex.Split(lLines(I).Trim(), "\s+")
+                                Dim lScenario As String = lItems(0).Trim()
+                                Dim lBlockWithTS As Object = Nothing
+                                If Temperature.Timeseries.Attributes.GetValue("Scenario") = lScenario Then
+                                    lBlockWithTS = Temperature
+                                ElseIf Evaporation.Timeseries.Attributes.GetValue("Scenario") = lScenario Then
+                                    lBlockWithTS = Evaporation
                                 Else
-
-                                    For Each lGage As atcSWMMRainGage In RainGages
-                                        If lGage.TimeSeries.Attributes.GetValue("Scenario") = lItems(0) Then
-
+                                    For Each lRaingage As atcSWMMRainGage In RainGages
+                                        If lRaingage.TimeSeries.Attributes.GetValue("Scenario") = lScenario Then
+                                            lBlockWithTS = RainGages
+                                            Exit For
                                         End If
                                     Next
+                                    'perhaps for each of other type of objects
+                                End If
+
+                                If lLines(I).Contains("FILE") Then
+                                    'TODO: need to anticipate multiple TS of any block type
+                                    If lBlockWithTS IsNot Nothing Then
+                                        lBlockWithTS.TimeseriesFromFile(lItems(2).Trim().Trim(""""), lBlockWithTS.Timeseries)
+                                    End If
+                                Else
+                                    'assuming only raingage use infile timeseries as in Example1.inp
+                                    'assuming dates is not give, only time (continuous?) as in Example1.inp
+
+                                    If lBlockWithTS.TimeSeries.ValuesNeedToBeRead Then
+                                        lBlockWithTS.AddValue(lLines(I))
+                                    End If
                                 End If
                             End If
                         Next
+                    Case "[RAINGAGES]", "[SYMBOLS]" : RainGages.FromString(lBlock.Name & vbCrLf & lBlock.Content)
+                        'any time multiple sections are used to build a single object type, the block's name is needed
+                        'The block's name is not part of the "content" during ReadBlockContents above
 
-
-                    Case "[RAINGAGES]" : RainGages.FromString(lBlock.Content)
-                        'Case "[CONDUITS]" : Conduits.FromString(lBlockContents)
-                    Case "[RAINFALL]", "[SUBCATCHMENTS]", "[SUBAREAS]", "[INFILTRATION]", _
-                         "[CONDUITS]", "[XSECTIONS]", "[INFLOWS]", "[POLLUTANTS]", "[LOADINGS]", _
-                         "[BUILDUP]", "[WASHOFF]", "[LOSSES]", "[LANDUSES]", "[COVERAGES]", _
-                         "[REPORT]", "[TAGS]", "[MAP]", "[COORDINATES]", "[VERTICES]", _
-                         "[POLYGONS]", "[SYMBOLS]", "[BACKDROP]", "[TAGS]", "[LABELS]", _
-                         "[STORAGE]", "[PUMPS]", "[CONTROLS]", "[DWF]", "[CURVES]", "[PATTERNS]"
-
-                        'Class.FromString(lBlock.Content)
-
-                        'TODO: parse these into better objects!
-                        'TODO: [JUNCTIONS] and [OUTFALLS] currently live inside Nodes
-                        'TODO: [XSECTIONS] lives inside Conduits
-                    Case Else
-                        Logger.Dbg("'" & lBlock.Name & "' is not a known input block  ")
+                        'Case "[JUNCTIONS]", "[OUTFALLS]", "[STORAGE]", "[COORDINATES]", "[INFLOWS]" : Nodes.FromString(lBlock.Content)
+                        'Case "[CONDUITS]", "[XSECTIONS]", "[LOSSES]", "[VERTICES]" : Conduits.FromString(lBlock.Content)
+                        'Case "[SUBCATCHMENTS]", "[SUBAREAS]", "[INFILTRATION]", "[COVERAGES]", "[LOADINGS]", "[Polygons]" : Catchments.FromString(lBlock.Content)
+                        'Case "[LANDUSES]" : Landuses.FromString(lBlock.Content)
+                        'Case "[POLLUTANTS]" : Pollutants.FromString(lBlock.Content)
+                        'Case "[PUMPS]" : Pumps.FromString(lBlock.Content)
+                        'Case "[CONTROLS]" : Controls.FromString(lBlock.Content)
+                        'Case "[REPORT]" : Report.FromString(lBlock.Content)
+                        'Case "[TAGS]" : Tags.FromString(lBlock.Content)
+                        'Case "[MAP]" : Map.FromString(lBlock.Content)
+                        'Case "[BACKDROP]"
+                        'Case "[LABELS]"
+                        'Case "[CURVES]"
+                        'Case "[DWF]"
+                        'Case "[PATTERNS]"
+                        'Case Else
+                        '    'Logger.Dbg("'" & lBlock.Name & "' is not a known input block  ")
                 End Select
-
             Next
 
+            If RainGages IsNot Nothing Then
+                For Each lRaingage As atcSWMMRainGage In RainGages
+                    If lRaingage.TimeSeries IsNot Nothing Then
+                        DataSets.Add("Rain", lRaingage.TimeSeries)
+                    End If
+                Next
+            End If
+            If Temperature IsNot Nothing AndAlso Temperature.Timeseries IsNot Nothing Then
+                DataSets.Add("Temperature", Temperature.Timeseries)
+            End If
+            If Evaporation IsNot Nothing AndAlso Evaporation.Timeseries IsNot Nothing Then
+                DataSets.Add("Evaporation", Evaporation.Timeseries)
+            End If
 
+            Save(IO.Path.Combine(IO.Path.GetDirectoryName(aFileName), IO.Path.GetFileNameWithoutExtension(aFileName) & "_test.inp"), EnumExistAction.ExistReplace)
         End If
     End Function
 
@@ -240,100 +277,101 @@ Public Class atcSWMMProject
     Public Overrides Function Save(ByVal aFileName As String, _
                           Optional ByVal ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
         Dim lSW As New IO.StreamWriter(aFileName)
-        Dim lBlocksWritten As New StringBuilder
+        'Dim lBlocksWritten As New StringBuilder
         FileName = aFileName
 
-        lBlocksWritten.Append("[TITLE]")
+        'lBlocksWritten.Append("[TITLE]")
         lSW.WriteLine("[TITLE]")
         lSW.WriteLine(Title)
         lSW.WriteLine()
 
-        lBlocksWritten.Append("[OPTIONS]")
-        lSW.WriteLine(Options.ToString)
-
-        lBlocksWritten.Append("[EVAPORATION]")
-        lSW.WriteLine(Evaporation.ToString)
-
-        lBlocksWritten.Append("[TEMPERATURE]")
-        lSW.WriteLine(Temperature.ToString)
-
-        lBlocksWritten.Append("[RAINGAGES]")
-        lSW.WriteLine(RainGages.ToString)
-        RainGages.TimeSeriesToFile()
-
-        lBlocksWritten.Append("[SUBCATCHMENTS]")
-        lSW.WriteLine(Catchments.ToString)
-
-        lBlocksWritten.Append("[SUBAREAS]")
-        lSW.WriteLine(Catchments.SubareasToString)
-
-        lBlocksWritten.Append("[INFILTRATION]")
-        lSW.WriteLine(Catchments.InfiltrationToString)
-
-        lBlocksWritten.Append("[JUNCTIONS][OUTFALLS]")
-        lSW.WriteLine(Nodes.ToString)
-
-        lBlocksWritten.Append("[CONDUITS][XSECTIONS]")
-        lSW.WriteLine(Conduits.ToString)
-
-        lBlocksWritten.Append("[LOSSES]")
-        lSW.WriteLine(Losses.ToString)
-
-        lBlocksWritten.Append("[LANDUSES]")
-        lSW.WriteLine(Landuses.ToString)
-
-        lBlocksWritten.Append("[COVERAGES]")
-        lSW.WriteLine(Landuses.CoveragesToString)
-
-        lBlocksWritten.Append("[TIMESERIES]")
-        lSW.WriteLine(atcSWMMEvaporation.TimeSeriesHeaderToString)
-        If Options.EJDate - Options.SJDate < 30 Then
-            Evaporation.TimeSeriesToStream(lSW)
-            Temperature.TimeSeriesToStream(lSW)
-        Else
-            'more than 30 days, write to file
-            lSW.WriteLine(Evaporation.TimeSeriesFileNamesToString)
-            lSW.WriteLine(Temperature.TimeSeriesFileNamesToString)
-            Evaporation.TimeSeriesToFile()
-            Temperature.TimeSeriesToFile()
-        End If
-        lSW.WriteLine()
-
-        lBlocksWritten.Append("[REPORT]")
-        lSW.WriteLine(Report.ToString)
-
-        lBlocksWritten.Append("[TAGS]")
-        lSW.WriteLine(Tags.ToString)
-
-        lBlocksWritten.Append("[MAP]")
-        lSW.WriteLine(Map.ToString)
-
-        lBlocksWritten.Append("[COORDINATES]")
-        lSW.WriteLine(Nodes.CoordinatesToString)
-
-        lBlocksWritten.Append("[VERTICES]")
-        lSW.WriteLine(Conduits.VerticesToString)
-
-        lBlocksWritten.Append("[POLYGONS]")
-        lSW.WriteLine(Catchments.PolygonsToString)
-
-        lBlocksWritten.Append("[SYMBOLS]")
-        lSW.WriteLine(RainGages.CoordinatesToString)
-
-        lBlocksWritten.Append("[BACKDROP]")
-        If BackdropFile.Length > 0 Then
-            lSW.WriteLine("")
-            lSW.WriteLine("[BACKDROP]")
-            lSW.WriteLine("FILE       " & """" & BackdropFile & """")
-            lSW.WriteLine("DIMENSIONS " & Format(BackdropX1, "0.000") & " " & Format(BackdropY1, "0.000") & " " & Format(BackdropX2, "0.000") & " " & Format(BackdropY2, "0.000"))
-        End If
-
-        'Write any blocks not already written above
         For Each lBlock As IBlock In Blocks
-            If Not lBlocksWritten.ToString.Contains(lBlock.Name.ToUpper) Then
-                lSW.WriteLine(lBlock.ToString)
-            End If
+            Select Case lBlock.Name
+                Case "[OPTIONS]" : lSW.WriteLine(Options.ToString)
+                Case "[EVAPORATION]" : lSW.WriteLine(Evaporation.ToString)
+
+                Case "[TEMPERATURE]" : lSW.WriteLine(Temperature.ToString)
+
+                Case "[RAINGAGES]"
+                    lSW.WriteLine(RainGages.ToString)
+                    RainGages.TimeSeriesToFile()
+
+                Case "[SUBCATCHMENTS]"
+                    lSW.WriteLine(Catchments.ToString)
+
+                Case "[SUBAREAS]"
+                    lSW.WriteLine(Catchments.SubareasToString)
+
+                Case "[INFILTRATION]"
+                    lSW.WriteLine(Catchments.InfiltrationToString)
+
+                Case "[JUNCTIONS][OUTFALLS]"
+                    lSW.WriteLine(Nodes.ToString)
+
+                Case "[CONDUITS][XSECTIONS]"
+                    lSW.WriteLine(Conduits.ToString)
+
+                Case "[LOSSES]"
+                    lSW.WriteLine(Losses.ToString)
+
+                Case "[LANDUSES]"
+                    lSW.WriteLine(Landuses.ToString)
+
+                Case "[COVERAGES]"
+                    lSW.WriteLine(Landuses.CoveragesToString)
+
+                Case "[TIMESERIES]"
+                    lSW.WriteLine(atcSWMMEvaporation.TimeSeriesHeaderToString)
+                    If Options.EJDate - Options.SJDate < 30 Then
+                        Evaporation.TimeSeriesToStream(lSW)
+                        Temperature.TimeSeriesToStream(lSW)
+                    Else
+                        'more than 30 days, write to file
+                        lSW.WriteLine(Evaporation.TimeSeriesFileNamesToString)
+                        lSW.WriteLine(Temperature.TimeSeriesFileNamesToString)
+                        Evaporation.TimeSeriesToFile()
+                        Temperature.TimeSeriesToFile()
+                    End If
+                    lSW.WriteLine()
+
+                Case "[REPORT]"
+                    lSW.WriteLine(Report.ToString)
+
+                Case "[TAGS]"
+                    lSW.WriteLine(Tags.ToString)
+
+                Case "[MAP]"
+                    lSW.WriteLine(Map.ToString)
+
+                Case "[COORDINATES]"
+                    lSW.WriteLine(Nodes.CoordinatesToString)
+
+                Case "[VERTICES]"
+                    lSW.WriteLine(Conduits.VerticesToString)
+
+                Case "[POLYGONS]"
+                    lSW.WriteLine(Catchments.PolygonsToString)
+
+                Case "[SYMBOLS]"
+                    lSW.WriteLine(RainGages.CoordinatesToString)
+
+                Case "[BACKDROP]"
+                    If BackdropFile.Length > 0 Then
+                        lSW.WriteLine("")
+                        lSW.WriteLine("[BACKDROP]")
+                        lSW.WriteLine("FILE       " & """" & BackdropFile & """")
+                        lSW.WriteLine("DIMENSIONS " & Format(BackdropX1, "0.000") & " " & Format(BackdropY1, "0.000") & " " & Format(BackdropX2, "0.000") & " " & Format(BackdropY2, "0.000"))
+                    End If
+
+                Case Else
+                    'Write any blocks not already written above
+                    'For Each lBlock As IBlock In Blocks
+                    'If Not lBlocksWritten.ToString.Contains(lBlock.Name.ToUpper) Then
+                    lSW.WriteLine(lBlock.ToString)
+                    'End If
+            End Select
         Next
+
 
         lSW.Close()
 
@@ -368,7 +406,6 @@ Public Class atcSWMMProject
             lSB.Append(StrPad(Format(aTimeSeries.Values(lIndex + 1), "0.000"), 10, " ", False))
             lSB.Append(vbCrLf)
         Next
-
         Return lSB.ToString
     End Function
 
@@ -411,4 +448,22 @@ Public Class atcSWMMProject
             Logger.Msg("Cannot find SWMM 5.0 Input File " & aInputFileName)
         End If
     End Sub
+
+    ''' <summary>
+    ''' Recursive, only use on short string!
+    ''' </summary>
+    ''' <param name="aFileName"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Function FilterFileName(ByVal aFileName As String) As String
+        Dim lInValidChars() As Char = {"/"c, "\"c, ":"c, "*"c, "?"c, """", "|"c, "<"c, ">"c}
+        Dim lNewName As String = aFileName
+        For Each lInvalidChar As Char In lInValidChars
+            If aFileName.IndexOf(lInvalidChar) >= 0 Then
+                lNewName = aFileName.Replace(lInvalidChar, "")
+                lNewName = FilterFileName(lNewName)
+            End If
+        Next
+        Return lNewName
+    End Function
 End Class

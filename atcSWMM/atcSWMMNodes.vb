@@ -3,6 +3,7 @@ Imports System.IO
 Imports MapWinUtility
 Imports atcUtility
 Imports System.Text
+Imports System.Text.RegularExpressions
 
 Public Class atcSWMMNodes
     Inherits KeyedCollection(Of String, atcSWMMNode)
@@ -32,7 +33,65 @@ Public Class atcSWMMNodes
     End Sub
 
     Public Sub FromString(ByVal aContents As String) Implements IBlock.FromString
-        'TODO: fill this in
+        'Break it up into multiple lines
+        Dim lLines() As String = aContents.Split(vbCrLf)
+        Dim lType As String = lLines(0).TrimStart("[").TrimEnd("]")
+        For I As Integer = 1 To lLines.Length - 1
+            If Not lLines(I).StartsWith(";") And lLines(I).Length > 2 Then
+                lLines(I) = lLines(I).TrimStart(" ")
+                Dim lItems() As String = Regex.Split(lLines(I).Trim(), "\s+")
+                Dim lNode As atcSWMMNode = Me(lItems(0))
+                If lNode Is Nothing Then
+                    lNode = New atcSWMMNode
+                End If
+                lNode.Type = lType
+                For J As Integer = 0 To lItems.Length - 1
+                    Select Case J
+                        Case 0 : lNode.Name = lItems(J)
+                        Case 1
+                            If Not lType.ToLower = "coordinates" Then
+                                lNode.InvertElevation = Double.Parse(lItems(J))
+                            Else
+                                lNode.XPos = Double.Parse(lItems(J))
+                            End If
+                        Case 2
+                            If lType.ToLower = "junctions" Or lType.ToLower = "storage" Then
+                                lNode.MaxDepth = Double.Parse(lItems(J))
+                            ElseIf lType.ToLower = "outfalls" Then
+                                lNode.OutfallType = lItems(J).Trim()
+                            ElseIf lType.ToLower = "coordinates" Then
+                                lNode.YPos = Double.Parse(lItems(J))
+                            End If
+                        Case 3
+                            If lType.ToLower = "junctions" Or lType.ToLower = "storage" Then
+                                lNode.InitDepth = Double.Parse(lItems(J))
+                            ElseIf lType.ToLower = "outfalls" Then
+                                lNode.StageTable = lItems(J).Trim() 'not sure how
+                            End If
+                        Case 4
+                            If lType.ToLower = "junctions" Then
+                                lNode.SurchargeDepth = Double.Parse(lItems(J))
+                            ElseIf lType.ToLower = "outfalls" Then
+                                lNode.TideGate = lItems(J).Trim()
+                            ElseIf lType.ToLower = "storage" Then
+                                lNode.ShapeCurve = lItems(J).Trim()
+                            End If
+                        Case 5
+                            If lType.ToLower = "junctions" Then
+                                lNode.PondedArea = Double.Parse(lItems(J))
+                            ElseIf lType.ToLower = "storage" Then
+
+                            End If
+
+                    End Select
+                Next
+
+                If Not Me.Contains(lItems(0)) Then
+                    Me.Add(lNode)
+                    Me.ChangeItemKey(lNode, lItems(0).Trim())
+                End If
+            End If
+        Next
     End Sub
 
     Public Overrides Function ToString() As String
@@ -112,7 +171,7 @@ End Class
 
 Public Class atcSWMMNode
     Public Name As String = ""
-    Public Type As String = "" 'junction or outfall
+    Public Type As String = "" 'junction or outfall or storage unit
     Public InvertElevation As Double = -1.0 'in feet or meters
     Public MaxDepth As Double = -1.0
     Public InitDepth As Double = -1.0
@@ -121,6 +180,7 @@ Public Class atcSWMMNode
     Public OutfallType As String = ""
     Public StageTable As String = ""
     Public TideGate As String = ""
+    Public ShapeCurve As String = String.Empty 'storage
     Public YPos As Double = 0.0
     Public XPos As Double = 0.0
 End Class
