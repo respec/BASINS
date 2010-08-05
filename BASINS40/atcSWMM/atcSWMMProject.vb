@@ -168,21 +168,31 @@ Public Class atcSWMMProject
                         'TODO:parse into Evaporation or Temperature block
                         Dim lLines() As String = lBlock.Content.Split(vbCrLf)
                         Dim laTSFile As String = String.Empty
-
+                        'Dim lScenarioPrev As String = Regex.Split(lLines(0).Trim(), "\s+")(0)
+                        Dim lScenarioPrev As String = String.Empty
+                        For I As Integer = 0 To lLines.Length - 1
+                            If Not lLines(I).Trim().StartsWith(";") And lLines(I).Trim().Length > 0 Then
+                                lScenarioPrev = Regex.Split(lLines(I).Trim(), "\s+")(0).Trim()
+                                Exit For
+                            End If
+                        Next
                         For I As Integer = 0 To lLines.Length - 1
                             If Not lLines(I).Trim().StartsWith(";") And lLines(I).Trim().Length > 0 Then
 
                                 Dim lItems() As String = Regex.Split(lLines(I).Trim(), "\s+")
                                 Dim lScenario As String = lItems(0).Trim()
                                 Dim lBlockWithTS As Object = Nothing
-                                If Temperature.Timeseries.Attributes.GetValue("Scenario") = lScenario Then
+                                Dim lRainGageName As String = String.Empty
+
+                                If Temperature.Timeseries IsNot Nothing AndAlso Temperature.Timeseries.Attributes.GetValue("Scenario") = lScenario Then
                                     lBlockWithTS = Temperature
-                                ElseIf Evaporation.Timeseries.Attributes.GetValue("Scenario") = lScenario Then
+                                ElseIf Evaporation.Timeseries IsNot Nothing AndAlso Evaporation.Timeseries.Attributes.GetValue("Scenario") = lScenario Then
                                     lBlockWithTS = Evaporation
                                 Else
                                     For Each lRaingage As atcSWMMRainGage In RainGages
                                         If lRaingage.TimeSeries.Attributes.GetValue("Scenario") = lScenario Then
                                             lBlockWithTS = RainGages
+                                            lRainGageName = lRaingage.Name
                                             Exit For
                                         End If
                                     Next
@@ -193,17 +203,41 @@ Public Class atcSWMMProject
                                     'TODO: need to anticipate multiple TS of any block type
                                     If lBlockWithTS IsNot Nothing Then
                                         lBlockWithTS.TimeseriesFromFile(lItems(2).Trim().Trim(""""), lBlockWithTS.Timeseries)
+                                        lBlockWithTS.Timeseries.ValuesNeedToBeRead = False
                                     End If
                                 Else
                                     'assuming only raingage use infile timeseries as in Example1.inp
                                     'assuming dates is not give, only time (continuous?) as in Example1.inp
+                                    If lBlockWithTS.GetType.Name = "atcSWMMRainGages" Then
+                                        If lBlockWithTS(lRainGageName).TimeSeries.ValuesNeedToBeRead Then
+                                            If lScenarioPrev = lScenario Then
+                                                lBlockWithTS.AddValue(lLines(I), lRainGageName, False)
+                                                If I = lLines.Length - 1 Then
+                                                    lBlockWithTS.AddValue("", lRainGageName, True)
+                                                End If
+                                            Else
+                                                lBlockWithTS.AddValue(lLines(I), lRainGageName, True)
+                                                lScenarioPrev = lScenario
+                                            End If
+                                        End If
+                                    Else
 
-                                    If lBlockWithTS.TimeSeries.ValuesNeedToBeRead Then
-                                        lBlockWithTS.AddValue(lLines(I))
                                     End If
                                 End If
                             End If
                         Next
+
+                        'By now, if there is data to be read, then they are read already
+                        'so close them down
+                        If Temperature.Timeseries IsNot Nothing Then Temperature.Timeseries.ValuesNeedToBeRead = False
+                        If Evaporation.Timeseries IsNot Nothing Then Evaporation.Timeseries.ValuesNeedToBeRead = False
+                        If RainGages IsNot Nothing Then
+                            For Each lRaingage As atcSWMMRainGage In RainGages
+                                If lRaingage.TimeSeries IsNot Nothing Then
+                                    lRaingage.TimeSeries.ValuesNeedToBeRead = False
+                                End If
+                            Next
+                        End If
                     Case "[RAINGAGES]", "[SYMBOLS]" : RainGages.FromString(lBlock.Name & vbCrLf & lBlock.Content)
                         'any time multiple sections are used to build a single object type, the block's name is needed
                         'The block's name is not part of the "content" during ReadBlockContents above
@@ -246,6 +280,10 @@ Public Class atcSWMMProject
         End If
     End Function
 
+    Public Overrides Sub ReadData(ByVal aData As atcData.atcDataSet)
+        'MyBase.ReadData(aData)
+    End Sub
+
     Shared Function ReadBlockContents(ByVal aBlockName As String, ByVal aSR As IO.StreamReader) As String
         Logger.Dbg("LoadGenericDummy " & aBlockName)
         Dim lBlockComplete As Boolean = False
@@ -280,88 +318,121 @@ Public Class atcSWMMProject
         'Dim lBlocksWritten As New StringBuilder
         FileName = aFileName
 
-        'lBlocksWritten.Append("[TITLE]")
-        lSW.WriteLine("[TITLE]")
-        lSW.WriteLine(Title)
-        lSW.WriteLine()
-
         For Each lBlock As IBlock In Blocks
             Select Case lBlock.Name
                 Case "[OPTIONS]" : lSW.WriteLine(Options.ToString)
-                Case "[EVAPORATION]" : lSW.WriteLine(Evaporation.ToString)
-
-                Case "[TEMPERATURE]" : lSW.WriteLine(Temperature.ToString)
-
+                Case "[EVAPORATION]"
+                    If Evaporation.Timeseries Is Nothing Then
+                        lSW.WriteLine(lBlock.ToString)
+                    Else
+                        lSW.WriteLine(Evaporation.ToString)
+                    End If
+                Case "[TEMPERATURE]"
+                    If Temperature.Timeseries Is Nothing Then
+                        lSW.WriteLine(lBlock.ToString)
+                    Else
+                        lSW.WriteLine(Temperature.ToString)
+                    End If
                 Case "[RAINGAGES]"
                     lSW.WriteLine(RainGages.ToString)
                     RainGages.TimeSeriesToFile()
 
                 Case "[SUBCATCHMENTS]"
-                    lSW.WriteLine(Catchments.ToString)
+                    'lSW.WriteLine(Catchments.ToString)
+                    lSW.WriteLine(lBlock.ToString)
 
                 Case "[SUBAREAS]"
-                    lSW.WriteLine(Catchments.SubareasToString)
+                    'lSW.WriteLine(Catchments.SubareasToString)
+                    lSW.WriteLine(lBlock.ToString)
 
                 Case "[INFILTRATION]"
-                    lSW.WriteLine(Catchments.InfiltrationToString)
+                    'lSW.WriteLine(Catchments.InfiltrationToString)
+                    lSW.WriteLine(lBlock.ToString)
 
-                Case "[JUNCTIONS][OUTFALLS]"
-                    lSW.WriteLine(Nodes.ToString)
+                    'Case "[JUNCTIONS][OUTFALLS]"
+                    '    lSW.WriteLine(Nodes.ToString)
+                Case "[JUNCTIONS]"
+                    lSW.WriteLine(lBlock.ToString)
+                Case "[OUTFALLS]"
+                    lSW.WriteLine(lBlock.ToString)
 
-                Case "[CONDUITS][XSECTIONS]"
-                    lSW.WriteLine(Conduits.ToString)
+                    'Case "[CONDUITS][XSECTIONS]"
+                    '    lSW.WriteLine(Conduits.ToString)
+                Case "[CONDUITS]"
+                    lSW.WriteLine(lBlock.ToString)
+                Case "[XSECTIONS]"
+                    lSW.WriteLine(lBlock.ToString)
 
                 Case "[LOSSES]"
-                    lSW.WriteLine(Losses.ToString)
+                    'lSW.WriteLine(Losses.ToString)
+                    lSW.WriteLine(lBlock.ToString)
 
                 Case "[LANDUSES]"
-                    lSW.WriteLine(Landuses.ToString)
-
+                    'lSW.WriteLine(Landuses.ToString)
+                    lSW.WriteLine(lBlock.ToString)
                 Case "[COVERAGES]"
-                    lSW.WriteLine(Landuses.CoveragesToString)
+                    'lSW.WriteLine(Landuses.CoveragesToString)
+                    lSW.WriteLine(lBlock.ToString)
 
                 Case "[TIMESERIES]"
                     lSW.WriteLine(atcSWMMEvaporation.TimeSeriesHeaderToString)
                     If Options.EJDate - Options.SJDate < 30 Then
-                        Evaporation.TimeSeriesToStream(lSW)
-                        Temperature.TimeSeriesToStream(lSW)
+                        If Temperature.Timeseries IsNot Nothing Then Temperature.TimeSeriesToStream(lSW)
+                        If Evaporation.Timeseries IsNot Nothing Then Evaporation.TimeSeriesToStream(lSW)
+                        If RainGages.Count > 0 Then
+                            RainGages.TimeSeriesToStream(lSW)
+                        End If
                     Else
                         'more than 30 days, write to file
-                        lSW.WriteLine(Evaporation.TimeSeriesFileNamesToString)
-                        lSW.WriteLine(Temperature.TimeSeriesFileNamesToString)
-                        Evaporation.TimeSeriesToFile()
-                        Temperature.TimeSeriesToFile()
+                        If Temperature.Timeseries IsNot Nothing Then
+                            lSW.WriteLine(Temperature.TimeSeriesFileNamesToString)
+                            lSW.WriteLine()
+                        End If
+                        If Evaporation.Timeseries IsNot Nothing Then
+                            lSW.WriteLine(Evaporation.TimeSeriesFileNamesToString)
+                        End If
+
+                        If Temperature.Timeseries IsNot Nothing Then Temperature.TimeSeriesToFile()
+                        If Evaporation.Timeseries IsNot Nothing Then Evaporation.TimeSeriesToFile()
                     End If
                     lSW.WriteLine()
 
                 Case "[REPORT]"
-                    lSW.WriteLine(Report.ToString)
+                    'lSW.WriteLine(Report.ToString)
+                    lSW.WriteLine(lBlock.ToString)
 
                 Case "[TAGS]"
-                    lSW.WriteLine(Tags.ToString)
+                    'lSW.WriteLine(Tags.ToString)
+                    lSW.WriteLine(lBlock.ToString)
 
                 Case "[MAP]"
-                    lSW.WriteLine(Map.ToString)
+                    'lSW.WriteLine(Map.ToString)
+                    lSW.WriteLine(lBlock.ToString)
 
                 Case "[COORDINATES]"
-                    lSW.WriteLine(Nodes.CoordinatesToString)
+                    'lSW.WriteLine(Nodes.CoordinatesToString)
+                    lSW.WriteLine(lBlock.ToString)
 
                 Case "[VERTICES]"
-                    lSW.WriteLine(Conduits.VerticesToString)
+                    'lSW.WriteLine(Conduits.VerticesToString)
+                    lSW.WriteLine(lBlock.ToString)
 
-                Case "[POLYGONS]"
-                    lSW.WriteLine(Catchments.PolygonsToString)
+                Case "[Polygons]"
+                    'lSW.WriteLine(Catchments.PolygonsToString)
+                    lSW.WriteLine(lBlock.ToString)
 
                 Case "[SYMBOLS]"
-                    lSW.WriteLine(RainGages.CoordinatesToString)
+                    'lSW.WriteLine(RainGages.CoordinatesToString)
+                    lSW.WriteLine(lBlock.ToString)
 
                 Case "[BACKDROP]"
-                    If BackdropFile.Length > 0 Then
-                        lSW.WriteLine("")
-                        lSW.WriteLine("[BACKDROP]")
-                        lSW.WriteLine("FILE       " & """" & BackdropFile & """")
-                        lSW.WriteLine("DIMENSIONS " & Format(BackdropX1, "0.000") & " " & Format(BackdropY1, "0.000") & " " & Format(BackdropX2, "0.000") & " " & Format(BackdropY2, "0.000"))
-                    End If
+                    'If BackdropFile.Length > 0 Then
+                    '    lSW.WriteLine("")
+                    '    lSW.WriteLine("[BACKDROP]")
+                    '    lSW.WriteLine("FILE       " & """" & BackdropFile & """")
+                    '    lSW.WriteLine("DIMENSIONS " & Format(BackdropX1, "0.000") & " " & Format(BackdropY1, "0.000") & " " & Format(BackdropX2, "0.000") & " " & Format(BackdropY2, "0.000"))
+                    'End If
+                    lSW.WriteLine(lBlock.ToString)
 
                 Case Else
                     'Write any blocks not already written above
@@ -371,7 +442,6 @@ Public Class atcSWMMProject
                     'End If
             End Select
         Next
-
 
         lSW.Close()
 
@@ -433,6 +503,38 @@ Public Class atcSWMMProject
             aSW.Write(StrPad(Format(aTimeSeries.Values(lIndex + 1), "0.000"), 10, " ", False))
             aSW.Write(vbCrLf)
         Next
+    End Sub
+
+    Public Sub RainTSToStream(ByVal aTimeSeries As atcData.atcTimeseries, _
+                                  ByVal aTimeseriesTag As String, _
+                                  ByVal aSW As IO.StreamWriter)
+        Dim lStartIndex As Integer = aTimeSeries.Dates.IndexOfValue(Options.SJDate, True)
+        If Options.SJDate = aTimeSeries.Dates.Values(0) Or lStartIndex < 0 Then
+            lStartIndex = 0
+        End If
+        Dim lEndIndex As Integer = aTimeSeries.Dates.IndexOfValue(Options.EJDate, True)
+        If lEndIndex < 0 Then lEndIndex = aTimeSeries.Dates.numValues
+        For lIndex As Integer = lStartIndex To lEndIndex - 1
+            If lIndex >= 1 Then
+                If Not aTimeSeries.Value(lIndex) > 0 Then
+                    Continue For
+                End If
+            End If
+            aSW.Write(StrPad(aTimeseriesTag, 16, " ", False))
+            aSW.Write(" ")
+            Dim lJDate As Double = aTimeSeries.Dates.Values(lIndex)
+            Dim lDate(6) As Integer
+            J2Date(lJDate, lDate)
+            Dim lDateString As String = lDate(1) & "/" & lDate(2) & "/" & lDate(0)
+            Dim lTimeString As String = lDate(3).ToString.PadLeft(2, "0") & ":" & lDate(4).ToString.PadLeft(2, "0")
+            aSW.Write(StrPad(lDateString, 10, " ", False))
+            aSW.Write(" ")
+            aSW.Write(StrPad(lTimeString, 10, " ", False))
+            aSW.Write(" ")
+            aSW.Write(StrPad(Format(aTimeSeries.Values(lIndex + 1), "0.000"), 10, " ", False))
+            aSW.Write(vbCrLf)
+        Next
+
     End Sub
 
     Public Sub Run(ByVal aInputFileName As String)

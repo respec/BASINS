@@ -45,6 +45,10 @@ Public Class atcSWMMEvaporation
         Dim laTSFile As String = String.Empty
         For I As Integer = 0 To lLines.Length - 1
             If Not lLines(I).Trim().StartsWith(";") Then
+                If lLines(I).Trim().StartsWith("CONSTANT") Then
+                    Timeseries = Nothing
+                    Exit Sub
+                End If
                 laTSFile = lLines(I).Trim().Substring(lWord.Length).Trim()
                 'Assuming there is only one TS for Evap
                 If laTSFile.Length > 0 Then
@@ -90,7 +94,7 @@ Public Class atcSWMMEvaporation
 
         Dim lFileName As String = ""
         If Timeseries IsNot Nothing Then
-            lFileName = PathNameOnly(Me.pSWMMProject.FileName) & g_PathChar & Timeseries.Attributes.GetValue("Location") & "E.DAT"
+            lFileName = """" & PathNameOnly(Me.pSWMMProject.FileName) & g_PathChar & Timeseries.Attributes.GetValue("Location") & "E.DAT" & """"
             lSB.Append(StrPad(Timeseries.Attributes.GetValue("Location") & ":E", 16, " ", False))
             lSB.AppendLine(" FILE " & lFileName)
         End If
@@ -121,6 +125,7 @@ Public Class atcSWMMEvaporation
         'Set up common date array
 
         Dim lSR As System.IO.StreamReader = New System.IO.StreamReader(aFilename)
+        Dim lLineCtr As Integer = 0
         While Not lSR.EndOfStream
             Dim line As String = lSR.ReadLine()
             Dim lItems() As String = Regex.Split(line.Trim(), "\s+")
@@ -130,10 +135,19 @@ Public Class atcSWMMEvaporation
             'If lItems(0) <> lStn Then
             '    Continue While
             'End If
+
+            Dim ldate As Double = -99.0
+            If lLineCtr = 0 Then
+                ldate = Jday(Integer.Parse(lDateParts(2)), Integer.Parse(lDateParts(0)), Integer.Parse(lDateParts(1)), Integer.Parse(lTimeParts(0)), Integer.Parse(lTimeParts(1)), 0)
+                lDates.Add(ldate)
+                lValues.Add(Double.NaN)
+            End If
             'SWMM5 denote a day has 0 hour to 23 hour, but atcTimeseries denote a day as 1 ~ 24 hour
-            Dim ldate As Double = Jday(Integer.Parse(lDateParts(2)), Integer.Parse(lDateParts(0)), Integer.Parse(lDateParts(1)), Integer.Parse(lTimeParts(0)) + 1, Integer.Parse(lTimeParts(1)), 0)
+            ldate = Jday(Integer.Parse(lDateParts(2)), Integer.Parse(lDateParts(0)), Integer.Parse(lDateParts(1)), Integer.Parse(lTimeParts(0)) + 1, Integer.Parse(lTimeParts(1)), 0)
             lDates.Add(ldate)
             lValues.Add(Double.Parse(lItems(lItems.Length - 1)))
+
+            lLineCtr += 1
         End While
 
         aTS.ValuesNeedToBeRead = False

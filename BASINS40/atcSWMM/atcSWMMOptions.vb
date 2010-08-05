@@ -29,6 +29,7 @@ Public Class atcSWMMOptions
     Public IgnoreRainfall As String = "NO"
     Public ForceMainEquation As String = "H-W"
     Public LinkOffsets As String = "DEPTH"
+    Public MinSlope As Double = 0
 
     Property Name() As String Implements IBlock.Name
         Get
@@ -82,6 +83,7 @@ Public Class atcSWMMOptions
                 Case "IGNORE_RAINFALL    " : IgnoreRainfall = lValue
                 Case "FORCE_MAIN_EQUATION" : ForceMainEquation = lValue
                 Case "LINK_OFFSETS       " : LinkOffsets = lValue
+                Case "MIN_SLOPE          " : MinSlope = lValue
                 Case Else
                     Logger.Dbg("Option '" & lOption & "' is unknown")
             End Select
@@ -113,13 +115,13 @@ Public Class atcSWMMOptions
 
     Private Function FormatDate(ByVal aJulianDate As Double) As String
         Dim lDateArray(6) As Integer
-        J2Date(SJDate, lDateArray)
+        J2Date(aJulianDate, lDateArray)
         Return lDateArray(1) & "/" & lDateArray(2) & "/" & lDateArray(0)
     End Function
 
     Private Function FormatTime(ByVal aJulianDate As Double) As String
         Dim lDateArray(6) As Integer
-        J2Date(SJDate, lDateArray)
+        J2Date(aJulianDate, lDateArray)
         Return Format(lDateArray(3), "00") & ":" & Format(lDateArray(4), "00") & ":" & Format(lDateArray(5), "00")
     End Function
 
@@ -155,6 +157,7 @@ Public Class atcSWMMOptions
             & "SKIP_STEADY_STATE    " & SkipSteadyState & vbCrLf _
             & "IGNORE_RAINFALL      " & IgnoreRainfall & vbCrLf _
             & "FORCE_MAIN_EQUATION  " & ForceMainEquation & vbCrLf _
-            & "LINK_OFFSETS         " & LinkOffsets & vbCrLf & vbCrLf
+            & "LINK_OFFSETS         " & LinkOffsets & vbCrLf _
+            & "MIN_SLOPE            " & MinSLope & vbCrLf & vbCrLf
     End Function
 End Class
