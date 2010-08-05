@@ -75,9 +75,9 @@ Public Class atcSWMMTemperature
                     Dim lLine As String = lLines(I)
                     Dim laKey As String = StrSplit(lLine, " ", "")
                     If AuxiParms.ContainsKey(laKey.Trim()) Then
-                        AuxiParms.Item(laKey.Trim()) &= vbCrLf & lLine.Trim()
+                        AuxiParms.Item(laKey.Trim()) &= ";" & lLine
                     Else
-                        AuxiParms.Add(laKey.Trim(), lLine.Trim())
+                        AuxiParms.Add(laKey.Trim(), lLine)
                     End If
                 End If
             End If
@@ -96,6 +96,15 @@ Public Class atcSWMMTemperature
             lSB.AppendLine()
         End If
 
+        If AuxiParms.Count > 0 Then
+            For Each lParmKey As String In AuxiParms.Keys
+                For Each line As String In AuxiParms(lParmKey).Split(";")
+                    lSB.Append(StrPad(lParmKey, 12, " ", False))
+                    lSB.AppendLine(line)
+                Next
+            Next
+        End If
+        lSB.AppendLine()
         Return lSB.ToString
     End Function
 
@@ -116,7 +125,7 @@ Public Class atcSWMMTemperature
         Dim lSB As New StringBuilder
 
         If Timeseries IsNot Nothing Then
-            Dim lFileName As String = PathNameOnly(Me.pSWMMProject.FileName) & g_PathChar & Timeseries.Attributes.GetValue("Location") & "T.DAT"
+            Dim lFileName As String = """" & PathNameOnly(Me.pSWMMProject.FileName) & g_PathChar & Timeseries.Attributes.GetValue("Location") & "T.DAT" & """"
             lSB.Append(StrPad(Timeseries.Attributes.GetValue("Location") & ":T", 16, " ", False))
             lSB.Append(" FILE " & lFileName)
         End If
@@ -145,6 +154,7 @@ Public Class atcSWMMTemperature
         'Set up common date array
 
         Dim lSR As System.IO.StreamReader = New System.IO.StreamReader(aFilename)
+        Dim lLineCtr As Integer = 0
         While Not lSR.EndOfStream
             Dim line As String = lSR.ReadLine()
             Dim lItems() As String = Regex.Split(line.Trim(), "\s+")
@@ -155,10 +165,19 @@ Public Class atcSWMMTemperature
             '    Continue While
             'End If
 
+            Dim ldate As Double = -99.0
+            If lLineCtr = 0 Then
+                ldate = Jday(Integer.Parse(lDateParts(2)), Integer.Parse(lDateParts(0)), Integer.Parse(lDateParts(1)), Integer.Parse(lTimeParts(0)), Integer.Parse(lTimeParts(1)), 0)
+                lDates.Add(ldate)
+                lValues.Add(Double.NaN)
+            End If
+
             'SWMM5 denote a day has 0 hour to 23 hour, but atcTimeseries denote a day as 1 ~ 24 hour
-            Dim ldate As Double = Jday(Integer.Parse(lDateParts(2)), Integer.Parse(lDateParts(0)), Integer.Parse(lDateParts(1)), Integer.Parse(lTimeParts(0)) + 1, Integer.Parse(lTimeParts(1)), 0)
+            ldate = Jday(Integer.Parse(lDateParts(2)), Integer.Parse(lDateParts(0)), Integer.Parse(lDateParts(1)), Integer.Parse(lTimeParts(0)) + 1, Integer.Parse(lTimeParts(1)), 0)
             lDates.Add(ldate)
             lValues.Add(Double.Parse(lItems(lItems.Length - 1)))
+
+            lLineCtr += 1
         End While
 
         aTS.ValuesNeedToBeRead = False
