@@ -143,7 +143,7 @@ Public Class atcSWMMProject
     End Sub
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
-        Clear()
+        'Clear()
         If Not MyBase.Open(aFileName, aAttributes) Then
             Return False
         Else
@@ -276,7 +276,8 @@ Public Class atcSWMMProject
                 DataSets.Add("Evaporation", Evaporation.Timeseries)
             End If
 
-            Save(IO.Path.Combine(IO.Path.GetDirectoryName(aFileName), IO.Path.GetFileNameWithoutExtension(aFileName) & "_test.inp"), EnumExistAction.ExistReplace)
+            'Save(IO.Path.Combine(IO.Path.GetDirectoryName(aFileName), IO.Path.GetFileNameWithoutExtension(aFileName) & "_test.inp"), EnumExistAction.ExistReplace)
+            Return True
         End If
     End Function
 
