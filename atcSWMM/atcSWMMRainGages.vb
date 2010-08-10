@@ -79,6 +79,7 @@ Public Class atcSWMMRainGages
                                 'lItem = lItem.Trim("""")
                                 lItem = pSWMMProject.FilterFileName(lItem)
                                 .TimeSeries.Attributes.SetValue("Scenario", lItem)
+                                .TimeSeries.Attributes.AddHistory("Read from " & pSWMMProject.FileName)
                                 .TimeSeries.ValuesNeedToBeRead = True
 
                                 If .Type.ToLower() = "file" Then
