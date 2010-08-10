@@ -53,6 +53,7 @@ Public Class atcSWMMEvaporation
                 'Assuming there is only one TS for Evap
                 If laTSFile.Length > 0 Then
                     Timeseries.Attributes.SetValue("Scenario", laTSFile)
+                    Timeseries.Attributes.AddHistory("Read from " & pSWMMProject.FileName)
                     Timeseries.Attributes.SetValue("Location", pSWMMProject.FilterFileName(laTSFile.TrimEnd("E")))
                     Exit For
                 End If

@@ -53,6 +53,7 @@ Public Class atcSWMMTemperature
                     laTSFile = lLines(I).Trim().Substring(lWord.Length).Trim()
                     If laTSFile.Length > 0 Then
                         Timeseries.Attributes.SetValue("Scenario", laTSFile)
+                        Timeseries.Attributes.AddHistory("Read from " & pSWMMProject.FileName)
                         Timeseries.Attributes.SetValue("Location", pSWMMProject.FilterFileName(laTSFile.TrimEnd("T")))
                     End If
                 Else
