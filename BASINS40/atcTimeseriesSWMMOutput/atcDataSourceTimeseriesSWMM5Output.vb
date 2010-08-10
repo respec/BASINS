@@ -106,6 +106,7 @@ Public Class atcDataSourceTimeseriesSWMM5Output
                         lData.ValuesNeedToBeRead = True
                         lData.numValues = lNumValues
                         lData.Dates = lDates
+                        lData.Attributes.AddHistory("Read from " & Specification)
                         DataSets.Add(lData)
                     Next
                 Next
@@ -123,6 +124,7 @@ Public Class atcDataSourceTimeseriesSWMM5Output
                         lData.ValuesNeedToBeRead = True
                         lData.numValues = lNumValues
                         lData.Dates = lDates
+                        lData.Attributes.AddHistory("Read from " & Specification)
                         DataSets.Add(lData)
                     Next
                 Next
@@ -140,6 +142,7 @@ Public Class atcDataSourceTimeseriesSWMM5Output
                         lData.ValuesNeedToBeRead = True
                         lData.numValues = lNumValues
                         lData.Dates = lDates
+                        lData.Attributes.AddHistory("Read from " & Specification)
                         DataSets.Add(lData)
                     Next
                 Next
@@ -156,6 +159,7 @@ Public Class atcDataSourceTimeseriesSWMM5Output
                     lData.ValuesNeedToBeRead = True
                     lData.numValues = lNumValues
                     lData.Dates = lDates
+                    lData.Attributes.AddHistory("Read from " & Specification)
                     DataSets.Add(lData)
                 Next
 
