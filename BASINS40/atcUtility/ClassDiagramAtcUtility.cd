@@ -1,0 +1,159 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="atcUtility.atcCollection" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <Members>
+      <Method Name="CompareValues" Hidden="true" />
+      <Field Name="pKeys" Hidden="true" />
+    </Members>
+    <NestedTypes>
+      <Class Name="atcUtility.atcCollection.clsDictionaryEnumerator" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>atcCollection.vb</NewMemberFileName>
+        </TypeIdentifier>
+        <Lollipop Position="0.2" />
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>CCIAEEAgICAAAAAEKAAQFAAiCAAAAIAACAASAMBEABE=</HashCode>
+      <FileName>atcCollection.vb</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="atcUtility.atcDateFormat" Collapsed="true">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <Members>
+      <Method Name="MonthString" Hidden="true" />
+      <Field Name="pDateOrder" Hidden="true" />
+      <Field Name="pDateSeparator" Hidden="true" />
+      <Field Name="pIncludeDays" Hidden="true" />
+      <Field Name="pIncludeHours" Hidden="true" />
+      <Field Name="pIncludeMinutes" Hidden="true" />
+      <Field Name="pIncludeMonths" Hidden="true" />
+      <Field Name="pIncludeSeconds" Hidden="true" />
+      <Field Name="pIncludeYears" Hidden="true" />
+      <Field Name="pMidnight24" Hidden="true" />
+      <Field Name="pMonthNames" Hidden="true" />
+      <Field Name="pTimeSeparator" Hidden="true" />
+      <Field Name="pTwoDigitYears" Hidden="true" />
+      <Method Name="YearString" Hidden="true" />
+    </Members>
+    <NestedTypes>
+      <Enum Name="atcUtility.atcDateFormat.DateOrderEnum" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>atcDateFormat.vb</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>QALIIkiAAAEAAIIAAAAAAQYAgAAAAACQoAgBABAgAAA=</HashCode>
+      <FileName>atcDateFormat.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcUtility.atcTableOpener" Collapsed="true">
+    <Position X="5.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>atcTable.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcUtility.atcTable" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4" Y="1.5" Width="1.5" />
+    <Members>
+      <Field Name="pCurrentRecord" Hidden="true" />
+      <Field Name="pEOF" Hidden="true" />
+      <Field Name="pFilename" Hidden="true" />
+      <Field Name="pHeaderLines" Hidden="true" />
+      <Field Name="pNumHeaderRows" Hidden="true" />
+    </Members>
+    <NestedTypes>
+      <Enum Name="atcUtility.atcTable.ComparisonEnum" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>atcTable.vb</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>VAGAEABADIVQAASIAAAEIAAACgCAEVBBIIAiCABABAA=</HashCode>
+      <FileName>atcTable.vb</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="atcUtility.atcTableArray" Collapsed="true">
+    <Position X="0.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAEABQAAEQAAQAAAAEAAAACgCAAFAAAIIkDABAAAA=</HashCode>
+      <FileName>atcTableArray.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcUtility.atcTableDBF" Collapsed="true">
+    <Position X="2.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIEAkBBIZAEQACQIAkAEEgICqgCAIVAGAIAoGBBABAA=</HashCode>
+      <FileName>atcTableDBF.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcUtility.atcTableDelimited" Collapsed="true">
+    <Position X="4" Y="2.75" Width="1.5" />
+    <Members>
+      <Field Name="pCurrentRecordStart" Hidden="true" />
+      <Field Name="pCurrentRowValues" Hidden="true" />
+      <Field Name="pDelimiter" Hidden="true" />
+      <Field Name="pFieldLengths" Hidden="true" />
+      <Field Name="pFieldNames" Hidden="true" />
+      <Field Name="pFieldTypes" Hidden="true" />
+      <Field Name="pNumFields" Hidden="true" />
+      <Field Name="pRecords" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>BAAAEABQAAEQAASEAABEABAACgCAAFAAAIYkHABAAAA=</HashCode>
+      <FileName>atcTableDelimited.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcUtility.atcTableFixed" Collapsed="true">
+    <Position X="5.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAkABAAAEQAAQAAAAEEBAACgCAAFAAAIYgCABAAAA=</HashCode>
+      <FileName>atcTableFixed.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcUtility.atcTableFixedStreaming" Collapsed="true">
+    <Position X="7.5" Y="2.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAkABAAAEQAAQAAAAEEBAACgCAAFAAAoQgGABAAAA=</HashCode>
+      <FileName>atcTableFixedStreaming.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcUtility.atcTableRDB" Collapsed="true">
+    <Position X="4" Y="3.75" Width="1.5" />
+    <Members>
+      <Method Name="RDBfieldtype" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAAAAAAAAAABAAAAAAAAAAAAAAQACAAAAAA=</HashCode>
+      <FileName>atcTableRDB.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcUtility.frmArgs" Collapsed="true">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAIACACAAAAEAAACAQFACgBAAJAAAAAAAAEAAAAA=</HashCode>
+      <FileName>frmArgs.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="atcUtility.frmFeedback" Collapsed="true">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BQAAAAIAACAKAAEAAgCCIEAyAQAAAIAAAAAAAAAAIAY=</HashCode>
+      <FileName>frmFeedback.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="atcUtility.IatcTable" Collapsed="true">
+    <Position X="2.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>FAGAEABADAFQAASIAAAEAAAAAgCAAVAAIIAgCABABAA=</HashCode>
+      <FileName>atcTable.vb</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>
