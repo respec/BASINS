@@ -305,6 +305,7 @@ Friend Class frmDataSource
                 End If
             End If
         Next
+        Return False
     End Function
 
     Private Sub treeSources_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles treeSources.DoubleClick

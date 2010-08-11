@@ -283,7 +283,7 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
             lTmpAttrDef = New atcAttributeDefinition
             lTmpAttrDef.Name = aAttributeName
         End If
-        SetValue(lTmpAttrDef, aAttributeValue)
+        Return SetValue(lTmpAttrDef, aAttributeValue)
     End Function
 
     Public Shadows Function Add(ByVal aDefinedValue As Object) As Integer

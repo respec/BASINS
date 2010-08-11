@@ -555,6 +555,7 @@ TryOldString:
             Case 9, 10, 12, 13 : Return True
             Case Is < 32 : Return False
             Case Is < 127 : Return True
+            Case Else : Return False
         End Select
     End Function
 

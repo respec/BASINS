@@ -260,10 +260,11 @@ Public Class frmSelectDisplay
         Dim lSaveSource As atcDataSource = lSave.AskUser(pTimeseriesGroup)
         '    Dim lSaveIn As atcDataSource = UserOpenDataFile(False, True)
         If Not lSaveSource Is Nothing AndAlso lSaveSource.Specification.Length > 0 Then
-            lSaveSource.AddDatasets(pTimeseriesGroup)
+            Return lSaveSource.AddDataSets(pTimeseriesGroup)
         End If
         '    End If
         '    Me.Close()
+        Return False
     End Function
 
     Private Function UserOpenDataFile(Optional ByVal aNeedToOpen As Boolean = True, _

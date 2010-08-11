@@ -1,5 +1,10 @@
 Option Strict Off
 Option Explicit On
+
+''' <summary>
+''' 
+''' </summary>
+''' <remarks></remarks>
 Public Interface IatcTable
     Function Cousin() As IatcTable
     Function CreationCode() As String
@@ -55,6 +60,10 @@ Public Class atcTableOpener
     End Function
 End Class
 
+''' <summary>
+''' 
+''' </summary>
+''' <remarks></remarks>
 Public MustInherit Class atcTable
     Implements IDisposable
     Implements IatcTable
@@ -329,11 +338,14 @@ Public MustInherit Class atcTable
         Return retval
     End Function
 
-    'Returns the number of the field with the specified name
-    'Returns zero if the named field does not appear in this file
-    Public Overridable Function FieldNumber(ByVal aFieldName As String) As Integer Implements IatcTable.FieldNumber
-    End Function
-
+    ''' <summary>
+    ''' determine field number from field name
+    ''' </summary>
+    ''' <param name="aFieldName">name of specified field</param>
+    ''' <returns>the number of the field with the specified name or zero if the named field does not appear in this file</returns>
+    ''' <remarks></remarks>
+    Public MustOverride Function FieldNumber(ByVal aFieldName As String) As Integer Implements IatcTable.FieldNumber
+ 
     'Returns a string version of the current record
     Public Overridable Function CurrentRecordAsDelimitedString(Optional ByVal aDelimiter As String = ",", Optional ByVal aQuote As String = "") As String
         CurrentRecordAsDelimitedString = ""

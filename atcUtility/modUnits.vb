@@ -62,29 +62,25 @@ errHand:
 
     Public Function GetConversionFactor(ByVal fromUnits As String, ByVal toUnits As String) As Double
         'Static AlreadyReportedError As Boolean
-        Dim table As Xml.XmlNode = GetTable(UnitsTableName)
-        Dim ConversionFrom As String
-        Dim ConversionTo As String
-
-        On Error GoTo errHand
-
-        If Not table Is Nothing Then
-            ConversionFrom = ExtractChildByName(table, "Row", "Name", fromUnits).Attributes.GetNamedItem("PerDefaultUnit").InnerText
-            ConversionTo = ExtractChildByName(table, "Row", "Name", toUnits).Attributes.GetNamedItem("PerDefaultUnit").InnerText
-            If IsNumeric(ConversionFrom) And IsNumeric(ConversionTo) And ConversionFrom <> 0 Then
-                GetConversionFactor = CDbl(ConversionTo) / CDbl(ConversionFrom)
+        Dim lConversionFactor As Double = GetNaN()
+        Try
+            Dim lUnitsTableNameNode As Xml.XmlNode = GetTable(UnitsTableName)
+            If lUnitsTableNameNode IsNot Nothing Then
+                Dim ConversionFrom As String = ExtractChildByName(lUnitsTableNameNode, "Row", "Name", fromUnits).Attributes.GetNamedItem("PerDefaultUnit").InnerText
+                Dim ConversionTo As String = ExtractChildByName(lUnitsTableNameNode, "Row", "Name", toUnits).Attributes.GetNamedItem("PerDefaultUnit").InnerText
+                If IsNumeric(ConversionFrom) AndAlso IsNumeric(ConversionTo) AndAlso ConversionFrom <> 0 Then
+                    lConversionFactor = CDbl(ConversionTo) / CDbl(ConversionFrom)
+                End If
             End If
-        End If
-        Exit Function
-
-errHand:
-        'If AlreadyReportedError Then
-        'Logger.dbg("Error in GetConversionFactor from: " & fromUnits & " to: " & toUnits & vbCr & Err.Description)
-        'Else
-        Logger.Msg("Cound not find factor from: " & fromUnits & " to: " & toUnits & vbCr & Err.Description, "ATCutility.modUnits.GetConversionFactor")
-        '  AlreadyReportedError = True
-        'End If
-
+        Catch lEx As Exception
+            'If AlreadyReportedError Then
+            'Logger.dbg("Error in GetConversionFactor from: " & fromUnits & " to: " & toUnits & vbCr & Err.Description)
+            'Else
+            Logger.Msg("Cound not find factor from: " & fromUnits & " to: " & toUnits & vbCr & lEx.Message, "ATCutility.modUnits.GetConversionFactor")
+            '  AlreadyReportedError = True
+            'End If
+        End Try
+        Return lConversionFactor
     End Function
 
     Public Function GetUnitDescription(ByVal unitsName As String) As String
