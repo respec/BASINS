@@ -122,6 +122,7 @@ Public Class atcDataManager
             Return pMapWin.Plugins.StartPlugin(lKey)
         Catch e As Exception
             Logger.Dbg("Exception loading " & aPluginName & ": " & e.Message)
+            Return False
         End Try
     End Function
 
@@ -184,13 +185,14 @@ Public Class atcDataManager
         If lPossibleDataSources.Count = 1 Then
             lMatchDataSource = lPossibleDataSources(0)
             lMatchDataSource = lMatchDataSource.NewOne()
-            OpenDataSource = OpenDataSource(lMatchDataSource, aSpecification, Nothing)
+            Return OpenDataSource(lMatchDataSource, aSpecification, Nothing)
         ElseIf lPossibleDataSources.Count = 0 Then
             Logger.Msg("No Data Source Available for '" & FileExt(aSpecification) & "'", "Open Data Source Problem")
         Else
             Logger.Msg("Data Source Ambiguous for " & aSpecification, "Open Data Source Problem")
             'TODO: choose the source
         End If
+        Return False
     End Function
 
     Public Shared Sub RemoveDataSource(ByVal aIndex As Integer)

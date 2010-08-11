@@ -860,13 +860,12 @@ NotEqual:
     'Returns zero if the named field does not appear in this file
     Public Overrides Function FieldNumber(ByVal aFieldName As String) As Integer
         aFieldName = aFieldName.ToLower
-        Dim retval As Integer
-        For retval = 1 To pNumFields
-            If TrimNull(pFields(retval).FieldName).ToLower = aFieldName Then
-                FieldNumber = retval
-                Exit Function
+        For lFieldIndex As Integer = 1 To pNumFields
+            If TrimNull(pFields(lFieldIndex).FieldName).ToLower = aFieldName Then
+                Return lFieldIndex
             End If
         Next
+        Return 0
     End Function
 
     Public Overrides Function OpenFile(ByVal aFilename As String) As Boolean

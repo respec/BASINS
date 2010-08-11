@@ -98,14 +98,19 @@ Public Class atcDataGroup
     ''' <summary>Add an <see cref="atcData.atcDataSet">atcDataSet</see> 
     ''' to the group with the default key of its serial number </summary>
     Public Shadows Function Add(ByVal aDataSet As atcDataSet) As Integer
-        If aDataSet IsNot Nothing Then Add(aDataSet.Serial, aDataSet)
+        If aDataSet IsNot Nothing Then
+            Return Add(aDataSet.Serial, aDataSet)
+        Else
+            Return -1
+        End If
     End Function
 
     ''' <summary>Add a dataset to the group with the key specified</summary>
     Public Shadows Function Add(ByVal aKey As Object, _
                                 ByVal aDataSet As atcDataSet) As Integer
-        MyBase.Add(aKey, aDataSet)
+        Dim lAdd As Integer = MyBase.Add(aKey, aDataSet)
         RaiseAddedOne(aDataSet)
+        Return lAdd
     End Function
 
     ''' <summary>Add items from an atcCollection or atcDataGroup to the group.</summary>

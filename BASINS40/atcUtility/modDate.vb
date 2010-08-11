@@ -749,20 +749,22 @@ Public Module modDate
                             ByVal TCODE As Integer, _
                             ByVal TSTEP As Integer, _
                             ByVal NVALS As Integer) As Double
-        Dim DATE1(6) As Integer
-        Dim DATE2(6) As Integer
+
         Dim lDate As DateTime, lDateNew As DateTime
 
+        Dim lTimAddJ As Double = -1
         If NVALS >= 0 Then 'add
+            Dim DATE1(6) As Integer
+            Dim DATE2(6) As Integer
             Select Case TCODE
-                Case 1 : TimAddJ = jStartDate + TSTEP * NVALS * JulianSecond
-                Case 2 : TimAddJ = jStartDate + TSTEP * NVALS * JulianMinute
-                Case 3 : TimAddJ = jStartDate + TSTEP * NVALS * JulianHour
-                Case 4 : TimAddJ = jStartDate + TSTEP * NVALS ' JulianDay = 1
+                Case 1 : lTimAddJ = jStartDate + TSTEP * NVALS * JulianSecond
+                Case 2 : lTimAddJ = jStartDate + TSTEP * NVALS * JulianMinute
+                Case 3 : lTimAddJ = jStartDate + TSTEP * NVALS * JulianHour
+                Case 4 : lTimAddJ = jStartDate + TSTEP * NVALS ' JulianDay = 1
                 Case 5, 6, 7 'month, year, century
                     J2Date(jStartDate, DATE1)
                     TIMADD(DATE1, TCODE, TSTEP, NVALS, DATE2)
-                    TimAddJ = Date2J(DATE2)
+                    lTimAddJ = Date2J(DATE2)
             End Select
         Else 'subtract
             lDate = FromOADate(jStartDate)
@@ -775,8 +777,9 @@ Public Module modDate
                 Case 6 : lDateNew = lDate.AddYears(TSTEP * NVALS)
                 Case 7 : lDateNew = lDate.AddYears(TSTEP * NVALS * 100)
             End Select
-            TimAddJ = lDateNew.ToOADate
+            lTimAddJ = lDateNew.ToOADate
         End If
+        Return lTimAddJ
     End Function
 
     Public Sub TIMADD(ByVal DATE1() As Integer, _

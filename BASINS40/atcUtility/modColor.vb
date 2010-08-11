@@ -1,11 +1,8 @@
-Option Strict On
-Option Explicit On
-
 Imports System.Drawing
 Imports MapWinUtility
 
 Public Module UtilColor
-    '##MODULE_REMARKS Copyright 2001-7 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+    '##MODULE_REMARKS Copyright 2001-9 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private pColorDatabase As atcTable
     Private Const pGrayBasename As String = "gray" 'base name for shades of gray (gray0..gray255)
@@ -19,21 +16,22 @@ Public Module UtilColor
     Public Sub InitMatchingColors(ByVal aFilename As String)
         pColorsUsed.Clear()
         Try
-            If FileExists(aFilename) Then
+            If IO.File.Exists(aFilename) Then
                 pColorMatchingRules.Clear()
                 pMatchingColorsFilename = aFilename
-                Dim lOneLine As String
                 Dim lColor As Color
-                For Each lOneLine In LinesInFile(aFilename)
+                For Each lOneLine As String In LinesInFile(aFilename)
                     lOneLine = lOneLine.Trim
                     If lOneLine.Length > 0 Then
                         lColor = TextOrNumericColor(StrRetRem(lOneLine))
                         pColorMatchingRules.Add(New Generic.KeyValuePair(Of String, Color)(lOneLine, lColor))
                     End If
                 Next
+            Else
+                Logger.Dbg("InitMatchingColors:Missing:" & aFilename)
             End If
         Catch e As Exception
-            Logger.Dbg("InitMatchingColors:" & e.Message)
+            Logger.Dbg("InitMatchingColors:Problem:" & e.Message)
         End Try
     End Sub
 
@@ -43,7 +41,7 @@ Public Module UtilColor
 
         'Find a color that matches a rule
         For Each lRule In pColorMatchingRules
-            If lSpec Like LCase(lRule.Key) AndAlso Not pColorsUsed.Contains(lRule.Value) Then
+            If lSpec Like lRule.Key.ToLower AndAlso Not pColorsUsed.Contains(lRule.Value) Then
                 GoTo FoundColor
             End If
         Next
@@ -70,9 +68,9 @@ FoundColor:
     Private Function colorDB() As atcTable
         Static lAlreadyReportedErrOpen As Boolean = False
         Static lOpenedDB As Boolean = False
-        Dim lDBpath As String = ""
 
         If Not lOpenedDB Then
+            Dim lDBpath As String = ""
             Try
                 lDBpath = FindFile("Please locate 'ATCoRend.dbf'", "ATCoRend.dbf", "dbf")
 
@@ -81,7 +79,7 @@ FoundColor:
                     lDBpath = IO.Path.ChangeExtension(lDBpath, ".dbf")
                 End If
 
-                If FileExists(lDBpath) Then
+                If IO.File.Exists(lDBpath) Then
                     pColorDatabase = New atcTableDBF
                     pColorDatabase.OpenFile(lDBpath)
                     lOpenedDB = True

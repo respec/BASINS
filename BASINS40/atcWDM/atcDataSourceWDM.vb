@@ -780,6 +780,8 @@ CaseExistRenumber:
                 Logger.Dbg("atcDataSourceWDM:Open:Problem opening WDM file '" & Specification & "'")
                 Return False
             End If
+        Else
+            Return False
         End If
     End Function
 

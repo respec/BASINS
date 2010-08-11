@@ -1198,8 +1198,8 @@ AtEndOfStream:
                     End Try
                     pStreamReader = Nothing
                     pCurrentLine = lSb.ToString
-                    Return (lSb.Length > 0)
                 End If
+                Return (lSb.Length > 0)
             End If
         End Function
 
@@ -1291,8 +1291,8 @@ AtEndOfStream:
                     End Try
                     pStreamReader = Nothing
                     pCurrentLine = ""
-                    Return False
                 End If
+                Return False
             End If
         End Function
 

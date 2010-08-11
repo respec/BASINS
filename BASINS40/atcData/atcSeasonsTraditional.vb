@@ -25,6 +25,7 @@ Public Class atcSeasonsTraditional
             Case 9 : If lDate.Day < 22 Then Return 2 Else Return 3
             Case 10, 11 : Return 3
             Case 12 : If lDate.Day < 21 Then Return 3 Else Return 0
+            Case Else : Return -1
         End Select
     End Function
 
