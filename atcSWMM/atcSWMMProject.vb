@@ -29,7 +29,6 @@ Public Class atcSWMMProject
     'Public Pumps As atcSWMMPumps
     'Public Controls As atcSWMMControls
 
-    Public FileName As String = ""
     Public Title As String = ""
 
     Public BackdropFile As String = ""
@@ -45,7 +44,6 @@ Public Class atcSWMMProject
 
     Public Overrides Sub Clear()
         MyBase.Clear()
-        FileName = ""
         Title = ""
         BackdropFile = ""
 
@@ -110,8 +108,8 @@ Public Class atcSWMMProject
             With lProcess
                 With .StartInfo
                     .FileName = lSWMMExeName
-                    .WorkingDirectory = IO.Path.GetDirectoryName(FileName)
-                    Dim lFileNameNoExt As String = IO.Path.GetFileNameWithoutExtension(FileName)
+                    .WorkingDirectory = IO.Path.GetDirectoryName(Specification)
+                    Dim lFileNameNoExt As String = IO.Path.GetFileNameWithoutExtension(Specification)
                     .Arguments = lFileNameNoExt & ".inp " & lFileNameNoExt & ".rpt " & lFileNameNoExt & ".out"
                     .CreateNoWindow = True
                     .UseShellExecute = False
@@ -148,7 +146,8 @@ Public Class atcSWMMProject
             Return False
         Else
             Blocks.Clear()
-            FileName = aFileName
+            Dim lPrevDir As String = CurDir()
+            ChDriveDir(IO.Path.GetDirectoryName(Me.Specification))
             Dim lSR As New IO.StreamReader(aFileName)
             'First set up a lookup using Blocks
             While Not lSR.EndOfStream
@@ -156,6 +155,7 @@ Public Class atcSWMMProject
                 Dim lBlockContents As String = ReadBlockContents(lBlockName, lSR)
                 Blocks.Add(New atcSWMMBlock(lBlockName, lBlockContents))
             End While
+            lSR.Close()
 
             'Then create classes using their contents
             For Each lBlock As atcSWMMBlock In Blocks
@@ -265,18 +265,19 @@ Public Class atcSWMMProject
             If RainGages IsNot Nothing Then
                 For Each lRaingage As atcSWMMRainGage In RainGages
                     If lRaingage.TimeSeries IsNot Nothing Then
-                        DataSets.Add("Rain", lRaingage.TimeSeries)
+                        DataSets.Add(lRaingage.TimeSeries.Attributes.GetValue("ID"), lRaingage.TimeSeries)
                     End If
                 Next
             End If
             If Temperature IsNot Nothing AndAlso Temperature.Timeseries IsNot Nothing Then
-                DataSets.Add("Temperature", Temperature.Timeseries)
+                DataSets.Add(Temperature.Timeseries.Attributes.GetValue("ID"), Temperature.Timeseries)
             End If
             If Evaporation IsNot Nothing AndAlso Evaporation.Timeseries IsNot Nothing Then
-                DataSets.Add("Evaporation", Evaporation.Timeseries)
+                DataSets.Add(Evaporation.Timeseries.Attributes.GetValue("ID"), Evaporation.Timeseries)
             End If
 
             'Save(IO.Path.Combine(IO.Path.GetDirectoryName(aFileName), IO.Path.GetFileNameWithoutExtension(aFileName) & "_test.inp"), EnumExistAction.ExistReplace)
+            ChDriveDir(lPrevDir)
             Return True
         End If
     End Function
@@ -317,7 +318,7 @@ Public Class atcSWMMProject
                           Optional ByVal ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
         Dim lSW As New IO.StreamWriter(aFileName)
         'Dim lBlocksWritten As New StringBuilder
-        FileName = aFileName
+        Specification = aFileName
 
         For Each lBlock As IBlock In Blocks
             Select Case lBlock.Name
