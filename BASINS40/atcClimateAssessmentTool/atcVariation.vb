@@ -341,6 +341,9 @@ Public Class atcVariation
                         lArgsMath.SetValue("Number", CurrentValue)
                         ComputationSource.Open(Operation, lArgsMath)
                         lModifiedTS = ComputationSource.DataSets(0)
+                        If lModifiedTS.Dates = lOriginalData.Dates Then
+                            lModifiedTS.Dates = lModifiedTS.Dates.Clone
+                        End If
                         lModifiedSplit.Add(ComputationSource.DataSets(0))
                         If lSplitData.Count > 1 Then
                             lModifiedSplit.Add(lSplitData.ItemByIndex(1))
@@ -650,8 +653,8 @@ Public Class atcVariation
                 .IntensifyVolumeFraction = IntensifyVolumeFraction
             End If
 
-            If Not DataSets Is Nothing Then .DataSets = DataSets.Clone()
-            If Not PETdata Is Nothing Then .PETdata = PETdata.Clone()
+            If DataSets IsNot Nothing Then .DataSets = DataSets.Clone()
+            If PETdata IsNot Nothing Then .PETdata = PETdata.Clone()
             .ComputationSource = ComputationSource
             .Operation = Operation.Clone()
             If Seasons Is Nothing Then

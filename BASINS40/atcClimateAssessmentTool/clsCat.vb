@@ -113,6 +113,9 @@ StartOver:
                                 Model.BaseScenario = (AbsolutePath(lChild.InnerText, CurDir))
                                 'TODO: generic case for any model type that creates correct Model and sets XML, 
                                 '      BaseScenario (and anything model specific) gets set inside XML property set
+                            Case "inp"
+                                If Model Is Nothing Then Model = New clsCatModelSWMM
+                                Model.BaseScenario = (AbsolutePath(lChild.InnerText, CurDir))
                             Case "preparedinputs"
                                 PreparedInputs.Clear()
                                 For Each lChild In lXML.ChildNodes

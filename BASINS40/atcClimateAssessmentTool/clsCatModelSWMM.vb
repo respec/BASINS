@@ -52,25 +52,27 @@ Public Class clsCatModelSWMM
         End If
     End Sub
 
-    Private Sub CreateModifiedINP(ByVal aNewScenarioName As String, ByVal aNewInpFilename As String)
-
+    Private Sub CreateModifiedINP(ByVal aNewScenarioName As String, ByVal aNewInpFilename As String, ByVal aModifiedData As atcData.atcTimeseriesGroup)
+        Dim lPrevCurDir As String = CurDir()
+        ChDriveDir(IO.Path.GetDirectoryName(aNewInpFilename))
         pBaseProject.Save(aNewInpFilename, atcDataSource.EnumExistAction.ExistReplace)
+        pBaseProject.Specification = pBaseScenario ' save changed specification for creating template, then switch back
 
-        'Dim lInpContents As String = WholeFileString(BaseScenario)
-        'Dim lNewFilesBlock As String = ""
-        'Dim lSaveLineEnd As String = ""
-        'Dim lCurrentLine As String
-        ''Dim lPathname As String
-        'Dim lFilename As String
+        Dim lModifiedProject As New atcSWMM.atcSWMMProject
+        lModifiedProject.Open(aNewInpFilename)
 
-
-        ''Commented out code preserves path of original file, we are putting Modified files in same folder as modified UCI
-        ''lPathname = PathNameOnly(lFilename)
-        ''If lPathname.Length > 0 Then lPathname &= g_PathChar
-        ''lFilename = lPathname & aNewScenarioName & "." & FilenameNoPath(lFilename)
-        'lFilename = aNewScenarioName & ".inp"
-        'lNewFilesBlock &= lInpContents
-        'SaveFileString(aNewInpFilename, lInpContents.Substring(0, lStartFilesPos) & lNewFilesBlock & lInpContents.Substring(lEndFilesPos))
+        For Each lTS As atcData.atcTimeseries In aModifiedData
+            Dim lID As String = lTS.Attributes.GetValue("ID")
+            Dim lOriginalTS As atcData.atcTimeseries = lModifiedProject.DataSets.ItemByKey(lID)
+            If lOriginalTS IsNot Nothing Then
+                lModifiedProject.DataSets.Remove(lOriginalTS)
+                lModifiedProject.DataSets.Add(lID, lTS)
+            End If
+        Next
+        lModifiedProject.Save(aNewInpFilename, atcDataSource.EnumExistAction.ExistReplace)
+        atcDataManager.RemoveDataSource(lModifiedProject)
+        lModifiedProject = Nothing
+        ChDriveDir(lPrevCurDir)
     End Sub
 
     ''' <summary>
@@ -130,64 +132,33 @@ Public Class clsCatModelSWMM
                     '    lBinOutResults.DataSets.Clear()
                     'Next
                 Case Else
-                    lNewINPfilename = lNewBaseFilename & FilenameNoPath(pBaseScenario)
+                    lNewFolder = PathNameOnly(lNewBaseFilename) & g_PathChar & aNewScenarioName & g_PathChar
+                    IO.Directory.CreateDirectory(lNewFolder)
+                    lNewBaseFilename = lNewFolder & IO.Path.GetFileNameWithoutExtension(pBaseScenario) & "."
+                    lNewINPfilename = lNewBaseFilename & "inp"
                     'Copy base INP, changing base to new scenario name within it
-                    CreateModifiedINP(aNewScenarioName, lNewINPfilename)
 
-                    'lDATfilename = AbsolutePath(lDATfilename, CurDir).Trim()
-                    'If FilenameNoPath(lDATfilename).ToLower = FilenameNoPath(aPreparedInput).ToLower Then
-                    '    lDATfilename = aPreparedInput
-                    'End If
-                    ''Copy each base DAT to new DAT only if simulation is to be rerun
-                    'Dim lNewDATfilename As String = lNewFolder & aNewScenarioName & "." & IO.Path.GetFileName(lDATfilename)
-                    'If aRunModel Then
-                    '    FileCopy(lDATfilename, lNewDATfilename)
-                    'End If
-                    ''Dim lWDMResults As New atcWDM.atcDataSourceWDM
-                    ''If Not lWDMResults.Open(lNewDATfilename) Then
-                    ''    Logger.Msg("Could not open new scenario WDM file '" & lNewDATfilename & "'", MsgBoxStyle.Critical, "Could not run model")
-                    ''    Return Nothing
-                    ''End If
-
-                    ''Key is base file name, value is modified file name
-                    'lModified.Add(IO.Path.GetFileName(lDATfilename).ToLower.Trim, lNewDATfilename.Trim)
-
-                    ' ''Update scenario name in new WDM
-                    ''For Each lCurrentTimeseries In aModifiedData
-                    ''    If Not lCurrentTimeseries Is Nothing _
-                    ''       AndAlso lCurrentTimeseries.Attributes.GetValue("History 1").ToString.ToLower.Equals("read from " & lDATfilename.ToLower) Then
-                    ''        lCurrentTimeseries.Attributes.SetValue("scenario", aNewScenarioName)
-                    ''        lWDMResults.AddDataset(lCurrentTimeseries)
-                    ''    End If
-                    ''Next
-                    ''For Each lCurrentTimeseries In lWDMResults.DataSets
-                    ''    Dim lScenario As atcDefinedValue = lCurrentTimeseries.Attributes.GetDefinedValue("scenario")
-                    ''    If lScenario.Value.ToLower = "base" Then
-                    ''        lWDMResults.WriteAttribute(lCurrentTimeseries, lScenario, aNewScenarioName)
-                    ''    End If
-                    ''    If Not aModifiedData.Contains(lCurrentTimeseries) Then
-                    ''        lCurrentTimeseries.ValuesNeedToBeRead = True
-                    ''        lCurrentTimeseries.Attributes.DiscardCalculated()
-                    ''    End If
-                    ''Next
-                    ''lWDMResults.DataSets.Clear()
+                    CreateModifiedINP(aNewScenarioName, lNewINPfilename, aModifiedData)
+                    lModified.Add(IO.Path.GetFileName(pBaseScenario).ToLower.Trim, lNewINPfilename.Trim)
             End Select
 
             Dim lRunExitCode As Integer = 0
             If aRunModel Then
                 'Run scenario
-                Dim lSWMMExeName As String = FindFile("Please locate epaswmm5.exe", g_PathChar & "Program Files\EPA SWMM 5.0\epaswmm5.exe")
-
-
+                Dim lSWMMExeName As String = FindFile("Please locate swmm5.exe", g_PathChar & "Program Files\EPA SWMM 5.0\swmm5.exe")
+                Dim lPrevCurDir As String = CurDir() 'save the base scenario folder
+                ChDriveDir(IO.Path.GetDirectoryName(lNewINPfilename)) 'change curdir to modified scenario folder
                 AppendFileString(lNewFolder & "SWMM5Error.Log", "Start log for " & lNewBaseFilename & vbCrLf)
                 Dim lArgs As String = lNewINPfilename
+                lArgs &= " " & IO.Path.ChangeExtension(lNewINPfilename, "rpt")
+                lArgs &= " " & IO.Path.ChangeExtension(lNewINPfilename, "out")
                 Logger.Dbg("Start " & lSWMMExeName & " with Arguments '" & lArgs & "'")
                 Dim lSWMMProcess As New Diagnostics.Process
                 With lSWMMProcess.StartInfo
                     .FileName = lSWMMExeName
                     .Arguments = lArgs
-                    .CreateNoWindow = True
-                    .UseShellExecute = False
+                    .CreateNoWindow = False
+                    .UseShellExecute = True
                 End With
                 lSWMMProcess.Start()
                 While Not lSWMMProcess.HasExited
@@ -202,6 +173,7 @@ Public Class clsCatModelSWMM
                 If lRunExitCode <> 0 Then
                     Logger.Dbg("****************** Problem *********************")
                 End If
+                ChDriveDir(lPrevCurDir) 'Change curdir back to base scenario folder
             Else
                 Logger.Dbg("Skipping running model")
             End If
@@ -210,13 +182,12 @@ Public Class clsCatModelSWMM
                 If lRunExitCode <> 0 Then 'SWMM run failed, don't send any timeseries back to cat
                     lModified.Clear()
                 Else
-                    Dim lBinOutFilename As String = IO.Path.GetFileNameWithoutExtension(lNewINPfilename) & ".out"
-                    lBinOutFilename = AbsolutePath(lBinOutFilename, CurDir)
+                    Dim lBinOutFilename As String = IO.Path.ChangeExtension(lNewINPfilename, "out")
 
                     If IO.File.Exists(lBinOutFilename) Then
                         'Dim lHBNResults As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
                         'If lHBNResults.Open(lNewFilename) Then
-                        lModified.Add(IO.Path.GetFileName(lBinOutFilename).ToLower.Trim, lBinOutFilename.Trim)
+                        lModified.Add(IO.Path.ChangeExtension(IO.Path.GetFileName(pBaseScenario), "out").ToLower.Trim, lBinOutFilename.Trim)
                         'Else
                         '    Logger.Dbg("Could not open output file '" & lBinOutFilename & "'")
                         'End If

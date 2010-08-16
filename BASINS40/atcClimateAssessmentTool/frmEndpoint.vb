@@ -619,16 +619,15 @@ Public Class frmEndpoint
                 Else
                     .Seasons = Nothing
                 End If
-                Try
-                    .Min = CDbl(txtMin.Text)
-                Catch
+
+                If Not Double.TryParse(txtMin.Text, .Min) Then
                     .Min = GetNaN()
-                End Try
-                Try
-                    .Max = CDbl(txtMax.Text)
-                Catch
+                End If
+
+                If Not Double.TryParse(txtMax.Text, .Max) Then
                     .Max = GetNaN()
-                End Try
+                End If
+
                 .ColorAboveMax = txtHighColor.BackColor
                 .ColorBelowMin = txtLowColor.BackColor
                 .ColorDefault = txtDefaultColor.BackColor
