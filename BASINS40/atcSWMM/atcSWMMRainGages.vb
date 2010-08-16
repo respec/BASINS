@@ -73,13 +73,15 @@ Public Class atcSWMMRainGages
                             Case 4 : .Type = lItems(J).Trim
                             Case 5
                                 .TimeSeries = New atcData.atcTimeseries(pSWMMProject)
-                                .TimeSeries.Attributes.SetValue("Location", .Name.Trim())
+                                .TimeSeries.Attributes.SetValue("Location", .Name.Trim()) ' raingage location label
                                 .TimeSeries.Attributes.SetValue("Constituent", "PREC")
                                 Dim lItem As String = lItems(J).Trim()
                                 'lItem = lItem.Trim("""")
                                 lItem = pSWMMProject.FilterFileName(lItem)
-                                .TimeSeries.Attributes.SetValue("Scenario", lItem)
-                                .TimeSeries.Attributes.AddHistory("Read from " & pSWMMProject.FileName)
+                                .TimeSeries.Attributes.SetValue("Scenario", lItem) ' raingage timeseries label
+                                .TimeSeries.Attributes.SetValue("Source", "") ' actual TS source file full path
+                                .TimeSeries.Attributes.AddHistory("Read from " & pSWMMProject.Specification)
+                                .TimeSeries.Attributes.SetValue("ID", "R" & Me.Count + 1)
                                 .TimeSeries.ValuesNeedToBeRead = True
 
                                 If .Type.ToLower() = "file" Then
@@ -211,6 +213,7 @@ Public Class atcSWMMRainGages
         aTS.Values = lValues.ToArray
 
         lSR.Close()
+        aTS.Attributes.SetValue("Source", IO.Path.GetFullPath(aFilename))
     End Sub
 
 
@@ -240,7 +243,7 @@ Public Class atcSWMMRainGages
                     lSB.AppendLine(lFileName)
                     Continue For
                 Else
-                    lFileName = IO.Path.GetFileName(PathNameOnly(Me.pSWMMProject.FileName) & g_PathChar & .Name & "P.DAT")
+                    lFileName = IO.Path.GetFileName(PathNameOnly(Me.pSWMMProject.Specification) & g_PathChar & .Name & "P.DAT")
                 End If
 
                 'lSB.Append(StrPad("""" & PathNameOnly(Me.pSWMMProject.FileName) & g_PathChar & .Name & "P.DAT" & """", 16, " ", False))
@@ -279,7 +282,11 @@ Public Class atcSWMMRainGages
 
     Public Function TimeSeriesToFile() As Boolean
         For Each lRaingage As atcSWMMRainGage In Me
-            Dim lFileName As String = PathNameOnly(Me.pSWMMProject.FileName) & g_PathChar & lRaingage.Name & "P.DAT"
+            Dim lTS As atcData.atcTimeseries = Me.pSWMMProject.DataSets.ItemByKey(lRaingage.TimeSeries.Attributes.GetValue("ID"))
+            If lTS IsNot Nothing Then
+                lRaingage.TimeSeries = lTS
+            End If
+            Dim lFileName As String = PathNameOnly(Me.pSWMMProject.Specification) & g_PathChar & lRaingage.Name & "P.DAT"
             Dim lSB As New StringBuilder
             lSB.Append(Me.pSWMMProject.TimeSeriesToString(lRaingage.TimeSeries, lRaingage.Name))
             SaveFileString(lFileName, lSB.ToString)
@@ -289,6 +296,11 @@ Public Class atcSWMMRainGages
     Public Sub TimeSeriesToStream(ByVal aSW As IO.StreamWriter)
         For Each lRaingage As atcSWMMRainGage In Me
             If lRaingage.TimeSeries IsNot Nothing Then
+                Dim lTS As atcData.atcTimeseries = Me.pSWMMProject.DataSets.ItemByKey(lRaingage.TimeSeries.Attributes.GetValue("ID"))
+                If lTS IsNot Nothing Then
+                    lRaingage.TimeSeries = lTS
+                End If
+
                 aSW.WriteLine(";RAINFALL")
                 'Me.pSWMMProject.TimeSeriesToStream(lRaingage.TimeSeries, lRaingage.TimeSeries.Attributes.GetValue("Location"), aSW)
                 Me.pSWMMProject.RainTSToStream(lRaingage.TimeSeries, lRaingage.TimeSeries.Attributes.GetValue("Scenario"), aSW)

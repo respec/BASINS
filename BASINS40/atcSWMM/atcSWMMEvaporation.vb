@@ -53,7 +53,9 @@ Public Class atcSWMMEvaporation
                 'Assuming there is only one TS for Evap
                 If laTSFile.Length > 0 Then
                     Timeseries.Attributes.SetValue("Scenario", laTSFile)
-                    Timeseries.Attributes.AddHistory("Read from " & pSWMMProject.FileName)
+                    Timeseries.Attributes.SetValue("Source", "")
+                    Timeseries.Attributes.AddHistory("Read from " & pSWMMProject.Specification)
+                    Timeseries.Attributes.SetValue("ID", "E")
                     Timeseries.Attributes.SetValue("Location", pSWMMProject.FilterFileName(laTSFile.TrimEnd("E")))
                     Exit For
                 End If
@@ -85,6 +87,11 @@ Public Class atcSWMMEvaporation
 
     Public Sub TimeSeriesToStream(ByVal aSW As IO.StreamWriter)
         If Timeseries IsNot Nothing Then
+            Dim lTS As atcData.atcTimeseries = Me.pSWMMProject.DataSets.ItemByKey(Timeseries.Attributes.GetValue("ID"))
+            If lTS IsNot Nothing Then
+                Timeseries = lTS
+            End If
+
             aSW.Write(";EVAPORATION" & vbCrLf)
             pSWMMProject.TimeSeriesToStream(Timeseries, Timeseries.Attributes.GetValue("Location") & ":E", aSW)
         End If
@@ -95,7 +102,7 @@ Public Class atcSWMMEvaporation
 
         Dim lFileName As String = ""
         If Timeseries IsNot Nothing Then
-            lFileName = """" & PathNameOnly(Me.pSWMMProject.FileName) & g_PathChar & Timeseries.Attributes.GetValue("Location") & "E.DAT" & """"
+            lFileName = """" & PathNameOnly(Me.pSWMMProject.Specification) & g_PathChar & Timeseries.Attributes.GetValue("Location") & "E.DAT" & """"
             lSB.Append(StrPad(Timeseries.Attributes.GetValue("Location") & ":E", 16, " ", False))
             lSB.AppendLine(" FILE " & lFileName)
         End If
@@ -105,7 +112,11 @@ Public Class atcSWMMEvaporation
 
     Public Function TimeSeriesToFile() As Boolean
         If Timeseries IsNot Nothing Then
-            Dim lFileName As String = PathNameOnly(Me.pSWMMProject.FileName) & g_PathChar & Timeseries.Attributes.GetValue("Location") & "E.DAT"
+            Dim lTS As atcData.atcTimeseries = Me.pSWMMProject.DataSets.ItemByKey(Timeseries.Attributes.GetValue("ID"))
+            If lTS IsNot Nothing Then
+                Timeseries = lTS
+            End If
+            Dim lFileName As String = PathNameOnly(Me.pSWMMProject.Specification) & g_PathChar & Timeseries.Attributes.GetValue("Location") & "E.DAT"
             Dim lSB As New StringBuilder
             lSB.Append(Me.pSWMMProject.TimeSeriesToString(Timeseries, Timeseries.Attributes.GetValue("Location") & ":E", "PEVT"))
             SaveFileString(lFileName, lSB.ToString)
@@ -161,6 +172,7 @@ Public Class atcSWMMEvaporation
         aTS.Dates = lDates1
         aTS.Values = lValues.ToArray
         lSR.Close()
+        aTS.Attributes.SetValue("Source", aFilename)
     End Sub
 
 End Class
