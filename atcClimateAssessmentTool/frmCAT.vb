@@ -1612,4 +1612,12 @@ Public Class frmCAT
     Private Sub chkShowEachRunProgress_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles chkShowEachRunProgress.CheckedChanged
         pCat.ShowEachRunProgress = chkShowEachRunProgress.Checked
     End Sub
+
+    Private Sub chkSaveAll_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles chkSaveAll.Click
+        If chkSaveAll.Checked Then
+            pCat.SaveAll = True
+        Else
+            pCat.SaveAll = False
+        End If
+    End Sub
 End Class
