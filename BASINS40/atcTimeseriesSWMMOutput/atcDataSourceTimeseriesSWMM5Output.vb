@@ -41,8 +41,9 @@ Public Class atcDataSourceTimeseriesSWMM5Output
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
         If MyBase.Open(aFileName, aAttributes) Then
-            pSWMM5_OutputFile = New SWMM5_OutputFile
-            If pSWMM5_OutputFile.OpenSwmmOutFile(MyBase.Specification) = 0 Then
+            Try
+                pSWMM5_OutputFile = New SWMM5_OutputFile(Specification)
+
                 Dim lScenario As String = IO.Path.GetFileNameWithoutExtension(MyBase.Specification)
 
                 'TODO: set attributes appropriately
@@ -107,6 +108,7 @@ Public Class atcDataSourceTimeseriesSWMM5Output
                         lData.numValues = lNumValues
                         lData.Dates = lDates
                         lData.Attributes.AddHistory("Read from " & Specification)
+                        lData.Attributes.SetValue("ID", DataSets.Count + 1)
                         DataSets.Add(lData)
                     Next
                 Next
@@ -125,6 +127,7 @@ Public Class atcDataSourceTimeseriesSWMM5Output
                         lData.numValues = lNumValues
                         lData.Dates = lDates
                         lData.Attributes.AddHistory("Read from " & Specification)
+                        lData.Attributes.SetValue("ID", DataSets.Count + 1)
                         DataSets.Add(lData)
                     Next
                 Next
@@ -143,6 +146,7 @@ Public Class atcDataSourceTimeseriesSWMM5Output
                         lData.numValues = lNumValues
                         lData.Dates = lDates
                         lData.Attributes.AddHistory("Read from " & Specification)
+                        lData.Attributes.SetValue("ID", DataSets.Count + 1)
                         DataSets.Add(lData)
                     Next
                 Next
@@ -160,16 +164,16 @@ Public Class atcDataSourceTimeseriesSWMM5Output
                     lData.numValues = lNumValues
                     lData.Dates = lDates
                     lData.Attributes.AddHistory("Read from " & Specification)
+                    lData.Attributes.SetValue("ID", DataSets.Count + 1)
                     DataSets.Add(lData)
                 Next
 
                 Return True
-            Else
-                Return False
-            End If
-        Else
-            Return False
+            Catch e As Exception
+                Logger.Dbg("Could not open " & aFileName & ": " & e.ToString)
+            End Try
         End If
+        Return False
     End Function
 
     Public Overrides Sub ReadData(ByVal aData As atcData.atcDataSet)
@@ -180,10 +184,15 @@ Public Class atcDataSourceTimeseriesSWMM5Output
         Dim lLocationIndex As Integer = aData.Attributes.GetValue("LocationIndex")
         Dim lParmIndex As Integer = aData.Attributes.GetValue("ParmIndex")
         Dim lValue As Single
+
+        pSWMM5_OutputFile.OpenSwmmOutFile(Specification)
+
         For lTimeStep As Integer = 1 To pSWMM5_OutputFile.TimeStarts.Length - 1
             pSWMM5_OutputFile.GetSwmmResult(lObjectType, lLocationIndex, lParmIndex, lTimeStep, lValue)
             lData.Values(lTimeStep) = lValue
         Next
+
+        pSWMM5_OutputFile.CloseSwmmOutFile()
     End Sub
 
     Public Sub New()
