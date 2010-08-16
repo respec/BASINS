@@ -74,11 +74,66 @@ Public Class SWMM5_OutputFile
         pBinaryFileStream = New FileStream(OutFile, FileMode.Open, FileAccess.Read)
         pBinaryReader = New BinaryReader(pBinaryFileStream)
 
-        Dim lReturnCode As Integer
+    End Function
+
+    Function GetSwmmResult(ByVal iType As Integer, ByVal iIndex As Integer, _
+                           ByVal vIndex As Integer, ByVal period As Integer, _
+                           ByRef Value As Single) As Integer
+        '------------------------------------------------------------------------------
+        '  Input:   iType = type of object whose value is being sought
+        '                   (0 = subcatchment, 1 = node, 2 = link, 3 = system
+        '           iIndex = index of item being sought (starting from 0)
+        '           vIndex = index of variable being sought (see Interfacing Guide)
+        '           period = reporting period index (starting from 1)
+        '  Output:  value = value of variable being sought;
+        '           function returns 1 if successful, 0 if not
+        '  Purpose: finds the result of a specific variable for a given object
+        '           at a specified time period.
+        '------------------------------------------------------------------------------
+        '// --- compute offset into output file
+        Dim offset1 As Integer = OffsetComputedResults + ((period - 1) * BytesPerPeriod) + (2 * RECORDSIZE) ' + 1
+        Dim offset2 As Integer = 0
+
+        If iType = SUBCATCH Then
+            offset2 = RECORDSIZE * (iIndex * SubcatchVars + vIndex)
+        ElseIf iType = NODE Then
+            offset2 = RECORDSIZE * (SWMM_Nsubcatch * SubcatchVars + _
+                                    iIndex * NodeVars + vIndex)
+        ElseIf iType = LINK Then
+            offset2 = RECORDSIZE * (SWMM_Nsubcatch * SubcatchVars + _
+                                    SWMM_Nnodes * NodeVars + _
+                                    iIndex * LinkVars + vIndex)
+        ElseIf iType = SYS Then
+            offset2 = RECORDSIZE * (SWMM_Nsubcatch * SubcatchVars + _
+                                    SWMM_Nnodes * NodeVars + _
+                                    SWMM_Nlinks * LinkVars + vIndex)
+        Else
+            Return 0
+        End If
+
+        ' --- re-position the file and read result
+        Dim offset As Integer = offset1 + offset2
+        pBinaryFileStream.Seek(offset, SeekOrigin.Begin)
+        Value = pBinaryReader.ReadSingle()
+        Return 1
+    End Function
+
+    Public Sub CloseSwmmOutFile()
+        '------------------------------------------------------------------------------
+        '  Input:   none
+        '  Output:  none
+        '  Purpose: closes the binary output file.
+        '------------------------------------------------------------------------------
+        pBinaryReader.Close()
+        pBinaryFileStream.Close()
+    End Sub
+
+    Public Sub New(ByVal OutFileName As String)
+        OpenSwmmOutFile(OutFileName)
         ' --- check that file contains at least 14 records
         If pBinaryFileStream.Length < 14 * RECORDSIZE Then
             pBinaryFileStream.Close()
-            Return lReturnCode
+            Throw New ApplicationException("Not enough output")
         End If
 
         With pBinaryReader
@@ -92,6 +147,10 @@ Public Class SWMM5_OutputFile
                 SWMM_Nperiods = .ReadInt32
                 ReDim TimeStarts(SWMM_Nperiods)
                 Dim errCode As Integer = .ReadInt32
+                If errCode <> 0 Then
+                    Throw New ApplicationException("Error code in output file")
+                End If
+
                 Dim magic2 As Integer = .ReadInt32
 
                 ' --- read magic number from beginning of file
@@ -100,19 +159,9 @@ Public Class SWMM5_OutputFile
 
                 ' --- perform error checks
                 If magic1 <> magic2 Then
-                    lReturnCode = 1
-                ElseIf errCode <> 0 Then
-                    lReturnCode = 1
+                    Throw New ApplicationException("Magic number mismatch")
                 ElseIf SWMM_Nperiods = 0 Then
-                    lReturnCode = 1
-                Else
-                    lReturnCode = 0
-                End If
-
-                ' --- quit if errors found
-                If lReturnCode > 0 Then
-                    CloseSwmmOutFile()
-                    Return lReturnCode
+                    Throw New ApplicationException("Nperiods = 0")
                 End If
 
                 ' --- otherwise read additional parameters from start of file
@@ -207,68 +256,12 @@ Public Class SWMM5_OutputFile
                     pBinaryFileStream.Seek(OffsetComputedResults + ((lTimeIndex - 1) * BytesPerPeriod), SeekOrigin.Begin)
                     TimeStarts(lTimeIndex) = .ReadDouble
                 Next
-
-                ' --- return with file left open
-                Return lReturnCode
-                Exit Function
             Catch ex As Exception
                 Logger.Dbg("SWMMOutputFileProblem " & ex.Message & vbCrLf & ex.StackTrace)
+            Finally
                 CloseSwmmOutFile()
-                Return lReturnCode
             End Try
         End With
-    End Function
-
-    Function GetSwmmResult(ByVal iType As Integer, ByVal iIndex As Integer, _
-                           ByVal vIndex As Integer, ByVal period As Integer, _
-                           ByRef Value As Single) As Integer
-        '------------------------------------------------------------------------------
-        '  Input:   iType = type of object whose value is being sought
-        '                   (0 = subcatchment, 1 = node, 2 = link, 3 = system
-        '           iIndex = index of item being sought (starting from 0)
-        '           vIndex = index of variable being sought (see Interfacing Guide)
-        '           period = reporting period index (starting from 1)
-        '  Output:  value = value of variable being sought;
-        '           function returns 1 if successful, 0 if not
-        '  Purpose: finds the result of a specific variable for a given object
-        '           at a specified time period.
-        '------------------------------------------------------------------------------
-        '// --- compute offset into output file
-        Dim offset1 As Integer = OffsetComputedResults + ((period - 1) * BytesPerPeriod) + (2 * RECORDSIZE) ' + 1
-        Dim offset2 As Integer = 0
-
-        If iType = SUBCATCH Then
-            offset2 = RECORDSIZE * (iIndex * SubcatchVars + vIndex)
-        ElseIf iType = NODE Then
-            offset2 = RECORDSIZE * (SWMM_Nsubcatch * SubcatchVars + _
-                                    iIndex * NodeVars + vIndex)
-        ElseIf iType = LINK Then
-            offset2 = RECORDSIZE * (SWMM_Nsubcatch * SubcatchVars + _
-                                    SWMM_Nnodes * NodeVars + _
-                                    iIndex * LinkVars + vIndex)
-        ElseIf iType = SYS Then
-            offset2 = RECORDSIZE * (SWMM_Nsubcatch * SubcatchVars + _
-                                    SWMM_Nnodes * NodeVars + _
-                                    SWMM_Nlinks * LinkVars + vIndex)
-        Else
-            Return 0
-        End If
-
-        ' --- re-position the file and read result
-        Dim offset As Integer = offset1 + offset2
-        pBinaryFileStream.Seek(offset, SeekOrigin.Begin)
-        Value = pBinaryReader.ReadSingle()
-        Return 1
-    End Function
-
-    Public Sub CloseSwmmOutFile()
-        '------------------------------------------------------------------------------
-        '  Input:   none
-        '  Output:  none
-        '  Purpose: closes the binary output file.
-        '------------------------------------------------------------------------------
-        pBinaryReader.Close()
-        pBinaryFileStream.Close()
     End Sub
 End Class
 
