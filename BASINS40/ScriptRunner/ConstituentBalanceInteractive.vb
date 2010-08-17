@@ -82,12 +82,18 @@ Public Module ConstituentBalanceInteractiveScript
                 lMsg.Open("hspfmsg.mdb")
                 Dim lHspfUci As New atcUCI.HspfUci
                 lHspfUci.FastReadUciForStarter(lMsg, lScenario & ".uci")
-                ConstituentBalance.ReportsToFiles(lHspfUci, lOperations, lConstituents, lScenario, lHspfBinFile, lLocations, lHspfBinFileInfo.LastWriteTime)
+                ConstituentBalance.ReportsToFiles(lHspfUci, lOperations, lConstituents, lScenario, lHspfBinFile, lLocations, lHspfBinFileInfo.LastWriteTime, , , , 10)
 
                 'clean up 
                 atcDataManager.DataSources.Remove(lHspfBinFile)
                 lHspfBinFile.DataSets.Clear()
                 lHspfBinFile = Nothing
+
+                'open output files
+                For Each lBalanceType As String In lConstituents
+                    Dim lOutFileName As String = lScenario & "_" & lBalanceType & "_Balance.txt"
+                    OpenFile(lOutFileName)
+                Next lBalanceType
             Next lScenario
 
         Else

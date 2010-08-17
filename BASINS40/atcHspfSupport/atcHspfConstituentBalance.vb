@@ -67,6 +67,7 @@ Public Module ConstituentBalance
 
                     Try
                         Dim lOutputTable As New atcTableDelimited
+                        lOutputTable.TrimValues = False
                         With lOutputTable
                             For Each lConstituentKey As String In lConstituentsToOutput.Keys
                                 If lConstituentKey.StartsWith(lOperationKey) Then

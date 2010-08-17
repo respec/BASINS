@@ -22,6 +22,7 @@ Public Class atcTableDelimited
     Protected pRecords As New ArrayList
     Private pCurrentRecordStart As Integer
     Private pDelimiter As Char = Chr(44) 'default to Chr(44) = comma
+    Private pTrimValues As Boolean = True
 
     Public Overrides Property CurrentRecord() As Integer
         Get
@@ -60,6 +61,15 @@ Public Class atcTableDelimited
         End Get
         Set(ByVal newValue As Char)
             pDelimiter = newValue
+        End Set
+    End Property
+
+    Public Property TrimValues() As Boolean
+        Get
+            Return pTrimValues
+        End Get
+        Set(ByVal newTrimValues As Boolean)
+            pTrimValues = newTrimValues
         End Set
     End Property
 
@@ -154,7 +164,11 @@ Public Class atcTableDelimited
             ElseIf aFieldNumber > pNumFields Then
                 Throw New ApplicationException("Value: Invalid Field Number: " & aFieldNumber & " > " & pNumFields)
             Else
-                Return TrimValue(pCurrentRowValues(aFieldNumber), FieldType(aFieldNumber))
+                If pTrimValues Then
+                    Return TrimValue(pCurrentRowValues(aFieldNumber), FieldType(aFieldNumber))
+                Else
+                    Return pCurrentRowValues(aFieldNumber)
+                End If
             End If
         End Get
         Set(ByVal newValue As String)

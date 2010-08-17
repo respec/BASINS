@@ -61,9 +61,9 @@ Module modWinHSPFLt
     Public Function Main() As Integer
         Dim lRetcod As Integer = 1234
         Dim lSendFeedBack As Boolean = True
+        Dim lErrLogFlag As Boolean = False
         Try
             Dim lErrLogName As String = "WinHspfLt.log"
-            Dim lErrLogFlag As Boolean = False
 
             Dim lExeCmd As String = Environment.CommandLine
 
@@ -182,6 +182,9 @@ Module modWinHSPFLt
         Catch ex As Exception
             If lRetcod = 0 Then lRetcod = 4321
             Logger.Dbg(ex.Message & vbCrLf & ex.StackTrace)
+            If Not lErrLogFlag Then
+                Logger.Msg(ex.Message & vbCrLf & ex.StackTrace, "HSPF Error")
+            End If
             If lSendFeedBack Then
                 ShowFeedback()
             End If
