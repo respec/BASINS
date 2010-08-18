@@ -152,7 +152,7 @@ Imports MapWinUtility
         Dim childIndent As String
         childIndent = indent & indentIncrement
         retval = ""
-        index = 1
+        index = 0 'CHANGE: to zero-based, used to be = 1
         maxIndex = MySubExpressions.Count()
         If ScriptAssigningLineNumbers Then
             If MyToken = ATCsToken.tok_ATCScript Then CurrentLineNum = 1
@@ -169,7 +169,7 @@ Imports MapWinUtility
                 index = 4
 
 DefaultLoop:
-                While index <= MyNumSubExpressionsOnSameLine And index <= maxIndex
+                While index <= MyNumSubExpressionsOnSameLine And index < maxIndex  'CHANGE: used to be index <= maxIndex
                     AddSuffixNoDoubles(retval, " ")
                     retval = retval & MySubExpressions.Item(index).Printable
                     index = index + 1
@@ -177,7 +177,7 @@ DefaultLoop:
 
                 If index <= maxIndex Then addCR = True Else addCR = False
 
-                While index <= maxIndex
+                While index <= maxIndex - 1
                     If Right(retval, Len(PrintEOL)) <> PrintEOL Then
                         retval = retval & PrintEOL
                         If ScriptAssigningLineNumbers Then CurrentLineNum = CurrentLineNum + 1
@@ -473,9 +473,9 @@ ExitFun:
             End If
         End If
 
-        SubExpIndex = 2
+        SubExpIndex = 1 'CHANGE: used to be 2
         SubExpMax = MySubExpressions.Count()
-        While SubExpIndex <= SubExpMax
+        While SubExpIndex <= SubExpMax - 1
             If ColIndex > UBound(ColDefs) Then ReDim Preserve ColDefs(ColIndex + 100)
             'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Printable. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
             rule = MySubExpressions.Item(SubExpIndex).Printable
@@ -617,7 +617,7 @@ ParseFixedDef:
                     If AbortScript Then Exit Function
                 Next
             Case ATCsToken.tok_Attribute
-                retval = MySubExpressions.Item(2).Evaluate
+                retval = MySubExpressions.Item(1).Evaluate 'CHANGE: used to be 2
                 ScriptSetAttribute(MySubExpressions.Item(1).Printable, retval)
             Case ATCsToken.tok_ColumnFormat : retval = SetColumnFormat()
             Case ATCsToken.tok_Comment : retval = ""
@@ -747,9 +747,9 @@ ParseFixedDef:
             Case ATCsToken.tok_In
                 retval = "0"
                 'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                tmpval = MySubExpressions.Item(1).Evaluate
+                tmpval = MySubExpressions.Item(0).Evaluate 'CHANGE: used to be 1
                 ForMax = MySubExpressions.Count()
-                For SubExp = 2 To ForMax
+                For SubExp = 1 To ForMax - 1 'CHANGE: used to be SubExp = 2 To ForMax
                     'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions(SubExp).Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
                     If MySubExpressions.Item(SubExp).Evaluate = tmpval Then
                         retval = "1"
@@ -778,7 +778,7 @@ ParseFixedDef:
                 If IsNumeric(MySubExpressions.Item(1).Evaluate) Then retval = "1" Else retval = "0"
             Case ATCsToken.tok_LineEnd
                 InputEOL = vbCr
-                tmpval = UCase(MySubExpressions.Item(1).Printable)
+                tmpval = UCase(MySubExpressions.Item(0).Printable)
                 If IsNumeric(tmpval) Then
                     InputEOL = ""
                     InputLineLen = CInt(tmpval)
@@ -838,7 +838,7 @@ ParseFixedDef:
                     ForMax = 1
                 Else
                     'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                    ForMax = MySubExpressions.Item(1).Evaluate
+                    ForMax = MySubExpressions.Item(0).Evaluate
                 End If
                 For SubExp = 1 To ForMax
                     ScriptNextLine()
@@ -854,7 +854,7 @@ ParseFixedDef:
                     tmpval = MySubExpressions.Item(1).Evaluate
                 End If
                 'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                tmpval2 = MySubExpressions.Item(2).Evaluate
+                tmpval2 = MySubExpressions.Item(1).Evaluate
                 ScriptSetVariable(tmpval, tmpval2)
                 retval = tmpval2
             Case ATCsToken.tok_Test
@@ -865,7 +865,7 @@ ParseFixedDef:
                     If AbortScript Then Exit Function
                 Next
                 'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                retval = MySubExpressions.Item(SubExp).Evaluate
+                retval = MySubExpressions.Item(SubExp - 1).Evaluate 'CHANGE: used to be SubExp
             Case ATCsToken.tok_Trim
                 'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
                 retval = Trim(MySubExpressions.Item(1).Evaluate)
