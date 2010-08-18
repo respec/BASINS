@@ -124,17 +124,6 @@ Public Module WatershedSummary
         lString.AppendLine("   Average Annual Rates and Totals")
         lString.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
         lString.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
-        lString.AppendLine("Land Use".PadLeft(25) & vbTab & _
-                           "   Area    " & vbTab & _
-                           "    Load    " & vbTab & _
-                           "Total Load  " & vbTab & _
-                           "Total Load")
-        lString.AppendLine("                         " & vbTab & _
-                           "  (acres)  " & vbTab & _
-                           " (" & lUnits & "/acre) " & vbTab & _
-                           "  (" & lTotalUnits & ")     " & vbTab & _
-                           "    (%)     ")
-        lString.AppendLine("")
 
         Dim lOper As atcUCI.HspfOperation
         Dim lLuName As String
@@ -211,27 +200,7 @@ Public Module WatershedSummary
             Next
         Next
 
-        Dim lStr As String
-        For lIndex As Integer = 1 To lLandUses.Count
-            lStr = lLandUses(lIndex)
-            lStr = lStr.PadLeft(25)
-            lString.AppendLine(lStr & vbTab & _
-                               DecimalAlign(lAreas(lIndex)) & vbTab & _
-                               DecimalAlign(lLoads(lIndex)) & vbTab & _
-                               DecimalAlign(lTotalLoads(lIndex)) & vbTab & _
-                               DecimalAlign((lTotalLoads(lIndex) / lSum * 100), 10, 2))
-        Next
-        lString.AppendLine("")
-        lStr = ""
-        lStr = lStr.PadRight(25)
-        lString.AppendLine(lStr & vbTab & vbTab & vbTab & "Total Load = " & vbTab & DecimalAlign(lSum) & vbTab & " " & lTotalUnits)
-
-
         'begin reach section
-        lString.AppendLine("")
-        lString.AppendLine("Reach Output".PadLeft(25))
-        lString.AppendLine("")
-
         Dim lReaches As New Collection
         Dim lReachLoads As New Collection
         Dim lReachName As String = ""
@@ -271,12 +240,68 @@ Public Module WatershedSummary
             End If
         Next
 
-        For lIndex As Integer = 1 To lReaches.Count
-            lStr = lReaches(lIndex)
-            lStr = lStr.PadLeft(25)
-            lString.AppendLine(lStr & vbTab & vbTab & vbTab & _
-                               DecimalAlign(lReachLoads(lIndex)))
-        Next
+        'now build table for output
+        Dim lOutputTable As New atcTableDelimited
+        lOutputTable.TrimValues = False
+        Dim lFieldWidth As Integer = 12
+
+        With lOutputTable
+            .NumHeaderRows = 0
+            .Delimiter = vbTab
+            .NumFields = 5
+
+            .FieldLength(1) = 25
+            .FieldName(1) = "Land Use".PadLeft(25)
+            .FieldLength(2) = lFieldWidth
+            .FieldName(2) = Center("Area", lFieldWidth)
+            .FieldLength(3) = lFieldWidth
+            .FieldName(3) = Center("Load", lFieldWidth)
+            .FieldLength(4) = lFieldWidth
+            .FieldName(4) = Center("Total Load", lFieldWidth)
+            .FieldLength(5) = lFieldWidth
+            .FieldName(5) = Center("Total Load", lFieldWidth)
+
+            .CurrentRecord += 1
+            .Value(1) = "".PadLeft(25)
+            .Value(2) = Center("(acres)", lFieldWidth)
+            .Value(3) = Center("(" & lUnits & "/acre)", lFieldWidth)
+            .Value(4) = Center("(" & lTotalUnits & ")", lFieldWidth)
+            .Value(5) = Center("(%)", lFieldWidth)
+
+            .CurrentRecord += 1
+            For lIndex As Integer = 1 To lLandUses.Count
+                .CurrentRecord += 1
+                .Value(1) = lLandUses(lIndex).PadLeft(25)
+                .Value(2) = DecimalAlign(lAreas(lIndex))
+                .Value(3) = DecimalAlign(lLoads(lIndex))
+                .Value(4) = DecimalAlign(lTotalLoads(lIndex))
+                .Value(5) = DecimalAlign((lTotalLoads(lIndex) / lSum * 100), 10, 2)
+            Next
+
+            .CurrentRecord += 1
+            .CurrentRecord += 1
+
+            .Value(1) = "".PadLeft(25)
+            .Value(2) = "".PadLeft(lFieldWidth)
+            .Value(3) = "Total Load = "
+            .Value(4) = DecimalAlign(DecimalAlign(lSum))
+            .Value(5) = lTotalUnits
+
+            .CurrentRecord += 1
+            .CurrentRecord += 1
+            .Value(1) = "Reach Output".PadLeft(25)
+            .CurrentRecord += 1
+
+            For lIndex As Integer = 1 To lReaches.Count
+                .CurrentRecord += 1
+                .Value(1) = lReaches(lIndex).ToString.PadLeft(25)
+                .Value(2) = "".PadLeft(lFieldWidth)
+                .Value(3) = "".PadLeft(lFieldWidth)
+                .Value(4) = DecimalAlign(lReachLoads(lIndex))
+            Next
+
+            lString.Append(.ToString)
+        End With
 
         Return lString
     End Function
