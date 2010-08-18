@@ -80,6 +80,12 @@ Public Module WatershedSummaryInteractive
                 atcDataManager.DataSources.Remove(lHspfBinFile)
                 lHspfBinFile.DataSets.Clear()
                 lHspfBinFile = Nothing
+
+                'open output files
+                For Each lReportType As String In lConstituents
+                    Dim lOutFileName As String = lScenario & "_" & lReportType & "_WatershedSummary.txt"
+                    OpenFile(lOutFileName)
+                Next lReportType
             Next
         Else
             Logger.Dbg("WatershedSummaryCancelled")
