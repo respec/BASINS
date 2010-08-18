@@ -1,0 +1,80 @@
+MapWinGeoProc: 
+24 references in SDMProjectBuilder:
+
+		 Selection.SelectLinesWithPolygon
+		 Selection.SelectPointsWithPolygon
+		 Selection.SelectPolygonsWithPolygon
+		 SpatialOperations.ClipGridWithPolygon
+		 SpatialOperations.Intersection
+		 SpatialOperations.MergeShapes
+		 SpatialReference.ProjectGrid
+		 SpatialReference.ProjectPoint
+		 SpatialReference.ProjectShapefile
+		 Statistics.Centroid
+		 TerrainAnalysis.Slope
+		 Utils.Area
+		 Utils.FindNearestPointAndLocOld
+
+22 references in D4EMDataManager:
+
+		 DataManagement.ChangeGridFormat
+		 SpatialOperations.ClipGridWithPolygon
+		 SpatialOperations.MergeShapes
+		 SpatialReference.ProjectGrid
+		 SpatialReference.ProjectImage
+		 SpatialReference.ProjectPoint
+		 SpatialReference.ProjectShapefile
+
+ 1 reference in BasinsDataExtension: 
+
+		 SpatialReference.ProjectPoint
+
+ 4 references in NHDPlusDataExtension:
+
+		 Error.GetLastErrorMsg
+
+no references in NLCD2001
+
+25 references in atcMwGisUtility
+
+		 DataManagement.CopyShapefile
+		 SpatialOperations.ClipGridWithPolygon
+		 SpatialOperations.ClipShapesWithPolygon
+		 SpatialOperations.Intersection
+		 SpatialOperations.MergeShapes
+		 SpatialReference.ProjectPoint
+		 TerrainAnalysis.Slope
+		 Utils.Area(Shape)
+		 Utils.Centroid
+		 Utils.FindNearestPointAndLoc
+		 
+ 1 reference in atcManDelin:
+		 SpatialOperations.ClipPolygonWithLine
+
+77 uses of MapWinGeoProc.* in SDMProjectBuilder & libraries
+
+21 unique calls:
+		 
+DataManagement.ChangeGridFormat
+DataManagement.CopyShapefile
+Error.GetLastErrorMsg
+Selection.SelectLinesWithPolygon
+Selection.SelectPointsWithPolygon
+Selection.SelectPolygonsWithPolygon
+SpatialOperations.ClipGridWithPolygon
+SpatialOperations.ClipPolygonWithLine
+SpatialOperations.ClipShapesWithPolygon
+SpatialOperations.Intersection
+SpatialOperations.MergeShapes
+SpatialReference.ProjectGrid
+SpatialReference.ProjectImage
+SpatialReference.ProjectPoint
+SpatialReference.ProjectShapefile
+Statistics.Centroid
+TerrainAnalysis.Slope
+Utils.Area(Shape)
+Utils.Centroid
+Utils.FindNearestPointAndLoc
+Utils.FindNearestPointAndLocOld
+
+
