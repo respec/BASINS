@@ -23,52 +23,69 @@ Public Module WatershedSummary
         Dim lTotalUnits As String = lUnits
         Dim lPerlndConstituents As New Collection
         Dim lImplndConstituents As New Collection
+
+        Dim lRchresConstituents As New Collection
+        Dim lRchresConversion As String = "1.0"
+
         Select Case aSummaryType
             Case "Water"
                 lPerlndConstituents.Add("PERO")
                 lImplndConstituents.Add("SURO")
                 lUnits = "in"
                 lTotalUnits = "cfs"
+                lRchresConstituents.Add("ROVOL")
+                lRchresConversion = "723.97"
             Case "BOD"
                 lPerlndConstituents.Add("POQUAL-BOD")
                 lImplndConstituents.Add("SOQUAL-BOD")
+                lRchresConstituents.Add("BODOUTTOT")
             Case "DO"
                 lPerlndConstituents.Add("PODOXM")
                 lImplndConstituents.Add("SODOXM")
+                lRchresConstituents.Add("DOXOUTTOT")
             Case "FColi"
                 lPerlndConstituents.Add("POQUAL-F.Coliform")
                 lImplndConstituents.Add("SOQUAL-F.Coliform")
                 lUnits = "10^9"
                 lTotalUnits = lUnits
+                lRchresConstituents.Add("F.Coliform-TROQAL")
             Case "Lead"
                 lPerlndConstituents.Add("POQUAL-LEAD")
                 lImplndConstituents.Add("SOQUAL-LEAD")
+                lRchresConstituents.Add("LEAD-TROQAL")
             Case "NH3"
                 lPerlndConstituents.Add("POQUAL-NH3")
                 lImplndConstituents.Add("SOQUAL-NH3")
+                lRchresConstituents.Add("TAM-OUTTOT")
             Case "NH4"
                 lAgchemConstituent = "NH4-N - TOTAL OUTFLOW"
                 lPerlndConstituents.Add("POQUAL-NH4")
                 lImplndConstituents.Add("SOQUAL-NH4")
+                lRchresConstituents.Add("TAM-OUTTOT")
             Case "NO3"
                 lAgchemConstituent = "N03-N - TOTAL OUTFLOW"
                 lPerlndConstituents.Add("POQUAL-NO3")
                 lImplndConstituents.Add("SOQUAL-NO3")
+                lRchresConstituents.Add("NO3-OUTTOT")
             Case "OrganicN"
                 lAgchemConstituent = "ORGN - TOTAL OUTFLOW"
                 lPerlndConstituents.Add("POQUAL-BOD")
                 lImplndConstituents.Add("SOQUAL-BOD")
+                lRchresConstituents.Add("BODOUTTOT")
             Case "OrganicP"
                 lPerlndConstituents.Add("POQUAL-BOD")
                 lImplndConstituents.Add("SOQUAL-BOD")
+                lRchresConstituents.Add("BODOUTTOT")
             Case "PO4"
                 lPerlndConstituents.Add("POQUAL-ORTHO P")
                 lImplndConstituents.Add("SOQUAL-ORTHO P")
+                lRchresConstituents.Add("PO4-OUTTOT")
             Case "Sediment"
                 lPerlndConstituents.Add("SOSED")
                 lImplndConstituents.Add("SOSLD")
                 lUnits = "tons"
                 lTotalUnits = lUnits
+                lRchresConstituents.Add("ROSED-TOT")
             Case "TotalN"
                 lAgchemConstituent = "NITROGEN - TOTAL OUTFLOW"
                 'Total N is a combination of NH4, No3, OrganicN
@@ -78,20 +95,27 @@ Public Module WatershedSummary
                 lImplndConstituents.Add("SOQUAL-NH4")
                 lImplndConstituents.Add("SOQUAL-NO3")
                 lImplndConstituents.Add("SOQUAL-BOD")
+                lRchresConstituents.Add("TAM-OUTTOT")
+                lRchresConstituents.Add("NO3-OUTTOT")
+                lRchresConstituents.Add("BODOUTTOT")
             Case "TotalP"
                 'Total P is a combination of PO4 and OrganicP
                 lPerlndConstituents.Add("POQUAL-ORTHO P")
                 lPerlndConstituents.Add("POQUAL-BOD")
                 lImplndConstituents.Add("SOQUAL-ORTHO P")
                 lImplndConstituents.Add("SOQUAL-BOD")
+                lRchresConstituents.Add("PO4-OUTTOT")
+                lRchresConstituents.Add("BODOUTTOT")
             Case "WaterTemp"
                 lPerlndConstituents.Add("POHT")
                 lPerlndConstituents.Add("SOHT")
                 lUnits = "btu"
                 lTotalUnits = lUnits
+                lRchresConstituents.Add("ROHEAT")
             Case "Zinc"
                 lPerlndConstituents.Add("POQUAL-ZINC")
                 lImplndConstituents.Add("SOQUAL-ZINC")
+                lRchresConstituents.Add("ZINC-TROQAL")
         End Select
 
         Dim lString As New Text.StringBuilder
@@ -195,12 +219,65 @@ Public Module WatershedSummary
                                DecimalAlign(lAreas(lIndex)) & vbTab & _
                                DecimalAlign(lLoads(lIndex)) & vbTab & _
                                DecimalAlign(lTotalLoads(lIndex)) & vbTab & _
-                               DecimalAlign((lTotalLoads(lIndex) / lSum * 100), , 2))
+                               DecimalAlign((lTotalLoads(lIndex) / lSum * 100), 10, 2))
         Next
         lString.AppendLine("")
         lStr = ""
         lStr = lStr.PadRight(25)
         lString.AppendLine(lStr & vbTab & vbTab & vbTab & "Total Load = " & vbTab & DecimalAlign(lSum) & vbTab & " " & lTotalUnits)
+
+
+        'begin reach section
+        lString.AppendLine("")
+        lString.AppendLine("Reach Output".PadLeft(25))
+        lString.AppendLine("")
+
+        Dim lReaches As New Collection
+        Dim lReachLoads As New Collection
+        Dim lReachName As String = ""
+        Dim lRchOperType As String = "RCHRES"
+        For Each lOper In aUci.OpnBlks(lRchOperType).Ids
+            'for each rchres, get reach name
+            If Not lOper.TableExists("GEN-INFO") Then
+                Logger.Dbg("Missing:GEN-INFO:" & lOper.Name & ":" & lOper.Id)
+            Else
+                lReachName = lOper.Tables("GEN-INFO").Parms(0).Value
+                Dim lTempDataGroup As atcTimeseriesGroup = aScenarioResults.DataSets.FindData("Location", Left(lRchOperType, 1) & ":" & lOper.Id)
+                If lTempDataGroup Is Nothing Then
+                    Logger.Dbg("No Data") 'TODO: for?
+                End If
+                lValue = 0.0
+                For Each lConstituent As String In lRchresConstituents
+                    If lTempDataGroup.FindData("Constituent", lConstituent).Count > 0 Then
+                        lTempDataSet = lTempDataGroup.FindData("Constituent", lConstituent).Item(0)
+                        Dim lMult As Single = 1.0
+                        If lConstituent = "BODOUTTOT" Then
+                            'might need another multiplier for bod
+                            If aSummaryType = "BOD" Then
+                                lMult = 0.4
+                            ElseIf aSummaryType = "OrganicN" Or aSummaryType = "TotalN" Then
+                                lMult = 0.048
+                            ElseIf aSummaryType = "OrganicP" Or aSummaryType = "TotalP" Then
+                                lMult = 0.0023
+                            End If
+                        ElseIf lConstituent = "F.Coliform-TROQAL" Then
+                            lMult = 1 / 1000000000.0 '10^9
+                        End If
+                        lValue += (lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value * lMult / lRchresConversion)
+                    End If
+                Next
+                lReaches.Add(lReachName.Trim)
+                lReachLoads.Add(lValue)
+            End If
+        Next
+
+        For lIndex As Integer = 1 To lReaches.Count
+            lStr = lReaches(lIndex)
+            lStr = lStr.PadLeft(25)
+            lString.AppendLine(lStr & vbTab & vbTab & vbTab & _
+                               DecimalAlign(lReachLoads(lIndex)))
+        Next
+
         Return lString
     End Function
 
