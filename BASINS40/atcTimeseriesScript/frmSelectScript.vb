@@ -4,45 +4,60 @@ Option Explicit On
 Imports atcUtility
 
 Friend Class frmSelectScript
-	Inherits System.Windows.Forms.Form
+    Inherits System.Windows.Forms.Form
     'Copyright 2010 by AQUA TERRA Consultants
-	
-	Public ButtonPressed As String
+
+    Public SelectedScript As String
+    Public ButtonPressed As String
     Private pDataFilename As String
     Private pCurrentRow As Integer = 1
     Private CanReadBackColor As Drawing.Color = Drawing.Color.FromArgb(11861940) 'RGB(180, 255, 180)
     Private NotReadableBackColor As Drawing.Color = Drawing.Color.Red
 
     Private Sub agdScripts_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdScripts.MouseDownCell
+        SelectedScript = agdScripts.Source.CellValue(aRow, 1)
+        Dim lLastRow As Integer = agdScripts.Source.Rows - 1
+        For lRow As Integer = 1 To lLastRow
+            If lRow = aRow Then
+                agdScripts.Source.CellSelected(lRow, 0) = True
+            Else
+                agdScripts.Source.CellSelected(lRow, 0) = False
+            End If
+
+        Next
+        agdScripts.Refresh()
         EnableButtons()
     End Sub
 
-	Private Sub cmdCancel_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdCancel.Click
-		ButtonPressed = cmdCancel.Text
-		Me.Hide()
-	End Sub
-	
-	Private Sub cmdFind_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdFind.Click
+    Private Sub cmdCancel_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdCancel.Click
+        ButtonPressed = cmdCancel.Text
+        Me.Hide()
+    End Sub
+
+    Private Sub cmdFind_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdFind.Click
         Dim bgColor As Drawing.Color
-		ButtonPressed = cmdFind.Text
+        ButtonPressed = cmdFind.Text
         dlgOpenFileOpen.Filter = "Wizard Script Files (*.ws)|*.ws|All Files (*.*)|*.*"
-		dlgOpenFileOpen.DefaultExt = "ws"
-		dlgOpenFileOpen.Title = "Open Script File"
-		dlgOpenFileOpen.ShowDialog()
-		Dim ScriptFilename, ScriptDescription As String
-		Dim Script As clsATCscriptExpression
-		If dlgOpenFileOpen.FileName <> "" Then
-			ScriptFilename = dlgOpenFileOpen.FileName
-			Script = ScriptFromString(WholeFileString(ScriptFilename))
-			If Script Is Nothing Then
-				ScriptDescription = Err.Description
+        dlgOpenFileOpen.DefaultExt = "ws"
+        dlgOpenFileOpen.Title = "Open Script File"
+        dlgOpenFileOpen.ShowDialog()
+        Dim ScriptFilename, ScriptDescription As String
+        Dim Script As clsATCscriptExpression
+        If dlgOpenFileOpen.FileName <> "" Then
+            ScriptFilename = dlgOpenFileOpen.FileName
+            Script = ScriptFromString(WholeFileString(ScriptFilename))
+            If Script Is Nothing Then
+                ScriptDescription = Err.Description
                 bgColor = NotReadableBackColor
-			Else
-				ScriptDescription = Script.SubExpression(1).Printable
+            Else
+                ScriptDescription = Script.SubExpression(0).Printable
                 Script = Nothing
-				SaveSetting("ATCTimeseriesImport", "Scripts", ScriptFilename, ScriptDescription)
-				bgColor = TestScriptColor(ScriptFilename)
-			End If
+                SaveSetting("ATCTimeseriesImport", "Scripts", ScriptFilename, ScriptDescription)
+                bgColor = TestScriptColor(ScriptFilename) 'TODO: debug this later
+            End If
+            'If agdScripts.Source Is Nothing Then
+            '    agdScripts.Source = New atcControls.atcGridSource
+            'End If
             With agdScripts.Source
                 .Rows = .Rows + 1
                 .CellValue(.Rows, 0) = ScriptDescription
@@ -55,15 +70,15 @@ Friend Class frmSelectScript
                 'End While
                 '.set_Selected(.Rows, 0, True)
             End With
-			EnableButtons()
-		End If
-	End Sub
-	
-	Private Sub cmdHelp_Click()
-		MsgBox("Select a script that will recognize the data you are importing. " & vbCr & "If no appropriate script is listed, select a similar one " & vbCr & "and click 'Edit' to create a new script based on it." & vbCr & "'Run' interprets the selected script and imports your data." & vbCr & "'Edit' reads the selected script and presents an interface for customizing it." & vbCr & "      Note: some complex scripts use features that can not yet be edited in the graphical " & vbCr & "      interface. These scripts may be edited manually as text files before pressing 'Run'. " & vbCr & "'Find' browses your disk for new scripts that are not in the list." & vbCr & "'Forget' removes the selected script from the list, but leaves it on disk." & vbCr & "'Debug' runs the selected script one step at a time." & vbCr & "'Cancel' closes this window without importing any data" & vbCr & "Green scripts have tested the current file and can probably read it." & vbCr & "Pink scripts have tested the current file and probably can't read it." & vbCr & "Red scripts contain errors or cannot be found on disk." & vbCr & "Other scripts are unable to test files for readability.", MsgBoxStyle.OKOnly, "Help for Script Selection")
-	End Sub
-	
-	Private Sub cmdDelete_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdDelete.Click
+            EnableButtons()
+        End If
+    End Sub
+
+    Private Sub cmdHelp_Click()
+        MsgBox("Select a script that will recognize the data you are importing. " & vbCr & "If no appropriate script is listed, select a similar one " & vbCr & "and click 'Edit' to create a new script based on it." & vbCr & "'Run' interprets the selected script and imports your data." & vbCr & "'Edit' reads the selected script and presents an interface for customizing it." & vbCr & "      Note: some complex scripts use features that can not yet be edited in the graphical " & vbCr & "      interface. These scripts may be edited manually as text files before pressing 'Run'. " & vbCr & "'Find' browses your disk for new scripts that are not in the list." & vbCr & "'Forget' removes the selected script from the list, but leaves it on disk." & vbCr & "'Debug' runs the selected script one step at a time." & vbCr & "'Cancel' closes this window without importing any data" & vbCr & "Green scripts have tested the current file and can probably read it." & vbCr & "Pink scripts have tested the current file and probably can't read it." & vbCr & "Red scripts contain errors or cannot be found on disk." & vbCr & "Other scripts are unable to test files for readability.", MsgBoxStyle.OkOnly, "Help for Script Selection")
+    End Sub
+
+    Private Sub cmdDelete_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdDelete.Click
         If agdScripts.Source.CellValue(pCurrentRow, 1) <> "" Then
             If MsgBox("About to forget script:" & vbCr & "Description: " & agdScripts.Source.CellValue(pCurrentRow, 0) & vbCr & "Filename: " & agdScripts.Source.CellValue(pCurrentRow, 1), MsgBoxStyle.YesNo, "Confirm Forget") = MsgBoxResult.Yes Then
                 DeleteSetting("ATCTimeseriesImport", "Scripts", agdScripts.Source.CellValue(pCurrentRow, 1))
@@ -72,36 +87,41 @@ Friend Class frmSelectScript
                 'agdScripts.TextMatrix(pCurrentRow, 1) = ""
             End If
         End If
-		EnableButtons()
-	End Sub
-	
-	Private Sub cmdRun_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdRun.Click
-		ButtonPressed = cmdRun.Text
-		Me.Hide()
-	End Sub
-	
-	Private Sub cmdTest_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdTest.Click
-		ButtonPressed = cmdTest.Text
-		Me.Hide()
-	End Sub
-	
-	Private Sub cmdWizard_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdWizard.Click
-		ButtonPressed = cmdWizard.Text
-		Me.Hide()
-	End Sub
-	
-	Public Sub LoadGrid(Optional ByRef DataFilename As String = "")
+        EnableButtons()
+    End Sub
+
+    Private Sub cmdRun_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdRun.Click
+        ButtonPressed = cmdRun.Text
+        Me.Hide()
+    End Sub
+
+    Private Sub cmdTest_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdTest.Click
+        ButtonPressed = cmdTest.Text
+        Me.Hide()
+    End Sub
+
+    Private Sub cmdWizard_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdWizard.Click
+        ButtonPressed = cmdWizard.Text
+        Me.Hide()
+    End Sub
+
+    Public Sub LoadGrid(Optional ByRef DataFilename As String = "")
         Dim MySettings As String(,)
-		Dim intSettings As Integer
+        Dim intSettings As Integer
         Dim bgColor As Drawing.Color
-		Dim CanReadRow As Integer
-		Dim RowsFilled As Integer
-		
-		pDataFilename = DataFilename
-        With agdScripts.Source
+        Dim CanReadRow As Integer
+        Dim RowsFilled As Integer
+
+        pDataFilename = DataFilename
+        Dim lSource As New atcControls.atcGridSource
+
+        With lSource
+            MySettings = GetAllSettings("ATCTimeseriesImport", "Scripts")
+            .Columns = 2
+            .Rows = UBound(MySettings, 1) - LBound(MySettings, 1) + 1
+
             .CellValue(0, 0) = "Description"
             .CellValue(0, 1) = "Script File"
-            MySettings = GetAllSettings("ATCTimeseriesImport", "Scripts")
             CanReadRow = 0
             .CellValue(1, 0) = "Blank Script"
             .CellValue(1, 1) = ""
@@ -121,7 +141,7 @@ Friend Class frmSelectScript
                         .CellValue(lRow, 0) = MySettings(intSettings, 1)
 
                         'Set background of cell based on whether this script can read data file
-                        bgColor = TestScriptColor(MySettings(intSettings, 0))
+                        'bgColor = TestScriptColor(MySettings(intSettings, 0)) 'TODO: debug this one later
                         .CellColor(lRow, 1) = bgColor
                         .CellColor(lRow, 0) = bgColor
 
@@ -131,6 +151,7 @@ Friend Class frmSelectScript
                 Next intSettings
             End If
             .Rows = RowsFilled
+            .FixedRows = 1
 
             If CanReadRow > 0 Then
                 pCurrentRow = CanReadRow
@@ -140,10 +161,13 @@ Friend Class frmSelectScript
                 'If Not .get_RowIsVisible(CanReadRow) Then .TopRow = CanReadRow
             End If
         End With
-		EnableButtons()
-		
-	End Sub
-	
+        agdScripts.Initialize(lSource)
+        agdScripts.SizeColumnToContents(0)
+        agdScripts.ColumnWidth(1) = agdScripts.ClientSize.Width - agdScripts.ColumnWidth(0) - 15
+        EnableButtons()
+
+    End Sub
+
     Private Function TestScriptColor(ByRef ScriptFilename As String) As Drawing.Color
         Dim Script As clsATCscriptExpression
         Dim TestResult As String
@@ -175,7 +199,7 @@ Friend Class frmSelectScript
 ErrExit:
         TestScriptColor = NotReadableBackColor
     End Function
-	
+
     Private Sub frmSelectScript_Resize(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Resize
         'If VB6.PixelsToTwipsY(Height) > 600 Then agdScripts.Height = VB6.TwipsToPixelsY(VB6.PixelsToTwipsY(Height) - 576)
         'If VB6.PixelsToTwipsX(Width) > 450 Then
@@ -183,7 +207,7 @@ ErrExit:
         '	If VB6.PixelsToTwipsX(fraButtons.Left) > 300 Then agdScripts.Width = VB6.TwipsToPixelsX(VB6.PixelsToTwipsX(fraButtons.Left) - 228)
         'End If
     End Sub
-	
+
     Private Sub EnableButtons()
         'TODO: enable appropriate buttons
         '      If agdScripts.SelCount > 0 And Len(agdScripts.Ctlget_Text()) > 0 Then
@@ -200,5 +224,4 @@ ErrExit:
         'cmdDelete.Enabled = cmdRun.Enabled
         'cmdTest.Enabled = cmdRun.Enabled
     End Sub
-
 End Class

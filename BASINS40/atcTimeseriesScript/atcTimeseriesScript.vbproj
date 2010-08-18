@@ -36,6 +36,7 @@
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic.Compatibility" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -61,6 +62,12 @@
       <DependentUpon>frmDebugScript.vb</DependentUpon>
     </Compile>
     <Compile Include="frmDebugScript.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmInputWizard.Designer.vb">
+      <DependentUpon>frmInputWizard.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmInputWizard.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmSelectScript.designer.vb">
@@ -89,6 +96,9 @@
   <ItemGroup>
     <EmbeddedResource Include="frmDebugScript.resX">
       <DependentUpon>frmDebugScript.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmInputWizard.resX">
+      <DependentUpon>frmInputWizard.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmSelectScript.resX">
       <DependentUpon>frmSelectScript.vb</DependentUpon>

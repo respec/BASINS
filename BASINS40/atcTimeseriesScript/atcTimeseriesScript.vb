@@ -13,9 +13,9 @@ Imports MapWinUtility
 ''' Does not read provisional values into timeseries
 ''' </remarks>
 Public Class atcTimeseriesScriptPlugin
-    Inherits atcDataSource
+    Inherits atcTimeseriesSource
 
-    Private Shared pFilter As String = "Any Data File (*.*)|(*.*)"
+    Private Shared pFilter As String = "Any Data File (*.*)|*.*"
     Private pErrorDescription As String
 
     Public Sub New()
@@ -58,14 +58,50 @@ Public Class atcTimeseriesScriptPlugin
             Me.Specification = aFileName
             Try
                 Dim lSelectForm As New frmSelectScript
-                lSelectForm.ShowDialog()
+                With lSelectForm
+                    .Text = "Script Selection for importing " & aFileName
+                    .LoadGrid(aFileName)
+ShowSelect:
+                    .ShowDialog()
+                    Dim lDefinitionFilename As String = .SelectedScript
+                    Select Case .ButtonPressed
+                        Case .cmdCancel.Text : Exit Function
+                        Case .cmdRun.Text
+                            RunSelectedScript(lDefinitionFilename, aFileName)
+                        Case .cmdTest.Text
+                            DebuggingScript = True
+                            RunSelectedScript(lDefinitionFilename, aFileName)
+                            DebuggingScript = False
+                        Case .cmdWizard.Text
+                            Dim lfrmInputwizard As New frmInputWizard
+                            With lfrmInputwizard
+                                .TserFile = Me
+                                .txtDataFile.Text = aFileName
+                                .txtScriptFile.Text = lDefinitionFilename
+                                .ReadScript()
+                                .ShowDialog()
+                            End With
 
+                    End Select
+                End With
             Catch e As Exception
                 Logger.Dbg("Exception reading '" & aFileName & "': " & e.ToString)
                 Return False
             End Try
         End If
     End Function
+
+    Private Sub RunSelectedScript(ByVal aDefinitionFilename As String, ByVal aDataFilename As String)
+        Dim Script As clsATCscriptExpression
+
+        Script = ScriptFromString(WholeFileString(aDefinitionFilename))
+        If Script Is Nothing Then
+            MsgBox("Could not load script " & aDefinitionFilename & vbCr & Err.Description, vbExclamation, "Run Script")
+        Else
+            ScriptRun(Script, aDataFilename, Me)
+        End If
+    End Sub
+
 
     'Private Function ScriptFileNames() As String(,)
     '    Dim lScriptsToShow As String(,) = GetAllSettings("atcTimeseriesScript", "Scripts")

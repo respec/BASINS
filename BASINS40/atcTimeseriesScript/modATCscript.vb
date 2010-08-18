@@ -5,43 +5,43 @@ Imports atcUtility
 Imports atcData
 
 Module modATCscript
-	'Copyright 2002 by AQUA TERRA Consultants
+    'Copyright 2002 by AQUA TERRA Consultants
 
     Public DebugScriptForm As frmDebugScript
-	Public ScriptState As Collection 'of variable names (as keys) and values
-	Public WholeDataFile As String 'Contains entire contents of data file
-	Public LenDataFile As Integer
-	Public NextLineStart As Integer 'Index in WholeDataFile of first character of next line to be read
-	Public LastPercent As Integer 'For updating status messages
-	Public CurrentLine As String 'Current line of data file being parsed
-	Public LenCurrentLine As Integer
-	Public CurrentRepeat As Integer 'Current repeating part within CurrentLine (>=1)
-	Public TestingFile As Boolean 'True if we are just testing, False if we are reading data
-	Public FixedColumns As Boolean 'True if columns are fixed width
-	Public ColumnDelimiter As String 'character that delimits columns if FixedColumns is False
-	Public NumColumnDelimiters As Integer 'ColumnDelimiter may contain more than one delimiter character
-	Public ColDefs() As clsATCscriptExpression.ColDef 'Names of columns (and start/width if FixedColumns) (1..NamesColumns)
-	'ColDefs(0) stores info about the first repeating column
-	Public NamedColumns As Integer 'Number of cols defined in ColDefs (there may be gaps if delimited)
-	Public RepeatStartCol As Integer 'First column that repeats
-	'Public RepeatEndCol As Long      'Last column that repeats
-	
-	Public CurrentLineNum As Integer 'Current line of script being printed
-	Public DebuggingScript As Boolean
-	Public ScriptAssigningLineNumbers As Boolean
-	Public AbortScript As Boolean
-	
-	Public PrintEOL As String
-	Public InputEOL As String
-	Public LenInputEOL As Integer
-	Public InputLineLen As Integer
-	
-    Public FillTU As ATCTimeUnit
-	Public FillTS As Integer
-	Public FillVal As Single
-	Public FillMissing As Single
-	Public FillAccum As Single
-	
+    Public ScriptState As Collection 'of variable names (as keys) and values
+    Public WholeDataFile As String 'Contains entire contents of data file
+    Public LenDataFile As Integer
+    Public NextLineStart As Integer 'Index in WholeDataFile of first character of next line to be read
+    Public LastPercent As Integer 'For updating status messages
+    Public CurrentLine As String 'Current line of data file being parsed
+    Public LenCurrentLine As Integer
+    Public CurrentRepeat As Integer 'Current repeating part within CurrentLine (>=1)
+    Public TestingFile As Boolean 'True if we are just testing, False if we are reading data
+    Public FixedColumns As Boolean 'True if columns are fixed width
+    Public ColumnDelimiter As String 'character that delimits columns if FixedColumns is False
+    Public NumColumnDelimiters As Integer 'ColumnDelimiter may contain more than one delimiter character
+    Public ColDefs() As clsATCscriptExpression.ColDef 'Names of columns (and start/width if FixedColumns) (1..NamesColumns)
+    'ColDefs(0) stores info about the first repeating column
+    Public NamedColumns As Integer 'Number of cols defined in ColDefs (there may be gaps if delimited)
+    Public RepeatStartCol As Integer 'First column that repeats
+    'Public RepeatEndCol As Long      'Last column that repeats
+
+    Public CurrentLineNum As Integer 'Current line of script being printed
+    Public DebuggingScript As Boolean
+    Public ScriptAssigningLineNumbers As Boolean
+    Public AbortScript As Boolean
+
+    Public PrintEOL As String
+    Public InputEOL As String
+    Public LenInputEOL As Integer
+    Public InputLineLen As Integer
+
+    Public FillTU As atcTimeUnit
+    Public FillTS As Integer
+    Public FillVal As Single
+    Public FillMissing As Single
+    Public FillAccum As Single
+
     ''' <summary>
     ''' Array of token names
     ''' Be sure to synchronize with Private Enum ATCsToken in clsATCscriptExpression
@@ -49,198 +49,198 @@ Module modATCscript
     ''' <remarks></remarks>
     Public TokenString As String() = {"Unknown", "And", "ATCScript", "Attribute", "ColumnFormat", "Comment", "Dataset", "Date", "FatalError", "Fill", "Flag", "For", "If", "In", "Increment", "Instr", "IsNumeric", "LineEnd", "Literal", "+", "/", "*", "^", "-", "Mid", "NextLine", "Not", "Or", "Set", "Test", "Trim", "Unset", "Value", "Variable", "Warn", "While", ">", ">=", "<", "<=", "<>", "=", "Last"}
 
-	Private Const DefaultScenario As String = "ScriptRead"
+    Private Const DefaultScenario As String = "ScriptRead"
     Private pTserFile As atcTimeseriesSource
-	Private pDataFilename As String
-	Private pTserData As Collection 'of ATCclsTserData
-	
-	Private Structure InputBuffer
-		Dim DateCount As Integer
-		Dim DateDim As Integer
-		Dim DateArray() As Double
-		Dim ValueArray() As Single
-		Dim FlagArray() As Integer
-	End Structure
-	Private InBuf() As InputBuffer
-	Private CurBuf As Integer
-	
-	Private pMonitor As Object
-	Private pMonitorSet As Boolean
-	
-	Private Sub ScriptInit()
-		ReDim InBuf(0)
-		
+    Private pDataFilename As String
+    Private pTserData As Collection 'of ATCclsTserData
+
+    Private Structure InputBuffer
+        Dim DateCount As Integer
+        Dim DateDim As Integer
+        Dim DateArray() As Double
+        Dim ValueArray() As Single
+        Dim FlagArray() As Integer
+    End Structure
+    Private InBuf() As InputBuffer
+    Private CurBuf As Integer
+
+    Private pMonitor As Object
+    Private pMonitorSet As Boolean
+
+    Private Sub ScriptInit()
+        ReDim InBuf(0)
+
         pTserData = Nothing
-		pTserData = New Collection
-		AddNewTserAndBuffer()
-		
+        pTserData = New Collection
+        AddNewTserAndBuffer()
+
         ScriptState = Nothing
-		ScriptState = New Collection
-		WholeDataFile = ""
-		LenDataFile = 0
-		NextLineStart = 1
-		LastPercent = 0
-		CurrentLine = ""
-		LenCurrentLine = 0
-		CurrentRepeat = 1
-		ColumnDelimiter = ""
-		NumColumnDelimiters = 0
-		ReDim ColDefs(0)
-		NamedColumns = 0
-		RepeatStartCol = 0
-		'  RepeatEndCol = 0
-		CurrentLineNum = 0
-		FillTS = 0
-		AbortScript = False
-	End Sub
-	
-	'UPGRADE_NOTE: str was upgraded to str_Renamed. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
-	Public Function ReadIntLeaveRest(ByRef str_Renamed As String) As Integer
-		Dim chpos, lenStr As Integer
-		chpos = 1
-		If IsNumeric(Left(str_Renamed, 1)) Then
-			lenStr = Len(str_Renamed)
-			While (IsNumeric(Mid(str_Renamed, chpos, 1)))
-				chpos = chpos + 1
-				If chpos > lenStr Then
-					ReadIntLeaveRest = CInt(str_Renamed)
-					Exit Function
-				End If
-			End While
-			ReadIntLeaveRest = CInt(Left(str_Renamed, chpos - 1))
-			str_Renamed = Mid(str_Renamed, chpos)
-		Else
-			ReadIntLeaveRest = 0
-		End If
-	End Function
-	
-	Public Sub ScriptSetMonitor(ByRef o As Object)
-		pMonitorSet = True
-		pMonitor = o
-	End Sub
-	
-	Public Function ScriptEndOfData() As Boolean
-		If NextLineStart >= LenDataFile And LenCurrentLine = 0 Then ScriptEndOfData = True Else ScriptEndOfData = False
-	End Function
-	
-	Public Sub ScriptNextLine()
-		Dim percent As Integer
-		Dim EOLPos As Integer
-		Do 
-			If NextLineStart > LenDataFile Then
-				CurrentLine = ""
-				LenCurrentLine = 0
-				Exit Sub
-			End If
-			If InputLineLen > 0 Then 'All lines are same length
-				CurrentLine = Mid(WholeDataFile, NextLineStart, LenCurrentLine)
-				LenCurrentLine = Len(CurrentLine)
-				NextLineStart = NextLineStart + LenCurrentLine
-			Else
-				If (InputEOL = vbCr Or InputEOL = vbLf) Then
-					EOLPos = FirstStringPos(NextLineStart, WholeDataFile, vbCr, vbLf)
-				Else
-					EOLPos = InStr(NextLineStart, WholeDataFile, InputEOL)
-				End If
-				If EOLPos = 0 Then EOLPos = LenDataFile + 1
-				LenCurrentLine = EOLPos - NextLineStart
-				CurrentLine = Mid(WholeDataFile, NextLineStart, LenCurrentLine)
-				NextLineStart = NextLineStart + LenCurrentLine + LenInputEOL
-				If (NextLineStart < LenDataFile) Then 'Skip LF after CR
-					If Mid(WholeDataFile, EOLPos, 1) = vbCr Then
-						If Mid(WholeDataFile, NextLineStart, 1) = vbLf Then
-							NextLineStart = NextLineStart + 1
-						End If
-					End If
-				End If
-			End If
-			CurrentLineNum = CurrentLineNum + 1
-		Loop While Len(Trim(CurrentLine)) = 0
-		If pMonitorSet Then
-			percent = 100 * NextLineStart / LenDataFile 'Loc = 128 * bytes read for sequential file
-			If percent <> LastPercent Then
-				'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-				pMonitor.SendMonitorMessage("(MSG1 " & Left(CurrentLine, 100) & ")")
-				'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-				pMonitor.SendMonitorMessage("(MSG3 " & CStr(percent) & "%)")
-				'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-				pMonitor.SendMonitorMessage("(PROGRESS " & CStr(percent) & ")")
-				LastPercent = percent
-				System.Windows.Forms.Application.DoEvents()
-			End If
-		End If
-		'Debug.Print "NextLine: " & Format(CurrentLineNum, "00") & " " & CurrentLine
+        ScriptState = New Collection
+        WholeDataFile = ""
+        LenDataFile = 0
+        NextLineStart = 1
+        LastPercent = 0
+        CurrentLine = ""
+        LenCurrentLine = 0
+        CurrentRepeat = 1
+        ColumnDelimiter = ""
+        NumColumnDelimiters = 0
+        ReDim ColDefs(0)
+        NamedColumns = 0
+        RepeatStartCol = 0
+        '  RepeatEndCol = 0
+        CurrentLineNum = 0
+        FillTS = 0
+        AbortScript = False
+    End Sub
+
+    'UPGRADE_NOTE: str was upgraded to str_Renamed. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
+    Public Function ReadIntLeaveRest(ByRef str_Renamed As String) As Integer
+        Dim chpos, lenStr As Integer
+        chpos = 1
+        If IsNumeric(Left(str_Renamed, 1)) Then
+            lenStr = Len(str_Renamed)
+            While (IsNumeric(Mid(str_Renamed, chpos, 1)))
+                chpos = chpos + 1
+                If chpos > lenStr Then
+                    ReadIntLeaveRest = CInt(str_Renamed)
+                    Exit Function
+                End If
+            End While
+            ReadIntLeaveRest = CInt(Left(str_Renamed, chpos - 1))
+            str_Renamed = Mid(str_Renamed, chpos)
+        Else
+            ReadIntLeaveRest = 0
+        End If
+    End Function
+
+    Public Sub ScriptSetMonitor(ByRef o As Object)
+        pMonitorSet = True
+        pMonitor = o
+    End Sub
+
+    Public Function ScriptEndOfData() As Boolean
+        If NextLineStart >= LenDataFile And LenCurrentLine = 0 Then ScriptEndOfData = True Else ScriptEndOfData = False
+    End Function
+
+    Public Sub ScriptNextLine()
+        Dim percent As Integer
+        Dim EOLPos As Integer
+        Do
+            If NextLineStart > LenDataFile Then
+                CurrentLine = ""
+                LenCurrentLine = 0
+                Exit Sub
+            End If
+            If InputLineLen > 0 Then 'All lines are same length
+                CurrentLine = Mid(WholeDataFile, NextLineStart, LenCurrentLine)
+                LenCurrentLine = Len(CurrentLine)
+                NextLineStart = NextLineStart + LenCurrentLine
+            Else
+                If (InputEOL = vbCr Or InputEOL = vbLf) Then
+                    EOLPos = FirstStringPos(NextLineStart, WholeDataFile, vbCr, vbLf)
+                Else
+                    EOLPos = InStr(NextLineStart, WholeDataFile, InputEOL)
+                End If
+                If EOLPos = 0 Then EOLPos = LenDataFile + 1
+                LenCurrentLine = EOLPos - NextLineStart
+                CurrentLine = Mid(WholeDataFile, NextLineStart, LenCurrentLine)
+                NextLineStart = NextLineStart + LenCurrentLine + LenInputEOL
+                If (NextLineStart < LenDataFile) Then 'Skip LF after CR
+                    If Mid(WholeDataFile, EOLPos, 1) = vbCr Then
+                        If Mid(WholeDataFile, NextLineStart, 1) = vbLf Then
+                            NextLineStart = NextLineStart + 1
+                        End If
+                    End If
+                End If
+            End If
+            CurrentLineNum = CurrentLineNum + 1
+        Loop While Len(Trim(CurrentLine)) = 0
+        If pMonitorSet Then
+            percent = 100 * NextLineStart / LenDataFile 'Loc = 128 * bytes read for sequential file
+            If percent <> LastPercent Then
+                'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+                pMonitor.SendMonitorMessage("(MSG1 " & Left(CurrentLine, 100) & ")")
+                'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+                pMonitor.SendMonitorMessage("(MSG3 " & CStr(percent) & "%)")
+                'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+                pMonitor.SendMonitorMessage("(PROGRESS " & CStr(percent) & ")")
+                LastPercent = percent
+                System.Windows.Forms.Application.DoEvents()
+            End If
+        End If
+        'Debug.Print "NextLine: " & Format(CurrentLineNum, "00") & " " & CurrentLine
         If DebuggingScript Then DebugScriptForm.NextLine()
-	End Sub
-	
-	Public Function ScriptSetDate(ByRef jdy As Double) As Double
-		With InBuf(CurBuf)
-			.DateCount = .DateCount + 1
-			If .DateCount > .DateDim Then
-				.DateDim = .DateCount * 2
-				ReDim Preserve .DateArray(.DateDim)
-				ReDim Preserve .ValueArray(.DateDim)
-				ReDim Preserve .FlagArray(.DateDim)
-			End If
-			.DateArray(.DateCount) = jdy
+    End Sub
+
+    Public Function ScriptSetDate(ByRef jdy As Double) As Double
+        With InBuf(CurBuf)
+            .DateCount = .DateCount + 1
+            If .DateCount > .DateDim Then
+                .DateDim = .DateCount * 2
+                ReDim Preserve .DateArray(.DateDim)
+                ReDim Preserve .ValueArray(.DateDim)
+                ReDim Preserve .FlagArray(.DateDim)
+            End If
+            .DateArray(.DateCount) = jdy
             If DebuggingScript Then DebugScriptForm.NewDate(.DateCount, jdy)
-			'Debug.Print "Date " & .DateCount & "=" & jdy;
-		End With
-		ScriptSetDate = jdy
-	End Function
-	
-	Public Function ScriptSetValue(ByRef newValue As Single) As Single
-		InBuf(CurBuf).ValueArray(InBuf(CurBuf).DateCount) = newValue
-		ScriptSetValue = newValue
+            'Debug.Print "Date " & .DateCount & "=" & jdy;
+        End With
+        ScriptSetDate = jdy
+    End Function
+
+    Public Function ScriptSetValue(ByRef newValue As Single) As Single
+        InBuf(CurBuf).ValueArray(InBuf(CurBuf).DateCount) = newValue
+        ScriptSetValue = newValue
         If DebuggingScript Then DebugScriptForm.NewValue(InBuf(CurBuf).DateCount, newValue)
-		'Debug.Print " Value " & pDateCount & "=" & newValue
-	End Function
-	
-	Public Function ScriptSetFlag(ByRef newValue As Integer) As Integer
-		InBuf(CurBuf).FlagArray(InBuf(CurBuf).DateCount) = newValue
-		ScriptSetFlag = newValue
-		'Debug.Print " Flag " & pDateCount & "=" & newValue
-	End Function
-	
-	Public Function ScriptSetVariable(ByRef VarName As String, ByRef newValue As String) As String
-		Static ShowedNumericMessage As Integer
-		Static ShowedRangeMessage As Integer
-		Select Case LCase(VarName)
-			Case "repeat"
-				If IsNumeric(newValue) Then
-					CurrentRepeat = CInt(newValue)
-					If CurrentRepeat < 1 Then
-						If ShowedRangeMessage < 2 Then
-							MsgBox("Repeat was set to '" & CurrentRepeat & "' but it should always be >= 1.", MsgBoxStyle.OKOnly, "modATCscript:ScriptSetVariable")
-							ShowedRangeMessage = ShowedRangeMessage + 1
-						End If
-					End If
-				Else
-					If ShowedNumericMessage < 2 Then
-						MsgBox("Non-numeric value '" & newValue & "' assigned to Repeat", MsgBoxStyle.OKOnly, "modATCscript:ScriptSetVariable")
-						ShowedNumericMessage = ShowedNumericMessage + 1
-					End If
-				End If
-			Case Else : On Error Resume Next
-				ScriptState.Remove(VarName)
-				ScriptState.Add(newValue, VarName)
-		End Select
-	End Function
-	
-	Public Function ScriptUnsetVariable(ByRef VarName As String) As String
-		On Error Resume Next
-		ScriptState.Remove(VarName)
-		ScriptUnsetVariable = VarName
-	End Function
-	
-	Public Sub ScriptSetDataset(ByRef index As Integer)
-		While index > pTserData.Count()
-			AddNewTserAndBuffer()
-		End While
-		CurBuf = index
-	End Sub
-	
-	Private Sub AddNewTserAndBuffer()
+        'Debug.Print " Value " & pDateCount & "=" & newValue
+    End Function
+
+    Public Function ScriptSetFlag(ByRef newValue As Integer) As Integer
+        InBuf(CurBuf).FlagArray(InBuf(CurBuf).DateCount) = newValue
+        ScriptSetFlag = newValue
+        'Debug.Print " Flag " & pDateCount & "=" & newValue
+    End Function
+
+    Public Function ScriptSetVariable(ByRef VarName As String, ByRef newValue As String) As String
+        Static ShowedNumericMessage As Integer
+        Static ShowedRangeMessage As Integer
+        Select Case LCase(VarName)
+            Case "repeat"
+                If IsNumeric(newValue) Then
+                    CurrentRepeat = CInt(newValue)
+                    If CurrentRepeat < 1 Then
+                        If ShowedRangeMessage < 2 Then
+                            MsgBox("Repeat was set to '" & CurrentRepeat & "' but it should always be >= 1.", MsgBoxStyle.OkOnly, "modATCscript:ScriptSetVariable")
+                            ShowedRangeMessage = ShowedRangeMessage + 1
+                        End If
+                    End If
+                Else
+                    If ShowedNumericMessage < 2 Then
+                        MsgBox("Non-numeric value '" & newValue & "' assigned to Repeat", MsgBoxStyle.OkOnly, "modATCscript:ScriptSetVariable")
+                        ShowedNumericMessage = ShowedNumericMessage + 1
+                    End If
+                End If
+            Case Else : On Error Resume Next
+                ScriptState.Remove(VarName)
+                ScriptState.Add(newValue, VarName)
+        End Select
+    End Function
+
+    Public Function ScriptUnsetVariable(ByRef VarName As String) As String
+        On Error Resume Next
+        ScriptState.Remove(VarName)
+        ScriptUnsetVariable = VarName
+    End Function
+
+    Public Sub ScriptSetDataset(ByRef index As Integer)
+        While index > pTserData.Count()
+            AddNewTserAndBuffer()
+        End While
+        CurBuf = index
+    End Sub
+
+    Private Sub AddNewTserAndBuffer()
         'Dim newts As ATCclsTserData
         'newts = New ATCclsTserData
         ''Set newts = New ATCclsTserData
@@ -258,88 +258,91 @@ Module modATCscript
         'ReDim InBuf(CurBuf).DateArray(0)
         'ReDim InBuf(CurBuf).ValueArray(0)
         'ReDim InBuf(CurBuf).FlagArray(0)
-	End Sub
-	
-	Public Sub ScriptManageDataset(ByRef cmd As String, Optional ByRef AttrName As String = "", Optional ByRef attrValue As String = "")
-		Static AttrNames(99) As String
-		Static AttrValues(99) As String
-		Static NumAttribs As Integer
-		Dim tserNum, attrNum As Integer
-		Dim MisMatch As Boolean
-		Dim tmp As String
-		
-		Select Case LCase(cmd)
-			Case "clearcriteria"
-				NumAttribs = 0
-			Case "addcriteria"
-				NumAttribs = NumAttribs + 1
-				AttrNames(NumAttribs) = AttrName
-				AttrValues(NumAttribs) = attrValue
-			Case "matchcriteria"
-				tserNum = 0
-				MisMatch = True
-				While tserNum < pTserData.Count() And MisMatch
-					tserNum = tserNum + 1
-					MisMatch = False
-					attrNum = 0
-					While attrNum < NumAttribs And Not MisMatch
-						attrNum = attrNum + 1
-						AttrName = AttrNames(attrNum)
-						attrValue = AttrValues(attrNum)
-						'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-						With pTserData.Item(tserNum).Header
-							Select Case LCase(AttrName)
-								Case "con", "cons", "constituent"
-									'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-									If .con <> "" Then
-										'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-										If .con <> attrValue Then MisMatch = True
-									End If
-								Case "sen", "scen", "scenario"
-									'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-									If .Sen <> "" And .Sen <> DefaultScenario Then
-										'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-										If .Sen <> attrValue Then MisMatch = True
-									End If
-								Case "loc", "location"
-									'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-									If .loc <> "" Then
-										'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-										If .loc <> attrValue Then MisMatch = True
-									End If
-								Case "des", "desc", "description"
-									'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-									If .desc <> "" And .desc <> pDataFilename Then
-										'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-										If .desc <> attrValue Then MisMatch = True
-									End If
-									
-								Case Else
-									'UPGRADE_WARNING: Couldn't resolve default property of object pTserData().Attrib. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-									tmp = pTserData.Item(tserNum).Attrib(AttrName, "")
-									If tmp <> "" Then
-										If tmp <> attrValue Then MisMatch = True
-									End If
-							End Select
-						End With
-					End While 'attrNum
-				End While 'tserNum
-				If MisMatch Then
-					AddNewTserAndBuffer()
-				Else
-					CurBuf = tserNum
-				End If
-				For attrNum = 1 To NumAttribs 'In case some "Matching" values were default or blank, explicitly set them
-					ScriptSetAttribute(AttrNames(attrNum), AttrValues(attrNum))
-				Next attrNum
-			Case Else
-				MsgBox("Unknown command " & cmd & " in ManageDataset", MsgBoxStyle.OKOnly, "modATCscript")
-				Stop
-		End Select
-	End Sub
-	
-	
-	Public Sub ScriptSetAttribute(ByRef AttrName As String, ByRef newValue As String)
+    End Sub
+
+    Public Sub ScriptManageDataset(ByRef cmd As String, Optional ByRef AttrName As String = "", Optional ByRef attrValue As String = "")
+        Static AttrNames(99) As String
+        Static AttrValues(99) As String
+        Static NumAttribs As Integer
+        Dim tserNum, attrNum As Integer
+        Dim MisMatch As Boolean
+        Dim tmp As String
+
+        Select Case LCase(cmd)
+            Case "clearcriteria"
+                NumAttribs = 0
+            Case "addcriteria"
+                NumAttribs = NumAttribs + 1
+                AttrNames(NumAttribs) = AttrName
+                AttrValues(NumAttribs) = attrValue
+            Case "matchcriteria"
+                tserNum = 0
+                MisMatch = True
+                While tserNum < pTserData.Count() And MisMatch
+                    tserNum = tserNum + 1
+                    MisMatch = False
+                    attrNum = 0
+                    While attrNum < NumAttribs And Not MisMatch
+                        attrNum = attrNum + 1
+                        AttrName = AttrNames(attrNum)
+                        attrValue = AttrValues(attrNum)
+                        'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+                        With pTserData.Item(tserNum).Header
+                            Select Case LCase(AttrName)
+                                Case "con", "cons", "constituent"
+                                    'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+                                    If .con <> "" Then
+                                        'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+                                        If .con <> attrValue Then MisMatch = True
+                                    End If
+                                Case "sen", "scen", "scenario"
+                                    'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+                                    If .Sen <> "" And .Sen <> DefaultScenario Then
+                                        'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+                                        If .Sen <> attrValue Then MisMatch = True
+                                    End If
+                                Case "loc", "location"
+                                    'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+                                    If .loc <> "" Then
+                                        'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+                                        If .loc <> attrValue Then MisMatch = True
+                                    End If
+                                Case "des", "desc", "description"
+                                    'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+                                    If .desc <> "" And .desc <> pDataFilename Then
+                                        'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+                                        If .desc <> attrValue Then MisMatch = True
+                                    End If
+
+                                Case Else
+                                    'UPGRADE_WARNING: Couldn't resolve default property of object pTserData().Attrib. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+                                    tmp = pTserData.Item(tserNum).Attrib(AttrName, "")
+                                    If tmp <> "" Then
+                                        If tmp <> attrValue Then MisMatch = True
+                                    End If
+                            End Select
+                        End With
+                    End While 'attrNum
+                End While 'tserNum
+                If MisMatch Then
+                    AddNewTserAndBuffer()
+                Else
+                    CurBuf = tserNum
+                End If
+                For attrNum = 1 To NumAttribs 'In case some "Matching" values were default or blank, explicitly set them
+                    ScriptSetAttribute(AttrNames(attrNum), AttrValues(attrNum))
+                Next attrNum
+            Case Else
+                MsgBox("Unknown command " & cmd & " in ManageDataset", MsgBoxStyle.OkOnly, "modATCscript")
+                Stop
+        End Select
+    End Sub
+
+
+    Public Sub ScriptSetAttribute(ByRef AttrName As String, ByRef newValue As String)
+        If pTserData.Count = 0 Then
+            Exit Sub
+        End If
         With pTserData.Item(CurBuf).Header
             Select Case LCase(AttrName)
                 Case "con", "cons", "constituent"
@@ -354,8 +357,8 @@ Module modATCscript
                     pTserData.Item(CurBuf).AttribSet(AttrName, newValue)
             End Select
         End With
-	End Sub
-	
+    End Sub
+
     Public Function ScriptFromString(ByRef ScriptString As String) As clsATCscriptExpression
         Dim ErrDescription As String = ""
         Dim CountParens, CountPos As Integer
@@ -408,47 +411,47 @@ Module modATCscript
         MapWinUtility.Logger.Msg(ErrDescription, vbCritical, "Error in ScriptFromString")
         Return Nothing
     End Function
-	
-	Public Function ScriptOpenDataFile(ByRef DataFilename As String) As String
-		Dim DataFile As Short 'File handle for data file being read
-		DataFile = FreeFile()
-		FileOpen(DataFile, DataFilename, OpenMode.Input)
-		LenDataFile = LOF(DataFile)
-		WholeDataFile = InputString(DataFile, LenDataFile)
-		CurrentLine = Left(WholeDataFile, 1000)
-		LenCurrentLine = 0
-		NextLineStart = 1
-		FileClose(DataFile)
-		ScriptOpenDataFile = "OK"
-		Exit Function
-		
-ErrorOpen: 
-		ScriptOpenDataFile = "Error opening data file: " & DataFilename & vbCr & Err.Description
-	End Function
-	
-	Public Function ScriptTest(ByRef Script As clsATCscriptExpression, ByRef DataFilename As String) As String
-		Dim msg As String
-		TestingFile = True
-		ScriptInit()
-		If pDataFilename = DataFilename And LenDataFile > 0 Then
-			NextLineStart = 1
-			LastPercent = 0
-			CurrentLine = ""
-			LenCurrentLine = 0
-			CurrentRepeat = 1
-			ScriptTest = Script.Evaluate
-		Else
-			pDataFilename = DataFilename
-			msg = ScriptOpenDataFile(DataFilename)
-			If msg <> "OK" Then
-				MsgBox(msg, MsgBoxStyle.OKOnly, "Data Import")
-				ScriptTest = "0"
-			Else
-				ScriptTest = Script.Evaluate
-			End If
-		End If
-	End Function
-	
+
+    Public Function ScriptOpenDataFile(ByRef DataFilename As String) As String
+        Dim DataFile As Short 'File handle for data file being read
+        DataFile = FreeFile()
+        FileOpen(DataFile, DataFilename, OpenMode.Input)
+        LenDataFile = LOF(DataFile)
+        WholeDataFile = InputString(DataFile, LenDataFile)
+        CurrentLine = Left(WholeDataFile, 1000)
+        LenCurrentLine = 0
+        NextLineStart = 1
+        FileClose(DataFile)
+        ScriptOpenDataFile = "OK"
+        Exit Function
+
+ErrorOpen:
+        ScriptOpenDataFile = "Error opening data file: " & DataFilename & vbCr & Err.Description
+    End Function
+
+    Public Function ScriptTest(ByRef Script As clsATCscriptExpression, ByRef DataFilename As String) As String
+        Dim msg As String
+        TestingFile = True
+        ScriptInit()
+        If pDataFilename = DataFilename And LenDataFile > 0 Then
+            NextLineStart = 1
+            LastPercent = 0
+            CurrentLine = ""
+            LenCurrentLine = 0
+            CurrentRepeat = 1
+            ScriptTest = Script.Evaluate
+        Else
+            pDataFilename = DataFilename
+            msg = ScriptOpenDataFile(DataFilename)
+            If msg <> "OK" Then
+                MsgBox(msg, MsgBoxStyle.OkOnly, "Data Import")
+                ScriptTest = "0"
+            Else
+                ScriptTest = Script.Evaluate
+            End If
+        End If
+    End Function
+
     Public Function ScriptRun(ByRef Script As clsATCscriptExpression, ByRef DataFilename As String, ByRef TserFile As atcTimeseriesSource) As String
         Dim msg As String
         'Dim tmpData As ATCclsTserData
