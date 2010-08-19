@@ -338,6 +338,10 @@ Public Class frmDownload
                                     Dim lWDMfrm As New frmWDM
                                     lWDMxml = lWDMfrm.AskUser(Me.Icon, "Flow", IO.Path.Combine(lSaveFolderOnly, "nwis"))
                                 End If
+                                If lChild Is chkNLDAS_GetNLDASParameter Then
+                                    Dim lWDMfrm As New frmWDM
+                                    lWDMxml = lWDMfrm.AskUser(Me.Icon, "NLDASPrecipitation", IO.Path.Combine(lSaveFolderOnly, "nldas"))
+                                End If
                                 If lWDMxml IsNot Nothing Then
                                     lXML &= "<function name='" & lChildName & "'>" & vbCrLf _
                                          & "<arguments>" & vbCrLf _

@@ -75,11 +75,11 @@ Public Class atcTimeseriesGDS
                 Dim lData(lNumX, lNumY) As atcTimeseries
                 Dim lTs As atcTimeseries
                 Dim lExpectedLineHeader As String
-                Dim lTimestep As Integer, lX As Integer, lY As Integer
-                For lTimestep = 0 To lNumTimesteps - 1
+                Dim lTimeIndex As Integer, lX As Integer, lY As Integer
+                For lTimeIndex = 0 To lNumTimesteps - 1
                     For lY = 0 To lNumY - 1
                         lCurLine = NextLine(lInputReader).Split(",")
-                        lExpectedLineHeader = "[" & lTimestep & "][" & lY & "]"
+                        lExpectedLineHeader = "[" & lTimeIndex & "][" & lY & "]"
                         If lCurLine(0) = lExpectedLineHeader Then
                             For lX = 1 To lNumX
                                 lTs = lData(lX, lY)
@@ -92,7 +92,7 @@ Public Class atcTimeseriesGDS
                                     lData(lX, lY) = lTs
                                     pData.Add(lTs)
                                 End If
-                                lTs.Value(lTimestep + 1) = Double.Parse(lCurLine(lX).Trim)
+                                lTs.Value(lTimeIndex + 1) = Double.Parse(lCurLine(lX).Trim)
                             Next
                             NextLine(lInputReader) 'Skip blank line
                         Else
@@ -124,14 +124,14 @@ Public Class atcTimeseriesGDS
                             lCurLine = NextLine(lInputReader).Split(",")
                             For lY = 0 To lNumY - 1
                                 For lX = 1 To lNumX
-                                    lData(lX, lY).Attributes.SetValue("lat", lCurLine(lY))
+                                    lData(lX, lY).Attributes.SetValue("Latitude", lCurLine(lY))
                                 Next
                             Next
                         Case "lon"
                             lCurLine = NextLine(lInputReader).Split(",")
                             For lY = 0 To lNumY - 1
                                 For lX = 1 To lNumX
-                                    lData(lX, lY).Attributes.SetValue("lat", lCurLine(lX - 1))
+                                    lData(lX, lY).Attributes.SetValue("Longitude", lCurLine(lX - 1))
                                 Next
                             Next
                             Exit Do
@@ -140,6 +140,18 @@ Public Class atcTimeseriesGDS
                             Logger.Dbg("Unexpected line in GDS data '" & String.Join(", ", lCurLine))
                     End Select
                 Loop
+
+                If lNumTimesteps > 1 AndAlso pData.Count > 0 Then
+                    Dim lTimeUnit As atcTimeUnit = atcTimeUnit.TUUnknown
+                    Dim lTimeStep As Integer = 1
+                    lTs = pData(0)
+                    CalcTimeUnitStep(lTs.Dates.Value(1), lTs.Dates.Value(2), lTimeUnit, lTimeStep)
+                    For Each lTs In pData
+                        lTs.Attributes.SetValue("Time Unit", lTimeUnit)
+                        lTs.Attributes.SetValue("Time Step", lTimeStep)
+                    Next
+                End If
+
                 Return True
             Catch e As Exception
                 Logger.Dbg("Exception reading '" & aFileName & "': " & e.Message, e.StackTrace)
