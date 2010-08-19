@@ -4,7 +4,7 @@ Public Class frmDefaultTimeInterval
     Private pAggr As Integer '0 aver, 1 sum, 2 min, 3 max, 4 first, 5 last
     Private pResult As Boolean
 
-    Public Function AskUser(ByVal aDsn As Integer, ByRef aTu As Integer, ByRef aTs As Integer, ByRef aAggr As Integer) As Boolean
+    Public Function AskUser(ByVal aDataSetDescription As String, ByRef aTu As Integer, ByRef aTs As Integer, ByRef aAggr As Integer) As Boolean
         If aTs > 0 Then atcTextTimeStep.ValueInteger = aTs
         If aTu > 0 Then
             lstTimeUnits.SelectedIndex = aTu - 2
@@ -17,7 +17,7 @@ Public Class frmDefaultTimeInterval
             lstAggregation.SelectedIndex = 0
         End If
 
-        lblInstructions.Text &= aDsn
+        lblInstructions.Text &= aDataSetDescription
 
         Me.ShowDialog()
 

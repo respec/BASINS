@@ -991,12 +991,22 @@ Public Module modDate
         Return NVALS
     End Function
 
-    Public Sub CalcTimeUnitStep(ByVal aSJDate As Double, ByVal aEJDate As Double, ByRef aTu As atcTimeUnit, ByRef aTs As Integer)
-        aTu = 6
-        aTs = 0
-        While aTs < 1
-            aTs = timdifJ(aSJDate, aEJDate, aTu, 1)
-            If aTs = 0 Then aTu -= 1
+    ''' <summary>
+    ''' Calculate Time Unit and Time Step between two dates
+    ''' </summary>
+    ''' <param name="aSJDate">Starting Julian Date</param>
+    ''' <param name="aEJDate">Ending Julian Date</param>
+    ''' <param name="aTimeUnit">ByRef: returns time unit of difference between dates</param>
+    ''' <param name="aTimeStep">ByRef: returns number of steps of time unit between dates</param>
+    Public Sub CalcTimeUnitStep(ByVal aSJDate As Double, _
+                                ByVal aEJDate As Double, _
+                                ByRef aTimeUnit As atcTimeUnit, _
+                                ByRef aTimeStep As Integer)
+        aTimeUnit = 6
+        aTimeStep = 0
+        While aTimeStep < 1
+            aTimeStep = timdifJ(aSJDate, aEJDate, aTimeUnit, 1)
+            If aTimeStep = 0 Then aTimeUnit -= 1
         End While
     End Sub
 
