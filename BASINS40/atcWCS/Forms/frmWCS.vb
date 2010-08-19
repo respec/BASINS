@@ -234,11 +234,14 @@ Public Class frmWCS
         RemoveHandler GisUtil.Progress, AddressOf UpdProg
     End Sub
 
-    Private Sub frmWCS_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
-            ShowHelp("BASINS Details\Analysis\Watershed Characterization System.html")
-        End If
-    End Sub
+    'following has been disabled by LCW 8/19/10; really want user to be able to press F1 at input field to get context-
+    'sensitive help. To get full help manual, must select from help button.
+
+    'Private Sub frmWCS_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+    '    If e.KeyValue = Windows.Forms.Keys.F1 Then
+    '        ShowHelp("BASINS Details\Analysis\Watershed Characterization System.html")
+    '    End If
+    'End Sub
 
     Private Sub frmWCS_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         GetWindowPos(REGAPP, Me)
@@ -360,6 +363,7 @@ Public Class frmWCS
             .PCSMajorField = cboMajorField.Text
             .PCSRecWaterField = cboRecWaterField.Text
             .PCSActiveField = cboActiveField.Text
+            .PCSActiveOnly = chkActiveOnly.Checked
 
             .lstDatasets.Clear()
             For Each s As String In lstDataSources.CheckedItems
@@ -390,6 +394,8 @@ Public Class frmWCS
                 My.Computer.FileSystem.DeleteFile(rpt)
             Next
         End If
+        'if delete reports, also clear current HTML report
+        wbResults.DocumentText = ""
     End Sub
 
     Private Sub btnHelp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnHelp.Click
@@ -409,9 +415,17 @@ Public Class frmWCS
     End Sub
 
     Private Sub lnkLandUseSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles lnkLandUseSave.Click
+        If MessageBox.Show("This will overwrite the landuse description file (LandUses.txt) used for all projects. Are you sure you want to continue?", "Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) = Windows.Forms.DialogResult.Cancel Then Exit Sub
         SaveForm()
         SaveLanduseGrid()
         Project.SaveLanduses()
+    End Sub
+
+    Private Sub lnkLandUseReset_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles lnkLandUseReset.Click
+        If MessageBox.Show("This will overwrite the landuse description file (LandUses.txt) used for all projects with default values. Are you sure you want to continue?", "Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) = Windows.Forms.DialogResult.Cancel Then Exit Sub
+        IO.File.WriteAllText(Project.AppFolder & "\Landuses.txt", My.Resources.LandUses)
+        Project.LoadLanduses()
+        LoadLanduseGrid()
     End Sub
 
     Private Sub SaveLanduseGrid()
@@ -462,4 +476,5 @@ Public Class frmWCS
             .Columns(0).AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
         End With
     End Sub
+
 End Class

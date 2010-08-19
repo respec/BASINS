@@ -56,7 +56,7 @@ Friend Class clsProject
     Friend dictLanduse(enumLandUseType.UserGrid) As Generic.SortedDictionary(Of String, clsLanduse)
 
     Friend PCSLayer As String
-    Friend PCSNpdesField, PCSFacNameField, PCSSicField, PCSSicNameField, PCSCityField, PCSMajorField, PCSRecWaterField, PCSActiveField As String
+    Friend PCSNpdesField, PCSFacNameField, PCSSicField, PCSSicNameField, PCSCityField, PCSMajorField, PCSRecWaterField, PCSActiveField As String, PCSActiveOnly As Boolean
 
     Friend lstDatasets As New Generic.List(Of String)
 
@@ -76,7 +76,8 @@ Friend Class clsProject
         Dim Filename As String = AppFolder & "\SoilNames.txt"
 
         If Not My.Computer.FileSystem.FileExists(Filename) Then
-            WarningMsg("Unable to find required file: {0}", Filename)
+            WarningMsg("Unable to find required file: {0}; replacing with default values.", Filename)
+            IO.File.WriteAllText(Filename, My.Resources.SoilNames)
             Exit Sub
         End If
 
@@ -95,14 +96,19 @@ Friend Class clsProject
             sr.Dispose()
         End Try
 
-        Filename = AppFolder & "\Landuses.txt"
+        LoadLanduses()
+
+    End Sub
+
+    Friend Sub LoadLanduses()
+        Dim Filename As String = AppFolder & "\Landuses.txt"
 
         If Not My.Computer.FileSystem.FileExists(Filename) Then
-            WarningMsg("Unable to find required file: {0}", Filename)
-            Exit Sub
+            WarningMsg("Unable to find required file: {0}; replacing with default values.", Filename)
+            IO.File.WriteAllText(Filename, My.Resources.LandUses)
         End If
 
-        sr = New IO.StreamReader(Filename)
+        Dim sr As New IO.StreamReader(Filename)
         Try
             For t As enumLandUseType = enumLandUseType.GIRAS To enumLandUseType.UserGrid
                 dictLanduse(t) = New Generic.SortedDictionary(Of String, clsLanduse)
@@ -121,7 +127,6 @@ Friend Class clsProject
             sr.Close()
             sr.Dispose()
         End Try
-
     End Sub
 
     Friend Sub SaveLanduses()
@@ -182,6 +187,7 @@ Friend Class clsProject
         PCSMajorField = iniFile.GetKeyText("Fields", "PCSMajorField", "MAJOR_ID")
         PCSRecWaterField = iniFile.GetKeyText("Fields", "PCSRecWaterField", "REC_WATER")
         PCSActiveField = iniFile.GetKeyText("Fields", "PCSActiveField", "ACTIVE")
+        PCSActiveOnly = iniFile.GetKeyText("Fields", "PCSActiveOnly", "True")
     End Sub
 
     Friend Sub Save()
@@ -221,6 +227,7 @@ Friend Class clsProject
         iniFile.SetKeyText("Fields", "PCSMajorField", PCSMajorField)
         iniFile.SetKeyText("Fields", "PCSRecWaterField", PCSRecWaterField)
         iniFile.SetKeyText("Fields", "PCSActiveField", PCSActiveField)
+        iniFile.SetKeyText("Fields", "PCSActiveOnly", PCSActiveOnly)
         iniFile.Save()
     End Sub
 
@@ -615,7 +622,7 @@ Friend Class clsProject
     Private Sub AppendLanduseTable(ByVal hb As HTMLBuilder.clsHTMLBuilder)
         Try
             GisUtil.Cancel = False
-            Dim TableName As String = "Land Use Distribution by Subbasin"
+            'Dim TableName As String = "Land Use Distribution by Subbasin & Landuse"
 
             If String.IsNullOrEmpty(SubbasinLayer) Or _
                String.IsNullOrEmpty(SubbasinField) Or _
@@ -625,18 +632,19 @@ Friend Class clsProject
                 Exit Sub
             End If
 
-            hb.AppendHeading(clsHTMLBuilder.enumHeading.Level4, clsHTMLBuilder.enumAlign.Left, TableName)
-            hb.AppendTable(100, clsHTMLBuilder.enumWidthUnits.Percent)
-            hb.AppendTableColumn("Subbasin Name", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Center)
-            If LanduseIDShown Then hb.AppendTableColumn("Land Use ID", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Left)
-            hb.AppendTableColumn("Description", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Left)
-            hb.AppendTableColumn("Area (ac)", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Right)
-            hb.AppendTableColumn("Portion of Watershed (%)", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Right)
+            'hb.AppendHeading(clsHTMLBuilder.enumHeading.Level4, clsHTMLBuilder.enumAlign.Left, TableName)
+            'hb.AppendTable(100, clsHTMLBuilder.enumWidthUnits.Percent)
+            'hb.AppendTableColumn("Subbasin Name", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Center)
+            'If LanduseIDShown Then hb.AppendTableColumn("Land Use ID", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Left)
+            'hb.AppendTableColumn("Description", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Left)
+            'hb.AppendTableColumn("Area (ac)", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Right)
+            'hb.AppendTableColumn("Portion of Watershed (%)", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Right)
 
             Dim lyrS As Integer = GisUtil.LayerIndex(SubbasinLayer)
             Dim fldS As Integer = GisUtil.FieldIndex(lyrS, SubbasinField)
             Dim LUField As String
 
+            'create dictionary where key is subbasin name and each entry is dictionary of landuse code and area
             Dim dictAreaSum As New Generic.SortedDictionary(Of String, Generic.SortedDictionary(Of String, Single))
 
             Select Case LanduseType
@@ -671,10 +679,14 @@ Friend Class clsProject
 
             If dictAreaSum Is Nothing Then Exit Sub
 
+            'create dictionary to hold data for two summary tables:
+
+            Dim dictSubAreaLanduse As New Generic.SortedDictionary(Of String, Generic.SortedDictionary(Of String, clsLanduse))
+
             For Each kv As KeyValuePair(Of String, Generic.SortedDictionary(Of String, Single)) In dictAreaSum
                 Dim SubName As String = kv.Key
-                Dim SubIndex As Integer = GisUtil.FindFeatureIndex(lyrS, fldS, SubName)
-                Dim SubArea As Single = GisUtil.FeatureArea(lyrS, SubIndex) / (DistFactor ^ 2 * 4046.86)
+                'Dim SubIndex As Integer = GisUtil.FindFeatureIndex(lyrS, fldS, SubName)
+                'Dim SubArea As Single = GisUtil.FeatureArea(lyrS, SubIndex) / (DistFactor ^ 2 * 4046.86)
 
                 'areas are now tabulated for each subbasin by ID; want to report by name (in case user aggregated by using same name for more than one ID)
                 'so form new sorted list by name and accumulate all codes with that name
@@ -700,6 +712,41 @@ Friend Class clsProject
                     End If
                 Next
 
+                dictSubAreaLanduse.Add(SubName, dictLanduseName)
+
+                'For Each kv3 As KeyValuePair(Of String, clsLanduse) In dictLanduseName
+                '    If LanduseIDShown Then
+                '        hb.AppendTableRow(SubName, kv3.Value.ID, kv3.Value.Name, kv3.Value.Area.ToString("0.0"), (kv3.Value.Area * 100 / SubArea).ToString("0.00"))
+                '    Else
+                '        hb.AppendTableRow(SubName, kv3.Value.Name, kv3.Value.Area.ToString("0.0"), (kv3.Value.Area * 100 / SubArea).ToString("0.00"))
+                '    End If
+                'Next
+
+                'If LanduseIDShown Then
+                '    hb.AppendTableRow(SubName, "", "Totals", SubArea.ToString("0.0"), "100.00")
+                'Else
+                '    hb.AppendTableRow(SubName, "Totals", SubArea.ToString("0.0"), "100.00")
+                'End If
+            Next
+            'hb.AppendTableEnd()
+
+            'create detailed list by subbasin and land use description with areas and percentages
+
+            Dim TableName As String = "Land Use Distribution by Subbasin & Landuse"
+
+            hb.AppendHeading(clsHTMLBuilder.enumHeading.Level4, clsHTMLBuilder.enumAlign.Left, TableName)
+            hb.AppendTable(100, clsHTMLBuilder.enumWidthUnits.Percent)
+            hb.AppendTableColumn("Subbasin Name", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Center)
+            If LanduseIDShown Then hb.AppendTableColumn("Land Use ID", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Left)
+            hb.AppendTableColumn("Description", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Left)
+            hb.AppendTableColumn("Area (ac)", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Right)
+            hb.AppendTableColumn("Portion of Watershed (%)", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Right)
+
+            For Each kv As Generic.KeyValuePair(Of String, Generic.SortedDictionary(Of String, clsLanduse)) In dictSubAreaLanduse
+                Dim SubName As String = kv.Key
+                Dim SubIndex As Integer = GisUtil.FindFeatureIndex(lyrS, fldS, SubName)
+                Dim SubArea As Single = GisUtil.FeatureArea(lyrS, SubIndex) / (DistFactor ^ 2 * 4046.86)
+                Dim dictLanduseName As Generic.SortedDictionary(Of String, clsLanduse) = kv.Value
                 For Each kv3 As KeyValuePair(Of String, clsLanduse) In dictLanduseName
                     If LanduseIDShown Then
                         hb.AppendTableRow(SubName, kv3.Value.ID, kv3.Value.Name, kv3.Value.Area.ToString("0.0"), (kv3.Value.Area * 100 / SubArea).ToString("0.00"))
@@ -708,26 +755,55 @@ Friend Class clsProject
                     End If
                 Next
 
-                'For Each kv2 As KeyValuePair(Of String, Single) In kv.Value
-                '    Dim LUCode As String = kv2.Key
-                '    Dim Area As Single = kv2.Value / (DistFactor ^ 2 * 4046.86)
-                '    Dim Name As String = ""
-                '    Dim landuse As clsLanduse = Nothing
-                '    If dictLanduse(LanduseType).TryGetValue(LUCode, landuse) Then Name = landuse.Name
-                '    If Area > 0 Then
-                '        hb.AppendTableRow(SubName, LUCode, Name, Area.ToString("0.0"), (Area * 100 / SubArea).ToString("0.00"))
-                '        If Not dictLanduse(LanduseType).ContainsKey(LUCode) Then
-                '            dictLanduse(LanduseType).Add(LUCode, New clsLanduse(LUCode, Name))
-                '        End If
-                '    End If
-                'Next
-
                 If LanduseIDShown Then
                     hb.AppendTableRow(SubName, "", "Totals", SubArea.ToString("0.0"), "100.00")
                 Else
                     hb.AppendTableRow(SubName, "Totals", SubArea.ToString("0.0"), "100.00")
                 End If
             Next
+
+            hb.AppendTableEnd()
+
+            'add second table in which each row is subbasin and each column is land use description (cells are area)
+
+            TableName = "Land Use Area (ac) by Subbasin"
+
+            'get list of unique land use descriptions for ALL subbasins
+            Dim LUName As New Generic.List(Of String)
+            For Each kv As KeyValuePair(Of String, Generic.SortedDictionary(Of String, clsLanduse)) In dictSubAreaLanduse
+                For Each kv2 As KeyValuePair(Of String, clsLanduse) In kv.Value
+                    Dim Name As String = kv2.Key
+                    If Not LUName.Contains(Name) Then LUName.Add(Name)
+                Next
+            Next
+            LUName.Sort()
+
+            hb.AppendHeading(clsHTMLBuilder.enumHeading.Level4, clsHTMLBuilder.enumAlign.Left, TableName)
+            hb.AppendTable(100, clsHTMLBuilder.enumWidthUnits.Percent)
+            hb.AppendTableColumn("Subbasin Name", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Center)
+            For Each s As String In LUName
+                hb.AppendTableColumn(s.Replace("/", "/ "), clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Right)
+            Next
+            hb.AppendTableColumn("Totals", clsHTMLBuilder.enumAlign.Center, clsHTMLBuilder.enumAlign.Right)
+
+            For Each kv As KeyValuePair(Of String, Generic.SortedDictionary(Of String, clsLanduse)) In dictSubAreaLanduse
+                Dim SubName As String = kv.Key
+                Dim SubIndex As Integer = GisUtil.FindFeatureIndex(lyrS, fldS, SubName)
+                Dim SubArea As Single = GisUtil.FeatureArea(lyrS, SubIndex) / (DistFactor ^ 2 * 4046.86)
+                hb.AppendTableRow()
+                hb.AppendTableCell(SubName)
+                For Each s As String In LUName
+                    If kv.Value.ContainsKey(s) Then
+                        Dim Area As Single = kv.Value(s).Area
+                        hb.AppendTableCell(Area.ToString("0.0"))
+                    Else
+                        hb.AppendTableCell("")
+                    End If
+                Next
+                hb.AppendTableCell(SubArea.ToString("0.0"))
+                hb.AppendTableRowEnd()
+            Next
+
             hb.AppendTableEnd()
 
         Catch ex As Exception
@@ -850,8 +926,8 @@ Friend Class clsProject
     End Function
 
     Private Class clsPCS
-        Friend NPDES, FacName, Sic, SicName, City, Major, RecWater, Active As String
-        Sub New(ByVal _NPDES As String, ByVal _FacName As String, ByVal _Sic As String, ByVal _SicName As String, ByVal _City As String, ByVal _Major As String, ByVal _RecWater As String, ByVal _Active As String)
+        Friend NPDES, FacName, Sic, SicName, City, Major, RecWater, Active As String, ActiveOnly As Boolean
+        Sub New(ByVal _NPDES As String, ByVal _FacName As String, ByVal _Sic As String, ByVal _SicName As String, ByVal _City As String, ByVal _Major As String, ByVal _RecWater As String, ByVal _Active As String, ByVal _ActiveOnly As Boolean)
             NPDES = _NPDES
             FacName = _FacName
             Sic = _Sic
@@ -860,6 +936,7 @@ Friend Class clsProject
             Major = _Major
             RecWater = _RecWater
             Active = _Active
+            ActiveOnly = _ActiveOnly
         End Sub
     End Class
 
@@ -918,7 +995,7 @@ Friend Class clsProject
                 For j As Integer = 0 To GisUtil.NumFeatures(lyr) - 1
                     If GisUtil.PointInPolygon(lyr, j, lyrS) = i Then
                         Dim NPDES As String = GisUtil.FieldValue(lyr, j, fldNPDES)
-                        If Not dictPCS(SubName).ContainsKey(NPDES) Then dictPCS(SubName).Add(NPDES, New clsPCS(NPDES, GisUtil.FieldValue(lyr, j, fldFacName), GisUtil.FieldValue(lyr, j, fldSic), GisUtil.FieldValue(lyr, j, fldSicName), GisUtil.FieldValue(lyr, j, fldCity), GisUtil.FieldValue(lyr, j, fldMajor), GisUtil.FieldValue(lyr, j, fldRecWater), GisUtil.FieldValue(lyr, j, fldActive)))
+                        If Not dictPCS(SubName).ContainsKey(NPDES) Then dictPCS(SubName).Add(NPDES, New clsPCS(NPDES, GisUtil.FieldValue(lyr, j, fldFacName), GisUtil.FieldValue(lyr, j, fldSic), GisUtil.FieldValue(lyr, j, fldSicName), GisUtil.FieldValue(lyr, j, fldCity), GisUtil.FieldValue(lyr, j, fldMajor), GisUtil.FieldValue(lyr, j, fldRecWater), GisUtil.FieldValue(lyr, j, fldActive), PCSActiveOnly))
                     End If
                 Next
                 If Not WCSForm.UpdateProgress("Tabulating NPDES permits...", i, GisUtil.NumFeatures(lyrS) - 1) Then Exit Sub
@@ -926,7 +1003,9 @@ Friend Class clsProject
             For Each kv As KeyValuePair(Of String, Generic.SortedDictionary(Of String, clsPCS)) In dictPCS
                 For Each kv2 As KeyValuePair(Of String, clsPCS) In kv.Value
                     With kv2.Value
-                        If .Active = "ACTIVE" Then hb.AppendTableRow(kv.Key, .NPDES, .FacName, .Sic, .SicName, .City, .Major, .RecWater)
+                        Dim PrintIt As Boolean = True
+                        If PCSActiveOnly AndAlso Not (.Active.ToUpper.StartsWith("A") Or .Active.ToUpper.StartsWith("Y")) Then PrintIt = False
+                        If PrintIt Then hb.AppendTableRow(kv.Key, .NPDES, .FacName, .Sic, .SicName, .City, .Major, .RecWater)
                     End With
                 Next
             Next
