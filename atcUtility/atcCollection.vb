@@ -310,9 +310,9 @@ Public Class atcCollection
             Try
                 Dim lItem As Object = Me.ItemByIndex(lIndex)
                 If TypeOf (lItem) Is ArrayList Then
-                    lString.AppendLine(lIndex & " (" & Me.Keys.Item(lIndex) & ") " & "<ArrayList>")
+                    lString.AppendLine(lIndex & " (" & Me.Keys.Item(lIndex).ToString & ") " & "<ArrayList>")
                 Else
-                    lString.AppendLine(lIndex & " (" & Me.Keys.Item(lIndex) & ") " & lItem)
+                    lString.AppendLine(lIndex & " (" & Me.Keys.Item(lIndex).ToString & ") " & lItem.ToString)
                 End If
             Catch
                 'Skip listing unprintable keys/values
@@ -322,9 +322,9 @@ Public Class atcCollection
             lString.AppendLine("(skipped " & lCount - lStop - 2 & " values)")
             Dim lItem As Object = Me.ItemByIndex(lCount - 1)
             If TypeOf (lItem) Is ArrayList Then
-                lString.AppendLine(lCount - 1 & " (" & Me.Keys.Item(lCount - 1) & ") " & "<ArrayList>")
+                lString.AppendLine(lCount - 1 & " (" & Me.Keys.Item(lCount - 1).ToString & ") " & "<ArrayList>")
             Else
-                lString.AppendLine(lCount - 1 & " (" & Me.Keys.Item(lCount - 1) & ") " & Me.ItemByIndex(lCount - 1))
+                lString.AppendLine(lCount - 1 & " (" & Me.Keys.Item(lCount - 1).ToString & ") " & Me.ItemByIndex(lCount - 1).ToString)
             End If
         End If
         Return lString.ToString

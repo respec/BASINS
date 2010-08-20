@@ -310,7 +310,7 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
             lDef = New atcAttributeDefinition
             lDef.Name = "ID"
             lDef.TypeString = "Integer"
-            lDef.CopiesInherit = False
+            lDef.CopiesInherit = True
             lDef.Editable = False
             pAllDefinitions.Add(lDef.Name.ToLower, lDef)
 

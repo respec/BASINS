@@ -41,7 +41,6 @@ Partial Class frmOptions
         Me.txtTimeSeparator = New System.Windows.Forms.TextBox
         Me.lblDateSeparator = New System.Windows.Forms.Label
         Me.txtDateSeparator = New System.Windows.Forms.TextBox
-        Me.btnOK = New System.Windows.Forms.Button
         Me.btnCancel = New System.Windows.Forms.Button
         Me.grpboxNumberFormat = New System.Windows.Forms.GroupBox
         Me.lblFormat = New System.Windows.Forms.Label
@@ -54,6 +53,8 @@ Partial Class frmOptions
         Me.txtSignificantDigits = New System.Windows.Forms.TextBox
         Me.txtFormat = New System.Windows.Forms.TextBox
         Me.lblSigDig = New System.Windows.Forms.Label
+        Me.btnApply = New System.Windows.Forms.Button
+        Me.btnOk = New System.Windows.Forms.Button
         Me.grpboxDateFormat.SuspendLayout()
         Me.grpboxNumberFormat.SuspendLayout()
         Me.SuspendLayout()
@@ -254,17 +255,6 @@ Partial Class frmOptions
         Me.txtDateSeparator.TabIndex = 0
         Me.txtDateSeparator.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
-        'btnOK
-        '
-        Me.btnOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnOK.Location = New System.Drawing.Point(150, 355)
-        Me.btnOK.Margin = New System.Windows.Forms.Padding(2)
-        Me.btnOK.Name = "btnOK"
-        Me.btnOK.Size = New System.Drawing.Size(75, 23)
-        Me.btnOK.TabIndex = 2
-        Me.btnOK.Text = "OK"
-        Me.btnOK.UseVisualStyleBackColor = True
-        '
         'btnCancel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
@@ -400,16 +390,39 @@ Partial Class frmOptions
         Me.lblSigDig.Text = "Significant Digits"
         Me.lblSigDig.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
+        'btnApply
+        '
+        Me.btnApply.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnApply.Location = New System.Drawing.Point(308, 355)
+        Me.btnApply.Margin = New System.Windows.Forms.Padding(2)
+        Me.btnApply.Name = "btnApply"
+        Me.btnApply.Size = New System.Drawing.Size(75, 23)
+        Me.btnApply.TabIndex = 5
+        Me.btnApply.Text = "Apply"
+        Me.btnApply.UseVisualStyleBackColor = True
+        '
+        'btnOk
+        '
+        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnOk.Location = New System.Drawing.Point(150, 355)
+        Me.btnOk.Margin = New System.Windows.Forms.Padding(2)
+        Me.btnOk.Name = "btnOk"
+        Me.btnOk.Size = New System.Drawing.Size(75, 23)
+        Me.btnOk.TabIndex = 6
+        Me.btnOk.Text = "Ok"
+        Me.btnOk.UseVisualStyleBackColor = True
+        '
         'frmOptions
         '
-        Me.AcceptButton = Me.btnOK
+        Me.AcceptButton = Me.btnApply
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(452, 389)
+        Me.Controls.Add(Me.btnOk)
+        Me.Controls.Add(Me.btnApply)
         Me.Controls.Add(Me.grpboxNumberFormat)
         Me.Controls.Add(Me.btnCancel)
-        Me.Controls.Add(Me.btnOK)
         Me.Controls.Add(Me.grpboxDateFormat)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Margin = New System.Windows.Forms.Padding(2)
@@ -426,7 +439,6 @@ Partial Class frmOptions
 
     End Sub
     Friend WithEvents grpboxDateFormat As System.Windows.Forms.GroupBox
-    Friend WithEvents btnOK As System.Windows.Forms.Button
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents grpboxNumberFormat As System.Windows.Forms.GroupBox
     Friend WithEvents lblSigDig As System.Windows.Forms.Label
@@ -456,4 +468,6 @@ Partial Class frmOptions
     Friend WithEvents lblExpFormat As System.Windows.Forms.Label
     Friend WithEvents lblCantFit As System.Windows.Forms.Label
     Friend WithEvents txtCantFit As System.Windows.Forms.TextBox
+    Friend WithEvents btnApply As System.Windows.Forms.Button
+    Friend WithEvents btnOk As System.Windows.Forms.Button
 End Class

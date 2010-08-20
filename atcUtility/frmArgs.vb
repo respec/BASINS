@@ -13,7 +13,7 @@ Public Class frmArgs
         pOk = False
         pLeft = btnOk.Left
         pTop = pLeft
-        pRowHeight = btnOk.Height * 1.5
+        pRowHeight = CInt(btnOk.Height * 1.5)
         pLeftColumnWidth = btnOk.Width
         pRightColumnItems = New ArrayList
 
@@ -21,8 +21,8 @@ Public Class frmArgs
         While lArgIndex < aArgs.Count
             Select Case aArgs.Keys(lArgIndex).GetType.Name
                 Case "String"
-                    Dim lKey As String = aArgs.Keys(lArgIndex)
-                    Dim lArgValue As Object = GetSetting("BASINS4", aTitle, lKey, aArgs.ItemByIndex(lArgIndex))
+                    Dim lKey As String = aArgs.Keys(lArgIndex).ToString
+                    Dim lArgValue As Object = GetSetting("BASINS4", aTitle, lKey, aArgs.ItemByIndex(lArgIndex).ToString)
                     If lKey.Substring(1, 1) = ":" Then
                         Select Case lKey.Substring(0, 1).ToUpper
                             Case "L" 'Just a label
@@ -36,7 +36,7 @@ Public Class frmArgs
                                 Dim lLabel As Windows.Forms.Label = AddLabel(lKey.Substring(2), "lbl" & lArgIndex)
                                 If lLabel.Width > pLeftColumnWidth Then pLeftColumnWidth = lLabel.Width
                                 lArgIndex += 1
-                                AddCheckbox(aArgs(lArgIndex), "chk" & lArgIndex)
+                                AddCheckbox(CBool(aArgs(lArgIndex)), "chk" & lArgIndex)
                             Case Else
                                 Stop
                         End Select

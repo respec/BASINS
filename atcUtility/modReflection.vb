@@ -708,6 +708,24 @@ Public Module modReflection
                     " Local(MB):" & System.GC.GetTotalMemory(True) / (2 ^ 20)
     End Function
 
+    ''' <summary>
+    ''' Copy the Text or Checked state from one Windows.Forms.Control to another
+    ''' Also copies state of child controls, if any
+    ''' </summary>
+    ''' <param name="aOriginalControl">Control to copy state from</param>
+    ''' <param name="aCopyTo">Control to copy state to</param>
+    ''' <remarks>Useful for copying the state of an Options form to support Cancel</remarks>
+    Public Sub CopyControlState(ByVal aOriginalControl As Windows.Forms.Control, ByVal aCopyTo As Windows.Forms.Control)
+        SetSomething(aCopyTo, "Text", GetSomething(aOriginalControl, "Text"))
+        SetSomething(aCopyTo, "Checked", GetSomething(aOriginalControl, "Checked"))
+
+        For lindex As Integer = 0 To aOriginalControl.Controls.Count - 1
+            Dim lOriginalControl As Windows.Forms.Control = aOriginalControl.Controls.Item(lindex)
+            Dim lCopyTo As Windows.Forms.Control = aCopyTo.Controls.Item(lindex)
+            CopyControlState(lOriginalControl, lCopyTo)
+        Next
+    End Sub
+
     'Public Sub ConnectObjects(ByRef aListOfObjects As ArrayList, _
     '                          ByVal aIdFieldName As String, _
     '                          ByVal aLinkIdFieldName As String, _

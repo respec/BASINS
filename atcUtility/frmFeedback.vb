@@ -335,10 +335,11 @@ Public Class frmFeedback
             lInfo.AppendLine()
             lInfo.AppendLine("------------Environment Variables-----------------")
             For Each lVariable As DictionaryEntry In Environment.GetEnvironmentVariables
-                If lVariable.Key.ToString.ToUpper = "PATH" Then
-                    lInfo.AppendLine(lVariable.Key & " =" & vbCrLf & " " & lVariable.Value.ToString.Replace(";", ";" & vbCrLf & " "))
+                Dim lVariableKey As String = lVariable.Key.ToString
+                If lVariableKey.ToUpper = "PATH" Then
+                    lInfo.AppendLine(lVariableKey & " =" & vbCrLf & " " & lVariable.Value.ToString.Replace(";", ";" & vbCrLf & " "))
                 Else
-                    lInfo.AppendLine(lVariable.Key & " = " & lVariable.Value)
+                    lInfo.AppendLine(lVariableKey & " = " & lVariable.Value.ToString)
                 End If
             Next
             lInfo.AppendLine()

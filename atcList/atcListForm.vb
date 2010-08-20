@@ -456,6 +456,7 @@ Public Class atcListForm
     Private Sub mnuOptions_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuDateValueFormats.Click
         Dim lFrmOptions As New frmOptions
         With lFrmOptions
+            .List = Me
             Select Case pDateFormat.DateOrder
                 Case atcDateFormat.DateOrderEnum.DayMonthYear : .radioOrderDMY.Checked = True
                 Case atcDateFormat.DateOrderEnum.JulianDate : .radioOrderJulian.Checked = True
@@ -482,7 +483,14 @@ Public Class atcListForm
             .txtMaxWidth.Text = pMaxWidth
             .txtCantFit.Text = pCantFit
 
-            If .ShowDialog = Windows.Forms.DialogResult.OK Then
+            .SaveState()
+            .Show(Me)
+        End With
+    End Sub
+
+    Friend Sub SetOptions(ByVal aFrmOptions As frmOptions)
+        If aFrmOptions IsNot Nothing Then
+            With aFrmOptions
                 If .radioOrderDMY.Checked Then pDateFormat.DateOrder = atcDateFormat.DateOrderEnum.DayMonthYear
                 If .radioOrderJulian.Checked Then pDateFormat.DateOrder = atcDateFormat.DateOrderEnum.JulianDate
                 If .radioOrderMDY.Checked Then pDateFormat.DateOrder = atcDateFormat.DateOrderEnum.MonthDayYear
@@ -508,8 +516,8 @@ Public Class atcListForm
                 Integer.TryParse(.txtMaxWidth.Text, pMaxWidth)
                 pCantFit = .txtCantFit.Text
                 PopulateGrid()
-            End If
-        End With
+            End With
+        End If
     End Sub
 
     Public Sub SizeToGrid()
