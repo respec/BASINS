@@ -699,7 +699,7 @@ Partial Class frmDownload
         Me.grpNLDAS.Size = New System.Drawing.Size(460, 42)
         Me.grpNLDAS.TabIndex = 45
         Me.grpNLDAS.TabStop = False
-        Me.grpNLDAS.Text = "North America Land Data Assimilation System"
+        Me.grpNLDAS.Text = "North American Land Data Assimilation System"
         '
         'chkNLDAS_GetNLDASParameter
         '

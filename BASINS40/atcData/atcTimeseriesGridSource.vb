@@ -120,6 +120,14 @@ Public Class atcTimeseriesGridSource
         End Set
     End Property
 
+    Public Overrides Property FixedRows() As Integer
+        Get
+            Return pDisplayAttributes.Count
+        End Get
+        Set(ByVal value As Integer)
+        End Set
+    End Property
+
     Public Overrides Property CellColor(ByVal aRow As Integer, ByVal aColumn As Integer) As System.Drawing.Color
         Get
             If CellEditable(aRow, aColumn) Then
