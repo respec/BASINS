@@ -412,21 +412,25 @@ Module modATCscript
         Return Nothing
     End Function
 
-    Public Function ScriptOpenDataFile(ByRef DataFilename As String) As String
-        Dim DataFile As Short 'File handle for data file being read
-        DataFile = FreeFile()
-        FileOpen(DataFile, DataFilename, OpenMode.Input)
-        LenDataFile = LOF(DataFile)
-        WholeDataFile = InputString(DataFile, LenDataFile)
-        CurrentLine = Left(WholeDataFile, 1000)
-        LenCurrentLine = 0
-        NextLineStart = 1
-        FileClose(DataFile)
-        ScriptOpenDataFile = "OK"
-        Exit Function
-
-ErrorOpen:
-        ScriptOpenDataFile = "Error opening data file: " & DataFilename & vbCr & Err.Description
+    Public Function ScriptOpenDataFile(ByRef aDataFilename As String) As String
+        If IO.File.Exists(aDataFilename) Then
+            Try
+                Dim DataFile As Short 'File handle for data file being read
+                DataFile = FreeFile()
+                FileOpen(DataFile, aDataFilename, OpenMode.Input)
+                LenDataFile = LOF(DataFile)
+                WholeDataFile = InputString(DataFile, LenDataFile)
+                CurrentLine = Left(WholeDataFile, 1000)
+                LenCurrentLine = 0
+                NextLineStart = 1
+                FileClose(DataFile)
+                Return "OK"
+            Catch ex As Exception
+                Return "Error opening data file: " & aDataFilename & vbCr & Err.Description
+            End Try
+        Else
+            Return "File not found: " & aDataFilename
+        End If
     End Function
 
     Public Function ScriptTest(ByRef Script As clsATCscriptExpression, ByRef DataFilename As String) As String

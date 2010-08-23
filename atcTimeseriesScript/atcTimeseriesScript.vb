@@ -49,7 +49,7 @@ Public Class atcTimeseriesScriptPlugin
     Public Overrides Function Open(ByVal aFileName As String, _
                       Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
         If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not IO.File.Exists(aFileName) Then
-            aFileName = FindFile("Select " & Name & " file to open", , , Filter, True, , 1)
+            aFileName = FindFile("Select data file to open", , , Filter, True, , 1)
         End If
 
         If Not IO.File.Exists(aFileName) Then
@@ -75,6 +75,9 @@ ShowSelect:
                         Case .cmdWizard.Text
                             Dim lfrmInputwizard As New frmInputWizard
                             With lfrmInputwizard
+                                If .txtSample.Count = 0 Then
+                                    .txtSample.Add(._txtSample_0)
+                                End If
                                 .TserFile = Me
                                 .txtDataFile.Text = aFileName
                                 .txtScriptFile.Text = lDefinitionFilename

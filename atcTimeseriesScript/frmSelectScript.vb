@@ -55,20 +55,20 @@ Friend Class frmSelectScript
                 SaveSetting("ATCTimeseriesImport", "Scripts", ScriptFilename, ScriptDescription)
                 bgColor = TestScriptColor(ScriptFilename) 'TODO: debug this later
             End If
-            'If agdScripts.Source Is Nothing Then
-            '    agdScripts.Source = New atcControls.atcGridSource
-            'End If
             With agdScripts.Source
+                Dim lCurRow As Integer = .Rows
                 .Rows = .Rows + 1
-                .CellValue(.Rows, 0) = ScriptDescription
-                .CellColor(.Rows, 0) = bgColor
-                .CellValue(.Rows, 1) = ScriptFilename
-                .CellColor(.Rows, 1) = bgColor
+                .CellValue(lCurRow, 0) = ScriptDescription
+                .CellColor(lCurRow, 0) = bgColor
+                .CellValue(lCurRow, 1) = ScriptFilename
+                .CellColor(lCurRow, 1) = bgColor
                 'TODO: scroll down so this row is visible, translate from old grid code below:
                 'While Not .get_RowIsVisible(agdScripts.rows)
                 '    .TopRow = .TopRow + 1
                 'End While
                 '.set_Selected(.Rows, 0, True)
+                .CellSelected(lCurRow, 0) = True ' had to add this to make the text be visible
+                agdScripts.Refresh()
             End With
             EnableButtons()
         End If
@@ -118,7 +118,7 @@ Friend Class frmSelectScript
         With lSource
             MySettings = GetAllSettings("ATCTimeseriesImport", "Scripts")
             .Columns = 2
-            .Rows = UBound(MySettings, 1) - LBound(MySettings, 1) + 1
+            .Rows = UBound(MySettings, 1) - LBound(MySettings, 1) + 3 'the number of scripts found plus title line and first blank line
 
             .CellValue(0, 0) = "Description"
             .CellValue(0, 1) = "Script File"
@@ -129,7 +129,6 @@ Friend Class frmSelectScript
             If MySettings Is Nothing Then
                 MsgBox("Use the Find button to locate scripts." & vbCr & "Look for the Scripts directory where this program is installed.", MsgBoxStyle.OkOnly, "No Scripts Found Yet")
             Else
-                .Rows = UBound(MySettings, 1) - LBound(MySettings, 1) + 2
                 For intSettings = LBound(MySettings, 1) To UBound(MySettings, 1)
                     'Set filename in second column
                     Dim lRow As Integer = RowsFilled + 1
@@ -138,7 +137,7 @@ Friend Class frmSelectScript
                         .CellValue(lRow, 1) = MySettings(intSettings, 0)
 
                         'Set description in column 0
-                        .CellValue(lRow, 0) = MySettings(intSettings, 1)
+                        .CellValue(lRow, 0) = MySettings(intSettings, 1).Trim("""")
 
                         'Set background of cell based on whether this script can read data file
                         'bgColor = TestScriptColor(MySettings(intSettings, 0)) 'TODO: debug this one later
@@ -150,7 +149,7 @@ Friend Class frmSelectScript
                     End If
                 Next intSettings
             End If
-            .Rows = RowsFilled
+            .Rows = RowsFilled + 1 'only retain non-missing scripts
             .FixedRows = 1
 
             If CanReadRow > 0 Then
