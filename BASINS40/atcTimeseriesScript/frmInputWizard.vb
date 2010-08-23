@@ -8,6 +8,8 @@ Friend Class frmInputWizard
     Inherits System.Windows.Forms.Form
     'Copyright 2002 by AQUA TERRA Consultants
 
+    Public txtSample As New Generic.List(Of Windows.Forms.TextBox)
+
     Private Const conNumSampleLines As Short = 50
 
     Private Const conSashLimit As Short = 2100 'Sash can't get closer than this to top or bottom
@@ -27,7 +29,7 @@ Friend Class frmInputWizard
     Private UnitDescFile As Short
     Private NameDescFile As String
 
-    Private CharWidth As Single
+    Private CharWidth As Single = 10.0
     Private SettingSelFromGrid As Boolean
 
     Private nFixedCols As Integer
@@ -116,8 +118,8 @@ Friend Class frmInputWizard
 
 
         ' initialize Input File Property defaults.
-        txtScriptFile.Text = ""
-        txtDataFile.Text = ""
+        'txtScriptFile.Text = ""
+        'txtDataFile.Text = ""
         DidMap = False
         delim = txtDelimiter.Text
         DisableFilePropertiesFields()
@@ -125,11 +127,7 @@ Friend Class frmInputWizard
         ' Left justify major display areas on form
         'fraTextSample.Left = tabTop.Left
         'fraColSample.Left = tabTop.Left
-        fraTab(2).Top = fraTab(1).Top
-        fraTab(2).Left = fraTab(1).Left
-        'fraTab(3).Top = fraTab(1).Top
-        'fraTab(3).Left = fraTab(1).Left
-        'SizeControls(VB6.PixelsToTwipsY(fraSash.Top))
+        SizeControls(fraSash.Top)
     End Sub
 
     'UPGRADE_WARNING: Event frmInputWizard.Resize may fire when form is initialized. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="88B12AE1-6DE0-48A0-86F1-60C0686C026A"'
@@ -142,13 +140,17 @@ Friend Class frmInputWizard
         'Dim fraWidth As Integer
         'Dim tabWidth As Integer
         'Dim txtWidth As Integer
-        'Dim SampleHeight As Integer
-        'Dim EachSampleHeight As Integer
+        Dim SampleHeight As Integer
+        Dim EachSampleHeight As Integer
         'Dim sam As Integer
         ''Dim ButtonsTop As Long
         'Dim BotTop As Integer
         'Dim TopHeight As Integer
-        'Dim BottomHeight As Integer
+        Dim BottomHeight As Integer
+
+        If txtSample.Count = 0 Then txtSample.Add(_txtSample_0)
+        Dim lNewSampleTextbox As Windows.Forms.TextBox = txtSample(0)
+
         'On Error Resume Next
 
         'fraSash.Top = VB6.TwipsToPixelsY(SashTop)
@@ -169,25 +171,38 @@ Friend Class frmInputWizard
         '' Set the height of the bottom objects, do the frames
         '' then the items contained - 900 for buttons
         '' at the bottom.
-        'BottomHeight = VB6.PixelsToTwipsY(Me.Height) - SashTop - 900 - VB6.PixelsToTwipsY(fraSash.Height)
+        BottomHeight = Me.Height - SashTop - fraSash.Height
 
         'fraTextSample.Height = VB6.TwipsToPixelsY(BottomHeight)
-        'SampleHeight = BottomHeight - VB6.PixelsToTwipsY(txtRuler1.Height) - VB6.PixelsToTwipsY(txtRuler2.Height) - VB6.PixelsToTwipsY(HScrollSample.Height)
+        SampleHeight = BottomHeight - txtRuler1.Height - txtRuler2.Height - HScrollSample.Height
         'VScrollSample.Top = txtSample(0).Top
         'VScrollSample.Height = VB6.TwipsToPixelsY(SampleHeight)
-        'EachSampleHeight = VB6.PixelsToTwipsY(txtSample(0).Height) * 0.95
+        EachSampleHeight = lNewSampleTextbox.Height * 0.95
         'sam = txtSample.Count - 1
         'While sam > 0 And VB6.PixelsToTwipsY(txtSample(sam).Top) + EachSampleHeight > SampleHeight
         '	txtSample.Unload(sam)
         '	sam = sam - 1
         'End While
-        'While VB6.PixelsToTwipsY(txtSample(sam).Top) < SampleHeight
-        '	sam = sam + 1
-        '	txtSample.Load(sam)
-        '	txtSample(sam).Top = VB6.TwipsToPixelsY(VB6.PixelsToTwipsY(txtSample(sam - 1).Top) + EachSampleHeight)
-        '	txtSample(sam).Visible = True
-        'End While
-        'PopulateTxtSample()
+
+        While lNewSampleTextbox.Top < SampleHeight
+            lNewSampleTextbox = New Windows.Forms.TextBox
+            With lNewSampleTextbox
+                fraTextSample.Controls.Add(lNewSampleTextbox)
+                AddHandler .MouseDown, AddressOf txtSample_MouseDown
+                AddHandler .MouseMove, AddressOf txtSample_MouseMove
+                AddHandler .MouseUp, AddressOf txtSample_MouseUp
+                .Top = txtSample(txtSample.Count - 1).Top + EachSampleHeight
+                .Visible = True
+                .Width = _txtSample_0.Width
+                .Anchor = _txtSample_0.Anchor
+                .Font = _txtSample_0.Font
+                .Height = _txtSample_0.Height
+                .BorderStyle = Windows.Forms.BorderStyle.None
+                .HideSelection = False
+                txtSample.Add(lNewSampleTextbox)
+            End With
+        End While
+        PopulateTxtSample()
         'HScrollSample.Top = VB6.TwipsToPixelsY(BottomHeight - VB6.PixelsToTwipsY(HScrollSample.Height)) 'txtSample(txtSample.Count - 1).Top + txtSample(txtSample.Count - 1).Height
         'HScrollSample.BringToFront()
         'fraColSample.Height = VB6.TwipsToPixelsY(BottomHeight)
@@ -314,12 +329,8 @@ Friend Class frmInputWizard
         'SizeControls(VB6.PixelsToTwipsY(fraSash.Top))
     End Sub
 
-    'UPGRADE_WARNING: Event optHeader.CheckedChanged may fire when form is initialized. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="88B12AE1-6DE0-48A0-86F1-60C0686C026A"'
-    Private Sub optHeader_CheckedChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles optHeader.CheckedChanged
-        If eventSender.Checked Then
-            Dim index As Short = optHeader.GetIndex(eventSender)
-            PopulateSample()
-        End If
+    Private Sub optHeader_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles optHeaderNone.CheckedChanged, optHeaderStartsWith.CheckedChanged, optHeaderLines.CheckedChanged
+        If sender.Checked Then PopulateSample()
     End Sub
 
     'ToDo: 
@@ -340,45 +351,37 @@ Friend Class frmInputWizard
         Dim newcol As Integer
         If InRowColChange Then Exit Sub
         InRowColChange = True
-        With agdDataMapping.Source
+        With MappingSource
 
-            If .Rows <> lastrow Or .Columns <> lastcol Then
-                newrow = .Rows
-                newcol = .Columns
-                If lastrow > nRequiredFields Or lastcol <> ColMappingName Then
-                    .Rows = lastrow
-                    .Columns = lastcol
-                    ''UPGRADE_NOTE: BackColor was upgraded to CtlBackColor. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
-                    '               .CellBackColor = .CtlBackColor
-                    ''UPGRADE_NOTE: ForeColor was upgraded to CtlForeColor. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
-                    '.CellForeColor = .CtlForeColor
-                    .Rows = newrow
-                    .Columns = newcol
-                End If
+            If aRow <> lastrow Or aColumn <> lastcol Then
+                newrow = aRow
+                newcol = aColumn
+                'If lastrow > nRequiredFields Or lastcol <> ColMappingName Then
+                '    .Row = lastrow
+                '    .Column = lastcol
+                '    ''UPGRADE_NOTE: BackColor was upgraded to CtlBackColor. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
+                '    '               .CellBackColor = .CtlBackColor
+                '    ''UPGRADE_NOTE: ForeColor was upgraded to CtlForeColor. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
+                '    '.CellForeColor = .CtlForeColor
+                '    .Row = newrow
+                '    .Column = newcol
+                'End If
                 If newrow > nRequiredFields Or newcol <> ColMappingName Then
                     '.CellBackColor = .BackColorSel
                     '.CellForeColor = .ForeColorSel
-                    .CellColor(newrow, newcol) = SystemColors.ControlDark
+                    '.CellColor(newrow, newcol) = SystemColors.ControlDark
                 End If
-                '.ClearValues() 'TODO: need replacement?
-
                 Dim lUniqueValues As New ArrayList
-                If newrow = ColMappingAttr Then
-                    '.addValue("yes")
-                    '.addValue("no")
+                If newcol = ColMappingAttr Then
                     lUniqueValues.Add("yes")
                     lUniqueValues.Add("no")
-                    agdDataMapping.ValidValues = lUniqueValues
                 End If
+                agdDataMapping.ValidValues = lUniqueValues
                 lastrow = newrow
                 lastcol = newcol
-                SetSelFromGrid(.Rows)
+                SetSelFromGrid(newrow)
             End If
-            If .Rows > nRequiredFields Or .Columns <> ColMappingName Then
-                '.set_ColEditable(.Col, True) 'TODO: need replacement?
-            End If
-
-            '.ClearValues() 'TODO: need replacement?
+            .CellEditable(newrow, newcol) = (aRow > nRequiredFields OrElse aColumn <> ColMappingName)
         End With
         InRowColChange = False
     End Sub
@@ -388,14 +391,14 @@ Friend Class frmInputWizard
     'End Sub
 
     Private Function FixedColLeft(ByRef index As Integer) As Integer
-        FixedColLeft = ReadIntLeaveRest(Trim(agdDataMapping.Source.CellValue(index, ColMappingCol)))
+        FixedColLeft = ReadIntLeaveRest(Trim(MappingSource.CellValue(index, ColMappingCol)))
     End Function
 
     Private Function FixedColRight(ByRef index As Integer) As Integer
         'UPGRADE_NOTE: str was upgraded to str_Renamed. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
         Dim str_Renamed As String
         Dim pos As Integer
-        str_Renamed = Trim(agdDataMapping.Source.CellValue(index, ColMappingCol))
+        str_Renamed = Trim(MappingSource.CellValue(index, ColMappingCol))
         pos = InStr(str_Renamed, "-")
 
         If pos > 0 Then
@@ -469,7 +472,7 @@ Friend Class frmInputWizard
         cmdCancel.Enabled = True
 
         With agdDataMapping
-            For Idx = 1 To agdDataMapping.Source.Rows
+            For Idx = 1 To MappingSource.Rows
                 'If Trim(Len(.TextMatrix(Idx, 3))) = 0 And _
                 ''   Trim(Len(.TextMatrix(Idx, 4))) = 0 _
                 ''Then
@@ -510,7 +513,7 @@ Friend Class frmInputWizard
 
         ' Reset and move the user prompt:
         '
-        m_Prompt = " To map " & agdDataMapping.Source.CellValue(1, ColMappingName) & " , click or enter a column number"
+        m_Prompt = " To map " & MappingSource.CellValue(1, ColMappingName) & " , click or enter a column number"
         m_LenPro = BoxWidth(m_Prompt)
         If m_LenPro > 7500 Then m_LenPro = 7500
 
@@ -546,7 +549,7 @@ Friend Class frmInputWizard
             'TODO: Determine if a single column in the grid is selected
 
             'If .SelStartCol = .SelEndCol And .SelStartRow = 1 And .SelEndRow = .Source.Rows Then
-            '    agdDataMapping.Source.CellValue(agdDataMapping.Source.Rows, ColMappingCol) = .SelStartCol + 1
+            '    MappingSource.CellValue(MappingSource.Rows, ColMappingCol) = .SelStartCol + 1
             '    'agdSample.ColTitle(agdSample.SelStartCol)
             'End If
 
@@ -589,41 +592,41 @@ Friend Class frmInputWizard
                 Else
                     FoundDDF = True
                     SetWizardFromScript(Script)
+                    agdDataMapping.SizeAllColumnsToContents(agdDataMapping.Width, True)
                 End If
             End If
         End If
     End Sub
 
     Private Sub InitDataMapping()
-        Dim r As Integer
-        With agdDataMapping.Source
+        Dim lSource As New atcControls.atcGridSource
+        With lSource
             '.ClearData() 'TODO: need replacement?
             .Columns = ColMappingLast + 1
             .Rows = nRequiredFields + 1
+            .FixedRows = 1
             .CellValue(0, ColMappingName) = "Name"
             .CellValue(0, ColMappingAttr) = "Attribute"
             .CellValue(0, ColMappingCol) = "Input Column"
             .CellValue(0, ColMappingConstant) = "Constant"
             .CellValue(0, ColMappingSkip) = "Skip Values"
-            .Columns = ColMappingName
-            For r = 1 To nRequiredFields
-                .Rows = r
-                'UPGRADE_NOTE: Text was upgraded to CtlText. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
-                'UPGRADE_WARNING: Couldn't resolve default property of object RequiredFields(). Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                '.Ctlset_Text(RequiredFields(r)) 'TODO: need replacement?
-                '.CellBackColor = System.Drawing.SystemColors.Menu 'TODO: need replacement?
-                .CellColor(r, 0) = SystemColors.ControlDark
-                Select Case RequiredFields(r)
-                    Case "Year" : .CellValue(r, ColMappingConstant) = "1900"
-                    Case "Day" : .CellValue(r, ColMappingConstant) = "1"
-                    Case "Hour", "Minute", "Second" : .CellValue(r, ColMappingConstant) = "0"
+            For lRow As Integer = 1 To nRequiredFields
+                .CellValue(lRow, 0) = RequiredFields(lRow)
+                .CellColor(lRow, 0) = SystemColors.ControlDark
+                .CellEditable(lRow, 0) = False
+                Select Case RequiredFields(lRow)
+                    Case "Year" : .CellValue(lRow, ColMappingConstant) = "1900"
+                    Case "Day" : .CellValue(lRow, ColMappingConstant) = "1"
+                    Case "Hour", "Minute", "Second" : .CellValue(lRow, ColMappingConstant) = "0"
 
                     Case "Scenario", "Location", "Constituent", "Description"
-                        .CellValue(r, ColMappingAttr) = "yes"
-                    Case Else : .CellValue(r, ColMappingAttr) = "no"
+                        .CellValue(lRow, ColMappingAttr) = "yes"
+                    Case Else : .CellValue(lRow, ColMappingAttr) = "no"
                 End Select
-            Next r
+            Next
         End With
+        agdDataMapping.Initialize(lSource)
+        agdDataMapping.SizeAllColumnsToContents(agdDataMapping.Width, True)
     End Sub
 
     Private Sub SetColumnFormatFromScript(ByRef scr As clsATCscriptExpression)
@@ -633,7 +636,7 @@ Friend Class frmInputWizard
         Dim StartCol, ColWidth As Integer
         Dim colonPos, caretPos, dollarPos, r As Integer
         ColIndex = 1
-        rule = scr.SubExpression(1).Printable
+        rule = scr.SubExpression(0).Printable
         InitDataMapping()
 
         FixedColumns = False
@@ -659,8 +662,8 @@ Friend Class frmInputWizard
             End If
         End If
 
-        SubExpMax = scr.SubExpressionCount
-        SubExpIndex = 2
+        SubExpMax = scr.SubExpressionCount - 1
+        SubExpIndex = 1
         While SubExpIndex <= SubExpMax
             rule = scr.SubExpression(SubExpIndex).Printable
             ColCol = ""
@@ -701,16 +704,16 @@ ParseFixedDef:
             SubExpIndex = SubExpIndex + 1
         End While
         If FixedColumns Then
-            optDelimiter_CheckedChanged(optDelimiter.Item(0), New System.EventArgs())
-            agdDataMapping.Source.Rows = 1
+            optDelimiter_CheckedChanged(optDelimiterNone, New System.EventArgs())
+            MappingSource.Rows = 1
             SetSelFromGrid(1)
         ElseIf ColumnDelimiter = " " Then
-            optDelimiter_CheckedChanged(optDelimiter.Item(1), New System.EventArgs())
+            optDelimiter_CheckedChanged(optDelimiterSpace, New System.EventArgs())
         ElseIf ColumnDelimiter = vbTab Then
-            optDelimiter_CheckedChanged(optDelimiter.Item(2), New System.EventArgs())
+            optDelimiter_CheckedChanged(optDelimiterTab, New System.EventArgs())
         Else
             txtDelimiter.Text = ColumnDelimiter
-            optDelimiter_CheckedChanged(optDelimiter.Item(3), New System.EventArgs())
+            optDelimiter_CheckedChanged(optDelimiterChar, New System.EventArgs())
         End If
         'agdDataMapping.ColsSizeByContents() 
         'agdDataMapping.SizeColumnToContents() 'TODO: this seems to be the replacement of line above?? Apply to all columns?
@@ -723,7 +726,7 @@ ParseFixedDef:
         Dim srchName, thisName As String
         Dim r, maxRow As Integer
 
-        With agdDataMapping.Source
+        With MappingSource
             maxRow = .Rows
             srchName = Trim(LCase(FieldName))
             For r = 1 To maxRow
@@ -740,10 +743,10 @@ ParseFixedDef:
         Dim r, otherRow As Integer
         Dim scp As String
         r = RowNamed(subexpName)
-        If r <= agdDataMapping.Source.Rows Then
+        If r <= MappingSource.Rows Then
             scp = TrimQuotes(scr.Printable)
             If LCase(scp) <> LCase(subexpName) Then
-                agdDataMapping.Source.CellValue(r, ColMappingConstant) = scp
+                MappingSource.CellValue(r, ColMappingConstant) = scp
             End If
         End If
     End Sub
@@ -752,13 +755,25 @@ ParseFixedDef:
         Dim SubExp, cnt, r As Integer
         Dim subexpName As String
         cnt = scr.SubExpressionCount
-        If cnt > 0 Then SetDatePortion(scr.SubExpression(1), "Year")
-        If cnt > 1 Then SetDatePortion(scr.SubExpression(2), "Month")
-        If cnt > 2 Then SetDatePortion(scr.SubExpression(3), "Day")
-        If cnt > 3 Then SetDatePortion(scr.SubExpression(4), "Hour")
-        If cnt > 4 Then SetDatePortion(scr.SubExpression(5), "Minute")
-        If cnt > 5 Then SetDatePortion(scr.SubExpression(6), "Second")
+        If cnt > 0 Then SetDatePortion(scr.SubExpression(0), "Year")
+        If cnt > 1 Then SetDatePortion(scr.SubExpression(1), "Month")
+        If cnt > 2 Then SetDatePortion(scr.SubExpression(2), "Day")
+        If cnt > 3 Then SetDatePortion(scr.SubExpression(3), "Hour")
+        If cnt > 4 Then SetDatePortion(scr.SubExpression(4), "Minute")
+        If cnt > 5 Then SetDatePortion(scr.SubExpression(5), "Second")
     End Sub
+
+    Public Property MappingSource() As atcControls.atcGridSource
+        Get
+            If agdDataMapping.Source Is Nothing Then
+                InitDataMapping()
+            End If
+            Return agdDataMapping.Source
+        End Get
+        Set(ByVal value As atcControls.atcGridSource)
+            agdDataMapping.Initialize(value)
+        End Set
+    End Property
 
     Public Sub SetWizardFromScript(ByRef scr As clsATCscriptExpression)
         Static ReverseLogic As Boolean
@@ -767,62 +782,62 @@ ParseFixedDef:
         Dim str_Renamed, str2 As String
         Select Case scr.Token
             Case clsATCscriptExpression.ATCsToken.tok_And
-                ForMax = scr.SubExpressionCount
-                For SubExp = 1 To ForMax
+                ForMax = scr.SubExpressionCount - 1
+                For SubExp = 0 To ForMax
                     SetWizardFromScript(scr.SubExpression(SubExp))
                 Next
             Case clsATCscriptExpression.ATCsToken.tok_ATCScript
-                ForMax = scr.SubExpressionCount
+                ForMax = scr.SubExpressionCount - 1
                 txtScriptDesc.Text = TrimQuotes(scr.SubExpression(1).Printable)
-                For SubExp = 2 To ForMax
+                For SubExp = 1 To ForMax
                     SetWizardFromScript(scr.SubExpression(SubExp))
                 Next
             Case clsATCscriptExpression.ATCsToken.tok_Attribute
-                str_Renamed = scr.SubExpression(1).Printable
+                str_Renamed = scr.SubExpression(0).Printable
                 r = RowNamed(str_Renamed)
-                agdDataMapping.Source.CellValue(r, ColMappingName) = str_Renamed
-                agdDataMapping.Source.CellValue(r, ColMappingAttr) = "yes"
-                str2 = Trim(scr.SubExpression(2).Printable)
+                MappingSource.CellValue(r, ColMappingName) = str_Renamed
+                MappingSource.CellValue(r, ColMappingAttr) = "yes"
+                str2 = Trim(scr.SubExpression(1).Printable)
                 If VB.Left(str2, 1) = """" Then str2 = Mid(str2, 2)
                 If VB.Right(str2, 1) = """" Then str2 = VB.Left(str2, Len(str2) - 1)
-                agdDataMapping.Source.CellValue(r, ColMappingConstant) = str2
+                MappingSource.CellValue(r, ColMappingConstant) = str2
             Case clsATCscriptExpression.ATCsToken.tok_ColumnFormat : SetColumnFormatFromScript(scr)
             Case clsATCscriptExpression.ATCsToken.tok_Dataset
-                ForMax = scr.SubExpressionCount
-                SubExp = 1
+                ForMax = scr.SubExpressionCount - 1
+                SubExp = 0
                 While SubExp < ForMax
                     str_Renamed = scr.SubExpression(SubExp).Printable
                     r = RowNamed(str_Renamed)
-                    agdDataMapping.Source.CellValue(r, ColMappingName) = str_Renamed
-                    agdDataMapping.Source.CellValue(r, ColMappingAttr) = "yes"
+                    MappingSource.CellValue(r, ColMappingName) = str_Renamed
+                    MappingSource.CellValue(r, ColMappingAttr) = "yes"
                     SubExp = SubExp + 1
                     If scr.SubExpression(SubExp).Token = clsATCscriptExpression.ATCsToken.tok_Literal Then
                         str2 = TrimQuotes(scr.SubExpression(SubExp).Printable)
-                        agdDataMapping.Source.CellValue(r, ColMappingConstant) = str2
+                        MappingSource.CellValue(r, ColMappingConstant) = str2
                     End If
                     SubExp = SubExp + 1
                 End While
             Case clsATCscriptExpression.ATCsToken.tok_Date : SetWizardFromDate(scr)
             Case clsATCscriptExpression.ATCsToken.tok_FatalError
             Case clsATCscriptExpression.ATCsToken.tok_For
-                If LCase(Trim(scr.SubExpression(1).Printable)) = "repeat" And scr.SubExpression(3).Token = clsATCscriptExpression.ATCsToken.tok_Literal Then
+                If LCase(Trim(scr.SubExpression(0).Printable)) = "repeat" AndAlso scr.SubExpression(2).Token = clsATCscriptExpression.ATCsToken.tok_Literal Then
                     r = RowNamed("Repeats")
-                    agdDataMapping.Source.CellValue(r, ColMappingConstant) = TrimQuotes(scr.SubExpression(3).Printable)
+                    MappingSource.CellValue(r, ColMappingConstant) = TrimQuotes(scr.SubExpression(2).Printable)
                 End If
-                ForMax = scr.SubExpressionCount
-                For SubExp = 4 To ForMax
+                ForMax = scr.SubExpressionCount - 1
+                For SubExp = 3 To ForMax
                     SetWizardFromScript(scr.SubExpression(SubExp))
                 Next
             Case clsATCscriptExpression.ATCsToken.tok_If
-                ForMax = scr.SubExpressionCount
-                For SubExp = 1 To ForMax
+                ForMax = scr.SubExpressionCount - 1
+                For SubExp = 0 To ForMax
                     SetWizardFromScript(scr.SubExpression(SubExp))
                 Next
             Case clsATCscriptExpression.ATCsToken.tok_In
-                r = RowNamed(scr.SubExpression(1).Printable)
-                If r <= agdDataMapping.Source.Rows Then
-                    ForMax = scr.SubExpressionCount
-                    SubExp = 2
+                r = RowNamed(scr.SubExpression(0).Printable)
+                If r <= MappingSource.Rows Then
+                    ForMax = scr.SubExpressionCount - 1
+                    SubExp = 1
                     str_Renamed = ""
                     While SubExp <= ForMax
                         str_Renamed = str_Renamed & scr.SubExpression(SubExp).Printable
@@ -830,35 +845,35 @@ ParseFixedDef:
                         If SubExp <= ForMax Then str_Renamed = str_Renamed & ","
                     End While
                     If ReverseLogic Then
-                        agdDataMapping.Source.CellValue(r, ColMappingSkip) = str_Renamed
+                        MappingSource.CellValue(r, ColMappingSkip) = str_Renamed
                     End If
                 End If
             Case clsATCscriptExpression.ATCsToken.tok_Increment
             Case clsATCscriptExpression.ATCsToken.tok_LineEnd
-                str_Renamed = UCase(scr.SubExpression(1).Printable)
+                str_Renamed = UCase(scr.SubExpression(0).Printable)
                 If IsNumeric(str_Renamed) Then
                     txtLineLen.Text = str_Renamed
-                    optLineEnd(3).Checked = True
+                    optLineEndLength.Checked = True
                 ElseIf VB.Left(str_Renamed, 1) = "A" And IsNumeric(Mid(str_Renamed, 2)) Then
                     txtLineEndChar.Text = Mid(str_Renamed, 2)
-                    optLineEnd(2).Checked = True
+                    optLineEndASCII.Checked = True
                 ElseIf str_Renamed = "CR" Then
-                    optLineEnd(0).Checked = True
+                    optLineEndCRLF.Checked = True
                 ElseIf str_Renamed = "LF" Then
-                    optLineEnd(1).Checked = True
+                    optLineEndLF.Checked = True
                 Else : MsgBox("Unknown LineEnd '" & str_Renamed & "' in SetWizardFromScript")
                 End If
             Case clsATCscriptExpression.ATCsToken.tok_Literal
             Case clsATCscriptExpression.ATCsToken.tok_Mid
             Case clsATCscriptExpression.ATCsToken.tok_Not
                 ReverseLogic = Not ReverseLogic
-                SetWizardFromScript(scr.SubExpression(1))
+                SetWizardFromScript(scr.SubExpression(0))
                 ReverseLogic = Not ReverseLogic
             Case clsATCscriptExpression.ATCsToken.tok_NextLine
                 If scr.SubExpressionCount = 1 Then
                     chkSkipHeader.CheckState = System.Windows.Forms.CheckState.Checked
-                    optHeader(3).Checked = True
-                    txtHeaderLines.Text = scr.SubExpression(1).Printable
+                    optHeaderLines.Checked = True
+                    txtHeaderLines.Text = scr.SubExpression(0).Printable
                 End If
             Case clsATCscriptExpression.ATCsToken.tok_Set
             Case clsATCscriptExpression.ATCsToken.tok_Value
@@ -866,19 +881,19 @@ ParseFixedDef:
             Case clsATCscriptExpression.ATCsToken.tok_Warn
             Case clsATCscriptExpression.ATCsToken.tok_While
                 If scr.SubExpressionCount = 2 Then
-                    If scr.SubExpression(2).Token = clsATCscriptExpression.ATCsToken.tok_NextLine Then
-                        str_Renamed = scr.SubExpression(1).Printable
+                    If scr.SubExpression(1).Token = clsATCscriptExpression.ATCsToken.tok_NextLine Then
+                        str_Renamed = scr.SubExpression(0).Printable
                         SubExp = Len("(= HeaderStart ")
                         If VB.Left(str_Renamed, SubExp) = "(= HeaderStart " Then
                             chkSkipHeader.CheckState = System.Windows.Forms.CheckState.Checked
-                            optHeader(2).Checked = True
+                            optHeaderStartsWith.Checked = True
                             txtHeaderStart.Text = Mid(str_Renamed, SubExp + 1, Len(str_Renamed) - SubExp - 1)
                             Exit Sub
                         End If
                     End If
                 End If
-                ForMax = scr.SubExpressionCount
-                For SubExp = 2 To ForMax
+                ForMax = scr.SubExpressionCount - 1
+                For SubExp = 1 To ForMax
                     SetWizardFromScript(scr.SubExpression(SubExp))
                 Next
             Case clsATCscriptExpression.ATCsToken.tok_GT
@@ -886,17 +901,17 @@ ParseFixedDef:
             Case clsATCscriptExpression.ATCsToken.tok_LT
             Case clsATCscriptExpression.ATCsToken.tok_LE
             Case clsATCscriptExpression.ATCsToken.tok_NE
-                r = RowNamed(scr.SubExpression(1).Printable)
-                If r <= agdDataMapping.Source.Rows Then
+                r = RowNamed(scr.SubExpression(0).Printable)
+                If r <= MappingSource.Rows Then
                     If Not ReverseLogic Then
-                        agdDataMapping.Source.CellValue(r, ColMappingSkip) = scr.SubExpression(2).Printable
+                        MappingSource.CellValue(r, ColMappingSkip) = scr.SubExpression(1).Printable
                     End If
                 End If
             Case clsATCscriptExpression.ATCsToken.tok_EQ
-                r = RowNamed(scr.SubExpression(1).Printable)
-                If r <= agdDataMapping.Source.Rows Then
+                r = RowNamed(scr.SubExpression(0).Printable)
+                If r <= MappingSource.Rows Then
                     If ReverseLogic Then
-                        agdDataMapping.Source.CellValue(r, ColMappingSkip) = scr.SubExpression(2).Printable
+                        MappingSource.CellValue(r, ColMappingSkip) = scr.SubExpression(1).Printable
                     End If
                 End If
             Case Else
@@ -933,22 +948,22 @@ ParseFixedDef:
         If tmpstr = "" Then tmpstr = "ReadData"
         str_Renamed = str_Renamed & """" & tmpstr & """"
         str_Renamed = str_Renamed & PrintEOL & Space(indent) & "(LineEnd "
-        If optLineEnd(0).Checked = True Then
+        If optLineEndCRLF.Checked = True Then
             str_Renamed = str_Renamed & "CR"
-        ElseIf optLineEnd(1).Checked = True Then
+        ElseIf optLineEndLF.Checked = True Then
             str_Renamed = str_Renamed & "LF"
-        ElseIf optLineEnd(2).Checked = True Then
+        ElseIf optLineEndASCII.Checked = True Then
             str_Renamed = str_Renamed & "A" & Trim(txtLineEndChar.Text)
-        ElseIf optLineEnd(3).Checked = True Then
+        ElseIf optLineEndLength.Checked = True Then
             str_Renamed = str_Renamed & Trim(txtLineLen.Text)
         End If
         str_Renamed = str_Renamed & ")" & PrintEOL
 
         If chkSkipHeader.CheckState = System.Windows.Forms.CheckState.Checked Then
-            If optHeader(2).Checked Then 'Starts With
+            If optHeaderStartsWith.Checked Then 'Starts With
                 str_Renamed = str_Renamed & Space(indent) & "(While (= HeaderStart """ & txtHeaderStart.Text & """)" & PrintEOL
                 str_Renamed = str_Renamed & Space(indent) & "       (NextLine))" & PrintEOL
-            ElseIf optHeader(3).Checked Then  'Number of lines
+            ElseIf optHeaderLines.Checked Then  'Number of lines
                 str_Renamed = str_Renamed & Space(indent) & "(NextLine " & txtHeaderLines.Text & ")" & PrintEOL
             End If
         End If
@@ -967,15 +982,15 @@ ParseFixedDef:
                 End Select
             Next
         End If
-        If optHeader(2).Checked Then 'Starts With
+        If optHeaderStartsWith.Checked Then 'Starts With
             str_Renamed = str_Renamed & PrintEOL & Space(indent) & "1"
             If Len(txtHeaderStart.Text) > 1 Then str_Renamed = str_Renamed & "-" & Len(txtHeaderStart.Text) - 1
             str_Renamed = str_Renamed & ":" & "HeaderStart"
         End If
-        For r = 1 To agdDataMapping.Source.Rows
-            tmpstr = Trim(agdDataMapping.Source.CellValue(r, ColMappingCol))
+        For r = 1 To MappingSource.Rows
+            tmpstr = Trim(MappingSource.CellValue(r, ColMappingCol))
             If tmpstr <> "" Then
-                tmpstr2 = Trim(agdDataMapping.Source.CellValue(r, ColMappingName))
+                tmpstr2 = Trim(MappingSource.CellValue(r, ColMappingName))
                 str_Renamed = str_Renamed & PrintEOL & Space(indent) & tmpstr
                 str_Renamed = str_Renamed & ":" & tmpstr2
 
@@ -991,9 +1006,9 @@ ParseFixedDef:
         'Figure out whether there is more than one dataset and if so whether it may change within a line
         SomeAttribVaries = False
         SomeAttribVariesRepeat = False
-        For r = 1 To agdDataMapping.Source.Rows
-            tmpstr = LCase(Trim(agdDataMapping.Source.CellValue(r, ColMappingAttr)))
-            tmpstr2 = Trim(agdDataMapping.Source.CellValue(r, ColMappingCol))
+        For r = 1 To MappingSource.Rows
+            tmpstr = LCase(Trim(MappingSource.CellValue(r, ColMappingAttr)))
+            tmpstr2 = Trim(MappingSource.CellValue(r, ColMappingCol))
             If VB.Left(tmpstr, 1) = "y" And tmpstr2 <> "" Then
                 SomeAttribVaries = True
                 If RepeatStart <= FixedColLeft(r) And RepeatEnd >= FixedColRight(r) Then
@@ -1003,17 +1018,17 @@ ParseFixedDef:
         Next
 
         If Not SomeAttribVaries Then
-            For r = 1 To agdDataMapping.Source.Rows
-                tmpstr = Trim(agdDataMapping.Source.CellValue(r, ColMappingConstant))
+            For r = 1 To MappingSource.Rows
+                tmpstr = Trim(MappingSource.CellValue(r, ColMappingConstant))
                 If tmpstr <> "" Then
-                    tmpstr2 = Trim(agdDataMapping.Source.CellValue(r, ColMappingCol))
+                    tmpstr2 = Trim(MappingSource.CellValue(r, ColMappingCol))
                     If tmpstr2 = "" Then
-                        If LCase(VB.Left(Trim(agdDataMapping.Source.CellValue(r, ColMappingAttr)), 1)) = "y" Then
+                        If LCase(VB.Left(Trim(MappingSource.CellValue(r, ColMappingAttr)), 1)) = "y" Then
                             str_Renamed = str_Renamed & PrintEOL & Space(indent) & "(Attribute "
                         Else
                             str_Renamed = str_Renamed & PrintEOL & Space(indent) & "(Set "
                         End If
-                        str_Renamed = str_Renamed & Trim(agdDataMapping.Source.CellValue(r, ColMappingName))
+                        str_Renamed = str_Renamed & Trim(MappingSource.CellValue(r, ColMappingName))
                         str_Renamed = str_Renamed & " """ & tmpstr & """)"
                     End If
                 End If
@@ -1040,8 +1055,8 @@ ParseFixedDef:
         End If
 
         NestedIfs = 0
-        For r = 1 To agdDataMapping.Source.Rows
-            tmpstr = Trim(agdDataMapping.Source.CellValue(r, ColMappingSkip))
+        For r = 1 To MappingSource.Rows
+            tmpstr = Trim(MappingSource.CellValue(r, ColMappingSkip))
             If tmpstr <> "" Then NestedIfs = NestedIfs + 1
         Next r
 
@@ -1053,16 +1068,16 @@ ParseFixedDef:
                 str_Renamed = str_Renamed & "(And "
                 indent = indent + Len("(And ")
             End If
-            For r = 1 To agdDataMapping.Source.Rows
-                tmpstr = Trim(agdDataMapping.Source.CellValue(r, ColMappingSkip))
+            For r = 1 To MappingSource.Rows
+                tmpstr = Trim(MappingSource.CellValue(r, ColMappingSkip))
                 If tmpstr <> "" Then
                     commaPos = InStr(tmpstr, ",")
                     If commaPos = 0 Then
                         'UPGRADE_WARNING: Couldn't resolve default property of object ConstOrCol(). Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                        str_Renamed = str_Renamed & "(<> " & ConstOrCol(Trim(agdDataMapping.Source.CellValue(r, ColMappingName))) & " " & tmpstr & ")"
+                        str_Renamed = str_Renamed & "(<> " & ConstOrCol(Trim(MappingSource.CellValue(r, ColMappingName))) & " " & tmpstr & ")"
                     Else
                         'UPGRADE_WARNING: Couldn't resolve default property of object ConstOrCol(). Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                        str_Renamed = str_Renamed & "(Not (In " & ConstOrCol(Trim(agdDataMapping.Source.CellValue(r, ColMappingName)))
+                        str_Renamed = str_Renamed & "(Not (In " & ConstOrCol(Trim(MappingSource.CellValue(r, ColMappingName)))
                         While commaPos > 0
                             str_Renamed = str_Renamed & " " & VB.Left(tmpstr, commaPos - 1)
                             If commaPos > Len(tmpstr) Then
@@ -1141,10 +1156,10 @@ ParseFixedDef:
         Dim tmpstr As String = String.Empty
         Dim tmpstr2 As String = String.Empty
 
-        For r = 1 To agdDataMapping.Source.Rows
-            tmpstr = LCase(Trim(agdDataMapping.Source.CellValue(r, ColMappingAttr)))
+        For r = 1 To MappingSource.Rows
+            tmpstr = LCase(Trim(MappingSource.CellValue(r, ColMappingAttr)))
             If VB.Left(tmpstr, 1) = "y" Then
-                tmpstr2 = Trim(agdDataMapping.Source.CellValue(r, ColMappingName))
+                tmpstr2 = Trim(MappingSource.CellValue(r, ColMappingName))
                 'UPGRADE_WARNING: Couldn't resolve default property of object ConstOrCol(). Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
                 tmpstr = ConstOrCol(tmpstr2)
                 If tmpstr <> "" Then
@@ -1169,14 +1184,14 @@ ParseFixedDef:
             retval = FieldName
         Else
             r = RowNamed(FieldName)
-            If r > agdDataMapping.Source.Rows Then
+            If r > MappingSource.Rows Then
                 'UPGRADE_WARNING: Couldn't resolve default property of object ConstOrCol. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
                 ConstOrCol = """" & FieldName & """"
             Else
-                colStr = Trim(agdDataMapping.Source.CellValue(r, ColMappingCol))
+                colStr = Trim(MappingSource.CellValue(r, ColMappingCol))
                 If Len(colStr) > 0 Then colStr = FieldName
                 retval = colStr
-                constStr = Trim(agdDataMapping.Source.CellValue(r, ColMappingConstant))
+                constStr = Trim(MappingSource.CellValue(r, ColMappingConstant))
                 If Len(constStr) > 0 Then
                     If LCase(constStr) = "repeat" Then
                         retval = constStr
@@ -1497,10 +1512,9 @@ ParseFixedDef:
             '      linecnt = linecnt + 1
             '    Wend
             '  End If
-            With agdSample.Source
+            Dim lNewSource As New atcControls.atcGridSource
+            With lNewSource
                 '.Clear() 'TODO: need replacement?
-                .Columns = 1
-                .Rows = 1
                 lines = conNumSampleLines
                 linecnt = 0
                 '    If chkHeaderRecord.Value = 1 Then
@@ -1529,6 +1543,7 @@ ParseFixedDef:
                 'Seek(UnitDataFile, 1)
                 UnitDataFileReader.BaseStream.Seek(0, IO.SeekOrigin.Begin)
             End With
+            agdSample.Initialize(lNewSource)
         End If
     End Sub
 
@@ -1542,13 +1557,13 @@ ParseFixedDef:
         Dim nChars As Integer
 
         InputLineLen = 0
-        If optLineEnd(0).Checked = True Then
+        If optLineEndCRLF.Checked = True Then
             InputEOL = vbCr
-        ElseIf optLineEnd(1).Checked = True Then
+        ElseIf optLineEndLF.Checked = True Then
             InputEOL = vbLf
-        ElseIf optLineEnd(2).Checked = True Then
+        ElseIf optLineEndASCII.Checked = True Then
             If IsNumeric(txtLineEndChar.Text) Then InputEOL = Chr(CInt(txtLineEndChar.Text))
-        ElseIf optLineEnd(3).Checked = True Then
+        ElseIf optLineEndLength.Checked = True Then
             If IsNumeric(txtLineLen.Text) Then InputLineLen = CInt(Trim(txtLineLen.Text))
         End If
         LenInputEOL = Len(InputEOL)
@@ -1562,12 +1577,12 @@ ParseFixedDef:
             'Skip lines vertical scroll has scrolled past
 
             If chkSkipHeader.CheckState = System.Windows.Forms.CheckState.Checked Then
-                If optHeader(2).Checked = True And Len(txtHeaderStart.Text) > 0 Then 'skip header lines starting with string
+                If optHeaderStartsWith.Checked = True And Len(txtHeaderStart.Text) > 0 Then 'skip header lines starting with string
                     CurrentLine = txtHeaderStart.Text
                     While Not ScriptEndOfData() And VB.Left(CurrentLine, Len(txtHeaderStart.Text)) = txtHeaderStart.Text
                         ScriptNextLine()
                     End While
-                ElseIf optHeader(3).Checked = True And IsNumeric(txtHeaderLines.Text) Then  'Skip number of header lines
+                ElseIf optHeaderLines.Checked = True And IsNumeric(txtHeaderLines.Text) Then  'Skip number of header lines
                     linecnt = CInt(txtHeaderLines.Text)
                     While Not ScriptEndOfData() And linecnt > 0
                         ScriptNextLine()
@@ -1582,7 +1597,7 @@ ParseFixedDef:
             End While
 
             'Read portion of lines right of horizontal scroll position
-            nChars = Microsoft.VisualBasic.Compatibility.VB6.PixelsToTwipsX(txtSample(0).Width) / CharWidth - 1
+            nChars = _txtSample_0.Width / CharWidth - 1
             linecnt = 0
             While Not ScriptEndOfData() And linecnt < txtSample.Count
                 ScriptNextLine()
@@ -1608,25 +1623,24 @@ exitsub:
     ' Purpose:  Responds to press of a "Delimiter-option" button
     '
     'UPGRADE_WARNING: Event optDelimiter.CheckedChanged may fire when form is initialized. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="88B12AE1-6DE0-48A0-86F1-60C0686C026A"'
-    Private Sub optDelimiter_CheckedChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles optDelimiter.CheckedChanged
+    Private Sub optDelimiter_CheckedChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles optDelimiterNone.CheckedChanged, optDelimiterSpace.CheckedChanged, optDelimiterTab.CheckedChanged, optDelimiterChar.CheckedChanged
         If eventSender.Checked Then
-            Dim index As Short = optDelimiter.GetIndex(eventSender)
-            Select Case index
-                Case 0 : delimQ = False
-                Case 1 : delimQ = True : delim = " "
-                Case 2 : delimQ = True : delim = Chr(9)
-                Case 3 : delimQ = True : delim = txtDelimiter.Text
+            Select Case eventSender.Name
+                Case "optDelimiterNone" : delimQ = False
+                Case "optDelimiterSpace" : delimQ = True : delim = " "
+                Case "optDelimiterTab" : delimQ = True : delim = Chr(9)
+                Case "optDelimiterChar" : delimQ = True : delim = txtDelimiter.Text
             End Select
 
             If delimQ Then
                 fraTextSample.Visible = False
                 fraColSample.Visible = True
-                agdDataMapping.Source.CellValue(0, ColMappingCol) = "Input Column"
+                MappingSource.CellValue(0, ColMappingCol) = "Input Column"
             Else
                 fraColSample.Visible = False
                 fraTextSample.Visible = True
                 'txtSample(0).Top = VB6.TwipsToPixelsY(VB6.PixelsToTwipsY(txtRuler2.Top) + VB6.PixelsToTwipsY(txtRuler2.Height))
-                agdDataMapping.Source.CellValue(0, ColMappingCol) = "Beg-End Column"
+                MappingSource.CellValue(0, ColMappingCol) = "Beg-End Column"
             End If
             PopulateSample()
         End If
@@ -1637,19 +1651,10 @@ exitsub:
         If fraTextSample.Visible Then PopulateTxtSample()
     End Sub
 
-    'UPGRADE_WARNING: Event optLineEnd.CheckedChanged may fire when form is initialized. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="88B12AE1-6DE0-48A0-86F1-60C0686C026A"'
-    Private Sub optLineEnd_CheckedChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles optLineEnd.CheckedChanged
+    Private Sub optLineEnd_CheckedChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles optLineEndCRLF.CheckedChanged, optLineEndLF.CheckedChanged, optLineEndASCII.CheckedChanged, optLineEndLength.CheckedChanged
         If eventSender.Checked Then
-            Dim index As Short = optLineEnd.GetIndex(eventSender)
             PopulateSample()
         End If
-    End Sub
-
-    Private Sub tabTop_ClickEvent(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) 'Handles tabTop.ClickEvent
-        'If tabTop.SelectedItem.index = 1 Then fraTab(1).Visible = True Else fraTab(1).Visible = False
-        'If tabTop.SelectedItem.index = 2 Then fraTab(2).Visible = True Else fraTab(2).Visible = False
-        'If tabTop.SelectedItem.index = 3 Then fraTab(3).Visible = True Else fraTab(3).Visible = False
-        'If fraTab(3).Visible Then PopulateGridTest
     End Sub
 
     Private Sub txtScriptFile_Enter(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles txtScriptFile.Enter
@@ -1667,25 +1672,25 @@ exitsub:
 
     'UPGRADE_WARNING: Event txtHeaderLines.TextChanged may fire when form is initialized. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="88B12AE1-6DE0-48A0-86F1-60C0686C026A"'
     Private Sub txtHeaderLines_TextChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles txtHeaderLines.TextChanged
-        optHeader(2).Checked = True 'CHANGE: used to be 3
+        optHeaderLines.Checked = True
         PopulateSample()
     End Sub
 
     'UPGRADE_WARNING: Event txtHeaderStart.TextChanged may fire when form is initialized. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="88B12AE1-6DE0-48A0-86F1-60C0686C026A"'
     Private Sub txtHeaderStart_TextChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles txtHeaderStart.TextChanged
-        optHeader(2).Checked = True
+        optHeaderStartsWith.Checked = True
         PopulateSample()
     End Sub
 
     'UPGRADE_WARNING: Event txtLineEndChar.TextChanged may fire when form is initialized. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="88B12AE1-6DE0-48A0-86F1-60C0686C026A"'
     Private Sub txtLineEndChar_TextChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles txtLineEndChar.TextChanged
-        optLineEnd(2).Checked = True
+        optLineEndASCII.Checked = True
         PopulateSample()
     End Sub
 
     'UPGRADE_WARNING: Event txtLineLen.TextChanged may fire when form is initialized. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="88B12AE1-6DE0-48A0-86F1-60C0686C026A"'
     Private Sub txtLineLen_TextChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles txtLineLen.TextChanged
-        optLineEnd(3).Checked = True
+        optLineEndLength.Checked = True
         PopulateSample()
     End Sub
 
@@ -1737,30 +1742,30 @@ exitsub:
         If Button = 1 Then txtSampleAnyChange(-2)
     End Sub
 
-    Private Sub txtSample_MouseDown(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.MouseEventArgs) Handles txtSample.MouseDown
+    Private Sub txtSample_MouseDown(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.MouseEventArgs) Handles _txtSample_0.MouseDown
         Dim Button As Short = eventArgs.Button \ &H100000
         Dim Shift As Short = System.Windows.Forms.Control.ModifierKeys \ &H10000
         'Dim x As Single = VB6.PixelsToTwipsX(eventArgs.X)
         'Dim y As Single = VB6.PixelsToTwipsY(eventArgs.Y)
-        Dim index As Short = txtSample.GetIndex(eventSender)
+        Dim index As Short = txtSample.IndexOf(eventSender)
         If Button = 1 Then txtSampleAnyChange(index)
     End Sub
 
-    Private Sub txtSample_MouseMove(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.MouseEventArgs) Handles txtSample.MouseMove
+    Private Sub txtSample_MouseMove(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.MouseEventArgs) Handles _txtSample_0.MouseMove
         Dim Button As Short = eventArgs.Button \ &H100000
         Dim Shift As Short = System.Windows.Forms.Control.ModifierKeys \ &H10000
         'Dim x As Single = VB6.PixelsToTwipsX(eventArgs.X)
         'Dim y As Single = VB6.PixelsToTwipsY(eventArgs.Y)
-        Dim index As Short = txtSample.GetIndex(eventSender)
+        Dim index As Short = txtSample.IndexOf(eventSender)
         If Button = 1 Then txtSampleAnyChange(index)
     End Sub
 
-    Private Sub txtSample_MouseUp(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.MouseEventArgs) Handles txtSample.MouseUp
+    Private Sub txtSample_MouseUp(ByVal eventSender As System.Object, ByVal eventArgs As System.Windows.Forms.MouseEventArgs) Handles _txtSample_0.MouseUp
         Dim Button As Short = eventArgs.Button \ &H100000
         Dim Shift As Short = System.Windows.Forms.Control.ModifierKeys \ &H10000
         'Dim x As Single = VB6.PixelsToTwipsX(eventArgs.X)
         'Dim y As Single = VB6.PixelsToTwipsY(eventArgs.Y)
-        Dim index As Short = txtSample.GetIndex(eventSender)
+        Dim index As Short = txtSample.IndexOf(eventSender)
         If Button = 1 Then txtSampleAnyChange(index)
     End Sub
 
@@ -1787,9 +1792,9 @@ exitsub:
         SelStart = SelStart + HScrollSample.Value
         If SelLength > 0 And Not SettingSelFromGrid Then
             If SelLength < 2 Then
-                agdDataMapping.Source.CellValue(agdDataMapping.Source.Rows, ColMappingCol) = SelStart
+                MappingSource.CellValue(MappingSource.Rows, ColMappingCol) = SelStart
             Else
-                agdDataMapping.Source.CellValue(agdDataMapping.Source.Rows, ColMappingCol) = SelStart & "-" & SelStart + SelLength - 1
+                MappingSource.CellValue(MappingSource.Rows, ColMappingCol) = SelStart & "-" & SelStart + SelLength - 1
             End If
             '    SetFixedWidthsFromDataMapping
         End If
@@ -1806,7 +1811,7 @@ exitsub:
         ' If a filename was not entered, exit the subroutine:
         ' If a filename not changed, then exit the subroutine:
         '
-        If txtDataFile.Text = "" Then
+        If txtDataFile.Text = "txtDataFile" Then
             'UnitDataFile = 0
             If UnitDataFileReader IsNot Nothing Then
                 UnitDataFileReader.Close()
@@ -1881,7 +1886,6 @@ exitsub:
     End Sub
     Private Sub OpenUnitDataFile()
         Dim msg As String
-        ScriptOpenDataFile(NameDataFile)
         msg = ScriptOpenDataFile(NameDataFile)
         If msg <> "OK" Then
             MsgBox(msg, MsgBoxStyle.OkOnly, "Data Import")
@@ -1890,9 +1894,7 @@ exitsub:
             'UnitDataFile = FreeFile()
             'FileOpen(UnitDataFile, NameDataFile, OpenMode.Input)
             UnitDataFileReader = New IO.StreamReader(NameDataFile)
-
             txtDataFile.Text = NameDataFile
-
             PopulateSample()
         End If
     End Sub
@@ -2028,9 +2030,8 @@ exitsub:
     ' Name:     txtDelimiter_Change
     ' Purpose:  Responds to any change in the "txtDelimiter" text box
     '
-    'UPGRADE_WARNING: Event txtDelimiter.TextChanged may fire when form is initialized. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="88B12AE1-6DE0-48A0-86F1-60C0686C026A"'
     Private Sub txtDelimiter_TextChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles txtDelimiter.TextChanged
-        optDelimiter(3).Checked = True
+        optDelimiterChar.Checked = True
         delim = txtDelimiter.Text
         If fraColSample.Visible Then PopulateGridSample()
     End Sub
@@ -2092,7 +2093,7 @@ exitsub:
         dlgOpenFileSave.Title = "Open lookup file"
         dlgOpenFileOpen.ShowDialog()
         dlgOpenFileSave.FileName = dlgOpenFileOpen.FileName
-        With agdDataMapping.Source
+        With MappingSource
             .CellValue(.Rows, 0) = dlgOpenFileOpen.FileName
             If Len(dlgOpenFileOpen.FileName) > 0 Then .CellValue(.Rows, 4) = ""
         End With
@@ -2213,7 +2214,7 @@ exitsub:
         ' could be read in directly from a ddf file.
         '
 
-        For i = 1 To agdDataMapping.Source.Rows
+        For i = 1 To MappingSource.Rows
             'Call objEditEngine.AddDataMapEntry( _
             ''     agdDataMapping.TextMatrix(i, 5), _
             ''     agdDataMapping.TextMatrix(i, 2), _

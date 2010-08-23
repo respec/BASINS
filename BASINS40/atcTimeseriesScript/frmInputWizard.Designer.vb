@@ -18,27 +18,26 @@
     Private components As System.ComponentModel.IContainer
     Public ToolTip1 As System.Windows.Forms.ToolTip
     Public WithEvents agdDataMapping As atcControls.atcGrid
-    Public WithEvents _fraTab_2 As System.Windows.Forms.Panel
     Public WithEvents txtScriptDesc As System.Windows.Forms.TextBox
     Public WithEvents txtHeaderLines As System.Windows.Forms.TextBox
     Public WithEvents chkSkipHeader As System.Windows.Forms.CheckBox
-    Public WithEvents _optHeader_3 As System.Windows.Forms.RadioButton
-    Public WithEvents _optHeader_2 As System.Windows.Forms.RadioButton
-    Public WithEvents _optHeader_1 As System.Windows.Forms.RadioButton
+    Public WithEvents optHeaderLines As System.Windows.Forms.RadioButton
+    Public WithEvents optHeaderStartsWith As System.Windows.Forms.RadioButton
+    Public WithEvents optHeaderNone As System.Windows.Forms.RadioButton
     Public WithEvents txtHeaderStart As System.Windows.Forms.TextBox
     Public WithEvents fraHeader As System.Windows.Forms.GroupBox
     Public WithEvents txtLineLen As System.Windows.Forms.TextBox
     Public WithEvents txtLineEndChar As System.Windows.Forms.TextBox
-    Public WithEvents _optLineEnd_0 As System.Windows.Forms.RadioButton
-    Public WithEvents _optLineEnd_2 As System.Windows.Forms.RadioButton
-    Public WithEvents _optLineEnd_1 As System.Windows.Forms.RadioButton
-    Public WithEvents _optLineEnd_3 As System.Windows.Forms.RadioButton
+    Public WithEvents optLineEndCRLF As System.Windows.Forms.RadioButton
+    Public WithEvents optLineEndASCII As System.Windows.Forms.RadioButton
+    Public WithEvents optLineEndLF As System.Windows.Forms.RadioButton
+    Public WithEvents optLineEndLength As System.Windows.Forms.RadioButton
     Public WithEvents fraLineEnd As System.Windows.Forms.GroupBox
-    Public WithEvents _optDelimiter_3 As System.Windows.Forms.RadioButton
-    Public WithEvents _optDelimiter_2 As System.Windows.Forms.RadioButton
-    Public WithEvents _optDelimiter_1 As System.Windows.Forms.RadioButton
+    Public WithEvents optDelimiterChar As System.Windows.Forms.RadioButton
+    Public WithEvents optDelimiterTab As System.Windows.Forms.RadioButton
+    Public WithEvents optDelimiterSpace As System.Windows.Forms.RadioButton
     Public WithEvents txtDelimiter As System.Windows.Forms.TextBox
-    Public WithEvents _optDelimiter_0 As System.Windows.Forms.RadioButton
+    Public WithEvents optDelimiterNone As System.Windows.Forms.RadioButton
     Public WithEvents fraColumns As System.Windows.Forms.GroupBox
     Public WithEvents cmdBrowseDesc As System.Windows.Forms.Button
     Public WithEvents txtScriptFile As System.Windows.Forms.TextBox
@@ -47,14 +46,12 @@
     Public WithEvents lblScriptDesc As System.Windows.Forms.Label
     Public WithEvents lblDataDescFile As System.Windows.Forms.Label
     Public WithEvents lblDataFile As System.Windows.Forms.Label
-    Public WithEvents _fraTab_1 As System.Windows.Forms.Panel
     Public WithEvents fraSash As System.Windows.Forms.Panel
     Public dlgOpenFileOpen As System.Windows.Forms.OpenFileDialog
     Public dlgOpenFileSave As System.Windows.Forms.SaveFileDialog
     Public WithEvents cmdSaveDesc As System.Windows.Forms.Button
     Public WithEvents cmdCancel As System.Windows.Forms.Button
     Public WithEvents cmdOk As System.Windows.Forms.Button
-    Public WithEvents fraButtons As System.Windows.Forms.Panel
     Public WithEvents VScrollSample As System.Windows.Forms.VScrollBar
     Public WithEvents HScrollSample As System.Windows.Forms.HScrollBar
     Public WithEvents txtRuler2 As System.Windows.Forms.TextBox
@@ -64,11 +61,6 @@
     Public WithEvents agdSample As atcControls.atcGrid
     Public WithEvents lblInputColumns As System.Windows.Forms.Label
     Public WithEvents fraColSample As System.Windows.Forms.Panel
-    Public WithEvents fraTab As Microsoft.VisualBasic.Compatibility.VB6.PanelArray
-    Public WithEvents optDelimiter As Microsoft.VisualBasic.Compatibility.VB6.RadioButtonArray
-    Public WithEvents optHeader As Microsoft.VisualBasic.Compatibility.VB6.RadioButtonArray
-    Public WithEvents optLineEnd As Microsoft.VisualBasic.Compatibility.VB6.RadioButtonArray
-    Public WithEvents txtSample As Microsoft.VisualBasic.Compatibility.VB6.TextBoxArray
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.
     'Do not modify it using the code editor.
@@ -83,24 +75,22 @@
         Me.txtDelimiter = New System.Windows.Forms.TextBox
         Me.txtDataFile = New System.Windows.Forms.TextBox
         Me.cmdSaveDesc = New System.Windows.Forms.Button
-        Me._fraTab_2 = New System.Windows.Forms.Panel
         Me.agdDataMapping = New atcControls.atcGrid
-        Me._fraTab_1 = New System.Windows.Forms.Panel
         Me.txtScriptDesc = New System.Windows.Forms.TextBox
         Me.fraHeader = New System.Windows.Forms.GroupBox
-        Me._optHeader_3 = New System.Windows.Forms.RadioButton
-        Me._optHeader_2 = New System.Windows.Forms.RadioButton
-        Me._optHeader_1 = New System.Windows.Forms.RadioButton
+        Me.optHeaderLines = New System.Windows.Forms.RadioButton
+        Me.optHeaderStartsWith = New System.Windows.Forms.RadioButton
+        Me.optHeaderNone = New System.Windows.Forms.RadioButton
         Me.fraLineEnd = New System.Windows.Forms.GroupBox
-        Me._optLineEnd_0 = New System.Windows.Forms.RadioButton
-        Me._optLineEnd_2 = New System.Windows.Forms.RadioButton
-        Me._optLineEnd_1 = New System.Windows.Forms.RadioButton
-        Me._optLineEnd_3 = New System.Windows.Forms.RadioButton
+        Me.optLineEndCRLF = New System.Windows.Forms.RadioButton
+        Me.optLineEndASCII = New System.Windows.Forms.RadioButton
+        Me.optLineEndLF = New System.Windows.Forms.RadioButton
+        Me.optLineEndLength = New System.Windows.Forms.RadioButton
         Me.fraColumns = New System.Windows.Forms.GroupBox
-        Me._optDelimiter_3 = New System.Windows.Forms.RadioButton
-        Me._optDelimiter_2 = New System.Windows.Forms.RadioButton
-        Me._optDelimiter_1 = New System.Windows.Forms.RadioButton
-        Me._optDelimiter_0 = New System.Windows.Forms.RadioButton
+        Me.optDelimiterChar = New System.Windows.Forms.RadioButton
+        Me.optDelimiterTab = New System.Windows.Forms.RadioButton
+        Me.optDelimiterSpace = New System.Windows.Forms.RadioButton
+        Me.optDelimiterNone = New System.Windows.Forms.RadioButton
         Me.cmdBrowseDesc = New System.Windows.Forms.Button
         Me.txtScriptFile = New System.Windows.Forms.TextBox
         Me.cmdBrowseData = New System.Windows.Forms.Button
@@ -110,7 +100,6 @@
         Me.fraSash = New System.Windows.Forms.Panel
         Me.dlgOpenFileOpen = New System.Windows.Forms.OpenFileDialog
         Me.dlgOpenFileSave = New System.Windows.Forms.SaveFileDialog
-        Me.fraButtons = New System.Windows.Forms.Panel
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdOk = New System.Windows.Forms.Button
         Me.fraTextSample = New System.Windows.Forms.Panel
@@ -122,24 +111,17 @@
         Me.fraColSample = New System.Windows.Forms.Panel
         Me.agdSample = New atcControls.atcGrid
         Me.lblInputColumns = New System.Windows.Forms.Label
-        Me.fraTab = New Microsoft.VisualBasic.Compatibility.VB6.PanelArray(Me.components)
-        Me.optDelimiter = New Microsoft.VisualBasic.Compatibility.VB6.RadioButtonArray(Me.components)
-        Me.optHeader = New Microsoft.VisualBasic.Compatibility.VB6.RadioButtonArray(Me.components)
-        Me.optLineEnd = New Microsoft.VisualBasic.Compatibility.VB6.RadioButtonArray(Me.components)
-        Me.txtSample = New Microsoft.VisualBasic.Compatibility.VB6.TextBoxArray(Me.components)
-        Me._fraTab_2.SuspendLayout()
-        Me._fraTab_1.SuspendLayout()
+        Me.tabTop = New System.Windows.Forms.TabControl
+        Me.tabFileProperty = New System.Windows.Forms.TabPage
+        Me.tabDataMapping = New System.Windows.Forms.TabPage
         Me.fraHeader.SuspendLayout()
         Me.fraLineEnd.SuspendLayout()
         Me.fraColumns.SuspendLayout()
-        Me.fraButtons.SuspendLayout()
         Me.fraTextSample.SuspendLayout()
         Me.fraColSample.SuspendLayout()
-        CType(Me.fraTab, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.optDelimiter, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.optHeader, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.optLineEnd, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtSample, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.tabTop.SuspendLayout()
+        Me.tabFileProperty.SuspendLayout()
+        Me.tabDataMapping.SuspendLayout()
         Me.SuspendLayout()
         '
         'txtHeaderLines
@@ -149,7 +131,7 @@
         Me.txtHeaderLines.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtHeaderLines.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtHeaderLines.ForeColor = System.Drawing.SystemColors.WindowText
-        Me.txtHeaderLines.Location = New System.Drawing.Point(96, 64)
+        Me.txtHeaderLines.Location = New System.Drawing.Point(103, 64)
         Me.txtHeaderLines.MaxLength = 0
         Me.txtHeaderLines.Name = "txtHeaderLines"
         Me.txtHeaderLines.RightToLeft = System.Windows.Forms.RightToLeft.No
@@ -169,7 +151,7 @@
         Me.chkSkipHeader.Location = New System.Drawing.Point(8, 16)
         Me.chkSkipHeader.Name = "chkSkipHeader"
         Me.chkSkipHeader.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.chkSkipHeader.Size = New System.Drawing.Size(113, 17)
+        Me.chkSkipHeader.Size = New System.Drawing.Size(89, 17)
         Me.chkSkipHeader.TabIndex = 6
         Me.chkSkipHeader.Text = "Skip"
         Me.ToolTip1.SetToolTip(Me.chkSkipHeader, "Do not search header for any information")
@@ -182,11 +164,11 @@
         Me.txtHeaderStart.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtHeaderStart.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtHeaderStart.ForeColor = System.Drawing.SystemColors.WindowText
-        Me.txtHeaderStart.Location = New System.Drawing.Point(96, 48)
+        Me.txtHeaderStart.Location = New System.Drawing.Point(103, 47)
         Me.txtHeaderStart.MaxLength = 0
         Me.txtHeaderStart.Name = "txtHeaderStart"
         Me.txtHeaderStart.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtHeaderStart.Size = New System.Drawing.Size(25, 19)
+        Me.txtHeaderStart.Size = New System.Drawing.Size(25, 20)
         Me.txtHeaderStart.TabIndex = 9
         Me.txtHeaderStart.Text = "#"
         Me.ToolTip1.SetToolTip(Me.txtHeaderStart, "Single printable character delimiter")
@@ -218,7 +200,7 @@
         Me.txtLineEndChar.MaxLength = 0
         Me.txtLineEndChar.Name = "txtLineEndChar"
         Me.txtLineEndChar.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtLineEndChar.Size = New System.Drawing.Size(25, 19)
+        Me.txtLineEndChar.Size = New System.Drawing.Size(25, 20)
         Me.txtLineEndChar.TabIndex = 20
         Me.txtLineEndChar.Text = "13"
         Me.ToolTip1.SetToolTip(Me.txtLineEndChar, "Single printable character delimiter")
@@ -230,11 +212,11 @@
         Me.txtDelimiter.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtDelimiter.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtDelimiter.ForeColor = System.Drawing.SystemColors.WindowText
-        Me.txtDelimiter.Location = New System.Drawing.Point(96, 64)
+        Me.txtDelimiter.Location = New System.Drawing.Point(108, 68)
         Me.txtDelimiter.MaxLength = 0
         Me.txtDelimiter.Name = "txtDelimiter"
         Me.txtDelimiter.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtDelimiter.Size = New System.Drawing.Size(17, 19)
+        Me.txtDelimiter.Size = New System.Drawing.Size(17, 20)
         Me.txtDelimiter.TabIndex = 16
         Me.txtDelimiter.Text = ","
         Me.ToolTip1.SetToolTip(Me.txtDelimiter, "Single printable character delimiter")
@@ -246,11 +228,11 @@
         Me.txtDataFile.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtDataFile.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtDataFile.ForeColor = System.Drawing.SystemColors.WindowText
-        Me.txtDataFile.Location = New System.Drawing.Point(80, 0)
+        Me.txtDataFile.Location = New System.Drawing.Point(93, 6)
         Me.txtDataFile.MaxLength = 0
         Me.txtDataFile.Name = "txtDataFile"
         Me.txtDataFile.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtDataFile.Size = New System.Drawing.Size(337, 19)
+        Me.txtDataFile.Size = New System.Drawing.Size(337, 20)
         Me.txtDataFile.TabIndex = 1
         Me.txtDataFile.Text = "txtDataFile"
         Me.ToolTip1.SetToolTip(Me.txtDataFile, "Name of file containing data to import")
@@ -261,7 +243,7 @@
         Me.cmdSaveDesc.Cursor = System.Windows.Forms.Cursors.Default
         Me.cmdSaveDesc.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdSaveDesc.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.cmdSaveDesc.Location = New System.Drawing.Point(104, 0)
+        Me.cmdSaveDesc.Location = New System.Drawing.Point(198, 461)
         Me.cmdSaveDesc.Name = "cmdSaveDesc"
         Me.cmdSaveDesc.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.cmdSaveDesc.Size = New System.Drawing.Size(89, 25)
@@ -270,60 +252,20 @@
         Me.ToolTip1.SetToolTip(Me.cmdSaveDesc, "Save selections and data mapping information to a data descriptor file.")
         Me.cmdSaveDesc.UseVisualStyleBackColor = False
         '
-        '_fraTab_2
-        '
-        Me._fraTab_2.BackColor = System.Drawing.SystemColors.Control
-        Me._fraTab_2.Controls.Add(Me.agdDataMapping)
-        Me._fraTab_2.Cursor = System.Windows.Forms.Cursors.Default
-        Me._fraTab_2.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me._fraTab_2.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.fraTab.SetIndex(Me._fraTab_2, CType(2, Short))
-        Me._fraTab_2.Location = New System.Drawing.Point(528, 40)
-        Me._fraTab_2.Name = "_fraTab_2"
-        Me._fraTab_2.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me._fraTab_2.Size = New System.Drawing.Size(457, 225)
-        Me._fraTab_2.TabIndex = 38
-        Me._fraTab_2.Text = "Frame1"
-        Me._fraTab_2.Visible = False
-        '
         'agdDataMapping
         '
         Me.agdDataMapping.AllowHorizontalScrolling = True
         Me.agdDataMapping.AllowNewValidValues = False
         Me.agdDataMapping.CellBackColor = System.Drawing.SystemColors.Window
+        Me.agdDataMapping.Dock = System.Windows.Forms.DockStyle.Fill
         Me.agdDataMapping.Fixed3D = False
         Me.agdDataMapping.LineColor = System.Drawing.SystemColors.Control
         Me.agdDataMapping.LineWidth = 1.0!
-        Me.agdDataMapping.Location = New System.Drawing.Point(0, 0)
+        Me.agdDataMapping.Location = New System.Drawing.Point(3, 3)
         Me.agdDataMapping.Name = "agdDataMapping"
-        Me.agdDataMapping.Size = New System.Drawing.Size(521, 201)
+        Me.agdDataMapping.Size = New System.Drawing.Size(495, 192)
         Me.agdDataMapping.Source = Nothing
         Me.agdDataMapping.TabIndex = 23
-        '
-        '_fraTab_1
-        '
-        Me._fraTab_1.BackColor = System.Drawing.SystemColors.Control
-        Me._fraTab_1.Controls.Add(Me.txtScriptDesc)
-        Me._fraTab_1.Controls.Add(Me.fraHeader)
-        Me._fraTab_1.Controls.Add(Me.fraLineEnd)
-        Me._fraTab_1.Controls.Add(Me.fraColumns)
-        Me._fraTab_1.Controls.Add(Me.cmdBrowseDesc)
-        Me._fraTab_1.Controls.Add(Me.txtScriptFile)
-        Me._fraTab_1.Controls.Add(Me.cmdBrowseData)
-        Me._fraTab_1.Controls.Add(Me.txtDataFile)
-        Me._fraTab_1.Controls.Add(Me.lblScriptDesc)
-        Me._fraTab_1.Controls.Add(Me.lblDataDescFile)
-        Me._fraTab_1.Controls.Add(Me.lblDataFile)
-        Me._fraTab_1.Cursor = System.Windows.Forms.Cursors.Default
-        Me._fraTab_1.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me._fraTab_1.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.fraTab.SetIndex(Me._fraTab_1, CType(1, Short))
-        Me._fraTab_1.Location = New System.Drawing.Point(19, 40)
-        Me._fraTab_1.Name = "_fraTab_1"
-        Me._fraTab_1.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me._fraTab_1.Size = New System.Drawing.Size(490, 161)
-        Me._fraTab_1.TabIndex = 39
-        Me._fraTab_1.Text = "Frame1"
         '
         'txtScriptDesc
         '
@@ -332,11 +274,11 @@
         Me.txtScriptDesc.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtScriptDesc.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtScriptDesc.ForeColor = System.Drawing.SystemColors.WindowText
-        Me.txtScriptDesc.Location = New System.Drawing.Point(80, 40)
+        Me.txtScriptDesc.Location = New System.Drawing.Point(93, 58)
         Me.txtScriptDesc.MaxLength = 0
         Me.txtScriptDesc.Name = "txtScriptDesc"
         Me.txtScriptDesc.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtScriptDesc.Size = New System.Drawing.Size(337, 19)
+        Me.txtScriptDesc.Size = New System.Drawing.Size(337, 20)
         Me.txtScriptDesc.TabIndex = 5
         Me.txtScriptDesc.Text = "txtScriptDesc"
         '
@@ -345,238 +287,227 @@
         Me.fraHeader.BackColor = System.Drawing.SystemColors.Control
         Me.fraHeader.Controls.Add(Me.txtHeaderLines)
         Me.fraHeader.Controls.Add(Me.chkSkipHeader)
-        Me.fraHeader.Controls.Add(Me._optHeader_3)
-        Me.fraHeader.Controls.Add(Me._optHeader_2)
-        Me.fraHeader.Controls.Add(Me._optHeader_1)
+        Me.fraHeader.Controls.Add(Me.optHeaderLines)
+        Me.fraHeader.Controls.Add(Me.optHeaderStartsWith)
+        Me.fraHeader.Controls.Add(Me.optHeaderNone)
         Me.fraHeader.Controls.Add(Me.txtHeaderStart)
         Me.fraHeader.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.fraHeader.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.fraHeader.Location = New System.Drawing.Point(0, 64)
+        Me.fraHeader.Location = New System.Drawing.Point(6, 84)
         Me.fraHeader.Name = "fraHeader"
         Me.fraHeader.Padding = New System.Windows.Forms.Padding(0)
         Me.fraHeader.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.fraHeader.Size = New System.Drawing.Size(129, 89)
+        Me.fraHeader.Size = New System.Drawing.Size(139, 95)
         Me.fraHeader.TabIndex = 42
         Me.fraHeader.TabStop = False
         Me.fraHeader.Text = "Header"
         '
-        '_optHeader_3
+        'optHeaderLines
         '
-        Me._optHeader_3.BackColor = System.Drawing.SystemColors.Control
-        Me._optHeader_3.Cursor = System.Windows.Forms.Cursors.Default
-        Me._optHeader_3.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me._optHeader_3.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.optHeader.SetIndex(Me._optHeader_3, CType(3, Short))
-        Me._optHeader_3.Location = New System.Drawing.Point(8, 64)
-        Me._optHeader_3.Name = "_optHeader_3"
-        Me._optHeader_3.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me._optHeader_3.Size = New System.Drawing.Size(89, 17)
-        Me._optHeader_3.TabIndex = 10
-        Me._optHeader_3.TabStop = True
-        Me._optHeader_3.Text = "Lines"
-        Me._optHeader_3.UseVisualStyleBackColor = False
+        Me.optHeaderLines.BackColor = System.Drawing.SystemColors.Control
+        Me.optHeaderLines.Cursor = System.Windows.Forms.Cursors.Default
+        Me.optHeaderLines.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.optHeaderLines.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.optHeaderLines.Location = New System.Drawing.Point(8, 64)
+        Me.optHeaderLines.Name = "optHeaderLines"
+        Me.optHeaderLines.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.optHeaderLines.Size = New System.Drawing.Size(89, 17)
+        Me.optHeaderLines.TabIndex = 10
+        Me.optHeaderLines.TabStop = True
+        Me.optHeaderLines.Text = "Lines"
+        Me.optHeaderLines.UseVisualStyleBackColor = False
         '
-        '_optHeader_2
+        'optHeaderStartsWith
         '
-        Me._optHeader_2.BackColor = System.Drawing.SystemColors.Control
-        Me._optHeader_2.Cursor = System.Windows.Forms.Cursors.Default
-        Me._optHeader_2.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me._optHeader_2.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.optHeader.SetIndex(Me._optHeader_2, CType(2, Short))
-        Me._optHeader_2.Location = New System.Drawing.Point(8, 48)
-        Me._optHeader_2.Name = "_optHeader_2"
-        Me._optHeader_2.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me._optHeader_2.Size = New System.Drawing.Size(89, 17)
-        Me._optHeader_2.TabIndex = 8
-        Me._optHeader_2.TabStop = True
-        Me._optHeader_2.Text = "Starts With"
-        Me._optHeader_2.UseVisualStyleBackColor = False
+        Me.optHeaderStartsWith.BackColor = System.Drawing.SystemColors.Control
+        Me.optHeaderStartsWith.Cursor = System.Windows.Forms.Cursors.Default
+        Me.optHeaderStartsWith.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.optHeaderStartsWith.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.optHeaderStartsWith.Location = New System.Drawing.Point(8, 48)
+        Me.optHeaderStartsWith.Name = "optHeaderStartsWith"
+        Me.optHeaderStartsWith.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.optHeaderStartsWith.Size = New System.Drawing.Size(89, 17)
+        Me.optHeaderStartsWith.TabIndex = 8
+        Me.optHeaderStartsWith.TabStop = True
+        Me.optHeaderStartsWith.Text = "Starts With"
+        Me.optHeaderStartsWith.UseVisualStyleBackColor = False
         '
-        '_optHeader_1
+        'optHeaderNone
         '
-        Me._optHeader_1.BackColor = System.Drawing.SystemColors.Control
-        Me._optHeader_1.Checked = True
-        Me._optHeader_1.Cursor = System.Windows.Forms.Cursors.Default
-        Me._optHeader_1.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me._optHeader_1.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.optHeader.SetIndex(Me._optHeader_1, CType(1, Short))
-        Me._optHeader_1.Location = New System.Drawing.Point(8, 32)
-        Me._optHeader_1.Name = "_optHeader_1"
-        Me._optHeader_1.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me._optHeader_1.Size = New System.Drawing.Size(113, 17)
-        Me._optHeader_1.TabIndex = 7
-        Me._optHeader_1.TabStop = True
-        Me._optHeader_1.Text = "None"
-        Me._optHeader_1.UseVisualStyleBackColor = False
+        Me.optHeaderNone.BackColor = System.Drawing.SystemColors.Control
+        Me.optHeaderNone.Checked = True
+        Me.optHeaderNone.Cursor = System.Windows.Forms.Cursors.Default
+        Me.optHeaderNone.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.optHeaderNone.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.optHeaderNone.Location = New System.Drawing.Point(8, 32)
+        Me.optHeaderNone.Name = "optHeaderNone"
+        Me.optHeaderNone.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.optHeaderNone.Size = New System.Drawing.Size(89, 17)
+        Me.optHeaderNone.TabIndex = 7
+        Me.optHeaderNone.TabStop = True
+        Me.optHeaderNone.Text = "None"
+        Me.optHeaderNone.UseVisualStyleBackColor = False
         '
         'fraLineEnd
         '
         Me.fraLineEnd.BackColor = System.Drawing.SystemColors.Control
         Me.fraLineEnd.Controls.Add(Me.txtLineLen)
         Me.fraLineEnd.Controls.Add(Me.txtLineEndChar)
-        Me.fraLineEnd.Controls.Add(Me._optLineEnd_0)
-        Me.fraLineEnd.Controls.Add(Me._optLineEnd_2)
-        Me.fraLineEnd.Controls.Add(Me._optLineEnd_1)
-        Me.fraLineEnd.Controls.Add(Me._optLineEnd_3)
+        Me.fraLineEnd.Controls.Add(Me.optLineEndCRLF)
+        Me.fraLineEnd.Controls.Add(Me.optLineEndASCII)
+        Me.fraLineEnd.Controls.Add(Me.optLineEndLF)
+        Me.fraLineEnd.Controls.Add(Me.optLineEndLength)
         Me.fraLineEnd.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.fraLineEnd.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.fraLineEnd.Location = New System.Drawing.Point(272, 64)
+        Me.fraLineEnd.Location = New System.Drawing.Point(296, 84)
         Me.fraLineEnd.Name = "fraLineEnd"
         Me.fraLineEnd.Padding = New System.Windows.Forms.Padding(0)
         Me.fraLineEnd.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.fraLineEnd.Size = New System.Drawing.Size(129, 89)
+        Me.fraLineEnd.Size = New System.Drawing.Size(134, 95)
         Me.fraLineEnd.TabIndex = 41
         Me.fraLineEnd.TabStop = False
         Me.fraLineEnd.Text = "Line Ending"
         '
-        '_optLineEnd_0
+        'optLineEndCRLF
         '
-        Me._optLineEnd_0.BackColor = System.Drawing.SystemColors.Control
-        Me._optLineEnd_0.Checked = True
-        Me._optLineEnd_0.Cursor = System.Windows.Forms.Cursors.Default
-        Me._optLineEnd_0.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me._optLineEnd_0.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.optLineEnd.SetIndex(Me._optLineEnd_0, CType(0, Short))
-        Me._optLineEnd_0.Location = New System.Drawing.Point(8, 16)
-        Me._optLineEnd_0.Name = "_optLineEnd_0"
-        Me._optLineEnd_0.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me._optLineEnd_0.Size = New System.Drawing.Size(113, 17)
-        Me._optLineEnd_0.TabIndex = 17
-        Me._optLineEnd_0.TabStop = True
-        Me._optLineEnd_0.Text = "CR/LF or CR"
-        Me._optLineEnd_0.UseVisualStyleBackColor = False
+        Me.optLineEndCRLF.BackColor = System.Drawing.SystemColors.Control
+        Me.optLineEndCRLF.Checked = True
+        Me.optLineEndCRLF.Cursor = System.Windows.Forms.Cursors.Default
+        Me.optLineEndCRLF.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.optLineEndCRLF.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.optLineEndCRLF.Location = New System.Drawing.Point(8, 16)
+        Me.optLineEndCRLF.Name = "optLineEndCRLF"
+        Me.optLineEndCRLF.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.optLineEndCRLF.Size = New System.Drawing.Size(113, 17)
+        Me.optLineEndCRLF.TabIndex = 17
+        Me.optLineEndCRLF.TabStop = True
+        Me.optLineEndCRLF.Text = "CR/LF or CR"
+        Me.optLineEndCRLF.UseVisualStyleBackColor = False
         '
-        '_optLineEnd_2
+        'optLineEndASCII
         '
-        Me._optLineEnd_2.BackColor = System.Drawing.SystemColors.Control
-        Me._optLineEnd_2.Cursor = System.Windows.Forms.Cursors.Default
-        Me._optLineEnd_2.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me._optLineEnd_2.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.optLineEnd.SetIndex(Me._optLineEnd_2, CType(2, Short))
-        Me._optLineEnd_2.Location = New System.Drawing.Point(8, 48)
-        Me._optLineEnd_2.Name = "_optLineEnd_2"
-        Me._optLineEnd_2.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me._optLineEnd_2.Size = New System.Drawing.Size(97, 17)
-        Me._optLineEnd_2.TabIndex = 19
-        Me._optLineEnd_2.TabStop = True
-        Me._optLineEnd_2.Text = "ASCII Char:"
-        Me._optLineEnd_2.UseVisualStyleBackColor = False
+        Me.optLineEndASCII.BackColor = System.Drawing.SystemColors.Control
+        Me.optLineEndASCII.Cursor = System.Windows.Forms.Cursors.Default
+        Me.optLineEndASCII.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.optLineEndASCII.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.optLineEndASCII.Location = New System.Drawing.Point(8, 48)
+        Me.optLineEndASCII.Name = "optLineEndASCII"
+        Me.optLineEndASCII.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.optLineEndASCII.Size = New System.Drawing.Size(97, 17)
+        Me.optLineEndASCII.TabIndex = 19
+        Me.optLineEndASCII.TabStop = True
+        Me.optLineEndASCII.Text = "ASCII Char:"
+        Me.optLineEndASCII.UseVisualStyleBackColor = False
         '
-        '_optLineEnd_1
+        'optLineEndLF
         '
-        Me._optLineEnd_1.BackColor = System.Drawing.SystemColors.Control
-        Me._optLineEnd_1.Cursor = System.Windows.Forms.Cursors.Default
-        Me._optLineEnd_1.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me._optLineEnd_1.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.optLineEnd.SetIndex(Me._optLineEnd_1, CType(1, Short))
-        Me._optLineEnd_1.Location = New System.Drawing.Point(8, 32)
-        Me._optLineEnd_1.Name = "_optLineEnd_1"
-        Me._optLineEnd_1.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me._optLineEnd_1.Size = New System.Drawing.Size(97, 17)
-        Me._optLineEnd_1.TabIndex = 18
-        Me._optLineEnd_1.TabStop = True
-        Me._optLineEnd_1.Text = "LF"
-        Me._optLineEnd_1.UseVisualStyleBackColor = False
+        Me.optLineEndLF.BackColor = System.Drawing.SystemColors.Control
+        Me.optLineEndLF.Cursor = System.Windows.Forms.Cursors.Default
+        Me.optLineEndLF.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.optLineEndLF.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.optLineEndLF.Location = New System.Drawing.Point(8, 32)
+        Me.optLineEndLF.Name = "optLineEndLF"
+        Me.optLineEndLF.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.optLineEndLF.Size = New System.Drawing.Size(97, 17)
+        Me.optLineEndLF.TabIndex = 18
+        Me.optLineEndLF.TabStop = True
+        Me.optLineEndLF.Text = "LF"
+        Me.optLineEndLF.UseVisualStyleBackColor = False
         '
-        '_optLineEnd_3
+        'optLineEndLength
         '
-        Me._optLineEnd_3.BackColor = System.Drawing.SystemColors.Control
-        Me._optLineEnd_3.Cursor = System.Windows.Forms.Cursors.Default
-        Me._optLineEnd_3.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me._optLineEnd_3.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.optLineEnd.SetIndex(Me._optLineEnd_3, CType(3, Short))
-        Me._optLineEnd_3.Location = New System.Drawing.Point(8, 64)
-        Me._optLineEnd_3.Name = "_optLineEnd_3"
-        Me._optLineEnd_3.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me._optLineEnd_3.Size = New System.Drawing.Size(97, 17)
-        Me._optLineEnd_3.TabIndex = 21
-        Me._optLineEnd_3.TabStop = True
-        Me._optLineEnd_3.Text = "Line Length:"
-        Me._optLineEnd_3.UseVisualStyleBackColor = False
+        Me.optLineEndLength.BackColor = System.Drawing.SystemColors.Control
+        Me.optLineEndLength.Cursor = System.Windows.Forms.Cursors.Default
+        Me.optLineEndLength.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.optLineEndLength.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.optLineEndLength.Location = New System.Drawing.Point(8, 64)
+        Me.optLineEndLength.Name = "optLineEndLength"
+        Me.optLineEndLength.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.optLineEndLength.Size = New System.Drawing.Size(97, 17)
+        Me.optLineEndLength.TabIndex = 21
+        Me.optLineEndLength.TabStop = True
+        Me.optLineEndLength.Text = "Line Length:"
+        Me.optLineEndLength.UseVisualStyleBackColor = False
         '
         'fraColumns
         '
         Me.fraColumns.BackColor = System.Drawing.SystemColors.Control
-        Me.fraColumns.Controls.Add(Me._optDelimiter_3)
-        Me.fraColumns.Controls.Add(Me._optDelimiter_2)
-        Me.fraColumns.Controls.Add(Me._optDelimiter_1)
+        Me.fraColumns.Controls.Add(Me.optDelimiterChar)
+        Me.fraColumns.Controls.Add(Me.optDelimiterTab)
+        Me.fraColumns.Controls.Add(Me.optDelimiterSpace)
         Me.fraColumns.Controls.Add(Me.txtDelimiter)
-        Me.fraColumns.Controls.Add(Me._optDelimiter_0)
+        Me.fraColumns.Controls.Add(Me.optDelimiterNone)
         Me.fraColumns.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.fraColumns.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.fraColumns.Location = New System.Drawing.Point(136, 64)
+        Me.fraColumns.Location = New System.Drawing.Point(151, 84)
         Me.fraColumns.Name = "fraColumns"
         Me.fraColumns.Padding = New System.Windows.Forms.Padding(0)
         Me.fraColumns.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.fraColumns.Size = New System.Drawing.Size(129, 89)
+        Me.fraColumns.Size = New System.Drawing.Size(139, 95)
         Me.fraColumns.TabIndex = 40
         Me.fraColumns.TabStop = False
         Me.fraColumns.Text = "Column Format"
         '
-        '_optDelimiter_3
+        'optDelimiterChar
         '
-        Me._optDelimiter_3.BackColor = System.Drawing.SystemColors.Control
-        Me._optDelimiter_3.Cursor = System.Windows.Forms.Cursors.Default
-        Me._optDelimiter_3.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me._optDelimiter_3.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.optDelimiter.SetIndex(Me._optDelimiter_3, CType(3, Short))
-        Me._optDelimiter_3.Location = New System.Drawing.Point(8, 64)
-        Me._optDelimiter_3.Name = "_optDelimiter_3"
-        Me._optDelimiter_3.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me._optDelimiter_3.Size = New System.Drawing.Size(89, 17)
-        Me._optDelimiter_3.TabIndex = 15
-        Me._optDelimiter_3.TabStop = True
-        Me._optDelimiter_3.Text = "Character:"
-        Me._optDelimiter_3.UseVisualStyleBackColor = False
+        Me.optDelimiterChar.BackColor = System.Drawing.SystemColors.Control
+        Me.optDelimiterChar.Cursor = System.Windows.Forms.Cursors.Default
+        Me.optDelimiterChar.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.optDelimiterChar.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.optDelimiterChar.Location = New System.Drawing.Point(8, 71)
+        Me.optDelimiterChar.Name = "optDelimiterChar"
+        Me.optDelimiterChar.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.optDelimiterChar.Size = New System.Drawing.Size(89, 17)
+        Me.optDelimiterChar.TabIndex = 15
+        Me.optDelimiterChar.TabStop = True
+        Me.optDelimiterChar.Text = "Character:"
+        Me.optDelimiterChar.UseVisualStyleBackColor = False
         '
-        '_optDelimiter_2
+        'optDelimiterTab
         '
-        Me._optDelimiter_2.BackColor = System.Drawing.SystemColors.Control
-        Me._optDelimiter_2.Cursor = System.Windows.Forms.Cursors.Default
-        Me._optDelimiter_2.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me._optDelimiter_2.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.optDelimiter.SetIndex(Me._optDelimiter_2, CType(2, Short))
-        Me._optDelimiter_2.Location = New System.Drawing.Point(8, 32)
-        Me._optDelimiter_2.Name = "_optDelimiter_2"
-        Me._optDelimiter_2.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me._optDelimiter_2.Size = New System.Drawing.Size(113, 17)
-        Me._optDelimiter_2.TabIndex = 13
-        Me._optDelimiter_2.TabStop = True
-        Me._optDelimiter_2.Text = "Tab Delimited"
-        Me._optDelimiter_2.UseVisualStyleBackColor = False
+        Me.optDelimiterTab.BackColor = System.Drawing.SystemColors.Control
+        Me.optDelimiterTab.Cursor = System.Windows.Forms.Cursors.Default
+        Me.optDelimiterTab.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.optDelimiterTab.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.optDelimiterTab.Location = New System.Drawing.Point(8, 32)
+        Me.optDelimiterTab.Name = "optDelimiterTab"
+        Me.optDelimiterTab.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.optDelimiterTab.Size = New System.Drawing.Size(113, 17)
+        Me.optDelimiterTab.TabIndex = 13
+        Me.optDelimiterTab.TabStop = True
+        Me.optDelimiterTab.Text = "Tab Delimited"
+        Me.optDelimiterTab.UseVisualStyleBackColor = False
         '
-        '_optDelimiter_1
+        'optDelimiterSpace
         '
-        Me._optDelimiter_1.BackColor = System.Drawing.SystemColors.Control
-        Me._optDelimiter_1.Cursor = System.Windows.Forms.Cursors.Default
-        Me._optDelimiter_1.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me._optDelimiter_1.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.optDelimiter.SetIndex(Me._optDelimiter_1, CType(1, Short))
-        Me._optDelimiter_1.Location = New System.Drawing.Point(8, 48)
-        Me._optDelimiter_1.Name = "_optDelimiter_1"
-        Me._optDelimiter_1.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me._optDelimiter_1.Size = New System.Drawing.Size(117, 17)
-        Me._optDelimiter_1.TabIndex = 14
-        Me._optDelimiter_1.TabStop = True
-        Me._optDelimiter_1.Text = "Space Delimited"
-        Me._optDelimiter_1.UseVisualStyleBackColor = False
+        Me.optDelimiterSpace.BackColor = System.Drawing.SystemColors.Control
+        Me.optDelimiterSpace.Cursor = System.Windows.Forms.Cursors.Default
+        Me.optDelimiterSpace.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.optDelimiterSpace.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.optDelimiterSpace.Location = New System.Drawing.Point(8, 48)
+        Me.optDelimiterSpace.Name = "optDelimiterSpace"
+        Me.optDelimiterSpace.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.optDelimiterSpace.Size = New System.Drawing.Size(117, 17)
+        Me.optDelimiterSpace.TabIndex = 14
+        Me.optDelimiterSpace.TabStop = True
+        Me.optDelimiterSpace.Text = "Space Delimited"
+        Me.optDelimiterSpace.UseVisualStyleBackColor = False
         '
-        '_optDelimiter_0
+        'optDelimiterNone
         '
-        Me._optDelimiter_0.BackColor = System.Drawing.SystemColors.Control
-        Me._optDelimiter_0.Checked = True
-        Me._optDelimiter_0.Cursor = System.Windows.Forms.Cursors.Default
-        Me._optDelimiter_0.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me._optDelimiter_0.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.optDelimiter.SetIndex(Me._optDelimiter_0, CType(0, Short))
-        Me._optDelimiter_0.Location = New System.Drawing.Point(8, 16)
-        Me._optDelimiter_0.Name = "_optDelimiter_0"
-        Me._optDelimiter_0.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me._optDelimiter_0.Size = New System.Drawing.Size(113, 17)
-        Me._optDelimiter_0.TabIndex = 12
-        Me._optDelimiter_0.TabStop = True
-        Me._optDelimiter_0.Text = "Fixed Width"
-        Me._optDelimiter_0.UseVisualStyleBackColor = False
+        Me.optDelimiterNone.BackColor = System.Drawing.SystemColors.Control
+        Me.optDelimiterNone.Checked = True
+        Me.optDelimiterNone.Cursor = System.Windows.Forms.Cursors.Default
+        Me.optDelimiterNone.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.optDelimiterNone.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.optDelimiterNone.Location = New System.Drawing.Point(8, 16)
+        Me.optDelimiterNone.Name = "optDelimiterNone"
+        Me.optDelimiterNone.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.optDelimiterNone.Size = New System.Drawing.Size(113, 17)
+        Me.optDelimiterNone.TabIndex = 12
+        Me.optDelimiterNone.TabStop = True
+        Me.optDelimiterNone.Text = "Fixed Width"
+        Me.optDelimiterNone.UseVisualStyleBackColor = False
         '
         'cmdBrowseDesc
         '
@@ -584,7 +515,7 @@
         Me.cmdBrowseDesc.Cursor = System.Windows.Forms.Cursors.Default
         Me.cmdBrowseDesc.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdBrowseDesc.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.cmdBrowseDesc.Location = New System.Drawing.Point(424, 24)
+        Me.cmdBrowseDesc.Location = New System.Drawing.Point(436, 30)
         Me.cmdBrowseDesc.Name = "cmdBrowseDesc"
         Me.cmdBrowseDesc.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.cmdBrowseDesc.Size = New System.Drawing.Size(57, 19)
@@ -599,11 +530,11 @@
         Me.txtScriptFile.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtScriptFile.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtScriptFile.ForeColor = System.Drawing.SystemColors.WindowText
-        Me.txtScriptFile.Location = New System.Drawing.Point(80, 24)
+        Me.txtScriptFile.Location = New System.Drawing.Point(93, 32)
         Me.txtScriptFile.MaxLength = 0
         Me.txtScriptFile.Name = "txtScriptFile"
         Me.txtScriptFile.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtScriptFile.Size = New System.Drawing.Size(337, 19)
+        Me.txtScriptFile.Size = New System.Drawing.Size(337, 20)
         Me.txtScriptFile.TabIndex = 3
         Me.txtScriptFile.Text = "txtScriptFile"
         '
@@ -613,7 +544,7 @@
         Me.cmdBrowseData.Cursor = System.Windows.Forms.Cursors.Default
         Me.cmdBrowseData.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdBrowseData.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.cmdBrowseData.Location = New System.Drawing.Point(424, 0)
+        Me.cmdBrowseData.Location = New System.Drawing.Point(436, 7)
         Me.cmdBrowseData.Name = "cmdBrowseData"
         Me.cmdBrowseData.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.cmdBrowseData.Size = New System.Drawing.Size(57, 19)
@@ -627,7 +558,7 @@
         Me.lblScriptDesc.Cursor = System.Windows.Forms.Cursors.Default
         Me.lblScriptDesc.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblScriptDesc.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.lblScriptDesc.Location = New System.Drawing.Point(0, 40)
+        Me.lblScriptDesc.Location = New System.Drawing.Point(6, 61)
         Me.lblScriptDesc.Name = "lblScriptDesc"
         Me.lblScriptDesc.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.lblScriptDesc.Size = New System.Drawing.Size(73, 17)
@@ -641,7 +572,7 @@
         Me.lblDataDescFile.Cursor = System.Windows.Forms.Cursors.Default
         Me.lblDataDescFile.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblDataDescFile.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.lblDataDescFile.Location = New System.Drawing.Point(0, 24)
+        Me.lblDataDescFile.Location = New System.Drawing.Point(6, 35)
         Me.lblDataDescFile.Name = "lblDataDescFile"
         Me.lblDataDescFile.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.lblDataDescFile.Size = New System.Drawing.Size(81, 17)
@@ -654,7 +585,7 @@
         Me.lblDataFile.Cursor = System.Windows.Forms.Cursors.Default
         Me.lblDataFile.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblDataFile.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.lblDataFile.Location = New System.Drawing.Point(0, 0)
+        Me.lblDataFile.Location = New System.Drawing.Point(6, 9)
         Me.lblDataFile.Name = "lblDataFile"
         Me.lblDataFile.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.lblDataFile.Size = New System.Drawing.Size(81, 20)
@@ -667,28 +598,12 @@
         Me.fraSash.Cursor = System.Windows.Forms.Cursors.SizeNS
         Me.fraSash.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.fraSash.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.fraSash.Location = New System.Drawing.Point(0, 216)
+        Me.fraSash.Location = New System.Drawing.Point(0, 267)
         Me.fraSash.Name = "fraSash"
         Me.fraSash.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.fraSash.Size = New System.Drawing.Size(537, 9)
         Me.fraSash.TabIndex = 37
         Me.fraSash.Text = "Frame3"
-        '
-        'fraButtons
-        '
-        Me.fraButtons.BackColor = System.Drawing.SystemColors.Control
-        Me.fraButtons.Controls.Add(Me.cmdSaveDesc)
-        Me.fraButtons.Controls.Add(Me.cmdCancel)
-        Me.fraButtons.Controls.Add(Me.cmdOk)
-        Me.fraButtons.Cursor = System.Windows.Forms.Cursors.Default
-        Me.fraButtons.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.fraButtons.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.fraButtons.Location = New System.Drawing.Point(96, 440)
-        Me.fraButtons.Name = "fraButtons"
-        Me.fraButtons.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.fraButtons.Size = New System.Drawing.Size(297, 25)
-        Me.fraButtons.TabIndex = 35
-        Me.fraButtons.Text = "Frame3"
         '
         'cmdCancel
         '
@@ -697,7 +612,7 @@
         Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdCancel.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdCancel.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.cmdCancel.Location = New System.Drawing.Point(208, 0)
+        Me.cmdCancel.Location = New System.Drawing.Point(293, 461)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.cmdCancel.Size = New System.Drawing.Size(89, 25)
@@ -711,7 +626,7 @@
         Me.cmdOk.Cursor = System.Windows.Forms.Cursors.Default
         Me.cmdOk.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdOk.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.cmdOk.Location = New System.Drawing.Point(0, 0)
+        Me.cmdOk.Location = New System.Drawing.Point(103, 461)
         Me.cmdOk.Name = "cmdOk"
         Me.cmdOk.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.cmdOk.Size = New System.Drawing.Size(89, 25)
@@ -730,7 +645,7 @@
         Me.fraTextSample.Cursor = System.Windows.Forms.Cursors.Default
         Me.fraTextSample.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.fraTextSample.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.fraTextSample.Location = New System.Drawing.Point(8, 232)
+        Me.fraTextSample.Location = New System.Drawing.Point(8, 283)
         Me.fraTextSample.Name = "fraTextSample"
         Me.fraTextSample.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.fraTextSample.Size = New System.Drawing.Size(489, 145)
@@ -788,13 +703,12 @@
         Me._txtSample_0.Font = New System.Drawing.Font("Courier New", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me._txtSample_0.ForeColor = System.Drawing.SystemColors.WindowText
         Me._txtSample_0.HideSelection = False
-        Me.txtSample.SetIndex(Me._txtSample_0, CType(0, Short))
         Me._txtSample_0.Location = New System.Drawing.Point(0, 32)
         Me._txtSample_0.MaxLength = 0
         Me._txtSample_0.Name = "_txtSample_0"
         Me._txtSample_0.ReadOnly = True
         Me._txtSample_0.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me._txtSample_0.Size = New System.Drawing.Size(473, 17)
+        Me._txtSample_0.Size = New System.Drawing.Size(473, 15)
         Me._txtSample_0.TabIndex = 29
         Me._txtSample_0.Text = "Sample"
         '
@@ -824,7 +738,7 @@
         Me.fraColSample.Cursor = System.Windows.Forms.Cursors.Default
         Me.fraColSample.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.fraColSample.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.fraColSample.Location = New System.Drawing.Point(8, 232)
+        Me.fraColSample.Location = New System.Drawing.Point(8, 283)
         Me.fraColSample.Name = "fraColSample"
         Me.fraColSample.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.fraColSample.Size = New System.Drawing.Size(489, 153)
@@ -859,17 +773,48 @@
         Me.lblInputColumns.TabIndex = 31
         Me.lblInputColumns.Text = "Column Number:"
         '
-        'optDelimiter
+        'tabTop
         '
+        Me.tabTop.Controls.Add(Me.tabFileProperty)
+        Me.tabTop.Controls.Add(Me.tabDataMapping)
+        Me.tabTop.Location = New System.Drawing.Point(12, 13)
+        Me.tabTop.Name = "tabTop"
+        Me.tabTop.SelectedIndex = 0
+        Me.tabTop.Size = New System.Drawing.Size(509, 228)
+        Me.tabTop.TabIndex = 40
         '
-        'optHeader
+        'tabFileProperty
         '
+        Me.tabFileProperty.BackColor = System.Drawing.SystemColors.Control
+        Me.tabFileProperty.Controls.Add(Me.txtScriptDesc)
+        Me.tabFileProperty.Controls.Add(Me.lblDataFile)
+        Me.tabFileProperty.Controls.Add(Me.fraHeader)
+        Me.tabFileProperty.Controls.Add(Me.lblDataDescFile)
+        Me.tabFileProperty.Controls.Add(Me.fraLineEnd)
+        Me.tabFileProperty.Controls.Add(Me.lblScriptDesc)
+        Me.tabFileProperty.Controls.Add(Me.fraColumns)
+        Me.tabFileProperty.Controls.Add(Me.txtDataFile)
+        Me.tabFileProperty.Controls.Add(Me.cmdBrowseDesc)
+        Me.tabFileProperty.Controls.Add(Me.cmdBrowseData)
+        Me.tabFileProperty.Controls.Add(Me.txtScriptFile)
+        Me.tabFileProperty.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.tabFileProperty.Location = New System.Drawing.Point(4, 26)
+        Me.tabFileProperty.Name = "tabFileProperty"
+        Me.tabFileProperty.Padding = New System.Windows.Forms.Padding(3)
+        Me.tabFileProperty.Size = New System.Drawing.Size(501, 198)
+        Me.tabFileProperty.TabIndex = 0
+        Me.tabFileProperty.Text = "File Properties  "
         '
-        'optLineEnd
+        'tabDataMapping
         '
-        '
-        'txtSample
-        '
+        Me.tabDataMapping.BackColor = System.Drawing.SystemColors.Control
+        Me.tabDataMapping.Controls.Add(Me.agdDataMapping)
+        Me.tabDataMapping.Location = New System.Drawing.Point(4, 26)
+        Me.tabDataMapping.Name = "tabDataMapping"
+        Me.tabDataMapping.Padding = New System.Windows.Forms.Padding(3)
+        Me.tabDataMapping.Size = New System.Drawing.Size(501, 198)
+        Me.tabDataMapping.TabIndex = 1
+        Me.tabDataMapping.Text = "Data Mapping  "
         '
         'frmInputWizard
         '
@@ -877,13 +822,14 @@
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.SystemColors.Control
         Me.CancelButton = Me.cmdCancel
-        Me.ClientSize = New System.Drawing.Size(1126, 473)
-        Me.Controls.Add(Me._fraTab_2)
-        Me.Controls.Add(Me._fraTab_1)
+        Me.ClientSize = New System.Drawing.Size(537, 498)
+        Me.Controls.Add(Me.cmdCancel)
+        Me.Controls.Add(Me.cmdSaveDesc)
+        Me.Controls.Add(Me.cmdOk)
         Me.Controls.Add(Me.fraSash)
-        Me.Controls.Add(Me.fraButtons)
         Me.Controls.Add(Me.fraTextSample)
         Me.Controls.Add(Me.fraColSample)
+        Me.Controls.Add(Me.tabTop)
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.Font = New System.Drawing.Font("Courier New", 10.5!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Location = New System.Drawing.Point(4, 23)
@@ -891,21 +837,24 @@
         Me.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual
         Me.Text = "Script Creation Wizard"
-        Me._fraTab_2.ResumeLayout(False)
-        Me._fraTab_1.ResumeLayout(False)
         Me.fraHeader.ResumeLayout(False)
+        Me.fraHeader.PerformLayout()
         Me.fraLineEnd.ResumeLayout(False)
+        Me.fraLineEnd.PerformLayout()
         Me.fraColumns.ResumeLayout(False)
-        Me.fraButtons.ResumeLayout(False)
+        Me.fraColumns.PerformLayout()
         Me.fraTextSample.ResumeLayout(False)
+        Me.fraTextSample.PerformLayout()
         Me.fraColSample.ResumeLayout(False)
-        CType(Me.fraTab, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.optDelimiter, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.optHeader, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.optLineEnd, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtSample, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.tabTop.ResumeLayout(False)
+        Me.tabFileProperty.ResumeLayout(False)
+        Me.tabFileProperty.PerformLayout()
+        Me.tabDataMapping.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
+    Friend WithEvents tabTop As System.Windows.Forms.TabControl
+    Friend WithEvents tabDataMapping As System.Windows.Forms.TabPage
+    Friend WithEvents tabFileProperty As System.Windows.Forms.TabPage
 #End Region
 End Class
