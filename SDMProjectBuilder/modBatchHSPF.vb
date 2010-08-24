@@ -36,10 +36,6 @@ Module BatchHSPF
 
     'Met Data Specs
     Private pMetWDM As String = pInputPath & "met\met.wdm"   'name of met wdm file
-    Private pSingleMetStationSelected As Integer = 0         'index of met station to use (zero based) if using a single station,
-    '                                                           used only if pSubbasinSegmentName is "<none>".
-    '                                                           otherwise pSubbasinSegmentName data is used 
-    '                                                           to match model segments to met stations.
 
     'Stream Specs
     Private pStreamLayerName As String = "Streams"     'name of layer as displayed on legend, or file name
@@ -133,7 +129,8 @@ Module BatchHSPF
         'get met data ready
         Dim pMetStations As New atcCollection
         Dim pMetBaseDsns As New atcCollection
-        BuildListofMetStationNames(pMetWDM, pMetStations, pMetBaseDsns)
+        Dim pMetWdmNames As New atcCollection
+        BuildListofMetStationNames(pMetWdmNames, pMetStations, pMetBaseDsns)
 
         Dim AtcGridMet As New atcControls.atcGrid
         AtcGridMet.Source = New atcControls.atcGridSource
@@ -148,7 +145,7 @@ Module BatchHSPF
         If PreProcessChecking(lOutputPath, pBaseOutputName, "HSPF", pLUType, pMetStations.Count, _
                               pSubbasinLayerName, pLandUseLayerName) Then 'early checks OK
             Logger.Status("Preparing HSPF Setup")
-            If SetupHSPF(AtcGridMet, pSingleMetStationSelected, AtcGridPervious, _
+            If SetupHSPF(AtcGridPervious, _
                          pMetStations, pMetBaseDsns, _
                          pUniqueModelSegmentNames, pUniqueModelSegmentIds, _
                          lOutputPath, pBaseOutputName, _
@@ -159,7 +156,9 @@ Module BatchHSPF
                          pLandUseFieldName, pLandUseClassFile, _
                          pSubbasinSegmentName, _
                          pPSRCustom, pPSRCustomFile, pPSRCalculate) Then
-                If CreateUCI(lOutputPath & "\" & pBaseOutputName & ".uci", pMetWDM, pWQConstituents) Then
+                pMetWdmNames.Clear()
+                pMetWdmNames.Add(pMetWDM)
+                If CreateUCI(lOutputPath & "\" & pBaseOutputName & ".uci", pMetWdmNames, pWQConstituents) Then
                     Logger.Status("Completed HSPF Setup")
                     Logger.Dbg("UCIBuilder:  Created UCI file " & lOutputPath & "\" & pBaseOutputName & ".uci")
                 Else
