@@ -55,10 +55,10 @@ Module modCreateUci
         Dim lWdmId As String = aMetWdmId
         Dim lWdmIndex As Integer = lWdmId.Substring(3)
         Dim lDsn As Integer = aMetBaseDsn
-        If Not aWatershed.MetSegments Is Nothing Then
-            lWdmId = aWatershed.MetSegments(0).DataTypes("PREC").WdmID
+        If aUci.MetSegs.Count > 0 Then
+            lWdmId = aUci.MetSegs(0).MetSegRecs("PREC").Source.VolName
             lWdmIndex = lWdmId.Substring(3)
-            lDsn = aWatershed.MetSegments(0).DataTypes("PREC").Dsn
+            lDsn = aUci.MetSegs(0).MetSegRecs("PREC").Source.VolId
         End If
         Dim lDataSet As atcData.atcTimeseries = aUci.GetDataSetFromDsn(lWdmIndex, lDsn)
         Dim lSJDate As Double = 0
@@ -66,19 +66,21 @@ Module modCreateUci
         If Not lDataSet Is Nothing Then
             lSJDate = lDataSet.Dates.Value(0)
             lEJDate = lDataSet.Dates.Value(lDataSet.numValues) - 1
-            If Not aWatershed.MetSegments Is Nothing Then
+            If aUci.MetSegs.Count > 0 Then
                 'also check dates of PEVT dataset
-                lWdmId = aWatershed.MetSegments(0).DataTypes("PEVT").WdmID
+                lWdmId = aUci.MetSegs(0).MetSegRecs("PEVT").Source.VolName
                 lWdmIndex = lWdmId.Substring(3)
-                lDsn = aWatershed.MetSegments(0).DataTypes("PEVT").Dsn
+                lDsn = aUci.MetSegs(0).MetSegRecs("PEVT").Source.VolId
                 lDataSet = aUci.GetDataSetFromDsn(lWdmIndex, lDsn)
-                Dim lSJDate2 As Double = lDataSet.Dates.Value(0)
-                Dim lEJDate2 As Double = lDataSet.Dates.Value(lDataSet.numValues) - 1
-                If lSJDate2 > lSJDate Then
-                    lSJDate = lSJDate2
-                End If
-                If lEJDate2 < lEJDate Then
-                    lEJDate = lEJDate2
+                If Not lDataSet Is Nothing Then
+                    Dim lSJDate2 As Double = lDataSet.Dates.Value(0)
+                    Dim lEJDate2 As Double = lDataSet.Dates.Value(lDataSet.numValues) - 1
+                    If lSJDate2 > lSJDate Then
+                        lSJDate = lSJDate2
+                    End If
+                    If lEJDate2 < lEJDate Then
+                        lEJDate = lEJDate2
+                    End If
                 End If
             End If
         End If
@@ -867,6 +869,24 @@ Module modCreateUci
             End With
             lMetSeg.Id = lMetSegment.Id
             aUci.MetSegs.Add(lMetSeg)
+        Next
+
+        'now see if any we can fill in any missing metsegrecs with those from another metseg
+        'for instance, no pet for this station -> use pet from another station
+        For Each lMetSeg As HspfMetSeg In aUci.MetSegs
+            For Each lMetSegRec As HspfMetSegRecord In lMetSeg.MetSegRecs
+                For Each lMetSegToCheck As HspfMetSeg In aUci.MetSegs
+                    Dim lFound As Boolean = False
+                    For Each lMetSegRecToCheck As HspfMetSegRecord In lMetSegToCheck.MetSegRecs
+                        If lMetSegRecToCheck.Name = lMetSegRec.Name Then
+                            lFound = True
+                        End If
+                    Next
+                    If Not lFound Then
+                        lMetSegToCheck.MetSegRecs.Add(lMetSegRec)
+                    End If
+                Next
+            Next
         Next
 
     End Sub

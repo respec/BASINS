@@ -124,7 +124,8 @@ Module BatchHSPF
         'get met data ready
         Dim pMetStations As New atcCollection
         Dim pMetBaseDsns As New atcCollection
-        BuildListofMetStationNames(pMetWDM, pMetStations, pMetBaseDsns)
+        Dim pMetWdmNames As New atcCollection
+        BuildListofMetStationNames(pMetWdmNames, pMetStations, pMetBaseDsns)
 
         Dim AtcGridMet As New atcControls.atcGrid
         AtcGridMet.Source = New atcControls.atcGridSource
@@ -139,8 +140,12 @@ Module BatchHSPF
         If PreProcessChecking(lOutputPath, pBaseOutputName, "HSPF", pLUType, pMetStations.Count, _
                               pSubbasinLayerName, pLandUseLayerName) Then 'early checks OK
             Logger.Status("Preparing HSPF Setup")
-            If SetupHSPF(AtcGridMet, pSingleMetStationSelected, AtcGridPervious, _
-                         pMetStations, pMetBaseDsns, _
+            Dim lMetBaseDsns As New atcCollection
+            lMetBaseDsns.Add(pMetBaseDsns(0))
+            Dim lMetWdmIds As New atcCollection
+            lMetWdmIds.Add("WDM2")
+            If SetupHSPF(AtcGridPervious, _
+                         lMetBaseDsns, lMetWdmIds, _
                          pUniqueModelSegmentNames, pUniqueModelSegmentIds, _
                          lOutputPath, pBaseOutputName, _
                          pSubbasinLayerName, pSubbasinFieldName, pSubbasinSlopeName, _
@@ -150,7 +155,9 @@ Module BatchHSPF
                          pLandUseFieldName, pLandUseClassFile, _
                          pSubbasinSegmentName, _
                          pPSRCustom, pPSRCustomFile, pPSRCalculate) Then
-                If CreateUCI(lOutputPath & "\" & pBaseOutputName & ".uci", pMetWDM, pWQConstituents) Then
+                pMetWdmNames.Clear()
+                pMetWdmNames.Add(pMetWDM)
+                If CreateUCI(lOutputPath & "\" & pBaseOutputName & ".uci", pMetWdmNames, pWQConstituents) Then
                     Logger.Status("Completed HSPF Setup")
                     Logger.Dbg("UCIBuilder:  Created UCI file " & lOutputPath & "\" & pBaseOutputName & ".uci")
                 Else
