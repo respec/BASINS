@@ -566,6 +566,8 @@ ParseFixedDef:
         ParseDate = TokenString(MyToken) & " " & ScriptSetDate(Jday(yr, mo, da, hr, Min, sec))
     End Function
 
+    Private pAbortResult As String = "Abort"
+
     Public Function Evaluate() As String
         Static WarnedAboutCannotIncrement As Boolean
         Static WarnedAboutNonNumericValue As Boolean
@@ -586,7 +588,7 @@ ParseFixedDef:
         'If MyString = "" Then Debug.Print Else Debug.Print " MyString = " & MyString
         Select Case MyToken
             '    Case tok_Abs:
-            '      tmpval = MySubExpressions(1).Evaluate
+            '      tmpval = MySubExpressions(0).Evaluate
             '      If IsNumeric(tmpval) Then
             '        num1 = CSng(tmpval)
             '        retval = Abs(num1)
@@ -595,17 +597,15 @@ ParseFixedDef:
             '      End If
             Case ATCsToken.tok_And
                 retval = "1"
-                ForMax = MySubExpressions.Count()
-                For SubExp = 1 To ForMax
+                ForMax = MySubExpressions.Count() - 1
+                For SubExp = 0 To ForMax
                     If Not EvalTruth(MySubExpressions.Item(SubExp).Evaluate) Then retval = "0" : Exit For
-                    If AbortScript Then
-                        Return Nothing
-                    End If
+                    If AbortScript Then Return pAbortResult
                 Next
             Case ATCsToken.tok_ATCScript
-                retval = TokenString(MyToken) & " " & MySubExpressions.Item(1).Printable
-                ForMax = MySubExpressions.Count()
-                For SubExp = 2 To ForMax
+                retval = TokenString(MyToken) & " " & MySubExpressions.Item(0).Printable
+                ForMax = MySubExpressions.Count() - 1
+                For SubExp = 1 To ForMax
                     If MySubExpressions.Item(SubExp).Token = ATCsToken.tok_Test Then
                         If TestingFile Then
                             retval = MySubExpressions.Item(SubExp).Evaluate
@@ -614,20 +614,20 @@ ParseFixedDef:
                     Else
                         MySubExpressions.Item(SubExp).Evaluate()
                     End If
-                    If AbortScript Then Exit Function
+                    If AbortScript Then Return pAbortResult
                 Next
             Case ATCsToken.tok_Attribute
                 retval = MySubExpressions.Item(1).Evaluate 'CHANGE: used to be 2
-                ScriptSetAttribute(MySubExpressions.Item(1).Printable, retval)
+                ScriptSetAttribute(MySubExpressions.Item(0).Printable, retval)
             Case ATCsToken.tok_ColumnFormat : retval = SetColumnFormat()
             Case ATCsToken.tok_Comment : retval = ""
                 'Case tok_ColumnValue:   retval = FindColumnValue
             Case ATCsToken.tok_Dataset
                 retval = TokenString(MyToken)
-                ForMax = MySubExpressions.Count()
-                If ForMax = 1 Then
-                    'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                    tmpval = MySubExpressions.Item(1).Evaluate
+                ForMax = MySubExpressions.Count() - 1
+                If ForMax = 0 Then
+
+                    tmpval = MySubExpressions.Item(0).Evaluate
                     If IsNumeric(tmpval) Then
                         ScriptSetDataset(CInt(tmpval))
                     Else
@@ -638,28 +638,24 @@ ParseFixedDef:
                     End If
                 Else
                     ScriptManageDataset("ClearCriteria")
-                    SubExp = 1
+                    SubExp = 0
                     While SubExp < ForMax
                         tmpval = MySubExpressions.Item(SubExp).Printable : SubExp = SubExp + 1
                         tmpval2 = MySubExpressions.Item(SubExp).Evaluate : SubExp = SubExp + 1
                         ScriptManageDataset("AddCriteria", tmpval, tmpval2)
-                        If AbortScript Then
-                            Exit Function
-                        End If
+                        If AbortScript Then Return pAbortResult
                     End While
                     ScriptManageDataset("MatchCriteria")
                 End If
             Case ATCsToken.tok_Date : retval = ParseDate()
             Case ATCsToken.tok_FatalError
-                'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                retval = MySubExpressions.Item(1).Evaluate
+                retval = MySubExpressions.Item(0).Evaluate
                 MsgBox(retval, MsgBoxStyle.OkOnly, "Fatal Error Importing Data")
             Case ATCsToken.tok_Fill
                 If MySubExpressions.Count() < 1 Then
                     MsgBox("Fill requires at least Time Units (Y,M,D,h,m,s)" & vbCr & "Optional args are Time Step (1), Fill Value (0), Missing Value (-999), and Accumulated Value (-998)")
                 Else
-                    'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                    Select Case Left(MySubExpressions.Item(1).Evaluate, 1)
+                    Select Case Left(MySubExpressions.Item(0).Evaluate, 1)
                         Case "C", "c" : modATCscript.FillTU = atcTimeUnit.TUCentury
                         Case "Y", "y" : modATCscript.FillTU = atcTimeUnit.TUYear
                         Case "M" : modATCscript.FillTU = atcTimeUnit.TUMonth
@@ -671,31 +667,27 @@ ParseFixedDef:
                     If MySubExpressions.Count() < 2 Then
                         FillTS = 1
                     Else
-                        'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
                         FillTS = MySubExpressions.Item(2).Evaluate
                     End If
                     If MySubExpressions.Count() < 3 Then
                         FillVal = 0
                     Else
-                        'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
                         FillVal = MySubExpressions.Item(3).Evaluate
                     End If
                     If MySubExpressions.Count() < 4 Then
                         FillMissing = -999
                     Else
-                        'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+
                         FillMissing = MySubExpressions.Item(4).Evaluate
                     End If
                     If MySubExpressions.Count() < 5 Then
                         FillAccum = -998
                     Else
-                        'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
                         FillAccum = MySubExpressions.Item(5).Evaluate
                     End If
                 End If
             Case ATCsToken.tok_Flag
-                'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                tmpval = MySubExpressions.Item(1).Evaluate
+                tmpval = MySubExpressions.Item(0).Evaluate
                 If IsNumeric(tmpval) Then
                     ScriptSetFlag(CInt(tmpval))
                 Else
@@ -704,23 +696,23 @@ ParseFixedDef:
                 End If
                 retval = tmpval
             Case ATCsToken.tok_For
-                If MySubExpressions.Item(1).Token = ATCsToken.tok_Variable Then
-                    tmpval = MySubExpressions.Item(1).Printable
+                If MySubExpressions.Item(0).Token = ATCsToken.tok_Variable Then
+                    tmpval = MySubExpressions.Item(0).Printable
                 Else
-                    tmpval = MySubExpressions.Item(1).Evaluate
+                    tmpval = MySubExpressions.Item(0).Evaluate
                 End If
-                tmpval2 = MySubExpressions.Item(2).Evaluate
+                tmpval2 = MySubExpressions.Item(1).Evaluate
                 retval = TokenString(MyToken) & " " & tmpval
                 If IsNumeric(tmpval2) Then
                     ForMin = CInt(tmpval2)
-                    tmpval2 = MySubExpressions.Item(3).Evaluate
+                    tmpval2 = MySubExpressions.Item(2).Evaluate
                     If IsNumeric(tmpval2) Then
                         ForMax = CInt(tmpval2)
                         For ForCounter = ForMin To ForMax
                             ScriptSetVariable(tmpval, CStr(ForCounter))
-                            For SubExp = 4 To MySubExpressions.Count()
+                            For SubExp = 3 To MySubExpressions.Count() - 1
                                 MySubExpressions.Item(SubExp).Evaluate()
-                                If AbortScript Then Exit Function
+                                If AbortScript Then Return pAbortResult
                             Next
                         Next
                     Else
@@ -732,33 +724,29 @@ ParseFixedDef:
                     'Stop
                 End If
             Case ATCsToken.tok_If
-                'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions(1).Printable. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
                 'UPGRADE_WARNING: Couldn't resolve default property of object TokenString(). Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                retval = TokenString(MyToken) & " " & MySubExpressions.Item(1).Printable
-                'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                If EvalTruth(MySubExpressions.Item(1).Evaluate) Then
-                    ForMax = MySubExpressions.Count()
-                    For SubExp = 2 To ForMax
-                        'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+                retval = TokenString(MyToken) & " " & MySubExpressions.Item(0).Printable
+
+                If EvalTruth(MySubExpressions.Item(0).Evaluate) Then
+                    ForMax = MySubExpressions.Count() - 1
+                    For SubExp = 1 To ForMax
                         MySubExpressions.Item(SubExp).Evaluate()
-                        If AbortScript Then Exit Function
+                        If AbortScript Then Return pAbortResult
                     Next
                 End If
             Case ATCsToken.tok_In
                 retval = "0"
-                'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                tmpval = MySubExpressions.Item(0).Evaluate 'CHANGE: used to be 1
-                ForMax = MySubExpressions.Count()
-                For SubExp = 1 To ForMax - 1 'CHANGE: used to be SubExp = 2 To ForMax
-                    'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions(SubExp).Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+                tmpval = MySubExpressions.Item(0).Evaluate
+                ForMax = MySubExpressions.Count() - 1
+                For SubExp = 1 To ForMax
                     If MySubExpressions.Item(SubExp).Evaluate = tmpval Then
                         retval = "1"
                         Exit For
                     End If
                 Next
             Case ATCsToken.tok_Increment
-                tmpval = MySubExpressions.Item(1).Printable
-                tmpval2 = MySubExpressions.Item(1).Evaluate
+                tmpval = MySubExpressions.Item(0).Printable
+                tmpval2 = MySubExpressions.Item(0).Evaluate
                 retval = TokenString(MyToken) & " " & tmpval
                 If IsNumeric(tmpval2) Then
                     ScriptSetVariable(tmpval, CStr(CInt(CDbl(tmpval2) + 1)))
@@ -798,7 +786,6 @@ ParseFixedDef:
                 SetNumericVals(num1, num2, tmpval, tmpval2)
                 retval = CStr(num1 + num2)
             Case ATCsToken.tok_MathDivide
-
                 SetNumericVals(num1, num2, tmpval, tmpval2)
                 If num2 = 0 Then
                     retval = CStr(0)
@@ -806,81 +793,66 @@ ParseFixedDef:
                     retval = CStr(num1 / num2)
                 End If
             Case ATCsToken.tok_MathMultiply
-
                 SetNumericVals(num1, num2, tmpval, tmpval2)
                 retval = CStr(num1 * num2)
             Case ATCsToken.tok_MathPower
-
                 SetNumericVals(num1, num2, tmpval, tmpval2)
                 retval = CStr(num1 ^ num2)
             Case ATCsToken.tok_MathSubtract
-
                 SetNumericVals(num1, num2, tmpval, tmpval2)
                 retval = CStr(num1 - num2)
             Case ATCsToken.tok_Mid
                 If MySubExpressions.Count() > 2 Then
-                    retval = Mid(MySubExpressions.Item(1).Evaluate, MySubExpressions.Item(2).Evaluate, MySubExpressions.Item(3).Evaluate)
+                    retval = Mid(MySubExpressions.Item(0).Evaluate, MySubExpressions.Item(1).Evaluate, MySubExpressions.Item(2).Evaluate)
                 Else
-                    retval = Mid(MySubExpressions.Item(1).Evaluate, MySubExpressions.Item(2).Evaluate)
+                    retval = Mid(MySubExpressions.Item(0).Evaluate, MySubExpressions.Item(1).Evaluate)
                 End If
             Case ATCsToken.tok_Not
-                If EvalTruth(MySubExpressions.Item(1).Evaluate) Then retval = "0" Else retval = "1"
+                If EvalTruth(MySubExpressions.Item(0).Evaluate) Then retval = "0" Else retval = "1"
             Case ATCsToken.tok_Or
                 retval = "0"
-                ForMax = MySubExpressions.Count()
-                For SubExp = 1 To ForMax
-                    'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+                ForMax = MySubExpressions.Count() - 1
+                For SubExp = 0 To ForMax
                     If EvalTruth(MySubExpressions.Item(SubExp).Evaluate) Then retval = "1" : Exit For
-                    If AbortScript Then Exit Function
+                    If AbortScript Then Return pAbortResult
                 Next
             Case ATCsToken.tok_NextLine
                 If MySubExpressions.Count() < 1 Then
-                    ForMax = 1
+                    ForMax = 0
                 Else
-                    'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                    ForMax = MySubExpressions.Item(0).Evaluate
+                    ForMax = MySubExpressions.Item(0).Evaluate - 1
                 End If
-                For SubExp = 1 To ForMax
+                For SubExp = 0 To ForMax
                     ScriptNextLine()
                 Next
                 retval = CurrentLine
             Case ATCsToken.tok_Set 'MySubExpressions(1) is variable name, (2) is new value
-                'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions(1).Token. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                If MySubExpressions.Item(1).Token = ATCsToken.tok_Variable Then
-                    'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Printable. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                    tmpval = MySubExpressions.Item(1).Printable
+                If MySubExpressions.Item(0).Token = ATCsToken.tok_Variable Then
+                    tmpval = MySubExpressions.Item(0).Printable
                 Else
-                    'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                    tmpval = MySubExpressions.Item(1).Evaluate
+                    tmpval = MySubExpressions.Item(0).Evaluate
                 End If
-                'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
                 tmpval2 = MySubExpressions.Item(1).Evaluate
                 ScriptSetVariable(tmpval, tmpval2)
                 retval = tmpval2
             Case ATCsToken.tok_Test
-                ForMax = MySubExpressions.Count() - 1
-                For SubExp = 1 To ForMax
-                    'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+                ForMax = MySubExpressions.Count() - 2
+                For SubExp = 0 To ForMax
                     MySubExpressions.Item(SubExp).Evaluate()
-                    If AbortScript Then Exit Function
+                    If AbortScript Then Return pAbortResult
                 Next
-                'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                retval = MySubExpressions.Item(SubExp - 1).Evaluate 'CHANGE: used to be SubExp
+                retval = MySubExpressions.Item(MySubExpressions.Count - 1).Evaluate
             Case ATCsToken.tok_Trim
-                'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                retval = Trim(MySubExpressions.Item(1).Evaluate)
+                retval = Trim(MySubExpressions.Item(0).Evaluate)
             Case ATCsToken.tok_Unset
-                'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions(1).Token. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
                 If MySubExpressions.Item(1).Token = ATCsToken.tok_Variable Then
-                    'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Printable. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
                     tmpval = MySubExpressions.Item(1).Printable
                 Else
-                    'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
                     tmpval = MySubExpressions.Item(1).Evaluate
                 End If
                 ScriptUnsetVariable(tmpval)
             Case ATCsToken.tok_Value
-                'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+
                 tmpval = MySubExpressions.Item(1).Evaluate
                 If IsNumeric(tmpval) Then
                     ScriptSetValue(CSng(tmpval))
@@ -900,12 +872,12 @@ ParseFixedDef:
                 retval = MySubExpressions.Item(1).Evaluate
                 MsgBox(retval, MsgBoxStyle.OkOnly, "Warning")
             Case ATCsToken.tok_While
-                retval = TokenString(MyToken) & " " & MySubExpressions.Item(1).Printable
-                While EvalTruth(MySubExpressions.Item(1).Evaluate)
-                    ForMax = MySubExpressions.Count()
-                    For SubExp = 2 To ForMax
+                retval = TokenString(MyToken) & " " & MySubExpressions.Item(0).Printable
+                While EvalTruth(MySubExpressions.Item(0).Evaluate)
+                    ForMax = MySubExpressions.Count() - 1
+                    For SubExp = 1 To ForMax
                         MySubExpressions.Item(SubExp).Evaluate()
-                        If AbortScript Then Exit Function
+                        If AbortScript Then Return pAbortResult
                     Next
                 End While
             Case ATCsToken.tok_GT
@@ -930,7 +902,7 @@ ParseFixedDef:
                 retval = "Unknown token evaluated: " & Printable()
                 'Hacking "Abs" token in without breaking binary compatibility by adding tok_Abs
                 If InStr(retval, "Unknown Abs ") > 0 And MySubExpressions.Count() = 1 Then
-                    'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Evaluate. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
+
                     tmpval = MySubExpressions.Item(1).Evaluate
                     If IsNumeric(tmpval) Then
                         num1 = CSng(tmpval)
@@ -971,8 +943,7 @@ ParseFixedDef:
             Case "eof" : If ScriptEndOfData() Then retval = "1" Else retval = "0"
             Case "eol" : If ColDefs(0).StartCol + CurrentRepeat * ColDefs(0).ColWidth >= LenCurrentLine Then retval = "1" Else retval = "0"
             Case Else
-                'UPGRADE_WARNING: Couldn't resolve default property of object ScriptState(). Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                retval = ScriptState.Item(MyString)
+                retval = ScriptState.ItemByKey(MyString)
         End Select
         If retval = MyString Then
             retval = FindColumnValue()
