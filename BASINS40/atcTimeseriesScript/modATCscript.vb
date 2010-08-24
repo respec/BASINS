@@ -8,7 +8,7 @@ Module modATCscript
     'Copyright 2002 by AQUA TERRA Consultants
 
     Public DebugScriptForm As frmDebugScript
-    Public ScriptState As Collection 'of variable names (as keys) and values
+    Public ScriptState As atcCollection 'of variable names (as keys) and values
     Public WholeDataFile As String 'Contains entire contents of data file
     Public LenDataFile As Integer
     Public NextLineStart As Integer 'Index in WholeDataFile of first character of next line to be read
@@ -52,15 +52,16 @@ Module modATCscript
     Private Const DefaultScenario As String = "ScriptRead"
     Private pTserFile As atcTimeseriesSource
     Private pDataFilename As String
-    Private pTserData As Collection 'of ATCclsTserData
+    Private pTserData As atcTimeseriesGroup
 
     Private Structure InputBuffer
         Dim DateCount As Integer
         Dim DateDim As Integer
         Dim DateArray() As Double
-        Dim ValueArray() As Single
+        Dim ValueArray() As Double
         Dim FlagArray() As Integer
     End Structure
+
     Private InBuf() As InputBuffer
     Private CurBuf As Integer
 
@@ -70,12 +71,10 @@ Module modATCscript
     Private Sub ScriptInit()
         ReDim InBuf(0)
 
-        pTserData = Nothing
-        pTserData = New Collection
+        pTserData = New atcTimeseriesGroup
         AddNewTserAndBuffer()
 
-        ScriptState = Nothing
-        ScriptState = New Collection
+        ScriptState = New atcCollection
         WholeDataFile = ""
         LenDataFile = 0
         NextLineStart = 1
@@ -258,6 +257,36 @@ Module modATCscript
         'ReDim InBuf(CurBuf).DateArray(0)
         'ReDim InBuf(CurBuf).ValueArray(0)
         'ReDim InBuf(CurBuf).FlagArray(0)
+
+        'Dim lExisting As Boolean = False
+        'For Each lTS As atcData.atcTimeseries In pTserData
+        '    If lTS.Attributes.GetValue("Description").Trim.ToLower = pDataFilename.Trim.ToLower Then
+        '        If lTS.Attributes.GetValue("Scenario").Trim.ToLower = DefaultScenario.Trim.ToLower Then
+        '            If lTS.Attributes.GetValue("FileImported").Trim.ToLower = pDataFilename.Trim.ToLower Then
+        '                lExisting = True
+        '            End If
+        '        End If
+        '    End If
+        'Next
+
+        'If Not lExisting Then
+        Dim lnewTS As New atcData.atcTimeseries(pTserFile)
+        With lnewTS
+            .Attributes.SetValue("Description", pDataFilename)
+            .Attributes.SetValue("Scenario", DefaultScenario)
+            .Attributes.SetValue("FileImported", pDataFilename)
+            .Dates = New atcData.atcTimeseries(pTserFile)
+        End With
+        pTserData.Add(lnewTS)
+        'End If
+
+        ReDim Preserve InBuf(UBound(InBuf) + 1)
+        CurBuf = UBound(InBuf)
+        InBuf(CurBuf).DateCount = 0
+        InBuf(CurBuf).DateDim = 0
+        ReDim InBuf(CurBuf).DateArray(0)
+        ReDim InBuf(CurBuf).ValueArray(0)
+        ReDim InBuf(CurBuf).FlagArray(0)
     End Sub
 
     Public Sub ScriptManageDataset(ByRef cmd As String, Optional ByRef AttrName As String = "", Optional ByRef attrValue As String = "")
@@ -279,51 +308,42 @@ Module modATCscript
                 tserNum = 0
                 MisMatch = True
                 While tserNum < pTserData.Count() And MisMatch
-                    tserNum = tserNum + 1
                     MisMatch = False
                     attrNum = 0
                     While attrNum < NumAttribs And Not MisMatch
                         attrNum = attrNum + 1
                         AttrName = AttrNames(attrNum)
                         attrValue = AttrValues(attrNum)
-                        'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                        With pTserData.Item(tserNum).Header
+                        With pTserData.Item(tserNum).Attributes
                             Select Case LCase(AttrName)
                                 Case "con", "cons", "constituent"
-                                    'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                                    If .con <> "" Then
-                                        'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                                        If .con <> attrValue Then MisMatch = True
+                                    If .ContainsAttribute("Constituent") Then
+                                        If .GetValue("Constituent") <> attrValue Then MisMatch = True
                                     End If
                                 Case "sen", "scen", "scenario"
-                                    'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                                    If .Sen <> "" And .Sen <> DefaultScenario Then
-                                        'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                                        If .Sen <> attrValue Then MisMatch = True
+                                    If .ContainsAttribute("Scenario") AndAlso .GetValue("Scenario") <> DefaultScenario Then
+                                        If .GetValue("Scenario") <> attrValue Then MisMatch = True
                                     End If
                                 Case "loc", "location"
-                                    'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                                    If .loc <> "" Then
-                                        'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                                        If .loc <> attrValue Then MisMatch = True
+                                    If .ContainsAttribute("Location") Then
+                                        If .GetValue("Location") <> attrValue Then MisMatch = True
                                     End If
                                 Case "des", "desc", "description"
-                                    'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                                    If .desc <> "" And .desc <> pDataFilename Then
-                                        'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(tserNum).Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                                        If .desc <> attrValue Then MisMatch = True
+                                    If .ContainsAttribute("Description") AndAlso .GetValue("Description") <> pDataFilename Then
+                                        If .GetValue("Description") <> attrValue Then MisMatch = True
                                     End If
 
                                 Case Else
-                                    'UPGRADE_WARNING: Couldn't resolve default property of object pTserData().Attrib. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                                    tmp = pTserData.Item(tserNum).Attrib(AttrName, "")
+                                    tmp = .GetValue(AttrName, "")
                                     If tmp <> "" Then
                                         If tmp <> attrValue Then MisMatch = True
                                     End If
                             End Select
                         End With
                     End While 'attrNum
+                    tserNum += 1
                 End While 'tserNum
+                tserNum -= 1
                 If MisMatch Then
                     AddNewTserAndBuffer()
                 Else
@@ -343,18 +363,18 @@ Module modATCscript
         If pTserData.Count = 0 Then
             Exit Sub
         End If
-        With pTserData.Item(CurBuf).Header
+        With pTserData.ItemByIndex(CurBuf).Attributes
             Select Case LCase(AttrName)
                 Case "con", "cons", "constituent"
-                    .con = newValue
+                    .SetValue("Constituent", newValue)
                 Case "sen", "scen", "scenario"
-                    .Sen = newValue
+                    .SetValue("Scenario", newValue)
                 Case "loc", "location"
-                    .loc = newValue
+                    .SetValue("Location", newValue)
                 Case "des", "desc", "description"
-                    .desc = newValue
+                    .SetValue("Description", newValue)
                 Case Else
-                    pTserData.Item(CurBuf).AttribSet(AttrName, newValue)
+                    .SetValue(AttrName, newValue)
             End Select
         End With
     End Sub
