@@ -51,41 +51,11 @@ Module modCreateUci
 
         aUci.Initialized = True
 
-        'get start and end dates from prec and pevt datasets
-        Dim lWdmId As String = aMetWdmId
-        Dim lWdmIndex As Integer = lWdmId.Substring(3)
-        Dim lDsn As Integer = aMetBaseDsn
-        If aUci.MetSegs.Count > 0 Then
-            lWdmId = aUci.MetSegs(0).MetSegRecs("PREC").Source.VolName
-            lWdmIndex = lWdmId.Substring(3)
-            lDsn = aUci.MetSegs(0).MetSegRecs("PREC").Source.VolId
-        End If
-        Dim lDataSet As atcData.atcTimeseries = aUci.GetDataSetFromDsn(lWdmIndex, lDsn)
+        'set start and end dates in global block
         Dim lSJDate As Double = 0
         Dim lEJDate As Double = 0
-        If Not lDataSet Is Nothing Then
-            lSJDate = lDataSet.Dates.Value(0)
-            lEJDate = lDataSet.Dates.Value(lDataSet.numValues) - 1
-            If aUci.MetSegs.Count > 0 Then
-                'also check dates of PEVT dataset
-                lWdmId = aUci.MetSegs(0).MetSegRecs("PEVT").Source.VolName
-                lWdmIndex = lWdmId.Substring(3)
-                lDsn = aUci.MetSegs(0).MetSegRecs("PEVT").Source.VolId
-                lDataSet = aUci.GetDataSetFromDsn(lWdmIndex, lDsn)
-                If Not lDataSet Is Nothing Then
-                    Dim lSJDate2 As Double = lDataSet.Dates.Value(0)
-                    Dim lEJDate2 As Double = lDataSet.Dates.Value(lDataSet.numValues) - 1
-                    If lSJDate2 > lSJDate Then
-                        lSJDate = lSJDate2
-                    End If
-                    If lEJDate2 < lEJDate Then
-                        lEJDate = lEJDate2
-                    End If
-                End If
-            End If
-        End If
-
-        'set start and end dates in global block
+        GetStartEndDatesFromMetsegs(aUci, _
+                                    lSJDate, lEJDate)
         Dim lStartDate(6) As Integer
         Dim lEndDate(6) As Integer
         J2Date(lSJDate, lStartDate)
@@ -915,4 +885,53 @@ ErrHandler:
         Return Nothing
 
     End Function
+
+    Private Sub GetStartEndDatesFromMetsegs(ByVal aUci As HspfUci, _
+                                            ByRef aSJDate As Double, ByRef aEJDate As Double)
+
+        aSJDate = 0
+        aEJDate = 0
+
+        Dim lWdmId As String
+        Dim lWdmIndex As Integer
+        Dim lDsn As Integer
+        For Each lMetSeg As HspfMetSeg In aUci.MetSegs
+            'get start and end dates from prec and pevt datasets
+            Dim lSJDate As Double = 0
+            Dim lEJDate As Double = 0
+            lWdmId = lMetSeg.MetSegRecs("PREC").Source.VolName
+            lWdmIndex = lWdmId.Substring(3)
+            lDsn = lMetSeg.MetSegRecs("PREC").Source.VolId
+            Dim lDataSet As atcData.atcTimeseries = aUci.GetDataSetFromDsn(lWdmIndex, lDsn)
+            If Not lDataSet Is Nothing Then
+                lSJDate = lDataSet.Dates.Value(0)
+                lEJDate = lDataSet.Dates.Value(lDataSet.numValues) - 1
+
+                'also check dates of PEVT dataset
+                If lMetSeg.MetSegRecs.Contains("PEVT") Then
+                    lWdmId = lMetSeg.MetSegRecs("PEVT").Source.VolName
+                    lWdmIndex = lWdmId.Substring(3)
+                    lDsn = lMetSeg.MetSegRecs("PEVT").Source.VolId
+                    lDataSet = aUci.GetDataSetFromDsn(lWdmIndex, lDsn)
+                    If Not lDataSet Is Nothing Then
+                        Dim lSJDate2 As Double = lDataSet.Dates.Value(0)
+                        Dim lEJDate2 As Double = lDataSet.Dates.Value(lDataSet.numValues) - 1
+                        If lSJDate2 > lSJDate Then
+                            lSJDate = lSJDate2
+                        End If
+                        If lEJDate2 < lEJDate Then
+                            lEJDate = lEJDate2
+                        End If
+                    End If
+                End If
+            End If
+
+            If lSJDate > aSJDate Then
+                aSJDate = lSJDate
+            End If
+            If lEJDate < aEJDate Or aEJDate < 1 Then
+                aEJDate = lEJDate
+            End If
+        Next
+    End Sub
 End Module
