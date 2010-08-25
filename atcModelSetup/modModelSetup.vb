@@ -675,7 +675,8 @@ Public Module modModelSetup
 
     Public Function CreateUCI(ByVal aUciName As String, _
                               ByVal aMetWdmNames As atcCollection, _
-                              ByVal aWQConstituents() As String) As Boolean
+                              ByVal aWQConstituents() As String, _
+                              Optional ByVal aCalledFromFrames As Boolean = False) As Boolean
         ChDriveDir(PathNameOnly(aUciName))
         'get message file ready
         Dim lMsg As New atcUCI.HspfMsg("hspfmsg.mdb")
@@ -721,10 +722,16 @@ Public Module modModelSetup
 
         'open met wdms
         For Each lWdmName As String In aMetWdmNames
-            lDataSource = atcDataManager.DataSourceBySpecification(lWdmName)
+            Dim lWdmNameForFrames As String = lWdmName
+            If aCalledFromFrames AndAlso CurDir() <> IO.Path.GetDirectoryName(lWdmName) Then
+                'FRAMES needs all HSPF input in the same folder (the HSPF one)
+                lWdmNameForFrames = CurDir() & "\met.wdm"
+                IO.File.Copy(lWdmName, lWdmNameForFrames)
+            End If
+            lDataSource = atcDataManager.DataSourceBySpecification(lWdmNameForFrames)
             If lDataSource Is Nothing Then 'need to open it here
                 lDataSource = New atcWDM.atcDataSourceWDM
-                If Not lDataSource.Open(lWdmName) Then
+                If Not lDataSource.Open(lWdmNameForFrames) Then
                     lDataSource = Nothing
                 End If
             End If

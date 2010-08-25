@@ -158,7 +158,7 @@ Module BatchHSPF
                          pPSRCustom, pPSRCustomFile, pPSRCalculate) Then
                 pMetWdmNames.Clear()
                 pMetWdmNames.Add(pMetWDM)
-                If CreateUCI(lOutputPath & "\" & pBaseOutputName & ".uci", pMetWdmNames, pWQConstituents) Then
+                If CreateUCI(lOutputPath & "\" & pBaseOutputName & ".uci", pMetWdmNames, pWQConstituents, True) Then
                     Logger.Status("Completed HSPF Setup")
                     Logger.Dbg("UCIBuilder:  Created UCI file " & lOutputPath & "\" & pBaseOutputName & ".uci")
                 Else
