@@ -590,12 +590,13 @@ Public Module modModelSetup
         'collection of unique wdm file names, used to establish WDM2, WDM3, etc
         Dim lUniqueWDMNames As New atcCollection
 
-        For Each lDataSource As atcWDM.atcDataSourceWDM In atcDataManager.DataSources
-            If lDataSource IsNot Nothing Then
+        For Each lDataSourceGeneric As atcDataSource In atcDataManager.DataSources
+            If lDataSourceGeneric IsNot Nothing AndAlso lDataSourceGeneric.Name = "Timeseries::WDM" Then
+                Dim lDataSourceWDM As atcWDM.atcDataSourceWDM = lDataSourceGeneric
                 Dim lCounter As Integer = 0
-                For Each lDataSet As atcTimeseries In lDataSource.DataSets
+                For Each lDataSet As atcTimeseries In lDataSourceWDM.DataSets
                     lCounter += 1
-                    Logger.Progress("Building List of Met Station Names", lCounter, lDataSource.DataSets.Count)
+                    Logger.Progress("Building List of Met Station Names", lCounter, lDataSourceWDM.DataSets.Count)
                     If lDataSet.Attributes.GetValue("Constituent") = "PREC" Then
                         If (lDataSet.Attributes.GetValue("Scenario") = "OBSERVED" Or lDataSet.Attributes.GetValue("Scenario") = "COMPUTED") Then
                             Dim lLoc As String = lDataSet.Attributes.GetValue("Location")
@@ -608,7 +609,7 @@ Public Module modModelSetup
                             Dim lEJDay As Double = lDataSet.Dates.Value(lDataSet.Dates.numValues)
                             'find pevt dataset at the same location
                             Dim lAddIt As Boolean = False
-                            For Each lDataSet2 As atcData.atcTimeseries In lDataSource.DataSets
+                            For Each lDataSet2 As atcData.atcTimeseries In lDataSourceWDM.DataSets
                                 If lDataSet2.Attributes.GetValue("Constituent") = "PEVT" And _
                                    lDataSet2.Attributes.GetValue("Location") = lLoc Then
                                     Dim lSJDay2 As Double = lDataSet2.Dates.Value(0)
@@ -621,7 +622,7 @@ Public Module modModelSetup
                             Next
                             'if this one is computed and observed also exists at same location, just use observed
                             If lDataSet.Attributes.GetValue("Scenario") = "COMPUTED" Then
-                                For Each lDataSet2 As atcData.atcTimeseries In lDataSource.DataSets
+                                For Each lDataSet2 As atcData.atcTimeseries In lDataSourceWDM.DataSets
                                     If lDataSet2.Attributes.GetValue("Constituent") = "PREC" And _
                                        lDataSet2.Attributes.GetValue("Scenario") = "OBSERVED" And _
                                        lDataSet2.Attributes.GetValue("Location") = lLoc Then
@@ -632,7 +633,7 @@ Public Module modModelSetup
                             End If
                             If lAddIt Then
                                 Dim lLeadingChar As String = ""
-                                If IsBASINSMetWDM(lDataSource.DataSets, lDsn, lLoc) Then
+                                If IsBASINSMetWDM(lDataSourceWDM.DataSets, lDsn, lLoc) Then
                                     'full set available here
                                     lLeadingChar = "*"
                                 End If
@@ -642,7 +643,7 @@ Public Module modModelSetup
                                 J2Date(lEJDay, lEdate)
                                 Dim lDateString As String = "(" & lSdate(0) & "/" & lSdate(1) & "/" & lSdate(2) & "-" & lEdate(0) & "/" & lEdate(1) & "/" & lEdate(2) & ")"
                                 aMetStations.Add(lLeadingChar & lLoc & ":" & lStanam & " " & lDateString)
-                                aMetBaseDsns.Add(lDsn)
+                                aMetBaseDsns.Add(aMetBaseDsns.Count, lDsn)
                                 aMetWdmNames.Add(aMetWdmNames.Count, lFileName)
                             End If
                         Else
@@ -662,7 +663,7 @@ Public Module modModelSetup
 
                             Dim lDateString As String = "(" & lSdate(0) & "/" & lSdate(1) & "/" & lSdate(2) & "-" & lEdate(0) & "/" & lEdate(1) & "/" & lEdate(2) & ")"
                             aMetStations.Add(lLoc & ":" & lStanam & " " & lDateString)
-                            aMetBaseDsns.Add(lDsn)
+                            aMetBaseDsns.Add(aMetBaseDsns.Count, lDsn)
                             aMetWdmNames.Add(aMetWdmNames.Count, lFileName)
                         End If
                     End If
@@ -670,7 +671,7 @@ Public Module modModelSetup
                     lDataSet.ValuesNeedToBeRead = True
                 Next
             End If
-        Next lDataSource
+        Next lDataSourceGeneric
     End Sub
 
     Public Function CreateUCI(ByVal aUciName As String, _
