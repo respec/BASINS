@@ -23,6 +23,17 @@ Imports System.CodeDom.Compiler
 Imports System.Reflection
 
 Public Class Scripting
+
+    ''' <summary>
+    ''' Unicode prefix sometimes gets included in a string, we have to remove it before interpreting as a filename or script
+    ''' </summary>
+    Private Shared ByteOrderMarker As String = Chr(239) & Chr(187) & Chr(191)
+    Private Shared Sub RemoveByteOrderMarker(ByRef aString As String)
+        If aString IsNot Nothing AndAlso aString.StartsWith(ByteOrderMarker) Then
+            aString = aString.Substring(ByteOrderMarker.Length)
+        End If
+    End Sub
+
     Public Shared Function Run(ByVal aLanguage As String, _
                     ByVal aDLLfilename As String, _
                     ByVal aCode As String, _
@@ -34,7 +45,6 @@ Public Class Scripting
         aErrors = "" 'No errors yet
         aLanguage = GetLanguageFromFilename(aLanguage)
         Dim assy As System.Reflection.Assembly
-        'Dim instance As Object
         Dim assyTypes As Type() 'list of items within the assembly
 
         Dim MethodName As String = "ScriptMain" 'Can't be MAIN or the C# compiler will have a heart attack.
@@ -43,6 +53,8 @@ Public Class Scripting
             aDLLfilename = MakeScriptName(m_MapWin.Plugins.PluginFolder)
         End If
 
+        RemoveByteOrderMarker(aCode)
+        
         If aLanguage = "dll" Then
             assy = System.Reflection.Assembly.LoadFrom(aCode)
         Else 'compile the code into an assembly
@@ -59,6 +71,7 @@ Public Class Scripting
                 'Treat as code, not as file name
             End Try
 
+            RemoveByteOrderMarker(aCode)
             assy = Compile(aLanguage, aCode, aErrors, aDLLfilename)
 
         End If

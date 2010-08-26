@@ -184,6 +184,10 @@ Public Module modFile
         Try
             If IO.File.Exists(aFromPath) Then
                 If IO.File.Exists(aToPath) Then TryDelete(aToPath)
+                Dim lDirectory As String = IO.Path.GetDirectoryName(aToPath)
+                If lDirectory.Length > 3 AndAlso Not IO.Directory.Exists(lDirectory) Then
+                    IO.Directory.CreateDirectory(lDirectory)
+                End If
                 IO.File.Copy(aFromPath, aToPath)
                 Return True
             End If
