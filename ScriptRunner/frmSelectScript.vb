@@ -11,7 +11,7 @@ Partial Class frmSelectScript
             Dim lOriginalCursor As Windows.Forms.Cursor = Windows.Forms.Cursor.Current
             Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
             Dim lAssembly As Assembly = Assembly.GetExecutingAssembly
-            Dim lCoClass As Type = lAssembly.GetType("ScriptRunner." & lScriptName)
+            Dim lCoClass As Type = lAssembly.GetType(lAssembly.GetName.Name & "." & lScriptName)
             Dim lMethod As MethodInfo = lCoClass.GetMethod("ScriptMain")
             Dim lArgs(0) As Object
             lArgs(0) = CObj(pMapWin)
