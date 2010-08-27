@@ -317,7 +317,7 @@ Public Module CatSummary
                     lString = vbTab & DecimalAlign(lValue)
                 End If
                 If aSummer Then ' if aSummer is true, then this also imply that aMonthList is not empty
-                    Dim lSeasons As New atcSeasons.atcSeasonsMonth
+                    Dim lSeasons As New atcSeasonsMonth
                     Dim lSeasonalAttributes As New atcDataAttributes
                     Dim lCalculatedAttributes As New atcDataAttributes
                     lSeasonalAttributes.SetValue(aTrans, 0) 'fluxes are summed from daily, monthly or annual to annual
@@ -380,7 +380,7 @@ Public Module CatSummary
                     lString = vbTab & DecimalAlign(lValue)
                 End If
 
-                Dim lSeasons As New atcSeasons.atcSeasonsMonth
+                Dim lSeasons As New atcSeasonsMonth
                 Dim lSeasonalAttributes As New atcDataAttributes
                 Dim lCalculatedAttributes As New atcDataAttributes
                 lSeasonalAttributes.SetValue(aTrans, 0) 'fluxes are summed from daily, monthly or annual to annual
