@@ -17,6 +17,7 @@ Public Module NLCDLanduseTable
         Dim lLanduseLayerIndex As Integer
         Dim lProblem As String = ""
         Dim lGridSource As New atcGridSource
+        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
 
         'find appropriate lu grid layer
         For i = 0 To GisUtil.NumLayers() - 1
@@ -49,7 +50,7 @@ Public Module NLCDLanduseTable
             If FileExists(lReclassifyFile) Then
                 lReclassifyFile = lReclassifyFile & "nlcd.dbf"
             Else
-                lReclassifyFile = Mid((GisUtil.LayerFileName(lLanduseLayerIndex)), 1, 1) & ":\basins\etc\nlcd.dbf"
+                lReclassifyFile = lBasinsFolder & "\etc\nlcd.dbf"
             End If
             Dim lcRcode As New Collection
             Dim lcRname As New Collection

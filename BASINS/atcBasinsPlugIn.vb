@@ -246,6 +246,7 @@ Public Class atcBasinsPlugIn
     Public Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
         'A menu item or toolbar button was clicked
         Logger.Dbg(aItemName)
+        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
         aHandled = True 'Assume we will handle it
         Select Case aItemName
             Case "mnuNew", "tbbNew"  'Override new project behavior
@@ -267,11 +268,11 @@ Public Class atcBasinsPlugIn
                 ShowHelp("")
             Case atcDataManager.LaunchMenuName & "_ArcView3"
                 'create apr if it does not exist, then open it
-                Dim lAprFileName As String = "\basins\apr" & g_PathChar & IO.Path.GetFileNameWithoutExtension(g_Project.FileName) & ".apr"
+                Dim lAprFileName As String = lBasinsFolder & "\apr" & g_PathChar & IO.Path.GetFileNameWithoutExtension(g_Project.FileName) & ".apr"
                 If Not FileExists(lAprFileName) Then 'build it
                     Dim lExeName As String = _
                        FindFile("Please locate BasinsArchive.exe", _
-                       "\BASINS\etc\basinsarchive\BasinsArchive.exe")
+                       lBasinsFolder & "\etc\basinsarchive\BasinsArchive.exe")
                     If Len(lExeName) > 0 Then
                         Dim Exec_Str As String = lExeName & " /build, " & PathNameOnly(g_Project.FileName) & ", " & IO.Path.GetFileNameWithoutExtension(lAprFileName)
                         Shell(Exec_Str, AppWinStyle.NormalFocus, False)
@@ -283,7 +284,7 @@ Public Class atcBasinsPlugIn
                     Logger.Msg("No application is associated with APR files - ArcView3 does not appear to be installed.", vbOKOnly, "ArcView Problem")
                 End Try
             Case atcDataManager.LaunchMenuName & "_ArcGIS"
-                Dim buildmxdFilename As String = FindFile("Please Locate build.mxd", "\BASINS\etc\build.mxd")
+                Dim buildmxdFilename As String = FindFile("Please Locate build.mxd", lBasinsFolder & "\etc\build.mxd")
                 If Len(buildmxdFilename) = 0 Then
                     Logger.Msg("Unable to locate Build.mxd", vbOKOnly, "ArcGIS Problem")
                 Else
@@ -300,8 +301,8 @@ Public Class atcBasinsPlugIn
                 If aItemName.StartsWith(atcDataManager.LaunchMenuName & "_") Then
                     Dim lExeName As String = ""
                     Select Case aItemName.Substring(atcDataManager.LaunchMenuName.Length + 1).ToLower
-                        Case "genscn" : lExeName = FindFile("Please locate GenScn.exe", "\BASINS\models\HSPF\bin\GenScn.exe")
-                        Case "wdmutil" : lExeName = FindFile("Please locate WDMUtil.exe", "\BASINS\models\HSPF\WDMUtil\WDMUtil.exe")
+                        Case "genscn" : lExeName = FindFile("Please locate GenScn.exe", lBasinsFolder & "\models\HSPF\bin\GenScn.exe")
+                        Case "wdmutil" : lExeName = FindFile("Please locate WDMUtil.exe", lBasinsFolder & "\models\HSPF\WDMUtil\WDMUtil.exe")
                     End Select
                     If FileExists(lExeName) Then
                         Shell("""" & lExeName & """", AppWinStyle.NormalFocus, False)

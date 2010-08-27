@@ -619,7 +619,8 @@ Module modCreateUci
             Dim lBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
             Dim lPollutantListPath As String = lBinLoc.Substring(0, lBinLoc.Length - 3) & "models\hspf\bin\" & lPollutantListFileName
             If Not FileExists(lPollutantListPath) Then
-                lPollutantListPath = "\basins\models\hspf\bin\" & lPollutantListFileName
+                Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
+                lPollutantListPath = lBasinsFolder & "\models\hspf\bin\" & lPollutantListFileName
                 If Not FileExists(lPollutantListPath) Then
                     lPollutantListPath = FindFile("Please locate " & lPollutantListFileName, lPollutantListFileName)
                 End If

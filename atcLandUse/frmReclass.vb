@@ -343,6 +343,7 @@ Public Class frmReclass
         If pSubbasinsLayer <> "<none>" Then
             SubbasinLayerIndex = GisUtil.LayerIndex(pSubbasinsLayer)
         End If
+        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
 
         Dim cluTiles As New Collection
         If lutype = "GIRAS" Then
@@ -358,7 +359,7 @@ Public Class frmReclass
             If FileExists(ReclassifyFile) Then
                 ReclassifyFile = ReclassifyFile & "giras.dbf"
             Else
-                ReclassifyFile = DriveLetter & ":\basins\etc\giras.dbf"
+                ReclassifyFile = lBasinsFolder & "\etc\giras.dbf"
             End If
 
             'figure out which land use tiles to list
@@ -405,7 +406,7 @@ Public Class frmReclass
             If FileExists(ReclassifyFile) Then
                 ReclassifyFile = ReclassifyFile & "giras.dbf"
             Else
-                ReclassifyFile = DriveLetter & ":\basins\etc\giras.dbf"
+                ReclassifyFile = lBasinsFolder & "\etc\giras.dbf"
             End If
             totalpolygoncount = GisUtil.NumFeatures(LanduseLayerIndex)
         End If
@@ -545,10 +546,11 @@ Public Class frmReclass
 
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
         ReclassifyFile = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\"
+        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
         If FileExists(ReclassifyFile) Then
             ReclassifyFile = ReclassifyFile & "nlcd.dbf"
         Else
-            ReclassifyFile = "\BASINS\etc\nlcd.dbf"
+            ReclassifyFile = lBasinsFolder & "\etc\nlcd.dbf"
         End If
 
         AtcGridLanduse.Source.Rows = 1
@@ -615,13 +617,13 @@ Public Class frmReclass
                     If FileExists(ReclassifyFile) Then
                         ReclassifyFile = ReclassifyFile & "mrlc2001.dbf"
                     Else
-                        ReclassifyFile = "\BASINS\etc\mrlc2001.dbf"
+                        ReclassifyFile = lBasinsFolder & "\etc\mrlc2001.dbf"
                     End If
                 Else
                     If FileExists(ReclassifyFile) Then
                         ReclassifyFile = ReclassifyFile & "mrlc.dbf"
                     Else
-                        ReclassifyFile = "\BASINS\etc\mrlc.dbf"
+                        ReclassifyFile = lBasinsFolder & "\etc\mrlc.dbf"
                     End If
                 End If
 
@@ -646,7 +648,7 @@ Public Class frmReclass
             If FileExists(ReclassifyFile) Then
                 ReclassifyFile = ReclassifyFile & "nlcd.dbf"
             Else
-                ReclassifyFile = "\BASINS\etc\nlcd.dbf"
+                ReclassifyFile = lBasinsFolder & "\etc\nlcd.dbf"
             End If
             AddGroupedClassifications(ReclassifyFile, lutype)
         End If

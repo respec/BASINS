@@ -152,7 +152,8 @@ Public Class frmSic
 
         Me.Refresh()
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
-        If pProjectFileName Is Nothing Then pProjectFileName = "\BASINS\data\national\national.mwprj"
+        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
+        If pProjectFileName Is Nothing Then pProjectFileName = lBasinsFolder & "\data\national\national.mwprj"
         If Not FileExists(pProjectFileName) Then
             lBasinsBinLoc = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
             pProjectFileName = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "data\national\national.mwprj"

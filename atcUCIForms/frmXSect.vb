@@ -52,7 +52,8 @@ Public Class frmXSect
         Dim lOper As Integer
         Dim lFileStream As Stream
 
-        OpenFileDialog1.InitialDirectory = "\basins\modelout"
+        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
+        OpenFileDialog1.InitialDirectory = lBasinsFolder & "\modelout"
         OpenFileDialog1.Filter = "BASINS Trapezoidal Files | *.ptf"
         OpenFileDialog1.FileName = "*.ptf"
         OpenFileDialog1.Title = "Select BASINS Trapezoidal File"

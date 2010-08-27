@@ -53,6 +53,7 @@ Public Module modModelSetup
 
         Logger.Status("Preparing to process")
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
 
         'build collection of selected subbasins 
         Dim lSubbasinsSelected As New atcCollection  'key is index, value is subbasin id
@@ -119,7 +120,7 @@ Public Module modModelSetup
             If IO.Directory.Exists(lReclassifyFileName) Then
                 lReclassifyFileName &= "giras.dbf"
             Else
-                lReclassifyFileName = lLandUsePathName.Substring(0, 1) & ":\basins\etc\giras.dbf"
+                lReclassifyFileName = lBasinsFolder & "\etc\giras.dbf"
             End If
 
         ElseIf aLUType = 1 Or aLUType = 3 Then
@@ -137,7 +138,7 @@ Public Module modModelSetup
                     If IO.Directory.Exists(lReclassifyFileName) Then
                         lReclassifyFileName &= "nlcd.dbf"
                     Else
-                        lReclassifyFileName = "\BASINS\etc\nlcd.dbf"
+                        lReclassifyFileName = lBasinsFolder & "\etc\nlcd.dbf"
                     End If
                 End If
             Else
