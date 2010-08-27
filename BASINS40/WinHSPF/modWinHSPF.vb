@@ -48,6 +48,7 @@ Public Module WinHSPF
     Sub Main()
         pDefUCI = New HspfUci
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
 
         If Not FileExists(Logger.FileName) Then
             Dim lLogFolder As String = lBasinsBinLoc
@@ -59,7 +60,7 @@ Public Module WinHSPF
         'set WinHSPF manual location
         pWinHSPFManualName = lBasinsBinLoc & "\..\..\..\docs\WinHSPF30.chm"
         If Not FileExists(pWinHSPFManualName) Then
-            pWinHSPFManualName = "\BASINS\docs\WinHSPF30.chm"
+            pWinHSPFManualName = lBasinsFolder & "\docs\WinHSPF30.chm"
             If Not FileExists(pWinHSPFManualName) Then
                 pWinHSPFManualName = FindFile("Please locate WinHSPF30.chm", "WinHSPF30.chm")
             End If
@@ -69,7 +70,7 @@ Public Module WinHSPF
         'set HSPF manual location
         pHSPFManualName = lBasinsBinLoc & "\..\..\..\docs\HSPF.chm"
         If Not FileExists(pHSPFManualName) Then
-            pHSPFManualName = "\BASINS\docs\HSPF.chm"
+            pHSPFManualName = lBasinsFolder & "\docs\HSPF.chm"
             If Not FileExists(pHSPFManualName) Then
                 pHSPFManualName = FindFile("Please locate HSPF.chm", "HSPF.chm")
             End If
@@ -84,7 +85,7 @@ Public Module WinHSPF
         Dim lStarterUciName As String = "starter.uci"
         Dim lStarterPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "models\hspf\bin\starter\" & lStarterUciName
         If Not FileExists(lStarterPath) Then
-            lStarterPath = "\basins\models\hspf\bin\starter\" & lStarterUciName
+            lStarterPath = lBasinsFolder & "\models\hspf\bin\starter\" & lStarterUciName
             If Not FileExists(lStarterPath) Then
                 lStarterPath = FindFile("Please locate " & lStarterUciName, lStarterUciName)
             End If

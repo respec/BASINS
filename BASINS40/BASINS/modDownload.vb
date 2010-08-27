@@ -1068,7 +1068,8 @@ StartOver:
     End Function
 
     Private Sub ShapeUtilMerge(ByVal aCurFilename As String, ByVal aOutputFilename As String, ByVal aProjectionFilename As String)
-        Dim lShapeUtilExe As String = FindFile("Please locate ShapeUtil.exe", "\basins\etc\datadownload\ShapeUtil.exe")
+        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
+        Dim lShapeUtilExe As String = FindFile("Please locate ShapeUtil.exe", lBasinsFolder & "\etc\datadownload\ShapeUtil.exe")
         If lShapeUtilExe.Length > 0 Then
             Dim lLayersDbf As String = GetSetting("ShapeMerge", "files", "layers.dbf")
             If Not FileExists(lLayersDbf) Then
@@ -1092,7 +1093,8 @@ StartOver:
     End Sub
 
     Private Function DataDownload(ByRef aCommandLine As String) As Boolean
-        Dim lDataDownloadExe As String = FindFile("Please locate DataDownload.exe", "\Basins\etc\DataDownload\DataDownload.exe")
+        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
+        Dim lDataDownloadExe As String = FindFile("Please locate DataDownload.exe", lBasinsFolder & "\etc\DataDownload\DataDownload.exe")
         If lDataDownloadExe.Length > 0 Then
             If Shell(lDataDownloadExe & " " & aCommandLine, AppWinStyle.NormalFocus, True) = 0 Then
                 Return True
@@ -1128,7 +1130,8 @@ StartOver:
     Private Function GetDefaultsXML() As Xml.XmlDocument
         Dim lDefaultsXML As Xml.XmlDocument = Nothing
         Dim lDefaultsPath As String 'full file name of defaults XML
-        lDefaultsPath = FindFile("Please Locate BasinsDefaultLayers.xml", "\basins\etc\BasinsDefaultLayers.xml")
+        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
+        lDefaultsPath = FindFile("Please Locate BasinsDefaultLayers.xml", lBasinsFolder & "\etc\BasinsDefaultLayers.xml")
         If FileExists(lDefaultsPath) Then
             lDefaultsXML = New Xml.XmlDocument
             lDefaultsXML.Load(lDefaultsPath)

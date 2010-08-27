@@ -1255,8 +1255,8 @@ Public Class frmModelSetup
         If FileExists(lOutputPath) Then
             lOutputPath &= lProjectName
         Else
-            Dim lDriveLetter As String = CurDir().Substring(0, 1)
-            lOutputPath = lDriveLetter & ":\BASINS\modelout\" & lProjectName
+            Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
+            lOutputPath = lBasinsFolder & "\modelout\" & lProjectName
         End If
         Dim lBaseOutputName As String = lProjectName
 

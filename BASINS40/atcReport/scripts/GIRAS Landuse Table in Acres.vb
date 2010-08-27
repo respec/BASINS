@@ -17,6 +17,7 @@ Public Module GIRASLanduseTable
         Dim lLanduseLayerIndex As Integer
         Dim lLandUseFieldIndex As Long
         Dim lGridSource As New atcGridSource
+        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
 
         'set land use index layer
         Try
@@ -91,7 +92,7 @@ Public Module GIRASLanduseTable
                     If FileExists(lReclassifyFile) Then
                         lReclassifyFile = lReclassifyFile & "giras.dbf"
                     Else
-                        lReclassifyFile = Mid(lPathName, 1, 1) & ":\basins\etc\giras.dbf"
+                        lReclassifyFile = lBasinsFolder & "\etc\giras.dbf"
                     End If
                     Dim lcRcode As New Collection
                     Dim lcRname As New Collection

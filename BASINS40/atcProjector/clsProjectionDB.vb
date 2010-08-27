@@ -34,7 +34,8 @@ Public Class ProjectionDB
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
         dbFilename = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\atcprj.dbf"
         If Not FileExists(dbFilename) Then
-            dbFilename = "\BASINS\etc\atcprj.dbf"
+            Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
+            dbFilename = lBasinsFolder & "\etc\atcprj.dbf"
         End If
         dbFilename = FindFile("Please locate table of projections atcprj.dbf", dbFilename)
 

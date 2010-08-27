@@ -1654,27 +1654,28 @@ Friend Class frmPollutantLoading
         Dim i As Integer
 
         If atcGridValues.Source Is Nothing Then Exit Sub
+        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
 
         If rbExportCoefficientMethod.Checked = True Then
             If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
-                lDefaultFile = "\BASINS\etc\pload\ecgiras.dbf"
+                lDefaultFile = lBasinsFolder & "\etc\pload\ecgiras.dbf"
             ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
-                lDefaultFile = "\BASINS\etc\pload\ecgiras.dbf"
+                lDefaultFile = lBasinsFolder & "\etc\pload\ecgiras.dbf"
             ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "NLCD Grid" Then
-                lDefaultFile = "\BASINS\etc\pload\ecnlcd.dbf"
+                lDefaultFile = lBasinsFolder & "\etc\pload\ecnlcd.dbf"
             Else 'grid
-                lDefaultFile = "\BASINS\etc\pload\ecnlcd.dbf"
+                lDefaultFile = lBasinsFolder & "\etc\pload\ecnlcd.dbf"
             End If
         Else
             'emc (simple) method
             If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
-                lDefaultFile = "\BASINS\etc\pload\emcgiras.dbf"
+                lDefaultFile = lBasinsFolder & "\etc\pload\emcgiras.dbf"
             ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
-                lDefaultFile = "\BASINS\etc\pload\emcgiras.dbf"
+                lDefaultFile = lBasinsFolder & "\etc\pload\emcgiras.dbf"
             ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "NLCD Grid" Then
-                lDefaultFile = "\BASINS\etc\pload\emcnlcd.dbf"
+                lDefaultFile = lBasinsFolder & "\etc\pload\emcnlcd.dbf"
             Else 'grid
-                lDefaultFile = "\BASINS\etc\pload\emcnlcd.dbf"
+                lDefaultFile = lBasinsFolder & "\etc\pload\emcnlcd.dbf"
             End If
         End If
 
@@ -1771,7 +1772,8 @@ Friend Class frmPollutantLoading
         If atcGridBMP.Source Is Nothing Then Exit Sub
 
         If lblBMPFile.Text = "<none>" Then
-            lblBMPFile.Text = "\BASINS\etc\pload\bmpeffic.dbf"
+            Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
+            lblBMPFile.Text = lBasinsFolder & "\etc\pload\bmpeffic.dbf"
         End If
         atcGridBMP.Clear()
 
