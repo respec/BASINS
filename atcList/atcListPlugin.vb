@@ -34,6 +34,8 @@ Public Class atcListPlugin
             Dim lCantFit As String = "#"
             Dim lSignificantDigits As Integer = 5
 
+            Dim lDisplayAttributes As ArrayList = Nothing
+
             For Each lOption As String In aOptions
                 Select Case lOption.ToLower
                     Case "filternodata" : lFilterNoData = True
@@ -87,6 +89,9 @@ Public Class atcListPlugin
                                     Case "significantdigits" : Integer.TryParse(lValue, lSignificantDigits)
                                 End Select
                             End If
+                        ElseIf lOption.ToLower.StartsWith("displayattributes:") Then
+                            lDisplayAttributes = New ArrayList
+                            lDisplayAttributes.AddRange(lOption.Substring(18).Split(","))
                         End If
                         Logger.Dbg("UnknownParameter:" & lOption)
                 End Select
@@ -94,7 +99,7 @@ Public Class atcListPlugin
 
             If lSpecifiedFormat Then lForm.ValueFormat(lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
 
-            lForm.Initialize(aTimeseriesGroup, , lViewValues, lFilterNoData, False)
+            lForm.Initialize(aTimeseriesGroup, lDisplayAttributes, lViewValues, lFilterNoData, False)
             atcUtility.SaveFileString(aFileName, lForm.ToString)
             lForm.Dispose()
         End If
