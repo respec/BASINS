@@ -1,0 +1,96 @@
+Summary of changes made by Aaron updaing DataManager from MW4 to MW6
+2001-08-30
+
+DataManager------------------------------------------------------------------
+
+clsBaseDataExtension:
+  removed MapWindow.Interfaces.IPlugin, did not replace with new plugin class
+clsLayer:
+  Aaron did not update - still using MapWinGIS.Shapefile, MapWinGIS.Grid
+clsOverlayReclassify:
+  Aaron did not make substantive changes - our version has important new code
+NetworkOperations:
+  RemoveFlowlinesWithoutCatchment:
+    Shapefile -> FeatureSet
+    NumShapes -> Features.Count
+    CellValue(Col, Row) -> Features.Item(Row).DataRow.Item(Col)
+    EditDeleteShape -> Features.RemoveAt
+  ClipFlowLinesToCatchments: above plus:
+    Shape = Shapefile.Shape(index) -> Feature = Features.Item(index)
+  RemoveBraidedFlowlines:
+    same as above
+  CopyAndOpenNewShapefile:
+    Shapefile.Open(filename) -> FeatureSet.OpenFile(filename)
+  FieldIndex:
+    For...ShapeFile.Field(lFieldIndex).Name ->
+      DataTable.Columns.IndexOf(FieldName)
+    (Note: want to retain For loop instead so we can avoid case sensitivity)
+  FindRecords:
+    same as above
+  CombineFlowlines:
+    EditCellValue(r,c,value) -> .Features.Item(r).DataRow.Item(c) = value
+    MapWinGeoProc.SpatialOperations.MergeShapes -> several lines
+    EditInsertShape -> Features.Add
+  ReconnectUpstreamToDownstream: same as above
+  DumpComid: same as above
+  CheckConnectivity: same as above
+  CombineCatchments:
+    Field(Col).Name -> DataTable.Columns.Item(Col).ColumnName
+    Shape1.Clip(Shape2, clUnion) -> Feature1.Intersection(Feature2)
+    MapWinGeoProc.SpatialOperations.MergeShapes -> Feature1.Union(Feature2)
+  Count: same as above
+  FieldIndexes:
+    MapWinGIS.Field -> Data.DataColumn
+    Field.Name -> DataColumn.ColumnName
+    Field.Width -> no equivalent
+    Field.Precision -> no equivalent
+    EditInsertField -> DataTable.Columns.Add
+Region and RegionShape:
+  Aaron did not update - still using:
+    MapWinGIS.Shapefile
+    MapWinGIS.Point
+    MapWinGeoProc.SpatialReference.ProjectPoint
+    MapWinGeoProc.SpatialOperations.ClipGridWithPolygon
+
+
+BasinsDataExtension----------------------------------------------------------
+
+Our version has new code for HUC-12
+
+Aaron replaced DataManager.Region with MapWindow.Geometries.Envelope, but it lacks GetKeysOfOverlappingShapes, HUC8s
+
+Shapefile -> FeatureSet
+
+atcMwGisUtility.GisUtil.RemoveLayer -> need new version (takes layer off main map)
+
+Shapefile.CreateNew(filename, MapWinGIS.ShpfileType.SHP_POINT)
+-> New MapWindow.Data.FeatureSet(MapWindow.Geometries.FeatureTypes.Point)
+
+StartEditingShapes, StopEditingShapes, StartEditingTable, StopEditingTable -> not needed
+
+MapWinGIS.Point -> MapWindow.Geometries.Coordinate
+
+MapWinGeoProc.SpatialReference.ProjectPoint 
+-> System.Spatial.Projections.Reproject.ReprojectPoints
+
+Shapefile.Projection
+-> System.Spatial.Projections.ProjectionInfo(aDesiredProjection)
+
+
+NHDPlusDataExtension---------------------------------------------------------
+
+Region.ClipGrid -> MapWindow.Tools.ClipWithPolygon
+
+NLCD2001DataExtension--------------------------------------------------------
+
+Aaron did not update, we have newer code for making sure cached data is good
+Does not appear to contain code that needs to change.
+
+NLLDASDataExtension----------------------------------------------------------
+
+Aaron did not update, uses MapWinGIS.Shapefile
+
+NWISDataExtension------------------------------------------------------------
+
+modDischarge: Aaron commented out use of atcTimeseriesRDB, no other changes
+modStations: Aaron did not update, uses MapWinGIS.Shapefile
