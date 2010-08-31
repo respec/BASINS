@@ -40,66 +40,21 @@ Public Module modFile
     ''' <returns>true if files are identical, false if not</returns>
     ''' <remarks>An exception will occur if either file cannot be read.</remarks>
     Public Function FilesMatch(ByVal aFilename1 As String, ByVal aFilename2 As String) As Boolean
-        Dim LongFileLength As Long = FileLen(aFilename1)
+        Dim lFileLength As Long = New IO.FileInfo(aFilename1).Length
 
         'If files are not the same size, they do not match
-        If FileLen(aFilename2) <> LongFileLength Then Return False
+        If New IO.FileInfo(aFilename2).Length <> lFileLength Then Return False
 
-        If LongFileLength > Integer.MaxValue Then
-            Throw New ApplicationException("FilesMatch cannot compare files larger than 2 Gigabytes.")
-        End If
-
-        Dim FileLength As Integer = CInt(LongFileLength)
-        Dim InFile1 As Short = FreeFile()
-        Dim InFile2 As Short = FreeFile()
-        Dim longBytes As Integer
-        Dim testL1, testL2 As Integer
-        Dim testB1, testB2 As Byte
-        Dim i As Long
-
-        ' ##LOCAL FileLength - length of first file in bytes
-        ' ##LOCAL InFile1 - file handle of first file
-        ' ##LOCAL InFile2 - file handle of second file
-        ' ##LOCAL longBytes - number of bytes that can be tested in Integer-sized chunks
-        ' ##LOCAL testL1, testL2 - Integers to read and compare more than one byte at a time
-        ' ##LOCAL testB1, testB2 - Byte values to compare one byte at a time
-        ' ##LOCAL i - byte index in files
-
-        FileOpen(InFile1, aFilename1, OpenMode.Binary, OpenAccess.Read, OpenShare.Shared)
-        Try
-            FileOpen(InFile2, aFilename2, OpenMode.Binary, OpenAccess.Read, OpenShare.Shared)
-        Catch ex As Exception
-            FileClose(InFile1) 'clean up the first file which we opened before having trouble with second file
-            Throw ex
-        End Try
-
-        Try
-            'Compare most of the file in Integer-sized chunks
-            longBytes = FileLength - FileLength Mod 4
-            For i = 1 To longBytes Step 4
-                FileGet(InFile1, testL1)
-                FileGet(InFile2, testL2)
-                If testL1 <> testL2 Then Return False
-            Next
-
-            'Compare any odd bytes at end of file one at a time
-            Do While i <= FileLength
-                FileGet(InFile1, testB1, i)
-                FileGet(InFile2, testB2, i)
-                If testB1 <> testB2 Then Return False
-                i = i + 1
-            Loop
-
-            FileClose(InFile1)
-            FileClose(InFile2)
-
-            Return True 'Reached the end and found no mismatches
-
-        Catch ex As Exception
-            FileClose(InFile1)
-            FileClose(InFile2)
-            Throw ex
-        End Try
+        Dim lBinaryReader1 As New IO.BinaryReader(New IO.FileStream(aFilename1, IO.FileMode.Open, IO.FileAccess.Read))
+        Dim lBinaryReader2 As New IO.BinaryReader(New IO.FileStream(aFilename2, IO.FileMode.Open, IO.FileAccess.Read))
+        For lIndex As Long = 1 To lFileLength
+            If lBinaryReader1.ReadByte <> lBinaryReader2.ReadByte Then
+                Return False
+            End If
+        Next
+        lBinaryReader1.Close()
+        lBinaryReader2.Close()
+        Return True 'Reached the end and found no mismatches
     End Function
 
     ''' <summary>
