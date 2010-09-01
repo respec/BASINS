@@ -57,6 +57,44 @@ Public Module modFile
         Return True 'Reached the end and found no mismatches
     End Function
 
+
+    ''' <summary>
+    ''' Compare two files and return True if contents are identical.
+    ''' </summary>
+    ''' <param name="aFilename1">Name of first file to compare</param>
+    ''' <param name="aFilename2">Name of second file to compare</param>
+    ''' <param name="aIgnoreCase">Ignore case flag</param>
+    ''' <returns>true if files are identical, false if not</returns>
+    ''' <remarks>An exception will occur if either file cannot be read.</remarks>
+    Public Function FilesMatchText(ByVal aFilename1 As String, ByVal aFilename2 As String, Optional ByVal aIgnoreCase As Boolean = False) As Boolean
+        Dim lFileLength As Long = New IO.FileInfo(aFilename1).Length
+
+        'If files are not the same size, they do not match
+        If New IO.FileInfo(aFilename2).Length <> lFileLength Then Return False
+
+        Dim lStreamReader1 As New IO.StreamReader(aFilename1)
+        Dim lStreamReader2 As New IO.StreamReader(aFilename2)
+        Dim lLine1 As String = lStreamReader1.ReadLine
+        Dim lLine2 As String = lStreamReader2.ReadLine
+        Dim lMatch As Boolean = True
+        Do Until (lMatch = False) OrElse (lLine1 Is Nothing)
+            If lLine1 <> lLine2 Then
+                If aIgnoreCase Then
+                    If lLine1.ToLower <> lLine2.ToLower Then
+                        lMatch = False
+                    End If
+                Else
+                    lMatch = False
+                End If
+            End If
+            lLine1 = lStreamReader1.ReadLine
+            lLine2 = lStreamReader2.ReadLine
+        Loop
+        lStreamReader1.Close()
+        lStreamReader2.Close()
+        Return lMatch
+    End Function
+
     ''' <summary>
     ''' Create the specified directory and any above it that are not yet there.
     ''' </summary>
