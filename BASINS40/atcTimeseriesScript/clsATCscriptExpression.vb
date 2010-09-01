@@ -162,20 +162,20 @@ Imports MapWinUtility
 
             Case ATCsToken.tok_For
                 retval = indent & "(" & TokenString(MyToken)
-                retval = retval & " " & MySubExpressions.Item(1).Printable & " = "
-                retval = retval & MySubExpressions.Item(2).Printable
+                retval = retval & " " & MySubExpressions.Item(0).Printable & " = "
+                retval = retval & MySubExpressions.Item(1).Printable
                 retval = retval & " to "
-                retval = retval & MySubExpressions.Item(3).Printable
-                index = 4
+                retval = retval & MySubExpressions.Item(2).Printable
+                index = 3
 
 DefaultLoop:
-                While index <= MyNumSubExpressionsOnSameLine And index < maxIndex  'CHANGE: used to be index <= maxIndex
+                While index <= MyNumSubExpressionsOnSameLine And index <= maxIndex - 1 'CHANGE: used to be index <= maxIndex
                     AddSuffixNoDoubles(retval, " ")
                     retval = retval & MySubExpressions.Item(index).Printable
                     index = index + 1
                 End While
 
-                If index <= maxIndex Then addCR = True Else addCR = False
+                If index <= maxIndex - 1 Then addCR = True Else addCR = False
 
                 While index <= maxIndex - 1
                     If Right(retval, Len(PrintEOL)) <> PrintEOL Then
@@ -445,9 +445,8 @@ ExitFun:
         ReDim ColDefs(100)
         RepeatStartCol = 0
         '  RepeatEndCol = 0
-        ColIndex = 1
-        'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Printable. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-        rule = MySubExpressions.Item(1).Printable
+        ColIndex = 1 'ZCHECK
+        rule = MySubExpressions.Item(0).Printable
 
         NamedColumns = 0
         FixedColumns = False
@@ -477,7 +476,6 @@ ExitFun:
         SubExpMax = MySubExpressions.Count()
         While SubExpIndex <= SubExpMax - 1
             If ColIndex > UBound(ColDefs) Then ReDim Preserve ColDefs(ColIndex + 100)
-            'UPGRADE_WARNING: Couldn't resolve default property of object MySubExpressions().Printable. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
             rule = MySubExpressions.Item(SubExpIndex).Printable
             If FixedColumns Then ' start-end:name or start+len:name
 ParseFixedDef:
@@ -533,7 +531,7 @@ ParseFixedDef:
         If cnt < 1 Then
             MsgBox("No values specified for date" & vbCr & Printable())
         Else
-            str_Renamed = MySubExpressions.Item(1).Evaluate
+            str_Renamed = MySubExpressions.Item(0).Evaluate
             If IsNumeric(str_Renamed) Then
                 yr = CInt(str_Renamed)
             Else
@@ -547,18 +545,18 @@ ParseFixedDef:
         sec = 0
 
         If cnt >= 2 Then
-            mo = MySubExpressions.Item(2).Evaluate
+            mo = MySubExpressions.Item(1).Evaluate
             If cnt < 3 Then
                 da = daymon(yr, mo)
             Else
-                da = MySubExpressions.Item(3).Evaluate
+                da = MySubExpressions.Item(2).Evaluate
                 If cnt >= 4 Then
-                    hr = MySubExpressions.Item(4).Evaluate
+                    hr = MySubExpressions.Item(3).Evaluate
                     If cnt < 5 Then
                         Min = 60
                     Else
-                        Min = MySubExpressions.Item(5).Evaluate
-                        If cnt >= 6 Then sec = MySubExpressions.Item(6).Evaluate
+                        Min = MySubExpressions.Item(4).Evaluate
+                        If cnt >= 6 Then sec = MySubExpressions.Item(5).Evaluate
                     End If
                 End If
             End If
@@ -626,7 +624,6 @@ ParseFixedDef:
                 retval = TokenString(MyToken)
                 ForMax = MySubExpressions.Count() - 1
                 If ForMax = 0 Then
-
                     tmpval = MySubExpressions.Item(0).Evaluate
                     If IsNumeric(tmpval) Then
                         ScriptSetDataset(CInt(tmpval))
@@ -667,23 +664,22 @@ ParseFixedDef:
                     If MySubExpressions.Count() < 2 Then
                         FillTS = 1
                     Else
-                        FillTS = MySubExpressions.Item(2).Evaluate
+                        FillTS = MySubExpressions.Item(1).Evaluate
                     End If
                     If MySubExpressions.Count() < 3 Then
                         FillVal = 0
                     Else
-                        FillVal = MySubExpressions.Item(3).Evaluate
+                        FillVal = MySubExpressions.Item(2).Evaluate
                     End If
                     If MySubExpressions.Count() < 4 Then
                         FillMissing = -999
                     Else
-
-                        FillMissing = MySubExpressions.Item(4).Evaluate
+                        FillMissing = MySubExpressions.Item(3).Evaluate
                     End If
                     If MySubExpressions.Count() < 5 Then
                         FillAccum = -998
                     Else
-                        FillAccum = MySubExpressions.Item(5).Evaluate
+                        FillAccum = MySubExpressions.Item(4).Evaluate
                     End If
                 End If
             Case ATCsToken.tok_Flag
@@ -726,7 +722,6 @@ ParseFixedDef:
             Case ATCsToken.tok_If
                 'UPGRADE_WARNING: Couldn't resolve default property of object TokenString(). Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
                 retval = TokenString(MyToken) & " " & MySubExpressions.Item(0).Printable
-
                 If EvalTruth(MySubExpressions.Item(0).Evaluate) Then
                     ForMax = MySubExpressions.Count() - 1
                     For SubExp = 1 To ForMax
@@ -758,12 +753,12 @@ ParseFixedDef:
                 End If
             Case ATCsToken.tok_Instr
                 If MySubExpressions.Count() > 2 Then
-                    retval = CStr(InStr(CInt(MySubExpressions.Item(1).Evaluate), MySubExpressions.Item(2).Evaluate, MySubExpressions.Item(3).Evaluate))
+                    retval = CStr(InStr(CInt(MySubExpressions.Item(0).Evaluate), MySubExpressions.Item(1).Evaluate, MySubExpressions.Item(2).Evaluate))
                 Else
-                    retval = CStr(InStr(MySubExpressions.Item(1).Evaluate, MySubExpressions.Item(2).Evaluate))
+                    retval = CStr(InStr(MySubExpressions.Item(0).Evaluate, MySubExpressions.Item(1).Evaluate))
                 End If
             Case ATCsToken.tok_IsNumeric
-                If IsNumeric(MySubExpressions.Item(1).Evaluate) Then retval = "1" Else retval = "0"
+                If IsNumeric(MySubExpressions.Item(0).Evaluate) Then retval = "1" Else retval = "0"
             Case ATCsToken.tok_LineEnd
                 InputEOL = vbCr
                 tmpval = UCase(MySubExpressions.Item(0).Printable)
@@ -771,7 +766,7 @@ ParseFixedDef:
                     InputEOL = ""
                     InputLineLen = CInt(tmpval)
                     LenCurrentLine = InputLineLen
-                ElseIf Left(tmpval, 1) = "A" And IsNumeric(Mid(tmpval, 2)) Then
+                ElseIf Left(tmpval, 1) = "A" And IsNumeric(Mid(tmpval, 2)) Then 'ZCHECK
                     InputEOL = Chr(CInt(Mid(tmpval, 2)))
                 ElseIf tmpval = "CR" Then
                     InputEOL = vbCr
@@ -845,15 +840,14 @@ ParseFixedDef:
             Case ATCsToken.tok_Trim
                 retval = Trim(MySubExpressions.Item(0).Evaluate)
             Case ATCsToken.tok_Unset
-                If MySubExpressions.Item(1).Token = ATCsToken.tok_Variable Then
-                    tmpval = MySubExpressions.Item(1).Printable
+                If MySubExpressions.Item(0).Token = ATCsToken.tok_Variable Then
+                    tmpval = MySubExpressions.Item(0).Printable
                 Else
-                    tmpval = MySubExpressions.Item(1).Evaluate
+                    tmpval = MySubExpressions.Item(0).Evaluate
                 End If
                 ScriptUnsetVariable(tmpval)
             Case ATCsToken.tok_Value
-
-                tmpval = MySubExpressions.Item(1).Evaluate
+                tmpval = MySubExpressions.Item(0).Evaluate
                 If IsNumeric(tmpval) Then
                     ScriptSetValue(CSng(tmpval))
                 ElseIf Len(tmpval) = 0 Then
@@ -866,10 +860,10 @@ ParseFixedDef:
                     End If
                 End If
                 retval = tmpval
-
-            Case ATCsToken.tok_Variable : retval = GetVariable()
+            Case ATCsToken.tok_Variable
+                retval = GetVariable()
             Case ATCsToken.tok_Warn
-                retval = MySubExpressions.Item(1).Evaluate
+                retval = MySubExpressions.Item(0).Evaluate
                 MsgBox(retval, MsgBoxStyle.OkOnly, "Warning")
             Case ATCsToken.tok_While
                 retval = TokenString(MyToken) & " " & MySubExpressions.Item(0).Printable
@@ -902,8 +896,7 @@ ParseFixedDef:
                 retval = "Unknown token evaluated: " & Printable()
                 'Hacking "Abs" token in without breaking binary compatibility by adding tok_Abs
                 If InStr(retval, "Unknown Abs ") > 0 And MySubExpressions.Count() = 1 Then
-
-                    tmpval = MySubExpressions.Item(1).Evaluate
+                    tmpval = MySubExpressions.Item(0).Evaluate
                     If IsNumeric(tmpval) Then
                         num1 = CSng(tmpval)
                         retval = CStr(System.Math.Abs(num1))
@@ -912,7 +905,6 @@ ParseFixedDef:
                     End If
                 End If
         End Select
-
         Return retval
         'Debug.Print "EvaluateReturn = " & retval
     End Function
@@ -920,8 +912,8 @@ ParseFixedDef:
     Private Sub SetNumericVals(ByRef num1 As Object, ByRef num2 As Object, ByVal tmpval As Object, ByVal tmpval2 As Object)
         num1 = 0
         num2 = 0
-        tmpval = MySubExpressions.Item(1).Evaluate
-        tmpval2 = MySubExpressions.Item(2).Evaluate
+        tmpval = MySubExpressions.Item(0).Evaluate
+        tmpval2 = MySubExpressions.Item(1).Evaluate
         If IsNumeric(tmpval) And IsNumeric(tmpval2) Then
             num1 = CSng(tmpval)
             num2 = CSng(tmpval2)
@@ -943,12 +935,14 @@ ParseFixedDef:
             Case "eof" : If ScriptEndOfData() Then retval = "1" Else retval = "0"
             Case "eol" : If ColDefs(0).StartCol + CurrentRepeat * ColDefs(0).ColWidth >= LenCurrentLine Then retval = "1" Else retval = "0"
             Case Else
-                retval = ScriptState.ItemByKey(MyString)
+                Dim lScriptStateIndex As Integer = ScriptState.IndexFromKey(MyString)
+                If lScriptStateIndex > -1 Then
+                    retval = ScriptState.ItemByIndex(lScriptStateIndex)
+                Else
+                    retval = FindColumnValue()
+                End If
         End Select
-        If retval = MyString Then
-            retval = FindColumnValue()
-        End If
-        GetVariable = retval
+        Return retval
     End Function
 
     'UPGRADE_NOTE: str was upgraded to str_Renamed. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'

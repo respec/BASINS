@@ -52,26 +52,42 @@ Module modATCscript
     Private Const DefaultScenario As String = "ScriptRead"
     Private pTserFile As atcTimeseriesSource
     Private pDataFilename As String
-    Private pTserData As atcTimeseriesGroup
 
-    Private Structure InputBuffer
-        Dim DateCount As Integer
-        Dim DateDim As Integer
-        Dim DateArray() As Double
-        Dim ValueArray() As Double
-        Dim FlagArray() As Integer
-    End Structure
+    Private Class InputBuffer
+        Public DateCount As Integer = 0
+        Public DateDim As Integer = 0
+        Public DateArray() As Double
+        Public ValueArray() As Double
+        Public FlagArray() As Integer
+        Public ts As atcTimeseries
 
-    Private InBuf() As InputBuffer
-    Private CurBuf As Integer
+        Public Sub New()
+            ReDim DateArray(0)
+            ReDim ValueArray(0)
+            ReDim FlagArray(0)
+
+            ts = New atcData.atcTimeseries(pTserFile)
+            With ts
+                .Attributes.SetValue("Description", pDataFilename)
+                .Attributes.SetValue("Scenario", DefaultScenario)
+                .Attributes.SetValue("FileImported", pDataFilename)
+                .Dates = New atcData.atcTimeseries(pTserFile)
+            End With
+        End Sub
+    End Class
+
+    'Private InBuf() As InputBuffer
+    Private InBuf As List(Of InputBuffer)
+    Private CurBuf As InputBuffer
 
     Private pMonitor As Object
     Private pMonitorSet As Boolean
 
     Private Sub ScriptInit()
-        ReDim InBuf(0)
+        'ReDim InBuf(0)
+        InBuf = New List(Of InputBuffer)
 
-        pTserData = New atcTimeseriesGroup
+        'pTserData = New atcTimeseriesGroup
         AddNewTserAndBuffer()
 
         ScriptState = New atcCollection
@@ -153,7 +169,7 @@ Module modATCscript
                     End If
                 End If
             End If
-            CurrentLineNum = CurrentLineNum + 1
+            CurrentLineNum += 1
         Loop While Len(Trim(CurrentLine)) = 0
         If pMonitorSet Then
             percent = 100 * NextLineStart / LenDataFile 'Loc = 128 * bytes read for sequential file
@@ -173,7 +189,7 @@ Module modATCscript
     End Sub
 
     Public Function ScriptSetDate(ByRef jdy As Double) As Double
-        With InBuf(CurBuf)
+        With CurBuf
             .DateCount = .DateCount + 1
             If .DateCount > .DateDim Then
                 .DateDim = .DateCount * 2
@@ -189,14 +205,14 @@ Module modATCscript
     End Function
 
     Public Function ScriptSetValue(ByRef newValue As Single) As Single
-        InBuf(CurBuf).ValueArray(InBuf(CurBuf).DateCount) = newValue
+        CurBuf.ValueArray(CurBuf.DateCount) = newValue
         ScriptSetValue = newValue
-        If DebuggingScript Then DebugScriptForm.NewValue(InBuf(CurBuf).DateCount, newValue)
+        If DebuggingScript Then DebugScriptForm.NewValue(CurBuf.DateCount, newValue)
         'Debug.Print " Value " & pDateCount & "=" & newValue
     End Function
 
     Public Function ScriptSetFlag(ByRef newValue As Integer) As Integer
-        InBuf(CurBuf).FlagArray(InBuf(CurBuf).DateCount) = newValue
+        CurBuf.FlagArray(CurBuf.DateCount) = newValue
         ScriptSetFlag = newValue
         'Debug.Print " Flag " & pDateCount & "=" & newValue
     End Function
@@ -221,8 +237,8 @@ Module modATCscript
                     End If
                 End If
             Case Else : On Error Resume Next
-                ScriptState.Remove(VarName)
-                ScriptState.Add(newValue, VarName)
+                ScriptState.RemoveByKey(VarName)
+                ScriptState.Add(VarName, newValue)
         End Select
     End Function
 
@@ -233,60 +249,15 @@ Module modATCscript
     End Function
 
     Public Sub ScriptSetDataset(ByRef index As Integer)
-        While index > pTserData.Count()
+        While index > InBuf.Count()
             AddNewTserAndBuffer()
         End While
-        CurBuf = index
+        CurBuf = InBuf.Item(index - 1)
     End Sub
 
     Private Sub AddNewTserAndBuffer()
-        'Dim newts As ATCclsTserData
-        'newts = New ATCclsTserData
-        ''Set newts = New ATCclsTserData
-        'newts.Header.desc = pDataFilename
-        'newts.Header.Sen = DefaultScenario
-        'newts.Dates = New ATCclsTserDate
-        'newts.AttribSet("FileImported", pDataFilename)
-
-        'pTserData.Add(newts)
-
-        'ReDim Preserve InBuf(UBound(InBuf) + 1)
-        'CurBuf = UBound(InBuf)
-        'InBuf(CurBuf).DateCount = 0
-        'InBuf(CurBuf).DateDim = 0
-        'ReDim InBuf(CurBuf).DateArray(0)
-        'ReDim InBuf(CurBuf).ValueArray(0)
-        'ReDim InBuf(CurBuf).FlagArray(0)
-
-        'Dim lExisting As Boolean = False
-        'For Each lTS As atcData.atcTimeseries In pTserData
-        '    If lTS.Attributes.GetValue("Description").Trim.ToLower = pDataFilename.Trim.ToLower Then
-        '        If lTS.Attributes.GetValue("Scenario").Trim.ToLower = DefaultScenario.Trim.ToLower Then
-        '            If lTS.Attributes.GetValue("FileImported").Trim.ToLower = pDataFilename.Trim.ToLower Then
-        '                lExisting = True
-        '            End If
-        '        End If
-        '    End If
-        'Next
-
-        'If Not lExisting Then
-        Dim lnewTS As New atcData.atcTimeseries(pTserFile)
-        With lnewTS
-            .Attributes.SetValue("Description", pDataFilename)
-            .Attributes.SetValue("Scenario", DefaultScenario)
-            .Attributes.SetValue("FileImported", pDataFilename)
-            .Dates = New atcData.atcTimeseries(pTserFile)
-        End With
-        pTserData.Add(lnewTS)
-        'End If
-
-        ReDim Preserve InBuf(UBound(InBuf) + 1)
-        CurBuf = UBound(InBuf)
-        InBuf(CurBuf).DateCount = 0
-        InBuf(CurBuf).DateDim = 0
-        ReDim InBuf(CurBuf).DateArray(0)
-        ReDim InBuf(CurBuf).ValueArray(0)
-        ReDim InBuf(CurBuf).FlagArray(0)
+        CurBuf = New InputBuffer
+        InBuf.Add(CurBuf)
     End Sub
 
     Public Sub ScriptManageDataset(ByRef cmd As String, Optional ByRef AttrName As String = "", Optional ByRef attrValue As String = "")
@@ -307,14 +278,14 @@ Module modATCscript
             Case "matchcriteria"
                 tserNum = 0
                 MisMatch = True
-                While tserNum < pTserData.Count() And MisMatch
+                While tserNum < InBuf.Count() And MisMatch
                     MisMatch = False
                     attrNum = 0
                     While attrNum < NumAttribs And Not MisMatch
                         attrNum = attrNum + 1
                         AttrName = AttrNames(attrNum)
                         attrValue = AttrValues(attrNum)
-                        With pTserData.Item(tserNum).Attributes
+                        With InBuf(tserNum).ts.Attributes
                             Select Case LCase(AttrName)
                                 Case "con", "cons", "constituent"
                                     If .ContainsAttribute("Constituent") Then
@@ -347,7 +318,7 @@ Module modATCscript
                 If MisMatch Then
                     AddNewTserAndBuffer()
                 Else
-                    CurBuf = tserNum
+                    CurBuf = InBuf.Item(tserNum)
                 End If
                 For attrNum = 1 To NumAttribs 'In case some "Matching" values were default or blank, explicitly set them
                     ScriptSetAttribute(AttrNames(attrNum), AttrValues(attrNum))
@@ -360,10 +331,10 @@ Module modATCscript
 
 
     Public Sub ScriptSetAttribute(ByRef AttrName As String, ByRef newValue As String)
-        If pTserData.Count = 0 Then
+        If InBuf.Count = 0 Then
             Exit Sub
         End If
-        With pTserData.ItemByIndex(CurBuf).Attributes
+        With CurBuf.ts.Attributes
             Select Case LCase(AttrName)
                 Case "con", "cons", "constituent"
                     .SetValue("Constituent", newValue)
@@ -432,18 +403,14 @@ Module modATCscript
         Return Nothing
     End Function
 
-    Public Function ScriptOpenDataFile(ByRef aDataFilename As String) As String
+    Public Function ScriptOpenDataFile(ByVal aDataFilename As String) As String
         If IO.File.Exists(aDataFilename) Then
             Try
-                Dim DataFile As Short 'File handle for data file being read
-                DataFile = FreeFile()
-                FileOpen(DataFile, aDataFilename, OpenMode.Input)
-                LenDataFile = LOF(DataFile)
-                WholeDataFile = InputString(DataFile, LenDataFile)
+                WholeDataFile = IO.File.ReadAllText(aDataFilename)
+                LenDataFile = WholeDataFile.Length
                 CurrentLine = Left(WholeDataFile, 1000)
                 LenCurrentLine = 0
                 NextLineStart = 1
-                FileClose(DataFile)
                 Return "OK"
             Catch ex As Exception
                 Return "Error opening data file: " & aDataFilename & vbCr & Err.Description
@@ -478,7 +445,7 @@ Module modATCscript
 
     Public Function ScriptRun(ByRef Script As clsATCscriptExpression, ByRef DataFilename As String, ByRef TserFile As atcTimeseriesSource) As String
         Dim msg As String
-        'Dim tmpData As ATCclsTserData
+        Dim tmpData As atcTimeseries
         pDataFilename = DataFilename
         pTserFile = TserFile
 
@@ -499,43 +466,31 @@ Module modATCscript
             If DebuggingScript Then
                 DebugScriptForm = New frmDebugScript
                 DebugScriptForm.ShowScript(Script)
-                'DebugScriptForm.Show 'vbModal 'FIXME vbModal conflict between GenScn and WDMUtil?
             End If
             TestingFile = False
             ScriptRun = Script.Evaluate
 
             If Not AbortScript Then
-                For CurBuf As Integer = 1 To UBound(InBuf)
-                    With InBuf(CurBuf)
+                For Each lBuffer As InputBuffer In InBuf
+                    With lBuffer
                         If .DateCount > 0 Then
                             If .DateDim > .DateCount Then
                                 ReDim Preserve .DateArray(.DateCount)
                                 ReDim Preserve .ValueArray(.DateCount)
                                 ReDim Preserve .FlagArray(.DateCount)
                             End If
-                            ''UPGRADE_WARNING: Couldn't resolve default property of object pTserData(CurBuf).Values. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                            'pTserData.Item(CurBuf).Values = VB6.CopyArray(.ValueArray)
-                            ''UPGRADE_WARNING: Couldn't resolve default property of object pTserData(CurBuf).flags. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                            'pTserData.Item(CurBuf).flags = VB6.CopyArray(.FlagArray)
-                            ''UPGRADE_WARNING: Couldn't resolve default property of object pTserData(CurBuf).Dates. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                            'pTserData.Item(CurBuf).Dates.Values = VB6.CopyArray(.DateArray)
+                            .ts.Values = .ValueArray
+                            'TODO: import flags if any as ValueAttributes: pTserData.Item(CurBuf).flags = .FlagArray
+                            .ts.Dates.Values = .DateArray
 
-                            ''UPGRADE_WARNING: Couldn't resolve default property of object pTserData().Dates. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                            'pTserData.Item(CurBuf).Dates.calcSummary()
-                            ''UPGRADE_WARNING: Couldn't resolve default property of object pTserData().calcSummary. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                            'pTserData.Item(CurBuf).calcSummary()
-                            ''UPGRADE_WARNING: Couldn't resolve default property of object pTserData().Header. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                            'pTserData.Item(CurBuf).Header.id = CurBuf
-                            'If FillTS > 0 Then
-                            '	'UPGRADE_WARNING: Couldn't resolve default property of object pTserData().FillValues. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                            '	tmpData = pTserData.Item(CurBuf).FillValues(FillTS, FillTU, FillVal, FillMissing, FillAccum)
-                            '	pTserFile.AddTimSer(tmpData)
-                            '	'UPGRADE_NOTE: Object tmpData may not be destroyed until it is garbage collected. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6E35BFF6-CD74-4B09-9689-3E1A43DF8969"'
-                            '	tmpData = Nothing
-                            'Else
-                            '	'UPGRADE_WARNING: Couldn't resolve default property of object pTserData(). Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                            '	pTserFile.AddTimSer(pTserData.Item(CurBuf), ATCDataTypes.ATCTsIdExistAction.TsIdRenum)
-                            'End If
+                            If FillTS > 0 Then
+                                tmpData = FillValues(.ts, FillTU, FillTS, FillVal, FillMissing, FillAccum)
+                                pTserFile.AddDataSet(tmpData)
+                                tmpData = Nothing
+                            Else
+                                pTserFile.AddDataSet(.ts, atcDataSource.EnumExistAction.ExistRenumber)
+                            End If
+                            pTserFile.DataSets(pTserFile.DataSets.Count - 1).Attributes.SetValue("ID", pTserFile.DataSets.Count)
                         End If
                     End With
                 Next

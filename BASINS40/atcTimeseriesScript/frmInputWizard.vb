@@ -634,9 +634,9 @@ Friend Class frmInputWizard
         Dim SubExpIndex, ColIndex, SubExpMax As Integer
         Dim ColName, tmpstr, ColCol As String
         Dim StartCol, ColWidth As Integer
-        Dim colonPos, caretPos, dollarPos, r As Integer
+        Dim colonPos, r As Integer
         ColIndex = 1
-        rule = scr.SubExpression(0).Printable
+        rule = scr.SubExpression(0).Printable.Trim("""")
         InitDataMapping()
 
         FixedColumns = False
@@ -656,7 +656,9 @@ Friend Class frmInputWizard
                         Case 65 : StartCol = 91
                         Case 97 : StartCol = 123
                     End Select
-                    If InStr(lrule, Chr(StartCol)) > 0 Then ColumnDelimiter = ColumnDelimiter & Chr(StartCol)
+                    If InStr(lrule, Chr(StartCol)) > 0 Then
+                        ColumnDelimiter = ColumnDelimiter & Chr(StartCol)
+                    End If
                 Next StartCol
                 NumColumnDelimiters = Len(ColumnDelimiter)
             End If
@@ -713,7 +715,8 @@ ParseFixedDef:
             optDelimiter_CheckedChanged(optDelimiterTab, New System.EventArgs())
         Else
             txtDelimiter.Text = ColumnDelimiter
-            optDelimiter_CheckedChanged(optDelimiterChar, New System.EventArgs())
+            optDelimiterChar.Checked = True
+            'optDelimiter_CheckedChanged(optDelimiterChar, New System.EventArgs())
         End If
         'agdDataMapping.ColsSizeByContents() 
         'agdDataMapping.SizeColumnToContents() 'TODO: this seems to be the replacement of line above?? Apply to all columns?
@@ -929,7 +932,7 @@ ParseFixedDef:
     End Function
 
     Private Function ScriptStringFromWizard() As String
-        'UPGRADE_NOTE: str was upgraded to str_Renamed. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
+        'UPGRADE_NOTE: str was upgraded to str_Renamed. 
         Dim tmpstr, str_Renamed, tmpstr2 As String
         Dim ParsePos As Integer
         Dim indent, indentIncrement As Integer
@@ -1647,8 +1650,10 @@ exitsub:
     End Sub
 
     Private Sub PopulateSample()
-        If fraColSample.Visible Then PopulateGridSample()
-        If fraTextSample.Visible Then PopulateTxtSample()
+        'If fraColSample.Visible Then PopulateGridSample()
+        'If fraTextSample.Visible Then PopulateTxtSample()
+        PopulateGridSample()
+        PopulateTxtSample()
     End Sub
 
     Private Sub optLineEnd_CheckedChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles optLineEndCRLF.CheckedChanged, optLineEndLF.CheckedChanged, optLineEndASCII.CheckedChanged, optLineEndLength.CheckedChanged
