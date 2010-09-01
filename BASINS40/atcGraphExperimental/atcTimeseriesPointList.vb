@@ -22,7 +22,7 @@ Public Class atcTimeseriesPointList
                 pValues.Value(lIndexNew) = lValue
                 Dim lDate As Double = aTimeseries.Dates.Value(lIndex)
                 pDates.Value(lIndexNew) = lDate
-                If lIndex > 0 AndAlso Double.IsNaN(lValue) Then
+                If lIndex > 0 AndAlso lIndex < aTimeseries.numValues AndAlso Double.IsNaN(lValue) Then
                     lIndexNew += 1
                     pValues.Value(lIndexNew) = aTimeseries.Value(lIndex + 1)
                     pDates.Value(lIndexNew) = lDate

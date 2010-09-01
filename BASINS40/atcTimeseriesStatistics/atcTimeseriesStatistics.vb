@@ -69,6 +69,8 @@ Public Class atcTimeseriesStatistics
 
                 AddOperation("Count Missing", "Count of values that are undefined", defTimeSeriesOne, lCategory, "Integer", 0)
 
+                AddOperation("Point", "True for sparse data", defTimeSeriesOne, lCategory, "Boolean", False)
+
                 AddOperation("Start Date", "Starting Julian Date", defTimeSeriesOne, lCategory, "Double", pNaN)
 
                 AddOperation("End Date", "Ending Julian Date", defTimeSeriesOne, lCategory, "Double", pNaN)
@@ -242,6 +244,7 @@ Public Class atcTimeseriesStatistics
             aTimeseries.Attributes.SetValue("Count", CInt(lCount))
             aTimeseries.Attributes.SetValue("Count Positive", CInt(lCountPositive))
             aTimeseries.Attributes.SetValue("Count Missing", CInt(lLastValueIndex - lCount))
+            aTimeseries.Attributes.SetValue("Point", (lLastValueIndex - lCount > lLastValueIndex * 0.75))
             aTimeseries.Attributes.SetValue("Count Zero", lCountZero)
             If lCount > 0 Then
                 aTimeseries.Attributes.SetValue("Last", aTimeseries.Value(lLastValueIndex))
