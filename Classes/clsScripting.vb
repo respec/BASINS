@@ -154,23 +154,14 @@ Public Class Scripting
 
         params = New System.CodeDom.Compiler.CompilerParameters
 
-        'CDM April 04 2006; Revised June 16 2006 to check for existence of MapWinX vs. MapWinGeoProc
-        'Force adding MapWinX or MapWinGeoProc (whichever is available, depending on version of MW)
-        'into the list of referenced assemblies, whether used or not.... Only 100K of memory lost
-        'thereabouts, pointed out by Sera Whyte (Only way to avoid ambiguous reference when it 
-        'tries to determine its location, due to other plug-ins referencing it.)
-        If System.IO.File.Exists(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\MapWinX.dll") Then
-            params.ReferencedAssemblies.Add(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\MapWinX.dll")
-        End If
-        If System.IO.File.Exists(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\MapWinGeoProc.dll") Then
-            params.ReferencedAssemblies.Add(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\MapWinGeoProc.dll")
-        End If
-
-        'force MapWinUtility too (JLK&MG 5/3/2006)
-        params.ReferencedAssemblies.Add(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\MapWinUtility.dll")
-
-        'force MapWinInterfaces too (JLK 3/13/2009)
-        params.ReferencedAssemblies.Add(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\MapWinInterfaces.dll")
+        'jlk&mg - 2010/09 - explicitly load assemblies that scripts are likely to need
+        Dim lAssemblyNames() As String = {"MapWinGeoProc", "MapWinUtility", "MapWinInterfaces", "Zedgraph"}
+        For Each lAssemblyName As String In lAssemblyNames
+            Dim lAssemblyFileName As String = IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), lAssemblyName & ".dll")
+            If IO.File.Exists(lAssemblyFileName) Then
+                params.ReferencedAssemblies.Add(lAssemblyFileName)
+            End If
+        Next
 
         If aOutputFilename.Length = 0 Then
             params.GenerateInMemory = True      'Assembly is created in memory
@@ -188,9 +179,7 @@ Public Class Scripting
                 Case "mscorlib", _
                      "mwIdentifier", _
                      "TableEditor.mw", _
-                     "ChilkatDotNet", _
                      "MapWindow.resources", _
-                     "MapWinX", _
                      "MapWinGeoProc", _
                      "MapWinUtility", _
                      "ZedGraph", _
