@@ -67,7 +67,7 @@ ShowSelect:
                     Select Case .ButtonPressed
                         Case .cmdCancel.Text : Exit Function
                         Case .cmdRun.Text
-                            RunSelectedScript(lDefinitionFilename, aFileName)
+                            Return RunSelectedScript(lDefinitionFilename, aFileName)
                         Case .cmdTest.Text
                             DebuggingScript = True
                             RunSelectedScript(lDefinitionFilename, aFileName)
@@ -94,16 +94,18 @@ ShowSelect:
         End If
     End Function
 
-    Private Sub RunSelectedScript(ByVal aDefinitionFilename As String, ByVal aDataFilename As String)
+    Private Function RunSelectedScript(ByVal aDefinitionFilename As String, ByVal aDataFilename As String) As Boolean
         Dim Script As clsATCscriptExpression
 
         Script = ScriptFromString(WholeFileString(aDefinitionFilename))
         If Script Is Nothing Then
             MsgBox("Could not load script " & aDefinitionFilename & vbCr & Err.Description, vbExclamation, "Run Script")
+            Return False
         Else
             ScriptRun(Script, aDataFilename, Me)
+            Return (Me.DataSets.Count > 0)
         End If
-    End Sub
+    End Function
 
 
     'Private Function ScriptFileNames() As String(,)
