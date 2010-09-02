@@ -107,7 +107,9 @@ Public Class Scripting
                         Logger.Dbg("No Args")
                     Else
                         For Each lArg As Object In aArgs
-                            Logger.Dbg("Arg:" & lArg.GetType.ToString & ":<" & lArg.ToString & ">")
+                            If Not (lArg Is Nothing) Then
+                                Logger.Dbg("Arg:" & lArg.GetType.ToString & ":<" & lArg.ToString & ">")
+                            End If
                         Next
                     End If
                     Try
