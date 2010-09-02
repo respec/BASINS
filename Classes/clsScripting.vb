@@ -16,7 +16,7 @@
 '(which no longer exists) and some useful utility functions from Aqua Terra Consulting.
 '
 'Contributor(s): (Open source contributors should list themselves and their modifications here). 
-'
+'09/02/2010 - KW - Modified class to work with MW4 and MW6/DotSpatial
 '********************************************************************************************************
 
 Imports System.CodeDom.Compiler
@@ -34,27 +34,30 @@ Public Class Scripting
         End If
     End Sub
 
-    Public Shared Function Run(ByVal aLanguage As String, _
-                    ByVal aDLLfilename As String, _
-                    ByVal aCode As String, _
-                    ByRef aErrors As String, _
-                    ByVal aPlugIn As Boolean, _
-                    ByRef m_MapWin As Object, _
-                    ByVal ParamArray aArgs() As Object) As Object
+
+    'Broke out the run method into PrepareScript and Run
+    'No longer have to pass in a reference to the Mainform
+    'PrepareScript now returns an assembly.  Assembly can be
+    'loaded by the appropriate Plugin manager from the calling code
+    Public Shared Function PrepareScript(ByVal aLanguage As String, _
+                        ByVal aDLLfilename As String, _
+                        ByVal aCode As String, _
+                        ByRef aErrors As String, _
+                        ByVal aPluginFolder As String) As Assembly
+
 
         aErrors = "" 'No errors yet
         aLanguage = GetLanguageFromFilename(aLanguage)
         Dim assy As System.Reflection.Assembly
-        Dim assyTypes As Type() 'list of items within the assembly
 
-        Dim MethodName As String = "ScriptMain" 'Can't be MAIN or the C# compiler will have a heart attack.
+
 
         If aDLLfilename Is Nothing OrElse aDLLfilename.Length = 0 Then
-            aDLLfilename = MakeScriptName(m_MapWin.Plugins.PluginFolder)
+            aDLLfilename = MakeScriptName(aPluginFolder)
         End If
 
         RemoveByteOrderMarker(aCode)
-        
+
         If aLanguage = "dll" Then
             assy = System.Reflection.Assembly.LoadFrom(aCode)
         Else 'compile the code into an assembly
@@ -62,7 +65,7 @@ Public Class Scripting
                 If System.IO.File.Exists(aCode) Then
                     aCode = Strings.WholeFileString(aCode)
                 Else
-                    Dim lCodeFile As String = PathNameOnly(m_MapWin.Plugins.PluginFolder) & "\scripts\" & aCode
+                    Dim lCodeFile As String = PathNameOnly(aPluginFolder) & "\scripts\" & aCode
                     If System.IO.File.Exists(lCodeFile) Then
                         aCode = Strings.WholeFileString(lCodeFile)
                     End If
@@ -76,35 +79,50 @@ Public Class Scripting
 
         End If
 
+        Return assy
+
+
+    End Function
+
+
+    Public Shared Function Run(ByVal aAssembly As Assembly, _
+                    ByRef aErrors As String, _
+                    ByVal ParamArray aArgs() As Object) As Object
+
+        Dim assy As Assembly
+        assy = aAssembly
+
+        Dim MethodName As String = "ScriptMain" 'Can't be MAIN or the C# compiler will have a heart attack.
+
+        Dim assyTypes As Type() 'list of items within the assembly
+
         If aErrors Is Nothing OrElse aErrors.Length = 0 Then
-            If aPlugIn Then
-                m_MapWin.Plugins.AddFromFile(aDLLfilename)
-            Else
-                assyTypes = assy.GetTypes()
-                For Each typ As Type In assyTypes
-                    Dim scriptMethodInfo As MethodInfo = typ.GetMethod(MethodName)
-                    If Not scriptMethodInfo Is Nothing Then
-                        Logger.Dbg("Invoke:" & scriptMethodInfo.Name)
-                        If aArgs Is Nothing Then
-                            Logger.Dbg("No Args")
-                        Else
-                            For Each lArg As Object In aArgs
-                                Logger.Dbg("Arg:" & lArg.GetType.ToString & ":<" & lArg.ToString & ">")
-                            Next
-                        End If
-                        Try
-                            Return scriptMethodInfo.Invoke(Nothing, aArgs) 'assy.CreateInstance(typ.Name)
-                        Catch ex As Exception
-                            Logger.Dbg("Exception:" & ex.ToString)
-                            Return False
-                        End Try
-                        If Not scriptMethodInfo Is Nothing Then
-                            Return scriptMethodInfo.Invoke(Nothing, aArgs) 'assy.CreateInstance(typ.Name)
-                        End If
+
+            assyTypes = assy.GetTypes()
+            For Each typ As Type In assyTypes
+                Dim scriptMethodInfo As MethodInfo = typ.GetMethod(MethodName)
+                If Not scriptMethodInfo Is Nothing Then
+                    Logger.Dbg("Invoke:" & scriptMethodInfo.Name)
+                    If aArgs Is Nothing Then
+                        Logger.Dbg("No Args")
+                    Else
+                        For Each lArg As Object In aArgs
+                            Logger.Dbg("Arg:" & lArg.GetType.ToString & ":<" & lArg.ToString & ">")
+                        Next
                     End If
-                Next
-                aErrors = "Scripting.Run: '" & MethodName & "' not found"
-            End If
+                    Try
+                        Return scriptMethodInfo.Invoke(Nothing, aArgs) 'assy.CreateInstance(typ.Name)
+                    Catch ex As Exception
+                        Logger.Dbg("Exception:" & ex.ToString)
+                        Return False
+                    End Try
+                    If Not scriptMethodInfo Is Nothing Then
+                        Return scriptMethodInfo.Invoke(Nothing, aArgs) 'assy.CreateInstance(typ.Name)
+                    End If
+                End If
+            Next
+            aErrors = "Scripting.Run: '" & MethodName & "' not found"
+
         End If
         Return Nothing
     End Function
@@ -155,7 +173,10 @@ Public Class Scripting
         params = New System.CodeDom.Compiler.CompilerParameters
 
         'jlk&mg - 2010/09 - explicitly load assemblies that scripts are likely to need
-        Dim lAssemblyNames() As String = {"MapWinGeoProc", "MapWinUtility", "MapWinInterfaces", "Zedgraph"}
+        Dim lAssemblyNames() As String = {"MapWinGeoProc", "MapWinUtility", "MapWinInterfaces", "Zedgraph", _
+                                            "DotSpatial.Common", "DotSpatial.Data", "DotSpatial.Desktop", _
+                                            "DotSpatial.Projections", "DotSpatial.Topology"}
+
         For Each lAssemblyName As String In lAssemblyNames
             Dim lAssemblyFileName As String = IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), lAssemblyName & ".dll")
             If IO.File.Exists(lAssemblyFileName) Then
@@ -184,7 +205,8 @@ Public Class Scripting
                      "MapWinUtility", _
                      "ZedGraph", _
                      "MapWinInterfaces", _
-                     "log4net"
+                     "log4net", _
+                     "System.Windows.Forms.Ribbon35"
 
                 Case Else
                     'Chris M July 2006 -- Don't add 'RemoveMe' or resources with "" as the location.
