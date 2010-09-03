@@ -94,8 +94,8 @@ Public Class clsGraphProbability
                     .IsOutside = False
                     .IsCrossOutside = False
                 End With                
-                'Dim lProbScale As ProbabilityScale = .Scale
-                'lProbScale.standardDeviations = 5
+                Dim lProbScale As ProbabilityScale = .Scale
+                lProbScale.standardDeviations = 3
                 'lProbScale.LabelStyle = ProbabilityScale.ProbabilityLabelStyle.ReturnInterval
                 'lProbScale.IsReverse = True
             End If

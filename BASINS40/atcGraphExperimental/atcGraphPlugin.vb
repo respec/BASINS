@@ -1,4 +1,5 @@
 Imports atcData
+Imports atcUtility
 Imports MapWinUtility
 
 Public Class atcGraphPlugin
@@ -72,10 +73,34 @@ Public Class atcGraphPlugin
 
                 If lChooseForm.ShowDialog() = Windows.Forms.DialogResult.OK Then
                     'lDataGroup = lChooseForm.atcDataGroupDates.CreateSelectedDataGroupSubset
+
+                    Dim lTimeseriesGroups As New Collection
+                    If lChooseForm.cbxMultiple.Checked Then
+                        'need multiple wq plots, split ltimeseriesgroup into groups by constituent
+                        Dim lCons As New atcCollection
+                        For Each lTimSer As atcTimeseries In lTimeseriesGroup
+                            lCons.Add(lTimSer.Attributes.GetValue("Constituent"))
+                        Next
+                        For Each lCon As String In lCons
+                            Dim lGroup As New atcTimeseriesGroup
+                            For Each lTimSer As atcTimeseries In lTimeseriesGroup
+                                If lTimSer.Attributes.GetValue("Constituent") = lCon Then
+                                    lGroup.Add(lTimSer)
+                                End If
+                            Next
+                            lTimeseriesGroups.Add(lGroup)
+                        Next
+                    Else
+                        'regular case
+                        lTimeseriesGroups.Add(lTimeseriesGroup)
+                    End If
+
                     Dim lAllCheckedItemNames As String = ""
                     For Each lGraphTypeName As String In .CheckedItems
                         lAllCheckedItemNames &= lGraphTypeName & ","
-                        Me.Show(lTimeseriesGroup, lGraphTypeName)
+                        For Each lGroup As atcTimeseriesGroup In lTimeseriesGroups
+                            Me.Show(lGroup, lGraphTypeName)
+                        Next
                     Next
                     SaveSetting("BASINS4", "Graph", "ChooseGraphs", lAllCheckedItemNames)
                 End If

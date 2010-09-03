@@ -615,6 +615,12 @@ FoundMatch:
                 'Could not get good Minimum or Maximum value
             End Try
         Next
+
+        If lDataMin < -1.0E+20 Then
+            'assume there is a bad value in here
+            lDataMin = 0
+        End If
+
         Scalit(lDataMin, lDataMax, lLogFlag, aAxis.Scale.Min, aAxis.Scale.Max)
     End Sub
 

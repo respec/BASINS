@@ -21,6 +21,29 @@ Public Class clsGraphScatter
             If newValue.Count > 1 Then
                 Dim lTimeseriesX As atcTimeseries = newValue.ItemByIndex(0)
                 Dim lTimeseriesY As atcTimeseries = newValue.ItemByIndex(1)
+
+                'find common start and end dates
+                Dim lSJDay As Double
+                Dim lEJDay As Double
+                If lTimeseriesX.Dates.Values(0) < lTimeseriesY.Dates.Values(0) Then
+                    'y starts after x, use y start date
+                    lSJDay = lTimeseriesY.Dates.Values(0)
+                Else 'use x start date
+                    lSJDay = lTimeseriesX.Dates.Values(0)
+                End If
+                If lTimeseriesX.Dates.Values(lTimeseriesX.Dates.numValues) < lTimeseriesY.Dates.Values(lTimeseriesY.Dates.numValues) Then
+                    'x ends before y, use x end date
+                    lEJDay = lTimeseriesX.Dates.Values(lTimeseriesX.Dates.numValues)
+                Else 'use y end date
+                    lEJDay = lTimeseriesY.Dates.Values(lTimeseriesY.Dates.numValues)
+                End If
+
+                Dim lSubsetTimeseriesX As atcTimeseries = SubsetByDate(lTimeseriesX, lSJDay, lEJDay, Nothing)
+                Dim lSubsetTimeseriesY As atcTimeseries = SubsetByDate(lTimeseriesY, lSJDay, lEJDay, Nothing)
+                Dim lSubsetGroup As New atcTimeseriesGroup
+                lSubsetGroup.Add(lSubsetTimeseriesX)
+                lSubsetGroup.Add(lSubsetTimeseriesY)
+
                 Dim lPane As GraphPane = MyBase.pZgc.MasterPane.PaneList(0)
                 lPane.Legend.IsVisible = False
                 With lPane.XAxis
@@ -42,8 +65,8 @@ Public Class clsGraphScatter
                     'Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
                     Dim lCurveColor As Color = Color.Blue
                     Dim lCurve As LineItem = Nothing
-                    Dim lXValues() As Double = lTimeseriesX.Values
-                    Dim lYValues() As Double = lTimeseriesY.Values
+                    Dim lXValues() As Double = lSubsetTimeseriesX.Values
+                    Dim lYValues() As Double = lSubsetTimeseriesY.Values
                     Dim lSymbol As SymbolType
                     Dim lNPts As Integer = lXValues.GetUpperBound(0)
                     If lNPts < 100 Then
@@ -60,7 +83,7 @@ Public Class clsGraphScatter
                     lCurve.Line.IsVisible = False
                     lCurve.Tag = lTimeseriesY.ToString & " vs " & lTimeseriesX.ToString
                 End With
-                ScaleAxis(newValue, lPane.YAxis)
+                ScaleAxis(lSubsetGroup, lPane.YAxis)
                 lPane.XAxis.Scale.Min = lPane.YAxis.Scale.Min
                 lPane.XAxis.Scale.Max = lPane.YAxis.Scale.Max
             End If
@@ -71,12 +94,36 @@ Public Class clsGraphScatter
     Public Sub AddFitLine()
         '45 degree line
         Dim lPane As ZedGraph.GraphPane = pZgc.MasterPane.PaneList(0)
-        AddLine(lPane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "45DegLine")
+        Dim lLine As ZedGraph.LineItem = AddLine(lPane, 1, 0, Drawing.Drawing2D.DashStyle.Dot, "45DegLine")
+        lLine.Color = Color.Black
+
         'regression line 
         Dim lACoef As Double
         Dim lBCoef As Double
         Dim lRSquare As Double
-        FitLine(Datasets(1), Datasets(0), lACoef, lBCoef, lRSquare)
+
+        'use common period from the two datasets
+        Dim lSJDay As Double
+        Dim lEJDay As Double
+        Dim lTimeseriesX As atcTimeseries = Datasets(1)
+        Dim lTimeseriesY As atcTimeseries = Datasets(0)
+        If lTimeseriesX.Dates.Values(0) < lTimeseriesY.Dates.Values(0) Then
+            'y starts after x, use y start date
+            lSJDay = lTimeseriesY.Dates.Values(0)
+        Else 'use x start date
+            lSJDay = lTimeseriesX.Dates.Values(0)
+        End If
+        If lTimeseriesX.Dates.Values(lTimeseriesX.Dates.numValues) < lTimeseriesY.Dates.Values(lTimeseriesY.Dates.numValues) Then
+            'x ends before y, use x end date
+            lEJDay = lTimeseriesX.Dates.Values(lTimeseriesX.Dates.numValues)
+        Else 'use y end date
+            lEJDay = lTimeseriesY.Dates.Values(lTimeseriesY.Dates.numValues)
+        End If
+
+        Dim lSubsetTimeseriesX As atcTimeseries = SubsetByDate(lTimeseriesX, lSJDay, lEJDay, Nothing)
+        Dim lSubsetTimeseriesY As atcTimeseries = SubsetByDate(lTimeseriesY, lSJDay, lEJDay, Nothing)
+
+        FitLine(lSubsetTimeseriesX, lSubsetTimeseriesY, lACoef, lBCoef, lRSquare)
         AddLine(lPane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "RegLine")
         Dim lText As New TextObj
         Dim lFmt As String = "###,##0.###"
