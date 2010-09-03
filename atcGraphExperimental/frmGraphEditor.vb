@@ -97,8 +97,10 @@ Public Class frmGraphEditor
         Select Case pPane.XAxis.Type
             Case AxisType.Exponent, AxisType.Linear, AxisType.Log
                 grpLineEquation.Visible = True
+                grpRegression.Visible = True
             Case Else
                 grpLineEquation.Visible = False
+                grpRegression.Visible = False
         End Select
         chkLegendOutline.Checked = pPane.Legend.Border.IsVisible
         txtLegendFontColor.BackColor = pPane.Legend.FontSpec.FontColor
@@ -673,4 +675,10 @@ Public Class frmGraphEditor
         Return False
     End Function
 
+    Private Sub btnLineRegressionAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnLineRegressionAdd.Click
+        Dim lForm As atcGraphForm = pZgc.ParentForm
+        Dim lGrapher As clsGraphScatter = lForm.Grapher
+        lGrapher.AddFitLine()
+        AddedLineItem()
+    End Sub
 End Class

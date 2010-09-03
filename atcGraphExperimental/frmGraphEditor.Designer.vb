@@ -88,10 +88,8 @@ Partial Class frmGraphEditor
         Me.radioCurveYaxisRight = New System.Windows.Forms.RadioButton
         Me.radioCurveYaxisLeft = New System.Windows.Forms.RadioButton
         Me.tabLines = New System.Windows.Forms.TabPage
-        Me.grpLineXconstant = New System.Windows.Forms.GroupBox
-        Me.txtXconstant = New System.Windows.Forms.TextBox
-        Me.lblLineXconstant = New System.Windows.Forms.Label
-        Me.btnLineConstantXAdd = New System.Windows.Forms.Button
+        Me.grpRegression = New System.Windows.Forms.GroupBox
+        Me.btnLineRegressionAdd = New System.Windows.Forms.Button
         Me.grpLineYconstant = New System.Windows.Forms.GroupBox
         Me.lblLineYconstant = New System.Windows.Forms.Label
         Me.txtLineYconstant = New System.Windows.Forms.TextBox
@@ -118,7 +116,7 @@ Partial Class frmGraphEditor
         Me.panelAxisType.SuspendLayout()
         Me.tabCurves.SuspendLayout()
         Me.tabLines.SuspendLayout()
-        Me.grpLineXconstant.SuspendLayout()
+        Me.grpRegression.SuspendLayout()
         Me.grpLineYconstant.SuspendLayout()
         Me.grpLineEquation.SuspendLayout()
         Me.tabLegend.SuspendLayout()
@@ -835,7 +833,7 @@ Partial Class frmGraphEditor
         '
         'tabLines
         '
-        Me.tabLines.Controls.Add(Me.grpLineXconstant)
+        Me.tabLines.Controls.Add(Me.grpRegression)
         Me.tabLines.Controls.Add(Me.grpLineYconstant)
         Me.tabLines.Controls.Add(Me.grpLineEquation)
         Me.tabLines.Location = New System.Drawing.Point(4, 22)
@@ -845,46 +843,25 @@ Partial Class frmGraphEditor
         Me.tabLines.Text = "Lines"
         Me.tabLines.UseVisualStyleBackColor = True
         '
-        'grpLineXconstant
+        'grpRegression
         '
-        Me.grpLineXconstant.Controls.Add(Me.txtXconstant)
-        Me.grpLineXconstant.Controls.Add(Me.lblLineXconstant)
-        Me.grpLineXconstant.Controls.Add(Me.btnLineConstantXAdd)
-        Me.grpLineXconstant.Location = New System.Drawing.Point(3, 121)
-        Me.grpLineXconstant.Name = "grpLineXconstant"
-        Me.grpLineXconstant.Size = New System.Drawing.Size(301, 53)
-        Me.grpLineXconstant.TabIndex = 20
-        Me.grpLineXconstant.TabStop = False
-        Me.grpLineXconstant.Text = "Constant X"
-        Me.grpLineXconstant.Visible = False
+        Me.grpRegression.Controls.Add(Me.btnLineRegressionAdd)
+        Me.grpRegression.Location = New System.Drawing.Point(3, 121)
+        Me.grpRegression.Name = "grpRegression"
+        Me.grpRegression.Size = New System.Drawing.Size(301, 53)
+        Me.grpRegression.TabIndex = 20
+        Me.grpRegression.TabStop = False
+        Me.grpRegression.Text = "Regression"
         '
-        'txtXconstant
+        'btnLineRegressionAdd
         '
-        Me.txtXconstant.Location = New System.Drawing.Point(44, 19)
-        Me.txtXconstant.Name = "txtXconstant"
-        Me.txtXconstant.Size = New System.Drawing.Size(54, 20)
-        Me.txtXconstant.TabIndex = 15
-        Me.txtXconstant.Text = "1"
-        Me.txtXconstant.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'lblLineXconstant
-        '
-        Me.lblLineXconstant.AutoSize = True
-        Me.lblLineXconstant.Location = New System.Drawing.Point(6, 22)
-        Me.lblLineXconstant.Name = "lblLineXconstant"
-        Me.lblLineXconstant.Size = New System.Drawing.Size(23, 13)
-        Me.lblLineXconstant.TabIndex = 16
-        Me.lblLineXconstant.Text = "X ="
-        '
-        'btnLineConstantXAdd
-        '
-        Me.btnLineConstantXAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnLineConstantXAdd.Location = New System.Drawing.Point(220, 17)
-        Me.btnLineConstantXAdd.Name = "btnLineConstantXAdd"
-        Me.btnLineConstantXAdd.Size = New System.Drawing.Size(75, 23)
-        Me.btnLineConstantXAdd.TabIndex = 17
-        Me.btnLineConstantXAdd.Text = "Add"
-        Me.btnLineConstantXAdd.UseVisualStyleBackColor = True
+        Me.btnLineRegressionAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnLineRegressionAdd.Location = New System.Drawing.Point(220, 17)
+        Me.btnLineRegressionAdd.Name = "btnLineRegressionAdd"
+        Me.btnLineRegressionAdd.Size = New System.Drawing.Size(75, 23)
+        Me.btnLineRegressionAdd.TabIndex = 17
+        Me.btnLineRegressionAdd.Text = "Add"
+        Me.btnLineRegressionAdd.UseVisualStyleBackColor = True
         '
         'grpLineYconstant
         '
@@ -1118,8 +1095,7 @@ Partial Class frmGraphEditor
         Me.tabCurves.ResumeLayout(False)
         Me.tabCurves.PerformLayout()
         Me.tabLines.ResumeLayout(False)
-        Me.grpLineXconstant.ResumeLayout(False)
-        Me.grpLineXconstant.PerformLayout()
+        Me.grpRegression.ResumeLayout(False)
         Me.grpLineYconstant.ResumeLayout(False)
         Me.grpLineYconstant.PerformLayout()
         Me.grpLineEquation.ResumeLayout(False)
@@ -1176,16 +1152,14 @@ Partial Class frmGraphEditor
     Friend WithEvents txtLineAcoef As System.Windows.Forms.TextBox
     Friend WithEvents lblLineXplus As System.Windows.Forms.Label
     Friend WithEvents txtLineBcoef As System.Windows.Forms.TextBox
-    Private WithEvents btnLineConstantXAdd As System.Windows.Forms.Button
-    Friend WithEvents lblLineXconstant As System.Windows.Forms.Label
-    Friend WithEvents txtXconstant As System.Windows.Forms.TextBox
+    Private WithEvents btnLineRegressionAdd As System.Windows.Forms.Button
     Private WithEvents btnLineConstantYAdd As System.Windows.Forms.Button
     Friend WithEvents lblLineYconstant As System.Windows.Forms.Label
     Friend WithEvents txtLineYconstant As System.Windows.Forms.TextBox
     Private WithEvents btnLineEquationAdd As System.Windows.Forms.Button
     Friend WithEvents grpLineEquation As System.Windows.Forms.GroupBox
     Friend WithEvents grpLineYconstant As System.Windows.Forms.GroupBox
-    Friend WithEvents grpLineXconstant As System.Windows.Forms.GroupBox
+    Friend WithEvents grpRegression As System.Windows.Forms.GroupBox
     Friend WithEvents radioAxisRight As System.Windows.Forms.RadioButton
     Friend WithEvents radioAxisAux As System.Windows.Forms.RadioButton
     Friend WithEvents panelAxisType As System.Windows.Forms.Panel

@@ -28,6 +28,7 @@ Partial Class frmChooseGraphs
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.btnAll = New System.Windows.Forms.Button
         Me.btnNone = New System.Windows.Forms.Button
+        Me.cbxMultiple = New System.Windows.Forms.CheckBox
         Me.SuspendLayout()
         '
         'lstChooseGraphs
@@ -39,7 +40,7 @@ Partial Class frmChooseGraphs
         Me.lstChooseGraphs.IntegralHeight = False
         Me.lstChooseGraphs.Location = New System.Drawing.Point(12, 12)
         Me.lstChooseGraphs.Name = "lstChooseGraphs"
-        Me.lstChooseGraphs.Size = New System.Drawing.Size(316, 134)
+        Me.lstChooseGraphs.Size = New System.Drawing.Size(316, 131)
         Me.lstChooseGraphs.TabIndex = 0
         '
         'lblChooseGraphs
@@ -54,7 +55,7 @@ Partial Class frmChooseGraphs
         '
         Me.btnGenerate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnGenerate.DialogResult = System.Windows.Forms.DialogResult.OK
-        Me.btnGenerate.Location = New System.Drawing.Point(253, 152)
+        Me.btnGenerate.Location = New System.Drawing.Point(253, 171)
         Me.btnGenerate.Name = "btnGenerate"
         Me.btnGenerate.Size = New System.Drawing.Size(75, 23)
         Me.btnGenerate.TabIndex = 4
@@ -65,7 +66,7 @@ Partial Class frmChooseGraphs
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(172, 152)
+        Me.btnCancel.Location = New System.Drawing.Point(172, 171)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(75, 23)
         Me.btnCancel.TabIndex = 3
@@ -75,7 +76,7 @@ Partial Class frmChooseGraphs
         'btnAll
         '
         Me.btnAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnAll.Location = New System.Drawing.Point(12, 152)
+        Me.btnAll.Location = New System.Drawing.Point(12, 171)
         Me.btnAll.Name = "btnAll"
         Me.btnAll.Size = New System.Drawing.Size(61, 23)
         Me.btnAll.TabIndex = 1
@@ -85,12 +86,23 @@ Partial Class frmChooseGraphs
         'btnNone
         '
         Me.btnNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnNone.Location = New System.Drawing.Point(79, 152)
+        Me.btnNone.Location = New System.Drawing.Point(79, 171)
         Me.btnNone.Name = "btnNone"
         Me.btnNone.Size = New System.Drawing.Size(61, 23)
         Me.btnNone.TabIndex = 2
         Me.btnNone.Text = "None"
         Me.btnNone.UseVisualStyleBackColor = True
+        '
+        'cbxMultiple
+        '
+        Me.cbxMultiple.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cbxMultiple.AutoSize = True
+        Me.cbxMultiple.Location = New System.Drawing.Point(192, 149)
+        Me.cbxMultiple.Name = "cbxMultiple"
+        Me.cbxMultiple.Size = New System.Drawing.Size(110, 17)
+        Me.cbxMultiple.TabIndex = 5
+        Me.cbxMultiple.Text = "Multiple WQ Plots"
+        Me.cbxMultiple.UseVisualStyleBackColor = True
         '
         'frmChooseGraphs
         '
@@ -98,7 +110,8 @@ Partial Class frmChooseGraphs
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(340, 187)
+        Me.ClientSize = New System.Drawing.Size(340, 206)
+        Me.Controls.Add(Me.cbxMultiple)
         Me.Controls.Add(Me.btnNone)
         Me.Controls.Add(Me.btnAll)
         Me.Controls.Add(Me.btnCancel)
@@ -119,4 +132,5 @@ Partial Class frmChooseGraphs
     Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
     Friend WithEvents btnAll As System.Windows.Forms.Button
     Friend WithEvents btnNone As System.Windows.Forms.Button
+    Friend WithEvents cbxMultiple As System.Windows.Forms.CheckBox
 End Class
