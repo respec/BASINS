@@ -788,8 +788,7 @@ NextOldVal:
             Dim lDate(5) As Integer
             If aTSer.Dates.Value(0) <= 0 OrElse Double.IsNaN(aTSer.Dates.Value(0)) Then
                 If aTSer.Attributes.ContainsAttribute("tu") Then
-                    J2Date(aTSer.Dates.Value(1), lDate)
-                    TIMADD(lDate, aTSer.Attributes.GetValue("tu"), aTSer.Attributes.GetValue("ts", 1), -1, lDate)
+                    J2Date(TimAddJ(aTSer.Dates.Value(1), aTSer.Attributes.GetValue("tu"), aTSer.Attributes.GetValue("ts", 1), -1), lDate)
                 ElseIf aTSer.numValues > 1 Then
                     J2Date(aTSer.Dates.Value(1) - (aTSer.Dates.Value(2) - aTSer.Dates.Value(1)), lDate)
                 End If
@@ -844,32 +843,11 @@ NextOldVal:
     Public Function NewDates(ByVal aStartDate As Double, ByVal aEndDate As Double, ByVal aTU As atcTimeUnit, ByVal aTS As Integer) As Double()
         Dim lNewDates(0) As Double
         If aTU >= atcTimeUnit.TUSecond AndAlso aTU <= atcTimeUnit.TUCentury Then
-            Dim lIntvl As Double
-            Dim lNewNumDates As Integer
-            Dim lDate(5) As Integer
-            Dim lSDate(5) As Integer
-
-            'get interval of new TSer
-            Select Case aTU
-                Case atcTimeUnit.TUSecond : lIntvl = aTS * JulianSecond
-                Case atcTimeUnit.TUMinute : lIntvl = aTS * JulianMinute
-                Case atcTimeUnit.TUHour : lIntvl = aTS * JulianHour
-                Case atcTimeUnit.TUDay : lIntvl = aTS
-                Case atcTimeUnit.TUMonth : lIntvl = aTS * 30.44
-                Case atcTimeUnit.TUYear : lIntvl = aTS * 365.25
-                Case atcTimeUnit.TUCentury : lIntvl = aTS * 36525
-            End Select
-            lNewNumDates = CInt((aEndDate - aStartDate) / lIntvl)
+            Dim lNewNumDates As Integer = timdifJ(aStartDate, aEndDate, aTU, aTS)
             ReDim lNewDates(lNewNumDates)
             lNewDates(0) = aStartDate
-            If aTU > modDate.atcTimeUnit.TUDay Then J2Date(aStartDate, lSDate) 'will need start date array
             For i As Integer = 1 To lNewNumDates
-                If aTU > modDate.atcTimeUnit.TUDay Then 'need to use special TIMADD function for varying length intervals (month, year)
-                    TIMADD(lSDate, aTU, aTS, i, lDate)
-                    lNewDates(i) = Date2J(lDate)
-                Else
-                    lNewDates(i) = aStartDate + lIntvl * i
-                End If
+                lNewDates(i) = TimAddJ(aStartDate, aTU, aTS, i)
             Next
         End If
         Return lNewDates
