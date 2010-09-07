@@ -63,7 +63,7 @@ Public Class PlugIn
             Logger.Dbg(lProblem)
         End Try
 
-        If Len(lProblem) = 0 Then
+        If lProblem.Length = 0 Then
             Try
                 lArgs(1) = GisUtil.FieldIndex(lAreaLayerIndex, aAreaIDFieldName)
             Catch
@@ -72,7 +72,7 @@ Public Class PlugIn
             End Try
         End If
 
-        If Len(lProblem) = 0 Then
+        If lProblem.Length = 0 Then
             Try
                 lArgs(2) = GisUtil.FieldIndex(lAreaLayerIndex, aAreaNameFieldName)
             Catch
@@ -81,7 +81,7 @@ Public Class PlugIn
             End Try
         End If
 
-        If Len(lProblem) = 0 Then
+        If lProblem.Length = 0 Then
             'are any areas selected?
             Dim cSelectedAreaIndexes As New Collection
             For i = 1 To GisUtil.NumSelectedFeatures(lAreaLayerIndex)
@@ -98,7 +98,10 @@ Public Class PlugIn
 
             'now run script
             'Return ListedSegmentsTable.ScriptMain(lArgs(0), lArgs(1), lArgs(2), lArgs(3))
-            BuildReport = Scripting.Run("vb", "", Reports(aReportIndex), lProblem, False, (pMapWin), lArgs)
+            Dim lAssembly As System.Reflection.Assembly = Scripting.PrepareScript("vb", Nothing, Reports(aReportIndex), lProblem, "")
+            If lProblem.Length = 0 Then
+                BuildReport = Scripting.Run(lAssembly, lProblem, lArgs)
+            End If
         End If
         If lProblem.Length > 0 Then
             BuildReport = "Error: " & lProblem
