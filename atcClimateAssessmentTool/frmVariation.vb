@@ -973,7 +973,10 @@ Imports MapWinUtility
                     SaveSetting("BASINS4", "Scenario", "ScriptFilename", .FileName)
                     Dim lErrors As String = ""
                     Try
-                        pVariation = Scripting.Run(FileExt(.FileName), "", .FileName, lErrors, False, (g_MapWin), lVariationTemplate)
+                        Dim lAssembly As System.Reflection.Assembly = Scripting.PrepareScript(FileExt(.FileName), Nothing, .FileName, lErrors, "")
+                        If lErrors.Length = 0 Then
+                            pVariation = Scripting.Run(lAssembly, lErrors, lVariationTemplate)
+                        End If
                     Catch ex As Exception
                         If lErrors.Length > 0 Then lErrors &= vbCrLf & vbCrLf
                         lErrors &= ex.Message
