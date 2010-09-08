@@ -188,6 +188,7 @@ Public Class Scripting
 
         If aOutputFilename.Length = 0 Then
             params.GenerateInMemory = True      'Assembly is created in memory
+            params.GenerateExecutable = False
         Else
             params.OutputAssembly = aOutputFilename
         End If
