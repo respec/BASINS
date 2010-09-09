@@ -31,7 +31,7 @@ Friend Class frmModelSegmentation
                 'change to hourglass cursor
                 Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
 
-                ModelSegmentationPlugIn.AssignMetStationsByProximity(lSubbasinLayerName, lMetLayerName, cbxUseSelected.Checked)
+                PlugIn.AssignMetStationsByProximity(lSubbasinLayerName, lMetLayerName, cbxUseSelected.Checked)
                 RaiseEvent TableEdited()
             End If
         End If
@@ -110,7 +110,7 @@ Friend Class frmModelSegmentation
     Private Sub cmdEditTable_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdEditTable.Click
         Dim lSubbasinLayerName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
         Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(lSubbasinLayerName)
-        Dim lModelSegFieldIndex As Integer = ModelSegmentationPlugIn.MetSegFieldIndex(lSubbasinLayerIndex)  'add field if is does not yet exist
+        Dim lModelSegFieldIndex As Integer = PlugIn.MetSegFieldIndex(lSubbasinLayerIndex)  'add field if is does not yet exist
 
         If lSubbasinLayerName <> pSubbasinLayerNameUserPrompt Then
             RaiseEvent OpenTableEditor(lSubbasinLayerName)
@@ -124,7 +124,7 @@ Friend Class frmModelSegmentation
             Logger.Msg(pSubbasinLayerNameUserPrompt, MsgBoxStyle.Critical, "BASINS Model Segmentation")
         Else
             Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(lSubbasinLayerName)
-            Dim lModelSegFieldIndex As Integer = ModelSegmentationPlugIn.MetSegFieldIndex(lSubbasinLayerIndex)
+            Dim lModelSegFieldIndex As Integer = PlugIn.MetSegFieldIndex(lSubbasinLayerIndex)
 
             'save original coloring scheme in case we want to return to it
             'TODO: figure out why this returns Nothing - does not store OutlineColor, etc?
