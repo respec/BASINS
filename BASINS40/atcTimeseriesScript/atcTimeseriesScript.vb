@@ -94,12 +94,12 @@ ShowSelect:
         End If
     End Function
 
-    Private Function RunSelectedScript(ByVal aDefinitionFilename As String, ByVal aDataFilename As String) As Boolean
+    Public Function RunSelectedScript(ByVal aDefinitionFilename As String, ByVal aDataFilename As String) As Boolean
         Dim Script As clsATCscriptExpression
 
         Script = ScriptFromString(WholeFileString(aDefinitionFilename))
         If Script Is Nothing Then
-            MsgBox("Could not load script " & aDefinitionFilename & vbCr & Err.Description, vbExclamation, "Run Script")
+            Logger.Msg("Could not load script " & aDefinitionFilename & vbCr & Err.Description, vbExclamation, "Run Script")
             Return False
         Else
             ScriptRun(Script, aDataFilename, Me)
