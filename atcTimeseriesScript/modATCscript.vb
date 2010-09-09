@@ -4,10 +4,10 @@ Option Explicit On
 Imports atcUtility
 Imports atcData
 
-Module modATCscript
+Friend Module modATCscript
     'Copyright 2002 by AQUA TERRA Consultants
 
-    Public DebugScriptForm As frmDebugScript
+    Friend DebugScriptForm As frmDebugScript
     Public ScriptState As atcCollection 'of variable names (as keys) and values
     Public WholeDataFile As String 'Contains entire contents of data file
     Public LenDataFile As Integer
@@ -482,15 +482,23 @@ Module modATCscript
                             .ts.Values = .ValueArray
                             'TODO: import flags if any as ValueAttributes: pTserData.Item(CurBuf).flags = .FlagArray
                             .ts.Dates.Values = .DateArray
+                            .ts.Attributes.SetValue("tu", FillTU)
 
                             If FillTS > 0 Then
-                                tmpData = FillValues(.ts, FillTU, FillTS, FillVal, FillMissing, FillAccum)
-                                pTserFile.AddDataSet(tmpData)
-                                tmpData = Nothing
-                            Else
-                                pTserFile.AddDataSet(.ts, atcDataSource.EnumExistAction.ExistRenumber)
+                                .ts = FillValues(.ts, FillTU, FillTS, FillVal, FillMissing, FillAccum)
                             End If
-                            pTserFile.DataSets(pTserFile.DataSets.Count - 1).Attributes.SetValue("ID", pTserFile.DataSets.Count)
+
+                            pTserFile.AddDataSet(.ts, atcDataSource.EnumExistAction.ExistRenumber)
+                            With .ts
+                                .Attributes.SetValue("ID", pTserFile.DataSets.Count)
+                                'Set missing values to NaN
+                                Dim lNaN As Double = GetNaN()
+                                For iVal As Integer = 1 To .numValues
+                                    If Math.Abs((.Value(iVal) - FillMissing)) < 1.0E-20 Then
+                                        .Value(iVal) = lNaN
+                                    End If
+                                Next
+                            End With
                         End If
                     End With
                 Next
