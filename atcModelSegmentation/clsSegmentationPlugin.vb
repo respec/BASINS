@@ -3,7 +3,7 @@ Imports atcUtility
 Imports mwTableEditor
 Imports MapWinUtility
 
-Public Class ModelSegmentationPlugIn
+Public Class PlugIn
     Implements MapWindow.Interfaces.IPlugin
 
     Private pMapWin As MapWindow.Interfaces.IMapWin

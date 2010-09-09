@@ -858,25 +858,20 @@ Public Class atcGrid
         Dim lY As Integer = 0
         Dim lWidth As Integer = 0
 
+
+        If pRowBottom.Keys.Contains(aRow - 1) Then
+            lY = pRowBottom.ItemByKey(aRow - 1)
+        End If
+
+        If pColumnRight.Keys.Contains(aColumn - 1) Then
+            lX = pColumnRight.ItemByKey(aColumn - 1)
+        End If
+
         If pColumnRight.Keys.Contains(aColumn) Then
-            Dim lFixedRows As Integer = pSource.FixedRows
-            Dim lFixedColumns As Integer = pSource.FixedColumns
-
-            For lRow As Integer = 0 To aRow - 1
-                If lRow < lFixedRows OrElse lRow > pRowsScrolled Then
-                    lY += RowHeight(lRow)
-                ElseIf lRow < pRowsScrolled - 1 Then 'skip rows we can't see
-                    lRow = pRowsScrolled - 1
-                End If
-            Next
-
-            If pColumnRight.Keys.Contains(aColumn - 1) Then
-                lX = pColumnRight.ItemByKey(aColumn - 1)
-            End If
-
             lWidth = pColumnRight.ItemByKey(aColumn) - lX
             If lWidth < 0 Then lWidth = 0
         End If
+
         Return New Rectangle(lX, lY, lWidth, RowHeight(aRow))
     End Function
 

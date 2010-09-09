@@ -563,7 +563,7 @@ StartOver:
                & "</arguments>" _
                & "</function>"
 
-        LoadPlugin("D4EM Data Download::BASINS")
+        atcDataManager.LoadPlugin("D4EM Data Download::BASINS")
         Dim lPlugins As New ArrayList
         For lPluginIndex As Integer = 0 To g_MapWin.Plugins.Count
             Try
@@ -609,16 +609,6 @@ StartOver:
                 End If
             End If
         End If
-    End Sub
-
-    Private Sub LoadPlugin(ByVal aPluginName As String)
-        Try
-            Dim lKey As String = g_MapWin.Plugins.GetPluginKey(aPluginName)
-            'If Not g_MapWin.Plugins.PluginIsLoaded(lKey) Then 
-            g_MapWin.Plugins.StartPlugin(lKey)
-        Catch e As Exception
-            Logger.Dbg("Exception loading " & aPluginName & ": " & e.Message)
-        End Try
     End Sub
 
     'Download new data for an existing project
