@@ -131,9 +131,8 @@ Public Class HspfFilesBlk
     Friend Sub ReadUciFile()
         Dim lBuff As String = Nothing
         Try
-            If Uci.FastFlag Then
-                pComment = GetCommentBeforeBlock("FILES")
-            End If
+            pComment = GetCommentBeforeBlock("FILES")
+
             Dim lRectyp As Integer
             Dim lRetcod As Integer = 0
             Dim lInit As Integer = 1
@@ -141,13 +140,8 @@ Public Class HspfFilesBlk
             Dim lComment As String = ""
             Dim lRetkey As Integer = -1
             Do
-                If Uci.FastFlag Then
-                    GetNextRecordFromBlock("FILES", lRetkey, lBuff, lRectyp, lRetcod)
-                Else
-                    lRetkey = -1
-                    Call REM_XBLOCKEX((Me.Uci), lOmCode, lInit, lRetkey, lBuff, lRectyp, lRetcod)
-                    lInit = 0
-                End If
+                GetNextRecordFromBlock("FILES", lRetkey, lBuff, lRectyp, lRetcod)
+
                 If lRetcod = 10 Then
                     Exit Do
                 ElseIf lRectyp = 0 Then

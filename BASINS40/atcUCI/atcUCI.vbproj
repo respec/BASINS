@@ -76,9 +76,6 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.vb" />
     <Compile Include="atcMDB.vb" />
-    <Compile Include="Hass_Ent.vb">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="HspfAddChar2Keyword.vb">
       <SubType>Code</SubType>
     </Compile>
@@ -183,9 +180,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="modPollutants.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="modRemoteHasslibs.vb">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="modStatusImplnd.vb">

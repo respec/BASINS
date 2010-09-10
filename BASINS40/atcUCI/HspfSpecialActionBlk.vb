@@ -52,9 +52,7 @@ Public Class HspfSpecialActionBlk
     End Property
 
     Public Sub ReadUciFile()
-        If Uci.FastFlag Then
-            Me.Comment = GetCommentBeforeBlock("SPEC-ACTIONS")
-        End If
+        Me.Comment = GetCommentBeforeBlock("SPEC-ACTIONS")
 
         Dim lOmCode As Integer = HspfOmCode("SPEC-ACTIONS")
         Dim lInit As Integer = 1
@@ -65,12 +63,8 @@ Public Class HspfSpecialActionBlk
         Dim lUCIRecordType As Integer
         Dim lReturnCode As Integer
         Do Until lDone
-            If Uci.FastFlag Then
-                GetNextRecordFromBlock("SPEC-ACTIONS", lRetKey, lUCIRecord, lUCIRecordType, lReturnCode)
-            Else
-                lRetKey = -2 'force return of comments/blanks
-                Call REM_XBLOCKEX((Me.Uci), lOmCode, lInit, lRetKey, lUCIRecord, lUCIRecordType, lReturnCode)
-            End If
+            GetNextRecordFromBlock("SPEC-ACTIONS", lRetKey, lUCIRecord, lUCIRecordType, lReturnCode)
+
             lInit = 0
             If lReturnCode = 2 Then 'normal record
                 Dim lSpecialRecord As New HspfSpecialRecord

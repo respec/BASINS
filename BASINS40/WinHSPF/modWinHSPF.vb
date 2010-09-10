@@ -145,11 +145,8 @@ Public Module WinHSPF
 
         pUCI = New HspfUci
         Dim lUCIName As String = IO.Path.GetFileName(aFileName)
-        pUCI.FastReadUci(pMsg, lUCIName)
-        'Dim lFilesOK As Boolean
-        'Dim lFullFg As Integer = -3
-        'Dim lEchoFile As String = ""
-        'pUCI.ReadUci(pMsg, lUCIName, lFullFg, lFilesOK, lEchoFile)
+        pUCI.ReadUciWithWDMs(pMsg, lUCIName)
+
         'set UCI name in caption
         If pWinHSPF IsNot Nothing Then
             pWinHSPF.Text = pWinHSPF.Tag & ": " & pUCI.Name

@@ -257,51 +257,6 @@ Public Class HspfFtable
         End If
     End Sub
 
-    'Public Sub ReadUciFile()
-    '  Dim init&, OmCode&, retkey&, cbuff$, retcod&
-    '  Dim done As Boolean
-    '  Dim i&, j&
-    '
-    '  OmCode = HspfOmCode("FTABLES")
-    '  init = 1
-    '  done = False
-    '  Do Until done
-    '    Call REM_XBLOCK(Me.Operation.Uci, OmCode, init, retkey, cbuff, retcod)
-    '    init = 0
-    '    If InStr(cbuff, "FTABLE") > 0 Then 'is this the one
-    '      If Right(cbuff, 3) = pId Then 'it is
-    '        Call REM_XBLOCK(Me.Operation.Uci, OmCode, init, retkey, cbuff, retcod)
-    '        Nrows = Left(cbuff, 5)
-    '        Ncols = Mid(cbuff, 6, 5)
-    '        For i = 1 To pNrows
-    '          Call REM_XBLOCK(Me.Operation.Uci, OmCode, init, retkey, cbuff, retcod)
-    '          pDepth(i) = Left(cbuff, 10)
-    '          pArea(i) = Mid(cbuff, 11, 10)
-    '          pVolume(i) = Mid(cbuff, 21, 10)
-    '          j = Ncols - 3
-    '          If j > 0 Then
-    '            pOutflow1(i) = Mid(cbuff, 31, 10)
-    '          End If
-    '          If j > 1 Then
-    '            pOutflow2(i) = Mid(cbuff, 41, 10)
-    '          End If
-    '          If j > 2 Then
-    '            pOutflow3(i) = Mid(cbuff, 51, 10)
-    '          End If
-    '          If j > 3 Then
-    '            pOutflow4(i) = Mid(cbuff, 61, 10)
-    '          End If
-    '          If j > 4 Then
-    '            pOutflow5(i) = Mid(cbuff, 71, 10)
-    '          End If
-    '        Next i
-    '        done = True
-    '      End If
-    '    End If
-    '  Loop
-    '
-    'End Sub
-
     Public Overrides Function ToString() As String
         Dim lSB As New StringBuilder
         Dim t, s As String
@@ -357,13 +312,13 @@ Public Class HspfFtable
                             Else
                                 t = Format(.Outflow2(lRow), lFmt).PadLeft(10)
                             End If
-                        elseIf lOutflowIndex = 3 Then
+                        ElseIf lOutflowIndex = 3 Then
                             If NumericallyTheSame(.Outflow3AsRead(lRow), .Outflow3(lRow)) Then
                                 t = .Outflow3AsRead(lRow)
                             Else
                                 t = Format(.Outflow3(lRow), lFmt).PadLeft(10)
                             End If
-                        elseIf lOutflowIndex = 4 Then
+                        ElseIf lOutflowIndex = 4 Then
                             If NumericallyTheSame(.Outflow4AsRead(lRow), .Outflow4(lRow)) Then
                                 t = .Outflow4AsRead(lRow)
                             Else

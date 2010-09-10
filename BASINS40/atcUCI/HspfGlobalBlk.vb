@@ -138,113 +138,108 @@ Public Class HspfGlobalBlk
         Dim lRecord As String = Nothing
         Dim lOutLev As Integer
 
-        If Me.Uci.FastFlag Then
-            lRecordIndex = -1
-            Me.Comment = GetCommentBeforeBlock("GLOBAL")
+        lRecordIndex = -1
+        Me.Comment = GetCommentBeforeBlock("GLOBAL")
+        GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
+        If Not lRecord.StartsWith("  START") Then
+            pRunInf.Value = lRecord.TrimEnd
             GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
-            If Not lRecord.StartsWith("  START") Then
-                pRunInf.Value = lRecord.TrimEnd
-                GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
-            Else
-                pRunInf.Value = ""
-            End If
-            'Allow room for comments
-            While lRecordType < 0 And lRecordIndex < 50 '(50 is arbitrary to prevent an endless loop)
-                GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
-            End While
-
-            Dim lField As String = lRecord.Substring(14, 4)
-            If IsInteger(lField) Then
-                pSDate(0) = lField
-            Else
-                Logger.Dbg("StartYearParseFailed:" & lField)
-                pSDate(0) = 1996 'better than nothing?
-            End If
-            lField = lRecord.Substring(19, 2)
-            If lField.Length > 0 AndAlso IsInteger(lField) Then
-                pSDate(1) = lField
-            Else
-                pSDate(1) = 1
-            End If
-            lField = lRecord.Substring(22, 2).TrimEnd
-            If lField.Length > 0 AndAlso IsInteger(lField) Then
-                pSDate(2) = lField
-            Else
-                pSDate(2) = 1
-            End If
-            lField = lRecord.Substring(25, 2).TrimEnd
-            If lField.Length > 0 AndAlso IsInteger(lField) Then
-                pSDate(3) = lField
-                pSDate(4) = lRecord.Substring(28, 2)
-            Else
-                pSDate(3) = 0
-                pSDate(4) = 0
-            End If
-
-            lField = lRecord.Substring(39, 4)
-            If IsInteger(lField) Then
-                pEDate(0) = lField
-            Else
-                Logger.Dbg("EndYearParseFailed:" & lField)
-                pEDate(0) = 2007 'better than nothing?
-            End If
-            lField = lRecord.Substring(44, 2).TrimEnd
-            If lField.Length > 0 AndAlso IsInteger(lField) Then
-                pEDate(1) = lField
-            Else
-                pEDate(1) = 12
-            End If
-            lField = lRecord.Substring(47, 2).TrimEnd
-            If lField.Length > 0 AndAlso IsInteger(lField) Then
-                pEDate(2) = lField
-            Else
-                pEDate(2) = 31
-            End If
-            lField = lRecord.Substring(50, 2).TrimEnd
-            If lField.Length > 0 AndAlso IsInteger(lField) Then
-                pEDate(3) = lField
-                pEDate(4) = lRecord.Substring(53, 2)
-            Else
-                pEDate(3) = 24
-                pEDate(4) = 0
-            End If
-
-            GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
-            lField = lRecord.Substring(25, 5)
-            If lField.Length > 0 AndAlso IsInteger(lField) Then
-                lOutLev = lField
-            Else
-                lOutLev = 3
-            End If
-            lField = lRecord.Substring(30, 5)
-            If lField.Length > 0 AndAlso IsInteger(lField) Then
-                pSpOut = lField
-            Else
-                pSpOut = 2
-            End If
-
-            GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
-            lField = lRecord.Substring(19, 5)
-            If lField.Length > 0 AndAlso IsInteger(lField) Then
-                pRunFg = lField
-            Else
-                pRunFg = 0
-            End If
-            lField = lRecord.Substring(57, 5)
-            If lField.Length > 0 AndAlso IsInteger(lField) Then
-                pEmFg = lField
-            Else
-                pEmFg = 1
-            End If
-            lField = lRecord.Substring(67, 5)
-            If lField.Length > 0 AndAlso IsInteger(lField) Then
-                pIhmFg = lField
-            Else
-                pIhmFg = 0
-            End If
         Else
-            Call REM_GLOBLK((Me.Uci), pSDate, pEDate, lOutLev, pSpOut, pRunFg, pEmFg, pRunInf.Value)
-            Call REM_GLOPRMI((Me.Uci), pIhmFg, "IHMFG")
+            pRunInf.Value = ""
+        End If
+        'Allow room for comments
+        While lRecordType < 0 And lRecordIndex < 50 '(50 is arbitrary to prevent an endless loop)
+            GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
+        End While
+
+        Dim lField As String = lRecord.Substring(14, 4)
+        If IsInteger(lField) Then
+            pSDate(0) = lField
+        Else
+            Logger.Dbg("StartYearParseFailed:" & lField)
+            pSDate(0) = 1996 'better than nothing?
+        End If
+        lField = lRecord.Substring(19, 2)
+        If lField.Length > 0 AndAlso IsInteger(lField) Then
+            pSDate(1) = lField
+        Else
+            pSDate(1) = 1
+        End If
+        lField = lRecord.Substring(22, 2).TrimEnd
+        If lField.Length > 0 AndAlso IsInteger(lField) Then
+            pSDate(2) = lField
+        Else
+            pSDate(2) = 1
+        End If
+        lField = lRecord.Substring(25, 2).TrimEnd
+        If lField.Length > 0 AndAlso IsInteger(lField) Then
+            pSDate(3) = lField
+            pSDate(4) = lRecord.Substring(28, 2)
+        Else
+            pSDate(3) = 0
+            pSDate(4) = 0
+        End If
+
+        lField = lRecord.Substring(39, 4)
+        If IsInteger(lField) Then
+            pEDate(0) = lField
+        Else
+            Logger.Dbg("EndYearParseFailed:" & lField)
+            pEDate(0) = 2007 'better than nothing?
+        End If
+        lField = lRecord.Substring(44, 2).TrimEnd
+        If lField.Length > 0 AndAlso IsInteger(lField) Then
+            pEDate(1) = lField
+        Else
+            pEDate(1) = 12
+        End If
+        lField = lRecord.Substring(47, 2).TrimEnd
+        If lField.Length > 0 AndAlso IsInteger(lField) Then
+            pEDate(2) = lField
+        Else
+            pEDate(2) = 31
+        End If
+        lField = lRecord.Substring(50, 2).TrimEnd
+        If lField.Length > 0 AndAlso IsInteger(lField) Then
+            pEDate(3) = lField
+            pEDate(4) = lRecord.Substring(53, 2)
+        Else
+            pEDate(3) = 24
+            pEDate(4) = 0
+        End If
+
+        GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
+        lField = lRecord.Substring(25, 5)
+        If lField.Length > 0 AndAlso IsInteger(lField) Then
+            lOutLev = lField
+        Else
+            lOutLev = 3
+        End If
+        lField = lRecord.Substring(30, 5)
+        If lField.Length > 0 AndAlso IsInteger(lField) Then
+            pSpOut = lField
+        Else
+            pSpOut = 2
+        End If
+
+        GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
+        lField = lRecord.Substring(19, 5)
+        If lField.Length > 0 AndAlso IsInteger(lField) Then
+            pRunFg = lField
+        Else
+            pRunFg = 0
+        End If
+        lField = lRecord.Substring(57, 5)
+        If lField.Length > 0 AndAlso IsInteger(lField) Then
+            pEmFg = lField
+        Else
+            pEmFg = 1
+        End If
+        lField = lRecord.Substring(67, 5)
+        If lField.Length > 0 AndAlso IsInteger(lField) Then
+            pIhmFg = lField
+        Else
+            pIhmFg = 0
         End If
 
         If pSDate(1) = 0 Then pSDate(1) = 1
@@ -276,7 +271,6 @@ Public Class HspfGlobalBlk
     End Function
 
     Private Sub Update()
-        'Call F90_PUTGLO(pSDate(0), pEDate(0), pOutLev, pSpOut, pRunFg, pEmFg, pRunInf, Len(pRunInf))
         Me.Uci.Edited = True
     End Sub
 
