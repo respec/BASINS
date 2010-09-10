@@ -28,9 +28,8 @@ Public Class HspfMonthData
     End Sub
 
     Public Sub ReadUciFile()
-        If Uci.FastFlag Then
-            pComment = GetCommentBeforeBlock("MONTH-DATA")
-        End If
+        pComment = GetCommentBeforeBlock("MONTH-DATA")
+
         Dim lOmCode As Integer = HspfOmCode("MONTH-DATA")
 
         Dim lInit As Integer = 1
@@ -41,11 +40,8 @@ Public Class HspfMonthData
 
         Dim lDone As Boolean = False
         Do Until lDone
-            If Uci.FastFlag Then
-                GetNextRecordFromBlock("MONTH-DATA", lRetkey, lBuff, lRectyp, lRetcod)
-            Else
-                Call REM_XBLOCK((Me.Uci), lOmCode, lInit, lRetkey, lBuff, lRetcod)
-            End If
+            GetNextRecordFromBlock("MONTH-DATA", lRetkey, lBuff, lRectyp, lRetcod)
+           
             lInit = 0
             If lBuff Is Nothing Then
                 lDone = True
@@ -57,11 +53,8 @@ Public Class HspfMonthData
                 lMonthDataTable.Block = Me
                 Dim lComment As String = ""
                 Do
-                    If Uci.FastFlag Then
-                        GetNextRecordFromBlock("MONTH-DATA", lRetkey, lBuff, lRectyp, lRetcod)
-                    Else
-                        Call REM_XBLOCK((Me.Uci), lOmCode, lInit, lRetkey, lBuff, lRetcod)
-                    End If
+                    GetNextRecordFromBlock("MONTH-DATA", lRetkey, lBuff, lRectyp, lRetcod)
+                    
                     If lRectyp = -1 Then 'this is a comment
                         If lComment.Length = 0 Then
                             lComment = lBuff

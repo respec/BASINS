@@ -46,29 +46,8 @@ Public Class HspfMassLink
         Dim lOmCode As Integer = HspfOmCode("MASS-LINK")
         Dim lMassLinkCount As Integer
 
-        If aUci.FastFlag Then
-            lMassLinkCount = 1
-            ReDim Preserve lMassLinkKeys(lMassLinkCount)
-        Else
-            Dim lId As Integer = -101
-            Dim lInit As Integer = 1
-            Dim lContinueFlag As Integer
-            Dim lKeyFlag As Integer
-            Dim lReturnId As Integer
-            lMassLinkCount = 0
-            Do
-                Dim lKeyWord As String = ""
-                Call REM_GTNXKW(aUci, lInit, lId, lKeyWord, lKeyFlag, lContinueFlag, lReturnId)
-                If lReturnId <> 0 Then
-                    lMassLinkCount += 1
-                    ReDim Preserve lMassLinkIds(lMassLinkCount)
-                    ReDim Preserve lMassLinkKeys(lMassLinkCount)
-                    lMassLinkIds(lMassLinkCount - 1) = CInt(lKeyWord)
-                    lMassLinkKeys(lMassLinkCount - 1) = lReturnId
-                End If
-                lInit = 0
-            Loop While lContinueFlag = 1
-        End If
+        lMassLinkCount = 1
+        ReDim Preserve lMassLinkKeys(lMassLinkCount)
 
         Dim lRecordType As Integer
         For lMassLinkIndex As Integer = 0 To lMassLinkCount - 1
@@ -81,26 +60,20 @@ Public Class HspfMassLink
             Dim lReturnCode As Integer
             Dim lMassLinkId As Integer
             Do
-                If aUci.FastFlag Then
-                    GetNextRecordFromBlock("MASS-LINK", lReturnKey, lString, lRecordType, lReturnCode)
-                    If lRecordType = -1 Then 'this is a comment
-                    Else
-                        If lString Is Nothing Then
-                            Exit Do
-                        ElseIf lString.StartsWith("  MASS-LINK") Then
-                            'start of a new mass link
-                            lMassLinkId = CShort(Mid(lString, 16, 5))
-                            lPastHeader = False
-                            GetNextRecordFromBlock("MASS-LINK", lReturnKey, lString, lRecordType, lReturnCode)
-                        ElseIf lString.StartsWith("  END MASS-LINK") Then
-                            'end of a mass link
-                            lRecordType = -2
-                        End If
-                    End If
+                GetNextRecordFromBlock("MASS-LINK", lReturnKey, lString, lRecordType, lReturnCode)
+                If lRecordType = -1 Then 'this is a comment
                 Else
-                    lReturnKey = -1
-                    Call REM_XBLOCKEX(aUci, lOmCode, lInit, lReturnKey, lString, lRecordType, lReturnCode)
-                    lMassLinkId = lMassLinkIds(lMassLinkIndex)
+                    If lString Is Nothing Then
+                        Exit Do
+                    ElseIf lString.StartsWith("  MASS-LINK") Then
+                        'start of a new mass link
+                        lMassLinkId = CShort(Mid(lString, 16, 5))
+                        lPastHeader = False
+                        GetNextRecordFromBlock("MASS-LINK", lReturnKey, lString, lRecordType, lReturnCode)
+                    ElseIf lString.StartsWith("  END MASS-LINK") Then
+                        'end of a mass link
+                        lRecordType = -2
+                    End If
                 End If
                 lInit = 0
                 If lRecordType = 0 Then

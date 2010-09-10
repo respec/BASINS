@@ -116,13 +116,10 @@ Public Class HspfOpnSeqBlk
         lOmCode = HspfOmCode("OPN SEQUENCE")
         lReturnCode = 0
         ' first call gets delt
-        If pUci.FastFlag Then
-            lRetkey = -1
-            pComment = GetCommentBeforeBlock("OPN SEQUENCE")
-            GetNextRecordFromBlock("OPN SEQUENCE", lRetkey, lBuff, lRecTyp, lReturnCode)
-        Else
-            Call REM_XBLOCK((Me.Uci), lOmCode, lInit, lRetkey, lBuff, lReturnCode)
-        End If
+        lRetkey = -1
+        pComment = GetCommentBeforeBlock("OPN SEQUENCE")
+        GetNextRecordFromBlock("OPN SEQUENCE", lRetkey, lBuff, lRecTyp, lReturnCode)
+
         If lReturnCode >= 0 Then
             pDelt = CDbl(Mid(lBuff, 31, 2)) * 60
             If lBuff.Length > 33 Then
@@ -131,12 +128,8 @@ Public Class HspfOpnSeqBlk
             lInit = 0
             lComment = ""
             While lReturnCode = 2
-                If pUci.FastFlag Then
-                    GetNextRecordFromBlock("OPN SEQUENCE", lRetkey, lBuff, lRecTyp, lReturnCode)
-                Else
-                    lRetkey = -1
-                    Call REM_XBLOCKEX((Me.Uci), lOmCode, lInit, lRetkey, lBuff, lRecTyp, lReturnCode)
-                End If
+                GetNextRecordFromBlock("OPN SEQUENCE", lRetkey, lBuff, lRecTyp, lReturnCode)
+
                 If InStr(lBuff, "INGRP") = 0 And lReturnCode = 2 And lRecTyp = 0 Then
                     lOperation = New HspfOperation
                     lOperation.Name = Trim(StrRetRem(lBuff))

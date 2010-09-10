@@ -69,13 +69,8 @@ Public Class HspfConnection
         Dim lComment As String = ""
         Dim lRetKey As Integer = -1
         Do
-            If aUci.FastFlag Then
-                GetNextRecordFromBlock("EXT SOURCES", lRetKey, lBuff, lRecTyp, lRetCod)
-            Else
-                lRetKey = -1
-                REM_XBLOCKEX(aUci, lOmCode, lInit, lRetKey, lBuff, lRecTyp, lRetCod)
-                lInit = 0
-            End If
+            GetNextRecordFromBlock("EXT SOURCES", lRetKey, lBuff, lRecTyp, lRetCod)
+            
             If lRetCod <> 2 Then
                 Exit Do
             ElseIf lRecTyp = 0 Then
@@ -142,13 +137,9 @@ Public Class HspfConnection
         lComment = ""
         lRetKey = -1
         Do
-            If aUci.FastFlag Then
-                GetNextRecordFromBlock("NETWORK", lRetKey, lBuff, lRecTyp, lRetCod)
-            Else
-                lRetKey = -1
-                Call REM_XBLOCKEX(aUci, lOmCode, lInit, lRetKey, lBuff, lRecTyp, lRetCod)
-                lInit = 0
-            End If
+
+            GetNextRecordFromBlock("NETWORK", lRetKey, lBuff, lRecTyp, lRetCod)
+
             If lRetCod <> 2 Then
                 Exit Do
             ElseIf lRecTyp = 0 Then
@@ -226,13 +217,8 @@ Public Class HspfConnection
         lComment = ""
         lRetKey = -1
         Do
-            If aUci.FastFlag Then
-                GetNextRecordFromBlock("SCHEMATIC", lRetKey, lBuff, lRecTyp, lRetCod)
-            Else
-                lRetKey = -1
-                Call REM_XBLOCKEX(aUci, lOmCode, lInit, lRetKey, lBuff, lRecTyp, lRetCod)
-                lInit = 0
-            End If
+            GetNextRecordFromBlock("SCHEMATIC", lRetKey, lBuff, lRecTyp, lRetCod)
+
             If lRetCod <> 2 Then
                 Exit Do
             ElseIf lRecTyp = 0 Then
@@ -278,13 +264,8 @@ Public Class HspfConnection
         lComment = ""
         lRetKey = -1
         Do
-            If aUci.FastFlag Then
-                GetNextRecordFromBlock("EXT TARGETS", lRetKey, lBuff, lRecTyp, lRetCod)
-            Else
-                lRetKey = -1
-                Call REM_XBLOCKEX(aUci, lOmCode, lInit, lRetKey, lBuff, lRecTyp, lRetCod)
-                lInit = 0
-            End If
+            GetNextRecordFromBlock("EXT TARGETS", lRetKey, lBuff, lRecTyp, lRetCod)
+
             If lRetCod <> 2 Then
                 Exit Do
             ElseIf lRecTyp = 0 Then

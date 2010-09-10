@@ -83,9 +83,8 @@ Public Class HspfCategoryBlk
     'End Function
 
     Friend Sub ReadUciFile()
-        If Uci.FastFlag Then
-            Comment = GetCommentBeforeBlock("CATEGORY")
-        End If
+
+        Comment = GetCommentBeforeBlock("CATEGORY")
 
         Dim lInit As Integer = 1
         Dim lOmCode As Integer = HspfOmCode("CATEGORY")
@@ -97,12 +96,7 @@ Public Class HspfCategoryBlk
 
         Try
             Do
-                If Uci.FastFlag Then
-                    GetNextRecordFromBlock("CATEGORY", lRetKey, lCBuff, lRecTyp, lRetCod)
-                Else
-                    lRetKey = -1
-                    Call REM_XBLOCKEX((Me.Uci), lOmCode, lInit, lRetKey, lCBuff, lRecTyp, lRetCod)
-                End If
+                GetNextRecordFromBlock("CATEGORY", lRetKey, lCBuff, lRecTyp, lRetCod)
 
                 If lRetCod = 10 Then
                     Exit Do

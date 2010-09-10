@@ -88,9 +88,7 @@ Public Class HspfOpnBlk
     End Function
 
     Public Sub setTableValues(ByVal aBlockDef As HspfBlockDef)
-        If Uci.FastFlag Then
-            Comment = GetCommentBeforeBlock(Me.Name)
-        End If
+        Comment = GetCommentBeforeBlock(Me.Name)
         ReadTables(aBlockDef)
     End Sub
 
@@ -108,38 +106,30 @@ Public Class HspfOpnBlk
             Dim lOccurCount As Integer
             Dim lOccurNum As Integer
             Dim lSRec As Integer
-            If Uci.FastFlag Then
-                lKeyword = aBlockDef.TableDefs(lTableIndex).Name
-                StartingRecordOfOperationTable(aBlockDef.Name, lKeyword, lSRec, lOccurCount)
-                If lSRec > 0 Then 'does it exist 
-                    lExistFlag = 1 'yes
-                Else
-                    lExistFlag = 0 'no 
-                End If
-                lTableIndex += 1
-                If lTableIndex < aBlockDef.TableDefs.Count Then
-                    lContinueFlag = 1 'more tables to read flag, 1 if so
-                Else
-                    lContinueFlag = 0
-                End If
-                lRetId = (lOperType * 1000) + lTableIndex
+
+            lKeyword = aBlockDef.TableDefs(lTableIndex).Name
+            StartingRecordOfOperationTable(aBlockDef.Name, lKeyword, lSRec, lOccurCount)
+            If lSRec > 0 Then 'does it exist 
+                lExistFlag = 1 'yes
             Else
-                Call REM_GTNXKW((Me.Uci), lInit, CInt(lOperType + 120), lKeyword, lExistFlag, lContinueFlag, lRetId)
-                lKeyword = AddChar2Keyword(lKeyword)
+                lExistFlag = 0 'no 
             End If
+            lTableIndex += 1
+            If lTableIndex < aBlockDef.TableDefs.Count Then
+                lContinueFlag = 1 'more tables to read flag, 1 if so
+            Else
+                lContinueFlag = 0
+            End If
+            lRetId = (lOperType * 1000) + lTableIndex
 
             lInit = 0
             If lExistFlag > 0 And lRetId <> 0 Then
                 'check for multiple occurences
-                If Not Uci.FastFlag Then
-                    Call REM_GETOCR(Me.Uci, lRetId, lOccurCount)
-                End If
                 Dim lTable As HspfTable
                 For lOccurNum = 1 To lOccurCount
                     Dim lTableComment As String = ""
-                    If Uci.FastFlag Then
-                        lTableComment = GetTableComment(lSRec, lKeyword, lOccurNum)
-                    End If
+                    lTableComment = GetTableComment(lSRec, lKeyword, lOccurNum)
+
                     Dim lString() As String = {}
                     Dim lComment() As String = {}
                     Dim lStringCount As Integer
@@ -162,7 +152,7 @@ Public Class HspfOpnBlk
                             lOperLast = lOperFirst
                             'check to see if this record could have been combined with the next record
                             If lStringIndex > 1 Then
-                                If compareTableString(1, 10, lString(lStringIndex), lString(lStringIndex - 1)) Then
+                                If CompareTableString(1, 10, lString(lStringIndex), lString(lStringIndex - 1)) Then
                                     'if it could have but wasn't, assume the user wants it on its own line
                                     lCombineOk = False
                                 End If
@@ -277,14 +267,10 @@ Public Class HspfOpnBlk
         pastHeader = False
         Do
             retkey = -1
-            If Uci.FastFlag Then
-                GetNextRecordFromTable(aBlockName, aTableName, srec, tinit, thisoccur, stemp, rectyp, retcod)
-                'stemp = record returned
-                'rectyp = record type returned, 0-normal, -1 comment, -2 blank
-                'retcod = 1-returned header, 2-returned normal, 3-comment, 10-no more
-            Else
-                Call REM_XTABLEEX((Me.Uci), SCLU, SGRP, uunits, tinit, CInt(1), thisoccur, retkey, stemp, rectyp, retcod)
-            End If
+            GetNextRecordFromTable(aBlockName, aTableName, srec, tinit, thisoccur, stemp, rectyp, retcod)
+            'stemp = record returned
+            'rectyp = record type returned, 0-normal, -1 comment, -2 blank
+            'retcod = 1-returned header, 2-returned normal, 3-comment, 10-no more
             tinit = 0
             If retcod = 2 Then
                 'this is the type of record we want

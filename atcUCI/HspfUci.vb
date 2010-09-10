@@ -33,7 +33,6 @@ Public Class HspfUci
         End Set
     End Property
 
-    Public FastFlag As Boolean = False
     Public AcidPhFlag As Boolean = False
     Public MetSegs As Collection(Of HspfMetSeg)
 
@@ -298,22 +297,18 @@ Public Class HspfUci
         Dim lFullFg As Integer
         Dim lEchoFile As String = ""
 
-        FastFlag = True
         lFullFg = -1
         ReadUci(aMsg, aNewName, lFullFg, lFilesOK, lEchoFile)
-        FastFlag = False
     End Sub
 
-    Public Sub FastReadUci(ByRef aMsg As HspfMsg, ByRef aNewName As String)
+    Public Sub ReadUciWithWDMs(ByRef aMsg As HspfMsg, ByRef aNewName As String)
         'called by scripthspf, processes wdm files
         Dim lFilesOK As Boolean
         Dim lFullFg As Integer
         Dim lEchoFile As String = ""
 
-        FastFlag = True
         lFullFg = -3
         ReadUci(aMsg, aNewName, lFullFg, lFilesOK, lEchoFile)
-        FastFlag = False
     End Sub
 
     ''' <summary>
@@ -354,28 +349,9 @@ Public Class HspfUci
                     lFlag = -2 'flag as coming from hspf class for status title
                 End If
 
-                If Not FastFlag Then 'do normal activate of uci, including run interpreter
-                    SendHspfMessage("CURDIR " & CurDir())
-                    SendHspfMessage("ACTIVATE " & lName & " " & lFlag)
-                    Dim lMsg As String = WaitForChildMessage()
-                    If lMsg.StartsWith("CURDIR") Then
-                        lMsg = WaitForChildMessage()
-                    End If
-                    If CDbl(Right(lMsg, 1)) <> 0 Or lMsg.StartsWith("HSPFUCI exited with code") Then
-                        pErrorDescription = "Error interpreting UCI File '" & lName & "'." & vbCrLf & vbCrLf & _
-                                            "See the file '" & aEchoFile.Trim & "' for more details." & vbCrLf & _
-                                            "Message " & lMsg
-                        SendMonitorMessage(pErrorDescription)
-                    End If
-                    FastFlag = True
-                End If
-
                 pInitialized = True
 
                 SendMonitorMessage("(Show)") 'where was the hide?
-                If Not FastFlag Then
-                    SendMonitorMessage("(Msg1 Building Collections)")
-                End If
 
                 SaveBlockOrder(pOrder)
 
@@ -805,6 +781,7 @@ Public Class HspfUci
                 Dim HSPFEngineExe As String = GetSetting("HSPFEngineNet", "files", "HSPFEngineNet.exe", "HSPFEngineNet.exe")
                 HSPFEngineExe = atcUtility.FindFile("Please locate HSPFEngineNet.exe", HSPFEngineExe)
                 SaveSetting("HSPFEngine", "files", "HSPFEngineNet.exe", HSPFEngineExe)
+                'note: the file HSPFEngineNet.exe is built over in D:\dev\HSPF\
                 .FileName = HSPFEngineExe
                 .Arguments = lProcessId '& " wait"
                 .CreateNoWindow = True
@@ -991,28 +968,7 @@ Public Class HspfUci
         Next
     End Sub
 
-    'Public Sub OpenWDM(ByRef OpenOrCreate As Integer, ByRef fname As String, ByRef fun As Integer, ByRef wid As String)
-    '    Dim lFile As atcData.atcDataSource
-    '    Dim iret, Ind As Integer
-
-    '    If OpenOrCreate = 2 Then 'need to create
-    '        fun = F90_WDBOPN(OpenOrCreate, fname, Len(fname))
-    '        iret = F90_WDFLCL(fun)
-    '    End If
-
-    '    fun = 0
-    '    lFile = AddWDMFile(fname)
-    '    If Not lFile Is Nothing Then
-    '        pWdmCount = pWdmCount + 1
-    '        Ind = WDMInd(wid)
-    '        pWdmUnit(Ind) = lFile.FileUnit
-    '        fun = pWdmUnit(Ind)
-    '    End If
-    'End Sub
-
     Public Sub ClearWDM()
-        Dim lMsg As String = "before close in ClearWDM"
-        Call F90_FILSTA(lMsg, lMsg.Length)
         For lWdmIndex As Integer = 0 To 4
             If Not pWDMObj(lWdmIndex) Is Nothing Then
                 pWDMObj(lWdmIndex) = Nothing
@@ -1020,9 +976,6 @@ Public Class HspfUci
         Next lWdmIndex
         pTserFiles.Clear()
         pWdmCount = 0
-
-        lMsg = "after close in ClearWDM"
-        Call F90_FILSTA(lMsg, lMsg.Length)
     End Sub
 
     Public Sub GetMetSegNames(ByRef aMetSegNames As Collection, ByRef aMetSegBaseDsns As Collection, ByRef aMetSegWDMIds As Collection, ByRef aMetSegDescs As Collection)
@@ -1745,8 +1698,7 @@ Public Class HspfUci
                     End If
                 End If
             Loop While lReturnCode = 2
-            's = "PreScanFilesBlock exit"
-            'F90_FILSTA s, Len(s)
+
             System.Windows.Forms.Application.DoEvents()
         Catch ex As Exception
             'TODO: myMsgBox.Show("Cannot open '" & Mid(s, 17, Len(s) - 16) & "' in PreScanFilesBlock." & vbCrLf & vbCrLf & "Error: " & Err.Description, "HSPF Files Error", "+-&OK")
@@ -1763,14 +1715,10 @@ Public Class HspfUci
         Dim FilesOK As Boolean
         Dim ifound As Boolean
         Dim j As Integer
-        Dim M As String
         'used after editing files block to open wdm files
         On Error GoTo x
 
         FilesOK = True
-
-        M = "at start of SetWDMFiles"
-        Call F90_FILSTA(M, Len(M))
 
         pWdmCount = 0
         For i = 1 To pFilesBlk.Count
@@ -1780,11 +1728,7 @@ Public Class HspfUci
                     'see if this wdm is already in project
                     ifound = False
                     If ifound = False And pWdmCount < 4 Then 'add it to project
-                        M = "just before AddWDMFile"
-                        Call F90_FILSTA(M, Len(M))
                         lFile = AddWDMFile(lHFile.Name.Trim)
-                        M = "at end of AddWDMFile"
-                        Call F90_FILSTA(M, Len(M))
                         If Not lFile Is Nothing Then
                             s = lHFile.Typ
                             Ind = WDMInd(Left(s, 4))
@@ -2515,11 +2459,7 @@ x:
         Dim lReturnCode As Integer
         Dim lRecordType As Integer
         Do Until lDone
-            If Me.FastFlag Then
-                GetNextRecordFromBlock("FTABLES", lReturnKey, lBuff, lRecordType, lReturnCode)
-            Else
-                Call REM_XBLOCK(Me, lOmCode, lInit, lReturnKey, lBuff, lReturnCode)
-            End If
+            GetNextRecordFromBlock("FTABLES", lReturnKey, lBuff, lRecordType, lReturnCode)
             lInit = 0
             If lBuff Is Nothing Then
                 lDone = True
@@ -2534,14 +2474,10 @@ x:
                     End If
                 Next
                 If Not lOperation Is Nothing Then
-                    If Me.FastFlag Then
-                        lRecordType = -999
-                        Do Until lRecordType = 0
-                            GetNextRecordFromBlock("FTABLES", lReturnKey, lBuff, lRecordType, lReturnCode)
-                        Loop
-                    Else
-                        Call REM_XBLOCK(Me, lOmCode, lInit, lReturnKey, lBuff, lReturnCode)
-                    End If
+                    lRecordType = -999
+                    Do Until lRecordType = 0
+                        GetNextRecordFromBlock("FTABLES", lReturnKey, lBuff, lRecordType, lReturnCode)
+                    Loop
                     With lOperation.FTable
                         Dim lString As String = lBuff.Substring(0, 5)
                         If lString.Trim.Length > 0 Then
@@ -2557,12 +2493,8 @@ x:
                         End If
                         Dim lRow As Integer = 1
                         Do While lRow <= .Nrows
-                            If Me.FastFlag Then
-                                GetNextRecordFromBlock("FTABLES", lReturnKey, lBuff, lRecordType, lReturnCode)
-                            Else
-                                lRecordType = 0
-                                Call REM_XBLOCK(Me, lOmCode, lInit, lReturnKey, lBuff, lReturnCode)
-                            End If
+                            GetNextRecordFromBlock("FTABLES", lReturnKey, lBuff, lRecordType, lReturnCode)
+
                             If lRecordType = -1 Then 'this is a comment
                                 If .Comment.Length = 0 Then
                                     .Comment = lBuff
