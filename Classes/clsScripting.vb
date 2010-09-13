@@ -163,7 +163,12 @@ Public Class Scripting
 
         Select Case aLanguage
             Case "cs"
-                provider = New Microsoft.CSharp.CSharpCodeProvider
+                'provider = New Microsoft.CSharp.CSharpCodeProvider
+                'Paul Meems - 2010/09/13: Use FrameWork v3.5 so we can use the C#3.0 options:
+                Dim provOptions As New System.Collections.Generic.Dictionary(Of String, String)()
+                provOptions.Add("CompilerVersion", "v3.5")
+                provider = New Microsoft.CSharp.CSharpCodeProvider(provOptions)
+
                 If aCode.IndexOf("using ") < 0 Then needSupportCode = True
                 'Case "js" : provider = Activator.CreateInstance("Microsoft.JScript", "Microsoft.JScript.JScriptCodeProvider").Unwrap()
             Case "vb"
