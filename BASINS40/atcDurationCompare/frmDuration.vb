@@ -15,7 +15,7 @@ Public Class frmDuration
         doDurReport(aTimeseriesGroup, aClassLimits)
     End Sub
 
-    Private Sub mnuSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    Private Sub mnuSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSave.Click
         Dim lSaveFileDialog As New Windows.Forms.SaveFileDialog
         With lSaveFileDialog
             .Title = "Save Duration Report As..."
@@ -29,7 +29,7 @@ Public Class frmDuration
         End With
     End Sub
 
-    Public Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    Public Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
         If sender.text = "Graph" Then
             doDurPlot(pDataGroup)
         Else

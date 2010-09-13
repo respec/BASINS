@@ -1,7 +1,7 @@
 Imports atcData
 Imports atcUtility
 
-Public Class clsHspfSupportPlugin
+Public Class clsDurationComparePlugin
     Inherits atcDataPlugin
 
     Public Overrides ReadOnly Property Name() As String
