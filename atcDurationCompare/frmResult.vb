@@ -2,6 +2,7 @@
 Imports atcUtility
 Imports atcGraph
 Imports ZedGraph
+Imports MapWinUtility
 
 Public Class frmResult
     Private WithEvents pDataGroup As atcTimeseriesGroup
@@ -51,6 +52,13 @@ Public Class frmResult
         End Get
     End Property
 
+    'This is designed for automated testing of this class in the TestingScript project
+    Public ReadOnly Property Results() As String
+        Get
+            Return txtReport.Text
+        End Get
+    End Property
+
     Public Overridable Function doPlot(ByVal aDatagroup As atcDataGroup) As Boolean
         Select Case pAnalysis.ToLower
             Case "duration", "compare"
@@ -74,10 +82,10 @@ Public Class frmResult
 
     End Function
 
-    Public Overridable Sub doReportDH(ByVal aTimeseriesGroup As atcDataGroup, ByVal aClassLimits As Double())
+    Public Overridable Sub doReportDH(ByVal aTimeseriesGroup As atcDataGroup, ByVal aPCTs As Double())
         Dim lStrbuilder As New Text.StringBuilder
         For Each lTS In aTimeseriesGroup
-            lStrbuilder.AppendLine(DurationHydrograph(lTS, aClassLimits))
+            lStrbuilder.AppendLine(DurationHydrograph(lTS, aPCTs))
         Next
         txtReport.Text = lStrbuilder.ToString
     End Sub
@@ -120,18 +128,37 @@ Public Class frmResult
         End With
     End Sub
 
-    Public Sub doPlotDH(ByVal aTimeseriesGroup As atcDataGroup, ByVal aClassLimits As Double())
+    Public Sub doPlotDH(ByVal aTimeseriesGroup As atcDataGroup, ByVal aClassLimits As Double(), Optional ByVal aSpecification As String = "")
         If pListPEGroups.Count = 0 Then
             For Each lTS As atcTimeseries In aTimeseriesGroup
                 pListPEGroups.Add(DurationHydrographSeasons(lTS, aClassLimits))
             Next
         End If
+
+        Dim lFileCounter As Integer = 0
+        Dim lFileName As String = ""
         For Each lTSgroup As atcTimeseriesGroup In pListPEGroups
-            DurationHydrographPlot(lTSgroup)
+            If pListPEGroups.Count > 1 And aSpecification IsNot Nothing Then
+                'Only do this if more than one graphs are to be plotted and user wants to save into specified files
+                If aSpecification.Length > 10 And IO.Directory.Exists(IO.Path.GetDirectoryName(aSpecification)) Then
+                    lFileCounter += 1
+                    lFileName = IO.Path.Combine(IO.Path.GetFileNameWithoutExtension(aSpecification) & "_" & lFileCounter, IO.Path.GetExtension(aSpecification))
+                    DurationHydrographPlot(lTSgroup, lFileName)
+                Else
+                    Logger.Dbg("atcDurationCompare:doPlotDH: cannot be saved into user specified file: " & aSpecification)
+                    DurationHydrographPlot(lTSgroup)
+                End If
+            Else
+                If aSpecification IsNot Nothing AndAlso Not aSpecification = "" Then
+                    DurationHydrographPlot(lTSgroup, aSpecification)
+                Else
+                    DurationHydrographPlot(lTSgroup)
+                End If
+            End If
         Next
     End Sub
 
-    Public Function doPlotDurCompare(ByRef aDatagroup As atcDataGroup) As Boolean
+    Public Function doPlotDurCompare(ByRef aDatagroup As atcDataGroup, Optional ByVal aSpecification As String = "") As Boolean
         Dim doneIt As Boolean = True
         Dim lp As String = ""
         Dim lgraphForm As New atcGraph.atcGraphForm()
@@ -139,12 +166,15 @@ Public Class frmResult
         Dim lZgc As ZedGraphControl = lgraphForm.ZedGraphCtrl
         Dim lGraphDur As New clsGraphProbability(aDatagroup, lZgc)
         lgraphForm.Grapher = lGraphDur
-        lgraphForm.Show()
-
+        If aSpecification = "" Then
+            lgraphForm.Show()
+        Else
+            lZgc.SaveIn(aSpecification)
+        End If
         Return doneIt
     End Function
 
-    Public Function DurationHydrographPlot(ByVal aDataGroup As atcTimeseriesGroup) As Boolean
+    Public Function DurationHydrographPlot(ByVal aDataGroup As atcTimeseriesGroup, Optional ByVal aSpecification As String = "") As Boolean
         Dim doneIt As Boolean = True
         Dim lp As String = ""
         Dim lgraphForm As New atcGraph.atcGraphForm()
@@ -208,8 +238,12 @@ Public Class frmResult
         lGraphDurHyd.ZedGraphCtrl.GraphPane.GraphObjList.Add(lText)
         lgraphForm.Width = 720
         lgraphForm.Height = 560
-        lgraphForm.Show()
 
+        If aSpecification = "" Then
+            lgraphForm.Show()
+        Else
+            lZgc.SaveIn(aSpecification)
+        End If
         Return doneIt
     End Function
 

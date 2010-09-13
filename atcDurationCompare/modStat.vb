@@ -751,6 +751,9 @@ Public Module modStat
     'End Function
 
     Public Function DurationHydrograph(ByVal aTS As atcTimeseries, ByVal aPcts As Double()) As String
+        If aPcts Is Nothing OrElse aPcts.Length = 0 Then
+            aPcts = DefaultExceedances()
+        End If
         Dim lStr As StringBuilder = New StringBuilder()
         Dim lExceedancePcts(aPcts.Length - 1) As Double
         For I As Integer = 0 To aPcts.Length - 1
@@ -873,6 +876,9 @@ Public Module modStat
     End Function
 
     Public Function DurationHydrographSeasons(ByVal aTS As atcTimeseries, ByVal aPcts As Double()) As atcTimeseriesGroup
+        If aPcts Is Nothing OrElse aPcts.Length = 0 Then
+            aPcts = DefaultExceedances()
+        End If
         Dim lDataGroup As New atcTimeseriesGroup
         Dim lExceedancePcts(aPcts.Length - 1) As Double
         For I As Integer = 0 To aPcts.Length - 1
@@ -959,6 +965,11 @@ Public Module modStat
             lDataGroup.Add(lNewPETS)
         Next ' lExccedPercent
         Return lDataGroup
+    End Function
+
+    Public Function DefaultExceedances() As Double()
+        Dim lDef() As Double = {0.0, 0.1, 0.2, 0.3, 0.5, 0.7, 0.8, 0.9, 1.0}
+        Return lDef
     End Function
 
     Public Function DRNHYD(ByVal aTS As atcTimeseries, _
