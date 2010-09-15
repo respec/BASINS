@@ -1554,7 +1554,6 @@ Public Class frmSWMMSetup
 
         If PreProcessChecking(lSWMMProjectFileName, lNodeLayerIndex, lConduitLayerIndex, lCatchmentLayerIndex) Then
             With pPlugIn.SWMMProject
-                .Name = lName
                 .Title = "SWMM Project Written from BASINS"
                 .RainGages.Clear()
                 .Evaporation.Timeseries = Nothing
