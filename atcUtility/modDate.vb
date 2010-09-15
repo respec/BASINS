@@ -44,11 +44,11 @@ Public Module modDate
     Public Const JulianMillisecond As Double = 1 / 86400000
 
     ''' <summary>estimate of month as number of days</summary>
-    ''' <remarks>When doing math on months and years, it is more accurate to use subroutines Timdif and Timadd</remarks>
+    ''' <remarks>When doing math on months and years, it is more accurate to use subroutines Timdif, Timadd, TimAddJ</remarks>
     Public Const JulianMonth As Double = 30.44
 
     ''' <summary>estimate of year as number of days</summary>
-    ''' <remarks>When doing math on months and years, it is more accurate to use subroutines Timdif and Timadd</remarks>
+    ''' <remarks>When doing math on months and years, it is more accurate to use subroutines Timdif, Timadd, TimAddJ</remarks>
     Public Const JulianYear As Double = 365.25
 
     '''' <summary>Julian days from actual year zero to modified Julian day we use as zero</summary>
@@ -782,112 +782,119 @@ Public Module modDate
         Return lTimAddJ
     End Function
 
+    ''' <summary>
+    ''' Add NVALS time steps to first date to compute second date.
+    ''' </summary>
+    ''' <param name="DATE1">starting date</param>
+    ''' <param name="TCODE">time units
+    '''              1 - second          5 - month
+    '''              2 - minute          6 - year
+    '''              3 - hour            7 - century
+    '''              4 - Day
+    ''' </param>
+    ''' <param name="TSTEP">number of TCODE units in one step, for example 10 if dealing with 10-minute data</param>
+    ''' <param name="NVALS">number of (TCODE * TSTEP) time intervals to add</param>
+    ''' <param name="DATE2">result of adding (TCODE * TSTEP * NVALS) to DATE1</param>
+    ''' <remarks>uses TIMADDJ if NVALS is less than zero</remarks>
     Public Sub TIMADD(ByVal DATE1() As Integer, _
                       ByVal TCODE As Integer, ByVal TSTEP As Integer, _
                       ByVal NVALS As Integer, ByRef DATE2() As Integer)
 
-        ' Add NVALS time steps to first date to compute second date.
-        ' The first date is assumed to be valid.
-        '     DATE1  - starting date
-        '     TCODE  - time units
-        '              1 - second          5 - month
-        '              2 - minute          6 - year
-        '              3 - hour            7 - century
-        '              4 - Day
-        '     TSTEP  - time step in TCODE units
-        '     NVALS  - number of time steps to be added
-        '     DATE2  - new date
-        Dim STPOS, TMN, TDY, TYR, CARRY, DPM, TMO, THR, TSC, DONFG As Integer
+        If NVALS < 0 Then
+            J2Date(TimAddJ(Date2J(DATE1), TCODE, TSTEP, NVALS), DATE2)
+        Else
+            Dim STPOS, TMN, TDY, TYR, CARRY, DPM, TMO, THR, TSC, DONFG As Integer
 
-        TYR = DATE1(0)
-        TMO = DATE1(1)
-        TDY = DATE1(2)
-        THR = DATE1(3)
-        TMN = DATE1(4)
-        TSC = DATE1(5)
+            TYR = DATE1(0)
+            TMO = DATE1(1)
+            TDY = DATE1(2)
+            THR = DATE1(3)
+            TMN = DATE1(4)
+            TSC = DATE1(5)
 
-        'figure out how much time to add and where to start
-        CARRY = NVALS * TSTEP
-        STPOS = TCODE
-        If (STPOS = 7) Then 'time units are centuries, convert to years
-            STPOS = 6
-            CARRY = CARRY * 100
-        End If
-
-        'add the time, not changing insig. parts
-        If (STPOS = 1) Then 'seconds
-            TSC = TSC + CARRY
-            CARRY = Fix(TSC / 60)
-            TSC = TSC - (CARRY * 60)
-        End If
-        If (STPOS <= 2 And CARRY > 0) Then ' minutes
-            TMN = TMN + CARRY
-            CARRY = Fix(TMN / 60)
-            TMN = TMN - (CARRY * 60)
-        End If
-        If (STPOS <= 3 And CARRY > 0) Then ' hours
-            THR = THR + CARRY
-            CARRY = Fix(THR / 24)
-            THR = THR - (CARRY * 24)
-            If (THR = 0 And TMN = 0 And TSC = 0) Then 'this is the day boundry problem
-                THR = 24
-                CARRY = CARRY - 1
+            'figure out how much time to add and where to start
+            CARRY = NVALS * TSTEP
+            STPOS = TCODE
+            If (STPOS = 7) Then 'time units are centuries, convert to years
+                STPOS = 6
+                CARRY = CARRY * 100
             End If
-        End If
-        If (STPOS <= 4 And CARRY > 0) Then ' days
-            TDY = TDY + CARRY
-            If (TDY > 28) Then 'may need month/year adjustment
-                DONFG = 0
-                While DONFG = 0
-                    DPM = daymon(TYR, TMO)
-                    If (TDY > DPM) Then 'add another month
-                        TDY = TDY - DPM
-                        TMO = TMO + 1
-                        If (TMO > 12) Then 'add year
-                            TMO = 1
-                            TYR = TYR + 1
+
+            'add the time, not changing insig. parts
+            If (STPOS = 1) Then 'seconds
+                TSC = TSC + CARRY
+                CARRY = Fix(TSC / 60)
+                TSC = TSC - (CARRY * 60)
+            End If
+            If (STPOS <= 2 And CARRY > 0) Then ' minutes
+                TMN = TMN + CARRY
+                CARRY = Fix(TMN / 60)
+                TMN = TMN - (CARRY * 60)
+            End If
+            If (STPOS <= 3 And CARRY > 0) Then ' hours
+                THR = THR + CARRY
+                CARRY = Fix(THR / 24)
+                THR = THR - (CARRY * 24)
+                If (THR = 0 And TMN = 0 And TSC = 0) Then 'this is the day boundry problem
+                    THR = 24
+                    CARRY = CARRY - 1
+                End If
+            End If
+            If (STPOS <= 4 And CARRY > 0) Then ' days
+                TDY = TDY + CARRY
+                If (TDY > 28) Then 'may need month/year adjustment
+                    DONFG = 0
+                    While DONFG = 0
+                        DPM = daymon(TYR, TMO)
+                        If (TDY > DPM) Then 'add another month
+                            TDY = TDY - DPM
+                            TMO = TMO + 1
+                            If (TMO > 12) Then 'add year
+                                TMO = 1
+                                TYR = TYR + 1
+                            End If
+                        ElseIf (TDY <= 0) Then  'subtract another month
+                            TMO = TMO - 1
+                            If (TMO = 0) Then
+                                TYR = TYR - 1
+                                TMO = 12
+                            End If
+                            TDY = TDY - daymon(TYR, TMO)
+                        Else
+                            DONFG = 1
                         End If
-                    ElseIf (TDY <= 0) Then  'subtract another month
-                        TMO = TMO - 1
-                        If (TMO = 0) Then
-                            TYR = TYR - 1
-                            TMO = 12
-                        End If
-                        TDY = TDY - daymon(TYR, TMO)
-                    Else
-                        DONFG = 1
-                    End If
-                End While
+                    End While
+                End If
+                'month and year updated here all done
             End If
-            'month and year updated here all done
+
+            If (STPOS >= 5) Then
+                If (STPOS = 5) Then 'months
+                    TMO = TMO + CARRY
+                    CARRY = Fix((TMO - 1) / 12)
+                    TMO = TMO - (CARRY * 12)
+                End If
+                If (STPOS <= 6 And CARRY > 0) Then ' years
+                    TYR = TYR + CARRY
+                End If
+
+                'check days/month
+                DPM = daymon(TYR, TMO)
+                If (DPM < TDY) Then
+                    TDY = DPM
+                End If
+                If (daymon(DATE1(0), DATE1(1)) = DATE1(2)) Then
+                    TDY = DPM
+                End If
+            End If
+
+            DATE2(0) = TYR
+            DATE2(1) = TMO
+            DATE2(2) = TDY
+            DATE2(3) = THR
+            DATE2(4) = TMN
+            DATE2(5) = TSC
         End If
-
-        If (STPOS >= 5) Then
-            If (STPOS = 5) Then 'months
-                TMO = TMO + CARRY
-                CARRY = Fix((TMO - 1) / 12)
-                TMO = TMO - (CARRY * 12)
-            End If
-            If (STPOS <= 6 And CARRY > 0) Then ' years
-                TYR = TYR + CARRY
-            End If
-
-            'check days/month
-            DPM = daymon(TYR, TMO)
-            If (DPM < TDY) Then
-                TDY = DPM
-            End If
-            If (daymon(DATE1(0), DATE1(1)) = DATE1(2)) Then
-                TDY = DPM
-            End If
-        End If
-
-        DATE2(0) = TYR
-        DATE2(1) = TMO
-        DATE2(2) = TDY
-        DATE2(3) = THR
-        DATE2(4) = TMN
-        DATE2(5) = TSC
     End Sub
 
     Public Sub TimDif(ByVal DATE1() As Integer, ByVal DATE2() As Integer, _

@@ -59,10 +59,14 @@ Public Class atcTimeseriesScriptPlugin
             Try
                 Dim lSelectForm As New frmSelectScript
                 With lSelectForm
+                    .Width = GetSetting("BASINS4", "Window Positions", "SelectScriptWidth", .Width)
+                    .Height = GetSetting("BASINS4", "Window Positions", "SelectScriptHeight", .Height)
                     .Text = "Script Selection for importing " & aFileName
                     .LoadGrid(aFileName)
 ShowSelect:
                     .ShowDialog()
+                    SaveSetting("BASINS4", "Window Positions", "SelectScriptWidth", .Width)
+                    SaveSetting("BASINS4", "Window Positions", "SelectScriptHeight", .Height)
                     Dim lDefinitionFilename As String = .SelectedScript
                     Select Case .ButtonPressed
                         Case .cmdCancel.Text : Exit Function

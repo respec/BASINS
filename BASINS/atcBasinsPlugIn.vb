@@ -124,13 +124,7 @@ Public Class atcBasinsPlugIn
 
         CheckForUpdates(True)
 
-        Try
-            Dim lKey As String = g_MapWin.Plugins.GetPluginKey("Timeseries::Statistics")
-            'If Not g_MapWin.Plugins.PluginIsLoaded(lKey) Then 
-            g_MapWin.Plugins.StartPlugin(lKey)
-        Catch lEx As Exception
-            Logger.Dbg("Exception loading Timeseries::Statistics - " & lEx.Message)
-        End Try
+        atcDataManager.LoadPlugin("Timeseries::Statistics")
 
         Dim lHelpFilename As String = FindFile("", g_ProgramDir & "docs\BASINS4.0.chm")
         If FileExists(lHelpFilename) Then
@@ -181,7 +175,6 @@ Public Class atcBasinsPlugIn
         atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_GenScn", atcDataManager.LaunchMenuName, "GenScn")
         atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_WDMUtil", atcDataManager.LaunchMenuName, "WDMUtil")
 
-        atcDataManager.LoadPlugin("Timeseries::Statistics")
         atcDataManager.LoadPlugin("D4EM Data Download::Main")
 
         Try 'atcDataManager.XML gets loaded when opening a project. This makes sure it gets loaded even without a project
