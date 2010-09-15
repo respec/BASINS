@@ -261,7 +261,11 @@ Public Class atcDataSourceNOAAISH
                     lData.numValues = lData.Attributes.GetValue("Count")
                     If lData.numValues > 0 Then
                         lData.Dates.Value(0) = lData.Dates.Value(1) - JulianHour 'set 0th date to start of 1st interval
-                        lDataFilled = FillValues(lData, 3, 1, 0.0, MissingVal, MissingAcc)
+                        If lData.Attributes.GetValue("Constituent").ToString.Substring(0, 4) = "HPCP" Then
+                            lDataFilled = FillValues(lData, 3, 1, 0.0, MissingVal, MissingAcc)
+                        Else
+                            lDataFilled = FillValues(lData, 3, 1, MissingVal, MissingVal, MissingAcc)
+                        End If
                         If Not lDataFilled Is Nothing Then
                             lDataFilled.ValuesNeedToBeRead = False
                             lDataFilled.Dates.ValuesNeedToBeRead = False
