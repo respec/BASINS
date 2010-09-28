@@ -94,7 +94,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\..\mapwindow4dev\bin\</OutputPath>
+    <OutputPath>..\..\mapwindow4dev\bin64\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>
     </DocumentationFile>
