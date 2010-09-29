@@ -72,8 +72,10 @@ Public Class PlugIn
             GisUtil.MappingObject = pMapWin
             If pFrmModelSegmentation Is Nothing OrElse pFrmModelSegmentation.IsDisposed Then
                 pFrmModelSegmentation = New frmModelSegmentation
+                pFrmModelSegmentation.Show(pMapWinForm)
+            Else
+                pFrmModelSegmentation.BringToFront()
             End If
-            pFrmModelSegmentation.Show(pMapWinForm)
             aHandled = True
         End If
     End Sub

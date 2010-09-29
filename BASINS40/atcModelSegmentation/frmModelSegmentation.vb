@@ -3,6 +3,7 @@ Imports atcMwGisUtility
 Imports MapWinUtility
 
 Friend Class frmModelSegmentation
+    Implements DotSpatial.Main.IProgressHandler
 
     Event OpenTableEditor(ByVal aLayerName As String)
     Event TableEdited()
@@ -138,4 +139,82 @@ Friend Class frmModelSegmentation
         End If
     End Sub
 
+    Private Sub cmdThiessen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdThiessen.Click
+        'todo: implement using selected features option
+        'todo: add attributes to output thiessens
+        'todo: check/remove thiessen layer that already exists
+
+        Dim lMetLayerName As String = cboMetStations.Items(cboMetStations.SelectedIndex)
+        Dim lMetLayerFileName As String = GisUtil.LayerFileName(lMetLayerName)
+        Dim lTempPath As String = IO.Path.GetTempPath
+
+        'copy the input points to a temp file because the dot spatial function insists the points not be on the map
+        TryCopyShapefile(lMetLayerFileName, lTempPath)
+        Dim lTempPointFileName As String = IO.Path.Combine(lTempPath, IO.Path.GetFileName(lMetLayerFileName))
+
+        'open the points into a dot spatial feature set
+        Dim lPoints As DotSpatial.Data.IFeatureSet = New DotSpatial.Data.PointShapefile(lTempPointFileName)
+
+        'because of a strange feature of the dot spatial voronoi algorithm, need scaled-down points
+        Dim lScaledDownPoints As DotSpatial.Data.IFeatureSet = New DotSpatial.Data.FeatureSet()
+        Dim lScaleFactor As Integer = 100000
+        For Each lFeature As DotSpatial.Data.Feature In lPoints.Features
+            Dim lX As Double = lFeature.Coordinates(0).X / lScaleFactor
+            Dim lY As Double = lFeature.Coordinates(0).Y / lScaleFactor
+            Dim lPt As New DotSpatial.Geometries.Point(lX, lY)
+            Dim lNewFeature As New DotSpatial.Data.Feature(lPt)
+            lScaledDownPoints.AddFeature(lNewFeature)
+        Next
+
+        'calculate the thiessen polygons
+        Dim lScaledDownPolygons As DotSpatial.Data.IFeatureSet = DotSpatial.Analysis.Voronoi.VoronoiPolygons(lScaledDownPoints, True, Nothing)
+
+        'save the scaled down thiessen polygons
+        'Dim lScaledDownOutputFile As String = IO.Path.GetDirectoryName(lMetLayerFileName) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lMetLayerFileName) & "ScaledDownThiessens.shp"
+        'lScaledDownPolygons.SaveAs(lScaledDownOutputFile, True)
+        'TryCopy(IO.Path.GetDirectoryName(lMetLayerFileName) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lMetLayerFileName) & ".prj", _
+        '        IO.Path.GetDirectoryName(lScaledDownOutputFile) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lScaledDownOutputFile) & ".prj")
+        'GisUtil.AddLayer(lScaledDownOutputFile, "Scaled Down Thiessen Polygons")
+
+        'find max coordinate of scaled down version to use in upscaling
+        Dim lMaxCoordinate As Double = Math.Abs(lScaledDownPolygons.Envelope.Maximum.Y)
+        If Math.Abs(lScaledDownPolygons.Envelope.Maximum.X) > lMaxCoordinate Then
+            lMaxCoordinate = Math.Abs(lScaledDownPolygons.Envelope.Maximum.X)
+        End If
+        If Math.Abs(lScaledDownPolygons.Envelope.Minimum.Y) > lMaxCoordinate Then
+            lMaxCoordinate = Math.Abs(lScaledDownPolygons.Envelope.Minimum.Y)
+        End If
+        If Math.Abs(lScaledDownPolygons.Envelope.Minimum.X) > lMaxCoordinate Then
+            lMaxCoordinate = Math.Abs(lScaledDownPolygons.Envelope.Minimum.X)
+        End If
+
+        'now scale the polygons back up
+        Dim lFullSizePolygons As DotSpatial.Data.IFeatureSet = New DotSpatial.Data.FeatureSet()
+        lFullSizePolygons = lScaledDownPolygons
+        For Each lFeature As DotSpatial.Data.Feature In lFullSizePolygons.Features
+            For Each lCoordinate As DotSpatial.Geometries.Coordinate In lFeature.Coordinates
+                If Math.Abs(lCoordinate.X) <= lMaxCoordinate Then  'have to check to see if we've already scaled this point
+                    lCoordinate.X = lCoordinate.X * lScaleFactor
+                End If
+                If Math.Abs(lCoordinate.Y) <= lMaxCoordinate Then
+                    lCoordinate.Y = lCoordinate.Y * lScaleFactor
+                End If
+            Next
+        Next
+
+        'save the thiessen polygons
+        Dim lOutputFile As String = IO.Path.GetDirectoryName(lMetLayerFileName) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lMetLayerFileName) & "Thiessens.shp"
+        lFullSizePolygons.SaveAs(lOutputFile, True)
+        TryCopy(IO.Path.GetDirectoryName(lMetLayerFileName) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lMetLayerFileName) & ".prj", _
+                IO.Path.GetDirectoryName(lOutputFile) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lOutputFile) & ".prj")
+
+        Dim lNewLayerName As String = "Thiessen Polygons for " & lMetLayerName
+        GisUtil.AddLayer(lOutputFile, lNewLayerName)
+        GisUtil.LayerVisible(lNewLayerName) = True
+        TryDeleteShapefile(lTempPointFileName)
+    End Sub
+
+    Public Sub Progress(ByVal Key As String, ByVal Percent As Integer, ByVal Message As String) Implements DotSpatial.Main.IProgressHandler.Progress
+        Logger.Progress(Percent, 100)
+    End Sub
 End Class

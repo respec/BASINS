@@ -86,6 +86,26 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotSpatial.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=de6dc4a67596c1e5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\DotSpatial.Common.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Data, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b600b0ba19543541, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\DotSpatial.Data.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Desktop, Version=6.0.0.0, Culture=neutral, PublicKeyToken=ca60e6823c3a6ee5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\DotSpatial.Desktop.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Topology, Version=1.0.0.0, Culture=neutral, PublicKeyToken=fbcb22813a521af8, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\DotSpatial.Topology.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Interop.MapWinGIS, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\Interop.MapWinGIS.dll</HintPath>
