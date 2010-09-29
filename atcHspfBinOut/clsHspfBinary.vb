@@ -157,19 +157,24 @@ Friend Class HspfBinary
                             Dim lVariableCount As Integer = lHspfBinaryHeader.VarNames.Count
                             ReDim .Value(lVariableCount - 1)
                             For lVariableIndex As Integer = 0 To lVariableCount - 1
-                                Dim lValue As Double = BitConverter.ToSingle(lCurrentRecord, 52 + (lVariableIndex * 4))
-                                If lValue < -1.0E+29 Then lValue = GetNaN()
-                                .Value(lVariableIndex) = lValue
+                                Try
+                                    Dim lValue As Double = BitConverter.ToSingle(lCurrentRecord, 52 + (lVariableIndex * 4))
+                                    If lValue < -1.0E+29 Then lValue = GetNaN()
+                                    .Value(lVariableIndex) = lValue
+                                Catch e As Exception
+                                    Logger.Dbg("***** Problem Converting Data for Key:" & lHspfBinId.AsKey & " " & e.ToString & vbCrLf & " at record " & pFileRecordIndex & " of " & pFile.RecordCount)
+                                    .Value(lVariableIndex) = GetNaN()
+                                End Try
                             Next lVariableIndex
                             Dim lDataKey As String = .OutLev & ":" & Date2J(.DateArray)
                             Try
                                 lHspfBinaryHeader.Data.Add(lHspfBinData) 'should this be a date string YYYY/MM/DD HH?
                             Catch e As Exception
-                                Logger.Dbg("***** ReadNewRecords:Fail to add data to header " & e.ToString)
+                                Logger.Dbg("***** ReadNewRecords:Fail to add data to header " & e.ToString & vbCrLf & " at record " & pFileRecordIndex & " of " & pFile.RecordCount)
                             End Try
                         End With
                     Catch e As Exception
-                        Dim lString As String = "***** Data Without Header for Key:" & lHspfBinId.AsKey & " " & e.ToString
+                        Dim lString As String = "***** Data Without Header for Key:" & lHspfBinId.AsKey & " " & e.ToString & vbCrLf & " at record " & pFileRecordIndex & " of " & pFile.RecordCount
                         Logger.Dbg(lString)
                         pErrorDescription = lString
                     End Try
@@ -181,6 +186,7 @@ Friend Class HspfBinary
             Logger.Progress(pFileRecordIndex, pFile.RecordCount * 2)
             pFileRecordIndex += 1
         End While
+        Logger.Dbg("DoneRecord " & pFileRecordIndex)
     End Sub
 
     Private Function MakeId(ByVal aRecord() As Byte) As HspfBinaryId
