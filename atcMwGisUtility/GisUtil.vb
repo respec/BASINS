@@ -2895,6 +2895,29 @@ Public Class GisUtil
         End If
     End Function
 
+    Public Shared Sub CopyAllAttributes(ByVal aSourceLayerIndex As Integer, ByVal aSourceFeatureIndex As Integer, ByVal aTargetLayerIndex As Integer, ByVal aTargetFeatureIndex As Integer)
+        'copy all attributes from a source feature to a target feature
+        Dim lSourceSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aSourceLayerIndex)
+        Dim lTargetSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aTargetLayerIndex)
+        If Not FeatureIndexValid(aSourceFeatureIndex, lSourceSf) Then
+            Throw New Exception("GisUtil:FieldValue:Error:FeatureIndex:" & aSourceFeatureIndex & ":OutOfRange")
+        ElseIf Not FeatureIndexValid(aTargetFeatureIndex, lTargetSf) Then
+            Throw New Exception("GisUtil:FieldValue:Error:FeatureIndex:" & aTargetFeatureIndex & ":OutOfRange")
+        Else
+            For lSourceFieldIndex As Integer = 0 To lSourceSf.NumFields - 1
+                Dim lFieldName As String = lSourceSf.Field(lSourceFieldIndex).Name
+                If Not IsField(aTargetLayerIndex, lFieldName) Then
+                    Dim lFieldWidth As Integer = lSourceSf.Field(lSourceFieldIndex).Width
+                    Dim lFieldType As Integer = lSourceSf.Field(lSourceFieldIndex).Type
+                    GisUtil.AddField(aTargetLayerIndex, lFieldName, lFieldType, lFieldWidth)
+                    GisUtil.StartSetFeatureValue(aTargetLayerIndex)
+                End If
+                Dim lTargetFieldIndex As Integer = FieldIndex(aTargetLayerIndex, lFieldName)
+                SetFeatureValueNoStartStop(aTargetLayerIndex, lTargetFieldIndex, aTargetFeatureIndex, FieldValue(aSourceLayerIndex, aSourceFeatureIndex, lSourceFieldIndex))
+            Next
+        End If
+    End Sub
+
     Public Shared WriteOnly Property ColoringScheme(ByVal aLayerIndex As Integer) As Object
         Set(ByVal aNewValue As Object)
             Dim lMWlayer As MapWindow.Interfaces.Layer = pMapWin.Layers(pMapWin.Layers.GetHandle(aLayerIndex))

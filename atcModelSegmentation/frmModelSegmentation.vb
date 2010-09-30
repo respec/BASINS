@@ -140,13 +140,30 @@ Friend Class frmModelSegmentation
     End Sub
 
     Private Sub cmdThiessen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdThiessen.Click
-        'todo: implement using selected features option
-        'todo: add attributes to output thiessens
-        'todo: check/remove thiessen layer that already exists
-
         Dim lMetLayerName As String = cboMetStations.Items(cboMetStations.SelectedIndex)
+        Dim lMetLayerIndex As Integer = GisUtil.LayerIndex(lMetLayerName)
         Dim lMetLayerFileName As String = GisUtil.LayerFileName(lMetLayerName)
         Dim lTempPath As String = IO.Path.GetTempPath
+
+        If cbxUseSelected.Checked And GisUtil.NumSelectedFeatures(lMetLayerIndex) = 0 Then
+            'nothing selected in specified layer, let user know this is a problem
+            Logger.Msg("Nothing is selected in layer '" & lMetLayerName & "'.", MsgBoxStyle.Critical, "Thiessen Problem")
+            Exit Sub
+        End If
+
+        'build local collection of selected features in met station layer
+        Dim lMetStationsSelected As New atcCollection
+        If cbxUseSelected.Checked Then
+            For lIndex As Integer = 1 To GisUtil.NumSelectedFeatures(lMetLayerIndex)
+                lMetStationsSelected.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex - 1, lMetLayerIndex))
+            Next
+        End If
+        If lMetStationsSelected.Count = 0 Then
+            'no met stations selected, act as if all are selected
+            For lIndex As Integer = 1 To GisUtil.NumFeatures(lMetLayerIndex)
+                lMetStationsSelected.Add(lIndex - 1)
+            Next
+        End If
 
         'copy the input points to a temp file because the dot spatial function insists the points not be on the map
         TryCopyShapefile(lMetLayerFileName, lTempPath)
@@ -158,7 +175,8 @@ Friend Class frmModelSegmentation
         'because of a strange feature of the dot spatial voronoi algorithm, need scaled-down points
         Dim lScaledDownPoints As DotSpatial.Data.IFeatureSet = New DotSpatial.Data.FeatureSet()
         Dim lScaleFactor As Integer = 100000
-        For Each lFeature As DotSpatial.Data.Feature In lPoints.Features
+        For Each lFeatureIndex As Integer In lMetStationsSelected
+            Dim lFeature As DotSpatial.Data.Feature = lPoints.Features(lFeatureIndex)
             Dim lX As Double = lFeature.Coordinates(0).X / lScaleFactor
             Dim lY As Double = lFeature.Coordinates(0).Y / lScaleFactor
             Dim lPt As New DotSpatial.Geometries.Point(lX, lY)
@@ -204,13 +222,32 @@ Friend Class frmModelSegmentation
 
         'save the thiessen polygons
         Dim lOutputFile As String = IO.Path.GetDirectoryName(lMetLayerFileName) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lMetLayerFileName) & "Thiessens.shp"
+        If GisUtil.IsLayerByFileName(lOutputFile) Then
+            Dim lOutputLayerIndex As Integer = GisUtil.LayerIndex(lOutputFile)
+            GisUtil.RemoveLayer(lOutputLayerIndex)
+        End If
         lFullSizePolygons.SaveAs(lOutputFile, True)
         TryCopy(IO.Path.GetDirectoryName(lMetLayerFileName) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lMetLayerFileName) & ".prj", _
                 IO.Path.GetDirectoryName(lOutputFile) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lOutputFile) & ".prj")
 
+        'now add them to the map
         Dim lNewLayerName As String = "Thiessen Polygons for " & lMetLayerName
-        GisUtil.AddLayer(lOutputFile, lNewLayerName)
+        lMetLayerIndex = GisUtil.LayerIndex(lMetLayerName)
+        Dim lGroup As String = GisUtil.LayerGroup(lMetLayerIndex)
+        GisUtil.AddLayerToGroup(lOutputFile, lNewLayerName, lGroup)
         GisUtil.LayerVisible(lNewLayerName) = True
+
+        'add associated attributes from points to thiessen polygons
+        Dim lThiessenLayerIndex As Integer = GisUtil.LayerIndex(lNewLayerName)
+        lMetLayerIndex = GisUtil.LayerIndex(lMetLayerName)
+        GisUtil.StartSetFeatureValue(lThiessenLayerIndex)
+        Dim lTargetFeatureIndex As Integer = -1
+        For Each lFeatureIndex As Integer In lMetStationsSelected
+            lTargetFeatureIndex += 1
+            GisUtil.CopyAllAttributes(lMetLayerIndex, lFeatureIndex, lThiessenLayerIndex, lTargetFeatureIndex)
+        Next
+        GisUtil.StopSetFeatureValue(lThiessenLayerIndex)
+
         TryDeleteShapefile(lTempPointFileName)
     End Sub
 
