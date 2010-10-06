@@ -98,28 +98,35 @@ Public Class Strings
         Return ""
     End Function
 
-    Public Shared Function IsEmpty(ByVal lString As String) As Boolean
-        If lString Is Nothing OrElse lString.Length < 1 Then
+    ''' <summary>
+    ''' See if a String is empty or Nothing
+    ''' </summary>
+    ''' <param name="aString">String to check</param>
+    ''' <returns>True is empty or Nothing, otherwise False</returns>
+    ''' <remarks></remarks>
+    Public Shared Function IsEmpty(ByVal aString As String) As Boolean
+        If aString Is Nothing OrElse aString.Length < 1 Then
             Return True
         Else
             Return False
         End If
     End Function
 
-    Public Shared Sub SaveFileString(ByRef filename As String, ByRef FileContents As String)
-        ' ##SUMMARY Saves incoming string to a text file.
-        ' ##PARAM FileName I Name of output text file
-        ' ##PARAM FileContents I Incoming string to be saved to file
-        Dim OutFile As Integer
-        ' ##LOCAL OutFile - integer filenumber of output text file
-
+    ''' <summary>
+    ''' Saves incoming string to a text file.
+    ''' </summary>
+    ''' <param name="aFileName">Name of output text file</param>
+    ''' <param name="aFileContents">Incoming string to be saved to file</param>
+    ''' <remarks></remarks>
+    Public Shared Sub SaveFileString(ByRef aFileName As String, ByRef aFileContents As String)
         Try
-            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filename))
-            OutFile = FileSystem.FreeFile()
-            FileOpen(OutFile, filename, OpenMode.Output, OpenAccess.Write, OpenShare.LockWrite)
-            Print(OutFile, FileContents)
-            FileClose(OutFile)
-        Catch ex As Exception
+            Dim lDirectory As String = System.IO.Path.GetDirectoryName(aFileName)
+            If Not IO.Directory.Exists(lDirectory) Then
+                IO.Directory.CreateDirectory(lDirectory)
+            End If
+            IO.File.WriteAllText(aFileName, aFileContents)
+        Catch lEx As Exception
+            Logger.Dbg("SaveFileStringFailed " & lEx.ToString)
         End Try
     End Sub
 End Class
