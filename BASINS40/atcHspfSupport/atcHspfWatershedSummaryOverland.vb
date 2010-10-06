@@ -17,7 +17,7 @@ Public Module WatershedSummaryOverland
                   Optional ByVal aSummary As Boolean = True, _
                   Optional ByVal aIncludeMinMax As Boolean = True, _
                   Optional ByVal aWaterYears As Boolean = False, _
-                  Optional ByVal aIdsPerSeg As Integer = 50) As Text.StringBuilder
+                  Optional ByVal aIdsPerSeg As Integer = 50) As atcReport.IReport
 
         Dim lNumberFormat As String = "#,##0.000"
         Dim lUnits As String = ""
@@ -69,7 +69,7 @@ Public Module WatershedSummaryOverland
                 lAllNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SOSED"))
                 lAllNonpointData.AddRange(aScenarioResults.DataSets.FindData("Constituent", "SOSLD"))
             Case Else
-                Return New Text.StringBuilder("Overland report not yet defined for balance type '" & aConstituentType & "'")
+                Return New atcReport.ReportText("Overland report not yet defined for balance type '" & aConstituentType & "'")
         End Select
 
         Dim lAllYearsToDo As New Generic.Dictionary(Of String, atcTimeseriesGroup)
@@ -97,22 +97,22 @@ Public Module WatershedSummaryOverland
 
         If aSummary Then lAllYearsToDo.Add("Summary", lAllNonpointData)
 
-        Dim lSB As New Text.StringBuilder
+        Dim lReport As New atcReport.ReportText
         Dim lSJDate As Double = aUci.GlobalBlock.SDateJ
         For Each lCurrentNonpointData As atcTimeseriesGroup In lAllYearsToDo.Values
             lSeasonName = lCurrentNonpointData.ItemByIndex(0).Attributes.GetValue("SeasonName", "")
-            lSB.AppendLine("Overland Summary Report for " & aConstituentType & " in " & aScenario & " " & lUnits)
-            lSB.AppendLine("   Run Made " & aRunMade)
-            lSB.AppendLine("   Results From File " & aScenarioResults.Specification)
-            lSB.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
+            lReport.AppendLine("Overland Summary Report for " & aConstituentType & " in " & aScenario & " " & lUnits)
+            lReport.AppendLine("   Run Made " & aRunMade)
+            lReport.AppendLine("   Results From File " & aScenarioResults.Specification)
+            lReport.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
 
             Dim lCurrentIsAll As Boolean = lCurrentNonpointData.Equals(lAllNonpointData)
             Dim lSummary As Boolean = aIncludeMinMax AndAlso lCurrentIsAll
             If lSummary OrElse lCurrentIsAll Then
-                lSB.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
+                lReport.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
             Else
                 Dim lEJDate As Double = TimAddJ(lSJDate, 6, 1, 1)
-                lSB.AppendLine(TimeSpanAsString(lSJDate, lEJDate, "   Time Span: "))
+                lReport.AppendLine(TimeSpanAsString(lSJDate, lEJDate, "   Time Span: "))
                 lSJDate = lEJDate
             End If
 
@@ -343,11 +343,11 @@ Public Module WatershedSummaryOverland
                     End If
                 Next
 
-                lSB.Append(.ToString)
-                lSB.AppendLine()
+                lReport.Append(.ToString)
+                lReport.AppendLine()
             End With
         Next
-        Return lSB
+        Return lReport
     End Function
 
     Private Sub MinMaxID(ByVal aOperations As HspfOperations, ByRef aMinID As Integer, ByRef aMaxID As Integer)

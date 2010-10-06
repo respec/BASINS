@@ -9,7 +9,7 @@ Public Module ConstituentBudget
                            ByVal aOperationTypes As atcCollection, _
                            ByVal aScenario As String, _
                            ByVal aScenarioResults As atcTimeseriesSource, _
-                           ByVal aRunMade As String) As Text.StringBuilder
+                           ByVal aRunMade As String) As atcReport.IReport
 
         Dim lNumberFormat As String = "#,##0.0"
         Dim lUnits As String = ""
@@ -31,17 +31,17 @@ Public Module ConstituentBudget
                 lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "ROSED-TOT"))
                 lDepScourData.Add(aScenarioResults.DataSets.FindData("Constituent", "DEPSCOUR-TOT"))
             Case Else
-                Return New Text.StringBuilder("Budget report not yet defined for balance type '" & aBalanceType & "'")
+                Return New atcReport.ReportText("Budget report not yet defined for balance type '" & aBalanceType & "'")
         End Select
 
         Dim lUpstreamInflows As New atcCollection
         Dim lCumulativePointNonpointColl As New atcCollection
 
-        Dim lSB As New Text.StringBuilder
-        lSB.AppendLine(aScenario & " " & aBalanceType & " Average Annual Totals " & lUnits)
-        lSB.AppendLine("   Run Made " & aRunMade)
-        lSB.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-        lSB.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
+        Dim lReport As New atcReport.ReportText
+        lReport.AppendLine(aScenario & " " & aBalanceType & " Average Annual Totals " & lUnits)
+        lReport.AppendLine("   Run Made " & aRunMade)
+        lReport.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
+        lReport.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
 
         Dim lOutputTable As New atcTableDelimited
         With lOutputTable
@@ -118,8 +118,8 @@ Public Module ConstituentBudget
                 lField += 1 : .Value(lField) = DoubleToString(lReachTrappingEfficiency * 100, , lNumberFormat)
             Next
 
-            lSB.Append(.ToString)
-            Return lSB
+            lReport.Append(.ToString)
+            Return lReport
         End With
     End Function
 

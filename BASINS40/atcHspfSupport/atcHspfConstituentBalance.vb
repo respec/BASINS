@@ -16,13 +16,13 @@ Public Module ConstituentBalance
                      Optional ByVal aFieldWidth As Integer = 12)
 
         For Each lBalanceType As String In aBalanceTypes
-            Dim lString As Text.StringBuilder = Report(aUci, lBalanceType, aOperations, _
-                                                       aScenario, aScenarioResults, aLocations, _
-                                                       aRunMade, _
-                                                       aDateColumns, aDecimalPlaces, aSignificantDigits, aFieldWidth)
+            Dim lReport As atcReport.ReportText = Report(aUci, lBalanceType, aOperations, _
+                                                         aScenario, aScenarioResults, aLocations, _
+                                                         aRunMade, _
+                                                         aDateColumns, aDecimalPlaces, aSignificantDigits, aFieldWidth)
             Dim lOutFileName As String = aScenario & "_" & lBalanceType & "_Balance.txt"
             Logger.Dbg("  WriteReportTo " & lOutFileName)
-            SaveFileString(lOutFileName, lString.ToString)
+            SaveFileString(lOutFileName, lReport.ToString)
         Next lBalanceType
     End Sub
 
@@ -36,24 +36,24 @@ Public Module ConstituentBalance
                   Optional ByVal aDateRows As Boolean = False, _
                   Optional ByVal aDecimalPlaces As Integer = 3, _
                   Optional ByVal aSignificantDigits As Integer = 5, _
-                  Optional ByVal aFieldWidth As Integer = 12) As Text.StringBuilder
+                  Optional ByVal aFieldWidth As Integer = 12) As atcReport.IReport
         Dim lConstituentsToOutput As atcCollection = ConstituentsToOutput(aBalanceType)
 
-        Dim lString As New Text.StringBuilder
-        lString.AppendLine(aBalanceType & " Balance Report For " & aScenario)
-        lString.AppendLine("   Run Made " & aRunMade)
-        lString.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-        lString.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
+        Dim lReport As New atcReport.ReportText
+        lReport.AppendLine(aBalanceType & " Balance Report For " & aScenario)
+        lReport.AppendLine("   Run Made " & aRunMade)
+        lReport.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
+        lReport.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
         If aBalanceType = "Water" Then
             If aUci.GlobalBlock.EmFg = 1 Then
-                lString.AppendLine("   (Units:Inches)")
+                lReport.AppendLine("   (Units:Inches)")
             Else
-                lString.AppendLine("   (Units:mm)")
+                lReport.AppendLine("   (Units:mm)")
             End If
         ElseIf aBalanceType = "Sediment" Then
             aDecimalPlaces = 1 'TODO: adjust in calling routine?
         End If
-        lString.AppendLine(vbCrLf)
+        lReport.AppendLine(vbCrLf)
 
         For Each lOperationKey As String In aOperationTypes.Keys
             For Each lLocation As String In aLocations
@@ -222,9 +222,9 @@ Public Module ConstituentBalance
                             Next
                             If lOutputTable.NumFields > 0 Then
                                 If aDateRows Then
-                                    lString.Append(.ToStringPivoted)
+                                    lReport.Append(.ToStringPivoted)
                                 Else
-                                    lString.Append(.ToString)
+                                    lReport.Append(.ToString)
                                 End If
                             End If
                         End With
@@ -237,20 +237,20 @@ Public Module ConstituentBalance
                     Else
                         If lPendingOutput.Length > 0 Then
                             If lNeedHeader Then
-                                lString.AppendLine("No data for " & aBalanceType & " balance report at " & lLocation & "!")
+                                lReport.AppendLine("No data for " & aBalanceType & " balance report at " & lLocation & "!")
                             Else
                                 Logger.Dbg("  No data for " & lPendingOutput)
                             End If
                         End If
                     End If
                     lLocationDataGroup = Nothing
-                    lString.AppendLine(vbCrLf)
+                    lReport.AppendLine(vbCrLf)
                 Else
                     'Logger.Dbg("   SKIP " & lLocation)
                 End If
             Next lLocation
         Next lOperationKey
 
-        Return lString
+        Return lReport
     End Function
 End Module

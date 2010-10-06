@@ -73,16 +73,16 @@ Module HSPFWatershedSummaryWQReport
         Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
 
         'constituent balance
-        Dim lString As Text.StringBuilder = HspfSupport.ConstituentBalance.Report _
+        Dim lReport As atcReport.ReportText = HspfSupport.ConstituentBalance.Report _
                 (lHspfUci, pSummaryType, pOperationTypes, pBaseName, _
                  lHspfBinDataSource, lLocations, lHspfBinFileInfo.LastWriteTime)
         Dim lOutFileName As String = "outfiles\" & pSummaryType & "_" & "ConstituentBalance.txt"
-        SaveFileString(lOutFileName, lString.ToString)
+        SaveFileString(lOutFileName, lReport.ToString)
 
         'watershed summary
-        lString = HspfSupport.WatershedSummary.Report(lHspfUci, lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime, pSummaryType)
+        lReport = HspfSupport.WatershedSummary.Report(lHspfUci, lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime, pSummaryType)
         lOutFileName = "outfiles\" & pSummaryType & "_" & "WatershedSummary.txt"
-        SaveFileString(lOutFileName, lString.ToString)
-        lString = Nothing
+        SaveFileString(lOutFileName, lReport.ToString)
+        lReport = Nothing
     End Sub
 End Module

@@ -2,6 +2,7 @@ Imports atcUtility
 Imports atcData
 Imports atcWDM
 Imports atcGraph
+Imports atcDurationCompare
 Imports HspfSupport
 Imports MapWindow.Interfaces
 Imports ZedGraph
@@ -92,9 +93,10 @@ Module CompareStatsTest
             FitLine(aDataGroup.ItemByIndex(1), aDataGroup.ItemByIndex(0), lACoef, lBCoef, lRSquare)
             Dim lCorrCoef As Double = Math.Sqrt(lRSquare)
             AddLine(lPane, lACoef, lBCoef, Drawing.Drawing2D.DashStyle.Solid, "RegLine")
+            Dim lReport As New atcDurationCompare.DurationReport
             SaveFileString("CompareStats.txt", CompareStats(aDataGroup.ItemByIndex(0), _
                                                             aDataGroup.ItemByIndex(1), _
-                                             GetClassLimits(aDataGroup.ItemByIndex(0))))
+                                                            lReport.ClassLimits))
 
             Dim lText As New TextObj
             Dim lFmt As String = "###,##0.###"
