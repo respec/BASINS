@@ -73,7 +73,10 @@ Public Class ProgressLevel
     Public Sub New(Optional ByVal aIncrementAfter As Boolean = False, Optional ByVal aStaySameLevel As Boolean = False)
         pIncrementAfter = aIncrementAfter
         pStaySameLevel = aStaySameLevel
-        If Not pStaySameLevel Then Logger.Status("PROGRESSLEVEL +")
+        Logger.Dbg("NewProgressLevel " & pIncrementAfter & ":" & pStaySameLevel)
+        If Not pStaySameLevel Then
+            Logger.Status("PROGRESSLEVEL +")
+        End If
     End Sub
 
     ''' <summary>
@@ -81,6 +84,7 @@ Public Class ProgressLevel
     ''' </summary>
     ''' <remarks></remarks>
     Public Sub Reset()
+        Logger.Dbg("ResetProgressLevel " & pIncrementAfter & ":" & pStaySameLevel)
         If pIncrementAfter AndAlso Not pStaySameLevel Then
             Logger.Status("PROGRESSLEVEL -++")
         Else
@@ -92,6 +96,7 @@ Public Class ProgressLevel
     ''' Ensure the stack of logger progress levels is consistent after we are finished with this level
     ''' </summary>
     Public Sub Dispose() Implements IDisposable.Dispose
+        Logger.Dbg("DisposeProgressLevel " & pIncrementAfter & ":" & pStaySameLevel)
         If Not pDisposed Then
             pDisposed = True
             If pStaySameLevel Then

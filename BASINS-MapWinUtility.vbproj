@@ -1,7 +1,7 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -62,14 +62,14 @@
     </DefineConstants>
     <DefineDebug>false</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <DebugSymbols>false</DebugSymbols>
+    <DebugSymbols>true</DebugSymbols>
     <Optimize>true</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032</NoWarn>
-    <DebugType>none</DebugType>
+    <DebugType>pdbonly</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">

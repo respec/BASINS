@@ -20,94 +20,90 @@
 '********************************************************************************************************
 
 Public Class Strings
-    Public Shared Function StrSplit(ByRef Source As String, ByRef delim As String, ByRef quote As String) As String
-        ' ##SUMMARY Divides string into 2 portions at position of 1st occurence of specified _
-        'delimeter. Quote specifies a particular string that is exempt from the delimeter search.
-        ' ##SUMMARY   Example: StrSplit("Julie, Todd, Jane, and Ray", ",", "") = "Julie", and "Todd, Jane, and Ray" is returned as Source.
-        ' ##SUMMARY   Example: StrSplit("Julie, Todd, Jane, and Ray", ",", "Julie, Todd") = "Julie, Todd", and "Jane, and Ray" is returned as Source.
-        ' ##PARAM Source M String to be analyzed
-        ' ##PARAM delim I Single-character string delimeter
-        ' ##PARAM quote I Multi-character string exempted from search.
-        ' ##RETURNS  Returns leading portion of incoming string up to first occurence of delimeter. _
-        'Returns input parameter without that portion. If no delimiter in string, _
-        'returns whole string, and input parameter reduced to null string.
-        Dim retval As String
-        Dim i As Integer
-        Dim quoted As Boolean
-        Dim trimlen As Integer
-        Dim quotlen As Integer
-        ' ##LOCAL retval - string to return as StrSplit
-        ' ##LOCAL i - long character position of search through Source
-        ' ##LOCAL quoted - Boolean whether quote was encountered in Source
-        ' ##LOCAL trimlen - long length of delimeter, or quote if encountered first
-        ' ##LOCAL quotlen - long length of quote
+    ''' <summary>
+    ''' Divides string into 2 portions at position of 1st occurence of specified delimeter. Quote specifies a particular string that is exempt from the delimeter search.
+    ''' </summary>
+    ''' <param name="aSource">String to be analyzed</param>
+    ''' <param name="aDelim">Single-character string delimeter</param>
+    ''' <param name="aQuote">Multi-character string exempted from search</param>
+    ''' <returns>
+    ''' Returns leading portion of incoming string up to first occurence of delimeter.  
+    ''' Returns input parameter without that portion. 
+    ''' If no delimiter in string, returns whole string, and input parameter reduced to null string.
+    ''' </returns>
+    ''' <remarks>
+    ''' Example: StrSplit("Julie, Todd, Jane, and Ray", ",", "") = "Julie", and "Todd, Jane, and Ray" is returned as Source.
+    ''' Example: StrSplit("'Julie, Todd', Jane, and Ray", ",", "'") = "Julie, Todd", and "Jane, and Ray" is returned as Source.
+    ''' </remarks>
+    Public Shared Function StrSplit(ByRef aSource As String, ByRef aDelim As String, ByRef aQuote As String) As String
+        Dim lRetval As String 'string to return as StrSplit
+        Dim lQuotePosition As Integer 'character position of search through Source
+        Dim lQuoted As Boolean = False 'whether quote was encountered in Source
+        Dim lTrimLength As Integer 'long length of delimeter, or quote if encountered first
+        Dim lQuoteLength As Integer = aQuote.Length 'length of quote
 
-        Source = LTrim(Source) 'remove leading blanks
-        quotlen = Len(quote)
-        If quotlen > 0 Then
-            i = InStr(Source, quote)
-            If i = 1 Then 'string beginning
-                trimlen = quotlen
-                Source = Mid(Source, trimlen + 1)
-                i = InStr(Source, quote) 'string end
-                quoted = True
+        aSource = aSource.TrimStart  'remove leading blanks
+        If lQuoteLength > 0 Then
+            lQuotePosition = aSource.IndexOf(aQuote)
+            If lQuotePosition = 0 Then 'string beginning
+                lTrimLength = lQuoteLength
+                aSource = aSource.Substring(lTrimLength)
+                lQuotePosition = aSource.IndexOf(aQuote) 'string end
+                lQuoted = True
             Else
-                i = InStr(Source, delim)
-                trimlen = Len(delim)
+                lQuotePosition = aSource.IndexOf(aDelim)
+                lTrimLength = aDelim.Length
             End If
         Else
-            i = InStr(Source, delim)
-            trimlen = Len(delim)
+            lQuotePosition = aSource.IndexOf(aDelim)
+            lTrimLength = aDelim.Length
         End If
 
-        If i > 0 Then 'found delimeter
-            retval = Microsoft.VisualBasic.Left(Source, i - 1) 'string to return
-            If Microsoft.VisualBasic.Right(retval, 1) = " " Then retval = RTrim(retval)
-            Source = LTrim(Mid(Source, i + trimlen)) 'string remaining
-            If quoted And Len(Source) > 0 Then
-                If Microsoft.VisualBasic.Left(Source, Len(delim)) = delim Then Source = LTrim(Mid(Source, Len(delim) + 1))
+        If lQuotePosition > -1 Then 'found delimeter
+            lRetval = aSource.Substring(0, lQuotePosition).TrimEnd  'string to return
+            aSource = aSource.Substring(lQuotePosition + lTrimLength).Trim 'string remaining
+            If lQuoted And aSource.Length > 0 Then
+                If aSource.StartsWith(aDelim) Then
+                    aSource = aSource.Substring(aDelim.Length + 1).Trim
+                End If
             End If
         Else 'take it all
-            retval = Source
-            Source = "" 'nothing left
+            lRetval = aSource
+            aSource = "" 'nothing left
         End If
 
-        StrSplit = retval
-
+        Return lRetval
     End Function
 
+    ''' <summary>
+    ''' Converts specified text file to a string.
+    ''' </summary>
+    ''' <param name="aFilename">Name of text file to read</param>
+    ''' <param name="aTimeoutMilliseconds">Keep trying for this much time</param>
+    ''' <returns>Contents of specified text file as string.</returns>
+    ''' <remarks></remarks>
     Public Shared Function WholeFileString(ByRef aFilename As String, Optional ByVal aTimeoutMilliseconds As Integer = 1000) As String
-        ' ##SUMMARY Converts specified text file to a string.
-        ' ##PARAM FileName I Name of text file
-        ' ##RETURNS Returns contents of specified text file as string.
-        Dim InFile As Integer
-        Dim FileLength As Long
-        Dim TryUntil As Date = Now.AddMilliseconds(aTimeoutMilliseconds)
-        ' ##LOCAL InFile - filenumber of text file
-        ' ##LOCAL FileLength - length of text file contents
-
-        InFile = FreeFile()
-TryAgain:
-        Try
-            FileOpen(InFile, aFilename, OpenMode.Input, OpenAccess.Read, OpenShare.Shared)
-            FileLength = FileSystem.LOF(InFile)
-            WholeFileString = InputString(InFile, CType(FileLength, Integer))
-            FileClose(InFile)
-        Catch ex As Exception
-            If Now > TryUntil Then
-                Return ""
-            Else
-                'MsgBox("WholeFileString error, trying again (" & ex.GetType.Name & ": " & ex.Message & ")")
-                System.Threading.Thread.Sleep(50)
-                GoTo TryAgain
-            End If
-        End Try
+        Dim lTryUntil As Date = Now.AddMilliseconds(aTimeoutMilliseconds)
+        While lTryUntil > Now
+            Try
+                Return IO.File.ReadAllText(aFilename)
+            Catch ex As Exception
+                If Now > lTryUntil Then
+                    Return ""
+                Else
+                    System.Threading.Thread.Sleep(50)
+                End If
+            End Try
+        End While
+        Return ""
     End Function
 
-    Public Shared Function IsEmpty(ByVal str As String) As Boolean
-        If str Is Nothing Then Return True
-        If str.Length < 1 Then Return True
-        Return False
+    Public Shared Function IsEmpty(ByVal lString As String) As Boolean
+        If lString Is Nothing OrElse lString.Length < 1 Then
+            Return True
+        Else
+            Return False
+        End If
     End Function
 
     Public Shared Sub SaveFileString(ByRef filename As String, ByRef FileContents As String)

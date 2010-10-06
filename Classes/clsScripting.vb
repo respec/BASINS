@@ -129,23 +129,17 @@ Public Class Scripting
         Return Nothing
     End Function
 
-    Public Shared Function MakeScriptName(ByVal PluginFolder As String) As String
-        Dim tryName As String
-        Dim iTry As Integer = 1
-        Dim scriptName As String = ""
-
-        If scriptName = "" Then
-            scriptName = "RemoveMe-Script-"
-        Else
-            scriptName += "-"
-        End If
+    Public Shared Function MakeScriptName(ByVal aPluginFolder As String) As String
+        Dim lTryName As String
+        Dim lTryCount As Integer = 1
+        Dim lScriptName As String = "RemoveMe-Script-"
 
         Do
-            tryName = PluginFolder & "\" & _
-                      scriptName & iTry & ".dll"
-            iTry += 1
-        Loop While System.IO.File.Exists(tryName)
-        Return tryName
+            lTryName = aPluginFolder & "\" & _
+                      lScriptName & lTryCount & ".dll"
+            lTryCount += 1
+        Loop While System.IO.File.Exists(lTryName)
+        Return lTryName
     End Function
 
     'language = "vb" or "cs" or "js"
