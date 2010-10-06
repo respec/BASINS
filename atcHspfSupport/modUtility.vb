@@ -506,32 +506,32 @@ Public Module Utility
 
     Public Function AreaReport(ByVal aUci As HspfUci, ByVal aRunMade As String, _
                                ByVal aOperationTypes As atcCollection, ByVal aLocations As atcCollection, _
-                               ByVal aLandUseReport As Boolean, ByVal aReportPath As String) As String
-        Dim lSB As New Text.StringBuilder
-        lSB.AppendLine("Area Summary Report")
-        lSB.AppendLine("   UCI File Name " & aUci.Name)
-        lSB.AppendLine("   Run Made " & aRunMade)
-        lSB.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-        lSB.AppendLine("")
+                               ByVal aLandUseReport As Boolean, ByVal aReportPath As String) As atcReport.IReport
+        Dim lReport As New atcReport.ReportText
+        lReport.AppendLine("Area Summary Report")
+        lReport.AppendLine("   UCI File Name " & aUci.Name)
+        lReport.AppendLine("   Run Made " & aRunMade)
+        lReport.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
+        lReport.AppendLine("")
 
-        lSB.AppendLine("Location" & vbTab & "TotalArea".PadLeft(12) & vbTab & "LocalArea".PadLeft(12) & vbTab & "UpstreamReaches")
+        lReport.AppendLine("Location" & vbTab & "TotalArea".PadLeft(12) & vbTab & "LocalArea".PadLeft(12) & vbTab & "UpstreamReaches")
         Dim lLocation As String = aLocations.Item(aLocations.Count - 1)
-        lSB.AppendLine(AreaReportLocation(aUci, aOperationTypes, lLocation, True, aReportPath, aRunMade))
+        lReport.AppendLine(AreaReportLocation(aUci, aOperationTypes, lLocation, True, aReportPath, aRunMade))
 
-        Return lSB.ToString
+        Return lReport
     End Function
 
     Private Function AreaReportLocation(ByVal aUci As HspfUci, ByVal aOperationtypes As atcCollection, _
                                         ByVal aLocation As String, ByVal aLandUseReport As Boolean, _
                                         ByVal aReportPath As String, ByVal aRunMade As String) As String
         If aLandUseReport Then
-            Dim lSB As New Text.StringBuilder
-            lSB.AppendLine("LanduseArea Summary Report at " & aLocation)
-            lSB.AppendLine("   UCI File Name " & aUci.Name)
-            lSB.AppendLine("   Run Made " & aRunMade)
-            lSB.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-            lSB.AppendLine("")
-            lSB.AppendLine("Landuse".PadLeft(20) & vbTab & _
+            Dim lReport As New atcReport.ReportText
+            lReport.AppendLine("LanduseArea Summary Report at " & aLocation)
+            lReport.AppendLine("   UCI File Name " & aUci.Name)
+            lReport.AppendLine("   Run Made " & aRunMade)
+            lReport.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
+            lReport.AppendLine("")
+            lReport.AppendLine("Landuse".PadLeft(20) & vbTab & _
                            "PervArea".PadLeft(12) & vbTab & _
                            "ImpvArea".PadLeft(12) & vbTab & _
                            "TotalArea".PadLeft(12))
@@ -548,9 +548,9 @@ Public Module Utility
                     lPervArea = lLandUseAreaString
                 End If
 
-                
+
                 Dim lLandUseArea As Double = lPervArea + lImprArea
-                lSB.AppendLine(lLandUsesCombinePervImpv.Keys(lLandUseIndex).ToString.PadLeft(20) & vbTab & _
+                lReport.AppendLine(lLandUsesCombinePervImpv.Keys(lLandUseIndex).ToString.PadLeft(20) & vbTab & _
                                DecimalAlign(lPervArea, , 2, 7) & vbTab & _
                                DecimalAlign(lImprArea, , 2, 7) & vbTab & _
                                DecimalAlign(lLandUseArea, , 2, 7))
@@ -560,12 +560,12 @@ Public Module Utility
             Next
             lLandUsesCombinePervImpv.Clear()
             lLandUses.Clear()
-            lSB.AppendLine("")
-            lSB.AppendLine("Total".PadLeft(20) & vbTab & _
+            lReport.AppendLine("")
+            lReport.AppendLine("Total".PadLeft(20) & vbTab & _
                            DecimalAlign(lTotalAreaPerv, , 2, 7) & vbTab & _
                            DecimalAlign(lTotalAreaImpr, , 2, 7) & vbTab & _
                            DecimalAlign(lTotalAreaFromLandUses, , 2, 7))
-            SaveFileString(aReportPath & SafeFilename("AreaLanduse_" & aLocation & ".txt"), lSB.ToString)
+            SaveFileString(aReportPath & SafeFilename("AreaLanduse_" & aLocation & ".txt"), lReport.ToString)
         End If
 
         Dim lLocations As atcCollection = UpstreamLocations(aUci, aOperationtypes, aLocation)

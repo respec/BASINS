@@ -10,14 +10,14 @@ Public Module WatershedSummary
                               ByVal aRunMade As String)
 
         For Each lSummaryType As String In aSummaryTypes
-            Dim lString As Text.StringBuilder = Report(aUci, aScenarioResults, aRunMade, lSummaryType)
+            Dim lReport As atcReport.ReportText = Report(aUci, aScenarioResults, aRunMade, lSummaryType)
             Dim lOutFileName As String = IO.Path.GetFileNameWithoutExtension(aUci.Name) & "_" & lSummaryType & "_WatershedSummary.txt"
             Logger.Dbg("  WriteReportTo " & lOutFileName)
-            SaveFileString(lOutFileName, lString.ToString)
+            SaveFileString(lOutFileName, lReport.ToString)
         Next lSummaryType
     End Sub
 
-    Public Function Report(ByVal aUci As HspfUci, ByVal aScenarioResults As atcTimeseriesSource, ByVal aRunMade As String, ByVal aSummaryType As String) As System.Text.StringBuilder
+    Public Function Report(ByVal aUci As HspfUci, ByVal aScenarioResults As atcTimeseriesSource, ByVal aRunMade As String, ByVal aSummaryType As String) As atcReport.IReport
         Dim lAgchemConstituent As String = ""
         Dim lUnits As String = "lbs"
         Dim lTotalUnits As String = lUnits
@@ -118,12 +118,12 @@ Public Module WatershedSummary
                 lRchresConstituents.Add("ZINC-TROQAL")
         End Select
 
-        Dim lString As New Text.StringBuilder
-        lString.AppendLine(aSummaryType & " Watershed Summary Report For " & IO.Path.GetFileNameWithoutExtension(aUci.Name))
-        lString.AppendLine("   Run Made " & aRunMade)
-        lString.AppendLine("   Average Annual Rates and Totals")
-        lString.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-        lString.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
+        Dim lReport As New atcReport.ReportText
+        lReport.AppendLine(aSummaryType & " Watershed Summary Report For " & IO.Path.GetFileNameWithoutExtension(aUci.Name))
+        lReport.AppendLine("   Run Made " & aRunMade)
+        lReport.AppendLine("   Average Annual Rates and Totals")
+        lReport.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
+        lReport.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
 
         Dim lOper As atcUCI.HspfOperation
         Dim lLuName As String
@@ -300,10 +300,10 @@ Public Module WatershedSummary
                 .Value(4) = DecimalAlign(lReachLoads(lIndex))
             Next
 
-            lString.Append(.ToString)
+            lReport.Append(.ToString)
         End With
 
-        Return lString
+        Return lReport
     End Function
 
     Private Function LandArea(ByVal aOperName As String, ByVal aOperID As Integer, ByVal aUci As atcUCI.HspfUci) As Single

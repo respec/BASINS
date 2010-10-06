@@ -208,7 +208,7 @@ Module HSPFOutputReports
         Initialize()
         ChDriveDir(pTestPath)
         Logger.Dbg("CurrentFolder " & My.Computer.FileSystem.CurrentDirectory)
-        If FileExists(pBaseName & "Orig.uci") Then
+        If IO.File.Exists(pBaseName & "Orig.uci") Then
             IO.File.Copy(pBaseName & "Orig.uci", pBaseName & ".uci")
         End If
 
@@ -216,6 +216,7 @@ Module HSPFOutputReports
             GraphWQDuration()
         End If
         If pGraphWQOnly Then Exit Sub ' early end here if just doing it for WQ graphs
+
 
         'open uci file
         Dim lMsg As New atcUCI.HspfMsg
@@ -275,8 +276,11 @@ Module HSPFOutputReports
         Dim lStr As String = ""
 
         'area report
-        lStr = HspfSupport.AreaReport(lHspfUci, lRunMade, lOperationTypes, pOutputLocations, True, lOutFolderName & "\")
-        SaveFileString(lOutFolderName & "AreaReport.txt", lStr)
+
+        Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(lHspfUci, lRunMade, lOperationTypes, pOutputLocations, True, lOutFolderName & "\")
+        lReport.MetaData.Insert(lReport.MetaData.ToString.IndexOf("Assembly"), lReport.AssemblyMetadata(System.Reflection.Assembly.GetExecutingAssembly) & vbCrLf)
+
+        SaveFileString(lOutFolderName & "AreaReport.txt", lReport.ToString)
 
         If pConstituents.Contains("Water") Then
             'open WDM file
@@ -478,74 +482,74 @@ Module HSPFOutputReports
         For Each lConstituent As String In pConstituents
             Logger.Dbg("------ Begin summary for " & lConstituent & " -----------------")
 
-            Dim lString As String = ""
+            Dim lReportCons As New atcReport.ReportText
             Dim lOutFileName As String = ""
             If lConstituent <> "Sediment" Then
                 HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, , , , pWaterYears, pIdsPerSeg).ToString()
                 lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedOverland.txt"
-                SaveFileString(lOutFileName, lString)
-                lString = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, True, pWaterYears, pIdsPerSeg).ToString
+                SaveFileString(lOutFileName, lReportCons.ToString)
+                lReportCons = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, True, pWaterYears, pIdsPerSeg)
                 lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedOverlandShortWithMinMax.txt"
-                SaveFileString(lOutFileName, lString)
-                lString = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, False, pWaterYears, pIdsPerSeg).ToString
+                SaveFileString(lOutFileName, lReportCons.ToString)
+                lReportCons = HspfSupport.WatershedSummaryOverland.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade, pPerlndSegmentStarts, pImplndSegmentStarts, False, True, False, pWaterYears, pIdsPerSeg)
                 lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedOverlandShort.txt"
-                SaveFileString(lOutFileName, lString)
+                SaveFileString(lOutFileName, lReportCons.ToString)
             End If
 
-            lString = Nothing
-            lString = HspfSupport.ConstituentBudget.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade).ToString
+            lReportCons = Nothing
+            lReportCons = HspfSupport.ConstituentBudget.Report(lHspfUci, lConstituent, lOperationTypes, pBaseName, lHspfBinDataSource, lRunMade)
             lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_Budget.txt"
-            SaveFileString(lOutFileName, lString)
-            lString = Nothing
+            SaveFileString(lOutFileName, lReportCons.ToString)
+            lReportCons = Nothing
 
-            lString = HspfSupport.WatershedSummary.Report(lHspfUci, lHspfBinDataSource, lRunMade, lConstituent).ToString
+            lReportCons = HspfSupport.WatershedSummary.Report(lHspfUci, lHspfBinDataSource, lRunMade, lConstituent)
             lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedSummary.txt"
-            SaveFileString(lOutFileName, lString)
-            lString = Nothing
+            SaveFileString(lOutFileName, lReportCons.ToString)
+            lReportCons = Nothing
 
             Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
             Logger.Dbg("Summary at " & lLocations.Count & " locations")
             'constituent balance
-            lString = HspfSupport.ConstituentBalance.Report _
+            lReportCons = HspfSupport.ConstituentBalance.Report _
                (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lLocations, lRunMade).ToString
+                lHspfBinDataSource, lLocations, lRunMade)
             lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_ConstituentBalance.txt"
-            SaveFileString(lOutFileName, lString)
+            SaveFileString(lOutFileName, lReportCons.ToString)
 
-            lString = HspfSupport.ConstituentBalance.Report _
+            lReportCons = HspfSupport.ConstituentBalance.Report _
                (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lLocations, lRunMade, True).ToString
+                lHspfBinDataSource, lLocations, lRunMade, True)
             lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_ConstituentBalancePivot.txt"
-            SaveFileString(lOutFileName, lString)
+            SaveFileString(lOutFileName, lReportCons.ToString)
 
-            lString = HspfSupport.ConstituentBalance.Report _
+            lReportCons = HspfSupport.ConstituentBalance.Report _
                (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lLocations, lRunMade, True, 2, 5, 8).ToString
+                lHspfBinDataSource, lLocations, lRunMade, True, 2, 5, 8)
             lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_ConstituentBalancePivotNarrowTab.txt"
-            SaveFileString(lOutFileName, lString)
+            SaveFileString(lOutFileName, lReportCons.ToString)
             lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_ConstituentBalancePivotNarrowSpace.txt"
-            SaveFileString(lOutFileName, lString.Replace(vbTab, " "))
+            SaveFileString(lOutFileName, lReportCons.ToString.Replace(vbTab, " "))
 
             'watershed constituent balance 
-            lString = HspfSupport.WatershedConstituentBalance.Report _
+            lReportCons = HspfSupport.WatershedConstituentBalance.Report _
                (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lRunMade).ToString
+                lHspfBinDataSource, lRunMade)
             lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedConstituentBalance.txt"
-            SaveFileString(lOutFileName, lString)
+            SaveFileString(lOutFileName, lReportCons.ToString)
 
-            lString = HspfSupport.WatershedConstituentBalance.Report _
+            lReportCons = HspfSupport.WatershedConstituentBalance.Report _
                (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lRunMade, , , , True).ToString
+                lHspfBinDataSource, lRunMade, , , , True)
             lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedConstituentBalancePivot.txt"
-            SaveFileString(lOutFileName, lString)
+            SaveFileString(lOutFileName, lReportCons.ToString)
 
-            lString = HspfSupport.WatershedConstituentBalance.Report _
+            lReportCons = HspfSupport.WatershedConstituentBalance.Report _
                (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                lHspfBinDataSource, lRunMade, , , , True, 2, 5, 8).ToString
+                lHspfBinDataSource, lRunMade, , , , True, 2, 5, 8)
             lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_All_WatershedConstituentBalancePivotNarrowTab.txt"
-            SaveFileString(lOutFileName, lString)
+            SaveFileString(lOutFileName, lReportCons.ToString)
             lOutFileName = lOutFolderName & lConstituent & "_" & pBaseName & "_Mult_WatershedConstituentBalancePivotNarrowSpace.txt"
-            SaveFileString(lOutFileName, lString.Replace(vbTab, " "))
+            SaveFileString(lOutFileName, lReportCons.ToString.Replace(vbTab, " "))
 
             If pOutputLocations.Count > 0 Then 'subwatershed constituent balance 
                 HspfSupport.WatershedConstituentBalance.ReportsToFiles _

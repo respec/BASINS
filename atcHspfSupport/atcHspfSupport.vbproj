@@ -151,6 +151,11 @@
       <Name>atcGraph</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcReport\atcReport.vbproj">
+      <Project>{EE3BB0CA-BB0A-4FB6-9AB3-E73F57DD4A21}</Project>
+      <Name>atcReport</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcSeasons\atcSeasons.vbproj">
       <Project>{12F7FDD0-A6EC-4ABE-A01B-790AD8CAEF03}</Project>
       <Name>atcSeasons</Name>

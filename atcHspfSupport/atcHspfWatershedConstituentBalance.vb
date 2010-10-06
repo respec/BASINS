@@ -39,19 +39,19 @@ Public Module WatershedConstituentBalance
                      Optional ByVal aSignificantDigits As Integer = 5, _
                      Optional ByVal aFieldWidth As Integer = 12)
         For Each lOutletLocation As String In aOutletLocations
-            Dim lString As Text.StringBuilder = Report(aUci, aBalanceType, _
-                                                       aOperationTypes, _
-                                                       aScenario, aScenarioResults, _
-                                                       aRunMade, lOutletLocation, _
-                                                       aOutFilePrefix, True, _
-                                                       aSegmentRows, aDecimalPlaces, aSignificantDigits, aFieldWidth)
+            Dim lReport As atcReport.ReportText = Report(aUci, aBalanceType, _
+                                               aOperationTypes, _
+                                               aScenario, aScenarioResults, _
+                                               aRunMade, lOutletLocation, _
+                                               aOutFilePrefix, True, _
+                                               aSegmentRows, aDecimalPlaces, aSignificantDigits, aFieldWidth)
             Dim lPivotString As String = ""
             If aSegmentRows Then
                 lPivotString = "Pivot"
             End If
             Dim lOutFileName As String = aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_" & lOutletLocation & "_Balance" & lPivotString & ".txt")
             Logger.Dbg("  WriteReportTo " & lOutFileName)
-            SaveFileString(lOutFileName, lString.ToString)
+            SaveFileString(lOutFileName, lReport.ToString)
         Next lOutletLocation
 
         If aOutletDetails Then 'final summary for all locations
@@ -137,38 +137,38 @@ Public Module WatershedConstituentBalance
                     Next lString
                 Next lOutletLocation
 
-                Dim lStringSB As New Text.StringBuilder
-                lStringSB.AppendLine(aBalanceType & " Balance Report For " & aScenario)
-                lStringSB.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci))
-                lStringSB.Append("Location".PadLeft(12))
+                Dim lReport As New atcReport.ReportText
+                lReport.AppendLine(aBalanceType & " Balance Report For " & aScenario)
+                lReport.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci))
+                lReport.Append("Location".PadLeft(12))
                 For Each lLocation As String In aOutletLocations
-                    lStringSB.Append(vbTab & lLocation.PadLeft(12) & vbTab & Space(12))
+                    lReport.Append(vbTab & lLocation.PadLeft(12) & vbTab & Space(12))
                 Next lLocation
-                lStringSB.AppendLine()
-                lStringSB.Append(Space(12))
+                lReport.AppendLine()
+                lReport.Append(Space(12))
                 For Each lLocation As String In aOutletLocations
                     If aBalanceType = "Water" Then
-                        lStringSB.Append(vbTab & "in".PadLeft(12) & vbTab & "ac-ft".PadLeft(12))
+                        lReport.Append(vbTab & "in".PadLeft(12) & vbTab & "ac-ft".PadLeft(12))
                     End If
                 Next lLocation
-                lStringSB.AppendLine()
+                lReport.AppendLine()
                 For Each lGroup As String In lGroups.Keys
-                    lStringSB.AppendLine()
-                    lStringSB.AppendLine(lGroup)
+                    lReport.AppendLine()
+                    lReport.AppendLine(lGroup)
                     lConstituents = lGroups.ItemByKey(lGroup)
                     For Each lConstituent As String In lConstituents.Keys
                         lSummaryDetails = lConstituents.ItemByKey(lConstituent)
-                        lStringSB.Append("  " & lConstituent.PadRight(12))
+                        lReport.Append("  " & lConstituent.PadRight(12))
                         For Each lSummaryDetail In lSummaryDetails
                             With lSummaryDetail
-                                lStringSB.Append(vbTab & DecimalAlign(.UnitValue) _
+                                lReport.Append(vbTab & DecimalAlign(.UnitValue) _
                                                & vbTab & DecimalAlign(.Mass, , 1))
                             End With
                         Next
-                        lStringSB.AppendLine()
+                        lReport.AppendLine()
                     Next
                 Next lGroup
-                SaveFileString(aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_Mult_BalanceBasin.txt"), lStringSB.ToString)
+                SaveFileString(aOutFilePrefix & SafeFilename(aBalanceType & "_" & aScenario & "_Mult_BalanceBasin.txt"), lReport.ToString)
             Catch lEx As Exception
                 Logger.Dbg("Whoops!")
             End Try
@@ -210,7 +210,7 @@ Public Module WatershedConstituentBalance
                   Optional ByVal aSegmentRows As Boolean = False, _
                   Optional ByVal aDecimalPlaces As Integer = 3, _
                   Optional ByVal aSignificantDigits As Integer = 5, _
-                  Optional ByVal aFieldWidth As Integer = 12) As Text.StringBuilder
+                  Optional ByVal aFieldWidth As Integer = 12) As atcReport.IReport
 
         Dim lOutletReport As Boolean = False
         If aOutletLocation.Length > 0 Then
@@ -225,18 +225,18 @@ Public Module WatershedConstituentBalance
         Dim lLandUses As atcCollection = LandUses(aUci, aOperationTypes, aOutletLocation)
         Logger.Dbg("LandUseCount:" & lLandUses.Count)
 
-        Dim lString As New Text.StringBuilder
-        lString.AppendLine(aBalanceType & " Watershed Balance Report For " & aScenario)
-        lString.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci))
+        Dim lReport As New atcReport.ReportText
+        lReport.AppendLine(aBalanceType & " Watershed Balance Report For " & aScenario)
+        lReport.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci))
         If aBalanceType = "Water" Then
             If aUci.GlobalBlock.EmFg = 1 Then
-                lString.AppendLine("   (Units:Inches)")
+                lReport.AppendLine("   (Units:Inches)")
             Else
-                lString.AppendLine("   (Units:mm)")
+                lReport.AppendLine("   (Units:mm)")
             End If
         End If
-        lString.AppendLine()
-        lString.AppendLine()
+        lReport.AppendLine()
+        lReport.AppendLine()
 
         Dim lConstituentDataGroup As atcTimeseriesGroup
         Dim lTempDataSet As atcDataSet
@@ -450,9 +450,9 @@ Public Module WatershedConstituentBalance
                             Next lConstituentKey
                             If lOutputTable.NumFields > 0 Then
                                 If aSegmentRows Then
-                                    lString.AppendLine(.ToStringPivoted)
+                                    lReport.AppendLine(.ToStringPivoted)
                                 Else
-                                    lString.AppendLine(.ToString)
+                                    lReport.AppendLine(.ToString)
                                 End If
                             End If
                         End With
@@ -465,18 +465,18 @@ Public Module WatershedConstituentBalance
                             End If
                         Next
                         If lNeedTotal Then
-                            lString.Remove(lString.Length - 2, 2)
-                            lString.AppendLine(aBalanceType)
+                            lReport.Body.Remove(lReport.Body.Length - 2, 2)
+                            lReport.AppendLine(aBalanceType)
                             For Each lLoad As Load In lLoadTotals
                                 If lLoad.Count > 1 Then
                                     Dim lStr As String = ""
                                     For lIndex As Integer = 0 To lLoad.Unit.GetUpperBound(0)
                                         lStr &= DecimalAlign(lLoad.Unit(lIndex), aFieldWidth, aDecimalPlaces, aSignificantDigits) & vbTab
                                     Next
-                                    lString.AppendLine(lLoad.Name.PadRight(12) & vbTab & lStr)
+                                    lReport.AppendLine(lLoad.Name.PadRight(12) & vbTab & lStr)
                                 End If
                             Next
-                            lString.AppendLine()
+                            lReport.AppendLine()
                         End If
                     Catch lEx As Exception
                         Logger.Dbg(lEx.Message)
@@ -718,7 +718,7 @@ Public Module WatershedConstituentBalance
             SaveFileString(lSummaryFileName, lSummarySB.ToString)
             lSummarySB = Nothing
         End If
-        Return lString
+        Return lReport
     End Function
 
     Private Class Loads
