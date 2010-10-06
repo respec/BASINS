@@ -3,6 +3,7 @@ Imports atcData
 Imports atcSeasons
 Imports atcUtility
 Imports MapWinUtility
+Imports MapWinUtility.Strings
 
 Public Class frmVariationCligen
     Inherits System.Windows.Forms.Form

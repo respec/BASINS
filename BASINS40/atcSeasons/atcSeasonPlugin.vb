@@ -1,6 +1,7 @@
 Imports atcdata
 Imports atcUtility
 Imports MapWinUtility
+Imports MapWinUtility.Strings
 Imports System.Reflection
 
 Public Class atcSeasonPlugin

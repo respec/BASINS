@@ -4,8 +4,8 @@ Option Explicit On
 ''' <summary>
 ''' General utility subroutines and functions shared by many projects
 ''' </summary>
-''' <remarks>Mark Gray and Jack Kittle of AQUA TERRA CONSULTANTS 2003-2006
-''' Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+''' <remarks>Mark Gray and Jack Kittle of AQUA TERRA CONSULTANTS 2003-2010
+''' Copyright 2010 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 ''' </remarks>
 Public Module modString
 
@@ -58,83 +58,6 @@ Public Module modString
         End If
     End Function
 
-    '    Function NumFmtRE(ByVal rtmp As Single, Optional ByRef maxWidth As Integer = 16) As String
-    '        ' ##SUMMARY Converts single-precision number to string with exponential syntax if length of number exceeds specified length.
-    '        ' ##SUMMARY If unspecified, length defaults to 16.
-    '        ' ##SUMMARY   Example: NumFmtRE(123000000, 7) = "1.23e-8"
-    '        ' ##PARAM rtmp I Single-precision number to be formatted
-    '        ' ##PARAM maxWidth I Length of string to be returned including decimal point and exponential syntax
-    '        ' ##RETURNS Input parameter rtmp formatted, if necessary, to scientific notation.
-    '        ' ##LOCAL LogVal - double-precision log10 value of rtmp
-    '        ' ##LOCAL retval - string used as antecedent to NumFmtRE
-    '        ' ##LOCAL expFormat - string syntax of exponential format
-    '        ' ##LOCAL DecimalPlaces - long number of decimal places
-    '        Dim LogVal As Double
-    '        Dim retval As String
-    '        Dim expFormat As String
-    '        Dim DecimalPlaces As Integer
-
-    '        retval = CStr(rtmp)
-    '        NumFmtRE = retval
-
-    '        If rtmp <> 0 And maxWidth > 0 Then
-    '            If Len(retval) > maxWidth Then
-    '                'Determine appropriate log syntax
-    '                LogVal = System.Math.Abs(Log10(System.Math.Abs(rtmp)))
-    '                If LogVal >= 100 Then
-    '                    expFormat = "e-###"
-    '                ElseIf LogVal >= 10 Then
-    '                    expFormat = "e-##"
-    '                Else
-    '                    expFormat = "e-#"
-    '                End If
-    '                'Set appropriate decimal position
-    '                DecimalPlaces = maxWidth - Len(expFormat) - 2
-    '                If DecimalPlaces < 1 Then DecimalPlaces = 1
-    '                retval = String.Format("#." & New String("#", DecimalPlaces) & expFormat, rtmp)
-    '            End If
-    '        End If
-    '        NumFmtRE = retval
-    '    End Function
-
-    '    Function NumFmted(ByVal rtmp As Single, ByVal wid As Integer, ByVal dpla As Integer) As String
-    '        ' ##SUMMARY Converts single precision number to string with specified format
-    '        ' ##SUMMARY   Example: NumFmted(1.23, 6, 3) = " 1.230"
-    '        ' ##PARAM rtmp I Single-precision number to be formatted
-    '        ' ##PARAM wid I Long width of formatted number
-    '        ' ##PARAM dpla I Long number of decimal places in formatted number
-    '        ' ##RETURNS Input parameter rtmp formatted to specified width _
-    '        'with specified number of decimal places (left buffered).
-    '        ' ##LOCAL fmt - string representation of generic format (i.e., "#0.000")
-    '        ' ##LOCAL nspc - long number of leading/trailing blanks
-    '        ' ##LOCAL stmp - string used to build formatted number
-    '        Dim fmt As String
-    '        Dim nspc As Integer
-    '        Dim stmp As String
-
-    '        On Error GoTo prob
-
-    '        If wid - dpla - 2 > 0 Then
-    '            fmt = New String("#", wid - dpla - 2) & "0." & New String("0", dpla) 'force 0.
-    '        Else
-    '            fmt = New String("#", wid - dpla - 1) & "." & New String("0", dpla) 'orig way
-    '        End If
-    '        stmp = String.Format(fmt, rtmp)
-    '        'add leading blanks
-    '        nspc = wid - dpla - InStr(1, stmp, ".")
-    '        If nspc < 0 Then nspc = 0
-    '        stmp = Space(nspc) & stmp
-    '        'add trailing blanks
-    '        nspc = wid - Len(stmp)
-    '        If nspc < 0 Then nspc = 0
-    '        NumFmted = stmp & Space(nspc)
-    '        Exit Function
-    'prob:
-    '        System.Diagnostics.Debug.WriteLine("NumFmted Problem rtmp:" & rtmp & " wid:" & wid & " dpla:" & dpla)
-    '        NumFmted = New String("#", wid)
-
-    '    End Function
-
     Function RightJustify(ByVal aValue As Object, ByVal aWidth As Integer) As String
         Dim lStr As String = CStr(aValue)
         If lStr.Length >= aWidth Then
@@ -143,51 +66,6 @@ Public Module modString
             Return lStr.PadLeft(aWidth)
         End If
     End Function
-
-    '    Function NumFmtI(ByRef itmp As Integer, ByRef wid As Integer) As String
-    '        ' ##SUMMARY Converts an integer to string of specified length, padded with leading zeros.
-    '        ' ##SUMMARY Specified length must equal or exceed length of integer.
-    '        ' ##SUMMARY   Example: NumFmtI(1234, 6) = "001234"
-    '        ' ##PARAM itmp I Long integer to be formatted
-    '        ' ##PARAM wid I Width of formatted integer
-    '        ' ##RETURNS Input parameter itmp formatted to specified width.
-    '        ' ##LOCAL fmt - string representation of generic format (i.e., "#####0")
-    '        ' ##LOCAL stmp - string used to build formatted number
-    '        Dim fmt As String
-    '        Dim stmp As String
-
-    '        If wid > 1 Then
-    '            fmt = New String("#", wid - 1)
-    '        End If
-    '        'assure at least one digit is output
-    '        fmt = fmt & "0"
-    '        stmp = String.Format(fmt, itmp)
-    '        'add leading blanks
-    '        NumFmtI = Space(wid - Len(stmp)) & stmp
-    '    End Function
-
-    '    Function Signif(ByRef fvalue As Double, ByRef Metric As Boolean) As Double
-    '        '##SUMMARY Converts double-precision number to three significant digits
-    '        '##SUMMARY   Example: Signif(1.23456, True) =  1.23000001907349
-    '        '##PARAM fvalue - double-precision number to be formatted
-    '        '##PARAM metric - Boolean whether metric or not
-    '        '##LOCAL tmp - Double-precision number used as antecedent to Signif
-    '        Dim tmp As Double
-
-    '        If Metric And fvalue < 10 Then
-    '            fvalue = Fix(fvalue * 100 + 0.5)
-    '            Signif = fvalue / 100
-    '        ElseIf Metric And fvalue < 100 Then
-    '            fvalue = Fix(fvalue * 10 + 0.5)
-    '            Signif = fvalue / 10
-    '        ElseIf fvalue < 100.0# Then
-    '            Signif = Fix(fvalue + 0.5)
-    '        Else
-    '            tmp = 10.0# ^ Fix(Log10(fvalue)) / 100.0#
-    '            Signif = Fix(fvalue / tmp + 0.5) * tmp
-    '        End If
-
-    '    End Function
 
     ''' <summary>
     ''' Round a double-precision number to the specified number of significant digits.
@@ -447,53 +325,6 @@ TryOldString:
         Return lString
     End Function
 
-    'Private Function CountSignificantDigits(ByVal aNumericString As String, ByVal aIncludeTrailingZeroes As Boolean) As Integer
-    '    Dim lCount As Integer = 0
-    '    Dim lTrailingZeroes As Integer = 0
-    '    For Each lChar As Char In aNumericString.ToCharArray
-    '        Select Case lChar
-    '            Case "."c 'decimal point is not a digit
-    '            Case "0"c
-    '                If lCount > 0 Then
-    '                    lCount += 1
-    '                    lTrailingZeroes += 1
-    '                End If
-    '            Case "1"c To "9"c
-    '                lTrailingZeroes = 0
-    '                lCount += 1
-    '            Case "e", "E" : Exit For
-    '        End Select
-    '    Next
-
-    '    If aIncludeTrailingZeroes Then
-    '        Return lCount
-    '    Else
-    '        Return lCount - lTrailingZeroes
-    '    End If
-    'End Function
-
-    '    Function Str_Read() As String
-    '        ' ##SUMMARY Reads a string from a binary database of open file.
-    '        ' ##SUMMARY Assumes open file # is '1'.
-    '        ' ##RETURNS String from a binary file.
-    '        ' ##LOCAL tmp - string used to read binary input one character at a time
-    '        ' ##LOCAL stmp - string used as antecedent to Str_Read
-    '        Dim tmp As String
-    '        Dim stmp As String
-
-    '        stmp = ""
-    '        Do
-    '            tmp = InputString(1, 1)
-    '            If Asc(tmp) = 0 Then
-    '                Exit Do
-    '            Else
-    '                stmp = stmp & tmp
-    '            End If
-    '        Loop
-    '        Str_Read = stmp
-
-    '    End Function
-
     ''' <summary>
     ''' Checks to see whether string argument is an integer.
     ''' </summary>
@@ -558,160 +389,6 @@ TryOldString:
             Case Else : Return False
         End Select
     End Function
-
-    'Public Sub NumChr(ByRef ilen As Integer, ByRef inam() As Integer, ByRef outstr As String)
-    '    ' ##SUMMARY Returns String of characters associated with specified ascii _
-    '    'character codes in inam().
-    '    ' ##PARAM ilen I Upper bound of inam() dimension
-    '    ' ##PARAM inam I Array of long ascii character codes
-    '    ' ##PARAM outstr O String of converted ascii codes
-    '    Dim i As Integer
-    '    ' ##LOCAL i - long number used as index for member of inam()
-
-    '    outstr = ""
-    '    For i = 0 To ilen
-    '        outstr = outstr & Chr(inam(i))
-    '    Next i
-
-    'End Sub
-
-    'Function StrAdd(ByRef o As Object, ByRef old As String, ByRef Add As String, ByRef mwid As String) As String
-    '    ' ##SUMMARY Concatenates given string plus addendum, up to maximum length _
-    '    'allowed by object (padded right).
-    '    ' ##PARAM o I Object containing text
-    '    ' ##PARAM old I Existing string
-    '    ' ##PARAM Add I New string to addend to existing string
-    '    ' ##PARAM mwid I MAXimum length of addendum
-    '    ' ##RETURNS Concatenated input parameters, old and Add, plus right padding _
-    '    'if necessary to extend string to specified width.
-    '    Dim nst As String
-    '    ' ##LOCAL nst - new string built with Add plus trailing blanks
-
-    '    nst = Add
-    '    Do While o.TextWidth(nst) < o.TextWidth(mwid)
-    '        nst = nst & " "
-    '    Loop
-    '    StrAdd = old & nst
-    'End Function
-
-    'Public Sub Scalit(ByVal itype As Short, ByVal mMin As Single, ByVal mMax As Single, _
-    '                  ByRef plmn As Single, ByRef plmx As Single)
-    '    ' ##SUMMARY Determines an appropriate scale based on the _
-    '    'minimum and maximum values and whether an arithmetic, probability, _
-    '    'or logarithmic scale is requested. Minimum and maximum for probability _
-    '    'plots must be standard deviates. For log scales, the minimum _
-    '    'and maximum must not be transformed.
-    '    ' ##PARAM itype I Integer indicating type of number scale (0-1 = arithmetic, 2 = probability, other = logarithmic)
-    '    ' ##PARAM mMin I Single-precision minimum incoming data value
-    '    ' ##PARAM mMax I Single-precision maximum incoming data value
-    '    ' ##PARAM plmn O Single-precision return value for scale minimum
-    '    ' ##PARAM plmx O Single-precision return value for scale maximum
-    '    Dim a As Short
-    '    Dim i As Short
-    '    Dim inc As Short
-    '    Dim x As Single
-    '    Dim m As Single
-    '    Dim tmax As Single
-    '    ' ##LOCAL a - short integer holds log10 min/max values rounded down to nearest magnitude
-    '    ' ##LOCAL i - short integer used as index for r()
-    '    ' ##LOCAL inc - short integer increments i by 1 or -1
-    '    ' ##LOCAL X - single-precision rounded data min/max values
-    '    ' ##LOCAL M - single-precision estimator of min/max values for arithmetic scale
-    '    ' ##LOCAL tmax - single-precision min/max values for distribution plots (+ = max, - = min)
-
-    '    Static r(15) As Single
-    '    If itype = 0 Or itype = 1 Then
-    '        'arithmetic scale
-    '        'get next lowest mult of 10
-
-    '        ' ##LOCAL r - holds possible values for multiplier used in determining M from X
-    '        If r(1) < 0.09 Then
-    '            r(1) = 0.1
-    '            r(2) = 0.15
-    '            r(3) = 0.2
-    '            r(4) = 0.4
-    '            r(5) = 0.5
-    '            r(6) = 0.6
-    '            r(7) = 0.8
-    '            r(8) = 1.0#
-    '            r(9) = 1.5
-    '            r(10) = 2.0#
-    '            r(11) = 4.0#
-    '            r(12) = 5.0#
-    '            r(13) = 6.0#
-    '            r(14) = 8.0#
-    '            r(15) = 10.0#
-    '        End If
-
-    '        x = Rndlow(mMax)
-    '        If x > 0.0# Then
-    '            inc = 1
-    '            i = 1
-    '        Else
-    '            inc = -1
-    '            i = 15
-    '        End If
-    '        Do
-    '            m = r(i) * x
-    '            i = i + inc
-    '        Loop While mMax > m And i <= 15 And i >= 1
-    '        plmx = m
-
-    '        If mMin < 0.5 * mMax And mMin >= 0.0# And itype = 1 Then
-    '            plmn = 0.0#
-    '        Else
-    '            'get next lowest mult of 10
-    '            x = Rndlow(mMin)
-    '            If x >= 0.0# Then
-    '                inc = -1
-    '                i = 15
-    '            Else
-    '                inc = 1
-    '                i = 1
-    '            End If
-    '            Do
-    '                m = r(i) * x
-    '                i = i + inc
-    '            Loop While mMin < m And i >= 1 And i <= 15
-    '            plmn = m
-    '        End If
-
-    '    ElseIf itype = 2 Then
-    '        'logarithmic scale
-    '        If mMin > 0.000000001 Then
-    '            a = Fix(Log10(CDbl(mMin)))
-    '        Else
-    '            'too small or neg value, set to -9
-    '            a = -9
-    '        End If
-    '        If mMin < 1.0# Then a = a - 1
-    '        plmn = 10.0# ^ a
-
-    '        If mMax > 0.000000001 Then
-    '            a = Fix(Log10(CDbl(mMax)))
-    '        Else
-    '            'too small or neg value, set to -8
-    '            a = -8
-    '        End If
-    '        If mMax > 1.0# Then a = a + 1
-    '        plmx = 10.0# ^ a
-
-    '        If plmn * 10000000.0# < plmx Then
-    '            'limit range to 7 cycles
-    '            plmn = plmx / 10000000.0#
-    '        End If
-
-    '    Else
-    '        'probability plots - assumes data transformed to normal deviates
-    '        tmax = System.Math.Abs(mMax)
-    '        If System.Math.Abs(mMin) > tmax Then tmax = System.Math.Abs(mMin)
-    '        tmax = CSng(Fix(tmax * 10.0#) + 1) / 10.0#
-    '        If tmax > 4.0# Then tmax = 4.0#
-    '        plmn = -tmax
-    '        plmx = tmax
-    '    End If
-
-    'End Sub
 
     ''' <summary>
     ''' Sets values less than 1.0E-19 to 0.0 for the plotting routines for bug in DISSPLA/PR1ME. 
@@ -792,32 +469,6 @@ TryOldString:
         FirstStringPos = foundPos
     End Function
 
-    'Use String.IndexOfAny instead of this
-    'Public Function FirstCharPos(ByVal start As Integer, ByVal Source As String, ByVal chars As String) As Integer
-    '  ' ##SUMMARY Searches str for each character in chars.
-    '  ' ##PARAM start I Position in str to start search
-    '  ' ##PARAM str I String to be searched
-    '  ' ##PARAM chars I String of characters to be individually searched for
-    '  ' ##RETURNS  Position of first occurrence of chars character in Source. _
-    '  'Returns len(str) + 1 if no characters from chars were found in Source.
-    '  Dim retval As Integer
-    '  Dim curval As Integer
-    '  Dim CharPos As Integer
-    '  Dim LenChars As Integer
-    '  ' ##LOCAL retval - long return value for FirstCharPos
-    '  ' ##LOCAL curval - long position of currently first-occurring character
-    '  ' ##LOCAL CharPos - long length of chars
-    '  ' ##LOCAL LenChars - long length of subString
-
-    '  retval = Len(Source) + 1
-    '  LenChars = Len(chars)
-    '  For CharPos = 1 To LenChars
-    '    curval = InStr(start, Source, Mid(chars, CharPos, 1))
-    '    If curval > 0 And curval < retval Then retval = curval
-    '  Next CharPos
-    '  FirstCharPos = retval
-    'End Function
-
     Public Function StrNoNull(ByVal S As String) As String
         ' ##SUMMARY Replaces null string with blank character.
         ' ##SUMMARY   Example: StrNoNull("NotNull") = "NotNull"
@@ -831,90 +482,6 @@ TryOldString:
             StrNoNull = S
         End If
     End Function
-
-    'Function StrRetRem(ByRef S As String) As String
-    '    ' ##SUMMARY Divides string into 2 portions at position of 1st occurence of comma or space.
-    '    ' ##SUMMARY   Example: StrRetRem("This string") = "This", and s is reduced to "string"
-    '    ' ##SUMMARY   Example: StrRetRem("This,string") = "This", and s is reduced to "string"
-    '    ' ##PARAM s M String to be analyzed
-    '    ' ##RETURNS  Returns leading portion of incoming string up to first occurence of delimeter. _
-    '    'Returns input parameter without that portion. If no comma or space in string, _
-    '    'returns whole string, and input parameter reduced to null string.
-    '    Dim l As String
-    '    Dim i As Integer
-    '    Dim j As Integer
-    '    ' ##LOCAL l - string to return
-    '    ' ##LOCAL i - position of blank delimeter
-    '    ' ##LOCAL j - position of comma delimeter
-
-    '    S = LTrim(S) 'remove leading blanks
-
-    '    i = InStr(S, "'")
-    '    If i = 1 Then 'string beginning
-    '        S = Mid(S, 2)
-    '        i = InStr(S, "'") 'string end
-    '    Else
-    '        i = InStr(S, " ") 'blank delimeter
-    '        j = InStr(S, ",") 'comma delimeter
-    '        If j > 0 Then 'comma found
-    '            If i = 0 Or j < i Then
-    '                i = j
-    '            End If
-    '        End If
-    '    End If
-
-    '    If i > 0 Then 'found delimeter
-    '        l = Left(S, i - 1) 'string to return
-    '        S = LTrim(Mid(S, i + 1)) 'string remaining
-    '        If InStr(Left(S, 1), ",") = 1 And i <> j Then S = Mid(S, 2)
-    '    Else 'take it all
-    '        l = S
-    '        S = "" 'nothing left
-    '    End If
-
-    '    StrRetRem = l
-
-    'End Function
-
-    'Function StrTokens(ByVal Source As String, ByRef delim As String, ByRef quote As String) As String()
-    '    ' ##SUMMARY Divides string into portions separated by specified delimeter.
-    '    ' ##SUMMARY   Example: StrTokens("Very,Special,string") = Array size 2;
-    '    ' ##SUMMARY                                               (0)="Very", (1)="Special", (2)="string" and
-    '    ' ##SUMMARY                                               String is reduced to ""
-    '    ' ##PARAM Source M String to be analyzed
-    '    ' ##PARAM delim I delimeter to look for in string Source
-    '    ' ##PARAM quote I Multi-character string exempted from search.
-    '    ' ##RETURNS  Returns array of string portions separated by specified delimeter.
-    '    Dim retval() As String
-    '    Dim sizeRetval As Integer
-    '    Dim nTokens As Integer
-    '    ' ##LOCAL retval - string array to return
-    '    ' ##LOCAL sizeRetval - dimension variable for sizing string array
-    '    ' ##LOCAL nTokens - number of tokens found in string Source
-
-    '    sizeRetval = 20
-    '    ReDim retval(sizeRetval)
-    '    While Len(Source) > 0
-    '        If nTokens > sizeRetval Then
-    '            sizeRetval = sizeRetval * 2
-    '            ReDim Preserve retval(sizeRetval)
-    '        End If
-    '        retval(nTokens) = StrSplit(Source, delim, quote)
-    '        nTokens = nTokens + 1
-    '    End While
-    '    ReDim Preserve retval(nTokens - 1)
-    '    Return retval
-    'End Function
-
-    'Sub DumpStrings(ByRef arr() As String)
-    '    ' ##SUMMARY Outputs array of strings to debug window.
-    '    ' ##PARAM arr I array of strings to output
-    '    Dim i As Integer
-    '    ' ##LOCAL i - counter for looping through arrays
-    '    For i = LBound(arr) To UBound(arr)
-    '        System.Diagnostics.Debug.WriteLine(String.Format("00", i) & ": " & arr(i))
-    '    Next
-    'End Sub
 
     ''' <summary>
     ''' Find a block of text between two known strings
@@ -971,79 +538,6 @@ TryOldString:
         End If
     End Function
 
-    Public Function StrSplit(ByRef Source As String, ByRef delim As String, ByRef quote As String) As String
-        ' ##SUMMARY Divides string into 2 portions at position of 1st occurence of specified _
-        'delimeter. Quote specifies a particular string that is exempt from the delimeter search.
-        ' ##SUMMARY   Example: StrSplit("Julie, Todd, Jane, and Ray", ",", "") = "Julie", and "Todd, Jane, and Ray" is returned as Source.
-        ' ##SUMMARY   Example: StrSplit("Julie, Todd, Jane, and Ray", ",", "Julie, Todd") = "Julie, Todd", and "Jane, and Ray" is returned as Source.
-        ' ##PARAM Source M String to be analyzed
-        ' ##PARAM delim I Single-character string delimeter
-        ' ##PARAM quote I String enclosing areas not searched for delimiter.
-        ' ##RETURNS  Returns leading portion of incoming string up to first occurence of delimeter. _
-        'Returns input parameter without that portion. If no delimiter in string, _
-        'returns whole string, and input parameter reduced to null string.
-        Dim retval As String
-        Dim i As Integer
-        Dim quoted As Boolean
-        Dim trimlen As Integer
-        Dim quotlen As Integer
-        ' ##LOCAL retval - string to return as StrSplit
-        ' ##LOCAL i - long character position of search through Source
-        ' ##LOCAL quoted - Boolean whether quote was encountered in Source
-        ' ##LOCAL trimlen - long length of delimeter, or quote if encountered first
-        ' ##LOCAL quotlen - long length of quote
-
-        Source = LTrim(Source) 'remove leading blanks
-        quotlen = Len(quote)
-        If quotlen > 0 Then
-            i = InStr(Source, quote)
-            If i = 1 Then 'string beginning
-                trimlen = quotlen
-                Source = Mid(Source, trimlen + 1)
-                i = InStr(Source, quote) 'string end
-                quoted = True
-            Else
-                i = InStr(Source, delim)
-                trimlen = Len(delim)
-            End If
-        Else
-            i = InStr(Source, delim)
-            trimlen = Len(delim)
-        End If
-
-        If i > 0 Then 'found delimeter
-            retval = Left(Source, i - 1) 'string to return
-            If Right(retval, 1) = " " Then retval = RTrim(retval)
-            Source = LTrim(Mid(Source, i + trimlen)) 'string remaining
-            If quoted And Len(Source) > 0 Then
-                If Left(Source, Len(delim)) = delim Then Source = LTrim(Mid(Source, Len(delim) + 1))
-            End If
-        Else 'take it all
-            retval = Source
-            Source = "" 'nothing left
-        End If
-
-        StrSplit = retval
-
-    End Function
-
-    'Public Function StrRepeat(ByRef repeat As Integer, ByRef Source As String) As String
-    '    ' ##SUMMARY Repeats specified string specified number of times.
-    '    ' ##SUMMARY   Example: StrRepeat(3, "I wish I were in Kansas. ")
-    '    ' ##PARAM repeat I Number of times for Source to be repeated
-    '    ' ##PARAM Source I String to be repeated then returned
-    '    ' ##RETURNS Returns input parameter Source in succession specified number of times.
-    '    Dim retval As String
-    '    Dim i As Integer
-    '    ' ##LOCAL retval - string to return as StrRepeat
-    '    ' ##LOCAL i - long index for 'repeat' loop
-
-    '    For i = 1 To repeat
-    '        retval = retval & Source
-    '    Next
-    '    StrRepeat = retval
-    'End Function
-
     Function StrFirstInt(ByRef Source As String) As Integer
         ' ##SUMMARY Divides alpha numeric sequence into leading numbers and trailing characters.
         ' ##SUMMARY   Example: StrFirstInt("123Go!) = "123", and changes Source to "Go!"
@@ -1066,65 +560,6 @@ TryOldString:
 
         Return retval
     End Function
-
-    'Sub StrToDate(ByRef txt As String, ByRef datevar As Object)
-    '    ' ##SUMMARY Converts yyyy/mm/dd date string to date variant.
-    '    ' ##PARAM txt I Date string
-    '    ' ##PARAM datevar O Date variant
-    '    Dim ilen As Integer
-    '    Dim ipos As Integer
-    '    Dim dattmp As Object
-    '    ' ##LOCAL ilen - long length of text string
-    '    ' ##LOCAL ipos - long character position in parse through text
-    '    ' ##LOCAL dattmp - intermediate date variant
-
-    '    txt = Trim(txt)
-    '    ilen = Len(txt)
-    '    datevar = ""
-    '    If ilen > 0 Then
-    '        ipos = InStr(txt, "/")
-    '        If ipos > 0 Then
-    '            dattmp = Right(txt, ilen - ipos) & "/" & Left(txt, ipos - 1)
-    '        End If
-    '    End If
-    '    datevar = DateSerial(Year(dattmp), Month(dattmp), VB.Day(dattmp))
-    'End Sub
-
-    'Sub GetDate(ByRef big As Double, ByRef dyval As Object)
-    '    ' ##SUMMARY Converts double-precision date to date variant.
-    '    ' ##PARAM big I Double-precision date (i.e., 19851101 = Nov 1, 1985)
-    '    ' ##PARAM dyval O Date variant
-    '    Dim yr As Integer
-    '    Dim mo As Integer
-    '    Dim dy As Integer
-    '    Dim tmp As Integer
-    '    ' ##LOCAL yr - long year
-    '    ' ##LOCAL mo - long month
-    '    ' ##LOCAL dy - long day
-    '    ' ##LOCAL tmp - long temporary value of double-precision date as it is parsed
-
-    '    yr = big / 10000
-    '    tmp = big - (yr * 10000)
-    '    mo = tmp / 100
-    '    dy = tmp - (mo * 100)
-    '    dyval = DateSerial(yr, mo, dy)
-    'End Sub
-
-    'Sub GetDateParts(ByRef big As Double, ByRef yr As Integer, ByRef mo As Integer, ByRef dy As Integer)
-    '    ' ##SUMMARY Converts double-precision date to traditional year, month, and day parts.
-    '    ' ##SUMMARY   Example: big = 19851101 returns yr = 1985, mo = 11, dy = 1
-    '    ' ##PARAM big I Double-precision date
-    '    ' ##PARAM yr O Long year
-    '    ' ##PARAM mo O Long month
-    '    ' ##PARAM dy O Long day
-    '    Dim tmp As Double
-    '    ' ##LOCAL tmp - double-precision temporary value of date as it is parsed
-
-    '    yr = big / 10000
-    '    tmp = big - (yr * 10000)
-    '    mo = tmp / 100
-    '    dy = tmp - (mo * 100)
-    'End Sub
 
     Public Function CountString(ByRef Source As String, ByRef Find As String) As Integer
         ' ##SUMMARY Searches for occurences of Find in Source.
