@@ -1,6 +1,7 @@
 Imports atcUtility
 Imports atcData
 Imports MapWinUtility
+Imports MapWinUtility.Strings
 
 Public Class atcDataSourceTimeseriesDbf
     Inherits atcTimeseriesSource

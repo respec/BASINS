@@ -2,6 +2,7 @@ Option Strict Off
 Option Explicit On
 
 Imports MapWinUtility
+Imports MapWinUtility.Strings
 Imports atcUtility
 
 Friend Class clsNetworkHspfOutput

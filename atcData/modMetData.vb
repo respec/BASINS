@@ -1,6 +1,7 @@
 Imports System.IO
 Imports atcUtility
 Imports MapWinUtility
+Imports MapWinUtility.Strings
 
 Public Module modMetData
 

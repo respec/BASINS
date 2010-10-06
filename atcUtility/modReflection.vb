@@ -4,6 +4,7 @@ Option Explicit On
 
 Imports System.Reflection
 Imports MapWinUtility
+Imports MapWinUtility.Strings
 
 Public Module modReflection
 

@@ -1,6 +1,7 @@
 Imports atcControls
 Imports atcUtility
 Imports MapWinUtility
+Imports MapWinUtility.Strings
 Imports System.Drawing
 
 Public Class frmCliGen

@@ -1,5 +1,6 @@
 Imports atcControls
 Imports atcUtility
+Imports MapWinUtility.Strings
 
 Public Class frmResult
     Inherits System.Windows.Forms.Form

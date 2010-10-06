@@ -1,6 +1,7 @@
 ﻿Imports System.Collections.ObjectModel
 Imports System.IO
 Imports MapWinUtility
+Imports MapWinUtility.Strings
 Imports atcUtility
 Imports System.Text
 Imports System.Text.RegularExpressions

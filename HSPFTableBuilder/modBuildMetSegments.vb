@@ -69,6 +69,10 @@ Module modBuildMetSegments
                 Dim lMetType As String = lMetSegRecord.Source.Member
                 If lMetType = "PEVT" Then
                     lMetSegRecord.Source.Member = "PMET"
+                    If g_PmetMFact <> 1.0 Then
+                        lMetSegRecord.MFactR = g_PmetMFact
+                        lMetSegRecord.MFactP = g_PmetMFact
+                    End If
                 End If
             Next
         Next

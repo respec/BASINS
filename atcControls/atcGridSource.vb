@@ -1,4 +1,4 @@
-Imports atcUtility
+Imports MapWinUtility.Strings
 
 Public Enum atcAlignment
     HAlignLeft = 1

@@ -1,7 +1,7 @@
 Imports System.Collections.ObjectModel
 Imports System.IO
 Imports MapWinUtility
-Imports atcUtility
+Imports MapWinUtility.Strings
 
 Public Class Channels
     Inherits KeyedCollection(Of String, Channel)
