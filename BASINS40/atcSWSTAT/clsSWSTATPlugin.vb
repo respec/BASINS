@@ -5,11 +5,11 @@ Imports MapWinUtility
 Public Class clsSWSTATPlugin
     Inherits atcData.atcDataDisplay
 
-    Private TrendName As String = "Analysis::Trend"
+    Private pTrendName As String = "Trend"
 
     Public Overrides ReadOnly Property Name() As String
         Get
-            Return "Analysis::SWSTAT"
+            Return "Analysis::SWSTAT::Integrated Frequency Analysis"
         End Get
     End Property
 
@@ -78,14 +78,18 @@ Public Class clsSWSTATPlugin
 
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
-        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_" & TrendName, atcDataManager.AnalysisMenuName, TrendName.Substring(10), Me.Icon, , , True))
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_SWSTAT_" & pTrendName, _
+                                                       atcDataManager.AnalysisMenuName & "_SWSTAT", pTrendName, Me.Icon, , , True))
     End Sub
 
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         MyBase.ItemClicked(aItemName, aHandled)
-        If Not aHandled AndAlso aItemName.Equals(atcDataManager.AnalysisMenuName & "_" & TrendName) Then
-            Dim lForm As New frmTrend
-            ShowForm(Nothing, lForm)
+        If Not aHandled AndAlso aItemName.Equals(atcDataManager.AnalysisMenuName & "_SWSTAT_" & pTrendName) Then
+            Dim lTimeseriesGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Data For Trend Analysis")
+            If lTimeseriesGroup.Count > 0 Then
+                Dim lForm As New frmTrend
+                ShowForm(lTimeseriesGroup, lForm)
+            End If
         End If
     End Sub
 
