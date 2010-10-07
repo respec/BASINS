@@ -107,45 +107,63 @@ Public Class atcDataPlugin
         AddMenuIfMissing(ManageDataMenuName, FileMenuName, ManageDataMenuString, OpenDataMenuName)
         AddMenuIfMissing(SaveDataMenuName, FileMenuName, SaveDataMenuString, "mnuSaveAs")
 
-        'g_MapWin.Menus.Remove(NewDataMenuName)
-        'g_MapWin.Menus.Remove(OpenDataMenuName)
-        'g_MapWin.Menus.Remove(ManageDataMenuName)
-        'g_MapWin.Menus.Remove(SaveDataMenuName)
+        Dim lSubMenus As New Generic.List(Of String)
+        Dim lRest As String = Name.Clone
+        While lRest.Contains("::")
+            lSubMenus.Add(MapWinUtility.Strings.StrSplit(lRest, "::", ""))
+        End While
+        If lSubMenus.Count > 0 Then
+            Select Case lSubMenus(0)
+                Case "Analysis"
+                    'Add Analysis menu if it does not yet exist
+                    Dim lParentMenuName As String = ""
+                    Dim lMenuName As String = atcDataManager.AnalysisMenuName
+                    atcDataManager.AddMenuIfMissing(lMenuName, "", atcDataManager.AnalysisMenuString, atcDataManager.FileMenuName)
+                    lParentMenuName = lMenuName
 
-        If Name.StartsWith("Analysis::") Then
-            atcDataManager.AddMenuIfMissing(atcDataManager.AnalysisMenuName, "", atcDataManager.AnalysisMenuString, atcDataManager.FileMenuName)
-            pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_" & Name, atcDataManager.AnalysisMenuName, Name.Substring(10), Me.Icon, , , True))
-        ElseIf Name.StartsWith("Timeseries::") Then
-            Try
-                Dim lDataSource As atcDataSource = Me
-                If lDataSource.Category <> "File" Then
-                    Dim lCategoryMenuName As String = atcDataManager.ComputeMenuName & "_" & lDataSource.Category
-                    Dim lOperations As atcDataAttributes = lDataSource.AvailableOperations
-                    If Not lOperations Is Nothing AndAlso lOperations.Count > 0 Then
-                        For Each lOperation As atcDefinedValue In lOperations
-                            Select Case lOperation.Definition.TypeString
-                                Case "atcTimeseries", "atcDataGroup", "atcTimeseriesGroup"
-                                    atcDataManager.AddMenuIfMissing(atcDataManager.ComputeMenuName, "", atcDataManager.ComputeMenuString, atcDataManager.FileMenuName)
-                                    pMenusAdded.Add(atcDataManager.AddMenuIfMissing(lCategoryMenuName, atcDataManager.ComputeMenuName, lDataSource.Category, , , True))
-                                    'Operations might have categories to further divide them
-                                    If lOperation.Definition.Category.Length > 0 Then
-                                        Dim lSubCategoryName As String = lCategoryMenuName & "_" & lOperation.Definition.Category
-                                        atcDataManager.AddMenuIfMissing(lSubCategoryName, lCategoryMenuName, lOperation.Definition.Category, , , True)
-                                        atcDataManager.AddMenuIfMissing(lSubCategoryName & "_" & lOperation.Definition.Name & "_" & Name, lSubCategoryName, lOperation.Definition.Name, , , True)
-                                    Else
-                                        atcDataManager.AddMenuIfMissing(lCategoryMenuName & "_" & lOperation.Definition.Name & "_" & Name, lCategoryMenuName, lOperation.Definition.Name, , , True)
-                                    End If
-                            End Select
-                        Next
-                    Else
-                        atcDataManager.AddMenuIfMissing(atcDataManager.ComputeMenuName, "", atcDataManager.ComputeMenuString, atcDataManager.FileMenuName)
-                        pMenusAdded.Add(atcDataManager.AddMenuIfMissing(lCategoryMenuName & "_" & Name, lCategoryMenuName, lDataSource.Description, , , True))
-                    End If
-                End If
-            Catch
-                'Could not add to menu, probably wasn't an atcDataSource
-            End Try
+                    'Add sub-menus if neeeded
+                    For lLevel As Integer = 1 To lSubMenus.Count - 1
+                        If lSubMenus(lLevel).Length > 0 Then
+                            lMenuName &= "_" & lSubMenus(lLevel)
+                            atcDataManager.AddMenuWithIcon(lMenuName, lParentMenuName, lSubMenus(lLevel), Me.Icon)
+                            lParentMenuName = lMenuName
+                        End If
+                    Next
 
+                    'Add menu item for this analysis
+                    pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_" & Name, lParentMenuName, lRest, Me.Icon, , , True))
+
+                Case "Timeseries"
+                    Try
+                        Dim lDataSource As atcDataSource = Me
+                        If lDataSource.Category <> "File" Then
+                            Dim lCategoryMenuName As String = atcDataManager.ComputeMenuName & "_" & lDataSource.Category
+                            Dim lOperations As atcDataAttributes = lDataSource.AvailableOperations
+                            If Not lOperations Is Nothing AndAlso lOperations.Count > 0 Then
+                                For Each lOperation As atcDefinedValue In lOperations
+                                    Select Case lOperation.Definition.TypeString
+                                        Case "atcTimeseries", "atcDataGroup", "atcTimeseriesGroup"
+                                            atcDataManager.AddMenuIfMissing(atcDataManager.ComputeMenuName, "", atcDataManager.ComputeMenuString, atcDataManager.FileMenuName)
+                                            pMenusAdded.Add(atcDataManager.AddMenuIfMissing(lCategoryMenuName, atcDataManager.ComputeMenuName, lDataSource.Category, , , True))
+                                            'Operations might have categories to further divide them
+                                            If lOperation.Definition.Category.Length > 0 Then
+                                                Dim lSubCategoryName As String = lCategoryMenuName & "_" & lOperation.Definition.Category
+                                                atcDataManager.AddMenuIfMissing(lSubCategoryName, lCategoryMenuName, lOperation.Definition.Category, , , True)
+                                                atcDataManager.AddMenuIfMissing(lSubCategoryName & "_" & lOperation.Definition.Name & "_" & Name, lSubCategoryName, lOperation.Definition.Name, , , True)
+                                            Else
+                                                atcDataManager.AddMenuIfMissing(lCategoryMenuName & "_" & lOperation.Definition.Name & "_" & Name, lCategoryMenuName, lOperation.Definition.Name, , , True)
+                                            End If
+                                    End Select
+                                Next
+                            Else
+                                atcDataManager.AddMenuIfMissing(atcDataManager.ComputeMenuName, "", atcDataManager.ComputeMenuString, atcDataManager.FileMenuName)
+                                pMenusAdded.Add(atcDataManager.AddMenuIfMissing(lCategoryMenuName & "_" & Name, lCategoryMenuName, lDataSource.Description, , , True))
+                            End If
+                        End If
+                    Catch
+                        'Could not add to menu, probably wasn't an atcDataSource
+                    End Try
+            End Select
         End If
     End Sub
 
