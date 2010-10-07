@@ -6,7 +6,7 @@ Public Class clsDurationComparePlugin
 
     Public Overrides ReadOnly Property Name() As String
         Get
-            Return "Analysis::Duration/Compare"
+            Return "Analysis::SWSTAT::Duration/Compare"
         End Get
     End Property
 
@@ -18,55 +18,37 @@ Public Class clsDurationComparePlugin
         pMapWinWindowHandle = aParentHandle
         atcDataManager.MapWindow = aMapWin
 
+        Dim lSWSTATMenuName As String = atcDataManager.AnalysisMenuName & "_SWSTAT"
+
         atcDataManager.AddMenuIfMissing(atcDataManager.AnalysisMenuName, "", atcDataManager.AnalysisMenuString, atcDataManager.FileMenuName)
-        'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_Duration", atcDataManager.AnalysisMenuName, "Duration", Me.Icon, , , True))
-        'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_Compare", atcDataManager.AnalysisMenuName, "Compare", Me.Icon, , , True))
-        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_DurationCompare", atcDataManager.AnalysisMenuName, "Duration/Compare", Me.Icon, , , True))
-        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_DurationHydrograph", atcDataManager.AnalysisMenuName, "Duration Hydrograph", Me.Icon, , , True))
+        atcDataManager.AddMenuIfMissing(lSWSTATMenuName, atcDataManager.AnalysisMenuName, "SWSTAT")
+
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_DurationCompare", lSWSTATMenuName, "Duration/Compare", Me.Icon, , , True))
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_DurationHydrograph", lSWSTATMenuName, "Duration Hydrograph", Me.Icon, , , True))
     End Sub
 
-    'Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
-    '    Dim lFrmClassLimts As frmAnalysis = Nothing
-    '    Dim lFrm As Object = Nothing 'Windows.Forms.Form
-    '    Select Case aItemName
-    '        Case atcDataManager.AnalysisMenuName & "_Duration"
-    '            lFrm = New frmDuration
-    '        Case atcDataManager.AnalysisMenuName & "_Compare"
-    '            lFrm = New frmCompare
-    '    End Select
-
-    '    If lFrm IsNot Nothing Then
-    '        Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
-    '        For Each lDisp As atcDataDisplay In DisplayPlugins
-    '            Dim lMenuText As String = lDisp.Name
-    '            If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
-    '            lFrm.mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf lFrm.mnuAnalysis_Click))
-    '        Next
-    '        If pMapWin IsNot Nothing AndAlso pMapWin.ApplicationInfo.FormIcon IsNot Nothing Then lFrm.Icon = pMapWin.ApplicationInfo.FormIcon
-    '        Dim lTimeseriesGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Data For " & aItemName.Substring(atcDataManager.AnalysisMenuName.Length + 1))
-    '        If lTimeseriesGroup.Count > 0 Then
-    '            lFrmClassLimts = New frmAnalysis(lTimeseriesGroup, lFrm)
-    '            lFrmClassLimts.Show()
-    '            'lFrm.Initialize(lTimeseriesGroup)
-    '            'lFrm.Show()
-    '        End If
-    '    End If
-    'End Sub
+    Public Overrides ReadOnly Property Icon() As System.Drawing.Icon
+        Get
+            Dim lResources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmAnalysis))
+            Return CType(lResources.GetObject("$this.Icon"), System.Drawing.Icon)
+        End Get
+    End Property
 
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         Dim lFrmClassLimits As frmAnalysis = Nothing
 
         If aItemName = atcDataManager.AnalysisMenuName & "_DurationCompare" Then
-            Dim lTimeseriesGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Data For " & aItemName.Substring(atcDataManager.AnalysisMenuName.Length + 1))
+            Dim lTimeseriesGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Data For Duration/Compare")
             If lTimeseriesGroup.Count > 0 Then
                 lFrmClassLimits = New frmAnalysis(lTimeseriesGroup)
                 If pMapWin IsNot Nothing AndAlso pMapWin.ApplicationInfo.FormIcon IsNot Nothing Then lFrmClassLimits.Icon = pMapWin.ApplicationInfo.FormIcon
                 lFrmClassLimits.Show()
             End If
         ElseIf aItemName = atcDataManager.AnalysisMenuName & "_DurationHydrograph" Then
-            Dim lTimeseriesGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Data For " & aItemName.Substring(atcDataManager.AnalysisMenuName.Length + 1))
+            Dim lTimeseriesGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Data For Duration Hydrograph")
             If lTimeseriesGroup.Count > 0 Then
                 Dim lfrmDHControl As New frmDurationHydrographControl(lTimeseriesGroup)
+                If pMapWin IsNot Nothing AndAlso pMapWin.ApplicationInfo.FormIcon IsNot Nothing Then lfrmDHControl.Icon = pMapWin.ApplicationInfo.FormIcon
                 lfrmDHControl.Show()
             End If
         End If
