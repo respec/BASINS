@@ -2,6 +2,7 @@ Imports atcControls
 Imports atcData
 Imports atcUtility
 Imports MapWinUtility
+Imports MapWinUtility.Strings
 
 Imports System.Windows.Forms
 

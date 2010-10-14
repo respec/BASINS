@@ -6,6 +6,7 @@ Imports MapWindow.Interfaces
 Imports System.Collections.Specialized
 Imports System.Windows.Forms.Application
 Imports MapWinUtility
+Imports MapWinUtility.Strings
 Imports atcData
 Imports atcUtility
 Imports atcMwGisUtility

@@ -3,6 +3,7 @@ Option Explicit On
 Imports atcData
 Imports atcUtility
 Imports MapWinUtility
+Imports MapWinUtility.Strings
 
 Public Module modCliGen
 

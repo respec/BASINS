@@ -1,4 +1,5 @@
 Imports MapWinUtility
+Imports MapWinUtility.Strings
 
 Public Class frmFeedback
     Inherits System.Windows.Forms.Form

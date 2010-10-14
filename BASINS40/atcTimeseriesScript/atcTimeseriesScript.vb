@@ -4,6 +4,7 @@ Option Explicit On
 Imports atcData
 Imports atcUtility
 Imports MapWinUtility
+Imports MapWinUtility.Strings
 
 ''' <summary>
 ''' Reads USGS rdb files containing daily values

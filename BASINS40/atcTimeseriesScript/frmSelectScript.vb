@@ -1,7 +1,7 @@
 Option Strict Off
 Option Explicit On
 
-Imports atcUtility
+Imports MapWinUtility.Strings
 
 Friend Class frmSelectScript
     Inherits System.Windows.Forms.Form
