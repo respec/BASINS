@@ -932,127 +932,6 @@ ErrorWriting:
         End Try
     End Function
 
-    ''' <summary>
-    ''' Return the contents of a file as a string
-    ''' </summary>
-    ''' <param name="aFilename">Name of text file to read</param>
-    ''' <param name="aTimeoutMilliseconds">Length of time to keep trying in case of an error</param>
-    ''' <returns>contents of specified file</returns>
-    ''' <remarks>Timeout is desirable in cases where the file might not yet be closed properly but it will be soon</remarks>
-    Public Function WholeFileString(ByVal aFilename As String, Optional ByVal aTimeoutMilliseconds As Integer = 1000) As String
-        Dim lTryUntil As Date = Now.AddMilliseconds(aTimeoutMilliseconds)
-        Dim lInFile As Integer
-        Dim lFileLength As Integer
-
-        WholeFileString = ""
-        lInFile = FreeFile()
-TryAgain:
-        Try
-            'IO.File.ReadAllText cannot read an open for writing file(like the logger)
-            'WholeFileString = IO.File.ReadAllText(aFilename)
-            FileOpen(lInFile, aFilename, OpenMode.Input, OpenAccess.Read, OpenShare.Shared)
-            lFileLength = LOF(lInFile)
-            WholeFileString = InputString(lInFile, lFileLength)
-            FileClose(lInFile)
-        Catch ex As Exception
-            If Now > lTryUntil Then
-                Logger.Msg("Error reading '" & aFilename & "'" & vbCr & vbCr & ex.Message, "WholeFileString - " & ex.GetType.Name)
-                Return ""
-            Else
-                'Logger.Msg("WholeFileString error, trying again (" & ex.GetType.Name & ": " & ex.Message & ")")
-                Threading.Thread.Sleep(50)
-                GoTo TryAgain
-            End If
-        End Try
-    End Function
-
-
-    '    Public Function WholeFileBytes(ByVal aFilename As String) As Byte()
-    '        ' ##SUMMARY Converts specified text file to Byte array
-    '        ' ##PARAM FileName I Name of text file
-    '        ' ##RETURNS Returns contents of specified text file in Byte array.
-    '        Dim retval(0) As Byte
-    '        ' ##LOCAL InFile - long filenumber of text file
-    '        ' ##LOCAL retval() - byte array containing return values
-
-    '        On Error GoTo ErrorReading
-
-    '        WholeFileBytes = IO.File.ReadAllBytes(aFilename)
-
-    'ErrorReading:
-    '        Logger.Msg("Error reading '" & aFilename & "'" & vbCr & vbCr & Err.Description, MsgBoxStyle.OkOnly, "WholeFileBytes")
-    '    End Function
-
-    '''' <summary>
-    '''' Compare two files and return True if contents are identical.
-    '''' </summary>
-    '''' <param name="aFilename1">Name of first file to compare</param>
-    '''' <param name="aFilename2">Name of second file to compare</param>
-    '''' <returns>true if files are identical, false if not</returns>
-    '''' <remarks>An exception will occur if either file cannot be read.</remarks>
-    'Public Function FilesMatch(ByVal aFilename1 As String, ByVal aFilename2 As String) As Boolean
-    '    Dim LongFileLength As Long = FileLen(aFilename1)
-
-    '    'If files are not the same size, they do not match
-    '    If FileLen(aFilename2) <> LongFileLength Then Return False
-
-    '    If LongFileLength > Integer.MaxValue Then
-    '        Throw New ApplicationException("FilesMatch cannot compare files larger than 2 Gigabytes.")
-    '    End If
-
-    '    Dim FileLength As Integer = CInt(LongFileLength)
-    '    Dim InFile1 As Short = FreeFile()
-    '    Dim InFile2 As Short = FreeFile()
-    '    Dim longBytes As Integer
-    '    Dim testL1, testL2 As Integer
-    '    Dim testB1, testB2 As Byte
-    '    Dim i As Long
-
-    '    ' ##LOCAL FileLength - length of first file in bytes
-    '    ' ##LOCAL InFile1 - file handle of first file
-    '    ' ##LOCAL InFile2 - file handle of second file
-    '    ' ##LOCAL longBytes - number of bytes that can be tested in Integer-sized chunks
-    '    ' ##LOCAL testL1, testL2 - Integers to read and compare more than one byte at a time
-    '    ' ##LOCAL testB1, testB2 - Byte values to compare one byte at a time
-    '    ' ##LOCAL i - byte index in files
-
-    '    FileOpen(InFile1, aFilename1, OpenMode.Binary, OpenAccess.Read, OpenShare.Shared)
-    '    Try
-    '        FileOpen(InFile2, aFilename2, OpenMode.Binary, OpenAccess.Read, OpenShare.Shared)
-    '    Catch ex As Exception
-    '        FileClose(InFile1) 'clean up the first file which we opened before having trouble with second file
-    '        Throw ex
-    '    End Try
-
-    '    Try
-    '        'Compare most of the file in Integer-sized chunks
-    '        longBytes = FileLength - FileLength Mod 4
-    '        For i = 1 To longBytes Step 4
-    '            FileGet(InFile1, testL1)
-    '            FileGet(InFile2, testL2)
-    '            If testL1 <> testL2 Then Return False
-    '        Next
-
-    '        'Compare any odd bytes at end of file one at a time
-    '        Do While i <= FileLength
-    '            FileGet(InFile1, testB1, i)
-    '            FileGet(InFile2, testB2, i)
-    '            If testB1 <> testB2 Then Return False
-    '            i = i + 1
-    '        Loop
-
-    '        FileClose(InFile1)
-    '        FileClose(InFile2)
-
-    '        Return True 'Reached the end and found no mismatches
-
-    '    Catch ex As Exception
-    '        FileClose(InFile1)
-    '        FileClose(InFile2)
-    '        Throw ex
-    '    End Try
-    'End Function
-
     Public Function SwapBytes(ByVal n As Integer) As Integer
         ' ##SUMMARY Swaps between big and little endian 32-bit integers.
         ' ##SUMMARY   Example: SwapBytes(1) = 16777216
@@ -1354,18 +1233,23 @@ ReadCharacter:
     ''' <remarks>workaround for mystery bug - program exit without message on first reference to NaN</remarks>
     Public Function GetNaN() As Double
         Static lFirst As Boolean = True
-        'If lFirst Then Logger.Dbg("GetNaN")
-        'Dim lStatus As UInteger = _statusfp
+        Static lCodeWithCount As New atcCollection
+        If lFirst Then Logger.Dbg("GetNaN")
+        Dim lStatus As UInteger = _statusfp
         If lFirst Then
-            'Logger.Dbg("StatusB4 " & lStatus)
+            Logger.Dbg("StatusB4 " & lStatus)
             _fpreset()
-            'Logger.Dbg("StatusAf " & _statusfp)
+            Logger.Dbg("StatusAf " & _statusfp)
             lFirst = False
-            'ElseIf lStatus > 1 Then
-            'Logger.Dbg("StatusB4 " & lStatus)
-            '_fpreset()
-        End If
-        Return GetNaNInternal()
+        ElseIf lStatus > 1 Then
+            lCodeWithCount.Increment(lStatus, 1)
+            Dim lCount As Integer = lCodeWithCount.ItemByKey(lStatus)
+            If lCount < 10 OrElse lCount Mod 500 = 0 Then
+                Logger.Dbg("StatusB4 " & lStatus & " Count " & lCount)
+            End If
+            _fpreset()
+            End If
+            Return GetNaNInternal()
     End Function
 
     ''' <summary>

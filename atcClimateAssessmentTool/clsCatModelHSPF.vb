@@ -1,6 +1,7 @@
 Imports atcData
 Imports atcUtility
 Imports MapWinUtility
+Imports MapWinUtility.Strings
 
 Public Class clsCatModelHSPF
     Implements clsCatModel

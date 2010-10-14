@@ -2,7 +2,7 @@ Option Strict Off
 Option Explicit On
 Imports VB = Microsoft.VisualBasic
 Imports System.Drawing
-Imports atcUtility
+Imports MapWinUtility.Strings
 
 Friend Class frmInputWizard
     Inherits System.Windows.Forms.Form

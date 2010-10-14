@@ -1,3 +1,4 @@
+Imports MapWinUtility.Strings
 Imports atcUtility
 
 Public Class frmProjection
