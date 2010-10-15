@@ -43,21 +43,6 @@ Public Module modString
         End If
     End Function
 
-    ''' <summary>
-    ''' Log base 10
-    ''' </summary>
-    ''' <param name="aX">Double-precision number to take the log of</param>
-    ''' <returns>Log 10 of given number.</returns>
-    ''' <remarks>Example: Log10(218.7761624) = 2.34</remarks>
-    Public Function Log10(ByVal aX As Double) As Double
-        'Do not try to calculate if (X <= 0)
-        If aX > 0 Then
-            Log10 = System.Math.Log(aX, 10)
-        Else
-            Log10 = 1
-        End If
-    End Function
-
     Function RightJustify(ByVal aValue As Object, ByVal aWidth As Integer) As String
         Dim lStr As String = CStr(aValue)
         If lStr.Length >= aWidth Then
@@ -86,7 +71,7 @@ Public Module modString
 
         Try
             If Not Double.IsInfinity(aValue) AndAlso Not Double.IsNaN(aValue) Then
-                lCurPower = Fix(Log10(aValue))
+                lCurPower = Fix(Math.Log10(aValue))
                 If aValue >= 1 Then
                     lCurPower += 1
                 End If
@@ -409,7 +394,7 @@ TryOldString:
             lRndlow = 0.0#
         Else
             Dim lA As Integer 'integer holds absolute value of log10 rounded down to nearest magnitude
-            lA = Int(Log10(CDbl(lX)))
+            lA = Int(Math.Log10(CDbl(lX)))
             lRndlow = lSign * 10.0# ^ lA
         End If
         Return lRndlow

@@ -186,7 +186,7 @@ Public Class atcSeasonBase
         End If
 
         Dim lFormat As String = ""
-        lFormat = lFormat.PadRight(Int(Log10(lSplit.Count)) + 1, "0")
+        lFormat = lFormat.PadRight(Int(Math.Log10(lSplit.Count)) + 1, "0")
 
         For Each lSeasonalTS As atcTimeseries In lSplit
             Dim lSeasonIndex As Integer = lSeasonalTS.Attributes.GetValue("SeasonIndex", 0)

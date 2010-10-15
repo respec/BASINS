@@ -433,7 +433,7 @@ Public Class atcFrequencyGridSource
                         lLogNdayTs.numValues = lNumPositive
                         For lIndex = 1 To lNdayTs.numValues
                             If lNdayTsNonLog.Value(lIndex) - lEpsilon > 0 Then
-                                lLogNdayTs.Value(lCurNewValueIndex) = Log10(lNdayTs.Value(lIndex))
+                                lLogNdayTs.Value(lCurNewValueIndex) = Math.Log10(lNdayTs.Value(lIndex))
                                 lLogNdayTs.Dates.Value(lCurNewValueIndex) = lNdayTs.Dates.Value(lIndex)
                                 lCurNewValueIndex += 1
                             End If
