@@ -86,18 +86,6 @@
     <Compile Include="frmAnalysis.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmCompare.Designer.vb">
-      <DependentUpon>frmCompare.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmCompare.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmDuration.Designer.vb">
-      <DependentUpon>frmDuration.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmDuration.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="frmDurationHydrographControl.Designer.vb">
       <DependentUpon>frmDurationHydrographControl.vb</DependentUpon>
     </Compile>
@@ -134,12 +122,6 @@
     <EmbeddedResource Include="frmAnalysis.resx">
       <DependentUpon>frmAnalysis.vb</DependentUpon>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmCompare.resx">
-      <DependentUpon>frmCompare.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmDuration.resx">
-      <DependentUpon>frmDuration.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmDurationHydrographControl.resx">
       <DependentUpon>frmDurationHydrographControl.vb</DependentUpon>
