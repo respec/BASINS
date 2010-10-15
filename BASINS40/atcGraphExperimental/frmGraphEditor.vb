@@ -664,7 +664,7 @@ Public Class frmGraphEditor
                 Dim lBorder As ZedGraph.Border = aFontSpec.Border.Clone
                 Dim lAngle As Single = aFontSpec.Angle
                 aFontSpec = New FontSpec( _
-                    .FontFamily.Name, .Size * 4 / 3, cdlg.Color, _
+                    .FontFamily.Name, .SizeInPoints * 1.666666, cdlg.Color, _
                     .Bold, .Italic, .Underline, _
                     aFontSpec.Fill.Color, aFontSpec.Fill.Brush, aFontSpec.Fill.Type)
                 aFontSpec.Border = lBorder

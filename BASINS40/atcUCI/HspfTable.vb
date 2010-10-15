@@ -501,7 +501,7 @@ notMissingTableForThisOper:
                     lNumFmtRE = "-" & lNumFmtRE.Substring(3)
                 Else
                     'Determine appropriate log syntax
-                    Dim lLogVal As Double = System.Math.Abs(atcUtility.Log10(System.Math.Abs(aRVal)))
+                    Dim lLogVal As Double = System.Math.Abs(Math.Log10(System.Math.Abs(aRVal)))
                     Dim lExpFormat As String
                     If lLogVal >= 100 Then
                         lExpFormat = "e-000"

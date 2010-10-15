@@ -693,7 +693,7 @@ FoundMatch:
         Else 'logarithmic scale
             Dim lLogMin As Integer
             If aDataMin > 0.000000001 Then
-                lLogMin = Fix(Log10(aDataMin))
+                lLogMin = Fix(Math.Log10(aDataMin))
             Else
                 'too small or neg value, set to -9
                 lLogMin = -9
@@ -705,7 +705,7 @@ FoundMatch:
 
             Dim lLogMax As Integer
             If aDataMax > 0.000000001 Then
-                lLogMax = Fix(Log10(aDataMax))
+                lLogMax = Fix(Math.Log10(aDataMax))
             Else
                 'too small or neg value, set to -8
                 lLogMax = -8

@@ -297,8 +297,8 @@ Public Class clsGraphFrequency
         If lYMin < lYMax Then
             aPane.YAxis.Scale.MaxAuto = False
             aPane.YAxis.Scale.MinAuto = False
-            aPane.YAxis.Scale.Max = Math.Pow(10, Math.Ceiling(Log10(lYMax)))
-            aPane.YAxis.Scale.Min = Math.Pow(10, Math.Floor(Log10(lYMin)))
+            aPane.YAxis.Scale.Max = Math.Pow(10, Math.Ceiling(Math.Log10(lYMax)))
+            aPane.YAxis.Scale.Min = Math.Pow(10, Math.Floor(Math.Log10(lYMin)))
             Debug.Print("setYRange: Min " & aPane.YAxis.Scale.Min)
             Debug.Print("setYRange: Max " & aPane.YAxis.Scale.Max)
         End If

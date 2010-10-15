@@ -160,44 +160,6 @@ Public Class clsGraphProbability
             Next
         Next
         aPane.YAxis.Scale.MaxAuto = False
-        aPane.YAxis.Scale.Max = Math.Pow(10, Math.Ceiling(Log10(lYMax)))
+        aPane.YAxis.Scale.Max = Math.Pow(10, Math.Ceiling(Math.Log10(lYMax)))
     End Sub
-
-    'Private Function Gausex(ByVal aExprob As Double) As Double
-    '    'GAUSSIAN PROBABILITY FUNCTIONS   W.KIRBY  JUNE 71
-    '    ' GAUSEX=VALUE EXCEEDED WITH PROB EXPROB
-    '    ' rev 8/96 by PRH for VB
-    '    ' rev 11/2006 by MHG for c#
-    '    ' rev 11/2007 by JLK for VB.NET
-    '    Static c0 As Double = 2.515517
-    '    Static c1 As Double = 0.802853
-    '    Static c2 As Double = 0.010328
-    '    Static d1 As Double = 1.432788
-    '    Static d2 As Double = 0.189269
-    '    Static d3 As Double = 0.001308
-    '    Static StandardDeviations As Integer = 3
-    '    Dim pr, rtmp, p, t, numerat, Denom As Double
-
-    '    Try
-    '        p = aExprob
-    '        If (p >= 1) Then
-    '            rtmp = -StandardDeviations 'set to minimum
-    '        ElseIf (p <= 0) Then
-    '            rtmp = StandardDeviations 'set at maximum
-    '        Else          'compute value
-    '            pr = p
-    '            If (p > 0.5) Then pr = 1 - pr
-    '            t = Math.Sqrt(-2 * Math.Log(pr))
-    '            numerat = (c0 + t * (c1 + t * c2))
-    '            Denom = (1 + t * (d1 + t * (d2 + t * d3)))
-    '            rtmp = t - numerat / Denom
-    '            If (p > 0.5) Then rtmp = -rtmp
-    '            If (rtmp > StandardDeviations) Then rtmp = StandardDeviations
-    '            If (rtmp < -StandardDeviations) Then rtmp = -StandardDeviations
-    '            Return rtmp
-    '        End If
-    '    Catch e As Exception
-    '        Return 0
-    '    End Try
-    'End Function
 End Class

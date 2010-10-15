@@ -1465,10 +1465,10 @@ G200:
             lMax = aMax
         End If
 
-        iexp = Fix(Log10(lMax))
+        iexp = Fix(Math.Log10(lMax))
         bound(1) = 10.0# ^ (iexp + 1)
         If lMin <= 0.0# Then lMin = lMax / 1000.0#
-        iexp = Int(Log10(lMin))
+        iexp = Int(Math.Log10(lMin))
         bound(0) = 10.0# ^ (iexp)
 
         'set up class intervals
@@ -1487,7 +1487,7 @@ G200:
 
         For i = 1 To aNumFDclasses
             c = clas(i)
-            clog = Log10(c) + 0.001
+            clog = Math.Log10(c) + 0.001
             If clog < 0.0# Then clog = clog - 1
             l = Fix(clog)
             l = l - 1
