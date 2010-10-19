@@ -52,31 +52,34 @@ Public Class atcTimeseriesRDB
             aFileName = FindFile("Select " & Name & " file to open", , , Filter, True, , 1)
         End If
 
-        If Not FileExists(aFileName) Then
+        If Not IO.File.Exists(aFileName) Then
             pErrorDescription = "File '" & aFileName & "' not found"
         Else
-            Me.Specification = aFileName
-
+            Specification = aFileName
             Try
-                Dim lCurLine As String
                 Dim lAttrName As String
                 Dim lAttrValue As String
                 Dim lAttributes As New atcDataAttributes
 
-                Dim lInputStream As New FileStream(aFileName, FileMode.Open, FileAccess.Read)
+                Dim lInputStream As New FileStream(Specification, FileMode.Open, FileAccess.Read)
                 Dim lInputBuffer As New BufferedStream(lInputStream)
                 Dim lInputReader As New BinaryReader(lInputBuffer)
 
-                Dim lURL As String = NextLine(lInputReader).Substring(2)
-                lAttributes.SetValue("URL", lURL)
-
                 Dim lWQData As Boolean = False
                 Dim lMeasurementsData As Boolean = False
-                Dim lParmCodeIndex As Integer = 10
-                If lURL.IndexOf("qwdata") > -1 Then 'TODO: need better way - only true with BASINS download
+                Dim lIdaData As Boolean = False
+
+                Dim lCurLine As String = NextLine(lInputReader).Substring(2)
+                If lCurLine.IndexOf("qwdata") > -1 Then 'TODO: need better way - only true with BASINS download
                     lWQData = True
-                ElseIf lURL.IndexOf("measurements") > -1 Then
+                    lAttributes.SetValue("URL", lCurLine)
+                ElseIf lCurLine.IndexOf("measurements") > -1 Then
                     lMeasurementsData = True
+                    lAttributes.SetValue("URL", lCurLine)
+                ElseIf (IO.Path.GetExtension(Specification).ToLower = ".txt") AndAlso lCurLine.StartsWith("retrieved") Then
+                    lIdaData = True
+                Else
+                    lAttributes.SetValue("URL", lCurLine)
                 End If
 
                 While lInputReader.PeekChar = Asc("#")
@@ -112,13 +115,15 @@ Public Class atcTimeseriesRDB
                     ProcessWaterQualityValues(lInputReader, lAttributes)
                 ElseIf lMeasurementsData Then
                     ProcessMeasurements(lInputReader, lAttributes)
+                ElseIf lIdaData Then
+                    ProcessIdaValues(lInputReader, lAttributes)
                 Else
                     ProcessDailyValues(lInputReader, lAttributes)
                 End If
 
                 Return True
-            Catch e As Exception
-                Logger.Dbg("Exception reading '" & aFileName & "': " & e.Message)
+            Catch lException As Exception
+                Logger.Dbg("Exception reading '" & aFileName & "': " & lException.Message & vbCrLf & lException.StackTrace)
                 Return False
             End Try
         End If
@@ -448,6 +453,89 @@ Public Class atcTimeseriesRDB
             DataSets.Add(FillValues(lData, atcTimeUnit.TUDay, 1, atcUtility.GetNaN, lMissingVal, , Me))
         Next
         lRawDataSets.Clear()
+    End Sub
+
+    Sub ProcessIdaValues(ByVal aInputReader As BinaryReader, ByVal aAttributes As atcDataAttributes)
+        Dim lTimeseries As New atcTimeseries(Me)
+        lTimeseries.Dates = New atcTimeseries(Me)
+        With lTimeseries
+            .Attributes.ChangeTo(aAttributes)
+            .Attributes.Add("Constituent", "Flow")
+            .Attributes.Add("Scenario", "Observed")
+            .Attributes.Add("Point", True)
+
+            Dim lCurLine As String
+            While aInputReader.PeekChar = Asc("#")
+                lCurLine = NextLine(aInputReader)
+                If lCurLine.StartsWith("#  USGS") Then
+                    .Attributes.Add("Agency", "USGS")
+                    .Attributes.Add("Location", lCurLine.Substring(8, 8))
+                    .Attributes.Add("StaNam", lCurLine.Substring(17, lCurLine.Length - 17))
+                End If
+            End While
+        End With
+
+        Dim lTable As New atcTableDelimited
+        With lTable
+            .Delimiter = vbTab
+            .OpenStream(aInputReader.BaseStream)
+
+            Dim lDateField As Integer = -1
+            Dim lLocationField As Integer = -1
+            Dim lValueField As Integer = -1
+            Dim lTimeZoneField As Integer = -1
+            For lField As Integer = 1 To .NumFields
+                Select Case .FieldName(lField)
+                    Case "site_no" : lLocationField = lField
+                    Case "date_time" : lDateField = lField
+                    Case "value" : lValueField = lField
+                    Case "tz_cd" : lTimeZoneField = lField
+                    Case Else
+                        If .FieldName(lField).EndsWith("_cd") Then 'code field
+                            ' TODO: add codes as ValueAttributes and decide how to treat Provisional values
+                            'Currently dropping Provisional values below by "peeking" at column next to value
+                        End If
+                End Select
+            Next
+            lTimeseries.numValues = .NumRecords - (.CurrentRecord + 1)
+
+            Dim lValue As String = ""
+            Dim lDateJ As Double = Double.NaN
+            Dim lDatePrevJ As Double = Double.NaN
+            Dim lTU_TS_Needed As Boolean = True
+            Dim lIndex As Integer = 0
+            While .CurrentRecord < .NumRecords
+                .MoveNext()
+                lDatePrevJ = lDateJ
+                Dim lDateString As String = .Value(lDateField)
+                Dim lDate As New Date(lDateString.Substring(0, 4), lDateString.Substring(4, 2), lDateString.Substring(6, 2), _
+                                      lDateString.Substring(8, 2), lDateString.Substring(10, 2), lDateString.Substring(12, 2))
+                lDateJ = lDate.ToOADate
+                If lTU_TS_Needed AndAlso Not Double.IsNaN(lDatePrevJ) Then
+                    Dim lTu As atcTimeUnit
+                    Dim lTs As Integer
+                    CalcTimeUnitStep(lDatePrevJ, lDateJ, lTu, lTs)
+                    Dim lTimeDif As Double = lDateJ - lDatePrevJ
+                    lTimeseries.Attributes.Add("TU", lTu)
+                    lTimeseries.Attributes.Add("TS", lTs)
+                    lTU_TS_Needed = False
+                End If
+
+                If lDateJ = 0 Then
+                    Logger.Dbg("BadDate " & .CurrentRecord.ToString)
+                Else
+                    lIndex += 1
+                    lTimeseries.Value(lIndex) = .Value(lValueField)
+                    lTimeseries.Dates.Value(lIndex) = lDateJ
+                 End If
+                If .CurrentRecord Mod 1000 = 0 Then
+                    Logger.Progress("Reading IDA Values", .CurrentRecord, .NumRecords)
+                End If
+            End While
+            Logger.Progress("", 0, 0)
+        End With
+        lTimeseries.Attributes.CalculateAll 
+        Me.AddDataSet(lTimeseries)
     End Sub
 
     'Private Function GetData(ByVal aSites As ArrayList, _
