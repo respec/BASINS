@@ -519,6 +519,7 @@ Public Class atcTimeseriesRDB
                     lTimeseries.Attributes.Add("TU", lTu)
                     lTimeseries.Attributes.Add("TS", lTs)
                     lTU_TS_Needed = False
+                    lTimeseries.Dates.Value(0) = lTimeseries.Dates.Value(1) - lTimeDif
                 End If
 
                 If lDateJ = 0 Then
