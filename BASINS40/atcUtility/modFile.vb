@@ -1063,7 +1063,7 @@ ReadCharacter:
                             GoTo ReadCharacter
                     End Select
                     pCurrentLine = lSb.ToString
-                    Logger.Progress(pStreamReader.BaseStream.Position / pStreamReader.BaseStream.Length * 1000, 1000)
+                    Logger.Progress(Math.Floor(pStreamReader.BaseStream.Position / pStreamReader.BaseStream.Length * 1000), 1000)
                     Return True
                 Catch lEndOfStreamException As IO.EndOfStreamException
                     lEndOfStream = True
