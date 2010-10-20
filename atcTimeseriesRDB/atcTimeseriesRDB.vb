@@ -57,9 +57,8 @@ Public Class atcTimeseriesRDB
         Else
             Specification = aFileName
             Try
-                Dim lAttrName As String
-                Dim lAttrValue As String
-                Dim lAttributes As New atcDataAttributes
+                Dim lTimeStartOpen As Date = Now
+                Logger.Dbg("OpenStartFor " & aFileName)
 
                 Dim lInputStream As New FileStream(Specification, FileMode.Open, FileAccess.Read)
                 Dim lInputBuffer As New BufferedStream(lInputStream)
@@ -69,6 +68,7 @@ Public Class atcTimeseriesRDB
                 Dim lMeasurementsData As Boolean = False
                 Dim lIdaData As Boolean = False
 
+                Dim lAttributes As New atcDataAttributes
                 Dim lCurLine As String = NextLine(lInputReader).Substring(2)
                 If lCurLine.IndexOf("qwdata") > -1 Then 'TODO: need better way - only true with BASINS download
                     lWQData = True
@@ -82,6 +82,8 @@ Public Class atcTimeseriesRDB
                     lAttributes.SetValue("URL", lCurLine)
                 End If
 
+                Dim lAttrName As String
+                Dim lAttrValue As String
                 While lInputReader.PeekChar = Asc("#")
                     lCurLine = NextLine(lInputReader)
                     If lCurLine.Length = 1 Then Exit While
@@ -116,6 +118,7 @@ Public Class atcTimeseriesRDB
                 ElseIf lMeasurementsData Then
                     ProcessMeasurements(lInputReader, lAttributes)
                 ElseIf lIdaData Then
+                    Logger.Dbg("AboutToProcessIdaValues;Elapsed " & (Now - lTimeStartOpen).TotalSeconds)
                     ProcessIdaValues(lInputReader, lAttributes)
                 Else
                     ProcessDailyValues(lInputReader, lAttributes)
@@ -456,6 +459,8 @@ Public Class atcTimeseriesRDB
     End Sub
 
     Sub ProcessIdaValues(ByVal aInputReader As BinaryReader, ByVal aAttributes As atcDataAttributes)
+        Dim lTimeStart As Date = Now
+        Logger.Dbg("StartProcessIdaValues")
         Dim lTimeseries As New atcTimeseries(Me)
         lTimeseries.Dates = New atcTimeseries(Me)
         With lTimeseries
@@ -479,17 +484,21 @@ Public Class atcTimeseriesRDB
         With lTable
             .Delimiter = vbTab
             .OpenStream(aInputReader.BaseStream)
+            Dim lTimeStreamOpened As Date = Now
+            Logger.Dbg("StreamOpened;Elapsed " & (lTimeStreamOpened - lTimeStart).TotalSeconds & " " & MemUsage())
 
             Dim lDateField As Integer = -1
             Dim lLocationField As Integer = -1
             Dim lValueField As Integer = -1
             Dim lTimeZoneField As Integer = -1
+            Dim lAccuracyCodeField As Integer = -1
             For lField As Integer = 1 To .NumFields
                 Select Case .FieldName(lField)
                     Case "site_no" : lLocationField = lField
                     Case "date_time" : lDateField = lField
                     Case "value" : lValueField = lField
                     Case "tz_cd" : lTimeZoneField = lField
+                    Case "accuracy_cd" : lAccuracyCodeField = lField
                     Case Else
                         If .FieldName(lField).EndsWith("_cd") Then 'code field
                             ' TODO: add codes as ValueAttributes and decide how to treat Provisional values
@@ -497,20 +506,33 @@ Public Class atcTimeseriesRDB
                         End If
                 End Select
             Next
-            lTimeseries.numValues = .NumRecords - (.CurrentRecord + 1)
+            lTimeseries.numValues = .NumRecords - 1
 
+            Dim lAccuracyCodeCounter As New atcCollection
             Dim lValue As String = ""
             Dim lDateJ As Double = Double.NaN
             Dim lDatePrevJ As Double = Double.NaN
+            Dim lTimeZone As String = ""
+            Dim lTimeZonePrev As String
             Dim lTU_TS_Needed As Boolean = True
             Dim lIndex As Integer = 0
-            While .CurrentRecord < .NumRecords
-                .MoveNext()
+            Dim lNotFirst As Boolean = False
+
+            For lRecordIndex As Integer = 2 To .NumRecords
+                .CurrentRecord = lRecordIndex
                 lDatePrevJ = lDateJ
                 Dim lDateString As String = .Value(lDateField)
                 Dim lDate As New Date(lDateString.Substring(0, 4), lDateString.Substring(4, 2), lDateString.Substring(6, 2), _
-                                      lDateString.Substring(8, 2), lDateString.Substring(10, 2), lDateString.Substring(12, 2))
+                                          lDateString.Substring(8, 2), lDateString.Substring(10, 2), lDateString.Substring(12, 2))
                 lDateJ = lDate.ToOADate
+
+                lTimeZonePrev = lTimeZone
+                lTimeZone = .Value(lTimeZoneField)
+                If lNotFirst AndAlso lTimeZone <> lTimeZonePrev Then
+                    Logger.Dbg("ChangeTimeZoneAt " & lDateString)
+                Else
+                    lNotFirst = True
+                End If
                 If lTU_TS_Needed AndAlso Not Double.IsNaN(lDatePrevJ) Then
                     Dim lTu As atcTimeUnit
                     Dim lTs As Integer
@@ -528,14 +550,25 @@ Public Class atcTimeseriesRDB
                     lIndex += 1
                     lTimeseries.Value(lIndex) = .Value(lValueField)
                     lTimeseries.Dates.Value(lIndex) = lDateJ
-                 End If
+                    Dim lAccuracyCode As String = .Value(lAccuracyCodeField)
+                    lAccuracyCodeCounter.Increment(lAccuracyCode)
+                    'NOTE: the next statement adds a requirement for about 3.5 times more memory!! 
+                    'lTimeseries.ValueAttributes(lIndex).Add("AccuracyCode", lAccuracyCode)
+                End If
                 If .CurrentRecord Mod 1000 = 0 Then
                     Logger.Progress("Reading IDA Values", .CurrentRecord, .NumRecords)
                 End If
-            End While
+            Next
             Logger.Progress("", 0, 0)
+            Logger.Dbg("IdaValuesTimeseriesCreated;Elapsed " & (Now - lTimeStreamOpened).TotalSeconds & " " & MemUsage())
+            Logger.Dbg("AccuracyCodeCounts")
+            For lIndex = 0 To lAccuracyCodeCounter.Count - 1
+                Logger.Dbg(lAccuracyCodeCounter.Keys(lIndex) & ":" & lAccuracyCodeCounter.Item(lIndex))
+            Next
         End With
-        lTimeseries.Attributes.CalculateAll 
+        Dim lTimeCreated As Date = Now
+        lTimeseries.Attributes.CalculateAll()
+        Logger.Dbg("IdaValuesAttributesCalculated;Elapsed " & (Now - lTimeCreated).TotalSeconds & " " & MemUsage())
         Me.AddDataSet(lTimeseries)
     End Sub
 
