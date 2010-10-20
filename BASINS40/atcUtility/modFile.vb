@@ -90,7 +90,7 @@ Public Module modFile
         Dim lFilename As String
         For Each lExtension As String In aExtensions
             lFilename = IO.Path.ChangeExtension(aBaseFilename, lExtension)
-            If FileExists(lFilename) AndAlso Not TryDelete(lFilename, aVerbose) Then lSuccess = False
+            If IO.File.Exists(lFilename) AndAlso Not TryDelete(lFilename, aVerbose) Then lSuccess = False
         Next
         Return lSuccess
     End Function
@@ -132,7 +132,7 @@ Public Module modFile
 
         For Each lExtension As String In aExtensions
             Dim lFilename As String = aBaseFilename & lExtension
-            If FileExists(lFilename) AndAlso Not TryCopy(lFilename, aDestinationPath & lExtension, aVerbose) Then
+            If IO.File.Exists(lFilename) AndAlso Not TryCopy(lFilename, aDestinationPath & lExtension, aVerbose) Then
                 TryCopyGroup = False
             End If
         Next
@@ -161,7 +161,7 @@ Public Module modFile
     ''' <param name="aVerbose">True to log what happens with Logger.Dbg</param>
     ''' <returns>True if all existing files were moved, False if an existing file could not be moved.</returns>
     Public Function TryMoveGroup(ByVal aBaseFilename As String, ByVal aDestinationPath As String, ByVal aExtensions() As String, Optional ByVal aVerbose As Boolean = False) As Boolean
-        TryMoveGroup = True
+        Dim lTryMoveGroup As Boolean = True
         Dim lNewBaseName As String
         If IO.Path.GetExtension(aDestinationPath).Length > 0 Then
             lNewBaseName = IO.Path.GetFileNameWithoutExtension(aDestinationPath)
@@ -175,10 +175,11 @@ Public Module modFile
 
         For Each lExtension As String In aExtensions
             Dim lFilename As String = aBaseFilename & lExtension
-            If FileExists(lFilename) AndAlso Not TryMove(lFilename, aDestinationPath & lExtension, aVerbose) Then
-                TryMoveGroup = False
+            If IO.File.Exists(lFilename) AndAlso Not TryMove(lFilename, aDestinationPath & lExtension, aVerbose) Then
+                lTryMoveGroup = False
             End If
         Next
+        Return lTryMoveGroup
     End Function
 
     ''' <summary>
@@ -236,7 +237,7 @@ Public Module modFile
         End If
         Dim lName As String = lBaseName
         If aExtension IsNot Nothing AndAlso aExtension.Length > 0 Then lName = IO.Path.ChangeExtension(lName, aExtension)
-        While FileExists(lName, True)
+        While IO.File.Exists(lName) OrElse IO.Directory.Exists(lName)
             lCounter += 1
             lName = lBaseName & "_" & lCounter
             If aExtension IsNot Nothing AndAlso aExtension.Length > 0 Then lName = IO.Path.ChangeExtension(lName, aExtension)
@@ -260,7 +261,11 @@ Public Module modFile
         Return lName
     End Function
 
-    'if aHelpTopic is a file, set the file to display instead of opening help
+    ''' <summary>
+    ''' Show Help for specified topic
+    ''' </summary>
+    ''' <param name="aHelpTopic">Topic to display</param>
+    ''' <remarks>if aHelpTopic is a file, set the file to display instead of opening help</remarks>
     Public Sub ShowHelp(ByVal aHelpTopic As String)
         Static lHelpFilename As String = ""
         Static lHelpProcess As Process = Nothing
@@ -306,14 +311,16 @@ Public Module modFile
         End If
     End Sub
 
+    ''' <summary>
+    ''' Changes directory and, if necessary, drive. Returns True if successful.
+    ''' </summary>
+    ''' <param name="aPath">New pathname</param>
+    ''' <returns>True if directory change is successful</returns>
+    ''' <remarks></remarks>
     Public Function ChDriveDir(ByVal aPath As String) As Boolean
-        ' ##SUMMARY Changes directory and, if necessary, drive. Returns True if successful.
-        ' ##PARAM aPath I New pathname.
-        ' ##RETURNS True if directory change is successful.
         Try
-            If FileExists(aPath, True, False) Then
-                If Mid(aPath, 2, 1) = ":" Then ChDrive(aPath)
-                ChDir(aPath)
+            If IO.Directory.Exists(aPath) Then
+                IO.Directory.SetCurrentDirectory(aPath)
                 Return True
             Else
                 Return False
