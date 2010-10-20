@@ -458,6 +458,12 @@ Public Class atcTimeseriesRDB
         lRawDataSets.Clear()
     End Sub
 
+    ''' <summary>
+    ''' build a timeseries from IDA flow values in an USGS RDB file
+    ''' </summary>
+    ''' <param name="aInputReader">Binary reader</param>
+    ''' <param name="aAttributes">Generic attributes</param>
+    ''' <remarks>flow timeseries added to flow data</remarks>
     Sub ProcessIdaValues(ByVal aInputReader As BinaryReader, ByVal aAttributes As atcDataAttributes)
         Dim lTimeStart As Date = Now
         Logger.Dbg("StartProcessIdaValues")
@@ -523,7 +529,7 @@ Public Class atcTimeseriesRDB
                 lDatePrevJ = lDateJ
                 Dim lDateString As String = .Value(lDateField)
                 Dim lDate As New Date(lDateString.Substring(0, 4), lDateString.Substring(4, 2), lDateString.Substring(6, 2), _
-                                          lDateString.Substring(8, 2), lDateString.Substring(10, 2), lDateString.Substring(12, 2))
+                                      lDateString.Substring(8, 2), lDateString.Substring(10, 2), lDateString.Substring(12, 2))
                 lDateJ = lDate.ToOADate
 
                 lTimeZonePrev = lTimeZone
@@ -531,6 +537,19 @@ Public Class atcTimeseriesRDB
                 If lNotFirst AndAlso lTimeZone <> lTimeZonePrev Then
                     Logger.Dbg("ChangeTimeZoneAt " & lDateString)
                 Else
+                    Dim lTimeZoneNumeric As Integer
+                    Select Case lTimeZone
+                        Case "AST", "EDT" : lTimeZoneNumeric = -4
+                        Case "EST", "CDT" : lTimeZoneNumeric = -5
+                        Case "CST", "MDT" : lTimeZoneNumeric = -6
+                        Case "MST", "PDT" : lTimeZoneNumeric = -7
+                        Case "PST" : lTimeZoneNumeric = -8
+                        Case "GMT", "UTC" : lTimeZoneNumeric = 0
+                        Case Else
+                            lTimeZoneNumeric = -999
+                            Logger.Dbg("UnknownTimeZone " & lTimeZone)
+                    End Select
+                    If lTimeZoneNumeric >= -12 Then lTimeseries.Attributes.Add("TMZONE", lTimeZoneNumeric)
                     lNotFirst = True
                 End If
                 If lTU_TS_Needed AndAlso Not Double.IsNaN(lDatePrevJ) Then
