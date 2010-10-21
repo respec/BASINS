@@ -207,7 +207,7 @@ Public Class frmAnalysis
 
     Private Function TSDescription(ByVal aTS As atcTimeseries) As String
         Dim lDesc As String = aTS.Attributes.GetValue("Constituent") & " at"
-        Dim lStaId As String = aTS.Attributes.GetValue("STAID")
+        Dim lStaId As String = aTS.Attributes.GetValue("STAID", "")
         If lStaId.Length = 0 OrElse lStaId = "0" Then
             Dim lLocation As String = aTS.Attributes.GetValue("Location")
             If IsNumeric(lLocation) Then
