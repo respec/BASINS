@@ -269,6 +269,12 @@ Public Module modStat
             Logger.Msg(lErr)
             Return lErr
         End If
+
+        Dim lClassLimits As Generic.List(Of Double) = aClassLimits
+        For lClassLimitsIndex As Integer = 0 To lClassLimits.Count - 1
+            lClassLimits(lClassLimitsIndex) = SignificantDigits(lClassLimits(lClassLimitsIndex), 4)
+        Next
+
         For lIndex As Integer = 1 To aTSer1.numValues
             lVal1 = aTSer1.Values(lIndex)
             lVal2 = aTSer2.Values(lIndex)
@@ -291,41 +297,36 @@ Public Module modStat
                 lMeanAbsoluteError += Math.Abs(lValDiff)
                 lRmsError += lValDiff * lValDiff
                 lGoodCount += 1
-                If aClassLimits IsNot Nothing Then
-                    lClassLimit = aClassLimits(0)
-                    For Each lLimit As Double In aClassLimits
-                        lLimit = SignificantDigits(lLimit, 4)
-                        If lLimit > lVal1 Then Exit For
-                        lClassLimit = lLimit
-                    Next
+                lClassLimit = lClassLimits(0)
+                For Each lLimit As Double In lClassLimits
+                    If lLimit > lVal1 Then Exit For
+                    lClassLimit = lLimit
+                Next
 
-                    If lClassBuckets.Keys.Contains(lClassLimit) Then
-                        lClassBucket = lClassBuckets.ItemByKey(lClassLimit)
-                    Else
-                        lClassBucket = New ClassBucket(lClassLimit)
-                        lClassBucket.setErrInt(lErrInt)
-                        lClassBuckets.Add(lClassLimit, lClassBucket)
-                    End If
-                    lClassBucket.Increment(lVal1, lVal2)
-                    lClassBucket.IncrementErr(lVal1, lVal2, lClassLimit)
-
-                    lClassLimit = aClassLimits(0)
-                    For Each lLimit As Double In aClassLimits
-                        lLimit = SignificantDigits(lLimit, 4)
-                        If lLimit > lVal2 Then Exit For
-                        lClassLimit = lLimit
-                    Next
-                    If lClassBuckets.Keys.Contains(lClassLimit) Then
-                        lClassBucket = lClassBuckets.ItemByKey(lClassLimit)
-                    Else ' this else branch will not happen because all the bins are created already for aVal1
-                        lClassBucket = New ClassBucket(lClassLimit)
-                        lClassBucket.setErrInt(lErrInt)
-                        lClassBuckets.Add(lClassLimit, lClassBucket)
-                    End If
-                    lClassBucket.Count2 += 1
-                    lClassBucket.Total2 += lVal2
-
+                If lClassBuckets.Keys.Contains(lClassLimit) Then
+                    lClassBucket = lClassBuckets.ItemByKey(lClassLimit)
+                Else
+                    lClassBucket = New ClassBucket(lClassLimit)
+                    lClassBucket.setErrInt(lErrInt)
+                    lClassBuckets.Add(lClassLimit, lClassBucket)
                 End If
+                lClassBucket.Increment(lVal1, lVal2)
+                lClassBucket.IncrementErr(lVal1, lVal2, lClassLimit)
+
+                lClassLimit = lClassLimits(0)
+                For Each lLimit As Double In lClassLimits
+                    If lLimit > lVal2 Then Exit For
+                    lClassLimit = lLimit
+                Next
+                If lClassBuckets.Keys.Contains(lClassLimit) Then
+                    lClassBucket = lClassBuckets.ItemByKey(lClassLimit)
+                Else ' this else branch will not happen because all the bins are created already for aVal1
+                    lClassBucket = New ClassBucket(lClassLimit)
+                    lClassBucket.setErrInt(lErrInt)
+                    lClassBuckets.Add(lClassLimit, lClassBucket)
+                End If
+                lClassBucket.Count2 += 1
+                lClassBucket.Total2 += lVal2
             Else
                 lSkipCount += 1
                 If lSkipCount = 1 Then
@@ -413,47 +414,45 @@ Public Module modStat
         lStrBuilder.AppendLine()
         lStrBuilder.AppendLine()
 
-        If aClassLimits IsNot Nothing Then
-            'lStr &= "Time Series 1" & vbCrLf & "Time Series 2" & vbCrLf
+        'lStr &= "Time Series 1" & vbCrLf & "Time Series 2" & vbCrLf
 
-            lStrBuilder.AppendLine("            TS 1 - " & TimeserIdString(aTSer1))
-            lStrBuilder.AppendLine("            TS 2 - " & TimeserIdString(aTSer2))
-            lStrBuilder.AppendLine()
-            lStrBuilder.AppendLine("                           Mean               Root mean")
-            lStrBuilder.AppendLine("   Lower    Number    absolute error(1)     square error(2)        Bias(3)      ")
-            lStrBuilder.AppendLine("   class      of     ------------------- ------------------- -------------------")
-            lStrBuilder.AppendLine("   limit     cases   Average    Percent   Average    Percent  Average   Percent ")
-            lStrBuilder.AppendLine(" --------- --------- --------- --------- --------- --------- --------- ---------")
+        lStrBuilder.AppendLine("            TS 1 - " & TimeserIdString(aTSer1))
+        lStrBuilder.AppendLine("            TS 2 - " & TimeserIdString(aTSer2))
+        lStrBuilder.AppendLine()
+        lStrBuilder.AppendLine("                           Mean               Root mean")
+        lStrBuilder.AppendLine("   Lower    Number    absolute error(1)     square error(2)        Bias(3)      ")
+        lStrBuilder.AppendLine("   class      of     ------------------- ------------------- -------------------")
+        lStrBuilder.AppendLine("   limit     cases   Average    Percent   Average    Percent  Average   Percent ")
+        lStrBuilder.AppendLine(" --------- --------- --------- --------- --------- --------- --------- ---------")
 
-            For Each lLimit As Double In aClassLimits
-                'lStrBuilder.Append(DoubleToString(lLimit, 10, "0.00").PadLeft(10)) 'lower class limit
-                Dim lCount As Integer = 0
-                If lClassBuckets.Keys.Contains(lLimit) Then
-                    lStrBuilder.Append(DoubleToString(lLimit, 10, "0.00").PadLeft(10)) 'lower class limit
-                    lClassBucket = lClassBuckets.ItemByKey(lLimit)
-                    With lClassBucket
-                        lStrBuilder.Append(CStr(.Count1).PadLeft(9).PadRight(10)) ' number of cases
-                        If Double.IsNaN(.TotalDifference) Then .TotalDifference = 0.0
-                        If Double.IsNaN(.TotalDifferencePCT) Then .TotalDifferencePCT = 0.0
-                        If Double.IsNaN(.TotalSS) Then .TotalSS = 0.0
-                        If Double.IsNaN(.TotalSSPCT) Then .TotalSSPCT = 0.0
-                        If Double.IsNaN(.TotalBias) Then .TotalBias = 0.0
-                        If Double.IsNaN(.TotalBiasPCT) Then .TotalBiasPCT = 0.0
+        For Each lLimit As Double In lClassLimits
+            'lStrBuilder.Append(DoubleToString(lLimit, 10, "0.00").PadLeft(10)) 'lower class limit
+            Dim lCount As Integer = 0
+            If lClassBuckets.Keys.Contains(lLimit) Then
+                lStrBuilder.Append(DoubleToString(lLimit, 10, "0.00").PadLeft(10)) 'lower class limit
+                lClassBucket = lClassBuckets.ItemByKey(lLimit)
+                With lClassBucket
+                    lStrBuilder.Append(CStr(.Count1).PadLeft(9).PadRight(10)) ' number of cases
+                    If Double.IsNaN(.TotalDifference) Then .TotalDifference = 0.0
+                    If Double.IsNaN(.TotalDifferencePCT) Then .TotalDifferencePCT = 0.0
+                    If Double.IsNaN(.TotalSS) Then .TotalSS = 0.0
+                    If Double.IsNaN(.TotalSSPCT) Then .TotalSSPCT = 0.0
+                    If Double.IsNaN(.TotalBias) Then .TotalBias = 0.0
+                    If Double.IsNaN(.TotalBiasPCT) Then .TotalBiasPCT = 0.0
 
-                        lStrBuilder.Append(DoubleToString(.TotalDifference, 10, "0.000").PadLeft(10)) 'mean average
-                        lStrBuilder.Append(DoubleToString(.TotalDifferencePCT, 10, "0.0").PadLeft(10)) 'mean percent
-                        lStrBuilder.Append(DoubleToString(.TotalSS, 10, "0.000").PadLeft(10)) 'root mean average
-                        lStrBuilder.Append(DoubleToString(.TotalSSPCT, 10, "0.0").PadLeft(10)) 'root mean percent
-                        lStrBuilder.Append(DoubleToString(.TotalBias, 10, "0.000").PadLeft(10)) 'bias average
-                        lStrBuilder.Append(DoubleToString(.TotalBiasPCT, 10, "0.0").PadLeft(10)) 'bias percent
-                    End With
-                    lStrBuilder.AppendLine()
-                Else
-                    Logger.Dbg("No Bucket for " & lLimit)
-                End If
-                'lStrBuilder.AppendLine()
-            Next
-        End If
+                    lStrBuilder.Append(DoubleToString(.TotalDifference, 10, "0.000").PadLeft(10)) 'mean average
+                    lStrBuilder.Append(DoubleToString(.TotalDifferencePCT, 10, "0.0").PadLeft(10)) 'mean percent
+                    lStrBuilder.Append(DoubleToString(.TotalSS, 10, "0.000").PadLeft(10)) 'root mean average
+                    lStrBuilder.Append(DoubleToString(.TotalSSPCT, 10, "0.0").PadLeft(10)) 'root mean percent
+                    lStrBuilder.Append(DoubleToString(.TotalBias, 10, "0.000").PadLeft(10)) 'bias average
+                    lStrBuilder.Append(DoubleToString(.TotalBiasPCT, 10, "0.0").PadLeft(10)) 'bias percent
+                End With
+                lStrBuilder.AppendLine()
+            Else
+                Logger.Dbg("No Bucket for " & lLimit)
+            End If
+            'lStrBuilder.AppendLine()
+        Next
 
         lStrBuilder.AppendLine(" --------- --------- --------- --------- --------- --------- --------- ---------")
         lStrBuilder.Append(CStr(lGoodCount).PadLeft(19).PadRight(20)) 'total count of values
@@ -493,69 +492,67 @@ Public Module modStat
 
         'Table nubmer 2
 
-        If aClassLimits IsNot Nothing Then
-            lStrBuilder.AppendLine("1")
-            lStrBuilder.AppendLine("Table 2")
-            lStrBuilder.AppendLine("            TS 1 - " & TimeserIdString(aTSer1))
-            lStrBuilder.AppendLine("            TS 2 - " & TimeserIdString(aTSer2))
-            lStrBuilder.AppendLine()
+        lStrBuilder.AppendLine("1")
+        lStrBuilder.AppendLine("Table 2")
+        lStrBuilder.AppendLine("            TS 1 - " & TimeserIdString(aTSer1))
+        lStrBuilder.AppendLine("            TS 2 - " & TimeserIdString(aTSer2))
+        lStrBuilder.AppendLine()
 
-            lStrBuilder.AppendLine("         Cases equal or exceeding lower")
-            lStrBuilder.AppendLine("          limit & less then upper limit     Percent cases")
-            lStrBuilder.AppendLine("           ----------------------------       equal or        Average of cases")
-            lStrBuilder.AppendLine("   Lower     Cases         Percent         exceeding limit   within class limits")
-            lStrBuilder.AppendLine("   class   --------- ------------------- ------------------- -------------------")
-            'lStrBuilder.AppendLine("   limit   Sim   Obs Simulated  Observed Simulated  Observed Simulated  Observed")
-            lStrBuilder.AppendLine("   limit   TS1   TS2       TS1       TS2       TS1       TS2       TS1       TS2")
-            lStrBuilder.AppendLine(" --------- ---- ---- --------- --------- --------- --------- --------- ---------")
-            Dim pctfrac As Double = 0.0
-            Dim numExceedPct As Double = 0.0
-            Dim avgClass As Double = 0.0
-            For Each lLimit As Double In aClassLimits
-                'lStrBuilder.Append(DoubleToString(lLimit, 10, "0.00").PadLeft(10)) 'class limit
-                If lClassBuckets.Keys.Contains(lLimit) Then
-                    lStrBuilder.Append(DoubleToString(lLimit, 10, "0.00").PadLeft(10)) 'class limit
-                    lClassBucket = lClassBuckets.ItemByKey(lLimit)
-                    With lClassBucket
-                        lStrBuilder.Append(CStr(.Count1).PadLeft(5)) 'count 1
-                        lStrBuilder.Append(CStr(.Count2).PadLeft(5)) 'count 2
-                        pctfrac = .Count1 * 100.0 / lGoodCount
-                        'round pct values to two decimal places, force it if need to, to guard against exp notation
-                        'do this manuver in subsequent instances
-                        pctfrac = Int(pctfrac * 100 + 0.5) / 100.0
-                        lStrBuilder.Append(DoubleToString(pctfrac, 10, "0.00").PadLeft(10)) 'pct fraction 1
-                        pctfrac = .Count2 * 100.0 / lGoodCount
-                        pctfrac = Int(pctfrac * 100 + 0.5) / 100.0
-                        lStrBuilder.Append(DoubleToString(pctfrac, 10, "0.00").PadLeft(10)) 'pct fraction 2
-                        numExceedPct = NumberExceeding(lLimit, lClassBuckets, False) * 100.0 / lGoodCount
-                        numExceedPct = Int(numExceedPct * 100 + 0.5) / 100.0
-                        lStrBuilder.Append(DoubleToString(numExceedPct, 10, "0.00").PadLeft(10)) 'pe 1
-                        numExceedPct = NumberExceeding(lLimit, lClassBuckets, True) * 100.0 / lGoodCount
-                        numExceedPct = Int(numExceedPct * 100 + 0.5) / 100.0
-                        lStrBuilder.Append(DoubleToString(numExceedPct, 10, "0.00").PadLeft(10)) 'pe 2
+        lStrBuilder.AppendLine("         Cases equal or exceeding lower")
+        lStrBuilder.AppendLine("          limit & less then upper limit     Percent cases")
+        lStrBuilder.AppendLine("           ----------------------------       equal or        Average of cases")
+        lStrBuilder.AppendLine("   Lower     Cases         Percent         exceeding limit   within class limits")
+        lStrBuilder.AppendLine("   class   --------- ------------------- ------------------- -------------------")
+        'lStrBuilder.AppendLine("   limit   Sim   Obs Simulated  Observed Simulated  Observed Simulated  Observed")
+        lStrBuilder.AppendLine("   limit   TS1   TS2       TS1       TS2       TS1       TS2       TS1       TS2")
+        lStrBuilder.AppendLine(" --------- ---- ---- --------- --------- --------- --------- --------- ---------")
+        Dim pctfrac As Double = 0.0
+        Dim numExceedPct As Double = 0.0
+        Dim avgClass As Double = 0.0
+        For Each lLimit As Double In lClassLimits
+            'lStrBuilder.Append(DoubleToString(lLimit, 10, "0.00").PadLeft(10)) 'class limit
+            If lClassBuckets.Keys.Contains(lLimit) Then
+                lStrBuilder.Append(DoubleToString(lLimit, 10, "0.00").PadLeft(10)) 'class limit
+                lClassBucket = lClassBuckets.ItemByKey(lLimit)
+                With lClassBucket
+                    lStrBuilder.Append(CStr(.Count1).PadLeft(5)) 'count 1
+                    lStrBuilder.Append(CStr(.Count2).PadLeft(5)) 'count 2
+                    pctfrac = .Count1 * 100.0 / lGoodCount
+                    'round pct values to two decimal places, force it if need to, to guard against exp notation
+                    'do this manuver in subsequent instances
+                    pctfrac = Int(pctfrac * 100 + 0.5) / 100.0
+                    lStrBuilder.Append(DoubleToString(pctfrac, 10, "0.00").PadLeft(10)) 'pct fraction 1
+                    pctfrac = .Count2 * 100.0 / lGoodCount
+                    pctfrac = Int(pctfrac * 100 + 0.5) / 100.0
+                    lStrBuilder.Append(DoubleToString(pctfrac, 10, "0.00").PadLeft(10)) 'pct fraction 2
+                    numExceedPct = NumberExceeding(lLimit, lClassBuckets, False) * 100.0 / lGoodCount
+                    numExceedPct = Int(numExceedPct * 100 + 0.5) / 100.0
+                    lStrBuilder.Append(DoubleToString(numExceedPct, 10, "0.00").PadLeft(10)) 'pe 1
+                    numExceedPct = NumberExceeding(lLimit, lClassBuckets, True) * 100.0 / lGoodCount
+                    numExceedPct = Int(numExceedPct * 100 + 0.5) / 100.0
+                    lStrBuilder.Append(DoubleToString(numExceedPct, 10, "0.00").PadLeft(10)) 'pe 2
 
-                        avgClass = .Total1 / .Count1 '1 average within class
-                        If Double.IsNaN(avgClass) Then
-                            lStrBuilder.Append(DoubleToString(0.0, 10, "0.00").PadLeft(10))
-                        Else
-                            lStrBuilder.Append(DoubleToString(avgClass, 10, "0.00").PadLeft(10))
-                        End If
+                    avgClass = .Total1 / .Count1 '1 average within class
+                    If Double.IsNaN(avgClass) Then
+                        lStrBuilder.Append(DoubleToString(0.0, 10, "0.00").PadLeft(10))
+                    Else
+                        lStrBuilder.Append(DoubleToString(avgClass, 10, "0.00").PadLeft(10))
+                    End If
 
-                        avgClass = .Total2 / .Count2 '2 average within class
-                        If Double.IsNaN(avgClass) Then
-                            lStrBuilder.Append(DoubleToString(0.0, 10, "0.00").PadLeft(10))
-                        Else
-                            lStrBuilder.Append(DoubleToString(avgClass, 10, "0.00").PadLeft(10))
-                        End If
-                    End With
-                    lStrBuilder.AppendLine()
-                Else
-                    Logger.Dbg("No Bucket for " & lLimit)
-                End If
-                'lStrBuilder.AppendLine()
-            Next
-        End If
-
+                    avgClass = .Total2 / .Count2 '2 average within class
+                    If Double.IsNaN(avgClass) Then
+                        lStrBuilder.Append(DoubleToString(0.0, 10, "0.00").PadLeft(10))
+                    Else
+                        lStrBuilder.Append(DoubleToString(avgClass, 10, "0.00").PadLeft(10))
+                    End If
+                End With
+                lStrBuilder.AppendLine()
+            Else
+                Logger.Dbg("No Bucket for " & lLimit)
+            End If
+            'lStrBuilder.AppendLine()
+        Next
+ 
         lStrBuilder.AppendLine(" --------- ---- ---- --------- --------- ---------- --------- --------- ---------")
         lStrBuilder.Append(CStr(lGoodCount).PadLeft(15) & CStr(lGoodCount).PadLeft(6))
         lStrBuilder.Append("100.00".PadLeft(9)) 'total percentage of TS1
@@ -571,50 +568,47 @@ Public Module modStat
         'Table Number 3
 
         Dim lEdIndex As Integer
-        If aClassLimits IsNot Nothing Then
-            lStrBuilder.AppendLine("1")
-            lStrBuilder.AppendLine("            TS 1 - " & TimeserIdString(aTSer1))
-            lStrBuilder.AppendLine("            TS 2 - " & TimeserIdString(aTSer2))
-            lStrBuilder.AppendLine()
-            lStrBuilder.AppendLine("   Lower         Number of occurrences between indicated deviations    ")
-            lStrBuilder.AppendLine("   class    -------------------------------------------------------------")
-            lStrBuilder.AppendLine("   limit          -60%    -30%    -10%      0%     10%     30%     60%")
-            lStrBuilder.AppendLine(" ---------  -------------------------------------------------------------")
-            For Each lLimit As Double In aClassLimits
-                'lStrBuilder.Append(DoubleToString(lLimit, 10, "0.00").PadLeft(10))
-                'Dim lCount As Integer = 0
-                If lClassBuckets.Keys.Contains(lLimit) Then
-                    lStrBuilder.Append(DoubleToString(lLimit, 10, "0.00").PadLeft(10))
-                    lClassBucket = lClassBuckets.ItemByKey(lLimit)
-                    With lClassBucket
-                        For lEdIndex = 0 To .ErrDevCount.Length - 1
-                            If lEdIndex > 0 Then
-                                lStrBuilder.Append(CStr(.ErrDevCount(lEdIndex)).PadLeft(8))
-                            ElseIf lEdIndex > 3 Then
-                                lStrBuilder.Append(CStr(.ErrDevCount(lEdIndex)).PadLeft(10))
-                            ElseIf lEdIndex > 5 Then
-                                lStrBuilder.Append(CStr(.ErrDevCount(lEdIndex)).PadLeft(14))
-                            Else
-                                lStrBuilder.Append(CStr(.ErrDevCount(lEdIndex)).PadLeft(6))
-                            End If
-                        Next
-                    End With
-                    lStrBuilder.AppendLine()
-                Else
-                    Logger.Dbg("No Bucket for " & lLimit)
-                End If
-                'lStrBuilder.AppendLine()
-            Next
-        End If
+        lStrBuilder.AppendLine("1")
+        lStrBuilder.AppendLine("            TS 1 - " & TimeserIdString(aTSer1))
+        lStrBuilder.AppendLine("            TS 2 - " & TimeserIdString(aTSer2))
+        lStrBuilder.AppendLine()
+        lStrBuilder.AppendLine("   Lower         Number of occurrences between indicated deviations    ")
+        lStrBuilder.AppendLine("   class    -------------------------------------------------------------")
+        lStrBuilder.AppendLine("   limit          -60%    -30%    -10%      0%     10%     30%     60%")
+        lStrBuilder.AppendLine(" ---------  -------------------------------------------------------------")
+        For Each lLimit As Double In lClassLimits
+            'lStrBuilder.Append(DoubleToString(lLimit, 10, "0.00").PadLeft(10))
+            'Dim lCount As Integer = 0
+            If lClassBuckets.Keys.Contains(lLimit) Then
+                lStrBuilder.Append(DoubleToString(lLimit, 10, "0.00").PadLeft(10))
+                lClassBucket = lClassBuckets.ItemByKey(lLimit)
+                With lClassBucket
+                    For lEdIndex = 0 To .ErrDevCount.Length - 1
+                        If lEdIndex > 0 Then
+                            lStrBuilder.Append(CStr(.ErrDevCount(lEdIndex)).PadLeft(8))
+                        ElseIf lEdIndex > 3 Then
+                            lStrBuilder.Append(CStr(.ErrDevCount(lEdIndex)).PadLeft(10))
+                        ElseIf lEdIndex > 5 Then
+                            lStrBuilder.Append(CStr(.ErrDevCount(lEdIndex)).PadLeft(14))
+                        Else
+                            lStrBuilder.Append(CStr(.ErrDevCount(lEdIndex)).PadLeft(6))
+                        End If
+                    Next
+                End With
+                lStrBuilder.AppendLine()
+            Else
+                Logger.Dbg("No Bucket for " & lLimit)
+            End If
+            'lStrBuilder.AppendLine()
+        Next
 
         lStrBuilder.AppendLine(" ---------  -------------------------------------------------------------")
         'Loop through ErrIntv then loop through classlimit to sum up total entry in each errintv
-        Dim i As Integer
         Dim lErrTot As Integer = 0
         lStrBuilder.Append(Space(10))
-        For i = 0 To lErrInt.Length
+        For i As Integer = 0 To lErrInt.Length
             lErrTot = 0
-            For Each lLimit As Double In aClassLimits
+            For Each lLimit As Double In lClassLimits
                 If lClassBuckets.Keys.Contains(lLimit) Then
                     lClassBucket = lClassBuckets.ItemByKey(lLimit)
                     lErrTot += lClassBucket.ErrDevCount(i)
