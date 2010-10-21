@@ -278,6 +278,7 @@ Public Class atcTimeseriesNdayHighLow
                                 End If
                                 lEndSeason(1) = aEndMonth
                                 lEndSeason(2) = aEndDay
+                                lEndSeason(3) = 24 'end of day
                                 lEndJday = Date2J(lEndSeason)
                             Else
                                 lEndJday = lNextSJday

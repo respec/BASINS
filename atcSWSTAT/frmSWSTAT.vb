@@ -915,7 +915,8 @@ Friend Class frmSWSTAT
         End If
 
         If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
-            pDataGroup = atcDataManager.UserSelectData("Select Data for Integrated Frequency Analysis", pDataGroup)
+            pDataGroup = atcDataManager.UserSelectData("Select Data for Integrated Frequency Analysis", _
+                                                       pDataGroup, Nothing, True, True, Me.Icon)
         End If
 
         If pDataGroup.Count > 0 Then
@@ -955,7 +956,8 @@ Friend Class frmSWSTAT
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        atcDataManager.UserSelectData("Select Data for Integrated Frequency Analysis", pDataGroup, , False)
+        atcDataManager.UserSelectData("Select Data for Integrated Frequency Analysis", _
+                                      pDataGroup, Nothing, False, True, Me.Icon)
     End Sub
 
     Private Sub SeasonsYearsToForm()
@@ -1068,6 +1070,7 @@ Friend Class frmSWSTAT
             .Initialize(SelectedData(), pBasicAttributes, False, , )
             .Width = 600
             .SwapRowsColumns = True
+            .Icon = Me.Icon
         End With
 
         'Code section is to print out Text format of Basic Statistics, leave to remind how formatting is working to get 
@@ -1172,15 +1175,18 @@ Friend Class frmSWSTAT
                                                                  aEndMonth:=pYearEndMonth, aEndDay:=pYearEndDay)
                 If lRankedAnnual.Count > 0 Then
                     Dim lList As New atcList.atcListForm
-                    With lList.DateFormat
-                        .IncludeDays = False
-                        .IncludeHours = False
-                        .IncludeMinutes = False
-                        .IncludeMonths = False
+                    With lList
+                        With .DateFormat
+                            .IncludeDays = False
+                            .IncludeHours = False
+                            .IncludeMinutes = False
+                            .IncludeMonths = False
+                        End With
+                        .Text = "N-Day " & HighOrLowString() & " Annual Time Series and Ranking"
+                        .Initialize(lRankedAnnual.Clone, pNDayAttributes, True, , )
+                        .DisplayValueAttributes = True
+                        .Icon = Me.Icon
                     End With
-                    lList.Text = "N-Day " & HighOrLowString() & " Annual Time Series and Ranking"
-                    lList.Initialize(lRankedAnnual.Clone, pNDayAttributes, True, , )
-                    lList.DisplayValueAttributes = True
                 End If
             Else
                 Logger.Msg("Select at least one number of days")
@@ -1373,6 +1379,7 @@ Friend Class frmSWSTAT
 
     Private Sub btnDisplayTrend_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDisplayTrend.Click
         Dim lList As New atcList.atcListForm
+        lList.Icon = Me.Icon
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
 
         Dim lHiLow As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
@@ -1448,6 +1455,7 @@ Friend Class frmSWSTAT
     Public Sub DoFrequencyGraph()
         Calculate("n-day " & HighOrLowString() & " value", clsSWSTATPlugin.ListDefaultArray("Return Period"))
         Dim lGraphPlugin As New atcGraph.atcGraphPlugin
+        Dim lGraphForm As atcGraph.atcGraphForm
         Dim lSeparateGraphs As Boolean = False
         Select Case pDataGroup.Count
             Case 0 : Return
@@ -1460,10 +1468,12 @@ Friend Class frmSWSTAT
         End Select
         If lSeparateGraphs Then
             For Each lDataSet As atcTimeseries In pDataGroup
-                lGraphPlugin.Show(New atcTimeseriesGroup(lDataSet), "Frequency")
+                lGraphForm = lGraphPlugin.Show(New atcTimeseriesGroup(lDataSet), "Frequency")
+                lGraphForm.Icon = Me.Icon
             Next
         Else
-            lGraphPlugin.Show(pDataGroup, "Frequency")
+            lGraphForm = lGraphPlugin.Show(pDataGroup, "Frequency")
+            lGraphForm.Icon = Me.Icon
         End If
     End Sub
 

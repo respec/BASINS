@@ -701,7 +701,8 @@ Friend Class frmTrend
         End If
 
         If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
-            pDataGroup = atcDataManager.UserSelectData("Select Data for Trend Analysis", pDataGroup)
+            pDataGroup = atcDataManager.UserSelectData("Select Data for Trend Analysis", _
+                                                       pDataGroup, Nothing, True, True, Me.Icon)
         End If
 
         If pDataGroup.Count > 0 Then
@@ -741,7 +742,8 @@ Friend Class frmTrend
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        atcDataManager.UserSelectData("Select Data for Trend Analysis", pDataGroup, , False)
+        atcDataManager.UserSelectData("Select Data for Trend Analysis", _
+                                      pDataGroup, Nothing, False, True, Me.Icon)
     End Sub
 
     Private Sub SeasonsYearsToForm()

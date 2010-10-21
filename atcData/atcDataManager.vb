@@ -313,7 +313,7 @@ Public Class atcDataManager
         lForm.AskUser(lSelectedDataSource, aNeedToOpen, aNeedToSave, aCategories)
         Return lSelectedDataSource
     End Function
-
+ 
     ''' <summary>
     ''' 
     ''' </summary>
@@ -326,8 +326,9 @@ Public Class atcDataManager
     Public Shared Function UserSelectData(Optional ByVal aTitle As String = "", _
                                           Optional ByVal aSelected As atcDataGroup = Nothing, _
                                           Optional ByVal aAvailable As atcDataGroup = Nothing, _
-                                          Optional ByVal aModal As Boolean = True) As atcDataGroup
-        Return UserSelectData(aTitle, aSelected, aAvailable, aModal, True)
+                                          Optional ByVal aModal As Boolean = True, _
+                                          Optional ByVal aCancelReturnsOriginalSelected As Boolean = True) As atcDataGroup
+        Return UserSelectData(aTitle, aSelected, aAvailable, aModal, aCancelReturnsOriginalSelected, Nothing)
     End Function
 
     ''' <summary>
@@ -344,8 +345,10 @@ Public Class atcDataManager
                                           ByVal aSelected As atcDataGroup, _
                                           ByVal aAvailable As atcDataGroup, _
                                           ByVal aModal As Boolean, _
-                                          ByVal aCancelReturnsOriginalSelected As Boolean) As atcDataGroup
+                                          ByVal aCancelReturnsOriginalSelected As Boolean, _
+                                          ByVal aIcon As System.Drawing.Icon) As atcDataGroup
         Dim lForm As New frmSelectData
+        If aIcon IsNot Nothing Then lForm.Icon = aIcon
         Dim lNonePreSelected As Boolean = (aSelected Is Nothing OrElse aSelected.Count = 0)
         If aTitle.Length > 0 Then lForm.Text = aTitle
         If aAvailable IsNot Nothing Then lForm.AvailableData = aAvailable
