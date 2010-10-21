@@ -356,9 +356,11 @@ NextIteration:
                                         lGroup = lResultDataSource.DataSets.FindData("ID", lOldData.Attributes.GetValue("ID"), 1)
                                         If Not (lGroup Is Nothing) AndAlso lGroup.Count > 0 Then
                                             Dim lData As atcTimeseries = lGroup.Item(0)
-                                            If Not lVariation.Seasons Is Nothing Then
-                                                lData = lVariation.Seasons.SplitBySelected(lData, Nothing).Item(0)
-                                            End If
+
+                                            'TODO: add change of time step to atcVariation, use it here to change time step if specified
+
+                                            lData = lVariation.SplitData(lData, Nothing).ItemByIndex(0)
+
                                             .CellValue(lRow, lColumn) = lData.Attributes.GetFormattedValue(lVariation.Operation)
                                             If .ColorCells Then
                                                 If Not IsNumeric(.CellValue(lRow, lColumn)) Then

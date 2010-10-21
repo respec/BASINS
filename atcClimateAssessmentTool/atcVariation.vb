@@ -128,97 +128,98 @@ Public Class atcVariation
         End If
     End Function
 
+    Public Function SplitData(ByVal lOriginalData As atcTimeseries, _
+                        ByRef lEvents As atcTimeseriesGroup) As atcTimeseriesGroup
+        Dim lSplitData As atcTimeseriesGroup = Nothing
+        If UseEvents Then
+            Dim lEvent As atcTimeseries
+            lEvents = EventSplit(lOriginalData, Nothing, EventThreshold, EventDaysGapAllowed, EventHigh)
+
+            'Remove events outside selected seasons
+            If Not Seasons Is Nothing Then
+                For lEventIndex As Integer = lEvents.Count - 1 To 0 Step -1
+                    lEvent = lEvents.ItemByIndex(lEventIndex)
+
+                    'Find peak value of event
+                    Dim lPeakIndex As Integer = 1
+                    For lValueIndex As Integer = 2 To lEvent.numValues
+                        If lEvent.Value(lValueIndex) > lEvent.Value(lPeakIndex) Then
+                            lPeakIndex = lValueIndex
+                        End If
+                    Next
+
+                    'If peak is not in season, remove this event
+                    If Not Seasons.SeasonSelected(Seasons.SeasonIndex(lEvent.Dates.Value(lPeakIndex))) Then
+                        lEvents.RemoveAt(lEventIndex)
+                    End If
+                Next
+            End If
+
+            'Remove events outside target volume threshold
+            Try
+                If Not Double.IsNaN(EventVolumeThreshold) Then
+                    For lEventIndex As Integer = lEvents.Count - 1 To 0 Step -1
+                        Dim lEventVolume As Double = lEvents.ItemByIndex(lEventIndex).Attributes.GetValue("Sum")
+                        If EventVolumeHigh Then
+                            If lEventVolume < EventVolumeThreshold Then
+                                lEvents.RemoveAt(lEventIndex)
+                            End If
+                        Else
+                            If lEventVolume > EventVolumeThreshold Then
+                                lEvents.RemoveAt(lEventIndex)
+                            End If
+                        End If
+                    Next
+                End If
+            Catch e As Exception
+                Logger.Dbg("VaryDataException-EventVolumeThreshold " & e.Message)
+            End Try
+
+            'Remove events outside target duration threshold
+            If Not Double.IsNaN(EventDurationDays) Then
+                For lEventIndex As Integer = lEvents.Count - 1 To 0 Step -1
+                    Dim lEventDuration As Double = atcSynopticAnalysis.atcSynopticAnalysisPlugin.DataSetDuration(lEvents.ItemByIndex(lEventIndex))
+                    If EventDurationHigh Then
+                        If lEventDuration < EventDurationDays Then
+                            lEvents.RemoveAt(lEventIndex)
+                        End If
+                    Else
+                        If lEventDuration > EventDurationDays Then
+                            lEvents.RemoveAt(lEventIndex)
+                        End If
+                    End If
+
+                Next
+            End If
+
+            If Operation <> "Intensify" Then
+                If lEvents.Count > 0 Then
+                    lSplitData = New atcTimeseriesGroup(MergeTimeseries(lEvents))
+                    lSplitData.Add(lOriginalData)
+                End If
+            End If
+
+        Else
+            If Seasons Is Nothing Then
+                lSplitData = New atcTimeseriesGroup(lOriginalData)
+            Else
+                lSplitData = Seasons.SplitBySelected(lOriginalData, Nothing)
+            End If
+        End If
+        Return lSplitData
+    End Function
+
     Protected Overridable Function VaryData() As atcTimeseriesGroup
-        'Dim lMetCmp As New atcMetCmp.atcMetCmpPlugin
         Dim lArgsMath As New atcDataAttributes
         Dim lModifiedTS As atcTimeseries = Nothing
         Dim lModifiedGroup As New atcTimeseriesGroup
         Dim lDataSetIndex As Integer = 0
-        Dim lValueIndex As Integer
 
         Dim lEvents As atcTimeseriesGroup = Nothing
         Dim lEvent As atcTimeseries
 
-        Dim lModifyThis As atcTimeseries
-
         For Each lOriginalData As atcTimeseries In DataSets
-            Dim lSplitData As atcTimeseriesGroup = Nothing
-            If UseEvents Then
-                lEvents = EventSplit(lOriginalData, Nothing, EventThreshold, EventDaysGapAllowed, EventHigh)
-
-                'Remove events outside selected seasons
-                If Not Seasons Is Nothing Then
-                    For lEventIndex As Integer = lEvents.Count - 1 To 0 Step -1
-                        lEvent = lEvents.ItemByIndex(lEventIndex)
-
-                        'Find peak value of event
-                        Dim lPeakIndex As Integer = 1
-                        For lValueIndex = 2 To lEvent.numValues
-                            If lEvent.Value(lValueIndex) > lEvent.Value(lPeakIndex) Then
-                                lPeakIndex = lValueIndex
-                            End If
-                        Next
-
-                        'If peak is not in season, remove this event
-                        If Not Seasons.SeasonSelected(Seasons.SeasonIndex(lEvent.Dates.Value(lPeakIndex))) Then
-                            lEvents.RemoveAt(lEventIndex)
-                        End If
-                    Next
-                End If
-
-                'Remove events outside target volume threshold
-                Try
-                    If Not Double.IsNaN(EventVolumeThreshold) Then
-                        For lEventIndex As Integer = lEvents.Count - 1 To 0 Step -1
-                            Dim lEventVolume As Double = lEvents.ItemByIndex(lEventIndex).Attributes.GetValue("Sum")
-                            If EventVolumeHigh Then
-                                If lEventVolume < EventVolumeThreshold Then
-                                    lEvents.RemoveAt(lEventIndex)
-                                End If
-                            Else
-                                If lEventVolume > EventVolumeThreshold Then
-                                    lEvents.RemoveAt(lEventIndex)
-                                End If
-                            End If
-                        Next
-                    End If
-                Catch e As Exception
-                    Logger.Dbg("VaryDataException-EventVolumeThreshold " & e.Message)
-                End Try
-
-                'Remove events outside target duration threshold
-                If Not Double.IsNaN(EventDurationDays) Then
-                    For lEventIndex As Integer = lEvents.Count - 1 To 0 Step -1
-                        Dim lEventDuration As Double = atcSynopticAnalysis.atcSynopticAnalysisPlugin.DataSetDuration(lEvents.ItemByIndex(lEventIndex))
-                        If EventDurationHigh Then
-                            If lEventDuration < EventDurationDays Then
-                                lEvents.RemoveAt(lEventIndex)
-                            End If
-                        Else
-                            If lEventDuration > EventDurationDays Then
-                                lEvents.RemoveAt(lEventIndex)
-                            End If
-                        End If
-
-                    Next
-                End If
-
-                If Operation <> "Intensify" Then
-                    If lEvents.Count > 0 Then
-                        lModifyThis = MergeTimeseries(lEvents)
-                        lSplitData = New atcTimeseriesGroup(lModifyThis)
-                        lSplitData.Add(lOriginalData)
-                    End If
-                End If
-
-            Else
-                lModifyThis = lOriginalData
-                If Seasons Is Nothing Then
-                    lSplitData = New atcTimeseriesGroup(lModifyThis)
-                Else
-                    lSplitData = Seasons.SplitBySelected(lModifyThis, Nothing)
-                End If
-            End If
+            Dim lSplitData As atcTimeseriesGroup = SplitData(lOriginalData, lEvents)
 
             Dim lModifiedSplit As New atcTimeseriesGroup
 
@@ -316,8 +317,7 @@ Public Class atcVariation
                                " TargetChange " & DecimalAlign(lTargetChange))
                     lEventIntensifyFactor = lTargetChange / lCurrentVolume
                     Logger.Dbg("EventIntensifyFactor " & DecimalAlign(lEventIntensifyFactor))
-                    lModifyThis = MergeTimeseries(lEvents)
-                    lSplitData = New atcTimeseriesGroup(lModifyThis)
+                    lSplitData = New atcTimeseriesGroup(MergeTimeseries(lEvents))
                     lSplitData.Add(lOriginalData)
 
                     Dim lSplitTS As atcTimeseries = lSplitData.ItemByIndex(0)
