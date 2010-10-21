@@ -38,17 +38,19 @@ Public Class clsDurationComparePlugin
         Dim lFrmClassLimits As frmAnalysis = Nothing
 
         If aItemName = atcDataManager.AnalysisMenuName & "_DurationCompare" Then
-            Dim lTimeseriesGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Data For Duration/Compare")
+            Dim lTimeseriesGroup As atcTimeseriesGroup = _
+            atcDataManager.UserSelectData("Select Data For Duration/Compare", _
+                                          Nothing, Nothing, True, True, Me.Icon)
             If lTimeseriesGroup.Count > 0 Then
                 lFrmClassLimits = New frmAnalysis(lTimeseriesGroup)
-                If pMapWin IsNot Nothing AndAlso pMapWin.ApplicationInfo.FormIcon IsNot Nothing Then lFrmClassLimits.Icon = pMapWin.ApplicationInfo.FormIcon
                 lFrmClassLimits.Show()
             End If
         ElseIf aItemName = atcDataManager.AnalysisMenuName & "_DurationHydrograph" Then
-            Dim lTimeseriesGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Data For Duration Hydrograph")
+            Dim lTimeseriesGroup As atcTimeseriesGroup = _
+            atcDataManager.UserSelectData("Select Data For Duration Hydrograph", _
+                                          Nothing, Nothing, True, True, Me.Icon)
             If lTimeseriesGroup.Count > 0 Then
                 Dim lfrmDHControl As New frmDurationHydrographControl(lTimeseriesGroup)
-                If pMapWin IsNot Nothing AndAlso pMapWin.ApplicationInfo.FormIcon IsNot Nothing Then lfrmDHControl.Icon = pMapWin.ApplicationInfo.FormIcon
                 lfrmDHControl.Show()
             End If
         End If

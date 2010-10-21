@@ -140,7 +140,7 @@ Public Class frmResult
         For Each lTSgroup As atcTimeseriesGroup In pListPEGroups
             If pListPEGroups.Count > 1 And aSpecification IsNot Nothing Then
                 'Only do this if more than one graphs are to be plotted and user wants to save into specified files
-                If aSpecification.Length > 10 And IO.Directory.Exists(IO.Path.GetDirectoryName(aSpecification)) Then
+                If aSpecification.Length > 10 AndAlso IO.Directory.Exists(IO.Path.GetDirectoryName(aSpecification)) Then
                     lFileCounter += 1
                     lFileName = IO.Path.Combine(IO.Path.GetFileNameWithoutExtension(aSpecification) & "_" & lFileCounter, IO.Path.GetExtension(aSpecification))
                     DurationHydrographPlot(lTSgroup, lFileName)
@@ -159,35 +159,30 @@ Public Class frmResult
     End Sub
 
     Public Function doPlotDurCompare(ByRef aDatagroup As atcDataGroup, Optional ByVal aSpecification As String = "") As Boolean
-        Dim doneIt As Boolean = True
-        Dim lp As String = ""
-        Dim lgraphForm As New atcGraph.atcGraphForm()
-
-        Dim lZgc As ZedGraphControl = lgraphForm.ZedGraphCtrl
+        Dim lGraphForm As New atcGraph.atcGraphForm()
+        lGraphForm.Icon = Me.Icon
+        Dim lZgc As ZedGraphControl = lGraphForm.ZedGraphCtrl
         Dim lGraphDur As New clsGraphProbability(aDatagroup, lZgc)
-        lgraphForm.Grapher = lGraphDur
+        lGraphForm.Grapher = lGraphDur
         If aSpecification = "" Then
-            lgraphForm.Show()
+            lGraphForm.Show()
         Else
             lZgc.SaveIn(aSpecification)
         End If
-        Return doneIt
+        Return True
     End Function
 
     Public Function DurationHydrographPlot(ByVal aDataGroup As atcTimeseriesGroup, Optional ByVal aSpecification As String = "") As Boolean
-        Dim doneIt As Boolean = True
-        Dim lp As String = ""
-        Dim lgraphForm As New atcGraph.atcGraphForm()
-
-        Dim lZgc As ZedGraphControl = lgraphForm.ZedGraphCtrl
+        Dim lGraphForm As New atcGraph.atcGraphForm()
+        lGraphForm.Icon = Me.Icon
+        Dim lZgc As ZedGraphControl = lGraphForm.ZedGraphCtrl
         Dim lGraphDurHyd As New clsGraphTime(aDataGroup, lZgc)
-        lgraphForm.Grapher = lGraphDurHyd
+        lGraphForm.Grapher = lGraphDurHyd
 
         Dim lXTitle As String = "Duration hydrograph for " & aDataGroup(0).Attributes.GetValue("stanam") & vbCrLf
         lXTitle &= "For period " & aDataGroup(0).Attributes.GetValue("StartYMD") & " to " & aDataGroup(0).Attributes.GetValue("EndYMD")
         Dim lYTitle As String = "STREAMFLOW IN CUBIC FEET PER SECOND"
         With lGraphDurHyd.ZedGraphCtrl.GraphPane
-
             With .XAxis
                 .MinorGrid.IsVisible = False
                 .MajorGrid.IsVisible = False
@@ -220,9 +215,9 @@ Public Class frmResult
             .Legend.IsVisible = False
         End With
         Dim lPEDecimals As String = "Percentiles" & vbCrLf
-        For I As Integer = 0 To aDataGroup.Count - 1
-            lPEDecimals &= aDataGroup(I).Attributes.GetValue("PEDecimal")
-            If I + 1 Mod 5 = 0 Then
+        For lGroupIndex As Integer = 0 To aDataGroup.Count - 1
+            lPEDecimals &= aDataGroup(lGroupIndex).Attributes.GetValue("PEDecimal")
+            If lGroupIndex + 1 Mod 5 = 0 Then
                 lPEDecimals &= Environment.NewLine
             End If
         Next
@@ -236,15 +231,15 @@ Public Class frmResult
         End With
 
         lGraphDurHyd.ZedGraphCtrl.GraphPane.GraphObjList.Add(lText)
-        lgraphForm.Width = 720
-        lgraphForm.Height = 560
+        lGraphForm.Width = 720
+        lGraphForm.Height = 560
 
         If aSpecification = "" Then
-            lgraphForm.Show()
+            lGraphForm.Show()
         Else
             lZgc.SaveIn(aSpecification)
         End If
-        Return doneIt
+        Return True
     End Function
 
     Private Sub DataGroupChanged() Handles pDataGroup.Added, pDataGroup.Removed
