@@ -82,7 +82,6 @@ Public Class frmDurationHydrographControl
         If DataGroup.Count = 0 Then
             mnuSelectData_Click(Nothing, Nothing)
         End If
-
         ResultForm.Initialize("DurationHydrograph", DataGroup, lListPct.ToArray(), "report")
         ResultForm.Show()
         ResultForm.txtReport.SelectionLength = 0
@@ -107,7 +106,8 @@ Public Class frmDurationHydrographControl
     End Sub
 
     Private Sub mnuSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectData.Click
-        pDataGroup = atcDataManager.UserSelectData("Select Data For Analysis", pDataGroup)
+        pDataGroup = atcDataManager.UserSelectData("Select Data For Analysis", _
+                                                   pDataGroup, Nothing, True, True, Me.Icon)
     End Sub
 
     Private Sub mnuExit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuExit.Click
@@ -120,18 +120,19 @@ Public Class frmDurationHydrographControl
 
 #Region "Util"
     Private Function CreateForm() As frmResult
-        Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
-        Dim lFrm As New frmResult
-        For Each lDisp As atcDataDisplay In DisplayPlugins
-            Dim lMenuText As String = lDisp.Name
+        Dim lDisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
+        Dim lFrmResult As New frmResult
+        lFrmResult.Icon = Me.Icon
+        For Each lDataDisplay As atcDataDisplay In lDisplayPlugins
+            Dim lMenuText As String = lDataDisplay.Name
             If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
-            If TypeOf (lFrm) Is frmResult Then
-                CType(lFrm, frmResult).mnuAnalysis.DropDownItems().Add(lMenuText, Nothing, New EventHandler(AddressOf lFrm.mnuAnalysis_Click))
+            If TypeOf (lFrmResult) Is frmResult Then
+                CType(lFrmResult, frmResult).mnuAnalysis.DropDownItems().Add(lMenuText, Nothing, New EventHandler(AddressOf lFrmResult.mnuAnalysis_Click))
             Else
-                lFrm.mnuAnalysis.DropDownItems().Add(lMenuText, Nothing, New EventHandler(AddressOf lFrm.mnuAnalysis_Click))
+                lFrmResult.mnuAnalysis.DropDownItems().Add(lMenuText, Nothing, New EventHandler(AddressOf lFrmResult.mnuAnalysis_Click))
             End If
         Next
-        Return lFrm
+        Return lFrmResult
     End Function
 
     Private Function ListOK() As List(Of Double)

@@ -132,8 +132,10 @@ Public Class frmAnalysis
         ElseIf pAnalysis = "" Then
             Exit Sub
         End If
+        Windows.Forms.Cursor.Current = Windows.Forms.Cursors.WaitCursor
         ResultForm.Initialize(pAnalysis, DataGroup, lstClassLimits.CurrentValues, "Report")
         ResultForm.Show()
+        Windows.Forms.Cursor.Current = Windows.Forms.Cursors.Default
         ResultForm.txtReport.SelectionLength = 0
     End Sub
 
@@ -162,22 +164,6 @@ Public Class frmAnalysis
         ResultForm.Initialize(pAnalysis, DataGroup, lstClassLimits.CurrentValues, "Graph")
     End Sub
 
-    'Private Sub txtDS1_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtDS1.Click
-    '    Dim lTimeseriesGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Data For The Observed Timeseries in a Compare Analysis", DataGroup)
-    '    If lTimeseriesGroup.Count > 0 Then
-    '        txtDS1.Text = TSDescription(lTimeseriesGroup(0)).TrimEnd(vbTab).TrimEnd(vbCrLf)
-    '        DataGroup(0) = lTimeseriesGroup(0)
-    '    End If
-    'End Sub
-
-    'Private Sub txtDS2_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtDS2.Click
-    '    Dim lTimeseriesGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Data For The Simulated Timeseries in a Compare Analysis", DataGroup)
-    '    If lTimeseriesGroup.Count > 1 Then
-    '        txtDS2.Text = TSDescription(lTimeseriesGroup(1)).TrimEnd(vbTab).TrimEnd(vbCrLf)
-    '        DataGroup(1) = lTimeseriesGroup(1)
-    '    End If
-    'End Sub
-
     Private Sub SettingChanged() Handles CtlClassLimits1.SettingChanged
         If CtlClassLimits1.UsePresetClasses Then
             lstClassLimits.CurrentValues = GenerateClasses()
@@ -193,18 +179,20 @@ Public Class frmAnalysis
     End Sub
 
     Private Function CreateForm() As frmResult
-        Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
-        Dim lFrm As New frmResult
-        For Each lDisp As atcDataDisplay In DisplayPlugins
-            Dim lMenuText As String = lDisp.Name
+        Dim lDisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
+        Dim lFrmResult As New frmResult
+        lFrmResult.Icon = Me.Icon
+        For Each lDataDisplay As atcDataDisplay In lDisplayPlugins
+            Dim lMenuText As String = lDataDisplay.Name
             If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
-            lFrm.mnuAnalysis.DropDownItems().Add(lMenuText, Nothing, New EventHandler(AddressOf lFrm.mnuAnalysis_Click))
+            lFrmResult.mnuAnalysis.DropDownItems().Add(lMenuText, Nothing, New EventHandler(AddressOf lFrmResult.mnuAnalysis_Click))
         Next
-        Return lFrm
+        Return lFrmResult
     End Function
 
     Private Sub SelectDataToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SelectDataToolStripMenuItem.Click
-        DataGroup = atcDataManager.UserSelectData("Select Data For Analysis", DataGroup)
+        DataGroup = atcDataManager.UserSelectData("Select Data For Analysis", _
+                                                  DataGroup, Nothing, True, True, Me.Icon)
         If rdoAnalysisDuration.Checked Then
             rdoAnalysisDuration_CheckedChanged(rdoAnalysisDuration, Nothing)
         ElseIf rdoAnalysisCompare.Checked Then
@@ -218,9 +206,19 @@ Public Class frmAnalysis
     End Sub
 
     Private Function TSDescription(ByVal aTS As atcTimeseries) As String
-        Dim lDesc As String = String.Empty
-        lDesc &= aTS.Attributes.GetValue("Constituent") & " at "
-        lDesc &= aTS.Attributes.GetValue("STAID") & " " & aTS.Attributes.GetValue("STANAM") & vbCrLf & Space(2)
+        Dim lDesc As String = aTS.Attributes.GetValue("Constituent") & " at"
+        Dim lStaId As String = aTS.Attributes.GetValue("STAID")
+        If lStaId.Length = 0 OrElse lStaId = "0" Then
+            Dim lLocation As String = aTS.Attributes.GetValue("Location")
+            If IsNumeric(lLocation) Then
+                lStaId = " " & lLocation
+            Else
+                lStaId = ""
+            End If
+        Else
+            lStaId = " " & lStaId
+        End If
+        lDesc &= lStaId & " " & aTS.Attributes.GetValue("STANAM") & vbCrLf & Space(2)
         Return lDesc
     End Function
 End Class
