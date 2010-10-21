@@ -85,7 +85,9 @@ Public Class clsSWSTATPlugin
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         MyBase.ItemClicked(aItemName, aHandled)
         If Not aHandled AndAlso aItemName.Equals(atcDataManager.AnalysisMenuName & "_SWSTAT_" & pTrendName) Then
-            Dim lTimeseriesGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Data For Trend Analysis")
+            Dim lTimeseriesGroup As atcTimeseriesGroup = _
+              atcDataManager.UserSelectData("Select Data For Trend Analysis", _
+                                            Nothing, Nothing, True, True, Me.Icon)
             If lTimeseriesGroup.Count > 0 Then
                 Dim lForm As New frmTrend
                 ShowForm(lTimeseriesGroup, lForm)
