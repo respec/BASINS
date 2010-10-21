@@ -1110,57 +1110,57 @@ Friend Class frmSWSTAT
 
     End Sub
 
-    Private Function TSStats(ByVal aTS As atcTimeseries) As ArrayList
+    'Private Function TSStats(ByVal aTS As atcTimeseries) As ArrayList
 
-        Dim lmean As Double
-        Dim lmin As Double
-        Dim lmax As Double
-        Dim lstdev As Double
-        Dim lUsed As Integer
-        Dim lTotalCount As Integer
-        Dim lSum As Double
-        Dim lUnused As Integer
-        Dim lSS As Double
+    '    Dim lmean As Double
+    '    Dim lmin As Double
+    '    Dim lmax As Double
+    '    Dim lstdev As Double
+    '    Dim lUsed As Integer
+    '    Dim lTotalCount As Integer
+    '    Dim lSum As Double
+    '    Dim lUnused As Integer
+    '    Dim lSS As Double
 
-        Dim lusedVals As New ArrayList()
-        Dim lStats As New ArrayList()
+    '    Dim lusedVals As New ArrayList()
+    '    Dim lStats As New ArrayList()
 
-        lmin = Double.MaxValue
-        lmax = Double.MinValue
-        For Each lVal As Double In aTS.Values
-            lTotalCount += 1
-            If lVal > 0 Then
-                lUsed += 1
-                lSum += lVal
-                lusedVals.Add(lVal)
-                If lVal > lmax Then
-                    lmax = lVal
-                End If
-                If lVal < lmin Then
-                    lmin = lVal
-                End If
-            End If
-        Next
+    '    lmin = Double.MaxValue
+    '    lmax = Double.MinValue
+    '    For Each lVal As Double In aTS.Values
+    '        lTotalCount += 1
+    '        If lVal > 0 Then
+    '            lUsed += 1
+    '            lSum += lVal
+    '            lusedVals.Add(lVal)
+    '            If lVal > lmax Then
+    '                lmax = lVal
+    '            End If
+    '            If lVal < lmin Then
+    '                lmin = lVal
+    '            End If
+    '        End If
+    '    Next
 
-        lmean = lSum / lUsed
-        lUnused = lTotalCount - lUsed
+    '    lmean = lSum / lUsed
+    '    lUnused = lTotalCount - lUsed
 
-        For Each lVal As Double In lusedVals
-            lSS += (lVal - lmean) ^ 2
-        Next
+    '    For Each lVal As Double In lusedVals
+    '        lSS += (lVal - lmean) ^ 2
+    '    Next
 
-        lstdev = Math.Sqrt(lSS / lUsed)
+    '    lstdev = Math.Sqrt(lSS / lUsed)
 
-        lStats.Add(lmin)
-        lStats.Add(lmax)
-        lStats.Add(lmean)
-        lStats.Add(lstdev)
-        lStats.Add(lUsed)
-        lStats.Add(lUnused)
+    '    lStats.Add(lmin)
+    '    lStats.Add(lmax)
+    '    lStats.Add(lmean)
+    '    lStats.Add(lstdev)
+    '    lStats.Add(lUsed)
+    '    lStats.Add(lUnused)
 
-        Return lStats
+    '    Return lStats
 
-    End Function
+    'End Function
 
     Private Sub btnNDay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNDay.Click
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor

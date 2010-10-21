@@ -847,67 +847,14 @@ Friend Class frmTrend
 
     Private Sub btnDisplayBasic_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDisplayBasic.Click
         Dim lList As New atcList.atcListForm
-
         With lList
             .Text = "Basic Statistics"
             .Initialize(SelectedData(), pBasicAttributes, False, , )
             .Width = 600
             .SwapRowsColumns = True
+            .Icon = Me.Icon
         End With
-
     End Sub
-
-    Private Function TSStats(ByVal aTS As atcTimeseries) As ArrayList
-
-        Dim lmean As Double
-        Dim lmin As Double
-        Dim lmax As Double
-        Dim lstdev As Double
-        Dim lUsed As Integer
-        Dim lTotalCount As Integer
-        Dim lSum As Double
-        Dim lUnused As Integer
-        Dim lSS As Double
-
-        Dim lusedVals As New ArrayList()
-        Dim lStats As New ArrayList()
-
-        lmin = Double.MaxValue
-        lmax = Double.MinValue
-        For Each lVal As Double In aTS.Values
-            lTotalCount += 1
-            If lVal > 0 Then
-                lUsed += 1
-                lSum += lVal
-                lusedVals.Add(lVal)
-                If lVal > lmax Then
-                    lmax = lVal
-                End If
-                If lVal < lmin Then
-                    lmin = lVal
-                End If
-            End If
-        Next
-
-        lmean = lSum / lUsed
-        lUnused = lTotalCount - lUsed
-
-        For Each lVal As Double In lusedVals
-            lSS += (lVal - lmean) ^ 2
-        Next
-
-        lstdev = Math.Sqrt(lSS / lUsed)
-
-        lStats.Add(lmin)
-        lStats.Add(lmax)
-        lStats.Add(lmean)
-        lStats.Add(lstdev)
-        lStats.Add(lUsed)
-        lStats.Add(lUnused)
-
-        Return lStats
-
-    End Function
 
     Private Sub btnNDay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNDay.Click
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
@@ -923,15 +870,18 @@ Friend Class frmTrend
                 If lRankedAnnual.Count > 0 Then
                     Dim lDisplayThese As atcTimeseriesGroup = GroupWithinLimits(lRankedAnnual)
                     Dim lList As New atcList.atcListForm
-                    With lList.DateFormat
-                        .IncludeDays = False
-                        .IncludeHours = False
-                        .IncludeMinutes = False
-                        .IncludeMonths = False
+                    With lList
+                        With .DateFormat
+                            .IncludeDays = False
+                            .IncludeHours = False
+                            .IncludeMinutes = False
+                            .IncludeMonths = False
+                        End With
+                        .Text = "N-Day " & HighOrLowString() & " Annual Time Series and Ranking"
+                        .Initialize(lDisplayThese, pNDayAttributes, True, , )
+                        .DisplayValueAttributes = True
+                        .Icon = Me.Icon
                     End With
-                    lList.Text = "N-Day " & HighOrLowString() & " Annual Time Series and Ranking"
-                    lList.Initialize(lDisplayThese, pNDayAttributes, True, , )
-                    lList.DisplayValueAttributes = True
                 End If
             Else
                 Logger.Msg("Select at least one number of days")
@@ -1119,18 +1069,21 @@ Friend Class frmTrend
                         Next
 
                         Dim lList As New atcList.atcListForm
-                        With lList.DateFormat
-                            .IncludeDays = False
-                            .IncludeHours = False
-                            .IncludeMinutes = False
-                            .IncludeMonths = False
-                        End With
-                        lList.Text = "Trend of " & HighOrLowString() & " Annual Time Series and Statistics"
+                        With lList
+                            With .DateFormat
+                                .IncludeDays = False
+                                .IncludeHours = False
+                                .IncludeMinutes = False
+                                .IncludeMonths = False
+                            End With
+                            .Text = "Trend of " & HighOrLowString() & " Annual Time Series and Statistics"
 
-                        If chkLowValue.Checked AndAlso Not pTrendAttributes.Contains("Limit Low") Then pTrendAttributes.Add("Limit Low")
-                        If chkHighValue.Checked AndAlso Not pTrendAttributes.Contains("Limit High") Then pTrendAttributes.Add("Limit High")
-                        lList.Initialize(lDisplayThese, pTrendAttributes, False)
-                        lList.SwapRowsColumns = True
+                            If chkLowValue.Checked AndAlso Not pTrendAttributes.Contains("Limit Low") Then pTrendAttributes.Add("Limit Low")
+                            If chkHighValue.Checked AndAlso Not pTrendAttributes.Contains("Limit High") Then pTrendAttributes.Add("Limit High")
+                            .Initialize(lDisplayThese, pTrendAttributes, False)
+                            .SwapRowsColumns = True
+                            .Icon = Me.Icon
+                        End With
                     End If
                 End If
             Else
@@ -1139,10 +1092,7 @@ Friend Class frmTrend
         Else
             Logger.Msg("Select at least one time series")
         End If
-
-ExitSub:
         Me.Cursor = System.Windows.Forms.Cursors.Default
-
     End Sub
 
     Private Function GroupWithinLimits(ByVal aGroup As atcTimeseriesGroup) As atcTimeseriesGroup
