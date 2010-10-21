@@ -21,7 +21,7 @@ Public Class clsDurationComparePlugin
         Dim lSWSTATMenuName As String = atcDataManager.AnalysisMenuName & "_SWSTAT"
 
         atcDataManager.AddMenuIfMissing(atcDataManager.AnalysisMenuName, "", atcDataManager.AnalysisMenuString, atcDataManager.FileMenuName)
-        atcDataManager.AddMenuIfMissing(lSWSTATMenuName, atcDataManager.AnalysisMenuName, "SWSTAT")
+        atcDataManager.AddMenuWithIcon(lSWSTATMenuName, atcDataManager.AnalysisMenuName, "SWSTAT", Me.Icon)
 
         pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_DurationCompare", lSWSTATMenuName, "Duration/Compare", Me.Icon, , , True))
         pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_DurationHydrograph", lSWSTATMenuName, "Duration Hydrograph", Me.Icon, , , True))
