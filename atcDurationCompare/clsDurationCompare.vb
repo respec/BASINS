@@ -35,15 +35,13 @@ Public Class clsDurationComparePlugin
     End Property
 
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
-        Dim lFrmClassLimits As frmAnalysis = Nothing
-
-        If aItemName = atcDataManager.AnalysisMenuName & "_DurationCompare" Then
+         If aItemName = atcDataManager.AnalysisMenuName & "_DurationCompare" Then
             Dim lTimeseriesGroup As atcTimeseriesGroup = _
             atcDataManager.UserSelectData("Select Data For Duration/Compare", _
                                           Nothing, Nothing, True, True, Me.Icon)
             If lTimeseriesGroup.Count > 0 Then
-                lFrmClassLimits = New frmAnalysis(lTimeseriesGroup)
-                lFrmClassLimits.Show()
+                Dim lFrmAnalysis As frmAnalysis = New frmAnalysis(lTimeseriesGroup)
+                lFrmAnalysis.Show()
             End If
         ElseIf aItemName = atcDataManager.AnalysisMenuName & "_DurationHydrograph" Then
             Dim lTimeseriesGroup As atcTimeseriesGroup = _
