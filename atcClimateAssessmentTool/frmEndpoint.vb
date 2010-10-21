@@ -913,9 +913,13 @@ Public Class frmEndpoint
             UpdateDataText(txtData, pVariation.DataSets)
 
             If .IsInput Then
-                Me.grpEvents.Visible = False
+                grpEvents.Visible = False
+                grpSeasons.Visible = False
             Else
-                If .UseEvents Then
+                If Not .UseEvents Then
+                    EnableEvents(False)
+                Else
+                    chkEvents.Checked = True
                     txtEventThreshold.Text = .EventThreshold
                     txtEventGap.Text = DoubleToString(.EventDaysGapAllowed * 24) 'atcSynopticAnalysis.atcSynopticAnalysisPlugin.TimeUnitFactor(lGapUnitIndex)
                     If Double.IsNaN(.EventDurationDays) Then
@@ -934,7 +938,7 @@ Public Class frmEndpoint
                     EnableSeasons(False)
                 Else
                     pSettingFormSeason = True
-                    EnableSeasons(True)
+                    chkSeasons.Checked = True
                     cboSeasons.Text = atcSeasonPlugin.SeasonClassNameToLabel(.Seasons.GetType.Name)
                     pSeasons = .Seasons
                     SetAllSeasons()
@@ -951,14 +955,22 @@ Public Class frmEndpoint
         End If
     End Sub
 
+    Private Sub chkEvents_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles chkEvents.CheckedChanged
+        EnableEvents(chkEvents.Checked)
+    End Sub
+
     Private Sub chkSeasons_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkSeasons.CheckedChanged
         EnableSeasons(chkSeasons.Checked)
     End Sub
 
+    Private Sub EnableEvents(ByVal aEnable As Boolean)
+        txtEventThreshold.Enabled = aEnable
+        txtEventGap.Enabled = aEnable
+        txtEventDuration.Enabled = aEnable
+        txtEventVolume.Enabled = aEnable
+    End Sub
+
     Private Sub EnableSeasons(ByVal aEnable As Boolean)
-
-        If chkSeasons.Checked <> aEnable Then chkSeasons.Checked = aEnable
-
         cboSeasons.Visible = aEnable
         lstSeasons.Visible = aEnable
         btnSeasonsAll.Visible = aEnable
