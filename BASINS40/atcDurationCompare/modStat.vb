@@ -249,16 +249,6 @@ Public Module modStat
         'Logger.Msg("GetLowerBound: " & lErrInt.GetLowerBound(1))
         'Logger.Msg("Rank:" & lErrInt.Rank)
 
-        'Dim lErrInt(7) As Double
-        'lErrInt(0) = -60.0
-        'lErrInt(1) = -30.0
-        'lErrInt(2) = -10.0
-        'lErrInt(3) = 0.0
-        'lErrInt(4) = 10.0
-        'lErrInt(5) = 30.0
-        'lErrInt(6) = 60.0
-
-
         If aClassLimits Is Nothing Then
             Dim lErr As String = "Class limits are not defined, unable to conduct compare analysis."
             Logger.Msg(lErr)
@@ -275,22 +265,45 @@ Public Module modStat
             lClassLimits(lClassLimitsIndex) = SignificantDigits(lClassLimits(lClassLimitsIndex), 4)
         Next
 
+        Dim lTimeStep As Double = 1
+        If aTSer1.numValues > 1 Then
+            lTimeStep = aTSer1.Dates.Value(2) - aTSer1.Dates.Value(1)
+        End If
+        Dim lIndex2 As Integer = 1
+
+        Dim lNeedToMatchDates As Boolean = False
+        If aTSer1.Attributes.GetValue("Start Date") <> aTSer2.Attributes.GetValue("Start Date") OrElse _
+           aTSer1.Attributes.GetValue("End Date") <> aTSer2.Attributes.GetValue("End Date") Then
+            lNeedToMatchDates = True
+        ElseIf aTSer1.Attributes.GetFormattedValue("Point") <> aTSer2.Attributes.GetFormattedValue("Point") Then
+            lNeedToMatchDates = True
+        End If
+
+        Dim lTS1Values As New List(Of Double)
+        Dim lTS2Values As New List(Of Double)
+
         For lIndex As Integer = 1 To aTSer1.numValues
             lVal1 = aTSer1.Values(lIndex)
-            lVal2 = aTSer2.Values(lIndex)
+            If lNeedToMatchDates Then
+                lIndex2 = atcData.FindDateAtOrAfter(aTSer2.Dates.Values, aTSer1.Dates.Value(lIndex), lIndex2)
+                If lIndex2 < 1 OrElse lIndex2 > aTSer2.numValues Then
+                    Logger.Dbg("CompareStats: matching value not found at " & lIndex)
+                    Continue For
+                ElseIf aTSer1.Dates.Value(lIndex) - aTSer2.Dates.Value(lIndex2) > lTimeStep Then
+                    Logger.Dbg("CompareStats: matching value found at " & lIndex2 & " is too far from date at " & lIndex)
+                    Continue For
+                End If
+                lVal2 = aTSer2.Value(lIndex2)
+            Else
+                lVal2 = aTSer2.Value(lIndex)
+            End If
+
             lVal1 = SignificantDigits(lVal1, 4)
             lVal2 = SignificantDigits(lVal2, 4)
-            'If lVal2 = 12400 Then MsgBox("found it")
-            'Logger.Dbg("lVal1:" & CStr(lVal1) & ":lVal2:" & CStr(lVal2))
             If Not Double.IsNaN(lVal1) And Not Double.IsNaN(lVal2) Then
+                lTS1Values.Add(lVal1)
+                lTS2Values.Add(lVal2)
 
-                'DBG:
-                'If (lVal1 >= 4.0 And lVal1 <= 5.7) Then
-                '    Logger.Msg("DBG: found a val 1: " & CStr(lVal1))
-                'End If
-                'If (lVal2 >= 4.0 And lVal2 <= 5.7) Then
-                '    Logger.Msg("DBG: found a val 2: " & CStr(lVal2))
-                'End If
                 lValDiff = lVal1 - lVal2
                 lMeanError += lValDiff
                 lMeanSMO2M1 += lVal2 - lVal1
@@ -381,19 +394,60 @@ Public Module modStat
 
         Dim lCorrelationCoefficient As Double = 0.0#
         Dim lNashSutcliffe As Double = 0.0#
-        Dim lMean1 As Double = aTSer1.Attributes.GetValue("Mean")
-        Dim lMean2 As Double = aTSer2.Attributes.GetValue("Mean")
+
+        Dim lMean1 As Double = 0.0
+        Dim lMean2 As Double = 0.0
+
+        If lNeedToMatchDates Then
+            Dim lOverallTotal1 As Double = 0.0
+            Dim lOverallTotal2 As Double = 0.0
+
+            For Each lClassBucket In lClassBuckets
+                lOverallTotal1 += lClassBucket.Total1
+                lOverallTotal2 += lClassBucket.Total2
+            Next
+            lMean1 = lOverallTotal1 / lGoodCount
+            lMean2 = lOverallTotal2 / lGoodCount
+        Else
+            lMean1 = aTSer1.Attributes.GetValue("Mean")
+            lMean2 = aTSer2.Attributes.GetValue("Mean")
+        End If
+
+        lIndex2 = 1
         For lIndex As Integer = 1 To aTSer1.numValues
             lVal1 = aTSer1.Values(lIndex)
-            lVal2 = aTSer2.Values(lIndex)
+
+            If lNeedToMatchDates Then
+                lIndex2 = atcData.FindDateAtOrAfter(aTSer2.Dates.Values, aTSer1.Dates.Value(lIndex), lIndex2)
+                If lIndex2 < 1 OrElse lIndex2 > aTSer2.numValues Then
+                    Logger.Dbg("CompareStats:Corr.Coef.: matching value not found at " & lIndex)
+                    Continue For
+                ElseIf aTSer1.Dates.Value(lIndex) - aTSer2.Dates.Value(lIndex2) > lTimeStep Then
+                    Logger.Dbg("CompareStats:Corr.Coef.: matching value found at " & lIndex2 & " is too far from date at " & lIndex)
+                    Continue For
+                End If
+                lVal2 = aTSer2.Value(lIndex2)
+            Else
+                lVal2 = aTSer2.Value(lIndex)
+            End If
+
             If Not Double.IsNaN(lVal1) And Not Double.IsNaN(lVal2) Then
                 lCorrelationCoefficient += (lVal1 - lMean1) * (lVal2 - lMean2)
                 lNashSutcliffe += (lVal2 - lMean2) ^ 2
             End If
         Next
-        lCorrelationCoefficient /= (aTSer1.numValues - 1)
-        Dim lSD1 As Double = aTSer1.Attributes.GetValue("Standard Deviation")
-        Dim lSD2 As Double = aTSer2.Attributes.GetValue("Standard Deviation")
+        'lCorrelationCoefficient /= (aTSer1.numValues - 1)
+        lCorrelationCoefficient /= (lGoodCount - 1)
+
+        Dim lSD1 As Double = 0.0
+        Dim lSD2 As Double = 0.0
+        If lNeedToMatchDates Then
+            lSD1 = StandardDeviation(lTS1Values.ToArray, lMean1)
+            lSD2 = StandardDeviation(lTS2Values.ToArray, lMean2)
+        Else
+            lSD1 = aTSer1.Attributes.GetValue("Standard Deviation")
+            lSD2 = aTSer2.Attributes.GetValue("Standard Deviation")
+        End If
         If Math.Abs(lSD1 * lSD2) > 0.0001 Then
             lCorrelationCoefficient /= (lSD1 * lSD2)
         End If
@@ -552,7 +606,7 @@ Public Module modStat
             End If
             'lStrBuilder.AppendLine()
         Next
- 
+
         lStrBuilder.AppendLine(" --------- ---- ---- --------- --------- ---------- --------- --------- ---------")
         lStrBuilder.Append(CStr(lGoodCount).PadLeft(15) & CStr(lGoodCount).PadLeft(6))
         lStrBuilder.Append("100.00".PadLeft(9)) 'total percentage of TS1
@@ -653,6 +707,14 @@ Public Module modStat
             lStrBuilder.AppendLine(lNote)
         End If
         Return lStrBuilder.ToString
+    End Function
+
+    Public Function StandardDeviation(ByVal aValues() As Double, ByVal aMean As Double) As Double
+        Dim lSumSquaredDeviation As Double = 0
+        For Each lVal As Double In aValues
+            lSumSquaredDeviation += (lVal - aMean) * (lVal - aMean)
+        Next
+        Return Math.Sqrt(lSumSquaredDeviation / (aValues.Length - 1))
     End Function
 
     'Public Function DurationHydrograph(ByVal aTS As atcTimeseries) As String
@@ -966,129 +1028,6 @@ Public Module modStat
         Return lDef
     End Function
 
-    Public Function DRNHYD(ByVal aTS As atcTimeseries, _
-                           ByVal aSTMO As Integer, _
-                           ByVal aEDMO As Integer, _
-                           ByVal aDECPLA As Integer, _
-                           ByVal aSIGDIG As Integer, _
-                           ByVal aFLDWID As Integer, _
-                           ByVal aNCI As Integer, _
-                           ByVal aPCTILE() As Double) As String
-        Dim lStr As String = String.Empty
-        Dim MXYR As Integer = 150
-
-        Dim lNCNT(365) As Integer
-        Dim lNMIS(365) As Integer
-        Dim lFLOW(366) As Double
-        Dim lFLDR(MXYR, 365) As Double
-        Dim lFPCT(365, 12) As Double
-        Dim lPYRS, LPYEAR, lPDAY, lIPT, lNPTS As Integer
-        Dim lSDATIM(5), lEDATTIM(5), TEMP(11), TEMPX(5), TEMPY(5) As Integer
-        Dim lTUNITS As Integer = 4
-        Dim lTSTEP As Integer = 1
-
-        Dim lDateFormat As New atcDateFormat
-        Dim lStartDate As String = lDateFormat.JDateToString(aTS.Attributes.GetValue("Start Date"))
-        Dim lEndDate As String = lDateFormat.JDateToString(aTS.Attributes.GetValue("End Date"))
-
-        'Construct Title Lines
-        lStr = Space(10) & "Duration hydrograph for " & aTS.Attributes.GetValue("STANAM", "") & vbCrLf
-        lStr &= Space(30) & "Station id  " & aTS.Attributes.GetValue("ISTAID", "") & vbCrLf
-        lStr &= Space(22) & "For period " & lStartDate & " to " & lEndDate & vbCrLf & vbCrLf
-        lStr &= Space(6) & "Num" & Space(30) & "Percentile" & vbCrLf
-        lStr &= " Oct  yrs     Max    0.10    0.20    0.30    0.50    0.70    0.80    0.90     Min" 'TODO: Check if always starts with Oct!
-
-        'Initialize arrays and counters
-        For I As Integer = 1 To 365
-            lNCNT(I) = 0 : lNMIS(I) = 0 : lFLOW(I) = 0
-            For J As Integer = 1 To MXYR
-                lFLDR(I, J) = 0.0 'for each day, multiple years
-            Next
-        Next
-
-        'TEMP is available begin date and end date for first season
-        'TEMPX is start date for first season
-        'TEMPY is start date for last season
-
-        DHBEGN(lSDATIM, lEDATTIM, aSTMO, aEDMO, TEMP, TEMPX, TEMPY, lIPT)
-        DHLEAP(TEMPX, aSTMO, aEDMO, lPDAY, LPYEAR)
-        'get period in 1st season, start dates of 1st and last season
-        'find leap day and index to first leap year
-        lPYRS = 4 - LPYEAR
-        Dim lavailDateBegin1stSeason(5) As Integer
-        Dim lavailDateEnd1stSeason(5) As Integer
-        For I As Integer = 0 To 5
-            lavailDateBegin1stSeason(I) = TEMP(I)
-        Next
-        For I As Integer = 6 To 11
-            lavailDateEnd1stSeason(I) = TEMP(I)
-        Next
-        TimDif(lavailDateBegin1stSeason, lavailDateEnd1stSeason, lTUNITS, lTSTEP, lNPTS)
-
-G200:
-        'retrieve data (modDate:TimDif, atcDataSourceWDM.ReadData
-        lNPTS = lNPTS + lIPT - 1
-        lIPT = 1
-
-        If lPYRS = 4 Or lPYRS = 0 Then
-            'leap year, send status report
-            If lPDAY > 0 And lPDAY <= lNPTS Then
-                'leap day needs to be removed
-                lNPTS = lNPTS - 1
-                For J As Integer = lPDAY To lNPTS
-                    lFLOW(J) = lFLOW(J + 1)
-                Next
-                lFLOW(lNPTS + 1) = -999.0
-            End If
-            lPYRS = 1
-        Else
-            'don't need status or to remove leap day
-            lPYRS = lPYRS + 1
-        End If
-
-        Dim K As Integer
-        For J As Integer = 1 To lNPTS
-            If lFLOW(J) >= 0.0 Then
-                lNCNT(J) = lNCNT(J) + 1
-                K = lNCNT(J)
-                lFLDR(K, J) = lFLOW(J)
-            Else
-                lNMIS(J) = lNMIS(J) + 1
-            End If
-        Next
-
-        'adjust dates for next year of data
-        lIPT = 1
-        Dim lproblem As Integer
-        If lproblem Then GoTo G200
-
-        Dim lFMIN As Double = Double.MaxValue
-        Dim lFMAX As Double = Double.MinValue
-
-        For I As Integer = 1 To 365
-            'sort the flows
-            'CALL ASRTRP(NCNT(I), FLDR(1, I))
-            For J As Integer = 1 To aNCI
-                If lNCNT(I) < 2 Then
-                    'no data, or only 1 good value
-                    lFPCT(I, J) = -999.0
-                Else
-                    'compute the percentiles
-                    If aPCTILE(J) < 0.00001 Then
-                        'must be 0, use maximum
-                        lFPCT(I, J) = lFLDR(1, I)
-                    Else
-                        'compute via linear interpolation
-                        'get base location in sorted array for the
-                        'percentile (flip-flop percentiles)
-                    End If
-                End If
-            Next
-        Next
-
-        Return lStr
-    End Function
-
     Private Function TimeserIdString(ByVal aTSer As atcTimeseries) As String
         Dim lStr As String = aTSer.Attributes.GetValue("ISTAID", "")
         If lStr.Trim = "0" Then lStr = ""
@@ -1113,142 +1052,16 @@ G200:
         Next
     End Function
 
-    Public Function DHLPYR(ByVal aYEAR As Integer) As Integer
-        Dim lYear1 As Integer = aYEAR + 1
-        Dim lYear2 As Integer = aYEAR + 2
-        Dim lYear3 As Integer = aYEAR + 3
-        If (aYEAR Mod 4 = 0 And Not aYEAR Mod 100 = 0) Or aYEAR Mod 400 = 0 Then
-            Return 0 'the current year is leap
-        ElseIf (lYear1 Mod 4 = 0 And Not lYear1 Mod 100 = 0) Or lYear1 Mod 400 = 0 Then
-            Return 1 'next year is leap year
-        ElseIf (lYear2 Mod 4 = 0 And Not lYear2 Mod 100 = 0) Or lYear2 Mod 400 = 0 Then
-            Return 2 'leap year is two years later
-        ElseIf (lYear3 Mod 4 = 0 And Not lYear3 Mod 100 = 0) Or lYear3 Mod 400 = 0 Then
-            Return 3 'leap year is three years later
-        End If
-    End Function
-
-    Public Sub DHLEAP(ByVal aDATBGN() As Integer, _
-                      ByVal aSTMO As Integer, _
-                      ByVal aEDMO As Integer, _
-                      ByRef aLPDAY As Integer, ByRef aLPYRS As Integer)
-
-        Dim lDATLEP() As Integer = {0, 2, 28, 24, 0, 0} 'year,month,day,hour,minute,second
-        Dim lTUNITS As Integer = 4
-        Dim lTSSTEP As Integer = 1
-
-        If (aSTMO = 2 Or aEDMO = 2) Or _
-           (aSTMO > 2 And aEDMO >= 2 And aSTMO > aEDMO) Or _
-           (aSTMO = 1 And aEDMO >= 2) Then
-            'February is included in season, which position is leap day
-            If aSTMO <= 2 Then
-                'February in starting year of season
-                lDATLEP(0) = aDATBGN(0)
-                aLPYRS = DHLPYR(aDATBGN(0))
-            Else
-                'February in second year of season
-                lDATLEP(0) = aDATBGN(0) + 1
-                aLPYRS = DHLPYR(aDATBGN(0) + 1)
-            End If
-            'find Feb 28 and increment by 1 to the 29th
-            TimDif(aDATBGN, lDATLEP, lTUNITS, lTSSTEP, aLPDAY)
-            aLPDAY += 1
-        Else
-            'February is not included in season
-            aLPDAY = 0
-            aLPYRS = DHLPYR(aDATBGN(0))
-        End If
-    End Sub
-
-    Public Sub DHBEGN(ByVal aDATBGN() As Integer, _
-                      ByVal aDATEND() As Integer, _
-                      ByVal aSTMO As Integer, _
-                      ByVal aEDMO As Integer, _
-                      ByRef aSEASON() As Integer, _
-                      ByRef aSEASBG() As Integer, _
-                      ByRef aSEASND() As Integer, _
-                      ByRef aIPT As Integer)
-        'C     + + + DUMMY ARGUMENTS + + +
-        'INTEGER   DATBGN(6), DATEND(6), STMO, EDMO,
-        '$         SEASON(12), SEASBG(6), SEASND(6), IPT
-
-        Dim lTUNITS As Integer = 4
-        Dim lTSSTEP As Integer = 1
-        Dim lI6 As Integer = 6
-
-        'COPYI(I6, DATBGN, SEASON)
-        For I As Integer = 0 To 5
-            aSEASON(I) = aDATBGN(I)
-        Next
-        aSEASON(7) = aEDMO
-        aSEASON(9) = 24
-        aSEASON(10) = 0
-        aSEASON(11) = 0
-        aSEASBG(1) = aSTMO
-        aSEASBG(2) = 1
-        aSEASBG(3) = 0
-        aSEASBG(4) = 0
-        aSEASBG(5) = 0
-        aSEASND(1) = aSTMO
-        aSEASND(2) = 1
-        aSEASND(3) = 0
-        aSEASND(4) = 0
-        aSEASND(5) = 0
-
-        If aSTMO <= aEDMO Then
-            'season begins and ends in same calendar year
-            If aDATBGN(1) <= aEDMO Then
-                'start date begins before end of season
-                aSEASON(6) = aDATBGN(0)
-                aSEASBG(0) = aDATBGN(0)
-            Else
-                'start date begins after end of season, next year
-                aSEASON(0) = aDATBGN(0) + 1
-                aSEASON(1) = aSTMO
-                aSEASON(6) = aDATBGN(0) + 1
-                aSEASBG(0) = aDATBGN(0) + 1
-            End If
-            If aDATEND(1) >= aSTMO Then
-                'end date ends after end of season
-                aSEASND(0) = aDATEND(0)
-            Else
-                'end date ends before beginning of season, previous year
-                aSEASND(0) = aDATEND(0) - 1
-            End If
-        Else
-            'season span calendar years
-            If aDATBGN(1) >= aSTMO Then
-                'start date begins before jan 1, season ends in next year
-                aSEASON(6) = aDATBGN(0) + 1
-                aSEASBG(0) = aDATBGN(0)
-            Else
-                'start date begins after jan 1, season ends in same year
-                aSEASON(6) = aDATBGN(0)
-                aSEASBG(0) = aDATBGN(0) - 1
-            End If
-
-            If aDATEND(1) <= aEDMO Then
-                'end date is after jan 1, last season begins in previous year
-                aSEASND(0) = aDATEND(0) - 1
-            Else
-                'end date is before jan 1, last season begins in same year
-                aSEASND(0) = aDATEND(0)
-            End If
-        End If
-        aSEASON(8) = daymon(aSEASON(6), aSEASON(7))
-
-        'where in season does data begin
-        TimDif(aSEASBG, aSEASON, lTUNITS, lTSSTEP, aIPT)
-        aIPT += 1
-    End Sub
-
     Public Class DurationReport
         Private pClassLimits As Generic.List(Of Double)
         Private pExceedPercents As Generic.List(Of Double)
 
         Public Sub New(Optional ByVal aClassLimits As Double() = Nothing)
             'Dim lClassLimits() As Double = {1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000, 10000, 20000, 25000, 50000, 100000}
+            '20801-DO-11 example class limits
             Dim lClassLimits() As Double = {0, 1, 1.4, 2, 2.8, 4, 5.7, 8.1, 11, 16, 23, 33, 46, 66, 93, 130, 190, 270, 380, 530, 760, 1100, 1500, 2200, 3100, 4300, 6100, 8700, 12000, 17000, 25000, 35000, 50000, 71000, 100000}
+            'Original SWSTAT class limits
+            'Dim lClassLimits() As Double = {0.0, 1.0, 1.3, 1.7, 2.3, 3.1, 4.0, 5.3, 7.1, 9.3, 12.0, 16.0, 22.0, 28.0, 38.0, 50.0, 66.0, 87.0, 110.0, 150.0, 200.0, 270.0, 350.0, 460.0, 610.0, 810.0, 1100.0, 1400.0, 1900.0, 2500.0, 3300.0, 4300.0, 5700.0, 7600.0, 10000.0}
             If aClassLimits IsNot Nothing Then
                 lClassLimits = aClassLimits
             End If
@@ -1430,7 +1243,10 @@ G200:
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Function GenerateClasses() As Double()
+        '20801-DO-11 default class limits
         Dim lClassLimits() As Double = {0, 1, 1.4, 2, 2.8, 4, 5.7, 8.1, 11, 16, 23, 33, 46, 66, 93, 130, 190, 270, 380, 530, 760, 1100, 1500, 2200, 3100, 4300, 6100, 8700, 12000, 17000, 25000, 35000, 50000, 71000, 100000}
+        'Default SWSTAT4.1 class limits
+        'Dim lClassLimits() As Double = {0.0, 1.0, 1.3, 1.7, 2.3, 3.1, 4.0, 5.3, 7.1, 9.3, 12.0, 16.0, 22.0, 28.0, 38.0, 50.0, 66.0, 87.0, 110.0, 150.0, 200.0, 270.0, 350.0, 460.0, 610.0, 810.0, 1100.0, 1400.0, 1900.0, 2500.0, 3300.0, 4300.0, 5700.0, 7600.0, 10000.0}
         Return lClassLimits
     End Function
 
