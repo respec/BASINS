@@ -14,7 +14,7 @@ Public Class atcTimeseries
     Private Shared pNaN As Double = atcUtility.GetNaN
 
     ''' <summary>
-    ''' adds two timseries
+    ''' adds each value in two timseries
     ''' </summary>
     ''' <param name="aTimeseries1">first timeseries</param>
     ''' <param name="aTimeseries2">second timeseries</param>
@@ -29,7 +29,7 @@ Public Class atcTimeseries
     End Operator
 
     ''' <summary>
-    ''' adds a constant to a timeseries
+    ''' adds a constant to each value in a timeseries
     ''' </summary>
     ''' <param name="aTimeseries">timeseries</param>
     ''' <param name="aValue">constant</param>
@@ -43,6 +43,13 @@ Public Class atcTimeseries
         Return DoMath("Add", lArgs)
     End Operator
 
+    ''' <summary>
+    ''' subtract each value in a timseries from each value in another timeseries
+    ''' </summary>
+    ''' <param name="aTimeseries1">timeseries to subtract from</param>
+    ''' <param name="aTimeseries2">timeseries to subtract</param>
+    ''' <returns>timeseries</returns>
+    ''' <remarks></remarks>
     Public Shared Operator -(ByVal aTimeseries1 As atcTimeseries, _
                              ByVal aTimeseries2 As atcTimeseries) As atcTimeseries
         Dim lDataGroup As New atcTimeseriesGroup(aTimeseries1, aTimeseries2)
@@ -51,6 +58,13 @@ Public Class atcTimeseries
         Return DoMath("Subtract", lArgs)
     End Operator
 
+    ''' <summary>
+    ''' subtract a constant from each value in a timeseries
+    ''' </summary>
+    ''' <param name="aTimeseries">timeseries</param>
+    ''' <param name="aValue">constant</param>
+    ''' <returns>timeseries</returns>
+    ''' <remarks></remarks>
     Public Shared Operator -(ByVal aTimeseries As atcTimeseries, _
                              ByVal aValue As Double) As atcTimeseries
         Dim lArgs As New atcDataAttributes
@@ -59,6 +73,13 @@ Public Class atcTimeseries
         Return DoMath("Subtract", lArgs)
     End Operator
 
+    ''' <summary>
+    ''' multipliply each value in a timeseries by each value in another timeseries
+    ''' </summary>
+    ''' <param name="aTimeseries1">first timeseries</param>
+    ''' <param name="aTimeseries2">second timeseries</param>
+    ''' <returns>timeseries</returns>
+    ''' <remarks></remarks>
     Public Shared Operator *(ByVal aTimeseries1 As atcTimeseries, _
                              ByVal aTimeseries2 As atcTimeseries) As atcTimeseries
         Dim lDataGroup As New atcTimeseriesGroup(aTimeseries1, aTimeseries2)
@@ -67,6 +88,13 @@ Public Class atcTimeseries
         Return DoMath("Multiply", lArgs)
     End Operator
 
+    ''' <summary>
+    ''' multiplies each value in a timeseries by a constant
+    ''' </summary>
+    ''' <param name="aTimeseries">timeseries</param>
+    ''' <param name="aValue">constant</param>
+    ''' <returns>timeseries</returns>
+    ''' <remarks></remarks>
     Public Shared Operator *(ByVal aTimeseries As atcTimeseries, _
                              ByVal aValue As Double) As atcTimeseries
         Dim lArgs As New atcDataAttributes
@@ -75,6 +103,13 @@ Public Class atcTimeseries
         Return DoMath("Multiply", lArgs)
     End Operator
 
+    ''' <summary>
+    ''' divide each value in a timeseries by each value in another timeseries
+    ''' </summary>
+    ''' <param name="aTimeseries1">first timeseries</param>
+    ''' <param name="aTimeseries2">second timeseries</param>
+    ''' <returns>timeseries</returns>
+    ''' <remarks></remarks>
     Public Shared Operator /(ByVal aTimeseries1 As atcTimeseries, _
                              ByVal aTimeseries2 As atcTimeseries) As atcTimeseries
         Dim lDataGroup As New atcTimeseriesGroup(aTimeseries1, aTimeseries2)
@@ -83,6 +118,13 @@ Public Class atcTimeseries
         Return DoMath("Divide", lArgs)
     End Operator
 
+    ''' <summary>
+    ''' divide each value in a timeseries by a constant
+    ''' </summary>
+    ''' <param name="aTimeseries">timeseries</param>
+    ''' <param name="aValue">constant</param>
+    ''' <returns>timeseries</returns>
+    ''' <remarks></remarks>
     Public Shared Operator /(ByVal aTimeseries As atcTimeseries, _
                              ByVal aValue As Double) As atcTimeseries
         Dim lArgs As New atcDataAttributes
@@ -91,6 +133,13 @@ Public Class atcTimeseries
         Return DoMath("Divide", lArgs)
     End Operator
 
+    ''' <summary>
+    ''' raise each value in a timeseries to an exponent specified by each value in another timeseries
+    ''' </summary>
+    ''' <param name="aTimeseries1">first timeseries</param>
+    ''' <param name="aTimeseries2">second timeseries</param>
+    ''' <returns>timeseries</returns>
+    ''' <remarks></remarks>
     Public Shared Operator ^(ByVal aTimeseries1 As atcTimeseries, _
                              ByVal aTimeseries2 As atcTimeseries) As atcTimeseries
         Dim lDataGroup As New atcTimeseriesGroup(aTimeseries1, aTimeseries2)
@@ -99,6 +148,13 @@ Public Class atcTimeseries
         Return DoMath("Exponent", lArgs)
     End Operator
 
+    ''' <summary>
+    ''' raise each value in a timeseries to an exponent specified by a constant
+    ''' </summary>
+    ''' <param name="aTimeseries">timeseries</param>
+    ''' <param name="aValue">constant</param>
+    ''' <returns>timeseries</returns>
+    ''' <remarks></remarks>
     Public Shared Operator ^(ByVal aTimeseries As atcTimeseries, _
                              ByVal aValue As Double) As atcTimeseries
         Dim lArgs As New atcDataAttributes
