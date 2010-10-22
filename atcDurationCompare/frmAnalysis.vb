@@ -60,6 +60,11 @@ Public Class frmAnalysis
         '                       "Step3. Choose an analysis" & vbNewLine & _
         '                       "Step4. Click either Graph or Report to carry out analysis and see results"
         lstClassLimits.CurrentValues = DefaultClasses
+        If DataGroup.Count = 1 Then
+            rdoAnalysisDuration.Checked = True
+        ElseIf DataGroup.Count = 2 Then
+            rdoAnalysisCompare.Checked = True
+        End If
     End Sub
 
     Private Sub rdoAnalysisCompare_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles rdoAnalysisCompare.CheckedChanged
