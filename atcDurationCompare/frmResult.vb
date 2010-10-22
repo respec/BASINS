@@ -113,11 +113,7 @@ Public Class frmResult
         End If
 
         'Check if the two timeseries has common starting and ending dates
-        If aTimeseriesGroup(0).Attributes.GetValue("Start Date") <> aTimeseriesGroup(1).Attributes.GetValue("Start Date") Or _
-           aTimeseriesGroup(0).Attributes.GetValue("End Date") <> aTimeseriesGroup(1).Attributes.GetValue("End Date") Then
-            txtReport.Text = "The two timeseries needs to have common start and end dates."
-            Exit Sub
-        End If
+        'This check and subsequent fix has been moved into CompareStats
 
         Dim lReport As New DurationReport(aClassLimits)
         With txtReport
@@ -164,6 +160,25 @@ Public Class frmResult
         Dim lZgc As ZedGraphControl = lGraphForm.ZedGraphCtrl
         Dim lGraphDur As New clsGraphProbability(aDatagroup, lZgc)
         lGraphForm.Grapher = lGraphDur
+
+        With lGraphDur.ZedGraphCtrl.GraphPane
+            .XAxis.Title.Text = "Percent Chance Flow Exceeded"
+            .YAxis.Title.Text = "Streamflow, in cubic feet per second"
+            .XAxis.Scale.Min = 0.005
+            .XAxis.Scale.Max = 0.995
+            '.Legend.Border.IsVisible = False
+            '.Legend.Position = LegendPos.InsideTopRight
+            '.Legend.IsVisible = True
+            For Each li As LineItem In .CurveList
+                li.Line.Width = 2
+                Dim lFS As New FontSpec
+                lFS.FontColor = li.Line.Color
+                li.Label.FontSpec = lFS
+                li.Label.FontSpec.Border.IsVisible = False
+            Next
+            .AxisChange()
+        End With
+
         If aSpecification = "" Then
             lGraphForm.Show()
         Else
