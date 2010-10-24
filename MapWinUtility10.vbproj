@@ -104,7 +104,7 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
-    <OutputPath>..\..\mapwindow4dev\bin\</OutputPath>
+    <OutputPath>..\..\mapwindow4dev\bin64\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>
     </DocumentationFile>
