@@ -77,18 +77,35 @@ Public Module modDate
     '    Return FromOADate(aJDate + JulianModification - JulianModification1899)
     'End Function
 
+    ''' <summary>
+    ''' convert a date array to a modfied Julian date (MJD)
+    ''' </summary>
+    ''' <param name="aYr"></param>
+    ''' <param name="aMo"></param>
+    ''' <param name="aDy"></param>
+    ''' <param name="aHr"></param>
+    ''' <param name="aMn"></param>
+    ''' <param name="aSc"></param>
+    ''' <returns>modified Julian date</returns>
+    ''' <remarks></remarks>
+    Public Function Date2J(ByVal aYr As Integer, ByVal aMo As Integer, ByVal aDy As Integer, _
+                           Optional ByVal aHr As Integer = 0, _
+                           Optional ByVal aMn As Integer = 0, _
+                           Optional ByVal aSc As Integer = 0) As Double
+        Dim lJd As Integer = MJD(aYr, aMo, aDy)
+        Dim lHms As Double = HMS2J(aHr, aMn, aSc)
+        Return ljd + lHms
+    End Function
+
     ''' <summary>convert a date array to a modfied Julian date (MJD)</summary>
     ''' <param name="aDate">date array to convert</param>
     ''' <returns>modified Julian date</returns>
     ''' <remarks></remarks>
     Public Function Date2J(ByVal aDate() As Integer) As Double
-        Dim lJd As Integer
-        Dim lHms As Double
         '##LOCAL lJd - date (year, month, day) portion of MJD
         '##LOCAL lHms - time (hour, minute, second) portion of MJD
-
-        lJd = MJD(aDate(0), aDate(1), aDate(2))
-        lHms = HMS2J(aDate(3), aDate(4), aDate(5))
+        Dim lJd As Integer = MJD(aDate(0), aDate(1), aDate(2))
+        Dim lHms As Double = HMS2J(aDate(3), aDate(4), aDate(5))
         Return lJd + lHms
     End Function
 

@@ -1,6 +1,7 @@
 Imports System.Windows.Forms
 Imports atcData
 Imports atcUtility
+Imports MapWinUtility
 
 Friend Class atcDataTreeForm
     Inherits System.Windows.Forms.Form
@@ -18,7 +19,7 @@ Friend Class atcDataTreeForm
         End If
 
         If aDataGroup.Count > 0 Then
-            pDataGroup = aDataGroup 'Don't assign to pDataGroup too soon or it may slow down UserSelectData
+            pTimeseriesGroup = aDataGroup 'Don't assign to pDataGroup too soon or it may slow down UserSelectData
             PopulateTree()
 
             Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
@@ -187,20 +188,11 @@ Friend Class atcDataTreeForm
 #End Region
 
     Private WithEvents pTreeViewMain As TreeView   'tree control
-    Private WithEvents pDataGroup As atcTimeseriesGroup    'group of atcData displayed
+    Private WithEvents pTimeseriesGroup As atcTimeseriesGroup
     Private pNumValuesShowDefault As Integer = 8
     Private pNumValuesShow As Integer = pNumValuesShowDefault
 
     Private Sub PopulateTree()
-        Dim lAttributeName As String
-        Dim lAttributeValue As String
-        Dim lNumValues As Integer
-        Dim lNumValuesNow As Integer
-        Dim lValueStart As Integer
-        Dim lDateString(3) As String
-        Dim lStr As String
-        Dim lDateOffset As Integer 'Mean data is labeled with previous date value (lDateOffset = -1)
-
         If Not pTreeViewMain Is Nothing Then
             Me.Controls.Remove(pTreeViewMain)
         End If
@@ -219,18 +211,18 @@ Friend Class atcDataTreeForm
                    Or AnchorStyles.Right
             Me.Controls.Add(pTreeViewMain)
             .Refresh()
-            For Each lData As atcTimeseries In pDataGroup
-                lData.Attributes.CalculateAll() 'be sure to get everything
-                Dim lNode As New TreeNode
-                lNode = .Nodes.Add(lData.ToString)
+
+            For Each lTimeseries As atcTimeseries In pTimeseriesGroup
+                lTimeseries.Attributes.CalculateAll() 'be sure to get everything
+                Dim lNode As TreeNode = .Nodes.Add(lTimeseries.ToString)
 
                 Dim lAttributeNode As TreeNode = lNode.Nodes.Add("Attributes")
                 Dim lComputedNode As TreeNode = lNode.Nodes.Add("Computed")
-                Dim lAttributes As SortedList = lData.Attributes.ValuesSortedByName
+                Dim lAttributes As SortedList = lTimeseries.Attributes.ValuesSortedByName
                 For lAttributeIndex As Integer = 0 To lAttributes.Count - 1
-                    lAttributeName = lAttributes.GetKey(lAttributeIndex)
-                    lAttributeValue = lData.Attributes.GetFormattedValue(lAttributeName)
-                    If lData.Attributes.GetDefinedValue(lAttributeName).Definition.Calculated Then
+                    Dim lAttributeName As String = lAttributes.GetKey(lAttributeIndex)
+                    Dim lAttributeValue As String = lTimeseries.Attributes.GetFormattedValue(lAttributeName)
+                    If lTimeseries.Attributes.GetDefinedValue(lAttributeName).Definition.Calculated Then
                         lComputedNode.Nodes.Add(lAttributeName & " : " & lAttributeValue)
                     Else
                         lAttributeNode.Nodes.Add(lAttributeName & " : " & lAttributeValue)
@@ -240,42 +232,47 @@ Friend Class atcDataTreeForm
                 lAttributeNode.EnsureVisible()
                 lComputedNode.ExpandAll()
 
-                Dim lInternalNode As New TreeNode
-                lInternalNode = lNode.Nodes.Add("Internal")
-                lNumValues = lData.numValues
+                Dim lInternalNode As TreeNode = lNode.Nodes.Add("Internal")
+                Dim lNumValues As Integer = lTimeseries.numValues
                 lInternalNode.Nodes.Add("NumValues : " & lNumValues)
                 lInternalNode.ExpandAll()
                 lInternalNode.EnsureVisible()
 
-                Dim lDataNode As New TreeNode
-                lDataNode = lNode.Nodes.Add("Data")
+                Dim lDataNode As TreeNode = lNode.Nodes.Add("Data")
+                Dim lNumValuesNow As Integer
                 If lNumValues > pNumValuesShow AndAlso pNumValuesShow <> -1 Then
                     lNumValuesNow = pNumValuesShow
                 Else
                     lNumValuesNow = lNumValues
                 End If
-                If lData.Attributes.GetValue("Point", False) Then
+                Logger.Dbg("NumValuesNow " & lNumValuesNow & " Show " & pNumValuesShow)
+
+                Dim lDateOffset As Integer 'Mean data is labeled with previous date value (lDateOffset = -1)
+                If lTimeseries.Attributes.GetValue("Point", False) Then
                     lDateOffset = 0
                 Else
                     lDateOffset = -1
                 End If
+                Logger.Dbg("DateOffset " & lDateOffset)
+
+                Logger.Dbg("AtStart ValueStart 1 NumValues " & lNumValuesNow)
                 For lValueIndex As Integer = 1 To lNumValuesNow
-                    'data starts at 1, date display is from prev value which is start of interval
-                    lStr = ValueWithAttributes(lData, lValueIndex, lDateOffset)
-                    lDataNode.Nodes.Add(lStr)
+                    'data starts at 1
+                    ' for non point data, date display is from prev value which is start of interval
+                    lDataNode.Nodes.Add(ValueWithAttributes(lTimeseries, lValueIndex, lDateOffset))
                 Next
 
                 If lNumValues > pNumValuesShow AndAlso pNumValuesShow <> -1 Then  'some from end too
+                    Dim lValueStart As Integer
                     If lNumValues - pNumValuesShow + 1 > pNumValuesShow Then
                         lDataNode.Nodes.Add("  <" & lNumValues - (2 * pNumValuesShow) & " values skipped>")
                         lValueStart = lNumValues - pNumValuesShow + 1
                     Else
                         lValueStart = lNumValuesNow
                     End If
-                    For lValueIndex As Integer = lValueStart To lData.numValues
-                        lDateString = DumpDate(lData.Dates.Value(lValueIndex + lDateOffset)).Split(" ")
-                        lStr = ValueWithAttributes(lData, lValueIndex, lDateOffset)
-                        lDataNode.Nodes.Add(lStr)
+                    Logger.Dbg("AtEnd ValueStart " & lValueStart & " NumValues " & lTimeseries.numValues)
+                    For lValueIndex As Integer = lValueStart To lTimeseries.numValues
+                        lDataNode.Nodes.Add(ValueWithAttributes(lTimeseries, lValueIndex, lDateOffset))
                     Next
                 End If
             Next
@@ -286,27 +283,29 @@ Friend Class atcDataTreeForm
     Private Function ValueWithAttributes(ByVal aData As atcTimeseries, _
                                          ByVal aValueIndex As Integer, _
                                          ByVal aDateOffset As Integer) As String
-        Dim lStr As String = ""
-        Dim lConditional As String = ""
         Dim lJDate As Double = aData.Dates.Value(aValueIndex + aDateOffset)
         Dim lDateString() As String = DumpDate(lJDate).Split(" ")
+
         Dim lValueAttributes As atcDataAttributes = Nothing
         If aData.ValueAttributesExist Then
             lValueAttributes = aData.ValueAttributes(aValueIndex)
         End If
+
+        Dim lConditional As String = ""
         If lValueAttributes Is Nothing Then
             lConditional = ""
         Else
             lConditional = lValueAttributes.GetValue("Conditional", "")
         End If
-        lStr = lDateString(0) & " " & _
-               lDateString(1) & " : " & _
-               lConditional & DoubleToString(aData.Value(aValueIndex)) & " : " & _
-               DoubleToString(lJDate)
+        Dim lString As String = lDateString(0) & " " & _
+                                lDateString(1) & " : " & _
+                                lConditional & DoubleToString(aData.Value(aValueIndex)) & " : " & _
+                                DoubleToString(lJDate)
+
         If Not lValueAttributes Is Nothing Then
             'TODO: add display of any attributes other than conditional - as nodes?
         End If
-        Return (lStr)
+        Return lString
     End Function
 
     Friend Sub Save(ByVal aFileName As String)
@@ -332,9 +331,6 @@ Friend Class atcDataTreeForm
 
     Public Overrides Function ToString() As String
         Dim lSB As New Text.StringBuilder
-        Dim lS As String = ""
-        Dim lT As String
-        Dim lTa(3) As String
 
         For lIndexOuter As Integer = 0 To pTreeViewMain.GetNodeCount(False) - 1
             With pTreeViewMain.Nodes(lIndexOuter)
@@ -351,10 +347,10 @@ Friend Class atcDataTreeForm
                             Else
                                 lSB.AppendLine()
                                 For lIndexInner As Integer = 0 To .GetNodeCount(False) - 1
-                                    lS = ""
-                                    lT = .Nodes(lIndexInner).Text.Replace(" : ", vbTab)
+                                    Dim lS As String = ""
+                                    Dim lT As String = .Nodes(lIndexInner).Text.Replace(" : ", vbTab)
                                     If lT.IndexOf(vbTab) > 0 Then
-                                        lTa = lT.Split(vbTab)
+                                        Dim lTa() As String = lT.Split(vbTab)
                                         lS &= vbTab & vbTab & lTa(0).PadRight(24) & vbTab & lTa(1).PadRight(16)
                                         If lTa.GetUpperBound(0) > 1 Then
                                             lS &= vbTab & lTa(2)
@@ -374,8 +370,10 @@ Friend Class atcDataTreeForm
     End Function
 
     Friend Sub TreeAction(ByVal ParamArray aAction() As String)
+        Logger.Dbg("TreeActionCount " & aAction.GetUpperBound(0))
         For Each lAction As String In aAction
             Dim lCurAction() As String = lAction.Split(" ")
+            Logger.Dbg("Action " & lAction)
             Select Case lCurAction(0)
                 Case "Expand"
                     With pTreeViewMain
@@ -393,6 +391,7 @@ Friend Class atcDataTreeForm
                 Case "Display"
                     If IsNumeric(lCurAction(1)) Then
                         pNumValuesShow = lCurAction(1)
+                        Logger.Dbg("NewNumValuesShow " & pNumValuesShow)
                         PopulateTree()
                     End If
             End Select
@@ -404,19 +403,19 @@ Friend Class atcDataTreeForm
     End Function
 
     Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-        atcDataManager.ShowDisplay(sender.Text, pDataGroup)
+        atcDataManager.ShowDisplay(sender.Text, pTimeseriesGroup)
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        atcDataManager.UserSelectData(, pDataGroup)
+        atcDataManager.UserSelectData(, pTimeseriesGroup)
     End Sub
 
-    Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
+    Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pTimeseriesGroup.Added
         PopulateTree()
         'TODO: could efficiently insert newly added item(s)
     End Sub
 
-    Private Sub pDataGroup_Removed(ByVal aRemoved As atcCollection) Handles pDataGroup.Removed
+    Private Sub pDataGroup_Removed(ByVal aRemoved As atcCollection) Handles pTimeseriesGroup.Removed
         PopulateTree()
         'TODO: could efficiently remove by serial number
     End Sub
@@ -442,7 +441,7 @@ Friend Class atcDataTreeForm
     End Sub
 
     Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
-        pDataGroup = Nothing
+        pTimeseriesGroup = Nothing
         pTreeViewMain = Nothing
     End Sub
 
