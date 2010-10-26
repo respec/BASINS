@@ -795,6 +795,7 @@ NextTS:
                 Logger.Progress("", pTotalTS, pTotalTS)
                 lblMatching.Text = "Matching Data (" & pMatchingGroup.Count & " of " & pTotalTS & ")"
                 pMatchingGrid.Refresh()
+                pSelectedGrid.Refresh()
                 'Logger.Dbg("PopulateMatching " & (Date.Now - lTimeStart).TotalSeconds)
             Catch ex As Exception 'Catch anything so we are sure to clear pPopulatingMatching and restore cursor
                 Me.Cursor = lSaveCursor
