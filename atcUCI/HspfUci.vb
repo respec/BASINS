@@ -1701,7 +1701,7 @@ Public Class HspfUci
 
             System.Windows.Forms.Application.DoEvents()
         Catch ex As Exception
-            'TODO: myMsgBox.Show("Cannot open '" & Mid(s, 17, Len(s) - 16) & "' in PreScanFilesBlock." & vbCrLf & vbCrLf & "Error: " & Err.Description, "HSPF Files Error", "+-&OK")
+            Logger.Msg("Error in Files Block" & vbCrLf & vbCrLf & "Error: " & Err.Description, MsgBoxStyle.OkOnly, "HSPF Files Error")
             lFilesOK = False
         End Try
         Return lFilesOK

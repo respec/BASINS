@@ -33,11 +33,11 @@ Partial Class frmEdit
         '
         Me.cmdOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdOk.DialogResult = System.Windows.Forms.DialogResult.OK
-        Me.cmdOk.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdOk.Location = New System.Drawing.Point(12, 270)
-        Me.cmdOk.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.cmdOk.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdOk.Location = New System.Drawing.Point(9, 219)
+        Me.cmdOk.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.cmdOk.Name = "cmdOk"
-        Me.cmdOk.Size = New System.Drawing.Size(80, 39)
+        Me.cmdOk.Size = New System.Drawing.Size(60, 32)
         Me.cmdOk.TabIndex = 0
         Me.cmdOk.Text = "&OK"
         Me.cmdOk.UseVisualStyleBackColor = True
@@ -46,11 +46,11 @@ Partial Class frmEdit
         '
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCancel.Location = New System.Drawing.Point(99, 270)
-        Me.cmdCancel.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdCancel.Location = New System.Drawing.Point(74, 219)
+        Me.cmdCancel.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.cmdCancel.Name = "cmdCancel"
-        Me.cmdCancel.Size = New System.Drawing.Size(80, 39)
+        Me.cmdCancel.Size = New System.Drawing.Size(60, 32)
         Me.cmdCancel.TabIndex = 1
         Me.cmdCancel.Text = "&Cancel"
         Me.cmdCancel.UseVisualStyleBackColor = True
@@ -58,11 +58,11 @@ Partial Class frmEdit
         'cmdApply
         '
         Me.cmdApply.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdApply.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdApply.Location = New System.Drawing.Point(184, 270)
-        Me.cmdApply.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.cmdApply.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdApply.Location = New System.Drawing.Point(138, 219)
+        Me.cmdApply.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.cmdApply.Name = "cmdApply"
-        Me.cmdApply.Size = New System.Drawing.Size(80, 39)
+        Me.cmdApply.Size = New System.Drawing.Size(60, 32)
         Me.cmdApply.TabIndex = 2
         Me.cmdApply.Text = "Apply"
         Me.cmdApply.UseVisualStyleBackColor = True
@@ -70,11 +70,11 @@ Partial Class frmEdit
         'cmdHelp
         '
         Me.cmdHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdHelp.Location = New System.Drawing.Point(269, 270)
-        Me.cmdHelp.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.cmdHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdHelp.Location = New System.Drawing.Point(202, 219)
+        Me.cmdHelp.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.cmdHelp.Name = "cmdHelp"
-        Me.cmdHelp.Size = New System.Drawing.Size(80, 39)
+        Me.cmdHelp.Size = New System.Drawing.Size(60, 32)
         Me.cmdHelp.TabIndex = 3
         Me.cmdHelp.Text = "Help"
         Me.cmdHelp.UseVisualStyleBackColor = True
@@ -82,11 +82,11 @@ Partial Class frmEdit
         'cmdEdit
         '
         Me.cmdEdit.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdEdit.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdEdit.Location = New System.Drawing.Point(553, 270)
-        Me.cmdEdit.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.cmdEdit.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdEdit.Location = New System.Drawing.Point(415, 219)
+        Me.cmdEdit.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.cmdEdit.Name = "cmdEdit"
-        Me.cmdEdit.Size = New System.Drawing.Size(80, 39)
+        Me.cmdEdit.Size = New System.Drawing.Size(60, 32)
         Me.cmdEdit.TabIndex = 4
         Me.cmdEdit.Text = "Edit"
         Me.cmdEdit.UseVisualStyleBackColor = True
@@ -94,11 +94,11 @@ Partial Class frmEdit
         'cmdRemove
         '
         Me.cmdRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdRemove.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdRemove.Location = New System.Drawing.Point(467, 270)
-        Me.cmdRemove.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.cmdRemove.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdRemove.Location = New System.Drawing.Point(350, 219)
+        Me.cmdRemove.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.cmdRemove.Name = "cmdRemove"
-        Me.cmdRemove.Size = New System.Drawing.Size(80, 39)
+        Me.cmdRemove.Size = New System.Drawing.Size(60, 32)
         Me.cmdRemove.TabIndex = 5
         Me.cmdRemove.Text = "Remove"
         Me.cmdRemove.UseVisualStyleBackColor = True
@@ -106,11 +106,11 @@ Partial Class frmEdit
         'cmdAdd
         '
         Me.cmdAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdAdd.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdAdd.Location = New System.Drawing.Point(381, 270)
-        Me.cmdAdd.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.cmdAdd.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdAdd.Location = New System.Drawing.Point(286, 219)
+        Me.cmdAdd.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.cmdAdd.Name = "cmdAdd"
-        Me.cmdAdd.Size = New System.Drawing.Size(80, 39)
+        Me.cmdAdd.Size = New System.Drawing.Size(60, 32)
         Me.cmdAdd.TabIndex = 6
         Me.cmdAdd.Text = "Add"
         Me.cmdAdd.UseVisualStyleBackColor = True
@@ -121,18 +121,18 @@ Partial Class frmEdit
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.panelEdit.Location = New System.Drawing.Point(0, 0)
-        Me.panelEdit.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.panelEdit.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.panelEdit.Name = "panelEdit"
-        Me.panelEdit.Size = New System.Drawing.Size(645, 263)
+        Me.panelEdit.Size = New System.Drawing.Size(484, 214)
         Me.panelEdit.TabIndex = 7
         '
         'frmEdit
         '
         Me.AcceptButton = Me.cmdOk
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.cmdCancel
-        Me.ClientSize = New System.Drawing.Size(645, 310)
+        Me.ClientSize = New System.Drawing.Size(484, 252)
         Me.Controls.Add(Me.panelEdit)
         Me.Controls.Add(Me.cmdAdd)
         Me.Controls.Add(Me.cmdRemove)
@@ -142,7 +142,7 @@ Partial Class frmEdit
         Me.Controls.Add(Me.cmdCancel)
         Me.Controls.Add(Me.cmdOk)
         Me.KeyPreview = True
-        Me.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.Name = "frmEdit"
         Me.Text = "frmEdit"
         Me.ResumeLayout(False)
