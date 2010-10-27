@@ -13,51 +13,61 @@ Public Module modTimeseriesMath
             lIndex = lIndex Xor -1
         End If
         Return lIndex
-
-        '    Dim lEnd As Integer = aDates.GetUpperBound(0)
-        '    While aStartAt < lEnd AndAlso aDates(aStartAt) < aDate
-        '        aStartAt += 1
-        '    End While
-        '    Debug.Print(lIndex & " " & aStartAt)
-        '    Return aStartAt
     End Function
 
+    ''' <summary>
+    ''' Creates a timeseries copied from orginal that only contains dates within specifed range
+    ''' </summary>
+    ''' <param name="aTimeseries">Original timeseries</param>
+    ''' <param name="aStartDate">Starting Julian date</param>
+    ''' <param name="aEndDate">Ending Julian date</param>
+    ''' <param name="aDataSource"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
     Public Function SubsetByDate(ByVal aTimeseries As atcTimeseries, _
                                  ByVal aStartDate As Double, _
                                  ByVal aEndDate As Double, _
                                  ByVal aDataSource As atcTimeseriesSource) As atcTimeseries
-        'TODO: boundary conditions...
+
         If aTimeseries Is Nothing OrElse aTimeseries.Dates Is Nothing Then Return Nothing
+
+        Dim lPointTimeseries As Boolean = aTimeseries.Attributes.GetValue("Point", False)
         Dim lStart As Integer = FindDateAtOrAfter(aTimeseries.Dates.Values, aStartDate)
-        Dim lEnd As Integer = FindDateAtOrAfter(aTimeseries.Dates.Values, aEndDate, lStart) - 1
-        If lEnd > aTimeseries.numValues - 1 Then 'adjust end to actual end
-            lEnd = aTimeseries.numValues - 1
+        Dim lEnd As Integer = FindDateAtOrAfter(aTimeseries.Dates.Values, aEndDate, lStart)
+        If lEnd > aTimeseries.numValues Then 'adjust end to actual end
+            lEnd = aTimeseries.numValues
+        End If
+        'Back up one time step for mean data or point data after end
+        If Not lPointTimeseries OrElse _
+          (lEnd > 0 AndAlso aTimeseries.Dates.Value(lEnd) > aEndDate) Then
+            lEnd -= 1
         End If
 
         Dim lnewTS As New atcTimeseries(aDataSource)
         lnewTS.Dates = New atcTimeseries(aDataSource)
         lnewTS.Attributes.SetValue("Parent Timeseries", aTimeseries)
 
-        Dim numNewValues As Integer = lEnd - lStart + 1
-        If numNewValues > 0 Then
-            Dim newValues(numNewValues) As Double
-            Dim newDates(numNewValues) As Double
-            newValues(0) = GetNaN()
+        Dim lNumNewValues As Integer = lEnd - lStart + 1
+        If lNumNewValues > 0 Then
+            Dim lNewValues(lNumNewValues) As Double
+            Dim lNewDates(lNumNewValues) As Double
+            lNewValues(0) = GetNaN()
 
-            If aTimeseries.Attributes.GetValue("Point", False) Then
-                newDates(0) = GetNaN()
-                System.Array.Copy(aTimeseries.Dates.Values, lStart, newDates, 1, numNewValues)
-                System.Array.Copy(aTimeseries.Values, lStart, newValues, 1, numNewValues)
+            If lPointTimeseries Then
+                lNewDates(0) = GetNaN()
+                System.Array.Copy(aTimeseries.Dates.Values, lStart, lNewDates, 1, lNumNewValues)
+                System.Array.Copy(aTimeseries.Values, lStart, lNewValues, 1, lNumNewValues)
             Else
-                System.Array.Copy(aTimeseries.Dates.Values, lStart, newDates, 0, numNewValues + 1)
-                System.Array.Copy(aTimeseries.Values, lStart + 1, newValues, 1, numNewValues)
+                System.Array.Copy(aTimeseries.Dates.Values, lStart, lNewDates, 0, lNumNewValues + 1)
+                System.Array.Copy(aTimeseries.Values, lStart + 1, lNewValues, 1, lNumNewValues)
             End If
 
-            lnewTS.Values = newValues
-            lnewTS.Dates.Values = newDates
-            CopyBaseAttributes(aTimeseries, lnewTS, numNewValues, lStart + 1, 1)
+            lnewTS.Values = lNewValues
+            lnewTS.Dates.Values = lNewDates
+            CopyBaseAttributes(aTimeseries, lnewTS, lNumNewValues, lStart + 1, 1)
             lnewTS.Attributes.SetValue("SJDAY", aStartDate)
             lnewTS.Attributes.SetValue("EJDAY", aEndDate)
+            lnewTS.Attributes.SetValue("Point", lPointTimeseries)
         Else
             CopyBaseAttributes(aTimeseries, lnewTS)
         End If
