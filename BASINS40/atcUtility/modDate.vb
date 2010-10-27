@@ -424,20 +424,27 @@ Public Module modDate
         addUniqueDate = Not fnd 'true if date added
     End Function
 
-    Public Function DumpDate(ByVal j As Double) As String ', Optional ByVal s As String = "JDate:"
-        '##SUMMARY DumpDate - convert a modfied Julian date to a string
-        '##PARM j - date to convert
-        '##PARM s - optional prefix for output string
-        Dim d(5) As Integer
-        'LOCAL d - date array set to values from j
-        J2Date(j, d)
-        'DumpDate = Format(j, "00000.00000") & " : " & _
-        DumpDate = Format(d(0), "0000") & "/" & _
-                   Format(d(1), "00") & "/" & _
-                   Format(d(2), "00") & " " & _
-                   Format(d(3), "00") & ":" & _
-                   Format(d(4), "00") & ":" & _
-                   Format(d(5), "00")
+    ''' <summary>
+    ''' convert a modfied Julian date to a string
+    ''' </summary>
+    ''' <param name="aDateJ">date to convert</param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Function DumpDate(ByVal aDateJ As Double) As String
+        Dim lDumpDate As String = ""
+        If Double.IsNaN(aDateJ) Then
+            lDumpDate = "<undefined>".PadLeft(19)
+        Else
+            Dim lDate(5) As Integer
+            J2Date(aDateJ, lDate)
+            lDumpDate = Format(lDate(0), "0000") & "/" & _
+                        Format(lDate(1), "00") & "/" & _
+                        Format(lDate(2), "00") & " " & _
+                        Format(lDate(3), "00") & ":" & _
+                        Format(lDate(4), "00") & ":" & _
+                        Format(lDate(5), "00")
+        End If
+        Return lDumpDate
     End Function
 
     'Public Sub DTMCMN(ByVal sdates() As Integer, ByVal edates() As Integer, _
