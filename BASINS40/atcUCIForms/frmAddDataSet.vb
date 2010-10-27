@@ -104,7 +104,8 @@ Public Class frmAddDataSet
             Dim lNewValueNumeric As Double = -999
             If IsNumeric(lNewValue) Then lNewValueNumeric = CDbl(lNewValue)
             Dim lNewColor As Color = aGrid.Source.CellColor(aRow, aColumn)
-            If (lNewValueNumeric >= lMinValue And lMinValue <> -999) AndAlso (lNewValueNumeric <= lMaxValue And lMaxValue <> -999) Then
+            If ((lNewValueNumeric >= lMinValue And lMinValue <> -999) Or lMinValue = -999) AndAlso _
+               ((lNewValueNumeric <= lMaxValue And lMaxValue <> -999) Or lMaxValue = -999) Then
                 lNewColor = aGrid.CellBackColor
             Else
                 lNewColor = Color.Pink

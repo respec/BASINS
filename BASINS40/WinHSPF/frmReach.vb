@@ -140,7 +140,8 @@ Public Class frmReach
             Dim lNewValueNumeric As Double = -999
             If IsNumeric(lNewValue) Then lNewValueNumeric = CDbl(lNewValue)
             Dim lNewColor As Color = aGrid.Source.CellColor(aRow, aColumn)
-            If (lNewValueNumeric >= lMinValue And lMinValue <> -999) AndAlso (lNewValueNumeric <= lMaxValue And lMaxValue <> -999) Then
+            If ((lNewValueNumeric >= lMinValue And lMinValue <> -999) Or lMinValue = -999) AndAlso _
+               ((lNewValueNumeric <= lMaxValue And lMaxValue <> -999) Or lMaxValue = -999) Then
                 lNewColor = aGrid.CellBackColor
             Else
                 lNewColor = Color.Pink
@@ -256,7 +257,7 @@ Public Class frmReach
                            And lConn.Target.VolName = "RCHRES" Then
                             Dim lSourcePos As Integer = 0
                             Dim lTargetPos As Integer = 0
-                            For lIndex As Integer = 1 To pUCI.OpnSeqBlock.Opns.Count
+                            For lIndex As Integer = 0 To pUCI.OpnSeqBlock.Opns.Count - 1
                                 Dim lOper As HspfOperation = pUCI.OpnSeqBlock.Opns(lIndex)
                                 If lOper.Name = lConn.Source.VolName And lOper.Id = lConn.Source.VolId Then
                                     lSourcePos = lIndex

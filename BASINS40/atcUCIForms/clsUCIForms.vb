@@ -107,9 +107,9 @@ Public Class UCIForms
                     End If
                     lForm = Nothing
                 Else
-                    Dim lName1 As String = StrSplit(aTag, ":", "")
-                    Dim lName2 As String = StrSplit(aTag, ":", "")
-                    Dim lName3 As String = StrSplit(aTag, ":", "")
+                    Dim lName1 As String = MapWinUtility.Strings.StrSplit(aTag, ":", "")
+                    Dim lName2 As String = MapWinUtility.Strings.StrSplit(aTag, ":", "")
+                    Dim lName3 As String = MapWinUtility.Strings.StrSplit(aTag, ":", "")
                     If lName3.Length > 0 Then
                         lPage = "Users Control Input/FORMAT OF THE USERS CONTROL INPUT/" & lName1 & " Block/" & lName2 & " input/" & lName3 & ".html"
                     Else

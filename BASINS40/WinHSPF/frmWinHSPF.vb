@@ -420,7 +420,7 @@ Public Class frmWinHSPF
 
     Private Function CheckForOpenUCI() As Boolean
         Dim lReturn As Boolean = True
-        If pUCI Is Nothing Or pUCI.Name.Length = 0 Then
+        If pUCI Is Nothing OrElse pUCI.Name.Length = 0 Then
             Logger.Msg("No project is active." & vbCrLf & vbCrLf & _
                        "Open a project before using this feature.", _
                        MsgBoxStyle.OkOnly, "WinHSPF Problem")
