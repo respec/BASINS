@@ -70,7 +70,7 @@ Public Module modString
         End If
 
         Try
-            If Not Double.IsInfinity(aValue) AndAlso Not Double.IsNaN(aValue) Then
+            If Not Double.IsInfinity(aValue) AndAlso Not Double.IsNaN(aValue) AndAlso aValue > 0 Then
                 lCurPower = Fix(Math.Log10(aValue))
                 If aValue >= 1 Then
                     lCurPower += 1

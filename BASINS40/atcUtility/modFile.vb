@@ -90,7 +90,10 @@ Public Module modFile
         Dim lFilename As String
         For Each lExtension As String In aExtensions
             lFilename = IO.Path.ChangeExtension(aBaseFilename, lExtension)
-            If IO.File.Exists(lFilename) AndAlso Not TryDelete(lFilename, aVerbose) Then lSuccess = False
+            If IO.File.Exists(lFilename) AndAlso Not TryDelete(lFilename, aVerbose) Then
+                lSuccess = False
+                Exit For
+            End If
         Next
         Return lSuccess
     End Function
