@@ -170,10 +170,30 @@ Public Module modStat
         Dim lPctFrac As Double = 0.0
         Dim lNumExceedPct As Double = 0.0
         Dim lAvgClass As Double = 0.0
-        For Each lLimit As Double In aDurationReport.ClassLimitsNeeded(aTimeseries)
-            'lStr &= DecimalAlign(lLimit, 12, 1)
+
+        'Formatting the class limits' print out
+        Dim lListLimits As List(Of Double) = aDurationReport.ClassLimitsNeeded(aTimeseries)
+        Dim lFmtLimitsFraction As String = "0."
+        Dim lSigDigit As Integer = 0
+        For Each lLimit As Double In lListLimits
+            If lLimit > 0 And lLimit < 1 Then 'find the longest fraction value
+                Dim lSigDigitThis As Integer = lLimit.ToString.Substring(lLimit.ToString.IndexOf(".") + 1).Length
+                If lSigDigitThis > lSigDigit Then lSigDigit = lSigDigitThis
+            End If
+        Next
+        For I As Integer = 1 To lSigDigit
+            lFmtLimitsFraction &= "0"
+        Next
+
+        For Each lLimit As Double In lListLimits
             If lClassBuckets.Keys.Contains(lLimit) Then
-                lStr &= DecimalAlign(lLimit, 12, 1)
+                'lStr &= DecimalAlign(lLimit, 12, 1)
+
+                If lLimit > 0 And lLimit < 1 Then
+                    lStr &= DecimalAlign(DoubleToString(lLimit, 12, lFmtLimitsFraction), 12, lSigDigit)
+                Else
+                    lStr &= DecimalAlign(DoubleToString(lLimit, 12, "0.00"), 12, lSigDigit)
+                End If
                 lClassBucket = lClassBuckets.ItemByKey(lLimit)
                 With lClassBucket
                     lStr &= CStr(.Count1).PadLeft(10)
@@ -524,7 +544,7 @@ Public Module modStat
         'Logger.Msg("TPDIF2 * 100 / lGoodcount = " & CStr(TPDIF2))
         lStrBuilder.Append(DoubleToString(lTPDIF2, 10, "0.0").PadLeft(10)) 'Average Percent for Square of Difference: TotalSquareDifference/Total#ofObs
         'lStr &= DecimalAlign(Math.Abs(lMeanAbsoluteError), 15)
-        lStrBuilder.Append(DoubleToString(Math.Abs(lMeanSMO2M1), 10, "0.000").PadLeft(10)) 'mean bias
+        lStrBuilder.Append(DoubleToString(lMeanSMO2M1, 10, "0.000").PadLeft(10)) 'mean bias
         lTPBias *= 100.0
         lTPBias /= lGoodCount
         lStrBuilder.AppendLine(DoubleToString(lTPBias, 10, "0.0").PadLeft(10)) 'Average Percent Bias: TotalPercentBias/Total#ofObs
@@ -1244,9 +1264,9 @@ Public Module modStat
     ''' <remarks></remarks>
     Public Function GenerateClasses() As Double()
         '20801-DO-11 default class limits
-        Dim lClassLimits() As Double = {0, 1, 1.4, 2, 2.8, 4, 5.7, 8.1, 11, 16, 23, 33, 46, 66, 93, 130, 190, 270, 380, 530, 760, 1100, 1500, 2200, 3100, 4300, 6100, 8700, 12000, 17000, 25000, 35000, 50000, 71000, 100000}
+        'Dim lClassLimits() As Double = {0, 1, 1.4, 2, 2.8, 4, 5.7, 8.1, 11, 16, 23, 33, 46, 66, 93, 130, 190, 270, 380, 530, 760, 1100, 1500, 2200, 3100, 4300, 6100, 8700, 12000, 17000, 25000, 35000, 50000, 71000, 100000}
         'Default SWSTAT4.1 class limits
-        'Dim lClassLimits() As Double = {0.0, 1.0, 1.3, 1.7, 2.3, 3.1, 4.0, 5.3, 7.1, 9.3, 12.0, 16.0, 22.0, 28.0, 38.0, 50.0, 66.0, 87.0, 110.0, 150.0, 200.0, 270.0, 350.0, 460.0, 610.0, 810.0, 1100.0, 1400.0, 1900.0, 2500.0, 3300.0, 4300.0, 5700.0, 7600.0, 10000.0}
+        Dim lClassLimits() As Double = {0.0, 1.0, 1.3, 1.7, 2.3, 3.1, 4.0, 5.3, 7.1, 9.3, 12.0, 16.0, 22.0, 28.0, 38.0, 50.0, 66.0, 87.0, 110.0, 150.0, 200.0, 270.0, 350.0, 460.0, 610.0, 810.0, 1100.0, 1400.0, 1900.0, 2500.0, 3300.0, 4300.0, 5700.0, 7600.0, 10000.0}
         Return lClassLimits
     End Function
 
