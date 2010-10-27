@@ -244,7 +244,7 @@ Public Class atcTimeseriesStatistics
             aTimeseries.Attributes.SetValue("Count", CInt(lCount))
             aTimeseries.Attributes.SetValue("Count Positive", CInt(lCountPositive))
             aTimeseries.Attributes.SetValue("Count Missing", CInt(lLastValueIndex - lCount))
-            aTimeseries.Attributes.SetValue("Point", (lLastValueIndex - lCount > lLastValueIndex * 0.75))
+            aTimeseries.Attributes.SetValueIfMissing("Point", (lLastValueIndex - lCount > lLastValueIndex * 0.75))
             aTimeseries.Attributes.SetValue("Count Zero", lCountZero)
             If lCount > 0 Then
                 aTimeseries.Attributes.SetValue("Last", aTimeseries.Value(lLastValueIndex))
