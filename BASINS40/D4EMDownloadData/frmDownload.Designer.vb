@@ -38,13 +38,10 @@ Partial Class frmDownload
         Me.grpNWIS = New System.Windows.Forms.GroupBox
         Me.chkNWIS_GetNWISWQ = New System.Windows.Forms.CheckBox
         Me.chkNWIS_GetNWISMeasurements = New System.Windows.Forms.CheckBox
-        Me.chkNWIS_GetNWISDischarge = New System.Windows.Forms.CheckBox
+        Me.chkNWIS_GetNWISDailyDischarge = New System.Windows.Forms.CheckBox
+        Me.chkNWIS_GetNWISIdaDischarge = New System.Windows.Forms.CheckBox
         Me.panelNWISnoStations = New System.Windows.Forms.Panel
         Me.lblNWISnoStations = New System.Windows.Forms.Label
-        Me.chkTerraServerWebService_Urban = New System.Windows.Forms.CheckBox
-        Me.grpTerraServerWebService = New System.Windows.Forms.GroupBox
-        Me.chkTerraServerWebService_DRG = New System.Windows.Forms.CheckBox
-        Me.chkTerraServerWebService_DOQ = New System.Windows.Forms.CheckBox
         Me.btnHelp = New System.Windows.Forms.Button
         Me.grpNLCD2001 = New System.Windows.Forms.GroupBox
         Me.chkNLCD2001_NED30 = New System.Windows.Forms.CheckBox
@@ -68,6 +65,8 @@ Partial Class frmDownload
         Me.chkNWISStations_gw = New System.Windows.Forms.CheckBox
         Me.chkClip = New System.Windows.Forms.CheckBox
         Me.chkMerge = New System.Windows.Forms.CheckBox
+        Me.chkNLDAS_GetNLDASParameter = New System.Windows.Forms.CheckBox
+        Me.chkNLDAS_GetNLDASGrid = New System.Windows.Forms.CheckBox
         Me.btnDownload = New System.Windows.Forms.Button
         Me.cboRegion = New System.Windows.Forms.ComboBox
         Me.lblRegion = New System.Windows.Forms.Label
@@ -78,12 +77,9 @@ Partial Class frmDownload
         Me.grpNWISStations = New System.Windows.Forms.GroupBox
         Me.chkCacheOnly = New System.Windows.Forms.CheckBox
         Me.grpNLDAS = New System.Windows.Forms.GroupBox
-        Me.chkNLDAS_GetNLDASParameter = New System.Windows.Forms.CheckBox
-        Me.chkNLDAS_GetNLDASGrid = New System.Windows.Forms.CheckBox
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
         Me.panelNWISnoStations.SuspendLayout()
-        Me.grpTerraServerWebService.SuspendLayout()
         Me.grpNLCD2001.SuspendLayout()
         Me.grpNHDplus.SuspendLayout()
         Me.grpSTORET.SuspendLayout()
@@ -107,7 +103,7 @@ Partial Class frmDownload
         Me.grpBASINS.Controls.Add(Me.chkBASINS_Census)
         Me.grpBASINS.Location = New System.Drawing.Point(12, 39)
         Me.grpBASINS.Name = "grpBASINS"
-        Me.grpBASINS.Size = New System.Drawing.Size(460, 68)
+        Me.grpBASINS.Size = New System.Drawing.Size(460, 65)
         Me.grpBASINS.TabIndex = 0
         Me.grpBASINS.TabStop = False
         Me.grpBASINS.Text = "BASINS"
@@ -228,11 +224,12 @@ Partial Class frmDownload
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISWQ)
         Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISMeasurements)
-        Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISDischarge)
+        Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISDailyDischarge)
+        Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISIdaDischarge)
         Me.grpNWIS.Controls.Add(Me.panelNWISnoStations)
-        Me.grpNWIS.Location = New System.Drawing.Point(12, 280)
+        Me.grpNWIS.Location = New System.Drawing.Point(12, 275)
         Me.grpNWIS.Name = "grpNWIS"
-        Me.grpNWIS.Size = New System.Drawing.Size(460, 42)
+        Me.grpNWIS.Size = New System.Drawing.Size(460, 65)
         Me.grpNWIS.TabIndex = 26
         Me.grpNWIS.TabStop = False
         Me.grpNWIS.Text = "Data Values from US Geological Survey National Water Information System"
@@ -244,7 +241,7 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISWQ.Location = New System.Drawing.Point(112, 19)
         Me.chkNWIS_GetNWISWQ.Name = "chkNWIS_GetNWISWQ"
         Me.chkNWIS_GetNWISWQ.Size = New System.Drawing.Size(90, 17)
-        Me.chkNWIS_GetNWISWQ.TabIndex = 28
+        Me.chkNWIS_GetNWISWQ.TabIndex = 29
         Me.chkNWIS_GetNWISWQ.Text = "Water Quality"
         Me.chkNWIS_GetNWISWQ.UseVisualStyleBackColor = True
         '
@@ -255,21 +252,32 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISMeasurements.Location = New System.Drawing.Point(205, 19)
         Me.chkNWIS_GetNWISMeasurements.Name = "chkNWIS_GetNWISMeasurements"
         Me.chkNWIS_GetNWISMeasurements.Size = New System.Drawing.Size(95, 17)
-        Me.chkNWIS_GetNWISMeasurements.TabIndex = 29
+        Me.chkNWIS_GetNWISMeasurements.TabIndex = 30
         Me.chkNWIS_GetNWISMeasurements.Text = "Measurements"
         Me.ToolTip1.SetToolTip(Me.chkNWIS_GetNWISMeasurements, "Periodic Manual Streamflow Measurements")
         Me.chkNWIS_GetNWISMeasurements.UseVisualStyleBackColor = True
         '
-        'chkNWIS_GetNWISDischarge
+        'chkNWIS_GetNWISDailyDischarge
         '
-        Me.chkNWIS_GetNWISDischarge.AutoSize = True
-        Me.chkNWIS_GetNWISDischarge.Enabled = False
-        Me.chkNWIS_GetNWISDischarge.Location = New System.Drawing.Point(6, 19)
-        Me.chkNWIS_GetNWISDischarge.Name = "chkNWIS_GetNWISDischarge"
-        Me.chkNWIS_GetNWISDischarge.Size = New System.Drawing.Size(100, 17)
-        Me.chkNWIS_GetNWISDischarge.TabIndex = 27
-        Me.chkNWIS_GetNWISDischarge.Text = "Daily Discharge"
-        Me.chkNWIS_GetNWISDischarge.UseVisualStyleBackColor = True
+        Me.chkNWIS_GetNWISDailyDischarge.AutoSize = True
+        Me.chkNWIS_GetNWISDailyDischarge.Enabled = False
+        Me.chkNWIS_GetNWISDailyDischarge.Location = New System.Drawing.Point(6, 19)
+        Me.chkNWIS_GetNWISDailyDischarge.Name = "chkNWIS_GetNWISDailyDischarge"
+        Me.chkNWIS_GetNWISDailyDischarge.Size = New System.Drawing.Size(100, 17)
+        Me.chkNWIS_GetNWISDailyDischarge.TabIndex = 27
+        Me.chkNWIS_GetNWISDailyDischarge.Text = "Daily Discharge"
+        Me.chkNWIS_GetNWISDailyDischarge.UseVisualStyleBackColor = True
+        '
+        'chkNWIS_GetNWISIdaDischarge
+        '
+        Me.chkNWIS_GetNWISIdaDischarge.AutoSize = True
+        Me.chkNWIS_GetNWISIdaDischarge.Enabled = False
+        Me.chkNWIS_GetNWISIdaDischarge.Location = New System.Drawing.Point(6, 42)
+        Me.chkNWIS_GetNWISIdaDischarge.Name = "chkNWIS_GetNWISIdaDischarge"
+        Me.chkNWIS_GetNWISIdaDischarge.Size = New System.Drawing.Size(144, 17)
+        Me.chkNWIS_GetNWISIdaDischarge.TabIndex = 28
+        Me.chkNWIS_GetNWISIdaDischarge.Text = "Instantaneous Discharge"
+        Me.chkNWIS_GetNWISIdaDischarge.UseVisualStyleBackColor = True
         '
         'panelNWISnoStations
         '
@@ -278,7 +286,7 @@ Partial Class frmDownload
         Me.panelNWISnoStations.Controls.Add(Me.lblNWISnoStations)
         Me.panelNWISnoStations.Location = New System.Drawing.Point(6, 16)
         Me.panelNWISnoStations.Name = "panelNWISnoStations"
-        Me.panelNWISnoStations.Size = New System.Drawing.Size(448, 20)
+        Me.panelNWISnoStations.Size = New System.Drawing.Size(448, 43)
         Me.panelNWISnoStations.TabIndex = 28
         Me.panelNWISnoStations.Visible = False
         '
@@ -291,58 +299,13 @@ Partial Class frmDownload
         Me.lblNWISnoStations.TabIndex = 0
         Me.lblNWISnoStations.Text = "Station Locations must be selected on the map before data value download"
         '
-        'chkTerraServerWebService_Urban
-        '
-        Me.chkTerraServerWebService_Urban.AutoSize = True
-        Me.chkTerraServerWebService_Urban.Location = New System.Drawing.Point(6, 19)
-        Me.chkTerraServerWebService_Urban.Name = "chkTerraServerWebService_Urban"
-        Me.chkTerraServerWebService_Urban.Size = New System.Drawing.Size(80, 17)
-        Me.chkTerraServerWebService_Urban.TabIndex = 12
-        Me.chkTerraServerWebService_Urban.Text = "Urban Area"
-        Me.chkTerraServerWebService_Urban.UseVisualStyleBackColor = True
-        '
-        'grpTerraServerWebService
-        '
-        Me.grpTerraServerWebService.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.grpTerraServerWebService.Controls.Add(Me.chkTerraServerWebService_DRG)
-        Me.grpTerraServerWebService.Controls.Add(Me.chkTerraServerWebService_DOQ)
-        Me.grpTerraServerWebService.Controls.Add(Me.chkTerraServerWebService_Urban)
-        Me.grpTerraServerWebService.Location = New System.Drawing.Point(418, 308)
-        Me.grpTerraServerWebService.Name = "grpTerraServerWebService"
-        Me.grpTerraServerWebService.Size = New System.Drawing.Size(460, 42)
-        Me.grpTerraServerWebService.TabIndex = 9
-        Me.grpTerraServerWebService.TabStop = False
-        Me.grpTerraServerWebService.Text = "TerraServer Images"
-        Me.grpTerraServerWebService.Visible = False
-        '
-        'chkTerraServerWebService_DRG
-        '
-        Me.chkTerraServerWebService_DRG.AutoSize = True
-        Me.chkTerraServerWebService_DRG.Location = New System.Drawing.Point(233, 19)
-        Me.chkTerraServerWebService_DRG.Name = "chkTerraServerWebService_DRG"
-        Me.chkTerraServerWebService_DRG.Size = New System.Drawing.Size(50, 17)
-        Me.chkTerraServerWebService_DRG.TabIndex = 14
-        Me.chkTerraServerWebService_DRG.Text = "DRG"
-        Me.chkTerraServerWebService_DRG.UseVisualStyleBackColor = True
-        '
-        'chkTerraServerWebService_DOQ
-        '
-        Me.chkTerraServerWebService_DOQ.AutoSize = True
-        Me.chkTerraServerWebService_DOQ.Location = New System.Drawing.Point(112, 19)
-        Me.chkTerraServerWebService_DOQ.Name = "chkTerraServerWebService_DOQ"
-        Me.chkTerraServerWebService_DOQ.Size = New System.Drawing.Size(50, 17)
-        Me.chkTerraServerWebService_DOQ.TabIndex = 13
-        Me.chkTerraServerWebService_DOQ.Text = "DOQ"
-        Me.chkTerraServerWebService_DOQ.UseVisualStyleBackColor = True
-        '
         'btnHelp
         '
         Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnHelp.Location = New System.Drawing.Point(266, 482)
+        Me.btnHelp.Location = New System.Drawing.Point(266, 490)
         Me.btnHelp.Name = "btnHelp"
         Me.btnHelp.Size = New System.Drawing.Size(59, 23)
-        Me.btnHelp.TabIndex = 41
+        Me.btnHelp.TabIndex = 45
         Me.btnHelp.Text = "Help"
         Me.ToolTip1.SetToolTip(Me.btnHelp, "Launch old data download tool")
         Me.btnHelp.UseVisualStyleBackColor = True
@@ -356,7 +319,7 @@ Partial Class frmDownload
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD2001_Canopy)
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD2001_Impervious)
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD2001_LandCover)
-        Me.grpNLCD2001.Location = New System.Drawing.Point(12, 328)
+        Me.grpNLCD2001.Location = New System.Drawing.Point(12, 346)
         Me.grpNLCD2001.Name = "grpNLCD2001"
         Me.grpNLCD2001.Size = New System.Drawing.Size(460, 42)
         Me.grpNLCD2001.TabIndex = 30
@@ -426,9 +389,9 @@ Partial Class frmDownload
         Me.grpNHDplus.Controls.Add(Me.chkNHDplus_elev_cm)
         Me.grpNHDplus.Controls.Add(Me.chkNHDplus_All)
         Me.grpNHDplus.Controls.Add(Me.chkNHDplus_Catchment)
-        Me.grpNHDplus.Location = New System.Drawing.Point(12, 113)
+        Me.grpNHDplus.Location = New System.Drawing.Point(12, 110)
         Me.grpNHDplus.Name = "grpNHDplus"
-        Me.grpNHDplus.Size = New System.Drawing.Size(460, 113)
+        Me.grpNHDplus.Size = New System.Drawing.Size(460, 111)
         Me.grpNHDplus.TabIndex = 12
         Me.grpNHDplus.TabStop = False
         Me.grpNHDplus.Text = "National Hydrography Dataset Plus"
@@ -545,10 +508,10 @@ Partial Class frmDownload
         Me.chkNWISStations_discharge.AutoSize = True
         Me.chkNWISStations_discharge.Location = New System.Drawing.Point(6, 19)
         Me.chkNWISStations_discharge.Name = "chkNWISStations_discharge"
-        Me.chkNWISStations_discharge.Size = New System.Drawing.Size(100, 17)
+        Me.chkNWISStations_discharge.Size = New System.Drawing.Size(74, 17)
         Me.chkNWISStations_discharge.TabIndex = 22
-        Me.chkNWISStations_discharge.Text = "Daily Discharge"
-        Me.ToolTip1.SetToolTip(Me.chkNWISStations_discharge, "Daily Discharge Station Point Layer")
+        Me.chkNWISStations_discharge.Text = "Discharge"
+        Me.ToolTip1.SetToolTip(Me.chkNWISStations_discharge, "Discharge Station Point Layer")
         Me.chkNWISStations_discharge.UseVisualStyleBackColor = True
         '
         'chkNWISStations_gw
@@ -566,10 +529,10 @@ Partial Class frmDownload
         '
         Me.chkClip.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkClip.AutoSize = True
-        Me.chkClip.Location = New System.Drawing.Point(124, 486)
+        Me.chkClip.Location = New System.Drawing.Point(124, 494)
         Me.chkClip.Name = "chkClip"
         Me.chkClip.Size = New System.Drawing.Size(92, 17)
-        Me.chkClip.TabIndex = 40
+        Me.chkClip.TabIndex = 43
         Me.chkClip.Text = "Clip to Region"
         Me.ToolTip1.SetToolTip(Me.chkClip, "Discard additional data if a larger area was retrieved than was requested")
         Me.chkClip.UseVisualStyleBackColor = True
@@ -578,21 +541,44 @@ Partial Class frmDownload
         '
         Me.chkMerge.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkMerge.AutoSize = True
-        Me.chkMerge.Location = New System.Drawing.Point(17, 486)
+        Me.chkMerge.Location = New System.Drawing.Point(18, 494)
         Me.chkMerge.Name = "chkMerge"
         Me.chkMerge.Size = New System.Drawing.Size(56, 17)
-        Me.chkMerge.TabIndex = 39
+        Me.chkMerge.TabIndex = 42
         Me.chkMerge.Text = "Merge"
         Me.ToolTip1.SetToolTip(Me.chkMerge, "Merge parts of the same dataset from different areas to form one layer")
         Me.chkMerge.UseVisualStyleBackColor = True
         '
+        'chkNLDAS_GetNLDASParameter
+        '
+        Me.chkNLDAS_GetNLDASParameter.AutoSize = True
+        Me.chkNLDAS_GetNLDASParameter.Enabled = False
+        Me.chkNLDAS_GetNLDASParameter.Location = New System.Drawing.Point(112, 19)
+        Me.chkNLDAS_GetNLDASParameter.Name = "chkNLDAS_GetNLDASParameter"
+        Me.chkNLDAS_GetNLDASParameter.Size = New System.Drawing.Size(262, 17)
+        Me.chkNLDAS_GetNLDASParameter.TabIndex = 41
+        Me.chkNLDAS_GetNLDASParameter.Text = "Precipitation (available after grid selection on map)"
+        Me.ToolTip1.SetToolTip(Me.chkNLDAS_GetNLDASParameter, "Hourly Precipitation for selected NLDAS grids")
+        Me.chkNLDAS_GetNLDASParameter.UseVisualStyleBackColor = True
+        '
+        'chkNLDAS_GetNLDASGrid
+        '
+        Me.chkNLDAS_GetNLDASGrid.AutoSize = True
+        Me.chkNLDAS_GetNLDASGrid.Location = New System.Drawing.Point(6, 19)
+        Me.chkNLDAS_GetNLDASGrid.Name = "chkNLDAS_GetNLDASGrid"
+        Me.chkNLDAS_GetNLDASGrid.Size = New System.Drawing.Size(45, 17)
+        Me.chkNLDAS_GetNLDASGrid.TabIndex = 40
+        Me.chkNLDAS_GetNLDASGrid.Text = "Grid"
+        Me.ToolTip1.SetToolTip(Me.chkNLDAS_GetNLDASGrid, "NLDAS Grid Layer")
+        Me.chkNLDAS_GetNLDASGrid.UseVisualStyleBackColor = True
+        '
         'btnDownload
         '
         Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDownload.Location = New System.Drawing.Point(396, 482)
+        Me.btnDownload.Location = New System.Drawing.Point(396, 490)
         Me.btnDownload.Name = "btnDownload"
         Me.btnDownload.Size = New System.Drawing.Size(75, 23)
-        Me.btnDownload.TabIndex = 43
+        Me.btnDownload.TabIndex = 47
         Me.btnDownload.Text = "Download"
         Me.btnDownload.UseVisualStyleBackColor = True
         '
@@ -620,10 +606,10 @@ Partial Class frmDownload
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(331, 482)
+        Me.btnCancel.Location = New System.Drawing.Point(331, 490)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(59, 23)
-        Me.btnCancel.TabIndex = 42
+        Me.btnCancel.TabIndex = 46
         Me.btnCancel.Text = "Cancel"
         Me.btnCancel.UseVisualStyleBackColor = True
         '
@@ -633,7 +619,7 @@ Partial Class frmDownload
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpSTORET.Controls.Add(Me.chkSTORET_Results)
         Me.grpSTORET.Controls.Add(Me.chkSTORET_Stations)
-        Me.grpSTORET.Location = New System.Drawing.Point(12, 376)
+        Me.grpSTORET.Location = New System.Drawing.Point(12, 394)
         Me.grpSTORET.Name = "grpSTORET"
         Me.grpSTORET.Size = New System.Drawing.Size(460, 42)
         Me.grpSTORET.TabIndex = 36
@@ -669,7 +655,7 @@ Partial Class frmDownload
         Me.grpNWISStations.Controls.Add(Me.chkNWISStations_qw)
         Me.grpNWISStations.Controls.Add(Me.chkNWISStations_measurement)
         Me.grpNWISStations.Controls.Add(Me.chkNWISStations_discharge)
-        Me.grpNWISStations.Location = New System.Drawing.Point(12, 232)
+        Me.grpNWISStations.Location = New System.Drawing.Point(12, 227)
         Me.grpNWISStations.Name = "grpNWISStations"
         Me.grpNWISStations.Size = New System.Drawing.Size(460, 42)
         Me.grpNWISStations.TabIndex = 21
@@ -680,7 +666,7 @@ Partial Class frmDownload
         '
         Me.chkCacheOnly.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkCacheOnly.AutoSize = True
-        Me.chkCacheOnly.Location = New System.Drawing.Point(222, 486)
+        Me.chkCacheOnly.Location = New System.Drawing.Point(222, 494)
         Me.chkCacheOnly.Name = "chkCacheOnly"
         Me.chkCacheOnly.Size = New System.Drawing.Size(81, 17)
         Me.chkCacheOnly.TabIndex = 44
@@ -694,35 +680,12 @@ Partial Class frmDownload
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpNLDAS.Controls.Add(Me.chkNLDAS_GetNLDASParameter)
         Me.grpNLDAS.Controls.Add(Me.chkNLDAS_GetNLDASGrid)
-        Me.grpNLDAS.Location = New System.Drawing.Point(12, 424)
+        Me.grpNLDAS.Location = New System.Drawing.Point(12, 442)
         Me.grpNLDAS.Name = "grpNLDAS"
         Me.grpNLDAS.Size = New System.Drawing.Size(460, 42)
-        Me.grpNLDAS.TabIndex = 45
+        Me.grpNLDAS.TabIndex = 39
         Me.grpNLDAS.TabStop = False
         Me.grpNLDAS.Text = "North American Land Data Assimilation System"
-        '
-        'chkNLDAS_GetNLDASParameter
-        '
-        Me.chkNLDAS_GetNLDASParameter.AutoSize = True
-        Me.chkNLDAS_GetNLDASParameter.Enabled = False
-        Me.chkNLDAS_GetNLDASParameter.Location = New System.Drawing.Point(112, 19)
-        Me.chkNLDAS_GetNLDASParameter.Name = "chkNLDAS_GetNLDASParameter"
-        Me.chkNLDAS_GetNLDASParameter.Size = New System.Drawing.Size(84, 17)
-        Me.chkNLDAS_GetNLDASParameter.TabIndex = 23
-        Me.chkNLDAS_GetNLDASParameter.Text = "Precipitation (available after grid selection on map)"
-        Me.ToolTip1.SetToolTip(Me.chkNLDAS_GetNLDASParameter, "Hourly Precipitation for selected NLDAS grids")
-        Me.chkNLDAS_GetNLDASParameter.UseVisualStyleBackColor = True
-        '
-        'chkNLDAS_GetNLDASStations
-        '
-        Me.chkNLDAS_GetNLDASGrid.AutoSize = True
-        Me.chkNLDAS_GetNLDASGrid.Location = New System.Drawing.Point(6, 19)
-        Me.chkNLDAS_GetNLDASGrid.Name = "chkNLDAS_GetNLDASGrid"
-        Me.chkNLDAS_GetNLDASGrid.Size = New System.Drawing.Size(64, 17)
-        Me.chkNLDAS_GetNLDASGrid.TabIndex = 22
-        Me.chkNLDAS_GetNLDASGrid.Text = "Grid"
-        Me.ToolTip1.SetToolTip(Me.chkNLDAS_GetNLDASGrid, "NLDAS Grid Layer")
-        Me.chkNLDAS_GetNLDASGrid.UseVisualStyleBackColor = True
         '
         'frmDownload
         '
@@ -730,7 +693,7 @@ Partial Class frmDownload
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(484, 517)
+        Me.ClientSize = New System.Drawing.Size(484, 525)
         Me.Controls.Add(Me.grpNLDAS)
         Me.Controls.Add(Me.grpNWISStations)
         Me.Controls.Add(Me.grpNLCD2001)
@@ -743,7 +706,6 @@ Partial Class frmDownload
         Me.Controls.Add(Me.grpNHDplus)
         Me.Controls.Add(Me.grpNWIS)
         Me.Controls.Add(Me.grpBASINS)
-        Me.Controls.Add(Me.grpTerraServerWebService)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnHelp)
         Me.Controls.Add(Me.chkCacheOnly)
@@ -759,8 +721,6 @@ Partial Class frmDownload
         Me.grpNWIS.PerformLayout()
         Me.panelNWISnoStations.ResumeLayout(False)
         Me.panelNWISnoStations.PerformLayout()
-        Me.grpTerraServerWebService.ResumeLayout(False)
-        Me.grpTerraServerWebService.PerformLayout()
         Me.grpNLCD2001.ResumeLayout(False)
         Me.grpNLCD2001.PerformLayout()
         Me.grpNHDplus.ResumeLayout(False)
@@ -786,11 +746,8 @@ Partial Class frmDownload
     Friend WithEvents chkBASINS_DEM As System.Windows.Forms.CheckBox
     Friend WithEvents chkBASINS_MetStations As System.Windows.Forms.CheckBox
     Friend WithEvents chkNWIS_GetNWISMeasurements As System.Windows.Forms.CheckBox
-    Friend WithEvents chkNWIS_GetNWISDischarge As System.Windows.Forms.CheckBox
-    Friend WithEvents chkTerraServerWebService_Urban As System.Windows.Forms.CheckBox
-    Friend WithEvents grpTerraServerWebService As System.Windows.Forms.GroupBox
-    Friend WithEvents chkTerraServerWebService_DRG As System.Windows.Forms.CheckBox
-    Friend WithEvents chkTerraServerWebService_DOQ As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNWIS_GetNWISDailyDischarge As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNWIS_GetNWISIdaDischarge As System.Windows.Forms.CheckBox
     Friend WithEvents grpNLCD2001 As System.Windows.Forms.GroupBox
     Friend WithEvents chkNLCD2001_LandCover As System.Windows.Forms.CheckBox
     Friend WithEvents grpNHDplus As System.Windows.Forms.GroupBox

@@ -1,10 +1,14 @@
 Public Class frmWDM
 
-    Public Function AskUser(ByVal aIcon As Drawing.Icon, ByVal aType As String, ByVal aSaveFolder As String) As String
+    Public Function AskUser(ByVal aIcon As Drawing.Icon, ByVal aType As String, ByVal aSaveFolder As String, Optional ByVal aWindowTitle As String = Nothing) As String
         Dim lSaveDir As String = CurDir()
         atcUtility.ChDriveDir(aSaveFolder)
         Me.Icon = aIcon
-        Me.Text = aType & Me.Text
+        If aWindowTitle Is Nothing Then
+            Me.Text = aType & Me.Text
+        Else
+            Me.Text = aWindowTitle
+        End If
         lblMessage.Text &= aType & " data,"
 
         Dim lFilename As String = IO.Path.Combine(aSaveFolder, aType.ToLower & ".wdm")

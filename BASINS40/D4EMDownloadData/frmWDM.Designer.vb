@@ -155,7 +155,7 @@ Partial Class frmWDM
         Me.Controls.Add(Me.RadioIndividual)
         Me.Controls.Add(Me.btnOk)
         Me.Name = "frmWDM"
-        Me.Text = " post-processing options"
+        Me.Text = " Processing Options"
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
