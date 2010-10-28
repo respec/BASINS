@@ -191,8 +191,9 @@ Public Class frmDownload
                 Dim lFilename As String = IO.Path.GetFileNameWithoutExtension(lLayer.FileName).ToLower
                 Select Case lFilename
                     Case "nwis_stations_discharge"
-                        chkNWIS_GetNWISDischarge.Enabled = True
-                        chkNWIS_GetNWISDischarge.Checked = True
+                        chkNWIS_GetNWISDailyDischarge.Enabled = True
+                        chkNWIS_GetNWISDailyDischarge.Checked = True
+                        chkNWIS_GetNWISIdaDischarge.Enabled = True
                     Case "nwis_stations_qw"
                         chkNWIS_GetNWISWQ.Enabled = True
                         chkNWIS_GetNWISWQ.Checked = True
@@ -216,12 +217,14 @@ Public Class frmDownload
                 End Select
             End If
         End If
-        If Not chkNWIS_GetNWISDischarge.Enabled AndAlso _
+        If Not chkNWIS_GetNWISDailyDischarge.Enabled AndAlso _
+           Not chkNWIS_GetNWISIdaDischarge.Enabled AndAlso _
            Not chkNWIS_GetNWISWQ.Enabled AndAlso _
            Not chkNWIS_GetNWISMeasurements.Enabled Then
             panelNWISnoStations.Visible = True
             panelNWISnoStations.BringToFront()
-            chkNWIS_GetNWISDischarge.Visible = False
+            chkNWIS_GetNWISDailyDischarge.Visible = False
+            chkNWIS_GetNWISIdaDischarge.Visible = False
             chkNWIS_GetNWISMeasurements.Visible = False
             chkNWIS_GetNWISWQ.Visible = False
         End If
@@ -259,7 +262,8 @@ Public Class frmDownload
                         Case "NWIS.WaterQualityStations" : chkNWISStations_qw.BackColor = lColor
                         Case "NWIS.MeasurementStations" : chkNWISStations_measurement.BackColor = lColor
                         Case "NWIS.GroundwaterStations" : chkNWISStations_gw.BackColor = lColor
-                        Case "NWIS.DischargeData" : chkNWIS_GetNWISDischarge.BackColor = lColor
+                        Case "NWIS.DischargeData" : chkNWIS_GetNWISDailyDischarge.BackColor = lColor
+                        Case "NWIS.IdaDischarge" : chkNWIS_GetNWISIdaDischarge.BackColor = lColor
                         Case "NWIS.WaterQualityData" : chkNWIS_GetNWISWQ.BackColor = lColor
                         Case "NWIS.MeasurementData" : chkNWIS_GetNWISMeasurements.BackColor = lColor
                         Case "Seamless.NLCD1992LandCover" : chkNLCD2001_1992.BackColor = lColor
@@ -334,13 +338,20 @@ Public Class frmDownload
                             If lChildName.ToLower.StartsWith("get") Then 'this checkbox has its own function name
 
                                 Dim lWDMxml As String = ""
-                                If lChild Is chkNWIS_GetNWISDischarge Then
+                                If lChild Is chkNWIS_GetNWISDailyDischarge Then
                                     Dim lWDMfrm As New frmWDM
-                                    lWDMxml = lWDMfrm.AskUser(Me.Icon, "Flow", IO.Path.Combine(lSaveFolderOnly, "nwis"))
+                                    lWDMxml = lWDMfrm.AskUser(Me.Icon, "Flow", IO.Path.Combine(lSaveFolderOnly, "nwis"), _
+                                                              lChild.Text & " Processing Options")
+                                End If
+                                If lChild Is chkNWIS_GetNWISIdaDischarge Then
+                                    Dim lWDMfrm As New frmWDM
+                                    lWDMxml = lWDMfrm.AskUser(Me.Icon, "Flow", IO.Path.Combine(lSaveFolderOnly, "nwis"), _
+                                                              lChild.Text & " Processing Options")
                                 End If
                                 If lChild Is chkNLDAS_GetNLDASParameter Then
                                     Dim lWDMfrm As New frmWDM
-                                    lWDMxml = lWDMfrm.AskUser(Me.Icon, "NLDASPrecipitation", IO.Path.Combine(lSaveFolderOnly, "nldas"))
+                                    lWDMxml = lWDMfrm.AskUser(Me.Icon, "NLDASPrecipitation", IO.Path.Combine(lSaveFolderOnly, "nldas"), _
+                                                              "NLDAS Precipitation Processing Options")
                                 End If
                                 If lWDMxml IsNot Nothing Then
                                     lXML &= "<function name='" & lChildName & "'>" & vbCrLf _
@@ -359,7 +370,8 @@ Public Class frmDownload
                         Dim lWDMxml As String = ""
                         If lCheckedChildren.Contains("<DataType>MetData</DataType>") Then
                             Dim lWDMfrm As New frmWDM
-                            lWDMxml = lWDMfrm.AskUser(Me.Icon, "Met", IO.Path.Combine(lSaveFolderOnly, "met"))
+                            lWDMxml = lWDMfrm.AskUser(Me.Icon, "Met", IO.Path.Combine(lSaveFolderOnly, "met"), _
+                                                      "Met Data Processing Options")
                         End If
                         If lWDMxml IsNot Nothing Then
                             lXML &= "<function name='Get" & lControl.Name.Substring(3) & "'>" & vbCrLf _
