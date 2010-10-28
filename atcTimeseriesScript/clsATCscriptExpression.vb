@@ -571,8 +571,8 @@ ParseFixedDef:
         Static WarnedAboutNonNumericValue As Boolean
         Static WarnedAboutNonNumericDataset As Boolean
         Dim SubExp As Integer
-        Dim tmpval As String
-        Dim tmpval2 As String
+        Dim tmpval As String = Nothing
+        Dim tmpval2 As String = Nothing
         Dim retval As String
         Dim ForMin As Integer
         Dim ForCounter As Integer
