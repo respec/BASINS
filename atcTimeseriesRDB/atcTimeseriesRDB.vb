@@ -67,26 +67,63 @@ Public Class atcTimeseriesRDB
                 Dim lWQData As Boolean = False
                 Dim lMeasurementsData As Boolean = False
                 Dim lIdaData As Boolean = False
+                Dim lDailyDischargeData As Boolean = False
 
                 Dim lAttributes As New atcDataAttributes
-                Dim lCurLine As String = NextLine(lInputReader).Substring(2)
-                If lCurLine.IndexOf("qwdata") > -1 Then 'TODO: need better way - only true with BASINS download
-                    lWQData = True
-                    lAttributes.SetValue("URL", lCurLine)
-                ElseIf lCurLine.IndexOf("measurements") > -1 Then
-                    lMeasurementsData = True
-                    lAttributes.SetValue("URL", lCurLine)
-                ElseIf (IO.Path.GetExtension(Specification).ToLower = ".txt") AndAlso lCurLine.StartsWith("retrieved") Then
-                    lIdaData = True
-                Else
-                    lAttributes.SetValue("URL", lCurLine)
-                End If
+                Dim lCurLine As String 
 
                 Dim lAttrName As String
                 Dim lAttrValue As String
-                While lInputReader.PeekChar = Asc("#")
+                While lInputReader.PeekChar = 35 ' Asc("#")
                     lCurLine = NextLine(lInputReader)
-                    If lCurLine.Length = 1 Then Exit While
+
+                    If lCurLine.Contains("Data for the following station is contained in this file") Then
+                        With lAttributes
+                            If Not .ContainsAttribute("AGENCY") Then 'Only parse this line if attributes not already set
+                                lCurLine = NextLine(lInputReader)
+                                If lCurLine.Contains("----------") Then
+                                    lCurLine = NextLine(lInputReader).Substring(1).Trim
+                                    .SetValue("AGENCY", MapWinUtility.Strings.StrSplit(lCurLine, " ", ""))
+                                    .SetValue("Location", MapWinUtility.Strings.StrSplit(lCurLine, " ", ""))
+                                    .SetValue("StaNam", lCurLine.Trim)
+                                End If
+                            End If
+                        End With
+                    End If
+
+                    If lCurLine.Contains("http://") Then
+                        If lCurLine.Contains("qwdata") Then
+                            lWQData = True
+                        ElseIf lCurLine.Contains("measurement") Then
+                            lMeasurementsData = True
+                        ElseIf lCurLine.Contains("dv?") OrElse lCurLine.Contains("provisional") Then
+                            lDailyDischargeData = True
+                        ElseIf lCurLine.Contains("ida.water.usgs.gov") Then
+                            lIdaData = True
+                        End If
+                        If Not lAttributes.ContainsAttribute("URL") Then
+                            lAttributes.SetValueIfMissing("URL", lCurLine.Substring(lCurLine.IndexOf("http://")).Trim)
+                        End If
+                    ElseIf lCurLine.Contains("File created on") Then
+                        lAttributes.SetValue("retrieved", lCurLine.Substring(lCurLine.IndexOf("File created on") + 15).Trim)
+                    ElseIf lCurLine.Contains("retrieved:") Then
+                        lAttributes.SetValue("retrieved", lCurLine.Substring(lCurLine.IndexOf("retrieved:") + 10).Trim)
+                    ElseIf lCurLine.Contains("contains selected water-quality data") Then
+                        lWQData = True
+                        Exit While
+                    ElseIf lCurLine.Contains("instantaneous data archive") Then
+                        lIdaData = True
+                        Exit While
+                    ElseIf lCurLine.Contains("DD parameter statistic") Then
+                        lDailyDischargeData = True
+                        Exit While
+                    ElseIf lCurLine.Contains("Surface water measurements") Then
+                        lMeasurementsData = True
+                        Exit While
+                    ElseIf lMeasurementsData AndAlso lCurLine.Contains("Stations in this file include") Then
+                        Exit While
+                    End If
+
                     If lCurLine.Length > 50 Then
                         lAttrName = lCurLine.Substring(2, 48).Trim
                         lAttrValue = lCurLine.Substring(50).Trim
@@ -118,9 +155,8 @@ Public Class atcTimeseriesRDB
                 ElseIf lMeasurementsData Then
                     ProcessMeasurements(lInputReader, lAttributes)
                 ElseIf lIdaData Then
-                    Logger.Dbg("AboutToProcessIdaValues;Elapsed " & (Now - lTimeStartOpen).TotalSeconds)
                     ProcessIdaValues(lInputReader, lAttributes)
-                Else
+                Else 'If lDailyDischargeData Then
                     ProcessDailyValues(lInputReader, lAttributes)
                 End If
 
@@ -478,11 +514,6 @@ Public Class atcTimeseriesRDB
             Dim lCurLine As String
             While aInputReader.PeekChar = Asc("#")
                 lCurLine = NextLine(aInputReader)
-                If lCurLine.StartsWith("#  USGS") Then
-                    .Attributes.Add("Agency", "USGS")
-                    .Attributes.Add("Location", lCurLine.Substring(8, 8))
-                    .Attributes.Add("StaNam", lCurLine.Substring(17, lCurLine.Length - 17))
-                End If
             End While
         End With
 
@@ -585,9 +616,6 @@ Public Class atcTimeseriesRDB
                 Logger.Dbg(lAccuracyCodeCounter.Keys(lIndex) & ":" & lAccuracyCodeCounter.Item(lIndex))
             Next
         End With
-        Dim lTimeCreated As Date = Now
-        lTimeseries.Attributes.CalculateAll()
-        Logger.Dbg("IdaValuesAttributesCalculated;Elapsed " & (Now - lTimeCreated).TotalSeconds & " " & MemUsage())
         Me.AddDataSet(lTimeseries)
     End Sub
 
