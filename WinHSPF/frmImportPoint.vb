@@ -1,6 +1,7 @@
 Imports atcUCI
 Imports atcUtility
 Imports MapWinUtility
+Imports MapWinUtility.Strings
 Imports System.IO
 
 Public Class frmImportPoint
@@ -183,16 +184,16 @@ Public Class frmImportPoint
 
             Do While lStreamReader.Peek() >= 0
                 lLineString = lStreamReader.ReadLine()
-                lDateArray(0) = MapWinUtility.Strings.StrSplit(lLineString, lDelimiter, lQuote)
-                lDateArray(1) = MapWinUtility.Strings.StrSplit(lLineString, lDelimiter, lQuote)
-                lDateArray(2) = MapWinUtility.Strings.StrSplit(lLineString, lDelimiter, lQuote)
-                lDateArray(3) = MapWinUtility.Strings.StrSplit(lLineString, lDelimiter, lQuote)
-                lDateArray(4) = MapWinUtility.Strings.StrSplit(lLineString, lDelimiter, lQuote)
+                lDateArray(0) = StrSplit(lLineString, lDelimiter, lQuote)
+                lDateArray(1) = StrSplit(lLineString, lDelimiter, lQuote)
+                lDateArray(2) = StrSplit(lLineString, lDelimiter, lQuote)
+                lDateArray(3) = StrSplit(lLineString, lDelimiter, lQuote)
+                lDateArray(4) = StrSplit(lLineString, lDelimiter, lQuote)
                 lDateArray(5) = 0
                 pJDatesCollection.Add(Date2J(lDateArray))
 
                 For j = 1 To pConstituentNames.Count
-                    pLoadValuesCollection.Add(MapWinUtility.Strings.StrSplit(lLineString, lDelimiter, lQuote))
+                    pLoadValuesCollection.Add(StrSplit(lLineString, lDelimiter, lQuote))
                 Next j
 
             Loop
