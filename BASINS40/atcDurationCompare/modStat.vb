@@ -176,9 +176,11 @@ Public Module modStat
         Dim lFmtLimitsFraction As String = "0."
         Dim lSigDigit As Integer = 0
         For Each lLimit As Double In lListLimits
-            If lLimit > 0 And lLimit < 1 Then 'find the longest fraction value
-                Dim lSigDigitThis As Integer = lLimit.ToString.Substring(lLimit.ToString.IndexOf(".") + 1).Length
-                If lSigDigitThis > lSigDigit Then lSigDigit = lSigDigitThis
+            If lClassBuckets.Keys.Contains(lLimit) Then
+                If lLimit > 0 And lLimit < 1 Then 'find the longest fraction value
+                    Dim lSigDigitThis As Integer = lLimit.ToString.Substring(lLimit.ToString.IndexOf(".") + 1).Length
+                    If lSigDigitThis > lSigDigit Then lSigDigit = lSigDigitThis
+                End If
             End If
         Next
         For I As Integer = 1 To lSigDigit
