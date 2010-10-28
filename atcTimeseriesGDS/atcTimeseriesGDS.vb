@@ -17,7 +17,7 @@ Imports System.IO
 Public Class atcTimeseriesGDS
     Inherits atcTimeseriesSource
 
-    Private Shared pFilter As String = "NASA GDS Files (*.gds, *.txt)|*.gds;*.txt|All Files (*.*)|(*.*)"
+    Private Shared pFilter As String = "NASA GDS Files (*.gds)|*.gds|Text Files (*.txt)|*.txt|All Files (*.*)|*.*"
     Private pErrorDescription As String
     Private pJulianOffset As Double = New Date(1900, 1, 1).Subtract(New Date(1, 1, 1)).TotalDays
 
@@ -58,100 +58,129 @@ Public Class atcTimeseriesGDS
 
             Try
                 Dim lNaN As Double = GetNaN()
-                Dim lCurLine() As String
+                Dim lBadDates As Boolean = False
 
-                Dim lInputStream As New FileStream(aFileName, FileMode.Open, FileAccess.Read)
-                Dim lInputBuffer As New BufferedStream(lInputStream)
-                Dim lInputReader As New BinaryReader(lInputBuffer)
+                Using lInputStream As New FileStream(aFileName, FileMode.Open, FileAccess.Read)
+                    Dim lInputBuffer As New BufferedStream(lInputStream)
+                    Dim lInputReader As New BinaryReader(lInputBuffer)
 
-                Dim lHeader() As String = NextLine(lInputReader).Split(",")
-                Dim lConstituent As String = lHeader(0).Trim
-                Dim lBounds() As String = lHeader(1).Trim.Replace("[", "").Split("]")
-                Dim lNumTimesteps As Integer = Integer.Parse(lBounds(0))
-                Dim lNumY As Integer = Integer.Parse(lBounds(1))
-                Dim lNumX As Integer = Integer.Parse(lBounds(2))
+                    Dim lCurLine() As String
+                    Dim lHeader() As String = NextLine(lInputReader).Split(",")
+                    Dim lConstituent As String = lHeader(0).Trim
+                    Dim lBounds() As String = lHeader(1).Trim.Replace("[", "").Split("]")
+                    Dim lNumTimesteps As Integer = Integer.Parse(lBounds(0))
+                    Dim lNumY As Integer = Integer.Parse(lBounds(1))
+                    Dim lNumX As Integer = Integer.Parse(lBounds(2))
 
-                pData.Clear()
-                Dim lData(lNumX, lNumY) As atcTimeseries
-                Dim lTs As atcTimeseries
-                Dim lExpectedLineHeader As String
-                Dim lTimeIndex As Integer, lX As Integer, lY As Integer
-                For lTimeIndex = 0 To lNumTimesteps - 1
-                    For lY = 0 To lNumY - 1
-                        lCurLine = NextLine(lInputReader).Split(",")
-                        lExpectedLineHeader = "[" & lTimeIndex & "][" & lY & "]"
-                        If lCurLine(0) = lExpectedLineHeader Then
-                            For lX = 1 To lNumX
-                                lTs = lData(lX, lY)
-                                If lTs Is Nothing Then
-                                    lTs = New atcTimeseries(Me)
-                                    lTs.Attributes.SetValue("Constituent", lConstituent)
-                                    lTs.Attributes.AddHistory("Read from " & Specification)
-                                    lTs.numValues = lNumTimesteps
-                                    lTs.Value(0) = lNaN
-                                    lData(lX, lY) = lTs
-                                    pData.Add(lTs)
-                                End If
-                                lTs.Value(lTimeIndex + 1) = Double.Parse(lCurLine(lX).Trim)
-                            Next
-                            NextLine(lInputReader) 'Skip blank line
-                        Else
-                            Throw New ApplicationException("Error reading '" & String.Join(", ", lCurLine) _
-                                                         & "' expected to start with '" & lExpectedLineHeader & "'")
-                        End If
-                    Next
-                Next
-
-                Do
-                    lCurLine = NextLine(lInputReader).Split(",")
-                    Select Case lCurLine(0)
-                        Case "time"
+                    pData.Clear()
+                    Dim lData(lNumX, lNumY) As atcTimeseries
+                    Dim lTs As atcTimeseries
+                    Dim lExpectedLineHeader As String
+                    Dim lTimeIndex As Integer, lX As Integer, lY As Integer
+                    For lTimeIndex = 0 To lNumTimesteps - 1
+                        For lY = 0 To lNumY - 1
                             lCurLine = NextLine(lInputReader).Split(",")
-                            Dim lDates As New atcTimeseries(Me) 'Common dates for all data in file
-                            lDates.numValues = lNumTimesteps
-                            For lDateIndex As Integer = 1 To lNumTimesteps
-                                lDates.Value(lDateIndex) = Double.Parse(lCurLine(lDateIndex - 1).Trim) - pJulianOffset
-                            Next
-                            If lNumTimesteps > 1 Then
-                                lDates.Value(0) = lDates.Value(1) - (lDates.Value(2) - lDates.Value(1))
+                            lExpectedLineHeader = "[" & lTimeIndex & "][" & lY & "]"
+                            If lCurLine(0) = lExpectedLineHeader Then
+                                For lX = 1 To lNumX
+                                    lTs = lData(lX, lY)
+                                    If lTs Is Nothing Then
+                                        lTs = New atcTimeseries(Me)
+                                        lTs.Attributes.SetValue("Constituent", lConstituent)
+                                        lTs.Attributes.AddHistory("Read from " & Specification)
+                                        lTs.Attributes.SetValue("TMZONE", 0) 'UTC offset = 0
+                                        lTs.numValues = lNumTimesteps
+                                        lTs.Value(0) = lNaN
+                                        lData(lX, lY) = lTs
+                                        pData.Add(lTs)
+                                    End If
+                                    lTs.Value(lTimeIndex + 1) = Double.Parse(lCurLine(lX).Trim)
+                                Next
+                                NextLine(lInputReader) 'Skip blank line
                             Else
-                                lDates.Value(0) = lNaN
+                                Throw New ApplicationException("Error reading '" & String.Join(", ", lCurLine) _
+                                                             & "' expected to start with '" & lExpectedLineHeader & "'")
                             End If
-                            For Each lTs In pData
-                                lTs.Dates = lDates
-                            Next
-                        Case "lat"
-                            lCurLine = NextLine(lInputReader).Split(",")
-                            For lY = 0 To lNumY - 1
-                                For lX = 1 To lNumX
-                                    lData(lX, lY).Attributes.SetValue("Latitude", lCurLine(lY))
-                                Next
-                            Next
-                        Case "lon"
-                            lCurLine = NextLine(lInputReader).Split(",")
-                            For lY = 0 To lNumY - 1
-                                For lX = 1 To lNumX
-                                    lData(lX, lY).Attributes.SetValue("Longitude", lCurLine(lX - 1))
-                                Next
-                            Next
-                            Exit Do
-                        Case ""
-                        Case Else
-                            Logger.Dbg("Unexpected line in GDS data '" & String.Join(", ", lCurLine))
-                    End Select
-                Loop
-
-                If lNumTimesteps > 1 AndAlso pData.Count > 0 Then
-                    Dim lTimeUnit As atcTimeUnit = atcTimeUnit.TUUnknown
-                    Dim lTimeStep As Integer = 1
-                    lTs = pData(0)
-                    CalcTimeUnitStep(lTs.Dates.Value(1), lTs.Dates.Value(2), lTimeUnit, lTimeStep)
-                    For Each lTs In pData
-                        lTs.Attributes.SetValue("Time Unit", lTimeUnit)
-                        lTs.Attributes.SetValue("Time Step", lTimeStep)
+                        Next
                     Next
-                End If
 
+                    Do
+                        lCurLine = NextLine(lInputReader).Split(",")
+                        Select Case lCurLine(0)
+                            Case "time"
+                                lCurLine = NextLine(lInputReader).Split(",")
+                                Dim lDates As New atcTimeseries(Me) 'Common dates for all data in file
+                                lDates.numValues = lNumTimesteps
+                                Dim lDateIndex As Integer
+                                For lDateIndex = 1 To lNumTimesteps
+                                    lDates.Value(lDateIndex) = Double.Parse(lCurLine(lDateIndex - 1).Trim) - pJulianOffset
+                                    If lDateIndex > 1 AndAlso lDates.Value(lDateIndex - 1) > lDates.Value(lDateIndex) Then
+                                        lBadDates = True
+                                        Exit For
+                                    End If
+                                Next
+                                If lBadDates Then
+                                    Dim lStartDate As Double = 722451.5 - pJulianOffset
+                                    Logger.Dbg("Error: Bad time, index " & lDateIndex - 1 & " > " & lDateIndex & " (" _
+                                               & DoubleToString(lDates.Value(lDateIndex - 1) + pJulianOffset, , , , , 11) & " > " _
+                                               & DoubleToString(lDates.Value(lDateIndex) + pJulianOffset, , , , , 11) _
+                                               & ") Assuming hourly values starting " & DumpDate(lStartDate) & " for " & aFileName)
+                                    lDates.Value(0) = lStartDate
+                                    For lDateIndex = 1 To lNumTimesteps
+                                        lDates.Value(lDateIndex) = lStartDate + JulianHour * lDateIndex
+                                    Next
+                                Else
+                                    If lNumTimesteps > 1 Then
+                                        lDates.Value(0) = lDates.Value(1) - (lDates.Value(2) - lDates.Value(1))
+                                    Else
+                                        lDates.Value(0) = lNaN
+                                    End If
+                                End If
+                                For Each lTs In pData
+                                    lTs.Dates = lDates
+                                Next
+                            Case "lat"
+                                lCurLine = NextLine(lInputReader).Split(",")
+                                For lY = 0 To lNumY - 1
+                                    For lX = 1 To lNumX
+                                        lData(lX, lY).Attributes.SetValue("Latitude", lCurLine(lY))
+                                    Next
+                                Next
+                            Case "lon"
+                                lCurLine = NextLine(lInputReader).Split(",")
+                                For lY = 0 To lNumY - 1
+                                    For lX = 1 To lNumX
+                                        lData(lX, lY).Attributes.SetValue("Longitude", lCurLine(lX - 1))
+                                    Next
+                                Next
+                                Exit Do
+                            Case ""
+                            Case Else
+                                Logger.Dbg("Unexpected line in GDS data '" & String.Join(", ", lCurLine))
+                        End Select
+                    Loop
+
+                    For lY = 0 To lNumY - 1
+                        For lX = 1 To lNumX
+                            With lData(lX, lY).Attributes
+                                Dim lLocation As String = "Lat=" & .GetValue("Latitude", "") & " Long=" & .GetValue("Longitude", "")
+                                .SetValue("STANAM", lLocation)
+                                .SetValue("Location", lLocation)
+                            End With
+                        Next
+                    Next
+
+                    If lNumTimesteps > 1 AndAlso pData.Count > 0 Then
+                        Dim lTimeUnit As atcTimeUnit = atcTimeUnit.TUUnknown
+                        Dim lTimeStep As Integer = 1
+                        lTs = pData(0)
+                        CalcTimeUnitStep(lTs.Dates.Value(1), lTs.Dates.Value(2), lTimeUnit, lTimeStep)
+                        For Each lTs In pData
+                            lTs.Attributes.SetValue("Time Unit", lTimeUnit)
+                            lTs.Attributes.SetValue("Time Step", lTimeStep)
+                        Next
+                    End If
+                End Using
                 Return True
             Catch e As Exception
                 Logger.Dbg("Exception reading '" & aFileName & "': " & e.Message, e.StackTrace)
