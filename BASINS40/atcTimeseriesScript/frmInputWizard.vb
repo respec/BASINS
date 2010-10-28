@@ -345,8 +345,6 @@ Friend Class frmInputWizard
         Static lastrow, lastcol As Integer
         Static InRowColChange As Boolean
 
-        Dim ics As String
-        Dim icl As Integer
         Dim newrow As Integer
         Dim newcol As Integer
         If InRowColChange Then Exit Sub
@@ -533,8 +531,6 @@ Friend Class frmInputWizard
     ' Purpose:  Responds to click on sample grid
     '
     Private Sub agdSample_ClickEvent(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles agdSample.Click
-        Dim m_Prompt As String
-        Dim m_LenPro As Short
         '
         ' Don't change the mapping unless you are on the data mapping
         ' tab.
@@ -726,7 +722,7 @@ ParseFixedDef:
     'If a blank row is found at the end of the grid, that row is returned
     'If no row matches, .rows + 1 is returned
     Private Function RowNamed(ByRef FieldName As String) As Integer
-        Dim srchName, thisName As String
+        Dim srchName As String
         Dim r, maxRow As Integer
 
         With MappingSource
@@ -743,21 +739,18 @@ ParseFixedDef:
     End Function
 
     Private Sub SetDatePortion(ByRef scr As clsATCscriptExpression, ByRef subexpName As String)
-        Dim r, otherRow As Integer
         Dim scp As String
-        r = RowNamed(subexpName)
-        If r <= MappingSource.Rows Then
+        Dim lRow As Integer = RowNamed(subexpName)
+        If lRow <= MappingSource.Rows Then
             scp = TrimQuotes(scr.Printable)
             If LCase(scp) <> LCase(subexpName) Then
-                MappingSource.CellValue(r, ColMappingConstant) = scp
+                MappingSource.CellValue(lRow, ColMappingConstant) = scp
             End If
         End If
     End Sub
 
     Private Sub SetWizardFromDate(ByRef scr As clsATCscriptExpression)
-        Dim SubExp, cnt, r As Integer
-        Dim subexpName As String
-        cnt = scr.SubExpressionCount
+        Dim cnt As Integer = scr.SubExpressionCount
         If cnt > 0 Then SetDatePortion(scr.SubExpression(0), "Year")
         If cnt > 1 Then SetDatePortion(scr.SubExpression(1), "Month")
         If cnt > 2 Then SetDatePortion(scr.SubExpression(2), "Day")
@@ -1181,7 +1174,7 @@ ParseFixedDef:
     Private Function ConstOrCol(ByRef FieldName As String) As Object
         'UPGRADE_NOTE: str was upgraded to str_Renamed. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
         Dim r As Integer
-        Dim constStr, searchstr, str_Renamed, colStr, retval As String
+        Dim constStr, colStr, retval As String
         retval = ""
         If LCase(FieldName) = "repeat" Then
             retval = FieldName
@@ -1265,9 +1258,6 @@ ParseFixedDef:
     '            when data file has been opened
     '
     Private Sub EnableFilePropertiesFields()
-        Dim m_Prompt As String
-        Dim m_LenPro As Short
-
         'zzz this is not needed ?  PopulateGridSample
         lblDataDescFile.Enabled = True
         txtScriptFile.Enabled = True
@@ -1431,15 +1421,15 @@ ParseFixedDef:
     '            fields selected on the Data-Mapping tab
     '
     Private Sub PopulateGridTest()
-        Dim lines As Integer
-        Dim linecnt As Integer
-        Dim cbuff As String
-        Dim parsed(conMaxNumColumns) As String
-        Dim pcols As Integer
-        Dim cout As Integer
-        Dim cin As Integer ' column out (agdTestMapping), in (agdDataMapping)
-        Dim icl As Integer
-        Dim ics As String ' input column long, string
+        'Dim lines As Integer
+        'Dim linecnt As Integer
+        'Dim cbuff As String
+        'Dim parsed(conMaxNumColumns) As String
+        'Dim pcols As Integer
+        'Dim cout As Integer
+        'Dim cin As Integer ' column out (agdTestMapping), in (agdDataMapping)
+        'Dim icl As Integer
+        'Dim ics As String ' input column long, string
 
         'Call objParser.AssignProperties( _
         ''     cboFileType.text, _
@@ -1556,7 +1546,6 @@ ParseFixedDef:
     '            text box with sample data
     Private Sub PopulateTxtSample()
         Dim linecnt As Integer
-        Dim cbuff As String
         Dim nChars As Integer
 
         InputLineLen = 0
@@ -1870,21 +1859,20 @@ exitsub:
     '           to obtain the input file name.
     '
     Private Sub cmdBrowseData_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdBrowseData.Click
-        Dim m_FileName As String
-
         If UnitDataFileReader IsNot Nothing Then
             UnitDataFileReader.Close()
             UnitDataFileReader = Nothing
         End If
 
-        'UPGRADE_WARNING: Filter has a new behavior. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="9B7D5ADD-D8FE-4819-A36C-6DEDAF088CC7"'
         dlgOpenFileOpen.Filter = "All Files (*.*)|*.*"
         dlgOpenFileSave.Filter = "All Files (*.*)|*.*"
         dlgOpenFileOpen.DefaultExt = ""
         dlgOpenFileSave.DefaultExt = ""
         dlgOpenFileOpen.Title = "Open Data File"
-        dlgOpenFileSave.Title = "Open Data File"
+        dlgOpenFileSave.Title = "Save Data File"
+
         dlgOpenFileOpen.ShowDialog()
+
         dlgOpenFileSave.FileName = dlgOpenFileOpen.FileName
         NameDataFile = dlgOpenFileOpen.FileName
         OpenUnitDataFile()
@@ -1982,8 +1970,6 @@ exitsub:
     '
     Private Sub txtScriptFile_Leave(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles txtScriptFile.Leave
         Dim m_FilePath As String
-        Dim m_Prompt As String
-        Dim m_LenPro As Short
         Dim n As Integer
 
         ' If a filename was not entered, reset found flags and
@@ -2089,13 +2075,12 @@ exitsub:
     ' Purpose:   Queries user for name of lookup file
     '
     Private Sub AskForLookupFilename()
-        'UPGRADE_WARNING: Filter has a new behavior. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="9B7D5ADD-D8FE-4819-A36C-6DEDAF088CC7"'
         dlgOpenFileOpen.Filter = "All Files (*.*)|*.*"
         dlgOpenFileSave.Filter = "All Files (*.*)|*.*"
         dlgOpenFileOpen.DefaultExt = ""
         dlgOpenFileSave.DefaultExt = ""
         dlgOpenFileOpen.Title = "Open lookup file"
-        dlgOpenFileSave.Title = "Open lookup file"
+        dlgOpenFileSave.Title = "Save lookup file"
         dlgOpenFileOpen.ShowDialog()
         dlgOpenFileSave.FileName = dlgOpenFileOpen.FileName
         With MappingSource
@@ -2149,11 +2134,6 @@ exitsub:
     ' Modified:
     '
     Private Sub WriteDescFile(ByRef UnitOutfile As Short)
-        Dim r, index As Integer
-        Dim view As String
-        Dim Field As String
-        Dim tmp As String
-
         If UnitOutfile < 0 Then
             MsgBox("Cannot write to output file.", MsgBoxStyle.OkOnly, "Data Import")
         Else
