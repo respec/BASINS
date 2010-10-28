@@ -99,12 +99,6 @@ Public Module modTimeseriesMath
                                 Optional ByVal aLastYear As Integer = 0, _
                                 Optional ByVal aEndMonth As Integer = 0, _
                                 Optional ByVal aEndDay As Integer = 0) As atcTimeseries
-        Dim lStartDate As Double
-        Dim lEndDate As Double
-        Dim lStartTimeseriesDate As Date
-        Dim lEndTimeseriesDate As Date
-        Dim lStartYear As Integer
-        Dim lEndYear As Integer
 
         If aEndMonth = 0 Then
             aEndMonth = aStartMonth 'Will be rolled back a day later
@@ -125,9 +119,9 @@ Public Module modTimeseriesMath
             aFirstYear -= 1
         End If
 
-        lStartDate = aTimeseries.Dates.Value(0)
+        Dim lStartDate As Double = aTimeseries.Dates.Value(0)
         If Double.IsNaN(lStartDate) Then lStartDate = aTimeseries.Dates.Value(1)
-        lStartTimeseriesDate = Date.FromOADate(lStartDate)
+        Dim lStartTimeseriesDate As Date = Date.FromOADate(lStartDate)
         With lStartTimeseriesDate
             'Roll back end of year by one day if it matches beginning of year
             If aEndMonth = aStartMonth AndAlso aEndDay = aStartDay Then
@@ -139,7 +133,7 @@ Public Module modTimeseriesMath
                 End If
             End If
 
-            lStartYear = .Year
+            Dim lStartYear As Integer = .Year
             If aFirstYear > lStartYear Then
                 lStartYear = aFirstYear
             Else
@@ -154,9 +148,10 @@ Public Module modTimeseriesMath
             lStartDate = Jday(lStartYear, aStartMonth, aStartDay, 0, 0, 0)
         End With
 
-        lEndTimeseriesDate = Date.FromOADate(aTimeseries.Dates.Value(aTimeseries.Dates.numValues))
+        Dim lEndDate As Double
+        Dim lEndTimeseriesDate As Date = Date.FromOADate(aTimeseries.Dates.Value(aTimeseries.Dates.numValues))
         With lEndTimeseriesDate
-            lEndYear = .Year
+            Dim lEndYear As Integer = .Year
             If aLastYear > 0 AndAlso aLastYear < lEndYear Then
                 lEndYear = aLastYear
             Else
