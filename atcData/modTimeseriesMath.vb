@@ -116,12 +116,18 @@ Public Module modTimeseriesMath
 
         aTimeseries.EnsureValuesRead()
 
+        If aTimeseries.numValues < 1 Then
+            Return aTimeseries
+        End If
+
         If aFirstYear > 0 AndAlso (aEndMonth < aStartMonth OrElse (aEndMonth = aStartMonth AndAlso aEndDay < aStartDay)) Then
             'Convert water year into calendar year
             aFirstYear -= 1
         End If
 
-        lStartTimeseriesDate = Date.FromOADate(aTimeseries.Dates.Value(0))
+        lStartDate = aTimeseries.Dates.Value(0)
+        If Double.IsNaN(lStartDate) Then lStartDate = aTimeseries.Dates.Value(1)
+        lStartTimeseriesDate = Date.FromOADate(lStartDate)
         With lStartTimeseriesDate
             'Roll back end of year by one day if it matches beginning of year
             If aEndMonth = aStartMonth AndAlso aEndDay = aStartDay Then
