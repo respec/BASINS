@@ -102,8 +102,6 @@ Public Module modDate
     ''' <returns>modified Julian date</returns>
     ''' <remarks></remarks>
     Public Function Date2J(ByVal aDate() As Integer) As Double
-        '##LOCAL lJd - date (year, month, day) portion of MJD
-        '##LOCAL lHms - time (hour, minute, second) portion of MJD
         Dim lJd As Integer = MJD(aDate(0), aDate(1), aDate(2))
         Dim lHms As Double = HMS2J(aDate(3), aDate(4), aDate(5))
         Return lJd + lHms
@@ -113,7 +111,7 @@ Public Module modDate
     ''' <param name="aHr">hour to convert</param>
     ''' <param name="aMi">minute to convert</param>
     ''' <param name="aSc">second to convert</param>
-    ''' <returns></returns>
+    ''' <returns>modified Julian date</returns>
     ''' <remarks></remarks>
     Function HMS2J(ByVal aHr As Integer, ByVal aMi As Integer, ByVal aSc As Integer) As Double
         Return (CDbl(aHr) * JulianHour) + (CDbl(aMi) * JulianMinute) + (CDbl(aSc) * JulianSecond)
@@ -183,26 +181,31 @@ Public Module modDate
         Call J2HMS(lJhms, aDate(3), aDate(4), aDate(5), lFrac)
     End Sub
 
+    ''' <summary>
+    ''' convert the time portion of a modfied Julian date to its component parts
+    ''' </summary>
+    ''' <param name="aJd">MJD to convert</param>
+    ''' <param name="aHr">hour portion of MJD</param>
+    ''' <param name="aMi">minute portion of MJD</param>
+    ''' <param name="aSc">second portion of MJD</param>
+    ''' <param name="aFrac">fraction of a second</param>
+    ''' <remarks></remarks>
     Sub J2HMS(ByVal aJd As Double, ByRef aHr As Integer, ByRef aMi As Integer, ByRef aSc As Integer, ByRef aFrac As Double)
-        '##SUMMARY J2HMS - convert a time portion of a modfied Julian date to its component parts
-        '##Parm aJd - MJD to convert
-        '##PARM aHr - hour portion of MJD
-        '##PARM aMi - minute portion of MJD
-        '##PARM aSc - second portion of MJD
-        '##PARM aFrac - fraction of a second
-        Dim lRem As Double
-        '##LOCAL lRem - intermediate result, units change from hours to seconds
+        Dim lRem As Double 'intermediate result, units change from hours to seconds
         If Double.IsNaN(aJd) Then
             lRem = 0
         Else
             lRem = 0.0000004 + ((aJd Mod 1) * 24)
+            If lRem < 0 Then
+                lRem = 1 - lRem
+            End If
         End If
 
-        aHr = Fix(lRem)
+        aHr = Math.Floor(lRem)
         lRem = (lRem - aHr) * 60
-        aMi = Fix(lRem)
+        aMi = Math.Floor(lRem)
         lRem = (lRem - aMi) * 60
-        aSc = Fix(lRem)
+        aSc = Math.Floor(lRem)
         aFrac = lRem - aSc
     End Sub
 
@@ -290,76 +293,76 @@ Public Module modDate
               aDy + b - JulianModification
     End Function
 
-    Function Jday(ByVal aYr As Integer, ByVal aMn As Integer, ByVal aDy As Integer, _
-                  ByVal aHr As Integer, ByVal aMi As Integer, ByVal aSc As Integer) As Double
-        'SUMMARY jday - convert portions of date to a modfied Julian date (MJD)
-        '##PARM aYr - calendar year
-        '##PARM aMn - number of month(1-12)
-        '##PARM aDy - day in the month
-        '##PARM aHr - hour of day
-        '##PARM aMi - minute of day
-        '##PARM aSc - second of day
-        Dim d(5) As Integer
-        'LOCAL d - date array
-        d(0) = aYr
-        d(1) = aMn
-        d(2) = aDy
-        d(3) = aHr
-        d(4) = aMi
-        d(5) = aSc
-        Jday = Date2J(d)
+    ''' <summary>
+    ''' convert a date array to a modfied Julian date (MJD)
+    ''' </summary>
+    ''' <param name="aYr"></param>
+    ''' <param name="aMo"></param>
+    ''' <param name="aDy"></param>
+    ''' <param name="aHr"></param>
+    ''' <param name="aMn"></param>
+    ''' <param name="aSc"></param>
+    ''' <returns>modified Julian date</returns>
+    ''' <remarks></remarks>
+    Function Jday(ByVal aYr As Integer, ByVal aMo As Integer, ByVal aDy As Integer, _
+                  ByVal aHr As Integer, ByVal aMn As Integer, ByVal aSc As Integer) As Double
+        Return Date2J(aYr, aMo, aDy, aHr, aMn, aSc)
     End Function
 
+    ''' <summary>
+    ''' determines the date interval (6-second thru 1-year) of a modfied Julian date
+    ''' </summary>
+    ''' <param name="aJd">MJD to determine interval of</param>
+    ''' <returns>date interval (6 second, 5 minute, 4 hour, 3 day, 2 month, 1 year</returns>
+    ''' <remarks></remarks>
     Function JDateIntrvl(ByVal aJd As Double) As Integer
-        '##SUMMARY JDateIntrvl - determines the date interval (6-second thru 1-year) of _
-        'a modfied Julian date
-        '##PARM aJd - MJD to determine interval of
         Dim lDate(5) As Integer
-        'LOCAL d - date array
         Call J2Date(aJd, lDate)
-        JDateIntrvl = DateIntrvl(lDate)
+        Return DateIntrvl(lDate)
     End Function
 
-    Function DateIntrvl(ByVal d() As Integer) As Integer
-        '##SUMMARY DateIntrvl - determines the date interval (6-second thru 1-year) of a date array
-        '##PARM d - date array to determine interval of
-        Dim i As Integer
-        'LOCAL i - pending date interval
-        i = 6 'at least a second boundary
-        If d(5) = 0 Then 'more: x x x x x 0
-            i = 5 'at least a minute boundary
-            If d(4) = 0 Then 'more: x x x x 0 0
-                i = 4 'at least an hour boundary
-                If d(3) = 0 Then 'more: x x x 0 0 0
-                    i = 3 'at least a day boundary
-                    If d(2) = 1 Then 'more: x x 1 0 0 0
-                        i = 2 'at least a month boundary
-                        If d(1) = 1 Then 'more: x 1 1 0 0 0
-                            i = 1 'a year boundary
+    ''' <summary>
+    ''' determines the date interval (6-second thru 1-year) of a date array
+    ''' </summary>
+    ''' <param name="aDate">date array to determine interval of</param>
+    ''' <returns>date interval (6 second, 5 minute, 4 hour, 3 day, 2 month, 1 year</returns>
+    ''' <remarks></remarks>
+    Function DateIntrvl(ByVal aDate() As Integer) As Integer
+        Dim lDateIntrvl As Integer = 6   ' pending date interval
+        lDateIntrvl = 6 'at least a second boundary
+        If aDate(5) = 0 Then 'more: x x x x x 0
+            lDateIntrvl = 5 'at least a minute boundary
+            If aDate(4) = 0 Then 'more: x x x x 0 0
+                lDateIntrvl = 4 'at least an hour boundary
+                If aDate(3) = 0 Then 'more: x x x 0 0 0
+                    lDateIntrvl = 3 'at least a day boundary
+                    If aDate(2) = 1 Then 'more: x x 1 0 0 0
+                        lDateIntrvl = 2 'at least a month boundary
+                        If aDate(1) = 1 Then 'more: x 1 1 0 0 0
+                            lDateIntrvl = 1 'a year boundary
                         End If
-                    ElseIf d(2) = 0 Then  'more: x x 0 0 0 0
-                        i = 2 'at least a month boundary
-                        If d(1) = 0 Then 'more: x 0 0 0 0 0
-                            i = 1 'at least a year boundary
+                    ElseIf aDate(2) = 0 Then  'more: x x 0 0 0 0
+                        lDateIntrvl = 2 'at least a month boundary
+                        If aDate(1) = 0 Then 'more: x 0 0 0 0 0
+                            lDateIntrvl = 1 'at least a year boundary
                         End If
                     End If
-                ElseIf d(3) = 24 Then  'more: x x x 24 0 0
-                    i = 3
-                    If d(2) = daymon(d(0), d(1)) Then 'more: x x 31,30,29,28 24 0 0
-                        i = 2 'month boundary
-                        If d(1) = 12 Then 'more: x 12 31 24 0 0
-                            i = 1 'year boundary
+                ElseIf aDate(3) = 24 Then  'more: x x x 24 0 0
+                    lDateIntrvl = 3
+                    If aDate(2) = daymon(aDate(0), aDate(1)) Then 'more: x x 31,30,29,28 24 0 0
+                        lDateIntrvl = 2 'month boundary
+                        If aDate(1) = 12 Then 'more: x 12 31 24 0 0
+                            lDateIntrvl = 1 'year boundary
                         End If
                     End If
                 End If
-            ElseIf d(4) = 60 Then  'more: x x x x 60 0
-                i = 4 'hour boundary
+            ElseIf aDate(4) = 60 Then  'more: x x x x 60 0
+                lDateIntrvl = 4 'hour boundary
             End If
-        ElseIf d(5) = 60 Then  'more: x x x x x 60
-            i = 5 'minute boundary
+        ElseIf aDate(5) = 60 Then  'more: x x x x x 60
+            lDateIntrvl = 5 'minute boundary
         End If
-
-        DateIntrvl = i
+        Return lDateIntrvl
     End Function
 
     Function daymon(ByVal yr As Integer, ByVal mo As Integer) As Integer
