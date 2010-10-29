@@ -35,6 +35,18 @@ Public Class atcGrid
     Private pColumnEditing As Integer = -1
     Private pRowEditing As Integer = -1
 
+    'added to enable copy/paste
+    Private pSelStartCol As Long, pSelStartRow As Long  'Cell where current selection was started
+    Private pSelEndCol As Long, pSelEndRow As Long      'Cell at other corner of current selection
+    Private pControlOrShiftKeyPressed As Boolean = False
+    Friend WithEvents CopyToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents PasteToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents GridContextMenuStrip As System.Windows.Forms.ContextMenuStrip
+
+    'added to enable arrow up/down/left/right
+    Private pCurrentRow As Integer = 0
+    Private pCurrentColumn As Integer = 0
+
 #Region " Windows Form Designer generated code "
 
     Public Sub New()
@@ -67,11 +79,16 @@ Public Class atcGrid
     Friend WithEvents CellEditBox As System.Windows.Forms.TextBox
     Friend WithEvents CellComboBox As System.Windows.Forms.ComboBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container
         Me.VScroller = New System.Windows.Forms.VScrollBar
         Me.HScroller = New System.Windows.Forms.HScrollBar
         Me.scrollCorner = New System.Windows.Forms.Panel
         Me.CellEditBox = New System.Windows.Forms.TextBox
         Me.CellComboBox = New System.Windows.Forms.ComboBox
+        Me.CopyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.PasteToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.GridContextMenuStrip = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.GridContextMenuStrip.SuspendLayout()
         Me.SuspendLayout()
         '
         'VScroller
@@ -118,6 +135,24 @@ Public Class atcGrid
         Me.CellComboBox.TabIndex = 5
         Me.CellComboBox.Visible = False
         '
+        'CopyToolStripMenuItem
+        '
+        Me.CopyToolStripMenuItem.Name = "CopyToolStripMenuItem"
+        Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.CopyToolStripMenuItem.Text = "Copy"
+        '
+        'PasteToolStripMenuItem
+        '
+        Me.PasteToolStripMenuItem.Name = "PasteToolStripMenuItem"
+        Me.PasteToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.PasteToolStripMenuItem.Text = "Paste"
+        '
+        'GridContextMenuStrip
+        '
+        Me.GridContextMenuStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToolStripMenuItem, Me.PasteToolStripMenuItem})
+        Me.GridContextMenuStrip.Name = "GridContextMenuStrip"
+        Me.GridContextMenuStrip.Size = New System.Drawing.Size(153, 70)
+        '
         'atcGrid
         '
         Me.Controls.Add(Me.CellComboBox)
@@ -126,6 +161,7 @@ Public Class atcGrid
         Me.Controls.Add(Me.HScroller)
         Me.Controls.Add(Me.VScroller)
         Me.Name = "atcGrid"
+        Me.GridContextMenuStrip.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -920,31 +956,59 @@ Public Class atcGrid
     End Sub
 
     Protected Overrides Sub OnMouseDown(ByVal e As System.Windows.Forms.MouseEventArgs)
+
         If Not Me.Focused Then Me.Focus()
+        Dim lRow As Integer = 0
+        Dim lColumn As Integer = 0
+
         If pRowBottom.Count > 0 Then
-            Dim lLastRowDisplayed As Integer = pRowBottom.Keys.Item(pRowBottom.Count - 1)
-            Dim lRowIndex As Integer = 0
-            Dim lRow As Integer = 0
-            Dim lColumn As Integer = ColumnEdgeToDrag(e.X)
-            Dim lColumnIndex As Integer = 0
-            If lColumn >= 0 Then
+            ComputeCurrentRowColumn(e, lRow, lColumn)
+            pCurrentRow = lRow
+            pCurrentColumn = lColumn
+
+            If ColumnEdgeToDrag(e.X) >= 0 Then
                 pColumnDragging = lColumn
             Else
+                Dim lRowIndex As Integer = 0
+                Dim lColumnIndex As Integer = 0
                 While lRowIndex < pRowBottom.Count AndAlso e.Y > pRowBottom.ItemByIndex(lRowIndex)
                     lRowIndex += 1
                 End While
-
                 While lColumnIndex < pColumnRight.Count AndAlso e.X > pColumnRight.ItemByIndex(lColumnIndex)
                     lColumnIndex += 1
                 End While
 
                 If lRowIndex < pRowBottom.Count AndAlso lColumnIndex < pColumnRight.Count Then
-                    lRow = pRowBottom.Keys(lRowIndex)
-                    lColumn = pColumnRight.Keys(lColumnIndex)
-                    RaiseEvent MouseDownCell(Me, lRow, lColumn)
-                    If pSource.CellEditable(lRow, lColumn) Then
-                        EditCell(lRow, lColumn)
+                    If e.Button = Windows.Forms.MouseButtons.Left Then
+                        RaiseEvent MouseDownCell(Me, lRow, lColumn)
+                        If pSource.CellEditable(lRow, lColumn) Then
+                            EditCell(lRow, lColumn)
+                        End If
                     End If
+                End If
+            End If
+
+            If e.Button = Windows.Forms.MouseButtons.Left Then
+                If Not pControlOrShiftKeyPressed Then
+                    'start selected range on click
+                    SetStartSelectedRange(lRow, lColumn)
+                Else
+                    'control or shift key pressed
+                    SetEndSelectedRange(lRow, lColumn)
+                End If
+            End If
+        End If
+
+        If e.Button = Windows.Forms.MouseButtons.Right Then  'on right mouse button set copy/paste in context menu
+            If (lRow < Me.Source.FixedRows Or lColumn < Me.Source.FixedColumns) Or _
+                lRow < pSelStartRow Or lRow > pSelEndRow Or lColumn < pSelStartCol Or lColumn > pSelEndCol Then
+                Me.ContextMenuStrip = Nothing
+            Else
+                Me.ContextMenuStrip = GridContextMenuStrip
+                If Clipboard.ContainsText Then
+                    PasteToolStripMenuItem.Enabled = True
+                Else
+                    PasteToolStripMenuItem.Enabled = False
                 End If
             End If
         End If
@@ -969,6 +1033,12 @@ Public Class atcGrid
                     End If
                     RaiseEvent UserResizedColumn(Me, pColumnDragging, ColumnWidth(pColumnDragging))
                     Refresh()
+                Else
+                    'drag out selection box
+                    Dim lRow As Integer = 0
+                    Dim lColumn As Integer = 0
+                    ComputeCurrentRowColumn(e, lRow, lColumn)
+                    SetEndSelectedRange(lRow, lColumn)
                 End If
         End Select
     End Sub
@@ -1071,10 +1141,18 @@ Public Class atcGrid
 
     Private Sub VScroller_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles VScroller.KeyDown
         RaiseEvent KeyDownGrid(Me, e)
+        Select Case e.KeyCode
+            Case Keys.ControlKey : pControlOrShiftKeyPressed = True
+            Case Keys.ShiftKey : pControlOrShiftKeyPressed = True
+        End Select
     End Sub
 
     Private Sub HScroller_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles HScroller.KeyDown
         RaiseEvent KeyDownGrid(Me, e)
+        Select Case e.KeyCode
+            Case Keys.ControlKey : pControlOrShiftKeyPressed = True
+            Case Keys.ShiftKey : pControlOrShiftKeyPressed = True
+        End Select
     End Sub
 
     Private Sub HScroll_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HScroller.ValueChanged
@@ -1088,9 +1166,26 @@ Public Class atcGrid
             Case Keys.Escape : CellEditBox.Visible = False : EditCellFinished()
             Case Keys.Enter : EditCellFinished()
             Case Keys.Tab : EditCellFinished() 'TODO: shift editing right one column
-            Case Keys.Up : EditCellFinished() 'TODO: shift editing 
-            Case Keys.Down : EditCellFinished() 'TODO: shift editing 
+            Case Keys.Up : EditCellFinished() : MoveToCell(pCurrentRow - 1, pCurrentColumn)
+            Case Keys.Down : EditCellFinished() : MoveToCell(pCurrentRow + 1, pCurrentColumn)
+            Case Keys.Right
+                If CellEditBox.SelectionStart = CellEditBox.TextLength Then
+                    EditCellFinished() : MoveToCell(pCurrentRow, pCurrentColumn + 1)
+                End If
+            Case Keys.Left
+                If CellEditBox.SelectionStart = 0 Then
+                    EditCellFinished() : MoveToCell(pCurrentRow, pCurrentColumn - 1)
+                End If
+            Case Keys.ControlKey : pControlOrShiftKeyPressed = True
+            Case Keys.ShiftKey : pControlOrShiftKeyPressed = True
         End Select
+        If pControlOrShiftKeyPressed Then
+            If e.KeyCode = Keys.V And My.Computer.Clipboard.ContainsText Then
+                PasteFromClipboard()
+            ElseIf e.KeyCode = Keys.C Then 'Control-C (copy)
+                CopyToClipboard()
+            End If
+        End If
     End Sub
 
     Private Sub CellEditBox_LostFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles CellEditBox.LostFocus
@@ -1102,7 +1197,16 @@ Public Class atcGrid
             Case Keys.Escape : CellComboBox.Visible = False : EditCellFinished()
             Case Keys.Enter : EditCellFinished()
             Case Keys.Tab : EditCellFinished() 'TODO: shift editing right one column
+            Case Keys.ControlKey : pControlOrShiftKeyPressed = True
+            Case Keys.ShiftKey : pControlOrShiftKeyPressed = True
         End Select
+        If pControlOrShiftKeyPressed Then
+            If e.KeyCode = Keys.V And My.Computer.Clipboard.ContainsText Then
+                PasteFromClipboard()
+            ElseIf e.KeyCode = Keys.C Then 'Control-C (copy)
+                CopyToClipboard()
+            End If
+        End If
     End Sub
 
     Private Sub CellComboBox_LostFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles CellComboBox.LostFocus
@@ -1133,5 +1237,130 @@ Public Class atcGrid
 
     Private Sub HScroller_MouseEnter(ByVal sender As Object, ByVal e As System.EventArgs) Handles HScroller.MouseEnter
         Me.Cursor = Cursors.Arrow
+    End Sub
+
+    Private Sub PasteFromClipboard()
+        If pSelStartRow = pSelEndRow And pSelStartCol = pSelEndCol Then
+            'cant paste to just one cell, this gets handles within the cell edit box
+        Else
+            Dim lCopyString As String = ""
+            If Clipboard.ContainsText Then
+                lCopyString = Clipboard.GetText()
+                Dim lSplitChars As Char() = {CChar(vbTab), CChar(vbCr)}
+                Dim lPasteValues As String() = lCopyString.Split(lSplitChars)
+
+                Dim lCellIndex As Integer = 0
+                For lSelectedRow As Integer = pSelStartRow To pSelEndRow
+                    For lSelectedCol As Integer = pSelStartCol To pSelEndCol
+                        If pSource.CellEditable(lSelectedRow, lSelectedCol) Then
+                            If lCellIndex <= lPasteValues.GetUpperBound(0) Then
+                                pSource.CellValue(lSelectedRow, lSelectedCol) = lPasteValues(lCellIndex)
+                            Else
+                                'have run out of values, use last one 
+                                pSource.CellValue(lSelectedRow, lSelectedCol) = lPasteValues(lPasteValues.GetUpperBound(0))
+                            End If
+                            RaiseEvent CellEdited(Me, lSelectedRow, lSelectedCol)
+                        End If
+                        lCellIndex += 1
+                    Next
+                Next
+                Me.Refresh()
+            End If
+        End If
+    End Sub
+
+    Private Sub CopyToClipboard()
+        Dim lCopyString As String = ""
+        For lSelectedRow As Integer = pSelStartRow To pSelEndRow
+            For lSelectedCol As Integer = pSelStartCol To pSelEndCol
+                lCopyString = lCopyString & pSource.CellValue(lSelectedRow, lSelectedCol)
+                If lSelectedRow < pSelEndRow And lSelectedCol = pSelEndCol Then
+                    lCopyString = lCopyString & vbCr
+                ElseIf lSelectedCol < pSelEndCol Then
+                    lCopyString = lCopyString & vbTab
+                End If
+            Next
+        Next
+        Clipboard.Clear()
+        Clipboard.SetText(lCopyString, TextDataFormat.Text)
+    End Sub
+
+    Private Sub CopyToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CopyToolStripMenuItem.Click
+        CopyToClipboard()
+    End Sub
+
+    Private Sub PasteToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PasteToolStripMenuItem.Click
+        PasteFromClipboard()
+    End Sub
+
+    Private Sub SetStartSelectedRange(ByVal aRow As Integer, ByVal aColumn As Integer)
+        'un-highlight previous selected range 
+        For lSelectedRow As Integer = 0 To pSource.Rows - 1
+            For lSelectedCol As Integer = 0 To pSource.Columns - 1
+                pSource.CellSelected(lSelectedRow, lSelectedCol) = False
+            Next
+        Next
+        Me.Refresh()
+        'start new selected range
+        pSelStartCol = aColumn
+        pSelStartRow = aRow
+        pSelEndCol = aColumn
+        pSelEndRow = aRow
+    End Sub
+
+    Private Sub SetEndSelectedRange(ByVal aRow As Integer, ByVal aColumn As Integer)
+        'set end of selected range 
+        pSelEndCol = aColumn
+        pSelEndRow = aRow
+        pControlOrShiftKeyPressed = False
+        'un-highlight previous selected range 
+        For lSelectedRow As Integer = 0 To pSource.Rows - 1
+            For lSelectedCol As Integer = 0 To pSource.Columns - 1
+                pSource.CellSelected(lSelectedRow, lSelectedCol) = False
+            Next
+        Next
+        'highlight selected range 
+        If pSelStartRow <> pSelEndRow Or pSelStartCol <> pSelEndCol Then
+            For lSelectedRow As Integer = pSelStartRow To pSelEndRow
+                For lSelectedCol As Integer = pSelStartCol To pSelEndCol
+                    pSource.CellSelected(lSelectedRow, lSelectedCol) = True
+                Next
+            Next
+            EditCellFinished()
+        End If
+        Me.Refresh()
+    End Sub
+
+    Private Sub ComputeCurrentRowColumn(ByVal e As System.Windows.Forms.MouseEventArgs, ByRef aRow As Integer, ByRef aColumn As Integer)
+        aRow = 0
+        aColumn = ColumnEdgeToDrag(e.X)
+        Dim lRowIndex As Integer = 0
+        Dim lColumnIndex As Integer = 0
+        If aColumn < 0 Then
+            While lRowIndex < pRowBottom.Count AndAlso e.Y > pRowBottom.ItemByIndex(lRowIndex)
+                lRowIndex += 1
+            End While
+            While lColumnIndex < pColumnRight.Count AndAlso e.X > pColumnRight.ItemByIndex(lColumnIndex)
+                lColumnIndex += 1
+            End While
+            If lRowIndex < pRowBottom.Count AndAlso lColumnIndex < pColumnRight.Count Then
+                aRow = pRowBottom.Keys(lRowIndex)
+                aColumn = pColumnRight.Keys(lColumnIndex)
+            End If
+        End If
+    End Sub
+
+    Private Sub MoveToCell(ByVal aRow As Integer, ByVal aColumn As Integer)
+        If aRow >= Me.Source.FixedRows And aRow < Me.Source.Rows And _
+           aColumn >= Me.Source.FixedColumns And aColumn < Me.Source.Columns Then
+            RaiseEvent MouseDownCell(Me, aRow, aColumn)
+            If pSource.CellEditable(aRow, aColumn) Then
+                EditCell(aRow, aColumn)
+            End If
+            pCurrentRow = aRow
+            pCurrentColumn = aColumn
+        Else
+            EditCell(pCurrentRow, pCurrentColumn)
+        End If
     End Sub
 End Class
