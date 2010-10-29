@@ -209,45 +209,38 @@ Public Module modDate
         aFrac = lRem - aSc
     End Sub
 
+    ''' <summary>
+    ''' invert modified Julian date as computed by function MJD (from DelbertDFranz)
+    ''' </summary>
+    ''' <param name="aMJD">value of modified julian date date number to invert</param>
+    ''' <param name="aYr">calendar year</param>
+    ''' <param name="aMn">number of month(1-12)</param>
+    ''' <param name="aDy">day in the month</param>
+    ''' <remarks>Developed from information given in: "Astronomical Formulae for Calculators", Jean Meeus, published by Willmann-Bell.</remarks>
     Sub INVMJD(ByVal aMJD As Integer, ByRef aYr As Integer, ByRef aMn As Integer, ByRef aDy As Integer)
-        '##SUMMARY INVMJD - invert modified Julian date as computed by function MJD (from DelbertDFranz) _
-        'Developed from information given in: "Astronomical Formulae _
-        'for Calculators', Jean Meeus, published by Willmann-Bell.
-        '##PARM aMJD - value of modified julian date date number to invert
-        '##PARM aYr - calendar year
-        '##PARM aMn - number of month(1-12)
-        '##PARM aDy - day in the month
-
-        Dim e, c, ALPHA, a, b, d, Z As Integer
-        '##LOCAL a - intermediate result
-        '##LOCAL ALPHA - intermediate result
-        '##LOCAL b - intermediate result
-        '##LOCAL c - intermediate result
-        '##LOCAL d - intermediate result
-        '##LOCAL e - intermediate result
-        '##LOCAL Z - intermediate result
-
         'convert to Julian time plus the .5 day correction. yields an integer
-        Z = aMJD + JulianModification + 1720994 + 1
-
+        Dim Z As Integer = aMJD + JulianModification + 1720994 + 1
+        Dim a As Integer
         If (Z < 2299161) Then
             a = Z
         Else
-            ALPHA = CInt(Fix((CDbl(Z) - CDbl(1867216.24)) / CDbl(36524.25)))
+            Dim ALPHA As Integer = CInt(Fix((CDbl(Z) - CDbl(1867216.24)) / CDbl(36524.25)))
             a = Z + 1 + ALPHA - Int(ALPHA / 4)
         End If
 
-        b = a + 1524
-        c = CInt(Fix((CDbl(b) - 122.1) / 365.25))
-        d = CInt(Fix(CDbl(365.25) * CDbl(c)))
-        e = CInt(Fix(CDbl(b - d) / 30.6001))
+        Dim b As Integer = a + 1524
+        Dim c As Integer = CInt(Fix((CDbl(b) - 122.1) / 365.25))
+        Dim d As Integer = CInt(Fix(CDbl(365.25) * CDbl(c)))
+        Dim e As Integer = CInt(Fix(CDbl(b - d) / 30.6001))
 
         aDy = b - d - Fix(30.6001 * CDbl(e))
+
         If (e <= 13) Then
             aMn = e - 1
         Else
             aMn = e - 13
         End If
+
         If (aMn >= 3) Then
             aYr = c - 4716
         Else
@@ -255,28 +248,24 @@ Public Module modDate
         End If
     End Sub
 
+    ''' <summary>
+    ''' Compute modified julian date for any date with a year greater than 1582 (from DelbertDFranz)
+    ''' </summary>
+    ''' <param name="aYr">calendar year</param>
+    ''' <param name="aMn">number of month(1-12)</param>
+    ''' <param name="aDy">day in the month</param>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' We take the resulting date to represent the elapsed time from 
+    ''' some point in the past to the first instant of the given day. 
+    ''' The date must be later than Nov. 17, 1858 for MJD to be 
+    ''' a positive number.  Thus for use in FEQ the year must be 1859 or greater. 
+    ''' This routine and INVMJD have been checked by DDF for every day from 1860 through the year 25000. 
+    ''' Developed from information given in: "Astronomical Formulae 
+    ''' for Calculators', Jean Meeus, published by Willmann-Bell.
+    '''</remarks>
     Function MJD(ByVal aYr As Integer, ByVal aMn As Integer, ByVal aDy As Integer) As Integer
-        '##SUMMARY MJD - 'Compute modified julian date for any date _
-        'with a year greater than 1582 (from DelbertDFranz) _
-        'We take the resulting date to represent the elapsed time from _
-        'some point in the past to the first instant of the given day. _
-        'The date must be later than Nov. 17, 1858 for MJD to be _
-        'a positive number.  Thus for use in FEQ the year must be 1859 _
-        'or greater. _
-        'This routine and INVMJD have been checked by DDF for every day _
-        'from 1860 through the year 25000. _
-        'Developed from information given in: "Astronomical Formulae _
-        'for Calculators', Jean Meeus, published by Willmann-Bell.
-        '##PARM aYr - calendar year
-        '##PARM aMn - number of month(1-12)
-        '##PARM aDy - day in the month
-
-        Dim m, a, b, y As Integer
-        '##LOCAL a - intermediate result
-        '##LOCAL b - intermediate result
-        '##LOCAL m - intermediate result
-        '##LOCAL y - intermediate result
-
+        Dim m, y As Integer
         If (aMn > 2) Then
             y = aYr
             m = aMn
@@ -285,8 +274,8 @@ Public Module modDate
             m = aMn + 12
         End If
 
-        a = Int(y / 100)
-        b = 2 - a + Int(a / 4)
+        Dim a As Integer = Int(y / 100)
+        Dim b As Integer = 2 - a + Int(a / 4)
 
         MJD = Int((36525 * y) / 100) + _
               Int(30.6001 * (m + 1)) + _
@@ -349,7 +338,7 @@ Public Module modDate
                     End If
                 ElseIf aDate(3) = 24 Then  'more: x x x 24 0 0
                     lDateIntrvl = 3
-                    If aDate(2) = daymon(aDate(0), aDate(1)) Then 'more: x x 31,30,29,28 24 0 0
+                    If aDate(2) = DayMon(aDate(0), aDate(1)) Then 'more: x x 31,30,29,28 24 0 0
                         lDateIntrvl = 2 'month boundary
                         If aDate(1) = 12 Then 'more: x 12 31 24 0 0
                             lDateIntrvl = 1 'year boundary
@@ -365,38 +354,40 @@ Public Module modDate
         Return lDateIntrvl
     End Function
 
-    Function daymon(ByVal yr As Integer, ByVal mo As Integer) As Integer
-        '##SUMMARY daymon - return the number of days in the given month for the given _
-        'year, with leap year taken into account.  For an invalid month, -1 is returned. _
-        'For an invalid year and a valid month, the correct number of days is returned, _
-        'with February = 28.
-        '##PARM yr - year, valid range is 1 - 2080
-        '##PARM mo - month, valid range is 1 - 12
-        Static ndaymon() As Integer = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
-        'LOCAL ndaymon - number of days in each month
-
-        If mo < 1 OrElse mo > 12 Then
-            daymon = -1 'invalid month
-
-        ElseIf mo = 2 Then  'check for leap year
-            If yr <= 0 Or yr > 2080 Then 'invalid year
-                daymon = 28
-            ElseIf yr Mod 100 = 0 Then
-                'check whether this is a leap year on a century boundary
-                If yr Mod 400 = 0 Then 'on a 400 year boundary
-                    daymon = 29
+    ''' <summary>
+    ''' return the number of days in the given month for the given 
+    ''' year, with leap year taken into account.  
+    ''' </summary>
+    ''' <param name="aYr">year, valid range is 1 - 2080</param>
+    ''' <param name="aMo">month, valid range is 1 - 12</param>
+    ''' <returns>number of days</returns>
+    ''' <remarks>
+    ''' For an invalid month, -1 is returned. 
+    ''' For an invalid year and a valid month, the correct number of days is returned, with February = 28.
+    ''' </remarks>
+    Function DayMon(ByVal aYr As Integer, ByVal aMo As Integer) As Integer
+        Static lNumDayMon() As Integer = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+        Dim lDayMon As Integer = -1
+        If aMo < 1 OrElse aMo > 12 Then
+            lDayMon = -1 'invalid month
+        ElseIf aMo = 2 Then  'check for leap year
+            If aYr <= 0 Or aYr > 2080 Then 'invalid year
+                lDayMon = 28
+            ElseIf aYr Mod 100 = 0 Then 'check whether this is a leap year on a century boundary
+                If aYr Mod 400 = 0 Then 'on a 400 year boundary
+                    lDayMon = 29
                 Else 'century boundary case
-                    daymon = 28
+                    lDayMon = 28
                 End If
-            ElseIf yr Mod 4 = 0 Then  'leap year
-                daymon = 29
+            ElseIf aYr Mod 4 = 0 Then  'leap year
+                lDayMon = 29
             Else 'non leap year
-                daymon = 28
+                lDayMon = 28
             End If
-
         Else 'valid month, not February
-            daymon = ndaymon(mo)
+            lDayMon = lNumDayMon(aMo)
         End If
+        Return lDayMon
     End Function
 
     Public Function addUniqueDate(ByVal j As Double, ByRef ja() As Double, ByRef ji() As Integer) As Boolean
@@ -449,130 +440,6 @@ Public Module modDate
         End If
         Return lDumpDate
     End Function
-
-    'Public Sub DTMCMN(ByVal sdates() As Integer, ByVal edates() As Integer, _
-    '                  ByVal TSTEP() As Integer, ByVal TCODE() As Integer, _
-    '                  ByRef sdat() As Integer, ByRef edat() As Integer, _
-    '                  ByRef ts As Integer, ByRef tc As Integer, _
-    '                  ByRef retcod As Integer) 'tc As ATCTimeUnit
-    '    '##SUMMARY DTMCMN - determine the time period common to a number of pairs of dates. _
-    '    'also determines the smallest common time step and unit.
-    '    '##PARM sdates - input array of beginning dates
-    '    '##PARM edates - input array of ending dates
-    '    '##PARM tstep  - input array of time steps
-    '    '##PARM tcode  - input array of time units codes _
-    '    '1 - second        4 - day _
-    '    '2 - minute        5 - month _
-    '    '3 - hour          6 - year
-    '    '##PARM stat   - output common starting date
-    '    '##PARM edat   - output common ending date
-    '    '##PARM ts     - output smallest common time step
-    '    '##PARM tc     - output smallest common time units code
-    '    '##PARM retcod - output return code _
-    '    '0 - there is a common time period and time step and units _
-    '    '-1 - there is no common time period _
-    '    '-2 - there is a common time period, but the time step and _
-    '    'time units are not compatible
-    '    Dim tstepf, ndat, n, tcdcmp As Integer
-    '    '##LOCAL ndat   - number of dates to compare
-    '    '##LOCAL n      - index of date being compared
-    '    '##LOCAL tstepf - time step compatibility flag _
-    '    '0 - compatible time steps _
-    '    '1 - incompatible time steps
-    '    '##LOCAL tcdcmp - flag indicating order of time steps _
-    '    '0 - time steps are the same _
-    '    '1 - first time step is smaller _
-    '    '2 - second time step is smaller _
-    '    '-1 - time units span day-month boundry
-
-    '    DatCmn(sdates, edates, sdat, edat, retcod) 'get common time period
-
-    '    If (retcod = 0) Then 'get common time step and units
-    '        ts = TSTEP(1)
-    '        tc = TCODE(1)
-    '        'check others
-    '        ndat = (UBound(sdates) / 6) '- 1 jlk 10/14/99
-    '        n = 1
-    '        Do While n < ndat And retcod = 0 'look for smallest common time step and unit
-    '            cmptim(TCODE(n), TSTEP(n), tc, ts, tstepf, tcdcmp)
-    '            If (tstepf = 0 And tcdcmp <> -1) Then 'compatible time steps, do not span day-month boundry
-    '                If (tcdcmp = 2) Then 'new larger time step
-    '                    ts = TSTEP(n)
-    '                    tc = TCODE(n)
-    '                End If
-    '            Else 'incompatible time steps or time units span day-month boundry
-    '                retcod = -2
-    '            End If
-    '            n = n + 1
-    '        Loop
-    '        If (retcod = -2) Then 'time step and time units are not all compatible
-    '            ts = 0
-    '            tc = 0
-    '        End If
-    '    Else 'no common time period
-    '        retcod = -1
-    '        ts = 0
-    '        tc = 0
-    '    End If
-    'End Sub
-
-    'Public Sub DatCmn(ByVal sd() As Integer, ByVal ed() As Integer, _
-    '                  ByRef SDate() As Integer, ByRef EDate() As Integer, ByRef retcod As Integer)
-    '    '##SUMMARY DatCmn - determine the time period common to a number of sets of dates.
-    '    '##PARM sd     - input array of beginning dates
-    '    '##PARM ed     - input array of ending dates
-    '    '##PARM sdate  - output common starting data
-    '    '##PARM edate  - output common ending date
-    '    '##PARM retcod - output return code _
-    '    '0 - there is a common time period _
-    '    '-1 - there is no common time period
-    '    Dim ljdate As Double
-    '    Dim ndat As Integer
-    '    Dim sjdate, ejdate As Double
-    '    Dim j, i As Integer
-    '    Dim d(5) As Integer
-    '    '##LOCAL ljdate - temp modified julian date
-    '    '##LOCAL ndat   - number of dates to check
-    '    '##LOCAL sjdate - earliest modfied julian date
-    '    '##LOCAL ejdate - latest modified julian date
-    '    '##LOCAL j      - input array pointer
-    '    '##LOCAL i      - loop counter thru dates arrays
-    '    '##LOCAL d      - temp date array
-    '    ndat = (UBound(sd) / 6) ' - 1 jlk 10/14/99
-    '    sjdate = -1.0E+30 'way in past
-    '    For i = 0 To ndat - 1
-    '        j = i * 6
-    '        d(0) = sd(j) : d(1) = sd(j + 1) : d(2) = sd(j + 2)
-    '        d(3) = sd(j + 3) : d(4) = sd(j + 4) : d(5) = sd(j + 5)
-    '        ljdate = Date2J(d)
-    '        If ljdate > sjdate Then 'new latest start
-    '            sjdate = ljdate
-    '        End If
-    '    Next i
-
-    '    ejdate = 1.0E+30 'way in future
-    '    For i = 0 To ndat - 1
-    '        j = i * 6
-    '        d(0) = ed(j) : d(1) = ed(j + 1) : d(2) = ed(j + 2)
-    '        d(3) = ed(j + 3) : d(4) = ed(j + 4) : d(5) = ed(j + 5)
-    '        ljdate = Date2J(d)
-    '        If ljdate < ejdate Then 'new earliest end
-    '            ejdate = ljdate
-    '        End If
-    '    Next i
-
-    '    If ejdate > sjdate Then 'common start date before common end date, as hoped for
-    '        J2Date(sjdate, SDate)
-    '        J2Date(ejdate, EDate)
-    '        retcod = 0
-    '    Else
-    '        For i = 0 To 5
-    '            SDate(i) = 0
-    '            EDate(i) = 0
-    '        Next i
-    '        retcod = -1
-    '    End If
-    'End Sub
 
     Private Sub cmptim(ByVal tcode1 As Integer, ByVal tstep1 As Integer, _
                        ByVal tcode2 As Integer, ByVal tstep2 As Integer, _
@@ -760,7 +627,7 @@ Public Module modDate
                         d(0) = d(0) - 1
                         d(1) = 12
                     End If
-                    d(2) = daymon(d(0), d(1))
+                    d(2) = DayMon(d(0), d(1))
                 End If
             End If
         End If
@@ -872,7 +739,7 @@ Public Module modDate
                 If (TDY > 28) Then 'may need month/year adjustment
                     DONFG = 0
                     While DONFG = 0
-                        DPM = daymon(TYR, TMO)
+                        DPM = DayMon(TYR, TMO)
                         If (TDY > DPM) Then 'add another month
                             TDY = TDY - DPM
                             TMO = TMO + 1
@@ -886,7 +753,7 @@ Public Module modDate
                                 TYR = TYR - 1
                                 TMO = 12
                             End If
-                            TDY = TDY - daymon(TYR, TMO)
+                            TDY = TDY - DayMon(TYR, TMO)
                         Else
                             DONFG = 1
                         End If
@@ -906,11 +773,11 @@ Public Module modDate
                 End If
 
                 'check days/month
-                DPM = daymon(TYR, TMO)
+                DPM = DayMon(TYR, TMO)
                 If (DPM < TDY) Then
                     TDY = DPM
                 End If
-                If (daymon(DATE1(0), DATE1(1)) = DATE1(2)) Then
+                If (DayMon(DATE1(0), DATE1(1)) = DATE1(2)) Then
                     TDY = DPM
                 End If
             End If
