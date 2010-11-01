@@ -991,10 +991,10 @@ Public Class atcGrid
             If e.Button = Windows.Forms.MouseButtons.Left Then
                 If Not pControlOrShiftKeyPressed Then
                     'start selected range on click
-                    SetStartSelectedRange(lRow, lColumn)
+                    '    SetStartSelectedRange(lRow, lColumn)
                 Else
                     'control or shift key pressed
-                    SetEndSelectedRange(lRow, lColumn)
+                    '    SetEndSelectedRange(lRow, lColumn)
                 End If
             End If
         End If
@@ -1038,7 +1038,7 @@ Public Class atcGrid
                     Dim lRow As Integer = 0
                     Dim lColumn As Integer = 0
                     ComputeCurrentRowColumn(e, lRow, lColumn)
-                    SetEndSelectedRange(lRow, lColumn)
+                    'SetEndSelectedRange(lRow, lColumn)
                 End If
         End Select
     End Sub
@@ -1294,7 +1294,7 @@ Public Class atcGrid
     End Sub
 
     Private Sub SetStartSelectedRange(ByVal aRow As Integer, ByVal aColumn As Integer)
-        'un-highlight previous selected range 
+        'unselect previous selected range 
         For lSelectedRow As Integer = 0 To pSource.Rows - 1
             For lSelectedCol As Integer = 0 To pSource.Columns - 1
                 pSource.CellSelected(lSelectedRow, lSelectedCol) = False
@@ -1313,13 +1313,13 @@ Public Class atcGrid
         pSelEndCol = aColumn
         pSelEndRow = aRow
         pControlOrShiftKeyPressed = False
-        'un-highlight previous selected range 
+        'unselect previous selected range 
         For lSelectedRow As Integer = 0 To pSource.Rows - 1
             For lSelectedCol As Integer = 0 To pSource.Columns - 1
                 pSource.CellSelected(lSelectedRow, lSelectedCol) = False
             Next
         Next
-        'highlight selected range 
+        'mark new selected range 
         If pSelStartRow <> pSelEndRow Or pSelStartCol <> pSelEndCol Then
             For lSelectedRow As Integer = pSelStartRow To pSelEndRow
                 For lSelectedCol As Integer = pSelStartCol To pSelEndCol
