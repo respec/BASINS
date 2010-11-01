@@ -74,7 +74,7 @@ Public Class atcGridSource
         End Get
         Set(ByVal newValue As Color)
             If pColors Is Nothing Then
-                ReDim pColors(pRows - 1, pColumns - 1)
+                ReDim pColors(Rows - 1, Columns - 1)
             End If
             ExpandRowsColumns(aRow, aColumn)
             pColors(aRow, aColumn) = newValue
@@ -93,7 +93,7 @@ Public Class atcGridSource
         Set(ByVal newValue As Boolean)
             ExpandRowsColumns(aRow, aColumn)
             If pSelected Is Nothing Then
-                ReDim pSelected(pRows - 1, pColumns - 1)
+                ReDim pSelected(Rows - 1, Columns - 1)
             End If
             pSelected(aRow, aColumn) = newValue
         End Set
@@ -112,7 +112,7 @@ Public Class atcGridSource
             If newValue <> CellEditable(aRow, aColumn) Then
                 ExpandRowsColumns(aRow, aColumn)
                 If pEditable Is Nothing Then
-                    ReDim pEditable(pRows - 1, pColumns - 1)
+                    ReDim pEditable(Rows - 1, Columns - 1)
                 End If
                 pEditable(aRow, aColumn) = newValue
             End If
