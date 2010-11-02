@@ -320,12 +320,16 @@ Public Class atcTimeseriesGridSource
                                     'TODO: exception?
                                 End If
                             Else
-                                lTS.Value(lIndex) = CDbl(newValue)
+                                If IsNumeric(newValue) Then
+                                    lTs.Value(lIndex) = CDbl(newValue)
+                                Else
+                                    'TODO: exception?
+                                End If
                             End If
                             'Catch 'was not a Timeseries or could not get a value
                             'End Try
                         Else
-                            'TODO: exception?
+                                'TODO: exception?
                         End If
                     End If
                 Case Else 'Column out of range

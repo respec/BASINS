@@ -37,7 +37,6 @@ Public Class atcGrid
 
     'added to enable copy/paste
     Private pSelStartCol As Long, pSelStartRow As Long  'Cell where current selection was started
-    Private pSelEndCol As Long, pSelEndRow As Long      'Cell at other corner of current selection
     Private pControlOrShiftKeyPressed As Boolean = False
     Friend WithEvents CopyToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents PasteToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
@@ -991,21 +990,47 @@ Public Class atcGrid
             If e.Button = Windows.Forms.MouseButtons.Left Then
                 If Not pControlOrShiftKeyPressed Then
                     'start selected range on click
-                    '    SetStartSelectedRange(lRow, lColumn)
+                    SetStartSelectedRange(lRow, lColumn)
                 Else
                     'control or shift key pressed
-                    '    SetEndSelectedRange(lRow, lColumn)
+                    SetEndSelectedRange(lRow, lColumn)
                 End If
             End If
         End If
 
         If e.Button = Windows.Forms.MouseButtons.Right Then  'on right mouse button set copy/paste in context menu
-            If (lRow < Me.Source.FixedRows Or lColumn < Me.Source.FixedColumns) Or _
-                lRow < pSelStartRow Or lRow > pSelEndRow Or lColumn < pSelStartCol Or lColumn > pSelEndCol Then
+            If (lRow < Me.Source.FixedRows Or lColumn < Me.Source.FixedColumns) Then
                 Me.ContextMenuStrip = Nothing
             Else
                 Me.ContextMenuStrip = GridContextMenuStrip
-                If Clipboard.ContainsText Then
+                'decide if copy should be available 
+                Dim lAnythingSelected As Boolean = False
+                For lCurRow As Integer = 0 To pSource.Rows - 1
+                    For lCurCol As Integer = 0 To pSource.Columns - 1
+                        If pSource.CellSelected(lCurRow, lCurCol) Then
+                            lAnythingSelected = True
+                            Exit For
+                        End If
+                    Next
+                    If lAnythingSelected Then Exit For
+                Next
+                If lAnythingSelected Then
+                    CopyToolStripMenuItem.Enabled = True
+                Else
+                    CopyToolStripMenuItem.Enabled = False
+                End If
+                'decide if paste should be available 
+                Dim lAnythingEditableAndSelected As Boolean = False
+                For lCurRow As Integer = 0 To pSource.Rows - 1
+                    For lCurCol As Integer = 0 To pSource.Columns - 1
+                        If pSource.CellSelected(lCurRow, lCurCol) And pSource.CellEditable(lCurRow, lCurCol) Then
+                            lAnythingEditableAndSelected = True
+                            Exit For
+                        End If
+                    Next
+                    If lAnythingEditableAndSelected Then Exit For
+                Next
+                If Clipboard.ContainsText And lAnythingEditableAndSelected Then
                     PasteToolStripMenuItem.Enabled = True
                 Else
                     PasteToolStripMenuItem.Enabled = False
@@ -1038,7 +1063,9 @@ Public Class atcGrid
                     Dim lRow As Integer = 0
                     Dim lColumn As Integer = 0
                     ComputeCurrentRowColumn(e, lRow, lColumn)
-                    'SetEndSelectedRange(lRow, lColumn)
+                    If pSource.CellEditable(lRow, lColumn) Then
+                        SetEndSelectedRange(lRow, lColumn)
+                    End If
                 End If
         End Select
     End Sub
@@ -1179,13 +1206,6 @@ Public Class atcGrid
             Case Keys.ControlKey : pControlOrShiftKeyPressed = True
             Case Keys.ShiftKey : pControlOrShiftKeyPressed = True
         End Select
-        If pControlOrShiftKeyPressed Then
-            If e.KeyCode = Keys.V And My.Computer.Clipboard.ContainsText Then
-                PasteFromClipboard()
-            ElseIf e.KeyCode = Keys.C Then 'Control-C (copy)
-                CopyToClipboard()
-            End If
-        End If
     End Sub
 
     Private Sub CellEditBox_LostFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles CellEditBox.LostFocus
@@ -1200,13 +1220,6 @@ Public Class atcGrid
             Case Keys.ControlKey : pControlOrShiftKeyPressed = True
             Case Keys.ShiftKey : pControlOrShiftKeyPressed = True
         End Select
-        If pControlOrShiftKeyPressed Then
-            If e.KeyCode = Keys.V And My.Computer.Clipboard.ContainsText Then
-                PasteFromClipboard()
-            ElseIf e.KeyCode = Keys.C Then 'Control-C (copy)
-                CopyToClipboard()
-            End If
-        End If
     End Sub
 
     Private Sub CellComboBox_LostFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles CellComboBox.LostFocus
@@ -1240,44 +1253,48 @@ Public Class atcGrid
     End Sub
 
     Private Sub PasteFromClipboard()
-        If pSelStartRow = pSelEndRow And pSelStartCol = pSelEndCol Then
-            'cant paste to just one cell, this gets handles within the cell edit box
-        Else
-            Dim lCopyString As String = ""
-            If Clipboard.ContainsText Then
-                lCopyString = Clipboard.GetText()
-                Dim lSplitChars As Char() = {CChar(vbTab), CChar(vbCr)}
-                Dim lPasteValues As String() = lCopyString.Split(lSplitChars)
+        Dim lCopyString As String = ""
+        If Clipboard.ContainsText Then
+            lCopyString = Clipboard.GetText()
+            Dim lSplitChars As Char() = {CChar(vbTab), CChar(vbCr)}
+            Dim lPasteValues As String() = lCopyString.Split(lSplitChars)
 
-                Dim lCellIndex As Integer = 0
-                For lSelectedRow As Integer = pSelStartRow To pSelEndRow
-                    For lSelectedCol As Integer = pSelStartCol To pSelEndCol
-                        If pSource.CellEditable(lSelectedRow, lSelectedCol) Then
-                            If lCellIndex <= lPasteValues.GetUpperBound(0) Then
-                                pSource.CellValue(lSelectedRow, lSelectedCol) = lPasteValues(lCellIndex)
-                            Else
-                                'have run out of values, use last one 
-                                pSource.CellValue(lSelectedRow, lSelectedCol) = lPasteValues(lPasteValues.GetUpperBound(0))
-                            End If
-                            RaiseEvent CellEdited(Me, lSelectedRow, lSelectedCol)
+            Dim lCellIndex As Integer = 0
+            For lRow As Integer = 0 To pSource.Rows - 1
+                For lCol As Integer = 0 To pSource.Columns - 1
+                    If pSource.CellSelected(lRow, lCol) AndAlso pSource.CellEditable(lRow, lCol) Then
+                        If lCellIndex <= lPasteValues.GetUpperBound(0) Then
+                            pSource.CellValue(lRow, lCol) = lPasteValues(lCellIndex)
+                        Else
+                            'have run out of values, use last one 
+                            pSource.CellValue(lRow, lCol) = lPasteValues(lPasteValues.GetUpperBound(0))
                         End If
                         lCellIndex += 1
-                    Next
+                        RaiseEvent CellEdited(Me, lRow, lCol)
+                    End If
                 Next
-                Me.Refresh()
-            End If
+            Next
+            Me.Refresh()
         End If
     End Sub
 
     Private Sub CopyToClipboard()
         Dim lCopyString As String = ""
-        For lSelectedRow As Integer = pSelStartRow To pSelEndRow
-            For lSelectedCol As Integer = pSelStartCol To pSelEndCol
-                lCopyString = lCopyString & pSource.CellValue(lSelectedRow, lSelectedCol)
-                If lSelectedRow < pSelEndRow And lSelectedCol = pSelEndCol Then
-                    lCopyString = lCopyString & vbCr
-                ElseIf lSelectedCol < pSelEndCol Then
-                    lCopyString = lCopyString & vbTab
+        Dim lFirstValue As Boolean = True
+        For lRow As Integer = 0 To pSource.Rows - 1
+            Dim lStartOfRow As Boolean = True
+            For lCol As Integer = 0 To pSource.Columns - 1
+                If pSource.CellSelected(lRow, lCol) Then
+                    If lFirstValue Then
+                        lCopyString = pSource.CellValue(lRow, lCol)
+                        lFirstValue = False
+                        lStartOfRow = False
+                    ElseIf lStartOfRow Then
+                        lCopyString = lCopyString & vbCr & pSource.CellValue(lRow, lCol)
+                        lStartOfRow = False
+                    Else
+                        lCopyString = lCopyString & vbTab & pSource.CellValue(lRow, lCol)
+                    End If
                 End If
             Next
         Next
@@ -1294,35 +1311,34 @@ Public Class atcGrid
     End Sub
 
     Private Sub SetStartSelectedRange(ByVal aRow As Integer, ByVal aColumn As Integer)
-        'unselect previous selected range 
-        For lSelectedRow As Integer = 0 To pSource.Rows - 1
-            For lSelectedCol As Integer = 0 To pSource.Columns - 1
-                pSource.CellSelected(lSelectedRow, lSelectedCol) = False
+        If pSource.CellEditable(aRow, aColumn) Then
+            'unselect previous selected range 
+            For lRow As Integer = 0 To pSource.Rows - 1
+                For lCol As Integer = 0 To pSource.Columns - 1
+                    pSource.CellSelected(lRow, lCol) = False
+                Next
             Next
-        Next
-        Me.Refresh()
+            Me.Refresh()
+        End If
         'start new selected range
         pSelStartCol = aColumn
         pSelStartRow = aRow
-        pSelEndCol = aColumn
-        pSelEndRow = aRow
     End Sub
 
     Private Sub SetEndSelectedRange(ByVal aRow As Integer, ByVal aColumn As Integer)
-        'set end of selected range 
-        pSelEndCol = aColumn
-        pSelEndRow = aRow
         pControlOrShiftKeyPressed = False
-        'unselect previous selected range 
-        For lSelectedRow As Integer = 0 To pSource.Rows - 1
-            For lSelectedCol As Integer = 0 To pSource.Columns - 1
-                pSource.CellSelected(lSelectedRow, lSelectedCol) = False
+        If pSource.CellEditable(aRow, aColumn) Then
+            'unselect previous selected range 
+            For lRow As Integer = 0 To pSource.Rows - 1
+                For lCol As Integer = 0 To pSource.Columns - 1
+                    pSource.CellSelected(lRow, lCol) = False
+                Next
             Next
-        Next
+        End If
         'mark new selected range 
-        If pSelStartRow <> pSelEndRow Or pSelStartCol <> pSelEndCol Then
-            For lSelectedRow As Integer = pSelStartRow To pSelEndRow
-                For lSelectedCol As Integer = pSelStartCol To pSelEndCol
+        If pSelStartRow <> aRow Or pSelStartCol <> aColumn Then
+            For lSelectedRow As Integer = pSelStartRow To aRow
+                For lSelectedCol As Integer = pSelStartCol To aColumn
                     pSource.CellSelected(lSelectedRow, lSelectedCol) = True
                 Next
             Next
