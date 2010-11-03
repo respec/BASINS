@@ -1062,16 +1062,18 @@ Public Module modStat
 
     Private Function NumberExceeding(ByVal aClassLimit As Double, ByVal aClassList As atcCollection, ByVal aTS2 As Boolean) As Double
         Dim lBucket As ClassBucket
+        Dim lNumberExceeding As Integer = 0
         For Each lClassLimit As Double In aClassList.Keys
             If aClassLimit <= lClassLimit Then
                 lBucket = aClassList.ItemByKey(lClassLimit)
                 If aTS2 Then
-                    NumberExceeding += lBucket.Count2
+                    lNumberExceeding += lBucket.Count2
                 Else
-                    NumberExceeding += lBucket.Count1
+                    lNumberExceeding += lBucket.Count1
                 End If
             End If
         Next
+        Return lNumberExceeding
     End Function
 
     Public Class DurationReport
