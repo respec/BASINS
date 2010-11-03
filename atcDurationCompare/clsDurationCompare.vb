@@ -6,7 +6,7 @@ Public Class clsDurationComparePlugin
 
     Public Overrides ReadOnly Property Name() As String
         Get
-            Return "Analysis::SWSTAT::Duration/Compare"
+            Return "Analysis::USGS Surface Water Statistics (SWSTAT)::Duration/Compare"
         End Get
     End Property
 
@@ -18,10 +18,10 @@ Public Class clsDurationComparePlugin
         pMapWinWindowHandle = aParentHandle
         atcDataManager.MapWindow = aMapWin
 
-        Dim lSWSTATMenuName As String = atcDataManager.AnalysisMenuName & "_SWSTAT"
+        Dim lSWSTATMenuName As String = atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)"
 
         atcDataManager.AddMenuIfMissing(atcDataManager.AnalysisMenuName, "", atcDataManager.AnalysisMenuString, atcDataManager.FileMenuName)
-        atcDataManager.AddMenuWithIcon(lSWSTATMenuName, atcDataManager.AnalysisMenuName, "SWSTAT", Me.Icon)
+        atcDataManager.AddMenuWithIcon(lSWSTATMenuName, atcDataManager.AnalysisMenuName, "USGS Surface Water Statistics (SWSTAT)", Me.Icon)
 
         pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_DurationCompare", lSWSTATMenuName, "Duration/Compare", Me.Icon, , , True))
         pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_DurationHydrograph", lSWSTATMenuName, "Duration Hydrograph", Me.Icon, , , True))

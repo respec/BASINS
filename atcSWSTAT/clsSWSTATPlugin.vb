@@ -9,7 +9,7 @@ Public Class clsSWSTATPlugin
 
     Public Overrides ReadOnly Property Name() As String
         Get
-            Return "Analysis::SWSTAT::Integrated Frequency Analysis"
+            Return "Analysis::USGS Surface Water Statistics (SWSTAT)::Integrated Frequency Analysis"
         End Get
     End Property
 
@@ -78,13 +78,13 @@ Public Class clsSWSTATPlugin
 
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
-        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_SWSTAT_" & pTrendName, _
-                                                       atcDataManager.AnalysisMenuName & "_SWSTAT", pTrendName, Me.Icon, , , True))
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)_" & pTrendName, _
+                                                       atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)", pTrendName, Me.Icon, , , True))
     End Sub
 
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         MyBase.ItemClicked(aItemName, aHandled)
-        If Not aHandled AndAlso aItemName.Equals(atcDataManager.AnalysisMenuName & "_SWSTAT_" & pTrendName) Then
+        If Not aHandled AndAlso aItemName.Equals(atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)_" & pTrendName) Then
             Dim lTimeseriesGroup As atcTimeseriesGroup = _
               atcDataManager.UserSelectData("Select Data For Trend Analysis", _
                                             Nothing, Nothing, True, True, Me.Icon)
