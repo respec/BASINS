@@ -27,6 +27,7 @@ Public Class atcDataSource
     ''' </summary>
     Public ReadOnly Property Attributes() As atcDataAttributes
         Get
+            If pAttributes Is Nothing Then pAttributes = New atcDataAttributes
             Return pAttributes
         End Get
     End Property
@@ -74,7 +75,7 @@ Public Class atcDataSource
 
     ''' <summary>Remove this source from memory</summary>
     Public Overridable Sub Clear()
-        If Not pAttributes Is Nothing Then
+        If pAttributes IsNot Nothing Then
             pAttributes.Clear()
             pAttributes = Nothing
         End If
@@ -262,8 +263,8 @@ Public Class atcDataSource
     End Sub
 
     Protected Overrides Sub Finalize()
-        If Not pAttributes Is Nothing Then pAttributes.Dispose()
-        If Not pData Is Nothing Then pData.Dispose()
+        If pAttributes IsNot Nothing Then pAttributes.Dispose()
+        If pData IsNot Nothing Then pData.Dispose()
         MyBase.Finalize()
     End Sub
 End Class
