@@ -428,6 +428,7 @@ Friend Class frmManager
             Select Case lActionArgs(0)
                 Case "Close"
                     atcDataManager.RemoveDataSource(aDataSource)
+                    pSelectedNodes.Clear()
                 Case "View"
                     .View()
                 Case "Display"
