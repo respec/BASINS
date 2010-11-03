@@ -40,6 +40,7 @@ Public Class atcGrid
     Private pControlOrShiftKeyPressed As Boolean = False
     Friend WithEvents CopyToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents PasteToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents CopyAllToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents GridContextMenuStrip As System.Windows.Forms.ContextMenuStrip
 
     'added to enable arrow up/down/left/right
@@ -87,6 +88,7 @@ Public Class atcGrid
         Me.CopyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.PasteToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.GridContextMenuStrip = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.CopyAllToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.GridContextMenuStrip.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -148,9 +150,15 @@ Public Class atcGrid
         '
         'GridContextMenuStrip
         '
-        Me.GridContextMenuStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToolStripMenuItem, Me.PasteToolStripMenuItem})
+        Me.GridContextMenuStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToolStripMenuItem, Me.PasteToolStripMenuItem, Me.CopyAllToolStripMenuItem})
         Me.GridContextMenuStrip.Name = "GridContextMenuStrip"
-        Me.GridContextMenuStrip.Size = New System.Drawing.Size(153, 70)
+        Me.GridContextMenuStrip.Size = New System.Drawing.Size(153, 92)
+        '
+        'CopyAllToolStripMenuItem
+        '
+        Me.CopyAllToolStripMenuItem.Name = "CopyAllToolStripMenuItem"
+        Me.CopyAllToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.CopyAllToolStripMenuItem.Text = "Copy All"
         '
         'atcGrid
         '
@@ -1278,13 +1286,13 @@ Public Class atcGrid
         End If
     End Sub
 
-    Private Sub CopyToClipboard()
+    Private Sub CopyToClipboard(ByVal aCheckSelected As Boolean)
         Dim lCopyString As String = ""
         Dim lFirstValue As Boolean = True
         For lRow As Integer = 0 To pSource.Rows - 1
             Dim lStartOfRow As Boolean = True
             For lCol As Integer = 0 To pSource.Columns - 1
-                If pSource.CellSelected(lRow, lCol) Then
+                If Not aCheckSelected Or pSource.CellSelected(lRow, lCol) Then
                     If lFirstValue Then
                         lCopyString = pSource.CellValue(lRow, lCol)
                         lFirstValue = False
@@ -1303,7 +1311,7 @@ Public Class atcGrid
     End Sub
 
     Private Sub CopyToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CopyToolStripMenuItem.Click
-        CopyToClipboard()
+        CopyToClipboard(True)
     End Sub
 
     Private Sub PasteToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PasteToolStripMenuItem.Click
@@ -1378,5 +1386,9 @@ Public Class atcGrid
         Else
             EditCell(pCurrentRow, pCurrentColumn)
         End If
+    End Sub
+
+    Private Sub CopyAllToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CopyAllToolStripMenuItem.Click
+        CopyToClipboard(False)
     End Sub
 End Class

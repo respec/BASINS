@@ -366,16 +366,22 @@ Friend Class frmManager
                     Logger.Msg("Choose at least one data source to " & aAction & " before choosing the action", aAction & " Problem")
                 End If
             Case 1
-                DoAction(aAction, lSources(0))
+                DoAction(aAction, lSources(0), False)
             Case Is > 1
-                If Logger.Msg(aAction & " " & lSources.Count & " sources?", vbYesNo, "More than one data source affected") = MsgBoxResult.Yes Then
+                'If Logger.Msg(aAction & " " & lSources.Count & " sources?", vbYesNo, "More than one data source affected") = MsgBoxResult.Yes Then
+                If aAction = "Display" Then
+                    DoDisplay()
+                ElseIf aAction.StartsWith("Analysis:") Then
+                    DoAction(aAction, lSources(0), True)
+                Else
                     pDelayPopulate = True
                     For Each lDataSource As atcDataSource In lSources
-                        DoAction(aAction, lDataSource)
+                        DoAction(aAction, lDataSource, True)
                     Next
                     pDelayPopulate = False
                     Populate(-1)
                 End If
+                'End If
         End Select
     End Sub
 
@@ -415,7 +421,7 @@ Friend Class frmManager
         Return lSources
     End Function
 
-    Private Sub DoAction(ByVal aAction As String, ByVal aDataSource As atcDataSource)        
+    Private Sub DoAction(ByVal aAction As String, ByVal aDataSource As atcDataSource, ByVal aMultipleSelected As Boolean)
         With aDataSource
             Logger.Dbg(aAction & ":" & .Specification)
             Dim lActionArgs() As String = aAction.Split(":")
@@ -425,14 +431,14 @@ Friend Class frmManager
                 Case "View"
                     .View()
                 Case "Display"
-                    Dim lSelected As atcTimeseriesGroup = .DataSets
-                    lSelected = atcDataManager.UserSelectData("Select data to Display", lSelected.Clone, Nothing, True, False)
-                    If lSelected IsNot Nothing AndAlso lSelected.Count > 0 Then
-                        atcDataManager.UserSelectDisplay("Select display", lSelected)
-                    End If
+                    DoDisplay()
                 Case "Analysis"
-                    Dim lSelected As atcTimeseriesGroup = .DataSets                    
-                    lSelected = atcDataManager.UserSelectData("Select data to " & lActionArgs(1), lSelected.Clone, Nothing, True, False)
+                    Dim lSelected As atcTimeseriesGroup = .DataSets
+                    If aMultipleSelected Then
+                        lSelected = atcDataManager.UserSelectData("Select data to " & lActionArgs(1), Nothing, Nothing, True, False)
+                    Else
+                        lSelected = atcDataManager.UserSelectData("Select data to " & lActionArgs(1), lSelected.Clone, Nothing, True, False)
+                    End If
                     If lSelected IsNot Nothing AndAlso lSelected.Count > 0 Then
                         atcDataManager.ShowDisplay(lActionArgs(1), lSelected)
                     End If
@@ -451,6 +457,16 @@ Friend Class frmManager
                     End If
             End Select
         End With
+    End Sub
+
+    Private Sub DoDisplay()
+        Dim lSelected As atcTimeseriesGroup = SelectedTimeseries()
+        If lSelected IsNot Nothing AndAlso lSelected.Count > 0 Then
+            lSelected = atcDataManager.UserSelectData("Select data to Display", Nothing, lSelected, True, False)
+            If lSelected IsNot Nothing AndAlso lSelected.Count > 0 Then
+                atcDataManager.UserSelectDisplay("Select display", lSelected)
+            End If
+        End If
     End Sub
 
     Private Sub ChangedData(ByVal aDataSource As atcTimeseriesSource)
@@ -513,6 +529,10 @@ Friend Class frmManager
         Else
             txtDetails.Text = ""
         End If
+    End Sub
+
+    Private Sub treeFiles_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles treeFiles.DoubleClick
+        DoDisplay()
     End Sub
 
     ' Draws a node.
