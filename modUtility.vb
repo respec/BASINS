@@ -1,5 +1,7 @@
 Imports System.Data.OleDb
 Imports MapWinUtility
+Imports MapWinUtility.Strings
+
 
 Module modUtility
 
@@ -311,7 +313,7 @@ TryExecute:
         Dim lFieldNames() As String = lAddSQLSplit(1).Split(",")
         Dim lFieldValueString As String = lAddSQLSplit(3)
         For Each lFieldName As String In lFieldNames
-            lSQL &= lFieldName & " = '" & atcUtility.modString.StrSplit(lFieldValueString, ",", "'") & "',"
+            lSQL &= lFieldName & " = '" & StrSplit(lFieldValueString, ",", "'") & "',"
         Next
         lSQL = lSQL.Substring(0, lSQL.Length - 1) & " WHERE " & aWhereClause
         Return lSQL
