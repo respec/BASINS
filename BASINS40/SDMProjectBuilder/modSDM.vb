@@ -1,6 +1,8 @@
 ﻿Imports atcUtility
 Imports atcMwGisUtility
 Imports MapWinUtility
+Imports MapWinUtility.Strings
+
 
 Public Module modSDM
     Friend g_MapWin As MapWindow.Interfaces.IMapWin
