@@ -12,16 +12,17 @@ Imports atcUtility
 Imports atcData
 
 Public Module ReadISHUpdates2
-    Private Const pInputPath As String = "C:\BasinsMet\original\ISH\"
-    Private Const pStationPath As String = "C:\BasinsMet\Stations\"
-    Private Const pOutputPath As String = "C:\BASINSMet\WDMRaw\"
+    Private Const pInputPath As String = "H:\BasinsMet\original\ISH\"
+    Private Const pStationPath As String = "H:\BasinsMet\Stations\"
+    Private Const pOutputPath As String = "C:\BasinsMet\WDMFilled\" '"H:\BASINSMet\Benning\" '"C:\BASINSMet\WDMRaw\"
+    Private Const pUpdateOnly As Boolean = False 'Only add to existing datasets if set to "True"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Logger.Dbg("ReadISHUpdates-2:Start")
         ChDriveDir(pInputPath)
         Logger.Dbg(" CurDir:" & CurDir())
 
-        Dim lNewYears() As String = {"2006"} '"2003", "2004", "2005"}
+        Dim lNewYears() As String = {"2007", "2008", "2009"} '"2003", "2004", "2005"}
 
         Dim lCurWDM As String = pOutputPath & "current.wdm"
         Dim lOutWDM As String = ""
@@ -115,7 +116,7 @@ Public Module ReadISHUpdates2
                                         End If
                                         lDSRevised = Nothing
                                     End If
-                                Else 'new dataset, save station attributes
+                                ElseIf Not pUpdateOnly Then 'new dataset, save station attributes
                                     lDS.Attributes.SetValue("STANAM", lStaName)
                                     lDS.Attributes.SetValue("LATDEG", lLat)
                                     lDS.Attributes.SetValue("LNGDEG", lLng)
