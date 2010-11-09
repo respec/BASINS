@@ -15,6 +15,22 @@ Module modSwatMetData
                                  ByVal aSaveInFolder As String, _
                                  ByVal aDateStart As Double, _
                                  ByVal aDateEnd As Double)
+        'If aTextInput Then
+        '    Dim lMetPcpFilename As String = IO.Path.Combine(aProjectFolder, "met\pcp1_new.pcp")
+        '    Dim lMetTmpFilename As String = IO.Path.Combine(aProjectFolder, "met\tmp1_new.tmp")
+        '    Dim lMetPcpToFilename As String = IO.Path.Combine(aSaveInFolder, "pcp1.pcp")
+        '    Dim lMetTmpToFilename As String = IO.Path.Combine(aSaveInFolder, "tmp1.tmp")
+
+        '    IO.File.Copy(lMetPcpFilename, lMetPcpToFilename, True)
+        '    IO.File.Copy(lMetTmpFilename, lMetTmpToFilename, True)
+        '    Exit Sub
+        '    'Dim lSwatPcpData As New atcTimeseriesSWAT.atcTimeseriesSWAT
+        '    'Dim lSwatTmpData As New atcTimeseriesSWAT.atcTimeseriesSWAT
+        '    'lSwatPcpData.Open(lMetPcpFilename)
+        '    'lSwatTmpData.Open(lMetTmpFilename)
+        '    'lSwatPcpData.Save(lMetPcpFilename, atcDataSource.EnumExistAction.ExistReplace)
+        '    'lSwatTmpData.Save(lMetTmpFilename, atcDataSource.EnumExistAction.ExistReplace)
+        'End If
         Dim lMetWDMfilename As String = IO.Path.Combine(aProjectFolder, "met\met.wdm")
         Dim lMetWDM As New atcDataSourceWDM ' open met.wdm created by download
         If lMetWDM.Open(lMetWDMfilename) Then
@@ -27,6 +43,61 @@ Module modSwatMetData
         Else
             MapWinUtility.Logger.Dbg("Could not open met wdm: " & lMetWDMfilename)
         End If
+    End Sub
+
+    Public Sub WriteSwatMetInput(ByVal aOriginalData As atcDataSource, ByVal aModifiedData As atcTimeseriesGroup, ByVal aSaveInFolder As String)
+        'Separate Prec and Atem modified data from aModifiedData into two atcTimeseriesGroup(s)
+        'Create two new atcTimeseriesSWAT, one for pcp and one for tmp
+        'search to swap into the two new atctimeseriesSWAT Datasets the modified data
+        'Then, call their Save function to save into aSaveInFolder
+        Dim lNewSwatDataSource As New atcTimeseriesSWAT.atcTimeseriesSWAT
+        lNewSwatDataSource.DataSets.AddRange(aOriginalData.DataSets)
+        lNewSwatDataSource.DataType = CType(aOriginalData, atcTimeseriesSWAT.atcTimeseriesSWAT).DataType
+        Dim lTargetSwatCons As String = lNewSwatDataSource.DataSets(0).Attributes.GetValue("Constituent")
+        Dim lTargetSwatStnID As String = ""
+        Dim lTargetSwatFldInd As String = ""
+
+        ''Another way of merging modified and original datasets
+        ''but it seems the original data should not be changed
+        'lTargetSwatCons = aOriginalData.DataSets(0).Attributes.GetValue("Constituent")
+        'Dim lFoundMatch As Boolean = False
+        'For I As Integer = 0 To aOriginalData.DataSets.Count - 1
+        '    lTargetSwatStnID = aOriginalData.DataSets(I).Attributes.GetValue("SWATSTNID")
+        '    lTargetSwatFldInd = aOriginalData.DataSets(I).Attributes.GetValue("FieldIndex")
+        '    lFoundMatch = False
+        '    For J As Integer = 0 To aModifiedData.Count - 1
+        '        If aModifiedData(J).Attributes.GetValue("Constituent") = lTargetSwatCons And _
+        '           aModifiedData(J).Attributes.GetValue("SWATSTNID") = lTargetSwatStnID And _
+        '           aModifiedData(J).Attributes.GetValue("FieldIndex") = lTargetSwatFldInd Then
+        '            lNewSwatDataSource.DataSets.Add(aModifiedData(J))
+        '            lFoundMatch = True
+        '            Exit For
+        '        End If
+        '    Next
+        '    If Not lFoundMatch Then
+        '        lNewSwatDataSource.DataSets.Add(aOriginalData.DataSets(I))
+        '    End If
+        'Next
+
+        For I As Integer = 0 To lNewSwatDataSource.DataSets.Count - 1
+            lTargetSwatStnID = lNewSwatDataSource.DataSets(I).Attributes.GetValue("SWATSTNID")
+            lTargetSwatFldInd = lNewSwatDataSource.DataSets(I).Attributes.GetValue("FieldIndex")
+            For J As Integer = 0 To aModifiedData.Count - 1
+                If aModifiedData(J).Attributes.GetValue("Constituent") = lTargetSwatCons And _
+                   aModifiedData(J).Attributes.GetValue("SWATSTNID") = lTargetSwatStnID And _
+                   aModifiedData(J).Attributes.GetValue("FieldIndex") = lTargetSwatFldInd Then
+                    lNewSwatDataSource.DataSets(I) = aModifiedData(J)
+                End If
+            Next
+        Next
+        Dim lSavedInFilename As String = ""
+        Select Case lTargetSwatCons.ToLower
+            Case "prec"
+                lSavedInFilename = IO.Path.Combine(aSaveInFolder, "pcp1.pcp")
+            Case "atem"
+                lSavedInFilename = IO.Path.Combine(aSaveInFolder, "tmp1.tmp")
+        End Select
+        lNewSwatDataSource.Save(lSavedInFilename, atcDataSource.EnumExistAction.ExistReplace)
     End Sub
 
     Public Sub WriteSwatMetInput(ByVal aOriginalData As atcDataSource, _

@@ -9,12 +9,24 @@ Public Class clsCatModelSWAT
 
     Public Event BaseScenarioSet(ByVal aBaseScenario As String) Implements clsCatModel.BaseScenarioSet
 
-    Private pBaseScenario As String = ""
-    Private pSWATDatabaseName As String = ""
+    Private pBaseScenario As String = Nothing
+    Private pSWATDatabaseName As String = Nothing
     Private pMetWDM As atcWDM.atcDataSourceWDM
+    Private pMetPcp As atcTimeseriesSWAT.atcTimeseriesSWAT
+    Private pMetTmp As atcTimeseriesSWAT.atcTimeseriesSWAT
     Private pBaseOutputHruFileName As String = Nothing
     Private pBaseOutputRchFileName As String = Nothing
     Private pBaseOutputSubFileName As String = Nothing
+    Private pSWATEXE As String = "swat2005.exe"
+
+    Public Property SwatExe() As String
+        Get
+            Return pSWATEXE
+        End Get
+        Set(ByVal value As String)
+            pSWATEXE = value
+        End Set
+    End Property
 
     Public Property BaseScenario() As String Implements clsCatModel.BaseScenario
         Get
@@ -36,7 +48,7 @@ Public Class clsCatModelSWAT
         pBaseOutputRchFileName = Nothing
         pBaseOutputSubFileName = Nothing
 
-        If Not aFilename Is Nothing AndAlso Not IO.File.Exists(aFilename) Then
+        If aFilename IsNot Nothing AndAlso Not IO.File.Exists(aFilename) Then
             If IO.File.Exists(aFilename & ".mdb") Then aFilename &= ".mdb"
         End If
 
@@ -49,7 +61,11 @@ Public Class clsCatModelSWAT
             End If
         End If
 
-        If aFilename.ToLower <> pBaseScenario.ToLower AndAlso IO.File.Exists(aFilename) Then
+        If Not IO.File.Exists(SWATDatabasePath) Then
+            Logger.Dbg("Could not find SWAT database path.")
+        End If
+
+        If (pBaseScenario Is Nothing OrElse aFilename.ToLower <> pBaseScenario.ToLower) AndAlso IO.File.Exists(aFilename) Then
             Dim lFolder As String = PathNameOnly(aFilename)
             ChDriveDir(lFolder)
             pBaseScenario = aFilename
@@ -58,7 +74,7 @@ Public Class clsCatModelSWAT
             'Find and open met data WDM file
             Dim lWDMfilename As String = IO.Path.GetDirectoryName(aFilename) & "\met.wdm"
             If Not IO.File.Exists(lWDMfilename) Then
-                lWDMfilename = IO.Path.GetDirectoryName(aFilename) & g_PathChar & "met\met.wdm"
+                lWDMfilename = IO.Path.Combine(IO.Path.GetDirectoryName(aFilename), "met\met.wdm")
             End If
 OpenMetWDM:
             If IO.File.Exists(lWDMfilename) Then
@@ -119,6 +135,16 @@ OpenOutput:
                             Logger.Dbg("OutputHruTimserCount " & .DataSets.Count)
                         End If
                     End With
+
+                    'open ascii Met data source
+                    Dim lPcpFile As String = IO.Path.Combine(lTxtInOutFolder, "pcp1.pcp")
+                    Dim lTmpFile As String = IO.Path.Combine(lTxtInOutFolder, "tmp1.tmp")
+                    If IO.File.Exists(lPcpFile) And IO.File.Exists(lTmpFile) Then
+                        pMetPcp = clsCat.OpenDataSource(lPcpFile)
+                        pMetTmp = clsCat.OpenDataSource(lTmpFile)
+                    Else
+                        Logger.Dbg("Cannot find SWAT Base case Met data pcp1.pcp and tmp1.tmp in " & lTxtInOutFolder)
+                    End If
                 Else
                     If Logger.Msg("Run base scenario now?", vbYesNo, "SWAT output.hru not found") = MsgBoxResult.Yes Then
                         pBaseOutputHruFileName = Nothing
@@ -165,7 +191,7 @@ ALREADYSET:
     Public Property SWATDatabasePath() As String
         Get
             If Not FileExists(pSWATDatabaseName) Then
-                pSWATDatabaseName = FindFile("Please locate SWAT 2005 database", SWATProgramBase & "Databases\SWAT2005.mdb")
+                pSWATDatabaseName = FindFile("Please locate SWAT 2005 database", SWATProgramBase & "Databases\SWAT2005.mdb", , , True)
             End If
             Return pSWATDatabaseName
         End Get
@@ -197,9 +223,14 @@ ALREADYSET:
 
         'write met data
         Dim lCioItem As SwatObject.SwatInput.clsCIOItem = lSwatInput.CIO.Item
-        modSwatMetData.WriteSwatMetInput(pMetWDM, aModifiedData, lProjectFolder, lTxtInOutFolder, _
-                                         atcUtility.Jday(lCioItem.IYR, 1, 1, 0, 0, 0), _
-                                         atcUtility.Jday(lCioItem.IYR + lCioItem.NBYR, 1, 1, 0, 0, 0))
+        If pMetWDM.DataSets.Count > 0 Then
+            modSwatMetData.WriteSwatMetInput(pMetWDM, aModifiedData, lProjectFolder, lTxtInOutFolder, _
+                                             atcUtility.Jday(lCioItem.IYR, 1, 1, 0, 0, 0), _
+                                             atcUtility.Jday(lCioItem.IYR + lCioItem.NBYR, 1, 1, 0, 0, 0))
+        Else
+            If pMetPcp.DataSets.Count > 0 Then modSwatMetData.WriteSwatMetInput(pMetPcp, aModifiedData, lTxtInOutFolder)
+            If pMetTmp.DataSets.Count > 0 Then modSwatMetData.WriteSwatMetInput(pMetTmp, aModifiedData, lTxtInOutFolder)
+        End If
         If aRunModel Then
             ChDir(lTxtInOutFolder)
             'Dim lSWATexeTargetPath As String = lTxtInOutFolder & "Swat2005.exe"
@@ -221,13 +252,13 @@ ALREADYSET:
             '    Logger.Dbg("SWAT exe not found, skipping model run")
             'End If
 
-            Dim lSWATExe As String = IO.Path.Combine(IO.Path.GetDirectoryName(pBaseScenario), "swat2005.exe")
+            Dim lSWATExe As String = IO.Path.Combine(IO.Path.GetDirectoryName(pBaseScenario), SwatExe())
             Dim lSWATexeTargetPath As String = String.Empty
             If IO.File.Exists(lSWATExe) Then
-                If TryDelete(lTxtInOutFolder & "swat2005.exe") Then
-                    TryCopy(lSWATExe, lTxtInOutFolder & "swat2005.exe")
+                If TryDelete(lTxtInOutFolder & SwatExe()) Then
+                    TryCopy(lSWATExe, lTxtInOutFolder & SwatExe())
                 End If
-                lSWATexeTargetPath = IO.Path.Combine(lTxtInOutFolder, "swat2005.exe")
+                lSWATexeTargetPath = IO.Path.Combine(lTxtInOutFolder, SwatExe())
                 Logger.Dbg("StartModel")
                 LaunchProgram(lSWATexeTargetPath, lTxtInOutFolder)
                 Logger.Dbg("DoneModelRun")
@@ -281,6 +312,7 @@ ALREADYSET:
             Dim lXML As String = ""
             lXML &= "<SWAT>" & vbCrLf
             lXML &= "  <FileName>" & pBaseScenario & "</FileName>" & vbCrLf
+            lXML &= "  <SWATDatabase>" & SWATDatabasePath & "</SWATDatabase>" & vbCrLf
             lXML &= "</SWAT>" & vbCrLf
             Return lXML
         End Get
