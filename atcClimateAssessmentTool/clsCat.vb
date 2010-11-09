@@ -116,6 +116,9 @@ StartOver:
                             Case "inp"
                                 If Model Is Nothing Then Model = New clsCatModelSWMM
                                 Model.BaseScenario = (AbsolutePath(lChild.InnerText, CurDir))
+                            Case "swat"
+                                If Model Is Nothing Then Model = New clsCatModelSWAT
+                                Model.BaseScenario = (AbsolutePath(lChild.InnerText, CurDir))
                             Case "preparedinputs"
                                 PreparedInputs.Clear()
                                 For Each lChild In lXML.ChildNodes
@@ -181,6 +184,8 @@ StartOver:
             Select Case IO.Path.GetExtension(aFilename).Substring(1).ToLower 'test letters after .
                 Case "wdm" : lDataSource = New atcWDM.atcDataSourceWDM
                 Case "hbn" : lDataSource = New atcHspfBinOut.atcTimeseriesFileHspfBinOut
+                Case "pcp" : lDataSource = New atcTimeseriesSWAT.atcTimeseriesSWAT
+                Case "tmp" : lDataSource = New atcTimeseriesSWAT.atcTimeseriesSWAT
                 Case "hru" : lDataSource = New atcTimeseriesSWAT.atcTimeseriesSWAT
                 Case "rch" : lDataSource = New atcTimeseriesSWAT.atcTimeseriesSWAT
                 Case "sub" : lDataSource = New atcTimeseriesSWAT.atcTimeseriesSWAT
@@ -339,7 +344,7 @@ NextIteration:
                         System.GC.Collect()
                         System.GC.WaitForPendingFinalizers()
                         If lVariation.Selected Then
-                            For Each lOldData As atcDataSet In lVariation.DataSets
+                            For Each lOldData As atcTimeseries In lVariation.DataSets
                                 .CellValue(lRow, lColumn) = "RunFailed 1"
                                 Dim lGroup As atcTimeseriesGroup = Nothing
                                 Dim lOriginalDataSpec As String = lOldData.Attributes.GetValue("History 1", "").Substring(10)
