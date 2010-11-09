@@ -63,10 +63,11 @@ Public Class atcDataAttributes
     ''' <summary>
     ''' Retrieve the atcAttributeDefinition for aAttributeName
     ''' </summary>
-    ''' <param name="aAttributeName"></param>
+    ''' <param name="aAttributeName">Name of definition to return</param>
+    ''' <param name="aCreate">If a definition by this name does not already exist, True creates a new definition, False returns Nothing</param>
     ''' <returns>AttributeDefinition</returns>
     ''' <remarks></remarks>
-    Public Shared Function GetDefinition(ByVal aAttributeName As String) As atcAttributeDefinition
+    Public Shared Function GetDefinition(ByVal aAttributeName As String, Optional ByVal aCreate As Boolean = False) As atcAttributeDefinition
         Dim lKey As String = AttributeNameToKey(aAttributeName)
         Dim lDef As atcAttributeDefinition = pAllDefinitions.ItemByKey(lKey)
         If lDef Is Nothing Then
@@ -91,6 +92,9 @@ Public Class atcDataAttributes
             End If
             If lDef IsNot Nothing Then            'Found a generic definition
                 lDef = lDef.Clone(aAttributeName) 'Make a specific definition
+            ElseIf aCreate Then
+                lDef = New atcAttributeDefinition
+                lDef.Name = aAttributeName
             End If
         End If
         Return lDef
@@ -286,11 +290,13 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
         Return SetValue(lTmpAttrDef, aAttributeValue)
     End Function
 
-    Public Shadows Function Add(ByVal aDefinedValue As Object) As Integer
+    Public Shadows Function Add(ByVal aDefinedValue As atcDefinedValue) As Integer
         If aDefinedValue Is Nothing Then
             Return -1
         Else
-            Return SetValue(aDefinedValue.Definition, aDefinedValue.Value, aDefinedValue.Arguments)
+            Dim lKey As String = AttributeNameToKey(aDefinedValue.Definition.Name)
+            MyBase.RemoveByKey(lKey)
+            Return MyBase.Add(lKey, aDefinedValue)
         End If
     End Function
 

@@ -111,6 +111,15 @@ Public Class atcCollection
         Next
     End Sub
 
+    Public Shadows Sub AddRange(ByVal aKeys As ArrayList, ByVal aValues As System.Collections.IEnumerable)
+        If pKeys.Count = 0 Then
+            pKeys = aKeys
+        Else
+            pKeys.AddRange(aKeys)
+        End If
+        MyBase.AddRange(aValues)
+    End Sub
+
     Public Shadows Sub AddRange(ByVal aKeys As System.Collections.IEnumerable, ByVal aValues As System.Collections.IEnumerable)
         pKeys.AddRange(aKeys)
         MyBase.AddRange(aValues)

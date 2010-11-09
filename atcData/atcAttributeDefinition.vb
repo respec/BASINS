@@ -6,6 +6,15 @@ Public Class atcDefinedValue
     Public Value As Object
     Public Arguments As atcDataAttributes 'Arguments used for calculating Value, if any, or Nothing
 
+    Public Sub New()
+    End Sub
+
+    Public Sub New(ByVal aDefinition As atcAttributeDefinition, ByVal aValue As Object, Optional ByVal aArguments As atcDataAttributes = Nothing)
+        Definition = aDefinition
+        Value = aValue
+        Arguments = aArguments
+    End Sub
+
     Public Function Clone() As atcDefinedValue
         Dim newDefinedValue As New atcDefinedValue
         With newDefinedValue
