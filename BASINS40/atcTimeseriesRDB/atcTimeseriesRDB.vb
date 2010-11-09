@@ -18,7 +18,7 @@ Imports System.IO
 Public Class atcTimeseriesRDB
     Inherits atcTimeseriesSource
 
-    Private Shared pFilter As String = "USGS RDB Files (*.rdb, *.txt)|*.rdb;*.txt|All Files (*.*)|(*.*)"
+    Private Shared pFilter As String = "USGS RDB Files (*.rdb, *.txt)|*.rdb;*.txt|All Files (*.*)|*.*"
     Private pErrorDescription As String
     Private pJulianInterval As Double = 1 'Add one day for daily values to record date at end of interval
 
