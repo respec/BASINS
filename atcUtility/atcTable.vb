@@ -9,8 +9,8 @@ Public Interface IatcTable
     Function Cousin() As IatcTable
     Function CreationCode() As String
 
-    Function OpenFile(ByVal filename As String) As Boolean
-    Function WriteFile(ByVal filename As String) As Boolean
+    Function OpenFile(ByVal aFileName As String) As Boolean
+    Function WriteFile(ByVal aFileName As String) As Boolean
 
     Function FieldNumber(ByVal aFieldName As String) As Integer
     Function FindFirst(ByVal aFieldNumber As Integer, _
@@ -44,24 +44,33 @@ Public Interface IatcTable
     Sub MovePrevious()
 End Interface
 
+''' <summary>
+''' opens a file containing a table based on the file extension
+''' </summary>
+''' <remarks></remarks>
 Public Class atcTableOpener
-    Public Shared Function OpenAnyTable(ByVal filename As String) As IatcTable
-        OpenAnyTable = Nothing
-        Select Case LCase(System.IO.Path.GetExtension(filename))
-            Case ".dbf" : OpenAnyTable = New atcTableDBF
-            Case ".csv" : OpenAnyTable = New atcTableDelimited
-                'Case "abt": Set OpenFile = New clsATCTableBin
+    ''' <summary>
+    ''' opens a table for known table types based on file extension
+    ''' </summary>
+    ''' <param name="aFileName">name of file containing table</param>
+    ''' <returns>opened table if file exists and of known type</returns>
+    ''' <remarks></remarks>
+    Public Shared Function OpenAnyTable(ByVal aFileName As String) As IatcTable
+        Dim lOpenAnyTable As IatcTable = Nothing
+        Select Case System.IO.Path.GetExtension(aFileName).ToLower
+            Case ".dbf" : lOpenAnyTable = New atcTableDBF
+            Case ".csv" : lOpenAnyTable = New atcTableDelimited
+                'Case "abt": Set lOpenFile = New clsATCTableBin
         End Select
-        If OpenAnyTable Is Nothing Then
-            'Failed to find the correct class to open the file
-        Else
-            OpenAnyTable.OpenFile(filename)
+        If lOpenAnyTable IsNot Nothing Then
+            lOpenAnyTable.OpenFile(aFileName)
         End If
+        Return lOpenAnyTable
     End Function
 End Class
 
 ''' <summary>
-''' 
+''' generic table class
 ''' </summary>
 ''' <remarks></remarks>
 Public MustInherit Class atcTable
@@ -83,16 +92,34 @@ Public MustInherit Class atcTable
         GE
     End Enum
 
-    'Returns a new table with the same fields as this one, but no data
+    ''' <summary>
+    ''' copies a table's structure without data
+    ''' </summary>
+    ''' <returns>new table with the same fields as this one, but no data</returns>
+    ''' <remarks></remarks>
     Public MustOverride Function Cousin() As IatcTable Implements IatcTable.Cousin
 
-    'Returns VB source code to create this table
+    ''' <summary>
+    ''' produces Visual Basic code needed to create this table
+    ''' </summary>
+    ''' <returns>VB source code to create this table</returns>
+    ''' <remarks></remarks>
     Public MustOverride Function CreationCode() As String Implements IatcTable.CreationCode
 
-    'Open the specified file, probably read at least the metadata about fields
+    ''' <summary>
+    ''' Open the specified file, probably read at least the metadata about fields
+    ''' </summary>
+    ''' <param name="aFilename">name of file containing table</param>
+    ''' <returns>true if table opened successfully</returns>
+    ''' <remarks></remarks>
     Public MustOverride Function OpenFile(ByVal aFilename As String) As Boolean Implements IatcTable.OpenFile
 
-    'Write the current table to the specified file
+    ''' <summary>
+    ''' Write the current table to the specified file
+    ''' </summary>
+    ''' <param name="aFilename">name of file to write table to</param>
+    ''' <returns>true if table written successfully</returns>
+    ''' <remarks></remarks>
     Public MustOverride Function WriteFile(ByVal aFilename As String) As Boolean Implements IatcTable.WriteFile
 
     ''' <summary>
@@ -110,7 +137,7 @@ Public MustInherit Class atcTable
         End Get
         Set(ByVal newValue As String)
             If aHeaderRow < 1 OrElse aHeaderRow > pHeaderLines.Count Then
-                Throw New ApplicationException("Cannot set header row " & aHeaderRow & ".  Row must be between 1 and " & pHeaderLines.Count & "." & vbCr & Err.Description)
+                Throw New ApplicationException("Cannot set header row " & aHeaderRow & ".  Row must be between 1 and " & pHeaderLines.Count & ".")
             Else
                 pHeaderLines(aHeaderRow - 1) = newValue
             End If
