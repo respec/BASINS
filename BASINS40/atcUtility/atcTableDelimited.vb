@@ -197,6 +197,7 @@ ErrHand:
 
     Public Overrides Sub ClearData()
         pRecords.Clear()
+        pCurrentRecord = 0
     End Sub
 
     Public Overrides Function Cousin() As IatcTable
