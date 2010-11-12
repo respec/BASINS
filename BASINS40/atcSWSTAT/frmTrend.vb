@@ -1061,6 +1061,7 @@ Friend Class frmTrend
                     If lDisplayThese IsNot Nothing AndAlso lDisplayThese.Count > 0 Then
                         For Each lTS As atcTimeseries In lDisplayThese
                             With lTS.Attributes
+                                lHiLow.ComputeTau(lTS, .GetValue("NDay"), .GetValue("HighFlag"), lTS.Attributes)
                                 .SetValue("Original ID", lTS.OriginalParent.Attributes.GetValue("ID"))
                                 .SetValue("From", pDateFormat.JDateToString(lTS.Dates.Value(1)))
                                 .SetValue("To", pDateFormat.JDateToString(lTS.Dates.Value(lTS.numValues)))

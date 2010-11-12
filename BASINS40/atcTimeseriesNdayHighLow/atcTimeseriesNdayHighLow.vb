@@ -344,7 +344,7 @@ Public Class atcTimeseriesNdayHighLow
         Return newTsGroup
     End Function
 
-    Private Sub ComputeTau(ByRef aTimeseries As atcTimeseries, _
+    Public Sub ComputeTau(ByRef aTimeseries As atcTimeseries, _
                            ByVal aNDay As Double, _
                            ByVal aHigh As Boolean, _
                            ByVal aAttributesStorage As atcDataAttributes, _
@@ -383,18 +383,21 @@ Public Class atcTimeseriesNdayHighLow
                         KENTAUattribute.Name = "KENTAU"
                         KENTAUattribute.TypeString = "Double"
                         KENTAUattribute.ID = 283
+                        KENTAUattribute.CopiesInherit = False
                     End If
                     If KENPLVattribute Is Nothing Then
                         KENPLVattribute = New atcAttributeDefinition
                         KENPLVattribute.Name = "KENPLV"
                         KENPLVattribute.TypeString = "Double"
                         KENPLVattribute.ID = 284
+                        KENPLVattribute.CopiesInherit = False
                     End If
                     If KENSLPLattribute Is Nothing Then
                         KENSLPLattribute = New atcAttributeDefinition
                         KENSLPLattribute.Name = "KENSLPL"
                         KENSLPLattribute.TypeString = "Double"
                         KENSLPLattribute.ID = 285
+                        KENSLPLattribute.CopiesInherit = False
                     End If
                     lNdayTs.Attributes.SetValue(KENTAUattribute, lTau, lArguments)
                     lNdayTs.Attributes.SetValue(KENPLVattribute, lLevel, lArguments)
@@ -432,6 +435,7 @@ Public Class atcTimeseriesNdayHighLow
                 .TypeString = "Double"
                 .Calculator = Me
                 .Category = "N-Day and Frequency"
+                .CopiesInherit = False
             End With
         End If
         aAttributesStorage.SetValue(lAttrDef, aValue, aArguments)
