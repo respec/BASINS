@@ -1,0 +1,204 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+HTMLBuilder
+</name>
+</assembly>
+<members>
+<member name="P:HTMLBuilder.My.Resources.Resources.ResourceManager">
+	<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member><member name="P:HTMLBuilder.My.Resources.Resources.Culture">
+	<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member><member name="T:HTMLBuilder.My.Resources.Resources">
+	<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.Append(System.String)">
+	<summary>
+ Append text to document
+ </summary>
+	<param name="Value">Text to append</param>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.Append(System.String,System.String[])">
+	<summary>
+ Append text to document
+ </summary>
+	<param name="Format">String format</param>
+	<param name="Args">Arguments</param>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendFont(HTMLBuilder.clsHTMLBuilder.enumFontSize,HTMLBuilder.clsHTMLBuilder.enumColors)">
+	<summary>
+ Begin a new font size override
+ </summary>
+	<param name="FontSize">One of seven standard font sizes</param>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendFontEnd">
+	<summary>
+ End prior font size override
+ </summary>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendHeading(HTMLBuilder.clsHTMLBuilder.enumHeading,HTMLBuilder.clsHTMLBuilder.enumAlign,System.String)">
+	<summary>
+ Append text to document
+ </summary>
+	<param name="Level">Heading level</param>
+	<param name="Value">Text to append</param>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendHeading(HTMLBuilder.clsHTMLBuilder.enumHeading,HTMLBuilder.clsHTMLBuilder.enumAlign,System.String,System.String[])">
+	<summary>
+ Append text to document
+ </summary>
+	<param name="Level">Heading level</param>
+	<param name="Format">String format</param>
+	<param name="Args">Arguments</param>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendHorizLine">
+	<summary>
+ Append a horizontal line
+ </summary>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendHTML(System.String)">
+	<summary>
+ Append raw HTML text
+ </summary>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendImage(System.String,System.Int32,HTMLBuilder.clsHTMLBuilder.enumWidthUnits,System.Int32)">
+	<summary>
+ Append an image
+ </summary>
+	<param name="ImageFile">Name of image file (path is relative to HTML file)</param>
+	<param name="Width">Width of units (height is set using original image aspect ratio)</param>
+	<param name="WidthUnits">Width units</param>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendLineBreak">
+	<summary>
+ Append a line break within a paragraph
+ </summary>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendList(HTMLBuilder.clsHTMLBuilder.enumListType,System.String[])">
+	<summary>
+ Append either a numbered or bulleted list
+ </summary>
+	<param name="ListType">Type of list</param>
+	<param name="Args">Items in list</param>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendPara(HTMLBuilder.clsHTMLBuilder.enumAlign,System.String)">
+	<summary>
+ Append text as entire paragraph (end tag is applied)
+ </summary>
+	<param name="Align">Paragraph alignment</param>
+	<param name="Value">Text</param>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendPara(HTMLBuilder.clsHTMLBuilder.enumAlign,System.String,System.String[])">
+	<summary>
+ Append text as entire paragraph (end tag is applied)
+ </summary>
+	<param name="Align">Paragraph alignment</param>
+	<param name="Format">Format string</param>
+	<param name="Args">Arguments</param>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendPara(HTMLBuilder.clsHTMLBuilder.enumAlign)">
+	<summary>
+ Begin a new paragraph
+ </summary>
+	<param name="Align">Paragraph alignment</param>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendParaEnd">
+	<summary>
+ End prior paragraph
+ </summary>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendStyle(HTMLBuilder.clsHTMLBuilder.enumFontStyle,System.String)">
+	<summary>
+ Append text formatted using specified font style (end tag is applied)
+ </summary>
+	<param name="Style">Text style</param>
+	<param name="Value">Text to format</param>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendStyle(HTMLBuilder.clsHTMLBuilder.enumFontStyle,System.String,System.String[])">
+	<summary>
+ Append text formatted using specified font style (end tag is applied)
+ </summary>
+	<param name="Style">Text style</param>
+	<param name="Format">String format</param>
+	<param name="Args">Arguements</param>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendTable(System.Int32,HTMLBuilder.clsHTMLBuilder.enumWidthUnits,HTMLBuilder.clsHTMLBuilder.enumBorderStyle,System.Int32,HTMLBuilder.clsHTMLBuilder.enumDividerStyle)">
+	<summary>
+ Begin a new table; must be followed by calls to AppendRow and AppendTableEnd
+ </summary>
+	<param name="TableWidth">Width of table</param>
+	<param name="WidthUnits">Units for width</param>
+	<param name="BorderWidth">Width of border in pixels</param>
+	<param name="BorderStyle">Border style around table</param>
+	<param name="DividerStyle">Format for cell dividers</param>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendTable(System.Windows.Forms.DataGridView,System.String,System.Int32,HTMLBuilder.clsHTMLBuilder.enumWidthUnits,HTMLBuilder.clsHTMLBuilder.enumBorderStyle,System.Int32,HTMLBuilder.clsHTMLBuilder.enumDividerStyle)">
+	<summary>
+ Create a table and fill it with the contents of a datagridview
+ </summary>
+	<param name="dg">Datagridview to take data from</param>
+	<param name="Title">Left aligned, bold and underlined table title</param>
+	<param name="TableWidth">Width of table</param>
+	<param name="WidthUnits">Units for width</param>
+	<param name="BorderWidth">Width of border in pixels</param>
+	<param name="BorderStyle">Border style around table</param>
+	<param name="DividerStyle">Format for cell dividers</param>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendTableCell(System.String)">
+	<summary>
+ Add a new cell to the current row (started with AppendTableRow); will default to column alignment and width set with AppendTableColumn calls
+ </summary>
+	<param name="cell">Text in cell</param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendTableCell">
+	<summary>
+ Start adding a new cell to the current row (started with AppendTableRow); will default to column alignment and width set with AppendTableColumn calls
+ Should be followed by Append, AppendFont, AppendHeading, etc., then AppendTableCellEnd
+ </summary>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendTableCell(System.String,System.String[])">
+	<summary>
+ Add a new cell to the current row (started with AppendTableRow); will default to column alignment and width set with AppendTableColumn calls
+ </summary>
+	<param name="format">Format string</param>
+	<param name="args">Arguments</param>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendTableCell(HTMLBuilder.clsHTMLBuilder.enumAlign,System.String)">
+	<summary>
+ Add a new cell to the current row (started with AppendTableRow); will default to column alignment and width set with AppendTableColumn calls
+ </summary>
+	<param name="cell">Text in cell</param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendTableCellEnd">
+	<summary>
+ Finish adding cell contents
+ </summary>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendTableColumn(System.String,HTMLBuilder.clsHTMLBuilder.enumAlign,HTMLBuilder.clsHTMLBuilder.enumAlign,System.Int32,HTMLBuilder.clsHTMLBuilder.enumWidthUnits,HTMLBuilder.clsHTMLBuilder.enumColors,HTMLBuilder.clsHTMLBuilder.enumColors)">
+	<summary>
+ Define columns in the active table
+ </summary>
+	<param name="Heading">Column heading text</param>
+	<param name="HeadingAlign">Alignment of heading text</param>
+	<param name="DataAlign">Alignment of data in column</param>
+	<param name="Width">Width of column</param>
+	<param name="WidthUnits">Units for width</param>
+	<param name="ForeColor">Heading text color</param>
+	<param name="BackColor">Heading cell background color</param>
+	<remarks>Column settings are saved in list and applied to individual cells because "col" tag apparently not supported)</remarks>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendTableEnd">
+	<summary>
+ End prior table
+ </summary>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendTableRow(System.String[])">
+	<summary>
+ Append a new row to the active table
+ </summary>
+	<param name="cells">Text for each cell in row</param>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendTableRow">
+	<summary>
+ Start new row (must follow with AppendTableCell calls and then AppendTableRowEnd)
+ </summary>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.AppendTableRowEnd">
+	<summary>
+ Finish prior added row
+ </summary>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.ToString">
+	<summary>
+ Return HTML text, encapsulated with appropriate tags
+ </summary>
+</member><member name="M:HTMLBuilder.clsHTMLBuilder.Save(System.String@)">
+	<summary>
+ Save the HTML string to the specified file
+ </summary>
+	<param name="Filename">Name of file to save to; will be overwritten without warning; if blank, will create a uniquely named temporary file</param>
+</member>
+</members>
+</doc>

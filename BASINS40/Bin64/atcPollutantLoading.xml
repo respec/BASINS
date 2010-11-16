@@ -1,0 +1,96 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+atcPollutantLoading
+</name>
+</assembly>
+<members>
+<member name="T:atcPollutantLoading.modPollutantLoadingScript">
+	<summary>
+ Pollutant Loading Script
+ </summary>
+	<remarks>
+ Created by Jack Kittle (jlkittle@aquaterra.com)
+ Date 12 Oct 2006
+ </remarks>
+</member><member name="M:atcPollutantLoading.PollutantLoadingBMPs.#ctor(System.String,System.String,System.String,atcControls.atcGridSource)">
+	<summary>
+	</summary>
+	<param name="aLayerName"></param>
+	<param name="aAreaField"></param>
+	<param name="aTypefield"></param>
+	<param name="aGridSource"></param>
+	<remarks></remarks>
+</member><member name="T:atcPollutantLoading.PollutantLoadingBMPs">
+	<summary>
+	</summary>
+	<remarks></remarks>
+</member><member name="M:atcPollutantLoading.PollutantLoadingPointLoads.#ctor(System.String,System.String,atcControls.atcGridSource)">
+	<summary>
+	</summary>
+	<param name="aPointLayerName"></param>
+	<param name="aPointIDField"></param>
+	<param name="aPointGridSource"></param>
+	<remarks></remarks>
+</member><member name="T:atcPollutantLoading.PollutantLoadingPointLoads">
+	<summary>
+	</summary>
+	<remarks></remarks>
+</member><member name="M:atcPollutantLoading.PollutantLoadingStreamBankLoads.#ctor(System.String,atcControls.atcGridSource)">
+	<summary>
+	</summary>
+	<param name="aStreamIDField"></param>
+	<param name="aBankGridSource"></param>
+	<remarks></remarks>
+</member><member name="T:atcPollutantLoading.PollutantLoadingStreamBankLoads">
+	<summary>
+	</summary>
+	<remarks></remarks>
+</member><member name="M:atcPollutantLoading.PollutantLoading.GenerateLoads(System.String,atcControls.atcGridSource,System.Boolean,System.String,System.String,System.String,System.Double[],System.Double,atcUtility.atcCollection,atcPollutantLoading.PollutantLoadingBMPs,atcPollutantLoading.PollutantLoadingPointLoads,atcPollutantLoading.PollutantLoadingStreamBankLoads)">
+	<summary>
+	</summary>
+	<param name="aSubbasinLayerName"></param>
+	<param name="aGridSource"></param>
+	<param name="aUseExportCoefficent"></param>
+	<param name="aLandUse"></param>
+	<param name="aLandUseLayer"></param>
+	<param name="aLandUseId"></param>
+	<param name="aPrec"></param>
+	<param name="aRatio"></param>
+	<param name="aConstituents"></param>
+	<param name="aBmps"></param>
+	<param name="aPointLoads"></param>
+	<remarks></remarks>
+</member><member name="M:atcPollutantLoading.PollutantLoading.GetEfficiency(atcControls.atcGridSource,System.String,System.String)">
+	<summary>
+	</summary>
+	<param name="aBMPGridSource"></param>
+	<param name="aBMPType"></param>
+	<param name="aConsName"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:atcPollutantLoading.PollutantLoading.CalculateGIRASAreas(System.Int32,Microsoft.VisualBasic.Collection,System.Double[0:,0:]@)">
+	<summary>
+	</summary>
+	<param name="aAreaLayerIndex"></param>
+	<param name="aSelectedAreaIndexes"></param>
+	<param name="aAreaLandSub"></param>
+	<remarks></remarks>
+</member><member name="M:atcPollutantLoading.PollutantLoading.SetGridValuesSource(System.String,atcControls.atcGridSource)">
+	<summary>
+	</summary>
+	<param name="aGridValuesFileName"></param>
+	<param name="aGridValuesSource"></param>
+	<remarks></remarks>
+</member><member name="T:atcPollutantLoading.PollutantLoading">
+	<summary>
+	</summary>
+	<remarks></remarks>
+</member><member name="T:atcPollutantLoading.frmPollutantLoading">
+	<summary>
+	</summary>
+	<remarks></remarks>
+</member>
+</members>
+</doc>

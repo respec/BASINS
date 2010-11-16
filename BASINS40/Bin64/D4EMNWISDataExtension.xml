@@ -1,0 +1,64 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+D4EMNWISDataExtension
+</name>
+</assembly>
+<members>
+<member name="M:D4EMNWISDataExtension.modIDA.SaveResponse(System.Net.HttpWebResponse,System.String)">
+	<summary>
+ Save the response stream to a file
+ </summary>
+	<param name="lResponse">Response containing stream to save</param>
+	<param name="aFilename">Save the stream to this file</param>
+	<returns>True on success, False on failure</returns>
+</member><member name="P:D4EMNWISDataExtension.My.Resources.Resources.ResourceManager">
+	<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member><member name="P:D4EMNWISDataExtension.My.Resources.Resources.Culture">
+	<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member><member name="T:D4EMNWISDataExtension.My.Resources.Resources">
+	<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member><member name="M:D4EMNWISDataExtension.modStations.GetStationsInRegion(D4EMDataManager.Region,System.String,System.String)">
+	<summary>
+ Download NWIS stations within the specified region and save to a text RDB file
+ </summary>
+	<param name="aRegion"></param>
+	<param name="aSaveAs">File name to save downloaded station information in</param>
+	<param name="aDataType">
+ "discharge" = Surface Water: Daily streamflow
+ "rt" = Real-time and Recent Daily Data
+ "peak" = Surface Water: Peak streamflow
+ "qw" = Water Quality
+ "gw" = Ground Water
+ "measurements" = streamflow measurements
+ </param>
+	<returns>True on successful download</returns>
+	<remarks></remarks>
+</member><member name="M:D4EMNWISDataExtension.NWISDataExtension.GetNWISStatistics(System.String,System.String,D4EMNWISDataExtension.NWISDataExtension.StationType)">
+	<summary>
+ Retrieve data from NWIS and compute statistics
+ </summary>
+	<param name="aHUC">USGS Hydrologic Unit Code (HUC2 or HUC8)</param>
+	<param name="aParameterCode">USGS Water Quality Parameter Code</param>
+	<param name="aStationType">USGS Station Type</param>
+	<returns>string containing Parameter values</returns>
+	<remarks></remarks>
+</member><member name="M:D4EMNWISDataExtension.NWISDataExtension.getDischargeValues(System.String,System.String,System.String)">
+	<summary>
+ Return the USGS RDB format string containing daily discharge values for the given station during the given date range
+ </summary>
+	<param name="aStationNumber">Station to retrieve values from</param>
+	<param name="aStartDate">First date to get values from</param>
+	<param name="aEndDate">Last date to get values from</param>
+	<returns>RDB format string</returns>
+</member>
+</members>
+</doc>

@@ -1,0 +1,26 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+atcManDelin
+</name>
+</assembly>
+<members>
+<member name="M:atcManDelin.clsProgressStatus.Progress(System.Int32,System.Int32)">
+	<summary>
+ Log the progress of a long-running task
+ </summary>
+	<param name="aCurrentPosition">Current position/item of task</param>
+	<param name="aLastPosition">Final position/item of task</param>
+	<remarks>
+ A final call when the task is done with aCurrent = aLast 
+ indicates completion and should clear the progress display.
+ </remarks>
+</member><member name="M:atcManDelin.clsProgressStatus.Status(System.String)">
+	<summary>
+ Update the current status message
+ </summary>
+	<param name="aStatusMessage">Description of current processing status</param>
+</member>
+</members>
+</doc>

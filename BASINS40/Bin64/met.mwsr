@@ -1,0 +1,48 @@
+<SFRendering>
+  <Layer Name="Weather Station Sites 2006" Type="1" Path="met.shp" Tag="" LegendPicture="" Visible="True" LabelsVisible="True" Expanded="False">
+    <Image Type="">
+    </Image>
+    <ShapeFileProperties Color="16711935" DrawFill="True" TransparencyPercent="1" FillStipple="0" LineOrPointSize="5" LineStipple="0" OutLineColor="0" PointType="0" CustomLineStipple="0" UseTransparency="False" TransparencyColor="0">
+      <CustomPointType>
+        <Image Type="">
+        </Image>
+      </CustomPointType>
+      <PointImageScheme FieldIndex="5">
+        <ImageData>
+          <Image ID="0">
+            <Image Type="Bitmap">iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAMxJREFUWEftluENhCAMRnEmdnIn53IgbCsYKAIpNuGHNSHeXXL28Wi/uDl3Brf2QoCVa2lxsr9y9wZgBszAXwwEdpXZIwyicMDTdliN+1uwUX3vAsQeffwGAMUhPiuA9FsXwHsFANg5Fsshnu8EV0d7rHpb0DSQg4wNwO5VjiAa4H1AAD0DuHttAznE0AACavYAn4IWwDMBWJwgeB9IxzBNARvF1hEUDZggikaUAvRygPqjMQVaOTDzBqWahDMA/f8Ij8AAzIAZMAPaBi57F5tZGk04YAAAAABJRU5ErkJggg==</Image>
+          </Image>
+          <Image ID="1">
+            <Image Type="Bitmap">iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAPhJREFUWEftlMENwzAIRelAPXkn7+Ts5FMHcvlUtJQqrTjAobIlx06UhOcPnwvRbRFdaYxBc05qrb2tx3EQv8MzbywOvnrvsurAXp9zaIYEaML0wS2I7lMBNAhWDAtk9ymnh6JWag9g4dIANIjm36agvAY0DVCiJP+aAiu1TQn2qQUormKL2WKzKckPLgByOZkJvv/oJRnNJfTP0MsZigQBFro1etbJGu8XUQAOjprxAPosH4BPrkWrEM97gYumKfgB5H+d9uEegJQr4OtAAKoVsBD1CjgX1AFoDTgr1qUAJ//SC9JdEA/wy5ZBG26ArcBWYCvwdwrcAfP8nHYEym8SAAAAAElFTkSuQmCC</Image>
+          </Image>
+          <Image ID="2">
+            <Image Type="Bitmap">iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAANJJREFUWEftllsOhTAIROtm755clwviAoaKtT4wAT6sSWOs1jkdHOJUygIl9yCAzJEqzu5n7n4ADAeGA8OBFw7ADAA/HCdne2MzdkISx/Z5AJA5fwDcOYlpiHrNcNbWblygHdAg4Q603wEDRDugIeIdaFIQByApaKIYV4KrPsAJcU6BXeAOyEx898Le/bVvbEM/4w6Awti5d4NhBMIVoCMuMBXCDaARlxJoN9a5NzV9sqYDQOIkunPhUwB69+KGXwn4b+eYgLiPsMYsM4YK4qQR/QHPPnSIsZCmiQAAAABJRU5ErkJggg==</Image>
+          </Image>
+          <Image ID="3">
+            <Image Type="Bitmap">iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAANhJREFUWEftlWsOhDAIhOuB9lp7J8/lgbqAixrqI0Pi9E+bNGoN5WOAdiplqSU1PmLlppO8L6ld1FB2Qad6rmHqGrqPBY8anTl3mAwEBHDnPAsBAbhatRlrSlA1UylQo9V/WwdkgBaCDNBdge4Ax0qkF2EbPbULMsV2ZQP2bp1F+K/Miyd+FqAA4lxvoQjga+8DSOT/a3CD2L4NDk0PaKDy79HafWwgdAViHRgAW4EjBF+B0AU8AK+B0Iq8FNydA1aML3cB7uAJCCZ+2hD9PwCGAkOBoUBnBX4Bm3zI/3en0gAAAABJRU5ErkJggg==</Image>
+          </Image>
+          <Image ID="4">
+            <Image Type="Bitmap">iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAMBJREFUWEftlWEKgCAMhe2y3alzeaDlJjMxFTZw+6GCVKK8z6d7XSFECL4NATy7qzi577n7A3AcOA4cBxQOwAMAd+qDpzzYhEmI4ik+fwA8th4g7RzFaojyTXDSaBcuqB2oQcwdaO8BAVg7UEPYO9BUgR0AV0FTinZHMMsBqpDFVZAFUKjXpeKKJGSAlIWlfTDGACyMJPl9NwA+A/cj2AkA/4KjEuRxnCO5jKLJVLcTCKm4Ogd6EBpxNUDrhFY8wgt/d3d8huI72QAAAABJRU5ErkJggg==</Image>
+          </Image>
+          <Image ID="5">
+            <Image Type="Bitmap">iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAQBJREFUWEftlEESgzAIRfFAXbVn8k69k131QJRAiDTT1mEqZBNHJ4oOPD/8LABPhNOPC+B2BaATHjV5vV9uGgD5RgDOvgApOV0rItaVnqmYiVEc1xI7u7jmo2Ja3KwFQkAKGEMFAtQiXMwoUe5VjUAAni2WWduhf29bEQxQIZoC0vddkdAW2NZ2w2cGNEEBM5SshFUg1AWfhts6QCyaqMB7S9SKgwD2tgwGYJf4NiK8yxx9W735/ABUnPvXgWgsHoAKt/28QrRnhvMp+pcCFiRdgX4OGCBbAQuRr8CwIVQXdFbMa8GvfYAdEuwCf4EjIDfxUULv+wkwFZgKTAUGK/ACHhmVkK6BYe8AAAAASUVORK5CYII=</Image>
+          </Image>
+          <Image ID="6">
+            <Image Type="Bitmap">iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAMtJREFUWEftlGEOgCAIhemy3alzdSALGoY021AW/cDNmc7k+YFvAdgLxDYUENlDgxP9yNungCSQBP5JANAcPnTHxoigcOsZVNnOHevZO6Pd2KqAOziKuCjovlNwXNcCeG1QQBu8YlAfeDgGZmEsos5JnNXa8Tai0U06cxIgCEghwwT0bVmAHq+03AR0HdB+DwKcfznKwvxNDTgXITnSI/evr0A9xYkUyKqd9AF6IeZXoH8IdUKreo/9ZmQeQZu0ex9oPS8JJIEkEEzgAOkZtCXkuUr+AAAAAElFTkSuQmCC</Image>
+          </Image>
+        </ImageData>
+        <ItemData>
+          <Item MatchValue="ATEM" ImgIndex="0" />
+          <Item MatchValue="CLOU" ImgIndex="1" />
+          <Item MatchValue="DEWP" ImgIndex="2" />
+          <Item MatchValue="EVAP" ImgIndex="3" />
+          <Item MatchValue="PEVT" ImgIndex="3" />
+          <Item MatchValue="PREC" ImgIndex="4" />
+          <Item MatchValue="SOLR" ImgIndex="5" />
+          <Item MatchValue="WIND" ImgIndex="6" />
+        </ItemData>
+      </PointImageScheme>
+    </ShapeFileProperties>
+    <DynamicVisibility UseDynamicVisibility="False" xMin="0" yMin="0" xMax="0" yMax="0" />
+  </Layer>
+</SFRendering>

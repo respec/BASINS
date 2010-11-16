@@ -1,0 +1,161 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+atcUCI
+</name>
+</assembly>
+<members>
+<member name="T:atcUCI.HspfBlockDefs">
+	<summary>
+ Keyed Collection of HspfBlockDef
+ </summary>
+	<remarks>Key is Name</remarks>
+</member><member name="T:atcUCI.HspfBlockDef">
+	<summary>
+ HSPF Block Definition
+ </summary>
+</member><member name="T:atcUCI.HspfSpecialRecord">
+	<summary>
+ HSPF Special Record
+ </summary>
+	<remarks>
+ Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+ </remarks>
+</member><member name="T:atcUCI.HspfCategoryBlk">
+	<summary>
+	</summary>
+	<remarks>Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license</remarks>
+</member><member name="M:atcUCI.atcMDB.#ctor(System.String)">
+	<summary>
+ Open an MDB file given its filename
+ </summary>
+	<param name="aFilename">Name of database file to open</param>
+</member><member name="M:atcUCI.atcMDB.GetTable(System.String)">
+	<summary>
+ Open a table within the database
+ </summary>
+	<param name="aTableName">Name of a table</param>
+	<returns>System.Data.DataTable</returns>
+	<remarks>aTableName can be a query, "SELECT * from " will be prepended within GetTable</remarks>
+</member><member name="T:atcUCI.atcMDB">
+	<summary>
+ Opens a MDB file and returns tables within it as DataTable
+ </summary>
+</member><member name="F:atcUCI.HspfAddChar2Keyword.pLastOperationSerial">
+	<summary>
+	</summary>
+	<remarks></remarks>
+</member><member name="M:atcUCI.HspfAddChar2Keyword.AddChar2Keyword(System.String@)">
+	<summary>
+ adds a missing character to the end of an input keyword if needed
+ </summary>
+	<param name="aKeyword">keyword to add missing character to</param>
+	<returns>updated keyword</returns>
+	<remarks></remarks>
+</member><member name="T:atcUCI.HspfAddChar2Keyword">
+	<summary>
+	</summary>
+	<remarks>Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license</remarks>
+</member><member name="F:atcUCI.HSPFParmDef.Name">
+	<summary>
+ Name of parameter.
+ </summary>
+</member><member name="P:atcUCI.HSPFParmDef.Typ">
+	<summary>
+ Type of parameter.
+ </summary>
+</member><member name="P:atcUCI.HSPFParmDef.Min">
+	<summary>
+ Minimum value for parameter.
+ </summary>
+</member><member name="P:atcUCI.HSPFParmDef.Max">
+	<summary>
+ Maximum value for parameter
+ </summary>
+</member><member name="P:atcUCI.HSPFParmDef.DefaultValue">
+	<summary>
+ Devault value for parameter.
+ </summary>
+</member><member name="P:atcUCI.HSPFParmDef.SoftMin">
+	<summary>
+ Recommended minimum value for parameter.
+ </summary>
+</member><member name="P:atcUCI.HSPFParmDef.SoftMax">
+	<summary>
+ Recommended maximum value for parameter.
+ </summary>
+</member><member name="P:atcUCI.HSPFParmDef.Define">
+	<summary>
+ Text definition of parameter.
+ </summary>
+</member><member name="P:atcUCI.HSPFParmDef.Parent">
+	<summary>
+ Parent object of parameter definition.
+ </summary>
+</member><member name="P:atcUCI.HSPFParmDef.Other">
+	<summary>
+ Additional information about parameter.
+ </summary>
+</member><member name="P:atcUCI.HSPFParmDef.StartCol">
+	<summary>
+ Starting column for parameter within a text string.
+ </summary>
+</member><member name="P:atcUCI.HSPFParmDef.Length">
+	<summary>
+ Length of parameter value when stored as a string.
+ </summary>
+</member><member name="T:atcUCI.HSPFParmDef">
+	<summary>
+ Definition of a model parameter.
+ </summary>
+	<remarks>
+ Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+ </remarks>
+</member><member name="P:atcUCI.HspfParm.Value">
+	<summary>
+ Value of parameter.
+ </summary>
+</member><member name="P:atcUCI.HspfParm.ValueAsRead">
+	<summary>
+ Value of parameter as read from UCI
+ </summary>
+</member><member name="P:atcUCI.HspfParm.Def">
+	<summary>
+ Link to object containing definition of parameter.
+ </summary>
+</member><member name="P:atcUCI.HspfParm.Parent">
+	<summary>
+ Link to object that is the parent of this parameter.
+ </summary>
+</member><member name="P:atcUCI.HspfParm.Name">
+	<summary>
+ Name of parameter.
+ </summary>
+</member><member name="T:atcUCI.HspfParm">
+	<summary>
+ A model parameter value.
+ </summary>
+	<remarks>Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license</remarks>
+</member><member name="T:atcUCI.HspfPointSource">
+	<summary>
+ HSPF Point Source
+ </summary>
+</member><member name="P:atcUCI.HspfTable.ParmValue(System.String)">
+	<summary>
+ Value of parameter with the given name
+ </summary>
+	<param name="aName">Name of parameter</param>
+</member><member name="M:atcUCI.HspfUci.ReadUci(atcUCI.HspfMsg@,System.String@,System.Int32@,System.Boolean@,System.String@)">
+	<summary>
+ Read UCI file into this class
+ </summary>
+	<param name="aMsg">HspfMsg file object</param>
+	<param name="aNewName">File to read</param>
+	<param name="aFullFg">-3 = , -1 = starter</param>
+	<param name="aFilesOK">gets set to True if files are ok, false if not</param>
+	<param name="aEchoFile"></param>
+	<remarks></remarks>
+</member>
+</members>
+</doc>

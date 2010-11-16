@@ -1,0 +1,18 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+atcSynopticAnalysis
+</name>
+</assembly>
+<members>
+<member name="M:atcSynopticAnalysis.frmSynoptic.ComputeEventsFromFormParameters(System.Boolean)">
+	<summary>
+ ComputeEventsFromFormParameters
+ </summary>
+	<param name="aCheckForChange">True to make sure event parameters have changed, False to recompute regardless of change</param>
+	<returns>True if events were recomputed, False if they were not</returns>
+	<remarks></remarks>
+</member>
+</members>
+</doc>

@@ -1,0 +1,61 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+atcGraph
+</name>
+</assembly>
+<members>
+<member name="M:atcGraph.clsGraphFrequency.IsIn(System.Double,System.Double[])">
+	<summary>
+ Return True if aArray is Nothing or else it contains a number within 1e-30 of aNumber
+ </summary>
+</member><member name="M:atcGraph.modGraph.FindYAxis(atcData.atcTimeseries,ZedGraph.ZedGraphControl,atcData.atcTimeseriesGroup)">
+	<summary>
+ Find a Y axis (LEFT, RIGHT, or AUX) for the given atcTimeseries
+ </summary>
+	<param name="aTimeseries">Timeseries data to turn into a curve</param>
+	<param name="aZgc">ZedGraphControl to add the curve to</param>
+	<param name="aExistingCurves">Group of other data on this graph, a hint for which Y axis to use</param>
+</member><member name="M:atcGraph.modGraph.AddTimeseriesCurves(atcData.atcTimeseriesGroup,ZedGraph.ZedGraphControl)">
+	<summary>
+ Create a new curve for each atcTimeseries in aDataGroup and add them to aZgc
+ </summary>
+	<param name="aDataGroup">Group of timeseries to make into curves</param>
+	<param name="aZgc">graph control to add curves to</param>
+	<remarks></remarks>
+</member><member name="M:atcGraph.modGraph.AddTimeseriesCurve(atcData.atcTimeseries,ZedGraph.ZedGraphControl,System.String,System.String,System.String,System.String,System.String,System.String)">
+	<summary>
+ Create a new curve from the given atcTimeseries and add it to the ZedGraphControl
+ </summary>
+	<param name="aTimeseries">Timeseries data to turn into a curve</param>
+	<param name="aZgc">ZedGraphControl to add the curve to</param>
+	<param name="aYAxisName">Y axis to use (LEFT, RIGHT, or AUX)</param>
+	<remarks></remarks>
+</member><member name="M:atcGraph.modGraph.Scalit(System.Double,System.Double,System.Boolean,System.Double@,System.Double@)">
+	<summary>
+ Determines an appropriate scale based on the minimum and maximum values and 
+ whether an arithmetic or logarithmic scale is requested. 
+ For log scales, the minimum and maximum must not be transformed.
+ </summary>
+	<param name="aDataMin"></param>
+	<param name="aDataMax"></param>
+	<param name="aLogScale"></param>
+	<param name="aScaleMin"></param>
+	<param name="aScaleMax"></param>
+	<remarks></remarks>
+</member><member name="M:atcGraph.frmGraphEditor.Edit(ZedGraph.ZedGraphControl)">
+	<summary>
+ Show this form for customizing the specified ZedGraphControl
+ </summary>
+	<param name="aZgc">graph control to edit</param>
+	<remarks></remarks>
+</member><member name="M:atcGraph.frmGraphEditor.UserEditFontSpec(ZedGraph.FontSpec@)">
+	<summary>
+ Use a FontDialog to edit a ZedGraph FontSpec
+ </summary>
+	<param name="aFontSpec"></param>
+	<returns>True if font was edited, false if user cancelled</returns>
+</member>
+</members>
+</doc>

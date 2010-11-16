@@ -1,0 +1,17 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+atcWASP
+</name>
+</assembly>
+<members>
+<member name="M:atcWASP.atcWASPSegments.AssignWaspIds">
+	<summary>
+ Assign Ids to each segment starting at downstream segment
+ </summary>
+	<returns>String describing any problems that occured</returns>
+	<remarks></remarks>
+</member>
+</members>
+</doc>
