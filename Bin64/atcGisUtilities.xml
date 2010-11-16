@@ -1,0 +1,25 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+atcGisUtilities
+</name>
+</assembly>
+<members>
+<member name="M:atcGisUtilities.GisUtilities.GridSourceToShapefile(System.Object,System.String,atcData.atcTimeseriesGridSource,System.String,System.String,System.String)">
+	<summary>
+ given an atcTimeseriesGridSource, build a shapefile 
+ </summary>
+	<param name="aMapWin"></param>
+	<param name="aShapefileName"></param>
+	<param name="aSource"></param>
+	<param name="aXfieldName"></param>
+	<param name="aYfieldName"></param>
+	<param name="aOutputProjection"></param>
+	<remarks></remarks>
+</member><member name="T:atcGisUtilities.GisUtilities">
+	<remarks>Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license</remarks>
+	<summary>GIS Utilities</summary>
+</member>
+</members>
+</doc>

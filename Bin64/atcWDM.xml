@@ -1,0 +1,57 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+atcWDM
+</name>
+</assembly>
+<members>
+<member name="T:atcWDM.Vb2F90">
+	<summary>
+ Declaratiions of entry points in hass-ent.dll fortran library
+ </summary>
+	<remarks>
+Copyright 2001-6 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+ </remarks>
+</member><member name="M:atcWDM.atcDataSourceWDM.AddDataset(atcData.atcDataSet,atcData.atcDataSource.EnumExistAction)">
+	<summary>
+ write timeseries data in dataset to wdm file
+ </summary>
+	<param name="aDataSet">dataset to write</param>
+	<param name="aExistAction">action to take if dataset with same id(dsn) already exists on wdm file</param>
+	<returns>true if successful, otherwise false</returns>
+	<remarks></remarks>
+</member><member name="M:atcWDM.atcDataSourceWDM.WriteAttribute(atcData.atcDataSet,atcData.atcDefinedValue,System.Object)">
+	<summary>
+ Write one attribute of a data set in memory to the dataset on the wdm file
+ </summary>
+	<param name="aDataSet">Data set which the attribute applies to</param>
+	<param name="aAttribute">Attribute to write</param>
+	<param name="aNewValue">New value for attribute (Optional)</param>
+	<returns>True on success, False on failure</returns>
+	<remarks>Use WriteAttributes to write all attributes</remarks>
+</member><member name="M:atcWDM.atcDataSourceWDM.DsnBld(System.Int32,atcData.atcTimeseries)">
+	<summary>
+ Put a new dataset in the WDM file from aTs
+ </summary>
+	<param name="aFileUnit">WDM file handle</param>
+	<param name="aTs">data set to add to WDM</param>
+	<returns></returns>
+</member><member name="M:atcWDM.atcDataSourceWDM.DsnWriteAttribute(System.Int32,System.Int32,System.Int32,atcData.atcDefinedValue)">
+	<summary>
+ Write an attribute to the WDM file
+ </summary>
+	<returns>True if attribute was written OR if attribute is not in message file</returns>
+	<remarks>Only attributes in WDM message file can be written to WDM files</remarks>
+</member><member name="T:atcWDM.atcMsgWDM">
+	<summary>
+ WDM attributes in memory, read from hspfmsg.wdm
+ </summary>
+	<remarks>
+Copyright 2005 by AQUA TERRA Consultants - Royalty-free use permitted under open source license
+</remarks>
+</member><member name="P:atcWDM.WDMGridSource.DisplayAttributes">
+	<summary>Names of attributes used for listing of data in UI</summary>
+</member>
+</members>
+</doc>

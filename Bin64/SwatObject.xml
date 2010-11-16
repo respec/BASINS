@@ -1,0 +1,217 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+SwatObject
+</name>
+</assembly>
+<members>
+<member name="T:SwatObject.SwatInput.clsChm">
+	<summary>
+ Chm Input Section
+ </summary>
+	<remarks></remarks>
+</member><member name="M:SwatObject.SwatInput.clsMgt.Save(System.Data.DataTable,System.Data.DataTable)">
+	<summary>
+ Save MGT information to set of .mgt text input files
+ </summary>
+	<remarks></remarks>
+</member><member name="T:SwatObject.SwatInput.clsMgt">
+	<summary>
+ Management (MGT) input section
+ </summary>
+	<remarks></remarks>
+</member><member name="F:SwatObject.SwatInput.pCIO">
+	<summary>
+ Master Watershed (CIO) input section
+ </summary>
+	<remarks></remarks>
+</member><member name="F:SwatObject.SwatInput.pSubBsn">
+	<summary>
+ SubBasin (SUB) input section
+ </summary>
+	<remarks></remarks>
+</member><member name="T:SwatObject.HeatUnitsCalculation">
+	<summary>
+	</summary>
+	<remarks>from OpenSWAT BASINS PlugIN - DO NOT MODIFY</remarks>
+</member><member name="M:SwatObject.SwatInput.clsHru.Save(System.Data.DataTable)">
+	<summary>
+ Save HRU information to set of .hru text input files
+ </summary>
+	<remarks></remarks>
+</member><member name="T:SwatObject.SwatInput.clsHru">
+	<summary>
+ Hydrologic Response Unit (HRU) input section
+ </summary>
+	<remarks></remarks>
+</member><member name="F:SwatObject.SwatInput.pSwq">
+	<summary>
+ Swq input section
+ </summary>
+	<remarks></remarks>
+</member><member name="T:SwatObject.SwatInput.clsWgn">
+	<summary>
+ WGN Input Section
+ </summary>
+	<remarks></remarks>
+</member><member name="M:SwatObject.SwatInput.clsBsn.ReadText">
+	<summary>
+ First draft of code to read SWAT input text file
+ </summary>
+</member><member name="T:SwatObject.SwatInput.clsBsn">
+	<summary>
+ Basin (BSN) Input Section
+ </summary>
+	<remarks></remarks>
+</member><member name="T:SwatObject.SwatInput.clsRes">
+	<summary>
+ Res Input Section
+ </summary>
+	<remarks></remarks>
+</member><member name="T:SwatObject.SwatInput.clsGw">
+	<summary>
+ Gw Input Section
+ </summary>
+	<remarks></remarks>
+</member><member name="T:SwatObject.SwatInput.clsSol">
+	<summary>
+ Sol Input Section
+ </summary>
+	<remarks></remarks>
+</member><member name="M:SwatObject.SwatInput.#ctor(System.Data.OleDb.OleDbConnection,System.Data.OleDb.OleDbConnection,System.Data.OleDb.OleDbConnection,System.String,System.String,System.Windows.Forms.StatusBar)">
+	<summary>
+ Initialize with existing open database connections
+ </summary>
+	<param name="aSwatGDB"></param>
+	<param name="aOutGDB"></param>
+	<param name="aOutputFolder"></param>
+	<param name="aStatusBar"></param>
+	<remarks></remarks>
+</member><member name="M:SwatObject.SwatInput.Initialize(System.Data.OleDb.OleDbConnection,System.Data.OleDb.OleDbConnection,System.Data.OleDb.OleDbConnection,System.String,System.String,System.Windows.Forms.StatusBar)">
+	<summary>
+ Initialize with existing open database connections
+ </summary>
+	<param name="aSwatGDB"></param>
+	<param name="aOutGDB"></param>
+	<param name="aOutputFolder"></param>
+	<param name="aStatusBar"></param>
+	<remarks></remarks>
+</member><member name="M:SwatObject.SwatInput.#ctor(System.String,System.String,System.String,System.String)">
+	<summary>
+ Initialize with access database filenames
+ </summary>
+	<param name="aSwatGDB"></param>
+	<param name="aOutGDB"></param>
+	<param name="aProjectFolder"></param>
+	<remarks>Opens database connections</remarks>
+</member><member name="M:SwatObject.SwatInput.Close">
+	<summary>
+ Close locally opened databases and unset other state variables  
+ </summary>
+	<remarks></remarks>
+</member><member name="M:SwatObject.SwatInput.QueryInputDB(System.String)">
+	<summary>
+ Generic routine to query the SWAT parameter input database
+ </summary>
+	<param name="aQuery">SQL query</param>
+	<returns>DataTable of query results</returns>
+	<remarks></remarks>
+</member><member name="M:SwatObject.SwatInput.QueryGDB(System.String)">
+	<summary>
+ Generic routine to query the SWAT geodatabase
+ </summary>
+	<param name="aQuery">SQL query</param>
+	<returns>DataTable of query results</returns>
+	<remarks></remarks>
+</member><member name="M:SwatObject.SwatInput.CopyTableInputDB(System.String,System.String)">
+	<summary>
+ Generic routine to copy a table in the SWAT parameter input database
+ </summary>
+	<param name="aTableNameSource">Source table name</param>
+	<param name="aTableNameTarget">Target table name</param>
+	<remarks>Overwrites existing output table if required</remarks>
+</member><member name="M:SwatObject.SwatInput.UpdateInputDB(System.String,System.String,System.Int32,System.String,System.String)">
+	<summary>
+ Generic routine to update a field value in a specified field in rows meeting specified criteria 
+ in a specified table in the SWAT parameter input database
+ </summary>
+	<param name="aTableName">Name of table containing values to update</param>
+	<param name="aIdFieldName">Match criteria field name</param>
+	<param name="aId">Match value</param>
+	<param name="aValueFieldName">Update field name</param>
+	<param name="aValue">New value</param>
+	<remarks></remarks>
+</member><member name="T:SwatObject.SwatInput">
+	<summary>
+ Class containing input needed for execution of SWAT2005 and methods to write text input files
+ </summary>
+	<remarks>Proof of concept - NOT COMPLETE</remarks>
+</member><member name="T:SwatObject.SwatInput.clsPp">
+	<summary>
+ point source (pp) input section
+ </summary>
+	<remarks></remarks>
+</member><member name="T:SwatObject.SwatInput.clsWwq">
+	<summary>
+ WWQ Input Section
+ </summary>
+	<remarks></remarks>
+</member><member name="P:SwatObject.My.Resources.Resources.ResourceManager">
+	<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member><member name="P:SwatObject.My.Resources.Resources.Culture">
+	<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member><member name="T:SwatObject.My.Resources.Resources">
+	<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member><member name="M:SwatObject.modUtility.MakeString(System.Object,System.Int32,System.Int32,System.Int32)">
+	<summary>
+ Create fixed with column string for writing to text file
+ </summary>
+	<param name="aValue">Number to format</param>
+	<param name="aDec">Number of decimal digits</param>
+	<param name="aSpc">Spaces to add after number</param>
+	<param name="aLeft">???</param>
+	<returns>Formatted string</returns>
+	<remarks>TODO: simplify!</remarks>
+</member><member name="M:SwatObject.modUtility.PopulateObjects(System.Data.DataTable,System.Type,atcUtility.atcCollection,System.Object[],System.Reflection.BindingFlags)">
+	<summary>
+ Create a new list of objects, one for each record of the table, populated from columns of table
+ </summary>
+	<param name="aObjectType"></param>
+	<param name="aFieldMap">Mapping of object field names as keys to table field names as items</param>
+	<param name="aNewArgs"></param>
+	<param name="aNewBindingFlags"></param>
+	<returns></returns>
+	<remarks>If aFieldMap is Nothing, default mapping of exactly the same field names is attempted</remarks>
+</member><member name="M:SwatObject.modUtility.PopulateObject(System.Data.DataRow,System.Object@,atcUtility.atcCollection)">
+	<summary>
+ Populate an object from the current record of the table
+ </summary>
+	<param name="aObject">Object to populate</param>
+	<param name="aFieldMap">Mapping of object field names as keys to table field names as items</param>
+	<remarks>If aFieldMap is Nothing, default mapping of exactly the same field names is attempted</remarks>
+</member><member name="T:SwatObject.SwatInput.clsRte">
+	<summary>
+ RTE Input Section
+ </summary>
+	<remarks></remarks>
+</member><member name="T:SwatObject.SwatInput.clsWus">
+	<summary>
+ Gw Input Section
+ </summary>
+	<remarks></remarks>
+</member><member name="T:SwatObject.SwatInput.clsPnd">
+	<summary>
+ Gw Input Section
+ </summary>
+	<remarks></remarks>
+</member>
+</members>
+</doc>

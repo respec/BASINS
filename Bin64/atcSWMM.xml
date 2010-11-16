@@ -1,0 +1,18 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+atcSWMM
+</name>
+</assembly>
+<members>
+<member name="M:atcSWMM.atcSWMMProject.FilterFileName(System.String)">
+	<summary>
+ Recursive, only use on short string!
+ </summary>
+	<param name="aFileName"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member>
+</members>
+</doc>

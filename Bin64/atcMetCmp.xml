@@ -1,0 +1,32 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+atcMetCmp
+</name>
+</assembly>
+<members>
+<member name="M:atcMetCmp.modMetCompute.CmpHamX(atcData.atcTimeseries,atcData.atcTimeseriesSource,System.Boolean,System.Double,System.Double[])">
+	<summary>
+ Compute HAMON PET from less than daily air temperature timeseries
+ </summary>
+	<param name="aTemperature"></param>
+	<param name="aSource"></param>
+	<param name="aDegF"></param>
+	<param name="aLatDeg"></param>
+	<param name="aCTS"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:atcMetCmp.modMetCompute.DisSolPet(atcData.atcTimeseries,atcData.atcTimeseriesSource,System.Int32,System.Double)">
+	<summary>
+ Disaggregate daily SOLAR or PET to hourly
+ </summary>
+	<param name="aInTs">input timeseries to be disaggregated</param>
+	<param name="aDataSource"></param>
+	<param name="aDisOpt">1 does Solar, DisOpt = 2 does PET</param>
+	<param name="aLatDeg">latitude, in degrees</param>
+	<returns></returns>
+	<remarks></remarks>
+</member>
+</members>
+</doc>

@@ -1,0 +1,362 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>
+    </SchemaVersion>
+    <ProjectGuid>{1F0CC763-D588-4FCD-8C31-3D0F3CCECD42}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <StartupObject>BasinsAll.Module1</StartupObject>
+    <RootNamespace>BasinsAll</RootNamespace>
+    <AssemblyName>BasinsAll</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>Console</MyType>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>
+    </DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>
+    </DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\Bin64\</OutputPath>
+    <DocumentationFile>
+    </DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\Bin64\</OutputPath>
+    <DocumentationFile>
+    </DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Module1.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\SwatObject\SwatObject10.vbproj">
+      <Project>{724F2B12-E252-4493-BE02-708FF8C5D56E}</Project>
+      <Name>SwatObject10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcBasinsObsWQ\atcBasinsObsWQ10.vbproj">
+      <Project>{7DCB47A0-7B03-4B7C-BC42-B8D920D46604}</Project>
+      <Name>atcBasinsObsWQ10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcCligenOutput\atcCligenOutput10.vbproj">
+      <Project>{DA829F2D-1760-4A50-A545-05B43798CB06}</Project>
+      <Name>atcCligenOutput10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcCligen\atcCligen10.vbproj">
+      <Project>{2EBD52CD-4BB4-4EC9-BE11-1101602958A2}</Project>
+      <Name>atcCligen10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcClimateAssessmentTool\atcClimateAssessmentTool10.vbproj">
+      <Project>{F40002FE-5698-4767-8198-997EE31A96A0}</Project>
+      <Name>atcClimateAssessmentTool10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcControls\atcControls10.vbproj">
+      <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
+      <Name>atcControls10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcDataTree\atcDataTree10.vbproj">
+      <Project>{F4EF0925-945B-418C-9A81-8490D89985DB}</Project>
+      <Name>atcDataTree10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcData\atcData10.vbproj">
+      <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
+      <Name>atcData10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcDurationCompare\atcDurationCompare10.vbproj">
+      <Project>{FBAA545B-7D95-43A3-8A4F-CC664D7DB201}</Project>
+      <Name>atcDurationCompare10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcEvents\atcEvents10.vbproj">
+      <Project>{9F469FD8-4A92-4C1F-901C-93D84D457D8F}</Project>
+      <Name>atcEvents10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcFrequencyGrid\atcFrequencyGrid10.vbproj">
+      <Project>{1E20B43E-B33D-4396-A7E1-498F72EBA5A4}</Project>
+      <Name>atcFrequencyGrid10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcGisUtilities\atcGisUtilities10.vbproj">
+      <Project>{E5D23BF6-95FE-4DDF-A1FF-3E0A7F5DCF5F}</Project>
+      <Name>atcGisUtilities10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcGraphExperimental\atcGraph10.vbproj">
+      <Project>{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}</Project>
+      <Name>atcGraph10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcHspfBinOut\atcHspfBinOut10.vbproj">
+      <Project>{61FAB3D2-9A2D-4D0A-BC4D-41C499DBE4B9}</Project>
+      <Name>atcHspfBinOut10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcHspfReadWrite\atcHspfReadWrite10.vbproj">
+      <Project>{00D0F71D-4726-4ED1-835F-183FF6BF58D5}</Project>
+      <Name>atcHspfReadWrite10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcHspfSupport\atcHspfSupport10.vbproj">
+      <Project>{3B2EB97A-A305-4394-9843-72E138815152}</Project>
+      <Name>atcHspfSupport10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcLandUse\atcLandUse10.vbproj">
+      <Project>{6EDD0CE5-8EF6-4BA3-9953-CFD027F7FCC9}</Project>
+      <Name>atcLandUse10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcList\atcList10.vbproj">
+      <Project>{A1A87CB8-8B9E-4C90-9549-C065357E499F}</Project>
+      <Name>atcList10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcLookup\atcLookup10.vbproj">
+      <Project>{EBAB4B57-1E71-4C28-BF3E-FA3E16D296DF}</Project>
+      <Name>atcLookup10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcManDelin\atcManDelin10.vbproj">
+      <Project>{21CF6B20-3932-46DF-A8C1-0ADCCC61328F}</Project>
+      <Name>atcManDelin10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcMetCmp\atcMetCmp10.vbproj">
+      <Project>{72264BDC-23F5-4A55-B53D-0752099CB263}</Project>
+      <Name>atcMetCmp10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcModelSegmentation\atcModelSegmentation10.vbproj">
+      <Project>{9CE0D790-6663-44B5-9902-4FB85EE36613}</Project>
+      <Name>atcModelSegmentation10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcModelSetup\atcModelSetup10.vbproj">
+      <Project>{AF800243-4EC0-4ABA-A722-85872F7BD308}</Project>
+      <Name>atcModelSetup10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility10.vbproj">
+      <Project>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</Project>
+      <Name>atcMwGisUtility10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcNOAAHPD\atcNOAAHPD10.vbproj">
+      <Project>{4A527E69-B21C-48C5-933E-2B45BADE7839}</Project>
+      <Name>atcNOAAHPD10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcNOAAISH\atcNOAAISH10.vbproj">
+      <Project>{24A67A2D-7C18-4DCB-976C-2C15C8AB9E6B}</Project>
+      <Name>atcNOAAISH10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcNOAA\atcNOAA10.vbproj">
+      <Project>{0B5BECA9-83A8-4CEC-A476-380E9F630091}</Project>
+      <Name>atcNOAA10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcPollutantLoading\atcPollutantLoading10.vbproj">
+      <Project>{9F91345F-B696-40B0-A6A4-65D93B8489FD}</Project>
+      <Name>atcPollutantLoading10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcProjector\atcProjector10.vbproj">
+      <Project>{863771D3-EA5B-45D2-8416-B75E9ADA8D7B}</Project>
+      <Name>atcProjector10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcReport\atcReport10.vbproj">
+      <Project>{EE3BB0CA-BB0A-4FB6-9AB3-E73F57DD4A21}</Project>
+      <Name>atcReport10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSeasonalAttributes\atcSeasonalAttributes10.vbproj">
+      <Project>{50FEF6BE-F961-4949-8658-2948DE7B777B}</Project>
+      <Name>atcSeasonalAttributes10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSeasons\atcSeasons10.vbproj">
+      <Project>{12F7FDD0-A6EC-4ABE-A01B-790AD8CAEF03}</Project>
+      <Name>atcSeasons10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSediment\atcSediment10.vbproj">
+      <Project>{9A8B85B9-8BDF-4621-AF02-A7DB75724D5B}</Project>
+      <Name>atcSediment10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSediment\HTMLBuilder\HTMLBuilder10.vbproj">
+      <Project>{6EA9D463-E649-4371-ADD3-80D2216C189B}</Project>
+      <Name>HTMLBuilder10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSegmentation\atcSegmentation10.vbproj">
+      <Project>{813E3F46-36CA-4320-BB05-325EEC553D3D}</Project>
+      <Name>atcSegmentation10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcStatusMonitor\atcStatusMonitor10.vbproj">
+      <Project>{241DE3DB-4EE8-4839-948E-DE366DF0BD9F}</Project>
+      <Name>atcStatusMonitor10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSWATDBF\atcSWATDBF10.vbproj">
+      <Project>{8DF179A4-2D5B-43B0-A78F-EF7B65F36AD5}</Project>
+      <Name>atcSWATDBF10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSWMMPlugIn\atcSWMMPlugIn10.vbproj">
+      <Project>{CF2F19C1-7495-472C-B065-1C4DBE25107E}</Project>
+      <Name>atcSWMMPlugIn10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSWMM\atcSWMM10.vbproj">
+      <Project>{EB1F831C-4588-4FA5-A9F9-68B0D9E1C390}</Project>
+      <Name>atcSWMM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSynopticAnalysis\atcSynopticAnalysis10.vbproj">
+      <Project>{FABF7AA3-DDE7-48A4-8226-ECD3AD423597}</Project>
+      <Name>atcSynopticAnalysis10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesD4EM\atcTimeseriesD4EM10.vbproj">
+      <Project>{31440B87-261C-4E1C-ADAB-76DA74B0A0FE}</Project>
+      <Name>atcTimeseriesD4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesDbf\atcTimeseriesDbf10.vbproj">
+      <Project>{F05FE01B-E35C-4444-B5A2-47085D073631}</Project>
+      <Name>atcTimeseriesDbf10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath10.vbproj">
+      <Project>{BD299EB7-7A62-4EF9-8806-86E9288C498F}</Project>
+      <Name>atcTimeseriesMath10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesNdayHighLow\atcTimeseriesNdayHighLow10.vbproj">
+      <Project>{24EEBEFB-2B19-489D-B3AF-9FE00A56346E}</Project>
+      <Name>atcTimeseriesNdayHighLow10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesStatistics\atcTimeseriesStatistics10.vbproj">
+      <Project>{7E40E3E6-BF8E-45B5-99AF-4E11DAF039FD}</Project>
+      <Name>atcTimeseriesStatistics10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesSWAT\atcTimeseriesSWAT10.vbproj">
+      <Project>{8157C92A-68A6-498D-84B7-EF2A299AB7BA}</Project>
+      <Name>atcTimeseriesSWAT10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesSWMMOutput\atcTimeserieSWMM5Output10.vbproj">
+      <Project>{4E255558-180A-4516-A342-EC7AA1D3BE92}</Project>
+      <Name>atcTimeserieSWMM5Output10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesWRDB\atcTimeseriesWRDB10.vbproj">
+      <Project>{5E5A80B8-06DC-428F-A139-F1CF20D756B2}</Project>
+      <Name>atcTimeseriesWRDB10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUCI\atcUCI10.vbproj">
+      <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>
+      <Name>atcUCI10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUtility\atcUtility10.vbproj">
+      <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
+      <Name>atcUtility10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcWASPPlugIn\atcWASPPlugIn10.vbproj">
+      <Project>{701A6CF3-2347-4DD1-B6A8-589F4B98D26E}</Project>
+      <Name>atcWASPPlugIn10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcWASP\atcWASP10.vbproj">
+      <Project>{74201F53-B122-40F0-9678-1DCDC45E99BC}</Project>
+      <Name>atcWASP10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcWDM\atcWDM10.vbproj">
+      <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
+      <Name>atcWDM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BASINS\BASINS10.vbproj">
+      <Project>{FE50F2FD-56E7-421E-A85D-A1F2DDCD5D9A}</Project>
+      <Name>BASINS10</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>del C:\dev\BASINS40\Bin64\BasinsAll.exe</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

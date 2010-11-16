@@ -1,0 +1,770 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+atcUtility
+</name>
+</assembly>
+<members>
+<member name="T:atcUtility.modDate.atcTimeUnit">
+	<summary>Standard timeseries time units</summary>
+</member><member name="T:atcUtility.modDate.atcTran">
+	<summary>Standard timeseries transformations</summary>
+</member><member name="F:atcUtility.modDate.JulianHour">
+	<summary>one hour as fraction of a day</summary>
+</member><member name="F:atcUtility.modDate.JulianMinute">
+	<summary>one minute as fraction of a day</summary>
+</member><member name="F:atcUtility.modDate.JulianSecond">
+	<summary>one second as fraction of a day</summary>
+</member><member name="F:atcUtility.modDate.SecondsPerDay">
+	<summary>cound of seconds in a day</summary>
+</member><member name="F:atcUtility.modDate.JulianMillisecond">
+	<summary>one millisecond as fraction of a day</summary>
+</member><member name="F:atcUtility.modDate.JulianMonth">
+	<summary>estimate of month as number of days</summary>
+	<remarks>When doing math on months and years, it is more accurate to use subroutines Timdif, Timadd, TimAddJ</remarks>
+</member><member name="F:atcUtility.modDate.JulianYear">
+	<summary>estimate of year as number of days</summary>
+	<remarks>When doing math on months and years, it is more accurate to use subroutines Timdif, Timadd, TimAddJ</remarks>
+</member><member name="F:atcUtility.modDate.MonthName3">
+	<summary>Three character month names</summary>
+	<remarks>TODO: make this international</remarks>
+</member><member name="M:atcUtility.modDate.Date2J(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
+	<summary>
+ convert a date array to a modfied Julian date (MJD)
+ </summary>
+	<param name="aYr"></param>
+	<param name="aMo"></param>
+	<param name="aDy"></param>
+	<param name="aHr"></param>
+	<param name="aMn"></param>
+	<param name="aSc"></param>
+	<returns>modified Julian date</returns>
+	<remarks></remarks>
+</member><member name="M:atcUtility.modDate.Date2J(System.Int32[])">
+	<summary>convert a date array to a modfied Julian date (MJD)</summary>
+	<param name="aDate">date array to convert</param>
+	<returns>modified Julian date</returns>
+	<remarks></remarks>
+</member><member name="M:atcUtility.modDate.HMS2J(System.Int32,System.Int32,System.Int32)">
+	<summary>convert an hour, minute, and second to a modifed Julian date (MJD)</summary>
+	<param name="aHr">hour to convert</param>
+	<param name="aMi">minute to convert</param>
+	<param name="aSc">second to convert</param>
+	<returns>modified Julian date</returns>
+	<remarks></remarks>
+</member><member name="M:atcUtility.modDate.J2DateRoundup(System.Double,atcUtility.modDate.atcTimeUnit,System.Int32[])">
+	<summary>
+ Round up dates to given time unit
+ </summary>
+	<param name="aJDate"></param>
+	<param name="aTU"></param>
+	<param name="aDate"></param>
+	<remarks></remarks>
+</member><member name="M:atcUtility.modDate.J2DateRounddown(System.Double,atcUtility.modDate.atcTimeUnit,System.Int32[]@)">
+	<summary>
+ Round down dates to given time unit
+ </summary>
+	<param name="aJDate"></param>
+	<param name="aTU"></param>
+	<param name="aDate"></param>
+	<remarks></remarks>
+</member><member name="M:atcUtility.modDate.J2Date(System.Double,System.Int32[]@)">
+	<summary>
+ Convert a modified Julian date (MJD) As Double to an array of integers
+ representing year, month, day, hour, minute, second
+ </summary>
+	<param name="aJd">modfied Julian date to convert</param>
+	<param name="aDate">output array containing year, month, day, hour, minute, second</param>
+	<remarks></remarks>
+</member><member name="M:atcUtility.modDate.J2HMS(System.Double,System.Int32@,System.Int32@,System.Int32@,System.Double@)">
+	<summary>
+ convert the time portion of a modfied Julian date to its component parts
+ </summary>
+	<param name="aJd">MJD to convert</param>
+	<param name="aHr">hour portion of MJD</param>
+	<param name="aMi">minute portion of MJD</param>
+	<param name="aSc">second portion of MJD</param>
+	<param name="aFrac">fraction of a second</param>
+	<remarks></remarks>
+</member><member name="M:atcUtility.modDate.INVMJD(System.Int32,System.Int32@,System.Int32@,System.Int32@)">
+	<summary>
+ invert modified Julian date as computed by function MJD (from DelbertDFranz)
+ </summary>
+	<param name="aMJD">value of modified julian date date number to invert</param>
+	<param name="aYr">calendar year</param>
+	<param name="aMn">number of month(1-12)</param>
+	<param name="aDy">day in the month</param>
+	<remarks>Developed from information given in: "Astronomical Formulae for Calculators", Jean Meeus, published by Willmann-Bell.</remarks>
+</member><member name="M:atcUtility.modDate.MJD(System.Int32,System.Int32,System.Int32)">
+	<summary>
+ Compute modified julian date for any date with a year greater than 1582 (from DelbertDFranz)
+ </summary>
+	<param name="aYr">calendar year</param>
+	<param name="aMn">number of month(1-12)</param>
+	<param name="aDy">day in the month</param>
+	<returns></returns>
+	<remarks>
+ We take the resulting date to represent the elapsed time from 
+ some point in the past to the first instant of the given day. 
+ The date must be later than Nov. 17, 1858 for MJD to be 
+ a positive number.  Thus for use in FEQ the year must be 1859 or greater. 
+ This routine and INVMJD have been checked by DDF for every day from 1860 through the year 25000. 
+ Developed from information given in: "Astronomical Formulae 
+ for Calculators', Jean Meeus, published by Willmann-Bell.
+</remarks>
+</member><member name="M:atcUtility.modDate.Jday(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
+	<summary>
+ convert a date array to a modfied Julian date (MJD)
+ </summary>
+	<param name="aYr"></param>
+	<param name="aMo"></param>
+	<param name="aDy"></param>
+	<param name="aHr"></param>
+	<param name="aMn"></param>
+	<param name="aSc"></param>
+	<returns>modified Julian date</returns>
+	<remarks></remarks>
+</member><member name="M:atcUtility.modDate.JDateIntrvl(System.Double)">
+	<summary>
+ determines the date interval (6-second thru 1-year) of a modfied Julian date
+ </summary>
+	<param name="aJd">MJD to determine interval of</param>
+	<returns>date interval (6 second, 5 minute, 4 hour, 3 day, 2 month, 1 year</returns>
+	<remarks></remarks>
+</member><member name="M:atcUtility.modDate.DateIntrvl(System.Int32[])">
+	<summary>
+ determines the date interval (6-second thru 1-year) of a date array
+ </summary>
+	<param name="aDate">date array to determine interval of</param>
+	<returns>date interval (6 second, 5 minute, 4 hour, 3 day, 2 month, 1 year</returns>
+	<remarks></remarks>
+</member><member name="M:atcUtility.modDate.DayMon(System.Int32,System.Int32)">
+	<summary>
+ return the number of days in the given month for the given 
+ year, with leap year taken into account.  
+ </summary>
+	<param name="aYr">year, valid range is 1 - 2080</param>
+	<param name="aMo">month, valid range is 1 - 12</param>
+	<returns>number of days</returns>
+	<remarks>
+ For an invalid month, -1 is returned. 
+ For an invalid year and a valid month, the correct number of days is returned, with February = 28.
+ </remarks>
+</member><member name="M:atcUtility.modDate.DumpDate(System.Double)">
+	<summary>
+ convert a modfied Julian date to a string
+ </summary>
+	<param name="aDateJ">date to convert</param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:atcUtility.modDate.TIMADD(System.Int32[],System.Int32,System.Int32,System.Int32,System.Int32[]@)">
+	<summary>
+ Add NVALS time steps to first date to compute second date.
+ </summary>
+	<param name="DATE1">starting date</param>
+	<param name="TCODE">time units
+              1 - second          5 - month
+              2 - minute          6 - year
+              3 - hour            7 - century
+              4 - Day
+ </param>
+	<param name="TSTEP">number of TCODE units in one step, for example 10 if dealing with 10-minute data</param>
+	<param name="NVALS">number of (TCODE * TSTEP) time intervals to add</param>
+	<param name="DATE2">result of adding (TCODE * TSTEP * NVALS) to DATE1</param>
+	<remarks>uses TIMADDJ if NVALS is less than zero</remarks>
+</member><member name="M:atcUtility.modDate.CalcTimeUnitStep(System.Double,System.Double,atcUtility.modDate.atcTimeUnit@,System.Int32@)">
+	<summary>
+ Calculate Time Unit and Time Step between two dates
+ </summary>
+	<param name="aSJDate">Starting Julian Date</param>
+	<param name="aEJDate">Ending Julian Date</param>
+	<param name="aTimeUnit">ByRef: returns time unit of difference between dates</param>
+	<param name="aTimeStep">ByRef: returns number of steps of time unit between dates</param>
+</member><member name="T:atcUtility.modDate">
+	<summary>General date utility subroutines and functions</summary>
+	<remarks>Copyright 2001-6 AQUA TERRA Consultants - Royalty-free use permitted under open source license </remarks>
+</member><member name="P:atcUtility.atcDateFormat.Midnight24">
+	<summary>
+ Midnight will be formatted as 24:00 on the previous day if true, will be formatted as 00:00 on the next day if false
+ </summary>
+	<value>True to format midnight as 24:00, false to format midnight as 00:00</value>
+	<returns>current setting</returns>
+	<remarks>default = True</remarks>
+</member><member name="P:atcUtility.atcTableFixedStreaming.FieldStart(System.Int32)">
+	<summary>
+ Character position where the field starts
+ </summary>
+	<param name="aFieldNumber">Number of field (one to NumFields)</param>
+	<value></value>
+	<returns>Character position &gt;= 1</returns>
+	<remarks>Returns zero if field does not exist</remarks>
+</member><member name="M:atcUtility.atcTableDBF.Merge(atcUtility.atcTableDBF,System.String[],System.Int32,System.Collections.ArrayList)">
+	<summary>
+ Merge records from dbf2Add into this dbf
+ </summary>
+	<param name="aAddFrom"></param>
+	<param name="aKeyFieldNames">Names of fields that together define a unique field. 
+ If blank, no duplicate checking will occur.
+ If Nothing or = "**ALL**" then the entire record will be used as a key</param>
+	<param name="aDuplicateAction">dictates handling of duplicate records as follows:
+ 0 - do not check for duplicates, just add all new records
+ 1 - keep existing instance and discard duplicates from dbf being added
+ 2 - replace existing instance with duplicates from dbf being added</param>
+	<param name="aAddedIndexes">Indexes from aAddFrom of items merged are added to aAddedIndexes if provided</param>
+	<remarks></remarks>
+</member><member name="M:atcUtility.atcTableDBF.findBytes(System.Byte[],System.Int32,System.Int32,System.Byte[],System.Int32,System.Int32,System.Int32,System.Int32)">
+	<summary>
+ Search for the set of bytes in aFindThis starting at index aThisFirstByte for aFindNumBytes
+ Search through aSearchIn starting at aSearchStart and advancing aSearchStride bytes.
+ </summary>
+	<param name="aFindThis">Sequence of bytes to find</param>
+	<param name="aFindFirstByte">First position in aFindThis to include in search</param>
+	<param name="aFindNumBytes">Number of bytes in aFindThis to include in search</param>
+	<param name="aSearchIn">Array to search</param>
+	<param name="aSearchStart">Index in aSearchIn to start search</param>
+	<param name="aSearchStride">Record length in aSearchIn, move this many bytes from aSearchStart to search for next possible match</param>
+	<param name="aSearchStop">End the search when we reach this position in aSearchIn</param>
+	<param name="aFieldLength">Search this section of each record for aFindThis, skipping zero or space padding. If zero, only check for value that starts exactly at aSearchStart [plus stride * n]</param>
+	<returns>
+ Number of times the pattern was searched for if found
+ 0 = pattern was not found
+ 1 = pattern was found in first place searched
+ n = pattern was found (n-1) strides after first place searched
+ </returns>
+	<remarks>
+ Example:
+ findBytes(aFindThis = {0, 1, 2, 3}, 
+           aFindFirstByte = 1,
+           aFindNumBytes = 2,
+           aSearchIn = { 0, 0, 1, 2, 4, 1, 2, 0, 0},
+           aSearchStart = 1,
+           aSearchStride = 4)
+ searches for the pattern {1, 2} (the two bytes starting at 1 of aFindThis)
+ does not match at the first comparison with bytes {0, 1} in aSearchIn
+ (does not match first instance of {1, 2} in aSearchIn because search strides past)
+ strides 4, matches {1, 2} after the 4, and returns 2 because it was found on the second comparison
+ </remarks>
+</member><member name="M:atcUtility.atcTableDBF.findAllNew(atcUtility.atcTableDBF,System.Int32)">
+	<summary>
+ Find records in aOtherTable that do not match any record in this table
+ </summary>
+	<param name="aOtherTable">Table to search for new records</param>
+	<param name="aField">Optional key field to search. If not specified, entire record will be compared.</param>
+	<returns>ArrayList of indexes of new records found in aOtherTable</returns>
+	<remarks></remarks>
+</member><member name="M:atcUtility.modString.Assign(System.Int32@,System.Int32)">
+	<summary>
+ Assign expression to result and return result
+ </summary>
+	<param name="aResult">output value of expression</param>
+	<param name="aExpression">input value of expression</param>
+	<returns>output value of expression</returns>
+	<remarks>use this like this 
+    While Assign(variable,expression) &gt; 0
+       'use variable as needed
+    End While
+ </remarks>
+</member><member name="M:atcUtility.modString.SignificantDigits(System.Double,System.Int32)">
+	<summary>
+ Round a double-precision number to the specified number of significant digits.
+ </summary>
+	<param name="aValue">Double-precision number to be formatted</param>
+	<param name="aDigits">Number of significant digits</param>
+	<returns>aValue rounded to aDigits significant digits.</returns>
+	<remarks>Example: Signif(1.23456, 3) =  1.23</remarks>
+</member><member name="M:atcUtility.modString.DecimalAlign(System.String[]@,System.Boolean@,System.Boolean@,System.Int32@)">
+	<summary>
+ Reformat an array of floating point numbers around location of decimal place.
+ </summary>
+	<param name="aNumericStrings">floating point numbers as strings</param>
+	<param name="PadLeft">False to disable adding spaces left of numbers</param>
+	<param name="PadRight">False to disable adding spaces right of numbers</param>
+	<param name="MinWidth">Minimum width of resulting strings</param>
+	<remarks>aNumericStrings is both an input and output argument</remarks>
+</member><member name="M:atcUtility.modString.IsInteger(System.String@)">
+	<summary>
+ Checks to see whether string argument is an integer.
+ </summary>
+	<param name="aStr">String to be checked for integer status</param>
+	<returns>True if each character in string is in range [0-9]</returns>
+	<remarks>
+ Example: IsInteger(12345) = True
+ Example: IsInteger(123.45) = False
+ </remarks>
+</member><member name="M:atcUtility.modString.IsAlpha(System.String@)">
+	<summary>
+ Checks to see whether incoming string is entirely alphabetic.
+ </summary>
+	<param name="aStr">String to be checked for alphabetic status</param>
+	<returns>True if input parameter istr contains only [A-Z] or [a-z]</returns>
+	<remarks>
+ Example: IsAlpha(abcde) = True
+ Example: IsAlpha(abc123) = False
+ </remarks>
+</member><member name="M:atcUtility.modString.IsAlphaNumeric(System.String@)">
+	<summary>
+ Checks to see whether incoming string is entirely alphanumeric.
+ </summary>
+	<param name="aStr">String to be checked for alphabetic status</param>
+	<returns>True if input parameter istr contains only [A-Z] or [a-z] or [0-9]</returns>
+	<remarks>
+ Example: IsAlpha(abcde) = True
+ Example: IsAlpha(abc123) = True
+ Example: IsAlpha(!#?$) = False
+ </remarks>
+</member><member name="M:atcUtility.modString.ByteIsPrintable(System.Byte@)">
+	<summary>
+ Checks to see whether incoming byte is printable.
+ </summary>
+	<param name="aByte">Byte to be checked for printable status</param>
+	<returns>True if argument is ASCII code 9, 10, 12, 13, 32 - 126</returns>
+	<remarks>
+ Example: ByteIsPrintable(44) = True
+ Example: ByteIsPrintable(7) = False
+ </remarks>
+</member><member name="M:atcUtility.modString.Rndlow(System.Double@)">
+	<summary>
+ Sets values less than 1.0E-19 to 0.0 for the plotting routines for bug in DISSPLA/PR1ME. 
+ Otherwise returns values rounded to lower magnitude.
+ </summary>
+	<param name="aX">Single-precision value</param>
+	<returns>Incoming value, rounded to 0.0 if less than 1.0E-19.</returns>
+	<remarks>Example: Rndlow(1.0E-20) = 0, Rndlow(11000) = 10000</remarks>
+</member><member name="M:atcUtility.modString.SafeSubstring(System.String,System.Int32,System.Int32)">
+	<summary>
+ Like String.Substring but gracefully return an empty or shorter string when it would have thrown an exception
+ </summary>
+	<param name="aSourceString">String to get substring of</param>
+	<param name="aStartIndex">Zero-based start position of substring</param>
+	<param name="aLength">Length of substring</param>
+	<remarks>Why could they not have implemented String.Substring more like this?</remarks>
+</member><member name="M:atcUtility.modString.SafeSubstring(System.String,System.Int32)">
+	<summary>
+ Like String.Substring but gracefully return an empty or shorter string when it would have thrown an exception
+ </summary>
+	<param name="aSourceString">String to get substring of</param>
+	<param name="aStartIndex">Zero-based start position of substring</param>
+	<remarks>Why could they not have implemented String.Substring more like this?</remarks>
+</member><member name="M:atcUtility.modString.StrFindBlock(System.String,System.String,System.String,System.Int32)">
+	<summary>
+ Find a block of text between two known strings
+ </summary>
+	<param name="aSource">Text to search through</param>
+	<param name="aStartsWith">String that indicates block to find is about to start</param>
+	<param name="aEndsWith">String that indicates block to find has ended</param>
+	<param name="aStartIndex">Optional offset within aSource to start searching</param>
+	<returns>Block of text that was found between aStartsWith and aEndsWith</returns>
+	<remarks>Returned string does not include aStartsWith and aEndsWith. 
+ Empty string is returned if aStartsWith or aEndsWith is not found.</remarks>
+</member><member name="M:atcUtility.modString.StrReplaceBlock(System.String,System.String,System.String,System.String,System.Int32)">
+	<summary>
+ Replace a block of text between two known strings
+ </summary>
+	<param name="aSource">Text to search through</param>
+	<param name="aStartsWith">String that indicates beginning of block to find</param>
+	<param name="aEndsWith">String that indicates end of block to find</param>
+	<param name="aReplaceWith">String to replace block that is found</param>
+	<param name="aStartIndex">Optional offset within aSource to start searching</param>
+	<returns>aSource where block of text that was found between aStartsWith and aEndsWith is replaced by aReplaceWith</returns>
+	<remarks>Returned string includes aStartsWith and aEndsWith. 
+ aSource is returned unchanged if aStartsWith or aEndsWith is not found.</remarks>
+</member><member name="T:atcUtility.modString">
+	<summary>
+ General utility subroutines and functions shared by many projects
+ </summary>
+	<remarks>Mark Gray and Jack Kittle of AQUA TERRA CONSULTANTS 2003-2010
+ Copyright 2010 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+ </remarks>
+</member><member name="T:atcUtility.IatcTable">
+	<summary>
+	</summary>
+	<remarks></remarks>
+</member><member name="M:atcUtility.atcTableOpener.OpenAnyTable(System.String)">
+	<summary>
+ opens a table for known table types based on file extension
+ </summary>
+	<param name="aFileName">name of file containing table</param>
+	<returns>opened table if file exists and of known type</returns>
+	<remarks></remarks>
+</member><member name="T:atcUtility.atcTableOpener">
+	<summary>
+ opens a file containing a table based on the file extension
+ </summary>
+	<remarks></remarks>
+</member><member name="M:atcUtility.atcTable.Cousin">
+	<summary>
+ copies a table's structure without data
+ </summary>
+	<returns>new table with the same fields as this one, but no data</returns>
+	<remarks></remarks>
+</member><member name="M:atcUtility.atcTable.CreationCode">
+	<summary>
+ produces Visual Basic code needed to create this table
+ </summary>
+	<returns>VB source code to create this table</returns>
+	<remarks></remarks>
+</member><member name="M:atcUtility.atcTable.OpenFile(System.String)">
+	<summary>
+ Open the specified file, probably read at least the metadata about fields
+ </summary>
+	<param name="aFilename">name of file containing table</param>
+	<returns>true if table opened successfully</returns>
+	<remarks></remarks>
+</member><member name="M:atcUtility.atcTable.WriteFile(System.String)">
+	<summary>
+ Write the current table to the specified file
+ </summary>
+	<param name="aFilename">name of file to write table to</param>
+	<returns>true if table written successfully</returns>
+	<remarks></remarks>
+</member><member name="P:atcUtility.atcTable.Header(System.Int32)">
+	<summary>
+ Get a specified row of the header
+ </summary>
+	<param name="aHeaderRow">Which row to get (range is 1..NumHeaderRows)</param>
+	<returns>text of specified row of the header</returns>
+</member><member name="P:atcUtility.atcTable.Header">
+	<summary>
+ All rows of the header concatenated with cr/lf at the end of each line
+ </summary>
+</member><member name="P:atcUtility.atcTable.NumHeaderRows">
+	<summary>
+ The number of header rows in the table
+ </summary>
+	<value></value>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:atcUtility.atcTable.TrimValue(System.String,System.String)">
+	<summary>
+ Trim leading and trailing spaces from value.
+ If numeric, also trim trailing zeroes after decimal point and trailing decimal point
+ </summary>
+	<param name="aValue">Value to be trimmed</param>
+	<param name="aType">Type character, N = Numeric</param>
+</member><member name="M:atcUtility.atcTable.FieldNumber(System.String)">
+	<summary>
+ determine field number from field name
+ </summary>
+	<param name="aFieldName">name of specified field</param>
+	<returns>the number of the field with the specified name or zero if the named field does not appear in this file</returns>
+	<remarks></remarks>
+</member><member name="M:atcUtility.atcTable.FindMatch(System.Int32[],System.String[],System.Object[],System.Boolean,System.Int32,System.Int32)">
+	<summary>
+ Find a record matching a set of rules
+ </summary>
+	<param name="aFieldNum">array of fields to compare</param>
+	<param name="aOperation">comparisons to make</param>
+	<param name="aFieldVal">values to compare fields to</param>
+	<param name="aMatchAny">true if any one comparison is enough to match, 
+ default of false means all comparisons must be true to match a record</param>
+	<param name="aStartRecord">record number to start searching</param>
+	<param name="aEndRecord">record number to stop searching (default of -1 searches to end of table)</param>
+	<returns>true if a matching record was found, with CurrentRecord set to the record that was found.
+ false if no matching record was found, with CurrentRecord set to aStartRecord</returns>
+</member><member name="M:atcUtility.atcTable.PopulateObjects(System.Type,atcUtility.atcCollection,System.Object[],System.Reflection.BindingFlags)">
+	<summary>
+ Create a new list of objects, one for each record of the table, populated from columns of table
+ </summary>
+	<param name="aObjectType"></param>
+	<param name="aFieldMap">Mapping of table field names as keys to object field/property names as items</param>
+	<param name="aNewArgs"></param>
+	<param name="aNewBindingFlags"></param>
+	<returns></returns>
+	<remarks>If aFieldMap is Nothing, default mapping of exactly the same field names is attempted</remarks>
+</member><member name="M:atcUtility.atcTable.PopulateObject(System.Object@,atcUtility.atcCollection)">
+	<summary>
+ Populate an object from the current record of the table
+ </summary>
+	<param name="aObject">Object to populate</param>
+	<param name="aFieldMap">Mapping of table field names as keys to object field/property names as items</param>
+	<remarks>If aFieldMap is Nothing, default mapping of exactly the same field names is attempted</remarks>
+</member><member name="T:atcUtility.atcTable">
+	<summary>
+ generic table class
+ </summary>
+	<remarks></remarks>
+</member><member name="P:atcUtility.atcTableArray.Header(System.Int32)">
+	<summary>
+ Get a specified row of the header
+ </summary>
+	<param name="aHeaderRow">Which row to get (range is 1..NumHeaderRows)</param>
+	<returns>text of specified row of the header</returns>
+</member><member name="P:atcUtility.atcTableArray.Header">
+	<summary>
+ All rows of the header concatenated with cr/lf at the end of each line
+ </summary>
+</member><member name="T:atcUtility.atcTableArray">
+	<summary>
+ Manage a table of strings
+ </summary>
+	<remarks>
+ Values are stored as a Generic.List(Of String()) where the Generic.List manages the rows and each row is an array of String
+ </remarks>
+</member><member name="M:atcUtility.atcCollection.BinarySearchForKey(System.String)">
+	<summary>Returns first index of a key equal to or higher than aKey</summary>
+	<param name="aKey">Key to search for</param>
+	<returns>Returns aKeys.Count if aKeys is empty or contains only values less than aKey</returns>
+	<remarks>Only works for collections sorted by key</remarks>
+</member><member name="M:atcUtility.atcCollection.BinarySearchForKey(System.Double)">
+	<summary>Returns first index of a key equal to or higher than aKey</summary>
+	<param name="aKey">Key to search for</param>
+	<returns>Returns aKeys.Count if aKeys is empty or contains only values less than aKey</returns>
+	<remarks>Only works for collections sorted by key</remarks>
+</member><member name="M:atcUtility.atcCollection.Add(atcUtility.atcCollection)">
+	<summary>Add items from an atcCollection along with their keys</summary>
+</member><member name="T:atcUtility.atcCollection.clsDictionaryEnumerator">
+	<summary>
+ Enumerator returns key/value pairs as DictionaryEntry objects
+ </summary>
+</member><member name="T:atcUtility.atcCollection">
+	<summary>
+ Collection that extends ArrayList with Keys
+ </summary>
+	<remarks>
+ Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+ </remarks>
+</member><member name="P:atcUtility.atcTableRDB.FieldType(System.Int32)">
+	<summary>
+ Overriding default FieldType to translate from RDB to DBF version of type character
+ </summary>
+	<param name="aFieldNumber"></param>
+	<value></value>
+	<returns></returns>
+	<remarks>
+ RDB s = string  -&gt; DBF C = Character
+ RDB d = date    -&gt; DBF C = Character
+ RDB n = numeric -&gt; DBF N = Numeric
+ </remarks>
+</member><member name="T:atcUtility.atcTableRDB">
+	<summary>
+ Read and write USGS RDB-formatted delimited text files as a table
+ </summary>
+	<remarks>
+ Field delimiter is a tab
+ Header rows start with #
+ First row after headers is column labels
+ Second row after headers contains field widths and types
+ </remarks>
+</member><member name="T:atcUtility.atcTableDelimited">
+	<summary>
+ Read and write delimited text files as a table
+ </summary>
+	<remarks>
+ Default field delimiter is a comma
+ First row after NumHeaderRows is read as field names
+ </remarks>
+</member><member name="P:atcUtility.atcTableFixed.FieldStart(System.Int32)">
+	<summary>
+ Character position where the field starts
+ </summary>
+	<param name="aFieldNumber">Number of field (one to NumFields)</param>
+	<value></value>
+	<returns>Character position &gt;= 1</returns>
+	<remarks>Returns zero if field does not exist</remarks>
+</member><member name="M:atcUtility.modFile.TryMove(System.String,System.String,System.Boolean)">
+	<summary>
+ Try moving a file to a new location, log a failure rather than raising an exception
+ </summary>
+	<param name="aFromFilename">Path of file to be moved</param>
+	<param name="aToPath">Folder or full path to move to</param>
+	<param name="aVerbose">True to log what happens with Logger.Dbg</param>
+	<returns>True if successful, False if unsuccessful</returns>
+	<remarks></remarks>
+</member><member name="M:atcUtility.modFile.TryDeleteShapefile(System.String)">
+	<summary>
+ Delete a shape file (including all associated files: .shp, .shx, .dbf, .prj, .spx, .sbn, .xml, .shp.xml, .mwsr)
+ </summary>
+	<param name="aShapefilename">file name of shape file (must end with .shp)</param>
+	<returns>True if all existing files were deleted or already did not exist, 
+ False if any files were present which could not be deleted.</returns>
+	<remarks>Most likely cause of failure is shape file is open (currently on a map)</remarks>
+</member><member name="M:atcUtility.modFile.TryDeleteGroup(System.String,System.String[],System.Boolean)">
+	<summary>
+ Delete a group of files with the same base name and different extensions
+ </summary>
+	<param name="aBaseFilename">full path and file name of one file to delete (example: "C:\temp.shp")</param>
+	<param name="aExtensions">all possible extensions to copy, examples are ShapeExtensions and TifExtensions above</param>
+	<param name="aVerbose">True to log what happens with Logger.Dbg</param>
+	<returns>True if all existing files were deleted or already did not exist, 
+ False if any files were present which could not be deleted.</returns>
+	<remarks>Most likely cause of failure is a file is open (for example is currently on a map)</remarks>
+</member><member name="M:atcUtility.modFile.TryCopyShapefile(System.String,System.String)">
+	<summary>
+ Copy a shape file (including all associated files: .shp, .shx, .dbf, .prj, .spx, .sbn, .xml, .shp.xml, .mwsr)
+ Log any exceptions and return false rather than raising them
+ </summary>
+	<param name="aShapeFilename">full path and file name of shape file to copy (example: "C:\temp.shp")</param>
+	<param name="aDestinationPath">full path of destination folder or file name 
+ (example: "C:\NewLocation\" or "C:\NewLocation\NewFilename.shp")</param>
+	<returns>True if all existing files were copied, False if an existing file could not be copied.</returns>
+</member><member name="M:atcUtility.modFile.TryCopyGroup(System.String,System.String,System.String[],System.Boolean)">
+	<summary>
+ Copy a group of files with the same base name and different extensions
+ Log any exceptions and return false rather than raising them
+ </summary>
+	<param name="aBaseFilename">full path and file name of one file to copy (example: "C:\temp.shp")</param>
+	<param name="aDestinationPath">full path of destination folder or file name 
+ (example: "C:\NewLocation\" or "C:\NewLocation\NewFilename.shp")</param>
+	<param name="aExtensions">all possible extensions to copy, examples are ShapeExtensions and TifExtensions above</param>
+	<param name="aVerbose">True to log what happens with Logger.Dbg</param>
+	<returns>True if all existing files were copied, False if an existing file could not be copied.</returns>
+</member><member name="M:atcUtility.modFile.TryMoveShapefile(System.String,System.String)">
+	<summary>
+ Move a shape file (including all associated files: .shp, .shx, .dbf, .prj, .spx, .sbn, .xml, .shp.xml, .mwsr)
+ Log any exceptions and return false rather than raising them
+ </summary>
+	<param name="aShapeFilename">full path and file name of shape file to move (example: "C:\temp.shp")</param>
+	<param name="aDestinationPath">full path of destination folder or file name 
+ (example: "C:\NewLocation\" or "C:\NewLocation\NewFilename.shp")</param>
+	<returns>True if all existing files were moved, False if an existing file could not be moved.</returns>
+</member><member name="M:atcUtility.modFile.TryMoveGroup(System.String,System.String,System.String[],System.Boolean)">
+	<summary>
+ Move a group of files with the same base name and different extensions
+ Log any exceptions and return false rather than raising them
+ </summary>
+	<param name="aBaseFilename">full path and file name of shape file to move (example: "C:\temp.shp")</param>
+	<param name="aDestinationPath">full path of destination folder or file name 
+ (example: "C:\NewLocation\" or "C:\NewLocation\NewFilename.shp")</param>
+	<param name="aExtensions">all possible extensions to copy, examples are ShapeExtensions and TifExtensions above</param>
+	<param name="aVerbose">True to log what happens with Logger.Dbg</param>
+	<returns>True if all existing files were moved, False if an existing file could not be moved.</returns>
+</member><member name="M:atcUtility.modFile.GetTemporaryFileName(System.String,System.String)">
+	<summary>
+ Return a new file name in the IO.Path.GetTempPath folder with a given base file name and extension.
+ An integer is inserted between the base file name and extension if needed to avoid conflict with an existing file.
+ If aBaseName.aExtension already exists (as a file or folder), 
+    aBaseName_1.aExtension is tried, then 
+    aBaseName_2.aExtension, ..., until a file name is found for which the file does not yet exist
+ Temporary files/folders found older than one day will be deleted and the name will be reused
+ </summary>
+	<remarks>It is the caller's responsibility to both create and remove this file. Two identical calls will get the same result if the file is not created before the second call.</remarks>
+</member><member name="M:atcUtility.modFile.GetNewFileName(System.String,System.String)">
+	<summary>
+ Return a file name matching the given pattern which does not yet exist.
+ If aBaseName.aExtension already exists (as a file or folder), 
+    aBaseName_1.aExtension is tried, then 
+    aBaseName_2.aExtension, ..., until a file name is found for which the file does not yet exist
+ </summary>
+	<remarks>It is the caller's responsibility to both create and remove this file. Two identical calls will get the same result if the file is not created before the second call.</remarks>
+</member><member name="M:atcUtility.modFile.NewTempDir(System.String)">
+	<summary>
+ Create a new empty folder in the user's temporary folder. 
+ </summary>
+	<param name="aBaseName">String to start temporary folder name with.</param>
+	<returns>
+ The return value will be aBaseName if it does not yet exist, or will have 
+ underscore and a number appended to avoid having the same name as an existing directory
+ </returns>
+	<remarks>It is the caller's responsibility to remove this folder and its contents later.</remarks>
+</member><member name="M:atcUtility.modFile.ShowHelp(System.String)">
+	<summary>
+ Show Help for specified topic
+ </summary>
+	<param name="aHelpTopic">Topic to display</param>
+	<remarks>if aHelpTopic is a file, set the file to display instead of opening help</remarks>
+</member><member name="M:atcUtility.modFile.ChDriveDir(System.String)">
+	<summary>
+ Changes directory and, if necessary, drive. Returns True if successful.
+ </summary>
+	<param name="aPath">New pathname</param>
+	<returns>True if directory change is successful</returns>
+	<remarks></remarks>
+</member><member name="M:atcUtility.modFile.ConvertLongPathToShort(System.String)">
+	<summary>
+ Convert a long path name to a short path name
+ </summary>
+	<param name="aLongPathName">Long path name to convert</param>
+	<returns>Converted short path name</returns>
+	<remarks>Use this routine when length of file name is limited (like wdm names)</remarks>
+</member><member name="T:atcUtility.modFile.clsLinesInFile">
+	<summary>
+ An enumerable set of lines read from a text file (or other BinaryReader)
+ lines in file end with carriage return and/or linefeed
+ end of line characters are stripped from enumerated lines returned
+ </summary>
+</member><member name="T:atcUtility.modFile.clsLinesInFileReadLine">
+	<summary>
+ An enumerable set of lines read from a text file (or other BinaryReader)
+ lines in file end with carriage return and/or linefeed
+ end of line characters are stripped from enumerated lines returned
+ </summary>
+</member><member name="M:atcUtility.modFile.NextLine(System.IO.BinaryReader)">
+	<summary>
+ Read the next line from a text file whose lines end with carriage return and/or linefeed
+ </summary>
+	<param name="aReader"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:atcUtility.modFile.GetNaN">
+	<summary>
+ Gets System.Double.NaN (not a number)
+ </summary>
+	<returns>Double.NaN</returns>
+	<remarks>workaround for mystery bug - program exit without message on first reference to NaN</remarks>
+</member><member name="M:atcUtility.modFile.GetNaNInternal(System.Double)">
+	<summary>
+ Magic - reference to System.Double.NaN in optional argument elimates problem
+ </summary>
+	<param name="aNaN"></param>
+	<returns>Double.NaN</returns>
+	<remarks>workaround for mystery bug - program exit without message on first reference to NaN</remarks>
+</member><member name="M:atcUtility.modFile.GetMaxValue">
+	<summary>
+ Gets System.Double.MaxValue
+ </summary>
+	<returns>Double.MaxValue</returns>
+	<remarks>workaround for mystery bug - program exit without message on first reference to Double.*</remarks>
+</member><member name="M:atcUtility.modFile.GetMaxValueInternal(System.Double)">
+	<summary>
+ Magic - reference to System.Double.MaxValue in optional argument elimates problem
+ </summary>
+	<param name="aMaxValue"></param>
+	<returns>Double.MaxValue</returns>
+	<remarks>workaround for mystery bug - program exit without message on first reference to Double.*</remarks>
+</member><member name="M:atcUtility.modFile.GetMinValue">
+	<summary>
+ Gets System.Double.MinValue
+ </summary>
+	<returns>Double.MinValue</returns>
+	<remarks>workaround for mystery bug - program exit without message on first reference to Double.*</remarks>
+</member><member name="M:atcUtility.modFile.GetMinValueInternal(System.Double)">
+	<summary>
+ Magic - reference to System.Double.MinValue in optional argument elimates problem
+ </summary>
+	<param name="aMinValue"></param>
+	<returns>Double.MaxValue</returns>
+	<remarks>workaround for mystery bug - program exit without message on first reference to Double.*</remarks>
+</member><member name="M:atcUtility.modReflection.GetEmbeddedFileAsString(System.String,System.Reflection.Assembly)">
+	<summary>
+ Extracts an embedded file out of a given assembly as a string
+ </summary>
+	<param name="aAssembly">Assembly file is embedded in.</param>
+	<param name="fileName">Name of the file to extract.</param>
+	<returns>A string containing the file data.</returns>
+</member><member name="M:atcUtility.modReflection.SetSomething(System.Object@,System.String,System.Object)">
+	<summary>
+ Set a property or field given its name and a new value
+ </summary>
+	<param name="aObject">Object whose property or field needs to be set</param>
+	<param name="aFieldName">Name of property or field to set</param>
+	<param name="aValue">New value to set</param>
+</member><member name="M:atcUtility.modReflection.SetSomething(System.Object@,System.String,System.Object,System.Boolean)">
+	<summary>
+ Set a property or field given its name and a new value
+ </summary>
+	<param name="aObject">Object whose property or field needs to be set</param>
+	<param name="aFieldName">Name of property or field to set</param>
+	<param name="aValue">New value to set</param>
+	<param name="aLogProblems">Quiet flag</param>
+</member><member name="M:atcUtility.modReflection.CopyControlState(System.Windows.Forms.Control,System.Windows.Forms.Control)">
+	<summary>
+ Copy the Text or Checked state from one Windows.Forms.Control to another
+ Also copies state of child controls, if any
+ </summary>
+	<param name="aOriginalControl">Control to copy state from</param>
+	<param name="aCopyTo">Control to copy state to</param>
+	<remarks>Useful for copying the state of an Options form to support Cancel</remarks>
+</member>
+</members>
+</doc>

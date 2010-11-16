@@ -1,0 +1,29 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+atcHspfBinOut
+</name>
+</assembly>
+<members>
+<member name="T:atcHspfBinOut.clsFtnUnfFile">
+	<summary>
+	</summary>
+	<remarks>
+ Copyright 2005-8 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+ </remarks>
+</member><member name="T:atcHspfBinOut.HspfBinary">
+	<summary>
+	</summary>
+	<remarks>
+Copyright 2005-2008 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+</remarks>
+</member><member name="T:atcHspfBinOut.atcTimeseriesFileHspfBinOut">
+	<summary>
+	</summary>
+	<remarks>
+Copyright 2005-2008 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+ </remarks>
+</member>
+</members>
+</doc>

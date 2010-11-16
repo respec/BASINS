@@ -1,0 +1,53 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+BASINS
+</name>
+</assembly>
+<members>
+<member name="M:BASINS.modBasinsPlugin.FindBasinsDrives">
+	<summary>
+	</summary>
+	<remarks></remarks>
+</member><member name="M:BASINS.modBasinsPlugin.LoadNationalProject">
+	<summary>
+	</summary>
+	<remarks></remarks>
+</member><member name="M:BASINS.modBasinsPlugin.NationalProjectIsOpen">
+	<summary>
+	</summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:BASINS.modBasinsPlugin.IsBASINSProject">
+	<summary>
+ check to see if project has both a catalog unit layer and a state layer
+ </summary>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="T:BASINS.modBasinsPlugin">
+	<summary>
+	</summary>
+	<remarks></remarks>
+</member><member name="M:BASINS.modDownload.BASINSNewMenu">
+	<summary>
+	</summary>
+	<remarks></remarks>
+</member><member name="M:BASINS.modDownload.RemoveEmptyGroups">
+	<summary>
+ Remove any groups from the legend that do not contain any layers 
+ for example, groups "Data Layers" and "New Group" are often created but then no layers end up in them
+ </summary>
+	<remarks></remarks>
+</member><member name="M:BASINS.modDownload.GetDefaultRenderer(System.String)">
+	<summary>
+ If the named layer does not have a .mwsr (for shape) or .mwleg (for grid) then look for the default file
+ and put a copy of the default renderer with the layer
+ </summary>
+</member><member name="T:BASINS.modDownload">
+	<summary>
+	</summary>
+	<remarks></remarks>
+</member>
+</members>
+</doc>
