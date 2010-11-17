@@ -99,6 +99,7 @@ Public Class frmCAT
     Friend WithEvents mnuOpenSWAT As System.Windows.Forms.MenuItem
     Friend WithEvents lblOpen As System.Windows.Forms.Label
     Friend WithEvents mnuOpenSWMM As System.Windows.Forms.MenuItem
+    Friend WithEvents chkRun As System.Windows.Forms.CheckBox
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -166,6 +167,7 @@ Public Class frmCAT
         Me.btnPlot = New System.Windows.Forms.Button
         Me.lblOpen = New System.Windows.Forms.Label
         Me.mnuOpenSWMM = New System.Windows.Forms.MenuItem
+        Me.chkRun = New System.Windows.Forms.CheckBox
         Me.myTabs.SuspendLayout()
         Me.tabInputs.SuspendLayout()
         Me.tabEndpoints.SuspendLayout()
@@ -722,10 +724,23 @@ Public Class frmCAT
         Me.mnuOpenSWMM.Index = 2
         Me.mnuOpenSWMM.Text = "Open SWMM Scenario"
         '
+        'chkRun
+        '
+        Me.chkRun.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.chkRun.AutoSize = True
+        Me.chkRun.Location = New System.Drawing.Point(399, 282)
+        Me.chkRun.Name = "chkRun"
+        Me.chkRun.Size = New System.Drawing.Size(46, 17)
+        Me.chkRun.TabIndex = 6
+        Me.chkRun.Text = "Run"
+        Me.chkRun.UseVisualStyleBackColor = True
+        Me.chkRun.Visible = False
+        '
         'frmCAT
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.ClientSize = New System.Drawing.Size(519, 309)
+        Me.Controls.Add(Me.chkRun)
         Me.Controls.Add(Me.btnPlot)
         Me.Controls.Add(Me.lblTop)
         Me.Controls.Add(Me.btnStart)
@@ -793,6 +808,7 @@ Public Class frmCAT
 
         RefreshTotalIterations()
 
+        pCat.RunModel = (chkRun.Checked)
         pCat.StartRun(txtModifiedScenarioName.Text)
 
         SaveSetting("BasinsCAT", "Settings", "TimePerRun", pCat.TimePerRun)
@@ -820,7 +836,7 @@ Public Class frmCAT
             lblOpen.Visible = False
             myTabs.Visible = True
             btnStart.Visible = True
-            btnPlot.Visible = True
+            'btnPlot.Visible = True
         End If
         RefreshInputList()
         RefreshTotalIterations()
@@ -1590,7 +1606,7 @@ Public Class frmCAT
         lblOpen.Visible = False
         myTabs.Visible = True
         btnStart.Visible = True
-        btnPlot.Visible = True
+        'btnPlot.Visible = True
     End Sub
 
     Private Sub pCat_Started() Handles pCat.Started
