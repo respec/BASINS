@@ -53,15 +53,11 @@ Partial Public Class atcTimeseriesSWAT
 
             .NumHeaderRows = 1
             pBaseDataField = 5
-            'pSubIdField = 2
 
             If .OpenFile(Specification) Then
                 'Set header text
                 Attributes.SetValue("HeaderText", lTable.Header)
                 Dim lConstituentHeader As String = lConstituent ' share common header, but later append the station id (i.e. column number)
-                'If Not pTableDelimited Then
-                '    lConstituentHeader = CType(lTable, atcTableFixedStreaming).Header(9)
-                'End If
                 Dim lField As Integer
                 Dim lLastField As Integer
                 Dim lFieldStart As Integer = 1
@@ -125,7 +121,6 @@ Partial Public Class atcTimeseriesSWAT
             If aAttributes.ContainsAttribute("GAGE") Then lGAGEsToProcess = aAttributes.GetValue("GAGE", "").ToString.Split(lDelim)
         End If
 
-        Dim lScenarioName As String = String.Empty
         Dim lKnowInterval As Boolean = False
         Dim lKnowYearBase As Boolean = False
 
@@ -145,11 +140,25 @@ ReOpenTable:
             Logger.Dbg("Unable to open " & Specification)
             Return False
         Else
+            Dim lDefScenario As atcAttributeDefinition = atcDataAttributes.GetDefinition("Scenario", True)
+            Dim lDefLocation As atcAttributeDefinition = atcDataAttributes.GetDefinition("Location", True)
+            Dim lDefConstituent As atcAttributeDefinition = atcDataAttributes.GetDefinition("Constituent", True)
+            Dim lDefUnits As atcAttributeDefinition = atcDataAttributes.GetDefinition("Units", True)
+            Dim lDefID As atcAttributeDefinition = atcDataAttributes.GetDefinition("ID", True)
+            Dim lDefLatitude As atcAttributeDefinition = atcDataAttributes.GetDefinition("Latitude", True)
+            Dim lDefLongitude As atcAttributeDefinition = atcDataAttributes.GetDefinition("Longitude", True)
+            Dim lDefElevation As atcAttributeDefinition = atcDataAttributes.GetDefinition("Elevation", True)
+
+            Me.Attributes.AddHistory("Read from " & Specification)
+            Dim lAttHistory1 As atcDefinedValue = Me.Attributes.GetDefinedValue("History 1")
+
             Try
-                lScenarioName = IO.Path.GetFileName(IO.Path.GetDirectoryName(IO.Path.GetDirectoryName(Specification)))
+                Me.Attributes.SetValue(lDefScenario, IO.Path.GetFileName(IO.Path.GetDirectoryName(IO.Path.GetDirectoryName(Specification))))
             Catch
-                lScenarioName = "Simulated"
+                Me.Attributes.SetValue(lDefScenario, "Simulated")
             End Try
+            Dim lAttScenario As atcDefinedValue = Me.Attributes.GetDefinedValue("Scenario")
+
             Dim lDatesReading As New Generic.List(Of Double)
 
             Dim lLatitudes() As String = Nothing
@@ -269,41 +278,31 @@ ReOpenTable:
                     'Do adjustment to PCP and Temp column index
                     If lFieldName.Contains("TMP") Then
                         lunit = "Celsius"
-                        'If lFieldName.Contains("Max") Then
-                        '    lSWATStnCtr = lSWATStnCtr * 2
-                        'Else
-                        '    lSWATStnCtr = lSWATStnCtr * 2 + 1
-                        'End If
                     ElseIf lFieldName.Contains("PCP") Then
                         lunit = "mm"
-                        'lSWATStnCtr = lSWATStnCtr + 1
                     End If
                     lTS = New atcTimeseries(Me)
                     DataSets.Add(lDatasetsSoFar + 1, lTS)
                     lDatasetsSoFar += 1
                     With lTS.Attributes
+                        .Add(lAttHistory1)
+                        .Add(lAttScenario)
                         .SetValue("SWATSTNID", lSWATStnCtr.ToString) ' SWAT station counter
-                        'If pSaveSubwatershedId Then
-                        '    .SetValue("SubId", lTable.FieldName(lDSCtr).Substring(3, 1))
-                        'End If
                         .SetValue("FieldIndex", lFieldIndex.ToString) ' the column index in the pcp file, 1-based
-                        .SetValue("SubId", "")
-                        .SetValue("Scenario", "")
-                        .SetValue("Units", lunit)
+                        .SetValue(lDefUnits, lunit)
                         .SetValue("tu", atcTimeUnit.TUDay)
                         .SetValue("ts", "1")
-                        .SetValue("Latitude", lLatitudes(lSWATStnCtr))
-                        .SetValue("Longitude", lLongitudes(lSWATStnCtr))
-                        .SetValue("Elevation", lElevations(lSWATStnCtr))
-                        .AddHistory("Read from " & Specification)
+                        .SetValue(lDefLatitude, lLatitudes(lSWATStnCtr))
+                        .SetValue(lDefLongitude, lLongitudes(lSWATStnCtr))
+                        .SetValue(lDefElevation, lElevations(lSWATStnCtr))
                         Select Case Me.pType
                             Case SWATDATATYPE.SWATDATATYPE_pcp
-                                .SetValue("Constituent", "PREC")
+                                .SetValue(lDefConstituent, "PREC")
                             Case SWATDATATYPE.SWATDATATYPE_tmp
-                                .SetValue("Constituent", "ATEM")
+                                .SetValue(lDefConstituent, "ATEM")
                         End Select
-                        .SetValue("Location", lFieldName) ' same as SWAT station counter
-                        .SetValue("ID", lDatasetsSoFar.ToString) ' sequential dataset counter, 1-based
+                        .SetValue(lDefLocation, lFieldName) ' same as SWAT station counter
+                        .SetValue(lDefID, lDatasetsSoFar.ToString) ' sequential dataset counter, 1-based
                     End With
                     lTS.ValuesNeedToBeRead = True
                     lTS.Dates = pDates

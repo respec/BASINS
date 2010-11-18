@@ -95,6 +95,7 @@ Public Class atcDataAttributes
             ElseIf aCreate Then
                 lDef = New atcAttributeDefinition
                 lDef.Name = aAttributeName
+                pAllDefinitions.Add(lKey, lDef)
             End If
         End If
         Return lDef
@@ -373,6 +374,7 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
 
                 .Add("latdeg", "Latitude")
                 .Add("lngdeg", "Longitude")
+                .Add("elev", "Elevation")
 
                 .Add("skewcf", "Skew")
                 .Add("stddev", "Standard Deviation")
