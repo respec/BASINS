@@ -182,8 +182,8 @@ Public Module modTimeseriesMath
     ''' <param name="aNumValues">Number of values to copy value attributes of</param>
     ''' <param name="aStartFrom">Start index for copying value attributes from</param>
     ''' <param name="aStartTo">Start index for copying value attributes to</param>
-    ''' <remarks>Only copies general attributes if aNumValues is omitted or is less than 1, 
-    ''' Also copes value attributes if aNumValues > 0</remarks>
+    ''' <remarks>Copies only general attributes if aNumValues is omitted or is less than 1, 
+    ''' Also copies value attributes if aNumValues > 0</remarks>
     Public Sub CopyBaseAttributes(ByVal aFromDataset As atcTimeseries, ByVal aToDataSet As atcTimeseries, _
                                   Optional ByVal aNumValues As Integer = 0, _
                                   Optional ByVal aStartFrom As Integer = 0, _
@@ -195,15 +195,17 @@ Public Module modTimeseriesMath
             End If
         Next
 
-        For lIndex As Integer = 0 To aNumValues - 1
-            If aFromDataset.ValueAttributesExist(lIndex + aStartFrom) Then
-                For Each lAttribute As atcDefinedValue In aFromDataset.ValueAttributes(lIndex + aStartFrom)
-                    If lAttribute.Definition.CopiesInherit Then
-                        aToDataSet.ValueAttributes(lIndex + aStartTo).SetValue(lAttribute.Definition, lAttribute.Value)
-                    End If
-                Next
-            End If
-        Next
+        If aFromDataset.ValueAttributesExist Then
+            For lIndex As Integer = 0 To aNumValues - 1
+                If aFromDataset.ValueAttributesExist(lIndex + aStartFrom) Then
+                    For Each lAttribute As atcDefinedValue In aFromDataset.ValueAttributes(lIndex + aStartFrom)
+                        If lAttribute.Definition.CopiesInherit Then
+                            aToDataSet.ValueAttributes(lIndex + aStartTo).SetValue(lAttribute.Definition, lAttribute.Value)
+                        End If
+                    Next
+                End If
+            Next
+        End If
     End Sub
 
     ''' <summary>Merge a group of atcTimeseries</summary>
@@ -552,7 +554,7 @@ Public Module modTimeseriesMath
                     End If
                 Next
                 With lNewTSer.Attributes
-                    .SetValue("point", False)
+                    '.SetValue("point", False)
                     .SetValue("tu", aTU)
                     .SetValue("ts", aTS)
                     .SetValue("TSFILL", aFillVal)
