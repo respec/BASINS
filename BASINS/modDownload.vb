@@ -995,6 +995,9 @@ StartOver:
             If Mid(aProjString, 1, 9) = "+proj=dd " Then
                 aProjString = "+proj=longlat " & Mid(aProjString, 10)
                 aProjString = aProjString & " +datum=NAD83"
+            ElseIf Mid(aProjString, 1, 15) = "+proj=merc +lon" Then
+                'special exception for google mercator
+                aProjString = "+proj=merc +lon_0=0 +lat_ts=0 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +units=m +no_defs"
             Else
                 aProjString = aProjString & " +datum=NAD83 +units=m"
             End If
