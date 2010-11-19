@@ -83,15 +83,15 @@ Public Class atcDataSourceWDM
     'True if attribute is set by custom code and does not need to be processed along with all attributes
     Private Function AttrStored(ByVal aSaind As Integer) As Boolean 'somewhere else
         Select Case aSaind
-            Case 17 : AttrStored = True 'tcode
-                'Case 27: AttrStored = True 'tsbyr  'jlk commmented to fix winhspf problem
-            Case 33 : AttrStored = True 'tsstep
-                'Case 45 : AttrStored = True 'staname  'prh - don't force STANAM to be read
-            Case 288 : AttrStored = True 'idscen
-            Case 289 : AttrStored = True 'idlocn
-            Case 290 : AttrStored = True 'idcons
-                'Case 10 : AttrStored = True 'description
-            Case Else : AttrStored = False
+            Case 17 : Return True 'tcode
+                'Case 27: Return True 'tsbyr  'jlk commmented to fix winhspf problem
+            Case 33 : Return True 'tsstep
+                'Case 45 : Return True 'staname  'prh - don't force STANAM to be read
+            Case 288 : Return True 'idscen
+            Case 289 : Return True 'idlocn
+            Case 290 : Return True 'idcons
+                'Case 10 : Return True 'description
+            Case Else : Return False
         End Select
     End Function
 
@@ -166,7 +166,7 @@ Public Class atcDataSourceWDM
             Dim lAggr As Integer = lTimser.Attributes.GetValue("aggregation", 0)
             Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 1)
             Dim lTGroup As Integer = aDataSet.Attributes.GetValue("tgroup", 6)
-            Dim lTSBYr As Integer = aDataSet.Attributes.GetValue("tsbyr", 1900)
+            'Dim lTSBYr As Integer = aDataSet.Attributes.GetValue("tsbyr", 1900)
 
             If lTs = 0 OrElse lTu = atcTimeUnit.TUUnknown Then ' sparse dataset - fill in dummy values for write
                 If pAskAboutMissingTuTs Then
@@ -498,67 +498,73 @@ CaseExistRenumber:
 
     Private Function DsnWriteAttributes(ByVal aFileUnit As Integer, _
                                         ByVal aTs As atcTimeseries) As Boolean
-        Dim lDsn As Integer = aTs.Attributes.GetValue("id", 1)
-        'add needed attributes
-        Dim lStr As String = aTs.Attributes.GetValue("cons", "")
-        If lStr.Length > 4 Then
-            lStr = lStr.Substring(0, 4)
-        End If
-        aTs.Attributes.SetValueIfMissing("TSTYPE", lStr)
-        aTs.Attributes.SetValueIfMissing("TGROUP", 6)
-        aTs.Attributes.SetValueIfMissing("COMPFG", 1)
-        aTs.Attributes.SetValueIfMissing("TSFORM", 1)
-        aTs.Attributes.SetValueIfMissing("TSFILL", -999)
-        Dim lTs As Integer
-        Dim lTu As atcTimeUnit
-        If Not aTs.Attributes.ContainsAttribute("tu") Then
-            CalcTimeUnitStep(aTs.Dates.Value(0), aTs.Dates.Value(1), lTu, lTs)
-            aTs.Attributes.SetValue("tu", lTu)
-            aTs.Attributes.SetValue("ts", lTs)
-        Else
-            lTu = aTs.Attributes.GetValue("tu")
-            lTs = aTs.Attributes.GetValue("ts")
-        End If
-        Dim lIVal As Integer = aTs.Attributes.GetValue("VBTIME", 1)
-        If lTs > 1 Then
-            lIVal = 2 'timestep > 1 vbtime must vary
-        End If
-        aTs.Attributes.SetValueIfMissing("VBTIME", lIVal)
-
-        If lTu < atcTimeUnit.TUYear Then
-            Dim lCSDat(6) As Integer
-            If aTs.Dates Is Nothing OrElse aTs.Dates.numValues = 0 Then 'no dates in timeseries
-                lCSDat(0) = 1950
+        With aTs.Attributes
+            Dim lDsn As Integer = .GetValue("id", 1)
+            'add needed attributes
+            Dim lStr As String = .GetValue("cons", "")
+            If lStr.Length > 4 Then
+                lStr = lStr.Substring(0, 4)
+            End If
+            .SetValueIfMissing("TSTYPE", lStr)
+            .SetValueIfMissing("TGROUP", 6)
+            .SetValueIfMissing("COMPFG", 1)
+            If .GetValue("Point", False) Then
+                .SetValueIfMissing("TSFORM", 3) 'TSFORM=3 instantaneous @ time (end of timestep)
             Else
-                J2Date(aTs.Dates.Value(0), lCSDat)
+                .SetValueIfMissing("TSFORM", 1) 'TSFORM=1 mean over the timestep (default)
+            End If
+            .SetValueIfMissing("TSFILL", -999)
+            Dim lTs As Integer
+            Dim lTu As atcTimeUnit = atcTimeUnit.TUUnknown
+            If .ContainsAttribute("tu") Then
+                lTu = .GetValue("tu")
+                lTs = .GetValue("ts")
+            ElseIf aTs.numValues > 0 Then
+                CalcTimeUnitStep(aTs.Dates.Value(0), aTs.Dates.Value(1), lTu, lTs)
+                .SetValue("tu", lTu)
+                .SetValue("ts", lTs)
+            End If
+            Dim lIVal As Integer = .GetValue("VBTIME", 1)
+            If lTs > 1 Then
+                lIVal = 2 'timestep > 1 vbtime must vary
+            End If
+            .SetValueIfMissing("VBTIME", lIVal)
+
+            If lTu < atcTimeUnit.TUYear Then
+                Dim lCSDat(6) As Integer
+                If aTs.Dates Is Nothing OrElse aTs.Dates.numValues = 0 Then 'no dates in timeseries
+                    lCSDat(0) = 1950
+                Else
+                    J2Date(aTs.Dates.Value(0), lCSDat)
+                End If
+
+                Dim lDecade As Integer = lCSDat(0) Mod 10
+                If lDecade > 0 Then 'subtract back to start of this decade
+                    lIVal = lCSDat(0) - lDecade
+                Else 'back to start of previous decade
+                    lIVal = lCSDat(0) - 10
+                End If
+                .SetValue("TSBYR", lIVal)
+            Else
+                .SetValueIfMissing("TSBYR", 1700)
             End If
 
-            Dim lDecade As Integer = lCSDat(0) Mod 10
-            If lDecade > 0 Then 'subtract back to start of this decade
-                lIVal = lCSDat(0) - lDecade
-            Else 'back to start of previous decade
-                lIVal = lCSDat(0) - 10
-            End If
-            aTs.Attributes.SetValue("TSBYR", lIVal)
-        Else
-            aTs.Attributes.SetValueIfMissing("TSBYR", 1700)
-        End If
+            .SetValueIfMissing("scen", "")
+            .SetValueIfMissing("cons", "")
+            .SetValueIfMissing("locn", "")
+            .SetValueIfMissing("desc", "")
 
-        aTs.Attributes.SetValueIfMissing("scen", "")
-        aTs.Attributes.SetValueIfMissing("cons", "")
-        aTs.Attributes.SetValueIfMissing("locn", "")
-        aTs.Attributes.SetValueIfMissing("desc", "")
-
-        DsnWriteAttributes = True
-        Dim lMsg As atcWdmHandle = pMsg.MsgHandle
-        Dim lMsgUnit As Integer = lMsg.Unit
-        For lAttributeIndex As Integer = 0 To aTs.Attributes.Count - 1
-            If Not DsnWriteAttribute(aFileUnit, lMsgUnit, lDsn, aTs.Attributes(lAttributeIndex)) Then
-                DsnWriteAttributes = False
-                Exit For
-            End If
-        Next
-        lMsg.Dispose()
+            DsnWriteAttributes = True
+            Dim lMsg As atcWdmHandle = pMsg.MsgHandle
+            Dim lMsgUnit As Integer = lMsg.Unit
+            For lAttributeIndex As Integer = 0 To .Count - 1
+                If Not DsnWriteAttribute(aFileUnit, lMsgUnit, lDsn, .ItemByIndex(lAttributeIndex)) Then
+                    DsnWriteAttributes = False
+                    Exit For
+                End If
+            Next
+            lMsg.Dispose()
+        End With
     End Function
 
     Private Function DateToyyyyMMddHHmmss(ByVal aDate As Date) As String
@@ -786,20 +792,20 @@ CaseExistRenumber:
     End Function
 
     Public Overrides Sub ReadData(ByVal aReadMe As atcDataSet)
-        Dim lV() As Single 'array of data values
-        Dim lVd() As Double 'array of double data values
-        Dim lJd() As Double 'array of julian dates
-        Dim lRetcod As Integer
-        Dim lSdat(6) As Integer 'starting date
-        Dim lSdatSeasonOffset(6) As Integer 'starting date with seasonal offset
-        Dim lEdat(6) As Integer 'ending (or current) date
-        Dim lTsFill As Double
-
         If Not DataSets.Contains(aReadMe) Then
             Logger.Dbg("WDM cannot read dataset with details:" & aReadMe.ToString & vbCrLf & _
                        "Specification:'" & Specification & "'")
         Else
+            Dim lV() As Single 'array of data values
+            Dim lVd() As Double 'array of double data values
+            Dim lJd() As Double 'array of julian dates
+            Dim lRetcod As Integer
+            Dim lSdat(6) As Integer 'starting date
+            Dim lSdatSeasonOffset(6) As Integer 'starting date with seasonal offset
+            Dim lEdat(6) As Integer 'ending (or current) date
+            Dim lTsFill As Double
             Dim lReadTS As atcTimeseries = aReadMe
+
             lReadTS.ValuesNeedToBeRead = False
             'Logger.dbg("WDM read data " & aReadMe.Attributes.GetValue("Location"))
             Dim lWdmHandle As New atcWdmHandle(0, Specification)
@@ -939,11 +945,14 @@ ParseDate:                          Logger.Dbg(lName & " text date '" & lS & "' 
                                     lDate = New Date(lYear, lMonth, lDay, 12, 0, 0)
                                     Logger.Dbg(lName & "parsed as '" & lDate.ToString & "' rounded to noon")
                                 End If
-                                lData.Attributes.SetValue(pMsg.Attributes.Item(lSaind), lDate)
+                                lData.Attributes.SetValue(lAttributeDefinition, lDate)
                                 'Case "DCODE"
                                 'lData.Attributes.SetValue(UnitsAttributeDefinition(True), GetUnitName(CInt(lS)))
+                            Case "TSFORM"
+                                lData.Attributes.SetValue("Point", (lS = "3"))
+                                lData.Attributes.SetValue(lAttributeDefinition, lS)
                             Case Else
-                                lData.Attributes.SetValue(pMsg.Attributes.Item(lSaind), lS)
+                                lData.Attributes.SetValue(lAttributeDefinition, lS)
                         End Select
                     Catch ex As Exception
                         Logger.Dbg("RefreshDsn:" & aDsn & " Attr:" & lSaind & " Error:" & ex.ToString)

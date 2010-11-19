@@ -882,7 +882,7 @@ Public Module modDate
             tmpDATE(5) = DATE2(5)
             Do
                 Call TIMADD(DATE1, TCODE, TSTEP, NVALS, tmpDATE)
-                If EndJDate < Date2J(tmpDATE) Then 'estimate too high
+                If EndJDate < Date2J(tmpDATE) - JulianMillisecond Then 'estimate too high
                     NVALS = NVALS - 1
                 Else 'estimate ok
                     Exit Do
