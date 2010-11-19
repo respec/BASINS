@@ -210,7 +210,9 @@ ALREADYSET:
         Dim lSaveDir As String = CurDir()
         Dim lProjectFolder As String = IO.Path.GetDirectoryName(pBaseScenario)
         Dim lScenarioFolder As String = lProjectFolder & "\Scenarios" & g_PathChar & aNewScenarioName
-        TryDelete(lScenarioFolder)
+        If aRunModel Then
+            TryDelete(lScenarioFolder)
+        End If
         Dim lTxtInOutFolder As String = lScenarioFolder & "\TxtInOut" & g_PathChar ' trailing directory separator
         Dim lSwatInput As New SwatObject.SwatInput(SWATDatabasePath, pBaseScenario, lProjectFolder, aNewScenarioName)
         lSwatInput.SaveAllTextInput()
@@ -302,6 +304,29 @@ ALREADYSET:
         Else
             Logger.Dbg("MissingSubOutput " & lOutputSubFileName)
         End If
+
+        Dim lPcpFileName As String = lTxtInOutFolder & "pcp1.pcp"
+        If FileExists(lPcpFileName) Then
+            If pMetPcp Is Nothing Then 'running base
+                pMetPcp = clsCat.OpenDataSource(lPcpFileName)
+            Else
+                lModified.Add(IO.Path.GetFileName(pMetPcp.Specification).ToLower.Trim, lPcpFileName.Trim)
+            End If
+        Else
+            Logger.Dbg("MissingPcp " & lPcpFileName)
+        End If
+
+        Dim lTmpFileName As String = lTxtInOutFolder & "tmp1.tmp"
+        If FileExists(lTmpFileName) Then
+            If pMetTmp Is Nothing Then 'running base
+                pMetTmp = clsCat.OpenDataSource(lTmpFileName)
+            Else
+                lModified.Add(IO.Path.GetFileName(pMetTmp.Specification).ToLower.Trim, lTmpFileName.Trim)
+            End If
+        Else
+            Logger.Dbg("MissingTmp " & lTmpFileName)
+        End If
+
 
         ChDir(lSaveDir)
         Return lModified
