@@ -722,8 +722,7 @@ Friend Class frmSWSTAT
 
     Private Const pNoDatesInCommon As String = ": No dates in common"
 
-    'TODO: Get correct help location
-    Private pHelpLocation As String = "BASINS Details\Analysis.html"
+    Private pHelpLocation As String = "BASINS Details\Analysis\USGS Surface Water Statistics.html"
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
         ShowHelp(pHelpLocation)
     End Sub
