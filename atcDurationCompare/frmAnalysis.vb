@@ -10,6 +10,17 @@ Public Class frmAnalysis
     Private pDefaultNumClasses As Integer = 35
     Private pDefaultClasses As Double() = {0}
     Private pAnalysis As String = String.Empty
+    Private pHelpLocation As String = "BASINS Details\Analysis\USGS Surface Water Statistics\Duration Compare.html"
+    Private Sub HelpToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HelpToolStripMenuItem.Click
+        ShowHelp(pHelpLocation)
+    End Sub
+
+    Private Sub frmAnalysis_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pHelpLocation)
+        End If
+    End Sub
+
 
     Public Property DataGroup() As atcTimeseriesGroup
         Get
@@ -226,4 +237,5 @@ Public Class frmAnalysis
         lDesc &= lStaId & " " & aTS.Attributes.GetValue("STANAM") & vbCrLf & Space(2)
         Return lDesc
     End Function
+
 End Class

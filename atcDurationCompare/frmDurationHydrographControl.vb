@@ -8,6 +8,17 @@ Public Class frmDurationHydrographControl
 
     Private pDefaultNumClasses As Integer = 35
     Private pDefaultClasses As Double() = {0.0, 0.1, 0.2, 0.3, 0.5, 0.7, 0.8, 0.9, 1.0}
+    Private pHelpLocation As String = "BASINS Details\Analysis\USGS Surface Water Statistics\Duration Hydrograph.html"
+    Private Sub HelpToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HelpToolStripMenuItem.Click
+        ShowHelp(pHelpLocation)
+    End Sub
+
+    Private Sub frmDurationHydrographControl_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pHelpLocation)
+        End If
+    End Sub
+
 
     Public Property DataGroup() As atcTimeseriesGroup
         Get

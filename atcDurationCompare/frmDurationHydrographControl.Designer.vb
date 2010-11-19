@@ -31,6 +31,7 @@ Partial Class frmDurationHydrographControl
         Me.lblExceedance = New System.Windows.Forms.Label
         Me.btnReport = New System.Windows.Forms.Button
         Me.btnGraph = New System.Windows.Forms.Button
+        Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -47,7 +48,7 @@ Partial Class frmDurationHydrographControl
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem, Me.HelpToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Size = New System.Drawing.Size(237, 24)
@@ -102,6 +103,12 @@ Partial Class frmDurationHydrographControl
         Me.btnGraph.Text = "Graph"
         Me.btnGraph.UseVisualStyleBackColor = True
         '
+        'HelpToolStripMenuItem
+        '
+        Me.HelpToolStripMenuItem.Name = "HelpToolStripMenuItem"
+        Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(40, 20)
+        Me.HelpToolStripMenuItem.Text = "Help"
+        '
         'frmDurationHydrographControl
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -113,6 +120,7 @@ Partial Class frmDurationHydrographControl
         Me.Controls.Add(Me.lstPctExceed)
         Me.Controls.Add(Me.MenuStrip1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.KeyPreview = True
         Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "frmDurationHydrographControl"
         Me.Text = "Duration Hydrograph"
@@ -130,4 +138,5 @@ Partial Class frmDurationHydrographControl
     Friend WithEvents lblExceedance As System.Windows.Forms.Label
     Friend WithEvents btnReport As System.Windows.Forms.Button
     Friend WithEvents btnGraph As System.Windows.Forms.Button
+    Friend WithEvents HelpToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 End Class
