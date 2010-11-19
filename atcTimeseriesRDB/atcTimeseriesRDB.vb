@@ -489,7 +489,7 @@ Public Class atcTimeseriesRDB
                 lData.numValues = lTSIndex
             End If
             lData.Attributes.RemoveByKey("DataKey")
-            DataSets.Add(FillValues(lData, atcTimeUnit.TUDay, 1, atcUtility.GetNaN, lMissingVal, , Me))
+            DataSets.Add(FillValues(lData, atcTimeUnit.TUDay, 1, GetNaN, lMissingVal, , Me))
         Next
         lRawDataSets.Clear()
     End Sub
@@ -502,20 +502,15 @@ Public Class atcTimeseriesRDB
     ''' <remarks>flow timeseries added to flow data</remarks>
     Sub ProcessIdaValues(ByVal aInputReader As BinaryReader, ByVal aAttributes As atcDataAttributes)
         Dim lTimeStart As Date = Now
-        Logger.Dbg("StartProcessIdaValues")
+        Dim lNaN As Double = GetNaN()
+        Logger.Status("Opening IDA Data")
         Dim lTimeseries As New atcTimeseries(Me)
         lTimeseries.Dates = New atcTimeseries(Me)
-        With lTimeseries
-            .Attributes.ChangeTo(aAttributes)
-            .Attributes.Add("Constituent", "Flow")
-            .Attributes.Add("Scenario", "Observed")
-            .Attributes.Add("Point", True)
 
-            Dim lCurLine As String
-            While aInputReader.PeekChar = Asc("#")
-                lCurLine = NextLine(aInputReader)
-            End While
-        End With
+        Dim lCurLine As String
+        While aInputReader.PeekChar = Asc("#")
+            lCurLine = NextLine(aInputReader)
+        End While
 
         Dim lTable As New atcTableDelimited
         With lTable
@@ -537,86 +532,126 @@ Public Class atcTimeseriesRDB
                     Case "tz_cd" : lTimeZoneField = lField
                     Case "accuracy_cd" : lAccuracyCodeField = lField
                     Case Else
-                        If .FieldName(lField).EndsWith("_cd") Then 'code field
-                            ' TODO: add codes as ValueAttributes and decide how to treat Provisional values
-                            'Currently dropping Provisional values below by "peeking" at column next to value
-                        End If
+                        'If .FieldName(lField).EndsWith("_cd") Then 'code field
+                            ' TODO: add codes as ValueAttributes
+                        'End If
                 End Select
             Next
             lTimeseries.numValues = .NumRecords - 1
+            lTimeseries.Dates.Value(0) = lNaN
 
             Dim lAccuracyCodeCounter As New atcCollection
             Dim lValue As String = ""
-            Dim lDateJ As Double = Double.NaN
-            Dim lDatePrevJ As Double = Double.NaN
+            Dim lDateJ As Double = lNaN
+            Dim lDatePrevJ As Double = lDateJ
             Dim lTimeZone As String = ""
             Dim lTimeZonePrev As String
-            Dim lTU_TS_Needed As Boolean = True
             Dim lIndex As Integer = 0
-            Dim lNotFirst As Boolean = False
+            Dim lTimeZoneNumeric As Double = lNaN 'Hours offset from UTC
+            Dim lTimeZoneOfFirstValue As Double = lNaN
+            Dim lTimeDifTotals As New atcCollection
+
+            Logger.Status("Reading IDA Values")
 
             For lRecordIndex As Integer = 2 To .NumRecords
                 .CurrentRecord = lRecordIndex
                 lDatePrevJ = lDateJ
-                Dim lDateString As String = .Value(lDateField)
-                Dim lDate As New Date(lDateString.Substring(0, 4), lDateString.Substring(4, 2), lDateString.Substring(6, 2), _
-                                      lDateString.Substring(8, 2), lDateString.Substring(10, 2), lDateString.Substring(12, 2))
-                lDateJ = lDate.ToOADate
+                Try
+                    Dim lDateString As String = .Value(lDateField)
+                    lTimeZonePrev = lTimeZone
+                    lTimeZone = .Value(lTimeZoneField)
 
-                lTimeZonePrev = lTimeZone
-                lTimeZone = .Value(lTimeZoneField)
-                If lNotFirst AndAlso lTimeZone <> lTimeZonePrev Then
-                    Logger.Dbg("ChangeTimeZoneAt " & lDateString)
-                Else
-                    Dim lTimeZoneNumeric As Integer
-                    Select Case lTimeZone
-                        Case "AST", "EDT" : lTimeZoneNumeric = -4
-                        Case "EST", "CDT" : lTimeZoneNumeric = -5
-                        Case "CST", "MDT" : lTimeZoneNumeric = -6
-                        Case "MST", "PDT" : lTimeZoneNumeric = -7
-                        Case "PST" : lTimeZoneNumeric = -8
-                        Case "GMT", "UTC" : lTimeZoneNumeric = 0
-                        Case Else
-                            lTimeZoneNumeric = -999
-                            Logger.Dbg("UnknownTimeZone " & lTimeZone)
-                    End Select
-                    If lTimeZoneNumeric >= -12 Then lTimeseries.Attributes.Add("TMZONE", lTimeZoneNumeric)
-                    lNotFirst = True
-                End If
-                If lTU_TS_Needed AndAlso Not Double.IsNaN(lDatePrevJ) Then
-                    Dim lTu As atcTimeUnit
-                    Dim lTs As Integer
-                    CalcTimeUnitStep(lDatePrevJ, lDateJ, lTu, lTs)
-                    Dim lTimeDif As Double = lDateJ - lDatePrevJ
-                    lTimeseries.Attributes.Add("TU", lTu)
-                    lTimeseries.Attributes.Add("TS", lTs)
-                    lTU_TS_Needed = False
-                    lTimeseries.Dates.Value(0) = lTimeseries.Dates.Value(1) - lTimeDif
-                End If
+                    If lTimeZone <> lTimeZonePrev Then
+                        Select Case lTimeZone
+                            Case "AST", "EDT" : lTimeZoneNumeric = -4
+                            Case "EST", "CDT" : lTimeZoneNumeric = -5
+                            Case "CST", "MDT" : lTimeZoneNumeric = -6
+                            Case "MST", "PDT" : lTimeZoneNumeric = -7
+                            Case "PST" : lTimeZoneNumeric = -8
+                            Case "GMT", "UTC" : lTimeZoneNumeric = 0
+                            Case Else
+                                Logger.Dbg("UnknownTimeZone " & lTimeZone)
+                        End Select
+                        If lRecordIndex = 2 Then
+                            lTimeZoneOfFirstValue = lTimeZoneNumeric
+                        Else
+                            Logger.Dbg("ChangeTimeZoneAt " & lDateString & " from " & lTimeZonePrev & " to " & lTimeZone)
+                        End If
+                    End If
 
-                If lDateJ = 0 Then
-                    Logger.Dbg("BadDate " & .CurrentRecord.ToString)
-                Else
-                    lIndex += 1
-                    lTimeseries.Value(lIndex) = .Value(lValueField)
-                    lTimeseries.Dates.Value(lIndex) = lDateJ
-                    Dim lAccuracyCode As String = .Value(lAccuracyCodeField)
-                    lAccuracyCodeCounter.Increment(lAccuracyCode)
-                    'NOTE: the next statement adds a requirement for about 3.5 times more memory!! 
-                    'lTimeseries.ValueAttributes(lIndex).Add("AccuracyCode", lAccuracyCode)
-                End If
-                If .CurrentRecord Mod 1000 = 0 Then
-                    Logger.Progress("Reading IDA Values", .CurrentRecord, .NumRecords)
-                End If
+                    Dim lDate As New Date(lDateString.Substring(0, 4), lDateString.Substring(4, 2), lDateString.Substring(6, 2), _
+                                          lDateString.Substring(8, 2), lDateString.Substring(10, 2), lDateString.Substring(12, 2))
+                    lDateJ = lDate.ToOADate
+
+                    If lDateJ = 0 Then
+                        Logger.Dbg("Bad Date " & .CurrentRecord.ToString)
+                    Else
+                        If lTimeZoneNumeric <> lTimeZoneOfFirstValue Then
+                            lDateJ += (lTimeZoneOfFirstValue - lTimeZoneNumeric) / 24
+                        End If
+
+                        lIndex += 1
+                        lTimeseries.Value(lIndex) = .Value(lValueField)
+                        lTimeseries.Dates.Value(lIndex) = lDateJ
+
+                        If lRecordIndex > 3 Then
+                            lTimeDifTotals.Increment(lDateJ - lDatePrevJ)
+                        End If
+                        'Dim lAccuracyCode As String = .Value(lAccuracyCodeField)
+                        'lAccuracyCodeCounter.Increment(lAccuracyCode)
+                        'NOTE: the next statement adds a requirement for about 3.5 times more memory
+                        'lTimeseries.ValueAttributes(lIndex).Add("AccuracyCode", lAccuracyCode)
+                    End If
+                    If .CurrentRecord Mod 1000 = 0 Then
+                        Logger.Progress(.CurrentRecord, .NumRecords)
+                    End If
+                Catch e As Exception
+                    Logger.Dbg("Exception processing IDA file " & Specification & " record " & .CurrentRecord & " = " & .CurrentRecordAsDelimitedString & vbCrLf & e.ToString)
+                End Try
             Next
+            'Logger.Dbg("AccuracyCodeCounts")
+            'For lIndex = 0 To lAccuracyCodeCounter.Count - 1
+            '    Logger.Dbg(lAccuracyCodeCounter.Keys(lIndex) & ":" & lAccuracyCodeCounter.Item(lIndex))
+            'Next
+
+            'Dim lMostCommonTimeDif As Double = 15 * JulianMinute
+            'Dim lMostCommonTimeDifCount As Integer = 0
+
+            'For lTimeDifIndex As Integer = 0 To lTimeDifTotals.Count - 1
+            '    If lTimeDifTotals(lTimeDifIndex) > lMostCommonTimeDifCount Then
+            '        lMostCommonTimeDifCount = lTimeDifTotals(lTimeDifIndex)
+            '        lMostCommonTimeDif = lTimeDifTotals.Keys(lTimeDifIndex)
+            '    End If
+            'Next
+
+            'Dim lTu As atcTimeUnit = atcTimeUnit.TUUnknown
+            'Dim lTs As Integer = 1
+
+            'If lMostCommonTimeDifCount > 0 Then
+            '    CalcTimeUnitStep(0, lMostCommonTimeDif, lTu, lTs)
+            'Else
+            '    lTu = atcTimeUnit.TUMinute
+            '    lTs = 15
+            'End If
+
+            Logger.Dbg("IdaValuesTimeseriesCreated;Elapsed seconds " & (Now - lTimeStreamOpened).TotalSeconds & " " & MemUsage())
             Logger.Progress("", 0, 0)
-            Logger.Dbg("IdaValuesTimeseriesCreated;Elapsed " & (Now - lTimeStreamOpened).TotalSeconds & " " & MemUsage())
-            Logger.Dbg("AccuracyCodeCounts")
-            For lIndex = 0 To lAccuracyCodeCounter.Count - 1
-                Logger.Dbg(lAccuracyCodeCounter.Keys(lIndex) & ":" & lAccuracyCodeCounter.Item(lIndex))
-            Next
+
+            'lTimeseries = FillValues(lTimeseries, lTu, lTs, lNaN, lNaN, lNaN, Me)
+            With lTimeseries.Attributes
+                .ChangeTo(aAttributes)
+                .SetValue("Constituent", "Flow")
+                .SetValue("Scenario", "Observed")
+                '.SetValue("tu", lTu)
+                '.SetValue("ts", lTs)
+                .SetValue("Point", True) 'FillValues sets this to False, but really this is instantaneous/point data
+                If Not Double.IsNaN(lTimeZoneOfFirstValue) Then
+                    .SetValue("TMZONE", lTimeZoneOfFirstValue)
+                End If
+            End With
+
+            Me.AddDataSet(lTimeseries)
         End With
-        Me.AddDataSet(lTimeseries)
     End Sub
 
     'Private Function GetData(ByVal aSites As ArrayList, _
