@@ -35,6 +35,7 @@ Partial Class frmAnalysis
         Me.mnuFile = New System.Windows.Forms.ToolStripMenuItem
         Me.SelectDataToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.CtlClassLimits1 = New atcDurationCompare.ctlClassLimits
         Me.gbClassLimits.SuspendLayout()
         Me.gbChooseAnalysis.SuspendLayout()
@@ -146,7 +147,7 @@ Partial Class frmAnalysis
         'menuStrip
         '
         Me.menuStrip.BackColor = System.Drawing.SystemColors.Control
-        Me.menuStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFile})
+        Me.menuStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFile, Me.HelpToolStripMenuItem})
         Me.menuStrip.Location = New System.Drawing.Point(0, 0)
         Me.menuStrip.Name = "menuStrip"
         Me.menuStrip.Size = New System.Drawing.Size(394, 24)
@@ -172,13 +173,21 @@ Partial Class frmAnalysis
         Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.ExitToolStripMenuItem.Text = "Exit"
         '
+        'HelpToolStripMenuItem
+        '
+        Me.HelpToolStripMenuItem.Name = "HelpToolStripMenuItem"
+        Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(40, 20)
+        Me.HelpToolStripMenuItem.Text = "Help"
+        '
         'CtlClassLimits1
         '
         Me.CtlClassLimits1.Location = New System.Drawing.Point(12, 27)
+        Me.CtlClassLimits1.LowerBound = -9999
         Me.CtlClassLimits1.Name = "CtlClassLimits1"
         Me.CtlClassLimits1.NumClasses = 0
         Me.CtlClassLimits1.Size = New System.Drawing.Size(147, 200)
         Me.CtlClassLimits1.TabIndex = 9
+        Me.CtlClassLimits1.UpperBound = -9999
         '
         'frmAnalysis
         '
@@ -194,6 +203,7 @@ Partial Class frmAnalysis
         Me.Controls.Add(Me.gbClassLimits)
         Me.Controls.Add(Me.menuStrip)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.KeyPreview = True
         Me.MainMenuStrip = Me.menuStrip
         Me.Name = "frmAnalysis"
         Me.Text = "Duration/Compare Analysis"
@@ -221,4 +231,5 @@ Partial Class frmAnalysis
     Friend WithEvents SelectDataToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ExitToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents lblAnalysisInfo As System.Windows.Forms.TextBox
+    Friend WithEvents HelpToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 End Class
