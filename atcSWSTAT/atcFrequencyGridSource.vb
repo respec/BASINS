@@ -362,7 +362,7 @@ Public Class atcFrequencyGridSource
     Public Function CreateReport(Optional ByVal aExpFmt As Boolean = False) As String
         Dim lStartDate As Date
         Dim lStartDateAnnual As Date
-        Dim lEndDate As Date
+        Dim lEndDate(5) As Integer
         Dim lStr As String
         Dim lIndex As Integer
         Dim lColumn As Integer
@@ -398,7 +398,8 @@ Public Class atcFrequencyGridSource
                     lLocation &= " " & lAttributes.GetValue("STANAM", "")
                     lStartDate = Date.FromOADate(lNdayTs.Dates.Value(0))
                     lStartDateAnnual = Date.FromOADate(lNdayTs.Dates.Value(1))
-                    lEndDate = Date.FromOADate(lNdayTs.Dates.Value(lNdayTs.numValues))
+                    J2Date(lNdayTs.Dates.Value(lNdayTs.numValues), lEndDate)
+                    timcnv(lEndDate)
 
                     Dim lPositiveNdayTs As atcTimeseries
                     Dim lEpsilon As Double = (lNdayTs.Attributes.GetValue("Max") - lNdayTs.Attributes.GetValue("Min")) / Math.Pow(10, 9)
@@ -451,10 +452,10 @@ Public Class atcFrequencyGridSource
                         End If
                         lRept.AppendLine("    SeasBg" & vbTab & lStartDate.Month)
                         lRept.AppendLine("    SeaDBg" & vbTab & lStartDate.Day)
-                        lRept.AppendLine("    SeasNd" & vbTab & lEndDate.Month)
-                        lRept.AppendLine("    SeaDNd" & vbTab & lEndDate.Day)
+                        lRept.AppendLine("    SeasNd" & vbTab & lEndDate(1))
+                        lRept.AppendLine("    SeaDNd" & vbTab & lEndDate(2))
                         lRept.AppendLine("    BegYear" & vbTab & lStartDateAnnual.Year)
-                        lRept.AppendLine("    EndYear" & vbTab & lEndDate.Year)
+                        lRept.AppendLine("    EndYear" & vbTab & lEndDate(0))
                         lRept.AppendLine("    NumZro" & vbTab & lNumZero)
                         lRept.AppendLine("    NonZro" & vbTab & lNumPositive)
                         lRept.AppendLine("    NumNeg" & vbTab & lNumMissing)
@@ -485,22 +486,14 @@ Public Class atcFrequencyGridSource
                         lRept.AppendLine()
                         lRept.AppendLine("       Description:  " & lLocation)
 
-                        'Dates by USGS SWSTAT convention as follows
+                        'Dates by USGS SWSTAT convention as follows:
                         ' for seasons - if season ends on month boundary - label with last day of previous month - 4/1 -> March 31
                         '               otherwise - label with day specified - 9/15 -> September 15
                         ' for years - if 
-                        Dim lEndDateForPrint As Date = lEndDate
-                        Dim lEndYear As Integer = lEndDate.Year
-                        Dim lEndMon As Integer = lEndDate.Month
-                        Dim lEndDay As Integer = lEndDate.Day
-                        If lEndDay = 1 Then
-                            lEndMon = lEndMon - 1
-                            If lEndMon = 0 Then
-                                lEndMon = 12
-                            End If
-                            lEndDay = Date.DaysInMonth(lEndYear, lEndMon)
-                            lEndDateForPrint = New Date(lEndYear, lEndMon, lEndDay)
-                        End If
+                        'PRH - USGS Date convention now resolved using call to timcnv on LEndDate above
+                        Dim lEndDateForPrint As New Date(lEndDate(0), lEndDate(1), lEndDate(2))
+                        Dim lEndYear As Integer = lEndDate(0)
+                        Dim lEndMon As Integer = lEndDate(1)
                         lRept.AppendLine("            Season:  " & lStartDate.ToString("MMMM") & lStartDate.Day.ToString.PadLeft(3) & " - " & _
                                                                    lEndDateForPrint.ToString("MMMM") & lEndDateForPrint.Day.ToString.PadLeft(3))
 
