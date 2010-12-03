@@ -18,6 +18,7 @@ Public Module modSDM
     Friend g_MapWinWindowHandle As Integer
     Friend g_ProgramDir As String = ""
     Friend g_ClipCatchments As Boolean = True
+    Friend g_HucList As Generic.List(Of String) = Nothing
 
     Public g_KeepConnectingRemovedFlowLines As Boolean = True
     Friend pBuildFrm As frmBuildNew
@@ -90,6 +91,9 @@ Public Module modSDM
         sb.AppendLine("SimulationEndYear," & g_SimulationEndYear)
         sb.AppendLine("RunSWAT," & g_DoSWAT)
         sb.AppendLine("RunHSPF," & g_DoHSPF)
+        If g_HucList IsNot Nothing AndAlso g_HucList.Count > 0 Then
+            sb.AppendLine("HucList," & String.Join(" ", g_HucList.ToArray))
+        End If
         IO.File.WriteAllText(aFilename, sb.ToString)
     End Sub
 
@@ -111,6 +115,7 @@ Public Module modSDM
                             Case "SimulationEndYear" : g_SimulationEndYear = Convert.ToInt32(items(1))
                             Case "RunSWAT" : g_DoSWAT = Convert.ToBoolean(items(1))
                             Case "RunHSPF" : g_DoHSPF = Convert.ToBoolean(items(1))
+                            Case "HucList" : g_HucList = New Generic.List(Of String)(items(1).Split(" "))
                             Case Else
                                 'Log something here?
                         End Select
@@ -494,7 +499,7 @@ Public Module modSDM
 
                 If g_GeoProcess Then 'Check for layer that does not exist (e.g. soils)
                     For Each lLayerName As String In pLayerFilenames
-                        Dim lFileName As String = StrSplit(lLayerName, "|", "")
+                        Dim lFileName As String = MapWinUtility.Strings.StrSplit(lLayerName, "|", "")
                         If Not IO.File.Exists(lFileName) Then
                             Logger.Msg(lFileName, "Layer for overlay does not exist")
                             Exit Sub
