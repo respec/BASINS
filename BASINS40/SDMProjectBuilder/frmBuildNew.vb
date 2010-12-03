@@ -73,19 +73,14 @@ Public Class frmBuildNew
         Me.btnCancel = New System.Windows.Forms.Button
         Me.chkHSPF = New System.Windows.Forms.CheckBox
         Me.chkSWAT = New System.Windows.Forms.CheckBox
-        Me.atxSize = New atcControls.atcText
         Me.lblSize = New System.Windows.Forms.Label
         Me.lblLength = New System.Windows.Forms.Label
-        Me.atxLength = New atcControls.atcText
         Me.lblLU = New System.Windows.Forms.Label
-        Me.atxLU = New atcControls.atcText
         Me.cmdSet = New System.Windows.Forms.Button
         Me.lblSWAT = New System.Windows.Forms.Label
         Me.lblFile = New System.Windows.Forms.Label
         Me.lblSimulationStartYear = New System.Windows.Forms.Label
-        Me.txtSimulationStartYear = New atcControls.atcText
         Me.lblSimulationEndYear = New System.Windows.Forms.Label
-        Me.txtSimulationEndYear = New atcControls.atcText
         Me.lblProjectSize = New System.Windows.Forms.Label
         Me.btnFind = New System.Windows.Forms.Button
         Me.txtFind = New System.Windows.Forms.TextBox
@@ -94,8 +89,13 @@ Public Class frmBuildNew
         Me.tabsAreaSelection = New System.Windows.Forms.TabControl
         Me.tabSelectOnMap = New System.Windows.Forms.TabPage
         Me.tabSelectList = New System.Windows.Forms.TabPage
-        Me.txtHucList = New System.Windows.Forms.TextBox
         Me.lblHucList = New System.Windows.Forms.Label
+        Me.txtHucList = New System.Windows.Forms.TextBox
+        Me.txtSimulationEndYear = New atcControls.atcText
+        Me.txtSimulationStartYear = New atcControls.atcText
+        Me.atxLU = New atcControls.atcText
+        Me.atxLength = New atcControls.atcText
+        Me.atxSize = New atcControls.atcText
         Me.tabsAreaSelection.SuspendLayout()
         Me.tabSelectOnMap.SuspendLayout()
         Me.tabSelectList.SuspendLayout()
@@ -118,10 +118,10 @@ Public Class frmBuildNew
         Me.txtInstructions.BackColor = System.Drawing.SystemColors.Control
         Me.txtInstructions.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.txtInstructions.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtInstructions.Location = New System.Drawing.Point(13, 14)
+        Me.txtInstructions.Location = New System.Drawing.Point(3, 6)
         Me.txtInstructions.Multiline = True
         Me.txtInstructions.Name = "txtInstructions"
-        Me.txtInstructions.Size = New System.Drawing.Size(507, 32)
+        Me.txtInstructions.Size = New System.Drawing.Size(494, 28)
         Me.txtInstructions.TabIndex = 2
         Me.txtInstructions.TabStop = False
         '
@@ -131,10 +131,10 @@ Public Class frmBuildNew
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtSelected.BackColor = System.Drawing.SystemColors.Menu
-        Me.txtSelected.Location = New System.Drawing.Point(0, 31)
+        Me.txtSelected.Location = New System.Drawing.Point(0, 67)
         Me.txtSelected.Multiline = True
         Me.txtSelected.Name = "txtSelected"
-        Me.txtSelected.Size = New System.Drawing.Size(500, 85)
+        Me.txtSelected.Size = New System.Drawing.Size(500, 89)
         Me.txtSelected.TabIndex = 3
         Me.txtSelected.TabStop = False
         Me.txtSelected.Text = "Selected:"
@@ -176,30 +176,6 @@ Public Class frmBuildNew
         Me.chkSWAT.Text = "SWAT"
         Me.chkSWAT.UseVisualStyleBackColor = True
         '
-        'atxSize
-        '
-        Me.atxSize.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxSize.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.atxSize.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxSize.DefaultValue = "1.0"
-        Me.atxSize.HardMax = -999
-        Me.atxSize.HardMin = 0
-        Me.atxSize.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxSize.Location = New System.Drawing.Point(12, 223)
-        Me.atxSize.MaxWidth = 20
-        Me.atxSize.Name = "atxSize"
-        Me.atxSize.NumericFormat = "0.#####"
-        Me.atxSize.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxSize.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxSize.SelLength = 0
-        Me.atxSize.SelStart = 0
-        Me.atxSize.Size = New System.Drawing.Size(49, 19)
-        Me.atxSize.SoftMax = -999
-        Me.atxSize.SoftMin = -999
-        Me.atxSize.TabIndex = 7
-        Me.atxSize.ValueDouble = 1
-        Me.atxSize.ValueInteger = 1
-        '
         'lblSize
         '
         Me.lblSize.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
@@ -220,30 +196,6 @@ Public Class frmBuildNew
         Me.lblLength.TabIndex = 10
         Me.lblLength.Text = "Minimum Flowline Length (kilometers)"
         '
-        'atxLength
-        '
-        Me.atxLength.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxLength.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.atxLength.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxLength.DefaultValue = "1.0"
-        Me.atxLength.HardMax = -999
-        Me.atxLength.HardMin = 0
-        Me.atxLength.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxLength.Location = New System.Drawing.Point(12, 248)
-        Me.atxLength.MaxWidth = 20
-        Me.atxLength.Name = "atxLength"
-        Me.atxLength.NumericFormat = "0.#####"
-        Me.atxLength.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxLength.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxLength.SelLength = 0
-        Me.atxLength.SelStart = 0
-        Me.atxLength.Size = New System.Drawing.Size(49, 18)
-        Me.atxLength.SoftMax = -999
-        Me.atxLength.SoftMin = -999
-        Me.atxLength.TabIndex = 9
-        Me.atxLength.ValueDouble = 5
-        Me.atxLength.ValueInteger = 5
-        '
         'lblLU
         '
         Me.lblLU.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
@@ -253,30 +205,6 @@ Public Class frmBuildNew
         Me.lblLU.Size = New System.Drawing.Size(184, 13)
         Me.lblLU.TabIndex = 12
         Me.lblLU.Text = "Ignore Landuse Areas Below Fraction"
-        '
-        'atxLU
-        '
-        Me.atxLU.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxLU.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.atxLU.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxLU.DefaultValue = "0.07"
-        Me.atxLU.HardMax = 1
-        Me.atxLU.HardMin = 0
-        Me.atxLU.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxLU.Location = New System.Drawing.Point(12, 272)
-        Me.atxLU.MaxWidth = 20
-        Me.atxLU.Name = "atxLU"
-        Me.atxLU.NumericFormat = "0.#####"
-        Me.atxLU.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxLU.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxLU.SelLength = 0
-        Me.atxLU.SelStart = 0
-        Me.atxLU.Size = New System.Drawing.Size(49, 18)
-        Me.atxLU.SoftMax = -999
-        Me.atxLU.SoftMin = -999
-        Me.atxLU.TabIndex = 11
-        Me.atxLU.ValueDouble = 0.07
-        Me.atxLU.ValueInteger = 0
         '
         'cmdSet
         '
@@ -321,30 +249,6 @@ Public Class frmBuildNew
         Me.lblSimulationStartYear.TabIndex = 17
         Me.lblSimulationStartYear.Text = "Simulation Start Year"
         '
-        'txtSimulationStartYear
-        '
-        Me.txtSimulationStartYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.txtSimulationStartYear.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.txtSimulationStartYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.txtSimulationStartYear.DefaultValue = "0.0"
-        Me.txtSimulationStartYear.HardMax = 3000
-        Me.txtSimulationStartYear.HardMin = 0
-        Me.txtSimulationStartYear.InsideLimitsBackground = System.Drawing.Color.White
-        Me.txtSimulationStartYear.Location = New System.Drawing.Point(12, 296)
-        Me.txtSimulationStartYear.MaxWidth = 20
-        Me.txtSimulationStartYear.Name = "txtSimulationStartYear"
-        Me.txtSimulationStartYear.NumericFormat = "0.#####"
-        Me.txtSimulationStartYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.txtSimulationStartYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.txtSimulationStartYear.SelLength = 0
-        Me.txtSimulationStartYear.SelStart = 0
-        Me.txtSimulationStartYear.Size = New System.Drawing.Size(49, 18)
-        Me.txtSimulationStartYear.SoftMax = -999
-        Me.txtSimulationStartYear.SoftMin = -999
-        Me.txtSimulationStartYear.TabIndex = 16
-        Me.txtSimulationStartYear.ValueDouble = 1990
-        Me.txtSimulationStartYear.ValueInteger = 1990
-        '
         'lblSimulationEndYear
         '
         Me.lblSimulationEndYear.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
@@ -354,6 +258,122 @@ Public Class frmBuildNew
         Me.lblSimulationEndYear.Size = New System.Drawing.Size(102, 13)
         Me.lblSimulationEndYear.TabIndex = 19
         Me.lblSimulationEndYear.Text = "Simulation End Year"
+        '
+        'lblProjectSize
+        '
+        Me.lblProjectSize.AutoSize = True
+        Me.lblProjectSize.Location = New System.Drawing.Point(6, 42)
+        Me.lblProjectSize.Name = "lblProjectSize"
+        Me.lblProjectSize.Size = New System.Drawing.Size(66, 13)
+        Me.lblProjectSize.TabIndex = 21
+        Me.lblProjectSize.Text = "Project Size:"
+        '
+        'btnFind
+        '
+        Me.btnFind.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnFind.Location = New System.Drawing.Point(422, 40)
+        Me.btnFind.Name = "btnFind"
+        Me.btnFind.Size = New System.Drawing.Size(75, 21)
+        Me.btnFind.TabIndex = 22
+        Me.btnFind.Text = "Find on Map"
+        Me.btnFind.UseVisualStyleBackColor = True
+        '
+        'txtFind
+        '
+        Me.txtFind.AcceptsReturn = True
+        Me.txtFind.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtFind.Location = New System.Drawing.Point(232, 40)
+        Me.txtFind.Multiline = True
+        Me.txtFind.Name = "txtFind"
+        Me.txtFind.Size = New System.Drawing.Size(184, 20)
+        Me.txtFind.TabIndex = 25
+        '
+        'rdoHUC8
+        '
+        Me.rdoHUC8.AutoSize = True
+        Me.rdoHUC8.Location = New System.Drawing.Point(78, 40)
+        Me.rdoHUC8.Name = "rdoHUC8"
+        Me.rdoHUC8.Size = New System.Drawing.Size(57, 17)
+        Me.rdoHUC8.TabIndex = 26
+        Me.rdoHUC8.Text = "HUC-8"
+        Me.rdoHUC8.UseVisualStyleBackColor = True
+        '
+        'rdoHUC12
+        '
+        Me.rdoHUC12.AutoSize = True
+        Me.rdoHUC12.Checked = True
+        Me.rdoHUC12.Location = New System.Drawing.Point(141, 41)
+        Me.rdoHUC12.Name = "rdoHUC12"
+        Me.rdoHUC12.Size = New System.Drawing.Size(63, 17)
+        Me.rdoHUC12.TabIndex = 27
+        Me.rdoHUC12.TabStop = True
+        Me.rdoHUC12.Text = "HUC-12"
+        Me.rdoHUC12.UseVisualStyleBackColor = True
+        '
+        'tabsAreaSelection
+        '
+        Me.tabsAreaSelection.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.tabsAreaSelection.Controls.Add(Me.tabSelectOnMap)
+        Me.tabsAreaSelection.Controls.Add(Me.tabSelectList)
+        Me.tabsAreaSelection.Location = New System.Drawing.Point(12, 12)
+        Me.tabsAreaSelection.Name = "tabsAreaSelection"
+        Me.tabsAreaSelection.SelectedIndex = 0
+        Me.tabsAreaSelection.Size = New System.Drawing.Size(508, 182)
+        Me.tabsAreaSelection.TabIndex = 28
+        '
+        'tabSelectOnMap
+        '
+        Me.tabSelectOnMap.Controls.Add(Me.rdoHUC12)
+        Me.tabSelectOnMap.Controls.Add(Me.rdoHUC8)
+        Me.tabSelectOnMap.Controls.Add(Me.txtSelected)
+        Me.tabSelectOnMap.Controls.Add(Me.lblProjectSize)
+        Me.tabSelectOnMap.Controls.Add(Me.btnFind)
+        Me.tabSelectOnMap.Controls.Add(Me.txtFind)
+        Me.tabSelectOnMap.Controls.Add(Me.txtInstructions)
+        Me.tabSelectOnMap.Location = New System.Drawing.Point(4, 22)
+        Me.tabSelectOnMap.Name = "tabSelectOnMap"
+        Me.tabSelectOnMap.Padding = New System.Windows.Forms.Padding(3)
+        Me.tabSelectOnMap.Size = New System.Drawing.Size(500, 156)
+        Me.tabSelectOnMap.TabIndex = 0
+        Me.tabSelectOnMap.Text = "Select One Project Area On Map"
+        Me.tabSelectOnMap.UseVisualStyleBackColor = True
+        '
+        'tabSelectList
+        '
+        Me.tabSelectList.Controls.Add(Me.lblHucList)
+        Me.tabSelectList.Controls.Add(Me.txtHucList)
+        Me.tabSelectList.Location = New System.Drawing.Point(4, 22)
+        Me.tabSelectList.Name = "tabSelectList"
+        Me.tabSelectList.Padding = New System.Windows.Forms.Padding(3)
+        Me.tabSelectList.Size = New System.Drawing.Size(500, 156)
+        Me.tabSelectList.TabIndex = 1
+        Me.tabSelectList.Text = "Specify List of HUCs to Build Separate Projects"
+        Me.tabSelectList.UseVisualStyleBackColor = True
+        '
+        'lblHucList
+        '
+        Me.lblHucList.AutoSize = True
+        Me.lblHucList.Location = New System.Drawing.Point(3, 3)
+        Me.lblHucList.Name = "lblHucList"
+        Me.lblHucList.Size = New System.Drawing.Size(453, 13)
+        Me.lblHucList.TabIndex = 9
+        Me.lblHucList.Text = "Paste or type 8 or 12-digit hydrologic unit codes separated by any delimiter or o" & _
+            "n separate lines:"
+        '
+        'txtHucList
+        '
+        Me.txtHucList.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtHucList.Location = New System.Drawing.Point(0, 19)
+        Me.txtHucList.Multiline = True
+        Me.txtHucList.Name = "txtHucList"
+        Me.txtHucList.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.txtHucList.Size = New System.Drawing.Size(500, 137)
+        Me.txtHucList.TabIndex = 0
         '
         'txtSimulationEndYear
         '
@@ -379,120 +399,101 @@ Public Class frmBuildNew
         Me.txtSimulationEndYear.ValueDouble = 2000
         Me.txtSimulationEndYear.ValueInteger = 2000
         '
-        'lblProjectSize
+        'txtSimulationStartYear
         '
-        Me.lblProjectSize.AutoSize = True
-        Me.lblProjectSize.Location = New System.Drawing.Point(6, 7)
-        Me.lblProjectSize.Name = "lblProjectSize"
-        Me.lblProjectSize.Size = New System.Drawing.Size(66, 13)
-        Me.lblProjectSize.TabIndex = 21
-        Me.lblProjectSize.Text = "Project Size:"
+        Me.txtSimulationStartYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.txtSimulationStartYear.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.txtSimulationStartYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.txtSimulationStartYear.DefaultValue = "0.0"
+        Me.txtSimulationStartYear.HardMax = 3000
+        Me.txtSimulationStartYear.HardMin = 0
+        Me.txtSimulationStartYear.InsideLimitsBackground = System.Drawing.Color.White
+        Me.txtSimulationStartYear.Location = New System.Drawing.Point(12, 296)
+        Me.txtSimulationStartYear.MaxWidth = 20
+        Me.txtSimulationStartYear.Name = "txtSimulationStartYear"
+        Me.txtSimulationStartYear.NumericFormat = "0.#####"
+        Me.txtSimulationStartYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.txtSimulationStartYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.txtSimulationStartYear.SelLength = 0
+        Me.txtSimulationStartYear.SelStart = 0
+        Me.txtSimulationStartYear.Size = New System.Drawing.Size(49, 18)
+        Me.txtSimulationStartYear.SoftMax = -999
+        Me.txtSimulationStartYear.SoftMin = -999
+        Me.txtSimulationStartYear.TabIndex = 16
+        Me.txtSimulationStartYear.ValueDouble = 1990
+        Me.txtSimulationStartYear.ValueInteger = 1990
         '
-        'btnFind
+        'atxLU
         '
-        Me.btnFind.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnFind.Location = New System.Drawing.Point(422, 5)
-        Me.btnFind.Name = "btnFind"
-        Me.btnFind.Size = New System.Drawing.Size(75, 21)
-        Me.btnFind.TabIndex = 22
-        Me.btnFind.Text = "Find on Map"
-        Me.btnFind.UseVisualStyleBackColor = True
+        Me.atxLU.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxLU.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.atxLU.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.atxLU.DefaultValue = "0.07"
+        Me.atxLU.HardMax = 1
+        Me.atxLU.HardMin = 0
+        Me.atxLU.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxLU.Location = New System.Drawing.Point(12, 272)
+        Me.atxLU.MaxWidth = 20
+        Me.atxLU.Name = "atxLU"
+        Me.atxLU.NumericFormat = "0.#####"
+        Me.atxLU.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxLU.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxLU.SelLength = 0
+        Me.atxLU.SelStart = 0
+        Me.atxLU.Size = New System.Drawing.Size(49, 18)
+        Me.atxLU.SoftMax = -999
+        Me.atxLU.SoftMin = -999
+        Me.atxLU.TabIndex = 11
+        Me.atxLU.ValueDouble = 0.07
+        Me.atxLU.ValueInteger = 0
         '
-        'txtFind
+        'atxLength
         '
-        Me.txtFind.AcceptsReturn = True
-        Me.txtFind.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtFind.Location = New System.Drawing.Point(232, 5)
-        Me.txtFind.Multiline = True
-        Me.txtFind.Name = "txtFind"
-        Me.txtFind.Size = New System.Drawing.Size(184, 20)
-        Me.txtFind.TabIndex = 25
+        Me.atxLength.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxLength.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.atxLength.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.atxLength.DefaultValue = "1.0"
+        Me.atxLength.HardMax = -999
+        Me.atxLength.HardMin = 0
+        Me.atxLength.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxLength.Location = New System.Drawing.Point(12, 248)
+        Me.atxLength.MaxWidth = 20
+        Me.atxLength.Name = "atxLength"
+        Me.atxLength.NumericFormat = "0.#####"
+        Me.atxLength.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxLength.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxLength.SelLength = 0
+        Me.atxLength.SelStart = 0
+        Me.atxLength.Size = New System.Drawing.Size(49, 18)
+        Me.atxLength.SoftMax = -999
+        Me.atxLength.SoftMin = -999
+        Me.atxLength.TabIndex = 9
+        Me.atxLength.ValueDouble = 5
+        Me.atxLength.ValueInteger = 5
         '
-        'rdoHUC8
+        'atxSize
         '
-        Me.rdoHUC8.AutoSize = True
-        Me.rdoHUC8.Location = New System.Drawing.Point(78, 5)
-        Me.rdoHUC8.Name = "rdoHUC8"
-        Me.rdoHUC8.Size = New System.Drawing.Size(57, 17)
-        Me.rdoHUC8.TabIndex = 26
-        Me.rdoHUC8.Text = "HUC-8"
-        Me.rdoHUC8.UseVisualStyleBackColor = True
-        '
-        'rdoHUC12
-        '
-        Me.rdoHUC12.AutoSize = True
-        Me.rdoHUC12.Checked = True
-        Me.rdoHUC12.Location = New System.Drawing.Point(141, 6)
-        Me.rdoHUC12.Name = "rdoHUC12"
-        Me.rdoHUC12.Size = New System.Drawing.Size(63, 17)
-        Me.rdoHUC12.TabIndex = 27
-        Me.rdoHUC12.TabStop = True
-        Me.rdoHUC12.Text = "HUC-12"
-        Me.rdoHUC12.UseVisualStyleBackColor = True
-        '
-        'tabsAreaSelection
-        '
-        Me.tabsAreaSelection.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.tabsAreaSelection.Controls.Add(Me.tabSelectOnMap)
-        Me.tabsAreaSelection.Controls.Add(Me.tabSelectList)
-        Me.tabsAreaSelection.Location = New System.Drawing.Point(12, 52)
-        Me.tabsAreaSelection.Name = "tabsAreaSelection"
-        Me.tabsAreaSelection.SelectedIndex = 0
-        Me.tabsAreaSelection.Size = New System.Drawing.Size(508, 142)
-        Me.tabsAreaSelection.TabIndex = 28
-        '
-        'tabSelectOnMap
-        '
-        Me.tabSelectOnMap.Controls.Add(Me.rdoHUC12)
-        Me.tabSelectOnMap.Controls.Add(Me.rdoHUC8)
-        Me.tabSelectOnMap.Controls.Add(Me.txtSelected)
-        Me.tabSelectOnMap.Controls.Add(Me.lblProjectSize)
-        Me.tabSelectOnMap.Controls.Add(Me.btnFind)
-        Me.tabSelectOnMap.Controls.Add(Me.txtFind)
-        Me.tabSelectOnMap.Location = New System.Drawing.Point(4, 22)
-        Me.tabSelectOnMap.Name = "tabSelectOnMap"
-        Me.tabSelectOnMap.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabSelectOnMap.Size = New System.Drawing.Size(500, 116)
-        Me.tabSelectOnMap.TabIndex = 0
-        Me.tabSelectOnMap.Text = "Select One Project Area On Map"
-        Me.tabSelectOnMap.UseVisualStyleBackColor = True
-        '
-        'tabSelectList
-        '
-        Me.tabSelectList.Controls.Add(Me.lblHucList)
-        Me.tabSelectList.Controls.Add(Me.txtHucList)
-        Me.tabSelectList.Location = New System.Drawing.Point(4, 22)
-        Me.tabSelectList.Name = "tabSelectList"
-        Me.tabSelectList.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabSelectList.Size = New System.Drawing.Size(500, 116)
-        Me.tabSelectList.TabIndex = 1
-        Me.tabSelectList.Text = "Specify List of HUCs to Build Separate Projects"
-        Me.tabSelectList.UseVisualStyleBackColor = True
-        '
-        'txtHucList
-        '
-        Me.txtHucList.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtHucList.Location = New System.Drawing.Point(0, 19)
-        Me.txtHucList.Multiline = True
-        Me.txtHucList.Name = "txtHucList"
-        Me.txtHucList.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtHucList.Size = New System.Drawing.Size(500, 97)
-        Me.txtHucList.TabIndex = 0
-        '
-        'lblHucList
-        '
-        Me.lblHucList.AutoSize = True
-        Me.lblHucList.Location = New System.Drawing.Point(3, 3)
-        Me.lblHucList.Name = "lblHucList"
-        Me.lblHucList.Size = New System.Drawing.Size(453, 13)
-        Me.lblHucList.TabIndex = 9
-        Me.lblHucList.Text = "Paste or type 8 or 12-digit hydrologic unit codes separated by any delimiter or o" & _
-            "n separate lines:"
+        Me.atxSize.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxSize.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.atxSize.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.atxSize.DefaultValue = "1.0"
+        Me.atxSize.HardMax = -999
+        Me.atxSize.HardMin = 0
+        Me.atxSize.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxSize.Location = New System.Drawing.Point(12, 223)
+        Me.atxSize.MaxWidth = 20
+        Me.atxSize.Name = "atxSize"
+        Me.atxSize.NumericFormat = "0.#####"
+        Me.atxSize.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxSize.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxSize.SelLength = 0
+        Me.atxSize.SelStart = 0
+        Me.atxSize.Size = New System.Drawing.Size(49, 19)
+        Me.atxSize.SoftMax = -999
+        Me.atxSize.SoftMin = -999
+        Me.atxSize.TabIndex = 7
+        Me.atxSize.ValueDouble = 1
+        Me.atxSize.ValueInteger = 1
         '
         'frmBuildNew
         '
@@ -516,7 +517,6 @@ Public Class frmBuildNew
         Me.Controls.Add(Me.chkSWAT)
         Me.Controls.Add(Me.chkHSPF)
         Me.Controls.Add(Me.btnCancel)
-        Me.Controls.Add(Me.txtInstructions)
         Me.Controls.Add(Me.btnBuild)
         Me.Controls.Add(Me.tabsAreaSelection)
         Me.KeyPreview = True
