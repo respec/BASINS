@@ -1,4 +1,4 @@
-Summary of changes made by Aaron updaing DataManager from MW4 to MW6
+Summary of changes made by Aaron updating DataManager from MW4 to MW6
 2001-08-30
 
 DataManager------------------------------------------------------------------

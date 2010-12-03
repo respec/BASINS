@@ -73,6 +73,34 @@ Public Module modDownload
         Return ""
     End Function
 
+    Private Function GetHucRegion(ByVal aHUC As String) As String
+        Try
+            Dim lXML As String = ""
+            Dim lThemeTag As String = "HUC" & aHUC.Length
+
+            'TODO: add bounding box of HUC shape?
+            'With g_MapWin.View.SelectedShapes.SelectBounds
+            '    lXML &= "  <northbc>" & .yMax & "</northbc>" & vbCrLf
+            '    lXML &= "  <southbc>" & .yMin & "</southbc>" & vbCrLf
+            '    lXML &= "  <eastbc>" & .xMax & "</eastbc>" & vbCrLf
+            '    lXML &= "  <westbc>" & .xMin & "</westbc>" & vbCrLf
+            lXML &= "  <projection>" & D4EMDataManager.SpatialOperations.AlbersProjections(0) & "</projection>" & vbCrLf
+            'End With
+
+            lXML &= "  <" & lThemeTag & " status=""set by " & XMLappName & """>" & aHUC & "</" & lThemeTag & ">" & vbCrLf
+
+            If aHUC.Length > 8 Then
+                lXML &= "  <HUC8>" & aHUC.Substring(0, 8) & "</HUC8>" & vbCrLf
+            End If
+
+            If lXML.Length > 0 Then
+                Return "<region>" & vbCrLf & lXML & "</region>" & vbCrLf
+            End If
+        Catch e As Exception
+            Logger.Dbg("Exception getting selected region: " & e.Message)
+        End Try
+        Return ""
+    End Function
 
     Private Sub CopyFeaturesWithinExtent(ByVal aOldFolder As String, ByVal aNewFolder As String)
         'copy features that are within selected indexes of selected layer to new folder
@@ -177,13 +205,31 @@ Public Module modDownload
         'Save national project as the user has adjusted it
         g_MapWin.Project.Save(g_MapWin.Project.FileName)
 
-        Dim lRegion As String = GetSelectedRegion()
-        lCreatedMapWindowProjectFilename = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
+        If g_HucList IsNot Nothing AndAlso g_HucList.Count > 0 Then
+            Dim lHucIndex As Integer = 0
+            For Each lHuc As String In g_HucList
+                Logger.Progress("Creating project for " & lHuc, lHucIndex, g_HucList.Count)
+                Using lLevel As New ProgressLevel(True)
+                    Dim lRegion As String = GetHucRegion(lHuc)
+                    lCreatedMapWindowProjectFilename = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
 
-        If IO.File.Exists(lCreatedMapWindowProjectFilename) Then
-            Logger.Status("")
-            Logger.Msg("Finished Building " & g_MapWin.Project.FileName, g_AppNameLong)
-            WriteParametersTextFile(lParametersFilename, lCreatedMapWindowProjectFilename)
+                    If IO.File.Exists(lCreatedMapWindowProjectFilename) Then
+                        Logger.Status("Finished Building " & g_MapWin.Project.FileName, True)
+                        WriteParametersTextFile(lParametersFilename, lCreatedMapWindowProjectFilename)
+                    End If
+                End Using
+                lHucIndex += 1
+            Next
+            Logger.Msg("Finished Building " & lHucIndex & " Projects", g_AppNameLong)
+        Else
+            Dim lRegion As String = GetSelectedRegion()
+            lCreatedMapWindowProjectFilename = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
+
+            If IO.File.Exists(lCreatedMapWindowProjectFilename) Then
+                Logger.Status("")
+                Logger.Msg("Finished Building " & g_MapWin.Project.FileName, g_AppNameLong)
+                WriteParametersTextFile(lParametersFilename, lCreatedMapWindowProjectFilename)
+            End If
         End If
         Return lCreatedMapWindowProjectFilename
     End Function
@@ -244,7 +290,13 @@ StartOver:
         Logger.Dbg("CreateNewProjectDirectory:" & lDefDirName)
         IO.Directory.CreateDirectory(lDefDirName)
 
-        Dim lProjectFileName As String = PromptForNewProjectFileName(lDefDirName, lDefaultProjectFileName)
+        Dim lProjectFileName As String
+        If g_HucList Is Nothing Then
+            lProjectFileName = PromptForNewProjectFileName(lDefDirName, lDefaultProjectFileName)
+        Else
+            lProjectFileName = lDefaultProjectFileName
+        End If
+
         If lProjectFileName.Length = 0 Then
             Return ""
         Else
@@ -1817,6 +1869,9 @@ RetryQuery:
                     Dim lShapeIndex As Integer = g_MapWin.View.SelectedShapes.Item(lSelected).ShapeIndex()
                     Dim lCurLayer As MapWinGIS.Shapefile = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
                     Return lCurLayer.Shape(lShapeIndex)
+                    Dim lCurLayerDS As New MapWinGIS.Shapefile
+                    lCurLayerDS.Open(lCurLayer.Filename)
+                    Return lCurLayerDS.Shape(lShapeIndex)
                 Next
             End If
         Catch e As Exception
