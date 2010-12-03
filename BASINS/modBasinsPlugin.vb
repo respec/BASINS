@@ -206,13 +206,18 @@ Public Module modBasinsPlugin
     End Function
 
     Public Function DefaultBasinsDataDir() As String
-        'TODO: change to using MyDocuments when the installer starts using Progra~1
-        'Return My.Computer.FileSystem.SpecialDirectories.MyDocuments & g_PathChar & BasinsDataPath
-
-        If Not g_BasinsDataDirs Is Nothing AndAlso g_BasinsDataDirs.Count > 0 Then
+        If g_BasinsDataDirs IsNot Nothing AndAlso g_BasinsDataDirs.Count > 0 Then
             Return g_BasinsDataDirs(0)
         Else
-            Return My.Computer.FileSystem.SpecialDirectories.MyDocuments & g_PathChar & BasinsDataPath
+            Try
+                Return My.Computer.FileSystem.SpecialDirectories.MyDocuments & g_PathChar & BasinsDataPath
+            Catch
+                Try
+                    Return Environment.GetFolderPath(Environment.SpecialFolder.Personal & g_PathChar & BasinsDataPath)
+                Catch ex As Exception
+                    Return g_PathChar & BasinsDataPath
+                End Try
+            End Try
         End If
     End Function
 
