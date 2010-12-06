@@ -18,6 +18,7 @@ Public Module modSDM
     Friend g_MapWinWindowHandle As Integer
     Friend g_ProgramDir As String = ""
     Friend g_ClipCatchments As Boolean = True
+    Friend g_Huc As String = Nothing
     Friend g_HucList As Generic.List(Of String) = Nothing
 
     Public g_KeepConnectingRemovedFlowLines As Boolean = True
@@ -70,8 +71,8 @@ Public Module modSDM
     Private _sdmBaseDirectory As String = ""
     Private _parametersFile As String = ""
 
-    Private _projFolder As String = ""
-    Private _defaultUnit As String = ""
+    'Private _projFolder As String = ""
+    'Private _defaultUnit As String = ""
     '    Private _swatSoilsDB As String = ""
 
     'private bool _defaultUnitChanged = false;
@@ -80,8 +81,11 @@ Public Module modSDM
 
     Friend Sub WriteParametersTextFile(ByVal aFilename As String, ByVal aMapWindowProjectFilename As String)
         Dim sb As New Text.StringBuilder
-        sb.AppendLine("ProjectsPath," & IO.Path.GetDirectoryName(IO.Path.GetDirectoryName(aMapWindowProjectFilename)))
-        sb.AppendLine("DefaultUnit," & IO.Path.GetFileName(IO.Path.GetDirectoryName(aMapWindowProjectFilename)))
+        'sb.AppendLine("ProjectsPath," & IO.Path.GetDirectoryName(IO.Path.GetDirectoryName(aMapWindowProjectFilename)))
+        'Dim lDirName As String = IO.Path.GetFileName(IO.Path.GetDirectoryName(aMapWindowProjectFilename))
+        'If lDirName.ToLower <> "national" Then
+        '    sb.AppendLine("DefaultUnit," & lDirName)
+        'End If
         sb.AppendLine("SWAT2005Database," & g_SWATDatabaseName)
         'sb.AppendLine("SWATSoilsDatabase," & _swatSoilsDB)
         sb.AppendLine("MinimumStreamLength," & g_MinFlowlineKM)
@@ -104,8 +108,8 @@ Public Module modSDM
                     Dim items() As String = line.Split(",")
                     If items.Length = 2 Then
                         Select Case items(0)
-                            Case "ProjectsPath" : _projFolder = items(1)
-                            Case "DefaultUnit" : _defaultUnit = items(1)
+                            'Case "ProjectsPath" : _projFolder = items(1)
+                            'Case "DefaultUnit" : _defaultUnit = items(1)
                             Case "SWAT2005Database" : g_SWATDatabaseName = items(1)
                                 'Case "SWATSoilsDatabase" : _swatSoilsDB = items(1)
                             Case "MinimumStreamLength" : g_MinFlowlineKM = Convert.ToDouble(items(1))
@@ -117,7 +121,7 @@ Public Module modSDM
                             Case "RunHSPF" : g_DoHSPF = Convert.ToBoolean(items(1))
                             Case "HucList" : g_HucList = New Generic.List(Of String)(items(1).Split(" "))
                             Case Else
-                                'Log something here?
+                                Logger.Dbg("Unused line in SDM Project Builder parameter file: '" & line & "' in file '" & aFilename & "'")
                         End Select
                     Else
                         Logger.Dbg("Found " & items.Length & " but expected 2 comma-separated values in line '" & line & "' in file '" & aFilename & "'")
