@@ -190,6 +190,7 @@ Public Module modDownload
 
     Public Function SpecifyAndCreateNewProject() As String
         Logger.Status("LABEL TITLE " & g_AppNameShort & " Status")
+        Dim lBuildForm As frmBuildNew = pBuildFrm 'Save local reference for FindText, but forget pBuildFrm
         pBuildFrm = Nothing
 
         Logger.Dbg("SpecifyAndCreateNewProject")
@@ -205,30 +206,37 @@ Public Module modDownload
         'Save national project as the user has adjusted it
         g_MapWin.Project.Save(g_MapWin.Project.FileName)
 
+        'Save parameters before starting to create project(s)
+        WriteParametersTextFile(lParametersFilename, g_MapWin.Project.FileName)
+
         If g_HucList IsNot Nothing AndAlso g_HucList.Count > 0 Then
             Dim lHucIndex As Integer = 0
-            For Each lHuc As String In g_HucList
-                Logger.Progress("Creating project for " & lHuc, lHucIndex, g_HucList.Count)
+            For Each modSDM.g_Huc In g_HucList
+                Logger.Progress("Creating project for " & g_Huc, lHucIndex, g_HucList.Count)
                 Using lLevel As New ProgressLevel(True)
-                    Dim lRegion As String = GetHucRegion(lHuc)
+                    lBuildForm.FindText(g_Huc)
+                    Dim lRegion As String = GetHucRegion(g_Huc)
                     lCreatedMapWindowProjectFilename = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
 
                     If IO.File.Exists(lCreatedMapWindowProjectFilename) Then
                         Logger.Status("Finished Building " & g_MapWin.Project.FileName, True)
-                        WriteParametersTextFile(lParametersFilename, lCreatedMapWindowProjectFilename)
+                        'WriteParametersTextFile(lParametersFilename, lCreatedMapWindowProjectFilename)
                     End If
                 End Using
                 lHucIndex += 1
             Next
+            g_Huc = Nothing
             Logger.Msg("Finished Building " & lHucIndex & " Projects", g_AppNameLong)
+            lCreatedMapWindowProjectFilename = ""
         Else
+            g_Huc = Nothing
             Dim lRegion As String = GetSelectedRegion()
             lCreatedMapWindowProjectFilename = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
 
             If IO.File.Exists(lCreatedMapWindowProjectFilename) Then
                 Logger.Status("")
                 Logger.Msg("Finished Building " & g_MapWin.Project.FileName, g_AppNameLong)
-                WriteParametersTextFile(lParametersFilename, lCreatedMapWindowProjectFilename)
+                'WriteParametersTextFile(lParametersFilename, lCreatedMapWindowProjectFilename)
             End If
         End If
         Return lCreatedMapWindowProjectFilename
@@ -262,10 +270,11 @@ StartOver:
                             Case "projection", "boxprojection"
                                 lAreaOfInterestProjection = lChild.InnerText
                             Case Else
-                                If lDefDirName = "NewProject" Then
+                                'Name project after selected area, use more specific (12-digit) HUC if also have less specific (8-digit) one
+                                If lDefDirName = "NewProject" OrElse lChild.InnerText.Length > lDefDirName.Length Then
                                     lDefDirName = lChild.InnerText
-                                Else
-                                    lDefDirName = "Multiple"
+                                ElseIf Not lDefDirName.StartsWith(lChild.InnerText) Then
+                                    lDefDirName = "Multiple" 'More than one different area selected
                                 End If
                         End Select
                     End If

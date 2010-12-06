@@ -565,17 +565,13 @@ Public Class frmBuildNew
                 Else
                     If lInHuc Then
                         lInHuc = False
-                        Dim lHucString As String = g_AllHucsString.Substring(lHucStart, lCharPos - lHucStart)
-                        If Math.Floor((lHucString.Length) / 2) * 2 < (lHucString.Length) Then
-                            lHucString = "0" & lHucString
-                        End If
-                        g_HucList.Add(lHucString)
+                        g_HucList.Add(HucStringRoundLength(g_AllHucsString.Substring(lHucStart, lCharPos - lHucStart)))
                     End If
                 End If
             Next
             If lInHuc Then
                 lInHuc = False
-                g_HucList.Add(g_AllHucsString.Substring(lHucStart, g_AllHucsString.Length - lHucStart + 1))
+                g_HucList.Add(HucStringRoundLength(g_AllHucsString.Substring(lHucStart, g_AllHucsString.Length - lHucStart)))
             End If
         Else
             g_HucList = Nothing
@@ -592,6 +588,17 @@ Public Class frmBuildNew
             modSDM.pBuildFrm = Me
         End If
     End Sub
+
+    ''' <summary>
+    ''' Prepend a zero if needed to make sure string has even number of characters
+    ''' </summary>
+    Private Function HucStringRoundLength(ByVal aHucString As String) As String
+        If Math.Floor((aHucString.Length) / 2) * 2 < (aHucString.Length) Then
+            Return "0" & aHucString
+        Else
+            Return aHucString
+        End If
+    End Function
 
     Private Sub frmBuildNew_Activated(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Activated
         'Me.Opacity = 1
@@ -639,17 +646,20 @@ Public Class frmBuildNew
     End Sub
 
     Private Sub Find()
-        Dim lText As String = txtFind.Text
-        If lText.Length > 0 Then
+        FindText(txtFind.Text)
+    End Sub
+
+    Public Sub FindText(ByVal aText As String)
+        If aText.Length > 0 Then
             Dim lMatchingRecord As Integer = -1
             Dim lLayerHandle As Integer = -1
             Dim lLoadedHuc12 As Boolean = False
-            If IsNumeric(lText) Then 'Numeric search
-                Select Case lText.Length
+            If IsNumeric(aText) Then 'Numeric search
+                Select Case aText.Length
                     Case 8 : lLayerHandle = Huc8Layer()
                     Case 12
 FindHuc12:
-                        Dim lHuc8 As String = SafeSubstring(lText, 0, 8)
+                        Dim lHuc8 As String = SafeSubstring(aText, 0, 8)
                         For iLayer As Integer = g_MapWin.Layers.NumLayers - 1 To 0 Step -1
                             Dim lSearchLayerHandle As Integer = g_MapWin.Layers.GetHandle(iLayer)
                             If lSearchLayerHandle >= 0 Then
@@ -670,17 +680,17 @@ FindHuc12:
                         If lLayerHandle < 0 Then
                             lLayerHandle = Huc8Layer()
                             If lLayerHandle >= 0 Then
-                                lText = lHuc8
+                                aText = lHuc8
                             End If
                         End If
                     Case Else
                         'TODO: partial search for number that is not 8 or 12 digits?
                 End Select
                 If lLayerHandle > -1 Then
-                    lMatchingRecord = MatchingKeyRecord(g_MapWin.Layers(lLayerHandle).FileName, lText)
-                    If lText.Length = 8 AndAlso Not lLoadedHuc12 AndAlso pBuildFrm.rdoHUC12.Checked Then
+                    lMatchingRecord = MatchingKeyRecord(g_MapWin.Layers(lLayerHandle).FileName, aText)
+                    If aText.Length = 8 AndAlso Not lLoadedHuc12 AndAlso pBuildFrm.rdoHUC12.Checked Then
                         lLoadedHuc12 = True
-                        LoadHUC12(lText)
+                        LoadHUC12(aText)
                     End If
                 End If
             Else
