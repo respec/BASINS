@@ -73,34 +73,34 @@ Public Module modDownload
         Return ""
     End Function
 
-    Private Function GetHucRegion(ByVal aHUC As String) As String
-        Try
-            Dim lXML As String = ""
-            Dim lThemeTag As String = "HUC" & aHUC.Length
+    'Private Function GetHucRegion(ByVal aHUC As String) As String
+    '    Try
+    '        Dim lXML As String = ""
+    '        Dim lThemeTag As String = "HUC" & aHUC.Length
 
-            'TODO: add bounding box of HUC shape?
-            'With g_MapWin.View.SelectedShapes.SelectBounds
-            '    lXML &= "  <northbc>" & .yMax & "</northbc>" & vbCrLf
-            '    lXML &= "  <southbc>" & .yMin & "</southbc>" & vbCrLf
-            '    lXML &= "  <eastbc>" & .xMax & "</eastbc>" & vbCrLf
-            '    lXML &= "  <westbc>" & .xMin & "</westbc>" & vbCrLf
-            lXML &= "  <projection>" & D4EMDataManager.SpatialOperations.AlbersProjections(0) & "</projection>" & vbCrLf
-            'End With
+    '        'TODO: add bounding box of HUC shape?
+    '        'With g_MapWin.View.SelectedShapes.SelectBounds
+    '        '    lXML &= "  <northbc>" & .yMax & "</northbc>" & vbCrLf
+    '        '    lXML &= "  <southbc>" & .yMin & "</southbc>" & vbCrLf
+    '        '    lXML &= "  <eastbc>" & .xMax & "</eastbc>" & vbCrLf
+    '        '    lXML &= "  <westbc>" & .xMin & "</westbc>" & vbCrLf
+    '        lXML &= "  <projection>" & D4EMDataManager.SpatialOperations.AlbersProjections(0) & "</projection>" & vbCrLf
+    '        'End With
 
-            lXML &= "  <" & lThemeTag & " status=""set by " & XMLappName & """>" & aHUC & "</" & lThemeTag & ">" & vbCrLf
+    '        lXML &= "  <" & lThemeTag & " status=""set by " & XMLappName & """>" & aHUC & "</" & lThemeTag & ">" & vbCrLf
 
-            If aHUC.Length > 8 Then
-                lXML &= "  <HUC8>" & aHUC.Substring(0, 8) & "</HUC8>" & vbCrLf
-            End If
+    '        If aHUC.Length > 8 Then
+    '            lXML &= "  <HUC8>" & aHUC.Substring(0, 8) & "</HUC8>" & vbCrLf
+    '        End If
 
-            If lXML.Length > 0 Then
-                Return "<region>" & vbCrLf & lXML & "</region>" & vbCrLf
-            End If
-        Catch e As Exception
-            Logger.Dbg("Exception getting selected region: " & e.Message)
-        End Try
-        Return ""
-    End Function
+    '        If lXML.Length > 0 Then
+    '            Return "<region>" & vbCrLf & lXML & "</region>" & vbCrLf
+    '        End If
+    '    Catch e As Exception
+    '        Logger.Dbg("Exception getting selected region: " & e.Message)
+    '    End Try
+    '    Return ""
+    'End Function
 
     Private Sub CopyFeaturesWithinExtent(ByVal aOldFolder As String, ByVal aNewFolder As String)
         'copy features that are within selected indexes of selected layer to new folder
@@ -209,28 +209,32 @@ Public Module modDownload
         'Save parameters before starting to create project(s)
         WriteParametersTextFile(lParametersFilename, g_MapWin.Project.FileName)
 
+        Dim lRegion As String = ""
         If g_HucList IsNot Nothing AndAlso g_HucList.Count > 0 Then
             Dim lHucIndex As Integer = 0
-            For Each modSDM.g_Huc In g_HucList
-                Logger.Progress("Creating project for " & g_Huc, lHucIndex, g_HucList.Count)
+            For Each lHuc As String In g_HucList
+                Logger.Progress("Creating project for " & lHuc, lHucIndex, g_HucList.Count)
                 Using lLevel As New ProgressLevel(True)
-                    lBuildForm.FindText(g_Huc)
-                    Dim lRegion As String = GetHucRegion(g_Huc)
-                    lCreatedMapWindowProjectFilename = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
+                    If lBuildForm.FindText(lHuc) Then
+                        lRegion = GetSelectedRegion()
+                        lCreatedMapWindowProjectFilename = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
 
-                    If IO.File.Exists(lCreatedMapWindowProjectFilename) Then
-                        Logger.Status("Finished Building " & g_MapWin.Project.FileName, True)
-                        'WriteParametersTextFile(lParametersFilename, lCreatedMapWindowProjectFilename)
+                        If IO.File.Exists(lCreatedMapWindowProjectFilename) Then
+                            Logger.Status("Finished Building " & g_MapWin.Project.FileName, True)
+                            'WriteParametersTextFile(lParametersFilename, lCreatedMapWindowProjectFilename)
+                        End If
+                    Else
+                        Logger.Dbg("Could not find region '" & lHuc)
                     End If
                 End Using
                 lHucIndex += 1
             Next
-            g_Huc = Nothing
+            'lHuc = Nothing
             Logger.Msg("Finished Building " & lHucIndex & " Projects", g_AppNameLong)
             lCreatedMapWindowProjectFilename = ""
         Else
-            g_Huc = Nothing
-            Dim lRegion As String = GetSelectedRegion()
+            'lHuc = Nothing
+            lRegion = GetSelectedRegion()
             lCreatedMapWindowProjectFilename = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
 
             If IO.File.Exists(lCreatedMapWindowProjectFilename) Then

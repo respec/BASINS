@@ -29,6 +29,7 @@ Public Class SDMplugin
 
         atcMwGisUtility.GisUtil.MappingObject = g_MapWin
         atcDataManager.MapWindow = g_MapWin
+        D4EMDataManager.SpatialOperations.MapOCX = g_MapWin.GetOCX
 
         g_MapWinWindowHandle = aParentHandle
         g_MapWin.ApplicationInfo.WelcomePlugin = "plugin" 'tell the main app to Plugins.BroadcastMessage("WELCOME_SCREEN") instead of showing default MW welcome screen
