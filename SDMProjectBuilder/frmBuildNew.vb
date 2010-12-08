@@ -649,9 +649,9 @@ Public Class frmBuildNew
         FindText(txtFind.Text)
     End Sub
 
-    Public Sub FindText(ByVal aText As String)
+    Public Function FindText(ByVal aText As String) As Boolean
+        Dim lMatchingRecord As Integer = -1
         If aText.Length > 0 Then
-            Dim lMatchingRecord As Integer = -1
             Dim lLayerHandle As Integer = -1
             Dim lLoadedHuc12 As Boolean = False
             If IsNumeric(aText) Then 'Numeric search
@@ -695,25 +695,28 @@ FindHuc12:
                 End If
             Else
                 For iLayer As Integer = g_MapWin.Layers.NumLayers - 1 To 0 Step -1
-                    Dim lSearchLayerHandle As Integer = g_MapWin.Layers.GetHandle(iLayer)
-                    If lSearchLayerHandle >= 0 Then
-                        Dim lSearchLayer As MapWindow.Interfaces.Layer = g_MapWin.Layers(lSearchLayerHandle)
-                        If lSearchLayer IsNot Nothing Then
-                            lLayerHandle = lSearchLayerHandle
+                    If lMatchingRecord < 0 Then
+                        Dim lSearchLayerHandle As Integer = g_MapWin.Layers.GetHandle(iLayer)
+                        If lSearchLayerHandle >= 0 Then
+                            Dim lSearchLayer As MapWindow.Interfaces.Layer = g_MapWin.Layers(lSearchLayerHandle)
+                            If lSearchLayer IsNot Nothing Then
+                                lLayerHandle = lSearchLayerHandle
 
-                            Dim lDescFieldName As String = DBFDescriptionFieldName(lSearchLayer.FileName).ToLower
-                            If lDescFieldName.Length > 0 Then
-                                Dim lDBF As atcTableDBF = LayerDBF(lSearchLayer.FileName)
-                                Dim lDescFieldNum As Integer = lDBF.FieldNumber(lDescFieldName)
-                                If lDescFieldNum > 0 Then
-                                    For lMatchingRecord = 1 To lDBF.NumRecords
-                                        If lMatchingRecord >= 0 Then
-                                            Exit For
-                                        End If
-                                    Next
+                                Dim lDescFieldName As String = DBFDescriptionFieldName(lSearchLayer.FileName).ToLower
+                                If lDescFieldName.Length > 0 Then
+                                    Dim lDBF As atcTableDBF = LayerDBF(lSearchLayer.FileName)
+                                    Dim lDescFieldNum As Integer = lDBF.FieldNumber(lDescFieldName)
+                                    If lDescFieldNum > 0 Then
+                                        For lRecord As Integer = 1 To lDBF.NumRecords
+                                            lDBF.CurrentRecord = lRecord
+                                            If lDBF.Value(lDescFieldNum).ToLower.Contains(aText.ToLower) Then
+                                                lMatchingRecord = lRecord
+                                                Exit For
+                                            End If
+                                        Next
+                                    End If
                                 End If
                             End If
-
                         End If
                     End If
                 Next
@@ -727,7 +730,8 @@ FindHuc12:
             End If
         End If
         UpdateSelectedFeatures()
-    End Sub
+        Return (lMatchingRecord >= 0)
+    End Function
 
     Private Function MatchingKeyRecord(ByVal aShapeFilename As String, ByVal aText As String) As Integer
         Dim lKeyFieldName As String = DBFKeyFieldName(aShapeFilename).ToLower

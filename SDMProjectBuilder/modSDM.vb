@@ -18,7 +18,7 @@ Public Module modSDM
     Friend g_MapWinWindowHandle As Integer
     Friend g_ProgramDir As String = ""
     Friend g_ClipCatchments As Boolean = True
-    Friend g_Huc As String = Nothing
+    'Friend g_Huc As String = Nothing
     Friend g_HucList As Generic.List(Of String) = Nothing
 
     Public g_KeepConnectingRemovedFlowLines As Boolean = True
