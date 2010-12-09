@@ -71,8 +71,8 @@ Public Module modSDM
     Private _sdmBaseDirectory As String = ""
     Private _parametersFile As String = ""
 
-    'Private _projFolder As String = ""
-    'Private _defaultUnit As String = ""
+    Private _projFolder As String = ""
+    Private _defaultUnit As String = ""
     '    Private _swatSoilsDB As String = ""
 
     'private bool _defaultUnitChanged = false;
@@ -108,8 +108,8 @@ Public Module modSDM
                     Dim items() As String = line.Split(",")
                     If items.Length = 2 Then
                         Select Case items(0)
-                            'Case "ProjectsPath" : _projFolder = items(1)
-                            'Case "DefaultUnit" : _defaultUnit = items(1)
+                            Case "ProjectsPath" : _projFolder = items(1)
+                            Case "DefaultUnit" : _defaultUnit = items(1)
                             Case "SWAT2005Database" : g_SWATDatabaseName = items(1)
                                 'Case "SWATSoilsDatabase" : _swatSoilsDB = items(1)
                             Case "MinimumStreamLength" : g_MinFlowlineKM = Convert.ToDouble(items(1))
