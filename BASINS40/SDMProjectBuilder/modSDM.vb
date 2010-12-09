@@ -81,11 +81,11 @@ Public Module modSDM
 
     Friend Sub WriteParametersTextFile(ByVal aFilename As String, ByVal aMapWindowProjectFilename As String)
         Dim sb As New Text.StringBuilder
-        'sb.AppendLine("ProjectsPath," & IO.Path.GetDirectoryName(IO.Path.GetDirectoryName(aMapWindowProjectFilename)))
-        'Dim lDirName As String = IO.Path.GetFileName(IO.Path.GetDirectoryName(aMapWindowProjectFilename))
-        'If lDirName.ToLower <> "national" Then
-        '    sb.AppendLine("DefaultUnit," & lDirName)
-        'End If
+        sb.AppendLine("ProjectsPath," & IO.Path.GetDirectoryName(IO.Path.GetDirectoryName(aMapWindowProjectFilename)))
+        Dim lDirName As String = IO.Path.GetFileName(IO.Path.GetDirectoryName(aMapWindowProjectFilename))
+        If lDirName.ToLower <> "national" Then
+            sb.AppendLine("DefaultUnit," & lDirName)
+        End If
         sb.AppendLine("SWAT2005Database," & g_SWATDatabaseName)
         'sb.AppendLine("SWATSoilsDatabase," & _swatSoilsDB)
         sb.AppendLine("MinimumStreamLength," & g_MinFlowlineKM)
@@ -532,6 +532,8 @@ Public Module modSDM
                     lHruTable = lHruTable.Sort(True)
                     D4EMDataManager.clsOverlayReclassify.ReportByTag(lHruReportBuilder, New atcCollection(lHruTable), lDisplayTags)
                     IO.File.WriteAllText(IO.Path.GetDirectoryName(lHRUGridFileName) & "\Hrus.txt", lHruReportBuilder.ToString)
+                    IO.File.WriteAllText(IO.Path.GetDirectoryName(lHRUGridFileName) & "\UniqueValuesSummary.txt", D4EMDataManager.clsOverlayReclassify.UniqueValuesSummary(lHruTable))
+                    IO.File.WriteAllText(IO.Path.GetDirectoryName(lHRUGridFileName) & "\LuCounts.txt", D4EMDataManager.clsOverlayReclassify.UniqueValuesSummary(lHruTable, "LandUse"))
                 End If
                 Logger.Status("DoneGeoProcessing " & MemUsage())
             Else
