@@ -221,7 +221,8 @@ Public Module modDownload
 
                         If IO.File.Exists(lCreatedMapWindowProjectFilename) Then
                             Logger.Status("Finished Building " & g_MapWin.Project.FileName, True)
-                            'WriteParametersTextFile(lParametersFilename, lCreatedMapWindowProjectFilename)
+                            WriteParametersTextFile(lParametersFilename, lCreatedMapWindowProjectFilename)
+                            IO.File.Copy(lParametersFilename, IO.Path.Combine(IO.Path.GetDirectoryName(g_MapWin.Project.FileName), PARAMETER_FILE))
                         End If
                     Else
                         Logger.Dbg("Could not find region '" & lHuc)
@@ -240,7 +241,8 @@ Public Module modDownload
             If IO.File.Exists(lCreatedMapWindowProjectFilename) Then
                 Logger.Status("")
                 Logger.Msg("Finished Building " & g_MapWin.Project.FileName, g_AppNameLong)
-                'WriteParametersTextFile(lParametersFilename, lCreatedMapWindowProjectFilename)
+                WriteParametersTextFile(lParametersFilename, lCreatedMapWindowProjectFilename)
+                IO.File.Copy(lParametersFilename, IO.Path.Combine(IO.Path.GetDirectoryName(g_MapWin.Project.FileName), PARAMETER_FILE))
             End If
         End If
         Return lCreatedMapWindowProjectFilename
