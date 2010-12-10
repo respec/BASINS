@@ -200,7 +200,9 @@ Public Module modDownload
         Logger.Dbg("  SWATDatabaseName " & g_SWATDatabaseName)
         Logger.Dbg("  DoHSPF,SWAT " & g_DoHSPF & " " & g_DoSWAT)
 
-        Dim lParametersFilename As String = IO.Path.Combine(IO.Path.GetDirectoryName(g_MapWin.Project.FileName), PARAMETER_FILE)
+        Dim lNationalProjectFilename As String = g_MapWin.Project.FileName.Clone
+        Dim lNationalHuc8Filename As String = g_MapWin.Layers(Huc8Layer).FileName
+        Dim lParametersFilename As String = IO.Path.Combine(IO.Path.GetDirectoryName(lNationalProjectFilename), PARAMETER_FILE)
         Dim lCreatedMapWindowProjectFilename As String = ""
 
         'Save national project as the user has adjusted it
@@ -229,6 +231,13 @@ Public Module modDownload
                     End If
                 End Using
                 lHucIndex += 1
+                g_MapWin.Layers.Clear()
+                If lHucIndex < g_HucList.Count Then
+                    'g_MapWin.Project.Load(lNationalProjectFilename)
+                    g_MapWin.Layers.Add(lNationalHuc8Filename)
+                    g_MapWin.Project.ProjectProjection = g_MapWin.Layers(Huc8Layer).Projection
+                    g_MapWin.Project.Save(IO.Path.GetDirectoryName(lNationalProjectFilename) & g_PathChar & "huc8only.mwprj")
+                End If
             Next
             'lHuc = Nothing
             Logger.Msg("Finished Building " & lHucIndex & " Projects", g_AppNameLong)
