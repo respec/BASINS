@@ -725,8 +725,8 @@ FindHuc12:
             If lMatchingRecord >= 0 Then
                 g_MapWin.Layers.CurrentLayer = lLayerHandle
                 g_MapWin.View.ClearSelectedShapes()
-                g_MapWin.View.SelectedShapes.AddByIndex(lMatchingRecord, g_MapWin.View.SelectColor)
                 g_MapWin.Layers(lLayerHandle).Shapes(lMatchingRecord).ZoomTo()
+                g_MapWin.View.SelectedShapes.AddByIndex(lMatchingRecord, g_MapWin.View.SelectColor)
             End If
         End If
         UpdateSelectedFeatures()
