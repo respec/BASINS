@@ -37,7 +37,7 @@ Public Class SDMplugin
         g_ProgramDir = PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)) & g_PathChar
 
         Logger.StartToFile(g_ProgramDir & "cache\log" & g_PathChar _
-                         & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & g_AppNameShort & ".log")
+                         & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & g_AppNameShort & ".log", False, True, True)
         Logger.Icon = g_MapWin.ApplicationInfo.FormIcon
 
         UnloadNonSDMPlugins()
