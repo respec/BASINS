@@ -1,12 +1,20 @@
 Imports atcUtility
 Imports MapWinUtility
 
+''' <summary>Math utility functions</summary>
 Public Module modTimeseriesMath
 
     Private pNaN As Double = GetNaN()
     Private pMaxValue As Double = GetMaxValue()
 
-    Public Function FindDateAtOrAfter(ByVal aDatesToSearch() As Double, ByVal aDate As Double, Optional ByVal aStartAt As Integer = 0) As Integer
+    ''' <summary>Search through an array of dates looking for a date </summary>
+    ''' <param name="aDatesToSearch">Array of dates to search</param>
+    ''' <param name="aDate">Date to search for</param>
+    ''' <param name="aStartAt">Index of data to begin search at (default is 0)</param>
+    ''' <returns>Index of first date on or after date searched for</returns>
+    ''' <remarks></remarks>
+    Public Function FindDateAtOrAfter(ByVal aDatesToSearch() As Double, ByVal aDate As Double, _
+                                      Optional ByVal aStartAt As Integer = 0) As Integer
         aDate -= JulianMillisecond 'Allow for floating point error
         Dim lIndex As Integer = Array.BinarySearch(aDatesToSearch, aDate)
         If lIndex < 0 Then
@@ -15,15 +23,13 @@ Public Module modTimeseriesMath
         Return lIndex
     End Function
 
-    ''' <summary>
-    ''' Creates a timeseries copied from orginal that only contains dates within specifed range
-    ''' </summary>
+    ''' <summary>Creates a timeseries copied from orginal that only contains dates within specifed range</summary>
     ''' <param name="aTimeseries">Original timeseries</param>
     ''' <param name="aStartDate">Starting Julian date</param>
     ''' <param name="aEndDate">Ending Julian date</param>
-    ''' <param name="aDataSource"></param>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
+    ''' <param name="aDataSource">Data Source to assign to newly created subset timeseries, can be 'Nothing'</param>
+    ''' <returns>Reference to new timeseries</returns>
+    ''' <remarks>if aDataSource is 'Nothing' only a reference to a new timeseries is returned</remarks>
     Public Function SubsetByDate(ByVal aTimeseries As atcTimeseries, _
                                  ByVal aStartDate As Double, _
                                  ByVal aEndDate As Double, _
@@ -76,7 +82,7 @@ Public Module modTimeseriesMath
 
     ''' <summary>
     ''' Trim a timeseries if needed to make it start and end at the desired year boundary.
-    ''' Useful when complete calendar or water years are needed
+    ''' Useful when complete calendar or water years are needed.
     ''' </summary>
     ''' <param name="aTimeseries">Original timeseries</param>
     ''' <param name="aStartMonth">Month containing first value of the year</param>
@@ -86,7 +92,7 @@ Public Module modTimeseriesMath
     ''' <param name="aLastYear">Optional last year of data to include in subset</param>
     ''' <param name="aEndMonth">Optional month containing last value of the year</param>
     ''' <param name="aEndDay">Optional day containing last value of the year</param>
-    ''' <returns></returns>
+    ''' <returns>New subset timeseries</returns>
     ''' <remarks>
     ''' If omitted or zero, aFirstYear or aLastYear will not be used to limit the subset.
     ''' If omitted or zero, aEndMonth/aEndDay will default to the day before aStartMonth/aStartDay.
@@ -129,7 +135,7 @@ Public Module modTimeseriesMath
                 If aEndDay = 0 Then
                     aEndMonth -= 1
                     If aEndMonth = 0 Then aEndMonth = 12
-                    aEndDay = daymon(.Year, aEndMonth)
+                    aEndDay = DayMon(.Year, aEndMonth)
                 End If
             End If
 
@@ -174,11 +180,9 @@ Public Module modTimeseriesMath
 
     End Function
 
-    ''' <summary>
-    ''' Copy any attributes that copies inherit from aFromDataSet into aToDataSet
-    ''' </summary>
-    ''' <param name="aFromDataset">dataset containing attributes to copy</param>
-    ''' <param name="aToDataSet">dataset to copy attributes into</param>
+    ''' <summary>Copy any attributes that copies inherit from aFromDataSet into aToDataSet</summary>
+    ''' <param name="aFromDataset">Dataset containing attributes to copy</param>
+    ''' <param name="aToDataSet">Dataset to copy attributes into</param>
     ''' <param name="aNumValues">Number of values to copy value attributes of</param>
     ''' <param name="aStartFrom">Start index for copying value attributes from</param>
     ''' <param name="aStartTo">Start index for copying value attributes to</param>
@@ -419,6 +423,12 @@ Public Module modTimeseriesMath
         Return lNewTS
     End Function
 
+    ''' <summary></summary>
+    ''' <param name="aTs"></param>
+    ''' <param name="aFilterNoData"></param>
+    ''' <param name="aIndex"></param>
+    ''' <param name="aNextDate"></param>
+    ''' <remarks></remarks>
     Private Sub GetNextDateIndex(ByVal aTs As atcTimeseries, _
                                  ByVal aFilterNoData As Boolean, _
                                  ByRef aIndex As Integer, _
@@ -469,9 +479,19 @@ Public Module modTimeseriesMath
         End Select
     End Function
 
-    'Fill values in constant interval timeseries with specified values.
-    'Assumes dates are at the end of each value's interval and that the
-    '0th position in the Dates array is the beginning of the first interval.
+    ''' <summary>Fill values in constant interval timeseries with specified values.</summary>
+    ''' <param name="aOldTSer">Timeseries to fill</param>
+    ''' <param name="aTU">Time units (1-sec, 2-min, 3-hour, 4-day, 5-month, 6-year, 7-century)</param>
+    ''' <param name="aTS">Timestep in units of aTU.</param>
+    ''' <param name="aFillVal">Value to Fill data gaps with.</param>
+    ''' <param name="aMissVal">Value indicating missing data.</param>
+    ''' <param name="aAccumVal">Value indicating accumulated data.</param>
+    ''' <param name="aDataSource"></param>
+    ''' <returns>Filled timeseries</returns>
+    ''' <remarks>
+    ''' Assumes dates are at the end of each value's interval and that the
+    ''' 0th position in the Dates array is the beginning of the first interval.
+    ''' </remarks>
     Public Function FillValues(ByVal aOldTSer As atcTimeseries, _
                                ByVal aTU As atcTimeUnit, _
                                Optional ByVal aTS As Long = 1, _
@@ -479,11 +499,6 @@ Public Module modTimeseriesMath
                                Optional ByVal aMissVal As Double = -999, _
                                Optional ByVal aAccumVal As Double = -999, _
                                Optional ByVal aDataSource As atcTimeseriesSource = Nothing) As atcTimeseries
-        'aTU - Time units (1-sec, 2-min, 3-hour, 4-day, 5-month, 6-year, 7-century).
-        'aTS - Timestep in units of aTU.
-        'aFillVal - Value to Fill data gaps with.
-        'aMissVal - Value indicating missing data.
-        'aAccumVal - Value indicating accumulated data.
 
         If aOldTSer.numValues > 0 Then
             Dim lDate(5) As Integer
@@ -644,6 +659,14 @@ Public Module modTimeseriesMath
         Return lInd
     End Function
 
+    ''' <summary>Aggregate specified timeseries to interval specified</summary>
+    ''' <param name="aTimeseries">Timeseries to aggregate</param>
+    ''' <param name="aTU">Time units to aggregate to</param>
+    ''' <param name="aTS">Time step to aggregate to (in time units</param>
+    ''' <param name="aTran">Transformation to use in aggregation</param>
+    ''' <param name="aDataSource">Data Source to assign to newly created subset timeseries, can be Nothing</param>
+    ''' <returns>Aggregated timeseries</returns>
+    ''' <remarks></remarks>
     Public Function Aggregate(ByVal aTimeseries As atcTimeseries, _
                               ByVal aTU As atcTimeUnit, _
                               ByVal aTS As Integer, _
@@ -687,7 +710,6 @@ Public Module modTimeseriesMath
                 End If
 
                 Select Case aTran
-
                     Case atcTran.TranAverSame, atcTran.TranSumDiv
                         While lNewIndex <= lNumNewVals
                             lDateNew = lNewDates(lNewIndex)
@@ -728,7 +750,6 @@ NextOldVal:
                             End If
                             lNewIndex = lNewIndex + 1
                         End While
-
                     Case atcTran.TranMax
                         Dim lMinValue As Double = GetMinValue()
                         While lNewIndex <= lNumNewVals
@@ -766,7 +787,6 @@ NextOldVal:
                             End If
                             lNewIndex = lNewIndex + 1
                         End While
-
                     Case atcTran.TranCountMissing
                         While lNewIndex <= lNumNewVals
                             lDateNew = lNewDates(lNewIndex)
@@ -781,7 +801,6 @@ NextOldVal:
                             End While
                             lNewIndex = lNewIndex + 1
                         End While
-
                 End Select
                 lNewTSer.Values = lNewVals
                 Return lNewTSer
@@ -1097,6 +1116,10 @@ NextOldVal:
         Next
     End Sub
 
+    ''' <summary>Compute sum value at specified percentile of specified timeseries</summary>
+    ''' <param name="aTimeseries">Timeseries to analyze.</param>
+    ''' <param name="aPercentile">Percentile to compute.</param>
+    ''' <remarks>Computed percentile stored in attribute within timeseries with attribute name built from percentile value prefixed with '%Sum'</remarks>
     Public Sub ComputePercentileSum(ByVal aTimeseries As atcTimeseries, ByVal aPercentile As Double)
         Dim lAttrName As String = "%sum" & Format(aPercentile, "00.####")
         Dim lNumValues As Integer = aTimeseries.numValues
@@ -1123,9 +1146,12 @@ NextOldVal:
 Finished:
                 aTimeseries.Attributes.SetValue(lAttrName, lSum)
         End Select
-
     End Sub
 
+    ''' <summary>Compute value at specified percentile of specified timeseries</summary>
+    ''' <param name="aTimeseries">Timeseries to analyze.</param>
+    ''' <param name="aPercentile">Percentile to compute.</param>
+    ''' <remarks>Computed percentile stored in attribute within timeseries with attribute name built from percentile value prefixed with '%'</remarks>
     Public Sub ComputePercentile(ByVal aTimeseries As atcTimeseries, ByVal aPercentile As Double)
         Dim lAttrName As String = "%" & Format(aPercentile, "00.####")
         Dim lNumValues As Integer = aTimeseries.numValues - aTimeseries.Attributes.GetValue("Count Missing")
@@ -1244,7 +1270,11 @@ Finished:
         End If
     End Sub
 
-    'Args are each usually either Double or atcTimeseries
+    ''' <summary>Perform a math operation on one or more timeseries</summary>
+    ''' <param name="aOperationName">Math operation</param>
+    ''' <param name="aArgs">Arguments needed by math operation</param>
+    ''' <returns>Timeseries containing result of math operation</returns>
+    ''' <remarks>Args are each usually either Double or atcTimeseries</remarks>
     Public Function DoMath(ByVal aOperationName As String, _
                            ByVal aArgs As atcDataAttributes) As atcTimeseries
         Dim lArgCount As Integer = 0

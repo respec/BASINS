@@ -1,3 +1,5 @@
+Imports System.Resources
+
 Imports System.Reflection
 Imports System.Runtime.InteropServices
 
@@ -8,8 +10,8 @@ Imports System.Runtime.InteropServices
 ' Review the values of the assembly attributes
 
 <Assembly: AssemblyTitle("")> 
-<Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("")> 
+<Assembly: AssemblyDescription("Classes and methods supporting timeseries data manipulation.")> 
+<Assembly: AssemblyCompany("Aqua Terra Consultants")> 
 <Assembly: AssemblyProduct("")> 
 <Assembly: AssemblyCopyright("")> 
 <Assembly: AssemblyTrademark("")> 
@@ -30,3 +32,5 @@ Imports System.Runtime.InteropServices
 
 <Assembly: AssemblyVersion("3.1.1.0")> 
 <Assembly: AssemblyFileVersion("3.1.1.0")> 
+
+<Assembly: NeutralResourcesLanguageAttribute("en-US")> 
