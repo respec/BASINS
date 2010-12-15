@@ -390,32 +390,31 @@ Public Module modDate
         Return lDayMon
     End Function
 
-    Public Function addUniqueDate(ByVal j As Double, ByRef ja() As Double, ByRef ji() As Integer) As Boolean
-        '##SUMMARY addUniqueDate - adds a unique MJD date to an array of dates if it is not already there _
-        'returns true if date added, false if date was already in array
-        '##PARM j - MJD date to try to add
-        '##PARM ja - array of current dates
-        '##PARM ji - array of date intervals corresponding to dates in ja
-        Dim i As Integer
-        Dim fnd As Boolean
-        'LOCAL i - index of current date array
-        'LOCAL fnd - date found in current date array flag
-        fnd = False 'assmume not found
-        For i = 0 To UBound(ja) 'loop thru existing dates
-            If j = ja(i) Then 'found the new date
-                fnd = True
+    ''' <summary>
+    ''' adds a unique MJD date to an array of dates if it is not already there
+    ''' </summary>
+    ''' <param name="aJdate">MJD date to try to add</param>
+    ''' <param name="aJdateExisting">array of current dates</param>
+    ''' <param name="aJDateExistingInterval">array of date intervals corresponding to dates in ja</param>
+    ''' <returns>true if date added, false if date was already in array</returns>
+    ''' <remarks></remarks>
+    Public Function AddUniqueDate(ByVal aJdate As Double, ByRef aJdateExisting() As Double, ByRef aJDateExistingInterval() As Integer) As Boolean
+        Dim lFound As Boolean = False 'date found in current date array flag
+        For lIndex As Integer = 0 To aJdateExisting.GetUpperBound(0) 'loop thru existing dates
+            If Math.Abs(aJdate - aJdateExisting(lIndex)) < 0.0000000001 Then 'found the new date
+                lFound = True
                 Exit For
             End If
-        Next i
-        If Not fnd Then 'add the date to the array
-            i = UBound(ja)
-            ReDim Preserve ja(i + 1)
-            ReDim Preserve ji(i + 1)
-            ja(i + 1) = j
-            ji(i + 1) = JDateIntrvl(j)
+        Next lIndex
+        If Not lFound Then 'add the date to the array
+            Dim lArraySize As Integer = aJdateExisting.GetUpperBound(0)
+            ReDim Preserve aJdateExisting(lArraySize + 1)
+            ReDim Preserve aJDateExistingInterval(lArraySize + 1)
+            aJdateExisting(lArraySize + 1) = aJdate
+            aJDateExistingInterval(lArraySize + 1) = JDateIntrvl(aJdate)
         End If
 
-        addUniqueDate = Not fnd 'true if date added
+        Return Not lFound 'true if date added
     End Function
 
     ''' <summary>
@@ -639,37 +638,44 @@ Public Module modDate
     '    Return lNumDays + lNumSeconds / SecondsPerDay
     'End Function
 
-    Public Function TimAddJ(ByVal jStartDate As Double, _
-                            ByVal TCODE As Integer, _
-                            ByVal TSTEP As Integer, _
-                            ByVal NVALS As Integer) As Double
-
-        Dim lDate As DateTime, lDateNew As DateTime
-
+    ''' <summary>
+    ''' Add (or subtract) specified amount of time to specified date
+    ''' </summary>
+    ''' <param name="aStartDate">starting date</param>
+    ''' <param name="aTimeUnits">time units for add (1-sec,2-min,3-hour,4-day,5-mon,6-year</param>
+    ''' <param name="aTimeStep">time step for add</param>
+    ''' <param name="aNumValues">number of values to add</param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Function TimAddJ(ByVal aStartDate As Double, _
+                            ByVal aTimeUnits As atcTimeUnit, _
+                            ByVal aTimeStep As Integer, _
+                            ByVal aNumValues As Integer) As Double
         Dim lTimAddJ As Double = -1
-        If NVALS >= 0 Then 'add
-            Dim DATE1(6) As Integer
-            Dim DATE2(6) As Integer
-            Select Case TCODE
-                Case 1 : lTimAddJ = jStartDate + TSTEP * NVALS * JulianSecond
-                Case 2 : lTimAddJ = jStartDate + TSTEP * NVALS * JulianMinute
-                Case 3 : lTimAddJ = jStartDate + TSTEP * NVALS * JulianHour
-                Case 4 : lTimAddJ = jStartDate + TSTEP * NVALS ' JulianDay = 1
-                Case 5, 6, 7 'month, year, century
-                    J2Date(jStartDate, DATE1)
-                    TIMADD(DATE1, TCODE, TSTEP, NVALS, DATE2)
+        If aNumValues >= 0 Then 'add
+            Select Case aTimeUnits
+                Case atcTimeUnit.TUSecond : lTimAddJ = aStartDate + aTimeStep * aNumValues * JulianSecond
+                Case atcTimeUnit.TUMinute : lTimAddJ = aStartDate + aTimeStep * aNumValues * JulianMinute
+                Case atcTimeUnit.TUHour : lTimAddJ = aStartDate + aTimeStep * aNumValues * JulianHour
+                Case atcTimeUnit.TUDay : lTimAddJ = aStartDate + aTimeStep * aNumValues ' JulianDay = 1
+                Case atcTimeUnit.TUMonth, atcTimeUnit.TUYear, atcTimeUnit.TUCentury
+                    Dim DATE1(6) As Integer
+                    Dim DATE2(6) As Integer
+                    J2Date(aStartDate, DATE1)
+                    TIMADD(DATE1, aTimeUnits, aTimeStep, aNumValues, DATE2)
                     lTimAddJ = Date2J(DATE2)
             End Select
         Else 'subtract
-            lDate = FromOADate(jStartDate)
-            Select Case TCODE
-                Case 1 : lDateNew = lDate.AddSeconds(TSTEP * NVALS)
-                Case 2 : lDateNew = lDate.AddMinutes(TSTEP * NVALS)
-                Case 3 : lDateNew = lDate.AddHours(TSTEP * NVALS)
-                Case 4 : lDateNew = lDate.AddDays(TSTEP * NVALS)
-                Case 5 : lDateNew = lDate.AddMonths(TSTEP * NVALS)
-                Case 6 : lDateNew = lDate.AddYears(TSTEP * NVALS)
-                Case 7 : lDateNew = lDate.AddYears(TSTEP * NVALS * 100)
+            Dim lDate As DateTime = FromOADate(aStartDate)
+            Dim lDateNew As DateTime
+            Select Case aTimeUnits
+                Case atcTimeUnit.TUSecond : lDateNew = lDate.AddSeconds(aTimeStep * aNumValues)
+                Case atcTimeUnit.TUMinute : lDateNew = lDate.AddMinutes(aTimeStep * aNumValues)
+                Case atcTimeUnit.TUHour : lDateNew = lDate.AddHours(aTimeStep * aNumValues)
+                Case atcTimeUnit.TUDay : lDateNew = lDate.AddDays(aTimeStep * aNumValues)
+                Case atcTimeUnit.TUMonth : lDateNew = lDate.AddMonths(aTimeStep * aNumValues)
+                Case atcTimeUnit.TUYear : lDateNew = lDate.AddYears(aTimeStep * aNumValues)
+                Case atcTimeUnit.TUCentury : lDateNew = lDate.AddYears(aTimeStep * aNumValues * 100)
             End Select
             lTimAddJ = lDateNew.ToOADate
         End If
