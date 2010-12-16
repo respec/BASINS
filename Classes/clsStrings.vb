@@ -40,6 +40,7 @@ Public Class Strings
         Dim lQuotePosition As Integer 'character position of search through Source
         Dim lQuoted As Boolean = False 'whether quote was encountered in Source
         Dim lTrimLength As Integer 'long length of delimeter, or quote if encountered first
+        If aQuote Is Nothing Then aQuote = ""
         Dim lQuoteLength As Integer = aQuote.Length 'length of quote
 
         aSource = aSource.TrimStart  'remove leading blanks
@@ -64,7 +65,7 @@ Public Class Strings
             aSource = aSource.Substring(lQuotePosition + lTrimLength).Trim 'string remaining
             If lQuoted And aSource.Length > 0 Then
                 If aSource.StartsWith(aDelim) Then
-                    aSource = aSource.Substring(aDelim.Length + 1).Trim
+                    aSource = aSource.Substring(aDelim.Length).Trim
                 End If
             End If
         Else 'take it all
