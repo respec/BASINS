@@ -5,6 +5,8 @@ Imports atcUtility
 Imports System.Text
 Imports System.Text.RegularExpressions
 
+''' <summary>Wrapper around SWMM RAINGAGES Block</summary>
+''' <remarks></remarks>
 Public Class atcSWMMRainGages
     Inherits KeyedCollection(Of String, atcSWMMRainGage)
     Implements IBlock
@@ -12,6 +14,10 @@ Public Class atcSWMMRainGages
     Private pName As String = "[RAINGAGES]"
     Private pSWMMProject As atcSWMMProject
 
+    ''' <summary>SWMM block name for [RAINGAGES]</summary>
+    ''' <value></value>
+    ''' <returns>Current name of block</returns>
+    ''' <remarks>Default is "[RAINGAGES]"</remarks>
     Property Name() As String Implements IBlock.Name
         Get
             Return pName
@@ -21,11 +27,20 @@ Public Class atcSWMMRainGages
         End Set
     End Property
 
+    Property UseBlockText As Boolean = False
+
+    ''' <summary>Extract key from RainGage object</summary>
+    ''' <param name="aRainGage">A specific RainGage</param>
+    ''' <returns>Key</returns>
+    ''' <remarks>Key is Name of RainGage</remarks>
     Protected Overrides Function GetKeyForItem(ByVal aRainGage As atcSWMMRainGage) As String
         Dim lKey As String = aRainGage.Name
         Return lKey
     End Function
 
+    ''' <summary>Constructor for SWMMRainGages</summary>
+    ''' <param name="aSWMMPRoject">Parent project</param>
+    ''' <remarks></remarks>
     Public Sub New(ByVal aSWMMPRoject As atcSWMMProject)
         pSWMMProject = aSWMMPRoject
     End Sub
@@ -59,7 +74,7 @@ Public Class atcSWMMRainGages
                             Case 0 : .Name = lItems(J).Trim
                             Case 1
                                 If lSectionName = "[RAINGAGES]" Then
-                                    .Form = lItems(J).Trim
+                                    .Form = [Enum].Parse(GetType(SWMM_RainGage_DataFormat), lItems(J).Trim)
                                 ElseIf lSectionName = "[SYMBOLS]" Then
                                     .XPos = Double.Parse(lItems(J))
                                 End If
@@ -88,7 +103,8 @@ Public Class atcSWMMRainGages
                                     Dim lpath As String = FindFile("Rain Gage Data File", lItem, lItem.Substring(lItem.LastIndexOf(".")))
                                     TimeseriesFromFile(lpath, .TimeSeries)
                                 ElseIf .Type.ToLower() = "timeseries" Then
-                                    'Do nothing here for now, read in data in the TIMESERIES block
+                                    UseBlockText = True
+                                    ' read in data in the TIMESERIES block
                                 End If
                             Case Else
                                 .AuxiParms &= lItems(J) & "  " 'some leftover text not sure what, but save it here
@@ -229,7 +245,7 @@ Public Class atcSWMMRainGages
             With lRaingage
                 lSB.Append(StrPad(.Name, 16, " ", False))
                 lSB.Append(" ")
-                lSB.Append(StrPad(.Form, 9, " ", False))
+                lSB.Append(StrPad([Enum].GetNames(.Form.GetType)(.Form), 9, " ", False))
                 lSB.Append(" ")
                 lSB.Append(StrPad(.Interval, 6, " ", False))
                 lSB.Append(" ")
@@ -258,6 +274,12 @@ Public Class atcSWMMRainGages
         Next
 
         Return lSB.ToString
+    End Function
+
+    Public Shared Function TimeSeriesHeaderToString() As String
+        Return "[TIMESERIES]" & vbCrLf & _
+               ";;Name           Date       Time       Value     " & vbCrLf & _
+               ";;-------------- ---------- ---------- ----------"
     End Function
 
     Public Function CoordinatesToString() As String
@@ -309,17 +331,51 @@ Public Class atcSWMMRainGages
     End Sub
 End Class
 
+''' <summary>Valid values for SWMM Raingage data formats</summary>
+''' <remarks></remarks>
+Public Enum SWMM_RainGage_DataFormat As Short
+    INTENSITY = 0
+    VOLUME = 1
+    CUMULATIVE = 2
+End Enum
+
+''' <summary>Object for storage of individual SWMM raingage</summary>
+''' <remarks></remarks>
 Public Class atcSWMMRainGage
+    ''' <summary>Name of raingage</summary>
+    ''' <remarks></remarks>
     Public Name As String
-    Public Form As String = "INTENSITY" 'intensity (or volume or cumulative)
+    ''' <summary>Format of data for raingage</summary>
+    ''' <remarks>Valid values are "INTENSITY", "VOLUME" or "CUMULATIVE"</remarks>
+    Public Form As SWMM_RainGage_DataFormat = SWMM_RainGage_DataFormat.INTENSITY
+    ''' <summary></summary>
+    ''' <remarks></remarks>
     Public Interval As String = "1:00"
+    ''' <summary>Interval of data in hours</summary>
+    ''' <remarks>Default is 1.0</remarks>
     Public SnowCatchFactor As Double = 1.0
+    ''' <summary>Type of data</summary>
+    ''' <remarks></remarks>
     Public Type As String = "FILE" '(timeseries) or file
+    ''' <summary></summary>
+    ''' <remarks></remarks>
     Public TimeSeries As atcData.atcTimeseries
+    ''' <summary></summary>
+    ''' <remarks></remarks>
     Public Units As String = "IN" 'in (or mm)
+    ''' <summary></summary>
+    ''' <remarks></remarks>
     Public YPos As Double = 0.0
+    ''' <summary></summary>
+    ''' <remarks></remarks>
     Public XPos As Double = 0.0
+    ''' <summary></summary>
+    ''' <remarks></remarks>
     Public ListDates As New List(Of Double)
+    ''' <summary></summary>
+    ''' <remarks></remarks>
     Public ListValues As New List(Of Double)
+    ''' <summary></summary>
+    ''' <remarks></remarks>
     Public AuxiParms As String = String.Empty
 End Class

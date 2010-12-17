@@ -9,7 +9,7 @@ Public Class atcSWMMCatchments
     Inherits KeyedCollection(Of String, atcSWMMCatchment)
     Implements IBlock
 
-    Private pName As String
+    Private pName As String = "[SUBCATCHMENTS]"
     Private pSWMMProject As atcSWMMProject
 
     Property Name() As String Implements IBlock.Name
@@ -27,7 +27,6 @@ Public Class atcSWMMCatchments
     End Function
 
     Public Sub New(ByVal aSWMMPRoject As atcSWMMProject)
-        Name = "[SUBCATCHMENTS]"
         pSWMMProject = aSWMMPRoject
     End Sub
 
@@ -164,6 +163,13 @@ Public Class atcSWMMCatchments
                 lSB.Append(vbCrLf)
             End With
         Next
+
+        If Not pSWMMProject.Blocks.Contains("[SUBAREAS]") Then
+            lSB.Append(SubareasToString)
+        End If
+        If Not pSWMMProject.Blocks.Contains("[INFILTRATION]") Then
+            lSB.Append(InfiltrationToString)
+        End If
 
         Return lSB.ToString
     End Function

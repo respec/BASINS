@@ -29,7 +29,7 @@ Public Class atcSWMMProject
     'Public Pumps As atcSWMMPumps
     'Public Controls As atcSWMMControls
 
-    Public Title As String = ""
+    Public Title As atcSWMMBlock
 
     Public BackdropFile As String = ""
     Public BackdropX1 As Double = 0.0
@@ -44,7 +44,7 @@ Public Class atcSWMMProject
 
     Public Overrides Sub Clear()
         MyBase.Clear()
-        Title = ""
+        Title = New atcSWMMBlock("[TITLE]", "")
         BackdropFile = ""
 
         Options = New atcSWMMOptions
@@ -60,24 +60,27 @@ Public Class atcSWMMProject
         Map = New atcSWMMBlock("[MAP]", _
                                "UNITS      " & MapUnits & vbCrLf)
         Nodes = New atcSWMMNodes
-        Landuses = New atcSWMMLanduses
+        Landuses = New atcSWMMLanduses(Me)
         RainGages = New atcSWMMRainGages(Me)
         Evaporation = New atcSWMMEvaporation(Me)
         Temperature = New atcSWMMTemperature(Me)
 
         Blocks = New atcSWMMBlocks
-        Blocks.Add(Options)
-        Blocks.Add(Catchments)
-        Blocks.Add(Conduits)
-        Blocks.Add(Losses)
-        Blocks.Add(Report)
-        Blocks.Add(Tags)
-        Blocks.Add(Map)
-        Blocks.Add(Nodes)
-        Blocks.Add(Landuses)
-        Blocks.Add(RainGages)
-        Blocks.Add(Evaporation)
-        Blocks.Add(Temperature)
+        With Blocks
+            .Add(Title)
+            .Add(Options)
+            .Add(Catchments)
+            .Add(Conduits)
+            .Add(Losses)
+            .Add(Report)
+            .Add(Tags)
+            .Add(Map)
+            .Add(Nodes)
+            .Add(Landuses)
+            .Add(RainGages)
+            .Add(Evaporation)
+            .Add(Temperature)
+        End With
 
         'Blocks.Add(Controls)
         'Blocks.Add(Pumps)
@@ -141,7 +144,6 @@ Public Class atcSWMMProject
     End Sub
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
-        'Clear()
         If Not MyBase.Open(aFileName, aAttributes) Then
             Return False
         Else
@@ -160,7 +162,7 @@ Public Class atcSWMMProject
             'Then create classes using their contents
             For Each lBlock As atcSWMMBlock In Blocks
                 Select Case lBlock.Name
-                    Case "[TITLE]" : Title = lBlock.Content
+                    Case "[TITLE]" : Title = lBlock
                     Case "[OPTIONS]" : Options.FromString(lBlock.Content)
                     Case "[EVAPORATION]" : Evaporation.FromString(lBlock.Content)
                     Case "[TEMPERATURE]" : Temperature.FromString(lBlock.Content)
@@ -238,7 +240,8 @@ Public Class atcSWMMProject
                                 End If
                             Next
                         End If
-                    Case "[RAINGAGES]", "[SYMBOLS]" : RainGages.FromString(lBlock.Name & vbCrLf & lBlock.Content)
+                    Case "[RAINGAGES]", "[SYMBOLS]"
+                        RainGages.FromString(lBlock.Name & vbCrLf & lBlock.Content)
                         'any time multiple sections are used to build a single object type, the block's name is needed
                         'The block's name is not part of the "content" during ReadBlockContents above
 
@@ -287,7 +290,10 @@ Public Class atcSWMMProject
     End Sub
 
     Shared Function ReadBlockContents(ByVal aBlockName As String, ByVal aSR As IO.StreamReader) As String
-        Logger.Dbg("LoadGenericDummy " & aBlockName)
+        'Logger.Dbg("LoadGenericDummy " & aBlockName)
+        If aBlockName = "[TIMESERIES]" Then
+            Logger.Dbg("Timeseries")
+        End If
         Dim lBlockComplete As Boolean = False
         Dim lContents As String = ""
         Dim lNextLine As String = aSR.ReadLine
@@ -316,12 +322,26 @@ Public Class atcSWMMProject
 
     Public Overrides Function Save(ByVal aFileName As String, _
                           Optional ByVal ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
+        If IO.File.Exists(aFileName) Then
+            Select Case ExistAction
+                Case EnumExistAction.ExistReplace : IO.File.Delete(aFileName)
+                Case EnumExistAction.ExistAskUser
+                    If MsgBox("Replace Existing " & aFileName, MsgBoxStyle.OkCancel) = MsgBoxResult.Ok Then
+                        IO.File.Delete(aFileName)
+                    Else
+                        Return False
+                    End If
+                Case Else : Return False
+            End Select
+        End If
+
         Dim lSW As New IO.StreamWriter(aFileName)
         'Dim lBlocksWritten As New StringBuilder
         Specification = aFileName
 
         For Each lBlock As IBlock In Blocks
             Select Case lBlock.Name
+                Case "[TITLE}" : lSW.WriteLine(Title.ToString)
                 Case "[OPTIONS]" : lSW.WriteLine(Options.ToString)
                 Case "[EVAPORATION]"
                     If Evaporation.Timeseries Is Nothing Then
@@ -338,51 +358,47 @@ Public Class atcSWMMProject
                 Case "[RAINGAGES]"
                     lSW.WriteLine(RainGages.ToString)
                     RainGages.TimeSeriesToFile()
-
                 Case "[SUBCATCHMENTS]"
                     'lSW.WriteLine(Catchments.ToString)
                     lSW.WriteLine(lBlock.ToString)
-
                 Case "[SUBAREAS]"
                     'lSW.WriteLine(Catchments.SubareasToString)
                     lSW.WriteLine(lBlock.ToString)
-
                 Case "[INFILTRATION]"
                     'lSW.WriteLine(Catchments.InfiltrationToString)
                     lSW.WriteLine(lBlock.ToString)
-
                     'Case "[JUNCTIONS][OUTFALLS]"
                     '    lSW.WriteLine(Nodes.ToString)
                 Case "[JUNCTIONS]"
                     lSW.WriteLine(lBlock.ToString)
                 Case "[OUTFALLS]"
                     lSW.WriteLine(lBlock.ToString)
-
                     'Case "[CONDUITS][XSECTIONS]"
                     '    lSW.WriteLine(Conduits.ToString)
                 Case "[CONDUITS]"
                     lSW.WriteLine(lBlock.ToString)
                 Case "[XSECTIONS]"
                     lSW.WriteLine(lBlock.ToString)
-
                 Case "[LOSSES]"
                     'lSW.WriteLine(Losses.ToString)
                     lSW.WriteLine(lBlock.ToString)
-
                 Case "[LANDUSES]"
                     'lSW.WriteLine(Landuses.ToString)
                     lSW.WriteLine(lBlock.ToString)
                 Case "[COVERAGES]"
                     'lSW.WriteLine(Landuses.CoveragesToString)
                     lSW.WriteLine(lBlock.ToString)
-
                 Case "[TIMESERIES]"
-                    lSW.WriteLine(atcSWMMEvaporation.TimeSeriesHeaderToString)
+                    If Not RainGages.UseBlockText Then lSW.WriteLine(atcSWMMRainGages.TimeSeriesHeaderToString)
                     If Options.EJDate - Options.SJDate < 30 Then
                         If Temperature.Timeseries IsNot Nothing Then Temperature.TimeSeriesToStream(lSW)
                         If Evaporation.Timeseries IsNot Nothing Then Evaporation.TimeSeriesToStream(lSW)
                         If RainGages.Count > 0 Then
-                            RainGages.TimeSeriesToStream(lSW)
+                            If RainGages.UseBlockText Then
+                                lSW.WriteLine(lBlock.ToString)
+                            Else
+                                RainGages.TimeSeriesToStream(lSW)
+                            End If
                         End If
                     Else
                         'more than 30 days, write to file
@@ -398,35 +414,27 @@ Public Class atcSWMMProject
                         If Evaporation.Timeseries IsNot Nothing Then Evaporation.TimeSeriesToFile()
                     End If
                     lSW.WriteLine()
-
                 Case "[REPORT]"
                     'lSW.WriteLine(Report.ToString)
                     lSW.WriteLine(lBlock.ToString)
-
                 Case "[TAGS]"
                     'lSW.WriteLine(Tags.ToString)
                     lSW.WriteLine(lBlock.ToString)
-
                 Case "[MAP]"
                     'lSW.WriteLine(Map.ToString)
                     lSW.WriteLine(lBlock.ToString)
-
                 Case "[COORDINATES]"
                     'lSW.WriteLine(Nodes.CoordinatesToString)
                     lSW.WriteLine(lBlock.ToString)
-
                 Case "[VERTICES]"
                     'lSW.WriteLine(Conduits.VerticesToString)
                     lSW.WriteLine(lBlock.ToString)
-
                 Case "[Polygons]"
                     'lSW.WriteLine(Catchments.PolygonsToString)
                     lSW.WriteLine(lBlock.ToString)
-
                 Case "[SYMBOLS]"
                     'lSW.WriteLine(RainGages.CoordinatesToString)
                     lSW.WriteLine(lBlock.ToString)
-
                 Case "[BACKDROP]"
                     'If BackdropFile.Length > 0 Then
                     '    lSW.WriteLine("")
@@ -435,7 +443,6 @@ Public Class atcSWMMProject
                     '    lSW.WriteLine("DIMENSIONS " & Format(BackdropX1, "0.000") & " " & Format(BackdropY1, "0.000") & " " & Format(BackdropX2, "0.000") & " " & Format(BackdropY2, "0.000"))
                     'End If
                     lSW.WriteLine(lBlock.ToString)
-
                 Case Else
                     'Write any blocks not already written above
                     'For Each lBlock As IBlock In Blocks
