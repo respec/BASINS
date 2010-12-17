@@ -10,6 +10,7 @@ Public Class atcSWMMLanduses
     Implements IBlock
 
     Private pName As String = "[LANDUSES]"
+    Private pSWMMProject As atcSWMMProject
 
     Property Name() As String Implements IBlock.Name
         Get
@@ -127,6 +128,10 @@ Public Class atcSWMMLanduses
             lSB.Append(vbCrLf)
         Next
 
+        If Not pSWMMProject.Blocks.Contains("[COVERAGES]") Then
+            lSB.Append(CoveragesToString)
+        End If
+
         Return lSB.ToString
     End Function
 
@@ -176,6 +181,10 @@ Public Class atcSWMMLanduses
 
         Return lSB.ToString
     End Function
+ 
+    Public Sub New(ByVal aSWMMPRoject As atcSWMMProject)
+        pSWMMProject = aSWMMPRoject
+    End Sub
 End Class
 
 Public Class atcSWMMLanduse
