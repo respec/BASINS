@@ -45,6 +45,12 @@ Public Class atcSWMMBlock
     End Sub
 
     Public Overrides Function ToString() As String
-        Return Name & vbCrLf & pContents & vbCrLf
+        Dim lTempString As String
+        If pContents.Length = 0 Then
+            lTempString = Name & vbCrLf
+        Else
+            lTempString = Name & vbCrLf & pContents & vbCrLf
+        End If
+        Return lTempString
     End Function
 End Class

@@ -30,6 +30,11 @@ Public Class atcSWMMProject
     'Public Controls As atcSWMMControls
 
     Public Title As atcSWMMBlock
+    Public Coordinates As atcSWMMBlock
+    Public Vertices As atcSWMMBlock
+    Public Polygons As atcSWMMBlock
+    Public Symbols As atcSWMMBlock
+    Public Backdrop As atcSWMMBlock
 
     Public BackdropFile As String = ""
     Public BackdropX1 As Double = 0.0
@@ -55,31 +60,42 @@ Public Class atcSWMMProject
                                 & ";;-------------- ---------- ---------- ---------- ----------" & vbCrLf)
         Report = New atcSWMMBlock("[REPORT]", _
                                   "INPUT      NO" & vbCrLf _
-                                & "CONTROLS   NO" & vbCrLf)
-        Tags = New atcSWMMBlock("[TAGS]", vbCrLf)
+                                & "CONTROLS   NO")
+        Tags = New atcSWMMBlock("[TAGS]", "")
         Map = New atcSWMMBlock("[MAP]", _
-                               "UNITS      " & MapUnits & vbCrLf)
+                               "UNITS      " & MapUnits)
         Nodes = New atcSWMMNodes
         Landuses = New atcSWMMLanduses(Me)
         RainGages = New atcSWMMRainGages(Me)
         Evaporation = New atcSWMMEvaporation(Me)
         Temperature = New atcSWMMTemperature(Me)
 
+        Coordinates = New atcSWMMBlock("[COORDINATES]", "")
+        Vertices = New atcSWMMBlock("[VERTICES]", "")
+        Polygons = New atcSWMMBlock("[Polygons]", "")
+        Symbols = New atcSWMMBlock("[SYMBOLS]", "")
+        Backdrop = New atcSWMMBlock("[BACKDROP]", "")
+
         Blocks = New atcSWMMBlocks
         With Blocks
             .Add(Title)
             .Add(Options)
+            .Add(Evaporation)
+            .Add(Temperature)
+            .Add(RainGages)
             .Add(Catchments)
+            .Add(Nodes)
             .Add(Conduits)
             .Add(Losses)
+            .Add(Landuses)
             .Add(Report)
             .Add(Tags)
             .Add(Map)
-            .Add(Nodes)
-            .Add(Landuses)
-            .Add(RainGages)
-            .Add(Evaporation)
-            .Add(Temperature)
+            .Add(Coordinates)
+            .Add(Vertices)
+            .Add(Polygons)
+            .Add(Symbols)
+            .Add(Backdrop)
         End With
 
         'Blocks.Add(Controls)
@@ -359,22 +375,15 @@ Public Class atcSWMMProject
                     lSW.WriteLine(RainGages.ToString)
                     RainGages.TimeSeriesToFile()
                 Case "[SUBCATCHMENTS]"
-                    'lSW.WriteLine(Catchments.ToString)
                     lSW.WriteLine(lBlock.ToString)
                 Case "[SUBAREAS]"
-                    'lSW.WriteLine(Catchments.SubareasToString)
                     lSW.WriteLine(lBlock.ToString)
                 Case "[INFILTRATION]"
-                    'lSW.WriteLine(Catchments.InfiltrationToString)
                     lSW.WriteLine(lBlock.ToString)
-                    'Case "[JUNCTIONS][OUTFALLS]"
-                    '    lSW.WriteLine(Nodes.ToString)
                 Case "[JUNCTIONS]"
                     lSW.WriteLine(lBlock.ToString)
                 Case "[OUTFALLS]"
                     lSW.WriteLine(lBlock.ToString)
-                    'Case "[CONDUITS][XSECTIONS]"
-                    '    lSW.WriteLine(Conduits.ToString)
                 Case "[CONDUITS]"
                     lSW.WriteLine(lBlock.ToString)
                 Case "[XSECTIONS]"
@@ -424,25 +433,40 @@ Public Class atcSWMMProject
                     'lSW.WriteLine(Map.ToString)
                     lSW.WriteLine(lBlock.ToString)
                 Case "[COORDINATES]"
-                    'lSW.WriteLine(Nodes.CoordinatesToString)
-                    lSW.WriteLine(lBlock.ToString)
+                    If lBlock.ToString.Trim = lBlock.Name Then
+                        lSW.WriteLine(Nodes.CoordinatesToString)
+                    Else
+                        lSW.WriteLine(lBlock.ToString)
+                    End If
                 Case "[VERTICES]"
-                    'lSW.WriteLine(Conduits.VerticesToString)
-                    lSW.WriteLine(lBlock.ToString)
+                    If lBlock.ToString.Trim = lBlock.Name Then
+                        lSW.WriteLine(Conduits.VerticesToString)
+                    Else
+                        lSW.WriteLine(lBlock.ToString)
+                    End If
                 Case "[Polygons]"
-                    'lSW.WriteLine(Catchments.PolygonsToString)
-                    lSW.WriteLine(lBlock.ToString)
+                    If lBlock.ToString.Trim = lBlock.Name Then
+                        lSW.WriteLine(Catchments.PolygonsToString)
+                    Else
+                        lSW.WriteLine(lBlock.ToString)
+                    End If
                 Case "[SYMBOLS]"
-                    'lSW.WriteLine(RainGages.CoordinatesToString)
-                    lSW.WriteLine(lBlock.ToString)
+                    If lBlock.ToString.Trim = lBlock.Name Then
+                        lSW.WriteLine(RainGages.CoordinatesToString)
+                    Else
+                        lSW.WriteLine(lBlock.ToString)
+                    End If
                 Case "[BACKDROP]"
-                    'If BackdropFile.Length > 0 Then
-                    '    lSW.WriteLine("")
-                    '    lSW.WriteLine("[BACKDROP]")
-                    '    lSW.WriteLine("FILE       " & """" & BackdropFile & """")
-                    '    lSW.WriteLine("DIMENSIONS " & Format(BackdropX1, "0.000") & " " & Format(BackdropY1, "0.000") & " " & Format(BackdropX2, "0.000") & " " & Format(BackdropY2, "0.000"))
-                    'End If
-                    lSW.WriteLine(lBlock.ToString)
+                    If lBlock.ToString.Trim = lBlock.Name Then
+                        If BackdropFile.Length > 0 Then
+                            lSW.WriteLine("")
+                            lSW.WriteLine("[BACKDROP]")
+                            lSW.WriteLine("FILE       " & """" & BackdropFile & """")
+                            lSW.WriteLine("DIMENSIONS " & Format(BackdropX1, "0.000") & " " & Format(BackdropY1, "0.000") & " " & Format(BackdropX2, "0.000") & " " & Format(BackdropY2, "0.000"))
+                        End If
+                    Else
+                        lSW.WriteLine(lBlock.ToString)
+                    End If
                 Case Else
                     'Write any blocks not already written above
                     'For Each lBlock As IBlock In Blocks

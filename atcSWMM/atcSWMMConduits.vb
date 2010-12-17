@@ -174,16 +174,16 @@ Public Class atcSWMMConduits
     End Function
 
     Public Sub VerticesFromString(ByVal aContents As String)
-        Dim lSubcatchmentName As String 'Parse this from aContents
-        Dim lConduit As atcSWMMConduit = Me(lSubcatchmentName)
-        With lConduit
-            '.ManningsNImperv=
-            '.ManningsNPerv=
-            '.DepressionStorageImperv=
-            '.PercentZeroStorage=
-            '.RouteTo=
-            '.PercentRouted=
-        End With
+        'Dim lSubcatchmentName As String 'Parse this from aContents
+        'Dim lConduit As atcSWMMConduit = Me(lSubcatchmentName)
+        'With lConduit
+        '    '.ManningsNImperv=
+        '    '.ManningsNPerv=
+        '    '.DepressionStorageImperv=
+        '    '.PercentZeroStorage=
+        '    '.RouteTo=
+        '    '.PercentRouted=
+        'End With
     End Sub
 
     Public Function VerticesToString() As String
