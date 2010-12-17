@@ -13,6 +13,7 @@ Public Class atcSWMMRainGages
 
     Private pName As String = "[RAINGAGES]"
     Private pSWMMProject As atcSWMMProject
+    Friend UseBlockText As Boolean = False
 
     ''' <summary>SWMM block name for [RAINGAGES]</summary>
     ''' <value></value>
@@ -26,8 +27,6 @@ Public Class atcSWMMRainGages
             pName = value
         End Set
     End Property
-
-    Property UseBlockText As Boolean = False
 
     ''' <summary>Extract key from RainGage object</summary>
     ''' <param name="aRainGage">A specific RainGage</param>

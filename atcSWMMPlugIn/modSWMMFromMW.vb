@@ -476,9 +476,10 @@ Friend Module modSWMMFromMW
     End Function
 
     Friend Function ReclassifyLandUses(ByVal aReclassificationRecords As atcCollection, _
-                                       ByVal aLandUses As atcSWMMLanduses) As atcSWMMLanduses
+                                       ByVal aLandUses As atcSWMMLanduses, _
+                                       ByVal aSWMMProject As atcSWMMProject) As atcSWMMLanduses
         Logger.Dbg("Begin")
-        Dim lReclassifyLandUses As New atcSWMMLanduses
+        Dim lReclassifyLandUses As New atcSWMMLanduses(aSWMMProject)
 
         'build collection of unique subbasin ids
         Dim lUniqueSubids As New atcCollection
