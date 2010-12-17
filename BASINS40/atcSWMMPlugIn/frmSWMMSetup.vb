@@ -1554,7 +1554,7 @@ Public Class frmSWMMSetup
 
         If PreProcessChecking(lSWMMProjectFileName, lNodeLayerIndex, lConduitLayerIndex, lCatchmentLayerIndex) Then
             With pPlugIn.SWMMProject
-                .Title = "SWMM Project Written from BASINS"
+                .Title.Content = "SWMM Project Written from BASINS"
                 .RainGages.Clear()
                 .Evaporation.Timeseries = Nothing
                 .Temperature.Timeseries = Nothing
@@ -1720,7 +1720,7 @@ Public Class frmSWMMSetup
                 End If
 
                 'now reclassify the landuses 
-                Dim lReclassifyLanduses As atcSWMM.atcSWMMLanduses = ReclassifyLandUses(lReclassificationRecords, .Landuses)
+                Dim lReclassifyLanduses As atcSWMM.atcSWMMLanduses = ReclassifyLandUses(lReclassificationRecords, .Landuses, pPlugIn.SWMMProject)
                 .Landuses = lReclassifyLanduses
 
                 Logger.Dbg(lblStatus.Text)

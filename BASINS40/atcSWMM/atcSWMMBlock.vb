@@ -26,10 +26,13 @@ Public Class atcSWMMBlock
         End Set
     End Property
 
-    ReadOnly Property Content() As String
+    Property Content() As String
         Get
             Return pContents
         End Get
+        Set(ByVal value As String)
+            pContents = value
+        End Set
     End Property
 
     Public Sub New(ByVal aName As String, ByVal aContents As String)
