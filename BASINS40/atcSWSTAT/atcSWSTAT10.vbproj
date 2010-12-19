@@ -69,7 +69,7 @@
     <DocumentationFile>atcSWSTAT.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>None</DebugType>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
@@ -81,6 +81,7 @@
     <Reference Include="MapWinUtility, Version=4.8.2.37691, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\MapWindow4Dev\Bin64\MapWinUtility.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -159,39 +160,39 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\atcControls\atcControls.vbproj">
+    <ProjectReference Include="..\atcControls\atcControls10.vbproj">
       <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
-      <Name>atcControls</Name>
+      <Name>atcControls10</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcData\atcData.vbproj">
+    <ProjectReference Include="..\atcData\atcData10.vbproj">
       <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
-      <Name>atcData</Name>
+      <Name>atcData10</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcGraphExperimental\atcGraph.vbproj">
+    <ProjectReference Include="..\atcGraphExperimental\atcGraph10.vbproj">
       <Project>{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}</Project>
-      <Name>atcGraph</Name>
+      <Name>atcGraph10</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcList\atcList.vbproj">
+    <ProjectReference Include="..\atcList\atcList10.vbproj">
       <Project>{A1A87CB8-8B9E-4C90-9549-C065357E499F}</Project>
-      <Name>atcList</Name>
+      <Name>atcList10</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcSeasons\atcSeasons.vbproj">
+    <ProjectReference Include="..\atcSeasons\atcSeasons10.vbproj">
       <Project>{12F7FDD0-A6EC-4ABE-A01B-790AD8CAEF03}</Project>
-      <Name>atcSeasons</Name>
+      <Name>atcSeasons10</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcTimeseriesNdayHighLow\atcTimeseriesNdayHighLow.vbproj">
+    <ProjectReference Include="..\atcTimeseriesNdayHighLow\atcTimeseriesNdayHighLow10.vbproj">
       <Project>{24EEBEFB-2B19-489D-B3AF-9FE00A56346E}</Project>
-      <Name>atcTimeseriesNdayHighLow</Name>
+      <Name>atcTimeseriesNdayHighLow10</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
+    <ProjectReference Include="..\atcUtility\atcUtility10.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
-      <Name>atcUtility</Name>
+      <Name>atcUtility10</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

@@ -287,6 +287,14 @@
       <Project>{EB1F831C-4588-4FA5-A9F9-68B0D9E1C390}</Project>
       <Name>atcSWMM10</Name>
     </ProjectReference>
+    <ProjectReference Include="..\atcSWSTAT\atcSWSTAT10.vbproj">
+      <Project>{C00718A3-FF1D-46C4-822E-C10964469DE2}</Project>
+      <Name>atcSWSTAT10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSynopInput\atcSynopInput10.vbproj">
+      <Project>{69A2617A-01FB-457D-883E-22BF45EEAD64}</Project>
+      <Name>atcSynopInput10</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcSynopticAnalysis\atcSynopticAnalysis10.vbproj">
       <Project>{FABF7AA3-DDE7-48A4-8226-ECD3AD423597}</Project>
       <Name>atcSynopticAnalysis10</Name>
@@ -307,9 +315,17 @@
       <Project>{24EEBEFB-2B19-489D-B3AF-9FE00A56346E}</Project>
       <Name>atcTimeseriesNdayHighLow10</Name>
     </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesScript\atcTimeseriesScript10.vbproj">
+      <Project>{40DE1F29-3531-4BC2-9D7E-324DC92689DF}</Project>
+      <Name>atcTimeseriesScript10</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesStatistics\atcTimeseriesStatistics10.vbproj">
       <Project>{7E40E3E6-BF8E-45B5-99AF-4E11DAF039FD}</Project>
       <Name>atcTimeseriesStatistics10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesSTORET\atcTimeseriesSTORET10.vbproj">
+      <Project>{F1FE7C7D-3477-400C-96BE-6BD43C1D7896}</Project>
+      <Name>atcTimeseriesSTORET10</Name>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesSWAT\atcTimeseriesSWAT10.vbproj">
       <Project>{8157C92A-68A6-498D-84B7-EF2A299AB7BA}</Project>
@@ -322,6 +338,10 @@
     <ProjectReference Include="..\atcTimeseriesWRDB\atcTimeseriesWRDB10.vbproj">
       <Project>{5E5A80B8-06DC-428F-A139-F1CF20D756B2}</Project>
       <Name>atcTimeseriesWRDB10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUCIForms\atcUCIForms10.vbproj">
+      <Project>{CEEC2636-9312-47E0-8877-BF16E0955906}</Project>
+      <Name>atcUCIForms10</Name>
     </ProjectReference>
     <ProjectReference Include="..\atcUCI\atcUCI10.vbproj">
       <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>
@@ -339,6 +359,10 @@
       <Project>{74201F53-B122-40F0-9678-1DCDC45E99BC}</Project>
       <Name>atcWASP10</Name>
     </ProjectReference>
+    <ProjectReference Include="..\atcWCS\atcWCS10.vbproj">
+      <Project>{0835A9E5-4C06-4D41-B25E-CD31E6979A35}</Project>
+      <Name>atcWCS10</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcWDM\atcWDM10.vbproj">
       <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
       <Name>atcWDM10</Name>
@@ -346,6 +370,10 @@
     <ProjectReference Include="..\BASINS\BASINS10.vbproj">
       <Project>{FE50F2FD-56E7-421E-A85D-A1F2DDCD5D9A}</Project>
       <Name>BASINS10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\D4EMDownloadData\D4EMDownloadData10.vbproj">
+      <Project>{ADD48409-FC1F-4A92-B07C-6B9A9A5BAC72}</Project>
+      <Name>D4EMDownloadData10</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

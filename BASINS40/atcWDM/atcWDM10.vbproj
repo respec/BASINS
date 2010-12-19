@@ -112,11 +112,6 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MapWinInterfaces, Version=4.2.2424.18924, Culture=neutral">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-      <HintPath>..\..\MapWindow4Dev\Bin64\MapWinInterfaces.dll</HintPath>
-    </Reference>
     <Reference Include="MapWinUtility, Version=4.8.2.37691, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\MapWindow4Dev\Bin64\MapWinUtility.dll</HintPath>
