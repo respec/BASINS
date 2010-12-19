@@ -116,11 +116,6 @@
     <CodeAnalysisFailOnMissingRules>true</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotSpatial.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=de6dc4a67596c1e5, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Bin\DotSpatial.Common.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="DotSpatial.Data, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b600b0ba19543541, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\DotSpatial.Data.dll</HintPath>
@@ -165,12 +160,6 @@
       <HintPath>..\..\MapWindow4Dev\Bin64\ApplicationPlugins\TableEditor.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <ProjectReference Include="..\atcControls\atcControls10.vbproj">
-      <Name>atcControls10</Name>
-      <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
-      <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility10.vbproj">
       <Project>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</Project>
       <Name>atcMwGisUtility10</Name>

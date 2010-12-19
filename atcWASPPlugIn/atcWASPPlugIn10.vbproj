@@ -86,17 +86,14 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
     <Import Include="System" />
     <Import Include="System.Collections" />
     <Import Include="System.Collections.Generic" />
-    <Import Include="System.Data" />
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
@@ -187,11 +184,6 @@
     <ProjectReference Include="..\atcWASP\atcWASP10.vbproj">
       <Project>{74201F53-B122-40F0-9678-1DCDC45E99BC}</Project>
       <Name>atcWASP10</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcWDM\atcWDM10.vbproj">
-      <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
-      <Name>atcWDM10</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

@@ -157,9 +157,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\atcUtility\atcUtility-D4EM10.vbproj">
+    <ProjectReference Include="..\atcUtility\atcUtility10.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
-      <Name>atcUtility-D4EM10</Name>
+      <Name>atcUtility10</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

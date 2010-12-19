@@ -1,20 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{00D0F71D-4726-4ED1-835F-183FF6BF58D5}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
-    <StartupObject>Sub Main</StartupObject>
-    <RootNamespace>atcHspfReadWrite</RootNamespace>
-    <AssemblyName>atcHspfReadWrite</AssemblyName>
-    <MyType>WindowsFormsWithCustomSubMain</MyType>
+    <ProjectGuid>{40DE1F29-3531-4BC2-9D7E-324DC92689DF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>atcTimeseriesScript</RootNamespace>
+    <AssemblyName>atcTimeseriesScript</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>Windows</MyType>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionCompare>Binary</OptionCompare>
+    <OptionStrict>Off</OptionStrict>
+    <OptionInfer>On</OptionInfer>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
-    <OldToolsVersion>2.0</OldToolsVersion>
+    <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation />
     <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
@@ -38,17 +42,17 @@
     <DebugType>full</DebugType>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>atcHspfReadWrite.xml</DocumentationFile>
+    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>atcTimeseriesScript.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>None</DebugType>
     <DefineDebug>false</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
-    <OutputPath>bin\</OutputPath>
-    <DocumentationFile>atcHspfReadWrite.xml</DocumentationFile>
+    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>atcTimeseriesScript.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
@@ -56,44 +60,63 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\Bin64\</OutputPath>
-    <DocumentationFile>atcHspfReadWrite.xml</DocumentationFile>
+    <DocumentationFile>atcTimeseriesScript.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
-    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
-    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\Bin64\</OutputPath>
-    <DocumentationFile>atcHspfReadWrite.xml</DocumentationFile>
+    <DocumentationFile>atcTimeseriesScript.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
     <DebugType>None</DebugType>
     <PlatformTarget>x64</PlatformTarget>
-    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MapWinUtility, Version=1.0.3229.21739, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="MapWinUtility, Version=4.8.2.40801, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Bin\MapWinUtility.dll</HintPath>
+      <HintPath>..\..\MapWindow4Dev\Bin64\MapWinUtility.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
     <Import Include="System" />
     <Import Include="System.Collections" />
     <Import Include="System.Collections.Generic" />
-    <Import Include="System.Diagnostics" />
-    <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="modHspfReadWrite.vb" />
+    <Compile Include="atcTimeseriesScript.vb" />
+    <Compile Include="clsATCscriptExpression.vb" />
+    <Compile Include="frmDebugScript.designer.vb">
+      <DependentUpon>frmDebugScript.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmDebugScript.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmInputWizard.Designer.vb">
+      <DependentUpon>frmInputWizard.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmInputWizard.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSelectScript.designer.vb">
+      <DependentUpon>frmSelectScript.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSelectScript.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="modATCscript.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -111,6 +134,15 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmDebugScript.resX">
+      <DependentUpon>frmDebugScript.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmInputWizard.resX">
+      <DependentUpon>frmInputWizard.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSelectScript.resX">
+      <DependentUpon>frmSelectScript.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
@@ -119,7 +151,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
@@ -129,18 +160,6 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\atcUCI\atcUCI10.vbproj">
-      <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>
-      <Name>atcUCI10</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcUtility\atcUtility10.vbproj">
-      <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
-      <Name>atcUtility10</Name>
-      <Private>False</Private>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -159,7 +178,24 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\atcControls\atcControls10.vbproj">
+      <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
+      <Name>atcControls10</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcData\atcData10.vbproj">
+      <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
+      <Name>atcData10</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUtility\atcUtility10.vbproj">
+      <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
+      <Name>atcUtility10</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

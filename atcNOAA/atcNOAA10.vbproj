@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
@@ -108,11 +108,6 @@
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
-    </Reference>
-    <Reference Include="MapWinInterfaces">
-      <HintPath>..\..\MapWindow4Dev\Bin64\MapWinInterfaces.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
