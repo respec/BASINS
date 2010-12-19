@@ -1,0 +1,36 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+atcSWSTAT
+</name>
+</assembly>
+<members>
+<member name="P:atcSWSTAT.My.Resources.Resources.ResourceManager">
+	<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member><member name="P:atcSWSTAT.My.Resources.Resources.Culture">
+	<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member><member name="T:atcSWSTAT.My.Resources.Resources">
+	<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member><member name="M:atcSWSTAT.atcFrequencyGridSource.#ctor(atcData.atcTimeseriesGroup,System.Double[],System.Double[])">
+	<summary>
+ Create grid source for displaying N-Day/Return Interval values
+ </summary>
+	<param name="aDataGroup">Timeseries data whose attributes to display</param>
+	<param name="aNdays">Which numbers of days are displayed (Nothing = display all present in attributes)</param>
+	<param name="aNyears">Which return periods are displayed (Nothing = display all present in attributes)</param>
+	<remarks></remarks>
+</member><member name="M:atcSWSTAT.atcFrequencyGridSource.IsIn(System.Double,System.Double[])">
+	<summary>
+ Return True if aArray is Nothing or else it contains a number within 1e-30 of aNumber
+ </summary>
+</member>
+</members>
+</doc>

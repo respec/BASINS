@@ -6,7 +6,66 @@ atcSWMM
 </name>
 </assembly>
 <members>
-<member name="M:atcSWMM.atcSWMMProject.FilterFileName(System.String)">
+<member name="P:atcSWMM.atcSWMMRainGages.Name">
+	<summary>SWMM block name for [RAINGAGES]</summary>
+	<value></value>
+	<returns>Current name of block</returns>
+	<remarks>Default is "[RAINGAGES]"</remarks>
+</member><member name="M:atcSWMM.atcSWMMRainGages.GetKeyForItem(atcSWMM.atcSWMMRainGage)">
+	<summary>Extract key from RainGage object</summary>
+	<param name="aRainGage">A specific RainGage</param>
+	<returns>Key</returns>
+	<remarks>Key is Name of RainGage</remarks>
+</member><member name="M:atcSWMM.atcSWMMRainGages.#ctor(atcSWMM.atcSWMMProject)">
+	<summary>Constructor for SWMMRainGages</summary>
+	<param name="aSWMMPRoject">Parent project</param>
+	<remarks></remarks>
+</member><member name="T:atcSWMM.atcSWMMRainGages">
+	<summary>Wrapper around SWMM RAINGAGES Block</summary>
+	<remarks></remarks>
+</member><member name="T:atcSWMM.SWMM_RainGage_DataFormat">
+	<summary>Valid values for SWMM Raingage data formats</summary>
+	<remarks></remarks>
+</member><member name="F:atcSWMM.atcSWMMRainGage.Name">
+	<summary>Name of raingage</summary>
+	<remarks></remarks>
+</member><member name="F:atcSWMM.atcSWMMRainGage.Form">
+	<summary>Format of data for raingage</summary>
+	<remarks>Valid values are "INTENSITY", "VOLUME" or "CUMULATIVE"</remarks>
+</member><member name="F:atcSWMM.atcSWMMRainGage.Interval">
+	<summary></summary>
+	<remarks></remarks>
+</member><member name="F:atcSWMM.atcSWMMRainGage.SnowCatchFactor">
+	<summary>Interval of data in hours</summary>
+	<remarks>Default is 1.0</remarks>
+</member><member name="F:atcSWMM.atcSWMMRainGage.Type">
+	<summary>Type of data</summary>
+	<remarks></remarks>
+</member><member name="F:atcSWMM.atcSWMMRainGage.TimeSeries">
+	<summary></summary>
+	<remarks></remarks>
+</member><member name="F:atcSWMM.atcSWMMRainGage.Units">
+	<summary></summary>
+	<remarks></remarks>
+</member><member name="F:atcSWMM.atcSWMMRainGage.YPos">
+	<summary></summary>
+	<remarks></remarks>
+</member><member name="F:atcSWMM.atcSWMMRainGage.XPos">
+	<summary></summary>
+	<remarks></remarks>
+</member><member name="F:atcSWMM.atcSWMMRainGage.ListDates">
+	<summary></summary>
+	<remarks></remarks>
+</member><member name="F:atcSWMM.atcSWMMRainGage.ListValues">
+	<summary></summary>
+	<remarks></remarks>
+</member><member name="F:atcSWMM.atcSWMMRainGage.AuxiParms">
+	<summary></summary>
+	<remarks></remarks>
+</member><member name="T:atcSWMM.atcSWMMRainGage">
+	<summary>Object for storage of individual SWMM raingage</summary>
+	<remarks></remarks>
+</member><member name="M:atcSWMM.atcSWMMProject.FilterFileName(System.String)">
 	<summary>
  Recursive, only use on short string!
  </summary>

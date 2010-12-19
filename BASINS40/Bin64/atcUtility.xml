@@ -151,11 +151,30 @@ atcUtility
  For an invalid month, -1 is returned. 
  For an invalid year and a valid month, the correct number of days is returned, with February = 28.
  </remarks>
+</member><member name="M:atcUtility.modDate.AddUniqueDate(System.Double,System.Double[]@,System.Int32[]@)">
+	<summary>
+ adds a unique MJD date to an array of dates if it is not already there
+ </summary>
+	<param name="aJdate">MJD date to try to add</param>
+	<param name="aJdateExisting">array of current dates</param>
+	<param name="aJDateExistingInterval">array of date intervals corresponding to dates in ja</param>
+	<returns>true if date added, false if date was already in array</returns>
+	<remarks></remarks>
 </member><member name="M:atcUtility.modDate.DumpDate(System.Double)">
 	<summary>
  convert a modfied Julian date to a string
  </summary>
 	<param name="aDateJ">date to convert</param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:atcUtility.modDate.TimAddJ(System.Double,atcUtility.modDate.atcTimeUnit,System.Int32,System.Int32)">
+	<summary>
+ Add (or subtract) specified amount of time to specified date
+ </summary>
+	<param name="aStartDate">starting date</param>
+	<param name="aTimeUnits">time units for add (1-sec,2-min,3-hour,4-day,5-mon,6-year</param>
+	<param name="aTimeStep">time step for add</param>
+	<param name="aNumValues">number of values to add</param>
 	<returns></returns>
 	<remarks></remarks>
 </member><member name="M:atcUtility.modDate.TIMADD(System.Int32[],System.Int32,System.Int32,System.Int32,System.Int32[]@)">
