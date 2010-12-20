@@ -141,7 +141,7 @@ atcData
 	<summary>True if we have read the header and not all the values (to save time and memory)</summary>
 	<remarks>
      Should only be changed by the
-     <see cref="T:atcData.atcDataSource">atcDataSource</see> that reads this
+     <see cref="!:atcData.atcDataSource">atcDataSource</see> that reads this
      timeseries (aFile from New)
  </remarks>
 </member><member name="M:atcData.atcTimeseries.IndexOfValue(System.Double,System.Boolean)">
@@ -201,7 +201,7 @@ atcData
 	<summary>
 		<para>
          Store attributes (and calculate some attributes if given an
-         <see cref="T:atcData.atcTimeseries">atcTimeseries</see>)
+         <see cref="!:atcData.atcTimeseries">atcTimeseries</see>)
      </para>
 	</summary>
 	<remarks>Attributes are stored as a collection of atcDefinedValue</remarks>
@@ -354,7 +354,7 @@ atcData
  </summary>
 </member><member name="P:atcData.atcDataSource.AvailableOperations">
 	<summary>
-		<see cref="T:atcData.atcDataAttributes">atcDataAttributes</see>
+		<see cref="!:atcData.atcDataAttributes">atcDataAttributes</see>
      Operations supported by this source
  </summary>
 	<remarks>defaults to an empty list (nothing available)</remarks>
@@ -898,9 +898,9 @@ atcData
  Set all the controls to default values from current DataGroup
  </summary>
 </member><member name="E:atcData.atcDataGroup.Added">
-	<summary>One or more <see cref="T:atcData.atcDataSet">atcDataSet</see> were just added</summary>
+	<summary>One or more <see cref="!:atcData.atcDataSet">atcDataSet</see> were just added</summary>
 </member><member name="E:atcData.atcDataGroup.Removed">
-	<summary>One or more <see cref="T:atcData.atcDataSet">atcDataSet</see> were just removed</summary>
+	<summary>One or more <see cref="!:atcData.atcDataSet">atcDataSet</see> were just removed</summary>
 	<remarks>aRemoved may contain the dataset(s) removed or may be Nothing</remarks>
 </member><member name="P:atcData.atcDataGroup.Item(System.Int32)">
 	<summary>atcDataSet by index</summary>
@@ -917,7 +917,7 @@ atcData
 	<summary>Create a new data group and add datasets
  to the group with the default key of its serial number</summary>
 </member><member name="M:atcData.atcDataGroup.Add(atcData.atcDataSet)">
-	<summary>Add an <see cref="T:atcData.atcDataSet">atcDataSet</see> 
+	<summary>Add an <see cref="!:atcData.atcDataSet">atcDataSet</see> 
  to the group with the default key of its serial number </summary>
 </member><member name="M:atcData.atcDataGroup.Add(System.Object,atcData.atcDataSet)">
 	<summary>Add a dataset to the group with the key specified</summary>
@@ -944,7 +944,7 @@ atcData
      because this overriding RemoveAt is called by MyBase.Remove--infinite loop
  </remarks>
 </member><member name="M:atcData.atcDataGroup.Remove(atcData.atcDataSet)">
-	<summary>Remove an <see cref="T:atcData.atcDataSet">atcDataSet</see> from this 
+	<summary>Remove an <see cref="!:atcData.atcDataSet">atcDataSet</see> from this 
  group.</summary>
 </member><member name="M:atcData.atcDataGroup.Remove(atcUtility.atcCollection)">
 	<summary>Remove a set of datasets from this group.</summary>
@@ -986,7 +986,7 @@ atcData
 		<para>Sharable between different views of the same data.</para>
 		<para>
          Events are defined to allow different
-         <see cref="T:atcData.atcDataDisplay">displays</see>
+         <see cref="!:atcData.atcDataDisplay">displays</see>
          to remain synchronized
      </para>
 	</remarks>
