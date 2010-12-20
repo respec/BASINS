@@ -117,10 +117,6 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MapWinInterfaces">
-      <HintPath>..\..\MapWindow4Dev\Bin64\MapWinInterfaces.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="MapWinUtility, Version=4.8.2.40620, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\MapWindow4Dev\Bin64\MapWinUtility.dll</HintPath>

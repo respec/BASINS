@@ -90,7 +90,7 @@
     <DebugSymbols>false</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\Bin64\</OutputPath>
+    <OutputPath>..\..\D4EM\Bin64\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>atcMwGisUtility.xml</DocumentationFile>
     <WarningLevel>1</WarningLevel>
@@ -103,7 +103,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\Bin64\</OutputPath>
+    <OutputPath>..\..\D4EM\Bin64\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>atcMwGisUtility.xml</DocumentationFile>
     <Optimize>true</Optimize>
