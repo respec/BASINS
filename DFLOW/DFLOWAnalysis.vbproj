@@ -1,0 +1,181 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B1998404-5A6C-49AB-BE38-ECFDAA8361B0}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>DFLOWAnalysis</RootNamespace>
+    <AssemblyName>DFLOWAnalysis</AssemblyName>
+    <MyType>Windows</MyType>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>DFLOWAnalysis.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>..\BASINS40\Bin\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>DFLOWAnalysis.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MapWinInterfaces, Version=4.3.2955.40261, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\BASINS40\Bin\MapWinInterfaces.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Diagnostics" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="frmAboutDFLOW.Designer.vb">
+      <DependentUpon>frmAboutDFLOW.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAboutDFLOW.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DFLOWAnalysisPlugin.vb" />
+    <Compile Include="DFLOWCalcs.vb" />
+    <Compile Include="frmDFLOWExcursions.Designer.vb">
+      <DependentUpon>frmDFLOWExcursions.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmDFLOWExcursions.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDFLOWProgress.Designer.vb">
+      <DependentUpon>frmDFLOWProgress.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmDFLOWProgress.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDFLOWArgs.Designer.vb">
+      <DependentUpon>frmDFLOWArgs.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmDFLOWArgs.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDFLOWResults.Designer.vb">
+      <DependentUpon>frmDFLOWResults.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmDFLOWResults.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="frmAboutDFLOW.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmAboutDFLOW.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDFLOWArgs.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmDFLOWArgs.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDFLOWExcursions.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmDFLOWExcursions.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDFLOWProgress.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmDFLOWProgress.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDFLOWResults.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmDFLOWResults.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BASINS40\atcControls\atcControls.vbproj">
+      <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
+      <Name>atcControls</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\BASINS40\atcData\atcData.vbproj">
+      <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
+      <Name>atcData</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\BASINS40\atcTimeseriesNdayHighLow\atcTimeseriesNdayHighLow.vbproj">
+      <Project>{24EEBEFB-2B19-489D-B3AF-9FE00A56346E}</Project>
+      <Name>atcTimeseriesNdayHighLow</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\BASINS40\atcUtility\atcUtility.vbproj">
+      <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
+      <Name>atcUtility</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility.vbproj">
+      <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
+      <Name>BASINS-MapWinUtility</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
