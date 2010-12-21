@@ -21,7 +21,7 @@ Public Class atcSWMMProject
     Public Tags As atcSWMMBlock 'TODO: create class
     Public Map As atcSWMMBlock 'TODO: create class
     Public Nodes As atcSWMMNodes
-    Public Landuses As atcSWMMLanduses
+
     Public RainGages As atcSWMMRainGages
     Public Evaporation As atcSWMMEvaporation
     Public Temperature As atcSWMMTemperature
@@ -30,6 +30,7 @@ Public Class atcSWMMProject
     'Public Controls As atcSWMMControls
 
     Public Title As atcSWMMBlock
+    Public Timeseries As atcSWMMBlock
     Public Coordinates As atcSWMMBlock
     Public Vertices As atcSWMMBlock
     Public Polygons As atcSWMMBlock
@@ -49,59 +50,90 @@ Public Class atcSWMMProject
 
     Public Overrides Sub Clear()
         MyBase.Clear()
-        Title = New atcSWMMBlock("[TITLE]", "")
-        BackdropFile = ""
-
-        Options = New atcSWMMOptions
-        Catchments = New atcSWMMCatchments(Me)
-        Conduits = New atcSWMMConduits(Me)
-        Losses = New atcSWMMBlock("[LOSSES]", _
-                                  ";;Link           Inlet      Outlet     Average    Flap Gate " & vbCrLf _
-                                & ";;-------------- ---------- ---------- ---------- ----------" & vbCrLf)
-        Report = New atcSWMMBlock("[REPORT]", _
-                                  "INPUT      NO" & vbCrLf _
-                                & "CONTROLS   NO")
-        Tags = New atcSWMMBlock("[TAGS]", "")
-        Map = New atcSWMMBlock("[MAP]", _
-                               "UNITS      " & MapUnits)
-        Nodes = New atcSWMMNodes
-        Landuses = New atcSWMMLanduses(Me)
-        RainGages = New atcSWMMRainGages(Me)
-        Evaporation = New atcSWMMEvaporation(Me)
-        Temperature = New atcSWMMTemperature(Me)
-
-        Coordinates = New atcSWMMBlock("[COORDINATES]", "")
-        Vertices = New atcSWMMBlock("[VERTICES]", "")
-        Polygons = New atcSWMMBlock("[Polygons]", "")
-        Symbols = New atcSWMMBlock("[SYMBOLS]", "")
-        Backdrop = New atcSWMMBlock("[BACKDROP]", "")
-
         Blocks = New atcSWMMBlocks
         With Blocks
+
+            Title = New atcSWMMBlock("[TITLE]", "")
             .Add(Title)
+
+            Options = New atcSWMMOptions
             .Add(Options)
+
+            Evaporation = New atcSWMMEvaporation(Me)
             .Add(Evaporation)
+
+            Temperature = New atcSWMMTemperature(Me)
             .Add(Temperature)
+
+            RainGages = New atcSWMMRainGages(Me)
             .Add(RainGages)
+
+            Catchments = New atcSWMMCatchments(Me)
             .Add(Catchments)
+
+            Nodes = New atcSWMMNodes
             .Add(Nodes)
+
+            Conduits = New atcSWMMConduits(Me)
             .Add(Conduits)
+
+            Losses = New atcSWMMBlock("[LOSSES]", _
+                                      ";;Link           Inlet      Outlet     Average    Flap Gate " & vbCrLf _
+                                    & ";;-------------- ---------- ---------- ---------- ----------")
             .Add(Losses)
-            .Add(Landuses)
+
+            Landuses = New atcSWMMLanduses(Me)
+
+            Timeseries = New atcSWMMBlock("[TIMESERIES]", "")
+            .Add(Timeseries)
+
+            Report = New atcSWMMBlock("[REPORT]", _
+                                      "INPUT      NO" & vbCrLf _
+                                    & "CONTROLS   NO")
             .Add(Report)
+
+            Tags = New atcSWMMBlock("[TAGS]", "")
             .Add(Tags)
+
+            Map = New atcSWMMBlock("[MAP]", _
+                                   "UNITS      " & MapUnits)
             .Add(Map)
+            
+            Coordinates = New atcSWMMBlock("[COORDINATES]", "")
             .Add(Coordinates)
+
+            Vertices = New atcSWMMBlock("[VERTICES]", "")
             .Add(Vertices)
+
+            Polygons = New atcSWMMBlock("[Polygons]", "")
             .Add(Polygons)
+
+            Symbols = New atcSWMMBlock("[SYMBOLS]", "")
             .Add(Symbols)
+
+            Backdrop = New atcSWMMBlock("[BACKDROP]", "")
+            BackdropFile = ""
             .Add(Backdrop)
         End With
 
-        'Blocks.Add(Controls)
-        'Blocks.Add(Pumps)
-        'Blocks.Add(Pollutants)
     End Sub
+
+    Public Property Landuses() As atcSWMMLanduses
+        Get
+            Return Blocks("[LANDUSES]")
+        End Get
+        Set(ByVal value As atcSWMMLanduses)
+            Dim lLanduseIndex As Integer
+            If Blocks.Contains("[LANDUSES]") Then
+                Dim lLanduses As atcSWMMLanduses = Blocks("[LANDUSES]")
+                lLanduseIndex = Blocks.IndexOf(lLanduses)
+                Blocks.RemoveAt(lLanduseIndex)
+            Else
+                lLanduseIndex = Blocks.Count
+            End If
+            Blocks.Insert(lLanduseIndex, value)
+        End Set
+    End Property
 
     Public Property IsMetric() As Boolean
         Get
@@ -392,7 +424,6 @@ Public Class atcSWMMProject
                     'lSW.WriteLine(Losses.ToString)
                     lSW.WriteLine(lBlock.ToString)
                 Case "[LANDUSES]"
-                    'lSW.WriteLine(Landuses.ToString)
                     lSW.WriteLine(lBlock.ToString)
                 Case "[COVERAGES]"
                     'lSW.WriteLine(Landuses.CoveragesToString)
@@ -413,7 +444,6 @@ Public Class atcSWMMProject
                         'more than 30 days, write to file
                         If Temperature.Timeseries IsNot Nothing Then
                             lSW.WriteLine(Temperature.TimeSeriesFileNamesToString)
-                            lSW.WriteLine()
                         End If
                         If Evaporation.Timeseries IsNot Nothing Then
                             lSW.WriteLine(Evaporation.TimeSeriesFileNamesToString)
@@ -422,7 +452,6 @@ Public Class atcSWMMProject
                         If Temperature.Timeseries IsNot Nothing Then Temperature.TimeSeriesToFile()
                         If Evaporation.Timeseries IsNot Nothing Then Evaporation.TimeSeriesToFile()
                     End If
-                    lSW.WriteLine()
                 Case "[REPORT]"
                     'lSW.WriteLine(Report.ToString)
                     lSW.WriteLine(lBlock.ToString)
@@ -469,10 +498,7 @@ Public Class atcSWMMProject
                     End If
                 Case Else
                     'Write any blocks not already written above
-                    'For Each lBlock As IBlock In Blocks
-                    'If Not lBlocksWritten.ToString.Contains(lBlock.Name.ToUpper) Then
                     lSW.WriteLine(lBlock.ToString)
-                    'End If
             End Select
         Next
 

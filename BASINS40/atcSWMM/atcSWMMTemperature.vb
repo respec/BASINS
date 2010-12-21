@@ -108,7 +108,6 @@ Public Class atcSWMMTemperature
                 Next
             Next
         End If
-        lSB.AppendLine()
         Return lSB.ToString
     End Function
 

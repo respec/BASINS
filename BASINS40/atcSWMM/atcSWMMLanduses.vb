@@ -129,6 +129,7 @@ Public Class atcSWMMLanduses
         Next
 
         If Not pSWMMProject.Blocks.Contains("[COVERAGES]") Then
+            lSB.Append(vbCrLf)
             lSB.Append(CoveragesToString)
         End If
 
