@@ -1,0 +1,46 @@
+BASINS framework questions
+--------------------------
+
+- Improper exit when canceling out of forms?
+
+- Can't rerun plugin
+
+- Expected operability - transition from form to form, menu choices in main (DFLOW Results) form?
+
+- CheckedBoxList supported?
+
+- Form at different text sizes
+
+- Help file format
+
+- Right way to handle subset of dates?
+
+- xQ1 calculation?
+
+- Percentile, harmonic mean calculations
+
+- Text controls for entry of real and integers
+
+- Significant figure methods?
+
+- Right code & target (problems working with Nov download)
+
+- Standalone version
+
+- Version of Visual Studio to use
+
+
+DFLOW calculation issues
+------------------------
+
+- Show excursions for lower guess
+
+- Check logic for alternative hydrologic values
+
+
+
+
+
+
+
+
