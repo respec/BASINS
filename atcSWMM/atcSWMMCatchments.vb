@@ -165,9 +165,11 @@ Public Class atcSWMMCatchments
         Next
 
         If Not pSWMMProject.Blocks.Contains("[SUBAREAS]") Then
+            lSB.Append(vbCrLf)
             lSB.Append(SubareasToString)
         End If
         If Not pSWMMProject.Blocks.Contains("[INFILTRATION]") Then
+            lSB.Append(vbCrLf)
             lSB.Append(InfiltrationToString)
         End If
 

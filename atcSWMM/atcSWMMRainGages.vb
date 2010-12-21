@@ -258,7 +258,7 @@ Public Class atcSWMMRainGages
                     lSB.AppendLine(lFileName)
                     Continue For
                 Else
-                    lFileName = IO.Path.GetFileName(PathNameOnly(Me.pSWMMProject.Specification) & g_PathChar & .Name & "P.DAT")
+                    lFileName = PathNameOnly(Me.pSWMMProject.Specification) & g_PathChar & .Name & "P.DAT"
                 End If
 
                 'lSB.Append(StrPad("""" & PathNameOnly(Me.pSWMMProject.FileName) & g_PathChar & .Name & "P.DAT" & """", 16, " ", False))
