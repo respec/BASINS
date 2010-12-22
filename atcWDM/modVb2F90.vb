@@ -131,16 +131,19 @@ Module Vb2F90
                    ByRef aMin As Single, ByRef aMax As Single, ByRef aDef As Single, _
                    ByRef aHLen As Integer, ByRef aHRec As Integer, ByRef aHPos As Integer, _
                    ByRef aVLen As Integer, ByRef aName As String, ByRef aDesc As String, ByRef aValid As String)
-        Dim lName(6) As Integer
+        Dim lName(5) As Integer
         Dim lDesc(47) As Integer
-        Dim lValid(240) As Integer
+        Dim lValid(239) As Integer
         F90_WDSAGY_XX(aWdmUnit, aSaind, _
                       aLen, aType, _
                       aMin, aMax, aDef, _
                       aHLen, aHRec, aHPos, _
                       aVLen, lName, lDesc, lValid)
         NumChr(6, lName, aName)
-        NumChr(47, lDesc, aDesc)
+        If aName.Length = 0 AndAlso aSaind < 290 Then
+            MapWinUtility.Logger.Dbg("WhyNoNameAt " & aSaind.ToString)
+        End If
+        NumChr(48, lDesc, aDesc)
         NumChr(aVLen, lValid, aValid)
     End Sub
 End Module
