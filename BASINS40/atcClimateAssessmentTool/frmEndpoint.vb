@@ -32,6 +32,7 @@ Public Class frmEndpoint
     Friend WithEvents lblThreshold As System.Windows.Forms.Label
     Friend WithEvents txtEventVolume As System.Windows.Forms.TextBox
     Friend WithEvents txtEventDuration As System.Windows.Forms.TextBox
+    Friend WithEvents btnSelectAttributes As System.Windows.Forms.Button
 
     Private pSettingFormSeason As Boolean = False
 
@@ -131,6 +132,7 @@ Public Class frmEndpoint
         Me.lblThreshold = New System.Windows.Forms.Label
         Me.txtEventVolume = New System.Windows.Forms.TextBox
         Me.txtEventDuration = New System.Windows.Forms.TextBox
+        Me.btnSelectAttributes = New System.Windows.Forms.Button
         Me.GroupBox1.SuspendLayout()
         Me.grpSeasons.SuspendLayout()
         Me.panelOperation.SuspendLayout()
@@ -340,9 +342,8 @@ Public Class frmEndpoint
         Me.cboAttribute.Location = New System.Drawing.Point(101, 64)
         Me.cboAttribute.MaxDropDownItems = 20
         Me.cboAttribute.Name = "cboAttribute"
-        Me.cboAttribute.Size = New System.Drawing.Size(217, 21)
+        Me.cboAttribute.Size = New System.Drawing.Size(185, 21)
         Me.cboAttribute.TabIndex = 5
-        Me.cboAttribute.Text = "ComboBox1"
         '
         'grpSeasons
         '
@@ -600,12 +601,22 @@ Public Class frmEndpoint
         Me.txtEventDuration.TabIndex = 36
         Me.txtEventDuration.Text = "0"
         '
+        'btnSelectAttributes
+        '
+        Me.btnSelectAttributes.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnSelectAttributes.Location = New System.Drawing.Point(292, 64)
+        Me.btnSelectAttributes.Name = "btnSelectAttributes"
+        Me.btnSelectAttributes.Size = New System.Drawing.Size(26, 21)
+        Me.btnSelectAttributes.TabIndex = 7
+        Me.btnSelectAttributes.Text = "..."
+        Me.btnSelectAttributes.UseVisualStyleBackColor = True
+        '
         'frmEndpoint
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.ClientSize = New System.Drawing.Size(336, 633)
+        Me.Controls.Add(Me.btnSelectAttributes)
         Me.Controls.Add(Me.grpEvents)
-        Me.Controls.Add(Me.panelOperation)
         Me.Controls.Add(Me.lblAttribute)
         Me.Controls.Add(Me.grpSeasons)
         Me.Controls.Add(Me.cboAttribute)
@@ -616,6 +627,7 @@ Public Class frmEndpoint
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnOk)
         Me.Controls.Add(Me.lblData)
+        Me.Controls.Add(Me.panelOperation)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
         Me.Name = "frmEndpoint"
@@ -644,11 +656,19 @@ Public Class frmEndpoint
             panelOperation.Visible = True
             grpSeasons.Visible = False
         Else
-            For Each lAttribute As atcAttributeDefinition In atcDataAttributes.AllDefinitions
-                If lAttribute.TypeString.ToLower.Equals("double") AndAlso atcDataAttributes.IsSimple(lAttribute) Then
-                    cboAttribute.Items.Add(lAttribute.Name)
-                End If
-            Next
+            Dim lAttributeNames As New Generic.List(Of String)
+            Dim lSettingNames As String = GetSetting("BasinsCAT", "Settings", "Attributes", "")
+            If lSettingNames.Length > 0 Then
+                lAttributeNames.AddRange(lSettingNames.Split(vbLf))
+            Else
+                For Each lAttribute As atcAttributeDefinition In atcDataAttributes.AllDefinitions
+                    If lAttribute.TypeString.ToLower.Equals("double") AndAlso atcDataAttributes.IsSimple(lAttribute) Then
+                        lAttributeNames.Add(lAttribute.Name)
+                    End If
+                Next
+            End If
+
+            cboAttribute.Items.AddRange(lAttributeNames.ToArray)
 
             'cboSeasons.Items.Add(AllSeasons)
             pSeasonsAvailable = atcSeasonPlugin.AllSeasonTypes
@@ -983,4 +1003,15 @@ Public Class frmEndpoint
         End If
     End Sub
 
+    Private Sub btnSelectAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSelectAttributes.Click
+        Dim lAttributesForm As New frmAttributes
+        Dim lAttributes(cboAttribute.Items.Count - 1) As String
+        For lItemIndex As Integer = lAttributes.GetUpperBound(0) To 0 Step -1
+            lAttributes(lItemIndex) = cboAttribute.Items(lItemIndex)
+        Next
+        If lAttributesForm.AskUser(lAttributes) Then
+            cboAttribute.Items.Clear()
+            cboAttribute.Items.AddRange(lAttributes)
+        End If
+    End Sub
 End Class

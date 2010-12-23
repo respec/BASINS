@@ -16,8 +16,32 @@ Public Class frmCAT
 
         'This call is required by the Windows Form Designer.
         InitializeComponent()
-
         'Add any initialization after the InitializeComponent() call
+
+        'Create menu items to directly open recently opened models
+        Dim lNumRecentMenus As Integer = 0
+
+        Dim lRecentSetups As String = GetSetting("BasinsCAT", "Recent", "Setups")
+        For Each lRecentSetup As String In lRecentSetups.Split(";"c)
+            If IO.File.Exists(lRecentSetup) Then
+                If lNumRecentMenus = 0 Then mnuFile.MenuItems.Add(New MenuItem("-"))
+                mnuFile.MenuItems.Add(New MenuItem(lRecentSetup, AddressOf mnuOpenRecent_Click))
+                lstRecent.Items.Add(lRecentSetup)
+                lNumRecentMenus += 1
+                If lNumRecentMenus > 9 Then Exit For
+            End If
+        Next
+        
+        Dim lRecentModels As String = GetSetting("BasinsCAT", "Recent", "Models")
+        For Each lRecentModel As String In lRecentModels.Split(";"c)
+            If IO.File.Exists(lRecentModel) Then
+                If lNumRecentMenus = 0 Then mnuFile.MenuItems.Add(New MenuItem("-"))
+                mnuFile.MenuItems.Add(New MenuItem(lRecentModel, AddressOf mnuOpenRecent_Click))
+                lstRecent.Items.Add(lRecentModel)
+                lNumRecentMenus += 1
+                If lNumRecentMenus > 9 Then Exit For
+            End If
+        Next
 
     End Sub
 
@@ -69,27 +93,27 @@ Public Class frmCAT
     Friend WithEvents btnEndpointModify As System.Windows.Forms.Button
     Friend WithEvents btnEndpointAdd As System.Windows.Forms.Button
     Friend WithEvents lstEndpoints As System.Windows.Forms.CheckedListBox
-    Friend WithEvents txtModifiedScenarioName As System.Windows.Forms.TextBox
-    Friend WithEvents lblBaseScenarioName As System.Windows.Forms.Label
-    Friend WithEvents lblNewScenarioName As System.Windows.Forms.Label
+    Friend WithEvents txtModifiedModelName As System.Windows.Forms.TextBox
+    Friend WithEvents lblBaseModelName As System.Windows.Forms.Label
+    Friend WithEvents lblNewModelName As System.Windows.Forms.Label
     Friend WithEvents agdResults As atcControls.atcGrid
-    Friend WithEvents mnuFileSep1 As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuFileSep2 As System.Windows.Forms.MenuItem
     Friend WithEvents mnuLoadResults As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuLoadVariations As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuSaveVariations As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuOpenSetup As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuSaveSetup As System.Windows.Forms.MenuItem
     Friend WithEvents lblTop As System.Windows.Forms.Label
     Friend WithEvents btnStop As System.Windows.Forms.Button
     Friend WithEvents lblAllResults As System.Windows.Forms.Label
     Friend WithEvents chkSaveAll As System.Windows.Forms.CheckBox
     Friend WithEvents mnuPivotHeaders As System.Windows.Forms.MenuItem
     Friend WithEvents mnuOptions As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuFileSep2 As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuFileSep3 As System.Windows.Forms.MenuItem
     Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
     Friend WithEvents btnInputAddCligen As System.Windows.Forms.Button
     Friend WithEvents chkShowEachRunProgress As System.Windows.Forms.CheckBox
     Friend WithEvents btnEndpointCopy As System.Windows.Forms.Button
     Friend WithEvents mnuOpenUCI As System.Windows.Forms.MenuItem
-    Friend WithEvents txtBaseScenario As System.Windows.Forms.TextBox
+    Friend WithEvents txtBaseModel As System.Windows.Forms.TextBox
     Friend WithEvents btnInputPrepared As System.Windows.Forms.Button
     Friend WithEvents btnInputView As System.Windows.Forms.Button
     Friend WithEvents btnEndpointBottom As System.Windows.Forms.Button
@@ -97,25 +121,52 @@ Public Class frmCAT
     Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
     Friend WithEvents btnPlot As System.Windows.Forms.Button
     Friend WithEvents mnuOpenSWAT As System.Windows.Forms.MenuItem
-    Friend WithEvents lblOpen As System.Windows.Forms.Label
     Friend WithEvents mnuOpenSWMM As System.Windows.Forms.MenuItem
     Friend WithEvents chkRun As System.Windows.Forms.CheckBox
+    Friend WithEvents mnuFileSep1 As System.Windows.Forms.MenuItem
+    Friend WithEvents tabModel As System.Windows.Forms.TabPage
+    Friend WithEvents grpModel As System.Windows.Forms.GroupBox
+    Friend WithEvents btnOpenSWMM As System.Windows.Forms.Button
+    Friend WithEvents btnOpenSWAT As System.Windows.Forms.Button
+    Friend WithEvents btnOpenHSPF As System.Windows.Forms.Button
+    Friend WithEvents grpCATstate As System.Windows.Forms.GroupBox
+    Friend WithEvents btnSaveClimateEndpoint As System.Windows.Forms.Button
+    Friend WithEvents btnOpenClimateEndpoint As System.Windows.Forms.Button
+    Friend WithEvents grpResults As System.Windows.Forms.GroupBox
+    Friend WithEvents btnSaveResults As System.Windows.Forms.Button
+    Friend WithEvents btnOpenResults As System.Windows.Forms.Button
+    Friend WithEvents grpRecent As System.Windows.Forms.GroupBox
+    Friend WithEvents lstRecent As System.Windows.Forms.ListView
+    Friend WithEvents lblDrop As System.Windows.Forms.Label
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmCAT))
         Me.myTabs = New System.Windows.Forms.TabControl
+        Me.tabModel = New System.Windows.Forms.TabPage
+        Me.grpRecent = New System.Windows.Forms.GroupBox
+        Me.lstRecent = New System.Windows.Forms.ListView
+        Me.grpResults = New System.Windows.Forms.GroupBox
+        Me.btnSaveResults = New System.Windows.Forms.Button
+        Me.btnOpenResults = New System.Windows.Forms.Button
+        Me.grpCATstate = New System.Windows.Forms.GroupBox
+        Me.btnSaveClimateEndpoint = New System.Windows.Forms.Button
+        Me.btnOpenClimateEndpoint = New System.Windows.Forms.Button
+        Me.grpModel = New System.Windows.Forms.GroupBox
+        Me.btnOpenSWMM = New System.Windows.Forms.Button
+        Me.btnOpenSWAT = New System.Windows.Forms.Button
+        Me.btnOpenHSPF = New System.Windows.Forms.Button
         Me.tabInputs = New System.Windows.Forms.TabPage
         Me.btnInputView = New System.Windows.Forms.Button
-        Me.txtBaseScenario = New System.Windows.Forms.TextBox
+        Me.txtBaseModel = New System.Windows.Forms.TextBox
         Me.btnInputDown = New System.Windows.Forms.Button
         Me.btnInputUp = New System.Windows.Forms.Button
         Me.btnInputRemove = New System.Windows.Forms.Button
         Me.btnInputModify = New System.Windows.Forms.Button
         Me.btnInputAdd = New System.Windows.Forms.Button
-        Me.txtModifiedScenarioName = New System.Windows.Forms.TextBox
-        Me.lblBaseScenarioName = New System.Windows.Forms.Label
-        Me.lblNewScenarioName = New System.Windows.Forms.Label
+        Me.txtModifiedModelName = New System.Windows.Forms.TextBox
+        Me.lblBaseModelName = New System.Windows.Forms.Label
+        Me.lblNewModelName = New System.Windows.Forms.Label
         Me.lstInputs = New System.Windows.Forms.CheckedListBox
         Me.btnInputPrepared = New System.Windows.Forms.Button
         Me.btnInputAddCligen = New System.Windows.Forms.Button
@@ -147,12 +198,14 @@ Public Class frmCAT
         Me.mnuFile = New System.Windows.Forms.MenuItem
         Me.mnuOpenUCI = New System.Windows.Forms.MenuItem
         Me.mnuOpenSWAT = New System.Windows.Forms.MenuItem
-        Me.mnuLoadVariations = New System.Windows.Forms.MenuItem
-        Me.mnuSaveVariations = New System.Windows.Forms.MenuItem
+        Me.mnuOpenSWMM = New System.Windows.Forms.MenuItem
         Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
+        Me.mnuOpenSetup = New System.Windows.Forms.MenuItem
+        Me.mnuSaveSetup = New System.Windows.Forms.MenuItem
+        Me.mnuFileSep2 = New System.Windows.Forms.MenuItem
         Me.mnuLoadResults = New System.Windows.Forms.MenuItem
         Me.mnuSaveResults = New System.Windows.Forms.MenuItem
-        Me.mnuFileSep2 = New System.Windows.Forms.MenuItem
+        Me.mnuFileSep3 = New System.Windows.Forms.MenuItem
         Me.mnuSavePivot = New System.Windows.Forms.MenuItem
         Me.mnuEdit = New System.Windows.Forms.MenuItem
         Me.mnuCopyResults = New System.Windows.Forms.MenuItem
@@ -165,10 +218,14 @@ Public Class frmCAT
         Me.btnStop = New System.Windows.Forms.Button
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.btnPlot = New System.Windows.Forms.Button
-        Me.lblOpen = New System.Windows.Forms.Label
-        Me.mnuOpenSWMM = New System.Windows.Forms.MenuItem
         Me.chkRun = New System.Windows.Forms.CheckBox
+        Me.lblDrop = New System.Windows.Forms.Label
         Me.myTabs.SuspendLayout()
+        Me.tabModel.SuspendLayout()
+        Me.grpRecent.SuspendLayout()
+        Me.grpResults.SuspendLayout()
+        Me.grpCATstate.SuspendLayout()
+        Me.grpModel.SuspendLayout()
         Me.tabInputs.SuspendLayout()
         Me.tabEndpoints.SuspendLayout()
         Me.tabResults.SuspendLayout()
@@ -180,35 +237,180 @@ Public Class frmCAT
         Me.myTabs.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.myTabs.Controls.Add(Me.tabModel)
         Me.myTabs.Controls.Add(Me.tabInputs)
         Me.myTabs.Controls.Add(Me.tabEndpoints)
         Me.myTabs.Controls.Add(Me.tabResults)
         Me.myTabs.Controls.Add(Me.tabPivot)
-        Me.myTabs.Location = New System.Drawing.Point(0, 3)
+        Me.myTabs.Location = New System.Drawing.Point(0, 0)
         Me.myTabs.Name = "myTabs"
         Me.myTabs.SelectedIndex = 0
-        Me.myTabs.Size = New System.Drawing.Size(520, 268)
+        Me.myTabs.Size = New System.Drawing.Size(520, 336)
         Me.myTabs.TabIndex = 1
-        Me.myTabs.Visible = False
+        '
+        'tabModel
+        '
+        Me.tabModel.Controls.Add(Me.lblDrop)
+        Me.tabModel.Controls.Add(Me.grpRecent)
+        Me.tabModel.Controls.Add(Me.grpResults)
+        Me.tabModel.Controls.Add(Me.grpCATstate)
+        Me.tabModel.Controls.Add(Me.grpModel)
+        Me.tabModel.Location = New System.Drawing.Point(4, 22)
+        Me.tabModel.Name = "tabModel"
+        Me.tabModel.Size = New System.Drawing.Size(512, 310)
+        Me.tabModel.TabIndex = 4
+        Me.tabModel.Text = "Model"
+        Me.tabModel.UseVisualStyleBackColor = True
+        '
+        'grpRecent
+        '
+        Me.grpRecent.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpRecent.Controls.Add(Me.lstRecent)
+        Me.grpRecent.Location = New System.Drawing.Point(8, 186)
+        Me.grpRecent.Name = "grpRecent"
+        Me.grpRecent.Size = New System.Drawing.Size(495, 99)
+        Me.grpRecent.TabIndex = 5
+        Me.grpRecent.TabStop = False
+        Me.grpRecent.Text = "Open a Recent Model"
+        '
+        'lstRecent
+        '
+        Me.lstRecent.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lstRecent.HideSelection = False
+        Me.lstRecent.Location = New System.Drawing.Point(6, 19)
+        Me.lstRecent.MultiSelect = False
+        Me.lstRecent.Name = "lstRecent"
+        Me.lstRecent.ShowGroups = False
+        Me.lstRecent.Size = New System.Drawing.Size(483, 74)
+        Me.lstRecent.TabIndex = 0
+        Me.lstRecent.UseCompatibleStateImageBehavior = False
+        Me.lstRecent.View = System.Windows.Forms.View.List
+        '
+        'grpResults
+        '
+        Me.grpResults.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpResults.Controls.Add(Me.btnSaveResults)
+        Me.grpResults.Controls.Add(Me.btnOpenResults)
+        Me.grpResults.Location = New System.Drawing.Point(8, 125)
+        Me.grpResults.Name = "grpResults"
+        Me.grpResults.Size = New System.Drawing.Size(495, 55)
+        Me.grpResults.TabIndex = 4
+        Me.grpResults.TabStop = False
+        Me.grpResults.Text = "Open or Save the Results Table"
+        '
+        'btnSaveResults
+        '
+        Me.btnSaveResults.Location = New System.Drawing.Point(87, 19)
+        Me.btnSaveResults.Name = "btnSaveResults"
+        Me.btnSaveResults.Size = New System.Drawing.Size(75, 23)
+        Me.btnSaveResults.TabIndex = 1
+        Me.btnSaveResults.Text = "Save"
+        Me.btnSaveResults.UseVisualStyleBackColor = True
+        '
+        'btnOpenResults
+        '
+        Me.btnOpenResults.Location = New System.Drawing.Point(6, 19)
+        Me.btnOpenResults.Name = "btnOpenResults"
+        Me.btnOpenResults.Size = New System.Drawing.Size(75, 23)
+        Me.btnOpenResults.TabIndex = 0
+        Me.btnOpenResults.Text = "Open"
+        Me.btnOpenResults.UseVisualStyleBackColor = True
+        '
+        'grpCATstate
+        '
+        Me.grpCATstate.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpCATstate.Controls.Add(Me.btnSaveClimateEndpoint)
+        Me.grpCATstate.Controls.Add(Me.btnOpenClimateEndpoint)
+        Me.grpCATstate.Location = New System.Drawing.Point(8, 64)
+        Me.grpCATstate.Name = "grpCATstate"
+        Me.grpCATstate.Size = New System.Drawing.Size(495, 55)
+        Me.grpCATstate.TabIndex = 3
+        Me.grpCATstate.TabStop = False
+        Me.grpCATstate.Text = "Open or save a model with CAT settings for Climate Data and Assessment Endpoints"
+        '
+        'btnSaveClimateEndpoint
+        '
+        Me.btnSaveClimateEndpoint.Location = New System.Drawing.Point(87, 19)
+        Me.btnSaveClimateEndpoint.Name = "btnSaveClimateEndpoint"
+        Me.btnSaveClimateEndpoint.Size = New System.Drawing.Size(75, 23)
+        Me.btnSaveClimateEndpoint.TabIndex = 1
+        Me.btnSaveClimateEndpoint.Text = "Save"
+        Me.btnSaveClimateEndpoint.UseVisualStyleBackColor = True
+        '
+        'btnOpenClimateEndpoint
+        '
+        Me.btnOpenClimateEndpoint.Location = New System.Drawing.Point(6, 19)
+        Me.btnOpenClimateEndpoint.Name = "btnOpenClimateEndpoint"
+        Me.btnOpenClimateEndpoint.Size = New System.Drawing.Size(75, 23)
+        Me.btnOpenClimateEndpoint.TabIndex = 0
+        Me.btnOpenClimateEndpoint.Text = "Open"
+        Me.btnOpenClimateEndpoint.UseVisualStyleBackColor = True
+        '
+        'grpModel
+        '
+        Me.grpModel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpModel.Controls.Add(Me.btnOpenSWMM)
+        Me.grpModel.Controls.Add(Me.btnOpenSWAT)
+        Me.grpModel.Controls.Add(Me.btnOpenHSPF)
+        Me.grpModel.Location = New System.Drawing.Point(8, 3)
+        Me.grpModel.Name = "grpModel"
+        Me.grpModel.Size = New System.Drawing.Size(495, 55)
+        Me.grpModel.TabIndex = 0
+        Me.grpModel.TabStop = False
+        Me.grpModel.Text = "Open a model with no saved CAT settings"
+        '
+        'btnOpenSWMM
+        '
+        Me.btnOpenSWMM.Location = New System.Drawing.Point(168, 19)
+        Me.btnOpenSWMM.Name = "btnOpenSWMM"
+        Me.btnOpenSWMM.Size = New System.Drawing.Size(75, 23)
+        Me.btnOpenSWMM.TabIndex = 2
+        Me.btnOpenSWMM.Text = "SWMM .inp"
+        Me.btnOpenSWMM.UseVisualStyleBackColor = True
+        '
+        'btnOpenSWAT
+        '
+        Me.btnOpenSWAT.Location = New System.Drawing.Point(87, 19)
+        Me.btnOpenSWAT.Name = "btnOpenSWAT"
+        Me.btnOpenSWAT.Size = New System.Drawing.Size(75, 23)
+        Me.btnOpenSWAT.TabIndex = 1
+        Me.btnOpenSWAT.Text = "SWAT .dbf"
+        Me.btnOpenSWAT.UseVisualStyleBackColor = True
+        '
+        'btnOpenHSPF
+        '
+        Me.btnOpenHSPF.Location = New System.Drawing.Point(6, 19)
+        Me.btnOpenHSPF.Name = "btnOpenHSPF"
+        Me.btnOpenHSPF.Size = New System.Drawing.Size(75, 23)
+        Me.btnOpenHSPF.TabIndex = 0
+        Me.btnOpenHSPF.Text = "HSPF .uci"
+        Me.btnOpenHSPF.UseVisualStyleBackColor = True
         '
         'tabInputs
         '
         Me.tabInputs.Controls.Add(Me.btnInputView)
-        Me.tabInputs.Controls.Add(Me.txtBaseScenario)
+        Me.tabInputs.Controls.Add(Me.txtBaseModel)
         Me.tabInputs.Controls.Add(Me.btnInputDown)
         Me.tabInputs.Controls.Add(Me.btnInputUp)
         Me.tabInputs.Controls.Add(Me.btnInputRemove)
         Me.tabInputs.Controls.Add(Me.btnInputModify)
         Me.tabInputs.Controls.Add(Me.btnInputAdd)
-        Me.tabInputs.Controls.Add(Me.txtModifiedScenarioName)
-        Me.tabInputs.Controls.Add(Me.lblBaseScenarioName)
-        Me.tabInputs.Controls.Add(Me.lblNewScenarioName)
+        Me.tabInputs.Controls.Add(Me.txtModifiedModelName)
+        Me.tabInputs.Controls.Add(Me.lblBaseModelName)
+        Me.tabInputs.Controls.Add(Me.lblNewModelName)
         Me.tabInputs.Controls.Add(Me.lstInputs)
         Me.tabInputs.Controls.Add(Me.btnInputPrepared)
         Me.tabInputs.Controls.Add(Me.btnInputAddCligen)
         Me.tabInputs.Location = New System.Drawing.Point(4, 22)
         Me.tabInputs.Name = "tabInputs"
-        Me.tabInputs.Size = New System.Drawing.Size(512, 242)
+        Me.tabInputs.Size = New System.Drawing.Size(512, 344)
         Me.tabInputs.TabIndex = 0
         Me.tabInputs.Text = "Climate Data"
         Me.tabInputs.UseVisualStyleBackColor = True
@@ -221,14 +423,14 @@ Public Class frmCAT
         Me.btnInputView.TabIndex = 9
         Me.btnInputView.Text = "View"
         '
-        'txtBaseScenario
+        'txtBaseModel
         '
-        Me.txtBaseScenario.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.txtBaseModel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtBaseScenario.Location = New System.Drawing.Point(96, 8)
-        Me.txtBaseScenario.Name = "txtBaseScenario"
-        Me.txtBaseScenario.Size = New System.Drawing.Size(408, 20)
-        Me.txtBaseScenario.TabIndex = 3
+        Me.txtBaseModel.Location = New System.Drawing.Point(96, 8)
+        Me.txtBaseModel.Name = "txtBaseModel"
+        Me.txtBaseModel.Size = New System.Drawing.Size(408, 20)
+        Me.txtBaseModel.TabIndex = 3
         '
         'btnInputDown
         '
@@ -273,33 +475,33 @@ Public Class frmCAT
         Me.btnInputAdd.Text = "Add"
         Me.ToolTip1.SetToolTip(Me.btnInputAdd, "Create new modification of existing climate data")
         '
-        'txtModifiedScenarioName
+        'txtModifiedModelName
         '
-        Me.txtModifiedScenarioName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.txtModifiedModelName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtModifiedScenarioName.Location = New System.Drawing.Point(96, 34)
-        Me.txtModifiedScenarioName.Name = "txtModifiedScenarioName"
-        Me.txtModifiedScenarioName.Size = New System.Drawing.Size(408, 20)
-        Me.txtModifiedScenarioName.TabIndex = 5
-        Me.txtModifiedScenarioName.Text = "Modified"
+        Me.txtModifiedModelName.Location = New System.Drawing.Point(96, 34)
+        Me.txtModifiedModelName.Name = "txtModifiedModelName"
+        Me.txtModifiedModelName.Size = New System.Drawing.Size(408, 20)
+        Me.txtModifiedModelName.TabIndex = 5
+        Me.txtModifiedModelName.Text = "Modified"
         '
-        'lblBaseScenarioName
+        'lblBaseModelName
         '
-        Me.lblBaseScenarioName.AutoSize = True
-        Me.lblBaseScenarioName.Location = New System.Drawing.Point(8, 11)
-        Me.lblBaseScenarioName.Name = "lblBaseScenarioName"
-        Me.lblBaseScenarioName.Size = New System.Drawing.Size(76, 13)
-        Me.lblBaseScenarioName.TabIndex = 2
-        Me.lblBaseScenarioName.Text = "Base Scenario"
+        Me.lblBaseModelName.AutoSize = True
+        Me.lblBaseModelName.Location = New System.Drawing.Point(8, 11)
+        Me.lblBaseModelName.Name = "lblBaseModelName"
+        Me.lblBaseModelName.Size = New System.Drawing.Size(63, 13)
+        Me.lblBaseModelName.TabIndex = 2
+        Me.lblBaseModelName.Text = "Base Model"
         '
-        'lblNewScenarioName
+        'lblNewModelName
         '
-        Me.lblNewScenarioName.AutoSize = True
-        Me.lblNewScenarioName.Location = New System.Drawing.Point(8, 37)
-        Me.lblNewScenarioName.Name = "lblNewScenarioName"
-        Me.lblNewScenarioName.Size = New System.Drawing.Size(74, 13)
-        Me.lblNewScenarioName.TabIndex = 4
-        Me.lblNewScenarioName.Text = "New Scenario"
+        Me.lblNewModelName.AutoSize = True
+        Me.lblNewModelName.Location = New System.Drawing.Point(8, 37)
+        Me.lblNewModelName.Name = "lblNewModelName"
+        Me.lblNewModelName.Size = New System.Drawing.Size(61, 13)
+        Me.lblNewModelName.TabIndex = 4
+        Me.lblNewModelName.Text = "New Model"
         '
         'lstInputs
         '
@@ -309,7 +511,7 @@ Public Class frmCAT
         Me.lstInputs.IntegralHeight = False
         Me.lstInputs.Location = New System.Drawing.Point(8, 94)
         Me.lstInputs.Name = "lstInputs"
-        Me.lstInputs.Size = New System.Drawing.Size(496, 139)
+        Me.lstInputs.Size = New System.Drawing.Size(496, 241)
         Me.lstInputs.TabIndex = 14
         '
         'btnInputPrepared
@@ -345,7 +547,7 @@ Public Class frmCAT
         Me.tabEndpoints.Controls.Add(Me.btnEndpointAdd)
         Me.tabEndpoints.Location = New System.Drawing.Point(4, 22)
         Me.tabEndpoints.Name = "tabEndpoints"
-        Me.tabEndpoints.Size = New System.Drawing.Size(512, 242)
+        Me.tabEndpoints.Size = New System.Drawing.Size(512, 344)
         Me.tabEndpoints.TabIndex = 1
         Me.tabEndpoints.Text = "Assessment Endpoints"
         Me.tabEndpoints.UseVisualStyleBackColor = True
@@ -411,7 +613,7 @@ Public Class frmCAT
         Me.lstEndpoints.IntegralHeight = False
         Me.lstEndpoints.Location = New System.Drawing.Point(8, 94)
         Me.lstEndpoints.Name = "lstEndpoints"
-        Me.lstEndpoints.Size = New System.Drawing.Size(496, 139)
+        Me.lstEndpoints.Size = New System.Drawing.Size(496, 241)
         Me.lstEndpoints.TabIndex = 22
         '
         'btnEndpointDown
@@ -461,7 +663,7 @@ Public Class frmCAT
         Me.tabResults.Controls.Add(Me.agdResults)
         Me.tabResults.Location = New System.Drawing.Point(4, 22)
         Me.tabResults.Name = "tabResults"
-        Me.tabResults.Size = New System.Drawing.Size(512, 242)
+        Me.tabResults.Size = New System.Drawing.Size(512, 344)
         Me.tabResults.TabIndex = 2
         Me.tabResults.Text = "Results Table"
         Me.tabResults.UseVisualStyleBackColor = True
@@ -480,7 +682,7 @@ Public Class frmCAT
         Me.agdResults.LineWidth = 0.0!
         Me.agdResults.Location = New System.Drawing.Point(8, 8)
         Me.agdResults.Name = "agdResults"
-        Me.agdResults.Size = New System.Drawing.Size(496, 225)
+        Me.agdResults.Size = New System.Drawing.Size(496, 327)
         Me.agdResults.Source = Nothing
         Me.agdResults.TabIndex = 21
         '
@@ -495,7 +697,7 @@ Public Class frmCAT
         Me.tabPivot.Controls.Add(Me.cboPivotRows)
         Me.tabPivot.Location = New System.Drawing.Point(4, 22)
         Me.tabPivot.Name = "tabPivot"
-        Me.tabPivot.Size = New System.Drawing.Size(512, 242)
+        Me.tabPivot.Size = New System.Drawing.Size(512, 344)
         Me.tabPivot.TabIndex = 3
         Me.tabPivot.Text = "Pivot Table"
         Me.tabPivot.UseVisualStyleBackColor = True
@@ -513,7 +715,7 @@ Public Class frmCAT
         Me.agdPivot.LineWidth = 0.0!
         Me.agdPivot.Location = New System.Drawing.Point(8, 89)
         Me.agdPivot.Name = "agdPivot"
-        Me.agdPivot.Size = New System.Drawing.Size(496, 144)
+        Me.agdPivot.Size = New System.Drawing.Size(496, 246)
         Me.agdPivot.Source = Nothing
         Me.agdPivot.TabIndex = 28
         '
@@ -577,7 +779,7 @@ Public Class frmCAT
         'btnStart
         '
         Me.btnStart.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnStart.Location = New System.Drawing.Point(12, 277)
+        Me.btnStart.Location = New System.Drawing.Point(12, 345)
         Me.btnStart.Name = "btnStart"
         Me.btnStart.Size = New System.Drawing.Size(56, 24)
         Me.btnStart.TabIndex = 0
@@ -591,53 +793,63 @@ Public Class frmCAT
         'mnuFile
         '
         Me.mnuFile.Index = 0
-        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuOpenUCI, Me.mnuOpenSWAT, Me.mnuOpenSWMM, Me.mnuLoadVariations, Me.mnuSaveVariations, Me.mnuFileSep1, Me.mnuLoadResults, Me.mnuSaveResults, Me.mnuFileSep2, Me.mnuSavePivot})
+        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuOpenUCI, Me.mnuOpenSWAT, Me.mnuOpenSWMM, Me.mnuFileSep1, Me.mnuOpenSetup, Me.mnuSaveSetup, Me.mnuFileSep2, Me.mnuLoadResults, Me.mnuSaveResults, Me.mnuFileSep3, Me.mnuSavePivot})
         Me.mnuFile.Text = "File"
         '
         'mnuOpenUCI
         '
         Me.mnuOpenUCI.Index = 0
-        Me.mnuOpenUCI.Text = "Open HSPF scenario"
+        Me.mnuOpenUCI.Text = "Open HSPF Model"
         '
         'mnuOpenSWAT
         '
         Me.mnuOpenSWAT.Index = 1
-        Me.mnuOpenSWAT.Text = "Open SWAT scenario"
+        Me.mnuOpenSWAT.Text = "Open SWAT Model"
         '
-        'mnuLoadVariations
+        'mnuOpenSWMM
         '
-        Me.mnuLoadVariations.Index = 3
-        Me.mnuLoadVariations.Text = "Load Climate and Endpoints"
-        '
-        'mnuSaveVariations
-        '
-        Me.mnuSaveVariations.Index = 4
-        Me.mnuSaveVariations.Text = "Save Climate and Endpoints"
+        Me.mnuOpenSWMM.Index = 2
+        Me.mnuOpenSWMM.Text = "Open SWMM Model"
         '
         'mnuFileSep1
         '
-        Me.mnuFileSep1.Index = 5
+        Me.mnuFileSep1.Index = 3
         Me.mnuFileSep1.Text = "-"
         '
-        'mnuLoadResults
+        'mnuOpenSetup
         '
-        Me.mnuLoadResults.Index = 6
-        Me.mnuLoadResults.Text = "Load Results"
+        Me.mnuOpenSetup.Index = 4
+        Me.mnuOpenSetup.Text = "Open Model with CAT Settings"
         '
-        'mnuSaveResults
+        'mnuSaveSetup
         '
-        Me.mnuSaveResults.Index = 7
-        Me.mnuSaveResults.Text = "Save Results"
+        Me.mnuSaveSetup.Index = 5
+        Me.mnuSaveSetup.Text = "Save Model with CAT Settings"
         '
         'mnuFileSep2
         '
-        Me.mnuFileSep2.Index = 8
+        Me.mnuFileSep2.Index = 6
         Me.mnuFileSep2.Text = "-"
+        '
+        'mnuLoadResults
+        '
+        Me.mnuLoadResults.Index = 7
+        Me.mnuLoadResults.Text = "Load Results Table"
+        '
+        'mnuSaveResults
+        '
+        Me.mnuSaveResults.Index = 8
+        Me.mnuSaveResults.Text = "Save Results Table"
+        '
+        'mnuFileSep3
+        '
+        Me.mnuFileSep3.Index = 9
+        Me.mnuFileSep3.Text = "-"
         '
         'mnuSavePivot
         '
-        Me.mnuSavePivot.Index = 9
-        Me.mnuSavePivot.Text = "Save Pivot"
+        Me.mnuSavePivot.Index = 10
+        Me.mnuSavePivot.Text = "Save Pivot Table"
         '
         'mnuEdit
         '
@@ -683,7 +895,7 @@ Public Class frmCAT
         '
         Me.lblTop.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblTop.Location = New System.Drawing.Point(74, 277)
+        Me.lblTop.Location = New System.Drawing.Point(74, 345)
         Me.lblTop.Name = "lblTop"
         Me.lblTop.Size = New System.Drawing.Size(433, 24)
         Me.lblTop.TabIndex = 2
@@ -692,7 +904,7 @@ Public Class frmCAT
         'btnStop
         '
         Me.btnStop.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnStop.Location = New System.Drawing.Point(12, 277)
+        Me.btnStop.Location = New System.Drawing.Point(12, 345)
         Me.btnStop.Name = "btnStop"
         Me.btnStop.Size = New System.Drawing.Size(56, 24)
         Me.btnStop.TabIndex = 3
@@ -702,56 +914,58 @@ Public Class frmCAT
         'btnPlot
         '
         Me.btnPlot.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnPlot.Location = New System.Drawing.Point(451, 277)
+        Me.btnPlot.Location = New System.Drawing.Point(451, 345)
         Me.btnPlot.Name = "btnPlot"
         Me.btnPlot.Size = New System.Drawing.Size(56, 24)
         Me.btnPlot.TabIndex = 4
         Me.btnPlot.Text = "Plot"
         Me.btnPlot.Visible = False
         '
-        'lblOpen
-        '
-        Me.lblOpen.AutoSize = True
-        Me.lblOpen.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblOpen.Location = New System.Drawing.Point(0, 20)
-        Me.lblOpen.Name = "lblOpen"
-        Me.lblOpen.Size = New System.Drawing.Size(444, 24)
-        Me.lblOpen.TabIndex = 5
-        Me.lblOpen.Text = "Open a scenario or load results using the File menu"
-        '
-        'mnuOpenSWMM
-        '
-        Me.mnuOpenSWMM.Index = 2
-        Me.mnuOpenSWMM.Text = "Open SWMM Scenario"
-        '
         'chkRun
         '
         Me.chkRun.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkRun.AutoSize = True
-        Me.chkRun.Location = New System.Drawing.Point(399, 282)
+        Me.chkRun.Checked = True
+        Me.chkRun.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkRun.Location = New System.Drawing.Point(399, 350)
         Me.chkRun.Name = "chkRun"
         Me.chkRun.Size = New System.Drawing.Size(46, 17)
         Me.chkRun.TabIndex = 6
         Me.chkRun.Text = "Run"
         Me.chkRun.UseVisualStyleBackColor = True
-        Me.chkRun.Visible = False
+        '
+        'lblDrop
+        '
+        Me.lblDrop.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lblDrop.AutoSize = True
+        Me.lblDrop.Location = New System.Drawing.Point(11, 288)
+        Me.lblDrop.Name = "lblDrop"
+        Me.lblDrop.Size = New System.Drawing.Size(210, 13)
+        Me.lblDrop.TabIndex = 6
+        Me.lblDrop.Text = "Or drop a model file onto this form to load it."
         '
         'frmCAT
         '
+        Me.AllowDrop = True
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(519, 309)
+        Me.ClientSize = New System.Drawing.Size(519, 377)
         Me.Controls.Add(Me.chkRun)
         Me.Controls.Add(Me.btnPlot)
         Me.Controls.Add(Me.lblTop)
         Me.Controls.Add(Me.btnStart)
         Me.Controls.Add(Me.myTabs)
         Me.Controls.Add(Me.btnStop)
-        Me.Controls.Add(Me.lblOpen)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Menu = Me.MainMenu1
         Me.Name = "frmCAT"
         Me.Text = "Climate Assessment Tool"
         Me.myTabs.ResumeLayout(False)
+        Me.tabModel.ResumeLayout(False)
+        Me.tabModel.PerformLayout()
+        Me.grpRecent.ResumeLayout(False)
+        Me.grpResults.ResumeLayout(False)
+        Me.grpCATstate.ResumeLayout(False)
+        Me.grpModel.ResumeLayout(False)
         Me.tabInputs.ResumeLayout(False)
         Me.tabInputs.PerformLayout()
         Me.tabEndpoints.ResumeLayout(False)
@@ -774,8 +988,9 @@ Public Class frmCAT
     Private pLastUpDownClick As Date = Date.Now
     Private pUpDownButtonDoubleClickSeconds As Double = 0.3
 
-    Private pResultsTabIndex As Integer = 2
+    Private pResultsTabIndex As Integer = 3
     Private WithEvents pCat As clsCat
+    Private pResultsSet As Boolean = False
 
     Public Sub Initialize(ByRef aPlugin As atcClimateAssessmentToolPlugin, _
                  Optional ByVal aCat As clsCat = Nothing)
@@ -809,7 +1024,7 @@ Public Class frmCAT
         RefreshTotalIterations()
 
         pCat.RunModel = (chkRun.Checked)
-        pCat.StartRun(txtModifiedScenarioName.Text)
+        pCat.StartRun(txtModifiedModelName.Text)
 
         SaveSetting("BasinsCAT", "Settings", "TimePerRun", pCat.TimePerRun)
 
@@ -826,15 +1041,14 @@ Public Class frmCAT
         chkSaveAll.Checked = pCat.SaveAll
         chkShowEachRunProgress.Checked = pCat.ShowEachRunProgress
         If pCat.Model Is Nothing Then
-            txtBaseScenario.Text = ""
-            lblOpen.Visible = True
-            myTabs.Visible = False
+            txtBaseModel.Text = ""
+            myTabs.SelectedIndex = 0
+            'TODO: disable other tabs until a model is loaded
             btnStart.Visible = False
             btnPlot.Visible = False
         Else
-            txtBaseScenario.Text = pCat.Model.BaseScenario
-            lblOpen.Visible = False
-            myTabs.Visible = True
+            txtBaseModel.Text = pCat.Model.BaseModel
+            myTabs.SelectedIndex = 1
             btnStart.Visible = True
             'btnPlot.Visible = True
         End If
@@ -1001,14 +1215,17 @@ Public Class frmCAT
     End Sub
 
     Private Sub PopulateResultsGrid(ByVal aNewContentsOfGrid As String)
+        Dim lNewSource As New atcGridSource
+        lNewSource.FixedRows = clsCat.ResultsFixedRows
+        lNewSource.FixedColumns = 1
+        lNewSource.FromString(aNewContentsOfGrid)
+        PopulateResultsGrid(lNewSource)
+    End Sub
+
+    Private Sub PopulateResultsGrid(ByVal aSource As atcGridSource)
         With agdResults
-            .Source = Nothing
-            .Source = New atcGridSource
-            .Source.FixedRows = clsCat.ResultsFixedRows
-            .Source.FixedColumns = 1
-            .Source.FromString(aNewContentsOfGrid)
+            .Initialize(aSource)
             ColorResultsGrid()
-            .Initialize(.Source)
             .SizeAllColumnsToContents()
             .Refresh()
         End With
@@ -1035,16 +1252,17 @@ Public Class frmCAT
         End With
     End Sub
 
-    Private Sub mnuLoadResults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuLoadResults.Click
+    Private Sub mnuLoadResults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuLoadResults.Click, btnOpenResults.Click
         Dim lOpenDialog As New Windows.Forms.OpenFileDialog
         With lOpenDialog
             .FileName = GetSetting("BasinsCAT", "Settings", "LastResults", "Results.txt")
             .Filter = "Text files (*.txt)|*.txt|All files|*.*"
             .FilterIndex = 1
-            .Title = "Scenario Builder - Load Results"
+            .Title = "Load Results"
             If .ShowDialog() = Windows.Forms.DialogResult.OK Then
                 If FileExists(.FileName) Then 'read file into grid
                     PopulateResultsGrid(WholeFileString(.FileName))
+                    pResultsSet = True
                     myTabs.SelectedIndex = pResultsTabIndex
                     SaveSetting("BasinsCAT", "Settings", "LastResults", .FileName)
                 End If
@@ -1053,13 +1271,41 @@ Public Class frmCAT
     End Sub
 
     Private Sub mnuPasteResults_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuPasteResults.Click
-        Dim iData As IDataObject = Clipboard.GetDataObject()
-        If iData.GetDataPresent(DataFormats.Text) Then
-            PopulateResultsGrid(CType(iData.GetData(DataFormats.Text), String))
+        Dim lClipboardData As IDataObject = Clipboard.GetDataObject()
+        If lClipboardData.GetDataPresent(DataFormats.Text) Then
+            PopulateResultsGrid(CType(lClipboardData.GetData(DataFormats.Text), String))
+            pResultsSet = True
+            myTabs.SelectedIndex = pResultsTabIndex
         Else
             Logger.Msg("No text on clipboard to paste into grid", "Paste")
         End If
-        myTabs.SelectedIndex = pResultsTabIndex
+    End Sub
+
+    Private Sub frmCAT_DragDrop(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles Me.DragDrop
+        Me.Activate()
+        If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
+            For Each lFilename As String In e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
+                Select Case IO.Path.GetExtension(lFilename).ToLower
+                    Case ".xml"
+                        OpenXML(lFilename)
+                    Case ".uci"
+                        pCat.Model = New clsCatModelHSPF
+                        pCat.Model.BaseModel = lFilename
+                    Case ".mdb"
+                        pCat.Model = New clsCatModelSWAT
+                        pCat.Model.BaseModel = lFilename
+                    Case ".inp"
+                        pCat.Model = New clsCatModelSWMM
+                        pCat.Model.BaseModel = lFilename
+                End Select
+            Next
+        End If
+    End Sub
+
+    Private Sub frmCAT_DragEnter(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles Me.DragEnter
+        If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
+            e.Effect = Windows.Forms.DragDropEffects.All
+        End If
     End Sub
 
     Private Sub frmCAT_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
@@ -1102,7 +1348,7 @@ Public Class frmCAT
         End If
     End Function
 
-    Private Sub mnuSaveResults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSaveResults.Click
+    Private Sub mnuSaveResults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSaveResults.Click, btnSaveResults.Click
         If agdResults.Source Is Nothing Then
             Logger.Msg("No results are available yet to save", "Save Results")
         Else
@@ -1417,7 +1663,7 @@ Public Class frmCAT
 
         'TODO: calculate size of all inputs/outputs for display
         'Try
-        '    lblAllResults.Text = "(" & Format((FileLen(cboBaseScenarioName.Text) * TotalIterations) / 1048576, "#,##0.#") & " Meg)"
+        '    lblAllResults.Text = "(" & Format((FileLen(cboBaseModelName.Text) * TotalIterations) / 1048576, "#,##0.#") & " Meg)"
         'Catch
         '    lblAllResults.Text = ""
         'End Try
@@ -1482,7 +1728,7 @@ Public Class frmCAT
         End If
     End Sub
 
-    Private Sub mnuSaveVariations_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuSaveVariations.Click
+    Private Sub mnuSaveVariations_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuSaveSetup.Click, btnSaveClimateEndpoint.Click
         Dim lSaveDialog As New Windows.Forms.SaveFileDialog
         With lSaveDialog
             .FileName = GetSetting("BasinsCAT", "Settings", "LastSetup", "CAT.xml")
@@ -1495,25 +1741,47 @@ Public Class frmCAT
                 SaveFileString(.FileName, (pCat.XML))
                 pUnsaved = False
                 SaveSetting("BasinsCAT", "Settings", "LastSetup", .FileName)
+                AddRecentSetup(.FileName)
             End If
         End With
     End Sub
 
-    Private Sub mnuLoadVariations_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuLoadVariations.Click
+    Private Sub mnuLoadVariations_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuOpenSetup.Click, btnOpenClimateEndpoint.Click
         Dim lOpenDialog As New Windows.Forms.OpenFileDialog
         With lOpenDialog
             .FileName = GetSetting("BasinsCAT", "Settings", "LastSetup", "CAT.xml")
             .Filter = "XML files (*.xml)|*.xml|All files|*.*"
             .FilterIndex = 1
-            .Title = Me.Text & " - Load Variations"
+            .Title = "Load Variations from XML file"
             If .ShowDialog() = Windows.Forms.DialogResult.OK Then
-                If FileExists(.FileName) Then
-                    pCat.XML = WholeFileString(.FileName)
-                    SaveSetting("BasinsCAT", "Settings", "LastSetup", .FileName)
-                    pUnsaved = False
-                End If
+                OpenXML(.FileName)
             End If
         End With
+    End Sub
+
+    Private Sub OpenXML(ByVal aFilename As String)
+        If FileExists(aFilename) Then
+            pCat.XML = WholeFileString(aFilename)
+            SaveSetting("BasinsCAT", "Settings", "LastSetup", aFilename)
+            pUnsaved = False
+            AddRecentSetup(aFilename)
+        End If
+    End Sub
+
+    Private Sub AddRecentSetup(ByVal aFilename As String)
+        Dim lNewRecentSetups As String = aFilename
+        Dim lOldRecentSetups As String = GetSetting("BasinsCAT", "Recent", "Setup")
+        Dim lCount As Integer = 1
+        If lOldRecentSetups.Contains(g_PathChar) Then
+            For Each lRecentSetup As String In lOldRecentSetups.Split(";"c)
+                If IO.Path.GetFullPath(lRecentSetup).ToLower <> IO.Path.GetFullPath(aFilename).ToLower AndAlso IO.File.Exists(lRecentSetup) Then
+                    lNewRecentSetups &= ";" & lRecentSetup
+                    lCount += 1
+                    If lCount > 9 Then Exit For
+                End If
+            Next
+        End If
+        SaveSetting("BasinsCAT", "Recent", "Setups", lNewRecentSetups)
     End Sub
 
     Private Sub btnStop_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStop.Click
@@ -1578,44 +1846,104 @@ Public Class frmCAT
         End If
     End Sub
 
-    Private Sub mnuOpenUCI_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenUCI.Click
+    Private Sub mnuOpenUCI_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenUCI.Click, btnOpenHSPF.Click
         pCat.Model = New clsCatModelHSPF
-        pCat.Model.BaseScenario = ""
+        pCat.Model.BaseModel = ""
     End Sub
 
-    Private Sub mnuOpenSWAT_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenSWAT.Click
+    Private Sub mnuOpenSWAT_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenSWAT.Click, btnOpenSWAT.Click
         pCat.Model = New clsCatModelSWAT
-        pCat.Model.BaseScenario = ""
+        pCat.Model.BaseModel = ""
     End Sub
 
-    Private Sub mnuOpenSWMM_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenSWMM.Click
+    Private Sub mnuOpenSWMM_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenSWMM.Click, btnOpenSWMM.Click
         pCat.Model = New clsCatModelSWMM
-        pCat.Model.BaseScenario = ""
+        pCat.Model.BaseModel = ""
     End Sub
 
-    Private Sub txtBaseScenario_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles txtBaseScenario.MouseClick
+    Private Sub mnuOpenRecent_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        Dim lFilename As String = ""
+        Try
+            Dim lMenu As MenuItem = sender
+            lFilename = lMenu.Text
+            If OpenFile(lFilename) Then
+                myTabs.SelectedIndex = 1
+            Else
+                mnuFile.MenuItems.Remove(lMenu)
+            End If
+        Catch ex As Exception
+            Logger.Msg("Exception opening '" & lFilename & "': " & e.ToString)
+        End Try
+    End Sub
+
+    Private Sub lstRecent_ItemSelectionChanged(ByVal sender As Object, ByVal e As System.Windows.Forms.ListViewItemSelectionChangedEventArgs) Handles lstRecent.ItemSelectionChanged
+        Dim lFilename As String = ""
+        Try
+            If e.IsSelected Then
+                lFilename = e.Item.Text
+                If OpenFile(lFilename) Then
+                    myTabs.SelectedIndex = 1
+                Else
+                    lstRecent.Items.Remove(e.Item)
+                End If
+            End If
+        Catch ex As Exception
+            Logger.Msg("Exception opening '" & lFilename & "': " & e.ToString)
+        End Try
+
+    End Sub
+
+    Private Function OpenFile(ByVal lFilename As String) As Boolean
+        If IO.File.Exists(lFilename) Then
+            Select Case IO.Path.GetExtension(lFilename).ToLower
+                Case ".uci" : pCat.Model = New clsCatModelHSPF
+                Case ".mdb" : pCat.Model = New clsCatModelSWAT
+                Case ".inp" : pCat.Model = New clsCatModelSWMM
+                Case ".xml"
+                    OpenXML(lFilename)
+                    Return True
+                Case Else
+                    Logger.Msg("Model type unknown for " & lFilename)
+                    Return False
+            End Select
+            pCat.Model.BaseModel = lFilename
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+
+    Private Sub txtBaseModel_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles txtBaseModel.MouseClick
         If pCat.Model Is Nothing Then
             'TODO: choose model
         Else
-            pCat.Model.BaseScenario = ""
+            pCat.Model.BaseModel = ""
         End If
     End Sub
 
-    Private Sub txtBaseScenarioNameChange(ByVal aBaseScenarioName As String) Handles pCat.BaseScenarioSet
-        txtBaseScenario.Text = aBaseScenarioName
-        lblOpen.Visible = False
-        myTabs.Visible = True
+    Private Sub txtBaseModelNameChange(ByVal aBaseModelName As String) Handles pCat.BaseModelSet
+        txtBaseModel.Text = aBaseModelName
         btnStart.Visible = True
         'btnPlot.Visible = True
+
+        Dim lNewRecentModels As String = aBaseModelName
+        Dim lOldRecentModels As String = GetSetting("BasinsCAT", "Recent", "Models")
+        Dim lCount As Integer = 1
+        If lOldRecentModels.Contains(g_PathChar) Then
+            For Each lRecentModel As String In lOldRecentModels.Split(";"c)
+                If IO.Path.GetFullPath(lRecentModel).ToLower <> IO.Path.GetFullPath(aBaseModelName).ToLower AndAlso IO.File.Exists(lRecentModel) Then
+                    lNewRecentModels &= ";" & lRecentModel
+                    lCount += 1
+                    If lCount > 9 Then Exit For
+                End If
+            Next
+        End If
+        SaveSetting("BasinsCAT", "Recent", "Models", lNewRecentModels)
     End Sub
 
     Private Sub pCat_Started() Handles pCat.Started
-        agdResults.Source = pCat.ResultsGrid
-        ColorResultsGrid()
-        agdResults.Initialize(agdResults.Source)
-        agdResults.SizeAllColumnsToContents()
-        agdResults.Refresh()
-
+        pResultsSet = True
+        PopulateResultsGrid(pCat.ResultsGrid)
         myTabs.SelectedIndex = pResultsTabIndex
     End Sub
 
@@ -1637,4 +1965,18 @@ Public Class frmCAT
             pCat.SaveAll = False
         End If
     End Sub
+
+    Private Sub myTabs_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles myTabs.SelectedIndexChanged
+        If Not g_Running AndAlso myTabs.SelectedIndex = pResultsTabIndex AndAlso pCat IsNot Nothing Then
+            Try
+                If Not pResultsSet Then
+                    pCat.InitResultsGrid()
+                End If
+                PopulateResultsGrid(pCat.ResultsGrid)
+            Catch ex As Exception
+                Logger.Dbg("Could not populate results grid from pCat: " & ex.ToString)
+            End Try
+        End If
+    End Sub
+
 End Class
