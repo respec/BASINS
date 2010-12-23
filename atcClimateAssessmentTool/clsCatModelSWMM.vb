@@ -5,17 +5,17 @@ Imports MapWinUtility
 Public Class clsCatModelSWMM
     Implements clsCatModel
 
-    Public Event BaseScenarioSet(ByVal aBaseScenario As String) Implements clsCatModel.BaseScenarioSet
+    Public Event BaseModelSet(ByVal aBaseModel As String) Implements clsCatModel.BaseModelSet
 
-    Private pBaseScenario As String = ""
+    Private pBaseModel As String = ""
     Private pBaseProject As atcSWMM.atcSWMMProject = Nothing
 
-    Public Property BaseScenario() As String Implements clsCatModel.BaseScenario
+    Public Property BaseModel() As String Implements clsCatModel.BaseModel
         Get
-            Return pBaseScenario
+            Return pBaseModel
         End Get
         Set(ByVal newValue As String)
-            OpenBaseScenario(newValue)
+            OpenBaseModel(newValue)
         End Set
     End Property
 
@@ -24,14 +24,14 @@ Public Class clsCatModelSWMM
     ''' </summary>
     ''' <param name="aFilename">Full path of INP file</param>
     ''' <remarks></remarks>
-    Friend Sub OpenBaseScenario(Optional ByVal aFilename As String = "")
+    Friend Sub OpenBaseModel(Optional ByVal aFilename As String = "")
         If Not aFilename Is Nothing And Not IO.File.Exists(aFilename) Then
             If IO.File.Exists(aFilename & ".inp") Then aFilename &= ".inp"
         End If
 
         If aFilename Is Nothing OrElse Not IO.File.Exists(aFilename) Then
             Dim cdlg As New Windows.Forms.OpenFileDialog
-            cdlg.Title = "Open INP file containing base scenario"
+            cdlg.Title = "Open INP file containing base model"
             cdlg.Filter = "INP files|*.inp|All Files|*.*"
             If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
                 aFilename = cdlg.FileName
@@ -41,8 +41,8 @@ Public Class clsCatModelSWMM
         If IO.File.Exists(aFilename) Then
             Dim lInpFolder As String = PathNameOnly(aFilename)
             ChDriveDir(lInpFolder)
-            pBaseScenario = aFilename
-            RaiseEvent BaseScenarioSet(aFilename)
+            pBaseModel = aFilename
+            RaiseEvent BaseModelSet(aFilename)
             pBaseProject = clsCat.OpenDataSource(aFilename)
 
             'Open the output file
@@ -52,11 +52,11 @@ Public Class clsCatModelSWMM
         End If
     End Sub
 
-    Private Sub CreateModifiedINP(ByVal aNewScenarioName As String, ByVal aNewInpFilename As String, ByVal aModifiedData As atcData.atcTimeseriesGroup)
+    Private Sub CreateModifiedINP(ByVal aNewModelName As String, ByVal aNewInpFilename As String, ByVal aModifiedData As atcData.atcTimeseriesGroup)
         Dim lPrevCurDir As String = CurDir()
         ChDriveDir(IO.Path.GetDirectoryName(aNewInpFilename))
         pBaseProject.Save(aNewInpFilename, atcDataSource.EnumExistAction.ExistReplace)
-        pBaseProject.Specification = pBaseScenario ' save changed specification for creating template, then switch back
+        pBaseProject.Specification = pBaseModel ' save changed specification for creating template, then switch back
 
         Dim lModifiedProject As New atcSWMM.atcSWMMProject
         lModifiedProject.Open(aNewInpFilename)
@@ -76,11 +76,11 @@ Public Class clsCatModelSWMM
     End Sub
 
     ''' <summary>
-    ''' Copy base INP and change scenario name within it
+    ''' Copy base INP and change model name within it
     ''' Change data to be modified in new INP
     ''' Run SWMM5 with the new INP
     ''' </summary>
-    ''' <param name="aNewScenarioName"></param>
+    ''' <param name="aNewModelName"></param>
     ''' <param name="aModifiedData"></param>
     ''' <param name="aPreparedInput"></param>
     ''' <param name="aRunModel"></param>
@@ -88,12 +88,12 @@ Public Class clsCatModelSWMM
     ''' <param name="aKeepRunning"></param>
     ''' <returns>atcCollection of atcDataSource</returns>
     ''' <remarks></remarks>
-    Public Function ScenarioRun(ByVal aNewScenarioName As String, _
+    Public Function ModelRun(ByVal aNewModelName As String, _
                                 ByVal aModifiedData As atcTimeseriesGroup, _
                                 ByVal aPreparedInput As String, _
                                 ByVal aRunModel As Boolean, _
                                 ByVal aShowProgress As Boolean, _
-                                ByVal aKeepRunning As Boolean) As atcCollection Implements clsCatModel.ScenarioRun
+                                ByVal aKeepRunning As Boolean) As atcCollection Implements clsCatModel.ModelRun
 
         Dim lModified As New atcCollection
         'Dim lCurrentTimeseries As atcTimeseries
@@ -102,19 +102,19 @@ Public Class clsCatModelSWMM
             aModifiedData = New atcTimeseriesGroup
         End If
 
-        If IO.File.Exists(pBaseScenario) Then
-            Dim lNewBaseFilename As String = AbsolutePath(pBaseScenario, CurDir)
+        If IO.File.Exists(pBaseModel) Then
+            Dim lNewBaseFilename As String = AbsolutePath(pBaseModel, CurDir)
             Dim lNewFolder As String = PathNameOnly(lNewBaseFilename) & g_PathChar
-            lNewBaseFilename = lNewFolder & aNewScenarioName & "."
+            lNewBaseFilename = lNewFolder & aNewModelName & "."
             Dim lNewINPfilename As String = ""
 
             'Get all external climate timeseries files, assuming they are named as *.DAT
-            Select Case aNewScenarioName.ToLower
+            Select Case aNewModelName.ToLower
                 Case "base"
-                    lNewINPfilename = AbsolutePath(pBaseScenario, CurDir)
+                    lNewINPfilename = AbsolutePath(pBaseModel, CurDir)
                     lModified.Add(IO.Path.GetFileName(lNewINPfilename).ToLower.Trim, lNewINPfilename.Trim)
                 Case "modifyoriginal"
-                    lNewINPfilename = AbsolutePath(pBaseScenario, CurDir)
+                    lNewINPfilename = AbsolutePath(pBaseModel, CurDir)
                     lModified.Add(IO.Path.GetFileName(lNewINPfilename).ToLower.Trim, lNewINPfilename.Trim)
 
                     'TODO: needs work here to make sense: first add into, then clear???
@@ -132,22 +132,22 @@ Public Class clsCatModelSWMM
                     '    lBinOutResults.DataSets.Clear()
                     'Next
                 Case Else
-                    lNewFolder = PathNameOnly(lNewBaseFilename) & g_PathChar & aNewScenarioName & g_PathChar
+                    lNewFolder = PathNameOnly(lNewBaseFilename) & g_PathChar & aNewModelName & g_PathChar
                     IO.Directory.CreateDirectory(lNewFolder)
-                    lNewBaseFilename = lNewFolder & IO.Path.GetFileNameWithoutExtension(pBaseScenario) & "."
+                    lNewBaseFilename = lNewFolder & IO.Path.GetFileNameWithoutExtension(pBaseModel) & "."
                     lNewINPfilename = lNewBaseFilename & "inp"
-                    'Copy base INP, changing base to new scenario name within it
+                    'Copy base INP, changing base to new model name within it
 
-                    CreateModifiedINP(aNewScenarioName, lNewINPfilename, aModifiedData)
-                    lModified.Add(IO.Path.GetFileName(pBaseScenario).ToLower.Trim, lNewINPfilename.Trim)
+                    CreateModifiedINP(aNewModelName, lNewINPfilename, aModifiedData)
+                    lModified.Add(IO.Path.GetFileName(pBaseModel).ToLower.Trim, lNewINPfilename.Trim)
             End Select
 
             Dim lRunExitCode As Integer = 0
             If aRunModel Then
-                'Run scenario
+                'Run Model
                 Dim lSWMMExeName As String = FindFile("Please locate swmm5.exe", g_PathChar & "Program Files\EPA SWMM 5.0\swmm5.exe")
-                Dim lPrevCurDir As String = CurDir() 'save the base scenario folder
-                ChDriveDir(IO.Path.GetDirectoryName(lNewINPfilename)) 'change curdir to modified scenario folder
+                Dim lPrevCurDir As String = CurDir() 'save the base model folder
+                ChDriveDir(IO.Path.GetDirectoryName(lNewINPfilename)) 'change curdir to modified model folder
                 AppendFileString(lNewFolder & "SWMM5Error.Log", "Start log for " & lNewBaseFilename & vbCrLf)
                 Dim lArgs As String = lNewINPfilename
                 lArgs &= " " & IO.Path.ChangeExtension(lNewINPfilename, "rpt")
@@ -173,7 +173,7 @@ Public Class clsCatModelSWMM
                 If lRunExitCode <> 0 Then
                     Logger.Dbg("****************** Problem *********************")
                 End If
-                ChDriveDir(lPrevCurDir) 'Change curdir back to base scenario folder
+                ChDriveDir(lPrevCurDir) 'Change curdir back to base model folder
             Else
                 Logger.Dbg("Skipping running model")
             End If
@@ -187,7 +187,7 @@ Public Class clsCatModelSWMM
                     If IO.File.Exists(lBinOutFilename) Then
                         'Dim lHBNResults As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
                         'If lHBNResults.Open(lNewFilename) Then
-                        lModified.Add(IO.Path.ChangeExtension(IO.Path.GetFileName(pBaseScenario), "out").ToLower.Trim, lBinOutFilename.Trim)
+                        lModified.Add(IO.Path.ChangeExtension(IO.Path.GetFileName(pBaseModel), "out").ToLower.Trim, lBinOutFilename.Trim)
                         'Else
                         '    Logger.Dbg("Could not open output file '" & lBinOutFilename & "'")
                         'End If
@@ -197,7 +197,7 @@ Public Class clsCatModelSWMM
                 End If
             End If
         Else
-            Logger.Msg("Could not find base INP file '" & pBaseScenario & "'" & vbCrLf & "Could not run model", "Scenario Run")
+            Logger.Msg("Could not find base INP file '" & pBaseModel & "'" & vbCrLf & "Could not run model", "Model Run")
         End If
         Return lModified
     End Function
@@ -206,7 +206,7 @@ Public Class clsCatModelSWMM
         Get
             Dim lXML As String = ""
             lXML &= "<INP>" & vbCrLf
-            lXML &= "  <FileName>" & pBaseScenario & "</FileName>" & vbCrLf
+            lXML &= "  <FileName>" & pBaseModel & "</FileName>" & vbCrLf
             lXML &= "</INP>" & vbCrLf
             Return lXML
         End Get

@@ -6,16 +6,16 @@ Imports MapWinUtility.Strings
 Public Class clsCatModelHSPF
     Implements clsCatModel
 
-    Public Event BaseScenarioSet(ByVal aBaseScenario As String) Implements clsCatModel.BaseScenarioSet
+    Public Event BaseModelSet(ByVal aBaseModel As String) Implements clsCatModel.BaseModelSet
 
-    Private pBaseScenario As String = ""
+    Private pBaseModel As String = ""
 
-    Public Property BaseScenario() As String Implements clsCatModel.BaseScenario
+    Public Property BaseModel() As String Implements clsCatModel.BaseModel
         Get
-            Return pBaseScenario
+            Return pBaseModel
         End Get
         Set(ByVal newValue As String)
-            OpenBaseScenario(newValue)
+            OpenBaseModel(newValue)
         End Set
     End Property
 
@@ -24,14 +24,14 @@ Public Class clsCatModelHSPF
     ''' </summary>
     ''' <param name="aFilename">Full path of UCI file</param>
     ''' <remarks></remarks>
-    Friend Sub OpenBaseScenario(Optional ByVal aFilename As String = "")
-        If Not aFilename Is Nothing And Not IO.File.Exists(aFilename) Then
+    Friend Sub OpenBaseModel(Optional ByVal aFilename As String = "")
+        If Not aFilename Is Nothing Andalso Not IO.File.Exists(aFilename) Then
             If IO.File.Exists(aFilename & ".uci") Then aFilename &= ".uci"
         End If
 
         If aFilename Is Nothing OrElse Not IO.File.Exists(aFilename) Then
             Dim cdlg As New Windows.Forms.OpenFileDialog
-            cdlg.Title = "Open UCI file containing base scenario"
+            cdlg.Title = "Open UCI file containing base model"
             cdlg.Filter = "UCI files|*.uci|All Files|*.*"
             If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
                 aFilename = cdlg.FileName
@@ -41,8 +41,8 @@ Public Class clsCatModelHSPF
         If IO.File.Exists(aFilename) Then
             Dim lUciFolder As String = PathNameOnly(aFilename)
             ChDriveDir(lUciFolder)
-            pBaseScenario = aFilename
-            RaiseEvent BaseScenarioSet(aFilename)
+            pBaseModel = aFilename
+            RaiseEvent BaseModelSet(aFilename)
             Dim lFullText As String = WholeFileString(aFilename)
             For Each lWDMfilename As String In UCIFilesBlockFilenames(lFullText, "WDM")
                 lWDMfilename = AbsolutePath(Trim(lWDMfilename), lUciFolder)
@@ -55,15 +55,14 @@ Public Class clsCatModelHSPF
         End If
     End Sub
 
-    Private Sub CreateModifiedUCI(ByVal aNewScenarioName As String, ByVal aNewUciFilename As String)
-        Dim lUciContents As String = WholeFileString(BaseScenario)
+    Private Sub CreateModifiedUCI(ByVal aNewModelName As String, ByVal aNewUciFilename As String)
+        Dim lUciContents As String = WholeFileString(BaseModel)
         Dim lStartFilesPos As Integer = lUciContents.IndexOf(vbLf & "FILES") + 1
         Dim lEndFilesPos As Integer = lUciContents.IndexOf(vbLf & "END FILES", lStartFilesPos) + 1
         Dim lOriginalFilesBlock As String = lUciContents.Substring(lStartFilesPos, lEndFilesPos - lStartFilesPos)
         Dim lNewFilesBlock As String = ""
         Dim lSaveLineEnd As String = ""
         Dim lCurrentLine As String
-        'Dim lPathname As String
         Dim lFilename As String
 
         For Each lCurrentLine In lOriginalFilesBlock.Split(vbLf)
@@ -82,11 +81,13 @@ Public Class clsCatModelHSPF
                     If lFilename.StartsWith("<") Then 'Not a file name
                         lNewFilesBlock &= lCurrentLine & lSaveLineEnd & vbLf
                     Else
-                        'Commented out code preserves path of original file, we are putting Modified files in same folder as modified UCI
-                        'lPathname = PathNameOnly(lFilename)
+                        'Commented out code preserves path of original file
+                        'Dim lPathname As String = PathNameOnly(lFilename)
                         'If lPathname.Length > 0 Then lPathname &= g_PathChar
-                        'lFilename = lPathname & aNewScenarioName & "." & FilenameNoPath(lFilename)
-                        lFilename = aNewScenarioName & "." & FilenameNoPath(lFilename)
+                        'lFilename = lPathname & aNewModelName & "." & FilenameNoPath(lFilename)
+
+                        'Now we are putting modified files in same folder with modified UCI, so remove the path
+                        lFilename = FilenameNoPath(lFilename)
                         lNewFilesBlock &= lCurrentLine.Substring(0, 16) & lFilename & lSaveLineEnd & vbLf
                     End If
             End Select
@@ -98,7 +99,7 @@ Public Class clsCatModelHSPF
     ''' <summary>
     ''' 
     ''' </summary>
-    ''' <param name="aNewScenarioName"></param>
+    ''' <param name="aNewModelName"></param>
     ''' <param name="aModifiedData"></param>
     ''' <param name="aPreparedInput"></param>
     ''' <param name="aRunModel"></param>
@@ -106,12 +107,12 @@ Public Class clsCatModelHSPF
     ''' <param name="aKeepRunning"></param>
     ''' <returns>atcCollection of atcDataSource</returns>
     ''' <remarks></remarks>
-    Public Function ScenarioRun(ByVal aNewScenarioName As String, _
-                                ByVal aModifiedData As atcTimeseriesGroup, _
-                                ByVal aPreparedInput As String, _
-                                ByVal aRunModel As Boolean, _
-                                ByVal aShowProgress As Boolean, _
-                                ByVal aKeepRunning As Boolean) As atcCollection Implements clsCatModel.ScenarioRun
+    Public Function ModelRun(ByVal aNewModelName As String, _
+                             ByVal aModifiedData As atcTimeseriesGroup, _
+                             ByVal aPreparedInput As String, _
+                             ByVal aRunModel As Boolean, _
+                             ByVal aShowProgress As Boolean, _
+                             ByVal aKeepRunning As Boolean) As atcCollection Implements clsCatModel.ModelRun
         'Copy base UCI and change scenario name within it
         'Copy WDM
         'Change data to be modified in new WDM
@@ -125,22 +126,25 @@ Public Class clsCatModelHSPF
             aModifiedData = New atcTimeseriesGroup
         End If
 
-        If IO.File.Exists(pBaseScenario) Then
-            Dim lNewBaseFilename As String = AbsolutePath(pBaseScenario, CurDir)
-            Dim lNewFolder As String = PathNameOnly(lNewBaseFilename) & g_PathChar
-            lNewBaseFilename = lNewFolder & aNewScenarioName & "."
-            Dim lNewUCIfilename As String = ""
+        If IO.File.Exists(pBaseModel) Then
+            Dim lNewFolder As String = PathNameOnly(AbsolutePath(pBaseModel, CurDir)) & g_PathChar & aNewModelName & g_PathChar
+            If aRunModel Then
+                TryDelete(lNewFolder)
+            End If
+            IO.Directory.CreateDirectory(lNewFolder)
 
-            Dim lWDMFilenames As ArrayList = UCIFilesBlockFilenames(WholeFileString(pBaseScenario), "WDM")
-            Select aNewScenarioName.ToLower
+            Dim lNewUCIfilename As String = ""
+            Dim lWDMFilenames As ArrayList = UCIFilesBlockFilenames(WholeFileString(pBaseModel), "WDM")
+
+            Select Case aNewModelName.ToLower
                 Case "base"
-                    lNewUCIfilename = pBaseScenario
+                    lNewUCIfilename = pBaseModel
                     For Each lWDMfilename As String In lWDMFilenames
                         lWDMfilename = AbsolutePath(lWDMfilename, CurDir)
                         lModified.Add(IO.Path.GetFileName(lWDMfilename).ToLower.Trim, lWDMfilename.Trim)
                     Next
                 Case "modifyoriginal"
-                    lNewUCIfilename = pBaseScenario
+                    lNewUCIfilename = pBaseModel
                     For Each lWDMfilename As String In lWDMFilenames
                         lWDMfilename = AbsolutePath(lWDMfilename, CurDir)
                         lModified.Add(IO.Path.GetFileName(lWDMfilename).ToLower.Trim, lWDMfilename.Trim)
@@ -157,9 +161,9 @@ Public Class clsCatModelHSPF
                         lWDMResults.DataSets.Clear()
                     Next
                 Case Else
-                    lNewUCIfilename = lNewBaseFilename & FilenameNoPath(pBaseScenario)
+                    lNewUCIfilename = lNewFolder & FilenameNoPath(pBaseModel)
                     'Copy base UCI, changing base to new scenario name within it
-                    CreateModifiedUCI(aNewScenarioName, lNewUCIfilename)
+                    CreateModifiedUCI(aNewModelName, lNewUCIfilename)
 
                     For Each lWDMfilename As String In lWDMFilenames
                         lWDMfilename = AbsolutePath(lWDMfilename, CurDir).Trim()
@@ -167,13 +171,13 @@ Public Class clsCatModelHSPF
                             lWDMfilename = aPreparedInput
                         End If
                         'Copy each base WDM to new WDM only if simulation is to be rerun
-                        Dim lNewWDMfilename As String = lNewFolder & aNewScenarioName & "." & IO.Path.GetFileName(lWDMfilename)
+                        Dim lNewWDMfilename As String = lNewFolder & IO.Path.GetFileName(lWDMfilename)
                         If aRunModel Then
                             FileCopy(lWDMfilename, lNewWDMfilename)
                         End If
                         Dim lWDMResults As New atcWDM.atcDataSourceWDM
                         If Not lWDMResults.Open(lNewWDMfilename) Then
-                            Logger.Msg("Could not open new scenario WDM file '" & lNewWDMfilename & "'", MsgBoxStyle.Critical, "Could not run model")
+                            Logger.Msg("Could not open new model WDM file '" & lNewWDMfilename & "'", MsgBoxStyle.Critical, "Could not run model")
                             Return Nothing
                         End If
 
@@ -184,14 +188,14 @@ Public Class clsCatModelHSPF
                         For Each lCurrentTimeseries In aModifiedData
                             If Not lCurrentTimeseries Is Nothing _
                                AndAlso lCurrentTimeseries.Attributes.GetValue("History 1").ToString.ToLower.Equals("read from " & lWDMfilename.ToLower) Then
-                                lCurrentTimeseries.Attributes.SetValue("scenario", aNewScenarioName)
+                                lCurrentTimeseries.Attributes.SetValue("scenario", aNewModelName)
                                 lWDMResults.AddDataset(lCurrentTimeseries)
                             End If
                         Next
                         For Each lCurrentTimeseries In lWDMResults.DataSets
                             Dim lScenario As atcDefinedValue = lCurrentTimeseries.Attributes.GetDefinedValue("scenario")
                             If lScenario.Value.ToLower = "base" Then
-                                lWDMResults.WriteAttribute(lCurrentTimeseries, lScenario, aNewScenarioName)
+                                lWDMResults.WriteAttribute(lCurrentTimeseries, lScenario, aNewModelName)
                             End If
                             If Not aModifiedData.Contains(lCurrentTimeseries) Then
                                 lCurrentTimeseries.ValuesNeedToBeRead = True
@@ -204,7 +208,7 @@ Public Class clsCatModelHSPF
 
             Dim lRunExitCode As Integer = 0
             If aRunModel Then
-                'Run scenario
+                'Run Model
                 Dim lWinHspfLtExeName As String = FindFile("Please locate WinHspfLt.exe", g_PathChar & "BASINS\bin\WinHspfLt.exe")
 
                 Dim lPipeHandles As String = " -1 -1 "
@@ -213,16 +217,17 @@ Public Class clsCatModelHSPF
                 'Shell(lWinHspfLtExeName & lPipeHandles & lNewBaseFilename & "uci", AppWinStyle.NormalFocus, True)
 
                 ''don't let winhspflt bring up message boxes
-                'Dim lBaseFolder As String = PathNameOnly(AbsolutePath(BaseScenario, CurDir))
+                'Dim lBaseFolder As String = PathNameOnly(AbsolutePath(BaseModel, CurDir))
                 'SaveFileString(lBaseFolder & g_PathChar & "WinHSPFLtError.Log", "WinHSPFMessagesFollow:" & vbCrLf)
 
-                AppendFileString(lNewFolder & "WinHSPFLtError.Log", "Start log for " & lNewBaseFilename & vbCrLf)
+                AppendFileString(lNewFolder & "WinHSPFLtError.Log", "Start log for " & lNewFolder & vbCrLf)
                 Dim lArgs As String = lPipeHandles & lNewUCIfilename & " /nosendfeedback "
                 Logger.Dbg("Start " & lWinHspfLtExeName & " with Arguments '" & lArgs & "'")
                 'lHspfProcess = Diagnostics.Process.Start(lWinHspfLtExeName, lArgs)
                 Dim lHspfProcess As New Diagnostics.Process
                 With lHspfProcess.StartInfo
                     .FileName = lWinHspfLtExeName
+                    .WorkingDirectory = lNewFolder
                     .Arguments = lArgs
                     .CreateNoWindow = True
                     .UseShellExecute = False
@@ -248,13 +253,13 @@ Public Class clsCatModelHSPF
                 If lRunExitCode <> 0 Then 'hspf run failed, don't send any timeseries back to cat
                     lModified.Clear()
                 Else
-                    For Each lBinOutFilename As String In UCIFilesBlockFilenames(WholeFileString(pBaseScenario), "BINO")
+                    For Each lBinOutFilename As String In UCIFilesBlockFilenames(WholeFileString(pBaseModel), "BINO")
                         lBinOutFilename = AbsolutePath(lBinOutFilename, CurDir)
                         Dim lNewFilename As String
-                        If aNewScenarioName.ToLower = "base" Then
+                        If aNewModelName.ToLower = "base" Then
                             lNewFilename = lBinOutFilename
                         Else
-                            lNewFilename = PathNameOnly(lBinOutFilename) & g_PathChar & aNewScenarioName & "." & IO.Path.GetFileName(lBinOutFilename)
+                            lNewFilename = PathNameOnly(lBinOutFilename) & g_PathChar & aNewModelName & "." & IO.Path.GetFileName(lBinOutFilename)
                         End If
                         If IO.File.Exists(lNewFilename) Then
                             'Dim lHBNResults As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
@@ -270,7 +275,7 @@ Public Class clsCatModelHSPF
                 End If
             End If
         Else
-            Logger.Msg("Could not find base UCI file '" & pBaseScenario & "'" & vbCrLf & "Could not run model", "Scenario Run")
+            Logger.Msg("Could not find base UCI file '" & pBaseModel & "'" & vbCrLf & "Could not run model", "Model Run")
         End If
         Return lModified
     End Function
@@ -298,7 +303,7 @@ Public Class clsCatModelHSPF
         Get
             Dim lXML As String = ""
             lXML &= "<UCI>" & vbCrLf
-            lXML &= "  <FileName>" & pBaseScenario & "</FileName>" & vbCrLf
+            lXML &= "  <FileName>" & pBaseModel & "</FileName>" & vbCrLf
             lXML &= "</UCI>" & vbCrLf
             Return lXML
         End Get

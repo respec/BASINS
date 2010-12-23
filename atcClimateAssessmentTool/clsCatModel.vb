@@ -7,11 +7,11 @@ Imports atcUtility
 ''' <remarks></remarks>
 Public Interface clsCatModel
 
-    Event BaseScenarioSet(ByVal aBaseScenario As String)
+    Event BaseModelSet(ByVal aBaseModel As String)
 
-    Property BaseScenario() As String
+    Property BaseModel() As String
 
-    Function ScenarioRun(ByVal aNewScenarioName As String, _
+    Function ModelRun(ByVal aNewModelName As String, _
                          ByVal aModifiedData As atcTimeseriesGroup, _
                          ByVal aPreparedInput As String, _
                          ByVal aRunModel As Boolean, _

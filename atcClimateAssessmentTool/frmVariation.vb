@@ -963,14 +963,14 @@ Imports MapWinUtility
                 .Title = "Select Script"
                 .Filter = "VB.Net *.vb|*.vb|C Sharp *.cs|*.cs|All Files|*.*"
                 Try
-                    .FilterIndex = CInt(GetSetting("BASINS4", "Scenario", "ScriptExtIndex", 1))
+                    .FilterIndex = CInt(GetSetting("BasinsCAT", "Variation", "ScriptExtIndex", 1))
                 Catch
                     .FilterIndex = 1
                 End Try
-                .FileName = GetSetting("BASINS4", "Scenario", "ScriptFilename", ReplaceString(Me.Text, " ", "_") & ".vb")
+                .FileName = GetSetting("BasinsCAT", "Variation", "ScriptFilename", ReplaceString(Me.Text, " ", "_") & ".vb")
                 If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
-                    SaveSetting("BASINS4", "Scenario", "ScriptExtIndex", .FilterIndex)
-                    SaveSetting("BASINS4", "Scenario", "ScriptFilename", .FileName)
+                    SaveSetting("BasinsCAT", "Variation", "ScriptExtIndex", .FilterIndex)
+                    SaveSetting("BasinsCAT", "Variation", "ScriptFilename", .FileName)
                     Dim lErrors As String = ""
                     Try
                         Dim lAssembly As System.Reflection.Assembly = Scripting.PrepareScript(FileExt(.FileName), Nothing, .FileName, lErrors, "")

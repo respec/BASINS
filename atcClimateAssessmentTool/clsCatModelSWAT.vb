@@ -7,9 +7,9 @@ Public Class clsCatModelSWAT
 
     Public SWATProgramBase As String = "C:\Program Files\SWAT 2005 Editor" & g_PathChar
 
-    Public Event BaseScenarioSet(ByVal aBaseScenario As String) Implements clsCatModel.BaseScenarioSet
+    Public Event BaseModelSet(ByVal aBaseModel As String) Implements clsCatModel.BaseModelSet
 
-    Private pBaseScenario As String = Nothing
+    Private pBaseModel As String = Nothing
     Private pSWATDatabaseName As String = Nothing
     Private pMetWDM As atcWDM.atcDataSourceWDM
     Private pMetPcp As atcTimeseriesSWAT.atcTimeseriesSWAT
@@ -28,16 +28,16 @@ Public Class clsCatModelSWAT
         End Set
     End Property
 
-    Public Property BaseScenario() As String Implements clsCatModel.BaseScenario
+    Public Property BaseModel() As String Implements clsCatModel.BaseModel
         Get
-            Return pBaseScenario
+            Return pBaseModel
         End Get
         Set(ByVal newValue As String)
-            OpenBaseScenario(newValue)
+            OpenBaseModel(newValue)
         End Set
     End Property
 
-    Friend Sub OpenBaseScenario(Optional ByVal aFilename As String = "")
+    Friend Sub OpenBaseModel(Optional ByVal aFilename As String = "")
         If pBaseOutputHruFileName IsNot Nothing AndAlso _
            pBaseOutputRchFileName IsNot Nothing AndAlso _
            pBaseOutputSubFileName IsNot Nothing Then
@@ -54,46 +54,56 @@ Public Class clsCatModelSWAT
 
         If aFilename Is Nothing OrElse Not IO.File.Exists(aFilename) Then
             Dim cdlg As New Windows.Forms.OpenFileDialog
-            cdlg.Title = "Open SWAT file containing base scenario"
+            cdlg.Title = "Open SWAT file containing base model"
             cdlg.Filter = "SWAT mdb files|*.mdb|All Files|*.*"
             If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
                 aFilename = cdlg.FileName
             End If
         End If
 
-        If Not IO.File.Exists(SWATDatabasePath) Then
-            Logger.Dbg("Could not find SWAT database path.")
-        End If
-
-        If (pBaseScenario Is Nothing OrElse aFilename.ToLower <> pBaseScenario.ToLower) AndAlso IO.File.Exists(aFilename) Then
-            Dim lFolder As String = PathNameOnly(aFilename)
-            ChDriveDir(lFolder)
-            pBaseScenario = aFilename
-            RaiseEvent BaseScenarioSet(aFilename)
-
-            'Find and open met data WDM file
-            Dim lWDMfilename As String = IO.Path.GetDirectoryName(aFilename) & "\met.wdm"
-            If Not IO.File.Exists(lWDMfilename) Then
-                lWDMfilename = IO.Path.Combine(IO.Path.GetDirectoryName(aFilename), "met\met.wdm")
+        If aFilename Is Nothing OrElse Not IO.File.Exists(aFilename) Then
+            Logger.Dbg("Could not find SWAT base model MDB.")
+        Else
+            If SWATDatabasePath Is Nothing OrElse Not IO.File.Exists(SWATDatabasePath) Then
+                Logger.Dbg("Could not find SWAT database path.")
             End If
-OpenMetWDM:
-            If IO.File.Exists(lWDMfilename) Then
-                pMetWDM = clsCat.OpenDataSource(lWDMfilename)
-            Else
-                If Logger.Msg("Did not find '" & lWDMfilename & "'" & vbCrLf & "Browse for met data?", vbOKCancel, "SWAT Met Data Not Found") = MsgBoxResult.Ok Then
-                    Dim lFileDialog As New Windows.Forms.OpenFileDialog
-                    With lFileDialog
-                        .Title = "Please locate met WDM for SWAT"
-                        .Filter = "*.wdm|*.wdm"
-                        If .ShowDialog = Windows.Forms.DialogResult.OK Then
-                            lWDMfilename = .FileName
-                            GoTo OpenMetWDM
-                        End If
-                    End With
+
+            If (pBaseModel Is Nothing OrElse aFilename.ToLower <> pBaseModel.ToLower) Then
+                Dim lFolder As String = PathNameOnly(aFilename)
+                ChDriveDir(lFolder)
+                pBaseModel = aFilename
+                RaiseEvent BaseModelSet(aFilename)
+
+                'Find and open met data WDM file
+                Dim lWDMfilename As String = IO.Path.GetDirectoryName(aFilename) & "\met.wdm"
+                If Not IO.File.Exists(lWDMfilename) Then
+                    lWDMfilename = IO.Path.Combine(IO.Path.GetDirectoryName(aFilename), "met\met.wdm")
                 End If
-            End If
+OpenMetWDM:
+                If IO.File.Exists(lWDMfilename) Then
+                    pMetWDM = clsCat.OpenDataSource(lWDMfilename)
+                Else
+                    Select Case Logger.Msg("Did not find '" & lWDMfilename & "'" & vbCrLf _
+                                & "Yes to browse for met data WDM" & vbCrLf _
+                                & "No to use SWAT met data directly" & vbCrLf _
+                                & "Cancel to stop opening SWAT base model", vbYesNoCancel, "SWAT Met WDM Not Found")
+                        Case MsgBoxResult.Yes
+                            Dim lFileDialog As New Windows.Forms.OpenFileDialog
+                            With lFileDialog
+                                .Title = "Please locate met WDM for SWAT"
+                                .Filter = "*.wdm|*.wdm"
+                                If .ShowDialog = Windows.Forms.DialogResult.OK Then
+                                    lWDMfilename = .FileName
+                                    GoTo OpenMetWDM
+                                End If
+                            End With
+                        Case MsgBoxResult.No
+                            'Continue without opening WDM
+                        Case MsgBoxResult.Cancel
+                            Throw New ApplicationException("Cancel Opening Base Model")
+                    End Select
+                End If
 
-            If pMetWDM IsNot Nothing Then
 OpenOutput:
                 'Find and open output from base run, TODO: offer to run base case
                 Dim lTxtInOutFolder As String = IO.Path.GetDirectoryName(aFilename) & g_PathChar & "Scenarios\base\TxtInOut" & g_PathChar ' trailing directory separator
@@ -139,16 +149,16 @@ OpenOutput:
                     'open ascii Met data source
                     Dim lPcpFile As String = IO.Path.Combine(lTxtInOutFolder, "pcp1.pcp")
                     Dim lTmpFile As String = IO.Path.Combine(lTxtInOutFolder, "tmp1.tmp")
-                    If IO.File.Exists(lPcpFile) And IO.File.Exists(lTmpFile) Then
+                    If IO.File.Exists(lPcpFile) AndAlso IO.File.Exists(lTmpFile) Then
                         pMetPcp = clsCat.OpenDataSource(lPcpFile)
                         pMetTmp = clsCat.OpenDataSource(lTmpFile)
                     Else
                         Logger.Dbg("Cannot find SWAT Base case Met data pcp1.pcp and tmp1.tmp in " & lTxtInOutFolder)
                     End If
                 Else
-                    If Logger.Msg("Run base scenario now?", vbYesNo, "SWAT output.hru not found") = MsgBoxResult.Yes Then
+                    If Logger.Msg("Run base model now?", vbYesNo, "SWAT output.hru not found") = MsgBoxResult.Yes Then
                         pBaseOutputHruFileName = Nothing
-                        ScenarioRun("Base", Nothing, "", True, True, False)
+                        ModelRun("Base", Nothing, "", True, True, False)
                         GoTo OpenOutput
                     Else
                         Logger.Dbg("MissingHruOutput " & pBaseOutputHruFileName)
@@ -200,23 +210,23 @@ ALREADYSET:
         End Set
     End Property
 
-    Public Function ScenarioRun(ByVal aNewScenarioName As String, _
+    Public Function ModelRun(ByVal aNewModelName As String, _
                                 ByVal aModifiedData As atcData.atcTimeseriesGroup, _
                                 ByVal aPreparedInput As String, _
                                 ByVal aRunModel As Boolean, _
                                 ByVal aShowProgress As Boolean, _
                                 ByVal aKeepRunning As Boolean) As atcUtility.atcCollection _
-                                                        Implements clsCatModel.ScenarioRun
+                                                        Implements clsCatModel.ModelRun
         Dim lSaveDir As String = CurDir()
-        Dim lProjectFolder As String = IO.Path.GetDirectoryName(pBaseScenario)
-        Dim lScenarioFolder As String = lProjectFolder & "\Scenarios" & g_PathChar & aNewScenarioName
+        Dim lProjectFolder As String = IO.Path.GetDirectoryName(pBaseModel)
+        Dim lModelFolder As String = lProjectFolder & "\Scenarios" & g_PathChar & aNewModelName
         If aRunModel Then
-            TryDelete(lScenarioFolder)
+            TryDelete(lModelFolder)
         End If
-        Dim lTxtInOutFolder As String = lScenarioFolder & "\TxtInOut" & g_PathChar ' trailing directory separator
-        Dim lSwatInput As New SwatObject.SwatInput(SWATDatabasePath, pBaseScenario, lProjectFolder, aNewScenarioName)
+        Dim lTxtInOutFolder As String = lModelFolder & "\TxtInOut" & g_PathChar ' trailing directory separator
+        Dim lSwatInput As New SwatObject.SwatInput(SWATDatabasePath, pBaseModel, lProjectFolder, aNewModelName)
         lSwatInput.SaveAllTextInput()
-        Dim lFigFilename As String = IO.Path.Combine(IO.Path.GetDirectoryName(pBaseScenario), "fig.fig")
+        Dim lFigFilename As String = IO.Path.Combine(IO.Path.GetDirectoryName(pBaseModel), "fig.fig")
         If IO.File.Exists(lFigFilename) Then
             If TryDelete(lTxtInOutFolder & "fig.fig") Then
                 TryCopy(lFigFilename, lTxtInOutFolder & "fig.fig")
@@ -225,7 +235,7 @@ ALREADYSET:
 
         'write met data
         Dim lCioItem As SwatObject.SwatInput.clsCIOItem = lSwatInput.CIO.Item
-        If pMetWDM.DataSets.Count > 0 Then
+        If pMetWDM IsNot Nothing AndAlso pMetWDM.DataSets.Count > 0 Then
             modSwatMetData.WriteSwatMetInput(pMetWDM, aModifiedData, lProjectFolder, lTxtInOutFolder, _
                                              atcUtility.Jday(lCioItem.IYR, 1, 1, 0, 0, 0), _
                                              atcUtility.Jday(lCioItem.IYR + lCioItem.NBYR, 1, 1, 0, 0, 0))
@@ -254,7 +264,7 @@ ALREADYSET:
             '    Logger.Dbg("SWAT exe not found, skipping model run")
             'End If
 
-            Dim lSWATExe As String = IO.Path.Combine(IO.Path.GetDirectoryName(pBaseScenario), SwatExe())
+            Dim lSWATExe As String = IO.Path.Combine(IO.Path.GetDirectoryName(pBaseModel), SwatExe())
             Dim lSWATexeTargetPath As String = String.Empty
             If IO.File.Exists(lSWATExe) Then
                 If TryDelete(lTxtInOutFolder & SwatExe()) Then
@@ -336,7 +346,7 @@ ALREADYSET:
         Get
             Dim lXML As String = ""
             lXML &= "<SWAT>" & vbCrLf
-            lXML &= "  <FileName>" & pBaseScenario & "</FileName>" & vbCrLf
+            lXML &= "  <FileName>" & pBaseModel & "</FileName>" & vbCrLf
             lXML &= "  <SWATDatabase>" & SWATDatabasePath & "</SWATDatabase>" & vbCrLf
             lXML &= "</SWAT>" & vbCrLf
             Return lXML

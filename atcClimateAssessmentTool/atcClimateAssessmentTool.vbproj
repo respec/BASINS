@@ -214,6 +214,12 @@
     <Compile Include="clsCatModelHSPF.vb" />
     <Compile Include="clsCatModelSWAT.vb" />
     <Compile Include="clsCatModelSWMM.vb" />
+    <Compile Include="frmAttributes.Designer.vb">
+      <DependentUpon>frmAttributes.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAttributes.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmCAT.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -236,6 +242,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="modSwatMetData.vb" />
+    <EmbeddedResource Include="frmAttributes.resx">
+      <DependentUpon>frmAttributes.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmCAT.resx">
       <DependentUpon>frmCAT.vb</DependentUpon>
       <SubType>Designer</SubType>

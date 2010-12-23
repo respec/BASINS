@@ -631,7 +631,7 @@ Public Class frmPlot
                         IO.File.AppendAllText(aFilename, lline)
                     Else
                         ltemp = pResults.CellValue(lRow, 0)
-                        '' adjust lblockIndex for base scenario name
+                        '' adjust lblockIndex for base model name
                         'If ltemp.StartsWith("base") Then
                         '    If cboDatablock.Text = "Landuse" Then
                         '        lblockIndex = 1
@@ -788,7 +788,7 @@ Public Class frmPlot
                                                         If pOneDataBlock Then
                                                             IO.File.AppendAllText(aFilename, lline)
                                                         Else
-                                                            '' adjust lblockIndex for base scenario name
+                                                            '' adjust lblockIndex for base model name
                                                             'Dim lblockIndex0 As Integer
                                                             'If lcv.StartsWith("base") Then
                                                             '    lblockIndex0 = lblockIndex 'save the default data block column number
@@ -927,12 +927,11 @@ Public Class frmPlot
 
         'This routine populate the Landuse, weather models, and modifications data filter listboxes
         'based on the 'Selection Field' choice.
-        'It is assumed that there is a field in the CAT result grid that has the scenario name that chains the 
-        'component scenario factors into a string with underscore
-        '
+        'It is assumed that there is a field in the CAT result grid that has the model name that chains the 
+        'component factors into a string with underscore
 
         If Not cboSelect.Text.Contains("Run") Then
-            'Has to choose a scenario column that has 'Run' in its title
+            'Has to choose a column that has 'Run' in its title
             'else just return and do nothing
             Return
         End If

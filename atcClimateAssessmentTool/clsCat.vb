@@ -38,7 +38,7 @@ Public Class clsCat
         Logger.Dbg(lString)
     End Sub
     Public Event UpdateResults(ByVal aResultsFilename As String)
-    Public Event BaseScenarioSet(ByVal aScenarioName As String)
+    Public Event BaseModelSet(ByVal aModelName As String)
 
     Public Property XML() As String
         Get
@@ -108,17 +108,19 @@ StartOver:
                                 SaveAll = (lXML.InnerText.ToLower = "true")
                             Case "showeachrun"
                                 ShowEachRunProgress = (lXML.InnerText.ToLower = "true")
-                            Case "uci"
-                                If Model Is Nothing Then Model = New clsCatModelHSPF
-                                Model.BaseScenario = (AbsolutePath(lChild.InnerText, CurDir))
+
                                 'TODO: generic case for any model type that creates correct Model and sets XML, 
-                                '      BaseScenario (and anything model specific) gets set inside XML property set
+                                '      BaseModel (and anything model specific) gets set inside XML property set
+                            Case "uci"
+                                Model = New clsCatModelHSPF
+                                Model.BaseModel = (AbsolutePath(lChild.InnerText, CurDir))
                             Case "inp"
-                                If Model Is Nothing Then Model = New clsCatModelSWMM
-                                Model.BaseScenario = (AbsolutePath(lChild.InnerText, CurDir))
+                                Model = New clsCatModelSWMM
+                                Model.BaseModel = (AbsolutePath(lChild.InnerText, CurDir))
                             Case "swat"
-                                If Model Is Nothing Then Model = New clsCatModelSWAT
-                                Model.BaseScenario = (AbsolutePath(lChild.InnerText, CurDir))
+                                Model = New clsCatModelSWAT
+                                Model.BaseModel = (AbsolutePath(lChild.InnerText, CurDir))
+
                             Case "preparedinputs"
                                 PreparedInputs.Clear()
                                 For Each lChild In lXML.ChildNodes
@@ -202,37 +204,59 @@ StartOver:
         Return Nothing
     End Function
 
-    Public Function StartRun(ByVal aModifiedScenario As String) As Boolean
+    Public Function StartRun(ByVal aModifiedModel As String) As Boolean
         g_Running = True
+        Dim lSelectedVariations As Generic.List(Of atcVariation) = SelectedVariations(Inputs)
+        Dim lSelectedEndpoints As Generic.List(Of atcVariation) = SelectedVariations(Endpoints)
+
+        InitResultsGrid(lSelectedVariations, lSelectedEndpoints)
+
+        RaiseEvent Started()
+
+        Dim lRuns As Integer = 0
+        Run(aModifiedModel, _
+            lSelectedVariations, _
+            lRuns, 0, Nothing)
+
+        g_Running = False
+        Return True
+    End Function
+
+    Public Function SelectedVariations(ByVal aAllVariations As Generic.List(Of atcVariation)) As Generic.List(Of atcVariation)
         Dim lSelectedVariations As New Generic.List(Of atcVariation)
         If PreparedInputs.Count = 0 Then
-            For Each lVariation As atcVariation In Inputs
+            For Each lVariation As atcVariation In aAllVariations
                 If lVariation.Selected Then
                     lSelectedVariations.Add(lVariation)
                 End If
             Next
         End If
+        Return lSelectedVariations
+    End Function
 
+    Public Sub InitResultsGrid()
+        InitResultsGrid(SelectedVariations(Inputs), SelectedVariations(Endpoints))
+    End Sub
+
+    Public Sub InitResultsGrid(ByVal aSelectedVariations As Generic.List(Of atcVariation), _
+                               ByVal aSelectedEndpoints As Generic.List(Of atcVariation))
         ResultsGrid = New atcGridSource
         With ResultsGrid
-            Dim lUsingSeasons As Boolean = False
             Dim lColumn As Integer = 1
             .FixedRows = ResultsFixedRows
             .FixedColumns = 1
-            .Columns = 1 + lSelectedVariations.Count
+            .Columns = 1 + aSelectedVariations.Count
             .CellValue(0, 0) = RunTitle
 
-            For Each lVariation As atcVariation In Endpoints
-                If lVariation.Selected Then
-                    .Columns += lVariation.DataSets.Count
-                End If
+            For Each lVariation As atcVariation In aSelectedEndpoints
+                .Columns += lVariation.DataSets.Count
             Next
             .Rows = 5
             lColumn = 1
 
             If PreparedInputs.Count = 0 Then
                 'header for attributes
-                For Each lVariation As atcVariation In lSelectedVariations
+                For Each lVariation As atcVariation In aSelectedVariations
                     .CellValue(0, lColumn) = lVariation.Name
                     .CellValue(1, lColumn) = lVariation.Operation
                     .CellValue(2, lColumn) = "Current Value"
@@ -243,34 +267,23 @@ StartOver:
                 Next
             End If
 
-            For Each lVariation As atcVariation In Endpoints
-                If lVariation.Selected Then
-                    For Each lDataset As atcDataSet In lVariation.DataSets
-                        .CellValue(0, lColumn) = lVariation.Name
-                        If Not lVariation.Operation Is Nothing Then
-                            .CellValue(1, lColumn) = lVariation.Operation
-                        End If
-                        .CellValue(2, lColumn) = lDataset.ToString
-                        If Not lVariation.Seasons Is Nothing Then
-                            .CellValue(3, lColumn) = lVariation.Seasons.ToString
-                        End If
-                        lColumn += 1
-                    Next
-                End If
+            For Each lVariation As atcVariation In aSelectedEndpoints
+                For Each lDataset As atcDataSet In lVariation.DataSets
+                    .CellValue(0, lColumn) = lVariation.Name
+                    If Not lVariation.Operation Is Nothing Then
+                        .CellValue(1, lColumn) = lVariation.Operation
+                    End If
+                    .CellValue(2, lColumn) = lDataset.ToString
+                    If Not lVariation.Seasons Is Nothing Then
+                        .CellValue(3, lColumn) = lVariation.Seasons.ToString
+                    End If
+                    lColumn += 1
+                Next
             Next
         End With
-        RaiseEvent Started()
+    End Sub
 
-        Dim lRuns As Integer = 0
-        Run(aModifiedScenario, _
-            lSelectedVariations, _
-            lRuns, 0, Nothing)
-
-        g_Running = False
-        Return True
-    End Function
-
-    Private Sub Run(ByVal aModifiedScenarioName As String, _
+    Private Sub Run(ByVal aModifiedModelName As String, _
                     ByVal aVariations As Generic.List(Of atcVariation), _
                     ByRef aIteration As Integer, _
                     ByRef aStartVariationIndex As Integer, _
@@ -283,10 +296,10 @@ StartOver:
             If aModifiedData Is Nothing Then
                 aModifiedData = New atcTimeseriesGroup
             End If
-            If Model Is Nothing OrElse Model.BaseScenario Is Nothing Then
+            If Model Is Nothing OrElse Model.BaseModel Is Nothing Then
                 Logger.Dbg("ModelNotSet")
             Else
-                Dim lCurDir As String = IO.Path.GetDirectoryName(Model.BaseScenario)
+                Dim lCurDir As String = IO.Path.GetDirectoryName(Model.BaseModel)
                 Logger.Dbg("ChangeCurDirTo " & lCurDir)
                 Try
                     ChDriveDir(lCurDir)
@@ -299,24 +312,24 @@ StartOver:
             If aStartVariationIndex >= aVariations.Count Then 'All variations have values, do a model run
 NextIteration:
                 Dim lPreparedInput As String
-                Dim lModifiedScenarioName As String
+                Dim lModifiedModelName As String
 
                 If PreparedInputs.Count = 0 Then
                     lPreparedInput = ""
-                    lModifiedScenarioName = aModifiedScenarioName
+                    lModifiedModelName = aModifiedModelName
                     If SaveAll Then
-                        lModifiedScenarioName &= "-" & aIteration + 1
+                        lModifiedModelName &= "-" & aIteration + 1
                     End If
                 Else
                     lPreparedInput = PreparedInputs.Item(aIteration)
-                    lModifiedScenarioName = IO.Path.GetFileNameWithoutExtension(PathNameOnly(lPreparedInput))
+                    lModifiedModelName = IO.Path.GetFileNameWithoutExtension(PathNameOnly(lPreparedInput))
                 End If
 
                 RaiseEvent StartIteration(aIteration)
                 TimePerRun = Now.ToOADate
-                Dim lResults As atcCollection = Model.ScenarioRun(lModifiedScenarioName, aModifiedData, lPreparedInput, RunModel, ShowEachRunProgress, False)
+                Dim lResults As atcCollection = Model.ModelRun(lModifiedModelName, aModifiedData, lPreparedInput, RunModel, ShowEachRunProgress, False)
                 If lResults Is Nothing OrElse lResults.Count = 0 Then
-                    Logger.Dbg("Null scenario results from ScenarioRun")
+                    Logger.Dbg("Null model results from ModelRun")
                 Else
                     TimePerRun = (Now.ToOADate - TimePerRun) * 24 * 60 * 60 'Convert days to seconds
                 End If
@@ -393,8 +406,8 @@ NextIteration:
                         End If
                     Next
                 End With
-                'TODO: don't assume Model.BaseScenario is a filename, find results another way
-                RaiseEvent UpdateResults(PathNameOnly(Model.BaseScenario) & g_PathChar & lModifiedScenarioName & ".results.txt")
+                'TODO: don't assume Model.BaseModel is a filename, find results another way
+                RaiseEvent UpdateResults(PathNameOnly(Model.BaseModel) & g_PathChar & lModifiedModelName & ".results.txt")
 
                 'Close any open results
                 For Each lSpecification As String In lResults
@@ -453,7 +466,7 @@ NextIteration:
                         lAllModifiedData.Add(lNewlyModified)
 
                         'We have handled a variation, now recursively handle more input variations or run the model
-                        Run(aModifiedScenarioName, _
+                        Run(aModifiedModelName, _
                             aVariations, _
                             aIteration, _
                             aStartVariationIndex + 1, _
@@ -480,7 +493,7 @@ NextIteration:
         pLastGcMemory = lGcMemory
     End Function
 
-    Private Sub Model_BaseScenarioSet(ByVal aBaseScenario As String) Handles Model.BaseScenarioSet
-        RaiseEvent BaseScenarioSet(aBaseScenario)
+    Private Sub Model_BaseModelSet(ByVal aBaseModel As String) Handles Model.BaseModelSet
+        RaiseEvent BaseModelSet(aBaseModel)
     End Sub
 End Class
