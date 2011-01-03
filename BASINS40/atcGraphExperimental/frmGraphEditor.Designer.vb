@@ -78,6 +78,7 @@ Partial Class frmGraphEditor
         Me.radioAxisLinear = New System.Windows.Forms.RadioButton
         Me.radioAxisTime = New System.Windows.Forms.RadioButton
         Me.tabCurves = New System.Windows.Forms.TabPage
+        Me.cboCurveStyle = New System.Windows.Forms.ComboBox
         Me.chkCurveSymbolFillVisible = New System.Windows.Forms.CheckBox
         Me.cboCurveStep = New System.Windows.Forms.ComboBox
         Me.cboCurveSymbolType = New System.Windows.Forms.ComboBox
@@ -245,7 +246,7 @@ Partial Class frmGraphEditor
         Me.txtCurveSymbolSize.Location = New System.Drawing.Point(125, 138)
         Me.txtCurveSymbolSize.Name = "txtCurveSymbolSize"
         Me.txtCurveSymbolSize.Size = New System.Drawing.Size(47, 20)
-        Me.txtCurveSymbolSize.TabIndex = 54
+        Me.txtCurveSymbolSize.TabIndex = 55
         Me.toolTip1.SetToolTip(Me.txtCurveSymbolSize, "Width of curve")
         '
         'comboWhichText
@@ -717,6 +718,7 @@ Partial Class frmGraphEditor
         '
         'tabCurves
         '
+        Me.tabCurves.Controls.Add(Me.cboCurveStyle)
         Me.tabCurves.Controls.Add(Me.chkCurveSymbolFillVisible)
         Me.tabCurves.Controls.Add(Me.cboCurveStep)
         Me.tabCurves.Controls.Add(Me.cboCurveSymbolType)
@@ -744,38 +746,47 @@ Partial Class frmGraphEditor
         Me.tabCurves.Text = "Curves"
         Me.tabCurves.UseVisualStyleBackColor = True
         '
+        'cboCurveStyle
+        '
+        Me.cboCurveStyle.FormattingEnabled = True
+        Me.cboCurveStyle.Location = New System.Drawing.Point(178, 111)
+        Me.cboCurveStyle.MaxDropDownItems = 11
+        Me.cboCurveStyle.Name = "cboCurveStyle"
+        Me.cboCurveStyle.Size = New System.Drawing.Size(121, 21)
+        Me.cboCurveStyle.TabIndex = 52
+        '
         'chkCurveSymbolFillVisible
         '
         Me.chkCurveSymbolFillVisible.AutoSize = True
-        Me.chkCurveSymbolFillVisible.Location = New System.Drawing.Point(335, 140)
+        Me.chkCurveSymbolFillVisible.Location = New System.Drawing.Point(305, 140)
         Me.chkCurveSymbolFillVisible.Name = "chkCurveSymbolFillVisible"
         Me.chkCurveSymbolFillVisible.Size = New System.Drawing.Size(38, 17)
-        Me.chkCurveSymbolFillVisible.TabIndex = 56
+        Me.chkCurveSymbolFillVisible.TabIndex = 57
         Me.chkCurveSymbolFillVisible.Text = "Fill"
         Me.chkCurveSymbolFillVisible.UseVisualStyleBackColor = True
         '
         'cboCurveStep
         '
         Me.cboCurveStep.FormattingEnabled = True
-        Me.cboCurveStep.Location = New System.Drawing.Point(208, 111)
+        Me.cboCurveStep.Location = New System.Drawing.Point(305, 111)
         Me.cboCurveStep.MaxDropDownItems = 11
         Me.cboCurveStep.Name = "cboCurveStep"
         Me.cboCurveStep.Size = New System.Drawing.Size(121, 21)
-        Me.cboCurveStep.TabIndex = 52
+        Me.cboCurveStep.TabIndex = 53
         '
         'cboCurveSymbolType
         '
         Me.cboCurveSymbolType.FormattingEnabled = True
-        Me.cboCurveSymbolType.Location = New System.Drawing.Point(208, 138)
+        Me.cboCurveSymbolType.Location = New System.Drawing.Point(178, 138)
         Me.cboCurveSymbolType.MaxDropDownItems = 11
         Me.cboCurveSymbolType.Name = "cboCurveSymbolType"
         Me.cboCurveSymbolType.Size = New System.Drawing.Size(121, 21)
-        Me.cboCurveSymbolType.TabIndex = 55
+        Me.cboCurveSymbolType.TabIndex = 56
         '
         'chkCurveLineVisible
         '
         Me.chkCurveLineVisible.AutoSize = True
-        Me.chkCurveLineVisible.Location = New System.Drawing.Point(9, 114)
+        Me.chkCurveLineVisible.Location = New System.Drawing.Point(9, 113)
         Me.chkCurveLineVisible.Name = "chkCurveLineVisible"
         Me.chkCurveLineVisible.Size = New System.Drawing.Size(46, 17)
         Me.chkCurveLineVisible.TabIndex = 50
@@ -785,10 +796,10 @@ Partial Class frmGraphEditor
         'chkCurveSymbolVisible
         '
         Me.chkCurveSymbolVisible.AutoSize = True
-        Me.chkCurveSymbolVisible.Location = New System.Drawing.Point(9, 137)
+        Me.chkCurveSymbolVisible.Location = New System.Drawing.Point(9, 140)
         Me.chkCurveSymbolVisible.Name = "chkCurveSymbolVisible"
         Me.chkCurveSymbolVisible.Size = New System.Drawing.Size(65, 17)
-        Me.chkCurveSymbolVisible.TabIndex = 53
+        Me.chkCurveSymbolVisible.TabIndex = 54
         Me.chkCurveSymbolVisible.Text = "Symbols"
         Me.chkCurveSymbolVisible.UseVisualStyleBackColor = True
         '
@@ -1197,4 +1208,5 @@ Partial Class frmGraphEditor
     Private WithEvents btnAxisFont As System.Windows.Forms.Button
     Private WithEvents btnScaleFont As System.Windows.Forms.Button
     Friend WithEvents chkCurveSymbolFillVisible As System.Windows.Forms.CheckBox
+    Friend WithEvents cboCurveStyle As System.Windows.Forms.ComboBox
 End Class
