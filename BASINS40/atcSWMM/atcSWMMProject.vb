@@ -342,21 +342,20 @@ Public Class atcSWMMProject
         If aBlockName = "[TIMESERIES]" Then
             Logger.Dbg("Timeseries")
         End If
-        Dim lBlockComplete As Boolean = False
         Dim lContents As String = ""
         Dim lNextLine As String = aSR.ReadLine
-        While Not lBlockComplete
+        While True
+            If lNextLine.Length = 0 Then
+                If aSR.Peek = Asc("[") Then
+                    Exit While
+                End If
+            End If
+
             lContents &= (lNextLine & vbCrLf)
             If aSR.EndOfStream Then
-                lBlockComplete = True
-                lNextLine = ""
+                Exit While
             Else
                 lNextLine = aSR.ReadLine
-                If lNextLine.Length = 0 Then
-                    If aSR.Peek = Asc("[") Then
-                        lBlockComplete = True
-                    End If
-                End If
             End If
         End While
         If lContents.Length < 2 Then

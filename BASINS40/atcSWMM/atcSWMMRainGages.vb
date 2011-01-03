@@ -96,6 +96,7 @@ Public Class atcSWMMRainGages
                                 .TimeSeries.Attributes.SetValue("Source", "") ' actual TS source file full path
                                 .TimeSeries.Attributes.AddHistory("Read from " & pSWMMProject.Specification)
                                 .TimeSeries.Attributes.SetValue("ID", "R" & Me.Count + 1)
+                                .TimeSeries.Attributes.SetValue("interval", .IntervalJulian())
                                 .TimeSeries.ValuesNeedToBeRead = True
 
                                 If .Type.ToLower() = "file" Then
@@ -192,6 +193,7 @@ Public Class atcSWMMRainGages
 
         Dim lSR As System.IO.StreamReader = New System.IO.StreamReader(aFilename)
         Dim lLineCtr As Integer = 0
+        Dim lTimeStep As Double = aTS.Attributes.GetValue("interval")
         While Not lSR.EndOfStream
             Dim line As String = lSR.ReadLine()
             Dim lItems() As String = Regex.Split(line.Trim(), "\s+")
@@ -201,21 +203,20 @@ Public Class atcSWMMRainGages
                 Continue While
             End If
 
-            Dim ldate As Double = 0.0
+            Dim ldate As Double = Jday(Integer.Parse(lItems(1)), Integer.Parse(lItems(2)), Integer.Parse(lItems(3)), Integer.Parse(lItems(4)), Integer.Parse(lItems(5)), 0)
             If lLineCtr = 0 Then
-                'Do need to add this first time step at the zero position for the zero hour of the day
-                ldate = Jday(Integer.Parse(lItems(1)), Integer.Parse(lItems(2)), Integer.Parse(lItems(3)), Integer.Parse(lItems(4)), Integer.Parse(lItems(5)), 0)
+                'Add beginning of first time step at the zero position
                 lDates.Add(ldate)
                 lValues.Add(Double.NaN)
             End If
-            'SWMM5 denote a day has 0 hour to 23 hour, but atcTimeseries denote a day as 1 ~ 24 hour
-            ldate = Jday(Integer.Parse(lItems(1)), Integer.Parse(lItems(2)), Integer.Parse(lItems(3)), Integer.Parse(lItems(4)) + 1, Integer.Parse(lItems(5)), 0)
+
+            'store each value at end of interval
+            ldate += lTimeStep
             lDates.Add(ldate)
             lValues.Add(Double.Parse(lItems(lItems.Length - 1)))
 
             lLineCtr += 1
         End While
-
 
         aTS.ValuesNeedToBeRead = False
 
@@ -328,6 +329,7 @@ Public Class atcSWMMRainGages
             End If
         Next
     End Sub
+
 End Class
 
 ''' <summary>Valid values for SWMM Raingage data formats</summary>
@@ -377,4 +379,9 @@ Public Class atcSWMMRainGage
     ''' <summary></summary>
     ''' <remarks></remarks>
     Public AuxiParms As String = String.Empty
+
+    Public Function IntervalJulian() As Double
+        Dim lParts() As String = Interval.Split(":")
+        Return CInt(lParts(0)) * JulianHour + CInt(lParts(1)) * JulianMinute
+    End Function
 End Class
