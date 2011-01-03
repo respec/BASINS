@@ -43,6 +43,9 @@ Public Class frmGraphEditor
         End If
         'Me.cboCurveStep.Items.Add("Smooth") 'Smooth looks pretty but makes the data look smoother than it really is
         Me.cboCurveStep.Items.AddRange(System.Enum.GetNames(GetType(ZedGraph.StepType)))
+        Me.cboCurveStyle.Items.AddRange(System.Enum.GetNames(GetType(System.Drawing.Drawing2D.DashStyle)))
+        Dim lCustomPos As Integer = Me.cboCurveStyle.Items.IndexOf("Custom")
+        If lCustomPos > -1 Then Me.cboCurveStyle.Items.RemoveAt(lCustomPos)
         Me.cboCurveSymbolType.Items.AddRange(System.Enum.GetNames(GetType(ZedGraph.SymbolType)))
 
         SetComboFromCurves()
@@ -294,6 +297,7 @@ Public Class frmGraphEditor
             Else
                 cboCurveStep.Text = System.Enum.GetName(GetType(ZedGraph.StepType), aCurve.Line.StepType)
             End If
+            cboCurveStyle.Text = System.Enum.GetName(GetType(System.Drawing.Drawing2D.DashStyle), aCurve.Line.Style)
             cboCurveSymbolType.Text = System.Enum.GetName(GetType(ZedGraph.SymbolType), aCurve.Symbol.Type)
         End If
         pSettingControls -= 1
@@ -335,6 +339,7 @@ Public Class frmGraphEditor
                 aCurve.Line.IsSmooth = False
                 aCurve.Line.StepType = System.Enum.Parse(GetType(ZedGraph.StepType), cboCurveStep.Text)
             End If
+            aCurve.Line.Style = System.Enum.Parse(GetType(System.Drawing.Drawing2D.DashStyle), cboCurveStyle.Text)
             aCurve.Symbol.Type = System.Enum.Parse(GetType(ZedGraph.SymbolType), cboCurveSymbolType.Text)
             'Select Case cboCurveSymbolType.Text
             '    Case "Square" : aCurve.Symbol.Type = SymbolType.Square
@@ -521,11 +526,7 @@ Public Class frmGraphEditor
         AddedLineItem()
     End Sub
 
-    Private Sub cboCurveStep_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboCurveStep.SelectedIndexChanged
-        If chkAutoApply.Checked Then ApplyAll()
-    End Sub
-
-    Private Sub cboCurveSymbolType_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboCurveSymbolType.SelectedIndexChanged
+    Private Sub cboCurveAny_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboCurveStep.SelectedIndexChanged, cboCurveStyle.SelectedIndexChanged, cboCurveSymbolType.SelectedIndexChanged
         If chkAutoApply.Checked Then ApplyAll()
     End Sub
 
