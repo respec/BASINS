@@ -69,7 +69,7 @@ Public Class frmEndpoint
     Friend WithEvents btnOk As System.Windows.Forms.Button
     Friend WithEvents lblAttribute As System.Windows.Forms.Label
     Friend WithEvents lblData As System.Windows.Forms.Label
-    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents grpHighlight As System.Windows.Forms.GroupBox
     Friend WithEvents txtMin As System.Windows.Forms.TextBox
     Friend WithEvents lblMinimum As System.Windows.Forms.Label
     Friend WithEvents txtLowColor As System.Windows.Forms.TextBox
@@ -97,7 +97,7 @@ Public Class frmEndpoint
         Me.lblAttribute = New System.Windows.Forms.Label
         Me.lblData = New System.Windows.Forms.Label
         Me.txtData = New System.Windows.Forms.TextBox
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.grpHighlight = New System.Windows.Forms.GroupBox
         Me.txtHighColor = New System.Windows.Forms.TextBox
         Me.lblHighColor = New System.Windows.Forms.Label
         Me.txtLowColor = New System.Windows.Forms.TextBox
@@ -133,7 +133,7 @@ Public Class frmEndpoint
         Me.txtEventVolume = New System.Windows.Forms.TextBox
         Me.txtEventDuration = New System.Windows.Forms.TextBox
         Me.btnSelectAttributes = New System.Windows.Forms.Button
-        Me.GroupBox1.SuspendLayout()
+        Me.grpHighlight.SuspendLayout()
         Me.grpSeasons.SuspendLayout()
         Me.panelOperation.SuspendLayout()
         Me.grpEvents.SuspendLayout()
@@ -209,26 +209,26 @@ Public Class frmEndpoint
         Me.txtData.Size = New System.Drawing.Size(217, 20)
         Me.txtData.TabIndex = 3
         '
-        'GroupBox1
+        'grpHighlight
         '
-        Me.GroupBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.grpHighlight.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.GroupBox1.Controls.Add(Me.txtHighColor)
-        Me.GroupBox1.Controls.Add(Me.lblHighColor)
-        Me.GroupBox1.Controls.Add(Me.txtLowColor)
-        Me.GroupBox1.Controls.Add(Me.lblLowColor)
-        Me.GroupBox1.Controls.Add(Me.txtMax)
-        Me.GroupBox1.Controls.Add(Me.txtMin)
-        Me.GroupBox1.Controls.Add(Me.lblMaximum)
-        Me.GroupBox1.Controls.Add(Me.lblMinimum)
-        Me.GroupBox1.Controls.Add(Me.txtDefaultColor)
-        Me.GroupBox1.Controls.Add(Me.lblDefaultColor)
-        Me.GroupBox1.Location = New System.Drawing.Point(12, 96)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(312, 160)
-        Me.GroupBox1.TabIndex = 6
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Highlight Values"
+        Me.grpHighlight.Controls.Add(Me.txtHighColor)
+        Me.grpHighlight.Controls.Add(Me.lblHighColor)
+        Me.grpHighlight.Controls.Add(Me.txtLowColor)
+        Me.grpHighlight.Controls.Add(Me.lblLowColor)
+        Me.grpHighlight.Controls.Add(Me.txtMax)
+        Me.grpHighlight.Controls.Add(Me.txtMin)
+        Me.grpHighlight.Controls.Add(Me.lblMaximum)
+        Me.grpHighlight.Controls.Add(Me.lblMinimum)
+        Me.grpHighlight.Controls.Add(Me.txtDefaultColor)
+        Me.grpHighlight.Controls.Add(Me.lblDefaultColor)
+        Me.grpHighlight.Location = New System.Drawing.Point(12, 96)
+        Me.grpHighlight.Name = "grpHighlight"
+        Me.grpHighlight.Size = New System.Drawing.Size(312, 160)
+        Me.grpHighlight.TabIndex = 6
+        Me.grpHighlight.TabStop = False
+        Me.grpHighlight.Text = "Highlight Values"
         '
         'txtHighColor
         '
@@ -620,7 +620,7 @@ Public Class frmEndpoint
         Me.Controls.Add(Me.lblAttribute)
         Me.Controls.Add(Me.grpSeasons)
         Me.Controls.Add(Me.cboAttribute)
-        Me.Controls.Add(Me.GroupBox1)
+        Me.Controls.Add(Me.grpHighlight)
         Me.Controls.Add(Me.lblName)
         Me.Controls.Add(Me.txtName)
         Me.Controls.Add(Me.txtData)
@@ -632,8 +632,8 @@ Public Class frmEndpoint
         Me.KeyPreview = True
         Me.Name = "frmEndpoint"
         Me.Text = "Endpoint"
-        Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox1.PerformLayout()
+        Me.grpHighlight.ResumeLayout(False)
+        Me.grpHighlight.PerformLayout()
         Me.grpSeasons.ResumeLayout(False)
         Me.grpSeasons.PerformLayout()
         Me.panelOperation.ResumeLayout(False)
@@ -984,17 +984,19 @@ Public Class frmEndpoint
     End Sub
 
     Private Sub EnableEvents(ByVal aEnable As Boolean)
-        txtEventThreshold.Enabled = aEnable
-        txtEventGap.Enabled = aEnable
-        txtEventDuration.Enabled = aEnable
-        txtEventVolume.Enabled = aEnable
+        For Each lControl As Windows.Forms.Control In grpEvents.Controls
+            If lControl IsNot chkEvents Then
+                lControl.Enabled = aEnable
+            End If
+        Next
     End Sub
 
     Private Sub EnableSeasons(ByVal aEnable As Boolean)
-        cboSeasons.Visible = aEnable
-        lstSeasons.Visible = aEnable
-        btnSeasonsAll.Visible = aEnable
-        btnSeasonsNone.Visible = aEnable
+        For Each lControl As Windows.Forms.Control In grpSeasons.Controls
+            If lControl IsNot chkSeasons Then
+                lControl.Enabled = aEnable
+            End If
+        Next
 
         If aEnable Then
             cboSeasons_SelectedIndexChanged(Nothing, Nothing)
