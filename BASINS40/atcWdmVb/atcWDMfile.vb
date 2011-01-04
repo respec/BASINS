@@ -123,7 +123,7 @@ Public Class atcWDMfile
         Dim lDsn As Int32 = aWdm.ReadInt32(Wdm_Fields.DSFST_Timeseries)
         While lDsn > 0
             Dim lRec As Int32 = aWdm.FirstRecordNumberFromDsn(lDsn)
-            Logger.Dbg("Dsn: " & lDsn & " Rec: " & lRec)
+            'Logger.Dbg("Dsn: " & lDsn & " Rec: " & lRec)
             DataSets.Add(lDsn, DataSetFromWdm(aWdm, lDsn))
             lDsn = aWdm.ReadInt32(lRec, 2)
             If lDsn = 0 Then
