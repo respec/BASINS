@@ -32,16 +32,16 @@ atcClimateAssessmentTool
 	<param name="aSeed">Random number seed</param>
 	<returns></returns>
 	<remarks></remarks>
-</member><member name="M:atcClimateAssessmentTool.clsCatModelHSPF.OpenBaseScenario(System.String)">
+</member><member name="M:atcClimateAssessmentTool.clsCatModelHSPF.OpenBaseModel(System.String)">
 	<summary>
  Open data files referred to in this UCI file
  </summary>
 	<param name="aFilename">Full path of UCI file</param>
 	<remarks></remarks>
-</member><member name="M:atcClimateAssessmentTool.clsCatModelHSPF.ScenarioRun(System.String,atcData.atcTimeseriesGroup,System.String,System.Boolean,System.Boolean,System.Boolean)">
+</member><member name="M:atcClimateAssessmentTool.clsCatModelHSPF.ModelRun(System.String,atcData.atcTimeseriesGroup,System.String,System.Boolean,System.Boolean,System.Boolean)">
 	<summary>
 	</summary>
-	<param name="aNewScenarioName"></param>
+	<param name="aNewModelName"></param>
 	<param name="aModifiedData"></param>
 	<param name="aPreparedInput"></param>
 	<param name="aRunModel"></param>
@@ -56,19 +56,19 @@ atcClimateAssessmentTool
 	<param name="aUCIfileContents">Full text of UCI file</param>
 	<param name="aFileType">WDM or MESSU or BINO</param>
 	<returns>ArrayList of file name(s) of the requested type appearing in the FILES block</returns>
-</member><member name="M:atcClimateAssessmentTool.clsCatModelSWMM.OpenBaseScenario(System.String)">
+</member><member name="M:atcClimateAssessmentTool.clsCatModelSWMM.OpenBaseModel(System.String)">
 	<summary>
  Open data files referred to in this INP file
  </summary>
 	<param name="aFilename">Full path of INP file</param>
 	<remarks></remarks>
-</member><member name="M:atcClimateAssessmentTool.clsCatModelSWMM.ScenarioRun(System.String,atcData.atcTimeseriesGroup,System.String,System.Boolean,System.Boolean,System.Boolean)">
+</member><member name="M:atcClimateAssessmentTool.clsCatModelSWMM.ModelRun(System.String,atcData.atcTimeseriesGroup,System.String,System.Boolean,System.Boolean,System.Boolean)">
 	<summary>
- Copy base INP and change scenario name within it
+ Copy base INP and change model name within it
  Change data to be modified in new INP
  Run SWMM5 with the new INP
  </summary>
-	<param name="aNewScenarioName"></param>
+	<param name="aNewModelName"></param>
 	<param name="aModifiedData"></param>
 	<param name="aPreparedInput"></param>
 	<param name="aRunModel"></param>
