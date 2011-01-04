@@ -305,9 +305,9 @@ Public Class frmCAT
         '
         'btnSaveResults
         '
-        Me.btnSaveResults.Location = New System.Drawing.Point(87, 19)
+        Me.btnSaveResults.Location = New System.Drawing.Point(97, 19)
         Me.btnSaveResults.Name = "btnSaveResults"
-        Me.btnSaveResults.Size = New System.Drawing.Size(75, 23)
+        Me.btnSaveResults.Size = New System.Drawing.Size(85, 23)
         Me.btnSaveResults.TabIndex = 1
         Me.btnSaveResults.Text = "Save"
         Me.btnSaveResults.UseVisualStyleBackColor = True
@@ -316,7 +316,7 @@ Public Class frmCAT
         '
         Me.btnOpenResults.Location = New System.Drawing.Point(6, 19)
         Me.btnOpenResults.Name = "btnOpenResults"
-        Me.btnOpenResults.Size = New System.Drawing.Size(75, 23)
+        Me.btnOpenResults.Size = New System.Drawing.Size(85, 23)
         Me.btnOpenResults.TabIndex = 0
         Me.btnOpenResults.Text = "Open"
         Me.btnOpenResults.UseVisualStyleBackColor = True
@@ -336,9 +336,9 @@ Public Class frmCAT
         '
         'btnSaveClimateEndpoint
         '
-        Me.btnSaveClimateEndpoint.Location = New System.Drawing.Point(87, 19)
+        Me.btnSaveClimateEndpoint.Location = New System.Drawing.Point(97, 19)
         Me.btnSaveClimateEndpoint.Name = "btnSaveClimateEndpoint"
-        Me.btnSaveClimateEndpoint.Size = New System.Drawing.Size(75, 23)
+        Me.btnSaveClimateEndpoint.Size = New System.Drawing.Size(85, 23)
         Me.btnSaveClimateEndpoint.TabIndex = 1
         Me.btnSaveClimateEndpoint.Text = "Save"
         Me.btnSaveClimateEndpoint.UseVisualStyleBackColor = True
@@ -347,7 +347,7 @@ Public Class frmCAT
         '
         Me.btnOpenClimateEndpoint.Location = New System.Drawing.Point(6, 19)
         Me.btnOpenClimateEndpoint.Name = "btnOpenClimateEndpoint"
-        Me.btnOpenClimateEndpoint.Size = New System.Drawing.Size(75, 23)
+        Me.btnOpenClimateEndpoint.Size = New System.Drawing.Size(85, 23)
         Me.btnOpenClimateEndpoint.TabIndex = 0
         Me.btnOpenClimateEndpoint.Text = "Open"
         Me.btnOpenClimateEndpoint.UseVisualStyleBackColor = True
@@ -368,27 +368,27 @@ Public Class frmCAT
         '
         'btnOpenSWMM
         '
-        Me.btnOpenSWMM.Location = New System.Drawing.Point(168, 19)
+        Me.btnOpenSWMM.Location = New System.Drawing.Point(188, 19)
         Me.btnOpenSWMM.Name = "btnOpenSWMM"
-        Me.btnOpenSWMM.Size = New System.Drawing.Size(75, 23)
+        Me.btnOpenSWMM.Size = New System.Drawing.Size(85, 23)
         Me.btnOpenSWMM.TabIndex = 2
         Me.btnOpenSWMM.Text = "SWMM .inp"
         Me.btnOpenSWMM.UseVisualStyleBackColor = True
         '
         'btnOpenSWAT
         '
-        Me.btnOpenSWAT.Location = New System.Drawing.Point(87, 19)
+        Me.btnOpenSWAT.Location = New System.Drawing.Point(97, 19)
         Me.btnOpenSWAT.Name = "btnOpenSWAT"
-        Me.btnOpenSWAT.Size = New System.Drawing.Size(75, 23)
+        Me.btnOpenSWAT.Size = New System.Drawing.Size(85, 23)
         Me.btnOpenSWAT.TabIndex = 1
-        Me.btnOpenSWAT.Text = "SWAT .dbf"
+        Me.btnOpenSWAT.Text = "SWAT .mdb"
         Me.btnOpenSWAT.UseVisualStyleBackColor = True
         '
         'btnOpenHSPF
         '
         Me.btnOpenHSPF.Location = New System.Drawing.Point(6, 19)
         Me.btnOpenHSPF.Name = "btnOpenHSPF"
-        Me.btnOpenHSPF.Size = New System.Drawing.Size(75, 23)
+        Me.btnOpenHSPF.Size = New System.Drawing.Size(85, 23)
         Me.btnOpenHSPF.TabIndex = 0
         Me.btnOpenHSPF.Text = "HSPF .uci"
         Me.btnOpenHSPF.UseVisualStyleBackColor = True
@@ -410,7 +410,7 @@ Public Class frmCAT
         Me.tabInputs.Controls.Add(Me.btnInputAddCligen)
         Me.tabInputs.Location = New System.Drawing.Point(4, 22)
         Me.tabInputs.Name = "tabInputs"
-        Me.tabInputs.Size = New System.Drawing.Size(512, 344)
+        Me.tabInputs.Size = New System.Drawing.Size(512, 310)
         Me.tabInputs.TabIndex = 0
         Me.tabInputs.Text = "Climate Data"
         Me.tabInputs.UseVisualStyleBackColor = True
@@ -511,7 +511,7 @@ Public Class frmCAT
         Me.lstInputs.IntegralHeight = False
         Me.lstInputs.Location = New System.Drawing.Point(8, 94)
         Me.lstInputs.Name = "lstInputs"
-        Me.lstInputs.Size = New System.Drawing.Size(496, 241)
+        Me.lstInputs.Size = New System.Drawing.Size(496, 207)
         Me.lstInputs.TabIndex = 14
         '
         'btnInputPrepared
@@ -547,7 +547,7 @@ Public Class frmCAT
         Me.tabEndpoints.Controls.Add(Me.btnEndpointAdd)
         Me.tabEndpoints.Location = New System.Drawing.Point(4, 22)
         Me.tabEndpoints.Name = "tabEndpoints"
-        Me.tabEndpoints.Size = New System.Drawing.Size(512, 344)
+        Me.tabEndpoints.Size = New System.Drawing.Size(512, 310)
         Me.tabEndpoints.TabIndex = 1
         Me.tabEndpoints.Text = "Assessment Endpoints"
         Me.tabEndpoints.UseVisualStyleBackColor = True
@@ -613,7 +613,7 @@ Public Class frmCAT
         Me.lstEndpoints.IntegralHeight = False
         Me.lstEndpoints.Location = New System.Drawing.Point(8, 94)
         Me.lstEndpoints.Name = "lstEndpoints"
-        Me.lstEndpoints.Size = New System.Drawing.Size(496, 241)
+        Me.lstEndpoints.Size = New System.Drawing.Size(496, 207)
         Me.lstEndpoints.TabIndex = 22
         '
         'btnEndpointDown
@@ -663,7 +663,7 @@ Public Class frmCAT
         Me.tabResults.Controls.Add(Me.agdResults)
         Me.tabResults.Location = New System.Drawing.Point(4, 22)
         Me.tabResults.Name = "tabResults"
-        Me.tabResults.Size = New System.Drawing.Size(512, 344)
+        Me.tabResults.Size = New System.Drawing.Size(512, 310)
         Me.tabResults.TabIndex = 2
         Me.tabResults.Text = "Results Table"
         Me.tabResults.UseVisualStyleBackColor = True
@@ -682,7 +682,7 @@ Public Class frmCAT
         Me.agdResults.LineWidth = 0.0!
         Me.agdResults.Location = New System.Drawing.Point(8, 8)
         Me.agdResults.Name = "agdResults"
-        Me.agdResults.Size = New System.Drawing.Size(496, 327)
+        Me.agdResults.Size = New System.Drawing.Size(496, 293)
         Me.agdResults.Source = Nothing
         Me.agdResults.TabIndex = 21
         '
@@ -697,7 +697,7 @@ Public Class frmCAT
         Me.tabPivot.Controls.Add(Me.cboPivotRows)
         Me.tabPivot.Location = New System.Drawing.Point(4, 22)
         Me.tabPivot.Name = "tabPivot"
-        Me.tabPivot.Size = New System.Drawing.Size(512, 344)
+        Me.tabPivot.Size = New System.Drawing.Size(512, 310)
         Me.tabPivot.TabIndex = 3
         Me.tabPivot.Text = "Pivot Table"
         Me.tabPivot.UseVisualStyleBackColor = True
@@ -715,7 +715,7 @@ Public Class frmCAT
         Me.agdPivot.LineWidth = 0.0!
         Me.agdPivot.Location = New System.Drawing.Point(8, 89)
         Me.agdPivot.Name = "agdPivot"
-        Me.agdPivot.Size = New System.Drawing.Size(496, 246)
+        Me.agdPivot.Size = New System.Drawing.Size(496, 212)
         Me.agdPivot.Source = Nothing
         Me.agdPivot.TabIndex = 28
         '
@@ -1285,19 +1285,7 @@ Public Class frmCAT
         Me.Activate()
         If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
             For Each lFilename As String In e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
-                Select Case IO.Path.GetExtension(lFilename).ToLower
-                    Case ".xml"
-                        OpenXML(lFilename)
-                    Case ".uci"
-                        pCat.Model = New clsCatModelHSPF
-                        pCat.Model.BaseModel = lFilename
-                    Case ".mdb"
-                        pCat.Model = New clsCatModelSWAT
-                        pCat.Model.BaseModel = lFilename
-                    Case ".inp"
-                        pCat.Model = New clsCatModelSWMM
-                        pCat.Model.BaseModel = lFilename
-                End Select
+                If OpenFile(lFilename) Then Exit For
             Next
         End If
     End Sub

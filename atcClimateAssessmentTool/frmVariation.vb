@@ -1108,33 +1108,22 @@ Imports MapWinUtility
 
     Private Sub EnableEvents(ByVal aEnable As Boolean)
         If chkEvents.Checked <> aEnable Then chkEvents.Checked = aEnable
-
-        lblThreshold.Visible = aEnable
-        txtEventThreshold.Visible = aEnable
-        lblThresholdUnits.Visible = aEnable
-
-        lblGap.Visible = aEnable
-        txtEventGap.Visible = aEnable
-        lblGapUnits.Visible = aEnable
-
-        lblVolume.Visible = aEnable
-        txtEventVolume.Visible = aEnable
-        lblVolumeUnits.Visible = aEnable
-
-        lblDuration.Visible = aEnable
-        txtEventDuration.Visible = aEnable
-        lblDurationUnits.Visible = aEnable
-
+        For Each lControl As Windows.Forms.Control In grpEvents.Controls
+            If lControl IsNot chkEvents Then
+                lControl.Enabled = aEnable
+            End If
+        Next
         SetVolumePercentVisible()
     End Sub
 
     Private Sub EnableSeasons(ByVal aEnable As Boolean)
         If chkSeasons.Checked <> aEnable Then chkSeasons.Checked = aEnable
 
-        cboSeasons.Visible = aEnable
-        lstSeasons.Visible = aEnable
-        btnSeasonsAll.Visible = aEnable
-        btnSeasonsNone.Visible = aEnable
+        For Each lControl As Windows.Forms.Control In grpSeasons.Controls
+            If lControl IsNot chkSeasons Then
+                lControl.Enabled = aEnable
+            End If
+        Next
 
         If aEnable Then
             cboSeasons_SelectedIndexChanged(Nothing, Nothing)
