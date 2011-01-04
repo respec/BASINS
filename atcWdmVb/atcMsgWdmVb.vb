@@ -21,8 +21,14 @@ Friend Class atcMsgWDMvb
     Public Sub New()
         Logger.Dbg("MessageFileReadWithVB")
         Dim lAttr As atcAttributeDefinition
-        Dim lFileName As String = FindFile("Please locate HSPF message file", "hspfmsg.wdm")
-        Dim lWdmMsg As New atcWdmFileHandle(1, lFileName)
+        Dim lWdmMsg As atcWdmFileHandle
+        Dim lBinaryReader As IO.BinaryReader = GetEmbeddedFileAsBinaryReader("hspfmsg.wdm")
+        If lBinaryReader Is Nothing Then
+            Dim lFileName As String = FindFile("Please locate HSPF message file", "hspfmsg.wdm")
+            lWdmMsg = New atcWdmFileHandle(1, lFileName)
+        Else
+            lWdmMsg = New atcWdmFileHandle(lBinaryReader)
+        End If
         Dim lAttributeDsn As Int32 = lWdmMsg.ReadInt32(Wdm_Fields.DSFST_Attribute)
         While lAttributeDsn > 0 'loop through all possible attributes 
             Dim lBaseRec As Int32 = lWdmMsg.FirstRecordNumberFromDsn(lAttributeDsn)
@@ -135,15 +141,15 @@ Friend Class atcMsgWDMvb
                                     lAttr.DefaultValue = lWdmMsg.ReadInt32
                                     If lAttr.DefaultValue = -999 Then
                                         lAttr.DefaultValue = GetNaN()
-                                    ' ElseIf lAttr.DefaultValue <> 0 Then
-                                    '    Logger.Dbg("NonZeroDefault:" & lAttr.Name & ":" & lAttr.DefaultValue)
+                                        ' ElseIf lAttr.DefaultValue <> 0 Then
+                                        '    Logger.Dbg("NonZeroDefault:" & lAttr.Name & ":" & lAttr.DefaultValue)
                                     End If
                                 ElseIf ReferenceEquals(lAttr.TypeString, pAttributeTypeName(2)) Then 'Single Default
                                     lAttr.DefaultValue = lWdmMsg.ReadSingle
                                     If lAttr.DefaultValue = -999 Then
                                         lAttr.DefaultValue = GetNaN()
-                                    ' ElseIf lAttr.DefaultValue <> 0 Then
-                                    '    Logger.Dbg("NonZeroDefault:" & lAttr.Name & ":" & lAttr.DefaultValue)
+                                        ' ElseIf lAttr.DefaultValue <> 0 Then
+                                        '    Logger.Dbg("NonZeroDefault:" & lAttr.Name & ":" & lAttr.DefaultValue)
                                     End If
                                 ElseIf ReferenceEquals(lAttr.TypeString, pAttributeTypeName(3)) Then 'String Default
                                     lAttr.DefaultValue &= lWdmMsg.ReadString(lNumWords)

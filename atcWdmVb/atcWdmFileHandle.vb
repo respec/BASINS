@@ -69,20 +69,24 @@ Friend Class atcWdmFileHandle
                 lFileAccess = IO.FileAccess.ReadWrite
             End If
 
-            Logger.Dbg("atcWdmFileHandle:OpenB4:" & lFileName)
+            'Logger.Dbg("atcWdmFileHandle:OpenB4:" & lFileName)
             Try
                 lFS = IO.File.Open(lFileName, IO.FileMode.Open, lFileAccess, IO.FileShare.Read)
                 pBr = New IO.BinaryReader(lFS)
                 'TODO: writer?
-                Logger.Dbg("atcWdmFileHandle:OpenAft:" & lFileAccess)
+                'Logger.Dbg("atcWdmFileHandle:OpenAft:" & lFileAccess)
             Catch ex As Exception
                 Throw New ApplicationException("atcWdmFileHandle:Exception:" & vbCrLf & ex.ToString)
             End Try
         End If
     End Sub
 
+    Public Sub New(ByVal aBinaryReader As IO.BinaryReader)
+        pBr = aBinaryReader
+    End Sub
+
     Public Sub Dispose() Implements System.IDisposable.Dispose
-        Logger.Dbg("atcWdmFileHandle:Dispose:")
+        'Logger.Dbg("atcWdmFileHandle:Dispose:")
         pBr.Close()
         GC.SuppressFinalize(Me)
     End Sub
