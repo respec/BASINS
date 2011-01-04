@@ -90,8 +90,8 @@ Public Class atcSWMMRainGages
                                 .TimeSeries.Attributes.SetValue("Location", .Name.Trim()) ' raingage location label
                                 .TimeSeries.Attributes.SetValue("Constituent", "PREC")
                                 Dim lItem As String = lItems(J).Trim()
-                                'lItem = lItem.Trim("""")
-                                lItem = pSWMMProject.FilterFileName(lItem)
+                                'lItem = pSWMMProject.FilterFileName(lItem)
+                                lItem = lItem.Trim("""")
                                 .TimeSeries.Attributes.SetValue("Scenario", lItem) ' raingage timeseries label
                                 .TimeSeries.Attributes.SetValue("Source", "") ' actual TS source file full path
                                 .TimeSeries.Attributes.AddHistory("Read from " & pSWMMProject.Specification)

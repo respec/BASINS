@@ -147,7 +147,7 @@ Public Class atcSWMMTemperature
             If lTS IsNot Nothing Then
                 Timeseries = lTS
             End If
-            Dim lFileName As String = PathNameOnly(Me.pSWMMProject.Specification) & g_PathChar & Timeseries.Attributes.GetValue("Location") & "T.DAT"
+            Dim lFileName As String = PathNameOnly(Me.pSWMMProject.Specification) & g_PathChar & SafeFilename(Timeseries.Attributes.GetValue("Location")) & "T.DAT"
             Dim lSB As New StringBuilder
             lSB.Append(Me.pSWMMProject.TimeSeriesToString(Timeseries, Timeseries.Attributes.GetValue("Location") & ":T", "ATEM"))
             SaveFileString(lFileName, lSB.ToString)
