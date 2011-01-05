@@ -160,7 +160,7 @@ Public Class atcMetCmpPlugin
                 Else
                     lWindTSer = aArgs.GetValue("WIND")
                 End If
-                If Not lWindTSer Is Nothing Then
+                If lWindTSer IsNot Nothing Then
                     Dim lMetCmpTS As atcTimeseries = CmpWnd(lWindTSer, Me)
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
