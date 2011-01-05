@@ -353,6 +353,7 @@ ParseDate:                          Logger.Dbg(.Name & " text date '" & lS & "' 
         Dim lDateD(lData.Count - 1) As Double
         lDate.CopyTo(lDateD)
         aDataSet.Dates.Values = lDateD
+        aDataSet.numValues = lDataD.GetUpperBound(0)
     End Sub
 
     Private Function WdmTimserGroupDate2JDate(ByVal aGroupDate As UInt32) As Double

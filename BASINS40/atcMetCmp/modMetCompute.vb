@@ -1,11 +1,16 @@
 Option Strict Off
 Option Explicit On
+
 Imports atcData
 Imports atcUtility
 Imports MapWinUtility
 
 Public Module modMetCompute
-    'Copyright 2005 by AQUA TERRA Consultants
+    'Copyright 2005-10 by AQUA TERRA Consultants
+
+    Friend MetComputeLatitudeMax As Double = 66.5
+    Friend MetComputeLatitudeMin As Double = -66.5
+
     Private X1() As Double = {0, 10.00028, 41.0003, 69.22113, 100.5259, 130.8852, 161.2853, _
                           191.7178, 222.1775, 253.66, 281.1629, 309.6838, 341.221}
     Private c(,) As Double = { _
@@ -963,7 +968,7 @@ Public Module modMetCompute
         JulDay = 30.5 * (aMonth - 1) + aDay
 
         'check latitude
-        If aLatDeg < -66.5 Or aLatDeg > 66.5 Then 'invalid latitude, return
+        If aLatDeg < MetComputeLatitudeMin OrElse aLatDeg > MetComputeLatitudeMax Then 'invalid latitude, return
             aRetCod = -1
         Else 'latitude ok
             'convert to radians
@@ -1036,7 +1041,7 @@ Public Module modMetCompute
         JulDay = 30.5 * (aMonth - 1) + aDay
 
         'check latitude
-        If aLatDeg < -66.5 Or aLatDeg > 66.5 Then 'invalid latitude, return
+        If aLatDeg < MetComputeLatitudeMin OrElse aLatDeg > MetComputeLatitudeMax Then 'invalid latitude, return
             aRetCod = -1
         Else 'latitude ok
             'convert to radians
