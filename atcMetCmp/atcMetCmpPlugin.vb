@@ -9,7 +9,7 @@ Public Class atcMetCmpPlugin
 
     Private pAvailableOperations As atcDataAttributes ' atcDataGroup
     Private pName As String = "Timeseries::Meteorologic Generation"
-
+ 
     Public Overrides ReadOnly Property Name() As String
         Get
             Return "Timeseries::Meteorologic Generation"
@@ -63,9 +63,8 @@ Public Class atcMetCmpPlugin
                     lLatitude = aArgs.GetValue("Latitude")
                     lOk = True
                 End If
-                lAttDef = atcDataAttributes.GetDefinition("Latitude")
-                If lOk And Not lCldTSer Is Nothing And _
-                  lLatitude >= lAttDef.Min And lLatitude <= lAttDef.Max Then
+                If lOk AndAlso lCldTSer IsNot Nothing AndAlso _
+                  lLatitude >= MetComputeLatitudeMin AndAlso lLatitude <= MetComputeLatitudeMax Then
                     Dim lMetCmpTS As atcTimeseries = CmpSol(lCldTSer, Me, lLatitude)
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
@@ -80,9 +79,8 @@ Public Class atcMetCmpPlugin
                     lLatitude = aArgs.GetValue("Latitude")
                     lOk = True
                 End If
-                lAttDef = atcDataAttributes.GetDefinition("Latitude")
-                If lOk And Not lSRadTSer Is Nothing And _
-                  lLatitude >= lAttDef.Min And lLatitude <= lAttDef.Max Then
+                If lOk AndAlso lSRadTSer IsNot Nothing AndAlso _
+                  lLatitude >= MetComputeLatitudeMin AndAlso lLatitude <= MetComputeLatitudeMax Then
                     Dim lMetCmpTS As atcTimeseries = CmpCldFromSolar(lSRadTSer, Me, lLatitude)
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
@@ -108,8 +106,8 @@ Public Class atcMetCmpPlugin
                     End If
                 Next
                 lAttDef = atcDataAttributes.GetDefinition("Constant Coefficient")
-                If lOk And Not lTMinTSer Is Nothing And Not lTMaxTSer Is Nothing And _
-                  Not lSRadTSer Is Nothing And lCTX >= lAttDef.Min And lCTX <= lAttDef.Max Then
+                If lOk AndAlso lTMinTSer IsNot Nothing AndAlso lTMaxTSer IsNot Nothing AndAlso _
+                               lSRadTSer IsNot Nothing AndAlso lCTX >= lAttDef.Min AndAlso lCTX <= lAttDef.Max Then
                     Dim lMetCmpTS As atcTimeseries = CmpJen(lTMinTSer, lTMaxTSer, lSRadTSer, Me, lDegF, lCTX, lCTS)
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
@@ -132,9 +130,8 @@ Public Class atcMetCmpPlugin
                         Exit For
                     End If
                 Next
-                lAttDef = atcDataAttributes.GetDefinition("Latitude")
-                If lOk And Not lTMinTSer Is Nothing And Not lTMinTSer Is Nothing And _
-                  lLatitude >= lAttDef.Min And lLatitude <= lAttDef.Max Then
+                If lOk AndAlso lTMaxTSer IsNot Nothing AndAlso lTMinTSer IsNot Nothing AndAlso _
+                   lLatitude >= MetComputeLatitudeMin AndAlso lLatitude <= MetComputeLatitudeMax Then
                     Dim lMetCmpTS As atcTimeseries = CmpHam(lTMinTSer, lTMaxTSer, Me, lDegF, lLatitude, lCTS)
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
@@ -151,8 +148,8 @@ Public Class atcMetCmpPlugin
                     lWindTSer = aArgs.GetValue("TWND")
                     lOk = True
                 End If
-                If lOk And Not lTMinTSer Is Nothing And Not lTMaxTSer Is Nothing And _
-                  Not lSRadTSer Is Nothing And Not lDewPTSer Is Nothing And Not lWindTSer Is Nothing Then
+                If lOk AndAlso lTMinTSer IsNot Nothing AndAlso lTMaxTSer IsNot Nothing AndAlso _
+                               lSRadTSer IsNot Nothing AndAlso lDewPTSer IsNot Nothing AndAlso lWindTSer IsNot Nothing Then
                     Dim lMetCmpTS As atcTimeseries = CmpPen(lTMinTSer, lTMaxTSer, lSRadTSer, lDewPTSer, lWindTSer, Me)
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
@@ -188,9 +185,8 @@ Public Class atcMetCmpPlugin
                     lLatitude = aArgs.GetValue("Latitude")
                     lOk = True
                 End If
-                lAttDef = atcDataAttributes.GetDefinition("Latitude")
-                If lOk And Not lDlyTSer Is Nothing And _
-                  lLatitude >= lAttDef.Min And lLatitude <= lAttDef.Max Then
+                If lOk AndAlso lDlyTSer IsNot Nothing AndAlso _
+                  lLatitude >= MetComputeLatitudeMin AndAlso lLatitude <= MetComputeLatitudeMax Then
                     Dim lMetCmpTS As atcTimeseries = DisSolPet(lDlyTSer, Me, 1, lLatitude)
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
@@ -205,9 +201,8 @@ Public Class atcMetCmpPlugin
                     lLatitude = aArgs.GetValue("Latitude")
                     lOk = True
                 End If
-                lAttDef = atcDataAttributes.GetDefinition("Latitude")
-                If lOk And Not lDlyTSer Is Nothing And _
-                  lLatitude >= lAttDef.Min And lLatitude <= lAttDef.Max Then
+                If lOk AndAlso lDlyTSer IsNot Nothing AndAlso _
+                  lLatitude >= MetComputeLatitudeMin AndAlso lLatitude <= MetComputeLatitudeMax Then
                     Dim lMetCmpTS As atcTimeseries = DisSolPet(lDlyTSer, Me, 2, lLatitude)
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
@@ -228,7 +223,7 @@ Public Class atcMetCmpPlugin
                     lObsTimeTSer = aArgs.GetValue("Observation Hour Timeseries")
                     lOk = True
                 End If
-                If lOk And Not lTMinTSer Is Nothing And Not lTMinTSer Is Nothing And Not lobstimeTSer Is Nothing Then
+                If lOk AndAlso lTMinTSer IsNot Nothing AndAlso lTMinTSer IsNot Nothing AndAlso lObsTimeTSer IsNot Nothing Then
                     Dim lMetCmpTS As atcTimeseries = DisaggTemp(lTMinTSer, lTMaxTSer, Me, lObsTimeTSer)
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
@@ -252,7 +247,7 @@ Public Class atcMetCmpPlugin
                         lHrSum += lHrDist(i)
                     End If
                 Next
-                If lOk And Not lWindTSer Is Nothing And Math.Abs(lHrSum - 1) < 0.001 Then
+                If lOk AndAlso lWindTSer IsNot Nothing AndAlso Math.Abs(lHrSum - 1) < 0.001 Then
                     Dim lMetCmpTS As atcTimeseries = DisWnd(lWindTSer, Me, lHrDist)
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
@@ -279,8 +274,8 @@ Public Class atcMetCmpPlugin
                     lOk = True
                 End If
                 lAttDef = atcDataAttributes.GetDefinition("Data Tolerance")
-                If lOk And Not lHrTSers Is Nothing And Not lObsTimeTSer Is Nothing And _
-                   lTol >= lAttDef.Min And lTol <= lAttDef.Max Then
+                If lOk AndAlso lHrTSers IsNot Nothing AndAlso lObsTimeTSer IsNot Nothing And _
+                       lTol >= lAttDef.Min And lTol <= lAttDef.Max Then
                     Dim lMetCmpTS As atcTimeseries = DisaggPrecip(lDlyTSer, Me, lHrTSers, lObsTimeTSer, lTol, lSummFile)
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
@@ -297,7 +292,7 @@ Public Class atcMetCmpPlugin
                     lATmpTSer = aArgs.GetValue("ATMP")
                     lOk = True
                 End If
-                If lOk And Not lDewPTSer Is Nothing And Not lATmpTSer Is Nothing Then
+                If lOk AndAlso lDewPTSer IsNot Nothing AndAlso lATmpTSer IsNot Nothing Then
                     Dim lMetCmpTS As atcTimeseries = DisDewPoint(lDewPTSer, Me, lATmpTSer)
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
@@ -344,8 +339,6 @@ Public Class atcMetCmpPlugin
                     .Name = "Latitude"
                     .Description = "Latitude in decimal degrees"
                     .DefaultValue = 0
-                    .Max = 66.5
-                    .Min = -66.5
                     .Editable = True
                     .TypeString = "Double"
                 End With
