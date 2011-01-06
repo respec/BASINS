@@ -10,6 +10,7 @@ Public Module modMetCompute
 
     Friend MetComputeLatitudeMax As Double = 66.5
     Friend MetComputeLatitudeMin As Double = -66.5
+    Private Const DegreesToRadians As Double = 0.01745329252
 
     Private X1() As Double = {0, 10.00028, 41.0003, 69.22113, 100.5259, 130.8852, 161.2853, _
                           191.7178, 222.1775, 253.66, 281.1629, 309.6838, 341.221}
@@ -90,44 +91,50 @@ Public Module modMetCompute
       {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}
     Private Sums() As Double = {0, 0.01, 0.02, 0.04, 0.08, 0.16, 0.32, 0.64, 1.28, 2.56, 5.12, 10.24, 20.48}
 
-    Public Function CmpSol(ByVal aCldTSer As atcTimeseries, ByVal aSource As atcTimeseriesSource, ByVal aLatDeg As Double) As atcTimeseries
-        'compute daily solar radiation based on daily cloud cover
-        Dim i As Integer
-        Dim ldate(5) As Integer
-        Dim SolRad(aCldTSer.numValues) As Double
-        Dim CldCov(aCldTSer.numValues) As Double
-        Dim lCmpTs As New atcTimeseries(aSource)
-        Dim lPoint As Boolean = aCldTSer.Attributes.GetValue("point", False)
+    ''' <summary>
+    ''' Compute daily solar radiation based on daily cloud cover
+    ''' </summary>
+    ''' <param name="aCldTSer">Cloud Cover timeseries</param>
+    ''' <param name="aSource"></param>
+    ''' <param name="aLatDeg">Latitude in degrees</param>
+    ''' <returns>Daily solar radiation timeseries</returns>
+    ''' <remarks></remarks>
+    Public Function SolarRadiationFromCloudCover(ByVal aCldTSer As atcTimeseries, ByVal aSource As atcTimeseriesSource, ByVal aLatDeg As Double) As atcTimeseries
+        Dim lSolRadTs As New atcTimeseries(aSource)
+        CopyBaseAttributes(aCldTSer, lSolRadTs)
+        lSolRadTs.Attributes.SetValue("Constituent", "DSOL")
+        lSolRadTs.Attributes.SetValue("TSTYPE", "DSOL")
+        lSolRadTs.Attributes.SetValue("Scenario", "COMPUTED")
+        lSolRadTs.Attributes.SetValue("Description", "Daily Solar Radiation (langleys) computed from Daily Cloud Cover")
+        lSolRadTs.Attributes.AddHistory("Computed Daily Solar Radiation - inputs: DCLD, Latitude")
+        lSolRadTs.Attributes.Add("DCLD", aCldTSer.ToString)
+        lSolRadTs.Attributes.Add("Latitude", aLatDeg)
+        lSolRadTs.Dates = aCldTSer.Dates
+        lSolRadTs.numValues = aCldTSer.numValues
+        Dim lCldCov(aCldTSer.numValues) As Double
+        Array.Copy(aCldTSer.Values, 1, lCldCov, 1, aCldTSer.numValues)
+
         Dim lNaN As Double = GetNaN()
+        Dim lDate(5) As Integer
+        Dim lPoint As Boolean = aCldTSer.Attributes.GetValue("point", False)
+        Dim lSolRad(aCldTSer.numValues) As Double
 
-        CopyBaseAttributes(aCldTSer, lCmpTs)
-        lCmpTs.Attributes.SetValue("Constituent", "DSOL")
-        lCmpTs.Attributes.SetValue("TSTYPE", "DSOL")
-        lCmpTs.Attributes.SetValue("Scenario", "COMPUTED")
-        lCmpTs.Attributes.SetValue("Description", "Daily Solar Radiation (langleys) computed from Daily Cloud Cover")
-        lCmpTs.Attributes.AddHistory("Computed Daily Solar Radiation - inputs: DCLD, Latitude")
-        lCmpTs.Attributes.Add("DCLD", aCldTSer.ToString)
-        lCmpTs.Attributes.Add("Latitude", aLatDeg)
-        lCmpTs.Dates = aCldTSer.Dates
-        lCmpTs.numValues = aCldTSer.numValues
-        Array.Copy(aCldTSer.Values, 1, CldCov, 1, aCldTSer.numValues)
-
-        For i = 1 To lCmpTs.numValues
-            If Not Double.IsNaN(CldCov(i)) Then
-                If CldCov(i) <= 0.0# Then CldCov(i) = 0.000001
+        For lValueIndex As Integer = 1 To lSolRadTs.numValues
+            If Not Double.IsNaN(lCldCov(lValueIndex)) Then
+                If lCldCov(lValueIndex) <= 0.0# Then lCldCov(lValueIndex) = 0.000001
                 If lPoint Then
-                    Call J2Date(aCldTSer.Dates.Value(i), ldate)
+                    J2Date(aCldTSer.Dates.Value(lValueIndex), lDate)
                 Else
-                    Call J2Date(aCldTSer.Dates.Value(i - 1), ldate)
+                    J2Date(aCldTSer.Dates.Value(lValueIndex - 1), lDate)
                 End If
-                Call RadClc(aLatDeg, CldCov(i), ldate(1), ldate(2), SolRad(i))
+                lSolRad(lValueIndex) = RadClc(aLatDeg, lCldCov(lValueIndex), lDate(1), lDate(2))
             Else
-                SolRad(i) = lNaN
+                lSolRad(lValueIndex) = lNaN
             End If
-        Next i
-        Array.Copy(SolRad, 1, lCmpTs.Values, 1, lCmpTs.numValues)
+        Next lValueIndex
+        Array.Copy(lSolRad, 1, lSolRadTs.Values, 1, lSolRadTs.numValues)
 
-        Return lCmpTs
+        Return lSolRadTs
 
     End Function
 
@@ -238,19 +245,20 @@ Public Module modMetCompute
     ''' <param name="aCTS"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Function CmpHamX(ByVal aTemperature As atcTimeseries, _
+    Public Function PanEvaporationTimeseriesComputedByHamonX(ByVal aTemperature As atcTimeseries, _
                             ByVal aSource As atcTimeseriesSource, _
                             ByVal aDegF As Boolean, _
                             ByVal aLatDeg As Double, _
                             ByVal aCTS() As Double) As atcTimeseries
         Dim lMin As Double = 1.0E+30, lMax As Double = -1.0E+30
-        Dim lValue As Double, lDate As Double, lDateYesterday As Integer = 0
-        Dim lIndex As Integer
+        Dim lValue As Double
+        Dim lDate As Double
+        Dim lDateYesterday As Integer = 0
         Dim lMinValues As New ArrayList
         Dim lMaxValues As New ArrayList
         Dim lDates As New ArrayList
 
-        For lIndex = 1 To aTemperature.numValues
+        For lIndex As Integer = 1 To aTemperature.numValues
             lDate = aTemperature.Dates.Value(lIndex)
             If lDateYesterday = 0 Then
                 lDateYesterday = CInt(lDate)
@@ -284,119 +292,124 @@ Public Module modMetCompute
         lTMinTS.numValues = lMinValues.Count
         lTMaxTS.numValues = lMaxValues.Count
         lDatesTS.Value(0) = lDates(0)
-        For lIndex = 1 To lMaxValues.Count
+        For lIndex As Integer = 1 To lMaxValues.Count
             lDatesTS.Value(lIndex) = lDates(lIndex - 1) + 1
             lTMinTS.Value(lIndex) = lMinValues(lIndex - 1)
             lTMaxTS.Value(lIndex) = lMaxValues(lIndex - 1)
         Next
-        Logger.Dbg("CmpHamX:Count:" & lMaxValues.Count)
+        Logger.Dbg("PanEvaporationTimeseriesComputedByHamonX:Count:" & lMaxValues.Count)
 
-        Return CmpHam(lTMinTS, lTMaxTS, aSource, aDegF, aLatDeg, aCTS)
+        Return PanEvaporationTimeseriesComputedByHamon(lTMinTS, lTMaxTS, aSource, aDegF, aLatDeg, aCTS)
     End Function
 
-    Public Function CmpHam(ByVal aTMinTS As atcTimeseries, ByVal aTMaxTS As atcTimeseries, ByVal aSource As atcTimeseriesSource, ByVal aDegF As Boolean, ByVal aLatDeg As Double, ByVal aCTS() As Double) As atcTimeseries
-        'compute HAMON - PET
-        'aTminTS/aTMaxTS - min/max temp timeseries
-        'aDegF   - Temperature in Degrees F (True) or C (False)
-        'aLatDeg - latitude, in degrees
-        'aCTS    - monthly variable coefficients
-
-        Dim i As Integer
-        Dim lRetCod As Integer
-        Dim ldate(5) As Integer
+    ''' <summary>compute Hamon - PET</summary>
+    ''' <param name="aTMinTS">Min Air Temperature - daily</param>
+    ''' <param name="aTMaxTS">Max Air Temperature - daily</param>
+    ''' <param name="aSource"></param>
+    ''' <param name="aDegF">Temperature in Degrees F (True) or C (False)</param>
+    ''' <param name="aLatDeg">latitude, in degrees</param>
+    ''' <param name="aCTS">monthly variable coefficients</param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Function PanEvaporationTimeseriesComputedByHamon(ByVal aTMinTS As atcTimeseries, ByVal aTMaxTS As atcTimeseries, ByVal aSource As atcTimeseriesSource, ByVal aDegF As Boolean, ByVal aLatDeg As Double, ByVal aCTS() As Double) As atcTimeseries
         Dim lAirTmp(aTMinTS.numValues) As Double
         Dim lPanEvp(aTMinTS.numValues) As Double
-        Dim tsfil(2) As Double
-        Dim lCmpTs As New atcTimeseries(aSource)
-        Dim lPoint As Boolean = aTMinTS.Attributes.GetValue("point", False)
+        Dim lPanEvapTimeSeries As New atcTimeseries(aSource)
 
-        CopyBaseAttributes(aTMinTS, lCmpTs)
-        lCmpTs.Attributes.SetValue("Constituent", "PET")
-        lCmpTs.Attributes.SetValue("TSTYPE", "EVAP")
-        lCmpTs.Attributes.SetValue("Scenario", "COMPUTED")
-        lCmpTs.Attributes.SetValue("Description", "Daily Potential ET (in) computed using Hamon algorithm")
-        lCmpTs.Attributes.AddHistory("Computed Daily Potential ET using Hamon - inputs: TMIN, TMAX, Degrees F, Latitude, Monthly Coefficients")
-        lCmpTs.Attributes.Add("TMIN", aTMinTS.ToString)
-        lCmpTs.Attributes.Add("TMAX", aTMaxTS.ToString)
-        lCmpTs.Attributes.Add("Degrees F", aDegF)
-        lCmpTs.Attributes.Add("LATDEG", aLatDeg)
-        Dim ls As String = "("
-        For i = 1 To 12
-            ls &= aCTS(i) & ", "
+        CopyBaseAttributes(aTMinTS, lPanEvapTimeSeries)
+        lPanEvapTimeSeries.Attributes.SetValue("Constituent", "PET")
+        lPanEvapTimeSeries.Attributes.SetValue("TSTYPE", "EVAP")
+        lPanEvapTimeSeries.Attributes.SetValue("Scenario", "COMPUTED")
+        lPanEvapTimeSeries.Attributes.SetValue("Description", "Daily Potential ET (in) computed using Hamon algorithm")
+        lPanEvapTimeSeries.Attributes.AddHistory("Computed Daily Potential ET using Hamon - inputs: TMIN, TMAX, Degrees F, Latitude, Monthly Coefficients")
+        lPanEvapTimeSeries.Attributes.Add("TMIN", aTMinTS.ToString)
+        lPanEvapTimeSeries.Attributes.Add("TMAX", aTMaxTS.ToString)
+        lPanEvapTimeSeries.Attributes.Add("Degrees F", aDegF)
+        lPanEvapTimeSeries.Attributes.Add("LATDEG", aLatDeg)
+        Dim lString As String = "("
+        For lMonthIndex As Integer = 1 To 12
+            lString &= aCTS(lMonthIndex) & ", "
         Next
-        ls = Left(ls, Len(ls) - 2) & ")"
-        lCmpTs.Attributes.Add("Monthly Coefficients", ls)
-        lCmpTs.Dates = aTMinTS.Dates
-        lCmpTs.numValues = aTMinTS.numValues
+        lString = lString.Substring(0, lString.Length - 2) & ")"
+        lPanEvapTimeSeries.Attributes.Add("Monthly Coefficients", lString)
+        lPanEvapTimeSeries.Dates = aTMinTS.Dates
+        lPanEvapTimeSeries.numValues = aTMinTS.numValues
 
         'get fill value for input dsns
-        tsfil(1) = aTMinTS.Attributes.GetValue("TSFILL", -999)
-        tsfil(2) = aTMaxTS.Attributes.GetValue("TSFILL", -999)
+        Dim lMissingValue(2) As Double
+        lMissingValue(1) = aTMinTS.Attributes.GetValue("TSFILL", -999)
+        lMissingValue(2) = aTMaxTS.Attributes.GetValue("TSFILL", -999)
 
-        For i = 1 To lCmpTs.numValues
-            If Math.Abs(aTMinTS.Value(i) - tsfil(1)) < 0.000001 Or _
-               Math.Abs(aTMaxTS.Value(i) - tsfil(2)) < 0.000001 Then
-                'missing data
-                lPanEvp(i) = tsfil(1)
+        Dim lDate(5) As Integer
+        Dim lPoint As Boolean = aTMinTS.Attributes.GetValue("point", False)
+        For lValueIndex As Integer = 1 To lPanEvapTimeSeries.numValues
+            If Math.Abs(aTMinTS.Value(lValueIndex) - lMissingValue(1)) < 0.000001 OrElse _
+               Math.Abs(aTMaxTS.Value(lValueIndex) - lMissingValue(2)) < 0.000001 Then
+                'missing source data
+                lPanEvp(lValueIndex) = lMissingValue(1)
             Else 'compute pet
-                lAirTmp(i) = (aTMinTS.Value(i) + aTMaxTS.Value(i)) / 2
+                lAirTmp(lValueIndex) = (aTMinTS.Value(lValueIndex) + aTMaxTS.Value(lValueIndex)) / 2
                 If lPoint Then
-                    Call J2Date(lCmpTs.Dates.Value(i), ldate)
+                    J2Date(lPanEvapTimeSeries.Dates.Value(lValueIndex), lDate)
                 Else
-                    Call J2Date(lCmpTs.Dates.Value(i - 1), ldate)
+                    J2Date(lPanEvapTimeSeries.Dates.Value(lValueIndex - 1), lDate)
                 End If
-                Call Hamon(ldate(1), ldate(2), aCTS, aLatDeg, lAirTmp(i), aDegF, lPanEvp(i), lRetCod)
+                lPanEvp(lValueIndex) = PanEvaporationValueComputedByHamon(lDate(1), lDate(2), aCTS, aLatDeg, lAirTmp(lValueIndex), aDegF, lMissingValue(1))
             End If
-        Next i
-        Array.Copy(lPanEvp, 1, lCmpTs.Values, 1, lCmpTs.numValues)
-        Return lCmpTs
+        Next lValueIndex
+        Array.Copy(lPanEvp, 1, lPanEvapTimeSeries.Values, 1, lPanEvapTimeSeries.numValues)
 
+        Return lPanEvapTimeSeries
     End Function
 
-    Public Function CmpPen(ByVal aTMinTS As atcTimeseries, ByVal aTMaxTS As atcTimeseries, ByVal aSRadTS As atcTimeseries, ByVal aDewPTS As atcTimeseries, ByVal aWindTS As atcTimeseries, ByVal aSource As atcTimeseriesSource) As atcTimeseries
-        'compute PENMAN - PET
-        'input timeseries are Min/Max Temp, Dewpoint Temp, Solar Radiation, Wind Movement
+    ''' <summary>compute Penman - PET</summary>
+    ''' <param name="aTMinTS">Min Air Temperature - daily</param>
+    ''' <param name="aTMaxTS">Max Air Temperature - daily</param>
+    ''' <param name="aSRadTS">Solar Radiation</param>
+    ''' <param name="aDewPTS">Dewpoint Temperature</param>
+    ''' <param name="aWindTS">Wind Movement</param>
+    ''' <param name="aSource"></param>
+    ''' <returns>Pan Evaporation timeseries - daily timestep</returns>
+    ''' <remarks>The computations are based on the Penman(1948) formula and the method of Kohler, Nordensen, and Fox (1955).</remarks>
+    Public Function PanEvaporationTimeseriesComputedByPenman(ByVal aTMinTS As atcTimeseries, ByVal aTMaxTS As atcTimeseries, ByVal aSRadTS As atcTimeseries, ByVal aDewPTS As atcTimeseries, ByVal aWindTS As atcTimeseries, ByVal aSource As atcTimeseriesSource) As atcTimeseries
+        Dim lPanEvapTimeSeries As New atcTimeseries(aSource)
+        CopyBaseAttributes(aTMinTS, lPanEvapTimeSeries)
+        lPanEvapTimeSeries.Attributes.SetValue("Constituent", "DEVP")
+        lPanEvapTimeSeries.Attributes.SetValue("TSTYPE", "EVAP")
+        lPanEvapTimeSeries.Attributes.SetValue("Scenario", "COMPUTED")
+        lPanEvapTimeSeries.Attributes.SetValue("Description", "Daily Pan Evaporation (in) computed using Penman algorithm")
+        lPanEvapTimeSeries.Attributes.AddHistory("Computed Daily Pan Evaporation using Penman - inputs: TMIN, TMAX, SRAD, DEWP, WIND")
+        lPanEvapTimeSeries.Attributes.Add("TMIN", aTMinTS.ToString)
+        lPanEvapTimeSeries.Attributes.Add("TMAX", aTMaxTS.ToString)
+        lPanEvapTimeSeries.Attributes.Add("SRAD", aSRadTS.ToString)
+        lPanEvapTimeSeries.Attributes.Add("DEWP", aDewPTS.ToString)
+        lPanEvapTimeSeries.Attributes.Add("WIND", aWindTS.ToString)
+        lPanEvapTimeSeries.Dates = aTMinTS.Dates
+        lPanEvapTimeSeries.numValues = aTMinTS.numValues
 
-        Dim i As Integer
-        Dim lPanEvp(aTMinTS.numValues) As Double
-        Dim tsfil(5) As Double
-        Dim lCmpTs As New atcTimeseries(aSource)
+        Dim lMissingValue(5) As Double
+        lMissingValue(1) = aTMinTS.Attributes.GetValue("TSFILL", -999)
+        lMissingValue(2) = aTMaxTS.Attributes.GetValue("TSFILL", -999)
+        lMissingValue(3) = aSRadTS.Attributes.GetValue("TSFILL", -999)
+        lMissingValue(4) = aDewPTS.Attributes.GetValue("TSFILL", -999)
+        lMissingValue(5) = aWindTS.Attributes.GetValue("TSFILL", -999)
 
-        CopyBaseAttributes(aTMinTS, lCmpTs)
-        lCmpTs.Attributes.SetValue("Constituent", "DEVP")
-        lCmpTs.Attributes.SetValue("TSTYPE", "EVAP")
-        lCmpTs.Attributes.SetValue("Scenario", "COMPUTED")
-        lCmpTs.Attributes.SetValue("Description", "Daily Pan Evaporation (in) computed using Penman algorithm")
-        lCmpTs.Attributes.AddHistory("Computed Daily Pan Evaporation using Penman - inputs: TMIN, TMAX, SRAD, DEWP, WIND")
-        lCmpTs.Attributes.Add("TMIN", aTMinTS.ToString)
-        lCmpTs.Attributes.Add("TMAX", aTMaxTS.ToString)
-        lCmpTs.Attributes.Add("SRAD", aSRadTS.ToString)
-        lCmpTs.Attributes.Add("DEWP", aDewPTS.ToString)
-        lCmpTs.Attributes.Add("WIND", aWindTS.ToString)
-        lCmpTs.Dates = aTMinTS.Dates
-        lCmpTs.numValues = aTMinTS.numValues
-
-        tsfil(1) = aTMinTS.Attributes.GetValue("TSFILL", -999)
-        tsfil(2) = aTMaxTS.Attributes.GetValue("TSFILL", -999)
-        tsfil(3) = aSRadTS.Attributes.GetValue("TSFILL", -999)
-        tsfil(4) = aDewPTS.Attributes.GetValue("TSFILL", -999)
-        tsfil(5) = aWindTS.Attributes.GetValue("TSFILL", -999)
-
-        For i = 1 To lCmpTs.numValues
-            If Math.Abs(aTMinTS.Value(i) - tsfil(1)) < 0.000001 Or _
-               Math.Abs(aTMaxTS.Value(i) - tsfil(2)) < 0.000001 Or _
-               Math.Abs(aSRadTS.Value(i) - tsfil(3)) < 0.000001 Or _
-               Math.Abs(aDewPTS.Value(i) - tsfil(4)) < 0.000001 Or _
-               Math.Abs(aWindTS.Value(i) - tsfil(5)) < 0.000001 Then
-                'missing data
-                lPanEvp(i) = tsfil(1)
+        Dim lPanEvapValues(aTMinTS.numValues) As Double
+        For lValueIndex As Integer = 1 To lPanEvapTimeSeries.numValues
+            If Math.Abs(aTMinTS.Value(lValueIndex) - lMissingValue(1)) < 0.000001 OrElse _
+               Math.Abs(aTMaxTS.Value(lValueIndex) - lMissingValue(2)) < 0.000001 OrElse _
+               Math.Abs(aSRadTS.Value(lValueIndex) - lMissingValue(3)) < 0.000001 OrElse _
+               Math.Abs(aDewPTS.Value(lValueIndex) - lMissingValue(4)) < 0.000001 OrElse _
+               Math.Abs(aWindTS.Value(lValueIndex) - lMissingValue(5)) < 0.000001 Then
+                'missing source data
+                lPanEvapValues(lValueIndex) = lMissingValue(1)
             Else 'compute pet
-                Call PNEVAP(aTMinTS.Value(i), aTMaxTS.Value(i), aDewPTS.Value(i), aWindTS.Value(i), aSRadTS.Value(i), lPanEvp(i))
+                lPanEvapValues(lValueIndex) = PanEvaporationValueComputedByPenman(aTMinTS.Value(lValueIndex), aTMaxTS.Value(lValueIndex), aDewPTS.Value(lValueIndex), aWindTS.Value(lValueIndex), aSRadTS.Value(lValueIndex))
             End If
-        Next i
-        Array.Copy(lPanEvp, 1, lCmpTs.Values, 1, lCmpTs.numValues)
-        Return lCmpTs
+        Next lValueIndex
 
+        Array.Copy(lPanEvapValues, 1, lPanEvapTimeSeries.Values, 1, lPanEvapTimeSeries.numValues)
+        Return lPanEvapTimeSeries
     End Function
 
     Public Function CmpCld(ByVal aPctSun As atcTimeseries, ByVal aSource As atcTimeseriesSource) As atcTimeseries
@@ -972,7 +985,7 @@ Public Module modMetCompute
             aRetCod = -1
         Else 'latitude ok
             'convert to radians
-            LatRdn = aLatDeg * 0.0174582
+            LatRdn = aLatDeg * DegreesToRadians
 
             Phi = LatRdn
             AD = 0.40928 * System.Math.Cos(0.0172141 * (172.0# - JulDay))
@@ -1045,7 +1058,7 @@ Public Module modMetCompute
             aRetCod = -1
         Else 'latitude ok
             'convert to radians
-            LatRdn = aLatDeg * 0.0174582
+            LatRdn = aLatDeg * DegreesToRadians
 
             Phi = LatRdn
             AD = 0.40928 * Math.Cos(0.0172141 * (172.0# - JulDay))
@@ -1097,57 +1110,54 @@ Public Module modMetCompute
 
     End Sub
 
-    Private Sub RadClc(ByRef aDegLat As Double, ByRef aCloud As Double, ByRef aMon As Integer, ByRef aDay As Integer, ByRef aDayRad As Double)
-
-        'This routine computes the total daily solar radiation based on
-        'the HSPII (Hydrocomp, 1978) RADIATION procedure, which is based
-        'on empirical curves of radiation as a function of latitude
-        '(Hamon et al, 1954, Monthly Weather Review 82(6):141-146.
-
-        Dim ILat, ii As Integer
-        Dim Lat3, Lat1, Lat2, Lat4 As Double
-        Dim A1, b, Exp2, Exp1, a, A0, A2 As Double
-        Dim b2, A3, b1, Frac As Double
-        Dim SS, x As Double
-        Dim Y100, YRD As Double
-
+    ''' <summary>
+    ''' Computes the total daily solar radiation based on
+    ''' the HSPII (Hydrocomp, 1978) RADIATION procedure, which is based
+    ''' on empirical curves of radiation as a function of latitude
+    ''' (Hamon et al, 1954, Monthly Weather Review 82(6):141-146.
+    ''' </summary>
+    ''' <param name="aDegLat"></param>
+    ''' <param name="aCloud"></param>
+    ''' <param name="aMon"></param>
+    ''' <param name="aDay"></param>
+    ''' <remarks></remarks>
+    Private Function RadClc(ByRef aDegLat As Double, ByRef aCloud As Double, ByRef aMon As Integer, ByRef aDay As Integer) As Double
         'integer part of latitude
-        ILat = Int(aDegLat)
-
+        Dim lLatInt As Integer = Math.Floor(aDegLat)
         'fractional part of latitude
-        Frac = aDegLat - CSng(ILat)
-        If Frac <= 0.0001 Then Frac = 0.0#
+        Dim lLatFrac As Double = aDegLat - CSng(lLatInt)
+        If lLatFrac <= 0.0001 Then lLatFrac = 0.0#
 
-        A0 = XLax(ILat, 1) + Frac * (XLax(ILat + 1, 1) - XLax(ILat, 1))
-        A1 = XLax(ILat, 2) + Frac * (XLax(ILat + 1, 2) - XLax(ILat, 2))
-        A2 = XLax(ILat, 3) + Frac * (XLax(ILat + 1, 3) - XLax(ILat, 3))
-        A3 = XLax(ILat, 4) + Frac * (XLax(ILat + 1, 4) - XLax(ILat, 4))
-        b1 = XLax(ILat, 5) + Frac * (XLax(ILat + 1, 5) - XLax(ILat, 5))
-        b2 = XLax(ILat, 6) + Frac * (XLax(ILat + 1, 6) - XLax(ILat, 6))
-        b = aDegLat - 44.0#
-        a = aDegLat - 25.0#
-        Exp1 = 0.7575 - 0.0018 * a
-        Exp2 = 0.725 + 0.00288 * b
-        Lat1 = 2.139 + 0.0423 * a
-        Lat2 = 30.0# - 0.667 * a
-        Lat3 = 2.9 - 0.0629 * b
-        Lat4 = 18.0# + 0.833 * b
+        Dim A0 As Double = XLax(lLatInt, 1) + lLatFrac * (XLax(lLatInt + 1, 1) - XLax(lLatInt, 1))
+        Dim A1 As Double = XLax(lLatInt, 2) + lLatFrac * (XLax(lLatInt + 1, 2) - XLax(lLatInt, 2))
+        Dim A2 As Double = XLax(lLatInt, 3) + lLatFrac * (XLax(lLatInt + 1, 3) - XLax(lLatInt, 3))
+        Dim A3 As Double = XLax(lLatInt, 4) + lLatFrac * (XLax(lLatInt + 1, 4) - XLax(lLatInt, 4))
+        Dim b1 As Double = XLax(lLatInt, 5) + lLatFrac * (XLax(lLatInt + 1, 5) - XLax(lLatInt, 5))
+        Dim b2 As Double = XLax(lLatInt, 6) + lLatFrac * (XLax(lLatInt + 1, 6) - XLax(lLatInt, 6))
+        Dim b As Double = aDegLat - 44.0#
+        Dim a As Double = aDegLat - 25.0#
+        Dim Exp1 As Double = 0.7575 - 0.0018 * a
+        Dim Exp2 As Double = 0.725 + 0.00288 * b
+        Dim Lat1 As Double = 2.139 + 0.0423 * a
+        Dim Lat2 As Double = 30.0# - 0.667 * a
+        Dim Lat3 As Double = 2.9 - 0.0629 * b
+        Dim Lat4 As Double = 18.0# + 0.833 * b
 
         'Percent sunshine
-        SS = 100.0# * (1.0# - (aCloud / 10.0#) ^ (5.0# / 3.0#))
-        If SS < 0.0# Then
-            'can't have SS being negative
+        Dim SS As Double = 100.0# * (1.0# - (aCloud / 10.0#) ^ (5.0# / 3.0#))
+        If SS < 0.0# Then 'can't have SS being negative
             SS = 0.0#
         End If
 
-        x = X1(aMon) + aDay
+        Dim x As Double = X1(aMon) + aDay
         'convert to radians
-        x = x * 2.0# * 3.14159 / 360.0#
+        x *= DegreesToRadians
 
-        Y100 = A0 + A1 * Math.Cos(x) + A2 * Math.Cos(2 * x) + A3 * Math.Cos(3 * x) + b1 * Math.Sin(x) + b2 * Math.Sin(2 * x)
+        Dim Y100 As Double = A0 + A1 * Math.Cos(x) + A2 * Math.Cos(2 * x) + A3 * Math.Cos(3 * x) + b1 * Math.Sin(x) + b2 * Math.Sin(2 * x)
 
-        ii = Math.Ceiling((SS + 10.0#) / 10.0#)
+        Dim ii As Double = Math.Ceiling((SS + 10.0#) / 10.0#)
 
+        Dim YRD As Double
         If aDegLat > 43.0# Then
             YRD = Lat3 * SS ^ Exp2 + Lat4
         Else
@@ -1155,16 +1165,17 @@ Public Module modMetCompute
         End If
 
         If ii < 11 Then
-            YRD = YRD + c(ii, aMon)
+            YRD += c(ii, aMon)
         End If
 
+        Dim lDayRad As Double
         If YRD >= 100.0# Then
-            aDayRad = Y100
+            lDayRad = Y100
         Else
-            aDayRad = Y100 * YRD / 100.0#
+            lDayRad = Y100 * YRD / 100.0#
         End If
-
-    End Sub
+        Return lDayRad
+    End Function
 
     Private Sub CldClc(ByRef aDegLat As Double, ByRef aDayRad As Double, ByRef aMon As Integer, ByRef aDay As Integer, ByRef aCloud As Double)
 
@@ -1208,7 +1219,7 @@ Public Module modMetCompute
 
         x = X1(aMon) + aDay
         'convert to radians
-        x = x * 2.0# * 3.14159 / 360.0#
+        x *= DegreesToRadians
 
         Y100 = A0 + A1 * Math.Cos(x) + A2 * Math.Cos(2 * x) + A3 * Math.Cos(3 * x) + b1 * Math.Sin(x) + b2 * Math.Sin(2 * x)
 
@@ -1281,88 +1292,77 @@ Public Module modMetCompute
 
     End Sub
 
-    Private Sub Hamon(ByVal aMonth As Integer, ByVal aDay As Integer, ByVal aCTS() As Double, ByVal aLatDeg As Double, ByVal aTAVC As Double, ByVal aDegF As Boolean, ByRef PanEvp As Single, ByVal aRetCod As Integer)
-
-        'Generates daily pan evaporation (inches)
-        'using a coefficient for the month, the possible hours of
-        'sunshine (computed from latitude), and absolute humidity.
-        'The computations are based on the Hamon (1961) formula.
-
-        'CTS    - array of monthly coefficients
-        'LatDeg - latitude
-        'TAVC   - Average daily temperature (C)
-        'aDegF  - temperature in Fahrenheit (True) or Celsius (False)
-        'PanEvp - daily pan evaporation (inches)
-        'RetCod - return code
-        '          0 - operation successful
-        '         -1 - operation failed
-
-        Dim VDSAT, SUNS, Delt, CS, AD, JulDay, LatRdn, Phi, SS, X2, SunR, DYL, VPSAT As Double
-
-        aRetCod = 0
-
-        'julian date
-        JulDay = 30.5 * (aMonth - 1) + aDay
-
+    ''' <summary>
+    ''' Generates daily pan evaporation (inches) using a coefficient for the month, the possible hours of
+    ''' sunshine (computed from latitude), and absolute humidity.
+    ''' The computations are based on the Hamon (1961) formula.
+    ''' </summary>
+    ''' <param name="aMonth">Month</param>
+    ''' <param name="aDay">Day</param>
+    ''' <param name="aCTS">Array of monthly coefficients</param>
+    ''' <param name="aLatDeg">Latitude in degrees</param>
+    ''' <param name="aTAVC">Average daily temperature (C)</param>
+    ''' <param name="aDegF">Temperature in Fahrenheit (True) or Celsius (False)</param>
+    ''' <param name="aMissingValue">Value to return if problem occurs</param>
+    ''' <returns>Daily PET value</returns>
+    ''' <remarks></remarks>
+    Private Function PanEvaporationValueComputedByHamon(ByVal aMonth As Integer, ByVal aDay As Integer, ByVal aCTS() As Double, ByVal aLatDeg As Double, ByVal aTAVC As Double, ByVal aDegF As Boolean, ByVal aMissingValue As Double) As Double
         'check latitude
-        If aLatDeg < -66.5 Or aLatDeg > 66.5 Then 'invalid latitude, return
-            aRetCod = -1
+        If aLatDeg < MetComputeLatitudeMin OrElse aLatDeg > MetComputeLatitudeMax Then 'invalid latitude 
+            Return aMissingValue
         Else 'latitude ok,convert to radians
-            LatRdn = aLatDeg * 0.0174582
-            Phi = LatRdn
-            AD = 0.40928 * System.Math.Cos(0.0172141 * (172.0# - JulDay))
-            SS = System.Math.Sin(Phi) * System.Math.Sin(AD)
-            CS = System.Math.Cos(Phi) * System.Math.Cos(AD)
-            X2 = -SS / CS
-            Delt = 7.6394 * (1.5708 - System.Math.Atan(X2 / System.Math.Sqrt(1.0# - X2 ^ 2)))
-            SunR = 12.0# - Delt / 2.0#
-            SUNS = 12.0# + Delt / 2.0#
-            DYL = (SUNS - SunR) / 12
+            'TODO: make this consistant with our conventions
+            Dim JulDay As Double = 30.5 * (aMonth - 1) + aDay
+
+            Dim LatRdn As Double = aLatDeg * DegreesToRadians
+            Dim Phi As Double = LatRdn
+            Dim AD As Double = 0.40928 * System.Math.Cos(0.0172141 * (172.0# - JulDay))
+            Dim SS As Double = System.Math.Sin(Phi) * System.Math.Sin(AD)
+            Dim CS As Double = System.Math.Cos(Phi) * System.Math.Cos(AD)
+            Dim X2 As Double = -SS / CS
+            Dim Delt As Double = 7.6394 * (1.5708 - System.Math.Atan(X2 / System.Math.Sqrt(1.0# - X2 ^ 2)))
+            Dim SunR As Double = 12.0# - Delt / 2.0#
+            Dim SUNS As Double = 12.0# + Delt / 2.0#
+            Dim DYL As Double = (SUNS - SunR) / 12
 
             'convert temperature to Centigrade if necessary
             If aDegF Then aTAVC = (aTAVC - 32.0#) * (5.0# / 9.0#)
 
             'Hamon equation
-            VPSAT = 6.108 * System.Math.Exp(17.26939 * aTAVC / (aTAVC + 237.3))
-            VDSAT = 216.7 * VPSAT / (aTAVC + 273.3)
-            PanEvp = aCTS(aMonth) * DYL * DYL * VDSAT
+            Dim VPSAT As Double = 6.108 * System.Math.Exp(17.26939 * aTAVC / (aTAVC + 237.3))
+            Dim VDSAT As Double = 216.7 * VPSAT / (aTAVC + 273.3)
+            Dim lPanEvap As Double = aCTS(aMonth) * DYL * DYL * VDSAT
 
             'when the estimated pan evaporation is negative
             'the value is set to zero
-            If PanEvp < 0.0# Then
-                PanEvp = 0.0#
+            If lPanEvap < 0.0# Then
+                lPanEvap = 0.0#
             End If
+            Return lPanEvap
         End If
+    End Function
 
-    End Sub
-
-    Private Sub PNEVAP(ByVal aMinTmp As Double, ByVal aMaxTmp As Double, ByVal aDewTmp As Double, ByVal aWindSp As Double, ByVal aSolRad As Double, ByRef aPanEvp As Double)
-
-        'Generates daily pan evaporation (inches) using
-        'daily minimum air temperature (F), daily maximum air
-        'temperature, dewpoint (F), wind movement (miles/day), and solar
-        'radiation (langleys/day). The computations are based on the Penman
-        '(1948) formula and the method of Kohler, Nordensen, and Fox (1955).
-
-        'aMinTmp - daily minimum air temperature (F)
-        'aMaxTmp - daily maximum air temperature (F)
-        'aDewTmp - dewpoint(F)
-        'aWindSp - wind movement (miles/day)
-        'aSolRad - solar radiation (langleys/day)
-        'aPanEvp - daily pan evaporation (inches)
-
-        Dim lQNDelt, lEsMiEa, lDelta, lEaGama, lAirTmp As Double
-
+    ''' <summary>
+    ''' Compute daily pan evaporation (inches)
+    ''' </summary>
+    ''' <param name="aMinTmp">daily minimum air temperature (degF)</param>
+    ''' <param name="aMaxTmp">daily maximum air temperature (degF)</param>
+    ''' <param name="aDewTmp">dewpoint temperature (degF)</param>
+    ''' <param name="aWindSp">wind movement (miles/day)</param>
+    ''' <param name="aSolRad">solar radiation (langleys/day)</param>
+    ''' <returns>pan evaporation (inches/day)</returns>
+    ''' <remarks>based on the Penman(1948) formula and the method of Kohler, Nordensen, and Fox (1955).</remarks>
+    Private Function PanEvaporationValueComputedByPenman(ByVal aMinTmp As Double, ByVal aMaxTmp As Double, ByVal aDewTmp As Double, ByVal aWindSp As Double, ByVal aSolRad As Double) As Double
         'compute average daily air temperature
-        lAirTmp = (aMinTmp + aMaxTmp) / 2.0#
+        Dim lAirTmp As Double = (aMinTmp + aMaxTmp) / 2.0#
 
         'net radiation exchange * delta
         If aSolRad <= 0.0# Then aSolRad = 0.00001
-        lQNDelt = Math.Exp((lAirTmp - 212.0#) * (0.1024 - 0.01066 * Math.Log(aSolRad))) - 0.0001
+        Dim lQNDelt As Double = Math.Exp((lAirTmp - 212.0#) * (0.1024 - 0.01066 * Math.Log(aSolRad))) - 0.0001
 
         'Vapor pressure deficit between surface and
         'dewpoint temps(Es-Ea) IN of Hg
-        lEsMiEa = (6413252.0# * System.Math.Exp(-7482.6 / (lAirTmp + 398.36))) - (6413252.0# * Math.Exp(-7482.6 / (aDewTmp + 398.36)))
+        Dim lEsMiEa As Double = (6413252.0# * System.Math.Exp(-7482.6 / (lAirTmp + 398.36))) - (6413252.0# * Math.Exp(-7482.6 / (aDewTmp + 398.36)))
 
         'pan evaporation assuming air temp equals water surface temp.
 
@@ -1372,27 +1372,24 @@ Public Module modMetCompute
         End If
 
         'pan evap * GAMMA, GAMMA = 0.0105 inch Hg/F
-        lEaGama = 0.0105 * (lEsMiEa ^ 0.88) * (0.37 + 0.0041 * aWindSp)
+        Dim lEaGama As Double = 0.0105 * (lEsMiEa ^ 0.88) * (0.37 + 0.0041 * aWindSp)
 
         'Delta = slope of saturation vapor pressure curve at air temperature
-        lDelta = 47987800000.0# * Math.Exp(-7482.6 / (lAirTmp + 398.36)) / ((lAirTmp + 398.36) ^ 2)
+        Dim lDelta As Double = 47987800000.0# * Math.Exp(-7482.6 / (lAirTmp + 398.36)) / ((lAirTmp + 398.36) ^ 2)
 
         'pan evaporation rate in inches per day
-        aPanEvp = (lQNDelt + lEaGama) / (lDelta + 0.0105)
+        Dim lPanEvap As Double = (lQNDelt + lEaGama) / (lDelta + 0.0105)
 
         'when the estimated pan evaporation is negative
         'the value is set to zero
-        If aPanEvp < 0.0# Then
-            aPanEvp = 0.0#
+        If lPanEvap < 0.0# Then
+            lPanEvap = 0.0#
         End If
 
-    End Sub
+        Return lPanEvap
+    End Function
 
     Private Sub InitRadclcConsts(ByRef X1() As Double, ByRef ac(,) As Double, ByRef aXLax(,) As Double)
-
-        Dim i, j As Integer
-
-
         ac(1, 1) = 4.0#
         ac(2, 1) = 3.0#
         ac(3, 1) = 0.0#
@@ -1514,8 +1511,8 @@ Public Module modMetCompute
         ac(9, 12) = 1.0#
         ac(10, 12) = 1.0#
 
-        For i = 1 To 24
-            For j = 1 To 6
+        For i As Integer = 1 To 24
+            For j As Integer = 1 To 6
                 aXLax(i, j) = -9999.0#
             Next j
         Next i
