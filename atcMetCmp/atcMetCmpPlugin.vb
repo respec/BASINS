@@ -65,7 +65,7 @@ Public Class atcMetCmpPlugin
                 End If
                 If lOk AndAlso lCldTSer IsNot Nothing AndAlso _
                   lLatitude >= MetComputeLatitudeMin AndAlso lLatitude <= MetComputeLatitudeMax Then
-                    Dim lMetCmpTS As atcTimeseries = CmpSol(lCldTSer, Me, lLatitude)
+                    Dim lMetCmpTS As atcTimeseries = SolarRadiationFromCloudCover(lCldTSer, Me, lLatitude)
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
             Case "Cloud Cover from Solar"
@@ -132,7 +132,7 @@ Public Class atcMetCmpPlugin
                 Next
                 If lOk AndAlso lTMaxTSer IsNot Nothing AndAlso lTMinTSer IsNot Nothing AndAlso _
                    lLatitude >= MetComputeLatitudeMin AndAlso lLatitude <= MetComputeLatitudeMax Then
-                    Dim lMetCmpTS As atcTimeseries = CmpHam(lTMinTSer, lTMaxTSer, Me, lDegF, lLatitude, lCTS)
+                    Dim lMetCmpTS As atcTimeseries = PanEvaporationTimeseriesComputedByHamon(lTMinTSer, lTMaxTSer, Me, lDegF, lLatitude, lCTS)
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
             Case "Penman Pan Evaporation"
@@ -150,7 +150,7 @@ Public Class atcMetCmpPlugin
                 End If
                 If lOk AndAlso lTMinTSer IsNot Nothing AndAlso lTMaxTSer IsNot Nothing AndAlso _
                                lSRadTSer IsNot Nothing AndAlso lDewPTSer IsNot Nothing AndAlso lWindTSer IsNot Nothing Then
-                    Dim lMetCmpTS As atcTimeseries = CmpPen(lTMinTSer, lTMaxTSer, lSRadTSer, lDewPTSer, lWindTSer, Me)
+                    Dim lMetCmpTS As atcTimeseries = PanEvaporationTimeseriesComputedByPenman(lTMinTSer, lTMaxTSer, lSRadTSer, lDewPTSer, lWindTSer, Me)
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
             Case "Wind Travel"
@@ -298,8 +298,11 @@ Public Class atcMetCmpPlugin
                 End If
         End Select
 
-        If MyBase.DataSets.Count > 0 Then Return True
-
+        If MyBase.DataSets.Count > 0 Then
+            Return True
+        Else
+            Return False
+        End If
     End Function
 
     <CLSCompliant(False)> _
