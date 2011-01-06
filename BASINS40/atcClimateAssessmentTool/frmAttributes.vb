@@ -69,4 +69,26 @@ Public Class frmAttributes
         Next
     End Sub
 
+    Private Sub btnPercentileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPercentileAdd.Click
+        If Not IsNumeric(txtPercentile.Text.Trim) Then
+            Logger.Msg("Non-numeric Percentile '" & txtPercentile.Text & "'")
+        Else
+            Dim lPercentile As Integer = CInt(txtPercentile.Text.Trim)
+            Dim lArgName As String = "%" & Format(lPercentile, "00")
+            If Not lstAttributes.Items.Contains(lArgName) Then
+                'insert in alphanumeric order by Percentile
+                For lIndex As Integer = 0 To lstAttributes.Items.Count - 1
+                    Dim lExistingAttributeName As String = lstAttributes.Items(lIndex)
+                    If lExistingAttributeName.StartsWith("%") Then
+                        lExistingAttributeName = lExistingAttributeName.Substring(1)
+                    End If
+                    If atcUtility.StrFirstInt(lExistingAttributeName) > lPercentile Then
+                        lstAttributes.Items.Insert(lIndex, lArgName)
+                        Return
+                    End If
+                Next
+                lstAttributes.Items.Add(lArgName)
+            End If
+        End If
+    End Sub
 End Class
