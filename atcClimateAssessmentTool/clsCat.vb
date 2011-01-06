@@ -37,7 +37,7 @@ Public Class clsCat
         End If
         Logger.Dbg(lString)
     End Sub
-    Public Event UpdateResults(ByVal aResultsFilename As String)
+    Public Event UpdateResults()
     Public Event BaseModelSet(ByVal aModelName As String)
 
     Public Property XML() As String
@@ -267,6 +267,8 @@ StartOver:
                 Next
             End If
 
+            Dim lFirstEndpointColumn As Integer = lColumn
+
             For Each lVariation As atcVariation In aSelectedEndpoints
                 For Each lDataset As atcDataSet In lVariation.DataSets
                     .CellValue(0, lColumn) = lVariation.Name
@@ -280,6 +282,8 @@ StartOver:
                     lColumn += 1
                 Next
             Next
+            .CellValue(.FixedRows, 0) = "base"
+            PopulateEndpoints(.FixedRows, lFirstEndpointColumn, Nothing)
         End With
     End Sub
 
@@ -318,7 +322,7 @@ NextIteration:
                     lPreparedInput = ""
                     lModifiedModelName = aModifiedModelName
                     If SaveAll Then
-                        lModifiedModelName &= "-" & aIteration + 1
+                        lModifiedModelName &= "-" & Format(aIteration + 1, "000")
                     End If
                 Else
                     lPreparedInput = PreparedInputs.Item(aIteration)
@@ -327,23 +331,23 @@ NextIteration:
 
                 RaiseEvent StartIteration(aIteration)
                 TimePerRun = Now.ToOADate
-                Dim lResults As atcCollection = Model.ModelRun(lModifiedModelName, aModifiedData, lPreparedInput, RunModel, ShowEachRunProgress, False)
-                If lResults Is Nothing OrElse lResults.Count = 0 Then
-                    Logger.Dbg("Null model results from ModelRun")
-                Else
-                    TimePerRun = (Now.ToOADate - TimePerRun) * 24 * 60 * 60 'Convert days to seconds
-                End If
 
+
+                Dim lModifiedFolder As String = PathNameOnly(AbsolutePath(Model.BaseModel, CurDir)) & g_PathChar & lModifiedModelName
+                Dim lThisRunVariations As String = ""
+
+                Dim lRow As Integer
+                Dim lColumn As Integer
                 With ResultsGrid
-                    Dim lRow As Integer = aIteration + .FixedRows
-                    Dim lColumn As Integer = .FixedColumns
-                    Dim lVariation As atcVariation
+                    lRow = aIteration + .FixedRows + 1 'Results for base are in row .FixedRows, aIteration starts at zero
+                    lColumn = .FixedColumns                    
 
                     If PreparedInputs.Count = 0 Then
                         .CellValue(lRow, 0) = aIteration + 1
-                        For Each lVariation In Inputs
+                        For Each lVariation As atcVariation In Inputs
                             If lVariation.Selected Then
                                 .CellValue(lRow, lColumn) = Format(lVariation.CurrentValue, "0.####")
+                                lThisRunVariations &= lVariation.ToString & " = " & .CellValue(lRow, lColumn) & vbCrLf
                                 lColumn += 1
                             End If
                         Next
@@ -352,62 +356,27 @@ NextIteration:
                         '.CellValue(lRow, 0) = IO.Path.GetFileNameWithoutExtension(PathNameOnly(PreparedInputs.Item(lstInputs.CheckedIndices.Item(aIteration))))
                     End If
                     .CellColor(lRow, 0) = Drawing.SystemColors.Control
-
-                    For Each lVariation In Endpoints
-                        System.GC.Collect()
-                        System.GC.WaitForPendingFinalizers()
-                        If lVariation.Selected Then
-                            For Each lOldData As atcTimeseries In lVariation.DataSets
-                                .CellValue(lRow, lColumn) = "RunFailed 1"
-                                Dim lGroup As atcTimeseriesGroup = Nothing
-                                Dim lOriginalDataSpec As String = lOldData.Attributes.GetValue("History 1", "").Substring(10)
-                                Dim lResultDataSpec As String = lResults.ItemByKey(IO.Path.GetFileName(lOriginalDataSpec).ToLower.Trim)
-                                If lResultDataSpec Is Nothing Then
-                                    Logger.Dbg("ResultsDataSpec is Nothing for " & lOldData.ToString)
-                                    .CellValue(lRow, lColumn) = "RunFailed"
-                                Else
-                                    Dim lResultDataSource As atcTimeseriesSource = OpenDataSource(lResultDataSpec)
-                                    If lResultDataSource Is Nothing Then
-                                        Logger.Dbg("ResultsDataSource is Nothing for " & lResultDataSpec.ToString)
-                                        .CellValue(lRow, lColumn) = "RunFailed 2"
-                                    Else
-                                        lGroup = lResultDataSource.DataSets.FindData("ID", lOldData.Attributes.GetValue("ID"), 1)
-                                        If Not (lGroup Is Nothing) AndAlso lGroup.Count > 0 Then
-                                            Dim lData As atcTimeseries = lGroup.Item(0)
-
-                                            'TODO: add change of time step to atcVariation, use it here to change time step if specified
-
-                                            lData = lVariation.SplitData(lData, Nothing).ItemByIndex(0)
-
-                                            .CellValue(lRow, lColumn) = lData.Attributes.GetFormattedValue(lVariation.Operation)
-                                            If .ColorCells Then
-                                                If Not IsNumeric(.CellValue(lRow, lColumn)) Then
-                                                    .CellColor(lRow, lColumn) = lVariation.ColorDefault
-                                                Else
-                                                    Dim lValue As Double = lGroup.Item(0).Attributes.GetValue(lVariation.Operation)
-                                                    If Not Double.IsNaN(lVariation.Min) AndAlso lValue < lVariation.Min Then
-                                                        .CellColor(lRow, lColumn) = lVariation.ColorBelowMin
-                                                    ElseIf Not Double.IsNaN(lVariation.Max) AndAlso lValue > lVariation.Max Then
-                                                        .CellColor(lRow, lColumn) = lVariation.ColorAboveMax
-                                                    Else
-                                                        .CellColor(lRow, lColumn) = lVariation.ColorDefault
-                                                    End If
-                                                End If
-                                            End If
-                                        Else
-                                            Logger.Dbg("No Data for ID " & lOldData.Attributes.GetValue("ID") & _
-                                                       " Count " & lResultDataSource.DataSets.Count)
-                                            .CellValue(lRow, lColumn) = "RunFailed 3"
-                                        End If
-                                    End If
-                                End If
-                                lColumn += 1
-                            Next
-                        End If
+                    For lRunningColumn As Integer = lColumn To .Columns - 1
+                        .CellValue(lRow, lRunningColumn) = "Running..."
                     Next
+                    RaiseEvent UpdateResults()
                 End With
+
+                Dim lResults As atcCollection = Model.ModelRun(lModifiedModelName, aModifiedData, lPreparedInput, RunModel, ShowEachRunProgress, False)
+                If lResults Is Nothing OrElse lResults.Count = 0 Then
+                    Logger.Dbg("Null model results from ModelRun")
+                Else
+                    TimePerRun = (Now.ToOADate - TimePerRun) * 24 * 60 * 60 'Convert days to seconds
+                End If
+
+                PopulateEndpoints(lRow, lColumn, lResults)
+
                 'TODO: don't assume Model.BaseModel is a filename, find results another way
-                RaiseEvent UpdateResults(PathNameOnly(Model.BaseModel) & g_PathChar & lModifiedModelName & ".results.txt")
+                If lThisRunVariations.Length > 0 Then
+                    SaveFileString(lModifiedFolder & ".results.txt" & g_PathChar, lThisRunVariations)
+                End If
+                Dim lResultsFilename As String = lModifiedFolder & ".results.txt"
+                SaveFileString(lResultsFilename, ResultsGrid.ToString)
 
                 'Close any open results
                 For Each lSpecification As String In lResults
@@ -480,6 +449,69 @@ NextIteration:
                 End With
             End If
         End If
+    End Sub
+
+    Private Sub PopulateEndpoints(ByVal aRow As Integer, ByVal aColumn As Integer, ByVal aResults As atcCollection)
+        With ResultsGrid
+            For Each lEndpoint As atcVariation In Endpoints
+                System.GC.Collect()
+                System.GC.WaitForPendingFinalizers()
+                If lEndpoint.Selected Then
+                    For Each lOldData As atcTimeseries In lEndpoint.DataSets
+                        Dim lData As atcTimeseries = Nothing
+                        If aResults Is Nothing Then
+                            lData = lOldData
+                        Else
+                            .CellValue(aRow, aColumn) = "Opening..."
+                            Dim lGroup As atcTimeseriesGroup = Nothing
+                            Dim lOriginalDataSpec As String = lOldData.Attributes.GetValue("History 1", "").Substring(10)
+                            Dim lResultDataSpec As String = aResults.ItemByKey(IO.Path.GetFileName(lOriginalDataSpec).ToLower.Trim)
+                            If lResultDataSpec Is Nothing Then
+                                .CellValue(aRow, aColumn) = "ResultsDataSpec is Nothing for " & lOldData.ToString
+                                Logger.Dbg(.CellValue(aRow, aColumn))
+                            Else
+                                Dim lResultDataSource As atcTimeseriesSource = OpenDataSource(lResultDataSpec)
+                                If lResultDataSource Is Nothing Then
+                                    .CellValue(aRow, aColumn) = "ResultsDataSource is Nothing for " & lResultDataSpec.ToString
+                                    Logger.Dbg(.CellValue(aRow, aColumn))
+                                Else
+                                    lGroup = lResultDataSource.DataSets.FindData("ID", lOldData.Attributes.GetValue("ID"), 1)
+                                    If Not (lGroup Is Nothing) AndAlso lGroup.Count > 0 Then
+                                        lData = lGroup.Item(0)
+                                    End If
+                                End If
+                            End If
+                        End If
+                        If lData IsNot Nothing Then
+                            'TODO: add change of time step to atcVariation, use it here to change time step if specified
+
+                            lData = lEndpoint.SplitData(lData, Nothing).ItemByIndex(0)
+
+                            .CellValue(aRow, aColumn) = lData.Attributes.GetFormattedValue(lEndpoint.Operation)
+                            If .ColorCells Then
+                                If Not IsNumeric(.CellValue(aRow, aColumn)) Then
+                                    .CellColor(aRow, aColumn) = lEndpoint.ColorDefault
+                                Else
+                                    Dim lValue As Double = lData.Attributes.GetValue(lEndpoint.Operation)
+                                    If Not Double.IsNaN(lEndpoint.Min) AndAlso lValue < lEndpoint.Min Then
+                                        .CellColor(aRow, aColumn) = lEndpoint.ColorBelowMin
+                                    ElseIf Not Double.IsNaN(lEndpoint.Max) AndAlso lValue > lEndpoint.Max Then
+                                        .CellColor(aRow, aColumn) = lEndpoint.ColorAboveMax
+                                    Else
+                                        .CellColor(aRow, aColumn) = lEndpoint.ColorDefault
+                                    End If
+                                End If
+                            End If
+                        Else
+                            .CellValue(aRow, aColumn) = "No Data for ID " & lOldData.Attributes.GetValue("ID")
+                            Logger.Dbg(.CellValue(aRow, aColumn))
+                        End If
+                        aColumn += 1
+                    Next
+                End If
+            Next
+        End With
+        RaiseEvent UpdateResults()
     End Sub
 
     Friend Function MemUsage() As String

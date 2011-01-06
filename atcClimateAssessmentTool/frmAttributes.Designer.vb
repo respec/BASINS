@@ -35,14 +35,19 @@ Partial Class frmAttributes
         Me.txtReturnPeriod = New System.Windows.Forms.TextBox
         Me.lblReturn = New System.Windows.Forms.Label
         Me.btnOk = New System.Windows.Forms.Button
+        Me.grpPercentile = New System.Windows.Forms.GroupBox
+        Me.btnPercentileAdd = New System.Windows.Forms.Button
+        Me.txtPercentile = New System.Windows.Forms.TextBox
+        Me.lblPercentile = New System.Windows.Forms.Label
         Me.grpNday.SuspendLayout()
+        Me.grpPercentile.SuspendLayout()
         Me.SuspendLayout()
         '
         'btnRemove
         '
         Me.btnRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnRemove.AutoSize = True
-        Me.btnRemove.Location = New System.Drawing.Point(12, 395)
+        Me.btnRemove.Location = New System.Drawing.Point(12, 517)
         Me.btnRemove.Name = "btnRemove"
         Me.btnRemove.Size = New System.Drawing.Size(118, 23)
         Me.btnRemove.TabIndex = 30
@@ -66,7 +71,7 @@ Partial Class frmAttributes
         'btnDefaults
         '
         Me.btnDefaults.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnDefaults.Location = New System.Drawing.Point(136, 394)
+        Me.btnDefaults.Location = New System.Drawing.Point(136, 516)
         Me.btnDefaults.Name = "btnDefaults"
         Me.btnDefaults.Size = New System.Drawing.Size(118, 24)
         Me.btnDefaults.TabIndex = 31
@@ -81,7 +86,7 @@ Partial Class frmAttributes
         Me.lstAttributes.Location = New System.Drawing.Point(12, 12)
         Me.lstAttributes.Name = "lstAttributes"
         Me.lstAttributes.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
-        Me.lstAttributes.Size = New System.Drawing.Size(308, 296)
+        Me.lstAttributes.Size = New System.Drawing.Size(308, 357)
         Me.lstAttributes.TabIndex = 27
         Me.lstAttributes.Tag = "NDay"
         '
@@ -126,7 +131,7 @@ Partial Class frmAttributes
         Me.grpNday.Controls.Add(Me.txtNday)
         Me.grpNday.Controls.Add(Me.radioLow)
         Me.grpNday.Controls.Add(Me.lblNDay)
-        Me.grpNday.Location = New System.Drawing.Point(12, 314)
+        Me.grpNday.Location = New System.Drawing.Point(12, 375)
         Me.grpNday.Name = "grpNday"
         Me.grpNday.Size = New System.Drawing.Size(250, 74)
         Me.grpNday.TabIndex = 37
@@ -152,18 +157,56 @@ Partial Class frmAttributes
         'btnOk
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(260, 394)
+        Me.btnOk.Location = New System.Drawing.Point(260, 516)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(61, 24)
         Me.btnOk.TabIndex = 38
         Me.btnOk.Text = "Ok"
+        '
+        'grpPercentile
+        '
+        Me.grpPercentile.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.grpPercentile.Controls.Add(Me.btnPercentileAdd)
+        Me.grpPercentile.Controls.Add(Me.txtPercentile)
+        Me.grpPercentile.Controls.Add(Me.lblPercentile)
+        Me.grpPercentile.Location = New System.Drawing.Point(12, 455)
+        Me.grpPercentile.Name = "grpPercentile"
+        Me.grpPercentile.Size = New System.Drawing.Size(250, 55)
+        Me.grpPercentile.TabIndex = 39
+        Me.grpPercentile.TabStop = False
+        Me.grpPercentile.Text = "Add Percentile Attribute"
+        '
+        'btnPercentileAdd
+        '
+        Me.btnPercentileAdd.Location = New System.Drawing.Point(194, 17)
+        Me.btnPercentileAdd.Name = "btnPercentileAdd"
+        Me.btnPercentileAdd.Size = New System.Drawing.Size(43, 24)
+        Me.btnPercentileAdd.TabIndex = 29
+        Me.btnPercentileAdd.Text = "Add"
+        '
+        'txtPercentile
+        '
+        Me.txtPercentile.Location = New System.Drawing.Point(71, 20)
+        Me.txtPercentile.Name = "txtPercentile"
+        Me.txtPercentile.Size = New System.Drawing.Size(39, 20)
+        Me.txtPercentile.TabIndex = 28
+        '
+        'lblPercentile
+        '
+        Me.lblPercentile.AutoSize = True
+        Me.lblPercentile.Location = New System.Drawing.Point(6, 23)
+        Me.lblPercentile.Name = "lblPercentile"
+        Me.lblPercentile.Size = New System.Drawing.Size(54, 13)
+        Me.lblPercentile.TabIndex = 33
+        Me.lblPercentile.Text = "Percentile"
         '
         'frmAttributes
         '
         Me.AcceptButton = Me.btnOk
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(332, 430)
+        Me.ClientSize = New System.Drawing.Size(332, 552)
+        Me.Controls.Add(Me.grpPercentile)
         Me.Controls.Add(Me.btnOk)
         Me.Controls.Add(Me.grpNday)
         Me.Controls.Add(Me.btnRemove)
@@ -175,6 +218,8 @@ Partial Class frmAttributes
         Me.Text = "Attributes"
         Me.grpNday.ResumeLayout(False)
         Me.grpNday.PerformLayout()
+        Me.grpPercentile.ResumeLayout(False)
+        Me.grpPercentile.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -191,4 +236,8 @@ Partial Class frmAttributes
     Friend WithEvents txtReturnPeriod As System.Windows.Forms.TextBox
     Friend WithEvents lblReturn As System.Windows.Forms.Label
     Friend WithEvents btnOk As System.Windows.Forms.Button
+    Friend WithEvents grpPercentile As System.Windows.Forms.GroupBox
+    Friend WithEvents btnPercentileAdd As System.Windows.Forms.Button
+    Friend WithEvents txtPercentile As System.Windows.Forms.TextBox
+    Friend WithEvents lblPercentile As System.Windows.Forms.Label
 End Class

@@ -906,20 +906,20 @@ Public Class atcVariation
     End Property
 
     Public Overrides Function ToString() As String
-        Dim retStr As String = Name & " " & Operation & " "
+        Dim lString As String = Name & " " & Operation & " "
 
         If Max <= Min Then
-            retStr &= DoubleString(Min)
+            lString &= DoubleString(Min)
         Else
-            If Not Double.IsNaN(Min) Then retStr &= "from " & DoubleString(Min)
-            If Not Double.IsNaN(Max) Then retStr &= " to " & DoubleString(Max)
-            If Not Double.IsNaN(Increment) Then retStr &= " step " & DoubleString(Increment)
+            If Not Double.IsNaN(Min) Then lString &= "from " & DoubleString(Min)
+            If Not Double.IsNaN(Max) Then lString &= " to " & DoubleString(Max)
+            If Not Double.IsNaN(Increment) Then lString &= " step " & DoubleString(Increment)
         End If
-        If Not Seasons Is Nothing Then
-            retStr &= " " & atcSeasons.atcSeasonPlugin.SeasonClassNameToLabel(Seasons.GetType.Name) _
+        If Seasons IsNot Nothing Then
+            lString &= " " & atcSeasons.atcSeasonPlugin.SeasonClassNameToLabel(Seasons.GetType.Name) _
                    & ": " & Seasons.SeasonsSelectedString
         End If
-        Return retStr
+        Return lString
     End Function
 
     Private Function DoubleString(ByVal aNumber As Double) As String
