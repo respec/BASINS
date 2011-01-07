@@ -1,8 +1,8 @@
 Option Strict Off
 Option Explicit On
 
-
 Imports MapWinUtility 'for Logger
+Imports MapWinUtility.Strings
 
 ''' <summary>
 ''' Windows wrapper for HSPF 
@@ -78,7 +78,7 @@ Module modWinHSPFLt
             End If
 
             If StringFindAndRemove(lExeCmd, "/debugpause") Then
-                Logger.Msg("Pause to attach to process")
+                'Logger.Msg("Pause to attach to process")
             End If
 
             Logger.Dbg("ExeName '" & StrSplit(lExeCmd, " ", """") & "'")

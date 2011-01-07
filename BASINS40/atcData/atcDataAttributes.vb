@@ -46,6 +46,9 @@ Public Class atcDataAttributes
 
     Public Shared Function AddDefinition(ByVal aDefinition As atcAttributeDefinition) As atcAttributeDefinition
         Dim lKey As String = AttributeNameToKey(aDefinition.Name)
+        If lKey.Length = 0 Then
+            Logger.Dbg("WhyNoKey?")
+        End If
         Dim lAddDefinition As atcAttributeDefinition
         If Not pAllDefinitions.Keys.Contains(lKey) Then
             aDefinition.Name = PreferredName(aDefinition.Name)
@@ -543,7 +546,7 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
         Return lS
     End Function
 
-    Public Shadows Sub RemoveByKey(ByVal key As Object)
-        MyBase.RemoveByKey(AttributeNameToKey(key))
+    Public Shadows Sub RemoveByKey(ByVal aAttributeName As Object)
+        MyBase.RemoveByKey(AttributeNameToKey(aAttributeName))
     End Sub
 End Class
