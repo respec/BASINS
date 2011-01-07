@@ -1,3 +1,5 @@
+Imports atcUtility
+
 ''' <summary>Base class for timeseries data</summary>
 Public Class atcTimeseries
     Inherits atcDataSet
@@ -443,4 +445,22 @@ Public Class atcTimeseries
         Return lFoundParent
     End Function
 
+    Public Sub SetInterval(ByVal aTu As atcTimeUnit, ByVal ats As Integer)
+        With Attributes
+            .SetValue("TU", aTu)
+            .SetValue("TS", ats)
+            Select Case aTu
+                Case atcTimeUnit.TUDay
+                    .SetValue("interval", ats)
+                Case atcTimeUnit.TUHour
+                    .SetValue("interval", ats / CDbl(24))
+                Case atcTimeUnit.TUMinute
+                    .SetValue("interval", ats / CDbl(1440))
+                Case atcTimeUnit.TUSecond
+                    .SetValue("interval", ats / CDbl(1440 * 60))
+                Case Else
+                    .RemoveByKey("interval")
+            End Select
+        End With
+    End Sub
 End Class

@@ -3,6 +3,7 @@ Imports System.Windows.Forms.Application
 Imports atcUtility
 Imports atcData
 Imports MapWinUtility
+Imports atcMwGisUtility
 
 Public Class atcBasinsPlugIn
     Implements MapWindow.Interfaces.IPlugin
@@ -84,7 +85,7 @@ Public Class atcBasinsPlugIn
         RegisterMenuString = "Register as a " & g_AppNameShort & " user"
         ProgramWebPageMenuString = g_AppNameShort & " Web Page"
 
-        atcMwGisUtility.GisUtil.MappingObject = g_MapWin
+        GisUtil.MappingObject = g_MapWin
         atcDataManager.MapWindow = g_MapWin
 
         g_MapWinWindowHandle = aParentHandle

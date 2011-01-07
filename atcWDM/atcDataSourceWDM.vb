@@ -991,8 +991,7 @@ ParseDate:                          Logger.Dbg(lName & " text date '" & lS & "' 
         If (lRetcod <> 0) Then ' set time step to default of 1
             lTs = 1
         End If
-        aDataset.Attributes.SetValue("ts", lTs)
-
+ 
         lSaInd = 17 'time unit
         Dim lTuInt As Integer
         F90_WDBSGI(aFileUnit, lDsn, lSaInd, lSaLen, lTuInt, lRetcod)
@@ -1002,17 +1001,9 @@ ParseDate:                          Logger.Dbg(lName & " text date '" & lS & "' 
             lTu = CType(lTuInt, atcTimeUnit)
         End If
 
-        aDataset.Attributes.SetValue("tu", lTu)
+        aDataset.SetInterval(lTu, lTs)
         'TODO: set constant interval/interval length attribute(s) in aDataset.Dates
         'lDateSum.CIntvl = True
-        Select Case lTu
-            Case atcTimeUnit.TUDay
-                aDataset.Attributes.SetValue("interval", lTs)
-            Case atcTimeUnit.TUHour
-                aDataset.Attributes.SetValue("interval", lTs / CDbl(24))
-            Case atcTimeUnit.TUMinute
-                aDataset.Attributes.SetValue("interval", lTs / CDbl(1440))
-        End Select
 
         If Not pQuick Then 'get start and end dates for each data set
             Dim lGpFlg As Integer = 1

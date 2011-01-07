@@ -96,7 +96,7 @@ Public Module modMetCompute
     ''' </summary>
     ''' <param name="aCldTSer">Cloud Cover timeseries</param>
     ''' <param name="aSource"></param>
-    ''' <param name="aLatDeg">Latitude in degrees</param>
+    ''' <param name="aLatDeg">Latitude, in degrees</param>
     ''' <returns>Daily solar radiation timeseries</returns>
     ''' <remarks></remarks>
     Public Function SolarRadiationFromCloudCover(ByVal aCldTSer As atcTimeseries, ByVal aSource As atcTimeseriesSource, ByVal aLatDeg As Double) As atcTimeseries
@@ -127,7 +127,7 @@ Public Module modMetCompute
                 Else
                     J2Date(aCldTSer.Dates.Value(lValueIndex - 1), lDate)
                 End If
-                lSolRad(lValueIndex) = RadClc(aLatDeg, lCldCov(lValueIndex), lDate(1), lDate(2))
+                lSolRad(lValueIndex) = SolarRadiationValueFromCloudCover(aLatDeg, lCldCov(lValueIndex), lDate(1), lDate(2))
             Else
                 lSolRad(lValueIndex) = lNaN
             End If
@@ -138,38 +138,45 @@ Public Module modMetCompute
 
     End Function
 
-    Public Function CmpCldFromSolar(ByVal aDSolTSer As atcTimeseries, ByVal aSource As atcTimeseriesSource, ByVal aLatDeg As Double) As atcTimeseries
-        'compute daily cloud cover based on daily solar radiation 
-        Dim i As Integer
-        Dim ldate(5) As Integer
-        Dim SolRad(aDSolTSer.numValues) As Double
-        Dim CldCov(aDSolTSer.numValues) As Double
-        Dim lCmpTs As New atcTimeseries(aSource)
+    ''' <summary>
+    ''' Compute daily cloud cover based on daily solar radiation 
+    ''' </summary>
+    ''' <param name="aDSolTSer">Daily solar radiation timeseries</param>
+    ''' <param name="aSource"></param>
+    ''' <param name="aLatDeg">Latitude, in degrees</param>
+    ''' <returns>Daily cloud cover timeseries</returns>
+    ''' <remarks></remarks>
+    Public Function CloudCoverTimeseriesFromSolar(ByVal aDSolTSer As atcTimeseries, ByVal aSource As atcTimeseriesSource, ByVal aLatDeg As Double) As atcTimeseries
+        Dim lCloudTs As New atcTimeseries(aSource)
+
+        CopyBaseAttributes(aDSolTSer, lCloudTs)
+        lCloudTs.Attributes.SetValue("Constituent", "CLDC")
+        lCloudTs.Attributes.SetValue("TSTYPE", "CLDC")
+        lCloudTs.Attributes.SetValue("Scenario", "COMPUTED")
+        lCloudTs.Attributes.SetValue("Description", "Daily Cloud Cover (0-10) computed from Daily Solar Radiation (Langleys)")
+        lCloudTs.Attributes.AddHistory("Computed Daily Cloud Cover - inputs: DSOL, Latitude")
+        lCloudTs.Attributes.Add("DSOL", aDSolTSer.ToString)
+        lCloudTs.Attributes.Add("Latitude", aLatDeg)
+        lCloudTs.Dates = aDSolTSer.Dates
+        lCloudTs.numValues = aDSolTSer.numValues
+
+        Dim lSolRad(aDSolTSer.numValues) As Double
+        Dim lCldCov(aDSolTSer.numValues) As Double
+        Array.Copy(aDSolTSer.Values, 1, lSolRad, 1, aDSolTSer.numValues)
+
+        Dim lDate(5) As Integer
         Dim lPoint As Boolean = aDSolTSer.Attributes.GetValue("point", False)
-
-        CopyBaseAttributes(aDSolTSer, lCmpTs)
-        lCmpTs.Attributes.SetValue("Constituent", "CLDC")
-        lCmpTs.Attributes.SetValue("TSTYPE", "CLDC")
-        lCmpTs.Attributes.SetValue("Scenario", "COMPUTED")
-        lCmpTs.Attributes.SetValue("Description", "Daily Cloud Cover (0-10) computed from Daily Solar Radiation (Langleys)")
-        lCmpTs.Attributes.AddHistory("Computed Daily Cloud Cover - inputs: DSOL, Latitude")
-        lCmpTs.Attributes.Add("DSOL", aDSolTSer.ToString)
-        lCmpTs.Attributes.Add("Latitude", aLatDeg)
-        lCmpTs.Dates = aDSolTSer.Dates
-        lCmpTs.numValues = aDSolTSer.numValues
-        Array.Copy(aDSolTSer.Values, 1, SolRad, 1, aDSolTSer.numValues)
-
-        For i = 1 To lCmpTs.numValues
+        For lValueIndex As Integer = 1 To lCloudTs.numValues
             If lPoint Then
-                Call J2Date(aDSolTSer.Dates.Value(i), ldate)
+                Call J2Date(aDSolTSer.Dates.Value(lValueIndex), lDate)
             Else
-                Call J2Date(aDSolTSer.Dates.Value(i - 1), ldate)
+                Call J2Date(aDSolTSer.Dates.Value(lValueIndex - 1), lDate)
             End If
-            Call CldClc(aLatDeg, SolRad(i), ldate(1), ldate(2), CldCov(i))
-        Next i
-        Array.Copy(CldCov, 1, lCmpTs.Values, 1, lCmpTs.numValues)
+            lCldCov(lValueIndex) = CloudCoverValueFromSolar(aLatDeg, lSolRad(lValueIndex), lDate(1), lDate(2))
+        Next lValueIndex
+        Array.Copy(lCldCov, 1, lCloudTs.Values, 1, lCloudTs.numValues)
 
-        Return lCmpTs
+        Return lCloudTs
 
     End Function
 
@@ -240,8 +247,8 @@ Public Module modMetCompute
     ''' </summary>
     ''' <param name="aTemperature"></param>
     ''' <param name="aSource"></param>
-    ''' <param name="aDegF"></param>
-    ''' <param name="aLatDeg"></param>
+    ''' <param name="aDegF">Temperature in Degrees F (True) or C (False)</param>
+    ''' <param name="aLatDeg">Latitude, in degrees</param>
     ''' <param name="aCTS"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
@@ -307,9 +314,9 @@ Public Module modMetCompute
     ''' <param name="aTMaxTS">Max Air Temperature - daily</param>
     ''' <param name="aSource"></param>
     ''' <param name="aDegF">Temperature in Degrees F (True) or C (False)</param>
-    ''' <param name="aLatDeg">latitude, in degrees</param>
-    ''' <param name="aCTS">monthly variable coefficients</param>
-    ''' <returns></returns>
+    ''' <param name="aLatDeg">Latitude, in degrees</param>
+    ''' <param name="aCTS">Monthly variable coefficients</param>
+    ''' <returns>Daily Pan Evaporation</returns>
     ''' <remarks></remarks>
     Public Function PanEvaporationTimeseriesComputedByHamon(ByVal aTMinTS As atcTimeseries, ByVal aTMaxTS As atcTimeseries, ByVal aSource As atcTimeseriesSource, ByVal aDegF As Boolean, ByVal aLatDeg As Double, ByVal aCTS() As Double) As atcTimeseries
         Dim lAirTmp(aTMinTS.numValues) As Double
@@ -458,34 +465,36 @@ Public Module modMetCompute
 
     End Function
 
-    Public Function CmpWnd(ByVal aWndSpd As atcTimeseries, ByVal aSource As atcTimeseriesSource) As atcTimeseries
-        'compute daily total wind travel (mi) from
-        'average daily wind speed (mph)
+    ''' <summary>
+    ''' compute daily total wind travel (mi) from average daily wind speed (mph)
+    ''' </summary>
+    ''' <param name="aWindSpeed"></param>
+    ''' <param name="aSource"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Function WindTravelFromWindSpeed(ByVal aWindSpeed As atcTimeseries, ByVal aSource As atcTimeseriesSource) As atcTimeseries
+        Dim lWindTravelTs As New atcTimeseries(aSource)
+        CopyBaseAttributes(aWindSpeed, lWindTravelTs)
+        lWindTravelTs.Attributes.SetValue("Constituent", "TWND")
+        lWindTravelTs.Attributes.SetValue("TSTYPE", "TWND")
+        lWindTravelTs.Attributes.SetValue("Scenario", "COMPUTED")
+        lWindTravelTs.Attributes.SetValue("Description", "Daily Total Wind (mi) computed using Average Daily Wind Speed (mph)")
+        lWindTravelTs.Attributes.AddHistory("Computed Daily Total Wind using Daily Wind Speed - inputs: WIND")
+        lWindTravelTs.Attributes.Add("WIND", aWindSpeed.ToString)
+        lWindTravelTs.Dates = aWindSpeed.Dates
+        lWindTravelTs.numValues = aWindSpeed.numValues
 
-        Dim i As Integer
-        Dim lTotWnd(aWndSpd.numValues) As Double
-        Dim lCmpTs As New atcTimeseries(aSource)
-
-        CopyBaseAttributes(aWndSpd, lCmpTs)
-        lCmpTs.Attributes.SetValue("Constituent", "TWND")
-        lCmpTs.Attributes.SetValue("TSTYPE", "TWND")
-        lCmpTs.Attributes.SetValue("Scenario", "COMPUTED")
-        lCmpTs.Attributes.SetValue("Description", "Daily Total Wind (mi) computed using Average Daily Wind Speed (mph)")
-        lCmpTs.Attributes.AddHistory("Computed Daily Total Wind using Daily Wind Speed - inputs: WIND")
-        lCmpTs.Attributes.Add("WIND", aWndSpd.ToString)
-        lCmpTs.Dates = aWndSpd.Dates
-        lCmpTs.numValues = aWndSpd.numValues
-
-        For i = 1 To lCmpTs.numValues
-            If aWndSpd.Value(i) <= 0.0# Then 'not valid wind speed value
-                lTotWnd(i) = 0
+        Dim lTotWnd(aWindSpeed.numValues) As Double
+        For lValueIndex As Integer = 1 To lWindTravelTs.numValues
+            If aWindSpeed.Value(lValueIndex) <= 0.0# Then 'not valid wind speed value
+                lTotWnd(lValueIndex) = 0
             Else
-                lTotWnd(i) = 24 * aWndSpd.Value(i)
+                lTotWnd(lValueIndex) = 24 * aWindSpeed.Value(lValueIndex)
             End If
-        Next i
-        Array.Copy(lTotWnd, 1, lCmpTs.Values, 1, lCmpTs.numValues)
-        Return lCmpTs
+        Next lValueIndex
+        Array.Copy(lTotWnd, 1, lWindTravelTs.Values, 1, lWindTravelTs.numValues)
 
+        Return lWindTravelTs
     End Function
 
     'DisTemp performs disaggregation of daily TMin/TMax to hourly temperature with a constant observation time
@@ -679,7 +688,7 @@ Public Module modMetCompute
     ''' <param name="aInTs">input timeseries to be disaggregated</param>
     ''' <param name="aDataSource"></param>
     ''' <param name="aDisOpt">1 does Solar, DisOpt = 2 does PET</param>
-    ''' <param name="aLatDeg">latitude, in degrees</param>
+    ''' <param name="aLatDeg">Latitude, in degrees</param>
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Function DisSolPet(ByVal aInTs As atcTimeseries, ByVal aDataSource As atcTimeseriesSource, ByVal aDisOpt As Integer, ByVal aLatDeg As Double) As atcTimeseries
@@ -1121,7 +1130,7 @@ Public Module modMetCompute
     ''' <param name="aMon"></param>
     ''' <param name="aDay"></param>
     ''' <remarks></remarks>
-    Private Function RadClc(ByRef aDegLat As Double, ByRef aCloud As Double, ByRef aMon As Integer, ByRef aDay As Integer) As Double
+    Private Function SolarRadiationValueFromCloudCover(ByRef aDegLat As Double, ByRef aCloud As Double, ByRef aMon As Integer, ByRef aDay As Integer) As Double
         'integer part of latitude
         Dim lLatInt As Integer = Math.Floor(aDegLat)
         'fractional part of latitude
@@ -1177,74 +1186,73 @@ Public Module modMetCompute
         Return lDayRad
     End Function
 
-    Private Sub CldClc(ByRef aDegLat As Double, ByRef aDayRad As Double, ByRef aMon As Integer, ByRef aDay As Integer, ByRef aCloud As Double)
-
-        'This routine computes the daily cloud cover based on daily solar radiation.
-        'NOTE:  This routine makes what is likely a gross assumption - 
-        'that percent sun, and thus, cloud cover is essentially the ratio
-        'of actual solar radiation to potential max solar radiation.
-        'Max solar radiation is based on the above routine (RadClc), which uses
-        'the HSPII (Hydrocomp, 1978) RADIATION procedure, which is based
-        'on empirical curves of radiation as a function of latitude
-        '(Hamon et al, 1954, Monthly Weather Review 82(6):141-146.
-
-        Dim ILat, ii As Integer
-        Dim Lat3, Lat1, Lat2, Lat4 As Double
-        Dim A1, b, Exp2, Exp1, a, A0, A2 As Double
-        Dim b2, A3, b1, Frac As Double
-        Dim SS, x As Double
-        Dim Y100, YRD As Double
-
+    ''' <summary>
+    ''' Computes daily cloud cover based on daily solar radiation.
+    ''' </summary>
+    ''' <param name="aDegLat"></param>
+    ''' <param name="aDayRad"></param>
+    ''' <param name="aMon"></param>
+    ''' <param name="aDay"></param>
+    ''' <returns>Daily cloud cover value</returns>
+    ''' <remarks>
+    ''' NOTE:  This routine makes what is likely a gross assumption - 
+    ''' that percent sun, and thus, cloud cover is essentially the ratio
+    ''' of actual solar radiation to potential max solar radiation.
+    ''' Max solar radiation is based on the above routine (RadClc), which uses
+    ''' the HSPII (Hydrocomp, 1978) RADIATION procedure, which is based
+    ''' on empirical curves of radiation as a function of latitude
+    ''' (Hamon et al, 1954, Monthly Weather Review 82(6):141-146.
+    '''</remarks>
+    Private Function CloudCoverValueFromSolar(ByRef aDegLat As Double, ByRef aDayRad As Double, ByRef aMon As Integer, ByRef aDay As Integer)
         'integer part of latitude
-        ILat = Int(aDegLat)
-
+        Dim lLatInt As Integer = Math.Floor(aDegLat)
         'fractional part of latitude
-        Frac = aDegLat - CSng(ILat)
-        If Frac <= 0.0001 Then Frac = 0.0#
+        Dim lLatFrac As Double = aDegLat - CSng(lLatInt)
+        If lLatFrac <= 0.0001 Then lLatFrac = 0.0#
 
-        A0 = XLax(ILat, 1) + Frac * (XLax(ILat + 1, 1) - XLax(ILat, 1))
-        A1 = XLax(ILat, 2) + Frac * (XLax(ILat + 1, 2) - XLax(ILat, 2))
-        A2 = XLax(ILat, 3) + Frac * (XLax(ILat + 1, 3) - XLax(ILat, 3))
-        A3 = XLax(ILat, 4) + Frac * (XLax(ILat + 1, 4) - XLax(ILat, 4))
-        b1 = XLax(ILat, 5) + Frac * (XLax(ILat + 1, 5) - XLax(ILat, 5))
-        b2 = XLax(ILat, 6) + Frac * (XLax(ILat + 1, 6) - XLax(ILat, 6))
-        b = aDegLat - 44.0#
-        a = aDegLat - 25.0#
-        Exp1 = 0.7575 - 0.0018 * a
-        Exp2 = 0.725 + 0.00288 * b
-        Lat1 = 2.139 + 0.0423 * a
-        Lat2 = 30.0# - 0.667 * a
-        Lat3 = 2.9 - 0.0629 * b
-        Lat4 = 18.0# + 0.833 * b
+        Dim A0 As Double = XLax(lLatInt, 1) + lLatFrac * (XLax(lLatInt + 1, 1) - XLax(lLatInt, 1))
+        Dim A1 As Double = XLax(lLatInt, 2) + lLatFrac * (XLax(lLatInt + 1, 2) - XLax(lLatInt, 2))
+        Dim A2 As Double = XLax(lLatInt, 3) + lLatFrac * (XLax(lLatInt + 1, 3) - XLax(lLatInt, 3))
+        Dim A3 As Double = XLax(lLatInt, 4) + lLatFrac * (XLax(lLatInt + 1, 4) - XLax(lLatInt, 4))
+        Dim b1 As Double = XLax(lLatInt, 5) + lLatFrac * (XLax(lLatInt + 1, 5) - XLax(lLatInt, 5))
+        Dim b2 As Double = XLax(lLatInt, 6) + lLatFrac * (XLax(lLatInt + 1, 6) - XLax(lLatInt, 6))
+        Dim b As Double = aDegLat - 44.0#
+        Dim a As Double = aDegLat - 25.0#
+        Dim Exp1 As Double = 0.7575 - 0.0018 * a
+        Dim Exp2 As Double = 0.725 + 0.00288 * b
+        Dim Lat1 As Double = 2.139 + 0.0423 * a
+        Dim Lat2 As Double = 30.0# - 0.667 * a
+        Dim Lat3 As Double = 2.9 - 0.0629 * b
+        Dim Lat4 As Double = 18.0# + 0.833 * b
 
-        x = X1(aMon) + aDay
+        Dim x As Double = X1(aMon) + aDay
         'convert to radians
         x *= DegreesToRadians
 
-        Y100 = A0 + A1 * Math.Cos(x) + A2 * Math.Cos(2 * x) + A3 * Math.Cos(3 * x) + b1 * Math.Sin(x) + b2 * Math.Sin(2 * x)
+        Dim Y100 As Double = A0 + A1 * Math.Cos(x) + A2 * Math.Cos(2 * x) + A3 * Math.Cos(3 * x) + b1 * Math.Sin(x) + b2 * Math.Sin(2 * x)
 
-        YRD = (aDayRad / Y100) * 100
+        Dim YRD As Double = (aDayRad / Y100) * 100
 
         'NOTE: here's where the ratio of Rad to Max Rad is used as %Sun
-        ii = Math.Ceiling((Math.Min(100, YRD) + 10.0#) / 10.0#)
+        Dim ii As Integer = Math.Ceiling((Math.Min(100, YRD) + 10.0#) / 10.0#)
         If ii < 11 Then
             YRD = YRD - c(ii, aMon)
         End If
 
+        Dim ss As Double
         If aDegLat > 43.0# Then
-            SS = Math.Pow(((YRD - Lat4) / Lat3), 1 / Exp2)
+            ss = Math.Pow(((YRD - Lat4) / Lat3), 1 / Exp2)
         Else
-            SS = Math.Pow(((YRD - Lat2) / Lat1), 1 / Exp1)
+            ss = Math.Pow(((YRD - Lat2) / Lat1), 1 / Exp1)
         End If
 
-        If SS < 0.0# Then
-            'can't have SS being negative
-            SS = 0.0#
+        If ss < 0.0# Then 'can't have SS being negative
+            ss = 0.0#
         End If
         'get cloud cover from %sun
-        aCloud = 10 * Math.Pow(-((SS / 100) - 1), 3 / 5)
+        Return 10 * Math.Pow(-((ss / 100) - 1), 3 / 5)
 
-    End Sub
+    End Function
 
     Private Sub Jensen(ByVal aMon As Integer, ByVal aCTS() As Double, ByVal aAirTmp As Double, ByVal aDegF As Boolean, ByVal aCTX As Double, ByVal aSolRad As Double, ByRef aPanEvp As Double, ByRef aRetCod As Integer)
 
@@ -1300,7 +1308,7 @@ Public Module modMetCompute
     ''' <param name="aMonth">Month</param>
     ''' <param name="aDay">Day</param>
     ''' <param name="aCTS">Array of monthly coefficients</param>
-    ''' <param name="aLatDeg">Latitude in degrees</param>
+    ''' <param name="aLatDeg">Latitude, in degrees</param>
     ''' <param name="aTAVC">Average daily temperature (C)</param>
     ''' <param name="aDegF">Temperature in Fahrenheit (True) or Celsius (False)</param>
     ''' <param name="aMissingValue">Value to return if problem occurs</param>

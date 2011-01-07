@@ -81,7 +81,7 @@ Public Class atcMetCmpPlugin
                 End If
                 If lOk AndAlso lSRadTSer IsNot Nothing AndAlso _
                   lLatitude >= MetComputeLatitudeMin AndAlso lLatitude <= MetComputeLatitudeMax Then
-                    Dim lMetCmpTS As atcTimeseries = CmpCldFromSolar(lSRadTSer, Me, lLatitude)
+                    Dim lMetCmpTS As atcTimeseries = CloudCoverTimeseriesFromSolar(lSRadTSer, Me, lLatitude)
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
             Case "Jensen PET"
@@ -161,7 +161,7 @@ Public Class atcMetCmpPlugin
                     lWindTSer = aArgs.GetValue("WIND")
                 End If
                 If lWindTSer IsNot Nothing Then
-                    Dim lMetCmpTS As atcTimeseries = CmpWnd(lWindTSer, Me)
+                    Dim lMetCmpTS As atcTimeseries = WindTravelFromWindSpeed(lWindTSer, Me)
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
             Case "Cloud Cover"
