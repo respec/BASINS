@@ -11,9 +11,9 @@ Imports atcData
 Imports atcMetCmp
 
 Public Module GenPenmanMonteithET
-    Private Const pOutputPath As String = "G:\TT_GCRP\WDM_Data\"
-    Private Const pStationPath As String = "C:\BASINSMet\Stations\"
-    Private pSWATStnFile As String = IO.Path.Combine(pOutputPath, "statwgn.txt")
+    Private Const pOutputPath As String = "G:\TT_GCRP\WDM_Data\" '<<<Change here to your own WDM folder
+    Private Const pStationPath As String = "C:\BASINSMet\Stations\" '<<<Need to locate your BASINS weather station DBF folder
+    Private pSWATStnFile As String = IO.Path.Combine(pOutputPath, "statwgn.txt") '<<< do not change this file name as it is required by the FORTRAN code
 
     Private pWriteSWATMet As Boolean = True ' Switch to write SWAT met input file
     Private pdoPET As Boolean = True ' Switch to do the actual PM PET calculation
@@ -112,7 +112,7 @@ Public Module GenPenmanMonteithET
                     Dim ltsPMETHour As atcTimeseries = Nothing
                     Dim ltsPrec As atcTimeseries
                     Dim ltsAtem As atcTimeseries
-                    Dim ltsAtemSub As atcTimeseries
+                    Dim ltsAtemSub As atcTimeseries = Nothing
 
                     Dim lPrecVals As Double() = Nothing
                     Dim lTMinVals As Double() = Nothing
@@ -240,10 +240,16 @@ Public Module GenPenmanMonteithET
                         lLat = lStationDBF.Value(4) 'in decimal degrees
                         lElev = lStationDBF.Value(6) 'in feet
                         lElev = lElev * 0.3048 ' turn into meter
-                        Dim lPMETValsSingle(lNVals) As Single
-                        Dim lPrecValsSingle(lNVals) As Single
-                        Dim lTMinValsSingle(lNVals) As Single
-                        Dim lTMaxValsSingle(lNVals) As Single
+
+                        Dim lPMETValsSingle(1) As Single
+                        Dim lPrecValsSingle(1) As Single
+                        Dim lTMinValsSingle(1) As Single
+                        Dim lTMaxValsSingle(1) As Single
+
+                        ReDim lPMETValsSingle(lNVals)
+                        ReDim lPrecValsSingle(lNVals)
+                        ReDim lTMinValsSingle(lNVals)
+                        ReDim lTMaxValsSingle(lNVals)
 
                         'Copy values into single array for calling fortran
                         For z As Integer = 0 To lPrecVals.GetUpperBound(0)
@@ -305,6 +311,17 @@ Public Module GenPenmanMonteithET
 PMETTSPROBLEM:
                             Logger.Dbg("GenPenmanMonteith:   PROBLEM writing Penman-Monteith PET to DSN " & ltsAtemID + 6)
                         End If
+
+                        'throw away temporary arrays
+                        ReDim lPMETValsSingle(0) : lPMETValsSingle = Nothing
+                        ReDim lPrecValsSingle(0) : lPrecValsSingle = Nothing
+                        ReDim lTMinValsSingle(0) : lTMinValsSingle = Nothing
+                        ReDim lTMaxValsSingle(0) : lTMaxValsSingle = Nothing
+
+                        ReDim lPrecVals(0) : lPrecVals = Nothing
+                        ReDim lTMinVals(0) : lTMinVals = Nothing
+                        ReDim lTMaxVals(0) : lTMaxVals = Nothing
+                        ReDim lPMETValsHdl(0) : lPMETValsHdl = Nothing
                     Else
                         Logger.Dbg("GenPenmanMonteith:   No common period available for Precip and Air Temp data")
                     End If
@@ -418,27 +435,29 @@ PMETTSPROBLEM:
                     '    Logger.Dbg("WriteSwatMetInput Exception: " & lEx.InnerException.Message & vbCrLf & lEx.InnerException.StackTrace)
                     '    Logger.Flush()
                     'End Try
-
 EndCleanUp:
                     'lstationWDMFile = Nothing
                     If ltsPrec IsNot Nothing Then ltsPrec.Clear()
                     If ltsAtem IsNot Nothing Then ltsAtem.Clear()
+                    If ltsAtemSub IsNot Nothing Then ltsAtemSub.Clear()
                     If ltsPEVT IsNot Nothing Then ltsPEVT.Clear() 'for report
                     If ltsPMET IsNot Nothing Then ltsPMET.Clear()
                     If ltsPMETHour IsNot Nothing Then ltsPMETHour.Clear()
-                    If lAtemVals IsNot Nothing Then Array.Clear(lAtemVals, 0, lAtemVals.Length)
-                    If lPrecValsMonthly IsNot Nothing Then Array.Clear(lPrecValsMonthly, 0, lPrecValsMonthly.Length)
-                    If lPrecValsYearly IsNot Nothing Then Array.Clear(lPrecValsYearly, 0, lPrecValsYearly.Length)
-                    If lAtemValsMonthly IsNot Nothing Then Array.Clear(lAtemValsMonthly, 0, lAtemValsMonthly.Length)
-                    If lAtemValsYearly IsNot Nothing Then Array.Clear(lAtemValsYearly, 0, lAtemValsYearly.Length)
-                    If lPEVTVals IsNot Nothing Then Array.Clear(lPEVTVals, 0, lPEVTVals.Length)
-                    If lPEVTValsMonthly IsNot Nothing Then Array.Clear(lPEVTValsMonthly, 0, lPEVTValsMonthly.Length)
-                    If lPEVTValsYearly IsNot Nothing Then Array.Clear(lPEVTValsYearly, 0, lPEVTValsYearly.Length)
-                    If lPMETValsMonthly IsNot Nothing Then Array.Clear(lPMETValsMonthly, 0, lPMETValsMonthly.Length)
-                    If lPMETValsYearly IsNot Nothing Then Array.Clear(lPMETValsYearly, 0, lPMETValsYearly.Length)
+
+                    If lAtemVals IsNot Nothing Then ReDim lAtemVals(0)
+                    If lPrecValsMonthly IsNot Nothing Then ReDim lPrecValsMonthly(0)
+                    If lPrecValsYearly IsNot Nothing Then ReDim lPrecValsYearly(0)
+                    If lAtemValsMonthly IsNot Nothing Then ReDim lAtemValsMonthly(0)
+                    If lAtemValsYearly IsNot Nothing Then ReDim lAtemValsYearly(0)
+                    If lPEVTVals IsNot Nothing Then ReDim lPEVTVals(0)
+                    If lPEVTValsMonthly IsNot Nothing Then ReDim lPEVTValsMonthly(0)
+                    If lPEVTValsYearly IsNot Nothing Then ReDim lPEVTValsYearly(0)
+                    If lPMETValsMonthly IsNot Nothing Then ReDim lPMETValsMonthly(0)
+                    If lPMETValsYearly IsNot Nothing Then ReDim lPMETValsYearly(0)
 
                     ltsPrec = Nothing
                     ltsAtem = Nothing
+                    ltsAtemSub = Nothing
                     ltsPEVT = Nothing 'for report
                     ltsPMET = Nothing
                     ltsPMETHour = Nothing
