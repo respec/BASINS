@@ -86,14 +86,39 @@ Public Class atcDataSourceNOAA
             Dim dats(100) As Double 'array of julian dates
             Dim iVal As Integer = 0 'current index for populating vals and dats
 
+            'read 1st 3 chars to see which SOD format (short or long)
+            curLine = inReader.ReadChars(3)
+            Dim lLongForm As Boolean = False
+
             pColDefs = New Hashtable
-            Dim ColRecType As ColDef = AddColEnd(1, 3, "RecType")
-            Dim ColLocation As ColDef = AddColEnd(4, 9, "Location")
-            Dim ColElementType As ColDef = AddColEnd(12, 15, "ElementType")
-            Dim ColUnits As ColDef = AddColEnd(16, 17, "Units")
-            Dim ColYear As ColDef = AddColEnd(18, 21, "Year")
-            Dim ColMonth As ColDef = AddColEnd(22, 23, "Month")
-            Dim ColRepeats As ColDef = AddColEnd(28, 30, "Repeats")
+            Dim ColRecType As ColDef
+            Dim ColLocation As ColDef
+            Dim ColElementType As ColDef
+            Dim ColUnits As ColDef
+            Dim ColYear As ColDef
+            Dim ColMonth As ColDef
+            Dim ColRepeats As ColDef
+            If curLine = "DLY" Then 'short SOD format
+                ColRecType = AddColEnd(1, 3, "RecType")
+                ColLocation = AddColEnd(4, 9, "Location")
+                ColElementType = AddColEnd(12, 15, "ElementType")
+                ColUnits = AddColEnd(16, 17, "Units")
+                ColYear = AddColEnd(18, 21, "Year")
+                ColMonth = AddColEnd(22, 23, "Month")
+                ColRepeats = AddColEnd(28, 30, "Repeats")
+            ElseIf curLine = "320" OrElse curLine = "321" Then 'long SOD format (3200 or 3210)
+                lLongForm = True
+                ColRecType = AddColEnd(1, 3, "RecType")
+                ColLocation = AddColEnd(6, 11, "Location")
+                ColElementType = AddColEnd(53, 56, "ElementType")
+                ColUnits = AddColEnd(58, 59, "Units")
+                ColYear = AddColEnd(61, 64, "Year")
+                ColMonth = AddColEnd(65, 66, "Month")
+                'no # values element in this format
+                'ColRepeats = AddColEnd(28, 30, "Repeats")
+            End If
+            'reset to start of file
+            inReader.BaseStream.Position = 0
 
             'These columns can repeat multiple times per line
             Dim ColDay(0) As ColDef
@@ -102,14 +127,18 @@ Public Class atcDataSourceNOAA
             Dim ColFlag1(0) As ColDef
             Dim ColFlag2(0) As ColDef
 
-            RedimensionRepeating(maxRepeat, ColDay, ColHour, ColValue, ColFlag1, ColFlag2)
+            RedimensionRepeating(lLongForm, maxRepeat, ColDay, ColHour, ColValue, ColFlag1, ColFlag2)
 
             Try
                 curLine = NextLine(inReader)
                 PopulateColumns(curLine)
-                repeatsThisLine = ColRepeats.Value ' daymon(ColYear.Value, ColMonth.Value)
+                If ColRecType.Value = "DLY" Then 'read # repeats from record
+                    repeatsThisLine = ColRepeats.Value
+                Else 'determine # repeats from year/month
+                    repeatsThisLine = DayMon(ColYear.Value, ColMonth.Value)
+                End If
 
-                If (ColRecType.Value = "DLY" AndAlso _
+                If ((ColRecType.Value = "DLY" Or ColRecType.Value = "320") AndAlso _
                    IsNumeric(ColValue(0).Value) AndAlso _
                    IsNumeric(ColYear.Value) AndAlso _
                    IsNumeric(ColMonth.Value) AndAlso _
@@ -129,7 +158,7 @@ Public Class atcDataSourceNOAA
                     Do
                         If repeatsThisLine > maxRepeat Then
                             maxRepeat = repeatsThisLine
-                            RedimensionRepeating(maxRepeat, ColDay, ColHour, ColValue, ColFlag1, ColFlag2)
+                            RedimensionRepeating(lLongForm, maxRepeat, ColDay, ColHour, ColValue, ColFlag1, ColFlag2)
                             PopulateColumns(curLine)
                         End If
                         lTSKey = ColLocation.Value & ":" & ColElementType.Value
@@ -171,7 +200,7 @@ Public Class atcDataSourceNOAA
                             If ColFlag2(repeat).Value <> "2" AndAlso _
                                ColFlag2(repeat).Value <> "3" AndAlso _
                                (ColDay(repeat).Value < 28 OrElse _
-                               ColDay(repeat).Value <= daymon(ColYear.Value, ColMonth.Value)) Then
+                               ColDay(repeat).Value <= DayMon(ColYear.Value, ColMonth.Value)) Then
                                 'valid value and not exceeding days in month
                                 lTSInd += 1
                                 If ColValue(repeat).Value.IndexOf("99999") = -1 Then 'make sure its not a missing value
@@ -222,7 +251,11 @@ Public Class atcDataSourceNOAA
                         curLine = NextLine(inReader)
                         'Logger.Progress("Processing NOAA SOD File", inStream.Position, inStream.Length)
                         PopulateColumns(curLine)
-                        repeatsThisLine = ColRepeats.Value ' daymon(ColYear.Value, ColMonth.Value)
+                        If ColRecType.Value = "DLY" Then 'read # repeats from record
+                            repeatsThisLine = ColRepeats.Value
+                        Else 'determine # repeats from year/month
+                            repeatsThisLine = DayMon(ColYear.Value, ColMonth.Value)
+                        End If
                     Loop
                     Open = True
                 Else
@@ -256,10 +289,11 @@ Public Class atcDataSourceNOAA
             inReader.Close()
             inBuffer.Close()
             inStream.Close()
-        End If
+            End If
     End Function
 
-    Private Sub RedimensionRepeating(ByVal aMaximum As Integer, _
+    Private Sub RedimensionRepeating(ByVal aLongForm As Boolean, _
+                                     ByVal aMaximum As Integer, _
                                      ByRef ColDay() As ColDef, _
                                      ByRef ColHour() As ColDef, _
                                      ByRef ColValue() As ColDef, _
@@ -276,14 +310,25 @@ Public Class atcDataSourceNOAA
 
         If oldMaximum = 0 Then oldMaximum = -1 'need to add first column
 
-        For repeat As Integer = oldMaximum + 1 To aMaximum
-            repeatOffset = repeat * 12 '12 characters from 31 to 42 repeat
-            ColDay(repeat) = AddColumn(31 + repeatOffset, 2, "Day." & repeat)
-            ColHour(repeat) = AddColumn(33 + repeatOffset, 2, "Hour." & repeat)
-            ColValue(repeat) = AddColumn(35 + repeatOffset, 6, "Value." & repeat)
-            ColFlag1(repeat) = AddColumn(41 + repeatOffset, 1, "Flag1." & repeat)
-            ColFlag2(repeat) = AddColumn(42 + repeatOffset, 1, "Flag2." & repeat)
-        Next
+        If aLongForm Then
+            For repeat As Integer = oldMaximum + 1 To aMaximum
+                repeatOffset = repeat * 16 '16 characters from 68 to 83 repeat
+                ColDay(repeat) = AddColumn(68 + repeatOffset, 2, "Day." & repeat)
+                ColHour(repeat) = AddColumn(70 + repeatOffset, 2, "Hour." & repeat)
+                ColValue(repeat) = AddColumn(73 + repeatOffset, 6, "Value." & repeat)
+                ColFlag1(repeat) = AddColumn(80 + repeatOffset, 1, "Flag1." & repeat)
+                ColFlag2(repeat) = AddColumn(82 + repeatOffset, 1, "Flag2." & repeat)
+            Next
+        Else
+            For repeat As Integer = oldMaximum + 1 To aMaximum
+                repeatOffset = repeat * 12 '12 characters from 31 to 42 repeat
+                ColDay(repeat) = AddColumn(31 + repeatOffset, 2, "Day." & repeat)
+                ColHour(repeat) = AddColumn(33 + repeatOffset, 2, "Hour." & repeat)
+                ColValue(repeat) = AddColumn(35 + repeatOffset, 6, "Value." & repeat)
+                ColFlag1(repeat) = AddColumn(41 + repeatOffset, 1, "Flag1." & repeat)
+                ColFlag2(repeat) = AddColumn(42 + repeatOffset, 1, "Flag2." & repeat)
+            Next
+        End If
 
     End Sub
 
