@@ -19,7 +19,10 @@ Public Class frmCAT
         'Add any initialization after the InitializeComponent() call
         Tag = Text
 
-        pAllTabs.AddRange(myTabs.Controls)
+        For Each lTab As TabPage In myTabs.Controls
+            pAllTabs.Add(lTab)
+        Next
+
         myTabs.Controls.Clear()
         myTabs.Controls.Add(Me.tabModel)
 
@@ -1824,7 +1827,7 @@ Public Class frmCAT
     Private Sub AddRecentSetup(ByVal aFilename As String)
         SaveSetting("BasinsCAT", "Settings", "LastSetup", aFilename)
         Dim lNewRecentSetups As String = aFilename
-        Dim lOldRecentSetups As String = GetSetting("BasinsCAT", "Recent", "Setup")
+        Dim lOldRecentSetups As String = GetSetting("BasinsCAT", "Recent", "Setups")
         Dim lCount As Integer = 1
         If lOldRecentSetups.Contains(g_PathChar) Then
             For Each lRecentSetup As String In lOldRecentSetups.Split(";"c)
