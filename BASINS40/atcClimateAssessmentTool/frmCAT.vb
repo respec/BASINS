@@ -161,17 +161,20 @@ Public Class frmCAT
         Me.btnInputPrepared = New System.Windows.Forms.Button
         Me.btnInputAddCligen = New System.Windows.Forms.Button
         Me.tabEndpoints = New System.Windows.Forms.TabPage
+        Me.radioSaveAll = New System.Windows.Forms.RadioButton
+        Me.radioSaveOnlyEndpoints = New System.Windows.Forms.RadioButton
         Me.btnEndpointBottom = New System.Windows.Forms.Button
         Me.btnEndpointTop = New System.Windows.Forms.Button
         Me.btnEndpointCopy = New System.Windows.Forms.Button
-        Me.lblAllResults = New System.Windows.Forms.Label
         Me.lstEndpoints = New System.Windows.Forms.CheckedListBox
         Me.btnEndpointDown = New System.Windows.Forms.Button
         Me.btnEndpointUp = New System.Windows.Forms.Button
         Me.btnEndpointRemove = New System.Windows.Forms.Button
         Me.btnEndpointModify = New System.Windows.Forms.Button
         Me.btnEndpointAdd = New System.Windows.Forms.Button
+        Me.lblAllResults = New System.Windows.Forms.Label
         Me.tabResults = New System.Windows.Forms.TabPage
+        Me.chkShowEachRunProgress = New System.Windows.Forms.CheckBox
         Me.lblRefresh = New System.Windows.Forms.Label
         Me.btnPlot = New System.Windows.Forms.Button
         Me.btnRefresh = New System.Windows.Forms.Button
@@ -209,9 +212,6 @@ Public Class frmCAT
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.lblStatus = New System.Windows.Forms.Label
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.chkShowEachRunProgress = New System.Windows.Forms.CheckBox
-        Me.radioSaveOnlyEndpoints = New System.Windows.Forms.RadioButton
-        Me.radioSaveAll = New System.Windows.Forms.RadioButton
         Me.myTabs.SuspendLayout()
         Me.tabModel.SuspendLayout()
         Me.grpResults.SuspendLayout()
@@ -572,6 +572,28 @@ Public Class frmCAT
         Me.tabEndpoints.Text = "Assessment Endpoints"
         Me.tabEndpoints.UseVisualStyleBackColor = True
         '
+        'radioSaveAll
+        '
+        Me.radioSaveAll.AutoSize = True
+        Me.radioSaveAll.Location = New System.Drawing.Point(16, 39)
+        Me.radioSaveAll.Name = "radioSaveAll"
+        Me.radioSaveAll.Size = New System.Drawing.Size(343, 17)
+        Me.radioSaveAll.TabIndex = 24
+        Me.radioSaveAll.Text = "Save Complete Copy of All Model Inputs and Outputs for Every Run"
+        Me.radioSaveAll.UseVisualStyleBackColor = True
+        '
+        'radioSaveOnlyEndpoints
+        '
+        Me.radioSaveOnlyEndpoints.AutoSize = True
+        Me.radioSaveOnlyEndpoints.Checked = True
+        Me.radioSaveOnlyEndpoints.Location = New System.Drawing.Point(16, 16)
+        Me.radioSaveOnlyEndpoints.Name = "radioSaveOnlyEndpoints"
+        Me.radioSaveOnlyEndpoints.Size = New System.Drawing.Size(169, 17)
+        Me.radioSaveOnlyEndpoints.TabIndex = 23
+        Me.radioSaveOnlyEndpoints.TabStop = True
+        Me.radioSaveOnlyEndpoints.Text = "Save Only Selected Endpoints"
+        Me.radioSaveOnlyEndpoints.UseVisualStyleBackColor = True
+        '
         'btnEndpointBottom
         '
         Me.btnEndpointBottom.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -597,15 +619,6 @@ Public Class frmCAT
         Me.btnEndpointCopy.Size = New System.Drawing.Size(48, 24)
         Me.btnEndpointCopy.TabIndex = 17
         Me.btnEndpointCopy.Text = "Copy"
-        '
-        'lblAllResults
-        '
-        Me.lblAllResults.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblAllResults.Location = New System.Drawing.Point(348, 16)
-        Me.lblAllResults.Name = "lblAllResults"
-        Me.lblAllResults.Size = New System.Drawing.Size(148, 16)
-        Me.lblAllResults.TabIndex = 18
         '
         'lstEndpoints
         '
@@ -660,6 +673,15 @@ Public Class frmCAT
         Me.btnEndpointAdd.TabIndex = 14
         Me.btnEndpointAdd.Text = "Add"
         '
+        'lblAllResults
+        '
+        Me.lblAllResults.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblAllResults.Location = New System.Drawing.Point(348, 16)
+        Me.lblAllResults.Name = "lblAllResults"
+        Me.lblAllResults.Size = New System.Drawing.Size(148, 16)
+        Me.lblAllResults.TabIndex = 18
+        '
         'tabResults
         '
         Me.tabResults.Controls.Add(Me.chkShowEachRunProgress)
@@ -676,6 +698,16 @@ Public Class frmCAT
         Me.tabResults.TabIndex = 2
         Me.tabResults.Text = "Results"
         Me.tabResults.UseVisualStyleBackColor = True
+        '
+        'chkShowEachRunProgress
+        '
+        Me.chkShowEachRunProgress.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.chkShowEachRunProgress.AutoSize = True
+        Me.chkShowEachRunProgress.Location = New System.Drawing.Point(343, 17)
+        Me.chkShowEachRunProgress.Name = "chkShowEachRunProgress"
+        Me.chkShowEachRunProgress.Size = New System.Drawing.Size(160, 17)
+        Me.chkShowEachRunProgress.TabIndex = 25
+        Me.chkShowEachRunProgress.Text = "Show Progress of Each Run"
         '
         'lblRefresh
         '
@@ -955,37 +987,6 @@ Public Class frmCAT
         Me.lblStatus.TabIndex = 2
         Me.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
-        'chkShowEachRunProgress
-        '
-        Me.chkShowEachRunProgress.AutoSize = True
-        Me.chkShowEachRunProgress.Location = New System.Drawing.Point(343, 17)
-        Me.chkShowEachRunProgress.Name = "chkShowEachRunProgress"
-        Me.chkShowEachRunProgress.Size = New System.Drawing.Size(160, 17)
-        Me.chkShowEachRunProgress.TabIndex = 25
-        Me.chkShowEachRunProgress.Text = "Show Progress of Each Run"
-        '
-        'radioSaveOnlyEndpoints
-        '
-        Me.radioSaveOnlyEndpoints.AutoSize = True
-        Me.radioSaveOnlyEndpoints.Checked = True
-        Me.radioSaveOnlyEndpoints.Location = New System.Drawing.Point(16, 16)
-        Me.radioSaveOnlyEndpoints.Name = "radioSaveOnlyEndpoints"
-        Me.radioSaveOnlyEndpoints.Size = New System.Drawing.Size(169, 17)
-        Me.radioSaveOnlyEndpoints.TabIndex = 23
-        Me.radioSaveOnlyEndpoints.TabStop = True
-        Me.radioSaveOnlyEndpoints.Text = "Save Only Selected Endpoints"
-        Me.radioSaveOnlyEndpoints.UseVisualStyleBackColor = True
-        '
-        'radioSaveAll
-        '
-        Me.radioSaveAll.AutoSize = True
-        Me.radioSaveAll.Location = New System.Drawing.Point(16, 39)
-        Me.radioSaveAll.Name = "radioSaveAll"
-        Me.radioSaveAll.Size = New System.Drawing.Size(343, 17)
-        Me.radioSaveAll.TabIndex = 24
-        Me.radioSaveAll.Text = "Save Complete Copy of All Model Inputs and Outputs for Every Run"
-        Me.radioSaveAll.UseVisualStyleBackColor = True
-        '
         'frmCAT
         '
         Me.AllowDrop = True
@@ -1111,7 +1112,6 @@ Public Class frmCAT
             lstRecentCATsettings.Enabled = Not value
             lstRecentModel.Enabled = Not value
             lstRecentResults.Enabled = Not value
-            chkShowEachRunProgress.Enabled = Not value
             radioSaveAll.Enabled = Not value
             radioSaveOnlyEndpoints.Enabled = Not value
 
@@ -1300,10 +1300,20 @@ Public Class frmCAT
     Private Function PopulateResultsGrid(ByVal aNewContentsOfGrid As String) As Boolean
         If aNewContentsOfGrid.StartsWith(clsCat.RunTitle & vbTab) Then
             Dim lNewSource As New atcGridSource
-            lNewSource.FixedRows = clsCat.ResultsFixedRows
-            lNewSource.FixedColumns = 1
             lNewSource.FromString(aNewContentsOfGrid)
+
+            For lRow As Integer = 0 To lNewSource.Rows - 1
+                Select Case lNewSource.CellValue(lRow, 0)
+                    Case "base", "1"
+                        lNewSource.FixedRows = lRow
+                        Exit For
+                End Select
+            Next
+
+            lNewSource.FixedColumns = 1
+
             PopulateResultsGrid(lNewSource)
+            If pCat IsNot Nothing Then pCat.ResultsGrid = lNewSource
         End If
     End Function
 
@@ -1314,6 +1324,8 @@ Public Class frmCAT
             .SizeAllColumnsToContents()
             .Refresh()
         End With
+        pResultsSet = True
+        SelectTab(tabResults)
         PopulatePivotCombos()
     End Sub
 
@@ -1354,8 +1366,6 @@ Public Class frmCAT
     Private Function LoadResultsFromFile(ByVal aFilename As String) As Boolean
         If FileExists(aFilename) Then 'read file into grid
             If PopulateResultsGrid(WholeFileString(aFilename)) Then
-                pResultsSet = True
-                SelectTab(tabResults)
                 AddRecentFile(aFilename, "Results")
                 Return True
             End If
@@ -2100,4 +2110,7 @@ Public Class frmCAT
         End If
     End Sub
 
+    Private Sub chkShowEachRunProgress_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkShowEachRunProgress.CheckedChanged
+        If pCat IsNot Nothing Then pCat.ShowEachRunProgress = chkShowEachRunProgress.Checked
+    End Sub
 End Class
