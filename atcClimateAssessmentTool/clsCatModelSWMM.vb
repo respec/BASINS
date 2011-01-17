@@ -60,9 +60,10 @@ Public Class clsCatModelSWMM
 
         Dim lModifiedProject As New atcSWMM.atcSWMMProject
         lModifiedProject.Open(aNewInpFilename)
+        lModifiedProject.IsFileData = True
 
         For Each lTS As atcData.atcTimeseries In aModifiedData
-            Dim lID As String = lTS.Attributes.GetValue("ID")
+            Dim lID As Integer = lTS.Attributes.GetValue("ID")
             Dim lOriginalTS As atcData.atcTimeseries = lModifiedProject.DataSets.ItemByKey(lID)
             If lOriginalTS IsNot Nothing Then
                 lModifiedProject.DataSets.Remove(lOriginalTS)
