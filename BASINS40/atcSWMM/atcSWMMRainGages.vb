@@ -95,11 +95,12 @@ Public Class atcSWMMRainGages
                                 .TimeSeries.Attributes.SetValue("Scenario", lItem) ' raingage timeseries label
                                 .TimeSeries.Attributes.SetValue("Source", "") ' actual TS source file full path
                                 .TimeSeries.Attributes.AddHistory("Read from " & pSWMMProject.Specification)
-                                .TimeSeries.Attributes.SetValue("ID", "R" & Me.Count + 1)
+                                .TimeSeries.Attributes.SetValue("ID", Me.pSWMMProject.DatasetId(True))
                                 .TimeSeries.Attributes.SetValue("interval", .IntervalJulian())
                                 .TimeSeries.ValuesNeedToBeRead = True
 
                                 If .Type.ToLower() = "file" Then
+                                    pSWMMProject.IsFileData = True
                                     Dim lpath As String = FindFile("Rain Gage Data File", lItem, lItem.Substring(lItem.LastIndexOf(".")))
                                     TimeseriesFromFile(lpath, .TimeSeries)
                                 ElseIf .Type.ToLower() = "timeseries" Then

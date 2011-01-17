@@ -50,13 +50,16 @@ Public Class atcSWMMTemperature
         Dim laTSFile As String = String.Empty
         For I As Integer = 0 To lLines.Length - 1
             If Not lLines(I).Trim().StartsWith(";") Then
-                If lLines(I).StartsWith(lWord) Then
+                If lLines(I).Trim().StartsWith(lWord) Then
                     laTSFile = lLines(I).Trim().Substring(lWord.Length).Trim()
                     If laTSFile.Length > 0 Then
                         Timeseries.Attributes.SetValue("Scenario", laTSFile)
                         Timeseries.Attributes.SetValue("Source", "")
                         Timeseries.Attributes.AddHistory("Read from " & pSWMMProject.Specification)
-                        Timeseries.Attributes.SetValue("ID", "T")
+                        Timeseries.Attributes.SetValue("ID", Me.pSWMMProject.DatasetId(True))
+                        If pSWMMProject.RainGages.Count > 0 Then
+                            Timeseries.Attributes.SetValue("interval", pSWMMProject.RainGages(0).TimeSeries.Attributes.GetValue("interval")) ' this is to go with the raingages' interval
+                        End If
                         Timeseries.Attributes.SetValue("Location", pSWMMProject.FilterFileName(laTSFile.TrimEnd("T")))
                     End If
                 Else
@@ -137,7 +140,7 @@ Public Class atcSWMMTemperature
             lSB.Append(StrPad(Timeseries.Attributes.GetValue("Location") & ":T", 16, " ", False))
             lSB.Append(" FILE " & lFileName)
         End If
-
+        lSB.AppendLine()
         Return lSB.ToString
     End Function
 
@@ -167,25 +170,21 @@ Public Class atcSWMMTemperature
 
         Dim lSR As System.IO.StreamReader = New System.IO.StreamReader(aFilename)
         Dim lLineCtr As Integer = 0
+        Dim lTimeStep As Double = aTS.Attributes.GetValue("interval")
         While Not lSR.EndOfStream
             Dim line As String = lSR.ReadLine()
             Dim lItems() As String = Regex.Split(line.Trim(), "\s+")
             Dim lDateParts() As String = lItems(0).Split("/")
             Dim lTimeParts() As String = lItems(1).Split(":")
 
-            'If lItems(0) <> lStn Then
-            '    Continue While
-            'End If
-
-            Dim ldate As Double = -99.0
+            Dim ldate As Double = Jday(Integer.Parse(lDateParts(2)), Integer.Parse(lDateParts(0)), Integer.Parse(lDateParts(1)), Integer.Parse(lTimeParts(0)), Integer.Parse(lTimeParts(1)), 0)
             If lLineCtr = 0 Then
-                ldate = Jday(Integer.Parse(lDateParts(2)), Integer.Parse(lDateParts(0)), Integer.Parse(lDateParts(1)), Integer.Parse(lTimeParts(0)), Integer.Parse(lTimeParts(1)), 0)
                 lDates.Add(ldate)
                 lValues.Add(Double.NaN)
             End If
 
             'SWMM5 denote a day has 0 hour to 23 hour, but atcTimeseries denote a day as 1 ~ 24 hour
-            ldate = Jday(Integer.Parse(lDateParts(2)), Integer.Parse(lDateParts(0)), Integer.Parse(lDateParts(1)), Integer.Parse(lTimeParts(0)) + 1, Integer.Parse(lTimeParts(1)), 0)
+            ldate += lTimeStep
             lDates.Add(ldate)
             lValues.Add(Double.Parse(lItems(lItems.Length - 1)))
 
