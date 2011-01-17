@@ -13,6 +13,7 @@ Public Class clsCat
     Public SaveAll As Boolean = False
     Public ShowEachRunProgress As Boolean = False
     Public ResultsGrid As New atcControls.atcGridSource
+    Public ResultsRow As Integer
     Public TimePerRun As Double = 0 'Time each run takes in seconds
     Public RunModel As Boolean = True 'True to actually run the model, false to just look for already computed results
 
@@ -207,9 +208,9 @@ StartOver:
     Public Function StartRun(ByVal aModifiedModel As String) As Boolean
         g_Running = True
         Dim lSelectedVariations As Generic.List(Of atcVariation) = SelectedVariations(Inputs)
-        Dim lSelectedEndpoints As Generic.List(Of atcVariation) = SelectedVariations(Endpoints)
+        'Dim lSelectedEndpoints As Generic.List(Of atcVariation) = SelectedVariations(Endpoints)
 
-        InitResultsGrid(lSelectedVariations, lSelectedEndpoints)
+        'InitResultsGrid(lSelectedVariations, lSelectedEndpoints)
 
         RaiseEvent Started()
 
@@ -251,7 +252,9 @@ StartOver:
             For Each lVariation As atcVariation In aSelectedEndpoints
                 .Columns += lVariation.DataSets.Count
             Next
-            .Rows = 5
+            .Rows = ResultsFixedRows + 1
+            If SaveAll Then .Columns += 1 : .CellValue(0, .Columns - 1) = "Saved Results"
+
             lColumn = 1
 
             If PreparedInputs.Count = 0 Then
@@ -283,7 +286,10 @@ StartOver:
                 Next
             Next
             .CellValue(.FixedRows, 0) = "base"
+            .CellColor(.FixedRows, 0) = Drawing.SystemColors.Control
+
             PopulateEndpoints(.FixedRows, lFirstEndpointColumn, Nothing)
+            ResultsRow = ResultsFixedRows + 1
         End With
     End Sub
 
@@ -313,6 +319,21 @@ StartOver:
             End If
             Logger.Dbg("WorkingDir " & My.Computer.FileSystem.CurrentDirectory)
 
+            If aStartVariationIndex = 0 AndAlso PreparedInputs.Count = 0 Then
+                With ResultsGrid
+                    .CellValue(ResultsRow, 0) = aIteration + 1
+                    .CellColor(ResultsRow, 0) = Drawing.SystemColors.Control
+                    Dim lColumn As Integer = .FixedColumns
+                    For Each lVariation As atcVariation In Inputs
+                        If lVariation.Selected Then
+                            .CellValue(ResultsRow, lColumn) = "Computing..."
+                            lColumn += 1
+                        End If
+                    Next
+                End With
+                RaiseEvent UpdateResults()
+            End If
+
             If aStartVariationIndex >= aVariations.Count Then 'All variations have values, do a model run
 NextIteration:
                 Dim lPreparedInput As String
@@ -332,33 +353,32 @@ NextIteration:
                 RaiseEvent StartIteration(aIteration)
                 TimePerRun = Now.ToOADate
 
-
+                'TODO: don't assume Model.BaseModel is a filename, find results another way
                 Dim lModifiedFolder As String = PathNameOnly(AbsolutePath(Model.BaseModel, CurDir)) & g_PathChar & lModifiedModelName
                 Dim lThisRunVariations As String = ""
 
-                Dim lRow As Integer
                 Dim lColumn As Integer
                 With ResultsGrid
-                    lRow = aIteration + .FixedRows + 1 'Results for base are in row .FixedRows, aIteration starts at zero
-                    lColumn = .FixedColumns                    
+                    lColumn = .FixedColumns
 
                     If PreparedInputs.Count = 0 Then
-                        .CellValue(lRow, 0) = aIteration + 1
-                        For Each lVariation As atcVariation In Inputs
-                            If lVariation.Selected Then
-                                .CellValue(lRow, lColumn) = Format(lVariation.CurrentValue, "0.####")
-                                lThisRunVariations &= lVariation.ToString & " = " & .CellValue(lRow, lColumn) & vbCrLf
-                                lColumn += 1
-                            End If
+                        .CellValue(ResultsRow, 0) = aIteration + 1
+                        For Each lVariation As atcVariation In aVariations
+                            .CellValue(ResultsRow, lColumn) = Format(lVariation.CurrentValue, "0.####")
+                            lThisRunVariations &= lVariation.ToString & " = " & .CellValue(ResultsRow, lColumn) & vbCrLf
+                            lColumn += 1
                         Next
                     Else
-                        .CellValue(lRow, 0) = IO.Path.GetFileNameWithoutExtension(PathNameOnly(PreparedInputs.Item(aIteration)))
+                        .CellValue(ResultsRow, 0) = IO.Path.GetFileNameWithoutExtension(PathNameOnly(PreparedInputs.Item(aIteration)))
                         '.CellValue(lRow, 0) = IO.Path.GetFileNameWithoutExtension(PathNameOnly(PreparedInputs.Item(lstInputs.CheckedIndices.Item(aIteration))))
                     End If
-                    .CellColor(lRow, 0) = Drawing.SystemColors.Control
+                    .CellColor(ResultsRow, 0) = Drawing.SystemColors.Control
                     For lRunningColumn As Integer = lColumn To .Columns - 1
-                        .CellValue(lRow, lRunningColumn) = "Running..."
+                        .CellValue(ResultsRow, lRunningColumn) = "Running..."
                     Next
+                    If SaveAll AndAlso .CellValue(0, .Columns - 1) = "Saved Results" Then
+                        .CellValue(ResultsRow, .Columns - 1) = lModifiedFolder
+                    End If
                     RaiseEvent UpdateResults()
                 End With
 
@@ -369,14 +389,17 @@ NextIteration:
                     TimePerRun = (Now.ToOADate - TimePerRun) * 24 * 60 * 60 'Convert days to seconds
                 End If
 
-                PopulateEndpoints(lRow, lColumn, lResults)
+                PopulateEndpoints(ResultsRow, lColumn, lResults)
+                ResultsRow += 1
 
-                'TODO: don't assume Model.BaseModel is a filename, find results another way
-                If lThisRunVariations.Length > 0 Then
-                    SaveFileString(lModifiedFolder & ".results.txt" & g_PathChar, lThisRunVariations)
+                If SaveAll Then
+                    If lThisRunVariations.Length > 0 Then
+                        SaveFileString(lModifiedFolder & g_PathChar & "Changes.txt", lThisRunVariations)
+                    End If
+                    SaveFileString(lModifiedFolder & g_PathChar & "Results.txt", ResultsGrid.ToString)
+                Else
+                    SaveFileString(lModifiedFolder & ".Results.txt", ResultsGrid.ToString)
                 End If
-                Dim lResultsFilename As String = lModifiedFolder & ".results.txt"
-                SaveFileString(lResultsFilename, ResultsGrid.ToString)
 
                 'Close any open results
                 For Each lSpecification As String In lResults
