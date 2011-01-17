@@ -126,6 +126,7 @@ Public Class frmCAT
     Friend WithEvents chkShowEachRunProgress As System.Windows.Forms.CheckBox
     Friend WithEvents radioSaveOnlyEndpoints As System.Windows.Forms.RadioButton
     Friend WithEvents radioSaveAll As System.Windows.Forms.RadioButton
+    Friend WithEvents chkClearResults As System.Windows.Forms.CheckBox
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -174,6 +175,7 @@ Public Class frmCAT
         Me.btnEndpointAdd = New System.Windows.Forms.Button
         Me.lblAllResults = New System.Windows.Forms.Label
         Me.tabResults = New System.Windows.Forms.TabPage
+        Me.chkClearResults = New System.Windows.Forms.CheckBox
         Me.chkShowEachRunProgress = New System.Windows.Forms.CheckBox
         Me.lblRefresh = New System.Windows.Forms.Label
         Me.btnPlot = New System.Windows.Forms.Button
@@ -684,6 +686,7 @@ Public Class frmCAT
         '
         'tabResults
         '
+        Me.tabResults.Controls.Add(Me.chkClearResults)
         Me.tabResults.Controls.Add(Me.chkShowEachRunProgress)
         Me.tabResults.Controls.Add(Me.lblRefresh)
         Me.tabResults.Controls.Add(Me.btnPlot)
@@ -698,6 +701,18 @@ Public Class frmCAT
         Me.tabResults.TabIndex = 2
         Me.tabResults.Text = "Results"
         Me.tabResults.UseVisualStyleBackColor = True
+        '
+        'chkClearResults
+        '
+        Me.chkClearResults.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.chkClearResults.AutoSize = True
+        Me.chkClearResults.Checked = True
+        Me.chkClearResults.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkClearResults.Location = New System.Drawing.Point(343, 46)
+        Me.chkClearResults.Name = "chkClearResults"
+        Me.chkClearResults.Size = New System.Drawing.Size(128, 17)
+        Me.chkClearResults.TabIndex = 26
+        Me.chkClearResults.Text = "Clear Results on Start"
         '
         'chkShowEachRunProgress
         '
@@ -766,12 +781,12 @@ Public Class frmCAT
         '
         'btnStart
         '
+        Me.btnStart.Enabled = False
         Me.btnStart.Location = New System.Drawing.Point(8, 11)
         Me.btnStart.Name = "btnStart"
         Me.btnStart.Size = New System.Drawing.Size(56, 24)
         Me.btnStart.TabIndex = 0
         Me.btnStart.Text = "Start"
-        Me.btnStart.Visible = False
         '
         'btnStop
         '
@@ -1085,6 +1100,9 @@ Public Class frmCAT
 
         RefreshTotalIterations()
 
+        If chkClearResults.Checked OrElse pCat.ResultsGrid Is Nothing Then
+            pCat.InitResultsGrid()
+        End If
         pCat.SaveAll = radioSaveAll.Checked
         pCat.ShowEachRunProgress = chkShowEachRunProgress.Checked
         pCat.RunModel = aRunModel
@@ -1104,6 +1122,7 @@ Public Class frmCAT
         Set(ByVal value As Boolean)
             g_Running = value
             btnStart.Visible = Not value
+            btnStart.Enabled = Not value
             btnStop.Visible = value
 
             btnRefresh.Enabled = Not value
@@ -1133,6 +1152,7 @@ Public Class frmCAT
             txtBaseModel.Text = pCat.Model.BaseModel
             SelectTab(tabInputs)
             btnStart.Visible = True
+            btnStart.Enabled = True
             btnRefresh.Enabled = True
             'btnPlot.Enabled = True
         End If
@@ -1168,8 +1188,9 @@ Public Class frmCAT
         cboPivotCells.Items.Clear()
 
         If Not agdResults.Source Is Nothing Then
+            Dim lColumnTitle As String
             For iColumn As Integer = 0 To agdResults.Source.Columns - 1
-                Dim lColumnTitle As String = ResultColumnTitle(iColumn)
+                lColumnTitle = ResultColumnTitle(iColumn)
                 If Not lColumnTitle Is Nothing AndAlso lColumnTitle.Length > 0 Then
                     cboPivotRows.Items.Add(lColumnTitle)
                     cboPivotColumns.Items.Add(lColumnTitle)
@@ -1182,6 +1203,21 @@ Public Class frmCAT
                     ElseIf lColumnTitle.ToLower.StartsWith("flow") Then
                         cboPivotCells.Text = lColumnTitle
                     End If
+                End If
+            Next
+            For Each lColumnTitle In cboPivotRows.Items
+                If cboPivotCells.Text.Length = 0 AndAlso _
+                    lColumnTitle <> cboPivotRows.Text AndAlso _
+                    lColumnTitle <> cboPivotColumns.Text Then
+                    cboPivotCells.Text = lColumnTitle
+                ElseIf cboPivotColumns.Text.Length = 0 AndAlso _
+                    lColumnTitle <> cboPivotRows.Text AndAlso _
+                    lColumnTitle <> cboPivotCells.Text Then
+                    cboPivotColumns.Text = lColumnTitle
+                ElseIf cboPivotRows.Text.Length = 0 AndAlso _
+                    lColumnTitle <> cboPivotRows.Text AndAlso _
+                    lColumnTitle <> cboPivotCells.Text Then
+                    cboPivotRows.Text = lColumnTitle
                 End If
             Next
         End If
@@ -1224,9 +1260,13 @@ Public Class frmCAT
     End Function
 
     Private Function ResultColumnTitle(ByVal aColumn As Integer) As String
-        Return agdResults.Source.CellValue(0, aColumn) & " " _
-             & agdResults.Source.CellValue(1, aColumn) & " " _
-             & agdResults.Source.CellValue(2, aColumn)
+        If aColumn = 0 Then
+            Return clsCat.RunTitle
+        Else
+            Return agdResults.Source.CellValue(0, aColumn) & " " _
+                 & agdResults.Source.CellValue(1, aColumn) & " " _
+                 & agdResults.Source.CellValue(2, aColumn)
+        End If
     End Function
 
     Private Sub PopulatePivotTable()
@@ -1312,9 +1352,11 @@ Public Class frmCAT
 
             lNewSource.FixedColumns = 1
 
-            PopulateResultsGrid(lNewSource)
             If pCat IsNot Nothing Then pCat.ResultsGrid = lNewSource
+            PopulateResultsGrid(lNewSource)
+            Return True
         End If
+        Return False
     End Function
 
     Private Sub PopulateResultsGrid(ByVal aSource As atcGridSource)
@@ -1912,6 +1954,7 @@ Public Class frmCAT
 
     Private Sub btnStop_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStop.Click
         btnStart.Visible = True
+        btnStart.Enabled = True
         btnStop.Visible = False
         btnRefresh.Enabled = True
         g_Running = False
@@ -2078,6 +2121,7 @@ Public Class frmCAT
         Text = Tag & " " & IO.Path.GetFileNameWithoutExtension(aBaseModelName)
         txtBaseModel.Text = aBaseModelName
         btnStart.Visible = True
+        btnStart.Enabled = True
         btnRefresh.Enabled = True
         btnPlot.Enabled = True
 
