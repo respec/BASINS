@@ -377,7 +377,9 @@ Public Class atcVariation
                 End If
 
                 pLatDeg = lOldPET.Attributes.GetValue("LatDeg", pLatDeg)
-                Dim lNewPET As atcDataSet = atcMetCmp.CmpHamX(lModifiedTS, Nothing, pDegF, pLatDeg, pCTS)
+                'TODO: this is where different methods of ET estimate diverge
+                'If lModifiedTS.Attributes.GetValue("Constituent") = "ATEM" Then
+                Dim lNewPET As atcDataSet = atcMetCmp.PanEvaporationTimeseriesComputedByHamonX(lModifiedTS, Nothing, pDegF, pLatDeg, pCTS)
                 If lOldPET.Attributes.GetValue("tu") < 4 Then
                     lNewPET = atcMetCmp.DisSolPet(lNewPET, Nothing, 2, pLatDeg)
                 End If
@@ -391,6 +393,7 @@ Public Class atcVariation
                     End If
                 End With
                 lModifiedGroup.Add(lOldPET, lNewPET)
+                'End If
             End If
             lDataSetIndex += 1
         Next
