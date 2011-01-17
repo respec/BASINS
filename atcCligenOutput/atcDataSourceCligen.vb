@@ -344,7 +344,7 @@ Public Class atcDataSourceCligen
             'now generate Hamon PET
             Dim lCTS() As Double = {0, 0.0045, 0.01, 0.01, 0.01, 0.0085, 0.0085, 0.0085, 0.0085, 0.0085, 0.0095, 0.0095, 0.0095}
             Logger.Dbg("Computing Hamon PET from Hourly temperature")
-            lts = atcMetCmp.CmpHamX(lATmp, Nothing, True, 39, lCTS)
+            lts = atcMetCmp.PanEvaporationTimeseriesComputedByHamonX(lATmp, Nothing, True, 39, lCTS)
             Logger.Dbg("Hamon PET generation complete!")
             lts.Attributes.SetValue("Location", lTMin.Attributes.GetValue("Location"))
             lDataGroup.Add(lts)
