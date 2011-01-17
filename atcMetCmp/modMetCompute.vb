@@ -1203,7 +1203,7 @@ Public Module modMetCompute
     ''' on empirical curves of radiation as a function of latitude
     ''' (Hamon et al, 1954, Monthly Weather Review 82(6):141-146.
     '''</remarks>
-    Private Function CloudCoverValueFromSolar(ByRef aDegLat As Double, ByRef aDayRad As Double, ByRef aMon As Integer, ByRef aDay As Integer)
+    Private Function CloudCoverValueFromSolar(ByRef aDegLat As Double, ByRef aDayRad As Double, ByRef aMon As Integer, ByRef aDay As Integer) As Double
         'integer part of latitude
         Dim lLatInt As Integer = Math.Floor(aDegLat)
         'fractional part of latitude
