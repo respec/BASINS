@@ -10,7 +10,7 @@ Public Class atcSWMMProject
     Inherits atcData.atcTimeseriesSource
 
     Private pIsMetric As Boolean
-
+    Private pDatasetId As Integer
     Public Blocks As atcSWMMBlocks
 
     Public Options As atcSWMMOptions
@@ -44,6 +44,8 @@ Public Class atcSWMMProject
     Public BackdropY2 As Double = 0.0
     Public MapUnits As String = "METERS"
 
+    Public IsFileData As Boolean = False
+
     Public Sub New()
         Me.Clear()
     End Sub
@@ -51,6 +53,7 @@ Public Class atcSWMMProject
     Public Overrides Sub Clear()
         MyBase.Clear()
         Blocks = New atcSWMMBlocks
+        pDatasetId = 0
         With Blocks
 
             Title = New atcSWMMBlock("[TITLE]", "")
@@ -117,6 +120,21 @@ Public Class atcSWMMProject
         End With
 
     End Sub
+
+    Public Property DatasetId(Optional ByVal aIncrement As Boolean = False) As Integer
+        Get
+            If aIncrement Then
+                pDatasetId += 1
+                Return pDatasetId
+            Else
+                Return pDatasetId
+            End If
+        End Get
+        Set(ByVal value As Integer)
+            If value < 0 Then value = 1
+            pDatasetId = value
+        End Set
+    End Property
 
     Public Property Landuses() As atcSWMMLanduses
         Get
@@ -250,6 +268,7 @@ Public Class atcSWMMProject
                                 End If
 
                                 If lLines(I).Contains("FILE") Then
+                                    IsFileData = True
                                     'TODO: need to anticipate multiple TS of any block type
                                     If lBlockWithTS IsNot Nothing Then
                                         lBlockWithTS.TimeseriesFromFile(lItems(2).Trim().Trim(""""), lBlockWithTS.Timeseries)
@@ -290,6 +309,12 @@ Public Class atcSWMMProject
                         End If
                     Case "[RAINGAGES]", "[SYMBOLS]"
                         RainGages.FromString(lBlock.Name & vbCrLf & lBlock.Content)
+                        If Temperature.Timeseries IsNot Nothing Then
+                            Temperature.Timeseries.Attributes.SetValue("interval", RainGages(0).TimeSeries.Attributes.GetValue("interval"))
+                        End If
+                        If Evaporation.Timeseries IsNot Nothing Then
+                            Evaporation.Timeseries.Attributes.SetValue("interval", RainGages(0).TimeSeries.Attributes.GetValue("interval"))
+                        End If
                         'any time multiple sections are used to build a single object type, the block's name is needed
                         'The block's name is not part of the "content" during ReadBlockContents above
 
@@ -388,7 +413,7 @@ Public Class atcSWMMProject
 
         For Each lBlock As IBlock In Blocks
             Select Case lBlock.Name
-                Case "[TITLE}" : lSW.WriteLine(Title.ToString)
+                Case "[TITLE]" : lSW.WriteLine(Title.ToString)
                 Case "[OPTIONS]" : lSW.WriteLine(Options.ToString)
                 Case "[EVAPORATION]"
                     If Evaporation.Timeseries Is Nothing Then
@@ -429,18 +454,8 @@ Public Class atcSWMMProject
                     lSW.WriteLine(lBlock.ToString)
                 Case "[TIMESERIES]"
                     If Not RainGages.UseBlockText Then lSW.WriteLine(atcSWMMRainGages.TimeSeriesHeaderToString)
-                    If Options.EJDate - Options.SJDate < 30 Then
-                        If Temperature.Timeseries IsNot Nothing Then Temperature.TimeSeriesToStream(lSW)
-                        If Evaporation.Timeseries IsNot Nothing Then Evaporation.TimeSeriesToStream(lSW)
-                        If RainGages.Count > 0 Then
-                            If RainGages.UseBlockText Then
-                                lSW.WriteLine(lBlock.ToString)
-                            Else
-                                RainGages.TimeSeriesToStream(lSW)
-                            End If
-                        End If
-                    Else
-                        'more than 30 days, write to file
+                    If IsFileData OrElse Options.EJDate - Options.SJDate >= 30 Then
+                        'more than 30 days, write to a separate data file
                         If Temperature.Timeseries IsNot Nothing Then
                             lSW.WriteLine(Temperature.TimeSeriesFileNamesToString)
                         End If
@@ -450,6 +465,16 @@ Public Class atcSWMMProject
 
                         If Temperature.Timeseries IsNot Nothing Then Temperature.TimeSeriesToFile()
                         If Evaporation.Timeseries IsNot Nothing Then Evaporation.TimeSeriesToFile()
+                    Else 'write data inline in project file
+                        If Temperature.Timeseries IsNot Nothing Then Temperature.TimeSeriesToStream(lSW)
+                        If Evaporation.Timeseries IsNot Nothing Then Evaporation.TimeSeriesToStream(lSW)
+                        If RainGages.Count > 0 Then
+                            If RainGages.UseBlockText Then
+                                lSW.WriteLine(lBlock.ToString)
+                            Else
+                                RainGages.TimeSeriesToStream(lSW)
+                            End If
+                        End If
                     End If
                 Case "[REPORT]"
                     'lSW.WriteLine(Report.ToString)
