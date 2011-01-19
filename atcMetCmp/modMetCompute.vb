@@ -257,56 +257,63 @@ Public Module modMetCompute
                             ByVal aDegF As Boolean, _
                             ByVal aLatDeg As Double, _
                             ByVal aCTS() As Double) As atcTimeseries
-        Dim lMin As Double = 1.0E+30, lMax As Double = -1.0E+30
-        Dim lValue As Double
-        Dim lDate As Double
-        Dim lDateYesterday As Integer = 0
-        Dim lMinValues As New ArrayList
-        Dim lMaxValues As New ArrayList
-        Dim lDates As New ArrayList
 
-        For lIndex As Integer = 1 To aTemperature.numValues
-            lDate = aTemperature.Dates.Value(lIndex)
-            If lDateYesterday = 0 Then
-                lDateYesterday = CInt(lDate)
-            ElseIf CInt(lDate) <> lDateYesterday Then
-                lMinValues.Add(lMin)
-                lMaxValues.Add(lMax)
-                lDates.Add(CDbl(lDateYesterday))
-                lDateYesterday = CInt(lDate)
-                lMin = 1.0E+30
-                lMax = -1.0E+30
-            End If
-            lValue = aTemperature.Value(lIndex)
-            If lValue < lMin Then
-                lMin = lValue
-            End If
-            If lValue > lMax Then
-                lMax = lValue
-            End If
-        Next
+        Dim lMinTemperatureTS As atcTimeseries = Aggregate(aTemperature, atcTimeUnit.TUDay, 1, atcTran.TranMin, aSource)
+        Dim lMaxTemperatureTS As atcTimeseries = Aggregate(aTemperature, atcTimeUnit.TUDay, 1, atcTran.TranMax, aSource)
+        Return PanEvaporationTimeseriesComputedByHamon(lMinTemperatureTS, lMaxTemperatureTS, aSource, aDegF, aLatDeg, aCTS)
 
-        Dim lDatesTS As New atcTimeseries(aSource)
-        lDatesTS.numValues = lDates.Count
-        Dim lTMinTS As New atcTimeseries(aSource)
-        Dim lTMaxTS As New atcTimeseries(aSource)
-        lTMinTS.Attributes.SetValue("TS", 1)
-        lTMaxTS.Attributes.SetValue("TS", 1)
-        lTMinTS.Attributes.SetValue("TU", 4)
-        lTMaxTS.Attributes.SetValue("TU", 4)
-        lTMinTS.Dates = lDatesTS
-        lTMaxTS.Dates = lDatesTS
-        lTMinTS.numValues = lMinValues.Count
-        lTMaxTS.numValues = lMaxValues.Count
-        lDatesTS.Value(0) = lDates(0)
-        For lIndex As Integer = 1 To lMaxValues.Count
-            lDatesTS.Value(lIndex) = lDates(lIndex - 1) + 1
-            lTMinTS.Value(lIndex) = lMinValues(lIndex - 1)
-            lTMaxTS.Value(lIndex) = lMaxValues(lIndex - 1)
-        Next
-        Logger.Dbg("PanEvaporationTimeseriesComputedByHamonX:Count:" & lMaxValues.Count)
+        'Dim lMin As Double = 1.0E+30, lMax As Double = -1.0E+30
+        'Dim lValue As Double
+        'Dim lDate As Double
+        'Dim lDay As Integer
+        'Dim lYesterday As Integer = 0
+        'Dim lMinValues As New ArrayList
+        'Dim lMaxValues As New ArrayList
+        'Dim lDates As New ArrayList
 
-        Return PanEvaporationTimeseriesComputedByHamon(lTMinTS, lTMaxTS, aSource, aDegF, aLatDeg, aCTS)
+        'For lIndex As Integer = 1 To aTemperature.numValues
+        '    lDate = aTemperature.Dates.Value(lIndex)
+        '    lDay = Math.Floor(lDate)
+        '    If lYesterday = 0 Then
+        '        lYesterday = lDay
+        '    ElseIf lDay <> lYesterday Then
+        '        lMinValues.Add(lMin)
+        '        lMaxValues.Add(lMax)
+        '        lDates.Add(CDbl(lYesterday))
+        '        lYesterday = lDay
+        '        lMin = 1.0E+30
+        '        lMax = -1.0E+30
+        '    End If
+        '    lValue = aTemperature.Value(lIndex)
+        '    If lValue < lMin Then
+        '        lMin = lValue
+        '    End If
+        '    If lValue > lMax Then
+        '        lMax = lValue
+        '    End If
+        'Next
+
+        'Dim lDatesTS As New atcTimeseries(aSource)
+        'lDatesTS.numValues = lDates.Count
+        'Dim lTMinTS As New atcTimeseries(aSource)
+        'Dim lTMaxTS As New atcTimeseries(aSource)
+        'lTMinTS.Attributes.SetValue("TS", 1)
+        'lTMaxTS.Attributes.SetValue("TS", 1)
+        'lTMinTS.Attributes.SetValue("TU", 4)
+        'lTMaxTS.Attributes.SetValue("TU", 4)
+        'lTMinTS.Dates = lDatesTS
+        'lTMaxTS.Dates = lDatesTS
+        'lTMinTS.numValues = lMinValues.Count
+        'lTMaxTS.numValues = lMaxValues.Count
+        'lDatesTS.Value(0) = lDates(0)
+        'For lIndex As Integer = 1 To lMaxValues.Count
+        '    lDatesTS.Value(lIndex) = lDates(lIndex - 1) + 1
+        '    lTMinTS.Value(lIndex) = lMinValues(lIndex - 1)
+        '    lTMaxTS.Value(lIndex) = lMaxValues(lIndex - 1)
+        'Next
+        'Logger.Dbg("PanEvaporationTimeseriesComputedByHamonX:Count:" & lMaxValues.Count)
+
+        'Return PanEvaporationTimeseriesComputedByHamon(lTMinTS, lTMaxTS, aSource, aDegF, aLatDeg, aCTS)
     End Function
 
     ''' <summary>compute Hamon - PET</summary>
