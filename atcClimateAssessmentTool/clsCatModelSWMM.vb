@@ -64,6 +64,7 @@ Public Class clsCatModelSWMM
         Dim lModifiedEvaporation As atcSWMM.atcSWMMEvaporation = Nothing
 
         lModifiedProject.Open(aNewInpFilename)
+        lModifiedProject.IsFileData = True
 
         For Each lTS As atcData.atcTimeseries In aModifiedData
             Dim lID As Integer = lTS.Attributes.GetValue("ID")
