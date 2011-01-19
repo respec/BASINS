@@ -59,8 +59,11 @@ Public Class clsCatModelSWMM
         pBaseProject.Specification = pBaseModel ' save changed specification for creating template, then switch back
 
         Dim lModifiedProject As New atcSWMM.atcSWMMProject
+        Dim lModifiedRaingages As New Generic.List(Of atcSWMM.atcSWMMRainGage)
+        Dim lModifiedTemperature As atcSWMM.atcSWMMTemperature = Nothing
+        Dim lModifiedEvaporation As atcSWMM.atcSWMMEvaporation = Nothing
+
         lModifiedProject.Open(aNewInpFilename)
-        lModifiedProject.IsFileData = True
 
         For Each lTS As atcData.atcTimeseries In aModifiedData
             Dim lID As Integer = lTS.Attributes.GetValue("ID")
@@ -69,8 +72,42 @@ Public Class clsCatModelSWMM
                 lModifiedProject.DataSets.Remove(lOriginalTS)
                 lModifiedProject.DataSets.Add(lID, lTS)
             End If
+            If lModifiedProject.Temperature.Timeseries IsNot Nothing AndAlso _
+               lModifiedProject.Temperature.Timeseries.Attributes.GetValue("ID") = lID Then
+                lModifiedTemperature = lModifiedProject.Temperature
+                lModifiedProject.Temperature.Timeseries = lTS
+            ElseIf lModifiedProject.Evaporation.Timeseries IsNot Nothing AndAlso _
+                   lModifiedProject.Evaporation.Timeseries.Attributes.GetValue("ID") = lID Then
+                lModifiedEvaporation = lModifiedProject.Evaporation
+                lModifiedProject.Evaporation.Timeseries = lTS
+            Else
+                For Each lRaingage As atcSWMM.atcSWMMRainGage In lModifiedProject.RainGages
+                    If lRaingage.TimeSeries IsNot Nothing AndAlso _
+                       lRaingage.TimeSeries.Attributes.GetValue("ID") = lID Then
+                        lModifiedRaingages.Add(lRaingage)
+                        lRaingage.TimeSeries = lTS
+                        Exit For
+                    End If
+                Next
+            End If
         Next
+
+        'Save the project now that it contains all the modified data
         lModifiedProject.Save(aNewInpFilename, atcDataSource.EnumExistAction.ExistReplace)
+
+        'Remove modified data before it is cleared by lModifiedProject being destroyed
+        For Each lTS As atcData.atcTimeseries In aModifiedData
+            lModifiedProject.DataSets.Remove(lTS)
+        Next
+
+        If lModifiedTemperature IsNot Nothing Then lModifiedTemperature.Timeseries = Nothing
+
+        If lModifiedEvaporation IsNot Nothing Then lModifiedEvaporation.Timeseries = Nothing
+
+        For Each lRaingage As atcSWMM.atcSWMMRainGage In lModifiedProject.RainGages
+            lRaingage.TimeSeries = Nothing
+        Next
+
         atcDataManager.RemoveDataSource(lModifiedProject)
         lModifiedProject = Nothing
         ChDriveDir(lPrevCurDir)
