@@ -128,17 +128,27 @@ Public Class atcVariation
         End If
     End Function
 
-    Public Function SplitData(ByVal lOriginalData As atcTimeseries, _
-                        ByRef lEvents As atcTimeseriesGroup) As atcTimeseriesGroup
+    ''' <summary>
+    ''' Divide the data in lOriginalData into a group of two atcTimeseries.
+    ''' First in group contains all values in the selected events and/or seasons, 
+    ''' Second includes all other values.
+    ''' </summary>
+    ''' <param name="aOriginalData">timeseries to split into selected and not selected</param>
+    ''' <param name="aEvents">Return argument: populated with one timeseries per selected event
+    '''                       found in aOriginalData if events are in use,
+    '''                       not set if events are not in use</param>
+    ''' <returns>Group of two timeseries</returns>
+    Public Function SplitData(ByVal aOriginalData As atcTimeseries, _
+                              ByRef aEvents As atcTimeseriesGroup) As atcTimeseriesGroup
         Dim lSplitData As atcTimeseriesGroup = Nothing
         If UseEvents Then
             Dim lEvent As atcTimeseries
-            lEvents = EventSplit(lOriginalData, Nothing, EventThreshold, EventDaysGapAllowed, EventHigh)
+            aEvents = EventSplit(aOriginalData, Nothing, EventThreshold, EventDaysGapAllowed, EventHigh)
 
             'Remove events outside selected seasons
-            If Not Seasons Is Nothing Then
-                For lEventIndex As Integer = lEvents.Count - 1 To 0 Step -1
-                    lEvent = lEvents.ItemByIndex(lEventIndex)
+            If Seasons IsNot Nothing Then
+                For lEventIndex As Integer = aEvents.Count - 1 To 0 Step -1
+                    lEvent = aEvents.ItemByIndex(lEventIndex)
 
                     'Find peak value of event
                     Dim lPeakIndex As Integer = 1
@@ -150,7 +160,7 @@ Public Class atcVariation
 
                     'If peak is not in season, remove this event
                     If Not Seasons.SeasonSelected(Seasons.SeasonIndex(lEvent.Dates.Value(lPeakIndex))) Then
-                        lEvents.RemoveAt(lEventIndex)
+                        aEvents.RemoveAt(lEventIndex)
                     End If
                 Next
             End If
@@ -158,15 +168,15 @@ Public Class atcVariation
             'Remove events outside target volume threshold
             Try
                 If Not Double.IsNaN(EventVolumeThreshold) Then
-                    For lEventIndex As Integer = lEvents.Count - 1 To 0 Step -1
-                        Dim lEventVolume As Double = lEvents.ItemByIndex(lEventIndex).Attributes.GetValue("Sum")
+                    For lEventIndex As Integer = aEvents.Count - 1 To 0 Step -1
+                        Dim lEventVolume As Double = aEvents.ItemByIndex(lEventIndex).Attributes.GetValue("Sum")
                         If EventVolumeHigh Then
                             If lEventVolume < EventVolumeThreshold Then
-                                lEvents.RemoveAt(lEventIndex)
+                                aEvents.RemoveAt(lEventIndex)
                             End If
                         Else
                             If lEventVolume > EventVolumeThreshold Then
-                                lEvents.RemoveAt(lEventIndex)
+                                aEvents.RemoveAt(lEventIndex)
                             End If
                         End If
                     Next
@@ -177,190 +187,174 @@ Public Class atcVariation
 
             'Remove events outside target duration threshold
             If Not Double.IsNaN(EventDurationDays) Then
-                For lEventIndex As Integer = lEvents.Count - 1 To 0 Step -1
-                    Dim lEventDuration As Double = atcSynopticAnalysis.atcSynopticAnalysisPlugin.DataSetDuration(lEvents.ItemByIndex(lEventIndex))
+                For lEventIndex As Integer = aEvents.Count - 1 To 0 Step -1
+                    Dim lEventDuration As Double = atcSynopticAnalysis.atcSynopticAnalysisPlugin.DataSetDuration(aEvents.ItemByIndex(lEventIndex))
                     If EventDurationHigh Then
                         If lEventDuration < EventDurationDays Then
-                            lEvents.RemoveAt(lEventIndex)
+                            aEvents.RemoveAt(lEventIndex)
                         End If
                     Else
                         If lEventDuration > EventDurationDays Then
-                            lEvents.RemoveAt(lEventIndex)
+                            aEvents.RemoveAt(lEventIndex)
                         End If
                     End If
-
                 Next
             End If
 
-            If Operation <> "Intensify" Then
-                If lEvents.Count > 0 Then
-                    lSplitData = New atcTimeseriesGroup(MergeTimeseries(lEvents))
-                    lSplitData.Add(lOriginalData)
-                End If
+            'If Operation <> "Intensify" Then
+            If aEvents.Count > 0 Then
+                lSplitData = New atcTimeseriesGroup(MergeTimeseries(aEvents))
+                lSplitData.Add(aOriginalData)
             End If
+            'End If
 
         Else
             If Seasons Is Nothing Then
-                lSplitData = New atcTimeseriesGroup(lOriginalData)
+                lSplitData = New atcTimeseriesGroup(aOriginalData)
             Else
-                lSplitData = Seasons.SplitBySelected(lOriginalData, Nothing)
+                lSplitData = Seasons.SplitBySelected(aOriginalData, Nothing)
             End If
         End If
         Return lSplitData
     End Function
 
-    Protected Overridable Function VaryData() As atcTimeseriesGroup
+    Private Function VaryDataAddEvents(ByRef lSplitData As atcTimeseriesGroup, ByRef lEvents As atcTimeseriesGroup) As atcTimeseries
+        Dim lModifiedTS As atcTimeseries = AddRemoveEventsVolumeFraction(lSplitData.ItemByIndex(0), CurrentValue, lEvents, 0)
+        If lSplitData.Count > 1 Then
+            Return MergeTimeseries(New atcTimeseriesGroup(lModifiedTS, lSplitData.ItemByIndex(1)))
+        Else
+            Return lModifiedTS
+        End If
+    End Function
+
+    Private Function VaryDataIntensify(ByRef lSplitData As atcTimeseriesGroup, ByRef lEvents As atcTimeseriesGroup) As atcTimeseries
+        Dim lEvent As atcTimeseries
         Dim lArgsMath As New atcDataAttributes
-        Dim lModifiedTS As atcTimeseries = Nothing
+        Dim lTotalVolume As Double = lSplitData(0).Attributes.GetValue("Sum")
+        Dim lEventIntensifyFactor As Double
+        Dim lCurrentVolume As Double = 0
+        Dim lTargetChange As Double = CurrentValue / 100 * lTotalVolume
+        Dim lNewEventTotalVolume As Double = 0.0
+
+        Try
+            If Not Double.IsNaN(IntensifyVolumeFraction) Then
+                Dim lTargetVolumeToIntensify As Double = lTotalVolume * IntensifyVolumeFraction
+                Logger.Dbg("TargetChange " & DecimalAlign(lTargetChange) & " TargetVolumeToIntensify " & DecimalAlign(lTargetVolumeToIntensify))
+                'sort events by volume
+                Logger.Dbg("Intensify " & DecimalAlign(IntensifyVolumeFraction) & " CurrentValue " & DecimalAlign(CurrentValue))
+                Dim lNewEvents As New System.Collections.SortedList(lEvents.Count)
+                For Each lEvent In lEvents
+                    Dim lEventVolume As Double = lEvent.Attributes.GetValue("Sum")
+                    While lNewEvents.IndexOfKey(lEventVolume) >= 0
+                        lEventVolume += 0.00000001
+                    End While
+                    lNewEvents.Add(lEventVolume, lEvent)
+                    lNewEventTotalVolume += lEventVolume
+                Next
+                lEvents.Clear()
+                Logger.Dbg(" TotalVolume " & DecimalAlign(lTotalVolume) & _
+                           " EventTotalVolume " & DecimalAlign(lNewEventTotalVolume) & _
+                           " PercentOfVolume " & DecimalAlign(100 * (lNewEventTotalVolume / lTotalVolume)))
+
+                If CurrentValue > 0.0 Then
+                    For lEventIndex As Integer = lNewEvents.Count - 1 To 0 Step -1
+                        lEvent = lNewEvents.GetByIndex(lEventIndex)
+                        Dim lAddFromThisEvent As Double = lNewEvents.GetKey(lEventIndex)
+                        lCurrentVolume += lAddFromThisEvent
+                        'Logger.Dbg("CurrentVolumeAdded " & lCurrentVolumeChange & " FromThisEvent " & lAddFromThisEvent)
+
+                        If lEventIndex = lNewEvents.Count - 1 Then 'details of biggest event
+                            Dim lEventStr As String = "  Event " & lEventIndex
+                            lEventStr &= "    Sum " & DecimalAlign(lEvent.Attributes.GetValue("Sum"))
+                            lEventStr &= " NumVals " & lEvent.numValues
+                            lEventStr &= " Starts " & DumpDate(lEvent.Dates.Value(1))
+                            Logger.Dbg(lEventStr)
+                        End If
+
+                        lEvents.Add(lEvent)
+                        If lCurrentVolume > lTargetVolumeToIntensify Then
+                            Logger.Dbg("Intensify " & lNewEvents.Count - lEventIndex & " of " & lNewEvents.Count)
+                            Exit For
+                        End If
+                    Next lEventIndex
+                Else
+                    For lEventIndex As Integer = 0 To lNewEvents.Count - 1
+                        lEvent = lNewEvents.GetByIndex(lEventIndex)
+                        lCurrentVolume += lNewEvents.GetKey(lEventIndex)
+                        ' Logger.Dbg("CurrentVolumeRemoved " & lCurrentVolumeChange)
+                        lEvents.Add(lEvent)
+                        If lCurrentVolume > lTargetVolumeToIntensify Then
+                            Logger.Dbg("NegativeIntensify " & lEventIndex & " of " & lNewEvents.Count)
+                            Exit For
+                        End If
+                    Next
+                End If
+            End If
+        Catch e As Exception
+            Logger.Dbg("VaryDataException-EventIntensifyFactor " & e.Message)
+        End Try
+
+        Logger.Dbg(" CurrentVolume " & DecimalAlign(lCurrentVolume) & _
+                   " TargetChange " & DecimalAlign(lTargetChange))
+        lEventIntensifyFactor = lTargetChange / lCurrentVolume
+        Logger.Dbg("EventIntensifyFactor " & DecimalAlign(lEventIntensifyFactor))
+        Dim lSplitTS As atcTimeseries = MergeTimeseries(lEvents)
+
+        ComputationSource.DataSets.Clear()
+        lArgsMath.Clear()
+        lArgsMath.SetValue("timeseries", lSplitTS)
+        lArgsMath.SetValue("Number", 1 + lEventIntensifyFactor)
+        ComputationSource.Open("Multiply", lArgsMath)
+        If lSplitData.Count > 1 Then
+            Return MergeTimeseries(New atcTimeseriesGroup(ComputationSource.DataSets(0), lSplitData.ItemByIndex(1)))
+        Else
+            Return ComputationSource.DataSets(0)
+        End If
+    End Function
+
+    Private Function VaryDataAddMultiply(ByVal lOriginalData As atcTimeseries, ByRef lSplitData As atcTimeseriesGroup) As atcTimeseries
+        Dim lArgsMath As New atcDataAttributes
+        If lSplitData IsNot Nothing AndAlso lSplitData.Count > 0 Then
+            Dim lSplitTS As atcTimeseries = lSplitData.ItemByIndex(0)
+            ComputationSource.DataSets.Clear()
+            lArgsMath.Clear()
+            lArgsMath.SetValue("timeseries", lSplitTS)
+            lArgsMath.SetValue("Number", CurrentValue)
+            ComputationSource.Open(Operation, lArgsMath)
+            Dim lModifiedTS As atcTimeseries = ComputationSource.DataSets(0)
+            If lModifiedTS.Dates = lOriginalData.Dates Then
+                lModifiedTS.Dates = lModifiedTS.Dates.Clone
+            End If
+
+            If lSplitData.Count > 1 Then
+                Return MergeTimeseries(New atcTimeseriesGroup(ComputationSource.DataSets(0), lSplitData.ItemByIndex(1)))
+            Else
+                Return ComputationSource.DataSets(0)
+            End If
+        Else
+            Return lOriginalData.Clone
+        End If
+    End Function
+
+    Protected Overridable Function VaryData() As atcTimeseriesGroup        
         Dim lModifiedGroup As New atcTimeseriesGroup
         Dim lDataSetIndex As Integer = 0
 
-        Dim lEvents As atcTimeseriesGroup = Nothing
-        Dim lEvent As atcTimeseries
-
         For Each lOriginalData As atcTimeseries In DataSets
+            Dim lEvents As atcTimeseriesGroup = Nothing
             Dim lSplitData As atcTimeseriesGroup = SplitData(lOriginalData, lEvents)
-
-            Dim lModifiedSplit As New atcTimeseriesGroup
+            Dim lModifiedTS As atcTimeseries = Nothing
 
             Select Case Operation
-                Case "AddEvents"
-                    'if there are seasons, modify data only from selected seasons
-                    Dim lSplitOriginalData As atcTimeseriesGroup
-                    If Seasons Is Nothing Then
-                        lSplitOriginalData = New atcTimeseriesGroup(lOriginalData)
-                    Else
-                        lSplitOriginalData = Seasons.SplitBySelected(lOriginalData, Nothing)
-                    End If
-
-                    Dim lSplitTS As atcTimeseries = lSplitOriginalData.ItemByIndex(0)
-
-                    lModifiedSplit.Add(AddRemoveEventsVolumeFraction(lSplitTS, CurrentValue, lEvents, 0))
-                    If lSplitOriginalData.Count > 0 Then
-                        lModifiedSplit.Add(lSplitOriginalData.ItemByIndex(1))
-                    End If
-
+                Case "AddEvents" : lModifiedTS = VaryDataAddEvents(lSplitData, lEvents)
                     'TODO Case "AddVolume"
-                Case "Intensify"
-                    'if there are seasons, modify data only from selected seasons
-                    Dim lSplitOriginalData As atcTimeseriesGroup
-                    If Seasons Is Nothing Then
-                        lSplitOriginalData = New atcTimeseriesGroup(lOriginalData)
-                    Else
-                        lSplitOriginalData = Seasons.SplitBySelected(lOriginalData, Nothing)
-                    End If
-                    Dim lTotalVolume As Double = lSplitOriginalData.ItemByIndex(0).Attributes.GetValue("Sum")
-                    Dim lEventIntensifyFactor As Double
-                    Dim lCurrentVolume As Double = 0
-                    Dim lTargetChange As Double = CurrentValue / 100 * lTotalVolume
-                    Dim lNewEventTotalVolume As Double = 0.0
-
-                    Try
-                        If Not Double.IsNaN(IntensifyVolumeFraction) Then
-                            Dim lTargetVolumeToIntensify As Double = lTotalVolume * IntensifyVolumeFraction
-                            Logger.Dbg("TargetChange " & DecimalAlign(lTargetChange) & " TargetVolumeToIntensify " & DecimalAlign(lTargetVolumeToIntensify))
-                            'sort events by volume
-                            Logger.Dbg("Intensify " & DecimalAlign(IntensifyVolumeFraction) & " CurrentValue " & DecimalAlign(CurrentValue))
-                            Dim lNewEvents As New System.Collections.SortedList(lEvents.Count)
-                            For Each lEvent In lEvents
-                                Dim lEventVolume As Double = lEvent.Attributes.GetValue("Sum")
-                                While lNewEvents.IndexOfKey(lEventVolume) >= 0
-                                    lEventVolume += 0.00000001
-                                End While
-                                lNewEvents.Add(lEventVolume, lEvent)
-                                lNewEventTotalVolume += lEventVolume
-                            Next
-                            lEvents.Clear()
-                            Logger.Dbg(" TotalVolume " & DecimalAlign(lTotalVolume) & _
-                                       " EventTotalVolume " & DecimalAlign(lNewEventTotalVolume) & _
-                                       " PercentOfVolume " & DecimalAlign(100 * (lNewEventTotalVolume / lTotalVolume)))
-
-                            If CurrentValue > 0.0 Then
-                                For lEventIndex As Integer = lNewEvents.Count - 1 To 0 Step -1
-                                    lEvent = lNewEvents.GetByIndex(lEventIndex)
-                                    Dim lAddFromThisEvent As Double = lNewEvents.GetKey(lEventIndex)
-                                    lCurrentVolume += lAddFromThisEvent
-                                    'Logger.Dbg("CurrentVolumeAdded " & lCurrentVolumeChange & " FromThisEvent " & lAddFromThisEvent)
-
-                                    If lEventIndex = lNewEvents.Count - 1 Then 'details of biggest event
-                                        Dim lEventStr As String = "  Event " & lEventIndex
-                                        lEventStr &= "    Sum " & DecimalAlign(lEvent.Attributes.GetValue("Sum"))
-                                        lEventStr &= " NumVals " & lEvent.numValues
-                                        lEventStr &= " Starts " & DumpDate(lEvent.Dates.Value(1))
-                                        Logger.Dbg(lEventStr)
-                                    End If
-
-                                    lEvents.Add(lEvent)
-                                    If lCurrentVolume > lTargetVolumeToIntensify Then
-                                        Logger.Dbg("Intensify " & lNewEvents.Count - lEventIndex & " of " & lNewEvents.Count)
-                                        Exit For
-                                    End If
-                                Next lEventIndex
-                            Else
-                                For lEventIndex As Integer = 0 To lNewEvents.Count - 1
-                                    lEvent = lNewEvents.GetByIndex(lEventIndex)
-                                    lCurrentVolume += lNewEvents.GetKey(lEventIndex)
-                                    ' Logger.Dbg("CurrentVolumeRemoved " & lCurrentVolumeChange)
-                                    lEvents.Add(lEvent)
-                                    If lCurrentVolume > lTargetVolumeToIntensify Then
-                                        Logger.Dbg("NegativeIntensify " & lEventIndex & " of " & lNewEvents.Count)
-                                        Exit For
-                                    End If
-                                Next
-                            End If
-                        End If
-                    Catch e As Exception
-                        Logger.Dbg("VaryDataException-EventIntensifyFactor " & e.Message)
-                    End Try
-
-                    Logger.Dbg(" CurrentVolume " & DecimalAlign(lCurrentVolume) & _
-                               " TargetChange " & DecimalAlign(lTargetChange))
-                    lEventIntensifyFactor = lTargetChange / lCurrentVolume
-                    Logger.Dbg("EventIntensifyFactor " & DecimalAlign(lEventIntensifyFactor))
-                    lSplitData = New atcTimeseriesGroup(MergeTimeseries(lEvents))
-                    lSplitData.Add(lOriginalData)
-
-                    Dim lSplitTS As atcTimeseries = lSplitData.ItemByIndex(0)
-                    ComputationSource.DataSets.Clear()
-                    lArgsMath.Clear()
-                    lArgsMath.SetValue("timeseries", lSplitTS)
-                    lArgsMath.SetValue("Number", 1 + lEventIntensifyFactor)
-                    ComputationSource.Open("Multiply", lArgsMath)
-                    lModifiedTS = ComputationSource.DataSets(0)
-                    lModifiedSplit.Add(ComputationSource.DataSets(0))
-                    If lSplitData.Count > 0 Then
-                        lModifiedSplit.Add(lSplitData.ItemByIndex(1))
-                    End If
-
-                Case Else '"Add", "Multiply"
-                    If lSplitData IsNot Nothing AndAlso lSplitData.Count > 0 Then
-                        Dim lSplitTS As atcTimeseries = lSplitData.ItemByIndex(0)
-                        ComputationSource.DataSets.Clear()
-                        lArgsMath.Clear()
-                        lArgsMath.SetValue("timeseries", lSplitTS)
-                        lArgsMath.SetValue("Number", CurrentValue)
-                        ComputationSource.Open(Operation, lArgsMath)
-                        lModifiedTS = ComputationSource.DataSets(0)
-                        If lModifiedTS.Dates = lOriginalData.Dates Then
-                            lModifiedTS.Dates = lModifiedTS.Dates.Clone
-                        End If
-                        lModifiedSplit.Add(ComputationSource.DataSets(0))
-                        If lSplitData.Count > 1 Then
-                            lModifiedSplit.Add(lSplitData.ItemByIndex(1))
-                        End If
-                    Else
-                        lModifiedSplit.Add(lOriginalData.Clone)
-                    End If
+                Case "Intensify" : lModifiedTS = VaryDataIntensify(lSplitData, lEvents)
+                Case Else : lModifiedTS = VaryDataAddMultiply(lOriginalData, lSplitData)
             End Select
 
-            Select Case lModifiedSplit.Count
-                Case 0
-                    Throw New ApplicationException("VaryData: No data computed")
-                Case 1
-                    lModifiedTS = lModifiedSplit.Item(0)
-                Case Is > 1
-                    lModifiedTS = MergeTimeseries(lModifiedSplit)
-            End Select
+            If lModifiedTS Is Nothing Then
+                Throw New ApplicationException("VaryData: No data computed")
+            End If
 
             lModifiedTS.Attributes.SetValue("ID", lOriginalData.Attributes.GetValue("ID"))
             Dim lMostOriginal As atcTimeseries = MostOriginal(lOriginalData)
@@ -707,6 +701,7 @@ Public Class atcVariation
                     EventHigh = GetAtt(lXML, "High", EventHigh)
                     IntensifyVolumeFraction = GetAtt(lXML, "FlashVolumeFraction", IntensifyVolumeFraction) 'supports old name
                     IntensifyVolumeFraction = GetAtt(lXML, "IntensifyVolumeFraction", IntensifyVolumeFraction)
+                    If IntensifyVolumeFraction > 1 Then IntensifyVolumeFraction -= 1 'Backward compatible with files saved when this was centered at 100%
                     EventDaysGapAllowed = GetAtt(lXML, "GapDays", EventDaysGapAllowed)
                     'EventGapDisplayUnits = lXML.GetAttrValue("GapDisplayUnits")
 

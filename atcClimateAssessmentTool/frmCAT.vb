@@ -280,6 +280,7 @@ Public Class frmCAT
         '
         'lstRecentResults
         '
+        Me.lstRecentResults.Activation = System.Windows.Forms.ItemActivation.OneClick
         Me.lstRecentResults.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -327,6 +328,7 @@ Public Class frmCAT
         '
         'lstRecentCATsettings
         '
+        Me.lstRecentCATsettings.Activation = System.Windows.Forms.ItemActivation.OneClick
         Me.lstRecentCATsettings.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -336,7 +338,7 @@ Public Class frmCAT
         Me.lstRecentCATsettings.Name = "lstRecentCATsettings"
         Me.lstRecentCATsettings.ShowGroups = False
         Me.lstRecentCATsettings.Size = New System.Drawing.Size(392, 81)
-        Me.lstRecentCATsettings.TabIndex = 0
+        Me.lstRecentCATsettings.TabIndex = 2
         Me.lstRecentCATsettings.UseCompatibleStateImageBehavior = False
         Me.lstRecentCATsettings.View = System.Windows.Forms.View.List
         '
@@ -375,6 +377,7 @@ Public Class frmCAT
         '
         'lstRecentModel
         '
+        Me.lstRecentModel.Activation = System.Windows.Forms.ItemActivation.OneClick
         Me.lstRecentModel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -1064,14 +1067,10 @@ Public Class frmCAT
     End Sub
 
     Private Sub UpdateRecent()
-        'Create menu items / entries in lstRecent to directly open recently opened models
-        Dim lNumRecentMenus As Integer = 0
-        'TODO: remove mnuFile Items that are old Recents if we decide to create those menus agai
-
+        'Create entries to open recently opened models, results
         UpdateRecentList(lstRecentCATsettings, GetSetting("BasinsCAT", "Recent", "Setup"))
         UpdateRecentList(lstRecentModel, GetSetting("BasinsCAT", "Recent", "Model"))
         UpdateRecentList(lstRecentResults, GetSetting("BasinsCAT", "Recent", "Results"))
-
     End Sub
 
     Private Sub UpdateRecentList(ByVal aList As ListView, ByVal aRecentFiles As String)
@@ -2046,45 +2045,42 @@ Public Class frmCAT
         End Try
     End Sub
 
-    Private Sub lstRecent_ItemSelectionChanged( _
-          ByVal sender As Object, _
-          ByVal e As System.Windows.Forms.ListViewItemSelectionChangedEventArgs) _
-          Handles lstRecentCATsettings.ItemSelectionChanged, lstRecentModel.ItemSelectionChanged
-        Dim lFilename As String = ""
+    Private Sub lstRecent_ItemActivate(ByVal sender As Object, ByVal e As System.EventArgs) _
+        Handles lstRecentCATsettings.ItemActivate, lstRecentModel.ItemActivate
+        RecentFileActivate(sender)
+    End Sub
+
+    Private Sub RecentFileActivate(ByVal aList As ListView)
         Try
-            If e.IsSelected Then
-                lFilename = e.Item.Text
+            For Each listItem As ListViewItem In aList.SelectedItems
+                Dim lFilename As String = listItem.Text
                 If OpenFile(lFilename) Then
                     SelectTab(tabInputs)
                 Else
-                    Try
-                        sender.Items.Remove(e.Item)
-                    Catch
-                    End Try
+                    aList.Items.Remove(listItem)
+                    Logger.Msg("Could not open '" & lFilename & "' as model.")
                 End If
-            End If
+                Exit Sub 'Whether we opened or removed the item, don't want to process any more now, should only be one selected at a time anyway
+            Next
         Catch ex As Exception
-            Logger.Msg("Exception opening '" & lFilename & "': " & e.ToString)
+            Logger.Msg("Exception opening recent file " & ex.ToString)
         End Try
     End Sub
 
-    Private Sub lstRecentResults_ItemSelectionChanged(ByVal sender As Object, ByVal e As System.Windows.Forms.ListViewItemSelectionChangedEventArgs) Handles lstRecentResults.ItemSelectionChanged
-        Dim lFilename As String = ""
+    Private Sub lstRecentResults_ItemActivate(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstRecentResults.ItemActivate
         Try
-            If e.IsSelected Then
-                lFilename = e.Item.Text
+            For Each listItem As ListViewItem In lstRecentResults.SelectedItems
+                Dim lFilename As String = listItem.Text
                 If LoadResultsFromFile(lFilename) Then
                     SelectTab(tabResults)
                 Else
-                    Try
-                        lstRecentResults.Items.Remove(e.Item)
-                    Catch
-                    End Try
+                    lstRecentResults.Items.Remove(listItem)
                     Logger.Msg("Could not open '" & lFilename & "' as results grid.")
                 End If
-            End If
+                Exit Sub 'Whether we opened or removed the item, don't want to process any more now, should only be one selected at a time anyway
+            Next
         Catch ex As Exception
-            Logger.Msg("Exception opening '" & lFilename & "': " & e.ToString)
+            Logger.Msg("Exception opening recent file " & ex.ToString)
         End Try
     End Sub
 

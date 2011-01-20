@@ -891,7 +891,7 @@ Imports MapWinUtility
                 If .UseEvents Then
 
                     If IsNumeric(txtVolumePercent.Text) Then
-                        .IntensifyVolumeFraction = 1 + (CDbl(txtVolumePercent.Text) / 100)
+                        .IntensifyVolumeFraction = (CDbl(txtVolumePercent.Text) / 100)
                     Else
                         .IntensifyVolumeFraction = pNaN
                     End If
@@ -1007,7 +1007,7 @@ Imports MapWinUtility
             If Double.IsNaN(.IntensifyVolumeFraction) Then
                 txtVolumePercent.Text = ""
             Else
-                txtVolumePercent.Text = DoubleToString((.IntensifyVolumeFraction - 1) * 100)
+                txtVolumePercent.Text = DoubleToString((.IntensifyVolumeFraction) * 100)
             End If
 
             EnableIterative(.Max > .Min)
