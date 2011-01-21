@@ -9,7 +9,7 @@ Public Class frmAttributes
             Dim lLastIndex As Integer = lstAttributes.Items.Count - 1
             ReDim aAttributes(lLastIndex)
             For lIndex As Integer = 0 To lLastIndex
-                aAttributes(lIndex) = lstAttributes.Items(lIndex)
+                aAttributes(lIndex) = lstAttributes.Items(lIndex).ToString
             Next
             SaveSetting("BasinsCAT", "Settings", "Attributes", String.Join(vbLf, aAttributes))
             Return True
@@ -63,7 +63,9 @@ Public Class frmAttributes
     Private Sub btnDefaults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDefaults.Click
         lstAttributes.Items.Clear()
         For Each lAttribute As atcData.atcAttributeDefinition In atcData.atcDataAttributes.AllDefinitions
-            If lAttribute.TypeString.ToLower.Equals("double") AndAlso atcData.atcDataAttributes.IsSimple(lAttribute) Then
+            If lAttribute.TypeString.ToLower.Equals("double") _
+               AndAlso atcData.atcDataAttributes.IsSimple(lAttribute) _
+               AndAlso Not lAttribute.Name.EndsWith("*") Then
                 lstAttributes.Items.Add(lAttribute.Name)
             End If
         Next
@@ -90,5 +92,10 @@ Public Class frmAttributes
                 lstAttributes.Items.Add(lArgName)
             End If
         End If
+    End Sub
+
+    Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
+        Me.DialogResult = Windows.Forms.DialogResult.OK
+        Me.Hide()
     End Sub
 End Class
