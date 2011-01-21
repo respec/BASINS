@@ -413,7 +413,11 @@ Public Class atcGrid
                     x += ColumnWidth(lColumn)
                 Next
                 If x > pVisibleWidth Then
-                    .Maximum = x '- Me.Width + .Minimum + VScroller.Width
+                    .Maximum = x
+                    If .Focused Then 'Changing .Maximum is not tracked by focus highlighting (.Net bug)
+                        Me.Focus()   'Workaround: take focus away from scrollbar for a moment
+                        .Focus()
+                    End If
                     If (lColumns - lFixedColumns) > 1 Then
                         If pColumnRight.Count > 1 Then
                             .SmallChange = ColumnWidth(pColumnRight.Keys(0))
@@ -499,7 +503,7 @@ Public Class atcGrid
     Private Sub Render(ByVal g As Graphics)
         Try
             If pSource IsNot Nothing AndAlso Me.Visible Then
-                If SetHScroller() Then Exit Sub 'Changed Scroller.Value will create new Render
+                SetHScroller()
 
                 Dim x As Integer = 0
                 Dim y As Integer = 0
