@@ -662,7 +662,9 @@ Public Class frmEndpoint
                 lAttributeNames.AddRange(lSettingNames.Split(vbLf))
             Else
                 For Each lAttribute As atcAttributeDefinition In atcDataAttributes.AllDefinitions
-                    If lAttribute.TypeString.ToLower.Equals("double") AndAlso atcDataAttributes.IsSimple(lAttribute) Then
+                    If lAttribute.TypeString.ToLower.Equals("double") _
+                       AndAlso atcData.atcDataAttributes.IsSimple(lAttribute) _
+                       AndAlso Not lAttribute.Name.EndsWith("*") Then
                         lAttributeNames.Add(lAttribute.Name)
                     End If
                 Next
