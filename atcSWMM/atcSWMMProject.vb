@@ -50,6 +50,30 @@ Public Class atcSWMMProject
         Me.Clear()
     End Sub
 
+    Public Overrides ReadOnly Property Category() As String
+        Get
+            Return "File"
+        End Get
+    End Property
+
+    Public Overrides ReadOnly Property Description() As String
+        Get
+            Return "SWMM Input"
+        End Get
+    End Property
+
+    Public Overrides ReadOnly Property Name() As String
+        Get
+            Return "Timeseries::SWMM Input"
+        End Get
+    End Property
+
+    Public Overrides ReadOnly Property CanOpen() As Boolean
+        Get
+            Return True
+        End Get
+    End Property
+
     Public Overrides Sub Clear()
         MyBase.Clear()
         Blocks = New atcSWMMBlocks

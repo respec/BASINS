@@ -80,7 +80,7 @@ Public Module modSDM
 
 
     Friend Sub WriteParametersTextFile(ByVal aFilename As String, ByVal aMapWindowProjectFilename As String)
-        Dim sb As New Text.StringBuilder
+        Dim sb As New System.Text.StringBuilder
         sb.AppendLine("ProjectsPath," & IO.Path.GetDirectoryName(IO.Path.GetDirectoryName(aMapWindowProjectFilename)))
         Dim lDirName As String = IO.Path.GetFileName(IO.Path.GetDirectoryName(aMapWindowProjectFilename))
         If lDirName.ToLower <> "national" Then
