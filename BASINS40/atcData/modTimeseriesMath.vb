@@ -482,7 +482,7 @@ Public Module modTimeseriesMath
     ''' <summary>Fill values in constant interval timeseries with specified values.</summary>
     ''' <param name="aOldTSer">Timeseries to fill</param>
     ''' <param name="aTU">Time units (1-sec, 2-min, 3-hour, 4-day, 5-month, 6-year, 7-century)</param>
-    ''' <param name="aTS">Timestep in units of aTU.</param>
+    ''' <param name="aTS">Timestep (number of units of aTU per time step)</param>
     ''' <param name="aFillVal">Value to Fill data gaps with.</param>
     ''' <param name="aMissVal">Value indicating missing data.</param>
     ''' <param name="aAccumVal">Value indicating accumulated data.</param>
@@ -662,7 +662,7 @@ Public Module modTimeseriesMath
     ''' <summary>Aggregate specified timeseries to interval specified</summary>
     ''' <param name="aTimeseries">Timeseries to aggregate</param>
     ''' <param name="aTU">Time units to aggregate to</param>
-    ''' <param name="aTS">Time step to aggregate to (in time units</param>
+    ''' <param name="aTS">Time step to aggregate to (number of time units)</param>
     ''' <param name="aTran">Transformation to use in aggregation</param>
     ''' <param name="aDataSource">Data Source to assign to newly created subset timeseries, can be Nothing</param>
     ''' <returns>Aggregated timeseries</returns>
