@@ -1,4 +1,6 @@
-﻿''' <summary>Base class for a collection of locations</summary>
+﻿Imports System.Collections.Generic
+
+''' <summary>Base class for a collection of locations</summary>
 ''' <remarks></remarks>
 Public MustInherit Class PointLocations
     Inherits System.Collections.ObjectModel.KeyedCollection(Of String, PointLocation)
@@ -41,12 +43,12 @@ Public MustInherit Class PointLocations
     ''' <summary>Name of embedded file containing default locations</summary>
     ''' <returns>filename without path</returns>
     ''' <remarks></remarks>
-    Friend MustOverride Function InternalFilename() As String
+    Protected MustOverride Function InternalFilename() As String
 
     ''' <summary>Delimter within records in table</summary>
     ''' <returns>record field delimeter</returns>
     ''' <remarks>may be different than original delimeter in table</remarks>
-    Friend Overridable Function Delimeter() As String
+    Protected Overridable Function Delimeter() As String
         Return vbTab
     End Function
 
@@ -77,17 +79,6 @@ Public MustInherit Class PointLocations
         Return lClosestPointsToReturn
     End Function
 End Class
-
-''' <summary>Supported formats for timeseries data needed by a model</summary>
-''' <remarks></remarks>
-Public Enum TimeseriesFormat As Integer
-    ''' <summary>SWMM hourly format</summary>
-    ''' <remarks></remarks>
-    SWMM_Hourly = 0
-    ''' <summary>SWMM monthly average format</summary>
-    ''' <remarks></remarks>
-    SWMM_Monthly_Average = 1
-End Enum
 
 ''' <summary>Base class for a location</summary>
 ''' <remarks>Contains minimum details</remarks>
