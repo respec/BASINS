@@ -105,8 +105,6 @@ Public MustInherit Class PointLocation
     ''' <remarks></remarks>
     Public Longitude As Double
 
-    Private pBaseMetURL As String = "http://www.epa.gov/waterscience/ftp/basins/met_data/"
-
     ''' <summary></summary>
     ''' <remarks></remarks>
     Public Sub New()
@@ -158,67 +156,6 @@ Public MustInherit Class PointLocation
     ''' <remarks></remarks>
     Public Overrides Function ToString() As String
         Return Description()
-    End Function
-
-    ''' <summary></summary>
-    ''' <param name="aFormat"></param>
-    ''' <param name="aFileName"></param>
-    ''' <param name="aDSN"></param>
-    ''' <param name="aSJDate"></param>
-    ''' <param name="aEJDate"></param>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
-    Public Function GetData(ByVal aFormat As TimeseriesFormat, _
-                   Optional ByVal aFileName As String = "", _
-                   Optional ByVal aDSN As String = "", _
-                   Optional ByVal aSJDate As Double = 0, _
-                   Optional ByVal aEJDate As Double = 0) As String
-
-        Dim lSB As New System.Text.StringBuilder
-
-        If aFormat = TimeseriesFormat.SWMM_Monthly_Average Then
-            Dim lFields() As String = Record.Split(vbTab)
-            For lFieldIndex As Integer = 13 To 24
-                lSB.Append(lFields(lFieldIndex) & " ")
-            Next
-        Else
-            If Not IO.File.Exists(aFileName) Then
-                'download the wdm file containing the desired met data from the BASINS archive
-                Dim lUrl As String = pBaseMetURL & aFileName.Replace("wdm", "zip")
-                Select Case My.Computer.Name.ToUpper 'Developer machines get from local server
-                    Case "WIZ", "RUNNER", "ZORRO", "XOR", "HOUSE", "TONGWORKSTATION", "ZAP"
-                        lUrl = lUrl.Replace(pBaseMetURL, "http://hspf.com/BasinsMet/")
-                End Select
-                Dim lMetDataZipFileStream As IO.Stream = GetHTTPStream(lUrl, 60)
-                Dim lFilesUnziped As List(Of String) = Zipper.UnZip(lMetDataZipFileStream, IO.Directory.GetCurrentDirectory)
-            End If
-
-            Dim lWdm As New atcWdmVb.atcWDMfile
-            If lWdm.Open(aFileName) Then
-                Select Case aFormat
-                    Case TimeseriesFormat.SWMM_Hourly
-                        Dim lTimeseries As atcData.atcTimeseries = atcData.SubsetByDate(lWdm.DataSets.FindData("ID", aDSN).Item(0), aSJDate, aEJDate, Nothing)
-                        If lTimeseries = Nothing Then
-                            Throw New ApplicationException("DidNotFindDSN " & Id & " in " & aFileName)
-                        End If
-                        Dim lSWMMProject As New atcSWMM.atcSWMMProject
-                        With lSWMMProject.Options
-                            .SJDate = lTimeseries.Dates.Values(0)
-                            .EJDate = lTimeseries.Dates.Value(lTimeseries.Dates.Values.GetUpperBound(0))
-                        End With
-                        Dim lSWMMRainGage As New atcSWMM.atcSWMMRainGage
-                        lSWMMRainGage.Name = Id
-                        lSWMMRainGage.TimeSeries = lTimeseries
-                        lSB.Append(lSWMMProject.TimeSeriesToString(lSWMMRainGage.TimeSeries, lSWMMRainGage.Name))
-                    Case Else
-                        Throw New ApplicationException("FormatNotSupported " & System.Enum.GetName(aFormat.GetType, aFormat))
-                End Select
-            Else
-                Throw New ApplicationException("FailedToOpen " & aFileName)
-            End If
-        End If
-
-        Return lSB.ToString
     End Function
 End Class
 
