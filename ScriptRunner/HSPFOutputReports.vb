@@ -1,6 +1,7 @@
 Imports System
 Imports atcUtility
 Imports atcData
+Imports atcTimeseriesStatistics
 Imports atcWDM
 Imports atcHspfBinOut
 Imports HspfSupport

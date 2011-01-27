@@ -140,6 +140,9 @@ Module BasinsWorkshopBatch
             Catch lEx As Exception
                 Logger.Dbg("ProblemProject " & lProject & " " & lEx.ToString)
             End Try
+            For Each lDataSource As atcDataSource In atcDataManager.DataSources
+                lDataSource.Clear()
+            Next
             pMapWin.Layers.Clear()
             pMapWin.PreviewMap.GetPictureFromMap()
         Next

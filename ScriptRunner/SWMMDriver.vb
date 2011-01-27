@@ -11,8 +11,8 @@ Module SWMMDriver
         Dim lResultAll As Boolean = True
         For Each lFileName As String In pFileNames
             Logger.Dbg("Test " & lFileName)
-            Dim lSWMM As New SWMMProject
-            lSWMM.Load(pPathName & lFileName)
+            Dim lSWMM As New atcSWMMProject
+            lSWMM.Open(pPathName & lFileName)
             Dim lResult = lSWMM.RunSimulation()
             Logger.Dbg("SWMM Simulation Complete " & lResult)
  

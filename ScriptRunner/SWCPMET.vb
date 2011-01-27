@@ -13,7 +13,7 @@ Imports atcMetCmp
 Public Module SWCPMET
     Private Const pReportNanAsZero As Boolean = True
     Private pWorkingDir As String = "G:\Data\BasinsMet\"
-    Private pOutputPath As String = pWorkingDir & "WDMFinal\" '<<<Change here to your own WDM folder, lDataSource
+    Private pOutputPath As String = pWorkingDir & "WdmFinal\" '"Sample2\" '<<<Change here to your own WDM folder, lDataSource
     'Private pOutputPath As String = pWorkingDir & "WDMDebug\" '<<<Change here to your own WDM folder, lDataSource
     Private pBSNsAllStnFile As String = pWorkingDir & "Stations\StationLocs.dbf" '<<<Need to locate your BASINS weather station DBF folder
     Private pSWATAllStnFile As String = pWorkingDir & "Stations\AllStns.txt" '<<< do not change this file name as it is the storage of all stations
@@ -21,7 +21,7 @@ Public Module SWCPMET
     Private pAllSWATStnsList As Dictionary(Of String, String) = New Dictionary(Of String, String)
 
     Private pdoPET As Boolean = True ' Switch to do the actual PM PET calculation
-    Private pdoReport As Boolean = False
+    Private pdoReport As Boolean = True
 
     Private pStartYear As Integer = 1970
     Private pEndYear As Integer = 2010
@@ -45,293 +45,321 @@ Public Module SWCPMET
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Logger.Dbg("SWCPMET:Start")
         ChDriveDir(pOutputPath)
+        Logger.StartToFile("SWCPMET.log")
         Logger.Dbg("SWCPMET:CurDir:" & CurDir())
 
-        Dim lFiles As New NameValueCollection
-        AddFilesInDir(lFiles, pOutputPath, True, "*.wdm")
-        Logger.Dbg("SWCPMET: Found " & lFiles.Count & " WDM data files")
-        If pdoReport Then
-            SummarizePMET(pOutputPath, lFiles)
-            Exit Sub
-        End If
+        Dim lFileNames As New NameValueCollection
+        AddFilesInDir(lFileNames, pOutputPath, True, "*.wdm")
+        Logger.Dbg("SWCPMET: Found " & lFileNames.Count & " WDM data files")
 
-        Dim lStationDBF As New atcTableDBF
-        Dim lSJD As Double
-        Dim lEJD As Double
+        If pdoPET Then
+            Dim lSJDSWCPMET As Double = Date2J(1970, 1, 1, 0, 0, 0)
+            Dim lEJDSWCPMET As Double = Date2J(2010, 12, 31, 24, 0, 0)
 
-        Dim lSJDSWCPMET As Double = Date2J(1970, 1, 1, 0, 0, 0)
-        Dim lEJDSWCPMET As Double = Date2J(2010, 12, 31, 24, 0, 0)
+            Dim lSw As System.IO.StreamWriter = New System.IO.StreamWriter(IO.Path.Combine(pOutputPath, "PMETReport.txt"), False)
+            Dim lDoneReport As Boolean = False
 
-        Dim lsw As System.IO.StreamWriter = New System.IO.StreamWriter(IO.Path.Combine(pOutputPath, "PMETReport.txt"), False)
-        Dim ldoneReport As Boolean = False
+            'Create a station_number-keyed list of SWAT WGN parameters
+            'TODO: this could be replaced with the PointLocations class
 
-        Dim line As String = String.Empty
+            pAllSWATStnsList.Clear()
 
-        Dim lNVals As Integer
-        Dim lDate(5) As Integer
-        Dim lJDay As Integer
-        Dim lLat As Double
-        Dim lElev As Double
-        Dim lNYrs As Integer
-        Dim lCO2 As Double
+            Dim lKey As String = String.Empty
+            Dim lArr() As String = Nothing
+            Dim lLine As String = String.Empty
+            Dim lSR As System.IO.StreamReader = New System.IO.StreamReader(pSWATAllStnFile)
+            While Not lSR.EndOfStream
+                lLine = lSR.ReadLine()
+                lArr = lLine.Split(" ")
+                lKey = lArr(3) ' e.g. 249, but as a string
+                pAllSWATStnsList.Add(lKey, lLine)
+                lArr = Nothing
+            End While
+            lSR.Close()
+            lSR = Nothing 'reuse this reader later
 
-        'Create a station_number-keyed list of SWAT WGN parameters
-        'TODO: this could be replaced with the PointLocations class
+            Dim lStationDBF As New atcTableDBF
+            If lStationDBF.OpenFile(pBSNsAllStnFile) Then
+                Logger.Dbg("SWCPMET: Opened Basins station location file: " & pBSNsAllStnFile & " with " & lStationDBF.NumRecords & " records")
+            End If
 
-        Dim lSR As System.IO.StreamReader = New System.IO.StreamReader(pSWATAllStnFile)
-        Dim lKey As String = String.Empty
-        Dim lArr() As String = Nothing
-        While Not lSR.EndOfStream
-            line = lSR.ReadLine()
-            lArr = line.Split(" ")
-            lKey = lArr(3) ' e.g. 249, but as a string
-            pAllSWATStnsList.Add(lKey, line)
-            lArr = Nothing
-        End While
-        lSR.Close()
-        lSR = Nothing 'reuse this reader later
+            For Each lFile As String In lFileNames
+                ''The current set up requires one StationList.txt be placed in the 
+                ''same folder as each WDM file as look up guide
+                'lkupFile = IO.Path.Combine(IO.Path.GetDirectoryName(lFile), "StationList.txt")
+                ''if a stationlist.txt is not there with a particular met.wdm, then skip it
+                'If Not IO.File.Exists(lkupFile) Then
+                '    Continue For
+                'End If
 
-        If lStationDBF.OpenFile(pBSNsAllStnFile) Then
-            Logger.Dbg("SWCPMET: Opened Basins station location file: " & pBSNsAllStnFile)
-        End If
+                Logger.Dbg("SWCPMET: Opening data file - " & lFile)
+                If pdoPET Then
+                    Dim lSJD As Double
+                    Dim lEJD As Double
+                    Dim lNVals As Integer
+                    Dim lDate(5) As Integer
+                    Dim lJDay As Integer
+                    Dim lLat As Double
+                    Dim lElev As Double
+                    Dim lNYrs As Integer
+                    Dim lCO2 As Double
 
-        For Each lFile As String In lFiles
-            ''The current set up requires one StationList.txt be placed in the 
-            ''same folder as each WDM file as look up guide
-            'lkupFile = IO.Path.Combine(IO.Path.GetDirectoryName(lFile), "StationList.txt")
-            ''if a stationlist.txt is not there with a particular met.wdm, then skip it
-            'If Not IO.File.Exists(lkupFile) Then
-            '    Continue For
-            'End If
+                    'Open WDM data file
+                    Dim lWDMFile As atcWDM.atcDataSourceWDM = New atcWDM.atcDataSourceWDM
+                    lWDMFile.Open(lFile)
 
-            Logger.Dbg("SWCPMET: Opening data file - " & lFile)
-            If pdoPET Then
-                'Open WDM data file
-                Dim lWDMFile As atcWDM.atcDataSourceWDM = New atcWDM.atcDataSourceWDM
-                lWDMFile.Open(lFile)
+                    Dim lPTPairList As New Dictionary(Of String, String)
+                    Dim lnumPairs As Integer = getRainTempPairs(lPTPairList, lWDMFile)
+                    Logger.Dbg("SWCPMET: Found " & lnumPairs & " matching pairs of rain and temp.")
 
-                Dim lPTPairList As New Dictionary(Of String, String)
-                Dim lnumPairs As Integer = getRainTempPairs(lPTPairList, lWDMFile)
-                Logger.Dbg("SWCPMET: Found " & lnumPairs & " matching pairs of rain and temp.")
+                    For Each lStation As String In lPTPairList.Keys 'Keys are station name
+                        Dim ltsPrecID As Integer = Integer.Parse(lPTPairList.Item(lStation).Split(",")(0))
+                        Dim ltsAtemID As Integer = Integer.Parse(lPTPairList.Item(lStation).Split(",")(1))
 
-                For Each lStation As String In lPTPairList.Keys 'Keys are station name
-                    Dim ltsPrecID As Integer = Integer.Parse(lPTPairList.Item(lStation).Split(",")(0))
-                    Dim ltsAtemID As Integer = Integer.Parse(lPTPairList.Item(lStation).Split(",")(1))
+                        Dim ltsPMET As atcTimeseries = Nothing
+                        Dim ltsPMETHour As atcTimeseries = Nothing
+                        Dim ltsPrec As atcTimeseries
+                        Dim ltsAtem As atcTimeseries
+                        Dim ltsAtemSub As atcTimeseries = Nothing
 
-                    Dim ltsPMET As atcTimeseries = Nothing
-                    Dim ltsPMETHour As atcTimeseries = Nothing
-                    Dim ltsPrec As atcTimeseries
-                    Dim ltsAtem As atcTimeseries
-                    Dim ltsAtemSub As atcTimeseries = Nothing
+                        Dim lPrecVals() As Double = Nothing
+                        Dim lTMinVals() As Double = Nothing
+                        Dim lTMaxVals() As Double = Nothing
+                        Dim lPMETValsHdl() As Double = Nothing
 
-                    Dim lPrecVals() As Double = Nothing
-                    Dim lTMinVals() As Double = Nothing
-                    Dim lTMaxVals() As Double = Nothing
-                    Dim lPMETValsHdl() As Double = Nothing
+                        Dim ltsTemp As atcTimeseries = Nothing
 
-                    Dim ltsTemp As atcTimeseries = Nothing
-
-                    'Find a matching SWAT stn or closest SWAT stn
-                    'TODO: might need to have a closest distance threshold beyond which just don't do it
-                    Dim lswatStnKey As String = ""
-                    Dim LatDeg As Double
-                    Dim LngDeg As Double
-                    With lPTPairList.Item(lStation)
-                        LatDeg = .Split(",")(2)
-                        LngDeg = .Split(",")(3)
-                    End With
-                    'find the closest SWAT Stn's id
-                    lswatStnKey = getTargetSWATStnKeys(LatDeg, LngDeg)
-                    'if there is no SWAT stn found, then bypass this WDM wthr station
-                    If lswatStnKey = "" Then
-                        Continue For
-                    End If
-                    'write out SWAT parameter for SWAT fortran PMET routine to read
-                    'if fails, then bypass this station
-                    If Not setSWATStn(pAllSWATStnsList, lswatStnKey) Then
-                        Continue For
-                    End If
-
-                    'Now, prepare the precip and temperature data
-                    ltsPrec = TrimTimeseries(lWDMFile.DataSets.ItemByKey(ltsPrecID))
-                    If ltsPrec Is Nothing Then
-                        Logger.Msg("SWCPMET:Precip data trim problem: " & lWDMFile.DataSets.ItemByKey(ltsPrecID).Attributes.GetFormattedValue("Location"), "Problem")
-                        Throw New ApplicationException()
-                    End If
-                    ltsAtem = TrimTimeseries(lWDMFile.DataSets.ItemByKey(ltsAtemID))
-                    If ltsAtem Is Nothing Then
-                        Logger.Msg("SWCPMET:ATMP data trim problem: " & lWDMFile.DataSets.ItemByKey(ltsAtemID).Attributes.GetFormattedValue("Location"), "Problem")
-                        Throw New ApplicationException()
-                    End If
-
-                    Logger.Dbg("SWCPMET:Start PM calculation for station - " & lStation)
-                    'Find common period for precip/temp
-                    lSJD = Math.Max(ltsPrec.Attributes.GetValue("SJDay"), _
-                                    ltsAtem.Attributes.GetValue("SJDay"))
-                    lEJD = Math.Min(ltsPrec.Attributes.GetValue("EJDay"), _
-                                    ltsAtem.Attributes.GetValue("EJDay"))
-                    If lSJD < lEJD Then 'common period found
-
-                        'Coordinate with SWC desired date boundaries
-                        If lSJD <= lSJDSWCPMET Then
-                            lSJD = lSJDSWCPMET
+                        'Find a matching SWAT stn or closest SWAT stn
+                        'TODO: might need to have a closest distance threshold beyond which just don't do it
+                        Dim lswatStnKey As String = ""
+                        Dim LatDeg As Double
+                        Dim LngDeg As Double
+                        With lPTPairList.Item(lStation)
+                            LatDeg = .Split(",")(2)
+                            LngDeg = .Split(",")(3)
+                        End With
+                        'find the closest SWAT Stn's id
+                        lswatStnKey = getTargetSWATStnKeys(LatDeg, LngDeg)
+                        'if there is no SWAT stn found, then bypass this WDM wthr station
+                        If lswatStnKey = "" Then
+                            Continue For
                         End If
-                        If lEJD >= lEJDSWCPMET Then
-                            lEJD = lEJDSWCPMET
+                        'write out SWAT parameter for SWAT fortran PMET routine to read
+                        'if fails, then bypass this station
+                        If Not setSWATStn(pAllSWATStnsList, lswatStnKey) Then
+                            Continue For
                         End If
 
-                        If lSJD >= lEJD Then
-                            Logger.Dbg("SWCPMET:No common period available for Precip and Air Temp data during " & DumpDate(lSJDSWCPMET) & " ~ " & DumpDate(lEJDSWCPMET))
-                            GoTo EndCleanUp
+                        'Now, prepare the precip and temperature data
+                        ltsPrec = TrimTimeseries(lWDMFile.DataSets.ItemByKey(ltsPrecID))
+                        If ltsPrec Is Nothing Then
+                            Logger.Msg("SWCPMET:Precip data trim problem: " & lWDMFile.DataSets.ItemByKey(ltsPrecID).Attributes.GetFormattedValue("Location"), "Problem")
+                            Throw New ApplicationException()
+                        End If
+                        ltsAtem = TrimTimeseries(lWDMFile.DataSets.ItemByKey(ltsAtemID))
+                        If ltsAtem Is Nothing Then
+                            Logger.Msg("SWCPMET:ATMP data trim problem: " & lWDMFile.DataSets.ItemByKey(ltsAtemID).Attributes.GetFormattedValue("Location"), "Problem")
+                            Throw New ApplicationException()
                         End If
 
-                        Logger.Dbg("SWCPMET:Generating ET for period " & DumpDate(lSJD) & " - " & DumpDate(lEJD))
-
-                        'SubsetByDate, Aggregate to daily
-                        'TODO: might need to add a test to see what the original timeseries' tu is instead of assuming hourly
-                        lPrecVals = Aggregate((SubsetByDate(ltsPrec, lSJD, lEJD, Nothing)), atcTimeUnit.TUDay, 1, atcTran.TranSumDiv).Values
-                        ltsAtemSub = SubsetByDate(ltsAtem, lSJD, lEJD, Nothing)
-                        lTMinVals = Aggregate(ltsAtemSub, atcTimeUnit.TUDay, 1, atcTran.TranMin).Values
-                        lTMaxVals = Aggregate(ltsAtemSub, atcTimeUnit.TUDay, 1, atcTran.TranMax).Values
-
-                        lNVals = lPrecVals.GetUpperBound(0)
-
-                        'Figure out the starting day for calling fortran PMET function below
+                        Logger.Dbg("SWCPMET:Start PM calculation for station - " & lStation)
+                        'Find common period for precip/temp
+                        lSJD = Math.Max(ltsPrec.Attributes.GetValue("SJDay"), _
+                                        ltsAtem.Attributes.GetValue("SJDay"))
+                        'Just do complete years
                         J2Date(lSJD, lDate)
+                        If lDate(1) > 1 OrElse lDate(2) > 1 Then 'start is not jan 1, figure out julian date for the year
+                            lDate(0) += 1
+                            lDate(1) = 1
+                            lDate(2) = 1
+                            lDate(3) = 0
+                            lDate(4) = 0
+                            lDate(5) = 0
+                            lSJD = Date2J(lDate)
+                        End If
+
+                        lEJD = Math.Min(ltsPrec.Attributes.GetValue("EJDay"), _
+                                        ltsAtem.Attributes.GetValue("EJDay"))
+                        J2Date(lEJD, lDate)
                         If lDate(1) > 1 OrElse lDate(2) > 1 Then 'start is not jan 1, figure out julian date for the year
                             lDate(1) = 1
                             lDate(2) = 1
-                            lJDay = lSJD - Date2J(lDate) + 1
-                        Else
-                            lJDay = 1
+                            lDate(3) = 0
+                            lDate(4) = 0
+                            lDate(5) = 0
+                            lEJD = Date2J(lDate)
                         End If
-                        lNYrs = timdifJ(lSJD, lEJD, atcTimeUnit.TUYear, 1)
-                        lStationDBF.FindFirst(1, lStation.Substring(2))
-                        lLat = lStationDBF.Value(4) 'in decimal degrees
-                        lElev = lStationDBF.Value(6) 'in feet
-                        lElev = lElev * 0.3048 ' turn into meter
 
-                        Dim lPMETValsSingle(1) As Single
-                        Dim lPrecValsSingle(1) As Single
-                        Dim lTMinValsSingle(1) As Single
-                        Dim lTMaxValsSingle(1) As Single
-
-                        ReDim lPMETValsSingle(lNVals)
-                        ReDim lPrecValsSingle(lNVals)
-                        ReDim lTMinValsSingle(lNVals)
-                        ReDim lTMaxValsSingle(lNVals)
-
-                        'Copy values into arrays of single for calling fortran
-                        For z As Integer = 0 To lPrecVals.GetUpperBound(0)
-                            lPrecValsSingle(z) = lPrecVals(z)
-                            lTMinValsSingle(z) = lTMinVals(z)
-                            lTMaxValsSingle(z) = lTMaxVals(z)
-                        Next
-                        'Call fortran PMET code
-                        Logger.Dbg("SWCPMET:Fortran PMET starts")
-                        PMPEVT(Integer.Parse(lswatStnKey), lDate(0), lJDay, lNYrs + 1, lElev, lLat, lCO2, lNVals, lPrecValsSingle(1), lTMaxValsSingle(1), lTMinValsSingle(1), lPMETValsSingle(1))
-                        Logger.Dbg("SWCPMET:Fortran PMET ends")
-                        ltsPMET = ltsAtemSub.Clone
-                        ltsPMET.Attributes.SetValue("Constituent", "PMET")
-                        ltsPMET.Attributes.SetValue("ID", ltsAtemID + 6)
-                        ltsPMET.Attributes.SetValue("TU", atcTimeUnit.TUDay)
-                        ltsPMET.Attributes.SetValue("description", "Daily SWAT PM ET mm")
-                        ltsPMET.Attributes.SetValue("interval", 1.0)
-                        ltsPMET.Attributes.SetValue("TSTYPE", "PMET")
-                        'J2Date(lSJD, lDate)
-                        ltsPMET.Attributes.SetValue("TSBYR", lDate(0))
-
-                        'These are the same as the ltsAtemSub's
-                        'ltsPMET.Attributes.SetValue("Location", lStation)
-                        'ltsPMET.Attributes.SetValue("start date", lSJD)
-                        'ltsPMET.Attributes.SetValue("end date", lEJD)
-                        'ltsPMET.Attributes.SetValue("Latitude", lLat)
-
-                        ltsPMET.Dates.Values = NewDates(lSJD, lEJD, atcTimeUnit.TUDay, 1)
-
-                        'Copy back from single PMET array to double array
-                        Dim lPMETVals(lPMETValsSingle.GetUpperBound(0)) As Double
-                        Dim lValue As Double = 0.0
-                        For z As Integer = 0 To lPMETValsSingle.GetUpperBound(0)
-                            lValue = Double.Parse(lPMETValsSingle(z).ToString)
-                            If lValue < 0.00000001 Then
-                                lValue = 0.0
-                            ElseIf lValue > 40.0 Then
-                                Logger.Dbg("SWCPMET:Extremely large PMET daily value, i.e. " & lValue & " in " & lStation)
-                            Else
-                                lValue = CInt(lValue * 1000000.0 + 0.5) / 1000000.0
+                        If lSJD < lEJD Then 'common period found
+                            'Coordinate with SWC desired date boundaries
+                            If lSJD <= lSJDSWCPMET Then
+                                lSJD = lSJDSWCPMET
                             End If
-                            lPMETVals(z) = lValue
-                        Next
-                        ltsPMET.Values = lPMETVals
+                            If lEJD >= lEJDSWCPMET Then
+                                lEJD = lEJDSWCPMET
+                            End If
 
-                        If ltsPMET.Attributes.GetDefinedValue("start date").Value > ltsPMET.Attributes.GetDefinedValue("end date").Value Then
-                            GoTo PMETTSPROBLEM
-                        End If
-                        Dim lLatitudeDefinedValue As atcDefinedValue = ltsPMET.Attributes.GetDefinedValue("Latitude")
-                        Dim lLatitude As Double
-                        If lLatitudeDefinedValue IsNot Nothing Then
-                            lLatitude = lLatitudeDefinedValue.Value
-                            Logger.Dbg("Latitude " & lLatitude)
-                        Else
-                            Logger.Dbg("DEFAULT Latitiude")
-                            lLatitude = 45
-                        End If
+                            If lSJD >= lEJD Then
+                                Logger.Dbg("SWCPMET:No common period available for Precip and Air Temp data during " & DumpDate(lSJDSWCPMET) & " ~ " & DumpDate(lEJDSWCPMET))
+                                GoTo EndCleanUp
+                            End If
 
-                        'Disaggragate the daily PMET timeseries into hourly timeseries
-                        ltsPMETHour = atcMetCmp.DisSolPet(ltsPMET, Nothing, 2, lLatitude)
-                        ltsPMETHour.Attributes.SetValue("Constituent", ltsPMET.Attributes.GetDefinedValue("Constituent").Value)
-                        ltsPMETHour.Attributes.SetValue("TSTYPE", ltsPMET.Attributes.GetDefinedValue("TSTYPE").Value)
-                        ltsPMETHour.Attributes.SetValue("ID", ltsPMET.Attributes.GetDefinedValue("ID").Value)
+                            Logger.Dbg("SWCPMET:Generating ET for period " & DumpDate(lSJD) & " - " & DumpDate(lEJD))
 
-                        'Add the newly calculated hourly PMET timeseries back into the current WDM, overwrite if already exists.
-                        If lWDMFile.AddDataset(ltsPMETHour, atcDataSource.EnumExistAction.ExistReplace) Then
-                            Logger.Dbg("SWCPMET:Wrote Penman-Monteith PET to DSN " & ltsPMETHour.Attributes.GetValue("ID").ToString & ", SumAnnual PMET=" & ltsPMETHour.Attributes.GetValue("SumAnnual").ToString)
-                        Else
+                            'SubsetByDate, Aggregate to daily
+                            'TODO: might need to add a test to see what the original timeseries' tu is instead of assuming hourly
+                            lPrecVals = Aggregate((SubsetByDate(ltsPrec, lSJD, lEJD, Nothing)), atcTimeUnit.TUDay, 1, atcTran.TranSumDiv).Values
+                            ltsAtemSub = SubsetByDate(ltsAtem, lSJD, lEJD, Nothing)
+                            lTMinVals = Aggregate(ltsAtemSub, atcTimeUnit.TUDay, 1, atcTran.TranMin).Values
+                            lTMaxVals = Aggregate(ltsAtemSub, atcTimeUnit.TUDay, 1, atcTran.TranMax).Values
+
+                            lNVals = lPrecVals.GetUpperBound(0)
+
+                            'Figure out the starting day for calling fortran PMET function below
+                            J2Date(lSJD, lDate)
+                            If lDate(1) > 1 OrElse lDate(2) > 1 Then 'start is not jan 1, figure out julian date for the year
+                                lDate(1) = 1
+                                lDate(2) = 1
+                                lJDay = lSJD - Date2J(lDate) + 1
+                            Else
+                                lJDay = 1
+                            End If
+                            lNYrs = timdifJ(lSJD, lEJD, atcTimeUnit.TUYear, 1)
+
+                            lStationDBF.FindFirst(1, lStation.Substring(2))
+                            lLat = lStationDBF.Value(4) 'in decimal degrees
+                            lElev = lStationDBF.Value(6) 'in feet
+                            lElev *= 0.3048 ' turn into meter
+
+                            Dim lPMETValsSingle(1) As Single
+                            Dim lPrecValsSingle(1) As Single
+                            Dim lTMinValsSingle(1) As Single
+                            Dim lTMaxValsSingle(1) As Single
+
+                            ReDim lPMETValsSingle(lNVals)
+                            ReDim lPrecValsSingle(lNVals)
+                            ReDim lTMinValsSingle(lNVals)
+                            ReDim lTMaxValsSingle(lNVals)
+
+                            'Copy values into arrays of single for calling fortran
+                            For z As Integer = 0 To lPrecVals.GetUpperBound(0)
+                                lPrecValsSingle(z) = lPrecVals(z)
+                                lTMinValsSingle(z) = lTMinVals(z)
+                                lTMaxValsSingle(z) = lTMaxVals(z)
+                            Next
+                            'Call fortran PMET code
+                            Logger.Dbg("SWCPMET:Fortran PMET starts")
+                            PMPEVT(Integer.Parse(lswatStnKey), lDate(0), lJDay, lNYrs + 1, lElev, lLat, lCO2, lNVals, lPrecValsSingle(1), lTMaxValsSingle(1), lTMinValsSingle(1), lPMETValsSingle(1))
+                            Logger.Dbg("SWCPMET:Fortran PMET ends")
+                            ltsPMET = ltsAtemSub.Clone
+                            ltsPMET.Attributes.SetValue("Constituent", "PMET")
+                            ltsPMET.Attributes.SetValue("ID", ltsAtemID + 6)
+                            ltsPMET.Attributes.SetValue("TU", atcTimeUnit.TUDay)
+                            ltsPMET.Attributes.SetValue("description", "Daily SWAT PM ET mm")
+                            ltsPMET.Attributes.SetValue("interval", 1.0)
+                            ltsPMET.Attributes.SetValue("TSTYPE", "PMET")
+                            'J2Date(lSJD, lDate)
+                            ltsPMET.Attributes.SetValue("TSBYR", lDate(0))
+
+                            'These are the same as the ltsAtemSub's
+                            'ltsPMET.Attributes.SetValue("Location", lStation)
+                            'ltsPMET.Attributes.SetValue("start date", lSJD)
+                            'ltsPMET.Attributes.SetValue("end date", lEJD)
+                            'ltsPMET.Attributes.SetValue("Latitude", lLat)
+
+                            ltsPMET.Dates.Values = NewDates(lSJD, lEJD, atcTimeUnit.TUDay, 1)
+
+                            'Copy back from single PMET array to double array
+                            Dim lPMETVals(lPMETValsSingle.GetUpperBound(0)) As Double
+                            Dim lValue As Double = 0.0
+                            For z As Integer = 0 To lPMETValsSingle.GetUpperBound(0)
+                                lValue = Double.Parse(lPMETValsSingle(z).ToString)
+                                If lValue < 0.00000001 Then
+                                    lValue = 0.0
+                                ElseIf lValue > 40.0 Then
+                                    Dim lYr, lMo, lDy As Integer
+                                    INVMJD(CInt(ltsPMET.Dates.Values(z)), lYr, lMo, lDy)
+                                    Logger.Dbg("SWCPMET:Extremely large PMET daily value, i.e. " & lValue & " in " & lStation & " on " & lYr & "/" & lMo & "/" & lDy)
+                                Else
+                                    lValue = CInt(lValue * 1000000.0 + 0.5) / 1000000.0
+                                End If
+                                lPMETVals(z) = lValue
+                            Next
+                            ltsPMET.Values = lPMETVals
+
+                            If ltsPMET.Attributes.GetDefinedValue("start date").Value > ltsPMET.Attributes.GetDefinedValue("end date").Value Then
+                                GoTo PMETTSPROBLEM
+                            End If
+                            Dim lLatitudeDefinedValue As atcDefinedValue = ltsPMET.Attributes.GetDefinedValue("Latitude")
+                            Dim lLatitude As Double
+                            If lLatitudeDefinedValue IsNot Nothing Then
+                                lLatitude = lLatitudeDefinedValue.Value
+                                Logger.Dbg("Latitude " & lLatitude)
+                            Else
+                                Logger.Dbg("DEFAULT Latitiude")
+                                lLatitude = 45
+                            End If
+
+                            'Disaggragate the daily PMET timeseries into hourly timeseries
+                            ltsPMETHour = atcMetCmp.DisSolPet(ltsPMET, Nothing, 2, lLatitude)
+                            ltsPMETHour.Attributes.SetValue("Constituent", ltsPMET.Attributes.GetDefinedValue("Constituent").Value)
+                            ltsPMETHour.Attributes.SetValue("TSTYPE", ltsPMET.Attributes.GetDefinedValue("TSTYPE").Value)
+                            ltsPMETHour.Attributes.SetValue("ID", ltsPMET.Attributes.GetDefinedValue("ID").Value)
+
+                            'Add the newly calculated hourly PMET timeseries back into the current WDM, overwrite if already exists.
+                            If lWDMFile.AddDataset(ltsPMETHour, atcDataSource.EnumExistAction.ExistReplace) Then
+                                Logger.Dbg("SWCPMET:Wrote Penman-Monteith PET to DSN " & ltsPMETHour.Attributes.GetValue("ID").ToString & ", SumAnnual PMET=" & ltsPMETHour.Attributes.GetValue("SumAnnual").ToString)
+                            Else
 PMETTSPROBLEM:
-                            Logger.Dbg("SWCPMET:PROBLEM writing Penman-Monteith PET to DSN " & ltsPMETHour.Attributes.GetValue("ID").ToString)
+                                Logger.Dbg("SWCPMET:PROBLEM writing Penman-Monteith PET to DSN " & ltsPMETHour.Attributes.GetValue("ID").ToString)
+                            End If
+
+                            'throw away temporary arrays
+                            ReDim lPMETValsSingle(0) : lPMETValsSingle = Nothing
+                            ReDim lPrecValsSingle(0) : lPrecValsSingle = Nothing
+                            ReDim lTMinValsSingle(0) : lTMinValsSingle = Nothing
+                            ReDim lTMaxValsSingle(0) : lTMaxValsSingle = Nothing
+
+                            ReDim lPrecVals(0) : lPrecVals = Nothing
+                            ReDim lTMinVals(0) : lTMinVals = Nothing
+                            ReDim lTMaxVals(0) : lTMaxVals = Nothing
+                            ReDim lPMETValsHdl(0) : lPMETValsHdl = Nothing
+                        Else
+                            Logger.Dbg("SWCPMET:No common period available for Precip and Air Temp data")
                         End If
-
-                        'throw away temporary arrays
-                        ReDim lPMETValsSingle(0) : lPMETValsSingle = Nothing
-                        ReDim lPrecValsSingle(0) : lPrecValsSingle = Nothing
-                        ReDim lTMinValsSingle(0) : lTMinValsSingle = Nothing
-                        ReDim lTMaxValsSingle(0) : lTMaxValsSingle = Nothing
-
-                        ReDim lPrecVals(0) : lPrecVals = Nothing
-                        ReDim lTMinVals(0) : lTMinVals = Nothing
-                        ReDim lTMaxVals(0) : lTMaxVals = Nothing
-                        ReDim lPMETValsHdl(0) : lPMETValsHdl = Nothing
-                    Else
-                        Logger.Dbg("SWCPMET:No common period available for Precip and Air Temp data")
-                    End If
 EndCleanUp:
-                    If ltsPrec IsNot Nothing Then ltsPrec.Clear()
-                    If ltsAtem IsNot Nothing Then ltsAtem.Clear()
-                    If ltsAtemSub IsNot Nothing Then ltsAtemSub.Clear()
-                    If ltsPMET IsNot Nothing Then ltsPMET.Clear()
-                    If ltsPMETHour IsNot Nothing Then ltsPMETHour.Clear()
+                        If ltsPrec IsNot Nothing Then ltsPrec.Clear()
+                        If ltsAtem IsNot Nothing Then ltsAtem.Clear()
+                        If ltsAtemSub IsNot Nothing Then ltsAtemSub.Clear()
+                        If ltsPMET IsNot Nothing Then ltsPMET.Clear()
+                        If ltsPMETHour IsNot Nothing Then ltsPMETHour.Clear()
 
-                    ltsPrec = Nothing
-                    ltsAtem = Nothing
-                    ltsAtemSub = Nothing
-                    ltsPMET = Nothing
-                    ltsPMETHour = Nothing
+                        ltsPrec = Nothing
+                        ltsAtem = Nothing
+                        ltsAtemSub = Nothing
+                        ltsPMET = Nothing
+                        ltsPMETHour = Nothing
+                        GC.Collect()
+                        System.Threading.Thread.Sleep(30)
+                        'Logger.Dbg(MemUsage)
+                    Next ' lPTPairList
+                    'Close it to let the added dataset finalize
+                    lWDMFile.Clear()
+                    lWDMFile = Nothing
                     GC.Collect()
                     System.Threading.Thread.Sleep(30)
-                    'Logger.Dbg(MemUsage)
-                Next ' lPTPairList
-                'Close it to let the added dataset finalize
-                lWDMFile.Clear()
-                lWDMFile = Nothing
-                GC.Collect()
-                System.Threading.Thread.Sleep(30)
-                Logger.Dbg("SWCPMET:Done PMET Calculation for " & lFile)
-            End If
-        Next ' lFiles
-        lsw.Close()
-        lStationDBF.Clear()
-        lStationDBF = Nothing
+                    Logger.Dbg("SWCPMET:Done PMET Calculation for " & lFile)
+                End If
+            Next ' lFileNames
+            lSw.Close()
+            lStationDBF.Clear()
+            lStationDBF = Nothing
+        End If
+
+        If pdoReport Then
+            SummarizePMET(pOutputPath, lFileNames)
+        End If
+
     End Sub
 
     Public Sub SummarizePMET(ByVal aDataSource As String, ByVal aWdmFileNames As NameValueCollection)

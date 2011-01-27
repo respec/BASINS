@@ -500,7 +500,8 @@ EndCleanUp:
                 lEJD = Jday(2006, 12, 31, 24, 0, 0)
                 Try
                     Dim lStationListFile As String = IO.Path.Combine(lprojectFolder, "StationList.txt")
-                    WriteSwatMetInput(lWDMFile, lStationDBF, lprojectFolder, lsaveInFolder, lSJD, lEJD, lStationListFile)
+                    Logger.Dbg("SkipWriteSwatMetInput")
+                    'WriteSwatMetInput(lWDMFile, lStationDBF, lprojectFolder, lsaveInFolder, lSJD, lEJD, lStationListFile)
                 Catch lEx As Exception
                     Logger.Dbg("WriteSwatMetInput Exception: " & lEx.InnerException.Message & vbCrLf & lEx.InnerException.StackTrace)
                     Logger.Flush()
