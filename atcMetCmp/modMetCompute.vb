@@ -1120,6 +1120,10 @@ Public Module modMetCompute
                     CURVE(IK) = 0.0#
                     aHrPet(IK) = CURVE(IK)
                 End If
+                If aHrPet(IK) > 40 Then
+                    Logger.Dbg("Bad Hourly Value " & aHrPet(IK))
+                End If
+
             Next IK
             aRetCod = 0
         End If
