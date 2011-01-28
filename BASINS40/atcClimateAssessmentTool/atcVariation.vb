@@ -218,15 +218,6 @@ Public Class atcVariation
         Return lSplitData
     End Function
 
-    Private Function VaryDataAddEvents(ByRef lSplitData As atcTimeseriesGroup, ByRef lEvents As atcTimeseriesGroup) As atcTimeseries
-        Dim lModifiedTS As atcTimeseries = AddRemoveEventsVolumeFraction(lSplitData.ItemByIndex(0), CurrentValue, lEvents, 0)
-        If lSplitData.Count > 1 Then
-            Return MergeTimeseries(New atcTimeseriesGroup(lModifiedTS, lSplitData.ItemByIndex(1)))
-        Else
-            Return lModifiedTS
-        End If
-    End Function
-
     Private Function VaryDataIntensify(ByRef lSplitData As atcTimeseriesGroup, ByRef lEvents As atcTimeseriesGroup) As atcTimeseries
         Dim lEvent As atcTimeseries
         Dim lArgsMath As New atcDataAttributes
@@ -346,8 +337,7 @@ Public Class atcVariation
             Dim lModifiedTS As atcTimeseries = Nothing
 
             Select Case Operation
-                Case "AddEvents" : lModifiedTS = VaryDataAddEvents(lSplitData, lEvents)
-                    'TODO Case "AddVolume"
+                Case "AddEvents" : lModifiedTS = AddRemoveEventsVolumeFraction(lOriginalData, CurrentValue, lEvents, 0)
                 Case "Intensify" : lModifiedTS = VaryDataIntensify(lSplitData, lEvents)
                 Case Else : lModifiedTS = VaryDataAddMultiply(lOriginalData, lSplitData)
             End Select
