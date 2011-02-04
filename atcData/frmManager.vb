@@ -294,31 +294,34 @@ Friend Class frmManager
             Dim lNode As TreeNode
             For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
                 Dim lTypeAndSource() As String = lDataSource.Name.Split(":")
+                Dim lSourceName As String = "Unknown"
+                If lTypeAndSource.GetUpperBound(0) > 1 Then
+                    lSourceName = lTypeAndSource(2)
+                End If
 
                 'TODO: leave code for lTypeAndSource(0) - now only Timeseries, might want to add Model or Table later
-
                 'If Not treeFiles.Nodes.ContainsKey(lTypeAndSource(0)) Then
                 '    treeFiles.Nodes.Add(lTypeAndSource(0), lTypeAndSource(0))
                 'End If
                 'Dim lSourceNodes As TreeNodeCollection = treeFiles.Nodes(lTypeAndSource(0)).Nodes
-                'If Not lSourceNodes.ContainsKey(lTypeAndSource(2)) Then
-                '    lSourceNodes.Add(lTypeAndSource(2), lTypeAndSource(2))
+                'If Not lSourceNodes.ContainsKey(lSourceName) Then
+                '    lSourceNodes.Add(lSourceName, lSourceName)
                 'End If
-                If Not treeFiles.Nodes.ContainsKey(lTypeAndSource(2)) Then
-                    lNode = treeFiles.Nodes.Add(lTypeAndSource(2), lTypeAndSource(2))
+                If Not treeFiles.Nodes.ContainsKey(lSourceName) Then
+                    lNode = treeFiles.Nodes.Add(lSourceName, lSourceName)
                     lNode.BackColor = treeFiles.BackColor
                     lNode.ForeColor = treeFiles.ForeColor
                 End If
 
                 lName = lDataSource.Specification & " (" & lDataSource.DataSets.Count & ")"
-                'treeFiles.Nodes(lTypeAndSource(0)).Nodes(lTypeAndSource(2)).Nodes.Add(lCount, lName)
-                lNode = treeFiles.Nodes(lTypeAndSource(2)).Nodes.Add(lCount, lName)
+                'treeFiles.Nodes(lTypeAndSource(0)).Nodes(lSourceName).Nodes.Add(lCount, lName)
+                lNode = treeFiles.Nodes(lSourceName).Nodes.Add(lCount, lName)
                 lNode.BackColor = treeFiles.BackColor
                 lNode.ForeColor = treeFiles.ForeColor
 
                 If lCount = aNodeKey Then
-                    'treeFiles.SelectedNode = treeFiles.Nodes(lTypeAndSource(0)).Nodes(lTypeAndSource(2)).Nodes(lCount)
-                    treeFiles.SelectedNode = treeFiles.Nodes(lTypeAndSource(2)).Nodes(lCount)
+                    'treeFiles.SelectedNode = treeFiles.Nodes(lTypeAndSource(0)).Nodes(lSourceName).Nodes(lCount)
+                    treeFiles.SelectedNode = treeFiles.Nodes(lSourceName).Nodes(lCount)
                     treeFiles.SelectedNode.EnsureVisible()
                     RefreshDetails(aNodeKey)
                 End If
