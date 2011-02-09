@@ -26,12 +26,25 @@ Public Module modReflection
         Return lReader.ReadToEnd()
     End Function
 
-    Public Function GetEmbeddedFileAsBinaryReader(ByVal aFileName As String, Optional ByVal aAssembly As Assembly = Nothing) As IO.BinaryReader
+    Public Function GetEmbeddedFileAsBinaryReader(ByVal aFileName As String, Optional ByVal aAssembly As Assembly = Nothing, Optional ByVal aPrefixName As String = "") As IO.BinaryReader
         Try
             If aAssembly Is Nothing Then aAssembly = Assembly.GetCallingAssembly
-            Dim lStream As IO.Stream = aAssembly.GetManifestResourceStream(aAssembly.GetName().Name + "." + aFileName)
-            Return New IO.BinaryReader(lStream)
-        Catch
+            Dim lPrefixName As String = aPrefixName
+            If lPrefixName.Length = 0 Then
+                lPrefixName = aAssembly.GetName().Name
+            End If
+            Logger.Dbg("Assembly " & aAssembly.GetName().Name & " PrefixName " & lPrefixName & " FileName " & aFileName)
+            Dim lStream As IO.Stream = aAssembly.GetManifestResourceStream(lPrefixName + "." + aFileName)
+            If lStream Is Nothing Then
+                Logger.Dbg("FailedToGetStream")
+                Return Nothing
+            End If
+            Logger.Dbg("StreamLength " & lStream.Length)
+            Dim lBinaryReader As New IO.BinaryReader(lStream)
+            Logger.Dbg("BinaryReader " & lBinaryReader.PeekChar)
+            Return lBinaryReader
+        Catch lEx As Exception
+            Logger.Dbg(lEx.Message)
             Return Nothing
         End Try
     End Function
