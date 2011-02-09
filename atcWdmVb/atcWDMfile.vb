@@ -355,6 +355,11 @@ ParseDate:                          Logger.Dbg(.Name & " text date '" & lS & "' 
             End If
         Next
         lDate.Add(lCurrentDateJ)
+        'remove trailing missing data
+        While Double.IsNaN(lData.Item(lData.Count - 1))
+            lData.RemoveAt(lData.Count - 1)
+            lDate.RemoveAt(lDate.Count - 1)
+        End While
         'Logger.Dbg("Done Dsn:DataCount:" & aDataSet.Attributes.GetValue("ID") & ":" & lData.Count)
         Dim lDataD(lData.Count - 1) As Double
         lData.CopyTo(lDataD)
