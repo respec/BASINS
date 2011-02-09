@@ -22,7 +22,7 @@ Friend Class atcMsgWDMvb
         Logger.Dbg("MessageFileReadWithVB")
         Dim lAttr As atcAttributeDefinition
         Dim lWdmMsg As atcWdmFileHandle
-        Dim lBinaryReader As IO.BinaryReader = GetEmbeddedFileAsBinaryReader("hspfmsg.wdm")
+        Dim lBinaryReader As IO.BinaryReader = GetEmbeddedFileAsBinaryReader("hspfmsg.wdm", , "atcWdmVb")
         If lBinaryReader Is Nothing Then
             Dim lFileName As String = FindFile("Please locate HSPF message file", "hspfmsg.wdm")
             lWdmMsg = New atcWdmFileHandle(1, lFileName)

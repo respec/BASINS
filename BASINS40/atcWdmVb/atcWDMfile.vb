@@ -317,14 +317,23 @@ ParseDate:                          Logger.Dbg(.Name & " text date '" & lS & "' 
                         lDataOffset += lBlockNumVals
                     Else
                         Dim lDataComp As Double = CDbl(aWdm.ReadSingle())
+                        Dim lSkipNaN As Boolean = False
                         If Math.Abs(lDataComp - lTsFill) < Double.Epsilon Then
                             lDataComp = GetNaN()
+                            If lDate.Count = 0 Then
+                                lSkipNaN = True
+                            End If
                         End If
-                        For lPos As Int32 = 1 To lBlockNumVals
-                            lDate.Add(lCurrentDateJ)
-                            lCurrentDateJ = TimAddJ(lBlockStartDateJ, lBlockTimeUnits, lBlockTimeStep, lPos)
-                            lData.Add(lDataComp)
-                        Next
+
+                        If lSkipNaN Then
+                            lCurrentDateJ = TimAddJ(lBlockStartDateJ, lBlockTimeUnits, lBlockTimeStep, lBlockNumVals)
+                        Else
+                            For lPos As Int32 = 1 To lBlockNumVals
+                                lDate.Add(lCurrentDateJ)
+                                lCurrentDateJ = TimAddJ(lBlockStartDateJ, lBlockTimeUnits, lBlockTimeStep, lPos)
+                                lData.Add(lDataComp)
+                            Next
+                        End If
                         lDataOffset += 1
                     End If
                     If lDataOffset >= 512 AndAlso (lEndDateJ - lCurrentDateJ) > JulianSecond Then 'move to next record
