@@ -566,6 +566,9 @@ Public Class atcSWMMProject
         Dim lSB As New StringBuilder
         For lIndex As Integer = lStartIndex To lEndIndex - 1
             If aType = "PREC" Then
+                If Not (aTimeSeries.Values(lIndex + 1) > 0.0) Then
+                    Continue For
+                End If
                 lSB.Append(StrPad(aTimeseriesTag, 16, " ", False))
                 lSB.Append(" ")
             End If
