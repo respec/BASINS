@@ -373,6 +373,37 @@ Public Class atcSWMMProject
                 DataSets.Add(Temperature.Timeseries.Attributes.GetValue("ID"), Temperature.Timeseries)
             End If
             If Evaporation IsNot Nothing AndAlso Evaporation.Timeseries IsNot Nothing Then
+                'Setting more attributes for evaporation's timeseries 
+                'Setting Evap's latitude using Temperature gage's latitude
+                'need to consider getting this from the climate file
+                For Each lParamKey As String In Temperature.AuxiParms.Keys
+                    If lParamKey = "SNOWMELT" Then
+                        Dim lParams As String = Temperature.AuxiParms.Item(lParamKey).Trim()
+                        Dim lItems() As String = Regex.Split(lParams, "\s+")
+                        Dim lLatDeg As Double = "40.0"
+                        If Double.TryParse(lItems(4), lLatDeg) Then
+                            Evaporation.Timeseries.Attributes.SetValue("LatDeg", lLatDeg)
+                        End If
+                        ReDim lItems(0)
+                        Exit For
+                    End If
+                Next
+                If RainGages.Count > 0 Then
+                    Dim lInterval As Double = RainGages(0).TimeSeries.Attributes.GetValue("interval")
+                    With Evaporation.Timeseries.Attributes
+                        .SetValue("interval", lInterval) ' this is to go with the raingages' interval
+                        If lInterval Mod JulianHour = 0 Then
+                            .SetValue("tu", atcTimeUnit.TUHour)
+                            .SetValue("ts", CInt(lInterval / JulianHour))
+                        ElseIf lInterval Mod JulianMinute = 0 Then
+                            .SetValue("tu", atcTimeUnit.TUMinute)
+                            .SetValue("ts", CInt(lInterval / JulianMinute))
+                        ElseIf lInterval Mod JulianSecond = 0 Then
+                            .SetValue("tu", atcTimeUnit.TUSecond)
+                            .SetValue("ts", CInt(lInterval / JulianSecond))
+                        End If
+                    End With
+                End If
                 DataSets.Add(Evaporation.Timeseries.Attributes.GetValue("ID"), Evaporation.Timeseries)
             End If
 
@@ -564,6 +595,7 @@ Public Class atcSWMMProject
         End If
         Dim lEndIndex As Integer = aTimeSeries.Dates.IndexOfValue(Options.EJDate, True)
         Dim lSB As New StringBuilder
+        Dim lValue As String = ""
         For lIndex As Integer = lStartIndex To lEndIndex - 1
             If aType = "PREC" Then
                 If Not (aTimeSeries.Values(lIndex + 1) > 0.0) Then
@@ -583,7 +615,13 @@ Public Class atcSWMMProject
             End If
             lSB.Append(StrPad(lDateString, 20, " ", False))
             lSB.Append(" ")
-            lSB.Append(StrPad(Format(aTimeSeries.Values(lIndex + 1), "0.000"), 10, " ", False))
+
+            If aType = "PEVT" Then
+                lValue = Format(aTimeSeries.Values(lIndex + 1), "0.0000000000")
+            Else
+                lValue = Format(aTimeSeries.Values(lIndex + 1), "0.000")
+            End If
+            lSB.Append(StrPad(lValue, 10, " ", False))
             lSB.Append(vbCrLf)
         Next
         Return lSB.ToString
@@ -626,7 +664,7 @@ Public Class atcSWMMProject
         If lEndIndex < 0 Then lEndIndex = aTimeSeries.Dates.numValues
         For lIndex As Integer = lStartIndex To lEndIndex - 1
             If lIndex >= 1 Then
-                If Not aTimeSeries.Value(lIndex) > 0 Then
+                If Not aTimeSeries.Value(lIndex + 1) > 0 Then
                     Continue For
                 End If
             End If
