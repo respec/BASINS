@@ -57,7 +57,8 @@ Public Class atcSWMMEvaporation
                     Timeseries.Attributes.AddHistory("Read from " & pSWMMProject.Specification)
                     Timeseries.Attributes.SetValue("ID", Me.pSWMMProject.DatasetId(True))
                     If pSWMMProject.RainGages.Count > 0 Then
-                        Timeseries.Attributes.SetValue("interval", pSWMMProject.RainGages(0).TimeSeries.Attributes.GetValue("interval")) ' this is to go with the raingages' interval
+                        Dim lInterval As Double = pSWMMProject.RainGages(0).TimeSeries.Attributes.GetValue("interval")
+                        Timeseries.Attributes.SetValue("interval", lInterval) ' this is to go with the raingages' interval
                     End If
                     Timeseries.Attributes.SetValue("Location", pSWMMProject.FilterFileName(laTSFile.TrimEnd("E")))
                     Exit For
