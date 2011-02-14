@@ -171,7 +171,6 @@
     </Compile>
     <Compile Include="HspfUci.vb">
       <SubType>Code</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="modClsTserFile.vb">
       <SubType>Code</SubType>
