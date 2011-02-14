@@ -42,7 +42,7 @@ Module modCreateUci
         Dim lEchoFileName As String = ""
         Dim lFilesBlockStatus As Boolean = aUci.PreScanFilesBlock(lEchoFileName)
 
-        If aWatershed.MetSegments Is Nothing Then
+        If aWatershed.MetSegments Is Nothing OrElse aWatershed.MetSegments.Count = 0 Then
             'build initial met segment 
             aUci.MetSegs.Add(DefaultBASINSMetseg(aUci, aMetBaseDsn, aMetWdmId))
         Else
@@ -796,6 +796,7 @@ Module modCreateUci
                           ByVal aMFactP As Integer, ByVal aMFactR As Integer, ByVal aSgapstrg As String) _
                           As HspfMetSegRecord
         Dim lMetSegRecord As New HspfMetSegRecord
+        lMetSegRecord.Name = aMember
         lMetSegRecord.Source.VolName = aMetWdmId
         lMetSegRecord.Sgapstrg = ""
         lMetSegRecord.Ssystem = "ENGL"
