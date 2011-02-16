@@ -303,7 +303,7 @@ Public Class clsCatModelHSPF
         Get
             Dim lXML As String = ""
             lXML &= "<UCI>" & vbCrLf
-            lXML &= "  <FileName>" & pBaseModel & "</FileName>" & vbCrLf
+            lXML &= "  <FileName>" & ToXML(pBaseModel) & "</FileName>" & vbCrLf
             lXML &= "</UCI>" & vbCrLf
             Return lXML
         End Get

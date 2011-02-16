@@ -61,7 +61,7 @@ Public Class clsCat
             Else
                 lXML &= "<PreparedInputs>"
                 For Each lPreparedInput As String In PreparedInputs
-                    lXML &= "<PreparedInput>" & lPreparedInput & "</PreparedInput>" & vbCrLf
+                    lXML &= "<PreparedInput>" & ToXML(lPreparedInput) & "</PreparedInput>" & vbCrLf
                 Next
                 'For Each lPreparedInput As String In PreparedInputs
                 '    lXML &= "<PreparedInput selected=""" & lstInputs.CheckedItems.Contains(lPreparedInput)
@@ -79,7 +79,7 @@ Public Class clsCat
             Dim lStartFolder As String = CurDir()
             lXML = ReplaceStringNoCase(lXML, lStartFolder, StartFolderVariable)
             If lXML.Contains(StartFolderVariable) Then
-                lXML = "<StartFolder>" & lStartFolder & "</StartFolder>" & vbCrLf & lXML
+                lXML = "<StartFolder>" & ToXML(lStartFolder) & "</StartFolder>" & vbCrLf & lXML
             End If
 
             lXML = "<BasinsCAT>" & vbCrLf & lXML & "</BasinsCAT>" & vbCrLf

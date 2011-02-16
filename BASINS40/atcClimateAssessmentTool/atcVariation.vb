@@ -722,7 +722,7 @@ Public Class atcVariation
             If Seasons Is Nothing Then
                 Return ""
             Else
-                Return "  <Seasons Type='" & Seasons.GetType.Name & "'>" & vbCrLf _
+                Return "  <Seasons Type='" & ToXML(Seasons.GetType.Name) & "'>" & vbCrLf _
                      & "  " & Seasons.SeasonsSelectedXML & "  </Seasons>" & vbCrLf
             End If
         End Get
@@ -758,18 +758,18 @@ Public Class atcVariation
                 Dim lDataKey As String = aDataGroup.Keys(lIndex)
                 If Not lDataSet Is Nothing Then
                     lXML &= "    <DataSet"
-                    lXML &= " ID='" & lDataSet.Attributes.GetValue("ID") & "'"
+                    lXML &= " ID='" & ToXML(lDataSet.Attributes.GetValue("ID")) & "'"
                     If lDataSet.Attributes.ContainsAttribute("History 1") Then
-                        lXML &= " History='" & lDataSet.Attributes.GetValue("History 1") & "'"
+                        lXML &= " History='" & ToXML(lDataSet.Attributes.GetValue("History 1")) & "'"
                     End If
                     If lDataSet.Attributes.ContainsAttribute("Location") Then
-                        lXML &= " Location='" & lDataSet.Attributes.GetValue("Location") & "'"
+                        lXML &= " Location='" & ToXML(lDataSet.Attributes.GetValue("Location")) & "'"
                     End If
                     If lDataSet.Attributes.ContainsAttribute("Constituent") Then
-                        lXML &= " Constituent='" & lDataSet.Attributes.GetValue("Constituent") & "'"
+                        lXML &= " Constituent='" & ToXML(lDataSet.Attributes.GetValue("Constituent")) & "'"
                     End If
-                    If Not lDataKey Is Nothing Then
-                        lXML &= " Key='" & lDataKey & "'"
+                    If lDataKey IsNot Nothing Then
+                        lXML &= " Key='" & ToXML(lDataKey) & "'"
                     End If
                     lXML &= " />" & vbCrLf
                 End If
@@ -826,7 +826,7 @@ Public Class atcVariation
     Public Overridable Property XML() As String
         Get
             Dim lXML As String = "<Variation>" & vbCrLf _
-                 & "  <Name>" & Name & "</Name>" & vbCrLf
+                 & "  <Name>" & ToXML(Name) & "</Name>" & vbCrLf
             If Not Double.IsNaN(Min) Then
                 lXML &= "  <Min>" & Min & "</Min>" & vbCrLf
             End If
@@ -839,10 +839,10 @@ Public Class atcVariation
             If IsInput Then
                 lXML &= "  <IsInput>" & IsInput & "</IsInput>" & vbCrLf
             End If
-            lXML &= "  <Operation>" & Operation & "</Operation>" & vbCrLf
+            lXML &= "  <Operation>" & ToXML(Operation) & "</Operation>" & vbCrLf
             'lXML &= "  <AddRemovePer>" & AddRemovePer & "</AddRemovePer>" & vbCrLf
             If Not ComputationSource Is Nothing Then
-                lXML &= "  <ComputationSource>" & ComputationSource.Name & "</ComputationSource>" & vbCrLf
+                lXML &= "  <ComputationSource>" & ToXML(ComputationSource.Name) & "</ComputationSource>" & vbCrLf
             End If
             lXML &= "  <Selected>" & Selected & "</Selected>" & vbCrLf _
                  & GetDataGroupXML(DataSets, "DataSets") _
