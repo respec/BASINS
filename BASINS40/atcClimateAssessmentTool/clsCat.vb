@@ -260,12 +260,7 @@ StartOver:
             If PreparedInputs.Count = 0 Then
                 'header for attributes
                 For Each lVariation As atcVariation In aSelectedVariations
-                    .CellValue(0, lColumn) = lVariation.Name
-                    .CellValue(1, lColumn) = lVariation.Operation
-                    .CellValue(2, lColumn) = "Current Value"
-                    If Not lVariation.Seasons Is Nothing Then
-                        .CellValue(3, lColumn) = lVariation.Seasons.ToString
-                    End If
+                    LabelResultsColumn(lColumn, lVariation, Nothing)
                     lColumn += 1
                 Next
             End If
@@ -274,24 +269,83 @@ StartOver:
 
             For Each lVariation As atcVariation In aSelectedEndpoints
                 For Each lDataset As atcDataSet In lVariation.DataSets
-                    .CellValue(0, lColumn) = lVariation.Name
-                    If Not lVariation.Operation Is Nothing Then
-                        .CellValue(1, lColumn) = lVariation.Operation
-                    End If
-                    .CellValue(2, lColumn) = lDataset.ToString
-                    If Not lVariation.Seasons Is Nothing Then
-                        .CellValue(3, lColumn) = lVariation.Seasons.ToString
-                    End If
+                    LabelResultsColumn(lColumn, lVariation, lDataset)
                     lColumn += 1
                 Next
             Next
+
             .CellValue(.FixedRows, 0) = "base"
             .CellColor(.FixedRows, 0) = Drawing.SystemColors.Control
+            PopulateEndpoints(.FixedRows, Nothing)
 
-            PopulateEndpoints(.FixedRows, lFirstEndpointColumn, Nothing)
             ResultsRow = ResultsFixedRows + 1
         End With
     End Sub
+
+    Private Sub LabelResultsColumn(ByVal aColumn As Integer, ByVal aVariation As atcVariation, ByVal aDataset As atcDataSet)
+        With ResultsGrid
+            .CellValue(0, aColumn) = aVariation.Name
+            If aVariation.Operation IsNot Nothing Then
+                .CellValue(1, aColumn) = aVariation.Operation
+            End If
+
+            If aVariation.Seasons IsNot Nothing Then
+                .CellValue(2, aColumn) = aVariation.Seasons.ToString
+            End If
+
+            If aDataset IsNot Nothing Then
+                .CellValue(3, aColumn) = aDataset.ToString
+            Else
+                .CellValue(3, aColumn) = "Current Value"
+            End If
+        End With
+    End Sub
+
+    Private Function ResultsGridColumn(ByVal aVariation As atcVariation, ByVal aDataset As atcTimeseries) As Integer
+        With ResultsGrid
+            Dim lOperation As String = Nothing
+            Dim lSeason As String = Nothing
+            Dim lDataset As String = "Current Value"
+            If aVariation.Operation IsNot Nothing Then lOperation = aVariation.Operation.ToString
+            If aVariation.Seasons IsNot Nothing Then lSeason = aVariation.Seasons.ToString
+            If aDataset IsNot Nothing Then lDataset = aDataset.ToString
+            Dim lColumn As Integer = 1
+            While lColumn < .Columns
+                If .CellValue(0, lColumn) = aVariation.Name AndAlso _
+                   .CellValue(1, lColumn) = lOperation AndAlso _
+                   .CellValue(2, lColumn) = lSeason AndAlso _
+                   .CellValue(3, lColumn) = lDataset Then
+
+                    Return lColumn
+                End If
+                lColumn += 1
+            End While
+
+            'Column not found, create a new column for this variation/dataset
+            .Columns += 1
+            If aDataset Is Nothing Then 'Insert new input change in first column
+                lColumn = 1
+                For lRow As Integer = 0 To .Rows - 1
+                    For lMoveToColumn As Integer = .Columns - 1 To lColumn + 1 Step -1
+                        .CellValue(lRow, lMoveToColumn) = .CellValue(lRow, lMoveToColumn - 1)
+                    Next
+                    .CellValue(lRow, lColumn) = Nothing
+                Next
+            ElseIf SaveAll Then 'Insert new column as second-to-last column
+                lColumn -= 1
+                For lRow As Integer = 0 To .Rows - 1 'Move results path column so it stays far right
+                    .CellValue(lRow, .Columns - 1) = .CellValue(lRow, lColumn)
+                    .CellValue(lRow, lColumn) = Nothing
+                Next
+            Else
+                'Add new column as far right column
+            End If
+
+            LabelResultsColumn(lColumn, aVariation, aDataset)
+
+            Return lColumn
+        End With
+    End Function
 
     Private Sub Run(ByVal aModifiedModelName As String, _
                     ByVal aVariations As Generic.List(Of atcVariation), _
@@ -361,21 +415,23 @@ NextIteration:
                 With ResultsGrid
                     lColumn = .FixedColumns
 
+                    .CellColor(ResultsRow, 0) = Drawing.SystemColors.Control
+                    For lRunningColumn As Integer = lColumn To .Columns - 1
+                        .CellValue(ResultsRow, lRunningColumn) = "Running..."
+                    Next
+
                     If PreparedInputs.Count = 0 Then
                         .CellValue(ResultsRow, 0) = aIteration + 1
                         For Each lVariation As atcVariation In aVariations
+                            lColumn = ResultsGridColumn(lVariation, Nothing)
                             .CellValue(ResultsRow, lColumn) = Format(lVariation.CurrentValue, "0.####")
                             lThisRunVariations &= lVariation.ToString & " = " & .CellValue(ResultsRow, lColumn) & vbCrLf
                             lColumn += 1
                         Next
                     Else
                         .CellValue(ResultsRow, 0) = IO.Path.GetFileNameWithoutExtension(PathNameOnly(PreparedInputs.Item(aIteration)))
-                        '.CellValue(lRow, 0) = IO.Path.GetFileNameWithoutExtension(PathNameOnly(PreparedInputs.Item(lstInputs.CheckedIndices.Item(aIteration))))
                     End If
-                    .CellColor(ResultsRow, 0) = Drawing.SystemColors.Control
-                    For lRunningColumn As Integer = lColumn To .Columns - 1
-                        .CellValue(ResultsRow, lRunningColumn) = "Running..."
-                    Next
+
                     If SaveAll AndAlso .CellValue(0, .Columns - 1) = "Saved Results" Then
                         .CellValue(ResultsRow, .Columns - 1) = lModifiedFolder
                     End If
@@ -389,7 +445,17 @@ NextIteration:
                     TimePerRun = (Now.ToOADate - TimePerRun) * 24 * 60 * 60 'Convert days to seconds
                 End If
 
-                PopulateEndpoints(ResultsRow, lColumn, lResults)
+                PopulateEndpoints(ResultsRow, lResults)
+
+                'Remove any remaining cells still displaying Running status.
+                ' this happens when running with different inputs/endpoints than before and not clearing results grid
+                For lRunningColumn As Integer = ResultsGrid.FixedColumns To ResultsGrid.Columns - 1
+                    If ResultsGrid.CellValue(ResultsRow, lRunningColumn) = "Running..." Then
+                        ResultsGrid.CellValue(ResultsRow, lRunningColumn) = Nothing
+                        RaiseEvent UpdateResults()
+                    End If
+                Next
+
                 ResultsRow += 1
 
                 If SaveAll Then
@@ -474,7 +540,7 @@ NextIteration:
         End If
     End Sub
 
-    Private Sub PopulateEndpoints(ByVal aRow As Integer, ByVal aColumn As Integer, ByVal aResults As atcCollection)
+    Private Sub PopulateEndpoints(ByVal aRow As Integer, ByVal aResults As atcCollection)
         With ResultsGrid
             For Each lEndpoint As atcVariation In Endpoints
                 System.GC.Collect()
@@ -482,24 +548,25 @@ NextIteration:
                 If lEndpoint.Selected Then
                     For Each lOldData As atcTimeseries In lEndpoint.DataSets
                         Dim lData As atcTimeseries = Nothing
+                        Dim lColumn As Integer = ResultsGridColumn(lEndpoint, lOldData)
                         If aResults Is Nothing Then
                             lData = lOldData
                         Else
-                            .CellValue(aRow, aColumn) = "Opening..."
+                            .CellValue(aRow, lColumn) = "Opening..."
                             Dim lGroup As atcTimeseriesGroup = Nothing
                             Dim lOriginalDataSpec As String = lOldData.Attributes.GetValue("History 1", "").Substring(10)
                             Dim lResultDataSpec As String = aResults.ItemByKey(IO.Path.GetFileName(lOriginalDataSpec).ToLower.Trim)
                             If lResultDataSpec Is Nothing Then
-                                .CellValue(aRow, aColumn) = "ResultsDataSpec is Nothing for " & lOldData.ToString
-                                Logger.Dbg(.CellValue(aRow, aColumn))
+                                .CellValue(aRow, lColumn) = "ResultsDataSpec is Nothing for " & lOldData.ToString
+                                Logger.Dbg(.CellValue(aRow, lColumn))
                             Else
                                 Dim lResultDataSource As atcTimeseriesSource = OpenDataSource(lResultDataSpec)
                                 If lResultDataSource Is Nothing Then
-                                    .CellValue(aRow, aColumn) = "ResultsDataSource is Nothing for " & lResultDataSpec.ToString
-                                    Logger.Dbg(.CellValue(aRow, aColumn))
+                                    .CellValue(aRow, lColumn) = "ResultsDataSource is Nothing for " & lResultDataSpec.ToString
+                                    Logger.Dbg(.CellValue(aRow, lColumn))
                                 Else
                                     lGroup = lResultDataSource.DataSets.FindData("ID", lOldData.Attributes.GetValue("ID"), 1)
-                                    If Not (lGroup Is Nothing) AndAlso lGroup.Count > 0 Then
+                                    If lGroup IsNot Nothing AndAlso lGroup.Count > 0 Then
                                         lData = lGroup.Item(0)
                                     End If
                                 End If
@@ -510,26 +577,25 @@ NextIteration:
 
                             lData = lEndpoint.SplitData(lData, Nothing).ItemByIndex(0)
 
-                            .CellValue(aRow, aColumn) = lData.Attributes.GetFormattedValue(lEndpoint.Operation)
+                            .CellValue(aRow, lColumn) = lData.Attributes.GetFormattedValue(lEndpoint.Operation)
                             If .ColorCells Then
-                                If Not IsNumeric(.CellValue(aRow, aColumn)) Then
-                                    .CellColor(aRow, aColumn) = lEndpoint.ColorDefault
+                                If Not IsNumeric(.CellValue(aRow, lColumn)) Then
+                                    .CellColor(aRow, lColumn) = lEndpoint.ColorDefault
                                 Else
                                     Dim lValue As Double = lData.Attributes.GetValue(lEndpoint.Operation)
                                     If Not Double.IsNaN(lEndpoint.Min) AndAlso lValue < lEndpoint.Min Then
-                                        .CellColor(aRow, aColumn) = lEndpoint.ColorBelowMin
+                                        .CellColor(aRow, lColumn) = lEndpoint.ColorBelowMin
                                     ElseIf Not Double.IsNaN(lEndpoint.Max) AndAlso lValue > lEndpoint.Max Then
-                                        .CellColor(aRow, aColumn) = lEndpoint.ColorAboveMax
+                                        .CellColor(aRow, lColumn) = lEndpoint.ColorAboveMax
                                     Else
-                                        .CellColor(aRow, aColumn) = lEndpoint.ColorDefault
+                                        .CellColor(aRow, lColumn) = lEndpoint.ColorDefault
                                     End If
                                 End If
                             End If
                         Else
-                            .CellValue(aRow, aColumn) = "No Data for ID " & lOldData.Attributes.GetValue("ID")
-                            Logger.Dbg(.CellValue(aRow, aColumn))
+                            .CellValue(aRow, lColumn) = "No Data for ID " & lOldData.Attributes.GetValue("ID")
+                            Logger.Dbg(.CellValue(aRow, lColumn))
                         End If
-                        aColumn += 1
                     Next
                 End If
             Next
