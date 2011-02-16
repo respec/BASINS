@@ -1122,6 +1122,7 @@ Public Class frmCAT
             g_Running = value
             btnStart.Visible = Not value
             btnStart.Enabled = Not value
+            lblStart.Visible = Not value
             btnStop.Visible = value
 
             btnRefresh.Enabled = Not value
