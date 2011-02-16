@@ -14,9 +14,7 @@ Public Class atcDataSourceNOAA
     '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private Shared pFileFilter As String = "NOAA Files (*.txt)|*.txt|All Files (*,*)|*.*"
-    Private pErrorDescription As String
     Private pColDefs As Hashtable
-    'Private pReadAll As Boolean = False
 
     Public Overrides ReadOnly Property Description() As String
         Get
@@ -58,6 +56,7 @@ Public Class atcDataSourceNOAA
     End Function
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
+        Dim lSuccess As Boolean = True
         Dim lData As atcTimeseries
         Dim lDataObs As atcTimeseries = Nothing
         Dim lDataFilled As atcTimeseries
@@ -68,7 +67,8 @@ Public Class atcDataSourceNOAA
         End If
 
         If Not FileExists(aFileName) Then
-            pErrorDescription = "File '" & aFileName & "' not found"
+            Logger.Dbg("PROBLEM: file '" & aFileName & "' not found.")
+            lSuccess = False
         Else
             Me.Specification = aFileName
             Dim inStream As New FileStream(aFileName, FileMode.Open, FileAccess.Read)
@@ -86,8 +86,7 @@ Public Class atcDataSourceNOAA
             Dim dats(100) As Double 'array of julian dates
             Dim iVal As Integer = 0 'current index for populating vals and dats
 
-            'read 1st 3 chars to see which SOD format (short or long)
-            curLine = inReader.ReadChars(3)
+            curLine = NextLine(inReader)
             Dim lLongForm As Boolean = False
 
             pColDefs = New Hashtable
@@ -98,27 +97,31 @@ Public Class atcDataSourceNOAA
             Dim ColYear As ColDef
             Dim ColMonth As ColDef
             Dim ColRepeats As ColDef
-            If curLine = "DLY" Then 'short SOD format
-                ColRecType = AddColEnd(1, 3, "RecType")
-                ColLocation = AddColEnd(4, 9, "Location")
-                ColElementType = AddColEnd(12, 15, "ElementType")
-                ColUnits = AddColEnd(16, 17, "Units")
-                ColYear = AddColEnd(18, 21, "Year")
-                ColMonth = AddColEnd(22, 23, "Month")
-                ColRepeats = AddColEnd(28, 30, "Repeats")
-            ElseIf curLine = "320" OrElse curLine = "321" Then 'long SOD format (3200 or 3210)
-                lLongForm = True
-                ColRecType = AddColEnd(1, 3, "RecType")
-                ColLocation = AddColEnd(6, 11, "Location")
-                ColElementType = AddColEnd(53, 56, "ElementType")
-                ColUnits = AddColEnd(58, 59, "Units")
-                ColYear = AddColEnd(61, 64, "Year")
-                ColMonth = AddColEnd(65, 66, "Month")
-                'no # values element in this format
-                'ColRepeats = AddColEnd(28, 30, "Repeats")
-            End If
-            'reset to start of file
-            inReader.BaseStream.Position = 0
+
+            Select Case curLine.Substring(0, 3)
+                Case "DLY" 'short SOD format
+                    ColRecType = AddColEnd(1, 3, "RecType")
+                    ColLocation = AddColEnd(4, 9, "Location")
+                    ColElementType = AddColEnd(12, 15, "ElementType")
+                    ColUnits = AddColEnd(16, 17, "Units")
+                    ColYear = AddColEnd(18, 21, "Year")
+                    ColMonth = AddColEnd(22, 23, "Month")
+                    ColRepeats = AddColEnd(28, 30, "Repeats")
+                Case "320", "321"  'long SOD format (3200 or 3210)
+                    lLongForm = True
+                    ColRecType = AddColEnd(1, 3, "RecType")
+                    ColLocation = AddColEnd(6, 11, "Location")
+                    ColElementType = AddColEnd(53, 56, "ElementType")
+                    ColUnits = AddColEnd(58, 59, "Units")
+                    ColYear = AddColEnd(61, 64, "Year")
+                    ColMonth = AddColEnd(65, 66, "Month")
+                    ColRepeats = Nothing 'no ColRepeats number of values element in this format
+                Case Else
+                    Logger.Dbg("PROBLEM: Test of format for file '" & aFileName & "' failed." & vbCrLf & _
+                               "Be sure this file follows the accepted NOAA TD-3200 format. First three characters expected to be DLY, 320 or 321.")
+                    lSuccess = False
+                    GoTo CloseAll
+            End Select
 
             'These columns can repeat multiple times per line
             Dim ColDay(0) As ColDef
@@ -130,16 +133,9 @@ Public Class atcDataSourceNOAA
             RedimensionRepeating(lLongForm, maxRepeat, ColDay, ColHour, ColValue, ColFlag1, ColFlag2)
 
             Try
-                curLine = NextLine(inReader)
                 PopulateColumns(curLine)
-                If ColRecType.Value = "DLY" Then 'read # repeats from record
-                    repeatsThisLine = ColRepeats.Value
-                Else 'determine # repeats from year/month
-                    repeatsThisLine = DayMon(ColYear.Value, ColMonth.Value)
-                End If
 
-                If ((ColRecType.Value = "DLY" Or ColRecType.Value = "320" Or ColRecType.Value = "321") AndAlso _
-                   IsNumeric(ColValue(0).Value) AndAlso _
+                If IsNumeric(ColValue(0).Value) AndAlso _
                    IsNumeric(ColYear.Value) AndAlso _
                    IsNumeric(ColMonth.Value) AndAlso _
                    IsNumeric(ColDay(0).Value) AndAlso _
@@ -148,7 +144,7 @@ Public Class atcDataSourceNOAA
                    ColMonth.Value < 13 AndAlso _
                    ColDay(0).Value > 0 AndAlso _
                    ColDay(0).Value < 32 AndAlso _
-                   (ColHour(0).Value < 26 Or ColHour(0).Value = 99)) Then
+                   (ColHour(0).Value < 26 OrElse ColHour(0).Value = 99) Then
 
                     Dim InMissing As Boolean = False
                     Dim InAccum As Boolean = False
@@ -156,6 +152,11 @@ Public Class atcDataSourceNOAA
                     Dim lTSInd As Integer
                     Dim lInd As Integer
                     Do
+                        If ColRecType.Value = "DLY" Then 'read # repeats from record
+                            repeatsThisLine = ColRepeats.Value
+                        Else 'determine # repeats from year/month
+                            repeatsThisLine = DayMon(ColYear.Value, ColMonth.Value)
+                        End If
                         If repeatsThisLine > maxRepeat Then
                             maxRepeat = repeatsThisLine
                             RedimensionRepeating(lLongForm, maxRepeat, ColDay, ColHour, ColValue, ColFlag1, ColFlag2)
@@ -169,17 +170,19 @@ Public Class atcDataSourceNOAA
                             lData.numValues = lBufSiz
                             lData.Value(0) = GetNaN()
                             lData.Dates.Value(0) = GetNaN()
-                            lData.Attributes.SetValue("Count", 0)
-                            lData.Attributes.SetValue("Scenario", "OBSERVED")
-                            lData.Attributes.SetValue("Location", ColLocation.Value)
-                            lData.Attributes.SetValue("Constituent", ColElementType.Value)
-                            lData.Attributes.SetValue("Description", "Summary of the Day")
-                            lData.Attributes.SetValue("tu", 4)
-                            lData.Attributes.SetValue("ts", 1)
-                            lData.Attributes.SetValue("point", False)
-                            lData.Attributes.SetValue("TSFILL", MissingVal)
-                            lData.Attributes.SetValue("MVal", MissingVal)
-                            lData.Attributes.SetValue("MAcc", MissingAcc)
+                            With lData.Attributes
+                                .SetValue("Count", 0)
+                                .SetValue("Scenario", "OBSERVED")
+                                .SetValue("Location", ColLocation.Value)
+                                .SetValue("Constituent", ColElementType.Value)
+                                .SetValue("Description", "Summary of the Day")
+                                .SetValue("tu", 4)
+                                .SetValue("ts", 1)
+                                .SetValue("point", False)
+                                .SetValue("TSFILL", MissingVal)
+                                .SetValue("MVal", MissingVal)
+                                .SetValue("MAcc", MissingAcc)
+                            End With
                             DataSets.Add(lTSKey, lData)
                             lDataObs = lData.Clone
                             lDataObs.Attributes.SetValue("Count", 0)
@@ -251,17 +254,11 @@ Public Class atcDataSourceNOAA
                         curLine = NextLine(inReader)
                         'Logger.Progress("Processing NOAA SOD File", inStream.Position, inStream.Length)
                         PopulateColumns(curLine)
-                        If ColRecType.Value = "DLY" Then 'read # repeats from record
-                            repeatsThisLine = ColRepeats.Value
-                        Else 'determine # repeats from year/month
-                            repeatsThisLine = DayMon(ColYear.Value, ColMonth.Value)
-                        End If
                     Loop
-                    Open = True
                 Else
-                    Logger.Dbg("PROBLEM:  Test of format for file " & aFileName & " failed." & vbCrLf & _
-                               "Be sure this file follows the accepted NOAA TD-3200 format.")
-                    Open = False
+                    Logger.Dbg("PROBLEM: Test of format for file '" & aFileName & "' failed." & vbCrLf & _
+                               "Be sure this file follows the accepted NOAA TD-3200 format. Non-numeric column or value out of range.")
+                    lSuccess = False
                 End If
             Catch endEx As EndOfStreamException
                 Dim lDataSets As New atcTimeseriesGroup
@@ -284,12 +281,13 @@ Public Class atcDataSourceNOAA
                 For Each lData In lDataSets
                     DataSets.Add(lData)
                 Next
-                Open = True
             End Try
+CloseAll:
             inReader.Close()
             inBuffer.Close()
             inStream.Close()
-            End If
+        End If
+        Return lSuccess
     End Function
 
     Private Sub RedimensionRepeating(ByVal aLongForm As Boolean, _
