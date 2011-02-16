@@ -245,7 +245,7 @@ Public Class clsCatModelSWMM
         Get
             Dim lXML As String = ""
             lXML &= "<INP>" & vbCrLf
-            lXML &= "  <FileName>" & pBaseModel & "</FileName>" & vbCrLf
+            lXML &= "  <FileName>" & ToXML(pBaseModel) & "</FileName>" & vbCrLf
             lXML &= "</INP>" & vbCrLf
             Return lXML
         End Get

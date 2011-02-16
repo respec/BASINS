@@ -346,8 +346,8 @@ ALREADYSET:
         Get
             Dim lXML As String = ""
             lXML &= "<SWAT>" & vbCrLf
-            lXML &= "  <FileName>" & pBaseModel & "</FileName>" & vbCrLf
-            lXML &= "  <SWATDatabase>" & SWATDatabasePath & "</SWATDatabase>" & vbCrLf
+            lXML &= "  <FileName>" & ToXML(pBaseModel) & "</FileName>" & vbCrLf
+            lXML &= "  <SWATDatabase>" & ToXML(SWATDatabasePath) & "</SWATDatabase>" & vbCrLf
             lXML &= "</SWAT>" & vbCrLf
             Return lXML
         End Get
