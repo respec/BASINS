@@ -516,7 +516,7 @@ Public Class clsHTMLBuilder
         If Text = "" Then
             Return "&nbsp;"
         Else
-            Return Text.Replace("<", "&lt;").Replace(">", "&gt;").Replace("&", "&amp;").Replace("""", "&quot;").Replace("'", "&apos;").Replace("\n", "<br>")
+            Return Text.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("""", "&quot;").Replace("'", "&apos;").Replace("\n", "<br>")
         End If
     End Function
 
