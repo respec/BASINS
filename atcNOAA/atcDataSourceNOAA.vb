@@ -138,7 +138,7 @@ Public Class atcDataSourceNOAA
                     repeatsThisLine = DayMon(ColYear.Value, ColMonth.Value)
                 End If
 
-                If ((ColRecType.Value = "DLY" Or ColRecType.Value = "320") AndAlso _
+                If ((ColRecType.Value = "DLY" Or ColRecType.Value = "320" Or ColRecType.Value = "321") AndAlso _
                    IsNumeric(ColValue(0).Value) AndAlso _
                    IsNumeric(ColYear.Value) AndAlso _
                    IsNumeric(ColMonth.Value) AndAlso _
