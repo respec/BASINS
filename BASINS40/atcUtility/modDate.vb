@@ -358,7 +358,7 @@ Public Module modDate
     ''' return the number of days in the given month for the given 
     ''' year, with leap year taken into account.  
     ''' </summary>
-    ''' <param name="aYr">year, valid range is 1 - 2080</param>
+    ''' <param name="aYr">year, valid range is 1 - 9999</param>
     ''' <param name="aMo">month, valid range is 1 - 12</param>
     ''' <returns>number of days</returns>
     ''' <remarks>
@@ -371,7 +371,7 @@ Public Module modDate
         If aMo < 1 OrElse aMo > 12 Then
             lDayMon = -1 'invalid month
         ElseIf aMo = 2 Then  'check for leap year
-            If aYr <= 0 Or aYr > 2080 Then 'invalid year
+            If aYr <= 0 Or aYr > 9999 Then 'invalid year
                 lDayMon = 28
             ElseIf aYr Mod 100 = 0 Then 'check whether this is a leap year on a century boundary
                 If aYr Mod 400 = 0 Then 'on a 400 year boundary
