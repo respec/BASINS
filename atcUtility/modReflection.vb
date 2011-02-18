@@ -17,6 +17,17 @@ Public Module modReflection
     ''' <summary>
     ''' Extracts an embedded file out of a given assembly as a string
     ''' </summary>
+    ''' <param name="fileName">Name of the file to extract.</param>
+    ''' <returns>A string containing the file data.</returns>
+    Public Function GetEmbeddedFileAsString(ByVal fileName As String, ByVal aFullResourceName As String) As String
+        Dim lAssembly As Assembly = Assembly.GetCallingAssembly
+        Dim lReader As New IO.StreamReader(lAssembly.GetManifestResourceStream(aFullResourceName))
+        Return lReader.ReadToEnd()
+    End Function
+
+    ''' <summary>
+    ''' Extracts an embedded file out of a given assembly as a string
+    ''' </summary>
     ''' <param name="aAssembly">Assembly file is embedded in.</param>
     ''' <param name="fileName">Name of the file to extract.</param>
     ''' <returns>A string containing the file data.</returns>
