@@ -10,10 +10,6 @@ Public Module modReflection
 
     Private pDontNeedTest As ArrayList
 
-    'Private Function GetEmbeddedFileAsStream(ByVal fileName As String, ByVal aAssembly As Assembly) As IO.Stream
-    '    Return aAssembly.GetManifestResourceStream(aAssembly.GetName().Name + "." + fileName)
-    'End Function
-
     ''' <summary>
     ''' Extracts an embedded file out of a given assembly as a string
     ''' </summary>
@@ -41,21 +37,21 @@ Public Module modReflection
         Try
             If aAssembly Is Nothing Then aAssembly = Assembly.GetCallingAssembly
             Dim lPrefixName As String = aPrefixName
-            If lPrefixName.Length = 0 Then
+            If String.IsNullOrEmpty(lPrefixName) Then
                 lPrefixName = aAssembly.GetName().Name
             End If
-            Logger.Dbg("Assembly " & aAssembly.GetName().Name & " PrefixName " & lPrefixName & " FileName " & aFileName)
-            Dim lStream As IO.Stream = aAssembly.GetManifestResourceStream(lPrefixName + "." + aFileName)
+            Logger.Dbg("GetEmbeddedFileAsBinaryReader '" & lPrefixName & "." & aFileName & "' from assembly " & aAssembly.GetName().Name)
+            Dim lStream As IO.Stream = aAssembly.GetManifestResourceStream(lPrefixName & "." & aFileName)
             If lStream Is Nothing Then
-                Logger.Dbg("FailedToGetStream")
+                Logger.Dbg("GetEmbeddedFileAsBinaryReader:FailedToGetStream")
                 Return Nothing
             End If
             Logger.Dbg("StreamLength " & lStream.Length)
             Dim lBinaryReader As New IO.BinaryReader(lStream)
-            Logger.Dbg("BinaryReader " & lBinaryReader.PeekChar)
+            'Logger.Dbg("BinaryReader " & lBinaryReader.PeekChar)
             Return lBinaryReader
         Catch lEx As Exception
-            Logger.Dbg(lEx.Message)
+            Logger.Dbg(lEx.ToString)
             Return Nothing
         End Try
     End Function
