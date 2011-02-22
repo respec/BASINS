@@ -139,6 +139,12 @@ Module BatchHSPF
         SetMetSegmentGrid(AtcGridMet, pMetStations, pUniqueModelSegmentNames, pUniqueModelSegmentIds, _
                           pSubbasinLayerName, pSubbasinFieldName, pSubbasinSegmentName)
 
+        'use a single met station
+        pUniqueModelSegmentIds.Add(1)
+        'assign appropriate wdm id
+        Dim lMetWdmIds As New atcCollection
+        lMetWdmIds.Add(0, "WDM2")
+
         Dim lOutputPath As String = pOutputPath & "HSPF"
 
         'now start the processing
@@ -146,7 +152,7 @@ Module BatchHSPF
                               pSubbasinLayerName, pLandUseLayerName) Then 'early checks OK
             Logger.Status("Preparing HSPF Setup")
             If SetupHSPF(AtcGridPervious, _
-                         pMetStations, pMetBaseDsns, _
+                         pMetBaseDsns, lMetWdmIds, _
                          pUniqueModelSegmentNames, pUniqueModelSegmentIds, _
                          lOutputPath, pBaseOutputName, _
                          pSubbasinLayerName, pSubbasinFieldName, pSubbasinSlopeName, _
