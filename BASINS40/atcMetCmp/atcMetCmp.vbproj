@@ -1,4 +1,5 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
     <ProductVersion>9.0.30729</ProductVersion>
@@ -30,11 +31,12 @@
     <MyType>Windows</MyType>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
-    <OldToolsVersion>2.0</OldToolsVersion>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
+    <OutputPath>..\local\AnyDebug\Plugins\BASINS\</OutputPath>
     <DocumentationFile>atcMetCmp.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
@@ -49,7 +51,7 @@
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningLevel>1</WarningLevel>
-    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -68,13 +70,13 @@
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningLevel>1</WarningLevel>
-    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
     <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MapWinInterfaces">
       <Name>MapWinInterfaces</Name>
-      <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
+      <HintPath>..\local\AnyDebug\MapWinInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System">
@@ -92,9 +94,8 @@
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcData\atcData.vbproj">
-      <Name>atcData</Name>
       <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
-      <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
+      <Name>atcData</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
@@ -144,6 +145,8 @@
     <Compile Include="modMetCompute.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="modPenmanMonteith_SWAT.vb" />
+    <Compile Include="modSWAT_MetUtil.vb" />
     <EmbeddedResource Include="frmCmpHPET.resx">
       <DependentUpon>frmCmpHPET.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -180,11 +183,14 @@
   <ItemGroup>
     <Folder Include="My Project\" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="AllStns.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>copy atcMetCmp.* ..\..\..\x64Debug\Plugins\BASINS
+copy atcMetCmp.* ..\..\..\x86Debug\Plugins\BASINS</PostBuildEvent>
   </PropertyGroup>
 </Project>
