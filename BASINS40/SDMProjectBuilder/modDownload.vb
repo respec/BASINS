@@ -31,7 +31,7 @@ Public Module modDownload
     Private Function GetSelectedRegion() As String
         Try
             Dim lNumSelected As Integer = g_MapWin.View.SelectedShapes.NumSelected
-            If lNumSelected > 0 Then
+            If lNumSelected = 1 Then
                 Dim lXML As String = ""
                 Dim lThemeTag As String = ""
                 Dim lFieldName As String = ""
@@ -219,12 +219,16 @@ Public Module modDownload
                 Using lLevel As New ProgressLevel(True)
                     If lBuildForm.FindText(lHuc) Then
                         lRegion = GetSelectedRegion()
-                        lCreatedMapWindowProjectFilename = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
+                        If String.IsNullOrEmpty(lRegion) Then
+                            Logger.Dbg("Region not found for " & lHuc)
+                        Else
+                            lCreatedMapWindowProjectFilename = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
 
-                        If IO.File.Exists(lCreatedMapWindowProjectFilename) Then
-                            Logger.Status("Finished Building " & g_MapWin.Project.FileName, True)
-                            WriteParametersTextFile(lParametersFilename, lCreatedMapWindowProjectFilename)
-                            IO.File.Copy(lParametersFilename, IO.Path.Combine(IO.Path.GetDirectoryName(g_MapWin.Project.FileName), PARAMETER_FILE))
+                            If IO.File.Exists(lCreatedMapWindowProjectFilename) Then
+                                Logger.Status("Finished Building " & g_MapWin.Project.FileName, True)
+                                WriteParametersTextFile(lParametersFilename, lCreatedMapWindowProjectFilename)
+                                IO.File.Copy(lParametersFilename, IO.Path.Combine(IO.Path.GetDirectoryName(g_MapWin.Project.FileName), PARAMETER_FILE))
+                            End If
                         End If
                     Else
                         Logger.Dbg("Could not find region '" & lHuc)
@@ -239,19 +243,21 @@ Public Module modDownload
                     g_MapWin.Project.Save(IO.Path.GetDirectoryName(lNationalProjectFilename) & g_PathChar & "huc8only.mwprj")
                 End If
             Next
-            'lHuc = Nothing
             Logger.Msg("Finished Building " & lHucIndex & " Projects", g_AppNameLong)
             lCreatedMapWindowProjectFilename = ""
         Else
-            'lHuc = Nothing
             lRegion = GetSelectedRegion()
-            lCreatedMapWindowProjectFilename = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
+            If String.IsNullOrEmpty(lRegion) Then
+                Logger.Msg("Exactly one HUC-8 or HUC-12 must be selected to build a project")
+            Else
+                lCreatedMapWindowProjectFilename = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
 
-            If IO.File.Exists(lCreatedMapWindowProjectFilename) Then
-                Logger.Status("")
-                Logger.Msg("Finished Building " & g_MapWin.Project.FileName, g_AppNameLong)
-                WriteParametersTextFile(lParametersFilename, lCreatedMapWindowProjectFilename)
-                IO.File.Copy(lParametersFilename, IO.Path.Combine(IO.Path.GetDirectoryName(g_MapWin.Project.FileName), PARAMETER_FILE))
+                If IO.File.Exists(lCreatedMapWindowProjectFilename) Then
+                    Logger.Status("")
+                    Logger.Msg("Finished Building " & g_MapWin.Project.FileName, g_AppNameLong)
+                    WriteParametersTextFile(lParametersFilename, lCreatedMapWindowProjectFilename)
+                    IO.File.Copy(lParametersFilename, IO.Path.Combine(IO.Path.GetDirectoryName(g_MapWin.Project.FileName), PARAMETER_FILE))
+                End If
             End If
         End If
         Return lCreatedMapWindowProjectFilename
@@ -1893,9 +1899,9 @@ RetryQuery:
                     Dim lShapeIndex As Integer = g_MapWin.View.SelectedShapes.Item(lSelected).ShapeIndex()
                     Dim lCurLayer As MapWinGIS.Shapefile = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
                     Return lCurLayer.Shape(lShapeIndex)
-                    Dim lCurLayerDS As New MapWinGIS.Shapefile
-                    lCurLayerDS.Open(lCurLayer.Filename)
-                    Return lCurLayerDS.Shape(lShapeIndex)
+                    'Dim lCurLayerDS As New MapWinGIS.Shapefile
+                    'lCurLayerDS.Open(lCurLayer.Filename)
+                    'Return lCurLayerDS.Shape(lShapeIndex)
                 Next
             End If
         Catch e As Exception
