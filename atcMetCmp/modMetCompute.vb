@@ -10,7 +10,7 @@ Public Module modMetCompute
 
     Friend MetComputeLatitudeMax As Double = 66.5
     Friend MetComputeLatitudeMin As Double = -66.5
-    Private Const DegreesToRadians As Double = 0.01745329252
+    Friend Const DegreesToRadians As Double = 0.01745329252
 
     Private X1() As Double = {0, 10.00028, 41.0003, 69.22113, 100.5259, 130.8852, 161.2853, _
                           191.7178, 222.1775, 253.66, 281.1629, 309.6838, 341.221}
