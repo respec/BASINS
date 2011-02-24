@@ -164,6 +164,18 @@ Public Class SwatWeatherStations
         End With
         Me.Add(lStation)
     End Sub
+
+    Public Function NearestStation(ByVal aLat As Double, ByVal aLng As Double) As Integer
+        Dim lDistanceMin As Double = 1.0E+30
+        Dim lNearestStation As Integer = -1
+        For Each lStation As SwatWeatherStation In Me
+            Dim lDistanceNow As Double = Spatial.GreatCircleDistance(lStation.Lng, lStation.Lat, aLng, aLng)
+            If lDistanceNow < lDistanceMin Then
+                lNearestStation = lStation.Id
+            End If
+        Next
+        Return lNearestStation
+    End Function
 End Class
 
 Public Class SwatWeatherStation
