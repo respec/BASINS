@@ -118,6 +118,7 @@
     <Compile Include="atcMetCmpPlugin.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="clsRandomNumber.vb" />
     <Compile Include="frmCmpHPET.vb">
       <SubType>Form</SubType>
     </Compile>

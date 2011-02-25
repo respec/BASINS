@@ -12,9 +12,6 @@ Module MetCmp_PenmanMonteith
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Logger.Dbg("MetCmp_PenmanMonteith Start")
-
-        Dim lElevation As Double = 1000.0
-
         Dim lFile As String = pWdmDataPath & pMetStation & ".wdm"
         Dim lWDMFile As atcWDM.atcDataSourceWDM = New atcWDM.atcDataSourceWDM
         If lWDMFile.Open(lFile) AndAlso lWDMFile.DataSets.Count > 0 Then
@@ -28,8 +25,17 @@ Module MetCmp_PenmanMonteith
             If lSJD < lEJD Then 'common period found
                 lPrecipitationTS = SubsetByDate(lPrecipitationTS, lSJD, lEJD, Nothing)
                 lAirTemperatureTS = SubsetByDate(lAirTemperatureTS, lSJD, lEJD, Nothing)
+                Dim pSwatWeatherStations As New SwatWeatherStations
+                Dim lLatitude As Double = 33.6
+                Dim lLongitude As Double = -84
+                Dim lNearestStations As SortedList(Of Double, PointLocation) = pSwatWeatherStations.Closest(lLatitude, lLongitude, 5)
+                Dim lNearestStation As SwatWeatherStation = lNearestStations.Values(0)
+
+                'TODO: get actual elevation of location rather than using station elveation
+                Dim lElevation As Double = lNearestStation.Elev / 0.3048
+                lElevation = 1010 'from BASINS StationLocs.dbf record 3500
                 Dim lPanEvapTimeseries As atcTimeseries = _
-                    PanEvaporationTimeseriesComputedByPenmanMonteith(lElevation, lPrecipitationTS, lAirTemperatureTS, Nothing, pMetId)
+                    PanEvaporationTimeseriesComputedByPenmanMonteith(lElevation, lPrecipitationTS, lAirTemperatureTS, Nothing, lNearestStation)
                 lPanEvapTimeseries.Attributes.CalculateAll()
                 Logger.Dbg("Attributes " & lPanEvapTimeseries.Attributes.ToString)
             End If

@@ -11,17 +11,23 @@ Public MustInherit Class PointLocations
     ''' <summary>Opens specified table and fills locations</summary>
     ''' <param name="aFileName">Name of containing table</param>
     ''' <remarks>Existing external file in current directory used before internal default version of file</remarks>
-    Public Sub New(ByVal aFileName As String)
+    Public Sub New(ByVal aFileName As String, Optional ByVal aNamespace As String = "D4EMLite")
         Dim lPointTable As New atcUtility.atcTableDelimited
         With lPointTable
-            .Delimiter = Delimeter
+            .Delimiter = Delimeter()
             If IO.File.Exists(aFileName) Then
                 MapWinUtility.Logger.Dbg("UsingExternalFile " & aFileName & " in " & IO.Directory.GetCurrentDirectory)
                 .OpenFile(aFileName)
             Else
                 MapWinUtility.Logger.Dbg("UsingInternalFile " & aFileName)
-                Dim lAssembly As System.Reflection.Assembly = System.Reflection.Assembly.GetExecutingAssembly
-                Dim lReader As New IO.StreamReader(lAssembly.GetManifestResourceStream("D4EMLite." + aFileName))
+                Dim lAssembly As System.Reflection.Assembly = System.Reflection.Assembly.GetCallingAssembly
+                Dim lReader As IO.StreamReader
+                Try
+                    lReader = New IO.StreamReader(lAssembly.GetManifestResourceStream(aNamespace & "." & aFileName))
+                Catch
+                    lAssembly = System.Reflection.Assembly.GetExecutingAssembly
+                    lReader = New IO.StreamReader(lAssembly.GetManifestResourceStream(aNamespace & "." & aFileName))
+                End Try
                 .OpenString(lReader.ReadToEnd())
             End If
             MapWinUtility.Logger.Dbg("  Opened with FieldCount " & .NumFields & " RecordCount " & .NumRecords)
