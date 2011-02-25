@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
@@ -31,7 +31,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.0</TargetFrameworkVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -47,9 +47,10 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
+    <OutputPath>..\local\AnyDebug\Plugins\BASINS\</OutputPath>
     <DocumentationFile>atcClimateAssessmentTool.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
@@ -68,7 +69,7 @@
     <DebugType>full</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
+    <OutputPath>..\local\AnyRelease\Plugins\BASINS\</OutputPath>
     <DocumentationFile>atcClimateAssessmentTool.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
@@ -90,7 +91,7 @@
     <DebugSymbols>false</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\Bin64\</OutputPath>
+    <OutputPath>..\local\x64Debug\Plugins\BASINS\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>atcClimateAssessmentTool.xml</DocumentationFile>
     <WarningLevel>1</WarningLevel>
@@ -103,7 +104,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\Bin64\</OutputPath>
+    <OutputPath>..\local\x64Release\Plugins\BASINS\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>atcClimateAssessmentTool.xml</DocumentationFile>
     <Optimize>true</Optimize>
@@ -113,6 +114,30 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\local\x86Debug\Plugins\BASINS\</OutputPath>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>atcClimateAssessmentTool.xml</DocumentationFile>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\local\x86Release\Plugins\BASINS\</OutputPath>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>atcClimateAssessmentTool.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MapWinInterfaces">
@@ -125,6 +150,10 @@
       <HintPath>..\..\MapWindow4Dev\Bin64\MapWinUtility.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="SwatObject, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\Plugins\BASINS\SwatObject.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -135,10 +164,6 @@
       <Name>System.Windows.Forms</Name>
     </Reference>
     <Reference Include="System.XML" />
-    <ProjectReference Include="..\..\SwatObject\SwatObject10.vbproj">
-      <Project>{724F2B12-E252-4493-BE02-708FF8C5D56E}</Project>
-      <Name>SwatObject10</Name>
-    </ProjectReference>
     <ProjectReference Include="..\atcCligen\atcCligen10.vbproj">
       <Project>{2EBD52CD-4BB4-4EC9-BE11-1101602958A2}</Project>
       <Name>atcCligen10</Name>
@@ -241,6 +266,12 @@
     <Compile Include="clsCatModelHSPF.vb" />
     <Compile Include="clsCatModelSWAT.vb" />
     <Compile Include="clsCatModelSWMM.vb" />
+    <Compile Include="frmAttributes.Designer.vb">
+      <DependentUpon>frmAttributes.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAttributes.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmCAT.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -263,6 +294,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="modSwatMetData.vb" />
+    <EmbeddedResource Include="frmAttributes.resx">
+      <DependentUpon>frmAttributes.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmCAT.resx">
       <DependentUpon>frmCAT.vb</DependentUpon>
       <SubType>Designer</SubType>
