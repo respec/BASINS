@@ -1,9 +1,8 @@
 ﻿Imports atcData
 Imports atcUtility
+Imports System.Collections.Generic
 
-''' <summary>
-''' Computes PenmanMonteith PET based on code from SWAT
-''' </summary>
+''' <summary>Computes PenmanMonteith PET based on code from SWAT 2005</summary>
 ''' <remarks></remarks>
 Public Module modPenmanMonteith_SWAT
     Dim pSwatWeatherStations As SwatWeatherStations
@@ -32,18 +31,20 @@ Public Module modPenmanMonteith_SWAT
         MinAirTemperatureDistribution = New UniformDistribution(392682216)
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aElevation"></param>
+    ''' <param name="aPrecipitationTS"></param>
+    ''' <param name="aAirTemperatureTS"></param>
+    ''' <param name="aSource"></param>
+    ''' <param name="aSwatStationId"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
     Public Function PanEvaporationTimeseriesComputedByPenmanMonteith(ByVal aElevation As Double, ByVal aPrecipitationTS As atcTimeseries, ByVal aAirTemperatureTS As atcTimeseries,
-                                                                     ByVal aSource As atcTimeseriesSource, Optional ByVal aSwatStationId As Integer = -1) As atcTimeseries
+                                                                     ByVal aSource As atcTimeseriesSource, ByVal aSwatWeatherStation As SwatWeatherStation) As atcTimeseries
         InitRandomNumbers()
 
-        If (pSwatWeatherStations Is Nothing OrElse pSwatWeatherStations.Count = 0) Then
-            pSwatWeatherStations = New SwatWeatherStations
-        End If
-        Dim lSwatStationId As Integer = aSwatStationId
-        If lSwatStationId < 0 Then 'find nearest swat station id
-            lSwatStationId = 203 'GAATLANTAWBAIRPORT
-        End If
-        Dim lStation As SwatWeatherStation = pSwatWeatherStations.Item(lSwatStationId - 1)
 
         Dim lPrecipitationTS As atcTimeseries = Aggregate(aPrecipitationTS, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
         Dim lAirTemperatureMinTS As atcTimeseries = Aggregate(aAirTemperatureTS, atcTimeUnit.TUDay, 1, atcTran.TranMin)
@@ -63,7 +64,7 @@ Public Module modPenmanMonteith_SWAT
         lPanEvapTimeSeries = lAirTemperatureMinTS.Clone
         With lPanEvapTimeSeries
             .Attributes.SetValue("Constituent", "PMET")
-            .Attributes.SetValue("Location", lStation)
+            .Attributes.SetValue("Location", aSwatWeatherStation)
             .Attributes.SetValue("ID", aAirTemperatureTS + 6)
             .Attributes.SetValue("TU", atcTimeUnit.TUDay)
             .Attributes.SetValue("description", "Daily SWAT PM ET mm")
@@ -81,7 +82,7 @@ Public Module modPenmanMonteith_SWAT
             .Dates.Values = NewDates(lSJDate, lEJDate, atcTimeUnit.TUDay, 1)
             .Values(0) = 0.0
             For lDateIndex As Integer = 1 To lAirTemperatureMinTS.numValues
-                .Values(lDateIndex) = PanEvaporationValueComputerbyPenmanMonteith(.Dates.Value(lDateIndex), lElevation, lStation, lAirTemperatureMinTS.Value(lDateIndex), lAirTemperatureMaxTS.Value(lDateIndex), lPrecipitationTS.Value(lDateIndex), 0)
+                .Values(lDateIndex) = PanEvaporationValueComputerbyPenmanMonteith(.Dates.Value(lDateIndex), lElevation, aSwatWeatherStation, lAirTemperatureMinTS.Value(lDateIndex), lAirTemperatureMaxTS.Value(lDateIndex), lPrecipitationTS.Value(lDateIndex), 0)
             Next
         End With
 
@@ -91,6 +92,18 @@ Public Module modPenmanMonteith_SWAT
         Return lPanEvapTimeSeries
     End Function
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aJDate"></param>
+    ''' <param name="aElevation"></param>
+    ''' <param name="aStation"></param>
+    ''' <param name="aAirTemperatureMin"></param>
+    ''' <param name="aAirtemperatureMax"></param>
+    ''' <param name="aPrecipitation"></param>
+    ''' <param name="aCo2Conc"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
     Function PanEvaporationValueComputerbyPenmanMonteith(ByVal aJDate As Double, ByVal aElevation As Double, _
                                                          ByVal aStation As SwatWeatherStation, _
                                                          ByVal aAirTemperatureMin As Double, ByVal aAirtemperatureMax As Double, _
@@ -214,6 +227,13 @@ Public Module modPenmanMonteith_SWAT
         Next
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aV1"></param>
+    ''' <param name="av2"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
     Private Function Dstn(ByVal aV1 As Single, ByVal av2 As Single) As Single
         Dim lDstn As Single = Math.Sqrt(-2.0 * Math.Log(aV1)) * Math.Cos(6.283185 * av2)
         Return lDstn

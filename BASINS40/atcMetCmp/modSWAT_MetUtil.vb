@@ -89,104 +89,35 @@ Module modSWAT_MetUtil
 End Module
 
 Public Class SwatWeatherStations
-    Inherits System.Collections.ObjectModel.KeyedCollection(Of String, SwatWeatherStation)
-    Protected Overrides Function GetKeyForItem(ByVal aStation As SwatWeatherStation) As String
-        Return aStation.Key
+    Inherits PointLocations
+ 
+    Private Const pFileName As String = "AllStns.txt"
+    Protected Overrides Function Delimeter() As String
+        Return " "
     End Function
 
-    Public Sub New(Optional ByVal aFileName As String = "AllStns.txt")
-        Dim lStationTable As New atcUtility.atcTableDelimited
-        With lStationTable
-            .Delimiter = " "
-            If IO.File.Exists(aFileName) Then
-                MapWinUtility.Logger.Dbg("UsingExternalFile " & aFileName & " in " & IO.Directory.GetCurrentDirectory)
-                .OpenFile(aFileName)
-            Else
-                MapWinUtility.Logger.Dbg("UsingInternalFile " & aFileName)
-                Dim lAssembly As System.Reflection.Assembly = System.Reflection.Assembly.GetExecutingAssembly
-                Dim lReader As New IO.StreamReader(lAssembly.GetManifestResourceStream("atcMetCmp." + aFileName))
-                .OpenString(lReader.ReadToEnd())
-            End If
-            MapWinUtility.Logger.Dbg("  Opened with FieldCount " & .NumFields & " RecordCount " & .NumRecords)
-            While Not .EOF
-                If .Value(1).ToString.Length > 0 Then
-                    AddStation(lStationTable)
-                End If
-                .MoveNext()
-            End While
-        End With
+    Public Sub New()
+        MyBase.New(pFileName, "atcMetCmp")
         MapWinUtility.Logger.Dbg("  Built SwatWeatherStations with Count " & Count)
     End Sub
 
-    ''' <summary>Fill specific details about point from record in table</summary>
-    ''' <param name="aTable">table containing locations</param>
-    ''' <remarks>uses current record from table</remarks>
-    Public Sub AddStation(ByVal aTable As atcUtility.atcTable)
-        Dim lFieldValues() As String = Split(aTable.CurrentRecordAsDelimitedString, ",")
-        Dim lStation As New SwatWeatherStation
-        With lStation
-            .State = lFieldValues(0)
-            .NameKey = lFieldValues(1)
-            .Name = lFieldValues(2).Replace("_", " ")
-            .Id = lFieldValues(3)
-            .Lat = lFieldValues(4)
-            .LatSinR = Math.Sin(.Lat * DegreesToRadians)
-            .LatCosR = Math.Cos(.Lat * DegreesToRadians)
-            .Lng = lFieldValues(5)
-            .Elev = lFieldValues(6)
-            If .Id = 203 Then
-                Debug.Print("Stop")
-            End If
-            For lMonthIndex As Integer = 1 To 12
-                .AirTempMaxAv(lMonthIndex) = lFieldValues(7 + lMonthIndex)
-                .AirTempMinAv(lMonthIndex) = lFieldValues(19 + lMonthIndex)
-                .Prob_WetAfterDry(lMonthIndex) = lFieldValues(91 + lMonthIndex)
-                .Prob_WetAfterWet(lMonthIndex) = lFieldValues(103 + lMonthIndex)
-                .SolarAv(lMonthIndex) = lFieldValues(139 + lMonthIndex)
-                .DewpointAv(lMonthIndex) = lFieldValues(151 + lMonthIndex)
-                .WindAv(lMonthIndex) = lFieldValues(163 + lMonthIndex)
-
-                Dim lDaysPerMonth As Integer = DayMon(2000, lMonthIndex)
-
-                Dim lPcpd As Double = 0.1
-                If .Prob_WetAfterWet(lMonthIndex) <= .Prob_WetAfterDry(lMonthIndex) OrElse _
-                   .Prob_WetAfterDry(lMonthIndex) <= 0 Then
-                    .Prob_WetAfterDry(lMonthIndex) = 0.75 * lPcpd / lDaysPerMonth
-                    .Prob_WetAfterWet(lMonthIndex) = 0.25 + .Prob_WetAfterDry(lMonthIndex)
-                Else
-                    lPcpd = lDaysPerMonth * .Prob_WetAfterDry(lMonthIndex) / (1 - .Prob_WetAfterWet(lMonthIndex) + .Prob_WetAfterDry(lMonthIndex))
-                End If
-                If lPcpd < 0.0 Then
-                    lPcpd = 0.001
-                End If
-                .ProportionWet(lMonthIndex) = lPcpd / lDaysPerMonth
-            Next
-        End With
-        Me.Add(lStation)
+    Public Overrides Sub AddLocation(ByVal aTable As atcUtility.atcTable)
+        Me.Add(New SwatWeatherStation(aTable))
     End Sub
 
-    Public Function NearestStation(ByVal aLat As Double, ByVal aLng As Double) As Integer
-        Dim lDistanceMin As Double = 1.0E+30
-        Dim lNearestStation As Integer = -1
-        For Each lStation As SwatWeatherStation In Me
-            Dim lDistanceNow As Double = Spatial.GreatCircleDistance(lStation.Lng, lStation.Lat, aLng, aLng)
-            If lDistanceNow < lDistanceMin Then
-                lNearestStation = lStation.Id
-            End If
-        Next
-        Return lNearestStation
+    Protected Overrides Function InternalFilename() As String
+        Return pFileName
     End Function
 End Class
 
 Public Class SwatWeatherStation
+    Inherits PointLocation
+
     Public State As String
     Public NameKey As String
     Public Name As String
-    Public Id As Integer
-    Public Lat As Double
     Public LatSinR As Double
     Public LatCosR As Double
-    Public Lng As Double
     Public Elev As Double
     Public PrecDaysPerMonth As Double
     Public PrecAv(12) As Double
@@ -199,11 +130,56 @@ Public Class SwatWeatherStation
     Public DewpointAv(12) As Double '153-164
     Public WindAv(12) As Double '165-176
 
+    ''' <summary>Fill specific details about point from record in table</summary>
+    ''' <param name="aTable">table containing locations</param>
+    ''' <remarks>uses current record from table</remarks>
+    Public Sub New(ByVal aTable As atcUtility.atcTable)
+        MyBase.New(aTable, 4, 5, 6, " ")
+        Dim lFieldValues() As String = Split(aTable.CurrentRecordAsDelimitedString, ",")
+        State = lFieldValues(0)
+        NameKey = lFieldValues(1)
+        Name = lFieldValues(2).Replace("_", " ")
+        LatSinR = Math.Sin(Latitude * DegreesToRadians)
+        LatCosR = Math.Cos(Latitude * DegreesToRadians)
+        Elev = lFieldValues(6)
+        If Id = 203 Then 'Hartsfield
+            Debug.Print("Stop")
+        End If
+        For lMonthIndex As Integer = 1 To 12
+            AirTempMaxAv(lMonthIndex) = lFieldValues(7 + lMonthIndex)
+            AirTempMinAv(lMonthIndex) = lFieldValues(19 + lMonthIndex)
+            Prob_WetAfterDry(lMonthIndex) = lFieldValues(91 + lMonthIndex)
+            Prob_WetAfterWet(lMonthIndex) = lFieldValues(103 + lMonthIndex)
+            SolarAv(lMonthIndex) = lFieldValues(139 + lMonthIndex)
+            DewpointAv(lMonthIndex) = lFieldValues(151 + lMonthIndex)
+            WindAv(lMonthIndex) = lFieldValues(163 + lMonthIndex)
+
+            Dim lDaysPerMonth As Integer = DayMon(2000, lMonthIndex)
+
+            Dim lPcpd As Double = 0.1
+            If Prob_WetAfterWet(lMonthIndex) <= Prob_WetAfterDry(lMonthIndex) OrElse _
+               Prob_WetAfterDry(lMonthIndex) <= 0 Then
+                Prob_WetAfterDry(lMonthIndex) = 0.75 * lPcpd / lDaysPerMonth
+                Prob_WetAfterWet(lMonthIndex) = 0.25 + Prob_WetAfterDry(lMonthIndex)
+            Else
+                lPcpd = lDaysPerMonth * Prob_WetAfterDry(lMonthIndex) / (1 - Prob_WetAfterWet(lMonthIndex) + Prob_WetAfterDry(lMonthIndex))
+            End If
+            If lPcpd < 0.0 Then
+                lPcpd = 0.001
+            End If
+            ProportionWet(lMonthIndex) = lPcpd / lDaysPerMonth
+        Next
+    End Sub
+
     ''' <summary></summary>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Overridable Function Key() As String
+    Public Overrides Function Key() As String
         Return NameKey
+    End Function
+
+    Public Overrides Function Description() As String
+        Return Name
     End Function
 End Class
 
