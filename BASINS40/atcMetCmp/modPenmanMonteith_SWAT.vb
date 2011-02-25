@@ -38,7 +38,7 @@ Public Module modPenmanMonteith_SWAT
     ''' <param name="aPrecipitationTS"></param>
     ''' <param name="aAirTemperatureTS"></param>
     ''' <param name="aSource"></param>
-    ''' <param name="aSwatStationId"></param>
+    ''' <param name="aSwatWeatherStation"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Function PanEvaporationTimeseriesComputedByPenmanMonteith(ByVal aElevation As Double, ByVal aPrecipitationTS As atcTimeseries, ByVal aAirTemperatureTS As atcTimeseries,
@@ -120,7 +120,7 @@ Public Module modPenmanMonteith_SWAT
         'equation 2.1.2 in SWAT manual
         Dim lSolarDeclination As Double = Math.Asin(0.4 * Math.Sin((lJulianDayWithinYear - 82.0) / 58.09)) '365/2pi = 58.09
         'relative distance of earth from sun - equation 2.1.1 in SWAT Manual
-        Dim lRelativeEarthToSunDistance As Double = 1.0 + (0.0333 * Math.Cos(lJulianDayWithinYear / 58.09))
+        Dim lRelativeEarthToSunDistance As Double = 1.0 + (0.033 * Math.Cos(lJulianDayWithinYear / 58.09))
         'daylength - equation 2.1.6 in SWAT manual
         Dim lCh As Double = -aStation.LatSinR * Math.Tan(lSolarDeclination) / aStation.LatCosR
         Dim lH As Double = 0.0
