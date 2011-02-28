@@ -50,6 +50,28 @@ Public Module modPenmanMonteith_SWAT
         Dim lAirTemperatureMinTS As atcTimeseries = Aggregate(aAirTemperatureTS, atcTimeUnit.TUDay, 1, atcTran.TranMin)
         Dim lAirTemperatureMaxTS As atcTimeseries = Aggregate(aAirTemperatureTS, atcTimeUnit.TUDay, 1, atcTran.TranMax)
 
+        ''Following section is for debugging
+        'Dim lPrecipValue As Double = 0.0
+        'Dim lIndex As Integer = 1
+        'Dim lStr As String = "Precip "
+        'While lIndex < 30 'lPrecipValue < 0.05
+        '    lPrecipValue = lPrecipitationTS.Value(lIndex)
+        '    lStr &= DoubleToString(lPrecipValue, , "##.00") & ", "
+        '    lIndex += 1
+        'End While
+        'MapWinUtility.Logger.Dbg("Count " & lIndex)
+        'MapWinUtility.Logger.Dbg(lStr)
+        'lStr = "ATempMin "
+        'For lIndex2 As Integer = 1 To lIndex
+        '    lStr &= DoubleToString(lAirTemperatureMinTS.Value(lIndex2), , "###.00") & ", "
+        'Next
+        'MapWinUtility.Logger.Dbg(lStr)
+        'lStr = "ATempMax "
+        'For lIndex2 As Integer = 1 To lIndex
+        '    lStr &= DoubleToString(lAirTemperatureMaxTS.Value(lIndex2), , "###.00") & ", "
+        'Next
+        'MapWinUtility.Logger.Dbg(lStr)
+
         'convert to SI units (degF -> degC and in -> mm)
         lPrecipitationTS = lPrecipitationTS * 25.4
         Dim lArgs As New atcDataAttributes
@@ -82,7 +104,7 @@ Public Module modPenmanMonteith_SWAT
             .Dates.Values = NewDates(lSJDate, lEJDate, atcTimeUnit.TUDay, 1)
             .Values(0) = 0.0
             For lDateIndex As Integer = 1 To lAirTemperatureMinTS.numValues
-                .Values(lDateIndex) = PanEvaporationValueComputerbyPenmanMonteith(.Dates.Value(lDateIndex), lElevation, aSwatWeatherStation, lAirTemperatureMinTS.Value(lDateIndex), lAirTemperatureMaxTS.Value(lDateIndex), lPrecipitationTS.Value(lDateIndex), 0)
+                .Values(lDateIndex) = PanEvaporationValueComputedbyPenmanMonteith(.Dates.Value(lDateIndex), lElevation, aSwatWeatherStation, lAirTemperatureMinTS.Value(lDateIndex), lAirTemperatureMaxTS.Value(lDateIndex), lPrecipitationTS.Value(lDateIndex), 0)
             Next
         End With
 
@@ -104,7 +126,7 @@ Public Module modPenmanMonteith_SWAT
     ''' <param name="aCo2Conc"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Function PanEvaporationValueComputerbyPenmanMonteith(ByVal aJDate As Double, ByVal aElevation As Double, _
+    Function PanEvaporationValueComputedbyPenmanMonteith(ByVal aJDate As Double, ByVal aElevation As Double, _
                                                          ByVal aStation As SwatWeatherStation, _
                                                          ByVal aAirTemperatureMin As Double, ByVal aAirtemperatureMax As Double, _
                                                          ByVal aPrecipitation As Double, ByVal aCo2Conc As Double) As Double
@@ -145,7 +167,7 @@ Public Module modPenmanMonteith_SWAT
         '  elevation adjustments
         Dim lAirTemperatureDiff As Double = (aElevation - aStation.Elev) * lLapseRate / 1000.0
         lAirTemperatureAve += lAirTemperatureDiff
-   
+
         'etPot (mm)
         'tk
         Dim lAirTemperatureK As Double = lAirTemperatureAve + 273.15
@@ -163,7 +185,7 @@ Public Module modPenmanMonteith_SWAT
                                                            aStation.ProportionWet(lMo), RelativeHumidityDistribution)
         'ed
         Dim lActualVaporPressure As Double = lSaturationVaporPressure * lRelativeHumidity
-                                             
+
         'vpd
         Dim lVaporPressureDeficit As Double = lSaturationVaporPressure - lActualVaporPressure
         'dlt
