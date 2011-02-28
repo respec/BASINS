@@ -257,6 +257,9 @@ Public Class atcTimeseriesStatistics
                     aTimeseries.Attributes.SetValue("Min", lMin)
                 End If
                 aTimeseries.Attributes.SetValue("Sum", lSum)
+                lMean = lSum / lCount
+                aTimeseries.Attributes.SetValue("Mean", lMean)
+
                 If aTimeseries.Dates IsNot Nothing Then
                     If Not Double.IsNaN(lMaxDate) Then
                         aTimeseries.Attributes.SetValue("MaxDate", lMaxDate)
@@ -272,25 +275,17 @@ Public Class atcTimeseriesStatistics
                         aTimeseries.Attributes.SetValue("SJDay", lSJDate)
                         aTimeseries.Attributes.SetValue("EJDay", lEJDate)
 
-                        If lEJDate > lSJDate Then
-                            Dim lYearSpan As Double
-                            J2Date(lSJDate, lSDate)
-                            J2Date(lEJDate, lEDate)
-                            If lSDate(1) = lEDate(1) AndAlso _
-                               lSDate(2) = lEDate(2) AndAlso _
-                               lSDate(3) = lEDate(3) AndAlso _
-                               lSDate(4) = lEDate(4) AndAlso _
-                               lSDate(5) = lEDate(5) Then ' exact number of years
-                                lYearSpan = lEDate(0) - lSDate(0)
-                            Else 'not exact, approximate
-                                lYearSpan = (lEJDate - lSJDate) / 365.25
-                            End If
-                            aTimeseries.Attributes.SetValue("SumAnnual", lSum / lYearSpan)
+                        Dim lTimeInterval As Double = aTimeseries.Attributes.GetValue("interval", -1.0)
+                        If lTimeInterval <= 0.0 Then
+                            Logger.Dbg("MissingInterval!")
+                        Else
+                            Dim lIntervalsPerYear As Double = 365.25 / lTimeInterval
+                            Dim lSumAnnual As Double = lMean * lIntervalsPerYear
+                            aTimeseries.Attributes.SetValue("SumAnnual", lSumAnnual)
                         End If
                     End With
                 End If
-                lMean = lSum / lCount
-                aTimeseries.Attributes.SetValue("Mean", lMean)
+
                 If lMin > 0 Then
                     lGeoMean = Math.Exp(lGeoMean / lCount)
                     aTimeseries.Attributes.SetValue("Geometric Mean", lGeoMean)
