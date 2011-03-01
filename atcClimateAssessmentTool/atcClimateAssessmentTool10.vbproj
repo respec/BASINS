@@ -31,7 +31,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
-    <TargetFrameworkVersion>v3.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -142,18 +142,14 @@
   <ItemGroup>
     <Reference Include="MapWinInterfaces">
       <Name>MapWinInterfaces</Name>
-      <HintPath>..\..\MapWindow4Dev\Bin64\MapWinInterfaces.dll</HintPath>
+      <HintPath>..\local\$(Platform)$(Configuration)\MapWinInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MapWinUtility, Version=4.8.2.37691, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\MapWindow4Dev\Bin64\MapWinUtility.dll</HintPath>
+    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility10.vbproj">
+      <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>
+      <Name>BASINS-MapWinUtility10</Name>
       <Private>False</Private>
-    </Reference>
-    <Reference Include="SwatObject, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Bin\Plugins\BASINS\SwatObject.dll</HintPath>
-    </Reference>
+    </ProjectReference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -164,6 +160,11 @@
       <Name>System.Windows.Forms</Name>
     </Reference>
     <Reference Include="System.XML" />
+    <ProjectReference Include="..\..\SwatObject\SwatObject10.vbproj">
+      <Project>{724F2B12-E252-4493-BE02-708FF8C5D56E}</Project>
+      <Name>SwatObject10</Name>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcCligen\atcCligen10.vbproj">
       <Project>{2EBD52CD-4BB4-4EC9-BE11-1101602958A2}</Project>
       <Name>atcCligen10</Name>
@@ -217,6 +218,7 @@
     <ProjectReference Include="..\atcTimeseriesD4EM\atcTimeseriesD4EM10.vbproj">
       <Project>{31440B87-261C-4E1C-ADAB-76DA74B0A0FE}</Project>
       <Name>atcTimeseriesD4EM10</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath10.vbproj">
       <Name>atcTimeseriesMath10</Name>
