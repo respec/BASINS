@@ -15,7 +15,7 @@
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
-    <TargetFrameworkVersion>v3.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -99,18 +99,15 @@
   <ItemGroup>
     <Reference Include="MapWinInterfaces, Version=4.6.3064.37096, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
+      <HintPath>..\local\$(Platform)$(Configuration)\MapWinInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MapWinUtility, Version=4.8.2.37691, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\MapWindow4Dev\Bin64\MapWinUtility.dll</HintPath>
+    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility10.vbproj">
+      <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>
+      <Name>BASINS-MapWinUtility10</Name>
       <Private>False</Private>
-    </Reference>
+    </ProjectReference>
     <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -123,7 +120,6 @@
     <Import Include="System.Collections.Generic" />
     <Import Include="System.Data" />
     <Import Include="System.Diagnostics" />
-    <Import Include="System.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="atcFrequencyGridSource.vb" />

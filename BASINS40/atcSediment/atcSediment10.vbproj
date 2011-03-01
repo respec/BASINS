@@ -32,7 +32,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
-    <TargetFrameworkVersion>v3.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -141,29 +141,29 @@
   <ItemGroup>
     <Reference Include="Interop.MapWinGIS, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Basins\bin\Interop.MapWinGIS.dll</HintPath>
+      <HintPath>..\local\$(Platform)$(Configuration)\Interop.MapWinGIS.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Interop.TKTAUDEMLib, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Basins\bin\Interop.TKTAUDEMLib.dll</HintPath>
+      <HintPath>..\local\$(Platform)$(Configuration)\Interop.TKTAUDEMLib.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MapWinGeoProc, Version=1.0.0.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Basins\bin\MapWinGeoProc.dll</HintPath>
+      <HintPath>..\local\$(Platform)$(Configuration)\MapWinGeoProc.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MapWinInterfaces, Version=4.3.3034.36587, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Basins\bin\MapWinInterfaces.dll</HintPath>
+      <HintPath>..\local\$(Platform)$(Configuration)\MapWinInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MapWinUtility, Version=1.0.3096.24764, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Basins\bin\MapWinUtility.dll</HintPath>
+    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility10.vbproj">
+      <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>
+      <Name>BASINS-MapWinUtility10</Name>
       <Private>False</Private>
-    </Reference>
+    </ProjectReference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>

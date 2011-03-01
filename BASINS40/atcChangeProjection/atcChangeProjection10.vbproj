@@ -111,11 +111,11 @@
     </COMReference>
     <Reference Include="MapWinGeoProc, Version=4.8.2.37693, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\MapWindow4Dev\Bin64\MapWinGeoProc.dll</HintPath>
+      <HintPath>..\local\$(Platform)$(Configuration)\MapWinGeoProc.dll</HintPath>
     </Reference>
     <Reference Include="MapWinInterfaces">
       <Name>MapWinInterfaces</Name>
-      <HintPath>..\..\Basins40\Bin\MapWinInterfaces.dll</HintPath>
+      <HintPath>..\local\$(Platform)$(Configuration)\MapWinInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System">

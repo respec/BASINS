@@ -23,7 +23,7 @@
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
-    <TargetFrameworkVersion>v3.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <PublishUrl>publish\</PublishUrl>
@@ -126,11 +126,11 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MapWinUtility, Version=4.8.2.37691, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\MapWindow4Dev\Bin64\MapWinUtility.dll</HintPath>
+    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility10.vbproj">
+      <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>
+      <Name>BASINS-MapWinUtility10</Name>
       <Private>False</Private>
-    </Reference>
+    </ProjectReference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -141,7 +141,7 @@
       <Name>System.Windows.Forms</Name>
     </Reference>
     <Reference Include="MapWinInterfaces">
-      <HintPath>..\..\MapWindow4Dev\Bin64\MapWinInterfaces.dll</HintPath>
+      <HintPath>..\local\$(Platform)$(Configuration)\MapWinInterfaces.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>

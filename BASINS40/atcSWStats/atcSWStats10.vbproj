@@ -130,13 +130,14 @@
     </ProjectReference>
     <Reference Include="MapWinInterfaces">
       <Name>MapWinInterfaces</Name>
-      <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
+      <HintPath>..\local\$(Platform)$(Configuration)\MapWinInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MapWinUtility, Version=4.8.2.37691, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\MapWindow4Dev\Bin64\MapWinUtility.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility10.vbproj">
+      <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>
+      <Name>BASINS-MapWinUtility10</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>

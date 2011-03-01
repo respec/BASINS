@@ -31,7 +31,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
-    <TargetFrameworkVersion>v3.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
@@ -142,34 +142,34 @@
   <ItemGroup>
     <Reference Include="DotSpatial.Data, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b600b0ba19543541, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Program Files (x86)\MapWindow\DotSpatial.Data.dll</HintPath>
+      <HintPath>..\local\$(Platform)$(Configuration)\DotSpatial.Data.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="DotSpatial.Desktop, Version=6.0.0.0, Culture=neutral, PublicKeyToken=ca60e6823c3a6ee5, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Program Files (x86)\MapWindow\DotSpatial.Desktop.dll</HintPath>
+      <HintPath>..\local\$(Platform)$(Configuration)\DotSpatial.Desktop.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="DotSpatial.Topology, Version=1.0.0.0, Culture=neutral, PublicKeyToken=fbcb22813a521af8, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Program Files (x86)\MapWindow\DotSpatial.Topology.dll</HintPath>
+      <HintPath>..\local\$(Platform)$(Configuration)\DotSpatial.Topology.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Interop.MapWinGIS, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Bin\Interop.MapWinGIS.dll</HintPath>
+      <HintPath>..\local\$(Platform)$(Configuration)\Interop.MapWinGIS.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MapWinInterfaces, Version=4.0.2311.37837, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
+      <HintPath>..\local\$(Platform)$(Configuration)\MapWinInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MapWinUtility, Version=4.8.2.37691, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\MapWindow4Dev\Bin64\MapWinUtility.dll</HintPath>
+    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility10.vbproj">
+      <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>
+      <Name>BASINS-MapWinUtility10</Name>
       <Private>False</Private>
-    </Reference>
+    </ProjectReference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -181,7 +181,7 @@
     </Reference>
     <Reference Include="TableEditor, Version=4.5.2956.17391, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\MapWindow4Dev\Bin64\ApplicationPlugins\TableEditor.dll</HintPath>
+      <HintPath>..\local\$(Platform)$(Configuration)\ApplicationPlugins\TableEditor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility10.vbproj">

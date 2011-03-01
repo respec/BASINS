@@ -31,7 +31,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
-    <TargetFrameworkVersion>v3.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -136,24 +136,24 @@
   <ItemGroup>
     <Reference Include="Interop.MapWinGIS">
       <Name>Interop.MapWinGIS</Name>
-      <HintPath>..\..\MapWindow4Dev\Bin64\Interop.MapWinGIS.dll</HintPath>
+      <HintPath>..\local\$(Platform)$(Configuration)\Interop.MapWinGIS.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MapWinGeoProc, Version=1.0.2635.24985, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\MapWindow4Dev\Bin64\MapWinGeoProc.dll</HintPath>
+      <HintPath>..\local\$(Platform)$(Configuration)\MapWinGeoProc.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MapWinInterfaces, Version=4.3.2611.38961, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\MapWindow4Dev\Bin64\MapWinInterfaces.dll</HintPath>
+      <HintPath>..\local\$(Platform)$(Configuration)\MapWinInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MapWinUtility, Version=4.8.2.37691, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\MapWindow4Dev\Bin64\MapWinUtility.dll</HintPath>
+    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility10.vbproj">
+      <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>
+      <Name>BASINS-MapWinUtility10</Name>
       <Private>False</Private>
-    </Reference>
+    </ProjectReference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
