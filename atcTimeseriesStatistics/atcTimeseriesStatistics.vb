@@ -279,8 +279,9 @@ Public Class atcTimeseriesStatistics
                         If lTimeInterval <= 0.0 Then
                             Logger.Dbg("MissingInterval!")
                         Else
-                            Dim lIntervalsPerYear As Double = 365.25 / lTimeInterval
-                            Dim lSumAnnual As Double = lMean * lIntervalsPerYear
+                            Dim lSeasonYearFraction As Double = aTimeseries.Attributes.GetValue("SeasonYearFraction", 1)
+                            Dim lIntervalsPerYear As Double = lSeasonYearFraction * 365.25 / lTimeInterval
+                            Dim lSumAnnual As Double = lMean * lIntervalsPerYear                            
                             aTimeseries.Attributes.SetValue("SumAnnual", lSumAnnual)
                         End If
                     End With

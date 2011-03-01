@@ -65,6 +65,8 @@ Public Class atcSeasonBase
                 lNewTS.Attributes.Add("SeasonDefinition", Me)
                 lNewTS.Attributes.Add("SeasonIndex", lSeasonIndex)
                 lNewTS.Attributes.Add("SeasonName", SeasonName(lSeasonIndex))
+                Dim lSeasonYearFraction As Double = SeasonYearFraction(lSeasonIndex)
+                If lSeasonYearFraction > 0 Then lNewTS.Attributes.Add("SeasonYearFraction", lSeasonYearFraction)
                 lNewGroup.Add(lSeasonIndex, lNewTS)
             End If
 
@@ -328,6 +330,10 @@ Public Class atcSeasonBase
 
     Public Overridable Overloads Function SeasonName(ByVal aIndex As Integer) As String
         Return CStr(aIndex)
+    End Function
+
+    Public Overridable Overloads Function SeasonYearFraction(ByVal aIndex As Integer) As Double
+        Return 0
     End Function
 
     Public Overrides Function ToString() As String
