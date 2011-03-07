@@ -40,7 +40,7 @@ Public Module modPenmanMonteith_SWAT
     ''' <param name="aSwatWeatherStation"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Function PanEvaporationTimeseriesComputedByPenmanMonteith(ByVal aElevation As Double, ByVal aPrecipitationTS As atcTimeseries, ByVal aAirTemperatureTS As atcTimeseries,
+    Public Function PanEvaporationTimeseriesComputedByPenmanMonteith(ByVal aElevation As Double, ByVal aPrecipitationTS As atcTimeseries, ByVal aAirTemperatureTS As atcTimeseries, _
                                                                      ByVal aSource As atcTimeseriesSource, ByVal aSwatWeatherStation As SwatWeatherStation) As atcTimeseries
         InitRandomNumbers()
 
