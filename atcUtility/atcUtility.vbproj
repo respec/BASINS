@@ -139,6 +139,7 @@
     <Compile Include="modUnits.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="PointLocation.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="frmArgs.resx">

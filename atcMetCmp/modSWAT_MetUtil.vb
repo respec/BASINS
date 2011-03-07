@@ -142,9 +142,9 @@ Public Class SwatWeatherStation
         LatSinR = Math.Sin(Latitude * DegreesToRadians)
         LatCosR = Math.Cos(Latitude * DegreesToRadians)
         Elev = lFieldValues(6)
-        If Id = 203 Then 'Hartsfield
-            Debug.Print("Stop")
-        End If
+        'If Id = 203 Then 'Hartsfield
+        '    Debug.Print("Stop")
+        'End If
         For lMonthIndex As Integer = 1 To 12
             AirTempMaxAv(lMonthIndex) = lFieldValues(7 + lMonthIndex)
             AirTempMinAv(lMonthIndex) = lFieldValues(19 + lMonthIndex)
