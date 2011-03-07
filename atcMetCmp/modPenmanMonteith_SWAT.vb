@@ -5,7 +5,6 @@ Imports System.Collections.Generic
 ''' <summary>Computes PenmanMonteith PET based on code from SWAT 2005</summary>
 ''' <remarks></remarks>
 Public Module modPenmanMonteith_SWAT
-    Dim pSwatWeatherStations As SwatWeatherStations
 
     Dim WetDryDayProbabilityDistribution As UniformDistribution 'SWAT rndseed(1:hru)
     Dim SolarRadiationDistribution As UniformDistribution 'SWAT rndseed(2:hru)
