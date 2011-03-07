@@ -9,10 +9,20 @@ Imports MapWinUtility
     Private pNaN As Double = GetNaN()
     Private pSettingFormSeason As Boolean = False
 
-    Private pFunctionLabels As String() = {"Change Temperature", "Multiply Existing Values by a Number", "Add/Remove Storm Events", "Add/Remove Volume in Extreme Events"}
-    Private pFunctionGroupLabels As String() = {"Degrees to add to each existing temperature value", "Number to multiply existing data by", "Percent Change in Volume", "Percent Change in Volume"}
-    Private pFunctionOperations As String() = {"Add", "Multiply", "AddEvents", "Intensify"}
-    Private pFunctionUnits As String() = {"degrees", "multiplication factor", "%", "%"}
+    Private pFunctionLabels As String() = {"Change Temperature", _
+                                           "Multiply Existing Values by a Number", _
+                                           "Add/Remove Storm Events", _
+                                           "Add/Remove Volume in Extreme Events", _
+                                           "Calculate Hamon PET", _
+                                           "Calculate Penman-Monteith PET"}
+    Private pFunctionGroupLabels As String() = {"Degrees to add to each existing temperature value", _
+                                                "Number to multiply existing data by", _
+                                                "Percent Change in Volume", _
+                                                "Percent Change in Volume", _
+                                                "Temperature for Hamon", _
+                                                "Inputs for Penman-Monteith"}
+    Private pFunctionOperations As String() = {"Add", "Multiply", "AddEvents", "Intensify", "Hamon", "Penman-Monteith"}
+    Private pFunctionUnits As String() = {"degrees", "multiplication factor", "%", "%", "", ""}
 
     Private pVariation As atcVariation
     Private pSeasonTypesAvailable As New atcCollection
@@ -21,9 +31,7 @@ Imports MapWinUtility
 
 #Region " Windows Form Designer generated code "
 
-    Friend WithEvents txtVaryPET As System.Windows.Forms.TextBox
     Friend WithEvents btnViewData As System.Windows.Forms.Button
-    Friend WithEvents btnViewPET As System.Windows.Forms.Button
     Friend WithEvents txtEventGap As System.Windows.Forms.TextBox
     Friend WithEvents txtEventThreshold As System.Windows.Forms.TextBox
     Friend WithEvents chkEvents As System.Windows.Forms.CheckBox
@@ -40,7 +48,6 @@ Imports MapWinUtility
     Friend WithEvents lblValueUnitsMaximum As System.Windows.Forms.Label
     Friend WithEvents grpMinMax As System.Windows.Forms.GroupBox
     Friend WithEvents grpEvents As System.Windows.Forms.GroupBox
-    Friend WithEvents lblPET As System.Windows.Forms.Label
     Friend WithEvents lblVolume As System.Windows.Forms.Label
     Friend WithEvents lblGap As System.Windows.Forms.Label
     Friend WithEvents lblVolumeUnits As System.Windows.Forms.Label
@@ -55,6 +62,18 @@ Imports MapWinUtility
     Friend WithEvents lblVolumePercent2 As System.Windows.Forms.Label
     Friend WithEvents radioSingle As System.Windows.Forms.RadioButton
     Friend WithEvents radioIterate As System.Windows.Forms.RadioButton
+    Friend WithEvents grpPET As System.Windows.Forms.GroupBox
+    Friend WithEvents btnPETPrecipitation As System.Windows.Forms.Button
+    Friend WithEvents txtPETprecipitation As System.Windows.Forms.TextBox
+    Friend WithEvents lblPETPrecip As System.Windows.Forms.Label
+    Friend WithEvents btnPETTemperature As System.Windows.Forms.Button
+    Friend WithEvents txtPETTemperature As System.Windows.Forms.TextBox
+    Friend WithEvents lblPETTemperature As System.Windows.Forms.Label
+    Friend WithEvents txtPETstationID As System.Windows.Forms.TextBox
+    Friend WithEvents lblPETstationID As System.Windows.Forms.Label
+    Friend WithEvents lblPETelevationUnits As System.Windows.Forms.Label
+    Friend WithEvents txtPETelevation As System.Windows.Forms.TextBox
+    Friend WithEvents lblPETelevation As System.Windows.Forms.Label
     Friend WithEvents cboSeasons As System.Windows.Forms.ComboBox
 
     Public Sub New()
@@ -111,9 +130,7 @@ Imports MapWinUtility
         Me.lblName = New System.Windows.Forms.Label
         Me.txtName = New System.Windows.Forms.TextBox
         Me.btnScript = New System.Windows.Forms.Button
-        Me.txtVaryPET = New System.Windows.Forms.TextBox
         Me.btnViewData = New System.Windows.Forms.Button
-        Me.btnViewPET = New System.Windows.Forms.Button
         Me.txtEventDuration = New System.Windows.Forms.TextBox
         Me.txtEventVolume = New System.Windows.Forms.TextBox
         Me.chkEvents = New System.Windows.Forms.CheckBox
@@ -145,10 +162,22 @@ Imports MapWinUtility
         Me.lblDuration = New System.Windows.Forms.Label
         Me.lblVolume = New System.Windows.Forms.Label
         Me.lblGap = New System.Windows.Forms.Label
-        Me.lblPET = New System.Windows.Forms.Label
+        Me.grpPET = New System.Windows.Forms.GroupBox
+        Me.btnPETPrecipitation = New System.Windows.Forms.Button
+        Me.txtPETprecipitation = New System.Windows.Forms.TextBox
+        Me.lblPETPrecip = New System.Windows.Forms.Label
+        Me.btnPETTemperature = New System.Windows.Forms.Button
+        Me.txtPETTemperature = New System.Windows.Forms.TextBox
+        Me.lblPETTemperature = New System.Windows.Forms.Label
+        Me.lblPETelevationUnits = New System.Windows.Forms.Label
+        Me.txtPETelevation = New System.Windows.Forms.TextBox
+        Me.lblPETelevation = New System.Windows.Forms.Label
+        Me.txtPETstationID = New System.Windows.Forms.TextBox
+        Me.lblPETstationID = New System.Windows.Forms.Label
         Me.grpSeasons.SuspendLayout()
         Me.grpMinMax.SuspendLayout()
         Me.grpEvents.SuspendLayout()
+        Me.grpPET.SuspendLayout()
         Me.SuspendLayout()
         '
         'txtIncrement
@@ -231,7 +260,7 @@ Imports MapWinUtility
         'btnOk
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(255, 565)
+        Me.btnOk.Location = New System.Drawing.Point(255, 547)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(72, 24)
         Me.btnOk.TabIndex = 45
@@ -241,7 +270,7 @@ Imports MapWinUtility
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(333, 565)
+        Me.btnCancel.Location = New System.Drawing.Point(333, 547)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(72, 24)
         Me.btnCancel.TabIndex = 46
@@ -269,22 +298,12 @@ Imports MapWinUtility
         'btnScript
         '
         Me.btnScript.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnScript.Location = New System.Drawing.Point(153, 565)
+        Me.btnScript.Location = New System.Drawing.Point(153, 547)
         Me.btnScript.Name = "btnScript"
         Me.btnScript.Size = New System.Drawing.Size(96, 24)
         Me.btnScript.TabIndex = 44
         Me.btnScript.Text = "Open Script..."
         Me.btnScript.Visible = False
-        '
-        'txtVaryPET
-        '
-        Me.txtVaryPET.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtVaryPET.Location = New System.Drawing.Point(136, 64)
-        Me.txtVaryPET.Name = "txtVaryPET"
-        Me.txtVaryPET.Size = New System.Drawing.Size(212, 20)
-        Me.txtVaryPET.TabIndex = 6
-        Me.txtVaryPET.Tag = "<click to specify PET to replace>"
         '
         'btnViewData
         '
@@ -294,15 +313,6 @@ Imports MapWinUtility
         Me.btnViewData.Size = New System.Drawing.Size(51, 21)
         Me.btnViewData.TabIndex = 4
         Me.btnViewData.Text = "View"
-        '
-        'btnViewPET
-        '
-        Me.btnViewPET.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnViewPET.Location = New System.Drawing.Point(354, 64)
-        Me.btnViewPET.Name = "btnViewPET"
-        Me.btnViewPET.Size = New System.Drawing.Size(51, 21)
-        Me.btnViewPET.TabIndex = 7
-        Me.btnViewPET.Text = "View"
         '
         'txtEventDuration
         '
@@ -352,7 +362,7 @@ Imports MapWinUtility
         Me.cboFunction.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboFunction.FormattingEnabled = True
-        Me.cboFunction.Location = New System.Drawing.Point(136, 90)
+        Me.cboFunction.Location = New System.Drawing.Point(136, 64)
         Me.cboFunction.Name = "cboFunction"
         Me.cboFunction.Size = New System.Drawing.Size(212, 21)
         Me.cboFunction.TabIndex = 9
@@ -361,7 +371,7 @@ Imports MapWinUtility
         '
         Me.lblFunction.AutoSize = True
         Me.lblFunction.BackColor = System.Drawing.Color.Transparent
-        Me.lblFunction.Location = New System.Drawing.Point(12, 93)
+        Me.lblFunction.Location = New System.Drawing.Point(12, 67)
         Me.lblFunction.Name = "lblFunction"
         Me.lblFunction.Size = New System.Drawing.Size(78, 13)
         Me.lblFunction.TabIndex = 8
@@ -391,7 +401,7 @@ Imports MapWinUtility
         'btnSeasonsNone
         '
         Me.btnSeasonsNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsNone.Location = New System.Drawing.Point(324, 131)
+        Me.btnSeasonsNone.Location = New System.Drawing.Point(324, 139)
         Me.btnSeasonsNone.Name = "btnSeasonsNone"
         Me.btnSeasonsNone.Size = New System.Drawing.Size(63, 23)
         Me.btnSeasonsNone.TabIndex = 43
@@ -400,7 +410,7 @@ Imports MapWinUtility
         'btnSeasonsAll
         '
         Me.btnSeasonsAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsAll.Location = New System.Drawing.Point(6, 131)
+        Me.btnSeasonsAll.Location = New System.Drawing.Point(6, 139)
         Me.btnSeasonsAll.Name = "btnSeasonsAll"
         Me.btnSeasonsAll.Size = New System.Drawing.Size(63, 23)
         Me.btnSeasonsAll.TabIndex = 42
@@ -416,9 +426,9 @@ Imports MapWinUtility
         Me.grpSeasons.Controls.Add(Me.chkSeasons)
         Me.grpSeasons.Controls.Add(Me.btnSeasonsAll)
         Me.grpSeasons.Controls.Add(Me.btnSeasonsNone)
-        Me.grpSeasons.Location = New System.Drawing.Point(12, 399)
+        Me.grpSeasons.Location = New System.Drawing.Point(12, 373)
         Me.grpSeasons.Name = "grpSeasons"
-        Me.grpSeasons.Size = New System.Drawing.Size(393, 160)
+        Me.grpSeasons.Size = New System.Drawing.Size(393, 168)
         Me.grpSeasons.TabIndex = 38
         Me.grpSeasons.TabStop = False
         Me.grpSeasons.Text = "Seasons"
@@ -434,7 +444,7 @@ Imports MapWinUtility
         Me.lstSeasons.MultiColumn = True
         Me.lstSeasons.Name = "lstSeasons"
         Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstSeasons.Size = New System.Drawing.Size(381, 79)
+        Me.lstSeasons.Size = New System.Drawing.Size(381, 87)
         Me.lstSeasons.TabIndex = 41
         '
         'cboSeasons
@@ -483,7 +493,7 @@ Imports MapWinUtility
         Me.grpMinMax.Controls.Add(Me.txtMax)
         Me.grpMinMax.Controls.Add(Me.txtIncrement)
         Me.grpMinMax.Controls.Add(Me.txtMin)
-        Me.grpMinMax.Location = New System.Drawing.Point(12, 117)
+        Me.grpMinMax.Location = New System.Drawing.Point(12, 91)
         Me.grpMinMax.Name = "grpMinMax"
         Me.grpMinMax.Size = New System.Drawing.Size(393, 120)
         Me.grpMinMax.TabIndex = 10
@@ -578,7 +588,7 @@ Imports MapWinUtility
         Me.grpEvents.Controls.Add(Me.lblVolumePercent2)
         Me.grpEvents.Controls.Add(Me.txtEventVolume)
         Me.grpEvents.Controls.Add(Me.txtEventDuration)
-        Me.grpEvents.Location = New System.Drawing.Point(12, 243)
+        Me.grpEvents.Location = New System.Drawing.Point(12, 217)
         Me.grpEvents.Name = "grpEvents"
         Me.grpEvents.Size = New System.Drawing.Size(393, 150)
         Me.grpEvents.TabIndex = 23
@@ -662,25 +672,142 @@ Imports MapWinUtility
         Me.lblGap.TabIndex = 38
         Me.lblGap.Text = "Allow gaps up to"
         '
-        'lblPET
+        'grpPET
         '
-        Me.lblPET.AutoSize = True
-        Me.lblPET.BackColor = System.Drawing.Color.Transparent
-        Me.lblPET.Location = New System.Drawing.Point(12, 68)
-        Me.lblPET.Name = "lblPET"
-        Me.lblPET.Size = New System.Drawing.Size(76, 13)
-        Me.lblPET.TabIndex = 5
-        Me.lblPET.Text = "Compute PET:"
+        Me.grpPET.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpPET.Controls.Add(Me.txtPETstationID)
+        Me.grpPET.Controls.Add(Me.lblPETstationID)
+        Me.grpPET.Controls.Add(Me.lblPETelevationUnits)
+        Me.grpPET.Controls.Add(Me.txtPETelevation)
+        Me.grpPET.Controls.Add(Me.lblPETelevation)
+        Me.grpPET.Controls.Add(Me.btnPETPrecipitation)
+        Me.grpPET.Controls.Add(Me.txtPETprecipitation)
+        Me.grpPET.Controls.Add(Me.lblPETPrecip)
+        Me.grpPET.Controls.Add(Me.btnPETTemperature)
+        Me.grpPET.Controls.Add(Me.txtPETTemperature)
+        Me.grpPET.Controls.Add(Me.lblPETTemperature)
+        Me.grpPET.Location = New System.Drawing.Point(12, 91)
+        Me.grpPET.Name = "grpPET"
+        Me.grpPET.Size = New System.Drawing.Size(393, 120)
+        Me.grpPET.TabIndex = 47
+        Me.grpPET.TabStop = False
+        Me.grpPET.Text = "PET calculation inputs"
+        Me.grpPET.Visible = False
+        '
+        'btnPETPrecip
+        '
+        Me.btnPETPrecipitation.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnPETPrecipitation.Location = New System.Drawing.Point(342, 50)
+        Me.btnPETPrecipitation.Name = "btnPETPrecip"
+        Me.btnPETPrecipitation.Size = New System.Drawing.Size(45, 21)
+        Me.btnPETPrecipitation.TabIndex = 13
+        Me.btnPETPrecipitation.Text = "View"
+        '
+        'txtPETPrecip
+        '
+        Me.txtPETprecipitation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtPETprecipitation.Location = New System.Drawing.Point(124, 50)
+        Me.txtPETprecipitation.Name = "txtPETPrecip"
+        Me.txtPETprecipitation.Size = New System.Drawing.Size(212, 20)
+        Me.txtPETprecipitation.TabIndex = 12
+        Me.txtPETprecipitation.Tag = "<click to specify Preipitation for PET>"
+        '
+        'lblPETPrecip
+        '
+        Me.lblPETPrecip.AutoSize = True
+        Me.lblPETPrecip.BackColor = System.Drawing.Color.Transparent
+        Me.lblPETPrecip.Location = New System.Drawing.Point(6, 53)
+        Me.lblPETPrecip.Name = "lblPETPrecip"
+        Me.lblPETPrecip.Size = New System.Drawing.Size(68, 13)
+        Me.lblPETPrecip.TabIndex = 11
+        Me.lblPETPrecip.Text = "Precipitation:"
+        '
+        'btnPETTemperature
+        '
+        Me.btnPETTemperature.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnPETTemperature.Location = New System.Drawing.Point(342, 22)
+        Me.btnPETTemperature.Name = "btnPETTemperature"
+        Me.btnPETTemperature.Size = New System.Drawing.Size(45, 21)
+        Me.btnPETTemperature.TabIndex = 10
+        Me.btnPETTemperature.Text = "View"
+        '
+        'txtPETTemperature
+        '
+        Me.txtPETTemperature.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtPETTemperature.Location = New System.Drawing.Point(124, 22)
+        Me.txtPETTemperature.Name = "txtPETTemperature"
+        Me.txtPETTemperature.Size = New System.Drawing.Size(212, 20)
+        Me.txtPETTemperature.TabIndex = 9
+        Me.txtPETTemperature.Tag = "<click to specify Temperature for PET>"
+        '
+        'lblPETTemperature
+        '
+        Me.lblPETTemperature.AutoSize = True
+        Me.lblPETTemperature.BackColor = System.Drawing.Color.Transparent
+        Me.lblPETTemperature.Location = New System.Drawing.Point(6, 25)
+        Me.lblPETTemperature.Name = "lblPETTemperature"
+        Me.lblPETTemperature.Size = New System.Drawing.Size(70, 13)
+        Me.lblPETTemperature.TabIndex = 8
+        Me.lblPETTemperature.Text = "Temperature:"
+        '
+        'lblPETelevationUnits
+        '
+        Me.lblPETelevationUnits.AutoSize = True
+        Me.lblPETelevationUnits.BackColor = System.Drawing.Color.Transparent
+        Me.lblPETelevationUnits.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblPETelevationUnits.Location = New System.Drawing.Point(342, 79)
+        Me.lblPETelevationUnits.Name = "lblPETelevationUnits"
+        Me.lblPETelevationUnits.Size = New System.Drawing.Size(25, 13)
+        Me.lblPETelevationUnits.TabIndex = 46
+        Me.lblPETelevationUnits.Text = "feet"
+        '
+        'txtPETelevation
+        '
+        Me.txtPETelevation.Location = New System.Drawing.Point(270, 76)
+        Me.txtPETelevation.Name = "txtPETelevation"
+        Me.txtPETelevation.Size = New System.Drawing.Size(66, 20)
+        Me.txtPETelevation.TabIndex = 45
+        '
+        'lblPETelevation
+        '
+        Me.lblPETelevation.AutoSize = True
+        Me.lblPETelevation.BackColor = System.Drawing.Color.Transparent
+        Me.lblPETelevation.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblPETelevation.Location = New System.Drawing.Point(210, 79)
+        Me.lblPETelevation.Name = "lblPETelevation"
+        Me.lblPETelevation.Size = New System.Drawing.Size(54, 13)
+        Me.lblPETelevation.TabIndex = 44
+        Me.lblPETelevation.Text = "Elevation:"
+        '
+        'txtPETstationID
+        '
+        Me.txtPETstationID.Location = New System.Drawing.Point(124, 76)
+        Me.txtPETstationID.Name = "txtPETstationID"
+        Me.txtPETstationID.Size = New System.Drawing.Size(57, 20)
+        Me.txtPETstationID.TabIndex = 48
+        '
+        'lblPETstationID
+        '
+        Me.lblPETstationID.AutoSize = True
+        Me.lblPETstationID.BackColor = System.Drawing.Color.Transparent
+        Me.lblPETstationID.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblPETstationID.Location = New System.Drawing.Point(6, 79)
+        Me.lblPETstationID.Name = "lblPETstationID"
+        Me.lblPETstationID.Size = New System.Drawing.Size(92, 13)
+        Me.lblPETstationID.TabIndex = 47
+        Me.lblPETstationID.Text = "SWAT Station:"
         '
         'frmVariation
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(417, 601)
+        Me.ClientSize = New System.Drawing.Size(417, 583)
+        Me.Controls.Add(Me.grpPET)
         Me.Controls.Add(Me.grpEvents)
         Me.Controls.Add(Me.grpMinMax)
         Me.Controls.Add(Me.grpSeasons)
-        Me.Controls.Add(Me.btnViewPET)
-        Me.Controls.Add(Me.txtVaryPET)
         Me.Controls.Add(Me.lblFunction)
         Me.Controls.Add(Me.cboFunction)
         Me.Controls.Add(Me.btnViewData)
@@ -691,7 +818,6 @@ Imports MapWinUtility
         Me.Controls.Add(Me.btnOk)
         Me.Controls.Add(Me.txtVaryData)
         Me.Controls.Add(Me.lblData)
-        Me.Controls.Add(Me.lblPET)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
         Me.Name = "frmVariation"
@@ -702,6 +828,8 @@ Imports MapWinUtility
         Me.grpMinMax.PerformLayout()
         Me.grpEvents.ResumeLayout(False)
         Me.grpEvents.PerformLayout()
+        Me.grpPET.ResumeLayout(False)
+        Me.grpPET.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -744,12 +872,20 @@ Imports MapWinUtility
         UserSelectData()
     End Sub
 
-    Private Sub txtVaryPET_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtVaryPET.Click
-        UserSelectPET()
+    Private Sub txtPETTemperature_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtPETTemperature.Click
+        UserSelectPETtemperature()
     End Sub
 
-    Private Sub txtVaryPET_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles txtVaryPET.KeyPress
-        UserSelectPET()
+    Private Sub txtPETTemperature_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles txtPETTemperature.KeyPress
+        UserSelectPETtemperature()
+    End Sub
+
+    Private Sub txtPETprecipitation_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtPETprecipitation.Click
+        UserSelectPETprecipitation()
+    End Sub
+
+    Private Sub txtPETprecipitation_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles txtPETprecipitation.KeyPress
+        UserSelectPETprecipitation()
     End Sub
 
     Private Sub UserSelectData()
@@ -760,11 +896,19 @@ Imports MapWinUtility
         End If
     End Sub
 
-    Private Sub UserSelectPET()
-        Dim lData As atcTimeseriesGroup = atcDataManager.UserSelectData("Select PET to replace with values computed from air temperature", pVariation.PETdata)
+    Private Sub UserSelectPETtemperature()
+        Dim lData As atcTimeseriesGroup = atcDataManager.UserSelectData("Select air temperature input to PET calculation", pVariation.PETtemperature)
         If Not lData Is Nothing Then
-            pVariation.PETdata = lData
-            UpdateDataText(txtVaryPET, lData)
+            pVariation.PETtemperature = lData
+            UpdateDataText(txtPETTemperature, lData)
+        End If
+    End Sub
+
+    Private Sub UserSelectPETprecipitation()
+        Dim lData As atcTimeseriesGroup = atcDataManager.UserSelectData("Select air temperature input to PET calculation", pVariation.PETprecipitation)
+        If Not lData Is Nothing Then
+            pVariation.PETprecipitation = lData
+            UpdateDataText(txtPETprecipitation, lData)
         End If
     End Sub
 
@@ -887,6 +1031,9 @@ Imports MapWinUtility
 
                 .Operation = pFunctionOperations(cboFunction.SelectedIndex)
 
+                Integer.TryParse(txtPETelevation.Text, .PETelevation)
+                .PETstationID = txtPETstationID.Text.Trim
+
                 .UseEvents = chkEvents.Checked
                 If .UseEvents Then
 
@@ -995,14 +1142,20 @@ Imports MapWinUtility
         With pVariation
             txtName.Text = .Name
             UpdateDataText(txtVaryData, pVariation.DataSets)
-            UpdateDataText(txtVaryPET, pVariation.PETdata)
+            UpdateDataText(txtPETTemperature, pVariation.PETtemperature)
+            UpdateDataText(txtPETprecipitation, pVariation.PETprecipitation)
 
             Select Case .Operation
                 Case "Add" : cboFunction.SelectedIndex = 0
                 Case "Multiply" : cboFunction.SelectedIndex = 1
                 Case "AddEvents" : cboFunction.SelectedIndex = 2
                 Case "Intensify" : cboFunction.SelectedIndex = 3
+                Case "Hamon" : cboFunction.SelectedIndex = 4
+                Case "Penman-Monteith" : cboFunction.SelectedIndex = 5
             End Select
+
+            If .PETelevation > Integer.MinValue Then txtPETelevation.Text = .PETelevation
+            If .PETstationID > Integer.MinValue Then txtPETstationID.Text = .PETstationID
 
             If Double.IsNaN(.IntensifyVolumeFraction) Then
                 txtVolumePercent.Text = ""
@@ -1064,15 +1217,27 @@ Imports MapWinUtility
         End Try
     End Sub
 
-    Private Sub btnViewPET_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnViewPET.Click
+    Private Sub btnPETTemperature_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPETTemperature.Click
         Try
-            If pVariation.PETdata.Count > 0 Then
-                atcDataManager.ShowDisplay("", pVariation.PETdata)
+            If pVariation.PETtemperature.Count > 0 Then
+                atcDataManager.ShowDisplay("", pVariation.PETtemperature)
             Else
-                UserSelectPET()
+                UserSelectPETtemperature()
             End If
         Catch ex As Exception
-            UserSelectPET()
+            UserSelectPETtemperature()
+        End Try
+    End Sub
+
+    Private Sub btnPETPrecipitation_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPETPrecipitation.Click
+        Try
+            If pVariation.PETprecipitation.Count > 0 Then
+                atcDataManager.ShowDisplay("", pVariation.PETprecipitation)
+            Else
+                UserSelectPETprecipitation()
+            End If
+        Catch ex As Exception
+            UserSelectPETprecipitation()
         End Try
     End Sub
 
@@ -1137,13 +1302,39 @@ Imports MapWinUtility
     End Sub
 
     Private Sub FunctionChanged()
-        grpMinMax.Text = pFunctionGroupLabels(cboFunction.SelectedIndex)
-        lblValueUnitsMinimum.Text = pFunctionUnits(cboFunction.SelectedIndex)
-        lblValueUnitsMaximum.Text = lblValueUnitsMinimum.Text
-        Select Case pFunctionOperations(cboFunction.SelectedIndex)
-            Case "Intensify", "AddEvents"
-                If Not chkEvents.Checked Then chkEvents.Checked = True
+        Dim lFunction As String = pFunctionOperations(cboFunction.SelectedIndex)
+        Select Case lFunction
+            Case "Hamon", "Penman-Monteith"
+                grpPET.Text = pFunctionGroupLabels(cboFunction.SelectedIndex)
+                grpMinMax.Visible = False
+                chkEvents.Checked = False
+                chkEvents.Enabled = False
+
+                Dim lPenmanMonteith As Boolean = lFunction.Equals("Penman-Monteith")
+                lblPETPrecip.Visible = lPenmanMonteith
+                txtPETprecipitation.Visible = lPenmanMonteith
+                btnPETPrecipitation.Visible = lPenmanMonteith
+                lblPETelevation.Visible = lPenmanMonteith
+                txtPETelevation.Visible = lPenmanMonteith
+                lblPETelevationUnits.Visible = lPenmanMonteith
+                lblPETstationID.Visible = lPenmanMonteith
+                txtPETstationID.Visible = lPenmanMonteith
+
+                grpPET.Visible = True
+
+            Case Else
+                grpMinMax.Text = pFunctionGroupLabels(cboFunction.SelectedIndex)
+                lblValueUnitsMinimum.Text = pFunctionUnits(cboFunction.SelectedIndex)
+                lblValueUnitsMaximum.Text = lblValueUnitsMinimum.Text
+                chkEvents.Enabled = True
+                grpMinMax.Visible = True
+                grpPET.Visible = False
         End Select
+
+        If Not chkEvents.Checked AndAlso (lFunction = "Intensify" OrElse lFunction = "AddEvents") Then
+            chkEvents.Checked = True
+        End If
+
         SetVolumePercentVisible()
     End Sub
 

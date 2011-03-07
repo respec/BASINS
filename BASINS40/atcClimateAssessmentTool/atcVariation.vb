@@ -6,7 +6,7 @@ Imports MapWinUtility
 Public Class atcVariation
     Private pNaN As Double = atcUtility.GetNaN
 
-    'Parameters for Hammon
+    'Parameters for Hamon
     Private pDegF As Boolean
     Private pLatDeg As Double
 
@@ -18,7 +18,13 @@ Public Class atcVariation
 
     Private pName As String
     Private pDataSets As atcTimeseriesGroup
-    Public PETdata As atcTimeseriesGroup
+
+    Public PETtemperature As atcTimeseriesGroup
+    Public PETprecipitation As atcTimeseriesGroup
+    Public PETelevation As Integer = Integer.MinValue
+    Public PETstationID As String = Nothing
+    Private Shared PETswatStations As atcMetCmp.SwatWeatherStations
+
     Private pComputationSource As atcTimeseriesSource
     Private pOperation As String
     'Public AddRemovePer As String
@@ -327,7 +333,7 @@ Public Class atcVariation
         End If
     End Function
 
-    Protected Overridable Function VaryData() As atcTimeseriesGroup        
+    Protected Overridable Function VaryData() As atcTimeseriesGroup
         Dim lModifiedGroup As New atcTimeseriesGroup
         Dim lDataSetIndex As Integer = 0
 
@@ -339,46 +345,81 @@ Public Class atcVariation
             Select Case Operation
                 Case "AddEvents" : lModifiedTS = AddRemoveEventsVolumeFraction(lOriginalData, CurrentValue, lEvents, 0)
                 Case "Intensify" : lModifiedTS = VaryDataIntensify(lSplitData, lEvents)
-                Case Else : lModifiedTS = VaryDataAddMultiply(lOriginalData, lSplitData)
+                Case "Hamon"
+
+                    If PETtemperature.Count > lDataSetIndex Then
+                        pLatDeg = lOriginalData.Attributes.GetValue("LatDeg", pLatDeg)
+                        lModifiedTS = atcMetCmp.PanEvaporationTimeseriesComputedByHamonX(PETtemperature(lDataSetIndex), Nothing, pDegF, pLatDeg, pCTS)
+                        If lOriginalData.Attributes.GetValue("tu") < 4 Then
+                            lModifiedTS = atcMetCmp.DisSolPet(lModifiedTS, Nothing, 2, pLatDeg)
+                        End If
+                    End If
+
+                Case "Penman-Monteith"
+                    If PETtemperature.Count > lDataSetIndex AndAlso PETprecipitation.Count > lDataSetIndex Then
+                        Dim PETstation As atcMetCmp.SwatWeatherStation = Nothing
+
+                        If PETswatStations Is Nothing Then
+                            PETswatStations = New atcMetCmp.SwatWeatherStations
+                        End If
+
+                        If PETswatStations IsNot Nothing Then
+                            If Not String.IsNullOrEmpty(PETstationID) Then 'Find by station's Name, NameKey or ID
+                                Dim lStationID As String = PETstationID.ToLower
+                                For Each lSearchStation As atcMetCmp.SwatWeatherStation In PETswatStations
+                                    If lSearchStation.Id.ToLower = lStationID OrElse _
+                                       lSearchStation.Name.ToLower = lStationID OrElse _
+                                       lSearchStation.NameKey.ToLower = lStationID Then
+                                        PETstation = lSearchStation
+                                        Exit For
+                                    End If
+                                Next
+                            End If
+
+                            If PETstation Is Nothing Then 'Find by lat/lon of original TS
+                                Dim lLatitude As Double = lOriginalData.Attributes.GetValue("Latitude", -999)
+                                Dim lLongitude As Double = lOriginalData.Attributes.GetValue("Longitude", -999)
+                                If lLatitude > -90 AndAlso lLongitude > -360 Then
+                                    PETstation = PETswatStations.Closest(lLatitude, lLongitude, 1)(0)
+                                End If
+                            End If
+                        End If
+
+                        If PETstation Is Nothing Then
+                            Throw New ApplicationException("VaryData: PET station not found")
+                        ElseIf Double.IsNaN(PETelevation) Then
+                            Throw New ApplicationException("VaryData: Elevation not found for PET")
+                        ElseIf PETprecipitation(lDataSetIndex) Is Nothing Then
+                            Throw New ApplicationException("VaryData: Precipitation not found for PET")
+                        ElseIf PETtemperature(lDataSetIndex) Is Nothing Then
+                            Throw New ApplicationException("VaryData: Temperature not found for PET")
+                        Else
+                            lModifiedTS = atcMetCmp.PanEvaporationTimeseriesComputedByPenmanMonteith(PETelevation, PETprecipitation(lDataSetIndex), PETtemperature(lDataSetIndex), Nothing, PETstation)
+                        End If
+                    End If
+
+                Case Else
+                        lModifiedTS = VaryDataAddMultiply(lOriginalData, lSplitData)
             End Select
 
             If lModifiedTS Is Nothing Then
                 Throw New ApplicationException("VaryData: No data computed")
             End If
 
-            lModifiedTS.Attributes.SetValue("ID", lOriginalData.Attributes.GetValue("ID"))
             Dim lMostOriginal As atcTimeseries = MostOriginal(lOriginalData)
+            With lModifiedTS.Attributes
+                .SetValue("CAToriginal", lMostOriginal)
+                .SetValue("ID", lOriginalData.Attributes.GetValue("ID"))
+                .SetValue("Location", lOriginalData.Attributes.GetValue("Location"))
+                .SetValue("Constituent", lOriginalData.Attributes.GetValue("Constituent"))
+                .SetValue("History 1", lOriginalData.Attributes.GetValue("History 1").ToString)
+                If lOriginalData.Attributes.ContainsAttribute("TSTYPE") Then
+                    .SetValue("TSTYPE", lOriginalData.Attributes.GetValue("TSTYPE"))
+                End If
+            End With
+
             lModifiedGroup.Add(lMostOriginal, lModifiedTS)
-            lModifiedTS.Attributes.SetValue("CAToriginal", lMostOriginal)
 
-            If PETdata.Count > lDataSetIndex Then
-                Dim lOldPET As atcDataSet = PETdata(lDataSetIndex)
-
-                'Discard any already modified PET, it will be replaced below
-                Dim lOldPETmodifiedIndex As Integer = lModifiedGroup.Keys.IndexOf(lOldPET)
-                If lOldPETmodifiedIndex >= 0 Then
-                    lModifiedGroup.RemoveAt(lOldPETmodifiedIndex)
-                End If
-
-                pLatDeg = lOldPET.Attributes.GetValue("LatDeg", pLatDeg)
-                'TODO: this is where different methods of ET estimate diverge
-                'If lModifiedTS.Attributes.GetValue("Constituent") = "ATEM" Then
-                Dim lNewPET As atcDataSet = atcMetCmp.PanEvaporationTimeseriesComputedByHamonX(lModifiedTS, Nothing, pDegF, pLatDeg, pCTS)
-                If lOldPET.Attributes.GetValue("tu") < 4 Then
-                    lNewPET = atcMetCmp.DisSolPet(lNewPET, Nothing, 2, pLatDeg)
-                End If
-                With lNewPET.Attributes
-                    .SetValue("Location", lOldPET.Attributes.GetValue("Location"))
-                    .SetValue("Constituent", lOldPET.Attributes.GetValue("Constituent"))
-                    .SetValue("History 1", lOldPET.Attributes.GetValue("History 1").ToString)
-                    .SetValue("Id", lOldPET.Attributes.GetValue("Id"))
-                    If lOldPET.Attributes.ContainsAttribute("TSTYPE") Then
-                        .SetValue("TSTYPE", lOldPET.Attributes.GetValue("TSTYPE"))
-                    End If
-                End With
-                lModifiedGroup.Add(lOldPET, lNewPET)
-                'End If
-            End If
             lDataSetIndex += 1
         Next
         Return lModifiedGroup
@@ -583,7 +624,7 @@ Public Class atcVariation
 
     Sub Clear()
 
-        'Parameters for Hammon - TODO: don't hard code these
+        'Parameters for Hamon - TODO: don't hard code these
         pDegF = True
         pLatDeg = 39
 
@@ -621,7 +662,7 @@ Public Class atcVariation
         ColorBelowMin = System.Drawing.Color.DeepSkyBlue
         ColorDefault = System.Drawing.Color.White
 
-        PETdata = New atcTimeseriesGroup
+        PETtemperature = New atcTimeseriesGroup
     End Sub
 
     Public Overridable Sub CopyTo(ByVal aTargetVariation As atcVariation)
@@ -641,7 +682,7 @@ Public Class atcVariation
             End If
 
             If DataSets IsNot Nothing Then .DataSets = DataSets.Clone()
-            If PETdata IsNot Nothing Then .PETdata = PETdata.Clone()
+            If PETtemperature IsNot Nothing Then .PETtemperature = PETtemperature.Clone()
             .ComputationSource = ComputationSource
             .Operation = Operation.Clone()
             If Seasons Is Nothing Then
@@ -827,6 +868,12 @@ Public Class atcVariation
         Get
             Dim lXML As String = "<Variation>" & vbCrLf _
                  & "  <Name>" & ToXML(Name) & "</Name>" & vbCrLf
+            If PETelevation > Integer.MinValue Then
+                lXML &= "  <Elevation>" & PETelevation & "</Elevation>" & vbCrLf
+            End If
+            If PETstationID > Integer.MinValue Then
+                lXML &= "  <StationID>" & PETstationID & "</StationID>" & vbCrLf
+            End If
             If Not Double.IsNaN(Min) Then
                 lXML &= "  <Min>" & Min & "</Min>" & vbCrLf
             End If
@@ -846,7 +893,8 @@ Public Class atcVariation
             End If
             lXML &= "  <Selected>" & Selected & "</Selected>" & vbCrLf _
                  & GetDataGroupXML(DataSets, "DataSets") _
-                 & GetDataGroupXML(PETdata, "PETdata") _
+                 & GetDataGroupXML(PETtemperature, "PETtemperature") _
+                 & GetDataGroupXML(PETprecipitation, "PETprecipitation") _
                  & EventsXML _
                  & SeasonsXML _
                  & "</Variation>" & vbCrLf
@@ -860,6 +908,8 @@ Public Class atcVariation
                     With lXML
                         Select Case .Name.ToLower
                             Case "name" : Name = .InnerText
+                            Case "elevation" : PETelevation = CInt(.InnerText)
+                            Case "stationid" : PETstationID = CInt(.InnerText)
                             Case "min" : Min = CDbl(.InnerText)
                             Case "max" : Max = CDbl(.InnerText)
                             Case "increment" : Increment = CDbl(.InnerText)
@@ -879,7 +929,8 @@ Public Class atcVariation
                                     End Select
                                 End If
                             Case "datasets" : SetDataGroupXML(DataSets, "DataSets", .OuterXml)
-                            Case "petdata" : SetDataGroupXML(PETdata, "PETdata", .OuterXml)
+                            Case "pettemperature" : SetDataGroupXML(PETtemperature, "PETtemperature", .OuterXml)
+                            Case "petprecipitation" : SetDataGroupXML(PETprecipitation, "PETprecipitation", .OuterXml)
                             Case "selected"
                                 Selected = .InnerText.ToLower.Equals("true")
                             Case "seasons" : SeasonsXML = .OuterXml
@@ -928,13 +979,17 @@ Public Class atcVariation
     End Sub
 
     Protected Overrides Sub Finalize()
-        If Not pDataSets Is Nothing Then
+        If pDataSets IsNot Nothing Then
             pDataSets.Dispose()
             pDataSets = Nothing
         End If
-        If Not PETdata Is Nothing Then
-            PETdata.Dispose()
-            PETdata = Nothing
+        If PETtemperature IsNot Nothing Then
+            PETtemperature.Dispose()
+            PETtemperature = Nothing
+        End If
+        If PETprecipitation IsNot Nothing Then
+            PETprecipitation.Dispose()
+            PETprecipitation = Nothing
         End If
         pComputationSource = Nothing
         Seasons = Nothing

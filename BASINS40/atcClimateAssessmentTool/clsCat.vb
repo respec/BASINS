@@ -491,13 +491,14 @@ NextIteration:
                     'save how this variation's datasets looked before we modified them
                     Dim lOriginalDatasets As atcTimeseriesGroup = .DataSets.Clone
                     Logger.Dbg("OriginalDatasetsCount " & lOriginalDatasets.Count)
+                    Dim lOriginalPETtemperature As atcTimeseriesGroup = .PETtemperature.Clone
+                    Dim lOriginalPETprecip As atcTimeseriesGroup = .PETprecipitation.Clone
 
                     'data modified before this variation plus data modified by this one
                     Dim lAllModifiedData As atcTimeseriesGroup = aModifiedData.Clone
                     Logger.Dbg("ModifiedDatasetsCount " & lAllModifiedData.Count)
 
                     For lDataSetIndex As Integer = 0 To .DataSets.Count - 1
-                        Logger.Dbg("Loop " & lDataSetIndex)
                         Dim lSourceDataSet As atcTimeseries = .DataSets(lDataSetIndex)
                         Dim lModifiedIndex As Integer = lAllModifiedData.Keys.IndexOf(lSourceDataSet)
                         If lModifiedIndex >= 0 Then
@@ -506,12 +507,28 @@ NextIteration:
                         End If
                     Next
 
+                    For lDataSetIndex As Integer = 0 To .PETtemperature.Count - 1
+                        Dim lSourceDataSet As atcTimeseries = .PETtemperature(lDataSetIndex)
+                        Dim lModifiedIndex As Integer = lAllModifiedData.Keys.IndexOf(lSourceDataSet)
+                        If lModifiedIndex >= 0 Then
+                            .PETtemperature.Item(lDataSetIndex) = lAllModifiedData.ItemByIndex(lModifiedIndex)
+                        End If
+                    Next
+
+                    For lDataSetIndex As Integer = 0 To .PETprecipitation.Count - 1
+                        Dim lSourceDataSet As atcTimeseries = .PETprecipitation(lDataSetIndex)
+                        Dim lModifiedIndex As Integer = lAllModifiedData.Keys.IndexOf(lSourceDataSet)
+                        If lModifiedIndex >= 0 Then
+                            .PETprecipitation.Item(lDataSetIndex) = lAllModifiedData.ItemByIndex(lModifiedIndex)
+                        End If
+                    Next
+
                     'Start varying data
                     Logger.Dbg("AboutToStartIteration")
                     Dim lNewlyModified As atcTimeseriesGroup = .StartIteration
                     Logger.Dbg("DoneStartIteration")
 
-                    While g_Running And Not lNewlyModified Is Nothing
+                    While g_Running AndAlso lNewlyModified IsNot Nothing
                         'Remove existing modified data also modified by this variation
                         'Most cases of this were handled above when creating lReModifiedData, 
                         'but side-effect computation like PET still needs removing here
@@ -535,6 +552,8 @@ NextIteration:
                     End While
 
                     .DataSets = lOriginalDatasets
+                    .PETtemperature = lOriginalPETtemperature
+                    .PETprecipitation = lOriginalPETprecip
                 End With
             End If
         End If

@@ -183,6 +183,7 @@
     <Compile Include="atcMetCmpPlugin.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="clsRandomNumber.vb" />
     <Compile Include="frmCmpHPET.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -210,6 +211,8 @@
     <Compile Include="modMetCompute.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="modPenmanMonteith_SWAT.vb" />
+    <Compile Include="modSWAT_MetUtil.vb" />
     <EmbeddedResource Include="frmCmpHPET.resx">
       <DependentUpon>frmCmpHPET.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -262,6 +265,9 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="AllStns.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
