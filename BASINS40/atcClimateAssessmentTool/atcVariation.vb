@@ -382,7 +382,7 @@ Public Class atcVariation
                                 Dim lLatitude As Double = lOriginalData.Attributes.GetValue("Latitude", -999)
                                 Dim lLongitude As Double = lOriginalData.Attributes.GetValue("Longitude", -999)
                                 If lLatitude > -90 AndAlso lLongitude > -360 Then
-                                    PETstation = PETswatStations.Closest(lLatitude, lLongitude, 1)(0)
+                                    PETstation = PETswatStations.Closest(lLatitude, lLongitude, 1).Values(0)
                                 End If
                             End If
                         End If
