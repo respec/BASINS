@@ -101,9 +101,9 @@ Public Module modPenmanMonteith_SWAT
             J2Date(lSJDate, lDate)
             .Attributes.SetValue("TSBYR", lDate(0))
             .Dates.Values = NewDates(lSJDate, lEJDate, atcTimeUnit.TUDay, 1)
-            .Values(0) = 0.0
+            .Value(0) = 0.0
             For lDateIndex As Integer = 1 To lAirTemperatureMinTS.numValues
-                .Values(lDateIndex) = PanEvaporationValueComputedbyPenmanMonteith(.Dates.Value(lDateIndex), lElevation, aSwatWeatherStation, lAirTemperatureMinTS.Value(lDateIndex), lAirTemperatureMaxTS.Value(lDateIndex), lPrecipitationTS.Value(lDateIndex), 0)
+                .Value(lDateIndex) = PanEvaporationValueComputedbyPenmanMonteith(.Dates.Value(lDateIndex), lElevation, aSwatWeatherStation, lAirTemperatureMinTS.Value(lDateIndex), lAirTemperatureMaxTS.Value(lDateIndex), lPrecipitationTS.Value(lDateIndex), 0)
             Next
         End With
 
