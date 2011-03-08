@@ -688,6 +688,10 @@ Public Class atcVariation
 
             If DataSets IsNot Nothing Then .DataSets = DataSets.Clone()
             If PETtemperature IsNot Nothing Then .PETtemperature = PETtemperature.Clone()
+            If PETprecipitation IsNot Nothing Then .PETprecipitation = PETprecipitation.Clone()
+            .PETelevation = PETelevation
+            .PETstationID = PETstationID
+
             .ComputationSource = ComputationSource
             .Operation = Operation.Clone()
             If Seasons Is Nothing Then
@@ -876,7 +880,7 @@ Public Class atcVariation
             If PETelevation > Integer.MinValue Then
                 lXML &= "  <Elevation>" & PETelevation & "</Elevation>" & vbCrLf
             End If
-            If PETstationID > Integer.MinValue Then
+            If Not String.IsNullOrEmpty(PETstationID) Then
                 lXML &= "  <StationID>" & PETstationID & "</StationID>" & vbCrLf
             End If
             If Not Double.IsNaN(Min) Then
@@ -914,7 +918,7 @@ Public Class atcVariation
                         Select Case .Name.ToLower
                             Case "name" : Name = .InnerText
                             Case "elevation" : PETelevation = CInt(.InnerText)
-                            Case "stationid" : PETstationID = CInt(.InnerText)
+                            Case "stationid" : PETstationID = .InnerText
                             Case "min" : Min = CDbl(.InnerText)
                             Case "max" : Max = CDbl(.InnerText)
                             Case "increment" : Increment = CDbl(.InnerText)
