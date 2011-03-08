@@ -550,15 +550,19 @@ Public Module modMetData
         Dim lCPos As Integer = aPos
 
         While lOT < 0
-            If aTS.Value(lCPos) > 0 And aTS.Value(lCPos) < 25 Then
-                lOT = aTS.Value(lCPos)
-            Else
-                lCPos = lCPos + lInc
-            End If
-            If lCPos < 1 Then 'at beginning of values, look ahead of initial "pos"
-                lInc = 1
-                lCPos = aPos + 1
-            ElseIf lCPos > aTS.numValues Then 'at end of values, no obs time found, set to 24
+            If lCPos <= aTS.numValues Then
+                If aTS.Value(lCPos) > 0 And aTS.Value(lCPos) < 25 Then
+                    lOT = aTS.Value(lCPos)
+                Else
+                    lCPos = lCPos + lInc
+                End If
+                If lCPos < 1 Then 'at beginning of values, look ahead of initial "pos"
+                    lInc = 1
+                    lCPos = aPos + 1
+                ElseIf lCPos > aTS.numValues Then 'at end of values, no obs time found, set to 24
+                    lOT = 24
+                End If
+            Else 'at end of values, assume obs time = 24
                 lOT = 24
             End If
         End While
