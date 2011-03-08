@@ -326,6 +326,44 @@ Public Module modTimeseriesMath
         Return lNewTS
     End Function
 
+    ''' <summary>
+    ''' Find the first starting date, last ending date, and common time period of a group of Timeseries
+    ''' </summary>
+    ''' <param name="aGroup">Group to search for start and end dates</param>
+    ''' <param name="aFirstStart">Earliest start date of any timeseries in group</param>
+    ''' <param name="aLastEnd">Latest ending date of any timeseries in group</param>
+    ''' <param name="aCommonStart">Beginning of the period shared by all in group</param>
+    ''' <param name="aCommonEnd">Ending of the period shared by all in group</param>
+    ''' <returns>True if there is a common period of all timeseries in the group, false if one timeseries begins only after another ends.</returns>
+    ''' <remarks>All arguments except aGroup are ByRef</remarks>
+    Public Function CommonDates(ByVal aGroup As atcTimeseriesGroup, _
+                                ByRef aFirstStart As Double, _
+                                ByRef aLastEnd As Double, _
+                                ByRef aCommonStart As Double, _
+                                ByRef aCommonEnd As Double) As Boolean
+        aFirstStart = GetMaxValue()
+        aLastEnd = GetMinValue()
+
+        aCommonStart = GetMinValue()
+        aCommonEnd = GetMaxValue()
+
+        If aGroup IsNot Nothing Then
+            For Each lTs As atcData.atcTimeseries In aGroup
+                If lTs.Dates.numValues > 0 Then
+                    Dim lThisDate As Double = lTs.Dates.Value(1)
+                    If lThisDate < aFirstStart Then aFirstStart = lThisDate
+                    If lThisDate > aCommonStart Then aCommonStart = lThisDate
+                    lThisDate = lTs.Dates.Value(lTs.Dates.numValues)
+                    If lThisDate > aLastEnd Then aLastEnd = lThisDate
+                    If lThisDate < aCommonEnd Then aCommonEnd = lThisDate
+                End If
+            Next
+        End If
+
+        Return aCommonStart > GetMinValue() AndAlso aCommonEnd < GetMaxValue() AndAlso aCommonStart < aCommonEnd
+
+    End Function
+
     ''' <summary>Merge the dates from a group of atcTimeseries</summary>
     ''' <param name="aGroup">Group of atcTimeseries to merge the dates of</param>
     ''' <param name="aFilterNoData">True to skip missing values, False to include missing values in result</param>

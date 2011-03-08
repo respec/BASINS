@@ -126,36 +126,7 @@ Public Class atcChooseDataGroupDates
             End With
         End If
 
-        pFirstStart = GetMaxValue()
-        pLastEnd = GetMinValue()
-
-        pCommonStart = GetMinValue()
-        pCommonEnd = GetMaxValue()
-
-        If pDataGroup IsNot Nothing Then
-            For Each lTs As atcData.atcTimeseries In pDataGroup
-                If lTs.Dates.numValues > 0 Then
-                    Dim lThisDate As Double = lTs.Dates.Value(1)
-                    If lThisDate < pFirstStart Then pFirstStart = lThisDate
-                    If lThisDate > pCommonStart Then pCommonStart = lThisDate
-                    lThisDate = lTs.Dates.Value(lTs.Dates.numValues)
-                    If lThisDate > pLastEnd Then pLastEnd = lThisDate
-                    If lThisDate < pCommonEnd Then pCommonEnd = lThisDate
-                End If
-            Next
-        End If
-        If pFirstStart <= pLastEnd Then
-            lblDataStart.Text = pDateFormat.JDateToString(pFirstStart)
-            lblDataEnd.Text = pDateFormat.JDateToString(pLastEnd)
-            btnAll.Enabled = True
-            btnAll_Click(Nothing, Nothing)
-        Else
-            lblDataStart.Text = ""
-            lblDataEnd.Text = ""
-            btnAll.Enabled = False
-        End If
-
-        If pCommonStart > GetMinValue() AndAlso pCommonEnd < GetMaxValue() AndAlso pCommonStart < pCommonEnd Then
+        If CommonDates(pDataGroup, pFirstStart, pLastEnd, pCommonStart, pCommonEnd) Then
             lblCommonStart.Text = pDateFormat.JDateToString(pCommonStart)
             lblCommonEnd.Text = pDateFormat.JDateToString(pCommonEnd)
             btnCommon.Enabled = True
