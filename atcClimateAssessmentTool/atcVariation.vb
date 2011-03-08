@@ -19,10 +19,12 @@ Public Class atcVariation
     Private pName As String
     Private pDataSets As atcTimeseriesGroup
 
+    Public Const PETstationUseClosest As String = "(Closest)"
+
     Public PETtemperature As atcTimeseriesGroup
     Public PETprecipitation As atcTimeseriesGroup
     Public PETelevation As Integer = Integer.MinValue
-    Public PETstationID As String = Nothing
+    Public PETstationID As String = PETstationUseClosest
     Private Shared PETswatStations As atcMetCmp.SwatWeatherStations
 
     Private pComputationSource As atcTimeseriesSource
@@ -364,7 +366,7 @@ Public Class atcVariation
                         End If
 
                         If PETswatStations IsNot Nothing Then
-                            If Not String.IsNullOrEmpty(PETstationID) Then 'Find by station's Name, NameKey or ID
+                            If Not String.IsNullOrEmpty(PETstationID) AndAlso PETstationID <> PETstationUseClosest Then 'Find by station's Name, NameKey or ID
                                 Dim lStationID As String = PETstationID.ToLower
                                 For Each lSearchStation As atcMetCmp.SwatWeatherStation In PETswatStations
                                     If lSearchStation.Id.ToLower = lStationID OrElse _
@@ -663,6 +665,9 @@ Public Class atcVariation
         ColorDefault = System.Drawing.Color.White
 
         PETtemperature = New atcTimeseriesGroup
+        PETprecipitation = New atcTimeseriesGroup
+        PETelevation = Integer.MinValue
+        PETstationID = PETstationUseClosest
     End Sub
 
     Public Overridable Sub CopyTo(ByVal aTargetVariation As atcVariation)
@@ -947,13 +952,38 @@ Public Class atcVariation
     Public Overrides Function ToString() As String
         Dim lString As String = Name & " " & Operation & " "
 
-        If Max <= Min Then
-            lString &= DoubleString(Min)
-        Else
-            If Not Double.IsNaN(Min) Then lString &= "from " & DoubleString(Min)
-            If Not Double.IsNaN(Max) Then lString &= " to " & DoubleString(Max)
-            If Not Double.IsNaN(Increment) Then lString &= " step " & DoubleString(Increment)
-        End If
+        Select Case Operation
+            Case "Hamon", "Penman-Monteith"
+                If PETtemperature IsNot Nothing AndAlso PETtemperature.Count > 0 Then
+                    If PETtemperature.Count = 1 Then
+                        lString &= "Temp: " & PETtemperature(0).ToString & " "
+                    Else
+                        lString &= "Temp: (" & PETtemperature.Count & ")"
+                    End If
+                End If
+                If PETprecipitation IsNot Nothing AndAlso PETprecipitation.Count > 0 Then
+                    If PETprecipitation.Count = 1 Then
+                        lString &= "Precip: " & PETprecipitation(0).ToString & " "
+                    Else
+                        lString &= "Precip: (" & PETprecipitation.Count & ")"
+                    End If
+                End If
+                If PETelevation > Integer.MinValue Then
+                    lString &= "Elev: " & PETelevation
+                End If
+                If Not String.IsNullOrEmpty(PETstationID) AndAlso PETstationID <> PETstationUseClosest Then
+                    lString &= "Station: " & PETstationID
+                End If
+            Case Else
+                If Max <= Min Then
+                    lString &= DoubleString(Min)
+                Else
+                    If Not Double.IsNaN(Min) Then lString &= "from " & DoubleString(Min)
+                    If Not Double.IsNaN(Max) Then lString &= " to " & DoubleString(Max)
+                    If Not Double.IsNaN(Increment) Then lString &= " step " & DoubleString(Increment)
+                End If
+        End Select
+
         If Seasons IsNot Nothing Then
             lString &= " " & atcSeasons.atcSeasonPlugin.SeasonClassNameToLabel(Seasons.GetType.Name) _
                    & ": " & Seasons.SeasonsSelectedString

@@ -905,7 +905,7 @@ Imports MapWinUtility
     End Sub
 
     Private Sub UserSelectPETprecipitation()
-        Dim lData As atcTimeseriesGroup = atcDataManager.UserSelectData("Select air temperature input to PET calculation", pVariation.PETprecipitation)
+        Dim lData As atcTimeseriesGroup = atcDataManager.UserSelectData("Select precipitation input to PET calculation", pVariation.PETprecipitation)
         If Not lData Is Nothing Then
             pVariation.PETprecipitation = lData
             UpdateDataText(txtPETprecipitation, lData)
@@ -1154,8 +1154,8 @@ Imports MapWinUtility
                 Case "Penman-Monteith" : cboFunction.SelectedIndex = 5
             End Select
 
-            If .PETelevation > Integer.MinValue Then txtPETelevation.Text = .PETelevation
-            If .PETstationID > Integer.MinValue Then txtPETstationID.Text = .PETstationID
+            If .PETelevation > Integer.MinValue Then txtPETelevation.Text = .PETelevation.ToString
+            If .PETstationID IsNot Nothing Then txtPETstationID.Text = .PETstationID
 
             If Double.IsNaN(.IntensifyVolumeFraction) Then
                 txtVolumePercent.Text = ""
