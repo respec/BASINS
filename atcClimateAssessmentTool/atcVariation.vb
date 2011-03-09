@@ -950,6 +950,9 @@ Public Class atcVariation
             Catch e As Exception
                 Logger.Msg("Unable to parse:" & vbCrLf & newValue, "CAT Variation XML Problem")
             End Try
+            If ComputationSource Is Nothing Then
+                ComputationSource = New atcTimeseriesMath.atcTimeseriesMath
+            End If
         End Set
     End Property
 
