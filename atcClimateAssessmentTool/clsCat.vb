@@ -246,7 +246,15 @@ StartOver:
             Dim lColumn As Integer = 1
             .FixedRows = ResultsFixedRows
             .FixedColumns = 1
-            .Columns = 1 + aSelectedVariations.Count
+            .Columns = 1
+            For Each lVariation As atcVariation In aSelectedVariations
+                Select Case lVariation.Operation
+                    Case "Hamon", "Penman-Monteith"
+                        'Skip PET variations in results table
+                    Case Else
+                        .Columns += 1
+                End Select
+            Next
             .CellValue(0, 0) = RunTitle
 
             For Each lVariation As atcVariation In aSelectedEndpoints
@@ -260,8 +268,13 @@ StartOver:
             If PreparedInputs.Count = 0 Then
                 'header for attributes
                 For Each lVariation As atcVariation In aSelectedVariations
-                    LabelResultsColumn(lColumn, lVariation, Nothing)
-                    lColumn += 1
+                    Select Case lVariation.Operation
+                        Case "Hamon", "Penman-Monteith"
+                            'Skip PET variations in results table
+                        Case Else
+                            LabelResultsColumn(lColumn, lVariation, Nothing)
+                            lColumn += 1
+                    End Select
                 Next
             End If
 
@@ -380,8 +393,13 @@ StartOver:
                     Dim lColumn As Integer = .FixedColumns
                     For Each lVariation As atcVariation In Inputs
                         If lVariation.Selected Then
-                            .CellValue(ResultsRow, lColumn) = "Computing..."
-                            lColumn += 1
+                            Select Case lVariation.Operation
+                                Case "Hamon", "Penman-Monteith"
+                                    'Skip PET variations in results table
+                                Case Else
+                                    .CellValue(ResultsRow, lColumn) = "Computing..."
+                                    lColumn += 1
+                            End Select
                         End If
                     Next
                 End With
@@ -423,10 +441,15 @@ NextIteration:
                     If PreparedInputs.Count = 0 Then
                         .CellValue(ResultsRow, 0) = aIteration + 1
                         For Each lVariation As atcVariation In aVariations
-                            lColumn = ResultsGridColumn(lVariation, Nothing)
-                            .CellValue(ResultsRow, lColumn) = Format(lVariation.CurrentValue, "0.####")
-                            lThisRunVariations &= lVariation.ToString & " = " & .CellValue(ResultsRow, lColumn) & vbCrLf
-                            lColumn += 1
+                            Select Case lVariation.Operation
+                                Case "Hamon", "Penman-Monteith"
+                                    'Skip PET variations in results table
+                                Case Else
+                                    lColumn = ResultsGridColumn(lVariation, Nothing)
+                                    .CellValue(ResultsRow, lColumn) = Format(lVariation.CurrentValue, "0.####")
+                                    lThisRunVariations &= lVariation.ToString & " = " & .CellValue(ResultsRow, lColumn) & vbCrLf
+                                    lColumn += 1
+                            End Select
                         Next
                     Else
                         .CellValue(ResultsRow, 0) = IO.Path.GetFileNameWithoutExtension(PathNameOnly(PreparedInputs.Item(aIteration)))
