@@ -359,6 +359,8 @@ Public Class atcVariation
 
                 Case "Penman-Monteith"
                     If PETtemperature.Count > lDataSetIndex AndAlso PETprecipitation.Count > lDataSetIndex Then
+                        Dim lLatitude As Double = lOriginalData.Attributes.GetValue("Latitude", -999)
+                        Dim lLongitude As Double = lOriginalData.Attributes.GetValue("Longitude", -999)
                         Dim PETstation As atcMetCmp.SwatWeatherStation = Nothing
 
                         If PETswatStations Is Nothing Then
@@ -379,8 +381,6 @@ Public Class atcVariation
                             End If
 
                             If PETstation Is Nothing Then 'Find by lat/lon of original TS
-                                Dim lLatitude As Double = lOriginalData.Attributes.GetValue("Latitude", -999)
-                                Dim lLongitude As Double = lOriginalData.Attributes.GetValue("Longitude", -999)
                                 If lLatitude > -90 AndAlso lLongitude > -360 Then
                                     PETstation = PETswatStations.Closest(lLatitude, lLongitude, 1).Values(0)
                                 End If
@@ -397,6 +397,12 @@ Public Class atcVariation
                             Throw New ApplicationException("VaryData: Temperature not found for PET")
                         Else
                             lModifiedTS = atcMetCmp.PanEvaporationTimeseriesComputedByPenmanMonteith(PETelevation, PETprecipitation(lDataSetIndex), PETtemperature(lDataSetIndex), Nothing, PETstation)
+                            'Disaggragate the daily PMET timeseries into hourly
+                            If lLatitude < -90 Then
+                                Logger.Dbg("Latitude not found, defaulting to 35 for disaggregation of PMET")
+                                lLatitude = 35
+                            End If
+                            lModifiedTS = atcMetCmp.DisSolPet(lModifiedTS, Nothing, 2, lLatitude)
                         End If
                     End If
 
