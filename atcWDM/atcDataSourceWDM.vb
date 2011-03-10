@@ -593,6 +593,7 @@ CaseExistRenumber:
             '    lValue = CStr(GetUnitID(lValue))
             Case "latitude" : lName = "latdeg"
             Case "longitude" : lName = "lngdeg"
+            Case "elevation" : lName = "elev"
             Case "skew" : lName = "skewcf"
             Case "standard deviation" : lName = "stddev"
             Case "mean" : lName = "meanvl"
