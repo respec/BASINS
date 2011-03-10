@@ -127,6 +127,7 @@ Public Class frmCAT
     Friend WithEvents radioSaveOnlyEndpoints As System.Windows.Forms.RadioButton
     Friend WithEvents radioSaveAll As System.Windows.Forms.RadioButton
     Friend WithEvents chkClearResults As System.Windows.Forms.CheckBox
+    Friend WithEvents btnInputCopy As System.Windows.Forms.Button
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -214,6 +215,7 @@ Public Class frmCAT
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.lblStatus = New System.Windows.Forms.Label
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.btnInputCopy = New System.Windows.Forms.Button
         Me.myTabs.SuspendLayout()
         Me.tabModel.SuspendLayout()
         Me.grpResults.SuspendLayout()
@@ -420,6 +422,7 @@ Public Class frmCAT
         '
         'tabInputs
         '
+        Me.tabInputs.Controls.Add(Me.btnInputCopy)
         Me.tabInputs.Controls.Add(Me.btnInputView)
         Me.tabInputs.Controls.Add(Me.txtBaseModel)
         Me.tabInputs.Controls.Add(Me.btnInputDown)
@@ -442,7 +445,7 @@ Public Class frmCAT
         '
         'btnInputView
         '
-        Me.btnInputView.Location = New System.Drawing.Point(176, 64)
+        Me.btnInputView.Location = New System.Drawing.Point(232, 64)
         Me.btnInputView.Name = "btnInputView"
         Me.btnInputView.Size = New System.Drawing.Size(48, 24)
         Me.btnInputView.TabIndex = 9
@@ -541,7 +544,7 @@ Public Class frmCAT
         '
         'btnInputPrepared
         '
-        Me.btnInputPrepared.Location = New System.Drawing.Point(229, 64)
+        Me.btnInputPrepared.Location = New System.Drawing.Point(285, 64)
         Me.btnInputPrepared.Name = "btnInputPrepared"
         Me.btnInputPrepared.Size = New System.Drawing.Size(63, 24)
         Me.btnInputPrepared.TabIndex = 10
@@ -549,7 +552,7 @@ Public Class frmCAT
         '
         'btnInputAddCligen
         '
-        Me.btnInputAddCligen.Location = New System.Drawing.Point(298, 64)
+        Me.btnInputAddCligen.Location = New System.Drawing.Point(354, 64)
         Me.btnInputAddCligen.Name = "btnInputAddCligen"
         Me.btnInputAddCligen.Size = New System.Drawing.Size(88, 24)
         Me.btnInputAddCligen.TabIndex = 10
@@ -1005,6 +1008,14 @@ Public Class frmCAT
         Me.lblStatus.TabIndex = 2
         Me.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
+        'btnInputCopy
+        '
+        Me.btnInputCopy.Location = New System.Drawing.Point(177, 64)
+        Me.btnInputCopy.Name = "btnInputCopy"
+        Me.btnInputCopy.Size = New System.Drawing.Size(49, 24)
+        Me.btnInputCopy.TabIndex = 15
+        Me.btnInputCopy.Text = "Copy"
+        '
         'frmCAT
         '
         Me.AllowDrop = True
@@ -1092,6 +1103,15 @@ Public Class frmCAT
         StartOrRefresh(False)
     End Sub
 
+    Private Sub SetCatProperties()
+        If chkClearResults.Checked OrElse pCat.ResultsGrid Is Nothing Then
+            pCat.InitResultsGrid()
+        End If
+        pCat.SaveAll = radioSaveAll.Checked
+        pCat.ShowEachRunProgress = chkShowEachRunProgress.Checked
+        pCat.ModifiedModelName = txtModifiedModelName.Text
+    End Sub
+
     Private Sub StartOrRefresh(ByVal aRunModel As Boolean)
         Running = True
 
@@ -1099,13 +1119,10 @@ Public Class frmCAT
 
         RefreshTotalIterations()
 
-        If chkClearResults.Checked OrElse pCat.ResultsGrid Is Nothing Then
-            pCat.InitResultsGrid()
-        End If
-        pCat.SaveAll = radioSaveAll.Checked
-        pCat.ShowEachRunProgress = chkShowEachRunProgress.Checked
+        SetCatProperties()
         pCat.RunModel = aRunModel
-        pCat.StartRun(txtModifiedModelName.Text)
+
+        pCat.StartRun()
 
         SaveSetting("BasinsCAT", "Settings", "TimePerRun", pCat.TimePerRun)
 
@@ -1870,6 +1887,7 @@ Public Class frmCAT
             .Title = "Save Variations as XML Text"
             .OverwritePrompt = True
             If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+                SetCatProperties()
                 'write file from form contents
                 SaveFileString(.FileName, (pCat.XML))
                 pUnsaved = False
@@ -2121,7 +2139,7 @@ Public Class frmCAT
         btnStart.Enabled = True
         btnRefresh.Enabled = True
         btnPlot.Enabled = True
-
+        txtModifiedModelName.Text = pCat.ModifiedModelName
         AddRecentFile(aBaseModelName, "Model")
     End Sub
 
@@ -2153,5 +2171,32 @@ Public Class frmCAT
 
     Private Sub chkShowEachRunProgress_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkShowEachRunProgress.CheckedChanged
         If pCat IsNot Nothing Then pCat.ShowEachRunProgress = chkShowEachRunProgress.Checked
+    End Sub
+
+    Private Sub btnInputCopy_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputCopy.Click
+        If pCat.PreparedInputs.Count = 0 Then
+            If lstInputs.SelectedIndices.Count = 0 AndAlso lstInputs.Items.Count = 1 Then
+                lstInputs.SelectedIndex = 0
+            End If
+            Dim lIndex As Integer = lstInputs.SelectedIndex
+            If lIndex >= 0 And lIndex < pCat.Inputs.Count Then
+                pUnsaved = True
+                Dim lVariation As atcVariation = pCat.Inputs.Item(lIndex).Clone
+                pCat.Inputs.Add(lVariation)
+                If lVariation.GetType.Name.EndsWith("Cligen") Then
+                    Dim frmVaryCligen As New frmVariationCligen
+                    lVariation = frmVaryCligen.AskUser(lVariation)
+                Else
+                    Dim frmVary As New frmVariation
+                    frmVary.AskUser(lVariation)
+                End If
+                RefreshInputList()
+                RefreshEndpointList()
+            ElseIf lstInputs.Items.Count = 0 Then 'Don't have any inputs to edit, add one
+                btnInputAdd_Click(sender, e)
+            Else
+                Logger.Msg("An input must be selected to edit", MsgBoxStyle.Critical, "No Input Selected")
+            End If
+        End If
     End Sub
 End Class

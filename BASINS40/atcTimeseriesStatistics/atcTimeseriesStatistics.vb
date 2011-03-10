@@ -277,11 +277,22 @@ Public Class atcTimeseriesStatistics
 
                         Dim lTimeInterval As Double = aTimeseries.Attributes.GetValue("interval", -1.0)
                         If lTimeInterval <= 0.0 Then
-                            Logger.Dbg("MissingInterval!")
+                            Dim lTimeUnit As atcTimeUnit = aTimeseries.Attributes.GetValue("Time Unit", atcTimeUnit.TUUnknown)
+                            Select Case lTimeUnit
+                                Case atcTimeUnit.TUYear
+                                    aTimeseries.Attributes.SetValue("SumAnnual", lMean)
+                                Case atcTimeUnit.TUMonth
+                                    'TODO: Need to decide on how to calculate
+                                    'Dim lMonthly As New atcData.atcSeasonsMonth
+                                    'lMonthly.SeasonYearFraction(lMonth)
+                                    Logger.Dbg("MissingInterval!")
+                                Case Else
+                                    Logger.Dbg("MissingInterval!")
+                            End Select
                         Else
                             Dim lSeasonYearFraction As Double = aTimeseries.Attributes.GetValue("SeasonYearFraction", 1)
                             Dim lIntervalsPerYear As Double = lSeasonYearFraction * 365.25 / lTimeInterval
-                            Dim lSumAnnual As Double = lMean * lIntervalsPerYear                            
+                            Dim lSumAnnual As Double = lMean * lIntervalsPerYear
                             aTimeseries.Attributes.SetValue("SumAnnual", lSumAnnual)
                         End If
                     End With

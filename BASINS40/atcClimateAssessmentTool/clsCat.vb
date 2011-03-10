@@ -12,6 +12,7 @@ Public Class clsCat
     Public PreparedInputs As New Generic.List(Of String) 'TODO: allow selected?
     Public SaveAll As Boolean = False
     Public ShowEachRunProgress As Boolean = False
+    Public ModifiedModelName As String = "Modified"
     Public ResultsGrid As New atcControls.atcGridSource
     Public ResultsRow As Integer
     Public TimePerRun As Double = 0 'Time each run takes in seconds
@@ -49,6 +50,7 @@ Public Class clsCat
             lXML &= "<SaveAll>" & SaveAll & "</SaveAll>" & vbCrLf
 
             lXML &= "<ShowEachRun>" & ShowEachRunProgress & "</ShowEachRun>" & vbCrLf
+            lXML &= "<ModifiedModelName>" & ModifiedModelName & "</ModifiedModelName>" & vbCrLf
 
             lXML &= Model.XML
 
@@ -109,6 +111,8 @@ StartOver:
                                 SaveAll = (lXML.InnerText.ToLower = "true")
                             Case "showeachrun"
                                 ShowEachRunProgress = (lXML.InnerText.ToLower = "true")
+                            Case "modifiedmodelname"
+                                ModifiedModelName = lXML.InnerText
 
                                 'TODO: generic case for any model type that creates correct Model and sets XML, 
                                 '      BaseModel (and anything model specific) gets set inside XML property set
@@ -205,7 +209,7 @@ StartOver:
         Return Nothing
     End Function
 
-    Public Function StartRun(ByVal aModifiedModel As String) As Boolean
+    Public Function StartRun() As Boolean
         g_Running = True
         Dim lSelectedVariations As Generic.List(Of atcVariation) = SelectedVariations(Inputs)
         'Dim lSelectedEndpoints As Generic.List(Of atcVariation) = SelectedVariations(Endpoints)
@@ -215,8 +219,7 @@ StartOver:
         RaiseEvent Started()
 
         Dim lRuns As Integer = 0
-        Run(aModifiedModel, _
-            lSelectedVariations, _
+        Run(lSelectedVariations, _
             lRuns, 0, Nothing)
 
         g_Running = False
@@ -360,8 +363,7 @@ StartOver:
         End With
     End Function
 
-    Private Sub Run(ByVal aModifiedModelName As String, _
-                    ByVal aVariations As Generic.List(Of atcVariation), _
+    Private Sub Run(ByVal aVariations As Generic.List(Of atcVariation), _
                     ByRef aIteration As Integer, _
                     ByRef aStartVariationIndex As Integer, _
                     ByRef aModifiedData As atcTimeseriesGroup)
@@ -413,7 +415,7 @@ NextIteration:
 
                 If PreparedInputs.Count = 0 Then
                     lPreparedInput = ""
-                    lModifiedModelName = aModifiedModelName
+                    lModifiedModelName = ModifiedModelName
                     If SaveAll Then
                         lModifiedModelName &= "-" & Format(aIteration + 1, "000")
                     End If
@@ -564,8 +566,7 @@ NextIteration:
                         lAllModifiedData.Add(lNewlyModified)
 
                         'We have handled a variation, now recursively handle more input variations or run the model
-                        Run(aModifiedModelName, _
-                            aVariations, _
+                        Run(aVariations, _
                             aIteration, _
                             aStartVariationIndex + 1, _
                             lAllModifiedData)

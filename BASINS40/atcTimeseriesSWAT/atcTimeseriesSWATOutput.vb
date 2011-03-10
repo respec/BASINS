@@ -185,6 +185,11 @@ ReOpenTable:
         Dim lDefCropId As atcAttributeDefinition = atcDataAttributes.GetDefinition("CropId", True)
         Dim lDefHruId As atcAttributeDefinition = atcDataAttributes.GetDefinition("HruId", True)
 
+        Dim lAttTimeStep As atcDefinedValue = Nothing
+        Dim lAttTimeUnit As atcDefinedValue = Nothing
+        Dim lAttInterval As atcDefinedValue = Nothing
+        Dim lAttPoint As atcDefinedValue = Nothing
+
         Dim lAttSubId As atcDefinedValue = Nothing
         Dim lAttCropId As atcDefinedValue = Nothing
         Dim lAttHruId As atcDefinedValue = Nothing
@@ -217,6 +222,20 @@ ReOpenTable:
                         .Add(lAttHistory1)
                         .Add(lAttScenario)
                         .Add(lAttLocation)
+
+                        If lAttTimeStep Is Nothing Then
+                            lTS.SetInterval(pTimeUnit, 1)
+                            lAttTimeStep = .GetDefinedValue("Time Step")
+                            lAttTimeUnit = .GetDefinedValue("Time Unit")
+                            lAttInterval = .GetDefinedValue("Interval")
+                            .SetValue("point", False)
+                            lAttPoint = .GetDefinedValue("Point")
+                        Else
+                            .Add(lAttTimeStep)
+                            .Add(lAttTimeUnit)
+                            .Add(lAttInterval)
+                            .Add(lAttPoint)
+                        End If
 
                         If pSaveSubwatershedId Then
                             .Add(lAttSubId)
@@ -620,11 +639,9 @@ NextRecord:
                     lReadTS.Values = lVd
                     With lReadTS.Attributes
                         .SetValue("point", False)
-                        .SetValue("ts", 1)
-                        .SetValue("tu", pTimeUnit)
-                        .SetValue("TSFILL", pNaN)
-                        .SetValue("MVal", pNaN)
-                        .SetValue("MAcc", pNaN)
+                        '.SetValue("TSFILL", pNaN)
+                        '.SetValue("MVal", pNaN)
+                        '.SetValue("MAcc", pNaN)
                         'Do we need to do FillValues? It seems like we already always have them filled, it is faster to skip, and lets us share pDates
                         'Dim lFilledTS As atcTimeseries = FillValues(lReadTS, .GetValue("tu"), .GetValue("ts"), .GetValue("TSFILL"), .GetValue("MVal"), .GetValue("MAcc"), Me)
                         'lReadTS.Dates.Values = lFilledTS.Dates.Values
