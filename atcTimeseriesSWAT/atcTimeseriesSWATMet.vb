@@ -258,7 +258,8 @@ ReOpenTable:
             Dim lunit As String = String.Empty
             Dim lIDRegex As New Regex("\d+")
             Dim lMatchCollection As MatchCollection = Nothing
-
+            'Assuming SWAT Met data are all daily
+            pTimeUnit = atcTimeUnit.TUDay
             For lFieldIndex As Integer = 2 To lTable.NumFields
                 Try
                     lFieldName = lTable.FieldName(lFieldIndex)
@@ -290,8 +291,7 @@ ReOpenTable:
                         .SetValue("SWATSTNID", lSWATStnCtr.ToString) ' SWAT station counter
                         .SetValue("FieldIndex", lFieldIndex.ToString) ' the column index in the pcp file, 1-based
                         .SetValue(lDefUnits, lunit)
-                        .SetValue("tu", atcTimeUnit.TUDay)
-                        .SetValue("ts", "1")
+                        lTS.SetInterval(pTimeUnit, 1) 'set tu, ts, interval
                         .SetValue(lDefLatitude, lLatitudes(lSWATStnCtr))
                         .SetValue(lDefLongitude, lLongitudes(lSWATStnCtr))
                         .SetValue(lDefElevation, lElevations(lSWATStnCtr))
@@ -396,8 +396,6 @@ NextRecord:
                         lReadTS.Values = lVd
                         With lReadTS.Attributes
                             .SetValue("point", False)
-                            .SetValue("ts", 1)
-                            .SetValue("tu", pTimeUnit)
                             .SetValue("TSFILL", pNaN)
                             .SetValue("MVal", pNaN)
                             .SetValue("MAcc", pNaN)

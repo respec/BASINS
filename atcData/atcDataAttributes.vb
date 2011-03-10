@@ -363,8 +363,13 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
                 .Add("path", "FileName")
 
                 .Add("ts", "Time Step")
-                .Add("tu", "Time Unit")
+                .Add("timestep", "Time Step")
+                .Add("timesteps", "Time Step")
                 .Add("time steps", "Time Step")
+
+                .Add("tu", "Time Unit")
+                .Add("timeunit", "Time Unit")
+                .Add("timeunits", "Time Unit")
                 .Add("time units", "Time Unit")
 
                 .Add("dsn", "ID")
