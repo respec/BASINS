@@ -276,20 +276,27 @@ Public Class atcTimeseriesStatistics
                         aTimeseries.Attributes.SetValue("EJDay", lEJDate)
 
                         Dim lTimeInterval As Double = aTimeseries.Attributes.GetValue("interval", -1.0)
-                        If lTimeInterval <= 0.0 Then
+                        If lTimeInterval <= 0 Then
                             Dim lTimeUnit As atcTimeUnit = aTimeseries.Attributes.GetValue("Time Unit", atcTimeUnit.TUUnknown)
                             Select Case lTimeUnit
                                 Case atcTimeUnit.TUYear
-                                    aTimeseries.Attributes.SetValue("SumAnnual", lMean)
+                                    lTimeInterval = JulianYear * 100
+                                Case atcTimeUnit.TUCentury
+                                    lTimeInterval = JulianYear
                                 Case atcTimeUnit.TUMonth
-                                    'TODO: Need to decide on how to calculate
-                                    'Dim lMonthly As New atcData.atcSeasonsMonth
-                                    'lMonthly.SeasonYearFraction(lMonth)
-                                    Logger.Dbg("MissingInterval!")
+                                    'TODO: We may want to weight months by length, this seems to treat each month as 30.6875 days
+                                    lTimeInterval = JulianYear / 12
+                                Case atcTimeUnit.TUDay, atcTimeUnit.TUHour, atcTimeUnit.TUMinute, atcTimeUnit.TUSecond
+                                    Dim lTimeStep As Double = aTimeseries.Attributes.GetValue("Time Step", -1)
+                                    If lTimeStep > 0 Then
+                                        aTimeseries.SetInterval(lTimeUnit, lTimeStep)
+                                        lTimeInterval = aTimeseries.Attributes.GetValue("interval", -1.0)
+                                    End If
                                 Case Else
-                                    Logger.Dbg("MissingInterval!")
+                                    Logger.Dbg("Missing Interval, cannot compute SumAnnual")
                             End Select
-                        Else
+                        End If
+                        If lTimeInterval > 0 Then
                             Dim lSeasonYearFraction As Double = aTimeseries.Attributes.GetValue("SeasonYearFraction", 1)
                             Dim lIntervalsPerYear As Double = lSeasonYearFraction * 365.25 / lTimeInterval
                             Dim lSumAnnual As Double = lMean * lIntervalsPerYear
