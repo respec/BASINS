@@ -9,8 +9,7 @@ Public Class atcDataSet
 
     Private pAttributes As atcDataAttributes
 
-    ''' <summary>Attributes associated with the whole data set(location, constituent, 
-    ''' etc.)</summary>
+    ''' <summary>Attributes associated with the whole data set(location, constituent, etc.)</summary>
     Public ReadOnly Property Attributes() As atcDataAttributes
         Get
             Return pAttributes

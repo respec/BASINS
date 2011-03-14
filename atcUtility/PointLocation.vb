@@ -4,6 +4,11 @@
 ''' <remarks></remarks>
 Public MustInherit Class PointLocations
     Inherits System.Collections.ObjectModel.KeyedCollection(Of String, PointLocation)
+
+    ''' <summary>Describes which property of PointLocation is the Key</summary>
+    ''' <param name="aPointLocation">PointLocation to determine key for</param>
+    ''' <returns>Key associated with aPointLocation argument</returns>
+    ''' <remarks></remarks>
     Protected Overrides Function GetKeyForItem(ByVal aPointLocation As PointLocation) As String
         Return aPointLocation.Key
     End Function

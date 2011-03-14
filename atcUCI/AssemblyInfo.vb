@@ -6,15 +6,11 @@ Imports System.Runtime.InteropServices
 ' set of attributes. Change these attribute values to modify the information
 ' associated with an assembly.
 
-
-' TODO: Review the values of the assembly attributes
-
-
-<Assembly: AssemblyTitle("atcUCI")>
+<Assembly: AssemblyTitle("atcUCI")> 
 <Assembly: AssemblyDescription("")>
 <Assembly: AssemblyCompany("Aqua Terra Consultants")>
 <Assembly: AssemblyProduct("")>
-<Assembly: AssemblyCopyright("2006")>
+<Assembly: AssemblyCopyright("2006-10")> 
 <Assembly: AssemblyTrademark("")>
 <Assembly: AssemblyCulture("")>
 

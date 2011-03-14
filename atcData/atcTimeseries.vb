@@ -435,6 +435,9 @@ Public Class atcTimeseries
         Return -1
     End Function
 
+    ''' <summary>Original parent timeseries of this timeseries</summary>
+    ''' <returns>Timeseries containing original parent of this timeseries, determined recursively</returns>
+    ''' <remarks>If no parent, returns this timeseries</remarks>
     Public Function OriginalParent() As atcTimeseries
         Dim lFoundParent As atcTimeseries = Me
         Dim lNextParent As atcTimeseries = Me.Attributes.GetValue("Parent Timeseries")
@@ -445,6 +448,22 @@ Public Class atcTimeseries
         Return lFoundParent
     End Function
 
+    ''' <summary>Set Interval attribute of timeseries based on attributes TU (or TCode) and TS</summary>
+    ''' <remarks>Unknown time units leads to removal of Interval attribute</remarks>
+    Public Sub SetInterval()
+        Dim lTu As atcTimeUnit = Attributes.GetValue("TU", atcTimeUnit.TUUnknown)
+        If lTu = atcTimeUnit.TUUnknown Then
+            Dim lTCode As Integer = Attributes.GetValue("TCode", 0)
+            lTu = lTCode
+        End If
+        Dim lTs As Integer = Attributes.GetValue("TS", 1)
+        SetInterval(lTu, lTs)
+     End Sub
+
+    ''' <summary>Set Interval attribute of timeseries based on time units and time step</summary>
+    ''' <param name="aTu">Time units (atcTimeUnit)</param>
+    ''' <param name="ats">Time step (in Time Units)</param>
+    ''' <remarks>Unknown time units leads to removal of Interval attribute</remarks>
     Public Sub SetInterval(ByVal aTu As atcTimeUnit, ByVal ats As Integer)
         With Attributes
             .SetValue("TU", aTu)
