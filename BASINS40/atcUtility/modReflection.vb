@@ -1,11 +1,12 @@
 Option Strict Off
 Option Explicit On
-'Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
 Imports System.Reflection
 Imports MapWinUtility
 Imports MapWinUtility.Strings
 
+''' <summary>Convenience functions wrapping System.Reflection </summary>
+''' <remarks>Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license</remarks>
 Public Module modReflection
 
     Private pDontNeedTest As ArrayList

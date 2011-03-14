@@ -47,7 +47,7 @@ Public Class clsMonitor
 
     Public Shared Sub Main()
         'MsgBox("Pausing Status Monitor, Attach to process " & Process.GetCurrentProcess.Id)
-        'Application.DoEvents()
+        Application.DoEvents()
 
         Dim lCommandLine As String = Command()
         'Console.WriteLine("StatusMonitorEntryWith " & lCommandLine)

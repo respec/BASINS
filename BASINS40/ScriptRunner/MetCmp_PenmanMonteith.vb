@@ -25,10 +25,10 @@ Module MetCmp_PenmanMonteith
             If lSJD < lEJD Then 'common period found
                 lPrecipitationTS = SubsetByDate(lPrecipitationTS, lSJD, lEJD, Nothing)
                 lAirTemperatureTS = SubsetByDate(lAirTemperatureTS, lSJD, lEJD, Nothing)
-                Dim pSwatWeatherStations As New SwatWeatherStations
+                Dim lSwatWeatherStations As New SwatWeatherStations
                 Dim lLatitude As Double = 33.6
                 Dim lLongitude As Double = -84
-                Dim lNearestStations As SortedList(Of Double, PointLocation) = pSwatWeatherStations.Closest(lLatitude, lLongitude, 5)
+                Dim lNearestStations As SortedList(Of Double, PointLocation) = lSwatWeatherStations.Closest(lLatitude, lLongitude, 5)
                 Dim lNearestStation As SwatWeatherStation = lNearestStations.Values(0)
 
                 'TODO: get actual elevation of location rather than using station elveation
@@ -36,6 +36,13 @@ Module MetCmp_PenmanMonteith
                 lElevation = 1010 'from BASINS StationLocs.dbf record 3500
                 Dim lPanEvapTimeseries As atcTimeseries = _
                     PanEvaporationTimeseriesComputedByPenmanMonteith(lElevation, lPrecipitationTS, lAirTemperatureTS, Nothing, lNearestStation)
+
+                Dim lTotal As Double = 0.0
+                For lIndex As Integer = 1 To 30
+                    lTotal += lPanEvapTimeseries.Value(lIndex)
+                Next
+                Debug.Print("Total " & lTotal)
+
                 lPanEvapTimeseries.Attributes.CalculateAll()
                 Logger.Dbg("Attributes " & lPanEvapTimeseries.Attributes.ToString)
             End If

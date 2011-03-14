@@ -157,6 +157,7 @@ Public Class atcWDMfile
         lDataSet.Attributes.AddHistory("read fromVB " & Specification)
 
         AttributesFromWdm(aWdm, lDataSet, lRec)
+        lDataSet.SetInterval()
 
         'Delay reading all the values until they are needed
         lDataSet.ValuesNeedToBeRead = True
@@ -211,13 +212,18 @@ Public Class atcWDMfile
                                     End Try
                                 Else 'parse dates written as M/D/YYYY h:mm:ss (truncated to 14 characters)
 ParseDate:                          Logger.Dbg(.Name & " text date '" & lS & "' - unknown whether AM or PM")
-                                    Dim lMonth As Integer = StrFirstInt(lS)
-                                    lS = lS.Substring(1)
-                                    Dim lDay As Integer = StrFirstInt(lS)
-                                    lS = lS.Substring(1)
-                                    Dim lYear As Integer = StrFirstInt(lS)
-                                    lDate = New Date(lYear, lMonth, lDay, 12, 0, 0)
-                                    Logger.Dbg(.Name & "parsed as '" & lDate.ToString & "' rounded to noon")
+                                    Try
+                                        Dim lMonth As Integer = StrFirstInt(lS)
+                                        lS = lS.Substring(1)
+                                        Dim lDay As Integer = StrFirstInt(lS)
+                                        lS = lS.Substring(1)
+                                        Dim lYear As Integer = StrFirstInt(lS)
+                                        lDate = New Date(lYear, lMonth, lDay, 12, 0, 0)
+                                        Logger.Dbg(.Name & "parsed as '" & lDate.ToString & "' rounded to noon")
+                                    Catch ex As Exception
+                                        Logger.Dbg(.Name & " failedToParse, defaulted to Now")
+                                        lDate = Now
+                                    End Try
                                 End If
                                 'TODO: set units attribute from DCODE
                                 'Case "DCODE"

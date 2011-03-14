@@ -1,6 +1,3 @@
-Option Strict Off
-Option Explicit On
-
 Imports MapWinGIS
 Imports MapWindow.Interfaces
 Imports System.Collections.Specialized
