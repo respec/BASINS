@@ -139,6 +139,9 @@ Public Class SwatWeatherStation
         State = lFieldValues(0)
         NameKey = lFieldValues(1)
         Name = lFieldValues(2).Replace("_", " ")
+        If lFieldValues(3) = 690 Then
+            Debug.Print("ProblemSpot")
+        End If
         LatSinR = Math.Sin(Latitude * DegreesToRadians)
         LatCosR = Math.Cos(Latitude * DegreesToRadians)
         Elev = lFieldValues(6)
@@ -150,24 +153,24 @@ Public Class SwatWeatherStation
             AirTempMinAv(lMonthIndex) = lFieldValues(19 + lMonthIndex)
             Prob_WetAfterDry(lMonthIndex) = lFieldValues(91 + lMonthIndex)
             Prob_WetAfterWet(lMonthIndex) = lFieldValues(103 + lMonthIndex)
+            ProportionWet(lMonthIndex) = lFieldValues(115 + lMonthIndex)
             SolarAv(lMonthIndex) = lFieldValues(139 + lMonthIndex)
             DewpointAv(lMonthIndex) = lFieldValues(151 + lMonthIndex)
             WindAv(lMonthIndex) = lFieldValues(163 + lMonthIndex)
 
             Dim lDaysPerMonth As Integer = DayMon(2000, lMonthIndex)
 
-            Dim lPcpd As Double = 0.1
             If Prob_WetAfterWet(lMonthIndex) <= Prob_WetAfterDry(lMonthIndex) OrElse _
                Prob_WetAfterDry(lMonthIndex) <= 0 Then
-                Prob_WetAfterDry(lMonthIndex) = 0.75 * lPcpd / lDaysPerMonth
+                Prob_WetAfterDry(lMonthIndex) = 0.75 * ProportionWet(lMonthIndex) / lDaysPerMonth
                 Prob_WetAfterWet(lMonthIndex) = 0.25 + Prob_WetAfterDry(lMonthIndex)
             Else
-                lPcpd = lDaysPerMonth * Prob_WetAfterDry(lMonthIndex) / (1 - Prob_WetAfterWet(lMonthIndex) + Prob_WetAfterDry(lMonthIndex))
+                ProportionWet(lMonthIndex) = lDaysPerMonth * Prob_WetAfterDry(lMonthIndex) / (1 - Prob_WetAfterWet(lMonthIndex) + Prob_WetAfterDry(lMonthIndex))
             End If
-            If lPcpd < 0.0 Then
-                lPcpd = 0.001
+            If ProportionWet(lMonthIndex) < 0.0 Then
+                ProportionWet(lMonthIndex) = 0.001
             End If
-            ProportionWet(lMonthIndex) = lPcpd / lDaysPerMonth
+            ProportionWet(lMonthIndex) = ProportionWet(lMonthIndex) / lDaysPerMonth
         Next
     End Sub
 
