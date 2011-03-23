@@ -162,6 +162,7 @@ Public Class atcTimeseriesFileHspfBinOut
                             End If
                             .ValuesNeedToBeRead = True
                             .Dates = New atcTimeseries(Me)
+                            .SetInterval(lTu, lTs)
                             AddDataSet(lTSer)
                         End With
                     Next lDataIndex
