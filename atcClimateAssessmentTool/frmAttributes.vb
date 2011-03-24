@@ -20,8 +20,8 @@ Public Class frmAttributes
     Private Sub btnNdayAdd_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnNdayAdd.Click
         If Not IsNumeric(txtNday.Text.Trim) Then
             Logger.Msg("Non-numeric number of days '" & txtNday.Text & "'")
-        ElseIf Not IsNumeric(txtReturnPeriod.Text.Trim) Then
-            Logger.Msg("Non-numeric Return Period '" & txtReturnPeriod.Text & "'")
+        ElseIf Not IsNumeric(txtReturnPeriod.Text.Trim) AndAlso atcData.atcDataAttributes.GetDefinition(txtReturnPeriod.Text.Trim) Is Nothing Then
+            Logger.Msg("Non-numeric Return Period is also not an attribute '" & txtReturnPeriod.Text & "'")
         Else
             Dim lNumDays As Integer = CInt(txtNday.Text.Trim)
             Dim lArgName As String = txtNday.Text.Trim
