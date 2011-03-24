@@ -87,11 +87,17 @@ Public Class atcDataAttributes
                     lDef = pAllDefinitions.ItemByKey("CI Upper")
                 ElseIf lKey.Contains("K Value") Then
                     lDef = pAllDefinitions.ItemByKey("K Value")
-                Else
+                ElseIf IsNumeric(lKey.Substring(lKey.IndexOf("low") + 3)) Then
                     lDef = pAllDefinitions.ItemByKey("n-day low value")
+                Else
+                    lDef = pAllDefinitions.ItemByKey("n-day low attribute")
                 End If
             ElseIf lKey.Contains("high") Then
-                lDef = pAllDefinitions.ItemByKey("n-day high value")
+                If IsNumeric(lKey.Substring(lKey.IndexOf("high") + 4)) Then
+                    lDef = pAllDefinitions.ItemByKey("n-day high value")
+                Else
+                    lDef = pAllDefinitions.ItemByKey("n-day high attribute")
+                End If
             End If
             If lDef IsNot Nothing Then            'Found a generic definition
                 lDef = lDef.Clone(aAttributeName) 'Make a specific definition
@@ -419,7 +425,7 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
 
     'Calculate all the known attributes that can be calculated with no additional arguments
     Public Sub CalculateAll()
-        Dim lCalculateThese As New ArrayList
+        Dim lCalculateThese As New Generic.List(Of String)
         For Each lDef As atcAttributeDefinition In pAllDefinitions 'For each kind of attribute we know about
             If lDef.Calculated Then                                  'This attribute can be calculated
                 Dim key As String = AttributeNameToKey((lDef.Name))
