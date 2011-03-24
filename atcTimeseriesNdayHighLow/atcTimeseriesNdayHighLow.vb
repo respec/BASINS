@@ -554,7 +554,7 @@ Public Class atcTimeseriesNdayHighLow
         Dim lLogFlg As Boolean = True
         Dim lOperationName As String = aOperationName.ToLower
         Dim lNDay As Object = 1
-        Dim lReturn As Object = 100
+        Dim lReturn As Object = 0
         Dim lHigh As Boolean = True
         Dim lHighLowWord As String = "high"
         Dim lBoundaryMonth As Integer = 10
