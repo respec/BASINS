@@ -93,6 +93,14 @@ Public Class atcTimeseriesNdayHighLow
                     .TypeString = "Boolean"
                 End With
 
+                Dim defAttribute As New atcAttributeDefinition
+                With defHigh
+                    .Name = "Attribute"
+                    .Description = "Attribute of n-day timeseries"
+                    .Editable = True
+                    .TypeString = "String"
+                End With
+
                 AddOperation("7Q10", "Seven day low flow 10-year return period", _
                              "Double", defTimeSeriesOne)
                 AddOperation("1High100", "One day high 100-year return period", _
@@ -107,6 +115,11 @@ Public Class atcTimeseriesNdayHighLow
                              "Double", defTimeSeriesOne, defDays, defReturnPeriod)
                 AddOperation("n-day high value", "n-day high value for a return period", _
                              "Double", defTimeSeriesOne, defDays, defReturnPeriod)
+
+                AddOperation("n-day low attribute", "attribute of n-day low timeseries", _
+                             "Double", defTimeSeriesOne, defDays, defAttribute)
+                AddOperation("n-day high attribute", "attribute of n-day high timeseries", _
+                             "Double", defTimeSeriesOne, defDays, defAttribute)
 
                 AddOperation("Kendall Tau", "Kendall Tau Statistics", _
                              "Double", defTimeSeriesOne, defDays, defHigh)
@@ -543,12 +556,14 @@ Public Class atcTimeseriesNdayHighLow
         Dim lNDay As Object = 1
         Dim lReturn As Object = 100
         Dim lHigh As Boolean = True
+        Dim lHighLowWord As String = "high"
         Dim lBoundaryMonth As Integer = 10
         Dim lBoundaryDay As Integer = 1
         Dim lEndMonth As Integer = 0
         Dim lEndDay As Integer = 0
         Dim lFirstYear As Integer = 0
         Dim lLastYear As Integer = 0
+        Dim lAttributeDef As atcAttributeDefinition = Nothing
 
         Select Case lOperationName
             Case "7q10"
@@ -569,17 +584,38 @@ Public Class atcTimeseriesNdayHighLow
                 If lPos < lOperationName.Length Then
                     lReturn = lOperationName.Substring(lPos)
                 End If
-                If lNDay > 0 AndAlso lReturn > 0 Then
-                    If lOperationName.Contains("low") Then
-                        lOperationName = "n-day low value"
-                    Else
-                        lOperationName = "n-day high value"
-                    End If
-                End If
         End Select
 
         'Change default from True to False if operation name contains "low"
-        If lOperationName.Contains("low") Then lHigh = False
+        If lOperationName.Contains("low") Then
+            lHigh = False
+            lHighLowWord = "low"
+        End If
+
+        If lNDay > 0 AndAlso lReturn > 0 Then
+            lOperationName = "n-day " & lHighLowWord & " value"
+        ElseIf lNDay > 0 Then 'See if we can find an attribute name instead of a return period
+            Dim lAttStart As Integer = -1
+            If lHigh Then
+                lAttStart = lOperationName.IndexOf("high")
+                If lAttStart >= 0 Then
+                    lAttStart += 4
+                Else
+                    lAttStart = lOperationName.IndexOf("hi")
+                    If lAttStart >= 0 Then lAttStart += 2
+                End If
+            Else
+                lAttStart = lOperationName.IndexOf("low")
+                If lAttStart >= 0 Then lAttStart += 3
+            End If
+
+            If lAttStart >= 0 Then
+                lAttributeDef = atcData.atcDataAttributes.GetDefinition(lOperationName.Substring(lAttStart), False)
+                If lAttributeDef IsNot Nothing Then
+                    lOperationName = "n-day " & lHighLowWord & " attribute"
+                End If
+            End If
+        End If
 
         If aArgs Is Nothing Then
             ltsGroup = atcDataManager.UserSelectData("Select data to compute statistics for")
@@ -614,6 +650,7 @@ Public Class atcTimeseriesNdayHighLow
             If aArgs.ContainsAttribute("EndDay") Then lEndDay = aArgs.GetValue("EndDay")
             If aArgs.ContainsAttribute("FirstYear") Then lFirstYear = aArgs.GetValue("FirstYear")
             If aArgs.ContainsAttribute("LastYear") Then lLastYear = aArgs.GetValue("LastYear")
+            If aArgs.ContainsAttribute("Attribute") Then lAttributeDef = atcData.atcDataAttributes.GetDefinition(aArgs.GetValue("Attribute"), False)
         End If
 
         If ltsGroup Is Nothing Then
@@ -634,6 +671,11 @@ Public Class atcTimeseriesNdayHighLow
                 Case "n-day low timeseries", "n-day high timeseries"
                     lNDayTsGroup = HighOrLowTimeseries(lTsB, lNDay, lHigh, lTs.Attributes, lEndMonth, lEndDay)
                     Me.DataSets.AddRange(lNDayTsGroup)
+                Case "n-day low attribute", "n-day high attribute"
+                    If lAttributeDef IsNot Nothing Then
+                        lNDayTsGroup = HighOrLowTimeseries(lTsB, lNDay, lHigh, lTs.Attributes, lEndMonth, lEndDay)
+                        lTs.Attributes.SetValue(CInt(lNDay) & lHighLowWord & lAttributeDef.Name, lNDayTsGroup(0).Attributes.GetValue(lAttributeDef.Name))
+                    End If
                 Case "kendall tau"
                     ComputeTau(lTsB, lNDay, lHigh, lTs.Attributes, lEndMonth, lEndDay)
             End Select
