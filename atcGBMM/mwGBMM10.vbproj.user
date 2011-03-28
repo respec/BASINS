@@ -19,7 +19,4 @@
     <StartProgram>C:\Basins\bin\MapWindow.exe</StartProgram>
     <StartAction>Program</StartAction>
   </PropertyGroup>
-  <PropertyGroup>
-    <ReferencePath>C:\dev\MapWindow4Dev\Bin64\;C:\dev\BASINS40\Bin64\</ReferencePath>
-  </PropertyGroup>
 </Project>

@@ -34,13 +34,13 @@ Public Class clsGraphCumulativeDifference
                         Dim lCommonLocation As String = aDataGroup.CommonAttributeValue("Location", "")
                         Dim lCommonConstituent As String = aDataGroup.CommonAttributeValue("Constituent", "")
                         Dim lCommonUnits As String = aDataGroup.CommonAttributeValue("Units", "")
-                        Dim lCommonTimeUnits As Integer = aDataGroup.CommonAttributeValue("Time Units", 0)
+                        Dim lCommonTimeUnit As Integer = aDataGroup.CommonAttributeValue("Time Unit", 0)
                         Dim lCommonTimeStep As Integer = aDataGroup.CommonAttributeValue("Time Step", 0)
-                        Dim lCommonTimeUnitName As String = TimeUnitName(lCommonTimeUnits, lCommonTimeStep)
+                        Dim lCommonTimeUnitName As String = TimeUnitName(lCommonTimeUnit, lCommonTimeStep)
                         For Each lTimeseries As atcTimeseries In Datasets
                             Dim lCurve As ZedGraph.CurveItem = AddTimeseriesCurve(lTimeseries, pZgc, FindYAxis(lTimeseries, pZgc, Datasets))
-                            lCurve.Label.Text = TSCurveLabel(aDataGroup(0), lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonTimeUnits) _
-                                      & " - " & TSCurveLabel(aDataGroup(1), lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonTimeUnits)
+                            lCurve.Label.Text = TSCurveLabel(aDataGroup(0), lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonTimeUnit) _
+                                      & " - " & TSCurveLabel(aDataGroup(1), lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonTimeUnit)
                         Next
                         pZgc.MasterPane.PaneList(0).XAxis.Title.Text = "Cummulative Difference"
                         AxisTitlesFromCommonAttributes(pZgc.MasterPane.PaneList(0), lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)

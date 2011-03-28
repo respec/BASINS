@@ -3,13 +3,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ReferencePath>C:\dev\MapWindow4Dev\Bin64\;C:\dev\BASINS40\Bin64\</ReferencePath>
     <CopyProjectDestinationFolder>
     </CopyProjectDestinationFolder>
     <CopyProjectUncPath>
     </CopyProjectUncPath>
     <CopyProjectOption>0</CopyProjectOption>
-    <ProjectView>ProjectFiles</ProjectView>
+    <ProjectView>ShowAllFiles</ProjectView>
     <PublishUrlHistory />
     <InstallUrlHistory />
     <SupportUrlHistory />

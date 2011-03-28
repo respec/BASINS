@@ -4,7 +4,6 @@
     <LastOpenVersion>7.10.3077</LastOpenVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ReferencePath>C:\dev\BASINS40\Bin64\;C:\dev\MapWindow4Dev\Bin64\</ReferencePath>
     <CopyProjectDestinationFolder>
     </CopyProjectDestinationFolder>
     <CopyProjectUncPath>
@@ -34,7 +33,7 @@
     </StartArguments>
     <StartPage>
     </StartPage>
-    <StartProgram>\dev\BASINS40\Bin\MapWindow.exe</StartProgram>
+    <StartProgram>S:\dev\BASINS40\local\AnyDebug\MapWindow.exe</StartProgram>
     <StartURL>
     </StartURL>
     <StartWorkingDirectory>
@@ -54,7 +53,7 @@
     </StartArguments>
     <StartPage>
     </StartPage>
-    <StartProgram>\dev\BASINS40\Bin\MapWindow.exe</StartProgram>
+    <StartProgram>S:\dev\BASINS40\local\AnyRelease\MapWindow.exe</StartProgram>
     <StartURL>
     </StartURL>
     <StartWorkingDirectory>
@@ -62,14 +61,11 @@
     <StartWithIE>false</StartWithIE>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <StartProgram>C:\dev\MapWindow4Dev\Bin64\MapWindow.exe</StartProgram>
+    <StartProgram>C:\dev\BASINS40\local\x64Debug\MapWindow.exe</StartProgram>
     <StartAction>Program</StartAction>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <StartProgram>C:\dev\MapWindow4Dev\Bin64\MapWindow.exe</StartProgram>
+    <StartProgram>C:\dev\BASINS40\local\x64Release\MapWindow.exe</StartProgram>
     <StartAction>Program</StartAction>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ReferencePath>C:\dev\MapWindow4Dev\Bin64\</ReferencePath>
   </PropertyGroup>
 </Project>

@@ -35,7 +35,7 @@ Public Class atcListPlugin
             Dim lCantFit As String = "#"
             Dim lSignificantDigits As Integer = 5
 
-            Dim lDisplayAttributes As ArrayList = Nothing
+            Dim lDisplayAttributes As Generic.List(Of String) = Nothing
 
             For Each lOption As String In aOptions
                 Select Case lOption.ToLower
@@ -91,7 +91,7 @@ Public Class atcListPlugin
                                 End Select
                             End If
                         ElseIf lOption.ToLower.StartsWith("displayattributes:") Then
-                            lDisplayAttributes = New ArrayList
+                            lDisplayAttributes = New Generic.List(Of String)
                             lDisplayAttributes.AddRange(lOption.Substring(18).Split(","))
                         End If
                         Logger.Dbg("UnknownParameter:" & lOption)

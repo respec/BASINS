@@ -83,12 +83,12 @@ Public Class atcDataSourceTimeseriesBinary
                                 Dim lTimeUnits As Object = lData.Attributes.GetValue("tu", 4)
                                 Dim lTU As atcUtility.atcTimeUnit
                                 If lTimeUnits.GetType.IsInstanceOfType("") Then
-                                    lTU = System.Enum.Parse(lTU.GetType, lTimeUnits) '6 'TODO: dont hard code this!!!
+                                    lTU = System.Enum.Parse(lTU.GetType, lTimeUnits)
                                     lData.Attributes.SetValue("tu", lTU)
                                 Else
                                     lTU = lTimeUnits
                                 End If
-                                Dim lTimeStep = lData.Attributes.GetValue("ts", 1)
+                                Dim lTimeStep As Integer = lData.Attributes.GetValue("ts", 1)
                                 Dim lDateStart As Double = lReader.ReadDouble
                                 lDates(0) = lDateStart
                                 For lIndex As Integer = 1 To lNumDates

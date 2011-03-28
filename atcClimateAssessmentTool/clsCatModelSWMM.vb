@@ -52,6 +52,24 @@ Public Class clsCatModelSWMM
         End If
     End Sub
 
+    Property SimulationStart() As Date Implements clsCatModel.SimulationStart
+        Get
+
+        End Get
+        Set(ByVal value As Date)
+
+        End Set
+    End Property
+
+    Property SimulationEnd() As Date Implements clsCatModel.SimulationEnd
+        Get
+
+        End Get
+        Set(ByVal value As Date)
+
+        End Set
+    End Property
+
     Private Sub CreateModifiedINP(ByVal aNewModelName As String, ByVal aNewInpFilename As String, ByVal aModifiedData As atcData.atcTimeseriesGroup)
         Dim lPrevCurDir As String = CurDir()
         ChDriveDir(IO.Path.GetDirectoryName(aNewInpFilename))

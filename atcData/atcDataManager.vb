@@ -8,8 +8,8 @@ Imports System.Reflection
 Public Class atcDataManager
     Private Shared pMapWin As MapWindow.Interfaces.IMapWin
     Private Shared pDataSources As ArrayList 'of atcTimeseriesSource, the currently open data sources
-    Private Shared pSelectionAttributes As ArrayList
-    Private Shared pDisplayAttributes As ArrayList
+    Private Shared pSelectionAttributes As Generic.List(Of String)
+    Private Shared pDisplayAttributes As Generic.List(Of String)
     Private Shared pManagerForm As frmManager
 
     Private Shared pDefaultSelectionAttributes() As String = {"Scenario", "Location", "Constituent"}
@@ -56,8 +56,8 @@ Public Class atcDataManager
             pDataSources.Clear()
         End If
         pDataSources = New ArrayList
-        pSelectionAttributes = New ArrayList(pDefaultSelectionAttributes)
-        pDisplayAttributes = New ArrayList(pDefaultDisplayAttributes)
+        pSelectionAttributes = New Generic.List(Of String)(pDefaultSelectionAttributes)
+        pDisplayAttributes = New Generic.List(Of String)(pDefaultDisplayAttributes)
     End Sub
 
     ''' <summary>Set of atcTimeseriesSource objects representing currently open DataSources</summary>
@@ -77,14 +77,14 @@ Public Class atcDataManager
     End Function
 
     ''' <summary>Names of attributes used for selection of data in UI</summary>
-    Public Shared ReadOnly Property SelectionAttributes() As ArrayList
+    Public Shared ReadOnly Property SelectionAttributes() As Generic.List(Of String)
         Get
             Return pSelectionAttributes
         End Get
     End Property
 
     ''' <summary>Names of attributes used for listing of data in UI</summary>
-    Public Shared ReadOnly Property DisplayAttributes() As ArrayList
+    Public Shared ReadOnly Property DisplayAttributes() As Generic.List(Of String)
         Get
             Return pDisplayAttributes
         End Get

@@ -633,10 +633,10 @@ Friend Class frmTrend
     Private pCantFit As String = "#"
     Private pSignificantDigits As Integer = 5
 
-    Private pDataAttributes As ArrayList
-    Private pBasicAttributes As ArrayList
-    Private pNDayAttributes As ArrayList
-    Private pTrendAttributes As ArrayList
+    'Private pDataAttributes As ArrayList
+    Private pBasicAttributes As Generic.List(Of String)
+    Private pNDayAttributes As Generic.List(Of String)
+    Private pTrendAttributes As Generic.List(Of String)
 
     Private pYearStartMonth As Integer = 0
     Private pYearStartDay As Integer = 0
@@ -662,9 +662,9 @@ Friend Class frmTrend
     End Sub
 
     Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing, _
-                          Optional ByVal aBasicAttributes As ArrayList = Nothing, _
-                          Optional ByVal aNDayAttributes As ArrayList = Nothing, _
-                          Optional ByVal aTrendAttributes As ArrayList = Nothing, _
+                          Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing, _
+                          Optional ByVal aNDayAttributes As Generic.List(Of String) = Nothing, _
+                          Optional ByVal aTrendAttributes As Generic.List(Of String) = Nothing, _
                           Optional ByVal aShowForm As Boolean = True)
         If aTimeseriesGroup Is Nothing Then
             pDataGroup = New atcTimeseriesGroup

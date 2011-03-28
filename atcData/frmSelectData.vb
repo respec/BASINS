@@ -1118,7 +1118,7 @@ NextName:
 
     'Update SelectionAttributes from current set of pcboCriteria
     Private Sub UpdateManagerSelectionAttributes()
-        Dim curAttributes As New ArrayList
+        Dim curAttributes As New Generic.List(Of String)
         For iCriteria As Integer = 0 To pcboCriteria.GetUpperBound(0)
             Dim attrName As String = pcboCriteria(iCriteria).SelectedItem
             If Not attrName Is Nothing Then

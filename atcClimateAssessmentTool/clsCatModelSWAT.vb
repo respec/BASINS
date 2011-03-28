@@ -198,6 +198,24 @@ OpenOutput:
 ALREADYSET:
     End Sub
 
+    Property SimulationStart() As Date Implements clsCatModel.SimulationStart
+        Get
+
+        End Get
+        Set(ByVal value As Date)
+
+        End Set
+    End Property
+
+    Property SimulationEnd() As Date Implements clsCatModel.SimulationEnd
+        Get
+
+        End Get
+        Set(ByVal value As Date)
+
+        End Set
+    End Property
+
     Public Property SWATDatabasePath() As String
         Get
             If Not FileExists(pSWATDatabaseName) Then

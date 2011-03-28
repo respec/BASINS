@@ -195,8 +195,7 @@ Public Class atcDataSourceWDM
                             lNumValues = lTimser.numValues
                         End If
                         .numValues = lNumValues
-                        .Attributes.SetValue("ts", lTs)
-                        .Attributes.SetValue("tu", lTu)
+                        .SetInterval(lTu, lTs)
                         Dim lIndex As Integer = 1
                         For lIndexConst As Integer = 1 To lNumValues
                             Dim lDate As Double
@@ -514,15 +513,14 @@ CaseExistRenumber:
                 .SetValueIfMissing("TSFORM", 1) 'TSFORM=1 mean over the timestep (default)
             End If
             .SetValueIfMissing("TSFILL", -999)
-            Dim lTs As Integer
+            Dim lTs As Integer = 1
             Dim lTu As atcTimeUnit = atcTimeUnit.TUUnknown
             If .ContainsAttribute("tu") Then
                 lTu = .GetValue("tu")
                 lTs = .GetValue("ts")
             ElseIf aTs.numValues > 0 Then
                 CalcTimeUnitStep(aTs.Dates.Value(0), aTs.Dates.Value(1), lTu, lTs)
-                .SetValue("tu", lTu)
-                .SetValue("ts", lTs)
+                aTs.SetInterval(lTu, lTs)
             End If
             Dim lIVal As Integer = .GetValue("VBTIME", 1)
             If lTs > 1 Then

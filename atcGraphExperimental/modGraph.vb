@@ -249,13 +249,13 @@ FoundMatch:
         Return False
     End Function
 
-    Public Function TimeUnitName(ByVal aTimeUnits As Integer, Optional ByVal aTimeStep As Integer = 1) As String
+    Public Function TimeUnitName(ByVal aTimeUnit As Integer, Optional ByVal aTimeStep As Integer = 1) As String
         Dim lName As String = ""
         Select Case aTimeStep
             Case Is > 1 : lName = aTimeStep & "-"
-            Case Is < 1 : aTimeUnits = 0 'aTimeStep <= 0 means bad time step, ignore time units and return ""
+            Case Is < 1 : aTimeUnit = 0 'aTimeStep <= 0 means bad time step, ignore time units and return ""
         End Select
-        Select Case aTimeUnits
+        Select Case aTimeUnit
             Case 1 : lName &= "SECOND"
             Case 2 : lName &= "MINUTE"
             Case 3 : lName &= "HOURLY"
@@ -375,8 +375,8 @@ FoundMatch:
             Dim lCurveLabel As String = ""
 
             If (aCommonTimeUnitName Is Nothing OrElse aCommonTimeUnitName.Length = 0) _
-              AndAlso aTimeseries.Attributes.ContainsAttribute("Time Units") Then
-                lCurveLabel &= TimeUnitName(aTimeseries.Attributes.GetValue("Time Units"), _
+              AndAlso aTimeseries.Attributes.ContainsAttribute("Time Unit") Then
+                lCurveLabel &= TimeUnitName(aTimeseries.Attributes.GetValue("Time Unit"), _
                                             aTimeseries.Attributes.GetValue("Time Step", 1)) & " "
             End If
 

@@ -221,11 +221,11 @@ Public Class atcListForm
 
     'Translator class between pDataGroup and agdMain
     Private pSource As atcTimeseriesGridSource
-    Private pDisplayAttributes As ArrayList
+    Private pDisplayAttributes As Generic.List(Of String)
     Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper
 
     Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing, _
-                          Optional ByVal aDisplayAttributes As ArrayList = Nothing, _
+                          Optional ByVal aDisplayAttributes As Generic.List(Of String) = Nothing, _
                           Optional ByVal aShowValues As Boolean = True, _
                           Optional ByVal aFilterNoData As Boolean = False, _
                           Optional ByVal aShowForm As Boolean = True)
@@ -365,12 +365,12 @@ Public Class atcListForm
 
     Private Sub mnuFileSelectAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectAttributes.Click
         Dim lst As New atcControls.atcSelectList
-        Dim lAvailable As New ArrayList
+        Dim lAvailable As New Generic.List(Of String)
         For Each lAttrDef As atcAttributeDefinition In atcDataAttributes.AllDefinitions
             Select Case lAttrDef.TypeString.ToLower
                 Case "double", "integer", "boolean", "string", "atctimeunit"
                     Select Case lAttrDef.Name.ToLower
-                        Case "attributes", "bins", "compfg", "constant coefficient", "degrees f", "headercomplete", "highflag", "kendall tau", "n-day high value", "n-day low value", "number", "return period", "summary file", "vbtime", "%*", "%sum*"
+                        Case "attributes", "bins", "compfg", "constant coefficient", "degrees f", "headercomplete", "highflag", "kendall tau", "n-day high value", "n-day low value", "n-day high attribute", "n-day low attribute", "number", "return period", "summary file", "vbtime", "%*", "%sum*"
                             'Skip displaying some things in the list
                         Case Else
                             lAvailable.Add(lAttrDef.Name)
