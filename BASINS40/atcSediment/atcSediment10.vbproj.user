@@ -13,13 +13,10 @@
     <ErrorReportUrlHistory />
     <FallbackCulture>en-US</FallbackCulture>
     <VerifyUploadedFiles>false</VerifyUploadedFiles>
-    <ProjectView>ShowAllFiles</ProjectView>
+    <ProjectView>ProjectFiles</ProjectView>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <StartProgram>C:\Basins\bin\MapWindow.exe</StartProgram>
     <StartAction>Program</StartAction>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ReferencePath>C:\dev\MapWindow4Dev\Bin64\</ReferencePath>
   </PropertyGroup>
 </Project>

@@ -286,7 +286,7 @@ Public Class atcTimeseries
         End Set
     End Property
 
-    ''' <summary>Each value in Dates is the instant of measurement or the start of the interval</summary>
+    ''' <summary>Each value in Dates is the instant of measurement or the end of the interval</summary>
     ''' <remarks>
     ''' Dates are julian days since the start of 1900. 
     ''' Fractional part of a date is time of day.
@@ -448,35 +448,35 @@ Public Class atcTimeseries
         Return lFoundParent
     End Function
 
-    ''' <summary>Set Interval attribute of timeseries based on attributes TU (or TCode) and TS</summary>
+    ''' <summary>Set Interval attribute of timeseries based on time unit and time step attributes</summary>
     ''' <remarks>Unknown time units leads to removal of Interval attribute</remarks>
     Public Sub SetInterval()
-        Dim lTu As atcTimeUnit = Attributes.GetValue("TU", atcTimeUnit.TUUnknown)
+        Dim lTu As atcTimeUnit = Attributes.GetValue("time unit", atcTimeUnit.TUUnknown)
         If lTu = atcTimeUnit.TUUnknown Then
             Dim lTCode As Integer = Attributes.GetValue("TCode", 0)
             lTu = lTCode
         End If
-        Dim lTs As Integer = Attributes.GetValue("TS", 1)
+        Dim lTs As Integer = Attributes.GetValue("time step", 1)
         SetInterval(lTu, lTs)
      End Sub
 
-    ''' <summary>Set Interval attribute of timeseries based on time units and time step</summary>
-    ''' <param name="aTu">Time units (atcTimeUnit)</param>
-    ''' <param name="ats">Time step (in Time Units)</param>
+    ''' <summary>Set Interval attribute of timeseries based on time unit and time step</summary>
+    ''' <param name="aTimeUnit">Unit of time (hour, day, month, etc.)</param>
+    ''' <param name="aTimeStep">Number of Time Units in one interval</param>
     ''' <remarks>Unknown time units leads to removal of Interval attribute</remarks>
-    Public Sub SetInterval(ByVal aTu As atcTimeUnit, ByVal ats As Integer)
+    Public Sub SetInterval(ByVal aTimeUnit As atcTimeUnit, ByVal aTimeStep As Integer)
         With Attributes
-            .SetValue("TU", aTu)
-            .SetValue("TS", ats)
-            Select Case aTu
+            .SetValue("time unit", aTimeUnit)
+            .SetValue("time step", aTimeStep)
+            Select Case aTimeUnit
                 Case atcTimeUnit.TUDay
-                    .SetValue("interval", ats)
+                    .SetValue("interval", aTimeStep)
                 Case atcTimeUnit.TUHour
-                    .SetValue("interval", ats / CDbl(24))
+                    .SetValue("interval", aTimeStep / CDbl(24))
                 Case atcTimeUnit.TUMinute
-                    .SetValue("interval", ats / CDbl(1440))
+                    .SetValue("interval", aTimeStep / CDbl(1440))
                 Case atcTimeUnit.TUSecond
-                    .SetValue("interval", ats / CDbl(1440 * 60))
+                    .SetValue("interval", aTimeStep / CDbl(1440 * 60))
                 Case Else
                     .RemoveByKey("interval")
             End Select

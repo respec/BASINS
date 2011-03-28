@@ -116,10 +116,10 @@ Public Class atcSelectList
 
 #End Region
 
-    Private pAvailable As ArrayList
-    Private pSelected As ArrayList
+    Private pAvailable As Generic.List(Of String)
+    Private pSelected As Generic.List(Of String)
 
-    Public Function AskUser(ByVal aAvailable As ArrayList, ByVal aSelected As ArrayList) As Boolean
+    Public Function AskUser(ByVal aAvailable As Generic.List(Of String), ByVal aSelected As Generic.List(Of String)) As Boolean
         If aAvailable Is Nothing Then
             Throw New Exception("Nothing Available in atcSelectList::AskUser")
         ElseIf aAvailable.Count < 1 Then

@@ -31,7 +31,7 @@ Public Class frmAddDataSet
             .CellValue(0, 2) = "Scenario"
             .CellValue(0, 3) = "Location"
             .CellValue(0, 4) = "Constituent"
-            .CellValue(0, 5) = "Time Units"
+            .CellValue(0, 5) = "Time Unit"
             .CellValue(0, 6) = "Time Step"
             For lDsnIndex As Integer = 1 To aNoDsns.Count
                 .Rows += 1

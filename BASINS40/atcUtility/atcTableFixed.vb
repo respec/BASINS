@@ -196,7 +196,7 @@ ErrHand:
     End Sub
 
     Public Overrides Sub ClearData()
-        If pHeaderLines Is Nothing Then pHeaderLines = New ArrayList
+        If pHeaderLines Is Nothing Then pHeaderLines = New Generic.List(Of String)
         ReDim pData(0)
     End Sub
 

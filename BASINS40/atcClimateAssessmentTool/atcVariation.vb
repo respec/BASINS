@@ -8,7 +8,6 @@ Public Class atcVariation
 
     'Parameters for Hamon
     Private pDegF As Boolean
-    Private pLatDeg As Double
 
     'WestBranch of Patux
     'Private pCTS() As Double = {0, 0.0045, 0.01, 0.01, 0.01, 0.0085, 0.0085, 0.0085, 0.0085, 0.0085, 0.0095, 0.0095, 0.0095}
@@ -311,6 +310,55 @@ Public Class atcVariation
         End If
     End Function
 
+    Private Function VaryDataPenmanMonteith(ByVal aOriginalData As atcTimeseries, ByVal aPETtemperature As atcTimeseries, ByVal aPETprecipitation As atcTimeseries) As atcTimeseries
+        Dim lModifiedTS As atcTimeseries = Nothing
+        Dim lLatitude As Double = aOriginalData.Attributes.GetValue("Latitude", 39)
+        Dim lLongitude As Double = aOriginalData.Attributes.GetValue("Longitude", -999)
+        Dim PETstation As atcMetCmp.SwatWeatherStation = Nothing
+
+        If PETswatStations Is Nothing Then
+            PETswatStations = New atcMetCmp.SwatWeatherStations
+        End If
+
+        If PETswatStations IsNot Nothing Then
+            If Not String.IsNullOrEmpty(PETstationID) AndAlso PETstationID <> PETstationUseClosest Then 'Find by station's Name, NameKey or ID
+                Dim lStationID As String = PETstationID.ToLower
+                For Each lSearchStation As atcMetCmp.SwatWeatherStation In PETswatStations
+                    If lSearchStation.Id.ToLower = lStationID OrElse _
+                       lSearchStation.Name.ToLower = lStationID OrElse _
+                       lSearchStation.NameKey.ToLower = lStationID Then
+                        PETstation = lSearchStation
+                        Exit For
+                    End If
+                Next
+            End If
+
+            If PETstation Is Nothing Then 'Find by lat/lon of original TS
+                If lLatitude > -90 AndAlso lLongitude > -360 Then
+                    PETstation = PETswatStations.Closest(lLatitude, lLongitude, 1).Values(0)
+                End If
+            End If
+        End If
+
+        If PETstation Is Nothing Then
+            Throw New ApplicationException("VaryData: PET station not found")
+        ElseIf Double.IsNaN(PETelevation) Then
+            Throw New ApplicationException("VaryData: Elevation not found for PET")
+        Else
+            lModifiedTS = atcMetCmp.PanEvaporationTimeseriesComputedByPenmanMonteith( _
+                            PETelevation, _
+                            aPETprecipitation, _
+                            aPETtemperature, _
+                            Nothing, PETstation)
+
+            If aOriginalData.Attributes.GetValue("tu") < 4 Then
+                'Disaggragate the daily PMET timeseries into hourly
+                lModifiedTS = atcMetCmp.DisSolPet(lModifiedTS, Nothing, 2, lLatitude)
+            End If
+        End If
+        Return lModifiedTS
+    End Function
+
     Private Function VaryDataAddMultiply(ByVal lOriginalData As atcTimeseries, ByRef lSplitData As atcTimeseriesGroup) As atcTimeseries
         Dim lArgsMath As New atcDataAttributes
         If lSplitData IsNot Nothing AndAlso lSplitData.Count > 0 Then
@@ -348,66 +396,24 @@ Public Class atcVariation
                 Case "AddEvents" : lModifiedTS = AddRemoveEventsVolumeFraction(lOriginalData, CurrentValue, lEvents, 0)
                 Case "Intensify" : lModifiedTS = VaryDataIntensify(lSplitData, lEvents)
                 Case "Hamon"
-
                     If PETtemperature.Count > lDataSetIndex Then
-                        pLatDeg = lOriginalData.Attributes.GetValue("LatDeg", pLatDeg)
-                        lModifiedTS = atcMetCmp.PanEvaporationTimeseriesComputedByHamonX(PETtemperature(lDataSetIndex), Nothing, pDegF, pLatDeg, pCTS)
+                        Dim lLatitude As Double = lOriginalData.Attributes.GetValue("Latitude", 39)
+                        lModifiedTS = atcMetCmp.PanEvaporationTimeseriesComputedByHamonX(PETtemperature(lDataSetIndex), Nothing, pDegF, lLatitude, pCTS)
                         If lOriginalData.Attributes.GetValue("tu") < 4 Then
-                            lModifiedTS = atcMetCmp.DisSolPet(lModifiedTS, Nothing, 2, pLatDeg)
-                        End If
-                    End If
-
-                Case "Penman-Monteith"
-                    If PETtemperature.Count > lDataSetIndex AndAlso PETprecipitation.Count > lDataSetIndex Then
-                        Dim lLatitude As Double = lOriginalData.Attributes.GetValue("Latitude", -999)
-                        Dim lLongitude As Double = lOriginalData.Attributes.GetValue("Longitude", -999)
-                        Dim PETstation As atcMetCmp.SwatWeatherStation = Nothing
-
-                        If PETswatStations Is Nothing Then
-                            PETswatStations = New atcMetCmp.SwatWeatherStations
-                        End If
-
-                        If PETswatStations IsNot Nothing Then
-                            If Not String.IsNullOrEmpty(PETstationID) AndAlso PETstationID <> PETstationUseClosest Then 'Find by station's Name, NameKey or ID
-                                Dim lStationID As String = PETstationID.ToLower
-                                For Each lSearchStation As atcMetCmp.SwatWeatherStation In PETswatStations
-                                    If lSearchStation.Id.ToLower = lStationID OrElse _
-                                       lSearchStation.Name.ToLower = lStationID OrElse _
-                                       lSearchStation.NameKey.ToLower = lStationID Then
-                                        PETstation = lSearchStation
-                                        Exit For
-                                    End If
-                                Next
-                            End If
-
-                            If PETstation Is Nothing Then 'Find by lat/lon of original TS
-                                If lLatitude > -90 AndAlso lLongitude > -360 Then
-                                    PETstation = PETswatStations.Closest(lLatitude, lLongitude, 1).Values(0)
-                                End If
-                            End If
-                        End If
-
-                        If PETstation Is Nothing Then
-                            Throw New ApplicationException("VaryData: PET station not found")
-                        ElseIf Double.IsNaN(PETelevation) Then
-                            Throw New ApplicationException("VaryData: Elevation not found for PET")
-                        ElseIf PETprecipitation(lDataSetIndex) Is Nothing Then
-                            Throw New ApplicationException("VaryData: Precipitation not found for PET")
-                        ElseIf PETtemperature(lDataSetIndex) Is Nothing Then
-                            Throw New ApplicationException("VaryData: Temperature not found for PET")
-                        Else
-                            lModifiedTS = atcMetCmp.PanEvaporationTimeseriesComputedByPenmanMonteith(PETelevation, PETprecipitation(lDataSetIndex), PETtemperature(lDataSetIndex), Nothing, PETstation)
-                            'Disaggragate the daily PMET timeseries into hourly
-                            If lLatitude < -90 Then
-                                Logger.Dbg("Latitude not found, defaulting to 35 for disaggregation of PMET")
-                                lLatitude = 35
-                            End If
                             lModifiedTS = atcMetCmp.DisSolPet(lModifiedTS, Nothing, 2, lLatitude)
                         End If
                     End If
 
+                Case "Penman-Monteith"
+                    If PETprecipitation.Count <= lDataSetIndex OrElse PETprecipitation(lDataSetIndex) Is Nothing Then
+                        Throw New ApplicationException("VaryData: Precipitation not found for PET")
+                    ElseIf PETtemperature.Count <= lDataSetIndex OrElse PETtemperature(lDataSetIndex) Is Nothing Then
+                        Throw New ApplicationException("VaryData: Temperature not found for PET")
+                    Else
+                        lModifiedTS = VaryDataPenmanMonteith(lOriginalData, PETtemperature(lDataSetIndex), PETprecipitation(lDataSetIndex))
+                    End If
                 Case Else
-                        lModifiedTS = VaryDataAddMultiply(lOriginalData, lSplitData)
+                    lModifiedTS = VaryDataAddMultiply(lOriginalData, lSplitData)
             End Select
 
             If lModifiedTS Is Nothing Then
@@ -456,7 +462,7 @@ Public Class atcVariation
                                                    ByVal aSeed As Integer) As atcTimeseries
         Dim lNewTimeseries As atcTimeseries = aTimeseries.Clone
         Dim lMaxEventIndex As Integer = aEventsToSearch.Count  'exclusive upper value, random less than
-        Dim lFoundIndexes As New ArrayList
+        Dim lFoundIndexes As New Generic.List(Of Integer)
         Dim lRandom As New Random(aSeed)
         Dim lAdd As Boolean = True
         Dim lValueIndex As Integer
@@ -570,7 +576,7 @@ Public Class atcVariation
         'Dim lEventsFound As New atcDataGroup
         Dim lNewTimeseries As atcTimeseries = aTimeseries.Clone
         Dim lMaxEventIndex As Integer = aEventsToSearch.Count - 1
-        Dim lFoundIndexes As New ArrayList
+        Dim lFoundIndexes As New Generic.List(Of Integer)
         Dim lVolumeFound As Double = 0
         Dim lRandom As New Random(aSeed)
         Dim lAdd As Boolean = True
@@ -634,7 +640,6 @@ Public Class atcVariation
 
         'Parameters for Hamon - TODO: don't hard code these
         pDegF = True
-        pLatDeg = 39
 
         pName = "<untitled>"
         pDataSets = New atcTimeseriesGroup

@@ -102,45 +102,6 @@ Public Class atcTableArray
         End Set
     End Property
 
-    ''' <summary>
-    ''' Get a specified row of the header
-    ''' </summary>
-    ''' <param name="aHeaderRow">Which row to get (range is 1..NumHeaderRows)</param>
-    ''' <returns>text of specified row of the header</returns>
-    Public Overrides Property Header(ByVal aHeaderRow As Integer) As String
-        Get
-            If aHeaderRow < 1 Or aHeaderRow > pHeaderLines.Count Then
-                Return "Header row " & aHeaderRow & " outside available range (1 to " & pHeaderLines.Count & ")"
-            Else
-                Return pHeaderLines(aHeaderRow - 1)
-            End If
-        End Get
-        Set(ByVal newValue As String)
-            If aHeaderRow < 1 Or aHeaderRow > pHeaderLines.Count Then
-                Throw New ApplicationException("Cannot set header row " & aHeaderRow & ".  Row must be between 1 and " & pHeaderLines.Count & "." & vbCr & Err.Description)
-            Else
-                pHeaderLines(aHeaderRow - 1) = newValue
-            End If
-        End Set
-    End Property
-
-    ''' <summary>
-    ''' All rows of the header concatenated with cr/lf at the end of each line
-    ''' </summary>
-    Public Overrides Property Header() As String
-        Get
-            Dim lReturnValue As String = ""
-            For Each lString As String In pHeaderLines
-                lReturnValue &= lString & vbCrLf
-            Next
-            Return lReturnValue
-        End Get
-        Set(ByVal newValue As String)
-            pHeaderLines.Clear()
-            pHeaderLines.AddRange(newValue.Replace(vbCrLf, vbCr).Replace(vbLf, vbCr).Split(vbCr))
-        End Set
-    End Property
-
     Public Overrides Property NumRecords() As Integer
         Get
             Return pRecords.Count

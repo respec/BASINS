@@ -121,22 +121,6 @@ Public Class atcTableDelimited
         End Set
     End Property
 
-    Public Overrides Property NumHeaderRows() As Integer
-        Get
-            If pNumHeaderRows >= 0 Then
-                Return pNumHeaderRows
-            Else
-                Return pHeaderLines.Count
-            End If
-        End Get
-        Set(ByVal newValue As Integer)
-            pNumHeaderRows = newValue
-            While pHeaderLines.Count < newValue
-                pHeaderLines.Add("") 'dummy header
-            End While
-        End Set
-    End Property
-
     Public Overrides Property NumRecords() As Integer
         Get
             NumRecords = pRecords.Count - 1

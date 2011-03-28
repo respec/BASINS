@@ -20,13 +20,13 @@ Public Class clsGraphProbability
         End Get
         Set(ByVal aDataGroup As atcTimeseriesGroup)
             MyBase.Datasets = aDataGroup
-            Dim lCommonTimeUnits As Integer = aDataGroup.CommonAttributeValue("Time Units", -1)
+            Dim lCommonTimeUnit As Integer = aDataGroup.CommonAttributeValue("Time Unit", -1)
             Dim lCommonTimeStep As Integer = aDataGroup.CommonAttributeValue("Time Step", -1)
             Dim lCommonScenario As String = aDataGroup.CommonAttributeValue("Scenario", "")
             Dim lCommonLocation As String = aDataGroup.CommonAttributeValue("Location", "")
             Dim lCommonConstituent As String = aDataGroup.CommonAttributeValue("Constituent", "")
             Dim lCommonUnits As String = aDataGroup.CommonAttributeValue("Units", "")
-            Dim lCommonTimeUnitName As String = TimeUnitName(lCommonTimeUnits, lCommonTimeStep)
+            Dim lCommonTimeUnitName As String = TimeUnitName(lCommonTimeUnit, lCommonTimeStep)
             For Each lTimeseries As atcTimeseries In aDataGroup
                 AddDatasetCurve(lTimeseries, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
             Next

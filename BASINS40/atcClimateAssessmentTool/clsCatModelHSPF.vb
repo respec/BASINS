@@ -96,6 +96,24 @@ Public Class clsCatModelHSPF
         SaveFileString(aNewUciFilename, lUciContents.Substring(0, lStartFilesPos) & lNewFilesBlock & lUciContents.Substring(lEndFilesPos))
     End Sub
 
+    Property SimulationStart() As Date Implements clsCatModel.SimulationStart
+        Get
+
+        End Get
+        Set(ByVal value As Date)
+
+        End Set
+    End Property
+
+    Property SimulationEnd() As Date Implements clsCatModel.SimulationEnd
+        Get
+
+        End Get
+        Set(ByVal value As Date)
+
+        End Set
+    End Property
+
     ''' <summary>
     ''' 
     ''' </summary>
@@ -259,7 +277,7 @@ Public Class clsCatModelHSPF
                         If aNewModelName.ToLower = "base" Then
                             lNewFilename = lBinOutFilename
                         Else
-                            lNewFilename = PathNameOnly(lBinOutFilename) & g_PathChar & aNewModelName & "." & IO.Path.GetFileName(lBinOutFilename)
+                            lNewFilename = PathNameOnly(lBinOutFilename) & g_PathChar & aNewModelName & g_PathChar & IO.Path.GetFileName(lBinOutFilename)
                         End If
                         If IO.File.Exists(lNewFilename) Then
                             'Dim lHBNResults As New atcHspfBinOut.atcTimeseriesFileHspfBinOut

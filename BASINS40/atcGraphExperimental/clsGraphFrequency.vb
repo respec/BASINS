@@ -101,13 +101,13 @@ Public Class clsGraphFrequency
         End Get
         Set(ByVal aDataGroup As atcTimeseriesGroup)
             MyBase.Datasets = aDataGroup
-            Dim lCommonTimeUnits As Integer = aDataGroup.CommonAttributeValue("Time Units", -1)
+            Dim lCommonTimeUnit As Integer = aDataGroup.CommonAttributeValue("Time Unit", -1)
             Dim lCommonTimeStep As Integer = aDataGroup.CommonAttributeValue("Time Step", -1)
             Dim lCommonScenario As String = aDataGroup.CommonAttributeValue("Scenario", "")
             Dim lCommonLocation As String = aDataGroup.CommonAttributeValue("Location", "")
             Dim lCommonConstituent As String = aDataGroup.CommonAttributeValue("Constituent", "")
             Dim lCommonUnits As String = aDataGroup.CommonAttributeValue("Units", "")
-            Dim lCommonTimeUnitName As String = TimeUnitName(lCommonTimeUnits, lCommonTimeStep)
+            Dim lCommonTimeUnitName As String = TimeUnitName(lCommonTimeUnit, lCommonTimeStep)
             For Each lTimeseries As atcTimeseries In aDataGroup
                 AddDatasetCurve(lTimeseries, lCommonTimeUnitName, lCommonScenario, lCommonConstituent, lCommonLocation, lCommonUnits)
             Next
@@ -162,7 +162,7 @@ Public Class clsGraphFrequency
         lPane.YAxis.Title.Text = "FLOW, " & aTimeseries.Attributes.GetValue("Units", "CUBIC FEET PER SECOND")
 
         'check to see if this is an annual timseries
-        If aTimeseries.Attributes.GetValue("Time Units") <> atcTimeUnit.TUYear Then
+        If aTimeseries.Attributes.GetValue("Time Unit") <> atcTimeUnit.TUYear Then
             Dim lAnnualTS As atcTimeseries
             Dim lAllAnnual As New atcTimeseriesGroup
             'check to see if any annual timeseries have already been computed by atcTimeseriesNdayHighLow
@@ -171,7 +171,7 @@ Public Class clsGraphFrequency
                     For Each lArgument As atcData.atcDefinedValue In lAttribute.Arguments
                         If lArgument.Value.GetType.Name = "atcTimeseries" Then
                             lAnnualTS = lArgument.Value
-                            If lAnnualTS.Attributes.GetValue("Time Units") = atcTimeUnit.TUYear Then
+                            If lAnnualTS.Attributes.GetValue("Time Unit") = atcTimeUnit.TUYear Then
                                 If Not lAllAnnual.Contains(lAnnualTS) Then
                                     lAllAnnual.Add(lAnnualTS)
                                 End If

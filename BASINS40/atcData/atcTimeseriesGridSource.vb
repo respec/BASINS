@@ -6,7 +6,7 @@ Public Class atcTimeseriesGridSource
 
     Private WithEvents pTimeseriesGroup As atcTimeseriesGroup
     Private pAllDates As atcTimeseries
-    Private pDisplayAttributes As ArrayList
+    Private pDisplayAttributes As Generic.List(Of String)
     Private pDisplayValues As Boolean
     Private pDisplayValueAttributes As Boolean
     Private pFilterNoData As Boolean
@@ -22,13 +22,13 @@ Public Class atcTimeseriesGridSource
     Private pValueAttributeDefs As Generic.List(Of Generic.List(Of atcAttributeDefinition))
 
     Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup, _
-            ByVal aDisplayAttributes As ArrayList, _
+            ByVal aDisplayAttributes As Generic.List(Of String), _
             ByVal aDisplayValues As Boolean)
         Me.New(aDataGroup, aDisplayAttributes, aDisplayValues, False)
     End Sub
 
     Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup, _
-            ByVal aDisplayAttributes As ArrayList, _
+            ByVal aDisplayAttributes As Generic.List(Of String), _
             ByVal aDisplayValues As Boolean, _
             ByVal aFilterNoData As Boolean)
         pTimeseriesGroup = aDataGroup

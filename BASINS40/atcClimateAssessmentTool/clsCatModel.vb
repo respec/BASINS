@@ -11,6 +11,10 @@ Public Interface clsCatModel
 
     Property BaseModel() As String
 
+    Property SimulationStart() As Date
+
+    Property SimulationEnd() As Date
+
     Function ModelRun(ByVal aNewModelName As String, _
                          ByVal aModifiedData As atcTimeseriesGroup, _
                          ByVal aPreparedInput As String, _

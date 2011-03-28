@@ -78,7 +78,7 @@ Public MustInherit Class atcTable
     Implements IatcTable
 
     Protected pFilename As String
-    Protected pHeaderLines As New ArrayList
+    Protected pHeaderLines As New Generic.List(Of String)
     Protected pNumHeaderRows As Integer = -1
     Protected pCurrentRecord As Integer
     Protected pEOF As Boolean = False
@@ -161,7 +161,6 @@ Public MustInherit Class atcTable
         End Set
     End Property
 
-
     ''' <summary>
     ''' The number of header rows in the table
     ''' </summary>
@@ -178,7 +177,12 @@ Public MustInherit Class atcTable
         End Get
         Set(ByVal newValue As Integer)
             pNumHeaderRows = newValue
-            'TODO: should anything happen here?
+            While pHeaderLines.Count < newValue
+                pHeaderLines.Add("") 'dummy header
+            End While
+            While pHeaderLines.Count > newValue AndAlso pHeaderLines.Count > 0
+                pHeaderLines.RemoveAt(pHeaderLines.Count - 1)
+            End While
         End Set
     End Property
 

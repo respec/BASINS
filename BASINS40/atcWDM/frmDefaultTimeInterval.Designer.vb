@@ -25,8 +25,8 @@ Partial Class frmDefaultTimeInterval
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDefaultTimeInterval))
         Me.lblTimestep = New System.Windows.Forms.Label
         Me.atcTextTimeStep = New atcControls.atcText
-        Me.lstTimeUnits = New System.Windows.Forms.ListBox
-        Me.lblTimeUnits = New System.Windows.Forms.Label
+        Me.lstTimeUnit = New System.Windows.Forms.ListBox
+        Me.lblTimeUnit = New System.Windows.Forms.Label
         Me.lblInstructions = New System.Windows.Forms.Label
         Me.btnOk = New System.Windows.Forms.Button
         Me.btnAll = New System.Windows.Forms.Button
@@ -72,27 +72,27 @@ Partial Class frmDefaultTimeInterval
         Me.atcTextTimeStep.ValueDouble = 1
         Me.atcTextTimeStep.ValueInteger = 1
         '
-        'lstTimeUnits
+        'lstTimeUnit
         '
-        Me.lstTimeUnits.ColumnWidth = 10
-        Me.lstTimeUnits.FormattingEnabled = True
-        Me.lstTimeUnits.Items.AddRange(New Object() {"Minutes", "Hours", "Days", "Months"})
-        Me.lstTimeUnits.Location = New System.Drawing.Point(91, 48)
-        Me.lstTimeUnits.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
-        Me.lstTimeUnits.Name = "lstTimeUnits"
-        Me.lstTimeUnits.Size = New System.Drawing.Size(74, 56)
-        Me.lstTimeUnits.TabIndex = 3
+        Me.lstTimeUnit.ColumnWidth = 10
+        Me.lstTimeUnit.FormattingEnabled = True
+        Me.lstTimeUnit.Items.AddRange(New Object() {"Minutes", "Hours", "Days", "Months"})
+        Me.lstTimeUnit.Location = New System.Drawing.Point(91, 48)
+        Me.lstTimeUnit.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.lstTimeUnit.Name = "lstTimeUnits"
+        Me.lstTimeUnit.Size = New System.Drawing.Size(74, 56)
+        Me.lstTimeUnit.TabIndex = 3
         '
-        'lblTimeUnits
+        'lblTimeUnit
         '
-        Me.lblTimeUnits.AutoSize = True
-        Me.lblTimeUnits.Location = New System.Drawing.Point(23, 48)
-        Me.lblTimeUnits.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
-        Me.lblTimeUnits.Name = "lblTimeUnits"
-        Me.lblTimeUnits.Size = New System.Drawing.Size(55, 13)
-        Me.lblTimeUnits.TabIndex = 2
-        Me.lblTimeUnits.Text = "Time units"
-        Me.lblTimeUnits.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblTimeUnit.AutoSize = True
+        Me.lblTimeUnit.Location = New System.Drawing.Point(23, 48)
+        Me.lblTimeUnit.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.lblTimeUnit.Name = "lblTimeUnits"
+        Me.lblTimeUnit.Size = New System.Drawing.Size(55, 13)
+        Me.lblTimeUnit.TabIndex = 2
+        Me.lblTimeUnit.Text = "Time Unit"
+        Me.lblTimeUnit.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'lblInstructions
         '
@@ -185,10 +185,10 @@ Partial Class frmDefaultTimeInterval
         Me.Controls.Add(Me.btnAll)
         Me.Controls.Add(Me.btnOk)
         Me.Controls.Add(Me.lblInstructions)
-        Me.Controls.Add(Me.lblTimeUnits)
+        Me.Controls.Add(Me.lblTimeUnit)
         Me.Controls.Add(Me.lblTimestep)
         Me.Controls.Add(Me.atcTextTimeStep)
-        Me.Controls.Add(Me.lstTimeUnits)
+        Me.Controls.Add(Me.lstTimeUnit)
         Me.HelpButton = True
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
@@ -201,8 +201,8 @@ Partial Class frmDefaultTimeInterval
     End Sub
     Friend WithEvents lblTimestep As System.Windows.Forms.Label
     Friend WithEvents atcTextTimeStep As atcControls.atcText
-    Friend WithEvents lstTimeUnits As System.Windows.Forms.ListBox
-    Friend WithEvents lblTimeUnits As System.Windows.Forms.Label
+    Friend WithEvents lstTimeUnit As System.Windows.Forms.ListBox
+    Friend WithEvents lblTimeUnit As System.Windows.Forms.Label
     Friend WithEvents lblInstructions As System.Windows.Forms.Label
     Friend WithEvents btnOk As System.Windows.Forms.Button
     Friend WithEvents btnAll As System.Windows.Forms.Button

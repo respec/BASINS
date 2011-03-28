@@ -7,9 +7,9 @@ Public Class frmDefaultTimeInterval
     Public Function AskUser(ByVal aDataSetDescription As String, ByRef aTu As Integer, ByRef aTs As Integer, ByRef aAggr As Integer) As Boolean
         If aTs > 0 Then atcTextTimeStep.ValueInteger = aTs
         If aTu > 0 Then
-            lstTimeUnits.SelectedIndex = aTu - 2
+            lstTimeUnit.SelectedIndex = aTu - 2
         Else
-            lstTimeUnits.SelectedIndex = 0 'minutes
+            lstTimeUnit.SelectedIndex = 0 'minutes
         End If
         If aAggr >= 0 Then
             lstAggregation.SelectedIndex = aAggr
@@ -28,7 +28,7 @@ Public Class frmDefaultTimeInterval
     End Function
 
     Private Sub btnAll_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnAll.Click
-        pTu = lstTimeUnits.SelectedIndex + 2 ' minutes = 2, hours = 3, days = 4, months = 5
+        pTu = lstTimeUnit.SelectedIndex + 2 ' minutes = 2, hours = 3, days = 4, months = 5
         If pTu = 1 Then 'nothing was selected
             pTu = 0
         End If
@@ -39,7 +39,7 @@ Public Class frmDefaultTimeInterval
     End Sub
 
     Private Sub btnOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnOk.Click
-        pTu = lstTimeUnits.SelectedIndex + 2 ' minutes = 2, hours = 3, days = 4, months = 5
+        pTu = lstTimeUnit.SelectedIndex + 2 ' minutes = 2, hours = 3, days = 4, months = 5
         If pTu = 1 Then 'nothing was selected
             pTu = 0
         End If
