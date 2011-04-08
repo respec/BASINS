@@ -163,9 +163,6 @@ Public Class atcTimeseriesNdayHighLow
             Return GetNaN()
         Else
             Dim lBestSoFar As Double
-            Dim lTimeIndex As Integer = 1
-            Dim lNumSummed As Integer = 1
-            Dim lRunningSum As Double = 0
             Dim lCurrentValue As Double
 
             If aHigh Then
@@ -174,32 +171,36 @@ Public Class atcTimeseriesNdayHighLow
                 lBestSoFar = GetMaxValue()
             End If
 
-            While lTimeIndex <= aTS.numValues
-                lCurrentValue = aTS.Value(lTimeIndex)
+            For lTimeIndex As Integer = aNDay To aTS.numValues
+                Dim lRunningSum As Double = 0
+                Dim lNumSummed As Integer = 0
+                For lSumIndex As Integer = lTimeIndex - aNDay + 1 To lTimeIndex
+                    lCurrentValue = aTS.Value(lTimeIndex)
 
-                'Can't calculate high or low value if any values in the period are missing
-                If Double.IsNaN(lCurrentValue) Then
-                    If aTS.ValueAttributesGetValue(lTimeIndex, "Inserted", False) Then
-                        lNumSummed = 1
-                        lRunningSum = 0
-                    Else
-                        Throw New ApplicationException("Missing Value at " & DumpDate(aTS.Dates.Value(lTimeIndex)))
-                    End If
-                Else
-                    lRunningSum += lCurrentValue
-                    If lNumSummed < aNDay Then
-                        lNumSummed += 1
-                    Else
-                        If (aHigh AndAlso lRunningSum > lBestSoFar) OrElse _
-                          ((Not aHigh) AndAlso lRunningSum < lBestSoFar) Then
-                            lBestSoFar = lRunningSum
-                            aDate = aTS.Dates.Value(lTimeIndex)
+                    'Can't calculate high or low value if any values in the period are missing
+                    If Double.IsNaN(lCurrentValue) Then
+                        If aTS.ValueAttributesGetValue(lTimeIndex, "Inserted", False) Then
+                            lNumSummed = 0
+                            lRunningSum = lCurrentValue
+                            Exit For
+                        Else
+                            Logger.Dbg("Missing Value at " & DumpDate(aTS.Dates.Value(lTimeIndex)))
+                            Return lCurrentValue
                         End If
-                        lRunningSum -= aTS.Value(lTimeIndex - aNDay + 1)
+                    Else
+                        lRunningSum += lCurrentValue
+                        lNumSummed += 1
+                    End If
+                Next
+
+                If lNumSummed = aNDay Then
+                    If (aHigh AndAlso lRunningSum > lBestSoFar) OrElse _
+                      ((Not aHigh) AndAlso lRunningSum < lBestSoFar) Then
+                        lBestSoFar = lRunningSum
+                        aDate = aTS.Dates.Value(lTimeIndex)
                     End If
                 End If
-                lTimeIndex += 1
-            End While
+            Next
             Return (lBestSoFar / aNDay)
         End If
     End Function
