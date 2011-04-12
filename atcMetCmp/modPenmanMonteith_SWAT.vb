@@ -41,7 +41,7 @@ Public Module modPenmanMonteith_SWAT
     Public Function PanEvaporationTimeseriesComputedByPenmanMonteith(ByVal aElevation As Double, ByVal aPrecipitationTS As atcTimeseries, ByVal aAirTemperatureTS As atcTimeseries, _
                                                                      ByVal aSource As atcTimeseriesSource, ByVal aSwatWeatherStation As SwatWeatherStation, _
                                                                      Optional ByVal aCanopyFactor As Double = 49.0, _
-                                                                     Optional ByVal aCo2Conc As Double = 0.0, _
+                                                                     Optional ByVal aCo2Conc As Double = 330.0, _
                                                                      Optional ByVal aDaily As Boolean = True, _
                                                                      Optional ByVal aDebug As Boolean = False) As atcTimeseries
         InitRandomNumbers()
@@ -68,6 +68,10 @@ Public Module modPenmanMonteith_SWAT
             lAirTemperatureMaxTS = SubsetByDate(lAirTemperatureMaxTS, lCommonStart, lCommonEnd, Nothing)
 
             If aDebug Then
+                MapWinUtility.Logger.Dbg("Latitude " & aSwatWeatherStation.Latitude)
+                MapWinUtility.Logger.Dbg("Id " & aSwatWeatherStation.Id)
+                MapWinUtility.Logger.Dbg("Elevation " & aSwatWeatherStation.Elev)
+
                 Dim lPrecipValue As Double = 0.0
                 Dim lIndex As Integer = 1
                 Dim lStr As String = "Precip "
@@ -104,7 +108,7 @@ Public Module modPenmanMonteith_SWAT
             lPanEvapTimeSeries = lAirTemperatureMinTS.Clone
             With lPanEvapTimeSeries
                 .Attributes.SetValue("Constituent", "PMET")
-                .Attributes.SetValue("Location", aSwatWeatherStation)
+                .Attributes.SetValue("Location", aSwatWeatherStation.Name)
                 .Attributes.SetValue("ID", aAirTemperatureTS + 6)
                 .Attributes.SetValue("TU", atcTimeUnit.TUDay)
                 .Attributes.SetValue("description", "Daily SWAT PM ET mm")
@@ -240,7 +244,7 @@ Public Module modPenmanMonteith_SWAT
         'rv - aerodynamic resistance to sensible heat and vapor transfer
         Dim lResistance As Double = 114 / lWindAt170cm
         'rc - canopy resistance (TODO:check details of canopy factor)
-        Dim lCanopyResistance As Double = aCanopyFactor / (1.4 - (0.4 * aCo2Conc) / 330.0)
+        Dim lCanopyResistance As Double = aCanopyFactor / (1.4 - (0.4 * (aCo2Conc / 330.0)))
 
         Dim lEvaporationValue As Double = ((lSlopeSaturationVaporPressureCurve * lNetRadiation) + _
                                            (lPsychrometricConstant * lRho * lVaporPressureDeficit / lResistance)) / _
