@@ -10,19 +10,64 @@ Imports atcData.atcDataManager
 '''     Others may be overridden if desired.</para>
 ''' </remarks>
 Public Class atcDataPlugin
+
+#If GISProvider = "DotSpatial" Then
+
+#Else
     Implements MapWindow.Interfaces.IPlugin
+#End If
 
     Private Shared pNextSerial As Integer = 0 'Next serial number to be assigned
     Private pSerial As Integer 'Serial number of this object, assigned in order of creation at runtime
-    <CLSCompliant(False)> _
-    Protected pMapWin As MapWindow.Interfaces.IMapWin
-    Protected pMapWinWindowHandle As Integer
-    Protected pMenusAdded As New ArrayList
 
     ''' <summary>create a new atcDataPlugin</summary>
     Public Sub New()
         pSerial = System.Threading.Interlocked.Increment(pNextSerial) 'Safely increment pNextSerial
     End Sub
+
+    ''' <summary></summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Overridable ReadOnly Property Icon() As System.Drawing.Icon
+        Get
+            Return Nothing
+        End Get
+    End Property
+
+    ''' <summary>Calls the version of New with no arguments.</summary>
+    ''' <remarks>Inheriting classes that have no New w/o arguments must override.</remarks>
+    Public Overridable Function NewOne() As atcDataPlugin
+        Return Me.GetType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
+    End Function
+
+    Public Overrides Function ToString() As String
+        Return Name & ":" & Version & ":" & SerialNumber
+    End Function
+
+#If GISProvider = "DotSpatial" Then
+    ''' <summary></summary>
+    ''' <remarks></remarks>
+    Public Overridable ReadOnly Property Name() As String  
+        Get
+            Return ""
+        End Get
+    End Property
+
+    ''' <summary></summary>
+    ''' <remarks> </remarks>
+    Public Overridable ReadOnly Property SerialNumber() As String  
+        Get
+            Return pSerial.ToString
+        End Get
+    End Property
+
+#Else
+
+    <CLSCompliant(False)> _
+    Protected pMapWin As MapWindow.Interfaces.IMapWin
+    Protected pMapWinWindowHandle As Integer
+    Protected pMenusAdded As New ArrayList
 
     ''' <summary>
     ''' String that appears in the MapWindow Plug-ins menu to identify this plug-in.
@@ -33,12 +78,6 @@ Public Class atcDataPlugin
     Public Overridable ReadOnly Property Name() As String Implements MapWindow.Interfaces.IPlugin.Name
         Get
             Return ""
-        End Get
-    End Property
-
-    Public Overridable ReadOnly Property Icon() As System.Drawing.Icon
-        Get
-            Return Nothing
         End Get
     End Property
 
@@ -411,15 +450,6 @@ Public Class atcDataPlugin
             Return pSerial.ToString
         End Get
     End Property
-
-    ''' <summary>Calls the version of New with no arguments.</summary>
-    ''' <remarks>Inheriting classes that have no New w/o arguments must override.</remarks>
-    Public Overridable Function NewOne() As atcDataPlugin
-        Return Me.GetType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
-    End Function
-
-    Public Overrides Function ToString() As String
-        Return Name & ":" & Version & ":" & SerialNumber
-    End Function
+#End If
 
 End Class
