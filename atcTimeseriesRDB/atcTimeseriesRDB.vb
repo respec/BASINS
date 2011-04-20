@@ -421,11 +421,11 @@ Public Class atcTimeseriesRDB
                 End Select
             Next
 
+            Dim lParsedDate As Date
             While lTable.CurrentRecord < lTable.NumRecords
                 lTable.MoveNext()
-                lDate = Date.Parse(.Value(lDateField)).ToOADate() + pJulianInterval 'add one interval to put date at end of interval
-
-                If lDate <> 0 Then
+                If Date.TryParse(.Value(lDateField), lParsedDate) Then
+                    lDate = lParsedDate.ToOADate() + pJulianInterval 'add one interval to put date at end of interval
                     lLocation = .Value(lLocationField)
                     For Each lField In lValueFields
                         lCurValue = .Value(lField).Trim
