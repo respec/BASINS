@@ -4,14 +4,14 @@
     <ProjectType>Local</ProjectType>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</ProjectGuid>
+    <ProjectGuid>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ApplicationIcon>
     </ApplicationIcon>
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
-    <AssemblyName>atcWDM</AssemblyName>
+    <AssemblyName>atcMwGisUtility</AssemblyName>
     <AssemblyOriginatorKeyFile>
     </AssemblyOriginatorKeyFile>
     <AssemblyOriginatorKeyMode>None</AssemblyOriginatorKeyMode>
@@ -23,18 +23,16 @@
     <OptionCompare>Binary</OptionCompare>
     <OptionExplicit>On</OptionExplicit>
     <OptionStrict>Off</OptionStrict>
-    <RootNamespace>atcWDM</RootNamespace>
-    <StartupObject>
-    </StartupObject>
+    <RootNamespace>atcMwGisUtility</RootNamespace>
+    <StartupObject>atcMwGisUtility.%28None%29</StartupObject>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <MyType>Windows</MyType>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile />
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -49,10 +47,11 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\..\D4EM\Bin\</OutputPath>
-    <DocumentationFile>atcWDM.xml</DocumentationFile>
+    <OutputPath>..\local\AnyDebug\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>atcMwGisUtility.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
@@ -60,7 +59,7 @@
     </DefineConstants>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <DebugSymbols>true</DebugSymbols>
+    <DebugSymbols>false</DebugSymbols>
     <Optimize>false</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
@@ -70,8 +69,8 @@
     <DebugType>full</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>..\..\D4EM\Bin\</OutputPath>
-    <DocumentationFile>atcWDM.xml</DocumentationFile>
+    <OutputPath>..\local\AnyRelease\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>atcMwGisUtility.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
@@ -79,28 +78,97 @@
     </DefineConstants>
     <DefineDebug>false</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <DebugSymbols>true</DebugSymbols>
+    <DebugSymbols>false</DebugSymbols>
     <Optimize>true</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>false</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\local\x64Debug\Plugins\BASINS\</OutputPath>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>atcMwGisUtility.xml</DocumentationFile>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\local\x64Release\Plugins\BASINS\</OutputPath>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>atcMwGisUtility.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\..\D4EM\Bin\</OutputPath>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>atcMwGisUtility.xml</DocumentationFile>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\local\x86Release\Plugins\BASINS\</OutputPath>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>atcMwGisUtility.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MapWinInterfaces, Version=4.2.2424.18924, Culture=neutral">
+    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\MapWinUtility-D4EM10.vbproj">
+      <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
+      <Name>MapWinUtility-D4EM10</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUtility\atcUtility-D4EM10.vbproj">
+      <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
+      <Name>atcUtility-D4EM10</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <Reference Include="Interop.MapWinGIS">
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>False</Private>
+      <HintPath>..\..\D4EM\Bin\Interop.MapWinGIS.dll</HintPath>
+    </Reference>
+    <Reference Include="MapWinGeoProc">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
-      <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
+      <HintPath>..\..\D4EM\Bin\MapWinGeoProc.dll</HintPath>
+    </Reference>
+    <Reference Include="MapWinInterfaces, Version=4.8.2.21830, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms">
-      <Name>System.Windows.Forms</Name>
+    <Reference Include="System.Drawing">
+      <Name>System.Drawing</Name>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -112,64 +180,9 @@
     <Compile Include="AssemblyInfo.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="atcDataSourceWDM.vb">
+    <Compile Include="GisUtil.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="atcMsgWDM.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="atcWdmHandle.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="frmDefaultTimeInterval.Designer.vb">
-      <DependentUpon>frmDefaultTimeInterval.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmDefaultTimeInterval.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmSave.Designer.vb">
-      <DependentUpon>frmSave.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmSave.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="modVb2F90.vb" />
-    <Compile Include="modWDMGlobal.vb">
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\MapWinUtility-D4EM10.vbproj">
-      <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
-      <Name>MapWinUtility-D4EM10</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcControls\atcControls-D4EM10.vbproj">
-      <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
-      <Name>atcControls-D4EM10</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcData\atcData-D4EM10.vbproj">
-      <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
-      <Name>atcData-D4EM10</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcUtility\atcUtility-D4EM10.vbproj">
-      <Name>atcUtility-D4EM10</Name>
-      <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
-      <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
-      <Private>False</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="frmDefaultTimeInterval.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>frmDefaultTimeInterval.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmSave.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>frmSave.vb</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -180,7 +193,7 @@
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
       <Visible>False</Visible>
       <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
-      <Install>true</Install>
+      <Install>false</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
       <Visible>False</Visible>
@@ -195,7 +208,12 @@
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
