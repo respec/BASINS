@@ -111,15 +111,6 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <COMReference Include="stdole">
-      <Guid>{00020430-0000-0000-C000-000000000046}</Guid>
-      <VersionMajor>2</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>primary</WrapperTool>
-    </COMReference>
-  </ItemGroup>
-  <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
     <Import Include="System" />
     <Import Include="System.Collections" />
@@ -134,9 +125,6 @@
     </Compile>
     <Compile Include="Classes\clsDataManagement.vb">
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Classes\clsImageUtils.vb">
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Classes\clsLog.vb">
       <SubType>Code</SubType>
