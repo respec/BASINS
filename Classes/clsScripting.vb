@@ -35,22 +35,29 @@ Public Class Scripting
     End Sub
 
 
-    'Broke out the run method into PrepareScript and Run
-    'No longer have to pass in a reference to the Mainform
-    'PrepareScript now returns an assembly.  Assembly can be
-    'loaded by the appropriate Plugin manager from the calling code
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aLanguage"></param>
+    ''' <param name="aDLLfilename"></param>
+    ''' <param name="aCode"></param>
+    ''' <param name="aErrors"></param>
+    ''' <param name="aPluginFolder"></param>
+    ''' <returns>an assembly built by compiling aCode or the contents of the file referenced by aCode</returns>
+    ''' <remarks>
+    ''' Broke out the run method into PrepareScript and Run.
+    ''' No longer have to pass in a reference to the Mainform.
+    ''' Output assembly can be loaded by the appropriate Plugin manager from the calling code.
+    ''' </remarks>
     Public Shared Function PrepareScript(ByVal aLanguage As String, _
                         ByVal aDLLfilename As String, _
                         ByVal aCode As String, _
                         ByRef aErrors As String, _
                         ByVal aPluginFolder As String) As Assembly
 
-
         aErrors = "" 'No errors yet
         aLanguage = GetLanguageFromFilename(aLanguage)
-        Dim assy As System.Reflection.Assembly
-
-
+        Dim lAssembly As System.Reflection.Assembly
 
         If aDLLfilename Is Nothing OrElse aDLLfilename.Length = 0 Then
             aDLLfilename = MakeScriptName(aPluginFolder)
@@ -59,7 +66,7 @@ Public Class Scripting
         RemoveByteOrderMarker(aCode)
 
         If aLanguage = "dll" Then
-            assy = System.Reflection.Assembly.LoadFrom(aCode)
+            lAssembly = System.Reflection.Assembly.LoadFrom(aCode)
         Else 'compile the code into an assembly
             Try
                 If System.IO.File.Exists(aCode) Then
@@ -75,34 +82,26 @@ Public Class Scripting
             End Try
 
             RemoveByteOrderMarker(aCode)
-            assy = Compile(aLanguage, aCode, aErrors, aDLLfilename)
-
+            lAssembly = Compile(aLanguage, aCode, aErrors, aDLLfilename)
         End If
 
-        Return assy
-
-
+        Return lAssembly
     End Function
-
 
     Public Shared Function Run(ByVal aAssembly As Assembly, _
                     ByRef aErrors As String, _
                     ByVal ParamArray aArgs() As Object) As Object
 
-        Dim assy As Assembly
-        assy = aAssembly
-
-        Dim MethodName As String = "ScriptMain" 'Can't be MAIN or the C# compiler will have a heart attack.
-
-        Dim assyTypes As Type() 'list of items within the assembly
+        Dim lAssembly As Assembly = aAssembly
+        Dim lMethodName As String = "ScriptMain" 'Can't be MAIN or the C# compiler will have a heart attack.
+        Dim lAssemblyTypes As Type() 'list of items within the assembly
 
         If aErrors Is Nothing OrElse aErrors.Length = 0 Then
-
-            assyTypes = assy.GetTypes()
-            For Each typ As Type In assyTypes
-                Dim scriptMethodInfo As MethodInfo = typ.GetMethod(MethodName)
-                If Not scriptMethodInfo Is Nothing Then
-                    Logger.Dbg("Invoke:" & scriptMethodInfo.Name)
+            lAssemblyTypes = lAssembly.GetTypes()
+            For Each lAssemblyType As Type In lAssemblyTypes
+                Dim lScriptMethodInfo As MethodInfo = lAssemblyType.GetMethod(lMethodName)
+                If Not lScriptMethodInfo Is Nothing Then
+                    Logger.Dbg("Invoke:" & lScriptMethodInfo.Name)
                     If aArgs Is Nothing Then
                         Logger.Dbg("No Args")
                     Else
@@ -113,18 +112,17 @@ Public Class Scripting
                         Next
                     End If
                     Try
-                        Return scriptMethodInfo.Invoke(Nothing, aArgs) 'assy.CreateInstance(typ.Name)
+                        Return lScriptMethodInfo.Invoke(Nothing, aArgs) 'assy.CreateInstance(typ.Name)
                     Catch ex As Exception
                         Logger.Dbg("Exception:" & ex.ToString)
                         Return False
                     End Try
-                    If Not scriptMethodInfo Is Nothing Then
-                        Return scriptMethodInfo.Invoke(Nothing, aArgs) 'assy.CreateInstance(typ.Name)
+                    If Not lScriptMethodInfo Is Nothing Then
+                        Return lScriptMethodInfo.Invoke(Nothing, aArgs) 'assy.CreateInstance(typ.Name)
                     End If
                 End If
             Next
-            aErrors = "Scripting.Run: '" & MethodName & "' not found"
-
+            aErrors = "Scripting.Run: '" & lMethodName & "' not found"
         End If
         Return Nothing
     End Function
@@ -147,31 +145,30 @@ Public Class Scripting
                                    ByVal aCode As String, _
                                    ByRef aErrors As String, _
                           Optional ByVal aOutputFilename As String = "") As System.Reflection.Assembly
-        Dim params As CompilerParameters
-        Dim results As CompilerResults
-        Dim provider As CodeDomProvider
-        Dim needSupportCode As Boolean = False
+        Dim lCompilerParameters As CompilerParameters
+        Dim lCompilerResults As CompilerResults
+        Dim lCodeDomProvider As CodeDomProvider
+        Dim lNeedSupportCode As Boolean = False
         Dim lSupportCode As String = ""
 
         aLanguage = GetLanguageFromFilename(aLanguage)
 
         Select Case aLanguage
             Case "cs"
-                'provider = New Microsoft.CSharp.CSharpCodeProvider
+                lCodeDomProvider = New Microsoft.CSharp.CSharpCodeProvider
                 'Paul Meems - 2010/09/13: Use FrameWork v3.5 so we can use the C#3.0 options:
-                Dim provOptions As New System.Collections.Generic.Dictionary(Of String, String)()
-                provOptions.Add("CompilerVersion", "v3.5")
-                provider = New Microsoft.CSharp.CSharpCodeProvider(provOptions)
-
-                If aCode.IndexOf("using ") < 0 Then needSupportCode = True
+                Dim lProviderOptions As New System.Collections.Generic.Dictionary(Of String, String)()
+                lProviderOptions.Add("CompilerVersion", "v3.5")
+                lCodeDomProvider = New Microsoft.CSharp.CSharpCodeProvider(lProviderOptions)
+                If aCode.IndexOf("using ") < 0 Then lNeedSupportCode = True
                 'Case "js" : provider = Activator.CreateInstance("Microsoft.JScript", "Microsoft.JScript.JScriptCodeProvider").Unwrap()
             Case "vb"
-                provider = New Microsoft.VisualBasic.VBCodeProvider
-                If aCode.IndexOf("Public ") < 0 Then needSupportCode = True
-            Case Else : provider = New Microsoft.VisualBasic.VBCodeProvider
+                lCodeDomProvider = New Microsoft.VisualBasic.VBCodeProvider
+                If aCode.IndexOf("Public ") < 0 Then lNeedSupportCode = True
+            Case Else : lCodeDomProvider = New Microsoft.VisualBasic.VBCodeProvider
         End Select
 
-        params = New System.CodeDom.Compiler.CompilerParameters
+        lCompilerParameters = New System.CodeDom.Compiler.CompilerParameters
 
         'jlk&mg - 2010/09 - explicitly load assemblies that scripts are likely to need
         Dim lAssemblyNames() As String = {"MapWinGeoProc", "MapWinUtility", "MapWinInterfaces", "Zedgraph", _
@@ -181,24 +178,23 @@ Public Class Scripting
         For Each lAssemblyName As String In lAssemblyNames
             Dim lAssemblyFileName As String = IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), lAssemblyName & ".dll")
             If IO.File.Exists(lAssemblyFileName) Then
-                params.ReferencedAssemblies.Add(lAssemblyFileName)
+                lCompilerParameters.ReferencedAssemblies.Add(lAssemblyFileName)
             End If
         Next
 
         If aOutputFilename.Length = 0 Then
-            params.GenerateInMemory = True      'Assembly is created in memory
-            params.GenerateExecutable = False
+            lCompilerParameters.GenerateInMemory = True      'Assembly is created in memory
         Else
-            params.OutputAssembly = aOutputFilename
+            lCompilerParameters.OutputAssembly = aOutputFilename
         End If
-        params.TreatWarningsAsErrors = False
-        params.WarningLevel = 4
+        lCompilerParameters.TreatWarningsAsErrors = False
+        lCompilerParameters.WarningLevel = 4
         'params.ReferencedAssemblies.AddRange(refs)
 
-        For Each refAssy As System.Reflection.Assembly In AppDomain.CurrentDomain.GetAssemblies()
-
-            Dim lAssyName As String = Strings.StrSplit(refAssy.FullName, ",", "")
-            Select Case lAssyName
+        Dim lAssemblyAdded As New ArrayList
+        For Each lReferenceAssembly As System.Reflection.Assembly In AppDomain.CurrentDomain.GetAssemblies()
+            Dim lAssemblyName As String = Strings.StrSplit(lReferenceAssembly.FullName, ",", "")
+            Select Case lAssemblyName
                 Case "mscorlib", _
                      "mwIdentifier", _
                      "TableEditor.mw", _
@@ -209,29 +205,31 @@ Public Class Scripting
                      "MapWinInterfaces", _
                      "log4net", _
                      "System.Windows.Forms.Ribbon35"
-
                 Case Else
                     'Chris M July 2006 -- Don't add 'RemoveMe' or resources with "" as the location.
-                    If Not lAssyName.Contains("MapWindow") And Not lAssyName.Contains("RemoveMe") Then
+                    If Not lAssemblyName.Contains("MapWindow") And Not lAssemblyName.Contains("RemoveMe") Then
                         'Chris M Jan 1 2006 -- don't add localized satellite assemblies
-                        If Not lAssyName.EndsWith(".resources") Then
-                            If lAssyName.StartsWith("RemoveMe") Then
+                        If Not lAssemblyName.EndsWith(".resources") Then
+                            If lAssemblyName.StartsWith("RemoveMe") Then
                                 'Don't add temporary assemblies
-                            ElseIf Not refAssy.Location.Trim() = "" Then
-                                If needSupportCode Then
+                            ElseIf Not lReferenceAssembly.Location.Trim() = "" Then
+                                If lNeedSupportCode Then
                                     Select Case aLanguage
-                                        Case "vb" : lSupportCode &= "Imports " & lAssyName & vbCrLf
-                                        Case "cs" : lSupportCode &= "using " & lAssyName & ";" & vbCrLf
+                                        Case "vb" : lSupportCode &= "Imports " & lAssemblyName & vbCrLf
+                                        Case "cs" : lSupportCode &= "using " & lAssemblyName & ";" & vbCrLf
                                     End Select
                                 End If
-                                params.ReferencedAssemblies.Add(refAssy.Location)
+                                If Not lAssemblyAdded.Contains(lAssemblyName) Then
+                                    lCompilerParameters.ReferencedAssemblies.Add(lReferenceAssembly.Location)
+                                    lAssemblyAdded.Add(lAssemblyName)
+                                End If
                             End If
                         End If
                     End If
             End Select
         Next
 
-        If aLanguage.ToLower = "vb" And needSupportCode Then
+        If aLanguage.ToLower = "vb" And lNeedSupportCode Then
             aCode = lSupportCode & vbCrLf _
                                  & "Public Module ScriptModule" & vbCrLf _
                                  & "  Public Sub ScriptMain(ByVal aDataManager As atcDataManager, ByVal aBasinsPlugIn As Object)" & vbCrLf _
@@ -243,19 +241,20 @@ Public Class Scripting
         'MsgBox(aCode)
 
         Try
-            results = provider.CompileAssemblyFromSource(params, aCode)
-            If results.Errors.Count = 0 Then        'No compile errors or warnings
-                Return results.CompiledAssembly
+            lCompilerResults = lCodeDomProvider.CompileAssemblyFromSource(lCompilerParameters, aCode)
+            If lCompilerResults.Errors.Count = 0 Then        'No compile errors or warnings
+                Return lCompilerResults.CompiledAssembly
             Else
-                For Each err As CompilerError In results.Errors
+                For Each lCompilerError As CompilerError In lCompilerResults.Errors
                     aErrors &= (String.Format( _
                         "Line {0}, Col {1}: Error {2} - {3}", _
-                        err.Line, err.Column, err.ErrorNumber, err.ErrorText)) & vbCrLf
+                        lCompilerError.Line, lCompilerError.Column, _
+                        lCompilerError.ErrorNumber, lCompilerError.ErrorText)) & vbCrLf
                 Next
             End If
         Catch ex As Exception
             'Compile errors don't throw exceptions. This is a deeper problem
-            aErrors = ex.Message
+            aErrors &= ex.Message
         End Try
 
         If Not aErrors Is Nothing AndAlso aErrors.Length > 0 Then
