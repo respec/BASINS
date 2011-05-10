@@ -116,6 +116,15 @@ Public Class atcDataSourceNOAA
                     ColYear = AddColEnd(61, 64, "Year")
                     ColMonth = AddColEnd(65, 66, "Month")
                     ColRepeats = Nothing 'no ColRepeats number of values element in this format
+                Case "MPA"
+                    lLongForm = True
+                    ColRecType = AddColEnd(5, 8, "StnType")
+                    ColLocation = AddColEnd(10, 23, "Location")
+                    ColElementType = AddColEnd(46, 49, "ElementType")
+                    ColUnits = AddColEnd(51, 52, "Units")
+                    ColYear = AddColEnd(54, 57, "Year")
+                    ColMonth = AddColEnd(59, 60, "Month")
+                    ColRepeats = AddColEnd(68, 83, "Repeats")
                 Case Else
                     Logger.Dbg("PROBLEM: Test of format for file '" & aFileName & "' failed." & vbCrLf & _
                                "Be sure this file follows the accepted NOAA TD-3200 format. First three characters expected to be DLY, 320 or 321.")
