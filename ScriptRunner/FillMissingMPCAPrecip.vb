@@ -24,7 +24,7 @@ Public Module FillMissingMPCAPrecip
         (ByVal aMsg As String, ByVal aMsgLen As Short)
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
-        Logger.StartToFile("FillMissingMPCA.log")
+        Logger.StartToFile(pStationPath & "FillMissingMPCA.log", , , True)
         Logger.Dbg("FillMissing:Start")
         ChDriveDir(pOutputPath)
         Logger.Dbg(" CurDir:" & CurDir())
