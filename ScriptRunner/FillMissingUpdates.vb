@@ -15,22 +15,23 @@ Imports atcWDM
 'Imports atcDataTree
 'Imports atcEvents
 
-Public Module FillMissing2006
+Public Module FillMissingUpdates
     Private Const pSubsetPath As String = "C:\BASINSMet\WDMFiltered\subset\"
-    Private Const pInputPath As String = "C:\BASINSMet\WDMFiltered\"
-    Private Const pStationPath As String = "C:\BasinsMet\Stations\"
-    Private Const pOutputPath As String = "C:\BASINSMet\WDMFilled\"
+    Private Const pInputPath As String = "H:\BASINSMet\subset\"
+    Private Const pStationPath As String = "H:\BasinsMet\Stations\"
+    Private Const pOutputPath As String = "H:\BASINSMet\subset\WDMFilled\"
     Private Const pMaxNearStas As Integer = 30
     Private Const pMaxFillLength As Integer = 11 'any span < max time shift (10 hrs for HI)
     Private Const pMinNumHrly As Integer = 43830 '5 years of hourly values
     Private Const pMinNumDly As Integer = 1830 '5 years of daily
     Private Const pMaxPctMiss As Integer = 35 'was 20, use higher number since it's just one year appended to a quality tser
     Private Const pAlreadyDone As String = "" '01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35" ',36,37,38,39,40,41,42,43,44,45,46" ',47,48,50,51,66,67,ak,al,ar,az,ca,co,ct,de,fl,ga,hi,ia,id,il,in,ks,ky,la,ma,md,me,mi,mn,mo,ms,mt,nc,nd,ne,nh,nj,nm,nv,ny"
+    Private Const pValidStates As String = "01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,50,51,66,67,ak,al,ar,az,ca,co,ct,de,fl,ga,hi,ia,id,il,in,ks,ky,la,ma,md,me,mi,mn,mo,ms,mt,nc,nd,ne,nh,nj,nm,nv,ny,oh,ok,or,pa,ri,sc,sd,tn,tx,ut,va,vt,wa,wi,wv,wy"
     Declare Sub F90_MSG Lib "hass_ent.dll" _
         (ByVal aMsg As String, ByVal aMsgLen As Short)
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
-        Logger.Dbg("FillMissing:Start")
+        Logger.Dbg("FillMissingUpdates:Start")
         ChDriveDir(pOutputPath)
         Logger.Dbg(" CurDir:" & CurDir())
 
@@ -66,7 +67,7 @@ Public Module FillMissing2006
         Dim lRepType As Integer = 1 'DBF parsing output format
 
         If lStationDBF.OpenFile(pStationPath & "StationLocs-Dist.dbf") Then
-            Logger.Dbg("FillMissing: Opened Station Location Master file " & pStationPath & "StationLocs-Dist.dbf")
+            Logger.Dbg("FillMissingUpdates: Opened Station Location Master file " & pStationPath & "StationLocs-Dist.dbf")
         End If
 
         Dim X1 As Double
@@ -77,7 +78,7 @@ Public Module FillMissing2006
         Dim lPos(lStationDBF.NumRecords) As Integer
         Dim lRank(lStationDBF.NumRecords) As Integer
 
-        Logger.Dbg("FillMissing: Read all lat/lng values")
+        Logger.Dbg("FillMissingUpdates: Read all lat/lng values")
         For lrec As Integer = 1 To lStationDBF.NumRecords
             lStationDBF.CurrentRecord = lrec
             X2(lStationDBF.CurrentRecord) = lStationDBF.Value(7)
@@ -86,18 +87,23 @@ Public Module FillMissing2006
 
         Dim lFiles As NameValueCollection = Nothing
         AddFilesInDir(lFiles, pInputPath, True, "*.wdm")
-        Logger.Dbg("FillMissing: Found " & lFiles.Count & " data files")
+        Logger.Dbg("FillMissingUpdates: Found " & lFiles.Count & " data files")
         For Each lfile As String In lFiles
             lStation = FilenameNoExt(FilenameNoPath(lfile))
-            lStatePath = Right(PathNameOnly(lfile), 2) & "\"
-            If Not pAlreadyDone.Contains(lStatePath.Substring(0, 2)) Then
-                Logger.StartToFile(pOutputPath & lStatePath & lStation & "_Fill_2006" & ".log", , , True)
+            lStatePath = Right(PathNameOnly(lfile), 2)
+            If pValidStates.Contains(lStatePath) Then
+                lStatePath = Right(PathNameOnly(lfile), 2) & "\"
+            Else
+                lStatePath = ""
+            End If
+            If lStatePath.Length = 0 OrElse Not pAlreadyDone.Contains(lStatePath.Substring(0, 2)) Then
+                Logger.StartToFile(pOutputPath & lStatePath & lStation & "_Fill_Updated" & ".log", , , True)
                 If lStationDBF.FindFirst(1, lStation) Then
                     X1 = 0
                     Y1 = 0
                     If FileExists(pOutputPath & lStatePath & FilenameNoPath(lfile)) Then
                         'existing filled WDM exists for this station
-                        FileCopy(lfile, lCurWDM)
+                        FileCopy(lfile, lCurWDM) 'make working copy of existing WDM file
                         Dim lWDMfile As New atcWDM.atcDataSourceWDM
                         lWDMfile.Open(lCurWDM)
                         'open existing filled WDM file for appending 2006 data
@@ -117,45 +123,11 @@ Public Module FillMissing2006
                                     Select Case lCons 'look for wanted constituents and check % missing
                                         Case "HPCP", "HPCP1", "TMIN", "TMAX", "PRCP"
                                             If lPctMiss < pMaxPctMiss Then '% missing OK
-                                                'If (lts.Attributes.GetValue("tu") = atcTimeUnit.TUHour AndAlso lts.numValues > pMinNumHrly) OrElse _
-                                                '   (lts.Attributes.GetValue("tu") = atcTimeUnit.TUDay AndAlso lts.numValues > pMinNumDly) Then 'want a significant time span
                                                 ExtendISHTSer(lts)
-                                                Logger.Dbg("FillMissing:  Filling data for " & lts.ToString & ", " & lts.Attributes.GetValue("Description"))
+                                                Logger.Dbg("FillMissingUpdates:  Filling data for " & lts.ToString & ", " & lts.Attributes.GetValue("Description"))
                                                 lAddMe = True
-                                                'Else
-                                                '    Logger.Dbg("FillMissing:  Not enough values (" & lts.numValues & ") for " & lts.ToString & _
-                                                '               " - need at least " & pMinNumHrly)
-                                                'End If
-                                                'ElseIf lPctMiss < pMaxPctMiss + 10 Then 'try to find recent subset with < max % missing
-                                                '    Logger.Dbg("FillMissing:  For " & lts.ToString & ", percent Missing (" & lPctMiss & ") > " & pMaxPctMiss & " - try subset of most recent data")
-                                                '    Dim lEJDay As Double = lts.Attributes.GetValue("EJDay")
-                                                '    Dim lSJDay As Double
-                                                '    Dim lSubTS As atcTimeseries
-                                                '    i = 0
-                                                '    Do 'back up in 5 year increments while %missing is low enough
-                                                '        i += 1
-                                                '        lSJDay = lEJDay - System.Math.Round(5 * i * JulianYear)
-                                                '        lSubTS = SubsetByDate(lts, lSJDay, lEJDay, Nothing)
-                                                '        lStr = MissingDataSummary(lSubTS, lMVal, lMAcc, lFMin, lFMax, lRepType)
-                                                '        lPctMiss = CDbl(lStr.Substring(lStr.LastIndexOf(",") + 1))
-                                                '        lSubTS = Nothing
-                                                '    Loop While lPctMiss < pMaxPctMiss
-                                                '    If i > 1 Then
-                                                '        lAddMe = True
-                                                '        Logger.Dbg("FillMissing:  Filling data for " & lts.ToString & ", " & lts.Attributes.GetValue("Description"))
-                                                '        lSJDay = lEJDay - System.Math.Round(5 * (i - 1) * JulianYear)
-                                                '        lSubTS = SubsetByDate(lts, lSJDay, lEJDay, Nothing)
-                                                '        lStr = MissingDataSummary(lSubTS, lMVal, lMAcc, lFMin, lFMax, lRepType)
-                                                '        lPctMiss = CDbl(lStr.Substring(lStr.LastIndexOf(",") + 1))
-                                                '        lts = Nothing
-                                                '        lts = lSubTS
-                                                '        lSubTS = Nothing
-                                                '        Logger.Dbg("FillMissing:  Using time subset of " & DumpDate(lSJDay) & " to " & DumpDate(lEJDay))
-                                                '    Else
-                                                '        Logger.Dbg("FillMissing:  Subset percent missing (" & lPctMiss & ") still too large")
-                                                '    End If
                                             Else
-                                                Logger.Dbg("FillMissing:  For " & lts.ToString & ", percent Missing (" & lPctMiss & ") too large (> " & pMaxPctMiss & ")")
+                                                Logger.Dbg("FillMissingUpdates:  For " & lts.ToString & ", percent Missing (" & lPctMiss & ") too large (> " & pMaxPctMiss & ")")
                                             End If
                                         Case "ATEMP", "DPTEMP", "WIND", "CLOU"
                                             If lPctMiss < pMaxPctMiss Then '% missing OK
@@ -164,8 +136,8 @@ Public Module FillMissing2006
                                                 lAddMe = True
                                                 'extend TSer to end of last day (from ISH data being time shifted)
                                                 ExtendISHTSer(lts)
-                                                Logger.Dbg("FillMissing:  Before Interpolation, % Missing:  " & lPctMiss)
-                                                Logger.Dbg("FillMissing:  Max span to interpolate is " & pMaxFillLength & " hours")
+                                                Logger.Dbg("FillMissingUpdates:  Before Interpolation, % Missing:  " & lPctMiss)
+                                                Logger.Dbg("FillMissingUpdates:  Max span to interpolate is " & pMaxFillLength & " hours")
                                                 'try interpolation for these hourly constituents
                                                 Dim lInterpTS As atcTimeseries = FillMissingByInterpolation(lts, (CDbl(pMaxFillLength) + 0.001) / 24)
                                                 If Not lInterpTS Is Nothing Then
@@ -173,34 +145,34 @@ Public Module FillMissing2006
                                                     lInterpTS = Nothing
                                                     lStr = MissingDataSummary(lts, lMVal, lMAcc, lFMin, lFMax, lRepType)
                                                     lPctMiss = CDbl(lStr.Substring(lStr.LastIndexOf(",") + 1))
-                                                    Logger.Dbg("FillMissing:  After Interpolation, % Missing:  " & lPctMiss)
+                                                    Logger.Dbg("FillMissingUpdates:  After Interpolation, % Missing:  " & lPctMiss)
                                                 Else
-                                                    Logger.Dbg("FillMissing:  PROBLEM with Interpolation")
+                                                    Logger.Dbg("FillMissingUpdates:  PROBLEM with Interpolation")
                                                 End If
                                                 'Else
                                                 '    Logger.Dbg("FillMissing:  Not enough values (" & lts.numValues & ") for " & lts.ToString & _
                                                 '               " - need at least " & pMinNumHrly)
                                                 'End If
                                             Else
-                                                Logger.Dbg("FillMissing:  For " & lts.ToString & ", percent Missing (" & lPctMiss & ") too large (> " & pMaxPctMiss & ")")
+                                                Logger.Dbg("FillMissingUpdates:  For " & lts.ToString & ", percent Missing (" & lPctMiss & ") too large (> " & pMaxPctMiss & ")")
                                             End If
                                         Case Else
-                                            Logger.Dbg("FillMissing:  Not processing constituent for " & lts.ToString)
+                                            Logger.Dbg("FillMissingUpdates:  Not processing constituent for " & lts.ToString)
                                     End Select
                                     If lAddMe Then
                                         If lPctMiss > 0 Then
                                             If X1 < Double.Epsilon AndAlso Y1 < Double.Epsilon Then 'determine nearest geographic stations
                                                 X1 = lStationDBF.Value(7)
                                                 Y1 = lStationDBF.Value(8)
-                                                Logger.Dbg("FillMissing: For Station " & lStation & ", " & lStationDBF.Value(2) & "  at Lat/Lng " & lStationDBF.Value(4) & " / " & lStationDBF.Value(5))
+                                                Logger.Dbg("FillMissingUpdates: For Station " & lStation & ", " & lStationDBF.Value(2) & "  at Lat/Lng " & lStationDBF.Value(4) & " / " & lStationDBF.Value(5))
                                                 For i = 1 To lStationDBF.NumRecords
                                                     lDist(i) = System.Math.Sqrt((X1 - X2(i)) ^ 2 + (Y1 - Y2(i)) ^ 2)
                                                 Next
                                                 SortRealArray(0, lStationDBF.NumRecords, lDist, lPos)
                                                 'SortIntegerArray(0, lStationDBF.NumRecords, lPos, lRank)
-                                                Logger.Dbg("FillMissing: Sorted stations by distance")
+                                                Logger.Dbg("FillMissingUpdates: Sorted stations by distance")
                                             End If
-                                            Logger.Dbg("FillMissing:    Nearby Stations:")
+                                            Logger.Dbg("FillMissingUpdates:    Nearby Stations:")
                                             lFillers = New atcCollection
                                             lFillerOTs = New atcCollection
                                             i = 2
@@ -209,7 +181,7 @@ Public Module FillMissing2006
                                                 For Each llts As atcTimeseries In lWDMfile.DataSets
                                                     If llts.Attributes.GetValue("Constituent") = "HPCP" Then
                                                         lFillers.Add(0, llts)
-                                                        Logger.Dbg("FillMissing:  Using " & _
+                                                        Logger.Dbg("FillMissingUpdates:  Using " & _
                                                                    llts.Attributes.GetValue("Constituent") & " from " & _
                                                                    llts.Attributes.GetValue("Location") & " " & _
                                                                    llts.Attributes.GetValue("STANAM") & " at Lat/Lng " & _
@@ -235,7 +207,7 @@ Public Module FillMissing2006
                                                             'contains data for time period being filled
                                                             lFillers.Add(lDist(lPos(i)), lFillTS)
                                                             j += 1
-                                                            Logger.Dbg("FillMissing:  Using " & _
+                                                            Logger.Dbg("FillMissingUpdates:  Using " & _
                                                                        lFillTS.Attributes.GetValue("Constituent") & " from " & _
                                                                        lFillTS.Attributes.GetValue("Location") & " " & _
                                                                        lFillTS.Attributes.GetValue("STANAM") & " at Lat/Lng " & _
@@ -251,13 +223,13 @@ Public Module FillMissing2006
                                                 i += 1
                                             End While
                                             If j > 0 Then
-                                                Logger.Dbg("FillMissing:  Found " & j & " nearby stations for filling")
-                                                Logger.Dbg("FillMissing:  Before Filling, % Missing:  " & lPctMiss)
+                                                Logger.Dbg("FillMissingUpdates:  Found " & j & " nearby stations for filling")
+                                                Logger.Dbg("FillMissingUpdates:  Before Filling, % Missing:  " & lPctMiss)
                                                 If lts.Attributes.GetValue("TU") = atcTimeUnit.TUHour Then
                                                     If lPctMiss > 0 Then
                                                         FillHourlyTser(lts, lFillers, lMVal, lMAcc, 90)
                                                     Else
-                                                        Logger.Dbg("FillMissing:  All Missing periods filled via interpolation")
+                                                        Logger.Dbg("FillMissingUpdates:  All Missing periods filled via interpolation")
                                                     End If
                                                 Else 'daily tser, locate obs time tsers
                                                     For Each lFiller As atcTimeseries In lFillers
@@ -269,22 +241,22 @@ Public Module FillMissing2006
                                                 End If
                                                 lStr = MissingDataSummary(lts, lMVal, lMAcc, lFMin, lFMax, lRepType)
                                                 lPctMiss = CDbl(lStr.Substring(lStr.LastIndexOf(",") + 1))
-                                                Logger.Dbg("FillMissing:  After Filling, % Missing:  " & lPctMiss)
+                                                Logger.Dbg("FillMissingUpdates:  After Filling, % Missing:  " & lPctMiss)
                                             Else
-                                                Logger.Dbg("FillMissing:  PROBLEM - Could not find any nearby stations for filling")
+                                                Logger.Dbg("FillMissingUpdates:  PROBLEM - Could not find any nearby stations for filling")
                                             End If
                                             If lPctMiss > 0 AndAlso (lCons = "ATEMP" OrElse lCons = "DPTEMP" OrElse _
                                                                      lCons = "WIND" OrElse lCons = "CLOU") Then
                                                 'fill remaining missing by interpolation for these hourly constituents
                                                 Dim lFillInstances As New ArrayList
-                                                Logger.Dbg("FillMissing:  NOTE - Forcing Interpolation of all remaining missing periods")
+                                                Logger.Dbg("FillMissingUpdates:  NOTE - Forcing Interpolation of all remaining missing periods")
                                                 Dim lInterpTS As atcTimeseries = FillMissingByInterpolation(lts, , lFillInstances)
                                                 If Not lInterpTS Is Nothing Then
                                                     lts = lInterpTS
                                                     lInterpTS = Nothing
                                                     lStr = MissingDataSummary(lts, lMVal, lMAcc, lFMin, lFMax, lRepType)
                                                     lPctMiss = CDbl(lStr.Substring(lStr.LastIndexOf(",") + 1))
-                                                    Logger.Dbg("FillMissing:  After Interpolation, % Missing:  " & lPctMiss)
+                                                    Logger.Dbg("FillMissingUpdates:  After Interpolation, % Missing:  " & lPctMiss)
                                                     Dim lHours As Integer = 0
                                                     Dim lQtrDay As Integer = 0
                                                     Dim lHalfDay As Integer = 0
@@ -306,7 +278,7 @@ Public Module FillMissing2006
                                                             lHours += 1
                                                         End If
                                                     Next
-                                                    Logger.Dbg("FillMissing:  Forced Interpolation Summary" & vbCrLf & _
+                                                    Logger.Dbg("FillMissingUpdates:  Forced Interpolation Summary" & vbCrLf & _
                                                                "                " & lFillInstances.Count & " instances of interpolation" & vbCrLf & _
                                                                "                   " & lWeek & " longer than 1 week" & vbCrLf & _
                                                                "                   " & lTwoDays & " longer than 2 days" & vbCrLf & _
@@ -315,25 +287,25 @@ Public Module FillMissing2006
                                                                "                   " & lQtrDay & " longer than 6 hours" & vbCrLf & _
                                                                "                   " & lHours & " less than 6 hours" & vbCrLf)
                                                 Else
-                                                    Logger.Dbg("FillMissing:  PROBLEM with Interpolation")
+                                                    Logger.Dbg("FillMissingUpdates:  PROBLEM with Interpolation")
                                                 End If
                                             End If
                                         Else
-                                            Logger.Dbg("FillMissing:  No Missing Data for this dataset!")
+                                            Logger.Dbg("FillMissingUpdates:  No Missing Data for this dataset!")
                                         End If
                                         'write filled data set to new WDM file
                                         If lNewWDMfile.AddDataset(lts, atcDataSource.EnumExistAction.ExistAppend) Then
-                                            Logger.Dbg("FillMissing:  Added " & lCons & " dataset to WDM file for station " & lStation)
+                                            Logger.Dbg("FillMissingUpdates:  Added " & lCons & " dataset to WDM file for station " & lStation)
                                         Else
-                                            Logger.Dbg("FillMissing:  PROBLEM adding " & lCons & " dataset to WDM file for station " & lStation)
+                                            Logger.Dbg("FillMissingUpdates:  PROBLEM adding " & lCons & " dataset to WDM file for station " & lStation)
                                         End If
                                     End If
                                 Else
-                                    Logger.Dbg("FillMissing:  No newer data available for " & ltsExist.ToString)
+                                    Logger.Dbg("FillMissingUpdates:  No newer data available for " & ltsExist.ToString)
                                 End If
                                 ltsExist = Nothing
                             Else
-                                Logger.Dbg("FillMissing:  No existing data for 2006 update: " & ltser.ToString)
+                                Logger.Dbg("FillMissingUpdates:  No existing data for 2006 update: " & ltser.ToString)
                             End If
                         Next
                         'If lNewWDMfile.DataSets.Count > 0 Then 'save new WDM file
@@ -353,12 +325,12 @@ Public Module FillMissing2006
                         Kill(lCurWDM)
                     End If
                 Else
-                    Logger.Dbg("FillMissing:  PROBLEM - could not find station on location DBF file")
+                    Logger.Dbg("FillMissingUpdates:  PROBLEM - could not find station on location DBF file")
                 End If
             End If
         Next
-        Logger.StartToFile("FillMissEnd.log", , , True)
-        Logger.Dbg("FillMissing:Completed Filling")
+        Logger.StartToFile("FillMissingUpdates.log", , , True)
+        Logger.Dbg("FillMissingUpdates:Completed Filling")
 
         'Application.Exit()
 
