@@ -19,7 +19,10 @@ Partial Class frmSelectScript
             Try
                 lResult = lMethod.Invoke(Nothing, lArgs)
             Catch lEx As Exception
-                Logger.Msg("Exception: " & lEx.InnerException.Message & vbCrLf & lEx.InnerException.StackTrace)
+                Logger.Dbg(vbCrLf & "Exception: " & lEx.ToString & vbCrLf)
+                If lEx.InnerException IsNot Nothing Then
+                    Logger.Dbg(vbCrLf & "Inner Exception: " & lEx.InnerException.Message & vbCrLf & lEx.InnerException.StackTrace & vbCrLf)
+                End If
                 Logger.Flush()
                 lResult = False
             End Try

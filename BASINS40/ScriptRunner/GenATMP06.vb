@@ -6,6 +6,7 @@ Imports System.Windows.Forms
 'Imports MapWinGIS
 Imports MapWindow.Interfaces
 Imports MapWinUtility
+Imports MapWinUtility.Strings
 'Imports BASINS
 
 Imports atcUtility

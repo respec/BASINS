@@ -14,7 +14,7 @@ Imports atcMetCmp
 'Imports atcDataTree
 'Imports atcEvents
 
-Public Module GenPET
+Public Module GenPET06
     Private Const pInputPath As String = "C:\BASINSMet\WDMFiltered\"
     Private Const pOutputPath As String = "C:\BASINSMet\WDMFinal\"
     Private Const pStationPath As String = "C:\BASINSMet\Stations\"
@@ -52,8 +52,8 @@ Public Module GenPET
             lts = lNewWDMFile.DataSets.ItemByKey(6)
             If Not lts Is Nothing AndAlso lts.Attributes.GetValue("EJDay") <= lNewJDate Then
                 'has PEVT data that is not through 2006
-                lStation = FilenameOnly(lFile).Substring(2, 6)
-                lStatePath = FilenameOnly(lStation).Substring(0, 2)
+                lStation = FilenameNoPath(lFile).Substring(2, 6)
+                lStatePath = FilenameNoPath(lStation).Substring(0, 2)
                 If lStationDBF.FindFirst(1, lStation) Then 'found station ID
                     Dim lLat As Double = lStationDBF.Value(4)
                     For Each lDS As atcDataSet In lNewWDMFile.DataSets

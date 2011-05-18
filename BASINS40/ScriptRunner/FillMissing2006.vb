@@ -17,9 +17,9 @@ Imports atcWDM
 
 Public Module FillMissing2006
     Private Const pSubsetPath As String = "C:\BASINSMet\WDMFiltered\subset\"
-    Private Const pInputPath As String = "C:\BASINSMet\WDMFiltered\"
-    Private Const pStationPath As String = "C:\BasinsMet\Stations\"
-    Private Const pOutputPath As String = "C:\BASINSMet\WDMFilled\"
+    Private Const pInputPath As String = "H:\BASINSMet\Benning\" '"C:\BASINSMet\WDMFiltered\"
+    Private Const pStationPath As String = "H:\BasinsMet\Stations\"
+    Private Const pOutputPath As String = "H:\BASINSMet\BenningFilled\" '"C:\BASINSMet\WDMFilled\"
     Private Const pMaxNearStas As Integer = 30
     Private Const pMaxFillLength As Integer = 11 'any span < max time shift (10 hrs for HI)
     Private Const pMinNumHrly As Integer = 43830 '5 years of hourly values
@@ -63,6 +63,7 @@ Public Module FillMissing2006
         Dim lMAcc As Double = -998.0
         Dim lFMin As Double = -100.0
         Dim lFMax As Double = 10000.0
+        Dim lFillLength As Integer = 0
         Dim lRepType As Integer = 1 'DBF parsing output format
 
         If lStationDBF.OpenFile(pStationPath & "StationLocs-Dist.dbf") Then
@@ -115,7 +116,7 @@ Public Module FillMissing2006
                                     lPctMiss = CDbl(lStr.Substring(lStr.LastIndexOf(",") + 1))
                                     'lPctMiss = CDbl(lts.Attributes.GetValue("UBC200"))
                                     Select Case lCons 'look for wanted constituents and check % missing
-                                        Case "HPCP", "HPCP1", "TMIN", "TMAX", "PRCP"
+                                        Case "xxx" '"HPCP", "HPCP1", "TMIN", "TMAX", "PRCP"
                                             If lPctMiss < pMaxPctMiss Then '% missing OK
                                                 'If (lts.Attributes.GetValue("tu") = atcTimeUnit.TUHour AndAlso lts.numValues > pMinNumHrly) OrElse _
                                                 '   (lts.Attributes.GetValue("tu") = atcTimeUnit.TUDay AndAlso lts.numValues > pMinNumDly) Then 'want a significant time span
@@ -167,9 +168,10 @@ Public Module FillMissing2006
                                                 Logger.Dbg("FillMissing:  Before Interpolation, % Missing:  " & lPctMiss)
                                                 Logger.Dbg("FillMissing:  Max span to interpolate is " & pMaxFillLength & " hours")
                                                 'try interpolation for these hourly constituents
-                                                Dim lInterpTS As atcTimeseries = FillMissingByInterpolation(lts, (CDbl(pMaxFillLength) + 0.001) / 24)
+                                                Dim lInterpTS As atcTimeseries = FillMissingByInterpolation(lts, (CDbl(pMaxFillLength) + 0.001) / 24, , lMVal)
                                                 If Not lInterpTS Is Nothing Then
                                                     lts = lInterpTS
+                                                    lts.Attributes.SetValue("ID", ltsExist.Attributes.GetValue("ID"))
                                                     lInterpTS = Nothing
                                                     lStr = MissingDataSummary(lts, lMVal, lMAcc, lFMin, lFMax, lRepType)
                                                     lPctMiss = CDbl(lStr.Substring(lStr.LastIndexOf(",") + 1))
