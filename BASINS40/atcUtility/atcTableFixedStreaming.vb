@@ -232,7 +232,7 @@ ErrHand:
 
             For iRec As Integer = 1 To NumHeaderRows 'read header rows, ignore for now
                 pLinesInFile.MoveNext()
-                pHeaderLines.Add(pLinesInFile.Current)
+                pHeaderLines(iRec - 1) = pLinesInFile.Current
             Next
             pCurrentRecord = -1
             Me.CurrentRecord = 1
