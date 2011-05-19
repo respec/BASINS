@@ -979,14 +979,14 @@ Public Class atcVariation
                         lString &= "Temp: (" & PETtemperature.Count & ")"
                     End If
                 End If
-                If PETprecipitation IsNot Nothing AndAlso PETprecipitation.Count > 0 Then
+                If PETprecipitation IsNot Nothing AndAlso PETprecipitation.Count > 0 AndAlso Not Operation.Equals("Hamon") Then
                     If PETprecipitation.Count = 1 Then
                         lString &= "Precip: " & PETprecipitation(0).ToString & " "
                     Else
                         lString &= "Precip: (" & PETprecipitation.Count & ")"
                     End If
                 End If
-                If PETelevation > Integer.MinValue Then
+                If PETelevation > Integer.MinValue AndAlso Not Operation.Equals("Hamon") Then
                     lString &= "Elev: " & PETelevation
                 End If
                 If Not String.IsNullOrEmpty(PETstationID) AndAlso PETstationID <> PETstationUseClosest Then

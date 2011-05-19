@@ -1900,7 +1900,7 @@ Public Class frmCAT
             pCat.XML = WholeFileString(aFilename)
             pUnsaved = False
             AddRecentFile(aFilename, "Setup")
-            Text = Tag & " " & IO.Path.GetFileNameWithoutExtension(aFilename)
+            Text = Tag & " - " & IO.Path.GetFileNameWithoutExtension(aFilename)
             SelectTab(tabInputs)
         End If
     End Sub
