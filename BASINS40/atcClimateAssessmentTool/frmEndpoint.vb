@@ -156,14 +156,14 @@ Public Class frmEndpoint
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtName.Location = New System.Drawing.Point(101, 16)
         Me.txtName.Name = "txtName"
-        Me.txtName.Size = New System.Drawing.Size(217, 20)
+        Me.txtName.Size = New System.Drawing.Size(240, 20)
         Me.txtName.TabIndex = 1
         '
         'btnCancel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(252, 618)
+        Me.btnCancel.Location = New System.Drawing.Point(275, 618)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(72, 24)
         Me.btnCancel.TabIndex = 23
@@ -172,7 +172,7 @@ Public Class frmEndpoint
         'btnOk
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(174, 618)
+        Me.btnOk.Location = New System.Drawing.Point(197, 618)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(72, 24)
         Me.btnOk.TabIndex = 22
@@ -206,7 +206,7 @@ Public Class frmEndpoint
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtData.Location = New System.Drawing.Point(101, 40)
         Me.txtData.Name = "txtData"
-        Me.txtData.Size = New System.Drawing.Size(217, 20)
+        Me.txtData.Size = New System.Drawing.Size(240, 20)
         Me.txtData.TabIndex = 3
         '
         'grpHighlight
@@ -225,7 +225,7 @@ Public Class frmEndpoint
         Me.grpHighlight.Controls.Add(Me.lblDefaultColor)
         Me.grpHighlight.Location = New System.Drawing.Point(12, 96)
         Me.grpHighlight.Name = "grpHighlight"
-        Me.grpHighlight.Size = New System.Drawing.Size(312, 160)
+        Me.grpHighlight.Size = New System.Drawing.Size(335, 160)
         Me.grpHighlight.TabIndex = 6
         Me.grpHighlight.TabStop = False
         Me.grpHighlight.Text = "Highlight Values"
@@ -237,7 +237,7 @@ Public Class frmEndpoint
         Me.txtHighColor.BackColor = System.Drawing.Color.OrangeRed
         Me.txtHighColor.Location = New System.Drawing.Point(144, 120)
         Me.txtHighColor.Name = "txtHighColor"
-        Me.txtHighColor.Size = New System.Drawing.Size(162, 20)
+        Me.txtHighColor.Size = New System.Drawing.Size(185, 20)
         Me.txtHighColor.TabIndex = 16
         '
         'lblHighColor
@@ -258,7 +258,7 @@ Public Class frmEndpoint
         Me.txtLowColor.BackColor = System.Drawing.Color.DeepSkyBlue
         Me.txtLowColor.Location = New System.Drawing.Point(144, 72)
         Me.txtLowColor.Name = "txtLowColor"
-        Me.txtLowColor.Size = New System.Drawing.Size(162, 20)
+        Me.txtLowColor.Size = New System.Drawing.Size(185, 20)
         Me.txtLowColor.TabIndex = 12
         '
         'lblLowColor
@@ -278,7 +278,7 @@ Public Class frmEndpoint
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtMax.Location = New System.Drawing.Point(144, 96)
         Me.txtMax.Name = "txtMax"
-        Me.txtMax.Size = New System.Drawing.Size(162, 20)
+        Me.txtMax.Size = New System.Drawing.Size(185, 20)
         Me.txtMax.TabIndex = 14
         Me.txtMax.Text = "<none>"
         '
@@ -288,7 +288,7 @@ Public Class frmEndpoint
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtMin.Location = New System.Drawing.Point(144, 48)
         Me.txtMin.Name = "txtMin"
-        Me.txtMin.Size = New System.Drawing.Size(162, 20)
+        Me.txtMin.Size = New System.Drawing.Size(185, 20)
         Me.txtMin.TabIndex = 10
         Me.txtMin.Text = "<none>"
         '
@@ -321,7 +321,7 @@ Public Class frmEndpoint
         Me.txtDefaultColor.BackColor = System.Drawing.Color.White
         Me.txtDefaultColor.Location = New System.Drawing.Point(144, 24)
         Me.txtDefaultColor.Name = "txtDefaultColor"
-        Me.txtDefaultColor.Size = New System.Drawing.Size(162, 20)
+        Me.txtDefaultColor.Size = New System.Drawing.Size(185, 20)
         Me.txtDefaultColor.TabIndex = 8
         '
         'lblDefaultColor
@@ -343,7 +343,7 @@ Public Class frmEndpoint
         Me.cboAttribute.Location = New System.Drawing.Point(101, 64)
         Me.cboAttribute.MaxDropDownItems = 20
         Me.cboAttribute.Name = "cboAttribute"
-        Me.cboAttribute.Size = New System.Drawing.Size(151, 21)
+        Me.cboAttribute.Size = New System.Drawing.Size(133, 21)
         Me.cboAttribute.TabIndex = 5
         '
         'grpSeasons
@@ -358,7 +358,7 @@ Public Class frmEndpoint
         Me.grpSeasons.Controls.Add(Me.btnSeasonsNone)
         Me.grpSeasons.Location = New System.Drawing.Point(12, 441)
         Me.grpSeasons.Name = "grpSeasons"
-        Me.grpSeasons.Size = New System.Drawing.Size(312, 171)
+        Me.grpSeasons.Size = New System.Drawing.Size(335, 171)
         Me.grpSeasons.TabIndex = 17
         Me.grpSeasons.TabStop = False
         Me.grpSeasons.Text = "Seasons"
@@ -381,7 +381,7 @@ Public Class frmEndpoint
         Me.cboSeasons.Location = New System.Drawing.Point(184, 17)
         Me.cboSeasons.MaxDropDownItems = 20
         Me.cboSeasons.Name = "cboSeasons"
-        Me.cboSeasons.Size = New System.Drawing.Size(122, 21)
+        Me.cboSeasons.Size = New System.Drawing.Size(145, 21)
         Me.cboSeasons.TabIndex = 18
         '
         'lstSeasons
@@ -394,7 +394,7 @@ Public Class frmEndpoint
         Me.lstSeasons.MultiColumn = True
         Me.lstSeasons.Name = "lstSeasons"
         Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstSeasons.Size = New System.Drawing.Size(300, 90)
+        Me.lstSeasons.Size = New System.Drawing.Size(323, 90)
         Me.lstSeasons.TabIndex = 19
         '
         'btnSeasonsAll
@@ -409,7 +409,7 @@ Public Class frmEndpoint
         'btnSeasonsNone
         '
         Me.btnSeasonsNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsNone.Location = New System.Drawing.Point(243, 140)
+        Me.btnSeasonsNone.Location = New System.Drawing.Point(266, 140)
         Me.btnSeasonsNone.Name = "btnSeasonsNone"
         Me.btnSeasonsNone.Size = New System.Drawing.Size(63, 23)
         Me.btnSeasonsNone.TabIndex = 21
@@ -432,7 +432,7 @@ Public Class frmEndpoint
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtOperation.Location = New System.Drawing.Point(89, 6)
         Me.txtOperation.Name = "txtOperation"
-        Me.txtOperation.Size = New System.Drawing.Size(217, 20)
+        Me.txtOperation.Size = New System.Drawing.Size(240, 20)
         Me.txtOperation.TabIndex = 6
         '
         'panelOperation
@@ -443,7 +443,7 @@ Public Class frmEndpoint
         Me.panelOperation.Controls.Add(Me.lblOperation)
         Me.panelOperation.Location = New System.Drawing.Point(12, 60)
         Me.panelOperation.Name = "panelOperation"
-        Me.panelOperation.Size = New System.Drawing.Size(312, 30)
+        Me.panelOperation.Size = New System.Drawing.Size(335, 30)
         Me.panelOperation.TabIndex = 24
         Me.panelOperation.Visible = False
         '
@@ -466,7 +466,7 @@ Public Class frmEndpoint
         Me.grpEvents.Controls.Add(Me.txtEventDuration)
         Me.grpEvents.Location = New System.Drawing.Point(12, 262)
         Me.grpEvents.Name = "grpEvents"
-        Me.grpEvents.Size = New System.Drawing.Size(312, 173)
+        Me.grpEvents.Size = New System.Drawing.Size(335, 173)
         Me.grpEvents.TabIndex = 25
         Me.grpEvents.TabStop = False
         Me.grpEvents.Text = "Events"
@@ -609,17 +609,17 @@ Public Class frmEndpoint
         'btnSelectAttributes
         '
         Me.btnSelectAttributes.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSelectAttributes.Location = New System.Drawing.Point(255, 64)
+        Me.btnSelectAttributes.Location = New System.Drawing.Point(240, 64)
         Me.btnSelectAttributes.Name = "btnSelectAttributes"
-        Me.btnSelectAttributes.Size = New System.Drawing.Size(63, 21)
+        Me.btnSelectAttributes.Size = New System.Drawing.Size(101, 21)
         Me.btnSelectAttributes.TabIndex = 7
-        Me.btnSelectAttributes.Text = "Manage"
+        Me.btnSelectAttributes.Text = "Manage Attributes"
         Me.btnSelectAttributes.UseVisualStyleBackColor = True
         '
         'frmEndpoint
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(336, 654)
+        Me.ClientSize = New System.Drawing.Size(359, 654)
         Me.Controls.Add(Me.btnSelectAttributes)
         Me.Controls.Add(Me.grpEvents)
         Me.Controls.Add(Me.lblAttribute)
