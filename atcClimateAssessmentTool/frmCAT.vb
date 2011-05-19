@@ -98,8 +98,6 @@ Public Class frmCAT
     Friend WithEvents txtBaseModel As System.Windows.Forms.TextBox
     Friend WithEvents btnInputPrepared As System.Windows.Forms.Button
     Friend WithEvents btnInputView As System.Windows.Forms.Button
-    Friend WithEvents btnEndpointBottom As System.Windows.Forms.Button
-    Friend WithEvents btnEndpointTop As System.Windows.Forms.Button
     Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
     Friend WithEvents btnPlot As System.Windows.Forms.Button
     Friend WithEvents mnuOpenSWAT As System.Windows.Forms.MenuItem
@@ -130,92 +128,90 @@ Public Class frmCAT
     Friend WithEvents btnInputCopy As System.Windows.Forms.Button
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
+        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmCAT))
-        Me.myTabs = New System.Windows.Forms.TabControl
-        Me.tabModel = New System.Windows.Forms.TabPage
-        Me.lblDrop = New System.Windows.Forms.Label
-        Me.grpResults = New System.Windows.Forms.GroupBox
-        Me.lstRecentResults = New System.Windows.Forms.ListView
-        Me.btnSaveResults = New System.Windows.Forms.Button
-        Me.btnOpenResults = New System.Windows.Forms.Button
-        Me.grpCATstate = New System.Windows.Forms.GroupBox
-        Me.lstRecentCATsettings = New System.Windows.Forms.ListView
-        Me.btnSaveClimateEndpoint = New System.Windows.Forms.Button
-        Me.btnOpenClimateEndpoint = New System.Windows.Forms.Button
-        Me.grpModel = New System.Windows.Forms.GroupBox
-        Me.lstRecentModel = New System.Windows.Forms.ListView
-        Me.btnOpenSWMM = New System.Windows.Forms.Button
-        Me.btnOpenSWAT = New System.Windows.Forms.Button
-        Me.btnOpenHSPF = New System.Windows.Forms.Button
-        Me.tabInputs = New System.Windows.Forms.TabPage
-        Me.btnInputView = New System.Windows.Forms.Button
-        Me.txtBaseModel = New System.Windows.Forms.TextBox
-        Me.btnInputDown = New System.Windows.Forms.Button
-        Me.btnInputUp = New System.Windows.Forms.Button
-        Me.btnInputRemove = New System.Windows.Forms.Button
-        Me.btnInputModify = New System.Windows.Forms.Button
-        Me.btnInputAdd = New System.Windows.Forms.Button
-        Me.txtModifiedModelName = New System.Windows.Forms.TextBox
-        Me.lblBaseModelName = New System.Windows.Forms.Label
-        Me.lblNewModelName = New System.Windows.Forms.Label
-        Me.lstInputs = New System.Windows.Forms.CheckedListBox
-        Me.btnInputPrepared = New System.Windows.Forms.Button
-        Me.btnInputAddCligen = New System.Windows.Forms.Button
-        Me.tabEndpoints = New System.Windows.Forms.TabPage
-        Me.radioSaveAll = New System.Windows.Forms.RadioButton
-        Me.radioSaveOnlyEndpoints = New System.Windows.Forms.RadioButton
-        Me.btnEndpointBottom = New System.Windows.Forms.Button
-        Me.btnEndpointTop = New System.Windows.Forms.Button
-        Me.btnEndpointCopy = New System.Windows.Forms.Button
-        Me.lstEndpoints = New System.Windows.Forms.CheckedListBox
-        Me.btnEndpointDown = New System.Windows.Forms.Button
-        Me.btnEndpointUp = New System.Windows.Forms.Button
-        Me.btnEndpointRemove = New System.Windows.Forms.Button
-        Me.btnEndpointModify = New System.Windows.Forms.Button
-        Me.btnEndpointAdd = New System.Windows.Forms.Button
-        Me.lblAllResults = New System.Windows.Forms.Label
-        Me.tabResults = New System.Windows.Forms.TabPage
-        Me.chkClearResults = New System.Windows.Forms.CheckBox
-        Me.chkShowEachRunProgress = New System.Windows.Forms.CheckBox
-        Me.lblRefresh = New System.Windows.Forms.Label
-        Me.btnPlot = New System.Windows.Forms.Button
-        Me.btnRefresh = New System.Windows.Forms.Button
-        Me.lblStart = New System.Windows.Forms.Label
-        Me.agdResults = New atcControls.atcGrid
-        Me.btnStart = New System.Windows.Forms.Button
-        Me.btnStop = New System.Windows.Forms.Button
-        Me.tabPivot = New System.Windows.Forms.TabPage
-        Me.agdPivot = New atcControls.atcGrid
-        Me.lblPivotColumns = New System.Windows.Forms.Label
-        Me.lblPivotCells = New System.Windows.Forms.Label
-        Me.lblPivotRows = New System.Windows.Forms.Label
-        Me.cboPivotCells = New System.Windows.Forms.ComboBox
-        Me.cboPivotColumns = New System.Windows.Forms.ComboBox
-        Me.cboPivotRows = New System.Windows.Forms.ComboBox
+        Me.myTabs = New System.Windows.Forms.TabControl()
+        Me.tabModel = New System.Windows.Forms.TabPage()
+        Me.lblDrop = New System.Windows.Forms.Label()
+        Me.grpResults = New System.Windows.Forms.GroupBox()
+        Me.lstRecentResults = New System.Windows.Forms.ListView()
+        Me.btnSaveResults = New System.Windows.Forms.Button()
+        Me.btnOpenResults = New System.Windows.Forms.Button()
+        Me.grpCATstate = New System.Windows.Forms.GroupBox()
+        Me.lstRecentCATsettings = New System.Windows.Forms.ListView()
+        Me.btnSaveClimateEndpoint = New System.Windows.Forms.Button()
+        Me.btnOpenClimateEndpoint = New System.Windows.Forms.Button()
+        Me.grpModel = New System.Windows.Forms.GroupBox()
+        Me.lstRecentModel = New System.Windows.Forms.ListView()
+        Me.btnOpenSWMM = New System.Windows.Forms.Button()
+        Me.btnOpenSWAT = New System.Windows.Forms.Button()
+        Me.btnOpenHSPF = New System.Windows.Forms.Button()
+        Me.tabInputs = New System.Windows.Forms.TabPage()
+        Me.btnInputCopy = New System.Windows.Forms.Button()
+        Me.btnInputView = New System.Windows.Forms.Button()
+        Me.txtBaseModel = New System.Windows.Forms.TextBox()
+        Me.btnInputDown = New System.Windows.Forms.Button()
+        Me.btnInputUp = New System.Windows.Forms.Button()
+        Me.btnInputRemove = New System.Windows.Forms.Button()
+        Me.btnInputModify = New System.Windows.Forms.Button()
+        Me.btnInputAdd = New System.Windows.Forms.Button()
+        Me.txtModifiedModelName = New System.Windows.Forms.TextBox()
+        Me.lblBaseModelName = New System.Windows.Forms.Label()
+        Me.lblNewModelName = New System.Windows.Forms.Label()
+        Me.lstInputs = New System.Windows.Forms.CheckedListBox()
+        Me.btnInputPrepared = New System.Windows.Forms.Button()
+        Me.btnInputAddCligen = New System.Windows.Forms.Button()
+        Me.tabEndpoints = New System.Windows.Forms.TabPage()
+        Me.radioSaveAll = New System.Windows.Forms.RadioButton()
+        Me.radioSaveOnlyEndpoints = New System.Windows.Forms.RadioButton()
+        Me.btnEndpointCopy = New System.Windows.Forms.Button()
+        Me.lstEndpoints = New System.Windows.Forms.CheckedListBox()
+        Me.btnEndpointDown = New System.Windows.Forms.Button()
+        Me.btnEndpointUp = New System.Windows.Forms.Button()
+        Me.btnEndpointRemove = New System.Windows.Forms.Button()
+        Me.btnEndpointModify = New System.Windows.Forms.Button()
+        Me.btnEndpointAdd = New System.Windows.Forms.Button()
+        Me.lblAllResults = New System.Windows.Forms.Label()
+        Me.tabResults = New System.Windows.Forms.TabPage()
+        Me.chkClearResults = New System.Windows.Forms.CheckBox()
+        Me.chkShowEachRunProgress = New System.Windows.Forms.CheckBox()
+        Me.lblRefresh = New System.Windows.Forms.Label()
+        Me.btnPlot = New System.Windows.Forms.Button()
+        Me.btnRefresh = New System.Windows.Forms.Button()
+        Me.lblStart = New System.Windows.Forms.Label()
+        Me.agdResults = New atcControls.atcGrid()
+        Me.btnStart = New System.Windows.Forms.Button()
+        Me.btnStop = New System.Windows.Forms.Button()
+        Me.tabPivot = New System.Windows.Forms.TabPage()
+        Me.agdPivot = New atcControls.atcGrid()
+        Me.lblPivotColumns = New System.Windows.Forms.Label()
+        Me.lblPivotCells = New System.Windows.Forms.Label()
+        Me.lblPivotRows = New System.Windows.Forms.Label()
+        Me.cboPivotCells = New System.Windows.Forms.ComboBox()
+        Me.cboPivotColumns = New System.Windows.Forms.ComboBox()
+        Me.cboPivotRows = New System.Windows.Forms.ComboBox()
         Me.MainMenu1 = New System.Windows.Forms.MainMenu(Me.components)
-        Me.mnuFile = New System.Windows.Forms.MenuItem
-        Me.mnuOpenUCI = New System.Windows.Forms.MenuItem
-        Me.mnuOpenSWAT = New System.Windows.Forms.MenuItem
-        Me.mnuOpenSWMM = New System.Windows.Forms.MenuItem
-        Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
-        Me.mnuOpenSetup = New System.Windows.Forms.MenuItem
-        Me.mnuSaveSetup = New System.Windows.Forms.MenuItem
-        Me.mnuFileSep2 = New System.Windows.Forms.MenuItem
-        Me.mnuLoadResults = New System.Windows.Forms.MenuItem
-        Me.mnuSaveResults = New System.Windows.Forms.MenuItem
-        Me.mnuFileSep3 = New System.Windows.Forms.MenuItem
-        Me.mnuSavePivot = New System.Windows.Forms.MenuItem
-        Me.mnuEdit = New System.Windows.Forms.MenuItem
-        Me.mnuCopyResults = New System.Windows.Forms.MenuItem
-        Me.mnuCopyPivot = New System.Windows.Forms.MenuItem
-        Me.mnuPasteResults = New System.Windows.Forms.MenuItem
-        Me.mnuOptions = New System.Windows.Forms.MenuItem
-        Me.mnuPivotHeaders = New System.Windows.Forms.MenuItem
-        Me.mnuHelp = New System.Windows.Forms.MenuItem
-        Me.lblStatus = New System.Windows.Forms.Label
+        Me.mnuFile = New System.Windows.Forms.MenuItem()
+        Me.mnuOpenUCI = New System.Windows.Forms.MenuItem()
+        Me.mnuOpenSWAT = New System.Windows.Forms.MenuItem()
+        Me.mnuOpenSWMM = New System.Windows.Forms.MenuItem()
+        Me.mnuFileSep1 = New System.Windows.Forms.MenuItem()
+        Me.mnuOpenSetup = New System.Windows.Forms.MenuItem()
+        Me.mnuSaveSetup = New System.Windows.Forms.MenuItem()
+        Me.mnuFileSep2 = New System.Windows.Forms.MenuItem()
+        Me.mnuLoadResults = New System.Windows.Forms.MenuItem()
+        Me.mnuSaveResults = New System.Windows.Forms.MenuItem()
+        Me.mnuFileSep3 = New System.Windows.Forms.MenuItem()
+        Me.mnuSavePivot = New System.Windows.Forms.MenuItem()
+        Me.mnuEdit = New System.Windows.Forms.MenuItem()
+        Me.mnuCopyResults = New System.Windows.Forms.MenuItem()
+        Me.mnuCopyPivot = New System.Windows.Forms.MenuItem()
+        Me.mnuPasteResults = New System.Windows.Forms.MenuItem()
+        Me.mnuOptions = New System.Windows.Forms.MenuItem()
+        Me.mnuPivotHeaders = New System.Windows.Forms.MenuItem()
+        Me.mnuHelp = New System.Windows.Forms.MenuItem()
+        Me.lblStatus = New System.Windows.Forms.Label()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.btnInputCopy = New System.Windows.Forms.Button
         Me.myTabs.SuspendLayout()
         Me.tabModel.SuspendLayout()
         Me.grpResults.SuspendLayout()
@@ -240,7 +236,7 @@ Public Class frmCAT
         Me.myTabs.Location = New System.Drawing.Point(0, 0)
         Me.myTabs.Name = "myTabs"
         Me.myTabs.SelectedIndex = 0
-        Me.myTabs.Size = New System.Drawing.Size(520, 364)
+        Me.myTabs.Size = New System.Drawing.Size(573, 364)
         Me.myTabs.TabIndex = 1
         '
         'tabModel
@@ -262,9 +258,9 @@ Public Class frmCAT
         Me.lblDrop.AutoSize = True
         Me.lblDrop.Location = New System.Drawing.Point(11, 316)
         Me.lblDrop.Name = "lblDrop"
-        Me.lblDrop.Size = New System.Drawing.Size(210, 13)
+        Me.lblDrop.Size = New System.Drawing.Size(324, 13)
         Me.lblDrop.TabIndex = 6
-        Me.lblDrop.Text = "Or drop a model file onto this form to load it."
+        Me.lblDrop.Text = "Model file can be drag-n-dropped anywhere onto this form to load it."
         '
         'grpResults
         '
@@ -278,7 +274,7 @@ Public Class frmCAT
         Me.grpResults.Size = New System.Drawing.Size(495, 77)
         Me.grpResults.TabIndex = 4
         Me.grpResults.TabStop = False
-        Me.grpResults.Text = "Open or Save the Results Table"
+        Me.grpResults.Text = "Open/save existing result table"
         '
         'lstRecentResults
         '
@@ -326,7 +322,8 @@ Public Class frmCAT
         Me.grpCATstate.Size = New System.Drawing.Size(495, 106)
         Me.grpCATstate.TabIndex = 3
         Me.grpCATstate.TabStop = False
-        Me.grpCATstate.Text = "Open or save a model with CAT settings for Climate Data and Assessment Endpoints"
+        Me.grpCATstate.Text = "Open/save existing model with CAT settings for Climate Data and Assessment Endpoi" & _
+            "nts"
         '
         'lstRecentCATsettings
         '
@@ -375,7 +372,7 @@ Public Class frmCAT
         Me.grpModel.Size = New System.Drawing.Size(495, 106)
         Me.grpModel.TabIndex = 0
         Me.grpModel.TabStop = False
-        Me.grpModel.Text = "Open a model with no saved CAT settings"
+        Me.grpModel.Text = "Open a model with no previous CAT settings"
         '
         'lstRecentModel
         '
@@ -438,14 +435,24 @@ Public Class frmCAT
         Me.tabInputs.Controls.Add(Me.btnInputAddCligen)
         Me.tabInputs.Location = New System.Drawing.Point(4, 22)
         Me.tabInputs.Name = "tabInputs"
-        Me.tabInputs.Size = New System.Drawing.Size(512, 338)
+        Me.tabInputs.Size = New System.Drawing.Size(565, 338)
         Me.tabInputs.TabIndex = 0
         Me.tabInputs.Text = "Climate Data"
         Me.tabInputs.UseVisualStyleBackColor = True
         '
+        'btnInputCopy
+        '
+        Me.btnInputCopy.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnInputCopy.Location = New System.Drawing.Point(324, 64)
+        Me.btnInputCopy.Name = "btnInputCopy"
+        Me.btnInputCopy.Size = New System.Drawing.Size(49, 24)
+        Me.btnInputCopy.TabIndex = 15
+        Me.btnInputCopy.Text = "Copy"
+        '
         'btnInputView
         '
-        Me.btnInputView.Location = New System.Drawing.Point(232, 64)
+        Me.btnInputView.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnInputView.Location = New System.Drawing.Point(379, 64)
         Me.btnInputView.Name = "btnInputView"
         Me.btnInputView.Size = New System.Drawing.Size(48, 24)
         Me.btnInputView.TabIndex = 9
@@ -457,13 +464,13 @@ Public Class frmCAT
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtBaseModel.Location = New System.Drawing.Point(96, 8)
         Me.txtBaseModel.Name = "txtBaseModel"
-        Me.txtBaseModel.Size = New System.Drawing.Size(408, 20)
+        Me.txtBaseModel.Size = New System.Drawing.Size(461, 20)
         Me.txtBaseModel.TabIndex = 3
         '
         'btnInputDown
         '
         Me.btnInputDown.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnInputDown.Location = New System.Drawing.Point(449, 64)
+        Me.btnInputDown.Location = New System.Drawing.Point(502, 64)
         Me.btnInputDown.Name = "btnInputDown"
         Me.btnInputDown.Size = New System.Drawing.Size(25, 24)
         Me.btnInputDown.TabIndex = 12
@@ -472,7 +479,7 @@ Public Class frmCAT
         'btnInputUp
         '
         Me.btnInputUp.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnInputUp.Location = New System.Drawing.Point(479, 64)
+        Me.btnInputUp.Location = New System.Drawing.Point(532, 64)
         Me.btnInputUp.Name = "btnInputUp"
         Me.btnInputUp.Size = New System.Drawing.Size(25, 24)
         Me.btnInputUp.TabIndex = 13
@@ -480,7 +487,8 @@ Public Class frmCAT
         '
         'btnInputRemove
         '
-        Me.btnInputRemove.Location = New System.Drawing.Point(61, 64)
+        Me.btnInputRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnInputRemove.Location = New System.Drawing.Point(207, 64)
         Me.btnInputRemove.Name = "btnInputRemove"
         Me.btnInputRemove.Size = New System.Drawing.Size(56, 24)
         Me.btnInputRemove.TabIndex = 7
@@ -488,7 +496,8 @@ Public Class frmCAT
         '
         'btnInputModify
         '
-        Me.btnInputModify.Location = New System.Drawing.Point(122, 64)
+        Me.btnInputModify.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnInputModify.Location = New System.Drawing.Point(269, 64)
         Me.btnInputModify.Name = "btnInputModify"
         Me.btnInputModify.Size = New System.Drawing.Size(49, 24)
         Me.btnInputModify.TabIndex = 8
@@ -498,7 +507,7 @@ Public Class frmCAT
         '
         Me.btnInputAdd.Location = New System.Drawing.Point(8, 64)
         Me.btnInputAdd.Name = "btnInputAdd"
-        Me.btnInputAdd.Size = New System.Drawing.Size(48, 24)
+        Me.btnInputAdd.Size = New System.Drawing.Size(90, 24)
         Me.btnInputAdd.TabIndex = 6
         Me.btnInputAdd.Text = "Add"
         Me.ToolTip1.SetToolTip(Me.btnInputAdd, "Create new modification of existing climate data")
@@ -509,7 +518,7 @@ Public Class frmCAT
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtModifiedModelName.Location = New System.Drawing.Point(96, 34)
         Me.txtModifiedModelName.Name = "txtModifiedModelName"
-        Me.txtModifiedModelName.Size = New System.Drawing.Size(408, 20)
+        Me.txtModifiedModelName.Size = New System.Drawing.Size(461, 20)
         Me.txtModifiedModelName.TabIndex = 5
         Me.txtModifiedModelName.Text = "Modified"
         '
@@ -539,12 +548,13 @@ Public Class frmCAT
         Me.lstInputs.IntegralHeight = False
         Me.lstInputs.Location = New System.Drawing.Point(8, 94)
         Me.lstInputs.Name = "lstInputs"
-        Me.lstInputs.Size = New System.Drawing.Size(496, 235)
+        Me.lstInputs.Size = New System.Drawing.Size(549, 235)
         Me.lstInputs.TabIndex = 14
         '
         'btnInputPrepared
         '
-        Me.btnInputPrepared.Location = New System.Drawing.Point(285, 64)
+        Me.btnInputPrepared.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnInputPrepared.Location = New System.Drawing.Point(433, 64)
         Me.btnInputPrepared.Name = "btnInputPrepared"
         Me.btnInputPrepared.Size = New System.Drawing.Size(63, 24)
         Me.btnInputPrepared.TabIndex = 10
@@ -563,8 +573,6 @@ Public Class frmCAT
         '
         Me.tabEndpoints.Controls.Add(Me.radioSaveAll)
         Me.tabEndpoints.Controls.Add(Me.radioSaveOnlyEndpoints)
-        Me.tabEndpoints.Controls.Add(Me.btnEndpointBottom)
-        Me.tabEndpoints.Controls.Add(Me.btnEndpointTop)
         Me.tabEndpoints.Controls.Add(Me.btnEndpointCopy)
         Me.tabEndpoints.Controls.Add(Me.lstEndpoints)
         Me.tabEndpoints.Controls.Add(Me.btnEndpointDown)
@@ -575,7 +583,7 @@ Public Class frmCAT
         Me.tabEndpoints.Controls.Add(Me.lblAllResults)
         Me.tabEndpoints.Location = New System.Drawing.Point(4, 22)
         Me.tabEndpoints.Name = "tabEndpoints"
-        Me.tabEndpoints.Size = New System.Drawing.Size(512, 338)
+        Me.tabEndpoints.Size = New System.Drawing.Size(565, 338)
         Me.tabEndpoints.TabIndex = 1
         Me.tabEndpoints.Text = "Assessment Endpoints"
         Me.tabEndpoints.UseVisualStyleBackColor = True
@@ -602,27 +610,10 @@ Public Class frmCAT
         Me.radioSaveOnlyEndpoints.Text = "Save Only Selected Endpoints"
         Me.radioSaveOnlyEndpoints.UseVisualStyleBackColor = True
         '
-        'btnEndpointBottom
-        '
-        Me.btnEndpointBottom.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnEndpointBottom.Location = New System.Drawing.Point(454, 64)
-        Me.btnEndpointBottom.Name = "btnEndpointBottom"
-        Me.btnEndpointBottom.Size = New System.Drawing.Size(50, 24)
-        Me.btnEndpointBottom.TabIndex = 21
-        Me.btnEndpointBottom.Text = "Bottom"
-        '
-        'btnEndpointTop
-        '
-        Me.btnEndpointTop.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnEndpointTop.Location = New System.Drawing.Point(348, 64)
-        Me.btnEndpointTop.Name = "btnEndpointTop"
-        Me.btnEndpointTop.Size = New System.Drawing.Size(39, 24)
-        Me.btnEndpointTop.TabIndex = 18
-        Me.btnEndpointTop.Text = "Top"
-        '
         'btnEndpointCopy
         '
-        Me.btnEndpointCopy.Location = New System.Drawing.Point(176, 64)
+        Me.btnEndpointCopy.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEndpointCopy.Location = New System.Drawing.Point(451, 64)
         Me.btnEndpointCopy.Name = "btnEndpointCopy"
         Me.btnEndpointCopy.Size = New System.Drawing.Size(48, 24)
         Me.btnEndpointCopy.TabIndex = 17
@@ -636,13 +627,13 @@ Public Class frmCAT
         Me.lstEndpoints.IntegralHeight = False
         Me.lstEndpoints.Location = New System.Drawing.Point(8, 94)
         Me.lstEndpoints.Name = "lstEndpoints"
-        Me.lstEndpoints.Size = New System.Drawing.Size(496, 235)
+        Me.lstEndpoints.Size = New System.Drawing.Size(549, 235)
         Me.lstEndpoints.TabIndex = 22
         '
         'btnEndpointDown
         '
         Me.btnEndpointDown.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnEndpointDown.Location = New System.Drawing.Point(424, 64)
+        Me.btnEndpointDown.Location = New System.Drawing.Point(534, 64)
         Me.btnEndpointDown.Name = "btnEndpointDown"
         Me.btnEndpointDown.Size = New System.Drawing.Size(23, 24)
         Me.btnEndpointDown.TabIndex = 20
@@ -651,7 +642,7 @@ Public Class frmCAT
         'btnEndpointUp
         '
         Me.btnEndpointUp.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnEndpointUp.Location = New System.Drawing.Point(394, 64)
+        Me.btnEndpointUp.Location = New System.Drawing.Point(505, 64)
         Me.btnEndpointUp.Name = "btnEndpointUp"
         Me.btnEndpointUp.Size = New System.Drawing.Size(23, 24)
         Me.btnEndpointUp.TabIndex = 19
@@ -659,7 +650,8 @@ Public Class frmCAT
         '
         'btnEndpointRemove
         '
-        Me.btnEndpointRemove.Location = New System.Drawing.Point(61, 64)
+        Me.btnEndpointRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEndpointRemove.Location = New System.Drawing.Point(334, 64)
         Me.btnEndpointRemove.Name = "btnEndpointRemove"
         Me.btnEndpointRemove.Size = New System.Drawing.Size(56, 24)
         Me.btnEndpointRemove.TabIndex = 15
@@ -667,7 +659,8 @@ Public Class frmCAT
         '
         'btnEndpointModify
         '
-        Me.btnEndpointModify.Location = New System.Drawing.Point(122, 64)
+        Me.btnEndpointModify.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEndpointModify.Location = New System.Drawing.Point(396, 64)
         Me.btnEndpointModify.Name = "btnEndpointModify"
         Me.btnEndpointModify.Size = New System.Drawing.Size(49, 24)
         Me.btnEndpointModify.TabIndex = 16
@@ -677,7 +670,7 @@ Public Class frmCAT
         '
         Me.btnEndpointAdd.Location = New System.Drawing.Point(8, 64)
         Me.btnEndpointAdd.Name = "btnEndpointAdd"
-        Me.btnEndpointAdd.Size = New System.Drawing.Size(48, 24)
+        Me.btnEndpointAdd.Size = New System.Drawing.Size(90, 24)
         Me.btnEndpointAdd.TabIndex = 14
         Me.btnEndpointAdd.Text = "Add"
         '
@@ -687,7 +680,7 @@ Public Class frmCAT
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblAllResults.Location = New System.Drawing.Point(348, 16)
         Me.lblAllResults.Name = "lblAllResults"
-        Me.lblAllResults.Size = New System.Drawing.Size(148, 16)
+        Me.lblAllResults.Size = New System.Drawing.Size(201, 16)
         Me.lblAllResults.TabIndex = 18
         '
         'tabResults
@@ -703,7 +696,7 @@ Public Class frmCAT
         Me.tabResults.Controls.Add(Me.btnStop)
         Me.tabResults.Location = New System.Drawing.Point(4, 22)
         Me.tabResults.Name = "tabResults"
-        Me.tabResults.Size = New System.Drawing.Size(512, 338)
+        Me.tabResults.Size = New System.Drawing.Size(565, 338)
         Me.tabResults.TabIndex = 2
         Me.tabResults.Text = "Results"
         Me.tabResults.UseVisualStyleBackColor = True
@@ -714,7 +707,7 @@ Public Class frmCAT
         Me.chkClearResults.AutoSize = True
         Me.chkClearResults.Checked = True
         Me.chkClearResults.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkClearResults.Location = New System.Drawing.Point(343, 46)
+        Me.chkClearResults.Location = New System.Drawing.Point(396, 46)
         Me.chkClearResults.Name = "chkClearResults"
         Me.chkClearResults.Size = New System.Drawing.Size(128, 17)
         Me.chkClearResults.TabIndex = 26
@@ -724,7 +717,7 @@ Public Class frmCAT
         '
         Me.chkShowEachRunProgress.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkShowEachRunProgress.AutoSize = True
-        Me.chkShowEachRunProgress.Location = New System.Drawing.Point(343, 17)
+        Me.chkShowEachRunProgress.Location = New System.Drawing.Point(396, 17)
         Me.chkShowEachRunProgress.Name = "chkShowEachRunProgress"
         Me.chkShowEachRunProgress.Size = New System.Drawing.Size(160, 17)
         Me.chkShowEachRunProgress.TabIndex = 25
@@ -742,7 +735,7 @@ Public Class frmCAT
         'btnPlot
         '
         Me.btnPlot.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnPlot.Location = New System.Drawing.Point(267, 12)
+        Me.btnPlot.Location = New System.Drawing.Point(320, 12)
         Me.btnPlot.Name = "btnPlot"
         Me.btnPlot.Size = New System.Drawing.Size(56, 24)
         Me.btnPlot.TabIndex = 4
@@ -781,7 +774,7 @@ Public Class frmCAT
         Me.agdResults.LineWidth = 0.0!
         Me.agdResults.Location = New System.Drawing.Point(8, 73)
         Me.agdResults.Name = "agdResults"
-        Me.agdResults.Size = New System.Drawing.Size(496, 256)
+        Me.agdResults.Size = New System.Drawing.Size(549, 256)
         Me.agdResults.Source = Nothing
         Me.agdResults.TabIndex = 21
         '
@@ -814,7 +807,7 @@ Public Class frmCAT
         Me.tabPivot.Controls.Add(Me.cboPivotRows)
         Me.tabPivot.Location = New System.Drawing.Point(4, 22)
         Me.tabPivot.Name = "tabPivot"
-        Me.tabPivot.Size = New System.Drawing.Size(512, 338)
+        Me.tabPivot.Size = New System.Drawing.Size(565, 338)
         Me.tabPivot.TabIndex = 3
         Me.tabPivot.Text = "Pivot Table"
         Me.tabPivot.UseVisualStyleBackColor = True
@@ -832,7 +825,7 @@ Public Class frmCAT
         Me.agdPivot.LineWidth = 0.0!
         Me.agdPivot.Location = New System.Drawing.Point(8, 89)
         Me.agdPivot.Name = "agdPivot"
-        Me.agdPivot.Size = New System.Drawing.Size(496, 240)
+        Me.agdPivot.Size = New System.Drawing.Size(549, 240)
         Me.agdPivot.Source = Nothing
         Me.agdPivot.TabIndex = 28
         '
@@ -872,7 +865,7 @@ Public Class frmCAT
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboPivotCells.Location = New System.Drawing.Point(96, 60)
         Me.cboPivotCells.Name = "cboPivotCells"
-        Me.cboPivotCells.Size = New System.Drawing.Size(408, 21)
+        Me.cboPivotCells.Size = New System.Drawing.Size(461, 21)
         Me.cboPivotCells.TabIndex = 27
         '
         'cboPivotColumns
@@ -881,7 +874,7 @@ Public Class frmCAT
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboPivotColumns.Location = New System.Drawing.Point(96, 34)
         Me.cboPivotColumns.Name = "cboPivotColumns"
-        Me.cboPivotColumns.Size = New System.Drawing.Size(408, 21)
+        Me.cboPivotColumns.Size = New System.Drawing.Size(461, 21)
         Me.cboPivotColumns.TabIndex = 25
         '
         'cboPivotRows
@@ -890,7 +883,7 @@ Public Class frmCAT
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboPivotRows.Location = New System.Drawing.Point(96, 8)
         Me.cboPivotRows.Name = "cboPivotRows"
-        Me.cboPivotRows.Size = New System.Drawing.Size(408, 21)
+        Me.cboPivotRows.Size = New System.Drawing.Size(461, 21)
         Me.cboPivotRows.TabIndex = 23
         '
         'MainMenu1
@@ -1004,30 +997,22 @@ Public Class frmCAT
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblStatus.Location = New System.Drawing.Point(12, 367)
         Me.lblStatus.Name = "lblStatus"
-        Me.lblStatus.Size = New System.Drawing.Size(495, 24)
+        Me.lblStatus.Size = New System.Drawing.Size(548, 24)
         Me.lblStatus.TabIndex = 2
         Me.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-        '
-        'btnInputCopy
-        '
-        Me.btnInputCopy.Location = New System.Drawing.Point(177, 64)
-        Me.btnInputCopy.Name = "btnInputCopy"
-        Me.btnInputCopy.Size = New System.Drawing.Size(49, 24)
-        Me.btnInputCopy.TabIndex = 15
-        Me.btnInputCopy.Text = "Copy"
         '
         'frmCAT
         '
         Me.AllowDrop = True
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(519, 391)
+        Me.ClientSize = New System.Drawing.Size(572, 391)
         Me.Controls.Add(Me.lblStatus)
         Me.Controls.Add(Me.myTabs)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Menu = Me.MainMenu1
         Me.Name = "frmCAT"
         Me.Tag = ""
-        Me.Text = "Climate Assessment Tool"
+        Me.Text = "Climate Assessment Tool 2.0"
         Me.myTabs.ResumeLayout(False)
         Me.tabModel.ResumeLayout(False)
         Me.tabModel.PerformLayout()
@@ -1775,11 +1760,11 @@ Public Class frmCAT
         MoveItem(pCat.Endpoints, lstEndpoints, 1)
     End Sub
 
-    Private Sub btnEndpointTop_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnEndpointTop.Click
+    Private Sub btnEndpointTop_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         MoveItem(pCat.Endpoints, lstEndpoints, -lstEndpoints.SelectedIndex)
     End Sub
 
-    Private Sub btnEndpointBottom_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointBottom.Click
+    Private Sub btnEndpointBottom_Click(ByVal sender As Object, ByVal e As System.EventArgs)
         MoveItem(pCat.Endpoints, lstEndpoints, lstEndpoints.Items.Count - lstEndpoints.SelectedIndex - 1)
     End Sub
 

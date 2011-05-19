@@ -90,49 +90,49 @@ Public Class frmEndpoint
     Friend WithEvents btnSeasonsNone As System.Windows.Forms.Button
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmEndpoint))
-        Me.lblName = New System.Windows.Forms.Label
-        Me.txtName = New System.Windows.Forms.TextBox
-        Me.btnCancel = New System.Windows.Forms.Button
-        Me.btnOk = New System.Windows.Forms.Button
-        Me.lblAttribute = New System.Windows.Forms.Label
-        Me.lblData = New System.Windows.Forms.Label
-        Me.txtData = New System.Windows.Forms.TextBox
-        Me.grpHighlight = New System.Windows.Forms.GroupBox
-        Me.txtHighColor = New System.Windows.Forms.TextBox
-        Me.lblHighColor = New System.Windows.Forms.Label
-        Me.txtLowColor = New System.Windows.Forms.TextBox
-        Me.lblLowColor = New System.Windows.Forms.Label
-        Me.txtMax = New System.Windows.Forms.TextBox
-        Me.txtMin = New System.Windows.Forms.TextBox
-        Me.lblMaximum = New System.Windows.Forms.Label
-        Me.lblMinimum = New System.Windows.Forms.Label
-        Me.txtDefaultColor = New System.Windows.Forms.TextBox
-        Me.lblDefaultColor = New System.Windows.Forms.Label
-        Me.cboAttribute = New System.Windows.Forms.ComboBox
-        Me.grpSeasons = New System.Windows.Forms.GroupBox
-        Me.chkSeasons = New System.Windows.Forms.CheckBox
-        Me.cboSeasons = New System.Windows.Forms.ComboBox
-        Me.lstSeasons = New System.Windows.Forms.ListBox
-        Me.btnSeasonsAll = New System.Windows.Forms.Button
-        Me.btnSeasonsNone = New System.Windows.Forms.Button
-        Me.lblOperation = New System.Windows.Forms.Label
-        Me.txtOperation = New System.Windows.Forms.TextBox
-        Me.panelOperation = New System.Windows.Forms.Panel
-        Me.grpEvents = New System.Windows.Forms.GroupBox
-        Me.lblVolumeUnits = New System.Windows.Forms.Label
-        Me.lblThresholdUnits = New System.Windows.Forms.Label
-        Me.lblDurationUnits = New System.Windows.Forms.Label
-        Me.lblGapUnits = New System.Windows.Forms.Label
-        Me.lblDuration = New System.Windows.Forms.Label
-        Me.lblVolume = New System.Windows.Forms.Label
-        Me.lblGap = New System.Windows.Forms.Label
-        Me.txtEventThreshold = New System.Windows.Forms.TextBox
-        Me.txtEventGap = New System.Windows.Forms.TextBox
-        Me.chkEvents = New System.Windows.Forms.CheckBox
-        Me.lblThreshold = New System.Windows.Forms.Label
-        Me.txtEventVolume = New System.Windows.Forms.TextBox
-        Me.txtEventDuration = New System.Windows.Forms.TextBox
-        Me.btnSelectAttributes = New System.Windows.Forms.Button
+        Me.lblName = New System.Windows.Forms.Label()
+        Me.txtName = New System.Windows.Forms.TextBox()
+        Me.btnCancel = New System.Windows.Forms.Button()
+        Me.btnOk = New System.Windows.Forms.Button()
+        Me.lblAttribute = New System.Windows.Forms.Label()
+        Me.lblData = New System.Windows.Forms.Label()
+        Me.txtData = New System.Windows.Forms.TextBox()
+        Me.grpHighlight = New System.Windows.Forms.GroupBox()
+        Me.txtHighColor = New System.Windows.Forms.TextBox()
+        Me.lblHighColor = New System.Windows.Forms.Label()
+        Me.txtLowColor = New System.Windows.Forms.TextBox()
+        Me.lblLowColor = New System.Windows.Forms.Label()
+        Me.txtMax = New System.Windows.Forms.TextBox()
+        Me.txtMin = New System.Windows.Forms.TextBox()
+        Me.lblMaximum = New System.Windows.Forms.Label()
+        Me.lblMinimum = New System.Windows.Forms.Label()
+        Me.txtDefaultColor = New System.Windows.Forms.TextBox()
+        Me.lblDefaultColor = New System.Windows.Forms.Label()
+        Me.cboAttribute = New System.Windows.Forms.ComboBox()
+        Me.grpSeasons = New System.Windows.Forms.GroupBox()
+        Me.chkSeasons = New System.Windows.Forms.CheckBox()
+        Me.cboSeasons = New System.Windows.Forms.ComboBox()
+        Me.lstSeasons = New System.Windows.Forms.ListBox()
+        Me.btnSeasonsAll = New System.Windows.Forms.Button()
+        Me.btnSeasonsNone = New System.Windows.Forms.Button()
+        Me.lblOperation = New System.Windows.Forms.Label()
+        Me.txtOperation = New System.Windows.Forms.TextBox()
+        Me.panelOperation = New System.Windows.Forms.Panel()
+        Me.grpEvents = New System.Windows.Forms.GroupBox()
+        Me.lblVolumeUnits = New System.Windows.Forms.Label()
+        Me.lblThresholdUnits = New System.Windows.Forms.Label()
+        Me.lblDurationUnits = New System.Windows.Forms.Label()
+        Me.lblGapUnits = New System.Windows.Forms.Label()
+        Me.lblDuration = New System.Windows.Forms.Label()
+        Me.lblVolume = New System.Windows.Forms.Label()
+        Me.lblGap = New System.Windows.Forms.Label()
+        Me.txtEventThreshold = New System.Windows.Forms.TextBox()
+        Me.txtEventGap = New System.Windows.Forms.TextBox()
+        Me.chkEvents = New System.Windows.Forms.CheckBox()
+        Me.lblThreshold = New System.Windows.Forms.Label()
+        Me.txtEventVolume = New System.Windows.Forms.TextBox()
+        Me.txtEventDuration = New System.Windows.Forms.TextBox()
+        Me.btnSelectAttributes = New System.Windows.Forms.Button()
         Me.grpHighlight.SuspendLayout()
         Me.grpSeasons.SuspendLayout()
         Me.panelOperation.SuspendLayout()
@@ -163,7 +163,7 @@ Public Class frmEndpoint
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(252, 597)
+        Me.btnCancel.Location = New System.Drawing.Point(252, 618)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(72, 24)
         Me.btnCancel.TabIndex = 23
@@ -172,7 +172,7 @@ Public Class frmEndpoint
         'btnOk
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(174, 597)
+        Me.btnOk.Location = New System.Drawing.Point(174, 618)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(72, 24)
         Me.btnOk.TabIndex = 22
@@ -339,10 +339,11 @@ Public Class frmEndpoint
         '
         Me.cboAttribute.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboAttribute.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboAttribute.Location = New System.Drawing.Point(101, 64)
         Me.cboAttribute.MaxDropDownItems = 20
         Me.cboAttribute.Name = "cboAttribute"
-        Me.cboAttribute.Size = New System.Drawing.Size(185, 21)
+        Me.cboAttribute.Size = New System.Drawing.Size(151, 21)
         Me.cboAttribute.TabIndex = 5
         '
         'grpSeasons
@@ -355,9 +356,9 @@ Public Class frmEndpoint
         Me.grpSeasons.Controls.Add(Me.lstSeasons)
         Me.grpSeasons.Controls.Add(Me.btnSeasonsAll)
         Me.grpSeasons.Controls.Add(Me.btnSeasonsNone)
-        Me.grpSeasons.Location = New System.Drawing.Point(12, 418)
+        Me.grpSeasons.Location = New System.Drawing.Point(12, 441)
         Me.grpSeasons.Name = "grpSeasons"
-        Me.grpSeasons.Size = New System.Drawing.Size(312, 173)
+        Me.grpSeasons.Size = New System.Drawing.Size(312, 171)
         Me.grpSeasons.TabIndex = 17
         Me.grpSeasons.TabStop = False
         Me.grpSeasons.Text = "Seasons"
@@ -365,7 +366,7 @@ Public Class frmEndpoint
         'chkSeasons
         '
         Me.chkSeasons.AutoSize = True
-        Me.chkSeasons.Location = New System.Drawing.Point(6, 26)
+        Me.chkSeasons.Location = New System.Drawing.Point(6, 19)
         Me.chkSeasons.Name = "chkSeasons"
         Me.chkSeasons.Size = New System.Drawing.Size(172, 17)
         Me.chkSeasons.TabIndex = 40
@@ -377,7 +378,7 @@ Public Class frmEndpoint
         Me.cboSeasons.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboSeasons.ItemHeight = 13
-        Me.cboSeasons.Location = New System.Drawing.Point(184, 24)
+        Me.cboSeasons.Location = New System.Drawing.Point(184, 17)
         Me.cboSeasons.MaxDropDownItems = 20
         Me.cboSeasons.Name = "cboSeasons"
         Me.cboSeasons.Size = New System.Drawing.Size(122, 21)
@@ -389,7 +390,7 @@ Public Class frmEndpoint
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstSeasons.IntegralHeight = False
-        Me.lstSeasons.Location = New System.Drawing.Point(6, 48)
+        Me.lstSeasons.Location = New System.Drawing.Point(6, 44)
         Me.lstSeasons.MultiColumn = True
         Me.lstSeasons.Name = "lstSeasons"
         Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
@@ -399,7 +400,7 @@ Public Class frmEndpoint
         'btnSeasonsAll
         '
         Me.btnSeasonsAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsAll.Location = New System.Drawing.Point(6, 144)
+        Me.btnSeasonsAll.Location = New System.Drawing.Point(6, 140)
         Me.btnSeasonsAll.Name = "btnSeasonsAll"
         Me.btnSeasonsAll.Size = New System.Drawing.Size(63, 23)
         Me.btnSeasonsAll.TabIndex = 20
@@ -408,7 +409,7 @@ Public Class frmEndpoint
         'btnSeasonsNone
         '
         Me.btnSeasonsNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsNone.Location = New System.Drawing.Point(243, 144)
+        Me.btnSeasonsNone.Location = New System.Drawing.Point(243, 140)
         Me.btnSeasonsNone.Name = "btnSeasonsNone"
         Me.btnSeasonsNone.Size = New System.Drawing.Size(63, 23)
         Me.btnSeasonsNone.TabIndex = 21
@@ -465,7 +466,7 @@ Public Class frmEndpoint
         Me.grpEvents.Controls.Add(Me.txtEventDuration)
         Me.grpEvents.Location = New System.Drawing.Point(12, 262)
         Me.grpEvents.Name = "grpEvents"
-        Me.grpEvents.Size = New System.Drawing.Size(312, 150)
+        Me.grpEvents.Size = New System.Drawing.Size(312, 173)
         Me.grpEvents.TabIndex = 25
         Me.grpEvents.TabStop = False
         Me.grpEvents.Text = "Events"
@@ -475,51 +476,55 @@ Public Class frmEndpoint
         Me.lblVolumeUnits.AutoSize = True
         Me.lblVolumeUnits.BackColor = System.Drawing.Color.Transparent
         Me.lblVolumeUnits.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblVolumeUnits.Location = New System.Drawing.Point(211, 97)
+        Me.lblVolumeUnits.Location = New System.Drawing.Point(277, 124)
         Me.lblVolumeUnits.Name = "lblVolumeUnits"
-        Me.lblVolumeUnits.Size = New System.Drawing.Size(38, 13)
+        Me.lblVolumeUnits.Size = New System.Drawing.Size(21, 13)
         Me.lblVolumeUnits.TabIndex = 44
-        Me.lblVolumeUnits.Text = "inches"
+        Me.lblVolumeUnits.Text = "SV"
+        Me.lblVolumeUnits.Visible = False
         '
         'lblThresholdUnits
         '
         Me.lblThresholdUnits.AutoSize = True
         Me.lblThresholdUnits.BackColor = System.Drawing.Color.Transparent
         Me.lblThresholdUnits.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblThresholdUnits.Location = New System.Drawing.Point(211, 45)
+        Me.lblThresholdUnits.Location = New System.Drawing.Point(277, 45)
         Me.lblThresholdUnits.Name = "lblThresholdUnits"
-        Me.lblThresholdUnits.Size = New System.Drawing.Size(29, 13)
+        Me.lblThresholdUnits.Size = New System.Drawing.Size(26, 13)
         Me.lblThresholdUnits.TabIndex = 43
-        Me.lblThresholdUnits.Text = "in/hr"
+        Me.lblThresholdUnits.Text = "V/T"
+        Me.lblThresholdUnits.Visible = False
         '
         'lblDurationUnits
         '
         Me.lblDurationUnits.AutoSize = True
         Me.lblDurationUnits.BackColor = System.Drawing.Color.Transparent
         Me.lblDurationUnits.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblDurationUnits.Location = New System.Drawing.Point(211, 123)
+        Me.lblDurationUnits.Location = New System.Drawing.Point(277, 150)
         Me.lblDurationUnits.Name = "lblDurationUnits"
-        Me.lblDurationUnits.Size = New System.Drawing.Size(33, 13)
+        Me.lblDurationUnits.Size = New System.Drawing.Size(14, 13)
         Me.lblDurationUnits.TabIndex = 42
-        Me.lblDurationUnits.Text = "hours"
+        Me.lblDurationUnits.Text = "T"
+        Me.lblDurationUnits.Visible = False
         '
         'lblGapUnits
         '
         Me.lblGapUnits.AutoSize = True
         Me.lblGapUnits.BackColor = System.Drawing.Color.Transparent
         Me.lblGapUnits.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblGapUnits.Location = New System.Drawing.Point(211, 71)
+        Me.lblGapUnits.Location = New System.Drawing.Point(277, 98)
         Me.lblGapUnits.Name = "lblGapUnits"
-        Me.lblGapUnits.Size = New System.Drawing.Size(33, 13)
+        Me.lblGapUnits.Size = New System.Drawing.Size(14, 13)
         Me.lblGapUnits.TabIndex = 41
-        Me.lblGapUnits.Text = "hours"
+        Me.lblGapUnits.Text = "T"
+        Me.lblGapUnits.Visible = False
         '
         'lblDuration
         '
         Me.lblDuration.AutoSize = True
         Me.lblDuration.BackColor = System.Drawing.Color.Transparent
         Me.lblDuration.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblDuration.Location = New System.Drawing.Point(24, 123)
+        Me.lblDuration.Location = New System.Drawing.Point(24, 150)
         Me.lblDuration.Name = "lblDuration"
         Me.lblDuration.Size = New System.Drawing.Size(105, 13)
         Me.lblDuration.TabIndex = 40
@@ -530,18 +535,18 @@ Public Class frmEndpoint
         Me.lblVolume.AutoSize = True
         Me.lblVolume.BackColor = System.Drawing.Color.Transparent
         Me.lblVolume.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblVolume.Location = New System.Drawing.Point(24, 97)
+        Me.lblVolume.Location = New System.Drawing.Point(24, 124)
         Me.lblVolume.Name = "lblVolume"
-        Me.lblVolume.Size = New System.Drawing.Size(101, 13)
+        Me.lblVolume.Size = New System.Drawing.Size(172, 13)
         Me.lblVolume.TabIndex = 39
-        Me.lblVolume.Text = "Total volume above"
+        Me.lblVolume.Text = "Sum of values exceeding threshold"
         '
         'lblGap
         '
         Me.lblGap.AutoSize = True
         Me.lblGap.BackColor = System.Drawing.Color.Transparent
         Me.lblGap.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblGap.Location = New System.Drawing.Point(24, 72)
+        Me.lblGap.Location = New System.Drawing.Point(24, 98)
         Me.lblGap.Name = "lblGap"
         Me.lblGap.Size = New System.Drawing.Size(85, 13)
         Me.lblGap.TabIndex = 38
@@ -549,7 +554,7 @@ Public Class frmEndpoint
         '
         'txtEventThreshold
         '
-        Me.txtEventThreshold.Location = New System.Drawing.Point(139, 42)
+        Me.txtEventThreshold.Location = New System.Drawing.Point(205, 42)
         Me.txtEventThreshold.Name = "txtEventThreshold"
         Me.txtEventThreshold.Size = New System.Drawing.Size(66, 20)
         Me.txtEventThreshold.TabIndex = 27
@@ -557,7 +562,7 @@ Public Class frmEndpoint
         '
         'txtEventGap
         '
-        Me.txtEventGap.Location = New System.Drawing.Point(139, 68)
+        Me.txtEventGap.Location = New System.Drawing.Point(205, 95)
         Me.txtEventGap.Name = "txtEventGap"
         Me.txtEventGap.Size = New System.Drawing.Size(66, 20)
         Me.txtEventGap.TabIndex = 29
@@ -581,13 +586,13 @@ Public Class frmEndpoint
         Me.lblThreshold.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.lblThreshold.Location = New System.Drawing.Point(24, 45)
         Me.lblThreshold.Name = "lblThreshold"
-        Me.lblThreshold.Size = New System.Drawing.Size(111, 13)
+        Me.lblThreshold.Size = New System.Drawing.Size(103, 13)
         Me.lblThreshold.TabIndex = 25
-        Me.lblThreshold.Text = "Hourly intensity above"
+        Me.lblThreshold.Text = "Exceeding threshold"
         '
         'txtEventVolume
         '
-        Me.txtEventVolume.Location = New System.Drawing.Point(139, 94)
+        Me.txtEventVolume.Location = New System.Drawing.Point(205, 121)
         Me.txtEventVolume.Name = "txtEventVolume"
         Me.txtEventVolume.Size = New System.Drawing.Size(66, 20)
         Me.txtEventVolume.TabIndex = 33
@@ -595,7 +600,7 @@ Public Class frmEndpoint
         '
         'txtEventDuration
         '
-        Me.txtEventDuration.Location = New System.Drawing.Point(139, 120)
+        Me.txtEventDuration.Location = New System.Drawing.Point(205, 147)
         Me.txtEventDuration.Name = "txtEventDuration"
         Me.txtEventDuration.Size = New System.Drawing.Size(66, 20)
         Me.txtEventDuration.TabIndex = 36
@@ -604,17 +609,17 @@ Public Class frmEndpoint
         'btnSelectAttributes
         '
         Me.btnSelectAttributes.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSelectAttributes.Location = New System.Drawing.Point(292, 64)
+        Me.btnSelectAttributes.Location = New System.Drawing.Point(255, 64)
         Me.btnSelectAttributes.Name = "btnSelectAttributes"
-        Me.btnSelectAttributes.Size = New System.Drawing.Size(26, 21)
+        Me.btnSelectAttributes.Size = New System.Drawing.Size(63, 21)
         Me.btnSelectAttributes.TabIndex = 7
-        Me.btnSelectAttributes.Text = "..."
+        Me.btnSelectAttributes.Text = "Manage"
         Me.btnSelectAttributes.UseVisualStyleBackColor = True
         '
         'frmEndpoint
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(336, 633)
+        Me.ClientSize = New System.Drawing.Size(336, 654)
         Me.Controls.Add(Me.btnSelectAttributes)
         Me.Controls.Add(Me.grpEvents)
         Me.Controls.Add(Me.lblAttribute)
@@ -664,7 +669,11 @@ Public Class frmEndpoint
                 For Each lAttribute As atcAttributeDefinition In atcDataAttributes.AllDefinitions
                     If lAttribute.TypeString.ToLower.Equals("double") _
                        AndAlso atcData.atcDataAttributes.IsSimple(lAttribute) _
-                       AndAlso Not lAttribute.Name.EndsWith("*") Then
+                       AndAlso Not lAttribute.Name.EndsWith("*") _
+                       AndAlso Not lAttribute.Name.Contains("Date") _
+                       AndAlso Not lAttribute.Name.Contains("Last") _
+                       AndAlso lAttribute.Category <> "N-day and Frequency" _
+                       AndAlso lAttribute.Calculated Then
                         lAttributeNames.Add(lAttribute.Name)
                     End If
                 Next
