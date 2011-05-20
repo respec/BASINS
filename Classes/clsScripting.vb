@@ -21,6 +21,7 @@
 
 Imports System.CodeDom.Compiler
 Imports System.Reflection
+Imports System.IO
 
 Public Class Scripting
 
@@ -55,18 +56,26 @@ Public Class Scripting
                         ByRef aErrors As String, _
                         ByVal aPluginFolder As String) As Assembly
 
+        Logger.Dbg("In PrepareScript")
+
         aErrors = "" 'No errors yet
         aLanguage = GetLanguageFromFilename(aLanguage)
         Dim lAssembly As System.Reflection.Assembly
 
-        If aDLLfilename Is Nothing OrElse aDLLfilename.Length = 0 Then
-            aDLLfilename = MakeScriptName(aPluginFolder)
-        End If
+        'PM May 2011: Why is this?
+        ' This resuls in a lot of RemoveMe-*.dll files,
+        ' It's better to do this for dlls only not for scripts:
+        'If aDLLfilename Is Nothing OrElse aDLLfilename.Length = 0 Then
+        '    aDLLfilename = MakeScriptName(aPluginFolder)
+        'End If
 
         RemoveByteOrderMarker(aCode)
 
         If aLanguage = "dll" Then
             lAssembly = System.Reflection.Assembly.LoadFrom(aCode)
+            If aDLLfilename Is Nothing OrElse aDLLfilename.Length = 0 Then
+                aDLLfilename = MakeScriptName(aPluginFolder)
+            End If
         Else 'compile the code into an assembly
             Try
                 If System.IO.File.Exists(aCode) Then
@@ -95,6 +104,8 @@ Public Class Scripting
         Dim lAssembly As Assembly = aAssembly
         Dim lMethodName As String = "ScriptMain" 'Can't be MAIN or the C# compiler will have a heart attack.
         Dim lAssemblyTypes As Type() 'list of items within the assembly
+
+        Logger.Dbg("In Scripting.Run")
 
         If aErrors Is Nothing OrElse aErrors.Length = 0 Then
             lAssemblyTypes = lAssembly.GetTypes()
@@ -153,6 +164,8 @@ Public Class Scripting
 
         aLanguage = GetLanguageFromFilename(aLanguage)
 
+        Logger.Dbg("Compiling: " + aLanguage)
+
         Select Case aLanguage
             Case "cs"
                 lCodeDomProvider = New Microsoft.CSharp.CSharpCodeProvider
@@ -182,7 +195,7 @@ Public Class Scripting
             End If
         Next
 
-        If aOutputFilename.Length = 0 Then
+        If aOutputFilename Is Nothing OrElse aOutputFilename.Length = 0 Then
             lCompilerParameters.GenerateInMemory = True      'Assembly is created in memory
         Else
             lCompilerParameters.OutputAssembly = aOutputFilename
