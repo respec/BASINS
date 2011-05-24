@@ -10,10 +10,11 @@ Module MetCmp_PenmanMonteith
     Dim pDebug As Boolean = False
     Dim pSingleStation As Boolean = False
     Dim pDateSubset As Boolean = False
-    Dim pSJDate As Double = Date2J(2000, 1, 1)
-    Dim pEJDate As Double = Date2J(2001, 1, 1)
+    Dim pWriteHourly As Boolean = True
+    Dim pSJDate As Double = Date2J(1977, 1, 1)
+    Dim pEJDate As Double = Date2J(1978, 1, 1)
 
-    Dim pCompareToOld As Boolean = True
+    Dim pCompareToOld As Boolean = False
     Private Declare Sub PMPEVT Lib "tt_met.dll" (ByRef idmet As Integer, _
                                                 ByRef istyrZ As Integer, _
                                                 ByRef istdyZ As Integer, _
@@ -32,7 +33,7 @@ Module MetCmp_PenmanMonteith
 
         Dim lFileNames As New NameValueCollection
         If pSingleStation Then
-            Dim lFileName As String = pWdmDataPath & "AK502316.wdm" '"NY303184.wdm" '"GA090451" Hartsfield
+            Dim lFileName As String = pWdmDataPath & "AK509739.wdm" '"NY303184.wdm" '"GA090451" Hartsfield
             lFileNames.Add(lFileName.ToLower, lFileName)
         Else
             AddFilesInDir(lFileNames, pWdmDataPath, False, "*.wdm")
@@ -98,9 +99,25 @@ Module MetCmp_PenmanMonteith
                             'TODO: get actual elevation of location rather than using station elveation
                             Dim lElevation As Double = lNearestStation.Elev / 0.3048
                             Dim lPanEvapTimeseries As atcTimeseries = _
-                                PanEvaporationTimeseriesComputedByPenmanMonteith(lElevation, lPrecipitationTS, lAirTemperatureTS, Nothing, lNearestStation, , , , pDebug)
+                                PanEvaporationTimeseriesComputedByPenmanMonteith(lElevation, lPrecipitationTS, lAirTemperatureTS, Nothing, lNearestStation, 0.0, , , pDebug)
                             lPanEvapTimeseries.SetInterval(atcTimeUnit.TUDay, 1)
+                            lPanEvapTimeseries.Attributes.SetValue("ID", lAirTemperatureTS.Attributes.GetDefinedValue("ID").Value + 6)
+                            lPanEvapTimeseries.Attributes.SetValue("TU", atcTimeUnit.TUDay)
+                            lPanEvapTimeseries.Attributes.SetValue("description", "SWAT PM ET inches")
 
+                            'Disaggragate the daily PMET timeseries into hourly timeseries
+                            Dim lID As Integer = lPanEvapTimeseries.Attributes.GetDefinedValue("ID").Value
+                            Dim ltsPMETHour As atcTimeseries = atcMetCmp.DisSolPet(lPanEvapTimeseries, Nothing, 2, lLatitude)
+                            ltsPMETHour.Attributes.SetValue("Constituent", lPanEvapTimeseries.Attributes.GetDefinedValue("Constituent").Value)
+                            ltsPMETHour.Attributes.SetValue("TSTYPE", lPanEvapTimeseries.Attributes.GetDefinedValue("TSTYPE").Value)
+                            ltsPMETHour.Attributes.SetValue("ID", lid)
+
+                            'Add the newly calculated hourly PMET timeseries back into the current WDM, overwrite if already exists.
+                            If lWDMFile.AddDataset(ltsPMETHour, atcDataSource.EnumExistAction.ExistReplace) Then
+                                Logger.Dbg("Wrote Penman-Monteith PET to DSN " & lID & " SumAnnual " & ltsPMETHour.Attributes.GetDefinedValue("SumAnnual").Value)
+                            Else
+                                Logger.Dbg("**** Problem Writing Penman-Monteith PET to DSN " & lID)
+                            End If
                             If pCompareToOld Then
                                 'lPanEvapTimeseries.Attributes.CalculateAll()
                                 Dim lSumAnnualVB As Double = lPanEvapTimeseries.Attributes.GetDefinedValue("SumAnnual").Value
@@ -109,7 +126,7 @@ Module MetCmp_PenmanMonteith
                                 If lMetStation = "az029287" OrElse lMetStation = "ia133584" OrElse lMetStation = "mo237435" OrElse lMetStation = "nd322695" Then
                                     Logger.Dbg("SkipFortranProblemStaion " & lMetStation)
                                 Else
-                                    Dim lCo2 As Single = 0.0
+                                    Dim lCo2 As Single = 330.0
                                     Dim lDateStart(5) As Integer
                                     J2Date(lPrecipitationTS.Dates.Values(0), lDateStart)
                                     Dim lNumYears As Integer = timdifJ(lPrecipitationTS.Dates.Values(0), lPrecipitationTS.Dates.Values(lPrecipitationTS.numValues), atcTimeUnit.TUYear, 1)
@@ -190,7 +207,7 @@ Module MetCmp_PenmanMonteith
                                 End If
                             End If
                         End If
-                    End If
+                        End If
                 End If
             End If
         Next
