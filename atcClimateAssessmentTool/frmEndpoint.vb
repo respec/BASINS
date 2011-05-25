@@ -153,7 +153,7 @@ Public Class frmEndpoint
         'txtName
         '
         Me.txtName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtName.Location = New System.Drawing.Point(101, 16)
         Me.txtName.Name = "txtName"
         Me.txtName.Size = New System.Drawing.Size(240, 20)
@@ -203,7 +203,7 @@ Public Class frmEndpoint
         'txtData
         '
         Me.txtData.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtData.Location = New System.Drawing.Point(101, 40)
         Me.txtData.Name = "txtData"
         Me.txtData.Size = New System.Drawing.Size(240, 20)
@@ -212,7 +212,7 @@ Public Class frmEndpoint
         'grpHighlight
         '
         Me.grpHighlight.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpHighlight.Controls.Add(Me.txtHighColor)
         Me.grpHighlight.Controls.Add(Me.lblHighColor)
         Me.grpHighlight.Controls.Add(Me.txtLowColor)
@@ -233,7 +233,7 @@ Public Class frmEndpoint
         'txtHighColor
         '
         Me.txtHighColor.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtHighColor.BackColor = System.Drawing.Color.OrangeRed
         Me.txtHighColor.Location = New System.Drawing.Point(144, 120)
         Me.txtHighColor.Name = "txtHighColor"
@@ -254,7 +254,7 @@ Public Class frmEndpoint
         'txtLowColor
         '
         Me.txtLowColor.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtLowColor.BackColor = System.Drawing.Color.DeepSkyBlue
         Me.txtLowColor.Location = New System.Drawing.Point(144, 72)
         Me.txtLowColor.Name = "txtLowColor"
@@ -275,7 +275,7 @@ Public Class frmEndpoint
         'txtMax
         '
         Me.txtMax.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtMax.Location = New System.Drawing.Point(144, 96)
         Me.txtMax.Name = "txtMax"
         Me.txtMax.Size = New System.Drawing.Size(185, 20)
@@ -285,7 +285,7 @@ Public Class frmEndpoint
         'txtMin
         '
         Me.txtMin.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtMin.Location = New System.Drawing.Point(144, 48)
         Me.txtMin.Name = "txtMin"
         Me.txtMin.Size = New System.Drawing.Size(185, 20)
@@ -317,7 +317,7 @@ Public Class frmEndpoint
         'txtDefaultColor
         '
         Me.txtDefaultColor.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtDefaultColor.BackColor = System.Drawing.Color.White
         Me.txtDefaultColor.Location = New System.Drawing.Point(144, 24)
         Me.txtDefaultColor.Name = "txtDefaultColor"
@@ -338,7 +338,7 @@ Public Class frmEndpoint
         'cboAttribute
         '
         Me.cboAttribute.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboAttribute.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboAttribute.Location = New System.Drawing.Point(101, 64)
         Me.cboAttribute.MaxDropDownItems = 20
@@ -349,8 +349,8 @@ Public Class frmEndpoint
         'grpSeasons
         '
         Me.grpSeasons.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpSeasons.Controls.Add(Me.chkSeasons)
         Me.grpSeasons.Controls.Add(Me.cboSeasons)
         Me.grpSeasons.Controls.Add(Me.lstSeasons)
@@ -361,7 +361,7 @@ Public Class frmEndpoint
         Me.grpSeasons.Size = New System.Drawing.Size(335, 171)
         Me.grpSeasons.TabIndex = 17
         Me.grpSeasons.TabStop = False
-        Me.grpSeasons.Text = "Seasons"
+        Me.grpSeasons.Text = "Months/Years"
         '
         'chkSeasons
         '
@@ -376,7 +376,7 @@ Public Class frmEndpoint
         'cboSeasons
         '
         Me.cboSeasons.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboSeasons.ItemHeight = 13
         Me.cboSeasons.Location = New System.Drawing.Point(184, 17)
         Me.cboSeasons.MaxDropDownItems = 20
@@ -387,8 +387,8 @@ Public Class frmEndpoint
         'lstSeasons
         '
         Me.lstSeasons.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstSeasons.IntegralHeight = False
         Me.lstSeasons.Location = New System.Drawing.Point(6, 44)
         Me.lstSeasons.MultiColumn = True
@@ -429,7 +429,7 @@ Public Class frmEndpoint
         'txtOperation
         '
         Me.txtOperation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtOperation.Location = New System.Drawing.Point(89, 6)
         Me.txtOperation.Name = "txtOperation"
         Me.txtOperation.Size = New System.Drawing.Size(240, 20)
@@ -438,7 +438,7 @@ Public Class frmEndpoint
         'panelOperation
         '
         Me.panelOperation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.panelOperation.Controls.Add(Me.txtOperation)
         Me.panelOperation.Controls.Add(Me.lblOperation)
         Me.panelOperation.Location = New System.Drawing.Point(12, 60)
@@ -450,7 +450,7 @@ Public Class frmEndpoint
         'grpEvents
         '
         Me.grpEvents.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpEvents.Controls.Add(Me.lblVolumeUnits)
         Me.grpEvents.Controls.Add(Me.lblThresholdUnits)
         Me.grpEvents.Controls.Add(Me.lblDurationUnits)
@@ -741,7 +741,7 @@ Public Class frmEndpoint
         If Not pSettingFormSeason Then
             pSeasons = Nothing
             pAllSeasons = Nothing
-            lstSeasons.Items.Clear()
+
             'If cboSeasons.Text <> AllSeasons Then
             Try
                 pSeasons = SelectedSeasonType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
@@ -752,6 +752,7 @@ Public Class frmEndpoint
                 RefreshSeasonsList()
             Catch ex As Exception
                 Logger.Dbg("Could not create new seasons for '" & cboSeasons.Text & "': " & ex.ToString)
+                lstSeasons.Items.Clear()
             End Try
             'End If
         End If
