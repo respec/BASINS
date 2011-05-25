@@ -248,7 +248,7 @@ Imports MapWinUtility
         'txtVaryData
         '
         Me.txtVaryData.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtVaryData.Location = New System.Drawing.Point(136, 38)
         Me.txtVaryData.Name = "txtVaryData"
         Me.txtVaryData.Size = New System.Drawing.Size(271, 20)
@@ -287,7 +287,7 @@ Imports MapWinUtility
         'txtName
         '
         Me.txtName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtName.Location = New System.Drawing.Point(136, 12)
         Me.txtName.Name = "txtName"
         Me.txtName.Size = New System.Drawing.Size(271, 20)
@@ -358,7 +358,7 @@ Imports MapWinUtility
         'cboFunction
         '
         Me.cboFunction.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboFunction.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboFunction.FormattingEnabled = True
         Me.cboFunction.Location = New System.Drawing.Point(136, 64)
@@ -418,8 +418,8 @@ Imports MapWinUtility
         'grpSeasons
         '
         Me.grpSeasons.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpSeasons.Controls.Add(Me.lstSeasons)
         Me.grpSeasons.Controls.Add(Me.cboSeasons)
         Me.grpSeasons.Controls.Add(Me.chkSeasons)
@@ -430,13 +430,13 @@ Imports MapWinUtility
         Me.grpSeasons.Size = New System.Drawing.Size(452, 169)
         Me.grpSeasons.TabIndex = 38
         Me.grpSeasons.TabStop = False
-        Me.grpSeasons.Text = "Seasons"
+        Me.grpSeasons.Text = "Months/Years"
         '
         'lstSeasons
         '
         Me.lstSeasons.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstSeasons.FormattingEnabled = True
         Me.lstSeasons.IntegralHeight = False
         Me.lstSeasons.Location = New System.Drawing.Point(6, 47)
@@ -449,7 +449,7 @@ Imports MapWinUtility
         'cboSeasons
         '
         Me.cboSeasons.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboSeasons.FormattingEnabled = True
         Me.cboSeasons.Location = New System.Drawing.Point(135, 20)
         Me.cboSeasons.Name = "cboSeasons"
@@ -469,7 +469,7 @@ Imports MapWinUtility
         'grpMinMax
         '
         Me.grpMinMax.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpMinMax.Controls.Add(Me.radioSingle)
         Me.grpMinMax.Controls.Add(Me.radioIterate)
         Me.grpMinMax.Controls.Add(Me.lblValueUnitsMinimum)
@@ -558,7 +558,7 @@ Imports MapWinUtility
         'grpEvents
         '
         Me.grpEvents.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpEvents.Controls.Add(Me.lblVolumePercent)
         Me.grpEvents.Controls.Add(Me.txtVolumePercent)
         Me.grpEvents.Controls.Add(Me.lblVolumeUnits)
@@ -666,7 +666,7 @@ Imports MapWinUtility
         'grpPET
         '
         Me.grpPET.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpPET.Controls.Add(Me.txtPETstationID)
         Me.grpPET.Controls.Add(Me.lblPETstationID)
         Me.grpPET.Controls.Add(Me.lblPETelevationUnits)
@@ -745,7 +745,7 @@ Imports MapWinUtility
         'txtPETprecipitation
         '
         Me.txtPETprecipitation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtPETprecipitation.Location = New System.Drawing.Point(124, 50)
         Me.txtPETprecipitation.Name = "txtPETprecipitation"
         Me.txtPETprecipitation.Size = New System.Drawing.Size(271, 20)
@@ -774,7 +774,7 @@ Imports MapWinUtility
         'txtPETTemperature
         '
         Me.txtPETTemperature.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtPETTemperature.Location = New System.Drawing.Point(124, 22)
         Me.txtPETTemperature.Name = "txtPETTemperature"
         Me.txtPETTemperature.Size = New System.Drawing.Size(271, 20)
