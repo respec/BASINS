@@ -511,13 +511,18 @@ Module modCreateUci
             lBase = 10
         Else
             'too many segments and land uses to use the multiple seg scheme
-            Logger.Msg("There are too many segments to use this segmentation scheme." & vbCrLf & "Create will use the 'Grouped' scheme instead", MsgBoxStyle.OkOnly, "Create Problem")
-            lSegmentIds.Clear()
-            lSegmentIds.Add(1)
-            For Each lReach As Reach In pWatershed.Reaches
-                lReach.SegmentId = 1
-            Next
-            lBase = 100
+            'Logger.Msg("There are too many segments to use this segmentation scheme." & vbCrLf & "Create will use the 'Grouped' scheme instead", MsgBoxStyle.OkOnly, "Create Problem")
+            'lSegmentIds.Clear()
+            'lSegmentIds.Add(1)
+            'For Each lReach As Reach In pWatershed.Reaches
+            '    lReach.SegmentId = 1
+            'Next
+            'lBase = 100
+            'next version of BASINS should work this way:
+            '   with 15 unique land uses, the lBase will be 20
+            lBase = lPerlndNames.Count + lImplndNames.Count
+            Dim lLastDigit As Integer = lBase Mod 10
+            lBase = lBase - lLastDigit + 10
         End If
 
         'create these operations for each segment
