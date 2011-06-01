@@ -523,6 +523,10 @@ Module modCreateUci
             lBase = lPerlndNames.Count + lImplndNames.Count
             Dim lLastDigit As Integer = lBase Mod 10
             lBase = lBase - lLastDigit + 10
+            If lBase < 50 And lSegmentIds.Count < 20 Then
+                'one more exception, 50 is a nice base in some situations
+                lBase = 50
+            End If
         End If
 
         'create these operations for each segment
