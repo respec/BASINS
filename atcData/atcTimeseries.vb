@@ -404,7 +404,7 @@ Public Class atcTimeseries
                 End If
             End If
             pValuesNeedToBeRead = newValue
-            If Not pDates Is Nothing Then
+            If pDates IsNot Nothing Then
                 pDates.ValuesNeedToBeRead = newValue
             End If
         End Set

@@ -4,14 +4,14 @@
     <ProjectType>Local</ProjectType>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</ProjectGuid>
+    <ProjectGuid>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ApplicationIcon>
     </ApplicationIcon>
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
-    <AssemblyName>atcControls</AssemblyName>
+    <AssemblyName>atcData</AssemblyName>
     <AssemblyOriginatorKeyFile>
     </AssemblyOriginatorKeyFile>
     <AssemblyOriginatorKeyMode>None</AssemblyOriginatorKeyMode>
@@ -23,7 +23,7 @@
     <OptionCompare>Binary</OptionCompare>
     <OptionExplicit>On</OptionExplicit>
     <OptionStrict>Off</OptionStrict>
-    <RootNamespace>atcControls</RootNamespace>
+    <RootNamespace>atcData</RootNamespace>
     <StartupObject>
     </StartupObject>
     <FileUpgradeFlags>
@@ -33,6 +33,7 @@
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -45,14 +46,13 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\local\AnyDebug\Plugins\BASINS\</OutputPath>
-    <DocumentationFile>atcControls.xml</DocumentationFile>
+    <DocumentationFile>atcData.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
@@ -71,7 +71,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>..\local\AnyRelease\Plugins\BASINS\</OutputPath>
-    <DocumentationFile>atcControls.xml</DocumentationFile>
+    <DocumentationFile>atcData.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
@@ -86,7 +86,7 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
-    <DebugType>none</DebugType>
+    <DebugType>pdbonly</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>false</DebugSymbols>
@@ -94,7 +94,7 @@
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\local\x64Debug\Plugins\BASINS\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
-    <DocumentationFile>atcControls.xml</DocumentationFile>
+    <DocumentationFile>atcData.xml</DocumentationFile>
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
@@ -103,40 +103,43 @@
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <DebugSymbols>false</DebugSymbols>
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\local\x64Release\Plugins\BASINS\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
-    <DocumentationFile>atcControls.xml</DocumentationFile>
+    <DocumentationFile>atcData.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
+    <DebugType>None</DebugType>
     <PlatformTarget>x64</PlatformTarget>
-    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\local\x86Debug\Plugins\BASINS\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
-    <DocumentationFile>atcControls.xml</DocumentationFile>
+    <DocumentationFile>atcData.xml</DocumentationFile>
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <DefineConstants>GISProvider = "DotSpatial"</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\local\x86Release\Plugins\BASINS\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
-    <DocumentationFile>atcControls.xml</DocumentationFile>
+    <DocumentationFile>atcData.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
-    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">
@@ -148,15 +151,20 @@
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
     </Reference>
+    <Reference Include="System.XML" />
     <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility10.vbproj">
       <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>
       <Name>BASINS-MapWinUtility10</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcControls\atcControls10.vbproj">
+      <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
+      <Name>atcControls10</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility10.vbproj">
-      <Name>atcUtility10</Name>
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
-      <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
+      <Name>atcUtility10</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
@@ -165,90 +173,164 @@
     <Import Include="System" />
     <Import Include="System.Collections" />
     <Import Include="System.Diagnostics" />
-    <Import Include="System.Drawing" />
-    <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="atcConnectFields.Designer.vb">
-      <DependentUpon>atcConnectFields.vb</DependentUpon>
-    </Compile>
-    <Compile Include="atcConnectFields.vb">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="atcGrid.vb">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="atcGridSource.vb">
+    <Compile Include="atcAttributeDefinition.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="atcGridSourceRowColumnSwapper.vb">
-      <SubType>Code</SubType>
+    <Compile Include="atcChooseDataGroupDates.Designer.vb">
+      <DependentUpon>atcChooseDataGroupDates.vb</DependentUpon>
     </Compile>
-    <Compile Include="atcGridSourceTable.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="atcManagedList.Designer.vb">
-      <DependentUpon>atcManagedList.vb</DependentUpon>
-    </Compile>
-    <Compile Include="atcManagedList.vb">
+    <Compile Include="atcChooseDataGroupDates.vb">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="atcSelectList.vb">
-      <SubType>Form</SubType>
+    <Compile Include="atcDataAttributes.vb">
+      <SubType>Code</SubType>
     </Compile>
-    <Compile Include="atcText.vb">
+    <Compile Include="atcDataDisplay.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="atcDataGroup.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="atcDataManager.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="atcDataPlugin.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="atcDataSet.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="atcDataSource.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="atcSeasonBase.vb" />
+    <Compile Include="atcSeasonsAMorPM.vb" />
+    <Compile Include="atcSeasonsCalendarYear.vb" />
+    <Compile Include="atcSeasonsDayOfMonth.vb" />
+    <Compile Include="atcSeasonsDayOfWeek.vb" />
+    <Compile Include="atcSeasonsDayOfYear.vb" />
+    <Compile Include="atcSeasonsHour.vb" />
+    <Compile Include="atcSeasonsMonth.vb" />
+    <Compile Include="atcSeasonsTraditional.vb" />
+    <Compile Include="atcSeasonsWaterYear.vb" />
+    <Compile Include="atcSeasonsYearSubset.vb" />
+    <Compile Include="atcSeasonYears.Designer.vb">
+      <DependentUpon>atcSeasonYears.vb</DependentUpon>
+    </Compile>
+    <Compile Include="atcSeasonYears.vb">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="frmButtons.vb">
+    <Compile Include="atcTimeseries.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="atcTimeseriesBuilder.vb" />
+    <Compile Include="atcTimeseriesGridSource.vb" />
+    <Compile Include="atcTimeseriesGroup.vb" />
+    <Compile Include="atcTimeseriesGroupBuilder.vb" />
+    <Compile Include="atcTimeseriesSource.vb" />
+    <Compile Include="frmDataSource.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmConnectFields.Designer.vb">
-      <DependentUpon>frmConnectFields.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmConnectFields.vb">
+    <Compile Include="frmManager.vb">
       <SubType>Form</SubType>
     </Compile>
-    <EmbeddedResource Include="atcConnectFields.resx">
+    <Compile Include="frmSaveData.Designer.vb">
+      <DependentUpon>frmSaveData.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSaveData.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSelectData.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSelectDisplay.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSpecifySeasonalAttributes.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSpecifyYearSubset.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="modMetData.vb" />
+    <Compile Include="modTimeseriesMath.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="atcChooseDataGroupDates.resx">
       <SubType>Designer</SubType>
-      <DependentUpon>atcConnectFields.vb</DependentUpon>
+      <DependentUpon>atcChooseDataGroupDates.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="atcGrid.resx">
-      <DependentUpon>atcGrid.vb</DependentUpon>
+    <EmbeddedResource Include="atcSeasonYears.resx">
+      <DependentUpon>atcSeasonYears.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="atcManagedList.resx">
-      <DependentUpon>atcManagedList.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="atcSelectList.resx">
-      <DependentUpon>atcSelectList.vb</DependentUpon>
+    <EmbeddedResource Include="frmDataSource.resx">
+      <DependentUpon>frmDataSource.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="atcText.resx">
-      <DependentUpon>atcText.vb</DependentUpon>
+    <EmbeddedResource Include="frmManager.resx">
+      <DependentUpon>frmManager.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmButtons.resx">
-      <DependentUpon>frmButtons.vb</DependentUpon>
+    <EmbeddedResource Include="frmSaveData.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmSaveData.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSelectData.resx">
+      <DependentUpon>frmSelectData.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmConnectFields.resx">
-      <DependentUpon>frmConnectFields.vb</DependentUpon>
+    <EmbeddedResource Include="frmSelectDisplay.resx">
+      <DependentUpon>frmSelectDisplay.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSpecifySeasonalAttributes.resx">
+      <DependentUpon>frmSpecifySeasonalAttributes.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSpecifyYearSubset.resx">
+      <DependentUpon>frmSpecifyYearSubset.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <SubType>Designer</SubType>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{94E38DFF-614B-4CBD-B67C-F211BB35CE8B}" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="My Project\" />
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">

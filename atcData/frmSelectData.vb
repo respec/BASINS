@@ -1282,7 +1282,10 @@ NextName:
         End If
         Try
             If mnuSelectMap IsNot Nothing AndAlso mnuSelectMap.Name.Length > 0 AndAlso mnuSelectMap.Checked AndAlso pSelectedGroup IsNot Nothing Then
+#If GISProvider = "DotSpatial" Then
+#Else
                 atcDataManager.SelectLocationsOnMap(pSelectedGroup.SortedAttributeValues("Location"), True)
+#End If
             End If
         Catch
         End Try
