@@ -6,7 +6,130 @@ Imports System.Reflection
 '''          Uses the set of plugins currently loaded to find ones that inherit atcTimeseriesSource
 ''' </summary>
 Public Class atcDataManager
+#If GISProvider = "DotSpatial" Then
+#Else
     Private Shared pMapWin As MapWindow.Interfaces.IMapWin
+    ''' <summary>Pointer to the root interface for MapWindow 4</summary>
+    <CLSCompliant(False)> _
+    Public Shared WriteOnly Property MapWindow() As MapWindow.Interfaces.IMapWin
+        Set(ByVal aMapWin As MapWindow.Interfaces.IMapWin)
+            If pMapWin Is Nothing AndAlso Not aMapWin Is Nothing Then
+                pMapWin = aMapWin
+                Clear()
+            End If
+        End Set
+    End Property
+
+#Region "MapWindow location selection"
+    ''' <summary>
+    ''' Return the currently loaded datasets whose Location attribute matches a currently selected shape on the map
+    ''' </summary>
+    Private Shared Function DatasetsAtMapSelectedLocations() As atcTimeseriesGroup
+        Dim lGroup As New atcTimeseriesGroup
+        Dim lLocations As ArrayList = MapSelectedLocations()
+        If lLocations.Count > 0 Then
+            For Each lDataSet As atcDataSet In DataSets()
+                If lLocations.Contains(lDataSet.Attributes.GetValue("Location", "")) Then
+                    lGroup.Add(lDataSet)
+                End If
+            Next
+        End If
+        Return lGroup
+    End Function
+
+    ''' <summary>
+    ''' Return the one-based location field index in the layer DBF
+    ''' </summary>
+    ''' <param name="aLayerDBF">Table to find a location field in. Contains one row per shape.</param>
+    ''' <remarks>
+    ''' Uses file layers.dbf to determine which field in the layer's dbf contains locations.
+    ''' Base layer file name is in first column, location field index is in fourth column.
+    ''' If layers.dbf is not found or layer is not found in it, scans aLayerDBF for a field 
+    ''' named in pLikelyShapeLocationFieldNames.
+    ''' </remarks>
+    Private Shared Function MapLayerLocationField(ByVal aLayerDBF As atcTableDBF) As Integer
+        Dim lLocationField As Integer = 0 'One-based field index. Zero indicates we have not found the index yet.
+
+        Dim lLayerListFilename As String = FindFile("Please locate layers.dbf", g_PathChar & "BASINS\etc\DataDownload\layers.dbf") 'table containing location field for BASINS layers
+        If FileExists(lLayerListFilename) Then
+            Try
+                Dim lLayersDBF As New atcTableDBF
+                If lLayersDBF.OpenFile(lLayerListFilename) Then
+                    If lLayersDBF.FindFirst(1, IO.Path.GetFileNameWithoutExtension(aLayerDBF.FileName)) Then
+                        lLocationField = CInt(lLayersDBF.Value(4))
+                    End If
+                End If
+                lLayersDBF.Clear()
+            Catch
+            End Try
+        End If
+
+        If lLocationField = 0 Then 'search for a likely location field name
+            For Each lLocationFieldName As String In pLikelyShapeLocationFieldNames
+                lLocationField = aLayerDBF.FieldNumber(lLocationFieldName)
+                If lLocationField > 0 Then Exit For
+            Next
+        End If
+        Return lLocationField
+    End Function
+
+    ''' <summary>
+    ''' Returns list of locations (as string) of currently selected shapes on the map
+    ''' Returns empty list if there is no dbf for the current layer or if location field cannot be determined
+    ''' </summary>
+    Private Shared Function MapSelectedLocations() As ArrayList
+        Dim lLocations As New ArrayList
+        If Not pMapWin Is Nothing _
+           AndAlso Not pMapWin.View Is Nothing _
+           AndAlso pMapWin.View.SelectedShapes.NumSelected > 0 _
+           AndAlso pMapWin.Layers.IsValidHandle(pMapWin.Layers.CurrentLayer) Then
+            Dim lCurrentLayerDBFname As String = FilenameSetExt(pMapWin.Layers(pMapWin.Layers.CurrentLayer).FileName.ToLower, "dbf")
+            If IO.File.Exists(lCurrentLayerDBFname) Then
+                Dim lDBF As New atcTableDBF 'Table associated with current layer on map
+                If lDBF.OpenFile(lCurrentLayerDBFname) Then
+                    Dim lLocationField As Integer = MapLayerLocationField(lDBF) 'One-based field index. Zero indicates we have not found the index yet.
+                    If lLocationField > 0 Then
+                        Dim lLocation As String
+                        For lSelectionIndex As Integer = pMapWin.View.SelectedShapes.NumSelected - 1 To 0 Step -1
+                            lDBF.CurrentRecord = pMapWin.View.SelectedShapes.Item(lSelectionIndex).ShapeIndex + 1 ' +1 because ShapeIndex is zero based
+                            lLocation = lDBF.Value(lLocationField)
+                            If Not lLocations.Contains(lLocation) Then
+                                lLocations.Add(lDBF.Value(lLocationField))
+                            End If
+                        Next
+                    End If
+                End If
+            End If
+        End If
+        Return lLocations
+    End Function
+
+    Friend Shared Sub SelectLocationsOnMap(ByVal aLocations As ArrayList, ByVal aUnselectOthers As Boolean)
+        If Not pMapWin Is Nothing AndAlso Not pMapWin.Layers Is Nothing AndAlso pMapWin.Layers.IsValidHandle(pMapWin.Layers.CurrentLayer) Then
+            Dim lCurrentLayerDBFname As String = FilenameSetExt(pMapWin.Layers(pMapWin.Layers.CurrentLayer).FileName.ToLower, "dbf")
+            If IO.File.Exists(lCurrentLayerDBFname) Then
+                Dim lDBF As New atcTableDBF 'Table associated with current layer on map
+                If lDBF.OpenFile(lCurrentLayerDBFname) Then
+                    Dim lLocationField As Integer = MapLayerLocationField(lDBF)
+                    If lLocationField > 0 Then 'One-based field index. Zero indicates we have not found the field index.
+                        If aUnselectOthers Then pMapWin.View.SelectedShapes.ClearSelectedShapes()
+                        For Each lLocation As String In aLocations
+                            If lDBF.FindFirst(lLocationField, lLocation) Then
+                                Do
+                                    pMapWin.View.SelectedShapes.AddByIndex(lDBF.CurrentRecord - 1, Drawing.Color.Yellow) ' -1 because AddByIndex is zero based
+                                Loop While lDBF.FindNext(lLocationField, lLocation)
+                            End If
+                        Next
+                        pMapWin.View.Redraw()
+                    End If
+                End If
+            End If
+        End If
+    End Sub
+#End Region
+
+#End If
+
     Private Shared pDataSources As ArrayList 'of atcTimeseriesSource, the currently open data sources
     Private Shared pSelectionAttributes As Generic.List(Of String)
     Private Shared pDisplayAttributes As Generic.List(Of String)
@@ -30,21 +153,6 @@ Public Class atcDataManager
     Private Sub New()
     End Sub
 
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <value>Pointer to the root interface for the MapWindow</value>
-    ''' <remarks></remarks>
-    <CLSCompliant(False)> _
-    Public Shared WriteOnly Property MapWindow() As MapWindow.Interfaces.IMapWin
-        Set(ByVal aMapWin As MapWindow.Interfaces.IMapWin)
-            If pMapWin Is Nothing AndAlso Not aMapWin Is Nothing Then
-                pMapWin = aMapWin
-                Clear()
-            End If
-        End Set
-    End Property
-
     ''' <summary>Sets data manager to its initial state.
     '''          Defaults Datasources, Selection Attributes and Display Attributes.
     ''' </summary>
@@ -56,8 +164,10 @@ Public Class atcDataManager
             pDataSources.Clear()
         End If
         pDataSources = New ArrayList
-        pSelectionAttributes = New Generic.List(Of String)(pDefaultSelectionAttributes)
-        pDisplayAttributes = New Generic.List(Of String)(pDefaultDisplayAttributes)
+
+        'repopulate attribute lists with defaults
+        pSelectionAttributes = Nothing : pSelectionAttributes = SelectionAttributes
+        pDisplayAttributes = Nothing : pDisplayAttributes = DisplayAttributes
     End Sub
 
     ''' <summary>Set of atcTimeseriesSource objects representing currently open DataSources</summary>
@@ -79,6 +189,9 @@ Public Class atcDataManager
     ''' <summary>Names of attributes used for selection of data in UI</summary>
     Public Shared ReadOnly Property SelectionAttributes() As Generic.List(Of String)
         Get
+            If pSelectionAttributes Is Nothing OrElse pSelectionAttributes.Count = 0 Then
+                pSelectionAttributes = New Generic.List(Of String)(pDefaultSelectionAttributes)
+            End If
             Return pSelectionAttributes
         End Get
     End Property
@@ -86,6 +199,9 @@ Public Class atcDataManager
     ''' <summary>Names of attributes used for listing of data in UI</summary>
     Public Shared ReadOnly Property DisplayAttributes() As Generic.List(Of String)
         Get
+            If pDisplayAttributes Is Nothing OrElse pDisplayAttributes.Count = 0 Then
+                pDisplayAttributes = New Generic.List(Of String)(pDefaultDisplayAttributes)
+            End If
             Return pDisplayAttributes
         End Get
     End Property
@@ -96,6 +212,8 @@ Public Class atcDataManager
     ''' </param>  
     Public Shared Function GetPlugins(ByVal aBaseType As Type) As atcCollection
         Dim lMatchingPlugIns As New atcCollection
+#If GISProvider = "DotSpatial" Then
+#Else
         If Not pMapWin Is Nothing Then
             Dim lLastPlugIn As Integer = pMapWin.Plugins.Count() - 1
             For iPlugin As Integer = 0 To lLastPlugIn
@@ -107,6 +225,7 @@ Public Class atcDataManager
                 End If
             Next
         End If
+#End If
         Return lMatchingPlugIns
     End Function
 
@@ -117,9 +236,13 @@ Public Class atcDataManager
     ''' <remarks></remarks>
     Public Shared Function LoadPlugin(ByVal aPluginName As String) As Boolean
         Try
+#If GISProvider = "DotSpatial" Then
+            Logger.Dbg("Loading plugins not yet supported in DotSpatial, did not load " & aPluginName)
+#Else
             Dim lKey As String = pMapWin.Plugins.GetPluginKey(aPluginName)
             'If Not g_MapWin.Plugins.PluginIsLoaded(lKey) Then 
             Return pMapWin.Plugins.StartPlugin(lKey)
+#End If
         Catch e As Exception
             Logger.Dbg("Exception loading " & aPluginName & ": " & e.Message)
             Return False
@@ -146,13 +269,17 @@ Public Class atcDataManager
                 Logger.Dbg("DataSetCount:" & aNewSource.DataSets.Count & ":Specification:" & aNewSource.Specification)
                 pDataSources.Add(aNewSource)
                 RaiseEvent OpenedData(aNewSource)
-                If Not pMapWin Is Nothing Then
+
+#If GISProvider = "DotSpatial" Then
+#Else
+                If pMapWin IsNot Nothing Then
                     pMapWin.Project.Modified = True
                     If aNewSource.CanSave Then
                         AddMenuIfMissing(SaveDataMenuName, FileMenuName, SaveDataMenuString, "mnuSaveAs")
                         AddMenuIfMissing(SaveDataMenuName & "_" & aNewSource.Specification, SaveDataMenuName, aNewSource.Specification)
                     End If
                 End If
+#End If
                 Return True
             Else
                 If Logger.LastDbgText.Length > 0 Then
@@ -282,7 +409,10 @@ Public Class atcDataManager
                     Dim lType As System.Type = lDisplay.GetType()
                     Dim lAssembly As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(lType)
                     lNewDisplay = lAssembly.CreateInstance(lType.FullName)
+#If GISProvider = "DotSpatial" Then
+#Else
                     lNewDisplay.Initialize(pMapWin, Nothing) 'TODO: do we need the aParentHandle here?
+#End If
                     lNewDisplay.Show(aTimeseriesGroup)
                     Exit Sub
                 End If
@@ -313,7 +443,7 @@ Public Class atcDataManager
         lForm.AskUser(lSelectedDataSource, aNeedToOpen, aNeedToSave, aCategories)
         Return lSelectedDataSource
     End Function
- 
+
     ''' <summary>
     ''' 
     ''' </summary>
@@ -354,13 +484,14 @@ Public Class atcDataManager
         If aAvailable IsNot Nothing Then lForm.AvailableData = aAvailable
 
         'Try automatically selecting data based on what is selected on the map
-
+#If GISProvider = "DotSpatial" Then
+#Else
         If aSelected Is Nothing Then
             aSelected = DatasetsAtMapSelectedLocations()
         ElseIf aSelected.Count = 0 Then
             aSelected.AddRange(DatasetsAtMapSelectedLocations)
         End If
-
+#End If
         aSelected = lForm.AskUser(aSelected, aModal)
         If Not lForm.SelectedOk Then 'User did not click Ok
             If lNonePreSelected OrElse Not aCancelReturnsOriginalSelected Then
@@ -434,114 +565,6 @@ Public Class atcDataManager
     'End Function
 #End Region
 
-#Region "MapWindow location selection"
-    ''' <summary>
-    ''' Return the currently loaded datasets whose Location attribute matches a currently selected shape on the map
-    ''' </summary>
-    Private Shared Function DatasetsAtMapSelectedLocations() As atcTimeseriesGroup
-        Dim lGroup As New atcTimeseriesGroup
-        Dim lLocations As ArrayList = MapSelectedLocations()
-        If lLocations.Count > 0 Then
-            For Each lDataSet As atcDataSet In DataSets()
-                If lLocations.Contains(lDataSet.Attributes.GetValue("Location", "")) Then
-                    lGroup.Add(lDataSet)
-                End If
-            Next
-        End If
-        Return lGroup
-    End Function
-
-    ''' <summary>
-    ''' Return the one-based location field index in the layer DBF
-    ''' </summary>
-    ''' <param name="aLayerDBF">Table to find a location field in. Contains one row per shape.</param>
-    ''' <remarks>
-    ''' Uses file layers.dbf to determine which field in the layer's dbf contains locations.
-    ''' Base layer file name is in first column, location field index is in fourth column.
-    ''' If layers.dbf is not found or layer is not found in it, scans aLayerDBF for a field 
-    ''' named in pLikelyShapeLocationFieldNames.
-    ''' </remarks>
-    Private Shared Function MapLayerLocationField(ByVal aLayerDBF As atcTableDBF) As Integer
-        Dim lLocationField As Integer = 0 'One-based field index. Zero indicates we have not found the index yet.
-
-        Dim lLayerListFilename As String = FindFile("Please locate layers.dbf", g_PathChar & "BASINS\etc\DataDownload\layers.dbf") 'table containing location field for BASINS layers
-        If FileExists(lLayerListFilename) Then
-            Try
-                Dim lLayersDBF As New atcTableDBF
-                If lLayersDBF.OpenFile(lLayerListFilename) Then
-                    If lLayersDBF.FindFirst(1, IO.Path.GetFileNameWithoutExtension(aLayerDBF.FileName)) Then
-                        lLocationField = CInt(lLayersDBF.Value(4))
-                    End If
-                End If
-                lLayersDBF.Clear()
-            Catch
-            End Try
-        End If
-
-        If lLocationField = 0 Then 'search for a likely location field name
-            For Each lLocationFieldName As String In pLikelyShapeLocationFieldNames
-                lLocationField = aLayerDBF.FieldNumber(lLocationFieldName)
-                If lLocationField > 0 Then Exit For
-            Next
-        End If
-        Return lLocationField
-    End Function
-
-    ''' <summary>
-    ''' Returns list of locations (as string) of currently selected shapes on the map
-    ''' Returns empty list if there is no dbf for the current layer or if location field cannot be determined
-    ''' </summary>
-    Private Shared Function MapSelectedLocations() As ArrayList
-        Dim lLocations As New ArrayList
-        If Not pMapWin Is Nothing _
-           AndAlso Not pMapWin.View Is Nothing _
-           AndAlso pMapWin.View.SelectedShapes.NumSelected > 0 _
-           AndAlso pMapWin.Layers.IsValidHandle(pMapWin.Layers.CurrentLayer) Then
-            Dim lCurrentLayerDBFname As String = FilenameSetExt(pMapWin.Layers(pMapWin.Layers.CurrentLayer).FileName.ToLower, "dbf")
-            If IO.File.Exists(lCurrentLayerDBFname) Then
-                Dim lDBF As New atcTableDBF 'Table associated with current layer on map
-                If lDBF.OpenFile(lCurrentLayerDBFname) Then
-                    Dim lLocationField As Integer = MapLayerLocationField(lDBF) 'One-based field index. Zero indicates we have not found the index yet.
-                    If lLocationField > 0 Then
-                        Dim lLocation As String
-                        For lSelectionIndex As Integer = pMapWin.View.SelectedShapes.NumSelected - 1 To 0 Step -1
-                            lDBF.CurrentRecord = pMapWin.View.SelectedShapes.Item(lSelectionIndex).ShapeIndex + 1 ' +1 because ShapeIndex is zero based
-                            lLocation = lDBF.Value(lLocationField)
-                            If Not lLocations.Contains(lLocation) Then
-                                lLocations.Add(lDBF.Value(lLocationField))
-                            End If
-                        Next
-                    End If
-                End If
-            End If
-        End If
-        Return lLocations
-    End Function
-
-    Friend Shared Sub SelectLocationsOnMap(ByVal aLocations As ArrayList, ByVal aUnselectOthers As Boolean)
-        If Not pMapWin Is Nothing AndAlso Not pMapWin.Layers Is Nothing AndAlso pMapWin.Layers.IsValidHandle(pMapWin.Layers.CurrentLayer) Then
-            Dim lCurrentLayerDBFname As String = FilenameSetExt(pMapWin.Layers(pMapWin.Layers.CurrentLayer).FileName.ToLower, "dbf")
-            If IO.File.Exists(lCurrentLayerDBFname) Then
-                Dim lDBF As New atcTableDBF 'Table associated with current layer on map
-                If lDBF.OpenFile(lCurrentLayerDBFname) Then
-                    Dim lLocationField As Integer = MapLayerLocationField(lDBF)
-                    If lLocationField > 0 Then 'One-based field index. Zero indicates we have not found the field index.
-                        If aUnselectOthers Then pMapWin.View.SelectedShapes.ClearSelectedShapes()
-                        For Each lLocation As String In aLocations
-                            If lDBF.FindFirst(lLocationField, lLocation) Then
-                                Do
-                                    pMapWin.View.SelectedShapes.AddByIndex(lDBF.CurrentRecord - 1, Drawing.Color.Yellow) ' -1 because AddByIndex is zero based
-                                Loop While lDBF.FindNext(lLocationField, lLocation)
-                            End If
-                        Next
-                        pMapWin.View.Redraw()
-                    End If
-                End If
-            End If
-        End If
-    End Sub
-#End Region
-
     ''' <summary>State of data manager in XML format</summary>
     ''' <value>Chilkat.Xml</value>
     ''' <requirements>
@@ -549,13 +572,13 @@ Public Class atcDataManager
     ''' <a href="http://www.xml-parser.com/downloads.htm">http://www.xml-parser.com/downloads.htm</a>
     ''' </requirements>
     <CLSCompliant(False)> _
-     Public Shared Property XML() As String
+    Public Shared Property XML() As String
         Get
             Dim lSaveXML As New Text.StringBuilder("<DataManager>")
-            For Each lName As String In pSelectionAttributes
+            For Each lName As String In SelectionAttributes
                 lSaveXML.Append("<SelectionAttribute>" & lName & "</SelectionAttribute>")
             Next
-            For Each lName As String In pDisplayAttributes
+            For Each lName As String In DisplayAttributes
                 lSaveXML.Append("<DisplayAttribute>" & lName & "</DisplayAttribute>")
             Next
             For Each lSource As atcTimeseriesSource In pDataSources
@@ -570,17 +593,21 @@ Public Class atcDataManager
             Dim newValue As New Xml.XmlDocument
             newValue.LoadXml(newXML)
             Clear()
-            Dim clearedSelectionAttributes As Boolean = False
-            Dim clearedDisplayAttributes As Boolean = False
-            For Each lchildXML As Xml.XmlNode In newValue.FirstChild.ChildNodes
-                Select Case lchildXML.Name
+            Dim lClearedSelectionAttributes As Boolean = False
+            Dim lClearedDisplayAttributes As Boolean = False
+            For Each lChildXML As Xml.XmlNode In newValue.FirstChild.ChildNodes
+                Select Case lChildXML.Name
                     Case "DataFile", "DataSource"
-                        Dim lDataSourceType As String = lchildXML.InnerText
-                        Dim lSpecification As String = lchildXML.Attributes.GetNamedItem("Specification").InnerText
+                        Dim lDataSourceType As String = lChildXML.InnerText
+                        Dim lSpecification As String = lChildXML.Attributes.GetNamedItem("Specification").InnerText
                         If lDataSourceType Is Nothing OrElse lDataSourceType.Length = 0 Then
                             Logger.Msg("No data source type found for '" & lSpecification & "'", "Data type not specified")
                         Else
-                            Dim lNewDataSource As atcTimeseriesSource = DataSourceByName(lDataSourceType)
+                            Dim lNewDataSource As atcTimeseriesSource = Nothing
+#If GISProvider = "DotSpatial" Then
+#Else
+                            lNewDataSource = DataSourceByName(lDataSourceType)
+#End If
                             If lNewDataSource Is Nothing Then
                                 Logger.Msg("Unable to open data source of type '" & lDataSourceType & "'", "Data type not found")
                             ElseIf lNewDataSource.Category = "File" Then
@@ -594,17 +621,17 @@ Public Class atcDataManager
                             End If
                         End If
                     Case "SelectionAttribute"
-                        If Not clearedSelectionAttributes Then
-                            clearedSelectionAttributes = True
+                        If Not lClearedSelectionAttributes Then
+                            lClearedSelectionAttributes = True
                             pSelectionAttributes.Clear()
                         End If
-                        pSelectionAttributes.Add(lchildXML.InnerText)
+                        pSelectionAttributes.Add(lChildXML.InnerText)
                     Case "DisplayAttribute"
-                        If Not clearedDisplayAttributes Then
+                        If Not lClearedDisplayAttributes Then
                             pDisplayAttributes.Clear()
-                            clearedDisplayAttributes = True
+                            lClearedDisplayAttributes = True
                         End If
-                        pDisplayAttributes.Add(lchildXML.InnerText)
+                        pDisplayAttributes.Add(lChildXML.InnerText)
                 End Select
             Next
         End Set
@@ -638,6 +665,8 @@ Public Class atcDataManager
     Public Const ModelsMenuString As String = "Models"
 
     Public Shared Sub RemoveMenuIfEmpty(ByVal aMenuName As String)
+#If GISProvider = "DotSpatial" Then
+#Else
         If Not pMapWin Is Nothing Then
             With pMapWin.Menus
                 Dim lMenu As MapWindow.Interfaces.MenuItem = .Item(aMenuName)
@@ -646,8 +675,11 @@ Public Class atcDataManager
                 End If
             End With
         End If
+#End If
     End Sub
 
+#If GISProvider = "DotSpatial" Then
+#Else
     <CLSCompliant(False)> _
     Public Shared Function AddMenuIfMissing(ByVal aMenuName As String, _
                                             ByVal aParent As String, _
@@ -740,6 +772,7 @@ Public Class atcDataManager
             End With
         End If
     End Function
+#End If
 #End Region
 
     Public Overrides Function ToString() As String

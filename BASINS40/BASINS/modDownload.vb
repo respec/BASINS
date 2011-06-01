@@ -1760,7 +1760,7 @@ StartOver:
 
         MWlay.Name &= " " & Left(IO.Path.GetFileNameWithoutExtension(shpFile.Filename), 8)
 
-        If MWlay.FileName.ToLower.EndsWith("_tgr_a.shp") Or _
+        If MWlay.FileName.ToLower.EndsWith("_tgr_a.shp") OrElse _
            MWlay.FileName.ToLower.EndsWith("_tgr_p.shp") Then
             'Color the roads
             colorScheme = New MapWinGIS.ShapefileColorScheme

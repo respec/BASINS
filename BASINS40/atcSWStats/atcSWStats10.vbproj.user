@@ -4,7 +4,6 @@
     <LastOpenVersion>7.10.3077</LastOpenVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ReferencePath>C:\dev\MapWindow4Dev\Bin64\</ReferencePath>
     <CopyProjectDestinationFolder />
     <CopyProjectUncPath />
     <CopyProjectOption>0</CopyProjectOption>

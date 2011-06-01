@@ -255,7 +255,11 @@ Public Class atcCollection
 
     Private Function CompareValues(ByVal x As Generic.KeyValuePair(Of Object, Object), _
                                    ByVal y As Generic.KeyValuePair(Of Object, Object)) As Integer
-        Return x.Value.CompareTo(y.Value)
+        If IsNumeric(x.Value) AndAlso IsNumeric(y.Value) Then
+            Return CDbl(x.Value).CompareTo(CDbl(y.Value))
+        Else
+            Return x.Value.CompareTo(y.Value)
+        End If
     End Function
 
     Public Shadows Sub TrimToSize()
