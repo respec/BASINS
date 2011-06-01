@@ -177,82 +177,82 @@ Public Module modPenmanMonteith_SWAT
             lAirTemperatureMaxTS = Aggregate(aAirTemperatureTSMax, atcTimeUnit.TUDay, 1, atcTran.TranMax)
         End If
 
-        Dim lCommonStart As Double
-        Dim lCommonEnd As Double
-        If CommonDates(New atcTimeseriesGroup(lPrecipitationTS, lAirTemperatureMaxTS, lAirTemperatureMinTS), 0, 0, lCommonStart, lCommonEnd) Then
-            lPrecipitationTS = SubsetByDate(lPrecipitationTS, lCommonStart, lCommonEnd, Nothing)
-            lAirTemperatureMinTS = SubsetByDate(lAirTemperatureMinTS, lCommonStart, lCommonEnd, Nothing)
-            lAirTemperatureMaxTS = SubsetByDate(lAirTemperatureMaxTS, lCommonStart, lCommonEnd, Nothing)
+        'Dim lCommonStart As Double
+        'Dim lCommonEnd As Double
+        'If CommonDates(New atcTimeseriesGroup(lPrecipitationTS, lAirTemperatureMaxTS, lAirTemperatureMinTS), 0, 0, lCommonStart, lCommonEnd) Then
+        '    lPrecipitationTS = SubsetByDate(lPrecipitationTS, lCommonStart, lCommonEnd, Nothing)
+        '    lAirTemperatureMinTS = SubsetByDate(lAirTemperatureMinTS, lCommonStart, lCommonEnd, Nothing)
+        '    lAirTemperatureMaxTS = SubsetByDate(lAirTemperatureMaxTS, lCommonStart, lCommonEnd, Nothing)
 
-            If aDebug Then
-                Dim lPrecipValue As Double = 0.0
-                Dim lIndex As Integer = 1
-                Dim lStr As String = "Precip "
-                While lIndex < 200 'lPrecipValue < 0.05
-                    lPrecipValue = lPrecipitationTS.Value(lIndex)
-                    lStr &= DoubleToString(lPrecipValue, , "##.00") & ", "
-                    lIndex += 1
-                End While
-                MapWinUtility.Logger.Dbg("Count " & lIndex)
-                MapWinUtility.Logger.Dbg(lStr)
-                lStr = "ATempMin "
-                For lIndex2 As Integer = 1 To lIndex
-                    lStr &= DoubleToString(lAirTemperatureMinTS.Value(lIndex2), , "###.00") & ", "
-                Next
-                MapWinUtility.Logger.Dbg(lStr)
-                lStr = "ATempMax "
-                For lIndex2 As Integer = 1 To lIndex
-                    lStr &= DoubleToString(lAirTemperatureMaxTS.Value(lIndex2), , "###.00") & ", "
-                Next
-                MapWinUtility.Logger.Dbg(lStr)
-            End If
-
-            'convert to SI units (degF -> degC and in -> mm)
-            lPrecipitationTS = lPrecipitationTS * 25.4
-            Dim lArgs As New atcDataAttributes
-            lArgs.Add("timeseries", lAirTemperatureMaxTS)
-            lAirTemperatureMaxTS = DoMath("ftoc", lArgs)
-            lArgs.Clear()
-            lArgs.Add("timeseries", lAirTemperatureMinTS)
-            lAirTemperatureMinTS = DoMath("ftoc", lArgs)
-            Dim lElevation As Double = aElevation * 0.3048
-
-            Dim lPanEvapTimeSeries As New atcTimeseries(aSource)
-            lPanEvapTimeSeries = lAirTemperatureMinTS.Clone
-            With lPanEvapTimeSeries
-                .Attributes.SetValue("Constituent", "PMET")
-                .Attributes.SetValue("Location", aSwatWeatherStation)
-                .Attributes.SetValue("ID", aAirTemperatureTSMin + 6)
-                .Attributes.SetValue("TU", atcTimeUnit.TUDay)
-                .Attributes.SetValue("description", "Daily SWAT PM ET mm")
-                .Attributes.SetValue("interval", 1.0)
-                .Attributes.SetValue("TSTYPE", "PMET")
-                Dim lSJDate As Double = lAirTemperatureMinTS.Dates.Value(0)
-                Dim lEJDate As Double = lAirTemperatureMinTS.Dates.Value(lAirTemperatureMaxTS.numValues)
-                Dim lSJDText As String = lAirTemperatureMinTS.Attributes.GetFormattedValue("start date")
-                .Attributes.SetValue("start date", lSJDText)
-                Dim lEJDText As String = lAirTemperatureMinTS.Attributes.GetFormattedValue("end date")
-                .Attributes.SetValue("end date", lEJDText)
-                Dim lDate(5) As Integer
-                J2Date(lSJDate, lDate)
-                .Attributes.SetValue("TSBYR", lDate(0))
-                .Dates.Values = NewDates(lSJDate, lEJDate, atcTimeUnit.TUDay, 1)
-                .Value(0) = 0.0
-                For lDateIndex As Integer = 1 To lAirTemperatureMinTS.numValues
-                    .Value(lDateIndex) = PanEvaporationValueComputedbyPenmanMonteith _
-                                          (.Dates.Value(lDateIndex), lElevation, aSwatWeatherStation, _
-                                           lAirTemperatureMinTS.Value(lDateIndex), lAirTemperatureMaxTS.Value(lDateIndex), lPrecipitationTS.Value(lDateIndex), _
-                                           aCo2Conc, aCanopyFactor, aDebug)
-                Next
-            End With
-
-            'convert to English units (mm -> in)
-            lPanEvapTimeSeries = lPanEvapTimeSeries / 25.4
-
-            Return lPanEvapTimeSeries
-        Else
-            Throw New ApplicationException("No common time period between arguments to PanEvaporationTimeseriesComputedByPenmanMonteith")
+        If aDebug Then
+            Dim lPrecipValue As Double = 0.0
+            Dim lIndex As Integer = 1
+            Dim lStr As String = "Precip "
+            While lIndex < 200 'lPrecipValue < 0.05
+                lPrecipValue = lPrecipitationTS.Value(lIndex)
+                lStr &= DoubleToString(lPrecipValue, , "##.00") & ", "
+                lIndex += 1
+            End While
+            MapWinUtility.Logger.Dbg("Count " & lIndex)
+            MapWinUtility.Logger.Dbg(lStr)
+            lStr = "ATempMin "
+            For lIndex2 As Integer = 1 To lIndex
+                lStr &= DoubleToString(lAirTemperatureMinTS.Value(lIndex2), , "###.00") & ", "
+            Next
+            MapWinUtility.Logger.Dbg(lStr)
+            lStr = "ATempMax "
+            For lIndex2 As Integer = 1 To lIndex
+                lStr &= DoubleToString(lAirTemperatureMaxTS.Value(lIndex2), , "###.00") & ", "
+            Next
+            MapWinUtility.Logger.Dbg(lStr)
         End If
+
+        'convert to SI units (degF -> degC and in -> mm)
+        'lPrecipitationTS = lPrecipitationTS * 25.4
+        'Dim lArgs As New atcDataAttributes
+        'lArgs.Add("timeseries", lAirTemperatureMaxTS)
+        'lAirTemperatureMaxTS = DoMath("ftoc", lArgs)
+        'lArgs.Clear()
+        'lArgs.Add("timeseries", lAirTemperatureMinTS)
+        'lAirTemperatureMinTS = DoMath("ftoc", lArgs)
+        Dim lElevation As Double = aElevation * 0.3048
+
+        Dim lPanEvapTimeSeries As New atcTimeseries(aSource)
+        lPanEvapTimeSeries = lAirTemperatureMinTS.Clone
+        With lPanEvapTimeSeries
+            .Attributes.SetValue("Constituent", "PMET")
+            .Attributes.SetValue("Location", aSwatWeatherStation)
+            .Attributes.SetValue("ID", aAirTemperatureTSMin + 6)
+            .Attributes.SetValue("TU", atcTimeUnit.TUDay)
+            .Attributes.SetValue("description", "Daily SWAT PM ET mm")
+            .Attributes.SetValue("interval", 1.0)
+            .Attributes.SetValue("TSTYPE", "PMET")
+            Dim lSJDate As Double = lAirTemperatureMinTS.Dates.Value(0)
+            Dim lEJDate As Double = lAirTemperatureMinTS.Dates.Value(lAirTemperatureMaxTS.numValues)
+            Dim lSJDText As String = lAirTemperatureMinTS.Attributes.GetFormattedValue("start date")
+            .Attributes.SetValue("start date", lSJDText)
+            Dim lEJDText As String = lAirTemperatureMinTS.Attributes.GetFormattedValue("end date")
+            .Attributes.SetValue("end date", lEJDText)
+            Dim lDate(5) As Integer
+            J2Date(lSJDate, lDate)
+            .Attributes.SetValue("TSBYR", lDate(0))
+            .Dates.Values = NewDates(lSJDate, lEJDate, atcTimeUnit.TUDay, 1)
+            .Value(0) = 0.0
+            For lDateIndex As Integer = 1 To lAirTemperatureMinTS.numValues
+                .Value(lDateIndex) = PanEvaporationValueComputedbyPenmanMonteith _
+                                      (.Dates.Value(lDateIndex), lElevation, aSwatWeatherStation, _
+                                       lAirTemperatureMinTS.Value(lDateIndex), lAirTemperatureMaxTS.Value(lDateIndex), lPrecipitationTS.Value(lDateIndex), _
+                                       aCo2Conc, aCanopyFactor, aDebug)
+            Next
+        End With
+
+        'convert to English units (mm -> in)
+        'lPanEvapTimeSeries = lPanEvapTimeSeries / 25.4
+
+        Return lPanEvapTimeSeries
+        'Else
+        '    Throw New ApplicationException("No common time period between arguments to PanEvaporationTimeseriesComputedByPenmanMonteith")
+        'End If
     End Function
 
 
