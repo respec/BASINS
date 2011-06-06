@@ -48,6 +48,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\..\StormwaterCalculator\bin\</OutputPath>
@@ -179,6 +180,7 @@
     <Compile Include="modUnits.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="PointLocation.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="frmArgs.resx">
