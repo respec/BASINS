@@ -211,77 +211,7 @@ Public Class atcFrequencyGridSource
                     Case 2 : Return RecurrenceAt(aRow)
                     Case Else
                         Dim lDataSet As atcDataSet = DataSetAt(aRow)
-                        Dim lAttrName As String = NdaysAt(aColumn)
-                        If pHigh Then lAttrName &= "High" Else lAttrName &= "Low"
-                        lAttrName &= RecurrenceAt(aRow)
-                        'If pAdj.Count > 0 Then
-                        '    RecurrenceAt(aRow)
-                        '    Dim lKey As String = lDataSet.Serial & ":" & Format(CDbl(RecurrenceAt(aRow)), "00000.0000")
-                        '    If pAdj.Item(lKey) Is Nothing Then
-                        '        CellValue = ""
-                        '    Else
-                        '        CellValue = DoubleToString(pAdj.Item(lKey), , "0.000")
-                        '    End If
-                        'Else
-                        If Not lDataSet.Attributes.ContainsAttribute(lAttrName) Then
-                            Try
-                                Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
-                                Dim lArgs As New atcDataAttributes
-                                Dim lOperationName As String
-                                Dim lNdays(pNdays.Count) As Double
-                                Dim lNextNdays As Integer = 1
-                                Dim lReturns(pRecurrence.Count) As Double
-                                Dim lNextReturns As Double = 1
-                                Dim lValue As Double
-
-                                If pHigh Then
-                                    lOperationName = "n-day high value"
-                                Else
-                                    lOperationName = "n-day low value"
-                                End If
-
-                                lArgs.SetValue("Timeseries", lDataSet)
-
-                                lNdays(0) = NdaysAt(aColumn)
-                                For Each lNday As DictionaryEntry In pNdays
-                                    lValue = CDbl(lNday.Value)
-                                    If lValue <> lNdays(0) AndAlso Not pCalculatedNdays.Contains(lValue) Then
-                                        pCalculatedNdays.Add(lValue)
-                                        lNdays(lNextNdays) = lValue
-                                        lNextNdays += 1
-                                    End If
-                                Next
-
-                                lReturns(0) = RecurrenceAt(aColumn)
-                                For Each lReturn As DictionaryEntry In pRecurrence
-                                    lValue = CDbl(ReplaceString(lReturn.Value, ",", ""))
-                                    If lValue <> lReturns(0) AndAlso Not pCalculatedRecurrence.Contains(lValue) Then
-                                        pCalculatedRecurrence.Add(lValue)
-                                        lReturns(lNextReturns) = lValue
-                                        lNextReturns += 1
-                                    End If
-                                Next
-
-                                ReDim Preserve lNdays(lNextNdays - 1)
-                                ReDim Preserve lReturns(lNextReturns - 1)
-
-                                lArgs.SetValue("NDay", lNdays)
-                                lArgs.SetValue("Return Period", lReturns)
-
-                                lCalculator.Open(lOperationName, lArgs)
-                            Catch e As Exception
-                                'LogDbg(Me.Name & " Could not calculate value at row " & aRow & ", col " & aColumn & ". " & e.ToString)
-                            End Try
-                        End If
-                        If lDataSet.Attributes.ContainsAttribute(lAttrName & "Adj") Then
-                            CellValue = lDataSet.Attributes.GetFormattedValue(lAttrName & "Adj")
-                        ElseIf lDataSet.Attributes.ContainsAttribute(lAttrName) Then
-                            CellValue = lDataSet.Attributes.GetFormattedValue(lAttrName)
-                        Else
-                            CellValue = ""
-                        End If
-                        'End If
-                        If CellValue = "NaN" Then CellValue = ""
+                        Return ValueAt(lDataSet, NdaysAt(aColumn), RecurrenceAt(aRow))
                 End Select
             End If
         End Get
@@ -289,6 +219,71 @@ Public Class atcFrequencyGridSource
         End Set
     End Property
 
+    Private Function ValueAt(ByVal aDataset As atcDataSet, ByVal aNDay As Integer, ByVal aRecurrence As String) As String
+        Dim lAttrName As String = aNDay
+        If pHigh Then lAttrName &= "High" Else lAttrName &= "Low"
+        lAttrName &= aRecurrence
+        If Not aDataset.Attributes.ContainsAttribute(lAttrName) Then
+            Try
+                Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
+                Dim lArgs As New atcDataAttributes
+                Dim lOperationName As String
+                Dim lNdays(pNdays.Count) As Double
+                Dim lNextNdays As Integer = 1
+                Dim lReturns(pRecurrence.Count) As Double
+                Dim lNextReturns As Double = 1
+                Dim lValue As Double
+
+                If pHigh Then
+                    lOperationName = "n-day high value"
+                Else
+                    lOperationName = "n-day low value"
+                End If
+
+                lArgs.SetValue("Timeseries", aDataset)
+
+                lNdays(0) = aNDay
+                For Each lNday As DictionaryEntry In pNdays
+                    lValue = CDbl(lNday.Value)
+                    If lValue <> lNdays(0) AndAlso Not pCalculatedNdays.Contains(lValue) Then
+                        pCalculatedNdays.Add(lValue)
+                        lNdays(lNextNdays) = lValue
+                        lNextNdays += 1
+                    End If
+                Next
+
+                lReturns(0) = aRecurrence
+                For Each lReturn As DictionaryEntry In pRecurrence
+                    lValue = CDbl(ReplaceString(lReturn.Value, ",", ""))
+                    If lValue <> lReturns(0) AndAlso Not pCalculatedRecurrence.Contains(lValue) Then
+                        pCalculatedRecurrence.Add(lValue)
+                        lReturns(lNextReturns) = lValue
+                        lNextReturns += 1
+                    End If
+                Next
+
+                ReDim Preserve lNdays(lNextNdays - 1)
+                ReDim Preserve lReturns(lNextReturns - 1)
+
+                lArgs.SetValue("NDay", lNdays)
+                lArgs.SetValue("Return Period", lReturns)
+
+                lCalculator.Open(lOperationName, lArgs)
+            Catch e As Exception
+                'LogDbg(Me.Name & " Could not calculate value at row " & aRow & ", col " & aColumn & ". " & e.ToString)
+            End Try
+        End If
+        If aDataset.Attributes.ContainsAttribute(lAttrName & "Adj") Then
+            ValueAt = aDataset.Attributes.GetFormattedValue(lAttrName & "Adj")
+        ElseIf aDataset.Attributes.ContainsAttribute(lAttrName) Then
+            ValueAt = aDataset.Attributes.GetFormattedValue(lAttrName)
+        Else
+            ValueAt = ""
+        End If
+        'End If
+        If ValueAt = "NaN" Then ValueAt = ""
+
+    End Function
     Overrides Property Alignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
         Get
             If aColumn > 0 Then
@@ -387,7 +382,7 @@ Public Class atcFrequencyGridSource
                         'Get original version of NDayTimeseries (not log version)
                         lIsLog = True
                         lLogString = "(logs)"
-                        lNdayTsNonLog = lAttributes.GetValue("NonLogNDayTimeseries")
+                        lNdayTsNonLog = lAttributes.GetValue("NonLog" & lNdayTs.Attributes.GetValue("NDay") & "DayTimeseries")
                     Else
                         lNdayTsNonLog = lNdayTs
                     End If

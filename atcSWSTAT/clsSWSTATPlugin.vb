@@ -27,7 +27,7 @@ Public Class clsSWSTATPlugin
     End Function
 
     Private Sub ShowForm(ByVal aTimeseriesGroup As atcData.atcDataGroup, ByVal aForm As Object)
-        Dim lBasicAttributes As New ArrayList
+        Dim lBasicAttributes As New Generic.List(Of String)
         With lBasicAttributes
             .Add("ID")
             .Add("Min")
@@ -38,14 +38,14 @@ Public Class clsSWSTATPlugin
             .Add("Count Missing")
         End With
 
-        Dim lNDayAttributes As New ArrayList
+        Dim lNDayAttributes As New Generic.List(Of String)
         With lNDayAttributes
             .Add("STAID")
             .Add("STANAM")
             .Add("Constituent")
         End With
 
-        Dim lTrendAttributes As New ArrayList
+        Dim lTrendAttributes As New Generic.List(Of String)
         With lTrendAttributes
             .Add("Original ID")
             .Add("KENTAU")

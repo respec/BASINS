@@ -175,16 +175,16 @@ Public Class atcTimeseriesNdayHighLow
                 Dim lRunningSum As Double = 0
                 Dim lNumSummed As Integer = 0
                 For lSumIndex As Integer = lTimeIndex - aNDay + 1 To lTimeIndex
-                    lCurrentValue = aTS.Value(lTimeIndex)
+                    lCurrentValue = aTS.Value(lSumIndex)
 
                     'Can't calculate high or low value if any values in the period are missing
                     If Double.IsNaN(lCurrentValue) Then
-                        If aTS.ValueAttributesGetValue(lTimeIndex, "Inserted", False) Then
+                        If aTS.ValueAttributesGetValue(lSumIndex, "Inserted", False) Then
                             lNumSummed = 0
                             lRunningSum = lCurrentValue
                             Exit For
                         Else
-                            Logger.Dbg("Missing Value at " & DumpDate(aTS.Dates.Value(lTimeIndex)))
+                            Logger.Dbg("Missing Value at " & DumpDate(aTS.Dates.Value(lSumIndex)))
                             Return lCurrentValue
                         End If
                     Else
@@ -497,7 +497,7 @@ Public Class atcTimeseriesNdayHighLow
                     lTsMath.Open("log 10", lArgsMath)
                     'Save non-log timeseries
                     lTsMath.DataSets(0).Attributes.SetValue("NDayTimeseries", lNonLogTs)
-                    aAttributesStorage.SetValue("NonLogNDayTimeseries", lNonLogTs)
+                    aAttributesStorage.SetValue("NonLog" & lNdayTs.Attributes.GetValue("NDay") & "DayTimeseries", lNonLogTs)
                     lNdayTs = lTsMath.DataSets(0)
                     'Set log-specific attributes
                     aAttributesStorage.SetValue("MEANDD", lNdayTs.Attributes.GetValue("Mean"))
