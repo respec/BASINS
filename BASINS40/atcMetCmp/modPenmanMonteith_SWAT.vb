@@ -222,7 +222,7 @@ Public Module modPenmanMonteith_SWAT
         With lPanEvapTimeSeries
             .Attributes.SetValue("Constituent", "PMET")
             .Attributes.SetValue("Location", aSwatWeatherStation)
-            .Attributes.SetValue("ID", aAirTemperatureTSMin + 6)
+            .Attributes.SetValue("ID", aAirTemperatureTSMin.Attributes.GetValue("ID") + 6)
             .Attributes.SetValue("TU", atcTimeUnit.TUDay)
             .Attributes.SetValue("description", "Daily SWAT PM ET mm")
             .Attributes.SetValue("interval", 1.0)
@@ -272,7 +272,7 @@ Public Module modPenmanMonteith_SWAT
                                                          ByVal aPrecipitation As Double, ByVal aCo2Conc As Double, ByVal aCanopyFactor As Double, _
                                                          Optional ByVal aDebug As Boolean = False) As Double
         Dim lYr, lMo, lDy As Integer
-        INVMJD(aJDate, lYr, lMo, lDy)
+        INVMJD(aJDate - 1, lYr, lMo, lDy)
 
         If aJDate = 36695 Then
             MapWinUtility.Logger.Dbg("ProblemSpot")
@@ -341,6 +341,12 @@ Public Module modPenmanMonteith_SWAT
         Dim lSolarRadiation As Double = SolarRadiation(aPrecipitation, aStation.ProportionWet(lMo), aStation.SolarAv(lMo), lSolarRadiationMax, lWgnCur(2))
         'ralb
         Dim lNetShortWaveRadiation As Double = lSolarRadiation * (1 - 0.23)
+        If lAirTemperatureAve < 0 Then
+            If aPrecipitation > 0.5 Then
+                lNetShortWaveRadiation = lSolarRadiation * (1 - 0.8)
+            End If
+        End If
+
         'rbo SWAT equation 1.2.20
         Dim lNetEmissivity As Double = -(0.34 - (0.139 * Math.Sqrt(lActualVaporPressure)))
         'rto SWAT equation 1.2.19
@@ -356,7 +362,8 @@ Public Module modPenmanMonteith_SWAT
         'wind at 1.7m
         Dim lWindAt170cm As Double = lWindAt10m * ((170.0 / 1000.0) ^ 0.2)
         'rv - aerodynamic resistance to sensible heat and vapor transfer
-        Dim lResistance As Double = 114 / lWindAt170cm
+        'Dim lResistance As Double = 114 / lWindAt170cm
+        Dim lResistance As Double = 114 / lWindAt10m
         'rc - canopy resistance (TODO:check details of canopy factor)
         Dim lCanopyResistance As Double = aCanopyFactor / (1.4 - (0.4 * (aCo2Conc / 330.0)))
 
