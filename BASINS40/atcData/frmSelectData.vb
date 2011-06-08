@@ -1126,8 +1126,7 @@ NextName:
             End If
         Next
         If curAttributes.Count > 0 Then
-            atcDataManager.SelectionAttributes.Clear()
-            atcDataManager.SelectionAttributes.AddRange(curAttributes)
+            atcDataManager.SelectionAttributesSet(curAttributes)
         End If
     End Sub
 

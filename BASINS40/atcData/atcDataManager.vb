@@ -166,8 +166,8 @@ Public Class atcDataManager
         pDataSources = New ArrayList
 
         'repopulate attribute lists with defaults
-        pSelectionAttributes = Nothing : pSelectionAttributes = SelectionAttributes
-        pDisplayAttributes = Nothing : pDisplayAttributes = DisplayAttributes
+        SelectionAttributesSet(Nothing)
+        DisplayAttributesSet(Nothing)
     End Sub
 
     ''' <summary>Set of atcTimeseriesSource objects representing currently open DataSources</summary>
@@ -189,22 +189,53 @@ Public Class atcDataManager
     ''' <summary>Names of attributes used for selection of data in UI</summary>
     Public Shared ReadOnly Property SelectionAttributes() As Generic.List(Of String)
         Get
-            If pSelectionAttributes Is Nothing OrElse pSelectionAttributes.Count = 0 Then
-                pSelectionAttributes = New Generic.List(Of String)(pDefaultSelectionAttributes)
-            End If
+            If pSelectionAttributes Is Nothing Then SelectionAttributesSet(Nothing)
             Return pSelectionAttributes
         End Get
     End Property
 
+    ''' <summary>
+    ''' Set the selection attributes to a new collection of values, or set to defaults if Nothing
+    ''' </summary>
+    ''' <param name="aNewValues">New collection of values to use for selection, if nothing, default values are used</param>
+    Public Shared Sub SelectionAttributesSet(ByVal aNewValues As IEnumerable)
+        If aNewValues Is Nothing Then aNewValues = pDefaultSelectionAttributes
+        pSelectionAttributes = New Generic.List(Of String)(aNewValues)
+        RemoveDuplicates(pSelectionAttributes)
+    End Sub
+
     ''' <summary>Names of attributes used for listing of data in UI</summary>
     Public Shared ReadOnly Property DisplayAttributes() As Generic.List(Of String)
         Get
-            If pDisplayAttributes Is Nothing OrElse pDisplayAttributes.Count = 0 Then
-                pDisplayAttributes = New Generic.List(Of String)(pDefaultDisplayAttributes)
-            End If
+            If pDisplayAttributes Is Nothing Then DisplayAttributesSet(Nothing)
             Return pDisplayAttributes
         End Get
     End Property
+
+    ''' <summary>
+    ''' Set the display attributes to a new collection of values, or set to defaults if Nothing
+    ''' </summary>
+    ''' <param name="aNewValues">New collection of values to use for selection, if nothing, default values are used</param>
+    Public Shared Sub DisplayAttributesSet(ByVal aNewValues As IEnumerable)
+        If aNewValues Is Nothing Then aNewValues = pDefaultDisplayAttributes
+        pDisplayAttributes = New Generic.List(Of String)(aNewValues)
+        RemoveDuplicates(pDisplayAttributes)
+    End Sub
+
+    Private Shared Sub RemoveDuplicates(ByVal aStringList As Generic.List(Of String))
+        If aStringList IsNot Nothing AndAlso aStringList.Count > 1 Then
+            Dim lSearchForIndex As Integer = 0
+            While lSearchForIndex < aStringList.Count - 1
+                Dim lSearchFor As String = aStringList.Item(lSearchForIndex)
+                For lSearchAtIndex As Integer = aStringList.Count - 1 To lSearchForIndex + 1 Step -1
+                    If aStringList.Item(lSearchAtIndex).Equals(lSearchFor) Then
+                        aStringList.RemoveAt(lSearchAtIndex)
+                    End If
+                Next
+                lSearchForIndex += 1
+            End While
+        End If
+    End Sub
 
     ''' <summary>Currently loaded plugins that inherit the specified class; returns empty objects</summary>
     ''' <param name="aBaseType">
