@@ -181,13 +181,11 @@ Public Class atcBasinsPlugIn
         Try 'atcDataManager.XML gets loaded when opening a project. This makes sure it gets loaded even without a project
             Dim lAttributesString As String = GetSetting(g_AppNameRegistry, "DataManager", "SelectionAttributes")
             If lAttributesString.Length > 0 Then
-                atcDataManager.SelectionAttributes.Clear()
-                atcDataManager.SelectionAttributes.AddRange(lAttributesString.Split(vbTab))
+                atcDataManager.SelectionAttributesSet(lAttributesString.Split(vbTab))
             End If
             lAttributesString = GetSetting(g_AppNameRegistry, "DataManager", "DisplayAttributes")
             If lAttributesString.Length > 0 Then
-                atcDataManager.DisplayAttributes.Clear()
-                atcDataManager.DisplayAttributes.AddRange(lAttributesString.Split(vbTab))
+                atcDataManager.DisplayAttributesSet(lAttributesString.Split(vbTab))
             End If
         Catch
         End Try
