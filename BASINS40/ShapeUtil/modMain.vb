@@ -3,6 +3,7 @@ Option Explicit On
 Imports VB = Microsoft.VisualBasic
 
 Imports atcUtility
+Imports MapWinUtility.Strings
 Imports MapWinUtility
 
 Module modMain
