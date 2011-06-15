@@ -9,8 +9,9 @@ Module MetCmp_PenmanMonteith
     Dim pWdmDataPath As String = "G:\Data\BasinsMet\WDMFinal\"
     Dim pDebug As Boolean = False
     Dim pSingleStation As Boolean = False
-    Dim pDateSubset As Boolean = False
     Dim pWriteHourly As Boolean = True
+
+    Dim pDateSubset As Boolean = False
     Dim pSJDate As Double = Date2J(1977, 1, 1)
     Dim pEJDate As Double = Date2J(1978, 1, 1)
 
