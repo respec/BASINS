@@ -362,6 +362,42 @@ Public Class atcFrequencyGridSource
         Dim lIndex As Integer
         Dim lColumn As Integer
         Dim lRept As New System.Text.StringBuilder
+        Dim lExpTab As atcTableDelimited = Nothing
+        Dim lExpTabColumns As Integer = 15 + 7 * pRecurrence.Keys.Count
+        Dim lExpTabFieldNames15() As String
+        Dim lExpTabFieldNames7() As String = Nothing
+        Dim lStrTemp As String = ""
+        If aExpFmt Then 'if for export, then set up the tab-delimited table
+            lExpTabFieldNames15 = {"Identifier", "Parameter", "SeasBg", "SeaDBg", "SeasNd", "SeaDNd", "BegYear", "EndYear", "NumZro", "NonZro", "NumNeg", "Ldist", "Mean", "Stdev", "Skw"}
+            lExpTabFieldNames7 = {"Recur", "Exceed", "1-Day High", "K-Value", "Variance", "CL_Low", "CL_Up"}
+            If pHigh Then
+                lExpTabFieldNames7(1) = "Exceed"
+            Else
+                lExpTabFieldNames7(1) = "NonExc"
+            End If
+            If pHigh Then
+                lExpTabFieldNames7(2) = "N-Day High"
+            Else
+                lExpTabFieldNames7(2) = "N-Day Low"
+            End If
+            lExpTab = New atcTableDelimited
+            With lExpTab
+                .Delimiter = vbTab
+                .NumFields = lExpTabColumns
+                Dim I As Integer
+                For I = 1 To lExpTabFieldNames15.Length
+                    .FieldName(I) = lExpTabFieldNames15(I - 1)
+                Next
+                For lRecCount As Integer = 1 To pRecurrence.Keys.Count
+                    For Each lFld As String In lExpTabFieldNames7
+                        .FieldName(I) = lFld & lRecCount.ToString.PadLeft(2, "0")
+                        I += 1
+                    Next
+                Next
+                .CurrentRecord = 1
+            End With
+        End If
+
         Try
             For Each lTimeseries As atcTimeseries In pDataGroup
                 Dim lAttributes As atcDataAttributes = lTimeseries.Attributes
@@ -439,32 +475,37 @@ Public Class atcFrequencyGridSource
                     End If
 
                     If aExpFmt Then 'build tabbed export file
-                        lRept.AppendLine("Identifier" & vbTab & lAttributes.GetValue("STAID", ""))
+                        lExpTab.Value(1) = lAttributes.GetValue("STAID", "") '"Identifier"
                         If pHigh Then
-                            lRept.AppendLine("    Parameter" & vbTab & "H" & StrPad(CStr(lNdays), 3, "0"))
+                            lExpTab.Value(2) = "H" & StrPad(CStr(lNdays), 3, "0") '"Parameter
                         Else
-                            lRept.AppendLine("    Parameter" & vbTab & "L" & StrPad(CStr(lNdays), 3, "0"))
+                            lExpTab.Value(2) = "L" & StrPad(CStr(lNdays), 3, "0") '"Parameter
                         End If
-                        lRept.AppendLine("    SeasBg" & vbTab & lStartDate.Month)
-                        lRept.AppendLine("    SeaDBg" & vbTab & lStartDate.Day)
-                        lRept.AppendLine("    SeasNd" & vbTab & lEndDate(1))
-                        lRept.AppendLine("    SeaDNd" & vbTab & lEndDate(2))
-                        lRept.AppendLine("    BegYear" & vbTab & lStartDateAnnual.Year)
-                        lRept.AppendLine("    EndYear" & vbTab & lEndDate(0))
-                        lRept.AppendLine("    NumZro" & vbTab & lNumZero)
-                        lRept.AppendLine("    NonZro" & vbTab & lNumPositive)
-                        lRept.AppendLine("    NumNeg" & vbTab & lNumMissing)
+
+                        lExpTab.Value(3) = lStartDate.Month '        "SeasBg" 
+                        lExpTab.Value(4) = lStartDate.Day '          "SeaDBg" 
+                        lExpTab.Value(5) = lEndDate(1) '             "SeasNd" 
+                        lExpTab.Value(6) = lEndDate(2) '             "SeaDNd" 
+                        lExpTab.Value(7) = lStartDateAnnual.Year '   "BegYear" 
+                        lExpTab.Value(8) = lEndDate(0) '             "EndYear" 
+                        lExpTab.Value(9) = lNumZero '                "NumZro" 
+                        lExpTab.Value(10) = lNumPositive '           "NonZro" 
+                        lExpTab.Value(11) = lNumMissing '            "NumNeg"
+
                         If lIsLog Then
-                            lRept.AppendLine("    Ldist" & vbTab & "LP3")
-                            lRept.AppendLine("    MeanND" & vbTab & DoubleToString(lLogNdayTs.Attributes.GetValue("Mean", 0), , "0.000"))
-                            lRept.AppendLine("    SdNd" & vbTab & DoubleToString(lLogNdayTs.Attributes.GetValue("Standard Deviation", 0), , "0.000"))
-                            lRept.AppendLine("    SkwNd" & vbTab & DoubleToString(lLogNdayTs.Attributes.GetValue("Skew", 0), , "0.000"))
+                            lExpTab.Value(12) = "LP3" '"    Ldist"
+                            'lExpTab.Value(13) = --> '"    MeanND"
+                            'lExpTab.Value(14) = --> '"    SdNd"
+                            'lExpTab.Value(15) = --> '"    SkwNd"
                         Else
-                            lRept.AppendLine("    Ldist" & vbTab & "LP")
-                            lRept.AppendLine("    Meanvl" & vbTab & DoubleToString(lLogNdayTs.Attributes.GetValue("Mean", 0), , "0.000"))
-                            lRept.AppendLine("    StdDev" & vbTab & DoubleToString(lLogNdayTs.Attributes.GetValue("Standard Deviation", 0), , "0.000"))
-                            lRept.AppendLine("    Skewcf" & vbTab & DoubleToString(lLogNdayTs.Attributes.GetValue("Skew", 0), , "0.000"))
+                            lExpTab.Value(12) = "LP" '"    Ldist"
+                            'lExpTab.Value(13) = --> '"    Meanvl"
+                            'lExpTab.Value(14) = --> '"    StdDev"
+                            'lExpTab.Value(15) = --> '"    Skewcf"
                         End If
+                        lExpTab.Value(13) = DoubleToString(lLogNdayTs.Attributes.GetValue("Mean", 0), , "0.000") '"                  Mean"
+                        lExpTab.Value(14) = DoubleToString(lLogNdayTs.Attributes.GetValue("Standard Deviation", 0), , "0.000") '"   StDev"
+                        lExpTab.Value(15) = DoubleToString(lLogNdayTs.Attributes.GetValue("Skew", 0), , "0.000") '"                   Skw"
                     Else
                         lRept.AppendLine()
                         lRept.AppendLine()
@@ -572,36 +613,43 @@ Public Class atcFrequencyGridSource
                         End If
                     End If
 
-                    Dim lExpRows(6) As String
-                    If aExpFmt Then
-                        lExpRows(0) = "    Recur"
-                        If pHigh Then
-                            lExpRows(1) = "    Exceed"
-                        Else
-                            lExpRows(1) = "    NonExc"
-                        End If
-                        If pHigh Then
-                            lExpRows(2) = "    " & lNdays & "-Day High"
-                        Else
-                            lExpRows(2) = "    " & lNdays & "-Day Low"
-                        End If
-                        lExpRows(3) = "    K-Value"
-                        lExpRows(4) = "    Variance"
-                        lExpRows(5) = "    CL_Low"
-                        lExpRows(6) = "    CL_Up"
-                    End If
-
                     Dim lReverseString As String = ""
                     Dim lThisRow As String = ""
-                    For Each lRecurrenceKey As String In pRecurrence.Keys
-                        Dim lRecurrence As String = pRecurrence.Item(lRecurrenceKey).ToString.Replace(",", "")
-                        Dim lNyears As Double = CDbl(lRecurrence)
+                    Dim lExpTabFldCtr As Integer = 16
+                    If aExpFmt Then
+                        For Each lRecurrenceKey As String In pRecurrence.Keys
+                            Dim lRecurrence As String = pRecurrence.Item(lRecurrenceKey).ToString.Replace(",", "")
+                            Dim lNyears As Double = CDbl(lRecurrence)
 
-                        lStr = DoubleToString(1 / lNyears, , "0.0000", "0.000")
-                        If aExpFmt Then
-                            lExpRows(0) &= vbTab & DoubleToString(lNyears, , "0.00")
-                            lExpRows(1) &= vbTab & lStr
-                        Else
+                            lStr = DoubleToString(1 / lNyears, , "0.0000", "0.000")
+                            lExpTab.Value(lExpTabFldCtr) = DoubleToString(lNyears, , "0.00") 'Recur
+                            lExpTab.Value(lExpTabFldCtr + 1) = lStr 'Exceed/NonExc
+
+                            If lNumZero > 0 Then 'If there is/are a zero annual event, then display adjusted values 
+                                'but, don't display adjusted probs
+                                'lThisRow &= pAdjProb.Item(lRecurrenceKey).PadLeft(15)
+                                Dim lAdjVal As String = ""
+                                If lAttributes.ContainsAttribute(lAttrName & lRecurrence & "Adj") Then
+                                    lAdjVal = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & "Adj"), , "0.000", "0.000")
+                                End If
+                                lExpTab.Value(lExpTabFldCtr + 2) = lAdjVal '-Day Low or High
+                            Else
+                                lExpTab.Value(lExpTabFldCtr + 2) = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000", "0.000")
+                            End If
+
+                            'K Value (export only), variance of estimate and confidence intervals
+                            lExpTab.Value(lExpTabFldCtr + 3) = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " K Value", 0), , "0.000", "0.000")
+                            lExpTab.Value(lExpTabFldCtr + 4) = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " Variance of Estimate", 0), , "0.000", "0.000")
+                            lExpTab.Value(lExpTabFldCtr + 5) = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Lower", 0), , "0.000", "0.000")
+                            lExpTab.Value(lExpTabFldCtr + 6) = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Upper", 0), , "0.000", "0.000")
+                            lExpTabFldCtr += lExpTabFieldNames7.Length
+                        Next ' for each lRecurrenceKey As String In pRecurrence.Keys
+                    Else
+                        For Each lRecurrenceKey As String In pRecurrence.Keys
+                            Dim lRecurrence As String = pRecurrence.Item(lRecurrenceKey).ToString.Replace(",", "")
+                            Dim lNyears As Double = CDbl(lRecurrence)
+
+                            lStr = DoubleToString(1 / lNyears, , "0.0000", "0.000")
                             lThisRow = ("  " & lStr.PadLeft(10))
 
                             If lNyears < 1.05 Then
@@ -609,50 +657,32 @@ Public Class atcFrequencyGridSource
                             Else
                                 lThisRow &= DoubleToString(lNyears, , "0.00").PadLeft(13) & " "
                             End If
-                        End If
 
-                        If lNumZero > 0 Then 'If there is/are a zero annual event, then display adjusted values 
-                            'but, don't display adjusted probs
-                            'lThisRow &= pAdjProb.Item(lRecurrenceKey).PadLeft(15)
-                            Dim lAdjVal As String = ""
-                            If lAttributes.ContainsAttribute(lAttrName & lRecurrence & "Adj") Then
-                                lAdjVal = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & "Adj"), , "0.000", "0.000")
-                            End If
-                            If aExpFmt Then
-                                lExpRows(2) &= vbTab & lAdjVal
-                            Else
+                            If lNumZero > 0 Then 'If there is/are a zero annual event, then display adjusted values 
+                                'but, don't display adjusted probs
+                                'lThisRow &= pAdjProb.Item(lRecurrenceKey).PadLeft(15)
+                                Dim lAdjVal As String = ""
+                                If lAttributes.ContainsAttribute(lAttrName & lRecurrence & "Adj") Then
+                                    lAdjVal = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & "Adj"), , "0.000", "0.000")
+                                End If
                                 lThisRow &= lAdjVal.PadLeft(11)
+                            Else
+                                lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000", "0.000").PadLeft(11)
                             End If
-                        ElseIf aExpFmt Then
-                            lExpRows(2) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000", "0.000")
-                        Else
-                            lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000", "0.000").PadLeft(11)
-                        End If
 
-                        'K Value (export only), variance of estimate and confidence intervals
-                        If aExpFmt Then
-                            lExpRows(3) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " K Value", 0), , "0.000", "0.000")
-                            lExpRows(4) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " Variance of Estimate", 0), , "0.000", "0.000")
-                            lExpRows(5) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Lower", 0), , "0.000", "0.000")
-                            lExpRows(6) &= vbTab & DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Upper", 0), , "0.000", "0.000")
-                        Else
+                            'K Value (export only), variance of estimate and confidence intervals
                             lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " Variance of Estimate", 0), , "0.000", "0.000").PadLeft(11)
                             lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Lower", 0), , "0.000", "0.000").PadLeft(11)
                             lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Upper", 0), , "0.000", "0.000").PadLeft(11)
-                        End If
+                            If pHigh Then
+                                lReverseString &= lThisRow & vbCrLf
+                            Else
+                                lReverseString = lThisRow & vbCrLf & lReverseString
+                            End If
+                        Next ' for each lRecurrenceKey As String In pRecurrence.Keys
+                    End If
 
-                        If pHigh Then
-                            lReverseString &= lThisRow & vbCrLf
-                        Else
-                            lReverseString = lThisRow & vbCrLf & lReverseString
-                        End If
-                    Next ' for each lRecurrenceKey As String In pRecurrence.Keys
-
-                    If aExpFmt Then
-                        For i As Integer = 0 To UBound(lExpRows)
-                            lRept.AppendLine(lExpRows(i))
-                        Next
-                    Else
+                    If Not aExpFmt Then
                         lRept.Append(lReverseString)
 
                         lRept.AppendLine()
@@ -669,13 +699,21 @@ Public Class atcFrequencyGridSource
 
                         lRept.AppendLine(vbFormFeed)
                     End If
-                Next
+                    If aExpFmt Then
+                        lExpTab.CurrentRecord += 1
+                    End If
+                Next 'for each lNdaysKey As String In pNdays.Keys
             Next
         Catch e As Exception
             lRept.AppendLine()
             lRept.AppendLine("Exception while creating report: " & e.Message)
         End Try
-        Return lRept.ToString
+
+        If aExpFmt Then
+            Return lExpTab.ToString
+        Else
+            Return lRept.ToString
+        End If
     End Function
 
     Private Function FormatStat(ByVal aTS As atcTimeseries, ByVal aAttName As String, ByVal aLogString As String, Optional ByVal aAttLabel As String = "") As String
