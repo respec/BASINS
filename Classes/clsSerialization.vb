@@ -38,7 +38,11 @@ Public Class Serialization
         namespaces.Add(String.Empty, String.Empty)
 
         ' serialization
-        serializer.Serialize(wr, obj, namespaces)
+        Try
+            serializer.Serialize(wr, obj, namespaces)
+        Catch
+            ' do nothing
+        End Try
         wr.Flush()
         wr.Close()
 
@@ -59,14 +63,17 @@ Public Class Serialization
         Dim namespaces As New XmlSerializerNamespaces()
         namespaces.Add(String.Empty, String.Empty)
 
-        xs.Serialize(writer, obj, namespaces)
+        Try
+            xs.Serialize(writer, obj, namespaces)
+        Catch
+            ' do nothing
+        End Try
         Dim s As String = writer.ToString()
 
         ' excluding part <xml> part
         Dim pos As Integer = s.IndexOf(">")
         s = s.Substring(pos + 1) + Environment.NewLine
 
-        System.Windows.Forms.MessageBox.Show(s)
         nodeParent.InnerXml = s
     End Sub
 
@@ -95,7 +102,11 @@ Public Class Serialization
 
                 ' deserializing
                 Dim reader As New XmlNodeReader(xel)
-                Return serializer.Deserialize(reader)
+                Try
+                    Return serializer.Deserialize(reader)
+                Catch
+                    Return Nothing
+                End Try
             End If
         End If
 

@@ -160,4 +160,21 @@ Public Class MiscUtils
         Return retStringBuf.ToString()
     End Function
 
+    ''' <summary>
+    ''' Parses double value from string. Uses invariant culture first (. separator). On failure replces '.' to ',' and tries again.
+    ''' </summary>
+    ''' <param name="str">A string to parse value from</param>
+    ''' <param name="defaultValue">Default value to return if parsing has faield</param>
+    ''' <returns>True on success, false otherwise</returns>
+    Public Shared Function ParseDouble(ByVal str As String, ByVal defaultValue As Double) As Double
+        Dim success As Boolean = False
+        Dim val As Double
+        success = Double.TryParse(str, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, val)
+        If Not success Then
+            str = str.Replace(",", ".")
+            success = Double.TryParse(str, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, val)
+        End If
+        Return IIf(success, val, defaultValue)
+    End Function
+
 End Class
