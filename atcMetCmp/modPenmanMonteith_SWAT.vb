@@ -43,7 +43,8 @@ Public Module modPenmanMonteith_SWAT
                                                                      Optional ByVal aCanopyFactor As Double = 49.0, _
                                                                      Optional ByVal aCo2Conc As Double = 330.0, _
                                                                      Optional ByVal aDaily As Boolean = True, _
-                                                                     Optional ByVal aDebug As Boolean = False) As atcTimeseries
+                                                                     Optional ByVal aDebug As Boolean = False, _
+                                                                     Optional ByVal aEnglishUnit As Boolean = True) As atcTimeseries
         InitRandomNumbers()
 
         Dim lPrecipitationTS As atcTimeseries
@@ -94,15 +95,19 @@ Public Module modPenmanMonteith_SWAT
                 MapWinUtility.Logger.Dbg(lStr)
             End If
 
-            'convert to SI units (degF -> degC and in -> mm)
-            lPrecipitationTS = lPrecipitationTS * 25.4
-            Dim lArgs As New atcDataAttributes
-            lArgs.Add("timeseries", lAirTemperatureMaxTS)
-            lAirTemperatureMaxTS = DoMath("ftoc", lArgs)
-            lArgs.Clear()
-            lArgs.Add("timeseries", lAirTemperatureMinTS)
-            lAirTemperatureMinTS = DoMath("ftoc", lArgs)
-            Dim lElevation As Double = aElevation * 0.3048
+            Dim lArgs As atcDataAttributes = Nothing
+            Dim lElevation As Double = aElevation
+            If aEnglishUnit Then
+                'convert to SI units (degF -> degC and in -> mm)
+                lPrecipitationTS = lPrecipitationTS * 25.4
+                lArgs = New atcDataAttributes
+                lArgs.Add("timeseries", lAirTemperatureMaxTS)
+                lAirTemperatureMaxTS = DoMath("ftoc", lArgs)
+                lArgs.Clear()
+                lArgs.Add("timeseries", lAirTemperatureMinTS)
+                lAirTemperatureMinTS = DoMath("ftoc", lArgs)
+                lElevation = aElevation * 0.3048
+            End If
 
             Dim lPanEvapTimeSeries As New atcTimeseries(aSource)
             lPanEvapTimeSeries = lAirTemperatureMinTS.Clone
@@ -111,7 +116,7 @@ Public Module modPenmanMonteith_SWAT
                 .Attributes.SetValue("Location", aSwatWeatherStation.Name)
                 .Attributes.SetValue("ID", aAirTemperatureTS + 6)
                 .Attributes.SetValue("TU", atcTimeUnit.TUDay)
-                .Attributes.SetValue("description", "Daily SWAT PM ET mm")
+                .Attributes.SetValue("Description", "Daily SWAT PM ET mm")
                 .Attributes.SetValue("interval", 1.0)
                 .Attributes.SetValue("TSTYPE", "PMET")
                 Dim lSJDate As Double = lAirTemperatureMinTS.Dates.Value(0)
@@ -133,8 +138,11 @@ Public Module modPenmanMonteith_SWAT
                 Next
             End With
 
-            'convert to English units (mm -> in)
-            lPanEvapTimeSeries = lPanEvapTimeSeries / 25.4
+            If aEnglishUnit Then
+                'convert to English units (mm -> in)
+                lPanEvapTimeSeries = lPanEvapTimeSeries / 25.4
+                lPanEvapTimeSeries.Attributes.SetValue("Description", "Daily SWAT PM ET inch")
+            End If
 
             Return lPanEvapTimeSeries
         Else
@@ -142,13 +150,14 @@ Public Module modPenmanMonteith_SWAT
         End If
     End Function
 
-    ''' <summary></summary>
-    ''' <param name="aElevation"></param>
-    ''' <param name="aPrecipitationTS"></param>
-    ''' <param name="aAirTemperatureTSMin"></param>
-    ''' <param name="aAirTemperatureTSMax"></param>
-    ''' <param name="aSource"></param>
-    ''' <param name="aSwatWeatherStation"></param>
+    ''' <summary>This version accomodates the use of prepared daily precip, min, max air temp, assuming SI units (mm, C) by default</summary>
+    ''' <param name="aElevation">Elevation in meter</param>
+    ''' <param name="aPrecipitationTS">Daily precip in mm</param>
+    ''' <param name="aAirTemperatureTSMin">Daily min air temp in C</param>
+    ''' <param name="aAirTemperatureTSMax">Daily max air temp in C</param>
+    ''' <param name="aSource">Data source</param>
+    ''' <param name="aSwatWeatherStation">SWAT Wthr Stn object</param>
+    ''' <param name="aEnglishUnit">Inputs are in English unit (Elevft, PRECinch, TEMPF), if true, then output is in English unit (inch PMET)</param>
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Function PanEvaporationTimeseriesComputedByPenmanMonteith(ByVal aElevation As Double, _
@@ -160,7 +169,8 @@ Public Module modPenmanMonteith_SWAT
                                                                      Optional ByVal aCanopyFactor As Double = 49.0, _
                                                                      Optional ByVal aCo2Conc As Double = 0.0, _
                                                                      Optional ByVal aDaily As Boolean = True, _
-                                                                     Optional ByVal aDebug As Boolean = False) As atcTimeseries
+                                                                     Optional ByVal aDebug As Boolean = False, _
+                                                                     Optional ByVal aEnglishUnit As Boolean = False) As atcTimeseries
         InitRandomNumbers()
 
         Dim lPrecipitationTS As atcTimeseries
@@ -208,23 +218,28 @@ Public Module modPenmanMonteith_SWAT
         End If
 
         'convert to SI units (degF -> degC and in -> mm)
-        'lPrecipitationTS = lPrecipitationTS * 25.4
-        'Dim lArgs As New atcDataAttributes
-        'lArgs.Add("timeseries", lAirTemperatureMaxTS)
-        'lAirTemperatureMaxTS = DoMath("ftoc", lArgs)
-        'lArgs.Clear()
-        'lArgs.Add("timeseries", lAirTemperatureMinTS)
-        'lAirTemperatureMinTS = DoMath("ftoc", lArgs)
-        Dim lElevation As Double = aElevation * 0.3048
+        Dim lArgs As atcDataAttributes = Nothing
+        Dim lElevation As Double = aElevation
+        If aEnglishUnit Then
+            lPrecipitationTS = lPrecipitationTS * 25.4
+            lArgs = New atcDataAttributes
+            lArgs.Add("timeseries", lAirTemperatureMaxTS)
+            lAirTemperatureMaxTS = DoMath("ftoc", lArgs)
+            lArgs.Clear()
+            lArgs.Add("timeseries", lAirTemperatureMinTS)
+            lAirTemperatureMinTS = DoMath("ftoc", lArgs)
+            lElevation = aElevation * 0.3048
+        End If
 
+        'The actual PMET calculation is adapted from SWAT, hence requires SI unit inputs
         Dim lPanEvapTimeSeries As New atcTimeseries(aSource)
         lPanEvapTimeSeries = lAirTemperatureMinTS.Clone
         With lPanEvapTimeSeries
             .Attributes.SetValue("Constituent", "PMET")
-            .Attributes.SetValue("Location", aSwatWeatherStation)
+            .Attributes.SetValue("Location", aSwatWeatherStation.Name)
             .Attributes.SetValue("ID", aAirTemperatureTSMin.Attributes.GetValue("ID") + 6)
             .Attributes.SetValue("TU", atcTimeUnit.TUDay)
-            .Attributes.SetValue("description", "Daily SWAT PM ET mm")
+            .Attributes.SetValue("Description", "Daily SWAT PM ET mm")
             .Attributes.SetValue("interval", 1.0)
             .Attributes.SetValue("TSTYPE", "PMET")
             Dim lSJDate As Double = lAirTemperatureMinTS.Dates.Value(0)
@@ -246,8 +261,12 @@ Public Module modPenmanMonteith_SWAT
             Next
         End With
 
-        'convert to English units (mm -> in)
-        'lPanEvapTimeSeries = lPanEvapTimeSeries / 25.4
+        If aEnglishUnit Then
+            'if input data are in English unit,
+            'then convert output to English units (mm -> in)
+            lPanEvapTimeSeries = lPanEvapTimeSeries / 25.4
+            lPanEvapTimeSeries.Attributes.SetValue("Description", "Daily SWAT PM ET inch")
+        End If
 
         Return lPanEvapTimeSeries
         'Else
