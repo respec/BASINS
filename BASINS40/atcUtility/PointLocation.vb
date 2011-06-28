@@ -95,20 +95,15 @@ End Class
 ''' <remarks>Contains minimum details</remarks>
 Public MustInherit Class PointLocation
     ''' <summary>Table record associated with this point</summary>
-    ''' <remarks></remarks>
-    Public Record As String
+     Public Record As String
     ''' <summary>Identifier for record</summary>
-    ''' <remarks></remarks>
     Public Id As String
     ''' <summary>Latitude in decimal degrees</summary>
-    ''' <remarks></remarks>
     Public Latitude As Double
     ''' <summary>Longitude in decimal degrees</summary>
-    ''' <remarks></remarks>
     Public Longitude As Double
 
-    ''' <summary></summary>
-    ''' <remarks></remarks>
+    ''' <summary>Default constructor</summary>
     Public Sub New()
     End Sub
 
@@ -141,31 +136,32 @@ Public MustInherit Class PointLocation
         End With
     End Sub
 
-    ''' <summary></summary>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
-    Public Overridable Function Key() As String
+    ''' <summary>Key for location</summary>
+     Public Overridable Function Key() As String
         Return Id
     End Function
 
-    ''' <summary></summary>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
+    ''' <summary>Location text details</summary>
     Public MustOverride Function Description() As String
 
     ''' <summary></summary>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
+    ''' <returns>Description of location</returns>
     Public Overrides Function ToString() As String
         Return Description()
     End Function
 End Class
 
 ''' <summary>Wrapper for distance calculations</summary>
-''' <remarks></remarks>
 Public Class Spatial
     Private Const DegreesToRadians As Double = 0.01745329252
- 
+
+    ''' <summary>Computes distance between two points</summary>
+    ''' <param name="aLong1">Longitude of first point</param>
+    ''' <param name="aLat1">Latitude of first point</param>
+    ''' <param name="aLong2">Longitude of second point</param>
+    ''' <param name="aLat2">Latitude of second point</param>
+    ''' <returns>Distance between points</returns>
+    ''' <remarks>Distance units are meters</remarks>
     Public Shared Function GreatCircleDistance(ByVal aLong1 As Double, ByVal aLat1 As Double, ByVal aLong2 As Double, ByVal aLat2 As Double) As Double
         Dim lLat1 As Double = DegreesToRadians * aLat1
         Dim lLat2 As Double = DegreesToRadians * aLat2
