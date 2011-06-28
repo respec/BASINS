@@ -1841,6 +1841,7 @@ Public Module modMetCompute
                         If lHrVals(i) > 0.00001 Then
                             lCarry = lHrVals(i) - (Math.Round(lHrVals(i) / lRndOff) * lRndOff)
                             lHrVals(i) = lHrVals(i) - lCarry
+                            WriteLine(lOutFil, " Hour " & lHrInd + lDate(3) & " " & DumpDate(lClosestHrTser.Dates.Values(lHrInd).ToString) & " " & lHrVals(i))
                         Else
                             lHrVals(i) = 0.0#
                         End If
@@ -1980,6 +1981,11 @@ OuttaHere:
             End If
             'lDisTs.errordescription = s
         End If
+
+        If lOutSumm Then
+            FileClose(lOutFil)
+        End If
+
         Return lDisTs
 
     End Function
