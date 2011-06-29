@@ -378,15 +378,21 @@ FoundMatch:
               AndAlso aTimeseries.Attributes.ContainsAttribute("Time Unit") Then
                 lCurveLabel &= TimeUnitName(aTimeseries.Attributes.GetValue("Time Unit"), _
                                             aTimeseries.Attributes.GetValue("Time Step", 1)) & " "
+            Else
+                lCurveLabel &= aCommonTimeUnitName & " "
             End If
 
             If aCommonScenario Is Nothing OrElse aCommonScenario.Length = 0 Then
                 lCurveLabel &= .GetValue("Scenario", "") & " "
+            ElseIf Not aCommonScenario.ToLower.Contains("<unk>") Then
+                lCurveLabel &= aCommonScenario & " "
             End If
             If aCommonConstituent Is Nothing OrElse aCommonConstituent.Length = 0 Then
                 lCurveLabel &= .GetValue("Constituent", "") & " "
+            Else
+                lCurveLabel &= aCommonConstituent & " "
             End If
-            If aCommonLocation Is Nothing OrElse aCommonLocation.Length = 0 Then
+            If aCommonLocation Is Nothing OrElse aCommonLocation.Length = 0 OrElse aCommonLocation.ToLower.Contains("<unk>") Then
                 Dim lLocation As String = .GetValue("Location", "")
                 If lLocation.Length = 0 OrElse lLocation = "<unk>" Then
                     lLocation = .GetValue("STAID", "")

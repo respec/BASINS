@@ -23,12 +23,12 @@ Public Class clsGraphFrequency
             '& "NOTE - Preliminary computation" & vbCrLf _
             '& " User is reponsible for assessment and interpretation."
             If aDataGroup.Count = 1 Then
-                Dim lValueStaId As String = aDataGroup(0).Attributes.GetValue("STAID")
+                'Dim lValueStaId As String = aDataGroup(0).Attributes.GetValue("STAID")
                 Dim lValueMean As Double = aDataGroup(0).Attributes.GetValue("Mean")
                 Dim lValueStddev As Double = aDataGroup(0).Attributes.GetValue("stddev")
                 Dim lValueSkew As Double = aDataGroup(0).Attributes.GetValue("Skew")
-                lStr &= vbCrLf & "Station: " & lValueStaId & vbCrLf
-                lStr &= "Mean: " & DoubleToString(lValueMean) & vbCrLf
+                'lStr &= vbCrLf & "Station: " & lValueStaId & vbCrLf
+                lStr &= vbCrLf & "Mean: " & DoubleToString(lValueMean) & vbCrLf
                 lStr &= "Standard Deviation: " & DoubleToString(lValueStddev) & vbCrLf
                 lStr &= "Skew: " & DoubleToString(lValueSkew)
             End If
