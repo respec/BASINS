@@ -18,11 +18,23 @@ Public Class clsGraphFrequency
         With pZgc.MasterPane.PaneList(0)
             'Add USGS Peakfq label
             Dim lUSGSLabel As TextObj = Nothing
-            Dim lStr As String = "run " & Date.Now.ToString("yyyy-MM-dd") & vbCrLf _
-                               & "NOTE - Preliminary computation" & vbCrLf _
-                               & " User is reponsible for assessment and interpretation."
+            Dim lStr As String = "SWSTAT2.0 run " & Date.Now.ToString("yyyy-MM-dd")
+            '& vbCrLf _
+            '& "NOTE - Preliminary computation" & vbCrLf _
+            '& " User is reponsible for assessment and interpretation."
+            If aDataGroup.Count = 1 Then
+                Dim lValueStaId As String = aDataGroup(0).Attributes.GetValue("STAID")
+                Dim lValueMean As Double = aDataGroup(0).Attributes.GetValue("Mean")
+                Dim lValueStddev As Double = aDataGroup(0).Attributes.GetValue("stddev")
+                Dim lValueSkew As Double = aDataGroup(0).Attributes.GetValue("Skew")
+                lStr &= vbCrLf & "Station: " & lValueStaId & vbCrLf
+                lStr &= "Mean: " & DoubleToString(lValueMean) & vbCrLf
+                lStr &= "Standard Deviation: " & DoubleToString(lValueStddev) & vbCrLf
+                lStr &= "Skew: " & DoubleToString(lValueSkew)
+            End If
             lUSGSLabel = New TextObj(lStr, 0.6, 0.9, CoordType.ChartFraction)
             lUSGSLabel.ZOrder = ZOrder.A_InFront
+            lUSGSLabel.FontSpec.StringAlignment = StringAlignment.Near
             .GraphObjList.Add(lUSGSLabel)
             lUSGSLabel.IsVisible = True
 
