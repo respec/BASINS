@@ -911,7 +911,7 @@ Public Module modDate
                                 ByRef aTimeStep As Integer)
         aTimeUnit = 6
         aTimeStep = 0
-        While aTimeStep < 1
+        While aTimeStep < 1 AndAlso aTimeUnit > atcTimeUnit.TUUnknown
             aTimeStep = timdifJ(aSJDate, aEJDate, aTimeUnit, 1)
             If aTimeStep = 0 Then aTimeUnit -= 1
         End While
