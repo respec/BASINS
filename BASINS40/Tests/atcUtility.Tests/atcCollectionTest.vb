@@ -53,204 +53,178 @@ Public Class atcCollectionTest
 
     '''<summary>Test atcCollection Constructor</summary>
     <TestMethod()> Public Sub atcCollectionConstructorTest()
-        Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As atcCollection = New atcCollection(aValuesToAdd)
-        Assert.Inconclusive("TODO: Implement code to verify target")
+        Dim lValuesToAdd() As String = {"A", "B", "C"}
+        Dim lCollection As atcCollection = New atcCollection(lValuesToAdd)
+        Assert.IsInstanceOfType(lCollection, GetType(atcCollection))
+        Assert.AreEqual(3, lCollection.Count)
     End Sub
 
     '''<summary>Test Add</summary>
     <TestMethod()> Public Sub AddTest()
-        Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
-        Dim aKey As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim aValue As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim actual As Integer
-        actual = target.Add(aKey, aValue)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim lCollection As atcCollection = New atcCollection
+        Dim lActual As Integer = lCollection.Add("Key4", 4)
+        Assert.AreEqual(0, lActual)
+        lActual = lCollection.Add("Key9", 9)
+        Assert.AreEqual(1, lActual)
+        lActual = lCollection.Add("Key4", 4)
+        Assert.AreEqual(0, lActual)
     End Sub
 
     '''<summary>Test Add</summary>
     <TestMethod()> Public Sub AddTest1()
-        Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
-        Dim aAddThese As atcCollection = Nothing ' TODO: Initialize to an appropriate value
-        target.Add(aAddThese)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim lValuesToAdd() As String = {"A", "B", "C"}
+        Dim lCollection As atcCollection = New atcCollection(lValuesToAdd)
+        Dim lAddThese As atcCollection = New atcCollection({"D", "E"})
+        lCollection.Add(lAddThese)
+        Assert.AreEqual(5, lCollection.Count)
     End Sub
 
     '''<summary>Test Add</summary>
     <TestMethod()> Public Sub AddTest2()
-        Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
-        Dim aValue As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim actual As Integer
-        actual = target.Add(aValue)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
-    End Sub
+        Dim lCollection As atcCollection = New atcCollection({"A", "B", "C"})
+        Dim lActual As Integer = lCollection.Add("D")
+        Assert.AreEqual(3, lActual)
+      End Sub
 
     '''<summary>Test AddRange</summary>
     <TestMethod()> Public Sub AddRangeTest()
-        Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
-        Dim aC As ICollection = Nothing ' TODO: Initialize to an appropriate value
-        target.AddRange(aC)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim lCollection As atcCollection = New atcCollection({"A", "B", "C"})
+        Dim aC As ICollection = ({"D", "E"})
+        lCollection.AddRange(aC)
+        Assert.AreEqual(5, lCollection.Count)
     End Sub
 
     '''<summary>Test AddRange</summary>
     <TestMethod()> Public Sub AddRangeTest1()
-        Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
-        Dim aKeys As ArrayList = Nothing ' TODO: Initialize to an appropriate value
-        Dim aValues As IEnumerable = Nothing ' TODO: Initialize to an appropriate value
-        target.AddRange(aKeys, aValues)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim lCollection As atcCollection = New atcCollection({"A", "B", "C"})
+        Dim lKeys As New ArrayList From {"KeyD", "KeyE"}
+        Dim lValues As New ArrayList From {"D", "E"}
+        lCollection.AddRange(lKeys, lValues)
+        Assert.AreEqual(5, lCollection.Count)
+        Assert.AreEqual("D", lCollection.ItemByKey("KeyD"))
     End Sub
 
     '''<summary>Test AddRange</summary>
     <TestMethod()> Public Sub AddRangeTest2()
-        Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
-        Dim aKeys As IEnumerable = Nothing ' TODO: Initialize to an appropriate value
-        Dim aValues As IEnumerable = Nothing ' TODO: Initialize to an appropriate value
-        target.AddRange(aKeys, aValues)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim lCollection As atcCollection = New atcCollection({"A", "B", "C"})
+        Dim lKeys() As String = {"KeyD", "KeyE"}
+        Dim lValues() As String = {"D", "E"}
+        lCollection.AddRange(lKeys, lValues)
+        Assert.AreEqual(5, lCollection.Count)
+        Assert.AreEqual("D", lCollection.ItemByKey("KeyD"))
     End Sub
 
     '''<summary>Test BinarySearchForKey</summary>
     <TestMethod()> Public Sub BinarySearchForKeyTest()
-        Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
-        Dim aKey As Double = 0.0! ' TODO: Initialize to an appropriate value
-        Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim actual As Integer
-        actual = target.BinarySearchForKey(aKey)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
-    End Sub
+        Dim lCollection As atcCollection = New atcCollection({"A", "B", "C", "D", "E"})
+        Assert.AreEqual(3, lCollection.BinarySearchForKey("D"))
+        Assert.AreEqual(5, lCollection.BinarySearchForKey("X"))
+      End Sub
 
     '''<summary>Test BinarySearchForKey</summary>
     <TestMethod()> Public Sub BinarySearchForKeyTest1()
-        Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
-        Dim aKey As String = String.Empty ' TODO: Initialize to an appropriate value
-        Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim actual As Integer
-        actual = target.BinarySearchForKey(aKey)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim lKeys As New ArrayList From {1, 2, 3, 4, 5}
+        Dim lValues As New ArrayList From {"A", "B", "C", "D", "E"}
+        Dim lCollection As New atcCollection
+        lCollection.AddRange(lKeys, lValues)
+        Assert.AreEqual(3, lCollection.BinarySearchForKey(3.5))
+        Assert.AreEqual(5, lCollection.BinarySearchForKey(6.5))
+        Assert.AreEqual(0, lCollection.BinarySearchForKey(-1))
     End Sub
 
     '''<summary>Test ChangeTo</summary>
     <TestMethod()> Public Sub ChangeToTest()
-        Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
-        Dim aNewItems As atcCollection = Nothing ' TODO: Initialize to an appropriate value
-        target.ChangeTo(aNewItems)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim lKeys As New ArrayList From {1, 2, 3, 4, 5}
+        Dim lValues As New ArrayList From {"A", "B", "C", "D", "E"}
+        Dim lCollection As New atcCollection
+        lCollection.AddRange(lKeys, lValues)
+        lCollection.ChangeTo(New atcCollection({"A1", "B2"}))
+        Assert.AreEqual(2, lCollection.Count)
     End Sub
 
     '''<summary>Test Clear</summary>
     <TestMethod()> Public Sub ClearTest()
-        Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
-        target.Clear()
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim lCollection As atcCollection = New atcCollection({"A", "B", "C", "D", "E"})
+        lCollection.Clear()
+        Assert.AreEqual(0, lCollection.Count)
     End Sub
 
     '''<summary>Test Clone</summary>
     <TestMethod()> Public Sub CloneTest()
-        Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
-        Dim expected As atcCollection = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As atcCollection
-        actual = target.Clone
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
-    End Sub
+        Dim lCollection As atcCollection = New atcCollection({"A", "B", "C", "D", "E"})
+        Dim lClonedCollection As atcCollection = lCollection.Clone
+        Assert.AreEqual(lCollection.Count, lClonedCollection.Count)
+        'TODO: should this test work?
+        'Assert.AreEqual(lCollection, lClonedCollection)
+      End Sub
 
     '''<summary>Test CompareValues</summary>
     <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub CompareValuesTest()
-        Dim param0 As PrivateObject = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As atcCollection_Accessor = New atcCollection_Accessor(param0) ' TODO: Initialize to an appropriate value
-        Dim x As KeyValuePair(Of Object, Object) = New KeyValuePair(Of Object, Object)() ' TODO: Initialize to an appropriate value
-        Dim y As KeyValuePair(Of Object, Object) = New KeyValuePair(Of Object, Object)() ' TODO: Initialize to an appropriate value
-        Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim actual As Integer
-        actual = target.CompareValues(x, y)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim lCollectionAccessor As atcCollection_Accessor = New atcCollection_Accessor(New atcCollection)
+        Dim lX As KeyValuePair(Of Object, Object) = New KeyValuePair(Of Object, Object)(3, "C")
+        Dim lY As KeyValuePair(Of Object, Object) = New KeyValuePair(Of Object, Object)(4, "D")
+        Assert.AreEqual(-1, lCollectionAccessor.CompareValues(lX, lY))
+        Dim lZ As KeyValuePair(Of Object, Object) = New KeyValuePair(Of Object, Object)(3, "C")
+        Assert.AreEqual(0, lCollectionAccessor.CompareValues(lX, lZ))
     End Sub
 
     '''<summary>Test DictionaryEntries</summary>
     <TestMethod()> Public Sub DictionaryEntriesTest()
-        Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
-        Dim expected As IEnumerable = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As IEnumerable
-        actual = target.DictionaryEntries
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim lCollection As atcCollection = New atcCollection({"A", "B", "C", "D", "E"})
+        Assert.IsInstanceOfType(lCollection.DictionaryEntries, GetType(atcCollection_Accessor.clsDictionaryEnumerator))
     End Sub
 
     '''<summary>Test Dispose</summary>
     <TestMethod()> Public Sub DisposeTest()
-        Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As IDisposable = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
-        target.Dispose()
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim lCollection As atcCollection = New atcCollection({"A", "B", "C", "D", "E"})
+        Assert.AreEqual(5, lCollection.Keys.Count)
+        Assert.AreEqual(5, lCollection.Count)
+        lCollection.Dispose()
+        Assert.AreEqual(0, lCollection.Keys.Count)
+        Assert.AreEqual(0, lCollection.Count)
     End Sub
 
     '''<summary>Test Increment</summary>
     <TestMethod()> Public Sub IncrementTest()
-        Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
-        Dim aKey As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
-        Dim actual As Double
-        actual = target.Increment(aKey)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
-    End Sub
+        Dim lValues As New ArrayList From {1, 2, 3, 4, 5}
+        Dim lKeys As New ArrayList From {"A", "B", "C", "D", "E"}
+        Dim lCollection As New atcCollection
+        lCollection.AddRange(lKeys, lValues)
+        Assert.AreEqual(CDbl(4), lCollection.Increment("C"))
+      End Sub
 
     '''<summary>Test Increment</summary>
     <TestMethod()> Public Sub IncrementTest1()
-        Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
-        Dim aKey As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim aValue As Double = 0.0! ' TODO: Initialize to an appropriate value
-        Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
-        Dim actual As Double
-        actual = target.Increment(aKey, aValue)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim lValues As New ArrayList From {1, 2, 3, 4, 5}
+        Dim lKeys As New ArrayList From {"A", "B", "C", "D", "E"}
+        Dim lCollection As New atcCollection
+        lCollection.AddRange(lKeys, lValues)
+        Assert.AreEqual(CDbl(6), lCollection.Increment("C", 3))
+        Assert.AreEqual(CDbl(4), lCollection.Increment("B", 2))
+        Assert.AreEqual(CDbl(4), lCollection.Increment("C", -2))
     End Sub
 
     '''<summary>Test IndexFromKey</summary>
     <TestMethod()> Public Sub IndexFromKeyTest()
-        Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
-        Dim akey As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim actual As Integer
-        actual = target.IndexFromKey(akey)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
-    End Sub
+        Dim lValues As New ArrayList From {1, 2, 3, 4, 5}
+        Dim lKeys As New ArrayList From {"A", "B", "C", "D", "E"}
+        Dim lCollection As New atcCollection
+        lCollection.AddRange(lKeys, lValues)
+        Assert.AreEqual(2, lCollection.IndexFromKey("C"))
+      End Sub
 
     '''<summary>Test Insert</summary>
     <TestMethod()> Public Sub InsertTest()
-        Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
-        Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim aValue As Object = Nothing ' TODO: Initialize to an appropriate value
-        target.Insert(aIndex, aValue)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim lValues As New ArrayList From {1, 2, 3, 4, 5}
+        Dim lKeys As New ArrayList From {"A", "B", "C", "D", "E"}
+        Dim lCollection As New atcCollection
+        lCollection.AddRange(lKeys, lValues)
+        lCollection.Insert(2, 2.5)
+        Assert.AreEqual(CDbl(1), CDbl(lCollection.ItemByIndex(0)))
+        Assert.AreEqual(CDbl(2.5), CDbl(lCollection.ItemByIndex(2)))
+        Assert.AreEqual(CDbl(2), CDbl(lCollection.ItemByIndex(1)))
+        Assert.AreEqual(CDbl(3), CDbl(lCollection.ItemByIndex(3)))
     End Sub
 
     '''<summary>Test Insert</summary>
