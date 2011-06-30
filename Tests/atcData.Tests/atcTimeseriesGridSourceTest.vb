@@ -1,16 +1,9 @@
 ﻿Imports System.Drawing
-
 Imports atcControls
-
 Imports atcUtility
-
 Imports System.Collections.Generic
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for atcTimeseriesGridSourceTest and is intended
@@ -18,8 +11,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class atcTimeseriesGridSourceTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -61,12 +52,8 @@ Public Class atcTimeseriesGridSourceTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcTimeseriesGridSource Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcTimeseriesGridSourceConstructorTest()
+    '''<summary>Test atcTimeseriesGridSource Constructor</summary>
+    <TestMethod()> Public Sub atcTimeseriesGridSourceConstructorTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayAttributes As List(Of String) = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayValues As Boolean = False ' TODO: Initialize to an appropriate value
@@ -74,11 +61,8 @@ Public Class atcTimeseriesGridSourceTest
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for atcTimeseriesGridSource Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcTimeseriesGridSourceConstructorTest1()
+    '''<summary>Test atcTimeseriesGridSource Constructor</summary>
+    <TestMethod()> Public Sub atcTimeseriesGridSourceConstructorTest1()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayAttributes As List(Of String) = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayValues As Boolean = False ' TODO: Initialize to an appropriate value
@@ -87,11 +71,8 @@ Public Class atcTimeseriesGridSourceTest
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for CellDataset
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test CellDataset</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub CellDatasetTest()
         Dim param0 As PrivateObject = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGridSource_Accessor = New atcTimeseriesGridSource_Accessor(param0) ' TODO: Initialize to an appropriate value
@@ -109,11 +90,8 @@ Public Class atcTimeseriesGridSourceTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for RefreshAllDates
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test RefreshAllDates</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub RefreshAllDatesTest()
         Dim param0 As PrivateObject = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGridSource_Accessor = New atcTimeseriesGridSource_Accessor(param0) ' TODO: Initialize to an appropriate value
@@ -121,11 +99,8 @@ Public Class atcTimeseriesGridSourceTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ValueFormat
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ValueFormatTest()
+    '''<summary>Test ValueFormat</summary>
+    <TestMethod()> Public Sub ValueFormatTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayAttributes As List(Of String) = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayValues As Boolean = False ' TODO: Initialize to an appropriate value
@@ -139,22 +114,16 @@ Public Class atcTimeseriesGridSourceTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for __ENCAddToList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test __ENCAddToList</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub __ENCAddToListTest()
         Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
         atcTimeseriesGridSource_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for pDataGroup_Added
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test pDataGroup_Added</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub pDataGroup_AddedTest()
         Dim param0 As PrivateObject = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGridSource_Accessor = New atcTimeseriesGridSource_Accessor(param0) ' TODO: Initialize to an appropriate value
@@ -163,11 +132,8 @@ Public Class atcTimeseriesGridSourceTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for pDataGroup_Removed
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test pDataGroup_Removed</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub pDataGroup_RemovedTest()
         Dim param0 As PrivateObject = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGridSource_Accessor = New atcTimeseriesGridSource_Accessor(param0) ' TODO: Initialize to an appropriate value
@@ -176,11 +142,8 @@ Public Class atcTimeseriesGridSourceTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Alignment
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AlignmentTest()
+    '''<summary>Test Alignment</summary>
+    <TestMethod()> Public Sub AlignmentTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayAttributes As List(Of String) = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayValues As Boolean = False ' TODO: Initialize to an appropriate value
@@ -195,11 +158,8 @@ Public Class atcTimeseriesGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CellColor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CellColorTest()
+    '''<summary>Test CellColor</summary>
+    <TestMethod()> Public Sub CellColorTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayAttributes As List(Of String) = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayValues As Boolean = False ' TODO: Initialize to an appropriate value
@@ -214,11 +174,8 @@ Public Class atcTimeseriesGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CellEditable
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CellEditableTest()
+    '''<summary>Test CellEditable</summary>
+    <TestMethod()> Public Sub CellEditableTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayAttributes As List(Of String) = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayValues As Boolean = False ' TODO: Initialize to an appropriate value
@@ -233,11 +190,8 @@ Public Class atcTimeseriesGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CellValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CellValueTest()
+    '''<summary>Test CellValue</summary>
+    <TestMethod()> Public Sub CellValueTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayAttributes As List(Of String) = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayValues As Boolean = False ' TODO: Initialize to an appropriate value
@@ -252,11 +206,8 @@ Public Class atcTimeseriesGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Columns
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ColumnsTest()
+    '''<summary>Test Columns</summary>
+    <TestMethod()> Public Sub ColumnsTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayAttributes As List(Of String) = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayValues As Boolean = False ' TODO: Initialize to an appropriate value
@@ -269,11 +220,8 @@ Public Class atcTimeseriesGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DateFormat
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DateFormatTest()
+    '''<summary>Test DateFormat</summary>
+    <TestMethod()> Public Sub DateFormatTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayAttributes As List(Of String) = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayValues As Boolean = False ' TODO: Initialize to an appropriate value
@@ -286,11 +234,8 @@ Public Class atcTimeseriesGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DisplayValueAttributes
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DisplayValueAttributesTest()
+    '''<summary>Test DisplayValueAttributes</summary>
+    <TestMethod()> Public Sub DisplayValueAttributesTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayAttributes As List(Of String) = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayValues As Boolean = False ' TODO: Initialize to an appropriate value
@@ -303,11 +248,8 @@ Public Class atcTimeseriesGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FixedRows
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FixedRowsTest()
+    '''<summary>Test FixedRows</summary>
+    <TestMethod()> Public Sub FixedRowsTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayAttributes As List(Of String) = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayValues As Boolean = False ' TODO: Initialize to an appropriate value
@@ -320,11 +262,8 @@ Public Class atcTimeseriesGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Rows
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RowsTest()
+    '''<summary>Test Rows</summary>
+    <TestMethod()> Public Sub RowsTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayAttributes As List(Of String) = Nothing ' TODO: Initialize to an appropriate value
         Dim aDisplayValues As Boolean = False ' TODO: Initialize to an appropriate value
@@ -337,11 +276,8 @@ Public Class atcTimeseriesGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for pTimeseriesGroup
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test pTimeseriesGroup</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub pTimeseriesGroupTest()
         Dim param0 As PrivateObject = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGridSource_Accessor = New atcTimeseriesGridSource_Accessor(param0) ' TODO: Initialize to an appropriate value

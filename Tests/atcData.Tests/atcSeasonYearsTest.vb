@@ -1,12 +1,7 @@
 ﻿Imports System
-
 Imports System.Windows.Forms
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for atcSeasonYearsTest and is intended
@@ -14,8 +9,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class atcSeasonYearsTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -57,21 +50,14 @@ Public Class atcSeasonYearsTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcSeasonYears Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcSeasonYearsConstructorTest()
+    '''<summary>Test atcSeasonYears Constructor</summary>
+    <TestMethod()> Public Sub atcSeasonYearsConstructorTest()
         Dim target As atcSeasonYears = New atcSeasonYears()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for Dispose
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test Dispose</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub DisposeTest()
         Dim target As atcSeasonYears_Accessor = New atcSeasonYears_Accessor() ' TODO: Initialize to an appropriate value
         Dim disposing As Boolean = False ' TODO: Initialize to an appropriate value
@@ -79,11 +65,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for GetTextbox
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test GetTextbox</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub GetTextboxTest()
         Dim target As atcSeasonYears_Accessor = New atcSeasonYears_Accessor() ' TODO: Initialize to an appropriate value
         Dim aTextbox As TextBox = Nothing ' TODO: Initialize to an appropriate value
@@ -94,32 +77,23 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for InitializeComponent
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test InitializeComponent</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub InitializeComponentTest()
         Dim target As atcSeasonYears_Accessor = New atcSeasonYears_Accessor() ' TODO: Initialize to an appropriate value
         target.InitializeComponent()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Reset
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ResetTest()
+    '''<summary>Test Reset</summary>
+    <TestMethod()> Public Sub ResetTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         target.Reset()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for SetTextbox
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test SetTextbox</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub SetTextboxTest()
         Dim target As atcSeasonYears_Accessor = New atcSeasonYears_Accessor() ' TODO: Initialize to an appropriate value
         Dim aTextbox As TextBox = Nothing ' TODO: Initialize to an appropriate value
@@ -128,22 +102,16 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for __ENCAddToList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test __ENCAddToList</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub __ENCAddToListTest()
         Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
         atcSeasonYears_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnAllYears_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test btnAllYears_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub btnAllYears_ClickTest()
         Dim target As atcSeasonYears_Accessor = New atcSeasonYears_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -152,11 +120,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnAll_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test btnAll_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub btnAll_ClickTest()
         Dim target As atcSeasonYears_Accessor = New atcSeasonYears_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -165,11 +130,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnCalendarYear_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test btnCalendarYear_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub btnCalendarYear_ClickTest()
         Dim target As atcSeasonYears_Accessor = New atcSeasonYears_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -178,11 +140,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnCommonYears_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test btnCommonYears_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub btnCommonYears_ClickTest()
         Dim target As atcSeasonYears_Accessor = New atcSeasonYears_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -191,11 +150,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnCommon_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test btnCommon_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub btnCommon_ClickTest()
         Dim target As atcSeasonYears_Accessor = New atcSeasonYears_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -204,11 +160,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnWaterYear_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test btnWaterYear_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub btnWaterYear_ClickTest()
         Dim target As atcSeasonYears_Accessor = New atcSeasonYears_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -217,11 +170,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for CommonEnd
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CommonEndTest()
+    '''<summary>Test CommonEnd</summary>
+    <TestMethod()> Public Sub CommonEndTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim actual As Double
@@ -231,11 +181,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CommonStart
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CommonStartTest()
+    '''<summary>Test CommonStart</summary>
+    <TestMethod()> Public Sub CommonStartTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim actual As Double
@@ -245,11 +192,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DataGroup
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DataGroupTest()
+    '''<summary>Test DataGroup</summary>
+    <TestMethod()> Public Sub DataGroupTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcTimeseriesGroup
@@ -259,11 +203,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for EndDay
-    '''</summary>
-    <TestMethod()> _
-    Public Sub EndDayTest()
+    '''<summary>Test EndDay</summary>
+    <TestMethod()> Public Sub EndDayTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -273,11 +214,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for EndMonth
-    '''</summary>
-    <TestMethod()> _
-    Public Sub EndMonthTest()
+    '''<summary>Test EndMonth</summary>
+    <TestMethod()> Public Sub EndMonthTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -287,11 +225,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for OmitAfterYear
-    '''</summary>
-    <TestMethod()> _
-    Public Sub OmitAfterYearTest()
+    '''<summary>Test OmitAfterYear</summary>
+    <TestMethod()> Public Sub OmitAfterYearTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -301,11 +236,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for OmitBeforeYear
-    '''</summary>
-    <TestMethod()> _
-    Public Sub OmitBeforeYearTest()
+    '''<summary>Test OmitBeforeYear</summary>
+    <TestMethod()> Public Sub OmitBeforeYearTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -315,11 +247,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ShowBoundaries
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ShowBoundariesTest()
+    '''<summary>Test ShowBoundaries</summary>
+    <TestMethod()> Public Sub ShowBoundariesTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
@@ -329,11 +258,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Splitter1
-    '''</summary>
-    <TestMethod()> _
-    Public Sub Splitter1Test()
+    '''<summary>Test Splitter1</summary>
+    <TestMethod()> Public Sub Splitter1Test()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Splitter = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Splitter
@@ -343,11 +269,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for StartDay
-    '''</summary>
-    <TestMethod()> _
-    Public Sub StartDayTest()
+    '''<summary>Test StartDay</summary>
+    <TestMethod()> Public Sub StartDayTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -357,11 +280,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for StartMonth
-    '''</summary>
-    <TestMethod()> _
-    Public Sub StartMonthTest()
+    '''<summary>Test StartMonth</summary>
+    <TestMethod()> Public Sub StartMonthTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -371,11 +291,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnAll
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnAllTest()
+    '''<summary>Test btnAll</summary>
+    <TestMethod()> Public Sub btnAllTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -385,11 +302,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnCalendarYear
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnCalendarYearTest()
+    '''<summary>Test btnCalendarYear</summary>
+    <TestMethod()> Public Sub btnCalendarYearTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -399,11 +313,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnCommon
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnCommonTest()
+    '''<summary>Test btnCommon</summary>
+    <TestMethod()> Public Sub btnCommonTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -413,11 +324,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnWaterYear
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnWaterYearTest()
+    '''<summary>Test btnWaterYear</summary>
+    <TestMethod()> Public Sub btnWaterYearTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -427,11 +335,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for cboEndMonth
-    '''</summary>
-    <TestMethod()> _
-    Public Sub cboEndMonthTest()
+    '''<summary>Test cboEndMonth</summary>
+    <TestMethod()> Public Sub cboEndMonthTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As ComboBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ComboBox
@@ -441,11 +346,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for cboStartMonth
-    '''</summary>
-    <TestMethod()> _
-    Public Sub cboStartMonthTest()
+    '''<summary>Test cboStartMonth</summary>
+    <TestMethod()> Public Sub cboStartMonthTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As ComboBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ComboBox
@@ -455,11 +357,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for grpBoundaries
-    '''</summary>
-    <TestMethod()> _
-    Public Sub grpBoundariesTest()
+    '''<summary>Test grpBoundaries</summary>
+    <TestMethod()> Public Sub grpBoundariesTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As GroupBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As GroupBox
@@ -469,11 +368,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for grpYears
-    '''</summary>
-    <TestMethod()> _
-    Public Sub grpYearsTest()
+    '''<summary>Test grpYears</summary>
+    <TestMethod()> Public Sub grpYearsTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As GroupBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As GroupBox
@@ -483,11 +379,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblCommonEnd
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblCommonEndTest()
+    '''<summary>Test lblCommonEnd</summary>
+    <TestMethod()> Public Sub lblCommonEndTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -497,11 +390,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblCommonStart
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblCommonStartTest()
+    '''<summary>Test lblCommonStart</summary>
+    <TestMethod()> Public Sub lblCommonStartTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -511,11 +401,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblDataEnd
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblDataEndTest()
+    '''<summary>Test lblDataEnd</summary>
+    <TestMethod()> Public Sub lblDataEndTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -525,11 +412,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblDataStart
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblDataStartTest()
+    '''<summary>Test lblDataStart</summary>
+    <TestMethod()> Public Sub lblDataStartTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -539,11 +423,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblOmitAfter
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblOmitAfterTest()
+    '''<summary>Test lblOmitAfter</summary>
+    <TestMethod()> Public Sub lblOmitAfterTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -553,11 +434,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblOmitBefore
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblOmitBeforeTest()
+    '''<summary>Test lblOmitBefore</summary>
+    <TestMethod()> Public Sub lblOmitBeforeTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -567,11 +445,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblYearEnd
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblYearEndTest()
+    '''<summary>Test lblYearEnd</summary>
+    <TestMethod()> Public Sub lblYearEndTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -581,11 +456,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblYearStart
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblYearStartTest()
+    '''<summary>Test lblYearStart</summary>
+    <TestMethod()> Public Sub lblYearStartTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -595,11 +467,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for pDataGroup
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test pDataGroup</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub pDataGroupTest()
         Dim target As atcSeasonYears_Accessor = New atcSeasonYears_Accessor() ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
@@ -610,11 +479,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for txtEndDay
-    '''</summary>
-    <TestMethod()> _
-    Public Sub txtEndDayTest()
+    '''<summary>Test txtEndDay</summary>
+    <TestMethod()> Public Sub txtEndDayTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As TextBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As TextBox
@@ -624,11 +490,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for txtOmitAfterYear
-    '''</summary>
-    <TestMethod()> _
-    Public Sub txtOmitAfterYearTest()
+    '''<summary>Test txtOmitAfterYear</summary>
+    <TestMethod()> Public Sub txtOmitAfterYearTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As TextBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As TextBox
@@ -638,11 +501,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for txtOmitBeforeYear
-    '''</summary>
-    <TestMethod()> _
-    Public Sub txtOmitBeforeYearTest()
+    '''<summary>Test txtOmitBeforeYear</summary>
+    <TestMethod()> Public Sub txtOmitBeforeYearTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As TextBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As TextBox
@@ -652,11 +512,8 @@ Public Class atcSeasonYearsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for txtStartDay
-    '''</summary>
-    <TestMethod()> _
-    Public Sub txtStartDayTest()
+    '''<summary>Test txtStartDay</summary>
+    <TestMethod()> Public Sub txtStartDayTest()
         Dim target As atcSeasonYears = New atcSeasonYears() ' TODO: Initialize to an appropriate value
         Dim expected As TextBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As TextBox

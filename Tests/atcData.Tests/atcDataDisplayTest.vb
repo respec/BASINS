@@ -1,8 +1,5 @@
 ﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for atcDataDisplayTest and is intended
@@ -10,8 +7,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class atcDataDisplayTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -53,21 +48,14 @@ Public Class atcDataDisplayTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcDataDisplay Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcDataDisplayConstructorTest()
+    '''<summary>Test atcDataDisplay Constructor</summary>
+    <TestMethod()> Public Sub atcDataDisplayConstructorTest()
         Dim target As atcDataDisplay = New atcDataDisplay()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for Save
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SaveTest()
+    '''<summary>Test Save</summary>
+    <TestMethod()> Public Sub SaveTest()
         Dim target As atcDataDisplay = New atcDataDisplay() ' TODO: Initialize to an appropriate value
         Dim aDataGroup As atcDataGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim aFileName As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -76,11 +64,8 @@ Public Class atcDataDisplayTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Show
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ShowTest()
+    '''<summary>Test Show</summary>
+    <TestMethod()> Public Sub ShowTest()
         Dim target As atcDataDisplay = New atcDataDisplay() ' TODO: Initialize to an appropriate value
         Dim expected As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Object
@@ -89,11 +74,8 @@ Public Class atcDataDisplayTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Show
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ShowTest1()
+    '''<summary>Test Show</summary>
+    <TestMethod()> Public Sub ShowTest1()
         Dim target As atcDataDisplay = New atcDataDisplay() ' TODO: Initialize to an appropriate value
         Dim aDataGroup As atcDataGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As Object = Nothing ' TODO: Initialize to an appropriate value

@@ -1,8 +1,5 @@
 ﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcUtility
-
-
 
 '''<summary>
 '''This is a test class for atcTableDBF_clsFieldDescriptorTest and is intended
@@ -10,8 +7,6 @@ Imports atcUtility
 '''</summary>
 <TestClass()> _
 Public Class atcTableDBF_clsFieldDescriptorTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -53,22 +48,15 @@ Public Class atcTableDBF_clsFieldDescriptorTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for clsFieldDescriptor Constructor
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test clsFieldDescriptor Constructor</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub atcTableDBF_clsFieldDescriptorConstructorTest()
         Dim target As atcTableDBF_Accessor.clsFieldDescriptor = New atcTableDBF_Accessor.clsFieldDescriptor()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for ReadFromFile
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test ReadFromFile</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub ReadFromFileTest()
         Dim target As atcTableDBF_Accessor.clsFieldDescriptor = New atcTableDBF_Accessor.clsFieldDescriptor() ' TODO: Initialize to an appropriate value
         Dim inFile As Short = 0 ' TODO: Initialize to an appropriate value
@@ -76,11 +64,8 @@ Public Class atcTableDBF_clsFieldDescriptorTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ToString
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test ToString</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub ToStringTest()
         Dim target As atcTableDBF_Accessor.clsFieldDescriptor = New atcTableDBF_Accessor.clsFieldDescriptor() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -90,11 +75,8 @@ Public Class atcTableDBF_clsFieldDescriptorTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for WriteToFile
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test WriteToFile</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub WriteToFileTest()
         Dim target As atcTableDBF_Accessor.clsFieldDescriptor = New atcTableDBF_Accessor.clsFieldDescriptor() ' TODO: Initialize to an appropriate value
         Dim outFile As Short = 0 ' TODO: Initialize to an appropriate value

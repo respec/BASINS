@@ -1,12 +1,7 @@
 ﻿Imports System
-
 Imports System.Windows.Forms
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcUtility
-
-
 
 '''<summary>
 '''This is a test class for frmArgsTest and is intended
@@ -14,8 +9,6 @@ Imports atcUtility
 '''</summary>
 <TestClass()> _
 Public Class frmArgsTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -57,21 +50,14 @@ Public Class frmArgsTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for frmArgs Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub frmArgsConstructorTest()
+    '''<summary>Test frmArgs Constructor</summary>
+    <TestMethod()> Public Sub frmArgsConstructorTest()
         Dim target As frmArgs = New frmArgs()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for AddCheckbox
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test AddCheckbox</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub AddCheckboxTest()
         Dim target As frmArgs_Accessor = New frmArgs_Accessor() ' TODO: Initialize to an appropriate value
         Dim aChecked As Boolean = False ' TODO: Initialize to an appropriate value
@@ -83,11 +69,8 @@ Public Class frmArgsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for AddLabel
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test AddLabel</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub AddLabelTest()
         Dim target As frmArgs_Accessor = New frmArgs_Accessor() ' TODO: Initialize to an appropriate value
         Dim aText As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -99,11 +82,8 @@ Public Class frmArgsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for AddTextbox
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test AddTextbox</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub AddTextboxTest()
         Dim target As frmArgs_Accessor = New frmArgs_Accessor() ' TODO: Initialize to an appropriate value
         Dim aText As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -115,11 +95,8 @@ Public Class frmArgsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for AskUser
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AskUserTest()
+    '''<summary>Test AskUser</summary>
+    <TestMethod()> Public Sub AskUserTest()
         Dim target As frmArgs = New frmArgs() ' TODO: Initialize to an appropriate value
         Dim aTitle As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aArgs As atcCollection = Nothing ' TODO: Initialize to an appropriate value
@@ -132,11 +109,8 @@ Public Class frmArgsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Dispose
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test Dispose</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub DisposeTest()
         Dim target As frmArgs_Accessor = New frmArgs_Accessor() ' TODO: Initialize to an appropriate value
         Dim disposing As Boolean = False ' TODO: Initialize to an appropriate value
@@ -144,33 +118,24 @@ Public Class frmArgsTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for InitializeComponent
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test InitializeComponent</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub InitializeComponentTest()
         Dim target As frmArgs_Accessor = New frmArgs_Accessor() ' TODO: Initialize to an appropriate value
         target.InitializeComponent()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for __ENCAddToList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test __ENCAddToList</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub __ENCAddToListTest()
         Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
         frmArgs_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnCancel_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test btnCancel_Click</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub btnCancel_ClickTest()
         Dim target As frmArgs_Accessor = New frmArgs_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -179,11 +144,8 @@ Public Class frmArgsTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnOk_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test btnOk_Click</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub btnOk_ClickTest()
         Dim target As frmArgs_Accessor = New frmArgs_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -192,11 +154,8 @@ Public Class frmArgsTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnCancel
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnCancelTest()
+    '''<summary>Test btnCancel</summary>
+    <TestMethod()> Public Sub btnCancelTest()
         Dim target As frmArgs = New frmArgs() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -206,11 +165,8 @@ Public Class frmArgsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnOk
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnOkTest()
+    '''<summary>Test btnOk</summary>
+    <TestMethod()> Public Sub btnOkTest()
         Dim target As frmArgs = New frmArgs() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button

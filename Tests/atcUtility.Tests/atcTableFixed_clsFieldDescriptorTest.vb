@@ -1,8 +1,5 @@
 ﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcUtility
-
-
 
 '''<summary>
 '''This is a test class for atcTableFixed_clsFieldDescriptorTest and is intended
@@ -10,8 +7,6 @@ Imports atcUtility
 '''</summary>
 <TestClass()> _
 Public Class atcTableFixed_clsFieldDescriptorTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -53,12 +48,8 @@ Public Class atcTableFixed_clsFieldDescriptorTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for clsFieldDescriptor Constructor
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test clsFieldDescriptor Constructor</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub atcTableFixed_clsFieldDescriptorConstructorTest()
         Dim target As atcTableFixed_Accessor.clsFieldDescriptor = New atcTableFixed_Accessor.clsFieldDescriptor()
         Assert.Inconclusive("TODO: Implement code to verify target")

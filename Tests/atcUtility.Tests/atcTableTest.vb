@@ -1,14 +1,8 @@
 ﻿Imports System.Collections
-
 Imports System.Reflection
-
 Imports System
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcUtility
-
-
 
 '''<summary>
 '''This is a test class for atcTableTest and is intended
@@ -16,8 +10,6 @@ Imports atcUtility
 '''</summary>
 <TestClass()> _
 Public Class atcTableTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -59,38 +51,28 @@ Public Class atcTableTest
     '
 #End Region
 
-
     Friend Overridable Function CreateatcTable() As atcTable
         'TODO: Instantiate an appropriate concrete class.
         Dim target As atcTable = Nothing
         Return target
     End Function
 
-    '''<summary>
-    '''A test for Clear
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ClearTest()
+    '''<summary>Test Clear</summary>
+    <TestMethod()> Public Sub ClearTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         target.Clear()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ClearData
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ClearDataTest()
+    '''<summary>Test ClearData</summary>
+    <TestMethod()> Public Sub ClearDataTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         target.ClearData()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ComputeFieldLengths
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ComputeFieldLengthsTest()
+    '''<summary>Test ComputeFieldLengths</summary>
+    <TestMethod()> Public Sub ComputeFieldLengthsTest()
         Dim target As atcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim expected() As Integer = Nothing ' TODO: Initialize to an appropriate value
         Dim actual() As Integer
@@ -99,11 +81,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Cousin
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CousinTest()
+    '''<summary>Test Cousin</summary>
+    <TestMethod()> Public Sub CousinTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim expected As IatcTable = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As IatcTable
@@ -112,11 +91,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CreationCode
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CreationCodeTest()
+    '''<summary>Test CreationCode</summary>
+    <TestMethod()> Public Sub CreationCodeTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -125,11 +101,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CurrentRecordAsDelimitedString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CurrentRecordAsDelimitedStringTest()
+    '''<summary>Test CurrentRecordAsDelimitedString</summary>
+    <TestMethod()> Public Sub CurrentRecordAsDelimitedStringTest()
         Dim target As atcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim aDelimiter As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aQuote As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -140,11 +113,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for EOF
-    '''</summary>
-    <TestMethod()> _
-    Public Sub EOFTest()
+    '''<summary>Test EOF</summary>
+    <TestMethod()> Public Sub EOFTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
@@ -153,11 +123,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FieldNumber
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FieldNumberTest()
+    '''<summary>Test FieldNumber</summary>
+    <TestMethod()> Public Sub FieldNumberTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim aFieldName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -167,11 +134,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FindFirst
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FindFirstTest()
+    '''<summary>Test FindFirst</summary>
+    <TestMethod()> Public Sub FindFirstTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim aFieldNumber As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aFindValue As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -184,11 +148,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FindMatch
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FindMatchTest()
+    '''<summary>Test FindMatch</summary>
+    <TestMethod()> Public Sub FindMatchTest()
         Dim target As atcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim aFieldNum() As Integer = Nothing ' TODO: Initialize to an appropriate value
         Dim aOperation() As String = Nothing ' TODO: Initialize to an appropriate value
@@ -203,11 +164,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FindNext
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FindNextTest()
+    '''<summary>Test FindNext</summary>
+    <TestMethod()> Public Sub FindNextTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim aFieldNumber As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aFindValue As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -218,51 +176,36 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for MoveFirst
-    '''</summary>
-    <TestMethod()> _
-    Public Sub MoveFirstTest()
+    '''<summary>Test MoveFirst</summary>
+    <TestMethod()> Public Sub MoveFirstTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         target.MoveFirst()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for MoveLast
-    '''</summary>
-    <TestMethod()> _
-    Public Sub MoveLastTest()
+    '''<summary>Test MoveLast</summary>
+    <TestMethod()> Public Sub MoveLastTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         target.MoveLast()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for MoveNext
-    '''</summary>
-    <TestMethod()> _
-    Public Sub MoveNextTest()
+    '''<summary>Test MoveNext</summary>
+    <TestMethod()> Public Sub MoveNextTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         target.MoveNext()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for MovePrevious
-    '''</summary>
-    <TestMethod()> _
-    Public Sub MovePreviousTest()
+    '''<summary>Test MovePrevious</summary>
+    <TestMethod()> Public Sub MovePreviousTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         target.MovePrevious()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for OpenFile
-    '''</summary>
-    <TestMethod()> _
-    Public Sub OpenFileTest()
+    '''<summary>Test OpenFile</summary>
+    <TestMethod()> Public Sub OpenFileTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim aFileName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -272,11 +215,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for PopulateObject
-    '''</summary>
-    <TestMethod()> _
-    Public Sub PopulateObjectTest()
+    '''<summary>Test PopulateObject</summary>
+    <TestMethod()> Public Sub PopulateObjectTest()
         Dim target As atcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim aObject As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim aObjectExpected As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -286,11 +226,8 @@ Public Class atcTableTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for PopulateObjects
-    '''</summary>
-    <TestMethod()> _
-    Public Sub PopulateObjectsTest()
+    '''<summary>Test PopulateObjects</summary>
+    <TestMethod()> Public Sub PopulateObjectsTest()
         Dim target As atcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim aObjectType As Type = Nothing ' TODO: Initialize to an appropriate value
         Dim aFieldMap As atcCollection = Nothing ' TODO: Initialize to an appropriate value
@@ -303,11 +240,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Summary
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SummaryTest()
+    '''<summary>Test Summary</summary>
+    <TestMethod()> Public Sub SummaryTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim aFormat As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -317,11 +251,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SummaryFields
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SummaryFieldsTest()
+    '''<summary>Test SummaryFields</summary>
+    <TestMethod()> Public Sub SummaryFieldsTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim aFormat As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -331,11 +262,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SummaryFile
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SummaryFileTest()
+    '''<summary>Test SummaryFile</summary>
+    <TestMethod()> Public Sub SummaryFileTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim aFormat As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -345,11 +273,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for TrimValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TrimValueTest()
+    '''<summary>Test TrimValue</summary>
+    <TestMethod()> Public Sub TrimValueTest()
         Dim target As atcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim aValue As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aType As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -360,11 +285,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for WriteFile
-    '''</summary>
-    <TestMethod()> _
-    Public Sub WriteFileTest()
+    '''<summary>Test WriteFile</summary>
+    <TestMethod()> Public Sub WriteFileTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim aFileName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -374,11 +296,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CurrentRecord
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CurrentRecordTest()
+    '''<summary>Test CurrentRecord</summary>
+    <TestMethod()> Public Sub CurrentRecordTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -388,11 +307,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FieldLength
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FieldLengthTest()
+    '''<summary>Test FieldLength</summary>
+    <TestMethod()> Public Sub FieldLengthTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim aFieldNumber As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -403,11 +319,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FieldName
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FieldNameTest()
+    '''<summary>Test FieldName</summary>
+    <TestMethod()> Public Sub FieldNameTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim aFieldNumber As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -418,11 +331,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FieldType
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FieldTypeTest()
+    '''<summary>Test FieldType</summary>
+    <TestMethod()> Public Sub FieldTypeTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim aFieldNumber As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -433,11 +343,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FileName
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FileNameTest()
+    '''<summary>Test FileName</summary>
+    <TestMethod()> Public Sub FileNameTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -447,11 +354,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Header
-    '''</summary>
-    <TestMethod()> _
-    Public Sub HeaderTest()
+    '''<summary>Test Header</summary>
+    <TestMethod()> Public Sub HeaderTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim aHeaderRow As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -462,11 +366,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Header
-    '''</summary>
-    <TestMethod()> _
-    Public Sub HeaderTest1()
+    '''<summary>Test Header</summary>
+    <TestMethod()> Public Sub HeaderTest1()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim aHeaderRow As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -477,11 +378,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for NumFields
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NumFieldsTest()
+    '''<summary>Test NumFields</summary>
+    <TestMethod()> Public Sub NumFieldsTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -491,11 +389,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for NumHeaderRows
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NumHeaderRowsTest()
+    '''<summary>Test NumHeaderRows</summary>
+    <TestMethod()> Public Sub NumHeaderRowsTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -505,11 +400,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for NumRecords
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NumRecordsTest()
+    '''<summary>Test NumRecords</summary>
+    <TestMethod()> Public Sub NumRecordsTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -519,11 +411,8 @@ Public Class atcTableTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Value
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ValueTest()
+    '''<summary>Test Value</summary>
+    <TestMethod()> Public Sub ValueTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
         Dim aFieldNumber As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value

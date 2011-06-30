@@ -1,12 +1,7 @@
 ﻿Imports System.Collections
-
 Imports atcUtility
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for atcDataGroupTest and is intended
@@ -14,8 +9,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class atcDataGroupTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -57,41 +50,28 @@ Public Class atcDataGroupTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcDataGroup Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcDataGroupConstructorTest()
+    '''<summary>Test atcDataGroup Constructor</summary>
+    <TestMethod()> Public Sub atcDataGroupConstructorTest()
         Dim target As atcDataGroup = New atcDataGroup()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for atcDataGroup Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcDataGroupConstructorTest1()
+    '''<summary>Test atcDataGroup Constructor</summary>
+    <TestMethod()> Public Sub atcDataGroupConstructorTest1()
         Dim aDataSet As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcDataGroup = New atcDataGroup(aDataSet)
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for atcDataGroup Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcDataGroupConstructorTest2()
+    '''<summary>Test atcDataGroup Constructor</summary>
+    <TestMethod()> Public Sub atcDataGroupConstructorTest2()
         Dim aDataSets() As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcDataGroup = New atcDataGroup(aDataSets)
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for Add
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddTest()
+    '''<summary>Test Add</summary>
+    <TestMethod()> Public Sub AddTest()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim aKey As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim aDataSet As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
@@ -102,11 +82,8 @@ Public Class atcDataGroupTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Add
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddTest1()
+    '''<summary>Test Add</summary>
+    <TestMethod()> Public Sub AddTest1()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim aDataSet As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -116,33 +93,24 @@ Public Class atcDataGroupTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Add
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddTest2()
+    '''<summary>Test Add</summary>
+    <TestMethod()> Public Sub AddTest2()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim aAddThese As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         target.Add(aAddThese)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for AddRange
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddRangeTest()
+    '''<summary>Test AddRange</summary>
+    <TestMethod()> Public Sub AddRangeTest()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim aAddThese As IEnumerable = Nothing ' TODO: Initialize to an appropriate value
         target.AddRange(aAddThese)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for AddRange
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddRangeTest1()
+    '''<summary>Test AddRange</summary>
+    <TestMethod()> Public Sub AddRangeTest1()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim aKeys As IEnumerable = Nothing ' TODO: Initialize to an appropriate value
         Dim aValues As IEnumerable = Nothing ' TODO: Initialize to an appropriate value
@@ -150,32 +118,23 @@ Public Class atcDataGroupTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ChangeTo
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ChangeToTest()
+    '''<summary>Test ChangeTo</summary>
+    <TestMethod()> Public Sub ChangeToTest()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim aNewGroup As atcDataGroup = Nothing ' TODO: Initialize to an appropriate value
         target.ChangeTo(aNewGroup)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Clear
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ClearTest()
+    '''<summary>Test Clear</summary>
+    <TestMethod()> Public Sub ClearTest()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         target.Clear()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Clone
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CloneTest()
+    '''<summary>Test Clone</summary>
+    <TestMethod()> Public Sub CloneTest()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim expected As atcDataGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcDataGroup
@@ -184,11 +143,8 @@ Public Class atcDataGroupTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CommonAttributeValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CommonAttributeValueTest()
+    '''<summary>Test CommonAttributeValue</summary>
+    <TestMethod()> Public Sub CommonAttributeValueTest()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aMissingValue As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -199,21 +155,15 @@ Public Class atcDataGroupTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Dispose
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DisposeTest()
+    '''<summary>Test Dispose</summary>
+    <TestMethod()> Public Sub DisposeTest()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         target.Dispose()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for FindData
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FindDataTest()
+    '''<summary>Test FindData</summary>
+    <TestMethod()> Public Sub FindDataTest()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aValues As atcCollection = Nothing ' TODO: Initialize to an appropriate value
@@ -225,11 +175,8 @@ Public Class atcDataGroupTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FindData
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FindDataTest1()
+    '''<summary>Test FindData</summary>
+    <TestMethod()> Public Sub FindDataTest1()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aValue As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -241,11 +188,8 @@ Public Class atcDataGroupTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for IndexOfSerial
-    '''</summary>
-    <TestMethod()> _
-    Public Sub IndexOfSerialTest()
+    '''<summary>Test IndexOfSerial</summary>
+    <TestMethod()> Public Sub IndexOfSerialTest()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim aSerial As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -255,11 +199,8 @@ Public Class atcDataGroupTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Insert
-    '''</summary>
-    <TestMethod()> _
-    Public Sub InsertTest()
+    '''<summary>Test Insert</summary>
+    <TestMethod()> Public Sub InsertTest()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDataSet As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
@@ -267,11 +208,8 @@ Public Class atcDataGroupTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for RaiseAddedOne
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test RaiseAddedOne</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub RaiseAddedOneTest()
         Dim target As atcDataGroup_Accessor = New atcDataGroup_Accessor() ' TODO: Initialize to an appropriate value
         Dim aDataSet As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
@@ -279,11 +217,8 @@ Public Class atcDataGroupTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for RaiseRemovedOne
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test RaiseRemovedOne</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub RaiseRemovedOneTest()
         Dim target As atcDataGroup_Accessor = New atcDataGroup_Accessor() ' TODO: Initialize to an appropriate value
         Dim aDataSet As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
@@ -291,44 +226,32 @@ Public Class atcDataGroupTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Remove
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RemoveTest()
+    '''<summary>Test Remove</summary>
+    <TestMethod()> Public Sub RemoveTest()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim aRemoveThese As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         target.Remove(aRemoveThese)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Remove
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RemoveTest1()
+    '''<summary>Test Remove</summary>
+    <TestMethod()> Public Sub RemoveTest1()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim aDataSet As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
         target.Remove(aDataSet)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for RemoveAt
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RemoveAtTest()
+    '''<summary>Test RemoveAt</summary>
+    <TestMethod()> Public Sub RemoveAtTest()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
         target.RemoveAt(aIndex)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for RemoveRange
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RemoveRangeTest()
+    '''<summary>Test RemoveRange</summary>
+    <TestMethod()> Public Sub RemoveRangeTest()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aNumber As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -336,11 +259,8 @@ Public Class atcDataGroupTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for SortedAttributeValues
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SortedAttributeValuesTest()
+    '''<summary>Test SortedAttributeValues</summary>
+    <TestMethod()> Public Sub SortedAttributeValuesTest()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim aAttributeDefinition As atcAttributeDefinition = Nothing ' TODO: Initialize to an appropriate value
         Dim aMissingValue As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -351,11 +271,8 @@ Public Class atcDataGroupTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SortedAttributeValues
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SortedAttributeValuesTest1()
+    '''<summary>Test SortedAttributeValues</summary>
+    <TestMethod()> Public Sub SortedAttributeValuesTest1()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aMissingValue As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -366,11 +283,8 @@ Public Class atcDataGroupTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ToString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ToStringTest()
+    '''<summary>Test ToString</summary>
+    <TestMethod()> Public Sub ToStringTest()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -379,22 +293,16 @@ Public Class atcDataGroupTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for __ENCAddToList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test __ENCAddToList</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub __ENCAddToListTest()
         Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
         atcDataGroup_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Item
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ItemTest()
+    '''<summary>Test Item</summary>
+    <TestMethod()> Public Sub ItemTest()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
@@ -405,11 +313,8 @@ Public Class atcDataGroupTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ItemByIndex
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ItemByIndexTest()
+    '''<summary>Test ItemByIndex</summary>
+    <TestMethod()> Public Sub ItemByIndexTest()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
@@ -420,11 +325,8 @@ Public Class atcDataGroupTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ItemByKey
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ItemByKeyTest()
+    '''<summary>Test ItemByKey</summary>
+    <TestMethod()> Public Sub ItemByKeyTest()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim aKey As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
@@ -435,11 +337,8 @@ Public Class atcDataGroupTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SelectedData
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SelectedDataTest()
+    '''<summary>Test SelectedData</summary>
+    <TestMethod()> Public Sub SelectedDataTest()
         Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
         Dim expected As atcDataGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcDataGroup

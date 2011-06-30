@@ -1,12 +1,7 @@
 ﻿Imports System
-
 Imports atcData
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcWDM
-
-
 
 '''<summary>
 '''This is a test class for atcDataSourceWDMTest and is intended
@@ -14,8 +9,6 @@ Imports atcWDM
 '''</summary>
 <TestClass()> _
 Public Class atcDataSourceWDMTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -27,7 +20,7 @@ Public Class atcDataSourceWDMTest
             Return testContextInstance
         End Get
         Set(ByVal value As TestContext)
-            testContextInstance = Value
+            testContextInstance = value
         End Set
     End Property
 
@@ -57,21 +50,14 @@ Public Class atcDataSourceWDMTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcDataSourceWDM Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcDataSourceWDMConstructorTest()
+    '''<summary>Test atcDataSourceWDM Constructor</summary>
+    <TestMethod()> Public Sub atcDataSourceWDMConstructorTest()
         Dim target As atcDataSourceWDM = New atcDataSourceWDM()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for AddDataSet
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddDataSetTest()
+    '''<summary>Test AddDataSet</summary>
+    <TestMethod()> Public Sub AddDataSetTest()
         Dim target As atcDataSourceWDM = New atcDataSourceWDM() ' TODO: Initialize to an appropriate value
         Dim aDataSet As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
         Dim aExistAction As atcDataSource.EnumExistAction = New atcDataSource.EnumExistAction() ' TODO: Initialize to an appropriate value
@@ -82,11 +68,8 @@ Public Class atcDataSourceWDMTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for AddDatasets
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddDatasetsTest()
+    '''<summary>Test AddDatasets</summary>
+    <TestMethod()> Public Sub AddDatasetsTest()
         Dim target As atcDataSourceWDM = New atcDataSourceWDM() ' TODO: Initialize to an appropriate value
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -96,11 +79,8 @@ Public Class atcDataSourceWDMTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for AttrStored
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test AttrStored</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub AttrStoredTest()
         Dim target As atcDataSourceWDM_Accessor = New atcDataSourceWDM_Accessor() ' TODO: Initialize to an appropriate value
         Dim aSaind As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -111,11 +91,8 @@ Public Class atcDataSourceWDMTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for AttrVal2String
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test AttrVal2String</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub AttrVal2StringTest()
         Dim target As atcDataSourceWDM_Accessor = New atcDataSourceWDM_Accessor() ' TODO: Initialize to an appropriate value
         Dim aSaInd As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -127,21 +104,15 @@ Public Class atcDataSourceWDMTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Clear
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ClearTest()
+    '''<summary>Test Clear</summary>
+    <TestMethod()> Public Sub ClearTest()
         Dim target As atcDataSourceWDM = New atcDataSourceWDM() ' TODO: Initialize to an appropriate value
         target.Clear()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for DateToyyyyMMddHHmmss
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test DateToyyyyMMddHHmmss</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub DateToyyyyMMddHHmmssTest()
         Dim target As atcDataSourceWDM_Accessor = New atcDataSourceWDM_Accessor() ' TODO: Initialize to an appropriate value
         Dim aDate As DateTime = New DateTime() ' TODO: Initialize to an appropriate value
@@ -152,11 +123,8 @@ Public Class atcDataSourceWDMTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DsnBld
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test DsnBld</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub DsnBldTest()
         Dim target As atcDataSourceWDM_Accessor = New atcDataSourceWDM_Accessor() ' TODO: Initialize to an appropriate value
         Dim aFileUnit As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -168,11 +136,8 @@ Public Class atcDataSourceWDMTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DsnReadGeneral
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test DsnReadGeneral</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub DsnReadGeneralTest()
         Dim target As atcDataSourceWDM_Accessor = New atcDataSourceWDM_Accessor() ' TODO: Initialize to an appropriate value
         Dim aFileUnit As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -181,11 +146,8 @@ Public Class atcDataSourceWDMTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for DsnWriteAttribute
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test DsnWriteAttribute</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub DsnWriteAttributeTest()
         Dim target As atcDataSourceWDM_Accessor = New atcDataSourceWDM_Accessor() ' TODO: Initialize to an appropriate value
         Dim aFileUnit As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -199,11 +161,8 @@ Public Class atcDataSourceWDMTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DsnWriteAttributes
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test DsnWriteAttributes</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub DsnWriteAttributesTest()
         Dim target As atcDataSourceWDM_Accessor = New atcDataSourceWDM_Accessor() ' TODO: Initialize to an appropriate value
         Dim aFileUnit As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -215,22 +174,16 @@ Public Class atcDataSourceWDMTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Finalize
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test Finalize</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub FinalizeTest()
         Dim target As atcDataSourceWDM_Accessor = New atcDataSourceWDM_Accessor() ' TODO: Initialize to an appropriate value
         target.Finalize()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for MemUsage
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test MemUsage</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub MemUsageTest()
         Dim target As atcDataSourceWDM_Accessor = New atcDataSourceWDM_Accessor() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -240,11 +193,8 @@ Public Class atcDataSourceWDMTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Open
-    '''</summary>
-    <TestMethod()> _
-    Public Sub OpenTest()
+    '''<summary>Test Open</summary>
+    <TestMethod()> Public Sub OpenTest()
         Dim target As atcDataSourceWDM = New atcDataSourceWDM() ' TODO: Initialize to an appropriate value
         Dim aFileName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aAttributes As atcDataAttributes = Nothing ' TODO: Initialize to an appropriate value
@@ -255,22 +205,16 @@ Public Class atcDataSourceWDMTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ReadData
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ReadDataTest()
+    '''<summary>Test ReadData</summary>
+    <TestMethod()> Public Sub ReadDataTest()
         Dim target As atcDataSourceWDM = New atcDataSourceWDM() ' TODO: Initialize to an appropriate value
         Dim aReadMe As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
         target.ReadData(aReadMe)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Refresh
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test Refresh</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub RefreshTest()
         Dim target As atcDataSourceWDM_Accessor = New atcDataSourceWDM_Accessor() ' TODO: Initialize to an appropriate value
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -278,11 +222,8 @@ Public Class atcDataSourceWDMTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for RefreshDsn
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test RefreshDsn</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub RefreshDsnTest()
         Dim target As atcDataSourceWDM_Accessor = New atcDataSourceWDM_Accessor() ' TODO: Initialize to an appropriate value
         Dim aFileUnit As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -291,11 +232,8 @@ Public Class atcDataSourceWDMTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for RemoveDataset
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RemoveDatasetTest()
+    '''<summary>Test RemoveDataset</summary>
+    <TestMethod()> Public Sub RemoveDatasetTest()
         Dim target As atcDataSourceWDM = New atcDataSourceWDM() ' TODO: Initialize to an appropriate value
         Dim aDataSet As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -305,11 +243,8 @@ Public Class atcDataSourceWDMTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Save
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SaveTest()
+    '''<summary>Test Save</summary>
+    <TestMethod()> Public Sub SaveTest()
         Dim target As atcDataSourceWDM = New atcDataSourceWDM() ' TODO: Initialize to an appropriate value
         Dim SaveFileName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim ExistAction As atcDataSource.EnumExistAction = New atcDataSource.EnumExistAction() ' TODO: Initialize to an appropriate value
@@ -320,21 +255,15 @@ Public Class atcDataSourceWDMTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for View
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ViewTest()
+    '''<summary>Test View</summary>
+    <TestMethod()> Public Sub ViewTest()
         Dim target As atcDataSourceWDM = New atcDataSourceWDM() ' TODO: Initialize to an appropriate value
         target.View()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for WriteAttribute
-    '''</summary>
-    <TestMethod()> _
-    Public Sub WriteAttributeTest()
+    '''<summary>Test WriteAttribute</summary>
+    <TestMethod()> Public Sub WriteAttributeTest()
         Dim target As atcDataSourceWDM = New atcDataSourceWDM() ' TODO: Initialize to an appropriate value
         Dim aDataSet As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
         Dim aAttribute As atcDefinedValue = Nothing ' TODO: Initialize to an appropriate value
@@ -346,11 +275,8 @@ Public Class atcDataSourceWDMTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for WriteAttributes
-    '''</summary>
-    <TestMethod()> _
-    Public Sub WriteAttributesTest()
+    '''<summary>Test WriteAttributes</summary>
+    <TestMethod()> Public Sub WriteAttributesTest()
         Dim target As atcDataSourceWDM = New atcDataSourceWDM() ' TODO: Initialize to an appropriate value
         Dim aDataSet As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -360,11 +286,8 @@ Public Class atcDataSourceWDMTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for findNextDsn
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test findNextDsn</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub findNextDsnTest()
         Dim target As atcDataSourceWDM_Accessor = New atcDataSourceWDM_Accessor() ' TODO: Initialize to an appropriate value
         Dim aDsn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -375,66 +298,48 @@ Public Class atcDataSourceWDMTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CanOpen
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CanOpenTest()
+    '''<summary>Test CanOpen</summary>
+    <TestMethod()> Public Sub CanOpenTest()
         Dim target As atcDataSourceWDM = New atcDataSourceWDM() ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
         actual = target.CanOpen
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CanRemoveDataset
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CanRemoveDatasetTest()
+    '''<summary>Test CanRemoveDataset</summary>
+    <TestMethod()> Public Sub CanRemoveDatasetTest()
         Dim target As atcDataSourceWDM = New atcDataSourceWDM() ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
         actual = target.CanRemoveDataset
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CanSave
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CanSaveTest()
+    '''<summary>Test CanSave</summary>
+    <TestMethod()> Public Sub CanSaveTest()
         Dim target As atcDataSourceWDM = New atcDataSourceWDM() ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
         actual = target.CanSave
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Category
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CategoryTest()
+    '''<summary>Test Category</summary>
+    <TestMethod()> Public Sub CategoryTest()
         Dim target As atcDataSourceWDM = New atcDataSourceWDM() ' TODO: Initialize to an appropriate value
         Dim actual As String
         actual = target.Category
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Description
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DescriptionTest()
+    '''<summary>Test Description</summary>
+    <TestMethod()> Public Sub DescriptionTest()
         Dim target As atcDataSourceWDM = New atcDataSourceWDM() ' TODO: Initialize to an appropriate value
         Dim actual As String
         actual = target.Description
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Name
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NameTest()
+    '''<summary>Test Name</summary>
+    <TestMethod()> Public Sub NameTest()
         Dim target As atcDataSourceWDM = New atcDataSourceWDM() ' TODO: Initialize to an appropriate value
         Dim actual As String
         actual = target.Name

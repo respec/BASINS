@@ -1,16 +1,9 @@
 ﻿Imports System.IO
-
 Imports System.Collections
-
 Imports System.Text
-
 Imports System.Collections.Specialized
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcUtility
-
-
 
 '''<summary>
 '''This is a test class for modFileTest and is intended
@@ -18,8 +11,6 @@ Imports atcUtility
 '''</summary>
 <TestClass()> _
 Public Class modFileTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -61,12 +52,8 @@ Public Class modFileTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for AbsolutePath
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AbsolutePathTest()
+    '''<summary>Test AbsolutePath</summary>
+    <TestMethod()> Public Sub AbsolutePathTest()
         Dim aFileName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aStartPath As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -76,11 +63,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for AddFilesInDir
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddFilesInDirTest()
+    '''<summary>Test AddFilesInDir</summary>
+    <TestMethod()> Public Sub AddFilesInDirTest()
         Dim aFilenames As NameValueCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim aFilenamesExpected As NameValueCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim aDirName As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -92,11 +76,8 @@ Public Class modFileTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for AppendFileString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AppendFileStringTest()
+    '''<summary>Test AppendFileString</summary>
+    <TestMethod()> Public Sub AppendFileStringTest()
         Dim filename As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim appendString As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -106,11 +87,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ChDriveDir
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ChDriveDirTest()
+    '''<summary>Test ChDriveDir</summary>
+    <TestMethod()> Public Sub ChDriveDirTest()
         Dim aPath As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
@@ -119,11 +97,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ConvertLongPathToShort
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ConvertLongPathToShortTest()
+    '''<summary>Test ConvertLongPathToShort</summary>
+    <TestMethod()> Public Sub ConvertLongPathToShortTest()
         Dim aLongPathName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -132,11 +107,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FileExt
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FileExtTest()
+    '''<summary>Test FileExt</summary>
+    <TestMethod()> Public Sub FileExtTest()
         Dim aStr As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -145,22 +117,16 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FileToBase64
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FileToBase64Test()
+    '''<summary>Test FileToBase64</summary>
+    <TestMethod()> Public Sub FileToBase64Test()
         Dim InputFilePath As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim OutputFilePath As String = String.Empty ' TODO: Initialize to an appropriate value
         modFile.FileToBase64(InputFilePath, OutputFilePath)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for FilenameNoPath
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FilenameNoPathTest()
+    '''<summary>Test FilenameNoPath</summary>
+    <TestMethod()> Public Sub FilenameNoPathTest()
         Dim aStr As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -169,11 +135,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FilenameSetExt
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FilenameSetExtTest()
+    '''<summary>Test FilenameSetExt</summary>
+    <TestMethod()> Public Sub FilenameSetExtTest()
         Dim aStr As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aExt As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -183,11 +146,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FindFile
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FindFileTest()
+    '''<summary>Test FindFile</summary>
+    <TestMethod()> Public Sub FindFileTest()
         Dim aFileDialogTitle As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aDefaultFileName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aDefaultExt As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -204,11 +164,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FindFileFilter
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FindFileFilterTest()
+    '''<summary>Test FindFileFilter</summary>
+    <TestMethod()> Public Sub FindFileFilterTest()
         Dim FileFilters As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim FileFilterIndex As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -218,11 +175,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FindFileFilterIndex
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FindFileFilterIndexTest()
+    '''<summary>Test FindFileFilterIndex</summary>
+    <TestMethod()> Public Sub FindFileFilterIndexTest()
         Dim aAllFilters As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aFindFilter As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -232,11 +186,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FindRecursive
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test FindRecursive</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub FindRecursiveTest()
         Dim aFilename As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aStartDirs() As String = Nothing ' TODO: Initialize to an appropriate value
@@ -247,11 +198,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetMaxValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetMaxValueTest()
+    '''<summary>Test GetMaxValue</summary>
+    <TestMethod()> Public Sub GetMaxValueTest()
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim actual As Double
         actual = modFile.GetMaxValue
@@ -259,11 +207,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetMaxValueInternal
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test GetMaxValueInternal</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub GetMaxValueInternalTest()
         Dim aMaxValue As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -273,11 +218,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetMinValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetMinValueTest()
+    '''<summary>Test GetMinValue</summary>
+    <TestMethod()> Public Sub GetMinValueTest()
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim actual As Double
         actual = modFile.GetMinValue
@@ -285,11 +227,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetMinValueInternal
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test GetMinValueInternal</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub GetMinValueInternalTest()
         Dim aMinValue As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -299,11 +238,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetNaN
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetNaNTest()
+    '''<summary>Test GetNaN</summary>
+    <TestMethod()> Public Sub GetNaNTest()
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim actual As Double
         actual = modFile.GetNaN
@@ -311,11 +247,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetNaNInternal
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test GetNaNInternal</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub GetNaNInternalTest()
         Dim aNaN As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -325,11 +258,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetNewFileName
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetNewFileNameTest()
+    '''<summary>Test GetNewFileName</summary>
+    <TestMethod()> Public Sub GetNewFileNameTest()
         Dim aBaseName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aExtension As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -339,11 +269,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetShortPathName
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetShortPathNameTest()
+    '''<summary>Test GetShortPathName</summary>
+    <TestMethod()> Public Sub GetShortPathNameTest()
         Dim lpszLongPath As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim lpszShortPath As StringBuilder = Nothing ' TODO: Initialize to an appropriate value
         Dim cchBuffer As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -354,11 +281,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetTemporaryFileName
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetTemporaryFileNameTest()
+    '''<summary>Test GetTemporaryFileName</summary>
+    <TestMethod()> Public Sub GetTemporaryFileNameTest()
         Dim aBaseName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aExtension As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -368,11 +292,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for LinesInFile
-    '''</summary>
-    <TestMethod()> _
-    Public Sub LinesInFileTest()
+    '''<summary>Test LinesInFile</summary>
+    <TestMethod()> Public Sub LinesInFileTest()
         Dim aFileName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As IEnumerable = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As IEnumerable
@@ -381,11 +302,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for LinesInFile
-    '''</summary>
-    <TestMethod()> _
-    Public Sub LinesInFileTest1()
+    '''<summary>Test LinesInFile</summary>
+    <TestMethod()> Public Sub LinesInFileTest1()
         Dim aFileReader As BinaryReader = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As IEnumerable = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As IEnumerable
@@ -394,11 +312,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for LinesInFileReadLine
-    '''</summary>
-    <TestMethod()> _
-    Public Sub LinesInFileReadLineTest()
+    '''<summary>Test LinesInFileReadLine</summary>
+    <TestMethod()> Public Sub LinesInFileReadLineTest()
         Dim aFileReader As StreamReader = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As IEnumerable = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As IEnumerable
@@ -407,11 +322,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for NewTempDir
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NewTempDirTest()
+    '''<summary>Test NewTempDir</summary>
+    <TestMethod()> Public Sub NewTempDirTest()
         Dim aBaseName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -420,11 +332,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for NextLine
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NextLineTest()
+    '''<summary>Test NextLine</summary>
+    <TestMethod()> Public Sub NextLineTest()
         Dim aReader As BinaryReader = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -433,22 +342,16 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for OpenFile
-    '''</summary>
-    <TestMethod()> _
-    Public Sub OpenFileTest()
+    '''<summary>Test OpenFile</summary>
+    <TestMethod()> Public Sub OpenFileTest()
         Dim FileOrURL As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim Wait As Boolean = False ' TODO: Initialize to an appropriate value
         modFile.OpenFile(FileOrURL, Wait)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ReadBigInt
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ReadBigIntTest()
+    '''<summary>Test ReadBigInt</summary>
+    <TestMethod()> Public Sub ReadBigIntTest()
         Dim InFile As Short = 0 ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -457,11 +360,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for RelativeFilename
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RelativeFilenameTest()
+    '''<summary>Test RelativeFilename</summary>
+    <TestMethod()> Public Sub RelativeFilenameTest()
         Dim filename As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim StartPath As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -471,11 +371,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ReplaceStringToFile
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ReplaceStringToFileTest()
+    '''<summary>Test ReplaceStringToFile</summary>
+    <TestMethod()> Public Sub ReplaceStringToFileTest()
         Dim Source As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim Find As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim ReplaceWith As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -484,11 +381,8 @@ Public Class modFileTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ReportFilesInDir
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ReportFilesInDirTest()
+    '''<summary>Test ReportFilesInDir</summary>
+    <TestMethod()> Public Sub ReportFilesInDirTest()
         Dim aDirName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aSubdirs As Boolean = False ' TODO: Initialize to an appropriate value
         Dim aFileFilter As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -500,11 +394,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SafeFilename
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SafeFilenameTest()
+    '''<summary>Test SafeFilename</summary>
+    <TestMethod()> Public Sub SafeFilenameTest()
         Dim aStr As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aReplaceWith As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -514,43 +405,31 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SaveFileBytes
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SaveFileBytesTest()
+    '''<summary>Test SaveFileBytes</summary>
+    <TestMethod()> Public Sub SaveFileBytesTest()
         Dim filename As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim FileContents() As Byte = Nothing ' TODO: Initialize to an appropriate value
         modFile.SaveFileBytes(filename, FileContents)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for SaveFileString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SaveFileStringTest()
+    '''<summary>Test SaveFileString</summary>
+    <TestMethod()> Public Sub SaveFileStringTest()
         Dim filename As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim FileContents As String = String.Empty ' TODO: Initialize to an appropriate value
         modFile.SaveFileString(filename, FileContents)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ShowHelp
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ShowHelpTest()
+    '''<summary>Test ShowHelp</summary>
+    <TestMethod()> Public Sub ShowHelpTest()
         Dim aHelpTopic As String = String.Empty ' TODO: Initialize to an appropriate value
         modFile.ShowHelp(aHelpTopic)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for SwapBytes
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SwapBytesTest()
+    '''<summary>Test SwapBytes</summary>
+    <TestMethod()> Public Sub SwapBytesTest()
         Dim n As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -559,11 +438,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for TryCopyGroup
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TryCopyGroupTest()
+    '''<summary>Test TryCopyGroup</summary>
+    <TestMethod()> Public Sub TryCopyGroupTest()
         Dim aBaseFilename As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aDestinationPath As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aExtensions() As String = Nothing ' TODO: Initialize to an appropriate value
@@ -575,11 +451,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for TryCopyShapefile
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TryCopyShapefileTest()
+    '''<summary>Test TryCopyShapefile</summary>
+    <TestMethod()> Public Sub TryCopyShapefileTest()
         Dim aShapeFilename As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aDestinationPath As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -589,11 +462,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for TryDeleteGroup
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TryDeleteGroupTest()
+    '''<summary>Test TryDeleteGroup</summary>
+    <TestMethod()> Public Sub TryDeleteGroupTest()
         Dim aBaseFilename As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aExtensions() As String = Nothing ' TODO: Initialize to an appropriate value
         Dim aVerbose As Boolean = False ' TODO: Initialize to an appropriate value
@@ -604,11 +474,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for TryDeleteShapefile
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TryDeleteShapefileTest()
+    '''<summary>Test TryDeleteShapefile</summary>
+    <TestMethod()> Public Sub TryDeleteShapefileTest()
         Dim aShapeFilename As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
@@ -617,11 +484,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for TryMove
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TryMoveTest()
+    '''<summary>Test TryMove</summary>
+    <TestMethod()> Public Sub TryMoveTest()
         Dim aFromFilename As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aToPath As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -631,11 +495,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for TryMove
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TryMoveTest1()
+    '''<summary>Test TryMove</summary>
+    <TestMethod()> Public Sub TryMoveTest1()
         Dim aFromFilename As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aToPath As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aVerbose As Boolean = False ' TODO: Initialize to an appropriate value
@@ -646,11 +507,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for TryMoveGroup
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TryMoveGroupTest()
+    '''<summary>Test TryMoveGroup</summary>
+    <TestMethod()> Public Sub TryMoveGroupTest()
         Dim aBaseFilename As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aDestinationPath As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aExtensions() As String = Nothing ' TODO: Initialize to an appropriate value
@@ -662,11 +520,8 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for TryMoveShapefile
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TryMoveShapefileTest()
+    '''<summary>Test TryMoveShapefile</summary>
+    <TestMethod()> Public Sub TryMoveShapefileTest()
         Dim aShapeFilename As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aDestinationPath As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -676,22 +531,16 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for WriteBigInt
-    '''</summary>
-    <TestMethod()> _
-    Public Sub WriteBigIntTest()
+    '''<summary>Test WriteBigInt</summary>
+    <TestMethod()> Public Sub WriteBigIntTest()
         Dim OutFile As Short = 0 ' TODO: Initialize to an appropriate value
         Dim Value As Integer = 0 ' TODO: Initialize to an appropriate value
         modFile.WriteBigInt(OutFile, Value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for _controlfp
-    '''</summary>
-    <TestMethod()> _
-    Public Sub _controlfpTest()
+    '''<summary>Test _controlfp</summary>
+    <TestMethod()> Public Sub _controlfpTest()
         Dim newControl As UInteger = 0 ' TODO: Initialize to an appropriate value
         Dim mask As UInteger = 0 ' TODO: Initialize to an appropriate value
         Dim expected As UInteger = 0 ' TODO: Initialize to an appropriate value
@@ -701,20 +550,14 @@ Public Class modFileTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for _fpreset
-    '''</summary>
-    <TestMethod()> _
-    Public Sub _fpresetTest()
+    '''<summary>Test _fpreset</summary>
+    <TestMethod()> Public Sub _fpresetTest()
         modFile._fpreset()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for _statusfp
-    '''</summary>
-    <TestMethod()> _
-    Public Sub _statusfpTest()
+    '''<summary>Test _statusfp</summary>
+    <TestMethod()> Public Sub _statusfpTest()
         Dim expected As UInteger = 0 ' TODO: Initialize to an appropriate value
         Dim actual As UInteger
         actual = modFile._statusfp

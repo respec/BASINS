@@ -1,10 +1,6 @@
 ﻿Imports atcUtility
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcWDM
-
-
 
 '''<summary>
 '''This is a test class for atcMsgWDMTest and is intended
@@ -12,8 +8,6 @@ Imports atcWDM
 '''</summary>
 <TestClass()> _
 Public Class atcMsgWDMTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -55,21 +49,14 @@ Public Class atcMsgWDMTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcMsgWDM Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcMsgWDMConstructorTest()
+    '''<summary>Test atcMsgWDM Constructor</summary>
+    <TestMethod()> Public Sub atcMsgWDMConstructorTest()
         Dim target As atcMsgWDM = New atcMsgWDM()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for MsgHandle
-    '''</summary>
-    <TestMethod()> _
-    Public Sub MsgHandleTest()
+    '''<summary>Test MsgHandle</summary>
+    <TestMethod()> Public Sub MsgHandleTest()
         Dim target As atcMsgWDM = New atcMsgWDM() ' TODO: Initialize to an appropriate value
         Dim expected As atcWdmHandle = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcWdmHandle
@@ -78,11 +65,8 @@ Public Class atcMsgWDMTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Attributes
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AttributesTest()
+    '''<summary>Test Attributes</summary>
+    <TestMethod()> Public Sub AttributesTest()
         Dim target As atcMsgWDM = New atcMsgWDM() ' TODO: Initialize to an appropriate value
         Dim actual As atcCollection
         actual = target.Attributes

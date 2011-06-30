@@ -1,8 +1,5 @@
 ﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcUtility
-
-
 
 '''<summary>
 '''This is a test class for PointLocationTest and is intended
@@ -10,8 +7,6 @@ Imports atcUtility
 '''</summary>
 <TestClass()> _
 Public Class PointLocationTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -53,18 +48,14 @@ Public Class PointLocationTest
     '
 #End Region
 
-
     Friend Overridable Function CreatePointLocation() As PointLocation
         'TODO: Instantiate an appropriate concrete class.
         Dim target As PointLocation = Nothing
         Return target
     End Function
 
-    '''<summary>
-    '''A test for Description
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DescriptionTest()
+    '''<summary>Test Description</summary>
+    <TestMethod()> Public Sub DescriptionTest()
         Dim target As PointLocation = CreatePointLocation() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -73,11 +64,8 @@ Public Class PointLocationTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Key
-    '''</summary>
-    <TestMethod()> _
-    Public Sub KeyTest()
+    '''<summary>Test Key</summary>
+    <TestMethod()> Public Sub KeyTest()
         Dim target As PointLocation = CreatePointLocation() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -86,11 +74,8 @@ Public Class PointLocationTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ToString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ToStringTest()
+    '''<summary>Test ToString</summary>
+    <TestMethod()> Public Sub ToStringTest()
         Dim target As PointLocation = CreatePointLocation() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String

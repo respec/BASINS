@@ -1,14 +1,8 @@
 ﻿Imports System.Drawing
-
 Imports System.Windows.Forms
-
 Imports System
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcControls
-
-
 
 '''<summary>
 '''This is a test class for atcTextTest and is intended
@@ -16,8 +10,6 @@ Imports atcControls
 '''</summary>
 <TestClass()> _
 Public Class atcTextTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -59,21 +51,14 @@ Public Class atcTextTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcText Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcTextConstructorTest()
+    '''<summary>Test atcText Constructor</summary>
+    <TestMethod()> Public Sub atcTextConstructorTest()
         Dim target As atcText = New atcText()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for ATCoTypeString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ATCoTypeStringTest()
+    '''<summary>Test ATCoTypeString</summary>
+    <TestMethod()> Public Sub ATCoTypeStringTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim DataType As atcText.ATCoDataType = New atcText.ATCoDataType() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -83,11 +68,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for AboveLimit
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test AboveLimit</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub AboveLimitTest()
         Dim target As atcText_Accessor = New atcText_Accessor() ' TODO: Initialize to an appropriate value
         Dim testVal As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -99,11 +81,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for BelowLimit
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test BelowLimit</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub BelowLimitTest()
         Dim target As atcText_Accessor = New atcText_Accessor() ' TODO: Initialize to an appropriate value
         Dim testVal As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -115,11 +94,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Dispose
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test Dispose</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub DisposeTest()
         Dim target As atcText_Accessor = New atcText_Accessor() ' TODO: Initialize to an appropriate value
         Dim disposing As Boolean = False ' TODO: Initialize to an appropriate value
@@ -127,11 +103,8 @@ Public Class atcTextTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for FormatValue
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test FormatValue</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub FormatValueTest()
         Dim target As atcText_Accessor = New atcText_Accessor() ' TODO: Initialize to an appropriate value
         Dim Val As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -142,98 +115,71 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for InitializeComponent
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test InitializeComponent</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub InitializeComponentTest()
         Dim target As atcText_Accessor = New atcText_Accessor() ' TODO: Initialize to an appropriate value
         target.InitializeComponent()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for SetColorFromDialog
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test SetColorFromDialog</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub SetColorFromDialogTest()
         Dim target As atcText_Accessor = New atcText_Accessor() ' TODO: Initialize to an appropriate value
         target.SetColorFromDialog()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for SetToolTip
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test SetToolTip</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub SetToolTipTest()
         Dim target As atcText_Accessor = New atcText_Accessor() ' TODO: Initialize to an appropriate value
         target.SetToolTip()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ShowRange
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ShowRangeTest()
+    '''<summary>Test ShowRange</summary>
+    <TestMethod()> Public Sub ShowRangeTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         target.ShowRange()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for UserControl_EnterFocus
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test UserControl_EnterFocus</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub UserControl_EnterFocusTest()
         Dim target As atcText_Accessor = New atcText_Accessor() ' TODO: Initialize to an appropriate value
         target.UserControl_EnterFocus()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for UserControl_InitProperties
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test UserControl_InitProperties</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub UserControl_InitPropertiesTest()
         Dim target As atcText_Accessor = New atcText_Accessor() ' TODO: Initialize to an appropriate value
         target.UserControl_InitProperties()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for UserControl_Initialize
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test UserControl_Initialize</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub UserControl_InitializeTest()
         Dim target As atcText_Accessor = New atcText_Accessor() ' TODO: Initialize to an appropriate value
         target.UserControl_Initialize()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for UserControl_Resize
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test UserControl_Resize</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub UserControl_ResizeTest()
         Dim target As atcText_Accessor = New atcText_Accessor() ' TODO: Initialize to an appropriate value
         target.UserControl_Resize()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Valid
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test Valid</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub ValidTest()
         Dim target As atcText_Accessor = New atcText_Accessor() ' TODO: Initialize to an appropriate value
         Dim aValue As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -244,22 +190,16 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for __ENCAddToList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test __ENCAddToList</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub __ENCAddToListTest()
         Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
         atcText_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for txtBox_GotFocus
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test txtBox_GotFocus</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub txtBox_GotFocusTest()
         Dim target As atcText_Accessor = New atcText_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -268,11 +208,8 @@ Public Class atcTextTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for txtBox_KeyDown
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test txtBox_KeyDown</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub txtBox_KeyDownTest()
         Dim target As atcText_Accessor = New atcText_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -281,11 +218,8 @@ Public Class atcTextTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for txtBox_LostFocus
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test txtBox_LostFocus</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub txtBox_LostFocusTest()
         Dim target As atcText_Accessor = New atcText_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -294,11 +228,8 @@ Public Class atcTextTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for txtBox_MouseDown
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test txtBox_MouseDown</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub txtBox_MouseDownTest()
         Dim target As atcText_Accessor = New atcText_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -307,11 +238,8 @@ Public Class atcTextTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for txtBox_TextChanged
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test txtBox_TextChanged</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub txtBox_TextChangedTest()
         Dim target As atcText_Accessor = New atcText_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -320,11 +248,8 @@ Public Class atcTextTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Alignment
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AlignmentTest()
+    '''<summary>Test Alignment</summary>
+    <TestMethod()> Public Sub AlignmentTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As HorizontalAlignment = New HorizontalAlignment() ' TODO: Initialize to an appropriate value
         Dim actual As HorizontalAlignment
@@ -334,11 +259,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DataType
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DataTypeTest()
+    '''<summary>Test DataType</summary>
+    <TestMethod()> Public Sub DataTypeTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As atcText.ATCoDataType = New atcText.ATCoDataType() ' TODO: Initialize to an appropriate value
         Dim actual As atcText.ATCoDataType
@@ -348,11 +270,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DefaultValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DefaultValueTest()
+    '''<summary>Test DefaultValue</summary>
+    <TestMethod()> Public Sub DefaultValueTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -362,11 +281,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Enabled
-    '''</summary>
-    <TestMethod()> _
-    Public Sub EnabledTest()
+    '''<summary>Test Enabled</summary>
+    <TestMethod()> Public Sub EnabledTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
@@ -376,11 +292,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ForeColor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ForeColorTest()
+    '''<summary>Test ForeColor</summary>
+    <TestMethod()> Public Sub ForeColorTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As Color = New Color() ' TODO: Initialize to an appropriate value
         Dim actual As Color
@@ -390,11 +303,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for HardMax
-    '''</summary>
-    <TestMethod()> _
-    Public Sub HardMaxTest()
+    '''<summary>Test HardMax</summary>
+    <TestMethod()> Public Sub HardMaxTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim actual As Double
@@ -404,11 +314,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for HardMin
-    '''</summary>
-    <TestMethod()> _
-    Public Sub HardMinTest()
+    '''<summary>Test HardMin</summary>
+    <TestMethod()> Public Sub HardMinTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim actual As Double
@@ -418,11 +325,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for InsideLimitsBackground
-    '''</summary>
-    <TestMethod()> _
-    Public Sub InsideLimitsBackgroundTest()
+    '''<summary>Test InsideLimitsBackground</summary>
+    <TestMethod()> Public Sub InsideLimitsBackgroundTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As Color = New Color() ' TODO: Initialize to an appropriate value
         Dim actual As Color
@@ -432,11 +336,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for MaxWidth
-    '''</summary>
-    <TestMethod()> _
-    Public Sub MaxWidthTest()
+    '''<summary>Test MaxWidth</summary>
+    <TestMethod()> Public Sub MaxWidthTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -446,11 +347,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for NumericFormat
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NumericFormatTest()
+    '''<summary>Test NumericFormat</summary>
+    <TestMethod()> Public Sub NumericFormatTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -460,11 +358,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for OutsideHardLimitBackground
-    '''</summary>
-    <TestMethod()> _
-    Public Sub OutsideHardLimitBackgroundTest()
+    '''<summary>Test OutsideHardLimitBackground</summary>
+    <TestMethod()> Public Sub OutsideHardLimitBackgroundTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As Color = New Color() ' TODO: Initialize to an appropriate value
         Dim actual As Color
@@ -474,11 +369,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for OutsideSoftLimitBackground
-    '''</summary>
-    <TestMethod()> _
-    Public Sub OutsideSoftLimitBackgroundTest()
+    '''<summary>Test OutsideSoftLimitBackground</summary>
+    <TestMethod()> Public Sub OutsideSoftLimitBackgroundTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As Color = New Color() ' TODO: Initialize to an appropriate value
         Dim actual As Color
@@ -488,11 +380,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SelLength
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SelLengthTest()
+    '''<summary>Test SelLength</summary>
+    <TestMethod()> Public Sub SelLengthTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -502,11 +391,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SelStart
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SelStartTest()
+    '''<summary>Test SelStart</summary>
+    <TestMethod()> Public Sub SelStartTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -516,11 +402,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SoftMax
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SoftMaxTest()
+    '''<summary>Test SoftMax</summary>
+    <TestMethod()> Public Sub SoftMaxTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim actual As Double
@@ -530,11 +413,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SoftMin
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SoftMinTest()
+    '''<summary>Test SoftMin</summary>
+    <TestMethod()> Public Sub SoftMinTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim actual As Double
@@ -544,11 +424,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Text
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TextTest()
+    '''<summary>Test Text</summary>
+    <TestMethod()> Public Sub TextTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -558,11 +435,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ToolTip1
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ToolTip1Test()
+    '''<summary>Test ToolTip1</summary>
+    <TestMethod()> Public Sub ToolTip1Test()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As ToolTip = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolTip
@@ -572,11 +446,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ValueDouble
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ValueDoubleTest()
+    '''<summary>Test ValueDouble</summary>
+    <TestMethod()> Public Sub ValueDoubleTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim actual As Double
@@ -586,11 +457,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ValueInteger
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ValueIntegerTest()
+    '''<summary>Test ValueInteger</summary>
+    <TestMethod()> Public Sub ValueIntegerTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -600,11 +468,8 @@ Public Class atcTextTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for txtBox
-    '''</summary>
-    <TestMethod()> _
-    Public Sub txtBoxTest()
+    '''<summary>Test txtBox</summary>
+    <TestMethod()> Public Sub txtBoxTest()
         Dim target As atcText = New atcText() ' TODO: Initialize to an appropriate value
         Dim expected As TextBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As TextBox

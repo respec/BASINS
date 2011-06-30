@@ -1,10 +1,6 @@
 ﻿Imports atcUtility
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for modMetDataTest and is intended
@@ -12,8 +8,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class modMetDataTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -55,23 +49,16 @@ Public Class modMetDataTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for BuildDBFSummary
-    '''</summary>
-    <TestMethod()> _
-    Public Sub BuildDBFSummaryTest()
+    '''<summary>Test BuildDBFSummary</summary>
+    <TestMethod()> Public Sub BuildDBFSummaryTest()
         Dim aSummStr As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aFName As String = String.Empty ' TODO: Initialize to an appropriate value
         modMetData.BuildDBFSummary(aSummStr, aFName)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for CalcMetDistances
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CalcMetDistancesTest()
+    '''<summary>Test CalcMetDistances</summary>
+    <TestMethod()> Public Sub CalcMetDistancesTest()
         Dim aTSer As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aStations As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim aAdjustAttribute As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -82,11 +69,8 @@ Public Class modMetDataTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ClosestPrecip
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ClosestPrecipTest()
+    '''<summary>Test ClosestPrecip</summary>
+    <TestMethod()> Public Sub ClosestPrecipTest()
         Dim aTSer As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aStations As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim aDV As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -101,11 +85,8 @@ Public Class modMetDataTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CurrentObsTime
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CurrentObsTimeTest()
+    '''<summary>Test CurrentObsTime</summary>
+    <TestMethod()> Public Sub CurrentObsTimeTest()
         Dim aTS As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aPos As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -115,11 +96,8 @@ Public Class modMetDataTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FillDailyTser
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FillDailyTserTest()
+    '''<summary>Test FillDailyTser</summary>
+    <TestMethod()> Public Sub FillDailyTserTest()
         Dim aTS2Fill As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aTS2FillExpected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aTS2FillOT As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
@@ -133,11 +111,8 @@ Public Class modMetDataTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for FillHourlyTser
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FillHourlyTserTest()
+    '''<summary>Test FillHourlyTser</summary>
+    <TestMethod()> Public Sub FillHourlyTserTest()
         Dim aTS2Fill As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aTSAvail As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim aMVal As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -147,11 +122,8 @@ Public Class modMetDataTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for GeoDist
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GeoDistTest()
+    '''<summary>Test GeoDist</summary>
+    <TestMethod()> Public Sub GeoDistTest()
         Dim aTS1 As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aTS2 As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As Single = 0.0! ' TODO: Initialize to an appropriate value
@@ -161,11 +133,8 @@ Public Class modMetDataTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetAdjustingAttribute
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetAdjustingAttributeTest()
+    '''<summary>Test GetAdjustingAttribute</summary>
+    <TestMethod()> Public Sub GetAdjustingAttributeTest()
         Dim aTSer As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -174,11 +143,8 @@ Public Class modMetDataTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for MissingDataSummary
-    '''</summary>
-    <TestMethod()> _
-    Public Sub MissingDataSummaryTest()
+    '''<summary>Test MissingDataSummary</summary>
+    <TestMethod()> Public Sub MissingDataSummaryTest()
         Dim aTSer As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aMVal As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aMAcc As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -192,11 +158,8 @@ Public Class modMetDataTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for NxtMis
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NxtMisTest()
+    '''<summary>Test NxtMis</summary>
+    <TestMethod()> Public Sub NxtMisTest()
         Dim aBufPos As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDBuff() As Double = Nothing ' TODO: Initialize to an appropriate value
         Dim aValMis As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -219,11 +182,8 @@ Public Class modMetDataTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ReadNOAAAttributes
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ReadNOAAAttributesTest()
+    '''<summary>Test ReadNOAAAttributes</summary>
+    <TestMethod()> Public Sub ReadNOAAAttributesTest()
         Dim aFilename As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcCollection
@@ -232,11 +192,8 @@ Public Class modMetDataTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ReadNOAAHPDAttributes
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ReadNOAAHPDAttributesTest()
+    '''<summary>Test ReadNOAAHPDAttributes</summary>
+    <TestMethod()> Public Sub ReadNOAAHPDAttributesTest()
         Dim aFilename As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcCollection
@@ -245,11 +202,8 @@ Public Class modMetDataTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SortIntegerArray
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SortIntegerArrayTest()
+    '''<summary>Test SortIntegerArray</summary>
+    <TestMethod()> Public Sub SortIntegerArrayTest()
         Dim aOpt As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aCnt As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aIVal() As Integer = Nothing ' TODO: Initialize to an appropriate value
@@ -262,11 +216,8 @@ Public Class modMetDataTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for SortRealArray
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SortRealArrayTest()
+    '''<summary>Test SortRealArray</summary>
+    <TestMethod()> Public Sub SortRealArrayTest()
         Dim aOpt As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aCnt As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aRVal() As Double = Nothing ' TODO: Initialize to an appropriate value

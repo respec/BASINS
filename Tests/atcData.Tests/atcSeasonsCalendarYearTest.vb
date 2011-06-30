@@ -1,8 +1,5 @@
 ﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for atcSeasonsCalendarYearTest and is intended
@@ -10,8 +7,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class atcSeasonsCalendarYearTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -53,21 +48,14 @@ Public Class atcSeasonsCalendarYearTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcSeasonsCalendarYear Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcSeasonsCalendarYearConstructorTest()
+    '''<summary>Test atcSeasonsCalendarYear Constructor</summary>
+    <TestMethod()> Public Sub atcSeasonsCalendarYearConstructorTest()
         Dim target As atcSeasonsCalendarYear = New atcSeasonsCalendarYear()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for AllSeasons
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AllSeasonsTest()
+    '''<summary>Test AllSeasons</summary>
+    <TestMethod()> Public Sub AllSeasonsTest()
         Dim target As atcSeasonsCalendarYear = New atcSeasonsCalendarYear() ' TODO: Initialize to an appropriate value
         Dim expected() As Integer = Nothing ' TODO: Initialize to an appropriate value
         Dim actual() As Integer
@@ -76,11 +64,8 @@ Public Class atcSeasonsCalendarYearTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Clone
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CloneTest()
+    '''<summary>Test Clone</summary>
+    <TestMethod()> Public Sub CloneTest()
         Dim target As atcSeasonsCalendarYear = New atcSeasonsCalendarYear() ' TODO: Initialize to an appropriate value
         Dim expected As atcSeasonBase = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcSeasonBase
@@ -89,11 +74,8 @@ Public Class atcSeasonsCalendarYearTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SeasonIndex
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SeasonIndexTest()
+    '''<summary>Test SeasonIndex</summary>
+    <TestMethod()> Public Sub SeasonIndexTest()
         Dim target As atcSeasonsCalendarYear = New atcSeasonsCalendarYear() ' TODO: Initialize to an appropriate value
         Dim aDate As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -103,11 +85,8 @@ Public Class atcSeasonsCalendarYearTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SetAllSeasons
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SetAllSeasonsTest()
+    '''<summary>Test SetAllSeasons</summary>
+    <TestMethod()> Public Sub SetAllSeasonsTest()
         Dim target As atcSeasonsCalendarYear = New atcSeasonsCalendarYear() ' TODO: Initialize to an appropriate value
         Dim aAllSeasons() As Integer = Nothing ' TODO: Initialize to an appropriate value
         target.SetAllSeasons(aAllSeasons)

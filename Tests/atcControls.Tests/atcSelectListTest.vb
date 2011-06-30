@@ -1,14 +1,8 @@
 ﻿Imports System.Windows.Forms
-
 Imports System
-
 Imports System.Collections.Generic
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcControls
-
-
 
 '''<summary>
 '''This is a test class for atcSelectListTest and is intended
@@ -16,8 +10,6 @@ Imports atcControls
 '''</summary>
 <TestClass()> _
 Public Class atcSelectListTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -59,21 +51,14 @@ Public Class atcSelectListTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcSelectList Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcSelectListConstructorTest()
+    '''<summary>Test atcSelectList Constructor</summary>
+    <TestMethod()> Public Sub atcSelectListConstructorTest()
         Dim target As atcSelectList = New atcSelectList()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for AskUser
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AskUserTest()
+    '''<summary>Test AskUser</summary>
+    <TestMethod()> Public Sub AskUserTest()
         Dim target As atcSelectList = New atcSelectList() ' TODO: Initialize to an appropriate value
         Dim aAvailable As List(Of String) = Nothing ' TODO: Initialize to an appropriate value
         Dim aSelected As List(Of String) = Nothing ' TODO: Initialize to an appropriate value
@@ -84,22 +69,16 @@ Public Class atcSelectListTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Clear
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test Clear</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub ClearTest()
         Dim target As atcSelectList_Accessor = New atcSelectList_Accessor() ' TODO: Initialize to an appropriate value
         target.Clear()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Dispose
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test Dispose</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub DisposeTest()
         Dim target As atcSelectList_Accessor = New atcSelectList_Accessor() ' TODO: Initialize to an appropriate value
         Dim disposing As Boolean = False ' TODO: Initialize to an appropriate value
@@ -107,33 +86,24 @@ Public Class atcSelectListTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for InitializeComponent
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test InitializeComponent</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub InitializeComponentTest()
         Dim target As atcSelectList_Accessor = New atcSelectList_Accessor() ' TODO: Initialize to an appropriate value
         target.InitializeComponent()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for __ENCAddToList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test __ENCAddToList</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub __ENCAddToListTest()
         Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
         atcSelectList_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnAttributesAll_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test btnAttributesAll_Click</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub btnAttributesAll_ClickTest()
         Dim target As atcSelectList_Accessor = New atcSelectList_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -142,11 +112,8 @@ Public Class atcSelectListTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnAttributesNone_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test btnAttributesNone_Click</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub btnAttributesNone_ClickTest()
         Dim target As atcSelectList_Accessor = New atcSelectList_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -155,11 +122,8 @@ Public Class atcSelectListTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnAttributesAll
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnAttributesAllTest()
+    '''<summary>Test btnAttributesAll</summary>
+    <TestMethod()> Public Sub btnAttributesAllTest()
         Dim target As atcSelectList = New atcSelectList() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -169,11 +133,8 @@ Public Class atcSelectListTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnAttributesNone
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnAttributesNoneTest()
+    '''<summary>Test btnAttributesNone</summary>
+    <TestMethod()> Public Sub btnAttributesNoneTest()
         Dim target As atcSelectList = New atcSelectList() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -183,11 +144,8 @@ Public Class atcSelectListTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnCancel
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnCancelTest()
+    '''<summary>Test btnCancel</summary>
+    <TestMethod()> Public Sub btnCancelTest()
         Dim target As atcSelectList = New atcSelectList() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -197,11 +155,8 @@ Public Class atcSelectListTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnOk
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnOkTest()
+    '''<summary>Test btnOk</summary>
+    <TestMethod()> Public Sub btnOkTest()
         Dim target As atcSelectList = New atcSelectList() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -211,11 +166,8 @@ Public Class atcSelectListTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lstAvailable
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lstAvailableTest()
+    '''<summary>Test lstAvailable</summary>
+    <TestMethod()> Public Sub lstAvailableTest()
         Dim target As atcSelectList = New atcSelectList() ' TODO: Initialize to an appropriate value
         Dim expected As ListBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ListBox

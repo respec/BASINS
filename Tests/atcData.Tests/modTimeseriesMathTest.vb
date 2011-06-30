@@ -1,12 +1,7 @@
 ﻿Imports System.Collections
-
 Imports atcUtility
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for modTimeseriesMathTest and is intended
@@ -14,8 +9,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class modTimeseriesMathTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -57,12 +50,8 @@ Public Class modTimeseriesMathTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for Aggregate
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AggregateTest()
+    '''<summary>Test Aggregate</summary>
+    <TestMethod()> Public Sub AggregateTest()
         Dim aTimeseries As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aTU As modDate.atcTimeUnit = New modDate.atcTimeUnit() ' TODO: Initialize to an appropriate value
         Dim aTS As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -75,11 +64,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for BinarySearchFirstGreaterDoubleArrayList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test BinarySearchFirstGreaterDoubleArrayList</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub BinarySearchFirstGreaterDoubleArrayListTest()
         Dim aArray As ArrayList = Nothing ' TODO: Initialize to an appropriate value
         Dim aValue As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -90,11 +76,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CommonDates
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CommonDatesTest()
+    '''<summary>Test CommonDates</summary>
+    <TestMethod()> Public Sub CommonDatesTest()
         Dim aGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim aFirstStart As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aFirstStartExpected As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -115,33 +98,24 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ComputePercentile
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ComputePercentileTest()
+    '''<summary>Test ComputePercentile</summary>
+    <TestMethod()> Public Sub ComputePercentileTest()
         Dim aTimeseries As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aPercentile As Double = 0.0! ' TODO: Initialize to an appropriate value
         modTimeseriesMath.ComputePercentile(aTimeseries, aPercentile)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ComputePercentileSum
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ComputePercentileSumTest()
+    '''<summary>Test ComputePercentileSum</summary>
+    <TestMethod()> Public Sub ComputePercentileSumTest()
         Dim aTimeseries As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aPercentile As Double = 0.0! ' TODO: Initialize to an appropriate value
         modTimeseriesMath.ComputePercentileSum(aTimeseries, aPercentile)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ComputeRanks
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ComputeRanksTest()
+    '''<summary>Test ComputeRanks</summary>
+    <TestMethod()> Public Sub ComputeRanksTest()
         Dim aTimeseries As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aLowToHigh As Boolean = False ' TODO: Initialize to an appropriate value
         Dim aAllowTies As Boolean = False ' TODO: Initialize to an appropriate value
@@ -149,11 +123,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for CopyBaseAttributes
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CopyBaseAttributesTest()
+    '''<summary>Test CopyBaseAttributes</summary>
+    <TestMethod()> Public Sub CopyBaseAttributesTest()
         Dim aFromDataset As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aToDataSet As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aNumValues As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -163,11 +134,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for DatasetOrGroupToGroup
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DatasetOrGroupToGroupTest()
+    '''<summary>Test DatasetOrGroupToGroup</summary>
+    <TestMethod()> Public Sub DatasetOrGroupToGroupTest()
         Dim aObject As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As atcDataGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcDataGroup
@@ -176,11 +144,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DoMath
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DoMathTest()
+    '''<summary>Test DoMath</summary>
+    <TestMethod()> Public Sub DoMathTest()
         Dim aOperationName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aArgs As atcDataAttributes = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
@@ -190,11 +155,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FillMissingByInterpolation
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FillMissingByInterpolationTest()
+    '''<summary>Test FillMissingByInterpolation</summary>
+    <TestMethod()> Public Sub FillMissingByInterpolationTest()
         Dim aOldTSer As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aMaxFillLength As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aFillInstances As ArrayList = Nothing ' TODO: Initialize to an appropriate value
@@ -206,11 +168,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FillValues
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FillValuesTest()
+    '''<summary>Test FillValues</summary>
+    <TestMethod()> Public Sub FillValuesTest()
         Dim aOldTSer As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aTU As modDate.atcTimeUnit = New modDate.atcTimeUnit() ' TODO: Initialize to an appropriate value
         Dim aTS As Long = 0 ' TODO: Initialize to an appropriate value
@@ -225,11 +184,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FindDateAtOrAfter
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FindDateAtOrAfterTest()
+    '''<summary>Test FindDateAtOrAfter</summary>
+    <TestMethod()> Public Sub FindDateAtOrAfterTest()
         Dim aDatesToSearch() As Double = Nothing ' TODO: Initialize to an appropriate value
         Dim aDate As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aStartAt As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -240,11 +196,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FindNextNotMissing
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test FindNextNotMissing</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub FindNextNotMissingTest()
         Dim aTser As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aInd As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -256,11 +209,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FitLine
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FitLineTest()
+    '''<summary>Test FitLine</summary>
+    <TestMethod()> Public Sub FitLineTest()
         Dim aTSerX As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aTSerY As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aACoef As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -276,11 +226,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for GetNextDateIndex
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test GetNextDateIndex</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub GetNextDateIndexTest()
         Dim aTs As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aFilterNoData As Boolean = False ' TODO: Initialize to an appropriate value
@@ -294,11 +241,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for MakeBins
-    '''</summary>
-    <TestMethod()> _
-    Public Sub MakeBinsTest()
+    '''<summary>Test MakeBins</summary>
+    <TestMethod()> Public Sub MakeBinsTest()
         Dim aTS As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aMaxBinSize As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As atcCollection = Nothing ' TODO: Initialize to an appropriate value
@@ -308,11 +252,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for MergeAttributes
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test MergeAttributes</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub MergeAttributesTest()
         Dim aGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim aTarget As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
@@ -320,11 +261,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for MergeDates
-    '''</summary>
-    <TestMethod()> _
-    Public Sub MergeDatesTest()
+    '''<summary>Test MergeDates</summary>
+    <TestMethod()> Public Sub MergeDatesTest()
         Dim aGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim aFilterNoData As Boolean = False ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
@@ -334,11 +272,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for MergeTimeseries
-    '''</summary>
-    <TestMethod()> _
-    Public Sub MergeTimeseriesTest()
+    '''<summary>Test MergeTimeseries</summary>
+    <TestMethod()> Public Sub MergeTimeseriesTest()
         Dim aGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim aFilterNoData As Boolean = False ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
@@ -348,11 +283,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for NewDates
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NewDatesTest()
+    '''<summary>Test NewDates</summary>
+    <TestMethod()> Public Sub NewDatesTest()
         Dim aTSer As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aTU As modDate.atcTimeUnit = New modDate.atcTimeUnit() ' TODO: Initialize to an appropriate value
         Dim aTS As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -363,11 +295,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for NewDates
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NewDatesTest1()
+    '''<summary>Test NewDates</summary>
+    <TestMethod()> Public Sub NewDatesTest1()
         Dim aStartDate As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aEndDate As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aTU As modDate.atcTimeUnit = New modDate.atcTimeUnit() ' TODO: Initialize to an appropriate value
@@ -379,11 +308,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for NewTimeseries
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NewTimeseriesTest()
+    '''<summary>Test NewTimeseries</summary>
+    <TestMethod()> Public Sub NewTimeseriesTest()
         Dim aStartDate As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aEndDate As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aTU As modDate.atcTimeUnit = New modDate.atcTimeUnit() ' TODO: Initialize to an appropriate value
@@ -397,11 +323,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SplitBin
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test SplitBin</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub SplitBinTest()
         Dim aBins As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim aBin As ArrayList = Nothing ' TODO: Initialize to an appropriate value
@@ -410,11 +333,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for SubsetByDate
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SubsetByDateTest()
+    '''<summary>Test SubsetByDate</summary>
+    <TestMethod()> Public Sub SubsetByDateTest()
         Dim aTimeseries As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aStartDate As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aEndDate As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -426,11 +346,8 @@ Public Class modTimeseriesMathTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SubsetByDateBoundary
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SubsetByDateBoundaryTest()
+    '''<summary>Test SubsetByDateBoundary</summary>
+    <TestMethod()> Public Sub SubsetByDateBoundaryTest()
         Dim aTimeseries As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aStartMonth As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aStartDay As Integer = 0 ' TODO: Initialize to an appropriate value

@@ -1,20 +1,11 @@
 ﻿Imports System.Collections
-
 Imports System.Collections.Generic
-
 Imports System.ComponentModel
-
 Imports System.Drawing
-
 Imports System.Windows.Forms
-
 Imports System
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for frmManagerTest and is intended
@@ -22,8 +13,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class frmManagerTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -65,21 +54,14 @@ Public Class frmManagerTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for frmManager Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub frmManagerConstructorTest()
+    '''<summary>Test frmManager Constructor</summary>
+    <TestMethod()> Public Sub frmManagerConstructorTest()
         Dim target As frmManager = New frmManager()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for AddDatasetsToolStripMenuItem_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test AddDatasetsToolStripMenuItem_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub AddDatasetsToolStripMenuItem_ClickTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -88,11 +70,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for AnalysisToolStripMenuItem_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test AnalysisToolStripMenuItem_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub AnalysisToolStripMenuItem_ClickTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -101,11 +80,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ChangedData
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test ChangedData</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub ChangedDataTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
@@ -113,11 +89,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for CloseAllToolStripMenuItem_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test CloseAllToolStripMenuItem_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub CloseAllToolStripMenuItem_ClickTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -126,11 +99,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for CloseToolStripMenuItem_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test CloseToolStripMenuItem_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub CloseToolStripMenuItem_ClickTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -139,11 +109,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for DisplayToolStripMenuItem_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test DisplayToolStripMenuItem_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub DisplayToolStripMenuItem_ClickTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -152,11 +119,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Dispose
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test Dispose</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub DisposeTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim disposing As Boolean = False ' TODO: Initialize to an appropriate value
@@ -164,11 +128,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for DoAction
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test DoAction</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub DoActionTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim aAction As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -178,33 +139,24 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for DoDisplay
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test DoDisplay</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub DoDisplayTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         target.DoDisplay()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Edit
-    '''</summary>
-    <TestMethod()> _
-    Public Sub EditTest()
+    '''<summary>Test Edit</summary>
+    <TestMethod()> Public Sub EditTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim aNodeKey As Integer = 0 ' TODO: Initialize to an appropriate value
         target.Edit(aNodeKey)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ExitToolStripMenuItem_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test ExitToolStripMenuItem_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub ExitToolStripMenuItem_ClickTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -213,11 +165,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Form_DragDrop
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test Form_DragDrop</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub Form_DragDropTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -226,11 +175,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Form_DragEnter
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test Form_DragEnter</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub Form_DragEnterTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -239,11 +185,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for HelpToolStripMenuItem_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test HelpToolStripMenuItem_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub HelpToolStripMenuItem_ClickTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -252,22 +195,16 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for InitializeComponent
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test InitializeComponent</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub InitializeComponentTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         target.InitializeComponent()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for NativeToolStripMenuItem_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test NativeToolStripMenuItem_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub NativeToolStripMenuItem_ClickTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -276,11 +213,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for NewToolStripMenuItem_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test NewToolStripMenuItem_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub NewToolStripMenuItem_ClickTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -289,11 +223,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for NodeBounds
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test NodeBounds</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub NodeBoundsTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim e As TreeNode = Nothing ' TODO: Initialize to an appropriate value
@@ -304,11 +235,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for OnAfterSelect
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test OnAfterSelect</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub OnAfterSelectTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -317,11 +245,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for OnBeforeSelect
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test OnBeforeSelect</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub OnBeforeSelectTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -330,11 +255,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for OnClosing
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test OnClosing</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub OnClosingTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim e As CancelEventArgs = Nothing ' TODO: Initialize to an appropriate value
@@ -342,11 +264,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for OpenToolStripMenuItem_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test OpenToolStripMenuItem_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub OpenToolStripMenuItem_ClickTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -355,11 +274,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Populate
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test Populate</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub PopulateTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim aNodeKey As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -367,11 +283,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for RefreshDetails
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test RefreshDetails</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub RefreshDetailsTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim aDataSourceIndex As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -379,11 +292,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for RemoveDatasetsToolStripMenuItem_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test RemoveDatasetsToolStripMenuItem_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub RemoveDatasetsToolStripMenuItem_ClickTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -392,11 +302,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for RenumberDatasetsToolStripMenuItem_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test RenumberDatasetsToolStripMenuItem_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub RenumberDatasetsToolStripMenuItem_ClickTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -405,11 +312,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for SaveInHandler
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test SaveInHandler</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub SaveInHandlerTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -418,11 +322,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for SaveInToolStripMenuItem_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test SaveInToolStripMenuItem_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub SaveInToolStripMenuItem_ClickTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -431,11 +332,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for SelectedSources
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test SelectedSources</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub SelectedSourcesTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim expected As List(Of atcTimeseriesSource) = Nothing ' TODO: Initialize to an appropriate value
@@ -445,11 +343,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SelectedTimeseries
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test SelectedTimeseries</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub SelectedTimeseriesTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
@@ -459,11 +354,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SelectionAction
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test SelectionAction</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub SelectionActionTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim aAction As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -471,22 +363,16 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for __ENCAddToList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test __ENCAddToList</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub __ENCAddToListTest()
         Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
         frmManager_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for frmManager_KeyDown
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test frmManager_KeyDown</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub frmManager_KeyDownTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -495,11 +381,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for isParent
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test isParent</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub isParentTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim aCheckParent As TreeNode = Nothing ' TODO: Initialize to an appropriate value
@@ -511,33 +394,24 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for paintSelectedNodes
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test paintSelectedNodes</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub paintSelectedNodesTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         target.paintSelectedNodes()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for removePaintFromNodes
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test removePaintFromNodes</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub removePaintFromNodesTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         target.removePaintFromNodes()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for treeFiles_AfterSelect
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test treeFiles_AfterSelect</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub treeFiles_AfterSelectTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -546,11 +420,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for treeFiles_DoubleClick
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test treeFiles_DoubleClick</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub treeFiles_DoubleClickTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -559,11 +430,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for treeFiles_DrawNode
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test treeFiles_DrawNode</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub treeFiles_DrawNodeTest()
         Dim target As frmManager_Accessor = New frmManager_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -572,11 +440,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for AddDatasetsToolStripMenuItem
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddDatasetsToolStripMenuItemTest()
+    '''<summary>Test AddDatasetsToolStripMenuItem</summary>
+    <TestMethod()> Public Sub AddDatasetsToolStripMenuItemTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As ToolStripMenuItem = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolStripMenuItem
@@ -586,11 +451,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for AnalysisToolStripMenuItem
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AnalysisToolStripMenuItemTest()
+    '''<summary>Test AnalysisToolStripMenuItem</summary>
+    <TestMethod()> Public Sub AnalysisToolStripMenuItemTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As ToolStripMenuItem = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolStripMenuItem
@@ -600,11 +462,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CloseAllToolStripMenuItem
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CloseAllToolStripMenuItemTest()
+    '''<summary>Test CloseAllToolStripMenuItem</summary>
+    <TestMethod()> Public Sub CloseAllToolStripMenuItemTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As ToolStripMenuItem = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolStripMenuItem
@@ -614,11 +473,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CloseToolStripMenuItem
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CloseToolStripMenuItemTest()
+    '''<summary>Test CloseToolStripMenuItem</summary>
+    <TestMethod()> Public Sub CloseToolStripMenuItemTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As ToolStripMenuItem = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolStripMenuItem
@@ -628,11 +484,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DisplayToolStripMenuItem
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DisplayToolStripMenuItemTest()
+    '''<summary>Test DisplayToolStripMenuItem</summary>
+    <TestMethod()> Public Sub DisplayToolStripMenuItemTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As ToolStripMenuItem = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolStripMenuItem
@@ -642,11 +495,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for EditToolStripMenuItem
-    '''</summary>
-    <TestMethod()> _
-    Public Sub EditToolStripMenuItemTest()
+    '''<summary>Test EditToolStripMenuItem</summary>
+    <TestMethod()> Public Sub EditToolStripMenuItemTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As ToolStripMenuItem = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolStripMenuItem
@@ -656,11 +506,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ExitToolStripMenuItem
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ExitToolStripMenuItemTest()
+    '''<summary>Test ExitToolStripMenuItem</summary>
+    <TestMethod()> Public Sub ExitToolStripMenuItemTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As ToolStripMenuItem = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolStripMenuItem
@@ -670,11 +517,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FileToolStripMenuItem
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FileToolStripMenuItemTest()
+    '''<summary>Test FileToolStripMenuItem</summary>
+    <TestMethod()> Public Sub FileToolStripMenuItemTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As ToolStripMenuItem = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolStripMenuItem
@@ -684,11 +528,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for HelpToolStripMenuItem
-    '''</summary>
-    <TestMethod()> _
-    Public Sub HelpToolStripMenuItemTest()
+    '''<summary>Test HelpToolStripMenuItem</summary>
+    <TestMethod()> Public Sub HelpToolStripMenuItemTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As ToolStripMenuItem = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolStripMenuItem
@@ -698,11 +539,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for MenuStrip1
-    '''</summary>
-    <TestMethod()> _
-    Public Sub MenuStrip1Test()
+    '''<summary>Test MenuStrip1</summary>
+    <TestMethod()> Public Sub MenuStrip1Test()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As MenuStrip = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As MenuStrip
@@ -712,11 +550,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for NativeToolStripMenuItem
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NativeToolStripMenuItemTest()
+    '''<summary>Test NativeToolStripMenuItem</summary>
+    <TestMethod()> Public Sub NativeToolStripMenuItemTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As ToolStripMenuItem = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolStripMenuItem
@@ -726,11 +561,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for NewToolStripMenuItem
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NewToolStripMenuItemTest()
+    '''<summary>Test NewToolStripMenuItem</summary>
+    <TestMethod()> Public Sub NewToolStripMenuItemTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As ToolStripMenuItem = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolStripMenuItem
@@ -740,11 +572,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for OpenToolStripMenuItem
-    '''</summary>
-    <TestMethod()> _
-    Public Sub OpenToolStripMenuItemTest()
+    '''<summary>Test OpenToolStripMenuItem</summary>
+    <TestMethod()> Public Sub OpenToolStripMenuItemTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As ToolStripMenuItem = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolStripMenuItem
@@ -754,11 +583,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for RemoveDatasetsToolStripMenuItem
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RemoveDatasetsToolStripMenuItemTest()
+    '''<summary>Test RemoveDatasetsToolStripMenuItem</summary>
+    <TestMethod()> Public Sub RemoveDatasetsToolStripMenuItemTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As ToolStripMenuItem = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolStripMenuItem
@@ -768,11 +594,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for RenumberDatasetsToolStripMenuItem
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RenumberDatasetsToolStripMenuItemTest()
+    '''<summary>Test RenumberDatasetsToolStripMenuItem</summary>
+    <TestMethod()> Public Sub RenumberDatasetsToolStripMenuItemTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As ToolStripMenuItem = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolStripMenuItem
@@ -782,11 +605,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SaveInToolStripMenuItem
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SaveInToolStripMenuItemTest()
+    '''<summary>Test SaveInToolStripMenuItem</summary>
+    <TestMethod()> Public Sub SaveInToolStripMenuItemTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As ToolStripMenuItem = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolStripMenuItem
@@ -796,11 +616,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SelectedNodes
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SelectedNodesTest()
+    '''<summary>Test SelectedNodes</summary>
+    <TestMethod()> Public Sub SelectedNodesTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As ArrayList = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ArrayList
@@ -810,11 +627,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ViewToolStripMenuItem
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ViewToolStripMenuItemTest()
+    '''<summary>Test ViewToolStripMenuItem</summary>
+    <TestMethod()> Public Sub ViewToolStripMenuItemTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As ToolStripMenuItem = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolStripMenuItem
@@ -824,11 +638,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for toolStripSeparator
-    '''</summary>
-    <TestMethod()> _
-    Public Sub toolStripSeparatorTest()
+    '''<summary>Test toolStripSeparator</summary>
+    <TestMethod()> Public Sub toolStripSeparatorTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As ToolStripSeparator = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolStripSeparator
@@ -838,11 +649,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for toolStripSeparator1
-    '''</summary>
-    <TestMethod()> _
-    Public Sub toolStripSeparator1Test()
+    '''<summary>Test toolStripSeparator1</summary>
+    <TestMethod()> Public Sub toolStripSeparator1Test()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As ToolStripSeparator = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolStripSeparator
@@ -852,11 +660,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for toolStripSeparator2
-    '''</summary>
-    <TestMethod()> _
-    Public Sub toolStripSeparator2Test()
+    '''<summary>Test toolStripSeparator2</summary>
+    <TestMethod()> Public Sub toolStripSeparator2Test()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As ToolStripSeparator = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolStripSeparator
@@ -866,11 +671,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for treeFiles
-    '''</summary>
-    <TestMethod()> _
-    Public Sub treeFilesTest()
+    '''<summary>Test treeFiles</summary>
+    <TestMethod()> Public Sub treeFilesTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As TreeView = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As TreeView
@@ -880,11 +682,8 @@ Public Class frmManagerTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for txtDetails
-    '''</summary>
-    <TestMethod()> _
-    Public Sub txtDetailsTest()
+    '''<summary>Test txtDetails</summary>
+    <TestMethod()> Public Sub txtDetailsTest()
         Dim target As frmManager = New frmManager() ' TODO: Initialize to an appropriate value
         Dim expected As TextBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As TextBox

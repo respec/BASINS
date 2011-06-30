@@ -1,8 +1,5 @@
 ﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for atcDataSourceTest and is intended
@@ -10,8 +7,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class atcDataSourceTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -53,21 +48,14 @@ Public Class atcDataSourceTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcDataSource Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcDataSourceConstructorTest()
+    '''<summary>Test atcDataSource Constructor</summary>
+    <TestMethod()> Public Sub atcDataSourceConstructorTest()
         Dim target As atcDataSource = New atcDataSource()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for AddDataSet
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddDataSetTest()
+    '''<summary>Test AddDataSet</summary>
+    <TestMethod()> Public Sub AddDataSetTest()
         Dim target As atcDataSource = New atcDataSource() ' TODO: Initialize to an appropriate value
         Dim aDs As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
         Dim aExistAction As atcDataSource.EnumExistAction = New atcDataSource.EnumExistAction() ' TODO: Initialize to an appropriate value
@@ -78,11 +66,8 @@ Public Class atcDataSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for AddDataSets
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddDataSetsTest()
+    '''<summary>Test AddDataSets</summary>
+    <TestMethod()> Public Sub AddDataSetsTest()
         Dim target As atcDataSource = New atcDataSource() ' TODO: Initialize to an appropriate value
         Dim aDataGroup As atcDataGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -92,32 +77,23 @@ Public Class atcDataSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Clear
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ClearTest()
+    '''<summary>Test Clear</summary>
+    <TestMethod()> Public Sub ClearTest()
         Dim target As atcDataSource = New atcDataSource() ' TODO: Initialize to an appropriate value
         target.Clear()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Finalize
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test Finalize</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub FinalizeTest()
         Dim target As atcDataSource_Accessor = New atcDataSource_Accessor() ' TODO: Initialize to an appropriate value
         target.Finalize()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Open
-    '''</summary>
-    <TestMethod()> _
-    Public Sub OpenTest()
+    '''<summary>Test Open</summary>
+    <TestMethod()> Public Sub OpenTest()
         Dim target As atcDataSource = New atcDataSource() ' TODO: Initialize to an appropriate value
         Dim aSpecification As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aAttributes As atcDataAttributes = Nothing ' TODO: Initialize to an appropriate value
@@ -128,22 +104,16 @@ Public Class atcDataSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ReadData
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ReadDataTest()
+    '''<summary>Test ReadData</summary>
+    <TestMethod()> Public Sub ReadDataTest()
         Dim target As atcDataSource = New atcDataSource() ' TODO: Initialize to an appropriate value
         Dim aData As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
         target.ReadData(aData)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for RemoveDataset
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RemoveDatasetTest()
+    '''<summary>Test RemoveDataset</summary>
+    <TestMethod()> Public Sub RemoveDatasetTest()
         Dim target As atcDataSource = New atcDataSource() ' TODO: Initialize to an appropriate value
         Dim aDataSet As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -153,11 +123,8 @@ Public Class atcDataSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Save
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SaveTest()
+    '''<summary>Test Save</summary>
+    <TestMethod()> Public Sub SaveTest()
         Dim target As atcDataSource = New atcDataSource() ' TODO: Initialize to an appropriate value
         Dim aSaveFileName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aExistAction As atcDataSource.EnumExistAction = New atcDataSource.EnumExistAction() ' TODO: Initialize to an appropriate value
@@ -168,11 +135,8 @@ Public Class atcDataSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ToString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ToStringTest()
+    '''<summary>Test ToString</summary>
+    <TestMethod()> Public Sub ToStringTest()
         Dim target As atcDataSource = New atcDataSource() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -181,87 +145,63 @@ Public Class atcDataSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for View
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ViewTest()
+    '''<summary>Test View</summary>
+    <TestMethod()> Public Sub ViewTest()
         Dim target As atcDataSource = New atcDataSource() ' TODO: Initialize to an appropriate value
         target.View()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Attributes
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AttributesTest()
+    '''<summary>Test Attributes</summary>
+    <TestMethod()> Public Sub AttributesTest()
         Dim target As atcDataSource = New atcDataSource() ' TODO: Initialize to an appropriate value
         Dim actual As atcDataAttributes
         actual = target.Attributes
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for AvailableOperations
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AvailableOperationsTest()
+    '''<summary>Test AvailableOperations</summary>
+    <TestMethod()> Public Sub AvailableOperationsTest()
         Dim target As atcDataSource = New atcDataSource() ' TODO: Initialize to an appropriate value
         Dim actual As atcDataAttributes
         actual = target.AvailableOperations
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CanOpen
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CanOpenTest()
+    '''<summary>Test CanOpen</summary>
+    <TestMethod()> Public Sub CanOpenTest()
         Dim target As atcDataSource = New atcDataSource() ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
         actual = target.CanOpen
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CanRemoveDataset
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CanRemoveDatasetTest()
+    '''<summary>Test CanRemoveDataset</summary>
+    <TestMethod()> Public Sub CanRemoveDatasetTest()
         Dim target As atcDataSource = New atcDataSource() ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
         actual = target.CanRemoveDataset
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CanSave
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CanSaveTest()
+    '''<summary>Test CanSave</summary>
+    <TestMethod()> Public Sub CanSaveTest()
         Dim target As atcDataSource = New atcDataSource() ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
         actual = target.CanSave
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DataSets
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DataSetsTest()
+    '''<summary>Test DataSets</summary>
+    <TestMethod()> Public Sub DataSetsTest()
         Dim target As atcDataSource = New atcDataSource() ' TODO: Initialize to an appropriate value
         Dim actual As atcDataGroup
         actual = target.DataSets
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Filter
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FilterTest()
+    '''<summary>Test Filter</summary>
+    <TestMethod()> Public Sub FilterTest()
         Dim target As atcDataSource = New atcDataSource() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -271,11 +211,8 @@ Public Class atcDataSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Specification
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SpecificationTest()
+    '''<summary>Test Specification</summary>
+    <TestMethod()> Public Sub SpecificationTest()
         Dim target As atcDataSource = New atcDataSource() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String

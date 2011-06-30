@@ -1,10 +1,6 @@
 ﻿Imports System.IO
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcUtility
-
-
 
 '''<summary>
 '''This is a test class for modFile_clsLinesInFileTest and is intended
@@ -12,8 +8,6 @@ Imports atcUtility
 '''</summary>
 <TestClass()> _
 Public Class modFile_clsLinesInFileTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -55,34 +49,24 @@ Public Class modFile_clsLinesInFileTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for clsLinesInFile Constructor
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test clsLinesInFile Constructor</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub modFile_clsLinesInFileConstructorTest()
         Dim aStreamReader As BinaryReader = Nothing ' TODO: Initialize to an appropriate value
         Dim target As modFile_Accessor.clsLinesInFile = New modFile_Accessor.clsLinesInFile(aStreamReader)
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for clsLinesInFile Constructor
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test clsLinesInFile Constructor</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub modFile_clsLinesInFileConstructorTest1()
         Dim aFileName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim target As modFile_Accessor.clsLinesInFile = New modFile_Accessor.clsLinesInFile(aFileName)
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for Clear
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test Clear</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub ClearTest()
         Dim param0 As PrivateObject = Nothing ' TODO: Initialize to an appropriate value
         Dim target As modFile_Accessor.clsLinesInFile = New modFile_Accessor.clsLinesInFile(param0) ' TODO: Initialize to an appropriate value
@@ -90,11 +74,8 @@ Public Class modFile_clsLinesInFileTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Dispose
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test Dispose</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub DisposeTest()
         'Class inheritance across assemblies is not preserved by private accessors. However, a static method AttachShadow() is provided in each private accessor class to transfer a private object from one private accessor class to another.
         Assert.Inconclusive("Class inheritance across assemblies is not preserved by private accessors. Howeve" & _
@@ -102,11 +83,8 @@ Public Class modFile_clsLinesInFileTest
                 "transfer a private object from one private accessor class to another.")
     End Sub
 
-    '''<summary>
-    '''A test for GetEnumerator
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test GetEnumerator</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub GetEnumeratorTest()
         'Class inheritance across assemblies is not preserved by private accessors. However, a static method AttachShadow() is provided in each private accessor class to transfer a private object from one private accessor class to another.
         Assert.Inconclusive("Class inheritance across assemblies is not preserved by private accessors. Howeve" & _
@@ -114,11 +92,8 @@ Public Class modFile_clsLinesInFileTest
                 "transfer a private object from one private accessor class to another.")
     End Sub
 
-    '''<summary>
-    '''A test for MoveNext
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test MoveNext</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub MoveNextTest()
         'Class inheritance across assemblies is not preserved by private accessors. However, a static method AttachShadow() is provided in each private accessor class to transfer a private object from one private accessor class to another.
         Assert.Inconclusive("Class inheritance across assemblies is not preserved by private accessors. Howeve" & _
@@ -126,11 +101,8 @@ Public Class modFile_clsLinesInFileTest
                 "transfer a private object from one private accessor class to another.")
     End Sub
 
-    '''<summary>
-    '''A test for Reset
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test Reset</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub ResetTest()
         'Class inheritance across assemblies is not preserved by private accessors. However, a static method AttachShadow() is provided in each private accessor class to transfer a private object from one private accessor class to another.
         Assert.Inconclusive("Class inheritance across assemblies is not preserved by private accessors. Howeve" & _
@@ -138,11 +110,8 @@ Public Class modFile_clsLinesInFileTest
                 "transfer a private object from one private accessor class to another.")
     End Sub
 
-    '''<summary>
-    '''A test for Current
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test Current</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub CurrentTest()
         'Class inheritance across assemblies is not preserved by private accessors. However, a static method AttachShadow() is provided in each private accessor class to transfer a private object from one private accessor class to another.
         Assert.Inconclusive("Class inheritance across assemblies is not preserved by private accessors. Howeve" & _

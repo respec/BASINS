@@ -1,8 +1,5 @@
 ﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for atcDataToolTest and is intended
@@ -10,8 +7,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class atcDataToolTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -53,18 +48,14 @@ Public Class atcDataToolTest
     '
 #End Region
 
-
     Friend Overridable Function CreateatcDataTool() As atcDataTool
         'TODO: Instantiate an appropriate concrete class.
         Dim target As atcDataTool = Nothing
         Return target
     End Function
 
-    '''<summary>
-    '''A test for Show
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ShowTest()
+    '''<summary>Test Show</summary>
+    <TestMethod()> Public Sub ShowTest()
         Dim target As atcDataTool = CreateatcDataTool() ' TODO: Initialize to an appropriate value
         Dim expected As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Object

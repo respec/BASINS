@@ -1,16 +1,9 @@
 ﻿Imports atcControls
-
 Imports System.Windows.Forms
-
 Imports System
-
 Imports atcData
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcWDM
-
-
 
 '''<summary>
 '''This is a test class for frmSaveTest and is intended
@@ -18,8 +11,6 @@ Imports atcWDM
 '''</summary>
 <TestClass()> _
 Public Class frmSaveTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -61,21 +52,14 @@ Public Class frmSaveTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for frmSave Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub frmSaveConstructorTest()
+    '''<summary>Test frmSave Constructor</summary>
+    <TestMethod()> Public Sub frmSaveConstructorTest()
         Dim target As frmSave = New frmSave()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for AskUser
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AskUserTest()
+    '''<summary>Test AskUser</summary>
+    <TestMethod()> Public Sub AskUserTest()
         Dim target As frmSave = New frmSave() ' TODO: Initialize to an appropriate value
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim aLabel As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -87,11 +71,8 @@ Public Class frmSaveTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Dispose
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test Dispose</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub DisposeTest()
         Dim target As frmSave_Accessor = New frmSave_Accessor() ' TODO: Initialize to an appropriate value
         Dim disposing As Boolean = False ' TODO: Initialize to an appropriate value
@@ -99,33 +80,24 @@ Public Class frmSaveTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for InitializeComponent
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test InitializeComponent</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub InitializeComponentTest()
         Dim target As frmSave_Accessor = New frmSave_Accessor() ' TODO: Initialize to an appropriate value
         target.InitializeComponent()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for __ENCAddToList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test __ENCAddToList</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub __ENCAddToListTest()
         Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
         frmSave_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnCancel_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test btnCancel_Click</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub btnCancel_ClickTest()
         Dim target As frmSave_Accessor = New frmSave_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -134,11 +106,8 @@ Public Class frmSaveTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnSave_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test btnSave_Click</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub btnSave_ClickTest()
         Dim target As frmSave_Accessor = New frmSave_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -147,11 +116,8 @@ Public Class frmSaveTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnSelectAttributes_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test btnSelectAttributes_Click</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub btnSelectAttributes_ClickTest()
         Dim target As frmSave_Accessor = New frmSave_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -160,11 +126,8 @@ Public Class frmSaveTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for frmSave_KeyDown
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test frmSave_KeyDown</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub frmSave_KeyDownTest()
         Dim target As frmSave_Accessor = New frmSave_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -173,11 +136,8 @@ Public Class frmSaveTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for agdData
-    '''</summary>
-    <TestMethod()> _
-    Public Sub agdDataTest()
+    '''<summary>Test agdData</summary>
+    <TestMethod()> Public Sub agdDataTest()
         Dim target As frmSave = New frmSave() ' TODO: Initialize to an appropriate value
         Dim expected As atcGrid = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcGrid
@@ -187,11 +147,8 @@ Public Class frmSaveTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnCancel
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnCancelTest()
+    '''<summary>Test btnCancel</summary>
+    <TestMethod()> Public Sub btnCancelTest()
         Dim target As frmSave = New frmSave() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -201,11 +158,8 @@ Public Class frmSaveTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnSave
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnSaveTest()
+    '''<summary>Test btnSave</summary>
+    <TestMethod()> Public Sub btnSaveTest()
         Dim target As frmSave = New frmSave() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -215,11 +169,8 @@ Public Class frmSaveTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnSelectAttributes
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnSelectAttributesTest()
+    '''<summary>Test btnSelectAttributes</summary>
+    <TestMethod()> Public Sub btnSelectAttributesTest()
         Dim target As frmSave = New frmSave() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -229,11 +180,8 @@ Public Class frmSaveTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblInstructions
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblInstructionsTest()
+    '''<summary>Test lblInstructions</summary>
+    <TestMethod()> Public Sub lblInstructionsTest()
         Dim target As frmSave = New frmSave() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -243,11 +191,8 @@ Public Class frmSaveTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblStatus
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblStatusTest()
+    '''<summary>Test lblStatus</summary>
+    <TestMethod()> Public Sub lblStatusTest()
         Dim target As frmSave = New frmSave() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label

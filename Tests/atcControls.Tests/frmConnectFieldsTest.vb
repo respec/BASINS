@@ -1,12 +1,7 @@
 ﻿Imports System.Windows.Forms
-
 Imports atcUtility
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcControls
-
-
 
 '''<summary>
 '''This is a test class for frmConnectFieldsTest and is intended
@@ -14,8 +9,6 @@ Imports atcControls
 '''</summary>
 <TestClass()> _
 Public Class frmConnectFieldsTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -57,21 +50,14 @@ Public Class frmConnectFieldsTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for frmConnectFields Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub frmConnectFieldsConstructorTest()
+    '''<summary>Test frmConnectFields Constructor</summary>
+    <TestMethod()> Public Sub frmConnectFieldsConstructorTest()
         Dim target As frmConnectFields = New frmConnectFields()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for Connections
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ConnectionsTest()
+    '''<summary>Test Connections</summary>
+    <TestMethod()> Public Sub ConnectionsTest()
         Dim target As frmConnectFields = New frmConnectFields() ' TODO: Initialize to an appropriate value
         Dim expected As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcCollection
@@ -80,11 +66,8 @@ Public Class frmConnectFieldsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Dispose
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test Dispose</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub DisposeTest()
         Dim target As frmConnectFields_Accessor = New frmConnectFields_Accessor() ' TODO: Initialize to an appropriate value
         Dim disposing As Boolean = False ' TODO: Initialize to an appropriate value
@@ -92,33 +75,24 @@ Public Class frmConnectFieldsTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for InitializeComponent
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test InitializeComponent</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub InitializeComponentTest()
         Dim target As frmConnectFields_Accessor = New frmConnectFields_Accessor() ' TODO: Initialize to an appropriate value
         target.InitializeComponent()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for __ENCAddToList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test __ENCAddToList</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub __ENCAddToListTest()
         Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
         frmConnectFields_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for cmdCancel
-    '''</summary>
-    <TestMethod()> _
-    Public Sub cmdCancelTest()
+    '''<summary>Test cmdCancel</summary>
+    <TestMethod()> Public Sub cmdCancelTest()
         Dim target As frmConnectFields = New frmConnectFields() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -128,11 +102,8 @@ Public Class frmConnectFieldsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for cmdOK
-    '''</summary>
-    <TestMethod()> _
-    Public Sub cmdOKTest()
+    '''<summary>Test cmdOK</summary>
+    <TestMethod()> Public Sub cmdOKTest()
         Dim target As frmConnectFields = New frmConnectFields() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -142,11 +113,8 @@ Public Class frmConnectFieldsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ctlConnectFields
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ctlConnectFieldsTest()
+    '''<summary>Test ctlConnectFields</summary>
+    <TestMethod()> Public Sub ctlConnectFieldsTest()
         Dim target As frmConnectFields = New frmConnectFields() ' TODO: Initialize to an appropriate value
         Dim expected As atcConnectFields = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcConnectFields

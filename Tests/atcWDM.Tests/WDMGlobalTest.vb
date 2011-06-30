@@ -1,10 +1,6 @@
 ﻿Imports atcData
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcWDM
-
-
 
 '''<summary>
 '''This is a test class for WDMGlobalTest and is intended
@@ -12,8 +8,6 @@ Imports atcWDM
 '''</summary>
 <TestClass()> _
 Public Class WDMGlobalTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -55,12 +49,8 @@ Public Class WDMGlobalTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for UnitsAttributeDefinition
-    '''</summary>
-    <TestMethod()> _
-    Public Sub UnitsAttributeDefinitionTest()
+    '''<summary>Test UnitsAttributeDefinition</summary>
+    <TestMethod()> Public Sub UnitsAttributeDefinitionTest()
         Dim Editable As Boolean = False ' TODO: Initialize to an appropriate value
         Dim EditableExpected As Boolean = False ' TODO: Initialize to an appropriate value
         Dim expected As atcAttributeDefinition = Nothing ' TODO: Initialize to an appropriate value

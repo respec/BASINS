@@ -1,10 +1,6 @@
 ﻿Imports System.Drawing
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcUtility
-
-
 
 '''<summary>
 '''This is a test class for UtilColorTest and is intended
@@ -12,8 +8,6 @@ Imports atcUtility
 '''</summary>
 <TestClass()> _
 Public Class UtilColorTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -55,12 +49,8 @@ Public Class UtilColorTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for GetMatchingColor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetMatchingColorTest()
+    '''<summary>Test GetMatchingColor</summary>
+    <TestMethod()> Public Sub GetMatchingColorTest()
         Dim aSpecification As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Color = New Color() ' TODO: Initialize to an appropriate value
         Dim actual As Color
@@ -69,21 +59,15 @@ Public Class UtilColorTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for InitMatchingColors
-    '''</summary>
-    <TestMethod()> _
-    Public Sub InitMatchingColorsTest()
+    '''<summary>Test InitMatchingColors</summary>
+    <TestMethod()> Public Sub InitMatchingColorsTest()
         Dim aFilename As String = String.Empty ' TODO: Initialize to an appropriate value
         UtilColor.InitMatchingColors(aFilename)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for TextOrNumericColor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TextOrNumericColorTest()
+    '''<summary>Test TextOrNumericColor</summary>
+    <TestMethod()> Public Sub TextOrNumericColorTest()
         Dim aColorName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Color = New Color() ' TODO: Initialize to an appropriate value
         Dim actual As Color
@@ -92,11 +76,8 @@ Public Class UtilColorTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for colorDB
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test colorDB</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub colorDBTest()
         Dim expected As atcTable = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcTable
@@ -105,11 +86,8 @@ Public Class UtilColorTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for colorName
-    '''</summary>
-    <TestMethod()> _
-    Public Sub colorNameTest()
+    '''<summary>Test colorName</summary>
+    <TestMethod()> Public Sub colorNameTest()
         Dim aColor As Color = New Color() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String

@@ -1,14 +1,8 @@
 ﻿Imports System.Windows.Forms
-
 Imports atcUtility
-
 Imports System
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for atcChooseDataGroupDatesTest and is intended
@@ -16,8 +10,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class atcChooseDataGroupDatesTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -59,21 +51,14 @@ Public Class atcChooseDataGroupDatesTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcChooseDataGroupDates Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcChooseDataGroupDatesConstructorTest()
+    '''<summary>Test atcChooseDataGroupDates Constructor</summary>
+    <TestMethod()> Public Sub atcChooseDataGroupDatesConstructorTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for CreateSelectedDataGroupSubset
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CreateSelectedDataGroupSubsetTest()
+    '''<summary>Test CreateSelectedDataGroupSubset</summary>
+    <TestMethod()> Public Sub CreateSelectedDataGroupSubsetTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcTimeseriesGroup
@@ -82,11 +67,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Dispose
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test Dispose</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub DisposeTest()
         Dim target As atcChooseDataGroupDates_Accessor = New atcChooseDataGroupDates_Accessor() ' TODO: Initialize to an appropriate value
         Dim disposing As Boolean = False ' TODO: Initialize to an appropriate value
@@ -94,43 +76,31 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for InitializeComponent
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test InitializeComponent</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub InitializeComponentTest()
         Dim target As atcChooseDataGroupDates_Accessor = New atcChooseDataGroupDates_Accessor() ' TODO: Initialize to an appropriate value
         target.InitializeComponent()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Reset
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ResetTest()
+    '''<summary>Test Reset</summary>
+    <TestMethod()> Public Sub ResetTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         target.Reset()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for __ENCAddToList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test __ENCAddToList</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub __ENCAddToListTest()
         Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
         atcChooseDataGroupDates_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnAll_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test btnAll_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub btnAll_ClickTest()
         Dim target As atcChooseDataGroupDates_Accessor = New atcChooseDataGroupDates_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -139,11 +109,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnCommon_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test btnCommon_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub btnCommon_ClickTest()
         Dim target As atcChooseDataGroupDates_Accessor = New atcChooseDataGroupDates_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -152,11 +119,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for pDataGroup_Added
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test pDataGroup_Added</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub pDataGroup_AddedTest()
         Dim target As atcChooseDataGroupDates_Accessor = New atcChooseDataGroupDates_Accessor() ' TODO: Initialize to an appropriate value
         Dim aAdded As atcCollection = Nothing ' TODO: Initialize to an appropriate value
@@ -164,11 +128,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for pDataGroup_Removed
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test pDataGroup_Removed</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub pDataGroup_RemovedTest()
         Dim target As atcChooseDataGroupDates_Accessor = New atcChooseDataGroupDates_Accessor() ' TODO: Initialize to an appropriate value
         Dim aRemoved As atcCollection = Nothing ' TODO: Initialize to an appropriate value
@@ -176,11 +137,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for CommonEnd
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CommonEndTest()
+    '''<summary>Test CommonEnd</summary>
+    <TestMethod()> Public Sub CommonEndTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim actual As Double
@@ -190,11 +148,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CommonStart
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CommonStartTest()
+    '''<summary>Test CommonStart</summary>
+    <TestMethod()> Public Sub CommonStartTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim actual As Double
@@ -204,11 +159,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DataGroup
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DataGroupTest()
+    '''<summary>Test DataGroup</summary>
+    <TestMethod()> Public Sub DataGroupTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcTimeseriesGroup
@@ -218,11 +170,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FirstStart
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FirstStartTest()
+    '''<summary>Test FirstStart</summary>
+    <TestMethod()> Public Sub FirstStartTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim actual As Double
@@ -232,11 +181,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for LastEnd
-    '''</summary>
-    <TestMethod()> _
-    Public Sub LastEndTest()
+    '''<summary>Test LastEnd</summary>
+    <TestMethod()> Public Sub LastEndTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim actual As Double
@@ -246,11 +192,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for OmitAfter
-    '''</summary>
-    <TestMethod()> _
-    Public Sub OmitAfterTest()
+    '''<summary>Test OmitAfter</summary>
+    <TestMethod()> Public Sub OmitAfterTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim actual As Double
@@ -260,11 +203,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for OmitBefore
-    '''</summary>
-    <TestMethod()> _
-    Public Sub OmitBeforeTest()
+    '''<summary>Test OmitBefore</summary>
+    <TestMethod()> Public Sub OmitBeforeTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim actual As Double
@@ -274,22 +214,16 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SelectedAll
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SelectedAllTest()
+    '''<summary>Test SelectedAll</summary>
+    <TestMethod()> Public Sub SelectedAllTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
         actual = target.SelectedAll
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Text
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TextTest()
+    '''<summary>Test Text</summary>
+    <TestMethod()> Public Sub TextTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -299,11 +233,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ToolTip1
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ToolTip1Test()
+    '''<summary>Test ToolTip1</summary>
+    <TestMethod()> Public Sub ToolTip1Test()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As ToolTip = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ToolTip
@@ -313,11 +244,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnAll
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnAllTest()
+    '''<summary>Test btnAll</summary>
+    <TestMethod()> Public Sub btnAllTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -327,11 +255,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnCommon
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnCommonTest()
+    '''<summary>Test btnCommon</summary>
+    <TestMethod()> Public Sub btnCommonTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -341,11 +266,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for chkYearly
-    '''</summary>
-    <TestMethod()> _
-    Public Sub chkYearlyTest()
+    '''<summary>Test chkYearly</summary>
+    <TestMethod()> Public Sub chkYearlyTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As CheckBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As CheckBox
@@ -355,11 +277,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for grpYears
-    '''</summary>
-    <TestMethod()> _
-    Public Sub grpYearsTest()
+    '''<summary>Test grpYears</summary>
+    <TestMethod()> Public Sub grpYearsTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As GroupBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As GroupBox
@@ -369,11 +288,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblCommonEnd
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblCommonEndTest()
+    '''<summary>Test lblCommonEnd</summary>
+    <TestMethod()> Public Sub lblCommonEndTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -383,11 +299,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblCommonStart
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblCommonStartTest()
+    '''<summary>Test lblCommonStart</summary>
+    <TestMethod()> Public Sub lblCommonStartTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -397,11 +310,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblDataEnd
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblDataEndTest()
+    '''<summary>Test lblDataEnd</summary>
+    <TestMethod()> Public Sub lblDataEndTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -411,11 +321,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblDataStart
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblDataStartTest()
+    '''<summary>Test lblDataStart</summary>
+    <TestMethod()> Public Sub lblDataStartTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -425,11 +332,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblOmitAfter
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblOmitAfterTest()
+    '''<summary>Test lblOmitAfter</summary>
+    <TestMethod()> Public Sub lblOmitAfterTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -439,11 +343,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblOmitBefore
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblOmitBeforeTest()
+    '''<summary>Test lblOmitBefore</summary>
+    <TestMethod()> Public Sub lblOmitBeforeTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -453,11 +354,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for pDataGroup
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test pDataGroup</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub pDataGroupTest()
         Dim target As atcChooseDataGroupDates_Accessor = New atcChooseDataGroupDates_Accessor() ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
@@ -468,11 +366,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for txtOmitAfter
-    '''</summary>
-    <TestMethod()> _
-    Public Sub txtOmitAfterTest()
+    '''<summary>Test txtOmitAfter</summary>
+    <TestMethod()> Public Sub txtOmitAfterTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As TextBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As TextBox
@@ -482,11 +377,8 @@ Public Class atcChooseDataGroupDatesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for txtOmitBefore
-    '''</summary>
-    <TestMethod()> _
-    Public Sub txtOmitBeforeTest()
+    '''<summary>Test txtOmitBefore</summary>
+    <TestMethod()> Public Sub txtOmitBeforeTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
         Dim expected As TextBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As TextBox

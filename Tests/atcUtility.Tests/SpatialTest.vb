@@ -1,8 +1,5 @@
 ﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcUtility
-
-
 
 '''<summary>
 '''This is a test class for SpatialTest and is intended
@@ -10,8 +7,6 @@ Imports atcUtility
 '''</summary>
 <TestClass()> _
 Public Class SpatialTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -53,21 +48,14 @@ Public Class SpatialTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for Spatial Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SpatialConstructorTest()
+    '''<summary>Test Spatial Constructor</summary>
+    <TestMethod()> Public Sub SpatialConstructorTest()
         Dim target As Spatial = New Spatial()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for GreatCircleDistance
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GreatCircleDistanceTest()
+    '''<summary>Test GreatCircleDistance</summary>
+    <TestMethod()> Public Sub GreatCircleDistanceTest()
         Dim aLong1 As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aLat1 As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aLong2 As Double = 0.0! ' TODO: Initialize to an appropriate value

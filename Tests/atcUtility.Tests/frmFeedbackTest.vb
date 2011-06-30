@@ -1,12 +1,7 @@
 ﻿Imports System.Windows.Forms
-
 Imports System
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcUtility
-
-
 
 '''<summary>
 '''This is a test class for frmFeedbackTest and is intended
@@ -14,8 +9,6 @@ Imports atcUtility
 '''</summary>
 <TestClass()> _
 Public Class frmFeedbackTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -57,21 +50,14 @@ Public Class frmFeedbackTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for frmFeedback Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub frmFeedbackConstructorTest()
+    '''<summary>Test frmFeedback Constructor</summary>
+    <TestMethod()> Public Sub frmFeedbackConstructorTest()
         Dim target As frmFeedback = New frmFeedback()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for Dispose
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test Dispose</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub DisposeTest()
         Dim target As frmFeedback_Accessor = New frmFeedback_Accessor() ' TODO: Initialize to an appropriate value
         Dim disposing As Boolean = False ' TODO: Initialize to an appropriate value
@@ -79,11 +65,8 @@ Public Class frmFeedbackTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for GetDebugInfo
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetDebugInfoTest()
+    '''<summary>Test GetDebugInfo</summary>
+    <TestMethod()> Public Sub GetDebugInfoTest()
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
         actual = frmFeedback.GetDebugInfo
@@ -91,11 +74,8 @@ Public Class frmFeedbackTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetModuleInfo
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetModuleInfoTest()
+    '''<summary>Test GetModuleInfo</summary>
+    <TestMethod()> Public Sub GetModuleInfoTest()
         Dim target As frmFeedback = New frmFeedback() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -104,11 +84,8 @@ Public Class frmFeedbackTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetSystemInfo
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetSystemInfoTest()
+    '''<summary>Test GetSystemInfo</summary>
+    <TestMethod()> Public Sub GetSystemInfoTest()
         Dim target As frmFeedback = New frmFeedback() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -117,22 +94,16 @@ Public Class frmFeedbackTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for InitializeComponent
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test InitializeComponent</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub InitializeComponentTest()
         Dim target As frmFeedback_Accessor = New frmFeedback_Accessor() ' TODO: Initialize to an appropriate value
         target.InitializeComponent()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ShowFeedback
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ShowFeedbackTest()
+    '''<summary>Test ShowFeedback</summary>
+    <TestMethod()> Public Sub ShowFeedbackTest()
         Dim target As frmFeedback = New frmFeedback() ' TODO: Initialize to an appropriate value
         Dim aName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aNameExpected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -157,22 +128,16 @@ Public Class frmFeedbackTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for __ENCAddToList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test __ENCAddToList</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub __ENCAddToListTest()
         Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
         frmFeedback_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnCancel_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test btnCancel_Click</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub btnCancel_ClickTest()
         Dim target As frmFeedback_Accessor = New frmFeedback_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -181,11 +146,8 @@ Public Class frmFeedbackTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnCopy_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test btnCopy_Click</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub btnCopy_ClickTest()
         Dim target As frmFeedback_Accessor = New frmFeedback_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -194,11 +156,8 @@ Public Class frmFeedbackTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnSend_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test btnSend_Click</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub btnSend_ClickTest()
         Dim target As frmFeedback_Accessor = New frmFeedback_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -207,11 +166,8 @@ Public Class frmFeedbackTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnCancel
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnCancelTest()
+    '''<summary>Test btnCancel</summary>
+    <TestMethod()> Public Sub btnCancelTest()
         Dim target As frmFeedback = New frmFeedback() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -221,11 +177,8 @@ Public Class frmFeedbackTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnCopy
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnCopyTest()
+    '''<summary>Test btnCopy</summary>
+    <TestMethod()> Public Sub btnCopyTest()
         Dim target As frmFeedback = New frmFeedback() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -235,11 +188,8 @@ Public Class frmFeedbackTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnSend
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnSendTest()
+    '''<summary>Test btnSend</summary>
+    <TestMethod()> Public Sub btnSendTest()
         Dim target As frmFeedback = New frmFeedback() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -249,11 +199,8 @@ Public Class frmFeedbackTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for chkSendSystemInformation
-    '''</summary>
-    <TestMethod()> _
-    Public Sub chkSendSystemInformationTest()
+    '''<summary>Test chkSendSystemInformation</summary>
+    <TestMethod()> Public Sub chkSendSystemInformationTest()
         Dim target As frmFeedback = New frmFeedback() ' TODO: Initialize to an appropriate value
         Dim expected As CheckBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As CheckBox
@@ -263,11 +210,8 @@ Public Class frmFeedbackTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblEmail
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblEmailTest()
+    '''<summary>Test lblEmail</summary>
+    <TestMethod()> Public Sub lblEmailTest()
         Dim target As frmFeedback = New frmFeedback() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -277,11 +221,8 @@ Public Class frmFeedbackTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblEnterAmessage
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblEnterAmessageTest()
+    '''<summary>Test lblEnterAmessage</summary>
+    <TestMethod()> Public Sub lblEnterAmessageTest()
         Dim target As frmFeedback = New frmFeedback() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -291,11 +232,8 @@ Public Class frmFeedbackTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblName
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblNameTest()
+    '''<summary>Test lblName</summary>
+    <TestMethod()> Public Sub lblNameTest()
         Dim target As frmFeedback = New frmFeedback() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -305,11 +243,8 @@ Public Class frmFeedbackTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for txtEmail
-    '''</summary>
-    <TestMethod()> _
-    Public Sub txtEmailTest()
+    '''<summary>Test txtEmail</summary>
+    <TestMethod()> Public Sub txtEmailTest()
         Dim target As frmFeedback = New frmFeedback() ' TODO: Initialize to an appropriate value
         Dim expected As TextBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As TextBox
@@ -319,11 +254,8 @@ Public Class frmFeedbackTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for txtMessage
-    '''</summary>
-    <TestMethod()> _
-    Public Sub txtMessageTest()
+    '''<summary>Test txtMessage</summary>
+    <TestMethod()> Public Sub txtMessageTest()
         Dim target As frmFeedback = New frmFeedback() ' TODO: Initialize to an appropriate value
         Dim expected As TextBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As TextBox
@@ -333,11 +265,8 @@ Public Class frmFeedbackTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for txtName
-    '''</summary>
-    <TestMethod()> _
-    Public Sub txtNameTest()
+    '''<summary>Test txtName</summary>
+    <TestMethod()> Public Sub txtNameTest()
         Dim target As frmFeedback = New frmFeedback() ' TODO: Initialize to an appropriate value
         Dim expected As TextBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As TextBox
@@ -347,11 +276,8 @@ Public Class frmFeedbackTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for txtSystemInformation
-    '''</summary>
-    <TestMethod()> _
-    Public Sub txtSystemInformationTest()
+    '''<summary>Test txtSystemInformation</summary>
+    <TestMethod()> Public Sub txtSystemInformationTest()
         Dim target As frmFeedback = New frmFeedback() ' TODO: Initialize to an appropriate value
         Dim expected As TextBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As TextBox

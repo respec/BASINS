@@ -1,12 +1,7 @@
 ﻿Imports System
-
 Imports System.Windows.Forms
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for frmSpecifySeasonalAttributesTest and is intended
@@ -14,8 +9,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class frmSpecifySeasonalAttributesTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -57,21 +50,14 @@ Public Class frmSpecifySeasonalAttributesTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for frmSpecifySeasonalAttributes Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub frmSpecifySeasonalAttributesConstructorTest()
+    '''<summary>Test frmSpecifySeasonalAttributes Constructor</summary>
+    <TestMethod()> Public Sub frmSpecifySeasonalAttributesConstructorTest()
         Dim target As frmSpecifySeasonalAttributes = New frmSpecifySeasonalAttributes()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for AskUser
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AskUserTest()
+    '''<summary>Test AskUser</summary>
+    <TestMethod()> Public Sub AskUserTest()
         Dim target As frmSpecifySeasonalAttributes = New frmSpecifySeasonalAttributes() ' TODO: Initialize to an appropriate value
         Dim aTimeseriesGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim aSeasonsAvailable As atcDataAttributes = Nothing ' TODO: Initialize to an appropriate value
@@ -82,11 +68,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CalculateAttributes
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test CalculateAttributes</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub CalculateAttributesTest()
         Dim target As frmSpecifySeasonalAttributes_Accessor = New frmSpecifySeasonalAttributes_Accessor() ' TODO: Initialize to an appropriate value
         Dim aAttributes As atcDataAttributes = Nothing ' TODO: Initialize to an appropriate value
@@ -98,22 +81,16 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Clear
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test Clear</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub ClearTest()
         Dim target As frmSpecifySeasonalAttributes_Accessor = New frmSpecifySeasonalAttributes_Accessor() ' TODO: Initialize to an appropriate value
         target.Clear()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for CurrentSeason
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test CurrentSeason</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub CurrentSeasonTest()
         Dim target As frmSpecifySeasonalAttributes_Accessor = New frmSpecifySeasonalAttributes_Accessor() ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
@@ -123,11 +100,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Dispose
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test Dispose</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub DisposeTest()
         Dim target As frmSpecifySeasonalAttributes_Accessor = New frmSpecifySeasonalAttributes_Accessor() ' TODO: Initialize to an appropriate value
         Dim disposing As Boolean = False ' TODO: Initialize to an appropriate value
@@ -135,22 +109,16 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for InitializeComponent
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test InitializeComponent</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub InitializeComponentTest()
         Dim target As frmSpecifySeasonalAttributes_Accessor = New frmSpecifySeasonalAttributes_Accessor() ' TODO: Initialize to an appropriate value
         target.InitializeComponent()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for LoadListSelected
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test LoadListSelected</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub LoadListSelectedTest()
         Dim target As frmSpecifySeasonalAttributes_Accessor = New frmSpecifySeasonalAttributes_Accessor() ' TODO: Initialize to an appropriate value
         Dim aListbox As ListBox = Nothing ' TODO: Initialize to an appropriate value
@@ -158,11 +126,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for SaveListSelected
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test SaveListSelected</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub SaveListSelectedTest()
         Dim target As frmSpecifySeasonalAttributes_Accessor = New frmSpecifySeasonalAttributes_Accessor() ' TODO: Initialize to an appropriate value
         Dim aListbox As ListBox = Nothing ' TODO: Initialize to an appropriate value
@@ -170,22 +135,16 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for __ENCAddToList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test __ENCAddToList</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub __ENCAddToListTest()
         Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
         frmSpecifySeasonalAttributes_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnAttributesAll_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test btnAttributesAll_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub btnAttributesAll_ClickTest()
         Dim target As frmSpecifySeasonalAttributes_Accessor = New frmSpecifySeasonalAttributes_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -194,11 +153,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnAttributesNone_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test btnAttributesNone_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub btnAttributesNone_ClickTest()
         Dim target As frmSpecifySeasonalAttributes_Accessor = New frmSpecifySeasonalAttributes_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -207,11 +163,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnCancel_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test btnCancel_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub btnCancel_ClickTest()
         Dim target As frmSpecifySeasonalAttributes_Accessor = New frmSpecifySeasonalAttributes_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -220,11 +173,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnOk_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test btnOk_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub btnOk_ClickTest()
         Dim target As frmSpecifySeasonalAttributes_Accessor = New frmSpecifySeasonalAttributes_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -233,11 +183,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnSeasonsAll_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test btnSeasonsAll_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub btnSeasonsAll_ClickTest()
         Dim target As frmSpecifySeasonalAttributes_Accessor = New frmSpecifySeasonalAttributes_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -246,11 +193,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnSeasonsNone_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test btnSeasonsNone_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub btnSeasonsNone_ClickTest()
         Dim target As frmSpecifySeasonalAttributes_Accessor = New frmSpecifySeasonalAttributes_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -259,11 +203,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for cboSeasons_SelectedIndexChanged
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test cboSeasons_SelectedIndexChanged</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub cboSeasons_SelectedIndexChangedTest()
         Dim target As frmSpecifySeasonalAttributes_Accessor = New frmSpecifySeasonalAttributes_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -272,11 +213,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for lstAttributes_SelectedIndexChanged
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test lstAttributes_SelectedIndexChanged</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub lstAttributes_SelectedIndexChangedTest()
         Dim target As frmSpecifySeasonalAttributes_Accessor = New frmSpecifySeasonalAttributes_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -285,11 +223,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Splitter1
-    '''</summary>
-    <TestMethod()> _
-    Public Sub Splitter1Test()
+    '''<summary>Test Splitter1</summary>
+    <TestMethod()> Public Sub Splitter1Test()
         Dim target As frmSpecifySeasonalAttributes = New frmSpecifySeasonalAttributes() ' TODO: Initialize to an appropriate value
         Dim expected As Splitter = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Splitter
@@ -299,11 +234,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnAttributesAll
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnAttributesAllTest()
+    '''<summary>Test btnAttributesAll</summary>
+    <TestMethod()> Public Sub btnAttributesAllTest()
         Dim target As frmSpecifySeasonalAttributes = New frmSpecifySeasonalAttributes() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -313,11 +245,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnAttributesNone
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnAttributesNoneTest()
+    '''<summary>Test btnAttributesNone</summary>
+    <TestMethod()> Public Sub btnAttributesNoneTest()
         Dim target As frmSpecifySeasonalAttributes = New frmSpecifySeasonalAttributes() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -327,11 +256,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnCancel
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnCancelTest()
+    '''<summary>Test btnCancel</summary>
+    <TestMethod()> Public Sub btnCancelTest()
         Dim target As frmSpecifySeasonalAttributes = New frmSpecifySeasonalAttributes() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -341,11 +267,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnOk
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnOkTest()
+    '''<summary>Test btnOk</summary>
+    <TestMethod()> Public Sub btnOkTest()
         Dim target As frmSpecifySeasonalAttributes = New frmSpecifySeasonalAttributes() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -355,11 +278,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnSeasonsAll
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnSeasonsAllTest()
+    '''<summary>Test btnSeasonsAll</summary>
+    <TestMethod()> Public Sub btnSeasonsAllTest()
         Dim target As frmSpecifySeasonalAttributes = New frmSpecifySeasonalAttributes() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -369,11 +289,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnSeasonsNone
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnSeasonsNoneTest()
+    '''<summary>Test btnSeasonsNone</summary>
+    <TestMethod()> Public Sub btnSeasonsNoneTest()
         Dim target As frmSpecifySeasonalAttributes = New frmSpecifySeasonalAttributes() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -383,11 +300,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for cboSeasons
-    '''</summary>
-    <TestMethod()> _
-    Public Sub cboSeasonsTest()
+    '''<summary>Test cboSeasons</summary>
+    <TestMethod()> Public Sub cboSeasonsTest()
         Dim target As frmSpecifySeasonalAttributes = New frmSpecifySeasonalAttributes() ' TODO: Initialize to an appropriate value
         Dim expected As ComboBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ComboBox
@@ -397,11 +311,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for grpAttributes
-    '''</summary>
-    <TestMethod()> _
-    Public Sub grpAttributesTest()
+    '''<summary>Test grpAttributes</summary>
+    <TestMethod()> Public Sub grpAttributesTest()
         Dim target As frmSpecifySeasonalAttributes = New frmSpecifySeasonalAttributes() ' TODO: Initialize to an appropriate value
         Dim expected As GroupBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As GroupBox
@@ -411,11 +322,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for grpSeasons
-    '''</summary>
-    <TestMethod()> _
-    Public Sub grpSeasonsTest()
+    '''<summary>Test grpSeasons</summary>
+    <TestMethod()> Public Sub grpSeasonsTest()
         Dim target As frmSpecifySeasonalAttributes = New frmSpecifySeasonalAttributes() ' TODO: Initialize to an appropriate value
         Dim expected As GroupBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As GroupBox
@@ -425,11 +333,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lstAttributes
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lstAttributesTest()
+    '''<summary>Test lstAttributes</summary>
+    <TestMethod()> Public Sub lstAttributesTest()
         Dim target As frmSpecifySeasonalAttributes = New frmSpecifySeasonalAttributes() ' TODO: Initialize to an appropriate value
         Dim expected As ListBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ListBox
@@ -439,11 +344,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lstSeasons
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lstSeasonsTest()
+    '''<summary>Test lstSeasons</summary>
+    <TestMethod()> Public Sub lstSeasonsTest()
         Dim target As frmSpecifySeasonalAttributes = New frmSpecifySeasonalAttributes() ' TODO: Initialize to an appropriate value
         Dim expected As ListBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ListBox
@@ -453,11 +355,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for pTimseriesGroup
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test pTimseriesGroup</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub pTimseriesGroupTest()
         Dim target As frmSpecifySeasonalAttributes_Accessor = New frmSpecifySeasonalAttributes_Accessor() ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
@@ -468,11 +367,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for panelBottom
-    '''</summary>
-    <TestMethod()> _
-    Public Sub panelBottomTest()
+    '''<summary>Test panelBottom</summary>
+    <TestMethod()> Public Sub panelBottomTest()
         Dim target As frmSpecifySeasonalAttributes = New frmSpecifySeasonalAttributes() ' TODO: Initialize to an appropriate value
         Dim expected As Panel = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Panel
@@ -482,11 +378,8 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for panelTop
-    '''</summary>
-    <TestMethod()> _
-    Public Sub panelTopTest()
+    '''<summary>Test panelTop</summary>
+    <TestMethod()> Public Sub panelTopTest()
         Dim target As frmSpecifySeasonalAttributes = New frmSpecifySeasonalAttributes() ' TODO: Initialize to an appropriate value
         Dim expected As Panel = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Panel

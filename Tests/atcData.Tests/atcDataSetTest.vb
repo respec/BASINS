@@ -1,8 +1,5 @@
 ﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for atcDataSetTest and is intended
@@ -10,8 +7,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class atcDataSetTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -53,31 +48,21 @@ Public Class atcDataSetTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcDataSet Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcDataSetConstructorTest()
+    '''<summary>Test atcDataSet Constructor</summary>
+    <TestMethod()> Public Sub atcDataSetConstructorTest()
         Dim target As atcDataSet = New atcDataSet()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for Clear
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ClearTest()
+    '''<summary>Test Clear</summary>
+    <TestMethod()> Public Sub ClearTest()
         Dim target As atcDataSet = New atcDataSet() ' TODO: Initialize to an appropriate value
         target.Clear()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Clone
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CloneTest()
+    '''<summary>Test Clone</summary>
+    <TestMethod()> Public Sub CloneTest()
         Dim target As atcDataSet = New atcDataSet() ' TODO: Initialize to an appropriate value
         Dim expected As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcDataSet
@@ -86,22 +71,16 @@ Public Class atcDataSetTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SetStringFormat
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SetStringFormatTest()
+    '''<summary>Test SetStringFormat</summary>
+    <TestMethod()> Public Sub SetStringFormatTest()
         Dim aAttributeNames() As String = Nothing ' TODO: Initialize to an appropriate value
         Dim aFormat As String = String.Empty ' TODO: Initialize to an appropriate value
         atcDataSet.SetStringFormat(aAttributeNames, aFormat)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ToString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ToStringTest()
+    '''<summary>Test ToString</summary>
+    <TestMethod()> Public Sub ToStringTest()
         Dim target As atcDataSet = New atcDataSet() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -110,11 +89,8 @@ Public Class atcDataSetTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for op_Equality
-    '''</summary>
-    <TestMethod()> _
-    Public Sub op_EqualityTest()
+    '''<summary>Test op_Equality</summary>
+    <TestMethod()> Public Sub op_EqualityTest()
         Dim aArg1 As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
         Dim aArg2 As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -124,11 +100,8 @@ Public Class atcDataSetTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for op_Inequality
-    '''</summary>
-    <TestMethod()> _
-    Public Sub op_InequalityTest()
+    '''<summary>Test op_Inequality</summary>
+    <TestMethod()> Public Sub op_InequalityTest()
         Dim aArg1 As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
         Dim aArg2 As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -138,22 +111,16 @@ Public Class atcDataSetTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Attributes
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AttributesTest()
+    '''<summary>Test Attributes</summary>
+    <TestMethod()> Public Sub AttributesTest()
         Dim target As atcDataSet = New atcDataSet() ' TODO: Initialize to an appropriate value
         Dim actual As atcDataAttributes
         actual = target.Attributes
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Serial
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SerialTest()
+    '''<summary>Test Serial</summary>
+    <TestMethod()> Public Sub SerialTest()
         Dim target As atcDataSet = New atcDataSet() ' TODO: Initialize to an appropriate value
         Dim actual As Integer
         actual = target.Serial

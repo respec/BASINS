@@ -1,8 +1,5 @@
 ﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcUtility
-
-
 
 '''<summary>
 '''This is a test class for modStringTest and is intended
@@ -10,8 +7,6 @@ Imports atcUtility
 '''</summary>
 <TestClass()> _
 Public Class modStringTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -53,12 +48,8 @@ Public Class modStringTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for Assign
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AssignTest()
+    '''<summary>Test Assign</summary>
+    <TestMethod()> Public Sub AssignTest()
         Dim aResult As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aResultExpected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aExpression As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -70,11 +61,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Assign
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AssignTest1()
+    '''<summary>Test Assign</summary>
+    <TestMethod()> Public Sub AssignTest1()
         Dim aResult As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aResultExpected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aExpression As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -86,11 +74,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Assign
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AssignTest2()
+    '''<summary>Test Assign</summary>
+    <TestMethod()> Public Sub AssignTest2()
         Dim aResult As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aResultExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aExpression As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -102,11 +87,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Byte2String
-    '''</summary>
-    <TestMethod()> _
-    Public Sub Byte2StringTest()
+    '''<summary>Test Byte2String</summary>
+    <TestMethod()> Public Sub Byte2StringTest()
         Dim Byt() As Byte = Nothing ' TODO: Initialize to an appropriate value
         Dim BytExpected() As Byte = Nothing ' TODO: Initialize to an appropriate value
         Dim StartAt As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -123,11 +105,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ByteIsPrintable
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ByteIsPrintableTest()
+    '''<summary>Test ByteIsPrintable</summary>
+    <TestMethod()> Public Sub ByteIsPrintableTest()
         Dim aByte As Byte = 0 ' TODO: Initialize to an appropriate value
         Dim aByteExpected As Byte = 0 ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -138,11 +117,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CapitalizeFirstLetter
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CapitalizeFirstLetterTest()
+    '''<summary>Test CapitalizeFirstLetter</summary>
+    <TestMethod()> Public Sub CapitalizeFirstLetterTest()
         Dim aStr As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -151,11 +127,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Center
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CenterTest()
+    '''<summary>Test Center</summary>
+    <TestMethod()> Public Sub CenterTest()
         Dim aStr As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aWidth As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -165,11 +138,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CountString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CountStringTest()
+    '''<summary>Test CountString</summary>
+    <TestMethod()> Public Sub CountStringTest()
         Dim Source As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim SourceExpected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim Find As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -183,11 +153,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DecimalAlign
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DecimalAlignTest()
+    '''<summary>Test DecimalAlign</summary>
+    <TestMethod()> Public Sub DecimalAlignTest()
         Dim aValue As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aFieldWidth As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDecimalPlaces As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -199,11 +166,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DecimalAlign
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DecimalAlignTest1()
+    '''<summary>Test DecimalAlign</summary>
+    <TestMethod()> Public Sub DecimalAlignTest1()
         Dim aValue As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aFieldWidth As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWidthAfterDecimal As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -214,11 +178,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DecimalAlign
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DecimalAlignTest2()
+    '''<summary>Test DecimalAlign</summary>
+    <TestMethod()> Public Sub DecimalAlignTest2()
         Dim aNumericStrings() As String = Nothing ' TODO: Initialize to an appropriate value
         Dim aNumericStringsExpected() As String = Nothing ' TODO: Initialize to an appropriate value
         Dim PadLeft As Boolean = False ' TODO: Initialize to an appropriate value
@@ -235,11 +196,8 @@ Public Class modStringTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for DoubleToString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DoubleToStringTest()
+    '''<summary>Test DoubleToString</summary>
+    <TestMethod()> Public Sub DoubleToStringTest()
         Dim aValue As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aMaxWidth As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aFormat As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -253,11 +211,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FirstStringPos
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FirstStringPosTest()
+    '''<summary>Test FirstStringPos</summary>
+    <TestMethod()> Public Sub FirstStringPosTest()
         Dim start As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim Source As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim SearchFor() As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -268,11 +223,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for IsAlpha
-    '''</summary>
-    <TestMethod()> _
-    Public Sub IsAlphaTest()
+    '''<summary>Test IsAlpha</summary>
+    <TestMethod()> Public Sub IsAlphaTest()
         Dim aStr As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aStrExpected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -283,11 +235,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for IsAlphaNumeric
-    '''</summary>
-    <TestMethod()> _
-    Public Sub IsAlphaNumericTest()
+    '''<summary>Test IsAlphaNumeric</summary>
+    <TestMethod()> Public Sub IsAlphaNumericTest()
         Dim aStr As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aStrExpected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -298,11 +247,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for IsInteger
-    '''</summary>
-    <TestMethod()> _
-    Public Sub IsIntegerTest()
+    '''<summary>Test IsInteger</summary>
+    <TestMethod()> Public Sub IsIntegerTest()
         Dim aStr As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aStrExpected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -313,11 +259,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Long2Single
-    '''</summary>
-    <TestMethod()> _
-    Public Sub Long2SingleTest()
+    '''<summary>Test Long2Single</summary>
+    <TestMethod()> Public Sub Long2SingleTest()
         Dim Value As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim ValueExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As Single = 0.0! ' TODO: Initialize to an appropriate value
@@ -328,11 +271,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Long2String
-    '''</summary>
-    <TestMethod()> _
-    Public Sub Long2StringTest()
+    '''<summary>Test Long2String</summary>
+    <TestMethod()> Public Sub Long2StringTest()
         Dim Value As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim ValueExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -343,11 +283,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ReadableFromXML
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ReadableFromXMLTest()
+    '''<summary>Test ReadableFromXML</summary>
+    <TestMethod()> Public Sub ReadableFromXMLTest()
         Dim aXML As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -356,11 +293,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ReplaceString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ReplaceStringTest()
+    '''<summary>Test ReplaceString</summary>
+    <TestMethod()> Public Sub ReplaceStringTest()
         Dim Source As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim SourceExpected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim Find As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -377,11 +311,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ReplaceStringNoCase
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ReplaceStringNoCaseTest()
+    '''<summary>Test ReplaceStringNoCase</summary>
+    <TestMethod()> Public Sub ReplaceStringNoCaseTest()
         Dim Source As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim SourceExpected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim Find As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -398,11 +329,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for RightJustify
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RightJustifyTest()
+    '''<summary>Test RightJustify</summary>
+    <TestMethod()> Public Sub RightJustifyTest()
         Dim aValue As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim aWidth As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -412,11 +340,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Rndlow
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RndlowTest()
+    '''<summary>Test Rndlow</summary>
+    <TestMethod()> Public Sub RndlowTest()
         Dim aX As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aXExpected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -427,11 +352,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SafeSubstring
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SafeSubstringTest()
+    '''<summary>Test SafeSubstring</summary>
+    <TestMethod()> Public Sub SafeSubstringTest()
         Dim aSourceString As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aStartIndex As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aLength As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -442,11 +364,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SafeSubstring
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SafeSubstringTest1()
+    '''<summary>Test SafeSubstring</summary>
+    <TestMethod()> Public Sub SafeSubstringTest1()
         Dim aSourceString As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aStartIndex As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -456,11 +375,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SignificantDigits
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SignificantDigitsTest()
+    '''<summary>Test SignificantDigits</summary>
+    <TestMethod()> Public Sub SignificantDigitsTest()
         Dim aValue As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aDigits As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -470,11 +386,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for StrFindBlock
-    '''</summary>
-    <TestMethod()> _
-    Public Sub StrFindBlockTest()
+    '''<summary>Test StrFindBlock</summary>
+    <TestMethod()> Public Sub StrFindBlockTest()
         Dim aSource As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aStartsWith As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aEndsWith As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -486,11 +399,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for StrFirstInt
-    '''</summary>
-    <TestMethod()> _
-    Public Sub StrFirstIntTest()
+    '''<summary>Test StrFirstInt</summary>
+    <TestMethod()> Public Sub StrFirstIntTest()
         Dim Source As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim SourceExpected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -501,11 +411,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for StrNoNull
-    '''</summary>
-    <TestMethod()> _
-    Public Sub StrNoNullTest()
+    '''<summary>Test StrNoNull</summary>
+    <TestMethod()> Public Sub StrNoNullTest()
         Dim S As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -514,11 +421,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for StrPad
-    '''</summary>
-    <TestMethod()> _
-    Public Sub StrPadTest()
+    '''<summary>Test StrPad</summary>
+    <TestMethod()> Public Sub StrPadTest()
         Dim S As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim NewLength As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim PadWith As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -530,11 +434,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for StrPrintable
-    '''</summary>
-    <TestMethod()> _
-    Public Sub StrPrintableTest()
+    '''<summary>Test StrPrintable</summary>
+    <TestMethod()> Public Sub StrPrintableTest()
         Dim S As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim SExpected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim ReplaceWith As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -548,11 +449,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for StrReplaceBlock
-    '''</summary>
-    <TestMethod()> _
-    Public Sub StrReplaceBlockTest()
+    '''<summary>Test StrReplaceBlock</summary>
+    <TestMethod()> Public Sub StrReplaceBlockTest()
         Dim aSource As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aStartsWith As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aEndsWith As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -565,11 +463,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for StrRetRem
-    '''</summary>
-    <TestMethod()> _
-    Public Sub StrRetRemTest()
+    '''<summary>Test StrRetRem</summary>
+    <TestMethod()> Public Sub StrRetRemTest()
         Dim S As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim SExpected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -580,11 +475,8 @@ Public Class modStringTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for StringQuotedAsNeeded
-    '''</summary>
-    <TestMethod()> _
-    Public Sub StringQuotedAsNeededTest()
+    '''<summary>Test StringQuotedAsNeeded</summary>
+    <TestMethod()> Public Sub StringQuotedAsNeededTest()
         Dim aInputString As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aDelimiter As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aQuote As String = String.Empty ' TODO: Initialize to an appropriate value

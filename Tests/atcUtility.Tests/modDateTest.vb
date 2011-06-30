@@ -1,8 +1,5 @@
 ﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcUtility
-
-
 
 '''<summary>
 '''This is a test class for modDateTest and is intended
@@ -10,8 +7,6 @@ Imports atcUtility
 '''</summary>
 <TestClass()> _
 Public Class modDateTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -53,12 +48,8 @@ Public Class modDateTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for AddUniqueDate
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddUniqueDateTest()
+    '''<summary>Test AddUniqueDate</summary>
+    <TestMethod()> Public Sub AddUniqueDateTest()
         Dim aJdate As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aJdateExisting() As Double = Nothing ' TODO: Initialize to an appropriate value
         Dim aJdateExistingExpected() As Double = Nothing ' TODO: Initialize to an appropriate value
@@ -73,11 +64,8 @@ Public Class modDateTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CalcTimeUnitStep
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CalcTimeUnitStepTest()
+    '''<summary>Test CalcTimeUnitStep</summary>
+    <TestMethod()> Public Sub CalcTimeUnitStepTest()
         Dim aSJDate As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aEJDate As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aTimeUnit As modDate.atcTimeUnit = New modDate.atcTimeUnit() ' TODO: Initialize to an appropriate value
@@ -90,11 +78,8 @@ Public Class modDateTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Date2J
-    '''</summary>
-    <TestMethod()> _
-    Public Sub Date2JTest()
+    '''<summary>Test Date2J</summary>
+    <TestMethod()> Public Sub Date2JTest()
         Dim aYr As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aMo As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDy As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -108,11 +93,8 @@ Public Class modDateTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Date2J
-    '''</summary>
-    <TestMethod()> _
-    Public Sub Date2JTest1()
+    '''<summary>Test Date2J</summary>
+    <TestMethod()> Public Sub Date2JTest1()
         Dim aDate() As Integer = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim actual As Double
@@ -121,11 +103,8 @@ Public Class modDateTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DateIntrvl
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DateIntrvlTest()
+    '''<summary>Test DateIntrvl</summary>
+    <TestMethod()> Public Sub DateIntrvlTest()
         Dim aDate() As Integer = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -134,11 +113,8 @@ Public Class modDateTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DayMon
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DayMonTest()
+    '''<summary>Test DayMon</summary>
+    <TestMethod()> Public Sub DayMonTest()
         Dim aYr As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aMo As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -148,11 +124,8 @@ Public Class modDateTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DumpDate
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DumpDateTest()
+    '''<summary>Test DumpDate</summary>
+    <TestMethod()> Public Sub DumpDateTest()
         Dim aDateJ As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -161,11 +134,8 @@ Public Class modDateTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FormatTime
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FormatTimeTest()
+    '''<summary>Test FormatTime</summary>
+    <TestMethod()> Public Sub FormatTimeTest()
         Dim aSeconds As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -174,11 +144,8 @@ Public Class modDateTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for HMS2J
-    '''</summary>
-    <TestMethod()> _
-    Public Sub HMS2JTest()
+    '''<summary>Test HMS2J</summary>
+    <TestMethod()> Public Sub HMS2JTest()
         Dim aHr As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aMi As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aSc As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -189,11 +156,8 @@ Public Class modDateTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for INVMJD
-    '''</summary>
-    <TestMethod()> _
-    Public Sub INVMJDTest()
+    '''<summary>Test INVMJD</summary>
+    <TestMethod()> Public Sub INVMJDTest()
         Dim aMJD As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aYr As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aYrExpected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -208,11 +172,8 @@ Public Class modDateTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for J2Date
-    '''</summary>
-    <TestMethod()> _
-    Public Sub J2DateTest()
+    '''<summary>Test J2Date</summary>
+    <TestMethod()> Public Sub J2DateTest()
         Dim aJd As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aDate() As Integer = Nothing ' TODO: Initialize to an appropriate value
         Dim aDateExpected() As Integer = Nothing ' TODO: Initialize to an appropriate value
@@ -221,11 +182,8 @@ Public Class modDateTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for J2DateRounddown
-    '''</summary>
-    <TestMethod()> _
-    Public Sub J2DateRounddownTest()
+    '''<summary>Test J2DateRounddown</summary>
+    <TestMethod()> Public Sub J2DateRounddownTest()
         Dim aJDate As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aTU As modDate.atcTimeUnit = New modDate.atcTimeUnit() ' TODO: Initialize to an appropriate value
         Dim aDate() As Integer = Nothing ' TODO: Initialize to an appropriate value
@@ -235,11 +193,8 @@ Public Class modDateTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for J2DateRoundup
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test J2DateRoundup</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub J2DateRoundupTest()
         Dim aJDate As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aTU As modDate.atcTimeUnit = New modDate.atcTimeUnit() ' TODO: Initialize to an appropriate value
@@ -248,11 +203,8 @@ Public Class modDateTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for J2HMS
-    '''</summary>
-    <TestMethod()> _
-    Public Sub J2HMSTest()
+    '''<summary>Test J2HMS</summary>
+    <TestMethod()> Public Sub J2HMSTest()
         Dim aJd As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aHr As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aHrExpected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -270,11 +222,8 @@ Public Class modDateTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for JDateIntrvl
-    '''</summary>
-    <TestMethod()> _
-    Public Sub JDateIntrvlTest()
+    '''<summary>Test JDateIntrvl</summary>
+    <TestMethod()> Public Sub JDateIntrvlTest()
         Dim aJd As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -283,11 +232,8 @@ Public Class modDateTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Jday
-    '''</summary>
-    <TestMethod()> _
-    Public Sub JdayTest()
+    '''<summary>Test Jday</summary>
+    <TestMethod()> Public Sub JdayTest()
         Dim aYr As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aMo As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDy As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -301,11 +247,8 @@ Public Class modDateTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for MJD
-    '''</summary>
-    <TestMethod()> _
-    Public Sub MJDTest()
+    '''<summary>Test MJD</summary>
+    <TestMethod()> Public Sub MJDTest()
         Dim aYr As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aMn As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDy As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -316,11 +259,8 @@ Public Class modDateTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for StringToJdate
-    '''</summary>
-    <TestMethod()> _
-    Public Sub StringToJdateTest()
+    '''<summary>Test StringToJdate</summary>
+    <TestMethod()> Public Sub StringToJdateTest()
         Dim aText As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aIntervalStart As Boolean = False ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -330,11 +270,8 @@ Public Class modDateTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for TIMADD
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TIMADDTest()
+    '''<summary>Test TIMADD</summary>
+    <TestMethod()> Public Sub TIMADDTest()
         Dim DATE1() As Integer = Nothing ' TODO: Initialize to an appropriate value
         Dim TCODE As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim TSTEP As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -346,11 +283,8 @@ Public Class modDateTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for TimAddJ
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TimAddJTest()
+    '''<summary>Test TimAddJ</summary>
+    <TestMethod()> Public Sub TimAddJTest()
         Dim aStartDate As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aTimeUnits As modDate.atcTimeUnit = New modDate.atcTimeUnit() ' TODO: Initialize to an appropriate value
         Dim aTimeStep As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -362,11 +296,8 @@ Public Class modDateTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for TimDif
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TimDifTest()
+    '''<summary>Test TimDif</summary>
+    <TestMethod()> Public Sub TimDifTest()
         Dim DATE1() As Integer = Nothing ' TODO: Initialize to an appropriate value
         Dim DATE2() As Integer = Nothing ' TODO: Initialize to an appropriate value
         Dim TCODE As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -378,11 +309,8 @@ Public Class modDateTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for TimeSpanAsString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TimeSpanAsStringTest()
+    '''<summary>Test TimeSpanAsString</summary>
+    <TestMethod()> Public Sub TimeSpanAsStringTest()
         Dim aSDateJ As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aEdateJ As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aPrefix As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -393,11 +321,8 @@ Public Class modDateTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for YearCount
-    '''</summary>
-    <TestMethod()> _
-    Public Sub YearCountTest()
+    '''<summary>Test YearCount</summary>
+    <TestMethod()> Public Sub YearCountTest()
         Dim aSDateJ As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim aEdateJ As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -407,11 +332,8 @@ Public Class modDateTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for cmptim
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test cmptim</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub cmptimTest()
         Dim tcode1 As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim tstep1 As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -427,11 +349,8 @@ Public Class modDateTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for cmptm2
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test cmptm2</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub cmptm2Test()
         Dim tc1 As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim ts1 As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -447,11 +366,8 @@ Public Class modDateTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for pTimDif
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test pTimDif</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub pTimDifTest()
         Dim StartJDate As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim EndJDate As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -466,11 +382,8 @@ Public Class modDateTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for timcnv
-    '''</summary>
-    <TestMethod()> _
-    Public Sub timcnvTest()
+    '''<summary>Test timcnv</summary>
+    <TestMethod()> Public Sub timcnvTest()
         Dim d() As Integer = Nothing ' TODO: Initialize to an appropriate value
         Dim dExpected() As Integer = Nothing ' TODO: Initialize to an appropriate value
         modDate.timcnv(d)
@@ -478,11 +391,8 @@ Public Class modDateTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for timdifJ
-    '''</summary>
-    <TestMethod()> _
-    Public Sub timdifJTest()
+    '''<summary>Test timdifJ</summary>
+    <TestMethod()> Public Sub timdifJTest()
         Dim StartJDate As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim EndJDate As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim TCODE As Integer = 0 ' TODO: Initialize to an appropriate value

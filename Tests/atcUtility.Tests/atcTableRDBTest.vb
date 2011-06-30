@@ -1,10 +1,6 @@
 ﻿Imports System.IO
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcUtility
-
-
 
 '''<summary>
 '''This is a test class for atcTableRDBTest and is intended
@@ -12,8 +8,6 @@ Imports atcUtility
 '''</summary>
 <TestClass()> _
 Public Class atcTableRDBTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -55,21 +49,14 @@ Public Class atcTableRDBTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcTableRDB Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcTableRDBConstructorTest()
+    '''<summary>Test atcTableRDB Constructor</summary>
+    <TestMethod()> Public Sub atcTableRDBConstructorTest()
         Dim target As atcTableRDB = New atcTableRDB()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for OpenStream
-    '''</summary>
-    <TestMethod()> _
-    Public Sub OpenStreamTest()
+    '''<summary>Test OpenStream</summary>
+    <TestMethod()> Public Sub OpenStreamTest()
         Dim target As atcTableRDB = New atcTableRDB() ' TODO: Initialize to an appropriate value
         Dim aStream As Stream = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -79,11 +66,8 @@ Public Class atcTableRDBTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for RDBfieldtype
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test RDBfieldtype</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub RDBfieldtypeTest()
         Dim target As atcTableRDB_Accessor = New atcTableRDB_Accessor() ' TODO: Initialize to an appropriate value
         Dim aDBFfieldType As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -94,11 +78,8 @@ Public Class atcTableRDBTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for WriteFile
-    '''</summary>
-    <TestMethod()> _
-    Public Sub WriteFileTest()
+    '''<summary>Test WriteFile</summary>
+    <TestMethod()> Public Sub WriteFileTest()
         Dim target As atcTableRDB = New atcTableRDB() ' TODO: Initialize to an appropriate value
         Dim aFilename As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -108,11 +89,8 @@ Public Class atcTableRDBTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FieldType
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FieldTypeTest()
+    '''<summary>Test FieldType</summary>
+    <TestMethod()> Public Sub FieldTypeTest()
         Dim target As atcTableRDB = New atcTableRDB() ' TODO: Initialize to an appropriate value
         Dim aFieldNumber As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
