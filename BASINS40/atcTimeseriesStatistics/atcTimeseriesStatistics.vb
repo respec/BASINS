@@ -33,6 +33,8 @@ Public Class atcTimeseriesStatistics
         End Get
     End Property
 
+#If GISProvider = "DotSpatial" Then
+#Else
     <CLSCompliant(False)> _
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
@@ -40,6 +42,7 @@ Public Class atcTimeseriesStatistics
             atcDataAttributes.AddDefinition(lOperation.Definition)
         Next
     End Sub
+#End If
 
     ''' <summary>Definitions of statistics supported by this class.</summary>
     Public Overrides ReadOnly Property AvailableOperations() As atcDataAttributes
@@ -405,7 +408,10 @@ Public Class atcTimeseriesStatistics
         End If
     End Function
 
+#If GISProvider = "DotSpatial" Then
+#Else
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         MyBase.ItemClicked(aItemName, aHandled)
     End Sub
+#End If
 End Class
