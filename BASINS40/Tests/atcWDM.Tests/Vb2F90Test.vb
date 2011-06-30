@@ -1,8 +1,5 @@
 ﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcWDM
-
-
 
 '''<summary>
 '''This is a test class for Vb2F90Test and is intended
@@ -10,8 +7,6 @@ Imports atcWDM
 '''</summary>
 <TestClass()> _
 Public Class Vb2F90Test
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -53,12 +48,8 @@ Public Class Vb2F90Test
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for F90_GETATT
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_GETATTTest()
+    '''<summary>Test F90_GETATT</summary>
+    <TestMethod()> Public Sub F90_GETATTTest()
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWdmUnitExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDsn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -76,11 +67,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_INQNAM
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_INQNAMTest()
+    '''<summary>Test F90_INQNAM</summary>
+    <TestMethod()> Public Sub F90_INQNAMTest()
         Dim aName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aNameExpected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aNameLen As Short = 0 ' TODO: Initialize to an appropriate value
@@ -92,11 +80,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_MSG
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_MSGTest()
+    '''<summary>Test F90_MSG</summary>
+    <TestMethod()> Public Sub F90_MSGTest()
         Dim aMsg As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aMsgExpected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aMsgLen As Short = 0 ' TODO: Initialize to an appropriate value
@@ -105,11 +90,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_WDBOPNR
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_WDBOPNRTest()
+    '''<summary>Test F90_WDBOPNR</summary>
+    <TestMethod()> Public Sub F90_WDBOPNRTest()
         Dim aRwflg As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aRwflgExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aName As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -127,11 +109,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_WDBSAC
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_WDBSACTest()
+    '''<summary>Test F90_WDBSAC</summary>
+    <TestMethod()> Public Sub F90_WDBSACTest()
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWdmUnitExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDsn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -158,11 +137,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_WDBSAI
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_WDBSAITest()
+    '''<summary>Test F90_WDBSAI</summary>
+    <TestMethod()> Public Sub F90_WDBSAITest()
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWdmUnitExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDsn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -188,11 +164,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_WDBSAR
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_WDBSARTest()
+    '''<summary>Test F90_WDBSAR</summary>
+    <TestMethod()> Public Sub F90_WDBSARTest()
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWdmUnitExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDsn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -218,11 +191,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_WDBSGC
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_WDBSGCTest()
+    '''<summary>Test F90_WDBSGC</summary>
+    <TestMethod()> Public Sub F90_WDBSGCTest()
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWdmUnitExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDsn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -242,11 +212,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_WDBSGC_XX
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_WDBSGC_XXTest()
+    '''<summary>Test F90_WDBSGC_XX</summary>
+    <TestMethod()> Public Sub F90_WDBSGC_XXTest()
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWdmUnitExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDsn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -264,11 +231,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_WDBSGI
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_WDBSGITest()
+    '''<summary>Test F90_WDBSGI</summary>
+    <TestMethod()> Public Sub F90_WDBSGITest()
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWdmUnitExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDsn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -291,11 +255,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_WDBSGR
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_WDBSGRTest()
+    '''<summary>Test F90_WDBSGR</summary>
+    <TestMethod()> Public Sub F90_WDBSGRTest()
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWdmUnitExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDsn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -318,11 +279,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_WDCKDT
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_WDCKDTTest()
+    '''<summary>Test F90_WDCKDT</summary>
+    <TestMethod()> Public Sub F90_WDCKDTTest()
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWdmUnitExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDsn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -336,11 +294,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_WDDSDL
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_WDDSDLTest()
+    '''<summary>Test F90_WDDSDL</summary>
+    <TestMethod()> Public Sub F90_WDDSDLTest()
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWdmUnitExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDsn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -354,11 +309,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_WDDSNX
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_WDDSNXTest()
+    '''<summary>Test F90_WDDSNX</summary>
+    <TestMethod()> Public Sub F90_WDDSNXTest()
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWdmUnitExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDsn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -369,11 +321,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_WDDSRN
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_WDDSRNTest()
+    '''<summary>Test F90_WDDSRN</summary>
+    <TestMethod()> Public Sub F90_WDDSRNTest()
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWdmUnitExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDsnOld As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -390,11 +339,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_WDFLCL
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_WDFLCLTest()
+    '''<summary>Test F90_WDFLCL</summary>
+    <TestMethod()> Public Sub F90_WDFLCLTest()
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWdmUnitExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -405,11 +351,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_WDLBAD
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_WDLBADTest()
+    '''<summary>Test F90_WDLBAD</summary>
+    <TestMethod()> Public Sub F90_WDLBADTest()
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWdmUnitExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDsn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -426,11 +369,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_WDLBAX
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_WDLBAXTest()
+    '''<summary>Test F90_WDLBAX</summary>
+    <TestMethod()> Public Sub F90_WDLBAXTest()
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWdmUnitExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDsn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -462,11 +402,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_WDSAGY
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_WDSAGYTest()
+    '''<summary>Test F90_WDSAGY</summary>
+    <TestMethod()> Public Sub F90_WDSAGYTest()
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWdmUnitExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aSaind As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -513,11 +450,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_WDSAGY_XX
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_WDSAGY_XXTest()
+    '''<summary>Test F90_WDSAGY_XX</summary>
+    <TestMethod()> Public Sub F90_WDSAGY_XXTest()
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWdmUnitExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aSaind As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -558,11 +492,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_WDTGET
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_WDTGETTest()
+    '''<summary>Test F90_WDTGET</summary>
+    <TestMethod()> Public Sub F90_WDTGETTest()
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWdmUnitExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDsn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -593,11 +524,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_WDTPUT
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_WDTPUTTest()
+    '''<summary>Test F90_WDTPUT</summary>
+    <TestMethod()> Public Sub F90_WDTPUTTest()
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWdmUnitExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDsn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -628,11 +556,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for F90_WTFNDT
-    '''</summary>
-    <TestMethod()> _
-    Public Sub F90_WTFNDTTest()
+    '''<summary>Test F90_WTFNDT</summary>
+    <TestMethod()> Public Sub F90_WTFNDTTest()
         Dim aWdmUnit As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aWdmUnitExpected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aDsn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -654,11 +579,8 @@ Public Class Vb2F90Test
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for NumChr
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test NumChr</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub NumChrTest()
         Dim aLen As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aLenExpected As Integer = 0 ' TODO: Initialize to an appropriate value

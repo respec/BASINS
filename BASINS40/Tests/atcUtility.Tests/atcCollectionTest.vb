@@ -1,14 +1,8 @@
 ﻿Imports System
-
 Imports System.Collections.Generic
-
 Imports System.Collections
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcUtility
-
-
 
 '''<summary>
 '''This is a test class for atcCollectionTest and is intended
@@ -16,8 +10,6 @@ Imports atcUtility
 '''</summary>
 <TestClass()> _
 Public Class atcCollectionTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -59,22 +51,15 @@ Public Class atcCollectionTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcCollection Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcCollectionConstructorTest()
+    '''<summary>Test atcCollection Constructor</summary>
+    <TestMethod()> Public Sub atcCollectionConstructorTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd)
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for Add
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddTest()
+    '''<summary>Test Add</summary>
+    <TestMethod()> Public Sub AddTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aKey As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -86,11 +71,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Add
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddTest1()
+    '''<summary>Test Add</summary>
+    <TestMethod()> Public Sub AddTest1()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aAddThese As atcCollection = Nothing ' TODO: Initialize to an appropriate value
@@ -98,11 +80,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Add
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddTest2()
+    '''<summary>Test Add</summary>
+    <TestMethod()> Public Sub AddTest2()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aValue As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -113,11 +92,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for AddRange
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddRangeTest()
+    '''<summary>Test AddRange</summary>
+    <TestMethod()> Public Sub AddRangeTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aC As ICollection = Nothing ' TODO: Initialize to an appropriate value
@@ -125,11 +101,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for AddRange
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddRangeTest1()
+    '''<summary>Test AddRange</summary>
+    <TestMethod()> Public Sub AddRangeTest1()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aKeys As ArrayList = Nothing ' TODO: Initialize to an appropriate value
@@ -138,11 +111,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for AddRange
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddRangeTest2()
+    '''<summary>Test AddRange</summary>
+    <TestMethod()> Public Sub AddRangeTest2()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aKeys As IEnumerable = Nothing ' TODO: Initialize to an appropriate value
@@ -151,11 +121,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for BinarySearchForKey
-    '''</summary>
-    <TestMethod()> _
-    Public Sub BinarySearchForKeyTest()
+    '''<summary>Test BinarySearchForKey</summary>
+    <TestMethod()> Public Sub BinarySearchForKeyTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aKey As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -166,11 +133,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for BinarySearchForKey
-    '''</summary>
-    <TestMethod()> _
-    Public Sub BinarySearchForKeyTest1()
+    '''<summary>Test BinarySearchForKey</summary>
+    <TestMethod()> Public Sub BinarySearchForKeyTest1()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aKey As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -181,11 +145,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ChangeTo
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ChangeToTest()
+    '''<summary>Test ChangeTo</summary>
+    <TestMethod()> Public Sub ChangeToTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aNewItems As atcCollection = Nothing ' TODO: Initialize to an appropriate value
@@ -193,22 +154,16 @@ Public Class atcCollectionTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Clear
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ClearTest()
+    '''<summary>Test Clear</summary>
+    <TestMethod()> Public Sub ClearTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         target.Clear()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Clone
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CloneTest()
+    '''<summary>Test Clone</summary>
+    <TestMethod()> Public Sub CloneTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim expected As atcCollection = Nothing ' TODO: Initialize to an appropriate value
@@ -218,11 +173,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CompareValues
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test CompareValues</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub CompareValuesTest()
         Dim param0 As PrivateObject = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection_Accessor = New atcCollection_Accessor(param0) ' TODO: Initialize to an appropriate value
@@ -235,11 +187,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DictionaryEntries
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DictionaryEntriesTest()
+    '''<summary>Test DictionaryEntries</summary>
+    <TestMethod()> Public Sub DictionaryEntriesTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim expected As IEnumerable = Nothing ' TODO: Initialize to an appropriate value
@@ -249,22 +198,16 @@ Public Class atcCollectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Dispose
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DisposeTest()
+    '''<summary>Test Dispose</summary>
+    <TestMethod()> Public Sub DisposeTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As IDisposable = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         target.Dispose()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Increment
-    '''</summary>
-    <TestMethod()> _
-    Public Sub IncrementTest()
+    '''<summary>Test Increment</summary>
+    <TestMethod()> Public Sub IncrementTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aKey As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -275,11 +218,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Increment
-    '''</summary>
-    <TestMethod()> _
-    Public Sub IncrementTest1()
+    '''<summary>Test Increment</summary>
+    <TestMethod()> Public Sub IncrementTest1()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aKey As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -291,11 +231,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for IndexFromKey
-    '''</summary>
-    <TestMethod()> _
-    Public Sub IndexFromKeyTest()
+    '''<summary>Test IndexFromKey</summary>
+    <TestMethod()> Public Sub IndexFromKeyTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim akey As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -306,11 +243,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Insert
-    '''</summary>
-    <TestMethod()> _
-    Public Sub InsertTest()
+    '''<summary>Test Insert</summary>
+    <TestMethod()> Public Sub InsertTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -319,11 +253,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Insert
-    '''</summary>
-    <TestMethod()> _
-    Public Sub InsertTest1()
+    '''<summary>Test Insert</summary>
+    <TestMethod()> Public Sub InsertTest1()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -333,11 +264,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for InsertRange
-    '''</summary>
-    <TestMethod()> _
-    Public Sub InsertRangeTest()
+    '''<summary>Test InsertRange</summary>
+    <TestMethod()> Public Sub InsertRangeTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -346,11 +274,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for InsertRange
-    '''</summary>
-    <TestMethod()> _
-    Public Sub InsertRangeTest1()
+    '''<summary>Test InsertRange</summary>
+    <TestMethod()> Public Sub InsertRangeTest1()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -360,11 +285,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Remove
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RemoveTest()
+    '''<summary>Test Remove</summary>
+    <TestMethod()> Public Sub RemoveTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aValue As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -372,11 +294,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for RemoveAt
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RemoveAtTest()
+    '''<summary>Test RemoveAt</summary>
+    <TestMethod()> Public Sub RemoveAtTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -384,11 +303,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for RemoveByKey
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RemoveByKeyTest()
+    '''<summary>Test RemoveByKey</summary>
+    <TestMethod()> Public Sub RemoveByKeyTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aKey As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -396,11 +312,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for RemoveRange
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RemoveRangeTest()
+    '''<summary>Test RemoveRange</summary>
+    <TestMethod()> Public Sub RemoveRangeTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -409,11 +322,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Reverse
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ReverseTest()
+    '''<summary>Test Reverse</summary>
+    <TestMethod()> Public Sub ReverseTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -422,22 +332,16 @@ Public Class atcCollectionTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Reverse
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ReverseTest1()
+    '''<summary>Test Reverse</summary>
+    <TestMethod()> Public Sub ReverseTest1()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         target.Reverse()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for SetRange
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SetRangeTest()
+    '''<summary>Test SetRange</summary>
+    <TestMethod()> Public Sub SetRangeTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -447,11 +351,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for SetRange
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SetRangeTest1()
+    '''<summary>Test SetRange</summary>
+    <TestMethod()> Public Sub SetRangeTest1()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -460,22 +361,16 @@ Public Class atcCollectionTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Sort
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SortTest()
+    '''<summary>Test Sort</summary>
+    <TestMethod()> Public Sub SortTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         target.Sort()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Sort
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SortTest1()
+    '''<summary>Test Sort</summary>
+    <TestMethod()> Public Sub SortTest1()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aComparer As IComparer = Nothing ' TODO: Initialize to an appropriate value
@@ -483,11 +378,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Sort
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SortTest2()
+    '''<summary>Test Sort</summary>
+    <TestMethod()> Public Sub SortTest2()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -497,22 +389,16 @@ Public Class atcCollectionTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for SortByValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SortByValueTest()
+    '''<summary>Test SortByValue</summary>
+    <TestMethod()> Public Sub SortByValueTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         target.SortByValue()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ToString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ToStringTest()
+    '''<summary>Test ToString</summary>
+    <TestMethod()> Public Sub ToStringTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -522,11 +408,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ToString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ToStringTest1()
+    '''<summary>Test ToString</summary>
+    <TestMethod()> Public Sub ToStringTest1()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aNumValues As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -537,22 +420,16 @@ Public Class atcCollectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for TrimToSize
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TrimToSizeTest()
+    '''<summary>Test TrimToSize</summary>
+    <TestMethod()> Public Sub TrimToSizeTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         target.TrimToSize()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Capacity
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CapacityTest()
+    '''<summary>Test Capacity</summary>
+    <TestMethod()> Public Sub CapacityTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -563,11 +440,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ItemByIndex
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ItemByIndexTest()
+    '''<summary>Test ItemByIndex</summary>
+    <TestMethod()> Public Sub ItemByIndexTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -579,11 +453,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ItemByKey
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ItemByKeyTest()
+    '''<summary>Test ItemByKey</summary>
+    <TestMethod()> Public Sub ItemByKeyTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim aKey As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -595,11 +466,8 @@ Public Class atcCollectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Keys
-    '''</summary>
-    <TestMethod()> _
-    Public Sub KeysTest()
+    '''<summary>Test Keys</summary>
+    <TestMethod()> Public Sub KeysTest()
         Dim aValuesToAdd() As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcCollection = New atcCollection(aValuesToAdd) ' TODO: Initialize to an appropriate value
         Dim expected As ArrayList = Nothing ' TODO: Initialize to an appropriate value

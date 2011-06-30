@@ -1,12 +1,7 @@
 ﻿Imports System.IO
-
 Imports atcData
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcTimeseriesRDB
-
-
 
 '''<summary>
 '''This is a test class for atcTimeseriesRDBTest and is intended
@@ -14,8 +9,6 @@ Imports atcTimeseriesRDB
 '''</summary>
 <TestClass()> _
 Public Class atcTimeseriesRDBTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -27,7 +20,7 @@ Public Class atcTimeseriesRDBTest
             Return testContextInstance
         End Get
         Set(ByVal value As TestContext)
-            testContextInstance = Value
+            testContextInstance = value
         End Set
     End Property
 
@@ -57,21 +50,14 @@ Public Class atcTimeseriesRDBTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcTimeseriesRDB Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcTimeseriesRDBConstructorTest()
+    '''<summary>Test atcTimeseriesRDB Constructor</summary>
+    <TestMethod()> Public Sub atcTimeseriesRDBConstructorTest()
         Dim target As atcTimeseriesRDB = New atcTimeseriesRDB()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for Open
-    '''</summary>
-    <TestMethod()> _
-    Public Sub OpenTest()
+    '''<summary>Test Open</summary>
+    <TestMethod()> Public Sub OpenTest()
         Dim target As atcTimeseriesRDB = New atcTimeseriesRDB() ' TODO: Initialize to an appropriate value
         Dim aFileName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aAttributes As atcDataAttributes = Nothing ' TODO: Initialize to an appropriate value
@@ -82,11 +68,8 @@ Public Class atcTimeseriesRDBTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ProcessDailyValues
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ProcessDailyValuesTest()
+    '''<summary>Test ProcessDailyValues</summary>
+    <TestMethod()> Public Sub ProcessDailyValuesTest()
         Dim target As atcTimeseriesRDB = New atcTimeseriesRDB() ' TODO: Initialize to an appropriate value
         Dim aInputReader As BinaryReader = Nothing ' TODO: Initialize to an appropriate value
         Dim aAttributes As atcDataAttributes = Nothing ' TODO: Initialize to an appropriate value
@@ -94,11 +77,8 @@ Public Class atcTimeseriesRDBTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ProcessIdaValues
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ProcessIdaValuesTest()
+    '''<summary>Test ProcessIdaValues</summary>
+    <TestMethod()> Public Sub ProcessIdaValuesTest()
         Dim target As atcTimeseriesRDB = New atcTimeseriesRDB() ' TODO: Initialize to an appropriate value
         Dim aInputReader As BinaryReader = Nothing ' TODO: Initialize to an appropriate value
         Dim aAttributes As atcDataAttributes = Nothing ' TODO: Initialize to an appropriate value
@@ -106,11 +86,8 @@ Public Class atcTimeseriesRDBTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ProcessMeasurements
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ProcessMeasurementsTest()
+    '''<summary>Test ProcessMeasurements</summary>
+    <TestMethod()> Public Sub ProcessMeasurementsTest()
         Dim target As atcTimeseriesRDB = New atcTimeseriesRDB() ' TODO: Initialize to an appropriate value
         Dim aInputReader As BinaryReader = Nothing ' TODO: Initialize to an appropriate value
         Dim aAttributes As atcDataAttributes = Nothing ' TODO: Initialize to an appropriate value
@@ -118,11 +95,8 @@ Public Class atcTimeseriesRDBTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ProcessWaterQualityValues
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ProcessWaterQualityValuesTest()
+    '''<summary>Test ProcessWaterQualityValues</summary>
+    <TestMethod()> Public Sub ProcessWaterQualityValuesTest()
         Dim target As atcTimeseriesRDB = New atcTimeseriesRDB() ' TODO: Initialize to an appropriate value
         Dim aInputReader As BinaryReader = Nothing ' TODO: Initialize to an appropriate value
         Dim aAttributes As atcDataAttributes = Nothing ' TODO: Initialize to an appropriate value
@@ -130,44 +104,32 @@ Public Class atcTimeseriesRDBTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for CanOpen
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CanOpenTest()
+    '''<summary>Test CanOpen</summary>
+    <TestMethod()> Public Sub CanOpenTest()
         Dim target As atcTimeseriesRDB = New atcTimeseriesRDB() ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
         actual = target.CanOpen
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Category
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CategoryTest()
+    '''<summary>Test Category</summary>
+    <TestMethod()> Public Sub CategoryTest()
         Dim target As atcTimeseriesRDB = New atcTimeseriesRDB() ' TODO: Initialize to an appropriate value
         Dim actual As String
         actual = target.Category
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Description
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DescriptionTest()
+    '''<summary>Test Description</summary>
+    <TestMethod()> Public Sub DescriptionTest()
         Dim target As atcTimeseriesRDB = New atcTimeseriesRDB() ' TODO: Initialize to an appropriate value
         Dim actual As String
         actual = target.Description
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Name
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NameTest()
+    '''<summary>Test Name</summary>
+    <TestMethod()> Public Sub NameTest()
         Dim target As atcTimeseriesRDB = New atcTimeseriesRDB() ' TODO: Initialize to an appropriate value
         Dim actual As String
         actual = target.Name

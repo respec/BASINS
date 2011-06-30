@@ -1,10 +1,6 @@
 ﻿Imports System
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for atcTimeseriesGroupBuilderTest and is intended
@@ -12,8 +8,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class atcTimeseriesGroupBuilderTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -55,22 +49,15 @@ Public Class atcTimeseriesGroupBuilderTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcTimeseriesGroupBuilder Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcTimeseriesGroupBuilderConstructorTest()
+    '''<summary>Test atcTimeseriesGroupBuilder Constructor</summary>
+    <TestMethod()> Public Sub atcTimeseriesGroupBuilderConstructorTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGroupBuilder = New atcTimeseriesGroupBuilder(aDataSource)
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for AddValues
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddValuesTest()
+    '''<summary>Test AddValues</summary>
+    <TestMethod()> Public Sub AddValuesTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGroupBuilder = New atcTimeseriesGroupBuilder(aDataSource) ' TODO: Initialize to an appropriate value
         Dim aDate As DateTime = New DateTime() ' TODO: Initialize to an appropriate value
@@ -79,11 +66,8 @@ Public Class atcTimeseriesGroupBuilderTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Builder
-    '''</summary>
-    <TestMethod()> _
-    Public Sub BuilderTest()
+    '''<summary>Test Builder</summary>
+    <TestMethod()> Public Sub BuilderTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGroupBuilder = New atcTimeseriesGroupBuilder(aDataSource) ' TODO: Initialize to an appropriate value
         Dim aDataSetKey As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -94,11 +78,8 @@ Public Class atcTimeseriesGroupBuilderTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Count
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CountTest()
+    '''<summary>Test Count</summary>
+    <TestMethod()> Public Sub CountTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGroupBuilder = New atcTimeseriesGroupBuilder(aDataSource) ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -108,11 +89,8 @@ Public Class atcTimeseriesGroupBuilderTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CreateBuilders
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CreateBuildersTest()
+    '''<summary>Test CreateBuilders</summary>
+    <TestMethod()> Public Sub CreateBuildersTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGroupBuilder = New atcTimeseriesGroupBuilder(aDataSource) ' TODO: Initialize to an appropriate value
         Dim aKeys() As String = Nothing ' TODO: Initialize to an appropriate value
@@ -120,11 +98,8 @@ Public Class atcTimeseriesGroupBuilderTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for CreateTimeseriesAddToGroup
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CreateTimeseriesAddToGroupTest()
+    '''<summary>Test CreateTimeseriesAddToGroup</summary>
+    <TestMethod()> Public Sub CreateTimeseriesAddToGroupTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGroupBuilder = New atcTimeseriesGroupBuilder(aDataSource) ' TODO: Initialize to an appropriate value
         Dim aGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
@@ -132,11 +107,8 @@ Public Class atcTimeseriesGroupBuilderTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for CreateTimeseriesGroup
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CreateTimeseriesGroupTest()
+    '''<summary>Test CreateTimeseriesGroup</summary>
+    <TestMethod()> Public Sub CreateTimeseriesGroupTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGroupBuilder = New atcTimeseriesGroupBuilder(aDataSource) ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value

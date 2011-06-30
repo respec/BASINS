@@ -1,10 +1,6 @@
 ﻿Imports System.Drawing
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for atcDataPluginTest and is intended
@@ -12,8 +8,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class atcDataPluginTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -55,21 +49,14 @@ Public Class atcDataPluginTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcDataPlugin Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcDataPluginConstructorTest()
+    '''<summary>Test atcDataPlugin Constructor</summary>
+    <TestMethod()> Public Sub atcDataPluginConstructorTest()
         Dim target As atcDataPlugin = New atcDataPlugin()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for NewOne
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NewOneTest()
+    '''<summary>Test NewOne</summary>
+    <TestMethod()> Public Sub NewOneTest()
         Dim target As atcDataPlugin = New atcDataPlugin() ' TODO: Initialize to an appropriate value
         Dim expected As atcDataPlugin = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcDataPlugin
@@ -78,11 +65,8 @@ Public Class atcDataPluginTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ToString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ToStringTest()
+    '''<summary>Test ToString</summary>
+    <TestMethod()> Public Sub ToStringTest()
         Dim target As atcDataPlugin = New atcDataPlugin() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -91,88 +75,64 @@ Public Class atcDataPluginTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Author
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AuthorTest()
+    '''<summary>Test Author</summary>
+    <TestMethod()> Public Sub AuthorTest()
         Dim target As atcDataPlugin = New atcDataPlugin() ' TODO: Initialize to an appropriate value
         Dim actual As String
         actual = target.Author
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for BuildDate
-    '''</summary>
-    <TestMethod()> _
-    Public Sub BuildDateTest()
+    '''<summary>Test BuildDate</summary>
+    <TestMethod()> Public Sub BuildDateTest()
         Dim target As atcDataPlugin = New atcDataPlugin() ' TODO: Initialize to an appropriate value
         Dim actual As String
         actual = target.BuildDate
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Category
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CategoryTest()
+    '''<summary>Test Category</summary>
+    <TestMethod()> Public Sub CategoryTest()
         Dim target As atcDataPlugin = New atcDataPlugin() ' TODO: Initialize to an appropriate value
         Dim actual As String
         actual = target.Category
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Description
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DescriptionTest()
+    '''<summary>Test Description</summary>
+    <TestMethod()> Public Sub DescriptionTest()
         Dim target As atcDataPlugin = New atcDataPlugin() ' TODO: Initialize to an appropriate value
         Dim actual As String
         actual = target.Description
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Icon
-    '''</summary>
-    <TestMethod()> _
-    Public Sub IconTest()
+    '''<summary>Test Icon</summary>
+    <TestMethod()> Public Sub IconTest()
         Dim target As atcDataPlugin = New atcDataPlugin() ' TODO: Initialize to an appropriate value
         Dim actual As Icon
         actual = target.Icon
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Name
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NameTest()
+    '''<summary>Test Name</summary>
+    <TestMethod()> Public Sub NameTest()
         Dim target As atcDataPlugin = New atcDataPlugin() ' TODO: Initialize to an appropriate value
         Dim actual As String
         actual = target.Name
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SerialNumber
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SerialNumberTest()
+    '''<summary>Test SerialNumber</summary>
+    <TestMethod()> Public Sub SerialNumberTest()
         Dim target As atcDataPlugin = New atcDataPlugin() ' TODO: Initialize to an appropriate value
         Dim actual As String
         actual = target.SerialNumber
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Version
-    '''</summary>
-    <TestMethod()> _
-    Public Sub VersionTest()
+    '''<summary>Test Version</summary>
+    <TestMethod()> Public Sub VersionTest()
         Dim target As atcDataPlugin = New atcDataPlugin() ' TODO: Initialize to an appropriate value
         Dim actual As String
         actual = target.Version

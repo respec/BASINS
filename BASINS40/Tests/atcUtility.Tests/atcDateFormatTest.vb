@@ -1,8 +1,5 @@
 ﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcUtility
-
-
 
 '''<summary>
 '''This is a test class for atcDateFormatTest and is intended
@@ -10,8 +7,6 @@ Imports atcUtility
 '''</summary>
 <TestClass()> _
 Public Class atcDateFormatTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -53,21 +48,14 @@ Public Class atcDateFormatTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcDateFormat Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcDateFormatConstructorTest()
+    '''<summary>Test atcDateFormat Constructor</summary>
+    <TestMethod()> Public Sub atcDateFormatConstructorTest()
         Dim target As atcDateFormat = New atcDateFormat()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for JDateToString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub JDateToStringTest()
+    '''<summary>Test JDateToString</summary>
+    <TestMethod()> Public Sub JDateToStringTest()
         Dim target As atcDateFormat = New atcDateFormat() ' TODO: Initialize to an appropriate value
         Dim aJulianDate As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -77,11 +65,8 @@ Public Class atcDateFormatTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for MonthString
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test MonthString</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub MonthStringTest()
         Dim target As atcDateFormat_Accessor = New atcDateFormat_Accessor() ' TODO: Initialize to an appropriate value
         Dim aDate() As Integer = Nothing ' TODO: Initialize to an appropriate value
@@ -92,11 +77,8 @@ Public Class atcDateFormatTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for YearString
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test YearString</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub YearStringTest()
         Dim target As atcDateFormat_Accessor = New atcDateFormat_Accessor() ' TODO: Initialize to an appropriate value
         Dim aDate() As Integer = Nothing ' TODO: Initialize to an appropriate value
@@ -107,11 +89,8 @@ Public Class atcDateFormatTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DateOrder
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DateOrderTest()
+    '''<summary>Test DateOrder</summary>
+    <TestMethod()> Public Sub DateOrderTest()
         Dim target As atcDateFormat = New atcDateFormat() ' TODO: Initialize to an appropriate value
         Dim expected As atcDateFormat.DateOrderEnum = New atcDateFormat.DateOrderEnum() ' TODO: Initialize to an appropriate value
         Dim actual As atcDateFormat.DateOrderEnum
@@ -121,11 +100,8 @@ Public Class atcDateFormatTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DateSeparator
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DateSeparatorTest()
+    '''<summary>Test DateSeparator</summary>
+    <TestMethod()> Public Sub DateSeparatorTest()
         Dim target As atcDateFormat = New atcDateFormat() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -135,11 +111,8 @@ Public Class atcDateFormatTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for IncludeDays
-    '''</summary>
-    <TestMethod()> _
-    Public Sub IncludeDaysTest()
+    '''<summary>Test IncludeDays</summary>
+    <TestMethod()> Public Sub IncludeDaysTest()
         Dim target As atcDateFormat = New atcDateFormat() ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
@@ -149,11 +122,8 @@ Public Class atcDateFormatTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for IncludeHours
-    '''</summary>
-    <TestMethod()> _
-    Public Sub IncludeHoursTest()
+    '''<summary>Test IncludeHours</summary>
+    <TestMethod()> Public Sub IncludeHoursTest()
         Dim target As atcDateFormat = New atcDateFormat() ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
@@ -163,11 +133,8 @@ Public Class atcDateFormatTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for IncludeMinutes
-    '''</summary>
-    <TestMethod()> _
-    Public Sub IncludeMinutesTest()
+    '''<summary>Test IncludeMinutes</summary>
+    <TestMethod()> Public Sub IncludeMinutesTest()
         Dim target As atcDateFormat = New atcDateFormat() ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
@@ -177,11 +144,8 @@ Public Class atcDateFormatTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for IncludeMonths
-    '''</summary>
-    <TestMethod()> _
-    Public Sub IncludeMonthsTest()
+    '''<summary>Test IncludeMonths</summary>
+    <TestMethod()> Public Sub IncludeMonthsTest()
         Dim target As atcDateFormat = New atcDateFormat() ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
@@ -191,11 +155,8 @@ Public Class atcDateFormatTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for IncludeSeconds
-    '''</summary>
-    <TestMethod()> _
-    Public Sub IncludeSecondsTest()
+    '''<summary>Test IncludeSeconds</summary>
+    <TestMethod()> Public Sub IncludeSecondsTest()
         Dim target As atcDateFormat = New atcDateFormat() ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
@@ -205,11 +166,8 @@ Public Class atcDateFormatTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for IncludeYears
-    '''</summary>
-    <TestMethod()> _
-    Public Sub IncludeYearsTest()
+    '''<summary>Test IncludeYears</summary>
+    <TestMethod()> Public Sub IncludeYearsTest()
         Dim target As atcDateFormat = New atcDateFormat() ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
@@ -219,11 +177,8 @@ Public Class atcDateFormatTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Midnight24
-    '''</summary>
-    <TestMethod()> _
-    Public Sub Midnight24Test()
+    '''<summary>Test Midnight24</summary>
+    <TestMethod()> Public Sub Midnight24Test()
         Dim target As atcDateFormat = New atcDateFormat() ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
@@ -233,11 +188,8 @@ Public Class atcDateFormatTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for MonthNames
-    '''</summary>
-    <TestMethod()> _
-    Public Sub MonthNamesTest()
+    '''<summary>Test MonthNames</summary>
+    <TestMethod()> Public Sub MonthNamesTest()
         Dim target As atcDateFormat = New atcDateFormat() ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
@@ -247,11 +199,8 @@ Public Class atcDateFormatTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for TimeSeparator
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TimeSeparatorTest()
+    '''<summary>Test TimeSeparator</summary>
+    <TestMethod()> Public Sub TimeSeparatorTest()
         Dim target As atcDateFormat = New atcDateFormat() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -261,11 +210,8 @@ Public Class atcDateFormatTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for TwoDigitYears
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TwoDigitYearsTest()
+    '''<summary>Test TwoDigitYears</summary>
+    <TestMethod()> Public Sub TwoDigitYearsTest()
         Dim target As atcDateFormat = New atcDateFormat() ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
         Dim actual As Boolean

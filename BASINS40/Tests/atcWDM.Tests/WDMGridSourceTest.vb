@@ -1,14 +1,8 @@
 ﻿Imports System.Collections
-
 Imports atcControls
-
 Imports atcData
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcWDM
-
-
 
 '''<summary>
 '''This is a test class for WDMGridSourceTest and is intended
@@ -16,8 +10,6 @@ Imports atcWDM
 '''</summary>
 <TestClass()> _
 Public Class WDMGridSourceTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -59,33 +51,23 @@ Public Class WDMGridSourceTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for WDMGridSource Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub WDMGridSourceConstructorTest()
+    '''<summary>Test WDMGridSource Constructor</summary>
+    <TestMethod()> Public Sub WDMGridSourceConstructorTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim target As WDMGridSource = New WDMGridSource(aDataGroup)
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for __ENCAddToList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test __ENCAddToList</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub __ENCAddToListTest()
         Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
         WDMGridSource_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Alignment
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AlignmentTest()
+    '''<summary>Test Alignment</summary>
+    <TestMethod()> Public Sub AlignmentTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim target As WDMGridSource = New WDMGridSource(aDataGroup) ' TODO: Initialize to an appropriate value
         Dim aRow As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -98,11 +80,8 @@ Public Class WDMGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CellEditable
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CellEditableTest()
+    '''<summary>Test CellEditable</summary>
+    <TestMethod()> Public Sub CellEditableTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim target As WDMGridSource = New WDMGridSource(aDataGroup) ' TODO: Initialize to an appropriate value
         Dim aRow As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -115,11 +94,8 @@ Public Class WDMGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CellValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CellValueTest()
+    '''<summary>Test CellValue</summary>
+    <TestMethod()> Public Sub CellValueTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim target As WDMGridSource = New WDMGridSource(aDataGroup) ' TODO: Initialize to an appropriate value
         Dim aRow As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -132,11 +108,8 @@ Public Class WDMGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Columns
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ColumnsTest()
+    '''<summary>Test Columns</summary>
+    <TestMethod()> Public Sub ColumnsTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim target As WDMGridSource = New WDMGridSource(aDataGroup) ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -147,11 +120,8 @@ Public Class WDMGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DisplayAttributes
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DisplayAttributesTest()
+    '''<summary>Test DisplayAttributes</summary>
+    <TestMethod()> Public Sub DisplayAttributesTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim target As WDMGridSource = New WDMGridSource(aDataGroup) ' TODO: Initialize to an appropriate value
         Dim expected As ArrayList = Nothing ' TODO: Initialize to an appropriate value
@@ -162,11 +132,8 @@ Public Class WDMGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FixedRows
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FixedRowsTest()
+    '''<summary>Test FixedRows</summary>
+    <TestMethod()> Public Sub FixedRowsTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim target As WDMGridSource = New WDMGridSource(aDataGroup) ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -177,11 +144,8 @@ Public Class WDMGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Rows
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RowsTest()
+    '''<summary>Test Rows</summary>
+    <TestMethod()> Public Sub RowsTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim target As WDMGridSource = New WDMGridSource(aDataGroup) ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value

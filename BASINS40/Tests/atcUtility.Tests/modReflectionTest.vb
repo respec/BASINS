@@ -1,20 +1,11 @@
 ﻿Imports System.Collections
-
 Imports System.Drawing
-
 Imports System.IO
-
 Imports System.Reflection
-
 Imports System
-
 Imports System.Windows.Forms
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcUtility
-
-
 
 '''<summary>
 '''This is a test class for modReflectionTest and is intended
@@ -22,8 +13,6 @@ Imports atcUtility
 '''</summary>
 <TestClass()> _
 Public Class modReflectionTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -65,12 +54,8 @@ Public Class modReflectionTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for BuildMissingTests
-    '''</summary>
-    <TestMethod()> _
-    Public Sub BuildMissingTestsTest()
+    '''<summary>Test BuildMissingTests</summary>
+    <TestMethod()> Public Sub BuildMissingTestsTest()
         Dim aSavePath As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -79,22 +64,16 @@ Public Class modReflectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CopyControlState
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CopyControlStateTest()
+    '''<summary>Test CopyControlState</summary>
+    <TestMethod()> Public Sub CopyControlStateTest()
         Dim aOriginalControl As Control = Nothing ' TODO: Initialize to an appropriate value
         Dim aCopyTo As Control = Nothing ' TODO: Initialize to an appropriate value
         modReflection.CopyControlState(aOriginalControl, aCopyTo)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for FieldNames
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FieldNamesTest()
+    '''<summary>Test FieldNames</summary>
+    <TestMethod()> Public Sub FieldNamesTest()
         Dim aType As Type = Nothing ' TODO: Initialize to an appropriate value
         Dim aDelimiter As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -104,11 +83,8 @@ Public Class modReflectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FieldValues
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FieldValuesTest()
+    '''<summary>Test FieldValues</summary>
+    <TestMethod()> Public Sub FieldValuesTest()
         Dim aObject As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim aDelimiter As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -118,11 +94,8 @@ Public Class modReflectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetEmbeddedFileAsBinaryReader
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetEmbeddedFileAsBinaryReaderTest()
+    '''<summary>Test GetEmbeddedFileAsBinaryReader</summary>
+    <TestMethod()> Public Sub GetEmbeddedFileAsBinaryReaderTest()
         Dim aFileName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aAssembly As [Assembly] = Nothing ' TODO: Initialize to an appropriate value
         Dim aPrefixName As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -133,11 +106,8 @@ Public Class modReflectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetEmbeddedFileAsBitmap
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetEmbeddedFileAsBitmapTest()
+    '''<summary>Test GetEmbeddedFileAsBitmap</summary>
+    <TestMethod()> Public Sub GetEmbeddedFileAsBitmapTest()
         Dim fileName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aAssembly As [Assembly] = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As Bitmap = Nothing ' TODO: Initialize to an appropriate value
@@ -147,11 +117,8 @@ Public Class modReflectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetEmbeddedFileAsString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetEmbeddedFileAsStringTest()
+    '''<summary>Test GetEmbeddedFileAsString</summary>
+    <TestMethod()> Public Sub GetEmbeddedFileAsStringTest()
         Dim fileName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aFullResourceName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -161,11 +128,8 @@ Public Class modReflectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetEmbeddedFileAsString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetEmbeddedFileAsStringTest1()
+    '''<summary>Test GetEmbeddedFileAsString</summary>
+    <TestMethod()> Public Sub GetEmbeddedFileAsStringTest1()
         Dim fileName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aAssembly As [Assembly] = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -175,11 +139,8 @@ Public Class modReflectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetSomething
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetSomethingTest()
+    '''<summary>Test GetSomething</summary>
+    <TestMethod()> Public Sub GetSomethingTest()
         Dim aObject As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim aObjectExpected As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim aFieldName As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -191,11 +152,8 @@ Public Class modReflectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for MemUsage
-    '''</summary>
-    <TestMethod()> _
-    Public Sub MemUsageTest()
+    '''<summary>Test MemUsage</summary>
+    <TestMethod()> Public Sub MemUsageTest()
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
         actual = modReflection.MemUsage
@@ -203,11 +161,8 @@ Public Class modReflectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for MethodAvailable
-    '''</summary>
-    <TestMethod()> _
-    Public Sub MethodAvailableTest()
+    '''<summary>Test MethodAvailable</summary>
+    <TestMethod()> Public Sub MethodAvailableTest()
         Dim aT As Type = Nothing ' TODO: Initialize to an appropriate value
         Dim aTExpected As Type = Nothing ' TODO: Initialize to an appropriate value
         Dim aMethodName As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -219,11 +174,8 @@ Public Class modReflectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for MethodDetails
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test MethodDetails</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub MethodDetailsTest()
         Dim aT As Type = Nothing ' TODO: Initialize to an appropriate value
         Dim aTExpected As Type = Nothing ' TODO: Initialize to an appropriate value
@@ -237,11 +189,8 @@ Public Class modReflectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for NeedToTest
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test NeedToTest</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub NeedToTestTest()
         Dim aMethodName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -251,11 +200,8 @@ Public Class modReflectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for NumberObjects
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NumberObjectsTest()
+    '''<summary>Test NumberObjects</summary>
+    <TestMethod()> Public Sub NumberObjectsTest()
         Dim aObjects As ArrayList = Nothing ' TODO: Initialize to an appropriate value
         Dim aFieldToNumber As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aPrefix As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -267,11 +213,8 @@ Public Class modReflectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ReflectAssemblyAsString
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test ReflectAssemblyAsString</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub ReflectAssemblyAsStringTest()
         Dim mA As [Assembly] = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -281,11 +224,8 @@ Public Class modReflectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SetSomething
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SetSomethingTest()
+    '''<summary>Test SetSomething</summary>
+    <TestMethod()> Public Sub SetSomethingTest()
         Dim aObject As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim aObjectExpected As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim aFieldName As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -298,11 +238,8 @@ Public Class modReflectionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SetSomething
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SetSomethingTest1()
+    '''<summary>Test SetSomething</summary>
+    <TestMethod()> Public Sub SetSomethingTest1()
         Dim aObject As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim aObjectExpected As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim aFieldName As String = String.Empty ' TODO: Initialize to an appropriate value

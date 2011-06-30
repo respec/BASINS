@@ -1,10 +1,6 @@
 ﻿Imports atcUtility
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for atcTimeseriesGroupTest and is intended
@@ -12,8 +8,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class atcTimeseriesGroupTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -55,51 +49,35 @@ Public Class atcTimeseriesGroupTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcTimeseriesGroup Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcTimeseriesGroupConstructorTest()
+    '''<summary>Test atcTimeseriesGroup Constructor</summary>
+    <TestMethod()> Public Sub atcTimeseriesGroupConstructorTest()
         Dim aTimeseries As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGroup = New atcTimeseriesGroup(aTimeseries)
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for atcTimeseriesGroup Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcTimeseriesGroupConstructorTest1()
+    '''<summary>Test atcTimeseriesGroup Constructor</summary>
+    <TestMethod()> Public Sub atcTimeseriesGroupConstructorTest1()
         Dim aDataGroup As atcDataGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGroup = New atcTimeseriesGroup(aDataGroup)
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for atcTimeseriesGroup Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcTimeseriesGroupConstructorTest2()
+    '''<summary>Test atcTimeseriesGroup Constructor</summary>
+    <TestMethod()> Public Sub atcTimeseriesGroupConstructorTest2()
         Dim aTimeseries() As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGroup = New atcTimeseriesGroup(aTimeseries)
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for atcTimeseriesGroup Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcTimeseriesGroupConstructorTest3()
+    '''<summary>Test atcTimeseriesGroup Constructor</summary>
+    <TestMethod()> Public Sub atcTimeseriesGroupConstructorTest3()
         Dim target As atcTimeseriesGroup = New atcTimeseriesGroup()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for Clone
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CloneTest()
+    '''<summary>Test Clone</summary>
+    <TestMethod()> Public Sub CloneTest()
         Dim target As atcTimeseriesGroup = New atcTimeseriesGroup() ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcTimeseriesGroup
@@ -108,11 +86,8 @@ Public Class atcTimeseriesGroupTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FindData
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FindDataTest()
+    '''<summary>Test FindData</summary>
+    <TestMethod()> Public Sub FindDataTest()
         Dim target As atcTimeseriesGroup = New atcTimeseriesGroup() ' TODO: Initialize to an appropriate value
         Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aValue As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -124,11 +99,8 @@ Public Class atcTimeseriesGroupTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FindData
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FindDataTest1()
+    '''<summary>Test FindData</summary>
+    <TestMethod()> Public Sub FindDataTest1()
         Dim target As atcTimeseriesGroup = New atcTimeseriesGroup() ' TODO: Initialize to an appropriate value
         Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aValues As atcCollection = Nothing ' TODO: Initialize to an appropriate value
@@ -140,22 +112,16 @@ Public Class atcTimeseriesGroupTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for __ENCAddToList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test __ENCAddToList</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub __ENCAddToListTest()
         Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
         atcTimeseriesGroup_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Item
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ItemTest()
+    '''<summary>Test Item</summary>
+    <TestMethod()> Public Sub ItemTest()
         Dim target As atcTimeseriesGroup = New atcTimeseriesGroup() ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
@@ -166,11 +132,8 @@ Public Class atcTimeseriesGroupTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ItemByIndex
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ItemByIndexTest()
+    '''<summary>Test ItemByIndex</summary>
+    <TestMethod()> Public Sub ItemByIndexTest()
         Dim target As atcTimeseriesGroup = New atcTimeseriesGroup() ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
@@ -181,11 +144,8 @@ Public Class atcTimeseriesGroupTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ItemByKey
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ItemByKeyTest()
+    '''<summary>Test ItemByKey</summary>
+    <TestMethod()> Public Sub ItemByKeyTest()
         Dim target As atcTimeseriesGroup = New atcTimeseriesGroup() ' TODO: Initialize to an appropriate value
         Dim aKey As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value

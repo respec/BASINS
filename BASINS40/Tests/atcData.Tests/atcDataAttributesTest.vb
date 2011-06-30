@@ -1,12 +1,7 @@
 ﻿Imports System.Collections
-
 Imports atcUtility
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for atcDataAttributesTest and is intended
@@ -14,8 +9,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class atcDataAttributesTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -57,21 +50,14 @@ Public Class atcDataAttributesTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcDataAttributes Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcDataAttributesConstructorTest()
+    '''<summary>Test atcDataAttributes Constructor</summary>
+    <TestMethod()> Public Sub atcDataAttributesConstructorTest()
         Dim target As atcDataAttributes = New atcDataAttributes()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for Add
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddTest()
+    '''<summary>Test Add</summary>
+    <TestMethod()> Public Sub AddTest()
         Dim target As atcDataAttributes = New atcDataAttributes() ' TODO: Initialize to an appropriate value
         Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aAttributeValue As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -82,11 +68,8 @@ Public Class atcDataAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Add
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddTest1()
+    '''<summary>Test Add</summary>
+    <TestMethod()> Public Sub AddTest1()
         Dim target As atcDataAttributes = New atcDataAttributes() ' TODO: Initialize to an appropriate value
         Dim aDefinedValue As atcDefinedValue = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -96,11 +79,8 @@ Public Class atcDataAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for AddDefinition
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddDefinitionTest()
+    '''<summary>Test AddDefinition</summary>
+    <TestMethod()> Public Sub AddDefinitionTest()
         Dim aDefinition As atcAttributeDefinition = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As atcAttributeDefinition = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcAttributeDefinition
@@ -109,22 +89,16 @@ Public Class atcDataAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for AddHistory
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddHistoryTest()
+    '''<summary>Test AddHistory</summary>
+    <TestMethod()> Public Sub AddHistoryTest()
         Dim target As atcDataAttributes = New atcDataAttributes() ' TODO: Initialize to an appropriate value
         Dim aNewEvent As String = String.Empty ' TODO: Initialize to an appropriate value
         target.AddHistory(aNewEvent)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for AllDefinitions
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AllDefinitionsTest()
+    '''<summary>Test AllDefinitions</summary>
+    <TestMethod()> Public Sub AllDefinitionsTest()
         Dim expected As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcCollection
         actual = atcDataAttributes.AllDefinitions
@@ -132,11 +106,8 @@ Public Class atcDataAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for AttributeNameToKey
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test AttributeNameToKey</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub AttributeNameToKeyTest()
         Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -146,32 +117,23 @@ Public Class atcDataAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CalculateAll
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CalculateAllTest()
+    '''<summary>Test CalculateAll</summary>
+    <TestMethod()> Public Sub CalculateAllTest()
         Dim target As atcDataAttributes = New atcDataAttributes() ' TODO: Initialize to an appropriate value
         target.CalculateAll()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ChangeTo
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ChangeToTest()
+    '''<summary>Test ChangeTo</summary>
+    <TestMethod()> Public Sub ChangeToTest()
         Dim target As atcDataAttributes = New atcDataAttributes() ' TODO: Initialize to an appropriate value
         Dim aNewItems As atcDataAttributes = Nothing ' TODO: Initialize to an appropriate value
         target.ChangeTo(aNewItems)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Clone
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CloneTest()
+    '''<summary>Test Clone</summary>
+    <TestMethod()> Public Sub CloneTest()
         Dim target As atcDataAttributes = New atcDataAttributes() ' TODO: Initialize to an appropriate value
         Dim expected As atcDataAttributes = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcDataAttributes
@@ -180,11 +142,8 @@ Public Class atcDataAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ContainsAttribute
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ContainsAttributeTest()
+    '''<summary>Test ContainsAttribute</summary>
+    <TestMethod()> Public Sub ContainsAttributeTest()
         Dim target As atcDataAttributes = New atcDataAttributes() ' TODO: Initialize to an appropriate value
         Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -194,21 +153,15 @@ Public Class atcDataAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DiscardCalculated
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DiscardCalculatedTest()
+    '''<summary>Test DiscardCalculated</summary>
+    <TestMethod()> Public Sub DiscardCalculatedTest()
         Dim target As atcDataAttributes = New atcDataAttributes() ' TODO: Initialize to an appropriate value
         target.DiscardCalculated()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for GetDefinedValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetDefinedValueTest()
+    '''<summary>Test GetDefinedValue</summary>
+    <TestMethod()> Public Sub GetDefinedValueTest()
         Dim target As atcDataAttributes = New atcDataAttributes() ' TODO: Initialize to an appropriate value
         Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As atcDefinedValue = Nothing ' TODO: Initialize to an appropriate value
@@ -218,11 +171,8 @@ Public Class atcDataAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetDefinition
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetDefinitionTest()
+    '''<summary>Test GetDefinition</summary>
+    <TestMethod()> Public Sub GetDefinitionTest()
         Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aCreate As Boolean = False ' TODO: Initialize to an appropriate value
         Dim expected As atcAttributeDefinition = Nothing ' TODO: Initialize to an appropriate value
@@ -232,11 +182,8 @@ Public Class atcDataAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetFormattedValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetFormattedValueTest()
+    '''<summary>Test GetFormattedValue</summary>
+    <TestMethod()> Public Sub GetFormattedValueTest()
         Dim target As atcDataAttributes = New atcDataAttributes() ' TODO: Initialize to an appropriate value
         Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aDefault As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -247,11 +194,8 @@ Public Class atcDataAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetValueTest()
+    '''<summary>Test GetValue</summary>
+    <TestMethod()> Public Sub GetValueTest()
         Dim target As atcDataAttributes = New atcDataAttributes() ' TODO: Initialize to an appropriate value
         Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aDefault As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -262,11 +206,8 @@ Public Class atcDataAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for IsSimple
-    '''</summary>
-    <TestMethod()> _
-    Public Sub IsSimpleTest()
+    '''<summary>Test IsSimple</summary>
+    <TestMethod()> Public Sub IsSimpleTest()
         Dim aDef As atcAttributeDefinition = Nothing ' TODO: Initialize to an appropriate value
         Dim aKey As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aOperation As atcDefinedValue = Nothing ' TODO: Initialize to an appropriate value
@@ -279,11 +220,8 @@ Public Class atcDataAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for PreferredName
-    '''</summary>
-    <TestMethod()> _
-    Public Sub PreferredNameTest()
+    '''<summary>Test PreferredName</summary>
+    <TestMethod()> Public Sub PreferredNameTest()
         Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aAttributeNameExpected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -294,22 +232,16 @@ Public Class atcDataAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for RemoveByKey
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RemoveByKeyTest()
+    '''<summary>Test RemoveByKey</summary>
+    <TestMethod()> Public Sub RemoveByKeyTest()
         Dim target As atcDataAttributes = New atcDataAttributes() ' TODO: Initialize to an appropriate value
         Dim aAttributeName As Object = Nothing ' TODO: Initialize to an appropriate value
         target.RemoveByKey(aAttributeName)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for SetValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SetValueTest()
+    '''<summary>Test SetValue</summary>
+    <TestMethod()> Public Sub SetValueTest()
         Dim target As atcDataAttributes = New atcDataAttributes() ' TODO: Initialize to an appropriate value
         Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aAttributeValue As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -317,11 +249,8 @@ Public Class atcDataAttributesTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for SetValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SetValueTest1()
+    '''<summary>Test SetValue</summary>
+    <TestMethod()> Public Sub SetValueTest1()
         Dim target As atcDataAttributes = New atcDataAttributes() ' TODO: Initialize to an appropriate value
         Dim aAttrDefinition As atcAttributeDefinition = Nothing ' TODO: Initialize to an appropriate value
         Dim aValue As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -333,11 +262,8 @@ Public Class atcDataAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SetValueIfMissing
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SetValueIfMissingTest()
+    '''<summary>Test SetValueIfMissing</summary>
+    <TestMethod()> Public Sub SetValueIfMissingTest()
         Dim target As atcDataAttributes = New atcDataAttributes() ' TODO: Initialize to an appropriate value
         Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aAttributeValue As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -345,11 +271,8 @@ Public Class atcDataAttributesTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ToString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ToStringTest()
+    '''<summary>Test ToString</summary>
+    <TestMethod()> Public Sub ToStringTest()
         Dim target As atcDataAttributes = New atcDataAttributes() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -358,11 +281,8 @@ Public Class atcDataAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ValuesSortedByName
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ValuesSortedByNameTest()
+    '''<summary>Test ValuesSortedByName</summary>
+    <TestMethod()> Public Sub ValuesSortedByNameTest()
         Dim target As atcDataAttributes = New atcDataAttributes() ' TODO: Initialize to an appropriate value
         Dim expected As SortedList = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As SortedList
@@ -371,11 +291,8 @@ Public Class atcDataAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Item
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ItemTest()
+    '''<summary>Test Item</summary>
+    <TestMethod()> Public Sub ItemTest()
         Dim target As atcDataAttributes = New atcDataAttributes() ' TODO: Initialize to an appropriate value
         Dim index As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As atcDefinedValue = Nothing ' TODO: Initialize to an appropriate value
@@ -386,11 +303,8 @@ Public Class atcDataAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ItemByIndex
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ItemByIndexTest()
+    '''<summary>Test ItemByIndex</summary>
+    <TestMethod()> Public Sub ItemByIndexTest()
         Dim target As atcDataAttributes = New atcDataAttributes() ' TODO: Initialize to an appropriate value
         Dim index As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As atcDefinedValue = Nothing ' TODO: Initialize to an appropriate value
@@ -401,11 +315,8 @@ Public Class atcDataAttributesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Owner
-    '''</summary>
-    <TestMethod()> _
-    Public Sub OwnerTest()
+    '''<summary>Test Owner</summary>
+    <TestMethod()> Public Sub OwnerTest()
         Dim target As atcDataAttributes = New atcDataAttributes() ' TODO: Initialize to an appropriate value
         Dim expected As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Object

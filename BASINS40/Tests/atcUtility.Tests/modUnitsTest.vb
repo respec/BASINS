@@ -1,12 +1,7 @@
 ﻿Imports System.Collections
-
 Imports System.Xml
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcUtility
-
-
 
 '''<summary>
 '''This is a test class for modUnitsTest and is intended
@@ -14,8 +9,6 @@ Imports atcUtility
 '''</summary>
 <TestClass()> _
 Public Class modUnitsTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -57,12 +50,8 @@ Public Class modUnitsTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for ExtractChildByName
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test ExtractChildByName</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub ExtractChildByNameTest()
         Dim aParent As XmlNode = Nothing ' TODO: Initialize to an appropriate value
         Dim aTag As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -75,11 +64,8 @@ Public Class modUnitsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetAllUnitCategories
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetAllUnitCategoriesTest()
+    '''<summary>Test GetAllUnitCategories</summary>
+    <TestMethod()> Public Sub GetAllUnitCategoriesTest()
         Dim expected As ArrayList = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ArrayList
         actual = modUnits.GetAllUnitCategories
@@ -87,11 +73,8 @@ Public Class modUnitsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetAllUnitCategoriesHelper
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test GetAllUnitCategoriesHelper</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub GetAllUnitCategoriesHelperTest()
         Dim aList As ArrayList = Nothing ' TODO: Initialize to an appropriate value
         Dim aListExpected As ArrayList = Nothing ' TODO: Initialize to an appropriate value
@@ -101,11 +84,8 @@ Public Class modUnitsTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for GetAllUnitsInCategory
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetAllUnitsInCategoryTest()
+    '''<summary>Test GetAllUnitsInCategory</summary>
+    <TestMethod()> Public Sub GetAllUnitsInCategoryTest()
         Dim Category As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As ArrayList = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ArrayList
@@ -114,11 +94,8 @@ Public Class modUnitsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetConversionFactor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetConversionFactorTest()
+    '''<summary>Test GetConversionFactor</summary>
+    <TestMethod()> Public Sub GetConversionFactorTest()
         Dim fromUnits As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim toUnits As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -128,11 +105,8 @@ Public Class modUnitsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetParameterUnits
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetParameterUnitsTest()
+    '''<summary>Test GetParameterUnits</summary>
+    <TestMethod()> Public Sub GetParameterUnitsTest()
         Dim ParameterName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim FileType As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -142,11 +116,8 @@ Public Class modUnitsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetTable
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test GetTable</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub GetTableTest()
         Dim aTableName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As XmlNode = Nothing ' TODO: Initialize to an appropriate value
@@ -156,11 +127,8 @@ Public Class modUnitsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetUnitCategory
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetUnitCategoryTest()
+    '''<summary>Test GetUnitCategory</summary>
+    <TestMethod()> Public Sub GetUnitCategoryTest()
         Dim unitsName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -169,11 +137,8 @@ Public Class modUnitsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetUnitDescription
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetUnitDescriptionTest()
+    '''<summary>Test GetUnitDescription</summary>
+    <TestMethod()> Public Sub GetUnitDescriptionTest()
         Dim unitsName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -182,11 +147,8 @@ Public Class modUnitsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetUnitID
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetUnitIDTest()
+    '''<summary>Test GetUnitID</summary>
+    <TestMethod()> Public Sub GetUnitIDTest()
         Dim unitsName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -195,11 +157,8 @@ Public Class modUnitsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetUnitName
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GetUnitNameTest()
+    '''<summary>Test GetUnitName</summary>
+    <TestMethod()> Public Sub GetUnitNameTest()
         Dim unitsID As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -208,11 +167,8 @@ Public Class modUnitsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for UnitSystem
-    '''</summary>
-    <TestMethod()> _
-    Public Sub UnitSystemTest()
+    '''<summary>Test UnitSystem</summary>
+    <TestMethod()> Public Sub UnitSystemTest()
         Dim aUnitSystem As atcUnitSystem = New atcUnitSystem() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -221,11 +177,8 @@ Public Class modUnitsTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for unitsDB
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test unitsDB</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub unitsDBTest()
         Dim expected As XmlNode = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As XmlNode

@@ -1,14 +1,8 @@
 ﻿Imports System
-
 Imports System.Windows.Forms
-
 Imports System.Collections
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for frmDataSourceTest and is intended
@@ -16,8 +10,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class frmDataSourceTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -59,21 +51,14 @@ Public Class frmDataSourceTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for frmDataSource Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub frmDataSourceConstructorTest()
+    '''<summary>Test frmDataSource Constructor</summary>
+    <TestMethod()> Public Sub frmDataSourceConstructorTest()
         Dim target As frmDataSource = New frmDataSource()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for AskUser
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AskUserTest()
+    '''<summary>Test AskUser</summary>
+    <TestMethod()> Public Sub AskUserTest()
         Dim target As frmDataSource = New frmDataSource() ' TODO: Initialize to an appropriate value
         Dim aSelectedSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim aSelectedSourceExpected As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
@@ -89,11 +74,8 @@ Public Class frmDataSourceTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Dispose
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test Dispose</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub DisposeTest()
         Dim target As frmDataSource_Accessor = New frmDataSource_Accessor() ' TODO: Initialize to an appropriate value
         Dim disposing As Boolean = False ' TODO: Initialize to an appropriate value
@@ -101,11 +83,8 @@ Public Class frmDataSourceTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for FindOrCreateNode
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test FindOrCreateNode</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub FindOrCreateNodeTest()
         Dim target As frmDataSource_Accessor = New frmDataSource_Accessor() ' TODO: Initialize to an appropriate value
         Dim aNodes As TreeNodeCollection = Nothing ' TODO: Initialize to an appropriate value
@@ -117,11 +96,8 @@ Public Class frmDataSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for GetSource
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test GetSource</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub GetSourceTest()
         Dim target As frmDataSource_Accessor = New frmDataSource_Accessor() ' TODO: Initialize to an appropriate value
         Dim aSourceName As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -133,22 +109,16 @@ Public Class frmDataSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for InitializeComponent
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test InitializeComponent</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub InitializeComponentTest()
         Dim target As frmDataSource_Accessor = New frmDataSource_Accessor() ' TODO: Initialize to an appropriate value
         target.InitializeComponent()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for NodeHeight
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test NodeHeight</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub NodeHeightTest()
         Dim target As frmDataSource_Accessor = New frmDataSource_Accessor() ' TODO: Initialize to an appropriate value
         Dim aNode As TreeNode = Nothing ' TODO: Initialize to an appropriate value
@@ -159,11 +129,8 @@ Public Class frmDataSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for OnLoad
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test OnLoad</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub OnLoadTest()
         Dim target As frmDataSource_Accessor = New frmDataSource_Accessor() ' TODO: Initialize to an appropriate value
         Dim e As EventArgs = Nothing ' TODO: Initialize to an appropriate value
@@ -171,11 +138,8 @@ Public Class frmDataSourceTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Populate
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test Populate</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub PopulateTest()
         Dim target As frmDataSource_Accessor = New frmDataSource_Accessor() ' TODO: Initialize to an appropriate value
         Dim aNeedToOpen As Boolean = False ' TODO: Initialize to an appropriate value
@@ -188,33 +152,24 @@ Public Class frmDataSourceTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ResizeToShowBottomNode
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test ResizeToShowBottomNode</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub ResizeToShowBottomNodeTest()
         Dim target As frmDataSource_Accessor = New frmDataSource_Accessor() ' TODO: Initialize to an appropriate value
         target.ResizeToShowBottomNode()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for __ENCAddToList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test __ENCAddToList</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub __ENCAddToListTest()
         Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
         frmDataSource_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnCancel_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test btnCancel_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub btnCancel_ClickTest()
         Dim target As frmDataSource_Accessor = New frmDataSource_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -223,11 +178,8 @@ Public Class frmDataSourceTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnOk_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test btnOk_Click</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub btnOk_ClickTest()
         Dim target As frmDataSource_Accessor = New frmDataSource_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -236,11 +188,8 @@ Public Class frmDataSourceTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for treeSources_AfterCollapse
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test treeSources_AfterCollapse</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub treeSources_AfterCollapseTest()
         Dim target As frmDataSource_Accessor = New frmDataSource_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -249,11 +198,8 @@ Public Class frmDataSourceTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for treeSources_AfterExpand
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test treeSources_AfterExpand</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub treeSources_AfterExpandTest()
         Dim target As frmDataSource_Accessor = New frmDataSource_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -262,11 +208,8 @@ Public Class frmDataSourceTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for treeSources_DoubleClick
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test treeSources_DoubleClick</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub treeSources_DoubleClickTest()
         Dim target As frmDataSource_Accessor = New frmDataSource_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -275,11 +218,8 @@ Public Class frmDataSourceTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnCancel
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnCancelTest()
+    '''<summary>Test btnCancel</summary>
+    <TestMethod()> Public Sub btnCancelTest()
         Dim target As frmDataSource = New frmDataSource() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -289,11 +229,8 @@ Public Class frmDataSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnOk
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnOkTest()
+    '''<summary>Test btnOk</summary>
+    <TestMethod()> Public Sub btnOkTest()
         Dim target As frmDataSource = New frmDataSource() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -303,11 +240,8 @@ Public Class frmDataSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for cboDisplay
-    '''</summary>
-    <TestMethod()> _
-    Public Sub cboDisplayTest()
+    '''<summary>Test cboDisplay</summary>
+    <TestMethod()> Public Sub cboDisplayTest()
         Dim target As frmDataSource = New frmDataSource() ' TODO: Initialize to an appropriate value
         Dim expected As ComboBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ComboBox
@@ -317,11 +251,8 @@ Public Class frmDataSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblDisplay
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblDisplayTest()
+    '''<summary>Test lblDisplay</summary>
+    <TestMethod()> Public Sub lblDisplayTest()
         Dim target As frmDataSource = New frmDataSource() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -331,11 +262,8 @@ Public Class frmDataSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for pnlButtons
-    '''</summary>
-    <TestMethod()> _
-    Public Sub pnlButtonsTest()
+    '''<summary>Test pnlButtons</summary>
+    <TestMethod()> Public Sub pnlButtonsTest()
         Dim target As frmDataSource = New frmDataSource() ' TODO: Initialize to an appropriate value
         Dim expected As Panel = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Panel
@@ -345,11 +273,8 @@ Public Class frmDataSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for treeSources
-    '''</summary>
-    <TestMethod()> _
-    Public Sub treeSourcesTest()
+    '''<summary>Test treeSources</summary>
+    <TestMethod()> Public Sub treeSourcesTest()
         Dim target As frmDataSource = New frmDataSource() ' TODO: Initialize to an appropriate value
         Dim expected As TreeView = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As TreeView

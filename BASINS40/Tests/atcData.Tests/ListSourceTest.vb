@@ -1,12 +1,7 @@
 ﻿Imports atcControls
-
 Imports atcUtility
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for ListSourceTest and is intended
@@ -14,8 +9,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class ListSourceTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -57,34 +50,24 @@ Public Class ListSourceTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for ListSource Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ListSourceConstructorTest()
+    '''<summary>Test ListSource Constructor</summary>
+    <TestMethod()> Public Sub ListSourceConstructorTest()
         Dim aValues As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim aSelected As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim target As ListSource = New ListSource(aValues, aSelected)
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for __ENCAddToList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test __ENCAddToList</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub __ENCAddToListTest()
         Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
         ListSource_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Alignment
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AlignmentTest()
+    '''<summary>Test Alignment</summary>
+    <TestMethod()> Public Sub AlignmentTest()
         Dim aValues As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim aSelected As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim target As ListSource = New ListSource(aValues, aSelected) ' TODO: Initialize to an appropriate value
@@ -98,11 +81,8 @@ Public Class ListSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CellSelected
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CellSelectedTest()
+    '''<summary>Test CellSelected</summary>
+    <TestMethod()> Public Sub CellSelectedTest()
         Dim aValues As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim aSelected As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim target As ListSource = New ListSource(aValues, aSelected) ' TODO: Initialize to an appropriate value
@@ -116,11 +96,8 @@ Public Class ListSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CellValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CellValueTest()
+    '''<summary>Test CellValue</summary>
+    <TestMethod()> Public Sub CellValueTest()
         Dim aValues As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim aSelected As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim target As ListSource = New ListSource(aValues, aSelected) ' TODO: Initialize to an appropriate value
@@ -134,11 +111,8 @@ Public Class ListSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Columns
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ColumnsTest()
+    '''<summary>Test Columns</summary>
+    <TestMethod()> Public Sub ColumnsTest()
         Dim aValues As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim aSelected As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim target As ListSource = New ListSource(aValues, aSelected) ' TODO: Initialize to an appropriate value
@@ -150,11 +124,8 @@ Public Class ListSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Rows
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RowsTest()
+    '''<summary>Test Rows</summary>
+    <TestMethod()> Public Sub RowsTest()
         Dim aValues As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim aSelected As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim target As ListSource = New ListSource(aValues, aSelected) ' TODO: Initialize to an appropriate value
@@ -166,11 +137,8 @@ Public Class ListSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SelectedItems
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SelectedItemsTest()
+    '''<summary>Test SelectedItems</summary>
+    <TestMethod()> Public Sub SelectedItemsTest()
         Dim aValues As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim aSelected As atcCollection = Nothing ' TODO: Initialize to an appropriate value
         Dim target As ListSource = New ListSource(aValues, aSelected) ' TODO: Initialize to an appropriate value

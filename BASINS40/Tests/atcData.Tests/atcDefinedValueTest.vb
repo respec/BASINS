@@ -1,8 +1,5 @@
 ﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for atcDefinedValueTest and is intended
@@ -10,8 +7,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class atcDefinedValueTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -53,12 +48,8 @@ Public Class atcDefinedValueTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcDefinedValue Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcDefinedValueConstructorTest()
+    '''<summary>Test atcDefinedValue Constructor</summary>
+    <TestMethod()> Public Sub atcDefinedValueConstructorTest()
         Dim aDefinition As atcAttributeDefinition = Nothing ' TODO: Initialize to an appropriate value
         Dim aValue As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim aArguments As atcDataAttributes = Nothing ' TODO: Initialize to an appropriate value
@@ -66,20 +57,14 @@ Public Class atcDefinedValueTest
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for atcDefinedValue Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcDefinedValueConstructorTest1()
+    '''<summary>Test atcDefinedValue Constructor</summary>
+    <TestMethod()> Public Sub atcDefinedValueConstructorTest1()
         Dim target As atcDefinedValue = New atcDefinedValue()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for Clone
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CloneTest()
+    '''<summary>Test Clone</summary>
+    <TestMethod()> Public Sub CloneTest()
         Dim target As atcDefinedValue = New atcDefinedValue() ' TODO: Initialize to an appropriate value
         Dim expected As atcDefinedValue = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcDefinedValue
@@ -88,11 +73,8 @@ Public Class atcDefinedValueTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ToString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ToStringTest()
+    '''<summary>Test ToString</summary>
+    <TestMethod()> Public Sub ToStringTest()
         Dim target As atcDefinedValue = New atcDefinedValue() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String

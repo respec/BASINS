@@ -1,8 +1,5 @@
 ﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcUtility
-
-
 
 '''<summary>
 '''This is a test class for atcTableOpenerTest and is intended
@@ -10,8 +7,6 @@ Imports atcUtility
 '''</summary>
 <TestClass()> _
 Public Class atcTableOpenerTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -53,21 +48,14 @@ Public Class atcTableOpenerTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcTableOpener Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcTableOpenerConstructorTest()
+    '''<summary>Test atcTableOpener Constructor</summary>
+    <TestMethod()> Public Sub atcTableOpenerConstructorTest()
         Dim target As atcTableOpener = New atcTableOpener()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for OpenAnyTable
-    '''</summary>
-    <TestMethod()> _
-    Public Sub OpenAnyTableTest()
+    '''<summary>Test OpenAnyTable</summary>
+    <TestMethod()> Public Sub OpenAnyTableTest()
         Dim aFileName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As IatcTable = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As IatcTable

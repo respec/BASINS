@@ -1,12 +1,7 @@
 ﻿Imports System.Collections.Generic
-
 Imports atcUtility
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for atcTimeseriesTest and is intended
@@ -14,8 +9,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class atcTimeseriesTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -57,33 +50,23 @@ Public Class atcTimeseriesTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcTimeseries Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcTimeseriesConstructorTest()
+    '''<summary>Test atcTimeseries Constructor</summary>
+    <TestMethod()> Public Sub atcTimeseriesConstructorTest()
         Dim aTimeseriesSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseries = New atcTimeseries(aTimeseriesSource)
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for Clear
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ClearTest()
+    '''<summary>Test Clear</summary>
+    <TestMethod()> Public Sub ClearTest()
         Dim aTimeseriesSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseries = New atcTimeseries(aTimeseriesSource) ' TODO: Initialize to an appropriate value
         target.Clear()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Clone
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CloneTest()
+    '''<summary>Test Clone</summary>
+    <TestMethod()> Public Sub CloneTest()
         Dim aTimeseriesSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseries = New atcTimeseries(aTimeseriesSource) ' TODO: Initialize to an appropriate value
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
@@ -94,11 +77,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Clone
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CloneTest1()
+    '''<summary>Test Clone</summary>
+    <TestMethod()> Public Sub CloneTest1()
         Dim aTimeseriesSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseries = New atcTimeseries(aTimeseriesSource) ' TODO: Initialize to an appropriate value
         Dim expected As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
@@ -108,22 +88,16 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for EnsureValuesRead
-    '''</summary>
-    <TestMethod()> _
-    Public Sub EnsureValuesReadTest()
+    '''<summary>Test EnsureValuesRead</summary>
+    <TestMethod()> Public Sub EnsureValuesReadTest()
         Dim aTimeseriesSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseries = New atcTimeseries(aTimeseriesSource) ' TODO: Initialize to an appropriate value
         target.EnsureValuesRead()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for FirstNumeric
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FirstNumericTest()
+    '''<summary>Test FirstNumeric</summary>
+    <TestMethod()> Public Sub FirstNumericTest()
         Dim aTimeseriesSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseries = New atcTimeseries(aTimeseriesSource) ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -133,11 +107,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for IndexOfValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub IndexOfValueTest()
+    '''<summary>Test IndexOfValue</summary>
+    <TestMethod()> Public Sub IndexOfValueTest()
         Dim aTimeseriesSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseries = New atcTimeseries(aTimeseriesSource) ' TODO: Initialize to an appropriate value
         Dim aValue As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -149,11 +120,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for OriginalParent
-    '''</summary>
-    <TestMethod()> _
-    Public Sub OriginalParentTest()
+    '''<summary>Test OriginalParent</summary>
+    <TestMethod()> Public Sub OriginalParentTest()
         Dim aTimeseriesSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseries = New atcTimeseries(aTimeseriesSource) ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
@@ -163,22 +131,16 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SetInterval
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SetIntervalTest()
+    '''<summary>Test SetInterval</summary>
+    <TestMethod()> Public Sub SetIntervalTest()
         Dim aTimeseriesSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseries = New atcTimeseries(aTimeseriesSource) ' TODO: Initialize to an appropriate value
         target.SetInterval()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for SetInterval
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SetIntervalTest1()
+    '''<summary>Test SetInterval</summary>
+    <TestMethod()> Public Sub SetIntervalTest1()
         Dim aTimeseriesSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseries = New atcTimeseries(aTimeseriesSource) ' TODO: Initialize to an appropriate value
         Dim aTimeUnit As modDate.atcTimeUnit = New modDate.atcTimeUnit() ' TODO: Initialize to an appropriate value
@@ -187,11 +149,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ValueAttributeDefinitions
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ValueAttributeDefinitionsTest()
+    '''<summary>Test ValueAttributeDefinitions</summary>
+    <TestMethod()> Public Sub ValueAttributeDefinitionsTest()
         Dim aTimeseriesSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseries = New atcTimeseries(aTimeseriesSource) ' TODO: Initialize to an appropriate value
         Dim expected As List(Of atcAttributeDefinition) = Nothing ' TODO: Initialize to an appropriate value
@@ -201,11 +160,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ValueAttributesExist
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ValueAttributesExistTest()
+    '''<summary>Test ValueAttributesExist</summary>
+    <TestMethod()> Public Sub ValueAttributesExistTest()
         Dim aTimeseriesSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseries = New atcTimeseries(aTimeseriesSource) ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -216,11 +172,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ValueAttributesGetValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ValueAttributesGetValueTest()
+    '''<summary>Test ValueAttributesGetValue</summary>
+    <TestMethod()> Public Sub ValueAttributesGetValueTest()
         Dim aTimeseriesSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseries = New atcTimeseries(aTimeseriesSource) ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -233,11 +186,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for op_Addition
-    '''</summary>
-    <TestMethod()> _
-    Public Sub op_AdditionTest()
+    '''<summary>Test op_Addition</summary>
+    <TestMethod()> Public Sub op_AdditionTest()
         Dim aTimeseries1 As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aTimeseries2 As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
@@ -247,11 +197,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for op_Addition
-    '''</summary>
-    <TestMethod()> _
-    Public Sub op_AdditionTest1()
+    '''<summary>Test op_Addition</summary>
+    <TestMethod()> Public Sub op_AdditionTest1()
         Dim aTimeseries As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aValue As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
@@ -261,11 +208,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for op_Division
-    '''</summary>
-    <TestMethod()> _
-    Public Sub op_DivisionTest()
+    '''<summary>Test op_Division</summary>
+    <TestMethod()> Public Sub op_DivisionTest()
         Dim aTimeseries1 As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aTimeseries2 As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
@@ -275,11 +219,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for op_Division
-    '''</summary>
-    <TestMethod()> _
-    Public Sub op_DivisionTest1()
+    '''<summary>Test op_Division</summary>
+    <TestMethod()> Public Sub op_DivisionTest1()
         Dim aTimeseries As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aValue As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
@@ -289,11 +230,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for op_Exponent
-    '''</summary>
-    <TestMethod()> _
-    Public Sub op_ExponentTest()
+    '''<summary>Test op_Exponent</summary>
+    <TestMethod()> Public Sub op_ExponentTest()
         Dim aTimeseries As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aValue As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
@@ -303,11 +241,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for op_Exponent
-    '''</summary>
-    <TestMethod()> _
-    Public Sub op_ExponentTest1()
+    '''<summary>Test op_Exponent</summary>
+    <TestMethod()> Public Sub op_ExponentTest1()
         Dim aTimeseries1 As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aTimeseries2 As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
@@ -317,11 +252,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for op_Multiply
-    '''</summary>
-    <TestMethod()> _
-    Public Sub op_MultiplyTest()
+    '''<summary>Test op_Multiply</summary>
+    <TestMethod()> Public Sub op_MultiplyTest()
         Dim aTimeseries As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aValue As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
@@ -331,11 +263,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for op_Multiply
-    '''</summary>
-    <TestMethod()> _
-    Public Sub op_MultiplyTest1()
+    '''<summary>Test op_Multiply</summary>
+    <TestMethod()> Public Sub op_MultiplyTest1()
         Dim aTimeseries1 As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aTimeseries2 As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
@@ -345,11 +274,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for op_Subtraction
-    '''</summary>
-    <TestMethod()> _
-    Public Sub op_SubtractionTest()
+    '''<summary>Test op_Subtraction</summary>
+    <TestMethod()> Public Sub op_SubtractionTest()
         Dim aTimeseries1 As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aTimeseries2 As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
@@ -359,11 +285,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for op_Subtraction
-    '''</summary>
-    <TestMethod()> _
-    Public Sub op_SubtractionTest1()
+    '''<summary>Test op_Subtraction</summary>
+    <TestMethod()> Public Sub op_SubtractionTest1()
         Dim aTimeseries As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
         Dim aValue As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
@@ -373,11 +296,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Dates
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DatesTest()
+    '''<summary>Test Dates</summary>
+    <TestMethod()> Public Sub DatesTest()
         Dim aTimeseriesSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseries = New atcTimeseries(aTimeseriesSource) ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
@@ -388,11 +308,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Value
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ValueTest()
+    '''<summary>Test Value</summary>
+    <TestMethod()> Public Sub ValueTest()
         Dim aTimeseriesSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseries = New atcTimeseries(aTimeseriesSource) ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -404,11 +321,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ValueAttributes
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ValueAttributesTest()
+    '''<summary>Test ValueAttributes</summary>
+    <TestMethod()> Public Sub ValueAttributesTest()
         Dim aTimeseriesSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseries = New atcTimeseries(aTimeseriesSource) ' TODO: Initialize to an appropriate value
         Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -420,11 +334,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Values
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ValuesTest()
+    '''<summary>Test Values</summary>
+    <TestMethod()> Public Sub ValuesTest()
         Dim aTimeseriesSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseries = New atcTimeseries(aTimeseriesSource) ' TODO: Initialize to an appropriate value
         Dim expected() As Double = Nothing ' TODO: Initialize to an appropriate value
@@ -435,11 +346,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ValuesNeedToBeRead
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ValuesNeedToBeReadTest()
+    '''<summary>Test ValuesNeedToBeRead</summary>
+    <TestMethod()> Public Sub ValuesNeedToBeReadTest()
         Dim aTimeseriesSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseries = New atcTimeseries(aTimeseriesSource) ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -450,11 +358,8 @@ Public Class atcTimeseriesTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for numValues
-    '''</summary>
-    <TestMethod()> _
-    Public Sub numValuesTest()
+    '''<summary>Test numValues</summary>
+    <TestMethod()> Public Sub numValuesTest()
         Dim aTimeseriesSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseries = New atcTimeseries(aTimeseriesSource) ' TODO: Initialize to an appropriate value
         Dim expected As Long = 0 ' TODO: Initialize to an appropriate value

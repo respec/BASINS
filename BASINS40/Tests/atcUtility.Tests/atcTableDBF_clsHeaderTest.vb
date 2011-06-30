@@ -1,8 +1,5 @@
 ﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcUtility
-
-
 
 '''<summary>
 '''This is a test class for atcTableDBF_clsHeaderTest and is intended
@@ -10,8 +7,6 @@ Imports atcUtility
 '''</summary>
 <TestClass()> _
 Public Class atcTableDBF_clsHeaderTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -53,33 +48,23 @@ Public Class atcTableDBF_clsHeaderTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for clsHeader Constructor
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test clsHeader Constructor</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub atcTableDBF_clsHeaderConstructorTest()
         Dim target As atcTableDBF_Accessor.clsHeader = New atcTableDBF_Accessor.clsHeader()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for Clear
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test Clear</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub ClearTest()
         Dim target As atcTableDBF_Accessor.clsHeader = New atcTableDBF_Accessor.clsHeader() ' TODO: Initialize to an appropriate value
         target.Clear()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ReadFromFile
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test ReadFromFile</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub ReadFromFileTest()
         Dim target As atcTableDBF_Accessor.clsHeader = New atcTableDBF_Accessor.clsHeader() ' TODO: Initialize to an appropriate value
         Dim inFile As Short = 0 ' TODO: Initialize to an appropriate value
@@ -87,11 +72,8 @@ Public Class atcTableDBF_clsHeaderTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ToString
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test ToString</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub ToStringTest()
         Dim target As atcTableDBF_Accessor.clsHeader = New atcTableDBF_Accessor.clsHeader() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -101,11 +83,8 @@ Public Class atcTableDBF_clsHeaderTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for WriteToFile
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test WriteToFile</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub WriteToFileTest()
         Dim target As atcTableDBF_Accessor.clsHeader = New atcTableDBF_Accessor.clsHeader() ' TODO: Initialize to an appropriate value
         Dim outFile As Short = 0 ' TODO: Initialize to an appropriate value
@@ -113,11 +92,8 @@ Public Class atcTableDBF_clsHeaderTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Year
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcUtility.dll")> _
+    '''<summary>Test Year</summary>
+    <TestMethod(), DeploymentItem("atcUtility.dll")> _
     Public Sub YearTest()
         Dim target As atcTableDBF_Accessor.clsHeader = New atcTableDBF_Accessor.clsHeader() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value

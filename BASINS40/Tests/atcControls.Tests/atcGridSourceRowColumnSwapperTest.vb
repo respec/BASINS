@@ -1,10 +1,6 @@
 ﻿Imports System.Drawing
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcControls
-
-
 
 '''<summary>
 '''This is a test class for atcGridSourceRowColumnSwapperTest and is intended
@@ -12,8 +8,6 @@ Imports atcControls
 '''</summary>
 <TestClass()> _
 Public Class atcGridSourceRowColumnSwapperTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -25,7 +19,7 @@ Public Class atcGridSourceRowColumnSwapperTest
             Return testContextInstance
         End Get
         Set(ByVal value As TestContext)
-            testContextInstance = Value
+            testContextInstance = value
         End Set
     End Property
 
@@ -55,33 +49,23 @@ Public Class atcGridSourceRowColumnSwapperTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcGridSourceRowColumnSwapper Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcGridSourceRowColumnSwapperConstructorTest()
+    '''<summary>Test atcGridSourceRowColumnSwapper Constructor</summary>
+    <TestMethod()> Public Sub atcGridSourceRowColumnSwapperConstructorTest()
         Dim aSource As atcGridSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcGridSourceRowColumnSwapper = New atcGridSourceRowColumnSwapper(aSource)
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for __ENCAddToList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test __ENCAddToList</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub __ENCAddToListTest()
         Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
         atcGridSourceRowColumnSwapper_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Alignment
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AlignmentTest()
+    '''<summary>Test Alignment</summary>
+    <TestMethod()> Public Sub AlignmentTest()
         Dim aSource As atcGridSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcGridSourceRowColumnSwapper = New atcGridSourceRowColumnSwapper(aSource) ' TODO: Initialize to an appropriate value
         Dim aRow As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -94,11 +78,8 @@ Public Class atcGridSourceRowColumnSwapperTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CellColor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CellColorTest()
+    '''<summary>Test CellColor</summary>
+    <TestMethod()> Public Sub CellColorTest()
         Dim aSource As atcGridSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcGridSourceRowColumnSwapper = New atcGridSourceRowColumnSwapper(aSource) ' TODO: Initialize to an appropriate value
         Dim aRow As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -111,11 +92,8 @@ Public Class atcGridSourceRowColumnSwapperTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CellEditable
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CellEditableTest()
+    '''<summary>Test CellEditable</summary>
+    <TestMethod()> Public Sub CellEditableTest()
         Dim aSource As atcGridSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcGridSourceRowColumnSwapper = New atcGridSourceRowColumnSwapper(aSource) ' TODO: Initialize to an appropriate value
         Dim aRow As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -128,11 +106,8 @@ Public Class atcGridSourceRowColumnSwapperTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CellSelected
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CellSelectedTest()
+    '''<summary>Test CellSelected</summary>
+    <TestMethod()> Public Sub CellSelectedTest()
         Dim aSource As atcGridSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcGridSourceRowColumnSwapper = New atcGridSourceRowColumnSwapper(aSource) ' TODO: Initialize to an appropriate value
         Dim aRow As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -145,11 +120,8 @@ Public Class atcGridSourceRowColumnSwapperTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CellValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CellValueTest()
+    '''<summary>Test CellValue</summary>
+    <TestMethod()> Public Sub CellValueTest()
         Dim aSource As atcGridSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcGridSourceRowColumnSwapper = New atcGridSourceRowColumnSwapper(aSource) ' TODO: Initialize to an appropriate value
         Dim aRow As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -162,11 +134,8 @@ Public Class atcGridSourceRowColumnSwapperTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Columns
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ColumnsTest()
+    '''<summary>Test Columns</summary>
+    <TestMethod()> Public Sub ColumnsTest()
         Dim aSource As atcGridSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcGridSourceRowColumnSwapper = New atcGridSourceRowColumnSwapper(aSource) ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -177,11 +146,8 @@ Public Class atcGridSourceRowColumnSwapperTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FixedColumns
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FixedColumnsTest()
+    '''<summary>Test FixedColumns</summary>
+    <TestMethod()> Public Sub FixedColumnsTest()
         Dim aSource As atcGridSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcGridSourceRowColumnSwapper = New atcGridSourceRowColumnSwapper(aSource) ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -192,11 +158,8 @@ Public Class atcGridSourceRowColumnSwapperTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FixedRows
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FixedRowsTest()
+    '''<summary>Test FixedRows</summary>
+    <TestMethod()> Public Sub FixedRowsTest()
         Dim aSource As atcGridSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcGridSourceRowColumnSwapper = New atcGridSourceRowColumnSwapper(aSource) ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -207,11 +170,8 @@ Public Class atcGridSourceRowColumnSwapperTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Rows
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RowsTest()
+    '''<summary>Test Rows</summary>
+    <TestMethod()> Public Sub RowsTest()
         Dim aSource As atcGridSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcGridSourceRowColumnSwapper = New atcGridSourceRowColumnSwapper(aSource) ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -222,11 +182,8 @@ Public Class atcGridSourceRowColumnSwapperTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SwapRowsColumns
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SwapRowsColumnsTest()
+    '''<summary>Test SwapRowsColumns</summary>
+    <TestMethod()> Public Sub SwapRowsColumnsTest()
         Dim aSource As atcGridSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcGridSourceRowColumnSwapper = New atcGridSourceRowColumnSwapper(aSource) ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -237,11 +194,8 @@ Public Class atcGridSourceRowColumnSwapperTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for pSource
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test pSource</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub pSourceTest()
         Dim param0 As PrivateObject = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcGridSourceRowColumnSwapper_Accessor = New atcGridSourceRowColumnSwapper_Accessor(param0) ' TODO: Initialize to an appropriate value

@@ -1,8 +1,5 @@
 ﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for atcTimeseriesSourceTest and is intended
@@ -10,8 +7,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class atcTimeseriesSourceTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -53,21 +48,14 @@ Public Class atcTimeseriesSourceTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcTimeseriesSource Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcTimeseriesSourceConstructorTest()
+    '''<summary>Test atcTimeseriesSource Constructor</summary>
+    <TestMethod()> Public Sub atcTimeseriesSourceConstructorTest()
         Dim target As atcTimeseriesSource = New atcTimeseriesSource()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for AddDatasets
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddDatasetsTest()
+    '''<summary>Test AddDatasets</summary>
+    <TestMethod()> Public Sub AddDatasetsTest()
         Dim target As atcTimeseriesSource = New atcTimeseriesSource() ' TODO: Initialize to an appropriate value
         Dim aTimeseriesGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -77,11 +65,8 @@ Public Class atcTimeseriesSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DataSets
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DataSetsTest()
+    '''<summary>Test DataSets</summary>
+    <TestMethod()> Public Sub DataSetsTest()
         Dim target As atcTimeseriesSource = New atcTimeseriesSource() ' TODO: Initialize to an appropriate value
         Dim actual As atcTimeseriesGroup
         actual = target.DataSets

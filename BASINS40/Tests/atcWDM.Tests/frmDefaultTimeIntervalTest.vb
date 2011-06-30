@@ -1,14 +1,8 @@
 ﻿Imports atcControls
-
 Imports System.Windows.Forms
-
 Imports System
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcWDM
-
-
 
 '''<summary>
 '''This is a test class for frmDefaultTimeIntervalTest and is intended
@@ -16,8 +10,6 @@ Imports atcWDM
 '''</summary>
 <TestClass()> _
 Public Class frmDefaultTimeIntervalTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -59,21 +51,14 @@ Public Class frmDefaultTimeIntervalTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for frmDefaultTimeInterval Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub frmDefaultTimeIntervalConstructorTest()
+    '''<summary>Test frmDefaultTimeInterval Constructor</summary>
+    <TestMethod()> Public Sub frmDefaultTimeIntervalConstructorTest()
         Dim target As frmDefaultTimeInterval = New frmDefaultTimeInterval()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for AskUser
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AskUserTest()
+    '''<summary>Test AskUser</summary>
+    <TestMethod()> Public Sub AskUserTest()
         Dim target As frmDefaultTimeInterval = New frmDefaultTimeInterval() ' TODO: Initialize to an appropriate value
         Dim aDataSetDescription As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aTu As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -92,11 +77,8 @@ Public Class frmDefaultTimeIntervalTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Dispose
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test Dispose</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub DisposeTest()
         Dim target As frmDefaultTimeInterval_Accessor = New frmDefaultTimeInterval_Accessor() ' TODO: Initialize to an appropriate value
         Dim disposing As Boolean = False ' TODO: Initialize to an appropriate value
@@ -104,33 +86,24 @@ Public Class frmDefaultTimeIntervalTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for InitializeComponent
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test InitializeComponent</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub InitializeComponentTest()
         Dim target As frmDefaultTimeInterval_Accessor = New frmDefaultTimeInterval_Accessor() ' TODO: Initialize to an appropriate value
         target.InitializeComponent()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for __ENCAddToList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test __ENCAddToList</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub __ENCAddToListTest()
         Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
         frmDefaultTimeInterval_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnAll_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test btnAll_Click</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub btnAll_ClickTest()
         Dim target As frmDefaultTimeInterval_Accessor = New frmDefaultTimeInterval_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -139,11 +112,8 @@ Public Class frmDefaultTimeIntervalTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnOk_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test btnOk_Click</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub btnOk_ClickTest()
         Dim target As frmDefaultTimeInterval_Accessor = New frmDefaultTimeInterval_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -152,11 +122,8 @@ Public Class frmDefaultTimeIntervalTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnSkipAll_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test btnSkipAll_Click</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub btnSkipAll_ClickTest()
         Dim target As frmDefaultTimeInterval_Accessor = New frmDefaultTimeInterval_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -165,11 +132,8 @@ Public Class frmDefaultTimeIntervalTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for btnSkip_Click
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test btnSkip_Click</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub btnSkip_ClickTest()
         Dim target As frmDefaultTimeInterval_Accessor = New frmDefaultTimeInterval_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -178,11 +142,8 @@ Public Class frmDefaultTimeIntervalTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for frmDefaultTimeInterval_KeyDown
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test frmDefaultTimeInterval_KeyDown</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub frmDefaultTimeInterval_KeyDownTest()
         Dim target As frmDefaultTimeInterval_Accessor = New frmDefaultTimeInterval_Accessor() ' TODO: Initialize to an appropriate value
         Dim sender As Object = Nothing ' TODO: Initialize to an appropriate value
@@ -191,11 +152,8 @@ Public Class frmDefaultTimeIntervalTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for atcTextTimeStep
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcTextTimeStepTest()
+    '''<summary>Test atcTextTimeStep</summary>
+    <TestMethod()> Public Sub atcTextTimeStepTest()
         Dim target As frmDefaultTimeInterval = New frmDefaultTimeInterval() ' TODO: Initialize to an appropriate value
         Dim expected As atcText = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcText
@@ -205,11 +163,8 @@ Public Class frmDefaultTimeIntervalTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnAll
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnAllTest()
+    '''<summary>Test btnAll</summary>
+    <TestMethod()> Public Sub btnAllTest()
         Dim target As frmDefaultTimeInterval = New frmDefaultTimeInterval() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -219,11 +174,8 @@ Public Class frmDefaultTimeIntervalTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnOk
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnOkTest()
+    '''<summary>Test btnOk</summary>
+    <TestMethod()> Public Sub btnOkTest()
         Dim target As frmDefaultTimeInterval = New frmDefaultTimeInterval() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -233,11 +185,8 @@ Public Class frmDefaultTimeIntervalTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnSkip
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnSkipTest()
+    '''<summary>Test btnSkip</summary>
+    <TestMethod()> Public Sub btnSkipTest()
         Dim target As frmDefaultTimeInterval = New frmDefaultTimeInterval() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -247,11 +196,8 @@ Public Class frmDefaultTimeIntervalTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for btnSkipAll
-    '''</summary>
-    <TestMethod()> _
-    Public Sub btnSkipAllTest()
+    '''<summary>Test btnSkipAll</summary>
+    <TestMethod()> Public Sub btnSkipAllTest()
         Dim target As frmDefaultTimeInterval = New frmDefaultTimeInterval() ' TODO: Initialize to an appropriate value
         Dim expected As Button = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Button
@@ -261,11 +207,8 @@ Public Class frmDefaultTimeIntervalTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblAggregation
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblAggregationTest()
+    '''<summary>Test lblAggregation</summary>
+    <TestMethod()> Public Sub lblAggregationTest()
         Dim target As frmDefaultTimeInterval = New frmDefaultTimeInterval() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -275,11 +218,8 @@ Public Class frmDefaultTimeIntervalTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblInstructions
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblInstructionsTest()
+    '''<summary>Test lblInstructions</summary>
+    <TestMethod()> Public Sub lblInstructionsTest()
         Dim target As frmDefaultTimeInterval = New frmDefaultTimeInterval() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -289,11 +229,8 @@ Public Class frmDefaultTimeIntervalTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblTimeUnit
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblTimeUnitTest()
+    '''<summary>Test lblTimeUnit</summary>
+    <TestMethod()> Public Sub lblTimeUnitTest()
         Dim target As frmDefaultTimeInterval = New frmDefaultTimeInterval() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -303,11 +240,8 @@ Public Class frmDefaultTimeIntervalTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lblTimestep
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lblTimestepTest()
+    '''<summary>Test lblTimestep</summary>
+    <TestMethod()> Public Sub lblTimestepTest()
         Dim target As frmDefaultTimeInterval = New frmDefaultTimeInterval() ' TODO: Initialize to an appropriate value
         Dim expected As Label = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Label
@@ -317,11 +251,8 @@ Public Class frmDefaultTimeIntervalTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lstAggregation
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lstAggregationTest()
+    '''<summary>Test lstAggregation</summary>
+    <TestMethod()> Public Sub lstAggregationTest()
         Dim target As frmDefaultTimeInterval = New frmDefaultTimeInterval() ' TODO: Initialize to an appropriate value
         Dim expected As ListBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ListBox
@@ -331,11 +262,8 @@ Public Class frmDefaultTimeIntervalTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for lstTimeUnit
-    '''</summary>
-    <TestMethod()> _
-    Public Sub lstTimeUnitTest()
+    '''<summary>Test lstTimeUnit</summary>
+    <TestMethod()> Public Sub lstTimeUnitTest()
         Dim target As frmDefaultTimeInterval = New frmDefaultTimeInterval() ' TODO: Initialize to an appropriate value
         Dim expected As ListBox = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ListBox

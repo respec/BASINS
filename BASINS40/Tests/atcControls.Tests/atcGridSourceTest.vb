@@ -1,10 +1,6 @@
 ﻿Imports System.Drawing
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcControls
-
-
 
 '''<summary>
 '''This is a test class for atcGridSourceTest and is intended
@@ -12,8 +8,6 @@ Imports atcControls
 '''</summary>
 <TestClass()> _
 Public Class atcGridSourceTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -55,21 +49,14 @@ Public Class atcGridSourceTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcGridSource Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcGridSourceConstructorTest()
+    '''<summary>Test atcGridSource Constructor</summary>
+    <TestMethod()> Public Sub atcGridSourceConstructorTest()
         Dim target As atcGridSource = New atcGridSource()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for AppendColumns
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AppendColumnsTest()
+    '''<summary>Test AppendColumns</summary>
+    <TestMethod()> Public Sub AppendColumnsTest()
         Dim target As atcGridSource = New atcGridSource() ' TODO: Initialize to an appropriate value
         Dim aRightColumns As atcGridSource = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As atcGridSource = Nothing ' TODO: Initialize to an appropriate value
@@ -79,11 +66,8 @@ Public Class atcGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CopyCell
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test CopyCell</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub CopyCellTest()
         Dim aFromSource As atcGridSource = Nothing ' TODO: Initialize to an appropriate value
         Dim aFromRow As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -95,11 +79,8 @@ Public Class atcGridSourceTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ExpandRowsColumns
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test ExpandRowsColumns</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub ExpandRowsColumnsTest()
         Dim target As atcGridSource_Accessor = New atcGridSource_Accessor() ' TODO: Initialize to an appropriate value
         Dim aRow As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -108,22 +89,16 @@ Public Class atcGridSourceTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for FromString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FromStringTest()
+    '''<summary>Test FromString</summary>
+    <TestMethod()> Public Sub FromStringTest()
         Dim target As atcGridSource = New atcGridSource() ' TODO: Initialize to an appropriate value
         Dim aString As String = String.Empty ' TODO: Initialize to an appropriate value
         target.FromString(aString)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for InvalidRowOrColumn
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test InvalidRowOrColumn</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub InvalidRowOrColumnTest()
         Dim target As atcGridSource_Accessor = New atcGridSource_Accessor() ' TODO: Initialize to an appropriate value
         Dim aRow As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -135,11 +110,8 @@ Public Class atcGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ToString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ToStringTest()
+    '''<summary>Test ToString</summary>
+    <TestMethod()> Public Sub ToStringTest()
         Dim target As atcGridSource = New atcGridSource() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -148,22 +120,16 @@ Public Class atcGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for __ENCAddToList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcControls.dll")> _
+    '''<summary>Test __ENCAddToList</summary>
+    <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub __ENCAddToListTest()
         Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
         atcGridSource_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Alignment
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AlignmentTest()
+    '''<summary>Test Alignment</summary>
+    <TestMethod()> Public Sub AlignmentTest()
         Dim target As atcGridSource = New atcGridSource() ' TODO: Initialize to an appropriate value
         Dim aRow As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aColumn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -175,11 +141,8 @@ Public Class atcGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CellColor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CellColorTest()
+    '''<summary>Test CellColor</summary>
+    <TestMethod()> Public Sub CellColorTest()
         Dim target As atcGridSource = New atcGridSource() ' TODO: Initialize to an appropriate value
         Dim aRow As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aColumn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -191,11 +154,8 @@ Public Class atcGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CellEditable
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CellEditableTest()
+    '''<summary>Test CellEditable</summary>
+    <TestMethod()> Public Sub CellEditableTest()
         Dim target As atcGridSource = New atcGridSource() ' TODO: Initialize to an appropriate value
         Dim aRow As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aColumn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -207,11 +167,8 @@ Public Class atcGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CellSelected
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CellSelectedTest()
+    '''<summary>Test CellSelected</summary>
+    <TestMethod()> Public Sub CellSelectedTest()
         Dim target As atcGridSource = New atcGridSource() ' TODO: Initialize to an appropriate value
         Dim aRow As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aColumn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -223,11 +180,8 @@ Public Class atcGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CellValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CellValueTest()
+    '''<summary>Test CellValue</summary>
+    <TestMethod()> Public Sub CellValueTest()
         Dim target As atcGridSource = New atcGridSource() ' TODO: Initialize to an appropriate value
         Dim aRow As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aColumn As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -239,11 +193,8 @@ Public Class atcGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ColorCells
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ColorCellsTest()
+    '''<summary>Test ColorCells</summary>
+    <TestMethod()> Public Sub ColorCellsTest()
         Dim target As atcGridSource = New atcGridSource() ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
@@ -253,11 +204,8 @@ Public Class atcGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Columns
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ColumnsTest()
+    '''<summary>Test Columns</summary>
+    <TestMethod()> Public Sub ColumnsTest()
         Dim target As atcGridSource = New atcGridSource() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -267,11 +215,8 @@ Public Class atcGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FixedColumns
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FixedColumnsTest()
+    '''<summary>Test FixedColumns</summary>
+    <TestMethod()> Public Sub FixedColumnsTest()
         Dim target As atcGridSource = New atcGridSource() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -281,11 +226,8 @@ Public Class atcGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FixedRows
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FixedRowsTest()
+    '''<summary>Test FixedRows</summary>
+    <TestMethod()> Public Sub FixedRowsTest()
         Dim target As atcGridSource = New atcGridSource() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -295,11 +237,8 @@ Public Class atcGridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Rows
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RowsTest()
+    '''<summary>Test Rows</summary>
+    <TestMethod()> Public Sub RowsTest()
         Dim target As atcGridSource = New atcGridSource() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer

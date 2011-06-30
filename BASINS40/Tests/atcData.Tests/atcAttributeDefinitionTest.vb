@@ -1,10 +1,6 @@
 ﻿Imports System.Collections
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for atcAttributeDefinitionTest and is intended
@@ -12,8 +8,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class atcAttributeDefinitionTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -25,7 +19,7 @@ Public Class atcAttributeDefinitionTest
             Return testContextInstance
         End Get
         Set(ByVal value As TestContext)
-            testContextInstance = Value
+            testContextInstance = value
         End Set
     End Property
 
@@ -55,31 +49,21 @@ Public Class atcAttributeDefinitionTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcAttributeDefinition Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcAttributeDefinitionConstructorTest()
+    '''<summary>Test atcAttributeDefinition Constructor</summary>
+    <TestMethod()> Public Sub atcAttributeDefinitionConstructorTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for Clear
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ClearTest()
+    '''<summary>Test Clear</summary>
+    <TestMethod()> Public Sub ClearTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
         target.Clear()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Clone
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CloneTest()
+    '''<summary>Test Clone</summary>
+    <TestMethod()> Public Sub CloneTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
         Dim aNewName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aNewDescription As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -90,11 +74,8 @@ Public Class atcAttributeDefinitionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for IsNumeric
-    '''</summary>
-    <TestMethod()> _
-    Public Sub IsNumericTest()
+    '''<summary>Test IsNumeric</summary>
+    <TestMethod()> Public Sub IsNumericTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
@@ -103,11 +84,8 @@ Public Class atcAttributeDefinitionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ToString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ToStringTest()
+    '''<summary>Test ToString</summary>
+    <TestMethod()> Public Sub ToStringTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -116,22 +94,16 @@ Public Class atcAttributeDefinitionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Calculated
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CalculatedTest()
+    '''<summary>Test Calculated</summary>
+    <TestMethod()> Public Sub CalculatedTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
         actual = target.Calculated
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Calculator
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CalculatorTest()
+    '''<summary>Test Calculator</summary>
+    <TestMethod()> Public Sub CalculatorTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcTimeseriesSource
@@ -141,11 +113,8 @@ Public Class atcAttributeDefinitionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Category
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CategoryTest()
+    '''<summary>Test Category</summary>
+    <TestMethod()> Public Sub CategoryTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -155,11 +124,8 @@ Public Class atcAttributeDefinitionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CopiesInherit
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CopiesInheritTest()
+    '''<summary>Test CopiesInherit</summary>
+    <TestMethod()> Public Sub CopiesInheritTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
@@ -169,11 +135,8 @@ Public Class atcAttributeDefinitionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for DefaultValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DefaultValueTest()
+    '''<summary>Test DefaultValue</summary>
+    <TestMethod()> Public Sub DefaultValueTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
         Dim expected As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As Object
@@ -183,11 +146,8 @@ Public Class atcAttributeDefinitionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Description
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DescriptionTest()
+    '''<summary>Test Description</summary>
+    <TestMethod()> Public Sub DescriptionTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -197,11 +157,8 @@ Public Class atcAttributeDefinitionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Editable
-    '''</summary>
-    <TestMethod()> _
-    Public Sub EditableTest()
+    '''<summary>Test Editable</summary>
+    <TestMethod()> Public Sub EditableTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
@@ -211,11 +168,8 @@ Public Class atcAttributeDefinitionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Help
-    '''</summary>
-    <TestMethod()> _
-    Public Sub HelpTest()
+    '''<summary>Test Help</summary>
+    <TestMethod()> Public Sub HelpTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -225,11 +179,8 @@ Public Class atcAttributeDefinitionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ID
-    '''</summary>
-    <TestMethod()> _
-    Public Sub IDTest()
+    '''<summary>Test ID</summary>
+    <TestMethod()> Public Sub IDTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -239,11 +190,8 @@ Public Class atcAttributeDefinitionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Max
-    '''</summary>
-    <TestMethod()> _
-    Public Sub MaxTest()
+    '''<summary>Test Max</summary>
+    <TestMethod()> Public Sub MaxTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim actual As Double
@@ -253,11 +201,8 @@ Public Class atcAttributeDefinitionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Min
-    '''</summary>
-    <TestMethod()> _
-    Public Sub MinTest()
+    '''<summary>Test Min</summary>
+    <TestMethod()> Public Sub MinTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
         Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
         Dim actual As Double
@@ -267,11 +212,8 @@ Public Class atcAttributeDefinitionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Name
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NameTest()
+    '''<summary>Test Name</summary>
+    <TestMethod()> Public Sub NameTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -281,11 +223,8 @@ Public Class atcAttributeDefinitionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for TypeString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TypeStringTest()
+    '''<summary>Test TypeString</summary>
+    <TestMethod()> Public Sub TypeStringTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -295,11 +234,8 @@ Public Class atcAttributeDefinitionTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ValidList
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ValidListTest()
+    '''<summary>Test ValidList</summary>
+    <TestMethod()> Public Sub ValidListTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
         Dim expected As ArrayList = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As ArrayList

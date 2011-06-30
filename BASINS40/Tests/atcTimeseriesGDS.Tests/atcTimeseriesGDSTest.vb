@@ -1,10 +1,6 @@
 ﻿Imports atcData
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcTimeseriesGDS
-
-
 
 '''<summary>
 '''This is a test class for atcTimeseriesGDSTest and is intended
@@ -12,8 +8,6 @@ Imports atcTimeseriesGDS
 '''</summary>
 <TestClass()> _
 Public Class atcTimeseriesGDSTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -25,7 +19,7 @@ Public Class atcTimeseriesGDSTest
             Return testContextInstance
         End Get
         Set(ByVal value As TestContext)
-            testContextInstance = Value
+            testContextInstance = value
         End Set
     End Property
 
@@ -55,21 +49,14 @@ Public Class atcTimeseriesGDSTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcTimeseriesGDS Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcTimeseriesGDSConstructorTest()
+    '''<summary>Test atcTimeseriesGDS Constructor</summary>
+    <TestMethod()> Public Sub atcTimeseriesGDSConstructorTest()
         Dim target As atcTimeseriesGDS = New atcTimeseriesGDS()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for Open
-    '''</summary>
-    <TestMethod()> _
-    Public Sub OpenTest()
+    '''<summary>Test Open</summary>
+    <TestMethod()> Public Sub OpenTest()
         Dim target As atcTimeseriesGDS = New atcTimeseriesGDS() ' TODO: Initialize to an appropriate value
         Dim aFileName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim aAttributes As atcDataAttributes = Nothing ' TODO: Initialize to an appropriate value
@@ -80,44 +67,32 @@ Public Class atcTimeseriesGDSTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CanOpen
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CanOpenTest()
+    '''<summary>Test CanOpen</summary>
+    <TestMethod()> Public Sub CanOpenTest()
         Dim target As atcTimeseriesGDS = New atcTimeseriesGDS() ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
         actual = target.CanOpen
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Category
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CategoryTest()
+    '''<summary>Test Category</summary>
+    <TestMethod()> Public Sub CategoryTest()
         Dim target As atcTimeseriesGDS = New atcTimeseriesGDS() ' TODO: Initialize to an appropriate value
         Dim actual As String
         actual = target.Category
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Description
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DescriptionTest()
+    '''<summary>Test Description</summary>
+    <TestMethod()> Public Sub DescriptionTest()
         Dim target As atcTimeseriesGDS = New atcTimeseriesGDS() ' TODO: Initialize to an appropriate value
         Dim actual As String
         actual = target.Description
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Name
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NameTest()
+    '''<summary>Test Name</summary>
+    <TestMethod()> Public Sub NameTest()
         Dim target As atcTimeseriesGDS = New atcTimeseriesGDS() ' TODO: Initialize to an appropriate value
         Dim actual As String
         actual = target.Name

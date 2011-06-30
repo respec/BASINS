@@ -1,10 +1,6 @@
 ﻿Imports System.IO
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcUtility
-
-
 
 '''<summary>
 '''This is a test class for atcTableDelimitedTest and is intended
@@ -12,8 +8,6 @@ Imports atcUtility
 '''</summary>
 <TestClass()> _
 Public Class atcTableDelimitedTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -55,41 +49,28 @@ Public Class atcTableDelimitedTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcTableDelimited Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcTableDelimitedConstructorTest()
+    '''<summary>Test atcTableDelimited Constructor</summary>
+    <TestMethod()> Public Sub atcTableDelimitedConstructorTest()
         Dim target As atcTableDelimited = New atcTableDelimited()
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for Clear
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ClearTest()
+    '''<summary>Test Clear</summary>
+    <TestMethod()> Public Sub ClearTest()
         Dim target As atcTableDelimited = New atcTableDelimited() ' TODO: Initialize to an appropriate value
         target.Clear()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for ClearData
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ClearDataTest()
+    '''<summary>Test ClearData</summary>
+    <TestMethod()> Public Sub ClearDataTest()
         Dim target As atcTableDelimited = New atcTableDelimited() ' TODO: Initialize to an appropriate value
         target.ClearData()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Cousin
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CousinTest()
+    '''<summary>Test Cousin</summary>
+    <TestMethod()> Public Sub CousinTest()
         Dim target As atcTableDelimited = New atcTableDelimited() ' TODO: Initialize to an appropriate value
         Dim expected As IatcTable = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As IatcTable
@@ -98,11 +79,8 @@ Public Class atcTableDelimitedTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CreationCode
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CreationCodeTest()
+    '''<summary>Test CreationCode</summary>
+    <TestMethod()> Public Sub CreationCodeTest()
         Dim target As atcTableDelimited = New atcTableDelimited() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -111,11 +89,8 @@ Public Class atcTableDelimitedTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FieldNumber
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FieldNumberTest()
+    '''<summary>Test FieldNumber</summary>
+    <TestMethod()> Public Sub FieldNumberTest()
         Dim target As atcTableDelimited = New atcTableDelimited() ' TODO: Initialize to an appropriate value
         Dim aFieldName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -125,11 +100,8 @@ Public Class atcTableDelimitedTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for OpenFile
-    '''</summary>
-    <TestMethod()> _
-    Public Sub OpenFileTest()
+    '''<summary>Test OpenFile</summary>
+    <TestMethod()> Public Sub OpenFileTest()
         Dim target As atcTableDelimited = New atcTableDelimited() ' TODO: Initialize to an appropriate value
         Dim Filename As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -139,11 +111,8 @@ Public Class atcTableDelimitedTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for OpenStream
-    '''</summary>
-    <TestMethod()> _
-    Public Sub OpenStreamTest()
+    '''<summary>Test OpenStream</summary>
+    <TestMethod()> Public Sub OpenStreamTest()
         Dim target As atcTableDelimited = New atcTableDelimited() ' TODO: Initialize to an appropriate value
         Dim aStream As Stream = Nothing ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -153,11 +122,8 @@ Public Class atcTableDelimitedTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for OpenString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub OpenStringTest()
+    '''<summary>Test OpenString</summary>
+    <TestMethod()> Public Sub OpenStringTest()
         Dim target As atcTableDelimited = New atcTableDelimited() ' TODO: Initialize to an appropriate value
         Dim aString As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -167,11 +133,8 @@ Public Class atcTableDelimitedTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ToString
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ToStringTest()
+    '''<summary>Test ToString</summary>
+    <TestMethod()> Public Sub ToStringTest()
         Dim target As atcTableDelimited = New atcTableDelimited() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -180,11 +143,8 @@ Public Class atcTableDelimitedTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for ToStringPivoted
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ToStringPivotedTest()
+    '''<summary>Test ToStringPivoted</summary>
+    <TestMethod()> Public Sub ToStringPivotedTest()
         Dim target As atcTableDelimited = New atcTableDelimited() ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
@@ -193,11 +153,8 @@ Public Class atcTableDelimitedTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for WriteFile
-    '''</summary>
-    <TestMethod()> _
-    Public Sub WriteFileTest()
+    '''<summary>Test WriteFile</summary>
+    <TestMethod()> Public Sub WriteFileTest()
         Dim target As atcTableDelimited = New atcTableDelimited() ' TODO: Initialize to an appropriate value
         Dim aFilename As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
@@ -207,11 +164,8 @@ Public Class atcTableDelimitedTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CurrentRecord
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CurrentRecordTest()
+    '''<summary>Test CurrentRecord</summary>
+    <TestMethod()> Public Sub CurrentRecordTest()
         Dim target As atcTableDelimited = New atcTableDelimited() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -221,11 +175,8 @@ Public Class atcTableDelimitedTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Delimiter
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DelimiterTest()
+    '''<summary>Test Delimiter</summary>
+    <TestMethod()> Public Sub DelimiterTest()
         Dim target As atcTableDelimited = New atcTableDelimited() ' TODO: Initialize to an appropriate value
         Dim expected As Char = Global.Microsoft.VisualBasic.ChrW(0) ' TODO: Initialize to an appropriate value
         Dim actual As Char
@@ -235,11 +186,8 @@ Public Class atcTableDelimitedTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FieldLength
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FieldLengthTest()
+    '''<summary>Test FieldLength</summary>
+    <TestMethod()> Public Sub FieldLengthTest()
         Dim target As atcTableDelimited = New atcTableDelimited() ' TODO: Initialize to an appropriate value
         Dim aFieldNumber As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -250,11 +198,8 @@ Public Class atcTableDelimitedTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FieldName
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FieldNameTest()
+    '''<summary>Test FieldName</summary>
+    <TestMethod()> Public Sub FieldNameTest()
         Dim target As atcTableDelimited = New atcTableDelimited() ' TODO: Initialize to an appropriate value
         Dim aFieldNumber As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -265,11 +210,8 @@ Public Class atcTableDelimitedTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for FieldType
-    '''</summary>
-    <TestMethod()> _
-    Public Sub FieldTypeTest()
+    '''<summary>Test FieldType</summary>
+    <TestMethod()> Public Sub FieldTypeTest()
         Dim target As atcTableDelimited = New atcTableDelimited() ' TODO: Initialize to an appropriate value
         Dim aFieldNumber As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -280,11 +222,8 @@ Public Class atcTableDelimitedTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for NumFields
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NumFieldsTest()
+    '''<summary>Test NumFields</summary>
+    <TestMethod()> Public Sub NumFieldsTest()
         Dim target As atcTableDelimited = New atcTableDelimited() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -294,11 +233,8 @@ Public Class atcTableDelimitedTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for NumRecords
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NumRecordsTest()
+    '''<summary>Test NumRecords</summary>
+    <TestMethod()> Public Sub NumRecordsTest()
         Dim target As atcTableDelimited = New atcTableDelimited() ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim actual As Integer
@@ -308,11 +244,8 @@ Public Class atcTableDelimitedTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for TrimValues
-    '''</summary>
-    <TestMethod()> _
-    Public Sub TrimValuesTest()
+    '''<summary>Test TrimValues</summary>
+    <TestMethod()> Public Sub TrimValuesTest()
         Dim target As atcTableDelimited = New atcTableDelimited() ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
         Dim actual As Boolean
@@ -322,11 +255,8 @@ Public Class atcTableDelimitedTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Value
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ValueTest()
+    '''<summary>Test Value</summary>
+    <TestMethod()> Public Sub ValueTest()
         Dim target As atcTableDelimited = New atcTableDelimited() ' TODO: Initialize to an appropriate value
         Dim aFieldNumber As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value

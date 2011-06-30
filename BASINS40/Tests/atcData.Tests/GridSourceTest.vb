@@ -1,12 +1,7 @@
 ﻿Imports atcUtility
-
 Imports atcControls
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for GridSourceTest and is intended
@@ -14,8 +9,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class GridSourceTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -57,33 +50,23 @@ Public Class GridSourceTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for GridSource Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub GridSourceConstructorTest()
+    '''<summary>Test GridSource Constructor</summary>
+    <TestMethod()> Public Sub GridSourceConstructorTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim target As GridSource = New GridSource(aDataGroup)
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for __ENCAddToList
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test __ENCAddToList</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub __ENCAddToListTest()
         Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
         GridSource_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Alignment
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AlignmentTest()
+    '''<summary>Test Alignment</summary>
+    <TestMethod()> Public Sub AlignmentTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim target As GridSource = New GridSource(aDataGroup) ' TODO: Initialize to an appropriate value
         Dim aRow As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -96,11 +79,8 @@ Public Class GridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CellSelected
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CellSelectedTest()
+    '''<summary>Test CellSelected</summary>
+    <TestMethod()> Public Sub CellSelectedTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim target As GridSource = New GridSource(aDataGroup) ' TODO: Initialize to an appropriate value
         Dim aRow As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -113,11 +93,8 @@ Public Class GridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for CellValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CellValueTest()
+    '''<summary>Test CellValue</summary>
+    <TestMethod()> Public Sub CellValueTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim target As GridSource = New GridSource(aDataGroup) ' TODO: Initialize to an appropriate value
         Dim aRow As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -130,11 +107,8 @@ Public Class GridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Columns
-    '''</summary>
-    <TestMethod()> _
-    Public Sub ColumnsTest()
+    '''<summary>Test Columns</summary>
+    <TestMethod()> Public Sub ColumnsTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim target As GridSource = New GridSource(aDataGroup) ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -145,11 +119,8 @@ Public Class GridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Rows
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RowsTest()
+    '''<summary>Test Rows</summary>
+    <TestMethod()> Public Sub RowsTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim target As GridSource = New GridSource(aDataGroup) ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -160,11 +131,8 @@ Public Class GridSourceTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for SelectedItems
-    '''</summary>
-    <TestMethod()> _
-    Public Sub SelectedItemsTest()
+    '''<summary>Test SelectedItems</summary>
+    <TestMethod()> Public Sub SelectedItemsTest()
         Dim aDataGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
         Dim target As GridSource = New GridSource(aDataGroup) ' TODO: Initialize to an appropriate value
         Dim expected As atcCollection = Nothing ' TODO: Initialize to an appropriate value

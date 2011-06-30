@@ -1,10 +1,6 @@
 ﻿Imports System
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcWDM
-
-
 
 '''<summary>
 '''This is a test class for atcWdmHandleTest and is intended
@@ -12,8 +8,6 @@ Imports atcWDM
 '''</summary>
 <TestClass()> _
 Public Class atcWdmHandleTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -55,23 +49,16 @@ Public Class atcWdmHandleTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcWdmHandle Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcWdmHandleConstructorTest()
+    '''<summary>Test atcWdmHandle Constructor</summary>
+    <TestMethod()> Public Sub atcWdmHandleConstructorTest()
         Dim aRWCFlg As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aFileName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim target As atcWdmHandle = New atcWdmHandle(aRWCFlg, aFileName)
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for Dispose
-    '''</summary>
-    <TestMethod()> _
-    Public Sub DisposeTest()
+    '''<summary>Test Dispose</summary>
+    <TestMethod()> Public Sub DisposeTest()
         Dim aRWCFlg As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aFileName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim target As IDisposable = New atcWdmHandle(aRWCFlg, aFileName) ' TODO: Initialize to an appropriate value
@@ -79,11 +66,8 @@ Public Class atcWdmHandleTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Finalize
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcWDM.dll")> _
+    '''<summary>Test Finalize</summary>
+    <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub FinalizeTest()
         Dim param0 As PrivateObject = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcWdmHandle_Accessor = New atcWdmHandle_Accessor(param0) ' TODO: Initialize to an appropriate value
@@ -91,11 +75,8 @@ Public Class atcWdmHandleTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Unit
-    '''</summary>
-    <TestMethod()> _
-    Public Sub UnitTest()
+    '''<summary>Test Unit</summary>
+    <TestMethod()> Public Sub UnitTest()
         Dim aRWCFlg As Integer = 0 ' TODO: Initialize to an appropriate value
         Dim aFileName As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim target As atcWdmHandle = New atcWdmHandle(aRWCFlg, aFileName) ' TODO: Initialize to an appropriate value

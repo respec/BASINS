@@ -1,12 +1,7 @@
 ﻿Imports atcUtility
-
 Imports System
-
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Imports atcData
-
-
 
 '''<summary>
 '''This is a test class for atcTimeseriesBuilderTest and is intended
@@ -14,8 +9,6 @@ Imports atcData
 '''</summary>
 <TestClass()> _
 Public Class atcTimeseriesBuilderTest
-
-
     Private testContextInstance As TestContext
 
     '''<summary>
@@ -57,22 +50,15 @@ Public Class atcTimeseriesBuilderTest
     '
 #End Region
 
-
-    '''<summary>
-    '''A test for atcTimeseriesBuilder Constructor
-    '''</summary>
-    <TestMethod()> _
-    Public Sub atcTimeseriesBuilderConstructorTest()
+    '''<summary>Test atcTimeseriesBuilder Constructor</summary>
+    <TestMethod()> Public Sub atcTimeseriesBuilderConstructorTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesBuilder = New atcTimeseriesBuilder(aDataSource)
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>
-    '''A test for AddValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddValueTest()
+    '''<summary>Test AddValue</summary>
+    <TestMethod()> Public Sub AddValueTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesBuilder = New atcTimeseriesBuilder(aDataSource) ' TODO: Initialize to an appropriate value
         Dim aDate As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -81,11 +67,8 @@ Public Class atcTimeseriesBuilderTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for AddValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddValueTest1()
+    '''<summary>Test AddValue</summary>
+    <TestMethod()> Public Sub AddValueTest1()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesBuilder = New atcTimeseriesBuilder(aDataSource) ' TODO: Initialize to an appropriate value
         Dim aDate As Double = 0.0! ' TODO: Initialize to an appropriate value
@@ -94,11 +77,8 @@ Public Class atcTimeseriesBuilderTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for AddValue
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddValueTest2()
+    '''<summary>Test AddValue</summary>
+    <TestMethod()> Public Sub AddValueTest2()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesBuilder = New atcTimeseriesBuilder(aDataSource) ' TODO: Initialize to an appropriate value
         Dim aDate As DateTime = New DateTime() ' TODO: Initialize to an appropriate value
@@ -107,11 +87,8 @@ Public Class atcTimeseriesBuilderTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for AddValueAttribute
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddValueAttributeTest()
+    '''<summary>Test AddValueAttribute</summary>
+    <TestMethod()> Public Sub AddValueAttributeTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesBuilder = New atcTimeseriesBuilder(aDataSource) ' TODO: Initialize to an appropriate value
         Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
@@ -120,11 +97,8 @@ Public Class atcTimeseriesBuilderTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for AddValueAttributes
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AddValueAttributesTest()
+    '''<summary>Test AddValueAttributes</summary>
+    <TestMethod()> Public Sub AddValueAttributesTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesBuilder = New atcTimeseriesBuilder(aDataSource) ' TODO: Initialize to an appropriate value
         Dim aAttributes As atcDataAttributes = Nothing ' TODO: Initialize to an appropriate value
@@ -132,11 +106,8 @@ Public Class atcTimeseriesBuilderTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for CreateTimeseries
-    '''</summary>
-    <TestMethod()> _
-    Public Sub CreateTimeseriesTest()
+    '''<summary>Test CreateTimeseries</summary>
+    <TestMethod()> Public Sub CreateTimeseriesTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesBuilder = New atcTimeseriesBuilder(aDataSource) ' TODO: Initialize to an appropriate value
         Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
@@ -146,11 +117,8 @@ Public Class atcTimeseriesBuilderTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for NumValues
-    '''</summary>
-    <TestMethod()> _
-    Public Sub NumValuesTest()
+    '''<summary>Test NumValues</summary>
+    <TestMethod()> Public Sub NumValuesTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesBuilder = New atcTimeseriesBuilder(aDataSource) ' TODO: Initialize to an appropriate value
         Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
@@ -160,22 +128,16 @@ Public Class atcTimeseriesBuilderTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for Restart
-    '''</summary>
-    <TestMethod()> _
-    Public Sub RestartTest()
+    '''<summary>Test Restart</summary>
+    <TestMethod()> Public Sub RestartTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesBuilder = New atcTimeseriesBuilder(aDataSource) ' TODO: Initialize to an appropriate value
         target.Restart()
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>
-    '''A test for Attributes
-    '''</summary>
-    <TestMethod()> _
-    Public Sub AttributesTest()
+    '''<summary>Test Attributes</summary>
+    <TestMethod()> Public Sub AttributesTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesBuilder = New atcTimeseriesBuilder(aDataSource) ' TODO: Initialize to an appropriate value
         Dim actual As atcDataAttributes
@@ -183,11 +145,8 @@ Public Class atcTimeseriesBuilderTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for LogDateFormat
-    '''</summary>
-    <TestMethod(), _
-     DeploymentItem("atcData.dll")> _
+    '''<summary>Test LogDateFormat</summary>
+    <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub LogDateFormatTest()
         Dim param0 As PrivateObject = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesBuilder_Accessor = New atcTimeseriesBuilder_Accessor(param0) ' TODO: Initialize to an appropriate value
@@ -196,11 +155,8 @@ Public Class atcTimeseriesBuilderTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>
-    '''A test for LogNonNumeric
-    '''</summary>
-    <TestMethod()> _
-    Public Sub LogNonNumericTest()
+    '''<summary>Test LogNonNumeric</summary>
+    <TestMethod()> Public Sub LogNonNumericTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesBuilder = New atcTimeseriesBuilder(aDataSource) ' TODO: Initialize to an appropriate value
         Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
