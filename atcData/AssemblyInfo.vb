@@ -34,3 +34,5 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyFileVersion("3.1.1.0")> 
 
 <Assembly: NeutralResourcesLanguageAttribute("en-US")> 
+<Assembly: ComVisibleAttribute(False)> 
+<Assembly: System.Runtime.CompilerServices.InternalsVisibleTo("atcData.Tests")>
