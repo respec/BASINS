@@ -1201,6 +1201,10 @@ Friend Class frmSWSTAT
                                                                  aBoundaryMonth:=pYearStartMonth, aBoundaryDay:=pYearStartDay, _
                                                                  aEndMonth:=pYearEndMonth, aEndDay:=pYearEndDay)
                 If lRankedAnnual.Count > 0 Then
+                    For Each lTS As atcTimeseries In lRankedAnnual
+                        lTS.Attributes.SetValue("Units", "Common")
+                    Next
+
                     Dim lList As New atcList.atcListForm
                     With lList
                         With .DateFormat
