@@ -30,3 +30,6 @@ Imports System.Runtime.InteropServices
 
 <Assembly: AssemblyVersion("3.1.2.0")> 
 <Assembly: AssemblyFileVersion("3.1.2.0")> 
+
+<Assembly: ComVisibleAttribute(False)> 
+<Assembly: System.Runtime.CompilerServices.InternalsVisibleTo("atcUtility.Tests")>
