@@ -52,186 +52,249 @@ Public Class atcDataGroupTest
 
     '''<summary>Test atcDataGroup Constructor</summary>
     <TestMethod()> Public Sub atcDataGroupConstructorTest()
-        Dim target As atcDataGroup = New atcDataGroup()
-        Assert.Inconclusive("TODO: Implement code to verify target")
+        Dim lDataGroup As atcDataGroup = New atcDataGroup()
+        Assert.IsInstanceOfType(lDataGroup, GetType(atcDataGroup))
     End Sub
 
     '''<summary>Test atcDataGroup Constructor</summary>
     <TestMethod()> Public Sub atcDataGroupConstructorTest1()
-        Dim aDataSet As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As atcDataGroup = New atcDataGroup(aDataSet)
-        Assert.Inconclusive("TODO: Implement code to verify target")
+        Dim lDataSet As atcDataSet = New atcDataSet
+        Dim lDataGroup As atcDataGroup = New atcDataGroup(lDataSet)
+        Assert.IsInstanceOfType(lDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(1, lDataGroup.Count)
     End Sub
 
     '''<summary>Test atcDataGroup Constructor</summary>
     <TestMethod()> Public Sub atcDataGroupConstructorTest2()
-        Dim aDataSets() As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
-        Dim target As atcDataGroup = New atcDataGroup(aDataSets)
-        Assert.Inconclusive("TODO: Implement code to verify target")
+        Dim lDataSet As atcDataSet = New atcDataSet
+        Dim lDataSets() As atcDataSet = {lDataSet, lDataSet.Clone}
+        Dim lDataGroup As atcDataGroup = New atcDataGroup(lDataSets)
+        Assert.IsInstanceOfType(lDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(2, lDataGroup.Count)
     End Sub
 
     '''<summary>Test Add</summary>
     <TestMethod()> Public Sub AddTest()
-        Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
-        Dim aKey As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim aDataSet As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
-        Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim actual As Integer
-        actual = target.Add(aKey, aDataSet)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim lDataGroup As atcDataGroup = New atcDataGroup()
+        Dim lKey As String = "Key1"
+        Dim lDataSet As atcDataSet = New atcDataSet
+        Dim lResult As Integer = lDataGroup.Add(lKey, lDataSet)
+        Assert.AreEqual(0, lResult)
     End Sub
 
     '''<summary>Test Add</summary>
     <TestMethod()> Public Sub AddTest1()
-        Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
-        Dim aDataSet As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
-        Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim actual As Integer
-        actual = target.Add(aDataSet)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim lDataGroup As atcDataGroup = New atcDataGroup()
+        Dim lDataSet As atcDataSet = New atcDataSet
+        Dim lResult As Integer = lDataGroup.Add(lDataSet)
+        Assert.AreEqual(0, lResult)
     End Sub
 
     '''<summary>Test Add</summary>
     <TestMethod()> Public Sub AddTest2()
-        Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
-        Dim aAddThese As atcCollection = Nothing ' TODO: Initialize to an appropriate value
-        target.Add(aAddThese)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim lDataSet As atcDataSet = New atcDataSet
+        Dim lDataSetCollection As New atcCollection
+        lDataSetCollection.Add(lDataSet.Clone)
+        lDataSetCollection.Add(lDataSet)
+        Dim lDataGroup As atcDataGroup = New atcDataGroup()
+        lDataGroup.Add(lDataSetCollection)
+        Assert.IsInstanceOfType(lDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(2, lDataGroup.Count)
     End Sub
 
     '''<summary>Test AddRange</summary>
     <TestMethod()> Public Sub AddRangeTest()
-        Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
-        Dim aAddThese As IEnumerable = Nothing ' TODO: Initialize to an appropriate value
-        target.AddRange(aAddThese)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim lDataGroup As atcDataGroup = New atcDataGroup()
+        Dim lDataSet As atcDataSet = New atcDataSet
+        Dim lAddThese As IEnumerable = {lDataSet.Clone, lDataSet}
+        lDataGroup.AddRange(lAddThese)
+        Assert.IsInstanceOfType(lDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(2, lDataGroup.Count)
     End Sub
 
     '''<summary>Test AddRange</summary>
     <TestMethod()> Public Sub AddRangeTest1()
-        Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
-        Dim aKeys As IEnumerable = Nothing ' TODO: Initialize to an appropriate value
-        Dim aValues As IEnumerable = Nothing ' TODO: Initialize to an appropriate value
-        target.AddRange(aKeys, aValues)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim lDataGroup As atcDataGroup = New atcDataGroup()
+        Dim lDataSet As atcDataSet = New atcDataSet
+        Dim lAddThese As IEnumerable = {lDataSet.Clone, lDataSet}
+        Dim lAddKeys As IEnumerable = {"Key1", "Key2"}
+        lDataGroup.AddRange(lAddKeys, lAddThese)
+        Assert.IsInstanceOfType(lDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(2, lDataGroup.Count)
     End Sub
 
     '''<summary>Test ChangeTo</summary>
     <TestMethod()> Public Sub ChangeToTest()
-        Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
-        Dim aNewGroup As atcDataGroup = Nothing ' TODO: Initialize to an appropriate value
-        target.ChangeTo(aNewGroup)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim lNewDataGroup As atcDataGroup = New atcDataGroup()
+        Dim lDataSet As atcDataSet = New atcDataSet
+        Dim lAddThese As IEnumerable = {lDataSet.Clone, lDataSet}
+        lNewDataGroup.AddRange(lAddThese)
+        Assert.IsInstanceOfType(lNewDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(2, lNewDataGroup.Count)
+        Dim lDataGroup As atcDataGroup = New atcDataGroup
+        lDataGroup.Add(lDataSet.Clone)
+        Assert.IsInstanceOfType(lDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(1, lDataGroup.Count)
+        lDataGroup.ChangeTo(lNewDataGroup)
+        Assert.IsInstanceOfType(lDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(2, lDataGroup.Count)
     End Sub
 
     '''<summary>Test Clear</summary>
     <TestMethod()> Public Sub ClearTest()
-        Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
-        target.Clear()
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim lDataGroup As atcDataGroup = New atcDataGroup()
+        Dim lDataSet As atcDataSet = New atcDataSet
+        Dim lAddThese As IEnumerable = {lDataSet.Clone, lDataSet}
+        lDataGroup.AddRange(lAddThese)
+        Assert.IsInstanceOfType(lDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(2, lDataGroup.Count)
+        lDataGroup.Clear()
+        Assert.AreEqual(0, lDataGroup.Count)
     End Sub
 
     '''<summary>Test Clone</summary>
     <TestMethod()> Public Sub CloneTest()
-        Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
-        Dim expected As atcDataGroup = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As atcDataGroup
-        actual = target.Clone
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim lDataSet As atcDataSet = New atcDataSet
+        Dim lAddThese As IEnumerable = {lDataSet.Clone, lDataSet}
+        Dim lDataGroup As atcDataGroup = New atcDataGroup()
+        lDataGroup.AddRange(lAddThese)
+        Assert.IsInstanceOfType(lDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(2, lDataGroup.Count)
+        Dim lNewDataGroup As atcDataGroup = lDataGroup.Clone()
+        Assert.IsInstanceOfType(lNewDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(2, lNewDataGroup.Count)
+        CollectionAssert.AreEqual(lDataGroup, lNewDataGroup)
     End Sub
 
     '''<summary>Test CommonAttributeValue</summary>
     <TestMethod()> Public Sub CommonAttributeValueTest()
-        Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
-        Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
-        Dim aMissingValue As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim expected As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As Object
-        actual = target.CommonAttributeValue(aAttributeName, aMissingValue)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim lDataSet As atcDataSet = New atcDataSet
+        lDataSet.Attributes.Add("ID", 1)
+        Dim lValue As String = "TestDataSet"
+        lDataSet.Attributes.Add("Name", lValue)
+        Dim lDataSet2 As atcDataSet = lDataSet.Clone
+        lDataSet2.Attributes.Add("ID", 2)
+        Dim lAddThese As IEnumerable = {lDataSet2, lDataSet}
+        Dim lDataGroup As atcDataGroup = New atcDataGroup()
+        lDataGroup.AddRange(lAddThese)
+        Assert.AreEqual(lValue, lDataGroup.CommonAttributeValue("Name", "Missing"))
+        Assert.AreEqual("Missing", lDataGroup.CommonAttributeValue("ID", "Missing"))
     End Sub
 
     '''<summary>Test Dispose</summary>
     <TestMethod()> Public Sub DisposeTest()
-        Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
-        target.Dispose()
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim lDataSet As atcDataSet = New atcDataSet
+        Dim lDataGroup As atcDataGroup = New atcDataGroup(lDataSet)
+        lDataGroup.Dispose()
+        Assert.IsInstanceOfType(lDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(0, lDataGroup.Count)
     End Sub
 
     '''<summary>Test FindData</summary>
     <TestMethod()> Public Sub FindDataTest()
-        Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
-        Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
-        Dim aValues As atcCollection = Nothing ' TODO: Initialize to an appropriate value
-        Dim aLimit As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim expected As atcDataGroup = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As atcDataGroup
-        actual = target.FindData(aAttributeName, aValues, aLimit)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim lDataSet As atcDataSet = New atcDataSet
+        lDataSet.Attributes.Add("ID", 1)
+        Dim lValue As String = "TestDataSet"
+        lDataSet.Attributes.Add("Name", lValue)
+        Dim lDataSet2 As atcDataSet = lDataSet.Clone
+        lDataSet2.Attributes.Add("ID", 2)
+        Dim lAddThese As IEnumerable = {lDataSet2, lDataSet}
+        Dim lDataGroup As atcDataGroup = New atcDataGroup()
+        lDataGroup.AddRange(lAddThese)
+        Assert.AreEqual(2, lDataGroup.FindData("Name", "TestDataSet").Count)
+        Assert.AreEqual(1, lDataGroup.FindData("ID", 2).Count)
+        Assert.AreEqual(0, lDataGroup.FindData("ID", 3).Count)
     End Sub
 
     '''<summary>Test FindData</summary>
     <TestMethod()> Public Sub FindDataTest1()
-        Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
-        Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
-        Dim aValue As String = String.Empty ' TODO: Initialize to an appropriate value
-        Dim aLimit As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim expected As atcDataGroup = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As atcDataGroup
-        actual = target.FindData(aAttributeName, aValue, aLimit)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim lDataSet As atcDataSet = New atcDataSet
+        lDataSet.Attributes.Add("ID", 1)
+        Dim lValue As String = "TestDataSet"
+        lDataSet.Attributes.Add("Name", lValue)
+        Dim lDataSet2 As atcDataSet = lDataSet.Clone
+        lDataSet2.Attributes.Add("ID", 2)
+        Dim lAddThese As IEnumerable = {lDataSet2, lDataSet}
+        Dim lDataGroup As atcDataGroup = New atcDataGroup()
+        lDataGroup.AddRange(lAddThese)
+        Assert.AreEqual(1, lDataGroup.FindData("Name", "TestDataSet", 1).Count)
+        Assert.AreEqual(0, lDataGroup.FindData("X", "TestDataSet", 1).Count)
     End Sub
 
     '''<summary>Test IndexOfSerial</summary>
     <TestMethod()> Public Sub IndexOfSerialTest()
-        Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
-        Dim aSerial As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim actual As Integer
-        actual = target.IndexOfSerial(aSerial)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim lDataSet As atcDataSet = New atcDataSet
+        lDataSet.Attributes.Add("ID", 1)
+        Dim lValue As String = "TestDataSet"
+        lDataSet.Attributes.Add("Name", lValue)
+        Dim lDataSet2 As atcDataSet = lDataSet.Clone
+        lDataSet2.Attributes.Add("ID", 2)
+        Dim lAddThese As IEnumerable = {lDataSet2, lDataSet}
+        Dim lDataGroup As atcDataGroup = New atcDataGroup()
+        lDataGroup.AddRange(lAddThese)
+        Assert.AreEqual(-1, lDataGroup.IndexOfSerial(0))
+        Assert.AreEqual(1, lDataGroup.IndexOfSerial(1))
+        Assert.AreEqual(0, lDataGroup.IndexOfSerial(2))
+        Assert.AreEqual(-1, lDataGroup.IndexOfSerial(3))
     End Sub
 
     '''<summary>Test Insert</summary>
     <TestMethod()> Public Sub InsertTest()
-        Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
-        Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim aDataSet As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
-        target.Insert(aIndex, aDataSet)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim lDataSet As atcDataSet = New atcDataSet
+        lDataSet.Attributes.Add("ID", 1)
+        Dim lValue As String = "TestDataSet"
+        lDataSet.Attributes.Add("Name", lValue)
+        Dim lDataSet2 As atcDataSet = lDataSet.Clone
+        lDataSet2.Attributes.Add("ID", 2)
+        Dim lAddThese As IEnumerable = {lDataSet2, lDataSet}
+        Dim lDataGroup As atcDataGroup = New atcDataGroup()
+        lDataGroup.AddRange(lAddThese)
+        Dim lIndex As Integer = 0 ' TODO: Initialize to an appropriate value
+        Dim lDataSet3 As atcDataSet = lDataSet.Clone
+        lDataSet3.Attributes.Add("ID", 3)
+        lDataGroup.Insert(0, lDataSet3)
+        Assert.IsInstanceOfType(lDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(3, lDataGroup.Count)
+        Assert.AreEqual(3, lDataGroup.ItemByIndex(0).Attributes.GetDefinedValue("ID").Value)
+        Assert.AreEqual(2, lDataGroup.ItemByIndex(1).Attributes.GetDefinedValue("ID").Value)
     End Sub
 
+    Private WithEvents lDataGroupWithEvents As atcDataGroup
+  
     '''<summary>Test RaiseAddedOne</summary>
     <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub RaiseAddedOneTest()
-        Dim target As atcDataGroup_Accessor = New atcDataGroup_Accessor() ' TODO: Initialize to an appropriate value
-        Dim aDataSet As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
-        target.RaiseAddedOne(aDataSet)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        lDataGroupWithEvents = New atcDataGroup
+        Dim lDataSet As atcDataSet = New atcDataSet
+        lDataGroupWithEvents.Add(lDataSet)
+       End Sub
+    Private Sub AddedEvent(ByVal aAddedDatasets As atcCollection) Handles lDataGroupWithEvents.Added
+        Assert.AreEqual(1, aAddedDatasets.Count)
     End Sub
+
 
     '''<summary>Test RaiseRemovedOne</summary>
     <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub RaiseRemovedOneTest()
-        Dim target As atcDataGroup_Accessor = New atcDataGroup_Accessor() ' TODO: Initialize to an appropriate value
-        Dim aDataSet As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
-        target.RaiseRemovedOne(aDataSet)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim lDataGroupAccessor As atcDataGroup_Accessor = New atcDataGroup_Accessor()
+        Dim lDataSet As atcDataSet = New atcDataSet
+        lDataGroupAccessor.RaiseRemovedOne(lDataSet)
+        Assert.Inconclusive("Need A Test Here")
     End Sub
 
     '''<summary>Test Remove</summary>
     <TestMethod()> Public Sub RemoveTest()
-        Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
-        Dim aRemoveThese As atcCollection = Nothing ' TODO: Initialize to an appropriate value
-        target.Remove(aRemoveThese)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim lDataSet As atcDataSet = New atcDataSet
+        Dim lAddThese As IEnumerable = {lDataSet.Clone, lDataSet}
+        Dim lDataGroup As atcDataGroup = New atcDataGroup
+        lDataGroup.AddRange(lAddThese)
+        Assert.IsInstanceOfType(lDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(2, lDataGroup.Count)
+        Dim lRemoveThese As New atcCollection
+        lRemoveThese.Add(lDataSet)
+        lDataGroup.Remove(lRemoveThese)
+        Assert.IsInstanceOfType(lDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(1, lDataGroup.Count)
     End Sub
 
     '''<summary>Test Remove</summary>
