@@ -20,7 +20,7 @@ Public Class atcDataGroupTest
             Return testContextInstance
         End Get
         Set(ByVal value As TestContext)
-            testContextInstance = Value
+            testContextInstance = value
         End Set
     End Property
 
@@ -260,26 +260,32 @@ Public Class atcDataGroupTest
     End Sub
 
     Private WithEvents lDataGroupWithEvents As atcDataGroup
-  
+    Private AddedEventCalledCount As Integer = 0
+    Private RemovedEventCalledCount As Integer = 0
+    Private Sub AddedEvent(ByVal aAddedDatasets As atcCollection) Handles lDataGroupWithEvents.Added
+        AddedEventCalledCount += 1
+    End Sub
+    Private Sub RemovedEvent(ByVal aRemovedDatasets As atcCollection) Handles lDataGroupWithEvents.Removed
+        RemovedEventCalledCount += 1
+    End Sub
+
     '''<summary>Test RaiseAddedOne</summary>
-    <TestMethod(), DeploymentItem("atcData.dll")> _
-    Public Sub RaiseAddedOneTest()
+    <TestMethod()> Public Sub RaiseAddedOneTest()
+        AddedEventCalledCount = 0
         lDataGroupWithEvents = New atcDataGroup
         Dim lDataSet As atcDataSet = New atcDataSet
         lDataGroupWithEvents.Add(lDataSet)
-       End Sub
-    Private Sub AddedEvent(ByVal aAddedDatasets As atcCollection) Handles lDataGroupWithEvents.Added
-        Assert.AreEqual(1, aAddedDatasets.Count)
+        Assert.AreEqual(1, AddedEventCalledCount)
     End Sub
-
-
     '''<summary>Test RaiseRemovedOne</summary>
-    <TestMethod(), DeploymentItem("atcData.dll")> _
-    Public Sub RaiseRemovedOneTest()
-        Dim lDataGroupAccessor As atcDataGroup_Accessor = New atcDataGroup_Accessor()
+    <TestMethod()> Public Sub RaiseRemovedOneTest()
+        RemovedEventCalledCount = 0
+        lDataGroupWithEvents = New atcDataGroup
         Dim lDataSet As atcDataSet = New atcDataSet
-        lDataGroupAccessor.RaiseRemovedOne(lDataSet)
-        Assert.Inconclusive("Need A Test Here")
+        lDataGroupWithEvents.Add(lDataSet)
+        lDataGroupWithEvents.Remove(lDataSet)
+        Assert.AreEqual(0, lDataGroupWithEvents.Count)
+        Assert.AreEqual(1, RemovedEventCalledCount)
     End Sub
 
     '''<summary>Test Remove</summary>
@@ -299,27 +305,43 @@ Public Class atcDataGroupTest
 
     '''<summary>Test Remove</summary>
     <TestMethod()> Public Sub RemoveTest1()
-        Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
-        Dim aDataSet As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
-        target.Remove(aDataSet)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim lDataSet As atcDataSet = New atcDataSet
+        Dim lAddThese As IEnumerable = {lDataSet.Clone, lDataSet}
+        Dim lDataGroup As atcDataGroup = New atcDataGroup
+        lDataGroup.AddRange(lAddThese)
+        Assert.IsInstanceOfType(lDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(2, lDataGroup.Count)
+        lDataGroup.Remove(lDataSet)
+        Assert.IsInstanceOfType(lDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(1, lDataGroup.Count)
     End Sub
 
     '''<summary>Test RemoveAt</summary>
     <TestMethod()> Public Sub RemoveAtTest()
-        Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
-        Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
-        target.RemoveAt(aIndex)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim lDataSet As atcDataSet = New atcDataSet
+        Dim lAddThese As IEnumerable = {lDataSet.Clone, lDataSet}
+        Dim lDataGroup As atcDataGroup = New atcDataGroup
+        lDataGroup.AddRange(lAddThese)
+        Assert.IsInstanceOfType(lDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(2, lDataGroup.Count)
+        lDataGroup.RemoveAt(0)
+        Assert.IsInstanceOfType(lDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(1, lDataGroup.Count)
+        Assert.AreEqual(lDataSet, lDataGroup.ItemByIndex(0))
     End Sub
 
     '''<summary>Test RemoveRange</summary>
     <TestMethod()> Public Sub RemoveRangeTest()
-        Dim target As atcDataGroup = New atcDataGroup() ' TODO: Initialize to an appropriate value
-        Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim aNumber As Integer = 0 ' TODO: Initialize to an appropriate value
-        target.RemoveRange(aIndex, aNumber)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim lDataSet As atcDataSet = New atcDataSet
+        Dim lAddThese As IEnumerable = {lDataSet.Clone, lDataSet.Clone, lDataSet}
+        Dim lDataGroup As atcDataGroup = New atcDataGroup
+        lDataGroup.AddRange(lAddThese)
+        Assert.IsInstanceOfType(lDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(3, lDataGroup.Count)
+        lDataGroup.RemoveRange(0, 2)
+        Assert.IsInstanceOfType(lDataGroup, GetType(atcDataGroup))
+        Assert.AreEqual(1, lDataGroup.Count)
+        Assert.AreEqual(lDataSet, lDataGroup.ItemByIndex(0))
     End Sub
 
     '''<summary>Test SortedAttributeValues</summary>
