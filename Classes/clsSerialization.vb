@@ -125,9 +125,14 @@ Public Class Serialization
         doc.LoadXml(state)
         Dim xelParent As XmlElement = doc.DocumentElement
 
-        Dim reader As New XmlNodeReader(xelParent)
-        Dim serializer As New XmlSerializer(t)
-        Return serializer.Deserialize(reader)
+        Try
+            Dim reader As New XmlNodeReader(xelParent)
+            Dim serializer As New XmlSerializer(t)
+            Return serializer.Deserialize(reader)
+        Catch
+            Logger.Status("Failed to deserialize object: " + t.Name.ToString())
+        End Try
+        Return False
     End Function
 
 End Class
