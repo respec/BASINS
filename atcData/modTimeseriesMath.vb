@@ -510,7 +510,7 @@ Public Module modTimeseriesMath
         Select Case aObject.GetType.Name
             Case "atcDataGroup", "atcTimeseriesGroup" : Return aObject
             Case "atcTimeseries" : Return New atcTimeseriesGroup(CType(aObject, atcTimeseries))
-            Case "atcDataset" : Return New atcDataGroup(aObject)
+            Case "atcDataSet" : Return New atcDataGroup(aObject)
             Case Else
                 Logger.Dbg("DatasetOrGroupToGroup: Unrecognized type '" & aObject.GetType.Name & "'")
                 Return Nothing
@@ -897,7 +897,12 @@ NextOldVal:
                     lDate(5) = 0 'clear seconds
             End Select
             lSJDay = Date2J(lDate)
-            lEJDay = aTSer.Dates.Value(aTSer.numValues)
+            For lEndIndex As Integer = aTSer.numValues To 0 Step -1
+                If Not Double.IsNaN(aTSer.Value(lEndIndex)) Then
+                    lEJDay = aTSer.Dates.Value(lEndIndex)
+                    Exit For
+                End If
+            Next
         End If
         Return NewDates(lSJDay, lEJDay, aTU, aTS)
     End Function

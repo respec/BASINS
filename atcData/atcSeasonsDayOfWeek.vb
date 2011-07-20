@@ -11,7 +11,7 @@ Public Class atcSeasonsDayOfWeek
     End Function
 
     Public Overrides Function SeasonIndex(ByVal aDate As Double) As Integer
-        Return Date.FromOADate(aDate).DayOfWeek
+        Return Date.FromOADate(aDate).DayOfWeek + 1
     End Function
 
     Public Overloads Overrides Function SeasonName(ByVal aIndex As Integer) As String
