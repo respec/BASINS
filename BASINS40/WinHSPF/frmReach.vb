@@ -37,6 +37,7 @@ Public Class frmReach
 
         With grdReach.Source
             .FixedRows = 1
+            .FixedColumns = 1
             .Columns = 6
             .CellValue(0, 0) = "ID"
             .CellValue(0, 1) = "Description"

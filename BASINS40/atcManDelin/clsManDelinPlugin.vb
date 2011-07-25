@@ -771,7 +771,7 @@ Public Class ManDelinPlugIn
             'is there anything downstream of this one?
             dval = GisUtil.FieldValue(lStreamsLayerIndex, i - 1, lDownstreamFieldIndex)
             Do While dval > 0
-                'Logger.Dbg("ManDelin:" & dval & " downstream of " & rval)
+                Logger.Dbg("ManDelin:" & dval & " downstream of " & rval)
                 bfound = False
                 For lStreamIndexDownstream As Integer = 1 To lNumStreams
                     rval = GisUtil.FieldValue(lStreamsLayerIndex, lStreamIndexDownstream - 1, lReachSubbasinFieldIndex)
