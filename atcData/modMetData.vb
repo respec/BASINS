@@ -87,7 +87,9 @@ Public Module modMetData
                     lClosestObsInd = -1
                     For k = 1 To lMLen
                         lFPos = lMJDay - lSJDay + k - 1
-                        lFillOT = CurrentObsTime(aTS2FillOT, lFPos)
+                        If Not aTS2FillOT Is Nothing Then
+                            lFillOT = CurrentObsTime(aTS2FillOT, lFPos)
+                        End If
                         lFilledIt = False
                         j = 1
                         While j < aTSAvail.Count
@@ -100,7 +102,9 @@ Public Module modMetData
                                 If lTSer.Attributes.GetValue("TU") = atcTimeUnit.TUDay Then 'check daily value
                                     lSPos = lMJDay - lTSer.Dates.Value(0) + k - 1
                                     If lTSer.Value(lSPos) > lValMin And lTSer.Value(lSPos) < lValMax Then 'check obs time
-                                        lStaOT = CurrentObsTime(aTSAvailOT(lInd), lSPos)
+                                        If Not aTSAvailOT Is Nothing Then
+                                            lStaOT = CurrentObsTime(aTSAvailOT(lInd), lSPos)
+                                        End If
                                         Select Case lCons.ToUpper
                                             Case "TMAX" 'assume TMax occurs at hour 16 (4 pm)
                                                 If lStaOT = lFillOT OrElse _
@@ -217,7 +221,9 @@ Public Module modMetData
                     lSubSJDay = lMJDay - 1 'back up an interval for SubSetByDate call in ClosestPrecip
                     lEJDay = lSubSJDay + lMLen
                     lFPos = lMJDay - lSJDay
-                    lFillOT = CurrentObsTime(aTS2FillOT, lFPos)
+                    If Not aTS2FillOT Is Nothing Then
+                        lFillOT = CurrentObsTime(aTS2FillOT, lFPos)
+                    End If
                     lTSer = ClosestPrecip(aTS2Fill, aTSAvail, lAccVal, lSubSJDay, lEJDay, aTol, lFillOT)
                     If Not lTSer Is Nothing Then
                         Logger.Dbg("    Distributing " & lAccVal & " from TS " & lTSer.ToString & ", " & lTSer.Attributes.GetValue("STANAM"))
