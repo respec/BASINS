@@ -115,7 +115,7 @@ Friend Class frmModelSegmentation
 
         If lSubbasinLayerName <> pSubbasinLayerNameUserPrompt Then
             RaiseEvent OpenTableEditor(lSubbasinLayerName)
-            Me.Focus()
+            'Me.Focus()
         End If
     End Sub
 
@@ -220,33 +220,37 @@ Friend Class frmModelSegmentation
             Next
         Next
 
-        'save the thiessen polygons
-        Dim lOutputFile As String = IO.Path.GetDirectoryName(lMetLayerFileName) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lMetLayerFileName) & "Thiessens.shp"
-        If GisUtil.IsLayerByFileName(lOutputFile) Then
-            Dim lOutputLayerIndex As Integer = GisUtil.LayerIndex(lOutputFile)
-            GisUtil.RemoveLayer(lOutputLayerIndex)
+        If lFullSizePolygons.Features.Count > 0 Then
+            'save the thiessen polygons
+            Dim lOutputFile As String = IO.Path.GetDirectoryName(lMetLayerFileName) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lMetLayerFileName) & "Thiessens.shp"
+            If GisUtil.IsLayerByFileName(lOutputFile) Then
+                Dim lOutputLayerIndex As Integer = GisUtil.LayerIndex(lOutputFile)
+                GisUtil.RemoveLayer(lOutputLayerIndex)
+            End If
+            lFullSizePolygons.SaveAs(lOutputFile, True)
+            TryCopy(IO.Path.GetDirectoryName(lMetLayerFileName) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lMetLayerFileName) & ".prj", _
+                    IO.Path.GetDirectoryName(lOutputFile) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lOutputFile) & ".prj")
+
+            'now add them to the map
+            Dim lNewLayerName As String = "Thiessen Polygons for " & lMetLayerName
+            lMetLayerIndex = GisUtil.LayerIndex(lMetLayerName)
+            Dim lGroup As String = GisUtil.LayerGroup(lMetLayerIndex)
+            GisUtil.AddLayerToGroup(lOutputFile, lNewLayerName, lGroup)
+            GisUtil.LayerVisible(lNewLayerName) = True
+
+            'add associated attributes from points to thiessen polygons
+            Dim lThiessenLayerIndex As Integer = GisUtil.LayerIndex(lNewLayerName)
+            lMetLayerIndex = GisUtil.LayerIndex(lMetLayerName)
+            GisUtil.StartSetFeatureValue(lThiessenLayerIndex)
+            Dim lTargetFeatureIndex As Integer = -1
+            For Each lFeatureIndex As Integer In lMetStationsSelected
+                lTargetFeatureIndex += 1
+                GisUtil.CopyAllAttributes(lMetLayerIndex, lFeatureIndex, lThiessenLayerIndex, lTargetFeatureIndex)
+            Next
+            GisUtil.StopSetFeatureValue(lThiessenLayerIndex)
+        Else
+            Logger.Msg("Problem producing Thiessen polygons for layer '" & lMetLayerName & "'.", MsgBoxStyle.Critical, "Thiessen Problem")
         End If
-        lFullSizePolygons.SaveAs(lOutputFile, True)
-        TryCopy(IO.Path.GetDirectoryName(lMetLayerFileName) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lMetLayerFileName) & ".prj", _
-                IO.Path.GetDirectoryName(lOutputFile) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lOutputFile) & ".prj")
-
-        'now add them to the map
-        Dim lNewLayerName As String = "Thiessen Polygons for " & lMetLayerName
-        lMetLayerIndex = GisUtil.LayerIndex(lMetLayerName)
-        Dim lGroup As String = GisUtil.LayerGroup(lMetLayerIndex)
-        GisUtil.AddLayerToGroup(lOutputFile, lNewLayerName, lGroup)
-        GisUtil.LayerVisible(lNewLayerName) = True
-
-        'add associated attributes from points to thiessen polygons
-        Dim lThiessenLayerIndex As Integer = GisUtil.LayerIndex(lNewLayerName)
-        lMetLayerIndex = GisUtil.LayerIndex(lMetLayerName)
-        GisUtil.StartSetFeatureValue(lThiessenLayerIndex)
-        Dim lTargetFeatureIndex As Integer = -1
-        For Each lFeatureIndex As Integer In lMetStationsSelected
-            lTargetFeatureIndex += 1
-            GisUtil.CopyAllAttributes(lMetLayerIndex, lFeatureIndex, lThiessenLayerIndex, lTargetFeatureIndex)
-        Next
-        GisUtil.StopSetFeatureValue(lThiessenLayerIndex)
 
         TryDeleteShapefile(lTempPointFileName)
     End Sub
