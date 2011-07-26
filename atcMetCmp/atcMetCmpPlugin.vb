@@ -56,9 +56,8 @@ Public Class atcMetCmpPlugin
             Case "Solar Radiation"
                 Dim lCldTSer As atcTimeseries = Nothing
                 If aArgs Is Nothing Then
-                    Throw New ApplicationException("frmCmpSol not in project")
-                    'Dim lForm As New frmCmpSol
-                    'lOk = lForm.AskUser(lCldTSer, lLatitude)
+                    Dim lForm As New frmCmpSol
+                    lOk = lForm.AskUser(lCldTSer, lLatitude)
                 Else
                     lCldTSer = aArgs.GetValue("DCLD")
                     lLatitude = aArgs.GetValue("Latitude")
@@ -88,9 +87,8 @@ Public Class atcMetCmpPlugin
             Case "Jensen PET"
                 Dim lCTX As Double
                 If aArgs Is Nothing Then
-                    Throw New ApplicationException("frmCmpJPET not in project")
-                    'Dim lForm As New frmCmpJPET
-                    'lOk = lForm.AskUser(lTMinTSer, lTMaxTSer, lSRadTSer, lDegF, lCTX, lCTS)
+                    Dim lForm As New frmCmpJPET
+                    lOk = lForm.AskUser(lTMinTSer, lTMaxTSer, lSRadTSer, lDegF, lCTX, lCTS)
                 Else
                     lTMinTSer = aArgs.GetValue("TMIN")
                     lTMaxTSer = aArgs.GetValue("TMAX")
@@ -115,9 +113,8 @@ Public Class atcMetCmpPlugin
                 End If
             Case "Hamon PET"
                 If aArgs Is Nothing Then
-                    Throw New ApplicationException("frmCmpHPET not in project")
-                    'Dim lForm As New frmCmpHPET
-                    'lOk = lForm.AskUser(lTMinTSer, lTMaxTSer, lDegF, lLatitude, lCTS)
+                    Dim lForm As New frmCmpHPET
+                    lOk = lForm.AskUser(lTMinTSer, lTMaxTSer, lDegF, lLatitude, lCTS)
                 Else
                     lTMinTSer = aArgs.GetValue("TMIN")
                     lTMaxTSer = aArgs.GetValue("TMAX")
@@ -141,9 +138,8 @@ Public Class atcMetCmpPlugin
             Case "Penman Pan Evaporation"
                 Dim lDewPTSer As atcTimeseries = Nothing
                 If aArgs Is Nothing Then
-                    Throw New ApplicationException("frmCmpPenman not in project")
-                    'Dim lForm As New frmCmpPenman
-                    'lOk = lForm.AskUser(lTMinTSer, lTMaxTSer, lSRadTSer, lDewPTSer, lWindTSer)
+                    Dim lForm As New frmCmpPenman
+                    lOk = lForm.AskUser(lTMinTSer, lTMaxTSer, lSRadTSer, lDewPTSer, lWindTSer)
                 Else
                     lTMinTSer = aArgs.GetValue("TMIN")
                     lTMaxTSer = aArgs.GetValue("TMAX")
@@ -182,10 +178,8 @@ Public Class atcMetCmpPlugin
                 End If
             Case "Solar Radiation (Disaggregate)"
                 If aArgs Is Nothing Then
-                    Throw New ApplicationException("frmDisSol not in project")
-
-                    'Dim lForm As New frmDisSol
-                    'lOk = lForm.AskUser(lDlyTSer, lLatitude)
+                    Dim lForm As New frmDisSol
+                    lOk = lForm.AskUser(lDlyTSer, lLatitude)
                 Else
                     lDlyTSer = aArgs.GetValue("SRAD")
                     lLatitude = aArgs.GetValue("Latitude")
@@ -198,11 +192,10 @@ Public Class atcMetCmpPlugin
                 End If
             Case "Evapotranspiration"
                 If aArgs Is Nothing Then
-                    Throw New ApplicationException("frmDisSol not in project")
-                    'Dim lForm As New frmDisSol
-                    'lForm.Text = "Disaggregate Evapotranspiration"
-                    'lForm.lblTSer.Text = "Specify Daily Evapotranspiration Timeseries"
-                    'lOk = lForm.AskUser(lDlyTSer, lLatitude)
+                    Dim lForm As New frmDisSol
+                    lForm.Text = "Disaggregate Evapotranspiration"
+                    lForm.lblTSer.Text = "Specify Daily Evapotranspiration Timeseries"
+                    lOk = lForm.AskUser(lDlyTSer, lLatitude)
                 Else
                     lDlyTSer = aArgs.GetValue("DEVT")
                     lLatitude = aArgs.GetValue("Latitude")
@@ -215,16 +208,15 @@ Public Class atcMetCmpPlugin
                 End If
             Case "Temperature"
                 If aArgs Is Nothing Then
-                    Throw New ApplicationException("frmDisTemp not in project")
-                    'Dim lForm As New frmDisTemp
-                    'lOk = lForm.AskUser(lTMinTSer, lTMaxTSer, lObsTime)
-                    ''build obs time TSer with constant value from aObsTime argument
-                    'lObsTimeTSer = lTMinTSer.Clone
-                    'For i As Integer = 1 To lObsTimeTSer.numValues
-                    '    lObsTimeTSer.Values(i) = lObsTime
-                    'Next
-                    'lObsTimeTSer.Attributes.SetValue("Scenario", "CONST-" & lObsTime)
-                    'lObsTimeTSer.Attributes.SetValue("Constituent", lTMinTSer.Attributes.GetValue("Constituent") & "-OBS")
+                    Dim lForm As New frmDisTemp
+                    lOk = lForm.AskUser(lTMinTSer, lTMaxTSer, lObsTime)
+                    'build obs time TSer with constant value from aObsTime argument
+                    lObsTimeTSer = lTMinTSer.Clone
+                    For i As Integer = 1 To lObsTimeTSer.numValues
+                        lObsTimeTSer.Values(i) = lObsTime
+                    Next
+                    lObsTimeTSer.Attributes.SetValue("Scenario", "CONST-" & lObsTime)
+                    lObsTimeTSer.Attributes.SetValue("Constituent", lTMinTSer.Attributes.GetValue("Constituent") & "-OBS")
                 Else
                     lTMinTSer = aArgs.GetValue("TMIN")
                     lTMaxTSer = aArgs.GetValue("TMAX")
@@ -239,9 +231,8 @@ Public Class atcMetCmpPlugin
                 Dim lHrDist(24) As Double
                 Dim lHrSum As Double = 0
                 If aArgs Is Nothing Then
-                    Throw New ApplicationException("frmDisWind not in project")
-                    'Dim lForm As New frmDisWind
-                    'lOk = lForm.AskUser(lWindTSer, lHrDist)
+                    Dim lForm As New frmDisWind
+                    lOk = lForm.AskUser(lWindTSer, lHrDist)
                 Else
                     lWindTSer = aArgs.GetValue("TWND")
                     lHrDist = aArgs.GetValue("Hourly Distribution")
@@ -265,16 +256,15 @@ Public Class atcMetCmpPlugin
                 Dim lTol As Double
                 Dim lSummFile As String = ""
                 If aArgs Is Nothing Then
-                    Throw New ApplicationException("frmDisPrec not in project")
-                    'Dim lForm As New frmDisPrec
-                    'lOk = lForm.AskUser(lDlyTSer, lHrTSers, lObsTime, lTol, lSummFile)
-                    ''build obs time TSer with constant value from aObsTime argument
-                    'lObsTimeTSer = lDlyTSer.Clone
-                    'For i As Integer = 1 To lObsTimeTSer.numValues
-                    '    lObsTimeTSer.Values(i) = lObsTime
-                    'Next
-                    'lObsTimeTSer.Attributes.SetValue("Scenario", "CONST-" & lObsTime)
-                    'lObsTimeTSer.Attributes.SetValue("Constituent", lDlyTSer.Attributes.GetValue("Constituent") & "-OBS")
+                    Dim lForm As New frmDisPrec
+                    lOk = lForm.AskUser(lDlyTSer, lHrTSers, lObsTime, lTol, lSummFile)
+                    'build obs time TSer with constant value from aObsTime argument
+                    lObsTimeTSer = lDlyTSer.Clone
+                    For i As Integer = 1 To lObsTimeTSer.numValues
+                        lObsTimeTSer.Values(i) = lObsTime
+                    Next
+                    lObsTimeTSer.Attributes.SetValue("Scenario", "CONST-" & lObsTime)
+                    lObsTimeTSer.Attributes.SetValue("Constituent", lDlyTSer.Attributes.GetValue("Constituent") & "-OBS")
                 Else
                     lDlyTSer = aArgs.GetValue("DPRC")
                     lHrTSers = aArgs.GetValue("HPCP")
@@ -316,7 +306,7 @@ Public Class atcMetCmpPlugin
     End Function
 
     <CLSCompliant(False)> _
-    Public Overloads Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
+    Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
                                     ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
         Dim lAvlOps As atcDataAttributes = AvailableOperations()
