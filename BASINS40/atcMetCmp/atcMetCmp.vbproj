@@ -32,7 +32,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -79,8 +79,12 @@
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System">
-      <Name>System</Name>
+    <Reference Include="System, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\System.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Drawing">
       <Name>System.Drawing</Name>
@@ -119,6 +123,30 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="clsRandomNumber.vb" />
+    <Compile Include="frmCmpHPET.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCmpJPET.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCmpPenman.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCmpSol.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDisPrec.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDisSol.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDisTemp.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDisWind.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="modMetCompute.vb">
       <SubType>Code</SubType>
     </Compile>
@@ -127,6 +155,30 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="AllStns.txt" />
+    <EmbeddedResource Include="frmCmpHPET.resx">
+      <DependentUpon>frmCmpHPET.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCmpJPET.resx">
+      <DependentUpon>frmCmpJPET.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCmpPenman.resx">
+      <DependentUpon>frmCmpPenman.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCmpSol.resx">
+      <DependentUpon>frmCmpSol.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDisPrec.resx">
+      <DependentUpon>frmDisPrec.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDisSol.resx">
+      <DependentUpon>frmDisSol.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDisTemp.resx">
+      <DependentUpon>frmDisTemp.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDisWind.resx">
+      <DependentUpon>frmDisWind.vb</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="My Project\" />
@@ -135,7 +187,7 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>copy atcMetCmp.* ..\..\..\x64Debug\Plugins\BASINS
-copy atcMetCmp.* ..\..\..\x86Debug\Plugins\BASINS</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
