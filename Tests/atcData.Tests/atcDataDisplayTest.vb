@@ -3,7 +3,7 @@ Imports atcData
 
 '''<summary>
 '''This is a test class for atcDataDisplayTest and is intended
-'''to contain all atcDataDisplayTest Unit Tests
+'''to contain all atcDataDisplayTest Unit Tests (Done)
 '''</summary>
 <TestClass()> _
 Public Class atcDataDisplayTest
@@ -51,17 +51,21 @@ Public Class atcDataDisplayTest
     '''<summary>Test atcDataDisplay Constructor</summary>
     <TestMethod()> Public Sub atcDataDisplayConstructorTest()
         Dim target As atcDataDisplay = New atcDataDisplay()
-        Assert.Inconclusive("TODO: Implement code to verify target")
+        Assert.IsInstanceOfType(target, GetType(atcDataDisplay))
     End Sub
 
     '''<summary>Test Save</summary>
     <TestMethod()> Public Sub SaveTest()
         Dim target As atcDataDisplay = New atcDataDisplay() ' TODO: Initialize to an appropriate value
         Dim aDataGroup As atcDataGroup = Nothing ' TODO: Initialize to an appropriate value
-        Dim aFileName As String = String.Empty ' TODO: Initialize to an appropriate value
+        Dim aFileName As String = IO.Path.Combine(Environment.CurrentDirectory, "zTest_atcDataDisplay_Save.txt")
         Dim aOption() As String = Nothing ' TODO: Initialize to an appropriate value
-        target.Save(aDataGroup, aFileName, aOption)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Try
+            target.Save(aDataGroup, aFileName, aOption)
+            Assert.AreEqual(True, True)
+        Catch ex As Exception
+            Assert.AreEqual(True, False)
+        End Try
     End Sub
 
     '''<summary>Test Show</summary>
@@ -71,7 +75,6 @@ Public Class atcDataDisplayTest
         Dim actual As Object
         actual = target.Show
         Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
     '''<summary>Test Show</summary>
@@ -82,6 +85,5 @@ Public Class atcDataDisplayTest
         Dim actual As Object
         actual = target.Show(aDataGroup)
         Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 End Class

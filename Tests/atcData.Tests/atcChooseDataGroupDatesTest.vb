@@ -6,7 +6,7 @@ Imports atcData
 
 '''<summary>
 '''This is a test class for atcChooseDataGroupDatesTest and is intended
-'''to contain all atcChooseDataGroupDatesTest Unit Tests
+'''to contain all atcChooseDataGroupDatesTest Unit Tests (Done, except events)
 '''</summary>
 <TestClass()> _
 Public Class atcChooseDataGroupDatesTest
@@ -53,18 +53,18 @@ Public Class atcChooseDataGroupDatesTest
 
     '''<summary>Test atcChooseDataGroupDates Constructor</summary>
     <TestMethod()> Public Sub atcChooseDataGroupDatesConstructorTest()
-        Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates()
-        Assert.Inconclusive("TODO: Implement code to verify target")
+        Try
+            Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates()
+            Assert.AreEqual(True, True)
+        Catch ex As Exception
+            Assert.AreEqual(True, False)
+        End Try
     End Sub
 
     '''<summary>Test CreateSelectedDataGroupSubset</summary>
     <TestMethod()> Public Sub CreateSelectedDataGroupSubsetTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
-        Dim expected As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As atcTimeseriesGroup
-        actual = target.CreateSelectedDataGroupSubset
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.IsInstanceOfType(target.CreateSelectedDataGroupSubset(), GetType(atcTimeseriesGroup))
     End Sub
 
     '''<summary>Test Dispose</summary>
@@ -87,8 +87,12 @@ Public Class atcChooseDataGroupDatesTest
     '''<summary>Test Reset</summary>
     <TestMethod()> Public Sub ResetTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
-        target.Reset()
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Try
+            target.Reset()
+            Assert.AreEqual(True, True)
+        Catch ex As Exception
+            Assert.AreEqual(True, False)
+        End Try
     End Sub
 
     '''<summary>Test __ENCAddToList</summary>
@@ -140,97 +144,75 @@ Public Class atcChooseDataGroupDatesTest
     '''<summary>Test CommonEnd</summary>
     <TestMethod()> Public Sub CommonEndTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
-        Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
-        Dim actual As Double
-        target.CommonEnd = expected
-        actual = target.CommonEnd
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.IsInstanceOfType(target.CommonEnd, GetType(Double))
+        target.CommonEnd = 0.0
+        Assert.AreEqual(target.CommonEnd, 0.0)
+        target.CommonEnd = 37906.0
+        Assert.AreEqual(target.CommonEnd, 37906.0)
     End Sub
 
     '''<summary>Test CommonStart</summary>
     <TestMethod()> Public Sub CommonStartTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
-        Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
-        Dim actual As Double
-        target.CommonStart = expected
-        actual = target.CommonStart
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.IsInstanceOfType(target.CommonStart, GetType(Double))
+        target.CommonStart = 0.0
+        Assert.AreEqual(target.CommonStart, 0.0)
+        target.CommonStart = 37906.0
+        Assert.AreEqual(target.CommonStart, 37906.0)
     End Sub
 
     '''<summary>Test DataGroup</summary>
     <TestMethod()> Public Sub DataGroupTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
-        Dim expected As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As atcTimeseriesGroup
-        target.DataGroup = expected
-        actual = target.DataGroup
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.AreEqual(target.DataGroup, Nothing)
+        target.DataGroup = New atcTimeseriesGroup()
+        Assert.IsInstanceOfType(target.DataGroup, GetType(atcTimeseriesGroup))
     End Sub
 
     '''<summary>Test FirstStart</summary>
     <TestMethod()> Public Sub FirstStartTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
-        Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
-        Dim actual As Double
-        target.FirstStart = expected
-        actual = target.FirstStart
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.IsInstanceOfType(target.FirstStart, GetType(Double))
+        target.FirstStart = 0.0
+        Assert.AreEqual(target.FirstStart, 0.0)
+        target.FirstStart = 37906.0
+        Assert.AreEqual(target.FirstStart, 37906.0)
     End Sub
 
     '''<summary>Test LastEnd</summary>
     <TestMethod()> Public Sub LastEndTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
-        Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
-        Dim actual As Double
-        target.LastEnd = expected
-        actual = target.LastEnd
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.IsInstanceOfType(target.LastEnd, GetType(Double))
+        target.LastEnd = 0.0
+        Assert.AreEqual(target.LastEnd, 0.0)
+        target.LastEnd = 37906.0
+        Assert.AreEqual(target.LastEnd, 37906.0)
     End Sub
 
     '''<summary>Test OmitAfter</summary>
     <TestMethod()> Public Sub OmitAfterTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
-        Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
-        Dim actual As Double
-        target.OmitAfter = expected
-        actual = target.OmitAfter
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.IsInstanceOfType(target.OmitAfter, GetType(Double))
     End Sub
 
     '''<summary>Test OmitBefore</summary>
     <TestMethod()> Public Sub OmitBeforeTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
-        Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
-        Dim actual As Double
-        target.OmitBefore = expected
-        actual = target.OmitBefore
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.IsInstanceOfType(target.OmitBefore, GetType(Double))
     End Sub
 
     '''<summary>Test SelectedAll</summary>
     <TestMethod()> Public Sub SelectedAllTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
-        Dim actual As Boolean
-        actual = target.SelectedAll
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.IsInstanceOfType(target.SelectedAll, GetType(Boolean))
     End Sub
 
     '''<summary>Test Text</summary>
     <TestMethod()> Public Sub TextTest()
         Dim target As atcChooseDataGroupDates = New atcChooseDataGroupDates() ' TODO: Initialize to an appropriate value
-        Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
-        Dim actual As String
-        target.Text = expected
-        actual = target.Text
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.IsInstanceOfType(target.Text, GetType(String))
+        target.Text = "Test 1"
+        Assert.AreEqual(target.Text, "Test 1")
     End Sub
 
     '''<summary>Test ToolTip1</summary>

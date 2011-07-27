@@ -5,7 +5,7 @@ Imports atcData
 
 '''<summary>
 '''This is a test class for atcSeasonYearsTest and is intended
-'''to contain all atcSeasonYearsTest Unit Tests
+'''to contain all atcSeasonYearsTest Unit Tests (User control, not tested)
 '''</summary>
 <TestClass()> _
 Public Class atcSeasonYearsTest

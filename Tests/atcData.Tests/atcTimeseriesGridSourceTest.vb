@@ -7,7 +7,7 @@ Imports atcData
 
 '''<summary>
 '''This is a test class for atcTimeseriesGridSourceTest and is intended
-'''to contain all atcTimeseriesGridSourceTest Unit Tests
+'''to contain all atcTimeseriesGridSourceTest Unit Tests (User control, not tested)
 '''</summary>
 <TestClass()> _
 Public Class atcTimeseriesGridSourceTest

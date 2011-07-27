@@ -4,7 +4,7 @@ Imports atcData
 
 '''<summary>
 '''This is a test class for atcAttributeDefinitionTest and is intended
-'''to contain all atcAttributeDefinitionTest Unit Tests
+'''to contain all atcAttributeDefinitionTest Unit Tests (Done)
 '''</summary>
 <TestClass()> _
 Public Class atcAttributeDefinitionTest
@@ -52,196 +52,150 @@ Public Class atcAttributeDefinitionTest
     '''<summary>Test atcAttributeDefinition Constructor</summary>
     <TestMethod()> Public Sub atcAttributeDefinitionConstructorTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition()
-        Assert.Inconclusive("TODO: Implement code to verify target")
+        Assert.AreEqual(target.TypeString, "String")
+        Assert.AreEqual(target.ID, 0)
+        Assert.AreEqual(target.DefaultValue, Nothing)
+        Assert.AreEqual(target.ValidList.Count, 0)
     End Sub
 
     '''<summary>Test Clear</summary>
     <TestMethod()> Public Sub ClearTest()
-        Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
-        target.Clear()
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim target As atcAttributeDefinition = New atcAttributeDefinition()
+        Assert.AreEqual(target.TypeString, "String")
+        Assert.AreEqual(target.ID, 0)
+        Assert.AreEqual(target.DefaultValue, Nothing)
+        Assert.AreEqual(target.ValidList.Count, 0)
     End Sub
 
     '''<summary>Test Clone</summary>
     <TestMethod()> Public Sub CloneTest()
-        Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
-        Dim aNewName As String = String.Empty ' TODO: Initialize to an appropriate value
-        Dim aNewDescription As String = String.Empty ' TODO: Initialize to an appropriate value
-        Dim expected As atcAttributeDefinition = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As atcAttributeDefinition
-        actual = target.Clone(aNewName, aNewDescription)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim target As atcAttributeDefinition = New atcAttributeDefinition()
+        Dim lclone As atcAttributeDefinition = target.Clone()
+        Assert.AreEqual(target.TypeString, lclone.TypeString)
+        Assert.AreEqual(target.ID, lclone.ID)
+        Assert.AreEqual(target.DefaultValue, lclone.DefaultValue)
+        Assert.AreEqual(target.ValidList.Count, lclone.ValidList.Count)
     End Sub
 
     '''<summary>Test IsNumeric</summary>
     <TestMethod()> Public Sub IsNumericTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
-        Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
-        Dim actual As Boolean
-        actual = target.IsNumeric
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        target.TypeString = "integer"
+        Assert.AreEqual(target.IsNumeric, True)
+        target.TypeString = "single"
+        Assert.AreEqual(target.IsNumeric, True)
+        target.TypeString = "double"
+        Assert.AreEqual(target.IsNumeric, True)
+        target.TypeString = "string"
+        Assert.AreEqual(target.IsNumeric, False)
     End Sub
 
     '''<summary>Test ToString</summary>
     <TestMethod()> Public Sub ToStringTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
-        Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
-        Dim actual As String
-        actual = target.ToString
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.AreNotEqual(target.ToString.Length, 0)
     End Sub
 
     '''<summary>Test Calculated</summary>
     <TestMethod()> Public Sub CalculatedTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
-        Dim actual As Boolean
-        actual = target.Calculated
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.AreEqual(target.Calculated, False)
+        target.Calculator = New atcTimeseriesSource
+        Assert.AreEqual(target.Calculated, True)
     End Sub
 
     '''<summary>Test Calculator</summary>
     <TestMethod()> Public Sub CalculatorTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
-        Dim expected As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As atcTimeseriesSource
-        target.Calculator = expected
-        actual = target.Calculator
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.AreEqual(target.Calculator, Nothing)
     End Sub
 
     '''<summary>Test Category</summary>
     <TestMethod()> Public Sub CategoryTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
-        Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
-        Dim actual As String
-        target.Category = expected
-        actual = target.Category
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.AreEqual(target.Category, "")
     End Sub
 
     '''<summary>Test CopiesInherit</summary>
     <TestMethod()> Public Sub CopiesInheritTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
-        Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
-        Dim actual As Boolean
-        target.CopiesInherit = expected
-        actual = target.CopiesInherit
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.IsInstanceOfType(target.CopiesInherit, GetType(Boolean))
     End Sub
 
     '''<summary>Test DefaultValue</summary>
     <TestMethod()> Public Sub DefaultValueTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
-        Dim expected As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As Object
-        target.DefaultValue = expected
-        actual = target.DefaultValue
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.AreEqual(target.DefaultValue, Nothing)
+        target.DefaultValue = New Object
+        Assert.IsInstanceOfType(target.DefaultValue, GetType(Object))
+        target.DefaultValue = New atcTimeseries(Nothing)
+        Assert.IsInstanceOfType(target.DefaultValue, GetType(atcTimeseries))
     End Sub
 
     '''<summary>Test Description</summary>
     <TestMethod()> Public Sub DescriptionTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
-        Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
-        Dim actual As String
-        target.Description = expected
-        actual = target.Description
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        target.Description = "Test 1"
+        Assert.AreEqual(target.Description, "Test 1")
     End Sub
 
     '''<summary>Test Editable</summary>
     <TestMethod()> Public Sub EditableTest()
-        Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
-        Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
-        Dim actual As Boolean
-        target.Editable = expected
-        actual = target.Editable
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim target As atcAttributeDefinition = New atcAttributeDefinition()
+        target.Editable = False
+        Assert.AreEqual(target.Editable, False)
+        target.Editable = True
+        Assert.AreEqual(target.Editable, True)
     End Sub
 
     '''<summary>Test Help</summary>
     <TestMethod()> Public Sub HelpTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
-        Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
-        Dim actual As String
-        target.Help = expected
-        actual = target.Help
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        target.Help = "Test 1"
+        Assert.AreEqual(target.Help, "Test 1")
     End Sub
 
     '''<summary>Test ID</summary>
     <TestMethod()> Public Sub IDTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
-        Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim actual As Integer
-        target.ID = expected
-        actual = target.ID
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        target.ID = 1
+        Assert.AreEqual(target.ID, 1)
     End Sub
 
     '''<summary>Test Max</summary>
     <TestMethod()> Public Sub MaxTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
-        Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
-        Dim actual As Double
-        target.Max = expected
-        actual = target.Max
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        target.Max = Double.MaxValue
+        Assert.AreEqual(target.Max, Double.MaxValue)
     End Sub
 
     '''<summary>Test Min</summary>
     <TestMethod()> Public Sub MinTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
-        Dim expected As Double = 0.0! ' TODO: Initialize to an appropriate value
-        Dim actual As Double
-        target.Min = expected
-        actual = target.Min
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        target.Min = Double.MinValue
+        Assert.AreEqual(target.Min, Double.MinValue)
     End Sub
 
     '''<summary>Test Name</summary>
     <TestMethod()> Public Sub NameTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
-        Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
-        Dim actual As String
-        target.Name = expected
-        actual = target.Name
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        target.Name = "Test 1"
+        Assert.AreEqual(target.Name, "Test 1")
     End Sub
 
     '''<summary>Test TypeString</summary>
     <TestMethod()> Public Sub TypeStringTest()
         Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
-        Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
-        Dim actual As String
-        target.TypeString = expected
-        actual = target.TypeString
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.AreEqual(target.TypeString, "String")
+        target.TypeString = "Test 1"
+        Assert.AreEqual(target.TypeString, "Test 1")
     End Sub
 
     '''<summary>Test ValidList</summary>
     <TestMethod()> Public Sub ValidListTest()
-        Dim target As atcAttributeDefinition = New atcAttributeDefinition() ' TODO: Initialize to an appropriate value
-        Dim expected As ArrayList = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As ArrayList
-        target.ValidList = expected
-        actual = target.ValidList
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim target As atcAttributeDefinition = New atcAttributeDefinition()
+        Assert.IsInstanceOfType(target.ValidList, GetType(ArrayList))
+        target.ValidList = New ArrayList(10)
+        Assert.AreEqual(target.ValidList.Count, 0)
     End Sub
 End Class

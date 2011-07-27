@@ -84,7 +84,7 @@ Public Class atcCollectionTest
         Dim lCollection As atcCollection = New atcCollection({"A", "B", "C"})
         Dim lActual As Integer = lCollection.Add("D")
         Assert.AreEqual(3, lActual)
-      End Sub
+    End Sub
 
     '''<summary>Test AddRange</summary>
     <TestMethod()> Public Sub AddRangeTest()
@@ -119,7 +119,7 @@ Public Class atcCollectionTest
         Dim lCollection As atcCollection = New atcCollection({"A", "B", "C", "D", "E"})
         Assert.AreEqual(3, lCollection.BinarySearchForKey("D"))
         Assert.AreEqual(5, lCollection.BinarySearchForKey("X"))
-      End Sub
+    End Sub
 
     '''<summary>Test BinarySearchForKey</summary>
     <TestMethod()> Public Sub BinarySearchForKeyTest1()
@@ -156,7 +156,7 @@ Public Class atcCollectionTest
         Assert.AreEqual(lCollection.Count, lClonedCollection.Count)
         'TODO: should this test work?
         'Assert.AreEqual(lCollection, lClonedCollection)
-      End Sub
+    End Sub
 
     '''<summary>Test CompareValues</summary>
     <TestMethod(), DeploymentItem("atcUtility.dll")> _
@@ -192,7 +192,7 @@ Public Class atcCollectionTest
         Dim lCollection As New atcCollection
         lCollection.AddRange(lKeys, lValues)
         Assert.AreEqual(CDbl(4), lCollection.Increment("C"))
-      End Sub
+    End Sub
 
     '''<summary>Test Increment</summary>
     <TestMethod()> Public Sub IncrementTest1()
@@ -212,7 +212,7 @@ Public Class atcCollectionTest
         Dim lCollection As New atcCollection
         lCollection.AddRange(lKeys, lValues)
         Assert.AreEqual(2, lCollection.IndexFromKey("C"))
-      End Sub
+    End Sub
 
     '''<summary>Test Insert</summary>
     <TestMethod()> Public Sub InsertTest()
