@@ -34,6 +34,11 @@ Public Class atcTimeseriesStatistics
     End Property
 
 #If GISProvider = "DotSpatial" Then
+    Public Sub Initialize()
+        For Each lOperation As atcDefinedValue In AvailableOperations
+            atcDataAttributes.AddDefinition(lOperation.Definition)
+        Next
+    End Sub
 #Else
     <CLSCompliant(False)> _
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
