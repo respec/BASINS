@@ -1,11 +1,11 @@
 Imports atcUtility
 Imports atcMwGisUtility
 Imports MapWinUtility
+Imports atcData.atcDataManager
 
 Public Class ManDelinPlugIn
-    Implements MapWindow.Interfaces.IPlugin
+    Inherits atcData.atcDataPlugin
 
-    Private pMapWin As MapWindow.Interfaces.IMapWin
     Private pFrmManDelin As frmManDelin
     Private pInitialized As Boolean
 
@@ -13,52 +13,27 @@ Public Class ManDelinPlugIn
     Private Const DelineateMenuName As String = "btdmWatershedDelin"
     Private Const DelineateMenuString As String = "Watershed Delineation"
 
-    Public ReadOnly Property Name() As String Implements MapWindow.Interfaces.IPlugin.Name
+    Public Overrides ReadOnly Property Name() As String
         Get
             Return "Manual Delineation"
         End Get
     End Property
 
-    Public ReadOnly Property Author() As String Implements MapWindow.Interfaces.IPlugin.Author
-        Get
-            Return "AQUA TERRA Consultants"
-        End Get
-    End Property
-
-    Public ReadOnly Property SerialNumber() As String Implements MapWindow.Interfaces.IPlugin.SerialNumber
-        Get
-            Return "G14R/KCU1FOWVVI"
-        End Get
-    End Property
-
-    Public ReadOnly Property Description() As String Implements MapWindow.Interfaces.IPlugin.Description
+    Public Overrides ReadOnly Property Description() As String
         Get
             Return "This plug-in provides an interface for manually delineating watersheds."
         End Get
     End Property
 
-    Public ReadOnly Property BuildDate() As String Implements MapWindow.Interfaces.IPlugin.BuildDate
-        Get
-            Return System.IO.File.GetLastWriteTime(Me.GetType().Assembly.Location)
-        End Get
-    End Property
-
-    Public ReadOnly Property Version() As String Implements MapWindow.Interfaces.IPlugin.Version
-        Get
-            Return System.Diagnostics.FileVersionInfo.GetVersionInfo(Me.GetType().Assembly.Location).FileVersion
-        End Get
-    End Property
-
     <CLSCompliant(False)> _
-    Public Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
+    Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
         pMapWin = MapWin
-        pMapWin.Menus.AddMenu(DelineateMenuName, "", Nothing, DelineateMenuString, "mnuFile")
-        Dim lMenuItem As MapWindow.Interfaces.MenuItem
-        lMenuItem = pMapWin.Menus.AddMenu(DelineateMenuName & "_ManDelin", DelineateMenuName, Nothing, "&Manual")
+        atcData.atcDataManager.AddMenuIfMissing(DelineateMenuName, "", DelineateMenuString, "mnuFile")
+        atcData.atcDataManager.AddMenuIfMissing(DelineateMenuName & "_ManDelin", DelineateMenuName, "&Manual")
         pInitialized = False
     End Sub
 
-    Public Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
+    Public Overrides Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean)
         If ItemName = DelineateMenuName & "_ManDelin" Then
             Dim lCreateNew As Boolean = True
             If Not pFrmManDelin Is Nothing Then
@@ -89,7 +64,7 @@ Public Class ManDelinPlugIn
         End If
     End Sub
 
-    Public Sub MapMouseMove(ByVal ScreenX As Integer, ByVal ScreenY As Integer, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.MapMouseMove
+    Public Overrides Sub MapMouseMove(ByVal ScreenX As Integer, ByVal ScreenY As Integer, ByRef Handled As Boolean)
         If pInitialized Then
             Dim lPixelX, lPixelY As Double
             pMapWin.View.PixelToProj(ScreenX, ScreenY, lPixelX, lPixelY)
@@ -97,62 +72,12 @@ Public Class ManDelinPlugIn
         End If
     End Sub
 
-    Public Sub MapMouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal x As Integer, ByVal y As Integer, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.MapMouseUp
+    Public Overrides Sub MapMouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal x As Integer, ByVal y As Integer, ByRef Handled As Boolean)
         If pInitialized Then
             Dim lPixelX, lPixelY As Double
             pMapWin.View.PixelToProj(x, y, lPixelX, lPixelY)
             pFrmManDelin.MouseButtonClickUp(lPixelX, lPixelY, Button)
         End If
-    End Sub
-
-    Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
-    End Sub
-
-    Public Sub LayerRemoved(ByVal Handle As Integer) Implements MapWindow.Interfaces.IPlugin.LayerRemoved
-    End Sub
-
-    <CLSCompliant(False)> _
-    Public Sub LayersAdded(ByVal Layers() As MapWindow.Interfaces.Layer) Implements MapWindow.Interfaces.IPlugin.LayersAdded
-    End Sub
-
-    Public Sub LayersCleared() Implements MapWindow.Interfaces.IPlugin.LayersCleared
-    End Sub
-
-    Public Sub LayerSelected(ByVal Handle As Integer) Implements MapWindow.Interfaces.IPlugin.LayerSelected
-    End Sub
-
-    <CLSCompliant(False)> _
-    Public Sub LegendDoubleClick(ByVal Handle As Integer, ByVal Location As MapWindow.Interfaces.ClickLocation, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.LegendDoubleClick
-    End Sub
-
-    <CLSCompliant(False)> _
-    Public Sub LegendMouseDown(ByVal Handle As Integer, ByVal Button As Integer, ByVal Location As MapWindow.Interfaces.ClickLocation, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.LegendMouseDown
-    End Sub
-
-    <CLSCompliant(False)> _
-    Public Sub LegendMouseUp(ByVal Handle As Integer, ByVal Button As Integer, ByVal Location As MapWindow.Interfaces.ClickLocation, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.LegendMouseUp
-    End Sub
-
-    Public Sub MapDragFinished(ByVal Bounds As System.Drawing.Rectangle, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.MapDragFinished
-    End Sub
-
-    Public Sub MapExtentsChanged() Implements MapWindow.Interfaces.IPlugin.MapExtentsChanged
-    End Sub
-
-    Public Sub MapMouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal x As Integer, ByVal y As Integer, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.MapMouseDown
-    End Sub
-
-    Public Sub Message(ByVal msg As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.Message
-    End Sub
-
-    Public Sub ProjectLoading(ByVal ProjectFile As String, ByVal SettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectLoading
-    End Sub
-
-    Public Sub ProjectSaving(ByVal ProjectFile As String, ByRef SettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectSaving
-    End Sub
-
-    <CLSCompliant(False)> _
-    Public Sub ShapesSelected(ByVal Handle As Integer, ByVal SelectInfo As MapWindow.Interfaces.SelectInfo) Implements MapWindow.Interfaces.IPlugin.ShapesSelected
     End Sub
 
     Public Shared Sub CalculateSubbasinParameters(ByVal aSubBasinThemeName As String, ByVal aElevationThemeName As String, _
