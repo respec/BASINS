@@ -106,6 +106,7 @@
     <ProjectReference Include="..\..\..\BASINS40\atcWDM\atcWDM10.vbproj">
       <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
       <Name>atcWDM10</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility10.vbproj">
       <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>

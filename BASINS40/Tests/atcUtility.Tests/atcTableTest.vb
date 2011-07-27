@@ -357,13 +357,11 @@ Public Class atcTableTest
     '''<summary>Test Header</summary>
     <TestMethod()> Public Sub HeaderTest()
         Dim target As IatcTable = CreateatcTable() ' TODO: Initialize to an appropriate value
-        Dim aHeaderRow As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
-        Dim actual As String
-        target.Header(aHeaderRow) = expected
-        actual = target.Header(aHeaderRow)
+        Dim aHeaderRow As Integer = 2
+        target.Header = "header1" & vbCrLf & "header2"
+        Dim expected As String = "header1" & vbCrLf & "header2"
+        Dim actual As String = target.Header(aHeaderRow)
         Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
     '''<summary>Test Header</summary>

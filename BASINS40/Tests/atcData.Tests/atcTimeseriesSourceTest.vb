@@ -3,7 +3,7 @@ Imports atcData
 
 '''<summary>
 '''This is a test class for atcTimeseriesSourceTest and is intended
-'''to contain all atcTimeseriesSourceTest Unit Tests
+'''to contain all atcTimeseriesSourceTest Unit Tests (Done)
 '''</summary>
 <TestClass()> _
 Public Class atcTimeseriesSourceTest
@@ -51,25 +51,38 @@ Public Class atcTimeseriesSourceTest
     '''<summary>Test atcTimeseriesSource Constructor</summary>
     <TestMethod()> Public Sub atcTimeseriesSourceConstructorTest()
         Dim target As atcTimeseriesSource = New atcTimeseriesSource()
-        Assert.Inconclusive("TODO: Implement code to verify target")
+        Assert.IsInstanceOfType(target, GetType(atcTimeseriesSource))
     End Sub
 
     '''<summary>Test AddDatasets</summary>
     <TestMethod()> Public Sub AddDatasetsTest()
         Dim target As atcTimeseriesSource = New atcTimeseriesSource() ' TODO: Initialize to an appropriate value
-        Dim aTimeseriesGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
-        Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
-        Dim actual As Boolean
-        actual = target.AddDatasets(aTimeseriesGroup)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim aTimeseriesGroup As New atcTimeseriesGroup
+        Dim lTs1 As New atcTimeseries(Nothing)
+        lTs1.Attributes.SetValue("ID", 1)
+        lTs1.Attributes.SetValue("Constituent", "PREC")
+        Dim lTs2 As New atcTimeseries(Nothing)
+        lTs2.Attributes.SetValue("ID", 2)
+        lTs2.Attributes.SetValue("Constituent", "ATEM")
+        Dim lTs3 As New atcTimeseries(Nothing)
+        lTs3.Attributes.SetValue("ID", 3)
+        lTs3.Attributes.SetValue("Constituent", "WIND")
+        aTimeseriesGroup.Add(lTs1)
+        aTimeseriesGroup.Add(lTs2)
+        aTimeseriesGroup.Add(lTs3)
+        Try
+            target.AddDatasets(aTimeseriesGroup)
+            Assert.AreEqual(True, True)
+        Catch ex As Exception
+            If ex.Message.Contains("does not implement") Then
+                Assert.AreEqual(False, False)
+            End If
+        End Try
     End Sub
 
     '''<summary>Test DataSets</summary>
     <TestMethod()> Public Sub DataSetsTest()
         Dim target As atcTimeseriesSource = New atcTimeseriesSource() ' TODO: Initialize to an appropriate value
-        Dim actual As atcTimeseriesGroup
-        actual = target.DataSets
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.AreEqual(0, target.DataSets.Count)
     End Sub
 End Class

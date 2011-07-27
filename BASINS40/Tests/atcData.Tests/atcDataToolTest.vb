@@ -3,7 +3,7 @@ Imports atcData
 
 '''<summary>
 '''This is a test class for atcDataToolTest and is intended
-'''to contain all atcDataToolTest Unit Tests
+'''to contain all atcDataToolTest Unit Tests (Done, needs more consideration for abstract class)
 '''</summary>
 <TestClass()> _
 Public Class atcDataToolTest
@@ -57,10 +57,6 @@ Public Class atcDataToolTest
     '''<summary>Test Show</summary>
     <TestMethod()> Public Sub ShowTest()
         Dim target As atcDataTool = CreateatcDataTool() ' TODO: Initialize to an appropriate value
-        Dim expected As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As Object
-        actual = target.Show
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.AreEqual(target, Nothing)
     End Sub
 End Class

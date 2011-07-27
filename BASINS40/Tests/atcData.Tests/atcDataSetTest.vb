@@ -3,7 +3,7 @@ Imports atcData
 
 '''<summary>
 '''This is a test class for atcDataSetTest and is intended
-'''to contain all atcDataSetTest Unit Tests
+'''to contain all atcDataSetTest Unit Tests (Done)
 '''</summary>
 <TestClass()> _
 Public Class atcDataSetTest
@@ -51,14 +51,17 @@ Public Class atcDataSetTest
     '''<summary>Test atcDataSet Constructor</summary>
     <TestMethod()> Public Sub atcDataSetConstructorTest()
         Dim target As atcDataSet = New atcDataSet()
-        Assert.Inconclusive("TODO: Implement code to verify target")
+        Assert.IsInstanceOfType(target, GetType(atcDataSet))
+        Dim lSer As Integer = target.Serial
+        Dim target2 As atcDataSet = New atcDataSet()
+        Assert.AreEqual(1, target2.Serial - target.Serial)
     End Sub
 
     '''<summary>Test Clear</summary>
     <TestMethod()> Public Sub ClearTest()
-        Dim target As atcDataSet = New atcDataSet() ' TODO: Initialize to an appropriate value
-        target.Clear()
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Dim target As atcDataSet = New atcDataSet()
+        Assert.IsInstanceOfType(target, GetType(atcDataSet))
+        Assert.AreEqual(0, target.Attributes.Count)
     End Sub
 
     '''<summary>Test Clone</summary>
@@ -67,63 +70,69 @@ Public Class atcDataSetTest
         Dim expected As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcDataSet
         actual = target.Clone
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.AreEqual(1, actual.Serial - target.Serial)
+        Assert.AreEqual(actual.Attributes.Count, target.Attributes.Count)
     End Sub
 
     '''<summary>Test SetStringFormat</summary>
     <TestMethod()> Public Sub SetStringFormatTest()
-        Dim aAttributeNames() As String = Nothing ' TODO: Initialize to an appropriate value
+        Dim aAttributeNames() As String = {"Test1", "Test2", "Test3"}
         Dim aFormat As String = String.Empty ' TODO: Initialize to an appropriate value
         atcDataSet.SetStringFormat(aAttributeNames, aFormat)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
     '''<summary>Test ToString</summary>
     <TestMethod()> Public Sub ToStringTest()
-        Dim target As atcDataSet = New atcDataSet() ' TODO: Initialize to an appropriate value
-        Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
-        Dim actual As String
-        actual = target.ToString
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim aAttributeNames() As String = {"Att 1", "Att 2", "Att 3"}
+        Dim aFormat As String = String.Empty ' TODO: Initialize to an appropriate value
+        atcDataSet.SetStringFormat(aAttributeNames, aFormat)
+
+        Dim lDS As atcDataSet = New atcDataSet
+        lDS.Clear()
+        lDS.Attributes.SetValue("Att 1", "Test1")
+        lDS.Attributes.SetValue("Att 2", "Test2")
+        lDS.Attributes.SetValue("Att 3", "Test3")
+        Assert.AreEqual("Test1 Test2 Test3", lDS.ToString.Trim)
     End Sub
 
     '''<summary>Test op_Equality</summary>
     <TestMethod()> Public Sub op_EqualityTest()
-        Dim aArg1 As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
-        Dim aArg2 As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
-        Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
-        Dim actual As Boolean
-        actual = (aArg1 = aArg2)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim aArg1 As New atcDataSet
+        Dim aArg2 As New atcDataSet
+
+        Assert.AreEqual(False, (aArg1 = aArg2))
+        Assert.AreEqual(True, (aArg1 = aArg1))
+
     End Sub
 
     '''<summary>Test op_Inequality</summary>
     <TestMethod()> Public Sub op_InequalityTest()
-        Dim aArg1 As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
-        Dim aArg2 As atcDataSet = Nothing ' TODO: Initialize to an appropriate value
-        Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
-        Dim actual As Boolean
-        actual = (aArg1 <> aArg2)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim aArg1 As New atcDataSet
+        Dim aArg2 As New atcDataSet
+
+        Assert.AreEqual(True, (aArg1 <> aArg2))
+        Assert.AreEqual(False, (aArg1 <> aArg1))
     End Sub
 
     '''<summary>Test Attributes</summary>
     <TestMethod()> Public Sub AttributesTest()
-        Dim target As atcDataSet = New atcDataSet() ' TODO: Initialize to an appropriate value
-        Dim actual As atcDataAttributes
-        actual = target.Attributes
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim target As atcDataSet = New atcDataSet()
+        target.Clear()
+        Assert.AreEqual(0, target.Attributes.Count)
+        target.Attributes.SetValue("Att 1", "Test1")
+        target.Attributes.SetValue("Att 2", "Test2")
+        target.Attributes.SetValue("Att 3", "Test3")
+
+        Assert.AreEqual(3, target.Attributes.Count)
     End Sub
 
     '''<summary>Test Serial</summary>
     <TestMethod()> Public Sub SerialTest()
-        Dim target As atcDataSet = New atcDataSet() ' TODO: Initialize to an appropriate value
-        Dim actual As Integer
-        actual = target.Serial
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim target As atcDataSet = New atcDataSet()
+        Dim lSer1 As Integer = target.Serial
+        Assert.AreNotEqual(0, lSer1)
+        Dim ltarget As atcDataSet = New atcDataSet()
+        Assert.AreEqual(1, ltarget.Serial - lSer1)
+
     End Sub
 End Class

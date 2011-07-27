@@ -4,7 +4,7 @@ Imports atcData
 
 '''<summary>
 '''This is a test class for atcTimeseriesGroupTest and is intended
-'''to contain all atcTimeseriesGroupTest Unit Tests
+'''to contain all atcTimeseriesGroupTest Unit Tests (Done)
 '''</summary>
 <TestClass()> _
 Public Class atcTimeseriesGroupTest
@@ -51,65 +51,91 @@ Public Class atcTimeseriesGroupTest
 
     '''<summary>Test atcTimeseriesGroup Constructor</summary>
     <TestMethod()> Public Sub atcTimeseriesGroupConstructorTest()
-        Dim aTimeseries As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
+        Dim aTimeseries As New atcTimeseries(Nothing)
         Dim target As atcTimeseriesGroup = New atcTimeseriesGroup(aTimeseries)
-        Assert.Inconclusive("TODO: Implement code to verify target")
+        Assert.AreEqual(1, target.Count)
     End Sub
 
     '''<summary>Test atcTimeseriesGroup Constructor</summary>
     <TestMethod()> Public Sub atcTimeseriesGroupConstructorTest1()
-        Dim aDataGroup As atcDataGroup = Nothing ' TODO: Initialize to an appropriate value
+        Dim aDataGroup As New atcDataGroup
+        aDataGroup.Add(New atcTimeseries(Nothing))
+        aDataGroup.Add(New atcTimeseries(Nothing))
+        aDataGroup.Add(New atcTimeseries(Nothing))
         Dim target As atcTimeseriesGroup = New atcTimeseriesGroup(aDataGroup)
-        Assert.Inconclusive("TODO: Implement code to verify target")
+        Assert.AreEqual(3, aDataGroup.Count)
     End Sub
 
     '''<summary>Test atcTimeseriesGroup Constructor</summary>
     <TestMethod()> Public Sub atcTimeseriesGroupConstructorTest2()
-        Dim aTimeseries() As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
+        Dim aTimeseries() As atcTimeseries = {New atcTimeseries(Nothing), New atcTimeseries(Nothing)}
         Dim target As atcTimeseriesGroup = New atcTimeseriesGroup(aTimeseries)
-        Assert.Inconclusive("TODO: Implement code to verify target")
+        Assert.AreEqual(2, target.Count)
     End Sub
 
     '''<summary>Test atcTimeseriesGroup Constructor</summary>
     <TestMethod()> Public Sub atcTimeseriesGroupConstructorTest3()
         Dim target As atcTimeseriesGroup = New atcTimeseriesGroup()
-        Assert.Inconclusive("TODO: Implement code to verify target")
+        Assert.AreEqual(0, target.Count)
     End Sub
 
     '''<summary>Test Clone</summary>
     <TestMethod()> Public Sub CloneTest()
         Dim target As atcTimeseriesGroup = New atcTimeseriesGroup() ' TODO: Initialize to an appropriate value
-        Dim expected As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As atcTimeseriesGroup
+        Dim actual As atcTimeseriesGroup = target.Clone
+        Assert.AreEqual(target.Count, actual.Count)
+        Dim aTimeseries() As atcTimeseries = {New atcTimeseries(Nothing), New atcTimeseries(Nothing)}
+        target = New atcTimeseriesGroup(aTimeseries)
         actual = target.Clone
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.AreEqual(target.Count, actual.Count)
     End Sub
 
     '''<summary>Test FindData</summary>
     <TestMethod()> Public Sub FindDataTest()
+        Dim lTs1 As New atcTimeseries(Nothing)
+        lTs1.Attributes.SetValue("ID", 1)
+        lTs1.Attributes.SetValue("Constituent", "PREC")
+        Dim lTs2 As New atcTimeseries(Nothing)
+        lTs2.Attributes.SetValue("ID", 2)
+        lTs2.Attributes.SetValue("Constituent", "ATEM")
+        Dim lTs3 As New atcTimeseries(Nothing)
+        lTs3.Attributes.SetValue("ID", 3)
+        lTs3.Attributes.SetValue("Constituent", "WIND")
+
         Dim target As atcTimeseriesGroup = New atcTimeseriesGroup() ' TODO: Initialize to an appropriate value
-        Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
-        Dim aValue As String = String.Empty ' TODO: Initialize to an appropriate value
+        target.Add(lTs1)
+        target.Add(lTs2)
+        target.Add(lTs3)
+        Dim aAttributeName As String = "Constituent"
+        Dim aValue As String = "ATEM"
         Dim aLimit As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim expected As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As atcTimeseriesGroup
-        actual = target.FindData(aAttributeName, aValue, aLimit)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim actual As atcTimeseriesGroup = target.FindData(aAttributeName, aValue, aLimit)
+        Assert.AreEqual(2, actual(0).Attributes.GetValue("ID"))
     End Sub
 
     '''<summary>Test FindData</summary>
     <TestMethod()> Public Sub FindDataTest1()
+        Dim lTs1 As New atcTimeseries(Nothing)
+        lTs1.Attributes.SetValue("ID", 1)
+        lTs1.Attributes.SetValue("Constituent", "PREC")
+        Dim lTs2 As New atcTimeseries(Nothing)
+        lTs2.Attributes.SetValue("ID", 2)
+        lTs2.Attributes.SetValue("Constituent", "ATEM")
+        Dim lTs3 As New atcTimeseries(Nothing)
+        lTs3.Attributes.SetValue("ID", 3)
+        lTs3.Attributes.SetValue("Constituent", "WIND")
+
         Dim target As atcTimeseriesGroup = New atcTimeseriesGroup() ' TODO: Initialize to an appropriate value
-        Dim aAttributeName As String = String.Empty ' TODO: Initialize to an appropriate value
-        Dim aValues As atcCollection = Nothing ' TODO: Initialize to an appropriate value
+        target.Add(lTs1)
+        target.Add(lTs2)
+        target.Add(lTs3)
+        Dim aAttributeName As String = "Constituent"
+        Dim lAtts() As IEnumerable = {"ATEM", "WIND"}
+        Dim aValue As New atcCollection(lAtts)
         Dim aLimit As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim expected As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As atcTimeseriesGroup
-        actual = target.FindData(aAttributeName, aValues, aLimit)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim actual As atcTimeseriesGroup = target.FindData(aAttributeName, aValue, aLimit)
+        Assert.AreEqual(2, actual(0).Attributes.GetValue("ID"))
+        Assert.AreEqual(3, actual(1).Attributes.GetValue("ID"))
     End Sub
 
     '''<summary>Test __ENCAddToList</summary>
@@ -122,37 +148,62 @@ Public Class atcTimeseriesGroupTest
 
     '''<summary>Test Item</summary>
     <TestMethod()> Public Sub ItemTest()
+        Dim lTs1 As New atcTimeseries(Nothing)
+        lTs1.Attributes.SetValue("ID", 1)
+        lTs1.Attributes.SetValue("Constituent", "PREC")
+        Dim lTs2 As New atcTimeseries(Nothing)
+        lTs2.Attributes.SetValue("ID", 2)
+        lTs2.Attributes.SetValue("Constituent", "ATEM")
+        Dim lTs3 As New atcTimeseries(Nothing)
+        lTs3.Attributes.SetValue("ID", 3)
+        lTs3.Attributes.SetValue("Constituent", "WIND")
+
         Dim target As atcTimeseriesGroup = New atcTimeseriesGroup() ' TODO: Initialize to an appropriate value
-        Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As atcTimeseries
-        target(aIndex) = expected
-        actual = target(aIndex)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        target.Add(lTs1)
+        target.Add(lTs2)
+        target.Add(lTs3)
+
+        Assert.AreEqual("WIND", target.Item(2).Attributes.GetValue("Constituent"))
+
     End Sub
 
     '''<summary>Test ItemByIndex</summary>
     <TestMethod()> Public Sub ItemByIndexTest()
+        Dim lTs1 As New atcTimeseries(Nothing)
+        lTs1.Attributes.SetValue("ID", 1)
+        lTs1.Attributes.SetValue("Constituent", "PREC")
+        Dim lTs2 As New atcTimeseries(Nothing)
+        lTs2.Attributes.SetValue("ID", 2)
+        lTs2.Attributes.SetValue("Constituent", "ATEM")
+        Dim lTs3 As New atcTimeseries(Nothing)
+        lTs3.Attributes.SetValue("ID", 3)
+        lTs3.Attributes.SetValue("Constituent", "WIND")
+
         Dim target As atcTimeseriesGroup = New atcTimeseriesGroup() ' TODO: Initialize to an appropriate value
-        Dim aIndex As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As atcTimeseries
-        target.ItemByIndex(aIndex) = expected
-        actual = target.ItemByIndex(aIndex)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        target.Add(lTs1)
+        target.Add(lTs2)
+        target.Add(lTs3)
+
+        Assert.AreEqual("WIND", target.ItemByIndex(2).Attributes.GetValue("Constituent"))
     End Sub
 
     '''<summary>Test ItemByKey</summary>
     <TestMethod()> Public Sub ItemByKeyTest()
+        Dim lTs1 As New atcTimeseries(Nothing)
+        lTs1.Attributes.SetValue("ID", 1)
+        lTs1.Attributes.SetValue("Constituent", "PREC")
+        Dim lTs2 As New atcTimeseries(Nothing)
+        lTs2.Attributes.SetValue("ID", 2)
+        lTs2.Attributes.SetValue("Constituent", "ATEM")
+        Dim lTs3 As New atcTimeseries(Nothing)
+        lTs3.Attributes.SetValue("ID", 3)
+        lTs3.Attributes.SetValue("Constituent", "WIND")
+
         Dim target As atcTimeseriesGroup = New atcTimeseriesGroup() ' TODO: Initialize to an appropriate value
-        Dim aKey As Object = Nothing ' TODO: Initialize to an appropriate value
-        Dim expected As atcTimeseries = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As atcTimeseries
-        target.ItemByKey(aKey) = expected
-        actual = target.ItemByKey(aKey)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        target.Add("1", lTs1)
+        target.Add("2", lTs2)
+        target.Add("3", lTs3)
+
+        Assert.AreEqual("ATEM", target.ItemByKey("2").Attributes.GetValue("Constituent"))
     End Sub
 End Class

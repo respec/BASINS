@@ -4,7 +4,7 @@ Imports atcData
 
 '''<summary>
 '''This is a test class for atcTimeseriesGroupBuilderTest and is intended
-'''to contain all atcTimeseriesGroupBuilderTest Unit Tests
+'''to contain all atcTimeseriesGroupBuilderTest Unit Tests (Done)
 '''</summary>
 <TestClass()> _
 Public Class atcTimeseriesGroupBuilderTest
@@ -53,68 +53,80 @@ Public Class atcTimeseriesGroupBuilderTest
     <TestMethod()> Public Sub atcTimeseriesGroupBuilderConstructorTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGroupBuilder = New atcTimeseriesGroupBuilder(aDataSource)
-        Assert.Inconclusive("TODO: Implement code to verify target")
+        Assert.IsInstanceOfType(target, GetType(atcTimeseriesGroupBuilder))
     End Sub
 
     '''<summary>Test AddValues</summary>
     <TestMethod()> Public Sub AddValuesTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGroupBuilder = New atcTimeseriesGroupBuilder(aDataSource) ' TODO: Initialize to an appropriate value
+        Dim lKeys() As String = {"1", "2", "3"}
+        target.CreateBuilders(lKeys)
+
         Dim aDate As DateTime = New DateTime() ' TODO: Initialize to an appropriate value
-        Dim aValues() As Double = Nothing ' TODO: Initialize to an appropriate value
+        Dim aValues() As Double = {1, 2, 3}
         target.AddValues(aDate, aValues)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Assert.AreEqual(2, target.Builder("1").NumValues)
     End Sub
 
     '''<summary>Test Builder</summary>
     <TestMethod()> Public Sub BuilderTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGroupBuilder = New atcTimeseriesGroupBuilder(aDataSource) ' TODO: Initialize to an appropriate value
-        Dim aDataSetKey As String = String.Empty ' TODO: Initialize to an appropriate value
-        Dim expected As atcTimeseriesBuilder = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As atcTimeseriesBuilder
-        actual = target.Builder(aDataSetKey)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Dim lKeys() As String = {"1", "2", "3"}
+        target.CreateBuilders(lKeys)
+
+        Dim aDate As DateTime = New DateTime() ' TODO: Initialize to an appropriate value
+        Dim aValues() As Double = {1, 2, 3}
+        target.AddValues(aDate, aValues)
+        Assert.AreEqual(2, target.Builder("1").NumValues)
+        Assert.AreEqual(2, target.Builder("2").NumValues)
+        Assert.AreEqual(2, target.Builder("3").NumValues)
     End Sub
 
     '''<summary>Test Count</summary>
     <TestMethod()> Public Sub CountTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGroupBuilder = New atcTimeseriesGroupBuilder(aDataSource) ' TODO: Initialize to an appropriate value
-        Dim expected As Integer = 0 ' TODO: Initialize to an appropriate value
-        Dim actual As Integer
-        actual = target.Count
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.AreEqual(0, target.Count)
+        Dim lKeys() As String = {"1", "2", "3"}
+        target.CreateBuilders(lKeys)
+
+        Dim aDate As DateTime = New DateTime() ' TODO: Initialize to an appropriate value
+        Dim aValues() As Double = {1, 2, 3}
+        target.AddValues(aDate, aValues)
+        Assert.AreEqual(3, target.Count)
     End Sub
 
     '''<summary>Test CreateBuilders</summary>
     <TestMethod()> Public Sub CreateBuildersTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGroupBuilder = New atcTimeseriesGroupBuilder(aDataSource) ' TODO: Initialize to an appropriate value
-        Dim aKeys() As String = Nothing ' TODO: Initialize to an appropriate value
+        Dim aKeys() As String = {"1", "2", "3"}
         target.CreateBuilders(aKeys)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Assert.AreEqual(3, target.Count)
     End Sub
 
     '''<summary>Test CreateTimeseriesAddToGroup</summary>
     <TestMethod()> Public Sub CreateTimeseriesAddToGroupTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGroupBuilder = New atcTimeseriesGroupBuilder(aDataSource) ' TODO: Initialize to an appropriate value
-        Dim aGroup As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
+        Dim aKeys() As String = {"1", "2", "3"}
+        target.CreateBuilders(aKeys)
+        Dim aGroup As New atcTimeseriesGroup
         target.CreateTimeseriesAddToGroup(aGroup)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
+        Assert.AreEqual(aKeys.Length, aGroup.Count)
     End Sub
 
     '''<summary>Test CreateTimeseriesGroup</summary>
     <TestMethod()> Public Sub CreateTimeseriesGroupTest()
         Dim aDataSource As atcTimeseriesSource = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcTimeseriesGroupBuilder = New atcTimeseriesGroupBuilder(aDataSource) ' TODO: Initialize to an appropriate value
-        Dim expected As atcTimeseriesGroup = Nothing ' TODO: Initialize to an appropriate value
-        Dim actual As atcTimeseriesGroup
+        Dim actual As atcTimeseriesGroup = target.CreateTimeseriesGroup
+        Assert.AreEqual(0, actual.Count)
+        Dim aKeys() As String = {"1", "2", "3"}
+        target.CreateBuilders(aKeys)
         actual = target.CreateTimeseriesGroup
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.AreEqual(3, actual.Count)
     End Sub
 End Class

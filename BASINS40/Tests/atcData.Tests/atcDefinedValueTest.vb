@@ -3,7 +3,7 @@ Imports atcData
 
 '''<summary>
 '''This is a test class for atcDefinedValueTest and is intended
-'''to contain all atcDefinedValueTest Unit Tests
+'''to contain all atcDefinedValueTest Unit Tests (Done)
 '''</summary>
 <TestClass()> _
 Public Class atcDefinedValueTest
@@ -54,23 +54,23 @@ Public Class atcDefinedValueTest
         Dim aValue As Object = Nothing ' TODO: Initialize to an appropriate value
         Dim aArguments As atcDataAttributes = Nothing ' TODO: Initialize to an appropriate value
         Dim target As atcDefinedValue = New atcDefinedValue(aDefinition, aValue, aArguments)
-        Assert.Inconclusive("TODO: Implement code to verify target")
+        Assert.IsInstanceOfType(target, GetType(atcDefinedValue))
     End Sub
 
     '''<summary>Test atcDefinedValue Constructor</summary>
     <TestMethod()> Public Sub atcDefinedValueConstructorTest1()
         Dim target As atcDefinedValue = New atcDefinedValue()
-        Assert.Inconclusive("TODO: Implement code to verify target")
+        Assert.IsInstanceOfType(target, GetType(atcDefinedValue))
     End Sub
 
     '''<summary>Test Clone</summary>
     <TestMethod()> Public Sub CloneTest()
         Dim target As atcDefinedValue = New atcDefinedValue() ' TODO: Initialize to an appropriate value
-        Dim expected As atcDefinedValue = Nothing ' TODO: Initialize to an appropriate value
         Dim actual As atcDefinedValue
         actual = target.Clone
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.AreEqual(target.Definition, actual.Definition)
+        Assert.AreEqual(target.Value, actual.Value)
+        Assert.AreEqual(target.Arguments, actual.Arguments)
     End Sub
 
     '''<summary>Test ToString</summary>
@@ -79,7 +79,6 @@ Public Class atcDefinedValueTest
         Dim expected As String = String.Empty ' TODO: Initialize to an appropriate value
         Dim actual As String
         actual = target.ToString
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.AreNotEqual(expected, actual)
     End Sub
 End Class
