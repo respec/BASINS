@@ -27,6 +27,7 @@ Public Class clsSWSTATPlugin
     End Function
 
     Private Sub ShowForm(ByVal aTimeseriesGroup As atcData.atcDataGroup, ByVal aForm As Object)
+        LoadPlugin("Timeseries::n-day high/low")
         Dim lBasicAttributes As New Generic.List(Of String)
         With lBasicAttributes
             .Add("ID")
@@ -68,6 +69,7 @@ Public Class clsSWSTATPlugin
                               ByVal ParamArray aOption() As String)
 
         If Not aTimeseriesGroup Is Nothing AndAlso aTimeseriesGroup.Count > 0 Then
+            LoadPlugin("Timeseries::n-day high/low")
             Dim lForm As New frmSWSTAT
 
             lForm.Initialize(aTimeseriesGroup)
@@ -80,6 +82,16 @@ Public Class clsSWSTATPlugin
         MyBase.Initialize(aMapWin, aParentHandle)
         pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)_" & pTrendName, _
                                                        atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)", pTrendName, Me.Icon, , , True))
+    End Sub
+
+    Private Sub LoadPlugin(ByVal aPluginName As String)
+        Try
+            Dim lKey As String = pMapWin.Plugins.GetPluginKey(aPluginName)
+            'If Not g_MapWin.Plugins.PluginIsLoaded(lKey) Then 
+            pMapWin.Plugins.StartPlugin(lKey)
+        Catch e As Exception
+            Logger.Dbg("Exception loading " & aPluginName & ": " & e.Message)
+        End Try
     End Sub
 
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
