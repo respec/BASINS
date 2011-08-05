@@ -399,6 +399,7 @@ Public Class atcFrequencyGridSource
         End If
 
         Try
+            Dim lPageCount As Integer = 1
             For Each lTimeseries As atcTimeseries In pDataGroup
                 Dim lAttributes As atcDataAttributes = lTimeseries.Attributes
                 For Each lNdaysKey As String In pNdays.Keys
@@ -509,8 +510,8 @@ Public Class atcFrequencyGridSource
                     Else
                         lRept.AppendLine()
                         lRept.AppendLine()
-                        lRept.AppendLine("Program SWStat             U.S. GEOLOGICAL SURVEY             Seq.000.000")
-                        lRept.AppendLine("Ver. 5.0 Beta 1   Log-Pearson & Pearson Type III Statistics   Run Date / Time")
+                        lRept.AppendLine("Program SWStat             U.S. GEOLOGICAL SURVEY             Seq " & lPageCount.ToString.PadLeft(5, "0"))
+                        lRept.AppendLine("Ver. 5.0          Log-Pearson & Pearson Type III Statistics   Run Date / Time")
                         lRept.AppendLine("10/1/2009                based on USGS Program A193           " & System.DateTime.Now.ToString)
                         lRept.AppendLine()
                         lRept.AppendLine(" Notice -- Log-Pearson Type III or Pearson Type III distributions are for")
@@ -698,6 +699,7 @@ Public Class atcFrequencyGridSource
                         'lRept.AppendLine("          L04003")
 
                         lRept.AppendLine(vbFormFeed)
+                        lPageCount += 1
                     End If
                     If aExpFmt Then
                         lExpTab.CurrentRecord += 1

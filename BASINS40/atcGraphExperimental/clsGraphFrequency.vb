@@ -10,23 +10,48 @@ Public Class clsGraphFrequency
     Private pExceedance As Boolean
     Private pXMin As Double = 0.01
     Private pXMax As Double = 0.99
+    Private pStations As Generic.List(Of String)
+    Private pNDays As Generic.List(Of String)
+    Private pLogStr As String = ""
 
     <CLSCompliant(False)> _
     Public Sub New(ByVal aDataGroup As atcTimeseriesGroup, ByVal aZedGraphControl As ZedGraphControl)
         MyBase.New(aDataGroup, aZedGraphControl)
 
+        Dim lValueStaId As String = ""
+        Dim lValueStaNam As String = ""
+        Dim lValueMean As Double = 0.0
+        Dim lValueStddev As Double = 0.0
+        Dim lValueSkew As Double = 0.0
+        Dim lValueHL As String = "Low"
+        Dim lNdayStr As String = ""
+
+        If aDataGroup.Count = 1 Then
+            lValueStaId = aDataGroup(0).Attributes.GetValue("STAID")
+            lValueStaNam = aDataGroup(0).Attributes.GetValue("STANAM")
+            lValueMean = aDataGroup(0).Attributes.GetValue("Mean")
+            lValueStddev = aDataGroup(0).Attributes.GetValue("stddev")
+            lValueSkew = aDataGroup(0).Attributes.GetValue("Skew")
+        End If
+
+        GetDataInfo()
+        If pNDays(0).StartsWith("H") Then
+            lValueHL = "High"
+        End If
+        If pNDays.Count = 1 Then
+            lNdayStr = pNDays(0).Substring(1).Trim("0")
+        Else
+            lNdayStr = "N"
+        End If
+
         With pZgc.MasterPane.PaneList(0)
             'Add USGS Peakfq label
             Dim lUSGSLabel As TextObj = Nothing
-            Dim lStr As String = "SWSTAT2.0 run " & Date.Now.ToString("yyyy-MM-dd")
+            Dim lStr As String = "SWSTAT5.0 run " & Date.Now.ToString("yyyy-MM-dd")
             '& vbCrLf _
             '& "NOTE - Preliminary computation" & vbCrLf _
             '& " User is reponsible for assessment and interpretation."
             If aDataGroup.Count = 1 Then
-                'Dim lValueStaId As String = aDataGroup(0).Attributes.GetValue("STAID")
-                Dim lValueMean As Double = aDataGroup(0).Attributes.GetValue("Mean")
-                Dim lValueStddev As Double = aDataGroup(0).Attributes.GetValue("stddev")
-                Dim lValueSkew As Double = aDataGroup(0).Attributes.GetValue("Skew")
                 'lStr &= vbCrLf & "Station: " & lValueStaId & vbCrLf
                 lStr &= vbCrLf & "Mean: " & DoubleToString(lValueMean) & vbCrLf
                 lStr &= "Standard Deviation: " & DoubleToString(lValueStddev) & vbCrLf
@@ -48,11 +73,18 @@ Public Class clsGraphFrequency
                 End With
                 .Title.FontSpec.IsBold = False
                 '.Title.Text = "Percent Exceeded"
-                If pExceedance Then
-                    .Title.Text = "ANNUAL EXCEEDANCE PROBABILITY, PERCENT" ' & vbCrLf & "Station - " & aTimeseries.ToString()
+
+                If pStations.Count > 1 Then
+                    .Title.Text = lNdayStr & "-day " & lValueHL & " Flow " & pLogStr & " Pearson Type III Frequency"
                 Else
-                    .Title.Text = "ANNUAL NON-EXCEEDANCE PROBABILITY, PERCENT"
+                    If pExceedance Then
+                        .Title.Text = "ANNUAL EXCEEDANCE PROBABILITY, PERCENT"
+                    Else
+                        .Title.Text = "ANNUAL NON-EXCEEDANCE PROBABILITY, PERCENT"
+                    End If
+                    .Title.Text &= vbCrLf & "Station - " & lValueStaId & " - " & lValueStaNam
                 End If
+
                 .Scale.Format = "0.####"
                 .Scale.MaxAuto = False
                 .Scale.Min = 0.01
@@ -113,6 +145,7 @@ Public Class clsGraphFrequency
         End Get
         Set(ByVal aDataGroup As atcTimeseriesGroup)
             MyBase.Datasets = aDataGroup
+            GetDataInfo()
             Dim lCommonTimeUnit As Integer = aDataGroup.CommonAttributeValue("Time Unit", -1)
             Dim lCommonTimeStep As Integer = aDataGroup.CommonAttributeValue("Time Step", -1)
             Dim lCommonScenario As String = aDataGroup.CommonAttributeValue("Scenario", "")
@@ -169,9 +202,19 @@ Public Class clsGraphFrequency
         Dim lLoc As String = aTimeseries.Attributes.GetValue("location")
         Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
         Dim lCurveLabel As String = TSCurveLabel(aTimeseries, aCommonTimeUnitName, aCommonScenario, aCommonConstituent, aCommonLocation, aCommonUnits)
+        If lCurveLabel.StartsWith("YEARLY") Then
+            Dim lNDay As Integer = Integer.Parse(lCons.Substring(1))
+            Dim lHighLow As String = "Low"
+            If lCons.StartsWith("H") Then lHighLow = "High"
+            lCurveLabel = lNDay & "-day " & lHighLow & " Flow"
+            If pStations.Count > 1 Then
+                lCurveLabel = aTimeseries.Attributes.GetValue("STAID") & " " & lCurveLabel
+            End If
+        End If
+
         Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
 
-        lPane.YAxis.Title.Text = "FLOW, " & aTimeseries.Attributes.GetValue("Units", "CUBIC FEET PER SECOND")
+        lPane.YAxis.Title.Text = "FLOW CHARACTERISTIC, " & aTimeseries.Attributes.GetValue("Units", "CUBIC FEET PER SECOND")
 
         'check to see if this is an annual timseries
         If aTimeseries.Attributes.GetValue("Time Unit") <> atcTimeUnit.TUYear Then
@@ -215,9 +258,9 @@ Public Class clsGraphFrequency
                                    ByVal aNdays() As Double, _
                                    ByVal aMinX As Double, _
                                    ByVal aMaxX As Double)
+
         Dim pNdays As New SortedList
         Dim lNdays As String
-
         For Each lData As atcDataSet In pDataGroup
             For Each lAttribute As atcDefinedValue In lData.Attributes
                 If Not lAttribute.Arguments Is Nothing Then
@@ -236,6 +279,8 @@ Public Class clsGraphFrequency
         Dim lOneCurve As Boolean = (Datasets.Count = 1 AndAlso pNdays.Count = 1)
         Dim lCurve As ZedGraph.LineItem
         Dim lHigh As Boolean = True
+        Dim lCurveLegendPrefix As String = ""
+        Dim lCurveLegendSuffix As String = ""
         For Each lNdays In pNdays.Values
             lCurve = AddAttributeCurve(aTimeseries, aPane, aCurveColor, lNdays & "Low", "", Drawing2D.DashStyle.Solid, aMinX, aMaxX)
             If lCurve IsNot Nothing Then
@@ -266,8 +311,12 @@ Public Class clsGraphFrequency
                 Else
                     lHighLowWord = "Low"
                 End If
-                AddAttributeCurve(aTimeseries, aPane, lCIcolor, lNdays & lHighLowWord, " CI Upper", Drawing2D.DashStyle.Dash, aMinX, aMaxX)
-                AddAttributeCurve(aTimeseries, aPane, lCIcolor, lNdays & lHighLowWord, " CI Lower", Drawing2D.DashStyle.Dot, aMinX, aMaxX)
+
+                lCurveLegendPrefix = lNdays & lHighLowWord
+                lCurveLegendSuffix = " CI Upper"
+                AddAttributeCurve(aTimeseries, aPane, lCIcolor, lCurveLegendPrefix, lCurveLegendSuffix, Drawing2D.DashStyle.Dash, aMinX, aMaxX)
+                lCurveLegendSuffix = " CI Lower"
+                AddAttributeCurve(aTimeseries, aPane, lCIcolor, lCurveLegendPrefix, lCurveLegendSuffix, Drawing2D.DashStyle.Dot, aMinX, aMaxX)
             End If
         Next
     End Sub
@@ -394,6 +443,26 @@ Public Class clsGraphFrequency
                 lZedGraphPoints.Add(New ZedGraph.PointPair(lX, lPoint.Value, CStr(lPoint.Key)))
                 'End If
             Next
+            'Special cases
+            If aAttributeSuffix.Contains("CI Upper") Then
+                aAttributePrefix = "Upper"
+                aAttributeSuffix = " Confidence Limit"
+            ElseIf aAttributeSuffix.Contains("CI Lower") Then
+                aAttributePrefix = "Lower"
+                aAttributeSuffix = " Confidence Limit"
+            ElseIf IsNumeric(aAttributePrefix.Substring(0, 1)) AndAlso (aAttributePrefix.EndsWith("Low") Or aAttributePrefix.EndsWith("High")) Then
+                If pLogStr = "" Then
+                    aAttributePrefix = ""
+                Else
+                    aAttributePrefix = pLogStr & "-"
+                End If
+                aAttributeSuffix = "Pearson Type III Frequency"
+            End If
+
+            If pStations.Count > 1 Then
+                aAttributePrefix = aTimeseries.Attributes.GetValue("STAID") & " " & aAttributePrefix
+            End If
+
             Dim lCurve As LineItem = aPane.AddCurve(aAttributePrefix & aAttributeSuffix, lZedGraphPoints, aCurveColor, SymbolType.None)
             lCurve.Line.Style = aCurveStyle
             Return lCurve
@@ -401,5 +470,35 @@ Public Class clsGraphFrequency
             Return Nothing
         End If
     End Function
+
+    Private Sub GetDataInfo()
+        pNDays = New Generic.List(Of String)
+        For Each lAtt As atcDefinedValue In pDataGroup(0).Attributes
+            Dim lAttName As String = lAtt.Definition.Name.ToUpper
+            If lAttName.Contains("DAYTIMESERIES") Then
+                Dim lAttValue As String = lAtt.Value.ToString.Trim.ToUpper
+                If lAttValue.StartsWith("H") Then
+                    If Not pNDays.Contains(lAttValue) Then
+                        pNDays.Add(lAttValue)
+                    End If
+                ElseIf lAttValue.StartsWith("L") Then
+                    If Not pNDays.Contains(lAttValue) Then
+                        pNDays.Add(lAttValue)
+                    End If
+                End If
+            End If
+            If lAttName.StartsWith("NONLOG") Then
+                pLogStr = "Log"
+            End If
+        Next
+
+        pStations = New Generic.List(Of String)
+        For Each lTs As atcTimeseries In pDataGroup
+            Dim lStation As String = lTs.Attributes.GetValue("STAID").ToString.Trim()
+            If Not pStations.Contains(lStation) Then
+                pStations.Add(lStation)
+            End If
+        Next
+    End Sub
 
 End Class
