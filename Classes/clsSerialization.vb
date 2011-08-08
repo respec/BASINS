@@ -132,7 +132,7 @@ Public Class Serialization
         Catch
             Logger.Status("Failed to deserialize object: " + t.Name.ToString())
         End Try
-        Return False
+        Return Nothing
     End Function
 
 End Class
