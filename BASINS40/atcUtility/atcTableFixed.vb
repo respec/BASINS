@@ -233,7 +233,7 @@ ErrHand:
 
             For iRec As Integer = 1 To NumHeaderRows 'read header rows, ignore for now
                 lLineReader.MoveNext()
-                pHeaderLines.Add(lLineReader.Current)
+                pHeaderLines(iRec - 1) = lLineReader.Current
             Next
 
             pRecords = New Generic.List(Of String)
