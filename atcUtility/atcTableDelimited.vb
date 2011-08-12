@@ -177,6 +177,7 @@ ErrHand:
         ClearData()
         pHeaderLines.Clear()
         NumFields = 0
+        NumHeaderRows = 0
     End Sub
 
     Public Overrides Sub ClearData()

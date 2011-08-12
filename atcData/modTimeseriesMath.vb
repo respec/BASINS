@@ -1229,7 +1229,7 @@ Finished:
     ''' <param name="aACoef">'a' coefficient in regression line (y=ax+b)</param>
     ''' <param name="aBCoef">'b' coefficient in regression line (y=ax+b)</param>
     ''' <param name="aRSquare">'r squared', the coefficient of determination</param>
-    ''' <remarks>from fortran-newaqt-FITLIN</remarks>
+    ''' <remarks>from fortran-newaqt-FITLIN; x, y values can't be the same values</remarks>
     Public Sub FitLine(ByVal aTSerX As atcTimeseries, ByVal aTSerY As atcTimeseries, _
                        ByRef aACoef As Double, ByRef aBCoef As Double, ByRef aRSquare As Double)
         Dim lProblem As String = ""

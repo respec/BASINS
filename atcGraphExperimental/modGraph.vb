@@ -88,6 +88,7 @@ Public Module modGraph
     ''' <remarks></remarks>
     <CLSCompliant(False)> _
     Sub AddTimeseriesCurves(ByVal aDataGroup As atcTimeseriesGroup, ByVal aZgc As ZedGraphControl)
+        If aZgc.IsDisposed Then Exit Sub
         Dim lPaneMain As GraphPane = aZgc.MasterPane.PaneList(aZgc.MasterPane.PaneList.Count - 1)
         Dim lCommonTimeUnits As Integer = aDataGroup.CommonAttributeValue("Time Unit", -1)
         Dim lCommonTimeStep As Integer = aDataGroup.CommonAttributeValue("Time Step", -1)
