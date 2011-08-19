@@ -8,7 +8,7 @@ Imports ZedGraph
 Imports MapWinUtility
 Imports System
 
-Module GraphFEQ
+Module GraphGenScn
     Private pbasename As String
     Private Const pWorkingDirectory As String = "G:\"
     Private Const pTimeseries1Axis As String = "Aux"
@@ -98,7 +98,7 @@ Module GraphFEQ
                         ElseIf lOneLine.Trim = "1" Then
                             pApplyGraphSpec = True
                         Else
-                            pApplyGraphSpec = False
+                            pApplyGraphSpec = True 'default is to apply specs
                         End If
                     End If
                 Case "GRAPHWIDTH"
