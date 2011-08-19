@@ -143,30 +143,26 @@ Module FtnIO
         End If
     End Sub
 
-    Sub FtnUnfSeqWrStr(ByRef f As Object, ByRef l As Object, ByRef s As Object)
-        Dim b As Byte
-        Dim lc, ls As Integer
+    'Sub FtnUnfSeqWrStr(ByRef f As Object, ByRef l As Object, ByRef s As Object)
+    '    Dim b As Byte
+    '    Dim lc, ls As Integer
 
-        ls = Len(s)
+    '    ls = Len(s)
 
-        'UPGRADE_WARNING: Couldn't resolve default property of object l. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-        For lc = 1 To l
-            If lc > ls Then
-                b = &H20S 'pad with blank
-            Else
-                'UPGRADE_WARNING: Couldn't resolve default property of object s. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                b = Asc(Mid(s, lc, 1))
-            End If
-            'UPGRADE_WARNING: Couldn't resolve default property of object f. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-            'UPGRADE_WARNING: Put was upgraded to FilePut and has a new behavior. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="9B7D5ADD-D8FE-4819-A36C-6DEDAF088CC7"'
-            FilePut(f, b)
-        Next lc
-    End Sub
+    '    For lc = 1 To l
+    '        If lc > ls Then
+    '            b = &H20S 'pad with blank
+    '        Else
+    '            b = Asc(Mid(s, lc, 1))
+    '        End If
+    '        FilePut(f, b)
+    '    Next lc
+    'End Sub
 
     Public Function FtnUnFmtClean(ByRef b() As Byte) As Byte()
         Dim c() As Byte
         Dim iOu, l, iIn, i As Integer
-        Dim r As Object
+        Dim r As Integer
         Dim first As Boolean
 
         If b(0) = &HFDS Then 'this is a lahey unformatted byte stream
@@ -176,9 +172,7 @@ Module FtnIO
             iOu = 0
             first = True
             While iIn < l
-                'UPGRADE_WARNING: Couldn't resolve default property of object r. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
                 r = FtnUnfSeqRecLenMem(b, iIn, first)
-                'UPGRADE_WARNING: Couldn't resolve default property of object r. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
                 For i = 1 To r
                     c(iOu) = b(iIn)
                     iOu = iOu + 1
@@ -223,6 +217,6 @@ Module FtnIO
             Loop
         End If
         LastLen = RecLen - 1
-        FtnUnfSeqRecLenMem = RecLen - 1
+        Return RecLen - 1
     End Function
 End Module

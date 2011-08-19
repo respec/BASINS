@@ -17,8 +17,8 @@ Public Class atcTimeseriesFEQ
     Private pFilename As String
     Private pFileExt As String
     Private pErrorDescription As String
-    Private pMonitor As Object
-    Private pMonitorSet As Boolean
+    'Private pMonitor As Object
+    'Private pMonitorSet As Boolean
     Private pDates As atcTimeseries
     Private pDatesPopulated As Boolean
     Private XTIOFF As Integer
@@ -172,32 +172,32 @@ Public Class atcTimeseriesFEQ
         Dim ya As Single
         'Dim a!, t!, dt!, j!, k!, dk!, b!, db!, alp!, dalp!, qc!, ma!, dma!, mq!, dmq!
         Dim a() As Double
-        Dim t() As Double
-        Dim dt() As Double
-        Dim j() As Double
-        Dim k() As Double
-        Dim dk() As Double
-        Dim b() As Double
-        Dim db() As Double
-        Dim alp() As Double
-        Dim dalp() As Double
-        Dim qc() As Double
-        Dim ma() As Double
-        Dim dma() As Double
-        Dim mq() As Double
-        Dim dmq() As Double
+        Dim t(0) As Double
+        Dim dt(0) As Double
+        Dim j(0) As Double
+        Dim k(0) As Double
+        Dim dk(0) As Double
+        Dim b(0) As Double
+        Dim db(0) As Double
+        Dim alp(0) As Double
+        Dim dalp(0) As Double
+        Dim qc(0) As Double
+        Dim ma(0) As Double
+        Dim dma(0) As Double
+        Dim mq(0) As Double
+        Dim dmq(0) As Double
         Dim spos As Integer
         'Dim Ftab() As Single
         Dim LA, HA, Xoff As Integer
         'Dim flg&()
         Dim LocName, ConName As String
 
-        'If pMonitorSet Then pMonitor.SendMonitorMessage "(OPEN Filling FEO Data)(BUTTOFF CANCEL)(BUTTOFF PAUSE)"
+        'Logger.Dbg "(OPEN Filling FEO Data)(BUTTOFF CANCEL)(BUTTOFF PAUSE)"
 
         If UBound(pFileBytes) = 0 Then
             pErrorDescription = "FTF file not found: " & f.NameFtf
             'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage.
-            If pMonitorSet Then pMonitor.SendMonitorMessage("(MSG1 " & pErrorDescription & ")(CLOSE)")
+            Logger.Dbg("(MSG1 " & pErrorDescription & ")(CLOSE)")
             Exit Sub
         End If
 
@@ -205,7 +205,7 @@ Public Class atcTimeseriesFEQ
         ConName = lFillTS.Attributes.GetValue("Constituent")
         'ReDim v(f.TimCount)
         'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage.
-        If pMonitorSet Then pMonitor.SendMonitorMessage("(MSG1 Filling FEO Data for Node " & LocName & ", Constituent " & ConName & ")")
+        Logger.Dbg("(MSG1 Filling FEO Data for Node " & LocName & ", Constituent " & ConName & ")")
 
         'index = dataObject.Header.id                'FIXME -- Is this where the index should come from?
         lind = 0
@@ -214,7 +214,7 @@ Public Class atcTimeseriesFEQ
             If lind > UBound(f.LocDir) Then
                 MsgBox("Location '" & LocName & "' not found in FEO.", MsgBoxStyle.Critical, "FEQ Fill Timser")
                 'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage.
-                If pMonitorSet Then pMonitor.SendMonitorMessage("(CLOSE)")
+                Logger.Dbg("(CLOSE)")
                 Exit Sub
             End If
         End While
@@ -322,7 +322,7 @@ Public Class atcTimeseriesFEQ
             'dataObject.flags = flg
             lFillTS.Attributes.DiscardCalculated()
         End If
-        'If pMonitorSet Then pMonitor.SendMonitorMessage "(CLOSE)"
+        'Logger.Dbg "(CLOSE)"
     End Sub
 
     Private Sub FindSetTS(ByRef aLocation As String, ByRef aConstituent As String, ByRef setValues() As Double)
@@ -365,8 +365,9 @@ Public Class atcTimeseriesFEQ
     End Function
 
     Private Sub FtfRead()
-        Dim kb, u, l, i, j, kl, p As Integer
-        Dim s As String
+        Dim u, l, i, j As Integer
+        'Dim kb, kl, p As Integer
+        'Dim s As String
         'Dim ftfDumpFilename As String
         ReDim f.ftf(0)
 
@@ -442,17 +443,11 @@ Public Class atcTimeseriesFEQ
 
         On Error GoTo error_Renamed
 
-        If pMonitorSet Then
-            'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-            pMonitor.SendMonitorMessage("(OPEN FEO File)")
-            'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-            pMonitor.SendMonitorMessage("(BUTTOFF CANCEL)")
-            'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-            pMonitor.SendMonitorMessage("(BUTTOFF PAUSE)")
-            'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-            pMonitor.SendMonitorMessage("(MSG1 " & f.NameFeo & ")")
-        End If
-
+        Logger.Dbg("(OPEN FEO File)")
+        Logger.Dbg("(BUTTOFF CANCEL)")
+        Logger.Dbg("(BUTTOFF PAUSE)")
+        Logger.Dbg("(MSG1 " & f.NameFeo & ")")
+        
         progress = "i = FreeFile(0)"
         i = FreeFile()
         progress = "Open f.NameFeo For Input As #i"
@@ -510,16 +505,13 @@ Public Class atcTimeseriesFEQ
                     f.LeftItemCnt = CInt(Right(s, 8))
                     'UPGRADE_WARNING: Dir has a new behavior. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="9B7D5ADD-D8FE-4819-A36C-6DEDAF088CC7"'
                     If Len(Dir(f.NameFtf)) > 0 Then
-                        'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                        If pMonitorSet Then pMonitor.SendMonitorMessage("(MSG2 Loading FTF File)")
+                        Logger.Dbg("(MSG2 Loading FTF File)")
                         progress = "Loading FTF: " & f.NameFtf
                         pFileBytes = IO.File.ReadAllBytes(f.NameFtf)
-                        'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                        If pMonitorSet Then pMonitor.SendMonitorMessage("(MSG2 Cleaning FTF File - " & UBound(pFileBytes) & " bytes)")
+                        Logger.Dbg("(MSG2 Cleaning FTF File - " & UBound(pFileBytes) & " bytes)")
                         progress = "FtnUnFmtClean"
                         pFileBytes = FtnUnFmtClean(pFileBytes)
-                        'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                        If pMonitorSet Then pMonitor.SendMonitorMessage("(MSG2 Scanning FTF File)")
+                        Logger.Dbg("(MSG2 Scanning FTF File)")
                         progress = "FtfRead"
                         FtfRead()
                     Else
@@ -529,7 +521,6 @@ Public Class atcTimeseriesFEQ
                     'Call F90_FILTAB(f.NameFtf, f.NumbFullRec, f.ItemPerRec, f.LeftItemCnt, Len(f.NameFtf))
                     '****^^^^^^^^^^***********
                 Case "-TSDDIR"
-                    'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
                     Logger.Status("Reading Node Information in FEO TSDDIR")
                     s = LineInput(i) 'First line of column labels
                     s = LineInput(i) 'Second line of labels
@@ -603,8 +594,7 @@ Public Class atcTimeseriesFEQ
                     f.LocCount = UBound(f.LocDir)
 
                 Case "-TSD"
-                    'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                    If pMonitorSet Then pMonitor.SendMonitorMessage("(MSG2 Reading Date Information in FEO TSD)")
+                    Logger.Dbg("(MSG2 Reading Date Information in FEO TSD)")
                     s = LineInput(i) 'LOCATION_KNT=
                     s = Trim(Mid(s, 14, 8))
                     If IsNumeric(s) Then
@@ -619,18 +609,16 @@ Public Class atcTimeseriesFEQ
                     s = LineInput(i) 'End time values
                     EJDay = CDbl(Mid(s, 23, 15))
                     NVALS = CInt(Mid(s, 40, 10))
-                    If pMonitorSet Then
-                        'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                        pMonitor.SendMonitorMessage("(MSG2 Start Day = " & DumpDate((SJDay)) & " End = " & DumpDate((EJDay)) & " NVALS = " & NVALS & ")")
-                    End If
+                    Logger.Dbg("(MSG2 Start Day = " & DumpDate((SJDay)) & " End = " & DumpDate((EJDay)) & " NVALS = " & NVALS & ")")
+
                 Case "-TERMINATION" : f.Term = LineInput(i)
                 Case Else
-                    If pMonitorSet Then pMonitor.SendMonitorMessage("(MSG2 Skipping line " & s & ")")
+                    Logger.Dbg("(MSG2 Skipping line " & s & ")")
             End Select
         Loop
         FileClose(i)
         'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-        If pMonitorSet Then pMonitor.SendMonitorMessage("(MSG2 Creating Dates)")
+        Logger.Dbg("(MSG2 Creating Dates)")
         f.RecLen = (f.LocCount + 1) * 8
 
         'Need to re-jigger if he has fixed FEQ to not save bogus zero element of array
@@ -646,7 +634,7 @@ Public Class atcTimeseriesFEQ
         If Len(Dir(f.NameTsd)) = 0 Then
             pErrorDescription = "Could not find TSD file " & f.NameTsd
             'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-            If pMonitorSet Then pMonitor.SendMonitorMessage("(MSG2 " & pErrorDescription & ")")
+            Logger.Dbg("(MSG2 " & pErrorDescription & ")")
             Exit Sub
         End If
 
@@ -693,7 +681,7 @@ Public Class atcTimeseriesFEQ
         pDatesPopulated = True
 
         'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-        If pMonitorSet Then pMonitor.SendMonitorMessage("(MSG2 Creating Datsets)")
+        Logger.Dbg("(MSG2 Creating Datsets)")
         For j = 0 To f.LocCount - 1
             For i = 1 To f.LocDir(j).Constit.Count()
                 'UPGRADE_NOTE: Object lData may not be destroyed until it is garbage collected. Click for more: 'ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?keyword="6E35BFF6-CD74-4B09-9689-3E1A43DF8969"'
