@@ -1203,13 +1203,15 @@ Public Class atcGrid
                     'this row is not currently displayed, have to scroll 
                     pRowsScrolled -= 1
                     VScroller.Value = pRowsScrolled
+                    Refresh()
                 End If
                 MoveToCell(pCurrentRow - 1, pCurrentColumn)
             Case Keys.Down
-                If Not pRowBottom.Keys.Contains(pCurrentRow + 1) Then
+                If Not pRowBottom.Keys.Contains(pCurrentRow + 1) And pCurrentRow + 1 < pSource.Rows Then
                     'this row is not currently displayed, have to scroll 
                     pRowsScrolled += 1
                     VScroller.Value = pRowsScrolled
+                    Refresh()
                 End If
                 MoveToCell(pCurrentRow + 1, pCurrentColumn)
             Case Keys.Right
