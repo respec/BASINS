@@ -908,6 +908,9 @@ Public Class atcGrid
 
         If pRowBottom.Keys.Contains(aRow - 1) Then
             lY = pRowBottom.ItemByKey(aRow - 1)
+        Else
+            'if that key does not exist, it may be scrolled off the top, try the next one down
+            lY = pRowBottom.ItemByKey(aRow) - RowHeight(aRow)
         End If
 
         If pColumnRight.Keys.Contains(aColumn - 1) Then
@@ -1195,8 +1198,20 @@ Public Class atcGrid
             Case Keys.Escape : CellEditBox.Visible = False : EditCellFinished()
             Case Keys.Enter : EditCellFinished()
             Case Keys.Tab : MoveToCell(pCurrentRow, pCurrentColumn + 1)
-            Case Keys.Up : MoveToCell(pCurrentRow - 1, pCurrentColumn)
-            Case Keys.Down : MoveToCell(pCurrentRow + 1, pCurrentColumn)
+            Case Keys.Up
+                If Not pRowBottom.Keys.Contains(pCurrentRow - 1) Then
+                    'this row is not currently displayed, have to scroll 
+                    pRowsScrolled -= 1
+                    VScroller.Value = pRowsScrolled
+                End If
+                MoveToCell(pCurrentRow - 1, pCurrentColumn)
+            Case Keys.Down
+                If Not pRowBottom.Keys.Contains(pCurrentRow + 1) Then
+                    'this row is not currently displayed, have to scroll 
+                    pRowsScrolled += 1
+                    VScroller.Value = pRowsScrolled
+                End If
+                MoveToCell(pCurrentRow + 1, pCurrentColumn)
             Case Keys.Right
                 If CellEditBox.SelectionStart = CellEditBox.TextLength Then
                     MoveToCell(pCurrentRow, pCurrentColumn + 1)
