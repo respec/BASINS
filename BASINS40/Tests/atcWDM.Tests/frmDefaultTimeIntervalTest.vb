@@ -94,14 +94,6 @@ Public Class frmDefaultTimeIntervalTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>Test __ENCAddToList</summary>
-    <TestMethod(), DeploymentItem("atcWDM.dll")> _
-    Public Sub __ENCAddToListTest()
-        Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
-        frmDefaultTimeInterval_Accessor.__ENCAddToList(value)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
-    End Sub
-
     '''<summary>Test btnAll_Click</summary>
     <TestMethod(), DeploymentItem("atcWDM.dll")> _
     Public Sub btnAll_ClickTest()

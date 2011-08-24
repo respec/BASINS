@@ -84,14 +84,6 @@ Public Class frmSaveDataTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>Test __ENCAddToList</summary>
-    <TestMethod(), DeploymentItem("atcData.dll")> _
-    Public Sub __ENCAddToListTest()
-        Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
-        frmSaveData_Accessor.__ENCAddToList(value)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
-    End Sub
-
     '''<summary>Test lstDataSources_DoubleClick</summary>
     <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub lstDataSources_DoubleClickTest()

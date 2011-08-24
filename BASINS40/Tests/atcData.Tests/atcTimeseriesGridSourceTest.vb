@@ -114,14 +114,6 @@ Public Class atcTimeseriesGridSourceTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>Test __ENCAddToList</summary>
-    <TestMethod(), DeploymentItem("atcData.dll")> _
-    Public Sub __ENCAddToListTest()
-        Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
-        atcTimeseriesGridSource_Accessor.__ENCAddToList(value)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
-    End Sub
-
     '''<summary>Test pDataGroup_Added</summary>
     <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub pDataGroup_AddedTest()

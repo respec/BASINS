@@ -520,14 +520,6 @@ Public Class atcGridTest
         Assert.Inconclusive("Verify the correctness of this test method.")
     End Sub
 
-    '''<summary>Test __ENCAddToList</summary>
-    <TestMethod(), DeploymentItem("atcControls.dll")> _
-    Public Sub __ENCAddToListTest()
-        Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
-        atcGrid_Accessor.__ENCAddToList(value)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
-    End Sub
-
     '''<summary>Test atcGrid_KeyDown</summary>
     <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub atcGrid_KeyDownTest()

@@ -135,14 +135,6 @@ Public Class frmSpecifySeasonalAttributesTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>Test __ENCAddToList</summary>
-    <TestMethod(), DeploymentItem("atcData.dll")> _
-    Public Sub __ENCAddToListTest()
-        Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
-        frmSpecifySeasonalAttributes_Accessor.__ENCAddToList(value)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
-    End Sub
-
     '''<summary>Test btnAttributesAll_Click</summary>
     <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub btnAttributesAll_ClickTest()

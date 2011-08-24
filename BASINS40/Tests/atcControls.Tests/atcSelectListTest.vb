@@ -54,7 +54,7 @@ Public Class atcSelectListTest
     '''<summary>Test atcSelectList Constructor</summary>
     <TestMethod()> Public Sub atcSelectListConstructorTest()
         Dim target As atcSelectList = New atcSelectList()
-        Assert.Inconclusive("TODO: Implement code to verify target")
+        Assert.IsNotNull(target)
     End Sub
 
     '''<summary>Test AskUser</summary>
@@ -91,14 +91,6 @@ Public Class atcSelectListTest
     Public Sub InitializeComponentTest()
         Dim target As atcSelectList_Accessor = New atcSelectList_Accessor() ' TODO: Initialize to an appropriate value
         target.InitializeComponent()
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
-    End Sub
-
-    '''<summary>Test __ENCAddToList</summary>
-    <TestMethod(), DeploymentItem("atcControls.dll")> _
-    Public Sub __ENCAddToListTest()
-        Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
-        atcSelectList_Accessor.__ENCAddToList(value)
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 

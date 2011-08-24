@@ -99,14 +99,6 @@ Public Class atcManagedListTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>Test __ENCAddToList</summary>
-    <TestMethod(), DeploymentItem("atcControls.dll")> _
-    Public Sub __ENCAddToListTest()
-        Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
-        atcManagedList_Accessor.__ENCAddToList(value)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
-    End Sub
-
     '''<summary>Test atcManagedList_Disposed</summary>
     <TestMethod(), DeploymentItem("atcControls.dll")> _
     Public Sub atcManagedList_DisposedTest()

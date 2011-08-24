@@ -95,14 +95,6 @@ Public Class frmSpecifyYearSubsetTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>Test __ENCAddToList</summary>
-    <TestMethod(), DeploymentItem("atcData.dll")> _
-    Public Sub __ENCAddToListTest()
-        Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
-        frmSpecifyYearSubset_Accessor.__ENCAddToList(value)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
-    End Sub
-
     '''<summary>Test btnOk_Click</summary>
     <TestMethod(), DeploymentItem("atcData.dll")> _
     Public Sub btnOk_ClickTest()
