@@ -368,8 +368,10 @@ Public Class atcFrequencyGridSource
         Dim lExpTabFieldNames7() As String = Nothing
         Dim lStrTemp As String = ""
         If aExpFmt Then 'if for export, then set up the tab-delimited table
-            lExpTabFieldNames15 = {"Identifier", "Parameter", "SeasBg", "SeaDBg", "SeasNd", "SeaDNd", "BegYear", "EndYear", "NumZro", "NonZro", "NumNeg", "Ldist", "Mean", "Stdev", "Skw"}
-            lExpTabFieldNames7 = {"Recur", "Exceed", "1-Day High", "K-Value", "Variance", "CL_Low", "CL_Up"}
+            Dim l15 As String() = {"Identifier", "Parameter", "SeasBg", "SeaDBg", "SeasNd", "SeaDNd", "BegYear", "EndYear", "NumZro", "NonZro", "NumNeg", "Ldist", "Mean", "Stdev", "Skw"}
+            Dim l7 As String() = {"Recur", "Exceed", "1-Day High", "K-Value", "Variance", "CL_Low", "CL_Up"}
+            lExpTabFieldNames15 = l15
+            lExpTabFieldNames7 = l7
             If pHigh Then
                 lExpTabFieldNames7(1) = "Exceed"
             Else
