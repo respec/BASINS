@@ -539,29 +539,4 @@ Public Class modFileTest
         Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
-    '''<summary>Test _controlfp</summary>
-    <TestMethod()> Public Sub _controlfpTest()
-        Dim newControl As UInteger = 0 ' TODO: Initialize to an appropriate value
-        Dim mask As UInteger = 0 ' TODO: Initialize to an appropriate value
-        Dim expected As UInteger = 0 ' TODO: Initialize to an appropriate value
-        Dim actual As UInteger
-        actual = modFile._controlfp(newControl, mask)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
-    End Sub
-
-    '''<summary>Test _fpreset</summary>
-    <TestMethod()> Public Sub _fpresetTest()
-        modFile._fpreset()
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
-    End Sub
-
-    '''<summary>Test _statusfp</summary>
-    <TestMethod()> Public Sub _statusfpTest()
-        Dim expected As UInteger = 0 ' TODO: Initialize to an appropriate value
-        Dim actual As UInteger
-        actual = modFile._statusfp
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
-    End Sub
 End Class

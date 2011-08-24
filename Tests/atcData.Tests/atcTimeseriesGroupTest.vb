@@ -138,14 +138,6 @@ Public Class atcTimeseriesGroupTest
         Assert.AreEqual(3, actual(1).Attributes.GetValue("ID"))
     End Sub
 
-    '''<summary>Test __ENCAddToList</summary>
-    <TestMethod(), DeploymentItem("atcData.dll")> _
-    Public Sub __ENCAddToListTest()
-        Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
-        atcTimeseriesGroup_Accessor.__ENCAddToList(value)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
-    End Sub
-
     '''<summary>Test Item</summary>
     <TestMethod()> Public Sub ItemTest()
         Dim lTs1 As New atcTimeseries(Nothing)

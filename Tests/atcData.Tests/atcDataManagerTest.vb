@@ -368,14 +368,6 @@ Public Class atcDataManagerTest
         End Try
     End Sub
 
-    '''<summary>Test __ENCAddToList</summary>
-    <TestMethod(), DeploymentItem("atcData.dll")> _
-    Public Sub __ENCAddToListTest()
-        Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
-        atcDataManager_Accessor.__ENCAddToList(value)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
-    End Sub
-
     '''<summary>Test DataSources</summary>
     <TestMethod()> Public Sub DataSourcesTest()
         atcDataManager.Clear()

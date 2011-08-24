@@ -60,13 +60,8 @@ Public Class atcConnectFieldsTest
     '''<summary>Test AddConnection</summary>
     <TestMethod()> Public Sub AddConnectionTest()
         Dim target As atcConnectFields = New atcConnectFields() ' TODO: Initialize to an appropriate value
-        Dim aConnectionString As String = String.Empty ' TODO: Initialize to an appropriate value
-        Dim aQuiet As Boolean = False ' TODO: Initialize to an appropriate value
-        Dim expected As Boolean = False ' TODO: Initialize to an appropriate value
-        Dim actual As Boolean
-        actual = target.AddConnection(aConnectionString, aQuiet)
-        Assert.AreEqual(expected, actual)
-        Assert.Inconclusive("Verify the correctness of this test method.")
+        Assert.IsFalse(target.AddConnection("a b c", True))
+        'TODO: Assert.IsTrue( add a connection that works
     End Sub
 
     '''<summary>Test Connections</summary>
@@ -105,14 +100,6 @@ Public Class atcConnectFieldsTest
         actual = target.LoadConnections(aFileName)
         Assert.AreEqual(expected, actual)
         Assert.Inconclusive("Verify the correctness of this test method.")
-    End Sub
-
-    '''<summary>Test __ENCAddToList</summary>
-    <TestMethod(), DeploymentItem("atcControls.dll")> _
-    Public Sub __ENCAddToListTest()
-        Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
-        atcConnectFields_Accessor.__ENCAddToList(value)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
     End Sub
 
     '''<summary>Test atcConnectFields_Resize</summary>

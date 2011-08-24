@@ -402,14 +402,6 @@ Public Class atcDataGroupTest
         Assert.AreEqual(lStr, lResult)
      End Sub
 
-    '''<summary>Test __ENCAddToList</summary>
-    <TestMethod(), DeploymentItem("atcData.dll")> _
-    Public Sub __ENCAddToListTest()
-        Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
-        atcDataGroup_Accessor.__ENCAddToList(value)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
-    End Sub
-
     '''<summary>Test Item</summary>
     <TestMethod()> Public Sub ItemTest()
         Dim lDataSet As atcDataSet = New atcDataSet

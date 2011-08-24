@@ -56,14 +56,6 @@ Public Class atcGridSourceRowColumnSwapperTest
         Assert.Inconclusive("TODO: Implement code to verify target")
     End Sub
 
-    '''<summary>Test __ENCAddToList</summary>
-    <TestMethod(), DeploymentItem("atcControls.dll")> _
-    Public Sub __ENCAddToListTest()
-        Dim value As Object = Nothing ' TODO: Initialize to an appropriate value
-        atcGridSourceRowColumnSwapper_Accessor.__ENCAddToList(value)
-        Assert.Inconclusive("A method that does not return a value cannot be verified.")
-    End Sub
-
     '''<summary>Test Alignment</summary>
     <TestMethod()> Public Sub AlignmentTest()
         Dim aSource As atcGridSource = Nothing ' TODO: Initialize to an appropriate value
