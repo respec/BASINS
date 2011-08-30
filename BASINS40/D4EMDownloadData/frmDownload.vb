@@ -344,9 +344,9 @@ Public Class frmDownload
                                                               lChild.Text & " Processing Options")
                                 End If
                                 If lChild Is chkNWIS_GetNWISIdaDischarge Then
-                                    Dim lWDMfrm As New frmWDM
-                                    lWDMxml = lWDMfrm.AskUser(Me.Icon, "Flow", IO.Path.Combine(lSaveFolderOnly, "nwis"), _
-                                                              lChild.Text & " Processing Options")
+                                    'Dim lWDMfrm As New frmWDM    'don't add to wdm, just add rdb file to project
+                                    'lWDMxml = lWDMfrm.AskUser(Me.Icon, "Flow", IO.Path.Combine(lSaveFolderOnly, "nwis"), _
+                                    '                          lChild.Text & " Processing Options")
                                 End If
                                 If lChild Is chkNLDAS_GetNLDASParameter Then
                                     Dim lWDMfrm As New frmWDM

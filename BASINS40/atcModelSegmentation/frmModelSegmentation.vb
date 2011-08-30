@@ -151,108 +151,113 @@ Friend Class frmModelSegmentation
             Exit Sub
         End If
 
-        'build local collection of selected features in met station layer
-        Dim lMetStationsSelected As New atcCollection
-        If cbxUseSelected.Checked Then
-            For lIndex As Integer = 1 To GisUtil.NumSelectedFeatures(lMetLayerIndex)
-                lMetStationsSelected.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex - 1, lMetLayerIndex))
-            Next
-        End If
-        If lMetStationsSelected.Count = 0 Then
-            'no met stations selected, act as if all are selected
-            For lIndex As Integer = 1 To GisUtil.NumFeatures(lMetLayerIndex)
-                lMetStationsSelected.Add(lIndex - 1)
-            Next
-        End If
-
-        'copy the input points to a temp file because the dot spatial function insists the points not be on the map
-        TryCopyShapefile(lMetLayerFileName, lTempPath)
-        Dim lTempPointFileName As String = IO.Path.Combine(lTempPath, IO.Path.GetFileName(lMetLayerFileName))
-
-        'open the points into a dot spatial feature set
-        Dim lPoints As DotSpatial.Data.IFeatureSet = New DotSpatial.Data.PointShapefile(lTempPointFileName)
-
-        'because of a strange feature of the dot spatial voronoi algorithm, need scaled-down points
-        Dim lScaledDownPoints As DotSpatial.Data.IFeatureSet = New DotSpatial.Data.FeatureSet()
-        Dim lScaleFactor As Integer = 100000
-        For Each lFeatureIndex As Integer In lMetStationsSelected
-            Dim lFeature As DotSpatial.Data.Feature = lPoints.Features(lFeatureIndex)
-            Dim lX As Double = lFeature.Coordinates(0).X / lScaleFactor
-            Dim lY As Double = lFeature.Coordinates(0).Y / lScaleFactor
-            Dim lPt As New DotSpatial.Geometries.Point(lX, lY)
-            Dim lNewFeature As New DotSpatial.Data.Feature(lPt)
-            lScaledDownPoints.AddFeature(lNewFeature)
-        Next
-
-        'calculate the thiessen polygons
-        Dim lScaledDownPolygons As DotSpatial.Data.IFeatureSet = DotSpatial.Analysis.Voronoi.VoronoiPolygons(lScaledDownPoints, True, Nothing)
-
-        'save the scaled down thiessen polygons
-        'Dim lScaledDownOutputFile As String = IO.Path.GetDirectoryName(lMetLayerFileName) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lMetLayerFileName) & "ScaledDownThiessens.shp"
-        'lScaledDownPolygons.SaveAs(lScaledDownOutputFile, True)
-        'TryCopy(IO.Path.GetDirectoryName(lMetLayerFileName) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lMetLayerFileName) & ".prj", _
-        '        IO.Path.GetDirectoryName(lScaledDownOutputFile) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lScaledDownOutputFile) & ".prj")
-        'GisUtil.AddLayer(lScaledDownOutputFile, "Scaled Down Thiessen Polygons")
-
-        'find max coordinate of scaled down version to use in upscaling
-        Dim lMaxCoordinate As Double = Math.Abs(lScaledDownPolygons.Envelope.Maximum.Y)
-        If Math.Abs(lScaledDownPolygons.Envelope.Maximum.X) > lMaxCoordinate Then
-            lMaxCoordinate = Math.Abs(lScaledDownPolygons.Envelope.Maximum.X)
-        End If
-        If Math.Abs(lScaledDownPolygons.Envelope.Minimum.Y) > lMaxCoordinate Then
-            lMaxCoordinate = Math.Abs(lScaledDownPolygons.Envelope.Minimum.Y)
-        End If
-        If Math.Abs(lScaledDownPolygons.Envelope.Minimum.X) > lMaxCoordinate Then
-            lMaxCoordinate = Math.Abs(lScaledDownPolygons.Envelope.Minimum.X)
-        End If
-
-        'now scale the polygons back up
-        Dim lFullSizePolygons As DotSpatial.Data.IFeatureSet = New DotSpatial.Data.FeatureSet()
-        lFullSizePolygons = lScaledDownPolygons
-        For Each lFeature As DotSpatial.Data.Feature In lFullSizePolygons.Features
-            For Each lCoordinate As DotSpatial.Geometries.Coordinate In lFeature.Coordinates
-                If Math.Abs(lCoordinate.X) <= lMaxCoordinate Then  'have to check to see if we've already scaled this point
-                    lCoordinate.X = lCoordinate.X * lScaleFactor
-                End If
-                If Math.Abs(lCoordinate.Y) <= lMaxCoordinate Then
-                    lCoordinate.Y = lCoordinate.Y * lScaleFactor
-                End If
-            Next
-        Next
-
-        If lFullSizePolygons.Features.Count > 0 Then
-            'save the thiessen polygons
-            Dim lOutputFile As String = IO.Path.GetDirectoryName(lMetLayerFileName) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lMetLayerFileName) & "Thiessens.shp"
-            If GisUtil.IsLayerByFileName(lOutputFile) Then
-                Dim lOutputLayerIndex As Integer = GisUtil.LayerIndex(lOutputFile)
-                GisUtil.RemoveLayer(lOutputLayerIndex)
+        Try
+            'build local collection of selected features in met station layer
+            Dim lMetStationsSelected As New atcCollection
+            If cbxUseSelected.Checked Then
+                For lIndex As Integer = 1 To GisUtil.NumSelectedFeatures(lMetLayerIndex)
+                    lMetStationsSelected.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(lIndex - 1, lMetLayerIndex))
+                Next
             End If
-            lFullSizePolygons.SaveAs(lOutputFile, True)
-            TryCopy(IO.Path.GetDirectoryName(lMetLayerFileName) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lMetLayerFileName) & ".prj", _
-                    IO.Path.GetDirectoryName(lOutputFile) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lOutputFile) & ".prj")
+            If lMetStationsSelected.Count = 0 Then
+                'no met stations selected, act as if all are selected
+                For lIndex As Integer = 1 To GisUtil.NumFeatures(lMetLayerIndex)
+                    lMetStationsSelected.Add(lIndex - 1)
+                Next
+            End If
 
-            'now add them to the map
-            Dim lNewLayerName As String = "Thiessen Polygons for " & lMetLayerName
-            lMetLayerIndex = GisUtil.LayerIndex(lMetLayerName)
-            Dim lGroup As String = GisUtil.LayerGroup(lMetLayerIndex)
-            GisUtil.AddLayerToGroup(lOutputFile, lNewLayerName, lGroup)
-            GisUtil.LayerVisible(lNewLayerName) = True
+            'copy the input points to a temp file because the dot spatial function insists the points not be on the map
+            TryCopyShapefile(lMetLayerFileName, lTempPath)
+            Dim lTempPointFileName As String = IO.Path.Combine(lTempPath, IO.Path.GetFileName(lMetLayerFileName))
 
-            'add associated attributes from points to thiessen polygons
-            Dim lThiessenLayerIndex As Integer = GisUtil.LayerIndex(lNewLayerName)
-            lMetLayerIndex = GisUtil.LayerIndex(lMetLayerName)
-            GisUtil.StartSetFeatureValue(lThiessenLayerIndex)
-            Dim lTargetFeatureIndex As Integer = -1
+            'open the points into a dot spatial feature set
+            Dim lPoints As DotSpatial.Data.IFeatureSet = New DotSpatial.Data.PointShapefile(lTempPointFileName)
+
+            'because of a strange feature of the dot spatial voronoi algorithm, need scaled-down points
+            Dim lScaledDownPoints As DotSpatial.Data.IFeatureSet = New DotSpatial.Data.FeatureSet()
+            Dim lScaleFactor As Integer = 100000
             For Each lFeatureIndex As Integer In lMetStationsSelected
-                lTargetFeatureIndex += 1
-                GisUtil.CopyAllAttributes(lMetLayerIndex, lFeatureIndex, lThiessenLayerIndex, lTargetFeatureIndex)
+                Dim lFeature As DotSpatial.Data.Feature = lPoints.Features(lFeatureIndex)
+                Dim lX As Double = lFeature.Coordinates(0).X / lScaleFactor
+                Dim lY As Double = lFeature.Coordinates(0).Y / lScaleFactor
+                Dim lPt As New DotSpatial.Geometries.Point(lX, lY)
+                Dim lNewFeature As New DotSpatial.Data.Feature(lPt)
+                lScaledDownPoints.AddFeature(lNewFeature)
             Next
-            GisUtil.StopSetFeatureValue(lThiessenLayerIndex)
-        Else
-            Logger.Msg("Problem producing Thiessen polygons for layer '" & lMetLayerName & "'.", MsgBoxStyle.Critical, "Thiessen Problem")
-        End If
 
-        TryDeleteShapefile(lTempPointFileName)
+            'calculate the thiessen polygons
+            Dim lScaledDownPolygons As DotSpatial.Data.IFeatureSet = DotSpatial.Analysis.Voronoi.VoronoiPolygons(lScaledDownPoints, True, Nothing)
+
+            'save the scaled down thiessen polygons
+            'Dim lScaledDownOutputFile As String = IO.Path.GetDirectoryName(lMetLayerFileName) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lMetLayerFileName) & "ScaledDownThiessens.shp"
+            'lScaledDownPolygons.SaveAs(lScaledDownOutputFile, True)
+            'TryCopy(IO.Path.GetDirectoryName(lMetLayerFileName) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lMetLayerFileName) & ".prj", _
+            '        IO.Path.GetDirectoryName(lScaledDownOutputFile) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lScaledDownOutputFile) & ".prj")
+            'GisUtil.AddLayer(lScaledDownOutputFile, "Scaled Down Thiessen Polygons")
+
+            'find max coordinate of scaled down version to use in upscaling
+            Dim lMaxCoordinate As Double = Math.Abs(lScaledDownPolygons.Envelope.Maximum.Y)
+            If Math.Abs(lScaledDownPolygons.Envelope.Maximum.X) > lMaxCoordinate Then
+                lMaxCoordinate = Math.Abs(lScaledDownPolygons.Envelope.Maximum.X)
+            End If
+            If Math.Abs(lScaledDownPolygons.Envelope.Minimum.Y) > lMaxCoordinate Then
+                lMaxCoordinate = Math.Abs(lScaledDownPolygons.Envelope.Minimum.Y)
+            End If
+            If Math.Abs(lScaledDownPolygons.Envelope.Minimum.X) > lMaxCoordinate Then
+                lMaxCoordinate = Math.Abs(lScaledDownPolygons.Envelope.Minimum.X)
+            End If
+
+            'now scale the polygons back up
+            Dim lFullSizePolygons As DotSpatial.Data.IFeatureSet = New DotSpatial.Data.FeatureSet()
+            lFullSizePolygons = lScaledDownPolygons
+            For Each lFeature As DotSpatial.Data.Feature In lFullSizePolygons.Features
+                For Each lCoordinate As DotSpatial.Geometries.Coordinate In lFeature.Coordinates
+                    If Math.Abs(lCoordinate.X) <= lMaxCoordinate Then  'have to check to see if we've already scaled this point
+                        lCoordinate.X = lCoordinate.X * lScaleFactor
+                    End If
+                    If Math.Abs(lCoordinate.Y) <= lMaxCoordinate Then
+                        lCoordinate.Y = lCoordinate.Y * lScaleFactor
+                    End If
+                Next
+            Next
+
+            If lFullSizePolygons.Features.Count > 0 Then
+                'save the thiessen polygons
+                Dim lOutputFile As String = IO.Path.GetDirectoryName(lMetLayerFileName) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lMetLayerFileName) & "Thiessens.shp"
+                If GisUtil.IsLayerByFileName(lOutputFile) Then
+                    Dim lOutputLayerIndex As Integer = GisUtil.LayerIndex(lOutputFile)
+                    GisUtil.RemoveLayer(lOutputLayerIndex)
+                End If
+                lFullSizePolygons.SaveAs(lOutputFile, True)
+                TryCopy(IO.Path.GetDirectoryName(lMetLayerFileName) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lMetLayerFileName) & ".prj", _
+                        IO.Path.GetDirectoryName(lOutputFile) & g_PathChar & IO.Path.GetFileNameWithoutExtension(lOutputFile) & ".prj")
+
+                'now add them to the map
+                Dim lNewLayerName As String = "Thiessen Polygons for " & lMetLayerName
+                lMetLayerIndex = GisUtil.LayerIndex(lMetLayerName)
+                Dim lGroup As String = GisUtil.LayerGroup(lMetLayerIndex)
+                GisUtil.AddLayerToGroup(lOutputFile, lNewLayerName, lGroup)
+                GisUtil.LayerVisible(lNewLayerName) = True
+
+                'add associated attributes from points to thiessen polygons
+                Dim lThiessenLayerIndex As Integer = GisUtil.LayerIndex(lNewLayerName)
+                lMetLayerIndex = GisUtil.LayerIndex(lMetLayerName)
+                GisUtil.StartSetFeatureValue(lThiessenLayerIndex)
+                Dim lTargetFeatureIndex As Integer = -1
+                For Each lFeatureIndex As Integer In lMetStationsSelected
+                    lTargetFeatureIndex += 1
+                    GisUtil.CopyAllAttributes(lMetLayerIndex, lFeatureIndex, lThiessenLayerIndex, lTargetFeatureIndex)
+                Next
+                GisUtil.StopSetFeatureValue(lThiessenLayerIndex)
+            Else
+                Logger.Msg("Problem producing Thiessen polygons for layer '" & lMetLayerName & "'.", MsgBoxStyle.Critical, "Thiessen Problem")
+            End If
+
+            TryDeleteShapefile(lTempPointFileName)
+        Catch lEx As Exception
+            Dim lMsg As String = "Problem producing Thiessen polygons for layer '" & lMetLayerName & "'." & vbCrLf & vbCrLf & " Exception " & lEx.ToString
+            Logger.Msg(lMsg, MsgBoxStyle.Critical, "Thiessen Problem")
+        End Try
     End Sub
 
     Public Sub Progress(ByVal Key As String, ByVal Percent As Integer, ByVal Message As String) Implements DotSpatial.Main.IProgressHandler.Progress
