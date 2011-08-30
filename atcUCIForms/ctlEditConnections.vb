@@ -495,6 +495,14 @@ Public Class ctlEditConnections
 
             End With
 
+            If Not grdEdit.Source Is Nothing Then
+                grdEdit.SizeAllColumnsToContents(grdEdit.Width - pVScrollColumnOffset, True)
+                grdEdit.ColumnWidth(grdEdit.Source.Columns - 1) = 0   'make last column, comment, not visible
+                For lCol As Integer = 0 To grdEdit.Source.Columns - 2
+                    grdEdit.SizeColumnToString(lCol, grdEdit.Source.CellValue(0, lCol))
+                Next
+            End If
+
             grdEdit.Refresh()
 
         End Set
@@ -783,5 +791,15 @@ Public Class ctlEditConnections
 
         pConnectionType = aTag
         Data = aHspfConnection
+    End Sub
+
+    Private Sub ctlEditConnections_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
+        If Not grdEdit.Source Is Nothing Then
+            grdEdit.SizeAllColumnsToContents(grdEdit.Width - pVScrollColumnOffset, True)
+            grdEdit.ColumnWidth(grdEdit.Source.Columns - 1) = 0   'make last column, comment, not visible
+            For lCol As Integer = 0 To grdEdit.Source.Columns - 2
+                grdEdit.SizeColumnToString(lCol, grdEdit.Source.CellValue(0, lCol))
+            Next
+        End If
     End Sub
 End Class
