@@ -15,6 +15,7 @@ Friend Class frmDisplayFrequencyGrid
     Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper
     Private pNday() As Double
     Friend WithEvents mnuFileExportResults As System.Windows.Forms.MenuItem
+    Friend WithEvents lblNote As System.Windows.Forms.Label
     Private pReturns() As Double
 
 #Region " Windows Form Designer generated code "
@@ -80,27 +81,28 @@ Friend Class frmDisplayFrequencyGrid
     Friend WithEvents mnuFileSaveViewNDay As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
+        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDisplayFrequencyGrid))
         Me.MainMenu1 = New System.Windows.Forms.MainMenu(Me.components)
-        Me.mnuFile = New System.Windows.Forms.MenuItem
-        Me.mnuFileSaveGrid = New System.Windows.Forms.MenuItem
-        Me.mnuFileSaveReport = New System.Windows.Forms.MenuItem
-        Me.mnuFileSaveViewNDay = New System.Windows.Forms.MenuItem
-        Me.mnuFileExportResults = New System.Windows.Forms.MenuItem
-        Me.mnuEdit = New System.Windows.Forms.MenuItem
-        Me.mnuEditCopy = New System.Windows.Forms.MenuItem
-        Me.mnuView = New System.Windows.Forms.MenuItem
-        Me.mnuViewColumns = New System.Windows.Forms.MenuItem
-        Me.mnuViewRows = New System.Windows.Forms.MenuItem
-        Me.mnuViewSep1 = New System.Windows.Forms.MenuItem
-        Me.mnuViewHigh = New System.Windows.Forms.MenuItem
-        Me.mnuViewLow = New System.Windows.Forms.MenuItem
-        Me.mnuViewSep2 = New System.Windows.Forms.MenuItem
-        Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem
-        Me.mnuAnalysis = New System.Windows.Forms.MenuItem
-        Me.mnuHelp = New System.Windows.Forms.MenuItem
-        Me.agdMain = New atcControls.atcGrid
+        Me.mnuFile = New System.Windows.Forms.MenuItem()
+        Me.mnuFileSaveGrid = New System.Windows.Forms.MenuItem()
+        Me.mnuFileSaveReport = New System.Windows.Forms.MenuItem()
+        Me.mnuFileSaveViewNDay = New System.Windows.Forms.MenuItem()
+        Me.mnuFileExportResults = New System.Windows.Forms.MenuItem()
+        Me.mnuEdit = New System.Windows.Forms.MenuItem()
+        Me.mnuEditCopy = New System.Windows.Forms.MenuItem()
+        Me.mnuView = New System.Windows.Forms.MenuItem()
+        Me.mnuViewColumns = New System.Windows.Forms.MenuItem()
+        Me.mnuViewRows = New System.Windows.Forms.MenuItem()
+        Me.mnuViewSep1 = New System.Windows.Forms.MenuItem()
+        Me.mnuViewHigh = New System.Windows.Forms.MenuItem()
+        Me.mnuViewLow = New System.Windows.Forms.MenuItem()
+        Me.mnuViewSep2 = New System.Windows.Forms.MenuItem()
+        Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem()
+        Me.mnuAnalysis = New System.Windows.Forms.MenuItem()
+        Me.mnuHelp = New System.Windows.Forms.MenuItem()
+        Me.agdMain = New atcControls.atcGrid()
+        Me.lblNote = New System.Windows.Forms.Label()
         Me.SuspendLayout()
         '
         'MainMenu1
@@ -205,8 +207,10 @@ Friend Class frmDisplayFrequencyGrid
         '
         Me.agdMain.AllowHorizontalScrolling = True
         Me.agdMain.AllowNewValidValues = False
+        Me.agdMain.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.agdMain.CellBackColor = System.Drawing.Color.Empty
-        Me.agdMain.Dock = System.Windows.Forms.DockStyle.Fill
         Me.agdMain.Fixed3D = False
         Me.agdMain.LineColor = System.Drawing.Color.Empty
         Me.agdMain.LineWidth = 0.0!
@@ -216,16 +220,30 @@ Friend Class frmDisplayFrequencyGrid
         Me.agdMain.Source = Nothing
         Me.agdMain.TabIndex = 0
         '
+        'lblNote
+        '
+        Me.lblNote.AutoSize = True
+        Me.lblNote.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.lblNote.Location = New System.Drawing.Point(0, 532)
+        Me.lblNote.Name = "lblNote"
+        Me.lblNote.Size = New System.Drawing.Size(447, 13)
+        Me.lblNote.TabIndex = 1
+        Me.lblNote.Text = "Note: Could not complete analysis for all values. Review source data for missing " & _
+    "or zero flows."
+        Me.lblNote.Visible = False
+        '
         'frmDisplayFrequencyGrid
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.ClientSize = New System.Drawing.Size(720, 545)
+        Me.Controls.Add(Me.lblNote)
         Me.Controls.Add(Me.agdMain)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Menu = Me.MainMenu1
         Me.Name = "frmDisplayFrequencyGrid"
         Me.Text = "Frequency Statistics"
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
@@ -254,6 +272,24 @@ Friend Class frmDisplayFrequencyGrid
                 SizeToGrid()
 
                 agdMain.Refresh()
+                Dim lCouldNotComputeAny As Boolean = False
+                For lRow As Integer = 0 To pSource.Rows - 1
+                    For lColumn As Integer = 0 To pSource.Columns - 1
+                        If pSource.CellValue(lRow, lColumn).Equals(atcFrequencyGridSource.CouldNotComputeText) Then
+                            lCouldNotComputeAny = True
+                            Exit For
+                        End If
+                    Next
+                    If lCouldNotComputeAny Then Exit For
+                Next
+                If lCouldNotComputeAny Then
+                    lblNote.Visible = True
+                    agdMain.Height = Me.ClientRectangle.Height - agdMain.Top - lblNote.Height * 1.5
+                Else
+                    lblNote.Visible = False
+                    agdMain.Height = Me.ClientRectangle.Height - agdMain.Top
+                End If
+
             Else 'user cancelled Frequency Grid specs form
                 Me.Close()
             End If
