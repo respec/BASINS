@@ -434,7 +434,7 @@ Public Class atcFrequencyGridSource
                             Else
                                 lExpTab.Value(2) = "L" & StrPad(CStr(lNdays), 3, "0") '"Parameter
                             End If
-                            lExpTab.Value(3) = "Note: Problem with source data and could not complete analysis. Please review source data."
+                            lExpTab.Value(3) = "Note: Could not complete analysis. Review source data for missing or zero flows."
                             For I As Integer = 4 To 15
                                 lExpTab.Value(I) = ""
                             Next
@@ -463,8 +463,8 @@ Public Class atcFrequencyGridSource
                             lRept.AppendLine()
                             lRept.AppendLine("       Description:  " & lIdentifier)
                             lRept.AppendLine()
-                            lRept.AppendLine(" Note -- Problem with source data and could not complete analysis for " & lAttrName & pRecurrence.GetByIndex(0) & vbCrLf & _
-                                             "         Please review source data.")
+                            lRept.AppendLine(" Note -- Could not complete analysis for " & lAttrName & pRecurrence.GetByIndex(0) & vbCrLf & _
+                                             "         Review source data for missing or zero flows.")
                             lRept.AppendLine(vbFormFeed)
                             lPageCount += 1
                         End If
