@@ -393,7 +393,7 @@ Public Class atcVariation
             Dim lModifiedTS As atcTimeseries = Nothing
 
             Select Case Operation
-                Case "AddEvents" : lModifiedTS = AddRemoveEventsVolumeFraction(lOriginalData, CurrentValue, lEvents, 0)
+                Case "AddEvents" : lModifiedTS = AddRemoveEventsVolumeFraction(lOriginalData, CurrentValue/100, lEvents, 0)
                 Case "Intensify" : lModifiedTS = VaryDataIntensify(lSplitData, lEvents)
                 Case "Hamon"
                     If PETtemperature.Count > lDataSetIndex Then
@@ -456,7 +456,7 @@ Public Class atcVariation
     ''' <param name="aSeed">Random number seed</param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Private Function AddRemoveEventsVolumeFraction(ByVal aTimeseries As atcTimeseries, _
+    Private Shared Function AddRemoveEventsVolumeFraction(ByVal aTimeseries As atcTimeseries, _
                                                    ByVal aVolumeChangeFraction As Double, _
                                                    ByVal aEventsToSearch As atcTimeseriesGroup, _
                                                    ByVal aSeed As Integer) As atcTimeseries
@@ -1009,7 +1009,7 @@ Public Class atcVariation
         Return lString
     End Function
 
-    Private Function DoubleString(ByVal aNumber As Double) As String
+    Private Shared Function DoubleString(ByVal aNumber As Double) As String
         Dim lStr As String = Format(aNumber, "0.000")
         Dim lDecimalPos As Integer = lStr.IndexOf("."c)
         If lDecimalPos >= 0 Then
