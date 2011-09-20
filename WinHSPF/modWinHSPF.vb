@@ -83,9 +83,9 @@ Public Module WinHSPF
 
         'get starter uci ready
         Dim lStarterUciName As String = "starter.uci"
-        Dim lStarterPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "models\hspf\bin\starter\" & lStarterUciName
+        Dim lStarterPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "models\WinHSPF30\bin\starter\" & lStarterUciName
         If Not FileExists(lStarterPath) Then
-            lStarterPath = lBasinsFolder & "\models\hspf\bin\starter\" & lStarterUciName
+            lStarterPath = lBasinsFolder & "\models\WinHSPF30\bin\starter\" & lStarterUciName
             If Not FileExists(lStarterPath) Then
                 lStarterPath = FindFile("Please locate " & lStarterUciName, lStarterUciName)
             End If
