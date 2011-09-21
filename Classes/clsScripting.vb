@@ -18,7 +18,6 @@
 'Contributor(s): (Open source contributors should list themselves and their modifications here). 
 '09/02/2010 - KW - Modified class to work with MW4 and MW6/DotSpatial
 '********************************************************************************************************
-
 Imports System.CodeDom.Compiler
 Imports System.Reflection
 Imports System.IO
@@ -35,21 +34,17 @@ Public Class Scripting
         End If
     End Sub
 
-
     ''' <summary>
-    ''' 
+    ''' Create a new assembly containing the compiled script
     ''' </summary>
-    ''' <param name="aLanguage"></param>
-    ''' <param name="aDLLfilename"></param>
-    ''' <param name="aCode"></param>
-    ''' <param name="aErrors"></param>
-    ''' <param name="aPluginFolder"></param>
-    ''' <returns>an assembly built by compiling aCode or the contents of the file referenced by aCode</returns>
-    ''' <remarks>
-    ''' Broke out the run method into PrepareScript and Run.
-    ''' No longer have to pass in a reference to the Mainform.
-    ''' Output assembly can be loaded by the appropriate Plugin manager from the calling code.
-    ''' </remarks>
+    ''' <param name="aLanguage">Language code is written in. Valid values are "vb", "cs", "js".
+    ''' Alternatively, "dll" will load an already-compiled assembly from file named aCode instead of compiling.</param>
+    ''' <param name="aDLLfilename">Save compiled assembly in this file</param>
+    ''' <param name="aCode">Source code or the name of a file containing source code</param>
+    ''' <param name="aErrors">Error messages are returned in this string</param>
+    ''' <param name="aPluginFolder">Folder to compile into if creating a plugin</param>
+    ''' <returns>an assembly built by compiling aCode or the contents of the file named aCode.</returns>
+    ''' <remarks>Output assembly can be loaded by the appropriate Plugin manager from the calling code.</remarks>
     Public Shared Function PrepareScript(ByVal aLanguage As String, _
                         ByVal aDLLfilename As String, _
                         ByVal aCode As String, _
@@ -61,13 +56,6 @@ Public Class Scripting
         aErrors = "" 'No errors yet
         aLanguage = GetLanguageFromFilename(aLanguage)
         Dim lAssembly As System.Reflection.Assembly
-
-        'PM May 2011: Why is this?
-        ' This resuls in a lot of RemoveMe-*.dll files,
-        ' It's better to do this for dlls only not for scripts:
-        'If aDLLfilename Is Nothing OrElse aDLLfilename.Length = 0 Then
-        '    aDLLfilename = MakeScriptName(aPluginFolder)
-        'End If
 
         RemoveByteOrderMarker(aCode)
 
@@ -97,9 +85,13 @@ Public Class Scripting
         Return lAssembly
     End Function
 
+    ''' <summary>
+    ''' Run the ScriptMain method in aAssembly 
+    ''' </summary>
+    ''' <returns>return value of ScriptMain</returns>
     Public Shared Function Run(ByVal aAssembly As Assembly, _
-                    ByRef aErrors As String, _
-                    ByVal ParamArray aArgs() As Object) As Object
+                               ByRef aErrors As String, _
+                               ByVal ParamArray aArgs() As Object) As Object
 
         Dim lAssembly As Assembly = aAssembly
         Dim lMethodName As String = "ScriptMain" 'Can't be MAIN or the C# compiler will have a heart attack.
@@ -138,6 +130,21 @@ Public Class Scripting
         Return Nothing
     End Function
 
+    ''' <summary>
+    ''' Backward-compatible version of Run with older API
+    ''' </summary>
+    ''' <returns>result of running script</returns>
+    Public Shared Function Run(ByVal aLanguage As String, _
+                               ByVal aDLLfilename As String, _
+                               ByVal aCode As String, _
+                               ByRef aErrors As String, _
+                               ByVal aPlugIn As Boolean, _
+                               ByRef m_MapWin As Object, _
+                               ByVal ParamArray aArgs() As Object) As Object
+        Dim lAssembly As System.Reflection.Assembly = PrepareScript(aLanguage, aDLLfilename, aCode, aErrors, m_MapWin.Plugins.PluginFolder)
+        Return Run(lAssembly, aErrors, aArgs)
+    End Function
+
     Public Shared Function MakeScriptName(ByVal aPluginFolder As String) As String
         Dim lTryName As String
         Dim lTryCount As Integer = 1
@@ -151,7 +158,15 @@ Public Class Scripting
         Return lTryName
     End Function
 
-    'language = "vb" or "cs" or "js"
+    ''' <summary>
+    ''' Compile code into an assembly
+    ''' </summary>
+    ''' <param name="aLanguage">Language code is written in. Valid values are "vb", "cs", "js"</param>
+    ''' <param name="aCode"></param>
+    ''' <param name="aErrors"></param>
+    ''' <param name="aOutputFilename"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
     Public Shared Function Compile(ByVal aLanguage As String, _
                                    ByVal aCode As String, _
                                    ByRef aErrors As String, _
