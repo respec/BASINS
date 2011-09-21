@@ -314,9 +314,9 @@ Public Class atcDataManager
                 Return True
             Else
                 If Logger.LastDbgText.Length > 0 Then
-                    Logger.Dbg("OpenFailure:Specification:'" & aNewSource.Specification & "'" & vbCrLf & _
-                               "Source Name:" & aNewSource.Name & vbCrLf & _
-                               "Details:" & Logger.LastDbgText)
+                    Logger.Dbg("When opening '" & aNewSource.Specification & "'" & vbCrLf & _
+                               aNewSource.Name & " gave the message:" & vbCrLf & _
+                               Logger.LastDbgText)
                 End If
                 Return False
             End If
@@ -551,7 +551,7 @@ Public Class atcDataManager
         Dim lFilesOnly As New ArrayList(1)
         lFilesOnly.Add("File")
         Dim lNewSource As atcTimeseriesSource = atcDataManager.UserSelectDataSource(lFilesOnly, "Select a File Type", aNeedToOpen, aNeedToSave)
-        If Not lNewSource Is Nothing Then 'user did not cancel
+        If lNewSource IsNot Nothing Then 'user did not cancel
             If Not atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
                 If Logger.LastDbgText.Length > 0 Then
                     Logger.Msg(Logger.LastDbgText, "Data Open Problem")

@@ -572,7 +572,7 @@ FoundSameUntil:
                 fName = Dir("*", FileAttribute.Directory)
                 While Len(fName) > 0
                     If GetAttr(fName) And FileAttribute.Directory Then
-                        If fName <> "." And fName <> ".." Then
+                        If fName <> "." AndAlso fName <> ".." Then
                             dirsThisDir.Add(fName.ToLower, fName)
                         End If
                     End If
@@ -845,6 +845,7 @@ ErrorWriting:
                         lFileName = AbsolutePath(.FileName, CurDir)
                         aFilterIndex = .FilterIndex
                         Logger.Dbg("User specified file '" & lFileName & "'")
+                        Logger.LastDbgText = ""
                     Else 'Return empty string if user clicked Cancel
                         lFileName = ""
                         Logger.Dbg("User Cancelled File Selection Dialog for " & aFileDialogTitle)

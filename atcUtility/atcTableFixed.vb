@@ -47,14 +47,14 @@ Public Class atcTableFixed
 
     Public Overrides Property FieldLength(ByVal aFieldNumber As Integer) As Integer
         Get
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+            If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
                 FieldLength = pFields(aFieldNumber).FieldLength
             Else
                 FieldLength = 0
             End If
         End Get
         Set(ByVal newValue As Integer)
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+            If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
                 pFields(aFieldNumber).FieldLength = newValue
             End If
         End Set
@@ -62,14 +62,14 @@ Public Class atcTableFixed
 
     Public Overrides Property FieldName(ByVal aFieldNumber As Integer) As String
         Get
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+            If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
                 FieldName = pFields(aFieldNumber).FieldName
             Else
                 FieldName = "Undefined"
             End If
         End Get
         Set(ByVal newValue As String)
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+            If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
                 pFields(aFieldNumber).FieldName = newValue
             End If
         End Set
@@ -84,14 +84,14 @@ Public Class atcTableFixed
     ''' <remarks>Returns zero if field does not exist</remarks>
     Public Property FieldStart(ByVal aFieldNumber As Integer) As Integer
         Get
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+            If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
                 Return pFields(aFieldNumber).FieldStart
             Else
                 Return 0
             End If
         End Get
         Set(ByVal newValue As Integer)
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+            If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
                 pFields(aFieldNumber).FieldStart = newValue
             End If
         End Set
@@ -101,14 +101,14 @@ Public Class atcTableFixed
     ''C = Character, D = Date, N = Numeric, L = Logical, M = Memo
     'Public Overrides Property FieldType(ByVal aFieldNumber As Integer) As String
     '  Get
-    '    If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+    '    If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
     '      FieldType = pFields(aFieldNumber).FieldType
     '    Else
     '      FieldType = "Undefined"
     '    End If
     '  End Get
     '  Set(ByVal newValue As String)
-    '    If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+    '    If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
     '      pFields(aFieldNumber).FieldType = newValue
     '    End If
     '  End Set

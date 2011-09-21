@@ -448,7 +448,7 @@ TryOldString:
         For Each vSearchFor In SearchFor
             findPos = InStr(start, Source, vSearchFor)
             If findPos > 0 Then
-                If foundPos = 0 Or foundPos > findPos Then foundPos = findPos
+                If foundPos = 0 OrElse foundPos > findPos Then foundPos = findPos
             End If
         Next vSearchFor
         FirstStringPos = foundPos
@@ -832,7 +832,7 @@ TryOldString:
             i = InStr(S, " ") 'blank delimeter
             j = InStr(S, ",") 'comma delimeter
             If j > 0 Then 'comma found
-                If i = 0 Or j < i Then
+                If i = 0 OrElse j < i Then
                     i = j
                 End If
             End If

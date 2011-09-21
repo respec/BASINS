@@ -371,7 +371,7 @@ Public Module modDate
         If aMo < 1 OrElse aMo > 12 Then
             lDayMon = -1 'invalid month
         ElseIf aMo = 2 Then  'check for leap year
-            If aYr <= 0 Or aYr > 9999 Then 'invalid year
+            If aYr <= 0 OrElse aYr > 9999 Then 'invalid year
                 lDayMon = 28
             ElseIf aYr Mod 100 = 0 Then 'check whether this is a leap year on a century boundary
                 If aYr Mod 400 = 0 Then 'on a 400 year boundary
@@ -496,11 +496,11 @@ Public Module modDate
 
         'If (tc(1) < TUSecond Or tc(1) > TUYear Or
 
-        If (tc(1) < 1 Or tc(1) > 6 Or tc(2) < 1 Or tc(2) > 6 Or ts(1) < 1 Or ts(1) > 1440 Or ts(2) < 1 Or ts(2) > 1440) Then
+        If (tc(1) < 1 OrElse tc(1) > 6 OrElse tc(2) < 1 OrElse tc(2) > 6 OrElse ts(1) < 1 OrElse ts(1) > 1440 OrElse ts(2) < 1 OrElse ts(2) > 1440) Then
             'an invalid time units code or time step
             tstepf = 1
             tcdcmp = -1
-        ElseIf ((tc(1) <= 4 And tc(2) >= 5) Or (tc(2) <= 4 And tc(1) >= 5)) Then
+        ElseIf ((tc(1) <= 4 AndAlso tc(2) >= 5) OrElse (tc(2) <= 4 AndAlso tc(1) >= 5)) Then
             'special case for time units that cross day-month boundry
             tstepf = 1
             tcdcmp = -1
@@ -512,9 +512,9 @@ Public Module modDate
                 tsx = 1
                 tcx = 5
                 Call cmptm2(tc(2), ts(2), tcx, tsx, tsfx(2), tcdx(2))
-                If (tsfx(1) = 0 And tsfx(2) = 0) Then
+                If (tsfx(1) = 0 AndAlso tsfx(2) = 0) Then
                     'times compatible with boundaries
-                    If ((tcdx(1) = 0 Or tcdx(1) = 1) And (tcdx(2) = 0 Or tcdx(2) = 2)) Then
+                    If ((tcdx(1) = 0 OrElse tcdx(1) = 1) AndAlso (tcdx(2) = 0 OrElse tcdx(2) = 2)) Then
                         'smaller time a day or less, larger time a month or more
                         tstepf = 0
                         tcdcmp = 1
@@ -528,9 +528,9 @@ Public Module modDate
                 tsx = 1
                 tcx = 4
                 Call cmptm2(tc(2), ts(2), tcx, tsx, tsfx(2), tcdx(2))
-                If (tsfx(1) = 0 And tsfx(2) = 0) Then
+                If (tsfx(1) = 0 AndAlso tsfx(2) = 0) Then
                     'times compatible with boundaries
-                    If ((tcdx(1) = 0 Or tcdx(1) = 2) And (tcdx(2) = 0 Or tcdx(2) = 1)) Then
+                    If ((tcdx(1) = 0 OrElse tcdx(1) = 2) AndAlso (tcdx(2) = 0 OrElse tcdx(2) = 1)) Then
                         'larger time a month or more, smaller time a day or less
                         tstepf = 0
                         tcdcmp = 2
@@ -570,7 +570,7 @@ Public Module modDate
 
         Dim convdn() As Integer = {-1, 0, 60, 60, 24, 0, 12, 100}
 
-        If ((tc1 <= 4 And tc2 > 4) Or (tc1 > 4 And tc2 <= 4)) Then
+        If ((tc1 <= 4 AndAlso tc2 > 4) OrElse (tc1 > 4 AndAlso tc2 <= 4)) Then
             'time units span day-month boundry
             tstepf = 1
             tcdcmp = -1
@@ -616,7 +616,7 @@ Public Module modDate
         '     would be converted to the date 1982/09/30 24:00:00.
 
         If (d(3) = 0) Then
-            If (d(4) = 0 And d(5) = 0) Then
+            If (d(4) = 0 AndAlso d(5) = 0) Then
                 '     date using new day boundry convention, convert to old
                 d(3) = 24
                 d(2) = d(2) - 1
@@ -726,21 +726,21 @@ Public Module modDate
                 CARRY = Fix(TSC / 60)
                 TSC = TSC - (CARRY * 60)
             End If
-            If (STPOS <= 2 And CARRY > 0) Then ' minutes
+            If (STPOS <= 2 AndAlso CARRY > 0) Then ' minutes
                 TMN = TMN + CARRY
                 CARRY = Fix(TMN / 60)
                 TMN = TMN - (CARRY * 60)
             End If
-            If (STPOS <= 3 And CARRY > 0) Then ' hours
+            If (STPOS <= 3 AndAlso CARRY > 0) Then ' hours
                 THR = THR + CARRY
                 CARRY = Fix(THR / 24)
                 THR = THR - (CARRY * 24)
-                If (THR = 0 And TMN = 0 And TSC = 0) Then 'this is the day boundry problem
+                If (THR = 0 AndAlso TMN = 0 AndAlso TSC = 0) Then 'this is the day boundry problem
                     THR = 24
                     CARRY = CARRY - 1
                 End If
             End If
-            If (STPOS <= 4 And CARRY > 0) Then ' days
+            If (STPOS <= 4 AndAlso CARRY > 0) Then ' days
                 TDY = TDY + CARRY
                 If (TDY > 28) Then 'may need month/year adjustment
                     DONFG = 0
@@ -774,7 +774,7 @@ Public Module modDate
                     CARRY = Fix((TMO - 1) / 12)
                     TMO = TMO - (CARRY * 12)
                 End If
-                If (STPOS <= 6 And CARRY > 0) Then ' years
+                If (STPOS <= 6 AndAlso CARRY > 0) Then ' years
                     TYR = TYR + CARRY
                 End If
 
@@ -853,7 +853,7 @@ Public Module modDate
                              ByVal TCODE As Integer, ByVal TSTEP As Integer) As Integer
         Dim NVALS As Integer
 
-        If TCODE = 0 Or TSTEP = 0 Then
+        If TCODE = 0 OrElse TSTEP = 0 Then
             NVALS = 0
         Else
             'convert dates to old format

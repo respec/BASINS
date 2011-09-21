@@ -200,10 +200,10 @@ SetHexValue:
     '      nextColor = Color.Black  'vbBlack
     '      nextColorName = "black"
     '    Else
-    '      If c = "black" And fwd Then
+    '      If c = "black" AndAlso fwd Then
     '        nextColor = Color.FromArgb(1, 1, 1)   'RGB(1, 1, 1)
     '        nextColorName = grayBasename & "1"
-    '      ElseIf c = "black1" And Not fwd Then
+    '      ElseIf c = "black1" AndAlso Not fwd Then
     '        nextColor = Color.FromArgb(254, 254, 254) ' RGB(254, 254, 254)
     '        nextColorName = grayBasename & "254"
     '      ElseIf Left(c, grayNameNumStart - 1) = LCase(grayBasename) Then
