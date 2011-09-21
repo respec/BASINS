@@ -464,10 +464,10 @@ Public MustInherit Class atcTable
 
         CurrentRecord = aStartRecord
         NotAtTheEnd = True
-        While NotAtTheEnd And CurrentRecord <= aEndRecord
+        While NotAtTheEnd AndAlso CurrentRecord <= aEndRecord
             curRule = 0
             allMatch = True
-            While curRule <= lLastRule And allMatch
+            While curRule <= lLastRule AndAlso allMatch
                 thisMatches = False
                 lValue = Value(aFieldNum(curRule))
                 Select Case lOperation(curRule)
@@ -494,7 +494,7 @@ Public MustInherit Class atcTable
                 End If
                 curRule += 1
             End While
-            If allMatch And Not aMatchAny Then
+            If allMatch AndAlso Not aMatchAny Then
                 FindMatch = True
                 Exit Function '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             End If

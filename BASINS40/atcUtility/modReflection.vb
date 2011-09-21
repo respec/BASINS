@@ -86,8 +86,8 @@ Public Module modReflection
 
         While Len(s) > 0
             sRec = StrSplit(s, vbCrLf, "")
-            If (InStr(sRec, "<none>") = 0 And InStr(sRec, "Public") > 0) Then
-                If Left(sRec, 5).ToLower = "test_" Then
+            If Not sRec.Contains("<none>") AndAlso Not sRec.Contains("Public") Then
+                If sRec.Substring(0, 5).ToLower = "test_" Then
                     sTest.Add(sRec)
                 Else
                     sEntry.Add(sRec)
@@ -101,12 +101,12 @@ Public Module modReflection
             t = StrSplit(lEntry, ":", "")
             lEntryFunction = lEntry
             found = False
-            s = s & lEntryModule & ":" & lEntryFunction
+            s &= lEntryModule & ":" & lEntryFunction
             For Each lTest As String In sTest
                 lTestModule = StrSplit(lTest, ":", "")
                 If "Test_" & lEntryModule = lTestModule Then
                     t = StrSplit(lTest, ":", "")
-                    lTestFunction = Mid(lTest, 5)
+                    lTestFunction = lTest.Substring(5)
                     If lTestFunction = lEntryFunction Then 'already have it
                         found = True
                         s = s & ":match" & vbCrLf
@@ -116,16 +116,16 @@ Public Module modReflection
             Next
             If Not found Then
                 If lEntryModule = "modReflection" Then
-                    s = s & ":skip" & vbCrLf
+                    s &= ":skip" & vbCrLf
                 Else
-                    s = s & ":add" & vbCrLf
+                    s &= ":add" & vbCrLf
                     sAdd.Add(lEntryModule & ":" & lEntryFunction)
                 End If
             End If
         Next
-        s = s & "CountTests:" & sTest.Count & vbCrLf
-        s = s & "CountEntry:" & sEntry.Count & vbCrLf
-        s = s & "CountAdd:" & sAdd.Count & vbCrLf
+        s &= "CountTests:" & sTest.Count & vbCrLf
+        s &= "CountEntry:" & sEntry.Count & vbCrLf
+        s &= "CountAdd:" & sAdd.Count & vbCrLf
         SaveFileString(aSavePath & g_PathChar & "TestsToAdd.txt", s)
 
         s = "Option Strict Off" & vbCrLf & _

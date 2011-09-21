@@ -172,14 +172,14 @@ Public Class atcTableDBF
 
     Public Property FieldDecimalCount(ByVal aFieldNumber As Integer) As Byte
         Get
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+            If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
                 FieldDecimalCount = pFields(aFieldNumber).DecimalCount
             Else
                 FieldDecimalCount = 0
             End If
         End Get
         Set(ByVal Value As Byte)
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+            If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
                 pFields(aFieldNumber).DecimalCount = Value
             End If
         End Set
@@ -223,7 +223,7 @@ Public Class atcTableDBF
         If aAddFrom.NumRecords < 1 Then
             Logger.Dbg("No records to add from empty DBF:" & vbCr & aAddFrom.FileName)
         Else
-            If pNumFields <> aAddFrom.NumFields And pHeader.NumRecs < 1 Then
+            If pNumFields <> aAddFrom.NumFields AndAlso pHeader.NumRecs < 1 Then
                 Logger.Dbg("Replacing field definitions with the new ones since we have no records")
                 NumFields = aAddFrom.NumFields
                 For lFieldNum = 1 To pNumFields
@@ -399,14 +399,14 @@ AllKeys:
 
     Public Overrides Property FieldLength(ByVal aFieldNumber As Integer) As Integer
         Get
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+            If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
                 FieldLength = pFields(aFieldNumber).FieldLength
             Else
                 FieldLength = 0
             End If
         End Get
         Set(ByVal Value As Integer)
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+            If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
                 pFields(aFieldNumber).FieldLength = Value
             End If
         End Set
@@ -416,14 +416,14 @@ AllKeys:
 
     Public Overrides Property FieldName(ByVal aFieldNumber As Integer) As String
         Get
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+            If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
                 FieldName = TrimNull(pFields(aFieldNumber).FieldName)
             Else
                 FieldName = "Undefined"
             End If
         End Get
         Set(ByVal Value As String)
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+            If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
                 Value = Trim(Left(Value, 10))
                 pFields(aFieldNumber).FieldName = Value & New String(Chr(0), 11 - Len(Value))
             End If
@@ -434,14 +434,14 @@ AllKeys:
     'C = Character, D = Date, N = Numeric, L = Logical, M = Memo
     Public Overrides Property FieldType(ByVal aFieldNumber As Integer) As String
         Get
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+            If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
                 FieldType = pFields(aFieldNumber).FieldType
             Else
                 FieldType = "Undefined"
             End If
         End Get
         Set(ByVal Value As String)
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+            If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
                 pFields(aFieldNumber).FieldType = Value
             End If
         End Set
@@ -496,9 +496,9 @@ AllKeys:
 
     Public Overrides Property Value(ByVal aFieldNumber As Integer) As String
         Get
-            If pCurrentRecord < 1 Or pCurrentRecord > pHeader.NumRecs Then
+            If pCurrentRecord < 1 OrElse pCurrentRecord > pHeader.NumRecs Then
                 Return "Invalid Current Record Number"
-            ElseIf aFieldNumber < 1 Or aFieldNumber > pNumFields Then
+            ElseIf aFieldNumber < 1 OrElse aFieldNumber > pNumFields Then
                 Return "Invalid Field Number"
             Else
                 'Dim lFirstByte As Integer = pCurrentRecordStart + pFields(aFieldNumber).DataAddress
@@ -524,7 +524,7 @@ AllKeys:
             Try
                 If pCurrentRecord < 1 Then
                     'Value = "Invalid Current Record Number"
-                ElseIf aFieldNumber < 1 Or aFieldNumber > pNumFields Then
+                ElseIf aFieldNumber < 1 OrElse aFieldNumber > pNumFields Then
                     'Value = "Invalid Field Number"
                 Else
                     pData(pCurrentRecordStart) = 32 'clear record deleted flag or overwrite EOF

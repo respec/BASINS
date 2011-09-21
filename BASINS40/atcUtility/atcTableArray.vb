@@ -56,14 +56,14 @@ Public Class atcTableArray
 
     Public Overrides Property FieldLength(ByVal aFieldNumber As Integer) As Integer
         Get
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+            If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
                 Return pFieldLengths(aFieldNumber)
             Else
                 Return 0
             End If
         End Get
         Set(ByVal newValue As Integer)
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+            If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
                 pFieldLengths(aFieldNumber) = newValue
             End If
         End Set
@@ -71,14 +71,14 @@ Public Class atcTableArray
 
     Public Overrides Property FieldName(ByVal aFieldNumber As Integer) As String
         Get
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+            If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
                 Return pFieldNames(aFieldNumber)
             Else
                 Return "Field " & aFieldNumber
             End If
         End Get
         Set(ByVal newValue As String)
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+            If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
                 pFieldNames(aFieldNumber) = newValue
             End If
         End Set
@@ -223,14 +223,14 @@ TryAgain:
     'on set translate to match DBF: s = string into C = Character, n = numeric into N = Numeric
     Public Overrides Property FieldType(ByVal aFieldNumber As Integer) As String
         Get
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+            If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
                 FieldType = pFieldTypes(aFieldNumber)
             Else
                 FieldType = "Undefined"
             End If
         End Get
         Set(ByVal newValue As String)
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
+            If aFieldNumber > 0 AndAlso aFieldNumber <= pNumFields Then
                 pFieldTypes(aFieldNumber) = newValue
             End If
         End Set
