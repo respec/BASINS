@@ -1605,7 +1605,7 @@ Public Class HspfUci
             'delete dsn
             pWDMObj(lId).DataSets.Remove(GenTs)
             'add dsn
-            Dim lAddDsn As Boolean = pWDMObj(lId).AddDataset(NewGenTs, 0)
+            Dim lAddDsn As Boolean = pWDMObj(lId).AddDataset(NewGenTs, atcData.atcDataSource.EnumExistAction.ExistReplace)
         End If
     End Sub
 
