@@ -280,23 +280,58 @@ Module GraphGenScn
             pTSGroup = lTSGroup
         End If
 
-        For Each lTS As atcTimeseries In pTSGroup
-            Dim lCons As String = lTS.Attributes.GetValue("Constituent")
-            If lCons = "PREC" Then
-                lTS.Attributes.SetValue("YAxis", pTimeseries1Axis)
-                lTS.Attributes.SetValue("Point", pTimeseries1IsPoint)
-                'pLeftAuxAxisLabel = "PREC (in)"
-                pLeftAuxAxisLabel = "PREC"
-            ElseIf lCons = "WSELEV" Then
-                lTS.Attributes.SetValue("YAxis", pTimeseries3Axis)
-                lTS.Attributes.SetValue("Point", pTimeseries3IsPoint)
-                pLeftYAxisLabel &= "WSELEV (ft)" & " "
-            ElseIf lCons = "ELEV" Then
-                lTS.Attributes.SetValue("YAxis", pTimeseries3Axis)
-                lTS.Attributes.SetValue("Point", pTimeseries3IsPoint)
-                pLeftYAxisLabel &= "ELEV (ft)" & " "
-            End If
+        Dim lCrvIndex As Integer
+        For I As Integer = 0 To pTSGroup.Count - 1
+            Dim lCons As String = pTSGroup(I).Attributes.GetValue("Constituent")
+            lCrvIndex = pGraphSpec.CurveIndex(lCons, I)
+            Dim lTimeseriesAxis As String = pTimeseries3Axis
+            '1-leftY,2-rightY,3-Aux,4-X
+            Select Case pGraphSpec.Crv(lCrvIndex).CType_Renamed
+                Case 1
+                    lTimeseriesAxis = pTimeseries3Axis
+                Case 2
+                    lTimeseriesAxis = pTimeseries7Axis
+                Case 3
+                    lTimeseriesAxis = pTimeseries1Axis
+                Case 4
+                    lTimeseriesAxis = "X"
+            End Select
+
+            With pTSGroup(I)
+                If lCons = "PREC" Then
+                    .Attributes.SetValue("YAxis", pTimeseries1Axis)
+                    .Attributes.SetValue("Point", pTimeseries1IsPoint)
+                    'pLeftAuxAxisLabel = "PREC (in)"
+                    pLeftAuxAxisLabel = "PREC"
+                    'ElseIf lCons = "WSELEV" Then
+                    '    .Attributes.SetValue("YAxis", pTimeseries3Axis)
+                    '    .Attributes.SetValue("Point", pTimeseries3IsPoint)
+                    '    pLeftYAxisLabel &= "WSELEV (ft)" & " "
+                    'ElseIf lCons = "ELEV" Then
+                    '    .Attributes.SetValue("YAxis", pTimeseries3Axis)
+                    '    .Attributes.SetValue("Point", pTimeseries3IsPoint)
+                    '    pLeftYAxisLabel &= "ELEV (ft)" & " "
+                Else
+                    .Attributes.SetValue("YAxis", lTimeseriesAxis)
+                    .Attributes.SetValue("Point", pTimeseries3IsPoint)
+                End If
+            End With
         Next
+        'Dim lAxisIndexWithYLab As Integer = 1
+        'For I As Integer = 1 To 4
+        '    If pGraphSpec.Axis(I).label IsNot Nothing Then
+        '        Select Case I
+        '            Case 1
+        '                lAxisIndexWithYLab = 1
+        '            Case 2
+        '                lAxisIndexWithYLab = 2
+        '            Case 3
+        '                lAxisIndexWithYLab = 3
+        '            Case 4
+        '        End Select
+        '    End If
+        'Next
+        'pLeftYAxisLabel = pGraphSpec.Axis(lAxisIndexWithYLab).label
 
         If pGraphSpec.IsReady And pApplyGraphSpec Then
             pLeftAuxAxisLabel = pGraphSpec.Axis(3).label
@@ -363,24 +398,33 @@ Module GraphGenScn
         End If
 
         Dim lGrapher As New clsGraphTime(aDataGroup, lZgc)
-        Dim lPaneAux As GraphPane = lZgc.MasterPane.PaneList(0)
-        Dim lPaneMain As GraphPane = lZgc.MasterPane.PaneList(1)
+        Dim lPaneAux As GraphPane = Nothing
+        Dim lPaneMain As GraphPane = Nothing
+        If lZgc.MasterPane.PaneList.Count < 2 Then
+            lPaneMain = lZgc.MasterPane.PaneList(0)
+        Else
+            lPaneAux = lZgc.MasterPane.PaneList(0)
+            lPaneMain = lZgc.MasterPane.PaneList(1)
+        End If
 
-        Dim lCurve As ZedGraph.LineItem
-        'Assuming only PREC is on the top Auxiliary pane
-        lCurve = lPaneAux.CurveList.Item(0)
-        Dim lCrvIndexPREC As Integer = aDataGroup.Count - 1
-        With lCurve
-            .Line.StepType = StepType.NonStep
-            If pGraphSpec.IsReady And pApplyGraphSpec Then
-                .Color = ToNewColor(pGraphSpec.Crv(lCrvIndexPREC).Color)
-                .Line.Width = pGraphSpec.Crv(lCrvIndexPREC).LThck
-                .Label.Text = pGraphSpec.Crv(lCrvIndexPREC).LegLbl
-            Else
-                .Line.Width = 2
-                .Color = Drawing.Color.Red
-            End If
-        End With
+        Dim lCurve As ZedGraph.LineItem = Nothing
+        Dim lCrvIndex As Integer = 0
+        If lPaneAux IsNot Nothing Then
+            'Assuming only PREC is on the top Auxiliary pane
+            lCurve = lPaneAux.CurveList.Item(0)
+            With lCurve
+                .Line.StepType = StepType.NonStep
+                If pGraphSpec.IsReady And pApplyGraphSpec Then
+                    lCrvIndex = pGraphSpec.CurveIndex("PREC", aDataGroup.Count - 1)
+                    .Color = ToNewColor(pGraphSpec.Crv(lCrvIndex).Color)
+                    .Line.Width = pGraphSpec.Crv(lCrvIndex).LThck
+                    .Label.Text = pGraphSpec.Crv(lCrvIndex).LegLbl
+                Else
+                    .Line.Width = 2
+                    .Color = Drawing.Color.Red
+                End If
+            End With
+        End If
 
         'If Not lCurve.Label.Text.Contains(" at ") Then
         '    lCurve.Label.Text &= " at " & aDataGroup(0).Attributes.GetValue("Location")
@@ -396,29 +440,36 @@ Module GraphGenScn
         '    End If
         'End If
 
-        Dim lObserved As ZedGraph.LineItem
-        For i As Integer = 0 To lPaneMain.CurveList.Count - 2
-            lObserved = lPaneMain.CurveList.Item(i)
+        Dim lCurveOnMainPane As ZedGraph.LineItem = Nothing
+        Dim lLastIndexOfCurvesOnMain As Integer
+        If lPaneAux Is Nothing Then
+            lLastIndexOfCurvesOnMain = lPaneMain.CurveList.Count - 1
+        Else
+            lLastIndexOfCurvesOnMain = lPaneMain.CurveList.Count - 2
+        End If
+        For i As Integer = 0 To lLastIndexOfCurvesOnMain
+            lCurveOnMainPane = lPaneMain.CurveList.Item(i)
             If pGraphSpec.IsReady And pApplyGraphSpec Then
-                lObserved.Label.Text = pGraphSpec.Crv(i).LegLbl
+                lCrvIndex = pGraphSpec.CurveIndex("BluhBluh", i)
+                lCurveOnMainPane.Label.Text = pGraphSpec.Crv(lCrvIndex).LegLbl
                 'If pGraphSpec.Crv(i).LType >= 0 Then
                 '    lObserved.Symbol.Type = pGraphSpec.Crv(i).LType Mod 5
                 'Else
                 '    lObserved.Symbol.Type = SymbolType.Circle
                 'End If
-                lObserved.Color = ToNewColor(pGraphSpec.Crv(i).Color)
-                lObserved.Line.StepType = StepType.NonStep
-                lObserved.Line.Width = pGraphSpec.Crv(i).LThck
+                lCurveOnMainPane.Color = ToNewColor(pGraphSpec.Crv(lCrvIndex).Color)
+                lCurveOnMainPane.Line.StepType = StepType.NonStep
+                lCurveOnMainPane.Line.Width = pGraphSpec.Crv(lCrvIndex).LThck
                 'lPaneMain.Y2Axis.Title.Text = pGraphSpec.Axis(2).label
             Else 'No graph specs loaded
-                If Not lObserved.Label.Text.Contains(" at ") Then
-                    lObserved.Label.Text &= " at " & aDataGroup(i).Attributes.GetValue("Location")
+                If Not lCurveOnMainPane.Label.Text.Contains(" at ") Then
+                    lCurveOnMainPane.Label.Text &= " at " & aDataGroup(i).Attributes.GetValue("Location")
                 End If
                 Dim constituent As String = aDataGroup(i).Attributes.GetValue("Constituent")
-                lObserved.Line.StepType = StepType.NonStep
-                lObserved.Line.Width = 2
+                lCurveOnMainPane.Line.StepType = StepType.NonStep
+                lCurveOnMainPane.Line.Width = 2
                 Dim lRand As New Random
-                lObserved.Color = Drawing.Color.FromArgb(255, lRand.Next(0, 255), lRand.Next(0, 255), lRand.Next(0, 255))
+                lCurveOnMainPane.Color = Drawing.Color.FromArgb(255, lRand.Next(0, 255), lRand.Next(0, 255), lRand.Next(0, 255))
             End If
         Next
 
@@ -430,34 +481,34 @@ Module GraphGenScn
         '    lCurve.Label.Text &= " at " & aDataGroup(0).Attributes.GetValue("Location")
         'End If
 
-        lCurve = lPaneMain.CurveList.Item(lPaneMain.CurveList.Count - 1)
-        lCurve.Line.StepType = StepType.NonStep
-        If pGraphSpec.IsReady And pApplyGraphSpec Then
-            lCurve.Line.Width = pGraphSpec.Crv(lPaneMain.CurveList.Count - 1).LThck
-            lCurve.Color = ToNewColor(pGraphSpec.Crv(lPaneMain.CurveList.Count - 1).Color)
-            lCurve.Label.Text = pGraphSpec.Crv(lPaneMain.CurveList.Count - 1).LegLbl
-        Else
-            lCurve.Line.Width = 2
-            lCurve.Color = Drawing.Color.Blue
-            If Not lCurve.Label.Text.Contains(" at ") Then
-                lCurve.Label.Text &= " at " & aDataGroup(0).Attributes.GetValue("Location")
-            End If
-        End If
+        'lCurve = lPaneMain.CurveList.Item(lPaneMain.CurveList.Count - 1)
+        'lCurve.Line.StepType = StepType.NonStep
+        'If pGraphSpec.IsReady And pApplyGraphSpec Then
+        '    lCurve.Line.Width = pGraphSpec.Crv(lPaneMain.CurveList.Count - 1).LThck
+        '    lCurve.Color = ToNewColor(pGraphSpec.Crv(lPaneMain.CurveList.Count - 1).Color)
+        '    lCurve.Label.Text = pGraphSpec.Crv(lPaneMain.CurveList.Count - 1).LegLbl
+        'Else
+        '    lCurve.Line.Width = 2
+        '    lCurve.Color = Drawing.Color.Blue
+        '    If Not lCurve.Label.Text.Contains(" at ") Then
+        '        lCurve.Label.Text &= " at " & aDataGroup(0).Attributes.GetValue("Location")
+        '    End If
+        'End If
 
         'FormatPanes(lZgc)
         'Apply labels etc
+        If lPaneAux IsNot Nothing Then lPaneAux.YAxis.Title.Text = pLeftAuxAxisLabel
         lPaneMain.YAxis.Title.Text = pLeftYAxisLabel
-        lPaneAux.YAxis.Title.Text = pLeftAuxAxisLabel
         lPaneMain.XAxis.Title.Text &= vbCrLf & "Analysis Plot for Values"
 
-        Dim lExtraText As ZedGraph.TextObj = Nothing
         If pGraphSpec.IsReady And pApplyGraphSpec Then
-            pGraphSpec.Title = pGraphSpec.Title.Replace("&", vbCrLf)
-            lPaneMain.XAxis.Title.Text &= vbCrLf & pGraphSpec.Title
+            lPaneMain.XAxis.Title.Text = pGraphSpec.Title.Replace("&", vbCrLf)
             lPaneMain.XAxis.Title.FontSpec.Size = 12.0
             If Not pGraphSpec.XtraText.Trim() = "" Then
-                pGraphSpec.XtraText = pGraphSpec.XtraText.Replace("&", vbCrLf)
-                lExtraText = New ZedGraph.TextObj(pGraphSpec.XtraText, pGraphSpec.XTxtLoc, 0.95, CoordType.ChartFraction, AlignH.Left, AlignV.Bottom)
+                Dim lExtraTextStr As String = pGraphSpec.XtraText.Replace("&", vbCrLf)
+                Dim lExtraText As ZedGraph.TextObj = Nothing
+                'lExtraText = New ZedGraph.TextObj(lExtraTextStr, pGraphSpec.XTxtLoc, 0.95, CoordType.ChartFraction, AlignH.Left, AlignV.Bottom)
+                lExtraText = New ZedGraph.TextObj(lExtraTextStr, pGraphSpec.XTxtLoc, pGraphSpec.YTxtLoc, CoordType.ChartFraction, AlignH.Left, AlignV.Bottom)
                 With lExtraText
                     .ZOrder = ZOrder.A_InFront
                     .FontSpec.StringAlignment = Drawing.StringAlignment.Near
@@ -470,7 +521,15 @@ Module GraphGenScn
             End If
         End If
 
+        'Adjust legend position
+        If pGraphSpec.IsReady And pApplyGraphSpec Then
+            Dim lLocLeg As Location = New Location(pGraphSpec.XLegLoc, pGraphSpec.YLegLoc - 0.95, CoordType.ChartFraction)
+            lPaneMain.Legend.Location = lLocLeg
+        End If
+
         'Adjust scale
+        Dim lYAxisCross As Double = 0.0
+        Dim lShowGrid As Boolean = False
         If pGraphSpec.IsReady And pApplyGraphSpec Then
             '1-leftY,2-rightY,3-Aux,4-X
             If pGraphSpec.Axis(1).label IsNot Nothing Then
@@ -480,8 +539,18 @@ Module GraphGenScn
                     .Min = pGraphSpec.Axis(1).minv
                     .Max = pGraphSpec.Axis(1).maxv
                     .MajorStep = (.Max - .Min) / pGraphSpec.Axis(1).NTic
+                    lYAxisCross = .Min
                 End With
+
+                If pGraphSpec.Gridy = 1 Then
+                    lShowGrid = True
+                End If
+                lPaneMain.YAxis.MajorGrid.IsVisible = lShowGrid
+                lPaneMain.YAxis.MinorGrid.IsVisible = lShowGrid
             End If
+            lPaneMain.YAxis.CrossAuto = False
+            lPaneMain.YAxis.Cross = lYAxisCross
+
             'If pGraphSpec.Axis(2).label IsNot Nothing Then
             '    With lPaneMain.Y2Axis.Scale
             '        .Min = pGraphSpec.Axis(2).minv
@@ -505,15 +574,28 @@ Module GraphGenScn
             '        .MajorStep = (.Max - .Min) / pGraphSpec.Axis(4).NTic
             '    End With
             'End If
+
+            lShowGrid = False
+            If pGraphSpec.Gridx = 1 Then
+                lShowGrid = True
+            End If
+            lPaneMain.XAxis.MajorGrid.IsVisible = lShowGrid
+            lPaneMain.XAxis.MinorGrid.IsVisible = lShowGrid
         End If
 
         'Make sure both graphs line up horizontally
-        lPaneAux.AxisChange()
-        lPaneMain.AxisChange()
-
-        Dim lMaxX As Single = Math.Max(lPaneAux.Chart.Rect.X, lPaneMain.Chart.Rect.X)
-        Dim lMinRight As Single = Math.Min(lPaneAux.Chart.Rect.Right, lPaneMain.Chart.Rect.Right)
-        lPaneAux.Chart.Rect = New Drawing.RectangleF(lMaxX, lPaneAux.Chart.Rect.Y, lMinRight - lMaxX, lPaneAux.Chart.Rect.Height)
+        Dim lMaxX As Single = 0
+        Dim lMinRight As Single = 0
+        If lPaneAux IsNot Nothing Then
+            lPaneAux.AxisChange()
+            lMaxX = Math.Max(lPaneAux.Chart.Rect.X, lPaneMain.Chart.Rect.X)
+            lMinRight = Math.Min(lPaneAux.Chart.Rect.Right, lPaneMain.Chart.Rect.Right)
+            lPaneAux.Chart.Rect = New Drawing.RectangleF(lMaxX, lPaneAux.Chart.Rect.Y, lMinRight - lMaxX, lPaneAux.Chart.Rect.Height)
+        Else
+            lMaxX = lPaneMain.Chart.Rect.X
+            lMinRight = lPaneMain.Chart.Rect.Right
+        End If
+        If lPaneMain IsNot Nothing Then lPaneMain.AxisChange()
         lPaneMain.Chart.Rect = New Drawing.RectangleF(lMaxX, lPaneMain.Chart.Rect.Y, lMinRight - lMaxX, lPaneMain.Chart.Rect.Height)
 
         lZgc.AxisChange()
