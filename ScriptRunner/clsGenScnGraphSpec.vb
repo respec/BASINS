@@ -72,8 +72,8 @@ Public Class clsGenScnGraphSpec
     Public Var(2 * POSMAX) As GSVarType
     Public Crv(POSMAX) As GSCrvType
     Public dtype(POSMAX) As Integer
-    Public XLegLoc, YLegLoc As Integer
-    Public XTxtLoc, YTxtLoc As Integer
+    Public XLegLoc, YLegLoc As Single
+    Public XTxtLoc, YTxtLoc As Single
     Public XtraText, Title As String
     Public DataLabelPosition As Integer '0=none, 1=horizontal, 2=vertical, 3=popup
 
@@ -311,6 +311,30 @@ ReadErr:
         ReDim Crv(0)
         ReDim Var(0)
     End Sub
+
+    Public Function CurveIndex(ByVal aCons As String, ByVal aIndex As Integer) As Integer
+        Dim lSearchKey As String = aCons.ToUpper
+        Dim lMatchWord As Boolean = False
+        'TODO: need a better matching algorithm here
+        Select Case aCons.ToUpper
+            Case "DEWP", "EVAP", "WIND", "TEMP", "PREC", "WSELEV", "ELEV"
+                lSearchKey = aCons.ToUpper
+            Case "SRAD", "RAD"
+                lSearchKey = "RAD"
+            Case "ATEM"
+                lSearchKey = "TEMP"
+            Case "RAIN"
+                lSearchKey = "PREC"
+        End Select
+        Dim lIndex As Integer = aIndex
+        For I As Integer = 0 To Crv.Length - 1
+            If Crv(I).LegLbl IsNot Nothing AndAlso Crv(I).LegLbl.ToUpper.Contains(lSearchKey) Then
+                lIndex = I
+                Exit For
+            End If
+        Next
+        Return lIndex
+    End Function
 
     Function StrSplit(ByRef Source As String, ByRef delim As String, ByRef quote As String) As String
         ' ##SUMMARY Divides string into 2 portions at position of 1st occurence of specified _
