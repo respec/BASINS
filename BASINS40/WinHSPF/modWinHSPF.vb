@@ -457,37 +457,25 @@ Public Module WinHSPF
                 lMapWindowExeName = FindFile("Please locate MapWindow.exe", "MapWindow.exe")
             End If
 
+            If Not FileExists(lMapWindowProjectName) Then
+                Dim lTempStr As String = atcUtility.GetEmbeddedFileAsString("template.mwprj")
+                Dim lFileStr As String = ""
+                Dim lDirStr As String = PathNameOnly(lMapWindowProjectName) & "\"
+                For lIndex As Integer = 0 To pUCI.FilesBlock.Count
+                    Dim lFile As HspfFile = pUCI.FilesBlock.Value(lIndex)
+                    If lFile.Typ.StartsWith("WDM") Then
+                        'DataSource Specification='D:\BASINS\data\tutorial\HSPF\met.wdm'&gt;Timeseries::WDM&lt;/DataSource&gt;&lt;
+                        'DataSource Specification='D:\BASINS\data\tutorial\HSPF\Patuxent.wdm'&gt;Timeseries::WDM&lt;/DataSource&gt;&lt;
+                        lFileStr = lFileStr & "DataSource Specification='" & lDirStr & lFile.Name.Trim & "'&gt;Timeseries::WDM&lt;/DataSource&gt;&lt;"
+                    End If
+                Next
+                lTempStr = lTempStr.Replace("ReplaceThisPartWithWDMFileNames", lFileStr)
+                IO.File.WriteAllText(lMapWindowProjectName, lTempStr)
+            End If
+
             If FileExists(lMapWindowProjectName) Then
                 If FileExists(lMapWindowExeName) Then
                     Process.Start(lMapWindowExeName, lMapWindowProjectName)
-                End If
-            Else
-                'create a script to run from the mapwindow command line
-                If FileExists(lMapWindowExeName) Then
-                    Dim lStr As String = "Imports MapWindow.Interfaces" & vbCrLf & _
-                                         "Imports atcData" & vbCrLf & _
-                                         "Imports atcUtility" & vbCrLf & vbCrLf & _
-                                         "Module AutoLoad" & vbCrLf & vbCrLf & _
-                                         "    Public Sub ScriptMain(ByRef aMapWin As IMapWin)" & vbCrLf & _
-                                         "        Dim lFolder As String = " & """" & PathNameOnly(lMapWindowProjectName) & """" & vbCrLf & _
-                                         "        ChDriveDir(lFolder)" & vbCrLf & vbCrLf
-
-                    For lIndex As Integer = 0 To pUCI.FilesBlock.Count
-                        Dim lFile As HspfFile = pUCI.FilesBlock.Value(lIndex)
-                        If lFile.Typ.StartsWith("WDM") Then
-                            lStr = lStr & "        atcDataManager.OpenDataSource(" & """" & lFile.Name.Trim & """" & ")" & vbCrLf
-                        End If
-                    Next
-                    lStr = lStr & vbCrLf & "        aMapWin.Project.Save(" & """" & lMapWindowProjectName & """" & ")" & vbCrLf
-
-                    lStr = lStr & vbCrLf & "    End Sub" & vbCrLf & _
-                                           "End Module"
-
-                    Dim lScriptName As String = PathNameOnly(lMapWindowProjectName) & "\AutoLoad.vb"
-
-                    IO.File.WriteAllText(lScriptName, lStr)
-
-                    Process.Start(lMapWindowExeName, lScriptName)
                 End If
             End If
         Else
