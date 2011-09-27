@@ -17,11 +17,16 @@ End Enum
 Public Class GWBaseFlow
     Private pDataSource As atcDataSource = Nothing
     Private pDataGroup As atcTimeseriesGroup = Nothing
-    Private pDrainageArea As Double = 0.0
-    Private pDatasetID As Integer = 0
-    Private pStartDate As Double = 0.0
-    Private pEndDate As Double = 0.0
+
+    Private pTargetTS As atcTimeseries
     Public Property TargetTS() As atcTimeseries
+        Get
+            Return pTargetTS
+        End Get
+        Set(ByVal value As atcTimeseries)
+            pTargetTS = value
+        End Set
+    End Property
 
     ''' <summary>
     ''' This is a file (usually called 'Station.txt') that is read by programs PREP, RECESS, RORA, and PART, 
@@ -40,7 +45,7 @@ Public Class GWBaseFlow
                 Return pStationInfoFile
             End If
         End Get
-        Set(value As String)
+        Set(ByVal value As String)
             If File.Exists(value) Then
                 pStationInfoFile = value
             Else
@@ -64,11 +69,59 @@ Public Class GWBaseFlow
         End If
     End Sub
 
+    'if metric unit (UnitFlag=2), then convert drainage area from square mile to square kilometer by a factor of 2.59
+    Private pDrainageArea As Double = 0.0
     Public Property DrainageArea() As Double
+        Get
+            Return pDrainageArea
+        End Get
+        Set(ByVal value As Double)
+            pDrainageArea = value
+        End Set
+    End Property
+
+    Private pTargetDatasetID As Integer = 0
     Public Property TargetDatasetID() As Integer
+        Get
+            Return pTargetDatasetID
+        End Get
+        Set(ByVal value As Integer)
+            pTargetDatasetID = value
+        End Set
+    End Property
+
+    Private pStartDate As Double = 0.0
     Public Property StartDate() As Double
+        Get
+            Return pStartDate
+        End Get
+        Set(ByVal value As Double)
+            pStartDate = value
+        End Set
+    End Property
+
+    Private pEndDate As Double = 0.0
     Public Property EndDate() As Double
+        Get
+            Return pEndDate
+        End Get
+        Set(ByVal value As Double)
+            pEndDate = value
+        End Set
+    End Property
+
+    'unit flag 1 for English, 2 for metric
+    'if metric, sq mi => sq km
+    'if metric, cfs => cms
+    Private pUnitFlag As Integer
     Public Property UnitFlag() As Integer
+        Get
+            Return pUnitFlag
+        End Get
+        Set(ByVal value As Integer)
+            pUnitFlag = value
+        End Set
+    End Property
 
     Public Function GetTargetTS() As atcTimeseries
         Try
@@ -103,13 +156,40 @@ Public Class GWBaseFlowHySep
             pIntervalInDay = value
         End Set
     End Property
-    Public Property Method() As HySepMethod
-    Public Property DaysInBuffer As Integer = 11
-    Public Property FlagLast As Boolean
 
-    Public Sub DoBaseFlowSeparation()
+    Private pMethod As HySepMethod
+    Public Property Method() As HySepMethod
+        Get
+            Return pMethod
+        End Get
+        Set(ByVal value As HySepMethod)
+            pMethod = value
+        End Set
+    End Property
+
+    Private pDaysInBuffer As Integer = 11
+    Public Property DaysInBuffer() As Integer
+        Get
+            Return pDaysInBuffer
+        End Get
+        Set(ByVal value As Integer)
+            pDaysInBuffer = value
+        End Set
+    End Property
+
+    Private pFlagLast As Boolean
+    Public Property FlagLast() As Boolean
+        Get
+            Return pFlagLast
+        End Get
+        Set(ByVal value As Boolean)
+            pFlagLast = value
+        End Set
+    End Property
+
+    Public Function DoBaseFlowSeparation() As atcTimeseries
         If TargetTS Is Nothing Then
-            Exit Sub
+            Return Nothing
         End If
 
         'Start organizing here using the original HYSEP scheme
@@ -139,15 +219,17 @@ Public Class GWBaseFlowHySep
         'unitflag 2 is to use metric units
         If UnitFlag = 2 Then DrainageArea = DrainageArea * 2.59
 
+        Dim lTsBF As atcTimeseries = Nothing
         Select Case Method
             Case HySepMethod.FIXED
-                HySepFixed(TargetTS)
+                lTsBF = HySepFixed(lTsDaily)
             Case HySepMethod.SLIDE
-                HySepSlide(TargetTS)
+                lTsBF = HySepSlide(lTsDaily)
             Case HySepMethod.LOCMIN
-                HySepLocMin(TargetTS)
+                lTsBF = HySepLocMin(lTsDaily)
         End Select
-    End Sub
+        Return lTsBF
+    End Function
 
     Public Function HySepFixed(ByVal aTS As atcTimeseries) As atcTimeseries
         Dim lInterv As Integer = IntervalInDays
@@ -162,7 +244,7 @@ Public Class GWBaseFlowHySep
                 lGoodValue = 1
             Else
                 lValueBaseflow(I) = aTS.Value(I)
-                If lGoodValue = 0 And I >= 0 Then lStartInd = I
+                If lGoodValue = 0 And I > lStartInd Then lStartInd = I
             End If
         Next
 
@@ -435,7 +517,15 @@ End Class
 Public Class GWBaseFlowPart
     Inherits GWBaseFlow
 
-    Public Property ThresholdLowLogQ As Double = 0.1
+    Private pThresholdLowLogQ As Double = 0.1
+    Public Property ThresholdLowLogQ() As Double
+        Get
+            Return pThresholdLowLogQ
+        End Get
+        Set(ByVal value As Double)
+            pThresholdLowLogQ = value
+        End Set
+    End Property
 
     Public Property TBase() As Double
         Get
@@ -449,7 +539,7 @@ Public Class GWBaseFlowPart
             End If
             Return lIntTbase
         End Get
-        Set(value As Double)
+        Set(ByVal value As Double)
         End Set
     End Property
 
@@ -869,13 +959,21 @@ Public Class GWBaseFlowPart
         lSW.Flush()
         lSW.Close()
         lSW = Nothing
+
+        'construct baseflow timeseries
+        Dim lTsBaseflow As New atcTimeseries(Nothing)
+        lTsBaseflow.Dates = aTS.Dates
+        For I = 0 To aTS.numValues
+            lTsBaseflow.Value(I) = lB1D(I, 3)
+        Next
+        Return lTsBaseflow
     End Function
 
     Public Sub PrintDataSummary(ByVal aTS As atcTimeseries)
         'print out data summary, usgs style
 
         Dim lStrBuilderDataSummary As New StringBuilder
-        lStrBuilderDataSummary.AppendLine(
+        lStrBuilderDataSummary.AppendLine( _
             "                 MONTH        " & vbCrLf & _
             " YEAR   J F M A M J J A S O N D")
         Dim lDate(5) As Integer
