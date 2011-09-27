@@ -195,24 +195,24 @@ Public Class GWBaseFlowHySep
         'Start organizing here using the original HYSEP scheme
         'that is to do one year at a time
         '
-        'Seems key is to have 11-day before and after the duration of interest
+        'Seems key is to have up to 11-day before and after the duration of interest
         Dim lTsStart As Double = TargetTS.Attributes.GetValue("SJDay")
         Dim lTsEnd As Double = TargetTS.Attributes.GetValue("EJDay")
 
         Dim lDaysPrev As Integer = timdifJ(lTsStart, StartDate, atcTimeUnit.TUDay, 1)
         Dim lDaysPost As Integer = timdifJ(EndDate, lTsEnd, atcTimeUnit.TUDay, 1)
 
-        If lDaysPrev >= 11 Then
-            lTsStart = TimAddJ(StartDate, atcTimeUnit.TUDay, 1, -11)
-        End If
+        If lDaysPrev >= 11 Then lDaysPrev = 11
+        lTsStart = TimAddJ(StartDate, atcTimeUnit.TUDay, 1, -1 * lDaysPrev)
 
-        If lDaysPost >= 11 Then
-            lTsEnd = TimAddJ(EndDate, atcTimeUnit.TUDay, 1, 11)
-        End If
+        If lDaysPost >= 11 Then lDaysPost = 11
+        lTsEnd = TimAddJ(EndDate, atcTimeUnit.TUDay, 1, lDaysPost)
 
         'Make sure the ts is in daily timestep
         Dim lTsDaily As atcTimeseries = SubsetByDate(TargetTS, lTsStart, lTsEnd, Nothing)
-        lTsDaily = Aggregate(lTsDaily, atcTimeUnit.TUDay, 1, atcTran.TranAverSame, Nothing)
+        If Not lTsDaily.Attributes.GetValue("Tu") = atcTimeUnit.TUDay Then
+            lTsDaily = Aggregate(lTsDaily, atcTimeUnit.TUDay, 1, atcTran.TranAverSame, Nothing)
+        End If
 
         'Get drainage area
         'if metric units chosen, convert drainage area (square miles2) to square km2
@@ -228,6 +228,10 @@ Public Class GWBaseFlowHySep
             Case HySepMethod.LOCMIN
                 lTsBF = HySepLocMin(lTsDaily)
         End Select
+
+        'Adjust for pre- and post- duration dates
+        lTsBF = SubsetByDate(lTsBF, StartDate, EndDate, Nothing)
+
         Return lTsBF
     End Function
 
@@ -249,17 +253,17 @@ Public Class GWBaseFlowHySep
         Next
 
         Dim lFxDays As Integer = aTS.numValues
-        If FlagLast Then
-            'last year to process: reduce total days for processing by 
-            'the number of missing values within extra 11 days at end
-            For I As Integer = aTS.numValues To aTS.numValues - (DaysInBuffer - 1) Step -1
-                If aTS.Value(I) < 0 Then
-                    lFxDays = lFxDays - 1
-                End If
-            Next
-        End If
+        'last year to process: reduce total days for processing by 
+        'the number of missing values within extra 11 days at end
+        'If FlagLast Then
+        'End If
+        For I As Integer = aTS.numValues To aTS.numValues - (DaysInBuffer - 1) Step -1
+            If aTS.Value(I) < 0 Then
+                lFxDays = lFxDays - 1
+            End If
+        Next
 
-        Dim lK As Integer = (lFxDays - lStartInd) / lInterv
+        Dim lK As Integer = Math.Floor((lFxDays - lStartInd) / lInterv)
         Dim lPMIN As Double
         Dim L1 As Integer
         Dim L2 As Integer
@@ -275,53 +279,61 @@ Public Class GWBaseFlowHySep
                 For J = L1 To L2
                     lValueBaseflow(J) = lPMIN
                 Next
+                If I = 220 Then
+                    Dim Checkpoint1 As String = "Checkpoint1"
+                End If
             Next
         End If
 
-        If FlagLast Then
-            'last year to process
-            If L2 < lFxDays Then
-                'extra days left over after process K intervals
-                'do baseflow separation on those days by themselves
-                lPMIN = 100000.0
-                For J = L2 + 1 To lFxDays
-                    If aTS.Value(J) < lPMIN Then lPMIN = aTS.Value(J)
-                Next
-                For J = L2 + 1 To lFxDays
-                    lValueBaseflow(J) = lPMIN
-                Next
-            End If
-        Else
-            'not last year to process
-            'set START for next year so that first few days of next year
-            'use some of last few days of this year to determin baseflow
-
-            'find last day processed
-            Dim lD As Integer = lStartInd + lK * lInterv
-            'find last day of year in array
-            Dim lA As Integer = aTS.numValues - DaysInBuffer
-            'move START back in interval increments
-            Do While (lD > lA)
-                lD -= lInterv
-                lStartInd = DaysInBuffer - (lA - lD)
-            Loop
+        'last year to process
+        If L2 < lFxDays Then
+            'extra days left over after process K intervals
+            'do baseflow separation on those days by themselves
+            lPMIN = 100000.0
+            For J = L2 + 1 To lFxDays
+                If aTS.Value(J) < lPMIN Then lPMIN = aTS.Value(J)
+            Next
+            For J = L2 + 1 To lFxDays
+                lValueBaseflow(J) = lPMIN
+            Next
         End If
 
-        Dim lBFStart As Double = aTS.Dates.Value(lStartInd - 1)
-        Dim lBFEnd As Double = aTS.Dates.Value(J)
-        Dim lNewDates As New atcTimeseries(Nothing)
-        lNewDates.Values = NewDates(lBFStart, lBFEnd, atcTimeUnit.TUDay, 1)
+        'TODO: further determine if below now becomes unnecessary
+        'If FlagLast Then
+        '    'moved outside this branch as it has to be done regardless
+        '    'as there always going to be an end
+        'Else
+        '    'not last year to process
+        '    'set START for next year so that first few days of next year
+        '    'use some of last few days of this year to determin baseflow
 
-        Dim lValueBaseflowFinal() As Double
-        ReDim lValueBaseflowFinal(J - lStartInd + 1)
-        lValueBaseflowFinal(0) = GetNaN()
-        For I As Integer = lStartInd To J
-            lValueBaseflowFinal(I - lStartInd + 1) = lValueBaseflow(I)
-        Next
+        '    'find last day processed
+        '    Dim lD As Integer = lStartInd + lK * lInterv
+        '    'find last day of year in array
+        '    Dim lA As Integer = aTS.numValues - DaysInBuffer
+        '    'move START back in interval increments
+        '    Do While (lD > lA)
+        '        lD -= lInterv
+        '        lStartInd = DaysInBuffer - (lA - lD)
+        '    Loop
+        'End If
 
-        Dim lTsBaseflow As New atcTimeseries(Nothing)
-        lTsBaseflow.Dates = lNewDates
-        lTsBaseflow.Values = lValueBaseflowFinal
+        Dim lTsBaseflow As atcTimeseries = aTS.Clone()
+        lTsBaseflow.Values = lValueBaseflow
+
+        'Dim lBFStart As Double = aTS.Dates.Value(lStartInd - 1)
+        'Dim lBFEnd As Double = aTS.Dates.Value(J)
+        'Dim lNewDates As New atcTimeseries(Nothing)
+        'lNewDates.Values = NewDates(lBFStart, lBFEnd, atcTimeUnit.TUDay, 1)
+
+        'Dim lValueBaseflowFinal() As Double
+        'ReDim lValueBaseflowFinal(J - lStartInd + 1)
+        'lValueBaseflowFinal(0) = GetNaN()
+        'For I As Integer = lStartInd To J
+        '    lValueBaseflowFinal(I - lStartInd + 1) = lValueBaseflow(I)
+        'Next
+        'lTsBaseflow.Dates = lNewDates
+        'lTsBaseflow.Values = lValueBaseflowFinal
         Return lTsBaseflow
     End Function
 
@@ -406,20 +418,24 @@ Public Class GWBaseFlowHySep
         Dim lDaysWithGoodValue As Integer = 0
         Dim lStartInd As Integer = 0
         Dim lIndex As Integer = 0 'ID in the original program
-        Dim lendInterv As Integer = 0 'END in the original program
+        Dim lendIndex As Integer = 0 'END in the original program
         Dim lPFLAG As Boolean = False 'signify finding good period to process
         Dim lIPoint(aTS.numValues) As Integer 'IPOINT(400) in original code
         Dim lNumPt As Integer 'NUMPT in original code
 
-        Do While lendInterv < aTS.numValues And lIndex < aTS.numValues
-
-            lIndex += 1
+        Do While lendIndex < aTS.numValues And lIndex < aTS.numValues
+            'loop for periods of good data
+            lNumPt = 0
+            lDaysWithGoodValue = 0
+            lPFLAG = False
             Do While lIndex < aTS.numValues And Not lPFLAG
+                'find start and end of good values
+                lIndex += 1
                 If aTS.Value(lIndex) >= 0 Then 'good value
                     lValueBaseflow(lIndex) = 0
                     If lDaysWithGoodValue = 0 Then lStartInd = lIndex
                     lDaysWithGoodValue += 1
-                    lendInterv = lIndex
+                    lendIndex = lIndex
                 Else ' bad value
                     If lDaysWithGoodValue = 0 Then
                         'no good values yet
@@ -448,14 +464,14 @@ Public Class GWBaseFlowHySep
             Dim lS As Integer 'S in the original code
 
             Dim lSearchRadius As Integer = (lInterv - (lInterv Mod 2)) / 2
-            lEnd = lendInterv - lSearchRadius
+            lEnd = lendIndex - lSearchRadius
             lS = lStartInd + lSearchRadius
             Dim lFoundLocMin As Boolean
             For I As Integer = lS To lEnd
-                lFoundLocMin = True
+                lFoundLocMin = False
                 For J As Integer = 1 To lSearchRadius
-                    If aTS.Value(I) > aTS.Value(I + J) OrElse aTS.Value(I) > aTS.Value(I - J) Then
-                        lFoundLocMin = False
+                    If aTS.Value(I) <= aTS.Value(I + J) And aTS.Value(I) <= aTS.Value(I - J) Then
+                        lFoundLocMin = True
                         Exit For
                     End If
                 Next
@@ -475,7 +491,7 @@ Public Class GWBaseFlowHySep
                 Next
 
                 'set ending values to last local minimum
-                For I As Integer = lIPoint(lNumPt) To lendInterv
+                For I As Integer = lIPoint(lNumPt) To lendIndex
                     lValueBaseflow(I) = aTS.Value(lIPoint(lNumPt))
                 Next
 
@@ -495,7 +511,7 @@ Public Class GWBaseFlowHySep
                 Next
 
             Else 'no local minimum found in period analyzed
-                For I As Integer = lStartInd To lendInterv
+                For I As Integer = lStartInd To lendIndex
                     lValueBaseflow(I) = -999.0
                 Next
             End If
@@ -508,6 +524,7 @@ Public Class GWBaseFlowHySep
         Dim lTsBaseflow As atcTimeseries = aTS.Clone
         With lTsBaseflow
             .Attributes.SetValue("Constituent", "Baseflow")
+            .Attributes.SetValue("Scenario", "HySEPLocMin")
             .Values = lValueBaseflow
         End With
         Return lTsBaseflow
