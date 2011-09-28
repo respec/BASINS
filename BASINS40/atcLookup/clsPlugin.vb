@@ -23,7 +23,7 @@ Public Class PlugIn
 
         pMapWin.Menus.AddMenu(AnalysisMenuName & "_LookupSeparator", AnalysisMenuName, Nothing, "-")
         atcData.atcDataManager.AddMenuIfMissing(AnalysisMenuName & "_Projection", AnalysisMenuName, "Projection Parameters")
-        atcData.atcDataManager.AddMenuIfMissing(AnalysisMenuName & "_Storet", AnalysisMenuName, "STORET Agency Codes")
+        atcData.atcDataManager.AddMenuIfMissing(AnalysisMenuName & "_Storet", AnalysisMenuName, "STORET Homepage")
         atcData.atcDataManager.AddMenuIfMissing(AnalysisMenuName & "_Sic", AnalysisMenuName, "Standard Industrial Classification Codes")
         atcData.atcDataManager.AddMenuIfMissing(AnalysisMenuName & "_WQ", AnalysisMenuName, "Water Quality Criteria 304a")
         pMapWin.Menus.AddMenu(AnalysisMenuName & "_LookupSeparator2", AnalysisMenuName, Nothing, "-")
@@ -41,7 +41,7 @@ Public Class PlugIn
                     'Dim main As New frmStoret
                     'main.initializeUI(pMapWin.Project.FileName)
                     'main.Show()
-                    OpenFile("http://oaspub.epa.gov/stormoda/DW_stationcriteria_STN")
+                    OpenFile("http://www.epa.gov/storet/")
                     Handled = True
                 Case "Sic"
                     'Dim main As New frmSic
