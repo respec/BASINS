@@ -34,7 +34,7 @@ Public Class PlugIn
         Dim lReportsDir As String = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\reports\"
         If Mid(lReportsDir, 3, 5) = "\dev\" Then
             'change loc if in devel envir
-            lReportsDir = "C:\dev\BASINS40\atcReport\scripts"
+            lReportsDir = Mid(lBasinsBinLoc, 1, 1) & ":\dev\BASINS40\atcReport\scripts"
         End If
         ReportsDir = lReportsDir
     End Sub
@@ -98,7 +98,7 @@ Public Class PlugIn
 
             'now run script
             'Return ListedSegmentsTable.ScriptMain(lArgs(0), lArgs(1), lArgs(2), lArgs(3))
-            Dim lAssembly As System.Reflection.Assembly = Scripting.PrepareScript("vb", Nothing, Reports(aReportIndex), lProblem, "")
+            Dim lAssembly As System.Reflection.Assembly = Scripting.PrepareScript("vb", Nothing, Reports(aReportIndex), lProblem, pMapWin.Plugins.PluginFolder)
             If lProblem.Length = 0 Then
                 BuildReport = Scripting.Run(lAssembly, lProblem, lArgs)
             End If
