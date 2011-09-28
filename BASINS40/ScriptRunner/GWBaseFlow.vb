@@ -35,7 +35,7 @@ Public Class GWBaseFlow
     ''' The streamflow file name should be 12 characters or less (for the original fortran program). 
     ''' </summary>
     ''' <remarks></remarks>
-    Private pStationInfoFile As String
+    Private pStationInfoFile As String = "Station.txt"
     Public Property StationInfoFile() As String
         Get
             If File.Exists(pStationInfoFile) Then
@@ -392,21 +392,9 @@ Public Class GWBaseFlowHySep
             End If
         Next
 
-        Dim lBFStart As Double = aTS.Dates.Value(lStartInd - 1)
-        Dim lBFEnd As Double = aTS.Dates.Value(J)
-        Dim lNewDates As New atcTimeseries(Nothing)
-        lNewDates.Values = NewDates(lBFStart, lBFEnd, atcTimeUnit.TUDay, 1)
+        Dim lTsBaseflow As atcTimeseries = aTS.Clone()
+        lTsBaseflow.Values = lValueBaseflow
 
-        Dim lValueBaseflowFinal() As Double
-        ReDim lValueBaseflowFinal(J - lStartInd + 1)
-        lValueBaseflowFinal(0) = GetNaN()
-        For I As Integer = lStartInd To J
-            lValueBaseflowFinal(I - lStartInd + 1) = lValueBaseflow(I)
-        Next
-
-        Dim lTsBaseflow As New atcTimeseries(Nothing)
-        lTsBaseflow.Dates = lNewDates
-        lTsBaseflow.Values = lValueBaseflowFinal
         Return lTsBaseflow
     End Function
 
@@ -443,8 +431,7 @@ Public Class GWBaseFlowHySep
                     ElseIf lDaysWithGoodValue < lInterv Then
                         'not enough good values to process
                         For J As Integer = 1 To lDaysWithGoodValue
-                            Dim lK As Integer = lIndex - J
-                            lValueBaseflow(lK) = -999.0
+                            lValueBaseflow(lIndex - J) = -999.0
                         Next
                         lDaysWithGoodValue = 0
                     Else
@@ -472,6 +459,8 @@ Public Class GWBaseFlowHySep
                 For J As Integer = 1 To lSearchRadius
                     If aTS.Value(I) <= aTS.Value(I + J) And aTS.Value(I) <= aTS.Value(I - J) Then
                         lFoundLocMin = True
+                    Else
+                        lFoundLocMin = False
                         Exit For
                     End If
                 Next
@@ -567,9 +556,9 @@ Public Class GWBaseFlowPart
         End If
     End Sub
 
-    Public Sub DoBaseFlowSeparation()
+    Public Function DoBaseFlowSeparation() As atcTimeseries
         If TargetTS Is Nothing Then
-            Exit Sub
+            Return Nothing
         End If
 
         'checking the drainage area size
@@ -589,24 +578,30 @@ Public Class GWBaseFlowPart
         If lMsgDrainageArea.Length > 0 Then
             Dim lYesNo() As String = {"Continue", "Quit"}
             If Logger.MsgCustom(lMsgDrainageArea, "Problematic Drainage Area", lYesNo) = "Quit" Then
-                Exit Sub
+                Return Nothing
             End If
         End If
 
         If TBase = -999.0 Then
             Logger.Msg("Problem with calculation of required antecedent recession.", MsgBoxStyle.Critical, "PART Method Stopped")
-            Exit Sub
+            Return Nothing
         End If
 
-        StartDate = TargetTS.Attributes.GetValue("SJDay")
-        EndDate = TargetTS.Attributes.GetValue("EJDay")
+        If StartDate = 0 Then StartDate = TargetTS.Attributes.GetValue("SJDay")
+        If EndDate = 0 Then EndDate = TargetTS.Attributes.GetValue("EJDay")
+        Dim lTsDaily As atcTimeseries = SubsetByDate(TargetTS, StartDate, EndDate, Nothing)
+        If Not lTsDaily.Attributes.GetValue("Tu") = atcTimeUnit.TUDay Then
+            lTsDaily = Aggregate(lTsDaily, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+        End If
 
-        Dim lNumMissing As Integer = TargetTS.Attributes.GetValue("Count Missing")
+        Dim lTsBaseflow As atcTimeseries = Nothing
+        PrintDataSummary(lTsDaily)
+        Dim lNumMissing As Integer = lTsDaily.Attributes.GetValue("Count Missing")
         If lNumMissing <= 1 Then
             Logger.Msg( _
-                  "NUMBER OF DAYS (WITH DATA) COUNTED =            " & TargetTS.numValues - lNumMissing & vbCrLf & _
-                  "NUMBER OF DAYS THAT SHOULD BE IN THIS INTERVAL =" & TargetTS.numValues, MsgBoxStyle.Information, "Perform PART")
-            Dim lTsBaseflow As atcTimeseries = Part(TargetTS)
+                  "NUMBER OF DAYS (WITH DATA) COUNTED =            " & lTsDaily.numValues - lNumMissing & vbCrLf & _
+                  "NUMBER OF DAYS THAT SHOULD BE IN THIS INTERVAL =" & lTsDaily.numValues, MsgBoxStyle.Information, "Perform PART")
+            lTsBaseflow = Part(TargetTS)
         Else
             Logger.Msg( _
                    "***************************************" & vbCrLf & _
@@ -614,11 +609,11 @@ Public Class GWBaseFlowPart
                    "*** FLOW RECORD WITHIN THE PERIOD OF **" & vbCrLf & _
                    "*** INTEREST.  PROGRAM TERMINATION. ***" & vbCrLf & _
                    "***************************************", MsgBoxStyle.Critical, "PART Method Stopped")
-            Exit Sub
+            Return Nothing
         End If
 
-
-    End Sub
+        Return lTsBaseflow
+    End Function
 
     Public Function Part(ByVal aTS As atcTimeseries) As atcTimeseries
 
@@ -664,8 +659,6 @@ Public Class GWBaseFlowPart
                 lB1D(D, IBASE) = -888.0
             Next
         Next
-
-        PrintDataSummary(aTS)
 
         Dim I, J As Integer
         '--------  REPEAT FROM HERE TO LINE 500 FOR EACH OF THE 3 VALUES  ----------
@@ -956,34 +949,31 @@ Public Class GWBaseFlowPart
         '------- WRITE DAILY STREAMFLOW AND BASEFLOW FOR ONE OR MORE YEARS: ---
         Dim lPartDayFilename As String = Path.GetDirectoryName(aTS.Attributes.GetValue("History 1"))
         lPartDayFilename = Path.Combine(lPartDayFilename, "PARTDAY.TXT")
-        Dim lSW As New StreamWriter(lPartDayFilename, False)
-
-        lSW.WriteLine("THIS IS FILE PARTDAY.TXT WHICH GIVES DAILY OUTPUT OF PROGRAM PART. " & vbCrLf)
-        lSW.WriteLine("NOTE -- RESULTS AT THIS SMALL TIME SCALE ARE PROVIDED FOR " & vbCrLf)
-        lSW.WriteLine("THE PURPOSES OF PROGRAM SCREENING AND FOR GRAPHICS, BUT " & vbCrLf)
-        lSW.WriteLine("SHOULD NOT BE REPORTED OR USED QUANTITATIVELY " & vbCrLf)
-        lSW.WriteLine(" INPUT FILE = " & aTS.Attributes.GetValue("History 1") & vbCrLf)
-        lSW.WriteLine(" STARTING YEAR = " & DumpDate(aTS.Attributes.GetValue("SJDay")) & vbCrLf)
-        lSW.WriteLine(" ENDING YEAR = " & DumpDate(aTS.Attributes.GetValue("EJDay")) & vbCrLf)
-        lSW.WriteLine("                         BASE FLOW FOR EACH" & vbCrLf)
-        lSW.WriteLine("                            REQUIREMENT OF  " & vbCrLf)
-        lSW.WriteLine("          STREAM         ANTECEDENT RECESSION " & vbCrLf)
-        lSW.WriteLine(" DAY #     FLOW        #1         #2         #3          DATE " & vbCrLf)
-
-        For I = 0 To aTS.numValues
-            lSW.WriteLine(I & " " & aTS.Value(I + 1) & " " & lB1D(I + 1, 1) & " " & lB1D(I + 1, 2) & " " & lB1D(I + 1, 3) & " " & DumpDate(aTS.Dates.Value(I)))
-        Next
-        lSW.Flush()
-        lSW.Close()
-        lSW = Nothing
 
         'construct baseflow timeseries
-        Dim lTsBaseflow As New atcTimeseries(Nothing)
-        lTsBaseflow.Dates = aTS.Dates
+        Dim lTsBaseflow1 As atcTimeseries = aTS.Clone()
+        Dim lTsBaseflow2 As atcTimeseries = aTS.Clone()
+        Dim lTsBaseflow3 As atcTimeseries = aTS.Clone()
+
+        lTsBaseflow1.Dates = aTS.Dates
+        lTsBaseflow2.Dates = aTS.Dates
+        lTsBaseflow3.Dates = aTS.Dates
+
         For I = 0 To aTS.numValues
-            lTsBaseflow.Value(I) = lB1D(I, 3)
+            lTsBaseflow1.Value(I) = lB1D(I, 1)
         Next
-        Return lTsBaseflow
+
+        For I = 0 To aTS.numValues
+            lTsBaseflow2.Value(I) = lB1D(I, 2)
+        Next
+
+        For I = 0 To aTS.numValues
+            lTsBaseflow3.Value(I) = lB1D(I, 3)
+        Next
+
+        WriteBFDaily(aTS, lTsBaseflow1, lTsBaseflow2, lTsBaseflow3, lPartDayFilename)
+
+        Return lTsBaseflow3 'TODO: make sure which one is it
     End Function
 
     Public Sub PrintDataSummary(ByVal aTS As atcTimeseries)
@@ -997,44 +987,96 @@ Public Class GWBaseFlowPart
         For I As Integer = 0 To aTS.numValues - 1
             J2Date(aTS.Dates.Value(I), lDate)
             lStrBuilderDataSummary.Append(lDate(0).ToString.PadLeft(5, " "))
-            Dim lprevM As Integer = 0
             Dim lDaysInMonth As Integer = DayMon(lDate(0), lDate(1))
 
             For M As Integer = 1 To 12
                 Dim lMonthFlag As String = "."
                 If lDate(1) = M Then
                     lDaysInMonth = DayMon(lDate(0), M)
-                    While lDate(2) <= lDaysInMonth
-                        If aTS.Value(I + 1) < 0 Then
+                    Dim lDayInMonthDone As Integer = 0
+                    While lDate(2) <= lDaysInMonth And lDate(1) = M
+                        lDayInMonthDone += 1
+                        If I = aTS.numValues Then Exit While
+                        If Double.IsNaN(aTS.Value(I + 1)) OrElse aTS.Value(I + 1) < 0 Then
                             lMonthFlag = "X"
                         End If
                         I += 1
                         J2Date(aTS.Dates.Value(I), lDate)
                     End While
-
+                    If lDayInMonthDone < lDaysInMonth Then
+                        If lMonthFlag = "." Then lMonthFlag = "X"
+                    End If
                     If M = 1 Then
                         lStrBuilderDataSummary.Append("   " & lMonthFlag)
                     ElseIf M = 12 Then
+                        'End of one year
                         lStrBuilderDataSummary.AppendLine(" " & lMonthFlag)
+                        I -= 1
                     Else
                         lStrBuilderDataSummary.Append(" " & lMonthFlag)
                     End If
                 Else
                     If M = 1 Then
-                        lStrBuilderDataSummary.Append("    ")
+                        lStrBuilderDataSummary.Append("X".PadLeft(4, " "))
                     ElseIf M = 12 Then
-                        lStrBuilderDataSummary.AppendLine("  ")
+                        lStrBuilderDataSummary.AppendLine(" X")
                     Else
-                        lStrBuilderDataSummary.Append("  ")
+                        lStrBuilderDataSummary.Append(" X")
                     End If
                 End If
             Next 'month
         Next 'day
 
         Dim lDataSummaryFilename As String = Path.GetDirectoryName(aTS.Attributes.GetValue("History 1"))
+        lDataSummaryFilename = lDataSummaryFilename.Substring("Read from ".Length)
         lDataSummaryFilename = Path.Combine(lDataSummaryFilename, "DataSummary.txt")
         Dim lSW As New StreamWriter(lDataSummaryFilename, False)
         lSW.WriteLine(lStrBuilderDataSummary.ToString)
+        lSW.Flush()
+        lSW.Close()
+        lSW = Nothing
+        lStrBuilderDataSummary.Remove(0, lStrBuilderDataSummary.Length)
+    End Sub
+
+    Private Sub WriteBFDaily(ByVal aTS As atcTimeseries, ByVal aBFTs1 As atcTimeseries, ByVal aBFTs2 As atcTimeseries, ByVal aBFTs3 As atcTimeseries, ByVal aFilename As String)
+        Dim lSW As New StreamWriter(aFilename, False)
+
+        Dim lDate() As Integer = Nothing
+        J2Date(aTS.Dates.Value(0), lDate)
+        Dim lStartingYear As String = lDate(0).ToString
+        J2Date(aTS.Dates.Value(aTS.numValues), lDate)
+        Dim lEndingYear As String = lDate(0).ToString
+
+        lSW.WriteLine("THIS IS FILE PARTDAY.TXT WHICH GIVES DAILY OUTPUT OF PROGRAM PART. " & vbCrLf)
+        lSW.WriteLine("NOTE -- RESULTS AT THIS SMALL TIME SCALE ARE PROVIDED FOR " & vbCrLf)
+        lSW.WriteLine("THE PURPOSES OF PROGRAM SCREENING AND FOR GRAPHICS, BUT " & vbCrLf)
+        lSW.WriteLine("SHOULD NOT BE REPORTED OR USED QUANTITATIVELY " & vbCrLf)
+        lSW.WriteLine(" INPUT FILE = " & aTS.Attributes.GetValue("History 1") & vbCrLf)
+        lSW.WriteLine(" STARTING YEAR =" & lStartingYear.PadLeft(6, " ") & vbCrLf)
+        lSW.WriteLine(" ENDING YEAR =" & lEndingYear.PadLeft(8, " ") & vbCrLf)
+        lSW.WriteLine("                         BASE FLOW FOR EACH" & vbCrLf)
+        lSW.WriteLine("                            REQUIREMENT OF  " & vbCrLf)
+        lSW.WriteLine("          STREAM         ANTECEDENT RECESSION " & vbCrLf)
+        lSW.WriteLine(" DAY #     FLOW        #1         #2         #3          DATE " & vbCrLf)
+        Dim lDayCount As String
+        Dim lStreamFlow As String
+        Dim lBF1 As String
+        Dim lBF2 As String
+        Dim lBF3 As String
+        Dim lDateStr As String
+
+        For I As Integer = 0 To aTS.numValues
+            lDayCount = I.ToString.PadLeft(5, " ")
+            lStreamFlow = String.Format("{0:#.00}", aTS.Value(I + 1)).PadLeft(11, " ")
+            lBF1 = String.Format("{0:#.00}", aBFTs1.Value(I + 1)).PadLeft(11, " ")
+            lBF2 = String.Format("{0:#.00}", aBFTs2.Value(I + 1)).PadLeft(11, " ")
+            lBF3 = String.Format("{0:#.00}", aBFTs3.Value(I + 1)).PadLeft(11, " ")
+            J2Date(aTS.Dates.Value(I), lDate)
+            lDateStr = lDate(0).ToString.PadLeft(9, " ") & _
+                       lDate(1).ToString.PadLeft(4, " ") & _
+                       lDate(2).ToString.PadLeft(4, " ")
+            lSW.WriteLine(lDayCount & lStreamFlow & lBF1 & lBF2 & lBF3 & lDateStr)
+        Next
         lSW.Flush()
         lSW.Close()
         lSW = Nothing
