@@ -15,6 +15,7 @@ Friend Class frmSelectScript
     Private NotReadableBackColor As Drawing.Color = Drawing.Color.Red
 
     Private Sub agdScripts_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdScripts.MouseDownCell
+        pCurrentRow = aRow
         SelectedScript = agdScripts.Source.CellValue(aRow, 1)
         Dim lLastRow As Integer = agdScripts.Source.Rows - 1
         Dim lLastColumn As Integer = agdScripts.Source.Columns - 1
@@ -81,10 +82,11 @@ Friend Class frmSelectScript
     End Sub
 
     Private Sub cmdDelete_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdDelete.Click
-        If agdScripts.Source.CellValue(pCurrentRow, 1) <> "" Then
+        If pCurrentRow > 1 AndAlso agdScripts.Source.CellValue(pCurrentRow, 1) <> "" Then
             If MsgBox("About to forget script:" & vbCr & "Description: " & agdScripts.Source.CellValue(pCurrentRow, 0) & vbCr & "Filename: " & agdScripts.Source.CellValue(pCurrentRow, 1), MsgBoxStyle.YesNo, "Confirm Forget") = MsgBoxResult.Yes Then
                 DeleteSetting("ATCTimeseriesImport", "Scripts", agdScripts.Source.CellValue(pCurrentRow, 1))
                 LoadGrid(pDataFilename) 'This is inefficient, but easier than copying all the .textmatrix and .cellbackcolor
+                agdScripts.Refresh()
                 'agdScripts.TextMatrix(pCurrentRow, 0) = ""
                 'agdScripts.TextMatrix(pCurrentRow, 1) = ""
             End If

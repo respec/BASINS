@@ -110,7 +110,7 @@ ShowSelect:
             Logger.Msg("Could not load script " & aDefinitionFilename & vbCr & Err.Description, vbExclamation, "Run Script")
             Return False
         Else
-            ScriptRun(Script, aDataFilename, Me)
+            MsgBox(ScriptRun(Script, aDataFilename, Me) & vbCrLf & "Dataset Count = " & DataSets.Count, vbOKOnly, "Ran Import Data Script")
             Return (Me.DataSets.Count > 0)
         End If
     End Function
