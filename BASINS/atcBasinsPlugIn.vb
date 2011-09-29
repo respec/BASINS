@@ -262,33 +262,36 @@ Public Class atcBasinsPlugIn
                 'create apr if it does not exist, then open it
                 Dim lAprFileName As String = lBasinsFolder & "\apr" & g_PathChar & IO.Path.GetFileNameWithoutExtension(g_Project.FileName) & ".apr"
                 If Not FileExists(lAprFileName) Then 'build it
-                    Dim lExeName As String = _
-                       FindFile("Please locate BasinsArchive.exe", _
-                       lBasinsFolder & "\etc\basinsarchive\BasinsArchive.exe")
-                    If Len(lExeName) > 0 Then
-                        Dim Exec_Str As String = lExeName & " /build, " & PathNameOnly(g_Project.FileName) & ", " & IO.Path.GetFileNameWithoutExtension(lAprFileName)
-                        Shell(Exec_Str, AppWinStyle.NormalFocus, False)
+                    Dim lEmptyAprName As String = lBasinsFolder & "\etc\buildapr.dat"
+                    If FileExists(lEmptyAprName) Then
+                        IO.Directory.CreateDirectory(IO.Path.GetDirectoryName(lAprFileName))
+                        IO.File.Copy(lEmptyAprName, lAprFileName)
+                    Else
+                        Logger.Msg("Unable to locate template apr file buildapr.dat", vbOKOnly, "Launch ArcView Problem")
                     End If
                 End If
                 Try
                     Process.Start(lAprFileName)
                 Catch
-                    Logger.Msg("No application is associated with APR files - ArcView3 does not appear to be installed.", vbOKOnly, "ArcView Problem")
+                    Logger.Msg("No application is associated with APR files - ArcView3 does not appear to be installed.", vbOKOnly, "Launch ArcView Problem")
                 End Try
             Case atcDataManager.LaunchMenuName & "_ArcGIS"
-                Dim buildmxdFilename As String = FindFile("Please Locate build.mxd", lBasinsFolder & "\etc\build.mxd")
-                If Len(buildmxdFilename) = 0 Then
-                    Logger.Msg("Unable to locate Build.mxd", vbOKOnly, "ArcGIS Problem")
-                Else
-                    Try
-                        'write directive file here
-                        SaveFileString(PathNameOnly(buildmxdFilename) & "\ArcMapInstructions.txt", "Build," & g_Project.FileName)
-                        'now start the build mxd
-                        Process.Start(buildmxdFilename)
-                    Catch
-                        Logger.Msg("No application is associated with MXD files - ArcGIS does not appear to be installed.", vbOKOnly, "ArcGIS Problem")
-                    End Try
+                'create mxd if it does not exist, then open it
+                Dim lMxdFileName As String = lBasinsFolder & "\mxd" & g_PathChar & IO.Path.GetFileNameWithoutExtension(g_Project.FileName) & ".mxd"
+                If Not FileExists(lMxdFileName) Then 'build it
+                    Dim lEmptyMxdName As String = lBasinsFolder & "\etc\buildmxd.dat"
+                    If FileExists(lEmptyMxdName) Then
+                        IO.Directory.CreateDirectory(IO.Path.GetDirectoryName(lMxdFileName))
+                        IO.File.Copy(lEmptyMxdName, lMxdFileName)
+                    Else
+                        Logger.Msg("Unable to locate template mxd file buildmxd.dat", vbOKOnly, "Launch ArcGIS Problem")
+                    End If
                 End If
+                Try
+                    Process.Start(lMxdFileName)
+                Catch
+                    Logger.Msg("No application is associated with MXD files - ArcGIS does not appear to be installed.", vbOKOnly, "Launch ArcGIS Problem")
+                End Try
             Case Else
                 If aItemName.StartsWith(atcDataManager.LaunchMenuName & "_") Then
                     Dim lExeName As String = ""
