@@ -76,7 +76,7 @@ Friend Class frmInputWizard
     End Sub
 
     Private Sub frmInputWizard_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
-        Logger.Dbg("") 'Avoid unhelpful error message when closing form instead of reading data
+        Logger.Dbg() 'Avoid unhelpful error message when closing form instead of reading data
     End Sub
 
     'Displays the Input Wizard form and initializes
@@ -93,15 +93,15 @@ Friend Class frmInputWizard
         ' Left justify major display areas on form
         'fraTextSample.Left = tabTop.Left
         'fraColSample.Left = tabTop.Left
-        SizeControls(fraSash.Top)
+        SizeControls() 'fraSash.Top)
     End Sub
 
     Private Sub frmInputWizard_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
-        SizeControls(fraSash.Top)
+        SizeControls() 'fraSash.Top)
     End Sub
 
     'Resize all controls on the form
-    Sub SizeControls(ByRef SashTop As Single)
+    Sub SizeControls() 'ByRef SashTop As Single)
         Dim SampleHeight As Integer
         Dim EachSampleHeight As Integer
         Dim BottomHeight As Integer
@@ -109,7 +109,7 @@ Friend Class frmInputWizard
         If txtSample.Count = 0 Then txtSample.Add(_txtSample_0)
         Dim lNewSampleTextbox As Windows.Forms.TextBox = txtSample(0)
 
-        BottomHeight = Me.Height - SashTop - fraSash.Height
+        BottomHeight = Me.Height - fraColSample.Top ' SashTop - fraSash.Height
 
         'fraTextSample.Height = VB6.TwipsToPixelsY(BottomHeight)
         SampleHeight = BottomHeight - txtRuler1.Height - txtRuler2.Height - HScrollSample.Height

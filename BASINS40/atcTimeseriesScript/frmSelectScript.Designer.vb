@@ -22,7 +22,6 @@
     Public WithEvents cmdCancel As System.Windows.Forms.Button
     Public WithEvents cmdFind As System.Windows.Forms.Button
     Public WithEvents cmdDelete As System.Windows.Forms.Button
-    Public WithEvents cmdTest As System.Windows.Forms.Button
     Public WithEvents fraButtons As System.Windows.Forms.Panel
     Public dlgOpenFileOpen As System.Windows.Forms.OpenFileDialog
     'NOTE: The following procedure is required by the Windows Form Designer
@@ -30,6 +29,7 @@
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSelectScript))
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.fraButtons = New System.Windows.Forms.Panel
         Me.cmdRun = New System.Windows.Forms.Button
@@ -37,7 +37,6 @@
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdFind = New System.Windows.Forms.Button
         Me.cmdDelete = New System.Windows.Forms.Button
-        Me.cmdTest = New System.Windows.Forms.Button
         Me.dlgOpenFileOpen = New System.Windows.Forms.OpenFileDialog
         Me.agdScripts = New atcControls.atcGrid
         Me.fraButtons.SuspendLayout()
@@ -52,14 +51,13 @@
         Me.fraButtons.Controls.Add(Me.cmdCancel)
         Me.fraButtons.Controls.Add(Me.cmdFind)
         Me.fraButtons.Controls.Add(Me.cmdDelete)
-        Me.fraButtons.Controls.Add(Me.cmdTest)
         Me.fraButtons.Cursor = System.Windows.Forms.Cursors.Default
         Me.fraButtons.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.fraButtons.ForeColor = System.Drawing.SystemColors.ControlText
         Me.fraButtons.Location = New System.Drawing.Point(560, 8)
         Me.fraButtons.Name = "fraButtons"
         Me.fraButtons.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.fraButtons.Size = New System.Drawing.Size(89, 185)
+        Me.fraButtons.Size = New System.Drawing.Size(89, 171)
         Me.fraButtons.TabIndex = 7
         Me.fraButtons.Text = "Frame1"
         '
@@ -85,7 +83,7 @@
         Me.cmdWizard.Cursor = System.Windows.Forms.Cursors.Default
         Me.cmdWizard.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdWizard.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.cmdWizard.Location = New System.Drawing.Point(0, 32)
+        Me.cmdWizard.Location = New System.Drawing.Point(0, 31)
         Me.cmdWizard.Name = "cmdWizard"
         Me.cmdWizard.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.cmdWizard.Size = New System.Drawing.Size(89, 25)
@@ -101,7 +99,7 @@
         Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdCancel.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdCancel.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.cmdCancel.Location = New System.Drawing.Point(0, 160)
+        Me.cmdCancel.Location = New System.Drawing.Point(0, 124)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.cmdCancel.Size = New System.Drawing.Size(89, 25)
@@ -116,7 +114,7 @@
         Me.cmdFind.Cursor = System.Windows.Forms.Cursors.Default
         Me.cmdFind.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdFind.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.cmdFind.Location = New System.Drawing.Point(0, 64)
+        Me.cmdFind.Location = New System.Drawing.Point(0, 62)
         Me.cmdFind.Name = "cmdFind"
         Me.cmdFind.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.cmdFind.Size = New System.Drawing.Size(89, 25)
@@ -131,28 +129,13 @@
         Me.cmdDelete.Cursor = System.Windows.Forms.Cursors.Default
         Me.cmdDelete.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdDelete.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.cmdDelete.Location = New System.Drawing.Point(0, 96)
+        Me.cmdDelete.Location = New System.Drawing.Point(0, 93)
         Me.cmdDelete.Name = "cmdDelete"
         Me.cmdDelete.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.cmdDelete.Size = New System.Drawing.Size(89, 25)
         Me.cmdDelete.TabIndex = 4
         Me.cmdDelete.Text = "For&get"
         Me.cmdDelete.UseVisualStyleBackColor = False
-        '
-        'cmdTest
-        '
-        Me.cmdTest.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdTest.BackColor = System.Drawing.SystemColors.Control
-        Me.cmdTest.Cursor = System.Windows.Forms.Cursors.Default
-        Me.cmdTest.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdTest.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.cmdTest.Location = New System.Drawing.Point(0, 128)
-        Me.cmdTest.Name = "cmdTest"
-        Me.cmdTest.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.cmdTest.Size = New System.Drawing.Size(89, 25)
-        Me.cmdTest.TabIndex = 5
-        Me.cmdTest.Text = "&Debug"
-        Me.cmdTest.UseVisualStyleBackColor = False
         '
         'agdScripts
         '
@@ -182,6 +165,7 @@
         Me.Controls.Add(Me.agdScripts)
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Location = New System.Drawing.Point(3, 18)
         Me.Name = "frmSelectScript"
         Me.RightToLeft = System.Windows.Forms.RightToLeft.No

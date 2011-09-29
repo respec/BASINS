@@ -46,7 +46,6 @@
     Public WithEvents lblScriptDesc As System.Windows.Forms.Label
     Public WithEvents lblDataDescFile As System.Windows.Forms.Label
     Public WithEvents lblDataFile As System.Windows.Forms.Label
-    Public WithEvents fraSash As System.Windows.Forms.Panel
     Public WithEvents cmdSaveScript As System.Windows.Forms.Button
     Public WithEvents cmdCancel As System.Windows.Forms.Button
     Public WithEvents cmdReadData As System.Windows.Forms.Button
@@ -64,6 +63,7 @@
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmInputWizard))
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.txtHeaderLines = New System.Windows.Forms.TextBox
         Me.chkSkipHeader = New System.Windows.Forms.CheckBox
@@ -95,7 +95,6 @@
         Me.lblScriptDesc = New System.Windows.Forms.Label
         Me.lblDataDescFile = New System.Windows.Forms.Label
         Me.lblDataFile = New System.Windows.Forms.Label
-        Me.fraSash = New System.Windows.Forms.Panel
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdReadData = New System.Windows.Forms.Button
         Me.fraTextSample = New System.Windows.Forms.Panel
@@ -599,21 +598,6 @@
         Me.lblDataFile.TabIndex = 43
         Me.lblDataFile.Text = "Data File:"
         '
-        'fraSash
-        '
-        Me.fraSash.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.fraSash.BackColor = System.Drawing.SystemColors.Control
-        Me.fraSash.Cursor = System.Windows.Forms.Cursors.SizeNS
-        Me.fraSash.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.fraSash.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.fraSash.Location = New System.Drawing.Point(0, 267)
-        Me.fraSash.Name = "fraSash"
-        Me.fraSash.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.fraSash.Size = New System.Drawing.Size(537, 9)
-        Me.fraSash.TabIndex = 37
-        Me.fraSash.Text = "Frame3"
-        '
         'cmdCancel
         '
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
@@ -659,10 +643,10 @@
         Me.fraTextSample.Cursor = System.Windows.Forms.Cursors.Default
         Me.fraTextSample.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.fraTextSample.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.fraTextSample.Location = New System.Drawing.Point(8, 283)
+        Me.fraTextSample.Location = New System.Drawing.Point(12, 247)
         Me.fraTextSample.Name = "fraTextSample"
         Me.fraTextSample.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.fraTextSample.Size = New System.Drawing.Size(489, 145)
+        Me.fraTextSample.Size = New System.Drawing.Size(509, 208)
         Me.fraTextSample.TabIndex = 27
         '
         'VScrollSample
@@ -671,10 +655,10 @@
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.VScrollSample.Cursor = System.Windows.Forms.Cursors.Default
         Me.VScrollSample.LargeChange = 5
-        Me.VScrollSample.Location = New System.Drawing.Point(472, 32)
+        Me.VScrollSample.Location = New System.Drawing.Point(492, 32)
         Me.VScrollSample.Maximum = 32771
         Me.VScrollSample.Name = "VScrollSample"
-        Me.VScrollSample.Size = New System.Drawing.Size(14, 81)
+        Me.VScrollSample.Size = New System.Drawing.Size(14, 163)
         Me.VScrollSample.TabIndex = 36
         Me.VScrollSample.TabStop = True
         '
@@ -684,12 +668,12 @@
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.HScrollSample.Cursor = System.Windows.Forms.Cursors.Default
         Me.HScrollSample.LargeChange = 40
-        Me.HScrollSample.Location = New System.Drawing.Point(0, 132)
+        Me.HScrollSample.Location = New System.Drawing.Point(0, 195)
         Me.HScrollSample.Maximum = 1039
         Me.HScrollSample.Minimum = 1
         Me.HScrollSample.Name = "HScrollSample"
         Me.HScrollSample.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.HScrollSample.Size = New System.Drawing.Size(489, 14)
+        Me.HScrollSample.Size = New System.Drawing.Size(493, 14)
         Me.HScrollSample.TabIndex = 34
         Me.HScrollSample.TabStop = True
         Me.HScrollSample.Value = 1
@@ -710,7 +694,7 @@
         Me.txtRuler2.Name = "txtRuler2"
         Me.txtRuler2.ReadOnly = True
         Me.txtRuler2.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtRuler2.Size = New System.Drawing.Size(489, 15)
+        Me.txtRuler2.Size = New System.Drawing.Size(509, 15)
         Me.txtRuler2.TabIndex = 33
         Me.txtRuler2.Text = "1234567890"
         '
@@ -730,7 +714,7 @@
         Me._txtSample_0.Name = "_txtSample_0"
         Me._txtSample_0.ReadOnly = True
         Me._txtSample_0.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me._txtSample_0.Size = New System.Drawing.Size(473, 15)
+        Me._txtSample_0.Size = New System.Drawing.Size(493, 15)
         Me._txtSample_0.TabIndex = 29
         Me._txtSample_0.Text = "Sample"
         '
@@ -750,7 +734,7 @@
         Me.txtRuler1.Name = "txtRuler1"
         Me.txtRuler1.ReadOnly = True
         Me.txtRuler1.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtRuler1.Size = New System.Drawing.Size(489, 15)
+        Me.txtRuler1.Size = New System.Drawing.Size(509, 15)
         Me.txtRuler1.TabIndex = 32
         Me.txtRuler1.Text = "         1"
         '
@@ -765,10 +749,10 @@
         Me.fraColSample.Cursor = System.Windows.Forms.Cursors.Default
         Me.fraColSample.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.fraColSample.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.fraColSample.Location = New System.Drawing.Point(8, 283)
+        Me.fraColSample.Location = New System.Drawing.Point(12, 247)
         Me.fraColSample.Name = "fraColSample"
         Me.fraColSample.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.fraColSample.Size = New System.Drawing.Size(489, 153)
+        Me.fraColSample.Size = New System.Drawing.Size(509, 208)
         Me.fraColSample.TabIndex = 28
         Me.fraColSample.Text = "fraColSample"
         Me.fraColSample.Visible = False
@@ -777,13 +761,16 @@
         '
         Me.agdSample.AllowHorizontalScrolling = True
         Me.agdSample.AllowNewValidValues = False
+        Me.agdSample.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.agdSample.CellBackColor = System.Drawing.SystemColors.Window
         Me.agdSample.Fixed3D = False
         Me.agdSample.LineColor = System.Drawing.SystemColors.Control
         Me.agdSample.LineWidth = 1.0!
         Me.agdSample.Location = New System.Drawing.Point(0, 16)
         Me.agdSample.Name = "agdSample"
-        Me.agdSample.Size = New System.Drawing.Size(489, 129)
+        Me.agdSample.Size = New System.Drawing.Size(509, 192)
         Me.agdSample.Source = Nothing
         Me.agdSample.TabIndex = 30
         '
@@ -855,12 +842,12 @@
         Me.Controls.Add(Me.cmdCancel)
         Me.Controls.Add(Me.cmdSaveScript)
         Me.Controls.Add(Me.cmdReadData)
-        Me.Controls.Add(Me.fraSash)
-        Me.Controls.Add(Me.fraTextSample)
         Me.Controls.Add(Me.tabTop)
         Me.Controls.Add(Me.fraColSample)
+        Me.Controls.Add(Me.fraTextSample)
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.Font = New System.Drawing.Font("Courier New", 10.5!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Location = New System.Drawing.Point(4, 23)
         Me.Name = "frmInputWizard"
         Me.RightToLeft = System.Windows.Forms.RightToLeft.No
