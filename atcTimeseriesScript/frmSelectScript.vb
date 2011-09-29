@@ -17,13 +17,15 @@ Friend Class frmSelectScript
     Private Sub agdScripts_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdScripts.MouseDownCell
         SelectedScript = agdScripts.Source.CellValue(aRow, 1)
         Dim lLastRow As Integer = agdScripts.Source.Rows - 1
+        Dim lLastColumn As Integer = agdScripts.Source.Columns - 1
         For lRow As Integer = 1 To lLastRow
-            If lRow = aRow Then
-                agdScripts.Source.CellSelected(lRow, 0) = True
-            Else
-                agdScripts.Source.CellSelected(lRow, 0) = False
-            End If
-
+            For lColumn As Integer = 0 To lLastColumn
+                If lRow = aRow Then
+                    agdScripts.Source.CellSelected(lRow, lColumn) = True
+                Else
+                    agdScripts.Source.CellSelected(lRow, lColumn) = False
+                End If
+            Next
         Next
         agdScripts.Refresh()
         EnableButtons()
@@ -95,10 +97,10 @@ Friend Class frmSelectScript
         Me.Hide()
     End Sub
 
-    Private Sub cmdTest_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdTest.Click
-        ButtonPressed = cmdTest.Text
-        Me.Hide()
-    End Sub
+    'Private Sub cmdTest_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs)
+    '    ButtonPressed = cmdTest.Text
+    '    Me.Hide()
+    'End Sub
 
     Private Sub cmdWizard_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdWizard.Click
         ButtonPressed = cmdWizard.Text

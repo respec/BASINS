@@ -70,14 +70,17 @@ ShowSelect:
                     SaveSetting("BASINS4", "Window Positions", "SelectScriptHeight", .Height)
                     Dim lDefinitionFilename As String = .SelectedScript
                     Select Case .ButtonPressed
-                        Case .cmdCancel.Text : Exit Function
+                        Case .cmdCancel.Text
+                            Return False
                         Case .cmdRun.Text
                             Return RunSelectedScript(lDefinitionFilename, aFileName)
-                        Case .cmdTest.Text
-                            DebuggingScript = True
-                            RunSelectedScript(lDefinitionFilename, aFileName)
-                            DebuggingScript = False
+                            'Case .cmdTest.Text
+                            '    DebuggingScript = True
+                            '    RunSelectedScript(lDefinitionFilename, aFileName)
+                            '    DebuggingScript = False
+                            '    GoTo ShowSelect
                         Case .cmdWizard.Text
+                            Dim lCountBefore As Integer = Me.DataSets.Count
                             Dim lfrmInputwizard As New frmInputWizard
                             With lfrmInputwizard
                                 If .txtSample.Count = 0 Then
@@ -89,7 +92,7 @@ ShowSelect:
                                 .ReadScript()
                                 .ShowDialog()
                             End With
-
+                            Return (Me.DataSets.Count > lCountBefore)
                     End Select
                 End With
             Catch e As Exception
