@@ -3,6 +3,7 @@ Option Explicit On
 
 Imports atcUtility
 Imports atcData
+Imports MapWinUtility
 
 Friend Module modATCscript
     'Copyright 2002 by AQUA TERRA Consultants
@@ -11,7 +12,7 @@ Friend Module modATCscript
     Public ScriptState As atcCollection 'of variable names (as keys) and values
     Public WholeDataFile As String 'Contains entire contents of data file
     Public LenDataFile As Integer
-    Public NextLineStart As Integer 'Index in WholeDataFile of first character of next line to be read
+    Public NextLineStart As Integer 'One-based index in WholeDataFile of first character of next line to be read
     Public LastPercent As Integer 'For updating status messages
     Public CurrentLine As String 'Current line of data file being parsed
     Public LenCurrentLine As Integer
@@ -80,9 +81,6 @@ Friend Module modATCscript
     Private InBuf As List(Of InputBuffer)
     Private CurBuf As InputBuffer
 
-    Private pMonitor As Object
-    Private pMonitorSet As Boolean
-
     Private Sub ScriptInit()
         'ReDim InBuf(0)
         InBuf = New List(Of InputBuffer)
@@ -129,13 +127,8 @@ Friend Module modATCscript
         End If
     End Function
 
-    Public Sub ScriptSetMonitor(ByRef o As Object)
-        pMonitorSet = True
-        pMonitor = o
-    End Sub
-
     Public Function ScriptEndOfData() As Boolean
-        If NextLineStart >= LenDataFile And LenCurrentLine = 0 Then ScriptEndOfData = True Else ScriptEndOfData = False
+        If NextLineStart >= LenDataFile AndAlso LenCurrentLine = 0 Then ScriptEndOfData = True Else ScriptEndOfData = False
     End Function
 
     Public Sub ScriptNextLine()
@@ -152,7 +145,7 @@ Friend Module modATCscript
                 LenCurrentLine = Len(CurrentLine)
                 NextLineStart = NextLineStart + LenCurrentLine
             Else
-                If (InputEOL = vbCr Or InputEOL = vbLf) Then
+                If (InputEOL = vbCr OrElse InputEOL = vbLf) Then
                     EOLPos = FirstStringPos(NextLineStart, WholeDataFile, vbCr, vbLf)
                 Else
                     EOLPos = InStr(NextLineStart, WholeDataFile, InputEOL)
@@ -171,18 +164,15 @@ Friend Module modATCscript
             End If
             CurrentLineNum += 1
         Loop While Len(Trim(CurrentLine)) = 0
-        If pMonitorSet Then
-            percent = 100 * NextLineStart / LenDataFile 'Loc = 128 * bytes read for sequential file
-            If percent <> LastPercent Then
-                'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                pMonitor.SendMonitorMessage("(MSG1 " & Left(CurrentLine, 100) & ")")
-                'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                pMonitor.SendMonitorMessage("(MSG3 " & CStr(percent) & "%)")
-                'UPGRADE_WARNING: Couldn't resolve default property of object pMonitor.SendMonitorMessage. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
-                pMonitor.SendMonitorMessage("(PROGRESS " & CStr(percent) & ")")
-                LastPercent = percent
-                System.Windows.Forms.Application.DoEvents()
-            End If
+
+
+        percent = 100 * NextLineStart / LenDataFile 'Loc = 128 * bytes read for sequential file
+        If percent <> LastPercent Then
+            Logger.Dbg("(MSG1 " & Left(CurrentLine, 100) & ")")
+            Logger.Dbg("(MSG3 " & CStr(percent) & "%)")
+            Logger.Dbg("(PROGRESS " & CStr(percent) & ")")
+            LastPercent = percent
+            System.Windows.Forms.Application.DoEvents()
         End If
         'Debug.Print "NextLine: " & Format(CurrentLineNum, "00") & " " & CurrentLine
         If DebuggingScript Then DebugScriptForm.NextLine()
@@ -452,15 +442,13 @@ Friend Module modATCscript
         ScriptInit()
         msg = ScriptOpenDataFile(DataFilename)
         If msg <> "OK" Then
-            MsgBox(msg, MsgBoxStyle.OkOnly, "Data Import")
+            Logger.Msg(msg, MsgBoxStyle.OkOnly, "Data Import")
             ScriptRun = msg
         Else
-            If pMonitorSet Then
-                pMonitor.SendMonitorMessage("(MSG1 Reading)")
-                pMonitor.SendMonitorMessage("(MSG2 0)")
-                pMonitor.SendMonitorMessage("(MSG3 0)")
-                pMonitor.SendMonitorMessage("(MSG4 100)")
-            End If
+            Logger.Dbg("(MSG1 Reading)")
+            Logger.Dbg("(MSG2 0)")
+            Logger.Dbg("(MSG3 0)")
+            Logger.Dbg("(MSG4 100)")
             On Error GoTo 0
 
             If DebuggingScript Then

@@ -39,7 +39,7 @@
     Public WithEvents txtDelimiter As System.Windows.Forms.TextBox
     Public WithEvents optDelimiterNone As System.Windows.Forms.RadioButton
     Public WithEvents fraColumns As System.Windows.Forms.GroupBox
-    Public WithEvents cmdBrowseDesc As System.Windows.Forms.Button
+    Public WithEvents cmdBrowseScript As System.Windows.Forms.Button
     Public WithEvents txtScriptFile As System.Windows.Forms.TextBox
     Public WithEvents cmdBrowseData As System.Windows.Forms.Button
     Public WithEvents txtDataFile As System.Windows.Forms.TextBox
@@ -47,11 +47,9 @@
     Public WithEvents lblDataDescFile As System.Windows.Forms.Label
     Public WithEvents lblDataFile As System.Windows.Forms.Label
     Public WithEvents fraSash As System.Windows.Forms.Panel
-    Public dlgOpenFileOpen As System.Windows.Forms.OpenFileDialog
-    Public dlgOpenFileSave As System.Windows.Forms.SaveFileDialog
-    Public WithEvents cmdSaveDesc As System.Windows.Forms.Button
+    Public WithEvents cmdSaveScript As System.Windows.Forms.Button
     Public WithEvents cmdCancel As System.Windows.Forms.Button
-    Public WithEvents cmdOk As System.Windows.Forms.Button
+    Public WithEvents cmdReadData As System.Windows.Forms.Button
     Public WithEvents VScrollSample As System.Windows.Forms.VScrollBar
     Public WithEvents HScrollSample As System.Windows.Forms.HScrollBar
     Public WithEvents txtRuler2 As System.Windows.Forms.TextBox
@@ -74,7 +72,7 @@
         Me.txtLineEndChar = New System.Windows.Forms.TextBox
         Me.txtDelimiter = New System.Windows.Forms.TextBox
         Me.txtDataFile = New System.Windows.Forms.TextBox
-        Me.cmdSaveDesc = New System.Windows.Forms.Button
+        Me.cmdSaveScript = New System.Windows.Forms.Button
         Me.agdDataMapping = New atcControls.atcGrid
         Me.txtScriptDesc = New System.Windows.Forms.TextBox
         Me.fraHeader = New System.Windows.Forms.GroupBox
@@ -91,17 +89,15 @@
         Me.optDelimiterTab = New System.Windows.Forms.RadioButton
         Me.optDelimiterSpace = New System.Windows.Forms.RadioButton
         Me.optDelimiterNone = New System.Windows.Forms.RadioButton
-        Me.cmdBrowseDesc = New System.Windows.Forms.Button
+        Me.cmdBrowseScript = New System.Windows.Forms.Button
         Me.txtScriptFile = New System.Windows.Forms.TextBox
         Me.cmdBrowseData = New System.Windows.Forms.Button
         Me.lblScriptDesc = New System.Windows.Forms.Label
         Me.lblDataDescFile = New System.Windows.Forms.Label
         Me.lblDataFile = New System.Windows.Forms.Label
         Me.fraSash = New System.Windows.Forms.Panel
-        Me.dlgOpenFileOpen = New System.Windows.Forms.OpenFileDialog
-        Me.dlgOpenFileSave = New System.Windows.Forms.SaveFileDialog
         Me.cmdCancel = New System.Windows.Forms.Button
-        Me.cmdOk = New System.Windows.Forms.Button
+        Me.cmdReadData = New System.Windows.Forms.Button
         Me.fraTextSample = New System.Windows.Forms.Panel
         Me.VScrollSample = New System.Windows.Forms.VScrollBar
         Me.HScrollSample = New System.Windows.Forms.HScrollBar
@@ -224,6 +220,8 @@
         'txtDataFile
         '
         Me.txtDataFile.AcceptsReturn = True
+        Me.txtDataFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtDataFile.BackColor = System.Drawing.SystemColors.Window
         Me.txtDataFile.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtDataFile.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -237,27 +235,30 @@
         Me.txtDataFile.Text = "txtDataFile"
         Me.ToolTip1.SetToolTip(Me.txtDataFile, "Name of file containing data to import")
         '
-        'cmdSaveDesc
+        'cmdSaveScript
         '
-        Me.cmdSaveDesc.BackColor = System.Drawing.SystemColors.Control
-        Me.cmdSaveDesc.Cursor = System.Windows.Forms.Cursors.Default
-        Me.cmdSaveDesc.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdSaveDesc.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.cmdSaveDesc.Location = New System.Drawing.Point(198, 461)
-        Me.cmdSaveDesc.Name = "cmdSaveDesc"
-        Me.cmdSaveDesc.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.cmdSaveDesc.Size = New System.Drawing.Size(89, 25)
-        Me.cmdSaveDesc.TabIndex = 25
-        Me.cmdSaveDesc.Text = "&Save Script"
-        Me.ToolTip1.SetToolTip(Me.cmdSaveDesc, "Save selections and data mapping information to a data descriptor file.")
-        Me.cmdSaveDesc.UseVisualStyleBackColor = False
+        Me.cmdSaveScript.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdSaveScript.BackColor = System.Drawing.SystemColors.Control
+        Me.cmdSaveScript.Cursor = System.Windows.Forms.Cursors.Default
+        Me.cmdSaveScript.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdSaveScript.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.cmdSaveScript.Location = New System.Drawing.Point(198, 461)
+        Me.cmdSaveScript.Name = "cmdSaveScript"
+        Me.cmdSaveScript.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.cmdSaveScript.Size = New System.Drawing.Size(89, 25)
+        Me.cmdSaveScript.TabIndex = 25
+        Me.cmdSaveScript.Text = "&Save Script"
+        Me.ToolTip1.SetToolTip(Me.cmdSaveScript, "Save selections and data mapping information to a data descriptor file.")
+        Me.cmdSaveScript.UseVisualStyleBackColor = False
         '
         'agdDataMapping
         '
         Me.agdDataMapping.AllowHorizontalScrolling = True
         Me.agdDataMapping.AllowNewValidValues = False
+        Me.agdDataMapping.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.agdDataMapping.CellBackColor = System.Drawing.SystemColors.Window
-        Me.agdDataMapping.Dock = System.Windows.Forms.DockStyle.Fill
         Me.agdDataMapping.Fixed3D = False
         Me.agdDataMapping.LineColor = System.Drawing.SystemColors.Control
         Me.agdDataMapping.LineWidth = 1.0!
@@ -270,6 +271,8 @@
         'txtScriptDesc
         '
         Me.txtScriptDesc.AcceptsReturn = True
+        Me.txtScriptDesc.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtScriptDesc.BackColor = System.Drawing.SystemColors.Window
         Me.txtScriptDesc.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtScriptDesc.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -509,23 +512,26 @@
         Me.optDelimiterNone.Text = "Fixed Width"
         Me.optDelimiterNone.UseVisualStyleBackColor = False
         '
-        'cmdBrowseDesc
+        'cmdBrowseScript
         '
-        Me.cmdBrowseDesc.BackColor = System.Drawing.SystemColors.Control
-        Me.cmdBrowseDesc.Cursor = System.Windows.Forms.Cursors.Default
-        Me.cmdBrowseDesc.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdBrowseDesc.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.cmdBrowseDesc.Location = New System.Drawing.Point(436, 30)
-        Me.cmdBrowseDesc.Name = "cmdBrowseDesc"
-        Me.cmdBrowseDesc.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.cmdBrowseDesc.Size = New System.Drawing.Size(57, 19)
-        Me.cmdBrowseDesc.TabIndex = 4
-        Me.cmdBrowseDesc.Text = "Browse"
-        Me.cmdBrowseDesc.UseVisualStyleBackColor = False
+        Me.cmdBrowseScript.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdBrowseScript.BackColor = System.Drawing.SystemColors.Control
+        Me.cmdBrowseScript.Cursor = System.Windows.Forms.Cursors.Default
+        Me.cmdBrowseScript.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdBrowseScript.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.cmdBrowseScript.Location = New System.Drawing.Point(436, 30)
+        Me.cmdBrowseScript.Name = "cmdBrowseScript"
+        Me.cmdBrowseScript.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.cmdBrowseScript.Size = New System.Drawing.Size(57, 19)
+        Me.cmdBrowseScript.TabIndex = 4
+        Me.cmdBrowseScript.Text = "Browse"
+        Me.cmdBrowseScript.UseVisualStyleBackColor = False
         '
         'txtScriptFile
         '
         Me.txtScriptFile.AcceptsReturn = True
+        Me.txtScriptFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtScriptFile.BackColor = System.Drawing.SystemColors.Window
         Me.txtScriptFile.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtScriptFile.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -540,6 +546,7 @@
         '
         'cmdBrowseData
         '
+        Me.cmdBrowseData.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdBrowseData.BackColor = System.Drawing.SystemColors.Control
         Me.cmdBrowseData.Cursor = System.Windows.Forms.Cursors.Default
         Me.cmdBrowseData.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -594,6 +601,8 @@
         '
         'fraSash
         '
+        Me.fraSash.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.fraSash.BackColor = System.Drawing.SystemColors.Control
         Me.fraSash.Cursor = System.Windows.Forms.Cursors.SizeNS
         Me.fraSash.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -607,6 +616,7 @@
         '
         'cmdCancel
         '
+        Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdCancel.BackColor = System.Drawing.SystemColors.Control
         Me.cmdCancel.Cursor = System.Windows.Forms.Cursors.Default
         Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
@@ -620,22 +630,26 @@
         Me.cmdCancel.Text = "&Cancel"
         Me.cmdCancel.UseVisualStyleBackColor = False
         '
-        'cmdOk
+        'cmdReadData
         '
-        Me.cmdOk.BackColor = System.Drawing.SystemColors.Control
-        Me.cmdOk.Cursor = System.Windows.Forms.Cursors.Default
-        Me.cmdOk.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdOk.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.cmdOk.Location = New System.Drawing.Point(103, 461)
-        Me.cmdOk.Name = "cmdOk"
-        Me.cmdOk.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.cmdOk.Size = New System.Drawing.Size(89, 25)
-        Me.cmdOk.TabIndex = 24
-        Me.cmdOk.Text = "&Read Data"
-        Me.cmdOk.UseVisualStyleBackColor = False
+        Me.cmdReadData.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdReadData.BackColor = System.Drawing.SystemColors.Control
+        Me.cmdReadData.Cursor = System.Windows.Forms.Cursors.Default
+        Me.cmdReadData.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdReadData.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.cmdReadData.Location = New System.Drawing.Point(103, 461)
+        Me.cmdReadData.Name = "cmdReadData"
+        Me.cmdReadData.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.cmdReadData.Size = New System.Drawing.Size(89, 25)
+        Me.cmdReadData.TabIndex = 24
+        Me.cmdReadData.Text = "&Read Data"
+        Me.cmdReadData.UseVisualStyleBackColor = False
         '
         'fraTextSample
         '
+        Me.fraTextSample.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.fraTextSample.BackColor = System.Drawing.SystemColors.Control
         Me.fraTextSample.Controls.Add(Me.VScrollSample)
         Me.fraTextSample.Controls.Add(Me.HScrollSample)
@@ -653,6 +667,8 @@
         '
         'VScrollSample
         '
+        Me.VScrollSample.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.VScrollSample.Cursor = System.Windows.Forms.Cursors.Default
         Me.VScrollSample.LargeChange = 5
         Me.VScrollSample.Location = New System.Drawing.Point(472, 32)
@@ -664,6 +680,8 @@
         '
         'HScrollSample
         '
+        Me.HScrollSample.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.HScrollSample.Cursor = System.Windows.Forms.Cursors.Default
         Me.HScrollSample.LargeChange = 40
         Me.HScrollSample.Location = New System.Drawing.Point(0, 132)
@@ -679,6 +697,8 @@
         'txtRuler2
         '
         Me.txtRuler2.AcceptsReturn = True
+        Me.txtRuler2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtRuler2.BackColor = System.Drawing.SystemColors.Control
         Me.txtRuler2.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.txtRuler2.Cursor = System.Windows.Forms.Cursors.IBeam
@@ -697,6 +717,8 @@
         '_txtSample_0
         '
         Me._txtSample_0.AcceptsReturn = True
+        Me._txtSample_0.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me._txtSample_0.BackColor = System.Drawing.SystemColors.Window
         Me._txtSample_0.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me._txtSample_0.Cursor = System.Windows.Forms.Cursors.IBeam
@@ -715,6 +737,8 @@
         'txtRuler1
         '
         Me.txtRuler1.AcceptsReturn = True
+        Me.txtRuler1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtRuler1.BackColor = System.Drawing.SystemColors.Control
         Me.txtRuler1.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.txtRuler1.Cursor = System.Windows.Forms.Cursors.IBeam
@@ -732,6 +756,9 @@
         '
         'fraColSample
         '
+        Me.fraColSample.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.fraColSample.BackColor = System.Drawing.SystemColors.Control
         Me.fraColSample.Controls.Add(Me.agdSample)
         Me.fraColSample.Controls.Add(Me.lblInputColumns)
@@ -775,6 +802,8 @@
         '
         'tabTop
         '
+        Me.tabTop.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.tabTop.Controls.Add(Me.tabFileProperty)
         Me.tabTop.Controls.Add(Me.tabDataMapping)
         Me.tabTop.Location = New System.Drawing.Point(12, 13)
@@ -794,7 +823,7 @@
         Me.tabFileProperty.Controls.Add(Me.lblScriptDesc)
         Me.tabFileProperty.Controls.Add(Me.fraColumns)
         Me.tabFileProperty.Controls.Add(Me.txtDataFile)
-        Me.tabFileProperty.Controls.Add(Me.cmdBrowseDesc)
+        Me.tabFileProperty.Controls.Add(Me.cmdBrowseScript)
         Me.tabFileProperty.Controls.Add(Me.cmdBrowseData)
         Me.tabFileProperty.Controls.Add(Me.txtScriptFile)
         Me.tabFileProperty.ForeColor = System.Drawing.SystemColors.ControlText
@@ -824,12 +853,12 @@
         Me.CancelButton = Me.cmdCancel
         Me.ClientSize = New System.Drawing.Size(537, 498)
         Me.Controls.Add(Me.cmdCancel)
-        Me.Controls.Add(Me.cmdSaveDesc)
-        Me.Controls.Add(Me.cmdOk)
+        Me.Controls.Add(Me.cmdSaveScript)
+        Me.Controls.Add(Me.cmdReadData)
         Me.Controls.Add(Me.fraSash)
         Me.Controls.Add(Me.fraTextSample)
-        Me.Controls.Add(Me.fraColSample)
         Me.Controls.Add(Me.tabTop)
+        Me.Controls.Add(Me.fraColSample)
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.Font = New System.Drawing.Font("Courier New", 10.5!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Location = New System.Drawing.Point(4, 23)
