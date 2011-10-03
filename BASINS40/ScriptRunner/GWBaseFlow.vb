@@ -177,15 +177,15 @@ Public Class GWBaseFlowHySep
         End Set
     End Property
 
-    Private pFlagLast As Boolean
-    Public Property FlagLast() As Boolean
-        Get
-            Return pFlagLast
-        End Get
-        Set(ByVal value As Boolean)
-            pFlagLast = value
-        End Set
-    End Property
+    'Private pFlagLast As Boolean
+    'Public Property FlagLast() As Boolean
+    '    Get
+    '        Return pFlagLast
+    '    End Get
+    '    Set(ByVal value As Boolean)
+    '        pFlagLast = value
+    '    End Set
+    'End Property
 
     Public Function DoBaseFlowSeparation() As atcTimeseries
         If TargetTS Is Nothing Then
@@ -634,38 +634,6 @@ Public Class GWBaseFlowPart
 
     Public Function Part(ByVal aTS As atcTimeseries) As atcTimeseries
 
-        ''Dim lFlowQ(,,) As Double
-
-        'Dim lSJDay As Double = aTS.Attributes.GetValue("SJDay")
-        'Dim lEJDay As Double = aTS.Dates.Value(aTS.numValues - 1)
-        'Dim lDateStart(5) As Integer
-        'J2Date(lSJDay, lDateStart)
-        'Dim lDateEnd(5) As Integer
-        'J2Date(lEJDay, lDateEnd)
-
-        'Dim lNumYears As Integer = lDateEnd(0) - lDateStart(0) + 1
-        ''TimDif(lDateStart, lDateEnd, atcTimeUnit.TUYear, 1, lNumYears)
-        ''Dim lNumMonths As Integer
-        ''TimDif(lDateStart, lDateEnd, atcTimeUnit.TUMonth, 1, lNumMonths)
-        'Dim lNumDays As Integer
-        ''TimDif(lDateStart, lDateEnd, atcTimeUnit.TUDay, 1, lNumDays)
-        'lNumDays = lNumYears * 12 * 31
-
-        'ReDim lFlowQ(lNumYears, 11, 30)
-        'Initialize
-        'For Y As Integer = 0 To lNumYears
-        '    For M As Integer = 0 To 11
-        '        For D As Integer = 0 To 30
-        '            lFlowQ(Y, M, D) = -999.0
-        '        Next
-        '    Next
-        'Next
-
-        'Dim lQ1D(lNumDays) As Double
-        'For D As Integer = 0 To lNumDays
-        '    lQ1D(D) = -999.0
-        'Next
-
         Dim lCountDays As Integer = aTS.numValues
         Dim lALLGW(lCountDays) As Char
         For D As Integer = 0 To lCountDays
@@ -1034,7 +1002,7 @@ Public Class GWBaseFlowPart
         ReDim lB1D(2, 0)
         ReDim lB1D(1, 0)
 
-        '------- WRITE DAILY STREAMFLOW AND BASEFLOW FOR ONE OR MORE YEARS: ---
+        '------- WRITE STREAMFLOW AND BASEFLOW FOR ONE OR MORE YEARS: ---
         Dim lOutputDir As String = Path.GetDirectoryName(aTS.Attributes.GetValue("History 1"))
         lOutputDir = lOutputDir.ToLower.Substring("read from ".Length)
         Dim lPartDayFilename As String = Path.Combine(lOutputDir, "partday_vbNet.TXT")
@@ -1045,6 +1013,12 @@ Public Class GWBaseFlowPart
 
         Dim lPartQrtFilename As String = Path.Combine(lOutputDir, "partqrt_vbNet.txt")
         WriteBFQuarterly(aTS, lPartQrtFilename)
+
+        Dim lPartWYFilename As String = Path.Combine(lOutputDir, "partWY_vbNet.txt")
+        WriteBFWaterYear(pTsBaseflowMonthlyDepth, lPartWYFilename)
+
+        Dim lPartSumFilename As String = Path.Combine(lOutputDir, "partsum_vbNet.txt")
+        WriteBFSum(aTS, lPartSumFilename)
 
         Return pTsBaseflow1 'TODO: make sure which one is it
     End Function
@@ -1208,21 +1182,21 @@ Public Class GWBaseFlowPart
         End If
 
         lSW.WriteLine("  ")
-        lSW.WriteLine(" THIS IS FILE PARTMON.TXT FOR INPUT FILE: " & Path.GetFileName(aFilename))
+        lSW.WriteLine("  THIS IS FILE PARTMON.TXT FOR INPUT FILE: " & Path.GetFileName(aTS.Attributes.GetValue("History 1")))
         lSW.WriteLine(" ")
-        lSW.WriteLine(" PROGRAM VERSION DATE = JANUARY 2007  ")
+        lSW.WriteLine("  PROGRAM VERSION DATE = JANUARY 2007  ")
         lSW.WriteLine(" ")
         lSW.WriteLine(" ")
-        lSW.WriteLine("                       MONTHLY STREAMFLOW (INCHES):")
-        lSW.WriteLine("         J     F     M     A     M     J     J     A     S     O     N     D   YEAR")
+        lSW.WriteLine("                        MONTHLY STREAMFLOW (INCHES):")
+        lSW.WriteLine("          J     F     M     A     M     J     J     A     S     O     N     D   YEAR")
         lSW.Flush()
         Dim lFieldWidth As Integer = 6
-        Dim lTsYearly As atcTimeseries = Aggregate(pTsMonthlyFlowDepth, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+        Dim lTsYearly As atcTimeseries = Aggregate(pTsMonthlyFlowDepth, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
         Dim lYearCount As Integer = 1
         Dim lYearHasMiss As Boolean = False
         For I As Integer = 1 To pTsMonthlyFlowDepth.numValues
             J2Date(pTsMonthlyFlowDepth.Dates.Value(I - 1), lDate)
-            lSW.WriteLine(lDate(0).ToString.PadLeft(lFieldWidth, " ")) 'begining of a year
+            lSW.Write(lDate(0).ToString.PadLeft(lFieldWidth, " ")) 'begining of a year
             Dim lCurrentYear As Integer = lDate(0)
             lYearHasMiss = False
             For M As Integer = 1 To 12
@@ -1230,17 +1204,17 @@ Public Class GWBaseFlowPart
                     If lDate(0) = lCurrentYear Then
                         If pTsMonthlyFlowDepth.Value(I) < -99.0 Then lYearHasMiss = True
                         lSW.Write(String.Format("{0:0.00}", pTsMonthlyFlowDepth.Value(I)).PadLeft(lFieldWidth, " "))
+                        I += 1
+                        J2Date(pTsMonthlyFlowDepth.Dates.Value(I - 1), lDate)
                     Else
-                        I -= 1
                         Exit For
                     End If
 
                 Else
                     lSW.Write(Space(lFieldWidth))
                 End If
-                I += 1
-                J2Date(pTsMonthlyFlowDepth.Dates.Value(I - 1), lDate)
             Next
+            I -= 1
 
             'print yearly sum
             If lYearHasMiss Then
@@ -1260,14 +1234,14 @@ Public Class GWBaseFlowPart
         'print baseflow monthly values
         lSW.WriteLine(" ")
         lSW.WriteLine(" ")
-        lSW.WriteLine("                        MONTHLY BASE FLOW (INCHES):")
-        lSW.WriteLine("         J     F     M     A     M     J     J     A     S     O     N     D   YEAR")
+        lSW.WriteLine("                         MONTHLY BASE FLOW (INCHES):")
+        lSW.WriteLine("          J     F     M     A     M     J     J     A     S     O     N     D   YEAR")
 
-        Dim lTsBFYearly As atcTimeseries = Aggregate(pTsBaseflowMonthlyDepth, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+        Dim lTsBFYearly As atcTimeseries = Aggregate(pTsBaseflowMonthlyDepth, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
         lYearCount = 1
         For I As Integer = 1 To pTsBaseflowMonthlyDepth.numValues
             J2Date(pTsBaseflowMonthlyDepth.Dates.Value(I - 1), lDate)
-            lSW.WriteLine(lDate(0).ToString.PadLeft(lFieldWidth, " ")) 'begining of a year
+            lSW.Write(lDate(0).ToString.PadLeft(lFieldWidth, " ")) 'begining of a year
             Dim lCurrentYear As Integer = lDate(0)
             lYearHasMiss = False
             For M As Integer = 1 To 12
@@ -1275,18 +1249,19 @@ Public Class GWBaseFlowPart
                     If lDate(0) = lCurrentYear Then
                         If pTsBaseflowMonthlyDepth.Value(I) < -99.0 Then lYearHasMiss = True
                         lSW.Write(String.Format("{0:0.00}", pTsBaseflowMonthlyDepth.Value(I)).PadLeft(lFieldWidth, " "))
+                        I += 1
+                        J2Date(pTsBaseflowMonthlyDepth.Dates.Value(I - 1), lDate)
                     Else
-                        I -= 1
                         Exit For
                     End If
 
                 Else
                     lSW.Write(Space(lFieldWidth))
                 End If
-                I += 1
-                J2Date(pTsBaseflowMonthlyDepth.Dates.Value(I - 1), lDate)
+
             Next
 
+            I -= 1
             'print yearly sum
             If lYearHasMiss Then
                 lSW.WriteLine(String.Format("{0:0.00}", -99.99).PadLeft(lFieldWidth, " "))
@@ -1297,11 +1272,11 @@ Public Class GWBaseFlowPart
         Next
 
         lSW.WriteLine(" ")
-        lSW.WriteLine("                 TOTAL OF MONTHLY AMOUNTS = " & pTotalBaseflowDepth)
+        lSW.WriteLine("                  TOTAL OF MONTHLY AMOUNTS = " & String.Format("{0:0.0000000}", pTotalBaseflowDepth))
         lSW.WriteLine(" ")
-        lSW.WriteLine("RESULTS ON THE MONTHLY TIME SCALE SHOULD BE USED WITH CAUTION. ")
-        lSW.WriteLine("FILES PARTQRT.TXT AND PARTSUM.TXT GIVE RESULT AT THE")
-        lSW.WriteLine("CORRECT TIME SCALES (QUARTER YEAR, YEAR, OR MORE). ")
+        lSW.WriteLine(" RESULTS ON THE MONTHLY TIME SCALE SHOULD BE USED WITH CAUTION. ")
+        lSW.WriteLine(" FILES PARTQRT.TXT AND PARTSUM.TXT GIVE RESULT AT THE")
+        lSW.WriteLine(" CORRECT TIME SCALES (QUARTER YEAR, YEAR, OR MORE). ")
 
         lSW.Flush()
         lSW.Close()
@@ -1313,10 +1288,6 @@ Public Class GWBaseFlowPart
         Dim lSW As New StreamWriter(aFilename, False)
 
         Dim lDate(5) As Integer
-        J2Date(aTS.Dates.Value(0), lDate)
-        Dim lStartingYear As String = lDate(0).ToString
-        J2Date(aTS.Dates.Value(aTS.numValues - 1), lDate)
-        Dim lEndingYear As String = lDate(0).ToString
 
         'Monthly stream flow in cfs
         Dim lTotXX As Double = 0.0
@@ -1341,21 +1312,21 @@ Public Class GWBaseFlowPart
         End If
 
         lSW.WriteLine("  ")
-        lSW.WriteLine(" THIS IS FILE PARTQRT.TXT FOR INPUT FILE: " & Path.GetFileName(aFilename))
+        lSW.WriteLine("  THIS IS FILE PARTQRT.TXT FOR INPUT FILE: " & Path.GetFileName(aTS.Attributes.GetValue("History 1")))
         lSW.WriteLine(" ")
-        lSW.WriteLine(" PROGRAM VERSION DATE = JANUARY 2007  ")
+        lSW.WriteLine("  PROGRAM VERSION DATE = JANUARY 2007  ")
         lSW.WriteLine(" ")
         lSW.WriteLine("  ")
-        lSW.WriteLine("       QUARTER-YEAR STREAMFLOW IN INCHES         ")
-        lSW.WriteLine("       --------------------------------          ")
-        lSW.WriteLine("         JAN-    APR-    JULY-   OCT-    YEAR    ")
-        lSW.WriteLine("         MAR     JUNE    SEPT    DEC     TOTAL   ")
+        lSW.WriteLine("        QUARTER-YEAR STREAMFLOW IN INCHES         ")
+        lSW.WriteLine("        --------------------------------          ")
+        lSW.WriteLine("          JAN-    APR-    JULY-   OCT-    YEAR    ")
+        lSW.WriteLine("          MAR     JUNE    SEPT    DEC     TOTAL   ")
         lSW.Flush()
 
         ' 1053 FORMAT (1I6, 5F8.2)
         Dim lFieldWidth1 As Integer = 6
         Dim lFieldWidthO As Integer = 8
-        Dim lTsYearly As atcTimeseries = Aggregate(pTsMonthlyFlowDepth, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+        Dim lTsYearly As atcTimeseries = Aggregate(pTsMonthlyFlowDepth, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
         Dim lYearCount As Integer = 1
         Dim lQuarter1 As Double = 0
         Dim lQuarter2 As Double = 0
@@ -1410,7 +1381,7 @@ Public Class GWBaseFlowPart
                             End If
                     End Select
                     I += 1
-                    J2Date(pTsMonthlyFlowDepth.Value(I - 1), lDate)
+                    J2Date(pTsMonthlyFlowDepth.Dates.Value(I - 1), lDate)
                 End If
             Next ' month
 
@@ -1435,12 +1406,13 @@ Public Class GWBaseFlowPart
         'print quarterly baseflow values
         lSW.WriteLine("  ")
         lSW.WriteLine("  ")
-        lSW.WriteLine("       QUARTER-YEAR BASE FLOW IN INCHES          ")
-        lSW.WriteLine("       --------------------------------          ")
-        lSW.WriteLine("         JAN-    APR-    JULY-   OCT-    YEAR    ")
-        lSW.WriteLine("         MAR     JUNE    SEPT    DEC     TOTAL   ")
+        lSW.WriteLine("        QUARTER-YEAR BASE FLOW IN INCHES          ")
+        lSW.WriteLine("        --------------------------------          ")
+        lSW.WriteLine("          JAN-    APR-    JULY-   OCT-    YEAR    ")
+        lSW.WriteLine("          MAR     JUNE    SEPT    DEC     TOTAL   ")
 
-        Dim lTsBFYearly As atcTimeseries = Aggregate(pTsBaseflowMonthlyDepth, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+        Dim lTsBFYearly As atcTimeseries = Aggregate(pTsBaseflowMonthlyDepth, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+        lYearCount = 1
         For I As Integer = 1 To pTsBaseflowMonthlyDepth.numValues
             J2Date(pTsBaseflowMonthlyDepth.Dates.Value(I - 1), lDate)
             Dim lCurrentYear As Integer = lDate(0)
@@ -1484,7 +1456,7 @@ Public Class GWBaseFlowPart
                             End If
                     End Select
                     I += 1
-                    J2Date(pTsBaseflowMonthlyDepth.Value(I - 1), lDate)
+                    J2Date(pTsBaseflowMonthlyDepth.Dates.Value(I - 1), lDate)
                 End If
             Next ' month
 
@@ -1511,6 +1483,117 @@ Public Class GWBaseFlowPart
         lSW = Nothing
         lTsYearly.Clear() : lTsYearly = Nothing
 
+    End Sub
+
+    Private Sub WriteBFSum(ByVal aTsSF As atcTimeseries, ByVal aFilename As String)
+        Dim lWriteHeader As Boolean = False
+        If Not File.Exists(aFilename) Then
+            lWriteHeader = True
+        End If
+
+        Dim lSW As New StreamWriter(aFilename, True)
+        Dim lDate(5) As Integer
+
+        If lWriteHeader Then
+            lSW.WriteLine("File ""partsum.txt""                    Program version -- Jan 2007")
+            lSW.WriteLine("-------------------------------------------------------------------")
+            lSW.WriteLine("Each time the PART program is run, a new line is written to the end")
+            lSW.WriteLine("of this file.")
+            lSW.WriteLine(" ")
+            lSW.WriteLine("            Drainage                                           Base-")
+            lSW.WriteLine("              area                  Mean           Mean        flow")
+            lSW.WriteLine("File name     (Sq.   Time         streamflow      baseflow     index")
+            lSW.WriteLine("             miles)  period     (cfs)  (in/yr)  (cfs)  (in/yr)  (%)")
+            lSW.WriteLine("--------------------------------------------------------------------")
+        End If
+
+        Dim lDataFilename As String = Path.GetFileName(TargetTS.Attributes.GetValue("History 1")).Substring(0, 10)
+        Dim lPadWidth As Integer = 19 - lDataFilename.Trim().Length
+        Dim lDrainageArea As String = String.Format("{0:0.00}", DrainageArea).PadLeft(lPadWidth, " ")
+        Dim lSFMean As Double = aTsSF.Attributes.GetValue("Mean")
+        Dim lBFMean1 As Double = pTsBaseflow1.Attributes.GetValue("Mean")
+        Dim lBFMean2 As Double = pTsBaseflow2.Attributes.GetValue("Mean")
+        Dim lBFMean3 As Double = pTsBaseflow3.Attributes.GetValue("Mean")
+        Dim lMsg As String = ""
+        If lBFMean1 <> lBFMean2 Then
+            lMsg &= "STREAMFLOW VARIES BETWEEN DIFFERENT " & vbCrLf
+            lMsg &= "VALUES OF THE REQMT ANT. RECESSION !!!"
+        End If
+        Dim lBFMeanArithmetic As Double = (lBFMean1 + lBFMean2 + lBFMean3) / 3.0
+
+        Dim lA As Double = (lBFMean1 - lBFMean2 - lBFMean2 + lBFMean3) / 2.0
+        Dim lB As Double = lBFMean2 - lBFMean1 - 3.0 * lA
+        Dim lC As Double = lBFMean1 - lA - lB
+        Dim lX As Double = DrainageArea ^ 0.2 - TBase + 1
+        Dim lBFInterpolatedCFS As Double = lA * lX ^ 2.0 + lB * lX + lC 'interpolated mean base flow (cfs)
+        Dim lBFInterpolatedInch As Double = lBFInterpolatedCFS * 13.5837 / DrainageArea 'interpolated mean base flow (IN/YR)
+
+        '   LINEAR INTERPOLATION BETWEEN RESULTS FOR THE FIRST AND SECOND VALUES
+        '   OF THE REQUIREMENT OF ANTECEDENT RECESSION.....
+        'Dim lBFLine As Double = lBFMean1 + (lX - 1) * (lBFMean2 - lBFMean1)
+        J2Date(aTsSF.Dates.Value(0), lDate)
+        Dim lYearStart As Integer = lDate(0)
+        J2Date(aTsSF.Dates.Value(aTsSF.numValues - 1), lDate)
+        Dim lYearEnd As Integer = lDate(0)
+        Dim lDurationString As String = (lYearStart.ToString & "-" & lYearEnd.ToString).PadLeft(11, " ")
+        If aTsSF.Attributes.GetValue("Count Missing") > 1 Then
+            lMsg = " ******** record incomplete ********"
+        Else
+            lMsg = ""
+        End If
+        Dim lSFMeanCfs As String = String.Format("{0:0.00}", lSFMean).PadLeft(8, " ")
+        Dim lSFMeanInch As String = String.Format("{0:0.00}", lSFMean * 13.5837 / DrainageArea).PadLeft(8, " ")
+
+        Dim lBFMeanCfs As String = String.Format("{0:0.00}", lBFInterpolatedCFS).PadLeft(8, " ")
+        Dim lBFMeanInch As String = String.Format("{0:0.00}", lBFInterpolatedInch).PadLeft(8, " ")
+
+        Dim lBFIndex As String = String.Format("{0:0.00}", 100 * lBFInterpolatedCFS / lSFMean).PadLeft(8, " ")
+
+        lSW.Write(lDataFilename & lDrainageArea & lDurationString)
+        If lMsg.Length = 0 Then
+            lSW.WriteLine(lSFMeanCfs & lSFMeanInch & lBFMeanCfs & lBFMeanInch & lBFIndex)
+        Else
+            lSW.WriteLine(lMsg)
+        End If
+
+        lSW.Flush()
+        lSW.Close()
+        lSW = Nothing
+    End Sub
+
+    Private Sub WriteBFWaterYear(ByVal aTsBFDepth As atcTimeseries, ByVal aFilename As String)
+        Dim lSW As New StreamWriter(aFilename, False)
+
+        Dim lWaterYear As New atcSeasonsWaterYear
+
+        Dim lWaterYearCollection As atcTimeseriesGroup = lWaterYear.Split(aTsBFDepth, Nothing)
+
+        'write file header
+        lSW.WriteLine(" Results on the basis of the ")
+        lSW.WriteLine(" water year (Oct 1 to Sept 30) ")
+        lSW.WriteLine("  ")
+        lSW.WriteLine("         Year              Total ")
+        lSW.WriteLine(" --------------------      ----- ")
+
+        'write results
+        Dim lDate(5) As Integer
+        For Each lTsWaterYear As atcTimeseries In lWaterYearCollection
+            If lTsWaterYear.Attributes.GetValue("Count") = 12 Then
+                'a full water year, then write out
+                J2Date(lTsWaterYear.Dates.Value(0), lDate)
+                lSW.Write("Oct " & lDate(0))
+                J2Date(lTsWaterYear.Dates.Value(lTsWaterYear.numValues), lDate)
+                lSW.Write(" to Sept " & lDate(0))
+                lSW.WriteLine(String.Format("{0:0.00}", lTsWaterYear.Attributes.GetValue("Sum")).PadLeft(11, " "))
+            Else
+                'not a full water year, ignore
+            End If
+        Next
+        lSW.Flush()
+        lSW.Close()
+        lSW = Nothing
+        lWaterYearCollection.Clear() : lWaterYearCollection = Nothing
+        lWaterYear = Nothing
     End Sub
 
     Public Sub Clear()
