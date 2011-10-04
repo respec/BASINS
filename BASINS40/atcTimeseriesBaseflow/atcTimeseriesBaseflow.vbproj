@@ -67,6 +67,12 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="atcChooseDataGroupDatesBF.designer.vb">
+      <DependentUpon>atcChooseDataGroupDatesBF.vb</DependentUpon>
+    </Compile>
+    <Compile Include="atcChooseDataGroupDatesBF.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="atcTimeseriesBaseflow.vb" />
     <Compile Include="clsBaseflow.vb" />
     <Compile Include="clsBaseflowHySep.vb" />
@@ -94,6 +100,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="atcChooseDataGroupDatesBF.resx">
+      <DependentUpon>atcChooseDataGroupDatesBF.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.vb</DependentUpon>
     </EmbeddedResource>
