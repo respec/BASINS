@@ -302,6 +302,7 @@ Public Module modPenmanMonteith_SWAT
         WeatherParmGenerator(lWgnCur)
         '  clgen
         Dim lJulianDayWithinYear As Double = aJDate - Date2J(lYr, 1, 1)
+
         'equation 2.1.2 in SWAT manual
         Dim lSolarDeclination As Double = Math.Asin(0.4 * Math.Sin((lJulianDayWithinYear - 82.0) / 58.09)) '365/2pi = 58.09
         'relative distance of earth from sun - equation 2.1.1 in SWAT Manual
@@ -381,8 +382,8 @@ Public Module modPenmanMonteith_SWAT
         'wind at 1.7m
         Dim lWindAt170cm As Double = lWindAt10m * ((170.0 / 1000.0) ^ 0.2)
         'rv - aerodynamic resistance to sensible heat and vapor transfer
-        'Dim lResistance As Double = 114 / lWindAt170cm
-        Dim lResistance As Double = 114 / lWindAt10m
+        Dim lResistance As Double = 114 / lWindAt170cm
+        'Dim lResistance As Double = 114 / lWindAt10m
         'rc - canopy resistance (TODO:check details of canopy factor)
         Dim lCanopyResistance As Double = aCanopyFactor / (1.4 - (0.4 * (aCo2Conc / 330.0)))
 
