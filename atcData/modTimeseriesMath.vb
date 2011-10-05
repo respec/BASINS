@@ -350,7 +350,7 @@ Public Module modTimeseriesMath
         If aGroup IsNot Nothing Then
             For Each lTs As atcData.atcTimeseries In aGroup
                 If lTs.Dates.numValues > 0 Then
-                    Dim lThisDate As Double = lTs.Dates.Value(1)
+                    Dim lThisDate As Double = lTs.Dates.Value(0)
                     If lThisDate < aFirstStart Then aFirstStart = lThisDate
                     If lThisDate > aCommonStart Then aCommonStart = lThisDate
                     lThisDate = lTs.Dates.Value(lTs.Dates.numValues)
