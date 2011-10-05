@@ -112,11 +112,12 @@ Module MetCmp_PMEt
                                 ltsPMETHour.Attributes.SetValue("Constituent", lPanEvapTimeseries.Attributes.GetValue("Constituent"))
                                 ltsPMETHour.Attributes.SetValue("TSTYPE", lPanEvapTimeseries.Attributes.GetValue("TSTYPE"))
                                 ltsPMETHour.Attributes.SetValue("ID", lID)
+                                ltsPMETHour.Attributes.SetValue("Location", lThisLocation)
 
                                 'Add the newly calculated hourly PMET timeseries back into the current WDM, overwrite if already exists.
                                 If lWDMFile.AddDataset(ltsPMETHour, atcDataSource.EnumExistAction.ExistReplace) Then
                                     Dim lSumAnnualPET As Double = ltsPMETHour.Attributes.GetValue("SumAnnual")
-                                    If lSW IsNot Nothing Then lSW.WriteLine(lThisLocation & " Penman-Monteith PET at DSN " & lID & " in file " & lWDMFile.Specification & ", SumAnnual " & lSumAnnualPET)
+                                    If lSW IsNot Nothing Then lSW.WriteLine(lThisLocation & " Penman-Monteith PET at DSN " & lID & " in file " & lWDMFile.Specification)
                                     Logger.Dbg("Wrote Penman-Monteith PET to DSN " & lID & " SumAnnual " & lSumAnnualPET)
                                 Else
                                     If lSW IsNot Nothing Then lSW.WriteLine(lThisLocation & " failed writing Penman-Montheith PET to DSN " & lID & " in file " & lWDMFile.Specification)
