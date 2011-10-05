@@ -556,8 +556,7 @@ Public Module modMetCompute
         Dim lDisTs As New atcTimeseries(aDataSource)
 
         CopyBaseAttributes(aMnTmpTS, lDisTs)
-        lDisTs.Attributes.SetValue("tu", atcTimeUnit.TUHour)
-        lDisTs.Attributes.SetValue("ts", 1)
+        lDisTs.SetInterval(atcTimeUnit.TUHour, 1)
         lDisTs.Attributes.SetValue("Scenario", "COMPUTED")
         lDisTs.Attributes.SetValue("Constituent", "ATEM")
         lDisTs.Attributes.SetValue("TSTYPE", "ATEM")
@@ -708,8 +707,7 @@ Public Module modMetCompute
 
         CopyBaseAttributes(aInTs, lDisTs)
         lDisTs.Attributes.SetValue("Scenario", "COMPUTED")
-        lDisTs.Attributes.SetValue("tu", atcTimeUnit.TUHour)
-        lDisTs.Attributes.SetValue("ts", 1)
+        lDisTs.SetInterval(atcTimeUnit.TUHour, 1)
         If aDisOpt = 1 Then 'solar disaggregation
             lDisTs.Attributes.SetValue("Constituent", "SOLR")
             lDisTs.Attributes.SetValue("TSTYPE", "SOLR")
@@ -772,8 +770,7 @@ Public Module modMetCompute
         Dim lHrVals(24) As Double
 
         CopyBaseAttributes(aInTs, lDisTs)
-        lDisTs.Attributes.SetValue("tu", atcTimeUnit.TUHour)
-        lDisTs.Attributes.SetValue("ts", 1)
+        lDisTs.SetInterval(atcTimeUnit.TUHour, 1)
         lDisTs.Attributes.SetValue("Scenario", "COMPUTED")
         lDisTs.Attributes.SetValue("Constituent", "WIND")
         lDisTs.Attributes.SetValue("TSTYPE", "WIND")
@@ -1768,8 +1765,7 @@ Public Module modMetCompute
         End If
 
         CopyBaseAttributes(aDyTSer, lDisTs)
-        lDisTs.Attributes.SetValue("tu", atcTimeUnit.TUHour)
-        lDisTs.Attributes.SetValue("ts", 1)
+        lDisTs.SetInterval(atcTimeUnit.TUHour, 1)
         lDisTs.Attributes.SetValue("Scenario", "COMPUTED")
         lDisTs.Attributes.SetValue("Constituent", "PREC")
         lDisTs.Attributes.SetValue("TSTYPE", "PREC")
@@ -2057,8 +2053,7 @@ OuttaHere:
         Dim i As Integer
 
         CopyBaseAttributes(aDPrecTSer, lDisTs)
-        lDisTs.Attributes.SetValue("tu", atcTimeUnit.TUHour)
-        lDisTs.Attributes.SetValue("ts", 1)
+        lDisTs.SetInterval(atcTimeUnit.TUHour, 1)
         lDisTs.Attributes.SetValue("Scenario", "COMPUTED")
         lDisTs.Attributes.SetValue("Constituent", "HPCP")
         lDisTs.Attributes.SetValue("TSTYPE", "HPCP")
