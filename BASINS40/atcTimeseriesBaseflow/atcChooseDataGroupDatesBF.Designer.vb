@@ -42,7 +42,7 @@ Partial Class atcChooseDataGroupDatesBF
         'lblCommonStart
         '
         Me.lblCommonStart.AutoSize = True
-        Me.lblCommonStart.Location = New System.Drawing.Point(116, 39)
+        Me.lblCommonStart.Location = New System.Drawing.Point(128, 48)
         Me.lblCommonStart.Name = "lblCommonStart"
         Me.lblCommonStart.Size = New System.Drawing.Size(0, 13)
         Me.lblCommonStart.TabIndex = 48
@@ -52,7 +52,7 @@ Partial Class atcChooseDataGroupDatesBF
         'lblCommonEnd
         '
         Me.lblCommonEnd.AutoSize = True
-        Me.lblCommonEnd.Location = New System.Drawing.Point(116, 62)
+        Me.lblCommonEnd.Location = New System.Drawing.Point(128, 71)
         Me.lblCommonEnd.Name = "lblCommonEnd"
         Me.lblCommonEnd.Size = New System.Drawing.Size(0, 13)
         Me.lblCommonEnd.TabIndex = 47
@@ -62,7 +62,7 @@ Partial Class atcChooseDataGroupDatesBF
         'lblDataStart
         '
         Me.lblDataStart.AutoSize = True
-        Me.lblDataStart.Location = New System.Drawing.Point(38, 39)
+        Me.lblDataStart.Location = New System.Drawing.Point(50, 48)
         Me.lblDataStart.Name = "lblDataStart"
         Me.lblDataStart.Size = New System.Drawing.Size(0, 13)
         Me.lblDataStart.TabIndex = 45
@@ -72,7 +72,7 @@ Partial Class atcChooseDataGroupDatesBF
         'lblDataEnd
         '
         Me.lblDataEnd.AutoSize = True
-        Me.lblDataEnd.Location = New System.Drawing.Point(38, 62)
+        Me.lblDataEnd.Location = New System.Drawing.Point(50, 71)
         Me.lblDataEnd.Name = "lblDataEnd"
         Me.lblDataEnd.Size = New System.Drawing.Size(0, 13)
         Me.lblDataEnd.TabIndex = 1
@@ -81,7 +81,7 @@ Partial Class atcChooseDataGroupDatesBF
         '
         'btnAll
         '
-        Me.btnAll.Location = New System.Drawing.Point(41, 19)
+        Me.btnAll.Location = New System.Drawing.Point(64, 19)
         Me.btnAll.Name = "btnAll"
         Me.btnAll.Size = New System.Drawing.Size(64, 20)
         Me.btnAll.TabIndex = 49
@@ -91,7 +91,7 @@ Partial Class atcChooseDataGroupDatesBF
         '
         'btnCommon
         '
-        Me.btnCommon.Location = New System.Drawing.Point(111, 19)
+        Me.btnCommon.Location = New System.Drawing.Point(134, 19)
         Me.btnCommon.Name = "btnCommon"
         Me.btnCommon.Size = New System.Drawing.Size(64, 20)
         Me.btnCommon.TabIndex = 50
@@ -101,24 +101,22 @@ Partial Class atcChooseDataGroupDatesBF
         '
         'grpYears
         '
-        Me.grpYears.AutoSize = True
         Me.grpYears.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-        Me.grpYears.Controls.Add(Me.btnCommon)
-        Me.grpYears.Controls.Add(Me.btnAll)
-        Me.grpYears.Controls.Add(Me.txtOmitBefore)
         Me.grpYears.Controls.Add(Me.lblCommonStart)
+        Me.grpYears.Controls.Add(Me.chkYearly)
         Me.grpYears.Controls.Add(Me.lblCommonEnd)
         Me.grpYears.Controls.Add(Me.lblDataStart)
         Me.grpYears.Controls.Add(Me.lblDataEnd)
+        Me.grpYears.Controls.Add(Me.btnCommon)
+        Me.grpYears.Controls.Add(Me.txtOmitAfter)
+        Me.grpYears.Controls.Add(Me.btnAll)
+        Me.grpYears.Controls.Add(Me.txtOmitBefore)
         Me.grpYears.Controls.Add(Me.lblOmitBefore)
         Me.grpYears.Controls.Add(Me.lblOmitAfter)
-        Me.grpYears.Controls.Add(Me.txtOmitAfter)
-        Me.grpYears.Controls.Add(Me.chkYearly)
-        Me.grpYears.Dock = System.Windows.Forms.DockStyle.Fill
         Me.grpYears.ForeColor = System.Drawing.SystemColors.ControlText
         Me.grpYears.Location = New System.Drawing.Point(0, 0)
         Me.grpYears.Name = "grpYears"
-        Me.grpYears.Size = New System.Drawing.Size(225, 135)
+        Me.grpYears.Size = New System.Drawing.Size(359, 123)
         Me.grpYears.TabIndex = 71
         Me.grpYears.TabStop = False
         Me.grpYears.Text = "Dates to Include"
@@ -127,16 +125,16 @@ Partial Class atcChooseDataGroupDatesBF
         '
         Me.txtOmitBefore.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtOmitBefore.Location = New System.Drawing.Point(41, 45)
+        Me.txtOmitBefore.Location = New System.Drawing.Point(246, 45)
         Me.txtOmitBefore.Name = "txtOmitBefore"
-        Me.txtOmitBefore.Size = New System.Drawing.Size(134, 20)
+        Me.txtOmitBefore.Size = New System.Drawing.Size(104, 20)
         Me.txtOmitBefore.TabIndex = 5
         Me.txtOmitBefore.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'lblOmitBefore
         '
         Me.lblOmitBefore.AutoSize = True
-        Me.lblOmitBefore.Location = New System.Drawing.Point(6, 48)
+        Me.lblOmitBefore.Location = New System.Drawing.Point(9, 48)
         Me.lblOmitBefore.Name = "lblOmitBefore"
         Me.lblOmitBefore.Size = New System.Drawing.Size(29, 13)
         Me.lblOmitBefore.TabIndex = 40
@@ -145,7 +143,7 @@ Partial Class atcChooseDataGroupDatesBF
         'lblOmitAfter
         '
         Me.lblOmitAfter.AutoSize = True
-        Me.lblOmitAfter.Location = New System.Drawing.Point(9, 74)
+        Me.lblOmitAfter.Location = New System.Drawing.Point(12, 71)
         Me.lblOmitAfter.Name = "lblOmitAfter"
         Me.lblOmitAfter.Size = New System.Drawing.Size(26, 13)
         Me.lblOmitAfter.TabIndex = 43
@@ -155,16 +153,16 @@ Partial Class atcChooseDataGroupDatesBF
         '
         Me.txtOmitAfter.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtOmitAfter.Location = New System.Drawing.Point(41, 71)
+        Me.txtOmitAfter.Location = New System.Drawing.Point(246, 71)
         Me.txtOmitAfter.Name = "txtOmitAfter"
-        Me.txtOmitAfter.Size = New System.Drawing.Size(134, 20)
+        Me.txtOmitAfter.Size = New System.Drawing.Size(104, 20)
         Me.txtOmitAfter.TabIndex = 6
         Me.txtOmitAfter.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'chkYearly
         '
         Me.chkYearly.AutoSize = True
-        Me.chkYearly.Location = New System.Drawing.Point(9, 97)
+        Me.chkYearly.Location = New System.Drawing.Point(12, 98)
         Me.chkYearly.Name = "chkYearly"
         Me.chkYearly.Size = New System.Drawing.Size(208, 17)
         Me.chkYearly.TabIndex = 51
@@ -172,18 +170,17 @@ Partial Class atcChooseDataGroupDatesBF
         Me.chkYearly.UseVisualStyleBackColor = True
         Me.chkYearly.Visible = False
         '
-        'atcChooseDataGroupDates
+        'atcChooseDataGroupDatesBF
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.Controls.Add(Me.grpYears)
-        Me.Name = "atcChooseDataGroupDates"
-        Me.Size = New System.Drawing.Size(225, 135)
+        Me.Name = "atcChooseDataGroupDatesBF"
+        Me.Size = New System.Drawing.Size(364, 126)
         Me.grpYears.ResumeLayout(False)
         Me.grpYears.PerformLayout()
         Me.ResumeLayout(False)
-        Me.PerformLayout()
 
     End Sub
     Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
