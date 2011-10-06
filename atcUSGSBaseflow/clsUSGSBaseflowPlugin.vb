@@ -15,17 +15,28 @@ Public Class clsUSGSBaseflowPlugin
         End Get
     End Property
 
-    'Public Overrides ReadOnly Property Icon() As System.Drawing.Icon
-    '    Get
-    '        Dim lResources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmMain))
-    '        Return CType(lResources.GetObject("$this.Icon"), System.Drawing.Icon)
-    '    End Get
-    'End Property
+    Public Overrides ReadOnly Property Icon() As System.Drawing.Icon
+        Get
+            Dim lResources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmMain))
+            Return CType(lResources.GetObject("$this.Icon"), System.Drawing.Icon)
+        End Get
+    End Property
 
     Public Overrides Function Show(ByVal aTimeseriesGroup As atcData.atcDataGroup) As Object
-        Dim lForm As New frmMain
-        ShowForm(aTimeseriesGroup, lForm)
-        Return lForm
+        Show = Nothing
+
+        Dim lTimeseriesGroup As atcTimeseriesGroup = aTimeseriesGroup
+        If lTimeseriesGroup Is Nothing Then lTimeseriesGroup = New atcTimeseriesGroup
+        If lTimeseriesGroup.Count = 0 Then 'ask user to specify some Data
+            lTimeseriesGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Baseflow Separation", lTimeseriesGroup)
+        End If
+        If lTimeseriesGroup.Count > 0 Then
+            Dim lForm As New frmMain
+            ShowForm(lTimeseriesGroup, lForm)
+            Return lForm
+        Else
+            Logger.Msg("Need to select at least one daily streamflow dataset", "USGS Baseflow Separation")
+        End If
     End Function
 
     Private Sub ShowForm(ByVal aTimeseriesGroup As atcData.atcDataGroup, ByVal aForm As Object)
@@ -39,17 +50,13 @@ Public Class clsUSGSBaseflowPlugin
             .Add("Standard Deviation")
             .Add("Count")
             .Add("Count Missing")
-        End With
-
-        Dim lBFAttributes As New Generic.List(Of String)
-        With lBFAttributes
             .Add("STAID")
             .Add("STANAM")
             .Add("Constituent")
             .Add("Location")
         End With
 
-        aForm.Initialize(aTimeseriesGroup, lBasicAttributes, lBFAttributes)
+        aForm.Initialize(aTimeseriesGroup, lBasicAttributes, True)
     End Sub
 
     Public Overrides Sub Save(ByVal aTimeseriesGroup As atcData.atcDataGroup, _
@@ -68,8 +75,6 @@ Public Class clsUSGSBaseflowPlugin
 
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
-        'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_USGS Baseflow Separation_" & pTrendName, _
-        '                                               atcDataManager.AnalysisMenuName & "_USGS Baseflow Separation", pTrendName, Me.Icon, , , True))
     End Sub
 
     Private Sub LoadPlugin(ByVal aPluginName As String)
@@ -80,19 +85,6 @@ Public Class clsUSGSBaseflowPlugin
         Catch e As Exception
             Logger.Dbg("Exception loading " & aPluginName & ": " & e.Message)
         End Try
-    End Sub
-
-    Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
-        'MyBase.ItemClicked(aItemName, aHandled)
-        'If Not aHandled AndAlso aItemName.Equals(atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)_" & pTrendName) Then
-        '    Dim lTimeseriesGroup As atcTimeseriesGroup = _
-        '      atcDataManager.UserSelectData("Select Data For Trend Analysis", _
-        '                                    Nothing, Nothing, True, True, Me.Icon)
-        '    If lTimeseriesGroup.Count > 0 Then
-        '        Dim lForm As New frmTrend
-        '        ShowForm(lTimeseriesGroup, lForm)
-        '    End If
-        'End If
     End Sub
 
     Public Shared Function ComputeRankedAnnualTimeseries(ByVal aTimeseriesGroup As atcTimeseriesGroup, _
@@ -131,18 +123,6 @@ Public Class clsUSGSBaseflowPlugin
             Next
         End If
         Return lCalculator.DataSets
-    End Function
-
-    Public Shared Function ListDefaultArray(ByVal aListTag As String) As Double()
-        'Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
-        'Dim lNDayHi As atcDefinedValue = lCalculator.AvailableOperations.GetDefinedValue("n-day high value")
-        'Dim lArgs As atcDataAttributes = lNDayHi.Arguments
-        'Dim lDefault As Object = lArgs.GetDefinedValue(aListTag).Definition.DefaultValue
-        'If IsArray(lDefault) Then
-        '    Return lDefault
-        'Else
-        '    Return Nothing
-        'End If
     End Function
 
 End Class

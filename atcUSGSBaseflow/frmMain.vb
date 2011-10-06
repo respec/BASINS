@@ -21,7 +21,7 @@ Public Class frmMain
     Private Const pNoDatesInCommon As String = ": No dates in common"
 
     Private pModel As String = ""
-    Private pStationsFile As String = ""
+    Private pClsBaseFlow As atcTimeseriesBaseflow.atcTimeseriesBaseflow
 
     Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing, _
                       Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing, _
@@ -70,7 +70,7 @@ Public Class frmMain
         End With
 
         pModel = GetSetting("atcUSGSBaseflow", "Defaults", "Model", "HySep-Fixed")
-        pStationsFile = GetSetting("atcUSGSBaseflow", "Defaults", "Stations", "")
+        StationInfoFile = GetSetting("atcUSGSBaseflow", "Defaults", "Stations", "Station.txt")
 
         RepopulateForm()
     End Sub
@@ -97,8 +97,8 @@ Public Class frmMain
         Next
 
         If lFirstDate < GetMaxValue() AndAlso lLastDate > GetMinValue() Then
-            lblDataStart.Text = lblDataStart.Tag & " " & pDateFormat.JDateToString(lFirstDate)
-            lblDataEnd.Text = lblDataEnd.Tag & " " & pDateFormat.JDateToString(lLastDate)
+            txtDataStart.Text = txtDataStart.Tag & " " & pDateFormat.JDateToString(lFirstDate)
+            txtDataEnd.Text = txtDataEnd.Tag & " " & pDateFormat.JDateToString(lLastDate)
             lAllText &= ": " & pDateFormat.JDateToString(lFirstDate) & " to " & pDateFormat.JDateToString(lLastDate)
         End If
 
@@ -182,5 +182,21 @@ Public Class frmMain
 
     Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
         atcDataManager.ShowDisplay(sender.Text, pDataGroup)
+    End Sub
+
+    Private Sub btnFindStations_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnFindStations.Click
+        StationInfoFile = FindFile("Locate Station File", StationInfoFile, "txt")
+        SaveSetting("atcUSGSBaseflow", "Defaults", "Stations", StationInfoFile)
+        GetStations()
+        Dim lfrmStaion As New frmStations(Stations)
+        lfrmStaion.Show()
+    End Sub
+
+    Private Sub btnExamineData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnExamineData.Click
+        For Each lTs As atcTimeseries In pDataGroup
+            Dim lfrmDataSummary As New frmDataSummary(PrintDataSummary(lTs))
+            lfrmDataSummary.txtDataSummary.SelectionStart = 0
+            lfrmDataSummary.Show()
+        Next
     End Sub
 End Class
