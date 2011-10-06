@@ -22,7 +22,7 @@
     <DebugType>full</DebugType>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
     <DocumentationFile>atcUSGSBaseflow.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
@@ -58,12 +58,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsUSGSBaseflowPlugin.vb" />
+    <Compile Include="frmDataSummary.Designer.vb">
+      <DependentUpon>frmDataSummary.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmDataSummary.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmMain.Designer.vb">
       <DependentUpon>frmMain.vb</DependentUpon>
     </Compile>
     <Compile Include="frmMain.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmStations.Designer.vb">
+      <DependentUpon>frmStations.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmStations.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="modBaseflowUtil.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -81,8 +94,14 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmDataSummary.resx">
+      <DependentUpon>frmDataSummary.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmStations.resx">
+      <DependentUpon>frmStations.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

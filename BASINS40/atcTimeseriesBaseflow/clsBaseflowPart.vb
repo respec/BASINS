@@ -49,9 +49,6 @@ Public Class clsBaseflowPart
 
     Public Sub New()
         MyBase.New()
-        If StationInfoFile = "" Then
-            StationInfoFile = "Station.txt"
-        End If
     End Sub
 
     Private pMissingDataMonth As atcCollection

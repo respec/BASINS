@@ -8,6 +8,7 @@ Public Class atcTimeseriesBaseflow
     Private Const pName As String = "Timeseries::Baseflow"
 
     Private Shared BFModel As atcAttributeDefinition
+    Private Shared ClsBaseFlow As clsBaseflow
 
     Public Overrides ReadOnly Property Name() As String
         Get
@@ -114,7 +115,7 @@ Public Class atcTimeseriesBaseflow
             .Editable = False
             .TypeString = aTypeString
             .Calculator = Me
-            .Category = "N-day and Frequency"
+            .Category = "Baseflow"
         End With
         Dim lArguments As atcDataAttributes = New atcDataAttributes
         For Each lArg As atcAttributeDefinition In aArgs

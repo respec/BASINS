@@ -3,7 +3,6 @@ Imports MapWindow.Interfaces
 Imports MapWinUtility
 Imports System.IO
 Imports System.Text
-
 Imports System.Collections.Specialized
 Imports atcMetCmp
 Imports atcData
@@ -26,76 +25,6 @@ Public Class clsBaseflow
         End Get
         Set(ByVal value As atcTimeseries)
             pTargetTS = value
-        End Set
-    End Property
-
-    ''' <summary>
-    ''' This is a file (usually called 'Station.txt') that is read by programs PREP, RECESS, RORA, and PART, 
-    ''' it contains the drainage area values for each station data file downloaded from NWIS
-    ''' Note: This file should have ten header lines.  
-    ''' The streamflow file name should be 12 characters or less (for the original fortran program). 
-    ''' </summary>
-    ''' <remarks></remarks>
-    Public Structure USGSGWStation
-        Dim Filename As String
-        Dim DrainageArea As Double
-        Dim ExtraInfo As String
-    End Structure
-
-    Private pStations As atcCollection
-    Public Property Stations() As atcCollection
-        Get
-            If pStations Is Nothing Then
-                pStations = New atcCollection()
-            End If
-            Return pStations
-        End Get
-        Set(ByVal value As atcCollection)
-            pStations = value
-        End Set
-    End Property
-
-    Public Function GetStations() As Integer
-        Stations.Clear()
-        Dim lSR As New StreamReader(StationInfoFile)
-        Dim lOneLine As String
-        Dim lCount As Integer = 0
-        While Not lSR.EndOfStream
-            'bypass the first 10 header lines
-            If lCount = 10 Then Exit While
-            lOneLine = lSR.ReadLine()
-            lCount += 1
-        End While
-        Dim lOneStation As USGSGWStation
-        While Not lSR.EndOfStream
-            lOneLine = lSR.ReadLine()
-            If lOneLine.Trim().Length >= 20 Then
-                lOneStation = New USGSGWStation
-                lOneStation.Filename = lOneLine.Substring(0, 12).Trim()
-                lOneStation.DrainageArea = Double.Parse(lOneLine.Substring(12, 8))
-                lOneStation.ExtraInfo = lOneLine.Substring(20).Trim()
-                Stations.Add(lOneStation.Filename, lOneStation)
-            End If
-        End While
-        lSR.Close()
-        lSR = Nothing
-        Return Stations.Count
-    End Function
-
-    Private pStationInfoFile As String = "Station.txt"
-    Public Property StationInfoFile() As String
-        Get
-            If Not File.Exists(pStationInfoFile) Then
-                pStationInfoFile = FindFile("Please locate Station.txt", pStationInfoFile, "txt")
-            End If
-            Return pStationInfoFile
-        End Get
-        Set(ByVal value As String)
-            If File.Exists(value) Then
-                pStationInfoFile = value
-            Else
-                pStationInfoFile = FindFile("Please locate Station.txt", value, "txt")
-            End If
         End Set
     End Property
 

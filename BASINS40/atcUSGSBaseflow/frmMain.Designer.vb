@@ -31,16 +31,16 @@ Partial Class frmMain
         Me.Label3 = New System.Windows.Forms.Label
         Me.btnOK = New System.Windows.Forms.Button
         Me.btnCancel = New System.Windows.Forms.Button
-        Me.Button3 = New System.Windows.Forms.Button
+        Me.btnExamineData = New System.Windows.Forms.Button
         Me.btnFindStations = New System.Windows.Forms.Button
         Me.gbDates = New System.Windows.Forms.GroupBox
+        Me.txtEndDateUser = New System.Windows.Forms.TextBox
         Me.txtStartDateUser = New System.Windows.Forms.TextBox
         Me.txtDataEnd = New System.Windows.Forms.TextBox
         Me.txtDataStart = New System.Windows.Forms.TextBox
         Me.lblDataEnd = New System.Windows.Forms.Label
         Me.lblDataStart = New System.Windows.Forms.Label
         Me.toolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.txtEndDateUser = New System.Windows.Forms.TextBox
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.mnuFile = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuFileSelectData = New System.Windows.Forms.ToolStripMenuItem
@@ -114,14 +114,14 @@ Partial Class frmMain
         Me.btnCancel.Text = "Cancel"
         Me.btnCancel.UseVisualStyleBackColor = True
         '
-        'Button3
+        'btnExamineData
         '
-        Me.Button3.Location = New System.Drawing.Point(241, 78)
-        Me.Button3.Name = "Button3"
-        Me.Button3.Size = New System.Drawing.Size(94, 23)
-        Me.Button3.TabIndex = 25
-        Me.Button3.Text = "Examine Data"
-        Me.Button3.UseVisualStyleBackColor = True
+        Me.btnExamineData.Location = New System.Drawing.Point(241, 78)
+        Me.btnExamineData.Name = "btnExamineData"
+        Me.btnExamineData.Size = New System.Drawing.Size(94, 23)
+        Me.btnExamineData.TabIndex = 25
+        Me.btnExamineData.Text = "Examine Data"
+        Me.btnExamineData.UseVisualStyleBackColor = True
         '
         'btnFindStations
         '
@@ -136,7 +136,7 @@ Partial Class frmMain
         '
         Me.gbDates.Controls.Add(Me.txtEndDateUser)
         Me.gbDates.Controls.Add(Me.txtStartDateUser)
-        Me.gbDates.Controls.Add(Me.Button3)
+        Me.gbDates.Controls.Add(Me.btnExamineData)
         Me.gbDates.Controls.Add(Me.txtDataEnd)
         Me.gbDates.Controls.Add(Me.txtDataStart)
         Me.gbDates.Controls.Add(Me.lblDataEnd)
@@ -147,6 +147,15 @@ Partial Class frmMain
         Me.gbDates.TabIndex = 27
         Me.gbDates.TabStop = False
         Me.gbDates.Text = "Baseflow Analysis Dates"
+        '
+        'txtEndDateUser
+        '
+        Me.txtEndDateUser.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtEndDateUser.Location = New System.Drawing.Point(194, 52)
+        Me.txtEndDateUser.Name = "txtEndDateUser"
+        Me.txtEndDateUser.Size = New System.Drawing.Size(141, 20)
+        Me.txtEndDateUser.TabIndex = 27
         '
         'txtStartDateUser
         '
@@ -159,6 +168,7 @@ Partial Class frmMain
         '
         'txtDataEnd
         '
+        Me.txtDataEnd.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txtDataEnd.Location = New System.Drawing.Point(68, 53)
         Me.txtDataEnd.Name = "txtDataEnd"
         Me.txtDataEnd.ReadOnly = True
@@ -167,6 +177,7 @@ Partial Class frmMain
         '
         'txtDataStart
         '
+        Me.txtDataStart.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txtDataStart.Location = New System.Drawing.Point(68, 26)
         Me.txtDataStart.Name = "txtDataStart"
         Me.txtDataStart.ReadOnly = True
@@ -193,15 +204,6 @@ Partial Class frmMain
         Me.lblDataStart.TabIndex = 0
         Me.lblDataStart.Text = "Data Start"
         '
-        'txtEndDateUser
-        '
-        Me.txtEndDateUser.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtEndDateUser.Location = New System.Drawing.Point(194, 52)
-        Me.txtEndDateUser.Name = "txtEndDateUser"
-        Me.txtEndDateUser.Size = New System.Drawing.Size(141, 20)
-        Me.txtEndDateUser.TabIndex = 27
-        '
         'MenuStrip1
         '
         Me.MenuStrip1.BackColor = System.Drawing.SystemColors.Window
@@ -216,25 +218,25 @@ Partial Class frmMain
         '
         Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileSelectData})
         Me.mnuFile.Name = "mnuFile"
-        Me.mnuFile.Size = New System.Drawing.Size(35, 20)
+        Me.mnuFile.Size = New System.Drawing.Size(37, 20)
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
         '
         Me.mnuFileSelectData.Name = "mnuFileSelectData"
-        Me.mnuFileSelectData.Size = New System.Drawing.Size(152, 22)
+        Me.mnuFileSelectData.Size = New System.Drawing.Size(132, 22)
         Me.mnuFileSelectData.Text = "Select Data"
         '
         'mnuAnalysis
         '
         Me.mnuAnalysis.Name = "mnuAnalysis"
-        Me.mnuAnalysis.Size = New System.Drawing.Size(58, 20)
+        Me.mnuAnalysis.Size = New System.Drawing.Size(62, 20)
         Me.mnuAnalysis.Text = "Analysis"
         '
         'mnuHelp
         '
         Me.mnuHelp.Name = "mnuHelp"
-        Me.mnuHelp.Size = New System.Drawing.Size(40, 20)
+        Me.mnuHelp.Size = New System.Drawing.Size(44, 20)
         Me.mnuHelp.Text = "Help"
         '
         'frmMain
@@ -271,7 +273,7 @@ Partial Class frmMain
     Friend WithEvents Label3 As System.Windows.Forms.Label
     Friend WithEvents btnOK As System.Windows.Forms.Button
     Friend WithEvents btnCancel As System.Windows.Forms.Button
-    Friend WithEvents Button3 As System.Windows.Forms.Button
+    Friend WithEvents btnExamineData As System.Windows.Forms.Button
     Friend WithEvents btnFindStations As System.Windows.Forms.Button
     Friend WithEvents gbDates As System.Windows.Forms.GroupBox
     Friend WithEvents lblDataEnd As System.Windows.Forms.Label
