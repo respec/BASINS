@@ -103,7 +103,7 @@ Module MetCmp_PMEt
                                 Dim lPanEvapTimeseries As atcTimeseries = _
                                     PanEvaporationTimeseriesComputedByPenmanMonteith(lElevation, lTsPrec, lTsAtem, Nothing, lNearestStation, 0.0, , , pDebug)
                                 lPanEvapTimeseries.SetInterval(atcTimeUnit.TUDay, 1)
-                                lPanEvapTimeseries.Attributes.SetValue("ID", lTsAtem.Attributes.GetValue("ID") + 6)
+                                lPanEvapTimeseries.Attributes.SetValue("ID", lTsAtem.Attributes.GetValue("ID") + 1000)
                                 lPanEvapTimeseries.Attributes.SetValue("TU", atcTimeUnit.TUDay)
                                 lPanEvapTimeseries.Attributes.SetValue("description", "SWAT PM ET inches")
 
