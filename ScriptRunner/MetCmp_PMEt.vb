@@ -101,7 +101,7 @@ Module MetCmp_PMEt
                                 'TODO: get actual elevation of location rather than using station elveation
                                 Dim lElevation As Double = lNearestStation.Elev / 0.3048
                                 Dim lPanEvapTimeseries As atcTimeseries = _
-                                    PanEvaporationTimeseriesComputedByPenmanMonteith(lElevation, lTsPrec, lTsAtem, Nothing, lNearestStation, 0.0, , , pDebug)
+                                    PanEvaporationTimeseriesComputedByPenmanMonteith(lElevation, lTsPrec, lTsAtem, Nothing, lNearestStation, 49.0, , , pDebug)
                                 lPanEvapTimeseries.SetInterval(atcTimeUnit.TUDay, 1)
                                 lPanEvapTimeseries.Attributes.SetValue("ID", lTsAtem.Attributes.GetValue("ID") + 1000)
                                 lPanEvapTimeseries.Attributes.SetValue("TU", atcTimeUnit.TUDay)
