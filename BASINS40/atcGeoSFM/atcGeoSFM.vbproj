@@ -76,12 +76,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsPlugin.vb" />
-    <Compile Include="frmGeoSFMFieldMapping.Designer.vb">
-      <DependentUpon>frmGeoSFMFieldMapping.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmGeoSFMFieldMapping.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="frmGeoSFM.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -102,10 +96,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="frmGeoSFMFieldMapping.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>frmGeoSFMFieldMapping.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="frmGeoSFM.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmGeoSFM.vb</DependentUpon>
