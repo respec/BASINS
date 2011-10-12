@@ -56,7 +56,7 @@ Public Class clsBaseflowHySep
     '    End Set
     'End Property
 
-    Public Function DoBaseFlowSeparation() As atcTimeseries
+    Public Overrides Function DoBaseFlowSeparation() As atcTimeseriesGroup
         If TargetTS Is Nothing Then
             Return Nothing
         End If
@@ -71,10 +71,10 @@ Public Class clsBaseflowHySep
         Dim lDaysPrev As Integer = timdifJ(lTsStart, StartDate, atcTimeUnit.TUDay, 1)
         Dim lDaysPost As Integer = timdifJ(EndDate, lTsEnd, atcTimeUnit.TUDay, 1)
 
-        If lDaysPrev >= 11 Then lDaysPrev = 11
+        If lDaysPrev >= DaysInBuffer Then lDaysPrev = DaysInBuffer
         lTsStart = TimAddJ(StartDate, atcTimeUnit.TUDay, 1, -1 * lDaysPrev)
 
-        If lDaysPost >= 11 Then lDaysPost = 11
+        If lDaysPost >= DaysInBuffer Then lDaysPost = DaysInBuffer
         lTsEnd = TimAddJ(EndDate, atcTimeUnit.TUDay, 1, lDaysPost)
 
         'Make sure the ts is in daily timestep
@@ -100,8 +100,11 @@ Public Class clsBaseflowHySep
 
         'Adjust for pre- and post- duration dates
         lTsBF = SubsetByDate(lTsBF, StartDate, EndDate, Nothing)
+        lTsBF.Attributes.SetValue("Drainage Area", DrainageArea)
+        Dim lTsBFgroup As New atcTimeseriesGroup
+        lTsBFgroup.Add(lTsBF)
 
-        Return lTsBF
+        Return lTsBFgroup
     End Function
 
     Public Function HySepFixed(ByVal aTS As atcTimeseries) As atcTimeseries
@@ -203,6 +206,7 @@ Public Class clsBaseflowHySep
         'Next
         'lTsBaseflow.Dates = lNewDates
         'lTsBaseflow.Values = lValueBaseflowFinal
+        lTsBaseflow.Attributes.SetValue("Scenario", "HySepFixed")
         Return lTsBaseflow
     End Function
 
@@ -264,6 +268,7 @@ Public Class clsBaseflowHySep
         Dim lTsBaseflow As atcTimeseries = aTS.Clone()
         lTsBaseflow.Values = lValueBaseflow
 
+        lTsBaseflow.Attributes.SetValue("Scenario", "HySepSlide")
         Return lTsBaseflow
     End Function
 
@@ -382,9 +387,13 @@ Public Class clsBaseflowHySep
         Dim lTsBaseflow As atcTimeseries = aTS.Clone
         With lTsBaseflow
             .Attributes.SetValue("Constituent", "Baseflow")
-            .Attributes.SetValue("Scenario", "HySEPLocMin")
+            .Attributes.SetValue("Scenario", "HySepLocMin")
             .Values = lValueBaseflow
         End With
         Return lTsBaseflow
     End Function
+
+    Public Overrides Sub Clear()
+        'do nothing
+    End Sub
 End Class
