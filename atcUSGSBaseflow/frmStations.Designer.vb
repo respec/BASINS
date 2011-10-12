@@ -43,7 +43,7 @@ Partial Class frmStations
         Me.txtHeader.Multiline = True
         Me.txtHeader.Name = "txtHeader"
         Me.txtHeader.ReadOnly = True
-        Me.txtHeader.Size = New System.Drawing.Size(584, 101)
+        Me.txtHeader.Size = New System.Drawing.Size(584, 75)
         Me.txtHeader.TabIndex = 0
         '
         'dgvStationEntries
@@ -53,9 +53,10 @@ Partial Class frmStations
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgvStationEntries.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvStationEntries.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.fld1RDBFilename, Me.fld2DrainageArea, Me.fld3StationID, Me.fld4StationInfo})
-        Me.dgvStationEntries.Location = New System.Drawing.Point(0, 107)
+        Me.dgvStationEntries.Location = New System.Drawing.Point(0, 81)
+        Me.dgvStationEntries.MultiSelect = False
         Me.dgvStationEntries.Name = "dgvStationEntries"
-        Me.dgvStationEntries.Size = New System.Drawing.Size(584, 173)
+        Me.dgvStationEntries.Size = New System.Drawing.Size(584, 199)
         Me.dgvStationEntries.TabIndex = 1
         '
         'fld1RDBFilename
@@ -75,8 +76,10 @@ Partial Class frmStations
         '
         'fld4StationInfo
         '
+        Me.fld4StationInfo.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
         Me.fld4StationInfo.HeaderText = "Station Info (optional)"
         Me.fld4StationInfo.Name = "fld4StationInfo"
+        Me.fld4StationInfo.Width = 121
         '
         'btnOK
         '
@@ -119,10 +122,10 @@ Partial Class frmStations
     End Sub
     Friend WithEvents txtHeader As System.Windows.Forms.TextBox
     Friend WithEvents dgvStationEntries As System.Windows.Forms.DataGridView
+    Friend WithEvents btnOK As System.Windows.Forms.Button
+    Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents fld1RDBFilename As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents fld2DrainageArea As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents fld3StationID As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents fld4StationInfo As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents btnOK As System.Windows.Forms.Button
-    Friend WithEvents btnCancel As System.Windows.Forms.Button
 End Class

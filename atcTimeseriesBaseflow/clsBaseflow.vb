@@ -13,7 +13,13 @@ Public Enum HySepMethod
     LOCMIN = 3
 End Enum
 
-Public Class clsBaseflow
+Public Interface IclsBaseflow
+    Function DoBaseFlowSeparation() As atcTimeseriesGroup
+    Sub Clear()
+End Interface
+
+Public MustInherit Class clsBaseflow
+    Implements IclsBaseflow
 
     Private pDataSource As atcDataSource = Nothing
     Private pDataGroup As atcTimeseriesGroup = Nothing
@@ -87,4 +93,6 @@ Public Class clsBaseflow
         End Set
     End Property
 
+    Public MustOverride Function DoBaseFlowSeparation() As atcData.atcTimeseriesGroup Implements IclsBaseflow.DoBaseFlowSeparation
+    Public MustOverride Sub Clear() Implements IclsBaseflow.Clear
 End Class

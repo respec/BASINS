@@ -136,6 +136,11 @@
       <Name>atcData</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcGraphExperimental\atcGraph.vbproj">
+      <Project>{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}</Project>
+      <Name>atcGraph</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesBaseflow\atcTimeseriesBaseflow.vbproj">
       <Project>{F9A4070C-1FAF-4D17-A8E6-7EB19D414B05}</Project>
       <Name>atcTimeseriesBaseflow</Name>

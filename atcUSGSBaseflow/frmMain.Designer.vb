@@ -25,9 +25,9 @@ Partial Class frmMain
         Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmMain))
         Me.Label1 = New System.Windows.Forms.Label
-        Me.ComboBox1 = New System.Windows.Forms.ComboBox
+        Me.cboBFMothod = New System.Windows.Forms.ComboBox
         Me.Label2 = New System.Windows.Forms.Label
-        Me.TextBox1 = New System.Windows.Forms.TextBox
+        Me.txtDrainageArea = New System.Windows.Forms.TextBox
         Me.Label3 = New System.Windows.Forms.Label
         Me.btnOK = New System.Windows.Forms.Button
         Me.btnCancel = New System.Windows.Forms.Button
@@ -44,8 +44,13 @@ Partial Class frmMain
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.mnuFile = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuFileSelectData = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuOutput = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuOutputASCII = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuAnalysis = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem
+        Me.txtOutputRootName = New System.Windows.Forms.TextBox
+        Me.lblScenario = New System.Windows.Forms.Label
+        Me.mnuGraphBF = New System.Windows.Forms.ToolStripMenuItem
         Me.gbDates.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -59,14 +64,15 @@ Partial Class frmMain
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Select Method"
         '
-        'ComboBox1
+        'cboBFMothod
         '
-        Me.ComboBox1.FormattingEnabled = True
-        Me.ComboBox1.Items.AddRange(New Object() {"HySEP-Fixed", "HySEP-LocMin", "HySEP-Slide", "PART"})
-        Me.ComboBox1.Location = New System.Drawing.Point(96, 36)
-        Me.ComboBox1.Name = "ComboBox1"
-        Me.ComboBox1.Size = New System.Drawing.Size(121, 21)
-        Me.ComboBox1.TabIndex = 1
+        Me.cboBFMothod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboBFMothod.FormattingEnabled = True
+        Me.cboBFMothod.Items.AddRange(New Object() {"HySEP-Fixed", "HySEP-LocMin", "HySEP-Slide", "PART"})
+        Me.cboBFMothod.Location = New System.Drawing.Point(96, 36)
+        Me.cboBFMothod.Name = "cboBFMothod"
+        Me.cboBFMothod.Size = New System.Drawing.Size(121, 21)
+        Me.cboBFMothod.TabIndex = 1
         '
         'Label2
         '
@@ -77,12 +83,12 @@ Partial Class frmMain
         Me.Label2.TabIndex = 2
         Me.Label2.Text = "Drainage Area"
         '
-        'TextBox1
+        'txtDrainageArea
         '
-        Me.TextBox1.Location = New System.Drawing.Point(96, 63)
-        Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.Size = New System.Drawing.Size(121, 20)
-        Me.TextBox1.TabIndex = 3
+        Me.txtDrainageArea.Location = New System.Drawing.Point(96, 63)
+        Me.txtDrainageArea.Name = "txtDrainageArea"
+        Me.txtDrainageArea.Size = New System.Drawing.Size(121, 20)
+        Me.txtDrainageArea.TabIndex = 3
         '
         'Label3
         '
@@ -96,7 +102,6 @@ Partial Class frmMain
         'btnOK
         '
         Me.btnOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.btnOK.Location = New System.Drawing.Point(201, 209)
         Me.btnOK.Name = "btnOK"
         Me.btnOK.Size = New System.Drawing.Size(75, 23)
@@ -156,6 +161,7 @@ Partial Class frmMain
         Me.txtEndDateUser.Name = "txtEndDateUser"
         Me.txtEndDateUser.Size = New System.Drawing.Size(141, 20)
         Me.txtEndDateUser.TabIndex = 27
+        Me.toolTip1.SetToolTip(Me.txtEndDateUser, "User-specified ending date: yyyy/mm/dd")
         '
         'txtStartDateUser
         '
@@ -165,6 +171,7 @@ Partial Class frmMain
         Me.txtStartDateUser.Name = "txtStartDateUser"
         Me.txtStartDateUser.Size = New System.Drawing.Size(141, 20)
         Me.txtStartDateUser.TabIndex = 26
+        Me.toolTip1.SetToolTip(Me.txtStartDateUser, "User-specified starting date: yyyy/mm/dd")
         '
         'txtDataEnd
         '
@@ -216,7 +223,7 @@ Partial Class frmMain
         '
         'mnuFile
         '
-        Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileSelectData})
+        Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileSelectData, Me.mnuOutput, Me.mnuGraphBF})
         Me.mnuFile.Name = "mnuFile"
         Me.mnuFile.Size = New System.Drawing.Size(37, 20)
         Me.mnuFile.Text = "File"
@@ -224,8 +231,21 @@ Partial Class frmMain
         'mnuFileSelectData
         '
         Me.mnuFileSelectData.Name = "mnuFileSelectData"
-        Me.mnuFileSelectData.Size = New System.Drawing.Size(132, 22)
+        Me.mnuFileSelectData.Size = New System.Drawing.Size(152, 22)
         Me.mnuFileSelectData.Text = "Select Data"
+        '
+        'mnuOutput
+        '
+        Me.mnuOutput.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOutputASCII})
+        Me.mnuOutput.Name = "mnuOutput"
+        Me.mnuOutput.Size = New System.Drawing.Size(152, 22)
+        Me.mnuOutput.Text = "Output"
+        '
+        'mnuOutputASCII
+        '
+        Me.mnuOutputASCII.Name = "mnuOutputASCII"
+        Me.mnuOutputASCII.Size = New System.Drawing.Size(102, 22)
+        Me.mnuOutputASCII.Text = "ASCII"
         '
         'mnuAnalysis
         '
@@ -239,19 +259,43 @@ Partial Class frmMain
         Me.mnuHelp.Size = New System.Drawing.Size(44, 20)
         Me.mnuHelp.Text = "Help"
         '
+        'txtOutputRootName
+        '
+        Me.txtOutputRootName.Location = New System.Drawing.Point(95, 211)
+        Me.txtOutputRootName.Name = "txtOutputRootName"
+        Me.txtOutputRootName.Size = New System.Drawing.Size(100, 20)
+        Me.txtOutputRootName.TabIndex = 29
+        '
+        'lblScenario
+        '
+        Me.lblScenario.AutoSize = True
+        Me.lblScenario.Location = New System.Drawing.Point(14, 214)
+        Me.lblScenario.Name = "lblScenario"
+        Me.lblScenario.Size = New System.Drawing.Size(70, 13)
+        Me.lblScenario.TabIndex = 30
+        Me.lblScenario.Text = "Output Name"
+        '
+        'mnuGraphBF
+        '
+        Me.mnuGraphBF.Name = "mnuGraphBF"
+        Me.mnuGraphBF.Size = New System.Drawing.Size(152, 22)
+        Me.mnuGraphBF.Text = "Graph"
+        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(369, 244)
+        Me.Controls.Add(Me.lblScenario)
+        Me.Controls.Add(Me.txtOutputRootName)
         Me.Controls.Add(Me.gbDates)
         Me.Controls.Add(Me.btnFindStations)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnOK)
         Me.Controls.Add(Me.Label3)
-        Me.Controls.Add(Me.TextBox1)
+        Me.Controls.Add(Me.txtDrainageArea)
         Me.Controls.Add(Me.Label2)
-        Me.Controls.Add(Me.ComboBox1)
+        Me.Controls.Add(Me.cboBFMothod)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.MenuStrip1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -267,9 +311,9 @@ Partial Class frmMain
 
     End Sub
     Friend WithEvents Label1 As System.Windows.Forms.Label
-    Friend WithEvents ComboBox1 As System.Windows.Forms.ComboBox
+    Friend WithEvents cboBFMothod As System.Windows.Forms.ComboBox
     Friend WithEvents Label2 As System.Windows.Forms.Label
-    Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
+    Friend WithEvents txtDrainageArea As System.Windows.Forms.TextBox
     Friend WithEvents Label3 As System.Windows.Forms.Label
     Friend WithEvents btnOK As System.Windows.Forms.Button
     Friend WithEvents btnCancel As System.Windows.Forms.Button
@@ -288,4 +332,9 @@ Partial Class frmMain
     Friend WithEvents mnuFileSelectData As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuAnalysis As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuOutput As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuOutputASCII As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents txtOutputRootName As System.Windows.Forms.TextBox
+    Friend WithEvents lblScenario As System.Windows.Forms.Label
+    Friend WithEvents mnuGraphBF As System.Windows.Forms.ToolStripMenuItem
 End Class

@@ -53,7 +53,7 @@ Public Class clsBaseflowPart
 
     Private pMissingDataMonth As atcCollection
 
-    Public Function DoBaseFlowSeparation() As atcTimeseries
+    Public Overrides Function DoBaseFlowSeparation() As atcTimeseriesGroup
         If TargetTS Is Nothing Then
             Return Nothing
         End If
@@ -98,7 +98,7 @@ Public Class clsBaseflowPart
             Logger.Dbg( _
                   "NUMBER OF DAYS (WITH DATA) COUNTED =            " & lTsDaily.numValues - lNumMissing & vbCrLf & _
                   "NUMBER OF DAYS THAT SHOULD BE IN THIS INTERVAL =" & lTsDaily.numValues, MsgBoxStyle.Information, "Perform PART")
-            lTsBaseflow = Part(lTsDaily)
+            Part(lTsDaily)
         Else
             Logger.Dbg( _
                    "***************************************" & vbCrLf & _
@@ -109,7 +109,28 @@ Public Class clsBaseflowPart
             Return Nothing
         End If
 
-        Return lTsBaseflow
+        Dim lTsBaseflowgroup As New atcTimeseriesGroup
+        pTsBaseflow1.Attributes.SetValue("Scenario", "PartDaily1")
+        pTsBaseflow1.Attributes.SetValue("Drainage Area", DrainageArea)
+        pTsBaseflow1.Attributes.SetValue("TBase", TBase)
+        pTsBaseflow2.Attributes.SetValue("Scenario", "PartDaily2")
+        pTsBaseflow3.Attributes.SetValue("Scenario", "PartDaily3")
+        pTsBaseflow1Monthly.Attributes.SetValue("Scenario", "PartMonthly1")
+        pTsBaseflow1Monthly.Attributes.SetValue("Drainage Area", DrainageArea)
+        pTsBaseflow2Monthly.Attributes.SetValue("Scenario", "PartMonthly2")
+        pTsBaseflow3Monthly.Attributes.SetValue("Scenario", "PartMonthly3")
+        pTsBaseflowMonthlyDepth.Attributes.SetValue("Scenario", "PartMonthlyDepth")
+        pTsBaseflowMonthlyDepth.Attributes.SetValue("Drainage Area", DrainageArea)
+        pTsBaseflowMonthlyDepth.Attributes.SetValue("SumDepth", pTotalBaseflowDepth)
+        pTsBaseflowMonthlyDepth.Attributes.SetValue("MissingMonths", pMissingDataMonth)
+        lTsBaseflowgroup.Add(pTsBaseflow1)
+        lTsBaseflowgroup.Add(pTsBaseflow2)
+        lTsBaseflowgroup.Add(pTsBaseflow3)
+        lTsBaseflowgroup.Add(pTsBaseflow1Monthly)
+        lTsBaseflowgroup.Add(pTsBaseflow2Monthly)
+        lTsBaseflowgroup.Add(pTsBaseflow3Monthly)
+        lTsBaseflowgroup.Add(pTsBaseflowMonthlyDepth)
+        Return lTsBaseflowgroup
     End Function
 
     Public Function Part(ByVal aTS As atcTimeseries) As atcTimeseries
@@ -486,7 +507,7 @@ Public Class clsBaseflowPart
         Dim lOutputDir As String = Path.GetDirectoryName(aTS.Attributes.GetValue("History 1"))
         lOutputDir = lOutputDir.ToLower.Substring("read from ".Length)
         Dim lPartDayFilename As String = Path.Combine(lOutputDir, "partday_vbNet.TXT")
-        WriteBFDaily(aTS, lPartDayFilename)
+        'WriteBFDaily(aTS, lPartDayFilename)
 
         Dim lPartMonthFilename As String = Path.Combine(lOutputDir, "partmon_vbNet.txt")
         WriteBFMonthly(aTS, lPartMonthFilename)
@@ -495,10 +516,10 @@ Public Class clsBaseflowPart
         WriteBFQuarterly(aTS, lPartQrtFilename)
 
         Dim lPartWYFilename As String = Path.Combine(lOutputDir, "partWY_vbNet.txt")
-        WriteBFWaterYear(pTsBaseflowMonthlyDepth, lPartWYFilename)
+        'WriteBFWaterYear(pTsBaseflowMonthlyDepth, lPartWYFilename)
 
         Dim lPartSumFilename As String = Path.Combine(lOutputDir, "partsum_vbNet.txt")
-        WriteBFSum(aTS, lPartSumFilename)
+        'WriteBFSum(aTS, lPartSumFilename)
 
         Return pTsBaseflow1 'TODO: make sure which one is it
     End Function
@@ -630,7 +651,6 @@ Public Class clsBaseflowPart
     End Sub
 
     Private Sub WriteBFMonthly(ByVal aTS As atcTimeseries, ByVal aFilename As String)
-        Dim lSW As New StreamWriter(aFilename, False)
 
         Dim lDate(5) As Integer
         J2Date(aTS.Dates.Value(0), lDate)
@@ -661,6 +681,9 @@ Public Class clsBaseflowPart
             Next
         End If
 
+        Exit Sub
+
+        Dim lSW As New StreamWriter(aFilename, False)
         lSW.WriteLine("  ")
         lSW.WriteLine("  THIS IS FILE PARTMON.TXT FOR INPUT FILE: " & Path.GetFileName(aTS.Attributes.GetValue("History 1")))
         lSW.WriteLine(" ")
@@ -765,7 +788,6 @@ Public Class clsBaseflowPart
     End Sub
 
     Private Sub WriteBFQuarterly(ByVal aTS As atcTimeseries, ByVal aFilename As String)
-        Dim lSW As New StreamWriter(aFilename, False)
 
         Dim lDate(5) As Integer
 
@@ -791,6 +813,9 @@ Public Class clsBaseflowPart
             Next
         End If
 
+        Exit Sub
+
+        Dim lSW As New StreamWriter(aFilename, False)
         lSW.WriteLine("  ")
         lSW.WriteLine("  THIS IS FILE PARTQRT.TXT FOR INPUT FILE: " & Path.GetFileName(aTS.Attributes.GetValue("History 1")))
         lSW.WriteLine(" ")
@@ -1076,7 +1101,7 @@ Public Class clsBaseflowPart
         lWaterYear = Nothing
     End Sub
 
-    Public Sub Clear()
+    Public Overrides Sub Clear()
         If pTsBaseflow1 IsNot Nothing Then
             pTsBaseflow1.Clear()
             pTsBaseflow1 = Nothing
