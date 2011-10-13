@@ -28,7 +28,8 @@
     <StartProgram>C:\dev\BASINS40\Bin\MapWindow.exe</StartProgram>
     <StartURL>
     </StartURL>
-    <StartWorkingDirectory></StartWorkingDirectory>
+    <StartWorkingDirectory>
+    </StartWorkingDirectory>
     <StartWithIE>true</StartWithIE>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -50,5 +51,15 @@
     <StartWorkingDirectory>
     </StartWorkingDirectory>
     <StartWithIE>true</StartWithIE>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <StartProgram>\dev\BASINS40\Bin\MapWindow.exe</StartProgram>
+    <StartWithIE>true</StartWithIE>
+    <StartAction>Program</StartAction>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <StartProgram>\dev\BASINS40\Bin\MapWindow.exe</StartProgram>
+    <StartWithIE>true</StartWithIE>
+    <StartAction>Program</StartAction>
   </PropertyGroup>
 </Project>

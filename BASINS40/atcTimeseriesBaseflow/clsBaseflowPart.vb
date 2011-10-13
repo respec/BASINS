@@ -681,110 +681,110 @@ Public Class clsBaseflowPart
             Next
         End If
 
-        Exit Sub
+'        Exit Sub
 
-        Dim lSW As New StreamWriter(aFilename, False)
-        lSW.WriteLine("  ")
-        lSW.WriteLine("  THIS IS FILE PARTMON.TXT FOR INPUT FILE: " & Path.GetFileName(aTS.Attributes.GetValue("History 1")))
-        lSW.WriteLine(" ")
-        lSW.WriteLine("  PROGRAM VERSION DATE = JANUARY 2007  ")
-        lSW.WriteLine(" ")
-        lSW.WriteLine(" ")
-        lSW.WriteLine("                        MONTHLY STREAMFLOW (INCHES):")
-        lSW.WriteLine("          J     F     M     A     M     J     J     A     S     O     N     D   YEAR")
-        lSW.Flush()
-        Dim lFieldWidth As Integer = 6
-        Dim lTsYearly As atcTimeseries = Aggregate(pTsMonthlyFlowDepth, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
-        Dim lYearCount As Integer = 1
-        Dim lYearHasMiss As Boolean = False
-        For I As Integer = 1 To pTsMonthlyFlowDepth.numValues
-            J2Date(pTsMonthlyFlowDepth.Dates.Value(I - 1), lDate)
-            lSW.Write(lDate(0).ToString.PadLeft(lFieldWidth, " ")) 'begining of a year
-            Dim lCurrentYear As Integer = lDate(0)
-            lYearHasMiss = False
-            For M As Integer = 1 To 12
-                If lDate(1) = M Then
-                    If lDate(0) = lCurrentYear Then
-                        If pTsMonthlyFlowDepth.Value(I) < -99.0 Then lYearHasMiss = True
-                        lSW.Write(String.Format("{0:0.00}", pTsMonthlyFlowDepth.Value(I)).PadLeft(lFieldWidth, " "))
-                        I += 1
-                        J2Date(pTsMonthlyFlowDepth.Dates.Value(I - 1), lDate)
-                    Else
-                        Exit For
-                    End If
+        'Dim lSW As New StreamWriter(aFilename, False)
+        'lSW.WriteLine("  ")
+        'lSW.WriteLine("  THIS IS FILE PARTMON.TXT FOR INPUT FILE: " & Path.GetFileName(aTS.Attributes.GetValue("History 1")))
+        'lSW.WriteLine(" ")
+        'lSW.WriteLine("  PROGRAM VERSION DATE = JANUARY 2007  ")
+        'lSW.WriteLine(" ")
+        'lSW.WriteLine(" ")
+        'lSW.WriteLine("                        MONTHLY STREAMFLOW (INCHES):")
+        'lSW.WriteLine("          J     F     M     A     M     J     J     A     S     O     N     D   YEAR")
+        'lSW.Flush()
+        'Dim lFieldWidth As Integer = 6
+        'Dim lTsYearly As atcTimeseries = Aggregate(pTsMonthlyFlowDepth, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+        'Dim lYearCount As Integer = 1
+        'Dim lYearHasMiss As Boolean = False
+        'For I As Integer = 1 To pTsMonthlyFlowDepth.numValues
+        '    J2Date(pTsMonthlyFlowDepth.Dates.Value(I - 1), lDate)
+        '    lSW.Write(lDate(0).ToString.PadLeft(lFieldWidth, " ")) 'begining of a year
+        '    Dim lCurrentYear As Integer = lDate(0)
+        '    lYearHasMiss = False
+        '    For M As Integer = 1 To 12
+        '        If lDate(1) = M Then
+        '            If lDate(0) = lCurrentYear Then
+        '                If pTsMonthlyFlowDepth.Value(I) < -99.0 Then lYearHasMiss = True
+        '                lSW.Write(String.Format("{0:0.00}", pTsMonthlyFlowDepth.Value(I)).PadLeft(lFieldWidth, " "))
+        '                I += 1
+        '                J2Date(pTsMonthlyFlowDepth.Dates.Value(I - 1), lDate)
+        '            Else
+        '                Exit For
+        '            End If
 
-                Else
-                    lSW.Write(Space(lFieldWidth))
-                End If
-            Next
-            I -= 1
+        '        Else
+        '            lSW.Write(Space(lFieldWidth))
+        '        End If
+        '    Next
+        '    I -= 1
 
-            'print yearly sum
-            If lYearHasMiss Then
-                lSW.WriteLine(String.Format("{0:0.00}", -99.99).PadLeft(lFieldWidth, " "))
-            Else
-                lSW.WriteLine(String.Format("{0:0.00}", lTsYearly.Value(lYearCount)).PadLeft(lFieldWidth, " "))
-            End If
-            lYearCount += 1
+        '    'print yearly sum
+        '    If lYearHasMiss Then
+        '        lSW.WriteLine(String.Format("{0:0.00}", -99.99).PadLeft(lFieldWidth, " "))
+        '    Else
+        '        lSW.WriteLine(String.Format("{0:0.00}", lTsYearly.Value(lYearCount)).PadLeft(lFieldWidth, " "))
+        '    End If
+        '    lYearCount += 1
 
-        Next
-        lSW.WriteLine(" ")
-        lSW.WriteLine("                 TOTAL OF MONTHLY AMOUNTS = " & lTotXX)
-        lSW.Flush()
+        'Next
+        'lSW.WriteLine(" ")
+        'lSW.WriteLine("                 TOTAL OF MONTHLY AMOUNTS = " & lTotXX)
+        'lSW.Flush()
 
 
 
-        'print baseflow monthly values
-        lSW.WriteLine(" ")
-        lSW.WriteLine(" ")
-        lSW.WriteLine("                         MONTHLY BASE FLOW (INCHES):")
-        lSW.WriteLine("          J     F     M     A     M     J     J     A     S     O     N     D   YEAR")
+        ''print baseflow monthly values
+        'lSW.WriteLine(" ")
+        'lSW.WriteLine(" ")
+        'lSW.WriteLine("                         MONTHLY BASE FLOW (INCHES):")
+        'lSW.WriteLine("          J     F     M     A     M     J     J     A     S     O     N     D   YEAR")
 
-        Dim lTsBFYearly As atcTimeseries = Aggregate(pTsBaseflowMonthlyDepth, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
-        lYearCount = 1
-        For I As Integer = 1 To pTsBaseflowMonthlyDepth.numValues
-            J2Date(pTsBaseflowMonthlyDepth.Dates.Value(I - 1), lDate)
-            lSW.Write(lDate(0).ToString.PadLeft(lFieldWidth, " ")) 'begining of a year
-            Dim lCurrentYear As Integer = lDate(0)
-            lYearHasMiss = False
-            For M As Integer = 1 To 12
-                If lDate(1) = M Then
-                    If lDate(0) = lCurrentYear Then
-                        If pTsBaseflowMonthlyDepth.Value(I) < -99.0 Then lYearHasMiss = True
-                        lSW.Write(String.Format("{0:0.00}", pTsBaseflowMonthlyDepth.Value(I)).PadLeft(lFieldWidth, " "))
-                        I += 1
-                        J2Date(pTsBaseflowMonthlyDepth.Dates.Value(I - 1), lDate)
-                    Else
-                        Exit For
-                    End If
+        'Dim lTsBFYearly As atcTimeseries = Aggregate(pTsBaseflowMonthlyDepth, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+        'lYearCount = 1
+        'For I As Integer = 1 To pTsBaseflowMonthlyDepth.numValues
+        '    J2Date(pTsBaseflowMonthlyDepth.Dates.Value(I - 1), lDate)
+        '    lSW.Write(lDate(0).ToString.PadLeft(lFieldWidth, " ")) 'begining of a year
+        '    Dim lCurrentYear As Integer = lDate(0)
+        '    lYearHasMiss = False
+        '    For M As Integer = 1 To 12
+        '        If lDate(1) = M Then
+        '            If lDate(0) = lCurrentYear Then
+        '                If pTsBaseflowMonthlyDepth.Value(I) < -99.0 Then lYearHasMiss = True
+        '                lSW.Write(String.Format("{0:0.00}", pTsBaseflowMonthlyDepth.Value(I)).PadLeft(lFieldWidth, " "))
+        '                I += 1
+        '                J2Date(pTsBaseflowMonthlyDepth.Dates.Value(I - 1), lDate)
+        '            Else
+        '                Exit For
+        '            End If
 
-                Else
-                    lSW.Write(Space(lFieldWidth))
-                End If
+        '        Else
+        '            lSW.Write(Space(lFieldWidth))
+        '        End If
 
-            Next
+        '    Next
 
-            I -= 1
-            'print yearly sum
-            If lYearHasMiss Then
-                lSW.WriteLine(String.Format("{0:0.00}", -99.99).PadLeft(lFieldWidth, " "))
-            Else
-                lSW.WriteLine(String.Format("{0:0.00}", lTsBFYearly.Value(lYearCount)).PadLeft(lFieldWidth, " "))
-            End If
-            lYearCount += 1
-        Next
+        '    I -= 1
+        '    'print yearly sum
+        '    If lYearHasMiss Then
+        '        lSW.WriteLine(String.Format("{0:0.00}", -99.99).PadLeft(lFieldWidth, " "))
+        '    Else
+        '        lSW.WriteLine(String.Format("{0:0.00}", lTsBFYearly.Value(lYearCount)).PadLeft(lFieldWidth, " "))
+        '    End If
+        '    lYearCount += 1
+        'Next
 
-        lSW.WriteLine(" ")
-        lSW.WriteLine("                  TOTAL OF MONTHLY AMOUNTS = " & String.Format("{0:0.0000000}", pTotalBaseflowDepth))
-        lSW.WriteLine(" ")
-        lSW.WriteLine(" RESULTS ON THE MONTHLY TIME SCALE SHOULD BE USED WITH CAUTION. ")
-        lSW.WriteLine(" FILES PARTQRT.TXT AND PARTSUM.TXT GIVE RESULT AT THE")
-        lSW.WriteLine(" CORRECT TIME SCALES (QUARTER YEAR, YEAR, OR MORE). ")
+        'lSW.WriteLine(" ")
+        'lSW.WriteLine("                  TOTAL OF MONTHLY AMOUNTS = " & String.Format("{0:0.0000000}", pTotalBaseflowDepth))
+        'lSW.WriteLine(" ")
+        'lSW.WriteLine(" RESULTS ON THE MONTHLY TIME SCALE SHOULD BE USED WITH CAUTION. ")
+        'lSW.WriteLine(" FILES PARTQRT.TXT AND PARTSUM.TXT GIVE RESULT AT THE")
+        'lSW.WriteLine(" CORRECT TIME SCALES (QUARTER YEAR, YEAR, OR MORE). ")
 
-        lSW.Flush()
-        lSW.Close()
-        lSW = Nothing
-        lTsYearly.Clear() : lTsYearly = Nothing
+        'lSW.Flush()
+        'lSW.Close()
+        'lSW = Nothing
+        'lTsYearly.Clear() : lTsYearly = Nothing
     End Sub
 
     Private Sub WriteBFQuarterly(ByVal aTS As atcTimeseries, ByVal aFilename As String)
@@ -813,181 +813,180 @@ Public Class clsBaseflowPart
             Next
         End If
 
-        Exit Sub
+        'Exit Sub
 
-        Dim lSW As New StreamWriter(aFilename, False)
-        lSW.WriteLine("  ")
-        lSW.WriteLine("  THIS IS FILE PARTQRT.TXT FOR INPUT FILE: " & Path.GetFileName(aTS.Attributes.GetValue("History 1")))
-        lSW.WriteLine(" ")
-        lSW.WriteLine("  PROGRAM VERSION DATE = JANUARY 2007  ")
-        lSW.WriteLine(" ")
-        lSW.WriteLine("  ")
-        lSW.WriteLine("        QUARTER-YEAR STREAMFLOW IN INCHES         ")
-        lSW.WriteLine("        --------------------------------          ")
-        lSW.WriteLine("          JAN-    APR-    JULY-   OCT-    YEAR    ")
-        lSW.WriteLine("          MAR     JUNE    SEPT    DEC     TOTAL   ")
-        lSW.Flush()
+        'Dim lSW As New StreamWriter(aFilename, False)
+        'lSW.WriteLine("  ")
+        'lSW.WriteLine("  THIS IS FILE PARTQRT.TXT FOR INPUT FILE: " & Path.GetFileName(aTS.Attributes.GetValue("History 1")))
+        'lSW.WriteLine(" ")
+        'lSW.WriteLine("  PROGRAM VERSION DATE = JANUARY 2007  ")
+        'lSW.WriteLine(" ")
+        'lSW.WriteLine("  ")
+        'lSW.WriteLine("        QUARTER-YEAR STREAMFLOW IN INCHES         ")
+        'lSW.WriteLine("        --------------------------------          ")
+        'lSW.WriteLine("          JAN-    APR-    JULY-   OCT-    YEAR    ")
+        'lSW.WriteLine("          MAR     JUNE    SEPT    DEC     TOTAL   ")
+        'lSW.Flush()
 
-        ' 1053 FORMAT (1I6, 5F8.2)
-        Dim lFieldWidth1 As Integer = 6
-        Dim lFieldWidthO As Integer = 8
-        Dim lTsYearly As atcTimeseries = Aggregate(pTsMonthlyFlowDepth, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
-        Dim lYearCount As Integer = 1
-        Dim lQuarter1 As Double = 0
-        Dim lQuarter2 As Double = 0
-        Dim lQuarter3 As Double = 0
-        Dim lQuarter4 As Double = 0
+        '' 1053 FORMAT (1I6, 5F8.2)
+        'Dim lFieldWidth1 As Integer = 6
+        'Dim lFieldWidthO As Integer = 8
+        'Dim lTsYearly As atcTimeseries = Aggregate(pTsMonthlyFlowDepth, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+        'Dim lYearCount As Integer = 1
+        'Dim lQuarter1 As Double = 0
+        'Dim lQuarter2 As Double = 0
+        'Dim lQuarter3 As Double = 0
+        'Dim lQuarter4 As Double = 0
 
-        Dim lQuarter1Negative As Boolean = False
-        Dim lQuarter2Negative As Boolean = False
-        Dim lQuarter3Negative As Boolean = False
-        Dim lQuarter4Negative As Boolean = False
+        'Dim lQuarter1Negative As Boolean = False
+        'Dim lQuarter2Negative As Boolean = False
+        'Dim lQuarter3Negative As Boolean = False
+        'Dim lQuarter4Negative As Boolean = False
 
-        For I As Integer = 1 To pTsMonthlyFlowDepth.numValues
-            J2Date(pTsMonthlyFlowDepth.Dates.Value(I - 1), lDate)
-            Dim lCurrentYear As Integer = lDate(0)
+        'For I As Integer = 1 To pTsMonthlyFlowDepth.numValues
+        '    J2Date(pTsMonthlyFlowDepth.Dates.Value(I - 1), lDate)
+        '    Dim lCurrentYear As Integer = lDate(0)
 
-            lQuarter1 = 0
-            lQuarter2 = 0
-            lQuarter3 = 0
-            lQuarter4 = 0
+        '    lQuarter1 = 0
+        '    lQuarter2 = 0
+        '    lQuarter3 = 0
+        '    lQuarter4 = 0
 
-            lQuarter1Negative = False
-            lQuarter2Negative = False
-            lQuarter3Negative = False
-            lQuarter4Negative = False
+        '    lQuarter1Negative = False
+        '    lQuarter2Negative = False
+        '    lQuarter3Negative = False
+        '    lQuarter4Negative = False
 
-            For M As Integer = 1 To 12
-                If lDate(1) = M And lDate(0) = lCurrentYear Then 'within a year
-                    Select Case M
-                        Case 1, 2, 3
-                            If pTsMonthlyFlowDepth.Value(I) < -99.0 Then
-                                lQuarter1Negative = True
-                            Else
-                                lQuarter1 += pTsMonthlyFlowDepth.Value(I)
-                            End If
-                        Case 4, 5, 6
-                            If pTsMonthlyFlowDepth.Value(I) < -99.0 Then
-                                lQuarter2Negative = True
-                            Else
-                                lQuarter2 += pTsMonthlyFlowDepth.Value(I)
-                            End If
-                        Case 7, 8, 9
-                            If pTsMonthlyFlowDepth.Value(I) < -99.0 Then
-                                lQuarter3Negative = True
-                            Else
-                                lQuarter3 += pTsMonthlyFlowDepth.Value(I)
-                            End If
-                        Case 10, 11, 12
-                            If pTsMonthlyFlowDepth.Value(I) < -99.0 Then
-                                lQuarter4Negative = True
-                            Else
-                                lQuarter4 += pTsMonthlyFlowDepth.Value(I)
-                            End If
-                    End Select
-                    I += 1
-                    J2Date(pTsMonthlyFlowDepth.Dates.Value(I - 1), lDate)
-                End If
-            Next ' month
+        '    For M As Integer = 1 To 12
+        '        If lDate(1) = M And lDate(0) = lCurrentYear Then 'within a year
+        '            Select Case M
+        '                Case 1, 2, 3
+        '                    If pTsMonthlyFlowDepth.Value(I) < -99.0 Then
+        '                        lQuarter1Negative = True
+        '                    Else
+        '                        lQuarter1 += pTsMonthlyFlowDepth.Value(I)
+        '                    End If
+        '                Case 4, 5, 6
+        '                    If pTsMonthlyFlowDepth.Value(I) < -99.0 Then
+        '                        lQuarter2Negative = True
+        '                    Else
+        '                        lQuarter2 += pTsMonthlyFlowDepth.Value(I)
+        '                    End If
+        '                Case 7, 8, 9
+        '                    If pTsMonthlyFlowDepth.Value(I) < -99.0 Then
+        '                        lQuarter3Negative = True
+        '                    Else
+        '                        lQuarter3 += pTsMonthlyFlowDepth.Value(I)
+        '                    End If
+        '                Case 10, 11, 12
+        '                    If pTsMonthlyFlowDepth.Value(I) < -99.0 Then
+        '                        lQuarter4Negative = True
+        '                    Else
+        '                        lQuarter4 += pTsMonthlyFlowDepth.Value(I)
+        '                    End If
+        '            End Select
+        '            I += 1
+        '            J2Date(pTsMonthlyFlowDepth.Dates.Value(I - 1), lDate)
+        '        End If
+        '    Next ' month
 
-            I -= 1
+        '    I -= 1
 
-            If lQuarter1Negative Then lQuarter1 = -99.99
-            If lQuarter2Negative Then lQuarter2 = -99.99
-            If lQuarter3Negative Then lQuarter3 = -99.99
-            If lQuarter4Negative Then lQuarter4 = -99.99
+        '    If lQuarter1Negative Then lQuarter1 = -99.99
+        '    If lQuarter2Negative Then lQuarter2 = -99.99
+        '    If lQuarter3Negative Then lQuarter3 = -99.99
+        '    If lQuarter4Negative Then lQuarter4 = -99.99
 
-            Dim lStrYear As String = lCurrentYear.ToString.PadLeft(lFieldWidth1, " ")
-            Dim lStrQ1 As String = String.Format("{0:0.00}", lQuarter1).PadLeft(lFieldWidthO, " ")
-            Dim lStrQ2 As String = String.Format("{0:0.00}", lQuarter2).PadLeft(lFieldWidthO, " ")
-            Dim lStrQ3 As String = String.Format("{0:0.00}", lQuarter3).PadLeft(lFieldWidthO, " ")
-            Dim lStrQ4 As String = String.Format("{0:0.00}", lQuarter4).PadLeft(lFieldWidthO, " ")
-            Dim lStrQYear As String = String.Format("{0:0.00}", lTsYearly.Value(lYearCount)).PadLeft(lFieldWidthO, " ")
-            lSW.WriteLine(lStrYear & lStrQ1 & lStrQ2 & lStrQ3 & lStrQ4 & lStrQYear)
+        '    Dim lStrYear As String = lCurrentYear.ToString.PadLeft(lFieldWidth1, " ")
+        '    Dim lStrQ1 As String = String.Format("{0:0.00}", lQuarter1).PadLeft(lFieldWidthO, " ")
+        '    Dim lStrQ2 As String = String.Format("{0:0.00}", lQuarter2).PadLeft(lFieldWidthO, " ")
+        '    Dim lStrQ3 As String = String.Format("{0:0.00}", lQuarter3).PadLeft(lFieldWidthO, " ")
+        '    Dim lStrQ4 As String = String.Format("{0:0.00}", lQuarter4).PadLeft(lFieldWidthO, " ")
+        '    Dim lStrQYear As String = String.Format("{0:0.00}", lTsYearly.Value(lYearCount)).PadLeft(lFieldWidthO, " ")
+        '    lSW.WriteLine(lStrYear & lStrQ1 & lStrQ2 & lStrQ3 & lStrQ4 & lStrQYear)
 
-            lYearCount += 1
-        Next 'monthly streamflow in inches
+        '    lYearCount += 1
+        'Next 'monthly streamflow in inches
 
-        'print quarterly baseflow values
-        lSW.WriteLine("  ")
-        lSW.WriteLine("  ")
-        lSW.WriteLine("        QUARTER-YEAR BASE FLOW IN INCHES          ")
-        lSW.WriteLine("        --------------------------------          ")
-        lSW.WriteLine("          JAN-    APR-    JULY-   OCT-    YEAR    ")
-        lSW.WriteLine("          MAR     JUNE    SEPT    DEC     TOTAL   ")
+        ''print quarterly baseflow values
+        'lSW.WriteLine("  ")
+        'lSW.WriteLine("  ")
+        'lSW.WriteLine("        QUARTER-YEAR BASE FLOW IN INCHES          ")
+        'lSW.WriteLine("        --------------------------------          ")
+        'lSW.WriteLine("          JAN-    APR-    JULY-   OCT-    YEAR    ")
+        'lSW.WriteLine("          MAR     JUNE    SEPT    DEC     TOTAL   ")
 
-        Dim lTsBFYearly As atcTimeseries = Aggregate(pTsBaseflowMonthlyDepth, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
-        lYearCount = 1
-        For I As Integer = 1 To pTsBaseflowMonthlyDepth.numValues
-            J2Date(pTsBaseflowMonthlyDepth.Dates.Value(I - 1), lDate)
-            Dim lCurrentYear As Integer = lDate(0)
+        'Dim lTsBFYearly As atcTimeseries = Aggregate(pTsBaseflowMonthlyDepth, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+        'lYearCount = 1
+        'For I As Integer = 1 To pTsBaseflowMonthlyDepth.numValues
+        '    J2Date(pTsBaseflowMonthlyDepth.Dates.Value(I - 1), lDate)
+        '    Dim lCurrentYear As Integer = lDate(0)
 
-            lQuarter1 = 0
-            lQuarter2 = 0
-            lQuarter3 = 0
-            lQuarter4 = 0
+        '    lQuarter1 = 0
+        '    lQuarter2 = 0
+        '    lQuarter3 = 0
+        '    lQuarter4 = 0
 
-            lQuarter1Negative = False
-            lQuarter2Negative = False
-            lQuarter3Negative = False
-            lQuarter4Negative = False
+        '    lQuarter1Negative = False
+        '    lQuarter2Negative = False
+        '    lQuarter3Negative = False
+        '    lQuarter4Negative = False
 
-            For M As Integer = 1 To 12
-                If lDate(1) = M And lDate(0) = lCurrentYear Then 'within a year
-                    Select Case M
-                        Case 1, 2, 3
-                            If pTsBaseflowMonthlyDepth.Value(I) < -99.0 Then
-                                lQuarter1Negative = True
-                            Else
-                                lQuarter1 += pTsBaseflowMonthlyDepth.Value(I)
-                            End If
-                        Case 4, 5, 6
-                            If pTsBaseflowMonthlyDepth.Value(I) < -99.0 Then
-                                lQuarter2Negative = True
-                            Else
-                                lQuarter2 += pTsBaseflowMonthlyDepth.Value(I)
-                            End If
-                        Case 7, 8, 9
-                            If pTsBaseflowMonthlyDepth.Value(I) < -99.0 Then
-                                lQuarter3Negative = True
-                            Else
-                                lQuarter3 += pTsBaseflowMonthlyDepth.Value(I)
-                            End If
-                        Case 10, 11, 12
-                            If pTsBaseflowMonthlyDepth.Value(I) < -99.0 Then
-                                lQuarter4Negative = True
-                            Else
-                                lQuarter4 += pTsBaseflowMonthlyDepth.Value(I)
-                            End If
-                    End Select
-                    I += 1
-                    J2Date(pTsBaseflowMonthlyDepth.Dates.Value(I - 1), lDate)
-                End If
-            Next ' month
+        '    For M As Integer = 1 To 12
+        '        If lDate(1) = M And lDate(0) = lCurrentYear Then 'within a year
+        '            Select Case M
+        '                Case 1, 2, 3
+        '                    If pTsBaseflowMonthlyDepth.Value(I) < -99.0 Then
+        '                        lQuarter1Negative = True
+        '                    Else
+        '                        lQuarter1 += pTsBaseflowMonthlyDepth.Value(I)
+        '                    End If
+        '                Case 4, 5, 6
+        '                    If pTsBaseflowMonthlyDepth.Value(I) < -99.0 Then
+        '                        lQuarter2Negative = True
+        '                    Else
+        '                        lQuarter2 += pTsBaseflowMonthlyDepth.Value(I)
+        '                    End If
+        '                Case 7, 8, 9
+        '                    If pTsBaseflowMonthlyDepth.Value(I) < -99.0 Then
+        '                        lQuarter3Negative = True
+        '                    Else
+        '                        lQuarter3 += pTsBaseflowMonthlyDepth.Value(I)
+        '                    End If
+        '                Case 10, 11, 12
+        '                    If pTsBaseflowMonthlyDepth.Value(I) < -99.0 Then
+        '                        lQuarter4Negative = True
+        '                    Else
+        '                        lQuarter4 += pTsBaseflowMonthlyDepth.Value(I)
+        '                    End If
+        '            End Select
+        '            I += 1
+        '            J2Date(pTsBaseflowMonthlyDepth.Dates.Value(I - 1), lDate)
+        '        End If
+        '    Next ' month
 
-            I -= 1
+        '    I -= 1
 
-            If lQuarter1Negative Then lQuarter1 = -99.99
-            If lQuarter2Negative Then lQuarter2 = -99.99
-            If lQuarter3Negative Then lQuarter3 = -99.99
-            If lQuarter4Negative Then lQuarter4 = -99.99
+        '    If lQuarter1Negative Then lQuarter1 = -99.99
+        '    If lQuarter2Negative Then lQuarter2 = -99.99
+        '    If lQuarter3Negative Then lQuarter3 = -99.99
+        '    If lQuarter4Negative Then lQuarter4 = -99.99
 
-            Dim lStrYear As String = lCurrentYear.ToString.PadLeft(lFieldWidth1, " ")
-            Dim lStrQ1 As String = String.Format("{0:0.00}", lQuarter1).PadLeft(lFieldWidthO, " ")
-            Dim lStrQ2 As String = String.Format("{0:0.00}", lQuarter2).PadLeft(lFieldWidthO, " ")
-            Dim lStrQ3 As String = String.Format("{0:0.00}", lQuarter3).PadLeft(lFieldWidthO, " ")
-            Dim lStrQ4 As String = String.Format("{0:0.00}", lQuarter4).PadLeft(lFieldWidthO, " ")
-            Dim lStrQYear As String = String.Format("{0:0.00}", lTsBFYearly.Value(lYearCount)).PadLeft(lFieldWidthO, " ")
-            lSW.WriteLine(lStrYear & lStrQ1 & lStrQ2 & lStrQ3 & lStrQ4 & lStrQYear)
+        '    Dim lStrYear As String = lCurrentYear.ToString.PadLeft(lFieldWidth1, " ")
+        '    Dim lStrQ1 As String = String.Format("{0:0.00}", lQuarter1).PadLeft(lFieldWidthO, " ")
+        '    Dim lStrQ2 As String = String.Format("{0:0.00}", lQuarter2).PadLeft(lFieldWidthO, " ")
+        '    Dim lStrQ3 As String = String.Format("{0:0.00}", lQuarter3).PadLeft(lFieldWidthO, " ")
+        '    Dim lStrQ4 As String = String.Format("{0:0.00}", lQuarter4).PadLeft(lFieldWidthO, " ")
+        '    Dim lStrQYear As String = String.Format("{0:0.00}", lTsBFYearly.Value(lYearCount)).PadLeft(lFieldWidthO, " ")
+        '    lSW.WriteLine(lStrYear & lStrQ1 & lStrQ2 & lStrQ3 & lStrQ4 & lStrQYear)
 
-            lYearCount += 1
-        Next 'monthly streamflow in inches
+        '    lYearCount += 1
+        'Next 'monthly streamflow in inches
 
-        lSW.Flush()
-        lSW.Close()
-        lSW = Nothing
-        lTsYearly.Clear() : lTsYearly = Nothing
-
+        'lSW.Flush()
+        'lSW.Close()
+        'lSW = Nothing
+        'lTsYearly.Clear() : lTsYearly = Nothing
     End Sub
 
     Private Sub WriteBFSum(ByVal aTsSF As atcTimeseries, ByVal aFilename As String)

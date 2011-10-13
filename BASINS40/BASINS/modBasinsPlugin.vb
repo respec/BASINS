@@ -63,7 +63,7 @@ Public Module modBasinsPlugin
     Friend Const DataMenuString As String = "Data"
     Friend pLoadedDataMenu As Boolean = False
 
-    Private Const BasinsDataPath As String = "Basins\data\"
+    Friend BasinsDataPath As String = "Basins\data\"
     Private Const NationalProjectFilename As String = "national.mwprj"
 
     ''' <summary>

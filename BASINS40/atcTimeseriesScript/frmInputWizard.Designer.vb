@@ -264,7 +264,6 @@
         Me.agdDataMapping.Location = New System.Drawing.Point(3, 3)
         Me.agdDataMapping.Name = "agdDataMapping"
         Me.agdDataMapping.Size = New System.Drawing.Size(495, 192)
-        Me.agdDataMapping.Source = Nothing
         Me.agdDataMapping.TabIndex = 23
         '
         'txtScriptDesc
@@ -771,7 +770,6 @@
         Me.agdSample.Location = New System.Drawing.Point(0, 16)
         Me.agdSample.Name = "agdSample"
         Me.agdSample.Size = New System.Drawing.Size(509, 192)
-        Me.agdSample.Source = Nothing
         Me.agdSample.TabIndex = 30
         '
         'lblInputColumns

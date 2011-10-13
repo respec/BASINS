@@ -12,7 +12,7 @@ Public Class atcBasinsPlugIn
     Public ReadOnly Property Name() As String Implements MapWindow.Interfaces.IPlugin.Name
         'This is the name that appears in the Plug-ins menu
         Get
-            Return "BASINS 4"
+            Return g_AppNameLong
         End Get
     End Property
 
@@ -31,7 +31,7 @@ Public Class atcBasinsPlugIn
     Public ReadOnly Property Description() As String Implements MapWindow.Interfaces.IPlugin.Description
         'Appears in the plug-ins dialog box when a user selects the plug-in.  
         Get
-            Return "BASINS extension"
+            Return g_AppNameLong & " extension"
         End Get
     End Property
 
@@ -67,6 +67,7 @@ Public Class atcBasinsPlugIn
         'This is where buttons or menu items are added.
         g_MapWin = aMapWin
         g_AppNameLong = aMapWin.ApplicationInfo.ApplicationName
+        Dim lHelpFilename As String = String.Empty
         Select Case g_AppNameLong
             Case "USGS Surface Water Analysis"
                 g_AppNameRegistry = "USGS-SW"
@@ -74,11 +75,21 @@ Public Class atcBasinsPlugIn
                 g_URL_Home = "http://water.usgs.gov/software/lists/surface_water/"
                 g_URL_Register = "http://hspf.com/pub/USGS-SW/register.html"
 
+            Case "USGS GW Toolbox"
+                g_AppNameRegistry = "USGS-GW"
+                g_AppNameShort = "USGS-GW"
+                g_URL_Home = "http://water.usgs.gov/software/lists/groundwater/"
+                g_URL_Register = "http://hspf.com/pub/USGS-GW/register.html"
+                lHelpFilename = FindFile("", g_ProgramDir & "docs\BASINS4.0.chm")
+                'TODO: lHelpFilename = FindFile("", g_ProgramDir & "docs\USGStoolbox.chm")
+                BasinsDataPath = "USGS-GWToolbox\data\"
+
             Case Else '"BASINS 4"
                 g_AppNameRegistry = "BASINS4"
                 g_AppNameShort = "BASINS"
                 g_URL_Home = "http://www.epa.gov/waterscience/BASINS/"
                 g_URL_Register = "http://hspf.com/pub/basins4/register.html"
+                lHelpFilename = FindFile("", g_ProgramDir & "docs\BASINS4.0.chm")
         End Select
 
         ProjectsMenuString = "Open " & g_AppNameShort & " Project"
@@ -96,15 +107,6 @@ Public Class atcBasinsPlugIn
         Logger.StartToFile(g_ProgramDir & "cache\log" & g_PathChar _
                          & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & g_AppNameShort & ".log")
         Logger.Icon = g_MapWin.ApplicationInfo.FormIcon
-
-        'Logger.MsgCustom("Test Message", "Test Title", "Button One", "2")
-        'For i As Integer = 1 To 10
-        '    If Logger.MsgCustom("Test Message " & i, "Test Title " & i, "Button One", "2", "All") = "All" Then Exit For
-        'Next
-        'For i As Integer = 1 To 10
-        '    If Logger.MsgCustomCheckbox("Test Message " & i, "Test Title " & i, g_AppNameShort, "Test", "Buttons", "Button One", "2", "All") = "All" Then Exit For
-        'Next
-
         If Logger.ProgressStatus Is Nothing OrElse Not (TypeOf (Logger.ProgressStatus) Is MonitorProgressStatus) Then
             'Start running status monitor to give better progress and status indication during long-running processes
             pStatusMonitor = New MonitorProgressStatus
@@ -127,7 +129,6 @@ Public Class atcBasinsPlugIn
 
         atcDataManager.LoadPlugin("Timeseries::Statistics")
 
-        Dim lHelpFilename As String = FindFile("", g_ProgramDir & "docs\BASINS4.0.chm")
         If FileExists(lHelpFilename) Then
             ShowHelp(lHelpFilename)
         Else
@@ -238,7 +239,7 @@ Public Class atcBasinsPlugIn
     Public Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
         'A menu item or toolbar button was clicked
         Logger.Dbg(aItemName)
-        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
+        Dim lProgramFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\" & g_AppNameShort, "Base Directory", "C:\" & g_AppNameShort)
         aHandled = True 'Assume we will handle it
         Select Case aItemName
             Case "mnuNew", "tbbNew"  'Override new project behavior
@@ -260,9 +261,9 @@ Public Class atcBasinsPlugIn
                 ShowHelp("")
             Case atcDataManager.LaunchMenuName & "_ArcView3"
                 'create apr if it does not exist, then open it
-                Dim lAprFileName As String = lBasinsFolder & "\apr" & g_PathChar & IO.Path.GetFileNameWithoutExtension(g_Project.FileName) & ".apr"
+                Dim lAprFileName As String = lProgramFolder & "\apr" & g_PathChar & IO.Path.GetFileNameWithoutExtension(g_Project.FileName) & ".apr"
                 If Not FileExists(lAprFileName) Then 'build it
-                    Dim lEmptyAprName As String = lBasinsFolder & "\etc\buildapr.dat"
+                    Dim lEmptyAprName As String = lProgramFolder & "\etc\buildapr.dat"
                     If FileExists(lEmptyAprName) Then
                         IO.Directory.CreateDirectory(IO.Path.GetDirectoryName(lAprFileName))
                         IO.File.Copy(lEmptyAprName, lAprFileName)
@@ -277,9 +278,9 @@ Public Class atcBasinsPlugIn
                 End Try
             Case atcDataManager.LaunchMenuName & "_ArcGIS"
                 'create mxd if it does not exist, then open it
-                Dim lMxdFileName As String = lBasinsFolder & "\mxd" & g_PathChar & IO.Path.GetFileNameWithoutExtension(g_Project.FileName) & ".mxd"
+                Dim lMxdFileName As String = lProgramFolder & "\mxd" & g_PathChar & IO.Path.GetFileNameWithoutExtension(g_Project.FileName) & ".mxd"
                 If Not FileExists(lMxdFileName) Then 'build it
-                    Dim lEmptyMxdName As String = lBasinsFolder & "\etc\buildmxd.dat"
+                    Dim lEmptyMxdName As String = lProgramFolder & "\etc\buildmxd.dat"
                     If FileExists(lEmptyMxdName) Then
                         IO.Directory.CreateDirectory(IO.Path.GetDirectoryName(lMxdFileName))
                         IO.File.Copy(lEmptyMxdName, lMxdFileName)
@@ -296,8 +297,8 @@ Public Class atcBasinsPlugIn
                 If aItemName.StartsWith(atcDataManager.LaunchMenuName & "_") Then
                     Dim lExeName As String = ""
                     Select Case aItemName.Substring(atcDataManager.LaunchMenuName.Length + 1).ToLower
-                        Case "genscn" : lExeName = FindFile("Please locate GenScn.exe", lBasinsFolder & "\models\HSPF\bin\GenScn.exe")
-                        Case "wdmutil" : lExeName = FindFile("Please locate WDMUtil.exe", lBasinsFolder & "\models\HSPF\WDMUtil\WDMUtil.exe")
+                        Case "genscn" : lExeName = FindFile("Please locate GenScn.exe", lProgramFolder & "\models\HSPF\bin\GenScn.exe")
+                        Case "wdmutil" : lExeName = FindFile("Please locate WDMUtil.exe", lProgramFolder & "\models\HSPF\WDMUtil\WDMUtil.exe")
                     End Select
                     If FileExists(lExeName) Then
                         Shell("""" & lExeName & """", AppWinStyle.NormalFocus, False)

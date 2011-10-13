@@ -112,7 +112,7 @@ Public Class frmBuildNew
         Me.MinimizeBox = False
         Me.Name = "frmBuildNew"
         Me.Opacity = 0.8
-        Me.Text = "Build New BASINS 4 Project"
+        Me.Text = "Build New Project"
         Me.TopMost = True
         Me.ResumeLayout(False)
         Me.PerformLayout()

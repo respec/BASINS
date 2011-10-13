@@ -1259,8 +1259,8 @@ ReadCharacter:
                 Logger.Dbg("StatusB4 " & lStatus & " Count " & lCount)
             End If
             _fpreset()
-            End If
-            Return GetNaNInternal()
+        End If
+        Return GetNaNInternal()
     End Function
 
     ''' <summary>

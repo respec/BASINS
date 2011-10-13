@@ -108,10 +108,10 @@ Public Module modDownload
                             End If
                         End If
                     Else
-                        Logger.Msg("The selected map feature must be a polygon shapefile to use this option.", "Create BASINS Project Problem")
+                        Logger.Msg("The selected map feature must be a polygon shapefile to use this option.", "Create Project Problem")
                     End If
                 Else
-                    Logger.Msg("One or more map features must be selected to use this option.", "Create BASINS Project Problem")
+                    Logger.Msg("One or more map features must be selected to use this option.", "Create Project Problem")
                 End If
             End If
 
@@ -133,8 +133,8 @@ Public Module modDownload
                         'set up temporary extents shapefile
                         Dim lProjectDir As String = PathNameOnly(GisUtil.ProjectFileName)
                         Dim lTitle As String = ""
-                        MkDirPath(lProjectDir & "\temp")
-                        Dim lNewShapeName As String = lProjectDir & "\temp\tempextent.shp"
+                        MkDirPath(IO.Path.Combine(lProjectDir, "temp"))
+                        Dim lNewShapeName As String = IO.Path.Combine(lProjectDir, "temp" & g_PathChar & "tempextent.shp")
                         TryDeleteShapefile(lNewShapeName)
                         'are any features selected?
                         If GisUtil.NumSelectedFeatures(GisUtil.CurrentLayer) > 0 Then
@@ -1059,8 +1059,8 @@ StartOver:
     End Function
 
     Private Sub ShapeUtilMerge(ByVal aCurFilename As String, ByVal aOutputFilename As String, ByVal aProjectionFilename As String)
-        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
-        Dim lShapeUtilExe As String = FindFile("Please locate ShapeUtil.exe", lBasinsFolder & "\etc\datadownload\ShapeUtil.exe")
+        Dim lProgramFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\" & g_AppNameShort, "Base Directory", "C:\" & g_AppNameShort)
+        Dim lShapeUtilExe As String = FindFile("Please locate ShapeUtil.exe", lProgramFolder & "\etc\datadownload\ShapeUtil.exe")
         If lShapeUtilExe.Length > 0 Then
             Dim lLayersDbf As String = GetSetting("ShapeMerge", "files", "layers.dbf")
             If Not FileExists(lLayersDbf) Then
@@ -1084,8 +1084,8 @@ StartOver:
     End Sub
 
     Private Function DataDownload(ByRef aCommandLine As String) As Boolean
-        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
-        Dim lDataDownloadExe As String = FindFile("Please locate DataDownload.exe", lBasinsFolder & "\etc\DataDownload\DataDownload.exe")
+        Dim lProgramFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\" & g_AppNameShort, "Base Directory", "C:\" & g_AppNameShort)
+        Dim lDataDownloadExe As String = FindFile("Please locate DataDownload.exe", lProgramFolder & "\etc\DataDownload\DataDownload.exe")
         If lDataDownloadExe.Length > 0 Then
             If Shell(lDataDownloadExe & " " & aCommandLine, AppWinStyle.NormalFocus, True) = 0 Then
                 Return True
@@ -1121,8 +1121,8 @@ StartOver:
     Private Function GetDefaultsXML() As Xml.XmlDocument
         Dim lDefaultsXML As Xml.XmlDocument = Nothing
         Dim lDefaultsPath As String 'full file name of defaults XML
-        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
-        lDefaultsPath = FindFile("Please Locate BasinsDefaultLayers.xml", lBasinsFolder & "\etc\BasinsDefaultLayers.xml")
+        Dim lProgramFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\" & g_AppNameShort, "Base Directory", "C:\" & g_AppNameShort)
+        lDefaultsPath = FindFile("Please Locate BasinsDefaultLayers.xml", lProgramFolder & "\etc\BasinsDefaultLayers.xml")
         If FileExists(lDefaultsPath) Then
             lDefaultsXML = New Xml.XmlDocument
             lDefaultsXML.Load(lDefaultsPath)
