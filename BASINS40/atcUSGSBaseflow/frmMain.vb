@@ -130,21 +130,36 @@ Public Class frmMain
 
     End Function
 
-    Private Sub AttributesFromForm(ByRef Args As atcDataAttributes)
-        'set method
-        Args.SetValue("Method", pMethod)
-        'Set drainage area
-        Args.SetValue("Drainage Area", CDbl(txtDrainageArea.Text))
-        'set duration
-        Args.SetValue("Start Date", StartDateFromForm)
-        Args.SetValue("End Date", EndDateFromForm)
-        'Set streamflow
-        Args.SetValue("Streamflow", pDataGroup)
-        'Set Unit
-        Args.SetValue("EnglishUnit", True)
-        'Set station.txt
-        Args.SetValue("Station File", StationInfoFile)
-    End Sub
+    Private Function AttributesFromForm(ByRef Args As atcDataAttributes) As String
+        'check validity of inputs
+        Dim lErrMsg As String = ""
+        If pDataGroup.Count = 0 Then lErrMsg &= "No streamflow data selected" & vbCrLf
+        If pMethod = "" Then lErrMsg = "Method not set" & vbCrLf
+        Dim lDA As Double = 0.0
+        If Not Double.TryParse(txtDrainageArea.Text.Trim, lDA) Then lErrMsg &= "Drainage Area not set" & vbCrLf
+        If txtOutputRootName.Text.Trim = "" Then
+            lErrMsg &= "Need to specify an output name" & vbCrLf
+        ElseIf txtOutputRootName.Text.Trim.Length > 25 Then
+            lErrMsg &= "Output name should be less than 25 characters" & vbCrLf
+        End If
+
+        If lErrMsg.Length = 0 Then
+            'set method
+            Args.SetValue("Method", pMethod)
+            'Set drainage area
+            Args.SetValue("Drainage Area", lDA)
+            'set duration
+            Args.SetValue("Start Date", StartDateFromForm)
+            Args.SetValue("End Date", EndDateFromForm)
+            'Set streamflow
+            Args.SetValue("Streamflow", pDataGroup)
+            'Set Unit
+            Args.SetValue("EnglishUnit", True)
+            'Set station.txt
+            Args.SetValue("Station File", StationInfoFile)
+        End If
+        Return lErrMsg
+    End Function
 
     Private Sub ClearAttributes()
         Dim lRemoveThese As New atcCollection
@@ -169,16 +184,19 @@ Public Class frmMain
         Else
             lMatches = Regex.Matches(txtStartDateUser.Text, "\d{4}\/\d{1,2}\/\d{1,2}")
         End If
+        Dim lArr() As String = Nothing
         If lMatches.Count > 0 Then
-            Dim lArr() As String = lMatches.Item(0).ToString.Split("/")
-            Dim lYear As Integer = lArr(0)
-            Dim lMonth As Integer = lArr(1)
-            Dim lDay As Integer = lArr(2)
-            If pAnalysisOverCommonDuration Then
-                pCommonStart = Date2J(lYear, lMonth, lDay)
-            End If
+            lArr = lMatches.Item(0).ToString.Split("/")
+        Else
+            lArr = txtDataStart.Text.Trim.Split("/")
         End If
 
+        Dim lYear As Integer = lArr(0)
+        Dim lMonth As Integer = lArr(1)
+        Dim lDay As Integer = lArr(2)
+        If pAnalysisOverCommonDuration Then
+            pCommonStart = Date2J(lYear, lMonth, lDay)
+        End If
         Return pCommonStart
     End Function
 
@@ -189,15 +207,19 @@ Public Class frmMain
         Else
             lMatches = Regex.Matches(txtEndDateUser.Text, "\d{4}\/\d{1,2}\/\d{1,2}")
         End If
+        Dim lArr() As String = Nothing
         If lMatches.Count > 0 Then
-            Dim lArr() As String = lMatches.Item(0).ToString.Split("/")
-            Dim lYear As Integer = lArr(0)
-            Dim lMonth As Integer = lArr(1)
-            Dim lDay As Integer = lArr(2)
-            If pAnalysisOverCommonDuration Then
-                pCommonEnd = Date2J(lYear, lMonth, lDay, 24, 0, 0)
-            End If
+            lArr = lMatches.Item(0).ToString.Split("/")
+        Else
+            lArr = txtDataEnd.Text.Trim.Split("/")
         End If
+        Dim lYear As Integer = lArr(0)
+        Dim lMonth As Integer = lArr(1)
+        Dim lDay As Integer = lArr(2)
+        If pAnalysisOverCommonDuration Then
+            pCommonEnd = Date2J(lYear, lMonth, lDay, 24, 0, 0)
+        End If
+
         Return pCommonEnd
     End Function
 
@@ -247,9 +269,15 @@ Public Class frmMain
 
     Private Sub btnOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOK.Click
         Dim lErrMsg As String = ""
-        ClearAttributes()
+
         Dim lArgs As New atcDataAttributes
-        AttributesFromForm(lArgs)
+        Dim lFormCheckMsg As String = AttributesFromForm(lArgs)
+        If lFormCheckMsg.Length > 0 Then
+            Logger.Msg("Please address the following issues before proceed:" & vbCrLf & lFormCheckMsg, MsgBoxStyle.Information, "Input Needs Correction")
+            Exit Sub
+        End If
+
+        ClearAttributes()
         Dim lClsBaseFlowCalculator As atcTimeseriesBaseflow.atcTimeseriesBaseflow
         lClsBaseFlowCalculator = New atcTimeseriesBaseflow.atcTimeseriesBaseflow
         Try
