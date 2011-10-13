@@ -3,6 +3,7 @@ Imports System.Windows.Forms.Application
 Imports atcUtility
 Imports atcData
 Imports MapWinUtility
+Imports atcMwGisUtility
 
 Public Class atcUSGSPlugIn
     Implements MapWindow.Interfaces.IPlugin
@@ -47,6 +48,8 @@ Public Class atcUSGSPlugIn
     End Property
 #End Region
 
+    Private pStatusMonitor As MonitorProgressStatus
+
     <CLSCompliant(False)> _
     Public ReadOnly Property MapWin() As MapWindow.Interfaces.IMapWin
         Get
@@ -63,42 +66,65 @@ Public Class atcUSGSPlugIn
 
         'This is where buttons or menu items are added.
         g_MapWin = aMapWin
-        atcMwGisUtility.GisUtil.MappingObject = g_MapWin
+        g_AppNameLong = aMapWin.ApplicationInfo.ApplicationName
+        Select Case g_AppNameLong
+            Case "USGS Surface Water Analysis"
+                g_AppNameRegistry = "USGS-SW"
+                g_AppNameShort = "USGS-SW"
+                g_URL_Home = "http://water.usgs.gov/software/lists/surface_water/"
+                g_URL_Register = "http://hspf.com/pub/USGS-SW/register.html"
+
+            Case "USGS GW Toolbox"
+                g_AppNameRegistry = "USGS-GW"
+                g_AppNameShort = "USGS-GW"
+                g_URL_Home = "http://water.usgs.gov/software/lists/groundwater/"
+                g_URL_Register = "http://hspf.com/pub/USGS-GW/register.html"
+
+            Case Else '"BASINS 4"
+                g_AppNameRegistry = "BASINS4"
+                g_AppNameShort = "BASINS"
+                g_URL_Home = "http://www.epa.gov/waterscience/BASINS/"
+                g_URL_Register = "http://hspf.com/pub/basins4/register.html"
+        End Select
+
+        ProjectsMenuString = "Open " & g_AppNameShort & " Project"
+        RegisterMenuString = "Register as a " & g_AppNameShort & " user"
+        ProgramWebPageMenuString = g_AppNameShort & " Web Page"
+
+        GisUtil.MappingObject = g_MapWin
         atcDataManager.MapWindow = g_MapWin
 
         g_MapWinWindowHandle = aParentHandle
-        g_MapWin.ApplicationInfo.WelcomePlugin = "USGSplugin"
-        'Set g_BasinsDir to folder above the Bin folder where the app and plugins live
-        g_BasinsDir = PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)) & "\"
+        g_MapWin.ApplicationInfo.WelcomePlugin = "plugin" 'tell the main app to Plugins.BroadcastMessage("WELCOME_SCREEN") instead of showing default MW welcome screen
+        'Set g_ProgramDir to folder above the Bin folder where the app and plugins live
+        g_ProgramDir = PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)) & g_PathChar
 
-        Logger.StartToFile(g_BasinsDir & "cache\log\" _
-                         & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-USGS.log")
-        'If LaunchMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), g_BasinsDir & "cache\log\", System.Diagnostics.Process.GetCurrentProcess.Id) Then
-        '    Logger.ProgressStatus = New MonitorProgressStatus
-        '    SendMonitorMessage("Show")
-        '    Logger.Status("Testing")
-        '    'Logger.Status("LABEL 2 Two")
-        '    'Logger.Status("LABEL 3 Three")
-        '    'Logger.Status("LABEL 4 Four")
-        '    'Logger.Status("LABEL 5 Five")
-        '    Dim lSeconds As Integer = 30
-        '    For lIndex As Integer = 1 To lSeconds
-        '        SendMonitorMessage("PROGRESS " & lIndex & " of " & lSeconds)
-        '        System.Threading.Thread.Sleep(1000)
-        '    Next
-        'End If
+        Logger.StartToFile(g_ProgramDir & "cache\log" & g_PathChar _
+                         & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & g_AppNameShort & ".log")
+        Logger.Icon = g_MapWin.ApplicationInfo.FormIcon
+        If Logger.ProgressStatus Is Nothing OrElse Not (TypeOf (Logger.ProgressStatus) Is MonitorProgressStatus) Then
+            'Start running status monitor to give better progress and status indication during long-running processes
+            pStatusMonitor = New MonitorProgressStatus
+            If pStatusMonitor.StartMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"), _
+                                            g_ProgramDir & "cache\log" & g_PathChar, _
+                                            System.Diagnostics.Process.GetCurrentProcess.Id) Then
+                'put our status monitor (StatusMonitor.exe) between the Logger and the default MW status monitor
+                pStatusMonitor.InnerProgressStatus = Logger.ProgressStatus
+                Logger.ProgressStatus = pStatusMonitor
+                Logger.Status("LABEL TITLE " & g_AppNameShort & " Status")
+                Logger.Status("PROGRESS TIME ON") 'Enable time-to-completion estimation
+                Logger.Status("")
+            Else
+                pStatusMonitor.StopMonitor()
+                pStatusMonitor = Nothing
+            End If
+        End If
 
         CheckForUpdates(True)
 
-        Try
-            Dim lKey As String = g_MapWin.Plugins.GetPluginKey("Timeseries::Statistics")
-            'If Not g_MapWin.Plugins.PluginIsLoaded(lKey) Then 
-            g_MapWin.Plugins.StartPlugin(lKey)
-        Catch e As Exception
-            Logger.Dbg("Exception loading Timeseries::Statistics - " & e.Message)
-        End Try
+        atcDataManager.LoadPlugin("Timeseries::Statistics")
 
-        Dim lHelpFilename As String = FindFile("", g_BasinsDir & "docs\Basins4.0.chm")
+        Dim lHelpFilename As String = FindFile("", g_ProgramDir & "docs\Basins4.0.chm")
         If FileExists(lHelpFilename) Then
             ShowHelp(lHelpFilename)
         Else
@@ -117,7 +143,7 @@ Public Class atcUSGSPlugIn
         'atcDataManager.AddMenuIfMissing(ProjectsMenuName, atcDataManager.FileMenuName, ProjectsMenuString, "mnuRecentProjects")
 
         'atcDataManager.AddMenuIfMissing(BasinsHelpMenuName, HelpMenuName, BasinsHelpMenuString, , "mnuOnlineDocs")
-        atcDataManager.AddMenuIfMissing(BasinsWebPageMenuName, HelpMenuName, BasinsWebPageMenuString, , "mnuOnlineDocs")
+        atcDataManager.AddMenuIfMissing(ProgramWebPageMenuName, HelpMenuName, ProgramWebPageMenuString, , "mnuOnlineDocs")
 
         'atcDataManager.AddMenuIfMissing(RegisterMenuName, HelpMenuName, RegisterMenuString, , "mnuShortcuts")
 
@@ -125,7 +151,8 @@ Public Class atcUSGSPlugIn
         g_Menus.Remove("mnuFileBreak5")      'Remove MW separator after mnuCheckForUpdates
 
         'atcDataManager.AddMenuIfMissing(CheckForUpdatesMenuName, HelpMenuName, CheckForUpdatesMenuString, RegisterMenuName)
-        atcDataManager.AddMenuIfMissing(SendFeedbackMenuName, HelpMenuName, SendFeedbackMenuString, CheckForUpdatesMenuName)
+        atcDataManager.AddMenuIfMissing(ShowStatusMenuName, HelpMenuName, ShowStatusMenuString, CheckForUpdatesMenuName)
+        atcDataManager.AddMenuIfMissing(SendFeedbackMenuName, HelpMenuName, SendFeedbackMenuString, ShowStatusMenuName)
 
         'Dim mnu As MapWindow.Interfaces.MenuItem
         'For Each lDataDir As String In g_BasinsDataDirs
@@ -146,19 +173,16 @@ Public Class atcUSGSPlugIn
         atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_GenScn", atcDataManager.LaunchMenuName, "GenScn")
         atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_WDMUtil", atcDataManager.LaunchMenuName, "WDMUtil")
 
-        atcDataManager.LoadPlugin("Timeseries::Statistics")
         atcDataManager.LoadPlugin("D4EM Data Download::Main")
 
         Try 'atcDataManager.XML gets loaded when opening a project. This makes sure it gets loaded even without a project
-            Dim lAttributesString As String = GetSetting(g_AppName, "DataManager", "SelectionAttributes")
+            Dim lAttributesString As String = GetSetting(g_AppNameRegistry, "DataManager", "SelectionAttributes")
             If lAttributesString.Length > 0 Then
-                atcDataManager.SelectionAttributes.Clear()
-                atcDataManager.SelectionAttributes.AddRange(lAttributesString.Split(vbTab))
+                atcDataManager.SelectionAttributesSet(lAttributesString.Split(vbTab))
             End If
-            lAttributesString = GetSetting(g_AppName, "DataManager", "DisplayAttributes")
+            lAttributesString = GetSetting(g_AppNameRegistry, "DataManager", "DisplayAttributes")
             If lAttributesString.Length > 0 Then
-                atcDataManager.DisplayAttributes.Clear()
-                atcDataManager.DisplayAttributes.AddRange(lAttributesString.Split(vbTab))
+                atcDataManager.DisplayAttributesSet(lAttributesString.Split(vbTab))
             End If
         Catch
         End Try
@@ -169,9 +193,10 @@ Public Class atcUSGSPlugIn
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
         'g_MapWin.Menus.Remove(ProjectsMenuName)
         'g_MapWin.Menus.Remove(BasinsHelpMenuName)
-        g_MapWin.Menus.Remove(BasinsWebPageMenuName)
+        g_MapWin.Menus.Remove(ProgramWebPageMenuName)
         'g_MapWin.Menus.Remove(RegisterMenuName)
         g_MapWin.Menus.Remove(CheckForUpdatesMenuName)
+        g_MapWin.Menus.Remove(ShowStatusMenuName)
         g_MapWin.Menus.Remove(SendFeedbackMenuName)
 
         g_MapWin.Menus.Remove(atcDataManager.LaunchMenuName & "_ArcView3")
@@ -188,9 +213,14 @@ Public Class atcUSGSPlugIn
         g_MapWin.ClearCustomWindowTitle()
 
         CloseForms()
-        'StopMonitor()
-        SaveSetting(g_AppName, "DataManager", "SelectionAttributes", String.Join(vbTab, atcDataManager.SelectionAttributes.ToArray("".GetType)))
-        SaveSetting(g_AppName, "DataManager", "DisplayAttributes", String.Join(vbTab, atcDataManager.DisplayAttributes.ToArray("".GetType)))
+
+        If pStatusMonitor IsNot Nothing Then
+            Logger.ProgressStatus = pStatusMonitor.InnerProgressStatus
+            pStatusMonitor.StopMonitor()
+        End If
+
+        SaveSetting(g_AppNameRegistry, "DataManager", "SelectionAttributes", String.Join(vbTab, atcDataManager.SelectionAttributes.ToArray()))
+        SaveSetting(g_AppNameRegistry, "DataManager", "DisplayAttributes", String.Join(vbTab, atcDataManager.DisplayAttributes.ToArray()))
     End Sub
 
     Private Sub CloseForms()
@@ -207,19 +237,21 @@ Public Class atcUSGSPlugIn
         Logger.Dbg(aItemName)
         aHandled = True 'Assume we will handle it
         Select Case aItemName
-            Case "mnuNew"            'Override File/New menu
+            Case "mnuNew", "tbbNew"  'Override new project behavior
                 BASINSNewMenu()
             Case "mnuAboutMapWindow" 'Override Help/About menu
                 Dim lAbout As New frmAbout
                 lAbout.ShowAbout()
-                'Case RegisterMenuName
-                '    OpenFile("http://hspf.com/pub/basins4/register.html")
+            Case RegisterMenuName
+                OpenFile(g_URL_Register)
             Case CheckForUpdatesMenuName
                 CheckForUpdates(False)
-            Case BasinsWebPageMenuName
-                OpenFile("http://water.usgs.gov/")
+            Case ProgramWebPageMenuName
+                OpenFile(g_URL_Home)
             Case SendFeedbackMenuName
                 SendFeedback()
+            Case ShowStatusMenuName
+                Logger.Status("SHOW")
                 'Case BasinsHelpMenuName
                 '    ShowHelp("")
             Case atcDataManager.LaunchMenuName & "_ArcView3"
@@ -280,12 +312,12 @@ Public Class atcUSGSPlugIn
             Dim lQuiet As String = ""
             Dim lToday As String = Format(Date.Today, "yyyy-MM-dd")
             If aQuiet Then 'Make sure automatic checking happens at most once a day
-                If GetSetting(g_AppName, "Update", "LastCheck", "Never") = lToday Then Exit Sub
+                If GetSetting(g_AppNameRegistry, "Update", "LastCheck", "Never") = lToday Then Exit Sub
                 lQuiet = "quiet "
             End If
-            SaveSetting(g_AppName, "Update", "LastCheck", lToday)
+            SaveSetting(g_AppNameRegistry, "Update", "LastCheck", lToday)
 
-            Dim lSavePath As String = IO.Path.Combine(g_BasinsDir, "cache")
+            Dim lSavePath As String = IO.Path.Combine(g_ProgramDir, "cache")
             Dim lExePath As String = IO.Path.GetDirectoryName(Reflection.Assembly.GetEntryAssembly.Location)
             Dim lUpdateCheckerPath As String = IO.Path.Combine(lExePath, "UpdateCheck.exe")
             If IO.File.Exists(lUpdateCheckerPath) Then
@@ -329,7 +361,7 @@ FoundDir:
                 End If
             End If
 
-            lPrjFileName = aDataDirName & "\" & IO.Path.GetFileNameWithoutExtension(aDataDirName) & ".mwprj"
+            lPrjFileName = aDataDirName & g_PathChar & IO.Path.GetFileNameWithoutExtension(aDataDirName) & ".mwprj"
             If FileExists(lPrjFileName) Then
                 Logger.Dbg("Opening project " & lPrjFileName)
                 Return g_Project.Load(lPrjFileName)
@@ -394,42 +426,25 @@ FoundDir:
         Dim lMessage As String = ""
 
         Dim lFeedbackForm As New frmFeedback
-
-        'TODO: format as an html document?
-        Dim lFeedback As String = lFeedbackForm.FeedbackGenericSystemInformation()
-        Dim lSectionFooter As String = "___________________________" & vbCrLf
+        Dim lFeedback As String = ""
 
         lFeedback &= "Project: " & g_Project.FileName & vbCrLf
         lFeedback &= "Config: " & g_Project.ConfigFileName & vbCrLf
 
         'plugin info
-        lFeedback &= vbCrLf & "Plugins loaded:" & vbCrLf
-        Dim lLastPlugIn As Integer = g_Plugins.Count() - 1
-        For iPlugin As Integer = 0 To lLastPlugIn
-            Dim lCurPlugin As MapWindow.Interfaces.IPlugin = g_Plugins.Item(iPlugin)
-            If Not lCurPlugin Is Nothing Then
-                With lCurPlugin
-                    lFeedback &= .Name & vbTab & .Version & vbTab & .BuildDate & vbCrLf
-                End With
-            End If
-        Next
-        lFeedback &= lSectionFooter
+        'lFeedback &= vbCrLf & "Plugins loaded:" & vbCrLf
+        'Dim lLastPlugIn As Integer = g_Plugins.Count() - 1
+        'For iPlugin As Integer = 0 To lLastPlugIn
+        '    Dim lCurPlugin As MapWindow.Interfaces.IPlugin = g_Plugins.Item(iPlugin)
+        '    If Not lCurPlugin Is Nothing Then
+        '        With lCurPlugin
+        '            lFeedback &= .Name & vbTab & .Version & vbTab & .BuildDate & vbCrLf
+        '        End With
+        '    End If
+        'Next
+        'lFeedback &= "___________________________" & vbCrLf
 
-        'TODO: add map layers info?
-        lFeedback &= vbCrLf & "Information from MapWinUtility.MiscUtils.GetDebugInfo" & vbCrLf & _
-                              MapWinUtility.MiscUtils.GetDebugInfo & vbCrLf & vbCrLf
-
-        Dim lSkipFilename As Integer = g_BasinsDir.Length
-        lFeedback &= vbCrLf & "Files in " & g_BasinsDir & vbCrLf
-
-        Dim lallFiles As New NameValueCollection
-        AddFilesInDir(lallFiles, g_BasinsDir, True)
-        'lFeedback &= vbCrLf & "Modified" & vbTab & "Size" & vbTab & "Filename" & vbCrLf
-        For Each lFilename As String In lallFiles
-            lFeedback &= FileDateTime(lFilename).ToString("yyyy-MM-dd HH:mm:ss") & vbTab & StrPad(Format(FileLen(lFilename), "#,###"), 10) & vbTab & lFilename.Substring(lSkipFilename) & vbCrLf
-        Next
-
-        If lFeedbackForm.ShowFeedback(lName, lEmail, lMessage, lFeedback) Then
+        If lFeedbackForm.ShowFeedback(lName, lEmail, lMessage, lFeedback, True, True, True, g_ProgramDir) Then
             Dim lFeedbackCollection As New NameValueCollection
             lFeedbackCollection.Add("name", Trim(lName))
             lFeedbackCollection.Add("email", Trim(lEmail))
@@ -539,7 +554,7 @@ FoundDir:
 
     Public Sub ProjectLoading(ByVal aProjectFile As String, ByVal aSettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectLoading
         CloseForms()
-        If Not aProjectFile Is Nothing AndAlso aProjectFile.Length > 0 Then
+        If aProjectFile IsNot Nothing AndAlso aProjectFile.Length > 0 Then
             Try
                 ChDriveDir(IO.Path.GetDirectoryName(aProjectFile))
             Catch

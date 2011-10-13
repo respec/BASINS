@@ -19,9 +19,14 @@ Public Module modUSGSPlugin
     Friend g_Plugins As MapWindow.Interfaces.Plugins
     Friend g_Project As MapWindow.Interfaces.Project
     Friend g_MapWinWindowHandle As Integer
-    Friend g_AppName As String = "USGS-SW"
+    Friend g_AppNameRegistry As String = "USGS-GW" 'For preferences in registry
+    Friend g_AppNameShort As String = "USGS-GW"
+    Friend g_AppNameLong As String = "USGS GW Toolbox"
+    Friend g_URL_Home As String = ""
+    Friend g_URL_Register As String = ""
+
     Friend g_BasinsDataDirs As New ArrayList
-    Friend g_BasinsDir As String = ""
+    Friend g_ProgramDir As String = ""
     Friend g_ProgressPanel As Windows.Forms.Panel
     Friend pBuildFrm As frmBuildNew
 
@@ -30,23 +35,26 @@ Public Module modUSGSPlugin
 
     'File menu -- created by MapWindow
 
-    'Friend Const ProjectsMenuName As String = "BasinsProjects"
-    'Friend Const ProjectsMenuString As String = "Open BASINS Project"
+    Friend Const ProjectsMenuName As String = "ProgramProjects"
+    Friend ProjectsMenuString As String = "Open BASINS Project"
 
     Friend pWelcomeScreenShow As Boolean = False
 
-    'Friend Const RegisterMenuName As String = "RegisterBASINS"
-    'Friend Const RegisterMenuString As String = "Register as a BASINS user"
+    Friend Const RegisterMenuName As String = "RegisterProgram"
+    Friend RegisterMenuString As String = "Register as a BASINS user"
 
     Friend Const CheckForUpdatesMenuName As String = "CheckForUpdates"
     Friend Const CheckForUpdatesMenuString As String = "Check For Updates"
+
+    Friend Const ShowStatusMenuName As String = "ShowStatus"
+    Friend Const ShowStatusMenuString As String = "Show Status Monitor"
 
     Friend Const HelpMenuName As String = "mnuHelp"
     'Friend Const BasinsHelpMenuName As String = "BasinsHelp"
     'Friend Const BasinsHelpMenuString As String = "BASINS Documentation"
 
-    Friend Const BasinsWebPageMenuName As String = "USGSWebPage"
-    Friend Const BasinsWebPageMenuString As String = "USGS Web Page"
+    Friend Const ProgramWebPageMenuName As String = "ProgramWebPage"
+    Friend ProgramWebPageMenuString As String = "BASINS Web Page"
 
     Friend Const SendFeedbackMenuName As String = "SendFeedback"
     Friend Const SendFeedbackMenuString As String = "Send Feedback"
@@ -95,12 +103,12 @@ Public Module modUSGSPlugin
     ''' 
     ''' </summary>
     ''' <remarks></remarks>
-    Friend Sub LoadNationalProject()
+    Public Sub LoadNationalProject()
         If Not NationalProjectIsOpen() Then
-            Dim lFileName As String = IO.Path.Combine(g_BasinsDir, "Data\national\" & NationalProjectFilename)
+            Dim lFileName As String = IO.Path.Combine(g_ProgramDir, "Data\national" & g_PathChar & NationalProjectFilename)
             If Not FileExists(lFileName) Then
                 For Each lDir As String In g_BasinsDataDirs
-                    lFileName = lDir & "national\" & NationalProjectFilename
+                    lFileName = lDir & "national" & g_PathChar & NationalProjectFilename
                     If FileExists(lFileName) Then 'found existing national project
                         Exit For
                     End If
@@ -136,8 +144,26 @@ Public Module modUSGSPlugin
             g_Toolbar.PressToolbarButton("tbbSelect")
             pBuildFrm = New frmBuildNew
             pBuildFrm.Show()
-            pBuildFrm.Top = GetSetting(g_AppName, "Window Positions", "BuildTop", "300")
-            pBuildFrm.Left = GetSetting(g_AppName, "Window Positions", "BuildLeft", "0")
+            Try
+                pBuildFrm.Top = GetSetting(g_AppNameRegistry, "Window Positions", "BuildTop", "300")
+                If pBuildFrm.Top < 0 Then
+                    pBuildFrm.Top = 0
+                ElseIf pBuildFrm.Top + pBuildFrm.Height > Windows.Forms.Screen.PrimaryScreen.Bounds.Height Then
+                    pBuildFrm.Top = Windows.Forms.Screen.PrimaryScreen.Bounds.Height - pBuildFrm.Height
+                End If
+            Catch
+            End Try
+
+            Try
+                pBuildFrm.Left = GetSetting(g_AppNameRegistry, "Window Positions", "BuildLeft", "0")
+                If pBuildFrm.Left < 0 Then
+                    pBuildFrm.Left = 0
+                ElseIf pBuildFrm.Left + pBuildFrm.Width > Windows.Forms.Screen.PrimaryScreen.Bounds.Width Then
+                    pBuildFrm.Left = Windows.Forms.Screen.PrimaryScreen.Bounds.Width - pBuildFrm.Width
+                End If
+            Catch
+            End Try
+
             UpdateSelectedFeatures()
         Else
             Logger.Msg("Unable to open national project", "Open National")
@@ -180,13 +206,18 @@ Public Module modUSGSPlugin
     End Function
 
     Public Function DefaultBasinsDataDir() As String
-        'TODO: change to using MyDocuments when the installer starts using Progra~1
-        'Return My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\" & BasinsDataPath
-
-        If Not g_BasinsDataDirs Is Nothing AndAlso g_BasinsDataDirs.Count > 0 Then
+        If g_BasinsDataDirs IsNot Nothing AndAlso g_BasinsDataDirs.Count > 0 Then
             Return g_BasinsDataDirs(0)
         Else
-            Return My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\" & BasinsDataPath
+            Try
+                Return My.Computer.FileSystem.SpecialDirectories.MyDocuments & g_PathChar & BasinsDataPath
+            Catch
+                Try
+                    Return Environment.GetFolderPath(Environment.SpecialFolder.Personal & g_PathChar & BasinsDataPath)
+                Catch ex As Exception
+                    Return g_PathChar & BasinsDataPath
+                End Try
+            End Try
         End If
     End Function
 
@@ -202,52 +233,53 @@ Public Module modUSGSPlugin
 
             RefreshView()
             ctext = "Selected Features:" & vbCrLf & "  <none>"
-            lCurLayer = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
+            If g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).LayerType = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
+                lCurLayer = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
+                If g_MapWin.View.SelectedShapes.NumSelected > 0 Then
+                    ctext = "Selected Features:"
+                    Select Case IO.Path.GetFileNameWithoutExtension(lCurLayer.Filename).ToLower
+                        Case "cat", "huc", "huc250d3"
+                            lFieldName = "CU"
+                            lFieldDesc = "catname"
+                        Case "cnty"
+                            lFieldName = "FIPS"
+                            lFieldDesc = "cntyname"
+                        Case "st"
+                            lFieldName = "ST"
+                            lFieldDesc = "name"
+                    End Select
 
-            If g_MapWin.View.SelectedShapes.NumSelected > 0 Then
-                ctext = "Selected Features:"
-                Select Case IO.Path.GetFileNameWithoutExtension(lCurLayer.Filename).ToLower
-                    Case "cat", "huc", "huc250d3"
-                        lFieldName = "CU"
-                        lFieldDesc = "catname"
-                    Case "cnty"
-                        lFieldName = "FIPS"
-                        lFieldDesc = "cntyname"
-                    Case "st"
-                        lFieldName = "ST"
-                        lFieldDesc = "name"
-                End Select
+                    lFieldName = lFieldName.ToLower
+                    lFieldDesc = lFieldDesc.ToLower
+                    For lField = 0 To lCurLayer.NumFields - 1
+                        If lCurLayer.Field(lField).Name.ToLower = lFieldName Then
+                            lNameIndex = lField
+                        End If
+                        If lCurLayer.Field(lField).Name.ToLower = lFieldDesc Then
+                            lDescIndex = lField
+                        End If
+                    Next
 
-                lFieldName = lFieldName.ToLower
-                lFieldDesc = lFieldDesc.ToLower
-                For lField = 0 To lCurLayer.NumFields - 1
-                    If lCurLayer.Field(lField).Name.ToLower = lFieldName Then
-                        lNameIndex = lField
-                    End If
-                    If lCurLayer.Field(lField).Name.ToLower = lFieldDesc Then
-                        lDescIndex = lField
-                    End If
-                Next
-
-                Dim lSelected As Integer
-                Dim lShape As Integer
-                Dim lname As String
-                Dim ldesc As String
-                Dim lSf As MapWinGIS.Shapefile = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
-                For lSelected = 0 To g_MapWin.View.SelectedShapes.NumSelected - 1
-                    lShape = g_MapWin.View.SelectedShapes.Item(lSelected).ShapeIndex()
-                    lname = ""
-                    ldesc = ""
-                    If lNameIndex > -1 Then
-                        lname = lSf.CellValue(lNameIndex, lShape)
-                    End If
-                    If lDescIndex > -1 Then
-                        ldesc = lSf.CellValue(lDescIndex, lShape)
-                    End If
-                    ctext = ctext & vbCrLf & "  " & lname & " : " & ldesc
-                Next
+                    Dim lSelected As Integer
+                    Dim lShape As Integer
+                    Dim lname As String
+                    Dim ldesc As String
+                    Dim lSf As MapWinGIS.Shapefile = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
+                    For lSelected = 0 To g_MapWin.View.SelectedShapes.NumSelected - 1
+                        lShape = g_MapWin.View.SelectedShapes.Item(lSelected).ShapeIndex()
+                        lname = ""
+                        ldesc = ""
+                        If lNameIndex > -1 Then
+                            lname = lSf.CellValue(lNameIndex, lShape)
+                        End If
+                        If lDescIndex > -1 Then
+                            ldesc = lSf.CellValue(lDescIndex, lShape)
+                        End If
+                        ctext = ctext & vbCrLf & "  " & lname & " : " & ldesc
+                    Next
+                End If
+                pBuildFrm.txtSelected.Text = ctext
             End If
-            pBuildFrm.txtSelected.Text = ctext
         End If
     End Sub
 

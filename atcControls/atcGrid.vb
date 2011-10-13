@@ -908,8 +908,7 @@ Public Class atcGrid
 
         If pRowBottom.Keys.Contains(aRow - 1) Then
             lY = pRowBottom.ItemByKey(aRow - 1)
-        Else
-            'if that key does not exist, it may be scrolled off the top, try the next one down
+        ElseIf pRowBottom.Keys.Contains(aRow) Then 'if (arow-1) does not exist, it may be scrolled off the top, try the next one
             lY = pRowBottom.ItemByKey(aRow) - RowHeight(aRow)
         End If
 

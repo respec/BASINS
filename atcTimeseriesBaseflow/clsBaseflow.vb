@@ -4,7 +4,6 @@ Imports MapWinUtility
 Imports System.IO
 Imports System.Text
 Imports System.Collections.Specialized
-Imports atcMetCmp
 Imports atcData
 
 Public Enum HySepMethod
