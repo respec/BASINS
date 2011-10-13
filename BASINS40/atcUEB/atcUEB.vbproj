@@ -5,10 +5,10 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{7862AD75-FC13-43FE-B1FF-316799321DB6}</ProjectGuid>
+    <ProjectGuid>{167C77DA-0DB1-4126-A20F-1E2931952930}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>atcGeoSFM</RootNamespace>
-    <AssemblyName>atcGeoSFM</AssemblyName>
+    <RootNamespace>atcUEB</RootNamespace>
+    <AssemblyName>atcUEB</AssemblyName>
     <MyType>Windows</MyType>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -23,7 +23,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
-    <DocumentationFile>atcGeoSFM.xml</DocumentationFile>
+    <DocumentationFile>atcUEB.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -32,7 +32,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
-    <DocumentationFile>atcGeoSFM.xml</DocumentationFile>
+    <DocumentationFile>atcUEB.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -40,7 +40,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
-    <DocumentationFile>atcGeoSFM.xml</DocumentationFile>
+    <DocumentationFile>atcUEB.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -48,7 +48,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
-    <DocumentationFile>atcGeoSFM.xml</DocumentationFile>
+    <DocumentationFile>atcUEB.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <DebugType>pdbonly</DebugType>
@@ -76,7 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsPlugin.vb" />
-    <Compile Include="frmGeoSFM.vb">
+    <Compile Include="frmUEB.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -96,9 +96,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="frmGeoSFM.resx">
+    <EmbeddedResource Include="frmUEB.resx">
       <SubType>Designer</SubType>
-      <DependentUpon>frmGeoSFM.vb</DependentUpon>
+      <DependentUpon>frmUEB.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

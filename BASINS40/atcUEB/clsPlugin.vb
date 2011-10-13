@@ -6,7 +6,7 @@ Public Class PlugIn
 
     Public Overrides ReadOnly Property Name() As String
         Get
-            Return "GeoSFM"
+            Return "UEB"
         End Get
     End Property
 
@@ -18,7 +18,7 @@ Public Class PlugIn
 
     Public Overrides ReadOnly Property Description() As String
         Get
-            Return "An interface for running the Geospatial Stream Flow Model GeoSFM."
+            Return "An interface for running the Utah Energy Balance Snow Accumulation and Melt Model UEB."
         End Get
     End Property
 
@@ -27,22 +27,22 @@ Public Class PlugIn
         MyBase.Initialize(aMapWin, aParentHandle)
         atcMwGisUtility.GisUtil.MappingObject = aMapWin
         AddMenuIfMissing(ModelsMenuName, "", ModelsMenuString, "mnuFile")
-        AddMenuIfMissing(ModelsMenuName & "_GeoSFM", ModelsMenuName, "GeoSFM")
+        AddMenuIfMissing(ModelsMenuName & "_UEB", ModelsMenuName, "UEB")
     End Sub
 
     Public Overrides Sub Terminate()
-        atcData.atcDataManager.RemoveMenuIfEmpty(ModelsMenuName & "_GeoSFM")
+        atcData.atcDataManager.RemoveMenuIfEmpty(ModelsMenuName & "_UEB")
         atcData.atcDataManager.RemoveMenuIfEmpty(ModelsMenuName)
     End Sub
 
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
-        If aItemName = ModelsMenuName & "_GeoSFM" Then
-            Dim lfrmGeoSFM As New frmGeoSFM
-            With lfrmGeoSFM
+        If aItemName = ModelsMenuName & "_UEB" Then
+            Dim lfrmUEB As New frmUEB
+            With lfrmUEB
                 .InitializeUI(Me)
-                Logger.Dbg("GeoSFM User Interface Initialized")
+                Logger.Dbg("UEB User Interface Initialized")
                 .Show()
-                Logger.Dbg("GeoSFM User Interface Shown")
+                Logger.Dbg("UEB User Interface Shown")
                 aHandled = True
             End With
         End If
