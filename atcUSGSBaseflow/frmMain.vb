@@ -133,14 +133,30 @@ Public Class frmMain
     Private Function AttributesFromForm(ByRef Args As atcDataAttributes) As String
         'check validity of inputs
         Dim lErrMsg As String = ""
-        If pDataGroup.Count = 0 Then lErrMsg &= "No streamflow data selected" & vbCrLf
-        If pMethod = "" Then lErrMsg = "Method not set" & vbCrLf
+        If pDataGroup.Count = 0 Then
+            lErrMsg &= "- No streamflow data selected" & vbCrLf
+        Else
+            Dim lTs As atcTimeseries = Nothing
+            For Each lTs In pDataGroup
+                Try
+                    lTs = SubsetByDate(lTs, StartDateFromForm, EndDateFromForm, Nothing)
+                    If lTs.Attributes.GetValue("Count missing") > 0 Then
+                        lErrMsg &= "- Selected Dataset has gaps." & vbCrLf
+                        Exit For
+                    End If
+                Catch ex As Exception
+                    lErrMsg &= "- Problematic starting and ending dates." & vbCrLf
+                End Try
+            Next
+        End If
+
+        If pMethod = "" Then lErrMsg = "- Method not set" & vbCrLf
         Dim lDA As Double = 0.0
-        If Not Double.TryParse(txtDrainageArea.Text.Trim, lDA) Then lErrMsg &= "Drainage Area not set" & vbCrLf
+        If Not Double.TryParse(txtDrainageArea.Text.Trim, lDA) Then lErrMsg &= "- Drainage Area not set" & vbCrLf
         If txtOutputRootName.Text.Trim = "" Then
-            lErrMsg &= "Need to specify an output name" & vbCrLf
+            lErrMsg &= "- Need to specify an output name" & vbCrLf
         ElseIf txtOutputRootName.Text.Trim.Length > 25 Then
-            lErrMsg &= "Output name should be less than 25 characters" & vbCrLf
+            lErrMsg &= "- Output name should be less than 25 characters" & vbCrLf
         End If
 
         If lErrMsg.Length = 0 Then
@@ -273,7 +289,7 @@ Public Class frmMain
         Dim lArgs As New atcDataAttributes
         Dim lFormCheckMsg As String = AttributesFromForm(lArgs)
         If lFormCheckMsg.Length > 0 Then
-            Logger.Msg("Please address the following issues before proceed:" & vbCrLf & lFormCheckMsg, MsgBoxStyle.Information, "Input Needs Correction")
+            Logger.Msg("Please address the following issues before proceed:" & vbCrLf & vbCrLf & lFormCheckMsg, MsgBoxStyle.Information, "Input Needs Correction")
             Exit Sub
         End If
 
