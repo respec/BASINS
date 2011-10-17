@@ -133,21 +133,31 @@ Public Class frmMain
     Private Function AttributesFromForm(ByRef Args As atcDataAttributes) As String
         'check validity of inputs
         Dim lErrMsg As String = ""
+
         If pDataGroup.Count = 0 Then
             lErrMsg &= "- No streamflow data selected" & vbCrLf
         Else
-            Dim lTs As atcTimeseries = Nothing
-            For Each lTs In pDataGroup
-                Try
-                    lTs = SubsetByDate(lTs, StartDateFromForm, EndDateFromForm, Nothing)
-                    If lTs.Attributes.GetValue("Count missing") > 0 Then
-                        lErrMsg &= "- Selected Dataset has gaps." & vbCrLf
-                        Exit For
-                    End If
-                Catch ex As Exception
-                    lErrMsg &= "- Problematic starting and ending dates." & vbCrLf
-                End Try
-            Next
+            Dim lSDate As Double = StartDateFromForm()
+            Dim lEDate As Double = EndDateFromForm()
+            If lSDate < 0 OrElse lEDate < 0 Then
+                lErrMsg &= "- Problematic start and/or end date." & vbCrLf
+            Else
+                Dim lTs As atcTimeseries = Nothing
+                For Each lTs In pDataGroup
+                    Try
+                        lTs = SubsetByDate(lTs, lSDate, lEDate, Nothing)
+                        If lTs.Attributes.GetValue("Count missing") > 0 Then
+                            lErrMsg &= "- Selected Dataset has gaps." & vbCrLf
+                            lTs.Clear()
+                            Exit For
+                        Else
+                            lTs.Clear()
+                        End If
+                    Catch ex As Exception
+                        lErrMsg &= "- Problematic starting and ending dates." & vbCrLf
+                    End Try
+                Next
+            End If
         End If
 
         If pMethod = "" Then lErrMsg = "- Method not set" & vbCrLf
@@ -204,14 +214,26 @@ Public Class frmMain
         If lMatches.Count > 0 Then
             lArr = lMatches.Item(0).ToString.Split("/")
         Else
-            lArr = txtDataStart.Text.Trim.Split("/")
+            Dim lAskUser As String = _
+            Logger.MsgCustom("Invalid starting date. Use dataset start date?", "Start Date Correction", New String() {"Yes", "No"})
+            If lAskUser = "Yes" Then
+                lArr = txtDataStart.Text.Trim.Split("/")
+                txtStartDateUser.Text = ""
+            Else
+                txtStartDateUser.Focus()
+                Return -99.0
+            End If
         End If
 
         Dim lYear As Integer = lArr(0)
         Dim lMonth As Integer = lArr(1)
         Dim lDay As Integer = lArr(2)
-        If pAnalysisOverCommonDuration Then
-            pCommonStart = Date2J(lYear, lMonth, lDay)
+        If IsDateValid(lArr) Then
+            If pAnalysisOverCommonDuration Then
+                pCommonStart = Date2J(lYear, lMonth, lDay)
+            End If
+        Else
+            Return -99.0
         End If
         Return pCommonStart
     End Function
@@ -219,25 +241,53 @@ Public Class frmMain
     Private Function EndDateFromForm() As Double
         Dim lMatches As MatchCollection = Nothing
         If txtEndDateUser.Text.Trim() = "" Then
-            lMatches = Regex.Matches(txtDataEnd.Text, "\d{4}\/\d{1,2}\/\d{1,2}")
+            lMatches = Regex.Matches(txtDataEnd.Text, "\d{4}/\d{1,2}/\d{1,2}")
         Else
-            lMatches = Regex.Matches(txtEndDateUser.Text, "\d{4}\/\d{1,2}\/\d{1,2}")
+            lMatches = Regex.Matches(txtEndDateUser.Text, "\d{4}/\d{1,2}/\d{1,2}")
         End If
         Dim lArr() As String = Nothing
         If lMatches.Count > 0 Then
             lArr = lMatches.Item(0).ToString.Split("/")
         Else
-            lArr = txtDataEnd.Text.Trim.Split("/")
+            Dim lAskUser As String = _
+            Logger.MsgCustom("Invalid ending date. Use dataset end date?", "End Date Correction", New String() {"Yes", "No"})
+            If lAskUser = "Yes" Then
+                lArr = txtDataEnd.Text.Trim.Split("/")
+                txtEndDateUser.Text = ""
+            Else
+                txtEndDateUser.Focus()
+                Return -99.0
+            End If
+
         End If
         Dim lYear As Integer = lArr(0)
         Dim lMonth As Integer = lArr(1)
         Dim lDay As Integer = lArr(2)
-        If pAnalysisOverCommonDuration Then
-            pCommonEnd = Date2J(lYear, lMonth, lDay, 24, 0, 0)
+        If IsDateValid(lArr) Then
+            If pAnalysisOverCommonDuration Then
+                pCommonEnd = Date2J(lYear, lMonth, lDay, 24, 0, 0)
+            End If
+        Else
+            Return -99.0
         End If
 
         Return pCommonEnd
     End Function
+
+    Private Function IsDateValid(ByVal aDate() As String) As Boolean
+        Dim isGoodDate As Boolean = True
+        Dim lYear As Integer = aDate(0)
+        Dim lMonth As Integer = aDate(1)
+        Dim lDay As Integer = aDate(2)
+
+        If lMonth > 12 OrElse lMonth < 1 Then
+            isGoodDate = False
+        ElseIf lDay > DayMon(lYear, lMonth) Then
+            isGoodDate = False
+        End If
+        Return isGoodDate
+    End Function
+
 
     Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
         atcDataManager.ShowDisplay(sender.Text, pDataGroup)
@@ -429,7 +479,7 @@ Public Class frmMain
         '                                                    "Separate", "One Graph") = "Separate")
         'End Select
 
-        Dim lTsDailyStreamflow As atctimeseries = pDataGroup(0)
+        Dim lTsDailyStreamflow As atcTimeseries = pDataGroup(0)
 
         Dim lTsBaseflow1 As atcTimeseries = Nothing
         Dim lTsBaseflow2 As atcTimeseries = Nothing
