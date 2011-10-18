@@ -1,8 +1,9 @@
 ﻿Imports atcUtility
+Imports atcUSGSUtility
 Imports System.Text.RegularExpressions
 
 Public Class frmStations
-    Private pHeaderText As String = StationHeaderText
+    Private pHeaderText As String = atcUSGSStations.StationHeaderText
     Private pStationList As atcCollection
     Private pFinalSelectedIndex As Integer
     Private pDataIsDirty As Boolean = False
@@ -34,9 +35,9 @@ Public Class frmStations
         With dgvStationEntries
             For I As Integer = 0 To pStationList.Count - 1
                 .Rows.Add()
-                .Item(0, I).Value = CType(pStationList(I), USGSGWStation).Filename
-                .Item(1, I).Value = CType(pStationList(I), USGSGWStation).DrainageArea.ToString
-                lExtraText = CType(pStationList(I), USGSGWStation).ExtraInfo
+                .Item(0, I).Value = CType(pStationList(I), atcUSGSStations.USGSGWStation).Filename
+                .Item(1, I).Value = CType(pStationList(I), atcUSGSStations.USGSGWStation).DrainageArea.ToString
+                lExtraText = CType(pStationList(I), atcUSGSStations.USGSGWStation).ExtraInfo
                 lMatches = Regex.Matches(lExtraText, "\d+")
                 If lMatches.Count = 0 Then
                     .Item(2, I).Value = ""
@@ -73,7 +74,7 @@ Public Class frmStations
                     If lFld1 <> "" AndAlso lFld2 <> "" Then
                         lFld3 = .Rows(I).Cells(2).EditedFormattedValue.ToString.Trim()
                         lFld4 = .Rows(I).Cells(3).EditedFormattedValue.ToString.Trim()
-                        Dim lNewStation As New USGSGWStation
+                        Dim lNewStation As New atcUSGSStations.USGSGWStation
                         With lNewStation
                             .Filename = lFld1
                             If Not Double.TryParse(lFld2, .DrainageArea) Then .DrainageArea = -99.99

@@ -46,13 +46,18 @@ Partial Class frmMain
         Me.mnuFileSelectData = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuOutput = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuOutputASCII = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuGraphBF = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuAnalysis = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem
         Me.txtOutputRootName = New System.Windows.Forms.TextBox
-        Me.lblScenario = New System.Windows.Forms.Label
-        Me.mnuGraphBF = New System.Windows.Forms.ToolStripMenuItem
+        Me.lblBaseFilename = New System.Windows.Forms.Label
+        Me.gbOutputFileSpecs = New System.Windows.Forms.GroupBox
+        Me.chkTabDelimited = New System.Windows.Forms.CheckBox
+        Me.txtOutputDir = New System.Windows.Forms.TextBox
+        Me.lblOutputDir = New System.Windows.Forms.Label
         Me.gbDates.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
+        Me.gbOutputFileSpecs.SuspendLayout()
         Me.SuspendLayout()
         '
         'Label1
@@ -102,7 +107,7 @@ Partial Class frmMain
         'btnOK
         '
         Me.btnOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOK.Location = New System.Drawing.Point(201, 209)
+        Me.btnOK.Location = New System.Drawing.Point(204, 300)
         Me.btnOK.Name = "btnOK"
         Me.btnOK.Size = New System.Drawing.Size(75, 23)
         Me.btnOK.TabIndex = 23
@@ -112,7 +117,7 @@ Partial Class frmMain
         'btnCancel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnCancel.Location = New System.Drawing.Point(282, 209)
+        Me.btnCancel.Location = New System.Drawing.Point(285, 300)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(75, 23)
         Me.btnCancel.TabIndex = 24
@@ -217,7 +222,7 @@ Partial Class frmMain
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFile, Me.mnuAnalysis, Me.mnuHelp})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(369, 24)
+        Me.MenuStrip1.Size = New System.Drawing.Size(372, 24)
         Me.MenuStrip1.TabIndex = 28
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -225,69 +230,107 @@ Partial Class frmMain
         '
         Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileSelectData, Me.mnuOutput, Me.mnuGraphBF})
         Me.mnuFile.Name = "mnuFile"
-        Me.mnuFile.Size = New System.Drawing.Size(37, 20)
+        Me.mnuFile.Size = New System.Drawing.Size(35, 20)
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
         '
         Me.mnuFileSelectData.Name = "mnuFileSelectData"
-        Me.mnuFileSelectData.Size = New System.Drawing.Size(152, 22)
+        Me.mnuFileSelectData.Size = New System.Drawing.Size(140, 22)
         Me.mnuFileSelectData.Text = "Select Data"
         '
         'mnuOutput
         '
         Me.mnuOutput.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOutputASCII})
         Me.mnuOutput.Name = "mnuOutput"
-        Me.mnuOutput.Size = New System.Drawing.Size(152, 22)
+        Me.mnuOutput.Size = New System.Drawing.Size(140, 22)
         Me.mnuOutput.Text = "Output"
         '
         'mnuOutputASCII
         '
         Me.mnuOutputASCII.Name = "mnuOutputASCII"
-        Me.mnuOutputASCII.Size = New System.Drawing.Size(102, 22)
+        Me.mnuOutputASCII.Size = New System.Drawing.Size(113, 22)
         Me.mnuOutputASCII.Text = "ASCII"
+        '
+        'mnuGraphBF
+        '
+        Me.mnuGraphBF.Name = "mnuGraphBF"
+        Me.mnuGraphBF.Size = New System.Drawing.Size(140, 22)
+        Me.mnuGraphBF.Text = "Graph"
         '
         'mnuAnalysis
         '
         Me.mnuAnalysis.Name = "mnuAnalysis"
-        Me.mnuAnalysis.Size = New System.Drawing.Size(62, 20)
+        Me.mnuAnalysis.Size = New System.Drawing.Size(58, 20)
         Me.mnuAnalysis.Text = "Analysis"
         '
         'mnuHelp
         '
         Me.mnuHelp.Name = "mnuHelp"
-        Me.mnuHelp.Size = New System.Drawing.Size(44, 20)
+        Me.mnuHelp.Size = New System.Drawing.Size(40, 20)
         Me.mnuHelp.Text = "Help"
         '
         'txtOutputRootName
         '
-        Me.txtOutputRootName.Location = New System.Drawing.Point(95, 211)
+        Me.txtOutputRootName.Location = New System.Drawing.Point(114, 49)
         Me.txtOutputRootName.Name = "txtOutputRootName"
-        Me.txtOutputRootName.Size = New System.Drawing.Size(100, 20)
+        Me.txtOutputRootName.Size = New System.Drawing.Size(121, 20)
         Me.txtOutputRootName.TabIndex = 29
         '
-        'lblScenario
+        'lblBaseFilename
         '
-        Me.lblScenario.AutoSize = True
-        Me.lblScenario.Location = New System.Drawing.Point(14, 214)
-        Me.lblScenario.Name = "lblScenario"
-        Me.lblScenario.Size = New System.Drawing.Size(70, 13)
-        Me.lblScenario.TabIndex = 30
-        Me.lblScenario.Text = "Output Name"
+        Me.lblBaseFilename.AutoSize = True
+        Me.lblBaseFilename.Location = New System.Drawing.Point(6, 52)
+        Me.lblBaseFilename.Name = "lblBaseFilename"
+        Me.lblBaseFilename.Size = New System.Drawing.Size(106, 13)
+        Me.lblBaseFilename.TabIndex = 30
+        Me.lblBaseFilename.Text = "Base output filename"
         '
-        'mnuGraphBF
+        'gbOutputFileSpecs
         '
-        Me.mnuGraphBF.Name = "mnuGraphBF"
-        Me.mnuGraphBF.Size = New System.Drawing.Size(152, 22)
-        Me.mnuGraphBF.Text = "Graph"
+        Me.gbOutputFileSpecs.Controls.Add(Me.chkTabDelimited)
+        Me.gbOutputFileSpecs.Controls.Add(Me.txtOutputDir)
+        Me.gbOutputFileSpecs.Controls.Add(Me.lblOutputDir)
+        Me.gbOutputFileSpecs.Controls.Add(Me.txtOutputRootName)
+        Me.gbOutputFileSpecs.Controls.Add(Me.lblBaseFilename)
+        Me.gbOutputFileSpecs.Location = New System.Drawing.Point(18, 208)
+        Me.gbOutputFileSpecs.Name = "gbOutputFileSpecs"
+        Me.gbOutputFileSpecs.Size = New System.Drawing.Size(342, 82)
+        Me.gbOutputFileSpecs.TabIndex = 31
+        Me.gbOutputFileSpecs.TabStop = False
+        Me.gbOutputFileSpecs.Text = "Output Specifications"
+        '
+        'chkTabDelimited
+        '
+        Me.chkTabDelimited.AutoSize = True
+        Me.chkTabDelimited.Location = New System.Drawing.Point(241, 51)
+        Me.chkTabDelimited.Name = "chkTabDelimited"
+        Me.chkTabDelimited.Size = New System.Drawing.Size(91, 17)
+        Me.chkTabDelimited.TabIndex = 33
+        Me.chkTabDelimited.Text = "Tab-Delimited"
+        Me.chkTabDelimited.UseVisualStyleBackColor = True
+        '
+        'txtOutputDir
+        '
+        Me.txtOutputDir.Location = New System.Drawing.Point(78, 20)
+        Me.txtOutputDir.Name = "txtOutputDir"
+        Me.txtOutputDir.Size = New System.Drawing.Size(257, 20)
+        Me.txtOutputDir.TabIndex = 32
+        '
+        'lblOutputDir
+        '
+        Me.lblOutputDir.AutoSize = True
+        Me.lblOutputDir.Location = New System.Drawing.Point(8, 23)
+        Me.lblOutputDir.Name = "lblOutputDir"
+        Me.lblOutputDir.Size = New System.Drawing.Size(68, 13)
+        Me.lblOutputDir.TabIndex = 31
+        Me.lblOutputDir.Text = "Output folder"
         '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(369, 244)
-        Me.Controls.Add(Me.lblScenario)
-        Me.Controls.Add(Me.txtOutputRootName)
+        Me.ClientSize = New System.Drawing.Size(372, 335)
         Me.Controls.Add(Me.gbDates)
         Me.Controls.Add(Me.btnFindStations)
         Me.Controls.Add(Me.btnCancel)
@@ -298,6 +341,7 @@ Partial Class frmMain
         Me.Controls.Add(Me.cboBFMothod)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.MenuStrip1)
+        Me.Controls.Add(Me.gbOutputFileSpecs)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "frmMain"
@@ -306,6 +350,8 @@ Partial Class frmMain
         Me.gbDates.PerformLayout()
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
+        Me.gbOutputFileSpecs.ResumeLayout(False)
+        Me.gbOutputFileSpecs.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -335,6 +381,10 @@ Partial Class frmMain
     Friend WithEvents mnuOutput As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuOutputASCII As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents txtOutputRootName As System.Windows.Forms.TextBox
-    Friend WithEvents lblScenario As System.Windows.Forms.Label
+    Friend WithEvents lblBaseFilename As System.Windows.Forms.Label
     Friend WithEvents mnuGraphBF As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents gbOutputFileSpecs As System.Windows.Forms.GroupBox
+    Friend WithEvents txtOutputDir As System.Windows.Forms.TextBox
+    Friend WithEvents lblOutputDir As System.Windows.Forms.Label
+    Friend WithEvents chkTabDelimited As System.Windows.Forms.CheckBox
 End Class

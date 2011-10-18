@@ -1,5 +1,6 @@
 ﻿Imports atcData
 Imports atcUtility
+Imports atcUSGSUtility
 Imports MapWinUtility
 Imports System.Windows.Forms
 Imports System.Text.RegularExpressions
@@ -22,7 +23,8 @@ Public Class frmMain
     Private pAnalysisOverCommonDuration As Boolean = True
 
     Private pMethod As String = ""
-    Private pScenario As String = ""
+    Private pOutputDir As String = ""
+    Private pBaseOutputFilename As String = ""
     Private pMethodLastDone As String = ""
     Private WithEvents pDataGroup As atcTimeseriesGroup
     Private WithEvents pfrmStations As frmStations
@@ -74,7 +76,9 @@ Public Class frmMain
         End With
 
         pMethod = GetSetting("atcUSGSBaseflow", "Defaults", "Model", "HySep-Fixed")
-        StationInfoFile = GetSetting("atcUSGSBaseflow", "Defaults", "Stations", "Station.txt")
+        pOutputDir = GetSetting("atcUSGSBaseflow", "Defaults", "OutputDir", "")
+        pBaseOutputFilename = GetSetting("atcUSGSBaseflow", "Defaults", "BaseOutputFilename", "")
+        atcUSGSStations.StationInfoFile = GetSetting("atcUSGSBaseflow", "Defaults", "Stations", "Station.txt")
 
         RepopulateForm()
     End Sub
@@ -117,6 +121,8 @@ Public Class frmMain
             lCommonText &= pNoDatesInCommon
         End If
 
+        txtOutputDir.Text = pOutputDir
+        txtOutputRootName.Text = pBaseOutputFilename
     End Sub
 
     Public Function AskUser(ByVal aName As String, _
@@ -182,7 +188,7 @@ Public Class frmMain
             'Set Unit
             Args.SetValue("EnglishUnit", True)
             'Set station.txt
-            Args.SetValue("Station File", StationInfoFile)
+            Args.SetValue("Station File", atcUSGSStations.StationInfoFile)
         End If
         Return lErrMsg
     End Function
@@ -294,31 +300,31 @@ Public Class frmMain
     End Sub
 
     Private Sub btnFindStations_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnFindStations.Click
-        StationInfoFile = FindFile("Locate Station File", StationInfoFile, "txt")
-        SaveSetting("atcUSGSBaseflow", "Defaults", "Stations", StationInfoFile)
-        GetStations()
+        atcUSGSStations.StationInfoFile = FindFile("Locate Station File", atcUSGSStations.StationInfoFile, "txt")
+        SaveSetting("atcUSGSBaseflow", "Defaults", "Stations", atcUSGSStations.StationInfoFile)
+        atcUSGSStations.GetStations()
         pfrmStations = New frmStations()
-        pfrmStations.AskUser(Stations)
+        pfrmStations.AskUser(atcUSGSStations.Stations)
     End Sub
 
     Private Sub StationSelectionChanged(ByVal aSelectedIndex As Integer, ByVal aStationList As atcCollection, ByVal aIsDataDirty As Boolean) Handles pfrmStations.StationInfoChanged
         Dim lStationFilename As String
         Dim lDrainageArea As Double
         If aSelectedIndex >= 0 AndAlso aStationList.Item(aSelectedIndex) IsNot Nothing Then
-            lStationFilename = CType(aStationList.Item(aSelectedIndex), USGSGWStation).Filename
-            lDrainageArea = CType(aStationList.Item(aSelectedIndex), USGSGWStation).DrainageArea
+            lStationFilename = CType(aStationList.Item(aSelectedIndex), atcUSGSStations.USGSGWStation).Filename
+            lDrainageArea = CType(aStationList.Item(aSelectedIndex), atcUSGSStations.USGSGWStation).DrainageArea
             If lDrainageArea < 0 Then lDrainageArea = 0.0
         End If
         txtDrainageArea.Text = lDrainageArea.ToString
 
         If aIsDataDirty Then
-            SaveStations(aStationList, StationInfoFile)
+            atcUSGSStations.SaveStations(aStationList, atcUSGSStations.StationInfoFile)
         End If
     End Sub
 
     Private Sub btnExamineData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnExamineData.Click
         For Each lTs As atcTimeseries In pDataGroup
-            Dim lfrmDataSummary As New frmDataSummary(PrintDataSummary(lTs))
+            Dim lfrmDataSummary As New frmDataSummary(atcUSGSScreen.PrintDataSummary(lTs))
             lfrmDataSummary.txtDataSummary.SelectionStart = 0
             lfrmDataSummary.Show()
         Next
@@ -350,6 +356,12 @@ Public Class frmMain
             lClsBaseFlowCalculator.Open("Baseflow", lArgs)
             lClsBaseFlowCalculator.DataSets.Clear()
             pMethodLastDone = lArgs.GetValue("Method")
+
+            pOutputDir = txtOutputDir.Text.Trim()
+            pBaseOutputFilename = txtOutputRootName.Text.Trim()
+            SaveSetting("atcUSGSBaseflow", "Defaults", "OutputDir", pOutputDir)
+            SaveSetting("atcUSGSBaseflow", "Defaults", "BaseOutputFilename", pBaseOutputFilename)
+
         Catch ex As Exception
             Logger.Msg("Baseflow separation failed: " & vbCrLf & ex.Message, MsgBoxStyle.Critical, "Baseflow separation")
             lErrMsg = ex.Message
@@ -361,8 +373,13 @@ Public Class frmMain
 
     Private Sub mnuOutputASCII_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOutputASCII.Click
         Dim lSpecification As String = ""
-        If pScenario = "" Then
-            Logger.Msg("Please specify an output scenario name", "Baseflow ASCII Output")
+        If Not IO.Directory.Exists(txtOutputDir.Text.Trim()) Then
+            Logger.Msg("Please specify an output directory", "Baseflow ASCII Output")
+            txtOutputDir.Focus()
+            Exit Sub
+        End If
+        If pBaseOutputFilename = "" Then
+            Logger.Msg("Please specify a base output filename", "Baseflow ASCII Output")
             txtOutputRootName.Focus()
             Exit Sub
         End If
@@ -372,27 +389,27 @@ Public Class frmMain
         '    .Title = "Specify Baseflow ASCII output filename"
         'End With
 
-        Dim lDir As String = IO.Path.GetDirectoryName(pDataGroup(0).Attributes.GetValue("History 1").ToString.ToLower.Substring("read from ".Length))
-        Dim FolderBrowserDialog1 As New FolderBrowserDialog
-        With FolderBrowserDialog1
-            ' Desktop is the root folder in the dialog.
-            .RootFolder = Environment.SpecialFolder.Desktop
-            ' Select directory on entry.
-            .SelectedPath = lDir
-            ' Prompt the user with a custom message.
-            .Description = "Specify Baseflow ASCII output directory"
-            If .ShowDialog = DialogResult.OK Then
-                ' Display the selected folder if the user clicked on the OK button.
-                lDir = .SelectedPath
-            End If
-        End With
+        'Dim lDir As String = IO.Path.GetDirectoryName(pDataGroup(0).Attributes.GetValue("History 1").ToString.ToLower.Substring("read from ".Length))
+        'Dim FolderBrowserDialog1 As New FolderBrowserDialog
+        'With FolderBrowserDialog1
+        '    ' Desktop is the root folder in the dialog.
+        '    .RootFolder = Environment.SpecialFolder.Desktop
+        '    ' Select directory on entry.
+        '    .SelectedPath = lDir
+        '    ' Prompt the user with a custom message.
+        '    .Description = "Specify Baseflow ASCII output directory"
+        '    If .ShowDialog = DialogResult.OK Then
+        '        ' Display the selected folder if the user clicked on the OK button.
+        '        lDir = .SelectedPath
+        '    End If
+        'End With
         'If lBaseFileName.Length > 0 AndAlso FileExists(lFileName) Then
         '    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\Software\VB and VBA Program Settings\FindFile\FoundFiles", lBaseFileName, lFileName)
         'End If
-
+        Dim lDir As String = txtOutputDir.Text.Trim()
         If pMethodLastDone.ToUpper.StartsWith("HYSEP") Then
             Dim lFilename As String = IO.Path.GetDirectoryName(pDataGroup(0).Attributes.GetValue("History 1").ToString.ToLower.Substring("read from ".Length))
-            lFilename = IO.Path.Combine(lDir, pScenario & ".SBF")
+            lFilename = IO.Path.Combine(lDir, pBaseOutputFilename & ".SBF")
             ASCIIHySepBSF(pDataGroup(0), lFilename)
             lSpecification = lFilename
 
@@ -411,16 +428,16 @@ Public Class frmMain
             '    '.FilterIndex = 0
             '    .DefaultExt = "SBF"
             'End With
-            Dim lFilename As String = IO.Path.Combine(lDir, pScenario & "_partday.txt")
+            Dim lFilename As String = IO.Path.Combine(lDir, pBaseOutputFilename & "_partday.txt")
             ASCIIPartDaily(pDataGroup(0), lFilename)
-            lFilename = IO.Path.Combine(lDir, pScenario & "_partmon.txt")
+            lFilename = IO.Path.Combine(lDir, pBaseOutputFilename & "_partmon.txt")
             lSpecification = lFilename
             ASCIIPartMonthly(pDataGroup(0), lFilename)
-            lFilename = IO.Path.Combine(lDir, pScenario & "_partqrt.txt")
+            lFilename = IO.Path.Combine(lDir, pBaseOutputFilename & "_partqrt.txt")
             ASCIIPartQuarterly(pDataGroup(0), lFilename)
-            lFilename = IO.Path.Combine(lDir, pScenario & "_partWY.txt")
+            lFilename = IO.Path.Combine(lDir, pBaseOutputFilename & "_partWY.txt")
             ASCIIPartWaterYear(pDataGroup(0), lFilename)
-            lFilename = IO.Path.Combine(lDir, pScenario & "_partsum.txt")
+            lFilename = IO.Path.Combine(lDir, pBaseOutputFilename & "_partsum.txt")
             ASCIIPartBFSum(pDataGroup(0), lFilename)
         End If
 
@@ -454,8 +471,8 @@ Public Class frmMain
     End Sub
 
     Private Sub txtOutputRootName_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtOutputRootName.TextChanged
-        pScenario = txtOutputRootName.Text.Trim()
-        pScenario = pScenario.Replace(" ", "_")
+        pBaseOutputFilename = txtOutputRootName.Text.Trim()
+        pBaseOutputFilename = pBaseOutputFilename.Replace(" ", "_")
     End Sub
 
     Private Sub mnuGraphBF_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuGraphBF.Click
@@ -539,5 +556,31 @@ Public Class frmMain
         'lDataGroup.Clear()
         'lDataGroup = Nothing
 
+    End Sub
+
+    Private Sub txtOutputDir_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOutputDir.Click
+        Dim lDir As String = ""
+        If IO.Directory.Exists(txtOutputDir.Text.Trim()) Then
+            lDir = txtOutputDir.Text.Trim()
+        ElseIf IO.Directory.Exists(pOutputDir) Then
+            lDir = pOutputDir
+        End If
+        Dim FolderBrowserDialog1 As New FolderBrowserDialog
+        With FolderBrowserDialog1
+            ' Desktop is the root folder in the dialog.
+            .RootFolder = Environment.SpecialFolder.Desktop
+            ' Select directory on entry.
+            .SelectedPath = lDir
+            ' Prompt the user with a custom message.
+            .Description = "Specify Baseflow ASCII output directory"
+            If .ShowDialog = DialogResult.OK Then
+                ' Display the selected folder if the user clicked on the OK button.
+                lDir = .SelectedPath
+            End If
+        End With
+        If IO.Directory.Exists(lDir) Then
+            txtOutputDir.Text = lDir
+            pOutputDir = lDir
+        End If
     End Sub
 End Class
