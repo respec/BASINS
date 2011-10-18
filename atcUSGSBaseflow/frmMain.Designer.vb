@@ -47,6 +47,8 @@ Partial Class frmMain
         Me.mnuOutput = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuOutputASCII = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuGraphBF = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuGraphTimeseries = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuGraphProbability = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuAnalysis = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem
         Me.txtOutputRootName = New System.Windows.Forms.TextBox
@@ -230,44 +232,57 @@ Partial Class frmMain
         '
         Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileSelectData, Me.mnuOutput, Me.mnuGraphBF})
         Me.mnuFile.Name = "mnuFile"
-        Me.mnuFile.Size = New System.Drawing.Size(35, 20)
+        Me.mnuFile.Size = New System.Drawing.Size(37, 20)
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
         '
         Me.mnuFileSelectData.Name = "mnuFileSelectData"
-        Me.mnuFileSelectData.Size = New System.Drawing.Size(140, 22)
+        Me.mnuFileSelectData.Size = New System.Drawing.Size(152, 22)
         Me.mnuFileSelectData.Text = "Select Data"
         '
         'mnuOutput
         '
         Me.mnuOutput.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOutputASCII})
         Me.mnuOutput.Name = "mnuOutput"
-        Me.mnuOutput.Size = New System.Drawing.Size(140, 22)
+        Me.mnuOutput.Size = New System.Drawing.Size(152, 22)
         Me.mnuOutput.Text = "Output"
         '
         'mnuOutputASCII
         '
         Me.mnuOutputASCII.Name = "mnuOutputASCII"
-        Me.mnuOutputASCII.Size = New System.Drawing.Size(113, 22)
+        Me.mnuOutputASCII.Size = New System.Drawing.Size(102, 22)
         Me.mnuOutputASCII.Text = "ASCII"
         '
         'mnuGraphBF
         '
+        Me.mnuGraphBF.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuGraphTimeseries, Me.mnuGraphProbability})
         Me.mnuGraphBF.Name = "mnuGraphBF"
-        Me.mnuGraphBF.Size = New System.Drawing.Size(140, 22)
+        Me.mnuGraphBF.Size = New System.Drawing.Size(152, 22)
         Me.mnuGraphBF.Text = "Graph"
+        '
+        'mnuGraphTimeseries
+        '
+        Me.mnuGraphTimeseries.Name = "mnuGraphTimeseries"
+        Me.mnuGraphTimeseries.Size = New System.Drawing.Size(152, 22)
+        Me.mnuGraphTimeseries.Text = "TimeSeries"
+        '
+        'mnuGraphProbability
+        '
+        Me.mnuGraphProbability.Name = "mnuGraphProbability"
+        Me.mnuGraphProbability.Size = New System.Drawing.Size(152, 22)
+        Me.mnuGraphProbability.Text = "Probability"
         '
         'mnuAnalysis
         '
         Me.mnuAnalysis.Name = "mnuAnalysis"
-        Me.mnuAnalysis.Size = New System.Drawing.Size(58, 20)
+        Me.mnuAnalysis.Size = New System.Drawing.Size(62, 20)
         Me.mnuAnalysis.Text = "Analysis"
         '
         'mnuHelp
         '
         Me.mnuHelp.Name = "mnuHelp"
-        Me.mnuHelp.Size = New System.Drawing.Size(40, 20)
+        Me.mnuHelp.Size = New System.Drawing.Size(44, 20)
         Me.mnuHelp.Text = "Help"
         '
         'txtOutputRootName
@@ -387,4 +402,6 @@ Partial Class frmMain
     Friend WithEvents txtOutputDir As System.Windows.Forms.TextBox
     Friend WithEvents lblOutputDir As System.Windows.Forms.Label
     Friend WithEvents chkTabDelimited As System.Windows.Forms.CheckBox
+    Friend WithEvents mnuGraphTimeseries As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuGraphProbability As System.Windows.Forms.ToolStripMenuItem
 End Class
