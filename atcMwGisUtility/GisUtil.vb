@@ -1144,16 +1144,9 @@ Public Class GisUtil
     ''' </summary>
     Public Shared Function PointInPolygon(ByVal aPointLayerIndex As Integer, ByVal aPointIndex As Integer, ByVal aPolygonLayerIndex As Integer) As Integer
         Dim lPointSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aPointLayerIndex)
-        Dim lPolygonSf As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aPolygonLayerIndex)
-        Dim lX As Double, lY As Double
-        lPolygonSf.BeginPointInShapefile()
-        'corrected by LCW 4/24/09
-        'lX = lPointSf.Shape(aPointIndex - 1).Point(0).x
-        'lY = lPointSf.Shape(aPointIndex - 1).Point(0).y
-        lX = lPointSf.Shape(aPointIndex).Point(0).x
-        lY = lPointSf.Shape(aPointIndex).Point(0).y
-        PointInPolygon = lPolygonSf.PointInShapefile(lX, lY)
-        lPolygonSf.EndPointInShapefile()
+        Return PointInPolygonXY(lPointSf.Shape(aPointIndex).Point(0).x, _
+                                lPointSf.Shape(aPointIndex).Point(0).y, _
+                                aPolygonLayerIndex)
     End Function
 
     ''' <summary>
