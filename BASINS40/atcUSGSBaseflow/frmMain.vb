@@ -1,6 +1,8 @@
 ﻿Imports atcData
 Imports atcUtility
 Imports atcUSGSUtility
+Imports atcGraph
+Imports ZedGraph
 Imports MapWinUtility
 Imports System.Windows.Forms
 Imports System.Text.RegularExpressions
@@ -26,6 +28,7 @@ Public Class frmMain
     Private pOutputDir As String = ""
     Private pBaseOutputFilename As String = ""
     Private pMethodLastDone As String = ""
+    Private pDALastUsed As Double = 0.0
     Private WithEvents pDataGroup As atcTimeseriesGroup
     Private WithEvents pfrmStations As frmStations
 
@@ -169,11 +172,6 @@ Public Class frmMain
         If pMethod = "" Then lErrMsg = "- Method not set" & vbCrLf
         Dim lDA As Double = 0.0
         If Not Double.TryParse(txtDrainageArea.Text.Trim, lDA) Then lErrMsg &= "- Drainage Area not set" & vbCrLf
-        If txtOutputRootName.Text.Trim = "" Then
-            lErrMsg &= "- Need to specify an output name" & vbCrLf
-        ElseIf txtOutputRootName.Text.Trim.Length > 25 Then
-            lErrMsg &= "- Output name should be less than 25 characters" & vbCrLf
-        End If
 
         If lErrMsg.Length = 0 Then
             'set method
@@ -294,7 +292,6 @@ Public Class frmMain
         Return isGoodDate
     End Function
 
-
     Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
         atcDataManager.ShowDisplay(sender.Text, pDataGroup)
     End Sub
@@ -335,6 +332,8 @@ Public Class frmMain
     End Sub
 
     Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
+        pDataGroup.Clear()
+        pDataGroup = Nothing
         Me.Dispose()
         Me.Close()
     End Sub
@@ -356,12 +355,7 @@ Public Class frmMain
             lClsBaseFlowCalculator.Open("Baseflow", lArgs)
             lClsBaseFlowCalculator.DataSets.Clear()
             pMethodLastDone = lArgs.GetValue("Method")
-
-            pOutputDir = txtOutputDir.Text.Trim()
-            pBaseOutputFilename = txtOutputRootName.Text.Trim()
-            SaveSetting("atcUSGSBaseflow", "Defaults", "OutputDir", pOutputDir)
-            SaveSetting("atcUSGSBaseflow", "Defaults", "BaseOutputFilename", pBaseOutputFilename)
-
+            pDALastUsed = lArgs.GetValue("Drainage Area")
         Catch ex As Exception
             Logger.Msg("Baseflow separation failed: " & vbCrLf & ex.Message, MsgBoxStyle.Critical, "Baseflow separation")
             lErrMsg = ex.Message
@@ -382,6 +376,8 @@ Public Class frmMain
             Logger.Msg("Please specify a base output filename", "Baseflow ASCII Output")
             txtOutputRootName.Focus()
             Exit Sub
+        Else
+            SaveSetting("atcUSGSBaseflow", "Defaults", "BaseOutputFilename", pBaseOutputFilename)
         End If
         Logger.Dbg("mnuOutputASCII_Click " & pMethod)
         'Dim cdlg As New Windows.Forms.OpenFileDialog
@@ -412,7 +408,10 @@ Public Class frmMain
             lFilename = IO.Path.Combine(lDir, pBaseOutputFilename & ".SBF")
             ASCIIHySepBSF(pDataGroup(0), lFilename)
             lSpecification = lFilename
-
+            If chkTabDelimited.Checked Then
+                lFilename = IO.Path.Combine(lDir, pBaseOutputFilename & "_tab" & ".SBF")
+                ASCIIHySepDelimited(pDataGroup(0), lFilename)
+            End If
             'With cdlg
             '    lFilename = AbsolutePath(lFilename, CurDir)
             '    .FileName = lFilename
@@ -430,13 +429,33 @@ Public Class frmMain
             'End With
             Dim lFilename As String = IO.Path.Combine(lDir, pBaseOutputFilename & "_partday.txt")
             ASCIIPartDaily(pDataGroup(0), lFilename)
+            If chkTabDelimited.Checked Then
+                lFilename = IO.Path.Combine(lDir, pBaseOutputFilename & "_partday_tab.txt")
+                ASCIIPartDailyDelimited(pDataGroup(0), lFilename)
+            End If
+
             lFilename = IO.Path.Combine(lDir, pBaseOutputFilename & "_partmon.txt")
             lSpecification = lFilename
             ASCIIPartMonthly(pDataGroup(0), lFilename)
+            If chkTabDelimited.Checked Then
+                lFilename = IO.Path.Combine(lDir, pBaseOutputFilename & "_partmon_tab.txt")
+                ASCIIPartMonthlyDelimited(pDataGroup(0), lFilename)
+            End If
+
             lFilename = IO.Path.Combine(lDir, pBaseOutputFilename & "_partqrt.txt")
             ASCIIPartQuarterly(pDataGroup(0), lFilename)
+            If chkTabDelimited.Checked Then
+                lFilename = IO.Path.Combine(lDir, pBaseOutputFilename & "_partqrt_tab.txt")
+                ASCIIPartQuarterlyDelimited(pDataGroup(0), lFilename)
+            End If
+
             lFilename = IO.Path.Combine(lDir, pBaseOutputFilename & "_partWY.txt")
             ASCIIPartWaterYear(pDataGroup(0), lFilename)
+            If chkTabDelimited.Checked Then
+                lFilename = IO.Path.Combine(lDir, pBaseOutputFilename & "_partWY_tab.txt")
+                ASCIIPartWaterYearDelim(pDataGroup(0), lFilename)
+            End If
+
             lFilename = IO.Path.Combine(lDir, pBaseOutputFilename & "_partsum.txt")
             ASCIIPartBFSum(pDataGroup(0), lFilename)
         End If
@@ -476,15 +495,19 @@ Public Class frmMain
     End Sub
 
     Private Sub mnuGraphBF_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuGraphBF.Click
+
+    End Sub
+
+    Private Sub mnuGraphTimeseries_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuGraphTimeseries.Click
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
-        DoBFGraph()
+        DoBFGraphTimeseries()
         Me.Cursor = System.Windows.Forms.Cursors.Default
     End Sub
 
-    Public Sub DoBFGraph(Optional ByVal aDataGroup As atcData.atcTimeseriesGroup = Nothing)
+    Public Sub DoBFGraphTimeseries(Optional ByVal aDataGroup As atcData.atcTimeseriesGroup = Nothing)
 
-        Dim lGraphPlugin As New atcGraph.atcGraphPlugin
-        Dim lGraphForm As atcGraph.atcGraphForm
+        'Dim lGraphPlugin As New atcGraph.atcGraphPlugin
+
         'Dim lSeparateGraphs As Boolean = False
         'Select Case pDataGroup.Count
         '    Case 0 : Return
@@ -541,20 +564,165 @@ Public Class frmMain
         Dim lstart As Double = lTsBaseflow1.Attributes.GetValue("SJDay")
         Dim lend As Double = lTsBaseflow1.Attributes.GetValue("EJDay")
         Dim lTsFlow As atcTimeseries = SubsetByDate(lTsDailyStreamflow, lstart, lend, Nothing)
-        lTsFlow.Attributes.SetValue("Units", "Inch")
+        lTsFlow.Attributes.SetValue("Units", "FLOW, IN CUBIC FEET PER SECOND")
         lTsFlow.Attributes.SetValue("YAxis", "LEFT")
 
-        lTsBaseflow1.Attributes.SetValue("Constituent", "Baseflow")
-        lTsBaseflow1.Attributes.SetValue("Units", "Inch")
-        lTsBaseflow1.Attributes.SetValue("YAxis", "LEFT")
+        Dim lTsBF4Graph As atcTimeseries = lTsBaseflow1.Clone()
+        With lTsBF4Graph.Attributes
+            .SetValue("Constituent", "Baseflow")
+            .SetValue("Scenario", "Estimated")
+            .SetValue("Units", "FLOW, IN CUBIC FEET PER SECOND")
+            .SetValue("YAxis", "LEFT")
+        End With
 
         Dim lDataGroup As New atcData.atcTimeseriesGroup
         lDataGroup.Add(lTsFlow)
-        lDataGroup.Add(lTsBaseflow1)
-        lGraphForm = lGraphPlugin.Show(lDataGroup, "Timeseries")
+        lDataGroup.Add(lTsBF4Graph)
+
+        Dim lGraphForm As New atcGraph.atcGraphForm()
         lGraphForm.Icon = Me.Icon
+        Dim lZgc As ZedGraphControl = lGraphForm.ZedGraphCtrl
+        'lGraphForm = lGraphPlugin.Show(lDataGroup, "Timeseries")
+        Dim lGraphTS As New clsGraphTime(lDataGroup, lZgc)
+        lGraphForm.Grapher = lGraphTS
+        With lGraphForm.Grapher.ZedGraphCtrl.GraphPane
+            .YAxis.Type = AxisType.Log
+            .AxisChange()
+            .CurveList.Item(0).Color = Drawing.Color.Red
+            .CurveList.Item(1).Color = Drawing.Color.DarkBlue
+            CType(.CurveList.Item(1), LineItem).Line.Width = 2
+        End With
+        lGraphForm.Show()
         'lDataGroup.Clear()
         'lDataGroup = Nothing
+
+    End Sub
+
+    Private Sub mnuGraphProbability_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuGraphProbability.Click
+        Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
+        Dim lPerUnitArea As Boolean = False
+        Dim lResponse As String = Logger.MsgCustom("Calculate exceedance probability per unit drainage area?", "Per Unit Area Plot", New String() {"Yes", "No"})
+        If lResponse = "Yes" Then
+            lPerUnitArea = True
+        End If
+        DoBFGraphProbability(lPerUnitArea)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+    End Sub
+
+    Private Sub DoBFGraphProbability(ByVal aPerUnitArea As Boolean)
+        Dim lTsDailyStreamflow As atcTimeseries = pDataGroup(0)
+
+        Dim lTsBaseflow1 As atcTimeseries = Nothing
+        Dim lTsBaseflow2 As atcTimeseries = Nothing
+        Dim lTsBaseflow3 As atcTimeseries = Nothing
+
+        Dim lBFDatagroup As atcTimeseriesGroup = lTsDailyStreamflow.Attributes.GetDefinedValue("Baseflow").Value
+        If lBFDatagroup IsNot Nothing Then
+            For Each lTsBF As atcTimeseries In lBFDatagroup
+                If pMethodLastDone.ToLower.StartsWith("hysep") Then
+                    If lTsBF.Attributes.GetValue("Scenario").ToString.ToLower.StartsWith("hysep") Then
+                        lTsBaseflow1 = lTsBF
+                        Exit For
+                    End If
+                ElseIf pMethodLastDone.ToLower.StartsWith("part") Then
+                    Select Case lTsBF.Attributes.GetValue("Scenario")
+                        Case "PartDaily1"
+                            lTsBaseflow1 = lTsBF
+                        Case "PartDaily2"
+                            lTsBaseflow2 = lTsBF
+                        Case "PartDaily3"
+                            lTsBaseflow3 = lTsBF
+                    End Select
+                End If
+            Next
+        Else
+            Logger.Dbg("DoBFGraph: no baseflow data found.")
+            Exit Sub
+        End If
+
+        If pMethodLastDone.ToLower.StartsWith("hysep") Then
+            If lTsBaseflow1 Is Nothing Then
+                Logger.Dbg("DoBFGraph: no baseflow data found.")
+                Exit Sub
+            End If
+        ElseIf pMethodLastDone.ToLower.StartsWith("part") Then
+            If lTsBaseflow1 Is Nothing OrElse lTsBaseflow2 Is Nothing OrElse lTsBaseflow3 Is Nothing Then
+                Logger.Dbg("DoBFGraph: no baseflow data found.")
+                Exit Sub
+            End If
+        End If
+
+        Dim lstart As Double = lTsBaseflow1.Attributes.GetValue("SJDay")
+        Dim lend As Double = lTsBaseflow1.Attributes.GetValue("EJDay")
+        Dim lTsFlow As atcTimeseries = SubsetByDate(lTsDailyStreamflow, lstart, lend, Nothing)
+        Dim lYAxisTitleText As String = "FLOW, IN CUBIC FEET PER SECOND"
+        If aPerUnitArea Then lYAxisTitleText &= " (per unit square mile)"
+        With lTsFlow.Attributes
+            .SetValue("Units", lYAxisTitleText)
+            .SetValue("YAxis", "LEFT")
+        End With
+
+        'TODO: need to construct the curve labels in legend manually
+        'so as not to touch the attributes of the original timeseries!!!
+        Dim lTsBF4Graph As atcTimeseries = lTsBaseflow1.Clone()
+        With lTsBF4Graph.Attributes
+            .SetValue("Constituent", "Baseflow")
+            .SetValue("Scenario", "Estimated")
+            .SetValue("Units", lYAxisTitleText)
+            .SetValue("YAxis", "LEFT")
+        End With
+
+        Dim lTsRunoff As atcTimeseries = lTsFlow - lTsBaseflow1
+        With lTsRunoff.Attributes
+            .SetValue("Constituent", "Runoff")
+            .SetValue("Scenario", "Estimated")
+            .SetValue("Units", lYAxisTitleText)
+            .SetValue("YAxis", "LEFT")
+        End With
+
+        Dim lDataGroup As New atcData.atcTimeseriesGroup
+
+        'Dim lAnnualTsFlow As atcTimeseries = Aggregate(lTsFlow, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+        'Dim lAnnualTsBF As atcTimeseries = Aggregate(lTsBaseflow1, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+        'Dim lAnnualTsRunoff As atcTimeseries = Aggregate(lTsRunoff, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+        'lDataGroup.Add(lAnnualTsFlow)
+        'lDataGroup.Add(lAnnualTsBF)
+        'lDataGroup.Add(lAnnualTsRunoff)
+
+        If aPerUnitArea Then
+            lTsFlow = lTsFlow / pDALastUsed
+            lTsBF4Graph = lTsBF4Graph / pDALastUsed
+            lTsRunoff = lTsRunoff / pDALastUsed
+        End If
+
+        lDataGroup.Add(lTsFlow)
+        lDataGroup.Add(lTsBF4Graph)
+        lDataGroup.Add(lTsRunoff)
+
+        Dim lGraphForm As New atcGraph.atcGraphForm()
+        lGraphForm.Icon = Me.Icon
+        Dim lZgc As ZedGraphControl = lGraphForm.ZedGraphCtrl
+        Dim lGraphTS As New clsGraphProbability(lDataGroup, lZgc)
+        lGraphForm.Grapher = lGraphTS
+        With lGraphForm.Grapher.ZedGraphCtrl.GraphPane
+            .YAxis.Scale.MinAuto = False
+            Dim lScaleMin As Double = 10
+            If aPerUnitArea Then lScaleMin = 0.005
+            .YAxis.Scale.Min = lScaleMin
+            .AxisChange()
+            .CurveList.Item(0).Color = Drawing.Color.Red
+            .CurveList.Item(1).Color = Drawing.Color.DarkBlue
+            'CType(.CurveList.Item(1), LineItem).Line.Width = 2
+            .CurveList.Item(2).Color = Drawing.Color.Cyan
+            With .Legend.FontSpec
+                .IsBold = False
+                .Border.IsVisible = False
+                .Size = 12
+            End With
+            .XAxis.Title.Text = "PERCENTAGE OF TIME FLOW WAS EQUALED OR EXCEEDED"
+        End With
+        lGraphForm.Grapher.ZedGraphCtrl.Refresh()
+        lGraphForm.Show()
 
     End Sub
 
@@ -581,6 +749,7 @@ Public Class frmMain
         If IO.Directory.Exists(lDir) Then
             txtOutputDir.Text = lDir
             pOutputDir = lDir
+            SaveSetting("atcUSGSBaseflow", "Defaults", "OutputDir", pOutputDir)
         End If
     End Sub
 End Class

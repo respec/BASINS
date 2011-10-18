@@ -137,7 +137,7 @@ Module modBaseflowUtil
         lDate = Nothing
     End Sub
 
-    Public Sub ASCIIHySepTabDelimited(ByVal aTs As atcTimeseries, ByVal aFilename As String)
+    Public Sub ASCIIHySepDelimited(ByVal aTs As atcTimeseries, ByVal aFilename As String, Optional ByVal aDelim As String = vbTab)
         Dim lSTAID As String = aTs.Attributes.GetValue("STAID", "12345678")
         Dim lColumnId1 As String = "2" & lSTAID & "   60    3"
         Dim lColumnId2 As String = ("3" & lSTAID).PadRight(16, " ")
@@ -166,7 +166,7 @@ Module modBaseflowUtil
         lSW.WriteLine("Baseflow at lSTAID")
         For I As Integer = 0 To lTsBF.numValues - 1
             J2Date(lTsBF.Dates.Value(I), lDate)
-            lSW.WriteLine(lDate(0) & "/" & lDate(1) & "/" & lDate(2) & vbTab & String.Format("{0:#.00}", lTsBF.Value(I + 1)))
+            lSW.WriteLine(lDate(0) & "/" & lDate(1) & "/" & lDate(2) & aDelim & String.Format("{0:#.00}", lTsBF.Value(I + 1)))
         Next
         lSW.Flush()
         lSW.Close()
@@ -248,6 +248,78 @@ Module modBaseflowUtil
             lDateStr = lDate(0).ToString.PadLeft(9, " ") & _
                        lDate(1).ToString.PadLeft(4, " ") & _
                        lDate(2).ToString.PadLeft(4, " ")
+            lSW.WriteLine(lDayCount & lStreamFlow & lBF1 & lBF2 & lBF3 & lDateStr)
+        Next
+        lSW.Flush()
+        lSW.Close()
+        lSW = Nothing
+    End Sub
+
+    Public Sub ASCIIPartDailyDelimited(ByVal aTS As atcTimeseries, ByVal aFilename As String, Optional ByVal aDelim As String = vbTab)
+        Dim lTsBaseflow1 As atcTimeseries = Nothing
+        Dim lTsBaseflow2 As atcTimeseries = Nothing
+        Dim lTsBaseflow3 As atcTimeseries = Nothing
+
+        Dim lBFDatagroup As atcTimeseriesGroup = aTS.Attributes.GetDefinedValue("Baseflow").Value
+        If lBFDatagroup IsNot Nothing Then
+            For Each lTsBF As atcTimeseries In lBFDatagroup
+                Select Case lTsBF.Attributes.GetValue("Scenario")
+                    Case "PartDaily1"
+                        lTsBaseflow1 = lTsBF
+                    Case "PartDaily2"
+                        lTsBaseflow2 = lTsBF
+                    Case "PartDaily3"
+                        lTsBaseflow3 = lTsBF
+                End Select
+            Next
+        Else
+            Logger.Dbg("ASCIIPartDailyTabDelimited: no baseflow data found.")
+            Exit Sub
+        End If
+
+        If lTsBaseflow1 Is Nothing OrElse lTsBaseflow2 Is Nothing OrElse lTsBaseflow3 Is Nothing Then
+            Logger.Dbg("ASCIIPartDailyTabDelimited: no baseflow data found.")
+            Exit Sub
+        End If
+
+        Dim lstart As Double = lTsBaseflow1.Attributes.GetValue("SJDay")
+        Dim lend As Double = lTsBaseflow1.Attributes.GetValue("EJDay")
+        Dim lTsFlow As atcTimeseries = SubsetByDate(aTS, lstart, lend, Nothing)
+
+        Dim lSW As New IO.StreamWriter(aFilename, False)
+
+        Dim lDate(5) As Integer
+        J2Date(aTS.Dates.Value(0), lDate)
+        Dim lStartingYear As String = lDate(0).ToString
+        J2Date(aTS.Dates.Value(aTS.numValues - 1), lDate)
+        Dim lEndingYear As String = lDate(0).ToString
+
+        lSW.WriteLine(" THIS IS FILE PARTDAY.TXT WHICH GIVES DAILY OUTPUT OF PROGRAM PART. ")
+        lSW.WriteLine(" NOTE -- RESULTS AT THIS SMALL TIME SCALE ARE PROVIDED FOR ")
+        lSW.WriteLine(" THE PURPOSES OF PROGRAM SCREENING AND FOR GRAPHICS, BUT ")
+        lSW.WriteLine(" SHOULD NOT BE REPORTED OR USED QUANTITATIVELY ")
+        lSW.WriteLine("  INPUT FILE = " & IO.Path.GetFileName(aTS.Attributes.GetValue("History 1")))
+        lSW.WriteLine("  STARTING YEAR =" & lStartingYear.PadLeft(6, " "))
+        lSW.WriteLine("  ENDING YEAR =" & lEndingYear.PadLeft(8, " "))
+        lSW.WriteLine("                          BASE FLOW FOR EACH")
+        lSW.WriteLine("                             REQUIREMENT OF  ")
+        lSW.WriteLine("           STREAM         ANTECEDENT RECESSION ")
+        lSW.WriteLine("DAY #" & aDelim & "FLOW" & aDelim & "#1" & aDelim & "#2" & aDelim & "#3" & aDelim & "DATE")
+        Dim lDayCount As String
+        Dim lStreamFlow As String
+        Dim lBF1 As String
+        Dim lBF2 As String
+        Dim lBF3 As String
+        Dim lDateStr As String
+
+        For I As Integer = 0 To lTsFlow.numValues - 1
+            lDayCount = (I + 1).ToString & aDelim
+            lStreamFlow = String.Format("{0:0.00}", lTsFlow.Value(I + 1)) & aDelim
+            lBF1 = String.Format("{0:0.00}", lTsBaseflow1.Value(I + 1)) & aDelim
+            lBF2 = String.Format("{0:0.00}", lTsBaseflow2.Value(I + 1)) & aDelim
+            lBF3 = String.Format("{0:0.00}", lTsBaseflow3.Value(I + 1)) & aDelim
+            J2Date(lTsFlow.Dates.Value(I), lDate)
+            lDateStr = lDate(0) & "/" & lDate(1) & "/" & lDate(2)
             lSW.WriteLine(lDayCount & lStreamFlow & lBF1 & lBF2 & lBF3 & lDateStr)
         Next
         lSW.Flush()
@@ -429,6 +501,100 @@ Module modBaseflowUtil
         lSW.Close()
         lSW = Nothing
         lTsYearly.Clear() : lTsYearly = Nothing
+    End Sub
+
+    Public Sub ASCIIPartMonthlyDelimited(ByVal aTS As atcTimeseries, ByVal aFilename As String, Optional ByVal aDelim As String = vbTab)
+        Dim lTsBaseflowMonthlyDepth As atcTimeseries = Nothing
+        Dim lTsBaseflowDaily As atcTimeseries = Nothing
+        Dim lTotalBaseflowDepth As Double = 0.0
+        Dim lMissingDataMonth As atcCollection = Nothing
+        Dim lDrainageArea As Double = 0.0
+        Dim lBFDatagroup As atcTimeseriesGroup = aTS.Attributes.GetDefinedValue("Baseflow").Value
+        If lBFDatagroup IsNot Nothing Then
+            For Each lTsBF As atcTimeseries In lBFDatagroup
+                If lTsBF.Attributes.GetValue("Scenario") = "PartMonthlyDepth" Then
+                    lTsBaseflowMonthlyDepth = lTsBF
+                    lDrainageArea = lTsBF.Attributes.GetValue("Drainage Area")
+                    lTotalBaseflowDepth = lTsBF.Attributes.GetValue("SumDepth")
+                    lMissingDataMonth = lTsBF.Attributes.GetValue("MissingMonths")
+                    If lTsBaseflowDaily IsNot Nothing Then Exit For
+                ElseIf lTsBF.Attributes.GetValue("Scenario") = "PartDaily1" Then
+                    lTsBaseflowDaily = lTsBF
+                    If lTsBaseflowMonthlyDepth IsNot Nothing Then Exit For
+                End If
+            Next
+        Else
+            Logger.Dbg("ASCIIPartMonthly: no baseflow data found.")
+            Exit Sub
+        End If
+
+        If lTsBaseflowMonthlyDepth Is Nothing Then
+            Logger.Dbg("ASCIIPartMonthly: no baseflow data found.")
+            Exit Sub
+        End If
+
+        Dim lstart As Double = lTsBaseflowDaily.Attributes.GetValue("SJDay")
+        Dim lend As Double = lTsBaseflowDaily.Attributes.GetValue("EJday")
+        Dim lTsFlow As atcTimeseries = SubsetByDate(aTS, lstart, lend, Nothing)
+
+        Dim lSW As New IO.StreamWriter(aFilename, False)
+
+        Dim lDate(5) As Integer
+        J2Date(aTS.Dates.Value(0), lDate)
+        Dim lStartingYear As String = lDate(0).ToString
+        J2Date(aTS.Dates.Value(aTS.numValues - 1), lDate)
+        Dim lEndingYear As String = lDate(0).ToString
+
+        'Monthly stream flow in cfs, then, turn into inches
+        Dim lTotXX As Double = 0.0 ' in inches
+        Dim lTsMonthlyFlowDepth As atcTimeseries = Nothing
+        If lTsMonthlyFlowDepth Is Nothing Then
+            lTsMonthlyFlowDepth = Aggregate(lTsFlow, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame, Nothing)
+            For M As Integer = 1 To lTsMonthlyFlowDepth.numValues
+                If lTsMonthlyFlowDepth.Value(M) = 0 Then
+                    lTsMonthlyFlowDepth.Value(M) = -99.99
+                End If
+            Next
+
+            'Monthly stream flow in inches and flag as -99.99 if month is incomplete
+            'Also determine total of monthly amounts
+            For M As Integer = 1 To lTsMonthlyFlowDepth.numValues
+                J2Date(lTsMonthlyFlowDepth.Dates.Value(M - 1), lDate)
+                If lMissingDataMonth.Keys.Contains(lDate(0).ToString & "_" & lDate(1).ToString.PadLeft(2, "0")) Then
+                    lTsMonthlyFlowDepth.Value(M) = -99.99
+                Else
+                    lTsMonthlyFlowDepth.Value(M) *= DayMon(lDate(0), lDate(1)) / (26.888889 * lDrainageArea)
+                    lTotXX += lTsMonthlyFlowDepth.Value(M)
+                End If
+            Next
+        End If
+
+        lSW.WriteLine(" ")
+        lSW.WriteLine("  THIS IS FILE PARTMON.TXT FOR INPUT FILE: " & IO.Path.GetFileName(aTS.Attributes.GetValue("History 1")))
+        lSW.WriteLine(" ")
+        lSW.WriteLine("  PROGRAM VERSION DATE = JANUARY 2007  ")
+        lSW.WriteLine(" ")
+        lSW.WriteLine(" ")
+        lSW.WriteLine("  MONTHLY STREAMFLOW AND BASEFLOW (INCHES):")
+        lSW.WriteLine("Date" & aDelim & "Flow" & aDelim & "Baseflow")
+        lSW.Flush()
+
+        For I As Integer = 1 To lTsMonthlyFlowDepth.numValues
+            J2Date(lTsMonthlyFlowDepth.Dates.Value(I - 1), lDate)
+            lSW.Write(lDate(0) & "/" & lDate(1) & aDelim)
+            lSW.Write(String.Format("{0:0.00}", lTsMonthlyFlowDepth.Value(I)) & aDelim)
+            lSW.WriteLine(String.Format("{0:0.00}", lTsBaseflowMonthlyDepth.Value(I)))
+        Next
+        lSW.WriteLine(" ")
+        lSW.WriteLine("     TOTAL OF MONTHLY Flow AMOUNTS = " & lTotXX)
+        lSW.WriteLine("     TOTAL OF MONTHLY Baseflow AMOUNTS = " & String.Format("{0:0.0000000}", lTotalBaseflowDepth))
+        lSW.WriteLine(" ")
+        lSW.WriteLine(" RESULTS ON THE MONTHLY TIME SCALE SHOULD BE USED WITH CAUTION. ")
+        lSW.WriteLine(" FILES PARTQRT.TXT AND PARTSUM.TXT GIVE RESULT AT THE")
+        lSW.WriteLine(" CORRECT TIME SCALES (QUARTER YEAR, YEAR, OR MORE). ")
+        lSW.Flush()
+        lSW.Close()
+        lSW = Nothing
     End Sub
 
     ''' <summary>
@@ -674,6 +840,242 @@ Module modBaseflowUtil
 
     End Sub
 
+    Public Sub ASCIIPartQuarterlyDelimited(ByVal aTS As atcTimeseries, ByVal aFilename As String, Optional ByVal aDelim As String = vbTab)
+        Dim lTsBaseflowMonthlyDepth As atcTimeseries = Nothing
+        Dim lTsBaseflowDaily As atcTimeseries = Nothing
+        Dim lTotalBaseflowDepth As Double = 0.0
+        Dim lMissingDataMonth As atcCollection = Nothing
+        Dim lDrainageArea As Double = 0.0
+        Dim lBFDatagroup As atcTimeseriesGroup = aTS.Attributes.GetDefinedValue("Baseflow").Value
+        If lBFDatagroup IsNot Nothing Then
+            For Each lTsBF As atcTimeseries In lBFDatagroup
+                If lTsBF.Attributes.GetValue("Scenario") = "PartMonthlyDepth" Then
+                    lTsBaseflowMonthlyDepth = lTsBF
+                    lDrainageArea = lTsBF.Attributes.GetValue("Drainage Area")
+                    lTotalBaseflowDepth = lTsBF.Attributes.GetValue("SumDepth")
+                    lMissingDataMonth = lTsBF.Attributes.GetValue("MissingMonths")
+                    If lTsBaseflowDaily IsNot Nothing Then Exit For
+                ElseIf lTsBF.Attributes.GetValue("Scenario") = "PartDaily1" Then
+                    lTsBaseflowDaily = lTsBF
+                    If lTsBaseflowMonthlyDepth IsNot Nothing Then Exit For
+                End If
+            Next
+        Else
+            Logger.Dbg("ASCIIPartQuarterly: no baseflow data found.")
+            Exit Sub
+        End If
+
+        If lTsBaseflowMonthlyDepth Is Nothing Then
+            Logger.Dbg("ASCIIPartQuarterly: no baseflow data found.")
+            Exit Sub
+        End If
+
+        Dim lstart As Double = lTsBaseflowDaily.Attributes.GetValue("SJDay")
+        Dim lend As Double = lTsBaseflowDaily.Attributes.GetValue("EJday")
+        Dim lTsFlow As atcTimeseries = SubsetByDate(aTS, lstart, lend, Nothing)
+
+
+        Dim lSW As New IO.StreamWriter(aFilename, False)
+
+        Dim lDate(5) As Integer
+
+        'Monthly stream flow in cfs
+        Dim lTsMonthlyFlowDepth As atcTimeseries = Nothing
+        Dim lTotXX As Double = 0.0
+        If lTsMonthlyFlowDepth Is Nothing Then
+            lTsMonthlyFlowDepth = Aggregate(lTsFlow, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame, Nothing)
+            For M As Integer = 1 To lTsMonthlyFlowDepth.numValues
+                If lTsMonthlyFlowDepth.Value(M) = 0 Then
+                    lTsMonthlyFlowDepth.Value(M) = -99.99
+                End If
+            Next
+            'Monthly stream flow in inches and flag as -99.99 if month is incomplete
+            'Also determine total of monthly amounts
+            For M As Integer = 1 To lTsMonthlyFlowDepth.numValues
+                J2Date(lTsMonthlyFlowDepth.Dates.Value(M - 1), lDate)
+                If lMissingDataMonth.Keys.Contains(lDate(0).ToString & "_" & lDate(1).ToString.PadLeft(2, "0")) Then
+                    lTsMonthlyFlowDepth.Value(M) = -99.99
+                Else
+                    lTsMonthlyFlowDepth.Value(M) *= DayMon(lDate(0), lDate(1)) / (26.888889 * lDrainageArea)
+                    lTotXX += lTsMonthlyFlowDepth.Value(M)
+                End If
+            Next
+        End If
+
+        lSW.WriteLine(" ")
+        lSW.WriteLine("  THIS IS FILE PARTQRT.TXT FOR INPUT FILE: " & IO.Path.GetFileName(aTS.Attributes.GetValue("History 1")))
+        lSW.WriteLine(" ")
+        lSW.WriteLine("  PROGRAM VERSION DATE = JANUARY 2007  ")
+        lSW.WriteLine(" ")
+        lSW.WriteLine(" ")
+        lSW.WriteLine("    " & aDelim & "QUARTER-YEAR STREAMFLOW IN INCHES         ")
+        lSW.WriteLine("    " & aDelim & "---------------------------------          ")
+        lSW.WriteLine("    " & aDelim & "JAN-" & aDelim & "APR-" & aDelim & "JUL-" & aDelim & "OCT-" & aDelim & "YEAR")
+        lSW.WriteLine("Year" & aDelim & "MAR " & aDelim & "JUN " & aDelim & "SEP " & aDelim & "DEC " & aDelim & "TOTAL")
+        lSW.Flush()
+
+        ' 1053 FORMAT (1I6, 5F8.2)
+        Dim lFieldWidth1 As Integer = 6
+        Dim lFieldWidthO As Integer = 8
+        Dim lTsYearly As atcTimeseries = Aggregate(lTsMonthlyFlowDepth, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+        Dim lYearCount As Integer = 1
+        Dim lQuarter1 As Double = 0
+        Dim lQuarter2 As Double = 0
+        Dim lQuarter3 As Double = 0
+        Dim lQuarter4 As Double = 0
+
+        Dim lQuarter1Negative As Boolean = False
+        Dim lQuarter2Negative As Boolean = False
+        Dim lQuarter3Negative As Boolean = False
+        Dim lQuarter4Negative As Boolean = False
+
+        For I As Integer = 1 To lTsMonthlyFlowDepth.numValues
+            J2Date(lTsMonthlyFlowDepth.Dates.Value(I - 1), lDate)
+            Dim lCurrentYear As Integer = lDate(0)
+
+            lQuarter1 = 0
+            lQuarter2 = 0
+            lQuarter3 = 0
+            lQuarter4 = 0
+
+            lQuarter1Negative = False
+            lQuarter2Negative = False
+            lQuarter3Negative = False
+            lQuarter4Negative = False
+
+            For M As Integer = 1 To 12
+                If lDate(1) = M And lDate(0) = lCurrentYear Then 'within a year
+                    Select Case M
+                        Case 1, 2, 3
+                            If lTsMonthlyFlowDepth.Value(I) < -99.0 Then
+                                lQuarter1Negative = True
+                            Else
+                                lQuarter1 += lTsMonthlyFlowDepth.Value(I)
+                            End If
+                        Case 4, 5, 6
+                            If lTsMonthlyFlowDepth.Value(I) < -99.0 Then
+                                lQuarter2Negative = True
+                            Else
+                                lQuarter2 += lTsMonthlyFlowDepth.Value(I)
+                            End If
+                        Case 7, 8, 9
+                            If lTsMonthlyFlowDepth.Value(I) < -99.0 Then
+                                lQuarter3Negative = True
+                            Else
+                                lQuarter3 += lTsMonthlyFlowDepth.Value(I)
+                            End If
+                        Case 10, 11, 12
+                            If lTsMonthlyFlowDepth.Value(I) < -99.0 Then
+                                lQuarter4Negative = True
+                            Else
+                                lQuarter4 += lTsMonthlyFlowDepth.Value(I)
+                            End If
+                    End Select
+                    I += 1
+                    J2Date(lTsMonthlyFlowDepth.Dates.Value(I - 1), lDate)
+                End If
+            Next ' month
+
+            I -= 1
+
+            If lQuarter1Negative Then lQuarter1 = -99.99
+            If lQuarter2Negative Then lQuarter2 = -99.99
+            If lQuarter3Negative Then lQuarter3 = -99.99
+            If lQuarter4Negative Then lQuarter4 = -99.99
+
+            Dim lStrYear As String = lCurrentYear.ToString & aDelim
+            Dim lStrQ1 As String = String.Format("{0:0.00}", lQuarter1) & aDelim
+            Dim lStrQ2 As String = String.Format("{0:0.00}", lQuarter2) & aDelim
+            Dim lStrQ3 As String = String.Format("{0:0.00}", lQuarter3) & aDelim
+            Dim lStrQ4 As String = String.Format("{0:0.00}", lQuarter4) & aDelim
+            Dim lStrQYear As String = String.Format("{0:0.00}", lTsYearly.Value(lYearCount))
+            lSW.WriteLine(lStrYear & lStrQ1 & lStrQ2 & lStrQ3 & lStrQ4 & lStrQYear)
+
+            lYearCount += 1
+        Next 'monthly streamflow in inches
+
+        'print quarterly baseflow values
+        lSW.WriteLine(" ")
+        lSW.WriteLine(" ")
+        lSW.WriteLine("    " & aDelim & "QUARTER-YEAR BASE FLOW IN INCHES          ")
+        lSW.WriteLine("    " & aDelim & "--------------------------------          ")
+        lSW.WriteLine("    " & aDelim & " JAN-" & aDelim & "APR-" & aDelim & "JUL-" & aDelim & "OCT-" & aDelim & "YEAR")
+        lSW.WriteLine("Year" & aDelim & " MAR " & aDelim & "JUN " & aDelim & "SEP " & aDelim & "DEC " & aDelim & "TOTAL")
+
+        Dim lTsBFYearly As atcTimeseries = Aggregate(lTsBaseflowMonthlyDepth, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+        lYearCount = 1
+        For I As Integer = 1 To lTsBaseflowMonthlyDepth.numValues
+            J2Date(lTsBaseflowMonthlyDepth.Dates.Value(I - 1), lDate)
+            Dim lCurrentYear As Integer = lDate(0)
+
+            lQuarter1 = 0
+            lQuarter2 = 0
+            lQuarter3 = 0
+            lQuarter4 = 0
+
+            lQuarter1Negative = False
+            lQuarter2Negative = False
+            lQuarter3Negative = False
+            lQuarter4Negative = False
+
+            For M As Integer = 1 To 12
+                If lDate(1) = M And lDate(0) = lCurrentYear Then 'within a year
+                    Select Case M
+                        Case 1, 2, 3
+                            If lTsBaseflowMonthlyDepth.Value(I) < -99.0 Then
+                                lQuarter1Negative = True
+                            Else
+                                lQuarter1 += lTsBaseflowMonthlyDepth.Value(I)
+                            End If
+                        Case 4, 5, 6
+                            If lTsBaseflowMonthlyDepth.Value(I) < -99.0 Then
+                                lQuarter2Negative = True
+                            Else
+                                lQuarter2 += lTsBaseflowMonthlyDepth.Value(I)
+                            End If
+                        Case 7, 8, 9
+                            If lTsBaseflowMonthlyDepth.Value(I) < -99.0 Then
+                                lQuarter3Negative = True
+                            Else
+                                lQuarter3 += lTsBaseflowMonthlyDepth.Value(I)
+                            End If
+                        Case 10, 11, 12
+                            If lTsBaseflowMonthlyDepth.Value(I) < -99.0 Then
+                                lQuarter4Negative = True
+                            Else
+                                lQuarter4 += lTsBaseflowMonthlyDepth.Value(I)
+                            End If
+                    End Select
+                    I += 1
+                    J2Date(lTsBaseflowMonthlyDepth.Dates.Value(I - 1), lDate)
+                End If
+            Next ' month
+
+            I -= 1
+
+            If lQuarter1Negative Then lQuarter1 = -99.99
+            If lQuarter2Negative Then lQuarter2 = -99.99
+            If lQuarter3Negative Then lQuarter3 = -99.99
+            If lQuarter4Negative Then lQuarter4 = -99.99
+
+            Dim lStrYear As String = lCurrentYear.ToString & aDelim
+            Dim lStrQ1 As String = String.Format("{0:0.00}", lQuarter1) & aDelim
+            Dim lStrQ2 As String = String.Format("{0:0.00}", lQuarter2) & aDelim
+            Dim lStrQ3 As String = String.Format("{0:0.00}", lQuarter3) & aDelim
+            Dim lStrQ4 As String = String.Format("{0:0.00}", lQuarter4) & aDelim
+            Dim lStrQYear As String = String.Format("{0:0.00}", lTsBFYearly.Value(lYearCount))
+            lSW.WriteLine(lStrYear & lStrQ1 & lStrQ2 & lStrQ3 & lStrQ4 & lStrQYear)
+
+            lYearCount += 1
+        Next 'monthly streamflow in inches
+
+        lSW.Flush()
+        lSW.Close()
+        lSW = Nothing
+        lTsYearly.Clear() : lTsYearly = Nothing
+
+    End Sub
+
     ''' <summary>
     ''' PART ASCII output, partsum.txt
     ''' </summary>
@@ -848,4 +1250,55 @@ Module modBaseflowUtil
         lWaterYear = Nothing
     End Sub
 
+    Public Sub ASCIIPartWaterYearDelim(ByVal aTs As atcTimeseries, ByVal aFilename As String, Optional ByVal aDelim As String = vbTab)
+        Dim lTsBaseflowMonthlyDepth As atcTimeseries = Nothing
+        Dim lBFDatagroup As atcTimeseriesGroup = aTs.Attributes.GetDefinedValue("Baseflow").Value
+        If lBFDatagroup IsNot Nothing Then
+            For Each lTsBF As atcTimeseries In lBFDatagroup
+                If lTsBF.Attributes.GetValue("Scenario") = "PartMonthlyDepth" Then
+                    lTsBaseflowMonthlyDepth = lTsBF
+                    Exit For
+                End If
+            Next
+        Else
+            Logger.Dbg("ASCIIPartWaterYear: no baseflow data found.")
+            Exit Sub
+        End If
+
+        If lTsBaseflowMonthlyDepth Is Nothing Then
+            Logger.Dbg("ASCIIPartWaterYear: no baseflow data found.")
+            Exit Sub
+        End If
+
+        Dim lSW As New IO.StreamWriter(aFilename, False)
+        Dim lWaterYear As New atcSeasonsWaterYear
+        Dim lWaterYearCollection As atcTimeseriesGroup = lWaterYear.Split(lTsBaseflowMonthlyDepth, Nothing)
+
+        'write file header
+        lSW.WriteLine(" Results on the basis of the ")
+        lSW.WriteLine(" water year (Oct 1 to Sept 30) ")
+        lSW.WriteLine(" ")
+        lSW.WriteLine("  Year " & aDelim & " Total ")
+        lSW.WriteLine(" ------" & aDelim & "----- ")
+
+        'write results
+        Dim lDate(5) As Integer
+        For Each lTsWaterYear As atcTimeseries In lWaterYearCollection
+            If lTsWaterYear.Attributes.GetValue("Count") = 12 Then
+                'a full water year, then write out
+                J2Date(lTsWaterYear.Dates.Value(0), lDate)
+                lSW.Write("Oct " & lDate(0))
+                J2Date(lTsWaterYear.Dates.Value(lTsWaterYear.numValues), lDate)
+                lSW.Write(" to Sept " & lDate(0) & aDelim)
+                lSW.WriteLine(String.Format("{0:0.00}", lTsWaterYear.Attributes.GetValue("Sum")))
+            Else
+                'not a full water year, ignore
+            End If
+        Next
+        lSW.Flush()
+        lSW.Close()
+        lSW = Nothing
+        lWaterYearCollection.Clear() : lWaterYearCollection = Nothing
+        lWaterYear = Nothing
+    End Sub
 End Module
