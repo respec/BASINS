@@ -32,6 +32,9 @@ Public Class frmMain
     Private WithEvents pDataGroup As atcTimeseriesGroup
     Private WithEvents pfrmStations As frmStations
 
+    Public Opened As Boolean = False
+    Private pDidBFSeparation As Boolean = False
+
     Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing, _
                       Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing, _
                       Optional ByVal aShowForm As Boolean = True)
@@ -356,6 +359,7 @@ Public Class frmMain
             lClsBaseFlowCalculator.DataSets.Clear()
             pMethodLastDone = lArgs.GetValue("Method")
             pDALastUsed = lArgs.GetValue("Drainage Area")
+            pDidBFSeparation = True
         Catch ex As Exception
             Logger.Msg("Baseflow separation failed: " & vbCrLf & ex.Message, MsgBoxStyle.Critical, "Baseflow separation")
             lErrMsg = ex.Message
@@ -366,7 +370,14 @@ Public Class frmMain
     End Sub
 
     Private Sub mnuOutputASCII_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOutputASCII.Click
+        If Not pDidBFSeparation Then
+            Logger.Msg("Need to perform baseflow separation first.")
+            Exit Sub
+        End If
         Dim lSpecification As String = ""
+        If pDataGroup Is Nothing OrElse pDataGroup.Count = 0 OrElse Not pDidBFSeparation Then
+            Exit Sub
+        End If
         If Not IO.Directory.Exists(txtOutputDir.Text.Trim()) Then
             Logger.Msg("Please specify an output directory", "Baseflow ASCII Output")
             txtOutputDir.Focus()
@@ -499,6 +510,10 @@ Public Class frmMain
     End Sub
 
     Private Sub mnuGraphTimeseries_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuGraphTimeseries.Click
+        If Not pDidBFSeparation Then
+            Logger.Msg("Need to perform baseflow separation first.")
+            Exit Sub
+        End If
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
         DoBFGraphTimeseries()
         Me.Cursor = System.Windows.Forms.Cursors.Default
@@ -518,7 +533,9 @@ Public Class frmMain
         '                                                    "Do not ask again", "BASINS", "SWSTAT", "SeparateFreqGraphs", _
         '                                                    "Separate", "One Graph") = "Separate")
         'End Select
-
+        If pDataGroup Is Nothing OrElse pDataGroup.Count = 0 Then
+            Exit Sub
+        End If
         Dim lTsDailyStreamflow As atcTimeseries = pDataGroup(0)
 
         Dim lTsBaseflow1 As atcTimeseries = Nothing
@@ -599,6 +616,10 @@ Public Class frmMain
     End Sub
 
     Private Sub mnuGraphProbability_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuGraphProbability.Click
+        If Not pDidBFSeparation Then
+            Logger.Msg("Need to perform baseflow separation first.")
+            Exit Sub
+        End If
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
         Dim lPerUnitArea As Boolean = False
         Dim lResponse As String = Logger.MsgCustom("Calculate exceedance probability per unit drainage area?", "Per Unit Area Plot", New String() {"Yes", "No"})
@@ -610,6 +631,9 @@ Public Class frmMain
     End Sub
 
     Private Sub DoBFGraphProbability(ByVal aPerUnitArea As Boolean)
+        If pDataGroup Is Nothing OrElse pDataGroup.Count = 0 Then
+            Exit Sub
+        End If
         Dim lTsDailyStreamflow As atcTimeseries = pDataGroup(0)
 
         Dim lTsBaseflow1 As atcTimeseries = Nothing
@@ -751,5 +775,17 @@ Public Class frmMain
             pOutputDir = lDir
             SaveSetting("atcUSGSBaseflow", "Defaults", "OutputDir", pOutputDir)
         End If
+    End Sub
+
+    Private Sub frmMain_Disposed(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Disposed
+        If pDataGroup IsNot Nothing Then
+            pDataGroup.Clear()
+            pDataGroup = Nothing
+        End If
+        Opened = False
+    End Sub
+
+    Private Sub frmMain_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        Opened = True
     End Sub
 End Class
