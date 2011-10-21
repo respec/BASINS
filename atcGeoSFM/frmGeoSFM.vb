@@ -139,12 +139,12 @@ Public Class frmGeoSFM
     Friend WithEvents TabPage9 As System.Windows.Forms.TabPage
     Friend WithEvents Label53 As System.Windows.Forms.Label
     Friend WithEvents AtcText1 As atcControls.atcText
-    Friend WithEvents ComboBox46 As System.Windows.Forms.ComboBox
+    Friend WithEvents cboReach As System.Windows.Forms.ComboBox
     Friend WithEvents Label52 As System.Windows.Forms.Label
-    Friend WithEvents ComboBox44 As System.Windows.Forms.ComboBox
+    Friend WithEvents cboSubbasin As System.Windows.Forms.ComboBox
     Friend WithEvents Label50 As System.Windows.Forms.Label
     Friend WithEvents Label51 As System.Windows.Forms.Label
-    Friend WithEvents ComboBox45 As System.Windows.Forms.ComboBox
+    Friend WithEvents cboDEM As System.Windows.Forms.ComboBox
     Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
     Friend WithEvents Label54 As System.Windows.Forms.Label
     Friend WithEvents Label55 As System.Windows.Forms.Label
@@ -169,7 +169,7 @@ Public Class frmGeoSFM
     Friend WithEvents TabPage5 As System.Windows.Forms.TabPage
     Friend WithEvents TabPage6 As System.Windows.Forms.TabPage
     Friend WithEvents TabPage11 As System.Windows.Forms.TabPage
-    Friend WithEvents Button1 As System.Windows.Forms.Button
+    Friend WithEvents cmdTerrainNext As System.Windows.Forms.Button
     Friend WithEvents Button2 As System.Windows.Forms.Button
     Friend WithEvents Button3 As System.Windows.Forms.Button
     Friend WithEvents Button4 As System.Windows.Forms.Button
@@ -189,15 +189,15 @@ Public Class frmGeoSFM
         Me.cmdAbout = New System.Windows.Forms.Button
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage9 = New System.Windows.Forms.TabPage
-        Me.Button1 = New System.Windows.Forms.Button
+        Me.cmdTerrainNext = New System.Windows.Forms.Button
         Me.Label53 = New System.Windows.Forms.Label
         Me.AtcText1 = New atcControls.atcText
-        Me.ComboBox46 = New System.Windows.Forms.ComboBox
+        Me.cboReach = New System.Windows.Forms.ComboBox
         Me.Label52 = New System.Windows.Forms.Label
-        Me.ComboBox44 = New System.Windows.Forms.ComboBox
+        Me.cboSubbasin = New System.Windows.Forms.ComboBox
         Me.Label50 = New System.Windows.Forms.Label
         Me.Label51 = New System.Windows.Forms.Label
-        Me.ComboBox45 = New System.Windows.Forms.ComboBox
+        Me.cboDEM = New System.Windows.Forms.ComboBox
         Me.TabPage7 = New System.Windows.Forms.TabPage
         Me.Button2 = New System.Windows.Forms.Button
         Me.Label19 = New System.Windows.Forms.Label
@@ -405,15 +405,15 @@ Public Class frmGeoSFM
         '
         'TabPage9
         '
-        Me.TabPage9.Controls.Add(Me.Button1)
+        Me.TabPage9.Controls.Add(Me.cmdTerrainNext)
         Me.TabPage9.Controls.Add(Me.Label53)
         Me.TabPage9.Controls.Add(Me.AtcText1)
-        Me.TabPage9.Controls.Add(Me.ComboBox46)
+        Me.TabPage9.Controls.Add(Me.cboReach)
         Me.TabPage9.Controls.Add(Me.Label52)
-        Me.TabPage9.Controls.Add(Me.ComboBox44)
+        Me.TabPage9.Controls.Add(Me.cboSubbasin)
         Me.TabPage9.Controls.Add(Me.Label50)
         Me.TabPage9.Controls.Add(Me.Label51)
-        Me.TabPage9.Controls.Add(Me.ComboBox45)
+        Me.TabPage9.Controls.Add(Me.cboDEM)
         Me.TabPage9.Location = New System.Drawing.Point(4, 46)
         Me.TabPage9.Name = "TabPage9"
         Me.TabPage9.Size = New System.Drawing.Size(647, 396)
@@ -421,16 +421,16 @@ Public Class frmGeoSFM
         Me.TabPage9.Text = "Terrain Analysis"
         Me.TabPage9.UseVisualStyleBackColor = True
         '
-        'Button1
+        'cmdTerrainNext
         '
-        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Button1.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.Button1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button1.Location = New System.Drawing.Point(555, 350)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(73, 28)
-        Me.Button1.TabIndex = 39
-        Me.Button1.Text = "Next >"
+        Me.cmdTerrainNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdTerrainNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdTerrainNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdTerrainNext.Location = New System.Drawing.Point(555, 350)
+        Me.cmdTerrainNext.Name = "cmdTerrainNext"
+        Me.cmdTerrainNext.Size = New System.Drawing.Size(73, 28)
+        Me.cmdTerrainNext.TabIndex = 39
+        Me.cmdTerrainNext.Text = "Next >"
         '
         'Label53
         '
@@ -464,16 +464,16 @@ Public Class frmGeoSFM
         Me.AtcText1.ValueDouble = 1000
         Me.AtcText1.ValueInteger = 1000
         '
-        'ComboBox46
+        'cboReach
         '
-        Me.ComboBox46.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.cboReach.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ComboBox46.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboBox46.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.ComboBox46.Location = New System.Drawing.Point(121, 54)
-        Me.ComboBox46.Name = "ComboBox46"
-        Me.ComboBox46.Size = New System.Drawing.Size(403, 21)
-        Me.ComboBox46.TabIndex = 31
+        Me.cboReach.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboReach.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboReach.Location = New System.Drawing.Point(121, 54)
+        Me.cboReach.Name = "cboReach"
+        Me.cboReach.Size = New System.Drawing.Size(403, 21)
+        Me.cboReach.TabIndex = 31
         '
         'Label52
         '
@@ -486,16 +486,16 @@ Public Class frmGeoSFM
         Me.Label52.Text = "River Shapefile:"
         Me.Label52.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
-        'ComboBox44
+        'cboSubbasin
         '
-        Me.ComboBox44.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.cboSubbasin.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ComboBox44.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboBox44.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.ComboBox44.Location = New System.Drawing.Point(121, 27)
-        Me.ComboBox44.Name = "ComboBox44"
-        Me.ComboBox44.Size = New System.Drawing.Size(403, 21)
-        Me.ComboBox44.TabIndex = 29
+        Me.cboSubbasin.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboSubbasin.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboSubbasin.Location = New System.Drawing.Point(121, 27)
+        Me.cboSubbasin.Name = "cboSubbasin"
+        Me.cboSubbasin.Size = New System.Drawing.Size(403, 21)
+        Me.cboSubbasin.TabIndex = 29
         '
         'Label50
         '
@@ -519,16 +519,16 @@ Public Class frmGeoSFM
         Me.Label51.Text = "DEM Grid:"
         Me.Label51.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
-        'ComboBox45
+        'cboDEM
         '
-        Me.ComboBox45.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.cboDEM.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ComboBox45.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboBox45.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.ComboBox45.Location = New System.Drawing.Point(121, 81)
-        Me.ComboBox45.Name = "ComboBox45"
-        Me.ComboBox45.Size = New System.Drawing.Size(403, 21)
-        Me.ComboBox45.TabIndex = 27
+        Me.cboDEM.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboDEM.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboDEM.Location = New System.Drawing.Point(121, 81)
+        Me.cboDEM.Name = "cboDEM"
+        Me.cboDEM.Size = New System.Drawing.Size(403, 21)
+        Me.cboDEM.TabIndex = 27
         '
         'TabPage7
         '
@@ -2173,11 +2173,236 @@ Public Class frmGeoSFM
     End Sub
 
     Public Sub InitializeUI(ByVal aPlugIn As PlugIn)
-        
+
+        'set choices for dem layer
+        For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
+            Dim lLayerName As String = GisUtil.LayerName(lLayerIndex)
+            If GisUtil.LayerType(lLayerIndex) = MapWindow.Interfaces.eLayerType.Grid Then
+                cboDEM.Items.Add(lLayerName)
+                If GisUtil.LayerFileName(lLayerIndex).IndexOf("\demg\") >= 0 Or GisUtil.LayerFileName(lLayerIndex).IndexOf("\dem\") >= 0 Then
+                    cboDEM.SelectedIndex = cboDEM.Items.Count - 1
+                ElseIf GisUtil.LayerFileName(lLayerIndex).IndexOf("\ned\") >= 0 Then
+                    cboDEM.SelectedIndex = cboDEM.Items.Count - 1
+                End If
+            End If
+        Next lLayerIndex
+        If cboDEM.SelectedIndex = -1 Then
+            cmdTerrainNext.Enabled = False
+        End If
+
+        'set reach layer
+        cboReach.Items.Add("<none>")
+        For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
+            If GisUtil.LayerType(lLayerIndex) = MapWindow.Interfaces.eLayerType.LineShapefile Then
+                cboReach.Items.Add(GisUtil.LayerName(lLayerIndex))
+                If GisUtil.LayerFileName(lLayerIndex).IndexOf("\nhd\") >= 0 Then
+                    cboReach.SelectedIndex = cboReach.Items.Count - 1
+                End If
+            End If
+        Next lLayerIndex
+
+        'set subbasin layer
+        cboSubbasin.Items.Add("<none>")
+        For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
+            If GisUtil.LayerType(lLayerIndex) = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
+                cboSubbasin.Items.Add(GisUtil.LayerName(lLayerIndex))
+                If GisUtil.CurrentLayer = lLayerIndex Then 'this is the current layer
+                    cboSubbasin.SelectedIndex = cboSubbasin.Items.Count - 1
+                End If
+            End If
+        Next lLayerIndex
+        If cboSubbasin.SelectedIndex = -1 Then 'make a guess
+            cboSubbasin.SelectedIndex = cboSubbasin.Items.IndexOf("Cataloging Unit Boundaries")
+        End If
+
     End Sub
 
     Private Sub lblStatus_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lblStatus.TextChanged
         Logger.Dbg(lblStatus.Text)
     End Sub
 
+    Private Sub cmdTerrainNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdTerrainNext.Click
+
+        Dim lDEMLayerName As String = cboDEM.Items(cboDEM.SelectedIndex)
+        Dim lElevationLayerIndex As Integer = GisUtil.LayerIndex(lDEMLayerName)
+        Dim lDEMFileName As String = GisUtil.LayerFileName(lElevationLayerIndex)
+
+
+        'innames = {"Corrected DEM", "Flow Direction Grid", "Flow Accumulation Grid", "Downstream Flow Length", "Stream Grid", "Stream Link Grid", "Outlet Grid", "Subbasin Grid", "Hill Length Grid", "Hill Slope Grid", "Downstream Grid"} 
+        'defaults = {"Elevations", "FlowDir", "FlowAcc", "FlowLen",  "Streams", "StrLinks", "Outlets", "Basins", "Hilllength", "Slope", "Downstream"}
+
+        'using the DEM grid, compute:
+        Dim lDEMLayerIndex As Integer = GisUtil.LayerIndex(lDEMLayerName)
+
+        'pit fill 
+        Dim lPitFillDEMLayerName As String = "Corrected DEM"
+        Dim lPitFillDEMLayerIndex As Integer = 0
+        Dim lPitFillDEMFileName As String = ""
+        If GisUtil.IsLayer(lPitFillDEMLayerName) Then
+            lPitFillDEMLayerIndex = GisUtil.LayerIndex(lPitFillDEMLayerName)
+            lPitFillDEMFileName = GisUtil.LayerFileName(lPitFillDEMLayerIndex)
+        Else
+            lPitFillDEMFileName = FilenameNoExt(lDEMFileName) & "PitFill.tif"
+            MapWinGeoProc.Hydrology.Fill(lDEMFileName, lPitFillDEMFileName, False)
+            GisUtil.AddLayer(lPitFillDEMFileName, lPitFillDEMLayerName)
+        End If
+
+        '"Flow Direction Grid" (Slope grid also gets produced here)
+        Dim lFlowDirGridLayerName As String = "Flow Direction Grid"
+        Dim lFlowDirGridLayerIndex As Integer = 0
+        Dim lFlowDirGridFileName As String = ""
+        Dim lSlopeGridLayerName As String = "Slope Grid"
+        Dim lSlopeGridLayerIndex As Integer = 0
+        Dim lSlopeGridFileName As String = ""
+        If GisUtil.IsLayer(lFlowDirGridLayerName) And GisUtil.IsLayer(lSlopeGridLayerName) Then
+            lFlowDirGridLayerIndex = GisUtil.LayerIndex(lFlowDirGridLayerName)
+            lFlowDirGridFileName = GisUtil.LayerFileName(lFlowDirGridLayerIndex)
+            lSlopeGridLayerIndex = GisUtil.LayerIndex(lSlopeGridLayerName)
+            lSlopeGridFileName = GisUtil.LayerFileName(lSlopeGridLayerIndex)
+        Else
+            lFlowDirGridFileName = FilenameNoExt(lDEMFileName) & "FlowDir.tif"
+            lSlopeGridFileName = FilenameNoExt(lDEMFileName) & "Slope.tif"
+            Dim lRet As Integer = MapWinGeoProc.Hydrology.D8(lPitFillDEMFileName, lFlowDirGridFileName, lSlopeGridFileName, Nothing)
+            GisUtil.AddLayer(lFlowDirGridFileName, lFlowDirGridLayerName)
+            GisUtil.AddLayer(lSlopeGridFileName, lSlopeGridLayerName)
+        End If
+
+        '"Flow Accumulation Grid"
+        Dim lFlowAccGridLayerName As String = "Flow Accumulation Grid"
+        Dim lFlowAccGridLayerIndex As Integer = 0
+        Dim lFlowAccGridFileName As String = ""
+        If GisUtil.IsLayer(lFlowAccGridLayerName) Then
+            lFlowAccGridLayerIndex = GisUtil.LayerIndex(lFlowAccGridLayerName)
+            lFlowAccGridFileName = GisUtil.LayerFileName(lFlowAccGridLayerIndex)
+        Else
+            lFlowAccGridFileName = FilenameNoExt(lDEMFileName) & "FlowAcc.tif"
+            Dim lRet As Integer = MapWinGeoProc.Hydrology.AreaD8(lFlowDirGridFileName, "", lFlowAccGridFileName, False, False, Nothing)
+            GisUtil.AddLayer(lFlowAccGridFileName, lFlowAccGridLayerName)
+        End If
+
+
+        Dim lThresh As Integer = AtcText1.ValueInteger
+        Dim lStrahlOrdResultGridFileName As String = FilenameNoExt(lDEMFileName) & "Strahl.tif"
+        Dim lLongUpslopeResultGridFileName As String = FilenameNoExt(lDEMFileName) & "LongUp.tif"
+        Dim lTotalUpslopeResultGridFileName As String = FilenameNoExt(lDEMFileName) & "TotUp.tif"
+        Dim lStreamResultGridFileName As String = FilenameNoExt(lDEMFileName) & "Stream.tif"
+        Dim lStreamOrderResultGridFileName As String = FilenameNoExt(lDEMFileName) & "StreamOrder.tif"
+        Dim lTreeDatResultFileName As String = FilenameNoExt(lDEMFileName) & "Tree.Dat"
+        Dim lCoordDatResultFileName As String = FilenameNoExt(lDEMFileName) & "Coord.Dat"
+        Dim lStreamShapeResultFileName As String = FilenameNoExt(lDEMFileName) & "StreamsShape.shp"
+        Dim lWatershedResultGridFileName As String = FilenameNoExt(lDEMFileName) & "Watershed.tif"
+
+        MapWinGeoProc.Hydrology.DelinStreamGrids(lDEMFileName, lPitFillDEMFileName, lFlowDirGridFileName, lSlopeGridFileName, lFlowAccGridFileName, "", lStrahlOrdResultGridFileName, lLongUpslopeResultGridFileName, lTotalUpslopeResultGridFileName, lStreamResultGridFileName, lStreamOrderResultGridFileName, lTreeDatResultFileName, lCoordDatResultFileName, lThresh, False, False, Nothing)
+
+        MapWinGeoProc.Hydrology.DelinStreamsAndSubBasins(lFlowDirGridFileName, lTreeDatResultFileName, lCoordDatResultFileName, lStreamShapeResultFileName, lWatershedResultGridFileName, Nothing)
+
+
+
+
+
+
+
+
+
+
+
+
+        '"Downstream Flow Length"
+        'dflgrid = fdrgrid.FlowLength(Nil, FALSE)
+        'don't seem to have a direct way to do this one?
+
+        'Dim lFlowLenGridLayerName As String = "Downstream Flow Length"
+        'Dim lFlowLenGridLayerIndex As Integer = 0
+        'Dim lFlowLenGridFileName As String = ""
+        'Dim lStrahlOrdResultGridFileName As String = ""
+        'Dim lLongUpslopeResultGridFileName As String = ""
+        'Dim lTotalUpslopeResultGridFileName As String = ""
+        'If GisUtil.IsLayer(lFlowLenGridLayerName) Then
+        '    lFlowLenGridLayerIndex = GisUtil.LayerIndex(lFlowLenGridLayerName)
+        '    lFlowLenGridFileName = GisUtil.LayerFileName(lFlowLenGridLayerIndex)
+        'Else
+        '    lFlowLenGridFileName = FilenameNoExt(lDEMFileName) & "FlowLen.tif"
+        '    lStrahlOrdResultGridFileName = FilenameNoExt(lDEMFileName) & "Strahl.tif"
+        '    lLongUpslopeResultGridFileName = FilenameNoExt(lDEMFileName) & "LongUp.tif"
+        '    lTotalUpslopeResultGridFileName = FilenameNoExt(lDEMFileName) & "TotUp.tif"
+        '    Dim lRet As Integer = MapWinGeoProc.Hydrology.PathLength(lFlowDirGridFileName, lStrahlOrdResultGridFileName, lLongUpslopeResultGridFileName, lTotalUpslopeResultGridFileName, Nothing)
+        '    'GisUtil.AddLayer(lFlowLenGridFileName, lFlowLenGridLayerName)
+        'End If
+
+        ''"Stream Grid"
+        'Dim lStreamGridLayerName As String = "Stream Grid"
+        'Dim lStreamLayerName As String = cboReach.Items(cboReach.SelectedIndex)
+        'If lStreamLayerName = "<none>" Then
+        '    Dim lInputGrid As New MapWinGIS.Grid
+        '    lInputGrid.Open(lFlowAccGridFileName)
+
+        '    Dim lStreamGridFileName As String = FilenameNoExt(lDEMFileName) & "Stream.tif"
+        '    System.IO.File.Copy(lFlowAccGridFileName, lStreamGridFileName)
+
+        '    Dim lOutputGrid As New MapWinGIS.Grid
+        '    lOutputGrid.Open(lFlowAccGridFileName)
+
+        '    Dim lStartCol As Integer = 0
+        '    Dim lEndCol As Integer = lInputGrid.Header.NumberCols
+        '    Dim lStartRow As Integer = 0
+        '    Dim lEndRow As Integer = lInputGrid.Header.NumberRows
+
+        '    For lCol As Integer = lStartCol To lEndCol
+        '        For lRow As Integer = lStartRow To lEndRow
+        '            If (lInputGrid.Value(lCol, lRow) <> lOutputGrid.Header.NodataValue) AndAlso Not lInputGrid.Value(lCol, lRow) > lThresh Then
+        '                lOutputGrid.Value(lCol, lRow) = lOutputGrid.Header.NodataValue
+        '            End If
+        '        Next lRow
+        '    Next lCol
+
+        '    lInputGrid.Close()
+        '    lInputGrid = Nothing
+
+        '    lOutputGrid.Save()
+        '    lOutputGrid.Close()
+        '    lOutputGrid = Nothing
+        '    GisUtil.AddLayer(lStreamGridFileName, lStreamGridLayerName)
+        'Else
+        '    'strtemp = strfftab.AsGrid(Prj.MakeNull, strGCfld, Nil)
+        'End If
+
+        ''"Stream Link Grid"
+        'Dim lStreamLinkGridLayerName As String = "Stream Link Grid"
+        'If lStreamLayerName = "<none>" Then
+        '    '  stlgrid = strgrid.StreamLink(fdrgrid)
+        '    'this is actually easier to do after you have the watershed grid
+        'Else
+        '    '  basgrid = basfftab.AsGrid(Prj.MakeNull, basGCfld, Nil)
+        '    '  stlgrid = strgrid * basgrid
+        'End If
+
+        '"Outlet Grid"
+        'zonefield = stlVtab.Findfield("Value")
+        'maxfac = facgrid.zonalstats( #grid_statype_max, stlgrid, prj.makenull, zoneField, false )
+        'outgrid = (facgrid <> maxfac).setnull(stlgrid)
+
+        '"Subbasin Grid"
+        'If (importDelin = false) Then
+        '  basgrid = fdrgrid.Watershed(outgrid)
+        'else
+        '  'computed subbasin grid for stream link grid
+        'End If
+
+        '"Hill Length Grid"
+        'fdrhill = (strgrid.IsNull)*(fdrgrid)
+        'hlggrid = fdrhill.FlowLength(Nil, False)
+
+        '"Hill Slope Grid"
+        'slpgrid = demgrid.slope(Nil, True)
+        '
+        'GisUtil.GridSlopeInPolygon()
+        'lSuccess = MapWinGeoProc.TerrainAnalysis.Slope(lDEMGrid, lSlopeGrid, False, Nothing)
+        'or dotspatial?
+
+        '"Downstream Grid"
+        'this is more complicated
+        'outdwngrd = outgrd11.merge({ outgrd22, outgrd33, outgrd44, outgrd55, outgrd66, outgrd77, outgrd88 })
+        'outdwn = allhoodgrd - outdwngrd
+        'dwngrid0 = outdwn.zonalStats(#GRID_STATYPE_MAX, basgrid, Prj.MakeNull, zonefield, false)
+    End Sub
 End Class
