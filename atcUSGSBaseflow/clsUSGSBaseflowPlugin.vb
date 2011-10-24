@@ -17,7 +17,7 @@ Public Class clsUSGSBaseflowPlugin
 
     Public Overrides ReadOnly Property Icon() As System.Drawing.Icon
         Get
-            Dim lResources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmMain))
+            Dim lResources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmUSGSBaseflow))
             Return CType(lResources.GetObject("$this.Icon"), System.Drawing.Icon)
         End Get
     End Property
@@ -31,7 +31,7 @@ Public Class clsUSGSBaseflowPlugin
             lTimeseriesGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Baseflow Separation", lTimeseriesGroup)
         End If
         If lTimeseriesGroup.Count > 0 Then
-            Dim lForm As New frmMain
+            Dim lForm As New frmUSGSBaseflow
             ShowForm(lTimeseriesGroup, lForm)
             Return lForm
         Else
@@ -65,7 +65,7 @@ Public Class clsUSGSBaseflowPlugin
 
         If Not aTimeseriesGroup Is Nothing AndAlso aTimeseriesGroup.Count > 0 Then
             LoadPlugin(pRequiredHelperPlugin)
-            Dim lForm As New frmMain
+            Dim lForm As New frmUSGSBaseflow
 
             lForm.Initialize(aTimeseriesGroup)
             atcUtility.SaveFileString(aFileName, lForm.ToString)

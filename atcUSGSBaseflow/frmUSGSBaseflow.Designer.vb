@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class frmMain
+Partial Class frmUSGSBaseflow
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -23,7 +23,7 @@ Partial Class frmMain
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmMain))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmUSGSBaseflow))
         Me.Label1 = New System.Windows.Forms.Label
         Me.cboBFMothod = New System.Windows.Forms.ComboBox
         Me.Label2 = New System.Windows.Forms.Label
@@ -113,7 +113,7 @@ Partial Class frmMain
         Me.btnOK.Name = "btnOK"
         Me.btnOK.Size = New System.Drawing.Size(75, 23)
         Me.btnOK.TabIndex = 23
-        Me.btnOK.Text = "OK"
+        Me.btnOK.Text = "Calculate"
         Me.btnOK.UseVisualStyleBackColor = True
         '
         'btnCancel
@@ -123,7 +123,7 @@ Partial Class frmMain
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(75, 23)
         Me.btnCancel.TabIndex = 24
-        Me.btnCancel.Text = "Cancel"
+        Me.btnCancel.Text = "Close"
         Me.btnCancel.UseVisualStyleBackColor = True
         '
         'btnExamineData
@@ -232,57 +232,57 @@ Partial Class frmMain
         '
         Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileSelectData, Me.mnuOutput, Me.mnuGraphBF})
         Me.mnuFile.Name = "mnuFile"
-        Me.mnuFile.Size = New System.Drawing.Size(37, 20)
+        Me.mnuFile.Size = New System.Drawing.Size(35, 20)
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
         '
         Me.mnuFileSelectData.Name = "mnuFileSelectData"
-        Me.mnuFileSelectData.Size = New System.Drawing.Size(152, 22)
+        Me.mnuFileSelectData.Size = New System.Drawing.Size(140, 22)
         Me.mnuFileSelectData.Text = "Select Data"
         '
         'mnuOutput
         '
         Me.mnuOutput.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOutputASCII})
         Me.mnuOutput.Name = "mnuOutput"
-        Me.mnuOutput.Size = New System.Drawing.Size(152, 22)
+        Me.mnuOutput.Size = New System.Drawing.Size(140, 22)
         Me.mnuOutput.Text = "Output"
         '
         'mnuOutputASCII
         '
         Me.mnuOutputASCII.Name = "mnuOutputASCII"
-        Me.mnuOutputASCII.Size = New System.Drawing.Size(102, 22)
+        Me.mnuOutputASCII.Size = New System.Drawing.Size(113, 22)
         Me.mnuOutputASCII.Text = "ASCII"
         '
         'mnuGraphBF
         '
         Me.mnuGraphBF.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuGraphTimeseries, Me.mnuGraphProbability})
         Me.mnuGraphBF.Name = "mnuGraphBF"
-        Me.mnuGraphBF.Size = New System.Drawing.Size(152, 22)
+        Me.mnuGraphBF.Size = New System.Drawing.Size(140, 22)
         Me.mnuGraphBF.Text = "Graph"
         '
         'mnuGraphTimeseries
         '
         Me.mnuGraphTimeseries.Name = "mnuGraphTimeseries"
-        Me.mnuGraphTimeseries.Size = New System.Drawing.Size(152, 22)
+        Me.mnuGraphTimeseries.Size = New System.Drawing.Size(136, 22)
         Me.mnuGraphTimeseries.Text = "TimeSeries"
         '
         'mnuGraphProbability
         '
         Me.mnuGraphProbability.Name = "mnuGraphProbability"
-        Me.mnuGraphProbability.Size = New System.Drawing.Size(152, 22)
+        Me.mnuGraphProbability.Size = New System.Drawing.Size(136, 22)
         Me.mnuGraphProbability.Text = "Probability"
         '
         'mnuAnalysis
         '
         Me.mnuAnalysis.Name = "mnuAnalysis"
-        Me.mnuAnalysis.Size = New System.Drawing.Size(62, 20)
+        Me.mnuAnalysis.Size = New System.Drawing.Size(58, 20)
         Me.mnuAnalysis.Text = "Analysis"
         '
         'mnuHelp
         '
         Me.mnuHelp.Name = "mnuHelp"
-        Me.mnuHelp.Size = New System.Drawing.Size(44, 20)
+        Me.mnuHelp.Size = New System.Drawing.Size(40, 20)
         Me.mnuHelp.Text = "Help"
         '
         'txtOutputRootName
@@ -341,7 +341,7 @@ Partial Class frmMain
         Me.lblOutputDir.TabIndex = 31
         Me.lblOutputDir.Text = "Output folder"
         '
-        'frmMain
+        'frmUSGSBaseflow
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -359,7 +359,7 @@ Partial Class frmMain
         Me.Controls.Add(Me.gbOutputFileSpecs)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MainMenuStrip = Me.MenuStrip1
-        Me.Name = "frmMain"
+        Me.Name = "frmUSGSBaseflow"
         Me.Text = "Baseflow Separation"
         Me.gbDates.ResumeLayout(False)
         Me.gbDates.PerformLayout()

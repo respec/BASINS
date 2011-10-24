@@ -7,7 +7,7 @@ Imports MapWinUtility
 Imports System.Windows.Forms
 Imports System.Text.RegularExpressions
 
-Public Class frmMain
+Public Class frmUSGSBaseflow
     Private pName As String = "Unnamed"
     Private pBasicAttributes As Generic.List(Of String)
     Private pDateFormat As atcDateFormat
@@ -787,5 +787,14 @@ Public Class frmMain
 
     Private Sub frmMain_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Opened = True
+    End Sub
+
+    Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
+        pDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Baseflow Separation", pDataGroup)
+        If pDataGroup.Count > 0 Then
+            Me.Initialize(pDataGroup, pBasicAttributes, True)
+        Else
+            Logger.Msg("Need to select at least one daily streamflow dataset", "USGS Baseflow Separation")
+        End If
     End Sub
 End Class

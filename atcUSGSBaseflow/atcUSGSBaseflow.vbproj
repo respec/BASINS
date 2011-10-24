@@ -88,10 +88,10 @@
     <Compile Include="frmDataSummary.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmMain.Designer.vb">
-      <DependentUpon>frmMain.vb</DependentUpon>
+    <Compile Include="frmUSGSBaseflow.Designer.vb">
+      <DependentUpon>frmUSGSBaseflow.vb</DependentUpon>
     </Compile>
-    <Compile Include="frmMain.vb">
+    <Compile Include="frmUSGSBaseflow.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmStations.Designer.vb">
@@ -121,8 +121,8 @@
     <EmbeddedResource Include="frmDataSummary.resx">
       <DependentUpon>frmDataSummary.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmMain.resx">
-      <DependentUpon>frmMain.vb</DependentUpon>
+    <EmbeddedResource Include="frmUSGSBaseflow.resx">
+      <DependentUpon>frmUSGSBaseflow.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmStations.resx">
       <DependentUpon>frmStations.vb</DependentUpon>
