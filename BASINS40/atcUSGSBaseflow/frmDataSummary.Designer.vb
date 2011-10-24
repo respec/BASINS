@@ -31,22 +31,22 @@ Partial Class frmDataSummary
         Me.txtDataSummary.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txtDataSummary.Dock = System.Windows.Forms.DockStyle.Fill
         Me.txtDataSummary.Location = New System.Drawing.Point(0, 0)
-        Me.txtDataSummary.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.txtDataSummary.Margin = New System.Windows.Forms.Padding(4)
         Me.txtDataSummary.Multiline = True
         Me.txtDataSummary.Name = "txtDataSummary"
         Me.txtDataSummary.ReadOnly = True
+        Me.txtDataSummary.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
         Me.txtDataSummary.Size = New System.Drawing.Size(416, 526)
         Me.txtDataSummary.TabIndex = 0
         '
         'frmDataSummary
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None
         Me.ClientSize = New System.Drawing.Size(416, 526)
         Me.Controls.Add(Me.txtDataSummary)
         Me.Font = New System.Drawing.Font("Courier New", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmDataSummary"
         Me.Text = "Data Summary"
         Me.ResumeLayout(False)
