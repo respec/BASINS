@@ -172,16 +172,16 @@ Public Class frmGeoSFM
     Friend WithEvents TabPage11 As System.Windows.Forms.TabPage
     Friend WithEvents cmdTerrainNext As System.Windows.Forms.Button
     Friend WithEvents cmdBasinNext As System.Windows.Forms.Button
-    Friend WithEvents Button3 As System.Windows.Forms.Button
-    Friend WithEvents Button4 As System.Windows.Forms.Button
-    Friend WithEvents Button5 As System.Windows.Forms.Button
-    Friend WithEvents Button6 As System.Windows.Forms.Button
-    Friend WithEvents Button7 As System.Windows.Forms.Button
-    Friend WithEvents Button8 As System.Windows.Forms.Button
-    Friend WithEvents Button9 As System.Windows.Forms.Button
-    Friend WithEvents Button12 As System.Windows.Forms.Button
+    Friend WithEvents cmdResponseNext As System.Windows.Forms.Button
+    Friend WithEvents cmdRainEvapNext As System.Windows.Forms.Button
+    Friend WithEvents cmdBalanceNext As System.Windows.Forms.Button
+    Friend WithEvents cmdRouteNext As System.Windows.Forms.Button
+    Friend WithEvents cmdSensitivityNext As System.Windows.Forms.Button
+    Friend WithEvents cmdCalibrationNext As System.Windows.Forms.Button
+    Friend WithEvents cmdBankfullNext As System.Windows.Forms.Button
+    Friend WithEvents cmdMapGenerate As System.Windows.Forms.Button
     Friend WithEvents Button10 As System.Windows.Forms.Button
-    Friend WithEvents Button11 As System.Windows.Forms.Button
+    Friend WithEvents cmdPlotGenerate As System.Windows.Forms.Button
     Friend WithEvents TabPage10 As System.Windows.Forms.TabPage
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmGeoSFM))
@@ -228,7 +228,7 @@ Public Class frmGeoSFM
         Me.Label3 = New System.Windows.Forms.Label
         Me.cboBC2 = New System.Windows.Forms.ComboBox
         Me.TabPage8 = New System.Windows.Forms.TabPage
-        Me.Button3 = New System.Windows.Forms.Button
+        Me.cmdResponseNext = New System.Windows.Forms.Button
         Me.AtcGridMannings = New atcControls.atcGrid
         Me.Label49 = New System.Windows.Forms.Label
         Me.ComboBox43 = New System.Windows.Forms.ComboBox
@@ -243,7 +243,7 @@ Public Class frmGeoSFM
         Me.RadioButton1 = New System.Windows.Forms.RadioButton
         Me.Label5 = New System.Windows.Forms.Label
         Me.TabPage3 = New System.Windows.Forms.TabPage
-        Me.Button4 = New System.Windows.Forms.Button
+        Me.cmdRainEvapNext = New System.Windows.Forms.Button
         Me.cboPrecipStation = New System.Windows.Forms.ComboBox
         Me.lblPrecipStation = New System.Windows.Forms.Label
         Me.cboOtherMet = New System.Windows.Forms.ComboBox
@@ -261,22 +261,22 @@ Public Class frmGeoSFM
         Me.AtcText6 = New atcControls.atcText
         Me.AtcText7 = New atcControls.atcText
         Me.TabPage1 = New System.Windows.Forms.TabPage
-        Me.Button5 = New System.Windows.Forms.Button
+        Me.cmdBalanceNext = New System.Windows.Forms.Button
         Me.AtcGrid1 = New atcControls.atcGrid
         Me.TabPage2 = New System.Windows.Forms.TabPage
-        Me.Button6 = New System.Windows.Forms.Button
+        Me.cmdRouteNext = New System.Windows.Forms.Button
         Me.AtcGrid2 = New atcControls.atcGrid
         Me.TabPage4 = New System.Windows.Forms.TabPage
-        Me.Button7 = New System.Windows.Forms.Button
+        Me.cmdSensitivityNext = New System.Windows.Forms.Button
         Me.TabPage5 = New System.Windows.Forms.TabPage
-        Me.Button8 = New System.Windows.Forms.Button
+        Me.cmdCalibrationNext = New System.Windows.Forms.Button
         Me.TabPage6 = New System.Windows.Forms.TabPage
-        Me.Button9 = New System.Windows.Forms.Button
+        Me.cmdBankfullNext = New System.Windows.Forms.Button
         Me.TabPage10 = New System.Windows.Forms.TabPage
-        Me.Button12 = New System.Windows.Forms.Button
+        Me.cmdMapGenerate = New System.Windows.Forms.Button
         Me.Button10 = New System.Windows.Forms.Button
         Me.TabPage11 = New System.Windows.Forms.TabPage
-        Me.Button11 = New System.Windows.Forms.Button
+        Me.cmdPlotGenerate = New System.Windows.Forms.Button
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.lblStatus = New System.Windows.Forms.Label
         Me.Label20 = New System.Windows.Forms.Label
@@ -866,7 +866,7 @@ Public Class frmGeoSFM
         '
         'TabPage8
         '
-        Me.TabPage8.Controls.Add(Me.Button3)
+        Me.TabPage8.Controls.Add(Me.cmdResponseNext)
         Me.TabPage8.Controls.Add(Me.AtcGridMannings)
         Me.TabPage8.Controls.Add(Me.Label49)
         Me.TabPage8.Controls.Add(Me.ComboBox43)
@@ -887,16 +887,16 @@ Public Class frmGeoSFM
         Me.TabPage8.Text = "Basin Response"
         Me.TabPage8.UseVisualStyleBackColor = True
         '
-        'Button3
+        'cmdResponseNext
         '
-        Me.Button3.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Button3.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.Button3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button3.Location = New System.Drawing.Point(558, 355)
-        Me.Button3.Name = "Button3"
-        Me.Button3.Size = New System.Drawing.Size(73, 28)
-        Me.Button3.TabIndex = 51
-        Me.Button3.Text = "Next >"
+        Me.cmdResponseNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdResponseNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdResponseNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdResponseNext.Location = New System.Drawing.Point(558, 355)
+        Me.cmdResponseNext.Name = "cmdResponseNext"
+        Me.cmdResponseNext.Size = New System.Drawing.Size(73, 28)
+        Me.cmdResponseNext.TabIndex = 51
+        Me.cmdResponseNext.Text = "Next >"
         '
         'AtcGridMannings
         '
@@ -1047,7 +1047,7 @@ Public Class frmGeoSFM
         '
         'TabPage3
         '
-        Me.TabPage3.Controls.Add(Me.Button4)
+        Me.TabPage3.Controls.Add(Me.cmdRainEvapNext)
         Me.TabPage3.Controls.Add(Me.cboPrecipStation)
         Me.TabPage3.Controls.Add(Me.lblPrecipStation)
         Me.TabPage3.Controls.Add(Me.cboOtherMet)
@@ -1060,16 +1060,16 @@ Public Class frmGeoSFM
         Me.TabPage3.Text = "Rain/Evap Data"
         Me.TabPage3.UseVisualStyleBackColor = True
         '
-        'Button4
+        'cmdRainEvapNext
         '
-        Me.Button4.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Button4.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.Button4.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button4.Location = New System.Drawing.Point(556, 352)
-        Me.Button4.Name = "Button4"
-        Me.Button4.Size = New System.Drawing.Size(73, 28)
-        Me.Button4.TabIndex = 40
-        Me.Button4.Text = "Next >"
+        Me.cmdRainEvapNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdRainEvapNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdRainEvapNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdRainEvapNext.Location = New System.Drawing.Point(556, 352)
+        Me.cmdRainEvapNext.Name = "cmdRainEvapNext"
+        Me.cmdRainEvapNext.Size = New System.Drawing.Size(73, 28)
+        Me.cmdRainEvapNext.TabIndex = 40
+        Me.cmdRainEvapNext.Text = "Next >"
         '
         'cboPrecipStation
         '
@@ -1319,7 +1319,7 @@ Public Class frmGeoSFM
         '
         'TabPage1
         '
-        Me.TabPage1.Controls.Add(Me.Button5)
+        Me.TabPage1.Controls.Add(Me.cmdBalanceNext)
         Me.TabPage1.Controls.Add(Me.AtcGrid1)
         Me.TabPage1.Location = New System.Drawing.Point(4, 46)
         Me.TabPage1.Name = "TabPage1"
@@ -1328,16 +1328,16 @@ Public Class frmGeoSFM
         Me.TabPage1.Text = "Compute Soil Water Balance"
         Me.TabPage1.UseVisualStyleBackColor = True
         '
-        'Button5
+        'cmdBalanceNext
         '
-        Me.Button5.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Button5.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.Button5.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button5.Location = New System.Drawing.Point(554, 353)
-        Me.Button5.Name = "Button5"
-        Me.Button5.Size = New System.Drawing.Size(73, 28)
-        Me.Button5.TabIndex = 52
-        Me.Button5.Text = "Next >"
+        Me.cmdBalanceNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdBalanceNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdBalanceNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdBalanceNext.Location = New System.Drawing.Point(554, 353)
+        Me.cmdBalanceNext.Name = "cmdBalanceNext"
+        Me.cmdBalanceNext.Size = New System.Drawing.Size(73, 28)
+        Me.cmdBalanceNext.TabIndex = 52
+        Me.cmdBalanceNext.Text = "Next >"
         '
         'AtcGrid1
         '
@@ -1359,7 +1359,7 @@ Public Class frmGeoSFM
         '
         'TabPage2
         '
-        Me.TabPage2.Controls.Add(Me.Button6)
+        Me.TabPage2.Controls.Add(Me.cmdRouteNext)
         Me.TabPage2.Controls.Add(Me.AtcGrid2)
         Me.TabPage2.Location = New System.Drawing.Point(4, 46)
         Me.TabPage2.Name = "TabPage2"
@@ -1368,16 +1368,16 @@ Public Class frmGeoSFM
         Me.TabPage2.Text = "Compute Stream Flow"
         Me.TabPage2.UseVisualStyleBackColor = True
         '
-        'Button6
+        'cmdRouteNext
         '
-        Me.Button6.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Button6.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.Button6.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button6.Location = New System.Drawing.Point(555, 349)
-        Me.Button6.Name = "Button6"
-        Me.Button6.Size = New System.Drawing.Size(73, 28)
-        Me.Button6.TabIndex = 53
-        Me.Button6.Text = "Next >"
+        Me.cmdRouteNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdRouteNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdRouteNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdRouteNext.Location = New System.Drawing.Point(555, 349)
+        Me.cmdRouteNext.Name = "cmdRouteNext"
+        Me.cmdRouteNext.Size = New System.Drawing.Size(73, 28)
+        Me.cmdRouteNext.TabIndex = 53
+        Me.cmdRouteNext.Text = "Next >"
         '
         'AtcGrid2
         '
@@ -1399,7 +1399,7 @@ Public Class frmGeoSFM
         '
         'TabPage4
         '
-        Me.TabPage4.Controls.Add(Me.Button7)
+        Me.TabPage4.Controls.Add(Me.cmdSensitivityNext)
         Me.TabPage4.Location = New System.Drawing.Point(4, 46)
         Me.TabPage4.Name = "TabPage4"
         Me.TabPage4.Size = New System.Drawing.Size(647, 396)
@@ -1407,20 +1407,20 @@ Public Class frmGeoSFM
         Me.TabPage4.Text = "Sensitivity Analysis"
         Me.TabPage4.UseVisualStyleBackColor = True
         '
-        'Button7
+        'cmdSensitivityNext
         '
-        Me.Button7.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Button7.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.Button7.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button7.Location = New System.Drawing.Point(558, 353)
-        Me.Button7.Name = "Button7"
-        Me.Button7.Size = New System.Drawing.Size(73, 28)
-        Me.Button7.TabIndex = 40
-        Me.Button7.Text = "Next >"
+        Me.cmdSensitivityNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdSensitivityNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdSensitivityNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdSensitivityNext.Location = New System.Drawing.Point(558, 353)
+        Me.cmdSensitivityNext.Name = "cmdSensitivityNext"
+        Me.cmdSensitivityNext.Size = New System.Drawing.Size(73, 28)
+        Me.cmdSensitivityNext.TabIndex = 40
+        Me.cmdSensitivityNext.Text = "Next >"
         '
         'TabPage5
         '
-        Me.TabPage5.Controls.Add(Me.Button8)
+        Me.TabPage5.Controls.Add(Me.cmdCalibrationNext)
         Me.TabPage5.Location = New System.Drawing.Point(4, 46)
         Me.TabPage5.Name = "TabPage5"
         Me.TabPage5.Size = New System.Drawing.Size(647, 396)
@@ -1428,20 +1428,20 @@ Public Class frmGeoSFM
         Me.TabPage5.Text = "Model Calibration"
         Me.TabPage5.UseVisualStyleBackColor = True
         '
-        'Button8
+        'cmdCalibrationNext
         '
-        Me.Button8.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Button8.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.Button8.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button8.Location = New System.Drawing.Point(554, 350)
-        Me.Button8.Name = "Button8"
-        Me.Button8.Size = New System.Drawing.Size(73, 28)
-        Me.Button8.TabIndex = 40
-        Me.Button8.Text = "Next >"
+        Me.cmdCalibrationNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdCalibrationNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdCalibrationNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdCalibrationNext.Location = New System.Drawing.Point(554, 350)
+        Me.cmdCalibrationNext.Name = "cmdCalibrationNext"
+        Me.cmdCalibrationNext.Size = New System.Drawing.Size(73, 28)
+        Me.cmdCalibrationNext.TabIndex = 40
+        Me.cmdCalibrationNext.Text = "Next >"
         '
         'TabPage6
         '
-        Me.TabPage6.Controls.Add(Me.Button9)
+        Me.TabPage6.Controls.Add(Me.cmdBankfullNext)
         Me.TabPage6.Location = New System.Drawing.Point(4, 46)
         Me.TabPage6.Name = "TabPage6"
         Me.TabPage6.Size = New System.Drawing.Size(647, 396)
@@ -1449,20 +1449,20 @@ Public Class frmGeoSFM
         Me.TabPage6.Text = "Bankfull and Flow Statistics"
         Me.TabPage6.UseVisualStyleBackColor = True
         '
-        'Button9
+        'cmdBankfullNext
         '
-        Me.Button9.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Button9.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.Button9.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button9.Location = New System.Drawing.Point(558, 350)
-        Me.Button9.Name = "Button9"
-        Me.Button9.Size = New System.Drawing.Size(73, 28)
-        Me.Button9.TabIndex = 40
-        Me.Button9.Text = "Next >"
+        Me.cmdBankfullNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdBankfullNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdBankfullNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdBankfullNext.Location = New System.Drawing.Point(558, 350)
+        Me.cmdBankfullNext.Name = "cmdBankfullNext"
+        Me.cmdBankfullNext.Size = New System.Drawing.Size(73, 28)
+        Me.cmdBankfullNext.TabIndex = 40
+        Me.cmdBankfullNext.Text = "Next >"
         '
         'TabPage10
         '
-        Me.TabPage10.Controls.Add(Me.Button12)
+        Me.TabPage10.Controls.Add(Me.cmdMapGenerate)
         Me.TabPage10.Controls.Add(Me.Button10)
         Me.TabPage10.Location = New System.Drawing.Point(4, 46)
         Me.TabPage10.Name = "TabPage10"
@@ -1471,16 +1471,16 @@ Public Class frmGeoSFM
         Me.TabPage10.Text = "Flow Percentile Map"
         Me.TabPage10.UseVisualStyleBackColor = True
         '
-        'Button12
+        'cmdMapGenerate
         '
-        Me.Button12.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Button12.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.Button12.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button12.Location = New System.Drawing.Point(475, 349)
-        Me.Button12.Name = "Button12"
-        Me.Button12.Size = New System.Drawing.Size(73, 28)
-        Me.Button12.TabIndex = 41
-        Me.Button12.Text = "Generate"
+        Me.cmdMapGenerate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdMapGenerate.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdMapGenerate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdMapGenerate.Location = New System.Drawing.Point(475, 349)
+        Me.cmdMapGenerate.Name = "cmdMapGenerate"
+        Me.cmdMapGenerate.Size = New System.Drawing.Size(73, 28)
+        Me.cmdMapGenerate.TabIndex = 41
+        Me.cmdMapGenerate.Text = "Generate"
         '
         'Button10
         '
@@ -1495,7 +1495,7 @@ Public Class frmGeoSFM
         '
         'TabPage11
         '
-        Me.TabPage11.Controls.Add(Me.Button11)
+        Me.TabPage11.Controls.Add(Me.cmdPlotGenerate)
         Me.TabPage11.Location = New System.Drawing.Point(4, 46)
         Me.TabPage11.Name = "TabPage11"
         Me.TabPage11.Size = New System.Drawing.Size(647, 396)
@@ -1503,16 +1503,16 @@ Public Class frmGeoSFM
         Me.TabPage11.Text = "Flow Hydrographs"
         Me.TabPage11.UseVisualStyleBackColor = True
         '
-        'Button11
+        'cmdPlotGenerate
         '
-        Me.Button11.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Button11.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.Button11.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button11.Location = New System.Drawing.Point(557, 350)
-        Me.Button11.Name = "Button11"
-        Me.Button11.Size = New System.Drawing.Size(73, 28)
-        Me.Button11.TabIndex = 40
-        Me.Button11.Text = "Generate"
+        Me.cmdPlotGenerate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdPlotGenerate.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdPlotGenerate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdPlotGenerate.Location = New System.Drawing.Point(557, 350)
+        Me.cmdPlotGenerate.Name = "cmdPlotGenerate"
+        Me.cmdPlotGenerate.Size = New System.Drawing.Size(73, 28)
+        Me.cmdPlotGenerate.TabIndex = 40
+        Me.cmdPlotGenerate.Text = "Generate"
         '
         'GroupBox1
         '
@@ -2230,6 +2230,39 @@ Public Class frmGeoSFM
 
     Private Sub cmdTerrainNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdTerrainNext.Click
 
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+        ' 
+        '      Program: terrain.ave
+        '
+        '      Function: The program checks for the presence of required terrain grids 
+        '          and calls up menu items to create those that are missing
+        '
+        '      Inputs include
+        '          a grid of surface elevations (corrected DEM) in meters
+        '          a grid of flow direction
+        '          a grid of flow accumulation
+        '          a grid of flow length
+        '          a grid of stream cells only
+        '          a grid of stream links
+        '          a grid of outlet cells
+        '          a grid of subbasins in a basin
+        '          a grid of hill length (distance to river channel) in meters
+        '          a grid of terrain slope expressed as a percentange   
+        '          a coverage of previously delineated subbasins <optional>
+        '          a coverage of previously delineated streams <optional>       
+        '
+        '      Outputs:  
+        '          Creates missing input grids for subsequently preprocessing steps
+        '
+        '      Assumptions: The program assumes that 
+        '          the View is active and it contains all existing grids
+        '          the corrected DEM is the required minimum input
+        '          (optional) the river and subbasin coverages from an existing delineation
+        '
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+
         Dim lDEMLayerName As String = cboDEM.Items(cboDEM.SelectedIndex)
         Dim lElevationLayerIndex As Integer = GisUtil.LayerIndex(lDEMLayerName)
         Dim lDEMFileName As String = GisUtil.LayerFileName(lElevationLayerIndex)
@@ -2339,94 +2372,94 @@ Public Class frmGeoSFM
 
 
         '"Downstream Flow Length"
-            'dflgrid = fdrgrid.FlowLength(Nil, FALSE)
-            'don't seem to have a direct way to do this one?
+        'dflgrid = fdrgrid.FlowLength(Nil, FALSE)
+        'don't seem to have a direct way to do this one?
 
-            'Dim lFlowLenGridLayerName As String = "Downstream Flow Length"
-            'Dim lFlowLenGridLayerIndex As Integer = 0
-            'Dim lFlowLenGridFileName As String = ""
-            'Dim lStrahlOrdResultGridFileName As String = ""
-            'Dim lLongUpslopeResultGridFileName As String = ""
-            'Dim lTotalUpslopeResultGridFileName As String = ""
-            'If GisUtil.IsLayer(lFlowLenGridLayerName) Then
-            '    lFlowLenGridLayerIndex = GisUtil.LayerIndex(lFlowLenGridLayerName)
-            '    lFlowLenGridFileName = GisUtil.LayerFileName(lFlowLenGridLayerIndex)
-            'Else
-            '    lFlowLenGridFileName = FilenameNoExt(lDEMFileName) & "FlowLen.tif"
-            '    lStrahlOrdResultGridFileName = FilenameNoExt(lDEMFileName) & "Strahl.tif"
-            '    lLongUpslopeResultGridFileName = FilenameNoExt(lDEMFileName) & "LongUp.tif"
-            '    lTotalUpslopeResultGridFileName = FilenameNoExt(lDEMFileName) & "TotUp.tif"
-            '    Dim lRet As Integer = MapWinGeoProc.Hydrology.PathLength(lFlowDirGridFileName, lStrahlOrdResultGridFileName, lLongUpslopeResultGridFileName, lTotalUpslopeResultGridFileName, Nothing)
-            '    'GisUtil.AddLayer(lFlowLenGridFileName, lFlowLenGridLayerName)
-            'End If
+        'Dim lFlowLenGridLayerName As String = "Downstream Flow Length"
+        'Dim lFlowLenGridLayerIndex As Integer = 0
+        'Dim lFlowLenGridFileName As String = ""
+        'Dim lStrahlOrdResultGridFileName As String = ""
+        'Dim lLongUpslopeResultGridFileName As String = ""
+        'Dim lTotalUpslopeResultGridFileName As String = ""
+        'If GisUtil.IsLayer(lFlowLenGridLayerName) Then
+        '    lFlowLenGridLayerIndex = GisUtil.LayerIndex(lFlowLenGridLayerName)
+        '    lFlowLenGridFileName = GisUtil.LayerFileName(lFlowLenGridLayerIndex)
+        'Else
+        '    lFlowLenGridFileName = FilenameNoExt(lDEMFileName) & "FlowLen.tif"
+        '    lStrahlOrdResultGridFileName = FilenameNoExt(lDEMFileName) & "Strahl.tif"
+        '    lLongUpslopeResultGridFileName = FilenameNoExt(lDEMFileName) & "LongUp.tif"
+        '    lTotalUpslopeResultGridFileName = FilenameNoExt(lDEMFileName) & "TotUp.tif"
+        '    Dim lRet As Integer = MapWinGeoProc.Hydrology.PathLength(lFlowDirGridFileName, lStrahlOrdResultGridFileName, lLongUpslopeResultGridFileName, lTotalUpslopeResultGridFileName, Nothing)
+        '    'GisUtil.AddLayer(lFlowLenGridFileName, lFlowLenGridLayerName)
+        'End If
 
         ''"Stream Grid"
-            'Dim lStreamGridLayerName As String = "Stream Grid"
-            'Dim lStreamLayerName As String = cboReach.Items(cboReach.SelectedIndex)
-            'If lStreamLayerName = "<none>" Then
-            '    Dim lInputGrid As New MapWinGIS.Grid
-            '    lInputGrid.Open(lFlowAccGridFileName)
+        'Dim lStreamGridLayerName As String = "Stream Grid"
+        'Dim lStreamLayerName As String = cboReach.Items(cboReach.SelectedIndex)
+        'If lStreamLayerName = "<none>" Then
+        '    Dim lInputGrid As New MapWinGIS.Grid
+        '    lInputGrid.Open(lFlowAccGridFileName)
 
-            '    Dim lStreamGridFileName As String = FilenameNoExt(lDEMFileName) & "Stream.tif"
-            '    System.IO.File.Copy(lFlowAccGridFileName, lStreamGridFileName)
+        '    Dim lStreamGridFileName As String = FilenameNoExt(lDEMFileName) & "Stream.tif"
+        '    System.IO.File.Copy(lFlowAccGridFileName, lStreamGridFileName)
 
-            '    Dim lOutputGrid As New MapWinGIS.Grid
-            '    lOutputGrid.Open(lFlowAccGridFileName)
+        '    Dim lOutputGrid As New MapWinGIS.Grid
+        '    lOutputGrid.Open(lFlowAccGridFileName)
 
-            '    Dim lStartCol As Integer = 0
-            '    Dim lEndCol As Integer = lInputGrid.Header.NumberCols
-            '    Dim lStartRow As Integer = 0
-            '    Dim lEndRow As Integer = lInputGrid.Header.NumberRows
+        '    Dim lStartCol As Integer = 0
+        '    Dim lEndCol As Integer = lInputGrid.Header.NumberCols
+        '    Dim lStartRow As Integer = 0
+        '    Dim lEndRow As Integer = lInputGrid.Header.NumberRows
 
-            '    For lCol As Integer = lStartCol To lEndCol
-            '        For lRow As Integer = lStartRow To lEndRow
-            '            If (lInputGrid.Value(lCol, lRow) <> lOutputGrid.Header.NodataValue) AndAlso Not lInputGrid.Value(lCol, lRow) > lThresh Then
-            '                lOutputGrid.Value(lCol, lRow) = lOutputGrid.Header.NodataValue
-            '            End If
-            '        Next lRow
-            '    Next lCol
+        '    For lCol As Integer = lStartCol To lEndCol
+        '        For lRow As Integer = lStartRow To lEndRow
+        '            If (lInputGrid.Value(lCol, lRow) <> lOutputGrid.Header.NodataValue) AndAlso Not lInputGrid.Value(lCol, lRow) > lThresh Then
+        '                lOutputGrid.Value(lCol, lRow) = lOutputGrid.Header.NodataValue
+        '            End If
+        '        Next lRow
+        '    Next lCol
 
-            '    lInputGrid.Close()
-            '    lInputGrid = Nothing
+        '    lInputGrid.Close()
+        '    lInputGrid = Nothing
 
-            '    lOutputGrid.Save()
-            '    lOutputGrid.Close()
-            '    lOutputGrid = Nothing
-            '    GisUtil.AddLayer(lStreamGridFileName, lStreamGridLayerName)
-            'Else
-            '    'strtemp = strfftab.AsGrid(Prj.MakeNull, strGCfld, Nil)
-            'End If
+        '    lOutputGrid.Save()
+        '    lOutputGrid.Close()
+        '    lOutputGrid = Nothing
+        '    GisUtil.AddLayer(lStreamGridFileName, lStreamGridLayerName)
+        'Else
+        '    'strtemp = strfftab.AsGrid(Prj.MakeNull, strGCfld, Nil)
+        'End If
 
-            ''"Stream Link Grid"
-            'Dim lStreamLinkGridLayerName As String = "Stream Link Grid"
-            'If lStreamLayerName = "<none>" Then
-            '    '  stlgrid = strgrid.StreamLink(fdrgrid)
-            '    'this is actually easier to do after you have the watershed grid
-            'Else
-            '    '  basgrid = basfftab.AsGrid(Prj.MakeNull, basGCfld, Nil)
-            '    '  stlgrid = strgrid * basgrid
-            'End If
+        ''"Stream Link Grid"
+        'Dim lStreamLinkGridLayerName As String = "Stream Link Grid"
+        'If lStreamLayerName = "<none>" Then
+        '    '  stlgrid = strgrid.StreamLink(fdrgrid)
+        '    'this is actually easier to do after you have the watershed grid
+        'Else
+        '    '  basgrid = basfftab.AsGrid(Prj.MakeNull, basGCfld, Nil)
+        '    '  stlgrid = strgrid * basgrid
+        'End If
 
         '"Outlet Grid"
-            'zonefield = stlVtab.Findfield("Value")
-            'maxfac = facgrid.zonalstats( #grid_statype_max, stlgrid, prj.makenull, zoneField, false )
-            'outgrid = (facgrid <> maxfac).setnull(stlgrid)
+        'zonefield = stlVtab.Findfield("Value")
+        'maxfac = facgrid.zonalstats( #grid_statype_max, stlgrid, prj.makenull, zoneField, false )
+        'outgrid = (facgrid <> maxfac).setnull(stlgrid)
 
         '"Subbasin Grid"
-            'If (importDelin = false) Then
-            '  basgrid = fdrgrid.Watershed(outgrid)
-            'else
-            '  'computed subbasin grid for stream link grid
-            'End If
+        'If (importDelin = false) Then
+        '  basgrid = fdrgrid.Watershed(outgrid)
+        'else
+        '  'computed subbasin grid for stream link grid
+        'End If
 
         '"Hill Length Grid"
-            'fdrhill = (strgrid.IsNull)*(fdrgrid)
-            'hlggrid = fdrhill.FlowLength(Nil, False)
+        'fdrhill = (strgrid.IsNull)*(fdrgrid)
+        'hlggrid = fdrhill.FlowLength(Nil, False)
 
         '"Downstream Grid"
-            'this is more complicated
-            'outdwngrd = outgrd11.merge({ outgrd22, outgrd33, outgrd44, outgrd55, outgrd66, outgrd77, outgrd88 })
-            'outdwn = allhoodgrd - outdwngrd
+        'this is more complicated
+        'outdwngrd = outgrd11.merge({ outgrd22, outgrd33, outgrd44, outgrd55, outgrd66, outgrd77, outgrd88 })
+        'outdwn = allhoodgrd - outdwngrd
         'dwngrid0 = outdwn.zonalStats(#GRID_STATYPE_MAX, basgrid, Prj.MakeNull, zonefield, false)
 
         DefaultBasinCharacteristicsGrids()
@@ -2543,6 +2576,42 @@ Public Class frmGeoSFM
 
     Private Sub cmdBasinNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdBasinNext.Click
 
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+        '
+        '      Program: basin.ave
+        '
+        '      Function: 
+        '          The program determines the mean values of terrain parameters 
+        '          for subbasins within each drainage basin
+        '
+        '      Inputs include
+        '          a grid of subbasins in a basin, 'basins'
+        '          a grid of soil water holding capacity in cm, 'whc'
+        '          a grid of total soil depth in cm, 'depth'
+        '          a grid of soil texture, 'texture'
+        '          a grid of hydraulic conductivity in cm/hr, 'ks'
+        '          a grid of hill length (distance to subbasin outlet) in meters, 'hilllength'
+        '          a grid of flow accumulation (dimensionless), 'flowacc'
+        '          a grid of surface elevations (corrected DEM) in m, 'elevations'
+        '          a grid of SCS runoff curve numbers expressed as a dimensionless number from 30 to 100, 'rcn'
+        '          a grid of downstream flow lengths in m, 'flowlen'
+        '          a grid of stream links, 'strlinks'
+        '          a grid of downstream basin ids, 'downstream'
+        '          a grid of maximum impervious cover as a fraction, 'maxcover'
+        '
+        '      Outputs:  
+        '          a basin parameter file entitled 'basin.txt'
+        '          a file with basin ids in the correct computational order entitled 'basin.txt'
+        '  
+        '
+        '      Assumptions: The program assumes that 
+        '          the View is active and it contains the basin grid and other products of terrain analysis
+        '          all input soil and land cover grids are in a single directory
+        '
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
         Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
 
@@ -2551,152 +2620,126 @@ Public Class frmGeoSFM
         Dim lRivFile = lOutputPath & "river.txt"
         Dim lOrderFile = lOutputPath & "order.txt"
 
-        '        addchk = MsgBox.YesNo("Add Soils & LandCover Data to View?", "Geospatial Stream Flow Model", True)
-        '        longmsg = ("Add the following grids to the View" + nl + nl + "1)  Runoff Curve Number Grid" + nl + "2)  Soil Water Holding Capacity Grid" + nl + "3)  Soil Depth Grid" + nl + "4)  Soil Texture Grid" + nl + "5)  Hydraulic Conductivity Grid" + nl + "6)  Maximum Impervious Cover Grid")
-
-        '        If (addchk = True) Then
-        '            MsgBox.report(longmsg, "Geospatial Stream Flow Model")
-        '            av.Run("View.Add", "soilgrids")
-        '        End If
-
-        '        ' get input grids
+        ' get input grids
         'defaultlist = { "Basins" , "Elevations" , "FlowAcc" , "Hilllength" , "Rcn" , "Whc" , "Soildepth" , "Texture" , "Ks", "FlowLen", "StrLinks", "Downstream", "Maxcover" }
         'labellist = { "Basin Grid" , "Processed DEM", "Flow Accumulation Grid" , "Hill Length Grid", "Runoff Curve Number Grid", "Water holding Capacity", "Soil Depth Grid" , "Soil Texture Grid" , "Hydraulic Conductivity Grid", "Downstream Flow Length Grid", "Stream Link Grid", "Downstream Basin id Grid", "Max Impervious Cover Grid" }
 
-        '        inputlist = MsgBox.MultiInput("Input Grid Themes", "Specify Names of Input Grids", labellist, defaultlist)
-        '        If (inputlist.isempty) Then
-        '            Exit Sub
-        '        End If
+        Dim zonegname As String = cboBC1.Items(cboBC1.SelectedIndex)
+        Dim basingthm As Integer = -1
+        If zonegname = "<none>" Then
+            Logger.Msg("Basin Grid, " + zonegname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Exit Sub
+        Else
+            basingthm = GisUtil.LayerIndex(zonegname)
+        End If
 
-        '        zonegname = inputlist.get(0)
-        '        demgname = inputlist.get(1)
-        '        facgname = inputlist.get(2)
-        '        hlengname = inputlist.get(3)
-        '        rcngname = inputlist.get(4)
-        '        whcgname = inputlist.get(5)
-        '        depthgname = inputlist.get(6)
-        '        texturegname = inputlist.get(7)
-        '        draingname = inputlist.get(8)
-        '        flowlengname = inputlist.get(9)
-        '        rivlinkgname = inputlist.get(10)
-        '        downgname = inputlist.get(11)
-        '        maxcovergname = inputlist.get(12)
+        Dim demgname As String = cboBC2.Items(cboBC2.SelectedIndex)
+        Dim demgthm As Integer = -1
+        If demgname = "<none>" Then
+            Logger.Msg("DEM Grid, " + demgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Exit Sub
+        Else
+            demgthm = GisUtil.LayerIndex(demgname)
+        End If
 
-        '        basingthm = TheView.FindTheme(zonegname)
-        '        demgthm = TheView.FindTheme(demgname)
-        '        facgthm = TheView.FindTheme(facgname)
-        '        hlengthm = TheView.FindTheme(hlengname)
-        '        rcngthm = TheView.FindTheme(rcngname)
-        '        whcgthm = TheView.FindTheme(whcgname)
-        '        depthgthm = TheView.FindTheme(depthgname)
-        '        texturegthm = TheView.FindTheme(texturegname)
-        '        draingthm = TheView.FindTheme(draingname)
-        '        flowlengthm = TheView.FindTheme(flowlengname)
-        '        rivlinkgthm = TheView.FindTheme(rivlinkgname)
-        '        downgthm = TheView.FindTheme(downgname)
-        '        maxcovergthm = TheView.FindTheme(maxcovergname)
+        Dim facgname As String = cboBC3.Items(cboBC3.SelectedIndex)
+        Dim facgthm As Integer = -1
+        If facgname = "<none>" Then
+            Logger.Msg("Flow Accumulation Grid, " + facgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Exit Sub
+        Else
+            facgthm = GisUtil.LayerIndex(facgname)
+        End If
 
-        '        If (basingthm = nil) Then
-        '            MsgBox.error("Basin Grid, " + zonegname + ", Not Found in the View", "")
-        '            Exit Sub
-        '        ElseIf (demgthm = nil) Then
-        '            MsgBox.error("DEM Grid, " + demgname + ", Not Found in the View", "")
-        '            Exit Sub
-        '        ElseIf (facgthm = nil) Then
-        '            MsgBox.error("Flow Accumulation Grid, " + facgname + ", Not Found in the View", "")
-        '            Exit Sub
-        '        ElseIf (hlengthm = nil) Then
-        '            MsgBox.error("Hill Length Grid, " + hlengname + ", Not Found in the View", "")
-        '            Exit Sub
-        '        ElseIf (rcngthm = nil) Then
-        '            MsgBox.error("Runoff Curve Number Grid, " + rcngname + ", Not Found in the View", "")
-        '            Exit Sub
-        '        ElseIf (whcgthm = nil) Then
-        '            MsgBox.error("Soil Water Holding Capacity Grid, " + whcgname + ", Not Found in the View", "")
-        '            Exit Sub
-        '        ElseIf (depthgthm = nil) Then
-        '            MsgBox.error("Soil Depth Grid, " + depthgname + ", Not Found in the View", "")
-        '            Exit Sub
-        '        ElseIf (texturegthm = nil) Then
-        '            MsgBox.error("Soil Texture Grid, " + texturegname + ", Not Found in the View", "")
-        '            Exit Sub
-        '        ElseIf (draingthm = nil) Then
-        '            MsgBox.error("Hydraulic Conductivity Grid, " + draingname + ", Not Found in the View", "")
-        '            Exit Sub
-        '        ElseIf (flowlengthm = nil) Then
-        '            MsgBox.error("Downstream Flow Length Grid, " + flowlengname + ", Not Found in the View", "")
-        '            Exit Sub
-        '        ElseIf (rivlinkgthm = nil) Then
-        '            MsgBox.error("Stream Link Grid, " + rivlinkgname + ", Not Found in the View", "")
-        '            Exit Sub
-        '        ElseIf (downgthm = nil) Then
-        '            MsgBox.error("Downstream Basin Id Grid, " + downgname + ", Not Found in the View", "")
-        '            Exit Sub
-        '        ElseIf (maxcovergthm = nil) Then
-        '            MsgBox.error("Maximum Impervious Cover Grid, " + maxcovergname + ", Not Found in the View", "")
-        '            Exit Sub
-        '        End If
+        Dim hlengname As String = cboBC4.Items(cboBC4.SelectedIndex)
+        Dim hlengthm As Integer = -1
+        If hlengname = "<none>" Then
+            Logger.Msg("Hill Length Grid, " + hlengname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Exit Sub
+        Else
+            hlengthm = GisUtil.LayerIndex(hlengname)
+        End If
 
-        '        If (basingthm.CanSelect) Then
-        '            MsgBox.error(zonegname + "is not a grid theme", "")
-        '            Exit Sub
-        '        ElseIf (demgthm.CanSelect) Then
-        '            MsgBox.error(demgname + "is not a grid theme", "")
-        '            Exit Sub
-        '        ElseIf (facgthm.CanSelect) Then
-        '            MsgBox.error(facgname + "is not a grid theme", "")
-        '            Exit Sub
-        '        ElseIf (hlengthm.CanSelect) Then
-        '            MsgBox.error(hlengname + "is not a grid theme", "")
-        '            Exit Sub
-        '        ElseIf (rcngthm.CanSelect) Then
-        '            MsgBox.error(rcngname + "is not a grid theme", "")
-        '            Exit Sub
-        '        ElseIf (whcgthm.CanSelect) Then
-        '            MsgBox.error(whcgname + "is not a grid theme", "")
-        '            Exit Sub
-        '        ElseIf (depthgthm.CanSelect) Then
-        '            MsgBox.error(depthgname + "is not a grid theme", "")
-        '            Exit Sub
-        '        ElseIf (texturegthm.CanSelect) Then
-        '            MsgBox.error(texturegname + "is not a grid theme", "")
-        '            Exit Sub
-        '        ElseIf (draingthm.CanSelect) Then
-        '            MsgBox.error(draingname + "is not a grid theme", "")
-        '            Exit Sub
-        '        ElseIf (flowlengthm.CanSelect) Then
-        '            MsgBox.error(flowlengname + "is not a grid theme", "")
-        '            Exit Sub
-        '        ElseIf (rivlinkgthm.CanSelect) Then
-        '            MsgBox.error(rivlinkgname + "is not a grid theme", "")
-        '            Exit Sub
-        '        ElseIf (downgthm.CanSelect) Then
-        '            MsgBox.error(downgname + "is not a grid theme", "")
-        '            Exit Sub
-        '        ElseIf (maxcovergthm.CanSelect) Then
-        '            MsgBox.error(maxcovergname + "is not a grid theme", "")
-        '            Exit Sub
-        '        End If
+        Dim rcngname As String = cboBC5.Items(cboBC5.SelectedIndex)
+        Dim rcngthm As Integer = -1
+        If rcngname = "<none>" Then
+            Logger.Msg("Runoff Curve Number Grid, " + rcngname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Exit Sub
+        Else
+            rcngthm = GisUtil.LayerIndex(rcngname)
+        End If
 
-        '        basingrid = basingthm.GetGrid
-        '        demgrid = demgthm.GetGrid
-        '        facgrid = facgthm.GetGrid
-        '        hlengrid = hlengthm.GetGrid
-        '        rcngrid = rcngthm.GetGrid
-        '        whcgrid = whcgthm.GetGrid
-        '        depthgrid = depthgthm.GetGrid
-        '        texturegrid = texturegthm.GetGrid
-        '        draingrid = draingthm.GetGrid
-        '        flowlengrid = flowlengthm.GetGrid
-        '        rivlinkgrid = rivlinkgthm.GetGrid
-        '        downgrid = downgthm.GetGrid
-        '        maxcovergrid = maxcovergthm.GetGrid
+        Dim whcgname As String = cboBC6.Items(cboBC6.SelectedIndex)
+        Dim whcgthm As Integer = -1
+        If whcgname = "<none>" Then
+            Logger.Msg("Soil Water Holding Capacity Grid, " + whcgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Exit Sub
+        Else
+            whcgthm = GisUtil.LayerIndex(whcgname)
+        End If
 
-        '        '--set the extent before extracting
-        '        ae = theView.GetExtension(AnalysisEnvironment)
-        'ae.SetExtent(#ANALYSISENV_VALUE,basingthm.ReturnExtent)
-        'ae.SetCellSize(#ANALYSISENV_VALUE,basingrid.GetCellSize)
-        '        ae.Activate()
+        Dim depthgname As String = cboBC7.Items(cboBC7.SelectedIndex)
+        Dim depthgthm As Integer = -1
+        If depthgname = "<none>" Then
+            Logger.Msg("Soil Depth Grid, " + depthgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Exit Sub
+        Else
+            depthgthm = GisUtil.LayerIndex(depthgname)
+        End If
+
+        Dim texturegname As String = cboBC8.Items(cboBC8.SelectedIndex)
+        Dim texturegthm As Integer = -1
+        If texturegname = "<none>" Then
+            Logger.Msg("Soil Texture Grid, " + texturegname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Exit Sub
+        Else
+            texturegthm = GisUtil.LayerIndex(texturegname)
+        End If
+
+        Dim draingname As String = cboBC9.Items(cboBC9.SelectedIndex)
+        Dim draingthm As Integer = -1
+        If draingname = "<none>" Then
+            Logger.Msg("Hydraulic Conductivity Grid, " + draingname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Exit Sub
+        Else
+            draingthm = GisUtil.LayerIndex(draingname)
+        End If
+
+        Dim flowlengname As String = cboBC10.Items(cboBC10.SelectedIndex)
+        Dim flowlengthm As Integer = -1
+        If flowlengname = "<none>" Then
+            Logger.Msg("Downstream Flow Length Grid, " + flowlengname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Exit Sub
+        Else
+            flowlengthm = GisUtil.LayerIndex(flowlengname)
+        End If
+
+        Dim rivlinkgname As String = cboBC11.Items(cboBC11.SelectedIndex)
+        Dim rivlinkgthm As Integer = -1
+        If rivlinkgname = "<none>" Then
+            Logger.Msg("Stream Link Grid, " + rivlinkgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Exit Sub
+        Else
+            rivlinkgthm = GisUtil.LayerIndex(rivlinkgname)
+        End If
+
+        Dim downgname As String = cboBC12.Items(cboBC12.SelectedIndex)
+        Dim downgthm As Integer = -1
+        If downgname = "<none>" Then
+            Logger.Msg("Downstream Basin Id Grid, " + downgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Exit Sub
+        Else
+            downgthm = GisUtil.LayerIndex(downgname)
+        End If
+
+        Dim maxcovergname As String = cboBC13.Items(cboBC13.SelectedIndex)
+        Dim maxcovergthm As Integer = -1
+        If maxcovergname = "<none>" Then
+            Logger.Msg("Maximum Impervious Cover Grid, " + maxcovergname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Exit Sub
+        Else
+            maxcovergthm = GisUtil.LayerIndex(maxcovergname)
+        End If
 
         '        If (basingrid.GetVtab <> nil) Then
         '            basintable = basingrid.GetVtab
@@ -2746,112 +2789,45 @@ Public Class frmGeoSFM
         '            If (cellcount = 1) Then
         '                MsgBox.report("Basin Grid contains single-cell subbasins" + nl + "for which zonalstatistics cannot be computed." + nl + nl + "Repeat delineation with higher stream definition" + nl + "threshold to eliminate this problem", "Error in Basin Grid")
         '                Exit Sub
-        '                End
-        '                End
+        '            End
+        '        End
 
-        '                zDemFN = myWkDirname + "zDem.dbf"
-        '                zFacFN = myWkDirname + "zFac.dbf"
-        '                zhlenFN = myWkDirname + "zHlen.dbf"
-        '                zRcnFN = myWkDirname + "zRcn.dbf"
-        '                zWhcFN = myWkDirname + "zWhc.dbf"
-        '                zDepthFN = myWkDirname + "zDepth.dbf"
-        '                zTextureFN = myWkDirname + "zTexture.dbf"
-        '                zDrainFN = myWkDirname + "zDrain.dbf"
-        '                zrivlenFN = myWkDirname + "zRivlen.dbf"
-        '                zrivdemFN = myWkDirname + "zRivDem.dbf"
-        '                zDownFN = myWkDirname + "zDown.dbf"
-        '                zmaxcoverFN = myWkDirname + "zMaxcover.dbf"
-        '                zlengthFN = myWkDirname + "zLength.dbf"
+        Logger.Status("Computing Zonal Statistics for " + demgname + "........")
+        'DemzoneVTab = DemGrid.ZonalStatsTable(basingthm, ThePrj, basinField, False, zDemFN.AsFileName)
+        'find average value of demgthm for each unique value of basingthm
 
-        '                av.ShowMsg("Computing Zonal Statistics for " + demgname + "........")
-        '                DemzoneVTab = DemGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zDemFN.AsFileName)
-        '                If (DemzoneVTab.HasError) Then
-        '                    Return NIL
-        '                    MsgBox.Error("Unable to compute zonal statistics for " + demgname, "")
-        '                    Exit Sub
-        '                ElseIf (demzoneVTab.GetNumRecords <> basintable.GetNumRecords) Then
-        '                    MsgBox.Error("Spatial Extent of" + +demgname + +"less than Basin grid", "Geospatial Stream Flow Model")
-        '                    Exit Sub
-        '                End If
+        Logger.Status("Computing Zonal Statistics for " + facgname + "........")
+        'FaczoneVTab = FacGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zFacFN.AsFileName)
+        'find average value of facgthm for each unique value of basingthm
 
-        '                av.ShowMsg("Computing Zonal Statistics for " + facgname + "........")
-        '                FaczoneVTab = FacGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zFacFN.AsFileName)
-        '                If (FaczoneVTab.HasError) Then
-        '                    Return NIL
-        '                    MsgBox.Error("Unable to compute zonal statistics for " + facgname, "")
-        '                    Exit Sub
-        '                ElseIf (faczoneVTab.GetNumRecords <> basintable.GetNumRecords) Then
-        '                    MsgBox.Error("Spatial Extent of" + +facgname + +"less than basin grid", "Geospatial Stream Flow Model")
-        '                    Exit Sub
-        '                End If
+        Logger.Status("Computing Zonal Statistics for " + hlengname + "........")
+        'HlenzoneVTab = HlenGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zHlenFN.AsFileName)
+        'find average value of hlengthm for each unique value of basingthm
 
-        '                av.ShowMsg("Computing Zonal Statistics for " + hlengname + "........")
-        '                HlenzoneVTab = HlenGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zHlenFN.AsFileName)
-        '                If (HlenzoneVTab.HasError) Then
-        '                    Return NIL
-        '                    MsgBox.Error("Unable to compute zonal statistics for " + Hlengname, "")
-        '                    Exit Sub
-        '                ElseIf (hlenzoneVTab.GetNumRecords <> basintable.GetNumRecords) Then
-        '                    MsgBox.Error("Spatial Extent of" + +hlengname + +"less than basin grid", "Geospatial Stream Flow Model")
-        '                    Exit Sub
-        '                End If
+        Logger.Status("Computing Zonal Statistics for " + rcngname + "........")
+        'RcnzoneVTab = RcnGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zRcnFN.AsFileName)
+        'find average value of rcngthm for each unique value of basingthm
 
-        '                av.ShowMsg("Computing Zonal Statistics for " + rcngname + "........")
-        '                RcnzoneVTab = RcnGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zRcnFN.AsFileName)
-        '                If (RcnzoneVTab.HasError) Then
-        '                    Return NIL
-        '                    MsgBox.Error("Unable to compute zonal statistics for " + rcngname, "")
-        '                    Exit Sub
-        '                ElseIf (rcnzoneVTab.GetNumRecords <> basintable.GetNumRecords) Then
-        '                    MsgBox.Error("Spatial Extent of" + +rcngname + +"less than basin grid", "Geospatial Stream Flow Model")
-        '                    Exit Sub
-        '                End If
+        Logger.Status("Computing Zonal Statistics for " + whcgname + "........")
+        'WhczoneVTab = WhcGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zwhcFN.AsFileName)
+        'find average value of whcgthm for each unique value of basingthm
 
-        '                av.ShowMsg("Computing Zonal Statistics for " + whcgname + "........")
-        '                WhczoneVTab = WhcGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zwhcFN.AsFileName)
-        '                If (WhczoneVTab.HasError) Then
-        '                    Return NIL
-        '                    MsgBox.Error("Unable to compute zonal statistics for " + whcgname, "")
-        '                    Exit Sub
-        '                ElseIf (whczoneVTab.GetNumRecords <> basintable.GetNumRecords) Then
-        '                    MsgBox.Error("Spatial Extent of" + +whcgname + +"less than basin grid", "Geospatial Stream Flow Model")
-        '                    Exit Sub
-        '                End If
+        Logger.Status("Computing Zonal Statistics for " + depthgname + "........")
+        'DepthzoneVTab = DepthGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zDepthFN.AsFileName)
+        'find average value of depthgthm for each unique value of basingthm
 
-        '                av.ShowMsg("Computing Zonal Statistics for " + depthgname + "........")
-        '                DepthzoneVTab = DepthGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zDepthFN.AsFileName)
-        '                If (DepthzoneVTab.HasError) Then
-        '                    Return NIL
-        '                    MsgBox.Error("Unable to compute zonal statistics for " + depthgname, "")
-        '                    Exit Sub
-        '                ElseIf (depthzoneVTab.GetNumRecords <> basintable.GetNumRecords) Then
-        '                    MsgBox.Error("Spatial Extent of" + +depthgname + +"less than basin grid", "Geospatial Stream Flow Model")
-        '                    Exit Sub
-        '                End If
+        Logger.Status("Computing Zonal Statistics for " + texturegname + "........")
+        'TexturezoneVTab = TextureGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zTextureFN.AsFileName)
+        'find average value of texturegthm for each unique value of basingthm
 
-        '                av.ShowMsg("Computing Zonal Statistics for " + texturegname + "........")
-        '                TexturezoneVTab = TextureGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zTextureFN.AsFileName)
-        '                If (TexturezoneVTab.HasError) Then
-        '                    Return NIL
-        '                    MsgBox.Error("Unable to compute zonal statistics for " + Texturegname, "")
-        '                    Exit Sub
-        '                ElseIf (texturezoneVTab.GetNumRecords <> basintable.GetNumRecords) Then
-        '                    MsgBox.Error("Spatial Extent of" + +texturegname + +"less than basin grid", "Geospatial Stream Flow Model")
-        '                    Exit Sub
-        '                End If
+        Logger.Status("Computing Zonal Statistics for " + draingname + "........")
+        'DrainzoneVTab = DrainGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zDrainFN.AsFileName)
+        'find average value of draingthm for each unique value of basingthm
 
-        '                av.ShowMsg("Computing Zonal Statistics for " + draingname + "........")
-        '                DrainzoneVTab = DrainGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zDrainFN.AsFileName)
-        '                If (DrainzoneVTab.HasError) Then
-        '                    Return NIL
-        '                    MsgBox.Error("Unable to compute zonal statistics for " + draingname, "")
-        '                    Exit Sub
-        '                ElseIf (drainzoneVTab.GetNumRecords <> basintable.GetNumRecords) Then
-        '                    MsgBox.Error("Spatial Extent of" + +draingname + +"less than basin grid", "Geospatial Stream Flow Model")
-        '                    Exit Sub
-        '                End If
 
-        '                av.ShowMsg("Computing River Grid......")
+
+
+        Logger.Status("Computing River Grid......")
         '                rivgrid = (basingrid * ((rivlinkgrid + 1) / (rivlinkgrid + 1))).Int
         '                rivVtab = rivgrid.GetVtab
         '                If (rivVtab = nil) Then
@@ -2860,60 +2836,28 @@ Public Class frmGeoSFM
         '                    End
         '                    zonefield = rivVtab.Findfield("Value")
 
-        '                    av.ShowMsg("Computing Zonal Statistics for " + flowlengname + "........")
-        '                    rivlenzoneVTab = flowlengrid.ZonalStatsTable(rivgrid, ThePrj, zoneField, False, zRivlenFN.AsFileName)
-        '                    If (rivlenzoneVTab.HasError) Then
-        '                        Return NIL
-        '                        MsgBox.Error("Unable to compute zonal statistics for " + Flowlengname, "")
-        '                        Exit Sub
-        '                    ElseIf (rivlenzoneVTab.GetNumRecords <> basintable.GetNumRecords) Then
-        '                        MsgBox.Error("Spatial Extent of" + +flowlengname + +"less than basin grid", "Geospatial Stream Flow Model")
-        '                        Exit Sub
-        '                    End If
 
-        '                    av.ShowMsg("Computing Zonal Statistics for " + flowlengname + "........")
-        '                    lengthzoneVTab = flowlengrid.ZonalStatsTable(basingrid, ThePrj, zoneField, False, zlengthFN.AsFileName)
-        '                    If (lengthzoneVTab.HasError) Then
-        '                        Return NIL
-        '                        MsgBox.Error("Unable to compute zonal statistics for " + Flowlengname, "")
-        '                        Exit Sub
-        '                    ElseIf (lengthzoneVTab.GetNumRecords <> basintable.GetNumRecords) Then
-        '                        MsgBox.Error("Spatial Extent of" + +flowlengname + +"less than basin grid", "Geospatial Stream Flow Model")
-        '                        Exit Sub
-        '                    End If
 
-        '                    av.ShowMsg("Computing Zonal Statistics for river cell elevations........")
-        '                    rivdemzoneVTab = DemGrid.ZonalStatsTable(rivgrid, ThePrj, zoneField, False, zRivDemFN.AsFileName)
-        '                    If (rivdemzoneVTab.HasError) Then
-        '                        Return NIL
-        '                        MsgBox.Error("Unable to compute zonal statistics for river cell elevations", "Geospatial Stream Flow Model")
-        '                        Exit Sub
-        '                    ElseIf (rivdemzoneVTab.GetNumRecords <> basintable.GetNumRecords) Then
-        '                        MsgBox.Error("Spatial Extent of" + +demgname + +"less than basin grid", "Geospatial Stream Flow Model")
-        '                        Exit Sub
-        '                    End If
 
-        '                    av.ShowMsg("Computing Zonal Statistics for downstream basin ids........")
-        '                    DownzoneVTab = DownGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zDownFN.AsFileName)
-        '                    If (DownzoneVTab.HasError) Then
-        '                        Return NIL
-        '                        MsgBox.Error("Unable to compute zonal statistics for " + downgname, "Geospatial Stream Flow Model")
-        '                        Exit Sub
-        '                    ElseIf (downzoneVTab.GetNumRecords <> basintable.GetNumRecords) Then
-        '                        MsgBox.Error("Spatial Extent of" + +downgname + +"less than basin grid", "Geospatial Stream Flow Model")
-        '                        Exit Sub
-        '                    End If
+        Logger.Status("Computing Zonal Statistics for " + flowlengname + "........")
+        'rivlenzoneVTab = flowlengrid.ZonalStatsTable(rivgrid, ThePrj, zoneField, False, zRivlenFN.AsFileName)
+        'find average value of flowlengthm for each unique value of rivgrid
 
-        '                    av.ShowMsg("Computing Zonal Statistics for " + maxcovergname + "........")
-        '                    maxcoverzoneVTab = maxcoverGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zmaxcoverFN.AsFileName)
-        '                    If (maxcoverzoneVTab.HasError) Then
-        '                        Return NIL
-        '                        MsgBox.Error("Unable to compute zonal statistics for " + maxcovergname, "Geospatial Stream Flow Model")
-        '                        Exit Sub
-        '                    ElseIf (maxcoverzoneVTab.GetNumRecords <> basintable.GetNumRecords) Then
-        '                        MsgBox.Error("Spatial Extent of" + +maxcovergname + +"less than basin grid", "Geospatial Stream Flow Model")
-        '                        Exit Sub
-        '                    End If
+        Logger.Status("Computing Zonal Statistics for " + flowlengname + "........")
+        'lengthzoneVTab = flowlengrid.ZonalStatsTable(basingrid, ThePrj, zoneField, False, zlengthFN.AsFileName)
+        'find average value of flowlengthm for each unique value of basingthm
+
+        Logger.Status("Computing Zonal Statistics for river cell elevations........")
+        'rivdemzoneVTab = DemGrid.ZonalStatsTable(rivgrid, ThePrj, zoneField, False, zRivDemFN.AsFileName)
+        'find average value of demgthm for each unique value of rivgrid
+
+        Logger.Status("Computing Zonal Statistics for downstream basin ids........")
+        'DownzoneVTab = DownGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zDownFN.AsFileName)
+        'find average value of downgthm for each unique value of basingthm
+
+        Logger.Status("Computing Zonal Statistics for " + maxcovergname + "........")
+        'maxcoverzoneVTab = maxcoverGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zmaxcoverFN.AsFileName)
+        'find average value of maxcovergthm for each unique value of basingthm
 
         '                    areafield = DemZoneVtab.FindField("area")
         '                    demfield = DemZoneVtab.FindField("mean")
@@ -2949,6 +2893,12 @@ Public Class frmGeoSFM
         '                srtlist.Add(srtstring)
         '            End If
         '            srtlist.sort(False)
+
+
+        'find unique values from the basins grid
+        Dim lUniqueBasinValues As New atcCollection
+        'GisUtil.GridUniqueValues(basingthm, lUniqueBasinValues)
+        'may also need counts and hasdam fields?
 
         ' Begin writing to the output file
 
@@ -3098,319 +3048,535 @@ Public Class frmGeoSFM
         lSBDesc.AppendLine("")
         SaveFileString(lDescFile, lSBDesc.ToString)
 
-        'for each srtnum in 0..(srtlist.count-1)
-        '                jstring = srtlist.get(srtnum)
-        '                rrecord = jstring.astokens("xxx").get(1).asnumber
-        '                basinvalue = (BasinTable.ReturnValue(basinfield, rrecord)).AsString
-        '                areavalue = ((DemZoneVtab.ReturnValue(areafield, rrecord)) / (1000000.0)).SetFormat("d.d").AsString
-        '                demvalue = (DemZoneVtab.ReturnValue(demfield, rrecord)).SetFormat("d.d").AsString
-        '                facvalue = (FacZoneVtab.ReturnValue(facfield, rrecord)).AsString
-        '                hlenvalue = (HlenZoneVtab.ReturnValue(hlenfield, rrecord)).SetFormat("d.d").AsString
-        '                If (hlenvalue.isnumber.not) Then
-        '                    hlenvalue = basingrid.GetCellSize
-        '                End If
-        '                If (hlenvalue < basingrid.GetCellSize) Then
-        '                    hlenvalue = basingrid.GetCellSize
-        '                End If
-        '                avgdrop = (DemZoneVtab.ReturnValue(Demfield, rrecord)) - (DemZoneVtab.ReturnValue(Demminfield, rrecord))
-        '                avglength = (LengthZoneVtab.ReturnValue(Lenfield, rrecord)) - (LengthZoneVtab.ReturnValue(Lenminfield, rrecord))
-        '                If (avglength < basingrid.GetCellSize) Then
-        '                    avglength = basingrid.GetCellSize
-        '                End If
+        For Each basinvalue As Integer In lUniqueBasinValues
+            'jstring = srtlist.get(srtnum)
+            'rrecord = jstring.astokens("xxx").get(1).asnumber
 
-        '                drainvalue = (DrainZoneVtab.ReturnValue(drainfield, rrecord)).SetFormat("d.ddd").AsString
-        '                upareavalue = ((facvalue.asstring.asnumber * facgrid.GetCellSize * facgrid.GetCellSize) / 1000000.0).SetFormat("d.d").asstring
+            'DemZoneVtab
+            Dim areavalue As Single = 0 '((DemZoneVtab.ReturnValue(areafield, rrecord)) / (1000000.0)).SetFormat("d.d").AsString
+            Dim demvalue As Single = 0 '(DemZoneVtab.ReturnValue(demfield, rrecord)).SetFormat("d.d").AsString
+            Dim avgdrop As Single = 0 '(DemZoneVtab.ReturnValue(Demfield, rrecord)) - (DemZoneVtab.ReturnValue(Demminfield, rrecord))
 
-        '                slopevalue = (((avgdrop * 100) / avglength).SetFormat("d.dddd")).AsString
-        '                If (slopevalue.isnumber.not) Then
-        '                    slopevalue = "0.0010"
-        '                End If
-        '                If (slopevalue.asnumber < 0.001) Then
-        '                    slopevalue = "0.0010"
-        '                End If
+            'FacZoneVtab
+            Dim facvalue As Single = 0 '(FacZoneVtab.ReturnValue(facfield, rrecord)).AsString
 
-        '                riverlossvalue = "1.0"
-        '                rivlenvalue = (rivlenZoneVtab.ReturnValue(rivlenfield, rrecord)).SetFormat("d.d").AsString
-        '                If (rivlenvalue.isnumber.not) Then
-        '                    rivlenvalue = basingrid.GetCellSize.asstring
-        '                End If
-        '                If (rivlenvalue.asnumber < basingrid.GetCellSize) Then
-        '                    rivlenvalue = basingrid.GetCellSize.asstring
-        '                End If
+            'HlenZoneVtab
+            Dim hlenvalue As Single = 0 '(HlenZoneVtab.ReturnValue(hlenfield, rrecord)).SetFormat("d.d").AsString
+            'If (hlenvalue.isnumber.not) Then
+            '    hlenvalue = basingrid.GetCellSize
+            'End If
+            'If (hlenvalue < basingrid.GetCellSize) Then
+            '    hlenvalue = basingrid.GetCellSize
+            'End If
 
-        '                ' Assume porosity of 0.439 for medium soil texture in computing max storage for the catchment
-        '                ' Assume both sides of the river (2 * No. of River Cells) are draining at the saturated rate
-        '                '  under the influence of the average head (= avgdrop) in the catchment
-        '                ' Assume baseflow is 3 times as slow as interflow
+            'LengthZoneVtab
+            Dim avglength As Single = 0 '(LengthZoneVtab.ReturnValue(Lenfield, rrecord)) - (LengthZoneVtab.ReturnValue(Lenminfield, rrecord))
+            'If (avglength < basingrid.GetCellSize) Then
+            '    avglength = basingrid.GetCellSize
+            'End If
 
-        '                interflowlag = (((areavalue.asstring.asnumber) * (avgdrop.asstring.asnumber) * basingrid.GetCellSize * 0.439) / ((rivlenvalue.asstring.asnumber) * (avgdrop.asstring.asnumber) * (drainvalue.asstring.asnumber) * 0.24 * 2)).asstring
-        '                If (interflowlag.isnumber.not) Then
-        '                    interflowlag = "10"
-        '                ElseIf (interflowlag.asnumber < 2) Then
-        '                    interflowlag = "2"
-        '                ElseIf (interflowlag.asnumber > 120) Then
-        '                    interflowlag = "120"
-        '                End If
+            'DrainZoneVtab
+            Dim drainvalue As Single = 0 '(DrainZoneVtab.ReturnValue(drainfield, rrecord)).SetFormat("d.ddd").AsString
 
-        '                baseflowlag = (interflowlag.asstring.asnumber * 3).asstring
+            Dim upareavalue As Single = 0 '((facvalue.asstring.asnumber * facgrid.GetCellSize * facgrid.GetCellSize) / 1000000.0).SetFormat("d.d").asstring
 
-        '                '(((areavalue.asstring.asnumber) * (avgdrop.asstring.asnumber) * basingrid.GetCellSize * 0.439  * 3)/((rivlenvalue.asstring.asnumber) * (avgdrop.asstring.asnumber) * (drainvalue.asstring.asnumber) * 0.24 * 2)).asstring  
-        '                '  if (baseflowlag.isnumber.not) then
-        '                '    baseflowlag = "90"
-        '                '  elseif (baseflowlag.asnumber < 6) then
-        '                '    baseflowlag = "6"
-        '                '  elseif (baseflowlag.asnumber > 365) then
-        '                '    baseflowlag = "365"  
-        '                '  end
+            Dim slopevalue As String = ((avgdrop * 100) / avglength).ToString  '(((avgdrop * 100) / avglength).Format("d.dddd")).AsString
+            If Not IsNumeric(slopevalue) Then
+                slopevalue = "0.0010"
+            End If
+            If CSng(slopevalue) < 0.001 Then
+                slopevalue = "0.0010"
+            End If
 
-        '                rcnvalue = (RcnZoneVtab.ReturnValue(Rcnfield, rrecord)).SetFormat("d.d").AsString
-        '                whcvalue = (whcZoneVtab.ReturnValue(Whcfield, rrecord)).AsString
-        '                depthvalue = (DepthZoneVtab.ReturnValue(depthfield, rrecord)).AsString
-        '                texturevalue = (TextureZoneVtab.ReturnValue(texturefield, rrecord)).AsString
+            'rivlenZoneVtab
+            Dim riverlossvalue As String = "1.0"
 
-        '                ' Soil texture (1=Sand,2=Loam,3=Clay,5=Water)
-        '                If (texturevalue = "1") Then
-        '                    basinlossvalue = "0.95"
-        '                ElseIf (texturevalue = "2") Then
-        '                    basinlossvalue = "0.97"
-        '                ElseIf (texturevalue = "3") Then
-        '                    basinlossvalue = "0.99"
-        '                ElseIf (texturevalue = "5") Then
-        '                    basinlossvalue = "0.98"
-        '                Else
-        '                    basinlossvalue = "0.99"
-        '                End If
+            Dim rivlenvalue As String = "0.0" ' (rivlenZoneVtab.ReturnValue(rivlenfield, rrecord)).SetFormat("d.d").AsString
+            If Not IsNumeric(rivlenvalue) Then
+                'rivlenvalue = basingrid.GetCellSize.asstring
+            End If
+            'If CSng(rivlenvalue) < basingrid.GetCellSize Then
+            ' rivlenvalue = basingrid.GetCellSize.asstring
+            'End If
 
-        '                rivdropvalue = (rivdemZoneVtab.ReturnValue(rivdemfield, rrecord))
-        '                rivslopevalue = (((rivdropvalue * 100) / rivlenvalue.AsNumber).SetFormat("d.dddd")).AsString
-        '                If (rivslopevalue.isnumber.not) Then
-        '                    rivslopevalue = "0.0010"
-        '                End If
-        '                If (rivslopevalue.asnumber < 0.001) Then
-        '                    rivslopevalue = "0.0010"
-        '                End If
+            ' Assume porosity of 0.439 for medium soil texture in computing max storage for the catchment
+            ' Assume both sides of the river (2 * No. of River Cells) are draining at the saturated rate
+            '  under the influence of the average head (= avgdrop) in the catchment
+            ' Assume baseflow is 3 times as slow as interflow
 
-        '                If (rivslopevalue.asnumber < 0.1) Then
+            Dim interflowlag As String = "0" '(((areavalue) * (avgdrop) * basingrid.GetCellSize * 0.439) / (rivlenvalue * avgdrop * drainvalue * 0.24 * 2)).tostring
+            If Not IsNumeric(interflowlag) Then
+                interflowlag = "10"
+            ElseIf CStr(interflowlag) < 2 Then
+                interflowlag = "2"
+            ElseIf CStr(interflowlag) > 120 Then
+                interflowlag = "120"
+            End If
 
-        '                    If (upareavalue.asnumber <= 10000) Then
-        '                        celerity = "0.3"
-        '                    ElseIf (upareavalue.asnumber <= 50000) Then
-        '                        celerity = "0.45"
-        '                    ElseIf (upareavalue.asnumber <= 100000) Then
-        '                        celerity = "0.6"
-        '                    ElseIf (upareavalue.asnumber <= 250000) Then
-        '                        celerity = "0.75"
-        '                    ElseIf (upareavalue.asnumber <= 500000) Then
-        '                        celerity = "0.9"
-        '                    ElseIf (upareavalue.asnumber <= 750000) Then
-        '                        celerity = "1.2"
-        '                    Else
-        '                        celerity = "1.5"
-        '                    End If
+            Dim baseflowlag As String = (CStr(interflowlag) * 3).ToString
 
-        '                    diffusion = (((0.15 * (celerity.asnumber) * (rivlenvalue.AsNumber)).SetFormat("d.d")).asstring)
-        '                    If (diffusion.asstring.asnumber < 100.0) Then
-        '                        diffusion = "100.0"
-        '                    ElseIf (diffusion.asstring.asnumber > 10000.0) Then
-        '                        diffusion = "10000.0"
-        '                    End If
+            'RcnZoneVtab
+            Dim rcnvalue As String = "0" '(RcnZoneVtab.ReturnValue(Rcnfield, rrecord)).SetFormat("d.d").AsString
 
-        '                    ElseIf (rivslopevalue.asnumber < 0.2) Then
+            'whcZoneVtab
+            Dim whcvalue As String = "0" '(whcZoneVtab.ReturnValue(Whcfield, rrecord)).AsString
 
-        '                        If (upareavalue.asnumber <= 10000) Then
-        '                            celerity = "0.4"
-        '                        ElseIf (upareavalue.asnumber <= 50000) Then
-        '                            celerity = "0.6"
-        '                        ElseIf (upareavalue.asnumber <= 100000) Then
-        '                            celerity = "0.8"
-        '                        ElseIf (upareavalue.asnumber <= 250000) Then
-        '                            celerity = "1.0"
-        '                        ElseIf (upareavalue.asnumber <= 500000) Then
-        '                            celerity = "1.2"
-        '                        ElseIf (upareavalue.asnumber <= 750000) Then
-        '                            celerity = "1.6"
-        '                        Else
-        '                            celerity = "2.0"
-        '                    End If
+            'DepthZoneVtab
+            Dim depthvalue As String = "0" '(DepthZoneVtab.ReturnValue(depthfield, rrecord)).AsString
 
-        '                    diffusion = (((0.15 * (celerity.asnumber) * (rivlenvalue.AsNumber)).SetFormat("d.d")).asstring)
-        '                    If (diffusion.asstring.asnumber < 100.0) Then
-        '                        diffusion = "100.0"
-        '                    ElseIf (diffusion.asstring.asnumber > 10000.0) Then
-        '                        diffusion = "10000.0"
-        '                    End If
+            'TextureZoneVtab
+            Dim texturevalue As String = "0" '(TextureZoneVtab.ReturnValue(texturefield, rrecord)).AsString
 
-        '                ElseIf (rivslopevalue.asnumber < 0.3) Then
+            ' Soil texture (1=Sand,2=Loam,3=Clay,5=Water)
+            Dim basinlossvalue As String = ""
+            If texturevalue = "1" Then
+                basinlossvalue = "0.95"
+            ElseIf texturevalue = "2" Then
+                basinlossvalue = "0.97"
+            ElseIf texturevalue = "3" Then
+                basinlossvalue = "0.99"
+            ElseIf texturevalue = "5" Then
+                basinlossvalue = "0.98"
+            Else
+                basinlossvalue = "0.99"
+            End If
 
-        '                    If (upareavalue.asnumber <= 10000) Then
-        '                        celerity = "0.6"
-        '                    ElseIf (upareavalue.asnumber <= 50000) Then
-        '                        celerity = "0.9"
-        '                    ElseIf (upareavalue.asnumber <= 100000) Then
-        '                        celerity = "1.2"
-        '                    ElseIf (upareavalue.asnumber <= 250000) Then
-        '                        celerity = "1.5"
-        '                    ElseIf (upareavalue.asnumber <= 500000) Then
-        '                        celerity = "1.8"
-        '                    ElseIf (upareavalue.asnumber <= 750000) Then
-        '                        celerity = "2.4"
-        '                    Else
-        '                        celerity = "3.0"
-        '                    End If
+            'rivdemZoneVtab
+            Dim rivdropvalue As Single = 0.0 '(rivdemZoneVtab.ReturnValue(rivdemfield, rrecord))
+            Dim rivslopevalue As String = ((rivdropvalue * 100) / CStr(rivlenvalue)).ToString   '(((rivdropvalue * 100) / CStr(rivlenvalue)).SetFormat("d.dddd")).AsString
+            If Not IsNumeric(rivslopevalue) Then
+                rivslopevalue = "0.0010"
+            End If
+            If CStr(rivslopevalue) < 0.001 Then
+                rivslopevalue = "0.0010"
+            End If
 
-        '                    diffusion = (((0.15 * (celerity.asnumber) * (rivlenvalue.AsNumber)).SetFormat("d.d")).asstring)
-        '                    If (diffusion.asstring.asnumber < 100.0) Then
-        '                        diffusion = "100.0"
-        '                    ElseIf (diffusion.asstring.asnumber > 10000.0) Then
-        '                        diffusion = "10000.0"
-        '                    End If
+            Dim celerity As String = ""
+            Dim diffusion As String = ""
+            If CSng(rivslopevalue) < 0.1 Then
 
-        '                ElseIf (rivslopevalue.asnumber < 0.4) Then
+                If CSng(upareavalue) <= 10000 Then
+                    celerity = "0.3"
+                ElseIf CSng(upareavalue) <= 50000 Then
+                    celerity = "0.45"
+                ElseIf CSng(upareavalue) <= 100000 Then
+                    celerity = "0.6"
+                ElseIf CSng(upareavalue) <= 250000 Then
+                    celerity = "0.75"
+                ElseIf CSng(upareavalue) <= 500000 Then
+                    celerity = "0.9"
+                ElseIf CSng(upareavalue) <= 750000 Then
+                    celerity = "1.2"
+                Else
+                    celerity = "1.5"
+                End If
 
-        '                    If (upareavalue.asnumber <= 10000) Then
-        '                        celerity = "0.8"
-        '                    ElseIf (upareavalue.asnumber <= 50000) Then
-        '                        celerity = "1.2"
-        '                    ElseIf (upareavalue.asnumber <= 100000) Then
-        '                        celerity = "1.6"
-        '                    ElseIf (upareavalue.asnumber <= 250000) Then
-        '                        celerity = "2.0"
-        '                    ElseIf (upareavalue.asnumber <= 500000) Then
-        '                        celerity = "2.4"
-        '                    ElseIf (upareavalue.asnumber <= 750000) Then
-        '                        celerity = "3.2"
-        '                    Else
-        '                        celerity = "4.0"
-        '                    End If
+                diffusion = (0.15 * CSng(celerity) * CSng(rivlenvalue)).ToString  '(((0.15 * (CSng(celerity)) * (CSng(rivlenvalue)).SetFormat("d.d")).asstring)
+                If (CSng(diffusion) < 100.0) Then
+                    diffusion = "100.0"
+                ElseIf (CSng(diffusion) > 10000.0) Then
+                    diffusion = "10000.0"
+                End If
 
-        '                    diffusion = (((0.15 * (celerity.asnumber) * (rivlenvalue.AsNumber)).SetFormat("d.d")).asstring)
-        '                    If (diffusion.asstring.asnumber < 100.0) Then
-        '                        diffusion = "100.0"
-        '                    ElseIf (diffusion.asstring.asnumber > 10000.0) Then
-        '                        diffusion = "10000.0"
-        '                    End If
+            ElseIf CSng(rivslopevalue) < 0.2 Then
 
-        '                Else
+                If (CSng(upareavalue) <= 10000) Then
+                    celerity = "0.4"
+                ElseIf (CSng(upareavalue) <= 50000) Then
+                    celerity = "0.6"
+                ElseIf (CSng(upareavalue) <= 100000) Then
+                    celerity = "0.8"
+                ElseIf (CSng(upareavalue) <= 250000) Then
+                    celerity = "1.0"
+                ElseIf (CSng(upareavalue) <= 500000) Then
+                    celerity = "1.2"
+                ElseIf (CSng(upareavalue) <= 750000) Then
+                    celerity = "1.6"
+                Else
+                    celerity = "2.0"
+                End If
 
-        '                    If (upareavalue.asnumber <= 10000) Then
-        '                        celerity = "1.0"
-        '                    ElseIf (upareavalue.asnumber <= 50000) Then
-        '                        celerity = "1.5"
-        '                    ElseIf (upareavalue.asnumber <= 100000) Then
-        '                        celerity = "2.0"
-        '                    ElseIf (upareavalue.asnumber <= 250000) Then
-        '                        celerity = "2.5"
-        '                    ElseIf (upareavalue.asnumber <= 500000) Then
-        '                        celerity = "3.0"
-        '                    ElseIf (upareavalue.asnumber <= 750000) Then
-        '                        celerity = "4.0"
-        '                    Else
-        '                        celerity = "5.0"
-        '                    End If
+                diffusion = (0.15 * CSng(celerity) * CSng(rivlenvalue)).ToString '(((0.15 * CSng(celerity) * CSng(rivlenvalue)).SetFormat("d.d")).asstring)
+                If (CSng(diffusion) < 100.0) Then
+                    diffusion = "100.0"
+                ElseIf (CSng(diffusion) > 10000.0) Then
+                    diffusion = "10000.0"
+                End If
 
-        '                    diffusion = (((0.15 * (celerity.asnumber) * (rivlenvalue.AsNumber)).SetFormat("d.d")).asstring)
-        '                    If (diffusion.asstring.asnumber < 100.0) Then
-        '                        diffusion = "100.0"
-        '                    ElseIf (diffusion.asstring.asnumber > 10000.0) Then
-        '                        diffusion = "10000.0"
-        '                    End If
+            ElseIf CSng(rivslopevalue) < 0.3 Then
 
-        '                End If
+                If (CSng(upareavalue) <= 10000) Then
+                    celerity = "0.6"
+                ElseIf (CSng(upareavalue) <= 50000) Then
+                    celerity = "0.9"
+                ElseIf (CSng(upareavalue) <= 100000) Then
+                    celerity = "1.2"
+                ElseIf (CSng(upareavalue) <= 250000) Then
+                    celerity = "1.5"
+                ElseIf (CSng(upareavalue) <= 500000) Then
+                    celerity = "1.8"
+                ElseIf (CSng(upareavalue) <= 750000) Then
+                    celerity = "2.4"
+                Else
+                    celerity = "3.0"
+                End If
 
-        '                downvalue = (DownZoneVtab.ReturnValue(downfield, rrecord)).AsString
+                diffusion = (0.15 * CSng(celerity) * CSng(rivlenvalue)).ToString '(((0.15 * CSng(celerity) * CSng(rivlenvalue)).SetFormat("d.d")).asstring)
+                If (CSng(diffusion) < 100.0) Then
+                    diffusion = "100.0"
+                ElseIf (CSng(diffusion) > 10000.0) Then
+                    diffusion = "10000.0"
+                End If
 
-        '                maxcovervalue = ((MaxCoverZoneVtab.ReturnValue(maxcoverfield, rrecord)) / 100).SetFormat("d.ddddd").AsString
-        '                If (maxcovervalue.asstring.asnumber <= 0.001) Then
-        '                    maxcovervalue = "0.001"
-        '                ElseIf (maxcovervalue.asstring.asnumber >= 1) Then
-        '                    maxcovervalue = "1.0"
-        '                End If
+            ElseIf CSng(rivslopevalue) < 0.4 Then
 
-        '                hasdamvalue = (BasinTable.ReturnValue(hasdamfld, rrecord)).SetFormat("d").AsString
-        '                rivpolyloss = "1.0"
-        '                hasrating = "0"
-        '                hasflowdata = "0"
-        '                rivwidth = (6.13 * ((upareavalue.asnumber) ^ (0.347))).asstring
-        '                flowref = (36 * 0.02832 * ((areavalue.asnumber / 2.59) ^ (0.68))).asstring
-        '                runtype = "0"
-        '                mannvalue = "0.035"
-        '                pancoef = "0.85"
-        '                topsoil = "0.1"
-        '                aridity = "2"
-        '                outfile.WriteElt(BasinValue + "," + WhcValue + "," + depthValue + "," + TextureValue + "," + DrainValue + "," + AreaValue + "," + Interflowlag + "," + SlopeValue + "," + baseflowlag + "," + RcnValue + "," + maxcoverValue + "," + basinlossvalue + "," + pancoef + "," + topsoil + "," + aridity)
-        '                rivfile.WriteElt(BasinValue + "," + AreaValue + "," + UpAreaValue + "," + rivslopevalue + "," + rivlenValue + "," + downValue + "," + mannvalue + "," + riverlossvalue + "," + rivpolyloss + "," + hasdamValue + "," + hasrating + "," + hasflowdata + "," + celerity + "," + diffusion + "," + rivwidth + "," + flowref + "," + runtype)
-        '                orderfile.WriteElt(BasinValue)
-        '                End if 
-        '                outfile.Flush()
-        '                rivfile.Flush()
+                If (CSng(upareavalue) <= 10000) Then
+                    celerity = "0.8"
+                ElseIf (CSng(upareavalue) <= 50000) Then
+                    celerity = "1.2"
+                ElseIf (CSng(upareavalue) <= 100000) Then
+                    celerity = "1.6"
+                ElseIf (CSng(upareavalue) <= 250000) Then
+                    celerity = "2.0"
+                ElseIf (CSng(upareavalue) <= 500000) Then
+                    celerity = "2.4"
+                ElseIf (CSng(upareavalue) <= 750000) Then
+                    celerity = "3.2"
+                Else
+                    celerity = "4.0"
+                End If
 
-        '                outVtab = Vtab.Make(outfile.GetFileName, False, False)
+                diffusion = (0.15 * CSng(celerity) * CSng(rivlenvalue)).ToString  '(((0.15 * CSng(celerity) * CSng(rivlenvalue)).SetFormat("d.d")).asstring)
+                If (CSng(diffusion) < 100.0) Then
+                    diffusion = "100.0"
+                ElseIf (CSng(diffusion) > 10000.0) Then
+                    diffusion = "10000.0"
+                End If
 
-        '                'outsize = outfile.GetSize
-        '                'outfile.GoToBeg
-        '                'for each lnum in 0..(outsize)
-        '                '  outfile.setpos(lnum)
-        '                '  readstr = outfile.ReadELT.Asstring
-        '                '  if (readstr = "nil") then
-        '                '    break
-        '                '  end
-        '                '  newstr = readstr.Substitute(",", " ")
-        '                '  outfile.setpos(lnum)
-        '                '  outfile.write({newstr}, 1)
-        '                'end
+            Else
 
-        '                outfile.close()
-        '                rivfile.close()
-        '                orderfile.close()
+                If (CSng(upareavalue) <= 10000) Then
+                    celerity = "1.0"
+                ElseIf (CSng(upareavalue) <= 50000) Then
+                    celerity = "1.5"
+                ElseIf (CSng(upareavalue) <= 100000) Then
+                    celerity = "2.0"
+                ElseIf (CSng(upareavalue) <= 250000) Then
+                    celerity = "2.5"
+                ElseIf (CSng(upareavalue) <= 500000) Then
+                    celerity = "3.0"
+                ElseIf (CSng(upareavalue) <= 750000) Then
+                    celerity = "4.0"
+                Else
+                    celerity = "5.0"
+                End If
 
-        '                File.Copy(((myWkDirname + "basin.txt").AsFileName), ((myWkDirname + "basin_original.txt").AsFileName))
-        '                File.Copy(((myWkDirname + "river.txt").AsFileName), ((myWkDirname + "river_original.txt").AsFileName))
+                diffusion = (0.15 * CSng(celerity) * CSng(rivlenvalue)).ToString  '(((0.15 * CSng(celerity) * CSng(rivlenvalue)).SetFormat("d.d")).asstring)
+                If (CSng(diffusion) < 100.0) Then
+                    diffusion = "100.0"
+                ElseIf (CSng(diffusion) > 10000.0) Then
+                    diffusion = "10000.0"
+                End If
 
-        '                demzoneVtab.Deactivate()
-        '                FacZoneVtab.Deactivate()
-        '                HlenZoneVtab.Deactivate()
-        '                RcnZoneVtab.Deactivate()
-        '                whcZoneVtab.Deactivate()
-        '                DepthZoneVtab.Deactivate()
-        '                TextureZoneVtab.Deactivate()
-        '                DrainZoneVtab.Deactivate()
-        '                rivlenZoneVtab.Deactivate()
-        '                RivdemZoneVtab.Deactivate()
-        '                DownZoneVtab.Deactivate()
-        '                MaxCoverZoneVtab.Deactivate()
-        '                LengthzoneVtab.Deactivate()
+            End If
 
-        '                demzoneVtab = nil
-        '                FacZoneVtab = nil
-        '                HlenZoneVtab = nil
-        '                RcnZoneVtab = nil
-        '                whcZoneVtab = nil
-        '                DepthZoneVtab = nil
-        '                TextureZoneVtab = nil
-        '                DrainZoneVtab = nil
-        '                rivlenZoneVtab = nil
-        '                RivdemZoneVtab = nil
-        '                DownZoneVtab = nil
-        '                MaxCoverZoneVtab = nil
-        '                LengthzoneVtab = nil
+            'DownZoneVtab
+            Dim downvalue As String = "" '(DownZoneVtab.ReturnValue(downfield, rrecord)).AsString
 
-        '                av.PurgeObjects()
+            'MaxCoverZoneVtab
+            Dim maxcovervalue As String = "" '((MaxCoverZoneVtab.ReturnValue(maxcoverfield, rrecord)) / 100).SetFormat("d.ddddd").AsString
+            If CSng(maxcovervalue) <= 0.001 Then
+                maxcovervalue = "0.001"
+            ElseIf CSng(maxcovervalue) >= 1 Then
+                maxcovervalue = "1.0"
+            End If
 
-        '                File.Delete(zDemFN.AsFileName)
-        '                File.Delete(zFacFN.AsFileName)
-        '                File.Delete(zhlenFN.AsFileName)
-        '                File.Delete(zRcnFN.AsFileName)
-        '                File.Delete(zWhcFN.AsFileName)
-        '                File.Delete(ZDepthFN.AsFileName)
-        '                File.Delete(zTextureFN.AsFileName)
-        '                File.Delete(zDrainFN.AsFileName)
-        '                File.Delete(zrivlenFN.AsFileName)
-        '                File.Delete(zrivdemFN.AsFileName)
-        '                File.Delete(zDownFN.AsFileName)
-        '                File.Delete(zmaxcoverFN.AsFileName)
-        '                File.Delete(zlengthFN.AsFileName)
+            Dim hasdamvalue As String = "" '(BasinTable.ReturnValue(hasdamfld, rrecord)).SetFormat("d").AsString
+            Dim rivpolyloss As String = "1.0"
+            Dim hasrating As String = "0"
+            Dim hasflowdata As String = "0"
+            Dim rivwidth As String = (6.13 * (CSng(upareavalue) ^ (0.347))).ToString
+            Dim flowref As String = (36 * 0.02832 * ((CSng(areavalue) / 2.59) ^ (0.68))).ToString
+            Dim runtype As String = "0"
+            Dim mannvalue As String = "0.035"
+            Dim pancoef As String = "0.85"
+            Dim topsoil As String = "0.1"
+            Dim aridity As String = "2"
+            lSBOut.AppendLine(basinvalue + "," + whcvalue + "," + depthvalue + "," + texturevalue + "," + drainvalue + "," + areavalue + "," + interflowlag + "," + slopevalue + "," + baseflowlag + "," + rcnvalue + "," + maxcovervalue + "," + basinlossvalue + "," + pancoef + "," + topsoil + "," + aridity)
+            lSBRiv.AppendLine(basinvalue + "," + areavalue + "," + upareavalue + "," + rivslopevalue + "," + rivlenvalue + "," + downvalue + "," + mannvalue + "," + riverlossvalue + "," + rivpolyloss + "," + hasdamvalue + "," + hasrating + "," + hasflowdata + "," + celerity + "," + diffusion + "," + rivwidth + "," + flowref + "," + runtype)
+            lSBOrder.AppendLine(basinvalue)
+        Next
+
+        'outVtab = Vtab.Make(outfile.GetFileName, False, False)
+
+        SaveFileString(lOutFile, lSBOut.ToString)
+        SaveFileString(lRivFile, lSBRiv.ToString)
+        SaveFileString(lOrderFile, lSBOrder.ToString)
+
+        IO.File.Copy(lOutFile, lOutputPath & "basin_original.txt")
+        IO.File.Copy(lRivFile, lOutputPath & "river_original.txt")
 
         Logger.Msg("Basin Characteristics Computed. Outputs written to: " & vbCrLf & vbCrLf & "      " & lOutFile & vbCrLf & "      " & lOrderFile & vbCrLf & "      " & lRivFile, "Geospatial Stream Flow Model")
+    End Sub
 
+    Private Sub cmdResponseNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdResponseNext.Click
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+        '
+        '      Program: response.ave
+        '
+        '      Function: 
+        '          The program calculates overland flow velocity based on landcover and 
+        '          slope and computes a response function (hydrograph) for each subbasin
+        '
+        '      Inputs include
+        '          a grid of subbasins in a basin
+        '          a grid of terrain slope expressed as a decimal
+        '          a grid of flow direction (8 pourpoint model)
+        '          a grid of surface elevations (corrected DEM)
+        '          a USGS Land Cover grid or User Specified Velocity grid or User Specified Velocity
+        '          a grid of downstream flow lengths
+        '          a grid of stream outlets
+        '
+        '      Outputs:  
+        '          a single output data file entitled 'response.txt'. This file details the 
+        '          fraction of input flow that reaches the subbasin outlet during each subsequent day
+        '
+        '      Assumptions: The program assumes that 
+        '          the View is active and it contains all the input grids
+        '
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+    End Sub
+
+    Private Sub cmdRainEvapNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdRainEvapNext.Click
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+        '
+        '      Program: RainEvap.ave
+        '
+        '      Function: 
+        '          The program determines the mean rainfall and evaporation values
+        '          for subbasins within each drainage basin for each time step
+        '
+        '      Inputs: 
+        '          a grid of subbasins in a basin
+        '          the full path to a directory where the evaporation and rainfall grids are stored
+        '          the number of subbasins in the basin   
+        '          the beginning year (4 digit number) for the rainfall and evaporation grids
+        '          the ending year (4 digit number) for the rainfall and evaporation grids
+        '          the beginning day (1 to 366) for the rainfall and evaporation grids
+        '          the ending day (1 to 366) for the rainfall and evaporation grids
+        '
+        '      Outputs:  
+        '          a rainfall file entitled 'rain.txt'
+        '          an evaporation file entitled 'evap.txt'
+        '
+        '      Assumptions: The program assumes that 
+        '          the View is active and it contains the basin grid
+        '          all input evaporation and rainfall grids are in a single directory
+        '          evaporation grids are named evapyearday eg evap_1999002 for the second day of 1999
+        '          rainfall grids are named rainyearday eg rain_1999002 for the second day of 1999
+        '
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+    End Sub
+
+    Private Sub cmdBalanceNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdBalanceNext.Click
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+        '
+        '      Program: balance.ave
+        '
+        '      Function: 
+        '          The program computes a soil water balance for each subbasin in the model  
+        '          called and executed from an ArcView interphase. 
+        '
+        '      Inputs:
+        '          a textfile containing hydrologic parameters for each subbasin, basin.txt
+        '          a textfile containing rainfall data for each subbasin, rain.txt
+        '          a textfile containing evaporation data for each subbasin, evap.txt
+        '          a textfile containing initialization data for each subbasin
+        '          a textfile containing parameters specific to the simulation run
+        '
+        '      Outputs:  
+        '          a textfile containing soil water balance results for each subbasin
+        '          a textfile containing streamflow data for each subbasin
+        '
+        '      Assumptions: The program assumes that 
+        '          the View is active and it contains the basin polygon coverage. basin.shp
+        '
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+    End Sub
+
+    Private Sub cmdRouteNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdRouteNext.Click
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+        '
+        '      Program: route.ave
+        '
+        '      Function: 
+        '          The program computes a soil water balance for each subbasin in the model  
+        '          called and executed from an ArcView interphase. 
+        '
+        '      Inputs:
+        '          a textfile containing hydrologic parameters for each subbasin, river.txt
+        '          a textfile containing rainfall data for each subbasin, soilwater.txt
+        '          a textfile containing evaporation data for each subbasin, response.txt
+        '          a textfile containing computational for each subbasin, order.txt
+        '          a textfile containing parameters specific to the simulation run, parameter.txt
+        '          a textfile containing discharge data for reservoirs in the basin, reservoir.txt
+        '
+        '      Outputs:  
+        '          a textfile containing daily water balance for each reservoir in the basin, damstatus.txt
+        '          a textfile containing streamflow data for each subbasin, streamflow.txt
+        '
+        '      Assumptions: The program assumes that 
+        '          the View is active and it contains the basin polygon coverage. basin.shp
+        '
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+    End Sub
+
+    Private Sub cmdSensitivityNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSensitivityNext.Click
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+        '
+        '      Program: sensititivity.ave
+        '
+        '      Function: 
+        '          The program calibrates basin.txt and river.txt parameters to improve the match  
+        '          between simulated and observed models runs. 
+        '
+        '      Inputs:
+        '          a textfile containing hydrologic parameters for each subbasin, basin.txt
+        '          a textfile containing hydrologic parameters for each river reach, river.txt
+        '          a textfile containing rainfall data for each subbasin, rain.txt
+        '          a textfile containing evaporation data for each subbasin, evap.txt
+        '          a textfile containing computational for each subbasin, order.txt
+        '          a textfile containing parameters for the water balance simulation run, balparam.txt
+        '          a textfile containing parameters for the river routing simulation run, routparam.txt
+        '          a textfile containing discharge data for reservoirs in the basin, reservoir.txt
+        '
+        '      Outputs:  
+        '          a logfile documenting the pre and post processing of calibration input and output files, logfilesarun.txt
+        '          a textfile containing streamflow data for each subbasin, streamflow.txt
+        '
+        '      Assumptions: The program assumes that 
+        '          the View is active and it contains the basin polygon coverage. basin.shp
+        '
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+    End Sub
+
+    Private Sub cmdCalibrationNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCalibrationNext.Click
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+        '
+        '      Program: calibrate.ave
+        '
+        '      Function: 
+        '          The program calibrates basin.txt and river.txt parameters to improve the match  
+        '          between simulated and observed models runs. 
+        '
+        '      Inputs:
+        '          a textfile containing hydrologic parameters for each subbasin, basin.txt
+        '          a textfile containing hydrologic parameters for each river reach, river.txt
+        '          a textfile containing rainfall data for each subbasin, rain.txt
+        '          a textfile containing evaporation data for each subbasin, evap.txt
+        '          a textfile containing computational for each subbasin, order.txt
+        '          a textfile containing parameters for the water balance simulation run, balparam.txt
+        '          a textfile containing parameters for the river routing simulation run, routparam.txt
+        '          a textfile containing discharge data for reservoirs in the basin, reservoir.txt
+        '
+        '      Outputs:  
+        '          a logfile documenting the pre and post processing of calibration input and output files, logfilecalib.txt
+        '          a textfile containing streamflow data for each subbasin, streamflow.txt
+        '
+        '      Assumptions: The program assumes that 
+        '          the View is active and it contains the basin polygon coverage. basin.shp
+        '
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+    End Sub
+
+    Private Sub cmdBankfullNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdBankfullNext.Click
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+        '
+        '      Program: bankfull.ave
+        '
+        '      Function: 
+        '          The program computes bankfull (= median annual maxima) for each subbasin.
+        '            also computes percentiles, variance and mean maximum flows.  
+        '          . 
+        '
+        '      Inputs:
+        '          a textfile containing hydrologic parameters for each subbasin, basin.txt
+        '          a textfile containing rainfall data for each subbasin, soilwater.txt
+        '          a textfile containing evaporation data for each subbasin, response.txt
+        '          a textfile containing computational for each subbasin, order.txt
+        '          a textfile containing parameters specific to the simulation run, parameter.txt
+        '          a textfile containing discharge data for reservoirs in the basin, reservoir.txt
+        '
+        '      Outputs:  
+        '          a textfile containing daily water balance for each reservoir in the basin, damstatus.txt
+        '          a textfile containing streamflow data for each subbasin, streamflow.txt
+        '
+        '      Assumptions: The program assumes that 
+        '          the View is active and it contains the basin polygon coverage. basin.shp
+        '
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+    End Sub
+
+    Private Sub cmdMapGenerate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdMapGenerate.Click
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+        '
+        '      Program: plotmap.ave
+        '
+        '      Function: 
+        '          Produces a color-coded map based on the magnitude of the selected day's flow
+        '          compared to the preassigned or computed high/medium/low flows for each subbasin
+        '
+        '      Inputs: 
+        '          a polygon coverage of subbasins
+        '          a table (streamflow.txt) containing streamflow values for each subbasin
+        '
+        '      Outputs:  
+        '          a color-coded map based, ranking flow in each subbasin as high/medium/low
+        '
+        '      Assumptions: The program assumes that 
+        '          the View is active and it contains the coverage/grid of subbasins
+        '          the project contains the streamflow table, streamflow.txt
+        '
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+    End Sub
+
+    Private Sub cmdPlotGenerate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdPlotGenerate.Click
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
+        '
+        '      Program: setplot.ave
+        '
+        '      Function: 
+        '          Activates the plotting tool active. 
+        '          Subsequent clicks on the View initiates plotxy.ave
+        '
+        '      Inputs: 
+        '          none
+        '
+        '      Outputs: 
+        '          none. Plotting tool becomes active.
+        '
+        '      Assumptions: The program assumes that 
+        '          the View is active and it contains the coverage/grid of subbasins
+        '          the plotting tool is the second from last tool in the View tool bar
+        '
+        ' ***********************************************************************************************
+        ' ***********************************************************************************************
     End Sub
 End Class
