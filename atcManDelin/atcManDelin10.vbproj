@@ -165,6 +165,11 @@
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
     </Reference>
+    <ProjectReference Include="..\atcData\atcData10.vbproj">
+      <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
+      <Name>atcData10</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility10.vbproj">
       <Project>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</Project>
       <Name>atcMwGisUtility10</Name>

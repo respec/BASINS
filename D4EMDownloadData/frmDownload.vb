@@ -200,7 +200,10 @@ Public Class frmDownload
                     Case "nwis_stations_measurements"
                         chkNWIS_GetNWISMeasurements.Enabled = True
                         chkNWIS_GetNWISMeasurements.Checked = True
-                    Case "nwis_stations_gw", "nwis_stations_peak" 'download of these data not yet implemented
+                    Case "nwis_stations_gw"
+                        chkNWIS_GetNWISDailyGW.Enabled = True
+                        chkNWIS_GetNWISDailyGW.Checked = True
+                    Case "nwis_stations_peak" 'download of these data not yet implemented
                     Case "storet"
                         chkSTORET_Results.Enabled = True
                         chkSTORET_Results.Text = "Results"
@@ -219,6 +222,7 @@ Public Class frmDownload
         End If
         If Not chkNWIS_GetNWISDailyDischarge.Enabled AndAlso _
            Not chkNWIS_GetNWISIdaDischarge.Enabled AndAlso _
+           Not chkNWIS_GetNWISDailyGW.Enabled AndAlso _
            Not chkNWIS_GetNWISWQ.Enabled AndAlso _
            Not chkNWIS_GetNWISMeasurements.Enabled Then
             panelNWISnoStations.Visible = True
@@ -226,6 +230,7 @@ Public Class frmDownload
             chkNWIS_GetNWISDailyDischarge.Visible = False
             chkNWIS_GetNWISIdaDischarge.Visible = False
             chkNWIS_GetNWISMeasurements.Visible = False
+            chkNWIS_GetNWISDailyGW.Visible = False
             chkNWIS_GetNWISWQ.Visible = False
         End If
     End Sub
@@ -347,6 +352,11 @@ Public Class frmDownload
                                     'Dim lWDMfrm As New frmWDM    'don't add to wdm, just add rdb file to project
                                     'lWDMxml = lWDMfrm.AskUser(Me.Icon, "Flow", IO.Path.Combine(lSaveFolderOnly, "nwis"), _
                                     '                          lChild.Text & " Processing Options")
+                                End If
+                                If lChild Is chkNWIS_GetNWISDailyGW Then
+                                    Dim lWDMfrm As New frmWDM
+                                    lWDMxml = lWDMfrm.AskUser(Me.Icon, "Groundwater", IO.Path.Combine(lSaveFolderOnly, "nwis"), _
+                                                              lChild.Text & " Processing Options")
                                 End If
                                 If lChild Is chkNLDAS_GetNLDASParameter Then
                                     Dim lWDMfrm As New frmWDM
