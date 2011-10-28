@@ -89,7 +89,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
+    <OutputPath>..\Bin\Plugins\Basins\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>atcModelSegmentation.xml</DocumentationFile>
     <WarningLevel>1</WarningLevel>
@@ -113,17 +113,27 @@
       <HintPath>..\Bin\DotSpatial.Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DotSpatial.Data, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b600b0ba19543541, processorArchitecture=MSIL">
+    <Reference Include="DotSpatial.Data, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c29dbf30e059ca9d, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\DotSpatial.Data.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DotSpatial.Desktop, Version=6.0.0.0, Culture=neutral, PublicKeyToken=ca60e6823c3a6ee5, processorArchitecture=MSIL">
+    <Reference Include="DotSpatial.Desktop, Version=6.0.0.0, Culture=neutral, PublicKeyToken=ca60e6823c3a6ee5, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\DotSpatial.Desktop.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DotSpatial.Topology, Version=1.0.0.0, Culture=neutral, PublicKeyToken=fbcb22813a521af8, processorArchitecture=MSIL">
+    <Reference Include="DotSpatial.Projections, Version=1.0.0.0, Culture=neutral, PublicKeyToken=272632bddd08a38b, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\DotSpatial.Projections.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Serialization, Version=1.0.0.0, Culture=neutral, PublicKeyToken=441f200f827611e7, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\DotSpatial.Serialization.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Topology, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a66b5e9434ca3671, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\DotSpatial.Topology.dll</HintPath>
       <Private>False</Private>

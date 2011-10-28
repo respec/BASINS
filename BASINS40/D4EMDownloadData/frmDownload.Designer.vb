@@ -40,6 +40,7 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISMeasurements = New System.Windows.Forms.CheckBox
         Me.chkNWIS_GetNWISDailyDischarge = New System.Windows.Forms.CheckBox
         Me.chkNWIS_GetNWISIdaDischarge = New System.Windows.Forms.CheckBox
+        Me.chkNWIS_GetNWISDailyGW = New System.Windows.Forms.CheckBox
         Me.panelNWISnoStations = New System.Windows.Forms.Panel
         Me.lblNWISnoStations = New System.Windows.Forms.Label
         Me.btnHelp = New System.Windows.Forms.Button
@@ -226,6 +227,7 @@ Partial Class frmDownload
         Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISMeasurements)
         Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISDailyDischarge)
         Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISIdaDischarge)
+        Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISDailyGW)
         Me.grpNWIS.Controls.Add(Me.panelNWISnoStations)
         Me.grpNWIS.Location = New System.Drawing.Point(12, 275)
         Me.grpNWIS.Name = "grpNWIS"
@@ -241,7 +243,7 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISWQ.Location = New System.Drawing.Point(112, 19)
         Me.chkNWIS_GetNWISWQ.Name = "chkNWIS_GetNWISWQ"
         Me.chkNWIS_GetNWISWQ.Size = New System.Drawing.Size(90, 17)
-        Me.chkNWIS_GetNWISWQ.TabIndex = 29
+        Me.chkNWIS_GetNWISWQ.TabIndex = 28
         Me.chkNWIS_GetNWISWQ.Text = "Water Quality"
         Me.chkNWIS_GetNWISWQ.UseVisualStyleBackColor = True
         '
@@ -252,7 +254,7 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISMeasurements.Location = New System.Drawing.Point(205, 19)
         Me.chkNWIS_GetNWISMeasurements.Name = "chkNWIS_GetNWISMeasurements"
         Me.chkNWIS_GetNWISMeasurements.Size = New System.Drawing.Size(95, 17)
-        Me.chkNWIS_GetNWISMeasurements.TabIndex = 30
+        Me.chkNWIS_GetNWISMeasurements.TabIndex = 29
         Me.chkNWIS_GetNWISMeasurements.Text = "Measurements"
         Me.ToolTip1.SetToolTip(Me.chkNWIS_GetNWISMeasurements, "Periodic Manual Streamflow Measurements")
         Me.chkNWIS_GetNWISMeasurements.UseVisualStyleBackColor = True
@@ -275,9 +277,20 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISIdaDischarge.Location = New System.Drawing.Point(6, 42)
         Me.chkNWIS_GetNWISIdaDischarge.Name = "chkNWIS_GetNWISIdaDischarge"
         Me.chkNWIS_GetNWISIdaDischarge.Size = New System.Drawing.Size(144, 17)
-        Me.chkNWIS_GetNWISIdaDischarge.TabIndex = 28
+        Me.chkNWIS_GetNWISIdaDischarge.TabIndex = 31
         Me.chkNWIS_GetNWISIdaDischarge.Text = "Instantaneous Discharge"
         Me.chkNWIS_GetNWISIdaDischarge.UseVisualStyleBackColor = True
+        '
+        'chkNWIS_GetNWISDailyGW
+        '
+        Me.chkNWIS_GetNWISDailyGW.AutoSize = True
+        Me.chkNWIS_GetNWISDailyGW.Enabled = False
+        Me.chkNWIS_GetNWISDailyGW.Location = New System.Drawing.Point(309, 19)
+        Me.chkNWIS_GetNWISDailyGW.Name = "chkNWIS_GetNWISDailyGW"
+        Me.chkNWIS_GetNWISDailyGW.Size = New System.Drawing.Size(113, 17)
+        Me.chkNWIS_GetNWISDailyGW.TabIndex = 30
+        Me.chkNWIS_GetNWISDailyGW.Text = "Daily Groundwater"
+        Me.chkNWIS_GetNWISDailyGW.UseVisualStyleBackColor = True
         '
         'panelNWISnoStations
         '
@@ -519,10 +532,10 @@ Partial Class frmDownload
         Me.chkNWISStations_gw.AutoSize = True
         Me.chkNWISStations_gw.Location = New System.Drawing.Point(309, 19)
         Me.chkNWISStations_gw.Name = "chkNWISStations_gw"
-        Me.chkNWISStations_gw.Size = New System.Drawing.Size(93, 17)
+        Me.chkNWISStations_gw.Size = New System.Drawing.Size(113, 17)
         Me.chkNWISStations_gw.TabIndex = 25
-        Me.chkNWISStations_gw.Text = "Ground Water"
-        Me.ToolTip1.SetToolTip(Me.chkNWISStations_gw, "Ground Water Station Point Layer")
+        Me.chkNWISStations_gw.Text = "Daily Groundwater"
+        Me.ToolTip1.SetToolTip(Me.chkNWISStations_gw, "Daily Groundwater Station Point Layer")
         Me.chkNWISStations_gw.UseVisualStyleBackColor = True
         '
         'chkClip
@@ -748,6 +761,7 @@ Partial Class frmDownload
     Friend WithEvents chkNWIS_GetNWISMeasurements As System.Windows.Forms.CheckBox
     Friend WithEvents chkNWIS_GetNWISDailyDischarge As System.Windows.Forms.CheckBox
     Friend WithEvents chkNWIS_GetNWISIdaDischarge As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNWIS_GetNWISDailyGW As System.Windows.Forms.CheckBox
     Friend WithEvents grpNLCD2001 As System.Windows.Forms.GroupBox
     Friend WithEvents chkNLCD2001_LandCover As System.Windows.Forms.CheckBox
     Friend WithEvents grpNHDplus As System.Windows.Forms.GroupBox

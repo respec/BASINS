@@ -3,7 +3,7 @@ Imports atcMwGisUtility
 Imports MapWinUtility
 
 Friend Class frmModelSegmentation
-    Implements DotSpatial.Main.IProgressHandler
+    'Implements DotSpatial.Main.IProgressHandler
 
     Event OpenTableEditor(ByVal aLayerName As String)
     Event TableEdited()
@@ -260,7 +260,7 @@ Friend Class frmModelSegmentation
         End Try
     End Sub
 
-    Public Sub Progress(ByVal Key As String, ByVal Percent As Integer, ByVal Message As String) Implements DotSpatial.Main.IProgressHandler.Progress
-        Logger.Progress(Percent, 100)
-    End Sub
+    'Public Sub Progress(ByVal Key As String, ByVal Percent As Integer, ByVal Message As String) Implements DotSpatial.Main.IProgressHandler.Progress
+    '    Logger.Progress(Percent, 100)
+    'End Sub
 End Class

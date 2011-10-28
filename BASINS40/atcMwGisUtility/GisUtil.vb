@@ -1574,6 +1574,90 @@ Public Class GisUtil
         End If
     End Function
 
+    ''' <summary>
+    ''' Compute statistics per zone
+    ''' </summary>
+    ''' <param name="aZoneGridIndex">Index of grid whose values are zone numbers, e.g. subbasins</param>
+    ''' <param name="aValueGridIndex">Index of grid to compute statistics from, by zone</param>
+    ''' <returns>atcCollection of atcDataAttributes, indexed by zone number. Each atcDataAttributes item contains statistics for one zone.</returns>
+    ''' <remarks></remarks>
+    Public Shared Function GridZonalStatistics(ByVal aZoneGridIndex As Integer, ByVal aValueGridIndex As Integer) As atcCollection
+        Dim lNaN As Double = GetNaN()
+        Dim lZoneGrid As MapWinGIS.Grid = GridFromIndex(aZoneGridIndex)
+        Dim lValueGrid As MapWinGIS.Grid = GridFromIndex(aValueGridIndex)
+
+        Dim lStartRow As Integer = 0
+        Dim lStartCol As Integer = 0
+        Dim lEndRow As Integer = lZoneGrid.Header.NumberRows - 1
+        Dim lEndCol As Integer = lZoneGrid.Header.NumberCols - 1
+
+        If (lValueGrid.Header.NumberRows - 1) <> lEndRow Then
+            Throw New ApplicationException("GridZonalStatistics: Number of rows in input grids do not match: " & lZoneGrid.Header.NumberRows & " <> " & lValueGrid.Header.NumberRows)
+        End If
+        If (lValueGrid.Header.NumberCols - 1) <> lEndCol Then
+            Throw New ApplicationException("GridZonalStatistics: Number of columns in input grids do not match: " & lZoneGrid.Header.NumberCols & " <> " & lValueGrid.Header.NumberCols)
+        End If
+
+        Dim lAreaPerCell As Double = lValueGrid.Header.dX * lValueGrid.Header.dY
+
+        Dim lZoneNumber As Integer
+        Dim lZonalValues As New atcCollection
+        Dim lThisZoneValues As Generic.List(Of Double)
+
+        For lRow As Integer = lStartRow To lEndRow
+            For lCol As Integer = lStartCol To lEndCol
+                lZoneNumber = lZoneGrid.Value(lCol, lRow)
+                lThisZoneValues = lZonalValues.ItemByKey(lZoneNumber)
+                If lThisZoneValues Is Nothing Then
+                    lThisZoneValues = New Generic.List(Of Double)
+                    lZonalValues.Add(lZoneNumber, lThisZoneValues)
+                End If
+                lThisZoneValues.Add(lValueGrid.Value(lCol, lRow))
+            Next
+            If pStatusShow Then Logger.Progress("Computing zonal statistics", lRow, lEndRow)
+        Next
+
+        Dim lZonalStatistics As New atcCollection 'Of ZoneGridIndex, atcDataAttributes
+
+        For lCollectionIndex As Integer = 0 To lZonalValues.Count - 1
+            lZoneNumber = lZonalValues.Keys(lCollectionIndex)
+            lThisZoneValues = lZonalValues.ItemByIndex(lCollectionIndex)
+
+            'Find most common value, called "Mode", a.k.a. "Majority"
+            Dim lValueTotals As New atcCollection
+            For Each lValue As Double In lThisZoneValues
+                lValueTotals.Increment(lValue)
+            Next
+            Dim lMode As Double = lNaN
+            Dim lModeCount As Integer = 0
+            For lSearchIndex As Integer = 0 To lValueTotals.Count - 1
+                If lValueTotals.ItemByIndex(lSearchIndex) > lModeCount Then
+                    lMode = lValueTotals.Keys(lSearchIndex)
+                    lModeCount = lValueTotals.ItemByIndex(lSearchIndex)
+                End If
+            Next
+
+            Dim lTs As New atcData.atcTimeseries(Nothing)
+            lThisZoneValues.Insert(0, lNaN)
+            lTs.Values = lThisZoneValues.ToArray
+            Dim lNumCellsInZone As Integer = lTs.Attributes.GetValue("Count") + lTs.Attributes.GetValue("Count Missing")
+            If Double.IsNaN(lAreaPerCell) OrElse lAreaPerCell <= 0 Then
+                lTs.Attributes.SetValue("Number Of Cells", lNumCellsInZone)
+                Logger.Dbg("Computed statistics, Zone " & lZoneNumber & " Number Of Cells = " & DoubleToString(lTs.Attributes.GetValue("Number Of Cells")))
+            Else
+                lTs.Attributes.SetValue("Area", lAreaPerCell * lNumCellsInZone)
+                Logger.Dbg("Computed statistics, Zone " & lZoneNumber & " Area = " & DoubleToString(lTs.Attributes.GetValue("Area")))
+            End If
+
+            If Not Double.IsNaN(lMode) Then
+                lTs.Attributes.SetValue("Mode", lMode)
+            End If
+            lTs.Attributes.SetValue("Zone", lZoneNumber)
+            lZonalStatistics.Add(lZoneNumber, lTs.Attributes)
+        Next
+        Return lZonalStatistics
+    End Function
+
     ''' <summary>Overlay Layer1 and Layer2 (eg landuse and subbasins), creating a polygon layer containing features from both layers</summary>
     ''' <param name="aLayer1Name">
     '''     <para>Name of first layer to overlay</para>
