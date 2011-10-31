@@ -1658,6 +1658,163 @@ Public Class GisUtil
         Return lZonalStatistics
     End Function
 
+    Public Shared Sub GridAssignValues(ByVal aStreamGridFileName As String, ByVal aSubbasinGridFileName As String, ByVal aNewGridFileName As String)
+        'to the first grid, assign the values at the coresponding cells of the second grid, and save the result as the third.
+        'used to assign a subbasin number to each stream cell
+
+        Dim lStreamGridLayerIndex As Integer = GisUtil.LayerIndex(aStreamGridFileName)
+        Dim lSubbasinGridLayerIndex As Integer = GisUtil.LayerIndex(aSubbasinGridFileName)
+
+        Dim lStreamGrid As MapWinGIS.Grid = GridFromIndex(lStreamGridLayerIndex)
+        Dim lSubbasinGrid As MapWinGIS.Grid = GridFromIndex(lSubbasinGridLayerIndex)
+
+        If FileExists(aNewGridFileName) Then
+            IO.File.Delete(aNewGridFileName)
+        End If
+        IO.File.Copy(aStreamGridFileName, aNewGridFileName)
+        Dim lOutputGrid As New MapWinGIS.Grid
+        lOutputGrid.Open(aNewGridFileName)
+
+        Dim lStartRow As Integer = 0
+        Dim lStartCol As Integer = 0
+        Dim lEndRow As Integer = lStreamGrid.Header.NumberRows - 1
+        Dim lEndCol As Integer = lStreamGrid.Header.NumberCols - 1
+
+        If (lSubbasinGrid.Header.NumberRows - 1) <> lEndRow Then
+            Throw New ApplicationException("GridAssignValues: Number of rows in input grids do not match: " & lStreamGrid.Header.NumberRows & " <> " & lSubbasinGrid.Header.NumberRows)
+        End If
+        If (lSubbasinGrid.Header.NumberCols - 1) <> lEndCol Then
+            Throw New ApplicationException("GridAssignValues: Number of columns in input grids do not match: " & lStreamGrid.Header.NumberCols & " <> " & lSubbasinGrid.Header.NumberCols)
+        End If
+
+        Dim lNoData As Object = lStreamGrid.Header.NodataValue
+        Dim lTempVal As Object = Nothing
+
+        For lRow As Integer = lStartRow To lEndRow
+            For lCol As Integer = lStartCol To lEndCol
+                lTempVal = lStreamGrid.Value(lCol, lRow)
+                If lTempVal <> lNoData And lTempVal > 0 Then
+                    lOutputGrid.Value(lCol, lRow) = lSubbasinGrid.Value(lCol, lRow)
+                End If
+            Next
+        Next
+
+        lOutputGrid.Save()
+    End Sub
+
+    Public Shared Sub GridBuildOutlets(ByVal aStreamLinkGridFileName As String, ByVal aFlowAccGridFileName As String, ByVal aNewGridFileName As String)
+        'used in creating an outlets grid.  for each stream link, include only the cell with the maximum flow accumulation
+
+        Dim lStreamGridLayerIndex As Integer = GisUtil.LayerIndex(aStreamLinkGridFileName)
+        Dim lFlowAccGridLayerIndex As Integer = GisUtil.LayerIndex(aFlowAccGridFileName)
+
+        Dim lStreamGrid As MapWinGIS.Grid = GridFromIndex(lStreamGridLayerIndex)
+        Dim lFlowAccGrid As MapWinGIS.Grid = GridFromIndex(lFlowAccGridLayerIndex)
+
+        If FileExists(aNewGridFileName) Then
+            IO.File.Delete(aNewGridFileName)
+        End If
+        IO.File.Copy(aStreamLinkGridFileName, aNewGridFileName)
+        Dim lOutputGrid As New MapWinGIS.Grid
+        lOutputGrid.Open(aNewGridFileName)
+
+        Dim lStartRow As Integer = 0
+        Dim lStartCol As Integer = 0
+        Dim lEndRow As Integer = lStreamGrid.Header.NumberRows - 1
+        Dim lEndCol As Integer = lStreamGrid.Header.NumberCols - 1
+
+        If (lFlowAccGrid.Header.NumberRows - 1) <> lEndRow Then
+            Throw New ApplicationException("GridBuildOutlets: Number of rows in input grids do not match: " & lStreamGrid.Header.NumberRows & " <> " & lFlowAccGrid.Header.NumberRows)
+        End If
+        If (lFlowAccGrid.Header.NumberCols - 1) <> lEndCol Then
+            Throw New ApplicationException("GridBuildOutlets: Number of columns in input grids do not match: " & lStreamGrid.Header.NumberCols & " <> " & lFlowAccGrid.Header.NumberCols)
+        End If
+
+        Dim lNoData As Object = lStreamGrid.Header.NodataValue
+        Dim lStreamVal As Object = Nothing
+        Dim lFlowAccVal As Object = Nothing
+
+        Dim lMaxAccums As New atcCollection
+
+        'in first pass figure out the highest flowacc in each stream segment 
+        For lRow As Integer = lStartRow To lEndRow
+            For lCol As Integer = lStartCol To lEndCol
+                lStreamVal = lStreamGrid.Value(lCol, lRow)
+                If lStreamVal > 0 Then
+                    'this is a stream segment 
+                    lFlowAccVal = lFlowAccGrid.Value(lCol, lRow)
+                    If Not lMaxAccums.Keys.Contains(lStreamVal) Then
+                        lMaxAccums.Add(lStreamVal, lFlowAccVal)
+                    Else
+                        If lMaxAccums.ItemByKey(lStreamVal) < lFlowAccVal Then
+                            lMaxAccums.ItemByKey(lStreamVal) = lFlowAccVal
+                        End If
+                    End If
+                End If
+            Next
+        Next
+
+        'in second pass set to null every cell except the one with the highest flowacc in each stream segment 
+        For lRow As Integer = lStartRow To lEndRow
+            For lCol As Integer = lStartCol To lEndCol
+                lStreamVal = lStreamGrid.Value(lCol, lRow)
+                If lStreamVal > 0 Then
+                    'this is a stream segment 
+                    lFlowAccVal = lFlowAccGrid.Value(lCol, lRow)
+                    If lMaxAccums.ItemByKey(lStreamVal) <> lFlowAccVal Then
+                        lOutputGrid.Value(lCol, lRow) = lNoData
+                    End If
+                End If
+            Next
+        Next
+
+        lOutputGrid.Save()
+    End Sub
+
+    Public Shared Sub GridAssignValuesToNull(ByVal aInputGridFileName As String, ByVal aStreamGridFileName As String, ByVal aNewGridFileName As String)
+        'to the first grid, assign null at the corresponding cells of the second grid, and save the result as the third.
+        'used to make null all the stream cells in a flow dir grid
+
+        Dim lInputGridLayerIndex As Integer = GisUtil.LayerIndex(aInputGridFileName)
+        Dim lStreamGridLayerIndex As Integer = GisUtil.LayerIndex(aStreamGridFileName)
+
+        Dim lInputGrid As MapWinGIS.Grid = GridFromIndex(lInputGridLayerIndex)
+        Dim lStreamGrid As MapWinGIS.Grid = GridFromIndex(lStreamGridLayerIndex)
+
+        If FileExists(aNewGridFileName) Then
+            IO.File.Delete(aNewGridFileName)
+        End If
+        IO.File.Copy(aInputGridFileName, aNewGridFileName)
+        Dim lOutputGrid As New MapWinGIS.Grid
+        lOutputGrid.Open(aNewGridFileName)
+
+        Dim lStartRow As Integer = 0
+        Dim lStartCol As Integer = 0
+        Dim lEndRow As Integer = lInputGrid.Header.NumberRows - 1
+        Dim lEndCol As Integer = lInputGrid.Header.NumberCols - 1
+
+        If (lStreamGrid.Header.NumberRows - 1) <> lEndRow Then
+            Throw New ApplicationException("GridAssignValuesNull: Number of rows in input grids do not match: " & lInputGrid.Header.NumberRows & " <> " & lStreamGrid.Header.NumberRows)
+        End If
+        If (lStreamGrid.Header.NumberCols - 1) <> lEndCol Then
+            Throw New ApplicationException("GridAssignValuesNull: Number of columns in input grids do not match: " & lInputGrid.Header.NumberCols & " <> " & lStreamGrid.Header.NumberCols)
+        End If
+
+        Dim lNoData As Object = lInputGrid.Header.NodataValue
+        Dim lTempVal As Object = Nothing
+
+        For lRow As Integer = lStartRow To lEndRow
+            For lCol As Integer = lStartCol To lEndCol
+                lTempVal = lStreamGrid.Value(lCol, lRow)
+                If lTempVal <> lNoData And lTempVal > 0 Then
+                    lOutputGrid.Value(lCol, lRow) = lNoData
+                End If
+            Next
+        Next
+
+        lOutputGrid.Save()
+    End Sub
+
     ''' <summary>Overlay Layer1 and Layer2 (eg landuse and subbasins), creating a polygon layer containing features from both layers</summary>
     ''' <param name="aLayer1Name">
     '''     <para>Name of first layer to overlay</para>

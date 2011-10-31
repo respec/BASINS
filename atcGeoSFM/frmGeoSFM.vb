@@ -2180,14 +2180,16 @@ Public Class frmGeoSFM
             Dim lLayerName As String = GisUtil.LayerName(lLayerIndex)
             If GisUtil.LayerType(lLayerIndex) = MapWindow.Interfaces.eLayerType.Grid Then
                 cboDEM.Items.Add(lLayerName)
-                If GisUtil.LayerFileName(lLayerIndex).IndexOf("\demg\") >= 0 Or GisUtil.LayerFileName(lLayerIndex).IndexOf("\dem\") >= 0 Then
+                'If GisUtil.LayerFileName(lLayerIndex).IndexOf("\demg\") >= 0 Or GisUtil.LayerFileName(lLayerIndex).IndexOf("\dem\") >= 0 Then
+                'cboDEM.SelectedIndex = cboDEM.Items.Count - 1
+                If GisUtil.LayerName(lLayerIndex) = "Digital Elevation Model" Then
                     cboDEM.SelectedIndex = cboDEM.Items.Count - 1
                 ElseIf GisUtil.LayerFileName(lLayerIndex).IndexOf("\ned\") >= 0 Then
                     cboDEM.SelectedIndex = cboDEM.Items.Count - 1
                 End If
             End If
         Next lLayerIndex
-        If cboDEM.SelectedIndex < 1 Then
+        If cboDEM.SelectedIndex < 0 Then
             cmdTerrainNext.Enabled = False
         End If
 
@@ -2196,9 +2198,9 @@ Public Class frmGeoSFM
         For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
             If GisUtil.LayerType(lLayerIndex) = MapWindow.Interfaces.eLayerType.LineShapefile Then
                 cboReach.Items.Add(GisUtil.LayerName(lLayerIndex))
-                If GisUtil.LayerFileName(lLayerIndex).IndexOf("\nhd\") >= 0 Then
-                    cboReach.SelectedIndex = cboReach.Items.Count - 1
-                End If
+                'If GisUtil.LayerFileName(lLayerIndex).IndexOf("\nhd\") >= 0 Then
+                'cboReach.SelectedIndex = cboReach.Items.Count - 1
+                'End If
             End If
         Next lLayerIndex
         If cboReach.SelectedIndex = -1 Then
@@ -2210,14 +2212,14 @@ Public Class frmGeoSFM
         For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
             If GisUtil.LayerType(lLayerIndex) = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
                 cboSubbasin.Items.Add(GisUtil.LayerName(lLayerIndex))
-                If GisUtil.CurrentLayer = lLayerIndex Then 'this is the current layer
-                    cboSubbasin.SelectedIndex = cboSubbasin.Items.Count - 1
-                End If
+                'If GisUtil.CurrentLayer = lLayerIndex Then 'this is the current layer
+                'cboSubbasin.SelectedIndex = cboSubbasin.Items.Count - 1
+                'End If
             End If
         Next lLayerIndex
-        If cboSubbasin.SelectedIndex = -1 Then 'make a guess
-            cboSubbasin.SelectedIndex = cboSubbasin.Items.IndexOf("Cataloging Unit Boundaries")
-        End If
+        'If cboSubbasin.SelectedIndex = -1 Then 'make a guess
+        'cboSubbasin.SelectedIndex = cboSubbasin.Items.IndexOf("Cataloging Unit Boundaries")
+        'End If
         If cboSubbasin.SelectedIndex = -1 Then
             cboSubbasin.SelectedIndex = 0
         End If
