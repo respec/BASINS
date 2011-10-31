@@ -164,7 +164,7 @@ Public Module modGeoSFM
             lFlowLenGridLayerIndex = GisUtil.LayerIndex(lFlowLenGridLayerName)
             lFlowLenGridFileName = GisUtil.LayerFileName(lFlowLenGridLayerIndex)
         Else
-            lFlowLenGridFileName = FilenameNoExt(lDEMFileName) & "FlowLen.tif"
+            lFlowLenGridFileName = FilenameNoExt(lDEMFileName) & "FlowLen.bgd"
             DownstreamFlowLength(lFlowDirGridFileName, lFlowLenGridFileName)
             GisUtil.AddLayer(lFlowLenGridFileName, lFlowLenGridLayerName)
         End If
@@ -177,9 +177,9 @@ Public Module modGeoSFM
             lStreamLinkGridLayerIndex = GisUtil.LayerIndex(lStreamLinkGridLayerName)
             lStreamLinkGridFileName = GisUtil.LayerFileName(lStreamLinkGridLayerIndex)
         Else
-            lStreamLinkGridFileName = FilenameNoExt(lDEMFileName) & "StreamLink.tif"
+            lStreamLinkGridFileName = FilenameNoExt(lDEMFileName) & "StreamLink.bgd"
             'to the first grid, assign the values at the coresponding cells of the second grid, and save the result as the third
-            GridAssignValues(lStreamGridFileName, lSubbasinGridFileName, lStreamLinkGridFileName)
+            GisUtil.GridAssignValues(lStreamGridFileName, lSubbasinGridFileName, lStreamLinkGridFileName)
             GisUtil.AddLayer(lStreamLinkGridFileName, lStreamLinkGridLayerName)
         End If
 
@@ -191,11 +191,11 @@ Public Module modGeoSFM
             lOutletGridLayerIndex = GisUtil.LayerIndex(lOutletGridLayerName)
             lOutletGridFileName = GisUtil.LayerFileName(lOutletGridLayerIndex)
         Else
-            lOutletGridFileName = FilenameNoExt(lDEMFileName) & "Outlet.tif"
+            lOutletGridFileName = FilenameNoExt(lDEMFileName) & "Outlet.bgd"
             'zonefield = stlVtab.Findfield("Value")
             'maxfac = facgrid.zonalstats( #grid_statype_max, stlgrid, prj.makenull, zoneField, false )
             'outgrid = (facgrid <> maxfac).setnull(stlgrid)
-            GridAssignMaxValues(lFlowAccGridFileName, lStreamLinkGridFileName, lOutletGridFileName)
+            GisUtil.GridBuildOutlets(lStreamLinkGridFileName, lFlowAccGridFileName, lOutletGridFileName)
             GisUtil.AddLayer(lOutletGridFileName, lOutletGridLayerName)
         End If
 
@@ -207,11 +207,11 @@ Public Module modGeoSFM
             lHillLenGridLayerIndex = GisUtil.LayerIndex(lHillLenGridLayerName)
             lHillLenGridFileName = GisUtil.LayerFileName(lHillLenGridLayerIndex)
         Else
-            lHillLenGridFileName = FilenameNoExt(lDEMFileName) & "HillLen.tif"
-            Dim lFlowDirHillGridFileName As String = FilenameNoExt(lDEMFileName) & "FlowDirHill.tif"
+            lHillLenGridFileName = FilenameNoExt(lDEMFileName) & "HillLen.bgd"
+            Dim lFlowDirHillGridFileName As String = FilenameNoExt(lDEMFileName) & "FlowDirHill.bgd"
             'fdrhill = (strgrid.IsNull)*(fdrgrid)
-            'to the first grid, assign null at the coresponding cells of the second grid, and save the result as the third
-            GridAssignValuesToNull(lFlowDirGridFileName, lStreamGridFileName, lFlowDirHillGridFileName)
+            'to the first grid, assign null at the corresponding cells of the second grid, and save the result as the third
+            GisUtil.GridAssignValuesToNull(lFlowDirGridFileName, lStreamGridFileName, lFlowDirHillGridFileName)
             'hlggrid = fdrhill.FlowLength(Nil, False)
             DownstreamFlowLength(lFlowDirHillGridFileName, lHillLenGridFileName)
             GisUtil.AddLayer(lHillLenGridFileName, lHillLenGridLayerName)
@@ -220,10 +220,6 @@ Public Module modGeoSFM
         '"Downstream Grid"
         'this is more complicated
         'we don't have to do this exactly, but we need to know which subbasin is downstream of each one
-        'outdwngrd = outgrd11.merge({ outgrd22, outgrd33, outgrd44, outgrd55, outgrd66, outgrd77, outgrd88 })
-        'outdwn = allhoodgrd - outdwngrd
-        'dwngrid0 = outdwn.zonalStats(#GRID_STATYPE_MAX, basgrid, Prj.MakeNull, zonefield, false)
-
     End Sub
 
     Friend Sub Basin(ByVal zonegname As String, ByVal demgname As String, ByVal facgname As String, ByVal hlengname As String, ByVal rcngname As String, _
@@ -434,8 +430,9 @@ Public Module modGeoSFM
         '        End
 
         Logger.Status("Computing Zonal Statistics for " + demgname + "........")
-        'DemzoneVTab = DemGrid.ZonalStatsTable(basingthm, ThePrj, basinField, False, zDemFN.AsFileName)
         'find average value of demgthm for each unique value of basingthm
+        Dim lDemZonalStats As New atcCollection
+        lDemZonalStats = GisUtil.GridZonalStatistics(basingthm, demgthm)
 
         Logger.Status("Computing Zonal Statistics for " + facgname + "........")
         'FaczoneVTab = FacGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zFacFN.AsFileName)
@@ -1737,26 +1734,19 @@ Public Module modGeoSFM
 
     Friend Sub DownstreamFlowLength(ByVal aFlowDirGridFileName As String, ByVal aLenGridFileName As String)
         'new sub to compute downstream flow length, not available directly in mapwindow
+
+        'cheat for now, use totup grid
+        IO.File.Copy(FilenameNoExt("D:\BASINS\data\02060006-7\dem\02060006demg.bgd") & "TotUp.bgd", aLenGridFileName)
     End Sub
 
     Friend Sub GridFromShapefile(ByVal aShapefileLayerIndex As Integer, ByVal aBaseGridFileName As String, ByVal aNewGridFileName As String)
         'given a shapefile (subbasins or streams) and a base grid, return a grid version of those shapes
+
+        'only used if streams and subbasins are entered as shapefiles
     End Sub
 
-    Friend Sub GridAssignValues(ByVal aStreamGridFileName As String, ByVal aSubbasinGridFileName As String, ByVal aNewGridFileName As String)
-        'to the first grid, assign the values at the coresponding cells of the second grid, and save the result as the third
-    End Sub
-
-    Friend Sub GridAssignMaxValues(ByVal aFlowAccGridFileName As String, ByVal aStreamLinkGridFileName As String, ByVal aOutletGridFileName As String)
-        'used in creating an outlets grid.  for each stream link, include only the cell with the maximum flow accumulation
-    End Sub
-
-    Friend Sub GridAssignValuesToNull(ByVal aFlowDirGridFileName, ByVal aStreamsGridFileName, ByVal aFlowDirHillGridFileName)
-        'to the first grid, assign null at the coresponding cells of the second grid, and save the result as the third
-    End Sub
-
-    Friend Function DownstreamSubbasinIds(ByVal aSubbasinGridFileName As String, ByVal aStreamGridFileName As String) As atcCollection
-        'given a grid of subbasin ids and a stream grid, figure out the downstream subbasin id
-        DownstreamSubbasinIds = New atcCollection
-    End Function
+    'Friend Function DownstreamSubbasinIds(ByVal aSubbasinGridFileName As String, ByVal aStreamGridFileName As String) As atcCollection
+    '    'given a grid of subbasin ids and a stream grid, figure out the downstream subbasin id
+    '    DownstreamSubbasinIds = New atcCollection
+    'End Function
 End Module
