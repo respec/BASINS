@@ -1695,6 +1695,8 @@ Public Class GisUtil
                 lTempVal = lStreamGrid.Value(lCol, lRow)
                 If lTempVal <> lNoData And lTempVal > 0 Then
                     lOutputGrid.Value(lCol, lRow) = lSubbasinGrid.Value(lCol, lRow)
+                Else
+                    lOutputGrid.Value(lCol, lRow) = lNoData
                 End If
             Next
         Next
@@ -1813,6 +1815,93 @@ Public Class GisUtil
         Next
 
         lOutputGrid.Save()
+    End Sub
+
+    Public Shared Sub GridSetNoData(ByVal aInputGridFileName As String)
+        'set no data values in the input grid, save it 
+
+        Dim lInputGridLayerIndex As Integer = GisUtil.LayerIndex(aInputGridFileName)
+        Dim lInputGrid As MapWinGIS.Grid = GridFromIndex(lInputGridLayerIndex)
+
+        Dim lNoData As Double = lInputGrid.Header.NodataValue
+        Dim lMinValue As Double = lInputGrid.Value(0, 0)
+
+        Dim lStartRow As Integer = 0
+        Dim lStartCol As Integer = 0
+        Dim lEndRow As Integer = lInputGrid.Header.NumberRows - 1
+        Dim lEndCol As Integer = lInputGrid.Header.NumberCols - 1
+
+        Dim lTempVal As Double = 0.0
+        For lRow As Integer = lStartRow To lEndRow
+            For lCol As Integer = lStartCol To lEndCol
+                lTempVal = lInputGrid.Value(lCol, lRow)
+                If lTempVal < lMinValue Then
+                    lMinValue = lTempVal
+                End If
+            Next
+        Next
+
+        If lMinValue < -100 And lMinValue <> lNoData Then
+            'arbitrary rule to determine if the nodata value is incorrectly set on this grid
+            lInputGrid.Header.NodataValue = lMinValue
+            lInputGrid.Save()
+        End If
+
+    End Sub
+
+    Public Shared Sub DownstreamFlowLength(ByVal aFlowDirGridFileName As String, ByVal aFlowAccGridFileName As String, ByVal aLenGridFileName As String)
+        'new sub to compute downstream flow length, not available directly in mapwindow
+
+        Dim lFlowAccGridLayerIndex As Integer = GisUtil.LayerIndex(aFlowAccGridFileName)
+        Dim lFlowAccGrid As MapWinGIS.Grid = GridFromIndex(lFlowAccGridLayerIndex)
+
+        'first use the flow acc grid to find the outlet of the watershed 
+        Dim lStartRow As Integer = 0
+        Dim lStartCol As Integer = 0
+        Dim lEndRow As Integer = lFlowAccGrid.Header.NumberRows - 1
+        Dim lEndCol As Integer = lFlowAccGrid.Header.NumberCols - 1
+        Dim lMaxRow As Integer = -1
+        Dim lMaxCol As Integer = -1
+        Dim lMaxVal As Double = 0.0
+
+        Dim lTempVal As Double = 0.0
+        For lRow As Integer = lStartRow To lEndRow
+            For lCol As Integer = lStartCol To lEndCol
+                lTempVal = lFlowAccGrid.Value(lCol, lRow)
+                If lTempVal > lMaxVal Then
+                    lMaxVal = lTempVal
+                    lMaxRow = lRow
+                    lMaxCol = lCol
+                End If
+            Next
+        Next
+
+        'prepare the output grid
+        Dim lFlowDirGridLayerIndex As Integer = GisUtil.LayerIndex(aFlowDirGridFileName)
+        Dim lFlowDirGrid As MapWinGIS.Grid = GridFromIndex(lFlowDirGridLayerIndex)
+
+        If FileExists(aLenGridFileName) Then
+            IO.File.Delete(aLenGridFileName)
+        End If
+        IO.File.Copy(aFlowDirGridFileName, aLenGridFileName)
+
+        Dim lOutputGrid As New MapWinGIS.Grid
+        lOutputGrid.Open(aLenGridFileName)
+
+        'initialize the new grid
+        Dim lNoData As Double = lOutputGrid.Header.NodataValue
+        For lRow As Integer = 0 To lOutputGrid.Header.NumberRows - 1
+            For lCol As Integer = 0 To lOutputGrid.Header.NumberCols - 1
+                lOutputGrid.Value(lCol, lRow) = lNoData
+            Next
+        Next
+        lOutputGrid.Value(lMaxCol, lMaxRow) = 0.0
+
+        'now call recursive routine to set surrounding cells 
+        Downstream.CheckNeighboringCells(lFlowDirGrid, lMaxCol, lMaxRow, lOutputGrid)
+
+        lOutputGrid.Save()
+        lOutputGrid = Nothing
     End Sub
 
     ''' <summary>Overlay Layer1 and Layer2 (eg landuse and subbasins), creating a polygon layer containing features from both layers</summary>
@@ -3719,6 +3808,97 @@ Public Class MappingObjectNotSetException
 
     Public Sub New()
         MyBase.New("Mapping Object Not Set")
+    End Sub
+End Class
+
+Friend Class Downstream
+    Friend Shared Sub CheckNeighboringCells(ByVal aFlowDirGrid As MapWinGIS.Grid, ByVal aCol As Integer, ByVal aRow As Integer, ByVal aOutputGrid As MapWinGIS.Grid)
+        'used in DownstreamFlowLength, accumulates distances to output recursively 
+
+        Dim lTempVal As Integer = -1
+        Dim lRowStart As Integer = aRow - 1
+        Dim lRowEnd As Integer = aRow + 1
+        Dim lColStart As Integer = aCol - 1
+        Dim lColEnd As Integer = aCol + 1
+        If lRowStart < 0 Then lRowStart = 0
+        If lColStart < 0 Then lColStart = 0
+        If lRowEnd > aFlowDirGrid.Header.NumberRows - 1 Then lRowEnd = aFlowDirGrid.Header.NumberRows - 1
+        If lColEnd > aFlowDirGrid.Header.NumberCols - 1 Then lColEnd = aFlowDirGrid.Header.NumberCols - 1
+
+        'figure out the distances x and y
+        Dim lX As Double = aOutputGrid.Header.dX
+        Dim lY As Double = aOutputGrid.Header.dY
+        Dim lDiag As Double = Math.Sqrt((lX ^ 2) + (lY ^ 2))
+
+        'this is the assumed flow dir coding from taudem:
+        '4 3 2
+        '5   1
+        '6 7 8
+
+        'check nw cell
+        If aRow - 1 > 0 And aCol - 1 > 0 Then
+            If aFlowDirGrid.Value(aCol - 1, aRow - 1) = 8 Then
+                aOutputGrid.Value(aCol - 1, aRow - 1) = lDiag + aOutputGrid.Value(aCol, aRow)
+                CheckNeighboringCells(aFlowDirGrid, aCol - 1, aRow - 1, aOutputGrid)
+            End If
+        End If
+
+        'check n cell
+        If aRow - 1 > 0 Then
+            If aFlowDirGrid.Value(aCol, aRow - 1) = 7 Then
+                aOutputGrid.Value(aCol, aRow - 1) = lY + aOutputGrid.Value(aCol, aRow)
+                CheckNeighboringCells(aFlowDirGrid, aCol, aRow - 1, aOutputGrid)
+            End If
+        End If
+
+        'check ne cell
+        If aRow - 1 > 0 And aCol + 1 < aFlowDirGrid.Header.NumberCols Then
+            If aFlowDirGrid.Value(aCol + 1, aRow - 1) = 6 Then
+                aOutputGrid.Value(aCol + 1, aRow - 1) = lDiag + aOutputGrid.Value(aCol, aRow)
+                CheckNeighboringCells(aFlowDirGrid, aCol + 1, aRow - 1, aOutputGrid)
+            End If
+        End If
+
+        'check w cell
+        If aCol - 1 > 0 Then
+            If aFlowDirGrid.Value(aCol - 1, aRow) = 1 Then
+                aOutputGrid.Value(aCol - 1, aRow) = lX + aOutputGrid.Value(aCol, aRow)
+                CheckNeighboringCells(aFlowDirGrid, aCol - 1, aRow, aOutputGrid)
+            End If
+        End If
+
+        'check e cell
+        If aCol + 1 < aFlowDirGrid.Header.NumberCols Then
+            If aFlowDirGrid.Value(aCol + 1, aRow) = 5 Then
+                aOutputGrid.Value(aCol + 1, aRow) = lX + aOutputGrid.Value(aCol, aRow)
+                CheckNeighboringCells(aFlowDirGrid, aCol + 1, aRow, aOutputGrid)
+            End If
+        End If
+
+        'check sw cell
+        If aRow + 1 < aFlowDirGrid.Header.NumberRows And aCol - 1 > 0 Then
+            If aFlowDirGrid.Value(aCol - 1, aRow + 1) = 2 Then
+                aOutputGrid.Value(aCol - 1, aRow + 1) = lDiag + aOutputGrid.Value(aCol, aRow)
+                CheckNeighboringCells(aFlowDirGrid, aCol - 1, aRow + 1, aOutputGrid)
+            End If
+        End If
+
+        'check s cell
+        If aRow + 1 < aFlowDirGrid.Header.NumberRows Then
+            If aFlowDirGrid.Value(aCol, aRow + 1) = 3 Then
+                aOutputGrid.Value(aCol, aRow + 1) = lY + aOutputGrid.Value(aCol, aRow)
+                CheckNeighboringCells(aFlowDirGrid, aCol, aRow + 1, aOutputGrid)
+            End If
+        End If
+
+        'check se cell
+        If aRow + 1 < aFlowDirGrid.Header.NumberRows And aCol + 1 < aFlowDirGrid.Header.NumberCols Then
+            If aFlowDirGrid.Value(aCol + 1, aRow + 1) = 4 Then
+                aOutputGrid.Value(aCol + 1, aRow + 1) = lDiag + aOutputGrid.Value(aCol, aRow)
+                CheckNeighboringCells(aFlowDirGrid, aCol + 1, aRow + 1, aOutputGrid)
+            End If
+        End If
+
     End Sub
 End Class
 
