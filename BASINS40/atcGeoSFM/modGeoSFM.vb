@@ -51,7 +51,10 @@ Public Module modGeoSFM
         'defaults = {"Elevations", "FlowDir", "FlowAcc", "FlowLen",  "Streams", "StrLinks", "Outlets", "Basins", "Hilllength", "Slope", "Downstream"}
 
         'first make a bgd copy of the tif 
-        lDEMFileName = FilenameNoExt(lDEMFileName) & ".bgd"
+        'lDEMFileName = FilenameNoExt(lDEMFileName) & ".bgd"
+
+        'set nodata value properly
+        GisUtil.GridSetNoData(lDEMFileName)
 
         'pit fill 
         Dim lPitFillDEMLayerName As String = "Corrected DEM"
@@ -61,6 +64,7 @@ Public Module modGeoSFM
             lPitFillDEMLayerIndex = GisUtil.LayerIndex(lPitFillDEMLayerName)
             lPitFillDEMFileName = GisUtil.LayerFileName(lPitFillDEMLayerIndex)
         Else
+            Logger.Status("Computing Pit Fill")
             lPitFillDEMFileName = FilenameNoExt(lDEMFileName) & "PitFill.bgd"
             MapWinGeoProc.Hydrology.Fill(lDEMFileName, lPitFillDEMFileName, False)
             GisUtil.AddLayer(lPitFillDEMFileName, lPitFillDEMLayerName)
@@ -79,6 +83,7 @@ Public Module modGeoSFM
             lSlopeGridLayerIndex = GisUtil.LayerIndex(lSlopeGridLayerName)
             lSlopeGridFileName = GisUtil.LayerFileName(lSlopeGridLayerIndex)
         Else
+            Logger.Status("Computing Flow Direction")
             lFlowDirGridFileName = FilenameNoExt(lDEMFileName) & "FlowDir.bgd"
             lSlopeGridFileName = FilenameNoExt(lDEMFileName) & "Slope.bgd"
             Dim lRet As Integer = MapWinGeoProc.Hydrology.D8(lPitFillDEMFileName, lFlowDirGridFileName, lSlopeGridFileName, Nothing)
@@ -98,6 +103,7 @@ Public Module modGeoSFM
             lFlowAccGridLayerIndex = GisUtil.LayerIndex(lFlowAccGridLayerName)
             lFlowAccGridFileName = GisUtil.LayerFileName(lFlowAccGridLayerIndex)
         Else
+            Logger.Status("Computing Flow Accumulation")
             lFlowAccGridFileName = FilenameNoExt(lDEMFileName) & "FlowAcc.bgd"
             Dim lRet As Integer = MapWinGeoProc.Hydrology.AreaD8(lFlowDirGridFileName, "", lFlowAccGridFileName, False, False, Nothing)
             GisUtil.AddLayer(lFlowAccGridFileName, lFlowAccGridLayerName)
@@ -109,9 +115,10 @@ Public Module modGeoSFM
         Dim lSubbasinGridFileName As String = ""
         If Not GisUtil.IsLayer(lSubbasinGridLayerName) And aSubbasinLayerName <> "<none>" Then
             'compute from input shapefile
+            Logger.Status("Computing Subbasin Grid")
             Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(aSubbasinLayerName)
             lSubbasinGridFileName = FilenameNoExt(lDEMFileName) & "Watershed.bgd"
-            GridFromShapefile(lSubbasinLayerIndex, lDEMFileName, lSubbasinGridFileName)
+            GridFromShapefile(lSubbasinLayerIndex, lPitFillDEMFileName, lSubbasinGridFileName)
             GisUtil.AddLayer(lSubbasinGridFileName, lSubbasinGridLayerName)
         End If
 
@@ -121,9 +128,10 @@ Public Module modGeoSFM
         Dim lStreamGridFileName As String = ""
         If Not GisUtil.IsLayer(lStreamGridLayerName) And aStreamLayerName <> "<none>" Then
             'compute from input shapefile
+            Logger.Status("Computing Stream Grid")
             Dim lStreamLayerIndex As Integer = GisUtil.LayerIndex(aStreamLayerName)
             lStreamGridFileName = FilenameNoExt(lDEMFileName) & "Stream.bgd"
-            GridFromShapefile(lStreamLayerIndex, lDEMFileName, lStreamGridFileName)
+            GridFromShapefile(lStreamLayerIndex, lPitFillDEMFileName, lStreamGridFileName)
             GisUtil.AddLayer(lStreamGridFileName, lSubbasinGridLayerName)
         End If
 
@@ -134,6 +142,7 @@ Public Module modGeoSFM
             lSubbasinGridLayerIndex = GisUtil.LayerIndex(lSubbasinGridLayerName)
             lSubbasinGridFileName = GisUtil.LayerFileName(lSubbasinGridLayerIndex)
         Else
+            Logger.Status("Computing Stream and Subbasin Grids")
             'need to run taudem if we don't already have the stream and subbasin grids
             Dim lStrahlOrdResultGridFileName As String = FilenameNoExt(lDEMFileName) & "Strahl.bgd"
             Dim lLongUpslopeResultGridFileName As String = FilenameNoExt(lDEMFileName) & "LongUp.bgd"
@@ -164,8 +173,9 @@ Public Module modGeoSFM
             lFlowLenGridLayerIndex = GisUtil.LayerIndex(lFlowLenGridLayerName)
             lFlowLenGridFileName = GisUtil.LayerFileName(lFlowLenGridLayerIndex)
         Else
+            Logger.Status("Computing Downstream Flow Length")
             lFlowLenGridFileName = FilenameNoExt(lDEMFileName) & "FlowLen.bgd"
-            DownstreamFlowLength(lFlowDirGridFileName, lFlowLenGridFileName)
+            GisUtil.DownstreamFlowLength(lFlowDirGridFileName, lFlowAccGridFileName, lFlowLenGridFileName)
             GisUtil.AddLayer(lFlowLenGridFileName, lFlowLenGridLayerName)
         End If
 
@@ -177,6 +187,7 @@ Public Module modGeoSFM
             lStreamLinkGridLayerIndex = GisUtil.LayerIndex(lStreamLinkGridLayerName)
             lStreamLinkGridFileName = GisUtil.LayerFileName(lStreamLinkGridLayerIndex)
         Else
+            Logger.Status("Computing Stream Link Grid")
             lStreamLinkGridFileName = FilenameNoExt(lDEMFileName) & "StreamLink.bgd"
             'to the first grid, assign the values at the coresponding cells of the second grid, and save the result as the third
             GisUtil.GridAssignValues(lStreamGridFileName, lSubbasinGridFileName, lStreamLinkGridFileName)
@@ -191,6 +202,7 @@ Public Module modGeoSFM
             lOutletGridLayerIndex = GisUtil.LayerIndex(lOutletGridLayerName)
             lOutletGridFileName = GisUtil.LayerFileName(lOutletGridLayerIndex)
         Else
+            Logger.Status("Computing Outlets Grid")
             lOutletGridFileName = FilenameNoExt(lDEMFileName) & "Outlet.bgd"
             'zonefield = stlVtab.Findfield("Value")
             'maxfac = facgrid.zonalstats( #grid_statype_max, stlgrid, prj.makenull, zoneField, false )
@@ -207,13 +219,14 @@ Public Module modGeoSFM
             lHillLenGridLayerIndex = GisUtil.LayerIndex(lHillLenGridLayerName)
             lHillLenGridFileName = GisUtil.LayerFileName(lHillLenGridLayerIndex)
         Else
+            Logger.Status("Computing Hill Length Grid")
             lHillLenGridFileName = FilenameNoExt(lDEMFileName) & "HillLen.bgd"
             Dim lFlowDirHillGridFileName As String = FilenameNoExt(lDEMFileName) & "FlowDirHill.bgd"
             'fdrhill = (strgrid.IsNull)*(fdrgrid)
             'to the first grid, assign null at the corresponding cells of the second grid, and save the result as the third
             GisUtil.GridAssignValuesToNull(lFlowDirGridFileName, lStreamGridFileName, lFlowDirHillGridFileName)
             'hlggrid = fdrhill.FlowLength(Nil, False)
-            DownstreamFlowLength(lFlowDirHillGridFileName, lHillLenGridFileName)
+            GisUtil.DownstreamFlowLength(lFlowDirHillGridFileName, lFlowAccGridFileName, lHillLenGridFileName)
             GisUtil.AddLayer(lHillLenGridFileName, lHillLenGridLayerName)
         End If
 
@@ -1731,13 +1744,6 @@ Public Module modGeoSFM
     End Sub
 
     'subs below are new GIS routines needed for GeoSFM
-
-    Friend Sub DownstreamFlowLength(ByVal aFlowDirGridFileName As String, ByVal aLenGridFileName As String)
-        'new sub to compute downstream flow length, not available directly in mapwindow
-
-        'cheat for now, use totup grid
-        IO.File.Copy(FilenameNoExt("D:\BASINS\data\02060006-7\dem\02060006demg.bgd") & "TotUp.bgd", aLenGridFileName)
-    End Sub
 
     Friend Sub GridFromShapefile(ByVal aShapefileLayerIndex As Integer, ByVal aBaseGridFileName As String, ByVal aNewGridFileName As String)
         'given a shapefile (subbasins or streams) and a base grid, return a grid version of those shapes

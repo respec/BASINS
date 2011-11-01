@@ -2190,7 +2190,8 @@ Public Class frmGeoSFM
             End If
         Next lLayerIndex
         If cboDEM.SelectedIndex < 0 Then
-            cmdTerrainNext.Enabled = False
+            cboDEM.SelectedIndex = 0
+            '    cmdTerrainNext.Enabled = False
         End If
 
         'set reach layer
@@ -2305,10 +2306,10 @@ Public Class frmGeoSFM
                 cboBC12.Items.Add(lLayerName)
                 cboBC13.Items.Add(lLayerName)
 
-                If lLayerName = "Basin Grid" Then
+                If lLayerName = "Basin Grid" Or lLayerName = "Subbasin Grid" Then
                     cboBC1.SelectedIndex = cboBC1.Items.Count - 1
                 End If
-                If lLayerName = "Processed DEM" Then
+                If lLayerName = "Processed DEM" Or lLayerName = "Corrected DEM" Then
                     cboBC2.SelectedIndex = cboBC2.Items.Count - 1
                 End If
                 If lLayerName = "Flow Accumulation Grid" Then
@@ -2332,7 +2333,7 @@ Public Class frmGeoSFM
                 If lLayerName = "Hydraulic Conductivity Grid" Then
                     cboBC9.SelectedIndex = cboBC9.Items.Count - 1
                 End If
-                If lLayerName = "Downstream Flow Length Grid" Then
+                If lLayerName = "Downstream Flow Length Grid" Or lLayerName = "Downstream Flow Length" Then
                     cboBC10.SelectedIndex = cboBC10.Items.Count - 1
                 End If
                 If lLayerName = "Stream Link Grid" Then
