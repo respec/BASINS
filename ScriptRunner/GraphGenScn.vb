@@ -547,9 +547,12 @@ Module GraphGenScn
                 End If
                 lPaneMain.YAxis.MajorGrid.IsVisible = lShowGrid
                 lPaneMain.YAxis.MinorGrid.IsVisible = lShowGrid
+                lPaneMain.YAxis.MinorTic.IsAllTics = lShowGrid
             End If
-            lPaneMain.YAxis.CrossAuto = False
-            lPaneMain.YAxis.Cross = lYAxisCross
+            lPaneMain.XAxis.CrossAuto = False
+            lPaneMain.XAxis.Cross = lYAxisCross
+            lPaneMain.YAxis.Scale.BaseTic = lYAxisCross
+            lZgc.AxisChange()
 
             'If pGraphSpec.Axis(2).label IsNot Nothing Then
             '    With lPaneMain.Y2Axis.Scale
