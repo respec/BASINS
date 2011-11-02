@@ -40,11 +40,11 @@ Public Class frmGeoSFM
     Friend WithEvents cmdCancel As System.Windows.Forms.Button
     Friend WithEvents cmdHelp As System.Windows.Forms.Button
     Friend WithEvents cmdAbout As System.Windows.Forms.Button
-    Friend WithEvents TabControl1 As System.Windows.Forms.TabControl
+    Friend WithEvents tabMain As System.Windows.Forms.TabControl
     Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
     Friend WithEvents lblStatus As System.Windows.Forms.Label
-    Friend WithEvents TabPage3 As System.Windows.Forms.TabPage
-    Friend WithEvents TabPage7 As System.Windows.Forms.TabPage
+    Friend WithEvents tpgRain As System.Windows.Forms.TabPage
+    Friend WithEvents tpgBasin As System.Windows.Forms.TabPage
     Friend WithEvents Label3 As System.Windows.Forms.Label
     Friend WithEvents cboBC2 As System.Windows.Forms.ComboBox
     Friend WithEvents cboBC1 As System.Windows.Forms.ComboBox
@@ -71,7 +71,7 @@ Public Class frmGeoSFM
     Friend WithEvents cboBC7 As System.Windows.Forms.ComboBox
     Friend WithEvents Label12 As System.Windows.Forms.Label
     Friend WithEvents cboBC6 As System.Windows.Forms.ComboBox
-    Friend WithEvents TabPage8 As System.Windows.Forms.TabPage
+    Friend WithEvents tpgResponse As System.Windows.Forms.TabPage
     Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents RadioButton3 As System.Windows.Forms.RadioButton
     Friend WithEvents RadioButton2 As System.Windows.Forms.RadioButton
@@ -137,7 +137,7 @@ Public Class frmGeoSFM
     Friend WithEvents Label45 As System.Windows.Forms.Label
     Friend WithEvents ComboBox39 As System.Windows.Forms.ComboBox
     Friend WithEvents AtcGridMannings As atcControls.atcGrid
-    Friend WithEvents TabPage9 As System.Windows.Forms.TabPage
+    Friend WithEvents tpgTerrain As System.Windows.Forms.TabPage
     Friend WithEvents Label53 As System.Windows.Forms.Label
     Friend WithEvents AtcText1 As atcControls.atcText
     Friend WithEvents cboReach As System.Windows.Forms.ComboBox
@@ -162,14 +162,14 @@ Public Class frmGeoSFM
     Friend WithEvents lblPrecipStation As System.Windows.Forms.Label
     Friend WithEvents cboOtherMet As System.Windows.Forms.ComboBox
     Friend WithEvents lblOtherMet As System.Windows.Forms.Label
-    Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
+    Friend WithEvents tpgSoil As System.Windows.Forms.TabPage
     Friend WithEvents AtcGrid1 As atcControls.atcGrid
-    Friend WithEvents TabPage2 As System.Windows.Forms.TabPage
+    Friend WithEvents tpgFlow As System.Windows.Forms.TabPage
     Friend WithEvents AtcGrid2 As atcControls.atcGrid
-    Friend WithEvents TabPage4 As System.Windows.Forms.TabPage
-    Friend WithEvents TabPage5 As System.Windows.Forms.TabPage
-    Friend WithEvents TabPage6 As System.Windows.Forms.TabPage
-    Friend WithEvents TabPage11 As System.Windows.Forms.TabPage
+    Friend WithEvents tpgSensitivity As System.Windows.Forms.TabPage
+    Friend WithEvents tpgCalibrate As System.Windows.Forms.TabPage
+    Friend WithEvents tpgBankfull As System.Windows.Forms.TabPage
+    Friend WithEvents tpgPlot As System.Windows.Forms.TabPage
     Friend WithEvents cmdTerrainNext As System.Windows.Forms.Button
     Friend WithEvents cmdBasinNext As System.Windows.Forms.Button
     Friend WithEvents cmdResponseNext As System.Windows.Forms.Button
@@ -182,14 +182,14 @@ Public Class frmGeoSFM
     Friend WithEvents cmdMapGenerate As System.Windows.Forms.Button
     Friend WithEvents Button10 As System.Windows.Forms.Button
     Friend WithEvents cmdPlotGenerate As System.Windows.Forms.Button
-    Friend WithEvents TabPage10 As System.Windows.Forms.TabPage
+    Friend WithEvents tpgMap As System.Windows.Forms.TabPage
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmGeoSFM))
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdHelp = New System.Windows.Forms.Button
         Me.cmdAbout = New System.Windows.Forms.Button
-        Me.TabControl1 = New System.Windows.Forms.TabControl
-        Me.TabPage9 = New System.Windows.Forms.TabPage
+        Me.tabMain = New System.Windows.Forms.TabControl
+        Me.tpgTerrain = New System.Windows.Forms.TabPage
         Me.cmdTerrainNext = New System.Windows.Forms.Button
         Me.Label53 = New System.Windows.Forms.Label
         Me.AtcText1 = New atcControls.atcText
@@ -199,7 +199,7 @@ Public Class frmGeoSFM
         Me.Label50 = New System.Windows.Forms.Label
         Me.Label51 = New System.Windows.Forms.Label
         Me.cboDEM = New System.Windows.Forms.ComboBox
-        Me.TabPage7 = New System.Windows.Forms.TabPage
+        Me.tpgBasin = New System.Windows.Forms.TabPage
         Me.cmdBasinNext = New System.Windows.Forms.Button
         Me.Label19 = New System.Windows.Forms.Label
         Me.cboBC13 = New System.Windows.Forms.ComboBox
@@ -227,7 +227,7 @@ Public Class frmGeoSFM
         Me.Label7 = New System.Windows.Forms.Label
         Me.Label3 = New System.Windows.Forms.Label
         Me.cboBC2 = New System.Windows.Forms.ComboBox
-        Me.TabPage8 = New System.Windows.Forms.TabPage
+        Me.tpgResponse = New System.Windows.Forms.TabPage
         Me.cmdResponseNext = New System.Windows.Forms.Button
         Me.AtcGridMannings = New atcControls.atcGrid
         Me.Label49 = New System.Windows.Forms.Label
@@ -242,7 +242,7 @@ Public Class frmGeoSFM
         Me.RadioButton2 = New System.Windows.Forms.RadioButton
         Me.RadioButton1 = New System.Windows.Forms.RadioButton
         Me.Label5 = New System.Windows.Forms.Label
-        Me.TabPage3 = New System.Windows.Forms.TabPage
+        Me.tpgRain = New System.Windows.Forms.TabPage
         Me.cmdRainEvapNext = New System.Windows.Forms.Button
         Me.cboPrecipStation = New System.Windows.Forms.ComboBox
         Me.lblPrecipStation = New System.Windows.Forms.Label
@@ -260,22 +260,22 @@ Public Class frmGeoSFM
         Me.AtcText5 = New atcControls.atcText
         Me.AtcText6 = New atcControls.atcText
         Me.AtcText7 = New atcControls.atcText
-        Me.TabPage1 = New System.Windows.Forms.TabPage
+        Me.tpgSoil = New System.Windows.Forms.TabPage
         Me.cmdBalanceNext = New System.Windows.Forms.Button
         Me.AtcGrid1 = New atcControls.atcGrid
-        Me.TabPage2 = New System.Windows.Forms.TabPage
+        Me.tpgFlow = New System.Windows.Forms.TabPage
         Me.cmdRouteNext = New System.Windows.Forms.Button
         Me.AtcGrid2 = New atcControls.atcGrid
-        Me.TabPage4 = New System.Windows.Forms.TabPage
+        Me.tpgSensitivity = New System.Windows.Forms.TabPage
         Me.cmdSensitivityNext = New System.Windows.Forms.Button
-        Me.TabPage5 = New System.Windows.Forms.TabPage
+        Me.tpgCalibrate = New System.Windows.Forms.TabPage
         Me.cmdCalibrationNext = New System.Windows.Forms.Button
-        Me.TabPage6 = New System.Windows.Forms.TabPage
+        Me.tpgBankfull = New System.Windows.Forms.TabPage
         Me.cmdBankfullNext = New System.Windows.Forms.Button
-        Me.TabPage10 = New System.Windows.Forms.TabPage
+        Me.tpgMap = New System.Windows.Forms.TabPage
         Me.cmdMapGenerate = New System.Windows.Forms.Button
         Me.Button10 = New System.Windows.Forms.Button
-        Me.TabPage11 = New System.Windows.Forms.TabPage
+        Me.tpgPlot = New System.Windows.Forms.TabPage
         Me.cmdPlotGenerate = New System.Windows.Forms.Button
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.lblStatus = New System.Windows.Forms.Label
@@ -331,19 +331,19 @@ Public Class frmGeoSFM
         Me.Label44 = New System.Windows.Forms.Label
         Me.Label45 = New System.Windows.Forms.Label
         Me.ComboBox39 = New System.Windows.Forms.ComboBox
-        Me.TabControl1.SuspendLayout()
-        Me.TabPage9.SuspendLayout()
-        Me.TabPage7.SuspendLayout()
-        Me.TabPage8.SuspendLayout()
-        Me.TabPage3.SuspendLayout()
+        Me.tabMain.SuspendLayout()
+        Me.tpgTerrain.SuspendLayout()
+        Me.tpgBasin.SuspendLayout()
+        Me.tpgResponse.SuspendLayout()
+        Me.tpgRain.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
-        Me.TabPage1.SuspendLayout()
-        Me.TabPage2.SuspendLayout()
-        Me.TabPage4.SuspendLayout()
-        Me.TabPage5.SuspendLayout()
-        Me.TabPage6.SuspendLayout()
-        Me.TabPage10.SuspendLayout()
-        Me.TabPage11.SuspendLayout()
+        Me.tpgSoil.SuspendLayout()
+        Me.tpgFlow.SuspendLayout()
+        Me.tpgSensitivity.SuspendLayout()
+        Me.tpgCalibrate.SuspendLayout()
+        Me.tpgBankfull.SuspendLayout()
+        Me.tpgMap.SuspendLayout()
+        Me.tpgPlot.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -378,49 +378,49 @@ Public Class frmGeoSFM
         Me.cmdAbout.TabIndex = 7
         Me.cmdAbout.Text = "About"
         '
-        'TabControl1
+        'tabMain
         '
-        Me.TabControl1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+        Me.tabMain.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.TabControl1.Controls.Add(Me.TabPage9)
-        Me.TabControl1.Controls.Add(Me.TabPage7)
-        Me.TabControl1.Controls.Add(Me.TabPage8)
-        Me.TabControl1.Controls.Add(Me.TabPage3)
-        Me.TabControl1.Controls.Add(Me.TabPage1)
-        Me.TabControl1.Controls.Add(Me.TabPage2)
-        Me.TabControl1.Controls.Add(Me.TabPage4)
-        Me.TabControl1.Controls.Add(Me.TabPage5)
-        Me.TabControl1.Controls.Add(Me.TabPage6)
-        Me.TabControl1.Controls.Add(Me.TabPage10)
-        Me.TabControl1.Controls.Add(Me.TabPage11)
-        Me.TabControl1.Cursor = System.Windows.Forms.Cursors.Default
-        Me.TabControl1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TabControl1.ItemSize = New System.Drawing.Size(60, 21)
-        Me.TabControl1.Location = New System.Drawing.Point(15, 15)
-        Me.TabControl1.Multiline = True
-        Me.TabControl1.Name = "TabControl1"
-        Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(655, 446)
-        Me.TabControl1.TabIndex = 8
+        Me.tabMain.Controls.Add(Me.tpgTerrain)
+        Me.tabMain.Controls.Add(Me.tpgBasin)
+        Me.tabMain.Controls.Add(Me.tpgResponse)
+        Me.tabMain.Controls.Add(Me.tpgRain)
+        Me.tabMain.Controls.Add(Me.tpgSoil)
+        Me.tabMain.Controls.Add(Me.tpgFlow)
+        Me.tabMain.Controls.Add(Me.tpgSensitivity)
+        Me.tabMain.Controls.Add(Me.tpgCalibrate)
+        Me.tabMain.Controls.Add(Me.tpgBankfull)
+        Me.tabMain.Controls.Add(Me.tpgMap)
+        Me.tabMain.Controls.Add(Me.tpgPlot)
+        Me.tabMain.Cursor = System.Windows.Forms.Cursors.Default
+        Me.tabMain.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.tabMain.ItemSize = New System.Drawing.Size(60, 21)
+        Me.tabMain.Location = New System.Drawing.Point(15, 15)
+        Me.tabMain.Multiline = True
+        Me.tabMain.Name = "tabMain"
+        Me.tabMain.SelectedIndex = 0
+        Me.tabMain.Size = New System.Drawing.Size(655, 446)
+        Me.tabMain.TabIndex = 8
         '
-        'TabPage9
+        'tpgTerrain
         '
-        Me.TabPage9.Controls.Add(Me.cmdTerrainNext)
-        Me.TabPage9.Controls.Add(Me.Label53)
-        Me.TabPage9.Controls.Add(Me.AtcText1)
-        Me.TabPage9.Controls.Add(Me.cboReach)
-        Me.TabPage9.Controls.Add(Me.Label52)
-        Me.TabPage9.Controls.Add(Me.cboSubbasin)
-        Me.TabPage9.Controls.Add(Me.Label50)
-        Me.TabPage9.Controls.Add(Me.Label51)
-        Me.TabPage9.Controls.Add(Me.cboDEM)
-        Me.TabPage9.Location = New System.Drawing.Point(4, 46)
-        Me.TabPage9.Name = "TabPage9"
-        Me.TabPage9.Size = New System.Drawing.Size(647, 396)
-        Me.TabPage9.TabIndex = 10
-        Me.TabPage9.Text = "Terrain Analysis"
-        Me.TabPage9.UseVisualStyleBackColor = True
+        Me.tpgTerrain.Controls.Add(Me.cmdTerrainNext)
+        Me.tpgTerrain.Controls.Add(Me.Label53)
+        Me.tpgTerrain.Controls.Add(Me.AtcText1)
+        Me.tpgTerrain.Controls.Add(Me.cboReach)
+        Me.tpgTerrain.Controls.Add(Me.Label52)
+        Me.tpgTerrain.Controls.Add(Me.cboSubbasin)
+        Me.tpgTerrain.Controls.Add(Me.Label50)
+        Me.tpgTerrain.Controls.Add(Me.Label51)
+        Me.tpgTerrain.Controls.Add(Me.cboDEM)
+        Me.tpgTerrain.Location = New System.Drawing.Point(4, 46)
+        Me.tpgTerrain.Name = "tpgTerrain"
+        Me.tpgTerrain.Size = New System.Drawing.Size(647, 396)
+        Me.tpgTerrain.TabIndex = 10
+        Me.tpgTerrain.Text = "Terrain Analysis"
+        Me.tpgTerrain.UseVisualStyleBackColor = True
         '
         'cmdTerrainNext
         '
@@ -531,48 +531,48 @@ Public Class frmGeoSFM
         Me.cboDEM.Size = New System.Drawing.Size(403, 21)
         Me.cboDEM.TabIndex = 27
         '
-        'TabPage7
+        'tpgBasin
         '
-        Me.TabPage7.Controls.Add(Me.cmdBasinNext)
-        Me.TabPage7.Controls.Add(Me.Label19)
-        Me.TabPage7.Controls.Add(Me.cboBC13)
-        Me.TabPage7.Controls.Add(Me.Label18)
-        Me.TabPage7.Controls.Add(Me.cboBC12)
-        Me.TabPage7.Controls.Add(Me.Label17)
-        Me.TabPage7.Controls.Add(Me.cboBC11)
-        Me.TabPage7.Controls.Add(Me.Label16)
-        Me.TabPage7.Controls.Add(Me.cboBC10)
-        Me.TabPage7.Controls.Add(Me.Label15)
-        Me.TabPage7.Controls.Add(Me.cboBC9)
-        Me.TabPage7.Controls.Add(Me.Label14)
-        Me.TabPage7.Controls.Add(Me.cboBC8)
-        Me.TabPage7.Controls.Add(Me.Label13)
-        Me.TabPage7.Controls.Add(Me.cboBC7)
-        Me.TabPage7.Controls.Add(Me.Label12)
-        Me.TabPage7.Controls.Add(Me.cboBC6)
-        Me.TabPage7.Controls.Add(Me.Label11)
-        Me.TabPage7.Controls.Add(Me.cboBC5)
-        Me.TabPage7.Controls.Add(Me.Label10)
-        Me.TabPage7.Controls.Add(Me.cboBC4)
-        Me.TabPage7.Controls.Add(Me.Label8)
-        Me.TabPage7.Controls.Add(Me.cboBC3)
-        Me.TabPage7.Controls.Add(Me.cboBC1)
-        Me.TabPage7.Controls.Add(Me.Label7)
-        Me.TabPage7.Controls.Add(Me.Label3)
-        Me.TabPage7.Controls.Add(Me.cboBC2)
-        Me.TabPage7.Location = New System.Drawing.Point(4, 46)
-        Me.TabPage7.Name = "TabPage7"
-        Me.TabPage7.Size = New System.Drawing.Size(647, 396)
-        Me.TabPage7.TabIndex = 8
-        Me.TabPage7.Text = "Basin Characteristics"
-        Me.TabPage7.UseVisualStyleBackColor = True
+        Me.tpgBasin.Controls.Add(Me.cmdBasinNext)
+        Me.tpgBasin.Controls.Add(Me.Label19)
+        Me.tpgBasin.Controls.Add(Me.cboBC13)
+        Me.tpgBasin.Controls.Add(Me.Label18)
+        Me.tpgBasin.Controls.Add(Me.cboBC12)
+        Me.tpgBasin.Controls.Add(Me.Label17)
+        Me.tpgBasin.Controls.Add(Me.cboBC11)
+        Me.tpgBasin.Controls.Add(Me.Label16)
+        Me.tpgBasin.Controls.Add(Me.cboBC10)
+        Me.tpgBasin.Controls.Add(Me.Label15)
+        Me.tpgBasin.Controls.Add(Me.cboBC9)
+        Me.tpgBasin.Controls.Add(Me.Label14)
+        Me.tpgBasin.Controls.Add(Me.cboBC8)
+        Me.tpgBasin.Controls.Add(Me.Label13)
+        Me.tpgBasin.Controls.Add(Me.cboBC7)
+        Me.tpgBasin.Controls.Add(Me.Label12)
+        Me.tpgBasin.Controls.Add(Me.cboBC6)
+        Me.tpgBasin.Controls.Add(Me.Label11)
+        Me.tpgBasin.Controls.Add(Me.cboBC5)
+        Me.tpgBasin.Controls.Add(Me.Label10)
+        Me.tpgBasin.Controls.Add(Me.cboBC4)
+        Me.tpgBasin.Controls.Add(Me.Label8)
+        Me.tpgBasin.Controls.Add(Me.cboBC3)
+        Me.tpgBasin.Controls.Add(Me.cboBC1)
+        Me.tpgBasin.Controls.Add(Me.Label7)
+        Me.tpgBasin.Controls.Add(Me.Label3)
+        Me.tpgBasin.Controls.Add(Me.cboBC2)
+        Me.tpgBasin.Location = New System.Drawing.Point(4, 25)
+        Me.tpgBasin.Name = "tpgBasin"
+        Me.tpgBasin.Size = New System.Drawing.Size(647, 417)
+        Me.tpgBasin.TabIndex = 8
+        Me.tpgBasin.Text = "Basin Characteristics"
+        Me.tpgBasin.UseVisualStyleBackColor = True
         '
         'cmdBasinNext
         '
         Me.cmdBasinNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdBasinNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdBasinNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdBasinNext.Location = New System.Drawing.Point(558, 354)
+        Me.cmdBasinNext.Location = New System.Drawing.Point(558, 375)
         Me.cmdBasinNext.Name = "cmdBasinNext"
         Me.cmdBasinNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdBasinNext.TabIndex = 48
@@ -864,35 +864,35 @@ Public Class frmGeoSFM
         Me.cboBC2.Size = New System.Drawing.Size(351, 21)
         Me.cboBC2.TabIndex = 23
         '
-        'TabPage8
+        'tpgResponse
         '
-        Me.TabPage8.Controls.Add(Me.cmdResponseNext)
-        Me.TabPage8.Controls.Add(Me.AtcGridMannings)
-        Me.TabPage8.Controls.Add(Me.Label49)
-        Me.TabPage8.Controls.Add(Me.ComboBox43)
-        Me.TabPage8.Controls.Add(Me.Label48)
-        Me.TabPage8.Controls.Add(Me.ComboBox42)
-        Me.TabPage8.Controls.Add(Me.Label47)
-        Me.TabPage8.Controls.Add(Me.ComboBox41)
-        Me.TabPage8.Controls.Add(Me.Label46)
-        Me.TabPage8.Controls.Add(Me.ComboBox40)
-        Me.TabPage8.Controls.Add(Me.RadioButton3)
-        Me.TabPage8.Controls.Add(Me.RadioButton2)
-        Me.TabPage8.Controls.Add(Me.RadioButton1)
-        Me.TabPage8.Controls.Add(Me.Label5)
-        Me.TabPage8.Location = New System.Drawing.Point(4, 46)
-        Me.TabPage8.Name = "TabPage8"
-        Me.TabPage8.Size = New System.Drawing.Size(647, 396)
-        Me.TabPage8.TabIndex = 9
-        Me.TabPage8.Text = "Basin Response"
-        Me.TabPage8.UseVisualStyleBackColor = True
+        Me.tpgResponse.Controls.Add(Me.cmdResponseNext)
+        Me.tpgResponse.Controls.Add(Me.AtcGridMannings)
+        Me.tpgResponse.Controls.Add(Me.Label49)
+        Me.tpgResponse.Controls.Add(Me.ComboBox43)
+        Me.tpgResponse.Controls.Add(Me.Label48)
+        Me.tpgResponse.Controls.Add(Me.ComboBox42)
+        Me.tpgResponse.Controls.Add(Me.Label47)
+        Me.tpgResponse.Controls.Add(Me.ComboBox41)
+        Me.tpgResponse.Controls.Add(Me.Label46)
+        Me.tpgResponse.Controls.Add(Me.ComboBox40)
+        Me.tpgResponse.Controls.Add(Me.RadioButton3)
+        Me.tpgResponse.Controls.Add(Me.RadioButton2)
+        Me.tpgResponse.Controls.Add(Me.RadioButton1)
+        Me.tpgResponse.Controls.Add(Me.Label5)
+        Me.tpgResponse.Location = New System.Drawing.Point(4, 25)
+        Me.tpgResponse.Name = "tpgResponse"
+        Me.tpgResponse.Size = New System.Drawing.Size(647, 417)
+        Me.tpgResponse.TabIndex = 9
+        Me.tpgResponse.Text = "Basin Response"
+        Me.tpgResponse.UseVisualStyleBackColor = True
         '
         'cmdResponseNext
         '
         Me.cmdResponseNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdResponseNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdResponseNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdResponseNext.Location = New System.Drawing.Point(558, 355)
+        Me.cmdResponseNext.Location = New System.Drawing.Point(558, 376)
         Me.cmdResponseNext.Name = "cmdResponseNext"
         Me.cmdResponseNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdResponseNext.TabIndex = 51
@@ -912,7 +912,7 @@ Public Class frmGeoSFM
         Me.AtcGridMannings.LineWidth = 0.0!
         Me.AtcGridMannings.Location = New System.Drawing.Point(31, 259)
         Me.AtcGridMannings.Name = "AtcGridMannings"
-        Me.AtcGridMannings.Size = New System.Drawing.Size(175, 107)
+        Me.AtcGridMannings.Size = New System.Drawing.Size(175, 128)
         Me.AtcGridMannings.Source = Nothing
         Me.AtcGridMannings.TabIndex = 50
         '
@@ -1045,27 +1045,27 @@ Public Class frmGeoSFM
         Me.Label5.TabIndex = 0
         Me.Label5.Text = "Method of Overland Flow Velocity Computation:"
         '
-        'TabPage3
+        'tpgRain
         '
-        Me.TabPage3.Controls.Add(Me.cmdRainEvapNext)
-        Me.TabPage3.Controls.Add(Me.cboPrecipStation)
-        Me.TabPage3.Controls.Add(Me.lblPrecipStation)
-        Me.TabPage3.Controls.Add(Me.cboOtherMet)
-        Me.TabPage3.Controls.Add(Me.lblOtherMet)
-        Me.TabPage3.Controls.Add(Me.GroupBox2)
-        Me.TabPage3.Location = New System.Drawing.Point(4, 46)
-        Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Size = New System.Drawing.Size(647, 396)
-        Me.TabPage3.TabIndex = 2
-        Me.TabPage3.Text = "Rain/Evap Data"
-        Me.TabPage3.UseVisualStyleBackColor = True
+        Me.tpgRain.Controls.Add(Me.cmdRainEvapNext)
+        Me.tpgRain.Controls.Add(Me.cboPrecipStation)
+        Me.tpgRain.Controls.Add(Me.lblPrecipStation)
+        Me.tpgRain.Controls.Add(Me.cboOtherMet)
+        Me.tpgRain.Controls.Add(Me.lblOtherMet)
+        Me.tpgRain.Controls.Add(Me.GroupBox2)
+        Me.tpgRain.Location = New System.Drawing.Point(4, 25)
+        Me.tpgRain.Name = "tpgRain"
+        Me.tpgRain.Size = New System.Drawing.Size(647, 417)
+        Me.tpgRain.TabIndex = 2
+        Me.tpgRain.Text = "Rain/Evap Data"
+        Me.tpgRain.UseVisualStyleBackColor = True
         '
         'cmdRainEvapNext
         '
         Me.cmdRainEvapNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdRainEvapNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdRainEvapNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdRainEvapNext.Location = New System.Drawing.Point(556, 352)
+        Me.cmdRainEvapNext.Location = New System.Drawing.Point(556, 373)
         Me.cmdRainEvapNext.Name = "cmdRainEvapNext"
         Me.cmdRainEvapNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdRainEvapNext.TabIndex = 40
@@ -1097,7 +1097,7 @@ Public Class frmGeoSFM
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboOtherMet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboOtherMet.FormattingEnabled = True
-        Me.cboOtherMet.Location = New System.Drawing.Point(119, 156)
+        Me.cboOtherMet.Location = New System.Drawing.Point(119, 177)
         Me.cboOtherMet.Name = "cboOtherMet"
         Me.cboOtherMet.Size = New System.Drawing.Size(416, 21)
         Me.cboOtherMet.TabIndex = 31
@@ -1106,7 +1106,7 @@ Public Class frmGeoSFM
         '
         Me.lblOtherMet.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblOtherMet.AutoSize = True
-        Me.lblOtherMet.Location = New System.Drawing.Point(16, 159)
+        Me.lblOtherMet.Location = New System.Drawing.Point(16, 180)
         Me.lblOtherMet.Name = "lblOtherMet"
         Me.lblOtherMet.Size = New System.Drawing.Size(83, 13)
         Me.lblOtherMet.TabIndex = 30
@@ -1127,7 +1127,7 @@ Public Class frmGeoSFM
         Me.GroupBox2.Controls.Add(Me.AtcText5)
         Me.GroupBox2.Controls.Add(Me.AtcText6)
         Me.GroupBox2.Controls.Add(Me.AtcText7)
-        Me.GroupBox2.Location = New System.Drawing.Point(19, 27)
+        Me.GroupBox2.Location = New System.Drawing.Point(19, 48)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(516, 96)
         Me.GroupBox2.TabIndex = 29
@@ -1317,23 +1317,23 @@ Public Class frmGeoSFM
         Me.AtcText7.ValueDouble = 2000
         Me.AtcText7.ValueInteger = 2000
         '
-        'TabPage1
+        'tpgSoil
         '
-        Me.TabPage1.Controls.Add(Me.cmdBalanceNext)
-        Me.TabPage1.Controls.Add(Me.AtcGrid1)
-        Me.TabPage1.Location = New System.Drawing.Point(4, 46)
-        Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Size = New System.Drawing.Size(647, 396)
-        Me.TabPage1.TabIndex = 11
-        Me.TabPage1.Text = "Compute Soil Water Balance"
-        Me.TabPage1.UseVisualStyleBackColor = True
+        Me.tpgSoil.Controls.Add(Me.cmdBalanceNext)
+        Me.tpgSoil.Controls.Add(Me.AtcGrid1)
+        Me.tpgSoil.Location = New System.Drawing.Point(4, 25)
+        Me.tpgSoil.Name = "tpgSoil"
+        Me.tpgSoil.Size = New System.Drawing.Size(647, 417)
+        Me.tpgSoil.TabIndex = 11
+        Me.tpgSoil.Text = "Compute Soil Water Balance"
+        Me.tpgSoil.UseVisualStyleBackColor = True
         '
         'cmdBalanceNext
         '
         Me.cmdBalanceNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdBalanceNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdBalanceNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdBalanceNext.Location = New System.Drawing.Point(554, 353)
+        Me.cmdBalanceNext.Location = New System.Drawing.Point(554, 374)
         Me.cmdBalanceNext.Name = "cmdBalanceNext"
         Me.cmdBalanceNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdBalanceNext.TabIndex = 52
@@ -1353,27 +1353,27 @@ Public Class frmGeoSFM
         Me.AtcGrid1.LineWidth = 0.0!
         Me.AtcGrid1.Location = New System.Drawing.Point(21, 19)
         Me.AtcGrid1.Name = "AtcGrid1"
-        Me.AtcGrid1.Size = New System.Drawing.Size(521, 308)
+        Me.AtcGrid1.Size = New System.Drawing.Size(521, 329)
         Me.AtcGrid1.Source = Nothing
         Me.AtcGrid1.TabIndex = 51
         '
-        'TabPage2
+        'tpgFlow
         '
-        Me.TabPage2.Controls.Add(Me.cmdRouteNext)
-        Me.TabPage2.Controls.Add(Me.AtcGrid2)
-        Me.TabPage2.Location = New System.Drawing.Point(4, 46)
-        Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Size = New System.Drawing.Size(647, 396)
-        Me.TabPage2.TabIndex = 12
-        Me.TabPage2.Text = "Compute Stream Flow"
-        Me.TabPage2.UseVisualStyleBackColor = True
+        Me.tpgFlow.Controls.Add(Me.cmdRouteNext)
+        Me.tpgFlow.Controls.Add(Me.AtcGrid2)
+        Me.tpgFlow.Location = New System.Drawing.Point(4, 25)
+        Me.tpgFlow.Name = "tpgFlow"
+        Me.tpgFlow.Size = New System.Drawing.Size(647, 417)
+        Me.tpgFlow.TabIndex = 12
+        Me.tpgFlow.Text = "Compute Stream Flow"
+        Me.tpgFlow.UseVisualStyleBackColor = True
         '
         'cmdRouteNext
         '
         Me.cmdRouteNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdRouteNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdRouteNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdRouteNext.Location = New System.Drawing.Point(555, 349)
+        Me.cmdRouteNext.Location = New System.Drawing.Point(555, 370)
         Me.cmdRouteNext.Name = "cmdRouteNext"
         Me.cmdRouteNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdRouteNext.TabIndex = 53
@@ -1393,19 +1393,19 @@ Public Class frmGeoSFM
         Me.AtcGrid2.LineWidth = 0.0!
         Me.AtcGrid2.Location = New System.Drawing.Point(25, 23)
         Me.AtcGrid2.Name = "AtcGrid2"
-        Me.AtcGrid2.Size = New System.Drawing.Size(518, 308)
+        Me.AtcGrid2.Size = New System.Drawing.Size(518, 329)
         Me.AtcGrid2.Source = Nothing
         Me.AtcGrid2.TabIndex = 52
         '
-        'TabPage4
+        'tpgSensitivity
         '
-        Me.TabPage4.Controls.Add(Me.cmdSensitivityNext)
-        Me.TabPage4.Location = New System.Drawing.Point(4, 46)
-        Me.TabPage4.Name = "TabPage4"
-        Me.TabPage4.Size = New System.Drawing.Size(647, 396)
-        Me.TabPage4.TabIndex = 13
-        Me.TabPage4.Text = "Sensitivity Analysis"
-        Me.TabPage4.UseVisualStyleBackColor = True
+        Me.tpgSensitivity.Controls.Add(Me.cmdSensitivityNext)
+        Me.tpgSensitivity.Location = New System.Drawing.Point(4, 46)
+        Me.tpgSensitivity.Name = "tpgSensitivity"
+        Me.tpgSensitivity.Size = New System.Drawing.Size(647, 396)
+        Me.tpgSensitivity.TabIndex = 13
+        Me.tpgSensitivity.Text = "Sensitivity Analysis"
+        Me.tpgSensitivity.UseVisualStyleBackColor = True
         '
         'cmdSensitivityNext
         '
@@ -1418,15 +1418,15 @@ Public Class frmGeoSFM
         Me.cmdSensitivityNext.TabIndex = 40
         Me.cmdSensitivityNext.Text = "Next >"
         '
-        'TabPage5
+        'tpgCalibrate
         '
-        Me.TabPage5.Controls.Add(Me.cmdCalibrationNext)
-        Me.TabPage5.Location = New System.Drawing.Point(4, 46)
-        Me.TabPage5.Name = "TabPage5"
-        Me.TabPage5.Size = New System.Drawing.Size(647, 396)
-        Me.TabPage5.TabIndex = 14
-        Me.TabPage5.Text = "Model Calibration"
-        Me.TabPage5.UseVisualStyleBackColor = True
+        Me.tpgCalibrate.Controls.Add(Me.cmdCalibrationNext)
+        Me.tpgCalibrate.Location = New System.Drawing.Point(4, 46)
+        Me.tpgCalibrate.Name = "tpgCalibrate"
+        Me.tpgCalibrate.Size = New System.Drawing.Size(647, 396)
+        Me.tpgCalibrate.TabIndex = 14
+        Me.tpgCalibrate.Text = "Model Calibration"
+        Me.tpgCalibrate.UseVisualStyleBackColor = True
         '
         'cmdCalibrationNext
         '
@@ -1439,15 +1439,15 @@ Public Class frmGeoSFM
         Me.cmdCalibrationNext.TabIndex = 40
         Me.cmdCalibrationNext.Text = "Next >"
         '
-        'TabPage6
+        'tpgBankfull
         '
-        Me.TabPage6.Controls.Add(Me.cmdBankfullNext)
-        Me.TabPage6.Location = New System.Drawing.Point(4, 46)
-        Me.TabPage6.Name = "TabPage6"
-        Me.TabPage6.Size = New System.Drawing.Size(647, 396)
-        Me.TabPage6.TabIndex = 15
-        Me.TabPage6.Text = "Bankfull and Flow Statistics"
-        Me.TabPage6.UseVisualStyleBackColor = True
+        Me.tpgBankfull.Controls.Add(Me.cmdBankfullNext)
+        Me.tpgBankfull.Location = New System.Drawing.Point(4, 46)
+        Me.tpgBankfull.Name = "tpgBankfull"
+        Me.tpgBankfull.Size = New System.Drawing.Size(647, 396)
+        Me.tpgBankfull.TabIndex = 15
+        Me.tpgBankfull.Text = "Bankfull and Flow Statistics"
+        Me.tpgBankfull.UseVisualStyleBackColor = True
         '
         'cmdBankfullNext
         '
@@ -1460,16 +1460,16 @@ Public Class frmGeoSFM
         Me.cmdBankfullNext.TabIndex = 40
         Me.cmdBankfullNext.Text = "Next >"
         '
-        'TabPage10
+        'tpgMap
         '
-        Me.TabPage10.Controls.Add(Me.cmdMapGenerate)
-        Me.TabPage10.Controls.Add(Me.Button10)
-        Me.TabPage10.Location = New System.Drawing.Point(4, 46)
-        Me.TabPage10.Name = "TabPage10"
-        Me.TabPage10.Size = New System.Drawing.Size(647, 396)
-        Me.TabPage10.TabIndex = 16
-        Me.TabPage10.Text = "Flow Percentile Map"
-        Me.TabPage10.UseVisualStyleBackColor = True
+        Me.tpgMap.Controls.Add(Me.cmdMapGenerate)
+        Me.tpgMap.Controls.Add(Me.Button10)
+        Me.tpgMap.Location = New System.Drawing.Point(4, 46)
+        Me.tpgMap.Name = "tpgMap"
+        Me.tpgMap.Size = New System.Drawing.Size(647, 396)
+        Me.tpgMap.TabIndex = 16
+        Me.tpgMap.Text = "Flow Percentile Map"
+        Me.tpgMap.UseVisualStyleBackColor = True
         '
         'cmdMapGenerate
         '
@@ -1493,15 +1493,15 @@ Public Class frmGeoSFM
         Me.Button10.TabIndex = 40
         Me.Button10.Text = "Next >"
         '
-        'TabPage11
+        'tpgPlot
         '
-        Me.TabPage11.Controls.Add(Me.cmdPlotGenerate)
-        Me.TabPage11.Location = New System.Drawing.Point(4, 46)
-        Me.TabPage11.Name = "TabPage11"
-        Me.TabPage11.Size = New System.Drawing.Size(647, 396)
-        Me.TabPage11.TabIndex = 17
-        Me.TabPage11.Text = "Flow Hydrographs"
-        Me.TabPage11.UseVisualStyleBackColor = True
+        Me.tpgPlot.Controls.Add(Me.cmdPlotGenerate)
+        Me.tpgPlot.Location = New System.Drawing.Point(4, 46)
+        Me.tpgPlot.Name = "tpgPlot"
+        Me.tpgPlot.Size = New System.Drawing.Size(647, 396)
+        Me.tpgPlot.TabIndex = 17
+        Me.tpgPlot.Text = "Flow Hydrographs"
+        Me.tpgPlot.UseVisualStyleBackColor = True
         '
         'cmdPlotGenerate
         '
@@ -1536,7 +1536,7 @@ Public Class frmGeoSFM
         Me.lblStatus.Name = "lblStatus"
         Me.lblStatus.Size = New System.Drawing.Size(631, 14)
         Me.lblStatus.TabIndex = 0
-        Me.lblStatus.Text = "Update specifications if desired, then click OK to proceed."
+        Me.lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
         '
         'Label20
         '
@@ -2116,7 +2116,7 @@ Public Class frmGeoSFM
         Me.CancelButton = Me.cmdCancel
         Me.ClientSize = New System.Drawing.Size(686, 568)
         Me.Controls.Add(Me.GroupBox1)
-        Me.Controls.Add(Me.TabControl1)
+        Me.Controls.Add(Me.tabMain)
         Me.Controls.Add(Me.cmdAbout)
         Me.Controls.Add(Me.cmdHelp)
         Me.Controls.Add(Me.cmdCancel)
@@ -2124,24 +2124,24 @@ Public Class frmGeoSFM
         Me.KeyPreview = True
         Me.Name = "frmGeoSFM"
         Me.Text = "Geospatial Stream Flow Model (GeoSFM) for BASINS"
-        Me.TabControl1.ResumeLayout(False)
-        Me.TabPage9.ResumeLayout(False)
-        Me.TabPage9.PerformLayout()
-        Me.TabPage7.ResumeLayout(False)
-        Me.TabPage7.PerformLayout()
-        Me.TabPage8.ResumeLayout(False)
-        Me.TabPage8.PerformLayout()
-        Me.TabPage3.ResumeLayout(False)
-        Me.TabPage3.PerformLayout()
+        Me.tabMain.ResumeLayout(False)
+        Me.tpgTerrain.ResumeLayout(False)
+        Me.tpgTerrain.PerformLayout()
+        Me.tpgBasin.ResumeLayout(False)
+        Me.tpgBasin.PerformLayout()
+        Me.tpgResponse.ResumeLayout(False)
+        Me.tpgResponse.PerformLayout()
+        Me.tpgRain.ResumeLayout(False)
+        Me.tpgRain.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
-        Me.TabPage1.ResumeLayout(False)
-        Me.TabPage2.ResumeLayout(False)
-        Me.TabPage4.ResumeLayout(False)
-        Me.TabPage5.ResumeLayout(False)
-        Me.TabPage6.ResumeLayout(False)
-        Me.TabPage10.ResumeLayout(False)
-        Me.TabPage11.ResumeLayout(False)
+        Me.tpgSoil.ResumeLayout(False)
+        Me.tpgFlow.ResumeLayout(False)
+        Me.tpgSensitivity.ResumeLayout(False)
+        Me.tpgCalibrate.ResumeLayout(False)
+        Me.tpgBankfull.ResumeLayout(False)
+        Me.tpgMap.ResumeLayout(False)
+        Me.tpgPlot.ResumeLayout(False)
         Me.GroupBox1.ResumeLayout(False)
         Me.ResumeLayout(False)
 
@@ -2237,10 +2237,19 @@ Public Class frmGeoSFM
         Dim lSubbasinLayerName As String = cboSubbasin.Items(cboSubbasin.SelectedIndex)
         Dim lStreamLayerName As String = cboReach.Items(cboReach.SelectedIndex)
         Dim lThresh As Integer = AtcText1.ValueInteger
+        EnableControls(False)
+        lblStatus.Text = "Performing Terrain Analysis ..."
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+        Me.Refresh()
 
         'call what was the avenue script 'terrain'
         Terrain(lDEMLayerName, lSubbasinLayerName, lStreamLayerName, lThresh)
 
+        tabMain.SelectedIndex = 1
+        lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+        Me.Refresh()
+        EnableControls(True)
         DefaultBasinCharacteristicsGrids()
     End Sub
 

@@ -1849,41 +1849,17 @@ Public Class GisUtil
 
     End Sub
 
-    Public Shared Sub DownstreamFlowLength(ByVal aFlowDirGridFileName As String, ByVal aFlowAccGridFileName As String, ByVal aLenGridFileName As String)
+    Public Shared Sub DownstreamFlowLength(ByVal aFlowDirGridFileName As String, ByVal aFlowAccGridFileName As String, ByVal aLenGridFileName As String, _
+                                           Optional ByVal aStreamGridFileName As String = "")
         'new sub to compute downstream flow length, not available directly in mapwindow
-
-        Dim lFlowAccGridLayerIndex As Integer = GisUtil.LayerIndex(aFlowAccGridFileName)
-        Dim lFlowAccGrid As MapWinGIS.Grid = GridFromIndex(lFlowAccGridLayerIndex)
-
-        'first use the flow acc grid to find the outlet of the watershed 
-        Dim lStartRow As Integer = 0
-        Dim lStartCol As Integer = 0
-        Dim lEndRow As Integer = lFlowAccGrid.Header.NumberRows - 1
-        Dim lEndCol As Integer = lFlowAccGrid.Header.NumberCols - 1
-        Dim lMaxRow As Integer = -1
-        Dim lMaxCol As Integer = -1
-        Dim lMaxVal As Double = 0.0
-
-        Dim lTempVal As Double = 0.0
-        For lRow As Integer = lStartRow To lEndRow
-            For lCol As Integer = lStartCol To lEndCol
-                lTempVal = lFlowAccGrid.Value(lCol, lRow)
-                If lTempVal > lMaxVal Then
-                    lMaxVal = lTempVal
-                    lMaxRow = lRow
-                    lMaxCol = lCol
-                End If
-            Next
-        Next
+        '  if stream grid is nothing, compute distances to watershed outlet.
+        '  if stream grid provided, compute distances to nearest stream.
 
         'prepare the output grid
-        Dim lFlowDirGridLayerIndex As Integer = GisUtil.LayerIndex(aFlowDirGridFileName)
-        Dim lFlowDirGrid As MapWinGIS.Grid = GridFromIndex(lFlowDirGridLayerIndex)
-
         If FileExists(aLenGridFileName) Then
             IO.File.Delete(aLenGridFileName)
         End If
-        IO.File.Copy(aFlowDirGridFileName, aLenGridFileName)
+        IO.File.Copy(aFlowAccGridFileName, aLenGridFileName)
 
         Dim lOutputGrid As New MapWinGIS.Grid
         lOutputGrid.Open(aLenGridFileName)
@@ -1895,10 +1871,63 @@ Public Class GisUtil
                 lOutputGrid.Value(lCol, lRow) = lNoData
             Next
         Next
-        lOutputGrid.Value(lMaxCol, lMaxRow) = 0.0
 
-        'now call recursive routine to set surrounding cells 
-        Downstream.CheckNeighboringCells(lFlowDirGrid, lMaxCol, lMaxRow, lOutputGrid)
+        'prepare the flow dir grid
+        Dim lFlowDirGrid As New MapWinGIS.Grid
+        lFlowDirGrid.Open(aFlowDirGridFileName)
+
+        Dim lStartRow As Integer = 0
+        Dim lStartCol As Integer = 0
+        Dim lEndRow As Integer = 0
+        Dim lEndCol As Integer = 0
+        Dim lTempVal As Double = 0.0
+
+        If aStreamGridFileName.Length = 0 Then
+            'use the flow acc grid to find the outlet of the watershed 
+            Dim lFlowAccGrid As New MapWinGIS.Grid
+            lFlowAccGrid.Open(aFlowAccGridFileName)
+
+            lEndRow = lFlowAccGrid.Header.NumberRows - 1
+            lEndCol = lFlowAccGrid.Header.NumberCols - 1
+            Dim lMaxRow As Integer = -1
+            Dim lMaxCol As Integer = -1
+            Dim lMaxVal As Double = 0.0
+
+            For lRow As Integer = lStartRow To lEndRow
+                For lCol As Integer = lStartCol To lEndCol
+                    lTempVal = lFlowAccGrid.Value(lCol, lRow)
+                    If lTempVal > lMaxVal Then
+                        lMaxVal = lTempVal
+                        lMaxRow = lRow
+                        lMaxCol = lCol
+                    End If
+                Next
+            Next
+            lFlowAccGrid = Nothing
+            lOutputGrid.Value(lMaxCol, lMaxRow) = 0.0
+
+            'now call recursive routine to set surrounding cells 
+            Downstream.CheckNeighboringCells(lFlowDirGrid, lMaxCol, lMaxRow, lOutputGrid)
+        Else
+            'use the streams grid to compute the distance to a stream cell
+            Dim lStreamGrid As New MapWinGIS.Grid
+            lStreamGrid.Open(aStreamGridFileName)
+
+            lEndRow = lStreamGrid.Header.NumberRows - 1
+            lEndCol = lStreamGrid.Header.NumberCols - 1
+
+            For lRow As Integer = lStartRow To lEndRow
+                For lCol As Integer = lStartCol To lEndCol
+                    lTempVal = lStreamGrid.Value(lCol, lRow)
+                    If lTempVal > 0 Then
+                        lOutputGrid.Value(lCol, lRow) = 0.0
+                        'now call recursive routine to set surrounding cells 
+                        Downstream.CheckNeighboringCells(lFlowDirGrid, lCol, lRow, lOutputGrid)
+                    End If
+                Next
+            Next
+            lStreamGrid = Nothing
+        End If
 
         lOutputGrid.Save()
         lOutputGrid = Nothing
@@ -3813,17 +3842,7 @@ End Class
 
 Friend Class Downstream
     Friend Shared Sub CheckNeighboringCells(ByVal aFlowDirGrid As MapWinGIS.Grid, ByVal aCol As Integer, ByVal aRow As Integer, ByVal aOutputGrid As MapWinGIS.Grid)
-        'used in DownstreamFlowLength, accumulates distances to output recursively 
-
-        Dim lTempVal As Integer = -1
-        Dim lRowStart As Integer = aRow - 1
-        Dim lRowEnd As Integer = aRow + 1
-        Dim lColStart As Integer = aCol - 1
-        Dim lColEnd As Integer = aCol + 1
-        If lRowStart < 0 Then lRowStart = 0
-        If lColStart < 0 Then lColStart = 0
-        If lRowEnd > aFlowDirGrid.Header.NumberRows - 1 Then lRowEnd = aFlowDirGrid.Header.NumberRows - 1
-        If lColEnd > aFlowDirGrid.Header.NumberCols - 1 Then lColEnd = aFlowDirGrid.Header.NumberCols - 1
+        'used in DownstreamFlowLength, accumulates distances to outlet recursively 
 
         'figure out the distances x and y
         Dim lX As Double = aOutputGrid.Header.dX
@@ -3839,6 +3858,9 @@ Friend Class Downstream
         If aRow - 1 > 0 And aCol - 1 > 0 Then
             If aFlowDirGrid.Value(aCol - 1, aRow - 1) = 8 Then
                 aOutputGrid.Value(aCol - 1, aRow - 1) = lDiag + aOutputGrid.Value(aCol, aRow)
+                'If aOutputGrid.Value(aCol, aRow) < 0 Then
+                '    'Logger.Dbg("negative value for output grid")
+                'End If
                 CheckNeighboringCells(aFlowDirGrid, aCol - 1, aRow - 1, aOutputGrid)
             End If
         End If
@@ -3847,6 +3869,9 @@ Friend Class Downstream
         If aRow - 1 > 0 Then
             If aFlowDirGrid.Value(aCol, aRow - 1) = 7 Then
                 aOutputGrid.Value(aCol, aRow - 1) = lY + aOutputGrid.Value(aCol, aRow)
+                'If aOutputGrid.Value(aCol, aRow) < 0 Then
+                '    'Logger.Dbg("negative value for output grid")
+                'End If
                 CheckNeighboringCells(aFlowDirGrid, aCol, aRow - 1, aOutputGrid)
             End If
         End If
@@ -3855,6 +3880,9 @@ Friend Class Downstream
         If aRow - 1 > 0 And aCol + 1 < aFlowDirGrid.Header.NumberCols Then
             If aFlowDirGrid.Value(aCol + 1, aRow - 1) = 6 Then
                 aOutputGrid.Value(aCol + 1, aRow - 1) = lDiag + aOutputGrid.Value(aCol, aRow)
+                'If aOutputGrid.Value(aCol, aRow) < 0 Then
+                '    'Logger.Dbg("negative value for output grid")
+                'End If
                 CheckNeighboringCells(aFlowDirGrid, aCol + 1, aRow - 1, aOutputGrid)
             End If
         End If
@@ -3863,6 +3891,9 @@ Friend Class Downstream
         If aCol - 1 > 0 Then
             If aFlowDirGrid.Value(aCol - 1, aRow) = 1 Then
                 aOutputGrid.Value(aCol - 1, aRow) = lX + aOutputGrid.Value(aCol, aRow)
+                'If aOutputGrid.Value(aCol, aRow) < 0 Then
+                '    'Logger.Dbg("negative value for output grid")
+                'End If
                 CheckNeighboringCells(aFlowDirGrid, aCol - 1, aRow, aOutputGrid)
             End If
         End If
@@ -3871,6 +3902,9 @@ Friend Class Downstream
         If aCol + 1 < aFlowDirGrid.Header.NumberCols Then
             If aFlowDirGrid.Value(aCol + 1, aRow) = 5 Then
                 aOutputGrid.Value(aCol + 1, aRow) = lX + aOutputGrid.Value(aCol, aRow)
+                'If aOutputGrid.Value(aCol, aRow) < 0 Then
+                '    'Logger.Dbg("negative value for output grid")
+                'End If
                 CheckNeighboringCells(aFlowDirGrid, aCol + 1, aRow, aOutputGrid)
             End If
         End If
@@ -3879,6 +3913,9 @@ Friend Class Downstream
         If aRow + 1 < aFlowDirGrid.Header.NumberRows And aCol - 1 > 0 Then
             If aFlowDirGrid.Value(aCol - 1, aRow + 1) = 2 Then
                 aOutputGrid.Value(aCol - 1, aRow + 1) = lDiag + aOutputGrid.Value(aCol, aRow)
+                'If aOutputGrid.Value(aCol, aRow) < 0 Then
+                '    'Logger.Dbg("negative value for output grid")
+                'End If
                 CheckNeighboringCells(aFlowDirGrid, aCol - 1, aRow + 1, aOutputGrid)
             End If
         End If
@@ -3887,6 +3924,9 @@ Friend Class Downstream
         If aRow + 1 < aFlowDirGrid.Header.NumberRows Then
             If aFlowDirGrid.Value(aCol, aRow + 1) = 3 Then
                 aOutputGrid.Value(aCol, aRow + 1) = lY + aOutputGrid.Value(aCol, aRow)
+                'If aOutputGrid.Value(aCol, aRow) < 0 Then
+                '    'Logger.Dbg("negative value for output grid")
+                'End If
                 CheckNeighboringCells(aFlowDirGrid, aCol, aRow + 1, aOutputGrid)
             End If
         End If
@@ -3895,6 +3935,9 @@ Friend Class Downstream
         If aRow + 1 < aFlowDirGrid.Header.NumberRows And aCol + 1 < aFlowDirGrid.Header.NumberCols Then
             If aFlowDirGrid.Value(aCol + 1, aRow + 1) = 4 Then
                 aOutputGrid.Value(aCol + 1, aRow + 1) = lDiag + aOutputGrid.Value(aCol, aRow)
+                'If aOutputGrid.Value(aCol, aRow) < 0 Then
+                '    'Logger.Dbg("negative value for output grid")
+                'End If
                 CheckNeighboringCells(aFlowDirGrid, aCol + 1, aRow + 1, aOutputGrid)
             End If
         End If

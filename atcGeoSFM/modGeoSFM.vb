@@ -226,7 +226,7 @@ Public Module modGeoSFM
             'to the first grid, assign null at the corresponding cells of the second grid, and save the result as the third
             GisUtil.GridAssignValuesToNull(lFlowDirGridFileName, lStreamGridFileName, lFlowDirHillGridFileName)
             'hlggrid = fdrhill.FlowLength(Nil, False)
-            GisUtil.DownstreamFlowLength(lFlowDirHillGridFileName, lFlowAccGridFileName, lHillLenGridFileName)
+            GisUtil.DownstreamFlowLength(lFlowDirHillGridFileName, lFlowAccGridFileName, lHillLenGridFileName, lStreamGridFileName)
             GisUtil.AddLayer(lHillLenGridFileName, lHillLenGridLayerName)
         End If
 
