@@ -311,28 +311,28 @@ Public Class clsRecess
         Dim lStrMonths As String = String.Join(",", RecessIncludeMonths.ToArray())
 
         pHeaderOutFile1 &= _
-" FILE " & lFileOut1 & "--  UNIT 10 OUTPUT OF RECESS.F " & vbCrLf & _
-" INPUT FILE = " & pDataFilename & vbCrLf & _
-" START = " & lYearStart & vbCrLf & _
-" END =   " & lYearEnd & vbCrLf & _
-" DAYS OF RECESSION REQUIRED FOR DETECTION=" & pRecessLengthInDays.ToString & vbCrLf & _
-" MONTHS SELECTED:" & lStrMonths & vbCrLf & _
-" " & vbCrLf & _
-"-----------------------------------------------------------------------" & vbCrLf & _
-"              RECESSION PERIODS INITIALLY SELECTED: " & vbCrLf & _
-"   LOG Q       RECESS.INDEX     TIME SINCE PEAK    .       DATE OF PEAK " & vbCrLf & _
-"   (MEAN)    ( -dT/d(LogQ) ) (START)(MIDDLE)(END)  .        (yr, mo, d) " & vbCrLf
+        " FILE " & lFileOut1 & "--  UNIT 10 OUTPUT OF RECESS.F " & vbCrLf & _
+        " INPUT FILE = " & pDataFilename & vbCrLf & _
+        " START = " & lYearStart & vbCrLf & _
+        " END =   " & lYearEnd & vbCrLf & _
+        " DAYS OF RECESSION REQUIRED FOR DETECTION=" & pRecessLengthInDays.ToString & vbCrLf & _
+        " MONTHS SELECTED:" & lStrMonths & vbCrLf & _
+        " " & vbCrLf & _
+        "-----------------------------------------------------------------------" & vbCrLf & _
+        "              RECESSION PERIODS INITIALLY SELECTED: " & vbCrLf & _
+        "   LOG Q       RECESS.INDEX     TIME SINCE PEAK    .       DATE OF PEAK " & vbCrLf & _
+        "   (MEAN)    ( -dT/d(LogQ) ) (START)(MIDDLE)(END)  .        (yr, mo, d) " & vbCrLf
 
         pHeaderOutFile2 &= _
-" FILE " & lFileOut2 & "--  UNIT 11 OUTPUT OF RECESS.F: " & vbCrLf & _
-" INPUT DATA FILE FOR THIS SESSION: ', INFILE" & vbCrLf & _
-" Tpeak is the time since the last peak  " & vbCrLf & _
-" Tmrc is the time on the Master Recession Curve " & vbCrLf & _
-" LogQ is the log of flow " & vbCrLf & _
-" Q is the flow " & vbCrLf & _
-" Seq# is the sequence number in which the segment " & vbCrLf & _
-" was selected.  " & vbCrLf & _
-"-----------------------------------------------------------------------"
+        " FILE " & lFileOut2 & "--  UNIT 11 OUTPUT OF RECESS.F: " & vbCrLf & _
+        " INPUT DATA FILE FOR THIS SESSION: ', INFILE" & vbCrLf & _
+        " Tpeak is the time since the last peak  " & vbCrLf & _
+        " Tmrc is the time on the Master Recession Curve " & vbCrLf & _
+        " LogQ is the log of flow " & vbCrLf & _
+        " Q is the flow " & vbCrLf & _
+        " Seq# is the sequence number in which the segment " & vbCrLf & _
+        " was selected.  " & vbCrLf & _
+        "-----------------------------------------------------------------------"
 
         Dim lSW As IO.StreamWriter = Nothing
         ' ------------- LOCATE a PEAK ---------------------
