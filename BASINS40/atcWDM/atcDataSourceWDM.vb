@@ -19,7 +19,11 @@ Public Class atcDataSourceWDM
     Private Shared pMsg As atcMsgWDM
     Private pTu As atcTimeUnit = 0 'default time units, default 2-minutes
     Private pTs As Integer = 0 'default timestep, default 1 
+
+#If BatchMode Then
+#Else
     Private pAskAboutMissingTuTs As Boolean = True
+#End If
 
     'Can be set by user to avoid asking user each time
     Private pExistAskUserAction As EnumExistAction = ExistAskUser
@@ -96,7 +100,6 @@ Public Class atcDataSourceWDM
     End Function
 
     Public Overrides Function AddDatasets(ByVal aDataGroup As atcTimeseriesGroup) As Boolean
-        Dim lfrm As New frmSave
         Dim lNumSaved As Integer = 0
         Dim lDSN As Integer
         Dim lLowestDSN As Integer = Integer.MaxValue
@@ -125,8 +128,11 @@ Public Class atcDataSourceWDM
             End If
             lDataSet.Attributes.SetValue("New DSN", lHighestNewDSN)
         Next
-
+#If BatchMode Then
+#Else
+        Dim lfrm As New frmSave
         aDataGroup = lfrm.AskUser(aDataGroup, lLabel, lHighestDSN)
+#End If
         If Not aDataGroup Is Nothing AndAlso aDataGroup.Count > 0 Then
             For Each lDataset As atcTimeseries In aDataGroup
                 Dim lNewDSN As Integer = lDataset.Attributes.GetValue("New DSN", 0)
@@ -169,10 +175,13 @@ Public Class atcDataSourceWDM
             'Dim lTSBYr As Integer = aDataSet.Attributes.GetValue("tsbyr", 1900)
 
             If lTs = 0 OrElse lTu = atcTimeUnit.TUUnknown Then ' sparse dataset - fill in dummy values for write
+#If BatchMode Then
+#Else
                 If pAskAboutMissingTuTs Then
                     Dim lFrmDefaultTimeInterval As New frmDefaultTimeInterval
                     pAskAboutMissingTuTs = lFrmDefaultTimeInterval.AskUser(lTimser.ToString & " #" & lDsn, pTu, pTs, lAggr)
                 End If
+#End If
                 lTs = pTs
                 lTu = pTu
                 If pTs > 0 AndAlso pTu <> atcTimeUnit.TUUnknown Then

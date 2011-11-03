@@ -115,24 +115,28 @@ Public Class atcWDMfile
     ''' <param name="aWdm">handle of open WDM file to read from</param>
     ''' <remarks>All static attributes are read, but data is not read here to save time and space</remarks>
     Private Sub Refresh(ByVal aWdm As atcWdmFileHandle)
-        Dim lProg As Integer = 0
-        Dim lProgPrev As Integer
+        'Dim lProg As Integer = 0
+        'Dim lProgPrev As Integer
 
         DataSets.Clear()
 
         Dim lDsn As Int32 = aWdm.ReadInt32(Wdm_Fields.DSFST_Timeseries)
         While lDsn > 0
+            If DataSets.Keys.Contains(lDsn) Then
+                Logger.Dbg("Found duplicate DSN: " & lDsn & ", aborting Refresh")
+                Exit Sub
+            End If
             Dim lRec As Int32 = aWdm.FirstRecordNumberFromDsn(lDsn)
-            'Logger.Dbg("Dsn: " & lDsn & " Rec: " & lRec)
+            Logger.Dbg("Dsn: " & lDsn & " Rec: " & lRec)
             DataSets.Add(lDsn, DataSetFromWdm(aWdm, lDsn))
             lDsn = aWdm.ReadInt32(lRec, 2)
-            If lDsn = 0 Then
-                'Logger.Progress("WDM Refresh Complete", 100, 100)
-            Else 'try the next dsn
-                lProgPrev = lProg
-                lProg = (100 * lDsn) / 32000 'TODO: use actual number of datasets read and total to read
-                'Logger.Progress("WDM Refresh", lProg, lProgPrev)
-            End If
+            'If lDsn = 0 Then
+            '    'Logger.Progress("WDM Refresh Complete", 100, 100)
+            'Else 'try the next dsn
+            '    lProgPrev = lProg
+            '    lProg = (100 * lDsn) / 32000 'TODO: use actual number of datasets read and total to read
+            '    'Logger.Progress("WDM Refresh", lProg, lProgPrev)
+            'End If
         End While
     End Sub
 
