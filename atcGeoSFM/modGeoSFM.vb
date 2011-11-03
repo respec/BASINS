@@ -231,8 +231,18 @@ Public Module modGeoSFM
         End If
 
         '"Downstream Grid"
-        'this is more complicated
-        'we don't have to do this exactly, but we need to know which subbasin is downstream of each one
+        Dim lDownstreamGridLayerName As String = "Downstream Subbasin Grid"
+        Dim lDownstreamGridLayerIndex As Integer = 0
+        Dim lDownstreamGridFileName As String = ""
+        If GisUtil.IsLayer(lDownstreamGridLayerName) Then
+            lDownstreamGridLayerIndex = GisUtil.LayerIndex(lDownstreamGridLayerName)
+            lDownstreamGridFileName = GisUtil.LayerFileName(lDownstreamGridLayerIndex)
+        Else
+            Logger.Status("Computing Downstream Grid")
+            lDownstreamGridFileName = FilenameNoExt(lDEMFileName) & "Downstream.bgd"
+            GisUtil.GridDownstreamSubbasins(lOutletGridFileName, lFlowDirGridFileName, lSubbasinGridFileName, lDownstreamGridFileName)
+            GisUtil.AddLayer(lDownstreamGridFileName, lDownstreamGridLayerName)
+        End If
     End Sub
 
     Friend Sub Basin(ByVal zonegname As String, ByVal demgname As String, ByVal facgname As String, ByVal hlengname As String, ByVal rcngname As String, _
@@ -391,37 +401,7 @@ Public Module modGeoSFM
             maxcovergthm = GisUtil.LayerIndex(maxcovergname)
         End If
 
-        '        If (basingrid.GetVtab <> nil) Then
-        '            basintable = basingrid.GetVtab
-        '        ElseIf ((basingrid.GetVtab = nil) And (basingrid.IsInteger)) Then
-        '            basinVtabTF = basingrid.buildvat
-        '            If (basinVtabTF.IsTrue) Then
-        '                basintable = basingrid.GetVtab
-        '            Else
-        '                MsgBox.error("Cannot open/create basin grid Value Attribute Table", "")
-        '                Exit Sub
-        '            End If
-        'elseif ((basingrid.GetVtab = nil) AND (basingrid.IsInteger.Not)) then
-        '                MsgBox.error("Basin grid is not an integer grid. Specify an integer basin grid.", "")
-        '                Exit Sub
-        '        End If
-
-        '        thebitmap = basintable.GetSelection
-        '        thebitmap.ClearAll()
-        '        basintable.UpdateSelection()
-
-        '        basinField = basinTable.FindField("Value")
-        '        If (basinfield = nil) Then
-        '            MsgBox.error("Field VALUE not found in basin grid Value Attribute Table", "")
-        '            Exit Sub
-        '        End If
-
-        '        basincount = basinTable.FindField("Count")
-        '        If (basincount = nil) Then
-        '            MsgBox.error("Field COUNT not found in basin grid Value Attribute Table", "")
-        '            Exit Sub
-        '        End If
-
+        'ToDo:Need way to include dam locations
         '        hasdamfld = basinTable.FindField("HasDam")
         '        If (hasdamfld = nil) Then
         '            basinTable.setEditable(True)
@@ -434,122 +414,89 @@ Public Module modGeoSFM
         '            basinTable.Calculate("0", hasdamfld)
         '        End If
 
-        '        For Each rec In basinTable
-        '            cellcount = basinTable.returnValue(basincount, rec)
-        '            If (cellcount = 1) Then
-        '                MsgBox.report("Basin Grid contains single-cell subbasins" + nl + "for which zonalstatistics cannot be computed." + nl + nl + "Repeat delineation with higher stream definition" + nl + "threshold to eliminate this problem", "Error in Basin Grid")
-        '                Exit Sub
-        '            End
-        '        End
-
         Logger.Status("Computing Zonal Statistics for " + demgname + "........")
         'find average value of demgthm for each unique value of basingthm
         Dim lDemZonalStats As New atcCollection
         lDemZonalStats = GisUtil.GridZonalStatistics(basingthm, demgthm)
 
         Logger.Status("Computing Zonal Statistics for " + facgname + "........")
-        'FaczoneVTab = FacGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zFacFN.AsFileName)
         'find average value of facgthm for each unique value of basingthm
+        Dim lFacZonalStats As New atcCollection
+        lFacZonalStats = GisUtil.GridZonalStatistics(basingthm, facgthm)
 
         Logger.Status("Computing Zonal Statistics for " + hlengname + "........")
-        'HlenzoneVTab = HlenGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zHlenFN.AsFileName)
         'find average value of hlengthm for each unique value of basingthm
+        Dim lHlenZonalStats As New atcCollection
+        lHlenZonalStats = GisUtil.GridZonalStatistics(basingthm, hlengthm)
 
         Logger.Status("Computing Zonal Statistics for " + rcngname + "........")
-        'RcnzoneVTab = RcnGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zRcnFN.AsFileName)
         'find average value of rcngthm for each unique value of basingthm
+        Dim lRcnZonalStats As New atcCollection
+        lRcnZonalStats = GisUtil.GridZonalStatisticsMismatched(basingthm, rcngthm)
 
         Logger.Status("Computing Zonal Statistics for " + whcgname + "........")
-        'WhczoneVTab = WhcGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zwhcFN.AsFileName)
         'find average value of whcgthm for each unique value of basingthm
+        Dim lWhcZonalStats As New atcCollection
+        lWhcZonalStats = GisUtil.GridZonalStatisticsMismatched(basingthm, whcgthm)
 
         Logger.Status("Computing Zonal Statistics for " + depthgname + "........")
-        'DepthzoneVTab = DepthGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zDepthFN.AsFileName)
         'find average value of depthgthm for each unique value of basingthm
+        Dim lDepthZonalStats As New atcCollection
+        lDepthZonalStats = GisUtil.GridZonalStatisticsMismatched(basingthm, depthgthm)
 
         Logger.Status("Computing Zonal Statistics for " + texturegname + "........")
-        'TexturezoneVTab = TextureGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zTextureFN.AsFileName)
         'find average value of texturegthm for each unique value of basingthm
+        Dim lTextureZonalStats As New atcCollection
+        lTextureZonalStats = GisUtil.GridZonalStatisticsMismatched(basingthm, texturegthm)
 
         Logger.Status("Computing Zonal Statistics for " + draingname + "........")
-        'DrainzoneVTab = DrainGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zDrainFN.AsFileName)
         'find average value of draingthm for each unique value of basingthm
+        Dim lDrainZonalStats As New atcCollection
+        lDrainZonalStats = GisUtil.GridZonalStatisticsMismatched(basingthm, draingthm)
 
-
-
-
-        Logger.Status("Computing River Grid......")
+        'how if this river grid different from the stream link grid?
+        'Logger.Status("Computing River Grid......")
         '                rivgrid = (basingrid * ((rivlinkgrid + 1) / (rivlinkgrid + 1))).Int
         '                rivVtab = rivgrid.GetVtab
-        '                If (rivVtab = nil) Then
-        '                    rivgrid.buildvat()
-        '                    rivVtab = rivgrid.GetVtab
-        '                    End
-        '                    zonefield = rivVtab.Findfield("Value")
-
-
-
 
         Logger.Status("Computing Zonal Statistics for " + flowlengname + "........")
-        'rivlenzoneVTab = flowlengrid.ZonalStatsTable(rivgrid, ThePrj, zoneField, False, zRivlenFN.AsFileName)
         'find average value of flowlengthm for each unique value of rivgrid
+        Dim lRivlenZonalStats As New atcCollection
+        lRivlenZonalStats = GisUtil.GridZonalStatistics(rivlinkgthm, flowlengthm)
 
         Logger.Status("Computing Zonal Statistics for " + flowlengname + "........")
-        'lengthzoneVTab = flowlengrid.ZonalStatsTable(basingrid, ThePrj, zoneField, False, zlengthFN.AsFileName)
         'find average value of flowlengthm for each unique value of basingthm
+        Dim lLengthZonalStats As New atcCollection
+        lLengthZonalStats = GisUtil.GridZonalStatistics(basingthm, flowlengthm)
 
         Logger.Status("Computing Zonal Statistics for river cell elevations........")
-        'rivdemzoneVTab = DemGrid.ZonalStatsTable(rivgrid, ThePrj, zoneField, False, zRivDemFN.AsFileName)
         'find average value of demgthm for each unique value of rivgrid
+        Dim lRivDemZonalStats As New atcCollection
+        lRivDemZonalStats = GisUtil.GridZonalStatistics(rivlinkgthm, demgthm)
 
         Logger.Status("Computing Zonal Statistics for downstream basin ids........")
-        'DownzoneVTab = DownGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zDownFN.AsFileName)
         'find average value of downgthm for each unique value of basingthm
+        Dim lDownZonalStats As New atcCollection
+        lDownZonalStats = GisUtil.GridZonalStatistics(basingthm, downgthm)
 
         Logger.Status("Computing Zonal Statistics for " + maxcovergname + "........")
-        'maxcoverzoneVTab = maxcoverGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, zmaxcoverFN.AsFileName)
         'find average value of maxcovergthm for each unique value of basingthm
+        Dim lMaxCoverZonalStats As New atcCollection
+        lMaxCoverZonalStats = GisUtil.GridZonalStatisticsMismatched(basingthm, maxcovergthm)
 
-        '                    areafield = DemZoneVtab.FindField("area")
-        '                    demfield = DemZoneVtab.FindField("mean")
-        '                    demminfield = DemZoneVtab.FindField("min")
-        '                    lenfield = LengthZoneVtab.FindField("mean")
-        '                    lenminfield = LengthZoneVtab.FindField("min")
-        '                    facfield = FacZoneVtab.FindField("max")
-        '                    hlenfield = HlenZoneVtab.FindField("mean")
-        '                    rcnfield = RcnZoneVtab.FindField("mean")
-        '                    whcfield = whcZoneVtab.FindField("mean")
-        '                    depthfield = DepthZoneVtab.FindField("mean")
-        '                    texturefield = TextureZoneVtab.FindField("majority")
-        '                    drainfield = DrainZoneVtab.FindField("mean")
-        '                    rivlenfield = rivlenZoneVtab.FindField("range")
-        '                    rivdemfield = RivDemZoneVtab.FindField("range")
-        '                    Downfield = DownZoneVtab.FindField("majority")
-        '                    maxcoverfield = MaxCoverZoneVtab.FindField("mean")
-
-        '                    'Sort basins in order of ascending drainage area
-        '                    'This ensures that upstream basins are listed before downstream ones
-
-        '                    srtlist = List.make
-        '                    For Each brecord In BasinTable
-        '                        basinvalue = (BasinTable.ReturnValue(basinfield, brecord)).AsString
-        '                        facvalue = (FacZoneVtab.ReturnValue(facfield, brecord)).setformat("d").AsString
-        '                        faccount = (facfield.getwidth) - (facvalue.count)
-        '                        If (faccount > 0) Then
-        '    for each fnum in 0..faccount
-        '                                facvalue = "0" + facvalue
-        '                                End If 
-        '                        End If 
-        '                srtstring = facvalue + "xxx" + brecord.asstring
-        '                srtlist.Add(srtstring)
-        '            End If
-        '            srtlist.sort(False)
-
-
-        'find unique values from the basins grid
-        Dim lUniqueBasinValues As New atcCollection
-        'GisUtil.GridUniqueValues(basingthm, lUniqueBasinValues)
-        'may also need counts and hasdam fields?
+        'Sort basins in order of ascending drainage area
+        'This ensures that upstream basins are listed before downstream ones
+        Dim lBasinIDs As New atcCollection
+        Dim lZone As Integer = -1
+        Dim lMax As Double = 0.0
+        For Each lBasin As atcDataAttributes In lFacZonalStats
+            lZone = lBasin.GetDefinedValue("Zone").Value
+            lMax = lBasin.GetDefinedValue("Max").Value
+            If lZone > -1 Then
+                lBasinIDs.Add(lZone, lMax)
+            End If
+        Next
+        lBasinIDs.SortByValue()
 
         ' Begin writing to the output file
 
@@ -699,21 +646,36 @@ Public Module modGeoSFM
         lSBDesc.AppendLine("")
         SaveFileString(lDescFile, lSBDesc.ToString)
 
-        For Each basinvalue As Integer In lUniqueBasinValues
-            'jstring = srtlist.get(srtnum)
-            'rrecord = jstring.astokens("xxx").get(1).asnumber
+        For Each basinvalue As Integer In lBasinIDs.Keys
+
+            '   areafield = DemZoneVtab.FindField("area")
+            '   demfield = DemZoneVtab.FindField("mean")
+            '   demminfield = DemZoneVtab.FindField("min")
+            '   facfield = FacZoneVtab.FindField("max")
+            '   lenfield = LengthZoneVtab.FindField("mean")
+            '   lenminfield = LengthZoneVtab.FindField("min")
+            '   hlenfield = HlenZoneVtab.FindField("mean")
+            '   drainfield = DrainZoneVtab.FindField("mean")
+            '   rivlenfield = rivlenZoneVtab.FindField("range")
+            '   rcnfield = RcnZoneVtab.FindField("mean")
+            '   whcfield = whcZoneVtab.FindField("mean")
+            '   depthfield = DepthZoneVtab.FindField("mean")
+            '   texturefield = TextureZoneVtab.FindField("majority")
+            '   rivdemfield = RivDemZoneVtab.FindField("range")
+            '   Downfield = DownZoneVtab.FindField("majority")
+            '   maxcoverfield = MaxCoverZoneVtab.FindField("mean")
 
             'DemZoneVtab
-            Dim areavalue As Single = 0 '((DemZoneVtab.ReturnValue(areafield, rrecord)) / (1000000.0)).SetFormat("d.d").AsString
-            Dim demvalue As Single = 0 '(DemZoneVtab.ReturnValue(demfield, rrecord)).SetFormat("d.d").AsString
-            Dim avgdrop As Single = 0 '(DemZoneVtab.ReturnValue(Demfield, rrecord)) - (DemZoneVtab.ReturnValue(Demminfield, rrecord))
+            Dim areavalue As Single = lDemZonalStats.ItemByKey(basinvalue).GetDefinedValue("Area").Value / 1000000.0 '((DemZoneVtab.ReturnValue(areafield, rrecord)) / (1000000.0)).SetFormat("d.d").AsString
+            Dim demvalue As Single = lDemZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value '(DemZoneVtab.ReturnValue(demfield, rrecord)).SetFormat("d.d").AsString
+            Dim avgdrop As Single = lDemZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value - lDemZonalStats.ItemByKey(basinvalue).GetDefinedValue("Min").Value '(DemZoneVtab.ReturnValue(Demfield, rrecord)) - (DemZoneVtab.ReturnValue(Demminfield, rrecord))
 
             'FacZoneVtab
-            Dim facvalue As Single = 0 '(FacZoneVtab.ReturnValue(facfield, rrecord)).AsString
+            Dim facvalue As Single = lFacZonalStats.ItemByKey(basinvalue).GetDefinedValue("Max").Value '(FacZoneVtab.ReturnValue(facfield, rrecord)).AsString
 
             'HlenZoneVtab
-            Dim hlenvalue As Single = 0 '(HlenZoneVtab.ReturnValue(hlenfield, rrecord)).SetFormat("d.d").AsString
-            'If (hlenvalue.isnumber.not) Then
+            Dim hlenvalue As String = lHlenZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value '(HlenZoneVtab.ReturnValue(hlenfield, rrecord)).SetFormat("d.d").AsString
+            'If Not IsNumeric(hlenvalue) Then
             '    hlenvalue = basingrid.GetCellSize
             'End If
             'If (hlenvalue < basingrid.GetCellSize) Then
@@ -721,15 +683,15 @@ Public Module modGeoSFM
             'End If
 
             'LengthZoneVtab
-            Dim avglength As Single = 0 '(LengthZoneVtab.ReturnValue(Lenfield, rrecord)) - (LengthZoneVtab.ReturnValue(Lenminfield, rrecord))
+            Dim avglength As Single = lLengthZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value - lLengthZonalStats.ItemByKey(basinvalue).GetDefinedValue("Min").Value '(LengthZoneVtab.ReturnValue(Lenfield, rrecord)) - (LengthZoneVtab.ReturnValue(Lenminfield, rrecord))
             'If (avglength < basingrid.GetCellSize) Then
             '    avglength = basingrid.GetCellSize
             'End If
 
             'DrainZoneVtab
-            Dim drainvalue As Single = 0 '(DrainZoneVtab.ReturnValue(drainfield, rrecord)).SetFormat("d.ddd").AsString
+            Dim drainvalue As Single = lDrainZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value '(DrainZoneVtab.ReturnValue(drainfield, rrecord)).SetFormat("d.ddd").AsString
 
-            Dim upareavalue As Single = 0 '((facvalue.asstring.asnumber * facgrid.GetCellSize * facgrid.GetCellSize) / 1000000.0).SetFormat("d.d").asstring
+            Dim upareavalue As Single = facvalue  '((facvalue.asstring.asnumber * facgrid.GetCellSize * facgrid.GetCellSize) / 1000000.0).SetFormat("d.d").asstring
 
             Dim slopevalue As String = ((avgdrop * 100) / avglength).ToString  '(((avgdrop * 100) / avglength).Format("d.dddd")).AsString
             If Not IsNumeric(slopevalue) Then
@@ -742,7 +704,7 @@ Public Module modGeoSFM
             'rivlenZoneVtab
             Dim riverlossvalue As String = "1.0"
 
-            Dim rivlenvalue As String = "0.0" ' (rivlenZoneVtab.ReturnValue(rivlenfield, rrecord)).SetFormat("d.d").AsString
+            Dim rivlenvalue As String = (lRivlenZonalStats.ItemByKey(basinvalue).GetDefinedValue("Max").Value - lRivlenZonalStats.ItemByKey(basinvalue).GetDefinedValue("Min").Value).ToString  ' (rivlenZoneVtab.ReturnValue(rivlenfield, rrecord)).SetFormat("d.d").AsString
             If Not IsNumeric(rivlenvalue) Then
                 'rivlenvalue = basingrid.GetCellSize.asstring
             End If
@@ -767,16 +729,16 @@ Public Module modGeoSFM
             Dim baseflowlag As String = (CStr(interflowlag) * 3).ToString
 
             'RcnZoneVtab
-            Dim rcnvalue As String = "0" '(RcnZoneVtab.ReturnValue(Rcnfield, rrecord)).SetFormat("d.d").AsString
+            Dim rcnvalue As String = lRcnZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value.ToString '(RcnZoneVtab.ReturnValue(Rcnfield, rrecord)).SetFormat("d.d").AsString
 
             'whcZoneVtab
-            Dim whcvalue As String = "0" '(whcZoneVtab.ReturnValue(Whcfield, rrecord)).AsString
+            Dim whcvalue As String = lWhcZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value.ToString '(whcZoneVtab.ReturnValue(Whcfield, rrecord)).AsString
 
             'DepthZoneVtab
-            Dim depthvalue As String = "0" '(DepthZoneVtab.ReturnValue(depthfield, rrecord)).AsString
+            Dim depthvalue As String = lDepthZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value.ToString '(DepthZoneVtab.ReturnValue(depthfield, rrecord)).AsString
 
             'TextureZoneVtab
-            Dim texturevalue As String = "0" '(TextureZoneVtab.ReturnValue(texturefield, rrecord)).AsString
+            Dim texturevalue As String = lTextureZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mode").Value.ToString '(TextureZoneVtab.ReturnValue(texturefield, rrecord)).AsString
 
             ' Soil texture (1=Sand,2=Loam,3=Clay,5=Water)
             Dim basinlossvalue As String = ""
@@ -793,7 +755,7 @@ Public Module modGeoSFM
             End If
 
             'rivdemZoneVtab
-            Dim rivdropvalue As Single = 0.0 '(rivdemZoneVtab.ReturnValue(rivdemfield, rrecord))
+            Dim rivdropvalue As Single = lRivDemZonalStats.ItemByKey(basinvalue).GetDefinedValue("Max").Value - lRivDemZonalStats.ItemByKey(basinvalue).GetDefinedValue("Min").Value '(rivdemZoneVtab.ReturnValue(rivdemfield, rrecord))
             Dim rivslopevalue As String = ((rivdropvalue * 100) / CStr(rivlenvalue)).ToString   '(((rivdropvalue * 100) / CStr(rivlenvalue)).SetFormat("d.dddd")).AsString
             If Not IsNumeric(rivslopevalue) Then
                 rivslopevalue = "0.0010"
@@ -932,10 +894,10 @@ Public Module modGeoSFM
             End If
 
             'DownZoneVtab
-            Dim downvalue As String = "" '(DownZoneVtab.ReturnValue(downfield, rrecord)).AsString
+            Dim downvalue As String = lDownZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mode").Value.ToString '(DownZoneVtab.ReturnValue(downfield, rrecord)).AsString
 
             'MaxCoverZoneVtab
-            Dim maxcovervalue As String = "" '((MaxCoverZoneVtab.ReturnValue(maxcoverfield, rrecord)) / 100).SetFormat("d.ddddd").AsString
+            Dim maxcovervalue As String = (lMaxCoverZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value / 100).ToString '((MaxCoverZoneVtab.ReturnValue(maxcoverfield, rrecord)) / 100).SetFormat("d.ddddd").AsString
             If CSng(maxcovervalue) <= 0.001 Then
                 maxcovervalue = "0.001"
             ElseIf CSng(maxcovervalue) >= 1 Then
@@ -953,18 +915,23 @@ Public Module modGeoSFM
             Dim pancoef As String = "0.85"
             Dim topsoil As String = "0.1"
             Dim aridity As String = "2"
-            lSBOut.AppendLine(basinvalue + "," + whcvalue + "," + depthvalue + "," + texturevalue + "," + drainvalue + "," + areavalue + "," + interflowlag + "," + slopevalue + "," + baseflowlag + "," + rcnvalue + "," + maxcovervalue + "," + basinlossvalue + "," + pancoef + "," + topsoil + "," + aridity)
-            lSBRiv.AppendLine(basinvalue + "," + areavalue + "," + upareavalue + "," + rivslopevalue + "," + rivlenvalue + "," + downvalue + "," + mannvalue + "," + riverlossvalue + "," + rivpolyloss + "," + hasdamvalue + "," + hasrating + "," + hasflowdata + "," + celerity + "," + diffusion + "," + rivwidth + "," + flowref + "," + runtype)
-            lSBOrder.AppendLine(basinvalue)
+            lSBOut.AppendLine(CStr(basinvalue) + "," + whcvalue + "," + depthvalue + "," + texturevalue + "," + CStr(drainvalue) + "," + CStr(areavalue) + "," + interflowlag + "," + slopevalue + "," + baseflowlag + "," + rcnvalue + "," + maxcovervalue + "," + basinlossvalue + "," + pancoef + "," + topsoil + "," + aridity)
+            lSBRiv.AppendLine(CStr(basinvalue) + "," + CStr(areavalue) + "," + CStr(upareavalue) + "," + rivslopevalue + "," + rivlenvalue + "," + downvalue + "," + mannvalue + "," + riverlossvalue + "," + rivpolyloss + "," + hasdamvalue + "," + hasrating + "," + hasflowdata + "," + celerity + "," + diffusion + "," + rivwidth + "," + flowref + "," + runtype)
+            lSBOrder.AppendLine(CStr(basinvalue))
         Next
-
-        'outVtab = Vtab.Make(outfile.GetFileName, False, False)
 
         SaveFileString(lOutFile, lSBOut.ToString)
         SaveFileString(lRivFile, lSBRiv.ToString)
         SaveFileString(lOrderFile, lSBOrder.ToString)
 
+        If FileExists(lOutputPath & "basin_original.txt") Then
+            IO.File.Delete(lOutputPath & "basin_original.txt")
+        End If
         IO.File.Copy(lOutFile, lOutputPath & "basin_original.txt")
+
+        If FileExists(lOutputPath & "river_original.txt") Then
+            IO.File.Delete(lOutputPath & "river_original.txt")
+        End If
         IO.File.Copy(lRivFile, lOutputPath & "river_original.txt")
 
         Logger.Msg("Basin Characteristics Computed. Outputs written to: " & vbCrLf & vbCrLf & "      " & lOutFile & vbCrLf & "      " & lOrderFile & vbCrLf & "      " & lRivFile, "Geospatial Stream Flow Model")
@@ -1751,8 +1718,4 @@ Public Module modGeoSFM
         'only used if streams and subbasins are entered as shapefiles
     End Sub
 
-    'Friend Function DownstreamSubbasinIds(ByVal aSubbasinGridFileName As String, ByVal aStreamGridFileName As String) As atcCollection
-    '    'given a grid of subbasin ids and a stream grid, figure out the downstream subbasin id
-    '    DownstreamSubbasinIds = New atcCollection
-    'End Function
 End Module
