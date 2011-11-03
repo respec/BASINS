@@ -111,8 +111,9 @@ TestFileName:
                 pUnit = 0
             End If
         End If
-            Dim lMsg As String = "atcWdmHandle:New:" & pUnit & ":" & lRetcod & ":" & lFileName
-            F90_MSG(lMsg, Len(lMsg))
+        Dim lMsg As String = "atcWdmHandle:New:" & pUnit & ":" & lRetcod & ":" & lFileName
+        F90_MSG(lMsg, Len(lMsg))
+        _fpreset()
     End Sub
 
     Public Sub Dispose() Implements System.IDisposable.Dispose
@@ -131,6 +132,7 @@ TestFileName:
         'Dim lMsg As String = "atcWdmHandle:Dispose:" & pUnit & ":" & lRetcod
         'F90_MSG(lMsg, Len(lMsg))
         pUnit = 0
+        _fpreset()
         GC.SuppressFinalize(Me)
     End Sub
 

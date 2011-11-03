@@ -133,8 +133,6 @@ Public Class atcDataManager
     Private Shared pDataSources As ArrayList 'of atcTimeseriesSource, the currently open data sources
     Private Shared pSelectionAttributes As Generic.List(Of String)
     Private Shared pDisplayAttributes As Generic.List(Of String)
-    Private Shared pManagerForm As frmManager
-
     Private Shared pDefaultSelectionAttributes() As String = {"Scenario", "Location", "Constituent"}
     Private Shared pDefaultDisplayAttributes() As String = {"History 1", "Constituent", "Id", "Min", "Max", "Mean"}
 
@@ -423,6 +421,9 @@ Public Class atcDataManager
     End Function
 
 #Region "User interaction"
+#If BatchMode Then
+#Else
+    Private Shared pManagerForm As frmManager
 
     Public Shared Sub UserSelectDisplay(ByVal aTitle As String, ByVal aDataGroup As atcTimeseriesGroup)
         Dim lSelectDisplay As New frmSelectDisplay
@@ -594,6 +595,7 @@ Public Class atcDataManager
     '    frm.Icon = pMapWin.ApplicationInfo.FormIcon
     '    Return frm.AskUser(aTitle, aMessage, aButtonLabels, aTimeoutSeconds, aTimeoutLabel)
     'End Function
+#End If
 #End Region
 
     ''' <summary>State of data manager in XML format</summary>

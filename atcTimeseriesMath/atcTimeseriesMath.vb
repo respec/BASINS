@@ -250,11 +250,15 @@ Public Class atcTimeseriesMath
         'Next
 
         If lNeedToAsk Then 'Ask user what to do
+#If BatchMode Then
+            Throw New ApplicationException("TimeseriesMath: Arguments not specified to Open")
+#Else
             Dim lSpecify As New frmSpecifyComputation
             lSpecify.Text = Me.Category & ": " & aOperationName
             If Not lSpecify.AskUser(aArgs) Then
                 Return False 'User cancelled
             End If
+#End If
         End If
 
         Try
