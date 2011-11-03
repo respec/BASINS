@@ -103,159 +103,177 @@ Public Class frmUEB
     Friend WithEvents Label56 As System.Windows.Forms.Label
     Friend WithEvents Label57 As System.Windows.Forms.Label
     Friend WithEvents Label58 As System.Windows.Forms.Label
-    Friend WithEvents AtcText2 As atcControls.atcText
-    Friend WithEvents AtcText3 As atcControls.atcText
-    Friend WithEvents AtcText4 As atcControls.atcText
-    Friend WithEvents AtcText5 As atcControls.atcText
-    Friend WithEvents AtcText6 As atcControls.atcText
-    Friend WithEvents AtcText7 As atcControls.atcText
+    Friend WithEvents AtcTextEDay As atcControls.atcText
+    Friend WithEvents AtcTextSDay As atcControls.atcText
+    Friend WithEvents AtcTextSYear As atcControls.atcText
+    Friend WithEvents AtcTextEMon As atcControls.atcText
+    Friend WithEvents AtcTextSMonth As atcControls.atcText
+    Friend WithEvents AtcTextEYear As atcControls.atcText
+    Friend WithEvents cboAtempStation As System.Windows.Forms.ComboBox
+    Friend WithEvents lblATempStation As System.Windows.Forms.Label
+    Friend WithEvents cboWindStation As System.Windows.Forms.ComboBox
+    Friend WithEvents lblWindStation As System.Windows.Forms.Label
+    Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
+    Friend WithEvents cmdSimulate As System.Windows.Forms.Button
+    Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
+    Friend WithEvents rdoMeasuredNet As System.Windows.Forms.RadioButton
+    Friend WithEvents rdoRadMeasuredInput As System.Windows.Forms.RadioButton
+    Friend WithEvents rdoRadEstimate As System.Windows.Forms.RadioButton
+    Friend WithEvents lblTimeStep As System.Windows.Forms.Label
+    Friend WithEvents atcTextTimeStep As atcControls.atcText
+    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents AtcTextEHour As atcControls.atcText
+    Friend WithEvents AtcTextSHour As atcControls.atcText
+    Friend WithEvents cboShortRadStation As System.Windows.Forms.ComboBox
+    Friend WithEvents lblShortRadStation As System.Windows.Forms.Label
+    Friend WithEvents cboRelHStation As System.Windows.Forms.ComboBox
+    Friend WithEvents lblRelHStation As System.Windows.Forms.Label
     Friend WithEvents cboPrecipStation As System.Windows.Forms.ComboBox
     Friend WithEvents lblPrecipStation As System.Windows.Forms.Label
-    Friend WithEvents cboOtherMet As System.Windows.Forms.ComboBox
-    Friend WithEvents lblOtherMet As System.Windows.Forms.Label
-    Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
-    Friend WithEvents Button1 As System.Windows.Forms.Button
-    Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
-    Friend WithEvents RadioButton6 As System.Windows.Forms.RadioButton
-    Friend WithEvents RadioButton5 As System.Windows.Forms.RadioButton
-    Friend WithEvents RadioButton4 As System.Windows.Forms.RadioButton
-    Friend WithEvents Label2 As System.Windows.Forms.Label
-    Friend WithEvents AtcText9 As atcControls.atcText
-    Friend WithEvents Label1 As System.Windows.Forms.Label
-    Friend WithEvents AtcText1 As atcControls.atcText
-    Friend WithEvents AtcText8 As atcControls.atcText
-    Friend WithEvents ComboBox46 As System.Windows.Forms.ComboBox
-    Friend WithEvents Label9 As System.Windows.Forms.Label
-    Friend WithEvents ComboBox45 As System.Windows.Forms.ComboBox
-    Friend WithEvents Label6 As System.Windows.Forms.Label
-    Friend WithEvents ComboBox44 As System.Windows.Forms.ComboBox
-    Friend WithEvents Label4 As System.Windows.Forms.Label
     Friend WithEvents TabPage2 As System.Windows.Forms.TabPage
-    Friend WithEvents AtcText19 As atcControls.atcText
+    Friend WithEvents AtcTextProjectName As atcControls.atcText
     Friend WithEvents Label62 As System.Windows.Forms.Label
     Friend WithEvents GroupBox4 As System.Windows.Forms.GroupBox
     Friend WithEvents Label50 As System.Windows.Forms.Label
-    Friend WithEvents AtcText10 As atcControls.atcText
+    Friend WithEvents AtcTextSnowAge As atcControls.atcText
     Friend WithEvents Label52 As System.Windows.Forms.Label
     Friend WithEvents Label53 As System.Windows.Forms.Label
-    Friend WithEvents AtcText15 As atcControls.atcText
-    Friend WithEvents AtcText18 As atcControls.atcText
-    Friend WithEvents AtcGrid1 As atcControls.atcGrid
+    Friend WithEvents AtcTextIniEnergyContent As atcControls.atcText
+    Friend WithEvents AtcTextIniWaterEquiv As atcControls.atcText
+    Friend WithEvents lblNetRadStation As System.Windows.Forms.Label
+    Friend WithEvents cboNetRadStation As System.Windows.Forms.ComboBox
+    Friend WithEvents AtcGridModelParms As atcControls.atcGrid
+    Friend WithEvents AtcGridSiteVars As atcControls.atcGrid
+    Friend WithEvents AtcTextCParm As atcControls.atcText
+    Friend WithEvents AtcTextAParm As atcControls.atcText
+    Friend WithEvents lblCParm As System.Windows.Forms.Label
+    Friend WithEvents lblAParm As System.Windows.Forms.Label
+    Friend WithEvents AtcGridBCMonthly As atcControls.atcGrid
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmUEB))
-        Me.cmdCancel = New System.Windows.Forms.Button
-        Me.cmdHelp = New System.Windows.Forms.Button
-        Me.cmdAbout = New System.Windows.Forms.Button
-        Me.TabControl1 = New System.Windows.Forms.TabControl
-        Me.TabPage3 = New System.Windows.Forms.TabPage
-        Me.cboPrecipStation = New System.Windows.Forms.ComboBox
-        Me.lblPrecipStation = New System.Windows.Forms.Label
-        Me.cboOtherMet = New System.Windows.Forms.ComboBox
-        Me.lblOtherMet = New System.Windows.Forms.Label
-        Me.GroupBox2 = New System.Windows.Forms.GroupBox
-        Me.Label54 = New System.Windows.Forms.Label
-        Me.Label55 = New System.Windows.Forms.Label
-        Me.Label56 = New System.Windows.Forms.Label
-        Me.Label57 = New System.Windows.Forms.Label
-        Me.Label58 = New System.Windows.Forms.Label
-        Me.AtcText2 = New atcControls.atcText
-        Me.AtcText3 = New atcControls.atcText
-        Me.AtcText4 = New atcControls.atcText
-        Me.AtcText5 = New atcControls.atcText
-        Me.AtcText6 = New atcControls.atcText
-        Me.AtcText7 = New atcControls.atcText
-        Me.TabPage7 = New System.Windows.Forms.TabPage
-        Me.TabPage8 = New System.Windows.Forms.TabPage
-        Me.TabPage1 = New System.Windows.Forms.TabPage
-        Me.AtcGrid1 = New atcControls.atcGrid
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox
-        Me.lblStatus = New System.Windows.Forms.Label
-        Me.Label20 = New System.Windows.Forms.Label
-        Me.ComboBox14 = New System.Windows.Forms.ComboBox
-        Me.Label21 = New System.Windows.Forms.Label
-        Me.ComboBox15 = New System.Windows.Forms.ComboBox
-        Me.Label22 = New System.Windows.Forms.Label
-        Me.ComboBox16 = New System.Windows.Forms.ComboBox
-        Me.Label23 = New System.Windows.Forms.Label
-        Me.ComboBox17 = New System.Windows.Forms.ComboBox
-        Me.Label24 = New System.Windows.Forms.Label
-        Me.ComboBox18 = New System.Windows.Forms.ComboBox
-        Me.Label25 = New System.Windows.Forms.Label
-        Me.ComboBox19 = New System.Windows.Forms.ComboBox
-        Me.Label26 = New System.Windows.Forms.Label
-        Me.ComboBox20 = New System.Windows.Forms.ComboBox
-        Me.Label27 = New System.Windows.Forms.Label
-        Me.ComboBox21 = New System.Windows.Forms.ComboBox
-        Me.Label28 = New System.Windows.Forms.Label
-        Me.ComboBox22 = New System.Windows.Forms.ComboBox
-        Me.Label29 = New System.Windows.Forms.Label
-        Me.ComboBox23 = New System.Windows.Forms.ComboBox
-        Me.Label30 = New System.Windows.Forms.Label
-        Me.ComboBox24 = New System.Windows.Forms.ComboBox
-        Me.ComboBox25 = New System.Windows.Forms.ComboBox
-        Me.Label31 = New System.Windows.Forms.Label
-        Me.Label32 = New System.Windows.Forms.Label
-        Me.ComboBox26 = New System.Windows.Forms.ComboBox
-        Me.Label33 = New System.Windows.Forms.Label
-        Me.ComboBox27 = New System.Windows.Forms.ComboBox
-        Me.Label34 = New System.Windows.Forms.Label
-        Me.ComboBox28 = New System.Windows.Forms.ComboBox
-        Me.Label35 = New System.Windows.Forms.Label
-        Me.ComboBox29 = New System.Windows.Forms.ComboBox
-        Me.Label36 = New System.Windows.Forms.Label
-        Me.ComboBox30 = New System.Windows.Forms.ComboBox
-        Me.Label37 = New System.Windows.Forms.Label
-        Me.ComboBox31 = New System.Windows.Forms.ComboBox
-        Me.Label38 = New System.Windows.Forms.Label
-        Me.ComboBox32 = New System.Windows.Forms.ComboBox
-        Me.Label39 = New System.Windows.Forms.Label
-        Me.ComboBox33 = New System.Windows.Forms.ComboBox
-        Me.Label40 = New System.Windows.Forms.Label
-        Me.ComboBox34 = New System.Windows.Forms.ComboBox
-        Me.Label41 = New System.Windows.Forms.Label
-        Me.ComboBox35 = New System.Windows.Forms.ComboBox
-        Me.Label42 = New System.Windows.Forms.Label
-        Me.ComboBox36 = New System.Windows.Forms.ComboBox
-        Me.Label43 = New System.Windows.Forms.Label
-        Me.ComboBox37 = New System.Windows.Forms.ComboBox
-        Me.ComboBox38 = New System.Windows.Forms.ComboBox
-        Me.Label44 = New System.Windows.Forms.Label
-        Me.Label45 = New System.Windows.Forms.Label
-        Me.ComboBox39 = New System.Windows.Forms.ComboBox
-        Me.Button1 = New System.Windows.Forms.Button
-        Me.GroupBox3 = New System.Windows.Forms.GroupBox
-        Me.RadioButton4 = New System.Windows.Forms.RadioButton
-        Me.RadioButton5 = New System.Windows.Forms.RadioButton
-        Me.RadioButton6 = New System.Windows.Forms.RadioButton
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.AtcText1 = New atcControls.atcText
-        Me.AtcText8 = New atcControls.atcText
-        Me.Label2 = New System.Windows.Forms.Label
-        Me.AtcText9 = New atcControls.atcText
-        Me.ComboBox44 = New System.Windows.Forms.ComboBox
-        Me.Label4 = New System.Windows.Forms.Label
-        Me.ComboBox45 = New System.Windows.Forms.ComboBox
-        Me.Label6 = New System.Windows.Forms.Label
-        Me.ComboBox46 = New System.Windows.Forms.ComboBox
-        Me.Label9 = New System.Windows.Forms.Label
-        Me.TabPage2 = New System.Windows.Forms.TabPage
-        Me.GroupBox4 = New System.Windows.Forms.GroupBox
-        Me.Label52 = New System.Windows.Forms.Label
-        Me.Label53 = New System.Windows.Forms.Label
-        Me.AtcText15 = New atcControls.atcText
-        Me.AtcText18 = New atcControls.atcText
-        Me.Label62 = New System.Windows.Forms.Label
-        Me.AtcText19 = New atcControls.atcText
-        Me.Label50 = New System.Windows.Forms.Label
-        Me.AtcText10 = New atcControls.atcText
+        Me.cmdCancel = New System.Windows.Forms.Button()
+        Me.cmdHelp = New System.Windows.Forms.Button()
+        Me.cmdAbout = New System.Windows.Forms.Button()
+        Me.TabControl1 = New System.Windows.Forms.TabControl()
+        Me.TabPage2 = New System.Windows.Forms.TabPage()
+        Me.AtcTextProjectName = New atcControls.atcText()
+        Me.Label62 = New System.Windows.Forms.Label()
+        Me.GroupBox4 = New System.Windows.Forms.GroupBox()
+        Me.Label50 = New System.Windows.Forms.Label()
+        Me.AtcTextSnowAge = New atcControls.atcText()
+        Me.Label52 = New System.Windows.Forms.Label()
+        Me.Label53 = New System.Windows.Forms.Label()
+        Me.AtcTextIniEnergyContent = New atcControls.atcText()
+        Me.AtcTextIniWaterEquiv = New atcControls.atcText()
+        Me.TabPage3 = New System.Windows.Forms.TabPage()
+        Me.cboShortRadStation = New System.Windows.Forms.ComboBox()
+        Me.lblShortRadStation = New System.Windows.Forms.Label()
+        Me.cboRelHStation = New System.Windows.Forms.ComboBox()
+        Me.lblRelHStation = New System.Windows.Forms.Label()
+        Me.cboPrecipStation = New System.Windows.Forms.ComboBox()
+        Me.lblPrecipStation = New System.Windows.Forms.Label()
+        Me.GroupBox3 = New System.Windows.Forms.GroupBox()
+        Me.rdoMeasuredNet = New System.Windows.Forms.RadioButton()
+        Me.rdoRadMeasuredInput = New System.Windows.Forms.RadioButton()
+        Me.rdoRadEstimate = New System.Windows.Forms.RadioButton()
+        Me.cboAtempStation = New System.Windows.Forms.ComboBox()
+        Me.lblATempStation = New System.Windows.Forms.Label()
+        Me.cboWindStation = New System.Windows.Forms.ComboBox()
+        Me.lblWindStation = New System.Windows.Forms.Label()
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.lblTimeStep = New System.Windows.Forms.Label()
+        Me.atcTextTimeStep = New atcControls.atcText()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.AtcTextEHour = New atcControls.atcText()
+        Me.AtcTextSHour = New atcControls.atcText()
+        Me.Label54 = New System.Windows.Forms.Label()
+        Me.Label55 = New System.Windows.Forms.Label()
+        Me.Label56 = New System.Windows.Forms.Label()
+        Me.Label57 = New System.Windows.Forms.Label()
+        Me.Label58 = New System.Windows.Forms.Label()
+        Me.AtcTextEDay = New atcControls.atcText()
+        Me.AtcTextSDay = New atcControls.atcText()
+        Me.AtcTextSYear = New atcControls.atcText()
+        Me.AtcTextEMon = New atcControls.atcText()
+        Me.AtcTextSMonth = New atcControls.atcText()
+        Me.AtcTextEYear = New atcControls.atcText()
+        Me.TabPage7 = New System.Windows.Forms.TabPage()
+        Me.TabPage8 = New System.Windows.Forms.TabPage()
+        Me.TabPage1 = New System.Windows.Forms.TabPage()
+        Me.AtcGridBCMonthly = New atcControls.atcGrid()
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.lblStatus = New System.Windows.Forms.Label()
+        Me.Label20 = New System.Windows.Forms.Label()
+        Me.ComboBox14 = New System.Windows.Forms.ComboBox()
+        Me.Label21 = New System.Windows.Forms.Label()
+        Me.ComboBox15 = New System.Windows.Forms.ComboBox()
+        Me.Label22 = New System.Windows.Forms.Label()
+        Me.ComboBox16 = New System.Windows.Forms.ComboBox()
+        Me.Label23 = New System.Windows.Forms.Label()
+        Me.ComboBox17 = New System.Windows.Forms.ComboBox()
+        Me.Label24 = New System.Windows.Forms.Label()
+        Me.ComboBox18 = New System.Windows.Forms.ComboBox()
+        Me.Label25 = New System.Windows.Forms.Label()
+        Me.ComboBox19 = New System.Windows.Forms.ComboBox()
+        Me.Label26 = New System.Windows.Forms.Label()
+        Me.ComboBox20 = New System.Windows.Forms.ComboBox()
+        Me.Label27 = New System.Windows.Forms.Label()
+        Me.ComboBox21 = New System.Windows.Forms.ComboBox()
+        Me.Label28 = New System.Windows.Forms.Label()
+        Me.ComboBox22 = New System.Windows.Forms.ComboBox()
+        Me.Label29 = New System.Windows.Forms.Label()
+        Me.ComboBox23 = New System.Windows.Forms.ComboBox()
+        Me.Label30 = New System.Windows.Forms.Label()
+        Me.ComboBox24 = New System.Windows.Forms.ComboBox()
+        Me.ComboBox25 = New System.Windows.Forms.ComboBox()
+        Me.Label31 = New System.Windows.Forms.Label()
+        Me.Label32 = New System.Windows.Forms.Label()
+        Me.ComboBox26 = New System.Windows.Forms.ComboBox()
+        Me.Label33 = New System.Windows.Forms.Label()
+        Me.ComboBox27 = New System.Windows.Forms.ComboBox()
+        Me.Label34 = New System.Windows.Forms.Label()
+        Me.ComboBox28 = New System.Windows.Forms.ComboBox()
+        Me.Label35 = New System.Windows.Forms.Label()
+        Me.ComboBox29 = New System.Windows.Forms.ComboBox()
+        Me.Label36 = New System.Windows.Forms.Label()
+        Me.ComboBox30 = New System.Windows.Forms.ComboBox()
+        Me.Label37 = New System.Windows.Forms.Label()
+        Me.ComboBox31 = New System.Windows.Forms.ComboBox()
+        Me.Label38 = New System.Windows.Forms.Label()
+        Me.ComboBox32 = New System.Windows.Forms.ComboBox()
+        Me.Label39 = New System.Windows.Forms.Label()
+        Me.ComboBox33 = New System.Windows.Forms.ComboBox()
+        Me.Label40 = New System.Windows.Forms.Label()
+        Me.ComboBox34 = New System.Windows.Forms.ComboBox()
+        Me.Label41 = New System.Windows.Forms.Label()
+        Me.ComboBox35 = New System.Windows.Forms.ComboBox()
+        Me.Label42 = New System.Windows.Forms.Label()
+        Me.ComboBox36 = New System.Windows.Forms.ComboBox()
+        Me.Label43 = New System.Windows.Forms.Label()
+        Me.ComboBox37 = New System.Windows.Forms.ComboBox()
+        Me.ComboBox38 = New System.Windows.Forms.ComboBox()
+        Me.Label44 = New System.Windows.Forms.Label()
+        Me.Label45 = New System.Windows.Forms.Label()
+        Me.ComboBox39 = New System.Windows.Forms.ComboBox()
+        Me.cmdSimulate = New System.Windows.Forms.Button()
+        Me.lblNetRadStation = New System.Windows.Forms.Label()
+        Me.cboNetRadStation = New System.Windows.Forms.ComboBox()
+        Me.AtcGridModelParms = New atcControls.atcGrid()
+        Me.AtcGridSiteVars = New atcControls.atcGrid()
+        Me.lblAParm = New System.Windows.Forms.Label()
+        Me.lblCParm = New System.Windows.Forms.Label()
+        Me.AtcTextAParm = New atcControls.atcText()
+        Me.AtcTextCParm = New atcControls.atcText()
         Me.TabControl1.SuspendLayout()
-        Me.TabPage3.SuspendLayout()
-        Me.GroupBox2.SuspendLayout()
-        Me.TabPage1.SuspendLayout()
-        Me.GroupBox1.SuspendLayout()
-        Me.GroupBox3.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
+        Me.TabPage3.SuspendLayout()
+        Me.GroupBox3.SuspendLayout()
+        Me.GroupBox2.SuspendLayout()
+        Me.TabPage7.SuspendLayout()
+        Me.TabPage8.SuspendLayout()
+        Me.TabPage1.SuspendLayout()
+        Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
         'cmdCancel
@@ -263,7 +281,7 @@ Public Class frmUEB
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCancel.Location = New System.Drawing.Point(323, 492)
+        Me.cmdCancel.Location = New System.Drawing.Point(323, 514)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(73, 28)
         Me.cmdCancel.TabIndex = 5
@@ -273,7 +291,7 @@ Public Class frmUEB
         '
         Me.cmdHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdHelp.Location = New System.Drawing.Point(402, 492)
+        Me.cmdHelp.Location = New System.Drawing.Point(402, 514)
         Me.cmdHelp.Name = "cmdHelp"
         Me.cmdHelp.Size = New System.Drawing.Size(65, 28)
         Me.cmdHelp.TabIndex = 6
@@ -283,7 +301,7 @@ Public Class frmUEB
         '
         Me.cmdAbout.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdAbout.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdAbout.Location = New System.Drawing.Point(473, 492)
+        Me.cmdAbout.Location = New System.Drawing.Point(473, 514)
         Me.cmdAbout.Name = "cmdAbout"
         Me.cmdAbout.Size = New System.Drawing.Size(72, 28)
         Me.cmdAbout.TabIndex = 7
@@ -306,29 +324,228 @@ Public Class frmUEB
         Me.TabControl1.Multiline = True
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(529, 409)
+        Me.TabControl1.Size = New System.Drawing.Size(529, 431)
         Me.TabControl1.TabIndex = 8
+        '
+        'TabPage2
+        '
+        Me.TabPage2.Controls.Add(Me.AtcTextProjectName)
+        Me.TabPage2.Controls.Add(Me.Label62)
+        Me.TabPage2.Controls.Add(Me.GroupBox4)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage2.Name = "TabPage2"
+        Me.TabPage2.Size = New System.Drawing.Size(521, 402)
+        Me.TabPage2.TabIndex = 12
+        Me.TabPage2.Text = "General"
+        Me.TabPage2.UseVisualStyleBackColor = True
+        '
+        'AtcTextProjectName
+        '
+        Me.AtcTextProjectName.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextProjectName.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
+        Me.AtcTextProjectName.DefaultValue = ""
+        Me.AtcTextProjectName.HardMax = -999.0R
+        Me.AtcTextProjectName.HardMin = -999.0R
+        Me.AtcTextProjectName.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextProjectName.Location = New System.Drawing.Point(113, 33)
+        Me.AtcTextProjectName.MaxWidth = 20
+        Me.AtcTextProjectName.Name = "AtcTextProjectName"
+        Me.AtcTextProjectName.NumericFormat = "0.#####"
+        Me.AtcTextProjectName.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextProjectName.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextProjectName.SelLength = 0
+        Me.AtcTextProjectName.SelStart = 0
+        Me.AtcTextProjectName.Size = New System.Drawing.Size(122, 21)
+        Me.AtcTextProjectName.SoftMax = -999.0R
+        Me.AtcTextProjectName.SoftMin = -999.0R
+        Me.AtcTextProjectName.TabIndex = 32
+        Me.AtcTextProjectName.ValueDouble = 0.0R
+        Me.AtcTextProjectName.ValueInteger = 0
+        '
+        'Label62
+        '
+        Me.Label62.AutoSize = True
+        Me.Label62.Location = New System.Drawing.Point(33, 33)
+        Me.Label62.Name = "Label62"
+        Me.Label62.Size = New System.Drawing.Size(74, 13)
+        Me.Label62.TabIndex = 31
+        Me.Label62.Text = "Project Name:"
+        '
+        'GroupBox4
+        '
+        Me.GroupBox4.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox4.Controls.Add(Me.Label50)
+        Me.GroupBox4.Controls.Add(Me.AtcTextSnowAge)
+        Me.GroupBox4.Controls.Add(Me.Label52)
+        Me.GroupBox4.Controls.Add(Me.Label53)
+        Me.GroupBox4.Controls.Add(Me.AtcTextIniEnergyContent)
+        Me.GroupBox4.Controls.Add(Me.AtcTextIniWaterEquiv)
+        Me.GroupBox4.Location = New System.Drawing.Point(22, 75)
+        Me.GroupBox4.Name = "GroupBox4"
+        Me.GroupBox4.Size = New System.Drawing.Size(480, 128)
+        Me.GroupBox4.TabIndex = 30
+        Me.GroupBox4.TabStop = False
+        Me.GroupBox4.Text = "Initial Conditions"
+        '
+        'Label50
+        '
+        Me.Label50.AutoSize = True
+        Me.Label50.Location = New System.Drawing.Point(20, 88)
+        Me.Label50.Name = "Label50"
+        Me.Label50.Size = New System.Drawing.Size(96, 13)
+        Me.Label50.TabIndex = 39
+        Me.Label50.Text = "Snow Surface Age"
+        '
+        'AtcTextSnowAge
+        '
+        Me.AtcTextSnowAge.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextSnowAge.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.AtcTextSnowAge.DefaultValue = ""
+        Me.AtcTextSnowAge.HardMax = 9999.0R
+        Me.AtcTextSnowAge.HardMin = 0.0R
+        Me.AtcTextSnowAge.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextSnowAge.Location = New System.Drawing.Point(156, 91)
+        Me.AtcTextSnowAge.MaxWidth = 20
+        Me.AtcTextSnowAge.Name = "AtcTextSnowAge"
+        Me.AtcTextSnowAge.NumericFormat = "0"
+        Me.AtcTextSnowAge.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextSnowAge.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextSnowAge.SelLength = 0
+        Me.AtcTextSnowAge.SelStart = 0
+        Me.AtcTextSnowAge.Size = New System.Drawing.Size(64, 21)
+        Me.AtcTextSnowAge.SoftMax = -999.0R
+        Me.AtcTextSnowAge.SoftMin = -999.0R
+        Me.AtcTextSnowAge.TabIndex = 38
+        Me.AtcTextSnowAge.ValueDouble = 1.0R
+        Me.AtcTextSnowAge.ValueInteger = 1
+        '
+        'Label52
+        '
+        Me.Label52.AutoSize = True
+        Me.Label52.Location = New System.Drawing.Point(20, 64)
+        Me.Label52.Name = "Label52"
+        Me.Label52.Size = New System.Drawing.Size(129, 13)
+        Me.Label52.TabIndex = 37
+        Me.Label52.Text = "Water Equivalence W (m)"
+        '
+        'Label53
+        '
+        Me.Label53.AutoSize = True
+        Me.Label53.Location = New System.Drawing.Point(20, 37)
+        Me.Label53.Name = "Label53"
+        Me.Label53.Size = New System.Drawing.Size(130, 13)
+        Me.Label53.TabIndex = 36
+        Me.Label53.Text = "Energy Content U (kJ/m2)"
+        '
+        'AtcTextIniEnergyContent
+        '
+        Me.AtcTextIniEnergyContent.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextIniEnergyContent.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.AtcTextIniEnergyContent.DefaultValue = ""
+        Me.AtcTextIniEnergyContent.HardMax = 9999999.0R
+        Me.AtcTextIniEnergyContent.HardMin = 0.0R
+        Me.AtcTextIniEnergyContent.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextIniEnergyContent.Location = New System.Drawing.Point(156, 37)
+        Me.AtcTextIniEnergyContent.MaxWidth = 20
+        Me.AtcTextIniEnergyContent.Name = "AtcTextIniEnergyContent"
+        Me.AtcTextIniEnergyContent.NumericFormat = "0"
+        Me.AtcTextIniEnergyContent.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextIniEnergyContent.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextIniEnergyContent.SelLength = 0
+        Me.AtcTextIniEnergyContent.SelStart = 0
+        Me.AtcTextIniEnergyContent.Size = New System.Drawing.Size(64, 21)
+        Me.AtcTextIniEnergyContent.SoftMax = -999.0R
+        Me.AtcTextIniEnergyContent.SoftMin = -999.0R
+        Me.AtcTextIniEnergyContent.TabIndex = 30
+        Me.AtcTextIniEnergyContent.ValueDouble = 20000.0R
+        Me.AtcTextIniEnergyContent.ValueInteger = 20000
+        '
+        'AtcTextIniWaterEquiv
+        '
+        Me.AtcTextIniWaterEquiv.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextIniWaterEquiv.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.AtcTextIniWaterEquiv.DefaultValue = ""
+        Me.AtcTextIniWaterEquiv.HardMax = 9999.0R
+        Me.AtcTextIniWaterEquiv.HardMin = 0.0R
+        Me.AtcTextIniWaterEquiv.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextIniWaterEquiv.Location = New System.Drawing.Point(156, 64)
+        Me.AtcTextIniWaterEquiv.MaxWidth = 20
+        Me.AtcTextIniWaterEquiv.Name = "AtcTextIniWaterEquiv"
+        Me.AtcTextIniWaterEquiv.NumericFormat = "0"
+        Me.AtcTextIniWaterEquiv.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextIniWaterEquiv.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextIniWaterEquiv.SelLength = 0
+        Me.AtcTextIniWaterEquiv.SelStart = 0
+        Me.AtcTextIniWaterEquiv.Size = New System.Drawing.Size(64, 21)
+        Me.AtcTextIniWaterEquiv.SoftMax = -999.0R
+        Me.AtcTextIniWaterEquiv.SoftMin = -999.0R
+        Me.AtcTextIniWaterEquiv.TabIndex = 27
+        Me.AtcTextIniWaterEquiv.ValueDouble = 1.0R
+        Me.AtcTextIniWaterEquiv.ValueInteger = 1
         '
         'TabPage3
         '
-        Me.TabPage3.Controls.Add(Me.ComboBox46)
-        Me.TabPage3.Controls.Add(Me.Label9)
-        Me.TabPage3.Controls.Add(Me.ComboBox45)
-        Me.TabPage3.Controls.Add(Me.Label6)
-        Me.TabPage3.Controls.Add(Me.ComboBox44)
-        Me.TabPage3.Controls.Add(Me.Label4)
-        Me.TabPage3.Controls.Add(Me.GroupBox3)
+        Me.TabPage3.Controls.Add(Me.cboNetRadStation)
+        Me.TabPage3.Controls.Add(Me.lblNetRadStation)
+        Me.TabPage3.Controls.Add(Me.cboShortRadStation)
+        Me.TabPage3.Controls.Add(Me.lblShortRadStation)
+        Me.TabPage3.Controls.Add(Me.cboRelHStation)
+        Me.TabPage3.Controls.Add(Me.lblRelHStation)
         Me.TabPage3.Controls.Add(Me.cboPrecipStation)
         Me.TabPage3.Controls.Add(Me.lblPrecipStation)
-        Me.TabPage3.Controls.Add(Me.cboOtherMet)
-        Me.TabPage3.Controls.Add(Me.lblOtherMet)
+        Me.TabPage3.Controls.Add(Me.GroupBox3)
+        Me.TabPage3.Controls.Add(Me.cboAtempStation)
+        Me.TabPage3.Controls.Add(Me.lblATempStation)
+        Me.TabPage3.Controls.Add(Me.cboWindStation)
+        Me.TabPage3.Controls.Add(Me.lblWindStation)
         Me.TabPage3.Controls.Add(Me.GroupBox2)
         Me.TabPage3.Location = New System.Drawing.Point(4, 25)
         Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Size = New System.Drawing.Size(521, 380)
+        Me.TabPage3.Size = New System.Drawing.Size(521, 402)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Weather"
         Me.TabPage3.UseVisualStyleBackColor = True
+        '
+        'cboShortRadStation
+        '
+        Me.cboShortRadStation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboShortRadStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboShortRadStation.FormattingEnabled = True
+        Me.cboShortRadStation.Location = New System.Drawing.Point(213, 338)
+        Me.cboShortRadStation.Name = "cboShortRadStation"
+        Me.cboShortRadStation.Size = New System.Drawing.Size(286, 21)
+        Me.cboShortRadStation.TabIndex = 40
+        '
+        'lblShortRadStation
+        '
+        Me.lblShortRadStation.AutoSize = True
+        Me.lblShortRadStation.Location = New System.Drawing.Point(16, 341)
+        Me.lblShortRadStation.Name = "lblShortRadStation"
+        Me.lblShortRadStation.Size = New System.Drawing.Size(191, 13)
+        Me.lblShortRadStation.TabIndex = 39
+        Me.lblShortRadStation.Text = "Incoming Shortwave Radiation Station:"
+        '
+        'cboRelHStation
+        '
+        Me.cboRelHStation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboRelHStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboRelHStation.FormattingEnabled = True
+        Me.cboRelHStation.Location = New System.Drawing.Point(213, 311)
+        Me.cboRelHStation.Name = "cboRelHStation"
+        Me.cboRelHStation.Size = New System.Drawing.Size(286, 21)
+        Me.cboRelHStation.TabIndex = 38
+        '
+        'lblRelHStation
+        '
+        Me.lblRelHStation.AutoSize = True
+        Me.lblRelHStation.Location = New System.Drawing.Point(16, 314)
+        Me.lblRelHStation.Name = "lblRelHStation"
+        Me.lblRelHStation.Size = New System.Drawing.Size(128, 13)
+        Me.lblRelHStation.TabIndex = 37
+        Me.lblRelHStation.Text = "Relative Humidity Station:"
         '
         'cboPrecipStation
         '
@@ -336,66 +553,219 @@ Public Class frmUEB
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboPrecipStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboPrecipStation.FormattingEnabled = True
-        Me.cboPrecipStation.Location = New System.Drawing.Point(213, 230)
+        Me.cboPrecipStation.Location = New System.Drawing.Point(213, 257)
         Me.cboPrecipStation.Name = "cboPrecipStation"
         Me.cboPrecipStation.Size = New System.Drawing.Size(286, 21)
-        Me.cboPrecipStation.TabIndex = 33
+        Me.cboPrecipStation.TabIndex = 36
         '
         'lblPrecipStation
         '
         Me.lblPrecipStation.AutoSize = True
-        Me.lblPrecipStation.Location = New System.Drawing.Point(16, 233)
+        Me.lblPrecipStation.Location = New System.Drawing.Point(16, 260)
         Me.lblPrecipStation.Name = "lblPrecipStation"
-        Me.lblPrecipStation.Size = New System.Drawing.Size(88, 13)
-        Me.lblPrecipStation.TabIndex = 32
-        Me.lblPrecipStation.Text = "Air Temp Station:"
+        Me.lblPrecipStation.Size = New System.Drawing.Size(76, 13)
+        Me.lblPrecipStation.TabIndex = 35
+        Me.lblPrecipStation.Text = "Precip Station:"
         '
-        'cboOtherMet
+        'GroupBox3
         '
-        Me.cboOtherMet.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.GroupBox3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboOtherMet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboOtherMet.FormattingEnabled = True
-        Me.cboOtherMet.Location = New System.Drawing.Point(213, 284)
-        Me.cboOtherMet.Name = "cboOtherMet"
-        Me.cboOtherMet.Size = New System.Drawing.Size(286, 21)
-        Me.cboOtherMet.TabIndex = 31
+        Me.GroupBox3.Controls.Add(Me.rdoMeasuredNet)
+        Me.GroupBox3.Controls.Add(Me.rdoRadMeasuredInput)
+        Me.GroupBox3.Controls.Add(Me.rdoRadEstimate)
+        Me.GroupBox3.Location = New System.Drawing.Point(19, 118)
+        Me.GroupBox3.Name = "GroupBox3"
+        Me.GroupBox3.Size = New System.Drawing.Size(480, 96)
+        Me.GroupBox3.TabIndex = 34
+        Me.GroupBox3.TabStop = False
+        Me.GroupBox3.Text = "Radiation Input Type"
         '
-        'lblOtherMet
+        'rdoMeasuredNet
         '
-        Me.lblOtherMet.AutoSize = True
-        Me.lblOtherMet.Location = New System.Drawing.Point(16, 287)
-        Me.lblOtherMet.Name = "lblOtherMet"
-        Me.lblOtherMet.Size = New System.Drawing.Size(105, 13)
-        Me.lblOtherMet.TabIndex = 30
-        Me.lblOtherMet.Text = "Wind Speed Station:"
+        Me.rdoMeasuredNet.AutoSize = True
+        Me.rdoMeasuredNet.Location = New System.Drawing.Point(18, 65)
+        Me.rdoMeasuredNet.Name = "rdoMeasuredNet"
+        Me.rdoMeasuredNet.Size = New System.Drawing.Size(140, 17)
+        Me.rdoMeasuredNet.TabIndex = 2
+        Me.rdoMeasuredNet.Text = "Measured Net Radiation"
+        Me.rdoMeasuredNet.UseVisualStyleBackColor = True
+        '
+        'rdoRadMeasuredInput
+        '
+        Me.rdoRadMeasuredInput.AutoSize = True
+        Me.rdoRadMeasuredInput.Checked = True
+        Me.rdoRadMeasuredInput.Location = New System.Drawing.Point(18, 42)
+        Me.rdoRadMeasuredInput.Name = "rdoRadMeasuredInput"
+        Me.rdoRadMeasuredInput.Size = New System.Drawing.Size(174, 17)
+        Me.rdoRadMeasuredInput.TabIndex = 1
+        Me.rdoRadMeasuredInput.TabStop = True
+        Me.rdoRadMeasuredInput.Text = "Measured Input Solar Radiation"
+        Me.rdoRadMeasuredInput.UseVisualStyleBackColor = True
+        '
+        'rdoRadEstimate
+        '
+        Me.rdoRadEstimate.AutoSize = True
+        Me.rdoRadEstimate.Location = New System.Drawing.Point(18, 19)
+        Me.rdoRadEstimate.Name = "rdoRadEstimate"
+        Me.rdoRadEstimate.Size = New System.Drawing.Size(212, 17)
+        Me.rdoRadEstimate.TabIndex = 0
+        Me.rdoRadEstimate.Text = "Estimate from Daily Temperature Range"
+        Me.rdoRadEstimate.UseVisualStyleBackColor = True
+        '
+        'cboAtempStation
+        '
+        Me.cboAtempStation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboAtempStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboAtempStation.FormattingEnabled = True
+        Me.cboAtempStation.Location = New System.Drawing.Point(213, 230)
+        Me.cboAtempStation.Name = "cboAtempStation"
+        Me.cboAtempStation.Size = New System.Drawing.Size(286, 21)
+        Me.cboAtempStation.TabIndex = 33
+        '
+        'lblATempStation
+        '
+        Me.lblATempStation.AutoSize = True
+        Me.lblATempStation.Location = New System.Drawing.Point(16, 233)
+        Me.lblATempStation.Name = "lblATempStation"
+        Me.lblATempStation.Size = New System.Drawing.Size(88, 13)
+        Me.lblATempStation.TabIndex = 32
+        Me.lblATempStation.Text = "Air Temp Station:"
+        '
+        'cboWindStation
+        '
+        Me.cboWindStation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboWindStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboWindStation.FormattingEnabled = True
+        Me.cboWindStation.Location = New System.Drawing.Point(213, 284)
+        Me.cboWindStation.Name = "cboWindStation"
+        Me.cboWindStation.Size = New System.Drawing.Size(286, 21)
+        Me.cboWindStation.TabIndex = 31
+        '
+        'lblWindStation
+        '
+        Me.lblWindStation.AutoSize = True
+        Me.lblWindStation.Location = New System.Drawing.Point(16, 287)
+        Me.lblWindStation.Name = "lblWindStation"
+        Me.lblWindStation.Size = New System.Drawing.Size(105, 13)
+        Me.lblWindStation.TabIndex = 30
+        Me.lblWindStation.Text = "Wind Speed Station:"
         '
         'GroupBox2
         '
         Me.GroupBox2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.GroupBox2.Controls.Add(Me.Label2)
-        Me.GroupBox2.Controls.Add(Me.AtcText9)
+        Me.GroupBox2.Controls.Add(Me.lblTimeStep)
+        Me.GroupBox2.Controls.Add(Me.atcTextTimeStep)
         Me.GroupBox2.Controls.Add(Me.Label1)
-        Me.GroupBox2.Controls.Add(Me.AtcText1)
-        Me.GroupBox2.Controls.Add(Me.AtcText8)
+        Me.GroupBox2.Controls.Add(Me.AtcTextEHour)
+        Me.GroupBox2.Controls.Add(Me.AtcTextSHour)
         Me.GroupBox2.Controls.Add(Me.Label54)
         Me.GroupBox2.Controls.Add(Me.Label55)
         Me.GroupBox2.Controls.Add(Me.Label56)
         Me.GroupBox2.Controls.Add(Me.Label57)
         Me.GroupBox2.Controls.Add(Me.Label58)
-        Me.GroupBox2.Controls.Add(Me.AtcText2)
-        Me.GroupBox2.Controls.Add(Me.AtcText3)
-        Me.GroupBox2.Controls.Add(Me.AtcText4)
-        Me.GroupBox2.Controls.Add(Me.AtcText5)
-        Me.GroupBox2.Controls.Add(Me.AtcText6)
-        Me.GroupBox2.Controls.Add(Me.AtcText7)
+        Me.GroupBox2.Controls.Add(Me.AtcTextEDay)
+        Me.GroupBox2.Controls.Add(Me.AtcTextSDay)
+        Me.GroupBox2.Controls.Add(Me.AtcTextSYear)
+        Me.GroupBox2.Controls.Add(Me.AtcTextEMon)
+        Me.GroupBox2.Controls.Add(Me.AtcTextSMonth)
+        Me.GroupBox2.Controls.Add(Me.AtcTextEYear)
         Me.GroupBox2.Location = New System.Drawing.Point(19, 16)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(480, 96)
         Me.GroupBox2.TabIndex = 29
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Simulation Dates"
+        '
+        'lblTimeStep
+        '
+        Me.lblTimeStep.AutoSize = True
+        Me.lblTimeStep.Location = New System.Drawing.Point(297, 38)
+        Me.lblTimeStep.Name = "lblTimeStep"
+        Me.lblTimeStep.Size = New System.Drawing.Size(78, 13)
+        Me.lblTimeStep.TabIndex = 42
+        Me.lblTimeStep.Text = "Time Step (hrs)"
+        '
+        'atcTextTimeStep
+        '
+        Me.atcTextTimeStep.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atcTextTimeStep.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atcTextTimeStep.DefaultValue = ""
+        Me.atcTextTimeStep.HardMax = 24.0R
+        Me.atcTextTimeStep.HardMin = 1.0R
+        Me.atcTextTimeStep.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atcTextTimeStep.Location = New System.Drawing.Point(381, 38)
+        Me.atcTextTimeStep.MaxWidth = 20
+        Me.atcTextTimeStep.Name = "atcTextTimeStep"
+        Me.atcTextTimeStep.NumericFormat = "0"
+        Me.atcTextTimeStep.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atcTextTimeStep.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atcTextTimeStep.SelLength = 0
+        Me.atcTextTimeStep.SelStart = 0
+        Me.atcTextTimeStep.Size = New System.Drawing.Size(64, 21)
+        Me.atcTextTimeStep.SoftMax = -999.0R
+        Me.atcTextTimeStep.SoftMin = -999.0R
+        Me.atcTextTimeStep.TabIndex = 41
+        Me.atcTextTimeStep.ValueDouble = 1.0R
+        Me.atcTextTimeStep.ValueInteger = 1
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(224, 20)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(30, 13)
+        Me.Label1.TabIndex = 40
+        Me.Label1.Text = "Hour"
+        '
+        'AtcTextEHour
+        '
+        Me.AtcTextEHour.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextEHour.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtcTextEHour.DefaultValue = ""
+        Me.AtcTextEHour.HardMax = 24.0R
+        Me.AtcTextEHour.HardMin = 0.0R
+        Me.AtcTextEHour.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextEHour.Location = New System.Drawing.Point(227, 64)
+        Me.AtcTextEHour.MaxWidth = 20
+        Me.AtcTextEHour.Name = "AtcTextEHour"
+        Me.AtcTextEHour.NumericFormat = "0"
+        Me.AtcTextEHour.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextEHour.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextEHour.SelLength = 0
+        Me.AtcTextEHour.SelStart = 0
+        Me.AtcTextEHour.Size = New System.Drawing.Size(44, 21)
+        Me.AtcTextEHour.SoftMax = -999.0R
+        Me.AtcTextEHour.SoftMin = -999.0R
+        Me.AtcTextEHour.TabIndex = 39
+        Me.AtcTextEHour.ValueDouble = 0.0R
+        Me.AtcTextEHour.ValueInteger = 0
+        '
+        'AtcTextSHour
+        '
+        Me.AtcTextSHour.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextSHour.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtcTextSHour.DefaultValue = ""
+        Me.AtcTextSHour.HardMax = 24.0R
+        Me.AtcTextSHour.HardMin = 0.0R
+        Me.AtcTextSHour.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextSHour.Location = New System.Drawing.Point(227, 38)
+        Me.AtcTextSHour.MaxWidth = 20
+        Me.AtcTextSHour.Name = "AtcTextSHour"
+        Me.AtcTextSHour.NumericFormat = "0"
+        Me.AtcTextSHour.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextSHour.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextSHour.SelLength = 0
+        Me.AtcTextSHour.SelStart = 0
+        Me.AtcTextSHour.Size = New System.Drawing.Size(44, 21)
+        Me.AtcTextSHour.SoftMax = -999.0R
+        Me.AtcTextSHour.SoftMin = -999.0R
+        Me.AtcTextSHour.TabIndex = 38
+        Me.AtcTextSHour.ValueDouble = 0.0R
+        Me.AtcTextSHour.ValueInteger = 0
         '
         'Label54
         '
@@ -442,189 +812,195 @@ Public Class frmUEB
         Me.Label58.TabIndex = 33
         Me.Label58.Text = "Year"
         '
-        'AtcText2
+        'AtcTextEDay
         '
-        Me.AtcText2.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText2.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcText2.DefaultValue = ""
-        Me.AtcText2.HardMax = 31
-        Me.AtcText2.HardMin = 1
-        Me.AtcText2.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText2.Location = New System.Drawing.Point(178, 64)
-        Me.AtcText2.MaxWidth = 20
-        Me.AtcText2.Name = "AtcText2"
-        Me.AtcText2.NumericFormat = "0"
-        Me.AtcText2.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText2.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText2.SelLength = 0
-        Me.AtcText2.SelStart = 0
-        Me.AtcText2.Size = New System.Drawing.Size(44, 21)
-        Me.AtcText2.SoftMax = -999
-        Me.AtcText2.SoftMin = -999
-        Me.AtcText2.TabIndex = 32
-        Me.AtcText2.ValueDouble = 31
-        Me.AtcText2.ValueInteger = 31
+        Me.AtcTextEDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextEDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtcTextEDay.DefaultValue = ""
+        Me.AtcTextEDay.HardMax = 31.0R
+        Me.AtcTextEDay.HardMin = 1.0R
+        Me.AtcTextEDay.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextEDay.Location = New System.Drawing.Point(178, 64)
+        Me.AtcTextEDay.MaxWidth = 20
+        Me.AtcTextEDay.Name = "AtcTextEDay"
+        Me.AtcTextEDay.NumericFormat = "0"
+        Me.AtcTextEDay.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextEDay.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextEDay.SelLength = 0
+        Me.AtcTextEDay.SelStart = 0
+        Me.AtcTextEDay.Size = New System.Drawing.Size(44, 21)
+        Me.AtcTextEDay.SoftMax = -999.0R
+        Me.AtcTextEDay.SoftMin = -999.0R
+        Me.AtcTextEDay.TabIndex = 32
+        Me.AtcTextEDay.ValueDouble = 31.0R
+        Me.AtcTextEDay.ValueInteger = 31
         '
-        'AtcText3
+        'AtcTextSDay
         '
-        Me.AtcText3.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText3.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcText3.DefaultValue = ""
-        Me.AtcText3.HardMax = 31
-        Me.AtcText3.HardMin = 1
-        Me.AtcText3.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText3.Location = New System.Drawing.Point(178, 38)
-        Me.AtcText3.MaxWidth = 20
-        Me.AtcText3.Name = "AtcText3"
-        Me.AtcText3.NumericFormat = "0"
-        Me.AtcText3.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText3.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText3.SelLength = 0
-        Me.AtcText3.SelStart = 0
-        Me.AtcText3.Size = New System.Drawing.Size(44, 21)
-        Me.AtcText3.SoftMax = -999
-        Me.AtcText3.SoftMin = -999
-        Me.AtcText3.TabIndex = 31
-        Me.AtcText3.ValueDouble = 1
-        Me.AtcText3.ValueInteger = 1
+        Me.AtcTextSDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextSDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtcTextSDay.DefaultValue = ""
+        Me.AtcTextSDay.HardMax = 31.0R
+        Me.AtcTextSDay.HardMin = 1.0R
+        Me.AtcTextSDay.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextSDay.Location = New System.Drawing.Point(178, 38)
+        Me.AtcTextSDay.MaxWidth = 20
+        Me.AtcTextSDay.Name = "AtcTextSDay"
+        Me.AtcTextSDay.NumericFormat = "0"
+        Me.AtcTextSDay.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextSDay.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextSDay.SelLength = 0
+        Me.AtcTextSDay.SelStart = 0
+        Me.AtcTextSDay.Size = New System.Drawing.Size(44, 21)
+        Me.AtcTextSDay.SoftMax = -999.0R
+        Me.AtcTextSDay.SoftMin = -999.0R
+        Me.AtcTextSDay.TabIndex = 31
+        Me.AtcTextSDay.ValueDouble = 1.0R
+        Me.AtcTextSDay.ValueInteger = 1
         '
-        'AtcText4
+        'AtcTextSYear
         '
-        Me.AtcText4.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText4.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcText4.DefaultValue = ""
-        Me.AtcText4.HardMax = 9999
-        Me.AtcText4.HardMin = 0
-        Me.AtcText4.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText4.Location = New System.Drawing.Point(60, 38)
-        Me.AtcText4.MaxWidth = 20
-        Me.AtcText4.Name = "AtcText4"
-        Me.AtcText4.NumericFormat = "0"
-        Me.AtcText4.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText4.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText4.SelLength = 0
-        Me.AtcText4.SelStart = 0
-        Me.AtcText4.Size = New System.Drawing.Size(64, 21)
-        Me.AtcText4.SoftMax = -999
-        Me.AtcText4.SoftMin = -999
-        Me.AtcText4.TabIndex = 30
-        Me.AtcText4.ValueDouble = 2000
-        Me.AtcText4.ValueInteger = 2000
+        Me.AtcTextSYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextSYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtcTextSYear.DefaultValue = ""
+        Me.AtcTextSYear.HardMax = 9999.0R
+        Me.AtcTextSYear.HardMin = 0.0R
+        Me.AtcTextSYear.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextSYear.Location = New System.Drawing.Point(60, 38)
+        Me.AtcTextSYear.MaxWidth = 20
+        Me.AtcTextSYear.Name = "AtcTextSYear"
+        Me.AtcTextSYear.NumericFormat = "0"
+        Me.AtcTextSYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextSYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextSYear.SelLength = 0
+        Me.AtcTextSYear.SelStart = 0
+        Me.AtcTextSYear.Size = New System.Drawing.Size(64, 21)
+        Me.AtcTextSYear.SoftMax = -999.0R
+        Me.AtcTextSYear.SoftMin = -999.0R
+        Me.AtcTextSYear.TabIndex = 30
+        Me.AtcTextSYear.ValueDouble = 2000.0R
+        Me.AtcTextSYear.ValueInteger = 2000
         '
-        'AtcText5
+        'AtcTextEMon
         '
-        Me.AtcText5.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText5.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcText5.DefaultValue = ""
-        Me.AtcText5.HardMax = 12
-        Me.AtcText5.HardMin = 1
-        Me.AtcText5.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText5.Location = New System.Drawing.Point(129, 64)
-        Me.AtcText5.MaxWidth = 20
-        Me.AtcText5.Name = "AtcText5"
-        Me.AtcText5.NumericFormat = "0"
-        Me.AtcText5.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText5.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText5.SelLength = 0
-        Me.AtcText5.SelStart = 0
-        Me.AtcText5.Size = New System.Drawing.Size(44, 21)
-        Me.AtcText5.SoftMax = -999
-        Me.AtcText5.SoftMin = -999
-        Me.AtcText5.TabIndex = 29
-        Me.AtcText5.ValueDouble = 12
-        Me.AtcText5.ValueInteger = 12
+        Me.AtcTextEMon.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextEMon.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtcTextEMon.DefaultValue = ""
+        Me.AtcTextEMon.HardMax = 12.0R
+        Me.AtcTextEMon.HardMin = 1.0R
+        Me.AtcTextEMon.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextEMon.Location = New System.Drawing.Point(129, 64)
+        Me.AtcTextEMon.MaxWidth = 20
+        Me.AtcTextEMon.Name = "AtcTextEMon"
+        Me.AtcTextEMon.NumericFormat = "0"
+        Me.AtcTextEMon.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextEMon.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextEMon.SelLength = 0
+        Me.AtcTextEMon.SelStart = 0
+        Me.AtcTextEMon.Size = New System.Drawing.Size(44, 21)
+        Me.AtcTextEMon.SoftMax = -999.0R
+        Me.AtcTextEMon.SoftMin = -999.0R
+        Me.AtcTextEMon.TabIndex = 29
+        Me.AtcTextEMon.ValueDouble = 12.0R
+        Me.AtcTextEMon.ValueInteger = 12
         '
-        'AtcText6
+        'AtcTextSMonth
         '
-        Me.AtcText6.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText6.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcText6.DefaultValue = ""
-        Me.AtcText6.HardMax = 12
-        Me.AtcText6.HardMin = 1
-        Me.AtcText6.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText6.Location = New System.Drawing.Point(129, 38)
-        Me.AtcText6.MaxWidth = 20
-        Me.AtcText6.Name = "AtcText6"
-        Me.AtcText6.NumericFormat = "0"
-        Me.AtcText6.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText6.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText6.SelLength = 0
-        Me.AtcText6.SelStart = 0
-        Me.AtcText6.Size = New System.Drawing.Size(44, 21)
-        Me.AtcText6.SoftMax = -999
-        Me.AtcText6.SoftMin = -999
-        Me.AtcText6.TabIndex = 28
-        Me.AtcText6.ValueDouble = 1
-        Me.AtcText6.ValueInteger = 1
+        Me.AtcTextSMonth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextSMonth.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtcTextSMonth.DefaultValue = ""
+        Me.AtcTextSMonth.HardMax = 12.0R
+        Me.AtcTextSMonth.HardMin = 1.0R
+        Me.AtcTextSMonth.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextSMonth.Location = New System.Drawing.Point(129, 38)
+        Me.AtcTextSMonth.MaxWidth = 20
+        Me.AtcTextSMonth.Name = "AtcTextSMonth"
+        Me.AtcTextSMonth.NumericFormat = "0"
+        Me.AtcTextSMonth.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextSMonth.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextSMonth.SelLength = 0
+        Me.AtcTextSMonth.SelStart = 0
+        Me.AtcTextSMonth.Size = New System.Drawing.Size(44, 21)
+        Me.AtcTextSMonth.SoftMax = -999.0R
+        Me.AtcTextSMonth.SoftMin = -999.0R
+        Me.AtcTextSMonth.TabIndex = 28
+        Me.AtcTextSMonth.ValueDouble = 1.0R
+        Me.AtcTextSMonth.ValueInteger = 1
         '
-        'AtcText7
+        'AtcTextEYear
         '
-        Me.AtcText7.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText7.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcText7.DefaultValue = ""
-        Me.AtcText7.HardMax = 9999
-        Me.AtcText7.HardMin = 0
-        Me.AtcText7.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText7.Location = New System.Drawing.Point(60, 64)
-        Me.AtcText7.MaxWidth = 20
-        Me.AtcText7.Name = "AtcText7"
-        Me.AtcText7.NumericFormat = "0"
-        Me.AtcText7.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText7.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText7.SelLength = 0
-        Me.AtcText7.SelStart = 0
-        Me.AtcText7.Size = New System.Drawing.Size(64, 21)
-        Me.AtcText7.SoftMax = -999
-        Me.AtcText7.SoftMin = -999
-        Me.AtcText7.TabIndex = 27
-        Me.AtcText7.ValueDouble = 2000
-        Me.AtcText7.ValueInteger = 2000
+        Me.AtcTextEYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextEYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtcTextEYear.DefaultValue = ""
+        Me.AtcTextEYear.HardMax = 9999.0R
+        Me.AtcTextEYear.HardMin = 0.0R
+        Me.AtcTextEYear.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextEYear.Location = New System.Drawing.Point(60, 64)
+        Me.AtcTextEYear.MaxWidth = 20
+        Me.AtcTextEYear.Name = "AtcTextEYear"
+        Me.AtcTextEYear.NumericFormat = "0"
+        Me.AtcTextEYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextEYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextEYear.SelLength = 0
+        Me.AtcTextEYear.SelStart = 0
+        Me.AtcTextEYear.Size = New System.Drawing.Size(64, 21)
+        Me.AtcTextEYear.SoftMax = -999.0R
+        Me.AtcTextEYear.SoftMin = -999.0R
+        Me.AtcTextEYear.TabIndex = 27
+        Me.AtcTextEYear.ValueDouble = 2000.0R
+        Me.AtcTextEYear.ValueInteger = 2000
         '
         'TabPage7
         '
+        Me.TabPage7.Controls.Add(Me.AtcGridModelParms)
         Me.TabPage7.Location = New System.Drawing.Point(4, 25)
         Me.TabPage7.Name = "TabPage7"
-        Me.TabPage7.Size = New System.Drawing.Size(521, 380)
+        Me.TabPage7.Size = New System.Drawing.Size(521, 402)
         Me.TabPage7.TabIndex = 8
         Me.TabPage7.Text = "Model Parameters"
         Me.TabPage7.UseVisualStyleBackColor = True
         '
         'TabPage8
         '
+        Me.TabPage8.Controls.Add(Me.AtcGridSiteVars)
         Me.TabPage8.Location = New System.Drawing.Point(4, 25)
         Me.TabPage8.Name = "TabPage8"
-        Me.TabPage8.Size = New System.Drawing.Size(521, 380)
+        Me.TabPage8.Size = New System.Drawing.Size(521, 402)
         Me.TabPage8.TabIndex = 9
         Me.TabPage8.Text = "Site Variables"
         Me.TabPage8.UseVisualStyleBackColor = True
         '
         'TabPage1
         '
-        Me.TabPage1.Controls.Add(Me.AtcGrid1)
+        Me.TabPage1.Controls.Add(Me.AtcTextCParm)
+        Me.TabPage1.Controls.Add(Me.AtcTextAParm)
+        Me.TabPage1.Controls.Add(Me.lblCParm)
+        Me.TabPage1.Controls.Add(Me.lblAParm)
+        Me.TabPage1.Controls.Add(Me.AtcGridBCMonthly)
         Me.TabPage1.Location = New System.Drawing.Point(4, 25)
         Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Size = New System.Drawing.Size(521, 380)
+        Me.TabPage1.Size = New System.Drawing.Size(521, 402)
         Me.TabPage1.TabIndex = 11
         Me.TabPage1.Text = "Bristow Campbell Parameters"
         Me.TabPage1.UseVisualStyleBackColor = True
         '
-        'AtcGrid1
+        'AtcGridBCMonthly
         '
-        Me.AtcGrid1.AllowHorizontalScrolling = True
-        Me.AtcGrid1.AllowNewValidValues = False
-        Me.AtcGrid1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+        Me.AtcGridBCMonthly.AllowHorizontalScrolling = True
+        Me.AtcGridBCMonthly.AllowNewValidValues = False
+        Me.AtcGridBCMonthly.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGrid1.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGrid1.Fixed3D = False
-        Me.AtcGrid1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AtcGrid1.LineColor = System.Drawing.Color.Empty
-        Me.AtcGrid1.LineWidth = 0.0!
-        Me.AtcGrid1.Location = New System.Drawing.Point(21, 19)
-        Me.AtcGrid1.Name = "AtcGrid1"
-        Me.AtcGrid1.Size = New System.Drawing.Size(395, 292)
-        Me.AtcGrid1.Source = Nothing
-        Me.AtcGrid1.TabIndex = 51
+        Me.AtcGridBCMonthly.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridBCMonthly.Fixed3D = False
+        Me.AtcGridBCMonthly.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AtcGridBCMonthly.LineColor = System.Drawing.Color.Empty
+        Me.AtcGridBCMonthly.LineWidth = 0.0!
+        Me.AtcGridBCMonthly.Location = New System.Drawing.Point(12, 65)
+        Me.AtcGridBCMonthly.Name = "AtcGridBCMonthly"
+        Me.AtcGridBCMonthly.Size = New System.Drawing.Size(502, 324)
+        Me.AtcGridBCMonthly.Source = Nothing
+        Me.AtcGridBCMonthly.TabIndex = 51
         '
         'GroupBox1
         '
@@ -632,7 +1008,7 @@ Public Class frmUEB
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox1.Controls.Add(Me.lblStatus)
         Me.GroupBox1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.GroupBox1.Location = New System.Drawing.Point(15, 430)
+        Me.GroupBox1.Location = New System.Drawing.Point(15, 452)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(530, 48)
         Me.GroupBox1.TabIndex = 9
@@ -1222,373 +1598,141 @@ Public Class frmUEB
         Me.ComboBox39.Size = New System.Drawing.Size(312, 21)
         Me.ComboBox39.TabIndex = 23
         '
-        'Button1
+        'cmdSimulate
         '
-        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Button1.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.Button1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button1.Location = New System.Drawing.Point(19, 491)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(73, 28)
-        Me.Button1.TabIndex = 10
-        Me.Button1.Text = "Simulate"
+        Me.cmdSimulate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdSimulate.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdSimulate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdSimulate.Location = New System.Drawing.Point(19, 513)
+        Me.cmdSimulate.Name = "cmdSimulate"
+        Me.cmdSimulate.Size = New System.Drawing.Size(73, 28)
+        Me.cmdSimulate.TabIndex = 10
+        Me.cmdSimulate.Text = "Simulate"
         '
-        'GroupBox3
+        'lblNetRadStation
         '
-        Me.GroupBox3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.lblNetRadStation.AutoSize = True
+        Me.lblNetRadStation.Location = New System.Drawing.Point(16, 369)
+        Me.lblNetRadStation.Name = "lblNetRadStation"
+        Me.lblNetRadStation.Size = New System.Drawing.Size(111, 13)
+        Me.lblNetRadStation.TabIndex = 41
+        Me.lblNetRadStation.Text = "Net Radiation Station:"
+        '
+        'cboNetRadStation
+        '
+        Me.cboNetRadStation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.GroupBox3.Controls.Add(Me.RadioButton6)
-        Me.GroupBox3.Controls.Add(Me.RadioButton5)
-        Me.GroupBox3.Controls.Add(Me.RadioButton4)
-        Me.GroupBox3.Location = New System.Drawing.Point(19, 118)
-        Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(480, 96)
-        Me.GroupBox3.TabIndex = 34
-        Me.GroupBox3.TabStop = False
-        Me.GroupBox3.Text = "Radiation Input Type"
+        Me.cboNetRadStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboNetRadStation.FormattingEnabled = True
+        Me.cboNetRadStation.Location = New System.Drawing.Point(213, 366)
+        Me.cboNetRadStation.Name = "cboNetRadStation"
+        Me.cboNetRadStation.Size = New System.Drawing.Size(286, 21)
+        Me.cboNetRadStation.TabIndex = 42
         '
-        'RadioButton4
+        'AtcGridModelParms
         '
-        Me.RadioButton4.AutoSize = True
-        Me.RadioButton4.Location = New System.Drawing.Point(18, 19)
-        Me.RadioButton4.Name = "RadioButton4"
-        Me.RadioButton4.Size = New System.Drawing.Size(212, 17)
-        Me.RadioButton4.TabIndex = 0
-        Me.RadioButton4.Text = "Estimate from Daily Temperature Range"
-        Me.RadioButton4.UseVisualStyleBackColor = True
-        '
-        'RadioButton5
-        '
-        Me.RadioButton5.AutoSize = True
-        Me.RadioButton5.Checked = True
-        Me.RadioButton5.Location = New System.Drawing.Point(18, 42)
-        Me.RadioButton5.Name = "RadioButton5"
-        Me.RadioButton5.Size = New System.Drawing.Size(174, 17)
-        Me.RadioButton5.TabIndex = 1
-        Me.RadioButton5.TabStop = True
-        Me.RadioButton5.Text = "Measured Input Solar Radiation"
-        Me.RadioButton5.UseVisualStyleBackColor = True
-        '
-        'RadioButton6
-        '
-        Me.RadioButton6.AutoSize = True
-        Me.RadioButton6.Location = New System.Drawing.Point(18, 65)
-        Me.RadioButton6.Name = "RadioButton6"
-        Me.RadioButton6.Size = New System.Drawing.Size(140, 17)
-        Me.RadioButton6.TabIndex = 2
-        Me.RadioButton6.Text = "Measured Net Radiation"
-        Me.RadioButton6.UseVisualStyleBackColor = True
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(224, 20)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(30, 13)
-        Me.Label1.TabIndex = 40
-        Me.Label1.Text = "Hour"
-        '
-        'AtcText1
-        '
-        Me.AtcText1.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText1.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcText1.DefaultValue = ""
-        Me.AtcText1.HardMax = 24
-        Me.AtcText1.HardMin = 0
-        Me.AtcText1.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText1.Location = New System.Drawing.Point(227, 64)
-        Me.AtcText1.MaxWidth = 20
-        Me.AtcText1.Name = "AtcText1"
-        Me.AtcText1.NumericFormat = "0"
-        Me.AtcText1.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText1.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText1.SelLength = 0
-        Me.AtcText1.SelStart = 0
-        Me.AtcText1.Size = New System.Drawing.Size(44, 21)
-        Me.AtcText1.SoftMax = -999
-        Me.AtcText1.SoftMin = -999
-        Me.AtcText1.TabIndex = 39
-        Me.AtcText1.ValueDouble = 0
-        Me.AtcText1.ValueInteger = 0
-        '
-        'AtcText8
-        '
-        Me.AtcText8.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText8.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcText8.DefaultValue = ""
-        Me.AtcText8.HardMax = 24
-        Me.AtcText8.HardMin = 0
-        Me.AtcText8.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText8.Location = New System.Drawing.Point(227, 38)
-        Me.AtcText8.MaxWidth = 20
-        Me.AtcText8.Name = "AtcText8"
-        Me.AtcText8.NumericFormat = "0"
-        Me.AtcText8.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText8.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText8.SelLength = 0
-        Me.AtcText8.SelStart = 0
-        Me.AtcText8.Size = New System.Drawing.Size(44, 21)
-        Me.AtcText8.SoftMax = -999
-        Me.AtcText8.SoftMin = -999
-        Me.AtcText8.TabIndex = 38
-        Me.AtcText8.ValueDouble = 0
-        Me.AtcText8.ValueInteger = 0
-        '
-        'Label2
-        '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(320, 38)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(55, 13)
-        Me.Label2.TabIndex = 42
-        Me.Label2.Text = "Time Step"
-        '
-        'AtcText9
-        '
-        Me.AtcText9.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText9.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcText9.DefaultValue = ""
-        Me.AtcText9.HardMax = 24
-        Me.AtcText9.HardMin = 1
-        Me.AtcText9.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText9.Location = New System.Drawing.Point(381, 38)
-        Me.AtcText9.MaxWidth = 20
-        Me.AtcText9.Name = "AtcText9"
-        Me.AtcText9.NumericFormat = "0"
-        Me.AtcText9.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText9.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText9.SelLength = 0
-        Me.AtcText9.SelStart = 0
-        Me.AtcText9.Size = New System.Drawing.Size(64, 21)
-        Me.AtcText9.SoftMax = -999
-        Me.AtcText9.SoftMin = -999
-        Me.AtcText9.TabIndex = 41
-        Me.AtcText9.ValueDouble = 1
-        Me.AtcText9.ValueInteger = 1
-        '
-        'ComboBox44
-        '
-        Me.ComboBox44.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.AtcGridModelParms.AllowHorizontalScrolling = True
+        Me.AtcGridModelParms.AllowNewValidValues = False
+        Me.AtcGridModelParms.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ComboBox44.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboBox44.FormattingEnabled = True
-        Me.ComboBox44.Location = New System.Drawing.Point(213, 257)
-        Me.ComboBox44.Name = "ComboBox44"
-        Me.ComboBox44.Size = New System.Drawing.Size(286, 21)
-        Me.ComboBox44.TabIndex = 36
+        Me.AtcGridModelParms.CellBackColor = System.Drawing.SystemColors.Window
+        Me.AtcGridModelParms.Fixed3D = False
+        Me.AtcGridModelParms.LineColor = System.Drawing.SystemColors.Control
+        Me.AtcGridModelParms.LineWidth = 1.0!
+        Me.AtcGridModelParms.Location = New System.Drawing.Point(12, 13)
+        Me.AtcGridModelParms.Name = "AtcGridModelParms"
+        Me.AtcGridModelParms.Size = New System.Drawing.Size(481, 376)
+        Me.AtcGridModelParms.Source = Nothing
+        Me.AtcGridModelParms.TabIndex = 0
         '
-        'Label4
+        'AtcGridSiteVars
         '
-        Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(16, 260)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(76, 13)
-        Me.Label4.TabIndex = 35
-        Me.Label4.Text = "Precip Station:"
-        '
-        'ComboBox45
-        '
-        Me.ComboBox45.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.AtcGridSiteVars.AllowHorizontalScrolling = True
+        Me.AtcGridSiteVars.AllowNewValidValues = False
+        Me.AtcGridSiteVars.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ComboBox45.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboBox45.FormattingEnabled = True
-        Me.ComboBox45.Location = New System.Drawing.Point(213, 311)
-        Me.ComboBox45.Name = "ComboBox45"
-        Me.ComboBox45.Size = New System.Drawing.Size(286, 21)
-        Me.ComboBox45.TabIndex = 38
+        Me.AtcGridSiteVars.CellBackColor = System.Drawing.SystemColors.Window
+        Me.AtcGridSiteVars.Fixed3D = False
+        Me.AtcGridSiteVars.LineColor = System.Drawing.SystemColors.Control
+        Me.AtcGridSiteVars.LineWidth = 1.0!
+        Me.AtcGridSiteVars.Location = New System.Drawing.Point(38, 3)
+        Me.AtcGridSiteVars.Name = "AtcGridSiteVars"
+        Me.AtcGridSiteVars.Size = New System.Drawing.Size(442, 395)
+        Me.AtcGridSiteVars.Source = Nothing
+        Me.AtcGridSiteVars.TabIndex = 0
         '
-        'Label6
+        'lblAParm
         '
-        Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(16, 314)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(128, 13)
-        Me.Label6.TabIndex = 37
-        Me.Label6.Text = "Relative Humidity Station:"
+        Me.lblAParm.AutoSize = True
+        Me.lblAParm.Location = New System.Drawing.Point(34, 21)
+        Me.lblAParm.Name = "lblAParm"
+        Me.lblAParm.Size = New System.Drawing.Size(68, 13)
+        Me.lblAParm.TabIndex = 52
+        Me.lblAParm.Text = "Parameter A:"
         '
-        'ComboBox46
+        'lblCParm
         '
-        Me.ComboBox46.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ComboBox46.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboBox46.FormattingEnabled = True
-        Me.ComboBox46.Location = New System.Drawing.Point(213, 338)
-        Me.ComboBox46.Name = "ComboBox46"
-        Me.ComboBox46.Size = New System.Drawing.Size(286, 21)
-        Me.ComboBox46.TabIndex = 40
+        Me.lblCParm.AutoSize = True
+        Me.lblCParm.Location = New System.Drawing.Point(247, 21)
+        Me.lblCParm.Name = "lblCParm"
+        Me.lblCParm.Size = New System.Drawing.Size(68, 13)
+        Me.lblCParm.TabIndex = 53
+        Me.lblCParm.Text = "Parameter C:"
         '
-        'Label9
+        'AtcTextAParm
         '
-        Me.Label9.AutoSize = True
-        Me.Label9.Location = New System.Drawing.Point(16, 341)
-        Me.Label9.Name = "Label9"
-        Me.Label9.Size = New System.Drawing.Size(191, 13)
-        Me.Label9.TabIndex = 39
-        Me.Label9.Text = "Incoming Shortwave Radiation Station:"
+        Me.AtcTextAParm.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextAParm.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.AtcTextAParm.DefaultValue = ""
+        Me.AtcTextAParm.HardMax = -999.0R
+        Me.AtcTextAParm.HardMin = -999.0R
+        Me.AtcTextAParm.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextAParm.Location = New System.Drawing.Point(108, 21)
+        Me.AtcTextAParm.MaxWidth = 20
+        Me.AtcTextAParm.Name = "AtcTextAParm"
+        Me.AtcTextAParm.NumericFormat = "0.#####"
+        Me.AtcTextAParm.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextAParm.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextAParm.SelLength = 0
+        Me.AtcTextAParm.SelStart = 0
+        Me.AtcTextAParm.Size = New System.Drawing.Size(97, 20)
+        Me.AtcTextAParm.SoftMax = -999.0R
+        Me.AtcTextAParm.SoftMin = -999.0R
+        Me.AtcTextAParm.TabIndex = 54
+        Me.AtcTextAParm.ValueDouble = 0.0R
+        Me.AtcTextAParm.ValueInteger = 0
         '
-        'TabPage2
+        'AtcTextCParm
         '
-        Me.TabPage2.Controls.Add(Me.AtcText19)
-        Me.TabPage2.Controls.Add(Me.Label62)
-        Me.TabPage2.Controls.Add(Me.GroupBox4)
-        Me.TabPage2.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Size = New System.Drawing.Size(521, 380)
-        Me.TabPage2.TabIndex = 12
-        Me.TabPage2.Text = "General"
-        Me.TabPage2.UseVisualStyleBackColor = True
-        '
-        'GroupBox4
-        '
-        Me.GroupBox4.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.GroupBox4.Controls.Add(Me.Label50)
-        Me.GroupBox4.Controls.Add(Me.AtcText10)
-        Me.GroupBox4.Controls.Add(Me.Label52)
-        Me.GroupBox4.Controls.Add(Me.Label53)
-        Me.GroupBox4.Controls.Add(Me.AtcText15)
-        Me.GroupBox4.Controls.Add(Me.AtcText18)
-        Me.GroupBox4.Location = New System.Drawing.Point(22, 75)
-        Me.GroupBox4.Name = "GroupBox4"
-        Me.GroupBox4.Size = New System.Drawing.Size(480, 128)
-        Me.GroupBox4.TabIndex = 30
-        Me.GroupBox4.TabStop = False
-        Me.GroupBox4.Text = "Initial Conditions"
-        '
-        'Label52
-        '
-        Me.Label52.AutoSize = True
-        Me.Label52.Location = New System.Drawing.Point(20, 64)
-        Me.Label52.Name = "Label52"
-        Me.Label52.Size = New System.Drawing.Size(129, 13)
-        Me.Label52.TabIndex = 37
-        Me.Label52.Text = "Water Equivalence W (m)"
-        '
-        'Label53
-        '
-        Me.Label53.AutoSize = True
-        Me.Label53.Location = New System.Drawing.Point(20, 37)
-        Me.Label53.Name = "Label53"
-        Me.Label53.Size = New System.Drawing.Size(130, 13)
-        Me.Label53.TabIndex = 36
-        Me.Label53.Text = "Energy Content U (kJ/m2)"
-        '
-        'AtcText15
-        '
-        Me.AtcText15.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText15.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.AtcText15.DefaultValue = ""
-        Me.AtcText15.HardMax = 9999999
-        Me.AtcText15.HardMin = 0
-        Me.AtcText15.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText15.Location = New System.Drawing.Point(156, 37)
-        Me.AtcText15.MaxWidth = 20
-        Me.AtcText15.Name = "AtcText15"
-        Me.AtcText15.NumericFormat = "0"
-        Me.AtcText15.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText15.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText15.SelLength = 0
-        Me.AtcText15.SelStart = 0
-        Me.AtcText15.Size = New System.Drawing.Size(64, 21)
-        Me.AtcText15.SoftMax = -999
-        Me.AtcText15.SoftMin = -999
-        Me.AtcText15.TabIndex = 30
-        Me.AtcText15.ValueDouble = 20000
-        Me.AtcText15.ValueInteger = 20000
-        '
-        'AtcText18
-        '
-        Me.AtcText18.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText18.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.AtcText18.DefaultValue = ""
-        Me.AtcText18.HardMax = 9999
-        Me.AtcText18.HardMin = 0
-        Me.AtcText18.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText18.Location = New System.Drawing.Point(156, 64)
-        Me.AtcText18.MaxWidth = 20
-        Me.AtcText18.Name = "AtcText18"
-        Me.AtcText18.NumericFormat = "0"
-        Me.AtcText18.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText18.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText18.SelLength = 0
-        Me.AtcText18.SelStart = 0
-        Me.AtcText18.Size = New System.Drawing.Size(64, 21)
-        Me.AtcText18.SoftMax = -999
-        Me.AtcText18.SoftMin = -999
-        Me.AtcText18.TabIndex = 27
-        Me.AtcText18.ValueDouble = 1
-        Me.AtcText18.ValueInteger = 1
-        '
-        'Label62
-        '
-        Me.Label62.AutoSize = True
-        Me.Label62.Location = New System.Drawing.Point(33, 33)
-        Me.Label62.Name = "Label62"
-        Me.Label62.Size = New System.Drawing.Size(74, 13)
-        Me.Label62.TabIndex = 31
-        Me.Label62.Text = "Project Name:"
-        '
-        'AtcText19
-        '
-        Me.AtcText19.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText19.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
-        Me.AtcText19.DefaultValue = ""
-        Me.AtcText19.HardMax = -999
-        Me.AtcText19.HardMin = -999
-        Me.AtcText19.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText19.Location = New System.Drawing.Point(113, 33)
-        Me.AtcText19.MaxWidth = 20
-        Me.AtcText19.Name = "AtcText19"
-        Me.AtcText19.NumericFormat = "0.#####"
-        Me.AtcText19.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText19.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText19.SelLength = 0
-        Me.AtcText19.SelStart = 0
-        Me.AtcText19.Size = New System.Drawing.Size(122, 21)
-        Me.AtcText19.SoftMax = -999
-        Me.AtcText19.SoftMin = -999
-        Me.AtcText19.TabIndex = 32
-        Me.AtcText19.ValueDouble = 0
-        Me.AtcText19.ValueInteger = 0
-        '
-        'Label50
-        '
-        Me.Label50.AutoSize = True
-        Me.Label50.Location = New System.Drawing.Point(20, 88)
-        Me.Label50.Name = "Label50"
-        Me.Label50.Size = New System.Drawing.Size(96, 13)
-        Me.Label50.TabIndex = 39
-        Me.Label50.Text = "Snow Surface Age"
-        '
-        'AtcText10
-        '
-        Me.AtcText10.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText10.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.AtcText10.DefaultValue = ""
-        Me.AtcText10.HardMax = 9999
-        Me.AtcText10.HardMin = 0
-        Me.AtcText10.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText10.Location = New System.Drawing.Point(156, 91)
-        Me.AtcText10.MaxWidth = 20
-        Me.AtcText10.Name = "AtcText10"
-        Me.AtcText10.NumericFormat = "0"
-        Me.AtcText10.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText10.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText10.SelLength = 0
-        Me.AtcText10.SelStart = 0
-        Me.AtcText10.Size = New System.Drawing.Size(64, 21)
-        Me.AtcText10.SoftMax = -999
-        Me.AtcText10.SoftMin = -999
-        Me.AtcText10.TabIndex = 38
-        Me.AtcText10.ValueDouble = 1
-        Me.AtcText10.ValueInteger = 1
+        Me.AtcTextCParm.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextCParm.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.AtcTextCParm.DefaultValue = ""
+        Me.AtcTextCParm.HardMax = -999.0R
+        Me.AtcTextCParm.HardMin = -999.0R
+        Me.AtcTextCParm.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextCParm.Location = New System.Drawing.Point(321, 21)
+        Me.AtcTextCParm.MaxWidth = 20
+        Me.AtcTextCParm.Name = "AtcTextCParm"
+        Me.AtcTextCParm.NumericFormat = "0.#####"
+        Me.AtcTextCParm.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextCParm.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextCParm.SelLength = 0
+        Me.AtcTextCParm.SelStart = 0
+        Me.AtcTextCParm.Size = New System.Drawing.Size(97, 20)
+        Me.AtcTextCParm.SoftMax = -999.0R
+        Me.AtcTextCParm.SoftMin = -999.0R
+        Me.AtcTextCParm.TabIndex = 55
+        Me.AtcTextCParm.ValueDouble = 0.0R
+        Me.AtcTextCParm.ValueInteger = 0
         '
         'frmUEB
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.cmdCancel
-        Me.ClientSize = New System.Drawing.Size(560, 531)
-        Me.Controls.Add(Me.Button1)
+        Me.ClientSize = New System.Drawing.Size(560, 553)
+        Me.Controls.Add(Me.cmdSimulate)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.cmdAbout)
@@ -1599,18 +1743,21 @@ Public Class frmUEB
         Me.Name = "frmUEB"
         Me.Text = "Utah Energy Balance Snow Accumulation and Melt Model (UEB) for BASINS"
         Me.TabControl1.ResumeLayout(False)
-        Me.TabPage3.ResumeLayout(False)
-        Me.TabPage3.PerformLayout()
-        Me.GroupBox2.ResumeLayout(False)
-        Me.GroupBox2.PerformLayout()
-        Me.TabPage1.ResumeLayout(False)
-        Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox3.ResumeLayout(False)
-        Me.GroupBox3.PerformLayout()
         Me.TabPage2.ResumeLayout(False)
         Me.TabPage2.PerformLayout()
         Me.GroupBox4.ResumeLayout(False)
         Me.GroupBox4.PerformLayout()
+        Me.TabPage3.ResumeLayout(False)
+        Me.TabPage3.PerformLayout()
+        Me.GroupBox3.ResumeLayout(False)
+        Me.GroupBox3.PerformLayout()
+        Me.GroupBox2.ResumeLayout(False)
+        Me.GroupBox2.PerformLayout()
+        Me.TabPage7.ResumeLayout(False)
+        Me.TabPage8.ResumeLayout(False)
+        Me.TabPage1.ResumeLayout(False)
+        Me.TabPage1.PerformLayout()
+        Me.GroupBox1.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -1629,7 +1776,7 @@ Public Class frmUEB
         ShowHelp("BASINS Details\Watershed and Instream Model Setup\UEB.html")
     End Sub
 
-    Private Sub frmWASPSetup_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    Private Sub frmUEB_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
         If e.KeyValue = Windows.Forms.Keys.F1 Then
             ShowHelp("BASINS Details\Watershed and Instream Model Setup\UEB.html")
         End If
@@ -1642,11 +1789,179 @@ Public Class frmUEB
     End Sub
 
     Public Sub InitializeUI(ByVal aPlugIn As PlugIn)
+        With AtcGridModelParms
+            .Source = New atcControls.atcGridSource
+            .AllowHorizontalScrolling = False
+        End With
+        AtcGridModelParms.Clear()
+        With AtcGridModelParms.Source
+            .Columns = 2
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 1
+            .CellColor(0, 0) = SystemColors.ControlDark
+            .CellColor(1, 0) = SystemColors.ControlDark
+            .CellColor(2, 0) = SystemColors.ControlDark
+            .CellColor(3, 0) = SystemColors.ControlDark
+            .CellColor(4, 0) = SystemColors.ControlDark
+            .CellColor(5, 0) = SystemColors.ControlDark
+            .CellColor(6, 0) = SystemColors.ControlDark
+            .CellColor(7, 0) = SystemColors.ControlDark
+            .CellColor(8, 0) = SystemColors.ControlDark
+            .CellColor(9, 0) = SystemColors.ControlDark
+            .CellColor(10, 0) = SystemColors.ControlDark
+            .CellColor(11, 0) = SystemColors.ControlDark
+            .CellColor(12, 0) = SystemColors.ControlDark
+            .CellColor(13, 0) = SystemColors.ControlDark
+            .CellColor(14, 0) = SystemColors.ControlDark
+            .CellColor(15, 0) = SystemColors.ControlDark
+            .CellColor(16, 0) = SystemColors.ControlDark
+            .CellColor(17, 0) = SystemColors.ControlDark
+            .CellColor(18, 0) = SystemColors.ControlDark
+            .CellColor(19, 0) = SystemColors.ControlDark
+            .CellColor(20, 0) = SystemColors.ControlDark
+            .CellColor(21, 0) = SystemColors.ControlDark
+            .CellColor(22, 0) = SystemColors.ControlDark
+            .CellColor(23, 0) = SystemColors.ControlDark
+            .CellColor(24, 0) = SystemColors.ControlDark
+            .CellColor(25, 0) = SystemColors.ControlDark
+            .CellColor(26, 0) = SystemColors.ControlDark
+            .CellColor(27, 0) = SystemColors.ControlDark
+            .CellColor(28, 0) = SystemColors.ControlDark
+            .CellColor(29, 0) = SystemColors.ControlDark
+            .CellColor(30, 0) = SystemColors.ControlDark
+            .Rows = 31
+            .CellValue(0, 0) = "Model Parameter"
+            .CellValue(0, 1) = "Value"
+            .CellValue(1, 0) = "Temp above which all precip is rain, deg C"
+            .CellValue(2, 0) = "Temp below which all precip is snow, deg C"
+            .CellValue(3, 0) = "Temperature of freezing, deg C"
+            .CellValue(4, 0) = "Constant to convert deg C to Kelvin"
+            .CellValue(5, 0) = "Emissivity of snow"
+            .CellValue(6, 0) = "Stefan boltzman constant, kJ/sq. m/hr/K"
+            .CellValue(7, 0) = "Heat of fusion, kJ/kg"
+            .CellValue(8, 0) = "Heat of Vaporization kJ/kg"
+            .CellValue(9, 0) = "Water heat capacity, kJ/kg/deg C"
+            .CellValue(10, 0) = "Ice heat capacity, kJ/kg/deg C"
+            .CellValue(11, 0) = "Ground heat capacity, kJ/kg/deg C"
+            .CellValue(12, 0) = "Air heat capacity, kJ/kg/deg C"
+            .CellValue(13, 0) = "Ideal gas constant for dry air, J/kg/K"
+            .CellValue(14, 0) = "Von Karman's constant"
+            .CellValue(15, 0) = "Measurement height for Temp & Humidity, m"
+            .CellValue(16, 0) = "Surface aerodynamic roughness, m"
+            .CellValue(17, 0) = "Factor converging hours to seconds"
+            .CellValue(18, 0) = "Density of ice, kg/cubic m"
+            .CellValue(19, 0) = "Density of water, kg/cubic m"
+            .CellValue(20, 0) = "Snow density, kg/cubic m"
+            .CellValue(21, 0) = "Soil density, kg/cubic m"
+            .CellValue(22, 0) = "Liquid holding capacity of snow"
+            .CellValue(23, 0) = "Snow saturated hyd. cond., m/hr"
+            .CellValue(24, 0) = "Thermally active depth of soil, m"
+            .CellValue(25, 0) = "Snow surface thermal conductance, m/hr"
+            .CellValue(26, 0) = "Gravitational acceleration, m/sq. sec"
+            .CellValue(27, 0) = "Bare ground albedo"
+            .CellValue(28, 0) = "New snow visible band reflectance"
+            .CellValue(29, 0) = "New snow near infrared band reflectance"
+            .CellValue(30, 0) = "Stability correction control parameter"
+        End With
 
+        With AtcGridSiteVars
+            .Source = New atcControls.atcGridSource
+            .AllowHorizontalScrolling = False
+        End With
+        AtcGridSiteVars.Clear()
+        With AtcGridSiteVars.Source
+            .Columns = 2
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 1
+            .CellColor(0, 0) = SystemColors.ControlDark
+            .CellColor(1, 0) = SystemColors.ControlDark
+            .CellColor(2, 0) = SystemColors.ControlDark
+            .CellColor(3, 0) = SystemColors.ControlDark
+            .CellColor(4, 0) = SystemColors.ControlDark
+            .CellColor(5, 0) = SystemColors.ControlDark
+            .CellColor(6, 0) = SystemColors.ControlDark
+            .CellColor(7, 0) = SystemColors.ControlDark
+            .CellColor(8, 0) = SystemColors.ControlDark
+            .Rows = 9
+            .CellValue(0, 0) = "Site Variable"
+            .CellValue(0, 1) = "Value"
+            .CellValue(1, 0) = "Forest cover fraction"
+            .CellValue(2, 0) = "Drift factor"
+            .CellValue(3, 0) = "Atmospheric pressure, Pa"
+            .CellValue(4, 0) = "Ground heat flux, kJ/sq. m/hr"
+            .CellValue(5, 0) = "Albedo extinction depth, m"
+            .CellValue(6, 0) = "Slope, degrees"
+            .CellValue(7, 0) = "Aspect, degrees from North"
+            .CellValue(8, 0) = "Latitude, degrees"
+        End With
+
+        With AtcGridBCMonthly
+            .Source = New atcControls.atcGridSource
+            .AllowHorizontalScrolling = False
+        End With
+        AtcGridBCMonthly.Clear()
+        With AtcGridBCMonthly.Source
+            .Columns = 2
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 1
+            .CellColor(0, 0) = SystemColors.ControlDark
+            .CellColor(1, 0) = SystemColors.ControlDark
+            .CellColor(2, 0) = SystemColors.ControlDark
+            .CellColor(3, 0) = SystemColors.ControlDark
+            .CellColor(4, 0) = SystemColors.ControlDark
+            .CellColor(5, 0) = SystemColors.ControlDark
+            .CellColor(6, 0) = SystemColors.ControlDark
+            .CellColor(7, 0) = SystemColors.ControlDark
+            .CellColor(8, 0) = SystemColors.ControlDark
+            .CellColor(9, 0) = SystemColors.ControlDark
+            .CellColor(10, 0) = SystemColors.ControlDark
+            .CellColor(11, 0) = SystemColors.ControlDark
+            .CellColor(12, 0) = SystemColors.ControlDark
+            .Rows = 13
+            .CellValue(0, 0) = "Month"
+            .CellValue(0, 1) = "Avg. diurnal temp range"
+            .CellValue(1, 0) = "January"
+            .CellValue(2, 0) = "February"
+            .CellValue(3, 0) = "March"
+            .CellValue(4, 0) = "April"
+            .CellValue(5, 0) = "May"
+            .CellValue(6, 0) = "June"
+            .CellValue(7, 0) = "July"
+            .CellValue(8, 0) = "August"
+            .CellValue(9, 0) = "September"
+            .CellValue(10, 0) = "October"
+            .CellValue(11, 0) = "November"
+            .CellValue(12, 0) = "December"
+        End With
     End Sub
 
     Private Sub lblStatus_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lblStatus.TextChanged
         Logger.Dbg(lblStatus.Text)
     End Sub
 
+    Private Sub rdoMeasuredNet_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoMeasuredNet.CheckedChanged
+        If rdoMeasuredNet.Checked Then
+            cboNetRadStation.Enabled = True
+        Else
+            cboNetRadStation.Enabled = False
+        End If
+    End Sub
+
+    Private Sub rdoRadMeasuredInput_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoRadMeasuredInput.CheckedChanged
+        If rdoRadMeasuredInput.Checked Then
+            cboShortRadStation.Enabled = True
+        Else
+            cboShortRadStation.Enabled = False
+        End If
+    End Sub
+
+    Private Sub rdoRadEstimate_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoRadEstimate.CheckedChanged
+        If rdoRadEstimate.Checked Then 'no need for Input Shortwave or Net Radition Timeseries
+            cboNetRadStation.Enabled = False
+            cboShortRadStation.Enabled = False
+        End If
+    End Sub
 End Class
