@@ -1658,6 +1658,136 @@ Public Class GisUtil
         Return lZonalStatistics
     End Function
 
+    ''' <summary>
+    ''' Compute statistics per zone
+    ''' </summary>
+    ''' <param name="aZoneGridIndex">Index of grid whose values are zone numbers, e.g. subbasins</param>
+    ''' <param name="aValueGridIndex">Index of grid to compute statistics from, by zone</param>
+    ''' <returns>atcCollection of atcDataAttributes, indexed by zone number. Each atcDataAttributes item contains statistics for one zone.</returns>
+    ''' <remarks>Grids do not have to be same resolution or area.
+    ''' Overlapping area will be used and the finer grid will control the level of detail of the computation.</remarks>
+    Public Shared Function GridZonalStatisticsMismatched(ByVal aZoneGridIndex As Integer, ByVal aValueGridIndex As Integer) As atcCollection
+        Dim lNaN As Double = GetNaN()
+        Dim lZoneGrid As MapWinGIS.Grid = GridFromIndex(aZoneGridIndex)
+        Dim lValueGrid As MapWinGIS.Grid = GridFromIndex(aValueGridIndex)
+
+        Dim lZoneRow As Integer
+        Dim lZoneCol As Integer
+        Dim lStartZoneRow As Integer = 0
+        Dim lStartZoneCol As Integer = 0
+        Dim lEndZoneRow As Integer = lZoneGrid.Header.NumberRows - 1
+        Dim lEndZoneCol As Integer = lZoneGrid.Header.NumberCols - 1
+        Dim lNodataZone As Integer = lZoneGrid.Header.NodataValue
+        Dim lValueRow As Integer
+        Dim lValueCol As Integer
+        Dim lStartValueRow As Integer = 0
+        Dim lStartValueCol As Integer = 0
+        Dim lEndValueRow As Integer = lValueGrid.Header.NumberRows - 1
+        Dim lEndValueCol As Integer = lValueGrid.Header.NumberCols - 1
+        Dim lNodataValue As Double = lValueGrid.Header.NodataValue
+        Dim lMapX As Double
+        Dim lMapY As Double
+
+        Dim lZoneNumber As Integer
+        Dim lZonalValues As New atcCollection
+        Dim lThisZoneValues As Generic.List(Of Double)
+
+        Dim lAreaPerCell As Double
+        Dim lAreaPerValueCell As Double = lValueGrid.Header.dX * lValueGrid.Header.dY
+        Dim lAreaPerZoneCell As Double = lZoneGrid.Header.dX * lZoneGrid.Header.dY
+        Dim lZoneIsFinest As Boolean = (lAreaPerValueCell >= lAreaPerZoneCell)
+
+        If lZoneIsFinest Then
+            lAreaPerCell = lAreaPerZoneCell
+            If lAreaPerValueCell = lAreaPerZoneCell Then
+                Logger.Dbg("Same cell area in both grids = " & DoubleToString(lAreaPerCell))
+            Else
+                Logger.Dbg("Using zone cell area = " & DoubleToString(lAreaPerCell) & " < value cell area " & DoubleToString(lAreaPerValueCell))
+            End If
+            For lZoneRow = lStartZoneRow To lEndZoneRow
+                For lZoneCol = lStartZoneCol To lEndZoneCol
+                    lZoneNumber = lZoneGrid.Value(lZoneCol, lZoneRow)
+                    If lZoneNumber <> lNodataZone Then
+                        lThisZoneValues = lZonalValues.ItemByKey(lZoneNumber)
+                        If lThisZoneValues Is Nothing Then
+                            lThisZoneValues = New Generic.List(Of Double)
+                            lZonalValues.Add(lZoneNumber, lThisZoneValues)
+                        End If
+                        lZoneGrid.CellToProj(lZoneCol, lZoneRow, lMapX, lMapY)
+                        lValueGrid.ProjToCell(lMapX, lMapY, lValueCol, lValueRow)
+                        If lValueCol < 0 OrElse lValueCol > lEndValueCol OrElse lValueRow < 0 OrElse lValueRow > lEndValueRow Then
+                            lThisZoneValues.Add(lNodataValue)
+                        Else
+                            lThisZoneValues.Add(lValueGrid.Value(lValueCol, lValueRow))
+                        End If
+                    End If
+                Next
+                If pStatusShow Then Logger.Progress("Computing zonal statistics", lZoneRow, lEndZoneRow)
+            Next
+        Else 'Value grid is finer
+            lAreaPerCell = lAreaPerValueCell
+            Logger.Dbg("Using value cell area = " & DoubleToString(lAreaPerCell) & " < zone cell area " & DoubleToString(lAreaPerZoneCell))
+            For lValueCol = lStartValueCol To lEndValueCol
+                lValueGrid.CellToProj(lValueCol, lValueRow, lMapX, lMapY)
+                lZoneGrid.ProjToCell(lMapX, lMapY, lZoneCol, lZoneRow)
+                If lZoneCol < 0 OrElse lZoneCol > lEndZoneCol OrElse lZoneRow < 0 OrElse lZoneRow > lEndZoneRow Then
+                    'Skip, not in any zone
+                Else
+                    lZoneNumber = lZoneGrid.Value(lZoneCol, lZoneRow)
+                    If lZoneNumber <> lNodataZone Then
+                        lThisZoneValues = lZonalValues.ItemByKey(lZoneNumber)
+                        If lThisZoneValues Is Nothing Then
+                            lThisZoneValues = New Generic.List(Of Double)
+                            lZonalValues.Add(lZoneNumber, lThisZoneValues)
+                        End If
+                        lThisZoneValues.Add(lValueGrid.Value(lValueCol, lValueRow))
+                    End If
+                End If
+                If pStatusShow Then Logger.Progress("Computing zonal statistics", lValueCol, lEndValueCol)
+            Next
+        End If
+
+        Dim lZonalStatistics As New atcCollection 'Of ZoneGridIndex, atcDataAttributes
+
+        For lCollectionIndex As Integer = 0 To lZonalValues.Count - 1
+            lZoneNumber = lZonalValues.Keys(lCollectionIndex)
+            lThisZoneValues = lZonalValues.ItemByIndex(lCollectionIndex)
+
+            'Find most common value, called "Mode", a.k.a. "Majority"
+            Dim lValueTotals As New atcCollection
+            For Each lValue As Double In lThisZoneValues
+                lValueTotals.Increment(lValue)
+            Next
+            Dim lMode As Double = lNaN
+            Dim lModeCount As Integer = 0
+            For lSearchIndex As Integer = 0 To lValueTotals.Count - 1
+                If lValueTotals.ItemByIndex(lSearchIndex) > lModeCount Then
+                    lMode = lValueTotals.Keys(lSearchIndex)
+                    lModeCount = lValueTotals.ItemByIndex(lSearchIndex)
+                End If
+            Next
+
+            Dim lTs As New atcData.atcTimeseries(Nothing)
+            lThisZoneValues.Insert(0, lNaN)
+            lTs.Values = lThisZoneValues.ToArray
+            Dim lNumCellsInZone As Integer = lTs.Attributes.GetValue("Count") + lTs.Attributes.GetValue("Count Missing")
+            If Double.IsNaN(lAreaPerCell) OrElse lAreaPerCell <= 0 Then
+                lTs.Attributes.SetValue("Number Of Cells", lNumCellsInZone)
+                Logger.Dbg("Computed statistics, Zone " & lZoneNumber & " Number Of Cells = " & DoubleToString(lTs.Attributes.GetValue("Number Of Cells")))
+            Else
+                lTs.Attributes.SetValue("Area", lAreaPerCell * lNumCellsInZone)
+                Logger.Dbg("Computed statistics, Zone " & lZoneNumber & " Area = " & DoubleToString(lTs.Attributes.GetValue("Area")))
+            End If
+
+            If Not Double.IsNaN(lMode) Then
+                lTs.Attributes.SetValue("Mode", lMode)
+            End If
+            lTs.Attributes.SetValue("Zone", lZoneNumber)
+            lZonalStatistics.Add(lZoneNumber, lTs.Attributes)
+        Next
+        Return lZonalStatistics
+    End Function
+
     Public Shared Sub GridAssignValues(ByVal aStreamGridFileName As String, ByVal aSubbasinGridFileName As String, ByVal aNewGridFileName As String)
         'to the first grid, assign the values at the coresponding cells of the second grid, and save the result as the third.
         'used to assign a subbasin number to each stream cell
