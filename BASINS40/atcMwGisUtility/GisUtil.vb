@@ -2063,6 +2063,95 @@ Public Class GisUtil
         lOutputGrid = Nothing
     End Sub
 
+    Public Shared Sub GridDownstreamSubbasins(ByVal aOutletGridFileName As String, ByVal aFlowDirGridFileName As String, ByVal aSubbasinGridFileName As String, ByVal aDownstreamGridFileName As String)
+        'given an outlet grid, a flow dir grid, and a subbasins grid, build a downstream subbasin grid
+        Dim lOutletGridLayerIndex As Integer = GisUtil.LayerIndex(aOutletGridFileName)
+        Dim lOutletGrid As MapWinGIS.Grid = GridFromIndex(lOutletGridLayerIndex)
+        Dim lFlowDirGridLayerIndex As Integer = GisUtil.LayerIndex(aFlowDirGridFileName)
+        Dim lFlowDirGrid As MapWinGIS.Grid = GridFromIndex(lFlowDirGridLayerIndex)
+        Dim lSubbasinGridLayerIndex As Integer = GisUtil.LayerIndex(aSubbasinGridFileName)
+        Dim lSubbasinGrid As MapWinGIS.Grid = GridFromIndex(lSubbasinGridLayerIndex)
+
+        Dim lStartRow As Integer = 0
+        Dim lStartCol As Integer = 0
+        Dim lEndRow As Integer = lOutletGrid.Header.NumberRows - 1
+        Dim lEndCol As Integer = lOutletGrid.Header.NumberCols - 1
+
+        'this is the assumed flow dir coding from taudem:
+        '4 3 2
+        '5   1
+        '6 7 8
+
+        Dim lOutletVal As Integer = 0
+        Dim lFlowDirVal As Integer = 0
+        Dim lDownSubRow As Integer = -1
+        Dim lDownSubCol As Integer = -1
+        Dim lDownstreamVal As Integer = lSubbasinGrid.Header.NodataValue
+        Dim lDownstreamIDs As New atcCollection
+        For lRow As Integer = lStartRow To lEndRow
+            For lCol As Integer = lStartCol To lEndCol
+                lOutletVal = lOutletGrid.Value(lCol, lRow)
+                If lOutletVal > 0 Then
+                    If lOutletVal = 217 Then
+                        Logger.Dbg("at outlet")
+                    End If
+                    'found an outlet, see what is downstream of this
+                    lFlowDirVal = lFlowDirGrid.Value(lCol, lRow)
+                    If lFlowDirVal = 2 Or lFlowDirVal = 3 Or lFlowDirVal = 4 Then
+                        lDownSubRow = lRow - 1
+                    ElseIf lFlowDirVal = 6 Or lFlowDirVal = 7 Or lFlowDirVal = 8 Then
+                        lDownSubRow = lRow + 1
+                    Else
+                        lDownSubRow = lRow
+                    End If
+                    If lFlowDirVal = 4 Or lFlowDirVal = 5 Or lFlowDirVal = 6 Then
+                        lDownSubCol = lCol - 1
+                    ElseIf lFlowDirVal = 2 Or lFlowDirVal = 1 Or lFlowDirVal = 8 Then
+                        lDownSubCol = lCol + 1
+                    Else
+                        lDownSubCol = lCol
+                    End If
+                    If lDownSubCol >= lStartCol And lDownSubCol <= lEndCol And _
+                       lDownSubRow >= lStartRow And lDownSubRow <= lEndRow Then
+                        lDownstreamVal = lSubbasinGrid.Value(lDownSubCol, lDownSubRow)
+                    End If
+                    'in output grid we'll need to change from loutletval to ldownstreamval
+                    lDownstreamIDs.Add(lOutletVal, lDownstreamVal)
+                End If
+            Next
+        Next
+
+        lOutletGrid = Nothing
+        lSubbasinGrid = Nothing
+        lFlowDirGrid = Nothing
+
+        If FileExists(aDownstreamGridFileName) Then
+            IO.File.Delete(aDownstreamGridFileName)
+        End If
+        IO.File.Copy(aSubbasinGridFileName, aDownstreamGridFileName)
+        Dim lOutputGrid As New MapWinGIS.Grid
+        lOutputGrid.Open(aDownstreamGridFileName)
+
+        lStartRow = 0
+        lStartCol = 0
+        lEndRow = lOutputGrid.Header.NumberRows - 1
+        lEndCol = lOutputGrid.Header.NumberCols - 1
+
+        Dim lTempVal As Integer = 0
+        For lRow As Integer = lStartRow To lEndRow
+            For lCol As Integer = lStartCol To lEndCol
+                lTempVal = lOutputGrid.Value(lCol, lRow)
+                If lTempVal > 0 Then
+                    'change this cell from loutletval to ldownstreamval
+                    lOutputGrid.Value(lCol, lRow) = lDownstreamIDs.ItemByKey(lTempVal)
+                End If
+            Next
+        Next
+
+        lOutputGrid.Save()
+        lOutputGrid = Nothing
+    End Sub
+
     ''' <summary>Overlay Layer1 and Layer2 (eg landuse and subbasins), creating a polygon layer containing features from both layers</summary>
     ''' <param name="aLayer1Name">
     '''     <para>Name of first layer to overlay</para>
@@ -3780,7 +3869,7 @@ Public Class GisUtil
                 Dim shpSubbasin As MapWinGIS.Shape = sfSubbasin.Shape(i)
                 Dim extSB As MapWinGIS.Extents = sfSubbasin.QuickExtents(i)
                 Dim ID As String = sfSubbasin.CellValue(fldSubbasin, i)
-                If dictSubbasin.ContainsKey(id) Then
+                If dictSubbasin.ContainsKey(ID) Then
                     Logger.Message(String.Format("Subbasin name field ({0}) contains duplicate values.", SubbasinFieldName), "Error", Windows.Forms.MessageBoxButtons.OK, Windows.Forms.MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
                     Return Nothing
                 End If

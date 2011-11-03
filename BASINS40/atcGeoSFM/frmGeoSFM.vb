@@ -2327,19 +2327,19 @@ Public Class frmGeoSFM
                 If lLayerName = "Hill Length Grid" Then
                     cboBC4.SelectedIndex = cboBC4.Items.Count - 1
                 End If
-                If lLayerName = "Runoff Curve Number Grid" Then
+                If lLayerName = "Runoff Curve Number Grid" Or lLayerName = "rcn" Then
                     cboBC5.SelectedIndex = cboBC5.Items.Count - 1
                 End If
-                If lLayerName = "Water holding Capacity" Then
+                If lLayerName = "Water Holding Capacity" Or lLayerName = "whc" Then
                     cboBC6.SelectedIndex = cboBC6.Items.Count - 1
                 End If
-                If lLayerName = "Soil Depth Grid" Then
+                If lLayerName = "Soil Depth Grid" Or lLayerName = "soildepth" Then
                     cboBC7.SelectedIndex = cboBC7.Items.Count - 1
                 End If
-                If lLayerName = "Soil Texture Grid" Then
+                If lLayerName = "Soil Texture Grid" Or lLayerName = "texture" Then
                     cboBC8.SelectedIndex = cboBC8.Items.Count - 1
                 End If
-                If lLayerName = "Hydraulic Conductivity Grid" Then
+                If lLayerName = "Hydraulic Conductivity Grid" Or lLayerName = "ks" Then
                     cboBC9.SelectedIndex = cboBC9.Items.Count - 1
                 End If
                 If lLayerName = "Downstream Flow Length Grid" Or lLayerName = "Downstream Flow Length" Then
@@ -2348,10 +2348,10 @@ Public Class frmGeoSFM
                 If lLayerName = "Stream Link Grid" Then
                     cboBC11.SelectedIndex = cboBC11.Items.Count - 1
                 End If
-                If lLayerName = "Downstream Basin id Grid" Then
+                If lLayerName = "Downstream Basin id Grid" Or lLayerName = "Downstream Subbasin Grid" Then
                     cboBC12.SelectedIndex = cboBC12.Items.Count - 1
                 End If
-                If lLayerName = "Max Impervious Cover Grid" Then
+                If lLayerName = "Max Impervious Cover Grid" Or lLayerName = "maxcover" Then
                     cboBC13.SelectedIndex = cboBC13.Items.Count - 1
                 End If
             End If
@@ -2378,11 +2378,22 @@ Public Class frmGeoSFM
         Dim lDowngname As String = cboBC12.Items(cboBC12.SelectedIndex)
         Dim lMaxcovergname As String = cboBC13.Items(cboBC13.SelectedIndex)
 
+        EnableControls(False)
+        lblStatus.Text = "Computing Basin Characteristics ..."
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+        Me.Refresh()
+
         'call what was the avenue script 'basin'
         Basin(lZonegname, lDemgname, lFacgname, lHlengname, lRcngname, lWhcgname, _
               lDepthgname, lTexturegname, lDraingname, lFlowlengname, _
               lRivlinkgname, lDowngname, lMaxcovergname)
 
+        tabMain.SelectedIndex = 2
+        lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+        Me.Refresh()
+        EnableControls(True)
+        'DefaultBasinCharacteristicsGrids()
     End Sub
 
     Private Sub cmdResponseNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdResponseNext.Click
