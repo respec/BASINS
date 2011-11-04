@@ -1585,9 +1585,9 @@ Public Class GisUtil
         Dim lNaN As Double = GetNaN()
 
         Dim lZoneGrid As MapWinGIS.Grid = GridFromIndex(aZoneGridIndex)
-        Dim lNodataZone As Integer = lZoneGrid.Header.NodataValue
-
         Dim lValueGrid As MapWinGIS.Grid = GridFromIndex(aValueGridIndex)
+
+        Dim lNodataZone As Integer = lZoneGrid.Header.NodataValue
         Dim lNodataValue As Double = lValueGrid.Header.NodataValue
 
         Dim lStartRow As Integer = 0
@@ -1595,14 +1595,14 @@ Public Class GisUtil
         Dim lEndRow As Integer = lZoneGrid.Header.NumberRows - 1
         Dim lEndCol As Integer = lZoneGrid.Header.NumberCols - 1
 
-        If (lValueGrid.Header.NumberRows - 1) <> lEndRow Then
-            Throw New ApplicationException("GridZonalStatistics: Number of rows in input grids do not match: " & lZoneGrid.Header.NumberRows & " <> " & lValueGrid.Header.NumberRows)
-        End If
-        If (lValueGrid.Header.NumberCols - 1) <> lEndCol Then
-            Throw New ApplicationException("GridZonalStatistics: Number of columns in input grids do not match: " & lZoneGrid.Header.NumberCols & " <> " & lValueGrid.Header.NumberCols)
-        End If
-
         Dim lAreaPerCell As Double = lValueGrid.Header.dX * lValueGrid.Header.dY
+
+        If (lValueGrid.Header.NumberRows - 1) <> lEndRow OrElse _
+           (lValueGrid.Header.NumberCols - 1) <> lEndCol OrElse _
+           Math.Abs(lAreaPerCell - (lZoneGrid.Header.dX * lZoneGrid.Header.dY)) > 0.0001 Then
+            Logger.Dbg("GridZonalStatistics: input grids do not match, using GridZonalStatisticsMismatch")
+            Return GridZonalStatisticsMismatched(lZoneGrid, lValueGrid)
+        End If
 
         Dim lZoneNumber As Integer
         Dim lValue As Double
@@ -1678,9 +1678,11 @@ Public Class GisUtil
     ''' <remarks>Grids do not have to be same resolution or area.
     ''' Overlapping area will be used and the finer grid will control the level of detail of the computation.</remarks>
     Public Shared Function GridZonalStatisticsMismatched(ByVal aZoneGridIndex As Integer, ByVal aValueGridIndex As Integer) As atcCollection
+        Return GridZonalStatisticsMismatched(GridFromIndex(aZoneGridIndex), GridFromIndex(aValueGridIndex))
+    End Function
+
+    Private Shared Function GridZonalStatisticsMismatched(ByVal lZoneGrid As MapWinGIS.Grid, ByVal lValueGrid As MapWinGIS.Grid) As atcCollection
         Dim lNaN As Double = GetNaN()
-        Dim lZoneGrid As MapWinGIS.Grid = GridFromIndex(aZoneGridIndex)
-        Dim lValueGrid As MapWinGIS.Grid = GridFromIndex(aValueGridIndex)
 
         Dim lZoneRow As Integer
         Dim lZoneCol As Integer
@@ -1689,6 +1691,7 @@ Public Class GisUtil
         Dim lEndZoneRow As Integer = lZoneGrid.Header.NumberRows - 1
         Dim lEndZoneCol As Integer = lZoneGrid.Header.NumberCols - 1
         Dim lNodataZone As Integer = lZoneGrid.Header.NodataValue
+
         Dim lValueRow As Integer
         Dim lValueCol As Integer
         Dim lStartValueRow As Integer = 0
@@ -1696,6 +1699,10 @@ Public Class GisUtil
         Dim lEndValueRow As Integer = lValueGrid.Header.NumberRows - 1
         Dim lEndValueCol As Integer = lValueGrid.Header.NumberCols - 1
         Dim lNodataValue As Double = lValueGrid.Header.NodataValue
+
+        GridOverlap(lZoneGrid, lValueGrid, lStartZoneRow, lEndZoneRow, lStartZoneCol, lEndZoneCol, _
+                                           lStartValueRow, lEndValueRow, lStartValueCol, lEndValueCol)
+
         Dim lMapX As Double
         Dim lMapY As Double
 
@@ -1802,6 +1809,63 @@ Public Class GisUtil
         Next
         Return lZonalStatistics
     End Function
+
+    Private Shared Sub GridOverlap(ByVal aGrid1 As MapWinGIS.Grid, ByVal aGrid2 As MapWinGIS.Grid, _
+        ByRef aStartRow1 As Integer, ByVal aEndRow1 As Integer, ByRef aStartCol1 As Integer, ByVal aEndCol1 As Integer, _
+        ByRef aStartRow2 As Integer, ByVal aEndRow2 As Integer, ByRef aStartCol2 As Integer, ByVal aEndCol2 As Integer)
+
+        Dim ldX1 As Double = aGrid1.Header.dX
+        Dim ldY1 As Double = aGrid1.Header.dY
+        Dim ldX2 As Double = aGrid2.Header.dX
+        Dim ldY2 As Double = aGrid2.Header.dY
+
+        'Start with assumption that all rows and columns of both overlap
+        aStartRow1 = 0 : aStartRow2 = 0 : aStartCol1 = 0 : aStartCol2 = 0
+
+        aEndRow1 = aGrid1.Header.NumberRows - 1
+        aEndCol1 = aGrid1.Header.NumberCols - 1
+
+        aEndRow2 = aGrid2.Header.NumberRows - 1
+        aEndCol2 = aGrid2.Header.NumberCols - 1
+
+        Dim lGrid1LeftX, lGrid1RightX, lGrid1TopY, lGrid1BottomY As Double
+        Dim lGrid2LeftX, lGrid2RightX, lGrid2TopY, lGrid2BottomY As Double
+
+        'Find projected location of edges of each grid
+        aGrid1.CellToProj(aStartCol1, aStartRow1, lGrid1LeftX, lGrid1TopY)
+        aGrid2.CellToProj(aStartCol2, aStartRow2, lGrid2LeftX, lGrid2TopY)
+
+        aGrid1.CellToProj(aEndCol1, aEndRow1, lGrid1RightX, lGrid1BottomY)
+        aGrid2.CellToProj(aEndCol2, aEndRow2, lGrid2RightX, lGrid2BottomY)
+
+        If (lGrid1LeftX < lGrid1RightX) AndAlso (lGrid1TopY > lGrid1BottomY) Then
+            If lGrid1LeftX < lGrid2LeftX Then
+                aStartCol1 += Math.Floor((lGrid2LeftX - lGrid1LeftX) / ldX1)
+            Else
+                aStartCol2 += Math.Floor((lGrid1LeftX - lGrid2LeftX) / ldX2)
+            End If
+
+            If lGrid1RightX > lGrid2RightX Then
+                aEndCol1 -= Math.Floor((lGrid2RightX - lGrid1RightX) / ldX1)
+            Else
+                aEndCol2 -= Math.Floor((lGrid1RightX - lGrid2RightX) / ldX2)
+            End If
+
+            If lGrid1TopY > lGrid2TopY Then
+                aStartRow1 += Math.Floor((lGrid1TopY - lGrid2TopY) / ldY1)
+            Else
+                aStartRow2 += Math.Floor((lGrid2TopY - lGrid1TopY) / ldY2)
+            End If
+
+            If lGrid1BottomY < lGrid2BottomY Then
+                aEndRow1 -= Math.Floor((lGrid2BottomY - lGrid1BottomY) / ldY1)
+            Else
+                aEndRow2 -= Math.Floor((lGrid1BottomY - lGrid2BottomY) / ldY2)
+            End If
+        Else
+            Throw New ApplicationException("Grids are not in expected orientation, additional code needed in GridOverlap")
+        End If
+    End Sub
 
     Public Shared Sub GridAssignValues(ByVal aStreamGridFileName As String, ByVal aSubbasinGridFileName As String, ByVal aNewGridFileName As String)
         'to the first grid, assign the values at the coresponding cells of the second grid, and save the result as the third.
