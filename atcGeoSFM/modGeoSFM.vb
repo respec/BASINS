@@ -414,6 +414,8 @@ Public Module modGeoSFM
         '            basinTable.Calculate("0", hasdamfld)
         '        End If
 
+        GisUtil.StatusShow = False
+
         Logger.Status("Computing Zonal Statistics for " + demgname + "........")
         'find average value of demgthm for each unique value of basingthm
         Dim lDemZonalStats As New atcCollection
@@ -483,6 +485,8 @@ Public Module modGeoSFM
         'find average value of maxcovergthm for each unique value of basingthm
         Dim lMaxCoverZonalStats As New atcCollection
         lMaxCoverZonalStats = GisUtil.GridZonalStatisticsMismatched(basingthm, maxcovergthm)
+
+        GisUtil.StatusShow = True
 
         'Sort basins in order of ascending drainage area
         'This ensures that upstream basins are listed before downstream ones
@@ -675,23 +679,23 @@ Public Module modGeoSFM
 
             'HlenZoneVtab
             Dim hlenvalue As String = lHlenZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value '(HlenZoneVtab.ReturnValue(hlenfield, rrecord)).SetFormat("d.d").AsString
-            'If Not IsNumeric(hlenvalue) Then
-            '    hlenvalue = basingrid.GetCellSize
-            'End If
-            'If (hlenvalue < basingrid.GetCellSize) Then
-            '    hlenvalue = basingrid.GetCellSize
-            'End If
+            If Not IsNumeric(hlenvalue) Then
+                hlenvalue = GisUtil.GridGetCellSizeX(basingthm)
+            End If
+            If (hlenvalue < GisUtil.GridGetCellSizeX(basingthm)) Then
+                hlenvalue = GisUtil.GridGetCellSizeX(basingthm)
+            End If
 
             'LengthZoneVtab
             Dim avglength As Single = lLengthZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value - lLengthZonalStats.ItemByKey(basinvalue).GetDefinedValue("Min").Value '(LengthZoneVtab.ReturnValue(Lenfield, rrecord)) - (LengthZoneVtab.ReturnValue(Lenminfield, rrecord))
-            'If (avglength < basingrid.GetCellSize) Then
-            '    avglength = basingrid.GetCellSize
-            'End If
+            If (avglength < GisUtil.GridGetCellSizeX(basingthm)) Then
+                avglength = GisUtil.GridGetCellSizeX(basingthm)
+            End If
 
             'DrainZoneVtab
             Dim drainvalue As Single = lDrainZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value '(DrainZoneVtab.ReturnValue(drainfield, rrecord)).SetFormat("d.ddd").AsString
 
-            Dim upareavalue As Single = facvalue  '((facvalue.asstring.asnumber * facgrid.GetCellSize * facgrid.GetCellSize) / 1000000.0).SetFormat("d.d").asstring
+            Dim upareavalue As Single = (facvalue * GisUtil.GridGetCellSizeX(facgthm) * GisUtil.GridGetCellSizeX(facgthm)) / 1000000.0  '((facvalue.asstring.asnumber * facgrid.GetCellSize * facgrid.GetCellSize) / 1000000.0).SetFormat("d.d").asstring
 
             Dim slopevalue As String = ((avgdrop * 100) / avglength).ToString  '(((avgdrop * 100) / avglength).Format("d.dddd")).AsString
             If Not IsNumeric(slopevalue) Then
@@ -706,11 +710,11 @@ Public Module modGeoSFM
 
             Dim rivlenvalue As String = (lRivlenZonalStats.ItemByKey(basinvalue).GetDefinedValue("Max").Value - lRivlenZonalStats.ItemByKey(basinvalue).GetDefinedValue("Min").Value).ToString  ' (rivlenZoneVtab.ReturnValue(rivlenfield, rrecord)).SetFormat("d.d").AsString
             If Not IsNumeric(rivlenvalue) Then
-                'rivlenvalue = basingrid.GetCellSize.asstring
+                rivlenvalue = GisUtil.GridGetCellSizeX(basingthm).ToString
             End If
-            'If CSng(rivlenvalue) < basingrid.GetCellSize Then
-            ' rivlenvalue = basingrid.GetCellSize.asstring
-            'End If
+            If CSng(rivlenvalue) < GisUtil.GridGetCellSizeX(basingthm) Then
+                rivlenvalue = GisUtil.GridGetCellSizeX(basingthm).ToString
+            End If
 
             ' Assume porosity of 0.439 for medium soil texture in computing max storage for the catchment
             ' Assume both sides of the river (2 * No. of River Cells) are draining at the saturated rate
@@ -755,7 +759,7 @@ Public Module modGeoSFM
             End If
 
             'rivdemZoneVtab
-            Dim rivdropvalue As Single = lRivDemZonalStats.ItemByKey(basinvalue).GetDefinedValue("Max").Value - lRivDemZonalStats.ItemByKey(basinvalue).GetDefinedValue("Min").Value '(rivdemZoneVtab.ReturnValue(rivdemfield, rrecord))
+            Dim rivdropvalue As Single = lRivDemZonalStats.ItemByKey(basinvalue).GetValue("Max") - lRivDemZonalStats.ItemByKey(basinvalue).GetDefinedValue("Min").Value '(rivdemZoneVtab.ReturnValue(rivdemfield, rrecord))
             Dim rivslopevalue As String = ((rivdropvalue * 100) / CStr(rivlenvalue)).ToString   '(((rivdropvalue * 100) / CStr(rivlenvalue)).SetFormat("d.dddd")).AsString
             If Not IsNumeric(rivslopevalue) Then
                 rivslopevalue = "0.0010"
@@ -894,10 +898,10 @@ Public Module modGeoSFM
             End If
 
             'DownZoneVtab
-            Dim downvalue As String = lDownZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mode").Value.ToString '(DownZoneVtab.ReturnValue(downfield, rrecord)).AsString
+            Dim downvalue As String = lDownZonalStats.ItemByKey(basinvalue).GetValue("Mode", "").ToString '(DownZoneVtab.ReturnValue(downfield, rrecord)).AsString
 
             'MaxCoverZoneVtab
-            Dim maxcovervalue As String = (lMaxCoverZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value / 100).ToString '((MaxCoverZoneVtab.ReturnValue(maxcoverfield, rrecord)) / 100).SetFormat("d.ddddd").AsString
+            Dim maxcovervalue As String = (lMaxCoverZonalStats.ItemByKey(basinvalue).GetValue("Mean", GetNaN) / 100).ToString '((MaxCoverZoneVtab.ReturnValue(maxcoverfield, rrecord)) / 100).SetFormat("d.ddddd").AsString
             If CSng(maxcovervalue) <= 0.001 Then
                 maxcovervalue = "0.001"
             ElseIf CSng(maxcovervalue) >= 1 Then

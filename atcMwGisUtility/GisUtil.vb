@@ -1583,8 +1583,12 @@ Public Class GisUtil
     ''' <remarks></remarks>
     Public Shared Function GridZonalStatistics(ByVal aZoneGridIndex As Integer, ByVal aValueGridIndex As Integer) As atcCollection
         Dim lNaN As Double = GetNaN()
+
         Dim lZoneGrid As MapWinGIS.Grid = GridFromIndex(aZoneGridIndex)
+        Dim lNodataZone As Integer = lZoneGrid.Header.NodataValue
+
         Dim lValueGrid As MapWinGIS.Grid = GridFromIndex(aValueGridIndex)
+        Dim lNodataValue As Double = lValueGrid.Header.NodataValue
 
         Dim lStartRow As Integer = 0
         Dim lStartCol As Integer = 0
@@ -1601,18 +1605,25 @@ Public Class GisUtil
         Dim lAreaPerCell As Double = lValueGrid.Header.dX * lValueGrid.Header.dY
 
         Dim lZoneNumber As Integer
+        Dim lValue As Double
         Dim lZonalValues As New atcCollection
         Dim lThisZoneValues As Generic.List(Of Double)
 
         For lRow As Integer = lStartRow To lEndRow
             For lCol As Integer = lStartCol To lEndCol
                 lZoneNumber = lZoneGrid.Value(lCol, lRow)
-                lThisZoneValues = lZonalValues.ItemByKey(lZoneNumber)
-                If lThisZoneValues Is Nothing Then
-                    lThisZoneValues = New Generic.List(Of Double)
-                    lZonalValues.Add(lZoneNumber, lThisZoneValues)
+                If lZoneNumber <> lNodataZone Then
+                    lThisZoneValues = lZonalValues.ItemByKey(lZoneNumber)
+                    If lThisZoneValues Is Nothing Then
+                        lThisZoneValues = New Generic.List(Of Double)
+                        lZonalValues.Add(lZoneNumber, lThisZoneValues)
+                    End If
+                    lValue = lValueGrid.Value(lCol, lRow)
+                    If lValue = lNodataValue Then
+                        lValue = lNaN
+                    End If
+                    lThisZoneValues.Add(lValue)
                 End If
-                lThisZoneValues.Add(lValueGrid.Value(lCol, lRow))
             Next
             If pStatusShow Then Logger.Progress("Computing zonal statistics", lRow, lEndRow)
         Next
@@ -1625,7 +1636,7 @@ Public Class GisUtil
 
             'Find most common value, called "Mode", a.k.a. "Majority"
             Dim lValueTotals As New atcCollection
-            For Each lValue As Double In lThisZoneValues
+            For Each lValue In lThisZoneValues
                 lValueTotals.Increment(lValue)
             Next
             Dim lMode As Double = lNaN
@@ -1643,10 +1654,10 @@ Public Class GisUtil
             Dim lNumCellsInZone As Integer = lTs.Attributes.GetValue("Count") + lTs.Attributes.GetValue("Count Missing")
             If Double.IsNaN(lAreaPerCell) OrElse lAreaPerCell <= 0 Then
                 lTs.Attributes.SetValue("Number Of Cells", lNumCellsInZone)
-                Logger.Dbg("Computed statistics, Zone " & lZoneNumber & " Number Of Cells = " & DoubleToString(lTs.Attributes.GetValue("Number Of Cells")))
+                If pStatusShow Then Logger.Dbg("Computed statistics, Zone " & lZoneNumber & " Number Of Cells = " & DoubleToString(lTs.Attributes.GetValue("Number Of Cells")))
             Else
                 lTs.Attributes.SetValue("Area", lAreaPerCell * lNumCellsInZone)
-                Logger.Dbg("Computed statistics, Zone " & lZoneNumber & " Area = " & DoubleToString(lTs.Attributes.GetValue("Area")))
+                If pStatusShow Then Logger.Dbg("Computed statistics, Zone " & lZoneNumber & " Area = " & DoubleToString(lTs.Attributes.GetValue("Area")))
             End If
 
             If Not Double.IsNaN(lMode) Then
@@ -1689,6 +1700,7 @@ Public Class GisUtil
         Dim lMapY As Double
 
         Dim lZoneNumber As Integer
+        Dim lValue As Double
         Dim lZonalValues As New atcCollection
         Dim lThisZoneValues As Generic.List(Of Double)
 
@@ -1716,10 +1728,11 @@ Public Class GisUtil
                         lZoneGrid.CellToProj(lZoneCol, lZoneRow, lMapX, lMapY)
                         lValueGrid.ProjToCell(lMapX, lMapY, lValueCol, lValueRow)
                         If lValueCol < 0 OrElse lValueCol > lEndValueCol OrElse lValueRow < 0 OrElse lValueRow > lEndValueRow Then
-                            lThisZoneValues.Add(lNodataValue)
+                            lValue = lNaN
                         Else
-                            lThisZoneValues.Add(lValueGrid.Value(lValueCol, lValueRow))
+                            lValue = lValueGrid.Value(lValueCol, lValueRow)
                         End If
+                        lThisZoneValues.Add(lValue)
                     End If
                 Next
                 If pStatusShow Then Logger.Progress("Computing zonal statistics", lZoneRow, lEndZoneRow)
@@ -1727,23 +1740,25 @@ Public Class GisUtil
         Else 'Value grid is finer
             lAreaPerCell = lAreaPerValueCell
             Logger.Dbg("Using value cell area = " & DoubleToString(lAreaPerCell) & " < zone cell area " & DoubleToString(lAreaPerZoneCell))
-            For lValueCol = lStartValueCol To lEndValueCol
-                lValueGrid.CellToProj(lValueCol, lValueRow, lMapX, lMapY)
-                lZoneGrid.ProjToCell(lMapX, lMapY, lZoneCol, lZoneRow)
-                If lZoneCol < 0 OrElse lZoneCol > lEndZoneCol OrElse lZoneRow < 0 OrElse lZoneRow > lEndZoneRow Then
-                    'Skip, not in any zone
-                Else
-                    lZoneNumber = lZoneGrid.Value(lZoneCol, lZoneRow)
-                    If lZoneNumber <> lNodataZone Then
-                        lThisZoneValues = lZonalValues.ItemByKey(lZoneNumber)
-                        If lThisZoneValues Is Nothing Then
-                            lThisZoneValues = New Generic.List(Of Double)
-                            lZonalValues.Add(lZoneNumber, lThisZoneValues)
+            For lValueRow = lStartValueRow To lEndValueRow
+                For lValueCol = lStartValueCol To lEndValueCol
+                    lValueGrid.CellToProj(lValueCol, lValueRow, lMapX, lMapY)
+                    lZoneGrid.ProjToCell(lMapX, lMapY, lZoneCol, lZoneRow)
+                    If lZoneCol < 0 OrElse lZoneCol > lEndZoneCol OrElse lZoneRow < 0 OrElse lZoneRow > lEndZoneRow Then
+                        'Skip, not in any zone
+                    Else
+                        lZoneNumber = lZoneGrid.Value(lZoneCol, lZoneRow)
+                        If lZoneNumber <> lNodataZone Then
+                            lThisZoneValues = lZonalValues.ItemByKey(lZoneNumber)
+                            If lThisZoneValues Is Nothing Then
+                                lThisZoneValues = New Generic.List(Of Double)
+                                lZonalValues.Add(lZoneNumber, lThisZoneValues)
+                            End If
+                            lThisZoneValues.Add(lValueGrid.Value(lValueCol, lValueRow))
                         End If
-                        lThisZoneValues.Add(lValueGrid.Value(lValueCol, lValueRow))
                     End If
-                End If
-                If pStatusShow Then Logger.Progress("Computing zonal statistics", lValueCol, lEndValueCol)
+                Next
+                If pStatusShow Then Logger.Progress("Computing zonal statistics", lValueRow, lEndValueRow)
             Next
         End If
 
@@ -1755,7 +1770,7 @@ Public Class GisUtil
 
             'Find most common value, called "Mode", a.k.a. "Majority"
             Dim lValueTotals As New atcCollection
-            For Each lValue As Double In lThisZoneValues
+            For Each lValue In lThisZoneValues
                 lValueTotals.Increment(lValue)
             Next
             Dim lMode As Double = lNaN
@@ -1773,10 +1788,10 @@ Public Class GisUtil
             Dim lNumCellsInZone As Integer = lTs.Attributes.GetValue("Count") + lTs.Attributes.GetValue("Count Missing")
             If Double.IsNaN(lAreaPerCell) OrElse lAreaPerCell <= 0 Then
                 lTs.Attributes.SetValue("Number Of Cells", lNumCellsInZone)
-                Logger.Dbg("Computed statistics, Zone " & lZoneNumber & " Number Of Cells = " & DoubleToString(lTs.Attributes.GetValue("Number Of Cells")))
+                If pStatusShow Then Logger.Dbg("Computed statistics, Zone " & lZoneNumber & " Number Of Cells = " & DoubleToString(lTs.Attributes.GetValue("Number Of Cells")))
             Else
                 lTs.Attributes.SetValue("Area", lAreaPerCell * lNumCellsInZone)
-                Logger.Dbg("Computed statistics, Zone " & lZoneNumber & " Area = " & DoubleToString(lTs.Attributes.GetValue("Area")))
+                If pStatusShow Then Logger.Dbg("Computed statistics, Zone " & lZoneNumber & " Area = " & DoubleToString(lTs.Attributes.GetValue("Area")))
             End If
 
             If Not Double.IsNaN(lMode) Then
@@ -2151,6 +2166,16 @@ Public Class GisUtil
         lOutputGrid.Save()
         lOutputGrid = Nothing
     End Sub
+
+    Public Shared Function GridGetCellSizeX(ByVal aGridLayerIndex As Integer) As Double
+        Dim lGrid As MapWinGIS.Grid = GridFromIndex(aGridLayerIndex)
+        Return lGrid.Header.dX
+    End Function
+
+    Public Shared Function GridGetCellSizeY(ByVal aGridLayerIndex As String) As Double
+        Dim lGrid As MapWinGIS.Grid = GridFromIndex(aGridLayerIndex)
+        Return lGrid.Header.dY
+    End Function
 
     ''' <summary>Overlay Layer1 and Layer2 (eg landuse and subbasins), creating a polygon layer containing features from both layers</summary>
     ''' <param name="aLayer1Name">
