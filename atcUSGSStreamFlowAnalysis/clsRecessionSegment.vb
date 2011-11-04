@@ -1,6 +1,7 @@
 ﻿Imports atcData
 
 Public Class clsRecessionSegment
+    Implements IComparable
 
     Public Shared RecessionCount As Integer
     Public Shared StreamFlowTS As atcTimeseries
@@ -10,23 +11,29 @@ Public Class clsRecessionSegment
     Public SegmentLength As Integer
     Public Coefficient1 As Double
     Public Coefficient2 As Double
-    Public MeanLogQ As Double
     Public DaysLogCycle As Double = -1 * Coefficient1
     Public MinDayOrdinal As Integer
     Public MaxDayOrdinal As Integer
     Public IsExcluded As Boolean = False
+    Public NeedtoReadData As Boolean = True
+    Public MeanLogQ As Double
+    Public MeanOrdinals As Double
 
     'for display
-    Public BestFitEquation As String = " T = ( " & String.Format("{0:0.0000}", Coefficient1).PadLeft(12, " ") & "* LOGQ )  +  " & String.Format("{0:0.0000}", Coefficient2).PadLeft(12, " ")
+    Public ReadOnly Property BestFitEquation() As String
+        Get
+            Return " T = ( " & String.Format("{0:0.0000}", Coefficient1).PadLeft(12, " ") & "* LOGQ )  +  " & String.Format("{0:0.0000}", Coefficient2).PadLeft(12, " ")
+        End Get
+    End Property
 
     Public Flow() As Double
     Public QLog() As Double
     Public Dates() As Double
 
     Public Sub New()
-        ReDim Flow(MaxSegmentLengthInDays)
-        ReDim QLog(MaxSegmentLengthInDays)
-        ReDim Dates(MaxSegmentLengthInDays)
+        'ReDim Flow(MaxSegmentLengthInDays)
+        'ReDim QLog(MaxSegmentLengthInDays)
+        'ReDim Dates(MaxSegmentLengthInDays)
     End Sub
 
     Public Sub GetData()
@@ -47,6 +54,7 @@ Public Class clsRecessionSegment
             End If
             Dates(I) = StreamFlowTS.Dates.Value(I + PeakDayIndex - 1)
         Next 'loop 220
+        NeedtoReadData = False
     End Sub
 
     Public Sub GetDataSubset()
@@ -99,4 +107,11 @@ Public Class clsRecessionSegment
         ReDim Dates(0)
     End Sub
 
+    Public Function CompareTo(ByVal obj As Object) As Integer Implements System.IComparable.CompareTo
+        If TypeOf obj Is clsRecessionSegment Then
+            Dim aSeg As clsRecessionSegment = CType(obj, clsRecessionSegment)
+            Return MeanLogQ.CompareTo(aSeg.MeanLogQ)
+        End If
+        Throw New ArgumentException("object is not a clsRecessionSegment")
+    End Function
 End Class
