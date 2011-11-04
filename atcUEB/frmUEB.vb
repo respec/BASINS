@@ -166,6 +166,8 @@ Public Class frmUEB
         Me.AtcTextIniEnergyContent = New atcControls.atcText()
         Me.AtcTextIniWaterEquiv = New atcControls.atcText()
         Me.TabPage3 = New System.Windows.Forms.TabPage()
+        Me.cboNetRadStation = New System.Windows.Forms.ComboBox()
+        Me.lblNetRadStation = New System.Windows.Forms.Label()
         Me.cboShortRadStation = New System.Windows.Forms.ComboBox()
         Me.lblShortRadStation = New System.Windows.Forms.Label()
         Me.cboRelHStation = New System.Windows.Forms.ComboBox()
@@ -198,8 +200,14 @@ Public Class frmUEB
         Me.AtcTextSMonth = New atcControls.atcText()
         Me.AtcTextEYear = New atcControls.atcText()
         Me.TabPage7 = New System.Windows.Forms.TabPage()
+        Me.AtcGridModelParms = New atcControls.atcGrid()
         Me.TabPage8 = New System.Windows.Forms.TabPage()
+        Me.AtcGridSiteVars = New atcControls.atcGrid()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
+        Me.AtcTextCParm = New atcControls.atcText()
+        Me.AtcTextAParm = New atcControls.atcText()
+        Me.lblCParm = New System.Windows.Forms.Label()
+        Me.lblAParm = New System.Windows.Forms.Label()
         Me.AtcGridBCMonthly = New atcControls.atcGrid()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.lblStatus = New System.Windows.Forms.Label()
@@ -256,14 +264,6 @@ Public Class frmUEB
         Me.Label45 = New System.Windows.Forms.Label()
         Me.ComboBox39 = New System.Windows.Forms.ComboBox()
         Me.cmdSimulate = New System.Windows.Forms.Button()
-        Me.lblNetRadStation = New System.Windows.Forms.Label()
-        Me.cboNetRadStation = New System.Windows.Forms.ComboBox()
-        Me.AtcGridModelParms = New atcControls.atcGrid()
-        Me.AtcGridSiteVars = New atcControls.atcGrid()
-        Me.lblAParm = New System.Windows.Forms.Label()
-        Me.lblCParm = New System.Windows.Forms.Label()
-        Me.AtcTextAParm = New atcControls.atcText()
-        Me.AtcTextCParm = New atcControls.atcText()
         Me.TabControl1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
@@ -506,6 +506,26 @@ Public Class frmUEB
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Weather"
         Me.TabPage3.UseVisualStyleBackColor = True
+        '
+        'cboNetRadStation
+        '
+        Me.cboNetRadStation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboNetRadStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboNetRadStation.FormattingEnabled = True
+        Me.cboNetRadStation.Location = New System.Drawing.Point(213, 366)
+        Me.cboNetRadStation.Name = "cboNetRadStation"
+        Me.cboNetRadStation.Size = New System.Drawing.Size(286, 21)
+        Me.cboNetRadStation.TabIndex = 42
+        '
+        'lblNetRadStation
+        '
+        Me.lblNetRadStation.AutoSize = True
+        Me.lblNetRadStation.Location = New System.Drawing.Point(16, 369)
+        Me.lblNetRadStation.Name = "lblNetRadStation"
+        Me.lblNetRadStation.Size = New System.Drawing.Size(111, 13)
+        Me.lblNetRadStation.TabIndex = 41
+        Me.lblNetRadStation.Text = "Net Radiation Station:"
         '
         'cboShortRadStation
         '
@@ -960,6 +980,23 @@ Public Class frmUEB
         Me.TabPage7.Text = "Model Parameters"
         Me.TabPage7.UseVisualStyleBackColor = True
         '
+        'AtcGridModelParms
+        '
+        Me.AtcGridModelParms.AllowHorizontalScrolling = True
+        Me.AtcGridModelParms.AllowNewValidValues = False
+        Me.AtcGridModelParms.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridModelParms.CellBackColor = System.Drawing.SystemColors.Window
+        Me.AtcGridModelParms.Fixed3D = False
+        Me.AtcGridModelParms.LineColor = System.Drawing.SystemColors.Control
+        Me.AtcGridModelParms.LineWidth = 1.0!
+        Me.AtcGridModelParms.Location = New System.Drawing.Point(3, 13)
+        Me.AtcGridModelParms.Name = "AtcGridModelParms"
+        Me.AtcGridModelParms.Size = New System.Drawing.Size(511, 376)
+        Me.AtcGridModelParms.Source = Nothing
+        Me.AtcGridModelParms.TabIndex = 0
+        '
         'TabPage8
         '
         Me.TabPage8.Controls.Add(Me.AtcGridSiteVars)
@@ -969,6 +1006,23 @@ Public Class frmUEB
         Me.TabPage8.TabIndex = 9
         Me.TabPage8.Text = "Site Variables"
         Me.TabPage8.UseVisualStyleBackColor = True
+        '
+        'AtcGridSiteVars
+        '
+        Me.AtcGridSiteVars.AllowHorizontalScrolling = True
+        Me.AtcGridSiteVars.AllowNewValidValues = False
+        Me.AtcGridSiteVars.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridSiteVars.CellBackColor = System.Drawing.SystemColors.Window
+        Me.AtcGridSiteVars.Fixed3D = False
+        Me.AtcGridSiteVars.LineColor = System.Drawing.SystemColors.Control
+        Me.AtcGridSiteVars.LineWidth = 1.0!
+        Me.AtcGridSiteVars.Location = New System.Drawing.Point(3, 3)
+        Me.AtcGridSiteVars.Name = "AtcGridSiteVars"
+        Me.AtcGridSiteVars.Size = New System.Drawing.Size(515, 395)
+        Me.AtcGridSiteVars.Source = Nothing
+        Me.AtcGridSiteVars.TabIndex = 0
         '
         'TabPage1
         '
@@ -984,6 +1038,70 @@ Public Class frmUEB
         Me.TabPage1.Text = "Bristow Campbell Parameters"
         Me.TabPage1.UseVisualStyleBackColor = True
         '
+        'AtcTextCParm
+        '
+        Me.AtcTextCParm.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextCParm.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.AtcTextCParm.DefaultValue = ""
+        Me.AtcTextCParm.HardMax = -999.0R
+        Me.AtcTextCParm.HardMin = -999.0R
+        Me.AtcTextCParm.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextCParm.Location = New System.Drawing.Point(321, 21)
+        Me.AtcTextCParm.MaxWidth = 20
+        Me.AtcTextCParm.Name = "AtcTextCParm"
+        Me.AtcTextCParm.NumericFormat = "0.#####"
+        Me.AtcTextCParm.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextCParm.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextCParm.SelLength = 0
+        Me.AtcTextCParm.SelStart = 0
+        Me.AtcTextCParm.Size = New System.Drawing.Size(97, 20)
+        Me.AtcTextCParm.SoftMax = -999.0R
+        Me.AtcTextCParm.SoftMin = -999.0R
+        Me.AtcTextCParm.TabIndex = 55
+        Me.AtcTextCParm.ValueDouble = 0.0R
+        Me.AtcTextCParm.ValueInteger = 0
+        '
+        'AtcTextAParm
+        '
+        Me.AtcTextAParm.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextAParm.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.AtcTextAParm.DefaultValue = ""
+        Me.AtcTextAParm.HardMax = -999.0R
+        Me.AtcTextAParm.HardMin = -999.0R
+        Me.AtcTextAParm.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextAParm.Location = New System.Drawing.Point(108, 21)
+        Me.AtcTextAParm.MaxWidth = 20
+        Me.AtcTextAParm.Name = "AtcTextAParm"
+        Me.AtcTextAParm.NumericFormat = "0.#####"
+        Me.AtcTextAParm.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextAParm.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextAParm.SelLength = 0
+        Me.AtcTextAParm.SelStart = 0
+        Me.AtcTextAParm.Size = New System.Drawing.Size(97, 20)
+        Me.AtcTextAParm.SoftMax = -999.0R
+        Me.AtcTextAParm.SoftMin = -999.0R
+        Me.AtcTextAParm.TabIndex = 54
+        Me.AtcTextAParm.ValueDouble = 0.0R
+        Me.AtcTextAParm.ValueInteger = 0
+        '
+        'lblCParm
+        '
+        Me.lblCParm.AutoSize = True
+        Me.lblCParm.Location = New System.Drawing.Point(247, 21)
+        Me.lblCParm.Name = "lblCParm"
+        Me.lblCParm.Size = New System.Drawing.Size(68, 13)
+        Me.lblCParm.TabIndex = 53
+        Me.lblCParm.Text = "Parameter C:"
+        '
+        'lblAParm
+        '
+        Me.lblAParm.AutoSize = True
+        Me.lblAParm.Location = New System.Drawing.Point(34, 21)
+        Me.lblAParm.Name = "lblAParm"
+        Me.lblAParm.Size = New System.Drawing.Size(68, 13)
+        Me.lblAParm.TabIndex = 52
+        Me.lblAParm.Text = "Parameter A:"
+        '
         'AtcGridBCMonthly
         '
         Me.AtcGridBCMonthly.AllowHorizontalScrolling = True
@@ -996,9 +1114,9 @@ Public Class frmUEB
         Me.AtcGridBCMonthly.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.AtcGridBCMonthly.LineColor = System.Drawing.Color.Empty
         Me.AtcGridBCMonthly.LineWidth = 0.0!
-        Me.AtcGridBCMonthly.Location = New System.Drawing.Point(12, 65)
+        Me.AtcGridBCMonthly.Location = New System.Drawing.Point(0, 65)
         Me.AtcGridBCMonthly.Name = "AtcGridBCMonthly"
-        Me.AtcGridBCMonthly.Size = New System.Drawing.Size(502, 324)
+        Me.AtcGridBCMonthly.Size = New System.Drawing.Size(521, 324)
         Me.AtcGridBCMonthly.Source = Nothing
         Me.AtcGridBCMonthly.TabIndex = 51
         '
@@ -1609,124 +1727,6 @@ Public Class frmUEB
         Me.cmdSimulate.TabIndex = 10
         Me.cmdSimulate.Text = "Simulate"
         '
-        'lblNetRadStation
-        '
-        Me.lblNetRadStation.AutoSize = True
-        Me.lblNetRadStation.Location = New System.Drawing.Point(16, 369)
-        Me.lblNetRadStation.Name = "lblNetRadStation"
-        Me.lblNetRadStation.Size = New System.Drawing.Size(111, 13)
-        Me.lblNetRadStation.TabIndex = 41
-        Me.lblNetRadStation.Text = "Net Radiation Station:"
-        '
-        'cboNetRadStation
-        '
-        Me.cboNetRadStation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboNetRadStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboNetRadStation.FormattingEnabled = True
-        Me.cboNetRadStation.Location = New System.Drawing.Point(213, 366)
-        Me.cboNetRadStation.Name = "cboNetRadStation"
-        Me.cboNetRadStation.Size = New System.Drawing.Size(286, 21)
-        Me.cboNetRadStation.TabIndex = 42
-        '
-        'AtcGridModelParms
-        '
-        Me.AtcGridModelParms.AllowHorizontalScrolling = True
-        Me.AtcGridModelParms.AllowNewValidValues = False
-        Me.AtcGridModelParms.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridModelParms.CellBackColor = System.Drawing.SystemColors.Window
-        Me.AtcGridModelParms.Fixed3D = False
-        Me.AtcGridModelParms.LineColor = System.Drawing.SystemColors.Control
-        Me.AtcGridModelParms.LineWidth = 1.0!
-        Me.AtcGridModelParms.Location = New System.Drawing.Point(12, 13)
-        Me.AtcGridModelParms.Name = "AtcGridModelParms"
-        Me.AtcGridModelParms.Size = New System.Drawing.Size(481, 376)
-        Me.AtcGridModelParms.Source = Nothing
-        Me.AtcGridModelParms.TabIndex = 0
-        '
-        'AtcGridSiteVars
-        '
-        Me.AtcGridSiteVars.AllowHorizontalScrolling = True
-        Me.AtcGridSiteVars.AllowNewValidValues = False
-        Me.AtcGridSiteVars.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridSiteVars.CellBackColor = System.Drawing.SystemColors.Window
-        Me.AtcGridSiteVars.Fixed3D = False
-        Me.AtcGridSiteVars.LineColor = System.Drawing.SystemColors.Control
-        Me.AtcGridSiteVars.LineWidth = 1.0!
-        Me.AtcGridSiteVars.Location = New System.Drawing.Point(38, 3)
-        Me.AtcGridSiteVars.Name = "AtcGridSiteVars"
-        Me.AtcGridSiteVars.Size = New System.Drawing.Size(442, 395)
-        Me.AtcGridSiteVars.Source = Nothing
-        Me.AtcGridSiteVars.TabIndex = 0
-        '
-        'lblAParm
-        '
-        Me.lblAParm.AutoSize = True
-        Me.lblAParm.Location = New System.Drawing.Point(34, 21)
-        Me.lblAParm.Name = "lblAParm"
-        Me.lblAParm.Size = New System.Drawing.Size(68, 13)
-        Me.lblAParm.TabIndex = 52
-        Me.lblAParm.Text = "Parameter A:"
-        '
-        'lblCParm
-        '
-        Me.lblCParm.AutoSize = True
-        Me.lblCParm.Location = New System.Drawing.Point(247, 21)
-        Me.lblCParm.Name = "lblCParm"
-        Me.lblCParm.Size = New System.Drawing.Size(68, 13)
-        Me.lblCParm.TabIndex = 53
-        Me.lblCParm.Text = "Parameter C:"
-        '
-        'AtcTextAParm
-        '
-        Me.AtcTextAParm.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcTextAParm.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.AtcTextAParm.DefaultValue = ""
-        Me.AtcTextAParm.HardMax = -999.0R
-        Me.AtcTextAParm.HardMin = -999.0R
-        Me.AtcTextAParm.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcTextAParm.Location = New System.Drawing.Point(108, 21)
-        Me.AtcTextAParm.MaxWidth = 20
-        Me.AtcTextAParm.Name = "AtcTextAParm"
-        Me.AtcTextAParm.NumericFormat = "0.#####"
-        Me.AtcTextAParm.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcTextAParm.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcTextAParm.SelLength = 0
-        Me.AtcTextAParm.SelStart = 0
-        Me.AtcTextAParm.Size = New System.Drawing.Size(97, 20)
-        Me.AtcTextAParm.SoftMax = -999.0R
-        Me.AtcTextAParm.SoftMin = -999.0R
-        Me.AtcTextAParm.TabIndex = 54
-        Me.AtcTextAParm.ValueDouble = 0.0R
-        Me.AtcTextAParm.ValueInteger = 0
-        '
-        'AtcTextCParm
-        '
-        Me.AtcTextCParm.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcTextCParm.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.AtcTextCParm.DefaultValue = ""
-        Me.AtcTextCParm.HardMax = -999.0R
-        Me.AtcTextCParm.HardMin = -999.0R
-        Me.AtcTextCParm.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcTextCParm.Location = New System.Drawing.Point(321, 21)
-        Me.AtcTextCParm.MaxWidth = 20
-        Me.AtcTextCParm.Name = "AtcTextCParm"
-        Me.AtcTextCParm.NumericFormat = "0.#####"
-        Me.AtcTextCParm.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcTextCParm.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcTextCParm.SelLength = 0
-        Me.AtcTextCParm.SelStart = 0
-        Me.AtcTextCParm.Size = New System.Drawing.Size(97, 20)
-        Me.AtcTextCParm.SoftMax = -999.0R
-        Me.AtcTextCParm.SoftMin = -999.0R
-        Me.AtcTextCParm.TabIndex = 55
-        Me.AtcTextCParm.ValueDouble = 0.0R
-        Me.AtcTextCParm.ValueInteger = 0
-        '
         'frmUEB
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -1799,38 +1799,11 @@ Public Class frmUEB
             .ColorCells = True
             .FixedRows = 1
             .FixedColumns = 1
-            .CellColor(0, 0) = SystemColors.ControlDark
-            .CellColor(1, 0) = SystemColors.ControlDark
-            .CellColor(2, 0) = SystemColors.ControlDark
-            .CellColor(3, 0) = SystemColors.ControlDark
-            .CellColor(4, 0) = SystemColors.ControlDark
-            .CellColor(5, 0) = SystemColors.ControlDark
-            .CellColor(6, 0) = SystemColors.ControlDark
-            .CellColor(7, 0) = SystemColors.ControlDark
-            .CellColor(8, 0) = SystemColors.ControlDark
-            .CellColor(9, 0) = SystemColors.ControlDark
-            .CellColor(10, 0) = SystemColors.ControlDark
-            .CellColor(11, 0) = SystemColors.ControlDark
-            .CellColor(12, 0) = SystemColors.ControlDark
-            .CellColor(13, 0) = SystemColors.ControlDark
-            .CellColor(14, 0) = SystemColors.ControlDark
-            .CellColor(15, 0) = SystemColors.ControlDark
-            .CellColor(16, 0) = SystemColors.ControlDark
-            .CellColor(17, 0) = SystemColors.ControlDark
-            .CellColor(18, 0) = SystemColors.ControlDark
-            .CellColor(19, 0) = SystemColors.ControlDark
-            .CellColor(20, 0) = SystemColors.ControlDark
-            .CellColor(21, 0) = SystemColors.ControlDark
-            .CellColor(22, 0) = SystemColors.ControlDark
-            .CellColor(23, 0) = SystemColors.ControlDark
-            .CellColor(24, 0) = SystemColors.ControlDark
-            .CellColor(25, 0) = SystemColors.ControlDark
-            .CellColor(26, 0) = SystemColors.ControlDark
-            .CellColor(27, 0) = SystemColors.ControlDark
-            .CellColor(28, 0) = SystemColors.ControlDark
-            .CellColor(29, 0) = SystemColors.ControlDark
-            .CellColor(30, 0) = SystemColors.ControlDark
             .Rows = 31
+            For i As Integer = 0 To .Rows - 1
+                .CellColor(i, 0) = SystemColors.ControlDark
+                .CellEditable(i, 1) = True
+            Next
             .CellValue(0, 0) = "Model Parameter"
             .CellValue(0, 1) = "Value"
             .CellValue(1, 0) = "Temp above which all precip is rain, deg C"
@@ -1864,6 +1837,7 @@ Public Class frmUEB
             .CellValue(29, 0) = "New snow near infrared band reflectance"
             .CellValue(30, 0) = "Stability correction control parameter"
         End With
+        AtcGridModelParms.ColumnWidth(0) = 300
 
         With AtcGridSiteVars
             .Source = New atcControls.atcGridSource
@@ -1875,16 +1849,11 @@ Public Class frmUEB
             .ColorCells = True
             .FixedRows = 1
             .FixedColumns = 1
-            .CellColor(0, 0) = SystemColors.ControlDark
-            .CellColor(1, 0) = SystemColors.ControlDark
-            .CellColor(2, 0) = SystemColors.ControlDark
-            .CellColor(3, 0) = SystemColors.ControlDark
-            .CellColor(4, 0) = SystemColors.ControlDark
-            .CellColor(5, 0) = SystemColors.ControlDark
-            .CellColor(6, 0) = SystemColors.ControlDark
-            .CellColor(7, 0) = SystemColors.ControlDark
-            .CellColor(8, 0) = SystemColors.ControlDark
             .Rows = 9
+            For i As Integer = 0 To .Rows - 1
+                .CellColor(i, 0) = SystemColors.ControlDark
+                .CellEditable(i, 1) = True
+            Next
             .CellValue(0, 0) = "Site Variable"
             .CellValue(0, 1) = "Value"
             .CellValue(1, 0) = "Forest cover fraction"
@@ -1896,6 +1865,7 @@ Public Class frmUEB
             .CellValue(7, 0) = "Aspect, degrees from North"
             .CellValue(8, 0) = "Latitude, degrees"
         End With
+        AtcGridSiteVars.ColumnWidth(0) = 300
 
         With AtcGridBCMonthly
             .Source = New atcControls.atcGridSource
@@ -1907,20 +1877,11 @@ Public Class frmUEB
             .ColorCells = True
             .FixedRows = 1
             .FixedColumns = 1
-            .CellColor(0, 0) = SystemColors.ControlDark
-            .CellColor(1, 0) = SystemColors.ControlDark
-            .CellColor(2, 0) = SystemColors.ControlDark
-            .CellColor(3, 0) = SystemColors.ControlDark
-            .CellColor(4, 0) = SystemColors.ControlDark
-            .CellColor(5, 0) = SystemColors.ControlDark
-            .CellColor(6, 0) = SystemColors.ControlDark
-            .CellColor(7, 0) = SystemColors.ControlDark
-            .CellColor(8, 0) = SystemColors.ControlDark
-            .CellColor(9, 0) = SystemColors.ControlDark
-            .CellColor(10, 0) = SystemColors.ControlDark
-            .CellColor(11, 0) = SystemColors.ControlDark
-            .CellColor(12, 0) = SystemColors.ControlDark
             .Rows = 13
+            For i As Integer = 0 To .Rows - 1
+                .CellColor(i, 0) = SystemColors.ControlDark
+                .CellEditable(i, 1) = True
+            Next
             .CellValue(0, 0) = "Month"
             .CellValue(0, 1) = "Avg. diurnal temp range"
             .CellValue(1, 0) = "January"
@@ -1936,6 +1897,7 @@ Public Class frmUEB
             .CellValue(11, 0) = "November"
             .CellValue(12, 0) = "December"
         End With
+        AtcGridBCMonthly.ColumnWidth(0) = 300
     End Sub
 
     Private Sub lblStatus_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lblStatus.TextChanged
