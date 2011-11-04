@@ -65,6 +65,18 @@
     <Compile Include="clsRecess.vb" />
     <Compile Include="clsRecessionSegment.vb" />
     <Compile Include="clsUSGSStreamFlowAnalysis.vb" />
+    <Compile Include="frmDataSummary.Designer.vb">
+      <DependentUpon>frmDataSummary.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmDataSummary.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmRecess.Designer.vb">
+      <DependentUpon>frmRecess.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmRecess.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmUSGSStreamFlowAnalysis.Designer.vb">
       <DependentUpon>frmUSGSStreamFlowAnalysis.vb</DependentUpon>
     </Compile>
@@ -88,6 +100,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmDataSummary.resx">
+      <DependentUpon>frmDataSummary.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmRecess.resx">
+      <DependentUpon>frmRecess.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmUSGSStreamFlowAnalysis.resx">
       <DependentUpon>frmUSGSStreamFlowAnalysis.vb</DependentUpon>
     </EmbeddedResource>
@@ -128,6 +146,11 @@
     <ProjectReference Include="..\atcTimeseriesRDB\atcTimeseriesRDB.vbproj">
       <Project>{EA68C9C7-8A7A-4EDF-8944-413E4E7FA276}</Project>
       <Name>atcTimeseriesRDB</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUSGSUtility\atcUSGSUtility.vbproj">
+      <Project>{4DBC8159-1072-41FA-9242-933E12A88EE6}</Project>
+      <Name>atcUSGSUtility</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">

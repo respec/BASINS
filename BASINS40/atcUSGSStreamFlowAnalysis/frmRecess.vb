@@ -1,5 +1,6 @@
 ﻿Imports atcData
 Imports atcUtility
+Imports atcUSGSUtility
 Imports MapWinUtility
 Imports atcTimeseriesRDB
 Imports atcGraph
@@ -8,8 +9,7 @@ Imports ZedGraph
 Imports System.Windows.Forms
 Imports System.Text.RegularExpressions
 
-Public Class frmUSGSStreamFlowAnalysis
-
+Public Class frmRecess
     'Form object that contains graph(s)
     Private pMaster As ZedGraph.MasterPane
     Private pAuxEnabled As Boolean = False
@@ -23,14 +23,33 @@ Public Class frmUSGSStreamFlowAnalysis
 
     Private pRecess As clsRecess
 
+    Private pDateFormat As atcDateFormat
+    Private pYearStartMonth As Integer = 0
+    Private pYearStartDay As Integer = 0
+    Private pYearEndMonth As Integer = 0
+    Private pYearEndDay As Integer = 0
+    Private pFirstYear As Integer = 0
+    Private pLastYear As Integer = 0
+    Private pSeason As String = ""
+
+    Private pCommonStart As Double = GetMinValue()
+    Private pCommonEnd As Double = GetMaxValue()
+    Private Const pNoDatesInCommon As String = ": No dates in common"
+    Private pAnalysisOverCommonDuration As Boolean = True
+
+    Private pOutputDir As String = ""
+    Private pMinRecessLength As String = ""
+
+    Public Opened As Boolean = False
+
     Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing, _
                       Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing, _
                       Optional ByVal aShowForm As Boolean = True)
         pDataGroup = aTimeseriesGroup
         pGraphRecessDatagroup = New atcTimeseriesGroup()
-        pRecess = New clsRecess(pDataGroup(0))
         SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
         InitMasterPane()
+        PopulateForm()
         Me.Show()
     End Sub
 
@@ -66,6 +85,61 @@ Public Class frmUSGSStreamFlowAnalysis
         pZgc.AxisChange()
         Invalidate()
         Refresh()
+    End Sub
+
+    Private Sub PopulateForm()
+        pDateFormat = New atcDateFormat
+        With pDateFormat
+            .IncludeHours = False
+            .IncludeMinutes = False
+            .IncludeSeconds = False
+        End With
+
+        pOutputDir = GetSetting("atcUSGSRecess", "Defaults", "OutputDir", "")
+        pMinRecessLength = GetSetting("atcUSGSRecess", "Defaults", "MinRecessLength", "")
+        RepopulateForm()
+    End Sub
+
+    Private Sub RepopulateForm()
+        Dim lFirstDate As Double = GetMaxValue()
+        Dim lLastDate As Double = GetMinValue()
+
+        pCommonStart = GetMinValue()
+        pCommonEnd = GetMaxValue()
+
+        Dim lAllText As String = "All"
+        Dim lCommonText As String = "Common"
+
+        For Each lDataset As atcData.atcTimeseries In pDataGroup
+            If lDataset.Dates.numValues > 0 Then
+                Dim lThisDate As Double = lDataset.Dates.Value(0)
+                If lThisDate < lFirstDate Then lFirstDate = lThisDate
+                If lThisDate > pCommonStart Then pCommonStart = lThisDate
+                lThisDate = lDataset.Dates.Value(lDataset.Dates.numValues)
+                If lThisDate > lLastDate Then lLastDate = lThisDate
+                If lThisDate < pCommonEnd Then pCommonEnd = lThisDate
+            End If
+        Next
+
+        If lFirstDate < GetMaxValue() AndAlso lLastDate > GetMinValue() Then
+            If txtDataStart.Tag IsNot Nothing AndAlso txtDataEnd.Tag IsNot Nothing Then
+                txtDataStart.Text = txtDataStart.Tag & " " & pDateFormat.JDateToString(lFirstDate + 1)
+                txtDataEnd.Text = txtDataEnd.Tag & " " & pDateFormat.JDateToString(lLastDate)
+            Else
+                txtDataStart.Text = pDateFormat.JDateToString(lFirstDate + 1)
+                txtDataEnd.Text = pDateFormat.JDateToString(lLastDate)
+            End If
+            lAllText &= ": " & pDateFormat.JDateToString(lFirstDate + 1) & " to " & pDateFormat.JDateToString(lLastDate)
+        End If
+
+        If pCommonStart > GetMinValue() AndAlso pCommonEnd < GetMaxValue() AndAlso pCommonStart < pCommonEnd Then
+            lCommonText &= ": " & pDateFormat.JDateToString(pCommonStart + 1) & " to " & pDateFormat.JDateToString(pCommonEnd)
+        Else
+            lCommonText &= pNoDatesInCommon
+        End If
+
+        txtOutputDir.Text = pOutputDir
+        txtMinRecessionDays.Text = pMinRecessLength
     End Sub
 
     Public Sub Recess()
@@ -483,7 +557,7 @@ Public Class frmUSGSStreamFlowAnalysis
         Next 'original loop 200
 
         '----------CONTINUE AFTER RECESSION PERIODS HAVE BEEN SELECTED:-------
-        Dim lNumbrII As Integer = II 'within 3000
+        Dim lNumbrII As Integer = II
         Dim liiDV As Integer = 0
         For Z As Integer = 1 To lNumbrII 'loop 270
             If lXX(Z) <> 0 And lYY(Z) <> 0 And lXX(Z) <> -99 And lYY(Z) <> -99 Then
@@ -961,6 +1035,7 @@ Public Class frmUSGSStreamFlowAnalysis
             '.YAxis.Type = AxisType.Log
             .AxisChange()
             .CurveList.Item(0).Color = Drawing.Color.Red
+            .Legend.IsVisible = False
             '.CurveList.Item(1).Color = Drawing.Color.DarkBlue
             'CType(.CurveList.Item(1), LineItem).Line.Width = 2
         End With
@@ -1084,35 +1159,344 @@ Public Class frmUSGSStreamFlowAnalysis
         End If
     End Sub
 
-    Private Sub btnTable_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTable.Click
-        pRecess.RecessAnalysis("d")
-        txtDisplayText.Text = pRecess.Table
+    Private Sub btnGetAllSegments_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGetAllSegments.Click
+        Dim lArgs As New atcDataAttributes
+        Dim lFormCheckMsg As String = AttributesFromForm(lArgs)
+        If lFormCheckMsg.Length > 0 Then
+            Logger.Msg("Please address the following issues before proceed:" & vbCrLf & vbCrLf & lFormCheckMsg, MsgBoxStyle.Information, "Input Needs Correction")
+            Exit Sub
+        End If
+
+        If pRecess IsNot Nothing Then
+            pRecess.Clear()
+            pRecess = Nothing
+        End If
+
+        pRecess = New clsRecess(pDataGroup(0), lArgs)
+        pRecess.RecessGetAllSegments()
+        lstRecessSegments.Items.Clear()
+        For Each lPeakDate As String In pRecess.listOfSegments.Keys
+            lstRecessSegments.Items.Add(lPeakDate)
+        Next
+    End Sub
+
+    Private Function AttributesFromForm(ByRef Args As atcDataAttributes) As String
+        'check validity of inputs
+        Dim lErrMsg As String = ""
+
+        Dim lSDate As Double = StartDateFromForm()
+        Dim lEDate As Double = EndDateFromForm()
+        If pDataGroup.Count = 0 Then
+            lErrMsg &= "- No streamflow data selected" & vbCrLf
+        Else
+            If lSDate < 0 OrElse lEDate < 0 Then
+                lErrMsg &= "- Problematic start and/or end date." & vbCrLf
+            Else
+                Dim lTs As atcTimeseries = Nothing
+                For Each lTs In pDataGroup
+                    Try
+                        lTs = SubsetByDate(lTs, lSDate, lEDate, Nothing)
+                        If lTs.Attributes.GetValue("Count missing") > 0 Then
+                            lErrMsg &= "- Selected Dataset has gaps." & vbCrLf
+                            lTs.Clear()
+                            Exit For
+                        Else
+                            lTs.Clear()
+                        End If
+                    Catch ex As Exception
+                        lErrMsg &= "- Problematic starting and ending dates." & vbCrLf
+                    End Try
+                Next
+            End If
+        End If
+
+        Dim lMinRecLength As Integer = 0
+        If Not Integer.TryParse(txtMinRecessionDays.Text.Trim, lMinRecLength) Then lErrMsg &= "- Min Recession Limb Length not set" & vbCrLf
+
+        Dim lMonths As New ArrayList()
+        For I As Integer = 0 To lstMonths.Items.Count - 1
+            If lstMonths.GetSelected(I) Then
+                lMonths.Add(I + 1)
+            End If
+        Next
+
+        Dim lSeason As String
+        If pSeason = "" Then
+            lSeason = "NoSeason"
+        Else
+            lSeason = pSeason
+        End If
+
+        If lErrMsg.Length = 0 Then
+            Args.SetValue("MinSegmentLength", lMinRecLength)
+            Args.SetValue("SelectedMonths", lMonths)
+            Args.SetValue("Season", lSeason)
+            'set duration
+            Args.SetValue("Start Date", lSDate)
+            Args.SetValue("End Date", lEDate)
+            ''Set streamflow
+            'Args.SetValue("Streamflow", pDataGroup)
+            'Set Unit
+            Args.SetValue("EnglishUnit", True)
+            'Set output directory
+            Args.SetValue("Output Path", txtOutputDir.Text)
+            Args.SetValue("SaveInterimResults", (chkSaveInterimToFile.Checked))
+        End If
+        Return lErrMsg
+
+    End Function
+
+    Private Function StartDateFromForm() As Double
+        Dim lMatches As MatchCollection = Nothing
+        If txtStartDateUser.Text.Trim() = "" Then
+            lMatches = Regex.Matches(txtDataStart.Text, "\d{4}\/\d{1,2}\/\d{1,2}")
+        Else
+            lMatches = Regex.Matches(txtStartDateUser.Text, "\d{4}\/\d{1,2}\/\d{1,2}")
+        End If
+        Dim lArr() As String = Nothing
+        If lMatches.Count > 0 Then
+            lArr = lMatches.Item(0).ToString.Split("/")
+        Else
+            Dim lAskUser As String = _
+            Logger.MsgCustom("Invalid starting date. Use dataset start date?", "Start Date Correction", New String() {"Yes", "No"})
+            If lAskUser = "Yes" Then
+                lArr = txtDataStart.Text.Trim.Split("/")
+                txtStartDateUser.Text = ""
+            Else
+                txtStartDateUser.Focus()
+                Return -99.0
+            End If
+        End If
+
+        Dim lYear As Integer = lArr(0)
+        Dim lMonth As Integer = lArr(1)
+        Dim lDay As Integer = lArr(2)
+        If IsDateValid(lArr) Then
+            If pAnalysisOverCommonDuration Then
+                pCommonStart = Date2J(lYear, lMonth, lDay)
+            End If
+        Else
+            Return -99.0
+        End If
+        Return pCommonStart
+    End Function
+
+    Private Function EndDateFromForm() As Double
+        Dim lMatches As MatchCollection = Nothing
+        If txtEndDateUser.Text.Trim() = "" Then
+            lMatches = Regex.Matches(txtDataEnd.Text, "\d{4}/\d{1,2}/\d{1,2}")
+        Else
+            lMatches = Regex.Matches(txtEndDateUser.Text, "\d{4}/\d{1,2}/\d{1,2}")
+        End If
+        Dim lArr() As String = Nothing
+        If lMatches.Count > 0 Then
+            lArr = lMatches.Item(0).ToString.Split("/")
+        Else
+            Dim lAskUser As String = _
+            Logger.MsgCustom("Invalid ending date. Use dataset end date?", "End Date Correction", New String() {"Yes", "No"})
+            If lAskUser = "Yes" Then
+                lArr = txtDataEnd.Text.Trim.Split("/")
+                txtEndDateUser.Text = ""
+            Else
+                txtEndDateUser.Focus()
+                Return -99.0
+            End If
+
+        End If
+        Dim lYear As Integer = lArr(0)
+        Dim lMonth As Integer = lArr(1)
+        Dim lDay As Integer = lArr(2)
+        If IsDateValid(lArr) Then
+            If pAnalysisOverCommonDuration Then
+                pCommonEnd = Date2J(lYear, lMonth, lDay, 24, 0, 0)
+            End If
+        Else
+            Return -99.0
+        End If
+
+        Return pCommonEnd
+    End Function
+
+    Private Function IsDateValid(ByVal aDate() As String) As Boolean
+        Dim isGoodDate As Boolean = True
+        Dim lYear As Integer = aDate(0)
+        Dim lMonth As Integer = aDate(1)
+        Dim lDay As Integer = aDate(2)
+
+        If lMonth > 12 OrElse lMonth < 1 Then
+            isGoodDate = False
+        ElseIf lDay > DayMon(lYear, lMonth) Then
+            isGoodDate = False
+        End If
+        Return isGoodDate
+    End Function
+
+    Private Sub txtOutputDir_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOutputDir.Click
+        Dim lDir As String = ""
+        If IO.Directory.Exists(txtOutputDir.Text.Trim()) Then
+            lDir = txtOutputDir.Text.Trim()
+        ElseIf IO.Directory.Exists(pOutputDir) Then
+            lDir = pOutputDir
+        End If
+        Dim FolderBrowserDialog1 As New FolderBrowserDialog
+        With FolderBrowserDialog1
+            ' Desktop is the root folder in the dialog.
+            .RootFolder = Environment.SpecialFolder.Desktop
+            ' Select directory on entry.
+            .SelectedPath = lDir
+            ' Prompt the user with a custom message.
+            .Description = "Specify Baseflow ASCII output directory"
+            If .ShowDialog = DialogResult.OK Then
+                ' Display the selected folder if the user clicked on the OK button.
+                lDir = .SelectedPath
+            End If
+        End With
+        If IO.Directory.Exists(lDir) Then
+            txtOutputDir.Text = lDir
+            pOutputDir = lDir
+            SaveSetting("atcUSGSRecess", "Defaults", "OutputDir", pOutputDir)
+        End If
+    End Sub
+
+    Private Sub btnExamineData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnExamineData.Click
+        For Each lTs As atcTimeseries In pDataGroup
+            Dim lfrmDataSummary As New frmDataSummary(atcUSGSScreen.PrintDataSummary(lTs))
+            lfrmDataSummary.txtDataSummary.SelectionStart = 0
+            lfrmDataSummary.Show()
+        Next
+    End Sub
+
+    Private Sub rdoSeason_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoSpring.CheckedChanged, rdoSummer.CheckedChanged, rdoFall.CheckedChanged, rdoWinter.CheckedChanged, rdoNoSeason.CheckedChanged
+        If rdoSpring.Checked Then
+            pSeason = "Spring"
+        ElseIf rdoSummer.Checked Then
+            pSeason = "Summer"
+        ElseIf rdoFall.Checked Then
+            pSeason = "Fall"
+        ElseIf rdoWinter.Checked Then
+            pSeason = "Winter"
+        ElseIf rdoNoSeason.Checked Then
+            pSeason = "NoSeason"
+        End If
+    End Sub
+
+    Private Sub lstRecessSegments_ItemCheck(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs) Handles lstRecessSegments.ItemCheck
+        Dim lOperation As String = ""
+        If e.NewValue = CheckState.Checked Then
+            lOperation = "select"
+        ElseIf e.NewValue = CheckState.Unchecked Then
+            lOperation = "unselect"
+        Else
+            Exit Sub
+        End If
+        pRecess.DoOperation(lOperation, lstRecessSegments.Items(e.Index).ToString)
+    End Sub
+
+    Private Sub lstRecessSegments_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstRecessSegments.SelectedIndexChanged
+        If txtAnalysisResults.Visible Then txtAnalysisResults.Visible = False
+        pRecess.DoOperation("d", lstRecessSegments.SelectedItem.ToString)
+        'txtDisplayText.Text = pRecess.Table
+        lstTable.Items.Clear()
+        Dim lSegs() As String = pRecess.Table.Split(vbCrLf)
+        For Each lSeg As String In lSegs
+            If lSeg.Trim() <> "" Then lstTable.Items.Add(lSeg.Trim(vbCr, vbLf))
+        Next
         pGraphRecessDatagroup.Clear()
         pGraphRecessDatagroup.Add(pRecess.GraphTs)
         RefreshGraphRecess(pGraphRecessDatagroup)
     End Sub
 
-    Private Sub btnRefineRecessionDuration_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRefineRecessionDuration.Click
-        tabRefine.Visible = True
+    Private Sub lstTable_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstTable.SelectedIndexChanged
+
+        Dim lMsgTitle As String = "Choose Recession Limb Duration"
+        Dim lSelectedIndex As Integer = lstTable.SelectedIndex
+        If lSelectedIndex = -1 OrElse lSelectedIndex = 0 OrElse lSelectedIndex = 1 Then
+            Exit Sub
+        End If
+
+        Dim lSelectedItem As String = lstTable.SelectedItem.ToString.Trim()
+        Dim lArr() As String = lSelectedItem.Split(" ")
+
+        Dim lDayOrdinal As Integer = CInt(lArr(0))
+        Dim lFirstLastCancel() As String = {"First Day", "Last Day", "Reset All", "Cancel"}
+        Dim lResponse As String = Logger.MsgCustom("Set '" & lDayOrdinal & "' as first or last day of this recession segment?", lMsgTitle, lFirstLastCancel)
+        If lResponse <> "Cancel" Then
+            Dim lRecSeg As clsRecessionSegment = pRecess.listOfSegments.ItemByKey(lstRecessSegments.SelectedItem.ToString)
+            If lRecSeg IsNot Nothing Then
+                Dim lOriginalMinDayOrdinal As Integer = lRecSeg.MinDayOrdinal
+                Dim lOriginalMaxDayOrdinal As Integer = lRecSeg.MaxDayOrdinal
+
+                If lResponse = "Reset All" Then
+                    lRecSeg.MinDayOrdinal = 1
+                    lRecSeg.MaxDayOrdinal = lRecSeg.SegmentLength
+                ElseIf lResponse = "First Day" Then
+                    If lDayOrdinal = lRecSeg.SegmentLength Then
+                        Logger.Msg("Cannot set first day to the end of recession limb.", MsgBoxStyle.Information, lMsgTitle)
+                        Exit Sub
+                    End If
+                    lRecSeg.MinDayOrdinal = lDayOrdinal
+                Else 'Last Day
+                    If lDayOrdinal = 1 Then
+                        Logger.Msg("Cannot set last day to the beginning of recession limb.", MsgBoxStyle.Information, lMsgTitle)
+                        Exit Sub
+                    End If
+                    lRecSeg.MaxDayOrdinal = lDayOrdinal
+                End If
+
+                If lRecSeg.MaxDayOrdinal <= lRecSeg.MinDayOrdinal Then
+                    Logger.Msg("First and last days are reversed." & vbCrLf & "Change is reverted.", MsgBoxStyle.Information, lMsgTitle)
+                    lRecSeg.MinDayOrdinal = lOriginalMinDayOrdinal
+                    lRecSeg.MaxDayOrdinal = lOriginalMaxDayOrdinal
+                    Exit Sub
+                End If
+            End If
+
+            'redo the table
+            lstRecessSegments_SelectedIndexChanged(Nothing, Nothing)
+        End If
     End Sub
 
-    Private Sub btnRefineRecessionDuration_MouseHover(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnRefineRecessionDuration.MouseHover
-        tabRefine.Visible = True
+    Private Sub btnAnalyse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAnalyse.Click
+        Dim lTargetPeakDate As String = lstRecessSegments.SelectedItem.ToString
+        Try
+            pRecess.DoOperation("r", lTargetPeakDate)
+            txtAnalysisResults.Text = pRecess.Bulletin
+            txtAnalysisResults.Visible = True
+        Catch ex As Exception
+            Logger.Msg("Regression Analysis for " & lTargetPeakDate & " failed." & vbCrLf & "Error: " & vbCrLf & ex.Message, MsgBoxStyle.Exclamation, "Recess Analysis")
+            Logger.Msg("Recession period after " & lTargetPeakDate & " is skipped.", MsgBoxStyle.Information, "Recess Analysis")
+            For Each lIndex As Integer In lstRecessSegments.CheckedIndices
+                If lstRecessSegments.Items(lIndex).ToString = lTargetPeakDate Then
+                    lstRecessSegments.SetItemChecked(lIndex, False)
+                    Exit For
+                End If
+            Next
+            txtAnalysisResults.Text = ""
+            txtAnalysisResults.Visible = False
+
+        End Try
     End Sub
 
-    Private Sub btnRefineRecessionDuration_MouseLeave(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnRefineRecessionDuration.MouseLeave
-        tabRefine.Visible = False
+    Private Sub chkSaveInterimToFile_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkSaveInterimToFile.CheckedChanged
+        If chkSaveInterimToFile.Checked Then
+            If Not IO.Directory.Exists(txtOutputDir.Text.Trim()) Then
+                Logger.Msg("Need to select output directory.", MsgBoxStyle.Information, "Save Intermediate Results")
+                txtOutputDir.Focus()
+            Else
+                Try
+                    Dim lSW As New IO.StreamWriter(IO.Path.Combine(txtOutputDir.Text.Trim(), "z.txt"), False)
+                    lSW.WriteLine("Done testing for WRITE permission.")
+                    lSW.Flush()
+                    lSW.Close()
+                Catch ex As Exception
+                    Logger.Msg("Unable to write to specified output directory." & "Try another directory.", MsgBoxStyle.Information, "Save Intermediate Results")
+                    txtOutputDir.Focus()
+                End Try
+            End If
+        End If
     End Sub
 
-    Private Sub btnSetDays_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSetDays.Click
-        tabRefine.Visible = False
-        'TODO: might need to check user entered days
-        pRecess.AskUserFirstDayofSegment = CInt(txtAskUserFirstDayofSegment.Text)
-        pRecess.AskUserLastDayofSegment = CInt(txtAskUserLastDayofSegment.Text)
-        pRecess.RecessAnalysis("c")
-        txtDisplayText.Text = pRecess.Table
-        pGraphRecessDatagroup.Clear()
-        pGraphRecessDatagroup.Add(pRecess.GraphTs)
-        RefreshGraphRecess(pGraphRecessDatagroup)
+    Private Sub btnSummary_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSummary.Click
+        pRecess.DoOperation("summary", "")
     End Sub
 End Class
