@@ -54,7 +54,7 @@ Public Module modGeoSFM
         'lDEMFileName = FilenameNoExt(lDEMFileName) & ".bgd"
 
         'set nodata value properly
-        GisUtil.GridSetNoData(lDEMFileName)
+        GisUtil.GridSetNoData(lDEMFileName, -100.0)
 
         'pit fill 
         Dim lPitFillDEMLayerName As String = "Corrected DEM"
@@ -414,6 +414,10 @@ Public Module modGeoSFM
         '            basinTable.Calculate("0", hasdamfld)
         '        End If
 
+        'try to preempt errors that come from having nodata value incorrectly set in input grids
+        GisUtil.GridSetNoData(GisUtil.LayerFileName(basingthm), 1.0)
+        GisUtil.GridSetNoData(GisUtil.LayerFileName(rivlinkgthm), 1.0)
+
         GisUtil.StatusShow = False
 
         Logger.Status("Computing Zonal Statistics for " + demgname + "........")
@@ -650,7 +654,9 @@ Public Module modGeoSFM
         lSBDesc.AppendLine("")
         SaveFileString(lDescFile, lSBDesc.ToString)
 
-        For Each basinvalue As Integer In lBasinIDs.Keys
+        Dim basinvalue As Integer
+        For lKey As Integer = lBasinIDs.Keys.Count - 1 To 0 Step -1
+            basinvalue = lBasinIDs.Keys(lKey)
 
             '   areafield = DemZoneVtab.FindField("area")
             '   demfield = DemZoneVtab.FindField("mean")

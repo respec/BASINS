@@ -2026,7 +2026,7 @@ Public Class GisUtil
         lOutputGrid.Save()
     End Sub
 
-    Public Shared Sub GridSetNoData(ByVal aInputGridFileName As String)
+    Public Shared Sub GridSetNoData(ByVal aInputGridFileName As String, ByVal aThreshold As Double)
         'set no data values in the input grid, save it 
 
         Dim lInputGridLayerIndex As Integer = GisUtil.LayerIndex(aInputGridFileName)
@@ -2050,7 +2050,7 @@ Public Class GisUtil
             Next
         Next
 
-        If lMinValue < -100 And lMinValue <> lNoData Then
+        If lMinValue < aThreshold And lMinValue <> lNoData Then
             'arbitrary rule to determine if the nodata value is incorrectly set on this grid
             lInputGrid.Header.NodataValue = lMinValue
             lInputGrid.Save()
