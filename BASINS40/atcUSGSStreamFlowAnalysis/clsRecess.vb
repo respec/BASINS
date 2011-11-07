@@ -58,10 +58,11 @@ Public Class clsRecess
             If IO.Directory.Exists(value) Then
                 Dim lSW As StreamWriter = Nothing
                 Try
-                    lSW = New StreamWriter(IO.Path.Combine(value, "z.txt"))
+                    lSW = New StreamWriter(IO.Path.Combine(value, "z.txt"), False)
                     lSW.WriteLine("1")
                     lSW.Close()
                     lSW = Nothing
+                    pOutputPath = value
                     pHasWritePermission = True
                 Catch ex As Exception
                     If lSW IsNot Nothing Then
@@ -70,13 +71,14 @@ Public Class clsRecess
                     End If
                     pHasWritePermission = False
                 End Try
-
+            Else
+                pHasWritePermission = False
             End If
         End Set
     End Property
 
     Private pDataFilename As String = ""
-    Private pSaveInterimResults As Boolean = False
+    Public SaveInterimResults As Boolean = False
     Private pFileRecSum As String = "recsum.txt"
     Private pFileIndex As String = "index.txt"
     Private pFileRecData As String = "recdata.txt"
@@ -85,6 +87,18 @@ Public Class clsRecess
     Private pFileOut2 As String = ""
     Private pHeaderOutFile1 As String = ""
     Private pHeaderOutFile2 As String = ""
+    Private pHeaderIndexFile As String = ""
+    Private pHeaderRecSumFile As String = ""
+
+    Private Sub SetOutputFiles()
+        pFileRecSum = IO.Path.Combine(OutputPath, pFileRecSum)
+        pFileRecData = IO.Path.Combine(OutputPath, pFileRecData)
+        pFileIndex = IO.Path.Combine(OutputPath, pFileIndex)
+        pFileRanges = IO.Path.Combine(OutputPath, pFileRanges)
+
+        pFileOut1 = IO.Path.Combine(OutputPath, "x" & SeasonLabel & pDataFilename)
+        pFileOut2 = IO.Path.Combine(OutputPath, "y" & SeasonLabel & pDataFilename)
+    End Sub
 #End Region
 
 #Region "Size Limits"
@@ -177,8 +191,8 @@ Public Class clsRecess
         End Set
     End Property
 
-    Public Tables As atcCollection = Nothing
-    Public Graphs As atcCollection = Nothing
+    'Public Tables As atcCollection = Nothing
+    'Public Graphs As atcCollection = Nothing
 
     Public Table As String 'current recession segment's table
     Public GraphTs As atcTimeseries 'current recession's timeseries
@@ -230,33 +244,37 @@ Public Class clsRecess
         End Set
     End Property
 
-    Private pIndicator() As Integer
-    Private pXX() As Double
-    Private pYY() As Double
-    Private pZZ() As Double
-    Private pX() As Double
-    Private pY() As Double
-    Private pK() As Double
-    Private pDUMMY() As Double
+    'Private pIndicator() As Integer
+    'Private pXX() As Double
+    'Private pYY() As Double
+    'Private pZZ() As Double
+    'Private pX() As Double
+    'Private pY() As Double
+    'Private pK() As Double
+    'Private pDUMMY() As Double
 
-    Private pXMeanAR() As Double
-    Private pYMeanAR() As Double
-    Private pCoef1AR() As Double
-    Private pCoef2AR() As Double
-    Private pMinAR() As Double
-    Private pMaxAR() As Double
-    Private pPickAR() As Integer
-    Private pOrigNoAR() As Integer
-    Private pDatesAR() As Double
-    Private pXMNArray() As Double
-    Private pCoefArray() As Double
+    'Private pXMeanAR() As Double
+    'Private pYMeanAR() As Double
+    'Private pCoef1AR() As Double
+    'Private pCoef2AR() As Double
+    'Private pMinAR() As Double
+    'Private pMaxAR() As Double
+    'Private pPickAR() As Integer
+    'Private pOrigNoAR() As Integer
+    'Private pDatesAR() As Double
+    'Private pXMNArray() As Double
+    'Private pCoefArray() As Double
 
     Private pQLogMax As Double = 0.0
     Private pQLogMin As Double = 10.0
 
 #End Region
 
-    Public Sub New(ByVal aTS As atcTimeseries, Optional ByVal aArgs As atcDataAttributes = Nothing)
+    Public Sub New()
+
+    End Sub
+
+    Public Sub Initialize(ByVal aTS As atcTimeseries, Optional ByVal aArgs As atcDataAttributes = Nothing)
 
         Dim lSdate As Double
         Dim lEdate As Double
@@ -268,7 +286,7 @@ Public Class clsRecess
             SeasonLabel = aArgs.GetValue("Season", "NoSeason")
             OutputPath = aArgs.GetValue("Output Path", "")
             RecessMinLengthInDays = aArgs.GetValue("MinSegmentLength", 5)
-            pSaveInterimResults = aArgs.GetValue("SaveInterimResults", False)
+            SaveInterimResults = aArgs.GetValue("SaveInterimResults", False)
         End If
 
         Dim lTs As atcTimeseries = SubsetByDate(aTS, lSdate, lEdate, Nothing)
@@ -277,14 +295,8 @@ Public Class clsRecess
         '***** File IO *****
         Dim lInputfile As String = IO.Path.GetFileName(aTS.Attributes.GetValue("history 1").substring("read from ".Length))
         pDataFilename = IO.Path.GetFileName(lInputfile)
-        If pSaveInterimResults Then
-            pFileRecSum = IO.Path.Combine(OutputPath, pFileRecSum)
-            pFileRecData = IO.Path.Combine(OutputPath, pFileRecData)
-            pFileIndex = IO.Path.Combine(OutputPath, pFileIndex)
-            pFileRanges = IO.Path.Combine(OutputPath, pFileRanges)
-
-            pFileOut1 = IO.Path.Combine(OutputPath, "x" & SeasonLabel & pDataFilename)
-            pFileOut2 = IO.Path.Combine(OutputPath, "y" & SeasonLabel & pDataFilename)
+        If SaveInterimResults Then
+            SetOutputFiles()
         End If
 
         Dim lYearStart As Integer
@@ -322,37 +334,73 @@ Public Class clsRecess
 " was selected.  " & vbCrLf & _
 "-----------------------------------------------------------------------"
 
-        'Initialize arrays
-        ReDim pIndicator(MaxNumDaysInAllRecPeriods)
-        ReDim pXX(MaxNumDaysInAllRecPeriods)
-        ReDim pYY(MaxNumDaysInAllRecPeriods)
-        ReDim pZZ(MaxNumDaysInAllRecPeriods)
-        ReDim pX(MaxNumRecPeriods)
-        ReDim pY(MaxNumRecPeriods)
-        ReDim pK(MaxNumRecPeriods)
-        ReDim pDUMMY(MaxNumRecPeriods)
+        pHeaderRecSumFile = "File ""recsum.txt""      Program version -- Jan 2007" & vbCrLf & _
+"--------------------------------------------------------------" & vbCrLf & _
+"Each time the recess program is run, a new line can be written" & vbCrLf & _
+"to the end of this file.  Guide to columns --" & vbCrLf & vbCrLf & _
+"  File = streamflow file analyzed" & vbCrLf & _
+"     S = Season analyzed" & vbCrLf & _
+"     P = Period analyzed (years)" & vbCrLf & _
+"     # = Number of segments analyzed" & vbCrLf & vbCrLf & _
+"  Kmin = Minimum recession index, among segments selected" & vbCrLf & _
+"  Kmed = Median recession index, among segments selected" & vbCrLf & _
+"  Kmax = Maximum recession index, among segments selected" & vbCrLf & vbCrLf & _
+"LogQmn = The minimum value of the log of the streamflow" & vbCrLf & _
+"LogQmx = The maximum value of the log of the streamflow" & vbCrLf & _
+" A,B,C = Coefficients of the master recession index" & vbCrLf & vbCrLf & _
+"    File    S     P      #  Kmin  Kmed  Kmax  LogQmn  LogQmx     A         B         C" & vbCrLf & _
+"-----------------------------------------------------------------------------------------" & vbCrLf & vbCrLf
 
-        ReDim pXMeanAR(MaxNumRecPeriods)
-        ReDim pYMeanAR(MaxNumRecPeriods)
-        ReDim pCoef1AR(MaxNumRecPeriods)
-        ReDim pCoef2AR(MaxNumRecPeriods)
-        ReDim pMinAR(MaxNumRecPeriods)
-        ReDim pMaxAR(MaxNumRecPeriods)
-        ReDim pPickAR(MaxNumRecPeriods)
-        ReDim pOrigNoAR(MaxNumRecPeriods)
-        ReDim pDatesAR(MaxNumRecPeriods)
-        ReDim pXMNArray(MaxNumRecPeriods)
-        ReDim pCoefArray(MaxNumRecPeriods)
-        pXX(1) = -99
-        pYY(1) = -99
+        pHeaderIndexFile = "File ""index.txt"" -- The recession index is entered on this file" & vbCrLf & _
+"manually or by running the RECESS program.  This file ""index.txt""" & vbCrLf & _
+"can be read by the PREP program (before running PULSE) and it can" & vbCrLf & _
+"be read by RORA.  Note -- this file should have ten header lines." & vbCrLf & _
+"----------------------------------------------------------------" & vbCrLf & _
+"              Recession" & vbCrLf & _
+"Name of         index" & vbCrLf & _
+"streamflow    (days per" & vbCrLf & _
+"file          log cycle)" & vbCrLf & _
+"------------------------"
+        'Indian.txt    100.00  (string12, f8.2)
+        'Indian.txt     22.92
+
+        ''Initialize arrays
+        'ReDim pIndicator(MaxNumDaysInAllRecPeriods)
+        'ReDim pXX(MaxNumDaysInAllRecPeriods)
+        'ReDim pYY(MaxNumDaysInAllRecPeriods)
+        'ReDim pZZ(MaxNumDaysInAllRecPeriods)
+        'ReDim pX(MaxNumRecPeriods)
+        'ReDim pY(MaxNumRecPeriods)
+        'ReDim pK(MaxNumRecPeriods)
+        'ReDim pDUMMY(MaxNumRecPeriods)
+
+        'ReDim pXMeanAR(MaxNumRecPeriods)
+        'ReDim pYMeanAR(MaxNumRecPeriods)
+        'ReDim pCoef1AR(MaxNumRecPeriods)
+        'ReDim pCoef2AR(MaxNumRecPeriods)
+        'ReDim pMinAR(MaxNumRecPeriods)
+        'ReDim pMaxAR(MaxNumRecPeriods)
+        'ReDim pPickAR(MaxNumRecPeriods)
+        'ReDim pOrigNoAR(MaxNumRecPeriods)
+        'ReDim pDatesAR(MaxNumRecPeriods)
+        'ReDim pXMNArray(MaxNumRecPeriods)
+        'ReDim pCoefArray(MaxNumRecPeriods)
+        'pXX(1) = -99
+        'pYY(1) = -99
 
         'Start off a recession search
         pCountDay = 2
         pIndexPeakDay = 0
         clsRecessionSegment.StreamFlowTS = FlowData
         clsRecessionSegment.RecessionCount = 0
-        Tables = New atcCollection()
-        Graphs = New atcCollection()
+        'Tables = New atcCollection()
+        'Graphs = New atcCollection()
+        If listOfSegments IsNot Nothing AndAlso listOfSegments.Count > 0 Then
+            For Each lSeg As clsRecessionSegment In listOfSegments
+                lSeg.Clear()
+            Next
+            listOfSegments = Nothing
+        End If
         listOfSegments = New atcCollection()
         'RecessAnalysis()
 
@@ -361,10 +409,13 @@ Public Class clsRecess
     Public Sub Clear()
         'in case when user changed the streamflow duration
         'then has to find everything again, need to clear existing
-        For Each lSeg As clsRecessionSegment In listOfSegments
-            lSeg.Clear()
-        Next
-        listOfSegments.Clear()
+        If listOfSegments IsNot Nothing AndAlso listOfSegments.Count > 0 Then
+            For Each lSeg As clsRecessionSegment In listOfSegments
+                lSeg.Clear()
+            Next
+            listOfSegments.Clear()
+        End If
+
         FlowData = Nothing
     End Sub
 
@@ -827,7 +878,7 @@ Public Class clsRecess
             lMsg.AppendLine(" DAYS/LOG CYCLE=" & -1 * .Coefficient1)
             lMsg.AppendLine(" MEAN LOG Q = " & .MeanLogQ)
 
-            If pSaveInterimResults And pHasWritePermission Then
+            If SaveInterimResults And pHasWritePermission Then
                 Dim lSW As IO.StreamWriter = New IO.StreamWriter(pFileOut1, True)
 
                 'If FileExists(pFileOut1) Then
@@ -881,9 +932,14 @@ Public Class clsRecess
 
     Public Sub RecessSummary()
 
+        If SaveInterimResults Then
+            SetOutputFiles()
+        End If
+
         Dim lSW As IO.StreamWriter = Nothing
         Dim lMsg As Text.StringBuilder = Nothing
         Dim lSeg As clsRecessionSegment = Nothing
+        Dim lDiff As Double = 0
         '----------CONTINUE AFTER RECESSION PERIODS HAVE BEEN SELECTED:-------
         ' ----- COUNT TOTAL NUMBER OF DAYS INVOLVED ------------
         ' ----- DETERMINE MAX AND MIN K AND TRANSFER LOGQ AND K TO OTHER ----
@@ -910,7 +966,7 @@ Public Class clsRecess
             End With
         Next
 
-        If pSaveInterimResults And pHasWritePermission Then
+        If SaveInterimResults And pHasWritePermission Then
             lSW = New IO.StreamWriter(pFileOut1, True)
             lSW.WriteLine("TOTAL NUMBER OF DAILY VALUES OF STREAMFLOW THAT WERE USED, FOR ALL RECESSION")
             lSW.WriteLine("PERIODS INITIALLY SELECTED = " & liiDV)
@@ -954,8 +1010,12 @@ Public Class clsRecess
             End If
         Next
         lListOfChosenSegments.SortByValue() 'sort MeanLogQ in Ascending order
+        lMsg = New Text.StringBuilder()
+        lMsg.AppendLine("MAXIMUM LOG Q FOR ALL CHOSEN RECESSIONS= " & String.Format("{0:0.00000}", lQLogMaxC).PadLeft(8, " "))
+        lMsg.AppendLine("MINIMUM LOG Q FOR ALL CHOSEN RECESSIONS= " & String.Format("{0:0.00000}", lQLogMinC).PadLeft(8, " "))
+
         Dim lAskUserNumRecToBeEliminated As Integer = listOfSegments.Count - lListOfChosenSegments.Count
-        If pSaveInterimResults And pHasWritePermission Then
+        If SaveInterimResults And pHasWritePermission Then
             lSW = New IO.StreamWriter(pFileOut1, True)
             lSW.WriteLine("NUMBER OF RECESSION PERIODS INITIALLY SELECTED=" & lListOfChosenSegments.Count)
             lSW.WriteLine("MAXIMUM LOG Q FOR ALL RECESSIONS=" & XLogQMax)
@@ -973,8 +1033,8 @@ Public Class clsRecess
 
                 'lPickAR(Z) = 1
                 lSlope = -1 * lSeg.Coefficient1
-                Dim lDiff As Double = lSlope - lSlopeMn
-                Dim lNumBlanks As String = Math.Floor(lDiff * 40 / (lSlopeMx - lSlopeMn))
+                lDiff = lSlope - lSlopeMn
+                Dim lNumBlanks As Integer = Math.Floor(lDiff * 40 / (lSlopeMx - lSlopeMn))
 
                 '   15 FORMAT (1I3, 2F9.3, 9X, 42A1)
                 Dim lStrOrigNo As String = "X".PadLeft(3, " ")
@@ -1015,7 +1075,6 @@ Public Class clsRecess
         End If 'has write permission and save interim results
 
         '----ASSIGN VALUES TO X AND Y TO BE SENT TO THE REGRESSION SUBROUTINE:----
-        lMsg = New Text.StringBuilder()
         'lNum = 0
         'For Z As Integer = 1 To lNumRecessPeriods 'loop 340
         '    If lOrigNoAR(Z) = 0 Then Continue For
@@ -1032,13 +1091,18 @@ Public Class clsRecess
         'Logger.Dbg(lMsg)
 
         lMsg.AppendLine("Selected recession periods:")
-        lMsg.AppendLine("PeakDay         MeanLogQ        Coefficient1")
-        For Each lPeakDayDate As String In lListOfChosenSegments.Keys
-            lSeg = lListOfChosenSegments.ItemByKey(lPeakDayDate)
-            lMsg.AppendLine(lPeakDayDate & String.Format("{0:0.000}", lSeg.MeanLogQ).PadLeft(6, " ") & String.Format("{0:0.000}", lSeg.Coefficient1).PadLeft(6, " "))
+        lMsg.AppendLine("   PeakDay   MeanLogQ         K")
+        For Z As Integer = lListOfChosenSegments.Count - 1 To 0 Step -1
+            lSeg = lListOfChosenSegments.Item(Z)
+            lMsg.AppendLine(lSeg.PeakDayDateToString & String.Format("{0:0.000}", lSeg.MeanLogQ).PadLeft(11, " ") & String.Format("{0:0.000}", lSeg.Coefficient1).PadLeft(10, " "))
         Next
-        Bulletin = lMsg.ToString
-        lMsg.Length = 0
+        'For Each lPeakDayDate As String In lListOfChosenSegments.Keys
+        '    lSeg = lListOfChosenSegments.ItemByKey(lPeakDayDate)
+        '    lMsg.AppendLine(lPeakDayDate & String.Format("{0:0.000}", lSeg.MeanLogQ).PadLeft(6, " ") & String.Format("{0:0.000}", lSeg.Coefficient1).PadLeft(6, " "))
+        'Next
+
+        'Bulletin = lMsg.ToString
+        'lMsg.Length = 0
 
         '-- PERFORM REGRESSION AND WRITE BEST EQUATION FOR K AS FUNCT. OF DISCHARGE
         'Dim lMNLogQC As Double = lX(1)
@@ -1058,7 +1122,7 @@ Public Class clsRecess
         Dim lCoeffC As Double = -0.5 * lCoeffA * lQLogMaxC ^ 2 - lCoeffB * lQLogMaxC
 
         '--------------- SHOW ORDERED DATA, AFTER ELIMINATION:  --------------
-        If pSaveInterimResults And pHasWritePermission Then
+        If SaveInterimResults And pHasWritePermission Then
             lSW = New IO.StreamWriter(pFileOut1, True)
             lSW.WriteLine(" ")
             lSW.WriteLine("-----------------------------------------------------------------------")
@@ -1067,14 +1131,14 @@ Public Class clsRecess
             Dim lStrSlopeMin As String = String.Format("{0:0.0}", lSlopeMn).PadLeft(7, " ")
             Dim lStrSlopeMax As String = String.Format("{0:0.0}", lSlopeMx).PadLeft(7, " ")
             lSW.WriteLine("NUMBER  LOG Q    K         " & lStrSlopeMin & Space(33) & lStrSlopeMax)
-            Dim lPeakDayKeys() As String = lListOfChosenSegments.Keys.ToArray()
+
             For Z As Integer = lListOfChosenSegments.Count - 1 To 0 Step -1 'loop 352
                 lSeg = lListOfChosenSegments.Item(Z)
                 lSlope = -1.0 * lSeg.Coefficient1 'lY(Z)
-                Dim lDiff As Double = lSlope - lSlopeMn
-                Dim lNumBlanks As String = Math.Floor(lDiff * 40 / (lSlopeMx - lSlopeMn))
+                lDiff = lSlope - lSlopeMn
+                Dim lNumBlanks As Integer = Math.Floor(lDiff * 40 / (lSlopeMx - lSlopeMn))
 
-                Dim lStrOrigNo As String = lPeakDayKeys(Z)
+                Dim lStrOrigNo As String = lSeg.PeakDayDateToString
                 Dim lStrX As String = String.Format("{0:0.000}", lSeg.MeanLogQ).PadLeft(9, " ") ' lX(Z)
                 Dim lStrY As String = String.Format("{0:0.000}", lSeg.Coefficient1).PadLeft(9, " ") 'lY(Z)
                 Dim lStrBlnk As String = Space(lNumBlanks) & "*" '.PadRight(42, " ")
@@ -1102,7 +1166,7 @@ Public Class clsRecess
             Dim lXLogQ As Double = lQLogMaxC 'lMXLogQC
             While True 'loop 370
                 lSlope = -1 * lCoeffA * lXLogQ - 1 * lCoeffB
-                Dim lDiff As Double = lSlope - lSlopeMn
+                lDiff = lSlope - lSlopeMn
                 Dim lNumBlanks As Integer = Math.Floor(lDiff * 40 / (lSlopeMx - lSlopeMn))
                 If lNumBlanks < 0 Then
                     lSW.WriteLine(lXLogQ & "   " & lSlope & "    ")
@@ -1159,131 +1223,146 @@ Public Class clsRecess
             lSW = Nothing
         End If
 
-        ''------------   DETERMINE MAX, MIN, AND MEDIAN K: -----------------------
-        'For Z As Integer = 1 To lNumRecessPeriods
-        '    lK(Z) = -1 * lY(Z)
-        '    lDUMMY(Z) = 1
-        'Next
-        'Order(lNumRecessPeriods, lK, lDUMMY, lOrigNoAR)
-        'Dim lKMax As Double = lK(lNumRecessPeriods)
-        'Dim lKMin As Double = lK(1)
-        'Dim liDown As Integer = 0
-        'Dim liUp As Integer = lNumRecessPeriods + 1
-        'Dim liCnt As Integer = 0
-        'Dim lKMed As Double
-        'While True 'loop 395
-        '    liCnt += 1
-        '    If liCnt > lMaxNumRecPeriods Then
-        '        Logger.Dbg("PROBLEMS WITH DETERMINATION OF MEDIAN")
-        '        lMsg = ""
-        '        lMsg &= "PROBLEMS WITH DETERMINATION OF MEDIAN"
-        '        Exit While
-        '    End If
-        '    If liUp - liDown = 2 Then
-        '        lKMed = lK(Math.Floor((liUp + liDown) / 2))
-        '        Exit While
-        '    ElseIf liUp - liDown = 1 Then
-        '        lKMed = (lK(liUp) + lK(liDown)) / 2
-        '        Exit While
-        '    Else
-        '        liDown += 1
-        '        liUp -= 1
-        '    End If
-        'End While 'loop 395
+        ''------------   DETERMINE MAX, MIN, AND MEDIAN K (aka Coefficient1): -----------------------
+        Dim lK(lListOfChosenSegments.Count) As Double
+        For Z As Integer = 1 To lListOfChosenSegments.Count
+            lK(Z) = lY(Z) * -1
+        Next
+        Order(lListOfChosenSegments.Count, lK)
+        Dim lKMax As Double = lK(lListOfChosenSegments.Count)
+        Dim lKMin As Double = lK(1)
+        Dim liDown As Integer = 0
+        Dim liUp As Integer = lListOfChosenSegments.Count + 1
+        Dim liCnt As Integer = 0
+        Dim lKMed As Double
+        While True 'loop 395
+            liCnt += 1
+            If liCnt > MaxNumRecPeriods Then
+                Logger.Dbg("PROBLEMS WITH DETERMINATION OF MEDIAN")
+                'lMsg.Length = 0
+                lMsg.AppendLine("PROBLEMS WITH DETERMINATION OF MEDIAN")
+
+                Bulletin = lMsg.ToString
+                Exit Sub
+                'Exit While
+            End If
+            If liUp - liDown = 2 Then
+                lKMed = lK(Math.Floor((liUp + liDown) / 2))
+                Exit While
+            ElseIf liUp - liDown = 1 Then
+                lKMed = (lK(liUp) + lK(liDown)) / 2
+                Exit While
+            Else
+                liDown += 1
+                liUp -= 1
+            End If
+        End While 'loop 395
+        ReDim lK(0)
 
         ''------------------- WRITE RAW RECESSION DATA TO "y-file"  ----------------
-        'lSW = New IO.StreamWriter(lFileOut2, True)
-        'lSW.WriteLine("----------------------------------------------------------------------")
-        'lSW.WriteLine("     Tpeak            Tmrc          LogQ           Q               Seq#  ")
+        If pHasWritePermission And SaveInterimResults Then
+            lSW = New IO.StreamWriter(pFileOut2, True)
+            lSW.WriteLine("----------------------------------------------------------------------")
+            lSW.WriteLine("     Tpeak            Tmrc          LogQ           Q               Seq#  ")
 
-        'Dim lStrYY As String = ""
-        'Dim lStrZZ As String = ""
-        'Dim lStrXX As String = ""
-        'Dim lStr10ExpXX As String = ""
-        'Dim lStrIndicator As String = ""
-        'II = lNumbrII + 1
-        'lDiff = 0
-        'While True 'loop 520
-        '    II -= 1
-        '    If lXX(II) = 0 And lYY(II) = 0 Then
-        '        lSW.WriteLine("   ")
-        '        II -= 1
-        '        Dim lT As Double = 0.5 * lCoeffA * lXX(II) ^ 2 + lCoeffB * lXX(II) + lCoeffC
-        '        lDiff = lT - lYY(II)
-        '        lZZ(II) = lT
-        '        '   31 format (4f14.6, 1i14)
-        '        lStrYY = String.Format("{0:0.000000}", lYY(II)).PadLeft(14, " ")
-        '        lStrZZ = String.Format("{0:0.000000}", lZZ(II)).PadLeft(14, " ")
-        '        lStrXX = String.Format("{0:0.000000}", lXX(II)).PadLeft(14, " ")
-        '        lStr10ExpXX = String.Format("{0:0.000000}", 10 ^ lXX(II)).PadLeft(14, " ")
-        '        lStrIndicator = lIndicator(II).ToString.PadLeft(14, " ")
-        '        lSW.WriteLine(lStrYY & lStrZZ & lStrXX & lStr10ExpXX & lStrIndicator)
-        '        Continue While
-        '    ElseIf lXX(II) = -99 And lYY(II) = -99 Then
-        '        'or if II = 1 as this loop is going backwards
-        '        Exit While
-        '    Else
-        '        lZZ(II) = lDiff + lYY(II)
-        '        lStrYY = String.Format("{0:0.000000}", lYY(II)).PadLeft(14, " ")
-        '        lStrZZ = String.Format("{0:0.000000}", lZZ(II)).PadLeft(14, " ")
-        '        lStrXX = String.Format("{0:0.000000}", lXX(II)).PadLeft(14, " ")
-        '        lStr10ExpXX = String.Format("{0:0.000000}", 10 ^ lXX(II)).PadLeft(14, " ")
-        '        lStrIndicator = lIndicator(II).ToString.PadLeft(14, " ")
-        '        lSW.WriteLine(lStrYY & lStrZZ & lStrXX & lStr10ExpXX & lStrIndicator)
-        '        Continue While
-        '    End If
-        'End While 'loop 520
-        'lSW.Flush()
-        'lSW.Close()
-        'lSW = Nothing
-        '' '
-        ''If you have executed this program simply to obtain'
-        ''a median recession index (for use in program RORA)'
-        ''then you might elect not to write additional data '
-        ''describing the master recession curve to file     '
-        ''RECSUM.txt: .............                         '
-        ''                                                  '
-        ''  To only write the median recession index (to file'
-        ''     "index.txt"), enter 1 '
-        ''  To write more results, including information about'
-        ''    the master recession curve to file "recsum.txt" '
-        ''    (in addition to "index.txt"), enter 2 
-        'Dim lAskUserRecIndexOnly As Integer = 2
+            Dim lStrYY As String = ""
+            Dim lStrZZ As String = ""
+            Dim lStrXX As String = ""
+            Dim lStr10ExpXX As String = ""
+            Dim lStrIndicator As String = ""
+            Dim lZZ As Double
+            lDiff = 0
+            For Z As Integer = listOfSegments.Count - 1 To 0 Step -1
+                lSeg = listOfSegments.Item(Z)
+                With lSeg
+                    If .IsExcluded Then Continue For
+                    For D As Integer = .MaxDayOrdinal To .MinDayOrdinal Step -1
+                        If .QLog(D) = 0 And D = 0 Then
+                            lSW.WriteLine("   ")
+                            Dim lT As Double = 0.5 * lCoeffA * .QLog(D) ^ 2 + lCoeffB * .QLog(D) + lCoeffC
+                            lDiff = lT - D
+                            lZZ = lT
+                            '   31 format (4f14.6, 1i14)
+                            lStrYY = String.Format("{0:0.000000}", D).PadLeft(14, " ")
+                            lStrZZ = String.Format("{0:0.000000}", lT).PadLeft(14, " ")
+                            lStrXX = String.Format("{0:0.000000}", .QLog(D)).PadLeft(14, " ")
+                            lStr10ExpXX = String.Format("{0:0.000000}", 10 ^ .QLog(D)).PadLeft(14, " ")
+                            lStrIndicator = .PeakDayDateToString.PadLeft(14, " ")
+                            lSW.WriteLine(lStrYY & lStrZZ & lStrXX & lStr10ExpXX & lStrIndicator)
+                            Exit For
+                        Else
+                            lZZ = lDiff + D 'lYY(II)
+                            lStrYY = String.Format("{0:0.000000}", D).PadLeft(14, " ")
+                            lStrZZ = String.Format("{0:0.000000}", lZZ).PadLeft(14, " ")
+                            lStrXX = String.Format("{0:0.000000}", .QLog(D)).PadLeft(14, " ")
+                            lStr10ExpXX = String.Format("{0:0.000000}", 10 ^ .QLog(D)).PadLeft(14, " ")
+                            lStrIndicator = .PeakDayDateToString.PadLeft(14, " ")
+                            lSW.WriteLine(lStrYY & lStrZZ & lStrXX & lStr10ExpXX & lStrIndicator)
+                        End If
+                    Next
+                End With
+            Next
+            lSW.Flush()
+            lSW.Close()
+            lSW = Nothing
 
-        'Dim lStrInputFile As String = ""
-        'If lInputfile.Length <= 12 Then
-        '    lStrInputFile = lInputfile
-        'Else
-        '    lStrInputFile = lInputfile.Substring(0, 12)
-        'End If
-        'If lAskUserRecIndexOnly <> 1 Then
-        '    lSW = New IO.StreamWriter(lFileRecSum, True)
-        '    '   17 FORMAT (A12,A1,1X,1I4,'-',1I4,1I3,3F6.1,2F8.3,1F9.4,2F10.4)
-        '    Dim lStrYearStart As String = lYearStart.ToString
-        '    Dim lStrYearEnd As String = lYearEnd.ToString
-        '    Dim lStrKMin As String = String.Format("{0:0.0}", lKMin).PadLeft(6, " ")
-        '    Dim lStrKMed As String = String.Format("{0:0.0}", lKMed).PadLeft(6, " ")
-        '    Dim lStrKMax As String = String.Format("{0:0.0}", lKMax).PadLeft(6, " ")
-        '    Dim lStrMNLogQC As String = String.Format("{0:0.000}", lMNLogQC).PadLeft(8, " ")
-        '    Dim lStrMXLogQC As String = String.Format("{0:0.000}", lMXLogQC).PadLeft(8, " ")
-        '    lStrCoeffA = String.Format("{0:0.0000}", 0.5 * lCoeffA).PadLeft(9, " ")
-        '    lStrCoeffB = String.Format("{0:0.0000}", lCoeffB).PadLeft(10, " ")
-        '    lStrCoeffC = String.Format("{0:0.0000}", lCoeffC).PadLeft(10, " ")
+            ' '
+            'If you have executed this program simply to obtain'
+            'a median recession index (for use in program RORA)'
+            'then you might elect not to write additional data '
+            'describing the master recession curve to file     '
+            'RECSUM.txt: .............                         '
+            '                                                  '
+            '  To only write the median recession index (to file'
+            '     "index.txt"), enter 1 '
+            '  To write more results, including information about'
+            '    the master recession curve to file "recsum.txt" '
+            '    (in addition to "index.txt"), enter 2 
+            Dim lAskUserRecIndexOnly As Integer = 2
 
-        '    lSW.WriteLine(lStrInputFile & lAskUserSeason & " " & lStrYearStart & "-" & lStrYearEnd & lNumRecessPeriods.ToString & _
-        '                  lStrKMin & lStrKMed & lStrKMax & lStrMNLogQC & lStrMXLogQC & lStrCoeffA & lStrCoeffB & lStrCoeffC)
-        '    lSW.Flush()
-        '    lSW.Close()
-        '    lSW = Nothing
-        'End If
+            Dim lStrInputFile As String = pDataFilename
+            If lStrInputFile.Length > 12 Then
+                lStrInputFile = lStrInputFile.Substring(0, 12)
+            End If
+            If lAskUserRecIndexOnly <> 1 Then
+                lSW = New IO.StreamWriter(pFileRecSum, True)
+                '   17 FORMAT (A12,A1,1X,1I4,'-',1I4,1I3,3F6.1,2F8.3,1F9.4,2F10.4)
+                Dim lDate(5) As Integer
+                J2Date(FlowData.Dates.Value(0), lDate)
+                Dim lStrYearStart As String = lDate(0).ToString
+                J2Date(FlowData.Dates.Value(FlowData.numValues - 1), lDate)
+                Dim lStrYearEnd As String = lDate(0).ToString
 
-        ''here is the final result
-        'lSW = New IO.StreamWriter(lFileIndex, True)
-        ''   13 format (A12,1f8.2)
-        'lSW.WriteLine(lStrInputFile & String.Format("{0:0.00}", lKMed).PadLeft(8, " "))
-        'lSW.Flush()
-        'lSW.Close()
-        'lSW = Nothing
+                Dim lStrKMin As String = String.Format("{0:0.0}", lKMin).PadLeft(6, " ")
+                Dim lStrKMed As String = String.Format("{0:0.0}", lKMed).PadLeft(6, " ")
+                Dim lStrKMax As String = String.Format("{0:0.0}", lKMax).PadLeft(6, " ")
+                Dim lStrMNLogQC As String = String.Format("{0:0.000}", lQLogMinC).PadLeft(8, " ") 'lMNLogQC
+                Dim lStrMXLogQC As String = String.Format("{0:0.000}", lQLogMaxC).PadLeft(8, " ") 'lMXLogQC
+                Dim lStrCoeffA As String = String.Format("{0:0.0000}", 0.5 * lCoeffA).PadLeft(9, " ")
+                Dim lStrCoeffB As String = String.Format("{0:0.0000}", lCoeffB).PadLeft(10, " ")
+                Dim lStrCoeffC As String = String.Format("{0:0.0000}", lCoeffC).PadLeft(10, " ")
+
+                lSW.WriteLine(lStrInputFile & SeasonLabel & " " & lStrYearStart & "-" & lStrYearEnd & lListOfChosenSegments.Count & _
+                              lStrKMin & lStrKMed & lStrKMax & lStrMNLogQC & lStrMXLogQC & lStrCoeffA & lStrCoeffB & lStrCoeffC)
+                lSW.Flush()
+                lSW.Close()
+                lSW = Nothing
+            End If
+
+            'here is the final result
+
+            Bulletin = lMsg.ToString
+            lSW = New IO.StreamWriter(pFileIndex, True)
+            '   13 format (A12,1f8.2)
+            lSW.WriteLine(lStrInputFile.PadRight(12, " ") & String.Format("{0:0.00}", lKMed).PadLeft(8, " "))
+            lSW.Flush()
+            lSW.Close()
+            lSW = Nothing
+        End If
+
+        'here is the final result
+        lMsg.AppendLine(vbCrLf & "Final median recession index: " & String.Format("{0:0.00}", lKMed).PadLeft(8, " "))
+        Bulletin = lMsg.ToString
     End Sub
 
     '--------- THIS SUBROUTINE MAKES TABULAR OUTPUT OF RECESSION DATA: -----
@@ -1520,47 +1599,50 @@ Public Class clsRecess
     '  INPUT IS 3 LISTS OF NUMBERS. ALL LISTS (LIST1,LIST2,AND LIST3) HAVE
     '  M NUMBERS. OUTPUT IS SAME, IN ASCENDING ORDER, SORTED BY VALUES
     '  IN LIST1. NOTE: LIST3 IS MADE UP OF INTEGERS.
-    'LIST1 XMean
-    'LIST2 Coefficient1
-    'LIST3 Original ordinal number of each segment
-    'Public Shared Sub Order(ByVal aListOfChosenSegments As atcCollection)
-    '    Dim lSwaped As String = "YES"
-    '    Dim lPasses As Integer = 0
-    '    Dim lTempValue As Double
-    '    While True
-    '        lSwaped = "NO"
-    '        lPasses += 1
-    '        Dim I As Integer = 1
-    '        While True
-    '            If aList1XMean(I) > aList1XMean(I + 1) Then
-    '                lTempValue = aList1XMean(I + 1)
-    '                aList1XMean(I + 1) = aList1XMean(I)
-    '                aList1XMean(I) = lTempValue
+    'LIST1 e.g XMean
+    'LIST2 e.g Coefficient1
+    'LIST3 e.g Original ordinal number of each segment
+    Private Sub Order(ByVal aNumOfRecessPeriods As Integer, ByRef aList1() As Double, Optional ByRef aList2() As Double = Nothing, Optional ByRef aList3() As Integer = Nothing)
+        Dim lSwaped As String = "YES"
+        Dim lPasses As Integer = 0
+        Dim lTempValue As Double
+        While True
+            lSwaped = "NO"
+            lPasses += 1
+            Dim I As Integer = 1
+            While True
+                If aList1(I) > aList1(I + 1) Then
+                    lTempValue = aList1(I + 1)
+                    aList1(I + 1) = aList1(I)
+                    aList1(I) = lTempValue
 
-    '                lTempValue = aList2Coef1(I + 1)
-    '                aList2Coef1(I + 1) = aList2Coef1(I)
-    '                aList2Coef1(I) = lTempValue
+                    If aList2 IsNot Nothing Then
+                        lTempValue = aList2(I + 1)
+                        aList2(I + 1) = aList2(I)
+                        aList2(I) = lTempValue
+                    End If
 
-    '                lTempValue = aList3OriginalOrder(I + 1)
-    '                aList3OriginalOrder(I + 1) = aList3OriginalOrder(I)
-    '                aList3OriginalOrder(I) = lTempValue
+                    If aList3 IsNot Nothing Then
+                        lTempValue = aList3(I + 1)
+                        aList3(I + 1) = aList3(I)
+                        aList3(I) = lTempValue
+                    End If
 
-    '                lSwaped = "YES"
-    '            End If
-    '            I += 1
-    '            If I <= aNumOfRecessPeriods - lPasses Then
-    '                Continue While
-    '            Else
-    '                Exit While
-    '            End If
-    '        End While
-    '        If lSwaped = "YES" Then
-    '            Continue While
-    '        Else
-    '            Exit While
-    '        End If
-    '    End While
-    'End Sub
-
+                    lSwaped = "YES"
+                End If
+                I += 1
+                If I <= aNumOfRecessPeriods - lPasses Then
+                    Continue While
+                Else
+                    Exit While
+                End If
+            End While
+            If lSwaped = "YES" Then
+                Continue While
+            Else
+                Exit While
+            End If
+        End While
+    End Sub
 
 End Class
