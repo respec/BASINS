@@ -47,6 +47,7 @@ Public Class frmRecess
                       Optional ByVal aShowForm As Boolean = True)
         pDataGroup = aTimeseriesGroup
         pGraphRecessDatagroup = New atcTimeseriesGroup()
+        pRecess = New clsRecess()
         SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
         InitMasterPane()
         PopulateForm()
@@ -1171,8 +1172,8 @@ Public Class frmRecess
             pRecess.Clear()
             pRecess = Nothing
         End If
-
-        pRecess = New clsRecess(pDataGroup(0), lArgs)
+        pRecess = New clsRecess()
+        pRecess.Initialize(pDataGroup(0), lArgs)
         pRecess.RecessGetAllSegments()
         lstRecessSegments.Items.Clear()
         For Each lPeakDate As String In pRecess.listOfSegments.Keys
@@ -1354,6 +1355,7 @@ Public Class frmRecess
         If IO.Directory.Exists(lDir) Then
             txtOutputDir.Text = lDir
             pOutputDir = lDir
+            pRecess.OutputPath = lDir
             SaveSetting("atcUSGSRecess", "Defaults", "OutputDir", pOutputDir)
         End If
     End Sub
@@ -1420,6 +1422,7 @@ Public Class frmRecess
         Dim lDayOrdinal As Integer = CInt(lArr(0))
         Dim lFirstLastCancel() As String = {"First Day", "Last Day", "Reset All", "Cancel"}
         Dim lResponse As String = Logger.MsgCustom("Set '" & lDayOrdinal & "' as first or last day of this recession segment?", lMsgTitle, lFirstLastCancel)
+
         If lResponse <> "Cancel" Then
             Dim lRecSeg As clsRecessionSegment = pRecess.listOfSegments.ItemByKey(lstRecessSegments.SelectedItem.ToString)
             If lRecSeg IsNot Nothing Then
@@ -1479,6 +1482,7 @@ Public Class frmRecess
 
     Private Sub chkSaveInterimToFile_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkSaveInterimToFile.CheckedChanged
         If chkSaveInterimToFile.Checked Then
+            pRecess.SaveInterimResults = True
             If Not IO.Directory.Exists(txtOutputDir.Text.Trim()) Then
                 Logger.Msg("Need to select output directory.", MsgBoxStyle.Information, "Save Intermediate Results")
                 txtOutputDir.Focus()
@@ -1493,10 +1497,14 @@ Public Class frmRecess
                     txtOutputDir.Focus()
                 End Try
             End If
+        Else
+            pRecess.SaveInterimResults = False
         End If
     End Sub
 
     Private Sub btnSummary_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSummary.Click
         pRecess.DoOperation("summary", "")
+        txtAnalysisResults.Text = pRecess.Bulletin
+        txtAnalysisResults.Visible = True
     End Sub
 End Class

@@ -1,4 +1,5 @@
 ﻿Imports atcData
+Imports atcUtility
 
 Public Class clsRecessionSegment
     Implements IComparable
@@ -23,6 +24,14 @@ Public Class clsRecessionSegment
     Public ReadOnly Property BestFitEquation() As String
         Get
             Return " T = ( " & String.Format("{0:0.0000}", Coefficient1).PadLeft(12, " ") & "* LOGQ )  +  " & String.Format("{0:0.0000}", Coefficient2).PadLeft(12, " ")
+        End Get
+    End Property
+
+    Public ReadOnly Property PeakDayDateToString() As String
+        Get
+            Dim lDate(5) As Integer
+            J2Date(PeakDayDate, lDate)
+            Return lDate(0).ToString & "/" & lDate(1).ToString.PadLeft(2, " ") & "/" & lDate(2).ToString.PadLeft(2, " ")
         End Get
     End Property
 

@@ -28,7 +28,7 @@ Public Class frmUSGSStreamFlowAnalysis
                       Optional ByVal aShowForm As Boolean = True)
         pDataGroup = aTimeseriesGroup
         pGraphRecessDatagroup = New atcTimeseriesGroup()
-        pRecess = New clsRecess(pDataGroup(0))
+        pRecess = New clsRecess()
         SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
         InitMasterPane()
         Me.Show()
