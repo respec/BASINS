@@ -699,11 +699,11 @@ Public Module modGeoSFM
             End If
 
             'DrainZoneVtab
-            Dim drainvalue As Single = lDrainZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value '(DrainZoneVtab.ReturnValue(drainfield, rrecord)).SetFormat("d.ddd").AsString
+            Dim drainvalue As Single = Format(lDrainZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value, "#.##0") '(DrainZoneVtab.ReturnValue(drainfield, rrecord)).SetFormat("d.ddd").AsString
 
             Dim upareavalue As Single = (facvalue * GisUtil.GridGetCellSizeX(facgthm) * GisUtil.GridGetCellSizeX(facgthm)) / 1000000.0  '((facvalue.asstring.asnumber * facgrid.GetCellSize * facgrid.GetCellSize) / 1000000.0).SetFormat("d.d").asstring
 
-            Dim slopevalue As String = ((avgdrop * 100) / avglength).ToString  '(((avgdrop * 100) / avglength).Format("d.dddd")).AsString
+            Dim slopevalue As String = Format(((avgdrop * 100) / avglength), "0.####")  '(((avgdrop * 100) / avglength).Format("d.dddd")).AsString
             If Not IsNumeric(slopevalue) Then
                 slopevalue = "0.0010"
             End If
@@ -714,7 +714,7 @@ Public Module modGeoSFM
             'rivlenZoneVtab
             Dim riverlossvalue As String = "1.0"
 
-            Dim rivlenvalue As String = (lRivlenZonalStats.ItemByKey(basinvalue).GetDefinedValue("Max").Value - lRivlenZonalStats.ItemByKey(basinvalue).GetDefinedValue("Min").Value).ToString  ' (rivlenZoneVtab.ReturnValue(rivlenfield, rrecord)).SetFormat("d.d").AsString
+            Dim rivlenvalue As String = Format((lRivlenZonalStats.ItemByKey(basinvalue).GetDefinedValue("Max").Value - lRivlenZonalStats.ItemByKey(basinvalue).GetDefinedValue("Min").Value), "#.0")  ' (rivlenZoneVtab.ReturnValue(rivlenfield, rrecord)).SetFormat("d.d").AsString
             If Not IsNumeric(rivlenvalue) Then
                 rivlenvalue = GisUtil.GridGetCellSizeX(basingthm).ToString
             End If
@@ -727,7 +727,7 @@ Public Module modGeoSFM
             '  under the influence of the average head (= avgdrop) in the catchment
             ' Assume baseflow is 3 times as slow as interflow
 
-            Dim interflowlag As String = "0" '(((areavalue) * (avgdrop) * basingrid.GetCellSize * 0.439) / (rivlenvalue * avgdrop * drainvalue * 0.24 * 2)).tostring
+            Dim interflowlag As String = Format((((areavalue) * (avgdrop) * GisUtil.GridGetCellSizeX(basingthm) * 0.439) / (rivlenvalue * avgdrop * drainvalue * 0.24 * 2)), "#.####")
             If Not IsNumeric(interflowlag) Then
                 interflowlag = "10"
             ElseIf CStr(interflowlag) < 2 Then
@@ -736,16 +736,16 @@ Public Module modGeoSFM
                 interflowlag = "120"
             End If
 
-            Dim baseflowlag As String = (CStr(interflowlag) * 3).ToString
+            Dim baseflowlag As String = Format((CStr(interflowlag) * 3), "#.####")
 
             'RcnZoneVtab
-            Dim rcnvalue As String = lRcnZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value.ToString '(RcnZoneVtab.ReturnValue(Rcnfield, rrecord)).SetFormat("d.d").AsString
+            Dim rcnvalue As String = Format(lRcnZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value, "#.0") '(RcnZoneVtab.ReturnValue(Rcnfield, rrecord)).SetFormat("d.d").AsString
 
             'whcZoneVtab
-            Dim whcvalue As String = lWhcZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value.ToString '(whcZoneVtab.ReturnValue(Whcfield, rrecord)).AsString
+            Dim whcvalue As String = Format(lWhcZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value, "###.###")  '(whcZoneVtab.ReturnValue(Whcfield, rrecord)).AsString
 
             'DepthZoneVtab
-            Dim depthvalue As String = lDepthZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value.ToString '(DepthZoneVtab.ReturnValue(depthfield, rrecord)).AsString
+            Dim depthvalue As String = Format(lDepthZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value, "###.###") '(DepthZoneVtab.ReturnValue(depthfield, rrecord)).AsString
 
             'TextureZoneVtab
             Dim texturevalue As String = lTextureZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mode").Value.ToString '(TextureZoneVtab.ReturnValue(texturefield, rrecord)).AsString
@@ -766,7 +766,7 @@ Public Module modGeoSFM
 
             'rivdemZoneVtab
             Dim rivdropvalue As Single = lRivDemZonalStats.ItemByKey(basinvalue).GetValue("Max") - lRivDemZonalStats.ItemByKey(basinvalue).GetDefinedValue("Min").Value '(rivdemZoneVtab.ReturnValue(rivdemfield, rrecord))
-            Dim rivslopevalue As String = ((rivdropvalue * 100) / CStr(rivlenvalue)).ToString   '(((rivdropvalue * 100) / CStr(rivlenvalue)).SetFormat("d.dddd")).AsString
+            Dim rivslopevalue As String = Format((rivdropvalue * 100) / CStr(rivlenvalue), "0.0000")   '(((rivdropvalue * 100) / CStr(rivlenvalue)).SetFormat("d.dddd")).AsString
             If Not IsNumeric(rivslopevalue) Then
                 rivslopevalue = "0.0010"
             End If
@@ -794,7 +794,7 @@ Public Module modGeoSFM
                     celerity = "1.5"
                 End If
 
-                diffusion = (0.15 * CSng(celerity) * CSng(rivlenvalue)).ToString  '(((0.15 * (CSng(celerity)) * (CSng(rivlenvalue)).SetFormat("d.d")).asstring)
+                diffusion = Format(0.15 * CSng(celerity) * CSng(rivlenvalue), "#.0")  '(((0.15 * (CSng(celerity)) * (CSng(rivlenvalue)).SetFormat("d.d")).asstring)
                 If (CSng(diffusion) < 100.0) Then
                     diffusion = "100.0"
                 ElseIf (CSng(diffusion) > 10000.0) Then
@@ -819,7 +819,7 @@ Public Module modGeoSFM
                     celerity = "2.0"
                 End If
 
-                diffusion = (0.15 * CSng(celerity) * CSng(rivlenvalue)).ToString '(((0.15 * CSng(celerity) * CSng(rivlenvalue)).SetFormat("d.d")).asstring)
+                diffusion = Format(0.15 * CSng(celerity) * CSng(rivlenvalue), "#.0") '(((0.15 * CSng(celerity) * CSng(rivlenvalue)).SetFormat("d.d")).asstring)
                 If (CSng(diffusion) < 100.0) Then
                     diffusion = "100.0"
                 ElseIf (CSng(diffusion) > 10000.0) Then
@@ -844,7 +844,7 @@ Public Module modGeoSFM
                     celerity = "3.0"
                 End If
 
-                diffusion = (0.15 * CSng(celerity) * CSng(rivlenvalue)).ToString '(((0.15 * CSng(celerity) * CSng(rivlenvalue)).SetFormat("d.d")).asstring)
+                diffusion = Format(0.15 * CSng(celerity) * CSng(rivlenvalue), "#.0") '(((0.15 * CSng(celerity) * CSng(rivlenvalue)).SetFormat("d.d")).asstring)
                 If (CSng(diffusion) < 100.0) Then
                     diffusion = "100.0"
                 ElseIf (CSng(diffusion) > 10000.0) Then
@@ -869,7 +869,7 @@ Public Module modGeoSFM
                     celerity = "4.0"
                 End If
 
-                diffusion = (0.15 * CSng(celerity) * CSng(rivlenvalue)).ToString  '(((0.15 * CSng(celerity) * CSng(rivlenvalue)).SetFormat("d.d")).asstring)
+                diffusion = Format(0.15 * CSng(celerity) * CSng(rivlenvalue), "#.0")  '(((0.15 * CSng(celerity) * CSng(rivlenvalue)).SetFormat("d.d")).asstring)
                 If (CSng(diffusion) < 100.0) Then
                     diffusion = "100.0"
                 ElseIf (CSng(diffusion) > 10000.0) Then
@@ -894,7 +894,7 @@ Public Module modGeoSFM
                     celerity = "5.0"
                 End If
 
-                diffusion = (0.15 * CSng(celerity) * CSng(rivlenvalue)).ToString  '(((0.15 * CSng(celerity) * CSng(rivlenvalue)).SetFormat("d.d")).asstring)
+                diffusion = Format(0.15 * CSng(celerity) * CSng(rivlenvalue), "#.0")  '(((0.15 * CSng(celerity) * CSng(rivlenvalue)).SetFormat("d.d")).asstring)
                 If (CSng(diffusion) < 100.0) Then
                     diffusion = "100.0"
                 ElseIf (CSng(diffusion) > 10000.0) Then
@@ -907,26 +907,26 @@ Public Module modGeoSFM
             Dim downvalue As String = lDownZonalStats.ItemByKey(basinvalue).GetValue("Mode", "").ToString '(DownZoneVtab.ReturnValue(downfield, rrecord)).AsString
 
             'MaxCoverZoneVtab
-            Dim maxcovervalue As String = (lMaxCoverZonalStats.ItemByKey(basinvalue).GetValue("Mean", GetNaN) / 100).ToString '((MaxCoverZoneVtab.ReturnValue(maxcoverfield, rrecord)) / 100).SetFormat("d.ddddd").AsString
-            If CSng(maxcovervalue) <= 0.001 Then
+            Dim maxcovervalue As String = Format((lMaxCoverZonalStats.ItemByKey(basinvalue).GetValue("Mean", GetNaN) / 100), "0.####") '((MaxCoverZoneVtab.ReturnValue(maxcoverfield, rrecord)) / 100).SetFormat("d.ddddd").AsString
+            If maxcovervalue.Length = 0 OrElse CSng(maxcovervalue) <= 0.001 Then
                 maxcovervalue = "0.001"
             ElseIf CSng(maxcovervalue) >= 1 Then
                 maxcovervalue = "1.0"
             End If
 
-            Dim hasdamvalue As String = "" '(BasinTable.ReturnValue(hasdamfld, rrecord)).SetFormat("d").AsString
+            Dim hasdamvalue As String = "0" '(BasinTable.ReturnValue(hasdamfld, rrecord)).SetFormat("d").AsString
             Dim rivpolyloss As String = "1.0"
             Dim hasrating As String = "0"
             Dim hasflowdata As String = "0"
-            Dim rivwidth As String = (6.13 * (CSng(upareavalue) ^ (0.347))).ToString
-            Dim flowref As String = (36 * 0.02832 * ((CSng(areavalue) / 2.59) ^ (0.68))).ToString
+            Dim rivwidth As String = Format(6.13 * (CSng(upareavalue) ^ (0.347)), "#.###")
+            Dim flowref As String = Format(36 * 0.02832 * ((CSng(areavalue) / 2.59) ^ (0.68)), "#.####")
             Dim runtype As String = "0"
             Dim mannvalue As String = "0.035"
             Dim pancoef As String = "0.85"
             Dim topsoil As String = "0.1"
             Dim aridity As String = "2"
-            lSBOut.AppendLine(CStr(basinvalue) + "," + whcvalue + "," + depthvalue + "," + texturevalue + "," + CStr(drainvalue) + "," + CStr(areavalue) + "," + interflowlag + "," + slopevalue + "," + baseflowlag + "," + rcnvalue + "," + maxcovervalue + "," + basinlossvalue + "," + pancoef + "," + topsoil + "," + aridity)
-            lSBRiv.AppendLine(CStr(basinvalue) + "," + CStr(areavalue) + "," + CStr(upareavalue) + "," + rivslopevalue + "," + rivlenvalue + "," + downvalue + "," + mannvalue + "," + riverlossvalue + "," + rivpolyloss + "," + hasdamvalue + "," + hasrating + "," + hasflowdata + "," + celerity + "," + diffusion + "," + rivwidth + "," + flowref + "," + runtype)
+            lSBOut.AppendLine(CStr(basinvalue) + "," + whcvalue + "," + depthvalue + "," + texturevalue + "," + CStr(drainvalue) + "," + Format(areavalue, "#.0") + "," + interflowlag + "," + slopevalue + "," + baseflowlag + "," + rcnvalue + "," + maxcovervalue + "," + basinlossvalue + "," + pancoef + "," + topsoil + "," + aridity)
+            lSBRiv.AppendLine(CStr(basinvalue) + "," + Format(areavalue, "#.0") + "," + Format(upareavalue, "#.0") + "," + rivslopevalue + "," + rivlenvalue + "," + downvalue + "," + mannvalue + "," + riverlossvalue + "," + rivpolyloss + "," + hasdamvalue + "," + hasrating + "," + hasflowdata + "," + celerity + "," + diffusion + "," + rivwidth + "," + flowref + "," + runtype)
             lSBOrder.AppendLine(CStr(basinvalue))
         Next
 
