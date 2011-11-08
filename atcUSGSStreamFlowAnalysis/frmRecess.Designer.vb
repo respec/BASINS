@@ -25,6 +25,7 @@ Partial Class frmRecess
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmRecess))
         Me.tabMain = New System.Windows.Forms.TabControl
         Me.tabConfig = New System.Windows.Forms.TabPage
+        Me.chkSaveInterimToFile = New System.Windows.Forms.CheckBox
         Me.gbRnages = New System.Windows.Forms.GroupBox
         Me.btnBrowseRangeFile = New System.Windows.Forms.Button
         Me.TextBox4 = New System.Windows.Forms.TextBox
@@ -55,6 +56,7 @@ Partial Class frmRecess
         Me.tabAnalysis = New System.Windows.Forms.TabPage
         Me.lstRecessSegments = New System.Windows.Forms.CheckedListBox
         Me.scDisplay = New System.Windows.Forms.SplitContainer
+        Me.txtAnalysisResults = New System.Windows.Forms.TextBox
         Me.lstTable = New System.Windows.Forms.ListBox
         Me.gbToolBar = New System.Windows.Forms.GroupBox
         Me.btnSummary = New System.Windows.Forms.Button
@@ -63,15 +65,7 @@ Partial Class frmRecess
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.mnuFile = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuFileSelectData = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuOutput = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuOutputASCII = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuGraphBF = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuGraphTimeseries = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuGraphProbability = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuAnalysis = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem
-        Me.txtAnalysisResults = New System.Windows.Forms.TextBox
-        Me.chkSaveInterimToFile = New System.Windows.Forms.CheckBox
         Me.tabMain.SuspendLayout()
         Me.tabConfig.SuspendLayout()
         Me.gbRnages.SuspendLayout()
@@ -115,6 +109,16 @@ Partial Class frmRecess
         Me.tabConfig.Text = "Configuration"
         Me.tabConfig.UseVisualStyleBackColor = True
         '
+        'chkSaveInterimToFile
+        '
+        Me.chkSaveInterimToFile.AutoSize = True
+        Me.chkSaveInterimToFile.Location = New System.Drawing.Point(8, 213)
+        Me.chkSaveInterimToFile.Name = "chkSaveInterimToFile"
+        Me.chkSaveInterimToFile.Size = New System.Drawing.Size(150, 17)
+        Me.chkSaveInterimToFile.TabIndex = 47
+        Me.chkSaveInterimToFile.Text = "Save Intermediate Results"
+        Me.chkSaveInterimToFile.UseVisualStyleBackColor = True
+        '
         'gbRnages
         '
         Me.gbRnages.Controls.Add(Me.btnBrowseRangeFile)
@@ -124,12 +128,13 @@ Partial Class frmRecess
         Me.gbRnages.Controls.Add(Me.Label2)
         Me.gbRnages.Controls.Add(Me.TextBox2)
         Me.gbRnages.Controls.Add(Me.Label1)
-        Me.gbRnages.Location = New System.Drawing.Point(6, 167)
+        Me.gbRnages.Location = New System.Drawing.Point(6, 236)
         Me.gbRnages.Name = "gbRnages"
         Me.gbRnages.Size = New System.Drawing.Size(582, 58)
         Me.gbRnages.TabIndex = 46
         Me.gbRnages.TabStop = False
         Me.gbRnages.Text = "Recession Data Display Parameters"
+        Me.gbRnages.Visible = False
         '
         'btnBrowseRangeFile
         '
@@ -190,7 +195,7 @@ Partial Class frmRecess
         '
         'txtOutputDir
         '
-        Me.txtOutputDir.Location = New System.Drawing.Point(6, 244)
+        Me.txtOutputDir.Location = New System.Drawing.Point(6, 187)
         Me.txtOutputDir.Name = "txtOutputDir"
         Me.txtOutputDir.Size = New System.Drawing.Size(581, 20)
         Me.txtOutputDir.TabIndex = 41
@@ -198,7 +203,7 @@ Partial Class frmRecess
         'lblOutpuDir
         '
         Me.lblOutpuDir.AutoSize = True
-        Me.lblOutpuDir.Location = New System.Drawing.Point(8, 228)
+        Me.lblOutpuDir.Location = New System.Drawing.Point(6, 171)
         Me.lblOutpuDir.Name = "lblOutpuDir"
         Me.lblOutpuDir.Size = New System.Drawing.Size(118, 13)
         Me.lblOutpuDir.TabIndex = 45
@@ -423,6 +428,21 @@ Partial Class frmRecess
         Me.scDisplay.SplitterDistance = 250
         Me.scDisplay.TabIndex = 39
         '
+        'txtAnalysisResults
+        '
+        Me.txtAnalysisResults.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.txtAnalysisResults.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.txtAnalysisResults.Font = New System.Drawing.Font("Consolas", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txtAnalysisResults.Location = New System.Drawing.Point(0, 0)
+        Me.txtAnalysisResults.Multiline = True
+        Me.txtAnalysisResults.Name = "txtAnalysisResults"
+        Me.txtAnalysisResults.ReadOnly = True
+        Me.txtAnalysisResults.ScrollBars = System.Windows.Forms.ScrollBars.Both
+        Me.txtAnalysisResults.Size = New System.Drawing.Size(250, 303)
+        Me.txtAnalysisResults.TabIndex = 1
+        Me.txtAnalysisResults.Visible = False
+        Me.txtAnalysisResults.WordWrap = False
+        '
         'lstTable
         '
         Me.lstTable.Dock = System.Windows.Forms.DockStyle.Fill
@@ -477,7 +497,7 @@ Partial Class frmRecess
         'MenuStrip1
         '
         Me.MenuStrip1.BackColor = System.Drawing.SystemColors.Window
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFile, Me.mnuAnalysis, Me.mnuHelp})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFile, Me.mnuHelp})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Size = New System.Drawing.Size(658, 24)
@@ -486,85 +506,22 @@ Partial Class frmRecess
         '
         'mnuFile
         '
-        Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileSelectData, Me.mnuOutput, Me.mnuGraphBF})
+        Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileSelectData})
         Me.mnuFile.Name = "mnuFile"
-        Me.mnuFile.Size = New System.Drawing.Size(35, 20)
+        Me.mnuFile.Size = New System.Drawing.Size(37, 20)
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
         '
         Me.mnuFileSelectData.Name = "mnuFileSelectData"
-        Me.mnuFileSelectData.Size = New System.Drawing.Size(140, 22)
+        Me.mnuFileSelectData.Size = New System.Drawing.Size(132, 22)
         Me.mnuFileSelectData.Text = "Select Data"
-        '
-        'mnuOutput
-        '
-        Me.mnuOutput.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOutputASCII})
-        Me.mnuOutput.Name = "mnuOutput"
-        Me.mnuOutput.Size = New System.Drawing.Size(140, 22)
-        Me.mnuOutput.Text = "Output"
-        '
-        'mnuOutputASCII
-        '
-        Me.mnuOutputASCII.Name = "mnuOutputASCII"
-        Me.mnuOutputASCII.Size = New System.Drawing.Size(113, 22)
-        Me.mnuOutputASCII.Text = "ASCII"
-        '
-        'mnuGraphBF
-        '
-        Me.mnuGraphBF.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuGraphTimeseries, Me.mnuGraphProbability})
-        Me.mnuGraphBF.Name = "mnuGraphBF"
-        Me.mnuGraphBF.Size = New System.Drawing.Size(140, 22)
-        Me.mnuGraphBF.Text = "Graph"
-        '
-        'mnuGraphTimeseries
-        '
-        Me.mnuGraphTimeseries.Name = "mnuGraphTimeseries"
-        Me.mnuGraphTimeseries.Size = New System.Drawing.Size(136, 22)
-        Me.mnuGraphTimeseries.Text = "TimeSeries"
-        '
-        'mnuGraphProbability
-        '
-        Me.mnuGraphProbability.Name = "mnuGraphProbability"
-        Me.mnuGraphProbability.Size = New System.Drawing.Size(136, 22)
-        Me.mnuGraphProbability.Text = "Probability"
-        '
-        'mnuAnalysis
-        '
-        Me.mnuAnalysis.Name = "mnuAnalysis"
-        Me.mnuAnalysis.Size = New System.Drawing.Size(58, 20)
-        Me.mnuAnalysis.Text = "Analysis"
         '
         'mnuHelp
         '
         Me.mnuHelp.Name = "mnuHelp"
-        Me.mnuHelp.Size = New System.Drawing.Size(40, 20)
+        Me.mnuHelp.Size = New System.Drawing.Size(44, 20)
         Me.mnuHelp.Text = "Help"
-        '
-        'txtAnalysisResults
-        '
-        Me.txtAnalysisResults.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.txtAnalysisResults.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.txtAnalysisResults.Font = New System.Drawing.Font("Consolas", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtAnalysisResults.Location = New System.Drawing.Point(0, 0)
-        Me.txtAnalysisResults.Multiline = True
-        Me.txtAnalysisResults.Name = "txtAnalysisResults"
-        Me.txtAnalysisResults.ReadOnly = True
-        Me.txtAnalysisResults.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtAnalysisResults.Size = New System.Drawing.Size(250, 303)
-        Me.txtAnalysisResults.TabIndex = 1
-        Me.txtAnalysisResults.Visible = False
-        Me.txtAnalysisResults.WordWrap = False
-        '
-        'chkSaveInterimToFile
-        '
-        Me.chkSaveInterimToFile.AutoSize = True
-        Me.chkSaveInterimToFile.Location = New System.Drawing.Point(7, 271)
-        Me.chkSaveInterimToFile.Name = "chkSaveInterimToFile"
-        Me.chkSaveInterimToFile.Size = New System.Drawing.Size(150, 17)
-        Me.chkSaveInterimToFile.TabIndex = 47
-        Me.chkSaveInterimToFile.Text = "Save Intermediate Results"
-        Me.chkSaveInterimToFile.UseVisualStyleBackColor = True
         '
         'frmRecess
         '
@@ -602,12 +559,6 @@ Partial Class frmRecess
     Friend WithEvents MenuStrip1 As System.Windows.Forms.MenuStrip
     Friend WithEvents mnuFile As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuFileSelectData As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents mnuOutput As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents mnuOutputASCII As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents mnuGraphBF As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents mnuGraphTimeseries As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents mnuGraphProbability As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents mnuAnalysis As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents gbRnages As System.Windows.Forms.GroupBox
     Friend WithEvents btnBrowseRangeFile As System.Windows.Forms.Button

@@ -23,7 +23,7 @@ Public Class clsRecessionSegment
     'for display
     Public ReadOnly Property BestFitEquation() As String
         Get
-            Return " T = ( " & String.Format("{0:0.0000}", Coefficient1).PadLeft(12, " ") & "* LOGQ )  +  " & String.Format("{0:0.0000}", Coefficient2).PadLeft(12, " ")
+            Return "T = ( " & String.Format("{0:0.0000}", Coefficient1).PadLeft(8, " ") & " * LOGQ )  +  " & String.Format("{0:0.0000}", Coefficient2).PadLeft(8, " ")
         End Get
     End Property
 
@@ -108,8 +108,9 @@ Public Class clsRecessionSegment
     End Sub
 
     Public Sub ReadData()
-
+        GetData()
     End Sub
+
     Public Sub Clear()
         ReDim Flow(0)
         ReDim QLog(0)
