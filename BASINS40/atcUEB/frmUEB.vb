@@ -9,6 +9,13 @@ Imports System.Windows.Forms
 Public Class frmUEB
     Inherits System.Windows.Forms.Form
 
+    Friend pWeatherFileName As String
+    Friend pParameterFileName As String
+    Friend pSiteFileName As String
+    Friend pBCParameterFileName As String
+    Friend pOutputFileName As String
+    Friend pRadOpt As Integer
+
 #Region " Windows Form Designer generated code "
 
     Public Sub New()
@@ -131,7 +138,6 @@ Public Class frmUEB
     Friend WithEvents cboPrecipStation As System.Windows.Forms.ComboBox
     Friend WithEvents lblPrecipStation As System.Windows.Forms.Label
     Friend WithEvents TabPage2 As System.Windows.Forms.TabPage
-    Friend WithEvents AtcTextProjectName As atcControls.atcText
     Friend WithEvents Label62 As System.Windows.Forms.Label
     Friend WithEvents GroupBox4 As System.Windows.Forms.GroupBox
     Friend WithEvents Label50 As System.Windows.Forms.Label
@@ -148,6 +154,20 @@ Public Class frmUEB
     Friend WithEvents AtcTextAParm As atcControls.atcText
     Friend WithEvents lblCParm As System.Windows.Forms.Label
     Friend WithEvents lblAParm As System.Windows.Forms.Label
+    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents Label3 As System.Windows.Forms.Label
+    Friend WithEvents Label4 As System.Windows.Forms.Label
+    Friend WithEvents Label5 As System.Windows.Forms.Label
+    Friend WithEvents lblInstructions As System.Windows.Forms.Label
+    Friend WithEvents Label6 As System.Windows.Forms.Label
+    Friend WithEvents txtWeatherFile As System.Windows.Forms.TextBox
+    Friend WithEvents txtParameterFile As System.Windows.Forms.TextBox
+    Friend WithEvents txtSiteFile As System.Windows.Forms.TextBox
+    Friend WithEvents txtBCParameterFile As System.Windows.Forms.TextBox
+    Friend WithEvents txtMasterFile As System.Windows.Forms.TextBox
+    Friend WithEvents txtOutputFile As System.Windows.Forms.TextBox
+    Friend WithEvents Label7 As System.Windows.Forms.Label
+    Friend WithEvents txtProjectName As System.Windows.Forms.TextBox
     Friend WithEvents AtcGridBCMonthly As atcControls.atcGrid
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmUEB))
@@ -156,7 +176,9 @@ Public Class frmUEB
         Me.cmdAbout = New System.Windows.Forms.Button()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage2 = New System.Windows.Forms.TabPage()
-        Me.AtcTextProjectName = New atcControls.atcText()
+        Me.txtMasterFile = New System.Windows.Forms.TextBox()
+        Me.lblInstructions = New System.Windows.Forms.Label()
+        Me.Label2 = New System.Windows.Forms.Label()
         Me.Label62 = New System.Windows.Forms.Label()
         Me.GroupBox4 = New System.Windows.Forms.GroupBox()
         Me.Label50 = New System.Windows.Forms.Label()
@@ -166,6 +188,8 @@ Public Class frmUEB
         Me.AtcTextIniEnergyContent = New atcControls.atcText()
         Me.AtcTextIniWaterEquiv = New atcControls.atcText()
         Me.TabPage3 = New System.Windows.Forms.TabPage()
+        Me.txtWeatherFile = New System.Windows.Forms.TextBox()
+        Me.Label3 = New System.Windows.Forms.Label()
         Me.cboNetRadStation = New System.Windows.Forms.ComboBox()
         Me.lblNetRadStation = New System.Windows.Forms.Label()
         Me.cboShortRadStation = New System.Windows.Forms.ComboBox()
@@ -200,10 +224,16 @@ Public Class frmUEB
         Me.AtcTextSMonth = New atcControls.atcText()
         Me.AtcTextEYear = New atcControls.atcText()
         Me.TabPage7 = New System.Windows.Forms.TabPage()
+        Me.txtParameterFile = New System.Windows.Forms.TextBox()
+        Me.Label4 = New System.Windows.Forms.Label()
         Me.AtcGridModelParms = New atcControls.atcGrid()
         Me.TabPage8 = New System.Windows.Forms.TabPage()
+        Me.txtSiteFile = New System.Windows.Forms.TextBox()
+        Me.Label5 = New System.Windows.Forms.Label()
         Me.AtcGridSiteVars = New atcControls.atcGrid()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
+        Me.txtBCParameterFile = New System.Windows.Forms.TextBox()
+        Me.Label6 = New System.Windows.Forms.Label()
         Me.AtcTextCParm = New atcControls.atcText()
         Me.AtcTextAParm = New atcControls.atcText()
         Me.lblCParm = New System.Windows.Forms.Label()
@@ -264,6 +294,9 @@ Public Class frmUEB
         Me.Label45 = New System.Windows.Forms.Label()
         Me.ComboBox39 = New System.Windows.Forms.ComboBox()
         Me.cmdSimulate = New System.Windows.Forms.Button()
+        Me.txtProjectName = New System.Windows.Forms.TextBox()
+        Me.txtOutputFile = New System.Windows.Forms.TextBox()
+        Me.Label7 = New System.Windows.Forms.Label()
         Me.TabControl1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
@@ -281,7 +314,7 @@ Public Class frmUEB
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCancel.Location = New System.Drawing.Point(323, 514)
+        Me.cmdCancel.Location = New System.Drawing.Point(323, 542)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(73, 28)
         Me.cmdCancel.TabIndex = 5
@@ -291,7 +324,7 @@ Public Class frmUEB
         '
         Me.cmdHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdHelp.Location = New System.Drawing.Point(402, 514)
+        Me.cmdHelp.Location = New System.Drawing.Point(402, 542)
         Me.cmdHelp.Name = "cmdHelp"
         Me.cmdHelp.Size = New System.Drawing.Size(65, 28)
         Me.cmdHelp.TabIndex = 6
@@ -301,7 +334,7 @@ Public Class frmUEB
         '
         Me.cmdAbout.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdAbout.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdAbout.Location = New System.Drawing.Point(473, 514)
+        Me.cmdAbout.Location = New System.Drawing.Point(473, 542)
         Me.cmdAbout.Name = "cmdAbout"
         Me.cmdAbout.Size = New System.Drawing.Size(72, 28)
         Me.cmdAbout.TabIndex = 7
@@ -324,48 +357,54 @@ Public Class frmUEB
         Me.TabControl1.Multiline = True
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(529, 431)
+        Me.TabControl1.Size = New System.Drawing.Size(529, 459)
         Me.TabControl1.TabIndex = 8
         '
         'TabPage2
         '
-        Me.TabPage2.Controls.Add(Me.AtcTextProjectName)
+        Me.TabPage2.Controls.Add(Me.txtOutputFile)
+        Me.TabPage2.Controls.Add(Me.Label7)
+        Me.TabPage2.Controls.Add(Me.txtProjectName)
+        Me.TabPage2.Controls.Add(Me.txtMasterFile)
+        Me.TabPage2.Controls.Add(Me.lblInstructions)
+        Me.TabPage2.Controls.Add(Me.Label2)
         Me.TabPage2.Controls.Add(Me.Label62)
         Me.TabPage2.Controls.Add(Me.GroupBox4)
         Me.TabPage2.Location = New System.Drawing.Point(4, 25)
         Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Size = New System.Drawing.Size(521, 402)
+        Me.TabPage2.Size = New System.Drawing.Size(521, 430)
         Me.TabPage2.TabIndex = 12
         Me.TabPage2.Text = "General"
         Me.TabPage2.UseVisualStyleBackColor = True
         '
-        'AtcTextProjectName
+        'txtMasterFile
         '
-        Me.AtcTextProjectName.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcTextProjectName.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
-        Me.AtcTextProjectName.DefaultValue = ""
-        Me.AtcTextProjectName.HardMax = -999.0R
-        Me.AtcTextProjectName.HardMin = -999.0R
-        Me.AtcTextProjectName.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcTextProjectName.Location = New System.Drawing.Point(113, 33)
-        Me.AtcTextProjectName.MaxWidth = 20
-        Me.AtcTextProjectName.Name = "AtcTextProjectName"
-        Me.AtcTextProjectName.NumericFormat = "0.#####"
-        Me.AtcTextProjectName.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcTextProjectName.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcTextProjectName.SelLength = 0
-        Me.AtcTextProjectName.SelStart = 0
-        Me.AtcTextProjectName.Size = New System.Drawing.Size(122, 21)
-        Me.AtcTextProjectName.SoftMax = -999.0R
-        Me.AtcTextProjectName.SoftMin = -999.0R
-        Me.AtcTextProjectName.TabIndex = 32
-        Me.AtcTextProjectName.ValueDouble = 0.0R
-        Me.AtcTextProjectName.ValueInteger = 0
+        Me.txtMasterFile.Location = New System.Drawing.Point(121, 97)
+        Me.txtMasterFile.Name = "txtMasterFile"
+        Me.txtMasterFile.Size = New System.Drawing.Size(380, 20)
+        Me.txtMasterFile.TabIndex = 45
+        '
+        'lblInstructions
+        '
+        Me.lblInstructions.AutoSize = True
+        Me.lblInstructions.Location = New System.Drawing.Point(18, 19)
+        Me.lblInstructions.Name = "lblInstructions"
+        Me.lblInstructions.Size = New System.Drawing.Size(0, 13)
+        Me.lblInstructions.TabIndex = 35
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(18, 100)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(97, 13)
+        Me.Label2.TabIndex = 33
+        Me.Label2.Text = "Master Project File:"
         '
         'Label62
         '
         Me.Label62.AutoSize = True
-        Me.Label62.Location = New System.Drawing.Point(33, 33)
+        Me.Label62.Location = New System.Drawing.Point(18, 139)
         Me.Label62.Name = "Label62"
         Me.Label62.Size = New System.Drawing.Size(74, 13)
         Me.Label62.TabIndex = 31
@@ -381,7 +420,7 @@ Public Class frmUEB
         Me.GroupBox4.Controls.Add(Me.Label53)
         Me.GroupBox4.Controls.Add(Me.AtcTextIniEnergyContent)
         Me.GroupBox4.Controls.Add(Me.AtcTextIniWaterEquiv)
-        Me.GroupBox4.Location = New System.Drawing.Point(22, 75)
+        Me.GroupBox4.Location = New System.Drawing.Point(21, 233)
         Me.GroupBox4.Name = "GroupBox4"
         Me.GroupBox4.Size = New System.Drawing.Size(480, 128)
         Me.GroupBox4.TabIndex = 30
@@ -486,6 +525,8 @@ Public Class frmUEB
         '
         'TabPage3
         '
+        Me.TabPage3.Controls.Add(Me.txtWeatherFile)
+        Me.TabPage3.Controls.Add(Me.Label3)
         Me.TabPage3.Controls.Add(Me.cboNetRadStation)
         Me.TabPage3.Controls.Add(Me.lblNetRadStation)
         Me.TabPage3.Controls.Add(Me.cboShortRadStation)
@@ -502,10 +543,26 @@ Public Class frmUEB
         Me.TabPage3.Controls.Add(Me.GroupBox2)
         Me.TabPage3.Location = New System.Drawing.Point(4, 25)
         Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Size = New System.Drawing.Size(521, 402)
+        Me.TabPage3.Size = New System.Drawing.Size(521, 430)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Weather"
         Me.TabPage3.UseVisualStyleBackColor = True
+        '
+        'txtWeatherFile
+        '
+        Me.txtWeatherFile.Location = New System.Drawing.Point(92, 12)
+        Me.txtWeatherFile.Name = "txtWeatherFile"
+        Me.txtWeatherFile.Size = New System.Drawing.Size(410, 20)
+        Me.txtWeatherFile.TabIndex = 44
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(16, 15)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(70, 13)
+        Me.Label3.TabIndex = 43
+        Me.Label3.Text = "Weather File:"
         '
         'cboNetRadStation
         '
@@ -513,7 +570,7 @@ Public Class frmUEB
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboNetRadStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboNetRadStation.FormattingEnabled = True
-        Me.cboNetRadStation.Location = New System.Drawing.Point(213, 366)
+        Me.cboNetRadStation.Location = New System.Drawing.Point(216, 395)
         Me.cboNetRadStation.Name = "cboNetRadStation"
         Me.cboNetRadStation.Size = New System.Drawing.Size(286, 21)
         Me.cboNetRadStation.TabIndex = 42
@@ -521,7 +578,7 @@ Public Class frmUEB
         'lblNetRadStation
         '
         Me.lblNetRadStation.AutoSize = True
-        Me.lblNetRadStation.Location = New System.Drawing.Point(16, 369)
+        Me.lblNetRadStation.Location = New System.Drawing.Point(19, 398)
         Me.lblNetRadStation.Name = "lblNetRadStation"
         Me.lblNetRadStation.Size = New System.Drawing.Size(111, 13)
         Me.lblNetRadStation.TabIndex = 41
@@ -533,7 +590,7 @@ Public Class frmUEB
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboShortRadStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboShortRadStation.FormattingEnabled = True
-        Me.cboShortRadStation.Location = New System.Drawing.Point(213, 338)
+        Me.cboShortRadStation.Location = New System.Drawing.Point(216, 367)
         Me.cboShortRadStation.Name = "cboShortRadStation"
         Me.cboShortRadStation.Size = New System.Drawing.Size(286, 21)
         Me.cboShortRadStation.TabIndex = 40
@@ -541,7 +598,7 @@ Public Class frmUEB
         'lblShortRadStation
         '
         Me.lblShortRadStation.AutoSize = True
-        Me.lblShortRadStation.Location = New System.Drawing.Point(16, 341)
+        Me.lblShortRadStation.Location = New System.Drawing.Point(19, 370)
         Me.lblShortRadStation.Name = "lblShortRadStation"
         Me.lblShortRadStation.Size = New System.Drawing.Size(191, 13)
         Me.lblShortRadStation.TabIndex = 39
@@ -553,7 +610,7 @@ Public Class frmUEB
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboRelHStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboRelHStation.FormattingEnabled = True
-        Me.cboRelHStation.Location = New System.Drawing.Point(213, 311)
+        Me.cboRelHStation.Location = New System.Drawing.Point(216, 340)
         Me.cboRelHStation.Name = "cboRelHStation"
         Me.cboRelHStation.Size = New System.Drawing.Size(286, 21)
         Me.cboRelHStation.TabIndex = 38
@@ -561,7 +618,7 @@ Public Class frmUEB
         'lblRelHStation
         '
         Me.lblRelHStation.AutoSize = True
-        Me.lblRelHStation.Location = New System.Drawing.Point(16, 314)
+        Me.lblRelHStation.Location = New System.Drawing.Point(19, 343)
         Me.lblRelHStation.Name = "lblRelHStation"
         Me.lblRelHStation.Size = New System.Drawing.Size(128, 13)
         Me.lblRelHStation.TabIndex = 37
@@ -573,7 +630,7 @@ Public Class frmUEB
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboPrecipStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboPrecipStation.FormattingEnabled = True
-        Me.cboPrecipStation.Location = New System.Drawing.Point(213, 257)
+        Me.cboPrecipStation.Location = New System.Drawing.Point(216, 286)
         Me.cboPrecipStation.Name = "cboPrecipStation"
         Me.cboPrecipStation.Size = New System.Drawing.Size(286, 21)
         Me.cboPrecipStation.TabIndex = 36
@@ -581,7 +638,7 @@ Public Class frmUEB
         'lblPrecipStation
         '
         Me.lblPrecipStation.AutoSize = True
-        Me.lblPrecipStation.Location = New System.Drawing.Point(16, 260)
+        Me.lblPrecipStation.Location = New System.Drawing.Point(19, 289)
         Me.lblPrecipStation.Name = "lblPrecipStation"
         Me.lblPrecipStation.Size = New System.Drawing.Size(76, 13)
         Me.lblPrecipStation.TabIndex = 35
@@ -594,9 +651,9 @@ Public Class frmUEB
         Me.GroupBox3.Controls.Add(Me.rdoMeasuredNet)
         Me.GroupBox3.Controls.Add(Me.rdoRadMeasuredInput)
         Me.GroupBox3.Controls.Add(Me.rdoRadEstimate)
-        Me.GroupBox3.Location = New System.Drawing.Point(19, 118)
+        Me.GroupBox3.Location = New System.Drawing.Point(19, 157)
         Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(480, 96)
+        Me.GroupBox3.Size = New System.Drawing.Size(483, 96)
         Me.GroupBox3.TabIndex = 34
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "Radiation Input Type"
@@ -639,7 +696,7 @@ Public Class frmUEB
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboAtempStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboAtempStation.FormattingEnabled = True
-        Me.cboAtempStation.Location = New System.Drawing.Point(213, 230)
+        Me.cboAtempStation.Location = New System.Drawing.Point(216, 259)
         Me.cboAtempStation.Name = "cboAtempStation"
         Me.cboAtempStation.Size = New System.Drawing.Size(286, 21)
         Me.cboAtempStation.TabIndex = 33
@@ -647,7 +704,7 @@ Public Class frmUEB
         'lblATempStation
         '
         Me.lblATempStation.AutoSize = True
-        Me.lblATempStation.Location = New System.Drawing.Point(16, 233)
+        Me.lblATempStation.Location = New System.Drawing.Point(19, 262)
         Me.lblATempStation.Name = "lblATempStation"
         Me.lblATempStation.Size = New System.Drawing.Size(88, 13)
         Me.lblATempStation.TabIndex = 32
@@ -659,7 +716,7 @@ Public Class frmUEB
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboWindStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboWindStation.FormattingEnabled = True
-        Me.cboWindStation.Location = New System.Drawing.Point(213, 284)
+        Me.cboWindStation.Location = New System.Drawing.Point(216, 313)
         Me.cboWindStation.Name = "cboWindStation"
         Me.cboWindStation.Size = New System.Drawing.Size(286, 21)
         Me.cboWindStation.TabIndex = 31
@@ -667,7 +724,7 @@ Public Class frmUEB
         'lblWindStation
         '
         Me.lblWindStation.AutoSize = True
-        Me.lblWindStation.Location = New System.Drawing.Point(16, 287)
+        Me.lblWindStation.Location = New System.Drawing.Point(19, 316)
         Me.lblWindStation.Name = "lblWindStation"
         Me.lblWindStation.Size = New System.Drawing.Size(105, 13)
         Me.lblWindStation.TabIndex = 30
@@ -693,9 +750,9 @@ Public Class frmUEB
         Me.GroupBox2.Controls.Add(Me.AtcTextEMon)
         Me.GroupBox2.Controls.Add(Me.AtcTextSMonth)
         Me.GroupBox2.Controls.Add(Me.AtcTextEYear)
-        Me.GroupBox2.Location = New System.Drawing.Point(19, 16)
+        Me.GroupBox2.Location = New System.Drawing.Point(19, 45)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(480, 96)
+        Me.GroupBox2.Size = New System.Drawing.Size(483, 96)
         Me.GroupBox2.TabIndex = 29
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Simulation Dates"
@@ -972,13 +1029,31 @@ Public Class frmUEB
         '
         'TabPage7
         '
+        Me.TabPage7.Controls.Add(Me.txtParameterFile)
+        Me.TabPage7.Controls.Add(Me.Label4)
         Me.TabPage7.Controls.Add(Me.AtcGridModelParms)
         Me.TabPage7.Location = New System.Drawing.Point(4, 25)
         Me.TabPage7.Name = "TabPage7"
-        Me.TabPage7.Size = New System.Drawing.Size(521, 402)
+        Me.TabPage7.Size = New System.Drawing.Size(521, 430)
         Me.TabPage7.TabIndex = 8
         Me.TabPage7.Text = "Model Parameters"
         Me.TabPage7.UseVisualStyleBackColor = True
+        '
+        'txtParameterFile
+        '
+        Me.txtParameterFile.Location = New System.Drawing.Point(92, 15)
+        Me.txtParameterFile.Name = "txtParameterFile"
+        Me.txtParameterFile.Size = New System.Drawing.Size(410, 20)
+        Me.txtParameterFile.TabIndex = 46
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(9, 18)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(77, 13)
+        Me.Label4.TabIndex = 45
+        Me.Label4.Text = "Parameter File:"
         '
         'AtcGridModelParms
         '
@@ -991,21 +1066,39 @@ Public Class frmUEB
         Me.AtcGridModelParms.Fixed3D = False
         Me.AtcGridModelParms.LineColor = System.Drawing.SystemColors.Control
         Me.AtcGridModelParms.LineWidth = 1.0!
-        Me.AtcGridModelParms.Location = New System.Drawing.Point(3, 13)
+        Me.AtcGridModelParms.Location = New System.Drawing.Point(3, 57)
         Me.AtcGridModelParms.Name = "AtcGridModelParms"
-        Me.AtcGridModelParms.Size = New System.Drawing.Size(511, 376)
+        Me.AtcGridModelParms.Size = New System.Drawing.Size(511, 360)
         Me.AtcGridModelParms.Source = Nothing
         Me.AtcGridModelParms.TabIndex = 0
         '
         'TabPage8
         '
+        Me.TabPage8.Controls.Add(Me.txtSiteFile)
+        Me.TabPage8.Controls.Add(Me.Label5)
         Me.TabPage8.Controls.Add(Me.AtcGridSiteVars)
         Me.TabPage8.Location = New System.Drawing.Point(4, 25)
         Me.TabPage8.Name = "TabPage8"
-        Me.TabPage8.Size = New System.Drawing.Size(521, 402)
+        Me.TabPage8.Size = New System.Drawing.Size(521, 430)
         Me.TabPage8.TabIndex = 9
         Me.TabPage8.Text = "Site Variables"
         Me.TabPage8.UseVisualStyleBackColor = True
+        '
+        'txtSiteFile
+        '
+        Me.txtSiteFile.Location = New System.Drawing.Point(68, 17)
+        Me.txtSiteFile.Name = "txtSiteFile"
+        Me.txtSiteFile.Size = New System.Drawing.Size(410, 20)
+        Me.txtSiteFile.TabIndex = 48
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(15, 20)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(47, 13)
+        Me.Label5.TabIndex = 47
+        Me.Label5.Text = "Site File:"
         '
         'AtcGridSiteVars
         '
@@ -1018,14 +1111,16 @@ Public Class frmUEB
         Me.AtcGridSiteVars.Fixed3D = False
         Me.AtcGridSiteVars.LineColor = System.Drawing.SystemColors.Control
         Me.AtcGridSiteVars.LineWidth = 1.0!
-        Me.AtcGridSiteVars.Location = New System.Drawing.Point(3, 3)
+        Me.AtcGridSiteVars.Location = New System.Drawing.Point(3, 47)
         Me.AtcGridSiteVars.Name = "AtcGridSiteVars"
-        Me.AtcGridSiteVars.Size = New System.Drawing.Size(515, 395)
+        Me.AtcGridSiteVars.Size = New System.Drawing.Size(515, 379)
         Me.AtcGridSiteVars.Source = Nothing
         Me.AtcGridSiteVars.TabIndex = 0
         '
         'TabPage1
         '
+        Me.TabPage1.Controls.Add(Me.txtBCParameterFile)
+        Me.TabPage1.Controls.Add(Me.Label6)
         Me.TabPage1.Controls.Add(Me.AtcTextCParm)
         Me.TabPage1.Controls.Add(Me.AtcTextAParm)
         Me.TabPage1.Controls.Add(Me.lblCParm)
@@ -1033,10 +1128,26 @@ Public Class frmUEB
         Me.TabPage1.Controls.Add(Me.AtcGridBCMonthly)
         Me.TabPage1.Location = New System.Drawing.Point(4, 25)
         Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Size = New System.Drawing.Size(521, 402)
+        Me.TabPage1.Size = New System.Drawing.Size(521, 430)
         Me.TabPage1.TabIndex = 11
         Me.TabPage1.Text = "Bristow Campbell Parameters"
         Me.TabPage1.UseVisualStyleBackColor = True
+        '
+        'txtBCParameterFile
+        '
+        Me.txtBCParameterFile.Location = New System.Drawing.Point(111, 15)
+        Me.txtBCParameterFile.Name = "txtBCParameterFile"
+        Me.txtBCParameterFile.Size = New System.Drawing.Size(403, 20)
+        Me.txtBCParameterFile.TabIndex = 57
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(15, 18)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(97, 13)
+        Me.Label6.TabIndex = 56
+        Me.Label6.Text = "B-C Parameter File:"
         '
         'AtcTextCParm
         '
@@ -1046,7 +1157,7 @@ Public Class frmUEB
         Me.AtcTextCParm.HardMax = -999.0R
         Me.AtcTextCParm.HardMin = -999.0R
         Me.AtcTextCParm.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcTextCParm.Location = New System.Drawing.Point(321, 21)
+        Me.AtcTextCParm.Location = New System.Drawing.Point(325, 58)
         Me.AtcTextCParm.MaxWidth = 20
         Me.AtcTextCParm.Name = "AtcTextCParm"
         Me.AtcTextCParm.NumericFormat = "0.#####"
@@ -1069,7 +1180,7 @@ Public Class frmUEB
         Me.AtcTextAParm.HardMax = -999.0R
         Me.AtcTextAParm.HardMin = -999.0R
         Me.AtcTextAParm.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcTextAParm.Location = New System.Drawing.Point(108, 21)
+        Me.AtcTextAParm.Location = New System.Drawing.Point(112, 58)
         Me.AtcTextAParm.MaxWidth = 20
         Me.AtcTextAParm.Name = "AtcTextAParm"
         Me.AtcTextAParm.NumericFormat = "0.#####"
@@ -1087,7 +1198,7 @@ Public Class frmUEB
         'lblCParm
         '
         Me.lblCParm.AutoSize = True
-        Me.lblCParm.Location = New System.Drawing.Point(247, 21)
+        Me.lblCParm.Location = New System.Drawing.Point(251, 58)
         Me.lblCParm.Name = "lblCParm"
         Me.lblCParm.Size = New System.Drawing.Size(68, 13)
         Me.lblCParm.TabIndex = 53
@@ -1096,7 +1207,7 @@ Public Class frmUEB
         'lblAParm
         '
         Me.lblAParm.AutoSize = True
-        Me.lblAParm.Location = New System.Drawing.Point(34, 21)
+        Me.lblAParm.Location = New System.Drawing.Point(38, 58)
         Me.lblAParm.Name = "lblAParm"
         Me.lblAParm.Size = New System.Drawing.Size(68, 13)
         Me.lblAParm.TabIndex = 52
@@ -1114,9 +1225,9 @@ Public Class frmUEB
         Me.AtcGridBCMonthly.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.AtcGridBCMonthly.LineColor = System.Drawing.Color.Empty
         Me.AtcGridBCMonthly.LineWidth = 0.0!
-        Me.AtcGridBCMonthly.Location = New System.Drawing.Point(0, 65)
+        Me.AtcGridBCMonthly.Location = New System.Drawing.Point(0, 97)
         Me.AtcGridBCMonthly.Name = "AtcGridBCMonthly"
-        Me.AtcGridBCMonthly.Size = New System.Drawing.Size(521, 324)
+        Me.AtcGridBCMonthly.Size = New System.Drawing.Size(521, 320)
         Me.AtcGridBCMonthly.Source = Nothing
         Me.AtcGridBCMonthly.TabIndex = 51
         '
@@ -1126,7 +1237,7 @@ Public Class frmUEB
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox1.Controls.Add(Me.lblStatus)
         Me.GroupBox1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.GroupBox1.Location = New System.Drawing.Point(15, 452)
+        Me.GroupBox1.Location = New System.Drawing.Point(15, 480)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(530, 48)
         Me.GroupBox1.TabIndex = 9
@@ -1721,17 +1832,40 @@ Public Class frmUEB
         Me.cmdSimulate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdSimulate.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdSimulate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdSimulate.Location = New System.Drawing.Point(19, 513)
+        Me.cmdSimulate.Location = New System.Drawing.Point(19, 541)
         Me.cmdSimulate.Name = "cmdSimulate"
         Me.cmdSimulate.Size = New System.Drawing.Size(73, 28)
         Me.cmdSimulate.TabIndex = 10
         Me.cmdSimulate.Text = "Simulate"
         '
+        'txtProjectName
+        '
+        Me.txtProjectName.Location = New System.Drawing.Point(121, 136)
+        Me.txtProjectName.Name = "txtProjectName"
+        Me.txtProjectName.Size = New System.Drawing.Size(142, 20)
+        Me.txtProjectName.TabIndex = 46
+        '
+        'txtOutputFile
+        '
+        Me.txtOutputFile.Location = New System.Drawing.Point(121, 175)
+        Me.txtOutputFile.Name = "txtOutputFile"
+        Me.txtOutputFile.Size = New System.Drawing.Size(142, 20)
+        Me.txtOutputFile.TabIndex = 48
+        '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.Location = New System.Drawing.Point(18, 178)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(92, 13)
+        Me.Label7.TabIndex = 47
+        Me.Label7.Text = "Output File Name:"
+        '
         'frmUEB
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.cmdCancel
-        Me.ClientSize = New System.Drawing.Size(560, 553)
+        Me.ClientSize = New System.Drawing.Size(560, 581)
         Me.Controls.Add(Me.cmdSimulate)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.TabControl1)
@@ -1754,7 +1888,9 @@ Public Class frmUEB
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         Me.TabPage7.ResumeLayout(False)
+        Me.TabPage7.PerformLayout()
         Me.TabPage8.ResumeLayout(False)
+        Me.TabPage8.PerformLayout()
         Me.TabPage1.ResumeLayout(False)
         Me.TabPage1.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
@@ -1789,6 +1925,11 @@ Public Class frmUEB
     End Sub
 
     Public Sub InitializeUI(ByVal aPlugIn As PlugIn)
+
+        lblInstructions.Text = "Select existing UEB project by clicking in the Master Project File box OR " & vbCrLf & _
+                               "build new UEB project by defining all fields on all tabs." & vbCrLf & _
+                               "Existing data files (e.g. Weather, Parameter, ...) may be accessed on other tabs."
+
         With AtcGridModelParms
             .Source = New atcControls.atcGridSource
             .AllowHorizontalScrolling = False
@@ -1924,6 +2065,39 @@ Public Class frmUEB
         If rdoRadEstimate.Checked Then 'no need for Input Shortwave or Net Radition Timeseries
             cboNetRadStation.Enabled = False
             cboShortRadStation.Enabled = False
+        End If
+    End Sub
+
+    Private Sub txtWeatherFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtWeatherFile.Click
+        Dim cdlg As New Windows.Forms.OpenFileDialog
+        cdlg.Title = "Open UCI file containing base model"
+        cdlg.Filter = "UCI files|*.uci|All Files|*.*"
+        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+            Dim lFilename As String = cdlg.FileName
+        End If
+
+    End Sub
+
+    Private Sub txtMasterFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtMasterFile.Click
+        Dim cdlg As New Windows.Forms.OpenFileDialog
+        cdlg.Title = "Open UEB master file containing all model data files"
+        cdlg.Filter = "Master Input files|*.in|All Files|*.*"
+        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+            Dim lFilename As String = cdlg.FileName
+            OpenMasterFile(lFilename, pWeatherFileName, pOutputFileName, pParameterFileName, pSiteFileName, pBCParameterFileName, pRadOpt)
+            txtWeatherFile.Text = pWeatherFileName
+            txtOutputFile.Text = pOutputFileName
+            txtParameterFile.Text = pParameterFileName
+            txtSiteFile.Text = pSiteFileName
+            txtBCParameterFile.Text = pBCParameterFileName
+            Select Case pRadOpt
+                Case 0
+                    rdoRadEstimate.Checked = True
+                Case 1
+                    rdoRadMeasuredInput.Checked = True
+                Case 2
+                    rdoMeasuredNet.Checked = True
+            End Select
         End If
     End Sub
 End Class
