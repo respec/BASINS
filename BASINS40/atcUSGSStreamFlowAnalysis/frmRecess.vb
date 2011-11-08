@@ -17,7 +17,7 @@ Public Class frmRecess
     Private WithEvents pZgc As ZedGraphControl
     Private pGrapher As clsGraphBase
     Private Shared SaveImageExtension As String = ".png"
-
+    Private pBasicAttributes As Generic.List(Of String)
     Public pDataGroup As atcTimeseriesGroup
     Private pGraphRecessDatagroup As atcTimeseriesGroup
 
@@ -42,14 +42,32 @@ Public Class frmRecess
 
     Public Opened As Boolean = False
 
+    Private pLastRunConfigs As atcDataAttributes
+    Private pLastSelectedRecessions As atcCollection
+
     Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing, _
                       Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing, _
                       Optional ByVal aShowForm As Boolean = True)
+        If aBasicAttributes Is Nothing Then
+            pBasicAttributes = atcDataManager.DisplayAttributes
+        Else
+            pBasicAttributes = aBasicAttributes
+        End If
         pDataGroup = aTimeseriesGroup
         pGraphRecessDatagroup = New atcTimeseriesGroup()
+        pLastRunConfigs = New atcDataAttributes()
+        pLastSelectedRecessions = New atcCollection()
+        If pRecess IsNot Nothing Then
+            pRecess.Clear()
+            pRecess = Nothing
+        End If
         pRecess = New clsRecess()
         SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
         InitMasterPane()
+        lstRecessSegments.Items.Clear()
+        lstTable.Items.Clear()
+        txtAnalysisResults.Text = ""
+        txtAnalysisResults.Visible = False
         PopulateForm()
         Me.Show()
     End Sub
@@ -65,20 +83,23 @@ Public Class frmRecess
     End Property
 
     Private Sub InitMasterPane()
-        pZgc = CreateZgc()
-        Me.Controls.Add(pZgc)
-        scDisplay.Panel2.Controls.Add(pZgc)
-        With pZgc
-            .Dock = System.Windows.Forms.DockStyle.Fill
-            '.IsEnableHZoom = mnuViewHorizontalZoom.Checked
-            '.IsEnableHPan = mnuViewHorizontalZoom.Checked
-            '.IsEnableVZoom = mnuViewVerticalZoom.Checked
-            '.IsEnableVPan = mnuViewVerticalZoom.Checked
-            '.IsZoomOnMouseCenter = mnuViewZoomMouse.Checked
-            pMaster = .MasterPane
+        If pZgc Is Nothing Then
+            pZgc = CreateZgc()
+            Me.Controls.Add(pZgc)
+            scDisplay.Panel2.Controls.Add(pZgc)
+            With pZgc
+                .Dock = System.Windows.Forms.DockStyle.Fill
+                '.IsEnableHZoom = mnuViewHorizontalZoom.Checked
+                '.IsEnableHPan = mnuViewHorizontalZoom.Checked
+                '.IsEnableVZoom = mnuViewVerticalZoom.Checked
+                '.IsEnableVPan = mnuViewVerticalZoom.Checked
+                '.IsZoomOnMouseCenter = mnuViewZoomMouse.Checked
+                pMaster = .MasterPane
 
-        End With
-
+            End With
+        Else
+            pZgc.GraphPane.CurveList.Clear()
+        End If
         RefreshGraph()
     End Sub
 
@@ -1031,6 +1052,12 @@ Public Class frmRecess
     End Function
 
     Public Sub RefreshGraphRecess(ByVal aDataGroup As atcTimeseriesGroup)
+        If pGrapher IsNot Nothing Then
+            With pGrapher.ZedGraphCtrl.GraphPane
+                .YAxis.Title.Text = ""
+            End With
+            pGrapher = Nothing
+        End If
         pGrapher = New clsGraphTime(aDataGroup, pZgc)
         With pGrapher.ZedGraphCtrl.GraphPane
             '.YAxis.Type = AxisType.Log
@@ -1161,8 +1188,11 @@ Public Class frmRecess
     End Sub
 
     Private Sub btnGetAllSegments_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGetAllSegments.Click
-        Dim lArgs As New atcDataAttributes
-        Dim lFormCheckMsg As String = AttributesFromForm(lArgs)
+        If Not ConfigurationChanged() Then
+            Exit Sub
+        End If
+        'Dim lArgs As New atcDataAttributes
+        Dim lFormCheckMsg As String = AttributesFromForm(pLastRunConfigs)
         If lFormCheckMsg.Length > 0 Then
             Logger.Msg("Please address the following issues before proceed:" & vbCrLf & vbCrLf & lFormCheckMsg, MsgBoxStyle.Information, "Input Needs Correction")
             Exit Sub
@@ -1170,10 +1200,10 @@ Public Class frmRecess
 
         If pRecess IsNot Nothing Then
             pRecess.Clear()
-            pRecess = Nothing
+            'pRecess = Nothing
         End If
-        pRecess = New clsRecess()
-        pRecess.Initialize(pDataGroup(0), lArgs)
+        'pRecess = New clsRecess()
+        pRecess.Initialize(pDataGroup(0), pLastRunConfigs)
         pRecess.RecessGetAllSegments()
         lstRecessSegments.Items.Clear()
         For Each lPeakDate As String In pRecess.listOfSegments.Keys
@@ -1221,12 +1251,8 @@ Public Class frmRecess
             End If
         Next
 
-        Dim lSeason As String
-        If pSeason = "" Then
-            lSeason = "NoSeason"
-        Else
-            lSeason = pSeason
-        End If
+        Dim lSeason As String = pSeason
+        If lSeason = "" Then lSeason = "n"
 
         If lErrMsg.Length = 0 Then
             Args.SetValue("MinSegmentLength", lMinRecLength)
@@ -1235,6 +1261,10 @@ Public Class frmRecess
             'set duration
             Args.SetValue("Start Date", lSDate)
             Args.SetValue("End Date", lEDate)
+            Args.SetValue("Original Start Date", pDataGroup(0).Dates.Value(0))
+            Args.SetValue("Original End Date", pDataGroup(0).Dates.Value(pDataGroup(0).numValues))
+            Args.SetValue("Constituent", pDataGroup(0).Attributes.GetValue("Constituent"))
+            Args.SetValue("History 1", pDataGroup(0).Attributes.GetValue("History 1"))
             ''Set streamflow
             'Args.SetValue("Streamflow", pDataGroup)
             'Set Unit
@@ -1332,6 +1362,112 @@ Public Class frmRecess
         Return isGoodDate
     End Function
 
+    Private Function RecessionSelectionChanged() As Boolean
+        Dim lIsSelectionChanged As Boolean = False
+        Dim lSeg As clsRecessionSegment = Nothing
+        If pLastSelectedRecessions.Count = 0 Then
+            'run for the first time
+            'record the selection
+            For Each lItem As String In lstRecessSegments.CheckedItems
+                lSeg = pRecess.listOfSegments.ItemByKey(lItem)
+                pLastSelectedRecessions.Add(lItem, lSeg.MinDayOrdinal.ToString & "-" & lSeg.MaxDayOrdinal.ToString)
+            Next
+            Return True
+        Else
+            'check if the current selection is different from that of the previous run
+            If lstRecessSegments.CheckedItems.Count = pLastSelectedRecessions.Count Then
+                For Each lItem As String In lstRecessSegments.CheckedItems
+                    If pLastSelectedRecessions.Keys.Contains(lItem) Then
+                        lSeg = pRecess.listOfSegments.ItemByKey(lItem)
+                        Dim lCurrentDuration As String = lSeg.MinDayOrdinal.ToString & "-" & lSeg.MaxDayOrdinal.ToString
+                        If pLastSelectedRecessions.ItemByKey(lItem) <> lCurrentDuration Then
+                            lIsSelectionChanged = True
+                            Exit For
+                        End If
+                    Else
+                        lIsSelectionChanged = True
+                        Exit For
+                    End If
+                Next
+            Else
+                lIsSelectionChanged = True
+            End If
+        End If
+
+        'if condition changed, then save the current selection
+        If lIsSelectionChanged Then
+            pLastSelectedRecessions.Clear()
+            lIsSelectionChanged = RecessionSelectionChanged()
+        End If
+
+        Return lIsSelectionChanged
+    End Function
+
+    Private Function ConfigurationChanged() As Boolean
+        Dim lIsConfigChanged As Boolean = False
+
+        If pLastRunConfigs.Count = 0 Then
+            AttributesFromForm(pLastRunConfigs)
+            Return True
+        Else
+            With pLastRunConfigs
+                Dim lLastStartDate As Double = .GetValue("Original Start Date", 0)
+                Dim lLastEndDate As Double = .GetValue("Original End Date", 0)
+                Dim lLastConstituent As String = .GetValue("Constituent", "")
+                Dim lLastHistory1 As String = .GetValue("History 1", "")
+
+                Dim lCurrentStartDate As Double = pDataGroup(0).Dates.Value(0)
+                Dim lCurrentEndDate As Double = pDataGroup(0).Dates.Value(pDataGroup(0).numValues)
+                Dim lCurrentConstituent As String = pDataGroup(0).Attributes.GetValue("Constituent")
+                Dim lCurrentHistory1 As String = pDataGroup(0).Attributes.GetValue("History 1")
+
+                If .GetValue("MinSegmentLength", "") <> txtMinRecessionDays.Text Then
+                    lIsConfigChanged = True
+                ElseIf .GetValue("Start Date", 0) <> StartDateFromForm() Then
+                    lIsConfigChanged = True
+                ElseIf .GetValue("End Date", 0) <> EndDateFromForm() Then
+                    lIsConfigChanged = True
+                ElseIf .GetValue("Season", "n") <> pSeason Then
+                    lIsConfigChanged = True
+                ElseIf .GetValue("Output Path", "") <> txtOutputDir.Text Then
+                    lIsConfigChanged = True
+                ElseIf .GetValue("SaveInterimResults", False) <> (chkSaveInterimToFile.Checked) Then
+                    lIsConfigChanged = True
+                ElseIf lLastConstituent <> lCurrentConstituent OrElse lLastHistory1 <> lCurrentHistory1 OrElse lLastStartDate <> lCurrentStartDate OrElse lLastEndDate <> lCurrentEndDate Then
+                    lIsConfigChanged = True
+                Else
+                    Dim lMonths As New ArrayList()
+                    For I As Integer = 0 To lstMonths.Items.Count - 1
+                        If lstMonths.GetSelected(I) Then
+                            lMonths.Add(I + 1)
+                        End If
+                    Next
+                    Dim lLastMonths As ArrayList = .GetValue("SelectedMonths", Nothing)
+                    If lLastMonths Is Nothing OrElse lLastMonths.Count = 0 Then
+                        If lMonths.Count > 0 Then lIsConfigChanged = True
+                    ElseIf lMonths.Count <> lLastMonths.Count Then
+                        lIsConfigChanged = True
+                    Else
+                        For Each lMonth As Integer In lMonths
+                            If Not lLastMonths.Contains(lMonth) Then
+                                lIsConfigChanged = True
+                                Exit For
+                            End If
+                        Next
+                    End If
+
+                End If
+                'Set Unit
+                '.GetValue("EnglishUnit", True)
+            End With
+        End If
+        If lIsConfigChanged Then
+            pLastRunConfigs.Clear()
+            lIsConfigChanged = ConfigurationChanged()
+        End If
+        Return lIsConfigChanged
+    End Function
+
     Private Sub txtOutputDir_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOutputDir.Click
         Dim lDir As String = ""
         If IO.Directory.Exists(txtOutputDir.Text.Trim()) Then
@@ -1370,15 +1506,15 @@ Public Class frmRecess
 
     Private Sub rdoSeason_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoSpring.CheckedChanged, rdoSummer.CheckedChanged, rdoFall.CheckedChanged, rdoWinter.CheckedChanged, rdoNoSeason.CheckedChanged
         If rdoSpring.Checked Then
-            pSeason = "Spring"
+            pSeason = "v"
         ElseIf rdoSummer.Checked Then
-            pSeason = "Summer"
+            pSeason = "s"
         ElseIf rdoFall.Checked Then
-            pSeason = "Fall"
+            pSeason = "f"
         ElseIf rdoWinter.Checked Then
-            pSeason = "Winter"
+            pSeason = "w"
         ElseIf rdoNoSeason.Checked Then
-            pSeason = "NoSeason"
+            pSeason = "n"
         End If
     End Sub
 
@@ -1421,8 +1557,9 @@ Public Class frmRecess
 
         Dim lDayOrdinal As Integer = CInt(lArr(0))
         Dim lFirstLastCancel() As String = {"First Day", "Last Day", "Reset All", "Cancel"}
+        Me.Enabled = False
         Dim lResponse As String = Logger.MsgCustom("Set '" & lDayOrdinal & "' as first or last day of this recession segment?", lMsgTitle, lFirstLastCancel)
-
+        Me.Enabled = True
         If lResponse <> "Cancel" Then
             Dim lRecSeg As clsRecessionSegment = pRecess.listOfSegments.ItemByKey(lstRecessSegments.SelectedItem.ToString)
             If lRecSeg IsNot Nothing Then
@@ -1460,6 +1597,10 @@ Public Class frmRecess
     End Sub
 
     Private Sub btnAnalyse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAnalyse.Click
+        If lstRecessSegments.Items.Count = 0 OrElse lstRecessSegments.SelectedItems.Count = 0 Then
+            Exit Sub
+        End If
+
         Dim lTargetPeakDate As String = lstRecessSegments.SelectedItem.ToString
         Try
             pRecess.DoOperation("r", lTargetPeakDate)
@@ -1503,8 +1644,33 @@ Public Class frmRecess
     End Sub
 
     Private Sub btnSummary_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSummary.Click
+        If lstRecessSegments.Items.Count = 0 OrElse lstRecessSegments.CheckedItems.Count = 0 Then
+            Exit Sub
+        End If
+        If Not (RecessionSelectionChanged() OrElse ConfigurationChanged()) Then
+            If pRecess.SaveInterimResults Then pRecess.SaveInterimResults = False
+        Else
+            If chkSaveInterimToFile.Checked Then pRecess.SaveInterimResults = True
+        End If
         pRecess.DoOperation("summary", "")
         txtAnalysisResults.Text = pRecess.Bulletin
         txtAnalysisResults.Visible = True
+
+        pGraphRecessDatagroup.Clear()
+        If pRecess.GraphTs.numValues > 1 Then
+            pGraphRecessDatagroup.Add(pRecess.GraphTs)
+            RefreshGraphRecess(pGraphRecessDatagroup)
+        End If
+    End Sub
+
+    Private Sub mnuFileSelectData_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
+        pDataGroup = atcDataManager.UserSelectData("Select Daily Streamflow for Recess Analysis", pDataGroup)
+        If pDataGroup.Count > 0 Then
+            If ConfigurationChanged() Then
+                Me.Initialize(pDataGroup, pBasicAttributes, True)
+            End If
+        Else
+            Logger.Msg("Need to select at least one daily streamflow dataset", "USGS Recess Analysis")
+        End If
     End Sub
 End Class

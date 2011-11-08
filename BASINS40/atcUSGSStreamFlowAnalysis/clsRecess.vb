@@ -875,8 +875,8 @@ Public Class clsRecess
 
             lMsg.AppendLine("BEST-FIT EQUATION:")
             lMsg.AppendLine(.BestFitEquation)
-            lMsg.AppendLine(" DAYS/LOG CYCLE=" & -1 * .Coefficient1)
-            lMsg.AppendLine(" MEAN LOG Q = " & .MeanLogQ)
+            lMsg.AppendLine(" DAYS/LOG CYCLE= " & String.Format("{0:0.000000}", -1 * .Coefficient1))
+            lMsg.AppendLine(" MEAN LOG Q = " & String.Format("{0:0.000000}", .MeanLogQ))
 
             If SaveInterimResults And pHasWritePermission Then
                 Dim lSW As IO.StreamWriter = New IO.StreamWriter(pFileOut1, True)
@@ -952,6 +952,10 @@ Public Class clsRecess
         XLogQMin = 3000 'min among all available peaks
         For Each lSeg In listOfSegments
             With lSeg
+                If .NeedtoReadData Then
+                    .GetData()
+                End If
+                DoOperation("r", lSeg.PeakDayDateToString)
                 If Not .IsExcluded Then
                     liiDV += .MaxDayOrdinal - .MinDayOrdinal + 1
                 End If
@@ -991,28 +995,34 @@ Public Class clsRecess
 
         Dim lCoef1Max As Double = 0
         Dim lCoef1Min As Double = 3000
-        Dim lQLogMaxC As Double = 0 'max among selected/chosen segs
-        Dim lQLogMinC As Double = 3000 'min among selected/chosen segs
+        Dim lMeanQLogMaxC As Double = 0 'max among selected/chosen segs
+        Dim lMeanQLogMinC As Double = 3000 'min among selected/chosen segs
         For Each lPeakDate As String In listOfSegments.Keys
             lSeg = listOfSegments.ItemByKey(lPeakDate)
             If Not lSeg.IsExcluded Then
                 lListOfChosenSegments.Add(lPeakDate, lSeg)
+                With lSeg
+                    If .MeanLogQ > lMeanQLogMaxC Then lMeanQLogMaxC = .MeanLogQ
+                    If .MeanLogQ < lMeanQLogMinC Then lMeanQLogMinC = .MeanLogQ
 
-                For I As Integer = lSeg.MinDayOrdinal To lSeg.MaxDayOrdinal
-                    If lSeg.QLog(I) > lQLogMaxC Then lQLogMaxC = lSeg.QLog(I)
-                    If lSeg.QLog(I) < lQLogMinC Then lQLogMinC = lSeg.QLog(I)
-
-                    If lSeg.Coefficient1 > lCoef1Max Then lCoef1Max = lSeg.Coefficient1
-                    If lSeg.Coefficient1 < lCoef1Min Then lCoef1Min = lSeg.Coefficient1
-                Next
+                    If .Coefficient1 > lCoef1Max Then lCoef1Max = .Coefficient1
+                    If .Coefficient1 < lCoef1Min Then lCoef1Min = .Coefficient1
+                End With
                 'Analyse each again here to make sure the parameters are set for summary
-                RecessAnalyse(lSeg)
+                'RecessAnalyse(lSeg)
             End If
         Next
+
+        If lListOfChosenSegments.Count = 0 OrElse lListOfChosenSegments.Count = 1 Then
+            If GraphTs IsNot Nothing Then GraphTs.Clear()
+            Bulletin = "Unable to perform Recess analysis. " & vbCrLf & "Must select at least two recession segments."
+            Exit Sub
+        End If
+
         lListOfChosenSegments.SortByValue() 'sort MeanLogQ in Ascending order
         lMsg = New Text.StringBuilder()
-        lMsg.AppendLine("MAXIMUM LOG Q FOR ALL CHOSEN RECESSIONS= " & String.Format("{0:0.00000}", lQLogMaxC).PadLeft(8, " "))
-        lMsg.AppendLine("MINIMUM LOG Q FOR ALL CHOSEN RECESSIONS= " & String.Format("{0:0.00000}", lQLogMinC).PadLeft(8, " "))
+        lMsg.AppendLine("MAXIMUM LOG Q FOR ALL CHOSEN RECESSIONS= " & String.Format("{0:0.00000}", lMeanQLogMaxC).PadLeft(8, " "))
+        lMsg.AppendLine("MINIMUM LOG Q FOR ALL CHOSEN RECESSIONS= " & String.Format("{0:0.00000}", lMeanQLogMinC).PadLeft(8, " "))
 
         Dim lAskUserNumRecToBeEliminated As Integer = listOfSegments.Count - lListOfChosenSegments.Count
         If SaveInterimResults And pHasWritePermission Then
@@ -1111,15 +1121,17 @@ Public Class clsRecess
         Dim lCoeffB As Double = 0.0
         Dim lX(lListOfChosenSegments.Count) As Double
         Dim lY(lListOfChosenSegments.Count) As Double
+        Dim lKDates(lListOfChosenSegments.Count) As Double
         For Z As Integer = 0 To lListOfChosenSegments.Count - 1
             lSeg = lListOfChosenSegments.Item(Z)
             lX(Z + 1) = lSeg.MeanLogQ
             lY(Z + 1) = lSeg.Coefficient1
+            lKDates(Z + 1) = lSeg.PeakDayDate
         Next
         DoRegression2(lX, lY, lListOfChosenSegments.Count, lCoeffA, lCoeffB)
         '---- AFTER INTEGRATION WRITE EQUATION FOR TIME AS FUNCTION OF DISCHARGE:
         'Dim lCoeffC As Double = -0.5 * lCoeffA * lMXLogQC ^ 2 - lCoeffB * lMXLogQC
-        Dim lCoeffC As Double = -0.5 * lCoeffA * lQLogMaxC ^ 2 - lCoeffB * lQLogMaxC
+        Dim lCoeffC As Double = -0.5 * lCoeffA * lMeanQLogMaxC ^ 2 - lCoeffB * lMeanQLogMaxC
 
         '--------------- SHOW ORDERED DATA, AFTER ELIMINATION:  --------------
         If SaveInterimResults And pHasWritePermission Then
@@ -1147,7 +1159,7 @@ Public Class clsRecess
 
             lSW.WriteLine("AMONG THE SELECTED RECESSION PERIODS, THESE ARE THE")
             lSW.WriteLine("MIN AND MAX VALUES OF LOGQ FOR WHICH K (DAYS PER ")
-            lSW.WriteLine("LOGQC WAS CALCULATED:" & lQLogMinC & "   " & lQLogMaxC)
+            lSW.WriteLine("LOGQC WAS CALCULATED:" & lMeanQLogMinC & "   " & lMeanQLogMaxC)
 
             lSW.WriteLine(" ")
 
@@ -1163,7 +1175,7 @@ Public Class clsRecess
             lStrSlopeMax = String.Format("{0:0.0}", lSlopeMx).PadLeft(7, " ")
             lSW.WriteLine("      LOG Q               " & lStrSlopeMin & Space(33) & lStrSlopeMax)
 
-            Dim lXLogQ As Double = lQLogMaxC 'lMXLogQC
+            Dim lXLogQ As Double = lMeanQLogMaxC 'lMXLogQC
             While True 'loop 370
                 lSlope = -1 * lCoeffA * lXLogQ - 1 * lCoeffB
                 lDiff = lSlope - lSlopeMn
@@ -1174,7 +1186,7 @@ Public Class clsRecess
                     lSW.WriteLine(lXLogQ & "   " & lSlope & Space(lNumBlanks) & "*")
                 End If
                 lXLogQ -= 0.05
-                If lXLogQ > lQLogMinC Then 'lMNLogQC
+                If lXLogQ > lMeanQLogMinC Then 'lMNLogQC
                     Continue While
                 Else
                     Exit While
@@ -1199,7 +1211,7 @@ Public Class clsRecess
             lSW.WriteLine("                                                GRAPHIC OF TIME:")
             Dim lTimeMax As Double = 0.5 * lCoeffA * XLogQMin ^ 2 + lCoeffB * XLogQMin + lCoeffC 'overall min Log Q
             lSW.WriteLine("    TIME(D)         LOG Q           Q       0.0 ")
-            lXLogQ = lQLogMaxC 'lMXLogQC
+            lXLogQ = lMeanQLogMaxC 'lMXLogQC
             While True 'loop 380
                 Dim lT As Double = 0.5 * lCoeffA * lXLogQ ^ 2 + lCoeffB * lXLogQ + lCoeffC
                 Dim lXQ As Double = 10 ^ lXLogQ
@@ -1210,7 +1222,7 @@ Public Class clsRecess
                 End If
                 lSW.WriteLine(lT & " " & lXLogQ & " " & lXQ & " " & lBlankStrNStar)
                 lXLogQ -= 0.05
-                If lXLogQ > lQLogMinC Then 'lMNLogQC
+                If lXLogQ > lMeanQLogMinC Then 'lMNLogQC
                     Continue While
                 Else
                     Exit While
@@ -1258,6 +1270,24 @@ Public Class clsRecess
             End If
         End While 'loop 395
         ReDim lK(0)
+
+        'construct graph TS for just the coefficients
+        If GraphTs IsNot Nothing Then GraphTs.Clear()
+        GraphTs = New atcTimeseries(Nothing)
+        GraphTs.Dates = New atcTimeseries(Nothing)
+        Order(lListOfChosenSegments.Count, lKDates, lY)
+        GraphTs.Dates.Values = lKDates
+        GraphTs.Values = lY
+        GraphTs = GraphTs * -1
+        With GraphTs
+            .Value(0) = GetNaN()
+            .Dates.Value(0) = .Dates.Value(1) - JulianHour * 24.0
+            .Attributes.SetValue("YAxis", "LEFT")
+            .Attributes.SetValue("point", True)
+            .Attributes.SetValue("Constituent", "")
+            .Attributes.SetValue("Scenario", "")
+            .Attributes.SetValue("Units", "K")
+        End With
 
         ''------------------- WRITE RAW RECESSION DATA TO "y-file"  ----------------
         If pHasWritePermission And SaveInterimResults Then
@@ -1321,9 +1351,11 @@ Public Class clsRecess
             Dim lAskUserRecIndexOnly As Integer = 2
 
             Dim lStrInputFile As String = pDataFilename
-            If lStrInputFile.Length > 12 Then
-                lStrInputFile = lStrInputFile.Substring(0, 12)
+            Dim lFilenameLength As Integer = 12
+            If lStrInputFile.Length > lFilenameLength Then
+                lStrInputFile = lStrInputFile.Substring(0, lFilenameLength)
             End If
+
             If lAskUserRecIndexOnly <> 1 Then
                 lSW = New IO.StreamWriter(pFileRecSum, True)
                 '   17 FORMAT (A12,A1,1X,1I4,'-',1I4,1I3,3F6.1,2F8.3,1F9.4,2F10.4)
@@ -1332,17 +1364,18 @@ Public Class clsRecess
                 Dim lStrYearStart As String = lDate(0).ToString
                 J2Date(FlowData.Dates.Value(FlowData.numValues - 1), lDate)
                 Dim lStrYearEnd As String = lDate(0).ToString
+                Dim lStrDuration As String = lStrYearStart & "-" & lStrYearEnd & "  "
 
                 Dim lStrKMin As String = String.Format("{0:0.0}", lKMin).PadLeft(6, " ")
                 Dim lStrKMed As String = String.Format("{0:0.0}", lKMed).PadLeft(6, " ")
                 Dim lStrKMax As String = String.Format("{0:0.0}", lKMax).PadLeft(6, " ")
-                Dim lStrMNLogQC As String = String.Format("{0:0.000}", lQLogMinC).PadLeft(8, " ") 'lMNLogQC
-                Dim lStrMXLogQC As String = String.Format("{0:0.000}", lQLogMaxC).PadLeft(8, " ") 'lMXLogQC
+                Dim lStrMNLogQC As String = String.Format("{0:0.000}", lMeanQLogMinC).PadLeft(8, " ") 'lMNLogQC
+                Dim lStrMXLogQC As String = String.Format("{0:0.000}", lMeanQLogMaxC).PadLeft(8, " ") 'lMXLogQC
                 Dim lStrCoeffA As String = String.Format("{0:0.0000}", 0.5 * lCoeffA).PadLeft(9, " ")
                 Dim lStrCoeffB As String = String.Format("{0:0.0000}", lCoeffB).PadLeft(10, " ")
                 Dim lStrCoeffC As String = String.Format("{0:0.0000}", lCoeffC).PadLeft(10, " ")
 
-                lSW.WriteLine(lStrInputFile & SeasonLabel & " " & lStrYearStart & "-" & lStrYearEnd & lListOfChosenSegments.Count & _
+                lSW.WriteLine(lStrInputFile.PadRight(lFilenameLength, " ") & SeasonLabel & " " & lStrDuration & lListOfChosenSegments.Count & _
                               lStrKMin & lStrKMed & lStrKMax & lStrMNLogQC & lStrMXLogQC & lStrCoeffA & lStrCoeffB & lStrCoeffC)
                 lSW.Flush()
                 lSW.Close()
