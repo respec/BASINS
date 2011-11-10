@@ -1,9 +1,11 @@
 ﻿Imports atcUtility
 Imports atcMwGisUtility
 Imports MapWinUtility
+Imports MapWinUtility.Strings
 Imports atcData
 Imports System.Drawing
 Imports System
+Imports System.IO
 Imports System.Windows.Forms
 Imports System.Text
 
@@ -948,7 +950,10 @@ Public Module modGeoSFM
 
     End Sub
 
-    Friend Sub Response()
+    Friend Sub Response(ByVal veltype As Integer, _
+                        ByVal zonegname As String, ByVal fdirgname As String, ByVal flowlengname As String, _
+                        ByVal outletgname As String, ByVal demgname As String, ByVal facgname As String, _
+                        ByVal UsgsLandCoverGname As String, ByVal OverlandFlowVelocity As Double, ByVal InstreamFlowVelocity As Double)
 
         ' ***********************************************************************************************
         ' ***********************************************************************************************
@@ -978,361 +983,267 @@ Public Module modGeoSFM
         ' ***********************************************************************************************
         ' ***********************************************************************************************
 
-
-
-
-        ' choose overland velocity computation method
         'velmethodlist = { "Non-Uniform from USGS Land Cover Grid" , "Non-Uniform with User Supplied Velocities", "Uniform from User Supplied Velocity Value" }
+        'If veltype = 1 Then
+        '    ' "Non-Uniform from USGS Land Cover Grid"
+        '    '            'defaultlist = { "Basins" , "Flowdir", "Flowlen", "Outlets", "Elevations", "Flowacc", "Usgslandcov", myWkdirname + "order.txt" }
+        'ElseIf veltype = 2 Then
+        '    ' "Non-Uniform with User Supplied Velocities"
+        '    '            'defaultlist = { "Basins" , "Flowdir", "Flowlen", "Flowacc", "Outlets", "0.05", "0.5", myWkdirname + "order.txt" }
+        '    '            'labellist = { "Basin Grid" , "Flow Direction Grid", "Flow Length Grid", "Flow Accumulation Grid", "Stream Outlet Grid", "Overland Flow Velocity (m/s)", "Instream Flow Velocity (m/s)", "Computational Order File" }
+        'Else
+        '    ' Uniform Velocity Value
+        '    '            'defaultlist = { "Basins" , "Flowdir", "Flowlen", "Outlets", "0.3", myWkdirname + "order.txt" }
+        '    '            'labellist = { "Basin Grid" , "Flow Direction Grid", "Flow Length Grid", "Stream Outlet Grid", "Overland Flow Velocity (m/s)", "Computational Order File" }
+        'End If
 
-        'velmethod = MsgBox.ChoiceAsString(velmethodlist, "Method of OverLand Flow Velocity Computation: ", "Geospatial Stream Flow Model")
+        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+        Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
+        Dim OrderFileName As String = lOutputPath & "order.txt"
 
-        '        If (velmethod = "Non-Uniform from USGS Land Cover Grid") Then
-        '            veltype = 1
-        '            MsgBox.report("For Non-Uniform Velocity from USGS Land Cover Grid," + nl + "required inputs include:" + nl + nl + "(1)    Basin Grid" + nl + "(2)    Flow Direction Grid" + nl + "(3)    Flow Length Grid" + nl + "(4)    Stream Outlet Grid" + nl + "(5)    USGS Land Cover Grid" + nl + "(6)    Elevation Grid" + nl + "(7)    Flow Accumulation Grid" + nl + "(8)    Computational Order File (created along with basin file)", "Required Inputs")
-        '            addlcgrid = MsgBox.YesNo("Would you like to add the USGS Land Cover grid to the view now?", "Geospatial Stream Flow Model", True)
-        '            If (addlcgrid = True) Then
-        '                av.Run("View.Add", "USGS Land Cover Grid")
-        '            End If
-        '            firstthm = theView.getThemes.get(0).getname
-        '            'defaultlist = { "Basins" , "Flowdir", "Flowlen", "Outlets", "Elevations", "Flowacc", "Usgslandcov", myWkdirname + "order.txt" }
-        '            'labellist = { "Basin Grid" , "Flow Direction Grid", "Flow Length Grid", "Stream Outlet Grid", "Elevation Grid", "Flow Accumulation Grid", "USGS Land Cover Grid", "Computational Order File" } 
-        '        ElseIf (velmethod = "Non-Uniform with User Supplied Velocities") Then
-        '            veltype = 2
-        '            MsgBox.report("For Non-Uniform Velocity with User Supplied Velocities, " + nl + "required inputs include:" + nl + nl + "(1)    Basin Grid" + nl + "(2)    Flow Direction Grid" + nl + "(3)    Flow Length Grid" + nl + "(4)    Flow Accumulation Grid" + nl + "(5)    Stream Outlet Grid" + nl + "(6)    Overland Flow Velocity Value" + nl + "(7)    Instream Flow Velocity Value" + nl + "(8)    Computational Order File (created along with basin file)", "Required Inputs")
-        '            addvgrid = MsgBox.YesNo("Would you like to add any of the input grids to the view now?", "Geospatial Stream Flow Model", True)
-        '            If (addvgrid = True) Then
-        '                av.Run("View.Add", "Input Grids")
-        '            End If
-        '            firstthm = theView.getThemes.get(0).getname
-        '            'defaultlist = { "Basins" , "Flowdir", "Flowlen", "Flowacc", "Outlets", "0.05", "0.5", myWkdirname + "order.txt" }
-        '            'labellist = { "Basin Grid" , "Flow Direction Grid", "Flow Length Grid", "Flow Accumulation Grid", "Stream Outlet Grid", "Overland Flow Velocity (m/s)", "Instream Flow Velocity (m/s)", "Computational Order File" }
-        '            Else
-        '                veltype = 3
-        '                MsgBox.report("For Uniform Velocity with User Supplied Velocity Value, " + nl + "required inputs include:" + nl + nl + "(1)    Basin Grid" + nl + "(2)    Flow Direction Grid" + nl + "(3)    Flow Length Grid" + nl + "(4)    Stream Outlet Grid" + nl + "(5)    Overland Flow Velocity Value" + nl + "(6)    Computational Order File (created along with basin file)", "Required Inputs")
-        '                addvgrid = MsgBox.YesNo("Would you like to add any of the input grids to the view now?", "Geospatial Stream Flow Model", True)
-        '                If (addvgrid = True) Then
-        '                    av.Run("View.Add", "Input Grids")
-        '            End If
-        '            'defaultlist = { "Basins" , "Flowdir", "Flowlen", "Outlets", "0.3", myWkdirname + "order.txt" }
-        '            'labellist = { "Basin Grid" , "Flow Direction Grid", "Flow Length Grid", "Stream Outlet Grid", "Overland Flow Velocity (m/s)", "Computational Order File" }
-        '        End If
+        Dim basingthm As Integer = -1
+        If zonegname = "<none>" Then
+            Logger.Msg("Basin Grid, " + zonegname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Exit Sub
+        Else
+            basingthm = GisUtil.LayerIndex(zonegname)
+        End If
 
-        '        If (veltype = 1) Then
-        '            zonegname = inputlist.get(0)
-        '            flowdirgname = inputlist.get(1)
-        '            flowlengname = inputlist.get(2)
-        '            outgname = inputlist.get(3)
-        '            demgname = inputlist.get(4)
-        '            facgname = inputlist.get(5)
-        '            lcovgname = inputlist.get(6)
-        '            orderfilename = inputlist.get(7)
-        '        ElseIf (veltype = 2) Then
-        '            zonegname = inputlist.get(0)
-        '            flowdirgname = inputlist.get(1)
-        '            flowlengname = inputlist.get(2)
-        '            facgname = inputlist.get(3)
-        '            outgname = inputlist.get(4)
-        '            overlandvelstr = inputlist.get(5)
-        '            instreamvelstr = inputlist.get(6)
-        '            orderfilename = inputlist.get(7)
-        '        Else
-        '            zonegname = inputlist.get(0)
-        '            flowdirgname = inputlist.get(1)
-        '            flowlengname = inputlist.get(2)
-        '            outgname = inputlist.get(3)
-        '            velstrname = inputlist.get(4)
-        '            orderfilename = inputlist.get(5)
-        '        End If
+        Dim flowdirgthm As Integer = -1
+        If fdirgname = "<none>" Then
+            Logger.Msg("Flow Direction Grid, " + fdirgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Exit Sub
+        Else
+            flowdirgthm = GisUtil.LayerIndex(fdirgname)
+        End If
 
-        '        basingthm = TheView.FindTheme(zonegname)
-        '        flowdirgthm = TheView.FindTheme(flowdirgname)
-        '        flowlengthm = TheView.FindTheme(flowlengname)
-        '        outgthm = TheView.FindTheme(outgname)
+        Dim flowlengthm As Integer = -1
+        If flowlengname = "<none>" Then
+            Logger.Msg("Flow Length Grid, " + flowlengname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Exit Sub
+        Else
+            flowlengthm = GisUtil.LayerIndex(flowlengname)
+        End If
 
-        '        basingrid = basingthm.GetGrid
-        '        flowdirgrid = flowdirgthm.GetGrid
-        '        flowlengrid = flowlengthm.GetGrid
-        '        outgrid = outgthm.GetGrid
+        Dim outgthm As Integer = -1
+        If outletgname = "<none>" Then
+            Logger.Msg("Outlet Grid, " + outletgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Exit Sub
+        Else
+            outgthm = GisUtil.LayerIndex(outletgname)
+        End If
 
-        '        If (basingrid.GetVtab <> nil) Then
-        '            basintable = basingrid.GetVtab
-        '        ElseIf ((basingrid.GetVtab = nil) And (basingrid.IsInteger)) Then
-        '            basinVtabTF = basingrid.buildvat
-        '            If (basinVtabTF.IsTrue) Then
-        '                basintable = basingrid.GetVtab
-        '            Else
-        '                MsgBox.error("Cannot open/create basin grid Value Attribute Table", "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            End If
-        '        ElseIf ((basingrid.GetVtab = nil) And (basingrid.IsInteger.Not)) Then
-        '            MsgBox.error("Basin grid is not an integer grid. Specify an integer basin grid.", "Geospatial Stream Flow Model")
-        '            Exit Sub
-        '        End If
+        Dim zonelist As New atcCollection
+        Try
+            Dim lCurrentRecord As String
+            Dim lStreamReader As New StreamReader(OrderFileName)
+            'lCurrentRecord = lStreamReader.ReadLine  'only if first line is a header
+            Dim lDelim As String = " "
+            Dim lQuote As String = """"
+            Do
+                lCurrentRecord = lStreamReader.ReadLine
+                If lCurrentRecord Is Nothing Then
+                    Exit Do
+                Else
+                    zonelist.Add(StrSplit(lCurrentRecord, lDelim, lQuote))
+                End If
+            Loop
+        Catch e As ApplicationException
+            Logger.Msg("Cannot determine computational order." & vbCrLf & "Run 'Generate basin file' menu to create order.txt", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+            Exit Sub
+        End Try
 
-        '        thebitmap = basintable.GetSelection
-        '        thebitmap.ClearAll()
-        '        basintable.UpdateSelection()
+        Dim mycellsize As Integer = GisUtil.GridGetCellSizeX(basingthm)
+        Dim lZoneLayerIndex As Integer = GisUtil.LayerIndex(zonegname)
+        Dim lZoneFileName As String = GisUtil.LayerFileName(lZoneLayerIndex)
+        Dim lVelocityGridLayerName As String = "Velocity Grid"
+        Dim lVelocityGridLayerIndex As Integer = 0
+        Dim lVelocityGridFileName As String = ""
 
-        '        basinField = basinTable.FindField("Value")
-        '        If (basinfield = nil) Then
-        '            MsgBox.error("Field VALUE not found in basin grid Value Attribute Table", "Geospatial Stream Flow Model")
-        '            Exit Sub
-        '        End If
+        If veltype = 1 Or veltype = 2 Then
+            Dim facgthm As Integer = -1
+            If facgname = "<none>" Then
+                Logger.Msg("Flow Accumulation Grid, " + facgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+                Exit Sub
+            Else
+                facgthm = GisUtil.LayerIndex(facgname)
+            End If
+        End If
 
-        '        'orderfile = LineFile.Make((orderfilename).AsFileName, #FILE_PERM_READ)
-        '        If (orderfile = nil) Then
-        '            MsgBox.error("Cannot determine computational order." + nl + "Run 'Generate basin file' menu to create order.txt", "Geospatial Stream Flow Model")
-        '            Exit Sub
-        '        End If
-        '        ordlist = List.make
-        '        ordsize = orderfile.getsize
-        '        If (ordsize < 2) Then
-        '            MsgBox.error("Cannot determine computational order." + nl + "Run 'Generate basin file' menu to create order.txt", "Geospatial Stream Flow Model")
-        '            Exit Sub
-        '        End If
+        If (veltype = 1) Then
 
-        '        orderfile.read(ordlist, ordsize)
-        '        If (ordlist.get(0).IsNumber.Not) Then
-        '            ordstart = 1
-        '        Else
-        '            ordstart = 0
-        '        End If
+            Dim demgthm As Integer = -1
+            If demgname = "<none>" Then
+                Logger.Msg("DEM Grid, " + demgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+                Exit Sub
+            Else
+                demgthm = GisUtil.LayerIndex(demgname)
+            End If
 
-        '        zonelist = List.make
-        'for each orec in ordstart..(ordsize - 1)
-        '            ordnum = ordlist.get(orec).asstring.asnumber
-        '            For Each zrec In basintable
-        '                zonenum = basintable.returnvalue(basinfield, zrec)
-        '                If (ordnum = zonenum) Then
-        '                    zonelist.add(zrec.asstring.AsNumber)
-        '                End If
-        '            Next
-        '        Next
+            '  meandrop = demgrid.zonalStats(#GRID_STATYPE_MEAN, basingrid, Prj.MakeNull, basinField, false) 
+            '  mindrop = demgrid.zonalStats(#GRID_STATYPE_MIN, basingrid, Prj.MakeNull, basinField, false)
+            Logger.Status("Computing Zonal Statistics for " + demgname + "........")
+            Dim lDemZonalStats As New atcCollection
+            lDemZonalStats = GisUtil.GridZonalStatistics(basingthm, demgthm)
+            '  avgdrop = meandrop - mindrop
 
-        '        '--set the extent before extracting
-        '        ae = theView.GetExtension(AnalysisEnvironment)
-        'ae.SetExtent(#ANALYSISENV_VALUE,basingthm.ReturnExtent)
-        'ae.SetCellSize(#ANALYSISENV_VALUE,basingrid.GetCellSize)
-        '        ae.Activate()
+            '  avgraw = flowlengrid.zonalStats(#GRID_STATYPE_MEAN, basingrid, Prj.MakeNull, basinField, false)
+            Logger.Status("Computing Zonal Statistics for " + flowlengname + "........")
+            Dim lFlowLenZonalStats As New atcCollection
+            lFlowLenZonalStats = GisUtil.GridZonalStatistics(basingthm, flowlengthm)
 
-        '        mycellsize = basingrid.GetCellSize
+            'Grid.Con(Yes,No) 
+            '  avglength = (avgraw < mycellsize).con(mycellsize.asgrid, avgraw)
+            '  sloperaw = ((avgdrop * 100) / avglength)
+            '  slopegrid = (sloperaw < 0.001).con(0.001.asgrid, sloperaw)
 
-        '        If (veltype = 1) Then
-        '            demgthm = TheView.FindTheme(demgname)
-        '            If (demgthm = nil) Then
-        '                MsgBox.error("Elevation Grid, " + demgname + ", Not Found in the View", "")
-        '                Exit Sub
-        '            End If
+            Dim lcovgthm As Integer = -1
+            If UsgsLandCoverGname = "<none>" Then
+                Logger.Msg("USGS Land Cover Grid, " + UsgsLandCoverGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+                Exit Sub
+            Else
+                lcovgthm = GisUtil.LayerIndex(UsgsLandCoverGname)
+            End If
 
-        '            If (demgthm.CanSelect) Then
-        '                MsgBox.error(demgname + "is not a grid theme", "")
-        '                Exit Sub
-        '            End If
+            '  Mannlist = { "0.03","0.03","0.035","0.033","0.035","0.04","0.05","0.05","0.05","0.06","0.1","0.1","0.12","0.12","0.1","0.035","0.05","0.05","0.03","0.05","0.05","0.05","0.04","0.04" }
+            '  lcvaluelist = { 100,211,212,213,280,290,311,321,330,332,411,412,421,422,430,500,620,610,770,820,810,850,830,900 }
+            '  lcnamelist = {"Urban and Built-Up Land", "Dryland Cropland and Pasture", "Irrigated Cropland and Pasture", "Mixed Dryland/Irrigated Cropland and Pasture", "Cropland/Grassland Mosaic", "Cropland/Woodland Mosaic", "Grassland", "Shrubland", "Mixed Shrubland/Grassland", "Savanna", "Deciduous Broadleaf Forest", "Deciduous Needleleaf Forest", "Evergreen Broadleaf Forest", "Evergreen Needleleaf Forest", "Mixed Forest", "Water Bodies", "Herbaceous Wetland", "Wooded Wetland", "Barren or Sparsely Vegetated", "Herbaceous Tundra", "Wooded Tundra", "Mixed Tundra", "Bare Ground Tundra", "Snow or Ice" }
 
-        '            facgthm = TheView.FindTheme(facgname)
-        '            If (facgthm = nil) Then
-        '                MsgBox.error("Flow Accumulation Grid, " + facgname + ", Not Found in the View", "")
-        '                Exit Sub
-        '            End If
+            '  lccodelist = MsgBox.MultiInput("Specify Mannings (Velocity) Coefficients for each land cover", "Land Cover, Anderson Code, Manning's N", lcnamelist, Mannlist)
+            '  If (lccodelist.isempty) Then
+            '     Exit Sub
+            '  End If
+            '  lcfield = lcovVtab.FindField("lc_code".Lcase)
+            '  If (lcfield = nil) Then
+            '    lcfield = lcovVtab.FindField("lccode".Lcase)
+            '    If (lcfield = nil) Then
+            '      lcfield = lcovVtab.FindField("lu_code".Lcase)
+            '      If (lcfield = nil) Then
+            '        lcfield = lcovVtab.FindField("lucode".Lcase)
+            '        If (lcfield = nil) Then
+            '          lcfldlst = lcovVtab.getfields.deepclone
+            '          lcfield = MsgBox.choiceasstring(lcfldlst, "Select the field containing the" + nl + "Anderson Land Cover Classification Code eg lc_code", "Geospatial Stream Flow Model")
+            '          If (lcfield = nil) Then
+            '            Exit Sub
+            '          End If
+            '        End If
+            '      End If
+            '    End If
+            '  End If
 
-        '            If (facgthm.CanSelect) Then
-        '                MsgBox.error(facgname + "is not a grid theme", "")
-        '                Exit Sub
-        '            End If
+            '  lcfile = LineFile.Make((myWkdirname + "roughness.txt").AsFileName, #FILE_PERM_WRITE)
+            '  if (lcfile = nil) then
+            '    msgbox.error("Cannot create roughness.txt file"+nl+"File may be open or held up by another program", "Geospatial Stream Flow Model")
+            '    exit
+            '  end
 
-        '            facgrid = facgthm.getgrid
-        '            demgrid = demgthm.getgrid
-        '  meandrop = demgrid.zonalStats(#GRID_STATYPE_MEAN, basingrid, Prj.MakeNull, basinField, false) 
-        '  mindrop = demgrid.zonalStats(#GRID_STATYPE_MIN, basingrid, Prj.MakeNull, basinField, false)
-        '            avgdrop = meandrop - mindrop
-        '  avgraw = flowlengrid.zonalStats(#GRID_STATYPE_MEAN, basingrid, Prj.MakeNull, basinField, false)
-        '            avglength = (avgraw < mycellsize).con(mycellsize.asgrid, avgraw)
-        '            sloperaw = ((avgdrop * 100) / avglength)
-        '            slopegrid = (sloperaw < 0.001).con(0.001.asgrid, sloperaw)
+            '  If (lcovVtab.CanEdit.Not) Then
+            '    MsgBox.info("Cannot Edit USGS Land Cover Grid." + nl + "Copy it to a location where you have write access.", "Geospatial Stream Flow Model")
+            '    Exit Sub
+            '  Else
+            '    lcovVtab.seteditable(True)
+            '    mannField = Field.Make("ManningN", #FIELD_DOUBLE, 10, 5)  
+            '    lcovVtab.AddFields({mannfield})
 
-        '            lcovgthm = theView.findtheme(lcovgname)
-        '            If (lcovgthm = nil) Then
-        '                MsgBox.error(lcovgname + " not found in the active View", "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            End If
-        '            If (lcovgthm.CanSelect) Then
-        '                MsgBox.error(lcovgname + "is not a grid theme", "")
-        '                Exit Sub
-        '            End If
-        '            If (lcovgthm.getgrid.isinteger) Then
-        '                lcovVtab = lcovgthm.GetVtab
-        '            Else
-        '                MsgBox.Error(lcovgthm.GetName + " is not an integer grid" + nl + "USGS Land Cover Grid must be an integer grid", "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            End If
-        '            If (lcovVtab = nil) Then
-        '                MsgBox.Error("Cannot open value attribute table for " + lcovgthm.GetName, "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            End If
-        '            lcovtempfld = lcovVtab.findfield("lu_code")
-        '            If (lcovtempfld = nil) Then
-        '                MsgBox.Error("Cannot find field 'lu_code' in land cover grid, " + lcovgthm.GetName, "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            End If
-        '            lufield = lcovtempfld.clone
-        '            If (lcovVtab.CanEdit.Not) Then
-        '                lcgridtemp = lcovgthm.getgrid.lookup("lu_code")
-        '                lcovVtab = lcgridtemp.getVtab
-        '                lcovVtab.seteditable(True)
-        '    lcovVtab.addfields({lufield})
-        '                lcovgthm = Gtheme.Make(lcgridtemp)
-        '            End If
+            '    testlocate = 0
 
-        '            Mannlist = { "0.03","0.03","0.035","0.033","0.035","0.04","0.05","0.05","0.05","0.06","0.1","0.1","0.12","0.12","0.1","0.035","0.05","0.05","0.03","0.05","0.05","0.05","0.04","0.04" }
-        '            lcvaluelist = { 100,211,212,213,280,290,311,321,330,332,411,412,421,422,430,500,620,610,770,820,810,850,830,900 }
-        '            lcnamelist = {"Urban and Built-Up Land", "Dryland Cropland and Pasture", "Irrigated Cropland and Pasture", "Mixed Dryland/Irrigated Cropland and Pasture", "Cropland/Grassland Mosaic", "Cropland/Woodland Mosaic", "Grassland", "Shrubland", "Mixed Shrubland/Grassland", "Savanna", "Deciduous Broadleaf Forest", "Deciduous Needleleaf Forest", "Evergreen Broadleaf Forest", "Evergreen Needleleaf Forest", "Mixed Forest", "Water Bodies", "Herbaceous Wetland", "Wooded Wetland", "Barren or Sparsely Vegetated", "Herbaceous Tundra", "Wooded Tundra", "Mixed Tundra", "Bare Ground Tundra", "Snow or Ice" }
+            '    For Each lrec In lcovVtab
+            '      lcvalue = (lcovVtab.ReturnValue(lcfield, lrec))
+            '      If (lcvalue = 0) Then
+            '        lcovVtab.setvalue(mannfield, lrec, 0.05)
+            '      Else
+            '        lstlocate = lcvaluelist.findbyvalue(lcvalue)
+            '        If ((lstlocate = -1) And (testlocate = 0)) Then
+            '          MsgBox.info("Anderson Code of " + lcvalue.asstring + " is not supported in the USGS Land Cover Grid" + nl + "Defaulting to Mannings n of 0.05", "Geospatial Stream Flow Model")
+            '          testlocate = 1
+            '          mannvalue = 0.05
+            '        ElseIf ((lstlocate = -1) And (testlocate = 1)) Then
+            '          mannvalue = 0.05
+            '        Else
+            '          mannvalue = lccodelist.get(lstlocate).asnumber
+            '        End If
+            '          lcovVtab.setvalue(mannfield, lrec, Mannvalue)
+            '      End If
+            '    Next
 
-        '            lccodelist = MsgBox.MultiInput("Specify Mannings (Velocity) Coefficients for each land cover", "Land Cover, Anderson Code, Manning's N", lcnamelist, Mannlist)
-        '            If (lccodelist.isempty) Then
-        '                Exit Sub
-        '            End If
-        '            lcfield = lcovVtab.FindField("lc_code".Lcase)
-        '            If (lcfield = nil) Then
-        '                lcfield = lcovVtab.FindField("lccode".Lcase)
-        '                If (lcfield = nil) Then
-        '                    lcfield = lcovVtab.FindField("lu_code".Lcase)
-        '                    If (lcfield = nil) Then
-        '                        lcfield = lcovVtab.FindField("lucode".Lcase)
-        '                        If (lcfield = nil) Then
-        '                            lcfldlst = lcovVtab.getfields.deepclone
-        '                            lcfield = MsgBox.choiceasstring(lcfldlst, "Select the field containing the" + nl + "Anderson Land Cover Classification Code eg lc_code", "Geospatial Stream Flow Model")
-        '                            If (lcfield = nil) Then
-        '                                Exit Sub
-        '                            End If
-        '                        End If
-        '                    End If
-        '                End If
-        '            End If
+            '    lcovgrid = lcovgthm.getgrid
+            '    manngrid = lcovgrid.lookup(mannfield.getname)
 
-        '            '  lcfile = LineFile.Make((myWkdirname + "roughness.txt").AsFileName, #FILE_PERM_WRITE)
-        '            '  if (lcfile = nil) then
-        '            '   msgbox.error("Cannot create roughness.txt file"+nl+"File may be open or held up by another program", "Geospatial Stream Flow Model")
-        '            '   exit
-        '            '  end
+            ' from Manning's equation, v = (1/n)(R^(2/3)(S^0.5) = K (S^0.5)
+            ' for Flowacc = 0-1000, R = 0.002,             k = (1/n)(0.002^(2/3)      = 0.0158740/n
+            ' for Flowacc = 1000-2000, R = 0.005,             k = (1/n)(0.005^(2/3)      = 0.0292402/n
+            ' for Flowacc = 2000-3000, R = 0.01,             k = (1/n)(0.01^(2/3)      = 0.0464159/n
+            ' for Flowacc = 3000-4000, R = 0.02,             k = (1/n)(0.02^(2/3)      = 0.0736806/n   
+            ' for Flowacc = 4000-5000, R = 0.05,             k = (1/n)(0.05^(2/3)      = 0.1357209/n
+            ' for Flowacc = 5000-10000,              vel = 0.3
+            ' for Flowacc = 10000-50000,             vel = 0.45
+            ' for Flowacc = 50000-100000,            vel = 0.6
+            ' for Flowacc = 100000-250000,           vel = 0.75
+            ' for Flowacc = 250000-500000,           vel = 0.9
+            ' for Flowacc = 500000-750000,           vel = 1.2
+            ' for Flowacc = > 750000,                vel = 1.5
 
-        '            If (lcovVtab.CanEdit.Not) Then
-        '                MsgBox.info("Cannot Edit USGS Land Cover Grid." + nl + "Copy it to a location where you have write access.", "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            Else
-        '                lcovVtab.seteditable(True)
-        '    mannField = Field.Make("ManningN", #FIELD_DOUBLE, 10, 5)  
-        '    lcovVtab.AddFields({mannfield})
+            '    velgrid1 = ((0.1357209).AsGrid / manngrid) * (slopegrid ^ 0.5)
+            '    velgrid2 = ((0.0736806).AsGrid / manngrid) * (slopegrid ^ 0.5)
+            '    velgrid3 = ((0.0464159).AsGrid / manngrid) * (slopegrid ^ 0.5)
+            '    velgrid4 = ((0.0292402).AsGrid / manngrid) * (slopegrid ^ 0.5)
+            '    velgrid5 = ((0.015874).AsGrid / manngrid) * (slopegrid ^ 0.5)
+            '    velgrid6 = (0.3).asgrid
+            '    velgrid7 = (0.45).asgrid
+            '    velgrid8 = (0.6).asgrid
+            '    velgrid9 = (0.75).asgrid
+            '    velgrid10 = (0.9).asgrid
+            '    velgrid11 = (1.2).asgrid
+            '    velgrid12 = (1.5).asgrid
 
-        '                testlocate = 0
+            '    velgridraw = (facgrid <= 1000).con(velgrid1, ((facgrid <= 2000).con(velgrid2, ((facgrid <= 3000).con(velgrid3, ((facgrid <= 4000).con(velgrid4, ((facgrid <= 5000).con(velgrid5, ((facgrid <= 10000).con(velgrid6, ((facgrid <= 50000).con(velgrid7, ((facgrid <= 100000).con(velgrid8, ((facgrid <= 250000).con(velgrid9, ((facgrid <= 500000).con(velgrid10, ((facgrid <= 750000).con(velgrid11, velgrid12)))))))))))))))))))))
+            '    velgrid = (velgridraw < 0.01).con((0.01).asgrid, (velgridraw > 1.5).con((1.5).asgrid, velgridraw))
 
-        '                For Each lrec In lcovVtab
-        '                    lcvalue = (lcovVtab.ReturnValue(lcfield, lrec))
-        '                    If (lcvalue = 0) Then
-        '                        lcovVtab.setvalue(mannfield, lrec, 0.05)
-        '                    Else
-        '                        lstlocate = lcvaluelist.findbyvalue(lcvalue)
-        '                        If ((lstlocate = -1) And (testlocate = 0)) Then
-        '                            MsgBox.info("Anderson Code of " + lcvalue.asstring + " is not supported in the USGS Land Cover Grid" + nl + "Defaulting to Mannings n of 0.05", "Geospatial Stream Flow Model")
-        '                            testlocate = 1
-        '                            mannvalue = 0.05
-        '                        ElseIf ((lstlocate = -1) And (testlocate = 1)) Then
-        '                            mannvalue = 0.05
-        '                        Else
-        '                            mannvalue = lccodelist.get(lstlocate).asnumber
-        '                        End If
-        '                        lcovVtab.setvalue(mannfield, lrec, Mannvalue)
-        '                    End If
-        '                Next
+            '    If (file.exists((myWkDirname + "velocity").AsFileName)) Then
+            '      grid.DeleteDataset((myWkDirname + "velocity").AsFileName)
+            '    End If
 
-        '                lcovgrid = lcovgthm.getgrid
-        '                manngrid = lcovgrid.lookup(mannfield.getname)
-        '                ' from Manning's equation, v = (1/n)(R^(2/3)(S^0.5) = K (S^0.5)
-        '                ' for Flowacc = 0-1000, R = 0.002,             k = (1/n)(0.002^(2/3)      = 0.0158740/n
-        '                ' for Flowacc = 1000-2000, R = 0.005,             k = (1/n)(0.005^(2/3)      = 0.0292402/n
-        '                ' for Flowacc = 2000-3000, R = 0.01,             k = (1/n)(0.01^(2/3)      = 0.0464159/n
-        '                ' for Flowacc = 3000-4000, R = 0.02,             k = (1/n)(0.02^(2/3)      = 0.0736806/n   
-        '                ' for Flowacc = 4000-5000, R = 0.05,             k = (1/n)(0.05^(2/3)      = 0.1357209/n
-        '                ' for Flowacc = 5000-10000,              vel = 0.3
-        '                ' for Flowacc = 10000-50000,             vel = 0.45
-        '                ' for Flowacc = 50000-100000,            vel = 0.6
-        '                ' for Flowacc = 100000-250000,           vel = 0.75
-        '                ' for Flowacc = 250000-500000,           vel = 0.9
-        '                ' for Flowacc = 500000-750000,           vel = 1.2
-        '                ' for Flowacc = > 750000,                vel = 1.5
+            '    velgthm = Gtheme.Make(velgrid)
 
-        '                velgrid1 = ((0.1357209).AsGrid / manngrid) * (slopegrid ^ 0.5)
-        '                velgrid2 = ((0.0736806).AsGrid / manngrid) * (slopegrid ^ 0.5)
-        '                velgrid3 = ((0.0464159).AsGrid / manngrid) * (slopegrid ^ 0.5)
-        '                velgrid4 = ((0.0292402).AsGrid / manngrid) * (slopegrid ^ 0.5)
-        '                velgrid5 = ((0.015874).AsGrid / manngrid) * (slopegrid ^ 0.5)
-        '                velgrid6 = (0.3).asgrid
-        '                velgrid7 = (0.45).asgrid
-        '                velgrid8 = (0.6).asgrid
-        '                velgrid9 = (0.75).asgrid
-        '                velgrid10 = (0.9).asgrid
-        '                velgrid11 = (1.2).asgrid
-        '                velgrid12 = (1.5).asgrid
+            '  End If
 
-        '                velgridraw = (facgrid <= 1000).con(velgrid1, ((facgrid <= 2000).con(velgrid2, ((facgrid <= 3000).con(velgrid3, ((facgrid <= 4000).con(velgrid4, ((facgrid <= 5000).con(velgrid5, ((facgrid <= 10000).con(velgrid6, ((facgrid <= 50000).con(velgrid7, ((facgrid <= 100000).con(velgrid8, ((facgrid <= 250000).con(velgrid9, ((facgrid <= 500000).con(velgrid10, ((facgrid <= 750000).con(velgrid11, velgrid12)))))))))))))))))))))
-        '                velgrid = (velgridraw < 0.01).con((0.01).asgrid, (velgridraw > 1.5).con((1.5).asgrid, velgridraw))
+        ElseIf (veltype = 2) Then
+            ' velgrid = (facgrid < 1000).con((OverlandFlowVelocity).asgrid, (InstreamFlowVelocity).asgrid)
+            ' velgthm = Gtheme.Make(velgrid)
+        Else
+            Dim lValue As Double = OverlandFlowVelocity
+            If lValue < 0.01 Then lValue = 0.01
+            If GisUtil.IsLayer(lVelocityGridLayerName) Then
+                lVelocityGridLayerIndex = GisUtil.LayerIndex(lVelocityGridLayerName)
+                GisUtil.RemoveLayer(lVelocityGridLayerIndex)
+            End If
+            lVelocityGridFileName = FilenameNoExt(lZoneFileName) & "Velocity.bgd"
+            'GisUtil.GridAssignConstant(lVelocityGridFileName, lZoneFileName, lValue)
+            GisUtil.AddLayer(lVelocityGridFileName, lVelocityGridLayerName)
+        End If
 
-        '                If (file.exists((myWkDirname + "velocity").AsFileName)) Then
-        '                    grid.DeleteDataset((myWkDirname + "velocity").AsFileName)
-        '                End If
-
-        '                velgthm = Gtheme.Make(velgrid)
-
-        '            End If
-        '        ElseIf (veltype = 2) Then
-        '            facgthm = TheView.FindTheme(facgname)
-        '            If (facgthm = nil) Then
-        '                MsgBox.error("Flow Accumulation Grid, " + facgname + ", Not Found in the View", "")
-        '                Exit Sub
-        '            End If
-
-        '            If (facgthm.CanSelect) Then
-        '                MsgBox.error(facgname + "is not a grid theme", "")
-        '                Exit Sub
-        '            End If
-
-        '            facgrid = facgthm.getgrid
-
-        '            If (overlandvelstr.isnumber) Then
-        '                overlandvel = overlandvelstr.asnumber
-        '            Else
-        '                MsgBox.info("Overland velocity, " + overlandvelstr + " must be a number", "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            End If
-
-        '            If (instreamvelstr.isnumber) Then
-        '                instreamvel = instreamvelstr.asnumber
-        '            Else
-        '                MsgBox.info("Instream velocity, " + instreamvelstr + " must be a number", "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            End If
-
-        '            velgrid = (facgrid < 1000).con((overlandvel).asgrid, (instreamvel).asgrid)
-        '            velgthm = Gtheme.Make(velgrid)
-        '        Else
-        '            velgrid1 = velstrname.asnumber.asgrid
-        '            velgrid = (velgrid1 < 0.01).con((0.01).asgrid, velgrid1)
-        '            velgthm = Gtheme.Make(velgrid)
-        '        End If
-
-        '        velgthm.SetName("velocity")
-        '        If (file.exists((myWkDirname + "velocity").AsFileName).not) Then
-        '            velgrid.SaveDataset((myWkDirname + "velocity").AsFileName)
-        '        End If
+        'given the velocity grid, compute travel times
 
         '        maskgrid = ((outgrid.isnull) / (outgrid.isnull))
         '        newfdrgrid = flowdirgrid * maskgrid
+        Dim lFlowDirGridFileName As String = GisUtil.LayerFileName(flowdirgthm)
 
         '        numsubs = basinTable.GetNumRecords
         '        invelgrid = (1.AsGrid / velgrid)
+        Dim lInverseVelocityGridFileName As String = FilenameNoExt(lZoneFileName) & "InverseVelocity.bgd"
+        'GisUtil.GridInverse(lVelocityGridFileName, lInverseVelocityGridFileName)
+
         '        flowtimegrid = newfdrgrid.flowlength(invelgrid, False)
-        '        If (file.exists((myWkDirname + "traveltime").AsFileName)) Then
-        '            grid.DeleteDataset((myWkDirname + "traveltime").AsFileName)
-        '        End If
+        Dim lTravelTimeGridLayerName As String = "Travel Time Grid"
+        Dim lTravelTimeGridLayerIndex As Integer = 0
+        Dim lTravelTimeGridFileName As String = ""
+        If GisUtil.IsLayer(lTravelTimeGridLayerName) Then
+            lTravelTimeGridLayerIndex = GisUtil.LayerIndex(lTravelTimeGridLayerName)
+            GisUtil.RemoveLayer(lTravelTimeGridLayerIndex)
+        End If
+        lTravelTimeGridFileName = FilenameNoExt(lZoneFileName) & "TravelTime.bgd"
+        GisUtil.DownstreamFlowLength(lFlowDirGridFileName, lInverseVelocityGridFileName, lTravelTimeGridFileName)
+        GisUtil.AddLayer(lTravelTimeGridFileName, lTravelTimeGridLayerName)
 
         '        daysgrid = (flowtimegrid / 86400).floor
         '        daysgthm = Gtheme.Make(daysgrid)
@@ -1448,44 +1359,7 @@ Public Module modGeoSFM
         '  respfile.write({newstr}, 1)
         'next 
 
-        'if (theView.FindTheme("velocity") <> nil) then
-        '  theView.DeleteTheme(theView.FindTheme("velocity"))
-        'endif 
-        'if (theView.FindTheme("traveltime") <> nil) then
-        '  theView.DeleteTheme(theView.FindTheme("traveltime"))
-        'endif 
-
-        'theView.AddTheme(velgthm)
-        'theView.AddTheme(daysgthm)
-
-
-        'GUIName = "Table"
-        'oldout = theProject.finddoc("response.txt")
-        'if (oldout <> nil) then
-        '  theproject.removedoc(oldout)
-        'end if 
-
-        'olddbf = theProject.finddoc("response.dbf")
-        'if (olddbf <> nil) then
-        '  theproject.removedoc(olddbf)
-        'end if 
-
-        'resptable = Vtab.make((myWkDirname+"response.dbf").asfilename, false, false)
-        't = Table.MakeWithGUI(resptable, GUIName)
-        't.SetName("response.dbf")
-        't.GetWin.Open
-
-        'av.ClearStatus
-        'av.clearmsg
-
-        'orderfile.close
-        '    'if (veltype = 1) then
-        '    '  lcfile.close
-        '    'end
-        'respfile.close
-        'expfile.close
-
-        'msgbox.Info( "Basin Response Computed. Output file: " +nl+ mywkDirname+"response.txt", "Geospatial Stream Flow Model")
+        Logger.Msg("Basin Response Computed. Output file: " & vbCrLf & lOutputPath + "response.txt", "Geospatial Stream Flow Model")
 
     End Sub
 
