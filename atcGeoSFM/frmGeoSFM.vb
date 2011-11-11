@@ -182,8 +182,6 @@ Public Class frmGeoSFM
     Friend WithEvents atxOverland As atcControls.atcText
     Friend WithEvents lblOutlets As System.Windows.Forms.Label
     Friend WithEvents cboOutlets As System.Windows.Forms.ComboBox
-    Friend WithEvents lblFlowDir As System.Windows.Forms.Label
-    Friend WithEvents cboFlowDir As System.Windows.Forms.ComboBox
     Friend WithEvents tpgMap As System.Windows.Forms.TabPage
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmGeoSFM))
@@ -230,6 +228,10 @@ Public Class frmGeoSFM
         Me.Label3 = New System.Windows.Forms.Label
         Me.cboBC2 = New System.Windows.Forms.ComboBox
         Me.tpgResponse = New System.Windows.Forms.TabPage
+        Me.lblOutlets = New System.Windows.Forms.Label
+        Me.cboOutlets = New System.Windows.Forms.ComboBox
+        Me.atxInstream = New atcControls.atcText
+        Me.atxOverland = New atcControls.atcText
         Me.cmdResponseNext = New System.Windows.Forms.Button
         Me.AtcGridMannings = New atcControls.atcGrid
         Me.lblUSGS = New System.Windows.Forms.Label
@@ -329,12 +331,6 @@ Public Class frmGeoSFM
         Me.Label44 = New System.Windows.Forms.Label
         Me.Label45 = New System.Windows.Forms.Label
         Me.ComboBox39 = New System.Windows.Forms.ComboBox
-        Me.atxOverland = New atcControls.atcText
-        Me.atxInstream = New atcControls.atcText
-        Me.lblFlowDir = New System.Windows.Forms.Label
-        Me.cboFlowDir = New System.Windows.Forms.ComboBox
-        Me.lblOutlets = New System.Windows.Forms.Label
-        Me.cboOutlets = New System.Windows.Forms.ComboBox
         Me.tabMain.SuspendLayout()
         Me.tpgTerrain.SuspendLayout()
         Me.tpgBasin.SuspendLayout()
@@ -872,8 +868,6 @@ Public Class frmGeoSFM
         '
         Me.tpgResponse.Controls.Add(Me.lblOutlets)
         Me.tpgResponse.Controls.Add(Me.cboOutlets)
-        Me.tpgResponse.Controls.Add(Me.lblFlowDir)
-        Me.tpgResponse.Controls.Add(Me.cboFlowDir)
         Me.tpgResponse.Controls.Add(Me.atxInstream)
         Me.tpgResponse.Controls.Add(Me.atxOverland)
         Me.tpgResponse.Controls.Add(Me.cmdResponseNext)
@@ -892,6 +886,74 @@ Public Class frmGeoSFM
         Me.tpgResponse.TabIndex = 9
         Me.tpgResponse.Text = "Basin Response"
         Me.tpgResponse.UseVisualStyleBackColor = True
+        '
+        'lblOutlets
+        '
+        Me.lblOutlets.AutoSize = True
+        Me.lblOutlets.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblOutlets.Location = New System.Drawing.Point(28, 259)
+        Me.lblOutlets.Name = "lblOutlets"
+        Me.lblOutlets.Size = New System.Drawing.Size(107, 13)
+        Me.lblOutlets.TabIndex = 56
+        Me.lblOutlets.Text = "Subbasin Outlet Grid:"
+        Me.lblOutlets.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'cboOutlets
+        '
+        Me.cboOutlets.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboOutlets.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboOutlets.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboOutlets.Location = New System.Drawing.Point(152, 256)
+        Me.cboOutlets.Name = "cboOutlets"
+        Me.cboOutlets.Size = New System.Drawing.Size(368, 21)
+        Me.cboOutlets.TabIndex = 57
+        '
+        'atxInstream
+        '
+        Me.atxInstream.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxInstream.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.atxInstream.DefaultValue = ""
+        Me.atxInstream.HardMax = -999
+        Me.atxInstream.HardMin = -999
+        Me.atxInstream.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxInstream.Location = New System.Drawing.Point(192, 171)
+        Me.atxInstream.MaxWidth = 20
+        Me.atxInstream.Name = "atxInstream"
+        Me.atxInstream.NumericFormat = "0.#####"
+        Me.atxInstream.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxInstream.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxInstream.SelLength = 0
+        Me.atxInstream.SelStart = 0
+        Me.atxInstream.Size = New System.Drawing.Size(93, 23)
+        Me.atxInstream.SoftMax = -999
+        Me.atxInstream.SoftMin = -999
+        Me.atxInstream.TabIndex = 53
+        Me.atxInstream.ValueDouble = 0
+        Me.atxInstream.ValueInteger = 0
+        '
+        'atxOverland
+        '
+        Me.atxOverland.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxOverland.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.atxOverland.DefaultValue = ""
+        Me.atxOverland.HardMax = -999
+        Me.atxOverland.HardMin = -999
+        Me.atxOverland.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxOverland.Location = New System.Drawing.Point(192, 145)
+        Me.atxOverland.MaxWidth = 20
+        Me.atxOverland.Name = "atxOverland"
+        Me.atxOverland.NumericFormat = "0.#####"
+        Me.atxOverland.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxOverland.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxOverland.SelLength = 0
+        Me.atxOverland.SelStart = 0
+        Me.atxOverland.Size = New System.Drawing.Size(94, 22)
+        Me.atxOverland.SoftMax = -999
+        Me.atxOverland.SoftMin = -999
+        Me.atxOverland.TabIndex = 52
+        Me.atxOverland.ValueDouble = 0
+        Me.atxOverland.ValueInteger = 0
         '
         'cmdResponseNext
         '
@@ -2072,96 +2134,6 @@ Public Class frmGeoSFM
         Me.ComboBox39.Size = New System.Drawing.Size(312, 21)
         Me.ComboBox39.TabIndex = 23
         '
-        'atxOverland
-        '
-        Me.atxOverland.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxOverland.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxOverland.DefaultValue = ""
-        Me.atxOverland.HardMax = -999
-        Me.atxOverland.HardMin = -999
-        Me.atxOverland.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxOverland.Location = New System.Drawing.Point(192, 145)
-        Me.atxOverland.MaxWidth = 20
-        Me.atxOverland.Name = "atxOverland"
-        Me.atxOverland.NumericFormat = "0.#####"
-        Me.atxOverland.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxOverland.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxOverland.SelLength = 0
-        Me.atxOverland.SelStart = 0
-        Me.atxOverland.Size = New System.Drawing.Size(94, 22)
-        Me.atxOverland.SoftMax = -999
-        Me.atxOverland.SoftMin = -999
-        Me.atxOverland.TabIndex = 52
-        Me.atxOverland.ValueDouble = 0
-        Me.atxOverland.ValueInteger = 0
-        '
-        'atxInstream
-        '
-        Me.atxInstream.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxInstream.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxInstream.DefaultValue = ""
-        Me.atxInstream.HardMax = -999
-        Me.atxInstream.HardMin = -999
-        Me.atxInstream.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxInstream.Location = New System.Drawing.Point(192, 171)
-        Me.atxInstream.MaxWidth = 20
-        Me.atxInstream.Name = "atxInstream"
-        Me.atxInstream.NumericFormat = "0.#####"
-        Me.atxInstream.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxInstream.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxInstream.SelLength = 0
-        Me.atxInstream.SelStart = 0
-        Me.atxInstream.Size = New System.Drawing.Size(93, 23)
-        Me.atxInstream.SoftMax = -999
-        Me.atxInstream.SoftMin = -999
-        Me.atxInstream.TabIndex = 53
-        Me.atxInstream.ValueDouble = 0
-        Me.atxInstream.ValueInteger = 0
-        '
-        'lblFlowDir
-        '
-        Me.lblFlowDir.AutoSize = True
-        Me.lblFlowDir.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblFlowDir.Location = New System.Drawing.Point(28, 259)
-        Me.lblFlowDir.Name = "lblFlowDir"
-        Me.lblFlowDir.Size = New System.Drawing.Size(99, 13)
-        Me.lblFlowDir.TabIndex = 54
-        Me.lblFlowDir.Text = "Flow Direction Grid:"
-        Me.lblFlowDir.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-        '
-        'cboFlowDir
-        '
-        Me.cboFlowDir.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboFlowDir.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboFlowDir.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboFlowDir.Location = New System.Drawing.Point(152, 256)
-        Me.cboFlowDir.Name = "cboFlowDir"
-        Me.cboFlowDir.Size = New System.Drawing.Size(368, 21)
-        Me.cboFlowDir.TabIndex = 55
-        '
-        'lblOutlets
-        '
-        Me.lblOutlets.AutoSize = True
-        Me.lblOutlets.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblOutlets.Location = New System.Drawing.Point(28, 286)
-        Me.lblOutlets.Name = "lblOutlets"
-        Me.lblOutlets.Size = New System.Drawing.Size(107, 13)
-        Me.lblOutlets.TabIndex = 56
-        Me.lblOutlets.Text = "Subbasin Outlet Grid:"
-        Me.lblOutlets.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-        '
-        'cboOutlets
-        '
-        Me.cboOutlets.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboOutlets.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboOutlets.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboOutlets.Location = New System.Drawing.Point(152, 283)
-        Me.cboOutlets.Name = "cboOutlets"
-        Me.cboOutlets.Size = New System.Drawing.Size(368, 21)
-        Me.cboOutlets.TabIndex = 57
-        '
         'frmGeoSFM
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -2277,6 +2249,8 @@ Public Class frmGeoSFM
             cboSubbasin.SelectedIndex = 0
         End If
 
+        DefaultBasinCharacteristicsGrids()
+        DefaultResponseGrids()
     End Sub
 
     Private Sub lblStatus_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lblStatus.TextChanged
@@ -2450,13 +2424,10 @@ Public Class frmGeoSFM
     Private Sub DefaultResponseGrids()
         'set choices for grid layers
         cboUSGS.Items.Clear()
-        cboFlowDir.Items.Clear()
         cboOutlets.Items.Clear()
         cboUSGS.Items.Add("<none>")
-        cboFlowDir.Items.Add("<none>")
         cboOutlets.Items.Add("<none>")
         cboUSGS.SelectedIndex = 0
-        cboFlowDir.SelectedIndex = 0
         cboOutlets.SelectedIndex = 0
 
         For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
@@ -2464,21 +2435,17 @@ Public Class frmGeoSFM
             If GisUtil.LayerType(lLayerIndex) = MapWindow.Interfaces.eLayerType.Grid Then
                 cboUSGS.Items.Add(lLayerName)
                 cboOutlets.Items.Add(lLayerName)
-                cboFlowDir.Items.Add(lLayerName)
                 If lLayerName.Contains("USGS") Then
                     cboUSGS.SelectedIndex = cboUSGS.Items.Count - 1
                 End If
-                If lLayerName.Contains("Flow Direction") Then
-                    cboFlowDir.SelectedIndex = cboFlowDir.Items.Count - 1
-                End If
-                If lLayerName.Contains("Outlets") Then
+                If lLayerName.Contains("Outlet") Then
                     cboOutlets.SelectedIndex = cboOutlets.Items.Count - 1
                 End If
             End If
         Next lLayerIndex
 
-        If cboUSGS.SelectedIndex = 0 Or cboFlowDir.SelectedIndex = 0 Or cboOutlets.SelectedIndex = 0 Then
-            cmdResponseNext.Enabled = False
+        If cboUSGS.SelectedIndex = 0 Or cboOutlets.SelectedIndex = 0 Then
+            'cmdResponseNext.Enabled = False
         End If
     End Sub
 
@@ -2494,17 +2461,29 @@ Public Class frmGeoSFM
 
         Dim lZonegname As String = cboBC1.Items(cboBC1.SelectedIndex)
         Dim lDemgname As String = cboBC2.Items(cboBC2.SelectedIndex)
-        Dim lFacgname As String = cboBC3.Items(cboBC3.SelectedIndex)
+        'Dim lFacgname As String = cboBC3.Items(cboBC3.SelectedIndex)
         Dim lFlowlengname As String = cboBC10.Items(cboBC10.SelectedIndex)
         Dim lUSGSLandcoverGridName As String = cboUSGS.Items(cboUSGS.SelectedIndex)
-        Dim lFlowDirGridName As String = cboFlowDir.Items(cboFlowDir.SelectedIndex)
+        'Dim lFlowDirGridName As String = cboFlowDir.Items(cboFlowDir.SelectedIndex)
         Dim lOutletGridName As String = cboOutlets.Items(cboOutlets.SelectedIndex)
 
         Dim lOverlandFlowVelocity As Double = atxOverland.ValueDouble
         Dim lInstreamFlowVelocity As Double = atxInstream.ValueDouble
 
-        Response(lVelMethod, lZonegname, lFlowDirGridName, lFlowlengname, lOutletGridName, lDemgname, lFacgname, _
+        EnableControls(False)
+        lblStatus.Text = "Computing Basin Response ..."
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+        Me.Refresh()
+
+        Response(lVelMethod, lZonegname, lFlowlengname, lOutletGridName, lDemgname, _
                  lUSGSLandcoverGridName, lOverlandFlowVelocity, lInstreamFlowVelocity)
+
+        tabMain.SelectedIndex = 3
+        lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+        Me.Refresh()
+        EnableControls(True)
+
     End Sub
 
     Private Sub cmdRainEvapNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdRainEvapNext.Click

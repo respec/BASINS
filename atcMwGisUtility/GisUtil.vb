@@ -2129,6 +2129,62 @@ Public Class GisUtil
         lOutputGrid.Save()
     End Sub
 
+    Public Shared Sub GridMultiply(ByVal aInputGridFileName As String, ByVal aInput2GridFileName As String, ByVal aNewGridFileName As String)
+        If FileExists(aNewGridFileName) Then
+            IO.File.Delete(aNewGridFileName)
+        End If
+        IO.File.Copy(aInputGridFileName, aNewGridFileName)
+
+        Dim lOutputGrid As New MapWinGIS.Grid
+        lOutputGrid.Open(aNewGridFileName)
+
+        Dim lInput2Grid As New MapWinGIS.Grid
+        lInput2Grid.Open(aInput2GridFileName)
+
+        Dim lStartRow As Integer = 0
+        Dim lStartCol As Integer = 0
+        Dim lEndRow As Integer = lOutputGrid.Header.NumberRows - 1
+        Dim lEndCol As Integer = lOutputGrid.Header.NumberCols - 1
+
+        For lRow As Integer = lStartRow To lEndRow
+            For lCol As Integer = lStartCol To lEndCol
+                If lOutputGrid.Value(lCol, lRow) <> lOutputGrid.Header.NodataValue Then
+                    lOutputGrid.Value(lCol, lRow) = lOutputGrid.Value(lCol, lRow) * lInput2Grid.Value(lCol, lRow)
+                End If
+            Next
+        Next
+
+        lOutputGrid.Save()
+    End Sub
+
+    Public Shared Sub GridToInteger(ByVal aInputGridFileName As String, ByVal aNewGridFileName As String)
+        If FileExists(aNewGridFileName) Then
+            IO.File.Delete(aNewGridFileName)
+        End If
+
+        Dim lInputGrid As New MapWinGIS.Grid
+        lInputGrid.Open(aInputGridFileName)
+
+        Dim lOutputGrid As New MapWinGIS.Grid
+        lOutputGrid.CreateNew(aNewGridFileName, lInputGrid.Header, MapWinGIS.GridDataType.ShortDataType, -999)
+        lOutputGrid.Header.NodataValue = -999
+
+        Dim lStartRow As Integer = 0
+        Dim lStartCol As Integer = 0
+        Dim lEndRow As Integer = lOutputGrid.Header.NumberRows - 1
+        Dim lEndCol As Integer = lOutputGrid.Header.NumberCols - 1
+
+        For lRow As Integer = lStartRow To lEndRow
+            For lCol As Integer = lStartCol To lEndCol
+                If lInputGrid.Value(lCol, lRow) > -1 Then
+                    lOutputGrid.Value(lCol, lRow) = lInputGrid.Value(lCol, lRow)
+                End If
+            Next
+        Next
+
+        lOutputGrid.Save()
+    End Sub
+
     Public Shared Sub GridSetNoData(ByVal aInputGridFileName As String, ByVal aThreshold As Double)
         'set no data values in the input grid, save it 
 
@@ -2171,7 +2227,7 @@ Public Class GisUtil
         If FileExists(aLenGridFileName) Then
             IO.File.Delete(aLenGridFileName)
         End If
-        IO.File.Copy(aFlowAccGridFileName, aLenGridFileName)
+        IO.File.Copy(aFlowDirGridFileName, aLenGridFileName)
 
         Dim lOutputGrid As New MapWinGIS.Grid
         lOutputGrid.Open(aLenGridFileName)
@@ -2240,6 +2296,61 @@ Public Class GisUtil
             Next
             lStreamGrid = Nothing
         End If
+
+        lOutputGrid.Save()
+        lOutputGrid = Nothing
+    End Sub
+
+    Public Shared Sub FlowLengthToOutlet(ByVal aLenGridFileName As String, ByVal aOutletGridFileName As String, ByVal aZoneGridFileName As String, ByVal aOutputGridFileName As String)
+        'compute downstream flow length to outlet of each subbasin
+
+        'prepare the output grid
+        If FileExists(aOutputGridFileName) Then
+            IO.File.Delete(aOutputGridFileName)
+        End If
+        IO.File.Copy(aLenGridFileName, aOutputGridFileName)
+        Dim lOutputGrid As New MapWinGIS.Grid
+        lOutputGrid.Open(aOutputGridFileName)
+
+        'prepare the flow length grid
+        Dim lFlowLenGrid As New MapWinGIS.Grid
+        lFlowLenGrid.Open(aLenGridFileName)
+
+        'for each outlet, find the corresponding flow length
+        Dim lOutletGrid As New MapWinGIS.Grid
+        lOutletGrid.Open(aOutletGridFileName)
+        Dim lEndRow As Integer = lOutletGrid.Header.NumberRows - 1
+        Dim lEndCol As Integer = lOutletGrid.Header.NumberCols - 1
+        Dim lBasinVal As Integer = -1
+        Dim lFlowLen As Double = -1.0
+        Dim lSubbasinFlowLengths As New atcCollection
+        For lRow As Integer = 0 To lEndRow
+            For lCol As Integer = 0 To lEndCol
+                lBasinVal = lOutletGrid.Value(lCol, lRow)
+                If lBasinVal > 0 Then
+                    'this is a subbasin outlet, get flow length at this location
+                    lFlowLen = lFlowLenGrid.Value(lCol, lRow)
+                    lSubbasinFlowLengths.Add(lBasinVal, lFlowLen)
+                End If
+            Next
+        Next
+
+        'prepare the zone grid
+        Dim lZoneGrid As New MapWinGIS.Grid
+        lZoneGrid.Open(aZoneGridFileName)
+
+        'loop through cells of output grid
+        lEndRow = lOutputGrid.Header.NumberRows - 1
+        lEndCol = lOutputGrid.Header.NumberCols - 1
+        For lRow As Integer = 0 To lEndRow
+            For lCol As Integer = 0 To lEndCol
+                lBasinVal = lZoneGrid.Value(lCol, lRow)
+                If lBasinVal > 0 Then
+                    'this is a subbasin, adjust flow length at this location
+                    lOutputGrid.Value(lCol, lRow) = lOutputGrid.Value(lCol, lRow) - lSubbasinFlowLengths.ItemByKey(lBasinVal)
+                End If
+            Next
+        Next
 
         lOutputGrid.Save()
         lOutputGrid = Nothing
@@ -4264,10 +4375,33 @@ Friend Class Downstream
         '4 3 2
         '5   1
         '6 7 8
+        Dim lnw As Integer = 8
+        Dim ln As Integer = 7
+        Dim lne As Integer = 6
+        Dim lw As Integer = 1
+        Dim le As Integer = 5
+        Dim lsw As Integer = 2
+        Dim ls As Integer = 3
+        Dim lse As Integer = 4
+
+        If aFlowDirGrid.Maximum > 8 Then
+            'assume arcview coding:
+            '32 64 128
+            '16      1
+            ' 8  4   2
+            lnw = 2
+            ln = 4
+            lne = 8
+            lw = 1
+            le = 16
+            lsw = 128
+            ls = 64
+            lse = 32
+        End If
 
         'check nw cell
         If aRow - 1 > 0 And aCol - 1 > 0 Then
-            If aFlowDirGrid.Value(aCol - 1, aRow - 1) = 8 Then
+            If aFlowDirGrid.Value(aCol - 1, aRow - 1) = lnw Then
                 aOutputGrid.Value(aCol - 1, aRow - 1) = lDiag + aOutputGrid.Value(aCol, aRow)
                 'If aOutputGrid.Value(aCol, aRow) < 0 Then
                 '    'Logger.Dbg("negative value for output grid")
@@ -4278,7 +4412,7 @@ Friend Class Downstream
 
         'check n cell
         If aRow - 1 > 0 Then
-            If aFlowDirGrid.Value(aCol, aRow - 1) = 7 Then
+            If aFlowDirGrid.Value(aCol, aRow - 1) = ln Then
                 aOutputGrid.Value(aCol, aRow - 1) = lY + aOutputGrid.Value(aCol, aRow)
                 'If aOutputGrid.Value(aCol, aRow) < 0 Then
                 '    'Logger.Dbg("negative value for output grid")
@@ -4289,7 +4423,7 @@ Friend Class Downstream
 
         'check ne cell
         If aRow - 1 > 0 And aCol + 1 < aFlowDirGrid.Header.NumberCols Then
-            If aFlowDirGrid.Value(aCol + 1, aRow - 1) = 6 Then
+            If aFlowDirGrid.Value(aCol + 1, aRow - 1) = lne Then
                 aOutputGrid.Value(aCol + 1, aRow - 1) = lDiag + aOutputGrid.Value(aCol, aRow)
                 'If aOutputGrid.Value(aCol, aRow) < 0 Then
                 '    'Logger.Dbg("negative value for output grid")
@@ -4300,7 +4434,7 @@ Friend Class Downstream
 
         'check w cell
         If aCol - 1 > 0 Then
-            If aFlowDirGrid.Value(aCol - 1, aRow) = 1 Then
+            If aFlowDirGrid.Value(aCol - 1, aRow) = lw Then
                 aOutputGrid.Value(aCol - 1, aRow) = lX + aOutputGrid.Value(aCol, aRow)
                 'If aOutputGrid.Value(aCol, aRow) < 0 Then
                 '    'Logger.Dbg("negative value for output grid")
@@ -4311,7 +4445,7 @@ Friend Class Downstream
 
         'check e cell
         If aCol + 1 < aFlowDirGrid.Header.NumberCols Then
-            If aFlowDirGrid.Value(aCol + 1, aRow) = 5 Then
+            If aFlowDirGrid.Value(aCol + 1, aRow) = le Then
                 aOutputGrid.Value(aCol + 1, aRow) = lX + aOutputGrid.Value(aCol, aRow)
                 'If aOutputGrid.Value(aCol, aRow) < 0 Then
                 '    'Logger.Dbg("negative value for output grid")
@@ -4322,7 +4456,7 @@ Friend Class Downstream
 
         'check sw cell
         If aRow + 1 < aFlowDirGrid.Header.NumberRows And aCol - 1 > 0 Then
-            If aFlowDirGrid.Value(aCol - 1, aRow + 1) = 2 Then
+            If aFlowDirGrid.Value(aCol - 1, aRow + 1) = lsw Then
                 aOutputGrid.Value(aCol - 1, aRow + 1) = lDiag + aOutputGrid.Value(aCol, aRow)
                 'If aOutputGrid.Value(aCol, aRow) < 0 Then
                 '    'Logger.Dbg("negative value for output grid")
@@ -4333,7 +4467,7 @@ Friend Class Downstream
 
         'check s cell
         If aRow + 1 < aFlowDirGrid.Header.NumberRows Then
-            If aFlowDirGrid.Value(aCol, aRow + 1) = 3 Then
+            If aFlowDirGrid.Value(aCol, aRow + 1) = ls Then
                 aOutputGrid.Value(aCol, aRow + 1) = lY + aOutputGrid.Value(aCol, aRow)
                 'If aOutputGrid.Value(aCol, aRow) < 0 Then
                 '    'Logger.Dbg("negative value for output grid")
@@ -4344,7 +4478,7 @@ Friend Class Downstream
 
         'check se cell
         If aRow + 1 < aFlowDirGrid.Header.NumberRows And aCol + 1 < aFlowDirGrid.Header.NumberCols Then
-            If aFlowDirGrid.Value(aCol + 1, aRow + 1) = 4 Then
+            If aFlowDirGrid.Value(aCol + 1, aRow + 1) = lse Then
                 aOutputGrid.Value(aCol + 1, aRow + 1) = lDiag + aOutputGrid.Value(aCol, aRow)
                 'If aOutputGrid.Value(aCol, aRow) < 0 Then
                 '    'Logger.Dbg("negative value for output grid")
