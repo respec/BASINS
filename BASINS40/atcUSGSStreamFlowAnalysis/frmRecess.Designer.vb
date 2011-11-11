@@ -25,7 +25,6 @@ Partial Class frmRecess
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmRecess))
         Me.tabMain = New System.Windows.Forms.TabControl
         Me.tabConfig = New System.Windows.Forms.TabPage
-        Me.lblDA = New System.Windows.Forms.Label
         Me.chkSaveInterimToFile = New System.Windows.Forms.CheckBox
         Me.gbRnages = New System.Windows.Forms.GroupBox
         Me.btnBrowseRangeFile = New System.Windows.Forms.Button
@@ -95,7 +94,6 @@ Partial Class frmRecess
         '
         'tabConfig
         '
-        Me.tabConfig.Controls.Add(Me.lblDA)
         Me.tabConfig.Controls.Add(Me.chkSaveInterimToFile)
         Me.tabConfig.Controls.Add(Me.gbRnages)
         Me.tabConfig.Controls.Add(Me.txtOutputDir)
@@ -111,15 +109,6 @@ Partial Class frmRecess
         Me.tabConfig.TabIndex = 0
         Me.tabConfig.Text = "Configuration"
         Me.tabConfig.UseVisualStyleBackColor = True
-        '
-        'lblDA
-        '
-        Me.lblDA.AutoSize = True
-        Me.lblDA.Location = New System.Drawing.Point(9, 237)
-        Me.lblDA.Name = "lblDA"
-        Me.lblDA.Size = New System.Drawing.Size(146, 13)
-        Me.lblDA.TabIndex = 48
-        Me.lblDA.Text = "Specify Drainage Area (sq mi)"
         '
         'chkSaveInterimToFile
         '
@@ -530,19 +519,19 @@ Partial Class frmRecess
         '
         Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileSelectData})
         Me.mnuFile.Name = "mnuFile"
-        Me.mnuFile.Size = New System.Drawing.Size(37, 20)
+        Me.mnuFile.Size = New System.Drawing.Size(35, 20)
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
         '
         Me.mnuFileSelectData.Name = "mnuFileSelectData"
-        Me.mnuFileSelectData.Size = New System.Drawing.Size(132, 22)
+        Me.mnuFileSelectData.Size = New System.Drawing.Size(140, 22)
         Me.mnuFileSelectData.Text = "Select Data"
         '
         'mnuHelp
         '
         Me.mnuHelp.Name = "mnuHelp"
-        Me.mnuHelp.Size = New System.Drawing.Size(44, 20)
+        Me.mnuHelp.Size = New System.Drawing.Size(40, 20)
         Me.mnuHelp.Text = "Help"
         '
         'frmRecess
@@ -618,6 +607,5 @@ Partial Class frmRecess
     Friend WithEvents lstRecessSegments As System.Windows.Forms.CheckedListBox
     Friend WithEvents txtAnalysisResults As System.Windows.Forms.TextBox
     Friend WithEvents chkSaveInterimToFile As System.Windows.Forms.CheckBox
-    Friend WithEvents lblDA As System.Windows.Forms.Label
     Friend WithEvents btnCurv As System.Windows.Forms.Button
 End Class
