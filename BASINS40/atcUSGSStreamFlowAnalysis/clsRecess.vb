@@ -83,12 +83,15 @@ Public Class clsRecess
     Private pFileIndex As String = "index.txt"
     Private pFileRecData As String = "recdata.txt"
     Private pFileRanges As String = "ranges.txt"
-    Private pFileOut1 As String = ""
-    Private pFileOut2 As String = ""
     Private pHeaderOutFile1 As String = ""
     Private pHeaderOutFile2 As String = ""
     Private pHeaderIndexFile As String = ""
     Private pHeaderRecSumFile As String = ""
+
+    Private pFileOut1 As String = ""
+    Private pFileOut2 As String = ""
+    Public FileOut1Created As Boolean = False
+    Public FileOut2Created As Boolean = False
 
     Private Sub SetOutputFiles()
         pFileRecSum = IO.Path.Combine(OutputPath, pFileRecSum)
@@ -96,8 +99,8 @@ Public Class clsRecess
         pFileIndex = IO.Path.Combine(OutputPath, pFileIndex)
         pFileRanges = IO.Path.Combine(OutputPath, pFileRanges)
 
-        pFileOut1 = IO.Path.Combine(OutputPath, "x" & SeasonLabel & pDataFilename)
-        pFileOut2 = IO.Path.Combine(OutputPath, "y" & SeasonLabel & pDataFilename)
+        pFileOut1 = IO.Path.Combine(OutputPath, "x" & SeasonLabel & "." & pDataFilename)
+        pFileOut2 = IO.Path.Combine(OutputPath, "y" & SeasonLabel & "." & pDataFilename)
     End Sub
 #End Region
 
@@ -297,6 +300,15 @@ Public Class clsRecess
         pDataFilename = IO.Path.GetFileName(lInputfile)
         If SaveInterimResults Then
             SetOutputFiles()
+            If pHasWritePermission Then
+                Dim lSW As StreamWriter = Nothing
+                lSW = New StreamWriter(pFileOut1, False)
+                lSW.Close() : lSW = Nothing
+                lSW = New StreamWriter(pFileOut2, False)
+                lSW.Close() : lSW = Nothing
+                FileOut1Created = True
+                FileOut1Created = True
+            End If
         End If
 
         Dim lYearStart As Integer
@@ -417,6 +429,8 @@ Public Class clsRecess
         End If
 
         FlowData = Nothing
+        FileOut1Created = False
+        FileOut2Created = False
     End Sub
 
     Public Function RecessAnalysis(Optional ByVal aOperation As String = "") As String
@@ -433,8 +447,8 @@ Public Class clsRecess
         lFileRecData = IO.Path.Combine(pOutputPath, lFileRecData)
         lFileIndex = IO.Path.Combine(pOutputPath, lFileIndex)
         lFileRanges = IO.Path.Combine(pOutputPath, lFileRanges)
-        lFileOut1 = IO.Path.Combine(pOutputPath, "x" & SeasonLabel & pDataFilename)
-        lFileOut2 = IO.Path.Combine(pOutputPath, "y" & SeasonLabel & pDataFilename)
+        lFileOut1 = IO.Path.Combine(pOutputPath, "x" & SeasonLabel & "." & pDataFilename)
+        lFileOut2 = IO.Path.Combine(pOutputPath, "y" & SeasonLabel & "." & pDataFilename)
 
         Dim lDate(5) As Integer
         J2Date(pData.Dates.Value(0), lDate)
@@ -779,7 +793,9 @@ Public Class clsRecess
             Case "d"
                 RecessDisplay(RecessionSegment)
             Case "r"
-                RecessAnalyse(RecessionSegment)
+                If RecessionSegment.NeedToAnalyse Then
+                    RecessAnalyse(RecessionSegment)
+                End If
             Case "select"
                 RecessionSegment.IsExcluded = False
             Case "unselect"
@@ -872,6 +888,8 @@ Public Class clsRecess
             .MeanOrdinals = lTotalOrdinal / (.MaxDayOrdinal - .MinDayOrdinal + 1)
 
             DoRegression2(aSegment)
+            'set analysed done
+            aSegment.NeedToAnalyse = False
 
             lMsg.AppendLine("BEST-FIT EQUATION:")
             lMsg.AppendLine(.BestFitEquation)
@@ -879,13 +897,7 @@ Public Class clsRecess
             lMsg.AppendLine(" MEAN LOG Q = " & String.Format("{0:0.000000}", .MeanLogQ))
 
             If SaveInterimResults And pHasWritePermission Then
-                Dim lSW As IO.StreamWriter = New IO.StreamWriter(pFileOut1, True)
-
-                'If FileExists(pFileOut1) Then
-                '    lSW = New IO.StreamWriter(pFileOut1, True)
-                'Else
-                '    lSW = New IO.StreamWriter(pFileOut1, False)
-                'End If
+                Dim lSW As IO.StreamWriter = New IO.StreamWriter(pFileOut1, FileOut1Created)
                 Dim lDate(5) As Integer
                 lSW.WriteLine(pHeaderOutFile1)
                 '   19 FORMAT (1F10.5,1F15.3,3F8.1,10X,1I6,2I3)
@@ -971,7 +983,7 @@ Public Class clsRecess
         Next
 
         If SaveInterimResults And pHasWritePermission Then
-            lSW = New IO.StreamWriter(pFileOut1, True)
+            lSW = New IO.StreamWriter(pFileOut1, FileOut1Created)
             lSW.WriteLine("TOTAL NUMBER OF DAILY VALUES OF STREAMFLOW THAT WERE USED, FOR ALL RECESSION")
             lSW.WriteLine("PERIODS INITIALLY SELECTED = " & liiDV)
             lSW.Flush()
@@ -1026,7 +1038,7 @@ Public Class clsRecess
 
         Dim lAskUserNumRecToBeEliminated As Integer = listOfSegments.Count - lListOfChosenSegments.Count
         If SaveInterimResults And pHasWritePermission Then
-            lSW = New IO.StreamWriter(pFileOut1, True)
+            lSW = New IO.StreamWriter(pFileOut1, FileOut1Created)
             lSW.WriteLine("NUMBER OF RECESSION PERIODS INITIALLY SELECTED=" & lListOfChosenSegments.Count)
             lSW.WriteLine("MAXIMUM LOG Q FOR ALL RECESSIONS=" & XLogQMax)
             lSW.WriteLine("MINIMUM LOG Q FOR ALL RECESSIONS=" & XLogQMin)
@@ -1135,7 +1147,7 @@ Public Class clsRecess
 
         '--------------- SHOW ORDERED DATA, AFTER ELIMINATION:  --------------
         If SaveInterimResults And pHasWritePermission Then
-            lSW = New IO.StreamWriter(pFileOut1, True)
+            lSW = New IO.StreamWriter(pFileOut1, FileOut1Created)
             lSW.WriteLine(" ")
             lSW.WriteLine("-----------------------------------------------------------------------")
             lSW.WriteLine("        RECESSION PERIODS LEFT AFTER ELIMINATION: ")
@@ -1678,4 +1690,7 @@ Public Class clsRecess
         End While
     End Sub
 
+    Public Shared Function MRCConstruct() As clsMRC
+
+    End Function
 End Class

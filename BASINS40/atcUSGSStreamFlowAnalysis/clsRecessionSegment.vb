@@ -13,12 +13,63 @@ Public Class clsRecessionSegment
     Public Coefficient1 As Double
     Public Coefficient2 As Double
     Public DaysLogCycle As Double = -1 * Coefficient1
-    Public MinDayOrdinal As Integer
-    Public MaxDayOrdinal As Integer
+
     Public IsExcluded As Boolean = False
     Public NeedtoReadData As Boolean = True
     Public MeanLogQ As Double
     Public MeanOrdinals As Double
+
+    Private pMinDayOrdinal As Integer
+    Private pMaxDayOrdinal As Integer
+    Private pMinDayOrdinalChanged As Boolean = False
+    Private pMaxDayOrdinalChanged As Boolean = False
+
+    Public Property MinDayOrdinal() As Integer
+        Get
+            Return pMinDayOrdinal
+        End Get
+        Set(ByVal value As Integer)
+            If value <> pMinDayOrdinal Then
+                pMinDayOrdinal = value
+                pMinDayOrdinalChanged = True
+            Else
+                pMinDayOrdinalChanged = False
+            End If
+        End Set
+    End Property
+    Public Property MaxDayOrdinal() As Integer
+        Get
+            Return pMaxDayOrdinal
+        End Get
+        Set(ByVal value As Integer)
+            If value <> pMaxDayOrdinal Then
+                pMaxDayOrdinal = value
+                pMaxDayOrdinalChanged = True
+            Else
+                pMaxDayOrdinalChanged = False
+            End If
+        End Set
+    End Property
+
+    Private pNeedToAnalyse As Boolean = True
+    Public Property NeedToAnalyse() As Boolean
+        Get
+            If Coefficient1 = 0 AndAlso Coefficient1 = Coefficient2 AndAlso Coefficient1 = MeanLogQ AndAlso Coefficient1 = MeanOrdinals Then
+                pNeedToAnalyse = True
+            ElseIf pMinDayOrdinalChanged OrElse pMaxDayOrdinalChanged Then
+                pNeedToAnalyse = True
+            Else
+                pNeedToAnalyse = False
+            End If
+            Return pNeedToAnalyse
+        End Get
+        Set(ByVal value As Boolean) 'set right after it is analysed
+            If Not value Then
+                pMinDayOrdinalChanged = False
+                pMaxDayOrdinalChanged = False
+            End If
+        End Set
+    End Property
 
     'for display
     Public ReadOnly Property BestFitEquation() As String

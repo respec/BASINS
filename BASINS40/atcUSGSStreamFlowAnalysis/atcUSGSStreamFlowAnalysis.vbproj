@@ -62,6 +62,7 @@
     <Import Include="System.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="clsMRC.vb" />
     <Compile Include="clsRecess.vb" />
     <Compile Include="clsRecessionSegment.vb" />
     <Compile Include="clsUSGSStreamFlowAnalysis.vb" />
@@ -69,6 +70,12 @@
       <DependentUpon>frmDataSummary.vb</DependentUpon>
     </Compile>
     <Compile Include="frmDataSummary.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMRCControl.Designer.vb">
+      <DependentUpon>frmMRCControl.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmMRCControl.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmRecess.Designer.vb">
@@ -102,6 +109,9 @@
   <ItemGroup>
     <EmbeddedResource Include="frmDataSummary.resx">
       <DependentUpon>frmDataSummary.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmMRCControl.resx">
+      <DependentUpon>frmMRCControl.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmRecess.resx">
       <DependentUpon>frmRecess.vb</DependentUpon>
