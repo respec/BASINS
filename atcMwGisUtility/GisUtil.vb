@@ -1810,6 +1810,40 @@ Public Class GisUtil
         Return lZonalStatistics
     End Function
 
+    Public Shared Function GridZoneCountValue(ByVal aZoneGridIndex As Integer, ByVal aValueGridIndex As Integer, ByVal aValue As Integer) As atcCollection
+        Dim lZoneGrid As MapWinGIS.Grid = GridFromIndex(aZoneGridIndex)
+        Dim lValueGrid As MapWinGIS.Grid = GridFromIndex(aValueGridIndex)
+
+        Dim lStartRow As Integer = 0
+        Dim lStartCol As Integer = 0
+        Dim lEndRow As Integer = lZoneGrid.Header.NumberRows - 1
+        Dim lEndCol As Integer = lZoneGrid.Header.NumberCols - 1
+
+        Dim lNodataZone As Integer = lZoneGrid.Header.NodataValue
+        Dim lNodataValue As Double = lValueGrid.Header.NodataValue
+
+        Dim lZoneNumber As Integer
+        Dim lZonalCounts As New atcCollection
+
+        For lRow As Integer = lStartRow To lEndRow
+            For lCol As Integer = lStartCol To lEndCol
+                If lValueGrid.Value(lCol, lRow) = aValue Then
+                    'increment count for this zone
+                    lZoneNumber = lZoneGrid.Value(lCol, lRow)
+                    If lZoneNumber <> lNodataZone Then
+                        If lZonalCounts.ItemByKey(lZoneNumber) Is Nothing Then
+                            lZonalCounts.Add(lZoneNumber, 1)
+                        Else
+                            lZonalCounts.ItemByKey(lZoneNumber) += 1
+                        End If
+                    End If
+                End If
+            Next
+        Next
+
+        Return lZonalCounts
+    End Function
+
     Private Shared Sub GridOverlap(ByVal aGrid1 As MapWinGIS.Grid, ByVal aGrid2 As MapWinGIS.Grid, _
         ByRef aStartRow1 As Integer, ByVal aEndRow1 As Integer, ByRef aStartCol1 As Integer, ByVal aEndCol1 As Integer, _
         ByRef aStartRow2 As Integer, ByVal aEndRow2 As Integer, ByRef aStartCol2 As Integer, ByVal aEndCol2 As Integer)
@@ -2020,6 +2054,75 @@ Public Class GisUtil
                 If lTempVal <> lNoData And lTempVal > 0 Then
                     lOutputGrid.Value(lCol, lRow) = lNoData
                 End If
+            Next
+        Next
+
+        lOutputGrid.Save()
+    End Sub
+
+    Public Shared Sub GridAssignConstant(ByVal aNewGridFileName As String, ByVal aBaseGridFileName As String, ByVal aValue As Double)
+        If FileExists(aNewGridFileName) Then
+            IO.File.Delete(aNewGridFileName)
+        End If
+        IO.File.Copy(aBaseGridFileName, aNewGridFileName)
+
+        Dim lOutputGrid As New MapWinGIS.Grid
+        lOutputGrid.Open(aNewGridFileName)
+
+        Dim lStartRow As Integer = 0
+        Dim lStartCol As Integer = 0
+        Dim lEndRow As Integer = lOutputGrid.Header.NumberRows - 1
+        Dim lEndCol As Integer = lOutputGrid.Header.NumberCols - 1
+
+        For lRow As Integer = lStartRow To lEndRow
+            For lCol As Integer = lStartCol To lEndCol
+                lOutputGrid.Value(lCol, lRow) = aValue
+            Next
+        Next
+
+        lOutputGrid.Save()
+    End Sub
+
+    Public Shared Sub GridInverse(ByVal aInputGridFileName As String, ByVal aNewGridFileName As String)
+        If FileExists(aNewGridFileName) Then
+            IO.File.Delete(aNewGridFileName)
+        End If
+        IO.File.Copy(aInputGridFileName, aNewGridFileName)
+
+        Dim lOutputGrid As New MapWinGIS.Grid
+        lOutputGrid.Open(aNewGridFileName)
+
+        Dim lStartRow As Integer = 0
+        Dim lStartCol As Integer = 0
+        Dim lEndRow As Integer = lOutputGrid.Header.NumberRows - 1
+        Dim lEndCol As Integer = lOutputGrid.Header.NumberCols - 1
+
+        For lRow As Integer = lStartRow To lEndRow
+            For lCol As Integer = lStartCol To lEndCol
+                lOutputGrid.Value(lCol, lRow) = 1 / lOutputGrid.Value(lCol, lRow)
+            Next
+        Next
+
+        lOutputGrid.Save()
+    End Sub
+
+    Public Shared Sub GridMultiplyConstant(ByVal aInputGridFileName As String, ByVal aValue As Double, ByVal aNewGridFileName As String)
+        If FileExists(aNewGridFileName) Then
+            IO.File.Delete(aNewGridFileName)
+        End If
+        IO.File.Copy(aInputGridFileName, aNewGridFileName)
+
+        Dim lOutputGrid As New MapWinGIS.Grid
+        lOutputGrid.Open(aNewGridFileName)
+
+        Dim lStartRow As Integer = 0
+        Dim lStartCol As Integer = 0
+        Dim lEndRow As Integer = lOutputGrid.Header.NumberRows - 1
+        Dim lEndCol As Integer = lOutputGrid.Header.NumberCols - 1
+
+        For lRow As Integer = lStartRow To lEndRow
+            For lCol As Integer = lStartCol To lEndCol
+                lOutputGrid.Value(lCol, lRow) = lOutputGrid.Value(lCol, lRow) * aValue
             Next
         Next
 
