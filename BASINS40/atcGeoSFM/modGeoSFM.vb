@@ -247,9 +247,9 @@ Public Module modGeoSFM
         End If
     End Sub
 
-    Friend Sub Basin(ByVal zonegname As String, ByVal demgname As String, ByVal facgname As String, ByVal hlengname As String, ByVal rcngname As String, _
-                     ByVal whcgname As String, ByVal depthgname As String, ByVal texturegname As String, ByVal draingname As String, _
-                     ByVal flowlengname As String, ByVal rivlinkgname As String, ByVal downgname As String, ByVal maxcovergname As String)
+    Friend Sub Basin(ByVal aZoneGname As String, ByVal aDemGname As String, ByVal aFacGname As String, ByVal aHlenGname As String, ByVal aRcnGname As String, _
+                     ByVal aWhcGname As String, ByVal aDepthGname As String, ByVal aTextureGname As String, ByVal aDrainGname As String, _
+                     ByVal aFlowlenGname As String, ByVal aRivlinkGname As String, ByVal aDownGname As String, ByVal aMaxcoverGname As String)
 
         ' ***********************************************************************************************
         ' ***********************************************************************************************
@@ -299,108 +299,108 @@ Public Module modGeoSFM
         'defaultlist = { "Basins" , "Elevations" , "FlowAcc" , "Hilllength" , "Rcn" , "Whc" , "Soildepth" , "Texture" , "Ks", "FlowLen", "StrLinks", "Downstream", "Maxcover" }
         'labellist = { "Basin Grid" , "Processed DEM", "Flow Accumulation Grid" , "Hill Length Grid", "Runoff Curve Number Grid", "Water holding Capacity", "Soil Depth Grid" , "Soil Texture Grid" , "Hydraulic Conductivity Grid", "Downstream Flow Length Grid", "Stream Link Grid", "Downstream Basin id Grid", "Max Impervious Cover Grid" }
 
-        Dim basingthm As Integer = -1
-        If zonegname = "<none>" Then
-            Logger.Msg("Basin Grid, " + zonegname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+        Dim lBasinGridIndex As Integer = -1
+        If aZoneGname = "<none>" Then
+            Logger.Msg("Basin Grid, " + aZoneGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
             Exit Sub
         Else
-            basingthm = GisUtil.LayerIndex(zonegname)
+            lBasinGridIndex = GisUtil.LayerIndex(aZoneGname)
         End If
 
-        Dim demgthm As Integer = -1
-        If demgname = "<none>" Then
-            Logger.Msg("DEM Grid, " + demgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+        Dim lDemGridIndex As Integer = -1
+        If aDemGname = "<none>" Then
+            Logger.Msg("DEM Grid, " + aDemGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
             Exit Sub
         Else
-            demgthm = GisUtil.LayerIndex(demgname)
+            lDemGridIndex = GisUtil.LayerIndex(aDemGname)
         End If
 
-        Dim facgthm As Integer = -1
-        If facgname = "<none>" Then
-            Logger.Msg("Flow Accumulation Grid, " + facgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+        Dim lFacGridIndex As Integer = -1
+        If aFacGname = "<none>" Then
+            Logger.Msg("Flow Accumulation Grid, " + aFacGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
             Exit Sub
         Else
-            facgthm = GisUtil.LayerIndex(facgname)
+            lFacGridIndex = GisUtil.LayerIndex(aFacGname)
         End If
 
-        Dim hlengthm As Integer = -1
-        If hlengname = "<none>" Then
-            Logger.Msg("Hill Length Grid, " + hlengname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+        Dim lHlenGridIndex As Integer = -1
+        If aHlenGname = "<none>" Then
+            Logger.Msg("Hill Length Grid, " + aHlenGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
             Exit Sub
         Else
-            hlengthm = GisUtil.LayerIndex(hlengname)
+            lHlenGridIndex = GisUtil.LayerIndex(aHlenGname)
         End If
 
-        Dim rcngthm As Integer = -1
-        If rcngname = "<none>" Then
-            Logger.Msg("Runoff Curve Number Grid, " + rcngname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+        Dim lRcnGridIndex As Integer = -1
+        If aRcnGname = "<none>" Then
+            Logger.Msg("Runoff Curve Number Grid, " + aRcnGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
             Exit Sub
         Else
-            rcngthm = GisUtil.LayerIndex(rcngname)
+            lRcnGridIndex = GisUtil.LayerIndex(aRcnGname)
         End If
 
-        Dim whcgthm As Integer = -1
-        If whcgname = "<none>" Then
-            Logger.Msg("Soil Water Holding Capacity Grid, " + whcgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+        Dim lWhcGridIndex As Integer = -1
+        If aWhcGname = "<none>" Then
+            Logger.Msg("Soil Water Holding Capacity Grid, " + aWhcGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
             Exit Sub
         Else
-            whcgthm = GisUtil.LayerIndex(whcgname)
+            lWhcGridIndex = GisUtil.LayerIndex(aWhcGname)
         End If
 
-        Dim depthgthm As Integer = -1
-        If depthgname = "<none>" Then
-            Logger.Msg("Soil Depth Grid, " + depthgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+        Dim lDepthGridIndex As Integer = -1
+        If aDepthGname = "<none>" Then
+            Logger.Msg("Soil Depth Grid, " + aDepthGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
             Exit Sub
         Else
-            depthgthm = GisUtil.LayerIndex(depthgname)
+            lDepthGridIndex = GisUtil.LayerIndex(aDepthGname)
         End If
 
-        Dim texturegthm As Integer = -1
-        If texturegname = "<none>" Then
-            Logger.Msg("Soil Texture Grid, " + texturegname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+        Dim lTextureGridIndex As Integer = -1
+        If aTextureGname = "<none>" Then
+            Logger.Msg("Soil Texture Grid, " + aTextureGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
             Exit Sub
         Else
-            texturegthm = GisUtil.LayerIndex(texturegname)
+            lTextureGridIndex = GisUtil.LayerIndex(aTextureGname)
         End If
 
-        Dim draingthm As Integer = -1
-        If draingname = "<none>" Then
-            Logger.Msg("Hydraulic Conductivity Grid, " + draingname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+        Dim lDrainGridIndex As Integer = -1
+        If aDrainGname = "<none>" Then
+            Logger.Msg("Hydraulic Conductivity Grid, " + aDrainGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
             Exit Sub
         Else
-            draingthm = GisUtil.LayerIndex(draingname)
+            lDrainGridIndex = GisUtil.LayerIndex(aDrainGname)
         End If
 
-        Dim flowlengthm As Integer = -1
-        If flowlengname = "<none>" Then
-            Logger.Msg("Downstream Flow Length Grid, " + flowlengname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+        Dim lFlowlenGridIndex As Integer = -1
+        If aFlowlenGname = "<none>" Then
+            Logger.Msg("Downstream Flow Length Grid, " + aFlowlenGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
             Exit Sub
         Else
-            flowlengthm = GisUtil.LayerIndex(flowlengname)
+            lFlowlenGridIndex = GisUtil.LayerIndex(aFlowlenGname)
         End If
 
-        Dim rivlinkgthm As Integer = -1
-        If rivlinkgname = "<none>" Then
-            Logger.Msg("Stream Link Grid, " + rivlinkgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+        Dim lRivlinkGridIndex As Integer = -1
+        If aRivlinkGname = "<none>" Then
+            Logger.Msg("Stream Link Grid, " + aRivlinkGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
             Exit Sub
         Else
-            rivlinkgthm = GisUtil.LayerIndex(rivlinkgname)
+            lRivlinkGridIndex = GisUtil.LayerIndex(aRivlinkGname)
         End If
 
-        Dim downgthm As Integer = -1
-        If downgname = "<none>" Then
-            Logger.Msg("Downstream Basin Id Grid, " + downgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+        Dim lDownGridIndex As Integer = -1
+        If aDownGname = "<none>" Then
+            Logger.Msg("Downstream Basin Id Grid, " + aDownGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
             Exit Sub
         Else
-            downgthm = GisUtil.LayerIndex(downgname)
+            lDownGridIndex = GisUtil.LayerIndex(aDownGname)
         End If
 
-        Dim maxcovergthm As Integer = -1
-        If maxcovergname = "<none>" Then
-            Logger.Msg("Maximum Impervious Cover Grid, " + maxcovergname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+        Dim lMaxcoverGridIndex As Integer = -1
+        If aMaxcoverGname = "<none>" Then
+            Logger.Msg("Maximum Impervious Cover Grid, " + aMaxcoverGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
             Exit Sub
         Else
-            maxcovergthm = GisUtil.LayerIndex(maxcovergname)
+            lMaxcoverGridIndex = GisUtil.LayerIndex(aMaxcoverGname)
         End If
 
         'ToDo:Need way to include dam locations
@@ -417,80 +417,80 @@ Public Module modGeoSFM
         '        End If
 
         'try to preempt errors that come from having nodata value incorrectly set in input grids
-        GisUtil.GridSetNoData(GisUtil.LayerFileName(basingthm), 1.0)
-        GisUtil.GridSetNoData(GisUtil.LayerFileName(rivlinkgthm), 1.0)
+        GisUtil.GridSetNoData(GisUtil.LayerFileName(lBasinGridIndex), 1.0)
+        GisUtil.GridSetNoData(GisUtil.LayerFileName(lRivlinkGridIndex), 1.0)
 
         GisUtil.StatusShow = False
 
-        Logger.Status("Computing Zonal Statistics for " + demgname + "........")
+        Logger.Status("Computing Zonal Statistics for " + aDemGname + "........")
         'find average value of demgthm for each unique value of basingthm
         Dim lDemZonalStats As New atcCollection
-        lDemZonalStats = GisUtil.GridZonalStatistics(basingthm, demgthm)
+        lDemZonalStats = GisUtil.GridZonalStatistics(lBasinGridIndex, lDemGridIndex)
 
-        Logger.Status("Computing Zonal Statistics for " + facgname + "........")
+        Logger.Status("Computing Zonal Statistics for " + aFacGname + "........")
         'find average value of facgthm for each unique value of basingthm
         Dim lFacZonalStats As New atcCollection
-        lFacZonalStats = GisUtil.GridZonalStatistics(basingthm, facgthm)
+        lFacZonalStats = GisUtil.GridZonalStatistics(lBasinGridIndex, lFacGridIndex)
 
-        Logger.Status("Computing Zonal Statistics for " + hlengname + "........")
+        Logger.Status("Computing Zonal Statistics for " + aHlenGname + "........")
         'find average value of hlengthm for each unique value of basingthm
         Dim lHlenZonalStats As New atcCollection
-        lHlenZonalStats = GisUtil.GridZonalStatistics(basingthm, hlengthm)
+        lHlenZonalStats = GisUtil.GridZonalStatistics(lBasinGridIndex, lHlenGridIndex)
 
-        Logger.Status("Computing Zonal Statistics for " + rcngname + "........")
+        Logger.Status("Computing Zonal Statistics for " + aRcnGname + "........")
         'find average value of rcngthm for each unique value of basingthm
         Dim lRcnZonalStats As New atcCollection
-        lRcnZonalStats = GisUtil.GridZonalStatisticsMismatched(basingthm, rcngthm)
+        lRcnZonalStats = GisUtil.GridZonalStatisticsMismatched(lBasinGridIndex, lRcnGridIndex)
 
-        Logger.Status("Computing Zonal Statistics for " + whcgname + "........")
+        Logger.Status("Computing Zonal Statistics for " + aWhcGname + "........")
         'find average value of whcgthm for each unique value of basingthm
         Dim lWhcZonalStats As New atcCollection
-        lWhcZonalStats = GisUtil.GridZonalStatisticsMismatched(basingthm, whcgthm)
+        lWhcZonalStats = GisUtil.GridZonalStatisticsMismatched(lBasinGridIndex, lWhcGridIndex)
 
-        Logger.Status("Computing Zonal Statistics for " + depthgname + "........")
+        Logger.Status("Computing Zonal Statistics for " + aDepthGname + "........")
         'find average value of depthgthm for each unique value of basingthm
         Dim lDepthZonalStats As New atcCollection
-        lDepthZonalStats = GisUtil.GridZonalStatisticsMismatched(basingthm, depthgthm)
+        lDepthZonalStats = GisUtil.GridZonalStatisticsMismatched(lBasinGridIndex, lDepthGridIndex)
 
-        Logger.Status("Computing Zonal Statistics for " + texturegname + "........")
+        Logger.Status("Computing Zonal Statistics for " + aTextureGname + "........")
         'find average value of texturegthm for each unique value of basingthm
         Dim lTextureZonalStats As New atcCollection
-        lTextureZonalStats = GisUtil.GridZonalStatisticsMismatched(basingthm, texturegthm)
+        lTextureZonalStats = GisUtil.GridZonalStatisticsMismatched(lBasinGridIndex, lTextureGridIndex)
 
-        Logger.Status("Computing Zonal Statistics for " + draingname + "........")
+        Logger.Status("Computing Zonal Statistics for " + aDrainGname + "........")
         'find average value of draingthm for each unique value of basingthm
         Dim lDrainZonalStats As New atcCollection
-        lDrainZonalStats = GisUtil.GridZonalStatisticsMismatched(basingthm, draingthm)
+        lDrainZonalStats = GisUtil.GridZonalStatisticsMismatched(lBasinGridIndex, lDrainGridIndex)
 
         'how if this river grid different from the stream link grid?
         'Logger.Status("Computing River Grid......")
         '                rivgrid = (basingrid * ((rivlinkgrid + 1) / (rivlinkgrid + 1))).Int
         '                rivVtab = rivgrid.GetVtab
 
-        Logger.Status("Computing Zonal Statistics for " + flowlengname + "........")
+        Logger.Status("Computing Zonal Statistics for " + aFlowlenGname + "........")
         'find average value of flowlengthm for each unique value of rivgrid
         Dim lRivlenZonalStats As New atcCollection
-        lRivlenZonalStats = GisUtil.GridZonalStatistics(rivlinkgthm, flowlengthm)
+        lRivlenZonalStats = GisUtil.GridZonalStatistics(lRivlinkGridIndex, lFlowlenGridIndex)
 
-        Logger.Status("Computing Zonal Statistics for " + flowlengname + "........")
+        Logger.Status("Computing Zonal Statistics for " + aFlowlenGname + "........")
         'find average value of flowlengthm for each unique value of basingthm
         Dim lLengthZonalStats As New atcCollection
-        lLengthZonalStats = GisUtil.GridZonalStatistics(basingthm, flowlengthm)
+        lLengthZonalStats = GisUtil.GridZonalStatistics(lBasinGridIndex, lFlowlenGridIndex)
 
         Logger.Status("Computing Zonal Statistics for river cell elevations........")
         'find average value of demgthm for each unique value of rivgrid
         Dim lRivDemZonalStats As New atcCollection
-        lRivDemZonalStats = GisUtil.GridZonalStatistics(rivlinkgthm, demgthm)
+        lRivDemZonalStats = GisUtil.GridZonalStatistics(lRivlinkGridIndex, lDemGridIndex)
 
         Logger.Status("Computing Zonal Statistics for downstream basin ids........")
         'find average value of downgthm for each unique value of basingthm
         Dim lDownZonalStats As New atcCollection
-        lDownZonalStats = GisUtil.GridZonalStatistics(basingthm, downgthm)
+        lDownZonalStats = GisUtil.GridZonalStatistics(lBasinGridIndex, lDownGridIndex)
 
-        Logger.Status("Computing Zonal Statistics for " + maxcovergname + "........")
+        Logger.Status("Computing Zonal Statistics for " + aMaxcoverGname + "........")
         'find average value of maxcovergthm for each unique value of basingthm
         Dim lMaxCoverZonalStats As New atcCollection
-        lMaxCoverZonalStats = GisUtil.GridZonalStatisticsMismatched(basingthm, maxcovergthm)
+        lMaxCoverZonalStats = GisUtil.GridZonalStatisticsMismatched(lBasinGridIndex, lMaxcoverGridIndex)
 
         GisUtil.StatusShow = True
 
@@ -656,9 +656,9 @@ Public Module modGeoSFM
         lSBDesc.AppendLine("")
         SaveFileString(lDescFile, lSBDesc.ToString)
 
-        Dim basinvalue As Integer
+        Dim lBasinValue As Integer
         For lKey As Integer = lBasinIDs.Keys.Count - 1 To 0 Step -1
-            basinvalue = lBasinIDs.Keys(lKey)
+            lBasinValue = lBasinIDs.Keys(lKey)
 
             '   areafield = DemZoneVtab.FindField("area")
             '   demfield = DemZoneVtab.FindField("mean")
@@ -678,50 +678,50 @@ Public Module modGeoSFM
             '   maxcoverfield = MaxCoverZoneVtab.FindField("mean")
 
             'DemZoneVtab
-            Dim areavalue As Single = lDemZonalStats.ItemByKey(basinvalue).GetDefinedValue("Area").Value / 1000000.0 '((DemZoneVtab.ReturnValue(areafield, rrecord)) / (1000000.0)).SetFormat("d.d").AsString
-            Dim demvalue As Single = lDemZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value '(DemZoneVtab.ReturnValue(demfield, rrecord)).SetFormat("d.d").AsString
-            Dim avgdrop As Single = lDemZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value - lDemZonalStats.ItemByKey(basinvalue).GetDefinedValue("Min").Value '(DemZoneVtab.ReturnValue(Demfield, rrecord)) - (DemZoneVtab.ReturnValue(Demminfield, rrecord))
+            Dim lAreaValue As Single = lDemZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Area").Value / 1000000.0 '((DemZoneVtab.ReturnValue(areafield, rrecord)) / (1000000.0)).SetFormat("d.d").AsString
+            Dim lDemValue As Single = lDemZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value '(DemZoneVtab.ReturnValue(demfield, rrecord)).SetFormat("d.d").AsString
+            Dim lAvgdrop As Single = lDemZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value - lDemZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Min").Value '(DemZoneVtab.ReturnValue(Demfield, rrecord)) - (DemZoneVtab.ReturnValue(Demminfield, rrecord))
 
             'FacZoneVtab
-            Dim facvalue As Single = lFacZonalStats.ItemByKey(basinvalue).GetDefinedValue("Max").Value '(FacZoneVtab.ReturnValue(facfield, rrecord)).AsString
+            Dim lFacValue As Single = lFacZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Max").Value '(FacZoneVtab.ReturnValue(facfield, rrecord)).AsString
 
             'HlenZoneVtab
-            Dim hlenvalue As String = lHlenZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value '(HlenZoneVtab.ReturnValue(hlenfield, rrecord)).SetFormat("d.d").AsString
-            If Not IsNumeric(hlenvalue) Then
-                hlenvalue = GisUtil.GridGetCellSizeX(basingthm)
+            Dim lHlenValue As String = lHlenZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value '(HlenZoneVtab.ReturnValue(hlenfield, rrecord)).SetFormat("d.d").AsString
+            If Not IsNumeric(lHlenValue) Then
+                lHlenValue = GisUtil.GridGetCellSizeX(lBasinGridIndex)
             End If
-            If (hlenvalue < GisUtil.GridGetCellSizeX(basingthm)) Then
-                hlenvalue = GisUtil.GridGetCellSizeX(basingthm)
+            If (lHlenValue < GisUtil.GridGetCellSizeX(lBasinGridIndex)) Then
+                lHlenValue = GisUtil.GridGetCellSizeX(lBasinGridIndex)
             End If
 
             'LengthZoneVtab
-            Dim avglength As Single = lLengthZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value - lLengthZonalStats.ItemByKey(basinvalue).GetDefinedValue("Min").Value '(LengthZoneVtab.ReturnValue(Lenfield, rrecord)) - (LengthZoneVtab.ReturnValue(Lenminfield, rrecord))
-            If (avglength < GisUtil.GridGetCellSizeX(basingthm)) Then
-                avglength = GisUtil.GridGetCellSizeX(basingthm)
+            Dim lAvglength As Single = lLengthZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value - lLengthZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Min").Value '(LengthZoneVtab.ReturnValue(Lenfield, rrecord)) - (LengthZoneVtab.ReturnValue(Lenminfield, rrecord))
+            If (lAvglength < GisUtil.GridGetCellSizeX(lBasinGridIndex)) Then
+                lAvglength = GisUtil.GridGetCellSizeX(lBasinGridIndex)
             End If
 
             'DrainZoneVtab
-            Dim drainvalue As Single = Format(lDrainZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value, "#.##0") '(DrainZoneVtab.ReturnValue(drainfield, rrecord)).SetFormat("d.ddd").AsString
+            Dim lDrainValue As Single = Format(lDrainZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value, "#.##0") '(DrainZoneVtab.ReturnValue(drainfield, rrecord)).SetFormat("d.ddd").AsString
 
-            Dim upareavalue As Single = (facvalue * GisUtil.GridGetCellSizeX(facgthm) * GisUtil.GridGetCellSizeX(facgthm)) / 1000000.0  '((facvalue.asstring.asnumber * facgrid.GetCellSize * facgrid.GetCellSize) / 1000000.0).SetFormat("d.d").asstring
+            Dim lUpareaValue As Single = (lFacValue * GisUtil.GridGetCellSizeX(lFacGridIndex) * GisUtil.GridGetCellSizeX(lFacGridIndex)) / 1000000.0  '((facvalue.asstring.asnumber * facgrid.GetCellSize * facgrid.GetCellSize) / 1000000.0).SetFormat("d.d").asstring
 
-            Dim slopevalue As String = Format(((avgdrop * 100) / avglength), "0.####")  '(((avgdrop * 100) / avglength).Format("d.dddd")).AsString
-            If Not IsNumeric(slopevalue) Then
-                slopevalue = "0.0010"
+            Dim lSlopeValue As String = Format(((lAvgdrop * 100) / lAvglength), "0.####")  '(((avgdrop * 100) / avglength).Format("d.dddd")).AsString
+            If Not IsNumeric(lSlopeValue) Then
+                lSlopeValue = "0.0010"
             End If
-            If CSng(slopevalue) < 0.001 Then
-                slopevalue = "0.0010"
+            If CSng(lSlopeValue) < 0.001 Then
+                lSlopeValue = "0.0010"
             End If
 
             'rivlenZoneVtab
-            Dim riverlossvalue As String = "1.0"
+            Dim lRiverlossValue As String = "1.0"
 
-            Dim rivlenvalue As String = Format((lRivlenZonalStats.ItemByKey(basinvalue).GetDefinedValue("Max").Value - lRivlenZonalStats.ItemByKey(basinvalue).GetDefinedValue("Min").Value), "#.0")  ' (rivlenZoneVtab.ReturnValue(rivlenfield, rrecord)).SetFormat("d.d").AsString
-            If Not IsNumeric(rivlenvalue) Then
-                rivlenvalue = GisUtil.GridGetCellSizeX(basingthm).ToString
+            Dim lRivlenValue As String = Format((lRivlenZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Max").Value - lRivlenZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Min").Value), "#.0")  ' (rivlenZoneVtab.ReturnValue(rivlenfield, rrecord)).SetFormat("d.d").AsString
+            If Not IsNumeric(lRivlenValue) Then
+                lRivlenValue = GisUtil.GridGetCellSizeX(lBasinGridIndex).ToString
             End If
-            If CSng(rivlenvalue) < GisUtil.GridGetCellSizeX(basingthm) Then
-                rivlenvalue = GisUtil.GridGetCellSizeX(basingthm).ToString
+            If CSng(lRivlenValue) < GisUtil.GridGetCellSizeX(lBasinGridIndex) Then
+                lRivlenValue = GisUtil.GridGetCellSizeX(lBasinGridIndex).ToString
             End If
 
             ' Assume porosity of 0.439 for medium soil texture in computing max storage for the catchment
@@ -729,28 +729,28 @@ Public Module modGeoSFM
             '  under the influence of the average head (= avgdrop) in the catchment
             ' Assume baseflow is 3 times as slow as interflow
 
-            Dim interflowlag As String = Format((((areavalue) * (avgdrop) * GisUtil.GridGetCellSizeX(basingthm) * 0.439) / (rivlenvalue * avgdrop * drainvalue * 0.24 * 2)), "#.####")
-            If Not IsNumeric(interflowlag) Then
-                interflowlag = "10"
-            ElseIf CStr(interflowlag) < 2 Then
-                interflowlag = "2"
-            ElseIf CStr(interflowlag) > 120 Then
-                interflowlag = "120"
+            Dim lInterflowlag As String = Format((((lAreaValue) * (lAvgdrop) * GisUtil.GridGetCellSizeX(lBasinGridIndex) * 0.439) / (lRivlenValue * lAvgdrop * lDrainValue * 0.24 * 2)), "#.####")
+            If Not IsNumeric(lInterflowlag) Then
+                lInterflowlag = "10"
+            ElseIf CStr(lInterflowlag) < 2 Then
+                lInterflowlag = "2"
+            ElseIf CStr(lInterflowlag) > 120 Then
+                lInterflowlag = "120"
             End If
 
-            Dim baseflowlag As String = Format((CStr(interflowlag) * 3), "#.####")
+            Dim baseflowlag As String = Format((CStr(lInterflowlag) * 3), "#.####")
 
             'RcnZoneVtab
-            Dim rcnvalue As String = Format(lRcnZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value, "#.0") '(RcnZoneVtab.ReturnValue(Rcnfield, rrecord)).SetFormat("d.d").AsString
+            Dim rcnvalue As String = Format(lRcnZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value, "#.0") '(RcnZoneVtab.ReturnValue(Rcnfield, rrecord)).SetFormat("d.d").AsString
 
             'whcZoneVtab
-            Dim whcvalue As String = Format(lWhcZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value, "###.###")  '(whcZoneVtab.ReturnValue(Whcfield, rrecord)).AsString
+            Dim whcvalue As String = Format(lWhcZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value, "###.###")  '(whcZoneVtab.ReturnValue(Whcfield, rrecord)).AsString
 
             'DepthZoneVtab
-            Dim depthvalue As String = Format(lDepthZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mean").Value, "###.###") '(DepthZoneVtab.ReturnValue(depthfield, rrecord)).AsString
+            Dim depthvalue As String = Format(lDepthZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value, "###.###") '(DepthZoneVtab.ReturnValue(depthfield, rrecord)).AsString
 
             'TextureZoneVtab
-            Dim texturevalue As String = lTextureZonalStats.ItemByKey(basinvalue).GetDefinedValue("Mode").Value.ToString '(TextureZoneVtab.ReturnValue(texturefield, rrecord)).AsString
+            Dim texturevalue As String = lTextureZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mode").Value.ToString '(TextureZoneVtab.ReturnValue(texturefield, rrecord)).AsString
 
             ' Soil texture (1=Sand,2=Loam,3=Clay,5=Water)
             Dim basinlossvalue As String = ""
@@ -767,8 +767,8 @@ Public Module modGeoSFM
             End If
 
             'rivdemZoneVtab
-            Dim rivdropvalue As Single = lRivDemZonalStats.ItemByKey(basinvalue).GetValue("Max") - lRivDemZonalStats.ItemByKey(basinvalue).GetDefinedValue("Min").Value '(rivdemZoneVtab.ReturnValue(rivdemfield, rrecord))
-            Dim rivslopevalue As String = Format((rivdropvalue * 100) / CStr(rivlenvalue), "0.0000")   '(((rivdropvalue * 100) / CStr(rivlenvalue)).SetFormat("d.dddd")).AsString
+            Dim rivdropvalue As Single = lRivDemZonalStats.ItemByKey(lBasinValue).GetValue("Max") - lRivDemZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Min").Value '(rivdemZoneVtab.ReturnValue(rivdemfield, rrecord))
+            Dim rivslopevalue As String = Format((rivdropvalue * 100) / CStr(lRivlenValue), "0.0000")   '(((rivdropvalue * 100) / CStr(rivlenvalue)).SetFormat("d.dddd")).AsString
             If Not IsNumeric(rivslopevalue) Then
                 rivslopevalue = "0.0010"
             End If
@@ -776,140 +776,140 @@ Public Module modGeoSFM
                 rivslopevalue = "0.0010"
             End If
 
-            Dim celerity As String = ""
-            Dim diffusion As String = ""
+            Dim lCelerity As String = ""
+            Dim lDiffusion As String = ""
             If CSng(rivslopevalue) < 0.1 Then
 
-                If CSng(upareavalue) <= 10000 Then
-                    celerity = "0.3"
-                ElseIf CSng(upareavalue) <= 50000 Then
-                    celerity = "0.45"
-                ElseIf CSng(upareavalue) <= 100000 Then
-                    celerity = "0.6"
-                ElseIf CSng(upareavalue) <= 250000 Then
-                    celerity = "0.75"
-                ElseIf CSng(upareavalue) <= 500000 Then
-                    celerity = "0.9"
-                ElseIf CSng(upareavalue) <= 750000 Then
-                    celerity = "1.2"
+                If CSng(lUpareaValue) <= 10000 Then
+                    lCelerity = "0.3"
+                ElseIf CSng(lUpareaValue) <= 50000 Then
+                    lCelerity = "0.45"
+                ElseIf CSng(lUpareaValue) <= 100000 Then
+                    lCelerity = "0.6"
+                ElseIf CSng(lUpareaValue) <= 250000 Then
+                    lCelerity = "0.75"
+                ElseIf CSng(lUpareaValue) <= 500000 Then
+                    lCelerity = "0.9"
+                ElseIf CSng(lUpareaValue) <= 750000 Then
+                    lCelerity = "1.2"
                 Else
-                    celerity = "1.5"
+                    lCelerity = "1.5"
                 End If
 
-                diffusion = Format(0.15 * CSng(celerity) * CSng(rivlenvalue), "#.0")  '(((0.15 * (CSng(celerity)) * (CSng(rivlenvalue)).SetFormat("d.d")).asstring)
-                If (CSng(diffusion) < 100.0) Then
-                    diffusion = "100.0"
-                ElseIf (CSng(diffusion) > 10000.0) Then
-                    diffusion = "10000.0"
+                lDiffusion = Format(0.15 * CSng(lCelerity) * CSng(lRivlenValue), "#.0")  '(((0.15 * (CSng(celerity)) * (CSng(rivlenvalue)).SetFormat("d.d")).asstring)
+                If (CSng(lDiffusion) < 100.0) Then
+                    lDiffusion = "100.0"
+                ElseIf (CSng(lDiffusion) > 10000.0) Then
+                    lDiffusion = "10000.0"
                 End If
 
             ElseIf CSng(rivslopevalue) < 0.2 Then
 
-                If (CSng(upareavalue) <= 10000) Then
-                    celerity = "0.4"
-                ElseIf (CSng(upareavalue) <= 50000) Then
-                    celerity = "0.6"
-                ElseIf (CSng(upareavalue) <= 100000) Then
-                    celerity = "0.8"
-                ElseIf (CSng(upareavalue) <= 250000) Then
-                    celerity = "1.0"
-                ElseIf (CSng(upareavalue) <= 500000) Then
-                    celerity = "1.2"
-                ElseIf (CSng(upareavalue) <= 750000) Then
-                    celerity = "1.6"
+                If (CSng(lUpareaValue) <= 10000) Then
+                    lCelerity = "0.4"
+                ElseIf (CSng(lUpareaValue) <= 50000) Then
+                    lCelerity = "0.6"
+                ElseIf (CSng(lUpareaValue) <= 100000) Then
+                    lCelerity = "0.8"
+                ElseIf (CSng(lUpareaValue) <= 250000) Then
+                    lCelerity = "1.0"
+                ElseIf (CSng(lUpareaValue) <= 500000) Then
+                    lCelerity = "1.2"
+                ElseIf (CSng(lUpareaValue) <= 750000) Then
+                    lCelerity = "1.6"
                 Else
-                    celerity = "2.0"
+                    lCelerity = "2.0"
                 End If
 
-                diffusion = Format(0.15 * CSng(celerity) * CSng(rivlenvalue), "#.0") '(((0.15 * CSng(celerity) * CSng(rivlenvalue)).SetFormat("d.d")).asstring)
-                If (CSng(diffusion) < 100.0) Then
-                    diffusion = "100.0"
-                ElseIf (CSng(diffusion) > 10000.0) Then
-                    diffusion = "10000.0"
+                lDiffusion = Format(0.15 * CSng(lCelerity) * CSng(lRivlenValue), "#.0") '(((0.15 * CSng(celerity) * CSng(rivlenvalue)).SetFormat("d.d")).asstring)
+                If (CSng(lDiffusion) < 100.0) Then
+                    lDiffusion = "100.0"
+                ElseIf (CSng(lDiffusion) > 10000.0) Then
+                    lDiffusion = "10000.0"
                 End If
 
             ElseIf CSng(rivslopevalue) < 0.3 Then
 
-                If (CSng(upareavalue) <= 10000) Then
-                    celerity = "0.6"
-                ElseIf (CSng(upareavalue) <= 50000) Then
-                    celerity = "0.9"
-                ElseIf (CSng(upareavalue) <= 100000) Then
-                    celerity = "1.2"
-                ElseIf (CSng(upareavalue) <= 250000) Then
-                    celerity = "1.5"
-                ElseIf (CSng(upareavalue) <= 500000) Then
-                    celerity = "1.8"
-                ElseIf (CSng(upareavalue) <= 750000) Then
-                    celerity = "2.4"
+                If (CSng(lUpareaValue) <= 10000) Then
+                    lCelerity = "0.6"
+                ElseIf (CSng(lUpareaValue) <= 50000) Then
+                    lCelerity = "0.9"
+                ElseIf (CSng(lUpareaValue) <= 100000) Then
+                    lCelerity = "1.2"
+                ElseIf (CSng(lUpareaValue) <= 250000) Then
+                    lCelerity = "1.5"
+                ElseIf (CSng(lUpareaValue) <= 500000) Then
+                    lCelerity = "1.8"
+                ElseIf (CSng(lUpareaValue) <= 750000) Then
+                    lCelerity = "2.4"
                 Else
-                    celerity = "3.0"
+                    lCelerity = "3.0"
                 End If
 
-                diffusion = Format(0.15 * CSng(celerity) * CSng(rivlenvalue), "#.0") '(((0.15 * CSng(celerity) * CSng(rivlenvalue)).SetFormat("d.d")).asstring)
-                If (CSng(diffusion) < 100.0) Then
-                    diffusion = "100.0"
-                ElseIf (CSng(diffusion) > 10000.0) Then
-                    diffusion = "10000.0"
+                lDiffusion = Format(0.15 * CSng(lCelerity) * CSng(lRivlenValue), "#.0") '(((0.15 * CSng(celerity) * CSng(rivlenvalue)).SetFormat("d.d")).asstring)
+                If (CSng(lDiffusion) < 100.0) Then
+                    lDiffusion = "100.0"
+                ElseIf (CSng(lDiffusion) > 10000.0) Then
+                    lDiffusion = "10000.0"
                 End If
 
             ElseIf CSng(rivslopevalue) < 0.4 Then
 
-                If (CSng(upareavalue) <= 10000) Then
-                    celerity = "0.8"
-                ElseIf (CSng(upareavalue) <= 50000) Then
-                    celerity = "1.2"
-                ElseIf (CSng(upareavalue) <= 100000) Then
-                    celerity = "1.6"
-                ElseIf (CSng(upareavalue) <= 250000) Then
-                    celerity = "2.0"
-                ElseIf (CSng(upareavalue) <= 500000) Then
-                    celerity = "2.4"
-                ElseIf (CSng(upareavalue) <= 750000) Then
-                    celerity = "3.2"
+                If (CSng(lUpareaValue) <= 10000) Then
+                    lCelerity = "0.8"
+                ElseIf (CSng(lUpareaValue) <= 50000) Then
+                    lCelerity = "1.2"
+                ElseIf (CSng(lUpareaValue) <= 100000) Then
+                    lCelerity = "1.6"
+                ElseIf (CSng(lUpareaValue) <= 250000) Then
+                    lCelerity = "2.0"
+                ElseIf (CSng(lUpareaValue) <= 500000) Then
+                    lCelerity = "2.4"
+                ElseIf (CSng(lUpareaValue) <= 750000) Then
+                    lCelerity = "3.2"
                 Else
-                    celerity = "4.0"
+                    lCelerity = "4.0"
                 End If
 
-                diffusion = Format(0.15 * CSng(celerity) * CSng(rivlenvalue), "#.0")  '(((0.15 * CSng(celerity) * CSng(rivlenvalue)).SetFormat("d.d")).asstring)
-                If (CSng(diffusion) < 100.0) Then
-                    diffusion = "100.0"
-                ElseIf (CSng(diffusion) > 10000.0) Then
-                    diffusion = "10000.0"
+                lDiffusion = Format(0.15 * CSng(lCelerity) * CSng(lRivlenValue), "#.0")  '(((0.15 * CSng(celerity) * CSng(rivlenvalue)).SetFormat("d.d")).asstring)
+                If (CSng(lDiffusion) < 100.0) Then
+                    lDiffusion = "100.0"
+                ElseIf (CSng(lDiffusion) > 10000.0) Then
+                    lDiffusion = "10000.0"
                 End If
 
             Else
 
-                If (CSng(upareavalue) <= 10000) Then
-                    celerity = "1.0"
-                ElseIf (CSng(upareavalue) <= 50000) Then
-                    celerity = "1.5"
-                ElseIf (CSng(upareavalue) <= 100000) Then
-                    celerity = "2.0"
-                ElseIf (CSng(upareavalue) <= 250000) Then
-                    celerity = "2.5"
-                ElseIf (CSng(upareavalue) <= 500000) Then
-                    celerity = "3.0"
-                ElseIf (CSng(upareavalue) <= 750000) Then
-                    celerity = "4.0"
+                If (CSng(lUpareaValue) <= 10000) Then
+                    lCelerity = "1.0"
+                ElseIf (CSng(lUpareaValue) <= 50000) Then
+                    lCelerity = "1.5"
+                ElseIf (CSng(lUpareaValue) <= 100000) Then
+                    lCelerity = "2.0"
+                ElseIf (CSng(lUpareaValue) <= 250000) Then
+                    lCelerity = "2.5"
+                ElseIf (CSng(lUpareaValue) <= 500000) Then
+                    lCelerity = "3.0"
+                ElseIf (CSng(lUpareaValue) <= 750000) Then
+                    lCelerity = "4.0"
                 Else
-                    celerity = "5.0"
+                    lCelerity = "5.0"
                 End If
 
-                diffusion = Format(0.15 * CSng(celerity) * CSng(rivlenvalue), "#.0")  '(((0.15 * CSng(celerity) * CSng(rivlenvalue)).SetFormat("d.d")).asstring)
-                If (CSng(diffusion) < 100.0) Then
-                    diffusion = "100.0"
-                ElseIf (CSng(diffusion) > 10000.0) Then
-                    diffusion = "10000.0"
+                lDiffusion = Format(0.15 * CSng(lCelerity) * CSng(lRivlenValue), "#.0")  '(((0.15 * CSng(celerity) * CSng(rivlenvalue)).SetFormat("d.d")).asstring)
+                If (CSng(lDiffusion) < 100.0) Then
+                    lDiffusion = "100.0"
+                ElseIf (CSng(lDiffusion) > 10000.0) Then
+                    lDiffusion = "10000.0"
                 End If
 
             End If
 
             'DownZoneVtab
-            Dim downvalue As String = lDownZonalStats.ItemByKey(basinvalue).GetValue("Mode", "").ToString '(DownZoneVtab.ReturnValue(downfield, rrecord)).AsString
+            Dim downvalue As String = lDownZonalStats.ItemByKey(lBasinValue).GetValue("Mode", "").ToString '(DownZoneVtab.ReturnValue(downfield, rrecord)).AsString
 
             'MaxCoverZoneVtab
-            Dim maxcovervalue As String = Format((lMaxCoverZonalStats.ItemByKey(basinvalue).GetValue("Mean", GetNaN) / 100), "0.####") '((MaxCoverZoneVtab.ReturnValue(maxcoverfield, rrecord)) / 100).SetFormat("d.ddddd").AsString
+            Dim maxcovervalue As String = Format((lMaxCoverZonalStats.ItemByKey(lBasinValue).GetValue("Mean", GetNaN) / 100), "0.####") '((MaxCoverZoneVtab.ReturnValue(maxcoverfield, rrecord)) / 100).SetFormat("d.ddddd").AsString
             If maxcovervalue.Length = 0 OrElse CSng(maxcovervalue) <= 0.001 Then
                 maxcovervalue = "0.001"
             ElseIf CSng(maxcovervalue) >= 1 Then
@@ -920,16 +920,16 @@ Public Module modGeoSFM
             Dim rivpolyloss As String = "1.0"
             Dim hasrating As String = "0"
             Dim hasflowdata As String = "0"
-            Dim rivwidth As String = Format(6.13 * (CSng(upareavalue) ^ (0.347)), "#.###")
-            Dim flowref As String = Format(36 * 0.02832 * ((CSng(areavalue) / 2.59) ^ (0.68)), "#.####")
+            Dim rivwidth As String = Format(6.13 * (CSng(lUpareaValue) ^ (0.347)), "#.###")
+            Dim flowref As String = Format(36 * 0.02832 * ((CSng(lAreaValue) / 2.59) ^ (0.68)), "#.####")
             Dim runtype As String = "0"
             Dim mannvalue As String = "0.035"
             Dim pancoef As String = "0.85"
             Dim topsoil As String = "0.1"
             Dim aridity As String = "2"
-            lSBOut.AppendLine(CStr(basinvalue) + "," + whcvalue + "," + depthvalue + "," + texturevalue + "," + CStr(drainvalue) + "," + Format(areavalue, "#.0") + "," + interflowlag + "," + slopevalue + "," + baseflowlag + "," + rcnvalue + "," + maxcovervalue + "," + basinlossvalue + "," + pancoef + "," + topsoil + "," + aridity)
-            lSBRiv.AppendLine(CStr(basinvalue) + "," + Format(areavalue, "#.0") + "," + Format(upareavalue, "#.0") + "," + rivslopevalue + "," + rivlenvalue + "," + downvalue + "," + mannvalue + "," + riverlossvalue + "," + rivpolyloss + "," + hasdamvalue + "," + hasrating + "," + hasflowdata + "," + celerity + "," + diffusion + "," + rivwidth + "," + flowref + "," + runtype)
-            lSBOrder.AppendLine(CStr(basinvalue))
+            lSBOut.AppendLine(CStr(lBasinValue) + "," + whcvalue + "," + depthvalue + "," + texturevalue + "," + CStr(lDrainValue) + "," + Format(lAreaValue, "#.0") + "," + lInterflowlag + "," + lSlopeValue + "," + baseflowlag + "," + rcnvalue + "," + maxcovervalue + "," + basinlossvalue + "," + pancoef + "," + topsoil + "," + aridity)
+            lSBRiv.AppendLine(CStr(lBasinValue) + "," + Format(lAreaValue, "#.0") + "," + Format(lUpareaValue, "#.0") + "," + rivslopevalue + "," + lRivlenValue + "," + downvalue + "," + mannvalue + "," + lRiverlossValue + "," + rivpolyloss + "," + hasdamvalue + "," + hasrating + "," + hasflowdata + "," + lCelerity + "," + lDiffusion + "," + rivwidth + "," + flowref + "," + runtype)
+            lSBOrder.AppendLine(CStr(lBasinValue))
         Next
 
         SaveFileString(lOutFile, lSBOut.ToString)
@@ -1037,15 +1037,13 @@ Public Module modGeoSFM
         Try
             Dim lCurrentRecord As String
             Dim lStreamReader As New StreamReader(OrderFileName)
-            'lCurrentRecord = lStreamReader.ReadLine  'only if first line is a header
-            Dim lDelim As String = " "
-            Dim lQuote As String = """"
+            lCurrentRecord = lStreamReader.ReadLine  'only if first line is a header
             Do
                 lCurrentRecord = lStreamReader.ReadLine
                 If lCurrentRecord Is Nothing Then
                     Exit Do
                 Else
-                    zonelist.Add(StrSplit(lCurrentRecord, lDelim, lQuote))
+                    zonelist.Add(lCurrentRecord)
                 End If
             Loop
         Catch e As ApplicationException
@@ -1060,14 +1058,12 @@ Public Module modGeoSFM
         Dim lVelocityGridLayerIndex As Integer = 0
         Dim lVelocityGridFileName As String = ""
 
-        If veltype = 1 Or veltype = 2 Then
-            Dim facgthm As Integer = -1
-            If facgname = "<none>" Then
-                Logger.Msg("Flow Accumulation Grid, " + facgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-                Exit Sub
-            Else
-                facgthm = GisUtil.LayerIndex(facgname)
-            End If
+        Dim facgthm As Integer = -1
+        If facgname = "<none>" Then
+            Logger.Msg("Flow Accumulation Grid, " + facgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Exit Sub
+        Else
+            facgthm = GisUtil.LayerIndex(facgname)
         End If
 
         If (veltype = 1) Then
@@ -1208,9 +1204,11 @@ Public Module modGeoSFM
             '  End If
 
         ElseIf (veltype = 2) Then
+            'set velocity grid based on a threshold value
             ' velgrid = (facgrid < 1000).con((OverlandFlowVelocity).asgrid, (InstreamFlowVelocity).asgrid)
             ' velgthm = Gtheme.Make(velgrid)
         Else
+            'set velocity grid to a constant
             Dim lValue As Double = OverlandFlowVelocity
             If lValue < 0.01 Then lValue = 0.01
             If GisUtil.IsLayer(lVelocityGridLayerName) Then
@@ -1218,7 +1216,7 @@ Public Module modGeoSFM
                 GisUtil.RemoveLayer(lVelocityGridLayerIndex)
             End If
             lVelocityGridFileName = FilenameNoExt(lZoneFileName) & "Velocity.bgd"
-            'GisUtil.GridAssignConstant(lVelocityGridFileName, lZoneFileName, lValue)
+            GisUtil.GridAssignConstant(lVelocityGridFileName, lZoneFileName, lValue)
             GisUtil.AddLayer(lVelocityGridFileName, lVelocityGridLayerName)
         End If
 
@@ -1227,137 +1225,85 @@ Public Module modGeoSFM
         '        maskgrid = ((outgrid.isnull) / (outgrid.isnull))
         '        newfdrgrid = flowdirgrid * maskgrid
         Dim lFlowDirGridFileName As String = GisUtil.LayerFileName(flowdirgthm)
+        Dim lFlowAccGridFileName As String = GisUtil.LayerFileName(facgthm)
+        Dim lOutletGridFileName As String = GisUtil.LayerFileName(outgthm)
 
-        '        numsubs = basinTable.GetNumRecords
         '        invelgrid = (1.AsGrid / velgrid)
         Dim lInverseVelocityGridFileName As String = FilenameNoExt(lZoneFileName) & "InverseVelocity.bgd"
-        'GisUtil.GridInverse(lVelocityGridFileName, lInverseVelocityGridFileName)
+        GisUtil.GridInverse(lVelocityGridFileName, lInverseVelocityGridFileName)
 
         '        flowtimegrid = newfdrgrid.flowlength(invelgrid, False)
-        Dim lTravelTimeGridLayerName As String = "Travel Time Grid"
-        Dim lTravelTimeGridLayerIndex As Integer = 0
-        Dim lTravelTimeGridFileName As String = ""
-        If GisUtil.IsLayer(lTravelTimeGridLayerName) Then
-            lTravelTimeGridLayerIndex = GisUtil.LayerIndex(lTravelTimeGridLayerName)
-            GisUtil.RemoveLayer(lTravelTimeGridLayerIndex)
-        End If
-        lTravelTimeGridFileName = FilenameNoExt(lZoneFileName) & "TravelTime.bgd"
-        GisUtil.DownstreamFlowLength(lFlowDirGridFileName, lInverseVelocityGridFileName, lTravelTimeGridFileName)
-        GisUtil.AddLayer(lTravelTimeGridFileName, lTravelTimeGridLayerName)
+        '        inverse velocity grid is used as a weighting factor 
+        Dim lTravelTimeGridFileName As String = FilenameNoExt(lZoneFileName) & "TravelTime.bgd"
+        GisUtil.DownstreamFlowLength(lFlowDirGridFileName, lFlowAccGridFileName, lTravelTimeGridFileName, lOutletGridFileName)
 
         '        daysgrid = (flowtimegrid / 86400).floor
-        '        daysgthm = Gtheme.Make(daysgrid)
-        '        daysgthm.SetName("traveltime")
-        '        If (file.exists((myWkDirname + "traveltime").AsFileName).not) Then
-        '            daysgrid.SaveDataset((myWkDirname + "traveltime").AsFileName)
-        '        End If
+        Dim lDaysGridLayerName As String = "Travel Time Grid (Days)"
+        Dim lDaysGridLayerIndex As Integer = 0
+        If GisUtil.IsLayer(lDaysGridLayerName) Then
+            lDaysGridLayerIndex = GisUtil.LayerIndex(lDaysGridLayerName)
+            GisUtil.RemoveLayer(lDaysGridLayerIndex)
+        End If
+        Dim lDaysGridFileName As String = FilenameNoExt(lZoneFileName) & "DaysGrid.bgd"
+        GisUtil.GridMultiplyConstant(lTravelTimeGridFileName, 1 / 86400, lDaysGridFileName)
+        'need to make sure days grid is an integer 
+        GisUtil.AddLayer(lDaysGridFileName, lDaysGridLayerName)
+        lDaysGridLayerIndex = GisUtil.LayerIndex(lDaysGridLayerName)
 
         '        newdaysgrid = daysgrid * basingrid / basingrid
         '        numdays = newdaysgrid.GetStatistics.Get(1)
+        Dim numdays As Integer = GisUtil.GridLayerMaximum(lDaysGridLayerIndex)
 
+        '        this comment is from the avenue script, not sure what to make of it
         '        ' This is a temporary solution that will be removed when
         '        ' the routing program can read a parameter file
 
-        '        extralist = List.make
-        '        If (numdays > 22) Then
-        '            numdays = 22
-        '            'else 
-        '            '  numdays = 22
-        '        End If
+        If (numdays > 22) Then
+            numdays = 22
+            'else 
+            '  numdays = 22
+        End If
 
-        '        basinlist = List.make
-        '        newfile = Vtab.Makenew((myWkdirname + "response.dbf").AsFilename, dBase)
-        'idField = Field.Make("BasinId", #FIELD_DOUBLE, 10, 0)  
-        'newfile.AddFields({idfield})
+        'prepare response file
+        Dim lRespOut As New StringBuilder
+        Dim lStr As String = """" & "BasinId" & """"
+        For nday As Integer = 0 To numdays - 1
+            lStr = lStr & ", " & """" & "Day" & CStr(nday) & """"
+        Next
+        lRespOut.AppendLine(lStr)
 
-        '        For Each bid In BasinTable
-        '            basinid = BasinTable.returnvalue(basinfield, bid)
-        '            basinlist.Add(basinid)
-        '            addedrec = newfile.AddRecord
-        '            newfile.seteditable(True)
-        '            newfile.setvalue(idfield, addedrec, basinid)
-        '        Next
-        '        basinlist.deepclone()
+        'figure out how many cells of each 'day' in each zone
+        Dim lDaysArray(zonelist.Count, numdays) As Integer
+        For nday As Integer = 0 To numdays - 1
+            Dim lDaysZonalStats As atcCollection = GisUtil.GridZoneCountValue(basingthm, lDaysGridLayerIndex, nday)
+            Dim lCnt As Integer = 0
+            For Each lzone As Integer In zonelist
+                lCnt += 1
+                If Not lDaysZonalStats.ItemByKey(lzone) Is Nothing Then
+                    lDaysArray(lCnt, nday) = lDaysZonalStats.ItemByKey(lzone)
+                End If
+            Next
+        Next
 
-        ' for each nday in 0..(numdays - 1)
-        '            countergrid = (daysgrid = nday.asGrid).con(1.AsGrid, 0.AsGrid)
-        '            counterFN = myWkDirname + "count" + nday.asstring + ".dbf"
-        '            counterVTab = CounterGrid.ZonalStatsTable(basingrid, ThePrj, basinField, False, CounterFN.AsFileName)
-        '            If (CounterVTab.HasError) Then
-        '                Return NIL
-        '                MsgBox.Error("Unable to write zonal statistics to " + counterFN, "")
-        '                Exit Sub
-        '            ElseIf (CounterVTab.GetNumRecords <> basintable.GetNumRecords) Then
-        '                MsgBox.Error("Spatial Extent of counter grid" + +nday.asstring + +"less than Basin grid", "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            End If
-        '   cdayfld = Field.Make("Day" + nday.asstring, #FIELD_FLOAT, 12, 6)
-        '   newfile.Addfields({cdayfld})
-        '            sumfield = CounterVtab.FindField("sum")
-        '            countfield = CounterVtab.FindField("count")
-        '            countidfld = CounterVtab.FindField("value")
-        '            newfile.join(idfield, counterVtab, countidfld)
-        '            newfile.calculate("[Sum]/[Count]", cdayfld)
-        '            newfile.unjoinall()
-        '            newfile.refresh()
-        '            deleteFN = counterFN.AsFileName
-        '            counterVtab.DeActivate()
-        '            counterVtab = nil
-        '            av.purgeObjects()
-        '            File.delete(deleteFN)
-        '        Next
-        '        newfile.Flush()
+        For Each bid As Integer In zonelist
+            lStr = CStr(bid)
+            Dim lSum As Integer = 0
+            Dim lCnt As Integer = 0
+            For nday As Integer = 0 To numdays - 1
+                lSum += lDaysArray(lCnt, nday)
+            Next
+            For nday As Integer = 0 To numdays - 1
+                If lSum > 0 Then
+                    lStr = lStr & ", " & (lDaysArray(lCnt, nday) / lSum)
+                Else
+                    lStr = lStr & ", 0.000000"
+                End If
+            Next
+            lRespOut.AppendLine(lStr)
+        Next
 
-        '        For Each brec In newfile
-        '            dsum = 0
-        '            for each exday in 0..(numdays - 1)
-        '                sfld = newfile.FindField("Day" + exday.asstring)
-        '                thenum = newfile.returnValue(sfld, brec)
-        '                dsum = dsum + thenum
-        '            Next
-        '            If (dsum <> 0) Then
-        '                dfactor = 1 / dsum
-        '            Else
-        '                dfactor = 1
-        '            End If
-        '            If (dfactor <> 1) Then
-        '                for each eday in 0..(numdays - 1)
-        '                    efld = newfile.FindField("Day" + eday.asstring)
-        '                    enum = newfile.returnValue(efld, brec)
-        '                    newfile.SetValue(efld, brec, (enum * dfactor))
-        '                next 
-        '            end if 
-        '        next 
-
-        ' newfile.seteditable(false)
-        '        tempfile = newfile.export((myWkDirname + "tempfile.txt").AsFileName, Dtext, False)
-
-        '        GUIName = "Table"
-        '        t = Table.MakeWithGUI(newfile, GUIName)
-        't.SetName(newfile.GetName)
-        't.GetWin.Open
-
-        'expfile = LineFile.Make((myWkDirname+"tempfile.txt").AsFileName, #FILE_PERM_MODIFY )
-        'expfile.setscratch(true)
-        'respfile = LineFile.Make((myWkDirname+"response.txt").AsFileName, #FILE_PERM_WRITE )
-
-        '        expsize = expfile.GetSize
-        'expfile.GoToBeg
-
-        'for each lnum in 0..(expsize-1)  
-        '  if (lnum = 0) then
-        '    expfile.GoToBeg
-        '  else
-        '    recposition = zonelist.get(lnum-1)
-        '    expfile.setpos(recposition+1) 
-        '  end if 
-        '  readstr = expfile.ReadElt.Asstring
-        '  if (readstr = "nil") then
-        '    break
-        '  end if 
-        '  newstr = readstr.Substitute(",", ", ")
-        '  respfile.write({newstr}, 1)
-        'next 
+        Dim lOutFile As String = lOutputPath & "response.txt"
+        SaveFileString(lOutFile, lRespOut.ToString)
 
         Logger.Msg("Basin Response Computed. Output file: " & vbCrLf & lOutputPath + "response.txt", "Geospatial Stream Flow Model")
 

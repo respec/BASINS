@@ -2566,6 +2566,8 @@ Public Class frmGeoSFM
             atxInstream.Visible = True
             lblUSGS.Visible = False
             cboUSGS.Visible = False
+            atxOverland.ValueDouble = 0.05
+            atxInstream.ValueDouble = 0.5
         ElseIf rbnUniform.Checked Then
             lblOverland.Visible = True
             atxOverland.Visible = True
@@ -2573,6 +2575,7 @@ Public Class frmGeoSFM
             atxInstream.Visible = False
             lblUSGS.Visible = False
             cboUSGS.Visible = False
+            atxOverland.ValueDouble = 0.3
         End If
     End Sub
 End Class
