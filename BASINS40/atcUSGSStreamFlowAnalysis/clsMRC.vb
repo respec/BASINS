@@ -121,8 +121,8 @@ Public Class clsMRC
         End If
 
         Try
-            lResults.AppendLine(Station & "    " & Season)
             lResults.AppendLine(" ")
+            lResults.AppendLine(Station & "    " & Season)
             Dim lFieldLength As Integer = 15
             Dim lStrT As String
             Dim lStrLogQ As String
