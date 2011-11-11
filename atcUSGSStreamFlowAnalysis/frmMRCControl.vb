@@ -326,6 +326,8 @@ Public Class frmMRCControl
         Dim lCoC As Double
         Dim lSeason As String
 
+        Dim lCurvFileName As String = Path.Combine(Path.GetDirectoryName(pFileRecSumFullName), "curvout.txt")
+        txtMRCTable.Text = clsMRC.CurvOutHeader
         For Each lItem As String In lstEquations.CheckedItems
 
             Dim lArr() As String = lItem.Split(",")
@@ -360,11 +362,18 @@ Public Class frmMRCControl
                 .MinLogQ = lMinLogQ
                 .Season = lSeason
                 If .BuildMRC() Then
+                    .FileCurvOut = lCurvFileName
+                    Try
+                        txtMRCTable.Text &= .WriteCurvTable()
+                    Catch ex As Exception
+                        'Do Nothing
+                    End Try
                     pGraphDataGroup.Add(.CurveData)
                 End If
             End With
             pMRCGroup.Add(lMRC)
         Next
+        txtMRCTable.SelectionLength = 0
     End Sub
 
     Private Sub lstStations_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstStations.SelectedIndexChanged

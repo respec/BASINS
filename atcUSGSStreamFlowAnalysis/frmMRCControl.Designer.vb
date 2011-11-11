@@ -55,18 +55,22 @@ Partial Class frmMRCControl
         Me.lstRecSum = New System.Windows.Forms.ListBox
         Me.tabPlotMRC = New System.Windows.Forms.TabPage
         Me.panelGraph = New System.Windows.Forms.Panel
+        Me.tabMRCTable = New System.Windows.Forms.TabPage
+        Me.txtMRCTable = New System.Windows.Forms.TextBox
         Me.tabMRCMain.SuspendLayout()
         Me.tabConstructMRC.SuspendLayout()
         Me.gbMRCEquations.SuspendLayout()
         Me.gbDA.SuspendLayout()
         Me.gbRecSum.SuspendLayout()
         Me.tabPlotMRC.SuspendLayout()
+        Me.tabMRCTable.SuspendLayout()
         Me.SuspendLayout()
         '
         'tabMRCMain
         '
         Me.tabMRCMain.Controls.Add(Me.tabConstructMRC)
         Me.tabMRCMain.Controls.Add(Me.tabPlotMRC)
+        Me.tabMRCMain.Controls.Add(Me.tabMRCTable)
         Me.tabMRCMain.Dock = System.Windows.Forms.DockStyle.Fill
         Me.tabMRCMain.Location = New System.Drawing.Point(0, 0)
         Me.tabMRCMain.Name = "tabMRCMain"
@@ -386,6 +390,29 @@ Partial Class frmMRCControl
         Me.panelGraph.Size = New System.Drawing.Size(646, 434)
         Me.panelGraph.TabIndex = 0
         '
+        'tabMRCTable
+        '
+        Me.tabMRCTable.Controls.Add(Me.txtMRCTable)
+        Me.tabMRCTable.Location = New System.Drawing.Point(4, 22)
+        Me.tabMRCTable.Name = "tabMRCTable"
+        Me.tabMRCTable.Size = New System.Drawing.Size(652, 440)
+        Me.tabMRCTable.TabIndex = 2
+        Me.tabMRCTable.Text = "MRC Table"
+        Me.tabMRCTable.UseVisualStyleBackColor = True
+        '
+        'txtMRCTable
+        '
+        Me.txtMRCTable.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.txtMRCTable.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.txtMRCTable.Font = New System.Drawing.Font("Consolas", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txtMRCTable.Location = New System.Drawing.Point(0, 0)
+        Me.txtMRCTable.Multiline = True
+        Me.txtMRCTable.Name = "txtMRCTable"
+        Me.txtMRCTable.ReadOnly = True
+        Me.txtMRCTable.ScrollBars = System.Windows.Forms.ScrollBars.Both
+        Me.txtMRCTable.Size = New System.Drawing.Size(652, 440)
+        Me.txtMRCTable.TabIndex = 0
+        '
         'frmMRCControl
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -402,6 +429,8 @@ Partial Class frmMRCControl
         Me.gbDA.ResumeLayout(False)
         Me.gbRecSum.ResumeLayout(False)
         Me.tabPlotMRC.ResumeLayout(False)
+        Me.tabMRCTable.ResumeLayout(False)
+        Me.tabMRCTable.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -437,4 +466,6 @@ Partial Class frmMRCControl
     Friend WithEvents txtLogQMax As System.Windows.Forms.TextBox
     Friend WithEvents txtSeason As System.Windows.Forms.TextBox
     Friend WithEvents lblSeason As System.Windows.Forms.Label
+    Friend WithEvents tabMRCTable As System.Windows.Forms.TabPage
+    Friend WithEvents txtMRCTable As System.Windows.Forms.TextBox
 End Class
