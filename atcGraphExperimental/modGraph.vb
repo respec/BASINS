@@ -268,6 +268,22 @@ FoundMatch:
         Return lName
     End Function
 
+    Private Function AxisTypeFromName(ByVal aAxisTypeName As String) As ZedGraph.AxisType
+        Select Case aAxisTypeName
+            Case "Date" : Return AxisType.Date
+            Case "DateAsOrdinal" : Return AxisType.DateAsOrdinal
+            Case "DateDual" : Return AxisType.DateDual
+            Case "Exponent" : Return AxisType.Exponent
+            Case "Linear" : Return AxisType.Linear
+            Case "LinearAsOrdinal" : Return AxisType.LinearAsOrdinal
+            Case "Log" : Return AxisType.Log
+            Case "Ordinal" : Return AxisType.Ordinal
+            Case "Probability" : Return AxisType.Probability
+            Case "Text" : Return AxisType.Text
+            Case Else : Return AxisType.DateDual
+        End Select
+    End Function
+
     ''' <summary>
     ''' Create a new curve from the given atcTimeseries and add it to the ZedGraphControl
     ''' </summary>
@@ -315,9 +331,9 @@ FoundMatch:
         lYAxis.Scale.IsVisible = True
 
         With lPane
-            If .XAxis.Type <> AxisType.DateDual Then
-                .XAxis.Type = AxisType.DateDual
-            End If
+            Dim lXAxisType As ZedGraph.AxisType = AxisTypeFromName(aTimeseries.Attributes.GetValue("GraphXAxisType", "DateDual"))
+            If .XAxis.Type <> lXAxisType Then .XAxis.Type = lXAxisType
+
             If aTimeseries.Attributes.GetValue("point", False) Then
                 lCurve = .AddCurve(lCurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.Plus)
                 lCurve.Line.IsVisible = False
