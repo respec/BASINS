@@ -1651,6 +1651,7 @@ Public Class frmRecess
             If pRecess.SaveInterimResults Then pRecess.SaveInterimResults = False
         Else
             If chkSaveInterimToFile.Checked Then pRecess.SaveInterimResults = True
+            If pRecess.FileOut1Created Then pRecess.FileOut1Created = False
         End If
         pRecess.DoOperation("summary", "")
         txtAnalysisResults.Text = pRecess.Bulletin
@@ -1672,5 +1673,10 @@ Public Class frmRecess
         Else
             Logger.Msg("Need to select at least one daily streamflow dataset", "USGS Recess Analysis")
         End If
+    End Sub
+
+    Private Sub btnCurv_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCurv.Click
+        Dim lfrmMRC As New frmMRCControl()
+        lfrmMRC.Initialize("")
     End Sub
 End Class

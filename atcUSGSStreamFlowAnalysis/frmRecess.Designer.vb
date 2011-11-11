@@ -25,6 +25,7 @@ Partial Class frmRecess
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmRecess))
         Me.tabMain = New System.Windows.Forms.TabControl
         Me.tabConfig = New System.Windows.Forms.TabPage
+        Me.lblDA = New System.Windows.Forms.Label
         Me.chkSaveInterimToFile = New System.Windows.Forms.CheckBox
         Me.gbRnages = New System.Windows.Forms.GroupBox
         Me.btnBrowseRangeFile = New System.Windows.Forms.Button
@@ -59,6 +60,7 @@ Partial Class frmRecess
         Me.txtAnalysisResults = New System.Windows.Forms.TextBox
         Me.lstTable = New System.Windows.Forms.ListBox
         Me.gbToolBar = New System.Windows.Forms.GroupBox
+        Me.btnCurv = New System.Windows.Forms.Button
         Me.btnSummary = New System.Windows.Forms.Button
         Me.btnAnalyse = New System.Windows.Forms.Button
         Me.btnGetAllSegments = New System.Windows.Forms.Button
@@ -93,6 +95,7 @@ Partial Class frmRecess
         '
         'tabConfig
         '
+        Me.tabConfig.Controls.Add(Me.lblDA)
         Me.tabConfig.Controls.Add(Me.chkSaveInterimToFile)
         Me.tabConfig.Controls.Add(Me.gbRnages)
         Me.tabConfig.Controls.Add(Me.txtOutputDir)
@@ -108,6 +111,15 @@ Partial Class frmRecess
         Me.tabConfig.TabIndex = 0
         Me.tabConfig.Text = "Configuration"
         Me.tabConfig.UseVisualStyleBackColor = True
+        '
+        'lblDA
+        '
+        Me.lblDA.AutoSize = True
+        Me.lblDA.Location = New System.Drawing.Point(9, 237)
+        Me.lblDA.Name = "lblDA"
+        Me.lblDA.Size = New System.Drawing.Size(146, 13)
+        Me.lblDA.TabIndex = 48
+        Me.lblDA.Text = "Specify Drainage Area (sq mi)"
         '
         'chkSaveInterimToFile
         '
@@ -128,7 +140,7 @@ Partial Class frmRecess
         Me.gbRnages.Controls.Add(Me.Label2)
         Me.gbRnages.Controls.Add(Me.TextBox2)
         Me.gbRnages.Controls.Add(Me.Label1)
-        Me.gbRnages.Location = New System.Drawing.Point(6, 236)
+        Me.gbRnages.Location = New System.Drawing.Point(6, 314)
         Me.gbRnages.Name = "gbRnages"
         Me.gbRnages.Size = New System.Drawing.Size(582, 58)
         Me.gbRnages.TabIndex = 46
@@ -457,6 +469,7 @@ Partial Class frmRecess
         '
         Me.gbToolBar.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbToolBar.Controls.Add(Me.btnCurv)
         Me.gbToolBar.Controls.Add(Me.btnSummary)
         Me.gbToolBar.Controls.Add(Me.btnAnalyse)
         Me.gbToolBar.Controls.Add(Me.btnGetAllSegments)
@@ -467,9 +480,18 @@ Partial Class frmRecess
         Me.gbToolBar.TabStop = False
         Me.gbToolBar.Text = "Recess Tool Bar"
         '
+        'btnCurv
+        '
+        Me.btnCurv.Location = New System.Drawing.Point(477, 19)
+        Me.btnCurv.Name = "btnCurv"
+        Me.btnCurv.Size = New System.Drawing.Size(75, 23)
+        Me.btnCurv.TabIndex = 18
+        Me.btnCurv.Text = "View MRC"
+        Me.btnCurv.UseVisualStyleBackColor = True
+        '
         'btnSummary
         '
-        Me.btnSummary.Location = New System.Drawing.Point(507, 19)
+        Me.btnSummary.Location = New System.Drawing.Point(396, 19)
         Me.btnSummary.Name = "btnSummary"
         Me.btnSummary.Size = New System.Drawing.Size(75, 23)
         Me.btnSummary.TabIndex = 17
@@ -478,7 +500,7 @@ Partial Class frmRecess
         '
         'btnAnalyse
         '
-        Me.btnAnalyse.Location = New System.Drawing.Point(426, 19)
+        Me.btnAnalyse.Location = New System.Drawing.Point(315, 19)
         Me.btnAnalyse.Name = "btnAnalyse"
         Me.btnAnalyse.Size = New System.Drawing.Size(75, 23)
         Me.btnAnalyse.TabIndex = 16
@@ -596,4 +618,6 @@ Partial Class frmRecess
     Friend WithEvents lstRecessSegments As System.Windows.Forms.CheckedListBox
     Friend WithEvents txtAnalysisResults As System.Windows.Forms.TextBox
     Friend WithEvents chkSaveInterimToFile As System.Windows.Forms.CheckBox
+    Friend WithEvents lblDA As System.Windows.Forms.Label
+    Friend WithEvents btnCurv As System.Windows.Forms.Button
 End Class
