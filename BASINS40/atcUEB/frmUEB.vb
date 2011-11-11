@@ -15,6 +15,14 @@ Public Class frmUEB
     Friend pBCParameterFileName As String
     Friend pOutputFileName As String
     Friend pRadOpt As Integer
+    Friend pSDate(5) As Integer
+    Friend pTStep As Integer
+    Friend pInitialEnergy As Double
+    Friend pInitialH2OEquiv As Double
+    Friend pInitialSnowAge As Double
+    Friend pParameterDataArray(29) As Double
+    Friend pSiteDataArray(7) As Double
+    Friend pBCDataArray(37) As Double
 
 #Region " Windows Form Designer generated code "
 
@@ -176,6 +184,9 @@ Public Class frmUEB
         Me.cmdAbout = New System.Windows.Forms.Button()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage2 = New System.Windows.Forms.TabPage()
+        Me.txtOutputFile = New System.Windows.Forms.TextBox()
+        Me.Label7 = New System.Windows.Forms.Label()
+        Me.txtProjectName = New System.Windows.Forms.TextBox()
         Me.txtMasterFile = New System.Windows.Forms.TextBox()
         Me.lblInstructions = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
@@ -294,9 +305,6 @@ Public Class frmUEB
         Me.Label45 = New System.Windows.Forms.Label()
         Me.ComboBox39 = New System.Windows.Forms.ComboBox()
         Me.cmdSimulate = New System.Windows.Forms.Button()
-        Me.txtProjectName = New System.Windows.Forms.TextBox()
-        Me.txtOutputFile = New System.Windows.Forms.TextBox()
-        Me.Label7 = New System.Windows.Forms.Label()
         Me.TabControl1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
@@ -377,6 +385,29 @@ Public Class frmUEB
         Me.TabPage2.Text = "General"
         Me.TabPage2.UseVisualStyleBackColor = True
         '
+        'txtOutputFile
+        '
+        Me.txtOutputFile.Location = New System.Drawing.Point(121, 175)
+        Me.txtOutputFile.Name = "txtOutputFile"
+        Me.txtOutputFile.Size = New System.Drawing.Size(142, 20)
+        Me.txtOutputFile.TabIndex = 48
+        '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.Location = New System.Drawing.Point(18, 178)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(92, 13)
+        Me.Label7.TabIndex = 47
+        Me.Label7.Text = "Output File Name:"
+        '
+        'txtProjectName
+        '
+        Me.txtProjectName.Location = New System.Drawing.Point(121, 136)
+        Me.txtProjectName.Name = "txtProjectName"
+        Me.txtProjectName.Size = New System.Drawing.Size(142, 20)
+        Me.txtProjectName.TabIndex = 46
+        '
         'txtMasterFile
         '
         Me.txtMasterFile.Location = New System.Drawing.Point(121, 97)
@@ -456,8 +487,8 @@ Public Class frmUEB
         Me.AtcTextSnowAge.SoftMax = -999.0R
         Me.AtcTextSnowAge.SoftMin = -999.0R
         Me.AtcTextSnowAge.TabIndex = 38
-        Me.AtcTextSnowAge.ValueDouble = 1.0R
-        Me.AtcTextSnowAge.ValueInteger = 1
+        Me.AtcTextSnowAge.ValueDouble = 0.0R
+        Me.AtcTextSnowAge.ValueInteger = 0
         '
         'Label52
         '
@@ -497,8 +528,8 @@ Public Class frmUEB
         Me.AtcTextIniEnergyContent.SoftMax = -999.0R
         Me.AtcTextIniEnergyContent.SoftMin = -999.0R
         Me.AtcTextIniEnergyContent.TabIndex = 30
-        Me.AtcTextIniEnergyContent.ValueDouble = 20000.0R
-        Me.AtcTextIniEnergyContent.ValueInteger = 20000
+        Me.AtcTextIniEnergyContent.ValueDouble = 0.0R
+        Me.AtcTextIniEnergyContent.ValueInteger = 0
         '
         'AtcTextIniWaterEquiv
         '
@@ -520,8 +551,8 @@ Public Class frmUEB
         Me.AtcTextIniWaterEquiv.SoftMax = -999.0R
         Me.AtcTextIniWaterEquiv.SoftMin = -999.0R
         Me.AtcTextIniWaterEquiv.TabIndex = 27
-        Me.AtcTextIniWaterEquiv.ValueDouble = 1.0R
-        Me.AtcTextIniWaterEquiv.ValueInteger = 1
+        Me.AtcTextIniWaterEquiv.ValueDouble = 0.0R
+        Me.AtcTextIniWaterEquiv.ValueInteger = 0
         '
         'TabPage3
         '
@@ -1838,29 +1869,6 @@ Public Class frmUEB
         Me.cmdSimulate.TabIndex = 10
         Me.cmdSimulate.Text = "Simulate"
         '
-        'txtProjectName
-        '
-        Me.txtProjectName.Location = New System.Drawing.Point(121, 136)
-        Me.txtProjectName.Name = "txtProjectName"
-        Me.txtProjectName.Size = New System.Drawing.Size(142, 20)
-        Me.txtProjectName.TabIndex = 46
-        '
-        'txtOutputFile
-        '
-        Me.txtOutputFile.Location = New System.Drawing.Point(121, 175)
-        Me.txtOutputFile.Name = "txtOutputFile"
-        Me.txtOutputFile.Size = New System.Drawing.Size(142, 20)
-        Me.txtOutputFile.TabIndex = 48
-        '
-        'Label7
-        '
-        Me.Label7.AutoSize = True
-        Me.Label7.Location = New System.Drawing.Point(18, 178)
-        Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(92, 13)
-        Me.Label7.TabIndex = 47
-        Me.Label7.Text = "Output File Name:"
-        '
         'frmUEB
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -2073,7 +2081,7 @@ Public Class frmUEB
         cdlg.Title = "Open UCI file containing base model"
         cdlg.Filter = "UCI files|*.uci|All Files|*.*"
         If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
-            Dim lFilename As String = cdlg.FileName
+            txtWeatherFile.Text = cdlg.FileName
         End If
 
     End Sub
@@ -2084,6 +2092,7 @@ Public Class frmUEB
         cdlg.Filter = "Master Input files|*.in|All Files|*.*"
         If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
             Dim lFilename As String = cdlg.FileName
+            txtMasterFile.Text = lFilename
             OpenMasterFile(lFilename, pWeatherFileName, pOutputFileName, pParameterFileName, pSiteFileName, pBCParameterFileName, pRadOpt)
             txtWeatherFile.Text = pWeatherFileName
             txtOutputFile.Text = pOutputFileName
@@ -2098,6 +2107,51 @@ Public Class frmUEB
                 Case 2
                     rdoMeasuredNet.Checked = True
             End Select
+        End If
+    End Sub
+
+    Private Sub txtWeatherFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtWeatherFile.TextChanged
+        If FileExists(txtWeatherFile.Text) Then
+            ReadWeatherFile(txtWeatherFile.Text, pSDate, pTStep, pInitialEnergy, pInitialH2OEquiv, pInitialSnowAge)
+            AtcTextSYear.ValueInteger = pSDate(0)
+            AtcTextSMonth.ValueInteger = pSDate(1)
+            AtcTextSDay.ValueInteger = pSDate(2)
+            AtcTextSHour.ValueInteger = pSDate(3)
+            atcTextTimeStep.ValueInteger = pTStep
+            AtcTextIniEnergyContent.Text = pInitialEnergy
+            AtcTextIniWaterEquiv.Text = pInitialH2OEquiv.ToString
+            AtcTextSnowAge.Text = pInitialSnowAge
+        End If
+    End Sub
+
+    Private Sub txtParameterFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtParameterFile.TextChanged
+        If FileExists(txtParameterFile.Text) Then
+            ReadDataFile(txtParameterFile.Text, pParameterDataArray)
+            For i As Integer = 1 To 30
+                AtcGridModelParms.Source.CellValue(i, 1) = pParameterDataArray(i - 1)
+            Next
+        End If
+    End Sub
+
+    Private Sub txtSiteFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtSiteFile.TextChanged
+        If FileExists(txtSiteFile.Text) Then
+            ReadDataFile(txtSiteFile.Text, pSiteDataArray)
+            For i As Integer = 1 To 8
+                AtcGridSiteVars.Source.CellValue(i, 1) = pSiteDataArray(i - 1)
+            Next
+        End If
+    End Sub
+
+    Private Sub txtBCParameterFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtBCParameterFile.TextChanged
+        Dim lMonth As Integer
+        If FileExists(txtBCParameterFile.Text) Then
+            ReadDataFile(txtBCParameterFile.Text, pBCDataArray)
+            AtcTextAParm.ValueDouble = pBCDataArray(0)
+            AtcTextCParm.ValueDouble = pBCDataArray(1)
+            For i As Integer = 1 To 12
+                lMonth = pBCDataArray(3 * i - 1)
+                AtcGridBCMonthly.Source.CellValue(lMonth, 1) = pBCDataArray(3 * i)
+            Next
         End If
     End Sub
 End Class
