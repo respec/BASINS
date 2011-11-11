@@ -639,41 +639,22 @@ TryOldString:
     End Function
 
     Public Function ReplaceString(ByRef Source As String, ByRef Find As String, ByRef ReplaceWith As String) As String
-        ' ##SUMMARY Replaces Find in Source with Replace (case sensitive).
-        ' ##SUMMARY   Example: ReplaceString("He left", "He", "She") = "She left"
-        ' ##PARAM Source I Full string to be searched
-        ' ##PARAM Find I Substring to be searched for and replaced
-        ' ##PARAM Replace I Substring to replace Find
-        ' ##RETURNS Returns new string like Source except that _
-        'any occurences of Find (case sensitive) are replaced with Replace.
-
         Return Source.Replace(Find, ReplaceWith)
+    End Function
 
-        'Dim retval As String = ""
-        'Dim findPos As Integer
-        'Dim lastFindEnd As Integer
-        'Dim findlen As Integer
-        'Dim replacelen As Integer
-        '' ##LOCAL retval - string to be returned as ReplaceString
-        '' ##LOCAL findpos - long position of Find in Source
-        '' ##LOCAL lastFindEnd - long position of first character after last replaced string in Source
-        '' ##LOCAL findlen - long length of Find
-        '' ##LOCAL replacelen - long length of Replace
-
-        'findlen = Len(Find)
-        'If findlen > 0 Then
-        '    replacelen = Len(ReplaceWith)
-        '    findPos = InStr(Source, Find)
-        '    lastFindEnd = 1
-        '    While findPos > 0
-        '        retval &= Mid(Source, lastFindEnd, findPos - lastFindEnd) & ReplaceWith
-        '        lastFindEnd = findPos + findlen
-        '        findPos = InStr(findPos + findlen, Source, Find)
-        '    End While
-        '    ReplaceString = retval & Mid(Source, lastFindEnd)
-        'Else
-        '    ReplaceString = Source
-        'End If
+    ''' <summary>
+    ''' Replace multiple adjacent instances of aReplace with just one.
+    ''' </summary>
+    ''' <param name="aSource">Search through this string</param>
+    ''' <param name="aReplace">Search for repeating instances of this string and eliminate repeats</param>
+    ''' <returns>aSource without any instances of aReplace next to another aReplace</returns>
+    ''' <remarks>For example in space-delimited files that delimit with one or more spaces, change to delimited with just one space</remarks>
+    Public Function ReplaceRepeats(ByVal aSource As String, ByVal aReplace As String) As String
+        Dim lRepeat As String = aReplace & aReplace
+        While aSource.Contains(lRepeat)
+            aSource = aSource.Replace(lRepeat, aReplace)
+        End While
+        Return aSource
     End Function
 
     'Public Sub StrTrim(ByRef istr As String)
