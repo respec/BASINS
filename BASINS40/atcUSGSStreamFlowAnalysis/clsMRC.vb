@@ -22,6 +22,17 @@ Public Class clsMRC
     Public FileCurvOut As String
 
     Private pRecSum As String
+
+    Public Shared CurvOutHeader = "T is time in days." & vbCrLf & _
+                "LogQcfs is the log of flow in CFS. " & vbCrLf & _
+                "LogQcfsmi is the log of flow in CFS per sq mile. " & vbCrLf & _
+                "Qcfs is the flow in CFS. " & vbCrLf & _
+                "Qcfsmi is the flow in CFS per square mile. " & vbCrLf & _
+                "-------------------------------------------------" & vbCrLf & _
+                " " & vbCrLf & _
+                "         T            LogQcfs       LogQcfsmi      .     Qcfs           Qcfsmi" & vbCrLf & _
+                " "
+
     Public Property RecSum() As String
         Get
             Return pRecSum
@@ -61,6 +72,9 @@ Public Class clsMRC
                     Return False
                 End If
             End If
+
+            ReDim TimeOrdinal(MaxLength)
+            ReDim LogQ(MaxLength)
             Dim lDeltaLogQ As Double = (MaxLogQ - MinLogQ) / (MaxLength - 1)
 
             Dim lLogQ As Double = MaxLogQ
@@ -83,6 +97,7 @@ Public Class clsMRC
             End With
             With CurveData.Attributes
                 .SetValue("YAxis", "LEFT")
+                .SetValue("GraphXAxisType", "Linear")
                 .SetValue("Location", Station)
                 .SetValue("Constituent", "")
                 .SetValue("Scenario", Equation)
@@ -98,34 +113,16 @@ Public Class clsMRC
         End Try
     End Function
 
-    Public Function WriteCurvOutput() As Boolean
+    Public Function WriteCurvTable(Optional ByVal aWriteToFile As Boolean = False) As String
+        Dim lResults As New System.Text.StringBuilder
 
         If DrainageArea <= 0 Then
-            Return False
-        End If
-
-        If Not Directory.Exists(Path.GetDirectoryName(FileCurvOut)) Then
-            Return False
+            Return "Fail:Invalid Drainage Area"
         End If
 
         Try
-            Dim lAppend As Boolean = (File.Exists(FileCurvOut))
-            Dim lSW As StreamWriter = New StreamWriter(FileCurvOut, lAppend)
-
-            If Not lAppend Then
-                lSW.WriteLine("T is time in days.")
-                lSW.WriteLine("LogQcfs is the log of flow in CFS. ")
-                lSW.WriteLine("LogQcfsmi is the log of flow in CFS per sq mile. ")
-                lSW.WriteLine("Qcfs is the flow in CFS. ")
-                lSW.WriteLine("Qcfsmi is the flow in CFS per square mile. ")
-                lSW.WriteLine("-------------------------------------------------")
-                lSW.WriteLine(" ")
-                lSW.WriteLine("         T            LogQcfs       LogQcfsmi      .     Qcfs           Qcfsmi")
-            End If
-
-            lSW.WriteLine(" ")
-            lSW.WriteLine(Station & "    " & Season)
-
+            lResults.AppendLine(Station & "    " & Season)
+            lResults.AppendLine(" ")
             Dim lFieldLength As Integer = 15
             Dim lStrT As String
             Dim lStrLogQ As String
@@ -135,25 +132,34 @@ Public Class clsMRC
             Dim lFlowQ As Double
 
             For I As Integer = 1 To MaxLength
-                lStrT = String.Format("{0.00000}", TimeOrdinal(I)).PadLeft(lFieldLength, " ")
-                lStrLogQ = String.Format("{0.00000}", LogQ(I)).PadLeft(lFieldLength, " ")
+                lStrT = String.Format("{0:0.00000}", TimeOrdinal(I)).PadLeft(lFieldLength, " ")
+                lStrLogQ = String.Format("{0:0.00000}", LogQ(I)).PadLeft(lFieldLength, " ")
 
                 lFlowQ = 10 ^ LogQ(I)
-                lStrLogQsmi = String.Format("{0.00000}", Math.Log10(lFlowQ / DrainageArea)).PadLeft(lFieldLength, " ")
-                lStrQ = String.Format("{0.00000}", lFlowQ).PadLeft(lFieldLength, " ")
-                lStrQsmi = String.Format("{0.00000}", lFlowQ / DrainageArea).PadLeft(lFieldLength, " ")
+                lStrLogQsmi = String.Format("{0:0.00000}", Math.Log10(lFlowQ / DrainageArea)).PadLeft(lFieldLength, " ")
+                lStrQ = String.Format("{0:0.00000}", lFlowQ).PadLeft(lFieldLength, " ")
+                lStrQsmi = String.Format("{0:0.00000}", lFlowQ / DrainageArea).PadLeft(lFieldLength, " ")
 
-                lSW.WriteLine(lStrT & lStrLogQ & lStrLogQsmi & lStrQ & lStrQsmi)
+                lResults.AppendLine(lStrT & lStrLogQ & lStrLogQsmi & lStrQ & lStrQsmi)
             Next
 
-            lSW.Flush()
-            lSW.Close()
-            lSW = Nothing
-            Return True
+            If aWriteToFile AndAlso Directory.Exists(Path.GetDirectoryName(FileCurvOut)) Then
+                Dim lAppend As Boolean = (File.Exists(FileCurvOut))
+                Dim lSW As StreamWriter = New StreamWriter(FileCurvOut, lAppend)
+                If Not lAppend Then
+                    lSW.WriteLine(CurvOutHeader)
+                End If
+                lSW.WriteLine(lResults.ToString)
+                lSW.Flush()
+                lSW.Close()
+                lSW = Nothing
+            End If
+
+            Return lResults.ToString
         Catch ex As Exception
-            Return False
+            Return "Failed:" & ex.Message
         End Try
-        
+
     End Function
 
     Public Sub Clear()
