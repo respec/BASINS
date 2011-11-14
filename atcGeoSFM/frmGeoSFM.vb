@@ -182,6 +182,8 @@ Public Class frmGeoSFM
     Friend WithEvents atxOverland As atcControls.atcText
     Friend WithEvents lblOutlets As System.Windows.Forms.Label
     Friend WithEvents cboOutlets As System.Windows.Forms.ComboBox
+    Friend WithEvents lblFlow As System.Windows.Forms.Label
+    Friend WithEvents cboFlowDir As System.Windows.Forms.ComboBox
     Friend WithEvents tpgMap As System.Windows.Forms.TabPage
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmGeoSFM))
@@ -331,6 +333,8 @@ Public Class frmGeoSFM
         Me.Label44 = New System.Windows.Forms.Label
         Me.Label45 = New System.Windows.Forms.Label
         Me.ComboBox39 = New System.Windows.Forms.ComboBox
+        Me.lblFlow = New System.Windows.Forms.Label
+        Me.cboFlowDir = New System.Windows.Forms.ComboBox
         Me.tabMain.SuspendLayout()
         Me.tpgTerrain.SuspendLayout()
         Me.tpgBasin.SuspendLayout()
@@ -866,6 +870,8 @@ Public Class frmGeoSFM
         '
         'tpgResponse
         '
+        Me.tpgResponse.Controls.Add(Me.lblFlow)
+        Me.tpgResponse.Controls.Add(Me.cboFlowDir)
         Me.tpgResponse.Controls.Add(Me.lblOutlets)
         Me.tpgResponse.Controls.Add(Me.cboOutlets)
         Me.tpgResponse.Controls.Add(Me.atxInstream)
@@ -988,7 +994,7 @@ Public Class frmGeoSFM
         '
         Me.lblUSGS.AutoSize = True
         Me.lblUSGS.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblUSGS.Location = New System.Drawing.Point(28, 232)
+        Me.lblUSGS.Location = New System.Drawing.Point(28, 206)
         Me.lblUSGS.Name = "lblUSGS"
         Me.lblUSGS.Size = New System.Drawing.Size(120, 13)
         Me.lblUSGS.TabIndex = 48
@@ -1001,7 +1007,7 @@ Public Class frmGeoSFM
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboUSGS.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboUSGS.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboUSGS.Location = New System.Drawing.Point(152, 229)
+        Me.cboUSGS.Location = New System.Drawing.Point(152, 203)
         Me.cboUSGS.Name = "cboUSGS"
         Me.cboUSGS.Size = New System.Drawing.Size(368, 21)
         Me.cboUSGS.TabIndex = 49
@@ -2134,6 +2140,28 @@ Public Class frmGeoSFM
         Me.ComboBox39.Size = New System.Drawing.Size(312, 21)
         Me.ComboBox39.TabIndex = 23
         '
+        'lblFlow
+        '
+        Me.lblFlow.AutoSize = True
+        Me.lblFlow.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblFlow.Location = New System.Drawing.Point(28, 232)
+        Me.lblFlow.Name = "lblFlow"
+        Me.lblFlow.Size = New System.Drawing.Size(99, 13)
+        Me.lblFlow.TabIndex = 58
+        Me.lblFlow.Text = "Flow Direction Grid:"
+        Me.lblFlow.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'cboFlowDir
+        '
+        Me.cboFlowDir.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboFlowDir.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboFlowDir.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboFlowDir.Location = New System.Drawing.Point(152, 229)
+        Me.cboFlowDir.Name = "cboFlowDir"
+        Me.cboFlowDir.Size = New System.Drawing.Size(368, 21)
+        Me.cboFlowDir.TabIndex = 59
+        '
         'frmGeoSFM
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -2426,8 +2454,10 @@ Public Class frmGeoSFM
         cboUSGS.Items.Clear()
         cboOutlets.Items.Clear()
         cboUSGS.Items.Add("<none>")
+        cboFlowDir.Items.Add("<none>")
         cboOutlets.Items.Add("<none>")
         cboUSGS.SelectedIndex = 0
+        cboFlowDir.SelectedIndex = 0
         cboOutlets.SelectedIndex = 0
 
         For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
@@ -2435,11 +2465,15 @@ Public Class frmGeoSFM
             If GisUtil.LayerType(lLayerIndex) = MapWindow.Interfaces.eLayerType.Grid Then
                 cboUSGS.Items.Add(lLayerName)
                 cboOutlets.Items.Add(lLayerName)
+                cboFlowDir.Items.Add(lLayerName)
                 If lLayerName.Contains("USGS") Then
                     cboUSGS.SelectedIndex = cboUSGS.Items.Count - 1
                 End If
                 If lLayerName.Contains("Outlet") Then
                     cboOutlets.SelectedIndex = cboOutlets.Items.Count - 1
+                End If
+                If lLayerName.Contains("Flow Direction") Then
+                    cboFlowDir.SelectedIndex = cboFlowDir.Items.Count - 1
                 End If
             End If
         Next lLayerIndex
@@ -2461,10 +2495,10 @@ Public Class frmGeoSFM
 
         Dim lZonegname As String = cboBC1.Items(cboBC1.SelectedIndex)
         Dim lDemgname As String = cboBC2.Items(cboBC2.SelectedIndex)
-        'Dim lFacgname As String = cboBC3.Items(cboBC3.SelectedIndex)
+        Dim lFacgname As String = cboBC3.Items(cboBC3.SelectedIndex)
         Dim lFlowlengname As String = cboBC10.Items(cboBC10.SelectedIndex)
         Dim lUSGSLandcoverGridName As String = cboUSGS.Items(cboUSGS.SelectedIndex)
-        'Dim lFlowDirGridName As String = cboFlowDir.Items(cboFlowDir.SelectedIndex)
+        Dim lFlowDirGridName As String = cboFlowDir.Items(cboFlowDir.SelectedIndex)
         Dim lOutletGridName As String = cboOutlets.Items(cboOutlets.SelectedIndex)
 
         Dim lOverlandFlowVelocity As Double = atxOverland.ValueDouble
@@ -2475,7 +2509,7 @@ Public Class frmGeoSFM
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         Me.Refresh()
 
-        Response(lVelMethod, lZonegname, lFlowlengname, lOutletGridName, lDemgname, _
+        Response(lVelMethod, lZonegname, lFlowlengname, lOutletGridName, lDemgname, lFacgname, lFlowDirGridName, _
                  lUSGSLandcoverGridName, lOverlandFlowVelocity, lInstreamFlowVelocity)
 
         tabMain.SelectedIndex = 3
