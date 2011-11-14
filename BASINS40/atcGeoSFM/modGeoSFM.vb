@@ -952,7 +952,7 @@ Public Module modGeoSFM
 
     Friend Sub Response(ByVal veltype As Integer, _
                         ByVal zonegname As String, ByVal flowlengname As String, _
-                        ByVal outletgname As String, ByVal demgname As String, _
+                        ByVal outletgname As String, ByVal demgname As String, ByVal facgname As String, ByVal fdirgname As String, _
                         ByVal UsgsLandCoverGname As String, ByVal OverlandFlowVelocity As Double, ByVal InstreamFlowVelocity As Double)
 
         ' ***********************************************************************************************
@@ -1013,13 +1013,14 @@ Public Module modGeoSFM
             basingthm = GisUtil.LayerIndex(zonegname)
         End If
 
-        'Dim flowdirgthm As Integer = -1
-        'If fdirgname = "<none>" Then
-        '    Logger.Msg("Flow Direction Grid, " + fdirgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-        '    Exit Sub
-        'Else
-        '    flowdirgthm = GisUtil.LayerIndex(fdirgname)
-        'End If
+        Dim flowdirgthm As Integer = -1
+        If fdirgname = "<none>" Then
+            Logger.Msg("Flow Direction Grid, " + fdirgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Exit Sub
+        Else
+            flowdirgthm = GisUtil.LayerIndex(fdirgname)
+        End If
+        Dim lFlowDirGridFileName As String = GisUtil.LayerFileName(flowdirgthm)
 
         Dim flowlengthm As Integer = -1
         If flowlengname = "<none>" Then
@@ -1055,13 +1056,14 @@ Public Module modGeoSFM
             Exit Sub
         End Try
 
-        'Dim facgthm As Integer = -1
-        'If facgname = "<none>" Then
-        '    Logger.Msg("Flow Accumulation Grid, " + facgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-        '    Exit Sub
-        'Else
-        '    facgthm = GisUtil.LayerIndex(facgname)
-        'End If
+        Dim facgthm As Integer = -1
+        If facgname = "<none>" Then
+            Logger.Msg("Flow Accumulation Grid, " + facgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Exit Sub
+        Else
+            facgthm = GisUtil.LayerIndex(facgname)
+        End If
+        Dim lFlowAccGridFileName As String = GisUtil.LayerFileName(facgthm)
 
         Dim demgthm As Integer = -1
         If demgname = "<none>" Then
@@ -1212,6 +1214,17 @@ Public Module modGeoSFM
             'set velocity grid based on a threshold value
             ' velgrid = (facgrid < 1000).con((OverlandFlowVelocity).asgrid, (InstreamFlowVelocity).asgrid)
             ' velgthm = Gtheme.Make(velgrid)
+            Dim lValue As Double = OverlandFlowVelocity
+            If GisUtil.IsLayer(lVelocityGridLayerName) Then
+                lVelocityGridLayerIndex = GisUtil.LayerIndex(lVelocityGridLayerName)
+                GisUtil.RemoveLayer(lVelocityGridLayerIndex)
+            End If
+            lVelocityGridFileName = FilenameNoExt(lDemFileName) & "Velocity.bgd"
+            GisUtil.GridAssignConstant(lVelocityGridFileName, lDemFileName, lValue)
+            'now for cells >= 1000, use instream flow velocity
+            lValue = InstreamFlowVelocity
+            GisUtil.GridAssignConstantAboveThreshold(lVelocityGridFileName, lFlowAccGridFileName, 999, lValue)
+            GisUtil.AddLayer(lVelocityGridFileName, lVelocityGridLayerName)
         Else
             'set velocity grid to a constant
             Dim lValue As Double = OverlandFlowVelocity
@@ -1230,23 +1243,21 @@ Public Module modGeoSFM
         '        maskgrid = ((outgrid.isnull) / (outgrid.isnull))
         '        newfdrgrid = flowdirgrid * maskgrid
         'Dim lFlowDirGridFileName As String = GisUtil.LayerFileName(flowdirgthm)
-        'Dim lFlowAccGridFileName As String = GisUtil.LayerFileName(facgthm)
         Dim lOutletGridFileName As String = GisUtil.LayerFileName(outgthm)
-        Dim lFlowLengthGridFileName As String = GisUtil.LayerFileName(flowlengthm)
+        'Dim lFlowLengthGridFileName As String = GisUtil.LayerFileName(flowlengthm)
 
         '        invelgrid = (1.AsGrid / velgrid)
         Dim lInverseVelocityGridFileName As String = FilenameNoExt(lVelocityGridFileName) & "InverseVelocity.bgd"
         GisUtil.GridInverse(lVelocityGridFileName, lInverseVelocityGridFileName)
 
         '        flowtimegrid = newfdrgrid.flowlength(invelgrid, False)
-        Dim lTravelTimeGridFileName As String = FilenameNoExt(lFlowLengthGridFileName) & "TravelTime." & FileExt(lFlowLengthGridFileName)
-        'compute from downstream flow length grid instead of generating from scratch
-        GisUtil.FlowLengthToOutlet(lFlowLengthGridFileName, lOutletGridFileName, lZoneFileName, lTravelTimeGridFileName)
-        'GisUtil.DownstreamFlowLength(lFlowDirGridFileName, lFlowAccGridFileName, lTravelTimeGridFileName, lOutletGridFileName)
+        Dim lTravelTimeGridFileName As String = FilenameNoExt(lFlowAccGridFileName) & "TravelTime." & FileExt(lFlowAccGridFileName)
 
+        'GisUtil.FlowLengthToOutlet(lFlowLengthGridFileName, lOutletGridFileName, lZoneFileName, lTravelTimeGridFileName)
         '        inverse velocity grid is used as a weighting factor 
-        Dim lWeightedGridFileName As String = FilenameNoExt(lTravelTimeGridFileName) & "Weighted." & FileExt(lTravelTimeGridFileName)
-        GisUtil.GridMultiply(lTravelTimeGridFileName, lInverseVelocityGridFileName, lWeightedGridFileName)
+        GisUtil.DownstreamFlowLength(lFlowDirGridFileName, lFlowAccGridFileName, lTravelTimeGridFileName, lOutletGridFileName, lInverseVelocityGridFileName)
+        'Dim lWeightedGridFileName As String = FilenameNoExt(lTravelTimeGridFileName) & "Weighted." & FileExt(lTravelTimeGridFileName)
+        'GisUtil.GridMultiply(lTravelTimeGridFileName, lInverseVelocityGridFileName, lWeightedGridFileName)
 
         '        daysgrid = (flowtimegrid / 86400).floor   'floor returns the greatest integer value less than or equal to aGrid.
         Dim lDaysGridLayerName As String = "Travel Time Grid (Days)"
@@ -1255,8 +1266,8 @@ Public Module modGeoSFM
             lDaysGridLayerIndex = GisUtil.LayerIndex(lDaysGridLayerName)
             GisUtil.RemoveLayer(lDaysGridLayerIndex)
         End If
-        Dim lDaysGridFileName As String = FilenameNoExt(lWeightedGridFileName) & "DaysGrid." & FileExt(lWeightedGridFileName)
-        GisUtil.GridMultiplyConstant(lWeightedGridFileName, 1 / 86400, lDaysGridFileName)
+        Dim lDaysGridFileName As String = FilenameNoExt(lTravelTimeGridFileName) & "DaysGrid." & FileExt(lTravelTimeGridFileName)
+        GisUtil.GridMultiplyConstant(lTravelTimeGridFileName, 1 / 86400, lDaysGridFileName)
 
         'need to make sure days grid is an integer 
         Dim lDaysIntegerGridFileName As String = FilenameNoExt(lDaysGridFileName) & "Integer." & FileExt(lDaysGridFileName)

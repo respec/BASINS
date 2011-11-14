@@ -1738,6 +1738,9 @@ Public Class GisUtil
                             lValue = lNaN
                         Else
                             lValue = lValueGrid.Value(lValueCol, lValueRow)
+                            If lValue = lNodataValue Then
+                                lValue = lNaN
+                            End If
                         End If
                         lThisZoneValues.Add(lValue)
                     End If
@@ -2083,6 +2086,29 @@ Public Class GisUtil
         lOutputGrid.Save()
     End Sub
 
+    Public Shared Sub GridAssignConstantAboveThreshold(ByVal aNewGridFileName As String, ByVal aThresholdGridFileName As String, ByVal aThreshold As Double, ByVal aValue As Double)
+        Dim lOutputGrid As New MapWinGIS.Grid
+        lOutputGrid.Open(aNewGridFileName)
+
+        Dim lThreshGrid As New MapWinGIS.Grid
+        lThreshGrid.Open(aThresholdGridFileName)
+
+        Dim lStartRow As Integer = 0
+        Dim lStartCol As Integer = 0
+        Dim lEndRow As Integer = lOutputGrid.Header.NumberRows - 1
+        Dim lEndCol As Integer = lOutputGrid.Header.NumberCols - 1
+
+        For lRow As Integer = lStartRow To lEndRow
+            For lCol As Integer = lStartCol To lEndCol
+                If lThreshGrid.Value(lCol, lRow) > aThreshold Then
+                    lOutputGrid.Value(lCol, lRow) = aValue
+                End If
+            Next
+        Next
+
+        lOutputGrid.Save()
+    End Sub
+
     Public Shared Sub GridInverse(ByVal aInputGridFileName As String, ByVal aNewGridFileName As String)
         If FileExists(aNewGridFileName) Then
             IO.File.Delete(aNewGridFileName)
@@ -2218,7 +2244,7 @@ Public Class GisUtil
     End Sub
 
     Public Shared Sub DownstreamFlowLength(ByVal aFlowDirGridFileName As String, ByVal aFlowAccGridFileName As String, ByVal aLenGridFileName As String, _
-                                           Optional ByVal aStreamGridFileName As String = "")
+                                           Optional ByVal aStreamGridFileName As String = "", Optional ByVal aWeightingFactorGridName As String = "")
         'new sub to compute downstream flow length, not available directly in mapwindow
         '  if stream grid is nothing, compute distances to watershed outlet.
         '  if stream grid provided, compute distances to nearest stream.
@@ -2227,7 +2253,7 @@ Public Class GisUtil
         If FileExists(aLenGridFileName) Then
             IO.File.Delete(aLenGridFileName)
         End If
-        IO.File.Copy(aFlowDirGridFileName, aLenGridFileName)
+        IO.File.Copy(aFlowAccGridFileName, aLenGridFileName)
 
         Dim lOutputGrid As New MapWinGIS.Grid
         lOutputGrid.Open(aLenGridFileName)
@@ -2281,8 +2307,25 @@ Public Class GisUtil
             Dim lStreamGrid As New MapWinGIS.Grid
             lStreamGrid.Open(aStreamGridFileName)
 
+            Dim lWeightingFactorGrid As New MapWinGIS.Grid
+            If aWeightingFactorGridName.Length > 0 Then
+                lWeightingFactorGrid.Open(aWeightingFactorGridName)
+            Else
+                lWeightingFactorGrid = Nothing
+            End If
+
             lEndRow = lStreamGrid.Header.NumberRows - 1
             lEndCol = lStreamGrid.Header.NumberCols - 1
+
+            'try this -- set flow directions to zero at stream cells 
+            For lRow As Integer = lStartRow To lEndRow
+                For lCol As Integer = lStartCol To lEndCol
+                    lTempVal = lStreamGrid.Value(lCol, lRow)
+                    If lTempVal > 0 Then
+                        lFlowDirGrid.Value(lCol, lRow) = 0.0
+                    End If
+                Next
+            Next
 
             For lRow As Integer = lStartRow To lEndRow
                 For lCol As Integer = lStartCol To lEndCol
@@ -2290,7 +2333,7 @@ Public Class GisUtil
                     If lTempVal > 0 Then
                         lOutputGrid.Value(lCol, lRow) = 0.0
                         'now call recursive routine to set surrounding cells 
-                        Downstream.CheckNeighboringCells(lFlowDirGrid, lCol, lRow, lOutputGrid)
+                        Downstream.CheckNeighboringCells(lFlowDirGrid, lCol, lRow, lOutputGrid, lWeightingFactorGrid)
                     End If
                 Next
             Next
@@ -2347,7 +2390,7 @@ Public Class GisUtil
                 lBasinVal = lZoneGrid.Value(lCol, lRow)
                 If lBasinVal > 0 Then
                     'this is a subbasin, adjust flow length at this location
-                    lOutputGrid.Value(lCol, lRow) = lOutputGrid.Value(lCol, lRow) - lSubbasinFlowLengths.ItemByKey(lBasinVal)
+                    lOutputGrid.Value(lCol, lRow) = lOutputGrid.Value(lCol, lRow) - lSubbasinFlowLengths.ItemByKey(lBasinVal) - lOutputGrid.Header.dX
                 End If
             Next
         Next
@@ -4363,13 +4406,19 @@ Public Class MappingObjectNotSetException
 End Class
 
 Friend Class Downstream
-    Friend Shared Sub CheckNeighboringCells(ByVal aFlowDirGrid As MapWinGIS.Grid, ByVal aCol As Integer, ByVal aRow As Integer, ByVal aOutputGrid As MapWinGIS.Grid)
+    Friend Shared Sub CheckNeighboringCells(ByVal aFlowDirGrid As MapWinGIS.Grid, ByVal aCol As Integer, ByVal aRow As Integer, ByVal aOutputGrid As MapWinGIS.Grid, Optional ByVal aWeightingFactorGrid As MapWinGIS.Grid = Nothing)
         'used in DownstreamFlowLength, accumulates distances to outlet recursively 
 
         'figure out the distances x and y
         Dim lX As Double = aOutputGrid.Header.dX
         Dim lY As Double = aOutputGrid.Header.dY
         Dim lDiag As Double = Math.Sqrt((lX ^ 2) + (lY ^ 2))
+
+        If Not aWeightingFactorGrid Is Nothing Then
+            lX = lX * aWeightingFactorGrid.Value(aCol, aRow)
+            lY = lY * aWeightingFactorGrid.Value(aCol, aRow)
+            lDiag = lDiag * aWeightingFactorGrid.Value(aCol, aRow)
+        End If
 
         'this is the assumed flow dir coding from taudem:
         '4 3 2
@@ -4406,7 +4455,7 @@ Friend Class Downstream
                 'If aOutputGrid.Value(aCol, aRow) < 0 Then
                 '    'Logger.Dbg("negative value for output grid")
                 'End If
-                CheckNeighboringCells(aFlowDirGrid, aCol - 1, aRow - 1, aOutputGrid)
+                CheckNeighboringCells(aFlowDirGrid, aCol - 1, aRow - 1, aOutputGrid, aWeightingFactorGrid)
             End If
         End If
 
@@ -4417,7 +4466,7 @@ Friend Class Downstream
                 'If aOutputGrid.Value(aCol, aRow) < 0 Then
                 '    'Logger.Dbg("negative value for output grid")
                 'End If
-                CheckNeighboringCells(aFlowDirGrid, aCol, aRow - 1, aOutputGrid)
+                CheckNeighboringCells(aFlowDirGrid, aCol, aRow - 1, aOutputGrid, aWeightingFactorGrid)
             End If
         End If
 
@@ -4428,7 +4477,7 @@ Friend Class Downstream
                 'If aOutputGrid.Value(aCol, aRow) < 0 Then
                 '    'Logger.Dbg("negative value for output grid")
                 'End If
-                CheckNeighboringCells(aFlowDirGrid, aCol + 1, aRow - 1, aOutputGrid)
+                CheckNeighboringCells(aFlowDirGrid, aCol + 1, aRow - 1, aOutputGrid, aWeightingFactorGrid)
             End If
         End If
 
@@ -4439,7 +4488,7 @@ Friend Class Downstream
                 'If aOutputGrid.Value(aCol, aRow) < 0 Then
                 '    'Logger.Dbg("negative value for output grid")
                 'End If
-                CheckNeighboringCells(aFlowDirGrid, aCol - 1, aRow, aOutputGrid)
+                CheckNeighboringCells(aFlowDirGrid, aCol - 1, aRow, aOutputGrid, aWeightingFactorGrid)
             End If
         End If
 
@@ -4450,7 +4499,7 @@ Friend Class Downstream
                 'If aOutputGrid.Value(aCol, aRow) < 0 Then
                 '    'Logger.Dbg("negative value for output grid")
                 'End If
-                CheckNeighboringCells(aFlowDirGrid, aCol + 1, aRow, aOutputGrid)
+                CheckNeighboringCells(aFlowDirGrid, aCol + 1, aRow, aOutputGrid, aWeightingFactorGrid)
             End If
         End If
 
@@ -4461,7 +4510,7 @@ Friend Class Downstream
                 'If aOutputGrid.Value(aCol, aRow) < 0 Then
                 '    'Logger.Dbg("negative value for output grid")
                 'End If
-                CheckNeighboringCells(aFlowDirGrid, aCol - 1, aRow + 1, aOutputGrid)
+                CheckNeighboringCells(aFlowDirGrid, aCol - 1, aRow + 1, aOutputGrid, aWeightingFactorGrid)
             End If
         End If
 
@@ -4472,7 +4521,7 @@ Friend Class Downstream
                 'If aOutputGrid.Value(aCol, aRow) < 0 Then
                 '    'Logger.Dbg("negative value for output grid")
                 'End If
-                CheckNeighboringCells(aFlowDirGrid, aCol, aRow + 1, aOutputGrid)
+                CheckNeighboringCells(aFlowDirGrid, aCol, aRow + 1, aOutputGrid, aWeightingFactorGrid)
             End If
         End If
 
@@ -4483,7 +4532,7 @@ Friend Class Downstream
                 'If aOutputGrid.Value(aCol, aRow) < 0 Then
                 '    'Logger.Dbg("negative value for output grid")
                 'End If
-                CheckNeighboringCells(aFlowDirGrid, aCol + 1, aRow + 1, aOutputGrid)
+                CheckNeighboringCells(aFlowDirGrid, aCol + 1, aRow + 1, aOutputGrid, aWeightingFactorGrid)
             End If
         End If
 
