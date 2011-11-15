@@ -1412,13 +1412,13 @@ Public Class clsRecess
 
     '--------- THIS SUBROUTINE MAKES TABULAR OUTPUT OF RECESSION DATA: -----
     Public Shared Function TableRecess(ByVal aQLog() As Double, _
-                            ByVal aFlow() As Double, _
-                            ByVal aDates() As Double, _
-                            ByVal aiPeak As Integer, _
-                            ByVal aiMin As Integer, _
-                            ByVal aiMax As Integer, _
-                            ByVal aPickStartingDay As Integer, _
-                            ByVal aiDisplayLastDay As Integer) As String
+                                       ByVal aFlow() As Double, _
+                                       ByVal aDates() As Double, _
+                                       ByVal aiPeak As Integer, _
+                                       ByVal aiMin As Integer, _
+                                       ByVal aiMax As Integer, _
+                                       ByVal aPickStartingDay As Integer, _
+                                       ByVal aiDisplayLastDay As Integer) As String
 
         'Logger.Dbg("ENTER STARTING DAY (1, 11, OR 21)") 'originally dynamically read in
         Dim liStart As Integer = aPickStartingDay
@@ -1471,16 +1471,16 @@ Public Class clsRecess
 
     '------ THIS SUBROUTINE MAKES GRAPHICAL OUTPUT OF RECESSION DATA: ----
     Public Shared Function GraphRecess(ByVal aQLog() As Double, _
-                            ByVal aFlow() As Double, _
-                            ByVal aDates() As Double, _
-                            ByVal aiPeak As Integer, _
-                            ByVal aiMin As Integer, _
-                            ByVal aiMax As Integer, _
-                            ByVal aXLogQMin As Double, _
-                            ByVal aXLogQMax As Double, _
-                            ByVal aPickStartingDay As Integer, _
-                            ByVal aPickInterval As Integer, _
-                            ByVal aiDisplayLastDay As Integer) As String
+                                       ByVal aFlow() As Double, _
+                                       ByVal aDates() As Double, _
+                                       ByVal aiPeak As Integer, _
+                                       ByVal aiMin As Integer, _
+                                       ByVal aiMax As Integer, _
+                                       ByVal aXLogQMin As Double, _
+                                       ByVal aXLogQMax As Double, _
+                                       ByVal aPickStartingDay As Integer, _
+                                       ByVal aPickInterval As Integer, _
+                                       ByVal aiDisplayLastDay As Integer) As String
 
         Dim liStart As Integer = aPickStartingDay
         Dim linterval As Integer = aPickInterval
@@ -1641,18 +1641,20 @@ Public Class clsRecess
         Next
     End Sub
 
-    '  INPUT IS 3 LISTS OF NUMBERS. ALL LISTS (LIST1,LIST2,AND LIST3) HAVE
-    '  M NUMBERS. OUTPUT IS SAME, IN ASCENDING ORDER, SORTED BY VALUES
-    '  IN LIST1. NOTE: LIST3 IS MADE UP OF INTEGERS.
+    '  INPUT IS 3 LISTS OF NUMBERS. ALL LISTS are the same length
+    '  OUTPUT IS SAME, IN ASCENDING ORDER, SORTED BY VALUES IN LIST1.
     'LIST1 e.g XMean
     'LIST2 e.g Coefficient1
     'LIST3 e.g Original ordinal number of each segment
-    Private Sub Order(ByVal aNumOfRecessPeriods As Integer, ByRef aList1() As Double, Optional ByRef aList2() As Double = Nothing, Optional ByRef aList3() As Integer = Nothing)
-        Dim lSwaped As String = "YES"
+    Private Sub Order(ByVal aNumOfRecessPeriods As Integer, _
+                      ByRef aList1() As Double, _
+             Optional ByRef aList2() As Double = Nothing, _
+             Optional ByRef aList3() As Integer = Nothing)
+        Dim lSwapped As Boolean
         Dim lPasses As Integer = 0
         Dim lTempValue As Double
         While True
-            lSwaped = "NO"
+            lSwapped = False
             lPasses += 1
             Dim I As Integer = 1
             While True
@@ -1673,7 +1675,7 @@ Public Class clsRecess
                         aList3(I) = lTempValue
                     End If
 
-                    lSwaped = "YES"
+                    lSwapped = True
                 End If
                 I += 1
                 If I <= aNumOfRecessPeriods - lPasses Then
@@ -1682,15 +1684,11 @@ Public Class clsRecess
                     Exit While
                 End If
             End While
-            If lSwaped = "YES" Then
+            If lSwapped Then
                 Continue While
             Else
                 Exit While
             End If
         End While
     End Sub
-
-    Public Shared Function MRCConstruct() As clsMRC
-
-    End Function
 End Class
