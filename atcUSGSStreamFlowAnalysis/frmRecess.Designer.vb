@@ -116,7 +116,7 @@ Partial Class frmRecess
         Me.chkSaveInterimToFile.Location = New System.Drawing.Point(8, 213)
         Me.chkSaveInterimToFile.Name = "chkSaveInterimToFile"
         Me.chkSaveInterimToFile.Size = New System.Drawing.Size(150, 17)
-        Me.chkSaveInterimToFile.TabIndex = 47
+        Me.chkSaveInterimToFile.TabIndex = 11
         Me.chkSaveInterimToFile.Text = "Save Intermediate Results"
         Me.chkSaveInterimToFile.UseVisualStyleBackColor = True
         '
@@ -199,7 +199,7 @@ Partial Class frmRecess
         Me.txtOutputDir.Location = New System.Drawing.Point(6, 187)
         Me.txtOutputDir.Name = "txtOutputDir"
         Me.txtOutputDir.Size = New System.Drawing.Size(581, 20)
-        Me.txtOutputDir.TabIndex = 41
+        Me.txtOutputDir.TabIndex = 10
         '
         'lblOutpuDir
         '
@@ -215,7 +215,7 @@ Partial Class frmRecess
         Me.txtMinRecessionDays.Location = New System.Drawing.Point(235, 141)
         Me.txtMinRecessionDays.Name = "txtMinRecessionDays"
         Me.txtMinRecessionDays.Size = New System.Drawing.Size(72, 20)
-        Me.txtMinRecessionDays.TabIndex = 40
+        Me.txtMinRecessionDays.TabIndex = 9
         '
         'lblRecessionDays
         '
@@ -401,12 +401,12 @@ Partial Class frmRecess
         '
         Me.lstRecessSegments.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.lstRecessSegments.Font = New System.Drawing.Font("Consolas", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lstRecessSegments.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lstRecessSegments.FormattingEnabled = True
         Me.lstRecessSegments.Location = New System.Drawing.Point(7, 65)
         Me.lstRecessSegments.Name = "lstRecessSegments"
         Me.lstRecessSegments.Size = New System.Drawing.Size(100, 304)
-        Me.lstRecessSegments.TabIndex = 40
+        Me.lstRecessSegments.TabIndex = 13
         '
         'scDisplay
         '
@@ -433,14 +433,14 @@ Partial Class frmRecess
         '
         Me.txtAnalysisResults.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txtAnalysisResults.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.txtAnalysisResults.Font = New System.Drawing.Font("Consolas", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txtAnalysisResults.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtAnalysisResults.Location = New System.Drawing.Point(0, 0)
         Me.txtAnalysisResults.Multiline = True
         Me.txtAnalysisResults.Name = "txtAnalysisResults"
         Me.txtAnalysisResults.ReadOnly = True
         Me.txtAnalysisResults.ScrollBars = System.Windows.Forms.ScrollBars.Both
         Me.txtAnalysisResults.Size = New System.Drawing.Size(250, 303)
-        Me.txtAnalysisResults.TabIndex = 1
+        Me.txtAnalysisResults.TabIndex = 15
         Me.txtAnalysisResults.Visible = False
         Me.txtAnalysisResults.WordWrap = False
         '
@@ -474,7 +474,7 @@ Partial Class frmRecess
         Me.btnCurv.Location = New System.Drawing.Point(477, 19)
         Me.btnCurv.Name = "btnCurv"
         Me.btnCurv.Size = New System.Drawing.Size(75, 23)
-        Me.btnCurv.TabIndex = 18
+        Me.btnCurv.TabIndex = 17
         Me.btnCurv.Text = "View MRC"
         Me.btnCurv.UseVisualStyleBackColor = True
         '
@@ -483,7 +483,7 @@ Partial Class frmRecess
         Me.btnSummary.Location = New System.Drawing.Point(396, 19)
         Me.btnSummary.Name = "btnSummary"
         Me.btnSummary.Size = New System.Drawing.Size(75, 23)
-        Me.btnSummary.TabIndex = 17
+        Me.btnSummary.TabIndex = 16
         Me.btnSummary.Text = "Summary"
         Me.btnSummary.UseVisualStyleBackColor = True
         '
@@ -492,7 +492,7 @@ Partial Class frmRecess
         Me.btnAnalyse.Location = New System.Drawing.Point(315, 19)
         Me.btnAnalyse.Name = "btnAnalyse"
         Me.btnAnalyse.Size = New System.Drawing.Size(75, 23)
-        Me.btnAnalyse.TabIndex = 16
+        Me.btnAnalyse.TabIndex = 14
         Me.btnAnalyse.Text = "Analyse"
         Me.btnAnalyse.UseVisualStyleBackColor = True
         '
