@@ -230,6 +230,7 @@ Public Class frmGraphEditor
                     If Double.TryParse(txtProbabilityDeviations.Text, lTemp) Then
                         lProbScale.standardDeviations = lTemp
                     End If
+                    lProbScale.Exceedance = chkProbabilityExceedance.Checked
                 End If
                 If Double.TryParse(txtAxisDisplayMinimum.Text, lTemp) Then
                     .Scale.MinAuto = False
@@ -462,7 +463,7 @@ Public Class frmGraphEditor
     Private Sub radioGeneral_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles _
             radioAxisLinear.CheckedChanged, radioAxisLogarithmic.CheckedChanged, _
             radioCurveYaxisLeft.CheckedChanged, radioCurveYaxisRight.CheckedChanged, radioCurveYaxisAuxiliary.CheckedChanged, _
-            radioProbablilityFraction.CheckedChanged, radioProbablilityPercent.CheckedChanged, radioProbablilityReturnPeriod.CheckedChanged
+            radioProbablilityFraction.CheckedChanged, radioProbablilityPercent.CheckedChanged, radioProbablilityReturnPeriod.CheckedChanged, chkProbabilityExceedance.CheckedChanged
 
         If chkAutoApply.Checked Then
             Dim lRadio As RadioButton = sender

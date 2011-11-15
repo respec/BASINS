@@ -53,7 +53,7 @@ Partial Class frmGraphEditor
         Me.chkAxisMinorGridVisible = New System.Windows.Forms.CheckBox
         Me.btnApply = New System.Windows.Forms.Button
         Me.chkAxisMajorGridVisible = New System.Windows.Forms.CheckBox
-        Me.label2 = New System.Windows.Forms.Label
+        Me.lblZoomTo = New System.Windows.Forms.Label
         Me.lblAxisLabel = New System.Windows.Forms.Label
         Me.lblAxisType = New System.Windows.Forms.Label
         Me.txtAxisLabel = New System.Windows.Forms.TextBox
@@ -111,6 +111,7 @@ Partial Class frmGraphEditor
         Me.btnTextAdd = New System.Windows.Forms.Button
         Me.txtText = New System.Windows.Forms.TextBox
         Me.chkAutoApply = New System.Windows.Forms.CheckBox
+        Me.chkProbabilityExceedance = New System.Windows.Forms.CheckBox
         Me.tabsCategory.SuspendLayout()
         Me.tabAxes.SuspendLayout()
         Me.panelProbability.SuspendLayout()
@@ -183,7 +184,7 @@ Partial Class frmGraphEditor
         Me.comboWhichCurve.FormattingEnabled = True
         Me.comboWhichCurve.Location = New System.Drawing.Point(81, 9)
         Me.comboWhichCurve.Name = "comboWhichCurve"
-        Me.comboWhichCurve.Size = New System.Drawing.Size(376, 21)
+        Me.comboWhichCurve.Size = New System.Drawing.Size(398, 21)
         Me.comboWhichCurve.TabIndex = 0
         Me.toolTip1.SetToolTip(Me.comboWhichCurve, "Select which curve to edit")
         '
@@ -256,7 +257,7 @@ Partial Class frmGraphEditor
         Me.comboWhichText.FormattingEnabled = True
         Me.comboWhichText.Location = New System.Drawing.Point(81, 9)
         Me.comboWhichText.Name = "comboWhichText"
-        Me.comboWhichText.Size = New System.Drawing.Size(376, 21)
+        Me.comboWhichText.Size = New System.Drawing.Size(398, 21)
         Me.comboWhichText.TabIndex = 12
         Me.toolTip1.SetToolTip(Me.comboWhichText, "Select which curve to edit")
         '
@@ -264,7 +265,7 @@ Partial Class frmGraphEditor
         '
         Me.txtLegendFontColor.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtLegendFontColor.BackColor = System.Drawing.Color.LightGray
-        Me.txtLegendFontColor.Location = New System.Drawing.Point(221, 158)
+        Me.txtLegendFontColor.Location = New System.Drawing.Point(243, 158)
         Me.txtLegendFontColor.Name = "txtLegendFontColor"
         Me.txtLegendFontColor.Size = New System.Drawing.Size(74, 20)
         Me.txtLegendFontColor.TabIndex = 55
@@ -274,7 +275,7 @@ Partial Class frmGraphEditor
         '
         Me.txtTextColor.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtTextColor.BackColor = System.Drawing.Color.Black
-        Me.txtTextColor.Location = New System.Drawing.Point(221, 158)
+        Me.txtTextColor.Location = New System.Drawing.Point(243, 158)
         Me.txtTextColor.Name = "txtTextColor"
         Me.txtTextColor.Size = New System.Drawing.Size(74, 20)
         Me.txtTextColor.TabIndex = 15
@@ -283,7 +284,7 @@ Partial Class frmGraphEditor
         'btnTextFont
         '
         Me.btnTextFont.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnTextFont.Location = New System.Drawing.Point(140, 156)
+        Me.btnTextFont.Location = New System.Drawing.Point(162, 156)
         Me.btnTextFont.Name = "btnTextFont"
         Me.btnTextFont.Size = New System.Drawing.Size(75, 23)
         Me.btnTextFont.TabIndex = 14
@@ -295,26 +296,26 @@ Partial Class frmGraphEditor
         '
         Me.txtProbabilityDeviations.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtProbabilityDeviations.Location = New System.Drawing.Point(328, 4)
+        Me.txtProbabilityDeviations.Location = New System.Drawing.Point(362, 2)
         Me.txtProbabilityDeviations.Name = "txtProbabilityDeviations"
-        Me.txtProbabilityDeviations.Size = New System.Drawing.Size(48, 20)
+        Me.txtProbabilityDeviations.Size = New System.Drawing.Size(25, 20)
         Me.txtProbabilityDeviations.TabIndex = 41
         Me.toolTip1.SetToolTip(Me.txtProbabilityDeviations, "Minimum value currently displayed on this axis")
         '
         'lblProbabilityDeviations
         '
         Me.lblProbabilityDeviations.AutoSize = True
-        Me.lblProbabilityDeviations.Location = New System.Drawing.Point(246, 7)
+        Me.lblProbabilityDeviations.Location = New System.Drawing.Point(305, 6)
         Me.lblProbabilityDeviations.Name = "lblProbabilityDeviations"
-        Me.lblProbabilityDeviations.Size = New System.Drawing.Size(76, 13)
+        Me.lblProbabilityDeviations.Size = New System.Drawing.Size(51, 13)
         Me.lblProbabilityDeviations.TabIndex = 21
-        Me.lblProbabilityDeviations.Text = "Std Deviations"
+        Me.lblProbabilityDeviations.Text = "Std Devs"
         Me.toolTip1.SetToolTip(Me.lblProbabilityDeviations, "Range of data currently displayed")
         '
         'btnAxisFont
         '
         Me.btnAxisFont.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnAxisFont.Location = New System.Drawing.Point(389, 62)
+        Me.btnAxisFont.Location = New System.Drawing.Point(400, 62)
         Me.btnAxisFont.Name = "btnAxisFont"
         Me.btnAxisFont.Size = New System.Drawing.Size(68, 20)
         Me.btnAxisFont.TabIndex = 43
@@ -325,7 +326,7 @@ Partial Class frmGraphEditor
         'btnScaleFont
         '
         Me.btnScaleFont.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnScaleFont.Location = New System.Drawing.Point(298, 130)
+        Me.btnScaleFont.Location = New System.Drawing.Point(309, 130)
         Me.btnScaleFont.Name = "btnScaleFont"
         Me.btnScaleFont.Size = New System.Drawing.Size(68, 20)
         Me.btnScaleFont.TabIndex = 52
@@ -367,7 +368,7 @@ Partial Class frmGraphEditor
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtCurveLabel.Location = New System.Drawing.Point(81, 36)
         Me.txtCurveLabel.Name = "txtCurveLabel"
-        Me.txtCurveLabel.Size = New System.Drawing.Size(376, 20)
+        Me.txtCurveLabel.Size = New System.Drawing.Size(398, 20)
         Me.txtCurveLabel.TabIndex = 16
         '
         'lblCurveLabel
@@ -410,7 +411,7 @@ Partial Class frmGraphEditor
         'btnApply
         '
         Me.btnApply.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnApply.Location = New System.Drawing.Point(405, 236)
+        Me.btnApply.Location = New System.Drawing.Point(416, 236)
         Me.btnApply.Name = "btnApply"
         Me.btnApply.Size = New System.Drawing.Size(75, 23)
         Me.btnApply.TabIndex = 60
@@ -427,14 +428,14 @@ Partial Class frmGraphEditor
         Me.chkAxisMajorGridVisible.Text = "grid"
         Me.chkAxisMajorGridVisible.UseVisualStyleBackColor = True
         '
-        'label2
+        'lblZoomTo
         '
-        Me.label2.AutoSize = True
-        Me.label2.Location = New System.Drawing.Point(179, 109)
-        Me.label2.Name = "label2"
-        Me.label2.Size = New System.Drawing.Size(16, 13)
-        Me.label2.TabIndex = 22
-        Me.label2.Text = "to"
+        Me.lblZoomTo.AutoSize = True
+        Me.lblZoomTo.Location = New System.Drawing.Point(179, 109)
+        Me.lblZoomTo.Name = "lblZoomTo"
+        Me.lblZoomTo.Size = New System.Drawing.Size(16, 13)
+        Me.lblZoomTo.TabIndex = 22
+        Me.lblZoomTo.Text = "to"
         '
         'lblAxisLabel
         '
@@ -460,7 +461,7 @@ Partial Class frmGraphEditor
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtAxisLabel.Location = New System.Drawing.Point(81, 62)
         Me.txtAxisLabel.Name = "txtAxisLabel"
-        Me.txtAxisLabel.Size = New System.Drawing.Size(302, 20)
+        Me.txtAxisLabel.Size = New System.Drawing.Size(313, 20)
         Me.txtAxisLabel.TabIndex = 42
         '
         'lblWhichAxis
@@ -493,11 +494,12 @@ Partial Class frmGraphEditor
         Me.tabsCategory.Location = New System.Drawing.Point(12, 12)
         Me.tabsCategory.Name = "tabsCategory"
         Me.tabsCategory.SelectedIndex = 0
-        Me.tabsCategory.Size = New System.Drawing.Size(468, 212)
+        Me.tabsCategory.Size = New System.Drawing.Size(479, 212)
         Me.tabsCategory.TabIndex = 11
         '
         'tabAxes
         '
+        Me.tabAxes.Controls.Add(Me.panelProbability)
         Me.tabAxes.Controls.Add(Me.btnScaleFont)
         Me.tabAxes.Controls.Add(Me.btnAxisFont)
         Me.tabAxes.Controls.Add(Me.chkRangeReverse)
@@ -519,18 +521,17 @@ Partial Class frmGraphEditor
         Me.tabAxes.Controls.Add(Me.lblAxisDataRange)
         Me.tabAxes.Controls.Add(Me.chkAxisMajorGridVisible)
         Me.tabAxes.Controls.Add(Me.txtAxisMinimum)
-        Me.tabAxes.Controls.Add(Me.label2)
+        Me.tabAxes.Controls.Add(Me.lblZoomTo)
         Me.tabAxes.Controls.Add(Me.txtAxisMaximum)
         Me.tabAxes.Controls.Add(Me.txtAxisDisplayMaximum)
         Me.tabAxes.Controls.Add(Me.lblAxisTo)
         Me.tabAxes.Controls.Add(Me.txtAxisDisplayMinimum)
         Me.tabAxes.Controls.Add(Me.lblAxisRange)
-        Me.tabAxes.Controls.Add(Me.panelProbability)
         Me.tabAxes.Controls.Add(Me.panelAxisType)
         Me.tabAxes.Location = New System.Drawing.Point(4, 22)
         Me.tabAxes.Name = "tabAxes"
         Me.tabAxes.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabAxes.Size = New System.Drawing.Size(460, 186)
+        Me.tabAxes.Size = New System.Drawing.Size(471, 186)
         Me.tabAxes.TabIndex = 0
         Me.tabAxes.Text = "Axes"
         Me.tabAxes.UseVisualStyleBackColor = True
@@ -548,7 +549,7 @@ Partial Class frmGraphEditor
         'radioAxisAux
         '
         Me.radioAxisAux.AutoSize = True
-        Me.radioAxisAux.Location = New System.Drawing.Point(300, 10)
+        Me.radioAxisAux.Location = New System.Drawing.Point(309, 10)
         Me.radioAxisAux.Name = "radioAxisAux"
         Me.radioAxisAux.Size = New System.Drawing.Size(73, 17)
         Me.radioAxisAux.TabIndex = 37
@@ -611,6 +612,7 @@ Partial Class frmGraphEditor
         '
         Me.panelProbability.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.panelProbability.Controls.Add(Me.chkProbabilityExceedance)
         Me.panelProbability.Controls.Add(Me.txtProbabilityDeviations)
         Me.panelProbability.Controls.Add(Me.lblProbabilityDeviations)
         Me.panelProbability.Controls.Add(Me.radioProbablilityReturnPeriod)
@@ -618,7 +620,7 @@ Partial Class frmGraphEditor
         Me.panelProbability.Controls.Add(Me.radioProbablilityPercent)
         Me.panelProbability.Location = New System.Drawing.Point(74, 32)
         Me.panelProbability.Name = "panelProbability"
-        Me.panelProbability.Size = New System.Drawing.Size(379, 28)
+        Me.panelProbability.Size = New System.Drawing.Size(390, 28)
         Me.panelProbability.TabIndex = 39
         Me.panelProbability.Visible = False
         '
@@ -627,10 +629,10 @@ Partial Class frmGraphEditor
         Me.radioProbablilityReturnPeriod.AutoSize = True
         Me.radioProbablilityReturnPeriod.Location = New System.Drawing.Point(150, 5)
         Me.radioProbablilityReturnPeriod.Name = "radioProbablilityReturnPeriod"
-        Me.radioProbablilityReturnPeriod.Size = New System.Drawing.Size(90, 17)
+        Me.radioProbablilityReturnPeriod.Size = New System.Drawing.Size(57, 17)
         Me.radioProbablilityReturnPeriod.TabIndex = 40
         Me.radioProbablilityReturnPeriod.TabStop = True
-        Me.radioProbablilityReturnPeriod.Text = "Return Period"
+        Me.radioProbablilityReturnPeriod.Text = "Return"
         Me.radioProbablilityReturnPeriod.UseVisualStyleBackColor = True
         '
         'radioProbablilityFraction
@@ -665,14 +667,14 @@ Partial Class frmGraphEditor
         Me.panelAxisType.Controls.Add(Me.radioAxisTime)
         Me.panelAxisType.Location = New System.Drawing.Point(74, 32)
         Me.panelAxisType.Name = "panelAxisType"
-        Me.panelAxisType.Size = New System.Drawing.Size(379, 28)
+        Me.panelAxisType.Size = New System.Drawing.Size(390, 28)
         Me.panelAxisType.TabIndex = 38
         '
         'radioAxisProbability
         '
         Me.radioAxisProbability.AutoSize = True
         Me.radioAxisProbability.Enabled = False
-        Me.radioAxisProbability.Location = New System.Drawing.Point(226, 5)
+        Me.radioAxisProbability.Location = New System.Drawing.Point(235, 5)
         Me.radioAxisProbability.Name = "radioAxisProbability"
         Me.radioAxisProbability.Size = New System.Drawing.Size(73, 17)
         Me.radioAxisProbability.TabIndex = 3
@@ -684,7 +686,7 @@ Partial Class frmGraphEditor
         '
         Me.radioAxisLogarithmic.AutoSize = True
         Me.radioAxisLogarithmic.Enabled = False
-        Me.radioAxisLogarithmic.Location = New System.Drawing.Point(141, 5)
+        Me.radioAxisLogarithmic.Location = New System.Drawing.Point(150, 5)
         Me.radioAxisLogarithmic.Name = "radioAxisLogarithmic"
         Me.radioAxisLogarithmic.Size = New System.Drawing.Size(79, 17)
         Me.radioAxisLogarithmic.TabIndex = 2
@@ -741,7 +743,7 @@ Partial Class frmGraphEditor
         Me.tabCurves.Location = New System.Drawing.Point(4, 22)
         Me.tabCurves.Name = "tabCurves"
         Me.tabCurves.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabCurves.Size = New System.Drawing.Size(460, 186)
+        Me.tabCurves.Size = New System.Drawing.Size(482, 186)
         Me.tabCurves.TabIndex = 1
         Me.tabCurves.Text = "Curves"
         Me.tabCurves.UseVisualStyleBackColor = True
@@ -849,7 +851,7 @@ Partial Class frmGraphEditor
         Me.tabLines.Controls.Add(Me.grpLineEquation)
         Me.tabLines.Location = New System.Drawing.Point(4, 22)
         Me.tabLines.Name = "tabLines"
-        Me.tabLines.Size = New System.Drawing.Size(460, 186)
+        Me.tabLines.Size = New System.Drawing.Size(482, 186)
         Me.tabLines.TabIndex = 2
         Me.tabLines.Text = "Lines"
         Me.tabLines.UseVisualStyleBackColor = True
@@ -982,7 +984,7 @@ Partial Class frmGraphEditor
         Me.tabLegend.Controls.Add(Me.txtLegendFontColor)
         Me.tabLegend.Location = New System.Drawing.Point(4, 22)
         Me.tabLegend.Name = "tabLegend"
-        Me.tabLegend.Size = New System.Drawing.Size(460, 186)
+        Me.tabLegend.Size = New System.Drawing.Size(482, 186)
         Me.tabLegend.TabIndex = 4
         Me.tabLegend.Text = "Legend"
         Me.tabLegend.UseVisualStyleBackColor = True
@@ -1009,7 +1011,7 @@ Partial Class frmGraphEditor
         'btnLegendFont
         '
         Me.btnLegendFont.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnLegendFont.Location = New System.Drawing.Point(140, 156)
+        Me.btnLegendFont.Location = New System.Drawing.Point(162, 156)
         Me.btnLegendFont.Name = "btnLegendFont"
         Me.btnLegendFont.Size = New System.Drawing.Size(75, 23)
         Me.btnLegendFont.TabIndex = 53
@@ -1027,7 +1029,7 @@ Partial Class frmGraphEditor
         Me.tabText.Controls.Add(Me.txtText)
         Me.tabText.Location = New System.Drawing.Point(4, 22)
         Me.tabText.Name = "tabText"
-        Me.tabText.Size = New System.Drawing.Size(460, 186)
+        Me.tabText.Size = New System.Drawing.Size(482, 186)
         Me.tabText.TabIndex = 3
         Me.tabText.Text = "Text"
         Me.tabText.UseVisualStyleBackColor = True
@@ -1045,7 +1047,7 @@ Partial Class frmGraphEditor
         'btnTextRemove
         '
         Me.btnTextRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnTextRemove.Location = New System.Drawing.Point(301, 156)
+        Me.btnTextRemove.Location = New System.Drawing.Point(323, 156)
         Me.btnTextRemove.Name = "btnTextRemove"
         Me.btnTextRemove.Size = New System.Drawing.Size(75, 23)
         Me.btnTextRemove.TabIndex = 16
@@ -1055,7 +1057,7 @@ Partial Class frmGraphEditor
         'btnTextAdd
         '
         Me.btnTextAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnTextAdd.Location = New System.Drawing.Point(382, 156)
+        Me.btnTextAdd.Location = New System.Drawing.Point(404, 156)
         Me.btnTextAdd.Name = "btnTextAdd"
         Me.btnTextAdd.Size = New System.Drawing.Size(75, 23)
         Me.btnTextAdd.TabIndex = 17
@@ -1070,26 +1072,36 @@ Partial Class frmGraphEditor
         Me.txtText.Location = New System.Drawing.Point(3, 36)
         Me.txtText.Multiline = True
         Me.txtText.Name = "txtText"
-        Me.txtText.Size = New System.Drawing.Size(454, 114)
+        Me.txtText.Size = New System.Drawing.Size(476, 114)
         Me.txtText.TabIndex = 13
         '
         'chkAutoApply
         '
         Me.chkAutoApply.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkAutoApply.AutoSize = True
-        Me.chkAutoApply.Location = New System.Drawing.Point(282, 240)
+        Me.chkAutoApply.Location = New System.Drawing.Point(293, 240)
         Me.chkAutoApply.Name = "chkAutoApply"
         Me.chkAutoApply.Size = New System.Drawing.Size(117, 17)
         Me.chkAutoApply.TabIndex = 59
         Me.chkAutoApply.Text = "Apply Automatically"
         Me.chkAutoApply.UseVisualStyleBackColor = True
         '
+        'chkProbabilityExceedance
+        '
+        Me.chkProbabilityExceedance.AutoSize = True
+        Me.chkProbabilityExceedance.Location = New System.Drawing.Point(213, 5)
+        Me.chkProbabilityExceedance.Name = "chkProbabilityExceedance"
+        Me.chkProbabilityExceedance.Size = New System.Drawing.Size(86, 17)
+        Me.chkProbabilityExceedance.TabIndex = 42
+        Me.chkProbabilityExceedance.Text = "Exceedance"
+        Me.chkProbabilityExceedance.UseVisualStyleBackColor = True
+        '
         'frmGraphEditor
         '
         Me.AcceptButton = Me.btnApply
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(492, 271)
+        Me.ClientSize = New System.Drawing.Size(503, 271)
         Me.Controls.Add(Me.chkAutoApply)
         Me.Controls.Add(Me.tabsCategory)
         Me.Controls.Add(Me.btnApply)
@@ -1142,7 +1154,7 @@ Partial Class frmGraphEditor
     Private WithEvents chkAxisMinorGridVisible As System.Windows.Forms.CheckBox
     Private WithEvents btnApply As System.Windows.Forms.Button
     Private WithEvents chkAxisMajorGridVisible As System.Windows.Forms.CheckBox
-    Private WithEvents label2 As System.Windows.Forms.Label
+    Private WithEvents lblZoomTo As System.Windows.Forms.Label
     Private WithEvents lblAxisLabel As System.Windows.Forms.Label
     Private WithEvents lblAxisType As System.Windows.Forms.Label
     Private WithEvents txtAxisLabel As System.Windows.Forms.TextBox
@@ -1209,4 +1221,5 @@ Partial Class frmGraphEditor
     Private WithEvents btnScaleFont As System.Windows.Forms.Button
     Friend WithEvents chkCurveSymbolFillVisible As System.Windows.Forms.CheckBox
     Friend WithEvents cboCurveStyle As System.Windows.Forms.ComboBox
+    Friend WithEvents chkProbabilityExceedance As System.Windows.Forms.CheckBox
 End Class

@@ -326,7 +326,7 @@ Public Class atcTimeseriesRDB
                             lData = New atcTimeseriesBuilder(Me)
                             lData.Attributes.ChangeTo(aAttributes)
                             lConstituentDescription = lConstituentDescriptions.ItemByKey(lConstituentString)
-                            lData.Attributes.SetValue("ConstituentDescription", lConstituentDescription)
+                            lData.Attributes.SetValue("Description", lConstituentDescription)
                             lData.Attributes.SetValue("ID", lRawDataSets.Count + 1)
                             Dim lParsed() As String = lConstituentDescription.Split(",")
                             Dim lConstituentName As String = ""
@@ -461,7 +461,7 @@ Public Class atcTimeseriesRDB
                                 lData.Attributes.SetValue("Count", 0)
                                 lData.Attributes.SetValue("Scenario", "OBSERVED")
                                 lData.Attributes.SetValue("Location", lLocation)
-                                lData.Attributes.SetValue("ConstituentDescription", lConstituentDescription)
+                                lData.Attributes.SetValue("Description", lConstituentDescription)
                                 lData.Attributes.SetValue("DataKey", lDataKey)
 
                                 lRawDataSets.Add(lDataKey, lData)

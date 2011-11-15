@@ -117,6 +117,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcUSGSUtility", "atcUSGSUt
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcUSGSBaseflow", "atcUSGSBaseflow\atcUSGSBaseflow.vbproj", "{9F09A31B-DE05-4FF8-8E89-867AFFE0ACE7}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcUSGSStreamFlowAnalysis", "atcUSGSStreamFlowAnalysis\atcUSGSStreamFlowAnalysis.vbproj", "{3D007252-DD48-4288-97BC-5E1657839FBB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -650,6 +652,15 @@ Global
 		{9F09A31B-DE05-4FF8-8E89-867AFFE0ACE7}.Release|x64.ActiveCfg = Release|x86
 		{9F09A31B-DE05-4FF8-8E89-867AFFE0ACE7}.Release|x86.ActiveCfg = Release|x86
 		{9F09A31B-DE05-4FF8-8E89-867AFFE0ACE7}.Release|x86.Build.0 = Release|x86
+		{3D007252-DD48-4288-97BC-5E1657839FBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D007252-DD48-4288-97BC-5E1657839FBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D007252-DD48-4288-97BC-5E1657839FBB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3D007252-DD48-4288-97BC-5E1657839FBB}.Debug|x86.ActiveCfg = Debug|x86
+		{3D007252-DD48-4288-97BC-5E1657839FBB}.Debug|x86.Build.0 = Debug|x86
+		{3D007252-DD48-4288-97BC-5E1657839FBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D007252-DD48-4288-97BC-5E1657839FBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D007252-DD48-4288-97BC-5E1657839FBB}.Release|x64.ActiveCfg = Release|Any CPU
+		{3D007252-DD48-4288-97BC-5E1657839FBB}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
