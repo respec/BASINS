@@ -128,7 +128,7 @@ Partial Class frmMRCControl
         Me.txtSeason.Location = New System.Drawing.Point(488, 131)
         Me.txtSeason.Name = "txtSeason"
         Me.txtSeason.Size = New System.Drawing.Size(20, 20)
-        Me.txtSeason.TabIndex = 32
+        Me.txtSeason.TabIndex = 11
         '
         'lblSeason
         '
@@ -144,7 +144,7 @@ Partial Class frmMRCControl
         Me.txtLogQMax.Location = New System.Drawing.Point(224, 131)
         Me.txtLogQMax.Name = "txtLogQMax"
         Me.txtLogQMax.Size = New System.Drawing.Size(60, 20)
-        Me.txtLogQMax.TabIndex = 30
+        Me.txtLogQMax.TabIndex = 7
         '
         'lblMaxLogQ
         '
@@ -160,7 +160,7 @@ Partial Class frmMRCControl
         Me.txtLogQMin.Location = New System.Drawing.Point(158, 131)
         Me.txtLogQMin.Name = "txtLogQMin"
         Me.txtLogQMin.Size = New System.Drawing.Size(60, 20)
-        Me.txtLogQMin.TabIndex = 28
+        Me.txtLogQMin.TabIndex = 6
         '
         'lblMinLogQ
         '
@@ -176,7 +176,7 @@ Partial Class frmMRCControl
         Me.txtStation.Location = New System.Drawing.Point(6, 131)
         Me.txtStation.Name = "txtStation"
         Me.txtStation.Size = New System.Drawing.Size(80, 20)
-        Me.txtStation.TabIndex = 26
+        Me.txtStation.TabIndex = 4
         '
         'lblStation
         '
@@ -194,7 +194,7 @@ Partial Class frmMRCControl
         Me.chkAutoMatching.Location = New System.Drawing.Point(532, 106)
         Me.chkAutoMatching.Name = "chkAutoMatching"
         Me.chkAutoMatching.Size = New System.Drawing.Size(94, 17)
-        Me.chkAutoMatching.TabIndex = 7
+        Me.chkAutoMatching.TabIndex = 17
         Me.chkAutoMatching.Text = "Auto matching"
         Me.chkAutoMatching.UseVisualStyleBackColor = True
         '
@@ -204,7 +204,7 @@ Partial Class frmMRCControl
         Me.btnMRCPlot.Location = New System.Drawing.Point(532, 77)
         Me.btnMRCPlot.Name = "btnMRCPlot"
         Me.btnMRCPlot.Size = New System.Drawing.Size(75, 23)
-        Me.btnMRCPlot.TabIndex = 6
+        Me.btnMRCPlot.TabIndex = 16
         Me.btnMRCPlot.Text = "Plot MRC"
         Me.btnMRCPlot.UseVisualStyleBackColor = True
         '
@@ -212,12 +212,12 @@ Partial Class frmMRCControl
         '
         Me.lstEquations.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lstEquations.Font = New System.Drawing.Font("Consolas", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lstEquations.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lstEquations.FormattingEnabled = True
         Me.lstEquations.Location = New System.Drawing.Point(6, 19)
         Me.lstEquations.Name = "lstEquations"
         Me.lstEquations.Size = New System.Drawing.Size(520, 94)
-        Me.lstEquations.TabIndex = 8
+        Me.lstEquations.TabIndex = 3
         '
         'btnMRCAdd
         '
@@ -225,7 +225,7 @@ Partial Class frmMRCControl
         Me.btnMRCAdd.Location = New System.Drawing.Point(532, 19)
         Me.btnMRCAdd.Name = "btnMRCAdd"
         Me.btnMRCAdd.Size = New System.Drawing.Size(75, 23)
-        Me.btnMRCAdd.TabIndex = 4
+        Me.btnMRCAdd.TabIndex = 14
         Me.btnMRCAdd.Text = "Add MRC"
         Me.btnMRCAdd.UseVisualStyleBackColor = True
         '
@@ -235,7 +235,7 @@ Partial Class frmMRCControl
         Me.btnMRCDelete.Location = New System.Drawing.Point(532, 48)
         Me.btnMRCDelete.Name = "btnMRCDelete"
         Me.btnMRCDelete.Size = New System.Drawing.Size(75, 23)
-        Me.btnMRCDelete.TabIndex = 5
+        Me.btnMRCDelete.TabIndex = 15
         Me.btnMRCDelete.Text = "Delete MRC"
         Me.btnMRCDelete.UseVisualStyleBackColor = True
         '
@@ -244,7 +244,7 @@ Partial Class frmMRCControl
         Me.txtDA.Location = New System.Drawing.Point(92, 131)
         Me.txtDA.Name = "txtDA"
         Me.txtDA.Size = New System.Drawing.Size(60, 20)
-        Me.txtDA.TabIndex = 0
+        Me.txtDA.TabIndex = 5
         '
         'Label1
         '
@@ -287,21 +287,21 @@ Partial Class frmMRCControl
         Me.txtCoefA.Location = New System.Drawing.Point(290, 131)
         Me.txtCoefA.Name = "txtCoefA"
         Me.txtCoefA.Size = New System.Drawing.Size(60, 20)
-        Me.txtCoefA.TabIndex = 1
+        Me.txtCoefA.TabIndex = 8
         '
         'txtCoefB
         '
         Me.txtCoefB.Location = New System.Drawing.Point(356, 131)
         Me.txtCoefB.Name = "txtCoefB"
         Me.txtCoefB.Size = New System.Drawing.Size(60, 20)
-        Me.txtCoefB.TabIndex = 2
+        Me.txtCoefB.TabIndex = 9
         '
         'txtCoefC
         '
         Me.txtCoefC.Location = New System.Drawing.Point(422, 131)
         Me.txtCoefC.Name = "txtCoefC"
         Me.txtCoefC.Size = New System.Drawing.Size(60, 20)
-        Me.txtCoefC.TabIndex = 3
+        Me.txtCoefC.TabIndex = 10
         '
         'gbDA
         '
@@ -320,12 +320,13 @@ Partial Class frmMRCControl
         '
         Me.lstStations.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lstStations.Font = New System.Drawing.Font("Consolas", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lstStations.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lstStations.FormattingEnabled = True
+        Me.lstStations.ItemHeight = 14
         Me.lstStations.Location = New System.Drawing.Point(6, 19)
         Me.lstStations.Name = "lstStations"
-        Me.lstStations.Size = New System.Drawing.Size(517, 108)
-        Me.lstStations.TabIndex = 10
+        Me.lstStations.Size = New System.Drawing.Size(517, 102)
+        Me.lstStations.TabIndex = 2
         '
         'btnStations
         '
@@ -333,7 +334,7 @@ Partial Class frmMRCControl
         Me.btnStations.Location = New System.Drawing.Point(532, 19)
         Me.btnStations.Name = "btnStations"
         Me.btnStations.Size = New System.Drawing.Size(97, 23)
-        Me.btnStations.TabIndex = 9
+        Me.btnStations.TabIndex = 13
         Me.btnStations.Text = "Browse Stations"
         Me.btnStations.UseVisualStyleBackColor = True
         '
@@ -356,7 +357,7 @@ Partial Class frmMRCControl
         Me.btnRecSum.Location = New System.Drawing.Point(529, 15)
         Me.btnRecSum.Name = "btnRecSum"
         Me.btnRecSum.Size = New System.Drawing.Size(100, 23)
-        Me.btnRecSum.TabIndex = 11
+        Me.btnRecSum.TabIndex = 12
         Me.btnRecSum.Text = "Browse RecSum"
         Me.btnRecSum.UseVisualStyleBackColor = True
         '
@@ -364,12 +365,13 @@ Partial Class frmMRCControl
         '
         Me.lstRecSum.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lstRecSum.Font = New System.Drawing.Font("Consolas", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lstRecSum.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lstRecSum.FormattingEnabled = True
+        Me.lstRecSum.ItemHeight = 14
         Me.lstRecSum.Location = New System.Drawing.Point(6, 15)
         Me.lstRecSum.Name = "lstRecSum"
-        Me.lstRecSum.Size = New System.Drawing.Size(517, 95)
-        Me.lstRecSum.TabIndex = 12
+        Me.lstRecSum.Size = New System.Drawing.Size(517, 88)
+        Me.lstRecSum.TabIndex = 1
         '
         'tabPlotMRC
         '
@@ -404,7 +406,7 @@ Partial Class frmMRCControl
         '
         Me.txtMRCTable.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txtMRCTable.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.txtMRCTable.Font = New System.Drawing.Font("Consolas", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txtMRCTable.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtMRCTable.Location = New System.Drawing.Point(0, 0)
         Me.txtMRCTable.Multiline = True
         Me.txtMRCTable.Name = "txtMRCTable"
