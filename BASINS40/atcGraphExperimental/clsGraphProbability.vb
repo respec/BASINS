@@ -6,6 +6,7 @@ Imports ZedGraph
 
 Public Class clsGraphProbability
     Inherits clsGraphBase
+    Private pExceedance As Boolean = True
 
     Private Const pNumProbabilityPoints As Integer = 200
 
@@ -13,6 +14,42 @@ Public Class clsGraphProbability
     Public Sub New(ByVal aDataGroup As atcTimeseriesGroup, ByVal aZedGraphControl As ZedGraphControl)
         MyBase.New(aDataGroup, aZedGraphControl)
     End Sub
+
+    Public Property Exceedance() As Boolean
+        Get
+            Return pExceedance
+        End Get
+        Set(ByVal value As Boolean)
+            If value <> pExceedance Then
+                pExceedance = value
+                Dim lCurves As New Generic.List(Of CurveItem)
+                lCurves.AddRange(MyBase.pZgc.MasterPane.PaneList.Item(0).CurveList)
+                If MyBase.pZgc.MasterPane.PaneList.Count > 1 Then
+                    lCurves.AddRange(MyBase.pZgc.MasterPane.PaneList.Item(1).CurveList)
+                End If
+
+                For Each lCurve As CurveItem In lCurves
+                    If lCurve.IsLine Then
+                        Dim lLine As LineItem = lCurve
+                        If Not pExceedance OrElse Not lLine.Line.IsVisible Then
+                            For lPointIndex As Integer = 0 To lCurve.NPts - 1
+                                lCurve.Points(lPointIndex).X = 1 - lCurve.Points(lPointIndex).X
+                            Next
+                        End If
+                    End If
+                Next
+
+                With pZgc.MasterPane.PaneList(0).XAxis.Title
+                    If pExceedance Then
+                        .Text = .Text.Replace(" NON-EXCEEDANCE", " EXCEEDANCE")
+                    Else
+                        .Text = .Text.Replace(" EXCEEDANCE", " NON-EXCEEDANCE")
+                    End If
+                End With
+                pZgc.Refresh()
+            End If
+        End Set
+    End Property
 
     Public Overrides Property Datasets() As atcTimeseriesGroup
         Get
@@ -115,8 +152,11 @@ Public Class clsGraphProbability
         ReDim lXFracExceed(lLastIndex)
 
         For lIndex = 0 To lLastIndex
-            'lXSd(lIndex) = Gausex(lX(lIndex) / 100)
-            lXFracExceed(lIndex) = (100 - lX(lIndex)) / 100
+            If pExceedance Then
+                lXFracExceed(lIndex) = (100 - lX(lIndex)) / 100
+            Else
+                lXFracExceed(lIndex) = lX(lIndex) / 100
+            End If
             lAttributeName = "%" & Format(lX(lIndex), "00.####")
             lY(lIndex) = aTimeseries.Attributes.GetValue(lAttributeName)
             'Logger.Dbg(lAttributeName & " = " & lY(lIndex) & _
