@@ -469,7 +469,13 @@ Public Class frmMRCControl
 
     Private Sub btnRecSum_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRecSum.Click
         Dim lNewFileRecSumFullName As String = ""
-        Dim lInitialPath As String = Path.GetDirectoryName(pFileRecSumFullName)
+        Dim lInitialPath As String = ""
+        Try
+            lInitialPath = Path.GetDirectoryName(pFileRecSumFullName)
+        Catch ex As Exception
+
+        End Try
+        If lInitialPath = "" Then lInitialPath = "C:\"
 
         Dim lOpenFileDialog As New System.Windows.Forms.OpenFileDialog()
         With lOpenFileDialog
@@ -492,7 +498,14 @@ Public Class frmMRCControl
 
     Private Sub btnStations_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStations.Click
         Dim lNewFileStationFullName As String = ""
-        Dim lInitialPath As String = Path.GetDirectoryName(pFileStationFullName)
+        Dim lInitialPath As String = ""
+        Try
+            lInitialPath = Path.GetDirectoryName(pFileStationFullName)
+        Catch ex As Exception
+
+        End Try
+        If lInitialPath = "" Then lInitialPath = "C:\"
+
         Dim lOpenFileDialog As New System.Windows.Forms.OpenFileDialog()
         With lOpenFileDialog
             .Title = "Browse For Station File"

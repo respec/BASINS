@@ -793,9 +793,9 @@ Public Class clsRecess
             Case "d"
                 RecessDisplay(RecessionSegment)
             Case "r"
-                If RecessionSegment.NeedToAnalyse Then
-                    RecessAnalyse(RecessionSegment)
-                End If
+                'If RecessionSegment.NeedToAnalyse Then
+                'End If
+                RecessAnalyse(RecessionSegment)
             Case "select"
                 RecessionSegment.IsExcluded = False
             Case "unselect"
@@ -896,7 +896,7 @@ Public Class clsRecess
             lMsg.AppendLine(" DAYS/LOG CYCLE= " & String.Format("{0:0.000000}", -1 * .Coefficient1))
             lMsg.AppendLine(" MEAN LOG Q = " & String.Format("{0:0.000000}", .MeanLogQ))
 
-            If SaveInterimResults And pHasWritePermission Then
+            If SaveInterimResults AndAlso pHasWritePermission AndAlso aSegment.NeedToAnalyse Then
                 Dim lSW As IO.StreamWriter = New IO.StreamWriter(pFileOut1, FileOut1Created)
                 Dim lDate(5) As Integer
                 lSW.WriteLine(pHeaderOutFile1)

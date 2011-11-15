@@ -447,11 +447,12 @@ Partial Class frmRecess
         'lstTable
         '
         Me.lstTable.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.lstTable.Font = New System.Drawing.Font("Consolas", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lstTable.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lstTable.FormattingEnabled = True
+        Me.lstTable.ItemHeight = 14
         Me.lstTable.Location = New System.Drawing.Point(0, 0)
         Me.lstTable.Name = "lstTable"
-        Me.lstTable.Size = New System.Drawing.Size(250, 303)
+        Me.lstTable.Size = New System.Drawing.Size(250, 298)
         Me.lstTable.TabIndex = 0
         '
         'gbToolBar
