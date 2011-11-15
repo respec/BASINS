@@ -1369,424 +1369,401 @@ Public Module modGeoSFM
         ' ***********************************************************************************************
         ' ***********************************************************************************************
 
-        '        TheProject = av.GetProject
-        '        theFileName = theProject.GetFileName
-        '        If (theFileName = nil) Then
-        '            av.Run("Project.SaveAs", nil)
-        '            theFileName = theProject.GetFileName
-        '            If (theFileName = nil) Then
-        '    exit
-        '                End
-        '            Else
-        '                If (av.Run("Project.CheckForEdits", nil).Not) Then
-        '                    Return nil
-        '                    End
-        '                    If (theProject.Save) Then
-        '                        av.ShowMsg("Project saved to '" + theFileName.GetBaseName + "'")
-        '    if (System.GetOS = #SYSTEM_OS_MAC) then
-        '                            Script.Make("MacClass.SetDocInfo(SELF, Project)").DoIt(theFileName)
-        '                            End
-        '                            End
-        '                            End
+        '  fldlist = {"Rainfall and Evaporation", "Rainfall Only", "Evaporation Only"}
+        '  fldchoice = MsgBox.ChoiceAsString(fldlist, "Select Parameter to Extract", "Extraction Parameter")
+        Dim typenum As Integer = 0
+        'If (fldchoice = "") Then
+        '    Exit Sub
+        'ElseIf (fldchoice = "Rainfall Only") Then
+        '    typenum = 1
+        'ElseIf (fldchoice = "Evaporation Only") Then
+        '    typenum = 2
+        'ElseIf (fldchoice = "Rainfall and Evaporation") Then
+        '    typenum = 3
+        'End If
 
-        '                            TheView = av.GetActiveDoc
+        'TheWkDir = TheProject.GetFileName.ReturnDir
+        'orderFNini = FileName.Merge(TheWkDir.AsString, "order.txt")
+        'If (TheWkDir.AsString.contains("\")) Then
+        '    myraindir = ((thewkdir.asstring.astokens("\").get(0)) + "\raindata\rain_year\")
+        '    myevapdir = ((thewkdir.asstring.astokens("\").get(0)) + "\evapdata\evap_year\")
+        'Else
+        '    myraindir = ((thewkdir.asstring.astokens("/").get(0)) + "/raindata/rain_year/")
+        '    myevapdir = ((thewkdir.asstring.astokens("/").get(0)) + "/evapdata/evap_year/")
+        'End If
 
-        '                            ViewChk = TheView.GetGUI
-        '                            If (ViewChk <> "View") Then
-        '                                MsgBox.error("Click on the View to make it 'active' before running this program", "Geospatial Stream Flow Model")
-        ' exit
-        '                                End
+        If (typenum = 3) Then
+            '  defaultlist = { "Basins" , TheWkDir.AsString , myraindir.AsString , myevapdir.AsString , "1999" , "1999" , "1" , "240", orderFNini.AsString }
+            '  labellist = { "Basin Grid" , "Output Directory", "Rain Data Directory" , "Evap Data Directory" , "Start Year" , "End Year" , "Start Day Number" , "End Day Number", "Computational Order File" }
 
-        '                                ThePrj = theView.GetProjection
-        '                                ' msgbox.info("My projection is "+theprj.AsString, " ")
+            '    inputlist = MsgBox.MultiInput("Enter Model Parameters", "Geospatial Stream Flow Model", labellist, defaultlist)
 
-        'fldlist = {"Rainfall and Evaporation", "Rainfall Only", "Evaporation Only"}
-        '                                fldchoice = MsgBox.ChoiceAsString(fldlist, "Select Parameter to Extract", "Extraction Parameter")
-        '                                If (fldchoice = nil) Then
-        '  exit
-        '                                ElseIf (fldchoice = "Rainfall Only") Then
-        '                                    typenum = 1
-        '                                ElseIf (fldchoice = "Evaporation Only") Then
-        '                                    typenum = 2
-        '                                ElseIf (fldchoice = "Rainfall and Evaporation") Then
-        '                                    typenum = 3
-        '                                    End
+            '    If (inputlist.isempty) Then
+            '        Exit Sub
+            '    End If
 
-        '                                    TheWkDir = TheProject.GetFileName.ReturnDir
-        '                                    orderFNini = FileName.Merge(TheWkDir.AsString, "order.txt")
-        '                                    If (TheWkDir.AsString.contains("\")) Then
-        '                                        myraindir = ((thewkdir.asstring.astokens("\").get(0)) + "\raindata\rain_year\")
-        '                                        myevapdir = ((thewkdir.asstring.astokens("\").get(0)) + "\evapdata\evap_year\")
-        '                                    Else
-        '                                        myraindir = ((thewkdir.asstring.astokens("/").get(0)) + "/raindata/rain_year/")
-        '                                        myevapdir = ((thewkdir.asstring.astokens("/").get(0)) + "/evapdata/evap_year/")
-        '                                        End
+            '    basingname = inputlist.get(0)
+            '    workdirname = inputlist.get(1)
+            '    raindirname = inputlist.get(2)
+            '    evapdirname = inputlist.get(3)
+            '    startyear = inputlist.get(4)
+            '    endyear = inputlist.get(5)
+            '    startday = inputlist.get(6)
+            '    endday = inputlist.get(7)
+            '    orderFileN = inputlist.get(8)
+        ElseIf (typenum = 2) Then
+            '  defaultlist = { "Basins" , TheWkDir.AsString , myevapdir.AsString , "1999" , "1999" , "1" , "240", orderFNini.AsString }
+            '  labellist = { "Basin Grid" , "Output Directory", "Evap Data Directory" , "Start Year" , "End Year" , "Start Day Number" , "End Day Number", "Computational Order File" }
 
-        '                                        If (typenum = 3) Then
-        '  defaultlist = { "Basins" , TheWkDir.AsString , myraindir.AsString , myevapdir.AsString , "1999" , "1999" , "1" , "240", orderFNini.AsString }
-        '  labellist = { "Basin Grid" , "Output Directory", "Rain Data Directory" , "Evap Data Directory" , "Start Year" , "End Year" , "Start Day Number" , "End Day Number", "Computational Order File" }
+            '    inputlist = MsgBox.MultiInput("Enter Model Parameters", "Geospatial Stream Flow Model", labellist, defaultlist)
 
-        '                                            inputlist = MsgBox.MultiInput("Enter Model Parameters", "Geospatial Stream Flow Model", labellist, defaultlist)
+            '    If (inputlist.isempty) Then
+            '        Exit Sub
+            '    End If
 
-        '                                            If (inputlist.isempty) Then
-        '   exit
-        '                                                End
+            '    basingname = inputlist.get(0)
+            '    workdirname = inputlist.get(1)
+            '    raindirname = inputlist.get(2)
+            '    evapdirname = inputlist.get(2)
+            '    startyear = inputlist.get(3)
+            '    endyear = inputlist.get(4)
+            '    startday = inputlist.get(5)
+            '    endday = inputlist.get(6)
+            '    orderFileN = inputlist.get(7)
+        ElseIf (typenum = 1) Then
+            '  defaultlist = { "Basins" , TheWkDir.AsString , myraindir.AsString , "1999" , "1999" , "1" , "240", orderFNini.AsString }
+            '  labellist = { "Basin Grid" , "Output Directory", "Rain Data Directory" , "Start Year" , "End Year" , "Start Day Number" , "End Day Number", "Computational Order File" }
 
-        '                                                basingname = inputlist.get(0)
-        '                                                workdirname = inputlist.get(1)
-        '                                                raindirname = inputlist.get(2)
-        '                                                evapdirname = inputlist.get(3)
-        '                                                startyear = inputlist.get(4)
-        '                                                endyear = inputlist.get(5)
-        '                                                startday = inputlist.get(6)
-        '                                                endday = inputlist.get(7)
-        '                                                orderFileN = inputlist.get(8)
-        '                                            ElseIf (typenum = 2) Then
-        '  defaultlist = { "Basins" , TheWkDir.AsString , myevapdir.AsString , "1999" , "1999" , "1" , "240", orderFNini.AsString }
-        '  labellist = { "Basin Grid" , "Output Directory", "Evap Data Directory" , "Start Year" , "End Year" , "Start Day Number" , "End Day Number", "Computational Order File" }
+            '    inputlist = MsgBox.MultiInput("Enter Model Parameters", "Geospatial Stream Flow Model", labellist, defaultlist)
 
-        '                                                inputlist = MsgBox.MultiInput("Enter Model Parameters", "Geospatial Stream Flow Model", labellist, defaultlist)
+            '    If (inputlist.isempty) Then
+            '        Exit Sub
+            '    End If
 
-        '                                                If (inputlist.isempty) Then
-        '   exit
-        '                                                    End
+            '    basingname = inputlist.get(0)
+            '    workdirname = inputlist.get(1)
+            '    raindirname = inputlist.get(2)
+            '    evapdirname = inputlist.get(2)
+            '    startyear = inputlist.get(3)
+            '    endyear = inputlist.get(4)
+            '    startday = inputlist.get(5)
+            '    endday = inputlist.get(6)
+            '    orderFileN = inputlist.get(7)
+        End If
 
-        '                                                    basingname = inputlist.get(0)
-        '                                                    workdirname = inputlist.get(1)
-        '                                                    raindirname = inputlist.get(2)
-        '                                                    evapdirname = inputlist.get(2)
-        '                                                    startyear = inputlist.get(3)
-        '                                                    endyear = inputlist.get(4)
-        '                                                    startday = inputlist.get(5)
-        '                                                    endday = inputlist.get(6)
-        '                                                    orderFileN = inputlist.get(7)
-        '                                                ElseIf (typenum = 1) Then
-        '  defaultlist = { "Basins" , TheWkDir.AsString , myraindir.AsString , "1999" , "1999" , "1" , "240", orderFNini.AsString }
-        '  labellist = { "Basin Grid" , "Output Directory", "Rain Data Directory" , "Start Year" , "End Year" , "Start Day Number" , "End Day Number", "Computational Order File" }
+        'If (startyear.IsNumber.Not) Then
+        '    MsgBox.error("Start year must be a number     eg 1999", "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'ElseIf (endyear.IsNumber.Not) Then
+        '    MsgBox.error("End year must be a number     eg 1999", "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'ElseIf (startday.IsNumber.Not) Then
+        '    MsgBox.error("Start day must be a number from 1 to 366", "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'ElseIf (endday.IsNumber.Not) Then
+        '    MsgBox.error("End day must be a number from 1 to 366", "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
-        '                                                    inputlist = MsgBox.MultiInput("Enter Model Parameters", "Geospatial Stream Flow Model", labellist, defaultlist)
+        'basingrdthm = TheView.FindTheme(basingname)
+        'If (basingrdthm = nil) Then
+        '    MsgBox.error("Basin grid theme not found in the active View", "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
-        '                                                    If (inputlist.isempty) Then
-        '   exit
-        '                                                        End
+        'If (basingrdthm.Is(GTHEME).Not) Then
+        '    MsgBox.error(Basingname + " is not a grid theme. Specify a grid theme as the basin grid.", "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
-        '                                                        basingname = inputlist.get(0)
-        '                                                        workdirname = inputlist.get(1)
-        '                                                        raindirname = inputlist.get(2)
-        '                                                        evapdirname = inputlist.get(2)
-        '                                                        startyear = inputlist.get(3)
-        '                                                        endyear = inputlist.get(4)
-        '                                                        startday = inputlist.get(5)
-        '                                                        endday = inputlist.get(6)
-        '                                                        orderFileN = inputlist.get(7)
-        '                                                        End
+        'zoneObj = basingrdthm.GetGrid
 
-        '                                                        If ((workdirname.contains("/")) And (workdirname.right(1) <> "/")) Then
-        '                                                            workdirname = workdirname + "/"
-        '                                                        ElseIf ((workdirname.contains("\")) And (workdirname.right(1) <> "\")) Then
-        '                                                            workdirname = workdirname + "\"
-        '                                                        ElseIf ((workdirname.contains("\").Not) And (workdirname.contains("\").Not) And (workdirname.right(1) <> "/")) Then
-        '                                                            workdirname = workdirname + "/"
-        '                                                            End
+        'zonetable = basingrdthm.GetVtab
+        'If (zonetable = nil) Then
+        '    MsgBox.error("Cannot open basin grid Value Attribute Table", "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
-        '                                                            If (File.Exists(workdirname.AsFileName) And (File.IsWritable(workdirname.AsFileName))) Then
-        '                                                                TheProject.SetWorkDir(workdirname.AsFileName)
-        '                                                            ElseIf (File.Exists(workdirname.AsFileName).Not) Then
-        '                                                                MsgBox.Error("Cannot read directory " + workdirname, "Directory Specification Error")
-        ' exit
-        '                                                            ElseIf (File.IsWritable(workdirname.AsFileName).Not) Then
-        '                                                                MsgBox.Error(workdirname + +"is not writable.", "Directory Specification Error")
-        ' exit
-        '                                                                End
+        'zoneField = zoneTable.FindField("Value")
+        'If (zonefield = nil) Then
+        '    MsgBox.error("Field VALUE not found in basin grid Value Attribute Table", "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
-        '                                                                If ((raindirname.contains("\").Not) And (raindirname.contains("/")) And (raindirname.right(1) <> "/")) Then
-        '                                                                    raindirname = raindirname + "/"
-        '                                                                ElseIf ((raindirname.contains("\")) And (raindirname.right(1) <> "\")) Then
-        '                                                                    raindirname = raindirname + "\"
-        '                                                                ElseIf ((raindirname.contains("\").Not) And (raindirname.contains("\").Not) And (raindirname.right(1) <> "/")) Then
-        '                                                                    raindirname = raindirname + "/"
-        '                                                                    End
-
-        '                                                                    If ((evapdirname.contains("\").Not) And (evapdirname.contains("/")) And (evapdirname.right(1) <> "/")) Then
-        '                                                                        evapdirname = evapdirname + "/"
-        '                                                                    ElseIf ((evapdirname.contains("\")) And (evapdirname.right(1) <> "\")) Then
-        '                                                                        evapdirname = evapdirname + "\"
-        '                                                                    ElseIf ((evapdirname.contains("\").Not) And (evapdirname.contains("\").Not) And (evapdirname.right(1) <> "/")) Then
-        '                                                                        evapdirname = evapdirname + "/"
-        '                                                                        End
-
-        '                                                                        If (startyear.IsNumber.Not) Then
-        '                                                                            MsgBox.error("Start year must be a number     eg 1999", "Geospatial Stream Flow Model")
-        ' exit
-        '                                                                        ElseIf (endyear.IsNumber.Not) Then
-        '                                                                            MsgBox.error("End year must be a number     eg 1999", "Geospatial Stream Flow Model")
-        ' exit
-        '                                                                        ElseIf (startday.IsNumber.Not) Then
-        '                                                                            MsgBox.error("Start day must be a number from 1 to 366", "Geospatial Stream Flow Model")
-        ' exit
-        '                                                                        ElseIf (endday.IsNumber.Not) Then
-        '                                                                            MsgBox.error("End day must be a number from 1 to 366", "Geospatial Stream Flow Model")
-        ' exit
-        '                                                                            End
-
-        '                                                                            basingrdthm = TheView.FindTheme(basingname)
-        '                                                                            If (basingrdthm = nil) Then
-        '                                                                                MsgBox.error("Basin grid theme not found in the active View", "Geospatial Stream Flow Model")
-        ' exit
-        '                                                                                End
-
-        '                                                                                If (basingrdthm.Is(GTHEME).Not) Then
-        '                                                                                    MsgBox.error(Basingname + " is not a grid theme. Specify a grid theme as the basin grid.", "Geospatial Stream Flow Model")
-        ' exit
-        '                                                                                    End
-
-        '                                                                                    zoneObj = basingrdthm.GetGrid
-
-        '                                                                                    zonetable = basingrdthm.GetVtab
-        '                                                                                    If (zonetable = nil) Then
-        '                                                                                        MsgBox.error("Cannot open basin grid Value Attribute Table", "Geospatial Stream Flow Model")
-        ' exit
-        '                                                                                        End
-
-        '                                                                                        zoneField = zoneTable.FindField("Value")
-        '                                                                                        If (zonefield = nil) Then
-        '                                                                                            MsgBox.error("Field VALUE not found in basin grid Value Attribute Table", "Geospatial Stream Flow Model")
-        ' exit
-        '                                                                                            End
-
-        '                                                                                            thebitmap = zonetable.GetSelection
-        '                                                                                            thebitmap.ClearAll()
-        '                                                                                            zonetable.UpdateSelection()
+        'thebitmap = zonetable.GetSelection
+        'thebitmap.ClearAll()
+        'zonetable.UpdateSelection()
 
         'orderfile = LineFile.Make((orderFileN).AsFileName, #FILE_PERM_READ)
-        '                                                                                            If (orderfile = nil) Then
-        '                                                                                                MsgBox.error("Cannot find computational order file, " + orderFileN + nl + "Run 'Generate Basin Characteristics File' menu to create order.txt", "Geospatial Stream Flow Model")
-        ' exit
-        '                                                                                                End
-        '                                                                                                ordlist = List.make
-        '                                                                                                ordsize = orderfile.getsize
-        '                                                                                                If (ordsize = 1) Then
-        '                                                                                                    MsgBox.error(orderFileN + " is empty or has data in a single row." + nl + "Run 'Generate Basin Characteristics File' menu to create a new order.txt file", "Geospatial Stream Flow Model")
-        ' exit
-        '                                                                                                    End
-        '                                                                                                    orderfile.read(ordlist, ordsize)
+        'If (orderfile = nil) Then
+        '    MsgBox.error("Cannot find computational order file, " + orderFileN + nl + "Run 'Generate Basin Characteristics File' menu to create order.txt", "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
+        'ordlist = List.make
+        'ordsize = orderfile.getsize
+        'If (ordsize = 1) Then
+        '    MsgBox.error(orderFileN + " is empty or has data in a single row." + nl + "Run 'Generate Basin Characteristics File' menu to create a new order.txt file", "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
+        'orderfile.read(ordlist, ordsize)
 
-        '                                                                                                    headerstr = "Time"
-        '                                                                                                    zonelist = List.make
-        '                                                                                                    If (ordlist.get(0).IsNumber) Then
-        '                                                                                                        ostart = 0
-        '                                                                                                    Else
-        '                                                                                                        ostart = 1
-        '                                                                                                        End
+        'headerstr = "Time"
+        'zonelist = List.make
+        'If (ordlist.get(0).IsNumber) Then
+        '    ostart = 0
+        'Else
+        '    ostart = 1
+        'End If
 
-        '                                                                                                        av.ShowMsg("Setting computational order.....")
-        '                                                                                                        av.ShowStopButton()
+        'av.ShowMsg("Setting computational order.....")
+        'av.ShowStopButton()
         'for each orec in ostart..(ordsize - 1)
-        '                                                                                                            If (ordlist.get(orec).asstring.isnumber.not) Then
-        '                                                                                                                MsgBox.error("Unrecognized basin-id format: " + nl + " ' " + ordlist.get(orec).asstring + " ' " + nl + " found in computation order file." + nl + "Run 'Generate Basin Characteristics File' menu to create a new order.txt file", "Geospatial Stream Flow Model")
-        '   exit
-        '                                                                                                                End
-        '                                                                                                                ordnum = ordlist.get(orec).asstring.asnumber
+        '    If (ordlist.get(orec).asstring.isnumber.not) Then
+        '        MsgBox.error("Unrecognized basin-id format: " + nl + " ' " + ordlist.get(orec).asstring + " ' " + nl + " found in computation order file." + nl + "Run 'Generate Basin Characteristics File' menu to create a new order.txt file", "Geospatial Stream Flow Model")
+        '        Exit Sub
+        '    End If
+        '    ordnum = ordlist.get(orec).asstring.asnumber
 
-        '                                                                                                                headerstr = headerstr + ", " + ordnum.asstring
-        '                                                                                                                For Each zrec In zonetable
-        '                                                                                                                    zonenum = zonetable.returnvalue(zonefield, zrec)
-        '                                                                                                                    If (zonenum = ordnum) Then
-        '                                                                                                                        zonelist.add(zrec.asstring.AsNumber)
-        '                                                                                                                        break()
-        '                                                                                                                        End
-        '                                                                                                                        End
-        '                                                                                                                        doMore = av.SetWorkingStatus
-        '                                                                                                                        If (doMore = False) Then
-        '    exit
-        '                                                                                                                            End
-        '                                                                                                                            End
+        '    headerstr = headerstr + ", " + ordnum.asstring
+        '    For Each zrec In zonetable
+        '        zonenum = zonetable.returnvalue(zonefield, zrec)
+        '        If (zonenum = ordnum) Then
+        '            zonelist.add(zrec.asstring.AsNumber)
+        '            break()
+        '        End If
+        '    Next
+        '    doMore = av.SetWorkingStatus
+        '    If (doMore = False) Then
+        '        Exit Sub
+        '    End If
+        'Next
 
 
-        '                                                                                                                            '--set the extent before extracting
-        '                                                                                                                            ae = theView.GetExtension(AnalysisEnvironment)
+        '--set the extent before extracting
+        'ae = theView.GetExtension(AnalysisEnvironment)
         'ae.SetExtent(#ANALYSISENV_VALUE,basingrdthm.ReturnExtent)
         'ae.SetCellSize(#ANALYSISENV_VALUE,zoneobj.GetCellSize)
-        '                                                                                                                            ae.Activate()
+        'ae.Activate()
 
-        '                                                                                                                            currentyear = startyear.AsNumber
-        '                                                                                                                            tempday = startday.AsNumber
-        '                                                                                                                            Day = 0
-        '                                                                                                                            lastday = 0
+        'currentyear = startyear.AsNumber
+        'tempday = startday.AsNumber
+        'Day = 0
+        'lastday = 0
 
-        '                                                                                                                            If ((typenum = 1) Or (typenum = 3)) Then
+        'If ((typenum = 1) Or (typenum = 3)) Then
 
-        '                                                                                                                                rfilename = FileName.Merge(workdirname.AsString, "rain.txt")
+        '    rfilename = FileName.Merge(workdirname.AsString, "rain.txt")
 
-        '  rainfile = TextFile.Make(rfilename, #FILE_PERM_WRITE)
-        '                                                                                                                                If (rainfile = nil) Then
-        '                                                                                                                                    MsgBox.error("Cannot create output file: " + rfileName.AsString, "Geospatial Stream Flow Model")
-        '   exit
-        '                                                                                                                                    End
+        '                  rainfile = TextFile.Make(rfilename, #FILE_PERM_WRITE)
+        '    If (rainfile = nil) Then
+        '        MsgBox.error("Cannot create output file: " + rfileName.AsString, "Geospatial Stream Flow Model")
+        '        Exit Sub
+        '    End If
 
-        '                                                                                                                                    av.ShowMsg("Creating output file, rain.txt........")
+        '    av.ShowMsg("Creating output file, rain.txt........")
 
-        '                                                                                                                                    rainfile.Write(headerstr, headerstr.count)
-        '                                                                                                                                    rainfile.Write(nl, 1)
-        '                                                                                                                                    rainfile.flush()
-        '                                                                                                                                    rainfile.close()
-        '                                                                                                                                    End
+        '    rainfile.Write(headerstr, headerstr.count)
+        '    rainfile.Write(nl, 1)
+        '    rainfile.flush()
+        '    rainfile.close()
+        'End If
 
-        '                                                                                                                                    If ((typenum = 2) Or (typenum = 3)) Then
+        'If ((typenum = 2) Or (typenum = 3)) Then
 
-        '                                                                                                                                        efilename = FileName.Merge(workdirname.AsString, "evap.txt")
+        '    efilename = FileName.Merge(workdirname.AsString, "evap.txt")
 
-        '  evapfile = TextFile.Make(efilename, #FILE_PERM_WRITE)
-        '                                                                                                                                        If (evapfile = nil) Then
-        '                                                                                                                                            MsgBox.error("Cannot create output file: " + efilename.AsString, "Geospatial Stream Flow Model")
-        '   exit
-        '                                                                                                                                            End
+        '      evapfile = TextFile.Make(efilename, #FILE_PERM_WRITE)
+        '    If (evapfile = nil) Then
+        '        MsgBox.error("Cannot create output file: " + efilename.AsString, "Geospatial Stream Flow Model")
+        '        Exit Sub
+        '    End If
 
-        '                                                                                                                                            av.ShowMsg("Creating output file, evap.txt........")
+        '    av.ShowMsg("Creating output file, evap.txt........")
 
-        '                                                                                                                                            evapfile.Write(headerstr, headerstr.count)
-        '                                                                                                                                            evapfile.Write(nl, 1)
-        '                                                                                                                                            evapfile.flush()
-        '                                                                                                                                            evapfile.close()
-        '                                                                                                                                            End
+        '    evapfile.Write(headerstr, headerstr.count)
+        '    evapfile.Write(nl, 1)
+        '    evapfile.flush()
+        '    evapfile.close()
+        'End If
 
-        '                                                                                                                                            While (currentyear <= (endyear.AsNumber))
+        'Do While (currentyear <= (endyear.AsNumber))
 
-        '                                                                                                                                                Day = tempday
+        '    Day = tempday
 
-        '                                                                                                                                                If (currentyear = (endyear.AsNumber)) Then
-        '                                                                                                                                                    lastday = endday.AsNumber
-        '                                                                                                                                                ElseIf (currentyear.Mod(4) = 0) Then
-        '                                                                                                                                                    lastday = 366
-        '                                                                                                                                                Else
-        '                                                                                                                                                    lastday = 365
-        '                                                                                                                                                    End
+        '    If (currentyear = (endyear.AsNumber)) Then
+        '        lastday = endday.AsNumber
+        '    ElseIf (currentyear.Mod(4) = 0) Then
+        '        lastday = 366
+        '    Else
+        '        lastday = 365
+        '    End If
 
-        '    raingrdlst = {}
-        '    evapgrdlst = {}
+        '        raingrdlst = {}
+        '        evapgrdlst = {}
 
-        '                                                                                                                                                    While (Day <= lastday)
+        '    Do While (Day <= lastday)
 
-        '                                                                                                                                                        Day.setformat("dddd")
+        '        Day.setformat("dddd")
 
-        '                                                                                                                                                        av.ShowMsg("Computing Zonal Mean for Day  " + +Day.asString + +" of Year  " + +currentyear.AsString)
+        '        av.ShowMsg("Computing Zonal Mean for Day  " + +Day.asString + +" of Year  " + +currentyear.AsString)
 
-        '                                                                                                                                                        If ((typenum = 1) Or (typenum = 3)) Then
-        '                                                                                                                                                            Day.setformat("dddd")
+        '        If ((typenum = 1) Or (typenum = 3)) Then
+        '            Day.setformat("dddd")
 
-        '                                                                                                                                                            zRainFN = FileName.Merge(workdirname, ("zr" + currentyear.asstring + Day.asstring + ".dbf"))
-        '                                                                                                                                                            currentraindir = raindirname.substitute("year", currentyear.asstring)
+        '            zRainFN = FileName.Merge(workdirname, ("zr" + currentyear.asstring + Day.asstring + ".dbf"))
+        '            currentraindir = raindirname.substitute("year", currentyear.asstring)
 
-        '                                                                                                                                                            If (File.Exists(currentraindir.AsFileName).Not) Then
-        '                                                                                                                                                                MsgBox.Error("Cannot read directory " + currentraindir, "Directory Specification Error")
-        '         exit
-        '                                                                                                                                                                End
+        '            If (File.Exists(currentraindir.AsFileName).Not) Then
+        '                MsgBox.Error("Cannot read directory " + currentraindir, "Directory Specification Error")
+        '                Exit Sub
+        '            End If
 
-        '                                                                                                                                                                theRainName = Grid.MakeSrcName(currentraindir + "rain_" + currentyear.asstring + Day.asstring)
-        '                                                                                                                                                                If (theRainName = nil) Then
-        '                                                                                                                                                                    theRainName = Grid.MakeSrcName(currentraindir + "rain_" + currentyear.asstring + Day.setformat("").asstring)
-        '                                                                                                                                                                    If (theRainName = nil) Then
-        '                                                                                                                                                                        MsgBox.Error("Rainfall Grid " + currentraindir + "rain_" + currentyear.asstring + Day.asstring + " Not Found", "Geospatial Stream Flow Model")
-        '            exit
-        '                                                                                                                                                                        End
-        '                                                                                                                                                                        End
-        '                                                                                                                                                                        theRainThm = Theme.Make(theRainName)
-        '                                                                                                                                                                        TheRainGrid = Grid.Make(theRainName)
-        '                                                                                                                                                                        If (TheRainGrid.isinteger.not) Then
-        '                                                                                                                                                                            tmpgrid = TheRainGrid.int
-        '                                                                                                                                                                            TheRainGrid = tmpgrid
-        '                                                                                                                                                                            End
+        '            theRainName = Grid.MakeSrcName(currentraindir + "rain_" + currentyear.asstring + Day.asstring)
+        '            If (theRainName = nil) Then
+        '                theRainName = Grid.MakeSrcName(currentraindir + "rain_" + currentyear.asstring + Day.setformat("").asstring)
+        '                If (theRainName = nil) Then
+        '                    MsgBox.Error("Rainfall Grid " + currentraindir + "rain_" + currentyear.asstring + Day.asstring + " Not Found", "Geospatial Stream Flow Model")
+        '                    Exit Sub
+        '                End If
+        '            End If
+        '            theRainThm = Theme.Make(theRainName)
+        '            TheRainGrid = Grid.Make(theRainName)
+        '            If (TheRainGrid.isinteger.not) Then
+        '                tmpgrid = TheRainGrid.int
+        '                TheRainGrid = tmpgrid
+        '            End If
 
-        '                                                                                                                                                                            raingrdlst.Add(theRainGrid)
+        '            raingrdlst.Add(theRainGrid)
 
-        '                                                                                                                                                                            RainVTab = theRainGrid.ZonalStatsTable(zoneObj, ThePrj, zoneField, False, zRainFN)
-        '                                                                                                                                                                            If (RainVTab.HasError) Then
-        '                                                                                                                                                                                Return NIL
-        '                                                                                                                                                                                MsgBox.error("Cannot create rainfall zonal statistics table, " + zRainFN, "Geospatial Stream Flow Model")
-        '          exit
-        '                                                                                                                                                                                End
+        '            RainVTab = theRainGrid.ZonalStatsTable(zoneObj, ThePrj, zoneField, False, zRainFN)
+        '            If (RainVTab.HasError) Then
+        '                Return NIL
+        '                MsgBox.error("Cannot create rainfall zonal statistics table, " + zRainFN, "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            End If
 
-        '                                                                                                                                                                                rainfield = RainVtab.FindField("median")
-        '                                                                                                                                                                                If (rainfield = nil) Then
-        '                                                                                                                                                                                    MsgBox.error("Cannot find 'median' field in " + zRainFN + " table.", "Geospatial Stream Flow Model")
-        '          exit
-        '                                                                                                                                                                                    End
+        '            rainfield = RainVtab.FindField("median")
+        '            If (rainfield = nil) Then
+        '                MsgBox.error("Cannot find 'median' field in " + zRainFN + " table.", "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            End If
 
-        '                                                                                                                                                                                    outputday = Day.setformat("dddd")
-        '        av.run("FEWS.rainwrite.ave", {rfilename, zRainFN, outputday, currentyear, zonelist })
-        '                                                                                                                                                                                    theproject.save()
+        '            outputday = Day.setformat("dddd")
+        '                        av.run("FEWS.rainwrite.ave", {rfilename, zRainFN, outputday, currentyear, zonelist })
+        '            theproject.save()
 
-        '                                                                                                                                                                                    End
+        '        End If
 
-        '                                                                                                                                                                                    If ((typenum = 2) Or (typenum = 3)) Then
-        '                                                                                                                                                                                        Day.setformat("dddd")
+        '        If ((typenum = 2) Or (typenum = 3)) Then
+        '            Day.setformat("dddd")
 
-        '                                                                                                                                                                                        zEvapFN = FileName.Merge(workdirname, ("ze" + currentyear.asstring + Day.asstring + ".dbf"))
-        '                                                                                                                                                                                        currentevapdir = evapdirname.substitute("year", currentyear.asstring)
+        '            zEvapFN = FileName.Merge(workdirname, ("ze" + currentyear.asstring + Day.asstring + ".dbf"))
+        '            currentevapdir = evapdirname.substitute("year", currentyear.asstring)
 
-        '                                                                                                                                                                                        If (File.Exists(currentevapdir.AsFileName).Not) Then
-        '                                                                                                                                                                                            MsgBox.Error("Cannot read directory " + currentevapdir, "Directory Specification Error")
-        '         exit
-        '                                                                                                                                                                                            End
+        '            If (File.Exists(currentevapdir.AsFileName).Not) Then
+        '                MsgBox.Error("Cannot read directory " + currentevapdir, "Directory Specification Error")
+        '                Exit Sub
+        '            End If
 
-        '                                                                                                                                                                                            theEvapName = Grid.MakeSrcName(currentevapdir + "evap_" + currentyear.asstring + Day.asstring)
-        '                                                                                                                                                                                            If (theEvapName = nil) Then
-        '                                                                                                                                                                                                theEvapName = Grid.MakeSrcName(currentevapdir + "evap_" + currentyear.asstring + Day.setformat("").asstring)
-        '                                                                                                                                                                                                If (theEvapName = nil) Then
-        '                                                                                                                                                                                                    MsgBox.Error("Evaporation Grid " + currentevapdir + "evap_" + currentyear.asstring + Day.asstring + " Not Found", "Geospatial Stream Flow Model")
-        '            exit
-        '                                                                                                                                                                                                    End
-        '                                                                                                                                                                                                    End
-        '                                                                                                                                                                                                    theEvapThm = Theme.Make(theEvapName)
-        '                                                                                                                                                                                                    TheEvapGrid = Grid.Make(theEvapName)
-        '                                                                                                                                                                                                    If (TheEvapGrid.isinteger.not) Then
-        '                                                                                                                                                                                                        tmpgrid = TheEvapGrid.int
-        '                                                                                                                                                                                                        TheEvapGrid = tmpgrid
-        '                                                                                                                                                                                                        End
+        '            theEvapName = Grid.MakeSrcName(currentevapdir + "evap_" + currentyear.asstring + Day.asstring)
+        '            If (theEvapName = nil) Then
+        '                theEvapName = Grid.MakeSrcName(currentevapdir + "evap_" + currentyear.asstring + Day.setformat("").asstring)
+        '                If (theEvapName = nil) Then
+        '                    MsgBox.Error("Evaporation Grid " + currentevapdir + "evap_" + currentyear.asstring + Day.asstring + " Not Found", "Geospatial Stream Flow Model")
+        '                    Exit Sub
+        '                End If
+        '            End If
+        '            theEvapThm = Theme.Make(theEvapName)
+        '            TheEvapGrid = Grid.Make(theEvapName)
+        '            If (TheEvapGrid.isinteger.not) Then
+        '                tmpgrid = TheEvapGrid.int
+        '                TheEvapGrid = tmpgrid
+        '            End If
 
-        '                                                                                                                                                                                                        evapgrdlst.Add(theEvapGrid)
+        '            evapgrdlst.Add(theEvapGrid)
 
-        '                                                                                                                                                                                                        EvapVTab = theEvapGrid.ZonalStatsTable(zoneObj, ThePrj, zoneField, False, zEvapFN)
-        '                                                                                                                                                                                                        If (EvapVTab.HasError) Then
-        '                                                                                                                                                                                                            Return NIL
-        '                                                                                                                                                                                                            MsgBox.error("Cannot create evaporation zonal statistics table, " + zEvapFN, "Geospatial Stream Flow Model")
-        '          exit
-        '                                                                                                                                                                                                            End
+        '            EvapVTab = theEvapGrid.ZonalStatsTable(zoneObj, ThePrj, zoneField, False, zEvapFN)
+        '            If (EvapVTab.HasError) Then
+        '                Return NIL
+        '                MsgBox.error("Cannot create evaporation zonal statistics table, " + zEvapFN, "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            End If
 
-        '                                                                                                                                                                                                            evapfield = EvapVtab.FindField("median")
-        '                                                                                                                                                                                                            If (evapfield = nil) Then
-        '                                                                                                                                                                                                                MsgBox.error("Cannot find 'median' field in " + zEvapFN + " table.", "Geospatial Stream Flow Model")
-        '          exit
-        '                                                                                                                                                                                                                End
+        '            evapfield = EvapVtab.FindField("median")
+        '            If (evapfield = nil) Then
+        '                MsgBox.error("Cannot find 'median' field in " + zEvapFN + " table.", "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            End If
 
-        '                                                                                                                                                                                                                outputday = Day.setformat("dddd")
-        '        av.run("FEWS.rainwrite.ave", {efilename, zEvapFN, outputday, currentyear, zonelist})
-        '                                                                                                                                                                                                                theproject.save()
+        '            outputday = Day.setformat("dddd")
+        '                av.run("FEWS.rainwrite.ave", {efilename, zEvapFN, outputday, currentyear, zonelist})
+        '            theproject.save()
 
-        '                                                                                                                                                                                                                End
+        '        End If
 
-        '                                                                                                                                                                                                                Day = Day + 1
+        '        Day = Day + 1
 
-        '                                                                                                                                                                                                                End
+        '    Loop
 
 
-        '                                                                                                                                                                                                                tempday = 1
-        '                                                                                                                                                                                                                currentyear = currentyear + 1
+        '    tempday = 1
+        '    currentyear = currentyear + 1
 
-        '                                                                                                                                                                                                                End
+        'Loop
 
-        '                                                                                                                                                                                                                orderfile.close()
+        'orderfile.close()
 
-        '                                                                                                                                                                                                                If (typenum = 1) Then
-        '                                                                                                                                                                                                                    MsgBox.Info("Processing Complete. Output files: " + nl + rfilename.AsString, "Geospatial Stream Flow Model")
-        '                                                                                                                                                                                                                ElseIf (typenum = 2) Then
-        '                                                                                                                                                                                                                    MsgBox.Info("Processing Complete. Output files: " + nl + efilename.AsString, "Geospatial Stream Flow Model")
-        '                                                                                                                                                                                                                Else
-        '                                                                                                                                                                                                                    MsgBox.Info("Processing Complete. Output files: " + nl + rfilename.AsString + nl + efilename.AsString, "Geospatial Stream Flow Model")
-        '                                                                                                                                                                                                                    End
+        'If (typenum = 1) Then
+        '    MsgBox.Info("Processing Complete. Output files: " + nl + rfilename.AsString, "Geospatial Stream Flow Model")
+        'ElseIf (typenum = 2) Then
+        '    MsgBox.Info("Processing Complete. Output files: " + nl + efilename.AsString, "Geospatial Stream Flow Model")
+        'Else
+        '    MsgBox.Info("Processing Complete. Output files: " + nl + rfilename.AsString + nl + efilename.AsString, "Geospatial Stream Flow Model")
+        'End If
 
-        '                                                                                                                                                                                                                    av.clearstatus()
+        'sub rainwrite
+        'rfilename = SELF.Get(0)
+        'zRainFN = SELF.Get(1)
+        'outputday = SELF.Get(2)
+        'currentyear = SELF.Get(3)
+        'zonelist = SELF.Get(4)
+        'rainfile = TextFile.Make(rfilename, #FILE_PERM_APPEND)
 
+        'RainVtab = Vtab.Make(zRainFN, False, False)
+        'rainfield = RainVtab.FindField("median")
+        'If (rainfield = nil) Then
+        '    MsgBox.error("Cannot find 'median' field in " + zRainFN + " table.", "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
+
+        'rainfile = TextFile.Make(rfilename, #FILE_PERM_APPEND)
+
+        'rainfile.Write(currentyear.asstring + outputday.asstring, 7)
+
+        'rreccount = 0
+
+        'For Each rrecord In RainVtab
+        '    rrecposition = zonelist.get(rreccount)
+        '    'rainwnum = (RainVtab.ReturnValue(Rainfield, rrecord))
+        '    rainwnum = (RainVtab.ReturnValue(Rainfield, rrecposition))
+        '    rainwrt = (rainwnum.setformat("d.d")).AsString
+        '    rainfile.Write(", " + rainwrt, (rainwrt.count + 2))
+        '    rreccount = rreccount + 1
+        'Next
+
+        ''msgbox.info("finishwriting","")
+
+        'rainfile.Write(nl, 1)
+        'rainfile.flush()
+        'rainfile.close()
+        'rainVtab.Deactivate()
+        'rainVtab = nil
+        'av.PurgeObjects()
+
+        'File.Delete(zRainFN)
+
+        'The rain.txt file created from this process contains an average rainfall value in millimeters for each subbasin per day. 
+        'The evap.txt file contains a potential evapotranspiration (PET) value in tenths of millimeters for each subbasin per day.
     End Sub
 
     Friend Sub Balance()
@@ -2662,6 +2639,69 @@ Public Module modGeoSFM
         ' ***********************************************************************************************
     End Sub
 
+    Friend Sub BuildListofValidStationNames(ByRef aMetConstituent As String, _
+                                            ByVal aStations As atcCollection)
+        aStations.Clear()
+
+        For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
+            Dim lTotalCount As Integer = lDataSource.DataSets.Count
+            Dim lCounter As Integer = 0
+
+            For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
+                lCounter += 1
+                Logger.Progress("Building list of valid station names...", lCounter, lDataSource.DataSets.Count)
+
+                If lDataSet.Attributes.GetValue("Constituent") = aMetConstituent Then
+                    Dim lLoc As String = lDataSet.Attributes.GetValue("Location")
+                    Dim lStanam As String = lDataSet.Attributes.GetValue("Stanam")
+                    Dim lDsn As Integer = lDataSet.Attributes.GetValue("Id")
+                    Dim lSJDay As Double
+                    Dim lEJDay As Double
+                    lSJDay = lDataSet.Attributes.GetValue("Start Date", 0)
+                    lEJDay = lDataSet.Attributes.GetValue("End Date", 0)
+                    If lSJDay = 0 Then
+                        lSJDay = lDataSet.Dates.Value(0)
+                    End If
+                    If lEJDay = 0 Then
+                        lEJDay = lDataSet.Dates.Value(lDataSet.Dates.numValues)
+                    End If
+                    Dim lAddIt As Boolean = True
+
+                    'if this one is computed and observed also exists at same location, just use observed
+                    If lDataSet.Attributes.GetValue("Scenario") = "COMPUTED" Then
+                        For Each lDataSet2 As atcData.atcTimeseries In lDataSource.DataSets
+                            If lDataSet2.Attributes.GetValue("Constituent") = aMetConstituent And _
+                               lDataSet2.Attributes.GetValue("Scenario") = "OBSERVED" And _
+                               lDataSet2.Attributes.GetValue("Location") = lLoc Then
+                                lAddIt = False
+                                Exit For
+                            End If
+                        Next
+                    End If
+
+                    If lAddIt Then
+                        Dim lSdate(6) As Integer
+                        Dim lEdate(6) As Integer
+                        J2Date(lSJDay, lSdate)
+                        J2Date(lEJDay, lEdate)
+                        Dim lDateString As String = "(" & lSdate(0) & "/" & lSdate(1) & "/" & lSdate(2) & "-" & lEdate(0) & "/" & lEdate(1) & "/" & lEdate(2) & ")"
+                        Dim lStationDetails As New StationDetails
+                        lStationDetails.Name = lLoc
+                        lStationDetails.StartJDate = lSJDay
+                        lStationDetails.EndJDate = lEJDay
+                        lStationDetails.Description = lLoc & ":" & lStanam & " " & lDateString
+                        aStations.Add(lStationDetails.Description, lStationDetails)
+                        'Logger.Dbg("Added " & lStationDetails.Description)
+                    End If
+                End If
+                'set valuesneedtoberead so that the dates and values will be forgotten, to free up memory
+                lDataSet.ValuesNeedToBeRead = True
+            Next
+        Next
+
+        Logger.Dbg("Found " & aStations.Count & " Stations")
+    End Sub
+
     'subs below are new GIS routines needed for GeoSFM
 
     Friend Sub GridFromShapefile(ByVal aShapefileLayerIndex As Integer, ByVal aBaseGridFileName As String, ByVal aNewGridFileName As String)
@@ -2669,5 +2709,12 @@ Public Module modGeoSFM
 
         'only used if streams and subbasins are entered as shapefiles
     End Sub
+
+    Friend Class StationDetails
+        Public Name As String
+        Public StartJDate As Double
+        Public EndJDate As Double
+        Public Description As String
+    End Class
 
 End Module
