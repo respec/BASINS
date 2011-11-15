@@ -2331,17 +2331,25 @@ Public Class GisUtil
                 For lCol As Integer = lStartCol To lEndCol
                     lTempVal = lStreamGrid.Value(lCol, lRow)
                     If lTempVal > 0 Then
-                        lOutputGrid.Value(lCol, lRow) = 0.0
+                        If lWeightingFactorGrid Is Nothing Then
+                            lOutputGrid.Value(lCol, lRow) = 0.0
+                        Else
+                            lOutputGrid.Value(lCol, lRow) = -1.0 * lOutputGrid.Header.dX * lWeightingFactorGrid.Value(lCol, lRow)
+                        End If
                         'now call recursive routine to set surrounding cells 
                         Downstream.CheckNeighboringCells(lFlowDirGrid, lCol, lRow, lOutputGrid, lWeightingFactorGrid)
                     End If
                 Next
             Next
+            lStreamGrid.Close()
             lStreamGrid = Nothing
         End If
 
         lOutputGrid.Save()
         lOutputGrid = Nothing
+
+        lFlowDirGrid.Close()
+        lFlowDirGrid = Nothing
     End Sub
 
     Public Shared Sub FlowLengthToOutlet(ByVal aLenGridFileName As String, ByVal aOutletGridFileName As String, ByVal aZoneGridFileName As String, ByVal aOutputGridFileName As String)

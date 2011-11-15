@@ -6,6 +6,7 @@ Imports System.Drawing
 Imports System
 Imports System.Windows.Forms
 Imports System.Text
+Imports System.IO
 
 Public Class frmGeoSFM
     Inherits System.Windows.Forms.Form
@@ -142,22 +143,18 @@ Public Class frmGeoSFM
     Friend WithEvents Label50 As System.Windows.Forms.Label
     Friend WithEvents Label51 As System.Windows.Forms.Label
     Friend WithEvents cboDEM As System.Windows.Forms.ComboBox
-    Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
+    Friend WithEvents gbxSimulationDates As System.Windows.Forms.GroupBox
     Friend WithEvents Label54 As System.Windows.Forms.Label
     Friend WithEvents Label55 As System.Windows.Forms.Label
     Friend WithEvents Label56 As System.Windows.Forms.Label
     Friend WithEvents Label57 As System.Windows.Forms.Label
     Friend WithEvents Label58 As System.Windows.Forms.Label
-    Friend WithEvents AtcText2 As atcControls.atcText
-    Friend WithEvents AtcText3 As atcControls.atcText
-    Friend WithEvents AtcText4 As atcControls.atcText
-    Friend WithEvents AtcText5 As atcControls.atcText
-    Friend WithEvents AtcText6 As atcControls.atcText
-    Friend WithEvents AtcText7 As atcControls.atcText
-    Friend WithEvents cboPrecipStation As System.Windows.Forms.ComboBox
-    Friend WithEvents lblPrecipStation As System.Windows.Forms.Label
-    Friend WithEvents cboOtherMet As System.Windows.Forms.ComboBox
-    Friend WithEvents lblOtherMet As System.Windows.Forms.Label
+    Friend WithEvents atxEDay As atcControls.atcText
+    Friend WithEvents atxSDay As atcControls.atcText
+    Friend WithEvents atxSYear As atcControls.atcText
+    Friend WithEvents atxEMonth As atcControls.atcText
+    Friend WithEvents atxSMonth As atcControls.atcText
+    Friend WithEvents atxEYear As atcControls.atcText
     Friend WithEvents tpgSoil As System.Windows.Forms.TabPage
     Friend WithEvents AtcGrid1 As atcControls.atcGrid
     Friend WithEvents tpgFlow As System.Windows.Forms.TabPage
@@ -184,6 +181,7 @@ Public Class frmGeoSFM
     Friend WithEvents cboOutlets As System.Windows.Forms.ComboBox
     Friend WithEvents lblFlow As System.Windows.Forms.Label
     Friend WithEvents cboFlowDir As System.Windows.Forms.ComboBox
+    Friend WithEvents AtcGridPrec As atcControls.atcGrid
     Friend WithEvents tpgMap As System.Windows.Forms.TabPage
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmGeoSFM))
@@ -230,6 +228,8 @@ Public Class frmGeoSFM
         Me.Label3 = New System.Windows.Forms.Label
         Me.cboBC2 = New System.Windows.Forms.ComboBox
         Me.tpgResponse = New System.Windows.Forms.TabPage
+        Me.lblFlow = New System.Windows.Forms.Label
+        Me.cboFlowDir = New System.Windows.Forms.ComboBox
         Me.lblOutlets = New System.Windows.Forms.Label
         Me.cboOutlets = New System.Windows.Forms.ComboBox
         Me.atxInstream = New atcControls.atcText
@@ -246,22 +246,18 @@ Public Class frmGeoSFM
         Me.lblMethod = New System.Windows.Forms.Label
         Me.tpgRain = New System.Windows.Forms.TabPage
         Me.cmdRainEvapNext = New System.Windows.Forms.Button
-        Me.cboPrecipStation = New System.Windows.Forms.ComboBox
-        Me.lblPrecipStation = New System.Windows.Forms.Label
-        Me.cboOtherMet = New System.Windows.Forms.ComboBox
-        Me.lblOtherMet = New System.Windows.Forms.Label
-        Me.GroupBox2 = New System.Windows.Forms.GroupBox
+        Me.gbxSimulationDates = New System.Windows.Forms.GroupBox
         Me.Label54 = New System.Windows.Forms.Label
         Me.Label55 = New System.Windows.Forms.Label
         Me.Label56 = New System.Windows.Forms.Label
         Me.Label57 = New System.Windows.Forms.Label
         Me.Label58 = New System.Windows.Forms.Label
-        Me.AtcText2 = New atcControls.atcText
-        Me.AtcText3 = New atcControls.atcText
-        Me.AtcText4 = New atcControls.atcText
-        Me.AtcText5 = New atcControls.atcText
-        Me.AtcText6 = New atcControls.atcText
-        Me.AtcText7 = New atcControls.atcText
+        Me.atxEDay = New atcControls.atcText
+        Me.atxSDay = New atcControls.atcText
+        Me.atxSYear = New atcControls.atcText
+        Me.atxEMonth = New atcControls.atcText
+        Me.atxSMonth = New atcControls.atcText
+        Me.atxEYear = New atcControls.atcText
         Me.tpgSoil = New System.Windows.Forms.TabPage
         Me.cmdBalanceNext = New System.Windows.Forms.Button
         Me.AtcGrid1 = New atcControls.atcGrid
@@ -333,14 +329,13 @@ Public Class frmGeoSFM
         Me.Label44 = New System.Windows.Forms.Label
         Me.Label45 = New System.Windows.Forms.Label
         Me.ComboBox39 = New System.Windows.Forms.ComboBox
-        Me.lblFlow = New System.Windows.Forms.Label
-        Me.cboFlowDir = New System.Windows.Forms.ComboBox
+        Me.AtcGridPrec = New atcControls.atcGrid
         Me.tabMain.SuspendLayout()
         Me.tpgTerrain.SuspendLayout()
         Me.tpgBasin.SuspendLayout()
         Me.tpgResponse.SuspendLayout()
         Me.tpgRain.SuspendLayout()
-        Me.GroupBox2.SuspendLayout()
+        Me.gbxSimulationDates.SuspendLayout()
         Me.tpgSoil.SuspendLayout()
         Me.tpgFlow.SuspendLayout()
         Me.tpgSensitivity.SuspendLayout()
@@ -893,6 +888,28 @@ Public Class frmGeoSFM
         Me.tpgResponse.Text = "Basin Response"
         Me.tpgResponse.UseVisualStyleBackColor = True
         '
+        'lblFlow
+        '
+        Me.lblFlow.AutoSize = True
+        Me.lblFlow.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblFlow.Location = New System.Drawing.Point(28, 232)
+        Me.lblFlow.Name = "lblFlow"
+        Me.lblFlow.Size = New System.Drawing.Size(99, 13)
+        Me.lblFlow.TabIndex = 58
+        Me.lblFlow.Text = "Flow Direction Grid:"
+        Me.lblFlow.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'cboFlowDir
+        '
+        Me.cboFlowDir.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboFlowDir.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboFlowDir.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboFlowDir.Location = New System.Drawing.Point(152, 229)
+        Me.cboFlowDir.Name = "cboFlowDir"
+        Me.cboFlowDir.Size = New System.Drawing.Size(368, 21)
+        Me.cboFlowDir.TabIndex = 59
+        '
         'lblOutlets
         '
         Me.lblOutlets.AutoSize = True
@@ -1049,9 +1066,9 @@ Public Class frmGeoSFM
         Me.rbnNonUniformUser.AutoSize = True
         Me.rbnNonUniformUser.Location = New System.Drawing.Point(48, 80)
         Me.rbnNonUniformUser.Name = "rbnNonUniformUser"
-        Me.rbnNonUniformUser.Size = New System.Drawing.Size(238, 17)
+        Me.rbnNonUniformUser.Size = New System.Drawing.Size(224, 17)
         Me.rbnNonUniformUser.TabIndex = 2
-        Me.rbnNonUniformUser.Text = "Non-Uniform from User Supplied Velocity Grid"
+        Me.rbnNonUniformUser.Text = "Non-Uniform from User Supplied Velocities"
         Me.rbnNonUniformUser.UseVisualStyleBackColor = True
         '
         'rbnNonUniformUSGS
@@ -1077,12 +1094,9 @@ Public Class frmGeoSFM
         '
         'tpgRain
         '
+        Me.tpgRain.Controls.Add(Me.AtcGridPrec)
         Me.tpgRain.Controls.Add(Me.cmdRainEvapNext)
-        Me.tpgRain.Controls.Add(Me.cboPrecipStation)
-        Me.tpgRain.Controls.Add(Me.lblPrecipStation)
-        Me.tpgRain.Controls.Add(Me.cboOtherMet)
-        Me.tpgRain.Controls.Add(Me.lblOtherMet)
-        Me.tpgRain.Controls.Add(Me.GroupBox2)
+        Me.tpgRain.Controls.Add(Me.gbxSimulationDates)
         Me.tpgRain.Location = New System.Drawing.Point(4, 46)
         Me.tpgRain.Name = "tpgRain"
         Me.tpgRain.Size = New System.Drawing.Size(647, 396)
@@ -1101,68 +1115,27 @@ Public Class frmGeoSFM
         Me.cmdRainEvapNext.TabIndex = 40
         Me.cmdRainEvapNext.Text = "Next >"
         '
-        'cboPrecipStation
+        'gbxSimulationDates
         '
-        Me.cboPrecipStation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.gbxSimulationDates.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboPrecipStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboPrecipStation.FormattingEnabled = True
-        Me.cboPrecipStation.Location = New System.Drawing.Point(119, 129)
-        Me.cboPrecipStation.Name = "cboPrecipStation"
-        Me.cboPrecipStation.Size = New System.Drawing.Size(416, 21)
-        Me.cboPrecipStation.TabIndex = 33
-        '
-        'lblPrecipStation
-        '
-        Me.lblPrecipStation.AutoSize = True
-        Me.lblPrecipStation.Location = New System.Drawing.Point(16, 132)
-        Me.lblPrecipStation.Name = "lblPrecipStation"
-        Me.lblPrecipStation.Size = New System.Drawing.Size(76, 13)
-        Me.lblPrecipStation.TabIndex = 32
-        Me.lblPrecipStation.Text = "Precip Station:"
-        '
-        'cboOtherMet
-        '
-        Me.cboOtherMet.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboOtherMet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboOtherMet.FormattingEnabled = True
-        Me.cboOtherMet.Location = New System.Drawing.Point(119, 156)
-        Me.cboOtherMet.Name = "cboOtherMet"
-        Me.cboOtherMet.Size = New System.Drawing.Size(416, 21)
-        Me.cboOtherMet.TabIndex = 31
-        '
-        'lblOtherMet
-        '
-        Me.lblOtherMet.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.lblOtherMet.AutoSize = True
-        Me.lblOtherMet.Location = New System.Drawing.Point(16, 159)
-        Me.lblOtherMet.Name = "lblOtherMet"
-        Me.lblOtherMet.Size = New System.Drawing.Size(83, 13)
-        Me.lblOtherMet.TabIndex = 30
-        Me.lblOtherMet.Text = "Other Met Data:"
-        '
-        'GroupBox2
-        '
-        Me.GroupBox2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.GroupBox2.Controls.Add(Me.Label54)
-        Me.GroupBox2.Controls.Add(Me.Label55)
-        Me.GroupBox2.Controls.Add(Me.Label56)
-        Me.GroupBox2.Controls.Add(Me.Label57)
-        Me.GroupBox2.Controls.Add(Me.Label58)
-        Me.GroupBox2.Controls.Add(Me.AtcText2)
-        Me.GroupBox2.Controls.Add(Me.AtcText3)
-        Me.GroupBox2.Controls.Add(Me.AtcText4)
-        Me.GroupBox2.Controls.Add(Me.AtcText5)
-        Me.GroupBox2.Controls.Add(Me.AtcText6)
-        Me.GroupBox2.Controls.Add(Me.AtcText7)
-        Me.GroupBox2.Location = New System.Drawing.Point(19, 27)
-        Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(516, 96)
-        Me.GroupBox2.TabIndex = 29
-        Me.GroupBox2.TabStop = False
-        Me.GroupBox2.Text = "Simulation Dates"
+        Me.gbxSimulationDates.Controls.Add(Me.Label54)
+        Me.gbxSimulationDates.Controls.Add(Me.Label55)
+        Me.gbxSimulationDates.Controls.Add(Me.Label56)
+        Me.gbxSimulationDates.Controls.Add(Me.Label57)
+        Me.gbxSimulationDates.Controls.Add(Me.Label58)
+        Me.gbxSimulationDates.Controls.Add(Me.atxEDay)
+        Me.gbxSimulationDates.Controls.Add(Me.atxSDay)
+        Me.gbxSimulationDates.Controls.Add(Me.atxSYear)
+        Me.gbxSimulationDates.Controls.Add(Me.atxEMonth)
+        Me.gbxSimulationDates.Controls.Add(Me.atxSMonth)
+        Me.gbxSimulationDates.Controls.Add(Me.atxEYear)
+        Me.gbxSimulationDates.Location = New System.Drawing.Point(19, 27)
+        Me.gbxSimulationDates.Name = "gbxSimulationDates"
+        Me.gbxSimulationDates.Size = New System.Drawing.Size(516, 96)
+        Me.gbxSimulationDates.TabIndex = 29
+        Me.gbxSimulationDates.TabStop = False
+        Me.gbxSimulationDates.Text = "Simulation Dates"
         '
         'Label54
         '
@@ -1209,143 +1182,143 @@ Public Class frmGeoSFM
         Me.Label58.TabIndex = 33
         Me.Label58.Text = "Year"
         '
-        'AtcText2
+        'atxEDay
         '
-        Me.AtcText2.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText2.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcText2.DefaultValue = ""
-        Me.AtcText2.HardMax = 31
-        Me.AtcText2.HardMin = 1
-        Me.AtcText2.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText2.Location = New System.Drawing.Point(245, 58)
-        Me.AtcText2.MaxWidth = 20
-        Me.AtcText2.Name = "AtcText2"
-        Me.AtcText2.NumericFormat = "0"
-        Me.AtcText2.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText2.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText2.SelLength = 0
-        Me.AtcText2.SelStart = 0
-        Me.AtcText2.Size = New System.Drawing.Size(44, 21)
-        Me.AtcText2.SoftMax = -999
-        Me.AtcText2.SoftMin = -999
-        Me.AtcText2.TabIndex = 32
-        Me.AtcText2.ValueDouble = 31
-        Me.AtcText2.ValueInteger = 31
+        Me.atxEDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxEDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxEDay.DefaultValue = ""
+        Me.atxEDay.HardMax = 31
+        Me.atxEDay.HardMin = 1
+        Me.atxEDay.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxEDay.Location = New System.Drawing.Point(245, 58)
+        Me.atxEDay.MaxWidth = 20
+        Me.atxEDay.Name = "atxEDay"
+        Me.atxEDay.NumericFormat = "0"
+        Me.atxEDay.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxEDay.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxEDay.SelLength = 0
+        Me.atxEDay.SelStart = 0
+        Me.atxEDay.Size = New System.Drawing.Size(44, 21)
+        Me.atxEDay.SoftMax = -999
+        Me.atxEDay.SoftMin = -999
+        Me.atxEDay.TabIndex = 32
+        Me.atxEDay.ValueDouble = 31
+        Me.atxEDay.ValueInteger = 31
         '
-        'AtcText3
+        'atxSDay
         '
-        Me.AtcText3.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText3.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcText3.DefaultValue = ""
-        Me.AtcText3.HardMax = 31
-        Me.AtcText3.HardMin = 1
-        Me.AtcText3.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText3.Location = New System.Drawing.Point(245, 32)
-        Me.AtcText3.MaxWidth = 20
-        Me.AtcText3.Name = "AtcText3"
-        Me.AtcText3.NumericFormat = "0"
-        Me.AtcText3.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText3.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText3.SelLength = 0
-        Me.AtcText3.SelStart = 0
-        Me.AtcText3.Size = New System.Drawing.Size(44, 21)
-        Me.AtcText3.SoftMax = -999
-        Me.AtcText3.SoftMin = -999
-        Me.AtcText3.TabIndex = 31
-        Me.AtcText3.ValueDouble = 1
-        Me.AtcText3.ValueInteger = 1
+        Me.atxSDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxSDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxSDay.DefaultValue = ""
+        Me.atxSDay.HardMax = 31
+        Me.atxSDay.HardMin = 1
+        Me.atxSDay.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxSDay.Location = New System.Drawing.Point(245, 32)
+        Me.atxSDay.MaxWidth = 20
+        Me.atxSDay.Name = "atxSDay"
+        Me.atxSDay.NumericFormat = "0"
+        Me.atxSDay.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxSDay.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxSDay.SelLength = 0
+        Me.atxSDay.SelStart = 0
+        Me.atxSDay.Size = New System.Drawing.Size(44, 21)
+        Me.atxSDay.SoftMax = -999
+        Me.atxSDay.SoftMin = -999
+        Me.atxSDay.TabIndex = 31
+        Me.atxSDay.ValueDouble = 1
+        Me.atxSDay.ValueInteger = 1
         '
-        'AtcText4
+        'atxSYear
         '
-        Me.AtcText4.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText4.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcText4.DefaultValue = ""
-        Me.AtcText4.HardMax = 9999
-        Me.AtcText4.HardMin = 0
-        Me.AtcText4.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText4.Location = New System.Drawing.Point(127, 32)
-        Me.AtcText4.MaxWidth = 20
-        Me.AtcText4.Name = "AtcText4"
-        Me.AtcText4.NumericFormat = "0"
-        Me.AtcText4.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText4.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText4.SelLength = 0
-        Me.AtcText4.SelStart = 0
-        Me.AtcText4.Size = New System.Drawing.Size(64, 21)
-        Me.AtcText4.SoftMax = -999
-        Me.AtcText4.SoftMin = -999
-        Me.AtcText4.TabIndex = 30
-        Me.AtcText4.ValueDouble = 2000
-        Me.AtcText4.ValueInteger = 2000
+        Me.atxSYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxSYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxSYear.DefaultValue = ""
+        Me.atxSYear.HardMax = 9999
+        Me.atxSYear.HardMin = 0
+        Me.atxSYear.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxSYear.Location = New System.Drawing.Point(127, 32)
+        Me.atxSYear.MaxWidth = 20
+        Me.atxSYear.Name = "atxSYear"
+        Me.atxSYear.NumericFormat = "0"
+        Me.atxSYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxSYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxSYear.SelLength = 0
+        Me.atxSYear.SelStart = 0
+        Me.atxSYear.Size = New System.Drawing.Size(64, 21)
+        Me.atxSYear.SoftMax = -999
+        Me.atxSYear.SoftMin = -999
+        Me.atxSYear.TabIndex = 30
+        Me.atxSYear.ValueDouble = 2000
+        Me.atxSYear.ValueInteger = 2000
         '
-        'AtcText5
+        'atxEMonth
         '
-        Me.AtcText5.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText5.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcText5.DefaultValue = ""
-        Me.AtcText5.HardMax = 12
-        Me.AtcText5.HardMin = 1
-        Me.AtcText5.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText5.Location = New System.Drawing.Point(196, 58)
-        Me.AtcText5.MaxWidth = 20
-        Me.AtcText5.Name = "AtcText5"
-        Me.AtcText5.NumericFormat = "0"
-        Me.AtcText5.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText5.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText5.SelLength = 0
-        Me.AtcText5.SelStart = 0
-        Me.AtcText5.Size = New System.Drawing.Size(44, 21)
-        Me.AtcText5.SoftMax = -999
-        Me.AtcText5.SoftMin = -999
-        Me.AtcText5.TabIndex = 29
-        Me.AtcText5.ValueDouble = 12
-        Me.AtcText5.ValueInteger = 12
+        Me.atxEMonth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxEMonth.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxEMonth.DefaultValue = ""
+        Me.atxEMonth.HardMax = 12
+        Me.atxEMonth.HardMin = 1
+        Me.atxEMonth.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxEMonth.Location = New System.Drawing.Point(196, 58)
+        Me.atxEMonth.MaxWidth = 20
+        Me.atxEMonth.Name = "atxEMonth"
+        Me.atxEMonth.NumericFormat = "0"
+        Me.atxEMonth.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxEMonth.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxEMonth.SelLength = 0
+        Me.atxEMonth.SelStart = 0
+        Me.atxEMonth.Size = New System.Drawing.Size(44, 21)
+        Me.atxEMonth.SoftMax = -999
+        Me.atxEMonth.SoftMin = -999
+        Me.atxEMonth.TabIndex = 29
+        Me.atxEMonth.ValueDouble = 12
+        Me.atxEMonth.ValueInteger = 12
         '
-        'AtcText6
+        'atxSMonth
         '
-        Me.AtcText6.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText6.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcText6.DefaultValue = ""
-        Me.AtcText6.HardMax = 12
-        Me.AtcText6.HardMin = 1
-        Me.AtcText6.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText6.Location = New System.Drawing.Point(196, 32)
-        Me.AtcText6.MaxWidth = 20
-        Me.AtcText6.Name = "AtcText6"
-        Me.AtcText6.NumericFormat = "0"
-        Me.AtcText6.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText6.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText6.SelLength = 0
-        Me.AtcText6.SelStart = 0
-        Me.AtcText6.Size = New System.Drawing.Size(44, 21)
-        Me.AtcText6.SoftMax = -999
-        Me.AtcText6.SoftMin = -999
-        Me.AtcText6.TabIndex = 28
-        Me.AtcText6.ValueDouble = 1
-        Me.AtcText6.ValueInteger = 1
+        Me.atxSMonth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxSMonth.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxSMonth.DefaultValue = ""
+        Me.atxSMonth.HardMax = 12
+        Me.atxSMonth.HardMin = 1
+        Me.atxSMonth.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxSMonth.Location = New System.Drawing.Point(196, 32)
+        Me.atxSMonth.MaxWidth = 20
+        Me.atxSMonth.Name = "atxSMonth"
+        Me.atxSMonth.NumericFormat = "0"
+        Me.atxSMonth.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxSMonth.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxSMonth.SelLength = 0
+        Me.atxSMonth.SelStart = 0
+        Me.atxSMonth.Size = New System.Drawing.Size(44, 21)
+        Me.atxSMonth.SoftMax = -999
+        Me.atxSMonth.SoftMin = -999
+        Me.atxSMonth.TabIndex = 28
+        Me.atxSMonth.ValueDouble = 1
+        Me.atxSMonth.ValueInteger = 1
         '
-        'AtcText7
+        'atxEYear
         '
-        Me.AtcText7.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText7.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcText7.DefaultValue = ""
-        Me.AtcText7.HardMax = 9999
-        Me.AtcText7.HardMin = 0
-        Me.AtcText7.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText7.Location = New System.Drawing.Point(127, 58)
-        Me.AtcText7.MaxWidth = 20
-        Me.AtcText7.Name = "AtcText7"
-        Me.AtcText7.NumericFormat = "0"
-        Me.AtcText7.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText7.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText7.SelLength = 0
-        Me.AtcText7.SelStart = 0
-        Me.AtcText7.Size = New System.Drawing.Size(64, 21)
-        Me.AtcText7.SoftMax = -999
-        Me.AtcText7.SoftMin = -999
-        Me.AtcText7.TabIndex = 27
-        Me.AtcText7.ValueDouble = 2000
-        Me.AtcText7.ValueInteger = 2000
+        Me.atxEYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxEYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxEYear.DefaultValue = ""
+        Me.atxEYear.HardMax = 9999
+        Me.atxEYear.HardMin = 0
+        Me.atxEYear.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxEYear.Location = New System.Drawing.Point(127, 58)
+        Me.atxEYear.MaxWidth = 20
+        Me.atxEYear.Name = "atxEYear"
+        Me.atxEYear.NumericFormat = "0"
+        Me.atxEYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxEYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxEYear.SelLength = 0
+        Me.atxEYear.SelStart = 0
+        Me.atxEYear.Size = New System.Drawing.Size(64, 21)
+        Me.atxEYear.SoftMax = -999
+        Me.atxEYear.SoftMin = -999
+        Me.atxEYear.TabIndex = 27
+        Me.atxEYear.ValueDouble = 2000
+        Me.atxEYear.ValueInteger = 2000
         '
         'tpgSoil
         '
@@ -2140,27 +2113,23 @@ Public Class frmGeoSFM
         Me.ComboBox39.Size = New System.Drawing.Size(312, 21)
         Me.ComboBox39.TabIndex = 23
         '
-        'lblFlow
+        'AtcGridPrec
         '
-        Me.lblFlow.AutoSize = True
-        Me.lblFlow.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblFlow.Location = New System.Drawing.Point(28, 232)
-        Me.lblFlow.Name = "lblFlow"
-        Me.lblFlow.Size = New System.Drawing.Size(99, 13)
-        Me.lblFlow.TabIndex = 58
-        Me.lblFlow.Text = "Flow Direction Grid:"
-        Me.lblFlow.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-        '
-        'cboFlowDir
-        '
-        Me.cboFlowDir.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.AtcGridPrec.AllowHorizontalScrolling = True
+        Me.AtcGridPrec.AllowNewValidValues = False
+        Me.AtcGridPrec.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboFlowDir.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboFlowDir.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboFlowDir.Location = New System.Drawing.Point(152, 229)
-        Me.cboFlowDir.Name = "cboFlowDir"
-        Me.cboFlowDir.Size = New System.Drawing.Size(368, 21)
-        Me.cboFlowDir.TabIndex = 59
+        Me.AtcGridPrec.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridPrec.Fixed3D = False
+        Me.AtcGridPrec.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AtcGridPrec.LineColor = System.Drawing.Color.Empty
+        Me.AtcGridPrec.LineWidth = 0.0!
+        Me.AtcGridPrec.Location = New System.Drawing.Point(19, 129)
+        Me.AtcGridPrec.Name = "AtcGridPrec"
+        Me.AtcGridPrec.Size = New System.Drawing.Size(516, 255)
+        Me.AtcGridPrec.Source = Nothing
+        Me.AtcGridPrec.TabIndex = 41
         '
         'frmGeoSFM
         '
@@ -2184,9 +2153,8 @@ Public Class frmGeoSFM
         Me.tpgResponse.ResumeLayout(False)
         Me.tpgResponse.PerformLayout()
         Me.tpgRain.ResumeLayout(False)
-        Me.tpgRain.PerformLayout()
-        Me.GroupBox2.ResumeLayout(False)
-        Me.GroupBox2.PerformLayout()
+        Me.gbxSimulationDates.ResumeLayout(False)
+        Me.gbxSimulationDates.PerformLayout()
         Me.tpgSoil.ResumeLayout(False)
         Me.tpgFlow.ResumeLayout(False)
         Me.tpgSensitivity.ResumeLayout(False)
@@ -2200,6 +2168,9 @@ Public Class frmGeoSFM
     End Sub
 
 #End Region
+
+    Friend pPrecStations As atcCollection
+    Friend pMetStations As atcCollection
 
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
         Me.Close()
@@ -2277,8 +2248,32 @@ Public Class frmGeoSFM
             cboSubbasin.SelectedIndex = 0
         End If
 
+        'set prec/evap grid
+        With AtcGridPrec
+            .Source = New atcControls.atcGridSource
+            .AllowHorizontalScrolling = False
+        End With
+        pPrecStations = New atcCollection
+        pMetStations = New atcCollection
+
+        lblStatus.Text = "Reading Precipitation Data ..."
+        Me.Refresh()
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+        EnableControls(False)
+        BuildListofValidStationNames("PREC", pPrecStations)
+
+        lblStatus.Text = "Reading Evap Data ..."
+        Me.Refresh()
+        BuildListofValidStationNames("PEVT", pMetStations)
+
+        lblStatus.Text = "Update specifications if desired, then click OK to proceed."
+        Me.Refresh()
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+        EnableControls(True)
+
         DefaultBasinCharacteristicsGrids()
         DefaultResponseGrids()
+        SetPrecipStationGrid()
     End Sub
 
     Private Sub lblStatus_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lblStatus.TextChanged
@@ -2518,10 +2513,213 @@ Public Class frmGeoSFM
         Me.Refresh()
         EnableControls(True)
 
+        SetPrecipStationGrid()
+    End Sub
+
+    Private Sub SetPrecipStationGrid()
+        If AtcGridPrec.Source Is Nothing Then
+            Logger.Dbg("No atcGridPrec")
+        Else
+
+            'read order file to get subbasin id list
+            Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+            Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
+            Dim OrderFileName As String = lOutputPath & "order.txt"
+
+            Dim lSubbasins As New atcCollection
+            Try
+                Dim lCurrentRecord As String
+                Dim lStreamReader As New StreamReader(OrderFileName)
+                lCurrentRecord = lStreamReader.ReadLine  'only if first line is a header
+                Do
+                    lCurrentRecord = lStreamReader.ReadLine
+                    If lCurrentRecord Is Nothing Then
+                        Exit Do
+                    Else
+                        lSubbasins.Add(lCurrentRecord)
+                    End If
+                Loop
+            Catch e As ApplicationException
+                Logger.Msg("Cannot determine computational order." & vbCrLf & "Run 'Generate basin file' menu to create order.txt", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+                Exit Sub
+            End Try
+
+            AtcGridPrec.Clear()
+            With AtcGridPrec.Source
+                .Columns = 3
+                .ColorCells = True
+                .FixedRows = 1
+                .FixedColumns = 1
+                .CellColor(0, 0) = SystemColors.ControlDark
+                .CellColor(0, 1) = SystemColors.ControlDark
+                .CellColor(0, 2) = SystemColors.ControlDark
+                .Rows = 1 + lSubbasins.Count
+                .CellValue(0, 0) = "Subbasin ID"
+                .CellValue(0, 1) = "Precip Station"
+                .CellValue(0, 2) = "Evap Station"
+                For lIndex As Integer = 1 To lSubbasins.Count
+                    .CellValue(lIndex, 0) = lSubbasins(lIndex - 1)
+                    .CellColor(lIndex, 0) = SystemColors.ControlDark
+                    If pPrecStations.Count > 0 Then
+                        .CellValue(lIndex, 1) = pPrecStations(0).Description
+                        .CellEditable(lIndex, 1) = True
+                    End If
+                    If pMetStations.Count > 0 Then
+                        .CellValue(lIndex, 2) = pMetStations(0).Description
+                        .CellEditable(lIndex, 2) = True
+                    End If
+                Next
+            End With
+
+            Logger.Dbg("SetValidValues")
+            Dim lValidValues As New atcCollection
+            For Each lPrecStation As StationDetails In pPrecStations
+                lValidValues.Add(lPrecStation.Description)
+            Next
+            AtcGridPrec.ValidValues = lValidValues
+            AtcGridPrec.SizeAllColumnsToContents()
+            AtcGridPrec.Refresh()
+            Logger.Dbg("PrecipStationGrid refreshed")
+            SetDates()
+        End If
+    End Sub
+
+    Private Sub SetMetStationValidValues(ByVal aRow As Integer, ByVal aColumn As Integer)
+        Logger.Dbg("SetValidValues")
+        Dim lValidValues As New atcCollection
+        If aColumn = 1 Then
+            For Each lPrecStation As StationDetails In pPrecStations
+                lValidValues.Add(lPrecStation.Description)
+            Next
+        ElseIf aColumn = 2 Then
+            For Each lMetStation As StationDetails In pMetStations
+                lValidValues.Add(lMetStation.Description)
+            Next
+        End If
+        AtcGridPrec.ValidValues = lValidValues
+    End Sub
+
+    Private Sub SetDates()
+        ''set dates to the last common year of the selected met data        
+
+        Dim lSJDate As Double = 0.0
+        Dim lEJDate As Double = 0.0
+        Dim lSelectedStation As StationDetails
+
+        'set dates from prec dsn
+        For lrow As Integer = 1 To AtcGridPrec.Source.Rows - 1
+            lSelectedStation = pPrecStations.ItemByKey(AtcGridPrec.Source.CellValue(lrow, 1))
+            'set dates
+            If lSelectedStation.StartJDate > lSJDate Then
+                lSJDate = lSelectedStation.StartJDate
+            End If
+            If lEJDate = 0.0 Or lSelectedStation.EndJDate < lEJDate Then
+                lEJDate = lSelectedStation.EndJDate
+            End If
+        Next
+
+        'change dates to reflect met dsns if different
+        For lrow As Integer = 1 To AtcGridPrec.Source.Rows - 1
+            lSelectedStation = pMetStations.ItemByKey(AtcGridPrec.Source.CellValue(lrow, 2))
+            'set dates
+            If lSelectedStation.StartJDate > lSJDate Then
+                lSJDate = lSelectedStation.StartJDate
+            End If
+            If lEJDate = 0.0 Or lSelectedStation.EndJDate < lEJDate Then
+                lEJDate = lSelectedStation.EndJDate
+            End If
+        Next
+
+        Dim lEDate(5) As Integer, lSDate(5) As Integer
+        J2Date(lEJDate, lEDate)
+        J2Date(lSJDate, lSDate)
+
+        'set limits
+        atxSYear.HardMax = lEDate(0)
+        atxSYear.HardMin = lSDate(0)
+        atxEYear.HardMax = lEDate(0)
+        atxEYear.HardMin = lSDate(0)
+
+        'default to last calendar year of data
+        lSDate(0) = lEDate(0) - 1
+        lSDate(1) = 1
+        lSDate(2) = 1
+        lEDate(0) = lSDate(0)
+        lEDate(1) = 12
+        lEDate(2) = 31
+        atxSYear.Text = lSDate(0)
+        atxSMonth.Text = lSDate(1)
+        atxSDay.Text = lSDate(2)
+        atxEYear.Text = lEDate(0)
+        atxEMonth.Text = lEDate(1)
+        atxEDay.Text = lEDate(2)
     End Sub
 
     Private Sub cmdRainEvapNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdRainEvapNext.Click
+        'For lrow As Integer = 1 To AtcGridPrec.Source.Rows - 1
+        '    lSelectedStation = pPrecStations.ItemByKey(AtcGridPrec.Source.CellValue(lrow, 1))
+        '    'set dates
+        '    If lSelectedStation.StartJDate > lSJMetDate Then
+        '        lSJMetDate = lSelectedStation.StartJDate
+        '    End If
+        '    If lEJMetDate = 0.0 Or lSelectedStation.EndJDate < lEJMetDate Then
+        '        lEJMetDate = lSelectedStation.EndJDate
+        '    End If
+        '    'remember which precip gage goes with each catchment
+        '    lPrecGageNamesByCatchment.Add(lSelectedStation.Name)
+        '    'create rain gages from shapefile and selected station
+        '    CreateRaingageFromShapefile(lMetShapefileName, lSelectedStation.Name, .RainGages)
+        'Next
+
+        Dim lSJDate As Double = 0.0
+        Dim lEJDate As Double = 0.0
+        Dim lSDate(5) As Integer
+        Dim lEDate(5) As Integer
+        lSDate(0) = atxSYear.Text
+        lSDate(1) = atxSMonth.Text
+        lSDate(2) = atxSDay.Text
+        lEDate(0) = atxEYear.Text
+        lEDate(1) = atxEMonth.Text
+        lEDate(2) = atxEDay.Text
+        lSJDate = Date2J(lSDate)
+        lEJDate = Date2J(lEDate)
+
+
+        'If lSJDate < 1.0 Or lEJDate < 1 Then 'failed date check
+        '    Logger.Msg("The specified start/end dates are invalid.", vbOKOnly, "BASINS SWMM Problem")
+        '    EnableControls(True)
+        '    Exit Sub
+        'End If
+        'If lSJDate > lEJDate Then 'failed date check
+        '    Logger.Msg("The specified starting date is after the ending date.", vbOKOnly, "BASINS SWMM Problem")
+        '    EnableControls(True)
+        '    Exit Sub
+        'End If
+        'If lSJMetDate > lEJMetDate Then 'failed date check
+        '    Logger.Msg("The specified meteorologic stations do not have a common period of record.", vbOKOnly, "BASINS SWMM Problem")
+        '    EnableControls(True)
+        '    Exit Sub
+        'End If
+        ''compare dates from met data with specified start and end dates, make sure they are valid
+        'If lSJDate < lSJMetDate Or lEJMetDate < lEJDate Then 'failed date check
+        '    Logger.Msg("The specified start/end dates are not within the dates of the specified meteorologic stations.", vbOKOnly, "BASINS SWMM Problem")
+        '    EnableControls(True)
+        '    Exit Sub
+        'End If
+
+
+        EnableControls(False)
+        lblStatus.Text = "Writing Prec/Evap Data ..."
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+        Me.Refresh()
+
         RainEvap()
+
+        tabMain.SelectedIndex = 4
+        lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+        Me.Refresh()
+        EnableControls(True)
     End Sub
 
     Private Sub cmdBalanceNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdBalanceNext.Click
@@ -2590,5 +2788,13 @@ Public Class frmGeoSFM
             cboUSGS.Visible = False
             atxOverland.ValueDouble = 0.3
         End If
+    End Sub
+
+    Private Sub AtcGridPrec_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridPrec.CellEdited
+        SetDates()
+    End Sub
+
+    Private Sub AtcGridPrec_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridPrec.MouseDownCell
+        SetMetStationValidValues(aRow, aColumn)
     End Sub
 End Class
