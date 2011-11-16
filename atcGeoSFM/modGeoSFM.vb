@@ -1337,7 +1337,7 @@ Public Module modGeoSFM
 
     End Sub
 
-    Friend Sub RainEvap()
+    Friend Sub RainEvap(ByVal aPrecGageNamesBySubbasin As Collection, ByVal aEvapGageNamesBySubbasin As Collection, ByVal aSJDate As Double, ByVal aEJDate As Double)
         ' ***********************************************************************************************
         ' ***********************************************************************************************
         '
@@ -1369,9 +1369,114 @@ Public Module modGeoSFM
         ' ***********************************************************************************************
         ' ***********************************************************************************************
 
+        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+        Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
+        Dim OrderFileName As String = lOutputPath & "order.txt"
+
+        Dim lSubbasins As New atcCollection
+        Try
+            Dim lCurrentRecord As String
+            Dim lStreamReader As New StreamReader(OrderFileName)
+            lCurrentRecord = lStreamReader.ReadLine  'only if first line is a header
+            Do
+                lCurrentRecord = lStreamReader.ReadLine
+                If lCurrentRecord Is Nothing Then
+                    Exit Do
+                Else
+                    lSubbasins.Add(lCurrentRecord)
+                End If
+            Loop
+        Catch e As ApplicationException
+            Logger.Msg("Cannot determine computational order." & vbCrLf & "Run 'Generate basin file' menu to create order.txt", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+            Exit Sub
+        End Try
+
+        Dim lRainOut As New StringBuilder
+        Dim lEvapOut As New StringBuilder
+        Dim lStr As String = "Time"
+        For Each lSubbasin As String In lSubbasins
+            lStr = lStr & ", " & lSubbasin
+        Next
+        lRainOut.AppendLine(lStr)
+        lEvapOut.AppendLine(lStr)
+
+        'populate prec and evap arrays
+        Dim lNdates As Integer = aEJDate - aSJDate + 1
+        Dim lPrecArray(lSubbasins.Count, lNdates) As Single
+        Dim lEvapArray(lSubbasins.Count, lNdates) As Single
+
+        Dim lPrecTimeseries As atcTimeseries = Nothing
+        Dim lEvapTimeseries As atcTimeseries = Nothing
+
+        For lSubbasin As Integer = 0 To lSubbasins.Count - 1
+            Dim lPrecGageName As String = aPrecGageNamesBySubbasin(lSubbasin + 1)
+            Dim lEvapGageName As String = aEvapGageNamesBySubbasin(lSubbasin + 1)
+            For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
+                For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
+                    If (lDataSet.Attributes.GetValue("Constituent") = "PREC" And _
+                        lDataSet.Attributes.GetValue("Location") = lPrecGageName) Then
+                        lPrecTimeseries = Aggregate(lDataSet, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+                    End If
+                    If (lDataSet.Attributes.GetValue("Constituent") = "PEVT" And _
+                        lDataSet.Attributes.GetValue("Location") = lEvapGageName) Then
+                        lEvapTimeseries = Aggregate(lDataSet, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+                    End If
+                Next
+            Next
+            If Not lPrecTimeseries Is Nothing Then
+                Dim lStartIndex As Integer = lPrecTimeseries.Dates.IndexOfValue(aSJDate, True)
+                If aSJDate = lPrecTimeseries.Dates.Values(0) Or lStartIndex < 0 Then
+                    lStartIndex = 0
+                End If
+                Dim lEndIndex As Integer = lPrecTimeseries.Dates.IndexOfValue(aEJDate, True)
+                For lIndex As Integer = lStartIndex To lEndIndex - 1
+                    'The rain.txt file created from this process contains an average rainfall value in millimeters for each subbasin per day. 
+                    lPrecArray(lSubbasin, lIndex - lStartIndex) = lPrecTimeseries.Values(lIndex + 1)
+                Next
+            End If
+            If Not lEvapTimeseries Is Nothing Then
+                Dim lStartIndex As Integer = lEvapTimeseries.Dates.IndexOfValue(aSJDate, True)
+                If aSJDate = lEvapTimeseries.Dates.Values(0) Or lStartIndex < 0 Then
+                    lStartIndex = 0
+                End If
+                Dim lEndIndex As Integer = lEvapTimeseries.Dates.IndexOfValue(aEJDate, True)
+                For lIndex As Integer = lStartIndex To lEndIndex - 1
+                    'The evap.txt file contains a potential evapotranspiration (PET) value in tenths of millimeters for each subbasin per day.
+                    lEvapArray(lSubbasin, lIndex - lStartIndex) = lEvapTimeseries.Values(lIndex + 1)
+                Next
+            End If
+        Next
+
+        'write record for each date
+        For lIndex As Integer = 1 To lNdates
+            Dim lDate(6) As Integer
+            J2Date(aSJDate + lIndex - 1, lDate)
+            Dim lYr As Integer = lDate(0)
+            Dim lJYr As Double = Date2J(lYr, 1, 1)
+            Dim lDaysAfter As Integer = aSJDate + lIndex - lJYr
+            Dim lPrecString As String = lDate(0) & Format(lDaysAfter, "000")
+            Dim lEvapString As String = lDate(0) & Format(lDaysAfter, "000")
+            For lSubbasin As Integer = 0 To lSubbasins.Count - 1
+                lPrecString = lPrecString & ", " & Format(lPrecArray(lSubbasin, lIndex - 1), "0.0")
+            Next
+            For lSubbasin As Integer = 0 To lSubbasins.Count - 1
+                lEvapString = lEvapString & ", " & Format(lEvapArray(lSubbasin, lIndex - 1), "0.0")
+            Next
+            lRainOut.AppendLine(lPrecString)
+            lEvapOut.AppendLine(lEvapString)
+        Next
+
+        Dim lOutFile As String = lOutputPath & "rain.txt"
+        SaveFileString(lOutFile, lRainOut.ToString)
+
+        lOutFile = lOutputPath & "evap.txt"
+        SaveFileString(lOutFile, lEvapOut.ToString)
+
+        Logger.Msg("Processing Complete. Output files: " & vbCrLf & lOutputPath + "rain.txt" & vbCrLf & lOutputPath + "evap.txt", "Geospatial Stream Flow Model")
+
         '  fldlist = {"Rainfall and Evaporation", "Rainfall Only", "Evaporation Only"}
         '  fldchoice = MsgBox.ChoiceAsString(fldlist, "Select Parameter to Extract", "Extraction Parameter")
-        Dim typenum As Integer = 0
+        'Dim typenum As Integer = 0
         'If (fldchoice = "") Then
         '    Exit Sub
         'ElseIf (fldchoice = "Rainfall Only") Then
@@ -1392,64 +1497,64 @@ Public Module modGeoSFM
         '    myevapdir = ((thewkdir.asstring.astokens("/").get(0)) + "/evapdata/evap_year/")
         'End If
 
-        If (typenum = 3) Then
-            '  defaultlist = { "Basins" , TheWkDir.AsString , myraindir.AsString , myevapdir.AsString , "1999" , "1999" , "1" , "240", orderFNini.AsString }
-            '  labellist = { "Basin Grid" , "Output Directory", "Rain Data Directory" , "Evap Data Directory" , "Start Year" , "End Year" , "Start Day Number" , "End Day Number", "Computational Order File" }
+        'If (typenum = 3) Then
+        '  defaultlist = { "Basins" , TheWkDir.AsString , myraindir.AsString , myevapdir.AsString , "1999" , "1999" , "1" , "240", orderFNini.AsString }
+        '  labellist = { "Basin Grid" , "Output Directory", "Rain Data Directory" , "Evap Data Directory" , "Start Year" , "End Year" , "Start Day Number" , "End Day Number", "Computational Order File" }
 
-            '    inputlist = MsgBox.MultiInput("Enter Model Parameters", "Geospatial Stream Flow Model", labellist, defaultlist)
+        '    inputlist = MsgBox.MultiInput("Enter Model Parameters", "Geospatial Stream Flow Model", labellist, defaultlist)
 
-            '    If (inputlist.isempty) Then
-            '        Exit Sub
-            '    End If
+        '    If (inputlist.isempty) Then
+        '        Exit Sub
+        '    End If
 
-            '    basingname = inputlist.get(0)
-            '    workdirname = inputlist.get(1)
-            '    raindirname = inputlist.get(2)
-            '    evapdirname = inputlist.get(3)
-            '    startyear = inputlist.get(4)
-            '    endyear = inputlist.get(5)
-            '    startday = inputlist.get(6)
-            '    endday = inputlist.get(7)
-            '    orderFileN = inputlist.get(8)
-        ElseIf (typenum = 2) Then
-            '  defaultlist = { "Basins" , TheWkDir.AsString , myevapdir.AsString , "1999" , "1999" , "1" , "240", orderFNini.AsString }
-            '  labellist = { "Basin Grid" , "Output Directory", "Evap Data Directory" , "Start Year" , "End Year" , "Start Day Number" , "End Day Number", "Computational Order File" }
+        '    basingname = inputlist.get(0)
+        '    workdirname = inputlist.get(1)
+        '    raindirname = inputlist.get(2)
+        '    evapdirname = inputlist.get(3)
+        '    startyear = inputlist.get(4)
+        '    endyear = inputlist.get(5)
+        '    startday = inputlist.get(6)
+        '    endday = inputlist.get(7)
+        '    orderFileN = inputlist.get(8)
+        'ElseIf (typenum = 2) Then
+        '  defaultlist = { "Basins" , TheWkDir.AsString , myevapdir.AsString , "1999" , "1999" , "1" , "240", orderFNini.AsString }
+        '  labellist = { "Basin Grid" , "Output Directory", "Evap Data Directory" , "Start Year" , "End Year" , "Start Day Number" , "End Day Number", "Computational Order File" }
 
-            '    inputlist = MsgBox.MultiInput("Enter Model Parameters", "Geospatial Stream Flow Model", labellist, defaultlist)
+        '    inputlist = MsgBox.MultiInput("Enter Model Parameters", "Geospatial Stream Flow Model", labellist, defaultlist)
 
-            '    If (inputlist.isempty) Then
-            '        Exit Sub
-            '    End If
+        '    If (inputlist.isempty) Then
+        '        Exit Sub
+        '    End If
 
-            '    basingname = inputlist.get(0)
-            '    workdirname = inputlist.get(1)
-            '    raindirname = inputlist.get(2)
-            '    evapdirname = inputlist.get(2)
-            '    startyear = inputlist.get(3)
-            '    endyear = inputlist.get(4)
-            '    startday = inputlist.get(5)
-            '    endday = inputlist.get(6)
-            '    orderFileN = inputlist.get(7)
-        ElseIf (typenum = 1) Then
-            '  defaultlist = { "Basins" , TheWkDir.AsString , myraindir.AsString , "1999" , "1999" , "1" , "240", orderFNini.AsString }
-            '  labellist = { "Basin Grid" , "Output Directory", "Rain Data Directory" , "Start Year" , "End Year" , "Start Day Number" , "End Day Number", "Computational Order File" }
+        '    basingname = inputlist.get(0)
+        '    workdirname = inputlist.get(1)
+        '    raindirname = inputlist.get(2)
+        '    evapdirname = inputlist.get(2)
+        '    startyear = inputlist.get(3)
+        '    endyear = inputlist.get(4)
+        '    startday = inputlist.get(5)
+        '    endday = inputlist.get(6)
+        '    orderFileN = inputlist.get(7)
+        'ElseIf (typenum = 1) Then
+        '  defaultlist = { "Basins" , TheWkDir.AsString , myraindir.AsString , "1999" , "1999" , "1" , "240", orderFNini.AsString }
+        '  labellist = { "Basin Grid" , "Output Directory", "Rain Data Directory" , "Start Year" , "End Year" , "Start Day Number" , "End Day Number", "Computational Order File" }
 
-            '    inputlist = MsgBox.MultiInput("Enter Model Parameters", "Geospatial Stream Flow Model", labellist, defaultlist)
+        '    inputlist = MsgBox.MultiInput("Enter Model Parameters", "Geospatial Stream Flow Model", labellist, defaultlist)
 
-            '    If (inputlist.isempty) Then
-            '        Exit Sub
-            '    End If
+        '    If (inputlist.isempty) Then
+        '        Exit Sub
+        '    End If
 
-            '    basingname = inputlist.get(0)
-            '    workdirname = inputlist.get(1)
-            '    raindirname = inputlist.get(2)
-            '    evapdirname = inputlist.get(2)
-            '    startyear = inputlist.get(3)
-            '    endyear = inputlist.get(4)
-            '    startday = inputlist.get(5)
-            '    endday = inputlist.get(6)
-            '    orderFileN = inputlist.get(7)
-        End If
+        '    basingname = inputlist.get(0)
+        '    workdirname = inputlist.get(1)
+        '    raindirname = inputlist.get(2)
+        '    evapdirname = inputlist.get(2)
+        '    startyear = inputlist.get(3)
+        '    endyear = inputlist.get(4)
+        '    startday = inputlist.get(5)
+        '    endday = inputlist.get(6)
+        '    orderFileN = inputlist.get(7)
+        'End If
 
         'If (startyear.IsNumber.Not) Then
         '    MsgBox.error("Start year must be a number     eg 1999", "Geospatial Stream Flow Model")
@@ -1718,7 +1823,7 @@ Public Module modGeoSFM
         'ElseIf (typenum = 2) Then
         '    MsgBox.Info("Processing Complete. Output files: " + nl + efilename.AsString, "Geospatial Stream Flow Model")
         'Else
-        '    MsgBox.Info("Processing Complete. Output files: " + nl + rfilename.AsString + nl + efilename.AsString, "Geospatial Stream Flow Model")
+        'MsgBox.Info("Processing Complete. Output files: " + nl + rfilename.AsString + nl + efilename.AsString, "Geospatial Stream Flow Model")
         'End If
 
         'sub rainwrite
@@ -1761,9 +1866,6 @@ Public Module modGeoSFM
         'av.PurgeObjects()
 
         'File.Delete(zRainFN)
-
-        'The rain.txt file created from this process contains an average rainfall value in millimeters for each subbasin per day. 
-        'The evap.txt file contains a potential evapotranspiration (PET) value in tenths of millimeters for each subbasin per day.
     End Sub
 
     Friend Sub Balance()

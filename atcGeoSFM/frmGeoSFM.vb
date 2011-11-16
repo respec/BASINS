@@ -2656,20 +2656,37 @@ Public Class frmGeoSFM
     End Sub
 
     Private Sub cmdRainEvapNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdRainEvapNext.Click
-        'For lrow As Integer = 1 To AtcGridPrec.Source.Rows - 1
-        '    lSelectedStation = pPrecStations.ItemByKey(AtcGridPrec.Source.CellValue(lrow, 1))
-        '    'set dates
-        '    If lSelectedStation.StartJDate > lSJMetDate Then
-        '        lSJMetDate = lSelectedStation.StartJDate
-        '    End If
-        '    If lEJMetDate = 0.0 Or lSelectedStation.EndJDate < lEJMetDate Then
-        '        lEJMetDate = lSelectedStation.EndJDate
-        '    End If
-        '    'remember which precip gage goes with each catchment
-        '    lPrecGageNamesByCatchment.Add(lSelectedStation.Name)
-        '    'create rain gages from shapefile and selected station
-        '    CreateRaingageFromShapefile(lMetShapefileName, lSelectedStation.Name, .RainGages)
-        'Next
+        Dim lPrecGageNamesBySubbasin As New Collection
+        Dim lEvapGageNamesBySubbasin As New Collection
+        Dim lSelectedStation As StationDetails
+        Dim lSJMetDate As Double = 0.0
+        Dim lEJMetDate As Double = 0.0
+        'set precip stations
+        For lrow As Integer = 1 To AtcGridPrec.Source.Rows - 1
+            lSelectedStation = pPrecStations.ItemByKey(AtcGridPrec.Source.CellValue(lrow, 1))
+            'set dates
+            If lSelectedStation.StartJDate > lSJMetDate Then
+                lSJMetDate = lSelectedStation.StartJDate
+            End If
+            If lEJMetDate = 0.0 Or lSelectedStation.EndJDate < lEJMetDate Then
+                lEJMetDate = lSelectedStation.EndJDate
+            End If
+            'remember which precip gage goes with each catchment
+            lPrecGageNamesBySubbasin.Add(lSelectedStation.Name)
+        Next
+        'set evap stations
+        For lrow As Integer = 1 To AtcGridPrec.Source.Rows - 1
+            lSelectedStation = pMetStations.ItemByKey(AtcGridPrec.Source.CellValue(lrow, 2))
+            'set dates
+            If lSelectedStation.StartJDate > lSJMetDate Then
+                lSJMetDate = lSelectedStation.StartJDate
+            End If
+            If lEJMetDate = 0.0 Or lSelectedStation.EndJDate < lEJMetDate Then
+                lEJMetDate = lSelectedStation.EndJDate
+            End If
+            'remember which precip gage goes with each catchment
+            lEvapGageNamesBySubbasin.Add(lSelectedStation.Name)
+        Next
 
         Dim lSJDate As Double = 0.0
         Dim lEJDate As Double = 0.0
@@ -2684,36 +2701,34 @@ Public Class frmGeoSFM
         lSJDate = Date2J(lSDate)
         lEJDate = Date2J(lEDate)
 
-
-        'If lSJDate < 1.0 Or lEJDate < 1 Then 'failed date check
-        '    Logger.Msg("The specified start/end dates are invalid.", vbOKOnly, "BASINS SWMM Problem")
-        '    EnableControls(True)
-        '    Exit Sub
-        'End If
-        'If lSJDate > lEJDate Then 'failed date check
-        '    Logger.Msg("The specified starting date is after the ending date.", vbOKOnly, "BASINS SWMM Problem")
-        '    EnableControls(True)
-        '    Exit Sub
-        'End If
-        'If lSJMetDate > lEJMetDate Then 'failed date check
-        '    Logger.Msg("The specified meteorologic stations do not have a common period of record.", vbOKOnly, "BASINS SWMM Problem")
-        '    EnableControls(True)
-        '    Exit Sub
-        'End If
-        ''compare dates from met data with specified start and end dates, make sure they are valid
-        'If lSJDate < lSJMetDate Or lEJMetDate < lEJDate Then 'failed date check
-        '    Logger.Msg("The specified start/end dates are not within the dates of the specified meteorologic stations.", vbOKOnly, "BASINS SWMM Problem")
-        '    EnableControls(True)
-        '    Exit Sub
-        'End If
-
+        If lSJDate < 1.0 Or lEJDate < 1 Then 'failed date check
+            Logger.Msg("The specified start/end dates are invalid.", vbOKOnly, "BASINS GeoSFM Problem")
+            EnableControls(True)
+            Exit Sub
+        End If
+        If lSJDate > lEJDate Then 'failed date check
+            Logger.Msg("The specified starting date is after the ending date.", vbOKOnly, "BASINS GeoSFM Problem")
+            EnableControls(True)
+            Exit Sub
+        End If
+        If lSJMetDate > lEJMetDate Then 'failed date check
+            Logger.Msg("The specified meteorologic stations do not have a common period of record.", vbOKOnly, "BASINS GeoSFM Problem")
+            EnableControls(True)
+            Exit Sub
+        End If
+        'compare dates from met data with specified start and end dates, make sure they are valid
+        If lSJDate < lSJMetDate Or lEJMetDate < lEJDate Then 'failed date check
+            Logger.Msg("The specified start/end dates are not within the dates of the specified meteorologic stations.", vbOKOnly, "BASINS GeoSFM Problem")
+            EnableControls(True)
+            Exit Sub
+        End If
 
         EnableControls(False)
         lblStatus.Text = "Writing Prec/Evap Data ..."
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         Me.Refresh()
 
-        RainEvap()
+        RainEvap(lPrecGageNamesBySubbasin, lEvapGageNamesBySubbasin, lSJDate, lEJDate)
 
         tabMain.SelectedIndex = 4
         lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
