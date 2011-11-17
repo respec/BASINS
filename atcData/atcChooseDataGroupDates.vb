@@ -135,6 +135,17 @@ Public Class atcChooseDataGroupDates
             lblCommonEnd.Text = pNoDatesInCommon
             btnCommon.Enabled = False
         End If
+
+        If pFirstStart <= pLastEnd Then
+            lblDataStart.Text = pDateFormat.JDateToString(pFirstStart)
+            lblDataEnd.Text = pDateFormat.JDateToString(pLastEnd)
+            btnAll.Enabled = True
+            btnAll_Click(Nothing, Nothing)
+        Else
+            lblDataStart.Text = pNoDatesInCommon
+            lblDataEnd.Text = pNoDatesInCommon
+            btnAll.Enabled = False
+        End If
     End Sub
 
     Public ReadOnly Property SelectedAll() As Boolean
