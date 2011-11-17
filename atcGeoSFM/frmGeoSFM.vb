@@ -156,7 +156,6 @@ Public Class frmGeoSFM
     Friend WithEvents atxSMonth As atcControls.atcText
     Friend WithEvents atxEYear As atcControls.atcText
     Friend WithEvents tpgSoil As System.Windows.Forms.TabPage
-    Friend WithEvents AtcGrid1 As atcControls.atcGrid
     Friend WithEvents tpgFlow As System.Windows.Forms.TabPage
     Friend WithEvents AtcGrid2 As atcControls.atcGrid
     Friend WithEvents tpgSensitivity As System.Windows.Forms.TabPage
@@ -182,6 +181,17 @@ Public Class frmGeoSFM
     Friend WithEvents lblFlow As System.Windows.Forms.Label
     Friend WithEvents cboFlowDir As System.Windows.Forms.ComboBox
     Friend WithEvents AtcGridPrec As atcControls.atcGrid
+    Friend WithEvents lblInitial As System.Windows.Forms.Label
+    Friend WithEvents gbxData As System.Windows.Forms.GroupBox
+    Friend WithEvents rbnDaily As System.Windows.Forms.RadioButton
+    Friend WithEvents rbnHourly As System.Windows.Forms.RadioButton
+    Friend WithEvents gbxRun As System.Windows.Forms.GroupBox
+    Friend WithEvents rbnRun As System.Windows.Forms.RadioButton
+    Friend WithEvents rbnContinue As System.Windows.Forms.RadioButton
+    Friend WithEvents gbxMode As System.Windows.Forms.GroupBox
+    Friend WithEvents rbnCal As System.Windows.Forms.RadioButton
+    Friend WithEvents rbnSim As System.Windows.Forms.RadioButton
+    Friend WithEvents atxInitial As atcControls.atcText
     Friend WithEvents tpgMap As System.Windows.Forms.TabPage
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmGeoSFM))
@@ -245,6 +255,7 @@ Public Class frmGeoSFM
         Me.rbnNonUniformUSGS = New System.Windows.Forms.RadioButton
         Me.lblMethod = New System.Windows.Forms.Label
         Me.tpgRain = New System.Windows.Forms.TabPage
+        Me.AtcGridPrec = New atcControls.atcGrid
         Me.cmdRainEvapNext = New System.Windows.Forms.Button
         Me.gbxSimulationDates = New System.Windows.Forms.GroupBox
         Me.Label54 = New System.Windows.Forms.Label
@@ -260,7 +271,6 @@ Public Class frmGeoSFM
         Me.atxEYear = New atcControls.atcText
         Me.tpgSoil = New System.Windows.Forms.TabPage
         Me.cmdBalanceNext = New System.Windows.Forms.Button
-        Me.AtcGrid1 = New atcControls.atcGrid
         Me.tpgFlow = New System.Windows.Forms.TabPage
         Me.cmdRouteNext = New System.Windows.Forms.Button
         Me.AtcGrid2 = New atcControls.atcGrid
@@ -329,7 +339,17 @@ Public Class frmGeoSFM
         Me.Label44 = New System.Windows.Forms.Label
         Me.Label45 = New System.Windows.Forms.Label
         Me.ComboBox39 = New System.Windows.Forms.ComboBox
-        Me.AtcGridPrec = New atcControls.atcGrid
+        Me.lblInitial = New System.Windows.Forms.Label
+        Me.gbxData = New System.Windows.Forms.GroupBox
+        Me.rbnHourly = New System.Windows.Forms.RadioButton
+        Me.rbnDaily = New System.Windows.Forms.RadioButton
+        Me.gbxRun = New System.Windows.Forms.GroupBox
+        Me.rbnRun = New System.Windows.Forms.RadioButton
+        Me.rbnContinue = New System.Windows.Forms.RadioButton
+        Me.gbxMode = New System.Windows.Forms.GroupBox
+        Me.rbnCal = New System.Windows.Forms.RadioButton
+        Me.rbnSim = New System.Windows.Forms.RadioButton
+        Me.atxInitial = New atcControls.atcText
         Me.tabMain.SuspendLayout()
         Me.tpgTerrain.SuspendLayout()
         Me.tpgBasin.SuspendLayout()
@@ -344,6 +364,9 @@ Public Class frmGeoSFM
         Me.tpgMap.SuspendLayout()
         Me.tpgPlot.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
+        Me.gbxData.SuspendLayout()
+        Me.gbxRun.SuspendLayout()
+        Me.gbxMode.SuspendLayout()
         Me.SuspendLayout()
         '
         'cmdCancel
@@ -1104,6 +1127,24 @@ Public Class frmGeoSFM
         Me.tpgRain.Text = "Rain/Evap Data"
         Me.tpgRain.UseVisualStyleBackColor = True
         '
+        'AtcGridPrec
+        '
+        Me.AtcGridPrec.AllowHorizontalScrolling = True
+        Me.AtcGridPrec.AllowNewValidValues = False
+        Me.AtcGridPrec.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridPrec.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridPrec.Fixed3D = False
+        Me.AtcGridPrec.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AtcGridPrec.LineColor = System.Drawing.Color.Empty
+        Me.AtcGridPrec.LineWidth = 0.0!
+        Me.AtcGridPrec.Location = New System.Drawing.Point(19, 129)
+        Me.AtcGridPrec.Name = "AtcGridPrec"
+        Me.AtcGridPrec.Size = New System.Drawing.Size(516, 255)
+        Me.AtcGridPrec.Source = Nothing
+        Me.AtcGridPrec.TabIndex = 41
+        '
         'cmdRainEvapNext
         '
         Me.cmdRainEvapNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
@@ -1322,8 +1363,12 @@ Public Class frmGeoSFM
         '
         'tpgSoil
         '
+        Me.tpgSoil.Controls.Add(Me.atxInitial)
+        Me.tpgSoil.Controls.Add(Me.gbxMode)
+        Me.tpgSoil.Controls.Add(Me.gbxRun)
+        Me.tpgSoil.Controls.Add(Me.gbxData)
+        Me.tpgSoil.Controls.Add(Me.lblInitial)
         Me.tpgSoil.Controls.Add(Me.cmdBalanceNext)
-        Me.tpgSoil.Controls.Add(Me.AtcGrid1)
         Me.tpgSoil.Location = New System.Drawing.Point(4, 46)
         Me.tpgSoil.Name = "tpgSoil"
         Me.tpgSoil.Size = New System.Drawing.Size(647, 396)
@@ -1341,24 +1386,6 @@ Public Class frmGeoSFM
         Me.cmdBalanceNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdBalanceNext.TabIndex = 52
         Me.cmdBalanceNext.Text = "Next >"
-        '
-        'AtcGrid1
-        '
-        Me.AtcGrid1.AllowHorizontalScrolling = True
-        Me.AtcGrid1.AllowNewValidValues = False
-        Me.AtcGrid1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGrid1.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGrid1.Fixed3D = False
-        Me.AtcGrid1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AtcGrid1.LineColor = System.Drawing.Color.Empty
-        Me.AtcGrid1.LineWidth = 0.0!
-        Me.AtcGrid1.Location = New System.Drawing.Point(21, 19)
-        Me.AtcGrid1.Name = "AtcGrid1"
-        Me.AtcGrid1.Size = New System.Drawing.Size(521, 308)
-        Me.AtcGrid1.Source = Nothing
-        Me.AtcGrid1.TabIndex = 51
         '
         'tpgFlow
         '
@@ -2113,23 +2140,136 @@ Public Class frmGeoSFM
         Me.ComboBox39.Size = New System.Drawing.Size(312, 21)
         Me.ComboBox39.TabIndex = 23
         '
-        'AtcGridPrec
+        'lblInitial
         '
-        Me.AtcGridPrec.AllowHorizontalScrolling = True
-        Me.AtcGridPrec.AllowNewValidValues = False
-        Me.AtcGridPrec.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridPrec.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGridPrec.Fixed3D = False
-        Me.AtcGridPrec.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AtcGridPrec.LineColor = System.Drawing.Color.Empty
-        Me.AtcGridPrec.LineWidth = 0.0!
-        Me.AtcGridPrec.Location = New System.Drawing.Point(19, 129)
-        Me.AtcGridPrec.Name = "AtcGridPrec"
-        Me.AtcGridPrec.Size = New System.Drawing.Size(516, 255)
-        Me.AtcGridPrec.Source = Nothing
-        Me.AtcGridPrec.TabIndex = 41
+        Me.lblInitial.AutoSize = True
+        Me.lblInitial.Location = New System.Drawing.Point(28, 31)
+        Me.lblInitial.Name = "lblInitial"
+        Me.lblInitial.Size = New System.Drawing.Size(97, 13)
+        Me.lblInitial.TabIndex = 53
+        Me.lblInitial.Text = "Initial Soil Moisture:"
+        '
+        'gbxData
+        '
+        Me.gbxData.Controls.Add(Me.rbnDaily)
+        Me.gbxData.Controls.Add(Me.rbnHourly)
+        Me.gbxData.Location = New System.Drawing.Point(193, 80)
+        Me.gbxData.Name = "gbxData"
+        Me.gbxData.Size = New System.Drawing.Size(152, 47)
+        Me.gbxData.TabIndex = 55
+        Me.gbxData.TabStop = False
+        Me.gbxData.Text = "Data Format"
+        '
+        'rbnHourly
+        '
+        Me.rbnHourly.AutoSize = True
+        Me.rbnHourly.Location = New System.Drawing.Point(14, 19)
+        Me.rbnHourly.Name = "rbnHourly"
+        Me.rbnHourly.Size = New System.Drawing.Size(55, 17)
+        Me.rbnHourly.TabIndex = 0
+        Me.rbnHourly.Text = "Hourly"
+        Me.rbnHourly.UseVisualStyleBackColor = True
+        '
+        'rbnDaily
+        '
+        Me.rbnDaily.AutoSize = True
+        Me.rbnDaily.Checked = True
+        Me.rbnDaily.Location = New System.Drawing.Point(75, 19)
+        Me.rbnDaily.Name = "rbnDaily"
+        Me.rbnDaily.Size = New System.Drawing.Size(48, 17)
+        Me.rbnDaily.TabIndex = 1
+        Me.rbnDaily.TabStop = True
+        Me.rbnDaily.Text = "Daily"
+        Me.rbnDaily.UseVisualStyleBackColor = True
+        '
+        'gbxRun
+        '
+        Me.gbxRun.Controls.Add(Me.rbnContinue)
+        Me.gbxRun.Controls.Add(Me.rbnRun)
+        Me.gbxRun.Location = New System.Drawing.Point(200, 186)
+        Me.gbxRun.Name = "gbxRun"
+        Me.gbxRun.Size = New System.Drawing.Size(159, 76)
+        Me.gbxRun.TabIndex = 56
+        Me.gbxRun.TabStop = False
+        Me.gbxRun.Text = "Run Option"
+        '
+        'rbnRun
+        '
+        Me.rbnRun.AutoSize = True
+        Me.rbnRun.Checked = True
+        Me.rbnRun.Location = New System.Drawing.Point(7, 28)
+        Me.rbnRun.Name = "rbnRun"
+        Me.rbnRun.Size = New System.Drawing.Size(70, 17)
+        Me.rbnRun.TabIndex = 1
+        Me.rbnRun.TabStop = True
+        Me.rbnRun.Text = "New Run"
+        Me.rbnRun.UseVisualStyleBackColor = True
+        '
+        'rbnContinue
+        '
+        Me.rbnContinue.AutoSize = True
+        Me.rbnContinue.Location = New System.Drawing.Point(7, 51)
+        Me.rbnContinue.Name = "rbnContinue"
+        Me.rbnContinue.Size = New System.Drawing.Size(134, 17)
+        Me.rbnContinue.TabIndex = 2
+        Me.rbnContinue.Text = "Continue Previous Run"
+        Me.rbnContinue.UseVisualStyleBackColor = True
+        '
+        'gbxMode
+        '
+        Me.gbxMode.Controls.Add(Me.rbnCal)
+        Me.gbxMode.Controls.Add(Me.rbnSim)
+        Me.gbxMode.Location = New System.Drawing.Point(103, 279)
+        Me.gbxMode.Name = "gbxMode"
+        Me.gbxMode.Size = New System.Drawing.Size(159, 76)
+        Me.gbxMode.TabIndex = 57
+        Me.gbxMode.TabStop = False
+        Me.gbxMode.Text = "Mode"
+        '
+        'rbnCal
+        '
+        Me.rbnCal.AutoSize = True
+        Me.rbnCal.Location = New System.Drawing.Point(7, 51)
+        Me.rbnCal.Name = "rbnCal"
+        Me.rbnCal.Size = New System.Drawing.Size(74, 17)
+        Me.rbnCal.TabIndex = 2
+        Me.rbnCal.Text = "Calibration"
+        Me.rbnCal.UseVisualStyleBackColor = True
+        '
+        'rbnSim
+        '
+        Me.rbnSim.AutoSize = True
+        Me.rbnSim.Checked = True
+        Me.rbnSim.Location = New System.Drawing.Point(7, 28)
+        Me.rbnSim.Name = "rbnSim"
+        Me.rbnSim.Size = New System.Drawing.Size(73, 17)
+        Me.rbnSim.TabIndex = 1
+        Me.rbnSim.TabStop = True
+        Me.rbnSim.Text = "Simulation"
+        Me.rbnSim.UseVisualStyleBackColor = True
+        '
+        'atxInitial
+        '
+        Me.atxInitial.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxInitial.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.atxInitial.DefaultValue = "0.1"
+        Me.atxInitial.HardMax = 1
+        Me.atxInitial.HardMin = 0
+        Me.atxInitial.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxInitial.Location = New System.Drawing.Point(183, 30)
+        Me.atxInitial.MaxWidth = 20
+        Me.atxInitial.Name = "atxInitial"
+        Me.atxInitial.NumericFormat = "0.#####"
+        Me.atxInitial.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxInitial.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxInitial.SelLength = 0
+        Me.atxInitial.SelStart = 0
+        Me.atxInitial.Size = New System.Drawing.Size(85, 22)
+        Me.atxInitial.SoftMax = -999
+        Me.atxInitial.SoftMin = -999
+        Me.atxInitial.TabIndex = 58
+        Me.atxInitial.ValueDouble = 0.1
+        Me.atxInitial.ValueInteger = 0
         '
         'frmGeoSFM
         '
@@ -2156,6 +2296,7 @@ Public Class frmGeoSFM
         Me.gbxSimulationDates.ResumeLayout(False)
         Me.gbxSimulationDates.PerformLayout()
         Me.tpgSoil.ResumeLayout(False)
+        Me.tpgSoil.PerformLayout()
         Me.tpgFlow.ResumeLayout(False)
         Me.tpgSensitivity.ResumeLayout(False)
         Me.tpgCalibrate.ResumeLayout(False)
@@ -2163,6 +2304,12 @@ Public Class frmGeoSFM
         Me.tpgMap.ResumeLayout(False)
         Me.tpgPlot.ResumeLayout(False)
         Me.GroupBox1.ResumeLayout(False)
+        Me.gbxData.ResumeLayout(False)
+        Me.gbxData.PerformLayout()
+        Me.gbxRun.ResumeLayout(False)
+        Me.gbxRun.PerformLayout()
+        Me.gbxMode.ResumeLayout(False)
+        Me.gbxMode.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -2738,7 +2885,38 @@ Public Class frmGeoSFM
     End Sub
 
     Private Sub cmdBalanceNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdBalanceNext.Click
-        Balance()
+        Dim lIniFract As Single = atxInitial.Text
+        Dim lDformat As Integer = 0
+        If rbnDaily.Checked Then
+            lDformat = 1
+        End If
+        Dim lInimode As Integer = 0
+        If rbnContinue.Checked Then
+            lInimode = 1
+        End If
+        Dim lRunmode As Integer = 0
+        If rbnCal.Checked Then
+            lRunmode = 1
+        End If
+        Dim lSJDate As Double = 0.0
+        Dim lSDate(5) As Integer
+        lSDate(0) = atxSYear.Text
+        lSDate(1) = atxSMonth.Text
+        lSDate(2) = atxSDay.Text
+        lSJDate = Date2J(lSDate)
+
+        EnableControls(False)
+        lblStatus.Text = "Performing Soil Water Balance ..."
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+        Me.Refresh()
+
+        Balance(lIniFract, lDformat, lInimode, lRunmode, lSJDate)
+
+        tabMain.SelectedIndex = 5
+        lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+        Me.Refresh()
+        EnableControls(True)
     End Sub
 
     Private Sub cmdRouteNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdRouteNext.Click

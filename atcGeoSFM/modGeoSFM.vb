@@ -153,17 +153,25 @@ Public Module modGeoSFM
             Dim lTreeDatResultFileName As String = FilenameNoExt(lDEMFileName) & "Tree.Dat"
             Dim lCoordDatResultFileName As String = FilenameNoExt(lDEMFileName) & "Coord.Dat"
             Dim lStreamShapeResultFileName As String = FilenameNoExt(lDEMFileName) & "StreamsShape.shp"
+            Dim lSubbasinShapeResultFileName As String = FilenameNoExt(lDEMFileName) & "SubbasinsShape.shp"
             lStreamGridFileName = FilenameNoExt(lDEMFileName) & "Stream.bgd"
             lSubbasinGridFileName = FilenameNoExt(lDEMFileName) & "Watershed.bgd"
 
             MapWinGeoProc.Hydrology.DelinStreamGrids(lDEMFileName, lPitFillDEMFileName, lFlowDirGridFileName, lSlopeGridFileName, lFlowAccGridFileName, "", lStrahlOrdResultGridFileName, lLongUpslopeResultGridFileName, lTotalUpslopeResultGridFileName, lStreamGridFileName, lStreamOrderResultGridFileName, lTreeDatResultFileName, lCoordDatResultFileName, aThresh, False, False, Nothing)
             MapWinGeoProc.Hydrology.DelinStreamsAndSubBasins(lFlowDirGridFileName, lTreeDatResultFileName, lCoordDatResultFileName, lStreamShapeResultFileName, lSubbasinGridFileName, Nothing)
+            MapWinGeoProc.Hydrology.SubbasinsToShape(lFlowDirGridFileName, lSubbasinGridFileName, lSubbasinShapeResultFileName, Nothing)
 
             If Not GisUtil.IsLayer(lSubbasinGridLayerName) Then
                 GisUtil.AddLayer(lSubbasinGridFileName, "Subbasin Grid")
             End If
             If Not GisUtil.IsLayer(lStreamGridLayerName) Then
                 GisUtil.AddLayer(lStreamGridFileName, "Stream Grid")
+            End If
+            If Not GisUtil.IsLayer("Streams") Then
+                GisUtil.AddLayer(lStreamShapeResultFileName, "Streams")
+            End If
+            If Not GisUtil.IsLayer("Subbasins") Then
+                GisUtil.AddLayer(lSubbasinShapeResultFileName, "Subbasins")
             End If
         End If
 
@@ -1408,21 +1416,32 @@ Public Module modGeoSFM
         Dim lPrecTimeseries As atcTimeseries = Nothing
         Dim lEvapTimeseries As atcTimeseries = Nothing
 
+        Dim lPrecGageNamePrev As String = ""
+        Dim lEvapGageNamePrev As String = ""
+
         For lSubbasin As Integer = 0 To lSubbasins.Count - 1
             Dim lPrecGageName As String = aPrecGageNamesBySubbasin(lSubbasin + 1)
             Dim lEvapGageName As String = aEvapGageNamesBySubbasin(lSubbasin + 1)
-            For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
-                For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
-                    If (lDataSet.Attributes.GetValue("Constituent") = "PREC" And _
-                        lDataSet.Attributes.GetValue("Location") = lPrecGageName) Then
-                        lPrecTimeseries = Aggregate(lDataSet, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
-                    End If
-                    If (lDataSet.Attributes.GetValue("Constituent") = "PEVT" And _
-                        lDataSet.Attributes.GetValue("Location") = lEvapGageName) Then
-                        lEvapTimeseries = Aggregate(lDataSet, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
-                    End If
+            If lPrecGageName <> lPrecGageNamePrev Then
+                For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
+                    For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
+                        If (lDataSet.Attributes.GetValue("Constituent") = "PREC" And _
+                            lDataSet.Attributes.GetValue("Location") = lPrecGageName) Then
+                            lPrecTimeseries = Aggregate(lDataSet, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+                        End If
+                    Next
                 Next
-            Next
+            End If
+            If lEvapGageName <> lEvapGageNamePrev Then
+                For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
+                    For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
+                        If (lDataSet.Attributes.GetValue("Constituent") = "PEVT" And _
+                            lDataSet.Attributes.GetValue("Location") = lEvapGageName) Then
+                            lEvapTimeseries = Aggregate(lDataSet, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+                        End If
+                    Next
+                Next
+            End If
             If Not lPrecTimeseries Is Nothing Then
                 Dim lStartIndex As Integer = lPrecTimeseries.Dates.IndexOfValue(aSJDate, True)
                 If aSJDate = lPrecTimeseries.Dates.Values(0) Or lStartIndex < 0 Then
@@ -1431,7 +1450,7 @@ Public Module modGeoSFM
                 Dim lEndIndex As Integer = lPrecTimeseries.Dates.IndexOfValue(aEJDate, True)
                 For lIndex As Integer = lStartIndex To lEndIndex - 1
                     'The rain.txt file created from this process contains an average rainfall value in millimeters for each subbasin per day. 
-                    lPrecArray(lSubbasin, lIndex - lStartIndex) = lPrecTimeseries.Values(lIndex + 1)
+                    lPrecArray(lSubbasin, lIndex - lStartIndex) = lPrecTimeseries.Values(lIndex + 1) * 25.4   'mm/inch 
                 Next
             End If
             If Not lEvapTimeseries Is Nothing Then
@@ -1442,9 +1461,11 @@ Public Module modGeoSFM
                 Dim lEndIndex As Integer = lEvapTimeseries.Dates.IndexOfValue(aEJDate, True)
                 For lIndex As Integer = lStartIndex To lEndIndex - 1
                     'The evap.txt file contains a potential evapotranspiration (PET) value in tenths of millimeters for each subbasin per day.
-                    lEvapArray(lSubbasin, lIndex - lStartIndex) = lEvapTimeseries.Values(lIndex + 1)
+                    lEvapArray(lSubbasin, lIndex - lStartIndex) = lEvapTimeseries.Values(lIndex + 1) * 254.0   'tenths of mm/inch 
                 Next
             End If
+            lPrecGageNamePrev = lPrecGageName
+            lEvapGageNamePrev = lEvapGageName
         Next
 
         'write record for each date
@@ -1868,7 +1889,7 @@ Public Module modGeoSFM
         'File.Delete(zRainFN)
     End Sub
 
-    Friend Sub Balance()
+    Friend Sub Balance(ByVal inifract As Single, ByVal dformat As Integer, ByVal inimode As Integer, ByVal runmode As Integer, ByVal aSjDate As Double)
         ' ***********************************************************************************************
         ' ***********************************************************************************************
         '
@@ -1895,58 +1916,7 @@ Public Module modGeoSFM
         ' ***********************************************************************************************
         ' ***********************************************************************************************
 
-        '        TheProject = av.GetProject
-        '        theFileName = theProject.GetFileName
-        '        If (theFileName = nil) Then
-        '            av.Run("Project.SaveAs", nil)
-        '            theFileName = theProject.GetFileName
-        '            If (theFileName = nil) Then
-        '    exit
-        '                End
-        '            Else
-        '                If (av.Run("Project.CheckForEdits", nil).Not) Then
-        '                    Return nil
-        '                    End
-        '                    If (theProject.Save) Then
-        '                        av.ShowMsg("Project saved to '" + theFileName.GetBaseName + "'")
-        '    if (System.GetOS = #SYSTEM_OS_MAC) then
-        '                            Script.Make("MacClass.SetDocInfo(SELF, Project)").DoIt(theFileName)
-        '                            End
-        '                            End
-        '                            End
-
-        '                            TheView = av.GetActiveDoc
-        '                            ViewChk = TheView.GetGUI
-        '                            If (ViewChk <> "View") Then
-        '                                MsgBox.error("Click on the View to make it 'active' before running this program", "")
-        ' exit
-        '                                End
-
-        '                                ' Check the working directory
-        '                                TheWkDir = TheProject.GetWorkDir.asstring
-        '                                myWkDirname = MsgBox.Input("Specify your working directory", "Working Directory", TheWkDir)
-        '                                If (mywkDirName = nil) Then
-        ' exit
-        '                                    End
-        '                                    If (File.Exists(myWkDirname.AsFileName).not) Then
-        '                                        MsgBox.Error("Cannot read directory " + myWkDirname, "Directory Specification Error")
-        ' exit
-        '                                        End
-        '                                        If (File.IsWritable(myWkDirname.AsFileName).not) Then
-        '                                            MsgBox.Error(myWkDirname + +"is not writable.", "Directory Specification Error")
-        ' exit
-        '                                            End
-        '                                            TheProject.SetWorkDir(myWkDirname.AsFileName)
-
-        '                                            If ((myWkDirname.contains("\").Not) And (myWkDirname.contains("/")) And (myWkDirname.right(1) <> "/")) Then
-        '                                                myWkDirname = myWkDirname + "/"
-        '                                            ElseIf ((myWkDirname.contains("\")) And (myWkDirname.right(1) <> "\")) Then
-        '                                                myWkDirname = myWkDirname + "\"
-        '                                            ElseIf ((myWkDirname.contains("\").Not) And (myWkDirname.contains("\").Not) And (myWkDirname.right(1) <> "/")) Then
-        '                                                myWkDirname = myWkDirname + "/"
-        '                                                End
-
-        '                                                'CREATE A LIST OF INPUT LABELS
+        'CREATE A LIST OF INPUT LABELS
         'labels = { "Input Rainfall File", "Input Evap File", "Input Basin File", 
         '          "Input Response File", "Input Parameter File", "Basin Runoff Yield File",
         '          "Output Soil Moisture File", "Output Actual Evap.File", "Ground Water Loss File", 
@@ -1954,620 +1924,445 @@ Public Module modGeoSFM
         '          "Mass Balance File", "Process/Error Log File",  "Initial Soil Moisture File"}
 
         'defaults = { "rain.txt", "evap.txt","basin.txt","response.txt", "balparam.txt", "basinrunoffyield.txt", "soilwater.txt", "actualevap.txt", "gwloss.txt", "cswater.txt", "excessflow.txt", "interflow.txt", "baseflow.txt", "massbalance.txt", "logfilesoil.txt", "initial.txt"}
+        'inpList = MsgBox.MultiInput("Enter Model Parameters.", "Geospatial Stream Flow Model", labels, defaults)
 
-        '                                                inpList = MsgBox.MultiInput("Enter Model Parameters.", "Geospatial Stream Flow Model", labels, defaults)
+        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+        Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
 
-        '                                                If (inpList.IsEmpty) Then
-        '  exit
-        '                                                    End
-
-        '                                                    rainfilename = myWkDirname + inplist.get(0)
-        '                                                    evapfilename = myWkDirname + inplist.get(1)
-        '                                                    basinfilename = myWkDirname + inplist.get(2)
-        '                                                    respfilename = myWkDirname + inplist.get(3)
-        '                                                    paramfilename = myWkDirname + inplist.get(4)
-        '                                                    surpfilename = myWkDirname + inplist.get(5)
-        '                                                    storefilename = myWkDirname + inplist.get(6)
-        '                                                    aevapfilename = myWkDirname + inplist.get(7)
-        '                                                    gwlossfilename = myWkDirname + inplist.get(8)
-        '                                                    outswfilename = myWkDirname + inplist.get(9)
-        '                                                    excessfilename = myWkDirname + inplist.get(10)
-        '                                                    interfilename = myWkDirname + inplist.get(11)
-        '                                                    basefilename = myWkDirname + inplist.get(12)
-        '                                                    massfilename = myWkDirname + inplist.get(13)
-        '                                                    logfilename = myWkDirname + inplist.get(14)
-        '                                                    initialfilename = myWkDirname + inplist.get(15)
-        '                                                    balfilename = myWkDirname + "balfiles.txt"
-        '                                                    'maxtimefilename = myWkDirname + "maxtime.txt"
-        '                                                    testfilename = myWkDirname + "testfile.txt"
-        '                                                    whichmodelFN = myWkDirname + "whichmodel.txt"
-
-
-
-        '                                                    'rainfilename = inplist.get(0)
-        '                                                    'evapfilename = inplist.get(1)
-        '                                                    'basinfilename = inplist.get(2)
-        '                                                    'respfilename = inplist.get(3)
-        '                                                    'paramfilename = inplist.get(4)
-        '                                                    'surpfilename = inplist.get(5)
-        '                                                    'storefilename = inplist.get(6)
-        '                                                    'aevapfilename = inplist.get(7)
-        '                                                    'gwlossfilename = inplist.get(8)
-        '                                                    'outswfilename = inplist.get(9)
-        '                                                    'excessfilename = inplist.get(10)
-        '                                                    'interfilename = inplist.get(11)
-        '                                                    'basefilename = inplist.get(12)
-        '                                                    'massfilename = inplist.get(13)
-        '                                                    'logfilename = inplist.get(14)
-        '                                                    'initialfilename = inplist.get(15)
-        '                                                    '
-        '                                                    oldout = theProject.finddoc("Final Soil Moisture")
-        '                                                    If (oldout <> nil) Then
-        '                                                        theproject.removedoc(oldout)
-        '                                                        End
-        '                                                        oldout = theProject.finddoc("cswater.txt")
-        '                                                        If (oldout <> nil) Then
-        '                                                            theproject.removedoc(oldout)
-        '                                                            End
-
-        '                                                            TableGUI = av.FindGUI("Table")
-        '                                                            theDocs = theProject.GetDocsWithGroupGUI(TableGUI)
-        '                                                            If (theDocs.IsEmpty.Not) Then
-        '                                                                For Each ddoc In thedocs
-        '                                                                    ddoc.getvtab.UnJoinall()
-        '                                                                    ddoc.getvtab.UnLinkall()
-        '                                                                    theProject.RemoveDoc(ddoc)
-        '                                                                    End
-        '                                                                    End
-
-        '                                                                    ChartGUI = av.FindGUI("Chart")
-        '                                                                    theDocs = theProject.GetDocsWithGroupGUI(ChartGUI)
-        '                                                                    If (theDocs.IsEmpty.Not) Then
-        '                                                                        For Each ddoc In thedocs
-        '                                                                            ddoc.getvtab.UnJoinall()
-        '                                                                            ddoc.getvtab.UnLinkall()
-        '                                                                            theProject.RemoveDoc(ddoc)
-        '                                                                            End
-        '                                                                            End
-
-        '                                                                            theFileName = theProject.GetFileName
-        '                                                                            If (theFileName = nil) Then
-        '                                                                                av.Run("Project.SaveAs", nil)
-        '                                                                                theFileName = theProject.GetFileName
-        '                                                                                If (theFileName = nil) Then
-        '    exit
-        '                                                                                    End
-        '                                                                                Else
-        '                                                                                    If (av.Run("Project.CheckForEdits", nil).Not) Then
-        '                                                                                        Return nil
-        '                                                                                        End
-        '                                                                                        If (theProject.Save) Then
-        '                                                                                            av.ShowMsg("Project saved to '" + theFileName.GetBaseName + "'")
-        '    if (System.GetOS = #SYSTEM_OS_MAC) then
-        '                                                                                                Script.Make("MacClass.SetDocInfo(SELF, Project)").DoIt(theFileName)
-        '                                                                                                End
-        '                                                                                                End
-        '                                                                                                End
+        Dim rainfilename As String = lOutputPath & "rain.txt"
+        Dim evapfilename As String = lOutputPath & "evap.txt"
+        Dim basinfilename As String = lOutputPath & "basin.txt"
+        Dim respfilename As String = lOutputPath & "response.txt"
+        Dim paramfilename As String = lOutputPath & "balparam.txt"
+        Dim surpfilename As String = lOutputPath & "basinrunoffyield.txt"
+        Dim storefilename As String = lOutputPath & "soilwater.txt"
+        Dim aevapfilename As String = lOutputPath & "actualevap.txt"
+        Dim gwlossfilename As String = lOutputPath & "gwloss.txt"
+        Dim outswfilename As String = lOutputPath & "cswater.txt"
+        Dim excessfilename As String = lOutputPath & "excessflow.txt"
+        Dim interfilename As String = lOutputPath & "interflow.txt"
+        Dim basefilename As String = lOutputPath & "baseflow.txt"
+        Dim massfilename As String = lOutputPath & "massbalance.txt"
+        Dim logfilename As String = lOutputPath & "logfilesoil.txt"
+        Dim initialfilename As String = lOutputPath & "initial.txt"
+        Dim balfilename As String = lOutputPath & "balfiles.txt"
+        Dim maxtimefilename As String = lOutputPath & "maxtime.txt"
+        Dim testfilename As String = lOutputPath & "testfile.txt"
+        Dim whichmodelFN As String = lOutputPath & "whichmodel.txt"
 
         'chkfile=TextFile.Make((balfilename).asfilename,#file_perm_write)
-        '                                                                                                If (chkfile = nil) Then
-        '                                                                                                    MsgBox.info("Could not create the input/output file: " + nl + "balfiles.txt", "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                    End
+        'If (chkfile = nil) Then
+        '    MsgBox.info("Could not create the input/output file: " + nl + "balfiles.txt", "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
-        'rainfile = LineFile.Make((rainfilename).asfilename,#file_perm_read)
-        '                                                                                                    If (rainfile = nil) Then
-        '                                                                                                        MsgBox.info("Could not open rain file," + nl + rainfilename, "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                        End
+        If Not FileExists(rainfilename) Then
+            Logger.Msg("Could not open rain file," & vbCrLf & rainfilename, "Geospatial Stream Flow Model")
+            Exit Sub
+        End If
 
-        'evapfile = LineFile.Make((evapfilename).asfilename,#file_perm_read)
-        '                                                                                                        If (evapfile = nil) Then
-        '                                                                                                            MsgBox.info("Could not open evap file," + nl + evapfilename, "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                            End
+        If Not FileExists(evapfilename) Then
+            Logger.Msg("Could not open evap file," & vbCrLf & evapfilename, "Geospatial Stream Flow Model")
+            Exit Sub
+        End If
 
-        'basinfile = LineFile.Make((basinfilename).asfilename,#file_perm_read)
-        '                                                                                                            If (basinfile = nil) Then
-        '                                                                                                                MsgBox.info("Could not open basin file," + nl + basinfilename, "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                                End
+        If Not FileExists(basinfilename) Then
+            Logger.Msg("Could not open basin file," & vbCrLf & basinfilename, "Geospatial Stream Flow Model")
+            Exit Sub
+        End If
 
         'respfile=LineFile.Make(respfilename.asfilename,#file_perm_read)
-        '                                                                                                                If (respfile = nil) Then
-        '                                                                                                                    MsgBox.info("Could not create the input/output file: " + nl + respfilename, "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                                    End
+        'If (respfile = nil) Then
+        '    MsgBox.info("Could not create the input/output file: " + nl + respfilename, "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
         'paramfile=TextFile.Make((paramfilename).asfilename,#file_perm_write)
-        '                                                                                                                    If (paramfile = nil) Then
-        '                                                                                                                        MsgBox.info("Could not create the balance parameter file: " + nl + paramfilename, "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                                        End
+        'If (paramfile = nil) Then
+        '    MsgBox.info("Could not create the balance parameter file: " + nl + paramfilename, "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
         'surpfile=LineFile.Make(surpfilename.asfilename,#file_perm_write)
-        '                                                                                                                        If (surpfile = nil) Then
-        '                                                                                                                            MsgBox.info("Could not create the basin runoff yield file: " + nl + surpfilename, "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                                            End
+        'If (surpfile = nil) Then
+        '    MsgBox.info("Could not create the basin runoff yield file: " + nl + surpfilename, "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
         'storefile=LineFile.Make(storefilename.asfilename,#file_perm_write)
-        '                                                                                                                            If (storefile = nil) Then
-        '                                                                                                                                MsgBox.info("Could not create the soil water file: " + nl + storefilename, "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                                                End
+        'If (storefile = nil) Then
+        '    MsgBox.info("Could not create the soil water file: " + nl + storefilename, "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
         'aevapfile=LineFile.Make(aevapfilename.asfilename,#file_perm_write)
-        '                                                                                                                                If (aevapfile = nil) Then
-        '                                                                                                                                    MsgBox.info("Could not create the actual evapotranspiration file: " + nl + aevapfilename, "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                                                    End
+        'If (aevapfile = nil) Then
+        '    MsgBox.info("Could not create the actual evapotranspiration file: " + nl + aevapfilename, "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
         'gwlossfile=LineFile.Make(gwlossfilename.asfilename,#file_perm_write)
-        '                                                                                                                                    If (gwlossfile = nil) Then
-        '                                                                                                                                        MsgBox.info("Could not create the ground water loss file: " + nl + gwlossfilename, "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                                                        End
+        'If (gwlossfile = nil) Then
+        '    MsgBox.info("Could not create the ground water loss file: " + nl + gwlossfilename, "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
         'outswfile=LineFile.Make(outswfilename.asfilename,#file_perm_write)
-        '                                                                                                                                        If (outswfile = nil) Then
-        '                                                                                                                                            MsgBox.info("Could not create the current soil water file: " + nl + outswfilename, "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                                                            End
+        'If (outswfile = nil) Then
+        '    MsgBox.info("Could not create the current soil water file: " + nl + outswfilename, "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
         'excessfile=LineFile.Make(excessfilename.asfilename,#file_perm_write)
-        '                                                                                                                                            If (excessfile = nil) Then
-        '                                                                                                                                                MsgBox.info("Could not create the input/output file: " + nl + excessfilename, "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                                                                End
+        'If (excessfile = nil) Then
+        '    MsgBox.info("Could not create the input/output file: " + nl + excessfilename, "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
         'interfile=LineFile.Make(interfilename.asfilename,#file_perm_write)
-        '                                                                                                                                                If (interfile = nil) Then
-        '                                                                                                                                                    MsgBox.info("Could not create the input/output file: " + nl + interfilename, "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                                                                    End
+        'If (interfile = nil) Then
+        '    MsgBox.info("Could not create the input/output file: " + nl + interfilename, "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
         'basefile=LineFile.Make(basefilename.asfilename,#file_perm_write)
-        '                                                                                                                                                    If (basefile = nil) Then
-        '                                                                                                                                                        MsgBox.info("Could not create the input/output file: " + nl + basefilename, "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                                                                        End
+        'If (basefile = nil) Then
+        '    MsgBox.info("Could not create the input/output file: " + nl + basefilename, "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
         'massfile=LineFile.Make(massfilename.asfilename,#file_perm_write)
-        '                                                                                                                                                        If (massfile = nil) Then
-        '                                                                                                                                                            MsgBox.info("Could not create the input/output file: " + nl + massfilename, "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                                                                            End
+        'If (massfile = nil) Then
+        '    MsgBox.info("Could not create the input/output file: " + nl + massfilename, "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
         'logfile=LineFile.Make(logfilename.asfilename,#file_perm_write)
-        '                                                                                                                                                            If (logfile = nil) Then
-        '                                                                                                                                                                MsgBox.info("Could not create the input/output file: " + nl + logfilename, "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                                                                                End
+        'If (logfile = nil) Then
+        '    MsgBox.info("Could not create the input/output file: " + nl + logfilename, "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
         'initialfile=LineFile.Make(initialfilename.asfilename,#file_perm_write)
-        '                                                                                                                                                                If (initialfile = nil) Then
-        '                                                                                                                                                                    MsgBox.info("Could not create the input/output file: " + nl + initialfilename, "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                                                                                    End
+        'If (initialfile = nil) Then
+        '    MsgBox.info("Could not create the input/output file: " + nl + initialfilename, "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
-        '                                                                                                                                                                    'timefile=LineFile.Make((maxtimefilename).asfilename,#file_perm_write)
-        '                                                                                                                                                                    'if (timefile=nil) then
-        '                                                                                                                                                                    '  msgbox.info("Could not create the input/output file: " +nl+ maxtimefilename,"Geospatial Stream Flow Model")
-        '                                                                                                                                                                    '  exit
-        '                                                                                                                                                                    'end
+        'timefile=LineFile.Make((maxtimefilename).asfilename,#file_perm_write)
+        'If (timefile = nil) Then
+        '    MsgBox.info("Could not create the input/output file: " + nl + maxtimefilename, "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
-        '                                                                                                                                                                    surpfile.SetScratch(True)
-        '                                                                                                                                                                    storefile.SetScratch(True)
-        '                                                                                                                                                                    aevapfile.SetScratch(True)
-        '                                                                                                                                                                    gwlossfile.SetScratch(True)
-        '                                                                                                                                                                    outswfile.SetScratch(True)
-        '                                                                                                                                                                    excessfile.SetScratch(True)
-        '                                                                                                                                                                    interfile.SetScratch(True)
-        '                                                                                                                                                                    basefile.SetScratch(True)
-        '                                                                                                                                                                    massfile.SetScratch(True)
-        '                                                                                                                                                                    logfile.SetScratch(True)
-        '                                                                                                                                                                    initialfile.SetScratch(True)
+        Dim lRStreamReader As New StreamReader(rainfilename)
+        Dim lCurrentRecord As String = ""
+        Dim lRainSize As Integer = 0
+        Do
+            lCurrentRecord = lRStreamReader.ReadLine
+            lRainSize += 1
+            If lCurrentRecord Is Nothing Then
+                Exit Do
+            End If
+        Loop
 
-        '                                                                                                                                                                    rainsize = rainfile.getsize
-        '                                                                                                                                                                    evapsize = evapfile.getsize
-        '                                                                                                                                                                    If (evapsize > rainsize) Then
-        '                                                                                                                                                                        runsize = rainsize - 1
-        '                                                                                                                                                                    ElseIf (rainsize > evapsize) Then
-        '                                                                                                                                                                        runsize = evapsize - 1
-        '                                                                                                                                                                    Else
-        '                                                                                                                                                                        runsize = rainsize - 1
-        '                                                                                                                                                                        End
-        '                                                                                                                                                                        bassize = (basinfile.getsize - 1)
+        Dim lEStreamReader As New StreamReader(rainfilename)
+        Dim lEvapSize As Integer = 0
+        Do
+            lCurrentRecord = lEStreamReader.ReadLine
+            lEvapSize += 1
+            If lCurrentRecord Is Nothing Then
+                Exit Do
+            End If
+        Loop
 
-        '                                                                                                                                                                        rainlist = List.make
-        '                                                                                                                                                                        rainfile.setpos(0)
-        '                                                                                                                                                                        rainfile.read(rainlist, rainsize)
-        '                                                                                                                                                                        timestr = ((((rainlist.get(1)).substitute(" ", ",")).astokens(",")).get(0)).asstring
-        '                                                                                                                                                                        If ((timestr.count >= 7) And (timestr.isnumber)) Then
-        '                                                                                                                                                                            startyr = (timestr.left(4)).asstring
-        '                                                                                                                                                                            startdy = (timestr.middle(4, 3)).asstring
-        '                                                                                                                                                                        Else
-        '                                                                                                                                                                            startyr = "2000"
-        '                                                                                                                                                                            startdy = "001"
-        '                                                                                                                                                                            End
+        Dim lRunSize As Integer = 0
+        If (lEvapSize > lRainSize) Then
+            lRunSize = lRainSize - 1
+        ElseIf (lRainSize > lEvapSize) Then
+            lRunSize = lEvapSize - 1
+        Else
+            lRunSize = lRainSize - 1
+        End If
 
-        '                                                                                                                                                                            resplist = List.make
-        '                                                                                                                                                                            respsize = respfile.getsize
-        '                                                                                                                                                                            respfile.read(resplist, (respsize))
-        '                                                                                                                                                                            If (respsize = 0) Then
-        '                                                                                                                                                                                MsgBox.info("The response file " + respfilename + " is empty", "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                                                                                                End
-        '                                                                                                                                                                                respfile.setpos(0)
-        '                                                                                                                                                                                If (respsize < bassize) Then
-        '                                                                                                                                                                                    MsgBox.info("The response file " + respfilename + " does not contain enough subbasins.", "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                                                                                                    End
-        '                                                                                                                                                                                    resdays = (((((resplist.get(0)).substitute(" ", ",")).astokens(",")).count) - 1)
+        'bassize = (basinfile.getsize - 1)
 
-        '                                                                                                                                                                                    'INITIALIZE GRAPHICS VARIABLES
-        '                                                                                                                                                                                    Gcnt = theView.GetGraphics.count
-        '                                                                                                                                                                                    Tsym = RasterFill.Make
-        '                                                                                                                                                                                    Tsym.Setcolor(Color.getRed)
+        Dim lDate(6) As Integer
+        J2Date(aSjDate, lDate)
+        Dim lStartYr As Integer = lDate(0)
+        Dim lJYr As Double = Date2J(lStartYr, 1, 1)
+        Dim lStartDy As Integer = aSjDate - lJYr
 
-        '                                                                                                                                                                                    chkfile.write(rainfilename, rainfilename.count)
-        '                                                                                                                                                                                    chkfile.writeelt(nl)
-        '                                                                                                                                                                                    chkfile.write(evapfilename, evapfilename.count)
-        '                                                                                                                                                                                    chkfile.writeelt(nl)
-        '                                                                                                                                                                                    chkfile.write(basinfilename, basinfilename.count)
-        '                                                                                                                                                                                    chkfile.writeelt(nl)
-        '                                                                                                                                                                                    chkfile.write(respfilename, respfilename.count)
-        '                                                                                                                                                                                    chkfile.writeelt(nl)
-        '                                                                                                                                                                                    chkfile.write(paramfilename, paramfilename.count)
-        '                                                                                                                                                                                    chkfile.writeelt(nl)
-        '                                                                                                                                                                                    chkfile.write(surpfilename, surpfilename.count)
-        '                                                                                                                                                                                    chkfile.writeelt(nl)
-        '                                                                                                                                                                                    chkfile.write(storefilename, storefilename.count)
-        '                                                                                                                                                                                    chkfile.writeelt(nl)
-        '                                                                                                                                                                                    chkfile.write(aevapfilename, aevapfilename.count)
-        '                                                                                                                                                                                    chkfile.writeelt(nl)
-        '                                                                                                                                                                                    chkfile.write(gwlossfilename, gwlossfilename.count)
-        '                                                                                                                                                                                    chkfile.writeelt(nl)
-        '                                                                                                                                                                                    chkfile.write(outswfilename, outswfilename.count)
-        '                                                                                                                                                                                    chkfile.writeelt(nl)
-        '                                                                                                                                                                                    chkfile.write(excessfilename, excessfilename.count)
-        '                                                                                                                                                                                    chkfile.writeelt(nl)
-        '                                                                                                                                                                                    chkfile.write(interfilename, interfilename.count)
-        '                                                                                                                                                                                    chkfile.writeelt(nl)
-        '                                                                                                                                                                                    chkfile.write(basefilename, basefilename.count)
-        '                                                                                                                                                                                    chkfile.writeelt(nl)
-        '                                                                                                                                                                                    chkfile.write(massfilename, massfilename.count)
-        '                                                                                                                                                                                    chkfile.writeelt(nl)
-        '                                                                                                                                                                                    chkfile.write(logfilename, logfilename.count)
-        '                                                                                                                                                                                    chkfile.writeelt(nl)
-        '                                                                                                                                                                                    chkfile.write(initialfilename, initialfilename.count)
-        '                                                                                                                                                                                    chkfile.writeelt(nl)
-        '                                                                                                                                                                                    chkfile.write(myWkDirname, myWkDirname.count)
+        'resplist = List.make
+        'respsize = respfile.getsize
+        'respfile.read(resplist, (respsize))
+        'If (respsize = 0) Then
+        '    MsgBox.info("The response file " + respfilename + " is empty", "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
+        'respfile.setpos(0)
+        'If (respsize < bassize) Then
+        '    MsgBox.info("The response file " + respfilename + " does not contain enough subbasins.", "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
+        'need to know the number of columns in the response file 
+        'resdays = (((((resplist.get(0)).substitute(" ", ",")).astokens(",")).count) - 1)
 
-        '                                                                                                                                                                                    chkfile.close()
-        '                                                                                                                                                                                    rainfile.close()
-        '                                                                                                                                                                                    evapfile.close()
-        '                                                                                                                                                                                    basinfile.close()
-        '                                                                                                                                                                                    respfile.close()
-        '                                                                                                                                                                                    surpfile.close()
-        '                                                                                                                                                                                    storefile.close()
-        '                                                                                                                                                                                    aevapfile.close()
-        '                                                                                                                                                                                    gwlossfile.close()
-        '                                                                                                                                                                                    outswfile.close()
-        '                                                                                                                                                                                    excessfile.close()
-        '                                                                                                                                                                                    interfile.close()
-        '                                                                                                                                                                                    basefile.close()
-        '                                                                                                                                                                                    massfile.close()
-        '                                                                                                                                                                                    logfile.close()
-        '                                                                                                                                                                                    initialfile.close()
+        'INITIALIZE GRAPHICS VARIABLES
+        'Gcnt = theView.GetGraphics.count
+        'Tsym = RasterFill.Make
+        'Tsym.Setcolor(Color.getRed)
+
+        Dim lChkFile As New StringBuilder
+        lChkFile.AppendLine(rainfilename)
+        lChkFile.AppendLine(evapfilename)
+        lChkFile.AppendLine(basinfilename)
+        lChkFile.AppendLine(respfilename)
+        lChkFile.AppendLine(paramfilename)
+        lChkFile.AppendLine(surpfilename)
+        lChkFile.AppendLine(storefilename)
+        lChkFile.AppendLine(aevapfilename)
+        lChkFile.AppendLine(gwlossfilename)
+        lChkFile.AppendLine(outswfilename)
+        lChkFile.AppendLine(excessfilename)
+        lChkFile.AppendLine(interfilename)
+        lChkFile.AppendLine(basefilename)
+        lChkFile.AppendLine(massfilename)
+        lChkFile.AppendLine(logfilename)
+        lChkFile.AppendLine(initialfilename)
+        lChkFile.AppendLine(lOutputPath)
+        SaveFileString(balfilename, lChkFile.ToString)
 
         'plabels = { "Computation Start Year", "Computation Start Day", "Number of Rain/Evap Days", 
         '          "Number of Response Days", "Number of Subbasins", "Initial Soil Moisture", "Data Format (0=Hourly/1=Daily)", 
         '          "New Run (0) or Continue Previous Run(1)", "Basin Polygon Theme","Key Field eg Grid Code","Simulation(0) or Calibration(1) Mode"}
 
         'pdefaults = { startyr, startdy, runsize.asstring, resdays.asstring, bassize.asstring, "0.1", "1", "0", "basply.shp", "gridcode", "0"}
+        'runpList = MsgBox.MultiInput("Enter Model Parameters.", "Geospatial Stream Flow Model", plabels, pdefaults)
 
-        '                                                                                                                                                                                    runpList = MsgBox.MultiInput("Enter Model Parameters.", "Geospatial Stream Flow Model", plabels, pdefaults)
+        'resdays = runpList.get(3)
+        'bassize = runpList.get(4)
 
-        '                                                                                                                                                                                    If (runpList.IsEmpty) Then
-        '  exit
-        '                                                                                                                                                                                        End
+        Dim tinterval As String = ""
+        If (dformat = 1) Then
+            tinterval = "24"
+        ElseIf (dformat = 0) Then
+            tinterval = "1"
+        Else
+            tinterval = "24"
+        End If
 
-        '                                                                                                                                                                                        startyr = runpList.get(0)
-        '                                                                                                                                                                                        startdy = runpList.get(1)
-        '                                                                                                                                                                                        runsize = runpList.get(2)
-        '                                                                                                                                                                                        resdays = runpList.get(3)
-        '                                                                                                                                                                                        bassize = runpList.get(4)
-        '                                                                                                                                                                                        inifract = runpList.get(5)
-        '                                                                                                                                                                                        dformat = runpList.get(6)
-        '                                                                                                                                                                                        inimode = runpList.get(7)
-        '                                                                                                                                                                                        basinthmname = runplist.get(8)
-        '                                                                                                                                                                                        idfieldname = runplist.get(9)
-        '                                                                                                                                                                                        runmode = runpList.get(10)
+        Dim basinthm As Integer = -1
+        Dim idfield As Integer = -1
+        Dim nowfield As Integer = -1
+        If GisUtil.IsLayer("Subbasins") Then
+            basinthm = GisUtil.LayerIndex("Subbasins")
+            If GisUtil.IsField(basinthm, "gridcode") Then
+                idfield = GisUtil.FieldIndex(basinthm, "gridcode")
+            Else
+                idfield = 0
+            End If
+            If GisUtil.IsField(basinthm, "soilwater") Then
+                nowfield = GisUtil.FieldIndex(basinthm, "soilwater")
+            Else
+                GisUtil.AddField(basinthm, "soilwater", 2, 10)
+                nowfield = GisUtil.FieldIndex(basinthm, "soilwater")
+            End If
+        End If
 
-        '                                                                                                                                                                                        If (runmode.isnumber.not) Then
-        '                                                                                                                                                                                            runmode = "0"
-        '                                                                                                                                                                                        ElseIf ((runmode.asnumber < 0) Or (runmode.asnumber > 1)) Then
-        '                                                                                                                                                                                            runmode = "0"
-        '                                                                                                                                                                                            End
+        Dim lParamFile As New StringBuilder
+        'lParamFile.AppendLine(resdays.asstring, resdays.asstring.count)
+        lParamFile.AppendLine(lRunSize.ToString)
+        lParamFile.AppendLine(lStartYr.ToString)
+        lParamFile.AppendLine(lStartDy.ToString)
+        'lParamFile.AppendLine(bassize.asstring, bassize.asstring.count)
+        lParamFile.AppendLine(tinterval.ToString)
+        lParamFile.AppendLine(dformat.ToString)
+        lParamFile.AppendLine(inimode.ToString)
+        lParamFile.AppendLine(inifract.ToString)
+        lParamFile.AppendLine(runmode.ToString)
+        SaveFileString(paramfilename, lParamFile.ToString)
 
-        '                                                                                                                                                                                            If (dformat.asstring.asnumber = 1) Then
-        '                                                                                                                                                                                                tinterval = "24"
-        '                                                                                                                                                                                            ElseIf (dformat.asstring.asnumber = 0) Then
-        '                                                                                                                                                                                                tinterval = "1"
-        '                                                                                                                                                                                            Else
-        '                                                                                                                                                                                                tinterval = "24"
-        '                                                                                                                                                                                                End
+        ''timefile.writeelt(runsize.asstring)
+        ''timefile.close
 
-        '                                                                                                                                                                                                basinthm = theView.FindTheme(basinthmname)
-        '                                                                                                                                                                                                If (basinthm = nil) Then
-        '                                                                                                                                                                                                    basinthm = theView.FindTheme("basply.shp")
-        '                                                                                                                                                                                                    basinthmname = "basply.shp"
-        '                                                                                                                                                                                                    If (basinthm = nil) Then
-        '                                                                                                                                                                                                        theViewthmlist = theView.Getthemes
-        '                                                                                                                                                                                                        For Each vthm In theViewthmlist
-        '                                                                                                                                                                                                            thethmnm = vthm.getname
-        '                                                                                                                                                                                                            If ((thethmnm.contains("basply")) And (vthm.CanSelect)) Then
-        '                                                                                                                                                                                                                basinthm = theView.FindTheme(thethmnm)
-        '                                                                                                                                                                                                                basinthmname = thethmnm
-        '                                                                                                                                                                                                                End
-        '                                                                                                                                                                                                                End
-        '                                                                                                                                                                                                                If (basinthm = nil) Then
-        '                                                                                                                                                                                                                    basinthmname = "basply.shp"
-        '                                                                                                                                                                                                                    MsgBox.info("Basin theme, " + basinthmname + " not found in the View." + nl + "Add the Basin Shapefile to the View before performing routing.", "Geospatial Stream Flow Model")
-        '      exit
-        '                                                                                                                                                                                                                    End
-        '                                                                                                                                                                                                                    End
-        '                                                                                                                                                                                                                    End
-
-        '                                                                                                                                                                                                                    basinthm.clearselection()
-
-        '                                                                                                                                                                                                                    basinVtab = basinthm.GetFtab
-        '                                                                                                                                                                                                                    basinVtab.UnJoinall()
-        '                                                                                                                                                                                                                    basinVtab.UnLinkall()
-        '                                                                                                                                                                                                                    idfield = basinVtab.FindField(idfieldname)
-        '                                                                                                                                                                                                                    nowfield = basinVtab.FindField("soilwater")
-        '                                                                                                                                                                                                                    If (nowfield = nil) Then
-        '                                                                                                                                                                                                                        basinVtab.SetEditable(True)
-        '                                                                                                                                                                                                                        addlist = List.make
-        '  fldadd = Field.Make("soilwater", #field_decimal, 10 , 1)
-        '                                                                                                                                                                                                                        addlist.Add(fldadd)
-        '                                                                                                                                                                                                                        basinVtab.Addfields(addlist)
-        '                                                                                                                                                                                                                        basinVtab.SetEditable(False)
-        '                                                                                                                                                                                                                        nowfield = basinVtab.FindField("soilwater")
-        '                                                                                                                                                                                                                        End
-        '                                                                                                                                                                                                                        basinVtab.flush()
-        '                                                                                                                                                                                                                        basinVtab.refresh()
-
-        '                                                                                                                                                                                                                        paramfile.write(resdays.asstring, resdays.asstring.count)
-        '                                                                                                                                                                                                                        paramfile.writeelt(nl)
-        '                                                                                                                                                                                                                        paramfile.write(runsize.asstring, runsize.asstring.count)
-        '                                                                                                                                                                                                                        paramfile.writeelt(nl)
-        '                                                                                                                                                                                                                        paramfile.write(startyr.asstring, startyr.asstring.count)
-        '                                                                                                                                                                                                                        paramfile.writeelt(nl)
-        '                                                                                                                                                                                                                        paramfile.write(startdy.asstring, startdy.asstring.count)
-        '                                                                                                                                                                                                                        paramfile.writeelt(nl)
-        '                                                                                                                                                                                                                        paramfile.write(bassize.asstring, bassize.asstring.count)
-        '                                                                                                                                                                                                                        paramfile.writeelt(nl)
-        '                                                                                                                                                                                                                        paramfile.write(tinterval.asstring, tinterval.asstring.count)
-        '                                                                                                                                                                                                                        paramfile.writeelt(nl)
-        '                                                                                                                                                                                                                        paramfile.write(dformat.asstring, dformat.asstring.count)
-        '                                                                                                                                                                                                                        paramfile.writeelt(nl)
-        '                                                                                                                                                                                                                        paramfile.write(inimode.asstring, inimode.asstring.count)
-        '                                                                                                                                                                                                                        paramfile.writeelt(nl)
-        '                                                                                                                                                                                                                        paramfile.write(inifract.asstring, inifract.asstring.count)
-        '                                                                                                                                                                                                                        paramfile.writeelt(nl)
-        '                                                                                                                                                                                                                        paramfile.write(runmode.asstring, runmode.asstring.count)
-        '                                                                                                                                                                                                                        paramfile.close()
-
-        '                                                                                                                                                                                                                        'timefile.writeelt(runsize.asstring)
-        '                                                                                                                                                                                                                        'timefile.close
-
-        '                                                                                                                                                                                                                        balancetype = "1"
-        '                                                                                                                                                                                                                        routetype = "2"
-        '                                                                                                                                                                                                                        balstr = "Linear Soil Model"
-        '                                                                                                                                                                                                                        routstr = "Muskingum-Cunge Routing"
-
-        '                                                                                                                                                                                                                        If (File.Exists(whichmodelFN.AsFileName)) Then
+        'balancetype = "1"
+        'routetype = "2"
+        'balstr = "Linear Soil Model"
+        'routstr = "Muskingum-Cunge Routing"
+        'If (File.Exists(whichmodelFN.AsFileName)) Then
         '  whichmodelfile = LineFile.Make((myWkDirname + "whichModel.txt").asfilename,#file_perm_read)
-        '                                                                                                                                                                                                                            If (whichmodelfile = nil) Then
-        '                                                                                                                                                                                                                                MsgBox.info("Could not create whichModel.txt file" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '    exit
-        '                                                                                                                                                                                                                                End
-        '                                                                                                                                                                                                                                whichsize = (whichmodelfile.getsize)
+        '    If (whichmodelfile = nil) Then
+        '        MsgBox.info("Could not create whichModel.txt file" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '        Exit Sub
+        '    End If
+        '    whichsize = (whichmodelfile.getsize)
 
-        '                                                                                                                                                                                                                                biglist = List.make
-        '                                                                                                                                                                                                                                If (whichsize > 2) Then
-        '                                                                                                                                                                                                                                    whichmodelfile.Read(biglist, whichsize)
-        '                                                                                                                                                                                                                                    balancetype = biglist.get(1).asstring.astokens(" ,/").get(0).asstring
-        '                                                                                                                                                                                                                                    routetype = biglist.get(2).asstring.astokens(" ,/").get(0).asstring
-        '                                                                                                                                                                                                                                Else
-        '                                                                                                                                                                                                                                    balancetype = "1"
-        '                                                                                                                                                                                                                                    routetype = "2"
-        '                                                                                                                                                                                                                                    End
+        '    biglist = List.make
+        '    If (whichsize > 2) Then
+        '        whichmodelfile.Read(biglist, whichsize)
+        '        balancetype = biglist.get(1).asstring.astokens(" ,/").get(0).asstring
+        '        routetype = biglist.get(2).asstring.astokens(" ,/").get(0).asstring
+        '    Else
+        '        balancetype = "1"
+        '        routetype = "2"
+        '    End If
 
-        '                                                                                                                                                                                                                                    whichmodelfile.close()
+        '    whichmodelfile.close()
 
-        '                                                                                                                                                                                                                                    If ((balancetype = "1") And (routetype = "3")) Then
-        '                                                                                                                                                                                                                                        balstr = "Linear Soil Model"
-        '                                                                                                                                                                                                                                        routstr = "Simple Lag Routing Method"
-        '                                                                                                                                                                                                                                    ElseIf ((balancetype = "1") And (routetype = "1")) Then
-        '                                                                                                                                                                                                                                        balstr = "Linear Soil Model"
-        '                                                                                                                                                                                                                                        routstr = "Diffusion Analog Routing Method"
-        '                                                                                                                                                                                                                                    ElseIf ((balancetype = "1") And (routetype = "2")) Then
-        '                                                                                                                                                                                                                                        balstr = "Linear Soil Model"
-        '                                                                                                                                                                                                                                        routstr = "Muskingum-Cunge Routing"
-        '                                                                                                                                                                                                                                    ElseIf ((balancetype = "2") And (routetype = "3")) Then
-        '                                                                                                                                                                                                                                        balstr = "Non-Linear Soil Model"
-        '                                                                                                                                                                                                                                        routstr = "Simple Lag Routing Method"
-        '                                                                                                                                                                                                                                    ElseIf ((balancetype = "2") And (routetype = "1")) Then
-        '                                                                                                                                                                                                                                        balstr = "Non-Linear Soil Model"
-        '                                                                                                                                                                                                                                        routstr = "Diffusion Analog Routing Method"
-        '                                                                                                                                                                                                                                    ElseIf ((balancetype = "2") And (routetype = "2")) Then
-        '                                                                                                                                                                                                                                        balstr = "Non-Linear Soil Model"
-        '                                                                                                                                                                                                                                        routstr = "Muskingum Cunge Routing Method"
-        '                                                                                                                                                                                                                                    Else
-        '                                                                                                                                                                                                                                        balstr = "Linear Soil Model"
-        '                                                                                                                                                                                                                                        routstr = "Muskingum-Cunge Routing"
-        '                                                                                                                                                                                                                                        End
-        ' ballst = {balstr, "Linear Soil Model", "Non-Linear Soil Model" }
-        'else
-        '  ballst = {"Linear Soil Model", "Non-Linear Soil Model" }
-        '                                                                                                                                                                                                                                        balstr = "Linear Soil Model"
-        '                                                                                                                                                                                                                                        routstr = "Muskingum-Cunge Routing"
-        '                                                                                                                                                                                                                                        End
+        '    If ((balancetype = "1") And (routetype = "3")) Then
+        '        balstr = "Linear Soil Model"
+        '        routstr = "Simple Lag Routing Method"
+        '    ElseIf ((balancetype = "1") And (routetype = "1")) Then
+        '        balstr = "Linear Soil Model"
+        '        routstr = "Diffusion Analog Routing Method"
+        '    ElseIf ((balancetype = "1") And (routetype = "2")) Then
+        '        balstr = "Linear Soil Model"
+        '        routstr = "Muskingum-Cunge Routing"
+        '    ElseIf ((balancetype = "2") And (routetype = "3")) Then
+        '        balstr = "Non-Linear Soil Model"
+        '        routstr = "Simple Lag Routing Method"
+        '    ElseIf ((balancetype = "2") And (routetype = "1")) Then
+        '        balstr = "Non-Linear Soil Model"
+        '        routstr = "Diffusion Analog Routing Method"
+        '    ElseIf ((balancetype = "2") And (routetype = "2")) Then
+        '        balstr = "Non-Linear Soil Model"
+        '        routstr = "Muskingum Cunge Routing Method"
+        '    Else
+        '        balstr = "Linear Soil Model"
+        '        routstr = "Muskingum-Cunge Routing"
+        '    End If
+        '     ballst = {balstr, "Linear Soil Model", "Non-Linear Soil Model" }
+        'Else
+        '      ballst = {"Linear Soil Model", "Non-Linear Soil Model" }
+        '    balstr = "Linear Soil Model"
+        '    routstr = "Muskingum-Cunge Routing"
+        'End If
 
         'whichmodelfile = LineFile.Make(whichmodelFN.asfilename,#file_perm_write)
-        '                                                                                                                                                                                                                                        If (whichmodelfile = nil) Then
-        '                                                                                                                                                                                                                                            MsgBox.info("Could not create file, " + whichmodelFN + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                                                                                                                                                            End
+        'If (whichmodelfile = nil) Then
+        '    MsgBox.info("Could not create file, " + whichmodelFN + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
-        '                                                                                                                                                                                                                                            balancestr = MsgBox.choiceasstring(ballst, "Select Flow Routing Method for Computation", "Geospatial Stream Flow Model")
-        '                                                                                                                                                                                                                                            If (balancestr = NIL) Then
-        '  exit
-        '                                                                                                                                                                                                                                            Else
-        '                                                                                                                                                                                                                                                If (balancestr = "Linear Soil Model") Then
-        '                                                                                                                                                                                                                                                    balancetype = "1"
-        '                                                                                                                                                                                                                                                ElseIf (balancestr = "Non-Linear Soil Model") Then
-        '                                                                                                                                                                                                                                                    balancetype = "2"
-        '                                                                                                                                                                                                                                                Else
-        '                                                                                                                                                                                                                                                    balancetype = "1"
-        '                                                                                                                                                                                                                                                    End
+        'balancestr = MsgBox.choiceasstring(ballst, "Select Flow Routing Method for Computation", "Geospatial Stream Flow Model")
+        'If (balancestr = NIL) Then
+        '    Exit Sub
+        'Else
+        '    If (balancestr = "Linear Soil Model") Then
+        '        balancetype = "1"
+        '    ElseIf (balancestr = "Non-Linear Soil Model") Then
+        '        balancetype = "2"
+        '    Else
+        '        balancetype = "1"
+        '    End If
 
-        '                                                                                                                                                                                                                                                    If (routstr = "Muskingum Cunge Routing Method") Then
-        '                                                                                                                                                                                                                                                        routetype = "2"
-        '                                                                                                                                                                                                                                                    ElseIf (routstr = "Simple Lag Routing Method") Then
-        '                                                                                                                                                                                                                                                        routetype = "3"
-        '                                                                                                                                                                                                                                                    ElseIf (routstr = "Diffusion Analog Routing Method") Then
-        '                                                                                                                                                                                                                                                        routetype = "1"
-        '                                                                                                                                                                                                                                                    Else
-        '                                                                                                                                                                                                                                                        routetype = "2"
-        '                                                                                                                                                                                                                                                        End
+        '    If (routstr = "Muskingum Cunge Routing Method") Then
+        '        routetype = "2"
+        '    ElseIf (routstr = "Simple Lag Routing Method") Then
+        '        routetype = "3"
+        '    ElseIf (routstr = "Diffusion Analog Routing Method") Then
+        '        routetype = "1"
+        '    Else
+        '        routetype = "2"
+        '    End If
 
-        '                                                                                                                                                                                                                                                        whichmodelfile.WriteElt("Model Index   Index description")
-        '                                                                                                                                                                                                                                                        whichmodelfile.WriteElt(balancetype + " //water balance model:  1=1D balance, 2=2D balance")
-        '                                                                                                                                                                                                                                                        whichmodelfile.WriteElt(routetype + " //routing model:  1=diffusion 2=Muskingum-Cunge 3=lag")
-        '                                                                                                                                                                                                                                                        whichmodelfile.close()
-        '                                                                                                                                                                                                                                                        End
+        '    whichmodelfile.WriteElt("Model Index   Index description")
+        '    whichmodelfile.WriteElt(balancetype + " //water balance model:  1=1D balance, 2=2D balance")
+        '    whichmodelfile.WriteElt(routetype + " //routing model:  1=diffusion 2=Muskingum-Cunge 3=lag")
+        '    whichmodelfile.close()
+        'End If
 
-        '                                                                                                                                                                                                                                                        myfilename = ("$AVEXT\geosfm.dll").AsFileName
-        '                                                                                                                                                                                                                                                        If (myfilename = Nil) Then
-        '                                                                                                                                                                                                                                                            MsgBox.info("Unable to locate the program file: geosfm.dll." + nl + nl + "Please install the program, balance.dll, before you continue.", "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                                                                                                                                                                            End
-        '                                                                                                                                                                                                                                                            mydll = DLL.Make(myfilename)
+        'myfilename = ("$AVEXT\geosfm.dll").AsFileName
+        'If (myfilename = Nil) Then
+        '    MsgBox.info("Unable to locate the program file: geosfm.dll." + nl + nl + "Please install the program, balance.dll, before you continue.", "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
+        'mydll = DLL.Make(myfilename)
 
-        '                                                                                                                                                                                                                                                            If (balancestr = "Linear Soil Model") Then
-        '  myproc=DLLProc.Make(myDLL, "ONELAYERBALANCE", #DLLPROC_TYPE_INT32,{#DLLPROC_TYPE_STR})
-        '                                                                                                                                                                                                                                                                If (myproc = Nil) Then
-        '                                                                                                                                                                                                                                                                    MsgBox.info("Unable to make the procedure, ONELAYERBALANCE" + nl + nl + "Please install the program, geosfm.dll, before you continue.", "FEWS SFM Model")
-        '    exit
-        '                                                                                                                                                                                                                                                                    End
-        '                                                                                                                                                                                                                                                                Else
-        '  myproc=DLLProc.Make(myDLL, "twolayerbalance", #DLLPROC_TYPE_INT32,{#DLLPROC_TYPE_STR})  
-        '                                                                                                                                                                                                                                                                    If (myproc = Nil) Then
-        '                                                                                                                                                                                                                                                                        MsgBox.info("Unable to make the procedure, twolayerbalance" + nl + nl + "Please install the program, geosfm.dll, before you continue.", "FEWS SFM Model")
-        '    exit
-        '                                                                                                                                                                                                                                                                        End
-        '                                                                                                                                                                                                                                                                        End
+        'If (balancestr = "Linear Soil Model") Then
+        '      myproc=DLLProc.Make(myDLL, "ONELAYERBALANCE", #DLLPROC_TYPE_INT32,{#DLLPROC_TYPE_STR})
+        '    If (myproc = Nil) Then
+        '        MsgBox.info("Unable to make the procedure, ONELAYERBALANCE" + nl + nl + "Please install the program, geosfm.dll, before you continue.", "FEWS SFM Model")
+        '        Exit Sub
+        '    End If
+        'Else
+        '          myproc=DLLProc.Make(myDLL, "twolayerbalance", #DLLPROC_TYPE_INT32,{#DLLPROC_TYPE_STR})  
+        '    If (myproc = Nil) Then
+        '        MsgBox.info("Unable to make the procedure, twolayerbalance" + nl + nl + "Please install the program, geosfm.dll, before you continue.", "FEWS SFM Model")
+        '        Exit Sub
+        '    End If
+        'End If
 
-        '                                                                                                                                                                                                                                                                        av.ShowStopButton()
-        '                                                                                                                                                                                                                                                                        av.SetStatus(0)
-        '                                                                                                                                                                                                                                                                        av.showmsg("Performing Soil Water Balance.......")
+        'av.ShowStopButton()
+        'av.SetStatus(0)
+        'av.showmsg("Performing Soil Water Balance.......")
 
-        '                                                                                                                                                                                                                                                                        'procGetLastError = 1
+        'procGetLastError = 1
         'procGetLastError = myproc.call({balfilename})
 
-        '                                                                                                                                                                                                                                                                        If (procGetLastError > 0) Then
-        '                                                                                                                                                                                                                                                                            MsgBox.info("An error occurred during the balance computation." + nl + "Check for possible causes in  " + logfilename, "Geospatial Stream Flow Model")
-        '  exit
-        '                                                                                                                                                                                                                                                                            End
+        'If (procGetLastError > 0) Then
+        '    MsgBox.info("An error occurred during the balance computation." + nl + "Check for possible causes in  " + logfilename, "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
-        '                                                                                                                                                                                                                                                                            If (runmode.asstring = "0") Then
-        '  outswfile = LineFile.Make((outswfilename).asfilename,#file_perm_read)
-        '                                                                                                                                                                                                                                                                                If (outswfile = nil) Then
-        '                                                                                                                                                                                                                                                                                    MsgBox.info("Could not open current soil water file," + nl + outswfilename, "Geospatial Stream Flow Model")
-        '    exit
-        '                                                                                                                                                                                                                                                                                    End
+        'If (runmode.asstring = "0") Then
+        '      outswfile = LineFile.Make((outswfilename).asfilename,#file_perm_read)
+        '    If (outswfile = nil) Then
+        '        MsgBox.info("Could not open current soil water file," + nl + outswfilename, "Geospatial Stream Flow Model")
+        '        Exit Sub
+        '    End If
 
-        '                                                                                                                                                                                                                                                                                    GUIName = "Table"
-        '                                                                                                                                                                                                                                                                                    outswfile.close()
-        '                                                                                                                                                                                                                                                                                    oldout = theProject.finddoc("Final Soil Moisture")
-        '                                                                                                                                                                                                                                                                                    If (oldout <> nil) Then
-        '                                                                                                                                                                                                                                                                                        theproject.removedoc(oldout)
-        '                                                                                                                                                                                                                                                                                        End
+        '    GUIName = "Table"
+        '    outswfile.close()
+        '    oldout = theProject.finddoc("Final Soil Moisture")
+        '    If (oldout <> nil) Then
+        '        theproject.removedoc(oldout)
+        '    End If
 
-        '                                                                                                                                                                                                                                                                                        outswVtab = Vtab.make((outswfilename).asfilename, False, False)
-        '                                                                                                                                                                                                                                                                                        t = Table.MakeWithGUI(outswVtab, GUIName)
-        '                                                                                                                                                                                                                                                                                        t.SetName("Final Soil Moisture")
-        '                                                                                                                                                                                                                                                                                        t.GetWin.Open()
+        '    outswVtab = Vtab.make((outswfilename).asfilename, False, False)
+        '    t = Table.MakeWithGUI(outswVtab, GUIName)
+        '    t.SetName("Final Soil Moisture")
+        '    t.GetWin.Open()
 
-        '                                                                                                                                                                                                                                                                                        swfldlst = outswVtab.getfields
-        '                                                                                                                                                                                                                                                                                        swcount = swfldlst.count
-        '                                                                                                                                                                                                                                                                                        outswfld = swfldlst.get(swcount - 1)
-        '                                                                                                                                                                                                                                                                                        outidfld = outswVtab.findfield("basinid")
-        '                                                                                                                                                                                                                                                                                        basinVtab.join(idfield, outswVtab, outidfld)
-        '                                                                                                                                                                                                                                                                                        basinVtab.SetEditable(True)
-        '                                                                                                                                                                                                                                                                                        basinVtab.Calculate("[" + outswfld.getname.asstring + "]", nowfield)
-        '                                                                                                                                                                                                                                                                                        basinVtab.SetEditable(False)
-        '                                                                                                                                                                                                                                                                                        basinVtab.flush()
-        '                                                                                                                                                                                                                                                                                        basinVtab.refresh()
+        '    swfldlst = outswVtab.getfields
+        '    swcount = swfldlst.count
+        '    outswfld = swfldlst.get(swcount - 1)
+        '    outidfld = outswVtab.findfield("basinid")
+        '    basinVtab.join(idfield, outswVtab, outidfld)
+        '    basinVtab.SetEditable(True)
+        '    basinVtab.Calculate("[" + outswfld.getname.asstring + "]", nowfield)
+        '    basinVtab.SetEditable(False)
+        '    basinVtab.flush()
+        '    basinVtab.refresh()
 
-        '  mylegend = legend.make(#SYMBOL_FILL)
-        '  mylegend.setlegendtype(#LEGEND_TYPE_COLOR)
-        '  mysymbol1 = symbol.make(#SYMBOL_FILL)
-        '  mysymbol2 = symbol.make(#SYMBOL_FILL)
-        '  mysymbol3 = symbol.make(#SYMBOL_FILL)
-        '                                                                                                                                                                                                                                                                                        myyellow = Color.make
-        '                                                                                                                                                                                                                                                                                        mygreen = Color.make
-        '                                                                                                                                                                                                                                                                                        myblue = Color.make
-        '  myyellow.setrgblist({250, 250, 0}) 
-        '  mygreen.setrgblist({0, 240, 0})
-        '  myblue.setrgblist({0, 0, 250})
-        '                                                                                                                                                                                                                                                                                        mysymbol1.SetColor(myyellow)
-        '                                                                                                                                                                                                                                                                                        mysymbol2.SetColor(mygreen)
-        '                                                                                                                                                                                                                                                                                        mysymbol3.SetColor(myblue)
-        '                                                                                                                                                                                                                                                                                        mylegend.Interval(Basinthm, nowfield.getname.asstring, 3)
-        '  mylegend.SetClassInfo(0, {"dry (0 - 50)", "1", mySymbol1, 0.0, 50.0})
-        '  mylegend.SetClassInfo(1, {"moist (50 - 100)", "2", mySymbol2, 50.0, 100.0})
-        '  mylegend.SetClassInfo(2, {"wet (> 100mm)", "3", mySymbol3, 100.0, 1000.0})
-        '                                                                                                                                                                                                                                                                                        mylegendFN = filename.Merge(myWkDirname, "soilwater.avl")
-        '                                                                                                                                                                                                                                                                                        mylegend.Save(mylegendFN)
-        '                                                                                                                                                                                                                                                                                        Basinthm.SetLegend(mylegend)
-        '                                                                                                                                                                                                                                                                                        Basinthm.UpdateLegend()
-        '                                                                                                                                                                                                                                                                                        Basinthm.SetVisible(True)
-        '                                                                                                                                                                                                                                                                                        theView.invalidate()
-        '                                                                                                                                                                                                                                                                                        End
+        '      mylegend = legend.make(#SYMBOL_FILL)
+        '      mylegend.setlegendtype(#LEGEND_TYPE_COLOR)
+        '      mysymbol1 = symbol.make(#SYMBOL_FILL)
+        '      mysymbol2 = symbol.make(#SYMBOL_FILL)
+        '      mysymbol3 = symbol.make(#SYMBOL_FILL)
+        '    myyellow = Color.make
+        '    mygreen = Color.make
+        '    myblue = Color.make
+        '      myyellow.setrgblist({250, 250, 0}) 
+        '      mygreen.setrgblist({0, 240, 0})
+        '      myblue.setrgblist({0, 0, 250})
+        '    mysymbol1.SetColor(myyellow)
+        '    mysymbol2.SetColor(mygreen)
+        '    mysymbol3.SetColor(myblue)
+        '    mylegend.Interval(Basinthm, nowfield.getname.asstring, 3)
+        '      mylegend.SetClassInfo(0, {"dry (0 - 50)", "1", mySymbol1, 0.0, 50.0})
+        '      mylegend.SetClassInfo(1, {"moist (50 - 100)", "2", mySymbol2, 50.0, 100.0})
+        '      mylegend.SetClassInfo(2, {"wet (> 100mm)", "3", mySymbol3, 100.0, 1000.0})
+        '    mylegendFN = filename.Merge(myWkDirname, "soilwater.avl")
+        '    mylegend.Save(mylegendFN)
+        '    Basinthm.SetLegend(mylegend)
+        '    Basinthm.UpdateLegend()
+        '    Basinthm.SetVisible(True)
+        '    theView.invalidate()
+        'End If
 
-        '                                                                                                                                                                                                                                                                                        av.ClearStatus()
-        '                                                                                                                                                                                                                                                                                        av.clearmsg()
-
-        '                                                                                                                                                                                                                                                                                        myfilename = nil
-        '                                                                                                                                                                                                                                                                                        mydll = nil
-        '                                                                                                                                                                                                                                                                                        myproc = Nil
-        '                                                                                                                                                                                                                                                                                        av.PurgeObjects()
-        '                                                                                                                                                                                                                                                                                        theFileName = theProject.GetFileName
-        '                                                                                                                                                                                                                                                                                        If (theFileName = nil) Then
-        '                                                                                                                                                                                                                                                                                            av.Run("Project.SaveAs", nil)
-        '                                                                                                                                                                                                                                                                                            theFileName = theProject.GetFileName
-        '                                                                                                                                                                                                                                                                                            If (theFileName = nil) Then
-        '    exit
-        '                                                                                                                                                                                                                                                                                                End
-        '                                                                                                                                                                                                                                                                                            Else
-        '                                                                                                                                                                                                                                                                                                If (av.Run("Project.CheckForEdits", nil).Not) Then
-        '                                                                                                                                                                                                                                                                                                    Return nil
-        '                                                                                                                                                                                                                                                                                                    End
-        '                                                                                                                                                                                                                                                                                                    If (theProject.Save) Then
-        '                                                                                                                                                                                                                                                                                                        av.ShowMsg("Project saved to '" + theFileName.GetBaseName + "'")
-        '    if (System.GetOS = #SYSTEM_OS_MAC) then
-        '                                                                                                                                                                                                                                                                                                            Script.Make("MacClass.SetDocInfo(SELF, Project)").DoIt(theFileName)
-        '                                                                                                                                                                                                                                                                                                            End
-        '                                                                                                                                                                                                                                                                                                            End
-        '                                                                                                                                                                                                                                                                                                            End
-
-        '                                                                                                                                                                                                                                                                                                            MsgBox.info("Soil Water Balance Complete. Results written to:" + nl + surpfilename, "Geospatial Stream Flow Model")
+        'MsgBox.info("Soil Water Balance Complete. Results written to:" + nl + surpfilename, "Geospatial Stream Flow Model")
 
     End Sub
 
