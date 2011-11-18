@@ -1060,12 +1060,14 @@ Public Class frmRecess
         End If
         pGrapher = New clsGraphTime(aDataGroup, pZgc)
         With pGrapher.ZedGraphCtrl.GraphPane
-            '.YAxis.Type = AxisType.Log
+            If aDataGroup.Count > 0 Then
+                '.YAxis.Type = AxisType.Log
+                .CurveList.Item(0).Color = Drawing.Color.Red
+                .Legend.IsVisible = False
+                '.CurveList.Item(1).Color = Drawing.Color.DarkBlue
+                'CType(.CurveList.Item(1), LineItem).Line.Width = 2
+            End If
             .AxisChange()
-            .CurveList.Item(0).Color = Drawing.Color.Red
-            .Legend.IsVisible = False
-            '.CurveList.Item(1).Color = Drawing.Color.DarkBlue
-            'CType(.CurveList.Item(1), LineItem).Line.Width = 2
         End With
         pZgc.Refresh()
     End Sub
@@ -1209,6 +1211,13 @@ Public Class frmRecess
         For Each lPeakDate As String In pRecess.listOfSegments.Keys
             lstRecessSegments.Items.Add(lPeakDate)
         Next
+
+        If lstRecessSegments.Items.Count = 0 Then
+            txtAnalysisResults.Text = ""
+            lstTable.Items.Clear()
+            pGraphRecessDatagroup.Clear()
+            RefreshGraphRecess(pGraphRecessDatagroup)
+        End If
     End Sub
 
     Private Function AttributesFromForm(ByRef Args As atcDataAttributes) As String

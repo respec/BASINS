@@ -49,6 +49,7 @@ Partial Class frmUSGSBaseflow
         Me.mnuGraphBF = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuGraphTimeseries = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuGraphProbability = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuGraphCDistPlot = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuAnalysis = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem
         Me.txtOutputRootName = New System.Windows.Forms.TextBox
@@ -238,14 +239,14 @@ Partial Class frmUSGSBaseflow
         'mnuFileSelectData
         '
         Me.mnuFileSelectData.Name = "mnuFileSelectData"
-        Me.mnuFileSelectData.Size = New System.Drawing.Size(140, 22)
+        Me.mnuFileSelectData.Size = New System.Drawing.Size(152, 22)
         Me.mnuFileSelectData.Text = "Select Data"
         '
         'mnuOutput
         '
         Me.mnuOutput.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOutputASCII})
         Me.mnuOutput.Name = "mnuOutput"
-        Me.mnuOutput.Size = New System.Drawing.Size(140, 22)
+        Me.mnuOutput.Size = New System.Drawing.Size(152, 22)
         Me.mnuOutput.Text = "Output"
         '
         'mnuOutputASCII
@@ -256,22 +257,28 @@ Partial Class frmUSGSBaseflow
         '
         'mnuGraphBF
         '
-        Me.mnuGraphBF.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuGraphTimeseries, Me.mnuGraphProbability})
+        Me.mnuGraphBF.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuGraphTimeseries, Me.mnuGraphProbability, Me.mnuGraphCDistPlot})
         Me.mnuGraphBF.Name = "mnuGraphBF"
-        Me.mnuGraphBF.Size = New System.Drawing.Size(140, 22)
+        Me.mnuGraphBF.Size = New System.Drawing.Size(152, 22)
         Me.mnuGraphBF.Text = "Graph"
         '
         'mnuGraphTimeseries
         '
         Me.mnuGraphTimeseries.Name = "mnuGraphTimeseries"
-        Me.mnuGraphTimeseries.Size = New System.Drawing.Size(136, 22)
+        Me.mnuGraphTimeseries.Size = New System.Drawing.Size(152, 22)
         Me.mnuGraphTimeseries.Text = "TimeSeries"
         '
         'mnuGraphProbability
         '
         Me.mnuGraphProbability.Name = "mnuGraphProbability"
-        Me.mnuGraphProbability.Size = New System.Drawing.Size(136, 22)
+        Me.mnuGraphProbability.Size = New System.Drawing.Size(152, 22)
         Me.mnuGraphProbability.Text = "Probability"
+        '
+        'mnuGraphCDistPlot
+        '
+        Me.mnuGraphCDistPlot.Name = "mnuGraphCDistPlot"
+        Me.mnuGraphCDistPlot.Size = New System.Drawing.Size(152, 22)
+        Me.mnuGraphCDistPlot.Text = "CDist Plot"
         '
         'mnuAnalysis
         '
@@ -404,4 +411,5 @@ Partial Class frmUSGSBaseflow
     Friend WithEvents chkTabDelimited As System.Windows.Forms.CheckBox
     Friend WithEvents mnuGraphTimeseries As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuGraphProbability As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuGraphCDistPlot As System.Windows.Forms.ToolStripMenuItem
 End Class

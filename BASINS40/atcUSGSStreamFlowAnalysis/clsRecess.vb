@@ -695,7 +695,7 @@ Public Class clsRecess
                 End If
             End If 'end of long if branch
         Next 'original loop 200
-
+        Return Nothing
     End Function
 
     Public Sub RecessGetAllSegments()
@@ -715,8 +715,10 @@ Public Class clsRecess
             If Not RecessIncludeMonths.Contains(lDate(1)) Then
                 Continue For 'loop 200
             End If
+
+            If liCount >= pData.numValues Then Continue For
             Dim lCurrentValue As Double = pData.Value(liCount)
-            If lCurrentValue <= pData.Value(liCount - 1) Or lCurrentValue <= pData.Value(liCount + 1) Then
+            If liCount < pData.numValues AndAlso (lCurrentValue <= pData.Value(liCount - 1) Or lCurrentValue <= pData.Value(liCount + 1)) Then
                 Continue For 'loop 200
             Else
                 pIndexPeakDay = liCount
@@ -1363,9 +1365,9 @@ Public Class clsRecess
             Dim lAskUserRecIndexOnly As Integer = 2
 
             Dim lStrInputFile As String = pDataFilename
-            Dim lFilenameLength As Integer = 12
+            Dim lFilenameLength As Integer = 11
             If lStrInputFile.Length > lFilenameLength Then
-                lStrInputFile = lStrInputFile.Substring(0, lFilenameLength)
+                lStrInputFile = lStrInputFile.Substring(0, lFilenameLength).PadRight(12, " ")
             End If
 
             If lAskUserRecIndexOnly <> 1 Then
