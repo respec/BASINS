@@ -35,15 +35,18 @@ Public Class clsGraphFrequency
         End If
 
         GetDataInfo()
-        If pNDays(0).StartsWith("H") Then
-            lValueHL = "High"
-        End If
-        If pNDays.Count = 1 Then
-            lNdayStr = pNDays(0).Substring(1).Trim("0")
+        If pNDays.Count > 0 Then
+            If pNDays(0).StartsWith("H") Then
+                lValueHL = "High"
+            End If
+            If pNDays.Count = 1 Then
+                lNdayStr = pNDays(0).Substring(1).Trim("0") & "-day "
+            Else
+                lNdayStr = "N-day "
+            End If
         Else
-            lNdayStr = "N"
+            lValueHL = ""
         End If
-
         With pZgc.MasterPane.PaneList(0)
             'Add USGS Peakfq label
             Dim lUSGSLabel As TextObj = Nothing
@@ -75,7 +78,7 @@ Public Class clsGraphFrequency
                 '.Title.Text = "Percent Exceeded"
 
                 If pStations.Count > 1 Then
-                    .Title.Text = lNdayStr & "-day " & lValueHL & " Flow " & pLogStr & " Pearson Type III Frequency"
+                    .Title.Text = lNdayStr & lValueHL & " Flow " & pLogStr & " Pearson Type III Frequency"
                 Else
                     If pExceedance Then
                         .Title.Text = "ANNUAL EXCEEDANCE PROBABILITY, PERCENT"
@@ -493,8 +496,15 @@ Public Class clsGraphFrequency
         Next
 
         pStations = New Generic.List(Of String)
+        Dim lStation As String
         For Each lTs As atcTimeseries In pDataGroup
-            Dim lStation As String = lTs.Attributes.GetValue("STAID").ToString.Trim()
+            If lTs.Attributes.ContainsAttribute("STAID") Then
+                lStation = lTs.Attributes.GetValue("STAID").ToString.Trim()
+            ElseIf lTs.Attributes.ContainsAttribute("Location") Then
+                lStation = lTs.Attributes.GetValue("Location").ToString.Trim()
+            Else
+                lStation = lTs.Serial
+            End If
             If Not pStations.Contains(lStation) Then
                 pStations.Add(lStation)
             End If
