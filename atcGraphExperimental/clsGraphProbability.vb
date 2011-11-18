@@ -6,7 +6,16 @@ Imports ZedGraph
 
 Public Class clsGraphProbability
     Inherits clsGraphBase
-    Private pExceedance As Boolean = True
+
+    ''' <summary>
+    ''' True  for Non-Exceedance graph
+    ''' False for Exceedance     graph
+    ''' Default is Exceedance
+    ''' </summary>
+    ''' <remarks>Because New runs before setting private member, 
+    ''' must set nonExceedance to false to default to exceedance graph
+    ''' </remarks>
+    Private pNonExceedance As Boolean = False
 
     Private Const pNumProbabilityPoints As Integer = 200
 
@@ -17,7 +26,7 @@ Public Class clsGraphProbability
 
     Public Property Exceedance() As Boolean
         Get
-            Return pExceedance
+            Return Not pNonExceedance
             'Try
             '    Dim lProbScale As ProbabilityScale = pZgc.MasterPane.PaneList(0).XAxis.Scale
             '    Return lProbScale.Exceedance
@@ -28,8 +37,8 @@ Public Class clsGraphProbability
         End Get
         Set(ByVal value As Boolean)
             Try
-                If value <> pExceedance Then
-                    pExceedance = value
+                If value = pNonExceedance Then
+                    pNonExceedance = Not value
                     Dim lCurves As New Generic.List(Of CurveItem)
                     lCurves.AddRange(MyBase.pZgc.MasterPane.PaneList.Item(0).CurveList)
                     If MyBase.pZgc.MasterPane.PaneList.Count > 1 Then
@@ -39,7 +48,7 @@ Public Class clsGraphProbability
                     For Each lCurve As CurveItem In lCurves
                         If lCurve.IsLine Then
                             Dim lLine As LineItem = lCurve
-                            If Not pExceedance OrElse Not lLine.Line.IsVisible Then
+                            If pNonExceedance OrElse Not lLine.Line.IsVisible Then
                                 For lPointIndex As Integer = 0 To lCurve.NPts - 1
                                     lCurve.Points(lPointIndex).X = 1 - lCurve.Points(lPointIndex).X
                                 Next
@@ -48,10 +57,10 @@ Public Class clsGraphProbability
                     Next
 
                     With pZgc.MasterPane.PaneList(0).XAxis.Title
-                        If pExceedance Then
-                            .Text = .Text.Replace(" Not-Exceeded", " Exceeded")
-                        Else
+                        If pNonExceedance Then
                             .Text = .Text.Replace(" Exceeded", " Not-Exceeded")
+                        Else
+                            .Text = .Text.Replace(" Not-Exceeded", " Exceeded")
                         End If
                     End With
                     pZgc.Refresh()
