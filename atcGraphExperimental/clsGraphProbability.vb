@@ -6,6 +6,7 @@ Imports ZedGraph
 
 Public Class clsGraphProbability
     Inherits clsGraphBase
+    Private pExceedance As Boolean = True
 
     Private Const pNumProbabilityPoints As Integer = 200
 
@@ -16,21 +17,38 @@ Public Class clsGraphProbability
 
     Public Property Exceedance() As Boolean
         Get
-            Try
-                Dim lProbScale As ProbabilityScale = pZgc.MasterPane.PaneList(0).XAxis.Scale
-                Return lProbScale.Exceedance
-            Catch e As Exception
-                MapWinUtility.Logger.Dbg("Could not get scale exceedance: " & e.ToString)
-                Return False
-            End Try
+            Return pExceedance
+            'Try
+            '    Dim lProbScale As ProbabilityScale = pZgc.MasterPane.PaneList(0).XAxis.Scale
+            '    Return lProbScale.Exceedance
+            'Catch e As Exception
+            '    MapWinUtility.Logger.Dbg("Could not get scale exceedance: " & e.ToString)
+            '    Return False
+            'End Try
         End Get
         Set(ByVal value As Boolean)
             Try
-                Dim lProbScale As ProbabilityScale = pZgc.MasterPane.PaneList(0).XAxis.Scale
-                If value <> lProbScale.Exceedance Then
-                    lProbScale.Exceedance = value
+                If value <> pExceedance Then
+                    pExceedance = value
+                    Dim lCurves As New Generic.List(Of CurveItem)
+                    lCurves.AddRange(MyBase.pZgc.MasterPane.PaneList.Item(0).CurveList)
+                    If MyBase.pZgc.MasterPane.PaneList.Count > 1 Then
+                        lCurves.AddRange(MyBase.pZgc.MasterPane.PaneList.Item(1).CurveList)
+                    End If
+
+                    For Each lCurve As CurveItem In lCurves
+                        If lCurve.IsLine Then
+                            Dim lLine As LineItem = lCurve
+                            If Not pExceedance OrElse Not lLine.Line.IsVisible Then
+                                For lPointIndex As Integer = 0 To lCurve.NPts - 1
+                                    lCurve.Points(lPointIndex).X = 1 - lCurve.Points(lPointIndex).X
+                                Next
+                            End If
+                        End If
+                    Next
+
                     With pZgc.MasterPane.PaneList(0).XAxis.Title
-                        If value Then
+                        If pExceedance Then
                             .Text = .Text.Replace(" Not-Exceeded", " Exceeded")
                         Else
                             .Text = .Text.Replace(" Exceeded", " Not-Exceeded")
@@ -38,6 +56,18 @@ Public Class clsGraphProbability
                     End With
                     pZgc.Refresh()
                 End If
+                '    Dim lProbScale As ProbabilityScale = pZgc.MasterPane.PaneList(0).XAxis.Scale
+                '    If value <> lProbScale.Exceedance Then
+                '        lProbScale.Exceedance = value
+                '        With pZgc.MasterPane.PaneList(0).XAxis.Title
+                '            If value Then
+                '                .Text = .Text.Replace(" Not-Exceeded", " Exceeded")
+                '            Else
+                '                .Text = .Text.Replace(" Exceeded", " Not-Exceeded")
+                '            End If
+                '        End With
+                '        pZgc.Refresh()
+                '    End If
             Catch e As Exception
                 MapWinUtility.Logger.Dbg("Could not set scale exceedance: " & e.ToString)
             End Try
@@ -127,8 +157,7 @@ Public Class clsGraphProbability
                 End With
                 lXScale = .Scale
                 lXScale.standardDeviations = 3
-                'lProbScale.LabelStyle = ProbabilityScale.ProbabilityLabelStyle.ReturnInterval
-                'lProbScale.IsReverse = True
+                'lXScale.IsReverse = True
             End If
 
             For lXindex As Integer = 0 To lLastIndex
@@ -144,7 +173,11 @@ Public Class clsGraphProbability
         ReDim lXFracExceed(lLastIndex)
 
         For lIndex = 0 To lLastIndex
-            lXFracExceed(lIndex) = (100 - lX(lIndex)) / 100
+            If Exceedance Then
+                lXFracExceed(lIndex) = (100 - lX(lIndex)) / 100
+            Else
+                lXFracExceed(lIndex) = lX(lIndex) / 100
+            End If
             lAttributeName = "%" & Format(lX(lIndex), "00.####")
             lY(lIndex) = aTimeseries.Attributes.GetValue(lAttributeName)
             'Logger.Dbg(lAttributeName & " = " & lY(lIndex) & _
@@ -152,10 +185,8 @@ Public Class clsGraphProbability
             '                            " : " & lXFracExceed(lIndex))
         Next
         lXScale = lPane.XAxis.Scale
-        '.Scale.Max = lXFracExceed(0)
-        '.Scale.Min = lXFracExceed(lLastIndex)
         lXScale.BaseTic = lXFracExceed(0)
-        If lXScale.Exceedance Then
+        If Exceedance Then
             lPane.XAxis.Title.Text = "Percent Exceeded"
         Else
             lPane.XAxis.Title.Text = "Percent Not-Exceeded"
