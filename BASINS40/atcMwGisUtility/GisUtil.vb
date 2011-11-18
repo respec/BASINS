@@ -3405,6 +3405,37 @@ Public Class GisUtil
 
     End Sub
 
+    Public Shared Sub SetLayerRendererWithRanges(ByVal aLayerIndex As Integer, ByVal aFieldIndex As Integer, ByVal aColors As Collection, _
+                                                 ByVal aCaptions As Collection, ByVal aLowRange As Collection, ByVal aHighRange As Collection)
+        'create a unique values renderer for the given layer and field,
+        'adapted from MapWindow SFColoringSchemeForm.vb
+
+        Dim lColorScheme As New MapWinGIS.ShapefileColorScheme
+
+        Dim lLayer As MapWindow.Interfaces.Layer = LayerFromIndex(aLayerIndex)
+
+        Dim lSf As New MapWinGIS.Shapefile
+        lSf = lLayer.GetObject()
+
+        lColorScheme.FieldIndex = aFieldIndex
+        For i As Integer = 1 To aColors.Count
+            Dim lBrk As New MapWinGIS.ShapefileColorBreak
+            lBrk.StartColor = aColors(i)
+            lBrk.EndColor = lBrk.StartColor
+            lBrk.StartValue = aLowRange(i)
+            lBrk.EndValue = aHighRange(i)
+            lBrk.Caption = aCaptions(i)
+            lColorScheme.Add(lBrk)
+            lBrk = Nothing
+        Next
+
+        lSf = Nothing
+
+        lLayer.ColoringScheme = lColorScheme
+        lLayer.Expanded = True
+        lLayer.Visible = True
+    End Sub
+
     Public Shared Sub SetLayerRendererUniqueValues(ByVal aDesc As String, ByVal aFieldIndex As Integer)
         'create a unique values renderer for the given layer and field,
         'adapted from MapWindow SFColoringSchemeForm.vb
