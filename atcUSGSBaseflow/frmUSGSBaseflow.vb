@@ -418,6 +418,8 @@ Public Class frmUSGSBaseflow
             Dim lFilename As String = IO.Path.GetDirectoryName(pDataGroup(0).Attributes.GetValue("History 1").ToString.ToLower.Substring("read from ".Length))
             lFilename = IO.Path.Combine(lDir, pBaseOutputFilename & ".SBF")
             ASCIIHySepBSF(pDataGroup(0), lFilename)
+            Dim lFilenamePrt As String = IO.Path.ChangeExtension(lFilename, "PRT")
+            ASCIIHySepMonthly(pDataGroup(0), lFilenamePrt)
             lSpecification = lFilename
             If chkTabDelimited.Checked Then
                 lFilename = IO.Path.Combine(lDir, pBaseOutputFilename & "_tab" & ".SBF")
@@ -796,5 +798,164 @@ Public Class frmUSGSBaseflow
         Else
             Logger.Msg("Need to select at least one daily streamflow dataset", "USGS Baseflow Separation")
         End If
+    End Sub
+
+    Private Sub mnuGraphCDistPlot_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuGraphCDistPlot.Click
+        If Not pDidBFSeparation Then
+            Logger.Msg("Need to perform baseflow separation first.")
+            Exit Sub
+        End If
+        Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
+        DoBFGraphCDistPlot()
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+    End Sub
+
+    Private Sub DoBFGraphCDistPlot()
+        If pDataGroup Is Nothing OrElse pDataGroup.Count = 0 Then
+            Exit Sub
+        End If
+        Dim lTsDailyStreamflow As atcTimeseries = pDataGroup(0)
+
+        Dim Location As String = lTsDailyStreamflow.Attributes.GetValue("Location", "")
+        Dim lSTAID As String = lTsDailyStreamflow.Attributes.GetValue("STAID", "")
+        If lSTAID = "" Then lSTAID = Location
+
+        Dim lTsBaseflow1 As atcTimeseries = Nothing
+        Dim lTsBaseflow2 As atcTimeseries = Nothing
+        Dim lTsBaseflow3 As atcTimeseries = Nothing
+
+        Dim lBFDatagroup As atcTimeseriesGroup = lTsDailyStreamflow.Attributes.GetDefinedValue("Baseflow").Value
+        If lBFDatagroup IsNot Nothing Then
+            For Each lTsBF As atcTimeseries In lBFDatagroup
+                If pMethodLastDone.ToLower.StartsWith("hysep") Then
+                    If lTsBF.Attributes.GetValue("Scenario").ToString.ToLower.StartsWith("hysep") Then
+                        lTsBaseflow1 = lTsBF
+                        Exit For
+                    End If
+                ElseIf pMethodLastDone.ToLower.StartsWith("part") Then
+                    Select Case lTsBF.Attributes.GetValue("Scenario")
+                        Case "PartDaily1"
+                            lTsBaseflow1 = lTsBF
+                        Case "PartDaily2"
+                            lTsBaseflow2 = lTsBF
+                        Case "PartDaily3"
+                            lTsBaseflow3 = lTsBF
+                    End Select
+                End If
+            Next
+        Else
+            Logger.Dbg("DoBFGraph: no baseflow data found.")
+            Exit Sub
+        End If
+
+        If pMethodLastDone.ToLower.StartsWith("hysep") Then
+            If lTsBaseflow1 Is Nothing Then
+                Logger.Dbg("DoBFGraph: no baseflow data found.")
+                Exit Sub
+            End If
+        ElseIf pMethodLastDone.ToLower.StartsWith("part") Then
+            If lTsBaseflow1 Is Nothing OrElse lTsBaseflow2 Is Nothing OrElse lTsBaseflow3 Is Nothing Then
+                Logger.Dbg("DoBFGraph: no baseflow data found.")
+                Exit Sub
+            End If
+        End If
+
+        Dim lstart As Double = lTsBaseflow1.Attributes.GetValue("SJDay")
+        Dim lend As Double = lTsBaseflow1.Attributes.GetValue("EJDay")
+        Dim lTsFlow As atcTimeseries = SubsetByDate(lTsDailyStreamflow, lstart, lend, Nothing)
+        Dim lYAxisTitleText As String = "FLOW, IN CUBIC FEET PER SECOND"
+        With lTsFlow.Attributes
+            .SetValue("STAID", lSTAID)
+            .SetValue("Constituent", "FLOW")
+            .SetValue("Units", lYAxisTitleText)
+            .SetValue("YAxis", "LEFT")
+        End With
+
+        'TODO: need to construct the curve labels in legend manually
+        'so as not to touch the attributes of the original timeseries!!!
+        Dim lTsBF4Graph As atcTimeseries = lTsBaseflow1.Clone()
+        With lTsBF4Graph.Attributes
+            .SetValue("STAID", lSTAID)
+            .SetValue("Constituent", "Baseflow")
+            .SetValue("Scenario", "Estimated")
+            .SetValue("Units", lYAxisTitleText)
+            .SetValue("YAxis", "LEFT")
+        End With
+
+        Dim lTsRunoff As atcTimeseries = lTsFlow - lTsBaseflow1
+        With lTsRunoff.Attributes
+            .SetValue("STAID", lSTAID)
+            .SetValue("Constituent", "Runoff")
+            .SetValue("Scenario", "Estimated")
+            .SetValue("Units", lYAxisTitleText)
+            .SetValue("YAxis", "LEFT")
+        End With
+
+        Dim lDataGroup As New atcData.atcTimeseriesGroup
+
+        Dim lTimeUnitToAggregate As atcTimeUnit = atcTimeUnit.TUMonth
+        Dim lGraphTsFlow As atcTimeseries = Aggregate(lTsFlow, lTimeUnitToAggregate, 1, atcTran.TranSumDiv)
+        Dim lGraphTsBF As atcTimeseries = Aggregate(lTsBF4Graph, lTimeUnitToAggregate, 1, atcTran.TranSumDiv)
+        Dim lGraphTsRunoff As atcTimeseries = Aggregate(lTsRunoff, lTimeUnitToAggregate, 1, atcTran.TranSumDiv)
+
+        'Convert to inch
+        Dim lConversionFactor As Double = 0.03719 / pDALastUsed
+        Dim lGraphTsFlowIn As atcTimeseries = lGraphTsFlow * lConversionFactor
+        With lGraphTsFlowIn.Attributes
+            .SetValue("Units", "Flow (in)")
+        End With
+        Dim lGraphTsBFIn As atcTimeseries = lGraphTsBF * lConversionFactor
+        lGraphTsBFIn.Attributes.SetValue("Units", "Flow (in)")
+        Dim lGraphTsRunoffIn As atcTimeseries = lGraphTsRunoff * lConversionFactor
+        lGraphTsRunoffIn.Attributes.SetValue("Units", "Flow (in)")
+
+        lDataGroup.Add(lGraphTsFlowIn)
+        lDataGroup.Add(lGraphTsBFIn)
+        lDataGroup.Add(lGraphTsRunoffIn)
+
+        'lDataGroup.Add(lTsFlow)
+        'lDataGroup.Add(lTsBF4Graph)
+        'lDataGroup.Add(lTsRunoff)
+
+        Dim lGraphForm As New atcGraph.atcGraphForm()
+        lGraphForm.Icon = Me.Icon
+        Dim lZgc As ZedGraphControl = lGraphForm.ZedGraphCtrl
+        Dim lGraphTS As New clsGraphProbability(lDataGroup, lZgc)
+        lGraphTS.Exceedance = False
+        lGraphForm.Grapher = lGraphTS
+        With lGraphForm.Grapher.ZedGraphCtrl.GraphPane
+            'Dim lScaleMin As Double = 10
+            .YAxis.Type = AxisType.Linear
+            '.YAxis.Scale.MinAuto = False
+            '.YAxis.Scale.Min = lScaleMin
+            .AxisChange()
+            .CurveList.Item(0).Color = Drawing.Color.Red
+            With CType(.CurveList.Item(0), LineItem).Symbol
+                .Type = SymbolType.Triangle
+                .IsVisible = True
+            End With
+
+            .CurveList.Item(1).Color = Drawing.Color.DarkBlue
+            With CType(.CurveList.Item(1), LineItem).Symbol
+                .Type = SymbolType.Circle
+                .IsVisible = True
+            End With
+
+            .CurveList.Item(2).Color = Drawing.Color.Cyan
+            With CType(.CurveList.Item(2), LineItem).Symbol
+                .Type = SymbolType.Square
+                .IsVisible = True
+            End With
+
+            With .Legend.FontSpec
+                .IsBold = False
+                .Border.IsVisible = False
+                .Size = 12
+            End With
+            .XAxis.Title.Text = "PERCENTAGE OF TIME FLOW WAS LESS THAN " & vbCrLf & "OR EQUAL TO INDICATED VALUE"
+        End With
+        lGraphForm.Grapher.ZedGraphCtrl.Refresh()
+        lGraphForm.Show()
+
     End Sub
 End Class

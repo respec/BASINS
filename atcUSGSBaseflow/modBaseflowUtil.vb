@@ -137,6 +137,351 @@ Module modBaseflowUtil
         lDate = Nothing
     End Sub
 
+    ''' <summary>
+    ''' this is the HySEP monthly ASCII output
+    ''' </summary>
+    ''' <param name="aTs">Streamflow timeseries with baseflow group as an attribute</param>
+    ''' <param name="aFilename">.BSF output filename</param>
+    ''' <remarks></remarks>
+    Public Sub ASCIIHySepMonthly(ByVal aTs As atcTimeseries, ByVal aFilename As String, Optional ByVal aBFName As String = "")
+        Dim lSW As IO.StreamWriter = Nothing
+        Try
+            lSW = New IO.StreamWriter(aFilename, False)
+        Catch ex As Exception
+            Logger.Dbg("Problem opening file: " & aFilename)
+            Exit Sub
+        End Try
+
+        Dim lTsBF As atcTimeseries = Nothing
+        Dim lTsFlow As atcTimeseries = Nothing
+        If aBFName = "" Then aBFName = "HySep"
+        For Each lTs As atcTimeseries In aTs.Attributes.GetDefinedValue("Baseflow").Value
+            If lTs.Attributes.GetValue("Scenario").ToString.StartsWith(aBFName) Then
+                lTsBF = lTs
+                lTsFlow = SubsetByDate(aTs, lTs.Dates.Value(0), lTs.Dates.Value(lTs.numValues), Nothing)
+                Exit For
+            End If
+        Next
+
+        If lTsBF Is Nothing Then
+            Logger.Dbg("No baseflow data found.")
+            Exit Sub
+        End If
+
+        Dim lEnglishUnit As Boolean = True
+        Dim lDate(5) As Integer
+        'English Unit: flow in cfs, depth in inch, drainage area in square miles
+        'Metric Unit: flow in m3/s, depth in centimeter, drainage area in square km
+        '1 second-foot for one day covers 1 square mile 0.03719 inch deep (Water Supply Paper by USGS)
+        '1 cfs = 0.6462 M gal/d (flow rate conversion)
+        Dim lDA As Double = lTsBF.Attributes.GetValue("DrainageArea", 1.0)
+        Dim lTsFlowDepthPUA As atcTimeseries = Nothing
+        Dim lTsFlowVolumePUA As atcTimeseries = Nothing
+        Dim lTsFlowRatePUA As atcTimeseries = Nothing
+        'Dim lTsFlowVolume As atcTimeseries = Nothing
+
+        If lEnglishUnit Then
+            lTsFlowDepthPUA = lTsFlow * (0.03719 / lDA) '-> inch
+            lTsFlowVolumePUA = lTsFlow * (0.6462 / lDA) '-> Mgal/d/mi2
+            'lTsFlowVolume = aTs * 0.6462
+        Else
+            lTsFlowDepthPUA = lTsFlow * (8.64 / lDA) '-> centimeter
+        End If
+        lTsFlowRatePUA = lTsFlow / lDA
+
+        Dim lTsBFDepthPUA As atcTimeseries = Nothing
+        Dim lTsBFVolumePUA As atcTimeseries = Nothing
+        Dim lTsBFRatePUA As atcTimeseries = Nothing
+        Dim lTsBFRateVolume As atcTimeseries = Nothing
+        If lEnglishUnit Then
+            lTsBFDepthPUA = lTsBF * (0.03719 / lDA) '-> inch
+            lTsBFVolumePUA = lTsBF * (0.6462 / lDA) '-> Mgal/d/mi2
+            lTsBFRateVolume = lTsBF * 0.6462
+        Else
+            lTsBFDepthPUA = lTsBF * (8.64 / lDA) '-> centimeter
+        End If
+        lTsBFRatePUA = lTsBF / lDA
+
+        'Dim lTsBFPct As atcTimeseries = (lTsBF * 100.0) / aTs
+
+        'aggregate into monthly values
+        Dim lMonthlyCo1RateFlow As atcTimeseries = Aggregate(lTsFlow, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
+        Dim lMonthlyCo2RateBF As atcTimeseries = Aggregate(lTsBF, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
+        Dim lMonthlyCo3RateRO As atcTimeseries = Aggregate(lTsFlow - lTsBF, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
+        Dim lMonthlyCo4DepthFlowPUA As atcTimeseries = Aggregate(lTsFlowDepthPUA, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
+        Dim lMonthlyCo5DepthBFPUA As atcTimeseries = Aggregate(lTsBFDepthPUA, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
+        Dim lMonthlyCo6DepthROPUA As atcTimeseries = Aggregate(lTsFlowDepthPUA - lTsBFDepthPUA, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
+        'Dim lMonthlyVolumeFlowPUA As atcTimeseries = Aggregate(lTsFlowVolumePUA, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
+        Dim lMonthlyCo8RateBFPUA As atcTimeseries = Aggregate(lTsBFRatePUA, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
+        Dim lMonthlyCo9RateBFVolumePUA As atcTimeseries = Aggregate(lTsBFVolumePUA, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
+        Dim lMonthlyCo10RateBFVolume As atcTimeseries = Aggregate(lTsBFRateVolume, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
+
+        Dim lSnMonth As New atcSeasonsMonth
+        Dim lSnCo1RateFlow As atcTimeseriesGroup = lSnMonth.Split(lMonthlyCo1RateFlow, Nothing)
+        Dim lSnCo2RateBF As atcTimeseriesGroup = lSnMonth.Split(lMonthlyCo2RateBF, Nothing)
+        Dim lSnCo3RateRO As atcTimeseriesGroup = lSnMonth.Split(lMonthlyCo3RateRO, Nothing)
+        Dim lSnCo4DepthFlowPUA As atcTimeseriesGroup = lSnMonth.Split(lMonthlyCo4DepthFlowPUA, Nothing)
+        Dim lSnCo5DepthBFPUA As atcTimeseriesGroup = lSnMonth.Split(lMonthlyCo5DepthBFPUA, Nothing)
+        Dim lSnCo6DepthROPUA As atcTimeseriesGroup = lSnMonth.Split(lMonthlyCo6DepthROPUA, Nothing)
+        Dim lSnCo8RateBFPUA As atcTimeseriesGroup = lSnMonth.Split(lMonthlyCo8RateBFPUA, Nothing)
+        Dim lSnCo9RateBFVolumePUA As atcTimeseriesGroup = lSnMonth.Split(lMonthlyCo9RateBFVolumePUA, Nothing)
+        Dim lSnCo10RateBFVolume As atcTimeseriesGroup = lSnMonth.Split(lMonthlyCo10RateBFVolume, Nothing)
+
+        '2100
+        Dim lHeader2100 As String = "" & _
+     Space(6) & "   Mean       Mean       Mean     Total   Total   Total    BF/     Base" & _
+     Space(6) & "  stream-     base      surface  stream-   base  surface stream-   flow" & _
+     Space(6) & "   flow       flow      runoff    flow     flow   runoff  flow   (Mgal/d/" & _
+     Space(6) & "  (ft3/s)    (ft3/s)    (ft3/s)    (in)    (in)    (in)    (%)      mi2)" & _
+     Space(6) & "---------- ---------- ---------- ------- ------- -------  ----- ----------"
+
+        '2110
+        Dim lHeader2110 As String = "" & _
+     Space(6) & "   Mean       Mean       Mean     Total   Total   Total    BF/" & _
+     Space(6) & "  stream-     base      surface  stream-   base  surface stream-   Base" & _
+     Space(6) & "   flow       flow      runoff    flow     flow   runoff  flow     flow" & _
+     Space(6) & "  (ft3/s)    (ft3/s)    (ft3/s)    (in)    (in)    (in)    (%)   (Mgal/d)" & _
+     Space(6) & "---------- ---------- ---------- ------- ------- -------  ----- ----------"
+
+        '2120
+        Dim lHeader2120 As String = "" & _
+     Space(6) & "   Mean       Mean       Mean     Total   Total   Total    BF/     Base" & _
+     Space(6) & "  stream-     base      surface  stream-   base  surface stream-   flow" & _
+     Space(6) & "   flow       flow      runoff    flow     flow   runoff  flow    (ft3/s/" & _
+     Space(6) & "  (ft3/s)    (ft3/s)    (ft3/s)    (in)    (in)    (in)    (%)      mi2)" & _
+     Space(6) & "---------- ---------- ---------- ------- ------- -------  ----- ----------"
+
+        '2130
+        Dim lHeader2130 As String = "" & _
+     Space(6) & "   Mean       Mean       Mean     Total   Total   Total    BF/     Base" & _
+     Space(6) & "  stream-     base      surface  stream-   base  surface stream-   flow" & _
+     Space(6) & "   flow       flow      runoff    flow     flow   runoff  flow    (m3/s/" & _
+     Space(6) & "  (m3/s)     (m3/s)     (m3/s)     (cm)    (cm)    (cm)    (%)      km2)" & _
+     Space(6) & "---------- ---------- ---------- ------- ------- -------  ----- ----------"
+
+        Dim lHeaderEngAll As String = "" & _
+     Space(6) & "   Mean       Mean       Mean     Total   Total   Total    BF/     Base       Base" & _
+     Space(6) & "  stream-     base      surface  stream-   base  surface stream-   flow       flow       Base" & _
+     Space(6) & "   flow       flow      runoff    flow     flow   runoff  flow    (ft3/s/   (Mgal/d/     flow" & _
+     Space(6) & "  (ft3/s)    (ft3/s)    (ft3/s)    (in)    (in)    (in)    (%)      mi2)       mi2)    (Mgal/d)" & _
+     Space(6) & "---------- ---------- ---------- ------- ------- -------  ----- ---------- ---------- ----------"
+
+        '2150 FORMAT (A5,3F11.2,3F8.3,F7.2,F11.3)
+        Dim lMonthNames() As String = {"Dummy", "Jan. ", "Feb. ", "Mar. ", "Apr. ", _
+                                                "May  ", "June ", "July ", "Aug. ", _
+                                                "Sept.", "Oct. ", "Nov. ", "Dec. "}
+
+        'construct table
+        Dim lCo0MonthName As String = ""
+        Dim lCo1RateFlow As String = ""
+        Dim lCo2RateBF As String = ""
+        Dim lCo3RateRO As String = ""
+        Dim lCo4DepthTotalflow As String = ""
+        Dim lCo5DepthTotalBF As String = ""
+        Dim lCo6DepthTotalRO As String = ""
+        Dim lCo7BFPct As String = ""
+        Dim lCo8RateBFPUA As String = ""
+        Dim lCo9RateBFVolumePUA As String = ""
+        Dim lCo10RateBFVolume As String = ""
+        Dim lTable As New atcTableDelimited
+        With lTable
+            .Delimiter = ","
+            .NumFields = 11
+            .FieldLength(1) = 5
+            .FieldName(1) = "Month"
+            For I As Integer = 2 To 4
+                .FieldLength(I) = 11
+                Select Case I
+                    Case 2 : .FieldName(I) = "FlowRate"
+                    Case 3 : .FieldName(I) = "BaseflowRate"
+                    Case 4 : .FieldName(I) = "RunoffRate"
+                End Select
+            Next
+            For I As Integer = 5 To 7
+                .FieldLength(I) = 8
+                Select Case I
+                    Case 5 : .FieldName(I) = "TotalFlowDepth"
+                    Case 6 : .FieldName(I) = "TotalBaseflowDepth"
+                    Case 7 : .FieldName(I) = "TotalRunoffDepth"
+                End Select
+            Next
+            .FieldLength(8) = 7
+            .FieldName(8) = "Baseflow%"
+
+            For I As Integer = 9 To 11
+                .FieldLength(I) = 11
+                Select Case I
+                    Case 9 : .FieldName(I) = "BaseflowRatePUA"
+                    Case 10 : .FieldName(I) = "BaseflowRateVolumePUA"
+                    Case 11 : .FieldName(I) = "BaseflowRateVolume"
+                End Select
+            Next
+
+            'Start write out
+
+            Dim lCo1Sum12MonthFlow As Double
+            Dim lCo2Sum12MonthBF As Double
+            Dim lCo3Sum12MonthRO As Double
+            Dim lCo4Sum12MonthDepthFlow As Double
+            Dim lCo5Sum12MonthDepthBF As Double
+            Dim lCo6Sum12MonthDepthRO As Double
+            Dim lCo8Sum12MonthRateBFPUA As Double
+            Dim lCo9Sum12MonthRateBFVolumePUA As Double
+            Dim lCo10Sum12MonthRateBFVolume As Double
+
+            .CurrentRecord = 1
+            For I As Integer = 0 To lMonthlyCo1RateFlow.numValues - 1
+
+                If I + 1 Mod 12 = 0 Then
+                    lCo1Sum12MonthFlow /= 12.0
+                    lCo2Sum12MonthBF /= 12.0
+                    lCo3Sum12MonthRO /= 12.0
+                    Dim lBFPct As Double = lCo5Sum12MonthDepthBF / lCo4Sum12MonthDepthFlow * 100.0
+                    lCo8Sum12MonthRateBFPUA /= 12.0
+                    lCo9Sum12MonthRateBFVolumePUA /= 12.0
+                    lCo10Sum12MonthRateBFVolume /= 12.0
+                    J2Date(lMonthlyCo1RateFlow.Dates.Value(I), lDate)
+
+                    .Value(1) = "E" & lDate(0)
+                    .Value(2) = String.Format("{0:0.00}", lCo1Sum12MonthFlow)
+                    .Value(3) = String.Format("{0:0.00}", lCo2Sum12MonthBF)
+                    .Value(4) = String.Format("{0:0.00}", lCo3Sum12MonthRO)
+                    .Value(5) = String.Format("{0:0.000}", lCo4Sum12MonthDepthFlow)
+                    .Value(6) = String.Format("{0:0.000}", lCo5Sum12MonthDepthBF)
+                    .Value(7) = String.Format("{0:0.000}", lCo6Sum12MonthDepthRO)
+                    .Value(8) = String.Format("{0:0.00}", lBFPct)
+                    .Value(9) = String.Format("{0:0.000}", lCo8Sum12MonthRateBFPUA)
+                    .Value(10) = String.Format("{0:0.000}", lCo9Sum12MonthRateBFVolumePUA)
+                    .Value(11) = String.Format("{0:0.000}", lCo10Sum12MonthRateBFVolume)
+
+                    lCo1Sum12MonthFlow = 0.0
+                    lCo2Sum12MonthBF = 0.0
+                    lCo3Sum12MonthRO = 0.0
+                    lCo4Sum12MonthDepthFlow = 0.0
+                    lCo5Sum12MonthDepthBF = 0.0
+                    lCo6Sum12MonthDepthRO = 0.0
+                    lCo8Sum12MonthRateBFPUA = 0.0
+                    lCo9Sum12MonthRateBFVolumePUA = 0.0
+                    lCo10Sum12MonthRateBFVolume = 0.0
+
+                    .CurrentRecord += 1
+                End If
+
+                J2Date(lMonthlyCo1RateFlow.Dates.Value(I), lDate)
+                .Value(1) = String.Format("{0:0.00}", lMonthNames(lDate(1)))
+                .Value(2) = String.Format("{0:0.00}", lMonthlyCo1RateFlow.Value(I + 1))
+                .Value(3) = String.Format("{0:0.00}", lMonthlyCo2RateBF.Value(I + 1))
+                .Value(4) = String.Format("{0:0.00}", lMonthlyCo3RateRO.Value(I + 1))
+                .Value(5) = String.Format("{0:0.000}", lMonthlyCo4DepthFlowPUA.Value(I + 1))
+                .Value(6) = String.Format("{0:0.000}", lMonthlyCo5DepthBFPUA.Value(I + 1))
+                .Value(7) = String.Format("{0:0.000}", lMonthlyCo6DepthROPUA.Value(I + 1))
+                .Value(8) = String.Format("{0:0.00}", CDbl(.Value(3)) / CDbl(.Value(2)) * 100.0)
+                .Value(9) = String.Format("{0:0.000}", lMonthlyCo8RateBFPUA.Value(I + 1))
+                .Value(10) = String.Format("{0:0.000}", lMonthlyCo9RateBFVolumePUA.Value(I + 1))
+                .Value(11) = String.Format("{0:0.000}", lMonthlyCo10RateBFVolume.Value(I + 1))
+
+                lCo1Sum12MonthFlow += lMonthlyCo1RateFlow.Value(I + 1)
+                lCo2Sum12MonthBF += lMonthlyCo2RateBF.Value(I + 1)
+                lCo3Sum12MonthRO += lMonthlyCo3RateRO.Value(I + 1)
+                lCo4Sum12MonthDepthFlow += lMonthlyCo4DepthFlowPUA.Value(I + 1)
+                lCo5Sum12MonthDepthBF += lMonthlyCo5DepthBFPUA.Value(I + 1)
+                lCo6Sum12MonthDepthRO += lMonthlyCo6DepthROPUA.Value(I + 1)
+                lCo8Sum12MonthRateBFPUA += lMonthlyCo8RateBFPUA.Value(I + 1)
+                lCo9Sum12MonthRateBFVolumePUA += lMonthlyCo9RateBFVolumePUA.Value(I + 1)
+                lCo10Sum12MonthRateBFVolume += lMonthlyCo10RateBFVolume.Value(I + 1)
+
+                .CurrentRecord += 1
+            Next
+            'For I As Integer = 1 To 12
+            '    .CurrentRecord = I
+            '    .Value(1) = lMonthNames(I)
+            '    .Value(2) = lSnCo1RateFlow(I - 1).Attributes.GetValue("Mean")
+            '    .Value(3) = lSnCo2RateBF(I - 1).Attributes.GetValue("Mean")
+            '    .Value(4) = lSnCo3RateRO(I - 1).Attributes.GetValue("Mean")
+            '    .Value(5) = lSnCo4DepthFlowPUA(I - 1).Attributes.GetValue("Mean")
+            '    .Value(6) = lSnCo5DepthBFPUA(I - 1).Attributes.GetValue("Mean")
+            '    .Value(7) = lSnCo6DepthROPUA(I - 1).Attributes.GetValue("Mean")
+            '    .Value(8) = CDbl(.Value(3)) / CDbl(.Value(2)) * 100.0
+            '    .Value(9) = lSnCo8RateBFPUA(I - 1).Attributes.GetValue("Mean")
+            '    .Value(10) = lSnCo9RateBFVolumePUA(I - 1).Attributes.GetValue("Mean")
+            '    .Value(11) = lSnCo10RateBFVolume(I - 1).Attributes.GetValue("Mean")
+            'Next
+        End With
+
+        Dim lStation As String = aTs.Attributes.GetValue("STAID", "")
+        If lStation = "" Then lStation = aTs.Attributes.GetValue("Location", "")
+        Dim lUnitArea As String = "square miles"
+        If Not lEnglishUnit Then lUnitArea = "square kilometers"
+
+        J2Date(lTsBF.Dates.Value(0), lDate)
+        Dim lStartYear As String = lDate(0)
+        Dim lStartMonth As Integer = lDate(1)
+        J2Date(lTsBF.Dates.Value(lTsBF.numValues - 1), lDate)
+        Dim lEndYear As String = lDate(0)
+        Dim lEndMonth As Integer = lDate(1)
+        Dim lBFInterval As Double = lTsBF.Attributes.GetValue("BFInterval", 0.0)
+
+        Dim lOneLine As String = lTsBF.Attributes.GetValue("Scenario", "")
+        If lOneLine.Length > 0 Then lOneLine = lOneLine.Substring("HySep".Length)
+        lSW.WriteLine(Space(80).Replace(" ", "-"))
+        lSW.WriteLine("Hydrograph separation by the " & lOneLine.PadRight(23, " "))
+        lSW.WriteLine("Station ID = " & lStation & " Drainage Area = " & String.Format("{0:0.00}", lDA) & " " & lUnitArea)
+        lSW.WriteLine("Period from " & lStartYear & " to " & lEndYear & "   interval = " & String.Format("{0:0.0}", lBFInterval) & " days")
+        lSW.WriteLine(Space(80).Replace(" ", "-"))
+
+        lSW.WriteLine(vbCrLf & vbCrLf)
+        lSW.WriteLine(lHeaderEngAll)
+        lSW.WriteLine(lTable.ToString.Replace(",", ""))
+
+        'Seasonal-distribution table
+        lSW.WriteLine(vbCrLf & vbCrLf)
+        lSW.WriteLine(Space(80).Replace(" ", "-"))
+        lSW.WriteLine("                 Seasonal-distribution table " & vbCrLf)
+        lSW.WriteLine("Hydrograph separation by the " & lOneLine.PadRight(23, " "))
+        lSW.WriteLine("Station ID = " & lStation & " Drainage Area = " & String.Format("{0:0.00}", lDA) & " " & lUnitArea)
+        lSW.WriteLine("Period from " & lStartYear & " to " & lEndYear & "   interval = " & String.Format("{0:0.0}", lBFInterval) & " days")
+        lSW.WriteLine(Space(80).Replace(" ", "-"))
+        lSW.WriteLine("                Year starts in " & lMonthNames(lStartMonth))
+        lSW.WriteLine("                 Year ends in " & lMonthNames(lEndMonth))
+
+        lSW.WriteLine("                        Base flow     Runoff")
+        lSW.WriteLine("           Month           (in)         (in)")
+        lSW.WriteLine("           ---------     ---------     ------")
+        Dim lBFinch As String
+        Dim lROinch As String
+        For I As Integer = lStartMonth To lEndMonth
+            lBFinch = String.Format("{0:0.000}", lSnCo5DepthBFPUA(I - 1).Attributes.GetValue("Mean")).PadLeft(13, " ")
+            lROinch = String.Format("{0:0.000}", lSnCo6DepthROPUA(I - 1).Attributes.GetValue("Mean")).PadLeft(13, " ")
+            lSW.Write(Space(11) & lMonthNames(I).Trim().PadRight(9, " ") & lBFinch & lROinch)
+        Next
+
+        lSW.Flush()
+        lSW.Close()
+        lSW = Nothing
+        lTable.Clear()
+        lTable = Nothing
+
+        lTsFlowDepthPUA.Clear()
+        lTsFlowVolumePUA.Clear()
+        lTsFlowRatePUA.Clear()
+        lTsBFDepthPUA.Clear()
+        lTsBFVolumePUA.Clear()
+        lTsBFRatePUA.Clear()
+        lTsBFRateVolume.Clear()
+
+        lMonthlyCo1RateFlow.Clear()
+        lMonthlyCo2RateBF.Clear()
+        lMonthlyCo3RateRO.Clear()
+        lMonthlyCo4DepthFlowPUA.Clear()
+        lMonthlyCo5DepthBFPUA.Clear()
+        lMonthlyCo6DepthROPUA.Clear()
+
+        lMonthlyCo8RateBFPUA.Clear()
+        lMonthlyCo9RateBFVolumePUA.Clear()
+        lMonthlyCo10RateBFVolume.Clear()
+
+    End Sub
+
     Public Sub ASCIIHySepDelimited(ByVal aTs As atcTimeseries, ByVal aFilename As String, Optional ByVal aDelim As String = vbTab)
         Dim lSTAID As String = aTs.Attributes.GetValue("STAID", "12345678")
         Dim lColumnId1 As String = "2" & lSTAID & "   60    3"
@@ -1107,7 +1452,7 @@ Module modBaseflowUtil
             Logger.Dbg("ASCIIPartBFSum: no baseflow data found.")
             Exit Sub
         End If
-        
+
         If lTsBaseflow1 Is Nothing OrElse lTsBaseflow2 Is Nothing OrElse lTsBaseflow3 Is Nothing Then
             Logger.Dbg("ASCIIPartBFSum: no baseflow data found.")
             Exit Sub
