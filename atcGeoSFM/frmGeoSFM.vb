@@ -192,6 +192,9 @@ Public Class frmGeoSFM
     Friend WithEvents rbnCal As System.Windows.Forms.RadioButton
     Friend WithEvents rbnSim As System.Windows.Forms.RadioButton
     Friend WithEvents atxInitial As atcControls.atcText
+    Friend WithEvents gbxFlow As System.Windows.Forms.GroupBox
+    Friend WithEvents rbnNonlinear As System.Windows.Forms.RadioButton
+    Friend WithEvents rbnLinear As System.Windows.Forms.RadioButton
     Friend WithEvents tpgMap As System.Windows.Forms.TabPage
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmGeoSFM))
@@ -350,6 +353,9 @@ Public Class frmGeoSFM
         Me.rbnCal = New System.Windows.Forms.RadioButton
         Me.rbnSim = New System.Windows.Forms.RadioButton
         Me.atxInitial = New atcControls.atcText
+        Me.gbxFlow = New System.Windows.Forms.GroupBox
+        Me.rbnNonlinear = New System.Windows.Forms.RadioButton
+        Me.rbnLinear = New System.Windows.Forms.RadioButton
         Me.tabMain.SuspendLayout()
         Me.tpgTerrain.SuspendLayout()
         Me.tpgBasin.SuspendLayout()
@@ -367,6 +373,7 @@ Public Class frmGeoSFM
         Me.gbxData.SuspendLayout()
         Me.gbxRun.SuspendLayout()
         Me.gbxMode.SuspendLayout()
+        Me.gbxFlow.SuspendLayout()
         Me.SuspendLayout()
         '
         'cmdCancel
@@ -1363,6 +1370,7 @@ Public Class frmGeoSFM
         '
         'tpgSoil
         '
+        Me.tpgSoil.Controls.Add(Me.gbxFlow)
         Me.tpgSoil.Controls.Add(Me.atxInitial)
         Me.tpgSoil.Controls.Add(Me.gbxMode)
         Me.tpgSoil.Controls.Add(Me.gbxRun)
@@ -2153,7 +2161,7 @@ Public Class frmGeoSFM
         '
         Me.gbxData.Controls.Add(Me.rbnDaily)
         Me.gbxData.Controls.Add(Me.rbnHourly)
-        Me.gbxData.Location = New System.Drawing.Point(193, 80)
+        Me.gbxData.Location = New System.Drawing.Point(31, 68)
         Me.gbxData.Name = "gbxData"
         Me.gbxData.Size = New System.Drawing.Size(152, 47)
         Me.gbxData.TabIndex = 55
@@ -2186,9 +2194,9 @@ Public Class frmGeoSFM
         '
         Me.gbxRun.Controls.Add(Me.rbnContinue)
         Me.gbxRun.Controls.Add(Me.rbnRun)
-        Me.gbxRun.Location = New System.Drawing.Point(200, 186)
+        Me.gbxRun.Location = New System.Drawing.Point(31, 130)
         Me.gbxRun.Name = "gbxRun"
-        Me.gbxRun.Size = New System.Drawing.Size(159, 76)
+        Me.gbxRun.Size = New System.Drawing.Size(159, 70)
         Me.gbxRun.TabIndex = 56
         Me.gbxRun.TabStop = False
         Me.gbxRun.Text = "Run Option"
@@ -2197,7 +2205,7 @@ Public Class frmGeoSFM
         '
         Me.rbnRun.AutoSize = True
         Me.rbnRun.Checked = True
-        Me.rbnRun.Location = New System.Drawing.Point(7, 28)
+        Me.rbnRun.Location = New System.Drawing.Point(7, 19)
         Me.rbnRun.Name = "rbnRun"
         Me.rbnRun.Size = New System.Drawing.Size(70, 17)
         Me.rbnRun.TabIndex = 1
@@ -2208,7 +2216,7 @@ Public Class frmGeoSFM
         'rbnContinue
         '
         Me.rbnContinue.AutoSize = True
-        Me.rbnContinue.Location = New System.Drawing.Point(7, 51)
+        Me.rbnContinue.Location = New System.Drawing.Point(7, 42)
         Me.rbnContinue.Name = "rbnContinue"
         Me.rbnContinue.Size = New System.Drawing.Size(134, 17)
         Me.rbnContinue.TabIndex = 2
@@ -2219,9 +2227,9 @@ Public Class frmGeoSFM
         '
         Me.gbxMode.Controls.Add(Me.rbnCal)
         Me.gbxMode.Controls.Add(Me.rbnSim)
-        Me.gbxMode.Location = New System.Drawing.Point(103, 279)
+        Me.gbxMode.Location = New System.Drawing.Point(386, 130)
         Me.gbxMode.Name = "gbxMode"
-        Me.gbxMode.Size = New System.Drawing.Size(159, 76)
+        Me.gbxMode.Size = New System.Drawing.Size(159, 70)
         Me.gbxMode.TabIndex = 57
         Me.gbxMode.TabStop = False
         Me.gbxMode.Text = "Mode"
@@ -2229,7 +2237,7 @@ Public Class frmGeoSFM
         'rbnCal
         '
         Me.rbnCal.AutoSize = True
-        Me.rbnCal.Location = New System.Drawing.Point(7, 51)
+        Me.rbnCal.Location = New System.Drawing.Point(7, 42)
         Me.rbnCal.Name = "rbnCal"
         Me.rbnCal.Size = New System.Drawing.Size(74, 17)
         Me.rbnCal.TabIndex = 2
@@ -2240,7 +2248,7 @@ Public Class frmGeoSFM
         '
         Me.rbnSim.AutoSize = True
         Me.rbnSim.Checked = True
-        Me.rbnSim.Location = New System.Drawing.Point(7, 28)
+        Me.rbnSim.Location = New System.Drawing.Point(7, 19)
         Me.rbnSim.Name = "rbnSim"
         Me.rbnSim.Size = New System.Drawing.Size(73, 17)
         Me.rbnSim.TabIndex = 1
@@ -2270,6 +2278,39 @@ Public Class frmGeoSFM
         Me.atxInitial.TabIndex = 58
         Me.atxInitial.ValueDouble = 0.1
         Me.atxInitial.ValueInteger = 0
+        '
+        'gbxFlow
+        '
+        Me.gbxFlow.Controls.Add(Me.rbnNonlinear)
+        Me.gbxFlow.Controls.Add(Me.rbnLinear)
+        Me.gbxFlow.Location = New System.Drawing.Point(209, 130)
+        Me.gbxFlow.Name = "gbxFlow"
+        Me.gbxFlow.Size = New System.Drawing.Size(159, 70)
+        Me.gbxFlow.TabIndex = 59
+        Me.gbxFlow.TabStop = False
+        Me.gbxFlow.Text = "Flow Routing Method"
+        '
+        'rbnNonlinear
+        '
+        Me.rbnNonlinear.AutoSize = True
+        Me.rbnNonlinear.Location = New System.Drawing.Point(7, 42)
+        Me.rbnNonlinear.Name = "rbnNonlinear"
+        Me.rbnNonlinear.Size = New System.Drawing.Size(129, 17)
+        Me.rbnNonlinear.TabIndex = 2
+        Me.rbnNonlinear.Text = "Non-Linear Soil Model"
+        Me.rbnNonlinear.UseVisualStyleBackColor = True
+        '
+        'rbnLinear
+        '
+        Me.rbnLinear.AutoSize = True
+        Me.rbnLinear.Checked = True
+        Me.rbnLinear.Location = New System.Drawing.Point(7, 19)
+        Me.rbnLinear.Name = "rbnLinear"
+        Me.rbnLinear.Size = New System.Drawing.Size(106, 17)
+        Me.rbnLinear.TabIndex = 1
+        Me.rbnLinear.TabStop = True
+        Me.rbnLinear.Text = "Linear Soil Model"
+        Me.rbnLinear.UseVisualStyleBackColor = True
         '
         'frmGeoSFM
         '
@@ -2310,6 +2351,8 @@ Public Class frmGeoSFM
         Me.gbxRun.PerformLayout()
         Me.gbxMode.ResumeLayout(False)
         Me.gbxMode.PerformLayout()
+        Me.gbxFlow.ResumeLayout(False)
+        Me.gbxFlow.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -2898,6 +2941,10 @@ Public Class frmGeoSFM
         If rbnCal.Checked Then
             lRunmode = 1
         End If
+        Dim lBalType As Integer = 1
+        If rbnNonlinear.Checked Then
+            lBalType = 2
+        End If
         Dim lSJDate As Double = 0.0
         Dim lSDate(5) As Integer
         lSDate(0) = atxSYear.Text
@@ -2910,7 +2957,7 @@ Public Class frmGeoSFM
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         Me.Refresh()
 
-        Balance(lIniFract, lDformat, lInimode, lRunmode, lSJDate)
+        Balance(lIniFract, lDformat, lInimode, lRunmode, lBalType, lSJDate)
 
         tabMain.SelectedIndex = 5
         lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
