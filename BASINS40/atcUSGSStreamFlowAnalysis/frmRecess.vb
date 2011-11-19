@@ -1059,6 +1059,9 @@ Public Class frmRecess
             pGrapher = Nothing
         End If
         pGrapher = New clsGraphTime(aDataGroup, pZgc)
+        'Dim lDataMin As Double = aDataGroup(0).Dates.Value(0)
+        'Dim lDataMax As Double = aDataGroup(0).Dates.Value(aDataGroup(0).numValues)
+        'Dim lLogFlag As Boolean = False
         With pGrapher.ZedGraphCtrl.GraphPane
             If aDataGroup.Count > 0 Then
                 '.YAxis.Type = AxisType.Log
@@ -1067,6 +1070,7 @@ Public Class frmRecess
                 '.CurveList.Item(1).Color = Drawing.Color.DarkBlue
                 'CType(.CurveList.Item(1), LineItem).Line.Width = 2
             End If
+            'Scalit(lDataMin, lDataMax, lLogFlag, .XAxis.Scale.Min, .XAxis.Scale.Max)
             .AxisChange()
         End With
         pZgc.Refresh()
