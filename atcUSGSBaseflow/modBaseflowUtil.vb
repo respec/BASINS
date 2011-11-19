@@ -431,7 +431,7 @@ Module modBaseflowUtil
 
         lSW.WriteLine(vbCrLf & vbCrLf)
         lSW.WriteLine(lHeaderEngAll)
-        lSW.WriteLine(lTable.ToString.Replace(",", ""))
+        lSW.WriteLine(lTable.ToString.Replace(",", " "))
 
         'Seasonal-distribution table
         lSW.WriteLine(vbCrLf & vbCrLf)
@@ -452,7 +452,7 @@ Module modBaseflowUtil
         For I As Integer = lStartMonth To lEndMonth
             lBFinch = String.Format("{0:0.000}", lSnCo5DepthBFPUA(I - 1).Attributes.GetValue("Mean")).PadLeft(13, " ")
             lROinch = String.Format("{0:0.000}", lSnCo6DepthROPUA(I - 1).Attributes.GetValue("Mean")).PadLeft(13, " ")
-            lSW.Write(Space(11) & lMonthNames(I).Trim().PadRight(9, " ") & lBFinch & lROinch)
+            lSW.WriteLine(Space(11) & lMonthNames(I).Trim().PadRight(9, " ") & lBFinch & lROinch)
         Next
 
         lSW.Flush()

@@ -405,7 +405,7 @@ Partial Class frmRecess
         Me.lstRecessSegments.FormattingEnabled = True
         Me.lstRecessSegments.Location = New System.Drawing.Point(7, 65)
         Me.lstRecessSegments.Name = "lstRecessSegments"
-        Me.lstRecessSegments.Size = New System.Drawing.Size(100, 304)
+        Me.lstRecessSegments.Size = New System.Drawing.Size(122, 304)
         Me.lstRecessSegments.TabIndex = 13
         '
         'scDisplay
@@ -413,7 +413,7 @@ Partial Class frmRecess
         Me.scDisplay.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.scDisplay.Location = New System.Drawing.Point(113, 64)
+        Me.scDisplay.Location = New System.Drawing.Point(135, 64)
         Me.scDisplay.Name = "scDisplay"
         '
         'scDisplay.Panel1
@@ -425,8 +425,8 @@ Partial Class frmRecess
         'scDisplay.Panel2
         '
         Me.scDisplay.Panel2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.scDisplay.Size = New System.Drawing.Size(534, 303)
-        Me.scDisplay.SplitterDistance = 250
+        Me.scDisplay.Size = New System.Drawing.Size(512, 303)
+        Me.scDisplay.SplitterDistance = 239
         Me.scDisplay.TabIndex = 39
         '
         'txtAnalysisResults
@@ -439,7 +439,7 @@ Partial Class frmRecess
         Me.txtAnalysisResults.Name = "txtAnalysisResults"
         Me.txtAnalysisResults.ReadOnly = True
         Me.txtAnalysisResults.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtAnalysisResults.Size = New System.Drawing.Size(250, 303)
+        Me.txtAnalysisResults.Size = New System.Drawing.Size(239, 303)
         Me.txtAnalysisResults.TabIndex = 15
         Me.txtAnalysisResults.Visible = False
         Me.txtAnalysisResults.WordWrap = False
@@ -452,7 +452,7 @@ Partial Class frmRecess
         Me.lstTable.ItemHeight = 14
         Me.lstTable.Location = New System.Drawing.Point(0, 0)
         Me.lstTable.Name = "lstTable"
-        Me.lstTable.Size = New System.Drawing.Size(250, 298)
+        Me.lstTable.Size = New System.Drawing.Size(239, 298)
         Me.lstTable.TabIndex = 0
         '
         'gbToolBar
