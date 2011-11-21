@@ -157,7 +157,6 @@ Public Class frmGeoSFM
     Friend WithEvents atxEYear As atcControls.atcText
     Friend WithEvents tpgSoil As System.Windows.Forms.TabPage
     Friend WithEvents tpgFlow As System.Windows.Forms.TabPage
-    Friend WithEvents AtcGrid2 As atcControls.atcGrid
     Friend WithEvents tpgSensitivity As System.Windows.Forms.TabPage
     Friend WithEvents tpgCalibrate As System.Windows.Forms.TabPage
     Friend WithEvents tpgBankfull As System.Windows.Forms.TabPage
@@ -195,6 +194,8 @@ Public Class frmGeoSFM
     Friend WithEvents gbxFlow As System.Windows.Forms.GroupBox
     Friend WithEvents rbnNonlinear As System.Windows.Forms.RadioButton
     Friend WithEvents rbnLinear As System.Windows.Forms.RadioButton
+    Friend WithEvents atxForecast As atcControls.atcText
+    Friend WithEvents lflForecast As System.Windows.Forms.Label
     Friend WithEvents tpgMap As System.Windows.Forms.TabPage
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmGeoSFM))
@@ -273,10 +274,25 @@ Public Class frmGeoSFM
         Me.atxSMonth = New atcControls.atcText
         Me.atxEYear = New atcControls.atcText
         Me.tpgSoil = New System.Windows.Forms.TabPage
+        Me.gbxFlow = New System.Windows.Forms.GroupBox
+        Me.rbnNonlinear = New System.Windows.Forms.RadioButton
+        Me.rbnLinear = New System.Windows.Forms.RadioButton
+        Me.atxInitial = New atcControls.atcText
+        Me.gbxMode = New System.Windows.Forms.GroupBox
+        Me.rbnCal = New System.Windows.Forms.RadioButton
+        Me.rbnSim = New System.Windows.Forms.RadioButton
+        Me.gbxRun = New System.Windows.Forms.GroupBox
+        Me.rbnContinue = New System.Windows.Forms.RadioButton
+        Me.rbnRun = New System.Windows.Forms.RadioButton
+        Me.gbxData = New System.Windows.Forms.GroupBox
+        Me.rbnDaily = New System.Windows.Forms.RadioButton
+        Me.rbnHourly = New System.Windows.Forms.RadioButton
+        Me.lblInitial = New System.Windows.Forms.Label
         Me.cmdBalanceNext = New System.Windows.Forms.Button
         Me.tpgFlow = New System.Windows.Forms.TabPage
+        Me.atxForecast = New atcControls.atcText
+        Me.lflForecast = New System.Windows.Forms.Label
         Me.cmdRouteNext = New System.Windows.Forms.Button
-        Me.AtcGrid2 = New atcControls.atcGrid
         Me.tpgSensitivity = New System.Windows.Forms.TabPage
         Me.cmdSensitivityNext = New System.Windows.Forms.Button
         Me.tpgCalibrate = New System.Windows.Forms.TabPage
@@ -342,20 +358,6 @@ Public Class frmGeoSFM
         Me.Label44 = New System.Windows.Forms.Label
         Me.Label45 = New System.Windows.Forms.Label
         Me.ComboBox39 = New System.Windows.Forms.ComboBox
-        Me.lblInitial = New System.Windows.Forms.Label
-        Me.gbxData = New System.Windows.Forms.GroupBox
-        Me.rbnHourly = New System.Windows.Forms.RadioButton
-        Me.rbnDaily = New System.Windows.Forms.RadioButton
-        Me.gbxRun = New System.Windows.Forms.GroupBox
-        Me.rbnRun = New System.Windows.Forms.RadioButton
-        Me.rbnContinue = New System.Windows.Forms.RadioButton
-        Me.gbxMode = New System.Windows.Forms.GroupBox
-        Me.rbnCal = New System.Windows.Forms.RadioButton
-        Me.rbnSim = New System.Windows.Forms.RadioButton
-        Me.atxInitial = New atcControls.atcText
-        Me.gbxFlow = New System.Windows.Forms.GroupBox
-        Me.rbnNonlinear = New System.Windows.Forms.RadioButton
-        Me.rbnLinear = New System.Windows.Forms.RadioButton
         Me.tabMain.SuspendLayout()
         Me.tpgTerrain.SuspendLayout()
         Me.tpgBasin.SuspendLayout()
@@ -363,6 +365,10 @@ Public Class frmGeoSFM
         Me.tpgRain.SuspendLayout()
         Me.gbxSimulationDates.SuspendLayout()
         Me.tpgSoil.SuspendLayout()
+        Me.gbxFlow.SuspendLayout()
+        Me.gbxMode.SuspendLayout()
+        Me.gbxRun.SuspendLayout()
+        Me.gbxData.SuspendLayout()
         Me.tpgFlow.SuspendLayout()
         Me.tpgSensitivity.SuspendLayout()
         Me.tpgCalibrate.SuspendLayout()
@@ -370,10 +376,6 @@ Public Class frmGeoSFM
         Me.tpgMap.SuspendLayout()
         Me.tpgPlot.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
-        Me.gbxData.SuspendLayout()
-        Me.gbxRun.SuspendLayout()
-        Me.gbxMode.SuspendLayout()
-        Me.gbxFlow.SuspendLayout()
         Me.SuspendLayout()
         '
         'cmdCancel
@@ -1384,6 +1386,170 @@ Public Class frmGeoSFM
         Me.tpgSoil.Text = "Compute Soil Water Balance"
         Me.tpgSoil.UseVisualStyleBackColor = True
         '
+        'gbxFlow
+        '
+        Me.gbxFlow.Controls.Add(Me.rbnNonlinear)
+        Me.gbxFlow.Controls.Add(Me.rbnLinear)
+        Me.gbxFlow.Location = New System.Drawing.Point(209, 130)
+        Me.gbxFlow.Name = "gbxFlow"
+        Me.gbxFlow.Size = New System.Drawing.Size(159, 70)
+        Me.gbxFlow.TabIndex = 59
+        Me.gbxFlow.TabStop = False
+        Me.gbxFlow.Text = "Flow Routing Method"
+        '
+        'rbnNonlinear
+        '
+        Me.rbnNonlinear.AutoSize = True
+        Me.rbnNonlinear.Location = New System.Drawing.Point(7, 42)
+        Me.rbnNonlinear.Name = "rbnNonlinear"
+        Me.rbnNonlinear.Size = New System.Drawing.Size(129, 17)
+        Me.rbnNonlinear.TabIndex = 2
+        Me.rbnNonlinear.Text = "Non-Linear Soil Model"
+        Me.rbnNonlinear.UseVisualStyleBackColor = True
+        '
+        'rbnLinear
+        '
+        Me.rbnLinear.AutoSize = True
+        Me.rbnLinear.Checked = True
+        Me.rbnLinear.Location = New System.Drawing.Point(7, 19)
+        Me.rbnLinear.Name = "rbnLinear"
+        Me.rbnLinear.Size = New System.Drawing.Size(106, 17)
+        Me.rbnLinear.TabIndex = 1
+        Me.rbnLinear.TabStop = True
+        Me.rbnLinear.Text = "Linear Soil Model"
+        Me.rbnLinear.UseVisualStyleBackColor = True
+        '
+        'atxInitial
+        '
+        Me.atxInitial.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxInitial.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
+        Me.atxInitial.DefaultValue = "0.1"
+        Me.atxInitial.HardMax = 1
+        Me.atxInitial.HardMin = 0
+        Me.atxInitial.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxInitial.Location = New System.Drawing.Point(183, 30)
+        Me.atxInitial.MaxWidth = 20
+        Me.atxInitial.Name = "atxInitial"
+        Me.atxInitial.NumericFormat = "0.#####"
+        Me.atxInitial.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxInitial.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxInitial.SelLength = 0
+        Me.atxInitial.SelStart = 0
+        Me.atxInitial.Size = New System.Drawing.Size(85, 22)
+        Me.atxInitial.SoftMax = -999
+        Me.atxInitial.SoftMin = -999
+        Me.atxInitial.TabIndex = 58
+        Me.atxInitial.ValueDouble = 0.1
+        Me.atxInitial.ValueInteger = 0
+        '
+        'gbxMode
+        '
+        Me.gbxMode.Controls.Add(Me.rbnCal)
+        Me.gbxMode.Controls.Add(Me.rbnSim)
+        Me.gbxMode.Location = New System.Drawing.Point(386, 130)
+        Me.gbxMode.Name = "gbxMode"
+        Me.gbxMode.Size = New System.Drawing.Size(159, 70)
+        Me.gbxMode.TabIndex = 57
+        Me.gbxMode.TabStop = False
+        Me.gbxMode.Text = "Mode"
+        '
+        'rbnCal
+        '
+        Me.rbnCal.AutoSize = True
+        Me.rbnCal.Location = New System.Drawing.Point(7, 42)
+        Me.rbnCal.Name = "rbnCal"
+        Me.rbnCal.Size = New System.Drawing.Size(74, 17)
+        Me.rbnCal.TabIndex = 2
+        Me.rbnCal.Text = "Calibration"
+        Me.rbnCal.UseVisualStyleBackColor = True
+        '
+        'rbnSim
+        '
+        Me.rbnSim.AutoSize = True
+        Me.rbnSim.Checked = True
+        Me.rbnSim.Location = New System.Drawing.Point(7, 19)
+        Me.rbnSim.Name = "rbnSim"
+        Me.rbnSim.Size = New System.Drawing.Size(73, 17)
+        Me.rbnSim.TabIndex = 1
+        Me.rbnSim.TabStop = True
+        Me.rbnSim.Text = "Simulation"
+        Me.rbnSim.UseVisualStyleBackColor = True
+        '
+        'gbxRun
+        '
+        Me.gbxRun.Controls.Add(Me.rbnContinue)
+        Me.gbxRun.Controls.Add(Me.rbnRun)
+        Me.gbxRun.Location = New System.Drawing.Point(31, 130)
+        Me.gbxRun.Name = "gbxRun"
+        Me.gbxRun.Size = New System.Drawing.Size(159, 70)
+        Me.gbxRun.TabIndex = 56
+        Me.gbxRun.TabStop = False
+        Me.gbxRun.Text = "Run Option"
+        '
+        'rbnContinue
+        '
+        Me.rbnContinue.AutoSize = True
+        Me.rbnContinue.Location = New System.Drawing.Point(7, 42)
+        Me.rbnContinue.Name = "rbnContinue"
+        Me.rbnContinue.Size = New System.Drawing.Size(134, 17)
+        Me.rbnContinue.TabIndex = 2
+        Me.rbnContinue.Text = "Continue Previous Run"
+        Me.rbnContinue.UseVisualStyleBackColor = True
+        '
+        'rbnRun
+        '
+        Me.rbnRun.AutoSize = True
+        Me.rbnRun.Checked = True
+        Me.rbnRun.Location = New System.Drawing.Point(7, 19)
+        Me.rbnRun.Name = "rbnRun"
+        Me.rbnRun.Size = New System.Drawing.Size(70, 17)
+        Me.rbnRun.TabIndex = 1
+        Me.rbnRun.TabStop = True
+        Me.rbnRun.Text = "New Run"
+        Me.rbnRun.UseVisualStyleBackColor = True
+        '
+        'gbxData
+        '
+        Me.gbxData.Controls.Add(Me.rbnDaily)
+        Me.gbxData.Controls.Add(Me.rbnHourly)
+        Me.gbxData.Location = New System.Drawing.Point(31, 68)
+        Me.gbxData.Name = "gbxData"
+        Me.gbxData.Size = New System.Drawing.Size(152, 47)
+        Me.gbxData.TabIndex = 55
+        Me.gbxData.TabStop = False
+        Me.gbxData.Text = "Data Format"
+        '
+        'rbnDaily
+        '
+        Me.rbnDaily.AutoSize = True
+        Me.rbnDaily.Checked = True
+        Me.rbnDaily.Location = New System.Drawing.Point(75, 19)
+        Me.rbnDaily.Name = "rbnDaily"
+        Me.rbnDaily.Size = New System.Drawing.Size(48, 17)
+        Me.rbnDaily.TabIndex = 1
+        Me.rbnDaily.TabStop = True
+        Me.rbnDaily.Text = "Daily"
+        Me.rbnDaily.UseVisualStyleBackColor = True
+        '
+        'rbnHourly
+        '
+        Me.rbnHourly.AutoSize = True
+        Me.rbnHourly.Location = New System.Drawing.Point(14, 19)
+        Me.rbnHourly.Name = "rbnHourly"
+        Me.rbnHourly.Size = New System.Drawing.Size(55, 17)
+        Me.rbnHourly.TabIndex = 0
+        Me.rbnHourly.Text = "Hourly"
+        Me.rbnHourly.UseVisualStyleBackColor = True
+        '
+        'lblInitial
+        '
+        Me.lblInitial.AutoSize = True
+        Me.lblInitial.Location = New System.Drawing.Point(28, 31)
+        Me.lblInitial.Name = "lblInitial"
+        Me.lblInitial.Size = New System.Drawing.Size(97, 13)
+        Me.lblInitial.TabIndex = 53
+        Me.lblInitial.Text = "Initial Soil Moisture:"
+        '
         'cmdBalanceNext
         '
         Me.cmdBalanceNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
@@ -1397,14 +1563,47 @@ Public Class frmGeoSFM
         '
         'tpgFlow
         '
+        Me.tpgFlow.Controls.Add(Me.atxForecast)
+        Me.tpgFlow.Controls.Add(Me.lflForecast)
         Me.tpgFlow.Controls.Add(Me.cmdRouteNext)
-        Me.tpgFlow.Controls.Add(Me.AtcGrid2)
         Me.tpgFlow.Location = New System.Drawing.Point(4, 46)
         Me.tpgFlow.Name = "tpgFlow"
         Me.tpgFlow.Size = New System.Drawing.Size(647, 396)
         Me.tpgFlow.TabIndex = 12
         Me.tpgFlow.Text = "Compute Stream Flow"
         Me.tpgFlow.UseVisualStyleBackColor = True
+        '
+        'atxForecast
+        '
+        Me.atxForecast.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxForecast.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxForecast.DefaultValue = "3"
+        Me.atxForecast.HardMax = 99
+        Me.atxForecast.HardMin = 0
+        Me.atxForecast.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxForecast.Location = New System.Drawing.Point(222, 58)
+        Me.atxForecast.MaxWidth = 20
+        Me.atxForecast.Name = "atxForecast"
+        Me.atxForecast.NumericFormat = "0.#####"
+        Me.atxForecast.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxForecast.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxForecast.SelLength = 0
+        Me.atxForecast.SelStart = 0
+        Me.atxForecast.Size = New System.Drawing.Size(85, 22)
+        Me.atxForecast.SoftMax = -999
+        Me.atxForecast.SoftMin = -999
+        Me.atxForecast.TabIndex = 60
+        Me.atxForecast.ValueDouble = 3
+        Me.atxForecast.ValueInteger = 3
+        '
+        'lflForecast
+        '
+        Me.lflForecast.AutoSize = True
+        Me.lflForecast.Location = New System.Drawing.Point(48, 58)
+        Me.lflForecast.Name = "lflForecast"
+        Me.lflForecast.Size = New System.Drawing.Size(168, 13)
+        Me.lflForecast.TabIndex = 59
+        Me.lflForecast.Text = "No. of Days of Forecast Required:"
         '
         'cmdRouteNext
         '
@@ -1416,24 +1615,6 @@ Public Class frmGeoSFM
         Me.cmdRouteNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdRouteNext.TabIndex = 53
         Me.cmdRouteNext.Text = "Next >"
-        '
-        'AtcGrid2
-        '
-        Me.AtcGrid2.AllowHorizontalScrolling = True
-        Me.AtcGrid2.AllowNewValidValues = False
-        Me.AtcGrid2.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGrid2.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGrid2.Fixed3D = False
-        Me.AtcGrid2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AtcGrid2.LineColor = System.Drawing.Color.Empty
-        Me.AtcGrid2.LineWidth = 0.0!
-        Me.AtcGrid2.Location = New System.Drawing.Point(25, 23)
-        Me.AtcGrid2.Name = "AtcGrid2"
-        Me.AtcGrid2.Size = New System.Drawing.Size(518, 308)
-        Me.AtcGrid2.Source = Nothing
-        Me.AtcGrid2.TabIndex = 52
         '
         'tpgSensitivity
         '
@@ -2148,170 +2329,6 @@ Public Class frmGeoSFM
         Me.ComboBox39.Size = New System.Drawing.Size(312, 21)
         Me.ComboBox39.TabIndex = 23
         '
-        'lblInitial
-        '
-        Me.lblInitial.AutoSize = True
-        Me.lblInitial.Location = New System.Drawing.Point(28, 31)
-        Me.lblInitial.Name = "lblInitial"
-        Me.lblInitial.Size = New System.Drawing.Size(97, 13)
-        Me.lblInitial.TabIndex = 53
-        Me.lblInitial.Text = "Initial Soil Moisture:"
-        '
-        'gbxData
-        '
-        Me.gbxData.Controls.Add(Me.rbnDaily)
-        Me.gbxData.Controls.Add(Me.rbnHourly)
-        Me.gbxData.Location = New System.Drawing.Point(31, 68)
-        Me.gbxData.Name = "gbxData"
-        Me.gbxData.Size = New System.Drawing.Size(152, 47)
-        Me.gbxData.TabIndex = 55
-        Me.gbxData.TabStop = False
-        Me.gbxData.Text = "Data Format"
-        '
-        'rbnHourly
-        '
-        Me.rbnHourly.AutoSize = True
-        Me.rbnHourly.Location = New System.Drawing.Point(14, 19)
-        Me.rbnHourly.Name = "rbnHourly"
-        Me.rbnHourly.Size = New System.Drawing.Size(55, 17)
-        Me.rbnHourly.TabIndex = 0
-        Me.rbnHourly.Text = "Hourly"
-        Me.rbnHourly.UseVisualStyleBackColor = True
-        '
-        'rbnDaily
-        '
-        Me.rbnDaily.AutoSize = True
-        Me.rbnDaily.Checked = True
-        Me.rbnDaily.Location = New System.Drawing.Point(75, 19)
-        Me.rbnDaily.Name = "rbnDaily"
-        Me.rbnDaily.Size = New System.Drawing.Size(48, 17)
-        Me.rbnDaily.TabIndex = 1
-        Me.rbnDaily.TabStop = True
-        Me.rbnDaily.Text = "Daily"
-        Me.rbnDaily.UseVisualStyleBackColor = True
-        '
-        'gbxRun
-        '
-        Me.gbxRun.Controls.Add(Me.rbnContinue)
-        Me.gbxRun.Controls.Add(Me.rbnRun)
-        Me.gbxRun.Location = New System.Drawing.Point(31, 130)
-        Me.gbxRun.Name = "gbxRun"
-        Me.gbxRun.Size = New System.Drawing.Size(159, 70)
-        Me.gbxRun.TabIndex = 56
-        Me.gbxRun.TabStop = False
-        Me.gbxRun.Text = "Run Option"
-        '
-        'rbnRun
-        '
-        Me.rbnRun.AutoSize = True
-        Me.rbnRun.Checked = True
-        Me.rbnRun.Location = New System.Drawing.Point(7, 19)
-        Me.rbnRun.Name = "rbnRun"
-        Me.rbnRun.Size = New System.Drawing.Size(70, 17)
-        Me.rbnRun.TabIndex = 1
-        Me.rbnRun.TabStop = True
-        Me.rbnRun.Text = "New Run"
-        Me.rbnRun.UseVisualStyleBackColor = True
-        '
-        'rbnContinue
-        '
-        Me.rbnContinue.AutoSize = True
-        Me.rbnContinue.Location = New System.Drawing.Point(7, 42)
-        Me.rbnContinue.Name = "rbnContinue"
-        Me.rbnContinue.Size = New System.Drawing.Size(134, 17)
-        Me.rbnContinue.TabIndex = 2
-        Me.rbnContinue.Text = "Continue Previous Run"
-        Me.rbnContinue.UseVisualStyleBackColor = True
-        '
-        'gbxMode
-        '
-        Me.gbxMode.Controls.Add(Me.rbnCal)
-        Me.gbxMode.Controls.Add(Me.rbnSim)
-        Me.gbxMode.Location = New System.Drawing.Point(386, 130)
-        Me.gbxMode.Name = "gbxMode"
-        Me.gbxMode.Size = New System.Drawing.Size(159, 70)
-        Me.gbxMode.TabIndex = 57
-        Me.gbxMode.TabStop = False
-        Me.gbxMode.Text = "Mode"
-        '
-        'rbnCal
-        '
-        Me.rbnCal.AutoSize = True
-        Me.rbnCal.Location = New System.Drawing.Point(7, 42)
-        Me.rbnCal.Name = "rbnCal"
-        Me.rbnCal.Size = New System.Drawing.Size(74, 17)
-        Me.rbnCal.TabIndex = 2
-        Me.rbnCal.Text = "Calibration"
-        Me.rbnCal.UseVisualStyleBackColor = True
-        '
-        'rbnSim
-        '
-        Me.rbnSim.AutoSize = True
-        Me.rbnSim.Checked = True
-        Me.rbnSim.Location = New System.Drawing.Point(7, 19)
-        Me.rbnSim.Name = "rbnSim"
-        Me.rbnSim.Size = New System.Drawing.Size(73, 17)
-        Me.rbnSim.TabIndex = 1
-        Me.rbnSim.TabStop = True
-        Me.rbnSim.Text = "Simulation"
-        Me.rbnSim.UseVisualStyleBackColor = True
-        '
-        'atxInitial
-        '
-        Me.atxInitial.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxInitial.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.atxInitial.DefaultValue = "0.1"
-        Me.atxInitial.HardMax = 1
-        Me.atxInitial.HardMin = 0
-        Me.atxInitial.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxInitial.Location = New System.Drawing.Point(183, 30)
-        Me.atxInitial.MaxWidth = 20
-        Me.atxInitial.Name = "atxInitial"
-        Me.atxInitial.NumericFormat = "0.#####"
-        Me.atxInitial.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxInitial.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxInitial.SelLength = 0
-        Me.atxInitial.SelStart = 0
-        Me.atxInitial.Size = New System.Drawing.Size(85, 22)
-        Me.atxInitial.SoftMax = -999
-        Me.atxInitial.SoftMin = -999
-        Me.atxInitial.TabIndex = 58
-        Me.atxInitial.ValueDouble = 0.1
-        Me.atxInitial.ValueInteger = 0
-        '
-        'gbxFlow
-        '
-        Me.gbxFlow.Controls.Add(Me.rbnNonlinear)
-        Me.gbxFlow.Controls.Add(Me.rbnLinear)
-        Me.gbxFlow.Location = New System.Drawing.Point(209, 130)
-        Me.gbxFlow.Name = "gbxFlow"
-        Me.gbxFlow.Size = New System.Drawing.Size(159, 70)
-        Me.gbxFlow.TabIndex = 59
-        Me.gbxFlow.TabStop = False
-        Me.gbxFlow.Text = "Flow Routing Method"
-        '
-        'rbnNonlinear
-        '
-        Me.rbnNonlinear.AutoSize = True
-        Me.rbnNonlinear.Location = New System.Drawing.Point(7, 42)
-        Me.rbnNonlinear.Name = "rbnNonlinear"
-        Me.rbnNonlinear.Size = New System.Drawing.Size(129, 17)
-        Me.rbnNonlinear.TabIndex = 2
-        Me.rbnNonlinear.Text = "Non-Linear Soil Model"
-        Me.rbnNonlinear.UseVisualStyleBackColor = True
-        '
-        'rbnLinear
-        '
-        Me.rbnLinear.AutoSize = True
-        Me.rbnLinear.Checked = True
-        Me.rbnLinear.Location = New System.Drawing.Point(7, 19)
-        Me.rbnLinear.Name = "rbnLinear"
-        Me.rbnLinear.Size = New System.Drawing.Size(106, 17)
-        Me.rbnLinear.TabIndex = 1
-        Me.rbnLinear.TabStop = True
-        Me.rbnLinear.Text = "Linear Soil Model"
-        Me.rbnLinear.UseVisualStyleBackColor = True
-        '
         'frmGeoSFM
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -2338,21 +2355,22 @@ Public Class frmGeoSFM
         Me.gbxSimulationDates.PerformLayout()
         Me.tpgSoil.ResumeLayout(False)
         Me.tpgSoil.PerformLayout()
+        Me.gbxFlow.ResumeLayout(False)
+        Me.gbxFlow.PerformLayout()
+        Me.gbxMode.ResumeLayout(False)
+        Me.gbxMode.PerformLayout()
+        Me.gbxRun.ResumeLayout(False)
+        Me.gbxRun.PerformLayout()
+        Me.gbxData.ResumeLayout(False)
+        Me.gbxData.PerformLayout()
         Me.tpgFlow.ResumeLayout(False)
+        Me.tpgFlow.PerformLayout()
         Me.tpgSensitivity.ResumeLayout(False)
         Me.tpgCalibrate.ResumeLayout(False)
         Me.tpgBankfull.ResumeLayout(False)
         Me.tpgMap.ResumeLayout(False)
         Me.tpgPlot.ResumeLayout(False)
         Me.GroupBox1.ResumeLayout(False)
-        Me.gbxData.ResumeLayout(False)
-        Me.gbxData.PerformLayout()
-        Me.gbxRun.ResumeLayout(False)
-        Me.gbxRun.PerformLayout()
-        Me.gbxMode.ResumeLayout(False)
-        Me.gbxMode.PerformLayout()
-        Me.gbxFlow.ResumeLayout(False)
-        Me.gbxFlow.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -2967,7 +2985,28 @@ Public Class frmGeoSFM
     End Sub
 
     Private Sub cmdRouteNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdRouteNext.Click
-        Route()
+        Dim lForecast As Integer = atxForecast.Text
+        Dim lRunmode As Integer = 0
+        If rbnCal.Checked Then
+            lRunmode = 1
+        End If
+        Dim lDformat As Integer = 0
+        If rbnDaily.Checked Then
+            lDformat = 1
+        End If
+
+        EnableControls(False)
+        lblStatus.Text = "Performing Flow Routing ..."
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+        Me.Refresh()
+
+        Route(lForecast, lRunmode, lDformat)
+
+        tabMain.SelectedIndex = 6
+        lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+        Me.Refresh()
+        EnableControls(True)
     End Sub
 
     Private Sub cmdSensitivityNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSensitivityNext.Click
@@ -3037,4 +3076,5 @@ Public Class frmGeoSFM
     Private Sub AtcGridPrec_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridPrec.MouseDownCell
         SetMetStationValidValues(aRow, aColumn)
     End Sub
+
 End Class
