@@ -196,6 +196,10 @@ Public Class frmGeoSFM
     Friend WithEvents rbnLinear As System.Windows.Forms.RadioButton
     Friend WithEvents atxForecast As atcControls.atcText
     Friend WithEvents lflForecast As System.Windows.Forms.Label
+    Friend WithEvents gbxStreamFlow As System.Windows.Forms.GroupBox
+    Friend WithEvents rbnMusk As System.Windows.Forms.RadioButton
+    Friend WithEvents rbnDiffusion As System.Windows.Forms.RadioButton
+    Friend WithEvents rbnSimple As System.Windows.Forms.RadioButton
     Friend WithEvents tpgMap As System.Windows.Forms.TabPage
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmGeoSFM))
@@ -358,6 +362,10 @@ Public Class frmGeoSFM
         Me.Label44 = New System.Windows.Forms.Label
         Me.Label45 = New System.Windows.Forms.Label
         Me.ComboBox39 = New System.Windows.Forms.ComboBox
+        Me.gbxStreamFlow = New System.Windows.Forms.GroupBox
+        Me.rbnMusk = New System.Windows.Forms.RadioButton
+        Me.rbnDiffusion = New System.Windows.Forms.RadioButton
+        Me.rbnSimple = New System.Windows.Forms.RadioButton
         Me.tabMain.SuspendLayout()
         Me.tpgTerrain.SuspendLayout()
         Me.tpgBasin.SuspendLayout()
@@ -376,6 +384,7 @@ Public Class frmGeoSFM
         Me.tpgMap.SuspendLayout()
         Me.tpgPlot.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
+        Me.gbxStreamFlow.SuspendLayout()
         Me.SuspendLayout()
         '
         'cmdCancel
@@ -1563,6 +1572,7 @@ Public Class frmGeoSFM
         '
         'tpgFlow
         '
+        Me.tpgFlow.Controls.Add(Me.gbxStreamFlow)
         Me.tpgFlow.Controls.Add(Me.atxForecast)
         Me.tpgFlow.Controls.Add(Me.lflForecast)
         Me.tpgFlow.Controls.Add(Me.cmdRouteNext)
@@ -2329,6 +2339,49 @@ Public Class frmGeoSFM
         Me.ComboBox39.Size = New System.Drawing.Size(312, 21)
         Me.ComboBox39.TabIndex = 23
         '
+        'gbxStreamFlow
+        '
+        Me.gbxStreamFlow.Controls.Add(Me.rbnSimple)
+        Me.gbxStreamFlow.Controls.Add(Me.rbnMusk)
+        Me.gbxStreamFlow.Controls.Add(Me.rbnDiffusion)
+        Me.gbxStreamFlow.Location = New System.Drawing.Point(51, 100)
+        Me.gbxStreamFlow.Name = "gbxStreamFlow"
+        Me.gbxStreamFlow.Size = New System.Drawing.Size(227, 95)
+        Me.gbxStreamFlow.TabIndex = 61
+        Me.gbxStreamFlow.TabStop = False
+        Me.gbxStreamFlow.Text = "Flow Routing Method"
+        '
+        'rbnMusk
+        '
+        Me.rbnMusk.AutoSize = True
+        Me.rbnMusk.Checked = True
+        Me.rbnMusk.Location = New System.Drawing.Point(18, 42)
+        Me.rbnMusk.Name = "rbnMusk"
+        Me.rbnMusk.Size = New System.Drawing.Size(192, 17)
+        Me.rbnMusk.TabIndex = 2
+        Me.rbnMusk.Text = "Muskingum Cunge Routing Method"
+        Me.rbnMusk.UseVisualStyleBackColor = True
+        '
+        'rbnDiffusion
+        '
+        Me.rbnDiffusion.AutoSize = True
+        Me.rbnDiffusion.Location = New System.Drawing.Point(18, 19)
+        Me.rbnDiffusion.Name = "rbnDiffusion"
+        Me.rbnDiffusion.Size = New System.Drawing.Size(181, 17)
+        Me.rbnDiffusion.TabIndex = 1
+        Me.rbnDiffusion.Text = "Diffusion Analog Routing Method"
+        Me.rbnDiffusion.UseVisualStyleBackColor = True
+        '
+        'rbnSimple
+        '
+        Me.rbnSimple.AutoSize = True
+        Me.rbnSimple.Location = New System.Drawing.Point(18, 65)
+        Me.rbnSimple.Name = "rbnSimple"
+        Me.rbnSimple.Size = New System.Drawing.Size(156, 17)
+        Me.rbnSimple.TabIndex = 3
+        Me.rbnSimple.Text = "Simple Lag Routing Method"
+        Me.rbnSimple.UseVisualStyleBackColor = True
+        '
         'frmGeoSFM
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -2371,6 +2424,8 @@ Public Class frmGeoSFM
         Me.tpgMap.ResumeLayout(False)
         Me.tpgPlot.ResumeLayout(False)
         Me.GroupBox1.ResumeLayout(False)
+        Me.gbxStreamFlow.ResumeLayout(False)
+        Me.gbxStreamFlow.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -2994,13 +3049,26 @@ Public Class frmGeoSFM
         If rbnDaily.Checked Then
             lDformat = 1
         End If
+        Dim lRouteMethod As Integer = 2
+        If rbnDiffusion.Checked Then
+            lRouteMethod = 1
+        End If
+        If rbnSimple.Checked Then
+            lRouteMethod = 3
+        End If
+        Dim lSJDate As Double = 0.0
+        Dim lSDate(5) As Integer
+        lSDate(0) = atxSYear.Text
+        lSDate(1) = atxSMonth.Text
+        lSDate(2) = atxSDay.Text
+        lSJDate = Date2J(lSDate)
 
         EnableControls(False)
         lblStatus.Text = "Performing Flow Routing ..."
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         Me.Refresh()
 
-        Route(lForecast, lRunmode, lDformat)
+        Route(lForecast, lRunmode, lDformat, lRouteMethod, lSJDate)
 
         tabMain.SelectedIndex = 6
         lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
