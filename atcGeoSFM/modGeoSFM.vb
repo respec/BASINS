@@ -52,6 +52,8 @@ Public Module modGeoSFM
         ' ***********************************************************************************************
         ' ***********************************************************************************************
 
+        'TODO: implement subbasins and streams from shapefiles
+
         Dim lDEMLayerIndex As Integer = GisUtil.LayerIndex(aDEMLayerName)
         Dim lDEMFileName As String = GisUtil.LayerFileName(lDEMLayerIndex)
 
@@ -126,7 +128,7 @@ Public Module modGeoSFM
             Logger.Status("Computing Subbasin Grid")
             Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(aSubbasinLayerName)
             lSubbasinGridFileName = FilenameNoExt(lDEMFileName) & "Watershed.bgd"
-            GridFromShapefile(lSubbasinLayerIndex, lPitFillDEMFileName, lSubbasinGridFileName)
+            'GridFromShapefile(lSubbasinLayerIndex, lPitFillDEMFileName, lSubbasinGridFileName)
             GisUtil.AddLayer(lSubbasinGridFileName, lSubbasinGridLayerName)
         End If
 
@@ -139,7 +141,7 @@ Public Module modGeoSFM
             Logger.Status("Computing Stream Grid")
             Dim lStreamLayerIndex As Integer = GisUtil.LayerIndex(aStreamLayerName)
             lStreamGridFileName = FilenameNoExt(lDEMFileName) & "Stream.bgd"
-            GridFromShapefile(lStreamLayerIndex, lPitFillDEMFileName, lStreamGridFileName)
+            'GridFromShapefile(lStreamLayerIndex, lPitFillDEMFileName, lStreamGridFileName)
             GisUtil.AddLayer(lStreamGridFileName, lSubbasinGridLayerName)
         End If
 
@@ -300,6 +302,8 @@ Public Module modGeoSFM
         '
         ' ***********************************************************************************************
         ' ***********************************************************************************************
+
+        'TODO: Need way to include dam locations
 
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
         Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
@@ -476,7 +480,7 @@ Public Module modGeoSFM
         Dim lDrainZonalStats As New atcCollection
         lDrainZonalStats = GisUtil.GridZonalStatisticsMismatched(lBasinGridIndex, lDrainGridIndex)
 
-        'how if this river grid different from the stream link grid?
+        'how is this river grid different from the stream link grid?
         'Logger.Status("Computing River Grid......")
         '                rivgrid = (basingrid * ((rivlinkgrid + 1) / (rivlinkgrid + 1))).Int
         '                rivVtab = rivgrid.GetVtab
@@ -997,6 +1001,8 @@ Public Module modGeoSFM
         ' ***********************************************************************************************
         ' ***********************************************************************************************
 
+        'TODO: Implement for USGS Land Cover Grid
+
         If veltype = 1 Then
             Logger.Msg("'Non-Uniform from USGS Land Cover Grid' option is not yet implemented.", MsgBoxStyle.Critical, "")
             Exit Sub
@@ -1256,9 +1262,7 @@ Public Module modGeoSFM
 
         '        maskgrid = ((outgrid.isnull) / (outgrid.isnull))
         '        newfdrgrid = flowdirgrid * maskgrid
-        'Dim lFlowDirGridFileName As String = GisUtil.LayerFileName(flowdirgthm)
         Dim lOutletGridFileName As String = GisUtil.LayerFileName(outgthm)
-        'Dim lFlowLengthGridFileName As String = GisUtil.LayerFileName(flowlengthm)
 
         '        invelgrid = (1.AsGrid / velgrid)
         Dim lInverseVelocityGridFileName As String = FilenameNoExt(lVelocityGridFileName) & "InverseVelocity.bgd"
@@ -1267,11 +1271,8 @@ Public Module modGeoSFM
         '        flowtimegrid = newfdrgrid.flowlength(invelgrid, False)
         Dim lTravelTimeGridFileName As String = FilenameNoExt(lFlowAccGridFileName) & "TravelTime." & FileExt(lFlowAccGridFileName)
 
-        'GisUtil.FlowLengthToOutlet(lFlowLengthGridFileName, lOutletGridFileName, lZoneFileName, lTravelTimeGridFileName)
         '        inverse velocity grid is used as a weighting factor 
         GisUtil.DownstreamFlowLength(lFlowDirGridFileName, lFlowAccGridFileName, lTravelTimeGridFileName, lOutletGridFileName, lInverseVelocityGridFileName)
-        'Dim lWeightedGridFileName As String = FilenameNoExt(lTravelTimeGridFileName) & "Weighted." & FileExt(lTravelTimeGridFileName)
-        'GisUtil.GridMultiply(lTravelTimeGridFileName, lInverseVelocityGridFileName, lWeightedGridFileName)
 
         '        daysgrid = (flowtimegrid / 86400).floor   'floor returns the greatest integer value less than or equal to aGrid.
         Dim lDaysGridLayerName As String = "Travel Time Grid (Days)"
@@ -1382,6 +1383,8 @@ Public Module modGeoSFM
         '
         ' ***********************************************************************************************
         ' ***********************************************************************************************
+
+        'TODO: Only works for BASINS timeseries at this point, default to using closest stations
 
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
         Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
@@ -1501,402 +1504,10 @@ Public Module modGeoSFM
 
         Logger.Msg("Processing Complete. Output files: " & vbCrLf & lOutputPath + "rain.txt" & vbCrLf & lOutputPath + "evap.txt", "Geospatial Stream Flow Model")
 
-        '  fldlist = {"Rainfall and Evaporation", "Rainfall Only", "Evaporation Only"}
-        '  fldchoice = MsgBox.ChoiceAsString(fldlist, "Select Parameter to Extract", "Extraction Parameter")
-        'Dim typenum As Integer = 0
-        'If (fldchoice = "") Then
-        '    Exit Sub
-        'ElseIf (fldchoice = "Rainfall Only") Then
-        '    typenum = 1
-        'ElseIf (fldchoice = "Evaporation Only") Then
-        '    typenum = 2
-        'ElseIf (fldchoice = "Rainfall and Evaporation") Then
-        '    typenum = 3
-        'End If
-
-        'TheWkDir = TheProject.GetFileName.ReturnDir
-        'orderFNini = FileName.Merge(TheWkDir.AsString, "order.txt")
-        'If (TheWkDir.AsString.contains("\")) Then
-        '    myraindir = ((thewkdir.asstring.astokens("\").get(0)) + "\raindata\rain_year\")
-        '    myevapdir = ((thewkdir.asstring.astokens("\").get(0)) + "\evapdata\evap_year\")
-        'Else
-        '    myraindir = ((thewkdir.asstring.astokens("/").get(0)) + "/raindata/rain_year/")
-        '    myevapdir = ((thewkdir.asstring.astokens("/").get(0)) + "/evapdata/evap_year/")
-        'End If
-
-        'If (typenum = 3) Then
-        '  defaultlist = { "Basins" , TheWkDir.AsString , myraindir.AsString , myevapdir.AsString , "1999" , "1999" , "1" , "240", orderFNini.AsString }
-        '  labellist = { "Basin Grid" , "Output Directory", "Rain Data Directory" , "Evap Data Directory" , "Start Year" , "End Year" , "Start Day Number" , "End Day Number", "Computational Order File" }
-
-        '    inputlist = MsgBox.MultiInput("Enter Model Parameters", "Geospatial Stream Flow Model", labellist, defaultlist)
-
-        '    If (inputlist.isempty) Then
-        '        Exit Sub
-        '    End If
-
-        '    basingname = inputlist.get(0)
-        '    workdirname = inputlist.get(1)
-        '    raindirname = inputlist.get(2)
-        '    evapdirname = inputlist.get(3)
-        '    startyear = inputlist.get(4)
-        '    endyear = inputlist.get(5)
-        '    startday = inputlist.get(6)
-        '    endday = inputlist.get(7)
-        '    orderFileN = inputlist.get(8)
-        'ElseIf (typenum = 2) Then
-        '  defaultlist = { "Basins" , TheWkDir.AsString , myevapdir.AsString , "1999" , "1999" , "1" , "240", orderFNini.AsString }
-        '  labellist = { "Basin Grid" , "Output Directory", "Evap Data Directory" , "Start Year" , "End Year" , "Start Day Number" , "End Day Number", "Computational Order File" }
-
-        '    inputlist = MsgBox.MultiInput("Enter Model Parameters", "Geospatial Stream Flow Model", labellist, defaultlist)
-
-        '    If (inputlist.isempty) Then
-        '        Exit Sub
-        '    End If
-
-        '    basingname = inputlist.get(0)
-        '    workdirname = inputlist.get(1)
-        '    raindirname = inputlist.get(2)
-        '    evapdirname = inputlist.get(2)
-        '    startyear = inputlist.get(3)
-        '    endyear = inputlist.get(4)
-        '    startday = inputlist.get(5)
-        '    endday = inputlist.get(6)
-        '    orderFileN = inputlist.get(7)
-        'ElseIf (typenum = 1) Then
-        '  defaultlist = { "Basins" , TheWkDir.AsString , myraindir.AsString , "1999" , "1999" , "1" , "240", orderFNini.AsString }
-        '  labellist = { "Basin Grid" , "Output Directory", "Rain Data Directory" , "Start Year" , "End Year" , "Start Day Number" , "End Day Number", "Computational Order File" }
-
-        '    inputlist = MsgBox.MultiInput("Enter Model Parameters", "Geospatial Stream Flow Model", labellist, defaultlist)
-
-        '    If (inputlist.isempty) Then
-        '        Exit Sub
-        '    End If
-
-        '    basingname = inputlist.get(0)
-        '    workdirname = inputlist.get(1)
-        '    raindirname = inputlist.get(2)
-        '    evapdirname = inputlist.get(2)
-        '    startyear = inputlist.get(3)
-        '    endyear = inputlist.get(4)
-        '    startday = inputlist.get(5)
-        '    endday = inputlist.get(6)
-        '    orderFileN = inputlist.get(7)
-        'End If
-
-        'If (startyear.IsNumber.Not) Then
-        '    MsgBox.error("Start year must be a number     eg 1999", "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'ElseIf (endyear.IsNumber.Not) Then
-        '    MsgBox.error("End year must be a number     eg 1999", "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'ElseIf (startday.IsNumber.Not) Then
-        '    MsgBox.error("Start day must be a number from 1 to 366", "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'ElseIf (endday.IsNumber.Not) Then
-        '    MsgBox.error("End day must be a number from 1 to 366", "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'basingrdthm = TheView.FindTheme(basingname)
-        'If (basingrdthm = nil) Then
-        '    MsgBox.error("Basin grid theme not found in the active View", "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'If (basingrdthm.Is(GTHEME).Not) Then
-        '    MsgBox.error(Basingname + " is not a grid theme. Specify a grid theme as the basin grid.", "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'zoneObj = basingrdthm.GetGrid
-
-        'zonetable = basingrdthm.GetVtab
-        'If (zonetable = nil) Then
-        '    MsgBox.error("Cannot open basin grid Value Attribute Table", "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'zoneField = zoneTable.FindField("Value")
-        'If (zonefield = nil) Then
-        '    MsgBox.error("Field VALUE not found in basin grid Value Attribute Table", "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'thebitmap = zonetable.GetSelection
-        'thebitmap.ClearAll()
-        'zonetable.UpdateSelection()
-
-        'orderfile = LineFile.Make((orderFileN).AsFileName, #FILE_PERM_READ)
-        'If (orderfile = nil) Then
-        '    MsgBox.error("Cannot find computational order file, " + orderFileN + nl + "Run 'Generate Basin Characteristics File' menu to create order.txt", "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-        'ordlist = List.make
-        'ordsize = orderfile.getsize
-        'If (ordsize = 1) Then
-        '    MsgBox.error(orderFileN + " is empty or has data in a single row." + nl + "Run 'Generate Basin Characteristics File' menu to create a new order.txt file", "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-        'orderfile.read(ordlist, ordsize)
-
-        'headerstr = "Time"
-        'zonelist = List.make
-        'If (ordlist.get(0).IsNumber) Then
-        '    ostart = 0
-        'Else
-        '    ostart = 1
-        'End If
-
-        'av.ShowMsg("Setting computational order.....")
-        'av.ShowStopButton()
-        'for each orec in ostart..(ordsize - 1)
-        '    If (ordlist.get(orec).asstring.isnumber.not) Then
-        '        MsgBox.error("Unrecognized basin-id format: " + nl + " ' " + ordlist.get(orec).asstring + " ' " + nl + " found in computation order file." + nl + "Run 'Generate Basin Characteristics File' menu to create a new order.txt file", "Geospatial Stream Flow Model")
-        '        Exit Sub
-        '    End If
-        '    ordnum = ordlist.get(orec).asstring.asnumber
-
-        '    headerstr = headerstr + ", " + ordnum.asstring
-        '    For Each zrec In zonetable
-        '        zonenum = zonetable.returnvalue(zonefield, zrec)
-        '        If (zonenum = ordnum) Then
-        '            zonelist.add(zrec.asstring.AsNumber)
-        '            break()
-        '        End If
-        '    Next
-        '    doMore = av.SetWorkingStatus
-        '    If (doMore = False) Then
-        '        Exit Sub
-        '    End If
-        'Next
-
-
-        '--set the extent before extracting
-        'ae = theView.GetExtension(AnalysisEnvironment)
-        'ae.SetExtent(#ANALYSISENV_VALUE,basingrdthm.ReturnExtent)
-        'ae.SetCellSize(#ANALYSISENV_VALUE,zoneobj.GetCellSize)
-        'ae.Activate()
-
-        'currentyear = startyear.AsNumber
-        'tempday = startday.AsNumber
-        'Day = 0
-        'lastday = 0
-
-        'If ((typenum = 1) Or (typenum = 3)) Then
-
-        '    rfilename = FileName.Merge(workdirname.AsString, "rain.txt")
-
-        '                  rainfile = TextFile.Make(rfilename, #FILE_PERM_WRITE)
-        '    If (rainfile = nil) Then
-        '        MsgBox.error("Cannot create output file: " + rfileName.AsString, "Geospatial Stream Flow Model")
-        '        Exit Sub
-        '    End If
-
-        '    av.ShowMsg("Creating output file, rain.txt........")
-
-        '    rainfile.Write(headerstr, headerstr.count)
-        '    rainfile.Write(nl, 1)
-        '    rainfile.flush()
-        '    rainfile.close()
-        'End If
-
-        'If ((typenum = 2) Or (typenum = 3)) Then
-
-        '    efilename = FileName.Merge(workdirname.AsString, "evap.txt")
-
-        '      evapfile = TextFile.Make(efilename, #FILE_PERM_WRITE)
-        '    If (evapfile = nil) Then
-        '        MsgBox.error("Cannot create output file: " + efilename.AsString, "Geospatial Stream Flow Model")
-        '        Exit Sub
-        '    End If
-
-        '    av.ShowMsg("Creating output file, evap.txt........")
-
-        '    evapfile.Write(headerstr, headerstr.count)
-        '    evapfile.Write(nl, 1)
-        '    evapfile.flush()
-        '    evapfile.close()
-        'End If
-
-        'Do While (currentyear <= (endyear.AsNumber))
-
-        '    Day = tempday
-
-        '    If (currentyear = (endyear.AsNumber)) Then
-        '        lastday = endday.AsNumber
-        '    ElseIf (currentyear.Mod(4) = 0) Then
-        '        lastday = 366
-        '    Else
-        '        lastday = 365
-        '    End If
-
-        '        raingrdlst = {}
-        '        evapgrdlst = {}
-
-        '    Do While (Day <= lastday)
-
-        '        Day.setformat("dddd")
-
-        '        av.ShowMsg("Computing Zonal Mean for Day  " + +Day.asString + +" of Year  " + +currentyear.AsString)
-
-        '        If ((typenum = 1) Or (typenum = 3)) Then
-        '            Day.setformat("dddd")
-
-        '            zRainFN = FileName.Merge(workdirname, ("zr" + currentyear.asstring + Day.asstring + ".dbf"))
-        '            currentraindir = raindirname.substitute("year", currentyear.asstring)
-
-        '            If (File.Exists(currentraindir.AsFileName).Not) Then
-        '                MsgBox.Error("Cannot read directory " + currentraindir, "Directory Specification Error")
-        '                Exit Sub
-        '            End If
-
-        '            theRainName = Grid.MakeSrcName(currentraindir + "rain_" + currentyear.asstring + Day.asstring)
-        '            If (theRainName = nil) Then
-        '                theRainName = Grid.MakeSrcName(currentraindir + "rain_" + currentyear.asstring + Day.setformat("").asstring)
-        '                If (theRainName = nil) Then
-        '                    MsgBox.Error("Rainfall Grid " + currentraindir + "rain_" + currentyear.asstring + Day.asstring + " Not Found", "Geospatial Stream Flow Model")
-        '                    Exit Sub
-        '                End If
-        '            End If
-        '            theRainThm = Theme.Make(theRainName)
-        '            TheRainGrid = Grid.Make(theRainName)
-        '            If (TheRainGrid.isinteger.not) Then
-        '                tmpgrid = TheRainGrid.int
-        '                TheRainGrid = tmpgrid
-        '            End If
-
-        '            raingrdlst.Add(theRainGrid)
-
-        '            RainVTab = theRainGrid.ZonalStatsTable(zoneObj, ThePrj, zoneField, False, zRainFN)
-        '            If (RainVTab.HasError) Then
-        '                Return NIL
-        '                MsgBox.error("Cannot create rainfall zonal statistics table, " + zRainFN, "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            End If
-
-        '            rainfield = RainVtab.FindField("median")
-        '            If (rainfield = nil) Then
-        '                MsgBox.error("Cannot find 'median' field in " + zRainFN + " table.", "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            End If
-
-        '            outputday = Day.setformat("dddd")
-        '                        av.run("FEWS.rainwrite.ave", {rfilename, zRainFN, outputday, currentyear, zonelist })
-        '            theproject.save()
-
-        '        End If
-
-        '        If ((typenum = 2) Or (typenum = 3)) Then
-        '            Day.setformat("dddd")
-
-        '            zEvapFN = FileName.Merge(workdirname, ("ze" + currentyear.asstring + Day.asstring + ".dbf"))
-        '            currentevapdir = evapdirname.substitute("year", currentyear.asstring)
-
-        '            If (File.Exists(currentevapdir.AsFileName).Not) Then
-        '                MsgBox.Error("Cannot read directory " + currentevapdir, "Directory Specification Error")
-        '                Exit Sub
-        '            End If
-
-        '            theEvapName = Grid.MakeSrcName(currentevapdir + "evap_" + currentyear.asstring + Day.asstring)
-        '            If (theEvapName = nil) Then
-        '                theEvapName = Grid.MakeSrcName(currentevapdir + "evap_" + currentyear.asstring + Day.setformat("").asstring)
-        '                If (theEvapName = nil) Then
-        '                    MsgBox.Error("Evaporation Grid " + currentevapdir + "evap_" + currentyear.asstring + Day.asstring + " Not Found", "Geospatial Stream Flow Model")
-        '                    Exit Sub
-        '                End If
-        '            End If
-        '            theEvapThm = Theme.Make(theEvapName)
-        '            TheEvapGrid = Grid.Make(theEvapName)
-        '            If (TheEvapGrid.isinteger.not) Then
-        '                tmpgrid = TheEvapGrid.int
-        '                TheEvapGrid = tmpgrid
-        '            End If
-
-        '            evapgrdlst.Add(theEvapGrid)
-
-        '            EvapVTab = theEvapGrid.ZonalStatsTable(zoneObj, ThePrj, zoneField, False, zEvapFN)
-        '            If (EvapVTab.HasError) Then
-        '                Return NIL
-        '                MsgBox.error("Cannot create evaporation zonal statistics table, " + zEvapFN, "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            End If
-
-        '            evapfield = EvapVtab.FindField("median")
-        '            If (evapfield = nil) Then
-        '                MsgBox.error("Cannot find 'median' field in " + zEvapFN + " table.", "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            End If
-
-        '            outputday = Day.setformat("dddd")
-        '                av.run("FEWS.rainwrite.ave", {efilename, zEvapFN, outputday, currentyear, zonelist})
-        '            theproject.save()
-
-        '        End If
-
-        '        Day = Day + 1
-
-        '    Loop
-
-
-        '    tempday = 1
-        '    currentyear = currentyear + 1
-
-        'Loop
-
-        'orderfile.close()
-
-        'If (typenum = 1) Then
-        '    MsgBox.Info("Processing Complete. Output files: " + nl + rfilename.AsString, "Geospatial Stream Flow Model")
-        'ElseIf (typenum = 2) Then
-        '    MsgBox.Info("Processing Complete. Output files: " + nl + efilename.AsString, "Geospatial Stream Flow Model")
-        'Else
-        'MsgBox.Info("Processing Complete. Output files: " + nl + rfilename.AsString + nl + efilename.AsString, "Geospatial Stream Flow Model")
-        'End If
-
-        'sub rainwrite
-        'rfilename = SELF.Get(0)
-        'zRainFN = SELF.Get(1)
-        'outputday = SELF.Get(2)
-        'currentyear = SELF.Get(3)
-        'zonelist = SELF.Get(4)
-        'rainfile = TextFile.Make(rfilename, #FILE_PERM_APPEND)
-
-        'RainVtab = Vtab.Make(zRainFN, False, False)
-        'rainfield = RainVtab.FindField("median")
-        'If (rainfield = nil) Then
-        '    MsgBox.error("Cannot find 'median' field in " + zRainFN + " table.", "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'rainfile = TextFile.Make(rfilename, #FILE_PERM_APPEND)
-
-        'rainfile.Write(currentyear.asstring + outputday.asstring, 7)
-
-        'rreccount = 0
-
-        'For Each rrecord In RainVtab
-        '    rrecposition = zonelist.get(rreccount)
-        '    'rainwnum = (RainVtab.ReturnValue(Rainfield, rrecord))
-        '    rainwnum = (RainVtab.ReturnValue(Rainfield, rrecposition))
-        '    rainwrt = (rainwnum.setformat("d.d")).AsString
-        '    rainfile.Write(", " + rainwrt, (rainwrt.count + 2))
-        '    rreccount = rreccount + 1
-        'Next
-
-        ''msgbox.info("finishwriting","")
-
-        'rainfile.Write(nl, 1)
-        'rainfile.flush()
-        'rainfile.close()
-        'rainVtab.Deactivate()
-        'rainVtab = nil
-        'av.PurgeObjects()
-
-        'File.Delete(zRainFN)
     End Sub
 
     Friend Sub Balance(ByVal inifract As Single, ByVal dformat As Integer, ByVal inimode As Integer, ByVal runmode As Integer, _
-                       ByVal balancetype As Integer, ByVal aSjDate As Double)
+                       ByVal abalancetype As Integer, ByVal aSjDate As Double)
         ' ***********************************************************************************************
         ' ***********************************************************************************************
         '
@@ -1957,12 +1568,6 @@ Public Module modGeoSFM
         Dim testfilename As String = lOutputPath & "testfile.txt"
         Dim whichmodelFN As String = lOutputPath & "whichmodel.txt"
 
-        'chkfile=TextFile.Make((balfilename).asfilename,#file_perm_write)
-        'If (chkfile = nil) Then
-        '    MsgBox.info("Could not create the input/output file: " + nl + "balfiles.txt", "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
         If Not FileExists(rainfilename) Then
             Logger.Msg("Could not open rain file," & vbCrLf & rainfilename, "Geospatial Stream Flow Model")
             Exit Sub
@@ -1982,84 +1587,6 @@ Public Module modGeoSFM
             Logger.Msg("Could not open response file," & vbCrLf & respfilename, "Geospatial Stream Flow Model")
             Exit Sub
         End If
-
-        'paramfile=TextFile.Make((paramfilename).asfilename,#file_perm_write)
-        'If (paramfile = nil) Then
-        '    MsgBox.info("Could not create the balance parameter file: " + nl + paramfilename, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'surpfile=LineFile.Make(surpfilename.asfilename,#file_perm_write)
-        'If (surpfile = nil) Then
-        '    MsgBox.info("Could not create the basin runoff yield file: " + nl + surpfilename, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'storefile=LineFile.Make(storefilename.asfilename,#file_perm_write)
-        'If (storefile = nil) Then
-        '    MsgBox.info("Could not create the soil water file: " + nl + storefilename, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'aevapfile=LineFile.Make(aevapfilename.asfilename,#file_perm_write)
-        'If (aevapfile = nil) Then
-        '    MsgBox.info("Could not create the actual evapotranspiration file: " + nl + aevapfilename, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'gwlossfile=LineFile.Make(gwlossfilename.asfilename,#file_perm_write)
-        'If (gwlossfile = nil) Then
-        '    MsgBox.info("Could not create the ground water loss file: " + nl + gwlossfilename, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'outswfile=LineFile.Make(outswfilename.asfilename,#file_perm_write)
-        'If (outswfile = nil) Then
-        '    MsgBox.info("Could not create the current soil water file: " + nl + outswfilename, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'excessfile=LineFile.Make(excessfilename.asfilename,#file_perm_write)
-        'If (excessfile = nil) Then
-        '    MsgBox.info("Could not create the input/output file: " + nl + excessfilename, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'interfile=LineFile.Make(interfilename.asfilename,#file_perm_write)
-        'If (interfile = nil) Then
-        '    MsgBox.info("Could not create the input/output file: " + nl + interfilename, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'basefile=LineFile.Make(basefilename.asfilename,#file_perm_write)
-        'If (basefile = nil) Then
-        '    MsgBox.info("Could not create the input/output file: " + nl + basefilename, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'massfile=LineFile.Make(massfilename.asfilename,#file_perm_write)
-        'If (massfile = nil) Then
-        '    MsgBox.info("Could not create the input/output file: " + nl + massfilename, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'logfile=LineFile.Make(logfilename.asfilename,#file_perm_write)
-        'If (logfile = nil) Then
-        '    MsgBox.info("Could not create the input/output file: " + nl + logfilename, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'initialfile=LineFile.Make(initialfilename.asfilename,#file_perm_write)
-        'If (initialfile = nil) Then
-        '    MsgBox.info("Could not create the input/output file: " + nl + initialfilename, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'timefile=LineFile.Make((maxtimefilename).asfilename,#file_perm_write)
-        'If (timefile = nil) Then
-        '    MsgBox.info("Could not create the input/output file: " + nl + maxtimefilename, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
 
         Dim lRStreamReader As New StreamReader(rainfilename)
         Dim lCurrentRecord As String = ""
@@ -2120,11 +1647,6 @@ Public Module modGeoSFM
             lstr = StrRetRem(lCurrentRecord)
         Loop
         resdays = resdays - 1
-
-        'INITIALIZE GRAPHICS VARIABLES
-        'Gcnt = theView.GetGraphics.count
-        'Tsym = RasterFill.Make
-        'Tsym.Setcolor(Color.getRed)
 
         Dim lChkFile As New StringBuilder
         lChkFile.AppendLine(rainfilename)
@@ -2196,116 +1718,22 @@ Public Module modGeoSFM
         ''timefile.writeelt(runsize.asstring)  'commented out in the avenue 
         ''timefile.close
 
-        'Dim balancetype As String = "1"
-        'Dim routetype As String = "2"
-        'Dim balstr As String = "Linear Soil Model"
-        'Dim routstr As String = "Muskingum-Cunge Routing"
-        'If (FileExists(whichmodelFN)) Then
-        '  whichmodelfile = LineFile.Make((myWkDirname + "whichModel.txt").asfilename,#file_perm_read)
-        '    If (whichmodelfile = nil) Then
-        '        MsgBox.info("Could not create whichModel.txt file" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '        Exit Sub
-        '    End If
-        '    whichsize = (whichmodelfile.getsize)
-
-        '    biglist = List.make
-        '    If (whichsize > 2) Then
-        '        whichmodelfile.Read(biglist, whichsize)
-        '        balancetype = biglist.get(1).asstring.astokens(" ,/").get(0).asstring
-        '        routetype = biglist.get(2).asstring.astokens(" ,/").get(0).asstring
-        '    Else
-        '        balancetype = "1"
-        '        routetype = "2"
-        '    End If
-
-        '    whichmodelfile.close()
-
-        '    If ((balancetype = "1") And (routetype = "3")) Then
-        '        balstr = "Linear Soil Model"
-        '        routstr = "Simple Lag Routing Method"
-        '    ElseIf ((balancetype = "1") And (routetype = "1")) Then
-        '        balstr = "Linear Soil Model"
-        '        routstr = "Diffusion Analog Routing Method"
-        '    ElseIf ((balancetype = "1") And (routetype = "2")) Then
-        '        balstr = "Linear Soil Model"
-        '        routstr = "Muskingum-Cunge Routing"
-        '    ElseIf ((balancetype = "2") And (routetype = "3")) Then
-        '        balstr = "Non-Linear Soil Model"
-        '        routstr = "Simple Lag Routing Method"
-        '    ElseIf ((balancetype = "2") And (routetype = "1")) Then
-        '        balstr = "Non-Linear Soil Model"
-        '        routstr = "Diffusion Analog Routing Method"
-        '    ElseIf ((balancetype = "2") And (routetype = "2")) Then
-        '        balstr = "Non-Linear Soil Model"
-        '        routstr = "Muskingum Cunge Routing Method"
-        '    Else
-        '        balstr = "Linear Soil Model"
-        '        routstr = "Muskingum-Cunge Routing"
-        '    End If
-        '     ballst = {balstr, "Linear Soil Model", "Non-Linear Soil Model" }
-        'Else
-        'ballst = {"Linear Soil Model", "Non-Linear Soil Model" }
-        'balstr = "Linear Soil Model"
-        'routstr = "Muskingum-Cunge Routing"
-        'End If
-
-        'balancestr = MsgBox.choiceasstring(ballst, "Select Flow Routing Method for Computation", "Geospatial Stream Flow Model")
-        'If (balancestr = NIL) Then
-        '    Exit Sub
-        'Else
-        'If (balancestr = "Linear Soil Model") Then
-        '    balancetype = "1"
-        'ElseIf (balancestr = "Non-Linear Soil Model") Then
-        '    balancetype = "2"
-        'Else
-        '    balancetype = "1"
-        'End If
-
-        '    If (routstr = "Muskingum Cunge Routing Method") Then
         Dim routetype As Integer = 2
-        '    ElseIf (routstr = "Simple Lag Routing Method") Then
-        '        routetype = "3"
-        '    ElseIf (routstr = "Diffusion Analog Routing Method") Then
-        '        routetype = "1"
-        '    Else
-        '        routetype = "2"
-        '    End If
 
         Dim lWhichFile As New StringBuilder
-        'whichmodelfile = LineFile.Make(whichmodelFN.asfilename,#file_perm_write)
-        'If (whichmodelfile = nil) Then
-        '    MsgBox.info("Could not create file, " + whichmodelFN + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
         lWhichFile.AppendLine("Model Index   Index description")
-        lWhichFile.AppendLine(balancetype & " //water balance model:  1=1D balance, 2=2D balance")
+        lWhichFile.AppendLine(abalancetype & " //water balance model:  1=1D balance, 2=2D balance")
         lWhichFile.AppendLine(routetype & " //routing model:  1=diffusion 2=Muskingum-Cunge 3=lag")
         SaveFileString(whichmodelFN, lWhichFile.ToString)
-        'End If
 
-        'av.ShowStopButton()
-        'av.SetStatus(0)
-        'av.showmsg("Performing Soil Water Balance.......")
         'If FileExists(surpfilename) Then
         '    IO.File.Delete(surpfilename)
         'End If
 
-        If balancetype = 1 Then    '"Linear Soil Model"
-            'procGetLastError = ONELAYERBALANCE(balfilename)
+        If abalancetype = 1 Then    '"Linear Soil Model"
             ONELAYERBALANCE(balfilename)
-            '      myproc=DLLProc.Make(myDLL, "ONELAYERBALANCE", #DLLPROC_TYPE_INT32,{#DLLPROC_TYPE_STR})
-            '    If (myproc = Nil) Then
-            '        MsgBox.info("Unable to make the procedure, ONELAYERBALANCE" + nl + nl + "Please install the program, geosfm.dll, before you continue.", "FEWS SFM Model")
-            '        Exit Sub
-            '    End If
         Else                       '"Non-Linear Soil Model"
-            'procGetLastError = TWOLAYERBALANCE(balfilename)
             TWOLAYERBALANCE(balfilename)
-            '          myproc=DLLProc.Make(myDLL, "twolayerbalance", #DLLPROC_TYPE_INT32,{#DLLPROC_TYPE_STR})  
-            '    If (myproc = Nil) Then
-            '        MsgBox.info("Unable to make the procedure, twolayerbalance" + nl + nl + "Please install the program, geosfm.dll, before you continue.", "FEWS SFM Model")
-            '        Exit Sub
-            '    End If
         End If
 
         If Not FileExists(surpfilename) Then
@@ -2431,11 +1859,6 @@ Public Module modGeoSFM
         Dim ratingFN As String = lOutputPath & "rating.txt"
         Dim whichmodelFN As String = lOutputPath & "whichmodel.txt"
 
-        'If Not FileExists(timesFN) Then
-        '    Logger.Msg("Could not open check file." & vbCrLf & timesFN, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
         If Not FileExists(runoffFN) Then
             Logger.Msg("Could not open runoff file." & vbCrLf & runoffFN, "Geospatial Stream Flow Model")
             Exit Sub
@@ -2450,64 +1873,6 @@ Public Module modGeoSFM
             Logger.Msg("Could not open river file," & vbCrLf & riverFN, "Geospatial Stream Flow Model")
             Exit Sub
         End If
-
-        'If Not FileExists(riverdepthFN) Then
-        '    Logger.Msg("Could not open river depth file," & vbCrLf & riverdepthFN, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'If Not FileExists(flowFN) Then
-        '    Logger.Msg("Could not open streamflow file," & vbCrLf & flowFN, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'If Not FileExists(localflowFN) Then
-        '    Logger.Msg("Could not open pflow file," & vbCrLf & localflowFN, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'If Not FileExists(damlinkFN) Then
-        '    Logger.Msg("Could not open reservoir status file" & vbCrLf & damlinkFN, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'If Not FileExists(damsFN) Then
-        '    Logger.Msg("Could not open reservoir status file" & vbCrLf & damsFN, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'If Not FileExists(inflowFN) Then
-        '    Logger.Msg("Could not open inflow file," & vbCrLf & inflowFN, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'If Not FileExists(initialFN) Then
-        '    Logger.Msg("Could not open initialization file," & vbCrLf & "initial.txt", "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'If Not FileExists(forecastFN) Then
-        '    Logger.Msg("Could not open forecast file," & vbCrLf & forecastFN, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
-
-        'timefile=LineFile.Make((maxtimeFN).asfilename,#file_perm_write)
-        'if (timefile=nil) then
-        '  msgbox.info("Could not create the input/output file: " +nl+ maxtimeFN,"Geospatial Stream Flow Model")
-        '  exit
-        'end
-
-        'ratingfile = LineFile.Make((ratingFN).asfilename,#file_perm_write)
-        '        If (ratingfile = nil) Then
-        '            MsgBox.info("Could not create the input/output file: " + nl + ratingFN, "Geospatial Stream Flow Model")
-        '  exit
-        '        End If
-
-        'logfile = LineFile.Make(logFN.asfilename,#file_perm_write)
-        '        If (logfile = nil) Then
-        '            MsgBox.info("Could not create log file, " + logFN, "Geospatial Stream Flow Model")
-        '  exit
-        '        End If
 
         Dim theday As String = System.DateTime.Now.Date.ToString
         Dim theyear As String = System.DateTime.Now.Year.ToString
@@ -2542,7 +1907,6 @@ Public Module modGeoSFM
                 If lCurrentRecord Is Nothing Then
                     Exit Do
                 Else
-                    'lRiv = StrRetRem(lCurrentRecord)
                     lRivList.Add(lCurrentRecord)
                 End If
             Loop
@@ -2574,9 +1938,7 @@ Public Module modGeoSFM
             Exit Sub
         End If
 
-        '        resdays = (((((responselist.get(0)).substitute(" ", ",")).astokens(",")).count) - 1)
         Dim resdays As Integer = lResponseList.Count
-        '        'msgbox.info("The resdays "+resdays.asstring,"")
 
         ' READ IN THE INPUT ARRAYS FOR PRECIPITATION AND POTENTIAL EVAPORATION
         Dim lRunoffList As New atcCollection
@@ -2601,45 +1963,7 @@ Public Module modGeoSFM
         Dim dayonestr As String = StrRetRem(lStr)
         Dim timetype As String = "Daily"
         Dim timeinhrs As String = "24"
-        If (dayonestr.Length = 7) Then
-            '    startyear = dayonestr.left(4)
-            '    If (startyear.isnumber.not) Then
-            '        startyear = MsgBox.input("Enter 4 digit start year eg 1999", "Geospatial Stream Flow Model", theyear)
-            '        If ((startyear = nil) Or (startyear.isnumber.not)) Then
-            '            MsgBox.info("Start year must be a 4 digit number", "Geospatial Stream Flow Model")
-            '            Exit Sub
-            '        End If
-            '    End If
-            '    startday = dayonestr.right(3)
-            '    If (startday.isnumber.not) Then
-            '        startday = MsgBox.input("Enter 3 digit start day eg 003", "Geospatial Stream Flow Model", theday)
-            '        If ((startday = nil) Or (startday.isnumber.not)) Then
-            '            MsgBox.info("Start day must be a 3 digit number", "Geospatial Stream Flow Model")
-            '            Exit Sub
-            '        End If
-            '    End If
-        Else
-            '    startyear = MsgBox.input("Enter 4 digit start year eg 1999", "Geospatial Stream Flow Model", theyear)
-            '    If ((startyear = nil) Or (startyear.isnumber.not)) Then
-            '        MsgBox.info("Start year must be a 4 digit number", "Geospatial Stream Flow Model")
-            '        exit
-            '    End If
-
-            '    startday = MsgBox.input("Enter 3 digit start day eg 003", "Geospatial Stream Flow Model", theday)
-            '    If ((startday = nil) Or (startday.isnumber.not)) Then
-            '        MsgBox.info("Start day must be a 3 digit number", "Geospatial Stream Flow Model")
-            '        exit
-            '    End If
-
-            '      timetype = msgbox.Choiceasstring({"Hourly","Daily"} , "Select the Routing Interval for this computation", "Geospatial Stream Flow Model")
-            '    If (timetype = NIL) Then
-            '        exit
-            '    ElseIf (timetype = "Daily") Then
-            '        timeinhrs = "24"
-            '    ElseIf (timetype = "Hourly") Then
-            '        timeinhrs = "1"
-            '    End If
-        End If
+        
         If dformat = 0 Then
             timetype = "Hourly"
             timeinhrs = "1"
@@ -2670,17 +1994,9 @@ Public Module modGeoSFM
         Dim damcount As Integer = 0
         Dim lReservoirList As New atcCollection
         For brec As Integer = (lRivList.Count - 1) To rivstart Step -1
-            '            myprogress = av.SetStatus((((rivsize - 1) - brec) / (rivsize - 1)) * 100)
-            '            If (Not myprogress) Then
-            '                av.clearmsg()
-            '    exit   
-            '            End If
 
             Dim charlist As String = lRivList.ItemByIndex(brec)
             Dim resplist As String = lResponseList.ItemByIndex(brec)
-
-            '            charcount = charlist.count
-
             Dim riverid As String = StrRetRem(charlist)
             Dim lTmpStr As String = ""
             For lIndex As Integer = 1 To 8
@@ -2718,11 +2034,6 @@ Public Module modGeoSFM
                 Dim resdtime As Single = 0.0
                 Dim lDamoutFile As New StringBuilder
                 Dim lDamoutFileName As String = lOutputPath & "dam" & riverid.ToString & ".txt"
-                '    damoutfile = LineFile.Make((myWkDirname + "dam"+riverid.asstring + ".txt").asfilename,#file_perm_write)
-                '                If (damoutfile = nil) Then
-                '                    MsgBox.info("Could not open reservoir discharge file," + nl + myWkDirname + "dam" + riverid.asstring + ".txt", "Geospatial Stream Flow Model")
-                '      exit
-                '                End If
 
                 Dim resvlist As String = ""
                 If lReservoirList.ItemByKey(riverid) Is Nothing Then
@@ -2802,7 +2113,6 @@ Public Module modGeoSFM
                 End If
 
                 Dim lDamLinkFile As New StringBuilder
-                'lDamLinkFile.AppendLine(riverid.ToString & ", " & lOutputPath & "dam" & riverid.ToString & ".txt, " & isoperated.ToString & ", " & resdtime.ToString)
                 lDamLinkFile.AppendLine(riverid.ToString)
                 lDamLinkFile.AppendLine(lOutputPath & "dam" & riverid.ToString & ".txt")
                 lDamLinkFile.AppendLine(isoperated.ToString)
@@ -2812,31 +2122,11 @@ Public Module modGeoSFM
 
         Next
 
-        '        damlinkfile.close()
-        '        responsefile.close()
-        '        riverfile.close()
-        '        runofffile.close()
-        '        inflowfile.close()
-        '        initialfile.close()
-        '        damsfile.close()
-        '        localflowfile.close()
-        '        flowfile.close()
-        '        riverdepthfile.close()
-        '        forefile.close()
-        '        logfile.close()
-        '        ratingfile.close()
-
         Dim balstr As String = ""
         Dim routstr As String = ""
         Dim balancetype As String = ""
         Dim routetype As String = ""
         If (FileExists(whichmodelFN)) Then
-            '  whichmodelfile = LineFile.Make((myWkDirname + "whichModel.txt").asfilename,#file_perm_read)
-            '            If (whichmodelfile = nil) Then
-            '                MsgBox.info("Could not create whichModel.txt file" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-            '    exit
-            '            End If
-            '            whichsize = (whichmodelfile.getsize)
             Dim whichsize As Integer = 0
             Dim biglist As New atcCollection
             Try
@@ -2896,16 +2186,8 @@ Public Module modGeoSFM
             balstr = "Linear Soil Model"
         End If
 
-        'whichmodelfile = LineFile.Make(whichmodelFN.asfilename,#file_perm_write)
-        '        If (whichmodelfile = nil) Then
-        '            MsgBox.info("Could not create file, " + whichmodelFN + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '  exit
-        '        End If
-
         '        routestr = MsgBox.choiceasstring(routelst, "Select Flow Routing Method for Computation", "Geospatial Stream Flow Model")
-        '        If (routestr = NIL) Then
-        '  exit
-        '        Else
+
         If (balstr = "Linear Soil Model") Then
             balancetype = "1"
         ElseIf (balstr = "Non-Linear Soil Model") Then
@@ -2914,15 +2196,6 @@ Public Module modGeoSFM
             balancetype = "1"
         End If
 
-        'If (routestr = "Muskingum Cunge Routing Method") Then
-        '    routetype = "2"
-        'ElseIf (routestr = "Simple Lag Routing Method") Then
-        '    routetype = "3"
-        'ElseIf (routestr = "Diffusion Analog Routing Method") Then
-        '    routetype = "1"
-        'Else
-        '    routetype = "2"
-        'End If
         routetype = aRouteMethod.ToString
 
         Dim lWhichFile As New StringBuilder
@@ -2930,18 +2203,6 @@ Public Module modGeoSFM
         lWhichFile.AppendLine(balancetype & " //water balance model:  1=1D balance, 2=2D balance")
         lWhichFile.AppendLine(routetype & " //routing model:  1=diffusion 2=Muskingum-Cunge 3=lag")
         SaveFileString(whichmodelFN, lWhichFile.ToString)
-        '        End If
-
-        '        av.ShowStopButton()
-        '        av.SetStatus(0)
-        '        av.showmsg("Performing Flow Routing.......")
-
-        '        myfilename = ("$AVEXT\geosfm.dll").AsFileName
-        '        If (myfilename = Nil) Then
-        '            MsgBox.info("Unable to locate the program file: geosfm.dll." + nl + nl + "Please install the program, route.dll, before you continue.", "Geospatial Stream Flow Model")
-        '  exit
-        '        End If
-        '        mydll = DLL.Make(myfilename)
 
         Dim myrunoff As Integer = 0
         If (runoffdays > 100) Then
@@ -2949,18 +2210,6 @@ Public Module modGeoSFM
         Else
             myrunoff = runoffdays
         End If
-
-        'parfile = TextFile.Make(routparamFN.asfilename,#file_perm_write)
-        '        If (parfile = nil) Then
-        '            MsgBox.info("Could not create parameter file, " + routparamFN, "Geospatial Stream Flow Model")
-        '  exit
-        '        End If
-
-        'routfile = TextFile.Make(routfilesFN.asfilename,#file_perm_write)
-        '        If (routfile = nil) Then
-        '            MsgBox.info("Could not create listing of routing files, " + routfilesFN, "Geospatial Stream Flow Model")
-        '  exit
-        '        End If
 
         Dim outformat As Integer = 0
         If (timetype = "Hourly") Then
@@ -3000,45 +2249,19 @@ Public Module modGeoSFM
 
         If (aRouteMethod = 3) Then
             LAGROUTE(routfilesFN)
-            '  myproc=DLLProc.Make(myDLL, "LAGROUTE", #DLLPROC_TYPE_INT32,{#DLLPROC_TYPE_STR})
-            'If (myproc = Nil) Then
-            '                MsgBox.info("Unable to make the procedure, LAGROUTE" + nl + nl + "Please install the program, geosfm.dll, before you continue.", "Geospatial Stream Flow Model")
-            '    exit
-            'End If
         ElseIf (aRouteMethod = 1) Then
             DIFFROUTE(routfilesFN)
-            '  myproc=DLLProc.Make(myDLL, "DIFFROUTE", #DLLPROC_TYPE_INT32,{#DLLPROC_TYPE_STR})  
-            'If (myproc = Nil) Then
-            '                MsgBox.info("Unable to make the procedure, DIFFROUTE" + nl + nl + "Please install the program, geosfm.dll, before you continue.", "Geospatial Stream Flow Model")
-            '    exit
-            'End If
         Else
-            CUNGEROUTE(routfilesFN)
-            '  myproc=DLLProc.Make(myDLL, "cungeroute", #DLLPROC_TYPE_INT32,{#DLLPROC_TYPE_STR})  
-            'If (myproc = Nil) Then
-            '                    MsgBox.info("Unable to make the procedure, CUNGEROUTE" + nl + nl + "Please install the program, geosfm.dll, before you continue.", "Geospatial Stream Flow Model")
-            '    exit
-            'End If
+            cungeroute(routfilesFN)
         End If
 
         'timefile.writeelt(myrunoff.asstring)  'commented out in the avenue 
         'timefile.close
 
-        'procGetLastError = 1
-        'procGetLastError=myproc.call({routfilesFN})
-
         If Not FileExists(flowFN) Then
-            Logger.Msg("An error occurred during the balance computation." & vbCrLf & "Check for possible causes in logfileflow.txt", "Geospatial Stream Flow Model")
+            Logger.Msg("An error occurred during the routing computations." & vbCrLf & "Check for possible causes in logfileflow.txt", "Geospatial Stream Flow Model")
             Exit Sub
         End If
-
-        'If FileExists(flowFN) Then
-        '    Dim tempFN As String = lOutputPath & "tmpfile.txt"
-        '    IO.File.Copy(flowFN, tempFN)
-        'Else
-        '    Logger.Msg("Could not open output streamflow file," & vbCrLf & flowFN, "Geospatial Stream Flow Model")
-        '    Exit Sub
-        'End If
 
         lChkFile.AppendLine("Ending Time: " & System.DateTime.Now.ToString)
         SaveFileString(timesFN, lChkFile.ToString)
@@ -3047,7 +2270,8 @@ Public Module modGeoSFM
 
     End Sub
 
-    Friend Sub Sensitivity()
+    Friend Sub Sensitivity(ByVal aSelectedReachIndex As Integer, ByVal aBalanceType As Integer, ByVal aRouteType As Integer, _
+                           ByVal aParameterRanges As atcCollection)
         ' ***********************************************************************************************
         ' ***********************************************************************************************
         '
@@ -3077,544 +2301,199 @@ Public Module modGeoSFM
         ' ***********************************************************************************************
         ' ***********************************************************************************************
 
-        '        mytitle = "Geospatial Stream Flow Model"
+        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+        Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
 
-        '        TheProject = av.GetProject
-        '        theFileName = theProject.GetFileName
-        '        If (theFileName = nil) Then
-        '            av.Run("Project.SaveAs", nil)
-        '            theFileName = theProject.GetFileName
-        '            If (theFileName = nil) Then
-        '    exit
-        '            End If
-        '        Else
-        '            If (av.Run("Project.CheckForEdits", nil).Not) Then
-        '                Return nil
-        '            End If
-        '            If (theProject.Save) Then
-        '                av.ShowMsg("Project saved to '" + theFileName.GetBaseName + "'")
-        '    if (System.GetOS = #SYSTEM_OS_MAC) then
-        '                    Script.Make("MacClass.SetDocInfo(SELF, Project)").DoIt(theFileName)
-        '                End If
-        '            End If
-        '        End If
+        'read/write balance parameters
+        Dim lBalParamFN As String = lOutputPath & "balparam.txt"
+        Dim lBalList As New Collection
+        Try
+            Dim lCurrentRecord As String
+            Dim lStreamReader As New StreamReader(lBalParamFN)
+            Do
+                lCurrentRecord = lStreamReader.ReadLine
+                If lCurrentRecord Is Nothing Then
+                    Exit Do
+                Else
+                    lBalList.Add(lCurrentRecord)
+                End If
+            Loop
+            lStreamReader.Close()
+        Catch e As ApplicationException
+            Logger.Msg("Problem reading parameters from balparam.txt file," & vbCrLf & "Check the contents of this file before continuing.", "Geospatial Stream Flow Model")
+            Exit Sub
+        End Try
+        'write it out in calibration mode
+        Dim lParamFile As New StringBuilder
+        For lIndex As Integer = 1 To 9
+            lParamFile.AppendLine(lBalList(lIndex))
+        Next
+        lParamFile.AppendLine(1.ToString)
+        SaveFileString(lBalParamFN, lParamFile.ToString)
 
-        '        TheView = av.GetActiveDoc
-        '        ViewChk = TheView.GetGUI
-        '        If (ViewChk <> "View") Then
-        '            MsgBox.error("Click on the View to make it 'active' before running this program", "")
-        ' exit
-        '        End If
+        'read/write routing parameters
+        Dim lRoutParamFN As String = lOutputPath & "routparam.txt"
+        Dim lRoutList As New Collection
+        Try
+            Dim lCurrentRecord As String
+            Dim lStreamReader As New StreamReader(lRoutParamFN)
+            Do
+                lCurrentRecord = lStreamReader.ReadLine
+                If lCurrentRecord Is Nothing Then
+                    Exit Do
+                Else
+                    lRoutList.Add(lCurrentRecord)
+                End If
+            Loop
+            lStreamReader.Close()
+        Catch e As ApplicationException
+            Logger.Msg("Problem reading parameters from routparam.txt file," & vbCrLf & "Check the contents of this file before continuing.", "Geospatial Stream Flow Model")
+            Exit Sub
+        End Try
+        'write it out in calibration mode
+        Dim lRParamFile As New StringBuilder
+        For lIndex As Integer = 1 To 9
+            lRParamFile.AppendLine(lRoutList(lIndex))
+        Next
+        lRParamFile.AppendLine(1.ToString)
+        SaveFileString(lRoutParamFN, lRParamFile.ToString)
 
-        '        ' Check the working directory
-        '        TheWkDir = TheProject.GetFileName.ReturnDir
+        Dim ntsteps As String = lBalList(2)
+        If Not IsNumeric(ntsteps) Then
+            ntsteps = lRoutList(1)
+        End If
 
-        '        'if(theWkdir.contains
+        Dim logfileFN As String = lOutputPath & "logfilesarun.txt"
+        Dim logfile As New StringBuilder
 
-        '        myWkDirname = MsgBox.Input("Specify your working directory", "Working Directory", TheWkDir.GetFullName)
-        '        If (mywkDirName = nil) Then
-        ' exit
-        '        End If
-        '        If (File.Exists(myWkDirname.AsFileName).not) Then
-        '            MsgBox.Error("Cannot read directory " + myWkDirname, "Directory Specification Error")
-        ' exit
-        '        End If
-        '        If (File.IsWritable(myWkDirname.AsFileName).not) Then
-        '            MsgBox.Error(myWkDirname + +"is not writable.", "Directory Specification Error")
-        ' exit
-        '        End If
-        '        TheProject.SetWorkDir(myWkDirname.AsFileName)
+        Dim balancetype As Integer = 0
+        Dim routetype As Integer = 0
+        Dim whichmodelFN As String = lOutputPath & "whichModel.txt"
+        If Not FileExists(whichmodelFN) Then
+            Dim lWhichFile As New StringBuilder
+            lWhichFile.AppendLine("Model Index   Index description")
+            lWhichFile.AppendLine(aBalanceType & " //water balance model:  1=1D balance, 2=2D balance")
+            lWhichFile.AppendLine(aRouteType & " //routing model:  1=diffusion 2=Muskingum-Cunge 3=lag")
+            SaveFileString(whichmodelFN, lWhichFile.ToString)
+        Else
+            Try
+                Dim lCurrentRecord As String
+                Dim lStreamReader As New StreamReader(whichmodelFN)
+                lCurrentRecord = lStreamReader.ReadLine  'only if first line is a header
+                Do
+                    lCurrentRecord = lStreamReader.ReadLine
+                    If lCurrentRecord Is Nothing Then
+                        Exit Do
+                    Else
+                        balancetype = StrRetRem(lCurrentRecord)
+                        lCurrentRecord = lStreamReader.ReadLine
+                        routetype = StrRetRem(lCurrentRecord)
+                    End If
+                Loop
+                lStreamReader.Close()
+            Catch e As ApplicationException
+                Logger.Msg("Could not open whichModel.txt file" & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+                Exit Sub
+            End Try
+        End If
 
-        '        If ((myWkDirname.contains("\").Not) And (myWkDirname.contains("/")) And (myWkDirname.right(1) <> "/")) Then
-        '            myWkDirname = myWkDirname + "/"
-        '        ElseIf ((myWkDirname.contains("\")) And (myWkDirname.right(1) <> "\")) Then
-        '            myWkDirname = myWkDirname + "\"
-        '        ElseIf ((myWkDirname.contains("\").Not) And (myWkDirname.contains("\").Not) And (myWkDirname.right(1) <> "/")) Then
-        '            myWkDirname = myWkDirname + "/"
-        '        End If
+        Dim methodtypestr As String = ""
+        If ((balancetype = 1) And (routetype = 2)) Then
+            methodtypestr = "One Soil Layer, Muskingum-Cunge Routing"
+        ElseIf ((balancetype = 1) And (routetype = 1)) Then
+            methodtypestr = "One Soil Layer, Diffusion Routing"
+        ElseIf ((balancetype = 1) And (routetype = 3)) Then
+            methodtypestr = "One Soil Layer, Lag Routing"
+        ElseIf ((balancetype = 2) And (routetype = 2)) Then
+            methodtypestr = "Two Soil Layers, Muskingum-Cunge Routing"
+        ElseIf ((balancetype = 2) And (routetype = 1)) Then
+            methodtypestr = "Two Soil Layers, Diffusion Routing"
+        ElseIf ((balancetype = 2) And (routetype = 3)) Then
+            methodtypestr = "Two Soil Layers, Lag Routing"
+        Else
+            methodtypestr = "One Soil Layer, Muskingum-Cunge Routing"
+        End If
 
+        logfile.AppendLine("Routing Models Selected as " & methodtypestr.ToString)
 
-        '        If (File.Exists((myWkDirname + "balparam.txt").AsFileName).not) Then
-        '  av.run("FEWS.balance.ave", {})
-        '        End If
-        'balparamFile = LineFile.Make((myWkDirname + "balparam.txt").asfilename,#file_perm_modify)
-        '        If (balparamFile = nil) Then
-        '            MsgBox.info("Could not open balparam.txt file," + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '  exit
-        '        End If
-        '        If (balparamFile.getsize < 10) Then
-        '            MsgBox.info("Not enough parameters in balparam.txt file," + nl + "Check the contents of this file before continuing.", "Geospatial Stream Flow Model")
-        '  exit
-        '        End If
+        Dim rangeFileFN As String = lOutputPath & "range.txt"
+        Dim rangeFile As New StringBuilder
+        rangeFile.AppendLine("Min, Max, Name, Description")
+        For rindex As Integer = 0 To aParameterRanges.Count - 1
+            rangeFile.AppendLine(aParameterRanges.ItemByIndex(rindex) & ", " & aParameterRanges.Keys(rindex))
+        Next
+        SaveFileString(rangeFileFN, rangeFile.ToString)
 
-        '        ballist = List.make
-        '        balparamFile.read(ballist, balparamFile.getsize)
-        '        balparamfile.gotobeg()
-        '        balparamfile.setpos(9)
-        '        balparamfile.writeelt("1")
-        '        balparamfile.flush()
-        '        balparamFile.close()
+        logfile.AppendLine("River and Basin Files Read")
 
-        '        If (File.Exists((myWkDirname + "routparam.txt").AsFileName).not) Then
-        '  av.run("FEWS.route.ave", {})
-        '        End If
-        'routparamFile = LineFile.Make((myWkDirname + "routparam.txt").asfilename,#file_perm_modify)
-        '        If (routparamFile = nil) Then
-        '            MsgBox.info("Could not open routparam.txt file," + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '  exit
-        '        End If
-        '        If (routparamFile.getsize < 10) Then
-        '            MsgBox.info("Not enough parameters in routparam.txt file," + nl + "Check the contents of this file before continuing.", "Geospatial Stream Flow Model")
-        '  exit
-        '        End If
+        Dim moscemparamfileFN As String = lOutputPath & "moscem_param.txt"
+        Dim moscemparamfile As New StringBuilder
+        moscemparamfile.AppendLine(1.ToString)
+        moscemparamfile.AppendLine(ntsteps)
+        moscemparamfile.AppendLine(ntsteps)
+        moscemparamfile.AppendLine(1.ToString)
+        moscemparamfile.AppendLine(-9999.ToString)
+        moscemparamfile.AppendLine(1.ToString)
+        moscemparamfile.AppendLine((aSelectedReachIndex + 1).ToString)
+        SaveFileString(moscemparamfileFN, moscemparamfile.ToString)
 
-        '        routlist = List.make
-        '        routparamFile.read(routlist, routparamFile.getsize)
-        '        ntsteps = ballist.get(1).asstring
-        '        If (ntsteps.isnumber.not) Then
-        '            ntsteps = routlist.get(0).asstring
-        '        End If
-        '        routparamFile.gotobeg()
-        '        routparamFile.setpos(9)
-        '        routparamFile.writeelt("1")
-        '        routparamFile.flush()
-        '        routparamFile.close()
+        logfile.AppendLine("River and Basin Parameter Ranges Confirmed")
 
-        'logfile = LineFile.Make((myWkDirname + "logfilesarun.txt").asfilename,#file_perm_write)
-        '        If (logfile = nil) Then
-        '            MsgBox.info("Could not create logfilesarun.txt file" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '  exit
-        '        End If
+        Dim geosfmsarunFN As String = ""
+        If FileExists(lOutputPath & "geosfmsarun.exe") Then
+            geosfmsarunFN = lOutputPath & "geosfmsarun.exe"
+        ElseIf FileExists(lBasinsBinLoc & "\geosfmsarun.exe") Then
+            File.Copy(lBasinsBinLoc & "\geosfmsarun.exe", lOutputPath & "geosfmsarun.exe")
+            geosfmsarunFN = lOutputPath & "geosfmsarun.exe"
+        Else
+            Logger.Msg("Unable to locate the program file: geosfmsarun.exe " & vbCrLf & vbCrLf & "Install the programs in your BASINS/bin folder.", "Geospatial Stream Flow Model")
+            Exit Sub
+        End If
 
-        '        orderfilename = myWkDirname + "order.txt"
+        logfile.AppendLine("geosfmsarun.exe program copied to working directory")
 
-        'orderfile = LineFile.Make((orderfilename).AsFileName, #FILE_PERM_READ)
-        '        If (orderfile = nil) Then
-        '            MsgBox.error("Cannot determine computational order." + nl + "Run 'Generate basin file' menu to create order.txt", "Geospatial Stream Flow Model")
-        ' exit
-        '        End If
-        '        ordlist = List.make
-        '        ordsize = orderfile.getsize
-        '        If (ordsize < 2) Then
-        '            MsgBox.error("Cannot determine computational order." + nl + "Run 'Generate basin file' menu to create order.txt", "Geospatial Stream Flow Model")
-        '  exit
-        '        End If
-        '        orderlist = List.make
-        '        orderfile.read(ordlist, ordsize)
-        '        For Each ordnum In ordlist
-        '            If (ordnum.asstring.IsNumber) Then
-        '                orderlist.add(ordnum.asstring)
-        '            End If
-        '        Next
-        '        orderfile.close()
+        Dim geosfmdllFN As String = ""
+        If FileExists(lOutputPath & "geosfm.dll") Then
+            geosfmdllFN = lOutputPath & "geosfm.dll"
+        ElseIf FileExists(lBasinsBinLoc & "\geosfm.dll") Then
+            File.Copy(lBasinsBinLoc & "\geosfm.dll", lOutputPath & "geosfm.dll")
+            geosfmdllFN = lOutputPath & "geosfm.dll"
+        Else
+            Logger.Msg("Unable to locate the program file: geosfm.dll " & vbCrLf & vbCrLf & "Install the programs in your BASINS/bin folder.", "Geospatial Stream Flow Model")
+            Exit Sub
+        End If
 
-        '        senpos = MsgBox.choiceasstring(orderlist, "Select the river reach for sensitivity analysis", "Geospatial Stream Flow Model")
-        '        If (senpos = nil) Then
-        '  exit
-        '        Else
-        '            mypos = ordlist.findbyvalue(senpos.asstring)
-        '            If (mypos = -1) Then
-        '                MsgBox.info("Specified RiverID not found in order file", "Geospatial Stream Flow Model")
-        '    exit
-        '            End If
-        '        End If
+        logfile.AppendLine("geosfm.dll program copied to working directory")
 
-        '        If (File.Exists((myWkDirname + "whichModel.txt").AsFileName).not) Then
+        If Not FileExists(lOutputPath & "dforrt.dll") Then
+            If FileExists(lBasinsBinLoc & "\dforrt.dll") Then
+                File.Copy(lBasinsBinLoc & "\dforrt.dll", lOutputPath & "dforrt.dll")
+            End If
+        End If
 
-        '  whichmodelfile = LineFile.Make((myWkDirname + "whichModel.txt").asfilename,#file_perm_write)
-        '            If (whichmodelfile = nil) Then
-        '                MsgBox.info("Could not create whichModel.txt file" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '    exit
-        '            End If
+        Dim lProcess As New Diagnostics.Process
+        With lProcess.StartInfo
+            .FileName = lOutputPath & "geosfmsarun.exe"
+            .WorkingDirectory = lOutputPath
+            .Arguments = ""
+            .CreateNoWindow = False
+            .UseShellExecute = True
+        End With
+        lProcess.Start()
+        While Not lProcess.HasExited
+            Windows.Forms.Application.DoEvents()
+            Threading.Thread.Sleep(50)
+        End While
 
-        '  methodlst = {"One Soil Layer, Muskingum-Cunge Routing", "One Soil Layer, Diffusion Routing", "One Soil Layer, Lag Routing", "Two Soil Layers, Muskingum-Cunge Routing", "Two Soil Layers, Diffusion Routing", "Two Soil Layers, Lag Routing" }
+        logfile.AppendLine("Calibration Program Successfully Executed!")
+        SaveFileString(logfileFN, logfile.ToString)
 
-        '            methodtypestr = MsgBox.ChoiceAsString(methodlst, "Select Model Configuration", "Geospatial Stream Flow Model")
-        '            If (methodtypestr = nil) Then
-        '    exit
-        '            End If
-
-        '            If (methodlst.findbyValue(methodtypestr) = 0) Then
-        '                balancetype = "1"
-        '                routetype = "2"
-        '            ElseIf (methodlst.findbyValue(methodtypestr) = 1) Then
-        '                balancetype = "1"
-        '                routetype = "1"
-        '            ElseIf (methodlst.findbyValue(methodtypestr) = 2) Then
-        '                balancetype = "1"
-        '                routetype = "3"
-        '            ElseIf (methodlst.findbyValue(methodtypestr) = 3) Then
-        '                balancetype = "2"
-        '                routetype = "2"
-        '            ElseIf (methodlst.findbyValue(methodtypestr) = 4) Then
-        '                balancetype = "2"
-        '                routetype = "1"
-        '            ElseIf (methodlst.findbyValue(methodtypestr) = 5) Then
-        '                balancetype = "2"
-        '                routetype = "3"
-        '            Else
-        '                balancetype = "1"
-        '                routetype = "2"
-        '            End If
-
-        '            whichmodelfile.WriteElt("Model Index   Index description")
-        '            whichmodelfile.WriteElt(balancetype + " //water balance model:  1=1D balance, 2=2D balance")
-        '            whichmodelfile.WriteElt(routetype + " //routing model:  1=diffusion 2=Muskingham-Cunge 3=lag")
-        '            whichmodelfile.flush()
-        '            whichmodelfile.close()
-
-        '        Else
-
-        '  whichmodelfile = LineFile.Make((myWkDirname + "whichModel.txt").asfilename,#file_perm_read)
-        '            If (whichmodelfile = nil) Then
-        '                MsgBox.info("Could not create whichModel.txt file" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '    exit
-        '            End If
-
-        '            whichsize = (whichmodelfile.getsize)
-        '            biglist = List.make
-        '            whichmodelfile.Read(biglist, whichsize)
-        '            balancetype = biglist.get(1).asstring.astokens(" ,/").get(0)
-        '            routetype = biglist.get(2).asstring.astokens(" ,/").get(0)
-        '            whichmodelfile.close()
-        '  methodlst = {"One Soil Layer, Muskingum-Cunge Routing", "One Soil Layer, Diffusion Routing", "One Soil Layer, Lag Routing", "Two Soil Layers, Muskingum-Cunge Routing", "Two Soil Layers, Diffusion Routing", "Two Soil Layers, Lag Routing" }
-
-        '            If ((balancetype = 1) And (routetype = 2)) Then
-        '                methodtypestr = methodlst.get(0)
-        '            ElseIf ((balancetype = 1) And (routetype = 1)) Then
-        '                methodtypestr = methodlst.get(1)
-        '            ElseIf ((balancetype = 1) And (routetype = 3)) Then
-        '                methodtypestr = methodlst.get(2)
-        '            ElseIf ((balancetype = 2) And (routetype = 2)) Then
-        '                methodtypestr = methodlst.get(3)
-        '            ElseIf ((balancetype = 2) And (routetype = 1)) Then
-        '                methodtypestr = methodlst.get(4)
-        '            ElseIf ((balancetype = 2) And (routetype = 3)) Then
-        '                methodtypestr = methodlst.get(5)
-        '            Else
-        '                methodtypestr = methodlst.get(0)
-        '            End If
-
-        '        End If
-
-
-        '        logfile.WriteElt("Routing Models Selected as " + methodtypestr.asstring)
-
-        'rangeFile = LineFile.Make((myWkDirname + "range.txt").asfilename,#file_perm_write)
-        '        If (rangeFile = nil) Then
-        '            MsgBox.info("Could not open range.txt file," + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '  exit
-        '        End If
-
-        '        If (balancetype.isnumber.not) Then
-        '            balancetype = "2"
-        '            balancenum = 2
-        '        Else
-        '            balancenum = balancetype.asstring.asnumber
-        '            If (balancenum > 2) Then
-        '                balancenum = 2
-        '            End If
-        '        End If
-
-        '        'if(balancenum = 1) then
-        '        '  rngparamnamelst = list.make
-        '        '  rngparamnamelst.add("SoilWHC, Soil water holding capacity (mm)")
-        '        '  rngparamnamelst.add("Depth, Total soil depth (cm)")
-        '        '  rngparamnamelst.add("Interflow, Interflow storage residence time (days)")
-        '        '  rngparamnamelst.add("Baseflow, Baseflow reservoir residence time (days)") 
-        '        '  rngparamnamelst.add("RivFPloss, Fraction of soil water infiltrating to ground water") 
-        '        '  rngparamnamelst.add("RivLoss, Fraction of flow lost within the river channel")
-        '        '  rngparamnamelst.add("Celerity, Flood wave celerity (m/s)")
-        '        '  
-        '        '  inparamrangelst = list.make
-        '        '  inparamrangelst.add("0.01,7.29")
-        '        '  inparamrangelst.add("0.009,1.83")
-        '        '  inparamrangelst.add("0.12,11.02")
-        '        '  inparamrangelst.add("0.06,7.47") 
-        '        '  inparamrangelst.add("0.1,1.01") 
-        '        '  inparamrangelst.add("0.1,1.01")
-        '        '  inparamrangelst.add("0.13,6.25")
-        '        '
-        '        'else  
-        '        '  rngparamnamelst = list.make
-        '        '  rngparamnamelst.add("SoilWHC, Soil water holding capacity (mm)")
-        '        '  rngparamnamelst.add("Depth, Total soil depth (cm)")
-        '        '  rngparamnamelst.add("Slope, Average subbasin slope") 
-        '        '  rngparamnamelst.add("Baseflow, Baseflow reservoir residence time (days)") 
-        '        '  rngparamnamelst.add("RivFPloss, Fraction of soil water infiltrating to ground water") 
-        '        '  rngparamnamelst.add("RivSlope, Average slope of the river")    
-        '        '  rngparamnamelst.add("RivWidth, Average channel width (m)") 
-        '        '
-        '        '  inparamrangelst = list.make
-        '        '  inparamrangelst.add("0.01,7.29")
-        '        '  inparamrangelst.add("0.009,1.83")
-        '        '  inparamrangelst.add("0.01,1.03") 
-        '        '  inparamrangelst.add("0.06,7.47") 
-        '        '  inparamrangelst.add("0.1,1.01") 
-        '        '  inparamrangelst.add("0.02,4.12")    
-        '        '  inparamrangelst.add("0.005,4.38") 
-        '        '
-        '        'end
-
-        '        rngparamnamelst = List.make
-        '        rngparamnamelst.add("SoilWhc, Soil water holding capacity (mm)")
-        '        rngparamnamelst.add("Depth, Total soil depth (cm)")
-        '        rngparamnamelst.add("Texture, Soil texture: 1=Sand 2=Loam 3=Clay 5=Water")
-        '        rngparamnamelst.add("Ks, Saturated hydraulic conductivity (cm/hr)")
-        '        rngparamnamelst.add("Interflow, Interflow storage residence time (days)")
-        '        rngparamnamelst.add("HSlope, Average subbasin slope")
-        '        rngparamnamelst.add("Baseflow, Baseflow reservoir residence time (days)")
-        '        rngparamnamelst.add("CurveNum, SCS runoff curve number")
-        '        rngparamnamelst.add("MaxCover, Permanently impervious cover fraction")
-        '        rngparamnamelst.add("BasinLoss, Fraction of soil water to ground water")
-        '        rngparamnamelst.add("PanCoeff, Pan coefficient for correcting PET readings")
-        '        rngparamnamelst.add("TopSoil, Fraction of soil layer hydrologically active")
-        '        rngparamnamelst.add("RainCalc, Excess mode 1=Philip 2=SCS 3=BucketModel")
-        '        rngparamnamelst.add("RivRough, Channel Roughness (Manning n)")
-        '        rngparamnamelst.add("RivSlope, Average slope of the river")
-        '        rngparamnamelst.add("RivWidth, Average channel width (m)")
-        '        rngparamnamelst.add("RivLoss, Fraction of flow lost within river channel")
-        '        rngparamnamelst.add("RivFPLoss, Fraction of river flow lost in floodplain")
-        '        rngparamnamelst.add("Celerity, Flood wave celerity (m/s)")
-        '        rngparamnamelst.add("Diffusion, Flow attenuation coefficient (m^2/s)")
-        '        'rngparamnamelst.add("Balmodel, Number of Soil Layers 1=OneLayer or 2=TwoLayers")
-        '        'rngparamnamelst.add("Routemodel, Routing Model 1=Diffusion 2=Muskingham-Cunge 3=Lag")
-
-        '        inparamrangelst = List.make
-        '        inparamrangelst.Add("1,600")
-        '        inparamrangelst.Add("1,800")
-        '        inparamrangelst.Add("1,5")
-        '        inparamrangelst.Add("0.001,150")
-        '        inparamrangelst.Add("1,365")
-        '        inparamrangelst.Add("0.001,10")
-        '        inparamrangelst.Add("1,365")
-        '        inparamrangelst.Add("25,98")
-        '        inparamrangelst.Add("0.01,1")
-        '        inparamrangelst.Add("0.001,0.5")
-        '        inparamrangelst.Add("0.6,0.95")
-        '        inparamrangelst.Add("0.05,1")
-        '        inparamrangelst.Add("1,3")
-        '        inparamrangelst.Add("0.012,0.07")
-        '        inparamrangelst.Add("0.001,10")
-        '        inparamrangelst.Add("30,1000")
-        '        inparamrangelst.Add("0.01,0.5")
-        '        inparamrangelst.Add("0.01,0.5")
-        '        inparamrangelst.Add("0.1,5")
-        '        inparamrangelst.Add("100,10000")
-
-        '        'inparamrangelst = list.make
-        '        'inparamrangelst.Add("0.1,5")
-        '        'inparamrangelst.Add("0.1,5")
-        '        'inparamrangelst.Add("0.3,3")
-        '        'inparamrangelst.Add("0.1,10")
-        '        'inparamrangelst.Add("0.1,5")
-        '        'inparamrangelst.Add("0.5,1.5") 
-        '        'inparamrangelst.Add("0.1,5") 
-        '        'inparamrangelst.Add("0.5,1.5")
-        '        'inparamrangelst.Add("0.1,5")
-        '        'inparamrangelst.Add("0.1,5") 
-        '        'inparamrangelst.Add("0.1,5")
-        '        'inparamrangelst.Add("0.1,5")
-        '        'inparamrangelst.Add("0.1,5")
-        '        'inparamrangelst.Add("0.1,5") 
-        '        'inparamrangelst.Add("0.1,5")    
-        '        'inparamrangelst.Add("0.1,5") 
-        '        'inparamrangelst.Add("0.1,5")
-        '        'inparamrangelst.Add("0.1,5")
-        '        'inparamrangelst.Add("0.1,5")
-        '        'inparamrangelst.Add("0.05,10.0")
-
-        '        outrangelst = MsgBox.multiinput("Enter the multiplier range for sensitivity parameters", mytitle, rngparamnamelst, inparamrangelst)
-        '        If (outrangelst.isempty) Then
-        '  exit
-        '        End If
-
-        '        rangeFile.WriteElt("Min, Max, Name, Description")
-        '        rindex = 0
-        '        For Each rparam In outrangelst
-        '            rangeFile.WriteElt(rparam.asstring + ", " + rngparamnamelst.get(rindex).asstring)
-        '            rindex = rindex + 1
-        '        Next
-
-        '        If (File.Exists((myWkDirname + "basin_original.txt").AsFileName).not) Then
-        '            If (File.Exists((myWkDirname + "basin.txt").AsFileName)) Then
-        '                File.Copy(((myWkDirname + "basin.txt").AsFileName), ((myWkDirname + "basin_original.txt").AsFileName))
-        '    origbasinfile = LineFile.Make((myWkDirname + "basin_original.txt").asfilename,#file_perm_read)
-        '                If (origbasinfile = nil) Then
-        '                    MsgBox.info("Could not open basin.txt or basin_original.txt" + nl + "File(s) may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '      exit
-        '                End If
-        '            Else
-        '                MsgBox.info("Could not open basin.txt or basin_original.txt" + nl + "File(s) may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '    exit
-        '            End If
-        'elseif ((File.Exists((myWkDirname + "basin_original.txt").AsFileName)) and (File.Candelete((myWkDirname + "basin_original.txt").AsFileName))) then
-        '                File.Delete((myWkDirname + "basin_original.txt").AsFileName)
-        '                File.Copy(((myWkDirname + "basin.txt").AsFileName), ((myWkDirname + "basin_original.txt").AsFileName))
-        '  origbasinfile = LineFile.Make((myWkDirname + "basin_original.txt").asfilename,#file_perm_read)
-        '                If (origbasinfile = nil) Then
-        '                    MsgBox.info("Could not open basin_original.txt" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '    exit
-        '            End If
-        '                Else
-        '  origbasinfile = LineFile.Make((myWkDirname + "basin_original.txt").asfilename,#file_perm_read)
-        '                    If (origbasinfile = nil) Then
-        '                        MsgBox.info("Could not open basin_original.txt" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '    exit
-        '            End If
-        '        End If
-
-        '        If (File.Exists((myWkDirname + "river_original.txt").AsFileName).not) Then
-        '            If (File.Exists((myWkDirname + "river.txt").AsFileName)) Then
-        '                File.Copy(((myWkDirname + "river.txt").AsFileName), ((myWkDirname + "river_original.txt").AsFileName))
-        '    origriverfile = LineFile.Make((myWkDirname + "river_original.txt").asfilename,#file_perm_read)
-        '                If (origriverfile = nil) Then
-        '                    MsgBox.info("Could not open river.txt or river_original.txt" + nl + "File(s) may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '      exit
-        '                End If
-        '            Else
-        '                MsgBox.info("Could not open river.txt or river_original.txt" + nl + "File(s) may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '    exit
-        '            End If
-        'elseif ((File.Exists((myWkDirname + "river_original.txt").AsFileName)) and (File.Candelete((myWkDirname + "river_original.txt").AsFileName))) then
-        '                File.Delete((myWkDirname + "river_original.txt").AsFileName)
-        '                File.Copy(((myWkDirname + "river.txt").AsFileName), ((myWkDirname + "river_original.txt").AsFileName))
-        '  origriverfile = LineFile.Make((myWkDirname + "river_original.txt").asfilename,#file_perm_read)
-        '                If (origriverfile = nil) Then
-        '                    MsgBox.info("Could not open river_original.txt" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '    exit
-        '            End If
-        '                Else
-        '  origriverfile = LineFile.Make((myWkDirname + "river_original.txt").asfilename,#file_perm_read)
-        '                    If (origriverfile = nil) Then
-        '                        MsgBox.info("Could not open river_original.txt" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '    exit
-        '            End If
-        '        End If
-
-        '        origsize = (origriverfile.getsize)
-        '        biglist = List.make
-        '        origriverfile.Read(biglist, origsize)
-        '        headerlst = List.make
-        ' For each orec in 1..(origsize - 1)
-        '            headerstr = biglist.get(orec).asstring.astokens(",").get(0)
-        '            headerlst.add(headerstr)
-        '        Next
-
-        '        origbasinfile.close()
-        '        origriverfile.close()
-
-        '        logfile.WriteElt("River and Basin Files Read")
-
-
-        'moscemparamfile = LineFile.Make((myWkDirname + "moscem_param.txt").asfilename,#file_perm_write)
-        '        If (moscemparamfile = nil) Then
-        '            MsgBox.info("Could not create moscem_param.txt file" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '  exit
-        '        End If
-        '        moscemparamfile.WriteElt(1.asstring)
-        '        moscemparamfile.WriteElt(ntsteps.asstring)
-        '        moscemparamfile.WriteElt(ntsteps.asstring)
-        '        moscemparamfile.WriteElt(1.asstring)
-        '        moscemparamfile.WriteElt(-9999.asstring)
-        '        moscemparamfile.WriteElt(1.asstring)
-        '        moscemparamfile.WriteElt(mypos.asstring)
-        '        moscemparamfile.close()
-
-        '        rangeFile.close()
-
-        '        logfile.WriteElt("River and Basin Parameter Ranges Confirmed")
-
-        'oatfile = LineFile.Make((myWkDirname + "oat.txt").asfilename,#file_perm_write)
-        '        If (oatfile = nil) Then
-        '            MsgBox.info("Could not create oat.txt file" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '  exit
-        '        End If
-        '        oatfile.close()
-
-        'sarunoutputfile = LineFile.Make((myWkDirname + "sarunoutput.txt").asfilename,#file_perm_write)
-        '        If (sarunoutputfile = nil) Then
-        '            MsgBox.info("Could not create sarunoutput.txt file" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '  exit
-        '        End If
-        '        sarunoutputfile.close()
-
-        'sensanalysisfile = LineFile.Make((myWkDirname + "sensanalysis.txt").asfilename,#file_perm_write)
-        '        If (sensanalysisfile = nil) Then
-        '            MsgBox.info("Could not create sensanalysis.txt file" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '  exit
-        '        End If
-        '        sensanalysisfile.close()
-
-        '        If (File.Exists((myWkDirname + "geosfmsarun.exe").AsFileName)) Then
-        '            geosfmsarunFN = (myWkDirname + "geosfmsarun.exe").AsFileName
-        '        ElseIf (File.Exists(("$AVEXT\geosfmsarun.exe").AsFileName)) Then
-        '  ziplistfile = LineFile.Make((myWkDirname + "ziplist.bat").AsFileName, #FILE_PERM_WRITE)
-        '            If (ziplistfile = nil) Then
-        '                MsgBox.error("Cannot open output file: ziplist.bat" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '   exit
-        '            End If
-        '            ziplistfile.WriteElt("Copy " + (("$AVEXT\geosfmsarun.exe").AsFileName).GetFullName + +myWkDirname + "geosfmsarun.exe")
-        '            ziplistfile.flush()
-        '            ziplistfile.close()
-
-        '            System.ExecuteSynchronous("ziplist.bat")
-        '            geosfmcalibFN = (myWkDirname + "geosfmsarun.exe").AsFileName
-        '            Else
-        '                MsgBox.info("Unable to locate the program file: geosfmsarun.exe " + nl + nl + "Install the programs in your ArcView/Ext32 or working directory.", "Geospatial Stream Flow Model")
-        '  exit
-        '        End If
-
-        '        logfile.WriteElt("geosfmsarun.exe program copied to working directory")
-
-        '        If (File.Exists((myWkDirname + "geosfm.dll").AsFileName)) Then
-        '            geosfmdllFN = (myWkDirname + "geosfm.dll").AsFileName
-        '        ElseIf (File.Exists(("$AVEXT\geosfm.dll").AsFileName)) Then
-        '  ziplistfile = LineFile.Make((myWkDirname + "ziplist.bat").AsFileName, #FILE_PERM_WRITE)
-        '            If (ziplistfile = nil) Then
-        '                MsgBox.error("Cannot open output file: ziplist.bat" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '   exit
-        '            End If
-        '            ziplistfile.WriteElt("Copy " + (("$AVEXT\geosfm.dll").AsFileName).GetFullName + +myWkDirname + "geosfm.dll")
-        '            ziplistfile.flush()
-        '            ziplistfile.close()
-
-        '            System.ExecuteSynchronous("ziplist.bat")
-        '            geosfmdllFN = (myWkDirname + "geosfm.dll").AsFileName
-        '            Else
-        '                MsgBox.info("Unable to locate the program file: geosfm.dll " + nl + nl + "Install the programs in your ArcView/Ext32 or working directory.", "Geospatial Stream Flow Model")
-        '  exit
-        '        End If
-
-        '        logfile.WriteElt("geosfm.dll program copied to working directory")
-
-        '        av.ShowMsg("Performing Sensitivity Analysis........")
-
-        'ziplistfile = LineFile.Make((myWkDirname + "ziplist.bat").AsFileName, #FILE_PERM_WRITE)
-        '        If (ziplistfile = nil) Then
-        '            MsgBox.error("Cannot open output file: ziplist.bat" + nl + "File may be open or tied up by another program", "GeoSFM Utilities")
-        ' exit
-        '        End If
-        '        ziplistfile.WriteElt("geosfmsarun.exe")
-        '        ziplistfile.flush()
-        '        ziplistfile.close()
-        '        System.ExecuteSynchronous("ziplist.bat")
-
-        '        logfile.WriteElt("Calibration Program Successfully Executed!")
-
-        '        av.ClearMsg()
-
-        '        oldout = theProject.finddoc("sarunoutput.txt")
-        '        If (oldout <> nil) Then
-        '            theproject.removedoc(oldout)
-        '        End If
-
-        '        If (File.Exists((myWkDirname + "sarunoutput.txt").AsFileName)) Then
-        '            outputtable = Vtab.make(("sarunoutput.txt").asfilename, False, False)
-        '            MsgBox.info("Sensitivity Analysis Complete. Results written to: sarunoutput.txt", "Geospatial Stream Flow Model")
-        '        Else
-        '            MsgBox.info("Output file, sarunoutput.txt, not found." + nl + "Check log file, logfilesarun.txt, for possible errors", "Geospatial Stream Flow Model")
-        '        End If
+        Dim SArunOutputFN As String = lOutputPath & "sarunoutput.txt"
+        If FileExists(SArunOutputFN) Then
+            Logger.Msg("Sensitivity Analysis Complete. Results written to: sarunoutput.txt", "Geospatial Stream Flow Model")
+        Else
+            Logger.Msg("Output file, sarunoutput.txt, not found." & vbCrLf & "Check log file, logfilesarun.txt, for possible errors", "Geospatial Stream Flow Model")
+        End If
 
     End Sub
 
@@ -3647,6 +2526,1035 @@ Public Module modGeoSFM
         '
         ' ***********************************************************************************************
         ' ***********************************************************************************************
+
+        '        TheProject = av.GetProject
+        '        theFileName = theProject.GetFileName
+        '        If (theFileName = nil) Then
+        '            av.Run("Project.SaveAs", nil)
+        '            theFileName = theProject.GetFileName
+        '            If (theFileName = nil) Then
+        '                Exit Sub
+        '            End If
+        '        Else
+        '            If (av.Run("Project.CheckForEdits", nil).Not) Then
+        '                Return nil
+        '            End If
+        '            If (theProject.Save) Then
+        '                av.ShowMsg("Project saved to '" + theFileName.GetBaseName + "'")
+        '    if (System.GetOS = #SYSTEM_OS_MAC) then
+        '                    Script.Make("MacClass.SetDocInfo(SELF, Project)").DoIt(theFileName)
+        '                End If
+        '            End If
+        '        End If
+
+        '        TheView = av.GetActiveDoc
+        '        ViewChk = TheView.GetGUI
+        '        If (ViewChk <> "View") Then
+        '            MsgBox.error("Click on the View to make it 'active' before running this program", "")
+        '            Exit Sub
+        '        End If
+
+        '        ' Check the working directory
+        '        TheWkDir = TheProject.GetFileName.ReturnDir
+
+        '        'if(theWkdir.contains
+
+        '        myWkDirname = MsgBox.Input("Specify your working directory", "Working Directory", TheWkDir.GetFullName)
+        '        If (mywkDirName = nil) Then
+        '            Exit Sub
+        '        End If
+        '        If (File.Exists(myWkDirname.AsFileName).not) Then
+        '            MsgBox.Error("Cannot read directory " + myWkDirname, "Directory Specification Error")
+        '            Exit Sub
+        '        End If
+        '        If (File.IsWritable(myWkDirname.AsFileName).not) Then
+        '            MsgBox.Error(myWkDirname + +"is not writable.", "Directory Specification Error")
+        '            Exit Sub
+        '        End If
+        '        TheProject.SetWorkDir(myWkDirname.AsFileName)
+
+        '        If ((myWkDirname.contains("\").Not) And (myWkDirname.contains("/")) And (myWkDirname.right(1) <> "/")) Then
+        '            myWkDirname = myWkDirname + "/"
+        '        ElseIf ((myWkDirname.contains("\")) And (myWkDirname.right(1) <> "\")) Then
+        '            myWkDirname = myWkDirname + "\"
+        '        ElseIf ((myWkDirname.contains("\").Not) And (myWkDirname.contains("\").Not) And (myWkDirname.right(1) <> "/")) Then
+        '            myWkDirname = myWkDirname + "/"
+        '        End If
+
+        '        balparamfn = myWkDirname + "balparam.txt"
+        '        If (File.Exists(balparamfn.AsFileName).not) Then
+        '  av.run("FEWS.balance.ave", {})
+        '        End If
+        'balparamFile = LineFile.Make(balparamfn.asfilename,#file_perm_modify)
+        '        If (balparamFile = nil) Then
+        '            MsgBox.info("Could not open balparam.txt file," + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+        '        If (balparamFile.getsize < 9) Then
+        '            MsgBox.info("Not enough parameters in balparam.txt file," + nl + "Check the contents of this file before continuing.", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+        '        ballist = List.make
+        '        balparamFile.read(ballist, balparamFile.getsize)
+        '        balparamfile.gotobeg()
+        '        balparamfile.setpos(9)
+        '        balparamfile.writeelt("1")
+        '        balparamfile.flush()
+        '        balparamFile.close()
+
+        '        routparamfn = myWkDirname + "routparam.txt"
+
+        '        If (File.Exists(routparamfn.AsFileName).not) Then
+        '  av.run("FEWS.route.ave", {})
+        '        End If
+        'routparamFile = LineFile.Make(routparamfn.asfilename,#file_perm_modify)
+        '        If (routparamFile = nil) Then
+        '            MsgBox.info("Could not open routparam.txt file," + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+        '        If (routparamFile.getsize < 9) Then
+        '            MsgBox.info("Not enough parameters in routparam.txt file," + nl + "Check the contents of this file before continuing.", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+        '        routlist = List.make
+        '        routparamFile.read(routlist, routparamFile.getsize)
+        '        routparamFile.gotobeg()
+        '        routparamFile.setpos(9)
+        '        routparamFile.writeelt("1")
+        '        routparamFile.flush()
+        '        routparamFile.close()
+
+        '        balfilesfn = myWkDirname + "balfiles.txt"
+        '        If (File.Exists(balfilesfn.AsFileName).not) Then
+        '  av.run("FEWS.balance.ave", {})
+        '        End If
+        'balfilesFile = LineFile.Make(balfilesfn.asfilename,#file_perm_read)
+        '        If (balfilesFile = nil) Then
+        '            MsgBox.info("Could not open balfiles.txt file," + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+        '        balfilesFile.close()
+
+        '        routfilesfn = myWkDirname + "routfiles.txt"
+        '        If (File.Exists(routfilesfn.AsFileName).not) Then
+        '  av.run("FEWS.route.ave", {})
+        '        End If
+        'routfilesFile = LineFile.Make(routfilesfn.asfilename,#file_perm_read)
+        '        If (routfilesFile = nil) Then
+        '            MsgBox.info("Could not open routfiles.txt file," + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+        '        routfilesFile.close()
+
+        'caliblabels = { "Streamflow Model Parameters File", 
+        '          "Optimization Flag File", 
+        '          "Observed Streamflow File", 
+        '          "Objective Function File", 
+        '          "Parameter Multiplier File", 
+        '          "Parameter Convergence File", 
+        '          "Calibration Input-Ouput File",
+        '          "Calibration Configuration File", 
+        '          "Streamflow Model Configuration File", 
+        '          "Original Basin Parameter File", 
+        '          "Original River Parameter File", 
+        '          "Final Basin Parameter File", 
+        '          "Final River Parameter File",
+        '          "Output Streamflow File"}
+
+        'calibdefaults = { "parameter.in", 
+        '          "objoptflag.in", 
+        '          "observed_streamflow.txt", 
+        '          "objectives.out", 
+        '          "parameter_values.out", 
+        '          "par_convergence.out", 
+        '          "moscem.in", 
+        '          "moscem_param.txt", 
+        '          "whichModel.txt", 
+        '          "basin_original.txt", 
+        '          "river_original.txt", 
+        '          "basin.txt", 
+        '          "river.txt", 
+        '          "streamflow.txt" }
+
+        '        inpList = MsgBox.MultiInput("Enter Model Parameters.", "Geospatial Stream Flow Model", caliblabels, calibdefaults)
+
+        '        If (inpList.IsEmpty) Then
+        '            Exit Sub
+        '        End If
+
+        '        parameterFN = myWkDirname + inplist.get(0)
+        '        objoptflagFN = myWkDirname + inplist.get(1)
+        '        obsflowFN = myWkDirname + inplist.get(2)
+        '        objectiveFN = myWkDirname + inplist.get(3)
+        '        paramvalFN = myWkDirname + inplist.get(4)
+        '        paramconFN = myWkDirname + inplist.get(5)
+        '        mosceminFN = myWkDirname + inplist.get(6)
+        '        moscemparamFN = myWkDirname + inplist.get(7)
+        '        whichModelFN = myWkDirname + inplist.get(8)
+        '        origbasFN = myWkDirname + inplist.get(9)
+        '        origrivFN = myWkDirname + inplist.get(10)
+        '        basinFN = myWkDirname + inplist.get(11)
+        '        riverFN = myWkDirname + inplist.get(12)
+        '        streamflowFN = myWkDirname + inplist.get(13)
+        '        'timeseriesFN = myWkDirname + inplist.get(14)
+        '        'objpostprocFN = myWkDirname + inplist.get(15)
+        '        'trdoffboundFN = myWkDirname + inplist.get(16)
+        '        'postprocinFN = myWkDirname + inplist.get(17)
+
+        'logfile = LineFile.Make((myWkDirname + "logfilecalib.txt").asfilename,#file_perm_write)
+        '        If (logfile = nil) Then
+        '            MsgBox.info("Could not create logfilecalib.txt file," + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+        'paraminFile = LineFile.Make(parameterFN.asfilename,#file_perm_write)
+        '        If (paraminFile = nil) Then
+        '            MsgBox.info("Could not create " + parameterFN + " file," + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+        'objoptflagFile = LineFile.Make(objoptflagFN.asfilename,#file_perm_write)
+        '        If (objoptflagFile = nil) Then
+        '            MsgBox.info("Could not open " + objoptflagFN + " file," + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+        '        If (File.Exists(obsflowFN.AsFileName).not) Then
+        '            MsgBox.info("Could not find observed streamflow file, " + nl + obsflowFN + nl + "Place the file in the work directory before running this program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        Else
+        '  observedfile = LineFile.Make(obsflowFN.asfilename,#file_perm_read)
+        '            If (observedfile = nil) Then
+        '                MsgBox.info("Could not open observed streamflow file, " + nl + obsflowFN + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            End If
+        '        End If
+
+        'objectivesFile = LineFile.Make(objectiveFN.asfilename,#file_perm_write)
+        '        If (objectivesFile = nil) Then
+        '            MsgBox.info("Could not create file, " + objectiveFN + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+        'paramvaluesFile = LineFile.Make(paramvalFN.asfilename,#file_perm_write)
+        '        If (paramvaluesFile = nil) Then
+        '            MsgBox.info("Could not create file, " + paramvalFN + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+        'parconvergeFile = LineFile.Make(paramconFN.asfilename,#file_perm_write)
+        '        If (parconvergeFile = nil) Then
+        '            MsgBox.info("Could not create file, " + paramconFN + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+        'mosceminfile = LineFile.Make(mosceminFN.asfilename,#file_perm_write)
+        '        If (mosceminfile = nil) Then
+        '            MsgBox.info("Could not create file, " + mosceminFN + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+        'moscemparamfile = LineFile.Make(moscemparamFN.asfilename,#file_perm_write)
+        '        If (moscemparamfile = nil) Then
+        '            MsgBox.info("Could not create file, " + moscemparamFN + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+        'basinfile = LineFile.Make(basinFN.asfilename,#file_perm_read)
+        '        If (basinfile = nil) Then
+        '            MsgBox.info("Could not open file, " + basinFN + nl + "File(s) may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+        '        basinfile.close()
+
+        'riverfile = LineFile.Make(riverFN.asfilename,#file_perm_read)
+        '        If (riverfile = nil) Then
+        '            MsgBox.info("Could not open file, " + riverFN + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+        '        riverfile.close()
+
+        '        If (File.Exists(origbasFN.AsFileName).not) Then
+        '            If (File.Exists(basinFN.AsFileName)) Then
+        '                File.Copy((basinFN.AsFileName), (origbasFN.AsFileName))
+        '    origbasinfile = LineFile.Make(origbasFN.asfilename,#file_perm_read)
+        '                If (origbasinfile = nil) Then
+        '                    MsgBox.info("Could not open basin.txt or basin_original.txt" + nl + "File(s) may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '                    Exit Sub
+        '                End If
+        '            Else
+        '                MsgBox.info("Could not open basin.txt or basin_original.txt" + nl + "File(s) may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            End If
+        'else
+        '  origbasinfile = LineFile.Make(origbasFN.asfilename,#file_perm_read)
+        '                If (origbasinfile = nil) Then
+        '                    MsgBox.info("Could not open file, " + origbasFN + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            End If
+        '        End If
+
+        '        If (File.Exists(origrivFN.AsFileName).not) Then
+        '            If (File.Exists(riverFN.AsFileName)) Then
+        '                File.Copy((riverFN.AsFileName), (origrivFN.AsFileName))
+        '    origriverfile = LineFile.Make(origrivFN.asfilename,#file_perm_read)
+        '                If (origriverfile = nil) Then
+        '                    MsgBox.info("Could not open " + riverFN + " or " + origrivFN + nl + "File(s) may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '                    Exit Sub
+        '                End If
+        '            Else
+        '                MsgBox.info("Could not open " + riverFN + " or " + origrivFN + nl + "File(s) may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            End If
+        'else
+        '  origriverfile = LineFile.Make(origrivFN.asfilename,#file_perm_read)
+        '                If (origriverfile = nil) Then
+        '                    MsgBox.info("Could not open file, " + origrivFN + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            End If
+        '        End If
+
+        'streamflowfile = LineFile.Make(streamflowFN.asfilename,#file_perm_write)
+        '        If (streamflowfile = nil) Then
+        '            MsgBox.info("Could not create file, " + streamflowFN + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+        '        streamflowfile.close()
+
+
+        'postlabels = { "Output Time Series File",
+        '          "Output Objective Convergence File",
+        '          "Output Tradeoff Boundary File",
+        '          "Processing Parameter File"}
+
+        'postdefaults = { "timeseries.txt",
+        '          "objectives_postproc.out",
+        '          "trdoff_bounds.out",
+        '          "postproc.in"}
+
+        '        inpostList = MsgBox.MultiInput("Enter Post Processing Parameters.", "Geospatial Stream Flow Model", postlabels, postdefaults)
+
+        '        If (inpostList.IsEmpty) Then
+        '            Exit Sub
+        '        End If
+
+        '        timeseriesFN = myWkDirname + inpostList.get(0)
+        '        objpostprocFN = myWkDirname + inpostList.get(1)
+        '        trdoffboundFN = myWkDirname + inpostList.get(2)
+        '        postprocinFN = myWkDirname + inpostList.get(3)
+
+
+        'timeseriesfile = LineFile.Make((timeseriesFN).asfilename,#file_perm_write)
+        '        If (timeseriesfile = nil) Then
+        '            MsgBox.info("Could not create file, " + timeseriesFN + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+        '        timeseriesfile.close()
+
+        'objpostprocFile = LineFile.Make(objpostprocFN.asfilename,#file_perm_write)
+        '        If (objpostprocFile = nil) Then
+        '            MsgBox.info("Could not open " + objpostprocFN + " file," + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+        '        objpostprocFile.close()
+
+        'trdoffboundFile = LineFile.Make(trdoffboundFN.asfilename,#file_perm_write)
+        '        If (trdoffboundFile = nil) Then
+        '            MsgBox.info("Could not create " + trdoffboundFN + " file," + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+        '        trdoffboundFile.close()
+
+        'postprocinFile = LineFile.Make(postprocinFN.asfilename,#file_perm_write)
+        '        If (postprocinFile = nil) Then
+        '            MsgBox.info("Could not create " + postprocinFN + " file," + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+        '        postprocinFile.close()
+
+
+        '        If (File.Exists(whichmodelFN.AsFileName)) Then
+        '  whichmodelfile = LineFile.Make((myWkDirname + "whichModel.txt").asfilename,#file_perm_read)
+        '            If (whichmodelfile = nil) Then
+        '                MsgBox.info("Could not create whichModel.txt file" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            End If
+        '            whichsize = (whichmodelfile.getsize)
+
+        '            biglist = List.make
+        '            If (whichsize > 2) Then
+        '                whichmodelfile.Read(biglist, whichsize)
+        '                balancetype = biglist.get(1).asstring.astokens(" ,/").get(0).asstring
+        '                routetype = biglist.get(2).asstring.astokens(" ,/").get(0).asstring
+        '            Else
+        '                balancetype = "1"
+        '                routetype = "2"
+        '            End If
+
+        '            whichmodelfile.close()
+        '            If ((balancetype = "1") And (routetype = "3")) Then
+        '                balstr = "Linear Soil Model, Lag Routing"
+        '            ElseIf ((balancetype = "1") And (routetype = "1")) Then
+        '                balstr = "Linear Soil Model, Diffusion Routing"
+        '            ElseIf ((balancetype = "1") And (routetype = "2")) Then
+        '                balstr = "Linear Soil Model, Muskingum-Cunge Routing"
+        '            ElseIf ((balancetype = "2") And (routetype = "3")) Then
+        '                balstr = "Non-Linear Soil Model, Lag Routing"
+        '            ElseIf ((balancetype = "2") And (routetype = "1")) Then
+        '                balstr = "Non-Linear Soil Model, Diffusion Routing"
+        '            Else
+        '                balstr = "Non-Linear Soil Model, Muskingum-Cunge Routing"
+        '            End If
+        '  methodlst = {balstr, "Linear Soil Model, Muskingum-Cunge Routing", "Linear Soil Model, Diffusion Routing", "Linear Soil Model, Lag Routing", "Non-Linear Soil Model, Muskingum-Cunge Routing", "Non-Linear Soil Model, Diffusion Routing", "Non-Linear Soil Model, Lag Routing" }
+        'else
+        '  methodlst = {"Linear Soil Model, Muskingum-Cunge Routing", "Linear Soil Model, Diffusion Routing", "Linear Soil Model, Lag Routing", "Non-Linear Soil Model, Muskingum-Cunge Routing", "Non-Linear Soil Model, Diffusion Routing", "Non-Linear Soil Model, Lag Routing" }
+        '        End If
+
+        'whichmodelfile = LineFile.Make(whichmodelFN.asfilename,#file_perm_write)
+        '        If (whichmodelfile = nil) Then
+        '            MsgBox.info("Could not create file, " + whichmodelFN + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+        '        methodtypestr = MsgBox.ChoiceAsString(methodlst, "Select Model Configuration", "Geospatial Stream Flow Model")
+        '        If (methodtypestr = nil) Then
+        '            Exit Sub
+        '        End If
+        'methodlst = {"Linear Soil Model, Muskingum-Cunge Routing", "Linear Soil Model, Diffusion Routing", "Linear Soil Model, Lag Routing", "Non-Linear Soil Model, Muskingum-Cunge Routing", "Non-Linear Soil Model, Diffusion Routing", "Non-Linear Soil Model, Lag Routing" }
+
+        '        If (methodtypestr = "Linear Soil Model, Lag Routing") Then
+        '            balancetype = "1"
+        '            routetype = "3"
+        '        ElseIf (methodtypestr = "Linear Soil Model, Diffusion Routing") Then
+        '            balancetype = "1"
+        '            routetype = "1"
+        '        ElseIf (methodtypestr = "Linear Soil Model, Muskingum-Cunge Routing") Then
+        '            balancetype = "1"
+        '            routetype = "2"
+        '        ElseIf (methodtypestr = "Non-Linear Soil Model, Lag Routing") Then
+        '            balancetype = "2"
+        '            routetype = "3"
+        '        ElseIf (methodtypestr = "Non-Linear Soil Model, Diffusion Routing") Then
+        '            balancetype = "2"
+        '            routetype = "1"
+        '        ElseIf (methodtypestr = "Non-Linear Soil Model, Muskingum-Cunge Routing") Then
+        '            balancetype = "2"
+        '            routetype = "2"
+        '        Else
+        '            balancetype = "1"
+        '            routetype = "2"
+        '        End If
+
+        '        whichmodelfile.WriteElt("Model Index   Index description")
+        '        whichmodelfile.WriteElt(balancetype + " //water balance model:  1=1D balance, 2=2D balance")
+        '        whichmodelfile.WriteElt(routetype + " //routing model:  1=diffusion 2=Muskingum-Cunge 3=lag")
+        '        whichmodelfile.flush()
+
+        '        logfile.WriteElt("Routing Models Selected as " + methodtypestr.asstring)
+
+
+        '        minparlst = List.make
+        '        maxparlst = List.make
+
+        '        origbsize = (origbasinfile.getsize)
+        '        bigblist = List.make
+
+        '        'store the positions of calibered variables
+        'magbposlst = {1,2,3,4,6,7,8,9,10,11,12,13,14}
+        'magrposlst = {6,3,14,7,8,12,13}
+
+        '        origbasinfile.Read(bigblist, origbsize)
+        '        minparlst = List.make
+        '        minparlst = List.make
+
+        'for each beg in 0..19
+        '            minparlst.add(0)
+        '            maxparlst.add(0)
+        '        Next
+
+        '        headerblst = List.make
+        'for each obrec in 1..(origbsize - 1)
+        '            headerbstr = bigblist.get(obrec).asstring.astokens(",").get(0)
+        '            headerblst.add(headerbstr)
+        '            chkparblst = bigblist.get(obrec).asstring.astokens(",")
+        '            numbrecs = chkparblst.count
+        '  For each bbrec in 0..(magbposlst.count - 1)
+        '                magbid = magbposlst.get(bbrec)
+        '                chkbpar = chkparblst.get(magbid).asstring.asnumber
+        '                If (chkbpar < minparlst.get(bbrec)) Then
+        '                    minparlst.set(bbrec, chkbpar)
+        '                End If
+        '                If (chkbpar > maxparlst.get(bbrec)) Then
+        '                    maxparlst.set(bbrec, chkbpar)
+        '                End If
+        '            Next
+        '        Next
+        '        origbasinfile.close()
+
+        '        'numbrecs = chkparblst.count
+
+        '        origrsize = (origriverfile.getsize)
+        '        bigrlist = List.make
+        '        origriverfile.Read(bigrlist, origrsize)
+
+        '        headerlst = List.make
+        'for each orec in 1..(origrsize - 1)
+        '            headerstr = bigrlist.get(orec).asstring.astokens(",").get(0)
+        '            headerlst.add(headerstr)
+        '            chkparlst = bigrlist.get(orec).asstring.astokens(",")
+        '            numrrecs = chkparlst.count
+        '            bendpos = ((magbposlst.count) - 1)
+        '  For each brrec in 0..(magrposlst.count - 1)
+        '                magbid = magbposlst.get(brrec)
+        '                chkrpar = chkparlst.get(magbid).asstring.asnumber
+        '                If (chkrpar < minparlst.get(brrec + bendpos)) Then
+        '                    minparlst.set(brrec + bendpos, chkrpar)
+        '                End If
+        '                If (chkrpar > maxparlst.get(brrec + bendpos)) Then
+        '                    maxparlst.set(brrec + bendpos, chkrpar)
+        '                End If
+        '            Next
+        '        Next
+        '        origriverfile.close()
+
+        '        logfile.WriteElt("River and Basin Files Read")
+
+        '        If (observedfile.getsize > 1) Then
+        '            'linecount = observedfile.ReadElt.asstring.astokens(",").count
+        '            fluxlist = observedfile.ReadElt.asstring.astokens(",")
+        '            linecount = fluxlist.count
+        '            If (linecount > 1) Then
+        '                fluxcount = linecount - 1
+        '            Else
+        '                MsgBox.info("Observed Streamflow file may be empty or badly formatted." + nl + "Ensure the file is comma delimited with one timestep per line.", "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            End If
+        '        Else
+        '            MsgBox.info("Observed Streamflow file may be empty or badly formatted." + nl + "Ensure the file is comma delimited with one timestep per line.", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+        '        nfluxlst = List.make
+        '        nposlst = List.make
+
+        'for each mrec in 1..(fluxlist.count - 1)
+        '            nfluxstr = fluxlist.get(mrec).asstring
+        '            nfluxlst.Add(nfluxstr)
+        '            nposlst.Add("0")
+        '        Next
+
+        '        nfluxchoices = MsgBox.MultiListAsString(nfluxlst, "Select Observed Streamflow Stations for Calibration", "Which Stations Do You Want to Calibrate?")
+        '        If (nfluxchoices = nil) Then
+        '            Exit Sub
+        '        End If
+
+        '        nfcount = nfluxlst.count
+        '        nccount = nfluxchoices.count
+        '        nbasidlst = List.make
+        '        nfluxcount = nccount
+
+        'for each crec in 0..(nccount-1)
+        '            ncurchoice = (nfluxchoices.get(crec)).asstring
+        '  for each drec in 0..(nfcount-1)
+        '                ncurdesc = (nfluxlst.get(drec)).asstring
+        '                If (ncurchoice = ncurdesc) Then
+        '                    nposlst.set(drec, "1")
+        '                    'nfluxcount = nfluxcount + 1
+        '                    idchoice = MsgBox.ChoiceAsString(headerlst, "Select BasinID for Streamflow Station " + ncurchoice, "Link River Reach to Gauging Station")
+        '                    If (idchoice = nil) Then
+        '                        Exit Sub
+        '                    End If
+        '                    nbasposition = (headerlst.FindByValue(idchoice))
+        '                    nbasidlst.Add((nbasposition + 1).asstring)
+        '                End If
+        '            Next
+        '        Next
+
+        '        logfile.WriteElt("Observed Streamflow File Read")
+
+        '        ncposstr = ""
+
+        'For each frec in 1..(nccount.asstring.asnumber)
+        '            ncid = (nfluxlst.FindByValue(nfluxchoices.get(frec - 1))) + 1
+        '            If (ncid <> 0) Then
+
+        '                If (frec = 1) Then
+        '                    nstr = ncid.asstring
+        '                    pnum = ncid
+        '                    ncposstr = nstr
+        '                Else
+        '                    nstr = (ncid - pnum).asstring
+        '                    pnum = ncid
+        '                    ncposstr = ncposstr + ", " + nstr
+        '                End If
+
+        '                'objoptflagFile.WriteElt("runoff_" + ncid.asstring + "      " + nposlst.get(frec - 1).asstring)
+        '                objoptflagFile.WriteElt("runoff_" + ncid.asstring + "      1")
+        '            End If
+        '        Next
+        '        objoptflagFile.close()
+
+        '        'paraminlst = list.make
+        '        'paraminlst.Add("No,Name,Default,Lower,Upper,OptIdx,Description")
+        '        'paraminlst.Add("1,SoilWhc,1,1,600,0,Soil Water Holding Capacity (mm)")
+        '        'paraminlst.Add("2,Depth,1,1,800,0,Total soil depth (cm)")
+        '        'paraminlst.Add("3,Texture,1,1,5,0,Soil 1=Sand 2=Loam 3=Clay 5=Water")
+        '        'paraminlst.Add("4,Ks,1,0.001,150,0,Saturated hydraulic conductivity (cm/hr)")
+        '        'paraminlst.Add("5,Interflow,1,1,365,0,Interflow storage residence time (days)")
+        '        'paraminlst.Add("6,HSlope,1,0.001,10,0,Average subbasin slope") 
+        '        'paraminlst.Add("7,Baseflow,1,1,365,0,Baseflow residence time (days)") 
+        '        'paraminlst.Add("8,CurveNum,1,25,98,0,SCS runoff curve number")
+        '        'paraminlst.Add("9,MaxCover,1,0.01,1,0,Fraction Impervious Cover")
+        '        'paraminlst.Add("10,BasinLoss,1,0.001,0.5,0,Regional Ground Water Loss Fraction") 
+        '        'paraminlst.Add("11,PanCoeff,1,0.6,0.95,0,Evapotranspiration Pan Coefficient")
+        '        'paraminlst.Add("12,TopSoil,1,0.05,1,0,Hydrologically Active Top Soil Fraction")
+        '        'paraminlst.Add("13,RainCalc,1,1,3,0, Saturation type 1=Philip 2=SCS 3=BucketModel")
+        '        'paraminlst.Add("14,RivRough,1,0.012,0.07,0, Manning's n for Channel Roughness") 
+        '        'paraminlst.Add("15,RivSlope,1,0.001,10,0,Average slope of the river")    
+        '        'paraminlst.Add("16,RivWidth,1,30,1000,0,Average channel width (m)") 
+        '        'paraminlst.Add("17,RivLoss,1,0.01,0.5,0,Channel Flow Loss Fraction")
+        '        'paraminlst.Add("18,RivFPLoss,1,0.01,0.5,0,Floodplain Flow Loss Fraction")
+        '        'paraminlst.Add("19,Celerity,1,0.1,5,0,Flood Wave Celerity (m/s)")
+        '        'paraminlst.Add("20,Diffusion,1,100,10000,0,Flow Attenuation Coefficient (m^2/s)")
+        '        'paraminlst.clone
+        '        '
+        '        'paraminlst1 = list.make
+        '        ''paraminlst1.Add("No,Name,Default,Lower,Upper,OptIdx,Description")
+        '        'paraminlst1.Add("1,SoilWhc,1,1,600,1,Soil Water Holding Capacity (mm)")
+        '        'paraminlst1.Add("2,Depth,1,1,800,1,Total soil depth (cm)")
+        '        'paraminlst1.Add("3,Texture,1,1,5,1,Soil 1=Sand 2=Loam 3=Clay 5=Water")
+        '        'paraminlst1.Add("4,Ks,1,0.001,150,1,Saturated hydraulic conductivity (cm/hr)")
+        '        'paraminlst1.Add("5,Interflow,1,1,365,1,Interflow storage residence time (days)")
+        '        'paraminlst1.Add("6,HSlope,1,0.001,10,1,Average subbasin slope") 
+        '        'paraminlst1.Add("7,Baseflow,1,1,365,1,Baseflow residence time (days)") 
+        '        'paraminlst1.Add("8,CurveNum,1,25,98,1,SCS runoff curve number")
+        '        'paraminlst1.Add("9,MaxCover,1,0.01,1,1,Fraction Impervious Cover")
+        '        'paraminlst1.Add("10,BasinLoss,1,0.001,0.5,1,Regional Ground Water Loss Fraction") 
+        '        'paraminlst1.Add("11,PanCoeff,1,0.6,0.95,1,Evapotranspiration Pan Coefficient")
+        '        'paraminlst1.Add("12,TopSoil,1,0.05,1,1,Hydrologically Active Top Soil Fraction")
+        '        'paraminlst1.Add("13,RainCalc,1,1,3,1, Saturation type 1=Philip 2=SCS 3=BucketModel")
+        '        'paraminlst1.Add("14,RivRough,1,0.012,0.07,1, Manning's n for Channel Roughness") 
+        '        'paraminlst1.Add("15,RivSlope,1,0.001,10,1,Average slope of the river")    
+        '        'paraminlst1.Add("16,RivWidth,1,30,1000,1,Average channel width (m)") 
+        '        'paraminlst1.Add("17,RivLoss,1,0.01,0.5,1,Channel Flow Loss Fraction")
+        '        'paraminlst1.Add("18,RivFPLoss,1,0.01,0.5,1,Floodplain Flow Loss Fraction")
+        '        'paraminlst1.Add("19,Celerity,1,0.1,5,1,Flood Wave Celerity (m/s)")
+        '        'paraminlst1.Add("20,Diffusion,1,100,10000,1,Flow Attenuation Coefficient (m^2/s)")
+        '        'paraminlst1.clone
+
+        '        paraminlst = List.make
+        '        paraminlst.Add("1,SoilWhc,1,0.1,5,0,Soil water holding capacity (mm)")
+        '        paraminlst.Add("2,Depth,1,0.1,5,0,Total soil depth (cm)")
+        '        paraminlst.Add("3,Texture,1,0.3,3,0,Soil texture 1=Sand 2=Loam 3=Clay 5=Water")
+        '        paraminlst.Add("4,Ks,1,0.1,10,0,Saturated hydraulic conductivity (cm/hr)")
+        '        paraminlst.Add("5,Interflow,1,0.1,5,0,Interflow storage residence time (days)")
+        '        paraminlst.Add("6,HSlope,1,0.5,1.5,0,Average subbasin slope")
+        '        paraminlst.Add("7,Baseflow,1,0.1,5,0,Baseflow reservoir residence time (days)")
+        '        paraminlst.Add("8,CurveNum,1,0.1,1.5,0,SCS runoff curve number")
+        '        paraminlst.Add("9,MaxCover,1,0.1,5,0,Fraction of the subbasin with permanently impervious cover")
+        '        paraminlst.Add("10,BasinLoss,1,0.1,5,0,Fraction of soil water infiltrating to ground water")
+        '        paraminlst.Add("11,PanCoeff,1,0.1,5,0,Pan coefficient for correcting PET readings")
+        '        paraminlst.Add("12,TopSoil,1,0.1,5,0,Fraction of soil layer that is hydrologically active")
+        '        paraminlst.Add("13,RainCalc,1,0.1,5,0,Excess rainfall mode 1=Philip 2=SCS 3=BucketModel")
+        '        paraminlst.Add("14,RivRough,1,0.1,5,0,River Channel Roughness Coefficient (Manning n)")
+        '        paraminlst.Add("15,RivSlope,1,0.1,5,0,Average slope of the river")
+        '        paraminlst.Add("16,RivWidth,1,0.1,5,0,Average channel width (m)")
+        '        paraminlst.Add("17,RivLoss,1,0.1,5,0,Fraction of flow lost within the river channel")
+        '        paraminlst.Add("18,RivFPLoss,1,0.1,5,0,Fraction of the river flow lost in floodplain")
+        '        paraminlst.Add("19,Celerity,1,0.1,5,0,Flood wave celerity (m/s)")
+        '        paraminlst.Add("20,Diffusion,1,0.05,10,0,Flow attenuation coefficient (m^2/s)")
+        '        paraminlst.clone()
+
+        '        paraminlst1 = List.make
+        '        paraminlst1.Add("1,SoilWhc,1,0.1,5,1,Soil water holding capacity (mm)")
+        '        paraminlst1.Add("2,Depth,1,0.1,5,1,Total soil depth (cm)")
+        '        paraminlst1.Add("3,Texture,1,0.3,3,1,Soil texture 1=Sand 2=Loam 3=Clay 5=Water")
+        '        paraminlst1.Add("4,Ks,1,0.1,10,1,Saturated hydraulic conductivity (cm/hr)")
+        '        paraminlst1.Add("5,Interflow,1,0.1,5,1,Interflow storage residence time (days)")
+        '        paraminlst1.Add("6,HSlope,1,0.5,1.5,1,Average subbasin slope")
+        '        paraminlst1.Add("7,Baseflow,1,0.1,5,1,Baseflow reservoir residence time (days)")
+        '        paraminlst1.Add("8,CurveNum,1,0.1,1.5,1,SCS runoff curve number")
+        '        paraminlst1.Add("9,MaxCover,1,0.1,5,1,Fraction of the subbasin with permanently impervious cover")
+        '        paraminlst1.Add("10,BasinLoss,1,0.1,5,1,Fraction of soil water infiltrating to ground water")
+        '        paraminlst1.Add("11,PanCoeff,1,0.1,5,1,Pan coefficient for correcting PET readings")
+        '        paraminlst1.Add("12,TopSoil,1,0.1,5,1,Fraction of soil layer that is hydrologically active")
+        '        paraminlst1.Add("13,RainCalc,1,0.1,5,1,Excess rainfall mode 1=Philip 2=SCS 3=BucketModel")
+        '        paraminlst1.Add("14,RivRough,1,0.1,5,1,River Channel Roughness Coefficient (Manning n)")
+        '        paraminlst1.Add("15,RivSlope,1,0.1,5,1,Average slope of the river")
+        '        paraminlst1.Add("16,RivWidth,1,0.1,5,1,Average channel width (m)")
+        '        paraminlst1.Add("17,RivLoss,1,0.1,5,1,Fraction of flow lost within the river channel")
+        '        paraminlst1.Add("18,RivFPLoss,1,0.1,5,1,Fraction of the river flow lost in floodplain")
+        '        paraminlst1.Add("19,Celerity,1,0.1,5,1,Flood wave celerity (m/s)")
+        '        paraminlst1.Add("20,Diffusion,1,0.05,10,1,Flow attenuation coefficient (m^2/s)")
+        '        paraminlst1.clone()
+
+        '        'paraminlst1 = list.make
+        '        'paraminlst1.Add("1,SoilWhc,1,0.01,7.29,1,Soil water holding capacity (mm)")
+        '        'paraminlst1.Add("2,Depth,1,0.009,1.83,1,Total soil depth (cm)")
+        '        'paraminlst1.Add("3,Texture,1,0.50,1.50,1,Soil texture 1=Sand 2=Loam 3=Clay 5=Water")
+        '        'paraminlst1.Add("4,Ks,1,0.0003,37.7,1,Saturated hydraulic conductivity (cm/hr)")
+        '        'paraminlst1.Add("5,Interflow,1,0.12,11.02,1,Interflow storage residence time (days)")
+        '        'paraminlst1.Add("6,HSlope,1,0.01,1.03,1,Average subbasin slope") 
+        '        'paraminlst1.Add("7,Baseflow,1,0.06,7.47,1,Baseflow reservoir residence time (days)") 
+        '        'paraminlst1.Add("8,CurveNum,1,0.33,1.29,1,SCS runoff curve number")
+        '        'paraminlst1.Add("9,MaxCover,1,5.6,168,1,Fraction of the subbasin with permanently impervious cover")
+        '        'paraminlst1.Add("10,BasinLoss,1,0.1,1.01,1,Fraction of soil water infiltrating to ground water") 
+        '        'paraminlst1.Add("11,PanCoeff,1,0.71,1.12,1,Pan coefficient for correcting PET readings")
+        '        'paraminlst1.Add("12,TopSoil,1,0.25,5,1,Fraction of soil layer that is hydrologically active")
+        '        'paraminlst1.Add("13,RainCalc,1,0.5,1.5,1,Excess rainfall mode 1=Philip 2=SCS 3=BucketModel")
+        '        'paraminlst1.Add("14,RivRough,1,0.34,2,1,River Channel Roughness Coefficient (Manning n)") 
+        '        'paraminlst1.Add("15,RivSlope,1,0.02,4.12,1,Average slope of the river")    
+        '        'paraminlst1.Add("16,RivWidth,1,0.005,4.38,1,Average channel width (m)") 
+        '        'paraminlst1.Add("17,RivLoss,1,0.1,1.01,1,Fraction of flow lost within the river channel")
+        '        'paraminlst1.Add("18,RivFPLoss,1,0.11,1.09,1,Fraction of the river flow lost in floodplain")
+        '        'paraminlst1.Add("19,Celerity,1,0.13,6.25,1,Flood wave celerity (m/s)")
+        '        'paraminlst1.Add("20,Diffusion,1,0.07,6.67,1,Flow attenuation coefficient (m^2/s)")
+        '        'paraminlst1.clone
+
+
+        '        desclst = List.make
+        'for each mrec in 0..(paraminlst.count - 1)
+        '            ministr = paraminlst.get(mrec).asstring
+        '            minilst = ministr.asstring.astokens(",")
+        '            desclst.Add(((minilst.get(1)).asstring))
+        '        Next
+
+        '        choices = MsgBox.MultiListAsString(desclst, "Select Parameters to be Calibrated", "Which Parameters Do You Want to Calibrate?")
+        '        If (choices = nil) Then
+        '            Exit Sub
+        '        End If
+
+        '        dcount = desclst.count
+        '        Ccount = Choices.count
+        '        paramidlst = List.make
+
+        'for each crec in 0..(Ccount-1)
+        '            curchoice = (Choices.get(crec)).asstring
+        '  for each drec in 0..(dcount-1)
+        '                curdesc = (desclst.get(drec)).asstring
+        '                If (curchoice = curdesc) Then
+        '                    chglst = paraminlst1.get(drec)
+
+        '                    lowval = minparlst.get(drec)
+        '                    lowrng = chglst.astokens(",").get(3).asstring.asnumber
+        '                    lowfrac = lowrng / lowval
+
+        '                    highval = minparlst.get(drec)
+        '                    highrng = chglst.astokens(",").get(4).asstring.asnumber
+        '                    highfrac = highrng / highval
+
+        '                    chglst.astokens(",").set(3, lowfrac)
+        '                    chglst.astokens(",").set(4, highfrac)
+
+        '                    paraminlst.Set(drec, chglst)
+        '                    paramidlst.Add((((chglst.astokens(",").get(0)).asstring).asnumber + 1).asstring)
+        '                End If
+        '            Next
+        '        Next
+
+        '        paraminFile.WriteElt("No,Name,Default,Lower,Upper,OptIdx,Description")
+
+        'for each drec in 0..(dcount-1)
+        '            paraminFile.WriteElt(paraminlst.get(drec).asstring)
+        '        Next
+        '        paraminFile.flush()
+        '        paraminFile.close()
+
+        '        logfile.WriteElt("River and Basin Calibration Parameters Identified")
+        '        ncomplex = 2
+        '        'ncomplex = ( Ccount / 2 ).ceiling
+        '        'if(ncomplex.asstring.isnumber.not) then
+        '        '  ncomplex = 4
+        '        'end
+
+        '        nsamples = 2 * ncomplex * ccount
+        '        If (nsamples < 10) Then
+        '            nummult = (10 / (ncomplex * ccount)).ceiling
+        '            nsamples = nummult * ncomplex * ccount
+        '        ElseIf (nsamples > 200) Then
+        '            nummult = (100 / (ncomplex * ccount)).floor
+        '            nsamples = nummult * ncomplex * ccount
+        '        End If
+
+        'runlist = { (nsamples * Ccount * 10).asstring, (nsamples * Ccount * 4).asstring, (nsamples * Ccount * 8).asstring, (nsamples * Ccount * 16).asstring, (nsamples * Ccount * 32).asstring, (nsamples * Ccount * 64).asstring, (nsamples * Ccount * 128).asstring }
+
+        '        runstr = MsgBox.ChoiceAsString(runlist, "Define a Maximum No. of Runs" + nl + "NOTE: Each run could take upto 1 minute!", "Geospatial Stream Flow Model")
+        '        If (runstr = nil) Then
+        '            Exit Sub
+        '        End If
+
+        '        mosceminfile.WriteElt((Ccount.asstring) + ",  nOptPar")
+        '        mosceminfile.WriteElt(nfluxcount.asstring + ", nOptObj")
+        '        mosceminfile.WriteElt(nsamples.asstring + ", nSamples")
+        '        mosceminfile.WriteElt(ncomplex.asstring + ", nComplex")
+        '        mosceminfile.WriteElt(runstr.asstring + ", nMaxDraw")
+        '        mosceminfile.WriteElt(parameterFN)
+        '        mosceminfile.WriteElt(objoptflagFN)
+        '        mosceminfile.WriteElt(obsflowFN)
+        '        mosceminfile.WriteElt(objectiveFN)
+        '        mosceminfile.WriteElt(paramvalFN)
+        '        mosceminfile.WriteElt(paramconFN)
+        '        mosceminfile.WriteElt(balparamFN)
+        '        mosceminfile.WriteElt(moscemparamFN)
+        '        mosceminfile.WriteElt(whichModelFN)
+        '        mosceminfile.WriteElt(origbasFN)
+        '        mosceminfile.WriteElt(origrivFN)
+        '        mosceminfile.WriteElt(basinFN)
+        '        mosceminfile.WriteElt(riverFN)
+        '        mosceminfile.WriteElt(streamflowFN)
+        '        mosceminfile.WriteElt(balfilesfn)
+        '        mosceminfile.WriteElt(routfilesfn)
+        '        mosceminfile.flush()
+        '        mosceminfile.close()
+
+        'caliblst = {"Root Mean Square Error (RMSE)", "Standard Deviation (STD)", "Maximum Likelihood Error (MLE)", "Nash-Sutcliffe Efficiency(NSE)", "Number of Sign Changes (NSC)", "BIAS" }
+
+        '        Calibtypestr = MsgBox.ChoiceAsString(caliblst, "Select Objective Function Type", "How Should Convergence Be Measured?")
+        '        If (Calibtypestr = nil) Then
+        '            Exit Sub
+        '        End If
+
+        '        calibposition = ((caliblst.FindByValue(Calibtypestr)) + 1)
+        '        myrstr = ""
+        'For each nrec in 0..(nfluxcount - 1 )
+        '            rstrnum = nbasidlst.get(nrec).asstring.asnumber
+        '            If (nrec = 0) Then
+        '                rstr = rstrnum.asstring
+        '                pnum = rstrnum
+        '                myrstr = rstr
+        '            Else
+        '                rstr = (rstrnum - pnum).asstring
+        '                pnum = rstrnum
+        '                myrstr = myrstr + ", " + rstr
+        '            End If
+        '        Next
+
+        '        logfile.WriteElt("Calibration Method set as " + Calibtypestr.asstring)
+
+        '        moscemparamfile.WriteElt(nfluxcount.asstring + "  //nflux")
+        '        moscemparamfile.WriteElt(routlist.get(0).asstring + "  //ntstep1")
+        '        moscemparamfile.WriteElt((routlist.get(0).asnumber + routlist.get(7).asnumber).asstring + "  //ntstep2")
+        '        moscemparamfile.WriteElt(calibposition.asstring + "  //obj_func")
+        '        moscemparamfile.WriteElt("-9999  //missing value")
+        '        moscemparamfile.WriteElt(ncposstr + "  //nflux_obs, column in observed_streamflow.txt to test (not including timestep)")
+        '        moscemparamfile.WriteElt(myrstr + "  //nflux_model, column in streamflow.txt (not including timestep)")
+        '        moscemparamfile.flush()
+
+        '        observedfile.close()
+        '        objectivesFile.close()
+        '        paramvaluesFile.close()
+        '        parconvergeFile.close()
+        '        moscemparamfile.close()
+        '        whichmodelfile.close()
+
+        '        theDate = Date.Now
+        '        theday = Date.Now.setformat("jj").asstring
+        '        theyear = Date.Now.setformat("yyy").asstring
+        '        logfile.writeelt("Starting Time:" + +theDate.Asstring)
+
+        '        If (File.Exists((myWkDirname + "geosfmcalib.exe").AsFileName)) Then
+        '            geosfmcalibFN = (myWkDirname + "geosfmcalib.exe").AsFileName
+        '        ElseIf (File.Exists(("$AVEXT\geosfmcalib.exe").AsFileName)) Then
+        '  ziplistfile = LineFile.Make((myWkDirname + "ziplist.bat").AsFileName, #FILE_PERM_WRITE)
+        '            If (ziplistfile = nil) Then
+        '                MsgBox.error("Cannot open output file: ziplist.bat" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            End If
+        '            ziplistfile.WriteElt("Copy " + (("$AVEXT\geosfmcalib.exe").AsFileName).GetFullName + +myWkDirname + "geosfmcalib.exe")
+        '            ziplistfile.flush()
+        '            ziplistfile.close()
+
+        '            System.ExecuteSynchronous("ziplist.bat")
+        '            geosfmcalibFN = (myWkDirname + "geosfmcalib.exe").AsFileName
+        '        Else
+        '            MsgBox.info("Unable to locate the program file: geosfmcalib.exe " + nl + nl + "Install the programs in your ArcView/Ext32 or working directory.", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+        '        logfile.WriteElt("geosfmcalib.exe program copied to working directory")
+
+        '        If (File.Exists((myWkDirname + "geosfm.dll").AsFileName)) Then
+        '            geosfmdllFN = (myWkDirname + "geosfm.dll").AsFileName
+        '        ElseIf (File.Exists(("$AVEXT\geosfm.dll").AsFileName)) Then
+        '  ziplistfile = LineFile.Make((myWkDirname + "ziplist.bat").AsFileName, #FILE_PERM_WRITE)
+        '            If (ziplistfile = nil) Then
+        '                MsgBox.error("Cannot open output file: ziplist.bat" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            End If
+        '            ziplistfile.WriteElt("Copy " + (("$AVEXT\geosfm.dll").AsFileName).GetFullName + +myWkDirname + "geosfm.dll")
+        '            ziplistfile.flush()
+        '            ziplistfile.close()
+
+        '            System.ExecuteSynchronous("ziplist.bat")
+        '            geosfmdllFN = (myWkDirname + "geosfm.dll").AsFileName
+        '        Else
+        '            MsgBox.info("Unable to locate the program file: geosfm.dll " + nl + nl + "Install the programs in your ArcView/Ext32 or working directory.", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+        '        logfile.WriteElt("geosfm.dll program copied to working directory")
+
+        '        av.ShowMsg("Performing Model Calibration with " + runstr.asstring + " ........")
+
+        'ziplistfile = LineFile.Make((myWkDirname + "ziplist.bat").AsFileName, #FILE_PERM_WRITE)
+        '        If (ziplistfile = nil) Then
+        '            MsgBox.error("Cannot open output file: ziplist.bat" + nl + "File may be open or tied up by another program", "GeoSFM Utilities")
+        '            Exit Sub
+        '        End If
+        '        ziplistfile.WriteElt("geosfmcalib.exe " + mosceminFN)
+        '        ziplistfile.flush()
+        '        ziplistfile.close()
+
+        '        logfile.WriteElt("Performing Model Calibration with " + runstr.asstring + " ........")
+
+        '        System.ExecuteSynchronous("ziplist.bat")
+
+        '        If (File.Exists(paramconFN.asfilename)) Then
+        '  paramconfile = LineFile.Make(paramconFN.AsFileName, #FILE_PERM_READ)
+        '            If (paramconfile = nil) Then
+        '                MsgBox.error("Cannot open output file, " + paramconFN + nl + "File may be open or tied up by another program", "GeoSFM Utilities")
+        '                Exit Sub
+        '            End If
+        '            pcfilesize = paramconfile.getsize
+        '            paramconfile.close()
+        '        End If
+
+        '        If (pcfilesize > 1) Then
+        '            logfile.WriteElt("Calibration Program Successfully Executed!")
+        '        Else
+        '            logfile.WriteElt("Problems encounted during calibration.")
+        '            logfile.WriteElt("Output parameter convergence file, " + paramconFN + ", is empty.")
+        '            logfile.close()
+        '            MsgBox.info("Calibration problems encountered." + nl + "Output parameter convergence file, " + paramconFN + ", is empty", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+        '        av.ClearMsg()
+
+        '        av.ShowMsg("Performing Model PostProcessing........")
+
+        'postprocinFile = LineFile.Make(postprocinFN.asfilename,#file_perm_write)
+        '        If (postprocinFile = nil) Then
+        '            MsgBox.info("Could not create " + postprocinFN + " file," + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+        '        postprocinFile.WriteElt(nsamples.asstring + ", nSamples")
+        '        postprocinFile.WriteElt(obsflowFN)
+        '        postprocinFile.WriteElt(paramvalFN)
+        '        postprocinFile.WriteElt(objectiveFN)
+        '        postprocinFile.WriteElt(timeseriesFN)
+        '        postprocinFile.WriteElt(objpostprocFN)
+        '        postprocinFile.WriteElt(trdoffboundFN)
+        '        postprocinFile.WriteElt(balparamFN)
+        '        postprocinFile.WriteElt(moscemparamFN)
+        '        postprocinFile.WriteElt(parameterFN)
+        '        postprocinFile.WriteElt(basinFN)
+        '        postprocinFile.WriteElt(riverFN)
+        '        postprocinFile.WriteElt(origbasFN)
+        '        postprocinFile.WriteElt(origrivFN)
+        '        postprocinFile.WriteElt(balfilesfn)
+        '        postprocinFile.WriteElt(routfilesfn)
+        '        postprocinFile.WriteElt(whichModelFN)
+        '        postprocinFile.flush()
+        '        postprocinFile.close()
+
+        '        logfile.WriteElt("Initiating Post Processing Program...")
+
+
+        '        If (File.Exists((myWkDirname + "geosfmpost.exe").AsFileName)) Then
+        '            geosfmpostFN = (myWkDirname + "geosfmpost.exe").AsFileName
+        '        ElseIf (File.Exists(("$AVEXT\geosfmpost.exe").AsFileName)) Then
+        '  ziplistfile = LineFile.Make((myWkDirname + "ziplist.bat").AsFileName, #FILE_PERM_WRITE)
+        '            If (ziplistfile = nil) Then
+        '                MsgBox.error("Cannot open output file: ziplist.bat" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            End If
+        '            ziplistfile.WriteElt("Copy " + (("$AVEXT\geosfmpost.exe").AsFileName).GetFullName + +myWkDirname + "geosfmpost.exe")
+        '            ziplistfile.flush()
+        '            ziplistfile.close()
+
+        '            System.ExecuteSynchronous("ziplist.bat")
+        '            geosfmpostFN = (myWkDirname + "geosfmpost.exe").AsFileName
+        '        Else
+        '            MsgBox.info("Unable to locate the program file: geosfmpost.exe " + nl + nl + "Install the programs in your ArcView/Ext32 or working directory.", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+        'ziplistfile = LineFile.Make((myWkDirname + "ziplist.bat").AsFileName, #FILE_PERM_WRITE)
+        '        If (ziplistfile = nil) Then
+        '            MsgBox.error("Cannot open output file: ziplist.bat" + nl + "File may be open or tied up by another program", "GeoSFM Utilities")
+        '            Exit Sub
+        '        End If
+        '        ziplistfile.WriteElt("geosfmpost.exe postproc.in")
+        '        ziplistfile.flush()
+        '        ziplistfile.close()
+
+        '        logfile.WriteElt("Performing Model PostProcessing........")
+
+        '        System.ExecuteSynchronous("ziplist.bat")
+
+        '        If (File.Exists(timeseriesFN.asfilename)) Then
+        '  timeseriesfile = LineFile.Make(timeseriesFN.AsFileName, #FILE_PERM_READ)
+        '            If (timeseriesfile = nil) Then
+        '                MsgBox.error("Cannot open output file, " + timeseriesFN + nl + "File may be open or tied up by another program", "GeoSFM Utilities")
+        '                Exit Sub
+        '            End If
+        '            tsfilesize = timeseriesfile.getsize
+        '            timeseriesfile.close()
+        '        End If
+
+        '        If (tsfilesize > 1) Then
+        '            tempFN = (myWkDirname.asfilename.maketmp("tmpfile", "txt")).asstring
+        '            File.Copy(timeseriesFN.asfilename, tempFN.asfilename)
+        '            logfile.WriteElt("Post Processing Program Successfully Executed!")
+        '        Else
+        '            logfile.WriteElt("Problems encounted during post processing.")
+        '            logfile.WriteElt("Output time series file, " + timeseriesFN + ", is empty.")
+        '            logfile.close()
+        '            MsgBox.info("Post processing problems encountered." + nl + "Output time series file, " + timeseriesFN + ", is empty", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+        '        temptable = Vtab.make(tempFN.asfilename, False, False)
+        '        If (temptable = nil) Then
+        '            MsgBox.info("Could not open output file," + nl + timeseriesFN, "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+        '        flowtable = temptable.export(timeseriesFN.AsFileName, Dtext, False)
+
+        '        GUIName = "Table"
+        '        flowtable.unlinkall()
+        '        flowtable.unjoinall()
+        '        flowtable.deactivate()
+        '        flowtable = nil
+        '        temptable.unlinkall()
+        '        temptable.unjoinall()
+        '        temptable.deactivate()
+        '        temptable = nil
+        '        File.Delete(tempFN.asfilename)
+
+        '        oldout = theProject.finddoc("Timeseries.txt")
+        '        If (oldout <> nil) Then
+        '            theproject.removedoc(oldout)
+        '        End If
+
+        '        flowtable = Vtab.make(timeseriesFN.asfilename, False, False)
+        '        t = Table.MakeWithGUI(flowtable, GUIName)
+        '        t.SetName("Timeseries.txt")
+        '        t.GetWin.Open()
+
+        '        av.ClearStatus()
+        '        av.clearmsg()
+        '        theDate = Date.Now
+        '        logfile.writeelt("Ending Time:" + +theDate.Asstring)
+        '        logfile.WriteElt("Output time series file added to ArcView.")
+        '        logfile.close()
+        '        av.ClearMsg()
+
+        '        MsgBox.info("Model Calibration Run Complete." + nl + "Results written to: " + nl + timeseriesFN, "Geospatial Stream Flow Model")
     End Sub
 
     Friend Sub BankFull()
@@ -3677,6 +3585,804 @@ Public Module modGeoSFM
         '
         ' ***********************************************************************************************
         ' ***********************************************************************************************
+
+        '        TheProject = av.GetProject
+        '        theFileName = theProject.GetFileName
+        '        If (theFileName = nil) Then
+        '            av.Run("Project.SaveAs", nil)
+        '            theFileName = theProject.GetFileName
+        '            If (theFileName = nil) Then
+        '                Exit Sub
+        '            End If
+        '        Else
+        '            If (av.Run("Project.CheckForEdits", nil).Not) Then
+        '                Return nil
+        '            End If
+        '            If (theProject.Save) Then
+        '                av.ShowMsg("Project saved to '" + theFileName.GetBaseName + "'")
+        '    if (System.GetOS = #SYSTEM_OS_MAC) then
+        '                    Script.Make("MacClass.SetDocInfo(SELF, Project)").DoIt(theFileName)
+        '                End If
+        '            End If
+        '        End If
+
+        '        TheView = av.GetActiveDoc
+        '        ViewChk = TheView.GetGUI
+        '        If (ViewChk <> "View") Then
+        '            MsgBox.error("Click on the View to make it 'active' before running this program", "")
+        '            Exit Sub
+        '        End If
+
+        '        ' Check the working directory
+        '        TheWkDir = TheProject.GetFileName.ReturnDir
+        '        myWkDirname = MsgBox.Input("Specify your working directory", "Working Directory", TheWkDir.GetFullName)
+        '        If (mywkDirName = nil) Then
+        '            Exit Sub
+        '        End If
+        '        If (File.Exists(myWkDirname.AsFileName).not) Then
+        '            MsgBox.Error("Cannot read directory " + myWkDirname, "Directory Specification Error")
+        '            Exit Sub
+        '        End If
+        '        If (File.IsWritable(myWkDirname.AsFileName).not) Then
+        '            MsgBox.Error(myWkDirname + +"is not writable.", "Directory Specification Error")
+        '            Exit Sub
+        '        End If
+        '        TheProject.SetWorkDir(myWkDirname.AsFileName)
+
+
+        '        If ((myWkDirname.contains("\").Not) And (myWkDirname.contains("/")) And (myWkDirname.right(1) <> "/")) Then
+        '            myWkDirname = myWkDirname + "/"
+        '        ElseIf ((myWkDirname.contains("\")) And (myWkDirname.right(1) <> "\")) Then
+        '            myWkDirname = myWkDirname + "\"
+        '        ElseIf ((myWkDirname.contains("\").Not) And (myWkDirname.contains("\").Not) And (myWkDirname.right(1) <> "/")) Then
+        '            myWkDirname = myWkDirname + "/"
+        '        End If
+
+
+        '        theThemelist = theView.GetThemes
+        '        mypolythmlist = List.make
+        '        For Each thm In theThemelist
+        '            If (thm.CanSelect) Then
+        '                athmname = thm.getname
+        '                If ((athmname.contains("basply")) Or (athmname.contains("basin"))) Then
+        '                    mypolythmlist.add(thm)
+        '                End If
+        '            End If
+        '        Next
+
+        '        If (mypolythmlist.isempty) Then
+        '            theTheme = MsgBox.Choice(theThemelist, "Select basin coverage/grid theme", "Basin Theme")
+        '            If (theTheme = nil) Then
+        '                Exit Sub
+        '            End If
+        '        Else
+        '            theTheme = MsgBox.Choice(mypolythmlist, "Select basin coverage/grid theme", "Basin Theme")
+        '            If (theTheme = nil) Then
+        '                Exit Sub
+        '            End If
+        '        End If
+
+
+        '        'CREATE A LIST OF INPUT LABELS
+        'labels = { "Input Daily Time Series File", "Output Monthly Time Series File", "Output Annual Time Series File" } 
+
+        'defaults = { "streamflow.txt", "monthlyflow.txt", "annualflow.txt" }
+
+        '        inpList = MsgBox.MultiInput("Enter Model Parameters.", "GeoSFM Utilities", labels, defaults)
+        '        If (inpList.IsEmpty) Then
+        '            Exit Sub
+        '        End If
+
+        '        runoffFN = myWkDirname + inplist.get(0)
+        '        monthlyFN = myWkDirname + inplist.get(1)
+        '        annualFN = myWkDirname + inplist.get(2)
+
+        '        oldout = theProject.finddoc(inplist.get(1).asstring)
+        '        If (oldout <> nil) Then
+        '            theproject.removedoc(oldout)
+        '        End If
+        '        oldout = theProject.finddoc(inplist.get(2).asstring)
+        '        If (oldout <> nil) Then
+        '            theproject.removedoc(oldout)
+        '        End If
+
+        'chkfile=LineFile.Make((myWkDirname+"times.txt").asfilename,#file_perm_write)
+        '        If (chkfile = nil) Then
+        '            MsgBox.info("Could not create time file, times.txt", "GeoSFM Utilities")
+        '            Exit Sub
+        '        End If
+
+        'paramfile=LineFile.Make((myWkDirname+"statsparam.txt").asfilename,#file_perm_write)
+        '        If (paramfile = nil) Then
+        '            MsgBox.info("Could not create parameter file, statsparam.txt", "GeoSFM Utilities")
+        '            Exit Sub
+        '        End If
+
+        'runofffile = LineFile.Make((runoffFN).asfilename,#file_perm_read)
+        '        If (runofffile = nil) Then
+        '            MsgBox.info("Could not open time series file," + nl + runoffFN, "GeoSFM Utilities")
+        '            Exit Sub
+        '        End If
+
+        'monthlyfile = LineFile.Make((monthlyFN).asfilename,#file_perm_write)
+        '        If (monthlyfile = nil) Then
+        '            MsgBox.info("Could not create monthly time series file, " + monthlyFN, "GeoSFM Utilities")
+        '            Exit Sub
+        '        End If
+
+        'annualfile = LineFile.Make((annualFN).asfilename,#file_perm_write)
+        '        If (annualfile = nil) Then
+        '            MsgBox.info("Could not create annual time series file, " + annualFN, "GeoSFM Utilities")
+        '            Exit Sub
+        '        End If
+
+        'logfile = LineFile.Make(("logfilestats.txt").asfilename,#file_perm_write)
+        '        If (logfile = nil) Then
+        '            MsgBox.info("Could not create logfilestats.txt file", "GeoSFM Utilities")
+        '            Exit Sub
+        '        End If
+
+
+        '        theDate = Date.Now
+        '        theday = Date.Now.setformat("jj").asstring
+        '        theyear = Date.Now.setformat("yyy").asstring
+
+        '        chkfile.writeelt("Starting Time:" + +theDate.Asstring)
+
+        '        'msgbox.info("The resdays "+resdays.asstring,"")
+
+        '        ' READ IN THE INPUT ARRAYS FOR PRECIPITATION AND POTENTIAL EVAPORATION
+        '        runofflist = List.make
+        '        runoffsize = runofffile.getsize
+        '        useyear = 1
+        '        If (runoffsize = 0) Then
+        '            MsgBox.info("The runofffile " + runoffFN + " is empty", "")
+        '            Exit Sub
+        '        ElseIf ((runoffsize < 3285) And (runoffsize > 280)) Then
+        '            MsgBox.info("Less than 9 years of data supplied." + nl + NL + "Computing bankfull from monthly data...", "")
+        '            useyear = 12
+        '        ElseIf (runoffsize < 270) Then
+        '            MsgBox.info("Less than 9 month of data supplied." + nl + NL + "Computing bankfull from daily data...", "")
+        '            useyear = 365
+        '        End If
+
+        '        runofffile.setpos(0)
+        '        runofffile.read(runofflist, runoffsize)
+        '        dayonestr = (((((runofflist.get(1)).substitute(" ", ",")).astokens(",")).get(0)))
+        '        enddaystr = (((((runofflist.get(runoffsize - 1)).substitute(" ", ",")).astokens(",")).get(0)))
+
+        '        If (dayonestr.count = 7) Then
+        '            startyear = dayonestr.left(4)
+        '            If (startyear.isnumber.not) Then
+        '                startyear = MsgBox.input("Enter 4 digit start year eg 1999", "GeoSFM Utilities", theYear)
+        '            End If
+        '            If ((startyear = nil) Or (startyear.isnumber.not)) Then
+        '                MsgBox.info("Start year must be a 4 digit number", "GeoSFM Utilities")
+        '                Exit Sub
+        '            ElseIf ((startyear.count) <> 4) Then
+        '                MsgBox.info("Start year must be a 4 digit number", "GeoSFM Utilities")
+        '                Exit Sub
+        '            End If
+
+        '            startday = dayonestr.right(3)
+        '            If (startday.isnumber.not) Then
+        '                startday = MsgBox.input("Enter 3 digit start day eg 003", "GeoSFM Utilities", theday)
+        '            End If
+        '            If ((startday = nil) Or (startday.isnumber.not)) Then
+        '                MsgBox.info("Start day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
+        '                Exit Sub
+        '            ElseIf (((startday.asnumber) > 366) Or ((startday.asnumber) < 1)) Then
+        '                MsgBox.info("Start day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
+        '                Exit Sub
+        '            End If
+        '        Else
+        '            startyear = MsgBox.input("Enter 4 digit start year eg 1999", "GeoSFM Utilities", theYear)
+        '            If ((startyear = nil) Or (startyear.isnumber.not)) Then
+        '                MsgBox.info("Start year must be a 4 digit number", "GeoSFM Utilities")
+        '                Exit Sub
+        '            ElseIf ((startyear.count) <> 4) Then
+        '                MsgBox.info("Start year must be a 4 digit number", "GeoSFM Utilities")
+        '                Exit Sub
+        '            End If
+
+        '            startday = MsgBox.input("Enter 3 digit start day eg 003", "GeoSFM Utilities", theday)
+        '            If ((startday = nil) Or (startday.isnumber.not)) Then
+        '                MsgBox.info("Start day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
+        '                Exit Sub
+        '            ElseIf (((startday.asnumber) > 366) Or ((startday.asnumber) < 1)) Then
+        '                MsgBox.info("Start day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
+        '                Exit Sub
+        '            End If
+        '        End If
+
+        '        startjdate = Date.Make(dayonestr, "yyyjj")
+        '        startmonth = startjdate.GetMonthOfYear.asstring
+        '        startdayofmonth = startjdate.GetDayOfMonth.asstring
+
+        '        If (enddaystr.count = 7) Then
+        '            endyear = enddaystr.left(4)
+        '            If (endyear.isnumber.not) Then
+        '                endyear = MsgBox.input("Enter 4 digit end year eg 1999", "GeoSFM Utilities", theYear)
+        '            End If
+        '        Else
+        '            endyear = MsgBox.input("Enter 4 digit end year eg 1999", "GeoSFM Utilities", theYear)
+        '        End If
+        '        If ((endyear = nil) Or (endyear.isnumber.not)) Then
+        '            MsgBox.info("Start year must be a 4 digit number", "GeoSFM Utilities")
+        '            Exit Sub
+        '        ElseIf ((endyear.count) <> 4) Then
+        '            MsgBox.info("Start year must be a 4 digit number", "GeoSFM Utilities")
+        '            Exit Sub
+        '        ElseIf ((endyear.asnumber) < startyear.asnumber) Then
+        '            MsgBox.info("End year must be greater than or equal to start year", "GeoSFM Utilities")
+        '            Exit Sub
+        '        End If
+
+        '        'statslist = { "Max" , "Mean"}
+        '        'statstype = msgbox.choiceasstring(statslist, "Select Statistic to be Computed" , "GeoSFM Utilities" )
+        '        'if(statstype = nil ) then
+        '        '  exit    
+        '        'end
+        '        statstype = "Max"
+
+        '        runoffdays = (runoffsize - 1)
+        '        basinsize = (((((runofflist.get(1)).substitute(" ", ",")).astokens(",")).count) - 1).asstring
+        '        numofyears = ((endyear.asnumber - startyear.asnumber) + 1)
+
+        '        paramfile.writeelt(startyear.asstring)
+        '        paramfile.writeelt(startmonth.asstring)
+        '        paramfile.writeelt(startdayofmonth.asstring)
+        '        paramfile.writeelt(endyear.asstring)
+        '        paramfile.writeelt(runoffdays.asstring)
+        '        paramfile.writeelt(basinsize.asstring)
+        '        paramfile.writeelt(statstype.asstring)
+        '        paramfile.writeelt(runoffFN)
+        '        paramfile.writeelt(monthlyFN)
+        '        paramfile.writeelt(annualFN)
+
+        '        paramfile.close()
+        '        runofffile.close()
+        '        logfile.close()
+        '        monthlyfile.close()
+        '        annualfile.close()
+
+        '        av.ShowStopButton()
+        '        av.SetStatus(0)
+        '        av.showmsg("Computing Monthly and Annual Fluxes.......")
+        '        '
+        '        'myfilename = ("$AVEXT\geosfmstats.dll").AsFileName 
+        '        'if(myfilename = Nil) then
+        '        '  msgbox.info("Unable to locate the program file: geosfmstats.dll."+nl+nl+"Please install the program, geosfmstats.dll, before you continue.", "GeoSFM Utilities") 
+        '        '  exit
+        '        'end
+        '        '
+        '        'mydll = DLL.Make(myfilename)
+        '        'if(mydll = Nil) then
+        '        '  msgbox.info("Unable to access the dll, geosfmstats.dll"+nl+nl+"Please install the program, geosfmstats.dll, before you continue.", "GeoSFM Utilities") 
+        '        '  exit
+        '        'end 
+        '        '
+        '        '
+        '        'myproc=DLLProc.Make(myDLL, "aggregateflows", #DLLPROC_TYPE_INT32,{#DLLPROC_TYPE_VOID})
+        '        'if(myproc = Nil) then
+        '        '  msgbox.info("Unable to make the procedure, aggregateflows"+nl+nl+"Please install the program, geosfmstats.dll, before you continue.", "GeoSFM Utilities") 
+        '        '  exit
+        '        'end 
+        '        '  
+        '        'doMore = av.SetWorkingStatus
+        '        'if (doMore = False) then
+        '        '  exit
+        '        'end
+        '        '
+        '        'procGetLastError=myproc.call({})
+        '        '
+
+        '        myrun = 0
+
+        '        myfilename = ("$AVEXT\geosfmstats.dll").AsFileName
+        '        myfilename2 = ("$AVEXT\geosfmstats.exe").AsFileName
+
+        '        If (File.Exists(("$AVEXT\geosfmstats.dll").AsFileName)) Then
+        '            mydll = DLL.Make(myfilename)
+        '            If (mydll <> Nil) Then
+        '    myproc=DLLProc.Make(myDLL, "aggregateflows", #DLLPROC_TYPE_INT32,{#DLLPROC_TYPE_VOID})
+        '                If (myproc <> Nil) Then
+        '                    myrun = 1
+        '      procGetLastError=myproc.call({})
+        '                End If
+        '            End If
+        '        End If
+
+        '        If (myrun = 0) Then
+        '            If (File.Exists(("$AVEXT\geosfmstats.exe").AsFileName)) Then
+        '    ziplistfile = LineFile.Make((myWkDirname + "statslist.bat").AsFileName, #FILE_PERM_WRITE)
+        '                If (ziplistfile = nil) Then
+        '                    MsgBox.error("Cannot open output file: statslist.bat" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '                    Exit Sub
+        '                End If
+        '                ziplistfile.WriteElt("Copy " + (("$AVEXT\geosfmstats.exe").AsFileName).GetFullName + +myWkDirname + "geosfmstats.exe")
+        '                ziplistfile.flush()
+        '                ziplistfile.close()
+        '                System.ExecuteSynchronous("statslist.bat")
+
+        '    ziplistfile = LineFile.Make((myWkDirname + "statslist.bat").AsFileName, #FILE_PERM_WRITE)
+        '                If (ziplistfile = nil) Then
+        '                    MsgBox.error("Cannot open output file: statslist.bat" + nl + "File may be open or tied up by another program", "GeoSFM Utilities")
+        '                    Exit Sub
+        '                End If
+        '                ziplistfile.WriteElt("geosfmstats.exe")
+        '                ziplistfile.flush()
+        '                ziplistfile.close()
+        '                System.ExecuteSynchronous("statslist.bat")
+        '            ElseIf (File.Exists(("$AVEXT\geosfmstats.exe").AsFileName).NOT) Then
+        '                MsgBox.info("Unable to locate the program file: geosfmstats.exe " + nl + nl + "Install the programs in your ArcView/Ext32 or working directory.", "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            ElseIf (myfilename = Nil) Then
+        '                MsgBox.info("Unable to locate the program file: geosfmstats.dll." + nl + nl + "Please install the program, geosfmstats.dll, before you continue.", "GeoSFM Utilities")
+        '                Exit Sub
+        '            ElseIf (mydll = Nil) Then
+        '                MsgBox.info("Unable to access the dll, geosfmstats.dll" + nl + nl + "Please install the program, geosfmstats.dll, before you continue.", "GeoSFM Utilities")
+        '                Exit Sub
+        '            ElseIf (myproc = Nil) Then
+        '                MsgBox.info("Unable to make the procedure, aggregateflows" + nl + nl + "Please install the program, geosfmstats.dll, before you continue.", "GeoSFM Utilities")
+        '                Exit Sub
+        '            End If
+        '        End If
+
+
+        'monthlyfile = LineFile.Make((monthlyFN).asfilename,#file_perm_read)
+        '        If (monthlyfile = nil) Then
+        '            MsgBox.info("Could not open output monthly time series file," + nl + monthlyFN, "GeoSFM Utilities")
+        '            Exit Sub
+        '        End If
+
+        'annualfile = LineFile.Make((annualFN).asfilename,#file_perm_read)
+        '        If (annualfile = nil) Then
+        '            MsgBox.info("Could not open output annual time series file," + nl + annualFN, "GeoSFM Utilities")
+        '            Exit Sub
+        '        End If
+
+        '        GUIName = "Table"
+        '        monthlyfile.close()
+        '        annualfile.close()
+
+        '        doMore = av.SetWorkingStatus
+        '        If (doMore = False) Then
+        '            Exit Sub
+        '        End If
+
+        '        oldout = theProject.finddoc(monthlyFN)
+        '        If (oldout <> nil) Then
+        '            theproject.removedoc(oldout)
+        '        End If
+
+        '        oldout = theProject.finddoc(annualFN)
+        '        If (oldout <> nil) Then
+        '            theproject.removedoc(oldout)
+        '        End If
+
+        '        monthlyfilename = monthlyFN.asfilename
+        '        monthlytable = Vtab.make(monthlyFN.asfilename, False, False)
+        '        tm = Table.MakeWithGUI(monthlytable, GUIName)
+        '        tm.SetName(monthlyFN.asfilename.getbasename.asstring)
+
+        '        annualfilename = annualFN.asfilename
+        '        annualfile = Vtab.make(annualfilename, False, False)
+        '        annualTbl = Table.MakeWithGUI(annualfile, GUIName)
+        '        annualTbl.SetName(annualfilename.getbasename.asstring)
+
+        '        dailyfilename = runoffFN.asfilename
+
+        '        If (useyear = 365) Then
+        '            resultfilename = dailyfilename
+        '        ElseIf (useyear = 12) Then
+        '            resultfilename = monthlyfilename
+        '        Else
+        '            resultfilename = annualfilename
+        '        End If
+        '        resultfile = Vtab.make(resultfilename, False, False)
+
+        '        av.ClearStatus()
+        '        av.clearmsg()
+
+        '        subname = (resultfilename.AsString.Substitute(".txt", ".dbf")).AsFileName
+        '        newVtab = resultfile.export(subname, DBase, False)
+        '        newTable = Table.Make(newVtab)
+
+        '        'select parameter to update
+        '        chksum = 1
+        '        chkcnt = 1
+        '        chkavg = 1
+        '        chkmax = 1
+        '        chkmin = 1
+        '        chkrng = 1
+        '        chkvar = 1
+        '        chkstd = 1
+        '        chkbkf = 1
+        '        chkmed = 1
+        '        chkq25 = 1
+        '        chkq33 = 1
+        '        chkq66 = 1
+        '        chkq75 = 1
+
+        '        updatethr = True
+
+        '        If (TheTheme.CanSelect) Then
+        '            theftheme = theTheme
+        '            theftab = theTheme.GetFtab
+        '            shpfld = theFTab.FindField("Shape")
+        '            theFTab.CreateIndex(shpfld)
+        '        Else
+        '            p = False
+        '            def = av.GetProject.MakeFileName("theme", "shp")
+        '            def = FileDialog.Put(def, "*.shp", "Convert " + TheTheme.getName)
+        '            If (def = NIL) Then
+        '                Exit Sub
+        '            End If
+        '            theFTab = TheTheme.ExportToFtab(def)
+        '            ' For Database themes, which can return a nil FTab sometimes 
+        '            If (theFTab = nil) Then
+        '    MsgBox.Warning("Error occurred while converting to shapefile."+NL+
+        '        "Shapefile was not created.", "Convert " + TheTheme.getName)
+        '                Exit Sub
+        '            End If
+        '            shpfld = theFTab.FindField("Shape")
+        '            ' build the spatial index
+        '            theFTab.CreateIndex(shpfld)
+        '            theftheme = FTheme.Make(theFTab)
+        '            theView.AddTheme(theftheme)
+        '            '  theView.GetWin.Activate
+        '            End If
+
+        '            theFtab.SetEditable(True)
+        '            addlist = List.Make
+
+        '            sumfld = theFtab.FindField("Sum")
+        '            If (sumfld = nil) Then
+        '  fldadd = Field.Make("Sum", #field_decimal, 10 , 1)
+        '                addlist.Add(fldadd)
+        '            End If
+        '            countfld = theFtab.FindField("Count")
+        '            If (Countfld = nil) Then
+        '  fldadd = Field.Make("Count", #field_decimal, 10 , 1)  
+        '                addlist.Add(fldadd)
+        '            End If
+        '            meanfld = theFtab.FindField("Mean")
+        '            If (Meanfld = nil) Then
+        '  fldadd = Field.Make("Mean", #field_decimal, 10 , 1)
+        '                addlist.Add(fldadd)
+        '            End If
+        '            maxfld = theFtab.FindField("Maximum")
+        '            If (Maxfld = nil) Then
+        '  fldadd = Field.Make("Maximum", #field_decimal, 10 , 1)
+        '                addlist.Add(fldadd)
+        '            End If
+        '            minfld = theFtab.FindField("Minimum")
+        '            If (Minfld = nil) Then
+        '  fldadd = Field.Make("Minimum", #field_decimal, 10 , 1)
+        '                addlist.Add(fldadd)
+        '            End If
+        '            rangefld = theFtab.FindField("Range")
+        '            If (Rangefld = nil) Then
+        '  fldadd = Field.Make("Range", #field_decimal, 10 , 1)
+        '                addlist.Add(fldadd)
+        '            End If
+        '            varfld = theFtab.FindField("Variance")
+        '            If (Varfld = nil) Then
+        '  fldadd = Field.Make("Variance", #field_decimal, 10 , 1)
+        '                addlist.Add(fldadd)
+        '            End If
+        '            stddevfld = theFtab.FindField("Stddev")
+        '            If (Stddevfld = nil) Then
+        '  fldadd = Field.Make("Stddev", #field_decimal, 10 , 1)
+        '                addlist.Add(fldadd)
+        '            End If
+        '            addlist.DeepClone()
+        '            medianfld = theFtab.FindField("Median")
+        '            If (medianfld = nil) Then
+        '  fldadd = Field.Make("Median", #field_decimal, 10 , 3)
+        '                addlist.Add(fldadd)
+        '            End If
+        '            addlist.DeepClone()
+        '            Quart25fld = theFtab.FindField("Quart25")
+        '            If (Quart25fld = nil) Then
+        '  fldadd = Field.Make("Quart25", #field_decimal, 10 , 3)
+        '                addlist.Add(fldadd)
+        '            End If
+        '            addlist.DeepClone()
+        '            Quart75fld = theFtab.FindField("Quart75")
+        '            If (Quart75fld = nil) Then
+        '  fldadd = Field.Make("Quart75", #field_decimal, 10 , 3)
+        '                addlist.Add(fldadd)
+        '            End If
+        '            addlist.DeepClone()
+        '            Quart33fld = theFtab.FindField("Quart33")
+        '            If (Quart33fld = nil) Then
+        '  fldadd = Field.Make("Quart33", #field_decimal, 10 , 3)
+        '                addlist.Add(fldadd)
+        '            End If
+        '            addlist.DeepClone()
+        '            Quart66fld = theFtab.FindField("Quart66")
+        '            If (Quart66fld = nil) Then
+        '  fldadd = Field.Make("Quart66", #field_decimal, 10 , 3)
+        '                addlist.Add(fldadd)
+        '            End If
+        '            addlist.DeepClone()
+        '            Highflowfld = theFtab.FindField("Highflow")
+        '            If (Highflowfld = nil) Then
+        '  fldadd = Field.Make("Highflow", #field_decimal, 10 , 3)
+        '                addlist.Add(fldadd)
+        '            End If
+        '            addlist.DeepClone()
+        '            lowflowfld = theFtab.FindField("Lowflow")
+        '            If (lowflowfld = nil) Then
+        '  fldadd = Field.Make("Lowflow", #field_decimal, 10 , 3)
+        '                addlist.Add(fldadd)
+        '            End If
+        '            addlist.DeepClone()
+        '            medflowfld = theFtab.FindField("Medflow")
+        '            If (medflowfld = nil) Then
+        '  fldadd = Field.Make("Medflow", #field_decimal, 10 , 3)
+        '                addlist.Add(fldadd)
+        '            End If
+        '            addlist.DeepClone()
+
+        '            theFtab.Addfields(addlist)
+        '            sumfld = theFtab.FindField("Sum")
+        '            meanfld = theFtab.FindField("Mean")
+        '            maxfld = theFtab.FindField("Maximum")
+        '            minfld = theFtab.FindField("Minimum")
+        '            stddevfld = theFtab.FindField("StdDev")
+        '            varfld = theFtab.FindField("Variance")
+        '            rangefld = theFtab.FindField("Range")
+        '            countfld = theFtab.FindField("Count")
+        '            medianfld = theFtab.FindField("Median")
+        '            Quart25fld = theFtab.FindField("Quart25")
+        '            Quart75fld = theFtab.FindField("Quart75")
+        '            Quart33fld = theFtab.FindField("Quart33")
+        '            Quart66fld = theFtab.FindField("Quart66")
+        '            Highflowfld = theFtab.FindField("Highflow")
+        '            lowflowfld = theFtab.FindField("Lowflow")
+        '            Medflowfld = theFtab.FindField("Medflow")
+
+        '            theFields = resultfile.GetFields
+        '            theFields.clone()
+        '            pidfield = theFtab.FindField("Gridcode")
+        '            polyidfld = theFtab.FindField("Id")
+        '            pnumrecs = theFtab.GetNumRecords
+        '            pidlist = List.Make
+        'For each prec in 0..(pnumrecs-1)
+        '                pidval = theFtab.ReturnValue(pidfield, prec)
+        '                pidlist.Add(pidval)
+        '        Next
+
+        '        numflds = theFields.count
+        '        numrecs = resultfile.GetNumRecords
+        '        If (numflds < 2) Then
+        '            MsgBox.error("Incorrect Textfile Format. Contains less than 2 fields." + nl + "Make sure input textfile is comma delimited.", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+        '        theSum = 0
+        '        theCount = 0
+        '        themean = 0
+        '        theMinimum = 0
+        '        theMaximum = 0
+        '        theRange = 0
+        '        theStdDev = 0
+        '        theVariance = 0
+        '        theMedian = 0
+        '        theQuart25 = 0
+        '        theQuart75 = 0
+        '        theQuart33 = 0
+        '        theQuart66 = 0
+
+        '        av.UseWaitCursor()
+        '        av.ShowStopButton()
+        '        av.ShowMsg("Computing Statistics..........")
+        '        tempcount = 0
+        'for each mynum in 0..(numflds-1)
+        '            theSum = 0
+        '            theCount = 0
+        '            theMinimum = nil
+        '            theMaximum = nil
+
+        '            av.ShowMsg("Processing Basin " + (mynum + 1).asstring + " of " + numflds.asstring + " .........")
+        '            progress = (mynum / (numflds - 1)) * 100
+        '            doMore = av.SetStatus(progress)
+        '            If (Not doMore) Then
+        '                av.ClearWorkingStatus()
+        '                av.clearstatus()
+        '                Exit Sub
+        '            End If
+
+        '            fld = theFields.Get(mynum)
+        '            If ((fld.IsTypeNumber) And (fld.GetName.IsNumber)) Then
+        '    reclist = {} 
+        '    For each rec in 0..(numrecs-1)     
+        '                    theValue = resultfile.ReturnValueNumber(Fld, rec)
+        '                    If (Not (theValue.IsNull)) Then
+        '                        reclist.Add(theValue)
+        '                        theSum = theValue + theSum
+        '                        theCount = theCount + 1
+        '                    End If
+        '                Next
+
+        '                theMean = theSum / theCount
+
+        '                reclist.clone()
+        '                reclist.Sort(True)
+        '                recCount = reclist.count
+
+        '                theMinimum = reclist.get(0)
+        '                theMaximum = reclist.get(recCount - 1)
+        '                theRange = (theMaximum - theMinimum)
+
+        '                If ((chkq25 = 1) Or (chkq33 = 1) Or (chkq66 = 1) Or (chkq75 = 1) Or (chkmed = 1) Or (chkbkf = 1)) Then
+
+        '                    If (chkmed = 1) Then
+        '                        If (recCount < 9) Then
+        '                            MsgBox.info("Too few records for flow statistics computation", "Less than 9 records")
+        '                            Exit Sub
+        '                        ElseIf (((recCount) Mod (2)) = 1) Then
+        '                            theMedian = reclist.get((recCount - 1) / 2)
+        '                        ElseIf (((recCount) Mod (2)) = 0) Then
+        '                            theMedian = (((reclist.get((recCount - 2) / 2)) + (reclist.get((recCount) / 2))) / 2)
+        '                        End If
+        '                    End If
+
+        '                    If ((chkq25 = 1) Or (chkq75 = 1)) Then
+        '                        If (recCount < 9) Then
+        '                            MsgBox.info("Too few records for flow statistics computation", "Less than 9 records")
+        '                            Exit Sub
+        '                        ElseIf (((recCount) Mod (2)) = 1) Then
+        '                            If (((recCount) Mod (4)) = 1) Then
+        '                                theQuart25 = reclist.get((recCount - 1) / 4)
+        '                                theQuart75 = reclist.get((recCount - 1) * 3 / 4)
+        '                            ElseIf (((recCount) Mod (4)) = 3) Then
+        '                                theQuart25 = (((reclist.get((recCount + 1) / 4)) + (reclist.get((recCount - 3) / 4))) / 2)
+        '                                theQuart75 = (((reclist.get((recCount + 1) * 3 / 4)) + (reclist.get(((recCount + 1) * 3 / 4) - 1))) / 2)
+        '                            End If
+        '                        ElseIf (((recCount) Mod (2)) = 0) Then
+        '                            If (((recCount) Mod (4)) = 2) Then
+        '                                theQuart25 = reclist.get((recCount - 2) / 4)
+        '                                theQuart75 = reclist.get((recCount - 2) * 3 / 4)
+        '                            ElseIf (((recCount) Mod (4)) = 0) Then
+        '                                theQuart25 = (((reclist.get((recCount - 4) / 4)) + (reclist.get((recCount) / 4))) / 2)
+        '                                theQuart75 = (((reclist.get((recCount * 3 / 4) - 1)) + (reclist.get((recCount) * 3 / 4))) / 2)
+        '                            End If
+        '                        End If
+        '                    End If
+
+        '                    If ((chkq33 = 1) Or (chkq66 = 1)) Then
+        '                        If ((((recCount) Mod (3)) = 0) And (recCount >= 9)) Then
+        '                            theQuart33 = (((reclist.get((recCount) / 3)) * 2 / 3) + ((reclist.get((recCount - 3) / 3)) * 1 / 3))
+        '                            theQuart66 = (((reclist.get((recCount) * 2 / 3)) * 1 / 3) + ((reclist.get((recCount - 1.5) * 2 / 3)) * 2 / 3))
+        '                        ElseIf ((((recCount) Mod (3)) = 1) And (recCount >= 9)) Then
+        '                            theQuart33 = (reclist.get((recCount - 1) / 3))
+        '                            theQuart66 = (reclist.get((recCount - 4) * 2 / 3))
+        '                        ElseIf ((((recCount) Mod (3)) = 2) And (recCount >= 9)) Then
+        '                            theQuart33 = (((reclist.get((recCount - 2) / 3)) * 2 / 3) + ((reclist.get((recCount + 1) / 3)) * 1 / 3))
+        '                            theQuart66 = (((reclist.get((recCount - 2) * 2 / 3)) * 2 / 3) + ((reclist.get(((recCount - 0.5) * 2 / 3) + 1)) * 1 / 3))
+        '                        Else
+        '                            theQuart33 = 0
+        '                            theQuart66 = 0
+        '                        End If
+        '                    End If
+        '                End If
+
+        '                If ((chkstd = 1) Or (chkvar = 1)) Then
+        '                    theSumSqDev = 0
+        '      for each rec in 0..(numrecs-1)
+        '                        theValue = resultfile.ReturnValueNumber(Fld, rec)
+        '                        If (Not (theValue.IsNull)) Then
+        '                            theSqDev = (theValue - theMean) * (theValue - theMean)
+        '                            theSumSqDev = theSqDev + theSumSqDev
+        '                        End If
+        '                    Next
+
+        '                    If (theCount > 1) Then
+        '                        theVariance = theSumsqdev / (theCount - 1)
+        '                        theStdDev = theVariance.Sqrt
+        '                    Else
+        '                        theVariance = 0
+        '                        theStdDev = 0
+        '                    End If
+        '                End If
+
+        '                rid = fld.AsString.AsNumber
+
+        '                For Each precs In theFtab
+        '                    cpid = theFtab.ReturnValue(pidfield, precs)
+        '                    If (cpid = rid) Then
+        '                        If (chksum = 1) Then
+        '                            theFtab.SetValue(sumfld, precs, theSum)
+        '                        End If
+        '                        If (chkcnt = 1) Then
+        '                            theFtab.SetValue(countfld, precs, theCount)
+        '                        End If
+        '                        If (chkavg = 1) Then
+        '                            theFtab.SetValue(meanfld, precs, themean)
+        '                        End If
+        '                        If (chkmin = 1) Then
+        '                            theFtab.SetValue(minfld, precs, theMinimum)
+        '                        End If
+        '                        If (chkmax = 1) Then
+        '                            theFtab.SetValue(maxfld, precs, theMaximum)
+        '                        End If
+        '                        If (chkrng = 1) Then
+        '                            theFtab.SetValue(rangefld, precs, theRange)
+        '                        End If
+        '                        If (chkstd = 1) Then
+        '                            theFtab.SetValue(stddevfld, precs, theStdDev)
+        '                        End If
+        '                        If (chkvar = 1) Then
+        '                            theFtab.SetValue(varfld, precs, theVariance)
+        '                        End If
+        '                        If (chkmed = 1) Then
+        '                            theFtab.SetValue(medianfld, precs, theMedian)
+        '                        End If
+        '                        If (chkq25 = 1) Then
+        '                            theFtab.SetValue(Quart25fld, precs, theQuart25)
+        '                        End If
+        '                        If (chkq33 = 1) Then
+        '                            theFtab.SetValue(Quart33fld, precs, theQuart33)
+        '                        End If
+        '                        If (chkq66 = 1) Then
+        '                            TheFtab.SetValue(Quart66fld, precs, theQuart66)
+        '                        End If
+        '                        If (chkq75 = 1) Then
+        '                            theFtab.SetValue(Quart75fld, precs, theQuart75)
+        '                        End If
+
+        '                        If (updatethr = True) Then
+        '                            mymean = theFtab.ReturnValue(meanfld, precs)
+        '                            mymax = theFtab.ReturnValue(maxfld, precs)
+        '                            mymin = theFtab.ReturnValue(minfld, precs)
+        '                            myhigh = (mymean * mymax).sqrt
+        '                            mylow = mymean.sqrt
+        '                            theFtab.SetValue(Highflowfld, precs, myhigh)
+        '                            theFtab.SetValue(Medflowfld, precs, mymean)
+        '                            theFtab.SetValue(Lowflowfld, precs, mylow)
+        '                        End If
+        '                    End If
+        '                Next
+
+        '            End If
+        '        Next
+
+        '        choicestrg = "Median"
+
+        'mylegend = legend.make(#SYMBOL_FILL)
+        'mylegend.setlegendtype(#LEGEND_TYPE_COLOR)
+        '        mylegend.Interval(theFtheme, choicestrg, 5)
+
+        'myColorRamp = SymbolList.GetPreDefined(#SYMLIST_TYPE_COLORRAMP).Get(25)
+        '        mylegend.GetSymbols.RampSavedColors(myColorRamp)
+
+        '        mylegend.Save(filename.Merge(myWkDirname, "flow.avl"))
+        '        theFtheme.SetLegend(mylegend)
+        '        theFtheme.UpdateLegend()
+
+        '        theFtab.SetEditable(False)
+        '        theFtheme.SetVisible(True)
+        '        av.ClearWorkingStatus()
+        '        av.clearstatus()
+
+        '        oldout = theProject.finddoc("riverstats.txt")
+        '        If (oldout <> nil) Then
+        '            theproject.removedoc(oldout)
+        '        End If
+
+        '        theFtab.Export("riverstats.txt".asFileName, DText, False)
+
+        '        bankfullVtab = Vtab.make("riverstats.txt".asFileName, False, False)
+        '        bankfulltable = Table.MakeWithGUI(bankfullVtab, GUIName)
+        '        bankfulltable.SetName("riverstats.txt".asFileName.getbasename.asstring)
+        '        bankfulltable.GetWin.Open()
+
+        '        MsgBox.Info("Bankfull and Flow Characteristics Computed. Outputs written to: " + nl + nl + "      " + mywkDirname + "riverstats.txt", "Geospatial Stream Flow Model")
+
     End Sub
 
     Friend Sub PlotMap()
@@ -3702,6 +4408,295 @@ Public Module modGeoSFM
         '
         ' ***********************************************************************************************
         ' ***********************************************************************************************
+
+        '        TheProject = av.GetProject
+        '        theFileName = theProject.GetFileName
+        '        If (theFileName = nil) Then
+        '            av.Run("Project.SaveAs", nil)
+        '            theFileName = theProject.GetFileName
+        '            If (theFileName = nil) Then
+        '                Exit Sub
+        '            End If
+        '        Else
+        '            If (av.Run("Project.CheckForEdits", nil).Not) Then
+        '                Return nil
+        '            End If
+        '            If (theProject.Save) Then
+        '                av.ShowMsg("Project saved to '" + theFileName.GetBaseName + "'")
+        '    if (System.GetOS = #SYSTEM_OS_MAC) then
+        '                    Script.Make("MacClass.SetDocInfo(SELF, Project)").DoIt(theFileName)
+        '                End If
+        '            End If
+        '        End If
+
+        '        TheView = av.GetActiveDoc
+        '        ViewChk = TheView.GetGUI
+        '        If (ViewChk <> "View") Then
+        '            MsgBox.error("Click on the View to make it 'active' before running this program", "")
+        '            Exit Sub
+        '        End If
+
+        '        ' Check the working directory
+        '        TheWkDir = TheProject.GetFileName.ReturnDir
+        '        myWkDirname = MsgBox.Input("Specify your working directory", "Working Directory", TheWkDir.GetFullName)
+        '        If (mywkDirName = nil) Then
+        '            Exit Sub
+        '        End If
+        '        If (File.Exists(myWkDirname.AsFileName).not) Then
+        '            MsgBox.Error("Cannot read directory " + myWkDirname, "Directory Specification Error")
+        '            Exit Sub
+        '        End If
+        '        If (File.IsWritable(myWkDirname.AsFileName).not) Then
+        '            MsgBox.Error(myWkDirname + +"is not writable.", "Directory Specification Error")
+        '            Exit Sub
+        '        End If
+        '        TheProject.SetWorkDir(myWkDirname.AsFileName)
+
+
+        '        If ((myWkDirname.contains("\").Not) And (myWkDirname.contains("/")) And (myWkDirname.right(1) <> "/")) Then
+        '            myWkDirname = myWkDirname + "/"
+        '        ElseIf ((myWkDirname.contains("\")) And (myWkDirname.right(1) <> "\")) Then
+        '            myWkDirname = myWkDirname + "\"
+        '        ElseIf ((myWkDirname.contains("\").Not) And (myWkDirname.contains("\").Not) And (myWkDirname.right(1) <> "/")) Then
+        '            myWkDirname = myWkDirname + "/"
+        '        End If
+
+        '        newtablelist = List.make
+        '        sflowFN = theProject.Finddoc("streamflow.txt")
+        '        If (sflowFN <> nil) Then
+        '            newtablelist.add(sflowFN)
+        '        End If
+
+        '        soilwFN = theProject.Finddoc("soilwater.txt")
+        '        If (soilwFN <> nil) Then
+        '            newtablelist.add(soilwFN)
+        '        End If
+
+        '        If (newtablelist.isempty) Then
+        '            resultfilename = FileDialog.Show("*.txt", "Textfile", "Select Input Data File")
+        '            If (resultfilename = nil) Then
+        '                Exit Sub
+        '            End If
+        '        Else
+        '            resulttablename = MsgBox.Choice(newtablelist, "Select Input Data File", "Input Flow Time Series")
+        '            If (resulttablename = nil) Then
+        '                resultfilename = FileDialog.Show("*.txt", "Textfile", "Select Input Data File")
+        '                If (resultfilename = nil) Then
+        '                    Exit Sub
+        '                End If
+        '            Else
+        '                resultfilename = resulttablename.getVtab.getname.asfilename
+        '            End If
+        '        End If
+
+        '        resultfile = Vtab.Make(resultfilename, False, False)
+
+        '        theThemelist = theView.GetThemes
+        '        mypolythmlist = List.make
+        '        For Each thm In theThemelist
+        '            If (thm.CanSelect) Then
+        '                athmname = thm.getname
+        '                If ((athmname.contains("basply")) Or (athmname.contains("basin"))) Then
+        '                    mypolythmlist.add(thm)
+        '                End If
+        '            End If
+        '        Next
+
+        '        If (mypolythmlist.isempty) Then
+        '            theTheme = MsgBox.Choice(theThemelist, "Select basin coverage/grid theme", "Basin Theme")
+        '            If (theTheme = nil) Then
+        '                Exit Sub
+        '            End If
+        '        Else
+        '            theTheme = MsgBox.Choice(mypolythmlist, "Select basin coverage/grid theme", "Basin Theme")
+        '            If (theTheme = nil) Then
+        '                Exit Sub
+        '            End If
+        '        End If
+
+        '        If (TheTheme.CanSelect) Then
+        '            theftheme = theTheme
+        '            theftab = theTheme.GetFtab
+        '            shpfld = theFTab.FindField("Shape")
+        '            theFTab.CreateIndex(shpfld)
+        '        Else
+        '            p = False
+        '            def = av.GetProject.MakeFileName("theme", "shp")
+        '            def = FileDialog.Put(def, "*.shp", "Convert " + TheTheme.getName)
+        '            If (def = NIL) Then
+        '                Return NIL
+        '            End If
+        '            theFTab = TheTheme.ExportToFtab(def)
+        '            ' For Database themes, which can return a nil FTab sometimes 
+        '            If (theFTab = nil) Then
+        '    MsgBox.Warning("Error occurred while converting to shapefile."+NL+
+        '        "Shapefile was not created.", "Convert " + TheTheme.getName)
+        '                Exit Sub
+        '            End If
+        '            shpfld = theFTab.FindField("Shape")
+        '            ' build the spatial index
+        '            theFTab.CreateIndex(shpfld)
+        '            theftheme = FTheme.Make(theFTab)
+        '            theView.AddTheme(theftheme)
+        '            '  theView.GetWin.Activate
+        '            End If
+
+        '            theFtab.SetEditable(True)
+        '            addlist = List.Make
+
+        '            Highflowfld = theFtab.FindField("Highflow")
+        '            If (Highflowfld = nil) Then
+        '                MsgBox.error("High flow field, Highflow, has not been initialized", "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            End If
+        '            lowflowfld = theFtab.FindField("Lowflow")
+        '            If (lowflowfld = nil) Then
+        '                MsgBox.error("Low flow field, Lowflow, has not been initialized", "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            End If
+
+        '            medflowfld = theFtab.FindField("Medflow")
+        '            If (medflowfld = nil) Then
+        '                MsgBox.error("Median flow field, Medflow, has not been initialized", "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            End If
+
+        '            newflds = List.make
+        '            theFields = resultfile.GetFields
+        '            theFields.clone()
+        '            pidfield = theFtab.FindField("Gridcode")
+        '            If (pidfield = nil) Then
+        '                pidfield = theFtab.FindField("Grid_code")
+        '                If (pidfield = nil) Then
+        '                    pidfield = MsgBox.choice(thefields, "Select key field for the basin coverage/grid", "Geospatial Stream Flow Model")
+        '                    If (pidfield = nil) Then
+        '                        Exit Sub
+        '                    End If
+        '                End If
+        '            End If
+
+        '            cflowfld = theFtab.FindField("FlowNow")
+        '            If (cflowfld = nil) Then
+        '  fldadd = Field.Make("FlowNow", #field_decimal, 12 , 3)
+        '                newflds.Add(fldadd)
+        '                theFtab.AddFields(newflds)
+        '                cflowfld = theFtab.FindField("FlowNow")
+        '  newflds = {}
+        '            End If
+
+        '            cfindexfld = theFtab.FindField("IndexNow")
+        '            If (cfindexfld = nil) Then
+        '  fldadd = Field.Make("IndexNow", #field_byte, 4 , 0)
+        '                newflds.Add(fldadd)
+        '                theFtab.AddFields(newflds)
+        '                cfindexfld = theFtab.FindField("IndexNow")
+        '            End If
+
+        '            pnumrecs = theFtab.GetNumRecords
+        '            pidlist = List.Make
+        'For each prec in 0..(pnumrecs-1)
+        '                pidval = (theFtab.ReturnValue(pidfield, prec)).setformat("d")
+        '                pidlist.Add(pidval)
+        '        Next
+
+        '        numflds = theFields.count
+        '        numrecs = resultfile.GetNumRecords
+        '        Dayfld = resultfile.FindField("Timestep")
+        '        If (Dayfld = nil) Then
+        '            Dayfld = resultfile.FindField("Day")
+        '            If (Dayfld = nil) Then
+        '                Dayfld = resultfile.FindField("BasinID")
+        '                If (Dayfld = nil) Then
+        '                    Dayfld = resultfile.FindField("Time")
+        '                    If (Dayfld = nil) Then
+        '                        Dayfld = MsgBox.choice(thefields, "Select key field for the time series file", "Geospatial Stream Flow Model")
+        '                        If (Dayfld = nil) Then
+        '                            Exit Sub
+        '                        End If
+        '                    End If
+        '                End If
+        '            End If
+        '        End If
+
+        '        daylist = List.make
+        'For each frec in (numrecs-1)..0 by -1
+        '            dayval = resultfile.ReturnValue(dayfld, frec)
+        '            daylist.Add((dayval.setformat("dd")).asstring)
+        '        Next
+
+        '        plotday = MsgBox.ChoiceAsString(daylist, "Select day to plot flow percentile map", "Geospatial Stream Flow Model")
+        '        If (plotday = nil) Then
+        '            Exit Sub
+        '        End If
+        '        dayindex = (daylist.count - (daylist.findbyvalue(plotday)) - 1)
+        '        If (dayindex = -1) Then
+        '            MsgBox.error("Selected day not found in " + resultfilename.AsString, "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+        '        av.UseWaitCursor()
+
+        'for each mynum in 0..(numflds-1)
+        '            fld = theFields.Get(mynum)
+        '            av.ShowMsg("Checking Status for Basin " + (mynum + 1).asstring + " of " + numflds.asstring)
+        '            progress = (mynum / (numflds - 1)) * 100
+        '            doMore = av.SetStatus(progress)
+        '            If (Not doMore) Then
+        '                av.ClearWorkingStatus()
+        '                av.clearstatus()
+        '                Exit Sub
+        '            End If
+        '            If ((fld.IsTypeNumber) And (fld.AsString <> "timestep") And (fld.AsString <> "day")) Then
+        '    For each pid in 0..(pnumrecs-1)
+        '                    If (pidlist.Get(pid).AsString = fld.AsString) Then
+        '                        theHighflow = theFtab.ReturnValue(highflowfld, pid)
+        '                        theLowflow = theFtab.ReturnValue(Lowflowfld, pid)
+        '                        theMedflow = theFtab.ReturnValue(medflowfld, pid)
+        '                        theflow = resultfile.ReturnValueNumber(fld, dayindex)
+        '                        theFtab.SetValue(cflowfld, pid, theflow)
+        '                        If (theflow > theHighflow) Then
+        '                            theFtab.SetValue(cfindexfld, pid, 3)
+        '                        ElseIf (theflow < thelowflow) Then
+        '                            theFtab.SetValue(cfindexfld, pid, 1)
+        '                        Else
+        '                            theFtab.SetValue(cfindexfld, pid, 2)
+        '                        End If
+        '                    End If
+        '                                end if 
+        '        Next
+        '    Next
+
+        '        theFtab.Flush()
+        '        theFtab.SetEditable(False)
+        'mylegend = legend.make(#SYMBOL_FILL)
+        'mylegend.setlegendtype(#LEGEND_TYPE_COLOR)
+        'mysymbol1 = symbol.make(#SYMBOL_FILL)
+        'mysymbol2 = symbol.make(#SYMBOL_FILL)
+        'mysymbol3 = symbol.make(#SYMBOL_FILL)
+
+        '        myyellow = Color.make
+        '        mygreen = Color.make
+        '        myblue = Color.make
+        'myyellow.setrgblist({250, 250, 0}) 
+        'mygreen.setrgblist({0, 240, 0})
+        'myblue.setrgblist({0, 0, 250})
+        '        mysymbol1.SetColor(myyellow)
+        '        mysymbol2.SetColor(mygreen)
+        '        mysymbol3.SetColor(myblue)
+        '        mylegend.Interval(theFtheme, "IndexNow", 3)
+        'mylegend.SetClassInfo(0, {"low_flow", "1", mySymbol1, 0, 1})
+        'mylegend.SetClassInfo(1, {"normal_flow", "2", mySymbol2, 1, 2})
+        'mylegend.SetClassInfo(2, {"high_flow", "3", mySymbol3, 2, 3})
+        '        mylegendFN = filename.Merge(myWkDirname, "flow.avl")
+        '        mylegend.Save(mylegendFN)
+        '        'thelegend = legend.make(#SYMBOL_FILL)
+        '        'thelegend.Load(mylegendFN, #LEGEND_LOADTYPE_ALL) 
+        '        theFtheme.SetLegend(mylegend)
+        '        theFtheme.UpdateLegend()
+        '        theFtheme.SetVisible(True)
+        '        'theFtheme.SetName("Basin.shp")
+
+
     End Sub
 
     Friend Sub SetPlot()
@@ -3726,6 +4721,231 @@ Public Module modGeoSFM
         '
         ' ***********************************************************************************************
         ' ***********************************************************************************************
+
+        '        TheProject = av.GetProject
+        '        theView = av.getactiveDoc
+        '        ViewChk = TheView.GetGUI
+        '        If (ViewChk <> "View") Then
+        '            MsgBox.error("Click on the View to make it 'active' before running this program", "")
+        '            Exit Sub
+        '        End If
+
+        '        theThemelist = theView.GetThemes
+        '        TheTheme = theView.FindTheme("basply.shp")
+        '        If (TheTheme = nil) Then
+        '            For Each vthm In theThemelist
+        '                thethmnm = vthm.getname
+        '                If ((thethmnm.contains("basply")) And (vthm.CanSelect)) Then
+        '                    TheTheme = theView.FindTheme(thethmnm)
+        '                    break()
+        '                End If
+        '            Next
+        '            If (thetheme = nil) Then
+        '                theTheme = MsgBox.Choice(theThemelist, "Select basin grid/polygon theme", "Basin Theme")
+        '                If (theTheme = nil) Then
+        '                    Exit Sub
+        '                End If
+        '            End If
+        '        End If
+
+
+
+        '        theWKdir = theproject.GetFileName.ReturnDir
+
+        '        found = False
+        '        p = theView.GetDisplay.ReturnUserPoint
+
+        '        If (TheTheme.Is(Ftheme).Not) Then
+        '            theGrid = theTheme.GetGrid
+        '            mycellsize = theGrid.GetCellSize
+        '            pntx = (p.GetX)
+        '            pnty = (p.GetY)
+        '            cenp = Point.Make(pntx, pnty)
+        '            ElementId = TheGrid.CellValue(cenp, Prj.MakeNull)
+        '        Else
+        '            TheVtab = TheTheme.GetFtab
+        '            keyfield = TheVtab.FindField("Gridcode")
+        '            If (keyField = nil) Then
+        '                fieldslist = TheVtab.GetFields
+        '                fieldName = MsgBox.Choice(fieldslist, "Select a subbasin id field", "Geospatial Stream Flow Model")
+        '                If (fieldName = nil) Then
+        '                    Exit Sub
+        '                End If
+
+        '                keyField = TheVtab.FindField(fieldName.AsString)
+        '                If (keyField = nil) Then
+        '                    Exit Sub
+        '                End If
+        '            End If
+
+        '            recs = TheTheme.FindByPoint(p)
+        '            If (recs.count = 0) Then
+        '                MsgBox.info("The selected point is outside the basin extent", "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            End If
+        '            rec = recs.get(0)
+        '            ElementId = TheVtab.ReturnValue(keyField, rec)
+        '        End If
+
+        '        If (ElementId.AsString.IsNumber.not) Then
+        '            System.beep()
+        '            MsgBox.info("The selected point is outside the basin extent", "Geospatial Stream Flow Model")
+        '            Exit Sub
+        '        End If
+
+
+        '        'MAKE THE SELECTED POLYGON ACTIVE
+        '        '(PRIMARILY FOR VISUAL EFFECTS)
+
+        '        If (theTheme.Is(FTheme)) Then
+        '            If (System.IsShiftKeyDown) Then
+        '    op = #VTAB_SELTYPE_XOR
+        '            Else
+        '    op = #VTAB_SELTYPE_NEW
+        '            End If
+        '            If (theTheme.CanSelect) Then
+        '                theTheme.SelectByPoint(p, op)
+        '            End If
+        '            av.GetProject.SetModified(True)
+        '        End If
+
+        '        docList = theProject.GetDocs
+        '        tabList = List.Make
+        '        numdocs = docList.count
+        'for each i in 0..(numdocs-1)
+        '            dtype = (docList.get(i)).getclass.getclassname
+        '            If (dtype = "Table") Then
+        '                tabList.Add(docList.Get(i).getname)
+        '            End If
+        '        Next
+
+        '        'chk=msgbox.choiceAsString(tabList,"Select A Table for Plotting",tabList.Get(0))
+
+        '        yList = List.Make
+        '        'yList.Add("Precipitation")
+        '        'yList.Add("Evaporation")
+        '        'yList.Add("Soil Water")
+        '        yList.Add("Streamflow")
+
+        '        nList = List.Make
+        '        'nList.Add("Precipitation")
+        '        'nList.Add("Evaporation")
+        '        'nList.Add("Soil Water")
+        '        nList.Add("Streamflow")
+
+        '        tabList = List.Make
+        '        'tabList.Add("rain.txt")
+        '        'tabList.Add("evap.txt")
+        '        'tabList.Add("soilwater.txt")
+        '        tabList.Add("Streamflow.txt")
+
+        '        colList = List.Make
+        '        colList.Add("green")
+        '        colList.Add("blue")
+        '        colList.Add("red")
+        '        colList.Add("yellow")
+
+        '        numtabs = tabList.Count
+
+        '        '************************
+        'for each i in 0..(numtabs-1)
+
+        '            tabname = tabList.Get(i)
+
+        '            FName = ElementId.AsString
+
+
+        '            plotTable = theProject.FindDoc(tabname)
+
+        '            If (plotTable = nil) Then
+        '                MsgBox.info("Could not find the file, " + tabList.get(i) + " in this project", "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            End If
+        '            plotVtab = plotTable.GetVtab
+
+
+        '            'SELECT FIELDS TO PLOT
+        '            timeField = plotVtab.findfield("day")
+        '            If (timeField = nil) Then
+        '                timeField = plotVtab.findfield("Time")
+        '                If (timeField = nil) Then
+        '                    MsgBox.info("Table " + tablist.get(i) + " does not Contain a 'day' or 'Time' field.", "Geospatial Stream Flow Model")
+        '                    Exit Sub
+        '                End If
+        '            End If
+        '            plotField = plotVtab.FindField(Fname)
+
+        '            If (plotField = nil) Then
+        '                MsgBox.info("Could not find the field named " + fname.asstring + nl + "in the file,  " + tablist.get(i), "Geospatial Stream Flow Model")
+        '                Exit Sub
+        '            End If
+
+
+        '            xname = "Julian Day"
+
+        '            yname = yList.Get(i)
+        '            col = colList.Get(i)
+        '            If (yname = "Streamflow") Then
+        '                yunits = " (m3/s)"
+        '            Else
+        '                yunits = " (mm)"
+        '            End If
+
+        '            If (col = "blue") Then
+        '                precColor = Color.GetBlue
+        '            ElseIf (col = "red") Then
+        '                precColor = Color.GetRed
+        '            ElseIf (col = "green") Then
+        '                precColor = Color.GetGreen
+        '            ElseIf (col = "yellow") Then
+        '                precColor = Color.GetYellow
+        '            Else
+        '                precColor = Color.GetBlue
+        '            End If
+
+
+        '            plotinfo = "Making plot...."
+        '            av.Showmsg(plotinfo)
+        '            'fldlist = { timeField, plotField }
+        '    fldlist = { plotField }
+
+        '            mychart = chart.make(plotVtab, fldlist)
+        '            mychart.SetSeriesFromRecords(False)
+        '            mychart.SetRecordLabelField(timeField)
+        '            myChartName = MyChart.getname
+        '            myChartDisp = mychart.getchartDisplay
+        '    myChartDisp.setType(#CHARTDISPLAY_line)
+        '            'myChartDisp.setMark(#CHARTDISPLAY_MARK_SQUARE)
+        '            myChartDisp.SetSeriesColor(0, precColor)
+        '            myChartDisp.SetMaxDataPoints(plotVtab.GetNumRecords)
+        '            'myChartDisp.SetSeriesColor(0,newColor)
+        '            myLegend = myChart.getchartLegend
+        '            myLegend.setvisible(False)
+        '            'chname=msgbox.input ( "Enter a chart name.","User Input", plotfield.getname)
+        '            chname = plotfield.getname
+        '            myChart.GetTitle.SetName("Hydrograph of Subbasin " + FName)
+        '            the_x = myChart.GetXaxis
+        '            the_y = myChart.GetYaxis
+        '            the_x.SetName(xname)
+        '            the_y.SetName(yname + yunits)
+        '            the_x.SetTicklabelsVisible(True)
+        '            the_y.SetTicklabelsVisible(True)
+        '            the_x.setMajorGridVisible(False)
+        '            the_x.SetMinorGridVisible(False)
+        '            the_y.setMajorGridVisible(True)
+        '            the_x.SetCrossValue(0)
+        '            the_y.SetCrossValue(0)
+        '            the_x.SetLabelVisible(True)
+        '            the_y.SetLabelVisible(True)
+        '            '  av.Showmsg("")
+        '            mychart.getwin.open()
+
+        '            mychart.setname("Basin" + +chname + +yname)
+        '        Next
+
+        '        'TheBitMap=PlotVtab.GetSelection
+        '        '  TheBitMap.ClearAll
+        '        '  PlotVtab.UpdateSelection
     End Sub
 
     Friend Sub BuildListofValidStationNames(ByRef aMetConstituent As String, _
@@ -3789,14 +5009,6 @@ Public Module modGeoSFM
         Next
 
         Logger.Dbg("Found " & aStations.Count & " Stations")
-    End Sub
-
-    'subs below are new GIS routines needed for GeoSFM
-
-    Friend Sub GridFromShapefile(ByVal aShapefileLayerIndex As Integer, ByVal aBaseGridFileName As String, ByVal aNewGridFileName As String)
-        'given a shapefile (subbasins or streams) and a base grid, return a grid version of those shapes
-
-        'only used if streams and subbasins are entered as shapefiles
     End Sub
 
     Friend Class StationDetails
