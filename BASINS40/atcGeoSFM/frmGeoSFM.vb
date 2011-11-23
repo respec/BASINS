@@ -200,6 +200,9 @@ Public Class frmGeoSFM
     Friend WithEvents rbnMusk As System.Windows.Forms.RadioButton
     Friend WithEvents rbnDiffusion As System.Windows.Forms.RadioButton
     Friend WithEvents rbnSimple As System.Windows.Forms.RadioButton
+    Friend WithEvents lblReach As System.Windows.Forms.Label
+    Friend WithEvents cboReachSensitivity As System.Windows.Forms.ComboBox
+    Friend WithEvents AtcGridSensitivity As atcControls.atcGrid
     Friend WithEvents tpgMap As System.Windows.Forms.TabPage
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmGeoSFM))
@@ -294,10 +297,16 @@ Public Class frmGeoSFM
         Me.lblInitial = New System.Windows.Forms.Label
         Me.cmdBalanceNext = New System.Windows.Forms.Button
         Me.tpgFlow = New System.Windows.Forms.TabPage
+        Me.gbxStreamFlow = New System.Windows.Forms.GroupBox
+        Me.rbnSimple = New System.Windows.Forms.RadioButton
+        Me.rbnMusk = New System.Windows.Forms.RadioButton
+        Me.rbnDiffusion = New System.Windows.Forms.RadioButton
         Me.atxForecast = New atcControls.atcText
         Me.lflForecast = New System.Windows.Forms.Label
         Me.cmdRouteNext = New System.Windows.Forms.Button
         Me.tpgSensitivity = New System.Windows.Forms.TabPage
+        Me.lblReach = New System.Windows.Forms.Label
+        Me.cboReachSensitivity = New System.Windows.Forms.ComboBox
         Me.cmdSensitivityNext = New System.Windows.Forms.Button
         Me.tpgCalibrate = New System.Windows.Forms.TabPage
         Me.cmdCalibrationNext = New System.Windows.Forms.Button
@@ -362,10 +371,7 @@ Public Class frmGeoSFM
         Me.Label44 = New System.Windows.Forms.Label
         Me.Label45 = New System.Windows.Forms.Label
         Me.ComboBox39 = New System.Windows.Forms.ComboBox
-        Me.gbxStreamFlow = New System.Windows.Forms.GroupBox
-        Me.rbnMusk = New System.Windows.Forms.RadioButton
-        Me.rbnDiffusion = New System.Windows.Forms.RadioButton
-        Me.rbnSimple = New System.Windows.Forms.RadioButton
+        Me.AtcGridSensitivity = New atcControls.atcGrid
         Me.tabMain.SuspendLayout()
         Me.tpgTerrain.SuspendLayout()
         Me.tpgBasin.SuspendLayout()
@@ -378,13 +384,13 @@ Public Class frmGeoSFM
         Me.gbxRun.SuspendLayout()
         Me.gbxData.SuspendLayout()
         Me.tpgFlow.SuspendLayout()
+        Me.gbxStreamFlow.SuspendLayout()
         Me.tpgSensitivity.SuspendLayout()
         Me.tpgCalibrate.SuspendLayout()
         Me.tpgBankfull.SuspendLayout()
         Me.tpgMap.SuspendLayout()
         Me.tpgPlot.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
-        Me.gbxStreamFlow.SuspendLayout()
         Me.SuspendLayout()
         '
         'cmdCancel
@@ -1583,6 +1589,50 @@ Public Class frmGeoSFM
         Me.tpgFlow.Text = "Compute Stream Flow"
         Me.tpgFlow.UseVisualStyleBackColor = True
         '
+        'gbxStreamFlow
+        '
+        Me.gbxStreamFlow.Controls.Add(Me.rbnSimple)
+        Me.gbxStreamFlow.Controls.Add(Me.rbnMusk)
+        Me.gbxStreamFlow.Controls.Add(Me.rbnDiffusion)
+        Me.gbxStreamFlow.Location = New System.Drawing.Point(51, 100)
+        Me.gbxStreamFlow.Name = "gbxStreamFlow"
+        Me.gbxStreamFlow.Size = New System.Drawing.Size(227, 95)
+        Me.gbxStreamFlow.TabIndex = 61
+        Me.gbxStreamFlow.TabStop = False
+        Me.gbxStreamFlow.Text = "Flow Routing Method"
+        '
+        'rbnSimple
+        '
+        Me.rbnSimple.AutoSize = True
+        Me.rbnSimple.Location = New System.Drawing.Point(18, 65)
+        Me.rbnSimple.Name = "rbnSimple"
+        Me.rbnSimple.Size = New System.Drawing.Size(156, 17)
+        Me.rbnSimple.TabIndex = 3
+        Me.rbnSimple.Text = "Simple Lag Routing Method"
+        Me.rbnSimple.UseVisualStyleBackColor = True
+        '
+        'rbnMusk
+        '
+        Me.rbnMusk.AutoSize = True
+        Me.rbnMusk.Checked = True
+        Me.rbnMusk.Location = New System.Drawing.Point(18, 42)
+        Me.rbnMusk.Name = "rbnMusk"
+        Me.rbnMusk.Size = New System.Drawing.Size(192, 17)
+        Me.rbnMusk.TabIndex = 2
+        Me.rbnMusk.TabStop = True
+        Me.rbnMusk.Text = "Muskingum Cunge Routing Method"
+        Me.rbnMusk.UseVisualStyleBackColor = True
+        '
+        'rbnDiffusion
+        '
+        Me.rbnDiffusion.AutoSize = True
+        Me.rbnDiffusion.Location = New System.Drawing.Point(18, 19)
+        Me.rbnDiffusion.Name = "rbnDiffusion"
+        Me.rbnDiffusion.Size = New System.Drawing.Size(181, 17)
+        Me.rbnDiffusion.TabIndex = 1
+        Me.rbnDiffusion.Text = "Diffusion Analog Routing Method"
+        Me.rbnDiffusion.UseVisualStyleBackColor = True
+        '
         'atxForecast
         '
         Me.atxForecast.Alignment = System.Windows.Forms.HorizontalAlignment.Left
@@ -1628,6 +1678,9 @@ Public Class frmGeoSFM
         '
         'tpgSensitivity
         '
+        Me.tpgSensitivity.Controls.Add(Me.AtcGridSensitivity)
+        Me.tpgSensitivity.Controls.Add(Me.lblReach)
+        Me.tpgSensitivity.Controls.Add(Me.cboReachSensitivity)
         Me.tpgSensitivity.Controls.Add(Me.cmdSensitivityNext)
         Me.tpgSensitivity.Location = New System.Drawing.Point(4, 46)
         Me.tpgSensitivity.Name = "tpgSensitivity"
@@ -1635,6 +1688,28 @@ Public Class frmGeoSFM
         Me.tpgSensitivity.TabIndex = 13
         Me.tpgSensitivity.Text = "Sensitivity Analysis"
         Me.tpgSensitivity.UseVisualStyleBackColor = True
+        '
+        'lblReach
+        '
+        Me.lblReach.AutoSize = True
+        Me.lblReach.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblReach.Location = New System.Drawing.Point(20, 43)
+        Me.lblReach.Name = "lblReach"
+        Me.lblReach.Size = New System.Drawing.Size(56, 13)
+        Me.lblReach.TabIndex = 43
+        Me.lblReach.Text = "Reach ID:"
+        Me.lblReach.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'cboReachSensitivity
+        '
+        Me.cboReachSensitivity.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboReachSensitivity.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboReachSensitivity.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboReachSensitivity.Location = New System.Drawing.Point(100, 40)
+        Me.cboReachSensitivity.Name = "cboReachSensitivity"
+        Me.cboReachSensitivity.Size = New System.Drawing.Size(183, 21)
+        Me.cboReachSensitivity.TabIndex = 42
         '
         'cmdSensitivityNext
         '
@@ -2339,48 +2414,23 @@ Public Class frmGeoSFM
         Me.ComboBox39.Size = New System.Drawing.Size(312, 21)
         Me.ComboBox39.TabIndex = 23
         '
-        'gbxStreamFlow
+        'AtcGridSensitivity
         '
-        Me.gbxStreamFlow.Controls.Add(Me.rbnSimple)
-        Me.gbxStreamFlow.Controls.Add(Me.rbnMusk)
-        Me.gbxStreamFlow.Controls.Add(Me.rbnDiffusion)
-        Me.gbxStreamFlow.Location = New System.Drawing.Point(51, 100)
-        Me.gbxStreamFlow.Name = "gbxStreamFlow"
-        Me.gbxStreamFlow.Size = New System.Drawing.Size(227, 95)
-        Me.gbxStreamFlow.TabIndex = 61
-        Me.gbxStreamFlow.TabStop = False
-        Me.gbxStreamFlow.Text = "Flow Routing Method"
-        '
-        'rbnMusk
-        '
-        Me.rbnMusk.AutoSize = True
-        Me.rbnMusk.Checked = True
-        Me.rbnMusk.Location = New System.Drawing.Point(18, 42)
-        Me.rbnMusk.Name = "rbnMusk"
-        Me.rbnMusk.Size = New System.Drawing.Size(192, 17)
-        Me.rbnMusk.TabIndex = 2
-        Me.rbnMusk.Text = "Muskingum Cunge Routing Method"
-        Me.rbnMusk.UseVisualStyleBackColor = True
-        '
-        'rbnDiffusion
-        '
-        Me.rbnDiffusion.AutoSize = True
-        Me.rbnDiffusion.Location = New System.Drawing.Point(18, 19)
-        Me.rbnDiffusion.Name = "rbnDiffusion"
-        Me.rbnDiffusion.Size = New System.Drawing.Size(181, 17)
-        Me.rbnDiffusion.TabIndex = 1
-        Me.rbnDiffusion.Text = "Diffusion Analog Routing Method"
-        Me.rbnDiffusion.UseVisualStyleBackColor = True
-        '
-        'rbnSimple
-        '
-        Me.rbnSimple.AutoSize = True
-        Me.rbnSimple.Location = New System.Drawing.Point(18, 65)
-        Me.rbnSimple.Name = "rbnSimple"
-        Me.rbnSimple.Size = New System.Drawing.Size(156, 17)
-        Me.rbnSimple.TabIndex = 3
-        Me.rbnSimple.Text = "Simple Lag Routing Method"
-        Me.rbnSimple.UseVisualStyleBackColor = True
+        Me.AtcGridSensitivity.AllowHorizontalScrolling = True
+        Me.AtcGridSensitivity.AllowNewValidValues = False
+        Me.AtcGridSensitivity.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridSensitivity.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridSensitivity.Fixed3D = False
+        Me.AtcGridSensitivity.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AtcGridSensitivity.LineColor = System.Drawing.Color.Empty
+        Me.AtcGridSensitivity.LineWidth = 0.0!
+        Me.AtcGridSensitivity.Location = New System.Drawing.Point(23, 77)
+        Me.AtcGridSensitivity.Name = "AtcGridSensitivity"
+        Me.AtcGridSensitivity.Size = New System.Drawing.Size(516, 255)
+        Me.AtcGridSensitivity.Source = Nothing
+        Me.AtcGridSensitivity.TabIndex = 44
         '
         'frmGeoSFM
         '
@@ -2418,14 +2468,15 @@ Public Class frmGeoSFM
         Me.gbxData.PerformLayout()
         Me.tpgFlow.ResumeLayout(False)
         Me.tpgFlow.PerformLayout()
+        Me.gbxStreamFlow.ResumeLayout(False)
+        Me.gbxStreamFlow.PerformLayout()
         Me.tpgSensitivity.ResumeLayout(False)
+        Me.tpgSensitivity.PerformLayout()
         Me.tpgCalibrate.ResumeLayout(False)
         Me.tpgBankfull.ResumeLayout(False)
         Me.tpgMap.ResumeLayout(False)
         Me.tpgPlot.ResumeLayout(False)
         Me.GroupBox1.ResumeLayout(False)
-        Me.gbxStreamFlow.ResumeLayout(False)
-        Me.gbxStreamFlow.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -2518,6 +2569,102 @@ Public Class frmGeoSFM
         End With
         pPrecStations = New atcCollection
         pMetStations = New atcCollection
+
+        Logger.Dbg("SetValidValues")
+        Dim lValidValues As New atcCollection
+        For Each lPrecStation As StationDetails In pPrecStations
+            lValidValues.Add(lPrecStation.Description)
+        Next
+        AtcGridPrec.ValidValues = lValidValues
+        AtcGridPrec.SizeAllColumnsToContents()
+        AtcGridPrec.Refresh()
+        Logger.Dbg("PrecipStationGrid refreshed")
+
+        'set sensitivity grid
+        With AtcGridSensitivity
+            .Source = New atcControls.atcGridSource
+            .AllowHorizontalScrolling = False
+        End With
+        With AtcGridSensitivity.Source
+            .Columns = 3
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 1
+            .CellColor(0, 0) = SystemColors.ControlDark
+            .CellColor(0, 1) = SystemColors.ControlDark
+            .CellColor(0, 2) = SystemColors.ControlDark
+            .Rows = 21
+            .CellValue(0, 0) = "Name/Description"
+            .CellValue(0, 1) = "Min Multiplier"
+            .CellValue(0, 2) = "Max Multiplier"
+            .CellValue(1, 0) = "SoilWhc, Soil water holding capacity (mm)"
+            .CellValue(2, 0) = "Depth, Total soil depth (cm)"
+            .CellValue(3, 0) = "Texture, Soil texture: 1=Sand 2=Loam 3=Clay 5=Water"
+            .CellValue(4, 0) = "Ks, Saturated hydraulic conductivity (cm/hr)"
+            .CellValue(5, 0) = "Interflow, Interflow storage residence time (days)"
+            .CellValue(6, 0) = "HSlope, Average subbasin slope"
+            .CellValue(7, 0) = "Baseflow, Baseflow reservoir residence time (days)"
+            .CellValue(8, 0) = "CurveNum, SCS runoff curve number"
+            .CellValue(9, 0) = "MaxCover, Permanently impervious cover fraction"
+            .CellValue(10, 0) = "BasinLoss, Fraction of soil water to ground water"
+            .CellValue(11, 0) = "PanCoeff, Pan coefficient for correcting PET readings"
+            .CellValue(12, 0) = "TopSoil, Fraction of soil layer hydrologically active"
+            .CellValue(13, 0) = "RainCalc, Excess mode 1=Philip 2=SCS 3=BucketModel"
+            .CellValue(14, 0) = "RivRough, Channel Roughness (Manning n)"
+            .CellValue(15, 0) = "RivSlope, Average slope of the river"
+            .CellValue(16, 0) = "RivWidth, Average channel width (m)"
+            .CellValue(17, 0) = "RivLoss, Fraction of flow lost within river channel"
+            .CellValue(18, 0) = "RivFPLoss, Fraction of river flow lost in floodplain"
+            .CellValue(19, 0) = "Celerity, Flood wave celerity (m/s)"
+            .CellValue(20, 0) = "Diffusion, Flow attenuation coefficient (m^2/s)"        
+            .CellValue(1, 1) = "1"
+            .CellValue(2, 1) = "1"
+            .CellValue(3, 1) = "1"
+            .CellValue(4, 1) = "0.001"
+            .CellValue(5, 1) = "1"
+            .CellValue(6, 1) = "0.001"
+            .CellValue(7, 1) = "1"
+            .CellValue(8, 1) = "25"
+            .CellValue(9, 1) = "0.01"
+            .CellValue(10, 1) = "0.001"
+            .CellValue(11, 1) = "0.6"
+            .CellValue(12, 1) = "0.05"
+            .CellValue(13, 1) = "1"
+            .CellValue(14, 1) = "0.012"
+            .CellValue(15, 1) = "0.001"
+            .CellValue(16, 1) = "30"
+            .CellValue(17, 1) = "0.01"
+            .CellValue(18, 1) = "0.01"
+            .CellValue(19, 1) = "0.1"
+            .CellValue(20, 1) = "100"
+            .CellValue(1, 2) = "600"
+            .CellValue(2, 2) = "800"
+            .CellValue(3, 2) = "5"
+            .CellValue(4, 2) = "150"
+            .CellValue(5, 2) = "365"
+            .CellValue(6, 2) = "10"
+            .CellValue(7, 2) = "365"
+            .CellValue(8, 2) = "98"
+            .CellValue(9, 2) = "1"
+            .CellValue(10, 2) = "0.5"
+            .CellValue(11, 2) = "0.95"
+            .CellValue(12, 2) = "1"
+            .CellValue(13, 2) = "3"
+            .CellValue(14, 2) = "0.07"
+            .CellValue(15, 2) = "10"
+            .CellValue(16, 2) = "1000"
+            .CellValue(17, 2) = "0.5"
+            .CellValue(18, 2) = "0.5"
+            .CellValue(19, 2) = "5"
+            .CellValue(20, 2) = "10000"
+            For lIndex As Integer = 1 To 20
+                .CellColor(lIndex, 0) = SystemColors.ControlDark
+                .CellEditable(lIndex, 1) = True
+                .CellEditable(lIndex, 2) = True
+            Next
+        End With
+        AtcGridSensitivity.SizeAllColumnsToContents()
+        AtcGridSensitivity.Refresh()
 
         lblStatus.Text = "Reading Precipitation Data ..."
         Me.Refresh()
@@ -3078,7 +3225,37 @@ Public Class frmGeoSFM
     End Sub
 
     Private Sub cmdSensitivityNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSensitivityNext.Click
-        Sensitivity()
+        Dim lBalType As Integer = 1
+        If rbnNonlinear.Checked Then
+            lBalType = 2
+        End If
+        Dim lRouteMethod As Integer = 2
+        If rbnDiffusion.Checked Then
+            lRouteMethod = 1
+        End If
+        If rbnSimple.Checked Then
+            lRouteMethod = 3
+        End If
+
+        Dim lParameterRanges As New atcCollection
+        With AtcGridSensitivity.Source
+            For lIndex As Integer = 1 To 20
+                lParameterRanges.Add(.CellValue(lIndex, 0), .CellValue(lIndex, 1) & "," & .CellValue(lIndex, 2))
+            Next
+        End With
+
+        EnableControls(False)
+        lblStatus.Text = "Performing Sensitivity Analysis........"
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+        Me.Refresh()
+
+        Sensitivity(cboReachSensitivity.SelectedIndex, lBalType, lRouteMethod, lParameterRanges)
+
+        tabMain.SelectedIndex = 7
+        lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+        Me.Refresh()
+        EnableControls(True)
     End Sub
 
     Private Sub cmdCalibrationNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCalibrationNext.Click
@@ -3145,4 +3322,48 @@ Public Class frmGeoSFM
         SetMetStationValidValues(aRow, aColumn)
     End Sub
 
+    Private Sub tabMain_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles tabMain.SelectedIndexChanged
+        If tabMain.SelectedIndex = 6 Then
+            'read reaches for sensitivity analysis
+            cboReachSensitivity.Items.Clear()
+            Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+            Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
+            Dim orderfilename As String = lOutputPath & "order.txt"
+            If FileExists(orderfilename) Then
+                Dim lCurrentRecord As String
+                Dim lStreamReader As New StreamReader(orderfilename)
+                Do
+                    lCurrentRecord = lStreamReader.ReadLine
+                    If lCurrentRecord Is Nothing Then
+                        Exit Do
+                    Else
+                        If IsNumeric(lCurrentRecord) Then
+                            cboReachSensitivity.Items.Add(lCurrentRecord)
+                        End If
+                    End If
+                Loop
+            Else
+                Logger.Msg("Cannot determine computational order." & vbCrLf & "Run 'Generate basin file' menu to create order.txt", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+            End If
+            cboReachSensitivity.SelectedIndex = 0
+        End If
+    End Sub
+
+    Private Sub AtcGridSensitivity_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridSensitivity.CellEdited
+        Dim lNewValue As String = aGrid.Source.CellValue(aRow, aColumn)
+        Dim lNewValueNumeric As Double = GetNaN()
+        If IsNumeric(lNewValue) Then lNewValueNumeric = CDbl(lNewValue)
+
+        Dim lNewColor As Color = aGrid.Source.CellColor(aRow, aColumn)
+        
+        If lNewValueNumeric >= 0 Then
+            lNewColor = aGrid.CellBackColor
+        Else
+            lNewColor = Color.Pink
+        End If
+
+        If Not lNewColor.Equals(aGrid.Source.CellColor(aRow, aColumn)) Then
+            aGrid.Source.CellColor(aRow, aColumn) = lNewColor
+        End If
+    End Sub
 End Class
