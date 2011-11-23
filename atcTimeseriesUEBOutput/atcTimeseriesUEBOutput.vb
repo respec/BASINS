@@ -43,12 +43,12 @@ Public Class atcTimeseriesUEBOutput
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
         Dim lData As atcTimeseries
-        Dim lTSAttributes() As String = {"", "", "", "", "Atmos TF", "HRI", "ATemp", "Precip Rate", "Wind Speed", "RelH", _
+        Dim lTSAttributes() As String = {"Atmos TF", "HRI", "ATemp", "Precip Rate", "Wind Speed", "RelH", _
                                         "Solar Rad", "Longwave Rad", "Zenith Angle Cos", "Snow Energy", "Snow Water Eq", _
-                                        "Snow Albedo", "Prec-Rain", "Prec-Snow", "Albedo", "Sens Heat Flux", "Laten Heat Flux", _
+                                        "Snow Albedo", "Prec-Rain", "Prec-Snow", "Albedo", "Sens Heat Flux", "Latent Heat Flux", _
                                         "Sublimation", "Melt Outflow", "Melt Energy", "Snow Energy Flux", "Snow Mass Flux", _
                                         "Snow Ave Temp", "Snow Surf Temp", "Cum Precip", "Cum Sublimation", "Cum Melt Outflow", _
-                                         "Net Radiation", "Mass Error"}
+                                         "Net Radiation", "E Melt", "Ref Depth", "Total Ref Depth", "Mass Error"}
 
         If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not FileExists(aFileName) Then
             aFileName = FindFile("Select " & Name & " file to open", , , pFileFilter, True, , 1)
@@ -74,6 +74,7 @@ Public Class atcTimeseriesUEBOutput
             Dim lMon As Integer
             Dim lDay As Integer
             Dim lHour As Integer
+            Dim lTStep As Integer
             Dim lStr As String
             Dim lStrArray() As String
             Dim i As Integer
@@ -84,7 +85,7 @@ Public Class atcTimeseriesUEBOutput
             curLine = NextLine(inReader) 'read line to examine format
 
             Try
-                lStr = ReplaceRepeats(curLine, " ") 'remove extra blanks
+                lStr = ReplaceRepeats(curLine, " ").Trim 'remove extra blanks
                 lStrArray = lStr.Split(pChrSep, StringSplitOptions.None)
 
                 If (IsInteger(lStrArray(0)) AndAlso _
@@ -120,7 +121,6 @@ Public Class atcTimeseriesUEBOutput
                                 lData.Attributes.SetValue("Constituent", lTSAttributes(lTSPos))
                                 lData.Attributes.SetValue("Description", "UEB Output Data")
                                 lData.Attributes.SetValue("tu", 3)
-                                lData.Attributes.SetValue("ts", 1)
                                 lData.Attributes.SetValue("point", False)
                                 lData.Attributes.SetValue("TSFILL", MissingVal)
                                 DataSets.Add(lTSAttributes(lTSPos), lData)
@@ -140,13 +140,14 @@ Public Class atcTimeseriesUEBOutput
                         Next
 
                         curLine = NextLine(inReader)
+                        lStr = ReplaceRepeats(curLine, " ").Trim 'remove extra blanks
                         lStrArray = lStr.Split(pChrSep, StringSplitOptions.None)
                         If (IsInteger(lStrArray(0)) AndAlso _
                            IsInteger(lStrArray(1)) AndAlso _
                            IsInteger(lStrArray(2))) Then 'first 3 elements of first line appear to be yy-mm-dd
                             lDPos = 4
                             lTSPos = 0
-                            lYr += lStrArray(0) + lCentury
+                            lYr = lStrArray(0) + lCentury
                             lMon = lStrArray(1)
                             lDay = lStrArray(2)
                             lHour = lStrArray(3)
@@ -171,7 +172,8 @@ Public Class atcTimeseriesUEBOutput
                     lData.numValues = lData.Attributes.GetValue("Count")
                     If lData.numValues > 0 Then
                         lData.Dates.Value(0) = lData.Dates.Value(1) - JulianHour 'set 0th date to start of 1st interval
-                        lDataFilled = FillValues(lData, 3, 1, MissingVal, MissingVal, MissingAcc)
+                        lTStep = Math.Round((lData.Dates.Value(2) - lData.Dates.Value(1)) * 24)
+                        lDataFilled = FillValues(lData, 3, lTStep, MissingVal, MissingVal, MissingAcc)
                         If Not lDataFilled Is Nothing Then
                             lDataFilled.ValuesNeedToBeRead = False
                             lDataFilled.Dates.ValuesNeedToBeRead = False
