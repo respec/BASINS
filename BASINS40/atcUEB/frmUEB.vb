@@ -9,6 +9,8 @@ Imports System.Windows.Forms
 Public Class frmUEB
     Inherits System.Windows.Forms.Form
 
+    Friend Const pNumDataParms = 22
+    Friend Const pNumSiteParms = 8
     Friend pWeatherFileName As String
     Friend pParameterFileName As String
     Friend pSiteFileName As String
@@ -20,8 +22,8 @@ Public Class frmUEB
     Friend pInitialEnergy As Double
     Friend pInitialH2OEquiv As Double
     Friend pInitialSnowAge As Double
-    Friend pParameterDataArray(29) As Double
-    Friend pSiteDataArray(7) As Double
+    Friend pParameterDataArray(pNumDataParms - 1) As Double
+    Friend pSiteDataArray(pNumSiteParms - 1) As Double
     Friend pBCDataArray(37) As Double
 
 #Region " Windows Form Designer generated code "
@@ -1948,7 +1950,7 @@ Public Class frmUEB
             .ColorCells = True
             .FixedRows = 1
             .FixedColumns = 1
-            .Rows = 31
+            .Rows = 22
             For i As Integer = 0 To .Rows - 1
                 .CellColor(i, 0) = SystemColors.ControlDark
                 .CellEditable(i, 1) = True
@@ -1961,24 +1963,24 @@ Public Class frmUEB
             .CellValue(4, 0) = "Ground heat capacity, kJ/kg/deg C"
             .CellValue(5, 0) = "Measurement height for Temp & Humidity, m"
             .CellValue(6, 0) = "Surface aerodynamic roughness, m"
-            .CellValue(7, 0) = "Snow density, kg/cubic m"
-            .CellValue(8, 0) = "Soil density, kg/cubic m"
+            .CellValue(7, 0) = "Snow density, kg/m^3"
+            .CellValue(8, 0) = "Soil density, kg/m^3"
             .CellValue(9, 0) = "Liquid holding capacity of snow"
-            .CellValue(10, 0) = "Snow saturated hyd. cond., m/hr"
+            .CellValue(10, 0) = "Snow saturated hydraulic conductivity, m/hr"
             .CellValue(11, 0) = "Thermally active depth of soil, m"
             .CellValue(12, 0) = "Bare ground albedo"
-            .CellValue(13, 0) = "New snow visible band reflectance"
-            .CellValue(14, 0) = "New snow near infrared band reflectance"
-            .CellValue(15, 0) = "Thermal cond of fresh (dry) snow, kJ/m/k/hr"
+            .CellValue(13, 0) = "Vsual new snow albedo"
+            .CellValue(14, 0) = "NIR new snow albedo"
+            .CellValue(15, 0) = "Thermal conductivity of fresh (dry) snow, kJ/m/k/hr"
             .CellValue(16, 0) = "Thermal conductivity of soil, kJ/m/k/hr"
-            .CellValue(17, 0) = "Low freq fluctuation in deep snow/soil layer, radian/hr"
+            .CellValue(17, 0) = "Low frequency fluctuation in deep snow/soil layer, radian/hr"
             .CellValue(18, 0) = "Amplitude correction coefficient of heat conduction"
             .CellValue(19, 0) = "Stability correction control parameter"
-            .CellValue(20, 0) = "Ref temp of soil layer in ground heat calc input, deg C"
-            .CellValue(21, 0) = "Threshold depth of for new snow, m"
+            .CellValue(20, 0) = "Reference temp of soil layer in ground heat calc input, deg C"
+            .CellValue(21, 0) = "Threshold depth of new snow, m"
             .CellValue(22, 0) = "Fraction of surface melt that runs off"
         End With
-        AtcGridModelParms.ColumnWidth(0) = 300
+        AtcGridModelParms.ColumnWidth(0) = 400
 
         With AtcGridSiteVars
             .Source = New atcControls.atcGridSource
@@ -2000,7 +2002,7 @@ Public Class frmUEB
             .CellValue(1, 0) = "Forest cover fraction"
             .CellValue(2, 0) = "Drift factor"
             .CellValue(3, 0) = "Atmospheric pressure, Pa"
-            .CellValue(4, 0) = "Ground heat flux, kJ/sq. m/hr"
+            .CellValue(4, 0) = "Ground heat flux, kJ/m^2/hr"
             .CellValue(5, 0) = "Albedo extinction depth, m"
             .CellValue(6, 0) = "Slope, degrees"
             .CellValue(7, 0) = "Aspect, degrees from North"
@@ -2119,7 +2121,7 @@ Public Class frmUEB
     Private Sub txtParameterFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtParameterFile.TextChanged
         If FileExists(txtParameterFile.Text) Then
             ReadDataFile(txtParameterFile.Text, pParameterDataArray)
-            For i As Integer = 1 To 30
+            For i As Integer = 1 To pNumDataParms
                 AtcGridModelParms.Source.CellValue(i, 1) = pParameterDataArray(i - 1)
             Next
         End If
@@ -2128,7 +2130,7 @@ Public Class frmUEB
     Private Sub txtSiteFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtSiteFile.TextChanged
         If FileExists(txtSiteFile.Text) Then
             ReadDataFile(txtSiteFile.Text, pSiteDataArray)
-            For i As Integer = 1 To 8
+            For i As Integer = 1 To pNumSiteParms
                 AtcGridSiteVars.Source.CellValue(i, 1) = pSiteDataArray(i - 1)
             Next
         End If
