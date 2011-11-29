@@ -2527,60 +2527,6 @@ Public Module modGeoSFM
         ' ***********************************************************************************************
         ' ***********************************************************************************************
 
-        '        TheProject = av.GetProject
-        '        theFileName = theProject.GetFileName
-        '        If (theFileName = nil) Then
-        '            av.Run("Project.SaveAs", nil)
-        '            theFileName = theProject.GetFileName
-        '            If (theFileName = nil) Then
-        '                Exit Sub
-        '            End If
-        '        Else
-        '            If (av.Run("Project.CheckForEdits", nil).Not) Then
-        '                Return nil
-        '            End If
-        '            If (theProject.Save) Then
-        '                av.ShowMsg("Project saved to '" + theFileName.GetBaseName + "'")
-        '    if (System.GetOS = #SYSTEM_OS_MAC) then
-        '                    Script.Make("MacClass.SetDocInfo(SELF, Project)").DoIt(theFileName)
-        '                End If
-        '            End If
-        '        End If
-
-        '        TheView = av.GetActiveDoc
-        '        ViewChk = TheView.GetGUI
-        '        If (ViewChk <> "View") Then
-        '            MsgBox.error("Click on the View to make it 'active' before running this program", "")
-        '            Exit Sub
-        '        End If
-
-        '        ' Check the working directory
-        '        TheWkDir = TheProject.GetFileName.ReturnDir
-
-        '        'if(theWkdir.contains
-
-        '        myWkDirname = MsgBox.Input("Specify your working directory", "Working Directory", TheWkDir.GetFullName)
-        '        If (mywkDirName = nil) Then
-        '            Exit Sub
-        '        End If
-        '        If (File.Exists(myWkDirname.AsFileName).not) Then
-        '            MsgBox.Error("Cannot read directory " + myWkDirname, "Directory Specification Error")
-        '            Exit Sub
-        '        End If
-        '        If (File.IsWritable(myWkDirname.AsFileName).not) Then
-        '            MsgBox.Error(myWkDirname + +"is not writable.", "Directory Specification Error")
-        '            Exit Sub
-        '        End If
-        '        TheProject.SetWorkDir(myWkDirname.AsFileName)
-
-        '        If ((myWkDirname.contains("\").Not) And (myWkDirname.contains("/")) And (myWkDirname.right(1) <> "/")) Then
-        '            myWkDirname = myWkDirname + "/"
-        '        ElseIf ((myWkDirname.contains("\")) And (myWkDirname.right(1) <> "\")) Then
-        '            myWkDirname = myWkDirname + "\"
-        '        ElseIf ((myWkDirname.contains("\").Not) And (myWkDirname.contains("\").Not) And (myWkDirname.right(1) <> "/")) Then
-        '            myWkDirname = myWkDirname + "/"
-        '        End If
-
         '        balparamfn = myWkDirname + "balparam.txt"
         '        If (File.Exists(balparamfn.AsFileName).not) Then
         '  av.run("FEWS.balance.ave", {})

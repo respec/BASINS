@@ -203,6 +203,19 @@ Public Class frmGeoSFM
     Friend WithEvents lblReach As System.Windows.Forms.Label
     Friend WithEvents cboReachSensitivity As System.Windows.Forms.ComboBox
     Friend WithEvents AtcGridSensitivity As atcControls.atcGrid
+    Friend WithEvents gbxConnect As System.Windows.Forms.GroupBox
+    Friend WithEvents AtcConnectFlows As atcControls.atcConnectFields
+    Friend WithEvents lblMax As System.Windows.Forms.Label
+    Friend WithEvents lstMax As System.Windows.Forms.ListBox
+    Friend WithEvents gbxObjective As System.Windows.Forms.GroupBox
+    Friend WithEvents lblParms As System.Windows.Forms.Label
+    Friend WithEvents lstCalib As System.Windows.Forms.ListBox
+    Friend WithEvents rbnObj2 As System.Windows.Forms.RadioButton
+    Friend WithEvents rbnObj1 As System.Windows.Forms.RadioButton
+    Friend WithEvents rbnObj6 As System.Windows.Forms.RadioButton
+    Friend WithEvents rbnObj5 As System.Windows.Forms.RadioButton
+    Friend WithEvents rbnObj4 As System.Windows.Forms.RadioButton
+    Friend WithEvents rbnObj3 As System.Windows.Forms.RadioButton
     Friend WithEvents tpgMap As System.Windows.Forms.TabPage
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmGeoSFM))
@@ -305,6 +318,7 @@ Public Class frmGeoSFM
         Me.lflForecast = New System.Windows.Forms.Label
         Me.cmdRouteNext = New System.Windows.Forms.Button
         Me.tpgSensitivity = New System.Windows.Forms.TabPage
+        Me.AtcGridSensitivity = New atcControls.atcGrid
         Me.lblReach = New System.Windows.Forms.Label
         Me.cboReachSensitivity = New System.Windows.Forms.ComboBox
         Me.cmdSensitivityNext = New System.Windows.Forms.Button
@@ -371,7 +385,19 @@ Public Class frmGeoSFM
         Me.Label44 = New System.Windows.Forms.Label
         Me.Label45 = New System.Windows.Forms.Label
         Me.ComboBox39 = New System.Windows.Forms.ComboBox
-        Me.AtcGridSensitivity = New atcControls.atcGrid
+        Me.gbxConnect = New System.Windows.Forms.GroupBox
+        Me.AtcConnectFlows = New atcControls.atcConnectFields
+        Me.lstCalib = New System.Windows.Forms.ListBox
+        Me.lblParms = New System.Windows.Forms.Label
+        Me.gbxObjective = New System.Windows.Forms.GroupBox
+        Me.lblMax = New System.Windows.Forms.Label
+        Me.lstMax = New System.Windows.Forms.ListBox
+        Me.rbnObj1 = New System.Windows.Forms.RadioButton
+        Me.rbnObj2 = New System.Windows.Forms.RadioButton
+        Me.rbnObj3 = New System.Windows.Forms.RadioButton
+        Me.rbnObj4 = New System.Windows.Forms.RadioButton
+        Me.rbnObj5 = New System.Windows.Forms.RadioButton
+        Me.rbnObj6 = New System.Windows.Forms.RadioButton
         Me.tabMain.SuspendLayout()
         Me.tpgTerrain.SuspendLayout()
         Me.tpgBasin.SuspendLayout()
@@ -391,6 +417,8 @@ Public Class frmGeoSFM
         Me.tpgMap.SuspendLayout()
         Me.tpgPlot.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
+        Me.gbxConnect.SuspendLayout()
+        Me.gbxObjective.SuspendLayout()
         Me.SuspendLayout()
         '
         'cmdCancel
@@ -398,7 +426,7 @@ Public Class frmGeoSFM
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCancel.Location = New System.Drawing.Point(449, 529)
+        Me.cmdCancel.Location = New System.Drawing.Point(449, 520)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(73, 28)
         Me.cmdCancel.TabIndex = 5
@@ -408,7 +436,7 @@ Public Class frmGeoSFM
         '
         Me.cmdHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdHelp.Location = New System.Drawing.Point(528, 529)
+        Me.cmdHelp.Location = New System.Drawing.Point(528, 520)
         Me.cmdHelp.Name = "cmdHelp"
         Me.cmdHelp.Size = New System.Drawing.Size(65, 28)
         Me.cmdHelp.TabIndex = 6
@@ -418,7 +446,7 @@ Public Class frmGeoSFM
         '
         Me.cmdAbout.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdAbout.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdAbout.Location = New System.Drawing.Point(599, 529)
+        Me.cmdAbout.Location = New System.Drawing.Point(599, 520)
         Me.cmdAbout.Name = "cmdAbout"
         Me.cmdAbout.Size = New System.Drawing.Size(72, 28)
         Me.cmdAbout.TabIndex = 7
@@ -447,7 +475,7 @@ Public Class frmGeoSFM
         Me.tabMain.Multiline = True
         Me.tabMain.Name = "tabMain"
         Me.tabMain.SelectedIndex = 0
-        Me.tabMain.Size = New System.Drawing.Size(655, 446)
+        Me.tabMain.Size = New System.Drawing.Size(655, 437)
         Me.tabMain.TabIndex = 8
         '
         'tpgTerrain
@@ -1146,7 +1174,7 @@ Public Class frmGeoSFM
         Me.tpgRain.Controls.Add(Me.gbxSimulationDates)
         Me.tpgRain.Location = New System.Drawing.Point(4, 46)
         Me.tpgRain.Name = "tpgRain"
-        Me.tpgRain.Size = New System.Drawing.Size(647, 396)
+        Me.tpgRain.Size = New System.Drawing.Size(647, 387)
         Me.tpgRain.TabIndex = 2
         Me.tpgRain.Text = "Rain/Evap Data"
         Me.tpgRain.UseVisualStyleBackColor = True
@@ -1165,7 +1193,7 @@ Public Class frmGeoSFM
         Me.AtcGridPrec.LineWidth = 0.0!
         Me.AtcGridPrec.Location = New System.Drawing.Point(19, 129)
         Me.AtcGridPrec.Name = "AtcGridPrec"
-        Me.AtcGridPrec.Size = New System.Drawing.Size(516, 255)
+        Me.AtcGridPrec.Size = New System.Drawing.Size(516, 246)
         Me.AtcGridPrec.Source = Nothing
         Me.AtcGridPrec.TabIndex = 41
         '
@@ -1174,7 +1202,7 @@ Public Class frmGeoSFM
         Me.cmdRainEvapNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdRainEvapNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdRainEvapNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdRainEvapNext.Location = New System.Drawing.Point(556, 352)
+        Me.cmdRainEvapNext.Location = New System.Drawing.Point(556, 343)
         Me.cmdRainEvapNext.Name = "cmdRainEvapNext"
         Me.cmdRainEvapNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdRainEvapNext.TabIndex = 40
@@ -1195,7 +1223,7 @@ Public Class frmGeoSFM
         Me.gbxSimulationDates.Controls.Add(Me.atxEMonth)
         Me.gbxSimulationDates.Controls.Add(Me.atxSMonth)
         Me.gbxSimulationDates.Controls.Add(Me.atxEYear)
-        Me.gbxSimulationDates.Location = New System.Drawing.Point(19, 27)
+        Me.gbxSimulationDates.Location = New System.Drawing.Point(19, 18)
         Me.gbxSimulationDates.Name = "gbxSimulationDates"
         Me.gbxSimulationDates.Size = New System.Drawing.Size(516, 96)
         Me.gbxSimulationDates.TabIndex = 29
@@ -1684,10 +1712,28 @@ Public Class frmGeoSFM
         Me.tpgSensitivity.Controls.Add(Me.cmdSensitivityNext)
         Me.tpgSensitivity.Location = New System.Drawing.Point(4, 46)
         Me.tpgSensitivity.Name = "tpgSensitivity"
-        Me.tpgSensitivity.Size = New System.Drawing.Size(647, 396)
+        Me.tpgSensitivity.Size = New System.Drawing.Size(647, 387)
         Me.tpgSensitivity.TabIndex = 13
         Me.tpgSensitivity.Text = "Sensitivity Analysis"
         Me.tpgSensitivity.UseVisualStyleBackColor = True
+        '
+        'AtcGridSensitivity
+        '
+        Me.AtcGridSensitivity.AllowHorizontalScrolling = True
+        Me.AtcGridSensitivity.AllowNewValidValues = False
+        Me.AtcGridSensitivity.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridSensitivity.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridSensitivity.Fixed3D = False
+        Me.AtcGridSensitivity.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AtcGridSensitivity.LineColor = System.Drawing.Color.Empty
+        Me.AtcGridSensitivity.LineWidth = 0.0!
+        Me.AtcGridSensitivity.Location = New System.Drawing.Point(23, 77)
+        Me.AtcGridSensitivity.Name = "AtcGridSensitivity"
+        Me.AtcGridSensitivity.Size = New System.Drawing.Size(516, 255)
+        Me.AtcGridSensitivity.Source = Nothing
+        Me.AtcGridSensitivity.TabIndex = 44
         '
         'lblReach
         '
@@ -1724,10 +1770,16 @@ Public Class frmGeoSFM
         '
         'tpgCalibrate
         '
+        Me.tpgCalibrate.Controls.Add(Me.lblMax)
+        Me.tpgCalibrate.Controls.Add(Me.lstMax)
+        Me.tpgCalibrate.Controls.Add(Me.gbxObjective)
+        Me.tpgCalibrate.Controls.Add(Me.lblParms)
+        Me.tpgCalibrate.Controls.Add(Me.lstCalib)
+        Me.tpgCalibrate.Controls.Add(Me.gbxConnect)
         Me.tpgCalibrate.Controls.Add(Me.cmdCalibrationNext)
         Me.tpgCalibrate.Location = New System.Drawing.Point(4, 46)
         Me.tpgCalibrate.Name = "tpgCalibrate"
-        Me.tpgCalibrate.Size = New System.Drawing.Size(647, 396)
+        Me.tpgCalibrate.Size = New System.Drawing.Size(647, 387)
         Me.tpgCalibrate.TabIndex = 14
         Me.tpgCalibrate.Text = "Model Calibration"
         Me.tpgCalibrate.UseVisualStyleBackColor = True
@@ -1737,7 +1789,7 @@ Public Class frmGeoSFM
         Me.cmdCalibrationNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdCalibrationNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdCalibrationNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCalibrationNext.Location = New System.Drawing.Point(554, 350)
+        Me.cmdCalibrationNext.Location = New System.Drawing.Point(554, 341)
         Me.cmdCalibrationNext.Name = "cmdCalibrationNext"
         Me.cmdCalibrationNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdCalibrationNext.TabIndex = 40
@@ -1824,7 +1876,7 @@ Public Class frmGeoSFM
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox1.Controls.Add(Me.lblStatus)
         Me.GroupBox1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.GroupBox1.Location = New System.Drawing.Point(15, 467)
+        Me.GroupBox1.Location = New System.Drawing.Point(15, 458)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(656, 48)
         Me.GroupBox1.TabIndex = 9
@@ -2414,29 +2466,155 @@ Public Class frmGeoSFM
         Me.ComboBox39.Size = New System.Drawing.Size(312, 21)
         Me.ComboBox39.TabIndex = 23
         '
-        'AtcGridSensitivity
+        'gbxConnect
         '
-        Me.AtcGridSensitivity.AllowHorizontalScrolling = True
-        Me.AtcGridSensitivity.AllowNewValidValues = False
-        Me.AtcGridSensitivity.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+        Me.gbxConnect.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridSensitivity.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGridSensitivity.Fixed3D = False
-        Me.AtcGridSensitivity.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AtcGridSensitivity.LineColor = System.Drawing.Color.Empty
-        Me.AtcGridSensitivity.LineWidth = 0.0!
-        Me.AtcGridSensitivity.Location = New System.Drawing.Point(23, 77)
-        Me.AtcGridSensitivity.Name = "AtcGridSensitivity"
-        Me.AtcGridSensitivity.Size = New System.Drawing.Size(516, 255)
-        Me.AtcGridSensitivity.Source = Nothing
-        Me.AtcGridSensitivity.TabIndex = 44
+        Me.gbxConnect.Controls.Add(Me.AtcConnectFlows)
+        Me.gbxConnect.Location = New System.Drawing.Point(22, 22)
+        Me.gbxConnect.Name = "gbxConnect"
+        Me.gbxConnect.Size = New System.Drawing.Size(329, 313)
+        Me.gbxConnect.TabIndex = 42
+        Me.gbxConnect.TabStop = False
+        Me.gbxConnect.Text = "Observed Flow / Subbasin Connections"
+        '
+        'AtcConnectFlows
+        '
+        Me.AtcConnectFlows.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcConnectFlows.Location = New System.Drawing.Point(5, 18)
+        Me.AtcConnectFlows.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.AtcConnectFlows.Name = "AtcConnectFlows"
+        Me.AtcConnectFlows.Size = New System.Drawing.Size(319, 281)
+        Me.AtcConnectFlows.TabIndex = 42
+        '
+        'lstCalib
+        '
+        Me.lstCalib.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lstCalib.FormattingEnabled = True
+        Me.lstCalib.Location = New System.Drawing.Point(369, 40)
+        Me.lstCalib.Name = "lstCalib"
+        Me.lstCalib.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
+        Me.lstCalib.Size = New System.Drawing.Size(125, 121)
+        Me.lstCalib.TabIndex = 43
+        '
+        'lblParms
+        '
+        Me.lblParms.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblParms.AutoSize = True
+        Me.lblParms.Location = New System.Drawing.Point(366, 24)
+        Me.lblParms.Name = "lblParms"
+        Me.lblParms.Size = New System.Drawing.Size(112, 13)
+        Me.lblParms.TabIndex = 44
+        Me.lblParms.Text = "Calibration Parameters"
+        '
+        'gbxObjective
+        '
+        Me.gbxObjective.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbxObjective.Controls.Add(Me.rbnObj6)
+        Me.gbxObjective.Controls.Add(Me.rbnObj5)
+        Me.gbxObjective.Controls.Add(Me.rbnObj4)
+        Me.gbxObjective.Controls.Add(Me.rbnObj3)
+        Me.gbxObjective.Controls.Add(Me.rbnObj2)
+        Me.gbxObjective.Controls.Add(Me.rbnObj1)
+        Me.gbxObjective.Location = New System.Drawing.Point(369, 166)
+        Me.gbxObjective.Name = "gbxObjective"
+        Me.gbxObjective.Size = New System.Drawing.Size(265, 168)
+        Me.gbxObjective.TabIndex = 45
+        Me.gbxObjective.TabStop = False
+        Me.gbxObjective.Text = "Objective Function Type"
+        '
+        'lblMax
+        '
+        Me.lblMax.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblMax.AutoSize = True
+        Me.lblMax.Location = New System.Drawing.Point(506, 24)
+        Me.lblMax.Name = "lblMax"
+        Me.lblMax.Size = New System.Drawing.Size(131, 13)
+        Me.lblMax.TabIndex = 47
+        Me.lblMax.Text = "Maximum Number of Runs"
+        '
+        'lstMax
+        '
+        Me.lstMax.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lstMax.FormattingEnabled = True
+        Me.lstMax.Location = New System.Drawing.Point(509, 40)
+        Me.lstMax.Name = "lstMax"
+        Me.lstMax.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
+        Me.lstMax.Size = New System.Drawing.Size(125, 121)
+        Me.lstMax.TabIndex = 46
+        '
+        'rbnObj1
+        '
+        Me.rbnObj1.AutoSize = True
+        Me.rbnObj1.Checked = True
+        Me.rbnObj1.Location = New System.Drawing.Point(10, 21)
+        Me.rbnObj1.Name = "rbnObj1"
+        Me.rbnObj1.Size = New System.Drawing.Size(180, 17)
+        Me.rbnObj1.TabIndex = 0
+        Me.rbnObj1.TabStop = True
+        Me.rbnObj1.Text = "Root Mean Square Error (RMSE)"
+        Me.rbnObj1.UseVisualStyleBackColor = True
+        '
+        'rbnObj2
+        '
+        Me.rbnObj2.AutoSize = True
+        Me.rbnObj2.Location = New System.Drawing.Point(10, 44)
+        Me.rbnObj2.Name = "rbnObj2"
+        Me.rbnObj2.Size = New System.Drawing.Size(147, 17)
+        Me.rbnObj2.TabIndex = 1
+        Me.rbnObj2.Text = "Standard Deviation (STD)"
+        Me.rbnObj2.UseVisualStyleBackColor = True
+        '
+        'rbnObj3
+        '
+        Me.rbnObj3.AutoSize = True
+        Me.rbnObj3.Location = New System.Drawing.Point(10, 67)
+        Me.rbnObj3.Name = "rbnObj3"
+        Me.rbnObj3.Size = New System.Drawing.Size(176, 17)
+        Me.rbnObj3.TabIndex = 2
+        Me.rbnObj3.Text = "Maximum Likelihood Error (MLE)"
+        Me.rbnObj3.UseVisualStyleBackColor = True
+        '
+        'rbnObj4
+        '
+        Me.rbnObj4.AutoSize = True
+        Me.rbnObj4.Location = New System.Drawing.Point(10, 90)
+        Me.rbnObj4.Name = "rbnObj4"
+        Me.rbnObj4.Size = New System.Drawing.Size(171, 17)
+        Me.rbnObj4.TabIndex = 3
+        Me.rbnObj4.Text = "Nash-Sutcliffe Efficiency (NSE)"
+        Me.rbnObj4.UseVisualStyleBackColor = True
+        '
+        'rbnObj5
+        '
+        Me.rbnObj5.AutoSize = True
+        Me.rbnObj5.Location = New System.Drawing.Point(10, 113)
+        Me.rbnObj5.Name = "rbnObj5"
+        Me.rbnObj5.Size = New System.Drawing.Size(174, 17)
+        Me.rbnObj5.TabIndex = 4
+        Me.rbnObj5.Text = "Number of Sign Changes (NSC)"
+        Me.rbnObj5.UseVisualStyleBackColor = True
+        '
+        'rbnObj6
+        '
+        Me.rbnObj6.AutoSize = True
+        Me.rbnObj6.Location = New System.Drawing.Point(10, 138)
+        Me.rbnObj6.Name = "rbnObj6"
+        Me.rbnObj6.Size = New System.Drawing.Size(49, 17)
+        Me.rbnObj6.TabIndex = 5
+        Me.rbnObj6.Text = "BIAS"
+        Me.rbnObj6.UseVisualStyleBackColor = True
         '
         'frmGeoSFM
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.cmdCancel
-        Me.ClientSize = New System.Drawing.Size(686, 568)
+        Me.ClientSize = New System.Drawing.Size(686, 559)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.tabMain)
         Me.Controls.Add(Me.cmdAbout)
@@ -2473,10 +2651,14 @@ Public Class frmGeoSFM
         Me.tpgSensitivity.ResumeLayout(False)
         Me.tpgSensitivity.PerformLayout()
         Me.tpgCalibrate.ResumeLayout(False)
+        Me.tpgCalibrate.PerformLayout()
         Me.tpgBankfull.ResumeLayout(False)
         Me.tpgMap.ResumeLayout(False)
         Me.tpgPlot.ResumeLayout(False)
         Me.GroupBox1.ResumeLayout(False)
+        Me.gbxConnect.ResumeLayout(False)
+        Me.gbxObjective.ResumeLayout(False)
+        Me.gbxObjective.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -2485,6 +2667,7 @@ Public Class frmGeoSFM
 
     Friend pPrecStations As atcCollection
     Friend pMetStations As atcCollection
+    Friend pFlowStations As atcCollection
 
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
         Me.Close()
@@ -2569,6 +2752,7 @@ Public Class frmGeoSFM
         End With
         pPrecStations = New atcCollection
         pMetStations = New atcCollection
+        pFlowStations = New atcCollection
 
         Logger.Dbg("SetValidValues")
         Dim lValidValues As New atcCollection
@@ -2616,7 +2800,7 @@ Public Class frmGeoSFM
             .CellValue(17, 0) = "RivLoss, Fraction of flow lost within river channel"
             .CellValue(18, 0) = "RivFPLoss, Fraction of river flow lost in floodplain"
             .CellValue(19, 0) = "Celerity, Flood wave celerity (m/s)"
-            .CellValue(20, 0) = "Diffusion, Flow attenuation coefficient (m^2/s)"        
+            .CellValue(20, 0) = "Diffusion, Flow attenuation coefficient (m^2/s)"
             .CellValue(1, 1) = "1"
             .CellValue(2, 1) = "1"
             .CellValue(3, 1) = "1"
@@ -3259,7 +3443,97 @@ Public Class frmGeoSFM
     End Sub
 
     Private Sub cmdCalibrationNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCalibrationNext.Click
+        'do a lot of checking here to make sure entries are valid
+        If AtcConnectFlows.lstConnections.Items.Count = 0 Then
+            Logger.Msg("No calibration timeseries / location connections have been specified.", vbOKOnly, "BASINS GeoSFM Problem")
+            EnableControls(True)
+            Exit Sub
+        End If
+        If lstCalib.SelectedItems.Count = 0 Then
+            Logger.Msg("No calibration parameters have been specified.", vbOKOnly, "BASINS GeoSFM Problem")
+            EnableControls(True)
+            Exit Sub
+        End If
+        If lstMax.SelectedItems.Count = 0 Then
+            Logger.Msg("The maximum number of calibration runs must be set.", vbOKOnly, "BASINS GeoSFM Problem")
+            EnableControls(True)
+            Exit Sub
+        End If
+
+        Dim lFlowGageNames As New Collection
+        Dim lSJDate As Double = 0.0
+        Dim lEJDate As Double = 0.0
+        Dim lSJFlowDate As Double = 0.0
+        Dim lEJFlowDate As Double = 0.0
+        Dim lSelectedStation As StationDetails
+        Dim lSelectedStationName As String = ""
+        Dim lReachId As String = ""
+        'set precip stations
+        For lIndex As Integer = 1 To AtcConnectFlows.lstConnections.Items.Count
+            Dim lString() As String = AtcConnectFlows.lstConnections.Items(lIndex).Split(" ")
+            lSelectedStationName = lString(0)
+            lReachId = lString(2)
+            lSelectedStation = pFlowStations.ItemByKey(lSelectedStationName)
+            'set dates
+            If lSelectedStation.StartJDate > lSJDate Then
+                lSJDate = lSelectedStation.StartJDate
+            End If
+            If lEJDate = 0.0 Or lSelectedStation.EndJDate < lEJDate Then
+                lEJDate = lSelectedStation.EndJDate
+            End If
+
+            If lSelectedStation.StartJDate > lSJFlowDate Then
+                lSJFlowDate = lSelectedStation.StartJDate
+            End If
+            If lEJFlowDate = 0.0 Or lSelectedStation.EndJDate < lEJFlowDate Then
+                lEJFlowDate = lSelectedStation.EndJDate
+            End If
+            'remember which flow gage goes with each reach segment
+            If Not lFlowGageNames.Contains(lReachId) Then
+                lFlowGageNames.Add(lSelectedStation.Name, lReachId)
+            Else
+                'already have this reach, tell user
+                Logger.Msg("One reach may not be associated with multiple streamflow gages.", vbOKOnly, "BASINS GeoSFM Problem")
+                EnableControls(True)
+                Exit Sub
+            End If
+        Next
+
+        Dim lSDate(5) As Integer
+        Dim lEDate(5) As Integer
+        lSDate(0) = atxSYear.Text
+        lSDate(1) = atxSMonth.Text
+        lSDate(2) = atxSDay.Text
+        lEDate(0) = atxEYear.Text
+        lEDate(1) = atxEMonth.Text
+        lEDate(2) = atxEDay.Text
+        lSJDate = Date2J(lSDate)
+        lEJDate = Date2J(lEDate)
+
+        If lSJFlowDate > lEJFlowDate Then 'failed date check
+            Logger.Msg("The specified flow stations do not have a common period of record.", vbOKOnly, "BASINS GeoSFM Problem")
+            EnableControls(True)
+            Exit Sub
+        End If
+        'compare dates from flow data with specified start and end dates, make sure they are valid
+        If lSJDate < lSJFlowDate Or lEJFlowDate < lEJDate Then 'failed date check
+            Logger.Msg("The specified start/end dates are not within the dates of the specified flow stations.", vbOKOnly, "BASINS GeoSFM Problem")
+            EnableControls(True)
+            Exit Sub
+        End If
+
+        EnableControls(False)
+        lblStatus.Text = "Performing Calibration ........"
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+        Me.Refresh()
+
         Calibrate()
+
+        tabMain.SelectedIndex = 8
+        lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+        Me.Refresh()
+        EnableControls(True)
     End Sub
 
     Private Sub cmdBankfullNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdBankfullNext.Click
@@ -3323,9 +3597,10 @@ Public Class frmGeoSFM
     End Sub
 
     Private Sub tabMain_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles tabMain.SelectedIndexChanged
-        If tabMain.SelectedIndex = 6 Then
-            'read reaches for sensitivity analysis
+        If tabMain.SelectedIndex = 6 Or tabMain.SelectedIndex = 7 Then
+            'read reaches for sensitivity analysis or calibration 
             cboReachSensitivity.Items.Clear()
+            AtcConnectFlows.lstTarget.Items.Clear()
             Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
             Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
             Dim orderfilename As String = lOutputPath & "order.txt"
@@ -3339,6 +3614,7 @@ Public Class frmGeoSFM
                     Else
                         If IsNumeric(lCurrentRecord) Then
                             cboReachSensitivity.Items.Add(lCurrentRecord)
+                            AtcConnectFlows.lstTarget.Items.Add(lCurrentRecord)
                         End If
                     End If
                 Loop
@@ -3346,6 +3622,69 @@ Public Class frmGeoSFM
                 Logger.Msg("Cannot determine computational order." & vbCrLf & "Run 'Generate basin file' menu to create order.txt", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
             End If
             cboReachSensitivity.SelectedIndex = 0
+        End If
+        If tabMain.SelectedIndex = 7 Then
+            'set up calibration tab
+            AtcConnectFlows.lstSource.Items.Clear()
+            pFlowStations.Clear()
+            For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
+                Dim lTotalCount As Integer = lDataSource.DataSets.Count
+                Dim lCounter As Integer = 0
+                For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
+                    lCounter += 1
+                    Logger.Progress("Building list of valid calibration station names...", lCounter, lDataSource.DataSets.Count)
+                    If lDataSet.Attributes.GetValue("Scenario") = "OBSERVED" And lDataSet.Attributes.GetValue("Constituent") = "FLOW" Then
+                        Dim lLoc As String = lDataSet.Attributes.GetValue("Location")
+                        Dim lStanam As String = lDataSet.Attributes.GetValue("Stanam")
+                        Dim lDsn As Integer = lDataSet.Attributes.GetValue("Id")
+                        Dim lSJDay As Double
+                        Dim lEJDay As Double
+                        lSJDay = lDataSet.Attributes.GetValue("Start Date", 0)
+                        lEJDay = lDataSet.Attributes.GetValue("End Date", 0)
+                        If lSJDay = 0 Then
+                            lSJDay = lDataSet.Dates.Value(0)
+                        End If
+                        If lEJDay = 0 Then
+                            lEJDay = lDataSet.Dates.Value(lDataSet.Dates.numValues)
+                        End If
+                        Dim lSdate(6) As Integer
+                        Dim lEdate(6) As Integer
+                        J2Date(lSJDay, lSdate)
+                        J2Date(lEJDay, lEdate)
+                        Dim lDateString As String = "(" & lSdate(0) & "/" & lSdate(1) & "/" & lSdate(2) & "-" & lEdate(0) & "/" & lEdate(1) & "/" & lEdate(2) & ")"
+                        AtcConnectFlows.lstSource.Items.Add(lLoc & ":" & lDateString)
+                        Dim lStationDetails As New StationDetails
+                        lStationDetails.Name = lLoc
+                        lStationDetails.StartJDate = lSJDay
+                        lStationDetails.EndJDate = lEJDay
+                        lStationDetails.Description = lLoc & ":" & lDateString
+                        pFlowStations.Add(lStationDetails.Description, lStationDetails)
+                    End If
+                    'set valuesneedtoberead so that the dates and values will be forgotten, to free up memory
+                    lDataSet.ValuesNeedToBeRead = True
+                Next
+            Next
+            lstCalib.Items.Clear()
+            lstCalib.Items.Add("SoilWhc")
+            lstCalib.Items.Add("Depth")
+            lstCalib.Items.Add("Texture")
+            lstCalib.Items.Add("Ks")
+            lstCalib.Items.Add("Interflow")
+            lstCalib.Items.Add("HSlope")
+            lstCalib.Items.Add("Baseflow")
+            lstCalib.Items.Add("CurveNum")
+            lstCalib.Items.Add("MaxCover")
+            lstCalib.Items.Add("BasinLoss")
+            lstCalib.Items.Add("PanCoeff")
+            lstCalib.Items.Add("TopSoil")
+            lstCalib.Items.Add("RainCalc")
+            lstCalib.Items.Add("RivRough")
+            lstCalib.Items.Add("RivSlope")
+            lstCalib.Items.Add("RivWidth")
+            lstCalib.Items.Add("RivLoss")
+            lstCalib.Items.Add("RivFPLoss")
+            lstCalib.Items.Add("Celerity")
+            lstCalib.Items.Add("Diffusion")
         End If
     End Sub
 
@@ -3355,7 +3694,7 @@ Public Class frmGeoSFM
         If IsNumeric(lNewValue) Then lNewValueNumeric = CDbl(lNewValue)
 
         Dim lNewColor As Color = aGrid.Source.CellColor(aRow, aColumn)
-        
+
         If lNewValueNumeric >= 0 Then
             lNewColor = aGrid.CellBackColor
         Else
@@ -3365,5 +3704,28 @@ Public Class frmGeoSFM
         If Not lNewColor.Equals(aGrid.Source.CellColor(aRow, aColumn)) Then
             aGrid.Source.CellColor(aRow, aColumn) = lNewColor
         End If
+    End Sub
+
+    Private Sub lstCalib_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        Dim lccount As Integer = lstCalib.SelectedItems.Count
+        Dim lncomplex As Integer = 2
+        Dim lnsamples As Integer = 2 * lncomplex * lccount
+        Dim lnummult As Integer = 0
+        If (lnsamples < 10) Then
+            lnummult = (10 / (lncomplex * lccount)) + 1
+            lnsamples = lnummult * lncomplex * lccount
+        ElseIf (lnsamples > 200) Then
+            lnummult = (100 / (lncomplex * lccount))
+            lnsamples = lnummult * lncomplex * lccount
+        End If
+        lstMax.Items.Clear()
+        lstMax.Items.Add(lnsamples * lccount * 10)
+        lstMax.Items.Add(lnsamples * lccount * 4)
+        lstMax.Items.Add(lnsamples * lccount * 8)
+        lstMax.Items.Add(lnsamples * lccount * 16)
+        lstMax.Items.Add(lnsamples * lccount * 32)
+        lstMax.Items.Add(lnsamples * lccount * 64)
+        lstMax.Items.Add(lnsamples * lccount * 128)
+        lstMax.SelectedItem = 1
     End Sub
 End Class
