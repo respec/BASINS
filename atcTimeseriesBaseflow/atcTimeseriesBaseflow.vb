@@ -194,6 +194,7 @@ Public Class atcTimeseriesBaseflow
                 ClsBaseFlow = New clsBaseflowPart()
             Case Else
         End Select
+        Dim lBFDatagroup As atcTimeseriesGroup = Nothing
         With ClsBaseFlow
             .DrainageArea = lDrainageArea
             .TargetTS = lTsStreamflow
@@ -204,8 +205,8 @@ Public Class atcTimeseriesBaseflow
             Else
                 .UnitFlag = 2
             End If
-            Dim lBFDatagroup As atcTimeseriesGroup = ClsBaseFlow.DoBaseFlowSeparation()
-            Me.DataSets.AddRange(lBFDatagroup)
+            lBFDatagroup = ClsBaseFlow.DoBaseFlowSeparation()
+            'Me.DataSets.AddRange(lBFDatagroup)
 
             Dim lNewDef As atcAttributeDefinition
             
@@ -228,7 +229,8 @@ Public Class atcTimeseriesBaseflow
             lTsStreamflow.Attributes.SetValue(lNewDef, lBFDatagroup, Nothing)
         End With
 
-        If Me.DataSets.Count > 0 Then
+        'If Me.DataSets.Count > 0 Then
+        If lBFDatagroup IsNot Nothing AndAlso lBFDatagroup.Count > 0 Then
             Return True 'todo: error checks
         Else
             Return False 'no datasets added, not a data source

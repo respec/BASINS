@@ -207,6 +207,7 @@ Public Class clsBaseflowHySep
         'lTsBaseflow.Dates = lNewDates
         'lTsBaseflow.Values = lValueBaseflowFinal
         lTsBaseflow.Attributes.SetValue("Scenario", "HySepFixed")
+        lTsBaseflow.Attributes.SetValue("BFInterval", lInterv)
         Return lTsBaseflow
     End Function
 
@@ -269,6 +270,7 @@ Public Class clsBaseflowHySep
         lTsBaseflow.Values = lValueBaseflow
 
         lTsBaseflow.Attributes.SetValue("Scenario", "HySepSlide")
+        lTsBaseflow.Attributes.SetValue("BFInterval", lInterv)
         Return lTsBaseflow
     End Function
 
@@ -388,6 +390,7 @@ Public Class clsBaseflowHySep
         With lTsBaseflow
             .Attributes.SetValue("Constituent", "Baseflow")
             .Attributes.SetValue("Scenario", "HySepLocMin")
+            .Attributes.SetValue("BFInterval", lInterv)
             .Values = lValueBaseflow
         End With
         Return lTsBaseflow
