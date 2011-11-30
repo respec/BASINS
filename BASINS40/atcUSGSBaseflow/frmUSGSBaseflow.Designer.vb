@@ -48,13 +48,18 @@ Partial Class frmUSGSBaseflow
         Me.mnuOutputASCII = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuGraphBF = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuGraphTimeseries = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuGraphProbability = New System.Windows.Forms.ToolStripMenuItem
+        Me.mnuGraphDuration = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuGraphCDistPlot = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuAnalysis = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem
         Me.txtOutputRootName = New System.Windows.Forms.TextBox
         Me.lblBaseFilename = New System.Windows.Forms.Label
         Me.gbOutputFileSpecs = New System.Windows.Forms.GroupBox
+        Me.btnGraphCDist = New System.Windows.Forms.Button
+        Me.btnGraphDurationPUA = New System.Windows.Forms.Button
+        Me.btnGraphDuration = New System.Windows.Forms.Button
+        Me.btnGraphTimeseries = New System.Windows.Forms.Button
+        Me.btnWriteASCIIOutput = New System.Windows.Forms.Button
         Me.chkTabDelimited = New System.Windows.Forms.CheckBox
         Me.txtOutputDir = New System.Windows.Forms.TextBox
         Me.lblOutputDir = New System.Windows.Forms.Label
@@ -110,7 +115,7 @@ Partial Class frmUSGSBaseflow
         'btnOK
         '
         Me.btnOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOK.Location = New System.Drawing.Point(204, 300)
+        Me.btnOK.Location = New System.Drawing.Point(200, 437)
         Me.btnOK.Name = "btnOK"
         Me.btnOK.Size = New System.Drawing.Size(75, 23)
         Me.btnOK.TabIndex = 23
@@ -120,7 +125,7 @@ Partial Class frmUSGSBaseflow
         'btnCancel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnCancel.Location = New System.Drawing.Point(285, 300)
+        Me.btnCancel.Location = New System.Drawing.Point(281, 437)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(75, 23)
         Me.btnCancel.TabIndex = 24
@@ -144,6 +149,7 @@ Partial Class frmUSGSBaseflow
         Me.btnFindStations.TabIndex = 26
         Me.btnFindStations.Text = "Browse Stations"
         Me.btnFindStations.UseVisualStyleBackColor = True
+        Me.btnFindStations.Visible = False
         '
         'gbDates
         '
@@ -225,7 +231,7 @@ Partial Class frmUSGSBaseflow
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFile, Me.mnuAnalysis, Me.mnuHelp})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(372, 24)
+        Me.MenuStrip1.Size = New System.Drawing.Size(368, 24)
         Me.MenuStrip1.TabIndex = 28
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -239,14 +245,14 @@ Partial Class frmUSGSBaseflow
         'mnuFileSelectData
         '
         Me.mnuFileSelectData.Name = "mnuFileSelectData"
-        Me.mnuFileSelectData.Size = New System.Drawing.Size(152, 22)
+        Me.mnuFileSelectData.Size = New System.Drawing.Size(140, 22)
         Me.mnuFileSelectData.Text = "Select Data"
         '
         'mnuOutput
         '
         Me.mnuOutput.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOutputASCII})
         Me.mnuOutput.Name = "mnuOutput"
-        Me.mnuOutput.Size = New System.Drawing.Size(152, 22)
+        Me.mnuOutput.Size = New System.Drawing.Size(140, 22)
         Me.mnuOutput.Text = "Output"
         '
         'mnuOutputASCII
@@ -257,28 +263,28 @@ Partial Class frmUSGSBaseflow
         '
         'mnuGraphBF
         '
-        Me.mnuGraphBF.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuGraphTimeseries, Me.mnuGraphProbability, Me.mnuGraphCDistPlot})
+        Me.mnuGraphBF.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuGraphTimeseries, Me.mnuGraphDuration, Me.mnuGraphCDistPlot})
         Me.mnuGraphBF.Name = "mnuGraphBF"
-        Me.mnuGraphBF.Size = New System.Drawing.Size(152, 22)
+        Me.mnuGraphBF.Size = New System.Drawing.Size(140, 22)
         Me.mnuGraphBF.Text = "Graph"
         '
         'mnuGraphTimeseries
         '
         Me.mnuGraphTimeseries.Name = "mnuGraphTimeseries"
-        Me.mnuGraphTimeseries.Size = New System.Drawing.Size(152, 22)
+        Me.mnuGraphTimeseries.Size = New System.Drawing.Size(146, 22)
         Me.mnuGraphTimeseries.Text = "TimeSeries"
         '
-        'mnuGraphProbability
+        'mnuGraphDuration
         '
-        Me.mnuGraphProbability.Name = "mnuGraphProbability"
-        Me.mnuGraphProbability.Size = New System.Drawing.Size(152, 22)
-        Me.mnuGraphProbability.Text = "Probability"
+        Me.mnuGraphDuration.Name = "mnuGraphDuration"
+        Me.mnuGraphDuration.Size = New System.Drawing.Size(146, 22)
+        Me.mnuGraphDuration.Text = "Duration"
         '
         'mnuGraphCDistPlot
         '
         Me.mnuGraphCDistPlot.Name = "mnuGraphCDistPlot"
-        Me.mnuGraphCDistPlot.Size = New System.Drawing.Size(152, 22)
-        Me.mnuGraphCDistPlot.Text = "CDist Plot"
+        Me.mnuGraphCDistPlot.Size = New System.Drawing.Size(146, 22)
+        Me.mnuGraphCDistPlot.Text = "Cummulative"
         '
         'mnuAnalysis
         '
@@ -310,6 +316,11 @@ Partial Class frmUSGSBaseflow
         '
         'gbOutputFileSpecs
         '
+        Me.gbOutputFileSpecs.Controls.Add(Me.btnGraphCDist)
+        Me.gbOutputFileSpecs.Controls.Add(Me.btnGraphDurationPUA)
+        Me.gbOutputFileSpecs.Controls.Add(Me.btnGraphDuration)
+        Me.gbOutputFileSpecs.Controls.Add(Me.btnGraphTimeseries)
+        Me.gbOutputFileSpecs.Controls.Add(Me.btnWriteASCIIOutput)
         Me.gbOutputFileSpecs.Controls.Add(Me.chkTabDelimited)
         Me.gbOutputFileSpecs.Controls.Add(Me.txtOutputDir)
         Me.gbOutputFileSpecs.Controls.Add(Me.lblOutputDir)
@@ -317,10 +328,60 @@ Partial Class frmUSGSBaseflow
         Me.gbOutputFileSpecs.Controls.Add(Me.lblBaseFilename)
         Me.gbOutputFileSpecs.Location = New System.Drawing.Point(18, 208)
         Me.gbOutputFileSpecs.Name = "gbOutputFileSpecs"
-        Me.gbOutputFileSpecs.Size = New System.Drawing.Size(342, 82)
+        Me.gbOutputFileSpecs.Size = New System.Drawing.Size(342, 223)
         Me.gbOutputFileSpecs.TabIndex = 31
         Me.gbOutputFileSpecs.TabStop = False
         Me.gbOutputFileSpecs.Text = "Output Specifications"
+        '
+        'btnGraphCDist
+        '
+        Me.btnGraphCDist.Location = New System.Drawing.Point(9, 193)
+        Me.btnGraphCDist.Name = "btnGraphCDist"
+        Me.btnGraphCDist.Size = New System.Drawing.Size(323, 23)
+        Me.btnGraphCDist.TabIndex = 38
+        Me.btnGraphCDist.Text = "Graph: Cummulative Distribution"
+        Me.btnGraphCDist.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnGraphCDist.UseVisualStyleBackColor = True
+        '
+        'btnGraphDurationPUA
+        '
+        Me.btnGraphDurationPUA.Location = New System.Drawing.Point(9, 164)
+        Me.btnGraphDurationPUA.Name = "btnGraphDurationPUA"
+        Me.btnGraphDurationPUA.Size = New System.Drawing.Size(323, 23)
+        Me.btnGraphDurationPUA.TabIndex = 37
+        Me.btnGraphDurationPUA.Text = "Graph: Flow Duration per unit area"
+        Me.btnGraphDurationPUA.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnGraphDurationPUA.UseVisualStyleBackColor = True
+        '
+        'btnGraphDuration
+        '
+        Me.btnGraphDuration.Location = New System.Drawing.Point(9, 135)
+        Me.btnGraphDuration.Name = "btnGraphDuration"
+        Me.btnGraphDuration.Size = New System.Drawing.Size(323, 23)
+        Me.btnGraphDuration.TabIndex = 36
+        Me.btnGraphDuration.Text = "Graph: Flow Duration"
+        Me.btnGraphDuration.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnGraphDuration.UseVisualStyleBackColor = True
+        '
+        'btnGraphTimeseries
+        '
+        Me.btnGraphTimeseries.Location = New System.Drawing.Point(9, 105)
+        Me.btnGraphTimeseries.Name = "btnGraphTimeseries"
+        Me.btnGraphTimeseries.Size = New System.Drawing.Size(323, 23)
+        Me.btnGraphTimeseries.TabIndex = 35
+        Me.btnGraphTimeseries.Text = "Graph: Timeseries"
+        Me.btnGraphTimeseries.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnGraphTimeseries.UseVisualStyleBackColor = True
+        '
+        'btnWriteASCIIOutput
+        '
+        Me.btnWriteASCIIOutput.Location = New System.Drawing.Point(9, 75)
+        Me.btnWriteASCIIOutput.Name = "btnWriteASCIIOutput"
+        Me.btnWriteASCIIOutput.Size = New System.Drawing.Size(323, 23)
+        Me.btnWriteASCIIOutput.TabIndex = 34
+        Me.btnWriteASCIIOutput.Text = "Write ASCII Outputs"
+        Me.btnWriteASCIIOutput.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnWriteASCIIOutput.UseVisualStyleBackColor = True
         '
         'chkTabDelimited
         '
@@ -352,7 +413,7 @@ Partial Class frmUSGSBaseflow
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(372, 335)
+        Me.ClientSize = New System.Drawing.Size(368, 472)
         Me.Controls.Add(Me.gbDates)
         Me.Controls.Add(Me.btnFindStations)
         Me.Controls.Add(Me.btnCancel)
@@ -410,6 +471,11 @@ Partial Class frmUSGSBaseflow
     Friend WithEvents lblOutputDir As System.Windows.Forms.Label
     Friend WithEvents chkTabDelimited As System.Windows.Forms.CheckBox
     Friend WithEvents mnuGraphTimeseries As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents mnuGraphProbability As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuGraphDuration As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuGraphCDistPlot As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents btnGraphDurationPUA As System.Windows.Forms.Button
+    Friend WithEvents btnGraphDuration As System.Windows.Forms.Button
+    Friend WithEvents btnGraphTimeseries As System.Windows.Forms.Button
+    Friend WithEvents btnWriteASCIIOutput As System.Windows.Forms.Button
+    Friend WithEvents btnGraphCDist As System.Windows.Forms.Button
 End Class

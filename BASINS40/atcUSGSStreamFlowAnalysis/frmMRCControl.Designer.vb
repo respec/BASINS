@@ -57,6 +57,7 @@ Partial Class frmMRCControl
         Me.panelGraph = New System.Windows.Forms.Panel
         Me.tabMRCTable = New System.Windows.Forms.TabPage
         Me.txtMRCTable = New System.Windows.Forms.TextBox
+        Me.btnMRCClear = New System.Windows.Forms.Button
         Me.tabMRCMain.SuspendLayout()
         Me.tabConstructMRC.SuspendLayout()
         Me.gbMRCEquations.SuspendLayout()
@@ -95,7 +96,9 @@ Partial Class frmMRCControl
         '
         Me.gbMRCEquations.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbMRCEquations.Controls.Add(Me.btnMRCClear)
         Me.gbMRCEquations.Controls.Add(Me.txtSeason)
+        Me.gbMRCEquations.Controls.Add(Me.btnMRCPlot)
         Me.gbMRCEquations.Controls.Add(Me.lblSeason)
         Me.gbMRCEquations.Controls.Add(Me.txtLogQMax)
         Me.gbMRCEquations.Controls.Add(Me.lblMaxLogQ)
@@ -104,7 +107,6 @@ Partial Class frmMRCControl
         Me.gbMRCEquations.Controls.Add(Me.txtStation)
         Me.gbMRCEquations.Controls.Add(Me.lblStation)
         Me.gbMRCEquations.Controls.Add(Me.chkAutoMatching)
-        Me.gbMRCEquations.Controls.Add(Me.btnMRCPlot)
         Me.gbMRCEquations.Controls.Add(Me.lstEquations)
         Me.gbMRCEquations.Controls.Add(Me.btnMRCAdd)
         Me.gbMRCEquations.Controls.Add(Me.btnMRCDelete)
@@ -191,7 +193,7 @@ Partial Class frmMRCControl
         '
         Me.chkAutoMatching.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkAutoMatching.AutoSize = True
-        Me.chkAutoMatching.Location = New System.Drawing.Point(532, 106)
+        Me.chkAutoMatching.Location = New System.Drawing.Point(532, 135)
         Me.chkAutoMatching.Name = "chkAutoMatching"
         Me.chkAutoMatching.Size = New System.Drawing.Size(94, 17)
         Me.chkAutoMatching.TabIndex = 17
@@ -201,7 +203,7 @@ Partial Class frmMRCControl
         'btnMRCPlot
         '
         Me.btnMRCPlot.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnMRCPlot.Location = New System.Drawing.Point(532, 77)
+        Me.btnMRCPlot.Location = New System.Drawing.Point(532, 48)
         Me.btnMRCPlot.Name = "btnMRCPlot"
         Me.btnMRCPlot.Size = New System.Drawing.Size(75, 23)
         Me.btnMRCPlot.TabIndex = 16
@@ -232,7 +234,7 @@ Partial Class frmMRCControl
         'btnMRCDelete
         '
         Me.btnMRCDelete.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnMRCDelete.Location = New System.Drawing.Point(532, 48)
+        Me.btnMRCDelete.Location = New System.Drawing.Point(532, 77)
         Me.btnMRCDelete.Name = "btnMRCDelete"
         Me.btnMRCDelete.Size = New System.Drawing.Size(75, 23)
         Me.btnMRCDelete.TabIndex = 15
@@ -415,6 +417,15 @@ Partial Class frmMRCControl
         Me.txtMRCTable.Size = New System.Drawing.Size(652, 440)
         Me.txtMRCTable.TabIndex = 0
         '
+        'btnMRCClear
+        '
+        Me.btnMRCClear.Location = New System.Drawing.Point(532, 106)
+        Me.btnMRCClear.Name = "btnMRCClear"
+        Me.btnMRCClear.Size = New System.Drawing.Size(75, 23)
+        Me.btnMRCClear.TabIndex = 32
+        Me.btnMRCClear.Text = "Clear"
+        Me.btnMRCClear.UseVisualStyleBackColor = True
+        '
         'frmMRCControl
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -470,4 +481,5 @@ Partial Class frmMRCControl
     Friend WithEvents lblSeason As System.Windows.Forms.Label
     Friend WithEvents tabMRCTable As System.Windows.Forms.TabPage
     Friend WithEvents txtMRCTable As System.Windows.Forms.TextBox
+    Friend WithEvents btnMRCClear As System.Windows.Forms.Button
 End Class
