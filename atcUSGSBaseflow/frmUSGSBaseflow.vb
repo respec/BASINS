@@ -84,7 +84,7 @@ Public Class frmUSGSBaseflow
         pMethod = GetSetting("atcUSGSBaseflow", "Defaults", "Model", "HySep-Fixed")
         pOutputDir = GetSetting("atcUSGSBaseflow", "Defaults", "OutputDir", "")
         pBaseOutputFilename = GetSetting("atcUSGSBaseflow", "Defaults", "BaseOutputFilename", "")
-        atcUSGSStations.StationInfoFile = GetSetting("atcUSGSBaseflow", "Defaults", "Stations", "Station.txt")
+        'atcUSGSStations.StationInfoFile = GetSetting("atcUSGSBaseflow", "Defaults", "Stations", "Station.txt")
 
         RepopulateForm()
     End Sub
@@ -189,7 +189,7 @@ Public Class frmUSGSBaseflow
             'Set Unit
             Args.SetValue("EnglishUnit", True)
             'Set station.txt
-            Args.SetValue("Station File", atcUSGSStations.StationInfoFile)
+            'Args.SetValue("Station File", atcUSGSStations.StationInfoFile)
         End If
         Return lErrMsg
     End Function
@@ -299,13 +299,13 @@ Public Class frmUSGSBaseflow
         atcDataManager.ShowDisplay(sender.Text, pDataGroup)
     End Sub
 
-    Private Sub btnFindStations_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnFindStations.Click
-        atcUSGSStations.StationInfoFile = FindFile("Locate Station File", atcUSGSStations.StationInfoFile, "txt")
-        SaveSetting("atcUSGSBaseflow", "Defaults", "Stations", atcUSGSStations.StationInfoFile)
-        atcUSGSStations.GetStations()
-        pfrmStations = New frmStations()
-        pfrmStations.AskUser(atcUSGSStations.Stations)
-    End Sub
+    'Private Sub btnFindStations_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnFindStations.Click
+    '    atcUSGSStations.StationInfoFile = FindFile("Locate Station File", atcUSGSStations.StationInfoFile, "txt")
+    '    SaveSetting("atcUSGSBaseflow", "Defaults", "Stations", atcUSGSStations.StationInfoFile)
+    '    atcUSGSStations.GetStations()
+    '    pfrmStations = New frmStations()
+    '    pfrmStations.AskUser(atcUSGSStations.Stations)
+    'End Sub
 
     Private Sub StationSelectionChanged(ByVal aSelectedIndex As Integer, ByVal aStationList As atcCollection, ByVal aIsDataDirty As Boolean) Handles pfrmStations.StationInfoChanged
         Dim lStationFilename As String
@@ -318,7 +318,7 @@ Public Class frmUSGSBaseflow
         txtDrainageArea.Text = lDrainageArea.ToString
 
         If aIsDataDirty Then
-            atcUSGSStations.SaveStations(aStationList, atcUSGSStations.StationInfoFile)
+            'atcUSGSStations.SaveStations(aStationList, atcUSGSStations.StationInfoFile)
         End If
     End Sub
 
@@ -617,7 +617,7 @@ Public Class frmUSGSBaseflow
 
     End Sub
 
-    Private Sub mnuGraphProbability_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuGraphProbability.Click
+    Private Sub mnuGraphDuration_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuGraphDuration.Click
         If Not pDidBFSeparation Then
             Logger.Msg("Need to perform baseflow separation first.")
             Exit Sub
@@ -957,5 +957,43 @@ Public Class frmUSGSBaseflow
         lGraphForm.Grapher.ZedGraphCtrl.Refresh()
         lGraphForm.Show()
 
+    End Sub
+
+    Private Sub btnWriteASCIIOutput_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnWriteASCIIOutput.Click
+        mnuOutputASCII_Click(Nothing, Nothing)
+    End Sub
+
+    Private Sub btnGraphTimeseries_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGraphTimeseries.Click
+        mnuGraphTimeseries_Click(Nothing, Nothing)
+    End Sub
+
+    Private Sub btnGraphDuration_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGraphDuration.Click
+        If Not pDidBFSeparation Then
+            Logger.Msg("Need to perform baseflow separation first.")
+            Exit Sub
+        End If
+        Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
+        DoBFGraphProbability(False)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+    End Sub
+
+    Private Sub btnGraphDurationPUA_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGraphDurationPUA.Click
+        If Not pDidBFSeparation Then
+            Logger.Msg("Need to perform baseflow separation first.")
+            Exit Sub
+        End If
+        Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
+        DoBFGraphProbability(True)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+    End Sub
+
+    Private Sub btnGraphCDist_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGraphCDist.Click
+        If Not pDidBFSeparation Then
+            Logger.Msg("Need to perform baseflow separation first.")
+            Exit Sub
+        End If
+        Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
+        DoBFGraphCDistPlot()
+        Me.Cursor = System.Windows.Forms.Cursors.Default
     End Sub
 End Class

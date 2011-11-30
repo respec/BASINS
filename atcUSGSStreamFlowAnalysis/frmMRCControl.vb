@@ -523,4 +523,16 @@ Public Class frmMRCControl
             PopulateStations()
         End If
     End Sub
+
+    Private Sub btnMRCClear_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnMRCClear.Click
+        lstEquations.Items.Clear()
+        txtStation.Text = ""
+        txtDA.Text = ""
+        txtSeason.Text = ""
+        txtLogQMax.Text = ""
+        txtLogQMin.Text = ""
+        txtCoefA.Text = ""
+        txtCoefB.Text = ""
+        txtCoefC.Text = ""
+    End Sub
 End Class

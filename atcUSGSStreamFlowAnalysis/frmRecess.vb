@@ -69,6 +69,7 @@ Public Class frmRecess
         txtAnalysisResults.Text = ""
         txtAnalysisResults.Visible = False
         PopulateForm()
+        chkSaveInterimToFile.Checked = True
         Me.Show()
     End Sub
 
@@ -1230,6 +1231,7 @@ Public Class frmRecess
 
         Dim lSDate As Double = StartDateFromForm()
         Dim lEDate As Double = EndDateFromForm()
+
         If pDataGroup.Count = 0 Then
             lErrMsg &= "- No streamflow data selected" & vbCrLf
         Else
@@ -1258,11 +1260,17 @@ Public Class frmRecess
         If Not Integer.TryParse(txtMinRecessionDays.Text.Trim, lMinRecLength) Then lErrMsg &= "- Min Recession Limb Length not set" & vbCrLf
 
         Dim lMonths As New ArrayList()
-        For I As Integer = 0 To lstMonths.Items.Count - 1
-            If lstMonths.GetSelected(I) Then
+        If lstMonths.SelectedItems.Count > 0 Then
+            For I As Integer = 0 To lstMonths.Items.Count - 1
+                If lstMonths.GetSelected(I) Then
+                    lMonths.Add(I + 1)
+                End If
+            Next
+        Else
+            For I As Integer = 0 To lstMonths.Items.Count - 1
                 lMonths.Add(I + 1)
-            End If
-        Next
+            Next
+        End If
 
         Dim lSeason As String = pSeason
         If lSeason = "" Then lSeason = "n"
