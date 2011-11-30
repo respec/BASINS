@@ -216,20 +216,24 @@ Public Class frmCustomMsgBox
             Next
         End If
 
-        Me.Show()
-        Me.BringToFront()
+        If TimeoutSeconds = 0 AndAlso Me.Owner IsNot Nothing Then
+            Me.ShowDialog(Me.Owner)
+        Else
+            Me.Show()
+            Me.BringToFront()
 
-        Dim lTimeLimit As Double = Date.Now.AddSeconds(TimeoutSeconds).ToOADate
-        pLabelClicked = ""
-        While pLabelClicked.Length = 0
-            Application.DoEvents()
-            System.Threading.Thread.Sleep(100)
-            If TimeoutSeconds > 0 AndAlso Date.Now.ToOADate > lTimeLimit Then
-                pLabelClicked = LabelCancel
-            End If
-        End While
+            Dim lTimeLimit As Double = Date.Now.AddSeconds(TimeoutSeconds).ToOADate
+            pLabelClicked = ""
+            While pLabelClicked.Length = 0
+                Application.DoEvents()
+                System.Threading.Thread.Sleep(100)
+                If TimeoutSeconds > 0 AndAlso Date.Now.ToOADate > lTimeLimit Then
+                    pLabelClicked = LabelCancel
+                End If
+            End While
 
-        Me.Visible = False
+            Me.Visible = False
+        End If
 
         For Each lButton As Windows.Forms.Button In lButtons
             Me.Controls.Remove(lButton)
@@ -247,6 +251,7 @@ Public Class frmCustomMsgBox
 
     Private Sub btnClick(ByVal sender As Object, ByVal e As System.EventArgs)
         pLabelClicked = sender.Tag
+        If Me.Modal Then Me.Close()
     End Sub
 
     Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)

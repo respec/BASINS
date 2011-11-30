@@ -75,7 +75,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>bin\x86\Debug\</OutputPath>
+    <OutputPath>..\..\BASINS40\bin\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>MapWinUtility.xml</DocumentationFile>
     <WarningLevel>1</WarningLevel>

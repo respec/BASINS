@@ -288,6 +288,29 @@ Public Class Logger
         Return lResult
     End Function
 
+    Public Shared Function MsgCustomOwned(ByVal aMessage As String, _
+                                          ByVal aTitle As String, _
+                                          ByVal aOwner As Windows.Forms.Form, _
+                                          ByVal ParamArray aButtonLabels() As String) As String
+        Dbg("MsgCustomOwned:" & aMessage & ":Title:" & aTitle & ":Style:" & String.Join(",", aButtonLabels))
+        Dim lResult As String = ""
+        If pDisplayMessageBoxes Then
+            Dim lMsgBox As frmCustomMsgBox = CustomMsgBox()
+            lMsgBox.Owner = aOwner
+            lResult = lMsgBox.AskUser(aMessage, aTitle, aButtonLabels)
+            Dbg("MsgResult:" & lResult)
+            pLastDbgText = ""
+        Else 'Default to first button or button label containing "+"
+            lResult = aButtonLabels(0)
+            For Each lButtonLabel As String In aButtonLabels
+                If lButtonLabel.Contains("+") Then lResult = lButtonLabel
+            Next
+            Dbg("MsgUserInteractionSkipped:Result:" & lResult)
+            pLastDbgText = aMessage 'dont forget the skipped message
+        End If
+        Return lResult
+    End Function
+
     Public Shared Function MsgCustomCheckbox(ByVal aMessage As String, _
                                              ByVal aTitle As String, _
                                              ByVal aRegistryCheckboxText As String, _
