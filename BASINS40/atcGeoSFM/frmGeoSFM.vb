@@ -3522,12 +3522,32 @@ Public Class frmGeoSFM
             Exit Sub
         End If
 
+        Dim lCalibParms As New Collection
+        For lIndex As Integer = 1 To lstCalib.SelectedItems.Count
+            lCalibParms.Add(lstCalib.SelectedItems(lIndex))
+        Next
+
+        Dim lObjFunction As Integer = 0
+        If rbnObj1.Checked Then
+            lObjFunction = 1
+        ElseIf rbnObj2.Checked Then
+            lObjFunction = 2
+        ElseIf rbnObj3.Checked Then
+            lObjFunction = 3
+        ElseIf rbnObj4.Checked Then
+            lObjFunction = 4
+        ElseIf rbnObj5.Checked Then
+            lObjFunction = 5
+        ElseIf rbnObj6.Checked Then
+            lObjFunction = 6
+        End If
+
         EnableControls(False)
-        lblStatus.Text = "Performing Calibration ........"
+        lblStatus.Text = "Performing Model Calibration........"
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         Me.Refresh()
 
-        Calibrate()
+        Calibrate(lFlowGageNames, lCalibParms, lstMax.SelectedItems(1), lObjFunction)
 
         tabMain.SelectedIndex = 8
         lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
