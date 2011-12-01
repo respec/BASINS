@@ -3460,7 +3460,7 @@ Public Class frmGeoSFM
             Exit Sub
         End If
 
-        Dim lFlowGageNames As New Collection
+        Dim lFlowGageNames As New atcCollection
         Dim lSJDate As Double = 0.0
         Dim lEJDate As Double = 0.0
         Dim lSJFlowDate As Double = 0.0
@@ -3468,8 +3468,8 @@ Public Class frmGeoSFM
         Dim lSelectedStation As StationDetails
         Dim lSelectedStationName As String = ""
         Dim lReachId As String = ""
-        'set precip stations
-        For lIndex As Integer = 1 To AtcConnectFlows.lstConnections.Items.Count
+        'set flow stations
+        For lIndex As Integer = 0 To AtcConnectFlows.lstConnections.Items.Count - 1
             Dim lString() As String = AtcConnectFlows.lstConnections.Items(lIndex).Split(" ")
             lSelectedStationName = lString(0)
             lReachId = lString(2)
@@ -3490,7 +3490,7 @@ Public Class frmGeoSFM
             End If
             'remember which flow gage goes with each reach segment
             If Not lFlowGageNames.Contains(lReachId) Then
-                lFlowGageNames.Add(lSelectedStation.Name, lReachId)
+                lFlowGageNames.Add(lReachId, lSelectedStation.Name)
             Else
                 'already have this reach, tell user
                 Logger.Msg("One reach may not be associated with multiple streamflow gages.", vbOKOnly, "BASINS GeoSFM Problem")
@@ -3524,7 +3524,7 @@ Public Class frmGeoSFM
 
         Dim lCalibParms As New Collection
         For lIndex As Integer = 1 To lstCalib.SelectedItems.Count
-            lCalibParms.Add(lstCalib.SelectedItems(lIndex))
+            lCalibParms.Add(lstCalib.SelectedItems(lIndex - 1))
         Next
 
         Dim lObjFunction As Integer = 0
@@ -3547,7 +3547,7 @@ Public Class frmGeoSFM
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         Me.Refresh()
 
-        Calibrate(lFlowGageNames, lCalibParms, lstMax.SelectedItems(1), lObjFunction)
+        Calibrate(lFlowGageNames, lCalibParms, lstMax.SelectedItems(0), lObjFunction, lSJDate, lEJDate)
 
         tabMain.SelectedIndex = 8
         lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
@@ -3684,27 +3684,29 @@ Public Class frmGeoSFM
                     lDataSet.ValuesNeedToBeRead = True
                 Next
             Next
-            lstCalib.Items.Clear()
-            lstCalib.Items.Add("SoilWhc")
-            lstCalib.Items.Add("Depth")
-            lstCalib.Items.Add("Texture")
-            lstCalib.Items.Add("Ks")
-            lstCalib.Items.Add("Interflow")
-            lstCalib.Items.Add("HSlope")
-            lstCalib.Items.Add("Baseflow")
-            lstCalib.Items.Add("CurveNum")
-            lstCalib.Items.Add("MaxCover")
-            lstCalib.Items.Add("BasinLoss")
-            lstCalib.Items.Add("PanCoeff")
-            lstCalib.Items.Add("TopSoil")
-            lstCalib.Items.Add("RainCalc")
-            lstCalib.Items.Add("RivRough")
-            lstCalib.Items.Add("RivSlope")
-            lstCalib.Items.Add("RivWidth")
-            lstCalib.Items.Add("RivLoss")
-            lstCalib.Items.Add("RivFPLoss")
-            lstCalib.Items.Add("Celerity")
-            lstCalib.Items.Add("Diffusion")
+            If lstCalib.Items.Count = 0 Then
+                lstCalib.Items.Clear()
+                lstCalib.Items.Add("SoilWhc")
+                lstCalib.Items.Add("Depth")
+                lstCalib.Items.Add("Texture")
+                lstCalib.Items.Add("Ks")
+                lstCalib.Items.Add("Interflow")
+                lstCalib.Items.Add("HSlope")
+                lstCalib.Items.Add("Baseflow")
+                lstCalib.Items.Add("CurveNum")
+                lstCalib.Items.Add("MaxCover")
+                lstCalib.Items.Add("BasinLoss")
+                lstCalib.Items.Add("PanCoeff")
+                lstCalib.Items.Add("TopSoil")
+                lstCalib.Items.Add("RainCalc")
+                lstCalib.Items.Add("RivRough")
+                lstCalib.Items.Add("RivSlope")
+                lstCalib.Items.Add("RivWidth")
+                lstCalib.Items.Add("RivLoss")
+                lstCalib.Items.Add("RivFPLoss")
+                lstCalib.Items.Add("Celerity")
+                lstCalib.Items.Add("Diffusion")
+            End If
         End If
     End Sub
 
@@ -3726,13 +3728,13 @@ Public Class frmGeoSFM
         End If
     End Sub
 
-    Private Sub lstCalib_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    Private Sub lstCalib_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lstCalib.SelectedIndexChanged
         Dim lccount As Integer = lstCalib.SelectedItems.Count
         Dim lncomplex As Integer = 2
         Dim lnsamples As Integer = 2 * lncomplex * lccount
         Dim lnummult As Integer = 0
         If (lnsamples < 10) Then
-            lnummult = (10 / (lncomplex * lccount)) + 1
+            lnummult = (10 / (lncomplex * lccount)) + 0.5
             lnsamples = lnummult * lncomplex * lccount
         ElseIf (lnsamples > 200) Then
             lnummult = (100 / (lncomplex * lccount))
@@ -3748,4 +3750,5 @@ Public Class frmGeoSFM
         lstMax.Items.Add(lnsamples * lccount * 128)
         lstMax.SelectedItem = 1
     End Sub
+
 End Class

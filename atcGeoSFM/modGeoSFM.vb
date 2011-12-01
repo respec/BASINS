@@ -2497,7 +2497,7 @@ Public Module modGeoSFM
 
     End Sub
 
-    Friend Sub Calibrate(ByVal aFlowGageNames As Collection, ByVal aCalibParms As Collection, ByVal aMaxRuns As Integer, ByVal aObjFunction As Integer)
+    Friend Sub Calibrate(ByVal aFlowGageNames As atcCollection, ByVal aCalibParms As Collection, ByVal aMaxRuns As Integer, ByVal aObjFunction As Integer, ByVal aSJDate As Double, ByVal aEJDate As Double)
         ' ***********************************************************************************************
         ' ***********************************************************************************************
         '
@@ -2526,6 +2526,8 @@ Public Module modGeoSFM
         '
         ' ***********************************************************************************************
         ' ***********************************************************************************************
+
+        'TODO: Need example observed streamflow data to run/debug example
 
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
         Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
@@ -2646,23 +2648,62 @@ Public Module modGeoSFM
         'streamflowfile = LineFile.Make(streamflowFN.asfilename,#file_perm_write)
 
         'objoptflagFile = LineFile.Make(objoptflagFN.asfilename,#file_perm_write)
-        If Not FileExists(objoptflagFN) Then
-            Logger.Msg("Could not open " + objoptflagFN + " file," & vbCrLf & "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-            Exit Sub
-        End If
+        'If Not FileExists(objoptflagFN) Then
+        '    Logger.Msg("Could not open " + objoptflagFN + " file," & vbCrLf & "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
-        'will need to write out observed flow timeseries here in required format
+        'will need to access observed flow timeseries here
+        Dim lNdates As Integer = aEJDate - aSJDate + 1
+        Dim lFlowArray(aFlowGageNames.Count, lNdates) As Single
+        Dim lFlowTimeseries As atcTimeseries = Nothing
 
-        If Not FileExists(obsflowFN) Then
-            '            MsgBox.info("Could not find observed streamflow file, " + nl + obsflowFN + nl + "Place the file in the work directory before running this program", "Geospatial Stream Flow Model")
-            '            Exit Sub
-        Else
-            '  observedfile = LineFile.Make(obsflowFN.asfilename,#file_perm_read)
-            '            If (observedfile = nil) Then
-            '                MsgBox.info("Could not open observed streamflow file, " + nl + obsflowFN + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-            '                Exit Sub
-            '            End If
-        End If
+        Dim lGageIndex As Integer = 0
+        For Each lGage As String In aFlowGageNames
+            lGageIndex += 1
+            For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
+                For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
+                    If (lDataSet.Attributes.GetValue("Constituent") = "FLOW" And _
+                        lDataSet.Attributes.GetValue("Scenario") = "OBSERVED" And _
+                        lDataSet.Attributes.GetValue("Location") = lGage) Then
+                        lFlowTimeseries = Aggregate(lDataSet, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+                    End If
+                Next
+            Next
+
+            If Not lFlowTimeseries Is Nothing Then
+                Dim lStartIndex As Integer = lFlowTimeseries.Dates.IndexOfValue(aSJDate, True)
+                If aSJDate = lFlowTimeseries.Dates.Values(0) Or lStartIndex < 0 Then
+                    lStartIndex = 0
+                End If
+                Dim lEndIndex As Integer = lFlowTimeseries.Dates.IndexOfValue(aEJDate, True)
+                For lIndex As Integer = lStartIndex To lEndIndex - 1
+                    lFlowArray(lGageIndex, lIndex - lStartIndex) = lFlowTimeseries.Values(lIndex + 1)
+                Next
+            End If
+        Next
+
+        'now write out observed flows in the expected format
+        Dim obsflowFile As New StringBuilder
+        Dim lString As String = ""
+        lString = """" & "Date" & """" & ",1"
+        For lGageIndex = 2 To aFlowGageNames.Count
+            lString = lString & "," & lGageIndex.ToString
+        Next
+        obsflowFile.AppendLine(lString)
+        For lIndex As Integer = 1 To lNdates
+            Dim lDate(6) As Integer
+            J2Date(aSJDate + lIndex - 1, lDate)
+            Dim lYr As Integer = lDate(0)
+            Dim lJYr As Double = Date2J(lYr, 1, 1)
+            Dim lDaysAfter As Integer = aSJDate + lIndex - lJYr
+            lString = lDate(0) & Format(lDaysAfter, "000") & "," & Format(lFlowArray(1, lIndex - 1), "0.0")
+            For lGageIndex = 2 To aFlowGageNames.Count
+                lString = lString & ", " & Format(lFlowArray(lGageIndex, lIndex - 1), "0.0")
+            Next
+            obsflowFile.AppendLine(lString)
+        Next
+        SaveFileString(obsflowFN, obsflowFile.ToString)
 
         If Not FileExists(origbasFN) Then
             If (File.Exists(basinFN)) Then
@@ -2697,147 +2738,172 @@ Public Module modGeoSFM
         Dim postprocinFN As String = lOutputPath & "postproc.in"
 
         'objpostprocFile = LineFile.Make(objpostprocFN.asfilename,#file_perm_write)
-        If Not FileExists(objpostprocFN) Then
-            Logger.Msg("Could not open " + objpostprocFN + " file," & vbCrLf & "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-            Exit Sub
-        End If
+        'If Not FileExists(objpostprocFN) Then
+        '    Logger.Msg("Could not open " + objpostprocFN + " file," & vbCrLf & "File may be open or tied up by another program", "Geospatial Stream Flow Model")
+        '    Exit Sub
+        'End If
 
         Dim minparlst(20) As String
         Dim maxparlst(20) As String
 
-        '        origbsize = (origbasinfile.getsize)
-        '        bigblist = List.make
+        Dim origbsize As Integer = 0
+        Dim bigblist As New Collection
+        If FileExists(origbasFN) Then
+            Try
+                Dim lCurrentRecord As String
+                Dim lStreamReader As New StreamReader(origbasFN)
+                lCurrentRecord = lStreamReader.ReadLine  'header line
+                Do
+                    lCurrentRecord = lStreamReader.ReadLine
+                    If lCurrentRecord Is Nothing Then
+                        Exit Do
+                    Else
+                        origbsize = origbsize + 1
+                        bigblist.Add(lCurrentRecord)
+                    End If
+                Loop
+            Catch e As ApplicationException
+                Logger.Msg("Problem reading basin_original.txt" & vbCrLf & "File(s) may be open or tied up by another program", "Geospatial Stream Flow Model")
+                Exit Sub
+            End Try
+        Else
+            Logger.Msg("Could not open basin_original.txt" & vbCrLf & "File(s) may be open or tied up by another program", "Geospatial Stream Flow Model")
+            Exit Sub
+        End If
 
-        '        'store the positions of calibered variables
-        'magbposlst = {1,2,3,4,6,7,8,9,10,11,12,13,14}
-        'magrposlst = {6,3,14,7,8,12,13}
+        'store the positions of calibered variables
+        Dim magbposlst() As Integer = {1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14}
+        Dim magrposlst() As Integer = {6, 3, 14, 7, 8, 12, 13}
 
-        '        origbasinfile.Read(bigblist, origbsize)
+        For lIndex As Integer = 1 To 20
+            minparlst(lIndex) = 999999
+            maxparlst(lIndex) = 0
+        Next
 
-        'for each beg in 0..19
-        '            minparlst.add(0)
-        '            maxparlst.add(0)
-        '        Next
+        Dim headerblst As New Collection
+        Dim lval As Single = 0.0
+        For obrec As Integer = 1 To origbsize
+            Dim lTmpStr As String = bigblist(obrec)
+            headerblst.Add(StrRetRem(lTmpStr))
+            For bbrec As Integer = 1 To UBound(magbposlst)
+                lval = StrRetRem(lTmpStr)
+                'skip parm 5
+                If bbrec = 5 Then
+                    lval = StrRetRem(lTmpStr)
+                End If
+                If lval < minparlst(bbrec) Then
+                    minparlst(bbrec) = lval
+                End If
+                If lval > maxparlst(bbrec) Then
+                    maxparlst(bbrec) = lval
+                End If
+            Next
+        Next
 
-        '        headerblst = List.make
-        'for each obrec in 1..(origbsize - 1)
-        '            headerbstr = bigblist.get(obrec).asstring.astokens(",").get(0)
-        '            headerblst.add(headerbstr)
-        '            chkparblst = bigblist.get(obrec).asstring.astokens(",")
-        '            numbrecs = chkparblst.count
-        '  For each bbrec in 0..(magbposlst.count - 1)
-        '                magbid = magbposlst.get(bbrec)
-        '                chkbpar = chkparblst.get(magbid).asstring.asnumber
-        '                If (chkbpar < minparlst.get(bbrec)) Then
-        '                    minparlst.set(bbrec, chkbpar)
-        '                End If
-        '                If (chkbpar > maxparlst.get(bbrec)) Then
-        '                    maxparlst.set(bbrec, chkbpar)
-        '                End If
-        '            Next
-        '        Next
-        '        origbasinfile.close()
+        Dim origrsize As Integer = 0
+        Dim bigrlist As New Collection
+        If FileExists(origrivFN) Then
+            Try
+                Dim lCurrentRecord As String
+                Dim lStreamReader As New StreamReader(origrivFN)
+                lCurrentRecord = lStreamReader.ReadLine   'header
+                Do
+                    lCurrentRecord = lStreamReader.ReadLine
+                    If lCurrentRecord Is Nothing Then
+                        Exit Do
+                    Else
+                        origrsize = origrsize + 1
+                        bigrlist.Add(lCurrentRecord)
+                    End If
+                Loop
+            Catch e As ApplicationException
+                Logger.Msg("Problem reading river_original.txt" & vbCrLf & "File(s) may be open or tied up by another program", "Geospatial Stream Flow Model")
+                Exit Sub
+            End Try
+        Else
+            Logger.Msg("Could not open river_original.txt" & vbCrLf & "File(s) may be open or tied up by another program", "Geospatial Stream Flow Model")
+            Exit Sub
+        End If
 
-        '        'numbrecs = chkparblst.count
+        Dim headerlst As New Collection
+        For orec As Integer = 1 To origrsize
+            Dim lTmpStr As String = bigrlist(orec)
+            headerlst.Add(StrRetRem(lTmpStr))
+            'Dim magrposlst() As Integer = {6, 3, 14, 7, 8, 12, 13}
+            lval = StrRetRem(lTmpStr)
+            lval = StrRetRem(lTmpStr)
+            lval = StrRetRem(lTmpStr)
+            If lval < minparlst(15) Then
+                minparlst(15) = lval
+            End If
+            If lval > maxparlst(15) Then
+                maxparlst(15) = lval
+            End If
+            lval = StrRetRem(lTmpStr)
+            lval = StrRetRem(lTmpStr)
+            lval = StrRetRem(lTmpStr)
+            If lval < minparlst(14) Then
+                minparlst(14) = lval
+            End If
+            If lval > maxparlst(14) Then
+                maxparlst(14) = lval
+            End If
+            lval = StrRetRem(lTmpStr)
+            If lval < minparlst(17) Then
+                minparlst(17) = lval
+            End If
+            If lval > maxparlst(17) Then
+                maxparlst(17) = lval
+            End If
+            lval = StrRetRem(lTmpStr)
+            If lval < minparlst(18) Then
+                minparlst(18) = lval
+            End If
+            If lval > maxparlst(18) Then
+                maxparlst(18) = lval
+            End If
+            lval = StrRetRem(lTmpStr)
+            lval = StrRetRem(lTmpStr)
+            lval = StrRetRem(lTmpStr)
+            lval = StrRetRem(lTmpStr)
+            If lval < minparlst(19) Then
+                minparlst(19) = lval
+            End If
+            If lval > maxparlst(19) Then
+                maxparlst(19) = lval
+            End If
+            lval = StrRetRem(lTmpStr)
+            If lval < minparlst(20) Then
+                minparlst(20) = lval
+            End If
+            If lval > maxparlst(20) Then
+                maxparlst(20) = lval
+            End If
+            lval = StrRetRem(lTmpStr)
+            If lval < minparlst(16) Then
+                minparlst(16) = lval
+            End If
+            If lval > maxparlst(16) Then
+                maxparlst(16) = lval
+            End If
+        Next
 
-        '        origrsize = (origriverfile.getsize)
-        '        bigrlist = List.make
-        '        origriverfile.Read(bigrlist, origrsize)
+        logfile.AppendLine("River and Basin Files Read")
 
-        '        headerlst = List.make
-        'for each orec in 1..(origrsize - 1)
-        '            headerstr = bigrlist.get(orec).asstring.astokens(",").get(0)
-        '            headerlst.add(headerstr)
-        '            chkparlst = bigrlist.get(orec).asstring.astokens(",")
-        '            numrrecs = chkparlst.count
-        '            bendpos = ((magbposlst.count) - 1)
-        '  For each brrec in 0..(magrposlst.count - 1)
-        '                magbid = magbposlst.get(brrec)
-        '                chkrpar = chkparlst.get(magbid).asstring.asnumber
-        '                If (chkrpar < minparlst.get(brrec + bendpos)) Then
-        '                    minparlst.set(brrec + bendpos, chkrpar)
-        '                End If
-        '                If (chkrpar > maxparlst.get(brrec + bendpos)) Then
-        '                    maxparlst.set(brrec + bendpos, chkrpar)
-        '                End If
-        '            Next
-        '        Next
-        '        origriverfile.close()
+        logfile.AppendLine("Observed Streamflow File Read")
 
-        '        logfile.WriteElt("River and Basin Files Read")
-
-        '        If (observedfile.getsize > 1) Then
-        '            'linecount = observedfile.ReadElt.asstring.astokens(",").count
-        '            fluxlist = observedfile.ReadElt.asstring.astokens(",")
-        '            linecount = fluxlist.count
-        '            If (linecount > 1) Then
-        '                fluxcount = linecount - 1
-        '            Else
-        '                MsgBox.info("Observed Streamflow file may be empty or badly formatted." + nl + "Ensure the file is comma delimited with one timestep per line.", "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            End If
-        '        Else
-        '            MsgBox.info("Observed Streamflow file may be empty or badly formatted." + nl + "Ensure the file is comma delimited with one timestep per line.", "Geospatial Stream Flow Model")
-        '            Exit Sub
-        '        End If
-
-        '        nfluxlst = List.make
-        '        nposlst = List.make
-
-        'for each mrec in 1..(fluxlist.count - 1)
-        '            nfluxstr = fluxlist.get(mrec).asstring
-        '            nfluxlst.Add(nfluxstr)
-        '            nposlst.Add("0")
-        '        Next
-
-        '        nfluxchoices = MsgBox.MultiListAsString(nfluxlst, "Select Observed Streamflow Stations for Calibration", "Which Stations Do You Want to Calibrate?")
-
-        '        nfcount = nfluxlst.count
-        '        nccount = nfluxchoices.count
-        Dim nccount As Integer = aFlowGageNames.Count
+        Dim ncposstr As String = "1"
         Dim nbasidlst As New Collection
-        Dim nfluxcount As Integer = nccount
-
-        'for each crec in 0..(nccount-1)
-        '            ncurchoice = (nfluxchoices.get(crec)).asstring
-        '  for each drec in 0..(nfcount-1)
-        '                ncurdesc = (nfluxlst.get(drec)).asstring
-        '                If (ncurchoice = ncurdesc) Then
-        '                    nposlst.set(drec, "1")
-        '                    'nfluxcount = nfluxcount + 1
-        '                    idchoice = MsgBox.ChoiceAsString(headerlst, "Select BasinID for Streamflow Station " + ncurchoice, "Link River Reach to Gauging Station")
-        '                    If (idchoice = nil) Then
-        '                        Exit Sub
-        '                    End If
-        '                    nbasposition = (headerlst.FindByValue(idchoice))
-        '                    nbasidlst.Add((nbasposition + 1).asstring)
-        '                End If
-        '            Next
-        '        Next
-
-        '        logfile.WriteElt("Observed Streamflow File Read")
-
-        Dim ncposstr As String = ""
-
-        'For each frec in 1..(nccount.asstring.asnumber)
-        '            ncid = (nfluxlst.FindByValue(nfluxchoices.get(frec - 1))) + 1
-        '            If (ncid <> 0) Then
-
-        '                If (frec = 1) Then
-        '                    nstr = ncid.asstring
-        '                    pnum = ncid
-        '                    ncposstr = nstr
-        '                Else
-        '                    nstr = (ncid - pnum).asstring
-        '                    pnum = ncid
-        '                    ncposstr = ncposstr + ", " + nstr
-        '                End If
-
-        '                'objoptflagFile.WriteElt("runoff_" + ncid.asstring + "      " + nposlst.get(frec - 1).asstring)
-        '                objoptflagFile.WriteElt("runoff_" + ncid.asstring + "      1")
-        '            End If
-        '        Next
-        '        objoptflagFile.close()
+        Dim objoptflagFile As New StringBuilder
+        Dim ncid As Integer = 0
+        For frec As Integer = 0 To aFlowGageNames.Count - 1
+            ncid = aFlowGageNames.Keys(frec)
+            nbasidlst.Add(ncid)
+            If (ncid <> 0) Then
+                objoptflagFile.AppendLine("runoff_" & ncid.ToString & "      1")
+            End If
+        Next
+        SaveFileString(objoptflagFN, objoptflagFile.ToString)
 
         Dim paraminlst(20) As String
         paraminlst(1) = "1,SoilWhc,1,0.1,5,0,Soil water holding capacity (mm)"
@@ -2882,22 +2948,21 @@ Public Module modGeoSFM
             data5(mrec) = minilst
             minilst = StrRetRem(ministr)
             data6(mrec) = minilst
-            minilst = StrRetRem(ministr)
-            data7(mrec) = minilst
+            data7(mrec) = ministr
         Next
 
         '        choices = MsgBox.MultiListAsString(desclst, "Select Parameters to be Calibrated", "Which Parameters Do You Want to Calibrate?")
 
         Dim lCcount As Integer = aCalibParms.Count
-        For crec As Integer = 0 To lCcount - 1
+        For crec As Integer = 1 To lCcount
             Dim curchoice As String = aCalibParms(crec)
             For drec As Integer = 1 To 20
                 Dim curdesc As String = data2(drec)
                 If (curchoice = curdesc) Then
                     Dim chglst As String = paraminlst(drec)
-                    Dim lowval As Integer = minparlst(drec)
+                    Dim lowval As Single = minparlst(drec)
                     Dim lowfrac As Single = data4(drec) / lowval
-                    Dim highval As Integer = maxparlst(drec)
+                    Dim highval As Single = maxparlst(drec)
                     Dim highfrac As Single = data5(drec) / highval
                     paraminlst(drec) = drec.ToString & "," & data2(drec) & "," & data3(drec) & "," & lowfrac & "," & highfrac & ",1," & data7(drec)
                 End If
@@ -2913,7 +2978,7 @@ Public Module modGeoSFM
 
         logfile.AppendLine("River and Basin Calibration Parameters Identified")
 
-        Dim ccount As Integer = aFlowGageNames.Count
+        Dim ccount As Integer = aCalibParms.Count
         Dim ncomplex As Integer = 2
         Dim nsamples As Integer = 2 * ncomplex * ccount
         Dim nummult As Integer = 0
@@ -2930,7 +2995,7 @@ Public Module modGeoSFM
 
         Dim mosceminfile As New StringBuilder
         mosceminfile.AppendLine(ccount.ToString & ",  nOptPar")
-        mosceminfile.AppendLine(nfluxcount.tostring & ", nOptObj")
+        mosceminfile.AppendLine(aFlowGageNames.Count.ToString & ", nOptObj")
         mosceminfile.AppendLine(nsamples.ToString & ", nSamples")
         mosceminfile.AppendLine(ncomplex.ToString & ", nComplex")
         mosceminfile.AppendLine(runstr + ", nMaxDraw")
@@ -2965,11 +3030,18 @@ Public Module modGeoSFM
         Dim calibposition As Integer = aObjFunction
 
         Dim myrstr As String = ""
-        For nrec As Integer = 0 To nfluxcount - 1
-            Dim rstrnum As Integer = nbasidlst(nrec)
+        For nrec As Integer = 1 To aFlowGageNames.Count
+            Dim lkey As Integer = aFlowGageNames.Keys(nrec - 1)
+            Dim rstrnum As Integer = 0
+            'where is lkey in streamflow 
+            For lindex As Integer = 1 To headerlst.Count
+                If headerlst(lindex) = lkey Then
+                    rstrnum = lindex
+                End If
+            Next
             Dim rstr As String = ""
             Dim pnum As Integer = 0
-            If (nrec = 0) Then
+            If (nrec = 1) Then
                 rstr = rstrnum.ToString
                 pnum = rstrnum
                 myrstr = rstr
@@ -2983,13 +3055,13 @@ Public Module modGeoSFM
         logfile.AppendLine("Calibration Method set as " & caliblst(calibposition))
 
         Dim moscemparamfile As New StringBuilder
-        moscemparamfile.AppendLine(nfluxcount.ToString + "  //nflux")
-        moscemparamfile.AppendLine(lRoutList(0).asstring + "  //ntstep1")
-        moscemparamfile.AppendLine((lRoutList(0).asnumber + lRoutList(7).asnumber).asstring + "  //ntstep2")
-        moscemparamfile.AppendLine(calibposition.ToString + "  //obj_func")
+        moscemparamfile.AppendLine(aFlowGageNames.Count.ToString & "  //nflux")
+        moscemparamfile.AppendLine(lRoutList(1).ToString & "  //ntstep1")
+        moscemparamfile.AppendLine(CInt(lRoutList(1)) + CInt(lRoutList(7)) & "  //ntstep2")
+        moscemparamfile.AppendLine(calibposition.ToString & "  //obj_func")
         moscemparamfile.AppendLine("-9999  //missing value")
-        moscemparamfile.AppendLine(ncposstr + "  //nflux_obs, column in observed_streamflow.txt to test (not including timestep)")
-        moscemparamfile.AppendLine(myrstr + "  //nflux_model, column in streamflow.txt (not including timestep)")
+        moscemparamfile.AppendLine(ncposstr & "  //nflux_obs, column in observed_streamflow.txt to test (not including timestep)")
+        moscemparamfile.AppendLine(myrstr & "  //nflux_model, column in streamflow.txt (not including timestep)")
         SaveFileString(moscemparamFN, moscemparamfile.ToString)
 
         logfile.AppendLine("Starting Time:" & " " & System.DateTime.Now.ToString)
