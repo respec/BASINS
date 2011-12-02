@@ -1364,11 +1364,7 @@ Public Class clsRecess
             '    (in addition to "index.txt"), enter 2 
             Dim lAskUserRecIndexOnly As Integer = 2
 
-            Dim lStrInputFile As String = pDataFilename
-            Dim lFilenameLength As Integer = 11
-            If lStrInputFile.Length > lFilenameLength Then
-                lStrInputFile = lStrInputFile.Substring(0, lFilenameLength).PadRight(12, " ")
-            End If
+            Dim lStrInputFile As String = InputFilename11(pDataFilename)
 
             If lAskUserRecIndexOnly <> 1 Then
                 lSW = New IO.StreamWriter(pFileRecSum, True)
@@ -1389,7 +1385,7 @@ Public Class clsRecess
                 Dim lStrCoeffB As String = String.Format("{0:0.0000}", lCoeffB).PadLeft(10, " ")
                 Dim lStrCoeffC As String = String.Format("{0:0.0000}", lCoeffC).PadLeft(10, " ")
 
-                lSW.WriteLine(lStrInputFile.PadRight(lFilenameLength, " ") & SeasonLabel & " " & lStrDuration & lListOfChosenSegments.Count & _
+                lSW.WriteLine(lStrInputFile & SeasonLabel & " " & lStrDuration & lListOfChosenSegments.Count & _
                               lStrKMin & lStrKMed & lStrKMax & lStrMNLogQC & lStrMXLogQC & lStrCoeffA & lStrCoeffB & lStrCoeffC)
                 lSW.Flush()
                 lSW.Close()
@@ -1411,6 +1407,19 @@ Public Class clsRecess
         lMsg.AppendLine(vbCrLf & "Final median recession index: " & String.Format("{0:0.00}", lKMed).PadLeft(8, " "))
         Bulletin = lMsg.ToString
     End Sub
+
+    Public Shared Function InputFilename11(ByVal aFilename As String) As String
+
+        Dim lFilenameLength As Integer = 11
+        If aFilename.Length > lFilenameLength Then
+            If aFilename.StartsWith("NWIS_discharge_") Then aFilename = aFilename.Substring(15)
+        End If
+        If aFilename.Length > lFilenameLength Then
+            aFilename = aFilename.Substring(0, lFilenameLength)
+        End If
+        Return aFilename.PadRight(12, " ")
+
+    End Function
 
     '--------- THIS SUBROUTINE MAKES TABULAR OUTPUT OF RECESSION DATA: -----
     Public Shared Function TableRecess(ByVal aQLog() As Double, _

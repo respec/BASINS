@@ -894,12 +894,8 @@ Public Class frmRecess
         '    (in addition to "index.txt"), enter 2 
         Dim lAskUserRecIndexOnly As Integer = 2
 
-        Dim lStrInputFile As String = ""
-        If lInputfile.Length <= 12 Then
-            lStrInputFile = lInputfile
-        Else
-            lStrInputFile = lInputfile.Substring(0, 12)
-        End If
+        Dim lStrInputFile As String = clsRecess.InputFilename11(lInputfile)
+
         If lAskUserRecIndexOnly <> 1 Then
             lSW = New IO.StreamWriter(lFileRecSum, True)
             '   17 FORMAT (A12,A1,1X,1I4,'-',1I4,1I3,3F6.1,2F8.3,1F9.4,2F10.4)
@@ -1310,7 +1306,7 @@ Public Class frmRecess
             lArr = lMatches.Item(0).ToString.Split("/")
         Else
             Dim lAskUser As String = _
-            Logger.MsgCustom("Invalid starting date. Use dataset start date?", "Start Date Correction", New String() {"Yes", "No"})
+            Logger.MsgCustomOwned("Invalid starting date. Use dataset start date?", "Start Date Correction", Me, New String() {"Yes", "No"})
             If lAskUser = "Yes" Then
                 lArr = txtDataStart.Text.Trim.Split("/")
                 txtStartDateUser.Text = ""
@@ -1345,7 +1341,7 @@ Public Class frmRecess
             lArr = lMatches.Item(0).ToString.Split("/")
         Else
             Dim lAskUser As String = _
-            Logger.MsgCustom("Invalid ending date. Use dataset end date?", "End Date Correction", New String() {"Yes", "No"})
+            Logger.MsgCustomOwned("Invalid ending date. Use dataset end date?", "End Date Correction", Me, New String() {"Yes", "No"})
             If lAskUser = "Yes" Then
                 lArr = txtDataEnd.Text.Trim.Split("/")
                 txtEndDateUser.Text = ""
@@ -1578,9 +1574,8 @@ Public Class frmRecess
 
         Dim lDayOrdinal As Integer = CInt(lArr(0))
         Dim lFirstLastCancel() As String = {"First Day", "Last Day", "Reset All", "Cancel"}
-        Me.Enabled = False
-        Dim lResponse As String = Logger.MsgCustom("Set '" & lDayOrdinal & "' as first or last day of this recession segment?", lMsgTitle, lFirstLastCancel)
-        Me.Enabled = True
+        Dim lResponse As String = Logger.MsgCustomOwned("Set '" & lDayOrdinal & "' as first or last day of this recession segment?", _
+                                                        lMsgTitle, Me, lFirstLastCancel)
         If lResponse <> "Cancel" Then
             Dim lRecSeg As clsRecessionSegment = pRecess.listOfSegments.ItemByKey(lstRecessSegments.SelectedItem.ToString)
             If lRecSeg IsNot Nothing Then
