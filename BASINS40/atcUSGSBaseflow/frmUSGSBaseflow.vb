@@ -96,9 +96,6 @@ Public Class frmUSGSBaseflow
         pCommonStart = GetMinValue()
         pCommonEnd = GetMaxValue()
 
-        Dim lAllText As String = "All"
-        Dim lCommonText As String = "Common"
-
         For Each lDataset As atcData.atcTimeseries In pDataGroup
             If lDataset.Dates.numValues > 0 Then
                 Dim lThisDate As Double = lDataset.Dates.Value(0)
@@ -107,6 +104,9 @@ Public Class frmUSGSBaseflow
                 lThisDate = lDataset.Dates.Value(lDataset.Dates.numValues)
                 If lThisDate > lLastDate Then lLastDate = lThisDate
                 If lThisDate < pCommonEnd Then pCommonEnd = lThisDate
+            End If
+            If lDataset.Attributes.ContainsAttribute("Drainage Area") Then
+                txtDrainageArea.Text = DoubleToString(lDataset.Attributes.GetValue("Drainage Area"))
             End If
         Next
 
@@ -118,13 +118,6 @@ Public Class frmUSGSBaseflow
                 txtDataStart.Text = pDateFormat.JDateToString(lFirstDate + 1)
                 txtDataEnd.Text = pDateFormat.JDateToString(lLastDate)
             End If
-            lAllText &= ": " & pDateFormat.JDateToString(lFirstDate + 1) & " to " & pDateFormat.JDateToString(lLastDate)
-        End If
-
-        If pCommonStart > GetMinValue() AndAlso pCommonEnd < GetMaxValue() AndAlso pCommonStart < pCommonEnd Then
-            lCommonText &= ": " & pDateFormat.JDateToString(pCommonStart + 1) & " to " & pDateFormat.JDateToString(pCommonEnd)
-        Else
-            lCommonText &= pNoDatesInCommon
         End If
 
         txtOutputDir.Text = pOutputDir
@@ -222,7 +215,7 @@ Public Class frmUSGSBaseflow
             lArr = lMatches.Item(0).ToString.Split("/")
         Else
             Dim lAskUser As String = _
-            Logger.MsgCustom("Invalid starting date. Use dataset start date?", "Start Date Correction", New String() {"Yes", "No"})
+            Logger.MsgCustomOwned("Invalid starting date. Use dataset start date?", "Start Date Correction", Me, New String() {"Yes", "No"})
             If lAskUser = "Yes" Then
                 lArr = txtDataStart.Text.Trim.Split("/")
                 txtStartDateUser.Text = ""
@@ -257,7 +250,7 @@ Public Class frmUSGSBaseflow
             lArr = lMatches.Item(0).ToString.Split("/")
         Else
             Dim lAskUser As String = _
-            Logger.MsgCustom("Invalid ending date. Use dataset end date?", "End Date Correction", New String() {"Yes", "No"})
+            Logger.MsgCustomOwned("Invalid ending date. Use dataset end date?", "End Date Correction", Me, New String() {"Yes", "No"})
             If lAskUser = "Yes" Then
                 lArr = txtDataEnd.Text.Trim.Split("/")
                 txtEndDateUser.Text = ""
@@ -624,7 +617,9 @@ Public Class frmUSGSBaseflow
         End If
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
         Dim lPerUnitArea As Boolean = False
-        Dim lResponse As String = Logger.MsgCustom("Calculate exceedance probability per unit drainage area?", "Per Unit Area Plot", New String() {"Yes", "No"})
+        Dim lResponse As String = Logger.MsgCustomOwned("Calculate exceedance probability per unit drainage area?", _
+                                                        "Per Unit Area Plot", Me, _
+                                                        New String() {"Yes", "No"})
         If lResponse = "Yes" Then
             lPerUnitArea = True
         End If

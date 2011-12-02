@@ -768,10 +768,17 @@ Module modBaseflowUtil
             For M As Integer = 1 To 12
                 If lDate(1) = M Then
                     If lDate(0) = lCurrentYear Then
-                        If lTsMonthlyFlowDepth.Value(I) < -99.0 Then lYearHasMiss = True
-                        lSW.Write(String.Format("{0:0.00}", lTsMonthlyFlowDepth.Value(I)).PadLeft(lFieldWidth, " "))
+                        Dim lMonthlyValue As Double
+                        If I > lTsMonthlyFlowDepth.numValues Then
+                            lMonthlyValue = -99.99
+                            TIMADD(lDate, atcTimeUnit.TUMonth, 1, 1, lDate)
+                        Else
+                            lMonthlyValue = lTsMonthlyFlowDepth.Value(I)
+                            J2Date(lTsMonthlyFlowDepth.Dates.Value(I), lDate)
+                        End If
+                        If lMonthlyValue < -99.0 Then lYearHasMiss = True
+                        lSW.Write(String.Format("{0:0.00}", lMonthlyValue).PadLeft(lFieldWidth, " "))
                         I += 1
-                        J2Date(lTsMonthlyFlowDepth.Dates.Value(I - 1), lDate)
                     Else
                         Exit For
                     End If
@@ -783,16 +790,15 @@ Module modBaseflowUtil
             I -= 1
 
             'print yearly sum
-            If lYearHasMiss Then
+            If lYearHasMiss OrElse lYearCount > lTsYearly.numValues Then
                 lSW.WriteLine(String.Format("{0:0.00}", -99.99).PadLeft(lFieldWidth, " "))
             Else
                 lSW.WriteLine(String.Format("{0:0.00}", lTsYearly.Value(lYearCount)).PadLeft(lFieldWidth, " "))
             End If
             lYearCount += 1
-
         Next
         lSW.WriteLine(" ")
-        lSW.WriteLine("                 TOTAL OF MONTHLY AMOUNTS = " & lTotXX)
+        lSW.WriteLine("                 TOTAL OF MONTHLY AMOUNTS = " & DoubleToString(lTotXX))
         lSW.Flush()
 
         'print baseflow monthly values
@@ -811,10 +817,18 @@ Module modBaseflowUtil
             For M As Integer = 1 To 12
                 If lDate(1) = M Then
                     If lDate(0) = lCurrentYear Then
-                        If lTsBaseflowMonthlyDepth.Value(I) < -99.0 Then lYearHasMiss = True
-                        lSW.Write(String.Format("{0:0.00}", lTsBaseflowMonthlyDepth.Value(I)).PadLeft(lFieldWidth, " "))
+                        Dim lMonthlyValue As Double
+                        If I > lTsMonthlyFlowDepth.numValues Then
+                            lMonthlyValue = -99.99
+                            TIMADD(lDate, atcTimeUnit.TUMonth, 1, 1, lDate)
+                        Else
+                            lMonthlyValue = lTsBaseflowMonthlyDepth.Value(I)
+                            J2Date(lTsBaseflowMonthlyDepth.Dates.Value(I), lDate)
+                        End If
+                        If lMonthlyValue < -99.0 Then lYearHasMiss = True
+                        lSW.Write(String.Format("{0:0.00}", lMonthlyValue).PadLeft(lFieldWidth, " "))
+
                         I += 1
-                        J2Date(lTsBaseflowMonthlyDepth.Dates.Value(I - 1), lDate)
                     Else
                         Exit For
                     End If
@@ -827,7 +841,7 @@ Module modBaseflowUtil
 
             I -= 1
             'print yearly sum
-            If lYearHasMiss Then
+            If lYearHasMiss OrElse lYearCount > lTsBFYearly.numValues Then
                 lSW.WriteLine(String.Format("{0:0.00}", -99.99).PadLeft(lFieldWidth, " "))
             Else
                 lSW.WriteLine(String.Format("{0:0.00}", lTsBFYearly.Value(lYearCount)).PadLeft(lFieldWidth, " "))
@@ -836,7 +850,7 @@ Module modBaseflowUtil
         Next
 
         lSW.WriteLine(" ")
-        lSW.WriteLine("                  TOTAL OF MONTHLY AMOUNTS = " & String.Format("{0:0.0000000}", lTotalBaseflowDepth))
+        lSW.WriteLine("                  TOTAL OF MONTHLY AMOUNTS = " & DoubleToString(lTotalBaseflowDepth))
         lSW.WriteLine(" ")
         lSW.WriteLine(" RESULTS ON THE MONTHLY TIME SCALE SHOULD BE USED WITH CAUTION. ")
         lSW.WriteLine(" FILES PARTQRT.TXT AND PARTSUM.TXT GIVE RESULT AT THE")
@@ -1056,32 +1070,38 @@ Module modBaseflowUtil
                 If lDate(1) = M And lDate(0) = lCurrentYear Then 'within a year
                     Select Case M
                         Case 1, 2, 3
-                            If lTsMonthlyFlowDepth.Value(I) < -99.0 Then
+                            If I > lTsMonthlyFlowDepth.numValues OrElse lTsMonthlyFlowDepth.Value(I) < -99.0 Then
                                 lQuarter1Negative = True
                             Else
                                 lQuarter1 += lTsMonthlyFlowDepth.Value(I)
                             End If
                         Case 4, 5, 6
-                            If lTsMonthlyFlowDepth.Value(I) < -99.0 Then
+                            If I > lTsMonthlyFlowDepth.numValues OrElse lTsMonthlyFlowDepth.Value(I) < -99.0 Then
                                 lQuarter2Negative = True
                             Else
                                 lQuarter2 += lTsMonthlyFlowDepth.Value(I)
                             End If
                         Case 7, 8, 9
-                            If lTsMonthlyFlowDepth.Value(I) < -99.0 Then
+                            If I > lTsMonthlyFlowDepth.numValues OrElse lTsMonthlyFlowDepth.Value(I) < -99.0 Then
                                 lQuarter3Negative = True
                             Else
                                 lQuarter3 += lTsMonthlyFlowDepth.Value(I)
                             End If
                         Case 10, 11, 12
-                            If lTsMonthlyFlowDepth.Value(I) < -99.0 Then
+                            If I > lTsMonthlyFlowDepth.numValues OrElse lTsMonthlyFlowDepth.Value(I) < -99.0 Then
                                 lQuarter4Negative = True
                             Else
                                 lQuarter4 += lTsMonthlyFlowDepth.Value(I)
                             End If
                     End Select
+
+                    If I > lTsMonthlyFlowDepth.numValues Then
+                        TIMADD(lDate, atcTimeUnit.TUMonth, 1, 1, lDate)
+                    Else
+                        J2Date(lTsMonthlyFlowDepth.Dates.Value(I), lDate)
+                    End If
+
                     I += 1
-                    J2Date(lTsMonthlyFlowDepth.Dates.Value(I - 1), lDate)
                 End If
             Next ' month
 
@@ -1097,7 +1117,12 @@ Module modBaseflowUtil
             Dim lStrQ2 As String = String.Format("{0:0.00}", lQuarter2).PadLeft(lFieldWidthO, " ")
             Dim lStrQ3 As String = String.Format("{0:0.00}", lQuarter3).PadLeft(lFieldWidthO, " ")
             Dim lStrQ4 As String = String.Format("{0:0.00}", lQuarter4).PadLeft(lFieldWidthO, " ")
-            Dim lStrQYear As String = String.Format("{0:0.00}", lTsYearly.Value(lYearCount)).PadLeft(lFieldWidthO, " ")
+
+            Dim lYearlyValue As Double = -99.99
+            If lYearCount <= lTsYearly.numValues Then
+                lYearlyValue = lTsYearly.Value(lYearCount)
+            End If
+            Dim lStrQYear As String = String.Format("{0:0.00}", lYearlyValue).PadLeft(lFieldWidthO, " ")
             lSW.WriteLine(lStrYear & lStrQ1 & lStrQ2 & lStrQ3 & lStrQ4 & lStrQYear)
 
             lYearCount += 1
@@ -1131,32 +1156,38 @@ Module modBaseflowUtil
                 If lDate(1) = M And lDate(0) = lCurrentYear Then 'within a year
                     Select Case M
                         Case 1, 2, 3
-                            If lTsBaseflowMonthlyDepth.Value(I) < -99.0 Then
+                            If I > lTsMonthlyFlowDepth.numValues OrElse lTsBaseflowMonthlyDepth.Value(I) < -99.0 Then
                                 lQuarter1Negative = True
                             Else
                                 lQuarter1 += lTsBaseflowMonthlyDepth.Value(I)
                             End If
                         Case 4, 5, 6
-                            If lTsBaseflowMonthlyDepth.Value(I) < -99.0 Then
+                            If I > lTsMonthlyFlowDepth.numValues OrElse lTsBaseflowMonthlyDepth.Value(I) < -99.0 Then
                                 lQuarter2Negative = True
                             Else
                                 lQuarter2 += lTsBaseflowMonthlyDepth.Value(I)
                             End If
                         Case 7, 8, 9
-                            If lTsBaseflowMonthlyDepth.Value(I) < -99.0 Then
+                            If I > lTsMonthlyFlowDepth.numValues OrElse lTsBaseflowMonthlyDepth.Value(I) < -99.0 Then
                                 lQuarter3Negative = True
                             Else
                                 lQuarter3 += lTsBaseflowMonthlyDepth.Value(I)
                             End If
                         Case 10, 11, 12
-                            If lTsBaseflowMonthlyDepth.Value(I) < -99.0 Then
+                            If I > lTsMonthlyFlowDepth.numValues OrElse lTsBaseflowMonthlyDepth.Value(I) < -99.0 Then
                                 lQuarter4Negative = True
                             Else
                                 lQuarter4 += lTsBaseflowMonthlyDepth.Value(I)
                             End If
                     End Select
+
+                    If I > lTsMonthlyFlowDepth.numValues Then
+                        TIMADD(lDate, atcTimeUnit.TUMonth, 1, 1, lDate)
+                    Else
+                        J2Date(lTsMonthlyFlowDepth.Dates.Value(I), lDate)
+                    End If
+
                     I += 1
-                    J2Date(lTsBaseflowMonthlyDepth.Dates.Value(I - 1), lDate)
                 End If
             Next ' month
 
@@ -1172,7 +1203,13 @@ Module modBaseflowUtil
             Dim lStrQ2 As String = String.Format("{0:0.00}", lQuarter2).PadLeft(lFieldWidthO, " ")
             Dim lStrQ3 As String = String.Format("{0:0.00}", lQuarter3).PadLeft(lFieldWidthO, " ")
             Dim lStrQ4 As String = String.Format("{0:0.00}", lQuarter4).PadLeft(lFieldWidthO, " ")
-            Dim lStrQYear As String = String.Format("{0:0.00}", lTsBFYearly.Value(lYearCount)).PadLeft(lFieldWidthO, " ")
+
+            Dim lYearlyValue As Double = -99.99
+            If lYearCount <= lTsBFYearly.numValues Then
+                lYearlyValue = lTsBFYearly.Value(lYearCount)
+            End If
+
+            Dim lStrQYear As String = String.Format("{0:0.00}", lYearlyValue).PadLeft(lFieldWidthO, " ")
             lSW.WriteLine(lStrYear & lStrQ1 & lStrQ2 & lStrQ3 & lStrQ4 & lStrQYear)
 
             lYearCount += 1
