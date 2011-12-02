@@ -3557,7 +3557,18 @@ Public Class frmGeoSFM
     End Sub
 
     Private Sub cmdBankfullNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdBankfullNext.Click
+        EnableControls(False)
+        lblStatus.Text = "Computing Monthly and Annual Fluxes......."
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+        Me.Refresh()
+
         BankFull()
+
+        tabMain.SelectedIndex = 9
+        lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+        Me.Refresh()
+        EnableControls(True)
     End Sub
 
     Private Sub cmdMapGenerate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdMapGenerate.Click
