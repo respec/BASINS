@@ -134,10 +134,10 @@ Public Class atcTimeseriesRDB
                                 Case "state_cd" : lAttributes.SetValue("STFIPS", lAttrValue)
                                 Case "county_cd" : lAttributes.SetValue("CNTYFIPS", lAttrValue)
                                 Case "huc_cd" : lAttributes.SetValue("HUCODE", lAttrValue)
-                                Case "dec_lat_va" : lAttributes.SetValue("LATDEG", CDbl(lAttrValue))
-                                Case "dec_long_va" : lAttributes.SetValue("LNGDEG", -Math.Abs(CDbl(lAttrValue)))
-                                Case "alt_va" : lAttributes.SetValue("ELEV", lAttrValue)
-                                Case "drain_area_va" : lAttributes.SetValue("DAREA", lAttrValue)
+                                Case "dec_lat_va" : lAttributes.SetValue("Latitude", CDbl(lAttrValue))
+                                Case "dec_long_va" : lAttributes.SetValue("Longitude", -Math.Abs(CDbl(lAttrValue)))
+                                Case "alt_va" : lAttributes.SetValue("Elevation", lAttrValue)
+                                Case "drain_area_va" : lAttributes.SetValue("Drainage Area", lAttrValue)
                                 Case Else
                                     If lAttrName.Length > 0 AndAlso lAttrValue.Length > 0 Then
                                         lAttributes.SetValue(lAttrName, lAttrValue)

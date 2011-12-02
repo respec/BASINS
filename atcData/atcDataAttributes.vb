@@ -388,7 +388,10 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
 
                 .Add("latdeg", "Latitude")
                 .Add("lngdeg", "Longitude")
+                .Add("dec_lat_va", "Latitude")
+                .Add("dec_long_va", "Longitude")
                 .Add("elev", "Elevation")
+                .Add("alt_va", "Elevation")
 
                 .Add("skewcf", "Skew")
                 .Add("stddev", "Standard Deviation")
@@ -402,6 +405,8 @@ FormatTimeUnit:         Dim lTU As atcTimeUnit = lValue
 
                 .Add("7low10", "7Q10")
                 .Add("datasource", "Data Source")
+                .Add("darea", "Drainage Area")
+                .Add("drain_area_va", "Drainage Area")
             End With
         End If
     End Sub
