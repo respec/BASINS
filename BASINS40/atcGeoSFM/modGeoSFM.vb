@@ -16,6 +16,7 @@ Public Module modGeoSFM
     Declare Sub LAGROUTE Lib "geosfm.dll" (ByVal aFileName As String)
     Declare Sub DIFFROUTE Lib "geosfm.dll" (ByVal aFileName As String)
     Declare Sub cungeroute Lib "geosfm.dll" (ByVal aFileName As String)
+    'Declare Sub aggregateflow Lib "geosfmstats.dll" ()
 
     Friend Sub Terrain(ByVal aDEMLayerName As String, ByVal aSubbasinLayerName As String, ByVal aStreamLayerName As String, ByVal aThresh As Integer)
 
@@ -3257,271 +3258,146 @@ Public Module modGeoSFM
         ' ***********************************************************************************************
         ' ***********************************************************************************************
 
-        '        TheProject = av.GetProject
-        '        theFileName = theProject.GetFileName
-        '        If (theFileName = nil) Then
-        '            av.Run("Project.SaveAs", nil)
-        '            theFileName = theProject.GetFileName
-        '            If (theFileName = nil) Then
-        '                Exit Sub
-        '            End If
-        '        Else
-        '            If (av.Run("Project.CheckForEdits", nil).Not) Then
-        '                Return nil
-        '            End If
-        '            If (theProject.Save) Then
-        '                av.ShowMsg("Project saved to '" + theFileName.GetBaseName + "'")
-        '    if (System.GetOS = #SYSTEM_OS_MAC) then
-        '                    Script.Make("MacClass.SetDocInfo(SELF, Project)").DoIt(theFileName)
-        '                End If
-        '            End If
-        '        End If
-
-        '        TheView = av.GetActiveDoc
-        '        ViewChk = TheView.GetGUI
-        '        If (ViewChk <> "View") Then
-        '            MsgBox.error("Click on the View to make it 'active' before running this program", "")
-        '            Exit Sub
-        '        End If
-
-        '        ' Check the working directory
-        '        TheWkDir = TheProject.GetFileName.ReturnDir
-        '        myWkDirname = MsgBox.Input("Specify your working directory", "Working Directory", TheWkDir.GetFullName)
-        '        If (mywkDirName = nil) Then
-        '            Exit Sub
-        '        End If
-        '        If (File.Exists(myWkDirname.AsFileName).not) Then
-        '            MsgBox.Error("Cannot read directory " + myWkDirname, "Directory Specification Error")
-        '            Exit Sub
-        '        End If
-        '        If (File.IsWritable(myWkDirname.AsFileName).not) Then
-        '            MsgBox.Error(myWkDirname + +"is not writable.", "Directory Specification Error")
-        '            Exit Sub
-        '        End If
-        '        TheProject.SetWorkDir(myWkDirname.AsFileName)
-
-
-        '        If ((myWkDirname.contains("\").Not) And (myWkDirname.contains("/")) And (myWkDirname.right(1) <> "/")) Then
-        '            myWkDirname = myWkDirname + "/"
-        '        ElseIf ((myWkDirname.contains("\")) And (myWkDirname.right(1) <> "\")) Then
-        '            myWkDirname = myWkDirname + "\"
-        '        ElseIf ((myWkDirname.contains("\").Not) And (myWkDirname.contains("\").Not) And (myWkDirname.right(1) <> "/")) Then
-        '            myWkDirname = myWkDirname + "/"
-        '        End If
-
-
-        '        theThemelist = theView.GetThemes
-        '        mypolythmlist = List.make
-        '        For Each thm In theThemelist
-        '            If (thm.CanSelect) Then
-        '                athmname = thm.getname
-        '                If ((athmname.contains("basply")) Or (athmname.contains("basin"))) Then
-        '                    mypolythmlist.add(thm)
-        '                End If
-        '            End If
-        '        Next
-
-        '        If (mypolythmlist.isempty) Then
-        '            theTheme = MsgBox.Choice(theThemelist, "Select basin coverage/grid theme", "Basin Theme")
-        '            If (theTheme = nil) Then
-        '                Exit Sub
-        '            End If
-        '        Else
-        '            theTheme = MsgBox.Choice(mypolythmlist, "Select basin coverage/grid theme", "Basin Theme")
-        '            If (theTheme = nil) Then
-        '                Exit Sub
-        '            End If
-        '        End If
-
-
+        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+        Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
+        
         '        'CREATE A LIST OF INPUT LABELS
         'labels = { "Input Daily Time Series File", "Output Monthly Time Series File", "Output Annual Time Series File" } 
 
         'defaults = { "streamflow.txt", "monthlyflow.txt", "annualflow.txt" }
 
-        '        inpList = MsgBox.MultiInput("Enter Model Parameters.", "GeoSFM Utilities", labels, defaults)
-        '        If (inpList.IsEmpty) Then
-        '            Exit Sub
-        '        End If
+        Dim runoffFN As String = lOutputPath & "streamflow.txt"
+        Dim monthlyFN As String = lOutputPath & "monthlyflow.txt"
+        Dim annualFN As String = lOutputPath & "annualflow.txt"
 
-        '        runoffFN = myWkDirname + inplist.get(0)
-        '        monthlyFN = myWkDirname + inplist.get(1)
-        '        annualFN = myWkDirname + inplist.get(2)
-
-        '        oldout = theProject.finddoc(inplist.get(1).asstring)
-        '        If (oldout <> nil) Then
-        '            theproject.removedoc(oldout)
-        '        End If
-        '        oldout = theProject.finddoc(inplist.get(2).asstring)
-        '        If (oldout <> nil) Then
-        '            theproject.removedoc(oldout)
-        '        End If
-
-        'chkfile=LineFile.Make((myWkDirname+"times.txt").asfilename,#file_perm_write)
-        '        If (chkfile = nil) Then
-        '            MsgBox.info("Could not create time file, times.txt", "GeoSFM Utilities")
-        '            Exit Sub
-        '        End If
-
-        'paramfile=LineFile.Make((myWkDirname+"statsparam.txt").asfilename,#file_perm_write)
-        '        If (paramfile = nil) Then
-        '            MsgBox.info("Could not create parameter file, statsparam.txt", "GeoSFM Utilities")
-        '            Exit Sub
-        '        End If
+        Dim chkFN As String = lOutputPath & "times.txt"
+        Dim paramFN As String = lOutputPath & "statsparam.txt"
 
         'runofffile = LineFile.Make((runoffFN).asfilename,#file_perm_read)
-        '        If (runofffile = nil) Then
-        '            MsgBox.info("Could not open time series file," + nl + runoffFN, "GeoSFM Utilities")
-        '            Exit Sub
-        '        End If
+        If Not FileExists(runoffFN) Then
+            Logger.Msg("Could not open time series file," & vbCrLf & runoffFN, "GeoSFM Utilities")
+            Exit Sub
+        End If
 
         'monthlyfile = LineFile.Make((monthlyFN).asfilename,#file_perm_write)
-        '        If (monthlyfile = nil) Then
-        '            MsgBox.info("Could not create monthly time series file, " + monthlyFN, "GeoSFM Utilities")
-        '            Exit Sub
-        '        End If
-
         'annualfile = LineFile.Make((annualFN).asfilename,#file_perm_write)
-        '        If (annualfile = nil) Then
-        '            MsgBox.info("Could not create annual time series file, " + annualFN, "GeoSFM Utilities")
-        '            Exit Sub
-        '        End If
 
-        'logfile = LineFile.Make(("logfilestats.txt").asfilename,#file_perm_write)
-        '        If (logfile = nil) Then
-        '            MsgBox.info("Could not create logfilestats.txt file", "GeoSFM Utilities")
-        '            Exit Sub
-        '        End If
+        Dim logFN As String = lOutputPath & "logfilestats.txt"
 
+        Dim chkfile As New StringBuilder
+        chkfile.AppendLine("Starting Time:" & " " & System.DateTime.Now.ToString)
 
-        '        theDate = Date.Now
-        '        theday = Date.Now.setformat("jj").asstring
-        '        theyear = Date.Now.setformat("yyy").asstring
+        Dim runofflist As New Collection
+        Try
+            Dim lCurrentRecord As String
+            Dim lStreamReader As New StreamReader(runoffFN)
+            lCurrentRecord = lStreamReader.ReadLine
+            Do
+                lCurrentRecord = lStreamReader.ReadLine
+                If lCurrentRecord Is Nothing Then
+                    Exit Do
+                Else
+                    runofflist.Add(lCurrentRecord)
+                End If
+            Loop
+            lStreamReader.Close()
+        Catch e As ApplicationException
+            Logger.Msg("Problem reading file " & runoffFN & vbCrLf & "Check the contents of this file before continuing.", "Geospatial Stream Flow Model")
+            Exit Sub
+        End Try
 
-        '        chkfile.writeelt("Starting Time:" + +theDate.Asstring)
+        Dim runoffsize As Integer = runofflist.Count
+        Dim useyear As Integer = 1
+        If (runoffsize = 0) Then
+            Logger.Msg("The runofffile " & vbCrLf & runoffFN & " is empty", "")
+            Exit Sub
+        ElseIf ((runoffsize < 3285) And (runoffsize > 280)) Then
+            Logger.Msg("Less than 9 years of data supplied." & vbCrLf & vbCrLf & "Computing bankfull from monthly data...", "")
+            useyear = 12
+        ElseIf (runoffsize < 270) Then
+            Logger.Msg("Less than 9 month of data supplied." & vbCrLf & vbCrLf & "Computing bankfull from daily data...", "")
+            useyear = 365
+        End If
 
-        '        'msgbox.info("The resdays "+resdays.asstring,"")
+        Dim lrec As String = runofflist(1)
+        Dim dayonestr As String = StrRetRem(lrec)
+        lrec = runofflist(runofflist.Count)
+        Dim enddaystr As String = StrRetRem(lrec)
 
-        '        ' READ IN THE INPUT ARRAYS FOR PRECIPITATION AND POTENTIAL EVAPORATION
-        '        runofflist = List.make
-        '        runoffsize = runofffile.getsize
-        '        useyear = 1
-        '        If (runoffsize = 0) Then
-        '            MsgBox.info("The runofffile " + runoffFN + " is empty", "")
-        '            Exit Sub
-        '        ElseIf ((runoffsize < 3285) And (runoffsize > 280)) Then
-        '            MsgBox.info("Less than 9 years of data supplied." + nl + NL + "Computing bankfull from monthly data...", "")
-        '            useyear = 12
-        '        ElseIf (runoffsize < 270) Then
-        '            MsgBox.info("Less than 9 month of data supplied." + nl + NL + "Computing bankfull from daily data...", "")
-        '            useyear = 365
-        '        End If
+        Dim startyear As String = ""
+        Dim startday As String = ""
+        startyear = Left(dayonestr, 4)
+        If Not IsNumeric(startyear) Then
+            Logger.Msg("Start year must be a 4 digit number", "GeoSFM Utilities")
+            Exit Sub
+        End If
+        startday = Right(dayonestr, 3)
+        If Not IsNumeric(startday) Then
+            Logger.Msg("Start day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
+            Exit Sub
+        End If
 
-        '        runofffile.setpos(0)
-        '        runofffile.read(runofflist, runoffsize)
-        '        dayonestr = (((((runofflist.get(1)).substitute(" ", ",")).astokens(",")).get(0)))
-        '        enddaystr = (((((runofflist.get(runoffsize - 1)).substitute(" ", ",")).astokens(",")).get(0)))
+        Dim endyear As String = ""
+        Dim endday As String = ""
+        endyear = Left(enddaystr, 4)
+        If Not IsNumeric(endyear) Then
+            Logger.Msg("End year must be a 4 digit number", "GeoSFM Utilities")
+            Exit Sub
+        End If
+        endday = Right(enddaystr, 3)
+        If Not IsNumeric(endday) Then
+            Logger.Msg("End day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
+            Exit Sub
+        End If
 
-        '        If (dayonestr.count = 7) Then
-        '            startyear = dayonestr.left(4)
-        '            If (startyear.isnumber.not) Then
-        '                startyear = MsgBox.input("Enter 4 digit start year eg 1999", "GeoSFM Utilities", theYear)
-        '            End If
-        '            If ((startyear = nil) Or (startyear.isnumber.not)) Then
-        '                MsgBox.info("Start year must be a 4 digit number", "GeoSFM Utilities")
-        '                Exit Sub
-        '            ElseIf ((startyear.count) <> 4) Then
-        '                MsgBox.info("Start year must be a 4 digit number", "GeoSFM Utilities")
-        '                Exit Sub
-        '            End If
+        Dim lSDate(5) As Integer
+        lSDate(0) = CInt(startyear)
+        lSDate(1) = 1
+        lSDate(2) = 1
+        Dim lSJDate As Double = Date2J(lSDate) + startday - 1
+        J2Date(lSJDate, lSDate)
 
-        '            startday = dayonestr.right(3)
-        '            If (startday.isnumber.not) Then
-        '                startday = MsgBox.input("Enter 3 digit start day eg 003", "GeoSFM Utilities", theday)
-        '            End If
-        '            If ((startday = nil) Or (startday.isnumber.not)) Then
-        '                MsgBox.info("Start day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
-        '                Exit Sub
-        '            ElseIf (((startday.asnumber) > 366) Or ((startday.asnumber) < 1)) Then
-        '                MsgBox.info("Start day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
-        '                Exit Sub
-        '            End If
-        '        Else
-        '            startyear = MsgBox.input("Enter 4 digit start year eg 1999", "GeoSFM Utilities", theYear)
-        '            If ((startyear = nil) Or (startyear.isnumber.not)) Then
-        '                MsgBox.info("Start year must be a 4 digit number", "GeoSFM Utilities")
-        '                Exit Sub
-        '            ElseIf ((startyear.count) <> 4) Then
-        '                MsgBox.info("Start year must be a 4 digit number", "GeoSFM Utilities")
-        '                Exit Sub
-        '            End If
+        Dim startmonth As String = lSDate(1).ToString
+        Dim startdayofmonth As String = lSDate(2).ToString
 
-        '            startday = MsgBox.input("Enter 3 digit start day eg 003", "GeoSFM Utilities", theday)
-        '            If ((startday = nil) Or (startday.isnumber.not)) Then
-        '                MsgBox.info("Start day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
-        '                Exit Sub
-        '            ElseIf (((startday.asnumber) > 366) Or ((startday.asnumber) < 1)) Then
-        '                MsgBox.info("Start day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
-        '                Exit Sub
-        '            End If
-        '        End If
+        If CInt(endyear) < CInt(startyear) Then
+            Logger.Msg("End year must be greater than or equal to start year", "GeoSFM Utilities")
+            Exit Sub
+        End If
 
-        '        startjdate = Date.Make(dayonestr, "yyyjj")
-        '        startmonth = startjdate.GetMonthOfYear.asstring
-        '        startdayofmonth = startjdate.GetDayOfMonth.asstring
-
-        '        If (enddaystr.count = 7) Then
-        '            endyear = enddaystr.left(4)
-        '            If (endyear.isnumber.not) Then
-        '                endyear = MsgBox.input("Enter 4 digit end year eg 1999", "GeoSFM Utilities", theYear)
-        '            End If
-        '        Else
-        '            endyear = MsgBox.input("Enter 4 digit end year eg 1999", "GeoSFM Utilities", theYear)
-        '        End If
-        '        If ((endyear = nil) Or (endyear.isnumber.not)) Then
-        '            MsgBox.info("Start year must be a 4 digit number", "GeoSFM Utilities")
-        '            Exit Sub
-        '        ElseIf ((endyear.count) <> 4) Then
-        '            MsgBox.info("Start year must be a 4 digit number", "GeoSFM Utilities")
-        '            Exit Sub
-        '        ElseIf ((endyear.asnumber) < startyear.asnumber) Then
-        '            MsgBox.info("End year must be greater than or equal to start year", "GeoSFM Utilities")
-        '            Exit Sub
-        '        End If
-
-        '        'statslist = { "Max" , "Mean"}
+        '        'statslist = { "Max" , "Mean"}            'commented in the avenue
         '        'statstype = msgbox.choiceasstring(statslist, "Select Statistic to be Computed" , "GeoSFM Utilities" )
         '        'if(statstype = nil ) then
         '        '  exit    
         '        'end
-        '        statstype = "Max"
+        Dim statstype As String = "Max"
 
-        '        runoffdays = (runoffsize - 1)
-        '        basinsize = (((((runofflist.get(1)).substitute(" ", ",")).astokens(",")).count) - 1).asstring
-        '        numofyears = ((endyear.asnumber - startyear.asnumber) + 1)
+        Dim runoffdays As Integer = runofflist.Count
+        Dim basinsize As Integer = 0
+        Dim lstr As String = runofflist(1)
+        Dim lstr1 As String = ""
+        Do While lstr.Length > 0
+            lstr1 = StrRetRem(lstr)
+            basinsize += 1
+        Loop
 
-        '        paramfile.writeelt(startyear.asstring)
-        '        paramfile.writeelt(startmonth.asstring)
-        '        paramfile.writeelt(startdayofmonth.asstring)
-        '        paramfile.writeelt(endyear.asstring)
-        '        paramfile.writeelt(runoffdays.asstring)
-        '        paramfile.writeelt(basinsize.asstring)
-        '        paramfile.writeelt(statstype.asstring)
-        '        paramfile.writeelt(runoffFN)
-        '        paramfile.writeelt(monthlyFN)
-        '        paramfile.writeelt(annualFN)
+        Dim numofyears As Integer = CInt(endyear) - CInt(startyear) + 1
 
-        '        paramfile.close()
-        '        runofffile.close()
-        '        logfile.close()
-        '        monthlyfile.close()
-        '        annualfile.close()
+        Dim paramfile As New StringBuilder
+        paramfile.AppendLine(startyear)
+        paramfile.AppendLine(startmonth)
+        paramfile.AppendLine(startdayofmonth)
+        paramfile.AppendLine(endyear)
+        paramfile.AppendLine(runoffdays.ToString)
+        paramfile.AppendLine(basinsize.ToString)
+        paramfile.AppendLine(statstype.tostring)
+        paramfile.AppendLine(runoffFN)
+        paramfile.AppendLine(monthlyFN)
+        paramfile.AppendLine(annualFN)
+        SaveFileString(paramFN, paramfile.ToString)
 
-        '        av.ShowStopButton()
-        '        av.SetStatus(0)
-        '        av.showmsg("Computing Monthly and Annual Fluxes.......")
         '        '
-        '        'myfilename = ("$AVEXT\geosfmstats.dll").AsFileName 
+        '        'myfilename = ("$AVEXT\geosfmstats.dll").AsFileName                 'commented in the avenue
         '        'if(myfilename = Nil) then
         '        '  msgbox.info("Unable to locate the program file: geosfmstats.dll."+nl+nl+"Please install the program, geosfmstats.dll, before you continue.", "GeoSFM Utilities") 
         '        '  exit
@@ -3548,113 +3424,98 @@ Public Module modGeoSFM
         '        'procGetLastError=myproc.call({})
         '        '
 
-        '        myrun = 0
+        Dim geosfmstatsdllFN As String = ""
+        If FileExists(lOutputPath & "geosfmstats.dll") Then
+            geosfmstatsdllFN = lOutputPath & "geosfmstats.dll"
+        ElseIf FileExists(lBasinsBinLoc & "\geosfmstats.dll") Then
+            File.Copy(lBasinsBinLoc & "\geosfmstats.dll", lOutputPath & "geosfmstats.dll")
+            geosfmstatsdllFN = lOutputPath & "geosfmstats.dll"
+        Else
+            Logger.Msg("Unable to locate the program file: geosfmstats.dll " & vbCrLf & vbCrLf & "Install the programs in your BASINS/bin folder.", "Geospatial Stream Flow Model")
+            Exit Sub
+        End If
 
-        '        myfilename = ("$AVEXT\geosfmstats.dll").AsFileName
-        '        myfilename2 = ("$AVEXT\geosfmstats.exe").AsFileName
+        'aggregateflows()
 
-        '        If (File.Exists(("$AVEXT\geosfmstats.dll").AsFileName)) Then
-        '            mydll = DLL.Make(myfilename)
-        '            If (mydll <> Nil) Then
-        '    myproc=DLLProc.Make(myDLL, "aggregateflows", #DLLPROC_TYPE_INT32,{#DLLPROC_TYPE_VOID})
-        '                If (myproc <> Nil) Then
-        '                    myrun = 1
-        '      procGetLastError=myproc.call({})
-        '                End If
-        '            End If
-        '        End If
+        Dim geosfmstatsFN As String = ""
+        If FileExists(lOutputPath & "geosfmstats.exe") Then
+            geosfmstatsFN = lOutputPath & "geosfmstats.exe"
+        ElseIf FileExists(lBasinsBinLoc & "\geosfmstats.exe") Then
+            File.Copy(lBasinsBinLoc & "\geosfmstats.exe", lOutputPath & "geosfmstats.exe")
+            geosfmstatsFN = lOutputPath & "geosfmstats.exe"
+        Else
+            Logger.Msg("Unable to locate the program file: geosfmstats.exe " & vbCrLf & vbCrLf & "Install the programs in your BASINS/bin folder.", "Geospatial Stream Flow Model")
+            Exit Sub
+        End If
 
-        '        If (myrun = 0) Then
-        '            If (File.Exists(("$AVEXT\geosfmstats.exe").AsFileName)) Then
-        '    ziplistfile = LineFile.Make((myWkDirname + "statslist.bat").AsFileName, #FILE_PERM_WRITE)
-        '                If (ziplistfile = nil) Then
-        '                    MsgBox.error("Cannot open output file: statslist.bat" + nl + "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-        '                    Exit Sub
-        '                End If
-        '                ziplistfile.WriteElt("Copy " + (("$AVEXT\geosfmstats.exe").AsFileName).GetFullName + +myWkDirname + "geosfmstats.exe")
-        '                ziplistfile.flush()
-        '                ziplistfile.close()
-        '                System.ExecuteSynchronous("statslist.bat")
+        Dim lPProcess As New Diagnostics.Process
+        With lPProcess.StartInfo
+            .FileName = lOutputPath & "geosfmstats.exe"
+            .WorkingDirectory = lOutputPath
+            .Arguments = ""
+            .CreateNoWindow = False
+            .UseShellExecute = True
+        End With
+        lPProcess.Start()
+        While Not lPProcess.HasExited
+            Windows.Forms.Application.DoEvents()
+            Threading.Thread.Sleep(50)
+        End While
 
-        '    ziplistfile = LineFile.Make((myWkDirname + "statslist.bat").AsFileName, #FILE_PERM_WRITE)
-        '                If (ziplistfile = nil) Then
-        '                    MsgBox.error("Cannot open output file: statslist.bat" + nl + "File may be open or tied up by another program", "GeoSFM Utilities")
-        '                    Exit Sub
-        '                End If
-        '                ziplistfile.WriteElt("geosfmstats.exe")
-        '                ziplistfile.flush()
-        '                ziplistfile.close()
-        '                System.ExecuteSynchronous("statslist.bat")
-        '            ElseIf (File.Exists(("$AVEXT\geosfmstats.exe").AsFileName).NOT) Then
-        '                MsgBox.info("Unable to locate the program file: geosfmstats.exe " + nl + nl + "Install the programs in your ArcView/Ext32 or working directory.", "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            ElseIf (myfilename = Nil) Then
-        '                MsgBox.info("Unable to locate the program file: geosfmstats.dll." + nl + nl + "Please install the program, geosfmstats.dll, before you continue.", "GeoSFM Utilities")
-        '                Exit Sub
-        '            ElseIf (mydll = Nil) Then
-        '                MsgBox.info("Unable to access the dll, geosfmstats.dll" + nl + nl + "Please install the program, geosfmstats.dll, before you continue.", "GeoSFM Utilities")
-        '                Exit Sub
-        '            ElseIf (myproc = Nil) Then
-        '                MsgBox.info("Unable to make the procedure, aggregateflows" + nl + nl + "Please install the program, geosfmstats.dll, before you continue.", "GeoSFM Utilities")
-        '                Exit Sub
-        '            End If
-        '        End If
+        Dim monthfilesize As Integer = 0
+        If FileExists(monthlyFN) Then
+            Try
+                Dim lCurrentRecord As String
+                Dim lStreamReader As New StreamReader(monthlyFN)
+                Do
+                    lCurrentRecord = lStreamReader.ReadLine
+                    If lCurrentRecord Is Nothing Then
+                        Exit Do
+                    Else
+                        monthfilesize = monthfilesize + 1
+                    End If
+                Loop
+            Catch e As ApplicationException
+                Logger.Msg("Cannot read output file, " & monthlyFN & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+                Exit Sub
+            End Try
+        Else
+            Logger.Msg("Cannot open output file, " & monthlyFN & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+            Exit Sub
+        End If
 
+        Dim annualfilesize As Integer = 0
+        If FileExists(annualFN) Then
+            Try
+                Dim lCurrentRecord As String
+                Dim lStreamReader As New StreamReader(annualFN)
+                Do
+                    lCurrentRecord = lStreamReader.ReadLine
+                    If lCurrentRecord Is Nothing Then
+                        Exit Do
+                    Else
+                        annualfilesize = annualfilesize + 1
+                    End If
+                Loop
+            Catch e As ApplicationException
+                Logger.Msg("Cannot read output file, " & annualFN & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+                Exit Sub
+            End Try
+        Else
+            Logger.Msg("Cannot open output file, " & annualFN & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+            Exit Sub
+        End If
 
-        'monthlyfile = LineFile.Make((monthlyFN).asfilename,#file_perm_read)
-        '        If (monthlyfile = nil) Then
-        '            MsgBox.info("Could not open output monthly time series file," + nl + monthlyFN, "GeoSFM Utilities")
-        '            Exit Sub
-        '        End If
+        Dim dailyfilename As String = runoffFN
 
-        'annualfile = LineFile.Make((annualFN).asfilename,#file_perm_read)
-        '        If (annualfile = nil) Then
-        '            MsgBox.info("Could not open output annual time series file," + nl + annualFN, "GeoSFM Utilities")
-        '            Exit Sub
-        '        End If
-
-        '        GUIName = "Table"
-        '        monthlyfile.close()
-        '        annualfile.close()
-
-        '        doMore = av.SetWorkingStatus
-        '        If (doMore = False) Then
-        '            Exit Sub
-        '        End If
-
-        '        oldout = theProject.finddoc(monthlyFN)
-        '        If (oldout <> nil) Then
-        '            theproject.removedoc(oldout)
-        '        End If
-
-        '        oldout = theProject.finddoc(annualFN)
-        '        If (oldout <> nil) Then
-        '            theproject.removedoc(oldout)
-        '        End If
-
-        '        monthlyfilename = monthlyFN.asfilename
-        '        monthlytable = Vtab.make(monthlyFN.asfilename, False, False)
-        '        tm = Table.MakeWithGUI(monthlytable, GUIName)
-        '        tm.SetName(monthlyFN.asfilename.getbasename.asstring)
-
-        '        annualfilename = annualFN.asfilename
-        '        annualfile = Vtab.make(annualfilename, False, False)
-        '        annualTbl = Table.MakeWithGUI(annualfile, GUIName)
-        '        annualTbl.SetName(annualfilename.getbasename.asstring)
-
-        '        dailyfilename = runoffFN.asfilename
-
-        '        If (useyear = 365) Then
-        '            resultfilename = dailyfilename
-        '        ElseIf (useyear = 12) Then
-        '            resultfilename = monthlyfilename
-        '        Else
-        '            resultfilename = annualfilename
-        '        End If
-        '        resultfile = Vtab.make(resultfilename, False, False)
-
-        '        av.ClearStatus()
-        '        av.clearmsg()
+        Dim resultfilename As String = ""
+        If (useyear = 365) Then
+            resultfilename = dailyfilename
+        ElseIf (useyear = 12) Then
+            resultfilename = monthlyFN
+        Else
+            resultfilename = annualFN
+        End If
 
         '        subname = (resultfilename.AsString.Substitute(".txt", ".dbf")).AsFileName
         '        newVtab = resultfile.export(subname, DBase, False)
@@ -3678,381 +3539,316 @@ Public Module modGeoSFM
 
         '        updatethr = True
 
-        '        If (TheTheme.CanSelect) Then
-        '            theftheme = theTheme
-        '            theftab = theTheme.GetFtab
-        '            shpfld = theFTab.FindField("Shape")
-        '            theFTab.CreateIndex(shpfld)
-        '        Else
-        '            p = False
-        '            def = av.GetProject.MakeFileName("theme", "shp")
-        '            def = FileDialog.Put(def, "*.shp", "Convert " + TheTheme.getName)
-        '            If (def = NIL) Then
-        '                Exit Sub
-        '            End If
-        '            theFTab = TheTheme.ExportToFtab(def)
-        '            ' For Database themes, which can return a nil FTab sometimes 
-        '            If (theFTab = nil) Then
-        '    MsgBox.Warning("Error occurred while converting to shapefile."+NL+
-        '        "Shapefile was not created.", "Convert " + TheTheme.getName)
-        '                Exit Sub
-        '            End If
-        '            shpfld = theFTab.FindField("Shape")
-        '            ' build the spatial index
-        '            theFTab.CreateIndex(shpfld)
-        '            theftheme = FTheme.Make(theFTab)
-        '            theView.AddTheme(theftheme)
-        '            '  theView.GetWin.Activate
-        '            End If
+        '        theftheme = theTheme
+        '        theftab = theTheme.GetFtab
+        '        shpfld = theFTab.FindField("Shape")
+        '        theFTab.CreateIndex(shpfld)
 
-        '            theFtab.SetEditable(True)
-        '            addlist = List.Make
+        '        theFtab.SetEditable(True)
+        '        addlist = List.Make
 
-        '            sumfld = theFtab.FindField("Sum")
-        '            If (sumfld = nil) Then
-        '  fldadd = Field.Make("Sum", #field_decimal, 10 , 1)
-        '                addlist.Add(fldadd)
-        '            End If
-        '            countfld = theFtab.FindField("Count")
-        '            If (Countfld = nil) Then
-        '  fldadd = Field.Make("Count", #field_decimal, 10 , 1)  
-        '                addlist.Add(fldadd)
-        '            End If
-        '            meanfld = theFtab.FindField("Mean")
-        '            If (Meanfld = nil) Then
-        '  fldadd = Field.Make("Mean", #field_decimal, 10 , 1)
-        '                addlist.Add(fldadd)
-        '            End If
-        '            maxfld = theFtab.FindField("Maximum")
-        '            If (Maxfld = nil) Then
-        '  fldadd = Field.Make("Maximum", #field_decimal, 10 , 1)
-        '                addlist.Add(fldadd)
-        '            End If
-        '            minfld = theFtab.FindField("Minimum")
-        '            If (Minfld = nil) Then
-        '  fldadd = Field.Make("Minimum", #field_decimal, 10 , 1)
-        '                addlist.Add(fldadd)
-        '            End If
-        '            rangefld = theFtab.FindField("Range")
-        '            If (Rangefld = nil) Then
-        '  fldadd = Field.Make("Range", #field_decimal, 10 , 1)
-        '                addlist.Add(fldadd)
-        '            End If
-        '            varfld = theFtab.FindField("Variance")
-        '            If (Varfld = nil) Then
-        '  fldadd = Field.Make("Variance", #field_decimal, 10 , 1)
-        '                addlist.Add(fldadd)
-        '            End If
-        '            stddevfld = theFtab.FindField("Stddev")
-        '            If (Stddevfld = nil) Then
-        '  fldadd = Field.Make("Stddev", #field_decimal, 10 , 1)
-        '                addlist.Add(fldadd)
-        '            End If
-        '            addlist.DeepClone()
-        '            medianfld = theFtab.FindField("Median")
-        '            If (medianfld = nil) Then
-        '  fldadd = Field.Make("Median", #field_decimal, 10 , 3)
-        '                addlist.Add(fldadd)
-        '            End If
-        '            addlist.DeepClone()
-        '            Quart25fld = theFtab.FindField("Quart25")
-        '            If (Quart25fld = nil) Then
-        '  fldadd = Field.Make("Quart25", #field_decimal, 10 , 3)
-        '                addlist.Add(fldadd)
-        '            End If
-        '            addlist.DeepClone()
-        '            Quart75fld = theFtab.FindField("Quart75")
-        '            If (Quart75fld = nil) Then
-        '  fldadd = Field.Make("Quart75", #field_decimal, 10 , 3)
-        '                addlist.Add(fldadd)
-        '            End If
-        '            addlist.DeepClone()
-        '            Quart33fld = theFtab.FindField("Quart33")
-        '            If (Quart33fld = nil) Then
-        '  fldadd = Field.Make("Quart33", #field_decimal, 10 , 3)
-        '                addlist.Add(fldadd)
-        '            End If
-        '            addlist.DeepClone()
-        '            Quart66fld = theFtab.FindField("Quart66")
-        '            If (Quart66fld = nil) Then
-        '  fldadd = Field.Make("Quart66", #field_decimal, 10 , 3)
-        '                addlist.Add(fldadd)
-        '            End If
-        '            addlist.DeepClone()
-        '            Highflowfld = theFtab.FindField("Highflow")
-        '            If (Highflowfld = nil) Then
-        '  fldadd = Field.Make("Highflow", #field_decimal, 10 , 3)
-        '                addlist.Add(fldadd)
-        '            End If
-        '            addlist.DeepClone()
-        '            lowflowfld = theFtab.FindField("Lowflow")
-        '            If (lowflowfld = nil) Then
-        '  fldadd = Field.Make("Lowflow", #field_decimal, 10 , 3)
-        '                addlist.Add(fldadd)
-        '            End If
-        '            addlist.DeepClone()
-        '            medflowfld = theFtab.FindField("Medflow")
-        '            If (medflowfld = nil) Then
-        '  fldadd = Field.Make("Medflow", #field_decimal, 10 , 3)
-        '                addlist.Add(fldadd)
-        '            End If
-        '            addlist.DeepClone()
+        Dim theTheme As Integer = -1
+        Dim sumfld As Integer = -1
+        Dim meanfld As Integer = -1
+        Dim maxfld As Integer = -1
+        Dim minfld As Integer = -1
+        Dim stddevfld As Integer = -1
+        Dim varfld As Integer = -1
+        Dim rangefld As Integer = -1
+        Dim countfld As Integer = -1
+        Dim medianfld As Integer = -1
+        Dim Quart25fld As Integer = -1
+        Dim Quart75fld As Integer = -1
+        Dim Quart33fld As Integer = -1
+        Dim Quart66fld As Integer = -1
+        Dim Highflowfld As Integer = -1
+        Dim lowflowfld As Integer = -1
+        Dim Medflowfld As Integer = -1
+        If GisUtil.IsLayer("Subbasins") Then
+            theTheme = GisUtil.LayerIndex("Subbasins")
+            sumfld = AddField(theTheme, "Sum")
+            meanfld = AddField(theTheme, "Mean")
+            maxfld = AddField(theTheme, "Maximum")
+            minfld = AddField(theTheme, "Minimum")
+            stddevfld = AddField(theTheme, "StdDev")
+            varfld = AddField(theTheme, "Variance")
+            rangefld = AddField(theTheme, "Range")
+            countfld = AddField(theTheme, "Count")
+            medianfld = AddField(theTheme, "Median")
+            Quart25fld = AddField(theTheme, "Quart25")
+            Quart75fld = AddField(theTheme, "Quart75")
+            Quart33fld = AddField(theTheme, "Quart33")
+            Quart66fld = AddField(theTheme, "Quart66")
+            Highflowfld = AddField(theTheme, "Highflow")
+            lowflowfld = AddField(theTheme, "Lowflow")
+            Medflowfld = AddField(theTheme, "Medflow")
+        End If
 
-        '            theFtab.Addfields(addlist)
-        '            sumfld = theFtab.FindField("Sum")
-        '            meanfld = theFtab.FindField("Mean")
-        '            maxfld = theFtab.FindField("Maximum")
-        '            minfld = theFtab.FindField("Minimum")
-        '            stddevfld = theFtab.FindField("StdDev")
-        '            varfld = theFtab.FindField("Variance")
-        '            rangefld = theFtab.FindField("Range")
-        '            countfld = theFtab.FindField("Count")
-        '            medianfld = theFtab.FindField("Median")
-        '            Quart25fld = theFtab.FindField("Quart25")
-        '            Quart75fld = theFtab.FindField("Quart75")
-        '            Quart33fld = theFtab.FindField("Quart33")
-        '            Quart66fld = theFtab.FindField("Quart66")
-        '            Highflowfld = theFtab.FindField("Highflow")
-        '            lowflowfld = theFtab.FindField("Lowflow")
-        '            Medflowfld = theFtab.FindField("Medflow")
+        Dim pidfield As Integer = GisUtil.FieldIndex(theTheme, "Gridcode")
+        Dim polyidfld As Integer = GisUtil.FieldIndex(theTheme, "Id")
+        Dim pnumrecs As Integer = GisUtil.NumFeatures(theTheme)
+        Dim pidlist As New Collection
+        Dim pidval As Integer = ""
+        For prec As Integer = 1 To pnumrecs
+            pidval = GisUtil.FieldValue(theTheme, prec, pidfield)
+            pidlist.Add(pidval)
+        Next
 
-        '            theFields = resultfile.GetFields
-        '            theFields.clone()
-        '            pidfield = theFtab.FindField("Gridcode")
-        '            polyidfld = theFtab.FindField("Id")
-        '            pnumrecs = theFtab.GetNumRecords
-        '            pidlist = List.Make
-        'For each prec in 0..(pnumrecs-1)
-        '                pidval = theFtab.ReturnValue(pidfield, prec)
-        '                pidlist.Add(pidval)
-        '        Next
+        'read result file into memory
+        Dim numrecs As Integer = 0
+        Dim resultrecs As New Collection
+        If FileExists(resultfilename) Then
+            Try
+                Dim lCurrentRecord As String
+                Dim lStreamReader As New StreamReader(resultfilename)
+                Do
+                    lCurrentRecord = lStreamReader.ReadLine
+                    If lCurrentRecord Is Nothing Then
+                        Exit Do
+                    Else
+                        numrecs = numrecs + 1
+                        resultrecs.Add(lCurrentRecord)
+                    End If
+                Loop
+            Catch e As ApplicationException
+                Logger.Msg("Cannot read output file, " & resultfilename & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+                Exit Sub
+            End Try
+        Else
+            Logger.Msg("Cannot open output file, " & resultfilename & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+            Exit Sub
+        End If
 
-        '        numflds = theFields.count
-        '        numrecs = resultfile.GetNumRecords
-        '        If (numflds < 2) Then
-        '            MsgBox.error("Incorrect Textfile Format. Contains less than 2 fields." + nl + "Make sure input textfile is comma delimited.", "Geospatial Stream Flow Model")
-        '            Exit Sub
-        '        End If
+        Dim numflds As Integer = 0
+        lstr = runofflist(1)
+        lstr1 = ""
+        Do While lstr.Length > 0
+            lstr1 = StrRetRem(lstr)
+            numflds += 1
+        Loop
 
-        '        theSum = 0
-        '        theCount = 0
-        '        themean = 0
-        '        theMinimum = 0
-        '        theMaximum = 0
-        '        theRange = 0
-        '        theStdDev = 0
-        '        theVariance = 0
-        '        theMedian = 0
-        '        theQuart25 = 0
-        '        theQuart75 = 0
-        '        theQuart33 = 0
-        '        theQuart66 = 0
+        'read results into local array
+        Dim resultvals(numrecs, numflds) As String
+        Dim irec As Integer = 0
+        For Each lrec In resultrecs
+            irec += 1
+            Dim ifield As Integer = 0
+            Do While lrec.Length > 0
+                lstr1 = StrRetRem(lrec)
+                ifield += 1
+                resultvals(irec, ifield) = lstr1
+            Loop
+        Next
 
-        '        av.UseWaitCursor()
-        '        av.ShowStopButton()
-        '        av.ShowMsg("Computing Statistics..........")
-        '        tempcount = 0
-        'for each mynum in 0..(numflds-1)
-        '            theSum = 0
-        '            theCount = 0
-        '            theMinimum = nil
-        '            theMaximum = nil
+        Dim theSum As Single = 0
+        Dim theCount As Single = 0
+        Dim theMean As Single = 0
+        Dim theMinimum As Single = 0
+        Dim theMaximum As Single = 0
+        Dim theRange As Single = 0
+        Dim theStdDev As Single = 0
+        Dim theVariance As Single = 0
+        Dim theMedian As Single = 0
+        Dim theQuart25 As Single = 0
+        Dim theQuart75 As Single = 0
+        Dim theQuart33 As Single = 0
+        Dim theQuart66 As Single = 0
 
-        '            av.ShowMsg("Processing Basin " + (mynum + 1).asstring + " of " + numflds.asstring + " .........")
-        '            progress = (mynum / (numflds - 1)) * 100
-        '            doMore = av.SetStatus(progress)
-        '            If (Not doMore) Then
-        '                av.ClearWorkingStatus()
-        '                av.clearstatus()
-        '                Exit Sub
-        '            End If
+        Dim tempcount As Integer = 0
+        For mynum As Integer = 1 To numflds
+            theSum = 0
+            theCount = 0
+            theMinimum = -9999999
+            theMaximum = 9999999
 
-        '            fld = theFields.Get(mynum)
-        '            If ((fld.IsTypeNumber) And (fld.GetName.IsNumber)) Then
-        '    reclist = {} 
-        '    For each rec in 0..(numrecs-1)     
-        '                    theValue = resultfile.ReturnValueNumber(Fld, rec)
-        '                    If (Not (theValue.IsNull)) Then
-        '                        reclist.Add(theValue)
-        '                        theSum = theValue + theSum
-        '                        theCount = theCount + 1
-        '                    End If
-        '                Next
+            Dim reclist As New atcCollection
+            Dim theValue As String
+            For rec As Integer = 1 To numrecs
+                thevalue = resultvals(rec, mynum)
+                If IsNumeric(thevalue) Then
+                    reclist.Add(thevalue)
+                    theSum = theValue + theSum
+                    theCount = theCount + 1
+                End If
+            Next
 
-        '                theMean = theSum / theCount
+            If theCount > 0 Then
+                theMean = theSum / theCount
+            Else
+                theMean = -999
+            End If
 
-        '                reclist.clone()
-        '                reclist.Sort(True)
-        '                recCount = reclist.count
+            reclist.Sort()
+            Dim recCount As Integer = reclist.Count
 
-        '                theMinimum = reclist.get(0)
-        '                theMaximum = reclist.get(recCount - 1)
-        '                theRange = (theMaximum - theMinimum)
+            '                theMinimum = reclist.get(0)
+            '                theMaximum = reclist.get(recCount - 1)
+            '                theRange = (theMaximum - theMinimum)
 
-        '                If ((chkq25 = 1) Or (chkq33 = 1) Or (chkq66 = 1) Or (chkq75 = 1) Or (chkmed = 1) Or (chkbkf = 1)) Then
+            '                If ((chkq25 = 1) Or (chkq33 = 1) Or (chkq66 = 1) Or (chkq75 = 1) Or (chkmed = 1) Or (chkbkf = 1)) Then
 
-        '                    If (chkmed = 1) Then
-        '                        If (recCount < 9) Then
-        '                            MsgBox.info("Too few records for flow statistics computation", "Less than 9 records")
-        '                            Exit Sub
-        '                        ElseIf (((recCount) Mod (2)) = 1) Then
-        '                            theMedian = reclist.get((recCount - 1) / 2)
-        '                        ElseIf (((recCount) Mod (2)) = 0) Then
-        '                            theMedian = (((reclist.get((recCount - 2) / 2)) + (reclist.get((recCount) / 2))) / 2)
-        '                        End If
-        '                    End If
+            '                    If (chkmed = 1) Then
+            '                        If (recCount < 9) Then
+            '                            MsgBox.info("Too few records for flow statistics computation", "Less than 9 records")
+            '                            Exit Sub
+            '                        ElseIf (((recCount) Mod (2)) = 1) Then
+            '                            theMedian = reclist.get((recCount - 1) / 2)
+            '                        ElseIf (((recCount) Mod (2)) = 0) Then
+            '                            theMedian = (((reclist.get((recCount - 2) / 2)) + (reclist.get((recCount) / 2))) / 2)
+            '                        End If
+            '                    End If
 
-        '                    If ((chkq25 = 1) Or (chkq75 = 1)) Then
-        '                        If (recCount < 9) Then
-        '                            MsgBox.info("Too few records for flow statistics computation", "Less than 9 records")
-        '                            Exit Sub
-        '                        ElseIf (((recCount) Mod (2)) = 1) Then
-        '                            If (((recCount) Mod (4)) = 1) Then
-        '                                theQuart25 = reclist.get((recCount - 1) / 4)
-        '                                theQuart75 = reclist.get((recCount - 1) * 3 / 4)
-        '                            ElseIf (((recCount) Mod (4)) = 3) Then
-        '                                theQuart25 = (((reclist.get((recCount + 1) / 4)) + (reclist.get((recCount - 3) / 4))) / 2)
-        '                                theQuart75 = (((reclist.get((recCount + 1) * 3 / 4)) + (reclist.get(((recCount + 1) * 3 / 4) - 1))) / 2)
-        '                            End If
-        '                        ElseIf (((recCount) Mod (2)) = 0) Then
-        '                            If (((recCount) Mod (4)) = 2) Then
-        '                                theQuart25 = reclist.get((recCount - 2) / 4)
-        '                                theQuart75 = reclist.get((recCount - 2) * 3 / 4)
-        '                            ElseIf (((recCount) Mod (4)) = 0) Then
-        '                                theQuart25 = (((reclist.get((recCount - 4) / 4)) + (reclist.get((recCount) / 4))) / 2)
-        '                                theQuart75 = (((reclist.get((recCount * 3 / 4) - 1)) + (reclist.get((recCount) * 3 / 4))) / 2)
-        '                            End If
-        '                        End If
-        '                    End If
+            '                    If ((chkq25 = 1) Or (chkq75 = 1)) Then
+            '                        If (recCount < 9) Then
+            '                            MsgBox.info("Too few records for flow statistics computation", "Less than 9 records")
+            '                            Exit Sub
+            '                        ElseIf (((recCount) Mod (2)) = 1) Then
+            '                            If (((recCount) Mod (4)) = 1) Then
+            '                                theQuart25 = reclist.get((recCount - 1) / 4)
+            '                                theQuart75 = reclist.get((recCount - 1) * 3 / 4)
+            '                            ElseIf (((recCount) Mod (4)) = 3) Then
+            '                                theQuart25 = (((reclist.get((recCount + 1) / 4)) + (reclist.get((recCount - 3) / 4))) / 2)
+            '                                theQuart75 = (((reclist.get((recCount + 1) * 3 / 4)) + (reclist.get(((recCount + 1) * 3 / 4) - 1))) / 2)
+            '                            End If
+            '                        ElseIf (((recCount) Mod (2)) = 0) Then
+            '                            If (((recCount) Mod (4)) = 2) Then
+            '                                theQuart25 = reclist.get((recCount - 2) / 4)
+            '                                theQuart75 = reclist.get((recCount - 2) * 3 / 4)
+            '                            ElseIf (((recCount) Mod (4)) = 0) Then
+            '                                theQuart25 = (((reclist.get((recCount - 4) / 4)) + (reclist.get((recCount) / 4))) / 2)
+            '                                theQuart75 = (((reclist.get((recCount * 3 / 4) - 1)) + (reclist.get((recCount) * 3 / 4))) / 2)
+            '                            End If
+            '                        End If
+            '                    End If
 
-        '                    If ((chkq33 = 1) Or (chkq66 = 1)) Then
-        '                        If ((((recCount) Mod (3)) = 0) And (recCount >= 9)) Then
-        '                            theQuart33 = (((reclist.get((recCount) / 3)) * 2 / 3) + ((reclist.get((recCount - 3) / 3)) * 1 / 3))
-        '                            theQuart66 = (((reclist.get((recCount) * 2 / 3)) * 1 / 3) + ((reclist.get((recCount - 1.5) * 2 / 3)) * 2 / 3))
-        '                        ElseIf ((((recCount) Mod (3)) = 1) And (recCount >= 9)) Then
-        '                            theQuart33 = (reclist.get((recCount - 1) / 3))
-        '                            theQuart66 = (reclist.get((recCount - 4) * 2 / 3))
-        '                        ElseIf ((((recCount) Mod (3)) = 2) And (recCount >= 9)) Then
-        '                            theQuart33 = (((reclist.get((recCount - 2) / 3)) * 2 / 3) + ((reclist.get((recCount + 1) / 3)) * 1 / 3))
-        '                            theQuart66 = (((reclist.get((recCount - 2) * 2 / 3)) * 2 / 3) + ((reclist.get(((recCount - 0.5) * 2 / 3) + 1)) * 1 / 3))
-        '                        Else
-        '                            theQuart33 = 0
-        '                            theQuart66 = 0
-        '                        End If
-        '                    End If
-        '                End If
+            '                    If ((chkq33 = 1) Or (chkq66 = 1)) Then
+            '                        If ((((recCount) Mod (3)) = 0) And (recCount >= 9)) Then
+            '                            theQuart33 = (((reclist.get((recCount) / 3)) * 2 / 3) + ((reclist.get((recCount - 3) / 3)) * 1 / 3))
+            '                            theQuart66 = (((reclist.get((recCount) * 2 / 3)) * 1 / 3) + ((reclist.get((recCount - 1.5) * 2 / 3)) * 2 / 3))
+            '                        ElseIf ((((recCount) Mod (3)) = 1) And (recCount >= 9)) Then
+            '                            theQuart33 = (reclist.get((recCount - 1) / 3))
+            '                            theQuart66 = (reclist.get((recCount - 4) * 2 / 3))
+            '                        ElseIf ((((recCount) Mod (3)) = 2) And (recCount >= 9)) Then
+            '                            theQuart33 = (((reclist.get((recCount - 2) / 3)) * 2 / 3) + ((reclist.get((recCount + 1) / 3)) * 1 / 3))
+            '                            theQuart66 = (((reclist.get((recCount - 2) * 2 / 3)) * 2 / 3) + ((reclist.get(((recCount - 0.5) * 2 / 3) + 1)) * 1 / 3))
+            '                        Else
+            '                            theQuart33 = 0
+            '                            theQuart66 = 0
+            '                        End If
+            '                    End If
+            '                End If
 
-        '                If ((chkstd = 1) Or (chkvar = 1)) Then
-        '                    theSumSqDev = 0
-        '      for each rec in 0..(numrecs-1)
-        '                        theValue = resultfile.ReturnValueNumber(Fld, rec)
-        '                        If (Not (theValue.IsNull)) Then
-        '                            theSqDev = (theValue - theMean) * (theValue - theMean)
-        '                            theSumSqDev = theSqDev + theSumSqDev
-        '                        End If
-        '                    Next
+            '                If ((chkstd = 1) Or (chkvar = 1)) Then
+            '                    theSumSqDev = 0
+            '      for each rec in 0..(numrecs-1)
+            '                        theValue = resultfile.ReturnValueNumber(Fld, rec)
+            '                        If (Not (theValue.IsNull)) Then
+            '                            theSqDev = (theValue - theMean) * (theValue - theMean)
+            '                            theSumSqDev = theSqDev + theSumSqDev
+            '                        End If
+            '                    Next
 
-        '                    If (theCount > 1) Then
-        '                        theVariance = theSumsqdev / (theCount - 1)
-        '                        theStdDev = theVariance.Sqrt
-        '                    Else
-        '                        theVariance = 0
-        '                        theStdDev = 0
-        '                    End If
-        '                End If
+            '                    If (theCount > 1) Then
+            '                        theVariance = theSumsqdev / (theCount - 1)
+            '                        theStdDev = theVariance.Sqrt
+            '                    Else
+            '                        theVariance = 0
+            '                        theStdDev = 0
+            '                    End If
+            '                End If
 
-        '                rid = fld.AsString.AsNumber
+            '                rid = fld.AsString.AsNumber
 
-        '                For Each precs In theFtab
-        '                    cpid = theFtab.ReturnValue(pidfield, precs)
-        '                    If (cpid = rid) Then
-        '                        If (chksum = 1) Then
-        '                            theFtab.SetValue(sumfld, precs, theSum)
-        '                        End If
-        '                        If (chkcnt = 1) Then
-        '                            theFtab.SetValue(countfld, precs, theCount)
-        '                        End If
-        '                        If (chkavg = 1) Then
-        '                            theFtab.SetValue(meanfld, precs, themean)
-        '                        End If
-        '                        If (chkmin = 1) Then
-        '                            theFtab.SetValue(minfld, precs, theMinimum)
-        '                        End If
-        '                        If (chkmax = 1) Then
-        '                            theFtab.SetValue(maxfld, precs, theMaximum)
-        '                        End If
-        '                        If (chkrng = 1) Then
-        '                            theFtab.SetValue(rangefld, precs, theRange)
-        '                        End If
-        '                        If (chkstd = 1) Then
-        '                            theFtab.SetValue(stddevfld, precs, theStdDev)
-        '                        End If
-        '                        If (chkvar = 1) Then
-        '                            theFtab.SetValue(varfld, precs, theVariance)
-        '                        End If
-        '                        If (chkmed = 1) Then
-        '                            theFtab.SetValue(medianfld, precs, theMedian)
-        '                        End If
-        '                        If (chkq25 = 1) Then
-        '                            theFtab.SetValue(Quart25fld, precs, theQuart25)
-        '                        End If
-        '                        If (chkq33 = 1) Then
-        '                            theFtab.SetValue(Quart33fld, precs, theQuart33)
-        '                        End If
-        '                        If (chkq66 = 1) Then
-        '                            TheFtab.SetValue(Quart66fld, precs, theQuart66)
-        '                        End If
-        '                        If (chkq75 = 1) Then
-        '                            theFtab.SetValue(Quart75fld, precs, theQuart75)
-        '                        End If
+            '                For Each precs In theFtab
+            '                    cpid = theFtab.ReturnValue(pidfield, precs)
+            '                    If (cpid = rid) Then
+            '                        If (chksum = 1) Then
+            '                            theFtab.SetValue(sumfld, precs, theSum)
+            '                        End If
+            '                        If (chkcnt = 1) Then
+            '                            theFtab.SetValue(countfld, precs, theCount)
+            '                        End If
+            '                        If (chkavg = 1) Then
+            '                            theFtab.SetValue(meanfld, precs, themean)
+            '                        End If
+            '                        If (chkmin = 1) Then
+            '                            theFtab.SetValue(minfld, precs, theMinimum)
+            '                        End If
+            '                        If (chkmax = 1) Then
+            '                            theFtab.SetValue(maxfld, precs, theMaximum)
+            '                        End If
+            '                        If (chkrng = 1) Then
+            '                            theFtab.SetValue(rangefld, precs, theRange)
+            '                        End If
+            '                        If (chkstd = 1) Then
+            '                            theFtab.SetValue(stddevfld, precs, theStdDev)
+            '                        End If
+            '                        If (chkvar = 1) Then
+            '                            theFtab.SetValue(varfld, precs, theVariance)
+            '                        End If
+            '                        If (chkmed = 1) Then
+            '                            theFtab.SetValue(medianfld, precs, theMedian)
+            '                        End If
+            '                        If (chkq25 = 1) Then
+            '                            theFtab.SetValue(Quart25fld, precs, theQuart25)
+            '                        End If
+            '                        If (chkq33 = 1) Then
+            '                            theFtab.SetValue(Quart33fld, precs, theQuart33)
+            '                        End If
+            '                        If (chkq66 = 1) Then
+            '                            TheFtab.SetValue(Quart66fld, precs, theQuart66)
+            '                        End If
+            '                        If (chkq75 = 1) Then
+            '                            theFtab.SetValue(Quart75fld, precs, theQuart75)
+            '                        End If
 
-        '                        If (updatethr = True) Then
-        '                            mymean = theFtab.ReturnValue(meanfld, precs)
-        '                            mymax = theFtab.ReturnValue(maxfld, precs)
-        '                            mymin = theFtab.ReturnValue(minfld, precs)
-        '                            myhigh = (mymean * mymax).sqrt
-        '                            mylow = mymean.sqrt
-        '                            theFtab.SetValue(Highflowfld, precs, myhigh)
-        '                            theFtab.SetValue(Medflowfld, precs, mymean)
-        '                            theFtab.SetValue(Lowflowfld, precs, mylow)
-        '                        End If
-        '                    End If
-        '                Next
+            '                        If (updatethr = True) Then
+            '                            mymean = theFtab.ReturnValue(meanfld, precs)
+            '                            mymax = theFtab.ReturnValue(maxfld, precs)
+            '                            mymin = theFtab.ReturnValue(minfld, precs)
+            '                            myhigh = (mymean * mymax).sqrt
+            '                            mylow = mymean.sqrt
+            '                            theFtab.SetValue(Highflowfld, precs, myhigh)
+            '                            theFtab.SetValue(Medflowfld, precs, mymean)
+            '                            theFtab.SetValue(Lowflowfld, precs, mylow)
+            '                        End If
+            '                    End If
+            '                Next
 
-        '            End If
-        '        Next
+            '            End If
+        Next
 
-        '        choicestrg = "Median"
+            '        choicestrg = "Median"
 
-        'mylegend = legend.make(#SYMBOL_FILL)
-        'mylegend.setlegendtype(#LEGEND_TYPE_COLOR)
-        '        mylegend.Interval(theFtheme, choicestrg, 5)
+            'mylegend = legend.make(#SYMBOL_FILL)
+            'mylegend.setlegendtype(#LEGEND_TYPE_COLOR)
+            '        mylegend.Interval(theFtheme, choicestrg, 5)
 
-        'myColorRamp = SymbolList.GetPreDefined(#SYMLIST_TYPE_COLORRAMP).Get(25)
-        '        mylegend.GetSymbols.RampSavedColors(myColorRamp)
+            'myColorRamp = SymbolList.GetPreDefined(#SYMLIST_TYPE_COLORRAMP).Get(25)
+            '        mylegend.GetSymbols.RampSavedColors(myColorRamp)
 
-        '        mylegend.Save(filename.Merge(myWkDirname, "flow.avl"))
-        '        theFtheme.SetLegend(mylegend)
-        '        theFtheme.UpdateLegend()
+            '        mylegend.Save(filename.Merge(myWkDirname, "flow.avl"))
+            '        theFtheme.SetLegend(mylegend)
+            '        theFtheme.UpdateLegend()
 
-        '        theFtab.SetEditable(False)
-        '        theFtheme.SetVisible(True)
-        '        av.ClearWorkingStatus()
-        '        av.clearstatus()
+            '        theFtab.SetEditable(False)
+            '        theFtheme.SetVisible(True)
+            '        av.ClearWorkingStatus()
+            '        av.clearstatus()
 
-        '        oldout = theProject.finddoc("riverstats.txt")
-        '        If (oldout <> nil) Then
-        '            theproject.removedoc(oldout)
-        '        End If
+            '        oldout = theProject.finddoc("riverstats.txt")
+            '        If (oldout <> nil) Then
+            '            theproject.removedoc(oldout)
+            '        End If
 
-        '        theFtab.Export("riverstats.txt".asFileName, DText, False)
+            '        theFtab.Export("riverstats.txt".asFileName, DText, False)
 
-        '        bankfullVtab = Vtab.make("riverstats.txt".asFileName, False, False)
-        '        bankfulltable = Table.MakeWithGUI(bankfullVtab, GUIName)
-        '        bankfulltable.SetName("riverstats.txt".asFileName.getbasename.asstring)
-        '        bankfulltable.GetWin.Open()
+            '        bankfullVtab = Vtab.make("riverstats.txt".asFileName, False, False)
+            '        bankfulltable = Table.MakeWithGUI(bankfullVtab, GUIName)
+            '        bankfulltable.SetName("riverstats.txt".asFileName.getbasename.asstring)
+            '        bankfulltable.GetWin.Open()
 
-        '        MsgBox.Info("Bankfull and Flow Characteristics Computed. Outputs written to: " + nl + nl + "      " + mywkDirname + "riverstats.txt", "Geospatial Stream Flow Model")
+            Logger.Msg("Bankfull and Flow Characteristics Computed. Outputs written to: " & vbCrLf & vbCrLf & "      " & lOutputPath & "riverstats.txt", "Geospatial Stream Flow Model")
 
     End Sub
 
@@ -4681,6 +4477,18 @@ Public Module modGeoSFM
 
         Logger.Dbg("Found " & aStations.Count & " Stations")
     End Sub
+
+    Private Function AddField(ByVal aTheme As Integer, ByVal aFieldName As String) As Integer
+        Dim lfld As Integer = -1
+        If GisUtil.IsField(aTheme, aFieldName) Then
+            lfld = GisUtil.FieldIndex(aTheme, aFieldName)
+        Else
+            GisUtil.AddField(aTheme, aFieldName, 2, 10)
+            lfld = GisUtil.FieldIndex(aTheme, aFieldName)
+        End If
+        Return lfld
+    End Function
+
 
     Friend Class StationDetails
         Public Name As String
