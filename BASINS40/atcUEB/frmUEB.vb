@@ -9,11 +9,10 @@ Imports System.Windows.Forms
 Public Class frmUEB
     Inherits System.Windows.Forms.Form
 
-    Friend Const pNumDataParms = 22
-    Friend Const pNumSiteParms = 8
+    Friend pParmData As clsUEBParameterFile
+    Friend pSiteData As clsUEBSiteFile
+
     Friend pWeatherFileName As String
-    Friend pParameterFileName As String
-    Friend pSiteFileName As String
     Friend pBCParameterFileName As String
     Friend pOutputFileName As String
     Friend pRadOpt As Integer
@@ -22,8 +21,6 @@ Public Class frmUEB
     Friend pInitialEnergy As Double
     Friend pInitialH2OEquiv As Double
     Friend pInitialSnowAge As Double
-    Friend pParameterDataArray(pNumDataParms - 1) As Double
-    Friend pSiteDataArray(pNumSiteParms - 1) As Double
     Friend pBCDataArray(37) As Double
 
 #Region " Windows Form Designer generated code "
@@ -1951,34 +1948,13 @@ Public Class frmUEB
             .FixedRows = 1
             .FixedColumns = 1
             .Rows = 22
-            For i As Integer = 0 To .Rows - 1
-                .CellColor(i, 0) = SystemColors.ControlDark
-                .CellEditable(i, 1) = True
-            Next
             .CellValue(0, 0) = "Model Parameter"
             .CellValue(0, 1) = "Value"
-            .CellValue(1, 0) = "Temp above which all precip is rain, deg C"
-            .CellValue(2, 0) = "Temp below which all precip is snow, deg C"
-            .CellValue(3, 0) = "Emissivity of snow"
-            .CellValue(4, 0) = "Ground heat capacity, kJ/kg/deg C"
-            .CellValue(5, 0) = "Measurement height for Temp & Humidity, m"
-            .CellValue(6, 0) = "Surface aerodynamic roughness, m"
-            .CellValue(7, 0) = "Snow density, kg/m^3"
-            .CellValue(8, 0) = "Soil density, kg/m^3"
-            .CellValue(9, 0) = "Liquid holding capacity of snow"
-            .CellValue(10, 0) = "Snow saturated hydraulic conductivity, m/hr"
-            .CellValue(11, 0) = "Thermally active depth of soil, m"
-            .CellValue(12, 0) = "Bare ground albedo"
-            .CellValue(13, 0) = "Vsual new snow albedo"
-            .CellValue(14, 0) = "NIR new snow albedo"
-            .CellValue(15, 0) = "Thermal conductivity of fresh (dry) snow, kJ/m/k/hr"
-            .CellValue(16, 0) = "Thermal conductivity of soil, kJ/m/k/hr"
-            .CellValue(17, 0) = "Low frequency fluctuation in deep snow/soil layer, radian/hr"
-            .CellValue(18, 0) = "Amplitude correction coefficient of heat conduction"
-            .CellValue(19, 0) = "Stability correction control parameter"
-            .CellValue(20, 0) = "Reference temp of soil layer in ground heat calc input, deg C"
-            .CellValue(21, 0) = "Threshold depth of new snow, m"
-            .CellValue(22, 0) = "Fraction of surface melt that runs off"
+            For i As Integer = 1 To .Rows
+                .CellColor(i, 0) = SystemColors.ControlDark
+                .CellEditable(i, 1) = True
+                .CellValue(i, 0) = clsUEBParameterFile.ParameterName(i - 1)
+            Next
         End With
         AtcGridModelParms.ColumnWidth(0) = 400
 
@@ -2087,11 +2063,11 @@ Public Class frmUEB
         If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
             Dim lFilename As String = cdlg.FileName
             txtMasterFile.Text = lFilename
-            OpenMasterFile(lFilename, pWeatherFileName, pOutputFileName, pParameterFileName, pSiteFileName, pBCParameterFileName, pRadOpt)
+            OpenMasterFile(lFilename, pWeatherFileName, pOutputFileName, pParmData.FileName, pSiteData.FileName, pBCParameterFileName, pRadOpt)
             txtWeatherFile.Text = pWeatherFileName
             txtOutputFile.Text = pOutputFileName
-            txtParameterFile.Text = pParameterFileName
-            txtSiteFile.Text = pSiteFileName
+            txtParameterFile.Text = pParmData.FileName
+            txtSiteFile.Text = pSiteData.FileName
             txtBCParameterFile.Text = pBCParameterFileName
             Select Case pRadOpt
                 Case 0
@@ -2116,24 +2092,27 @@ Public Class frmUEB
             AtcTextIniWaterEquiv.Text = pInitialH2OEquiv.ToString
             AtcTextSnowAge.Text = pInitialSnowAge
         End If
+        pWeatherFileName = txtWeatherFile.Text
     End Sub
 
     Private Sub txtParameterFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtParameterFile.TextChanged
         If FileExists(txtParameterFile.Text) Then
-            ReadDataFile(txtParameterFile.Text, pParameterDataArray)
-            For i As Integer = 1 To pNumDataParms
-                AtcGridModelParms.Source.CellValue(i, 1) = pParameterDataArray(i - 1)
+            ReadDataFile(txtParameterFile.Text, pParmData.ParameterValue)
+            For i As Integer = 1 To clsUEBParameterFile.NumParameters
+                AtcGridModelParms.Source.CellValue(i, 1) = pParmData.ParameterValue(i - 1)
             Next
         End If
+        pParmData.FileName = txtParameterFile.Text
     End Sub
 
     Private Sub txtSiteFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtSiteFile.TextChanged
         If FileExists(txtSiteFile.Text) Then
-            ReadDataFile(txtSiteFile.Text, pSiteDataArray)
-            For i As Integer = 1 To pNumSiteParms
-                AtcGridSiteVars.Source.CellValue(i, 1) = pSiteDataArray(i - 1)
+            ReadDataFile(txtSiteFile.Text, pSiteData.VariableValue)
+            For i As Integer = 1 To clsUEBSiteFile.NumVariables
+                AtcGridSiteVars.Source.CellValue(i, 1) = pSiteData.VariableValue(i - 1)
             Next
         End If
+        pSiteData.FileName = txtSiteFile.Text
     End Sub
 
     Private Sub txtBCParameterFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtBCParameterFile.TextChanged
@@ -2147,5 +2126,67 @@ Public Class frmUEB
                 AtcGridBCMonthly.Source.CellValue(lMonth, 1) = pBCDataArray(3 * i)
             Next
         End If
+        pBCParameterFileName = txtBCParameterFile.Text
     End Sub
+
+    Private Sub cmdSimulate_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdSimulate.Click
+
+        UpdateInputFiles()
+
+    End Sub
+
+    Private Sub UpdateInputFiles()
+        Dim lMsg As String
+
+        lMsg = ""
+        If pParmData.FileName.Length > 0 Then 'check 
+            For i As Integer = 1 To clsUEBParameterFile.NumParameters
+                If IsNumeric(AtcGridModelParms.Source.CellValue(i, 1)) Then
+                    pParmData.ParameterValue(i - 1) = AtcGridModelParms.Source.CellValue(i, 1)
+                Else 'problem with a parameter value
+                    lMsg = "Problem processing value on Model Parameters tab in row " & i
+                    Exit For
+                End If
+            Next
+            If lMsg.Length = 0 Then
+                pParmData.WriteParameterFile()
+            End If
+        End If
+
+        lMsg = ""
+        If pSiteData.FileName.Length > 0 Then
+            For i As Integer = 1 To clsUEBSiteFile.NumVariables
+                If IsNumeric(AtcGridSiteVars.Source.CellValue(i, 1)) Then
+                    pSiteData.VariableValue(i - 1) = AtcGridSiteVars.Source.CellValue(i, 1)
+                Else 'problem with a site value
+                    lMsg = "Problem processing value on Site Variables tab in row " & i
+                    Exit For
+                End If
+            Next
+            If lMsg.Length = 0 Then
+                pSiteData.WriteSiteFile()
+            End If
+        End If
+
+        lMsg = ""
+        If pBCParameterFileName.Length > 0 Then
+            pBCDataArray(0) = AtcTextAParm.ValueDouble
+            pBCDataArray(1) = AtcTextCParm.ValueDouble
+            Dim lMonth As Integer
+            For i As Integer = 1 To 12
+                If IsNumeric(AtcGridBCMonthly.Source.CellValue(i, 1)) Then
+                    lMonth = pBCDataArray(3 * i - 1)
+                    pBCDataArray(3 * i) = AtcGridBCMonthly.Source.CellValue(lMonth, 1)
+                Else 'problem with a site value
+                    lMsg = "Problem processing value on Bristow-Campbell Parameters tab in row " & i
+                    Exit For
+                End If
+            Next
+            If lMsg.Length = 0 Then
+                WriteBCParmsFile(pBCParameterFileName, pBCDataArray)
+            End If
+        End If
+
+    End Sub
+
 End Class
