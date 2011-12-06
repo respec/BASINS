@@ -57,6 +57,7 @@ Module modUEBUtil
         Dim lStr As String = WholeFileString(aFilename)
         lStr = ReplaceRepeats(lStr, " ") 'remove extra blanks
         Dim lStrArray() As String = lStr.Split(lChrSep, StringSplitOptions.None)
+        ReDim aDataArray(lStrArray.Length - 1)
         Dim j As Integer = 0
         For i As Integer = 0 To UBound(lStrArray)
             If IsNumeric(lStrArray(i)) Then
