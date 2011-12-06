@@ -21,6 +21,12 @@ Public Class frmUEB
     Friend pInitialEnergy As Double
     Friend pInitialH2OEquiv As Double
     Friend pInitialSnowAge As Double
+    Friend WithEvents txtNetRadStation As System.Windows.Forms.TextBox
+    Friend WithEvents txtShortRadStation As System.Windows.Forms.TextBox
+    Friend WithEvents txtRelHStation As System.Windows.Forms.TextBox
+    Friend WithEvents txtWindStation As System.Windows.Forms.TextBox
+    Friend WithEvents txtPrecipStation As System.Windows.Forms.TextBox
+    Friend WithEvents txtAtempStation As System.Windows.Forms.TextBox
     Friend pBCDataArray(37) As Double
 
 #Region " Windows Form Designer generated code "
@@ -123,9 +129,7 @@ Public Class frmUEB
     Friend WithEvents AtcTextEMon As atcControls.atcText
     Friend WithEvents AtcTextSMonth As atcControls.atcText
     Friend WithEvents AtcTextEYear As atcControls.atcText
-    Friend WithEvents cboAtempStation As System.Windows.Forms.ComboBox
     Friend WithEvents lblATempStation As System.Windows.Forms.Label
-    Friend WithEvents cboWindStation As System.Windows.Forms.ComboBox
     Friend WithEvents lblWindStation As System.Windows.Forms.Label
     Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
     Friend WithEvents cmdSimulate As System.Windows.Forms.Button
@@ -138,11 +142,8 @@ Public Class frmUEB
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents AtcTextEHour As atcControls.atcText
     Friend WithEvents AtcTextSHour As atcControls.atcText
-    Friend WithEvents cboShortRadStation As System.Windows.Forms.ComboBox
     Friend WithEvents lblShortRadStation As System.Windows.Forms.Label
-    Friend WithEvents cboRelHStation As System.Windows.Forms.ComboBox
     Friend WithEvents lblRelHStation As System.Windows.Forms.Label
-    Friend WithEvents cboPrecipStation As System.Windows.Forms.ComboBox
     Friend WithEvents lblPrecipStation As System.Windows.Forms.Label
     Friend WithEvents TabPage2 As System.Windows.Forms.TabPage
     Friend WithEvents Label62 As System.Windows.Forms.Label
@@ -154,7 +155,6 @@ Public Class frmUEB
     Friend WithEvents AtcTextIniEnergyContent As atcControls.atcText
     Friend WithEvents AtcTextIniWaterEquiv As atcControls.atcText
     Friend WithEvents lblNetRadStation As System.Windows.Forms.Label
-    Friend WithEvents cboNetRadStation As System.Windows.Forms.ComboBox
     Friend WithEvents AtcGridModelParms As atcControls.atcGrid
     Friend WithEvents AtcGridSiteVars As atcControls.atcGrid
     Friend WithEvents AtcTextCParm As atcControls.atcText
@@ -200,21 +200,15 @@ Public Class frmUEB
         Me.TabPage3 = New System.Windows.Forms.TabPage()
         Me.txtWeatherFile = New System.Windows.Forms.TextBox()
         Me.Label3 = New System.Windows.Forms.Label()
-        Me.cboNetRadStation = New System.Windows.Forms.ComboBox()
         Me.lblNetRadStation = New System.Windows.Forms.Label()
-        Me.cboShortRadStation = New System.Windows.Forms.ComboBox()
         Me.lblShortRadStation = New System.Windows.Forms.Label()
-        Me.cboRelHStation = New System.Windows.Forms.ComboBox()
         Me.lblRelHStation = New System.Windows.Forms.Label()
-        Me.cboPrecipStation = New System.Windows.Forms.ComboBox()
         Me.lblPrecipStation = New System.Windows.Forms.Label()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
         Me.rdoMeasuredNet = New System.Windows.Forms.RadioButton()
         Me.rdoRadMeasuredInput = New System.Windows.Forms.RadioButton()
         Me.rdoRadEstimate = New System.Windows.Forms.RadioButton()
-        Me.cboAtempStation = New System.Windows.Forms.ComboBox()
         Me.lblATempStation = New System.Windows.Forms.Label()
-        Me.cboWindStation = New System.Windows.Forms.ComboBox()
         Me.lblWindStation = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.lblTimeStep = New System.Windows.Forms.Label()
@@ -304,6 +298,12 @@ Public Class frmUEB
         Me.Label45 = New System.Windows.Forms.Label()
         Me.ComboBox39 = New System.Windows.Forms.ComboBox()
         Me.cmdSimulate = New System.Windows.Forms.Button()
+        Me.txtAtempStation = New System.Windows.Forms.TextBox()
+        Me.txtPrecipStation = New System.Windows.Forms.TextBox()
+        Me.txtWindStation = New System.Windows.Forms.TextBox()
+        Me.txtRelHStation = New System.Windows.Forms.TextBox()
+        Me.txtShortRadStation = New System.Windows.Forms.TextBox()
+        Me.txtNetRadStation = New System.Windows.Forms.TextBox()
         Me.TabControl1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
@@ -555,20 +555,20 @@ Public Class frmUEB
         '
         'TabPage3
         '
+        Me.TabPage3.Controls.Add(Me.txtNetRadStation)
+        Me.TabPage3.Controls.Add(Me.txtShortRadStation)
+        Me.TabPage3.Controls.Add(Me.txtRelHStation)
+        Me.TabPage3.Controls.Add(Me.txtWindStation)
+        Me.TabPage3.Controls.Add(Me.txtPrecipStation)
+        Me.TabPage3.Controls.Add(Me.txtAtempStation)
         Me.TabPage3.Controls.Add(Me.txtWeatherFile)
         Me.TabPage3.Controls.Add(Me.Label3)
-        Me.TabPage3.Controls.Add(Me.cboNetRadStation)
         Me.TabPage3.Controls.Add(Me.lblNetRadStation)
-        Me.TabPage3.Controls.Add(Me.cboShortRadStation)
         Me.TabPage3.Controls.Add(Me.lblShortRadStation)
-        Me.TabPage3.Controls.Add(Me.cboRelHStation)
         Me.TabPage3.Controls.Add(Me.lblRelHStation)
-        Me.TabPage3.Controls.Add(Me.cboPrecipStation)
         Me.TabPage3.Controls.Add(Me.lblPrecipStation)
         Me.TabPage3.Controls.Add(Me.GroupBox3)
-        Me.TabPage3.Controls.Add(Me.cboAtempStation)
         Me.TabPage3.Controls.Add(Me.lblATempStation)
-        Me.TabPage3.Controls.Add(Me.cboWindStation)
         Me.TabPage3.Controls.Add(Me.lblWindStation)
         Me.TabPage3.Controls.Add(Me.GroupBox2)
         Me.TabPage3.Location = New System.Drawing.Point(4, 25)
@@ -594,17 +594,6 @@ Public Class frmUEB
         Me.Label3.TabIndex = 43
         Me.Label3.Text = "Weather File:"
         '
-        'cboNetRadStation
-        '
-        Me.cboNetRadStation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboNetRadStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboNetRadStation.FormattingEnabled = True
-        Me.cboNetRadStation.Location = New System.Drawing.Point(216, 395)
-        Me.cboNetRadStation.Name = "cboNetRadStation"
-        Me.cboNetRadStation.Size = New System.Drawing.Size(286, 21)
-        Me.cboNetRadStation.TabIndex = 42
-        '
         'lblNetRadStation
         '
         Me.lblNetRadStation.AutoSize = True
@@ -614,36 +603,14 @@ Public Class frmUEB
         Me.lblNetRadStation.TabIndex = 41
         Me.lblNetRadStation.Text = "Net Radiation Station:"
         '
-        'cboShortRadStation
-        '
-        Me.cboShortRadStation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboShortRadStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboShortRadStation.FormattingEnabled = True
-        Me.cboShortRadStation.Location = New System.Drawing.Point(216, 367)
-        Me.cboShortRadStation.Name = "cboShortRadStation"
-        Me.cboShortRadStation.Size = New System.Drawing.Size(286, 21)
-        Me.cboShortRadStation.TabIndex = 40
-        '
         'lblShortRadStation
         '
         Me.lblShortRadStation.AutoSize = True
         Me.lblShortRadStation.Location = New System.Drawing.Point(19, 370)
         Me.lblShortRadStation.Name = "lblShortRadStation"
-        Me.lblShortRadStation.Size = New System.Drawing.Size(191, 13)
+        Me.lblShortRadStation.Size = New System.Drawing.Size(145, 13)
         Me.lblShortRadStation.TabIndex = 39
-        Me.lblShortRadStation.Text = "Incoming Shortwave Radiation Station:"
-        '
-        'cboRelHStation
-        '
-        Me.cboRelHStation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboRelHStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboRelHStation.FormattingEnabled = True
-        Me.cboRelHStation.Location = New System.Drawing.Point(216, 340)
-        Me.cboRelHStation.Name = "cboRelHStation"
-        Me.cboRelHStation.Size = New System.Drawing.Size(286, 21)
-        Me.cboRelHStation.TabIndex = 38
+        Me.lblShortRadStation.Text = "Shortwave Radiation Station:"
         '
         'lblRelHStation
         '
@@ -653,17 +620,6 @@ Public Class frmUEB
         Me.lblRelHStation.Size = New System.Drawing.Size(128, 13)
         Me.lblRelHStation.TabIndex = 37
         Me.lblRelHStation.Text = "Relative Humidity Station:"
-        '
-        'cboPrecipStation
-        '
-        Me.cboPrecipStation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboPrecipStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboPrecipStation.FormattingEnabled = True
-        Me.cboPrecipStation.Location = New System.Drawing.Point(216, 286)
-        Me.cboPrecipStation.Name = "cboPrecipStation"
-        Me.cboPrecipStation.Size = New System.Drawing.Size(286, 21)
-        Me.cboPrecipStation.TabIndex = 36
         '
         'lblPrecipStation
         '
@@ -720,17 +676,6 @@ Public Class frmUEB
         Me.rdoRadEstimate.Text = "Estimate from Daily Temperature Range"
         Me.rdoRadEstimate.UseVisualStyleBackColor = True
         '
-        'cboAtempStation
-        '
-        Me.cboAtempStation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboAtempStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboAtempStation.FormattingEnabled = True
-        Me.cboAtempStation.Location = New System.Drawing.Point(216, 259)
-        Me.cboAtempStation.Name = "cboAtempStation"
-        Me.cboAtempStation.Size = New System.Drawing.Size(286, 21)
-        Me.cboAtempStation.TabIndex = 33
-        '
         'lblATempStation
         '
         Me.lblATempStation.AutoSize = True
@@ -739,17 +684,6 @@ Public Class frmUEB
         Me.lblATempStation.Size = New System.Drawing.Size(88, 13)
         Me.lblATempStation.TabIndex = 32
         Me.lblATempStation.Text = "Air Temp Station:"
-        '
-        'cboWindStation
-        '
-        Me.cboWindStation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboWindStation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboWindStation.FormattingEnabled = True
-        Me.cboWindStation.Location = New System.Drawing.Point(216, 313)
-        Me.cboWindStation.Name = "cboWindStation"
-        Me.cboWindStation.Size = New System.Drawing.Size(286, 21)
-        Me.cboWindStation.TabIndex = 31
         '
         'lblWindStation
         '
@@ -1868,6 +1802,48 @@ Public Class frmUEB
         Me.cmdSimulate.TabIndex = 10
         Me.cmdSimulate.Text = "Simulate"
         '
+        'txtAtempStation
+        '
+        Me.txtAtempStation.Location = New System.Drawing.Point(163, 263)
+        Me.txtAtempStation.Name = "txtAtempStation"
+        Me.txtAtempStation.Size = New System.Drawing.Size(338, 20)
+        Me.txtAtempStation.TabIndex = 45
+        '
+        'txtPrecipStation
+        '
+        Me.txtPrecipStation.Location = New System.Drawing.Point(163, 289)
+        Me.txtPrecipStation.Name = "txtPrecipStation"
+        Me.txtPrecipStation.Size = New System.Drawing.Size(338, 20)
+        Me.txtPrecipStation.TabIndex = 46
+        '
+        'txtWindStation
+        '
+        Me.txtWindStation.Location = New System.Drawing.Point(163, 313)
+        Me.txtWindStation.Name = "txtWindStation"
+        Me.txtWindStation.Size = New System.Drawing.Size(338, 20)
+        Me.txtWindStation.TabIndex = 47
+        '
+        'txtRelHStation
+        '
+        Me.txtRelHStation.Location = New System.Drawing.Point(163, 341)
+        Me.txtRelHStation.Name = "txtRelHStation"
+        Me.txtRelHStation.Size = New System.Drawing.Size(338, 20)
+        Me.txtRelHStation.TabIndex = 48
+        '
+        'txtShortRadStation
+        '
+        Me.txtShortRadStation.Location = New System.Drawing.Point(163, 370)
+        Me.txtShortRadStation.Name = "txtShortRadStation"
+        Me.txtShortRadStation.Size = New System.Drawing.Size(338, 20)
+        Me.txtShortRadStation.TabIndex = 49
+        '
+        'txtNetRadStation
+        '
+        Me.txtNetRadStation.Location = New System.Drawing.Point(163, 395)
+        Me.txtNetRadStation.Name = "txtNetRadStation"
+        Me.txtNetRadStation.Size = New System.Drawing.Size(338, 20)
+        Me.txtNetRadStation.TabIndex = 50
+        '
         'frmUEB
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -2017,6 +1993,9 @@ Public Class frmUEB
             .CellValue(12, 0) = "December"
         End With
         AtcGridBCMonthly.ColumnWidth(0) = 300
+
+        pParmData = New clsUEBParameterFile
+        pSiteData = New clsUEBSiteFile
     End Sub
 
     Private Sub lblStatus_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lblStatus.TextChanged
@@ -2025,24 +2004,24 @@ Public Class frmUEB
 
     Private Sub rdoMeasuredNet_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoMeasuredNet.CheckedChanged
         If rdoMeasuredNet.Checked Then
-            cboNetRadStation.Enabled = True
+            txtNetRadStation.Enabled = True
         Else
-            cboNetRadStation.Enabled = False
+            txtNetRadStation.Enabled = False
         End If
     End Sub
 
     Private Sub rdoRadMeasuredInput_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoRadMeasuredInput.CheckedChanged
         If rdoRadMeasuredInput.Checked Then
-            cboShortRadStation.Enabled = True
+            txtShortRadStation.Enabled = True
         Else
-            cboShortRadStation.Enabled = False
+            txtShortRadStation.Enabled = False
         End If
     End Sub
 
     Private Sub rdoRadEstimate_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoRadEstimate.CheckedChanged
         If rdoRadEstimate.Checked Then 'no need for Input Shortwave or Net Radition Timeseries
-            cboNetRadStation.Enabled = False
-            cboShortRadStation.Enabled = False
+            txtNetRadStation.Enabled = False
+            txtShortRadStation.Enabled = False
         End If
     End Sub
 
