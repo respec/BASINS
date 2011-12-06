@@ -11,14 +11,14 @@ Module modUEBUtil
                               ByRef aWeatherFileName As String, ByRef aOutputFileName As String, _
                               ByRef aParameterFileName As String, ByRef aSiteFileName As String, _
                               ByRef aBCParameterFileName As String, ByRef aRadOpt As Integer)
-
+        Dim lPath As String = PathNameOnly(aFilename) & "\"
         Dim lStr As String = WholeFileString(aFilename)
 
-        aWeatherFileName = StrRetRem(lStr) 'should be weather input file
-        aOutputFileName = StrRetRem(lStr) 'should be output file
-        aParameterFileName = StrRetRem(lStr) 'should be parameter file
-        aSiteFileName = StrRetRem(lStr) 'should be site file
-        aBCParameterFileName = StrRetRem(lStr) 'should be B-C parameter file
+        aWeatherFileName = lPath & StrRetRem(lStr) 'should be weather input file
+        aOutputFileName = lPath & StrRetRem(lStr) 'should be output file
+        aParameterFileName = lPath & StrRetRem(lStr) 'should be parameter file
+        aSiteFileName = lPath & StrRetRem(lStr) 'should be site file
+        aBCParameterFileName = lPath & StrRetRem(lStr) 'should be B-C parameter file
         aRadOpt = StrRetRem(lStr) 'should be input radiation option
     End Sub
 
@@ -87,50 +87,6 @@ Module modUEBUtil
         End If
     End Function
 
-    Public Function WriteParameterFile(ByVal aFileName As String, ByVal aParameterArray() As Double) As Boolean
-
-        Dim lStr As String = ""
-
-        If aFileName.Length > 0 Then
-            Try
-                For i As Integer = 0 To UBound(aParameterArray)
-                    lStr &= aParameterArray(i) & " "
-                    If (i + 1 Mod 8) = 0 Then 'make a new line
-                        lStr &= vbCrLf
-                    End If
-                Next
-                SaveFileString(aFileName, lStr)
-                Return True
-            Catch ex As Exception
-                Return False
-            End Try
-        Else
-            Return False
-        End If
-    End Function
-
-    Public Function WriteSiteFile(ByVal aFileName As String, ByVal aSiteArray() As Double) As Boolean
-
-        Dim lStr As String = ""
-
-        If aFileName.Length > 0 Then
-            Try
-                For i As Integer = 0 To UBound(aSiteArray)
-                    lStr &= aSiteArray(i) & " "
-                    If (i + 1 Mod 5) = 0 Then 'make a new line
-                        lStr &= vbCrLf
-                    End If
-                Next
-                SaveFileString(aFileName, lStr)
-                Return True
-            Catch ex As Exception
-                Return False
-            End Try
-        Else
-            Return False
-        End If
-    End Function
-
     Public Function WriteBCParmsFile(ByVal aFileName As String, ByVal aBCParmsArray() As Double) As Boolean
 
         Dim lStr As String = ""
@@ -140,7 +96,7 @@ Module modUEBUtil
                 lStr = aBCParmsArray(0) & " " & aBCParmsArray(1) & "   A, C" & vbCrLf
                 For i As Integer = 2 To UBound(aBCParmsArray)
                     lStr &= aBCParmsArray(i) & "   "
-                    If (i + 2 Mod 3) = 0 Then 'make a new line
+                    If ((i + 2) Mod 3) = 0 Then 'make a new line
                         lStr &= vbCrLf
                     End If
                 Next
