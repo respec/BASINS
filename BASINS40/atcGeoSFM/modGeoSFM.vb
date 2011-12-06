@@ -3273,14 +3273,10 @@ Public Module modGeoSFM
         Dim chkFN As String = lOutputPath & "times.txt"
         Dim paramFN As String = lOutputPath & "statsparam.txt"
 
-        'runofffile = LineFile.Make((runoffFN).asfilename,#file_perm_read)
         If Not FileExists(runoffFN) Then
             Logger.Msg("Could not open time series file," & vbCrLf & runoffFN, "GeoSFM Utilities")
             Exit Sub
         End If
-
-        'monthlyfile = LineFile.Make((monthlyFN).asfilename,#file_perm_write)
-        'annualfile = LineFile.Make((annualFN).asfilename,#file_perm_write)
 
         Dim logFN As String = lOutputPath & "logfilestats.txt"
 
@@ -3435,7 +3431,7 @@ Public Module modGeoSFM
             Exit Sub
         End If
 
-        'aggregateflows()
+        'aggregateflows()   now appears to be done using geosfmstats.exe 
 
         Dim geosfmstatsFN As String = ""
         If FileExists(lOutputPath & "geosfmstats.exe") Then
@@ -3517,35 +3513,23 @@ Public Module modGeoSFM
             resultfilename = annualFN
         End If
 
-        '        subname = (resultfilename.AsString.Substitute(".txt", ".dbf")).AsFileName
-        '        newVtab = resultfile.export(subname, DBase, False)
-        '        newTable = Table.Make(newVtab)
+        'select parameter to update
+        Dim chksum As Integer = 1
+        Dim chkcnt As Integer = 1
+        Dim chkavg As Integer = 1
+        Dim chkmax As Integer = 1
+        Dim chkmin As Integer = 1
+        Dim chkrng As Integer = 1
+        Dim chkvar As Integer = 1
+        Dim chkstd As Integer = 1
+        Dim chkbkf As Integer = 1
+        Dim chkmed As Integer = 1
+        Dim chkq25 As Integer = 1
+        Dim chkq33 As Integer = 1
+        Dim chkq66 As Integer = 1
+        Dim chkq75 As Integer = 1
 
-        '        'select parameter to update
-        '        chksum = 1
-        '        chkcnt = 1
-        '        chkavg = 1
-        '        chkmax = 1
-        '        chkmin = 1
-        '        chkrng = 1
-        '        chkvar = 1
-        '        chkstd = 1
-        '        chkbkf = 1
-        '        chkmed = 1
-        '        chkq25 = 1
-        '        chkq33 = 1
-        '        chkq66 = 1
-        '        chkq75 = 1
-
-        '        updatethr = True
-
-        '        theftheme = theTheme
-        '        theftab = theTheme.GetFtab
-        '        shpfld = theFTab.FindField("Shape")
-        '        theFTab.CreateIndex(shpfld)
-
-        '        theFtab.SetEditable(True)
-        '        addlist = List.Make
+        Dim updatethr As Boolean = True
 
         Dim theTheme As Integer = -1
         Dim sumfld As Integer = -1
@@ -3588,8 +3572,8 @@ Public Module modGeoSFM
         Dim polyidfld As Integer = GisUtil.FieldIndex(theTheme, "Id")
         Dim pnumrecs As Integer = GisUtil.NumFeatures(theTheme)
         Dim pidlist As New Collection
-        Dim pidval As Integer = ""
-        For prec As Integer = 1 To pnumrecs
+        Dim pidval As String = ""
+        For prec As Integer = 0 To pnumrecs - 1
             pidval = GisUtil.FieldValue(theTheme, prec, pidfield)
             pidlist.Add(pidval)
         Next
@@ -3628,15 +3612,17 @@ Public Module modGeoSFM
         Loop
 
         'read results into local array
-        Dim resultvals(numrecs, numflds) As String
+        Dim resultvals(numrecs, numflds) As Single
         Dim irec As Integer = 0
         For Each lrec In resultrecs
             irec += 1
-            Dim ifield As Integer = 0
+            Dim ifield As Integer = -1
             Do While lrec.Length > 0
                 lstr1 = StrRetRem(lrec)
                 ifield += 1
-                resultvals(irec, ifield) = lstr1
+                If IsNumeric(lstr1) Then
+                    resultvals(irec, ifield) = lstr1
+                End If
             Loop
         Next
 
@@ -3655,18 +3641,20 @@ Public Module modGeoSFM
         Dim theQuart66 As Single = 0
 
         Dim tempcount As Integer = 0
-        For mynum As Integer = 1 To numflds
+        Dim lMaxMedian As Single = 0
+        For mynum As Integer = 1 To numflds - 1
             theSum = 0
             theCount = 0
             theMinimum = -9999999
             theMaximum = 9999999
 
+            Dim lSubbasinId As Integer = resultvals(1, mynum)
             Dim reclist As New atcCollection
             Dim theValue As String
-            For rec As Integer = 1 To numrecs
-                thevalue = resultvals(rec, mynum)
-                If IsNumeric(thevalue) Then
-                    reclist.Add(thevalue)
+            For rec As Integer = 2 To numrecs
+                theValue = resultvals(rec, mynum)
+                If IsNumeric(theValue) Then
+                    reclist.Add(theValue)
                     theSum = theValue + theSum
                     theCount = theCount + 1
                 End If
@@ -3678,177 +3666,194 @@ Public Module modGeoSFM
                 theMean = -999
             End If
 
-            reclist.Sort()
+            reclist.SortByValue()
             Dim recCount As Integer = reclist.Count
 
-            '                theMinimum = reclist.get(0)
-            '                theMaximum = reclist.get(recCount - 1)
-            '                theRange = (theMaximum - theMinimum)
+            theMinimum = reclist(0)
+            theMaximum = reclist(recCount - 1)
+            theRange = (theMaximum - theMinimum)
 
-            '                If ((chkq25 = 1) Or (chkq33 = 1) Or (chkq66 = 1) Or (chkq75 = 1) Or (chkmed = 1) Or (chkbkf = 1)) Then
+            If ((chkq25 = 1) Or (chkq33 = 1) Or (chkq66 = 1) Or (chkq75 = 1) Or (chkmed = 1) Or (chkbkf = 1)) Then
 
-            '                    If (chkmed = 1) Then
-            '                        If (recCount < 9) Then
-            '                            MsgBox.info("Too few records for flow statistics computation", "Less than 9 records")
-            '                            Exit Sub
-            '                        ElseIf (((recCount) Mod (2)) = 1) Then
-            '                            theMedian = reclist.get((recCount - 1) / 2)
-            '                        ElseIf (((recCount) Mod (2)) = 0) Then
-            '                            theMedian = (((reclist.get((recCount - 2) / 2)) + (reclist.get((recCount) / 2))) / 2)
-            '                        End If
-            '                    End If
+                If (chkmed = 1) Then
+                    If (recCount < 9) Then
+                        Logger.Msg("Too few records for flow statistics computation", "Less than 9 records")
+                        Exit Sub
+                    ElseIf (((recCount) Mod (2)) = 1) Then
+                        theMedian = reclist((recCount - 1) / 2)
+                    ElseIf (((recCount) Mod (2)) = 0) Then
+                        theMedian = (CSng((reclist((recCount - 2) / 2)) + CSng(reclist((recCount - 1) / 2))) / 2)
+                    End If
+                End If
 
-            '                    If ((chkq25 = 1) Or (chkq75 = 1)) Then
-            '                        If (recCount < 9) Then
-            '                            MsgBox.info("Too few records for flow statistics computation", "Less than 9 records")
-            '                            Exit Sub
-            '                        ElseIf (((recCount) Mod (2)) = 1) Then
-            '                            If (((recCount) Mod (4)) = 1) Then
-            '                                theQuart25 = reclist.get((recCount - 1) / 4)
-            '                                theQuart75 = reclist.get((recCount - 1) * 3 / 4)
-            '                            ElseIf (((recCount) Mod (4)) = 3) Then
-            '                                theQuart25 = (((reclist.get((recCount + 1) / 4)) + (reclist.get((recCount - 3) / 4))) / 2)
-            '                                theQuart75 = (((reclist.get((recCount + 1) * 3 / 4)) + (reclist.get(((recCount + 1) * 3 / 4) - 1))) / 2)
-            '                            End If
-            '                        ElseIf (((recCount) Mod (2)) = 0) Then
-            '                            If (((recCount) Mod (4)) = 2) Then
-            '                                theQuart25 = reclist.get((recCount - 2) / 4)
-            '                                theQuart75 = reclist.get((recCount - 2) * 3 / 4)
-            '                            ElseIf (((recCount) Mod (4)) = 0) Then
-            '                                theQuart25 = (((reclist.get((recCount - 4) / 4)) + (reclist.get((recCount) / 4))) / 2)
-            '                                theQuart75 = (((reclist.get((recCount * 3 / 4) - 1)) + (reclist.get((recCount) * 3 / 4))) / 2)
-            '                            End If
-            '                        End If
-            '                    End If
+                If ((chkq25 = 1) Or (chkq75 = 1)) Then
+                    If (recCount < 9) Then
+                        Logger.Msg("Too few records for flow statistics computation", "Less than 9 records")
+                        Exit Sub
+                    ElseIf (((recCount) Mod (2)) = 1) Then
+                        If (((recCount) Mod (4)) = 1) Then
+                            theQuart25 = reclist((recCount - 1) / 4)
+                            theQuart75 = reclist((recCount - 1) * 3 / 4)
+                        ElseIf (((recCount) Mod (4)) = 3) Then
+                            theQuart25 = (CSng((reclist((recCount + 1) / 4)) + CSng(reclist((recCount - 3) / 4))) / 2)
+                            theQuart75 = (CSng((reclist((recCount + 1) * 3 / 4)) + CSng(reclist(((recCount + 1) * 3 / 4) - 1))) / 2)
+                        End If
+                    ElseIf (((recCount) Mod (2)) = 0) Then
+                        If (((recCount) Mod (4)) = 2) Then
+                            theQuart25 = reclist((recCount - 2) / 4)
+                            theQuart75 = reclist((recCount - 2) * 3 / 4)
+                        ElseIf (((recCount) Mod (4)) = 0) Then
+                            theQuart25 = (CSng((reclist((recCount - 4) / 4)) + CSng(reclist((recCount) / 4))) / 2)
+                            theQuart75 = (CSng((reclist((recCount * 3 / 4) - 1)) + CSng(reclist((recCount) * 3 / 4))) / 2)
+                        End If
+                    End If
+                End If
 
-            '                    If ((chkq33 = 1) Or (chkq66 = 1)) Then
-            '                        If ((((recCount) Mod (3)) = 0) And (recCount >= 9)) Then
-            '                            theQuart33 = (((reclist.get((recCount) / 3)) * 2 / 3) + ((reclist.get((recCount - 3) / 3)) * 1 / 3))
-            '                            theQuart66 = (((reclist.get((recCount) * 2 / 3)) * 1 / 3) + ((reclist.get((recCount - 1.5) * 2 / 3)) * 2 / 3))
-            '                        ElseIf ((((recCount) Mod (3)) = 1) And (recCount >= 9)) Then
-            '                            theQuart33 = (reclist.get((recCount - 1) / 3))
-            '                            theQuart66 = (reclist.get((recCount - 4) * 2 / 3))
-            '                        ElseIf ((((recCount) Mod (3)) = 2) And (recCount >= 9)) Then
-            '                            theQuart33 = (((reclist.get((recCount - 2) / 3)) * 2 / 3) + ((reclist.get((recCount + 1) / 3)) * 1 / 3))
-            '                            theQuart66 = (((reclist.get((recCount - 2) * 2 / 3)) * 2 / 3) + ((reclist.get(((recCount - 0.5) * 2 / 3) + 1)) * 1 / 3))
-            '                        Else
-            '                            theQuart33 = 0
-            '                            theQuart66 = 0
-            '                        End If
-            '                    End If
-            '                End If
+                If ((chkq33 = 1) Or (chkq66 = 1)) Then
+                    If ((((recCount) Mod (3)) = 0) And (recCount >= 9)) Then
+                        theQuart33 = (CSng((reclist((recCount) / 3)) * 2 / 3) + CSng((reclist((recCount - 3) / 3)) * 1 / 3))
+                        theQuart66 = (CSng((reclist((recCount) * 2 / 3)) * 1 / 3) + CSng((reclist((recCount - 1.5) * 2 / 3)) * 2 / 3))
+                    ElseIf ((((recCount) Mod (3)) = 1) And (recCount >= 9)) Then
+                        theQuart33 = (reclist((recCount - 1) / 3))
+                        theQuart66 = (reclist((recCount - 4) * 2 / 3))
+                    ElseIf ((((recCount) Mod (3)) = 2) And (recCount >= 9)) Then
+                        theQuart33 = (CSng((reclist((recCount - 2) / 3)) * 2 / 3) + CSng((reclist((recCount + 1) / 3)) * 1 / 3))
+                        theQuart66 = (CSng((reclist((recCount - 2) * 2 / 3)) * 2 / 3) + CSng((reclist(((recCount - 0.5) * 2 / 3) + 1)) * 1 / 3))
+                    Else
+                        theQuart33 = 0
+                        theQuart66 = 0
+                    End If
+                End If
+            End If
 
-            '                If ((chkstd = 1) Or (chkvar = 1)) Then
-            '                    theSumSqDev = 0
-            '      for each rec in 0..(numrecs-1)
-            '                        theValue = resultfile.ReturnValueNumber(Fld, rec)
-            '                        If (Not (theValue.IsNull)) Then
-            '                            theSqDev = (theValue - theMean) * (theValue - theMean)
-            '                            theSumSqDev = theSqDev + theSumSqDev
-            '                        End If
-            '                    Next
+            If ((chkstd = 1) Or (chkvar = 1)) Then
+                Dim theSqDev As Double = 0.0
+                Dim theSumSqDev As Double = 0.0
+                For rec As Integer = 0 To (numrecs - 1)
+                    theValue = resultvals(rec, mynum)
+                    If (IsNumeric(theValue)) Then
+                        theSqDev = (theValue - theMean) * (theValue - theMean)
+                        theSumSqDev = theSqDev + theSumSqDev
+                    End If
+                Next
 
-            '                    If (theCount > 1) Then
-            '                        theVariance = theSumsqdev / (theCount - 1)
-            '                        theStdDev = theVariance.Sqrt
-            '                    Else
-            '                        theVariance = 0
-            '                        theStdDev = 0
-            '                    End If
-            '                End If
+                If (theCount > 1) Then
+                    theVariance = theSumSqDev / (theCount - 1)
+                    theStdDev = Math.Sqrt(theVariance)
+                Else
+                    theVariance = 0
+                    theStdDev = 0
+                End If
+            End If
 
-            '                rid = fld.AsString.AsNumber
+            If theMedian > lMaxMedian Then
+                lMaxMedian = theMedian
+            End If
 
-            '                For Each precs In theFtab
-            '                    cpid = theFtab.ReturnValue(pidfield, precs)
-            '                    If (cpid = rid) Then
-            '                        If (chksum = 1) Then
-            '                            theFtab.SetValue(sumfld, precs, theSum)
-            '                        End If
-            '                        If (chkcnt = 1) Then
-            '                            theFtab.SetValue(countfld, precs, theCount)
-            '                        End If
-            '                        If (chkavg = 1) Then
-            '                            theFtab.SetValue(meanfld, precs, themean)
-            '                        End If
-            '                        If (chkmin = 1) Then
-            '                            theFtab.SetValue(minfld, precs, theMinimum)
-            '                        End If
-            '                        If (chkmax = 1) Then
-            '                            theFtab.SetValue(maxfld, precs, theMaximum)
-            '                        End If
-            '                        If (chkrng = 1) Then
-            '                            theFtab.SetValue(rangefld, precs, theRange)
-            '                        End If
-            '                        If (chkstd = 1) Then
-            '                            theFtab.SetValue(stddevfld, precs, theStdDev)
-            '                        End If
-            '                        If (chkvar = 1) Then
-            '                            theFtab.SetValue(varfld, precs, theVariance)
-            '                        End If
-            '                        If (chkmed = 1) Then
-            '                            theFtab.SetValue(medianfld, precs, theMedian)
-            '                        End If
-            '                        If (chkq25 = 1) Then
-            '                            theFtab.SetValue(Quart25fld, precs, theQuart25)
-            '                        End If
-            '                        If (chkq33 = 1) Then
-            '                            theFtab.SetValue(Quart33fld, precs, theQuart33)
-            '                        End If
-            '                        If (chkq66 = 1) Then
-            '                            TheFtab.SetValue(Quart66fld, precs, theQuart66)
-            '                        End If
-            '                        If (chkq75 = 1) Then
-            '                            theFtab.SetValue(Quart75fld, precs, theQuart75)
-            '                        End If
+            GisUtil.StartSetFeatureValue(theTheme)
+            For precs As Integer = 0 To GisUtil.NumFeatures(theTheme) - 1
+                Dim cpid As Integer = GisUtil.FieldValue(theTheme, precs, pidfield)
+                If (cpid = lSubbasinId) Then
+                    If (chksum = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(theTheme, sumfld, precs, SignificantDigits(theSum, 4))
+                    End If
+                    If (chkcnt = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(theTheme, countfld, precs, SignificantDigits(theCount, 4))
+                    End If
+                    If (chkavg = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(theTheme, meanfld, precs, SignificantDigits(theMean, 4))
+                    End If
+                    If (chkmin = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(theTheme, minfld, precs, SignificantDigits(theMinimum, 4))
+                    End If
+                    If (chkmax = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(theTheme, maxfld, precs, SignificantDigits(theMaximum, 4))
+                    End If
+                    If (chkrng = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(theTheme, rangefld, precs, SignificantDigits(theRange, 4))
+                    End If
+                    If (chkstd = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(theTheme, stddevfld, precs, SignificantDigits(theStdDev, 4))
+                    End If
+                    If (chkvar = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(theTheme, varfld, precs, theVariance)
+                    End If
+                    If (chkmed = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(theTheme, medianfld, precs, SignificantDigits(theMedian, 4))
+                    End If
+                    If (chkq25 = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(theTheme, Quart25fld, precs, SignificantDigits(theQuart25, 4))
+                    End If
+                    If (chkq33 = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(theTheme, Quart33fld, precs, SignificantDigits(theQuart33, 4))
+                    End If
+                    If (chkq66 = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(theTheme, Quart66fld, precs, SignificantDigits(theQuart66, 4))
+                    End If
+                    If (chkq75 = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(theTheme, Quart75fld, precs, SignificantDigits(theQuart75, 4))
+                    End If
 
-            '                        If (updatethr = True) Then
-            '                            mymean = theFtab.ReturnValue(meanfld, precs)
-            '                            mymax = theFtab.ReturnValue(maxfld, precs)
-            '                            mymin = theFtab.ReturnValue(minfld, precs)
-            '                            myhigh = (mymean * mymax).sqrt
-            '                            mylow = mymean.sqrt
-            '                            theFtab.SetValue(Highflowfld, precs, myhigh)
-            '                            theFtab.SetValue(Medflowfld, precs, mymean)
-            '                            theFtab.SetValue(Lowflowfld, precs, mylow)
-            '                        End If
-            '                    End If
-            '                Next
-
-            '            End If
+                    If (updatethr = True) Then
+                        Dim mymean As Single = GisUtil.FieldValue(theTheme, precs, meanfld)
+                        Dim mymax As Single = GisUtil.FieldValue(theTheme, precs, maxfld)
+                        Dim mymin As Single = GisUtil.FieldValue(theTheme, precs, minfld)
+                        Dim myhigh As Single = Math.Sqrt(mymean * mymax)
+                        Dim mylow As Single = Math.Sqrt(mymean)
+                        GisUtil.SetFeatureValueNoStartStop(theTheme, Highflowfld, precs, SignificantDigits(myhigh, 4))
+                        GisUtil.SetFeatureValueNoStartStop(theTheme, Medflowfld, precs, SignificantDigits(mymean, 4))
+                        GisUtil.SetFeatureValueNoStartStop(theTheme, lowflowfld, precs, SignificantDigits(mylow, 4))
+                    End If
+                End If
+            Next
+            GisUtil.StopSetFeatureValue(theTheme)
         Next
 
-            '        choicestrg = "Median"
+        'render the map layer by median flow
+        Dim lInc As Single = lMaxMedian / 5
+        Dim lColors As New Collection
+        lColors.Add(System.Convert.ToUInt32(RGB(250, 250, 0))) 'yellow
+        lColors.Add(System.Convert.ToUInt32(RGB(200, 255, 32)))   'lt green
+        lColors.Add(System.Convert.ToUInt32(RGB(0, 240, 0)))   'green
+        lColors.Add(System.Convert.ToUInt32(RGB(0, 200, 122)))   '
+        lColors.Add(System.Convert.ToUInt32(RGB(0, 125, 200)))   'blue
+        Dim lLowRange As New Collection
+        lLowRange.Add(0.0)
+        lLowRange.Add(1 * lInc)
+        lLowRange.Add(2 * lInc)
+        lLowRange.Add(3 * lInc)
+        lLowRange.Add(4 * lInc)
+        Dim lHighRange As New Collection
+        lHighRange.Add(1 * lInc)
+        lHighRange.Add(2 * lInc)
+        lHighRange.Add(3 * lInc)
+        lHighRange.Add(4 * lInc)
+        lHighRange.Add(5 * lInc)
+        Dim lCaptions As New Collection
+        lCaptions.Add("Median Flow in cms " & lLowRange(1).ToString & " - " & lHighRange(1).ToString)
+        lCaptions.Add(lLowRange(2).ToString & " - " & lHighRange(2).ToString)
+        lCaptions.Add(lLowRange(3).ToString & " - " & lHighRange(3).ToString)
+        lCaptions.Add(lLowRange(4).ToString & " - " & lHighRange(4).ToString)
+        lCaptions.Add(lLowRange(5).ToString & " - " & lHighRange(5).ToString)
+        GisUtil.SetLayerRendererWithRanges(theTheme, medianfld, lColors, lCaptions, lLowRange, lHighRange)
 
-            'mylegend = legend.make(#SYMBOL_FILL)
-            'mylegend.setlegendtype(#LEGEND_TYPE_COLOR)
-            '        mylegend.Interval(theFtheme, choicestrg, 5)
+        'write basin attribute table to text file
+        Dim lRivStatsFile As New StringBuilder
+        lstr = GisUtil.FieldName(0, theTheme)
+        For lcol As Integer = 1 To GisUtil.NumFields(theTheme) - 1
+            lstr = lstr & ", " & GisUtil.FieldName(lcol, theTheme)
+        Next
+        lRivStatsFile.AppendLine(lstr)
+        For lrow As Integer = 0 To GisUtil.NumFeatures(theTheme) - 1
+            lstr = GisUtil.FieldValue(theTheme, lrow, 0)
+            For lcol As Integer = 1 To GisUtil.NumFields(theTheme) - 1
+                lstr = lstr & ", " & GisUtil.FieldValue(theTheme, lrow, lcol)
+            Next
+            lRivStatsFile.AppendLine(lstr)
+        Next
+        SaveFileString(lOutputPath & "riverstats.txt", lRivStatsFile.ToString)
 
-            'myColorRamp = SymbolList.GetPreDefined(#SYMLIST_TYPE_COLORRAMP).Get(25)
-            '        mylegend.GetSymbols.RampSavedColors(myColorRamp)
-
-            '        mylegend.Save(filename.Merge(myWkDirname, "flow.avl"))
-            '        theFtheme.SetLegend(mylegend)
-            '        theFtheme.UpdateLegend()
-
-            '        theFtab.SetEditable(False)
-            '        theFtheme.SetVisible(True)
-            '        av.ClearWorkingStatus()
-            '        av.clearstatus()
-
-            '        oldout = theProject.finddoc("riverstats.txt")
-            '        If (oldout <> nil) Then
-            '            theproject.removedoc(oldout)
-            '        End If
-
-            '        theFtab.Export("riverstats.txt".asFileName, DText, False)
-
-            '        bankfullVtab = Vtab.make("riverstats.txt".asFileName, False, False)
-            '        bankfulltable = Table.MakeWithGUI(bankfullVtab, GUIName)
-            '        bankfulltable.SetName("riverstats.txt".asFileName.getbasename.asstring)
-            '        bankfulltable.GetWin.Open()
-
-            Logger.Msg("Bankfull and Flow Characteristics Computed. Outputs written to: " & vbCrLf & vbCrLf & "      " & lOutputPath & "riverstats.txt", "Geospatial Stream Flow Model")
+        Logger.Msg("Bankfull and Flow Characteristics Computed. Outputs written to: " & vbCrLf & vbCrLf & "      " & lOutputPath & "riverstats.txt", "Geospatial Stream Flow Model")
 
     End Sub
 
