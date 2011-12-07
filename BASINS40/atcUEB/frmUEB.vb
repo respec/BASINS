@@ -11,23 +11,19 @@ Public Class frmUEB
 
     Friend pParmData As clsUEBParameterFile
     Friend pSiteData As clsUEBSiteFile
+    Friend pWeatherData As clsUEBWeather
 
-    Friend pWeatherFileName As String
     Friend pBCParameterFileName As String
+    Friend pBCDataArray(37) As Double
     Friend pOutputFileName As String
     Friend pRadOpt As Integer
-    Friend pSDate(5) As Integer
-    Friend pTStep As Integer
-    Friend pInitialEnergy As Double
-    Friend pInitialH2OEquiv As Double
-    Friend pInitialSnowAge As Double
+
     Friend WithEvents txtNetRadStation As System.Windows.Forms.TextBox
     Friend WithEvents txtShortRadStation As System.Windows.Forms.TextBox
     Friend WithEvents txtRelHStation As System.Windows.Forms.TextBox
     Friend WithEvents txtWindStation As System.Windows.Forms.TextBox
     Friend WithEvents txtPrecipStation As System.Windows.Forms.TextBox
     Friend WithEvents txtAtempStation As System.Windows.Forms.TextBox
-    Friend pBCDataArray(37) As Double
 
 #Region " Windows Form Designer generated code "
 
@@ -1996,6 +1992,7 @@ Public Class frmUEB
 
         pParmData = New clsUEBParameterFile
         pSiteData = New clsUEBSiteFile
+        pWeatherData = New clsUEBWeather
     End Sub
 
     Private Sub lblStatus_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lblStatus.TextChanged
@@ -2042,8 +2039,8 @@ Public Class frmUEB
         If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
             Dim lFilename As String = cdlg.FileName
             txtMasterFile.Text = lFilename
-            OpenMasterFile(lFilename, pWeatherFileName, pOutputFileName, pParmData.FileName, pSiteData.FileName, pBCParameterFileName, pRadOpt)
-            txtWeatherFile.Text = pWeatherFileName
+            OpenMasterFile(lFilename, pWeatherData.FileName, pOutputFileName, pParmData.FileName, pSiteData.FileName, pBCParameterFileName, pRadOpt)
+            txtWeatherFile.Text = pWeatherData.FileName
             txtOutputFile.Text = pOutputFileName
             txtParameterFile.Text = pParmData.FileName
             txtSiteFile.Text = pSiteData.FileName
@@ -2061,17 +2058,19 @@ Public Class frmUEB
 
     Private Sub txtWeatherFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtWeatherFile.TextChanged
         If FileExists(txtWeatherFile.Text) Then
-            ReadWeatherFile(txtWeatherFile.Text, pSDate, pTStep, pInitialEnergy, pInitialH2OEquiv, pInitialSnowAge)
-            AtcTextSYear.ValueInteger = pSDate(0)
-            AtcTextSMonth.ValueInteger = pSDate(1)
-            AtcTextSDay.ValueInteger = pSDate(2)
-            AtcTextSHour.ValueInteger = pSDate(3)
-            atcTextTimeStep.ValueInteger = pTStep
-            AtcTextIniEnergyContent.Text = pInitialEnergy
-            AtcTextIniWaterEquiv.Text = pInitialH2OEquiv.ToString
-            AtcTextSnowAge.Text = pInitialSnowAge
+            pWeatherData.ReadWeatherFile()
+            Dim lDate(5) As Integer
+            J2Date(pWeatherData.SJDate, lDate)
+            AtcTextSYear.ValueInteger = lDate(0)
+            AtcTextSMonth.ValueInteger = lDate(1)
+            AtcTextSDay.ValueInteger = lDate(2)
+            AtcTextSHour.ValueInteger = lDate(3)
+            atcTextTimeStep.ValueInteger = pWeatherData.TimeStep
+            AtcTextIniEnergyContent.Text = pWeatherData.InitialEnergy
+            AtcTextIniWaterEquiv.Text = pWeatherData.InitialH2OEquiv
+            AtcTextSnowAge.Text = pWeatherData.InitialSnowAge
         End If
-        pWeatherFileName = txtWeatherFile.Text
+        pWeatherData.FileName = txtWeatherFile.Text
     End Sub
 
     Private Sub txtParameterFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtParameterFile.TextChanged
