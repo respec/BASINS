@@ -141,6 +141,7 @@ Public Class atcTimeseriesBaseflow
         Dim lStartDate As Double = 0
         Dim lEndDate As Double = 0
         Dim lMethod As String = ""
+        Dim lMethods As ArrayList = Nothing
         Dim lDrainageArea As Double = 0
         Dim lStationFile As String = ""
 
@@ -160,6 +161,7 @@ Public Class atcTimeseriesBaseflow
             lStartDate = aArgs.GetValue("Start Date")
             lEndDate = aArgs.GetValue("End Date")
             lMethod = aArgs.GetValue("Method")
+            lMethods = aArgs.GetValue("Methods")
             lDrainageArea = aArgs.GetValue("Drainage Area")
             lStationFile = aArgs.GetValue("Station File")
 
@@ -179,37 +181,50 @@ Public Class atcTimeseriesBaseflow
         'If ltsGroup Is Nothing Then
         '    ltsGroup = atcDataManager.UserSelectData("Select data to compute statistics for")
         'End If
+        If lMethods Is Nothing OrElse lMethods.Count = 0 Then
+            Return False
+        End If
 
-        Select Case lMethod
-            Case "HySEP-Fixed"
-                ClsBaseFlow = New clsBaseflowHySep()
-                CType(ClsBaseFlow, clsBaseflowHySep).Method = HySepMethod.FIXED
-            Case "HySEP-LocMin"
-                ClsBaseFlow = New clsBaseflowHySep()
-                CType(ClsBaseFlow, clsBaseflowHySep).Method = HySepMethod.LOCMIN
-            Case "HySEP-Slide"
-                ClsBaseFlow = New clsBaseflowHySep()
-                CType(ClsBaseFlow, clsBaseflowHySep).Method = HySepMethod.SLIDE
-            Case "PART"
-                ClsBaseFlow = New clsBaseflowPart()
-            Case Else
-        End Select
         Dim lBFDatagroup As atcTimeseriesGroup = Nothing
-        With ClsBaseFlow
-            .DrainageArea = lDrainageArea
-            .TargetTS = lTsStreamflow
-            .StartDate = lStartDate
-            .EndDate = lEndDate
-            If lEnglishFlg Then
-                .UnitFlag = 1
-            Else
-                .UnitFlag = 2
-            End If
-            lBFDatagroup = ClsBaseFlow.DoBaseFlowSeparation()
-            'Me.DataSets.AddRange(lBFDatagroup)
+        Dim lBFDataGroupFinal As New atcTimeseriesGroup
 
+        For Each lMethod In lMethods
+            Select Case lMethod
+                Case BFMethods.HySEPFixed
+                    ClsBaseFlow = New clsBaseflowHySep()
+                    CType(ClsBaseFlow, clsBaseflowHySep).Method = BFMethods.HySEPFixed
+                Case BFMethods.HySEPLocMin
+                    ClsBaseFlow = New clsBaseflowHySep()
+                    CType(ClsBaseFlow, clsBaseflowHySep).Method = BFMethods.HySEPLocMin
+                Case BFMethods.HySEPSlide
+                    ClsBaseFlow = New clsBaseflowHySep()
+                    CType(ClsBaseFlow, clsBaseflowHySep).Method = BFMethods.HySEPSlide
+                Case BFMethods.PART
+                    ClsBaseFlow = New clsBaseflowPart()
+                Case Else
+            End Select
+            With ClsBaseFlow
+                .DrainageArea = lDrainageArea
+                .TargetTS = lTsStreamflow
+                .StartDate = lStartDate
+                .EndDate = lEndDate
+                If lEnglishFlg Then
+                    .UnitFlag = 1
+                Else
+                    .UnitFlag = 2
+                End If
+            End With
+            lBFDatagroup = ClsBaseFlow.DoBaseFlowSeparation()
+            If lBFDatagroup IsNot Nothing AndAlso lBFDatagroup.Count > 0 Then
+                lBFDataGroupFinal.AddRange(lBFDatagroup)
+            End If
+        Next
+
+
+
+        'If Me.DataSets.Count > 0 Then
+        If lBFDataGroupFinal IsNot Nothing AndAlso lBFDataGroupFinal.Count > 0 Then
             Dim lNewDef As atcAttributeDefinition
-            
             Dim lIndex As Integer = atcDataAttributes.AllDefinitions.Keys.IndexOf("Baseflow")
             If lIndex >= 0 Then
                 lNewDef = atcDataAttributes.AllDefinitions.ItemByIndex(lIndex)
@@ -217,7 +232,7 @@ Public Class atcTimeseriesBaseflow
                 lNewDef = New atcAttributeDefinition
                 With lNewDef
                     .Name = "Baseflow"
-                    .Description = "Daily baseflow"
+                    .Description = "Baseflow Related Timeseries"
                     .DefaultValue = ""
                     .Editable = False
                     .TypeString = "atcTimeseriesGroup"
@@ -226,11 +241,7 @@ Public Class atcTimeseriesBaseflow
                     .CopiesInherit = False
                 End With
             End If
-            lTsStreamflow.Attributes.SetValue(lNewDef, lBFDatagroup, Nothing)
-        End With
-
-        'If Me.DataSets.Count > 0 Then
-        If lBFDatagroup IsNot Nothing AndAlso lBFDatagroup.Count > 0 Then
+            lTsStreamflow.Attributes.SetValue(lNewDef, lBFDataGroupFinal, Nothing)
             Return True 'todo: error checks
         Else
             Return False 'no datasets added, not a data source

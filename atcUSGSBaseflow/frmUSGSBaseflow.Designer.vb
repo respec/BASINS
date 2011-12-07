@@ -24,8 +24,6 @@ Partial Class frmUSGSBaseflow
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmUSGSBaseflow))
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.cboBFMothod = New System.Windows.Forms.ComboBox
         Me.Label2 = New System.Windows.Forms.Label
         Me.txtDrainageArea = New System.Windows.Forms.TextBox
         Me.Label3 = New System.Windows.Forms.Label
@@ -63,34 +61,21 @@ Partial Class frmUSGSBaseflow
         Me.chkTabDelimited = New System.Windows.Forms.CheckBox
         Me.txtOutputDir = New System.Windows.Forms.TextBox
         Me.lblOutputDir = New System.Windows.Forms.Label
+        Me.gbBFMethods = New System.Windows.Forms.GroupBox
+        Me.chkMethodHySEPFixed = New System.Windows.Forms.CheckBox
+        Me.chkMethodHySEPLocMin = New System.Windows.Forms.CheckBox
+        Me.chkMethodHySEPSlide = New System.Windows.Forms.CheckBox
+        Me.chkMethodPART = New System.Windows.Forms.CheckBox
         Me.gbDates.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.gbOutputFileSpecs.SuspendLayout()
+        Me.gbBFMethods.SuspendLayout()
         Me.SuspendLayout()
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(14, 39)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(76, 13)
-        Me.Label1.TabIndex = 0
-        Me.Label1.Text = "Select Method"
-        '
-        'cboBFMothod
-        '
-        Me.cboBFMothod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboBFMothod.FormattingEnabled = True
-        Me.cboBFMothod.Items.AddRange(New Object() {"HySEP-Fixed", "HySEP-LocMin", "HySEP-Slide", "PART"})
-        Me.cboBFMothod.Location = New System.Drawing.Point(96, 36)
-        Me.cboBFMothod.Name = "cboBFMothod"
-        Me.cboBFMothod.Size = New System.Drawing.Size(121, 21)
-        Me.cboBFMothod.TabIndex = 1
         '
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(15, 66)
+        Me.Label2.Location = New System.Drawing.Point(15, 136)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(75, 13)
         Me.Label2.TabIndex = 2
@@ -98,7 +83,7 @@ Partial Class frmUSGSBaseflow
         '
         'txtDrainageArea
         '
-        Me.txtDrainageArea.Location = New System.Drawing.Point(96, 63)
+        Me.txtDrainageArea.Location = New System.Drawing.Point(99, 133)
         Me.txtDrainageArea.Name = "txtDrainageArea"
         Me.txtDrainageArea.Size = New System.Drawing.Size(121, 20)
         Me.txtDrainageArea.TabIndex = 3
@@ -106,7 +91,7 @@ Partial Class frmUSGSBaseflow
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(223, 66)
+        Me.Label3.Location = New System.Drawing.Point(226, 136)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(31, 13)
         Me.Label3.TabIndex = 4
@@ -115,22 +100,23 @@ Partial Class frmUSGSBaseflow
         'btnOK
         '
         Me.btnOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOK.Location = New System.Drawing.Point(200, 437)
+        Me.btnOK.Location = New System.Drawing.Point(198, 274)
         Me.btnOK.Name = "btnOK"
-        Me.btnOK.Size = New System.Drawing.Size(75, 23)
+        Me.btnOK.Size = New System.Drawing.Size(161, 23)
         Me.btnOK.TabIndex = 23
-        Me.btnOK.Text = "Calculate"
+        Me.btnOK.Text = "Perform Baseflow Separation"
         Me.btnOK.UseVisualStyleBackColor = True
         '
         'btnCancel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnCancel.Location = New System.Drawing.Point(281, 437)
+        Me.btnCancel.Location = New System.Drawing.Point(117, 274)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(75, 23)
         Me.btnCancel.TabIndex = 24
         Me.btnCancel.Text = "Close"
         Me.btnCancel.UseVisualStyleBackColor = True
+        Me.btnCancel.Visible = False
         '
         'btnExamineData
         '
@@ -143,7 +129,7 @@ Partial Class frmUSGSBaseflow
         '
         'btnFindStations
         '
-        Me.btnFindStations.Location = New System.Drawing.Point(261, 61)
+        Me.btnFindStations.Location = New System.Drawing.Point(264, 134)
         Me.btnFindStations.Name = "btnFindStations"
         Me.btnFindStations.Size = New System.Drawing.Size(98, 23)
         Me.btnFindStations.TabIndex = 26
@@ -160,7 +146,7 @@ Partial Class frmUSGSBaseflow
         Me.gbDates.Controls.Add(Me.txtDataStart)
         Me.gbDates.Controls.Add(Me.lblDataEnd)
         Me.gbDates.Controls.Add(Me.lblDataStart)
-        Me.gbDates.Location = New System.Drawing.Point(18, 92)
+        Me.gbDates.Location = New System.Drawing.Point(18, 159)
         Me.gbDates.Name = "gbDates"
         Me.gbDates.Size = New System.Drawing.Size(341, 109)
         Me.gbDates.TabIndex = 27
@@ -326,7 +312,7 @@ Partial Class frmUSGSBaseflow
         Me.gbOutputFileSpecs.Controls.Add(Me.lblOutputDir)
         Me.gbOutputFileSpecs.Controls.Add(Me.txtOutputRootName)
         Me.gbOutputFileSpecs.Controls.Add(Me.lblBaseFilename)
-        Me.gbOutputFileSpecs.Location = New System.Drawing.Point(18, 208)
+        Me.gbOutputFileSpecs.Location = New System.Drawing.Point(17, 303)
         Me.gbOutputFileSpecs.Name = "gbOutputFileSpecs"
         Me.gbOutputFileSpecs.Size = New System.Drawing.Size(342, 223)
         Me.gbOutputFileSpecs.TabIndex = 31
@@ -409,20 +395,72 @@ Partial Class frmUSGSBaseflow
         Me.lblOutputDir.TabIndex = 31
         Me.lblOutputDir.Text = "Output folder"
         '
+        'gbBFMethods
+        '
+        Me.gbBFMethods.Controls.Add(Me.chkMethodPART)
+        Me.gbBFMethods.Controls.Add(Me.chkMethodHySEPSlide)
+        Me.gbBFMethods.Controls.Add(Me.chkMethodHySEPLocMin)
+        Me.gbBFMethods.Controls.Add(Me.chkMethodHySEPFixed)
+        Me.gbBFMethods.Location = New System.Drawing.Point(18, 27)
+        Me.gbBFMethods.Name = "gbBFMethods"
+        Me.gbBFMethods.Size = New System.Drawing.Size(341, 100)
+        Me.gbBFMethods.TabIndex = 32
+        Me.gbBFMethods.TabStop = False
+        Me.gbBFMethods.Text = "Select Methods"
+        '
+        'chkMethodHySEPFixed
+        '
+        Me.chkMethodHySEPFixed.AutoSize = True
+        Me.chkMethodHySEPFixed.Location = New System.Drawing.Point(7, 20)
+        Me.chkMethodHySEPFixed.Name = "chkMethodHySEPFixed"
+        Me.chkMethodHySEPFixed.Size = New System.Drawing.Size(88, 17)
+        Me.chkMethodHySEPFixed.TabIndex = 0
+        Me.chkMethodHySEPFixed.Text = "HySEP-Fixed"
+        Me.chkMethodHySEPFixed.UseVisualStyleBackColor = True
+        '
+        'chkMethodHySEPLocMin
+        '
+        Me.chkMethodHySEPLocMin.AutoSize = True
+        Me.chkMethodHySEPLocMin.Location = New System.Drawing.Point(7, 44)
+        Me.chkMethodHySEPLocMin.Name = "chkMethodHySEPLocMin"
+        Me.chkMethodHySEPLocMin.Size = New System.Drawing.Size(98, 17)
+        Me.chkMethodHySEPLocMin.TabIndex = 1
+        Me.chkMethodHySEPLocMin.Text = "HySEP-LocMin"
+        Me.chkMethodHySEPLocMin.UseVisualStyleBackColor = True
+        '
+        'chkMethodHySEPSlide
+        '
+        Me.chkMethodHySEPSlide.AutoSize = True
+        Me.chkMethodHySEPSlide.Location = New System.Drawing.Point(7, 68)
+        Me.chkMethodHySEPSlide.Name = "chkMethodHySEPSlide"
+        Me.chkMethodHySEPSlide.Size = New System.Drawing.Size(86, 17)
+        Me.chkMethodHySEPSlide.TabIndex = 2
+        Me.chkMethodHySEPSlide.Text = "HySEP-Slide"
+        Me.chkMethodHySEPSlide.UseVisualStyleBackColor = True
+        '
+        'chkMethodPART
+        '
+        Me.chkMethodPART.AutoSize = True
+        Me.chkMethodPART.Location = New System.Drawing.Point(113, 20)
+        Me.chkMethodPART.Name = "chkMethodPART"
+        Me.chkMethodPART.Size = New System.Drawing.Size(55, 17)
+        Me.chkMethodPART.TabIndex = 3
+        Me.chkMethodPART.Text = "PART"
+        Me.chkMethodPART.UseVisualStyleBackColor = True
+        '
         'frmUSGSBaseflow
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(368, 472)
+        Me.ClientSize = New System.Drawing.Size(368, 543)
+        Me.Controls.Add(Me.gbBFMethods)
         Me.Controls.Add(Me.gbDates)
         Me.Controls.Add(Me.btnFindStations)
         Me.Controls.Add(Me.btnCancel)
-        Me.Controls.Add(Me.btnOK)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.txtDrainageArea)
+        Me.Controls.Add(Me.btnOK)
         Me.Controls.Add(Me.Label2)
-        Me.Controls.Add(Me.cboBFMothod)
-        Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.MenuStrip1)
         Me.Controls.Add(Me.gbOutputFileSpecs)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -435,12 +473,12 @@ Partial Class frmUSGSBaseflow
         Me.MenuStrip1.PerformLayout()
         Me.gbOutputFileSpecs.ResumeLayout(False)
         Me.gbOutputFileSpecs.PerformLayout()
+        Me.gbBFMethods.ResumeLayout(False)
+        Me.gbBFMethods.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents Label1 As System.Windows.Forms.Label
-    Friend WithEvents cboBFMothod As System.Windows.Forms.ComboBox
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents txtDrainageArea As System.Windows.Forms.TextBox
     Friend WithEvents Label3 As System.Windows.Forms.Label
@@ -478,4 +516,9 @@ Partial Class frmUSGSBaseflow
     Friend WithEvents btnGraphTimeseries As System.Windows.Forms.Button
     Friend WithEvents btnWriteASCIIOutput As System.Windows.Forms.Button
     Friend WithEvents btnGraphCDist As System.Windows.Forms.Button
+    Friend WithEvents gbBFMethods As System.Windows.Forms.GroupBox
+    Friend WithEvents chkMethodHySEPSlide As System.Windows.Forms.CheckBox
+    Friend WithEvents chkMethodHySEPLocMin As System.Windows.Forms.CheckBox
+    Friend WithEvents chkMethodHySEPFixed As System.Windows.Forms.CheckBox
+    Friend WithEvents chkMethodPART As System.Windows.Forms.CheckBox
 End Class

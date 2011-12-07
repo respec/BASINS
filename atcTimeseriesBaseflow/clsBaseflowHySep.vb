@@ -26,12 +26,12 @@ Public Class clsBaseflowHySep
         End Set
     End Property
 
-    Private pMethod As HySepMethod
-    Public Property Method() As HySepMethod
+    Private pMethod As BFMethods
+    Public Property Method() As BFMethods
         Get
             Return pMethod
         End Get
-        Set(ByVal value As HySepMethod)
+        Set(ByVal value As BFMethods)
             pMethod = value
         End Set
     End Property
@@ -89,12 +89,13 @@ Public Class clsBaseflowHySep
         If UnitFlag = 2 Then DrainageArea = DrainageArea * 2.59
 
         Dim lTsBF As atcTimeseries = Nothing
+
         Select Case Method
-            Case HySepMethod.FIXED
+            Case BFMethods.HySEPFixed
                 lTsBF = HySepFixed(lTsDaily)
-            Case HySepMethod.SLIDE
+            Case BFMethods.HySEPSlide
                 lTsBF = HySepSlide(lTsDaily)
-            Case HySepMethod.LOCMIN
+            Case BFMethods.HySEPLocMin
                 lTsBF = HySepLocMin(lTsDaily)
         End Select
 
@@ -207,6 +208,7 @@ Public Class clsBaseflowHySep
         'lTsBaseflow.Dates = lNewDates
         'lTsBaseflow.Values = lValueBaseflowFinal
         lTsBaseflow.Attributes.SetValue("Scenario", "HySepFixed")
+        lTsBaseflow.Attributes.SetValue("Method", BFMethods.HySEPFixed)
         lTsBaseflow.Attributes.SetValue("BFInterval", lInterv)
         Return lTsBaseflow
     End Function
@@ -270,6 +272,7 @@ Public Class clsBaseflowHySep
         lTsBaseflow.Values = lValueBaseflow
 
         lTsBaseflow.Attributes.SetValue("Scenario", "HySepSlide")
+        lTsBaseflow.Attributes.SetValue("Method", BFMethods.HySEPSlide)
         lTsBaseflow.Attributes.SetValue("BFInterval", lInterv)
         Return lTsBaseflow
     End Function
@@ -390,6 +393,7 @@ Public Class clsBaseflowHySep
         With lTsBaseflow
             .Attributes.SetValue("Constituent", "Baseflow")
             .Attributes.SetValue("Scenario", "HySepLocMin")
+            .Attributes.SetValue("Method", BFMethods.HySEPLocMin)
             .Attributes.SetValue("BFInterval", lInterv)
             .Values = lValueBaseflow
         End With
