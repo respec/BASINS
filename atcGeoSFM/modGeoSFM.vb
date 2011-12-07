@@ -3857,7 +3857,7 @@ Public Module modGeoSFM
 
     End Sub
 
-    Friend Sub PlotMap()
+    Friend Sub PlotMap(ByVal aStreamflow As Boolean, ByVal aMapJDate As Double)
         ' ***********************************************************************************************
         ' ***********************************************************************************************
         '
@@ -3881,263 +3881,159 @@ Public Module modGeoSFM
         ' ***********************************************************************************************
         ' ***********************************************************************************************
 
-        '        TheProject = av.GetProject
-        '        theFileName = theProject.GetFileName
-        '        If (theFileName = nil) Then
-        '            av.Run("Project.SaveAs", nil)
-        '            theFileName = theProject.GetFileName
-        '            If (theFileName = nil) Then
-        '                Exit Sub
-        '            End If
-        '        Else
-        '            If (av.Run("Project.CheckForEdits", nil).Not) Then
-        '                Return nil
-        '            End If
-        '            If (theProject.Save) Then
-        '                av.ShowMsg("Project saved to '" + theFileName.GetBaseName + "'")
-        '    if (System.GetOS = #SYSTEM_OS_MAC) then
-        '                    Script.Make("MacClass.SetDocInfo(SELF, Project)").DoIt(theFileName)
-        '                End If
-        '            End If
-        '        End If
+        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+        Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
 
-        '        TheView = av.GetActiveDoc
-        '        ViewChk = TheView.GetGUI
-        '        If (ViewChk <> "View") Then
-        '            MsgBox.error("Click on the View to make it 'active' before running this program", "")
-        '            Exit Sub
-        '        End If
+        Dim resultfilename As String = ""
+        If aStreamflow Then
+            resultfilename = lOutputPath & "streamflow.txt"
+        Else
+            resultfilename = lOutputPath & "soilwater.txt"
+        End If
 
-        '        ' Check the working directory
-        '        TheWkDir = TheProject.GetFileName.ReturnDir
-        '        myWkDirname = MsgBox.Input("Specify your working directory", "Working Directory", TheWkDir.GetFullName)
-        '        If (mywkDirName = nil) Then
-        '            Exit Sub
-        '        End If
-        '        If (File.Exists(myWkDirname.AsFileName).not) Then
-        '            MsgBox.Error("Cannot read directory " + myWkDirname, "Directory Specification Error")
-        '            Exit Sub
-        '        End If
-        '        If (File.IsWritable(myWkDirname.AsFileName).not) Then
-        '            MsgBox.Error(myWkDirname + +"is not writable.", "Directory Specification Error")
-        '            Exit Sub
-        '        End If
-        '        TheProject.SetWorkDir(myWkDirname.AsFileName)
+        If Not FileExists(resultfilename) Then
+            Logger.Msg("Could not open time series file," & vbCrLf & resultfilename, "GeoSFM Utilities")
+            Exit Sub
+        End If
 
+        Dim theTheme As Integer = -1
+        Dim Highflowfld As Integer = -1
+        Dim lowflowfld As Integer = -1
+        Dim Medflowfld As Integer = -1
+        If GisUtil.IsLayer("Subbasins") Then
+            theTheme = GisUtil.LayerIndex("Subbasins")
+            Highflowfld = AddField(theTheme, "Highflow")
+            lowflowfld = AddField(theTheme, "Lowflow")
+            Medflowfld = AddField(theTheme, "Medflow")
+        End If
 
-        '        If ((myWkDirname.contains("\").Not) And (myWkDirname.contains("/")) And (myWkDirname.right(1) <> "/")) Then
-        '            myWkDirname = myWkDirname + "/"
-        '        ElseIf ((myWkDirname.contains("\")) And (myWkDirname.right(1) <> "\")) Then
-        '            myWkDirname = myWkDirname + "\"
-        '        ElseIf ((myWkDirname.contains("\").Not) And (myWkDirname.contains("\").Not) And (myWkDirname.right(1) <> "/")) Then
-        '            myWkDirname = myWkDirname + "/"
-        '        End If
+        If (theTheme = -1) Then
+            Logger.Msg("The map must contain a layer named 'Subbasins' to use this feature.", "Geospatial Stream Flow Model")
+            Exit Sub
+        End If
 
-        '        newtablelist = List.make
-        '        sflowFN = theProject.Finddoc("streamflow.txt")
-        '        If (sflowFN <> nil) Then
-        '            newtablelist.add(sflowFN)
-        '        End If
+        If (Highflowfld = -1) Then
+            Logger.Msg("High flow field, Highflow, has not been initialized.  Run 'Bankfull and Flow Statistics' to compute this field.", "Geospatial Stream Flow Model")
+            Exit Sub
+        End If
+        If (lowflowfld = -1) Then
+            Logger.Msg("Low flow field, Lowflow, has not been initialized.  Run 'Bankfull and Flow Statistics' to compute this field.", "Geospatial Stream Flow Model")
+            Exit Sub
+        End If
+        If (Medflowfld = -1) Then
+            Logger.Msg("Median flow field, Medflow, has not been initialized.  Run 'Bankfull and Flow Statistics' to compute this field.", "Geospatial Stream Flow Model")
+            Exit Sub
+        End If
 
-        '        soilwFN = theProject.Finddoc("soilwater.txt")
-        '        If (soilwFN <> nil) Then
-        '            newtablelist.add(soilwFN)
-        '        End If
+        Dim pidfield As Integer = GisUtil.FieldIndex(theTheme, "Gridcode")
+        If pidfield < 0 Then
+            pidfield = GisUtil.FieldIndex(theTheme, "Grid_code")
+            If pidfield < 0 Then
+                Logger.Msg("Subbasins layer must have a field named 'Gridcode'.", "Geospatial Stream Flow Model")
+                Exit Sub
+            End If
+        End If
 
-        '        If (newtablelist.isempty) Then
-        '            resultfilename = FileDialog.Show("*.txt", "Textfile", "Select Input Data File")
-        '            If (resultfilename = nil) Then
-        '                Exit Sub
-        '            End If
-        '        Else
-        '            resulttablename = MsgBox.Choice(newtablelist, "Select Input Data File", "Input Flow Time Series")
-        '            If (resulttablename = nil) Then
-        '                resultfilename = FileDialog.Show("*.txt", "Textfile", "Select Input Data File")
-        '                If (resultfilename = nil) Then
-        '                    Exit Sub
-        '                End If
-        '            Else
-        '                resultfilename = resulttablename.getVtab.getname.asfilename
-        '            End If
-        '        End If
+        Dim cflowfld As Integer = AddField(theTheme, "FlowNow")
+        Dim cfindexfld As Integer = AddField(theTheme, "IndexNow", 1)
 
-        '        resultfile = Vtab.Make(resultfilename, False, False)
+        'read result file into memory
+        Dim numrecs As Integer = 0
+        Dim resultrecs As New Collection
+        If FileExists(resultfilename) Then
+            Try
+                Dim lCurrentRecord As String
+                Dim lStreamReader As New StreamReader(resultfilename)
+                Do
+                    lCurrentRecord = lStreamReader.ReadLine
+                    If lCurrentRecord Is Nothing Then
+                        Exit Do
+                    Else
+                        numrecs = numrecs + 1
+                        resultrecs.Add(lCurrentRecord)
+                    End If
+                Loop
+            Catch e As ApplicationException
+                Logger.Msg("Cannot read output file, " & resultfilename & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+                Exit Sub
+            End Try
+        Else
+            Logger.Msg("Cannot open output file, " & resultfilename & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+            Exit Sub
+        End If
 
-        '        theThemelist = theView.GetThemes
-        '        mypolythmlist = List.make
-        '        For Each thm In theThemelist
-        '            If (thm.CanSelect) Then
-        '                athmname = thm.getname
-        '                If ((athmname.contains("basply")) Or (athmname.contains("basin"))) Then
-        '                    mypolythmlist.add(thm)
-        '                End If
-        '            End If
-        '        Next
+        Dim numflds As Integer = 0
+        Dim lstr As String = resultrecs(1)
+        Dim lstr1 As String = ""
+        Do While lstr.Length > 0
+            lstr1 = StrRetRem(lstr)
+            numflds += 1
+        Loop
 
-        '        If (mypolythmlist.isempty) Then
-        '            theTheme = MsgBox.Choice(theThemelist, "Select basin coverage/grid theme", "Basin Theme")
-        '            If (theTheme = nil) Then
-        '                Exit Sub
-        '            End If
-        '        Else
-        '            theTheme = MsgBox.Choice(mypolythmlist, "Select basin coverage/grid theme", "Basin Theme")
-        '            If (theTheme = nil) Then
-        '                Exit Sub
-        '            End If
-        '        End If
+        'read results into local array
+        Dim resultvals(numrecs, numflds) As Single
+        Dim irec As Integer = 0
+        For Each lrec As String In resultrecs
+            irec += 1
+            Dim ifield As Integer = -1
+            Do While lrec.Length > 0
+                lstr1 = StrRetRem(lrec)
+                ifield += 1
+                If IsNumeric(lstr1) Then
+                    resultvals(irec, ifield) = lstr1
+                End If
+            Loop
+        Next
 
-        '        If (TheTheme.CanSelect) Then
-        '            theftheme = theTheme
-        '            theftab = theTheme.GetFtab
-        '            shpfld = theFTab.FindField("Shape")
-        '            theFTab.CreateIndex(shpfld)
-        '        Else
-        '            p = False
-        '            def = av.GetProject.MakeFileName("theme", "shp")
-        '            def = FileDialog.Put(def, "*.shp", "Convert " + TheTheme.getName)
-        '            If (def = NIL) Then
-        '                Return NIL
-        '            End If
-        '            theFTab = TheTheme.ExportToFtab(def)
-        '            ' For Database themes, which can return a nil FTab sometimes 
-        '            If (theFTab = nil) Then
-        '    MsgBox.Warning("Error occurred while converting to shapefile."+NL+
-        '        "Shapefile was not created.", "Convert " + TheTheme.getName)
-        '                Exit Sub
-        '            End If
-        '            shpfld = theFTab.FindField("Shape")
-        '            ' build the spatial index
-        '            theFTab.CreateIndex(shpfld)
-        '            theftheme = FTheme.Make(theFTab)
-        '            theView.AddTheme(theftheme)
-        '            '  theView.GetWin.Activate
-        '            End If
+        'figure out date string from julian date
+        Dim lDate(6) As Integer
+        J2Date(aMapJDate, lDate)
+        Dim lYr As Integer = lDate(0)
+        Dim lJYr As Double = Date2J(lYr, 1, 1)
+        Dim lDaysAfter As Integer = aMapJDate - lJYr
+        Dim lDateString As String = lDate(0) & Format(lDaysAfter, "000")
 
-        '            theFtab.SetEditable(True)
-        '            addlist = List.Make
+        Dim plotday As Integer = 0
+        For lrow As Integer = 1 To numrecs
+            If resultvals(lrow, 0) = CSng(lDateString) Then
+                'found the date in the output file
+                plotday = lrow
+            End If
+        Next
 
-        '            Highflowfld = theFtab.FindField("Highflow")
-        '            If (Highflowfld = nil) Then
-        '                MsgBox.error("High flow field, Highflow, has not been initialized", "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            End If
-        '            lowflowfld = theFtab.FindField("Lowflow")
-        '            If (lowflowfld = nil) Then
-        '                MsgBox.error("Low flow field, Lowflow, has not been initialized", "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            End If
+        If plotday = 0 Then
+            Logger.Msg("Selected day not found in " & resultfilename, "Geospatial Stream Flow Model")
+            Exit Sub
+        End If
 
-        '            medflowfld = theFtab.FindField("Medflow")
-        '            If (medflowfld = nil) Then
-        '                MsgBox.error("Median flow field, Medflow, has not been initialized", "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            End If
+        Dim theHighflow As Single = 0.0
+        Dim theLowflow As Single = 0.0
+        Dim theMedflow As Single = 0.0
+        Dim theflow As Single = 0.0
+        For mynum As Integer = 1 To numflds - 1
+            Dim lSubbasinId As Integer = resultvals(1, mynum)
+            GisUtil.StartSetFeatureValue(theTheme)
+            For precs As Integer = 0 To GisUtil.NumFeatures(theTheme) - 1
+                Dim cpid As Integer = GisUtil.FieldValue(theTheme, precs, pidfield)
+                If (cpid = lSubbasinId) Then
+                    theHighflow = GisUtil.FieldValue(theTheme, precs, Highflowfld)
+                    theLowflow = GisUtil.FieldValue(theTheme, precs, lowflowfld)
+                    theMedflow = GisUtil.FieldValue(theTheme, precs, Medflowfld)
+                    theflow = resultvals(plotday, mynum)
+                    GisUtil.SetFeatureValueNoStartStop(theTheme, cflowfld, precs, SignificantDigits(theflow, 4))
+                    If (theflow > theHighflow) Then
+                        GisUtil.SetFeatureValueNoStartStop(theTheme, cfindexfld, precs, 3)
+                    ElseIf (theflow < theLowflow) Then
+                        GisUtil.SetFeatureValueNoStartStop(theTheme, cfindexfld, precs, 1)
+                    Else
+                        GisUtil.SetFeatureValueNoStartStop(theTheme, cfindexfld, precs, 2)
+                    End If
+                End If
+            Next
+            GisUtil.StopSetFeatureValue(theTheme)
+        Next
 
-        '            newflds = List.make
-        '            theFields = resultfile.GetFields
-        '            theFields.clone()
-        '            pidfield = theFtab.FindField("Gridcode")
-        '            If (pidfield = nil) Then
-        '                pidfield = theFtab.FindField("Grid_code")
-        '                If (pidfield = nil) Then
-        '                    pidfield = MsgBox.choice(thefields, "Select key field for the basin coverage/grid", "Geospatial Stream Flow Model")
-        '                    If (pidfield = nil) Then
-        '                        Exit Sub
-        '                    End If
-        '                End If
-        '            End If
-
-        '            cflowfld = theFtab.FindField("FlowNow")
-        '            If (cflowfld = nil) Then
-        '  fldadd = Field.Make("FlowNow", #field_decimal, 12 , 3)
-        '                newflds.Add(fldadd)
-        '                theFtab.AddFields(newflds)
-        '                cflowfld = theFtab.FindField("FlowNow")
-        '  newflds = {}
-        '            End If
-
-        '            cfindexfld = theFtab.FindField("IndexNow")
-        '            If (cfindexfld = nil) Then
-        '  fldadd = Field.Make("IndexNow", #field_byte, 4 , 0)
-        '                newflds.Add(fldadd)
-        '                theFtab.AddFields(newflds)
-        '                cfindexfld = theFtab.FindField("IndexNow")
-        '            End If
-
-        '            pnumrecs = theFtab.GetNumRecords
-        '            pidlist = List.Make
-        'For each prec in 0..(pnumrecs-1)
-        '                pidval = (theFtab.ReturnValue(pidfield, prec)).setformat("d")
-        '                pidlist.Add(pidval)
-        '        Next
-
-        '        numflds = theFields.count
-        '        numrecs = resultfile.GetNumRecords
-        '        Dayfld = resultfile.FindField("Timestep")
-        '        If (Dayfld = nil) Then
-        '            Dayfld = resultfile.FindField("Day")
-        '            If (Dayfld = nil) Then
-        '                Dayfld = resultfile.FindField("BasinID")
-        '                If (Dayfld = nil) Then
-        '                    Dayfld = resultfile.FindField("Time")
-        '                    If (Dayfld = nil) Then
-        '                        Dayfld = MsgBox.choice(thefields, "Select key field for the time series file", "Geospatial Stream Flow Model")
-        '                        If (Dayfld = nil) Then
-        '                            Exit Sub
-        '                        End If
-        '                    End If
-        '                End If
-        '            End If
-        '        End If
-
-        '        daylist = List.make
-        'For each frec in (numrecs-1)..0 by -1
-        '            dayval = resultfile.ReturnValue(dayfld, frec)
-        '            daylist.Add((dayval.setformat("dd")).asstring)
-        '        Next
-
-        '        plotday = MsgBox.ChoiceAsString(daylist, "Select day to plot flow percentile map", "Geospatial Stream Flow Model")
-        '        If (plotday = nil) Then
-        '            Exit Sub
-        '        End If
-        '        dayindex = (daylist.count - (daylist.findbyvalue(plotday)) - 1)
-        '        If (dayindex = -1) Then
-        '            MsgBox.error("Selected day not found in " + resultfilename.AsString, "Geospatial Stream Flow Model")
-        '            Exit Sub
-        '        End If
-
-        '        av.UseWaitCursor()
-
-        'for each mynum in 0..(numflds-1)
-        '            fld = theFields.Get(mynum)
-        '            av.ShowMsg("Checking Status for Basin " + (mynum + 1).asstring + " of " + numflds.asstring)
-        '            progress = (mynum / (numflds - 1)) * 100
-        '            doMore = av.SetStatus(progress)
-        '            If (Not doMore) Then
-        '                av.ClearWorkingStatus()
-        '                av.clearstatus()
-        '                Exit Sub
-        '            End If
-        '            If ((fld.IsTypeNumber) And (fld.AsString <> "timestep") And (fld.AsString <> "day")) Then
-        '    For each pid in 0..(pnumrecs-1)
-        '                    If (pidlist.Get(pid).AsString = fld.AsString) Then
-        '                        theHighflow = theFtab.ReturnValue(highflowfld, pid)
-        '                        theLowflow = theFtab.ReturnValue(Lowflowfld, pid)
-        '                        theMedflow = theFtab.ReturnValue(medflowfld, pid)
-        '                        theflow = resultfile.ReturnValueNumber(fld, dayindex)
-        '                        theFtab.SetValue(cflowfld, pid, theflow)
-        '                        If (theflow > theHighflow) Then
-        '                            theFtab.SetValue(cfindexfld, pid, 3)
-        '                        ElseIf (theflow < thelowflow) Then
-        '                            theFtab.SetValue(cfindexfld, pid, 1)
-        '                        Else
-        '                            theFtab.SetValue(cfindexfld, pid, 2)
-        '                        End If
-        '                    End If
-        '                                end if 
-        '        Next
-        '    Next
-
+        'generate thematic map
         '        theFtab.Flush()
         '        theFtab.SetEditable(False)
         'mylegend = legend.make(#SYMBOL_FILL)
@@ -4483,12 +4379,12 @@ Public Module modGeoSFM
         Logger.Dbg("Found " & aStations.Count & " Stations")
     End Sub
 
-    Private Function AddField(ByVal aTheme As Integer, ByVal aFieldName As String) As Integer
+    Private Function AddField(ByVal aTheme As Integer, ByVal aFieldName As String, Optional ByVal aFieldType As Integer = 2) As Integer
         Dim lfld As Integer = -1
         If GisUtil.IsField(aTheme, aFieldName) Then
             lfld = GisUtil.FieldIndex(aTheme, aFieldName)
         Else
-            GisUtil.AddField(aTheme, aFieldName, 2, 10)
+            GisUtil.AddField(aTheme, aFieldName, aFieldType, 10)
             lfld = GisUtil.FieldIndex(aTheme, aFieldName)
         End If
         Return lfld

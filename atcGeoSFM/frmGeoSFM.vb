@@ -216,6 +216,16 @@ Public Class frmGeoSFM
     Friend WithEvents rbnObj5 As System.Windows.Forms.RadioButton
     Friend WithEvents rbnObj4 As System.Windows.Forms.RadioButton
     Friend WithEvents rbnObj3 As System.Windows.Forms.RadioButton
+    Friend WithEvents gbxMap As System.Windows.Forms.GroupBox
+    Friend WithEvents rbnSoil As System.Windows.Forms.RadioButton
+    Friend WithEvents rbnStreamflow As System.Windows.Forms.RadioButton
+    Friend WithEvents gbxMapDates As System.Windows.Forms.GroupBox
+    Friend WithEvents lblMapDay As System.Windows.Forms.Label
+    Friend WithEvents lblMapMonth As System.Windows.Forms.Label
+    Friend WithEvents lblMapYear As System.Windows.Forms.Label
+    Friend WithEvents AtxMapDay As atcControls.atcText
+    Friend WithEvents atxMapYear As atcControls.atcText
+    Friend WithEvents AtxMapMonth As atcControls.atcText
     Friend WithEvents tpgMap As System.Windows.Forms.TabPage
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmGeoSFM))
@@ -323,6 +333,19 @@ Public Class frmGeoSFM
         Me.cboReachSensitivity = New System.Windows.Forms.ComboBox
         Me.cmdSensitivityNext = New System.Windows.Forms.Button
         Me.tpgCalibrate = New System.Windows.Forms.TabPage
+        Me.lblMax = New System.Windows.Forms.Label
+        Me.lstMax = New System.Windows.Forms.ListBox
+        Me.gbxObjective = New System.Windows.Forms.GroupBox
+        Me.rbnObj6 = New System.Windows.Forms.RadioButton
+        Me.rbnObj5 = New System.Windows.Forms.RadioButton
+        Me.rbnObj4 = New System.Windows.Forms.RadioButton
+        Me.rbnObj3 = New System.Windows.Forms.RadioButton
+        Me.rbnObj2 = New System.Windows.Forms.RadioButton
+        Me.rbnObj1 = New System.Windows.Forms.RadioButton
+        Me.lblParms = New System.Windows.Forms.Label
+        Me.lstCalib = New System.Windows.Forms.ListBox
+        Me.gbxConnect = New System.Windows.Forms.GroupBox
+        Me.AtcConnectFlows = New atcControls.atcConnectFields
         Me.cmdCalibrationNext = New System.Windows.Forms.Button
         Me.tpgBankfull = New System.Windows.Forms.TabPage
         Me.cmdBankfullNext = New System.Windows.Forms.Button
@@ -385,19 +408,16 @@ Public Class frmGeoSFM
         Me.Label44 = New System.Windows.Forms.Label
         Me.Label45 = New System.Windows.Forms.Label
         Me.ComboBox39 = New System.Windows.Forms.ComboBox
-        Me.gbxConnect = New System.Windows.Forms.GroupBox
-        Me.AtcConnectFlows = New atcControls.atcConnectFields
-        Me.lstCalib = New System.Windows.Forms.ListBox
-        Me.lblParms = New System.Windows.Forms.Label
-        Me.gbxObjective = New System.Windows.Forms.GroupBox
-        Me.lblMax = New System.Windows.Forms.Label
-        Me.lstMax = New System.Windows.Forms.ListBox
-        Me.rbnObj1 = New System.Windows.Forms.RadioButton
-        Me.rbnObj2 = New System.Windows.Forms.RadioButton
-        Me.rbnObj3 = New System.Windows.Forms.RadioButton
-        Me.rbnObj4 = New System.Windows.Forms.RadioButton
-        Me.rbnObj5 = New System.Windows.Forms.RadioButton
-        Me.rbnObj6 = New System.Windows.Forms.RadioButton
+        Me.gbxMap = New System.Windows.Forms.GroupBox
+        Me.rbnSoil = New System.Windows.Forms.RadioButton
+        Me.rbnStreamflow = New System.Windows.Forms.RadioButton
+        Me.gbxMapDates = New System.Windows.Forms.GroupBox
+        Me.lblMapDay = New System.Windows.Forms.Label
+        Me.lblMapMonth = New System.Windows.Forms.Label
+        Me.lblMapYear = New System.Windows.Forms.Label
+        Me.AtxMapDay = New atcControls.atcText
+        Me.atxMapYear = New atcControls.atcText
+        Me.AtxMapMonth = New atcControls.atcText
         Me.tabMain.SuspendLayout()
         Me.tpgTerrain.SuspendLayout()
         Me.tpgBasin.SuspendLayout()
@@ -413,12 +433,14 @@ Public Class frmGeoSFM
         Me.gbxStreamFlow.SuspendLayout()
         Me.tpgSensitivity.SuspendLayout()
         Me.tpgCalibrate.SuspendLayout()
+        Me.gbxObjective.SuspendLayout()
+        Me.gbxConnect.SuspendLayout()
         Me.tpgBankfull.SuspendLayout()
         Me.tpgMap.SuspendLayout()
         Me.tpgPlot.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
-        Me.gbxConnect.SuspendLayout()
-        Me.gbxObjective.SuspendLayout()
+        Me.gbxMap.SuspendLayout()
+        Me.gbxMapDates.SuspendLayout()
         Me.SuspendLayout()
         '
         'cmdCancel
@@ -491,7 +513,7 @@ Public Class frmGeoSFM
         Me.tpgTerrain.Controls.Add(Me.cboDEM)
         Me.tpgTerrain.Location = New System.Drawing.Point(4, 46)
         Me.tpgTerrain.Name = "tpgTerrain"
-        Me.tpgTerrain.Size = New System.Drawing.Size(647, 396)
+        Me.tpgTerrain.Size = New System.Drawing.Size(647, 387)
         Me.tpgTerrain.TabIndex = 10
         Me.tpgTerrain.Text = "Terrain Analysis"
         Me.tpgTerrain.UseVisualStyleBackColor = True
@@ -501,7 +523,7 @@ Public Class frmGeoSFM
         Me.cmdTerrainNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdTerrainNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdTerrainNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdTerrainNext.Location = New System.Drawing.Point(555, 350)
+        Me.cmdTerrainNext.Location = New System.Drawing.Point(555, 341)
         Me.cmdTerrainNext.Name = "cmdTerrainNext"
         Me.cmdTerrainNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdTerrainNext.TabIndex = 39
@@ -636,7 +658,7 @@ Public Class frmGeoSFM
         Me.tpgBasin.Controls.Add(Me.cboBC2)
         Me.tpgBasin.Location = New System.Drawing.Point(4, 46)
         Me.tpgBasin.Name = "tpgBasin"
-        Me.tpgBasin.Size = New System.Drawing.Size(647, 396)
+        Me.tpgBasin.Size = New System.Drawing.Size(647, 387)
         Me.tpgBasin.TabIndex = 8
         Me.tpgBasin.Text = "Basin Characteristics"
         Me.tpgBasin.UseVisualStyleBackColor = True
@@ -646,7 +668,7 @@ Public Class frmGeoSFM
         Me.cmdBasinNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdBasinNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdBasinNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdBasinNext.Location = New System.Drawing.Point(558, 354)
+        Me.cmdBasinNext.Location = New System.Drawing.Point(558, 345)
         Me.cmdBasinNext.Name = "cmdBasinNext"
         Me.cmdBasinNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdBasinNext.TabIndex = 48
@@ -958,7 +980,7 @@ Public Class frmGeoSFM
         Me.tpgResponse.Controls.Add(Me.lblMethod)
         Me.tpgResponse.Location = New System.Drawing.Point(4, 46)
         Me.tpgResponse.Name = "tpgResponse"
-        Me.tpgResponse.Size = New System.Drawing.Size(647, 396)
+        Me.tpgResponse.Size = New System.Drawing.Size(647, 387)
         Me.tpgResponse.TabIndex = 9
         Me.tpgResponse.Text = "Basin Response"
         Me.tpgResponse.UseVisualStyleBackColor = True
@@ -1058,7 +1080,7 @@ Public Class frmGeoSFM
         Me.cmdResponseNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdResponseNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdResponseNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdResponseNext.Location = New System.Drawing.Point(558, 355)
+        Me.cmdResponseNext.Location = New System.Drawing.Point(558, 346)
         Me.cmdResponseNext.Name = "cmdResponseNext"
         Me.cmdResponseNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdResponseNext.TabIndex = 51
@@ -1078,7 +1100,7 @@ Public Class frmGeoSFM
         Me.AtcGridMannings.LineWidth = 0.0!
         Me.AtcGridMannings.Location = New System.Drawing.Point(31, 259)
         Me.AtcGridMannings.Name = "AtcGridMannings"
-        Me.AtcGridMannings.Size = New System.Drawing.Size(175, 107)
+        Me.AtcGridMannings.Size = New System.Drawing.Size(175, 98)
         Me.AtcGridMannings.Source = Nothing
         Me.AtcGridMannings.TabIndex = 50
         '
@@ -1424,7 +1446,7 @@ Public Class frmGeoSFM
         Me.tpgSoil.Controls.Add(Me.cmdBalanceNext)
         Me.tpgSoil.Location = New System.Drawing.Point(4, 46)
         Me.tpgSoil.Name = "tpgSoil"
-        Me.tpgSoil.Size = New System.Drawing.Size(647, 396)
+        Me.tpgSoil.Size = New System.Drawing.Size(647, 387)
         Me.tpgSoil.TabIndex = 11
         Me.tpgSoil.Text = "Compute Soil Water Balance"
         Me.tpgSoil.UseVisualStyleBackColor = True
@@ -1598,7 +1620,7 @@ Public Class frmGeoSFM
         Me.cmdBalanceNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdBalanceNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdBalanceNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdBalanceNext.Location = New System.Drawing.Point(554, 353)
+        Me.cmdBalanceNext.Location = New System.Drawing.Point(554, 344)
         Me.cmdBalanceNext.Name = "cmdBalanceNext"
         Me.cmdBalanceNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdBalanceNext.TabIndex = 52
@@ -1612,7 +1634,7 @@ Public Class frmGeoSFM
         Me.tpgFlow.Controls.Add(Me.cmdRouteNext)
         Me.tpgFlow.Location = New System.Drawing.Point(4, 46)
         Me.tpgFlow.Name = "tpgFlow"
-        Me.tpgFlow.Size = New System.Drawing.Size(647, 396)
+        Me.tpgFlow.Size = New System.Drawing.Size(647, 387)
         Me.tpgFlow.TabIndex = 12
         Me.tpgFlow.Text = "Compute Stream Flow"
         Me.tpgFlow.UseVisualStyleBackColor = True
@@ -1698,7 +1720,7 @@ Public Class frmGeoSFM
         Me.cmdRouteNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdRouteNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdRouteNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdRouteNext.Location = New System.Drawing.Point(555, 349)
+        Me.cmdRouteNext.Location = New System.Drawing.Point(555, 340)
         Me.cmdRouteNext.Name = "cmdRouteNext"
         Me.cmdRouteNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdRouteNext.TabIndex = 53
@@ -1784,6 +1806,150 @@ Public Class frmGeoSFM
         Me.tpgCalibrate.Text = "Model Calibration"
         Me.tpgCalibrate.UseVisualStyleBackColor = True
         '
+        'lblMax
+        '
+        Me.lblMax.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblMax.AutoSize = True
+        Me.lblMax.Location = New System.Drawing.Point(506, 24)
+        Me.lblMax.Name = "lblMax"
+        Me.lblMax.Size = New System.Drawing.Size(131, 13)
+        Me.lblMax.TabIndex = 47
+        Me.lblMax.Text = "Maximum Number of Runs"
+        '
+        'lstMax
+        '
+        Me.lstMax.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lstMax.FormattingEnabled = True
+        Me.lstMax.Location = New System.Drawing.Point(509, 40)
+        Me.lstMax.Name = "lstMax"
+        Me.lstMax.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
+        Me.lstMax.Size = New System.Drawing.Size(125, 121)
+        Me.lstMax.TabIndex = 46
+        '
+        'gbxObjective
+        '
+        Me.gbxObjective.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbxObjective.Controls.Add(Me.rbnObj6)
+        Me.gbxObjective.Controls.Add(Me.rbnObj5)
+        Me.gbxObjective.Controls.Add(Me.rbnObj4)
+        Me.gbxObjective.Controls.Add(Me.rbnObj3)
+        Me.gbxObjective.Controls.Add(Me.rbnObj2)
+        Me.gbxObjective.Controls.Add(Me.rbnObj1)
+        Me.gbxObjective.Location = New System.Drawing.Point(369, 166)
+        Me.gbxObjective.Name = "gbxObjective"
+        Me.gbxObjective.Size = New System.Drawing.Size(265, 168)
+        Me.gbxObjective.TabIndex = 45
+        Me.gbxObjective.TabStop = False
+        Me.gbxObjective.Text = "Objective Function Type"
+        '
+        'rbnObj6
+        '
+        Me.rbnObj6.AutoSize = True
+        Me.rbnObj6.Location = New System.Drawing.Point(10, 138)
+        Me.rbnObj6.Name = "rbnObj6"
+        Me.rbnObj6.Size = New System.Drawing.Size(49, 17)
+        Me.rbnObj6.TabIndex = 5
+        Me.rbnObj6.Text = "BIAS"
+        Me.rbnObj6.UseVisualStyleBackColor = True
+        '
+        'rbnObj5
+        '
+        Me.rbnObj5.AutoSize = True
+        Me.rbnObj5.Location = New System.Drawing.Point(10, 113)
+        Me.rbnObj5.Name = "rbnObj5"
+        Me.rbnObj5.Size = New System.Drawing.Size(174, 17)
+        Me.rbnObj5.TabIndex = 4
+        Me.rbnObj5.Text = "Number of Sign Changes (NSC)"
+        Me.rbnObj5.UseVisualStyleBackColor = True
+        '
+        'rbnObj4
+        '
+        Me.rbnObj4.AutoSize = True
+        Me.rbnObj4.Location = New System.Drawing.Point(10, 90)
+        Me.rbnObj4.Name = "rbnObj4"
+        Me.rbnObj4.Size = New System.Drawing.Size(171, 17)
+        Me.rbnObj4.TabIndex = 3
+        Me.rbnObj4.Text = "Nash-Sutcliffe Efficiency (NSE)"
+        Me.rbnObj4.UseVisualStyleBackColor = True
+        '
+        'rbnObj3
+        '
+        Me.rbnObj3.AutoSize = True
+        Me.rbnObj3.Location = New System.Drawing.Point(10, 67)
+        Me.rbnObj3.Name = "rbnObj3"
+        Me.rbnObj3.Size = New System.Drawing.Size(176, 17)
+        Me.rbnObj3.TabIndex = 2
+        Me.rbnObj3.Text = "Maximum Likelihood Error (MLE)"
+        Me.rbnObj3.UseVisualStyleBackColor = True
+        '
+        'rbnObj2
+        '
+        Me.rbnObj2.AutoSize = True
+        Me.rbnObj2.Location = New System.Drawing.Point(10, 44)
+        Me.rbnObj2.Name = "rbnObj2"
+        Me.rbnObj2.Size = New System.Drawing.Size(147, 17)
+        Me.rbnObj2.TabIndex = 1
+        Me.rbnObj2.Text = "Standard Deviation (STD)"
+        Me.rbnObj2.UseVisualStyleBackColor = True
+        '
+        'rbnObj1
+        '
+        Me.rbnObj1.AutoSize = True
+        Me.rbnObj1.Checked = True
+        Me.rbnObj1.Location = New System.Drawing.Point(10, 21)
+        Me.rbnObj1.Name = "rbnObj1"
+        Me.rbnObj1.Size = New System.Drawing.Size(180, 17)
+        Me.rbnObj1.TabIndex = 0
+        Me.rbnObj1.TabStop = True
+        Me.rbnObj1.Text = "Root Mean Square Error (RMSE)"
+        Me.rbnObj1.UseVisualStyleBackColor = True
+        '
+        'lblParms
+        '
+        Me.lblParms.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblParms.AutoSize = True
+        Me.lblParms.Location = New System.Drawing.Point(366, 24)
+        Me.lblParms.Name = "lblParms"
+        Me.lblParms.Size = New System.Drawing.Size(112, 13)
+        Me.lblParms.TabIndex = 44
+        Me.lblParms.Text = "Calibration Parameters"
+        '
+        'lstCalib
+        '
+        Me.lstCalib.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lstCalib.FormattingEnabled = True
+        Me.lstCalib.Location = New System.Drawing.Point(369, 40)
+        Me.lstCalib.Name = "lstCalib"
+        Me.lstCalib.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
+        Me.lstCalib.Size = New System.Drawing.Size(125, 121)
+        Me.lstCalib.TabIndex = 43
+        '
+        'gbxConnect
+        '
+        Me.gbxConnect.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbxConnect.Controls.Add(Me.AtcConnectFlows)
+        Me.gbxConnect.Location = New System.Drawing.Point(22, 22)
+        Me.gbxConnect.Name = "gbxConnect"
+        Me.gbxConnect.Size = New System.Drawing.Size(329, 313)
+        Me.gbxConnect.TabIndex = 42
+        Me.gbxConnect.TabStop = False
+        Me.gbxConnect.Text = "Observed Flow / Subbasin Connections"
+        '
+        'AtcConnectFlows
+        '
+        Me.AtcConnectFlows.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcConnectFlows.Location = New System.Drawing.Point(5, 18)
+        Me.AtcConnectFlows.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.AtcConnectFlows.Name = "AtcConnectFlows"
+        Me.AtcConnectFlows.Size = New System.Drawing.Size(319, 281)
+        Me.AtcConnectFlows.TabIndex = 42
+        '
         'cmdCalibrationNext
         '
         Me.cmdCalibrationNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
@@ -1800,7 +1966,7 @@ Public Class frmGeoSFM
         Me.tpgBankfull.Controls.Add(Me.cmdBankfullNext)
         Me.tpgBankfull.Location = New System.Drawing.Point(4, 46)
         Me.tpgBankfull.Name = "tpgBankfull"
-        Me.tpgBankfull.Size = New System.Drawing.Size(647, 396)
+        Me.tpgBankfull.Size = New System.Drawing.Size(647, 387)
         Me.tpgBankfull.TabIndex = 15
         Me.tpgBankfull.Text = "Bankfull and Flow Statistics"
         Me.tpgBankfull.UseVisualStyleBackColor = True
@@ -1810,7 +1976,7 @@ Public Class frmGeoSFM
         Me.cmdBankfullNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdBankfullNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdBankfullNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdBankfullNext.Location = New System.Drawing.Point(558, 350)
+        Me.cmdBankfullNext.Location = New System.Drawing.Point(558, 341)
         Me.cmdBankfullNext.Name = "cmdBankfullNext"
         Me.cmdBankfullNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdBankfullNext.TabIndex = 40
@@ -1818,11 +1984,13 @@ Public Class frmGeoSFM
         '
         'tpgMap
         '
+        Me.tpgMap.Controls.Add(Me.gbxMapDates)
+        Me.tpgMap.Controls.Add(Me.gbxMap)
         Me.tpgMap.Controls.Add(Me.cmdMapGenerate)
         Me.tpgMap.Controls.Add(Me.Button10)
         Me.tpgMap.Location = New System.Drawing.Point(4, 46)
         Me.tpgMap.Name = "tpgMap"
-        Me.tpgMap.Size = New System.Drawing.Size(647, 396)
+        Me.tpgMap.Size = New System.Drawing.Size(647, 387)
         Me.tpgMap.TabIndex = 16
         Me.tpgMap.Text = "Flow Percentile Map"
         Me.tpgMap.UseVisualStyleBackColor = True
@@ -1832,7 +2000,7 @@ Public Class frmGeoSFM
         Me.cmdMapGenerate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdMapGenerate.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdMapGenerate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdMapGenerate.Location = New System.Drawing.Point(475, 349)
+        Me.cmdMapGenerate.Location = New System.Drawing.Point(475, 340)
         Me.cmdMapGenerate.Name = "cmdMapGenerate"
         Me.cmdMapGenerate.Size = New System.Drawing.Size(73, 28)
         Me.cmdMapGenerate.TabIndex = 41
@@ -1843,7 +2011,7 @@ Public Class frmGeoSFM
         Me.Button10.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.Button10.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.Button10.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button10.Location = New System.Drawing.Point(554, 349)
+        Me.Button10.Location = New System.Drawing.Point(554, 340)
         Me.Button10.Name = "Button10"
         Me.Button10.Size = New System.Drawing.Size(73, 28)
         Me.Button10.TabIndex = 40
@@ -1854,7 +2022,7 @@ Public Class frmGeoSFM
         Me.tpgPlot.Controls.Add(Me.cmdPlotGenerate)
         Me.tpgPlot.Location = New System.Drawing.Point(4, 46)
         Me.tpgPlot.Name = "tpgPlot"
-        Me.tpgPlot.Size = New System.Drawing.Size(647, 396)
+        Me.tpgPlot.Size = New System.Drawing.Size(647, 387)
         Me.tpgPlot.TabIndex = 17
         Me.tpgPlot.Text = "Flow Hydrographs"
         Me.tpgPlot.UseVisualStyleBackColor = True
@@ -1864,7 +2032,7 @@ Public Class frmGeoSFM
         Me.cmdPlotGenerate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdPlotGenerate.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdPlotGenerate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdPlotGenerate.Location = New System.Drawing.Point(557, 350)
+        Me.cmdPlotGenerate.Location = New System.Drawing.Point(557, 341)
         Me.cmdPlotGenerate.Name = "cmdPlotGenerate"
         Me.cmdPlotGenerate.Size = New System.Drawing.Size(73, 28)
         Me.cmdPlotGenerate.TabIndex = 40
@@ -2466,149 +2634,151 @@ Public Class frmGeoSFM
         Me.ComboBox39.Size = New System.Drawing.Size(312, 21)
         Me.ComboBox39.TabIndex = 23
         '
-        'gbxConnect
+        'gbxMap
         '
-        Me.gbxConnect.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.gbxMap.Controls.Add(Me.rbnSoil)
+        Me.gbxMap.Controls.Add(Me.rbnStreamflow)
+        Me.gbxMap.Location = New System.Drawing.Point(24, 23)
+        Me.gbxMap.Name = "gbxMap"
+        Me.gbxMap.Size = New System.Drawing.Size(159, 70)
+        Me.gbxMap.TabIndex = 58
+        Me.gbxMap.TabStop = False
+        Me.gbxMap.Text = "Result File"
+        '
+        'rbnSoil
+        '
+        Me.rbnSoil.AutoSize = True
+        Me.rbnSoil.Location = New System.Drawing.Point(7, 42)
+        Me.rbnSoil.Name = "rbnSoil"
+        Me.rbnSoil.Size = New System.Drawing.Size(74, 17)
+        Me.rbnSoil.TabIndex = 2
+        Me.rbnSoil.Text = "Soil Water"
+        Me.rbnSoil.UseVisualStyleBackColor = True
+        '
+        'rbnStreamflow
+        '
+        Me.rbnStreamflow.AutoSize = True
+        Me.rbnStreamflow.Checked = True
+        Me.rbnStreamflow.Location = New System.Drawing.Point(7, 19)
+        Me.rbnStreamflow.Name = "rbnStreamflow"
+        Me.rbnStreamflow.Size = New System.Drawing.Size(83, 17)
+        Me.rbnStreamflow.TabIndex = 1
+        Me.rbnStreamflow.TabStop = True
+        Me.rbnStreamflow.Text = "Stream Flow"
+        Me.rbnStreamflow.UseVisualStyleBackColor = True
+        '
+        'gbxMapDates
+        '
+        Me.gbxMapDates.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.gbxConnect.Controls.Add(Me.AtcConnectFlows)
-        Me.gbxConnect.Location = New System.Drawing.Point(22, 22)
-        Me.gbxConnect.Name = "gbxConnect"
-        Me.gbxConnect.Size = New System.Drawing.Size(329, 313)
-        Me.gbxConnect.TabIndex = 42
-        Me.gbxConnect.TabStop = False
-        Me.gbxConnect.Text = "Observed Flow / Subbasin Connections"
+        Me.gbxMapDates.Controls.Add(Me.lblMapDay)
+        Me.gbxMapDates.Controls.Add(Me.lblMapMonth)
+        Me.gbxMapDates.Controls.Add(Me.lblMapYear)
+        Me.gbxMapDates.Controls.Add(Me.AtxMapDay)
+        Me.gbxMapDates.Controls.Add(Me.atxMapYear)
+        Me.gbxMapDates.Controls.Add(Me.AtxMapMonth)
+        Me.gbxMapDates.Location = New System.Drawing.Point(24, 99)
+        Me.gbxMapDates.Name = "gbxMapDates"
+        Me.gbxMapDates.Size = New System.Drawing.Size(207, 80)
+        Me.gbxMapDates.TabIndex = 59
+        Me.gbxMapDates.TabStop = False
+        Me.gbxMapDates.Text = "Result Date"
         '
-        'AtcConnectFlows
+        'lblMapDay
         '
-        Me.AtcConnectFlows.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcConnectFlows.Location = New System.Drawing.Point(5, 18)
-        Me.AtcConnectFlows.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
-        Me.AtcConnectFlows.Name = "AtcConnectFlows"
-        Me.AtcConnectFlows.Size = New System.Drawing.Size(319, 281)
-        Me.AtcConnectFlows.TabIndex = 42
+        Me.lblMapDay.AutoSize = True
+        Me.lblMapDay.Location = New System.Drawing.Point(136, 27)
+        Me.lblMapDay.Name = "lblMapDay"
+        Me.lblMapDay.Size = New System.Drawing.Size(26, 13)
+        Me.lblMapDay.TabIndex = 35
+        Me.lblMapDay.Text = "Day"
         '
-        'lstCalib
+        'lblMapMonth
         '
-        Me.lstCalib.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lstCalib.FormattingEnabled = True
-        Me.lstCalib.Location = New System.Drawing.Point(369, 40)
-        Me.lstCalib.Name = "lstCalib"
-        Me.lstCalib.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstCalib.Size = New System.Drawing.Size(125, 121)
-        Me.lstCalib.TabIndex = 43
+        Me.lblMapMonth.AutoSize = True
+        Me.lblMapMonth.Location = New System.Drawing.Point(87, 27)
+        Me.lblMapMonth.Name = "lblMapMonth"
+        Me.lblMapMonth.Size = New System.Drawing.Size(37, 13)
+        Me.lblMapMonth.TabIndex = 34
+        Me.lblMapMonth.Text = "Month"
         '
-        'lblParms
+        'lblMapYear
         '
-        Me.lblParms.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblParms.AutoSize = True
-        Me.lblParms.Location = New System.Drawing.Point(366, 24)
-        Me.lblParms.Name = "lblParms"
-        Me.lblParms.Size = New System.Drawing.Size(112, 13)
-        Me.lblParms.TabIndex = 44
-        Me.lblParms.Text = "Calibration Parameters"
+        Me.lblMapYear.AutoSize = True
+        Me.lblMapYear.Location = New System.Drawing.Point(19, 27)
+        Me.lblMapYear.Name = "lblMapYear"
+        Me.lblMapYear.Size = New System.Drawing.Size(29, 13)
+        Me.lblMapYear.TabIndex = 33
+        Me.lblMapYear.Text = "Year"
         '
-        'gbxObjective
+        'AtxMapDay
         '
-        Me.gbxObjective.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.gbxObjective.Controls.Add(Me.rbnObj6)
-        Me.gbxObjective.Controls.Add(Me.rbnObj5)
-        Me.gbxObjective.Controls.Add(Me.rbnObj4)
-        Me.gbxObjective.Controls.Add(Me.rbnObj3)
-        Me.gbxObjective.Controls.Add(Me.rbnObj2)
-        Me.gbxObjective.Controls.Add(Me.rbnObj1)
-        Me.gbxObjective.Location = New System.Drawing.Point(369, 166)
-        Me.gbxObjective.Name = "gbxObjective"
-        Me.gbxObjective.Size = New System.Drawing.Size(265, 168)
-        Me.gbxObjective.TabIndex = 45
-        Me.gbxObjective.TabStop = False
-        Me.gbxObjective.Text = "Objective Function Type"
+        Me.AtxMapDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtxMapDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtxMapDay.DefaultValue = ""
+        Me.AtxMapDay.HardMax = 31
+        Me.AtxMapDay.HardMin = 1
+        Me.AtxMapDay.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtxMapDay.Location = New System.Drawing.Point(139, 45)
+        Me.AtxMapDay.MaxWidth = 20
+        Me.AtxMapDay.Name = "AtxMapDay"
+        Me.AtxMapDay.NumericFormat = "0"
+        Me.AtxMapDay.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtxMapDay.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtxMapDay.SelLength = 0
+        Me.AtxMapDay.SelStart = 0
+        Me.AtxMapDay.Size = New System.Drawing.Size(44, 21)
+        Me.AtxMapDay.SoftMax = -999
+        Me.AtxMapDay.SoftMin = -999
+        Me.AtxMapDay.TabIndex = 31
+        Me.AtxMapDay.ValueDouble = 1
+        Me.AtxMapDay.ValueInteger = 1
         '
-        'lblMax
+        'atxMapYear
         '
-        Me.lblMax.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblMax.AutoSize = True
-        Me.lblMax.Location = New System.Drawing.Point(506, 24)
-        Me.lblMax.Name = "lblMax"
-        Me.lblMax.Size = New System.Drawing.Size(131, 13)
-        Me.lblMax.TabIndex = 47
-        Me.lblMax.Text = "Maximum Number of Runs"
+        Me.atxMapYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxMapYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxMapYear.DefaultValue = ""
+        Me.atxMapYear.HardMax = 9999
+        Me.atxMapYear.HardMin = 0
+        Me.atxMapYear.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxMapYear.Location = New System.Drawing.Point(21, 45)
+        Me.atxMapYear.MaxWidth = 20
+        Me.atxMapYear.Name = "atxMapYear"
+        Me.atxMapYear.NumericFormat = "0"
+        Me.atxMapYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxMapYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxMapYear.SelLength = 0
+        Me.atxMapYear.SelStart = 0
+        Me.atxMapYear.Size = New System.Drawing.Size(64, 21)
+        Me.atxMapYear.SoftMax = -999
+        Me.atxMapYear.SoftMin = -999
+        Me.atxMapYear.TabIndex = 30
+        Me.atxMapYear.ValueDouble = 2000
+        Me.atxMapYear.ValueInteger = 2000
         '
-        'lstMax
+        'AtxMapMonth
         '
-        Me.lstMax.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lstMax.FormattingEnabled = True
-        Me.lstMax.Location = New System.Drawing.Point(509, 40)
-        Me.lstMax.Name = "lstMax"
-        Me.lstMax.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstMax.Size = New System.Drawing.Size(125, 121)
-        Me.lstMax.TabIndex = 46
-        '
-        'rbnObj1
-        '
-        Me.rbnObj1.AutoSize = True
-        Me.rbnObj1.Checked = True
-        Me.rbnObj1.Location = New System.Drawing.Point(10, 21)
-        Me.rbnObj1.Name = "rbnObj1"
-        Me.rbnObj1.Size = New System.Drawing.Size(180, 17)
-        Me.rbnObj1.TabIndex = 0
-        Me.rbnObj1.TabStop = True
-        Me.rbnObj1.Text = "Root Mean Square Error (RMSE)"
-        Me.rbnObj1.UseVisualStyleBackColor = True
-        '
-        'rbnObj2
-        '
-        Me.rbnObj2.AutoSize = True
-        Me.rbnObj2.Location = New System.Drawing.Point(10, 44)
-        Me.rbnObj2.Name = "rbnObj2"
-        Me.rbnObj2.Size = New System.Drawing.Size(147, 17)
-        Me.rbnObj2.TabIndex = 1
-        Me.rbnObj2.Text = "Standard Deviation (STD)"
-        Me.rbnObj2.UseVisualStyleBackColor = True
-        '
-        'rbnObj3
-        '
-        Me.rbnObj3.AutoSize = True
-        Me.rbnObj3.Location = New System.Drawing.Point(10, 67)
-        Me.rbnObj3.Name = "rbnObj3"
-        Me.rbnObj3.Size = New System.Drawing.Size(176, 17)
-        Me.rbnObj3.TabIndex = 2
-        Me.rbnObj3.Text = "Maximum Likelihood Error (MLE)"
-        Me.rbnObj3.UseVisualStyleBackColor = True
-        '
-        'rbnObj4
-        '
-        Me.rbnObj4.AutoSize = True
-        Me.rbnObj4.Location = New System.Drawing.Point(10, 90)
-        Me.rbnObj4.Name = "rbnObj4"
-        Me.rbnObj4.Size = New System.Drawing.Size(171, 17)
-        Me.rbnObj4.TabIndex = 3
-        Me.rbnObj4.Text = "Nash-Sutcliffe Efficiency (NSE)"
-        Me.rbnObj4.UseVisualStyleBackColor = True
-        '
-        'rbnObj5
-        '
-        Me.rbnObj5.AutoSize = True
-        Me.rbnObj5.Location = New System.Drawing.Point(10, 113)
-        Me.rbnObj5.Name = "rbnObj5"
-        Me.rbnObj5.Size = New System.Drawing.Size(174, 17)
-        Me.rbnObj5.TabIndex = 4
-        Me.rbnObj5.Text = "Number of Sign Changes (NSC)"
-        Me.rbnObj5.UseVisualStyleBackColor = True
-        '
-        'rbnObj6
-        '
-        Me.rbnObj6.AutoSize = True
-        Me.rbnObj6.Location = New System.Drawing.Point(10, 138)
-        Me.rbnObj6.Name = "rbnObj6"
-        Me.rbnObj6.Size = New System.Drawing.Size(49, 17)
-        Me.rbnObj6.TabIndex = 5
-        Me.rbnObj6.Text = "BIAS"
-        Me.rbnObj6.UseVisualStyleBackColor = True
+        Me.AtxMapMonth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtxMapMonth.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtxMapMonth.DefaultValue = ""
+        Me.AtxMapMonth.HardMax = 12
+        Me.AtxMapMonth.HardMin = 1
+        Me.AtxMapMonth.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtxMapMonth.Location = New System.Drawing.Point(90, 45)
+        Me.AtxMapMonth.MaxWidth = 20
+        Me.AtxMapMonth.Name = "AtxMapMonth"
+        Me.AtxMapMonth.NumericFormat = "0"
+        Me.AtxMapMonth.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtxMapMonth.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtxMapMonth.SelLength = 0
+        Me.AtxMapMonth.SelStart = 0
+        Me.AtxMapMonth.Size = New System.Drawing.Size(44, 21)
+        Me.AtxMapMonth.SoftMax = -999
+        Me.AtxMapMonth.SoftMin = -999
+        Me.AtxMapMonth.TabIndex = 28
+        Me.AtxMapMonth.ValueDouble = 1
+        Me.AtxMapMonth.ValueInteger = 1
         '
         'frmGeoSFM
         '
@@ -2652,13 +2822,17 @@ Public Class frmGeoSFM
         Me.tpgSensitivity.PerformLayout()
         Me.tpgCalibrate.ResumeLayout(False)
         Me.tpgCalibrate.PerformLayout()
+        Me.gbxObjective.ResumeLayout(False)
+        Me.gbxObjective.PerformLayout()
+        Me.gbxConnect.ResumeLayout(False)
         Me.tpgBankfull.ResumeLayout(False)
         Me.tpgMap.ResumeLayout(False)
         Me.tpgPlot.ResumeLayout(False)
         Me.GroupBox1.ResumeLayout(False)
-        Me.gbxConnect.ResumeLayout(False)
-        Me.gbxObjective.ResumeLayout(False)
-        Me.gbxObjective.PerformLayout()
+        Me.gbxMap.ResumeLayout(False)
+        Me.gbxMap.PerformLayout()
+        Me.gbxMapDates.ResumeLayout(False)
+        Me.gbxMapDates.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -3572,7 +3746,29 @@ Public Class frmGeoSFM
     End Sub
 
     Private Sub cmdMapGenerate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdMapGenerate.Click
-        PlotMap()
+        Dim lStreamFlow As Boolean = True
+        If rbnSoil.Checked Then
+            lStreamFlow = False
+        End If
+
+        Dim lMapJDate As Double = 0.0
+        Dim lMapDate(5) As Integer
+        lMapDate(0) = atxSYear.Text
+        lMapDate(1) = atxSMonth.Text
+        lMapDate(2) = atxSDay.Text
+        lMapJDate = Date2J(lMapDate)
+
+        EnableControls(False)
+        lblStatus.Text = "Generating Map......."
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+        Me.Refresh()
+
+        PlotMap(lStreamFlow, lMapJDate)
+
+        lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+        Me.Refresh()
+        EnableControls(True)
     End Sub
 
     Private Sub cmdPlotGenerate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdPlotGenerate.Click
@@ -3718,6 +3914,11 @@ Public Class frmGeoSFM
                 lstCalib.Items.Add("Celerity")
                 lstCalib.Items.Add("Diffusion")
             End If
+        ElseIf tabMain.SelectedIndex = 9 Then
+            'plot map tab
+            atxMapYear.Text = atxSYear.Text
+            AtxMapMonth.Text = atxSMonth.Text
+            AtxMapDay.Text = atxSDay.Text
         End If
     End Sub
 
