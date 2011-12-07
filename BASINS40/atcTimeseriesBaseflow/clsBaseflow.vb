@@ -6,10 +6,11 @@ Imports System.Text
 Imports System.Collections.Specialized
 Imports atcData
 
-Public Enum HySepMethod
-    FIXED = 1
-    SLIDE = 2
-    LOCMIN = 3
+Public Enum BFMethods
+    HySEPFixed = 1
+    HySEPLocMin = 2
+    HySEPSlide = 3
+    PART = 4
 End Enum
 
 Public Interface IclsBaseflow

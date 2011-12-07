@@ -1,8 +1,392 @@
 ﻿Imports atcData
 Imports atcUtility
+Imports atcTimeseriesBaseflow
 Imports MapWinUtility
 
 Module modBaseflowUtil
+    Public MethodsLastDone As ArrayList
+    Public OutputFilenameRoot As String
+    Public OutputDir As String
+    Private pUADepth As Double = 0.03719
+
+    Public Sub ASCIICommon(ByVal aTs As atcTimeseries)
+
+        If Not IO.Directory.Exists(OutputDir) Then
+            Exit Sub
+        End If
+
+        'Organize data
+        Dim lStart As Double = -99.9
+        Dim lEnd As Double = -99.9
+        Dim lDA As Double = -99.9
+
+        Dim lTsGroupPart As atcCollection = ConstructReportTsGroup(aTs, BFMethods.PART, lStart, lEnd, lDA)
+        Dim lTsGroupFixed As atcCollection = ConstructReportTsGroup(aTs, BFMethods.HySEPFixed, lStart, lEnd, lDA)
+        Dim lTsGroupLocMin As atcCollection = ConstructReportTsGroup(aTs, BFMethods.HySEPLocMin, lStart, lEnd, lDA)
+        Dim lTsGroupSlide As atcCollection = ConstructReportTsGroup(aTs, BFMethods.HySEPSlide, lStart, lEnd, lDA)
+
+        If (lStart < 0 AndAlso lEnd < 0) OrElse lDA < 0 Then Exit Sub
+
+        Dim lConversionFactor As Double = pUADepth / lDA
+        Dim lTsFlowDaily As atcTimeseries = SubsetByDate(aTs, lStart, lEnd, Nothing)
+        Dim lTsFlowDailyDepth As atcTimeseries = lTsFlowDaily * lConversionFactor
+
+        Dim lTsFlowMonthly As atcTimeseries = Aggregate(lTsFlowDaily, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
+        Dim lTsFlowMonthlySum As atcTimeseries = Aggregate(lTsFlowDaily, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
+        Dim lTsFlowMonthlyDepth As atcTimeseries = lTsFlowMonthlySum * lConversionFactor
+
+        Dim lTsFlowYearly As atcTimeseries = Aggregate(lTsFlowDaily, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+        Dim lTsFlowYearlySum As atcTimeseries = Aggregate(lTsFlowDaily, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+        Dim lTsFlowYearlyDepth As atcTimeseries = lTsFlowYearlySum * lConversionFactor
+
+        Dim lTsGroupStreamFlow As New atcCollection
+        With lTsGroupStreamFlow
+            .Add("RateDaily", lTsFlowDaily)
+            .Add("DepthDaily", lTsFlowDailyDepth)
+            .Add("RateMonthly", lTsFlowMonthly)
+            .Add("DepthMonthly", lTsFlowMonthlyDepth)
+            .Add("RateYearly", lTsFlowYearly)
+            .Add("DepthYearly", lTsFlowYearlyDepth)
+        End With
+
+        Dim lFileDailySum As String = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_Daily.csv")
+        Dim lFileMonthlySum As String = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_Monthly.csv")
+        Dim lFileYearlySum As String = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_Yearly.csv")
+
+        Dim lMethodNames As New atcCollection
+        With lMethodNames
+            .Add(BFMethods.PART, "PART")
+            .Add(BFMethods.HySEPFixed, "HySEP-Fixed")
+            .Add(BFMethods.HySEPLocMin, "HySEP-LocMin")
+            .Add(BFMethods.HySEPSlide, "HySEP-Slide")
+        End With
+
+        Dim lNumColumns As Integer = 4 + MethodsLastDone.Count * 5
+        Dim lTableHeader As New atcTableDelimited
+        lTableHeader.Delimiter = ","
+        lTableHeader.NumFields = lNumColumns
+
+        Dim lTableToReport As atcTableDelimited = ASCIICommonTable(lTsGroupStreamFlow, lTsGroupPart, lTsGroupFixed, lTsGroupLocMin, lTsGroupSlide, "Daily")
+        Dim lMethodLabelColumnStart As Integer = 7
+        Dim lConsLabelColumnStart As Integer = 5
+        Dim lUnitsLabelColumnStarts As Integer = 5
+        Dim lColumnsPerMethod As Integer = 5
+        With lTableHeader
+
+            For lRow As Integer = 1 To 3
+                lTableHeader.CurrentRecord = lRow
+                If lRow = 2 Then
+                    .Value(3) = "Streamflow"
+                ElseIf lRow = 3 Then
+                    .Value(1) = "Day"
+                    .Value(2) = "Date"
+                    .Value(3) = "CFS"
+                    .Value(4) = "IN"
+                End If
+
+                For Each lMethodKey As BFMethods In MethodsLastDone
+                    Select Case lRow
+                        Case 1
+                            .Value(lMethodLabelColumnStart) = lMethodNames.ItemByKey(lMethodKey)
+                            lMethodLabelColumnStart += lColumnsPerMethod
+                        Case 2
+                            .Value(lConsLabelColumnStart) = "Baseflow"
+                            .Value(lConsLabelColumnStart + 2) = "Runoff"
+                            .Value(lConsLabelColumnStart + 4) = "BFP"
+                            lConsLabelColumnStart += lColumnsPerMethod
+                        Case 3
+                            .Value(lUnitsLabelColumnStarts) = "CFS"
+                            .Value(lUnitsLabelColumnStarts + 1) = "IN"
+                            .Value(lUnitsLabelColumnStarts + 2) = "CFS"
+                            .Value(lUnitsLabelColumnStarts + 3) = "IN"
+                            .Value(lUnitsLabelColumnStarts + 4) = "(%)"
+                            lUnitsLabelColumnStarts += lColumnsPerMethod
+                    End Select
+                Next
+            Next
+        End With
+
+        Dim lTitleLine1 As String = "Groundwater Toolbox daily output for hydrograph separation."
+        Dim lTitleLine2 As String = "Station: " & aTs.Attributes.GetValue("Location") & " " & aTs.Attributes.GetValue("STANAM").ToString.Replace(",", " ")
+        Dim lTitleLine3 As String = "Drainage area: " & DoubleToString(lDA, , "0.0") & " square miles"
+        Dim lTitleLine4 As String = "(CFS: cubic feet per second; IN: flow per drainage area (inches); BFP: Base-Flow Percentage (ratio of base-flow to streamflow multiplied by 100)"
+
+        Dim lSW As New IO.StreamWriter(lFileDailySum, False)
+        lSW.WriteLine(lTitleLine1) : lSW.WriteLine(lTitleLine2) : lSW.WriteLine(lTitleLine3) : lSW.WriteLine(lTitleLine4)
+        lSW.WriteLine(lTableHeader.ToString)
+        lSW.WriteLine(lTableToReport.ToString)
+        lSW.Flush()
+        lSW.Close()
+        lSW = Nothing
+
+        lTableToReport.ClearData()
+        lTableToReport = ASCIICommonTable(lTsGroupStreamFlow, lTsGroupPart, lTsGroupFixed, lTsGroupLocMin, lTsGroupSlide, "Monthly")
+        lTableHeader.CurrentRecord = 3
+        lTableHeader.Value(1) = "Month"
+        lSW = New IO.StreamWriter(lFileMonthlySum, False)
+        lTitleLine1 = lTitleLine1.Replace("daily", "monthly")
+        lTitleLine4 = "(CFS: average flow for the month (cubic feet per second); IN: flow per drainage area (inches); BFP: Base-Flow Percentage (ratio of base-flow to streamflow multiplied by 100)"
+        lSW.WriteLine(lTitleLine1) : lSW.WriteLine(lTitleLine2) : lSW.WriteLine(lTitleLine3) : lSW.WriteLine(lTitleLine4)
+        lSW.WriteLine(lTableHeader.ToString)
+        lSW.WriteLine(lTableToReport.ToString)
+        lSW.Flush()
+        lSW.Close()
+        lSW = Nothing
+
+        lTableToReport.ClearData()
+        lTableToReport = ASCIICommonTable(lTsGroupStreamFlow, lTsGroupPart, lTsGroupFixed, lTsGroupLocMin, lTsGroupSlide, "Yearly")
+        lTableHeader.CurrentRecord = 3
+        lTableHeader.Value(1) = "Year"
+        lSW = New IO.StreamWriter(lFileYearlySum, False)
+        lTitleLine1 = "Groundwater Toolbox annual output for hydrograph separation (calendar year January 1-December 31)"
+        lTitleLine4 = "(CFS: average flow for the year (cubic feet per second); IN: flow per drainage area (inches); BFP: Base-Flow Percentage (ratio of base-flow to streamflow multiplied by 100)"
+        lSW.WriteLine(lTitleLine1) : lSW.WriteLine(lTitleLine2) : lSW.WriteLine(lTitleLine3) : lSW.WriteLine(lTitleLine4)
+        lSW.WriteLine(lTableHeader.ToString)
+        lSW.WriteLine(lTableToReport.ToString)
+        lSW.Flush()
+        lSW.Close()
+        lSW = Nothing
+    End Sub
+
+    Private Function ASCIICommonTable(ByVal aTsGroupStreamFlow As atcCollection, _
+                                 ByVal aTsGroupPart As atcCollection, _
+                                 ByVal aTsGroupFixed As atcCollection, _
+                                 ByVal aTsGroupLocMin As atcCollection, _
+                                 ByVal aTsGroupSlide As atcCollection, _
+                                 ByVal ATStep As String) As atcTableDelimited
+        'set up table
+        Dim lNumColumns As Integer = 4 + MethodsLastDone.Count * 5
+        Dim lTableBody As New atcTableDelimited
+        lTableBody.Delimiter = ","
+        lTableBody.NumFields = lNumColumns
+        lTableBody.CurrentRecord = 1
+
+        Dim lDate(5) As Integer
+
+        Dim lBF As Double
+        Dim lBFDepth As Double
+        Dim lRO As Double
+        Dim lRODepth As Double
+        Dim lBFPct As Double = 0.0
+
+        Dim lTsFlow As atcTimeseries = aTsGroupStreamFlow.ItemByKey("Rate" & ATStep)
+        Dim lTsFlowDepth As atcTimeseries = aTsGroupStreamFlow.ItemByKey("Depth" & ATStep)
+        For I As Integer = 1 To lTsFlow.numValues
+            J2Date(lTsFlow.Dates.Value(I - 1), lDate)
+            With lTableBody
+                .Value(1) = I
+                Select Case ATStep
+                    Case "Daily" : .Value(2) = lDate(0) & "-" & lDate(1).ToString.PadLeft(2, "0") & "-" & lDate(2).ToString.PadLeft(2, "0")
+                    Case "Monthly" : .Value(2) = lDate(0) & "-" & lDate(1).ToString.PadLeft(2, "0")
+                    Case "Yearly" : .Value(2) = lDate(0)
+                    Case Else : .Value(2) = lDate(0) & "-" & lDate(1) & "-" & lDate(2)
+                End Select
+
+                .Value(3) = DoubleToString(lTsFlow.Value(I), , "0")
+                .Value(4) = DoubleToString(lTsFlowDepth.Value(I), , "0.00")
+                Dim lLastColumn As Integer = 4
+                If aTsGroupPart.Count > 0 Then
+                    lBF = aTsGroupPart.ItemByKey("Rate" & ATStep).Value(I)
+                    lBFDepth = aTsGroupPart.ItemByKey("Depth" & ATStep).Value(I)
+                    lRO = lTsFlow.Value(I) - lBF
+                    lRODepth = lTsFlowDepth.Value(I) - lBFDepth
+                    lBFPct = lBF / lTsFlow.Value(I) * 100
+                    .Value(lLastColumn + 1) = DoubleToString(lBF, , "0")
+                    .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
+                    .Value(lLastColumn + 3) = DoubleToString(lRO, , "0")
+                    .Value(lLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
+                    .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
+                    lLastColumn += 5
+                End If
+                If aTsGroupFixed.Count > 0 Then
+                    lBF = aTsGroupFixed.ItemByKey("Rate" & ATStep).Value(I)
+                    lBFDepth = aTsGroupFixed.ItemByKey("Depth" & ATStep).Value(I)
+                    lRO = lTsFlow.Value(I) - lBF
+                    lRODepth = lTsFlowDepth.Value(I) - lBFDepth
+                    lBFPct = lBF / lTsFlow.Value(I) * 100
+                    .Value(lLastColumn + 1) = DoubleToString(lBF, , "0")
+                    .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
+                    .Value(lLastColumn + 3) = DoubleToString(lRO, , "0")
+                    .Value(lLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
+                    .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
+                    lLastColumn += 5
+                End If
+                If aTsGroupLocMin.Count > 0 Then
+                    lBF = aTsGroupLocMin.ItemByKey("Rate" & ATStep).Value(I)
+                    lBFDepth = aTsGroupLocMin.ItemByKey("Depth" & ATStep).Value(I)
+                    lRO = lTsFlow.Value(I) - lBF
+                    lRODepth = lTsFlowDepth.Value(I) - lBFDepth
+                    lBFPct = lBF / lTsFlow.Value(I) * 100
+                    .Value(lLastColumn + 1) = DoubleToString(lBF, , "0")
+                    .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
+                    .Value(lLastColumn + 3) = DoubleToString(lRO, , "0")
+                    .Value(lLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
+                    .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
+                    lLastColumn += 5
+                End If
+                If aTsGroupSlide.Count > 0 Then
+                    lBF = aTsGroupSlide.ItemByKey("Rate" & ATStep).Value(I)
+                    lBFDepth = aTsGroupSlide.ItemByKey("Depth" & ATStep).Value(I)
+                    lRO = lTsFlow.Value(I) - lBF
+                    lRODepth = lTsFlowDepth.Value(I) - lBFDepth
+                    lBFPct = lBF / lTsFlow.Value(I) * 100
+                    .Value(lLastColumn + 1) = DoubleToString(lBF, , "0")
+                    .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
+                    .Value(lLastColumn + 3) = DoubleToString(lRO, , "0")
+                    .Value(lLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
+                    .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
+                End If
+                .CurrentRecord += 1
+            End With
+        Next
+        Return lTableBody
+    End Function
+
+    Private Function ConstructReportTsGroup(ByVal aTs As atcTimeseries, ByVal aMethod As BFMethods, _
+                                            Optional ByRef aStart As Double = 0.0, _
+                                            Optional ByRef aEnd As Double = 0.0, _
+                                            Optional ByRef aDA As Double = 0.0) As atcCollection
+
+        'use a new ts group to hold the final ts for report
+
+        Dim lDA As Double
+        Dim lConversionFactor As Double
+        Dim lTsGroupToReport = New atcCollection
+
+        Dim lTsBFGroup As atcTimeseriesGroup = aTs.Attributes.GetDefinedValue("Baseflow").Value
+        If lTsBFGroup Is Nothing OrElse lTsBFGroup.Count = 0 Then Return lTsGroupToReport
+
+        Dim lMethodConsUnit As String = ""
+        Dim lReportColumnAttributeName As String = "ReportColumn"
+
+        Dim lMatchBFTsGroup As New atcTimeseriesGroup
+        For Each lTs As atcTimeseries In lTsBFGroup
+            If lTs.Attributes.GetValue("Method") = aMethod Then
+                lMatchBFTsGroup.Add(lTs)
+            End If
+        Next
+        If lMatchBFTsGroup.Count > 0 Then
+            If aMethod = BFMethods.PART Then
+                Dim lTsBFToReportPartDaily1 As atcTimeseries = lMatchBFTsGroup.FindData("Scenario", "PartDaily1")(0)
+                Dim lTsBFToReportPartDaily2 As atcTimeseries = lMatchBFTsGroup.FindData("Scenario", "PartDaily2")(0)
+                Dim lTsBFToReportPartMonthly As atcTimeseries = lMatchBFTsGroup.FindData("Scenario", "PartMonthlyInterpolated")(0)
+                Dim lTsBFToReportPartMonthlyDepth As atcTimeseries = lMatchBFTsGroup.FindData("Scenario", "PartMonthlyDepth")(0)
+
+                Dim linearSlope As Double = lTsBFToReportPartMonthly.Attributes.GetValue("LinearSlope")
+                Dim lTsBFToReportPartDaily As atcTimeseries = lTsBFToReportPartDaily1.Clone
+                For I As Integer = 1 To lTsBFToReportPartDaily1.numValues
+                    lTsBFToReportPartDaily.Value(I) = lTsBFToReportPartDaily1.Value(I) + linearSlope * (lTsBFToReportPartDaily2.Value(I) - lTsBFToReportPartDaily1.Value(I))
+                Next
+                lDA = lTsBFToReportPartDaily1.Attributes.GetValue("Drainage Area")
+                lConversionFactor = pUADepth / lDA
+                Dim lTsBFToReportPartDailyDepth As atcTimeseries = lTsBFToReportPartDaily * lConversionFactor
+
+                Dim lTsBFToReportPartYearly As atcTimeseries = Aggregate(lTsBFToReportPartMonthly, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+                Dim lTsBFToReportPartYearlySum As atcTimeseries = Aggregate(lTsBFToReportPartMonthly, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+                Dim lTsBFToReportPartYearlyDepth As atcTimeseries = lTsBFToReportPartYearlySum * lConversionFactor
+
+                'lTsBFToReportPartDaily.Attributes.SetValue(lReportColumnAttributeName, "RateDaily")
+                'lTsBFToReportPartDailyDepth.Attributes.SetValue(lReportColumnAttributeName, "DepthDaily")
+                'lTsBFToReportPartMonthly.Attributes.SetValue(lReportColumnAttributeName, "RateMonthly")
+                'lTsBFToReportPartMonthlyDepth.Attributes.SetValue(lReportColumnAttributeName, "DepthMonthly")
+                'lTsBFToReportPartYearly.Attributes.SetValue(lReportColumnAttributeName, "RateYearly")
+                'lTsBFToReportPartYearlyDepth.Attributes.SetValue(lReportColumnAttributeName, "DepthYearly")
+                With lTsGroupToReport
+                    .Add("RateDaily", lTsBFToReportPartDaily)
+                    .Add("DepthDaily", lTsBFToReportPartDailyDepth)
+                    .Add("RateMonthly", lTsBFToReportPartMonthly)
+                    .Add("DepthMonthly", lTsBFToReportPartMonthlyDepth)
+                    .Add("RateYearly", lTsBFToReportPartYearly)
+                    .Add("DepthYearly", lTsBFToReportPartYearlyDepth)
+                End With
+            Else
+                Dim lTsDaily As atcTimeseries = lMatchBFTsGroup(0)
+                lDA = lTsDaily.Attributes.GetValue("Drainage Area")
+                lConversionFactor = pUADepth / lDA
+                Dim lTsDailyDepth As atcTimeseries = lTsDaily * lConversionFactor
+                Dim lTsMon As atcTimeseries = Aggregate(lTsDaily, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
+                Dim lTsMonSum As atcTimeseries = Aggregate(lTsDaily, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
+                Dim lTsMonDepth As atcTimeseries = lTsMonSum * lConversionFactor
+                Dim lTsYear As atcTimeseries = Aggregate(lTsDaily, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
+                Dim lTsYearSum As atcTimeseries = Aggregate(lTsDaily, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+                Dim lTsYearDepth As atcTimeseries = lTsYearSum * lConversionFactor
+
+                'lTsDaily.Attributes.SetValue(lReportColumnAttributeName, "RateDaily")
+                'lTsDailyDepth.Attributes.SetValue(lReportColumnAttributeName, "DepthDaily")
+                'lTsMon.Attributes.SetValue(lReportColumnAttributeName, "RateMonthly")
+                'lTsMonDepth.Attributes.SetValue(lReportColumnAttributeName, "DepthMonthly")
+                'lTsYear.Attributes.SetValue(lReportColumnAttributeName, "RateYearly")
+                'lTsYearDepth.Attributes.SetValue(lReportColumnAttributeName, "DepthYearly")
+
+                With lTsGroupToReport
+                    .Add("RateDaily", lTsDaily)
+                    .Add("DepthDaily", lTsDailyDepth)
+                    .Add("RateMonthly", lTsMon)
+                    .Add("DepthMonthly", lTsMonDepth)
+                    .Add("RateYearly", lTsYear)
+                    .Add("DepthYearly", lTsYearDepth)
+                End With
+            End If
+        End If
+
+        If aStart < 0 AndAlso aEnd < 0 Then
+            aStart = lTsGroupToReport(0).Dates.Value(0)
+            aEnd = lTsGroupToReport(0).Dates.Value(lTsGroupToReport(0).numValues)
+        End If
+        If aDA < 0 Then
+            aDA = lTsGroupToReport(0).Attributes.GetValue("Drainage Area")
+        End If
+        Return lTsGroupToReport
+    End Function
+
+    Public Function ConstructGraphTsGroup(ByVal aTs As atcTimeseries, ByVal aMethod As BFMethods, _
+                                            Optional ByRef aStart As Double = 0.0, _
+                                            Optional ByRef aEnd As Double = 0.0, _
+                                            Optional ByRef aDA As Double = 0.0) As atcCollection
+        'use a new ts group to hold the final ts for graph
+
+        Dim lTsGroupToGraph = New atcCollection
+
+        Dim lTsBFGroup As atcTimeseriesGroup = aTs.Attributes.GetDefinedValue("Baseflow").Value
+        If lTsBFGroup Is Nothing OrElse lTsBFGroup.Count = 0 Then Return lTsGroupToGraph
+
+        Dim lMatchBFTsGroup As New atcTimeseriesGroup
+        For Each lTs As atcTimeseries In lTsBFGroup
+            If lTs.Attributes.GetValue("Method") = aMethod Then
+                lMatchBFTsGroup.Add(lTs)
+            End If
+        Next
+        If lMatchBFTsGroup.Count > 0 Then
+            If aMethod = BFMethods.PART Then
+                Dim lTsBFToReportPartDaily1 As atcTimeseries = lMatchBFTsGroup.FindData("Scenario", "PartDaily1")(0)
+                Dim lTsBFToReportPartDaily2 As atcTimeseries = lMatchBFTsGroup.FindData("Scenario", "PartDaily2")(0)
+                Dim lTsBFToReportPartMonthly As atcTimeseries = lMatchBFTsGroup.FindData("Scenario", "PartMonthlyInterpolated")(0)
+
+                Dim linearSlope As Double = lTsBFToReportPartMonthly.Attributes.GetValue("LinearSlope")
+                Dim lTsBFToReportPartDaily As atcTimeseries = lTsBFToReportPartDaily1.Clone
+                For I As Integer = 1 To lTsBFToReportPartDaily1.numValues
+                    lTsBFToReportPartDaily.Value(I) = lTsBFToReportPartDaily1.Value(I) + linearSlope * (lTsBFToReportPartDaily2.Value(I) - lTsBFToReportPartDaily1.Value(I))
+                Next
+                With lTsGroupToGraph
+                    .Add("RateDaily", lTsBFToReportPartDaily)
+                End With
+            Else
+                Dim lTsDaily As atcTimeseries = lMatchBFTsGroup(0)
+                With lTsGroupToGraph
+                    .Add("RateDaily", lTsDaily)
+                End With
+            End If
+        End If
+
+        If aStart < 0 AndAlso aEnd < 0 Then
+            aStart = lTsGroupToGraph(0).Dates.Value(0)
+            aEnd = lTsGroupToGraph(0).Dates.Value(lTsGroupToGraph(0).numValues)
+        End If
+        If aDA < 0 Then
+            aDA = lTsGroupToGraph(0).Attributes.GetValue("Drainage Area")
+        End If
+        Return lTsGroupToGraph
+    End Function
 
     ''' <summary>
     ''' this is the .BSF WatStore format ASCII output
