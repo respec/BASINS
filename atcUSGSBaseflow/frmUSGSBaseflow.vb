@@ -531,6 +531,7 @@ Public Class frmUSGSBaseflow
 
         Dim lYAxisTitleText As String = "FLOW, IN CUBIC FEET PER SECOND"
         If aPerUnitArea Then lYAxisTitleText &= " (per unit square mile)"
+        If aGraphType = "CDist" Then lYAxisTitleText = "Flow (in)"
         Dim lTsFlow As atcTimeseries = SubsetByDate(lTsDailyStreamflow, lStart, lEnd, Nothing)
         lTsFlow.Attributes.SetValue("Units", lYAxisTitleText)
         lTsFlow.Attributes.SetValue("YAxis", "LEFT")
@@ -555,6 +556,8 @@ Public Class frmUSGSBaseflow
                     DisplayTsGraph(lDataGroup)
                 ElseIf aGraphType = "Duration" Then
                     DisplayDurGraph(lDataGroup, aPerUnitArea)
+                ElseIf aGraphType = "CDist" Then
+                    DisplayCDistGraph(lDataGroup)
                 End If
             End If
             If lTsGroupFixed.Count > 0 Then
@@ -564,6 +567,8 @@ Public Class frmUSGSBaseflow
                     DisplayTsGraph(lDataGroup)
                 ElseIf aGraphType = "Duration" Then
                     DisplayDurGraph(lDataGroup, aPerUnitArea)
+                ElseIf aGraphType = "CDist" Then
+                    DisplayCDistGraph(lDataGroup)
                 End If
             End If
             If lTsGroupLocMin.Count > 0 Then
@@ -573,6 +578,8 @@ Public Class frmUSGSBaseflow
                     DisplayTsGraph(lDataGroup)
                 ElseIf aGraphType = "Duration" Then
                     DisplayDurGraph(lDataGroup, aPerUnitArea)
+                ElseIf aGraphType = "CDist" Then
+                    DisplayCDistGraph(lDataGroup)
                 End If
 
             End If
@@ -583,11 +590,13 @@ Public Class frmUSGSBaseflow
                     DisplayTsGraph(lDataGroup)
                 ElseIf aGraphType = "Duration" Then
                     DisplayDurGraph(lDataGroup, aPerUnitArea)
+                ElseIf aGraphType = "CDist" Then
+                    DisplayCDistGraph(lDataGroup)
                 End If
             End If
         Else
             lTsGraphAll = New atcTimeseriesGroup
-            lTsGraphAll.Add(lTsFlow)
+
             Dim lTsGroupPart1 As atcTimeseriesGroup = Nothing
             Dim lTsGroupFixed1 As atcTimeseriesGroup = Nothing
             Dim lTsGroupLocMin1 As atcTimeseriesGroup = Nothing
@@ -631,6 +640,11 @@ Public Class frmUSGSBaseflow
                 lTsGroupStock.AddRange(lTsGroupSlide1)
             End If
 
+            If aGraphType = "CDist" Then
+                lTsGraphAll.Add(lTsGroupStock.FindData("Constituent", "FLOW")(0))
+            Else
+                lTsGraphAll.Add(lTsFlow)
+            End If
             Dim lTsGroupBf As atcTimeseriesGroup = lTsGroupStock.FindData("Constituent", "Baseflow")
             lTsGraphAll.AddRange(lTsGroupBf)
             If aGraphType = "Timeseries" Then
@@ -639,6 +653,10 @@ Public Class frmUSGSBaseflow
                 Dim lTsGroupRO As atcTimeseriesGroup = lTsGroupStock.FindData("Constituent", "Runoff")
                 lTsGraphAll.AddRange(lTsGroupRO)
                 DisplayDurGraph(lTsGraphAll, aPerUnitArea)
+            ElseIf aGraphType = "CDist" Then
+                Dim lTsGroupRO As atcTimeseriesGroup = lTsGroupStock.FindData("Constituent", "Runoff")
+                lTsGraphAll.AddRange(lTsGroupRO)
+                DisplayCDistGraph(lTsGraphAll)
             End If
         End If
 
@@ -650,12 +668,12 @@ Public Class frmUSGSBaseflow
         Dim lDA As Double = aParams.GetValue("Drainage Area")
         Dim lPerUnitArea As Boolean = aParams.GetValue("PerUnitArea")
         Dim lGraphType As String = aParams.GetValue("GraphType")
-        Dim lTsFlow As atcTimeseries = aParams.GetValue("StreamFlow")
+        Dim lTsFlow As atcTimeseries = aParams.GetValue("StreamFlow").Clone()
         Dim lYAxisTitleText As String = aParams.GetValue("YAxisTitleText")
         Dim lMethod As String = aParams.GetValue("Method")
 
         Dim lTsBF4Graph As atcTimeseries = aTsCollection.ItemByKey("RateDaily").Clone()
-        lDA = ltsbf4graph.attributes.getvalue("Drainage Area")
+        lDA = lTsBF4Graph.Attributes.GetValue("Drainage Area")
         With lTsBF4Graph.Attributes
             .SetValue("Constituent", "Baseflow")
             .SetValue("Scenario", "Estimated by " & lMethod)
@@ -666,21 +684,63 @@ Public Class frmUSGSBaseflow
         Dim lTsRunoff As atcTimeseries = Nothing
         If lGraphType = "Duration" Then
             lTsRunoff = lTsFlow - lTsBF4Graph
-            With lTsRunoff.Attributes
+            If lPerUnitArea Then
+                lTsFlow = lTsFlow / lDA
+                lTsBF4Graph = lTsBF4Graph / lDA
+                If lTsRunoff IsNot Nothing Then
+                    lTsRunoff = lTsRunoff / lDA
+                    With lTsRunoff.Attributes
+                        .SetValue("Constituent", "Runoff")
+                        .SetValue("Scenario", "Estimated by " & lMethod)
+                        .SetValue("Units", lYAxisTitleText)
+                        .SetValue("YAxis", "LEFT")
+                    End With
+                End If
+            End If
+        End If
+        If lGraphType = "CDist" Then
+            Dim lTimeUnitToAggregate As atcTimeUnit = atcTimeUnit.TUMonth
+            lTsRunoff = lTsFlow - lTsBF4Graph
+
+            'Convert to depth inch
+            Dim lConversionFactor As Double = 0.03719 / lDA
+
+            Dim lGraphTsFlow As atcTimeseries = Aggregate(lTsFlow, lTimeUnitToAggregate, 1, atcTran.TranSumDiv)
+            Dim lGraphTsBF As atcTimeseries = Aggregate(lTsBF4Graph, lTimeUnitToAggregate, 1, atcTran.TranSumDiv)
+            Dim lGraphTsRunoff As atcTimeseries = Aggregate(lTsRunoff, lTimeUnitToAggregate, 1, atcTran.TranSumDiv)
+
+            Dim lGraphTsFlowIn As atcTimeseries = lGraphTsFlow * lConversionFactor
+            With lGraphTsFlowIn.Attributes
+                '.SetValue("Constituent", "FLOW")
+                '.SetValue("Scenario", "Observed")
+                .SetValue("Units", lYAxisTitleText)
+                .SetValue("YAxis", "LEFT")
+            End With
+
+            Dim lGraphTsBFIn As atcTimeseries = lGraphTsBF * lConversionFactor
+            With lGraphTsBFIn.Attributes
+                .SetValue("Constituent", "Baseflow")
+                .SetValue("Scenario", "Estimated by " & lMethod)
+                .SetValue("Units", lYAxisTitleText)
+                .SetValue("YAxis", "LEFT")
+            End With
+
+            Dim lGraphTsRunoffIn As atcTimeseries = lGraphTsRunoff * lConversionFactor
+            With lGraphTsRunoffIn.Attributes
                 .SetValue("Constituent", "Runoff")
                 .SetValue("Scenario", "Estimated by " & lMethod)
                 .SetValue("Units", lYAxisTitleText)
                 .SetValue("YAxis", "LEFT")
             End With
+
+            lDataGroup.Add(lGraphTsFlowIn)
+            lDataGroup.Add(lGraphTsBFIn)
+            lDataGroup.Add(lGraphTsRunoffIn)
+        Else
+            lDataGroup.Add(lTsFlow)
+            lDataGroup.Add(lTsBF4Graph)
+            If lTsRunoff IsNot Nothing Then lDataGroup.Add(lTsRunoff)
         End If
-        If lGraphType = "Duration" AndAlso lPerUnitArea Then
-            lTsFlow = lTsFlow / lDA
-            lTsBF4Graph = lTsBF4Graph / lDA
-            If lTsRunoff IsNot Nothing Then lTsRunoff = lTsRunoff / lDA
-        End If
-        lDataGroup.Add(lTsFlow)
-        lDataGroup.Add(lTsBF4Graph)
-        If lTsRunoff IsNot Nothing Then lDataGroup.Add(lTsRunoff)
 
         Return lDataGroup
     End Function
@@ -819,7 +879,8 @@ Public Class frmUSGSBaseflow
             Exit Sub
         End If
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
-        DoBFGraphCDistPlot()
+        'DoBFGraphCDistPlot()
+        DoBFGraphTimeseries("CDist")
         Me.Cursor = System.Windows.Forms.Cursors.Default
     End Sub
 
@@ -930,10 +991,15 @@ Public Class frmUSGSBaseflow
         'lDataGroup.Add(lTsBF4Graph)
         'lDataGroup.Add(lTsRunoff)
 
+        DisplayCDistGraph(lDataGroup)
+
+    End Sub
+
+    Private Sub DisplayCDistGraph(ByVal aDataGroup As atcTimeseriesGroup)
         Dim lGraphForm As New atcGraph.atcGraphForm()
         lGraphForm.Icon = Me.Icon
         Dim lZgc As ZedGraphControl = lGraphForm.ZedGraphCtrl
-        Dim lGraphTS As New clsGraphProbability(lDataGroup, lZgc)
+        Dim lGraphTS As New clsGraphProbability(aDataGroup, lZgc)
         lGraphTS.Exceedance = False
         lGraphForm.Grapher = lGraphTS
         With lGraphForm.Grapher.ZedGraphCtrl.GraphPane
@@ -948,17 +1014,40 @@ Public Class frmUSGSBaseflow
                 .IsVisible = True
             End With
 
-            .CurveList.Item(1).Color = Drawing.Color.DarkBlue
-            With CType(.CurveList.Item(1), LineItem).Symbol
-                .Type = SymbolType.Circle
-                .IsVisible = True
-            End With
+            If aDataGroup.Count > 3 Then
+                'this scheme assume the order in which ts are added is as follow:
+                'streamflow, all bf, then all ro
+                Dim lBFCurveCount As Integer = (aDataGroup.Count - 1) / 2
+                Dim lBFInitColor As Integer = Drawing.Color.DarkBlue.ToArgb
+                For I As Integer = 1 To lBFCurveCount
+                    .CurveList.Item(I).Color = System.Drawing.Color.FromArgb(lBFInitColor - (I - 1) * 8)
+                    With CType(.CurveList.Item(I), LineItem).Symbol
+                        .Type = SymbolType.Circle
+                        .IsVisible = True
+                    End With
+                Next
+                lBFInitColor = Drawing.Color.DarkCyan.ToArgb
+                For I As Integer = lBFCurveCount + 1 To aDataGroup.Count - 1
+                    .CurveList.Item(I).Color = System.Drawing.Color.FromArgb(lBFInitColor - (I - 1) * 8)
+                    With CType(.CurveList.Item(I), LineItem).Symbol
+                        .Type = SymbolType.Square
+                        .IsVisible = True
+                    End With
+                Next
 
-            .CurveList.Item(2).Color = Drawing.Color.Cyan
-            With CType(.CurveList.Item(2), LineItem).Symbol
-                .Type = SymbolType.Square
-                .IsVisible = True
-            End With
+            Else
+                .CurveList.Item(1).Color = Drawing.Color.DarkBlue
+                With CType(.CurveList.Item(1), LineItem).Symbol
+                    .Type = SymbolType.Circle
+                    .IsVisible = True
+                End With
+
+                .CurveList.Item(2).Color = Drawing.Color.DarkCyan
+                With CType(.CurveList.Item(2), LineItem).Symbol
+                    .Type = SymbolType.Square
+                    .IsVisible = True
+                End With
+            End If
 
             With .Legend.FontSpec
                 .IsBold = False
@@ -969,9 +1058,7 @@ Public Class frmUSGSBaseflow
         End With
         lGraphForm.Grapher.ZedGraphCtrl.Refresh()
         lGraphForm.Show()
-
     End Sub
-
     Private Sub btnWriteASCIIOutput_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnWriteASCIIOutput.Click
         mnuOutputASCII_Click(Nothing, Nothing)
     End Sub
@@ -1006,7 +1093,8 @@ Public Class frmUSGSBaseflow
             Exit Sub
         End If
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
-        DoBFGraphCDistPlot()
+        'DoBFGraphCDistPlot()
+        DoBFGraphTimeseries("CDist")
         Me.Cursor = System.Windows.Forms.Cursors.Default
     End Sub
 
