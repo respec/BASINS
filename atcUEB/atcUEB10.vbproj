@@ -77,6 +77,7 @@
     <Compile Include="clsPlugin.vb" />
     <Compile Include="clsUEBParameterFile.vb" />
     <Compile Include="clsUEBSiteFile.vb" />
+    <Compile Include="clsUEBWeather.vb" />
     <Compile Include="frmUEB.vb">
       <SubType>Form</SubType>
     </Compile>
