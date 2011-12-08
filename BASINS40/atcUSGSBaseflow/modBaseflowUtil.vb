@@ -53,6 +53,8 @@ Module modBaseflowUtil
         Dim lFileMonthlySum As String = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_Monthly.csv")
         Dim lFileYearlySum As String = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_Yearly.csv")
 
+        Dim lFileDuration As String = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_Duration.csv")
+
         Dim lMethodNames As New atcCollection
         With lMethodNames
             .Add(BFMethods.PART, "PART")
@@ -61,6 +63,7 @@ Module modBaseflowUtil
             .Add(BFMethods.HySEPSlide, "HySEP-Slide")
         End With
 
+        'header for data dump file
         Dim lNumColumns As Integer = 4 + MethodsLastDone.Count * 5
         Dim lTableHeader As New atcTableDelimited
         lTableHeader.Delimiter = ","
@@ -72,7 +75,6 @@ Module modBaseflowUtil
         Dim lUnitsLabelColumnStarts As Integer = 5
         Dim lColumnsPerMethod As Integer = 5
         With lTableHeader
-
             For lRow As Integer = 1 To 3
                 lTableHeader.CurrentRecord = lRow
                 If lRow = 2 Then
@@ -83,7 +85,6 @@ Module modBaseflowUtil
                     .Value(3) = "CFS"
                     .Value(4) = "IN"
                 End If
-
                 For Each lMethodKey As BFMethods In MethodsLastDone
                     Select Case lRow
                         Case 1
@@ -146,7 +147,228 @@ Module modBaseflowUtil
         lSW.Flush()
         lSW.Close()
         lSW = Nothing
+
+        'Write Duration Tables
+        'header for duration file
+        lNumColumns = 2 + MethodsLastDone.Count * 2
+        lMethodLabelColumnStart = 3
+        lConsLabelColumnStart = 3
+        lColumnsPerMethod = 2
+        Dim lTableHeaderDuration As New atcTableDelimited
+        With lTableHeaderDuration
+            .Delimiter = ","
+            .NumFields = lNumColumns
+            For lRow As Integer = 1 To 2
+                .CurrentRecord = lRow
+                If lRow = 1 Then
+                    .Value(1) = "Percent"
+                ElseIf lRow = 2 Then
+                    .Value(1) = "exceedance"
+                    .Value(2) = "Streamflow"
+                End If
+                For Each lMethodKey As BFMethods In MethodsLastDone
+                    Select Case lRow
+                        Case 1
+                            .Value(lMethodLabelColumnStart) = lMethodNames.ItemByKey(lMethodKey)
+                            lMethodLabelColumnStart += lColumnsPerMethod
+                        Case 2
+                            .Value(lConsLabelColumnStart) = "Baseflow"
+                            .Value(lConsLabelColumnStart + 1) = "Runoff"
+                            lConsLabelColumnStart += lColumnsPerMethod
+                    End Select
+                Next 'method
+            Next 'row
+        End With 'lTableHeaderDuration
+
+        lTableToReport.Clear()
+
+        lTitleLine1 = "Groundwater Toolbox daily output for hydrograph separation."
+        lTitleLine2 = "Station: " & aTs.Attributes.GetValue("Location") & " " & aTs.Attributes.GetValue("STANAM").ToString.Replace(",", " ")
+        lTitleLine3 = "Drainage area: " & DoubleToString(lDA, , "0.0") & " square miles"
+        lTitleLine4 = "Period of analysis: " & DumpDate(lStart) & " to " & DumpDate(lEnd)
+        Dim lTitleLine5 As String = "Percent exceedence: Percentage of time flow was equaled or exceeded"
+        Dim lTitleLine6 As String = "Flow: in cubic feet per second"
+
+        lSW = New System.IO.StreamWriter(lFileDuration, False)
+        lSW.WriteLine(lTitleLine1) : lSW.WriteLine(lTitleLine2) : lSW.WriteLine(lTitleLine3)
+        lSW.WriteLine(lTitleLine4) : lSW.WriteLine(lTitleLine5) : lSW.WriteLine(lTitleLine6)
+
+        lSW.WriteLine("****   Daily Duration Table  ****")
+        lTableToReport = ASCIICommonDurationTable(lTsGroupStreamFlow, lTsGroupPart, lTsGroupFixed, lTsGroupLocMin, lTsGroupSlide, "Daily")
+        lSW.WriteLine(lTableHeaderDuration.ToString)
+        lSW.WriteLine(lTableToReport.ToString)
+
+        'lTableToReport.ClearData()
+        'lSW.WriteLine("****   Monthly Duration Table  ****")
+        'lTableToReport = ASCIICommonDurationTable(lTsGroupStreamFlow, lTsGroupPart, lTsGroupFixed, lTsGroupLocMin, lTsGroupSlide, "Monthly")
+        'lSW.WriteLine(lTableHeaderDuration.ToString)
+        'lSW.WriteLine(lTableToReport.ToString)
+
+        'lTableToReport.ClearData()
+        'lSW.WriteLine("****   Annual Duration Table  ****")
+        'lTableToReport = ASCIICommonDurationTable(lTsGroupStreamFlow, lTsGroupPart, lTsGroupFixed, lTsGroupLocMin, lTsGroupSlide, "Yearly")
+        'lSW.WriteLine(lTableHeaderDuration.ToString)
+        'lSW.WriteLine(lTableToReport.ToString)
+        lSW.Flush()
+        lSW.Close()
+        lSW = Nothing
+
     End Sub
+
+    Public Function ASCIICommonDurationTable(ByVal aTsGroupStreamFlow As atcCollection, _
+                                 ByVal aTsGroupPart As atcCollection, _
+                                 ByVal aTsGroupFixed As atcCollection, _
+                                 ByVal aTsGroupLocMin As atcCollection, _
+                                 ByVal aTsGroupSlide As atcCollection, _
+                                 ByVal ATStep As String) As atcTableDelimited
+
+        Dim lTsFlow As atcTimeseries = aTsGroupStreamFlow.ItemByKey("Rate" & ATStep)
+
+        Dim lTsBFPart As atcTimeseries = Nothing
+        Dim lTsROPart As atcTimeseries = Nothing
+        Dim lExceedanceListing As New atcCollection
+        Dim lResult As atcCollection = ConstructExceedanceListing(lTsFlow, "Observed", "StreamFlow")
+        lExceedanceListing.AddRange(lResult.Keys, lResult)
+
+        If aTsGroupPart.Count > 0 Then
+            lTsBFPart = aTsGroupPart.ItemByKey("Rate" & ATStep)
+            lTsROPart = lTsFlow - lTsBFPart
+            lResult = ConstructExceedanceListing(lTsBFPart, "Part", "Baseflow")
+            lExceedanceListing.AddRange(lResult.Keys, lResult)
+            lResult = ConstructExceedanceListing(lTsROPart, "Part", "Runoff")
+            lExceedanceListing.AddRange(lResult.Keys, lResult)
+        End If
+
+        Dim lTsBFFixed As atcTimeseries = Nothing
+        Dim lTsROFixed As atcTimeseries = Nothing
+        If aTsGroupFixed.Count > 0 Then
+            lTsBFFixed = aTsGroupFixed.ItemByKey("Rate" & ATStep)
+            lTsROFixed = lTsFlow - lTsBFFixed
+            lResult = ConstructExceedanceListing(lTsBFFixed, "Fixed", "Baseflow")
+            lExceedanceListing.AddRange(lResult.Keys, lResult)
+            lResult = ConstructExceedanceListing(lTsROFixed, "Fixed", "Runoff")
+            lExceedanceListing.AddRange(lResult.Keys, lResult)
+        End If
+        Dim lTsBFLocMin As atcTimeseries = Nothing
+        Dim lTsROLocMin As atcTimeseries = Nothing
+        If aTsGroupLocMin.Count > 0 Then
+            lTsBFLocMin = aTsGroupLocMin.ItemByKey("Rate" & ATStep)
+            lTsROLocMin = lTsFlow - lTsBFLocMin
+            lResult = ConstructExceedanceListing(lTsBFLocMin, "LocMin", "Baseflow")
+            lExceedanceListing.AddRange(lResult.Keys, lResult)
+            lResult = ConstructExceedanceListing(lTsROLocMin, "LocMin", "Runoff")
+            lExceedanceListing.AddRange(lResult.Keys, lResult)
+        End If
+        Dim lTsBFSlide As atcTimeseries = Nothing
+        Dim lTsROSlide As atcTimeseries = Nothing
+        If aTsGroupSlide.Count > 0 Then
+            lTsBFSlide = aTsGroupSlide.ItemByKey("Rate" & ATStep)
+            lTsROSlide = lTsFlow - lTsBFSlide
+            lResult = ConstructExceedanceListing(lTsBFSlide, "Slide", "Baseflow")
+            lExceedanceListing.AddRange(lResult.Keys, lResult)
+            lResult = ConstructExceedanceListing(lTsROSlide, "Slide", "Runoff")
+            lExceedanceListing.AddRange(lResult.Keys, lResult)
+        End If
+
+        'set up table
+        Dim lNumColumns As Integer = 2 + MethodsLastDone.Count * 2
+        Dim lColumnsPerMethod As Integer = 2
+        Dim lTableBody As New atcTableDelimited
+        With lTableBody
+            .Delimiter = ","
+            .NumFields = lNumColumns
+            .CurrentRecord = 1
+            Dim lNumEntries As Integer = lExceedanceListing.ItemByKey("X_Observed_StreamFlow").Length - 1
+            For I As Integer = 0 To lNumEntries
+                .Value(1) = DoubleToString(lExceedanceListing.Item(0)(I) * 100)
+                .Value(2) = lExceedanceListing.Item(1)(I)
+                Dim lLastColumn As Integer = 2
+                If aTsGroupPart.Count > 0 Then
+                    .Value(lLastColumn + 1) = lExceedanceListing.ItemByKey("Y_Part_Baseflow")(I)
+                    .Value(lLastColumn + 2) = lExceedanceListing.ItemByKey("Y_Part_Runoff")(I)
+                    lLastColumn += lColumnsPerMethod
+                End If
+
+                If aTsGroupFixed.Count > 0 Then
+                    .Value(lLastColumn + 1) = lExceedanceListing.ItemByKey("Y_Fixed_Baseflow")(I)
+                    .Value(lLastColumn + 2) = lExceedanceListing.ItemByKey("Y_Fixed_Runoff")(I)
+                    lLastColumn += lColumnsPerMethod
+                End If
+
+                If aTsGroupLocMin.Count > 0 Then
+                    .Value(lLastColumn + 1) = lExceedanceListing.ItemByKey("Y_LocMin_Baseflow")(I)
+                    .Value(lLastColumn + 2) = lExceedanceListing.ItemByKey("Y_LocMin_Runoff")(I)
+                    lLastColumn += lColumnsPerMethod
+                End If
+
+                If aTsGroupSlide.Count > 0 Then
+                    .Value(lLastColumn + 1) = lExceedanceListing.ItemByKey("Y_Slide_Baseflow")(I)
+                    .Value(lLastColumn + 2) = lExceedanceListing.ItemByKey("Y_Slide_Runoff")(I)
+                    lLastColumn += lColumnsPerMethod
+                End If
+                .CurrentRecord += 1
+            Next 'exceedance level or probability threshold
+        End With
+
+        Return lTableBody
+    End Function
+
+    Private Function ConstructExceedanceListing(ByVal aTs As atcTimeseries, ByVal aMethod As String, ByVal aCons As String) As atcCollection
+        Dim lNumProbabilityPoints As Integer = 30 '200
+        Dim lExceedance As Boolean = False
+        Dim lZgc As New ZedGraph.ZedGraphControl
+        Dim lX(lNumProbabilityPoints) As Double
+        Dim lLastIndex As Integer = lX.GetUpperBound(0)
+        Dim lPane As ZedGraph.GraphPane = lZgc.MasterPane.PaneList(0)
+        Dim lXScale As ZedGraph.ProbabilityScale
+        With lPane.XAxis
+            If .Type <> ZedGraph.AxisType.Probability Then
+                .Type = ZedGraph.AxisType.Probability
+                With .MajorTic
+                    .IsInside = True
+                    .IsCrossInside = True
+                    .IsOutside = False
+                    .IsCrossOutside = False
+                End With
+                lXScale = .Scale
+                lXScale.standardDeviations = 3
+                'lXScale.IsReverse = True
+            End If
+
+            For lXindex As Integer = 0 To lLastIndex
+                lX(lXindex) = 100 * .Scale.DeLinearize(lXindex / CDbl(lLastIndex))
+            Next
+        End With
+        Dim lAttributeName As String
+        Dim lIndex As Integer
+        Dim lXFracExceed() As Double
+        Dim lY() As Double
+
+        ReDim lY(lLastIndex)
+        ReDim lXFracExceed(lLastIndex)
+
+        For lIndex = 0 To lLastIndex
+            If lExceedance Then
+                lXFracExceed(lIndex) = (100 - lX(lIndex)) / 100
+                lAttributeName = "%" & Format(lX(lIndex), "00.####")
+            Else
+                lXFracExceed(lIndex) = lX(lIndex) / 100
+                lAttributeName = "%" & Format(100 - lX(lIndex), "00.####")
+            End If
+
+            'lAttributeName = "%" & Format(lX(lIndex), "00.####")
+            lY(lIndex) = aTs.Attributes.GetValue(lAttributeName)
+            'Logger.Dbg(lAttributeName & " = " & lY(lIndex) & _
+            '                            " : " & lX(lIndex) & _
+            '                            " : " & lXFracExceed(lIndex))
+        Next
+        Dim lExceedanceListing As New atcCollection
+        lExceedanceListing.Add("X_" & aMethod & "_" & aCons, lXFracExceed) 'probability
+        lExceedanceListing.Add("Y_" & aMethod & "_" & aCons, lY) 'threshold value
+        lZgc.Dispose()
+        lZgc = Nothing
+        Return lExceedanceListing
+    End Function
 
     Private Function ASCIICommonTable(ByVal aTsGroupStreamFlow As atcCollection, _
                                  ByVal aTsGroupPart As atcCollection, _
