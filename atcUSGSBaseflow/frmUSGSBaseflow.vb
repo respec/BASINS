@@ -25,7 +25,6 @@ Public Class frmUSGSBaseflow
     Private Const pNoDatesInCommon As String = ": No dates in common"
     Private pAnalysisOverCommonDuration As Boolean = True
 
-    Private pMethod As String = ""
     Private pMethods As ArrayList = Nothing
     Private pOutputDir As String = ""
     'Private pBaseOutputFilename As String = ""
@@ -85,9 +84,21 @@ Public Class frmUSGSBaseflow
             .IncludeSeconds = False
         End With
 
-        pMethod = GetSetting("atcUSGSBaseflow", "Defaults", "Model", "HySep-Fixed")
         pOutputDir = GetSetting("atcUSGSBaseflow", "Defaults", "OutputDir", "")
         OutputFilenameRoot = GetSetting("atcUSGSBaseflow", "Defaults", "BaseOutputFilename", "")
+
+        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodPART", "False") = "True" Then
+            chkMethodPART.Checked = True
+        End If
+        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPFixed", "False") = "True" Then
+            chkMethodHySEPFixed.Checked = True
+        End If
+        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPLocMin", "False") = True Then
+            chkMethodHySEPLocMin.Checked = True
+        End If
+        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPSlide", "False") = "True" Then
+            chkMethodHySEPSlide.Checked = True
+        End If
         'atcUSGSStations.StationInfoFile = GetSetting("atcUSGSBaseflow", "Defaults", "Stations", "Station.txt")
 
         RepopulateForm()
@@ -328,27 +339,28 @@ Public Class frmUSGSBaseflow
         Next
     End Sub
 
-    Private Sub cboBFMothod_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
-        pMethod = sender.SelectedItem()
-    End Sub
+    'Private Sub cboBFMothod_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    '    pMethod = sender.SelectedItem()
+    'End Sub
 
-    Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
-        pDataGroup.Clear()
-        pDataGroup = Nothing
-        Me.Dispose()
-        Me.Close()
-    End Sub
+    'Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    '    pDataGroup.Clear()
+    '    pDataGroup = Nothing
+    '    Me.Dispose()
+    '    Me.Close()
+    'End Sub
 
-    Private Sub btnOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOK.Click
-        Dim lErrMsg As String = ""
+    'Private Sub btnOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    '    ComputeBaseflow()
+    'End Sub
 
+    Private Sub ComputeBaseflow()
         Dim lArgs As New atcDataAttributes
         Dim lFormCheckMsg As String = AttributesFromForm(lArgs)
         If lFormCheckMsg.Length > 0 Then
-            Logger.Msg("Please address the following issues before proceed:" & vbCrLf & vbCrLf & lFormCheckMsg, MsgBoxStyle.Information, "Input Needs Correction")
+            Logger.Msg("Please address the following issues before proceeding:" & vbCrLf & vbCrLf & lFormCheckMsg, MsgBoxStyle.Information, "Input Needs Correction")
             Exit Sub
         End If
-
         ClearAttributes()
         Dim lClsBaseFlowCalculator As New atcTimeseriesBaseflow.atcTimeseriesBaseflow
         Try
@@ -360,20 +372,20 @@ Public Class frmUSGSBaseflow
             pDidBFSeparation = True
         Catch ex As Exception
             Logger.Msg("Baseflow separation failed: " & vbCrLf & ex.Message, MsgBoxStyle.Critical, "Baseflow separation")
-            lErrMsg = ex.Message
         End Try
-        If lErrMsg = "" Then
-            Logger.Msg("Baseflow separation is successful.", MsgBoxStyle.OkOnly, "Baseflow Separation")
-        End If
+        'If pDidBFSeparation Then
+        '    Logger.Msg("Baseflow separation is successful.", MsgBoxStyle.OkOnly, "Baseflow Separation")
+        'End If
     End Sub
 
     Private Sub mnuOutputASCII_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOutputASCII.Click
         If Not pDidBFSeparation Then
-            Logger.Msg("Need to perform baseflow separation first.")
-            Exit Sub
+            ComputeBaseflow()
+            If Not pDidBFSeparation Then Exit Sub
         End If
+
         Dim lSpecification As String = ""
-        If pDataGroup Is Nothing OrElse pDataGroup.Count = 0 OrElse Not pDidBFSeparation Then
+        If pDataGroup Is Nothing OrElse pDataGroup.Count = 0 Then
             Exit Sub
         End If
         If Not IO.Directory.Exists(txtOutputDir.Text.Trim()) Then
@@ -388,98 +400,98 @@ Public Class frmUSGSBaseflow
         Else
             SaveSetting("atcUSGSBaseflow", "Defaults", "BaseOutputFilename", OutputFilenameRoot)
         End If
-        Logger.Dbg("mnuOutputASCII_Click " & pMethod)
+        Logger.Dbg("Output ASCII")
 
         OutputDir = txtOutputDir.Text.Trim()
         ASCIICommon(pDataGroup(0))
         Exit Sub
 
-        If pMethodLastDone.ToUpper.StartsWith("HYSEP") Then
-            Dim lFilename As String = IO.Path.GetDirectoryName(pDataGroup(0).Attributes.GetValue("History 1").ToString.ToLower.Substring("read from ".Length))
-            lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & ".SBF")
-            ASCIIHySepBSF(pDataGroup(0), lFilename)
-            Dim lFilenamePrt As String = IO.Path.ChangeExtension(lFilename, "PRT")
-            ASCIIHySepMonthly(pDataGroup(0), lFilenamePrt)
-            lSpecification = lFilename
-            If chkTabDelimited.Checked Then
-                lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_tab" & ".SBF")
-                ASCIIHySepDelimited(pDataGroup(0), lFilename)
-            End If
-            'With cdlg
-            '    lFilename = AbsolutePath(lFilename, CurDir)
-            '    .FileName = lFilename
-            '    .Filter = ""
-            '    '.FilterIndex = 0
-            '    .DefaultExt = "SBF"
-            'End With
-        ElseIf pMethodLastDone.ToUpper.StartsWith("PART") Then
-            'With cdlg
-            '    lFilename = AbsolutePath(lFilename, CurDir)
-            '    .FileName = lFilename
-            '    .Filter = ""
-            '    '.FilterIndex = 0
-            '    .DefaultExt = "SBF"
-            'End With
-            Dim lFilename As String = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partday.txt")
-            ASCIIPartDaily(pDataGroup(0), lFilename)
-            If chkTabDelimited.Checked Then
-                lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partday_tab.txt")
-                ASCIIPartDailyDelimited(pDataGroup(0), lFilename)
-            End If
-
-            lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partmon.txt")
-            lSpecification = lFilename
-            ASCIIPartMonthly(pDataGroup(0), lFilename)
-            If chkTabDelimited.Checked Then
-                lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partmon_tab.txt")
-                ASCIIPartMonthlyDelimited(pDataGroup(0), lFilename)
-            End If
-
-            lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partqrt.txt")
-            ASCIIPartQuarterly(pDataGroup(0), lFilename)
-            If chkTabDelimited.Checked Then
-                lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partqrt_tab.txt")
-                ASCIIPartQuarterlyDelimited(pDataGroup(0), lFilename)
-            End If
-
-            lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partWY.txt")
-            ASCIIPartWaterYear(pDataGroup(0), lFilename)
-            If chkTabDelimited.Checked Then
-                lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partWY_tab.txt")
-                ASCIIPartWaterYearDelim(pDataGroup(0), lFilename)
-            End If
-
-            lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partsum.txt")
-            ASCIIPartBFSum(pDataGroup(0), lFilename)
-        End If
-
-        'With cdlg
-        '    If .ShowDialog() = Windows.Forms.DialogResult.OK Then
-        '        lFilename = AbsolutePath(.FileName, CurDir)
-        '        aFilterIndex = .FilterIndex
-        '        Logger.Dbg("User specified file '" & lFilename & "'")
-        '        Logger.LastDbgText = ""
-        '    Else 'Return empty string if user clicked Cancel
-        '        lFilename = ""
-        '        Logger.Dbg("User Cancelled File Selection Dialog for " & aFileDialogTitle)
-        '        Logger.LastDbgText = "" 'forget about this - user was in control - no additional message box needed
+        'If pMethodLastDone.ToUpper.StartsWith("HYSEP") Then
+        '    Dim lFilename As String '= IO.Path.GetDirectoryName(pDataGroup(0).Attributes.GetValue("History 1").ToString.ToLower.Substring("read from ".Length))
+        '    lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & ".SBF")
+        '    ASCIIHySepBSF(pDataGroup(0), lFilename)
+        '    Dim lFilenamePrt As String = IO.Path.ChangeExtension(lFilename, "PRT")
+        '    ASCIIHySepMonthly(pDataGroup(0), lFilenamePrt)
+        '    lSpecification = lFilename
+        '    If chkTabDelimited.Checked Then
+        '        lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_tab" & ".SBF")
+        '        ASCIIHySepDelimited(pDataGroup(0), lFilename)
         '    End If
-        'End With
+        '    'With cdlg
+        '    '    lFilename = AbsolutePath(lFilename, CurDir)
+        '    '    .FileName = lFilename
+        '    '    .Filter = ""
+        '    '    '.FilterIndex = 0
+        '    '    .DefaultExt = "SBF"
+        '    'End With
+        'ElseIf pMethodLastDone.ToUpper.StartsWith("PART") Then
+        '    'With cdlg
+        '    '    lFilename = AbsolutePath(lFilename, CurDir)
+        '    '    .FileName = lFilename
+        '    '    .Filter = ""
+        '    '    '.FilterIndex = 0
+        '    '    .DefaultExt = "SBF"
+        '    'End With
+        '    Dim lFilename As String = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partday.txt")
+        '    ASCIIPartDaily(pDataGroup(0), lFilename)
+        '    If chkTabDelimited.Checked Then
+        '        lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partday_tab.txt")
+        '        ASCIIPartDailyDelimited(pDataGroup(0), lFilename)
+        '    End If
 
-        Dim lProcess As New Process
-        With lProcess
-            .StartInfo.FileName = "Notepad.exe"
-            .StartInfo.Arguments = lSpecification
-            Try
-                .Start()
-            Catch lException As System.SystemException
-                'Dim lExtension As String = FileExt(lSpecification)
-                'lProcess.StartInfo.FileName = "Notepad.exe"
-                'lProcess.StartInfo.Arguments = lSpecification
-                'lProcess.Start()
-                .Dispose()
-            End Try
-        End With
+        '    lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partmon.txt")
+        '    lSpecification = lFilename
+        '    ASCIIPartMonthly(pDataGroup(0), lFilename)
+        '    If chkTabDelimited.Checked Then
+        '        lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partmon_tab.txt")
+        '        ASCIIPartMonthlyDelimited(pDataGroup(0), lFilename)
+        '    End If
+
+        '    lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partqrt.txt")
+        '    ASCIIPartQuarterly(pDataGroup(0), lFilename)
+        '    If chkTabDelimited.Checked Then
+        '        lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partqrt_tab.txt")
+        '        ASCIIPartQuarterlyDelimited(pDataGroup(0), lFilename)
+        '    End If
+
+        '    lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partWY.txt")
+        '    ASCIIPartWaterYear(pDataGroup(0), lFilename)
+        '    If chkTabDelimited.Checked Then
+        '        lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partWY_tab.txt")
+        '        ASCIIPartWaterYearDelim(pDataGroup(0), lFilename)
+        '    End If
+
+        '    lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partsum.txt")
+        '    ASCIIPartBFSum(pDataGroup(0), lFilename)
+        'End If
+
+        ''With cdlg
+        ''    If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+        ''        lFilename = AbsolutePath(.FileName, CurDir)
+        ''        aFilterIndex = .FilterIndex
+        ''        Logger.Dbg("User specified file '" & lFilename & "'")
+        ''        Logger.LastDbgText = ""
+        ''    Else 'Return empty string if user clicked Cancel
+        ''        lFilename = ""
+        ''        Logger.Dbg("User Cancelled File Selection Dialog for " & aFileDialogTitle)
+        ''        Logger.LastDbgText = "" 'forget about this - user was in control - no additional message box needed
+        ''    End If
+        ''End With
+
+        'Dim lProcess As New Process
+        'With lProcess
+        '    .StartInfo.FileName = "Notepad.exe"
+        '    .StartInfo.Arguments = lSpecification
+        '    Try
+        '        .Start()
+        '    Catch lException As System.SystemException
+        '        'Dim lExtension As String = FileExt(lSpecification)
+        '        'lProcess.StartInfo.FileName = "Notepad.exe"
+        '        'lProcess.StartInfo.Arguments = lSpecification
+        '        'lProcess.Start()
+        '        .Dispose()
+        '    End Try
+        'End With
     End Sub
 
     Private Sub txtOutputRootName_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtOutputRootName.TextChanged
@@ -487,15 +499,12 @@ Public Class frmUSGSBaseflow
         OutputFilenameRoot = OutputFilenameRoot.Replace(" ", "_")
     End Sub
 
-    Private Sub mnuGraphBF_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuGraphBF.Click
-
-    End Sub
-
     Private Sub mnuGraphTimeseries_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuGraphTimeseries.Click
         If Not pDidBFSeparation Then
-            Logger.Msg("Need to perform baseflow separation first.")
-            Exit Sub
+            ComputeBaseflow()
+            If Not pDidBFSeparation Then Exit Sub
         End If
+
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
         DoBFGraphTimeseries("Timeseries")
         Me.Cursor = System.Windows.Forms.Cursors.Default
@@ -767,9 +776,10 @@ Public Class frmUSGSBaseflow
 
     Private Sub mnuGraphDuration_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuGraphDuration.Click
         If Not pDidBFSeparation Then
-            Logger.Msg("Need to perform baseflow separation first.")
-            Exit Sub
+            ComputeBaseflow()
+            If Not pDidBFSeparation Then Exit Sub
         End If
+
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
         Dim lPerUnitArea As Boolean = False
         Dim lResponse As String = Logger.MsgCustomOwned("Calculate exceedance probability per unit drainage area?", _
@@ -875,9 +885,10 @@ Public Class frmUSGSBaseflow
 
     Private Sub mnuGraphCDistPlot_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuGraphCDistPlot.Click
         If Not pDidBFSeparation Then
-            Logger.Msg("Need to perform baseflow separation first.")
-            Exit Sub
+            ComputeBaseflow()
+            If Not pDidBFSeparation Then Exit Sub
         End If
+
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
         DoBFGraphTimeseries("CDist")
         Me.Cursor = System.Windows.Forms.Cursors.Default
@@ -957,9 +968,10 @@ Public Class frmUSGSBaseflow
 
     Private Sub btnGraphDuration_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGraphDuration.Click
         If Not pDidBFSeparation Then
-            Logger.Msg("Need to perform baseflow separation first.")
-            Exit Sub
+            ComputeBaseflow()
+            If Not pDidBFSeparation Then Exit Sub
         End If
+
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
         DoBFGraphTimeseries("Duration", False)
         Me.Cursor = System.Windows.Forms.Cursors.Default
@@ -967,9 +979,10 @@ Public Class frmUSGSBaseflow
 
     Private Sub btnGraphDurationPUA_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGraphDurationPUA.Click
         If Not pDidBFSeparation Then
-            Logger.Msg("Need to perform baseflow separation first.")
-            Exit Sub
+            ComputeBaseflow()
+            If Not pDidBFSeparation Then Exit Sub
         End If
+
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
         DoBFGraphTimeseries("Duration", True)
         Me.Cursor = System.Windows.Forms.Cursors.Default
@@ -977,9 +990,10 @@ Public Class frmUSGSBaseflow
 
     Private Sub btnGraphCDist_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGraphCDist.Click
         If Not pDidBFSeparation Then
-            Logger.Msg("Need to perform baseflow separation first.")
-            Exit Sub
+            ComputeBaseflow()
+            If Not pDidBFSeparation Then Exit Sub
         End If
+
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
         DoBFGraphTimeseries("CDist")
         Me.Cursor = System.Windows.Forms.Cursors.Default
@@ -989,10 +1003,26 @@ Public Class frmUSGSBaseflow
                                                                                                              chkMethodHySEPLocMin.CheckedChanged, _
                                                                                                              chkMethodHySEPSlide.CheckedChanged, _
                                                                                                              chkMethodPART.CheckedChanged
+        pDidBFSeparation = False
         pMethods.Clear()
         If chkMethodPART.Checked Then pMethods.Add(BFMethods.PART)
         If chkMethodHySEPFixed.Checked Then pMethods.Add(BFMethods.HySEPFixed)
         If chkMethodHySEPLocMin.Checked Then pMethods.Add(BFMethods.HySEPLocMin)
         If chkMethodHySEPSlide.Checked Then pMethods.Add(BFMethods.HySEPSlide)
+
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodPART", chkMethodPART.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPFixed", chkMethodHySEPFixed.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPLocMin", chkMethodHySEPLocMin.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPSlide", chkMethodHySEPSlide.Checked)
+
+    End Sub
+
+    Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
+        MsgBox("Documentation not yet available")
+    End Sub
+
+    Private Sub txtAny_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) _
+            Handles txtDrainageArea.TextChanged, txtStartDateUser.TextChanged, txtEndDateUser.TextChanged
+        pDidBFSeparation = False
     End Sub
 End Class
