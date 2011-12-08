@@ -681,7 +681,13 @@ Public Class frmUSGSBaseflow
         Dim lTsFlow As atcTimeseries = aParams.GetValue("StreamFlow").Clone()
         Dim lYAxisTitleText As String = aParams.GetValue("YAxisTitleText")
         Dim lMethod As String = aParams.GetValue("Method")
-
+        Dim lMethodAtt As BFMethods
+        Select Case lMethod.ToLower
+            Case "part" : lMethodAtt = BFMethods.PART
+            Case "fixed" : lMethodAtt = BFMethods.HySEPFixed
+            Case "locmin" : lMethodAtt = BFMethods.HySEPLocMin
+            Case "slide" : lMethodAtt = BFMethods.HySEPSlide
+        End Select
         Dim lTsBF4Graph As atcTimeseries = aTsCollection.ItemByKey("RateDaily").Clone()
         lDA = lTsBF4Graph.Attributes.GetValue("Drainage Area")
         With lTsBF4Graph.Attributes
@@ -706,6 +712,7 @@ Public Class frmUSGSBaseflow
                 .SetValue("Scenario", "Estimated by " & lMethod)
                 .SetValue("Units", lYAxisTitleText)
                 .SetValue("YAxis", "LEFT")
+                .SetValue("Method", lMethodAtt)
             End With
         End If
         If lGraphType = "CDist" Then
@@ -741,6 +748,7 @@ Public Class frmUSGSBaseflow
                 .SetValue("Scenario", "Estimated by " & lMethod)
                 .SetValue("Units", lYAxisTitleText)
                 .SetValue("YAxis", "LEFT")
+                .SetValue("Method", lMethodAtt)
             End With
 
             lDataGroup.Add(lGraphTsFlowIn)
@@ -769,6 +777,9 @@ Public Class frmUSGSBaseflow
             .CurveList.Item(0).Color = Drawing.Color.Red
             If aDataGroup.Count > 2 Then
                 CType(.CurveList.Item(0), LineItem).Line.Width = 3
+                For I As Integer = 1 To aDataGroup.Count - 1
+                    .CurveList.Item(I).Color = GetCurveColor(aDataGroup(I))
+                Next
             Else
                 .CurveList.Item(1).Color = Drawing.Color.DarkBlue
                 CType(.CurveList.Item(1), LineItem).Line.Width = 2
@@ -795,6 +806,38 @@ Public Class frmUSGSBaseflow
         Me.Cursor = System.Windows.Forms.Cursors.Default
     End Sub
 
+    Private Function GetCurveColor(ByVal aTs As atcTimeseries) As System.Drawing.Color
+        Dim lCons As String = aTs.Attributes.GetValue("Constituent").ToString.ToLower
+        Dim lMethod As BFMethods = aTs.Attributes.GetValue("Method")
+
+        Select Case lMethod
+            Case BFMethods.PART
+                If lCons.StartsWith("baseflow") Then
+                    Return Drawing.Color.DarkBlue
+                ElseIf lCons.StartsWith("runoff") Then
+                    Return Drawing.Color.LightBlue
+                End If
+            Case BFMethods.HySEPFixed
+                If lCons.StartsWith("baseflow") Then
+                    Return Drawing.Color.DarkGreen
+                ElseIf lCons.StartsWith("runoff") Then
+                    Return Drawing.Color.LightGreen
+                End If
+            Case BFMethods.HySEPLocMin
+                If lCons.StartsWith("baseflow") Then
+                    Return Drawing.Color.DarkOrange
+                ElseIf lCons.StartsWith("runoff") Then
+                    Return Drawing.Color.Orange
+                End If
+            Case BFMethods.HySEPSlide
+                If lCons.StartsWith("baseflow") Then
+                    Return Drawing.Color.Maroon
+                ElseIf lCons.StartsWith("runoff") Then
+                    Return Drawing.Color.Magenta
+                End If
+        End Select
+    End Function
+
     Private Sub DisplayDurGraph(ByVal aDataGroup As atcTimeseriesGroup, ByVal aPerUnitArea As Boolean)
         Dim lGraphForm As New atcGraph.atcGraphForm()
         lGraphForm.Icon = Me.Icon
@@ -815,11 +858,14 @@ Public Class frmUSGSBaseflow
                 Dim lBFCurveCount As Integer = (aDataGroup.Count - 1) / 2
                 Dim lBFInitColor As Integer = Drawing.Color.DarkBlue.ToArgb
                 For I As Integer = 1 To lBFCurveCount
-                    .CurveList.Item(I).Color = System.Drawing.Color.FromArgb(lBFInitColor - (I - 1) * 8)
+                    '.CurveList.Item(I).Color = System.Drawing.Color.FromArgb(lBFInitColor - (I - 1) * 8)
+                    'CType(.CurveList.Item(I), LineItem).Line.Style = Drawing.Drawing2D.DashStyle.Dash
+                    .CurveList.Item(I).Color = GetCurveColor(aDataGroup(I))
                 Next
                 lBFInitColor = Drawing.Color.DarkCyan.ToArgb
                 For I As Integer = lBFCurveCount + 1 To aDataGroup.Count - 1
-                    .CurveList.Item(I).Color = System.Drawing.Color.FromArgb(lBFInitColor - (I - 1) * 8)
+                    '.CurveList.Item(I).Color = System.Drawing.Color.FromArgb(lBFInitColor - (I - 1) * 8)
+                    .CurveList.Item(I).Color = GetCurveColor(aDataGroup(I))
                 Next
             Else
                 .CurveList.Item(1).Color = Drawing.Color.DarkBlue
@@ -923,7 +969,8 @@ Public Class frmUSGSBaseflow
                 Dim lBFCurveCount As Integer = (aDataGroup.Count - 1) / 2
                 Dim lBFInitColor As Integer = Drawing.Color.DarkBlue.ToArgb
                 For I As Integer = 1 To lBFCurveCount
-                    .CurveList.Item(I).Color = System.Drawing.Color.FromArgb(lBFInitColor - (I - 1) * 8)
+                    '.CurveList.Item(I).Color = System.Drawing.Color.FromArgb(lBFInitColor - (I - 1) * 8)
+                    .CurveList.Item(I).Color = GetCurveColor(aDataGroup(I))
                     With CType(.CurveList.Item(I), LineItem).Symbol
                         .Type = SymbolType.Circle
                         .IsVisible = True
@@ -931,7 +978,8 @@ Public Class frmUSGSBaseflow
                 Next
                 lBFInitColor = Drawing.Color.DarkCyan.ToArgb
                 For I As Integer = lBFCurveCount + 1 To aDataGroup.Count - 1
-                    .CurveList.Item(I).Color = System.Drawing.Color.FromArgb(lBFInitColor - (I - 1) * 8)
+                    '.CurveList.Item(I).Color = System.Drawing.Color.FromArgb(lBFInitColor - (I - 1) * 8)
+                    .CurveList.Item(I).Color = GetCurveColor(aDataGroup(I))
                     With CType(.CurveList.Item(I), LineItem).Symbol
                         .Type = SymbolType.Square
                         .IsVisible = True
