@@ -404,6 +404,7 @@ Public Class frmUSGSBaseflow
 
         OutputDir = txtOutputDir.Text.Trim()
         ASCIICommon(pDataGroup(0))
+        Logger.MsgCustomOwned("Baseflow output completed.", "USGS Baseflow Separation", Me, New String() {"OK"})
         Exit Sub
 
         'If pMethodLastDone.ToUpper.StartsWith("HYSEP") Then
@@ -698,14 +699,14 @@ Public Class frmUSGSBaseflow
                 lTsBF4Graph = lTsBF4Graph / lDA
                 If lTsRunoff IsNot Nothing Then
                     lTsRunoff = lTsRunoff / lDA
-                    With lTsRunoff.Attributes
-                        .SetValue("Constituent", "Runoff")
-                        .SetValue("Scenario", "Estimated by " & lMethod)
-                        .SetValue("Units", lYAxisTitleText)
-                        .SetValue("YAxis", "LEFT")
-                    End With
                 End If
             End If
+            With lTsRunoff.Attributes
+                .SetValue("Constituent", "Runoff")
+                .SetValue("Scenario", "Estimated by " & lMethod)
+                .SetValue("Units", lYAxisTitleText)
+                .SetValue("YAxis", "LEFT")
+            End With
         End If
         If lGraphType = "CDist" Then
             Dim lTimeUnitToAggregate As atcTimeUnit = atcTimeUnit.TUMonth
@@ -762,6 +763,8 @@ Public Class frmUSGSBaseflow
         lGraphForm.Grapher = lGraphTS
         With lGraphForm.Grapher.ZedGraphCtrl.GraphPane
             .YAxis.Type = AxisType.Log
+            Dim lScaleMin As Double = 10
+            .YAxis.Scale.Min = lScaleMin
             .AxisChange()
             .CurveList.Item(0).Color = Drawing.Color.Red
             If aDataGroup.Count > 2 Then
@@ -902,10 +905,11 @@ Public Class frmUSGSBaseflow
         lGraphTS.Exceedance = False
         lGraphForm.Grapher = lGraphTS
         With lGraphForm.Grapher.ZedGraphCtrl.GraphPane
-            'Dim lScaleMin As Double = 10
             .YAxis.Type = AxisType.Linear
+            'Dim lScaleMin As Double = 10
             '.YAxis.Scale.MinAuto = False
             '.YAxis.Scale.Min = lScaleMin
+            .YAxis.Scale.Max = 15
             .AxisChange()
             .CurveList.Item(0).Color = Drawing.Color.Red
             With CType(.CurveList.Item(0), LineItem).Symbol
