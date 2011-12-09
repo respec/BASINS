@@ -3436,7 +3436,8 @@ Public Class GisUtil
         lLayer.Visible = True
     End Sub
 
-    Public Shared Sub SetLayerRendererUniqueValues(ByVal aDesc As String, ByVal aFieldIndex As Integer)
+    Public Shared Sub SetLayerRendererUniqueValues(ByVal aDesc As String, ByVal aFieldIndex As Integer, Optional ByVal aColors As Collection = Nothing, _
+                                                   Optional ByVal aCaptions As Collection = Nothing)
         'create a unique values renderer for the given layer and field,
         'adapted from MapWindow SFColoringSchemeForm.vb
 
@@ -3505,6 +3506,19 @@ Public Class GisUtil
             Else
                 lBrk.Caption = CStr(lArr(i))
             End If
+
+            If Not aColors Is Nothing Then
+                If aColors.Count > i Then
+                    lBrk.StartColor = aColors(i + 1)
+                    lBrk.EndColor = lBrk.StartColor
+                End If
+            End If
+            If Not aCaptions Is Nothing Then
+                If aCaptions.Count > i Then
+                    lBrk.Caption = aCaptions(i + 1)
+                End If
+            End If
+
             lColorScheme.Add(lBrk)
             lBrk = Nothing
         Next
