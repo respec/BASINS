@@ -216,34 +216,35 @@ Public Class frmMRCControl
 
         Dim lSR As New StreamReader(pFileRecSumFullName)
         Dim lOneLine As String
-        Dim lTitleSectionLines As Integer = 22
         Dim lLinesRead As Integer = 1
 
+        Dim lArr() As String
         While Not lSR.EndOfStream
-            lOneLine = lSR.ReadLine
-            If lLinesRead < lTitleSectionLines Then
-                lLinesRead += 1
-                Continue While
-            End If
-            While Not lSR.EndOfStream
-                lOneLine = lSR.ReadLine()
-                If lOneLine.Trim.Length < 2 Then
-                    Continue While
-                End If
+            lOneLine = lSR.ReadLine()
 
-                Dim lFoundMatch As Boolean = False
-                'key to use is the RecSum string
-                For Each lItem As String In lstRecSum.Items
-                    If lItem.ToLower = lOneLine.ToLower Then
-                        lFoundMatch = True
-                        Exit For
-                    End If
+            'Eliminate lines by pattern, 12 values and last 9 are numeric
+            lArr = Regex.Split(lOneLine, "\s+")
+            If lArr.Length <> 12 Then
+                Continue While
+            Else
+                For I As Integer = 3 To 11
+                    If Not IsNumeric(lArr(I)) Then Continue While
                 Next
-                If Not lFoundMatch Then
-                    lstRecSum.Items.Add(lOneLine)
+            End If
+
+            Dim lFoundMatch As Boolean = False
+            'key to use is the RecSum string
+            For Each lItem As String In lstRecSum.Items
+                If lItem.ToLower = lOneLine.ToLower Then
+                    lFoundMatch = True
+                    Exit For
                 End If
-            End While
+            Next
+            If Not lFoundMatch Then
+                lstRecSum.Items.Add(lOneLine)
+            End If
         End While
+
         lSR.Close()
         lSR = Nothing
         SaveSetting("atcUSGSRecess", "Defaults", "FileRecSum", pFileRecSumFullName)
@@ -261,16 +262,67 @@ Public Class frmMRCControl
 
             lMatched = False
 
-        ElseIf lstRecSum.SelectedIndex < 2 OrElse lstStations.SelectedIndex < 2 Then
+        ElseIf lstRecSum.SelectedIndex < 2 Then
             lMatched = False
-        Else
-            Dim lArrRecSum() As String = Regex.Split(lstRecSum.SelectedItem, "\s+")
-            Dim lArrStation() As String = Regex.Split(lstStations.SelectedItem, "\s+")
-            If lArrRecSum(0).Trim().ToLower() <> lArrStation(0).Trim().ToLower() Then
-                lMatched = False
-            End If
+        ElseIf Not RecSumStationAddAllowed() Then
+            lMatched = False
+            'Else
+            '    Dim lArrRecSum() As String = Regex.Split(lstRecSum.SelectedItem, "\s+")
+            '    Dim lArrStation() As String = Regex.Split(lstStations.SelectedItem, "\s+")
+            '    If lArrRecSum(0).Trim().ToLower() <> lArrStation(0).Trim().ToLower() Then
+            '        lMatched = False
+            '    End If
         End If
         Return lMatched
+    End Function
+
+    Private Function RecSumStationAddAllowed() As Boolean
+        Dim lAddAllowed As Boolean = True
+        Dim lInStationList As Boolean = False
+        Dim lNewStationName As String = txtStation.Text.Trim()
+        Dim lArrRecSum() As String = Regex.Split(lstRecSum.SelectedItem, "\s+")
+        If lNewStationName <> lArrRecSum(0) Then
+            Logger.Msg("Entered station name does not match file name" & vbCrLf & _
+                       "in the Recsum (polynomial coefficients) list.", "Problem adding MRC")
+            lAddAllowed = False
+        Else
+            If lstStations.Items.Count > 0 Then
+                Dim lArrStation() As String = Nothing
+                For I As Integer = 2 To lstStations.Items.Count - 1
+                    lArrStation = Regex.Split(lstStations.Items(I), "\s+")
+                    If lNewStationName = lArrStation(0) Then 'already in the list
+                        lInStationList = True
+                        Exit For
+                    End If
+                Next
+            End If
+        End If
+
+        If lAddAllowed AndAlso Not lInStationList Then
+            'Actually "TRY" to add into the station.txt file
+            'doesn't really matter if successful or not
+            If IO.File.Exists(pFileStationFullName) Then
+                If IsNumeric(txtDA.Text) Then
+                    Dim lSW As StreamWriter = Nothing
+                    Try
+                        lSW = New StreamWriter(pFileStationFullName, True)
+                        lSW.WriteLine(lNewStationName.PadRight(12, " ") & txtDA.Text.PadLeft(8, " "))
+                        lSW.Flush() : lSW.Close() : lSW = Nothing
+                        PopulateStations()
+                    Catch ex As Exception
+                        If lSW IsNot Nothing Then
+                            lSW.Close()
+                            lSW = Nothing
+                        End If
+                        'lAddAllowed = False
+                    End Try
+                End If
+            Else
+                'lAddAllowed = False
+            End If
+        End If
+
+        Return lAddAllowed
     End Function
 
     Private Sub PopulateEquations()
