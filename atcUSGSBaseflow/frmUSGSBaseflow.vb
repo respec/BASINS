@@ -93,7 +93,7 @@ Public Class frmUSGSBaseflow
         If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPFixed", "False") = "True" Then
             chkMethodHySEPFixed.Checked = True
         End If
-        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPLocMin", "False") = True Then
+        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPLocMin", "False") = "True" Then
             chkMethodHySEPLocMin.Checked = True
         End If
         If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPSlide", "False") = "True" Then
@@ -1057,16 +1057,17 @@ Public Class frmUSGSBaseflow
                                                                                                              chkMethodPART.CheckedChanged
         pDidBFSeparation = False
         pMethods.Clear()
-        If chkMethodPART.Checked Then pMethods.Add(BFMethods.PART)
-        If chkMethodHySEPFixed.Checked Then pMethods.Add(BFMethods.HySEPFixed)
-        If chkMethodHySEPLocMin.Checked Then pMethods.Add(BFMethods.HySEPLocMin)
-        If chkMethodHySEPSlide.Checked Then pMethods.Add(BFMethods.HySEPSlide)
+        If Opened Then
+            If chkMethodPART.Checked Then pMethods.Add(BFMethods.PART)
+            If chkMethodHySEPFixed.Checked Then pMethods.Add(BFMethods.HySEPFixed)
+            If chkMethodHySEPLocMin.Checked Then pMethods.Add(BFMethods.HySEPLocMin)
+            If chkMethodHySEPSlide.Checked Then pMethods.Add(BFMethods.HySEPSlide)
 
-        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodPART", chkMethodPART.Checked)
-        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPFixed", chkMethodHySEPFixed.Checked)
-        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPLocMin", chkMethodHySEPLocMin.Checked)
-        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPSlide", chkMethodHySEPSlide.Checked)
-
+            SaveSetting("atcUSGSBaseflow", "Defaults", "MethodPART", chkMethodPART.Checked)
+            SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPFixed", chkMethodHySEPFixed.Checked)
+            SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPLocMin", chkMethodHySEPLocMin.Checked)
+            SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPSlide", chkMethodHySEPSlide.Checked)
+        End If
     End Sub
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click

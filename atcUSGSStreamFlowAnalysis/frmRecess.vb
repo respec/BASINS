@@ -45,6 +45,9 @@ Public Class frmRecess
     Private pLastRunConfigs As atcDataAttributes
     Private pLastSelectedRecessions As atcCollection
 
+    Private pMessage As String = ""
+    Private pLoaded As Boolean = False
+
     Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing, _
                       Optional ByVal aBasicAttributes As Generic.List(Of String) = Nothing, _
                       Optional ByVal aShowForm As Boolean = True)
@@ -1252,6 +1255,8 @@ Public Class frmRecess
             End If
         End If
 
+        If Not IO.Directory.Exists(txtOutputDir.Text) Then lErrMsg &= "- Output directory doesn't exist" & vbCrLf
+
         Dim lMinRecLength As Integer = 0
         If Not Integer.TryParse(txtMinRecessionDays.Text.Trim, lMinRecLength) Then lErrMsg &= "- Min Recession Limb Length not set" & vbCrLf
 
@@ -1641,7 +1646,11 @@ Public Class frmRecess
         If chkSaveInterimToFile.Checked Then
             pRecess.SaveInterimResults = True
             If Not IO.Directory.Exists(txtOutputDir.Text.Trim()) Then
-                Logger.Msg("Need to select output directory.", MsgBoxStyle.Information, "Save Intermediate Results")
+                If pLoaded Then
+                    Logger.Msg("For saving results, please specify output directory.", MsgBoxStyle.Information, "Reminder: Save Results")
+                Else
+                    pMessage = "For saving results, please specify output directory."
+                End If
                 txtOutputDir.Focus()
             Else
                 Try
@@ -1694,5 +1703,13 @@ Public Class frmRecess
     Private Sub btnCurv_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCurv.Click
         Dim lfrmMRC As New frmMRCControl()
         lfrmMRC.Initialize("")
+    End Sub
+
+    Private Sub frmRecess_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
+        pLoaded = True
+        If pMessage.Length > 0 Then
+            Logger.MsgCustomOwned(pMessage, "Reminder", Me, New String() {"OK"})
+            pMessage = ""
+        End If
     End Sub
 End Class
