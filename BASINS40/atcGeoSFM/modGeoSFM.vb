@@ -2267,7 +2267,9 @@ Public Module modGeoSFM
         lChkFile.AppendLine("Ending Time: " & System.DateTime.Now.ToString)
         SaveFileString(timesFN, lChkFile.ToString)
 
-        Logger.Msg("Stream Flow Routing Complete. Results written to: " & vbCrLf & flowFN, "Geospatial Stream Flow Model")
+        SetFlowTimeseries(flowFN)
+
+        Logger.Msg("Stream Flow Routing Complete." & vbCrLf & "Results written as BASINS internal timeseries and to file: " & vbCrLf & flowFN, "Geospatial Stream Flow Model")
 
     End Sub
 
@@ -3747,7 +3749,7 @@ Public Module modGeoSFM
             End If
 
             If theMedian > lMaxMedian Then
-                lMaxMedian = theMedian
+                lMaxMedian = SignificantDigits(theMedian, 4)
             End If
 
             GisUtil.StartSetFeatureValue(theTheme)
@@ -3828,13 +3830,13 @@ Public Module modGeoSFM
         lHighRange.Add(2 * lInc)
         lHighRange.Add(3 * lInc)
         lHighRange.Add(4 * lInc)
-        lHighRange.Add(5 * lInc)
+        lHighRange.Add(6 * lInc)
         Dim lCaptions As New Collection
         lCaptions.Add("Median Flow in cms " & lLowRange(1).ToString & " - " & lHighRange(1).ToString)
         lCaptions.Add(lLowRange(2).ToString & " - " & lHighRange(2).ToString)
         lCaptions.Add(lLowRange(3).ToString & " - " & lHighRange(3).ToString)
         lCaptions.Add(lLowRange(4).ToString & " - " & lHighRange(4).ToString)
-        lCaptions.Add(lLowRange(5).ToString & " - " & lHighRange(5).ToString)
+        lCaptions.Add(lLowRange(5).ToString & " + ")
         GisUtil.SetLayerRendererWithRanges(theTheme, medianfld, lColors, lCaptions, lLowRange, lHighRange)
 
         'write basin attribute table to text file
@@ -3990,7 +3992,7 @@ Public Module modGeoSFM
         J2Date(aMapJDate, lDate)
         Dim lYr As Integer = lDate(0)
         Dim lJYr As Double = Date2J(lYr, 1, 1)
-        Dim lDaysAfter As Integer = aMapJDate - lJYr
+        Dim lDaysAfter As Integer = aMapJDate - lJYr + 1
         Dim lDateString As String = lDate(0) & Format(lDaysAfter, "000")
 
         Dim plotday As Integer = 0
@@ -4010,9 +4012,9 @@ Public Module modGeoSFM
         Dim theLowflow As Single = 0.0
         Dim theMedflow As Single = 0.0
         Dim theflow As Single = 0.0
+        GisUtil.StartSetFeatureValue(theTheme)
         For mynum As Integer = 1 To numflds - 1
             Dim lSubbasinId As Integer = resultvals(1, mynum)
-            GisUtil.StartSetFeatureValue(theTheme)
             For precs As Integer = 0 To GisUtil.NumFeatures(theTheme) - 1
                 Dim cpid As Integer = GisUtil.FieldValue(theTheme, precs, pidfield)
                 If (cpid = lSubbasinId) Then
@@ -4030,290 +4032,161 @@ Public Module modGeoSFM
                     End If
                 End If
             Next
-            GisUtil.StopSetFeatureValue(theTheme)
         Next
+        GisUtil.StopSetFeatureValue(theTheme)
 
         'generate thematic map
-        '        theFtab.Flush()
-        '        theFtab.SetEditable(False)
-        'mylegend = legend.make(#SYMBOL_FILL)
-        'mylegend.setlegendtype(#LEGEND_TYPE_COLOR)
-        'mysymbol1 = symbol.make(#SYMBOL_FILL)
-        'mysymbol2 = symbol.make(#SYMBOL_FILL)
-        'mysymbol3 = symbol.make(#SYMBOL_FILL)
-
-        '        myyellow = Color.make
-        '        mygreen = Color.make
-        '        myblue = Color.make
-        'myyellow.setrgblist({250, 250, 0}) 
-        'mygreen.setrgblist({0, 240, 0})
-        'myblue.setrgblist({0, 0, 250})
-        '        mysymbol1.SetColor(myyellow)
-        '        mysymbol2.SetColor(mygreen)
-        '        mysymbol3.SetColor(myblue)
-        '        mylegend.Interval(theFtheme, "IndexNow", 3)
-        'mylegend.SetClassInfo(0, {"low_flow", "1", mySymbol1, 0, 1})
-        'mylegend.SetClassInfo(1, {"normal_flow", "2", mySymbol2, 1, 2})
-        'mylegend.SetClassInfo(2, {"high_flow", "3", mySymbol3, 2, 3})
-        '        mylegendFN = filename.Merge(myWkDirname, "flow.avl")
-        '        mylegend.Save(mylegendFN)
-        '        'thelegend = legend.make(#SYMBOL_FILL)
-        '        'thelegend.Load(mylegendFN, #LEGEND_LOADTYPE_ALL) 
-        '        theFtheme.SetLegend(mylegend)
-        '        theFtheme.UpdateLegend()
-        '        theFtheme.SetVisible(True)
-        '        'theFtheme.SetName("Basin.shp")
-
-
+        Dim lColors As New Collection
+        lColors.Add(System.Convert.ToUInt32(RGB(250, 250, 0))) 'yellow
+        lColors.Add(System.Convert.ToUInt32(RGB(0, 240, 0)))   'green
+        lColors.Add(System.Convert.ToUInt32(RGB(0, 0, 250)))   'blue
+        Dim lCaptions As New Collection
+        lCaptions.Add("low_flow")
+        lCaptions.Add("normal_flow")
+        lCaptions.Add("high_flow")
+        GisUtil.SetLayerRendererUniqueValues("Subbasins", cfindexfld, lColors, lCaptions)
     End Sub
 
-    Friend Sub SetPlot()
-        ' ***********************************************************************************************
-        ' ***********************************************************************************************
-        '
-        '      Program: setplot.ave
-        '
-        '      Function: 
-        '          Activates the plotting tool active. 
-        '          Subsequent clicks on the View initiates plotxy.ave
-        '
-        '      Inputs: 
-        '          none
-        '
-        '      Outputs: 
-        '          none. Plotting tool becomes active.
-        '
-        '      Assumptions: The program assumes that 
-        '          the View is active and it contains the coverage/grid of subbasins
-        '          the plotting tool is the second from last tool in the View tool bar
-        '
-        ' ***********************************************************************************************
-        ' ***********************************************************************************************
+    Friend Sub SetFlowTimeseries(ByVal aFlowFileName As String)
+        'read result file into memory
+        Dim numrecs As Integer = 0
+        Dim resultrecs As New Collection
+        If FileExists(aFlowFileName) Then
+            Try
+                Dim lCurrentRecord As String
+                Dim lStreamReader As New StreamReader(aFlowFileName)
+                Do
+                    lCurrentRecord = lStreamReader.ReadLine
+                    If lCurrentRecord Is Nothing Then
+                        Exit Do
+                    Else
+                        numrecs = numrecs + 1
+                        resultrecs.Add(lCurrentRecord)
+                    End If
+                Loop
+            Catch e As ApplicationException
+                Logger.Msg("Cannot read output file, " & aFlowFileName & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+                Exit Sub
+            End Try
+        Else
+            Logger.Msg("Cannot open output file, " & aFlowFileName & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+            Exit Sub
+        End If
 
-        '        TheProject = av.GetProject
-        '        theView = av.getactiveDoc
-        '        ViewChk = TheView.GetGUI
-        '        If (ViewChk <> "View") Then
-        '            MsgBox.error("Click on the View to make it 'active' before running this program", "")
-        '            Exit Sub
-        '        End If
+        Dim numflds As Integer = 0
+        Dim lstr As String = resultrecs(1)
+        Dim lstr1 As String = ""
+        Do While lstr.Length > 0
+            lstr1 = StrRetRem(lstr)
+            numflds += 1
+        Loop
 
-        '        theThemelist = theView.GetThemes
-        '        TheTheme = theView.FindTheme("basply.shp")
-        '        If (TheTheme = nil) Then
-        '            For Each vthm In theThemelist
-        '                thethmnm = vthm.getname
-        '                If ((thethmnm.contains("basply")) And (vthm.CanSelect)) Then
-        '                    TheTheme = theView.FindTheme(thethmnm)
-        '                    break()
-        '                End If
-        '            Next
-        '            If (thetheme = nil) Then
-        '                theTheme = MsgBox.Choice(theThemelist, "Select basin grid/polygon theme", "Basin Theme")
-        '                If (theTheme = nil) Then
-        '                    Exit Sub
-        '                End If
-        '            End If
-        '        End If
+        'read results into local array
+        Dim resultvals(numrecs, numflds) As Single
+        Dim irec As Integer = 0
+        For Each lrec As String In resultrecs
+            irec += 1
+            Dim ifield As Integer = -1
+            Do While lrec.Length > 0
+                lstr1 = StrRetRem(lrec)
+                ifield += 1
+                If IsNumeric(lstr1) Then
+                    resultvals(irec, ifield) = lstr1
+                End If
+            Loop
+        Next
 
+        'set the start/end dates
+        Dim startyear As String = ""
+        Dim startday As String = ""
+        startyear = Left(resultvals(2, 0), 4)
+        If Not IsNumeric(startyear) Then
+            Logger.Msg("Problem reading streamflow file:  Start year must be a 4 digit number", "GeoSFM Utilities")
+            Exit Sub
+        End If
+        startday = Right(resultvals(2, 0), 3)
+        If Not IsNumeric(startday) Then
+            Logger.Msg("Problem reading streamflow file:  Start day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
+            Exit Sub
+        End If
+        Dim endyear As String = ""
+        Dim endday As String = ""
+        endyear = Left(resultvals(numrecs, 0), 4)
+        If Not IsNumeric(endyear) Then
+            Logger.Msg("End year must be a 4 digit number", "GeoSFM Utilities")
+            Exit Sub
+        End If
+        endday = Right(resultvals(numrecs, 0), 3)
+        If Not IsNumeric(endday) Then
+            Logger.Msg("End day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
+            Exit Sub
+        End If
+        Dim lSDate(5) As Integer
+        lSDate(0) = CInt(startyear)
+        lSDate(1) = 1
+        lSDate(2) = 1
+        Dim lSJDate As Double = Date2J(lSDate) + startday - 1
+        Dim lEDate(5) As Integer
+        lEDate(0) = CInt(endyear)
+        lEDate(1) = 1
+        lEDate(2) = 1
+        Dim lEJDate As Double = Date2J(lEDate) + endday - 1
+        Dim lNvals As Double = lEJDate - lSJDate
+        Dim lDates(lNvals) As Double
+        For lDateIndex As Integer = 0 To lNvals
+            lDates(lDateIndex) = lSJDate + lDateIndex
+        Next
 
+        'does this type of data source already exist?
+        For lDSIndex As Integer = 0 To atcDataManager.DataSources.Count - 1
+            Dim lDS As atcDataSource = atcDataManager.DataSources(lDSIndex)
+            If lDS.Name = "" And lDS.Description = "" Then
+                atcDataManager.RemoveDataSource(lDSIndex)
+            End If
+        Next
 
-        '        theWKdir = theproject.GetFileName.ReturnDir
+        'create new data source to receive the data
+        Dim lDataSource As New atcTimeseriesSource
 
-        '        found = False
-        '        p = theView.GetDisplay.ReturnUserPoint
+        For lTsIndex As Integer = 1 To numflds - 1
+            'now convert the local array into atcTimeseries
+            Dim lDsn As Integer = lTsIndex
+            Dim lRchId As String = CInt(resultvals(1, lTsIndex)).ToString
+            Dim lGenericTs As New atcData.atcTimeseries(Nothing)
+            With lGenericTs.Attributes
+                .SetValue("ID", lDsn)
+                .SetValue("Scenario", "Simulated")
+                .SetValue("Constituent", "Flow")
+                .SetValue("Location", "Reach " & lRchId)
+                .SetValue("Description", "Simulated flow from GeoSFM")
+                .SetValue("STANAM", "GeoSFM Reach " & lRchId)
+                .SetValue("TU", 4)  'assume daily
+                .SetValue("TS", 1)
+                .SetValue("TSTYPE", "FLOW")
+                .SetValue("Data Source", aFlowFileName)
+            End With
 
-        '        If (TheTheme.Is(Ftheme).Not) Then
-        '            theGrid = theTheme.GetGrid
-        '            mycellsize = theGrid.GetCellSize
-        '            pntx = (p.GetX)
-        '            pnty = (p.GetY)
-        '            cenp = Point.Make(pntx, pnty)
-        '            ElementId = TheGrid.CellValue(cenp, Prj.MakeNull)
-        '        Else
-        '            TheVtab = TheTheme.GetFtab
-        '            keyfield = TheVtab.FindField("Gridcode")
-        '            If (keyField = nil) Then
-        '                fieldslist = TheVtab.GetFields
-        '                fieldName = MsgBox.Choice(fieldslist, "Select a subbasin id field", "Geospatial Stream Flow Model")
-        '                If (fieldName = nil) Then
-        '                    Exit Sub
-        '                End If
+            Dim lTsDate As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
+            lTsDate.Values = lDates
+            lGenericTs.Dates = lTsDate
 
-        '                keyField = TheVtab.FindField(fieldName.AsString)
-        '                If (keyField = nil) Then
-        '                    Exit Sub
-        '                End If
-        '            End If
+            'now fill in the values
+            Dim lValues(lNvals) As Double
+            Dim lCurDate As Double
+            lCurDate = lSJDate
+            Dim lDayCounter As Integer = 0
+            Dim lValueCounter As Integer = 1
+            Do While lCurDate <= lEJDate 'loop through each day
+                lValues(lDayCounter) = resultvals(lDayCounter, lTsIndex)
+                lDayCounter = lDayCounter + 1
+                lCurDate = lCurDate + 1
+            Loop
 
-        '            recs = TheTheme.FindByPoint(p)
-        '            If (recs.count = 0) Then
-        '                MsgBox.info("The selected point is outside the basin extent", "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            End If
-        '            rec = recs.get(0)
-        '            ElementId = TheVtab.ReturnValue(keyField, rec)
-        '        End If
+            lGenericTs.Values = lValues
+            lDataSource.DataSets.Add(lDsn, lGenericTs)
+        Next
 
-        '        If (ElementId.AsString.IsNumber.not) Then
-        '            System.beep()
-        '            MsgBox.info("The selected point is outside the basin extent", "Geospatial Stream Flow Model")
-        '            Exit Sub
-        '        End If
-
-
-        '        'MAKE THE SELECTED POLYGON ACTIVE
-        '        '(PRIMARILY FOR VISUAL EFFECTS)
-
-        '        If (theTheme.Is(FTheme)) Then
-        '            If (System.IsShiftKeyDown) Then
-        '    op = #VTAB_SELTYPE_XOR
-        '            Else
-        '    op = #VTAB_SELTYPE_NEW
-        '            End If
-        '            If (theTheme.CanSelect) Then
-        '                theTheme.SelectByPoint(p, op)
-        '            End If
-        '            av.GetProject.SetModified(True)
-        '        End If
-
-        '        docList = theProject.GetDocs
-        '        tabList = List.Make
-        '        numdocs = docList.count
-        'for each i in 0..(numdocs-1)
-        '            dtype = (docList.get(i)).getclass.getclassname
-        '            If (dtype = "Table") Then
-        '                tabList.Add(docList.Get(i).getname)
-        '            End If
-        '        Next
-
-        '        'chk=msgbox.choiceAsString(tabList,"Select A Table for Plotting",tabList.Get(0))
-
-        '        yList = List.Make
-        '        'yList.Add("Precipitation")
-        '        'yList.Add("Evaporation")
-        '        'yList.Add("Soil Water")
-        '        yList.Add("Streamflow")
-
-        '        nList = List.Make
-        '        'nList.Add("Precipitation")
-        '        'nList.Add("Evaporation")
-        '        'nList.Add("Soil Water")
-        '        nList.Add("Streamflow")
-
-        '        tabList = List.Make
-        '        'tabList.Add("rain.txt")
-        '        'tabList.Add("evap.txt")
-        '        'tabList.Add("soilwater.txt")
-        '        tabList.Add("Streamflow.txt")
-
-        '        colList = List.Make
-        '        colList.Add("green")
-        '        colList.Add("blue")
-        '        colList.Add("red")
-        '        colList.Add("yellow")
-
-        '        numtabs = tabList.Count
-
-        '        '************************
-        'for each i in 0..(numtabs-1)
-
-        '            tabname = tabList.Get(i)
-
-        '            FName = ElementId.AsString
-
-
-        '            plotTable = theProject.FindDoc(tabname)
-
-        '            If (plotTable = nil) Then
-        '                MsgBox.info("Could not find the file, " + tabList.get(i) + " in this project", "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            End If
-        '            plotVtab = plotTable.GetVtab
-
-
-        '            'SELECT FIELDS TO PLOT
-        '            timeField = plotVtab.findfield("day")
-        '            If (timeField = nil) Then
-        '                timeField = plotVtab.findfield("Time")
-        '                If (timeField = nil) Then
-        '                    MsgBox.info("Table " + tablist.get(i) + " does not Contain a 'day' or 'Time' field.", "Geospatial Stream Flow Model")
-        '                    Exit Sub
-        '                End If
-        '            End If
-        '            plotField = plotVtab.FindField(Fname)
-
-        '            If (plotField = nil) Then
-        '                MsgBox.info("Could not find the field named " + fname.asstring + nl + "in the file,  " + tablist.get(i), "Geospatial Stream Flow Model")
-        '                Exit Sub
-        '            End If
-
-
-        '            xname = "Julian Day"
-
-        '            yname = yList.Get(i)
-        '            col = colList.Get(i)
-        '            If (yname = "Streamflow") Then
-        '                yunits = " (m3/s)"
-        '            Else
-        '                yunits = " (mm)"
-        '            End If
-
-        '            If (col = "blue") Then
-        '                precColor = Color.GetBlue
-        '            ElseIf (col = "red") Then
-        '                precColor = Color.GetRed
-        '            ElseIf (col = "green") Then
-        '                precColor = Color.GetGreen
-        '            ElseIf (col = "yellow") Then
-        '                precColor = Color.GetYellow
-        '            Else
-        '                precColor = Color.GetBlue
-        '            End If
-
-
-        '            plotinfo = "Making plot...."
-        '            av.Showmsg(plotinfo)
-        '            'fldlist = { timeField, plotField }
-        '    fldlist = { plotField }
-
-        '            mychart = chart.make(plotVtab, fldlist)
-        '            mychart.SetSeriesFromRecords(False)
-        '            mychart.SetRecordLabelField(timeField)
-        '            myChartName = MyChart.getname
-        '            myChartDisp = mychart.getchartDisplay
-        '    myChartDisp.setType(#CHARTDISPLAY_line)
-        '            'myChartDisp.setMark(#CHARTDISPLAY_MARK_SQUARE)
-        '            myChartDisp.SetSeriesColor(0, precColor)
-        '            myChartDisp.SetMaxDataPoints(plotVtab.GetNumRecords)
-        '            'myChartDisp.SetSeriesColor(0,newColor)
-        '            myLegend = myChart.getchartLegend
-        '            myLegend.setvisible(False)
-        '            'chname=msgbox.input ( "Enter a chart name.","User Input", plotfield.getname)
-        '            chname = plotfield.getname
-        '            myChart.GetTitle.SetName("Hydrograph of Subbasin " + FName)
-        '            the_x = myChart.GetXaxis
-        '            the_y = myChart.GetYaxis
-        '            the_x.SetName(xname)
-        '            the_y.SetName(yname + yunits)
-        '            the_x.SetTicklabelsVisible(True)
-        '            the_y.SetTicklabelsVisible(True)
-        '            the_x.setMajorGridVisible(False)
-        '            the_x.SetMinorGridVisible(False)
-        '            the_y.setMajorGridVisible(True)
-        '            the_x.SetCrossValue(0)
-        '            the_y.SetCrossValue(0)
-        '            the_x.SetLabelVisible(True)
-        '            the_y.SetLabelVisible(True)
-        '            '  av.Showmsg("")
-        '            mychart.getwin.open()
-
-        '            mychart.setname("Basin" + +chname + +yname)
-        '        Next
-
-        '        'TheBitMap=PlotVtab.GetSelection
-        '        '  TheBitMap.ClearAll
-        '        '  PlotVtab.UpdateSelection
+        atcDataManager.DataSources.Add(lDataSource)
     End Sub
 
     Friend Sub BuildListofValidStationNames(ByRef aMetConstituent As String, _

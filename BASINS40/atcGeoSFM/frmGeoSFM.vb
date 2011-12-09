@@ -159,8 +159,6 @@ Public Class frmGeoSFM
     Friend WithEvents tpgFlow As System.Windows.Forms.TabPage
     Friend WithEvents tpgSensitivity As System.Windows.Forms.TabPage
     Friend WithEvents tpgCalibrate As System.Windows.Forms.TabPage
-    Friend WithEvents tpgBankfull As System.Windows.Forms.TabPage
-    Friend WithEvents tpgPlot As System.Windows.Forms.TabPage
     Friend WithEvents cmdTerrainNext As System.Windows.Forms.Button
     Friend WithEvents cmdBasinNext As System.Windows.Forms.Button
     Friend WithEvents cmdResponseNext As System.Windows.Forms.Button
@@ -169,10 +167,7 @@ Public Class frmGeoSFM
     Friend WithEvents cmdRouteNext As System.Windows.Forms.Button
     Friend WithEvents cmdSensitivityNext As System.Windows.Forms.Button
     Friend WithEvents cmdCalibrationNext As System.Windows.Forms.Button
-    Friend WithEvents cmdBankfullNext As System.Windows.Forms.Button
     Friend WithEvents cmdMapGenerate As System.Windows.Forms.Button
-    Friend WithEvents Button10 As System.Windows.Forms.Button
-    Friend WithEvents cmdPlotGenerate As System.Windows.Forms.Button
     Friend WithEvents atxInstream As atcControls.atcText
     Friend WithEvents atxOverland As atcControls.atcText
     Friend WithEvents lblOutlets As System.Windows.Forms.Label
@@ -216,9 +211,8 @@ Public Class frmGeoSFM
     Friend WithEvents rbnObj5 As System.Windows.Forms.RadioButton
     Friend WithEvents rbnObj4 As System.Windows.Forms.RadioButton
     Friend WithEvents rbnObj3 As System.Windows.Forms.RadioButton
-    Friend WithEvents gbxMap As System.Windows.Forms.GroupBox
-    Friend WithEvents rbnSoil As System.Windows.Forms.RadioButton
-    Friend WithEvents rbnStreamflow As System.Windows.Forms.RadioButton
+    Friend WithEvents cmdReadStreamflow As System.Windows.Forms.Button
+    Friend WithEvents gbxMapper As System.Windows.Forms.GroupBox
     Friend WithEvents gbxMapDates As System.Windows.Forms.GroupBox
     Friend WithEvents lblMapDay As System.Windows.Forms.Label
     Friend WithEvents lblMapMonth As System.Windows.Forms.Label
@@ -226,6 +220,14 @@ Public Class frmGeoSFM
     Friend WithEvents AtxMapDay As atcControls.atcText
     Friend WithEvents atxMapYear As atcControls.atcText
     Friend WithEvents AtxMapMonth As atcControls.atcText
+    Friend WithEvents gbxMap As System.Windows.Forms.GroupBox
+    Friend WithEvents rbnSoil As System.Windows.Forms.RadioButton
+    Friend WithEvents rbnStreamflow As System.Windows.Forms.RadioButton
+    Friend WithEvents cmdBankfullNext As System.Windows.Forms.Button
+    Friend WithEvents gbxBankfull As System.Windows.Forms.GroupBox
+    Friend WithEvents gbxHydrographs As System.Windows.Forms.GroupBox
+    Friend WithEvents lblRchHydro As System.Windows.Forms.Label
+    Friend WithEvents cboRchHydro As System.Windows.Forms.ComboBox
     Friend WithEvents tpgMap As System.Windows.Forms.TabPage
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmGeoSFM))
@@ -347,13 +349,21 @@ Public Class frmGeoSFM
         Me.gbxConnect = New System.Windows.Forms.GroupBox
         Me.AtcConnectFlows = New atcControls.atcConnectFields
         Me.cmdCalibrationNext = New System.Windows.Forms.Button
-        Me.tpgBankfull = New System.Windows.Forms.TabPage
-        Me.cmdBankfullNext = New System.Windows.Forms.Button
         Me.tpgMap = New System.Windows.Forms.TabPage
+        Me.cmdBankfullNext = New System.Windows.Forms.Button
+        Me.gbxMapper = New System.Windows.Forms.GroupBox
+        Me.gbxMapDates = New System.Windows.Forms.GroupBox
+        Me.lblMapDay = New System.Windows.Forms.Label
+        Me.lblMapMonth = New System.Windows.Forms.Label
+        Me.lblMapYear = New System.Windows.Forms.Label
+        Me.AtxMapDay = New atcControls.atcText
+        Me.atxMapYear = New atcControls.atcText
+        Me.AtxMapMonth = New atcControls.atcText
+        Me.gbxMap = New System.Windows.Forms.GroupBox
+        Me.rbnSoil = New System.Windows.Forms.RadioButton
+        Me.rbnStreamflow = New System.Windows.Forms.RadioButton
         Me.cmdMapGenerate = New System.Windows.Forms.Button
-        Me.Button10 = New System.Windows.Forms.Button
-        Me.tpgPlot = New System.Windows.Forms.TabPage
-        Me.cmdPlotGenerate = New System.Windows.Forms.Button
+        Me.cmdReadStreamflow = New System.Windows.Forms.Button
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.lblStatus = New System.Windows.Forms.Label
         Me.Label20 = New System.Windows.Forms.Label
@@ -408,16 +418,10 @@ Public Class frmGeoSFM
         Me.Label44 = New System.Windows.Forms.Label
         Me.Label45 = New System.Windows.Forms.Label
         Me.ComboBox39 = New System.Windows.Forms.ComboBox
-        Me.gbxMap = New System.Windows.Forms.GroupBox
-        Me.rbnSoil = New System.Windows.Forms.RadioButton
-        Me.rbnStreamflow = New System.Windows.Forms.RadioButton
-        Me.gbxMapDates = New System.Windows.Forms.GroupBox
-        Me.lblMapDay = New System.Windows.Forms.Label
-        Me.lblMapMonth = New System.Windows.Forms.Label
-        Me.lblMapYear = New System.Windows.Forms.Label
-        Me.AtxMapDay = New atcControls.atcText
-        Me.atxMapYear = New atcControls.atcText
-        Me.AtxMapMonth = New atcControls.atcText
+        Me.gbxBankfull = New System.Windows.Forms.GroupBox
+        Me.lblRchHydro = New System.Windows.Forms.Label
+        Me.cboRchHydro = New System.Windows.Forms.ComboBox
+        Me.gbxHydrographs = New System.Windows.Forms.GroupBox
         Me.tabMain.SuspendLayout()
         Me.tpgTerrain.SuspendLayout()
         Me.tpgBasin.SuspendLayout()
@@ -435,12 +439,13 @@ Public Class frmGeoSFM
         Me.tpgCalibrate.SuspendLayout()
         Me.gbxObjective.SuspendLayout()
         Me.gbxConnect.SuspendLayout()
-        Me.tpgBankfull.SuspendLayout()
         Me.tpgMap.SuspendLayout()
-        Me.tpgPlot.SuspendLayout()
-        Me.GroupBox1.SuspendLayout()
-        Me.gbxMap.SuspendLayout()
+        Me.gbxMapper.SuspendLayout()
         Me.gbxMapDates.SuspendLayout()
+        Me.gbxMap.SuspendLayout()
+        Me.GroupBox1.SuspendLayout()
+        Me.gbxBankfull.SuspendLayout()
+        Me.gbxHydrographs.SuspendLayout()
         Me.SuspendLayout()
         '
         'cmdCancel
@@ -487,9 +492,7 @@ Public Class frmGeoSFM
         Me.tabMain.Controls.Add(Me.tpgFlow)
         Me.tabMain.Controls.Add(Me.tpgSensitivity)
         Me.tabMain.Controls.Add(Me.tpgCalibrate)
-        Me.tabMain.Controls.Add(Me.tpgBankfull)
         Me.tabMain.Controls.Add(Me.tpgMap)
-        Me.tabMain.Controls.Add(Me.tpgPlot)
         Me.tabMain.Cursor = System.Windows.Forms.Cursors.Default
         Me.tabMain.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.tabMain.ItemSize = New System.Drawing.Size(60, 21)
@@ -1961,82 +1964,206 @@ Public Class frmGeoSFM
         Me.cmdCalibrationNext.TabIndex = 40
         Me.cmdCalibrationNext.Text = "Next >"
         '
-        'tpgBankfull
+        'tpgMap
         '
-        Me.tpgBankfull.Controls.Add(Me.cmdBankfullNext)
-        Me.tpgBankfull.Location = New System.Drawing.Point(4, 46)
-        Me.tpgBankfull.Name = "tpgBankfull"
-        Me.tpgBankfull.Size = New System.Drawing.Size(647, 387)
-        Me.tpgBankfull.TabIndex = 15
-        Me.tpgBankfull.Text = "Bankfull and Flow Statistics"
-        Me.tpgBankfull.UseVisualStyleBackColor = True
+        Me.tpgMap.Controls.Add(Me.gbxHydrographs)
+        Me.tpgMap.Controls.Add(Me.gbxBankfull)
+        Me.tpgMap.Controls.Add(Me.gbxMapper)
+        Me.tpgMap.Location = New System.Drawing.Point(4, 46)
+        Me.tpgMap.Name = "tpgMap"
+        Me.tpgMap.Size = New System.Drawing.Size(647, 387)
+        Me.tpgMap.TabIndex = 16
+        Me.tpgMap.Text = "Output Results"
+        Me.tpgMap.UseVisualStyleBackColor = True
         '
         'cmdBankfullNext
         '
         Me.cmdBankfullNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdBankfullNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdBankfullNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdBankfullNext.Location = New System.Drawing.Point(558, 341)
+        Me.cmdBankfullNext.Location = New System.Drawing.Point(20, 49)
         Me.cmdBankfullNext.Name = "cmdBankfullNext"
-        Me.cmdBankfullNext.Size = New System.Drawing.Size(73, 28)
-        Me.cmdBankfullNext.TabIndex = 40
-        Me.cmdBankfullNext.Text = "Next >"
+        Me.cmdBankfullNext.Size = New System.Drawing.Size(124, 28)
+        Me.cmdBankfullNext.TabIndex = 62
+        Me.cmdBankfullNext.Text = "Generate Statistics"
         '
-        'tpgMap
+        'gbxMapper
         '
-        Me.tpgMap.Controls.Add(Me.gbxMapDates)
-        Me.tpgMap.Controls.Add(Me.gbxMap)
-        Me.tpgMap.Controls.Add(Me.cmdMapGenerate)
-        Me.tpgMap.Controls.Add(Me.Button10)
-        Me.tpgMap.Location = New System.Drawing.Point(4, 46)
-        Me.tpgMap.Name = "tpgMap"
-        Me.tpgMap.Size = New System.Drawing.Size(647, 387)
-        Me.tpgMap.TabIndex = 16
-        Me.tpgMap.Text = "Flow Percentile Map"
-        Me.tpgMap.UseVisualStyleBackColor = True
+        Me.gbxMapper.Controls.Add(Me.gbxMapDates)
+        Me.gbxMapper.Controls.Add(Me.gbxMap)
+        Me.gbxMapper.Controls.Add(Me.cmdMapGenerate)
+        Me.gbxMapper.Location = New System.Drawing.Point(193, 32)
+        Me.gbxMapper.Name = "gbxMapper"
+        Me.gbxMapper.Size = New System.Drawing.Size(252, 254)
+        Me.gbxMapper.TabIndex = 61
+        Me.gbxMapper.TabStop = False
+        Me.gbxMapper.Text = "Flow Percentile Map"
+        '
+        'gbxMapDates
+        '
+        Me.gbxMapDates.Controls.Add(Me.lblMapDay)
+        Me.gbxMapDates.Controls.Add(Me.lblMapMonth)
+        Me.gbxMapDates.Controls.Add(Me.lblMapYear)
+        Me.gbxMapDates.Controls.Add(Me.AtxMapDay)
+        Me.gbxMapDates.Controls.Add(Me.atxMapYear)
+        Me.gbxMapDates.Controls.Add(Me.AtxMapMonth)
+        Me.gbxMapDates.Location = New System.Drawing.Point(21, 115)
+        Me.gbxMapDates.Name = "gbxMapDates"
+        Me.gbxMapDates.Size = New System.Drawing.Size(207, 80)
+        Me.gbxMapDates.TabIndex = 60
+        Me.gbxMapDates.TabStop = False
+        Me.gbxMapDates.Text = "Result Date"
+        '
+        'lblMapDay
+        '
+        Me.lblMapDay.AutoSize = True
+        Me.lblMapDay.Location = New System.Drawing.Point(136, 27)
+        Me.lblMapDay.Name = "lblMapDay"
+        Me.lblMapDay.Size = New System.Drawing.Size(26, 13)
+        Me.lblMapDay.TabIndex = 35
+        Me.lblMapDay.Text = "Day"
+        '
+        'lblMapMonth
+        '
+        Me.lblMapMonth.AutoSize = True
+        Me.lblMapMonth.Location = New System.Drawing.Point(87, 27)
+        Me.lblMapMonth.Name = "lblMapMonth"
+        Me.lblMapMonth.Size = New System.Drawing.Size(37, 13)
+        Me.lblMapMonth.TabIndex = 34
+        Me.lblMapMonth.Text = "Month"
+        '
+        'lblMapYear
+        '
+        Me.lblMapYear.AutoSize = True
+        Me.lblMapYear.Location = New System.Drawing.Point(19, 27)
+        Me.lblMapYear.Name = "lblMapYear"
+        Me.lblMapYear.Size = New System.Drawing.Size(29, 13)
+        Me.lblMapYear.TabIndex = 33
+        Me.lblMapYear.Text = "Year"
+        '
+        'AtxMapDay
+        '
+        Me.AtxMapDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtxMapDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtxMapDay.DefaultValue = ""
+        Me.AtxMapDay.HardMax = 31
+        Me.AtxMapDay.HardMin = 1
+        Me.AtxMapDay.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtxMapDay.Location = New System.Drawing.Point(139, 45)
+        Me.AtxMapDay.MaxWidth = 20
+        Me.AtxMapDay.Name = "AtxMapDay"
+        Me.AtxMapDay.NumericFormat = "0"
+        Me.AtxMapDay.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtxMapDay.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtxMapDay.SelLength = 0
+        Me.AtxMapDay.SelStart = 0
+        Me.AtxMapDay.Size = New System.Drawing.Size(44, 21)
+        Me.AtxMapDay.SoftMax = -999
+        Me.AtxMapDay.SoftMin = -999
+        Me.AtxMapDay.TabIndex = 31
+        Me.AtxMapDay.ValueDouble = 1
+        Me.AtxMapDay.ValueInteger = 1
+        '
+        'atxMapYear
+        '
+        Me.atxMapYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxMapYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxMapYear.DefaultValue = ""
+        Me.atxMapYear.HardMax = 9999
+        Me.atxMapYear.HardMin = 0
+        Me.atxMapYear.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxMapYear.Location = New System.Drawing.Point(21, 45)
+        Me.atxMapYear.MaxWidth = 20
+        Me.atxMapYear.Name = "atxMapYear"
+        Me.atxMapYear.NumericFormat = "0"
+        Me.atxMapYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxMapYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxMapYear.SelLength = 0
+        Me.atxMapYear.SelStart = 0
+        Me.atxMapYear.Size = New System.Drawing.Size(64, 21)
+        Me.atxMapYear.SoftMax = -999
+        Me.atxMapYear.SoftMin = -999
+        Me.atxMapYear.TabIndex = 30
+        Me.atxMapYear.ValueDouble = 2000
+        Me.atxMapYear.ValueInteger = 2000
+        '
+        'AtxMapMonth
+        '
+        Me.AtxMapMonth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtxMapMonth.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtxMapMonth.DefaultValue = ""
+        Me.AtxMapMonth.HardMax = 12
+        Me.AtxMapMonth.HardMin = 1
+        Me.AtxMapMonth.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtxMapMonth.Location = New System.Drawing.Point(90, 45)
+        Me.AtxMapMonth.MaxWidth = 20
+        Me.AtxMapMonth.Name = "AtxMapMonth"
+        Me.AtxMapMonth.NumericFormat = "0"
+        Me.AtxMapMonth.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtxMapMonth.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtxMapMonth.SelLength = 0
+        Me.AtxMapMonth.SelStart = 0
+        Me.AtxMapMonth.Size = New System.Drawing.Size(44, 21)
+        Me.AtxMapMonth.SoftMax = -999
+        Me.AtxMapMonth.SoftMin = -999
+        Me.AtxMapMonth.TabIndex = 28
+        Me.AtxMapMonth.ValueDouble = 1
+        Me.AtxMapMonth.ValueInteger = 1
+        '
+        'gbxMap
+        '
+        Me.gbxMap.Controls.Add(Me.rbnSoil)
+        Me.gbxMap.Controls.Add(Me.rbnStreamflow)
+        Me.gbxMap.Location = New System.Drawing.Point(21, 30)
+        Me.gbxMap.Name = "gbxMap"
+        Me.gbxMap.Size = New System.Drawing.Size(159, 70)
+        Me.gbxMap.TabIndex = 59
+        Me.gbxMap.TabStop = False
+        Me.gbxMap.Text = "Result File"
+        '
+        'rbnSoil
+        '
+        Me.rbnSoil.AutoSize = True
+        Me.rbnSoil.Location = New System.Drawing.Point(7, 42)
+        Me.rbnSoil.Name = "rbnSoil"
+        Me.rbnSoil.Size = New System.Drawing.Size(74, 17)
+        Me.rbnSoil.TabIndex = 2
+        Me.rbnSoil.Text = "Soil Water"
+        Me.rbnSoil.UseVisualStyleBackColor = True
+        '
+        'rbnStreamflow
+        '
+        Me.rbnStreamflow.AutoSize = True
+        Me.rbnStreamflow.Checked = True
+        Me.rbnStreamflow.Location = New System.Drawing.Point(7, 19)
+        Me.rbnStreamflow.Name = "rbnStreamflow"
+        Me.rbnStreamflow.Size = New System.Drawing.Size(83, 17)
+        Me.rbnStreamflow.TabIndex = 1
+        Me.rbnStreamflow.TabStop = True
+        Me.rbnStreamflow.Text = "Stream Flow"
+        Me.rbnStreamflow.UseVisualStyleBackColor = True
         '
         'cmdMapGenerate
         '
         Me.cmdMapGenerate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdMapGenerate.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdMapGenerate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdMapGenerate.Location = New System.Drawing.Point(475, 340)
+        Me.cmdMapGenerate.Location = New System.Drawing.Point(68, 210)
         Me.cmdMapGenerate.Name = "cmdMapGenerate"
-        Me.cmdMapGenerate.Size = New System.Drawing.Size(73, 28)
+        Me.cmdMapGenerate.Size = New System.Drawing.Size(103, 28)
         Me.cmdMapGenerate.TabIndex = 41
-        Me.cmdMapGenerate.Text = "Generate"
+        Me.cmdMapGenerate.Text = "Generate Map"
         '
-        'Button10
+        'cmdReadStreamflow
         '
-        Me.Button10.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Button10.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.Button10.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button10.Location = New System.Drawing.Point(554, 340)
-        Me.Button10.Name = "Button10"
-        Me.Button10.Size = New System.Drawing.Size(73, 28)
-        Me.Button10.TabIndex = 40
-        Me.Button10.Text = "Next >"
-        '
-        'tpgPlot
-        '
-        Me.tpgPlot.Controls.Add(Me.cmdPlotGenerate)
-        Me.tpgPlot.Location = New System.Drawing.Point(4, 46)
-        Me.tpgPlot.Name = "tpgPlot"
-        Me.tpgPlot.Size = New System.Drawing.Size(647, 387)
-        Me.tpgPlot.TabIndex = 17
-        Me.tpgPlot.Text = "Flow Hydrographs"
-        Me.tpgPlot.UseVisualStyleBackColor = True
-        '
-        'cmdPlotGenerate
-        '
-        Me.cmdPlotGenerate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdPlotGenerate.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdPlotGenerate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdPlotGenerate.Location = New System.Drawing.Point(557, 341)
-        Me.cmdPlotGenerate.Name = "cmdPlotGenerate"
-        Me.cmdPlotGenerate.Size = New System.Drawing.Size(73, 28)
-        Me.cmdPlotGenerate.TabIndex = 40
-        Me.cmdPlotGenerate.Text = "Generate"
+        Me.cmdReadStreamflow.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdReadStreamflow.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdReadStreamflow.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdReadStreamflow.Location = New System.Drawing.Point(18, 98)
+        Me.cmdReadStreamflow.Name = "cmdReadStreamflow"
+        Me.cmdReadStreamflow.Size = New System.Drawing.Size(135, 28)
+        Me.cmdReadStreamflow.TabIndex = 60
+        Me.cmdReadStreamflow.Text = "Generate Plot"
         '
         'GroupBox1
         '
@@ -2634,151 +2761,49 @@ Public Class frmGeoSFM
         Me.ComboBox39.Size = New System.Drawing.Size(312, 21)
         Me.ComboBox39.TabIndex = 23
         '
-        'gbxMap
+        'gbxBankfull
         '
-        Me.gbxMap.Controls.Add(Me.rbnSoil)
-        Me.gbxMap.Controls.Add(Me.rbnStreamflow)
-        Me.gbxMap.Location = New System.Drawing.Point(24, 23)
-        Me.gbxMap.Name = "gbxMap"
-        Me.gbxMap.Size = New System.Drawing.Size(159, 70)
-        Me.gbxMap.TabIndex = 58
-        Me.gbxMap.TabStop = False
-        Me.gbxMap.Text = "Result File"
+        Me.gbxBankfull.Controls.Add(Me.cmdBankfullNext)
+        Me.gbxBankfull.Location = New System.Drawing.Point(15, 32)
+        Me.gbxBankfull.Name = "gbxBankfull"
+        Me.gbxBankfull.Size = New System.Drawing.Size(163, 100)
+        Me.gbxBankfull.TabIndex = 63
+        Me.gbxBankfull.TabStop = False
+        Me.gbxBankfull.Text = "Bankfull and Flow Statistics"
         '
-        'rbnSoil
+        'lblRchHydro
         '
-        Me.rbnSoil.AutoSize = True
-        Me.rbnSoil.Location = New System.Drawing.Point(7, 42)
-        Me.rbnSoil.Name = "rbnSoil"
-        Me.rbnSoil.Size = New System.Drawing.Size(74, 17)
-        Me.rbnSoil.TabIndex = 2
-        Me.rbnSoil.Text = "Soil Water"
-        Me.rbnSoil.UseVisualStyleBackColor = True
+        Me.lblRchHydro.AutoSize = True
+        Me.lblRchHydro.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblRchHydro.Location = New System.Drawing.Point(6, 30)
+        Me.lblRchHydro.Name = "lblRchHydro"
+        Me.lblRchHydro.Size = New System.Drawing.Size(56, 13)
+        Me.lblRchHydro.TabIndex = 65
+        Me.lblRchHydro.Text = "Reach ID:"
+        Me.lblRchHydro.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
-        'rbnStreamflow
+        'cboRchHydro
         '
-        Me.rbnStreamflow.AutoSize = True
-        Me.rbnStreamflow.Checked = True
-        Me.rbnStreamflow.Location = New System.Drawing.Point(7, 19)
-        Me.rbnStreamflow.Name = "rbnStreamflow"
-        Me.rbnStreamflow.Size = New System.Drawing.Size(83, 17)
-        Me.rbnStreamflow.TabIndex = 1
-        Me.rbnStreamflow.TabStop = True
-        Me.rbnStreamflow.Text = "Stream Flow"
-        Me.rbnStreamflow.UseVisualStyleBackColor = True
-        '
-        'gbxMapDates
-        '
-        Me.gbxMapDates.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.cboRchHydro.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.gbxMapDates.Controls.Add(Me.lblMapDay)
-        Me.gbxMapDates.Controls.Add(Me.lblMapMonth)
-        Me.gbxMapDates.Controls.Add(Me.lblMapYear)
-        Me.gbxMapDates.Controls.Add(Me.AtxMapDay)
-        Me.gbxMapDates.Controls.Add(Me.atxMapYear)
-        Me.gbxMapDates.Controls.Add(Me.AtxMapMonth)
-        Me.gbxMapDates.Location = New System.Drawing.Point(24, 99)
-        Me.gbxMapDates.Name = "gbxMapDates"
-        Me.gbxMapDates.Size = New System.Drawing.Size(207, 80)
-        Me.gbxMapDates.TabIndex = 59
-        Me.gbxMapDates.TabStop = False
-        Me.gbxMapDates.Text = "Result Date"
+        Me.cboRchHydro.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboRchHydro.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboRchHydro.Location = New System.Drawing.Point(68, 27)
+        Me.cboRchHydro.Name = "cboRchHydro"
+        Me.cboRchHydro.Size = New System.Drawing.Size(85, 21)
+        Me.cboRchHydro.TabIndex = 64
         '
-        'lblMapDay
+        'gbxHydrographs
         '
-        Me.lblMapDay.AutoSize = True
-        Me.lblMapDay.Location = New System.Drawing.Point(136, 27)
-        Me.lblMapDay.Name = "lblMapDay"
-        Me.lblMapDay.Size = New System.Drawing.Size(26, 13)
-        Me.lblMapDay.TabIndex = 35
-        Me.lblMapDay.Text = "Day"
-        '
-        'lblMapMonth
-        '
-        Me.lblMapMonth.AutoSize = True
-        Me.lblMapMonth.Location = New System.Drawing.Point(87, 27)
-        Me.lblMapMonth.Name = "lblMapMonth"
-        Me.lblMapMonth.Size = New System.Drawing.Size(37, 13)
-        Me.lblMapMonth.TabIndex = 34
-        Me.lblMapMonth.Text = "Month"
-        '
-        'lblMapYear
-        '
-        Me.lblMapYear.AutoSize = True
-        Me.lblMapYear.Location = New System.Drawing.Point(19, 27)
-        Me.lblMapYear.Name = "lblMapYear"
-        Me.lblMapYear.Size = New System.Drawing.Size(29, 13)
-        Me.lblMapYear.TabIndex = 33
-        Me.lblMapYear.Text = "Year"
-        '
-        'AtxMapDay
-        '
-        Me.AtxMapDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtxMapDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtxMapDay.DefaultValue = ""
-        Me.AtxMapDay.HardMax = 31
-        Me.AtxMapDay.HardMin = 1
-        Me.AtxMapDay.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtxMapDay.Location = New System.Drawing.Point(139, 45)
-        Me.AtxMapDay.MaxWidth = 20
-        Me.AtxMapDay.Name = "AtxMapDay"
-        Me.AtxMapDay.NumericFormat = "0"
-        Me.AtxMapDay.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtxMapDay.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtxMapDay.SelLength = 0
-        Me.AtxMapDay.SelStart = 0
-        Me.AtxMapDay.Size = New System.Drawing.Size(44, 21)
-        Me.AtxMapDay.SoftMax = -999
-        Me.AtxMapDay.SoftMin = -999
-        Me.AtxMapDay.TabIndex = 31
-        Me.AtxMapDay.ValueDouble = 1
-        Me.AtxMapDay.ValueInteger = 1
-        '
-        'atxMapYear
-        '
-        Me.atxMapYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxMapYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.atxMapYear.DefaultValue = ""
-        Me.atxMapYear.HardMax = 9999
-        Me.atxMapYear.HardMin = 0
-        Me.atxMapYear.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atxMapYear.Location = New System.Drawing.Point(21, 45)
-        Me.atxMapYear.MaxWidth = 20
-        Me.atxMapYear.Name = "atxMapYear"
-        Me.atxMapYear.NumericFormat = "0"
-        Me.atxMapYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atxMapYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atxMapYear.SelLength = 0
-        Me.atxMapYear.SelStart = 0
-        Me.atxMapYear.Size = New System.Drawing.Size(64, 21)
-        Me.atxMapYear.SoftMax = -999
-        Me.atxMapYear.SoftMin = -999
-        Me.atxMapYear.TabIndex = 30
-        Me.atxMapYear.ValueDouble = 2000
-        Me.atxMapYear.ValueInteger = 2000
-        '
-        'AtxMapMonth
-        '
-        Me.AtxMapMonth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtxMapMonth.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtxMapMonth.DefaultValue = ""
-        Me.AtxMapMonth.HardMax = 12
-        Me.AtxMapMonth.HardMin = 1
-        Me.AtxMapMonth.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtxMapMonth.Location = New System.Drawing.Point(90, 45)
-        Me.AtxMapMonth.MaxWidth = 20
-        Me.AtxMapMonth.Name = "AtxMapMonth"
-        Me.AtxMapMonth.NumericFormat = "0"
-        Me.AtxMapMonth.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtxMapMonth.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtxMapMonth.SelLength = 0
-        Me.AtxMapMonth.SelStart = 0
-        Me.AtxMapMonth.Size = New System.Drawing.Size(44, 21)
-        Me.AtxMapMonth.SoftMax = -999
-        Me.AtxMapMonth.SoftMin = -999
-        Me.AtxMapMonth.TabIndex = 28
-        Me.AtxMapMonth.ValueDouble = 1
-        Me.AtxMapMonth.ValueInteger = 1
+        Me.gbxHydrographs.Controls.Add(Me.lblRchHydro)
+        Me.gbxHydrographs.Controls.Add(Me.cboRchHydro)
+        Me.gbxHydrographs.Controls.Add(Me.cmdReadStreamflow)
+        Me.gbxHydrographs.Location = New System.Drawing.Point(460, 32)
+        Me.gbxHydrographs.Name = "gbxHydrographs"
+        Me.gbxHydrographs.Size = New System.Drawing.Size(169, 154)
+        Me.gbxHydrographs.TabIndex = 66
+        Me.gbxHydrographs.TabStop = False
+        Me.gbxHydrographs.Text = "Flow Hydrographs"
         '
         'frmGeoSFM
         '
@@ -2825,14 +2850,16 @@ Public Class frmGeoSFM
         Me.gbxObjective.ResumeLayout(False)
         Me.gbxObjective.PerformLayout()
         Me.gbxConnect.ResumeLayout(False)
-        Me.tpgBankfull.ResumeLayout(False)
         Me.tpgMap.ResumeLayout(False)
-        Me.tpgPlot.ResumeLayout(False)
-        Me.GroupBox1.ResumeLayout(False)
-        Me.gbxMap.ResumeLayout(False)
-        Me.gbxMap.PerformLayout()
+        Me.gbxMapper.ResumeLayout(False)
         Me.gbxMapDates.ResumeLayout(False)
         Me.gbxMapDates.PerformLayout()
+        Me.gbxMap.ResumeLayout(False)
+        Me.gbxMap.PerformLayout()
+        Me.GroupBox1.ResumeLayout(False)
+        Me.gbxBankfull.ResumeLayout(False)
+        Me.gbxHydrographs.ResumeLayout(False)
+        Me.gbxHydrographs.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -3753,9 +3780,9 @@ Public Class frmGeoSFM
 
         Dim lMapJDate As Double = 0.0
         Dim lMapDate(5) As Integer
-        lMapDate(0) = atxSYear.Text
-        lMapDate(1) = atxSMonth.Text
-        lMapDate(2) = atxSDay.Text
+        lMapDate(0) = atxMapYear.Text
+        lMapDate(1) = AtxMapMonth.Text
+        lMapDate(2) = AtxMapDay.Text
         lMapJDate = Date2J(lMapDate)
 
         EnableControls(False)
@@ -3769,10 +3796,6 @@ Public Class frmGeoSFM
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
         Me.Refresh()
         EnableControls(True)
-    End Sub
-
-    Private Sub cmdPlotGenerate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdPlotGenerate.Click
-        SetPlot()
     End Sub
 
     Private Sub rbnNonUniformUSGS_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rbnNonUniformUSGS.CheckedChanged
@@ -3824,6 +3847,7 @@ Public Class frmGeoSFM
     End Sub
 
     Private Sub tabMain_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles tabMain.SelectedIndexChanged
+        Dim lAppEx As ApplicationException
         If tabMain.SelectedIndex = 6 Or tabMain.SelectedIndex = 7 Then
             'read reaches for sensitivity analysis or calibration 
             cboReachSensitivity.Items.Clear()
@@ -3914,11 +3938,43 @@ Public Class frmGeoSFM
                 lstCalib.Items.Add("Celerity")
                 lstCalib.Items.Add("Diffusion")
             End If
-        ElseIf tabMain.SelectedIndex = 9 Then
+        ElseIf tabMain.SelectedIndex = 8 Then
             'plot map tab
             atxMapYear.Text = atxSYear.Text
             AtxMapMonth.Text = atxSMonth.Text
             AtxMapDay.Text = atxSDay.Text
+            'read reaches for hydrograph plot 
+            cboRchHydro.Items.Clear()
+            Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+            Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
+            Dim lFlowFileName As String = lOutputPath & "streamflow.txt"
+            If FileExists(lFlowFileName) Then
+                Try
+                    Dim lCurrentRecord As String
+                    Dim lStreamReader As New StreamReader(lFlowFileName)
+                    Do
+                        lCurrentRecord = lStreamReader.ReadLine
+                        If lCurrentRecord Is Nothing Then
+                            Exit Do
+                        Else
+                            Dim lstr As String = lCurrentRecord
+                            Dim lstr1 As String = ""
+                            Do While lstr.Length > 0
+                                lstr1 = StrRetRem(lstr)
+                                If IsNumeric(lstr1) Then
+                                    cboRchHydro.Items.Add(lstr1)
+                                End If
+                            Loop
+                            Exit Do
+                        End If
+                    Loop
+                Catch lAppEx
+                    Exit Sub
+                End Try
+            Else
+                Exit Sub
+            End If
+            cboRchHydro.SelectedIndex = 0
         End If
     End Sub
 
@@ -3961,6 +4017,35 @@ Public Class frmGeoSFM
         lstMax.Items.Add(lnsamples * lccount * 64)
         lstMax.Items.Add(lnsamples * lccount * 128)
         lstMax.SelectedItem = 1
+    End Sub
+
+    Private Sub cmdReadStreamflow_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdReadStreamflow.Click
+        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+        Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
+        Dim lFlowFN As String = lOutputPath & "streamflow.txt"
+        SetFlowTimeseries(lFlowFN)
+
+        Dim lGroup As New atcTimeseriesGroup
+        For lDSIndex As Integer = 0 To atcDataManager.DataSources.Count - 1
+            Dim lDS As atcDataSource = atcDataManager.DataSources(lDSIndex)
+            If lDS.Name = "" And lDS.Description = "" Then
+                'assume this is the right source
+                For Each lts As atcDataSet In lDS.DataSets
+                    If lts.Attributes.GetDefinedValue("Location").Value = "Reach " & cboRchHydro.SelectedItem.ToString Then
+                        lGroup.Add(lts)
+                    End If
+                Next
+            End If
+        Next
+
+        Dim lForm As New atcGraph.atcGraphForm()
+        Dim lGrapher As atcGraph.clsGraphBase = New atcGraph.clsGraphTime(lGroup, lForm.ZedGraphCtrl)
+        If lGrapher Is Nothing Then
+            lForm.Dispose()
+        Else
+            lForm.Grapher = lGrapher
+            lForm.Show()
+        End If
     End Sub
 
 End Class
