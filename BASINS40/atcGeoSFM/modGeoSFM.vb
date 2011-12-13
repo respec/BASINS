@@ -3268,97 +3268,97 @@ Public Module modGeoSFM
 
         'defaults = { "streamflow.txt", "monthlyflow.txt", "annualflow.txt" }
 
-        Dim runoffFN As String = lOutputPath & "streamflow.txt"
-        Dim monthlyFN As String = lOutputPath & "monthlyflow.txt"
-        Dim annualFN As String = lOutputPath & "annualflow.txt"
+        Dim lRunoffFN As String = lOutputPath & "streamflow.txt"
+        Dim lMonthlyFN As String = lOutputPath & "monthlyflow.txt"
+        Dim lAnnualFN As String = lOutputPath & "annualflow.txt"
 
-        Dim chkFN As String = lOutputPath & "times.txt"
-        Dim paramFN As String = lOutputPath & "statsparam.txt"
+        Dim lChkFN As String = lOutputPath & "times.txt"
+        Dim lParamFN As String = lOutputPath & "statsparam.txt"
 
-        If Not FileExists(runoffFN) Then
-            Logger.Msg("Could not open time series file," & vbCrLf & runoffFN, "GeoSFM Utilities")
+        If Not FileExists(lRunoffFN) Then
+            Logger.Msg("Could not open time series file," & vbCrLf & lRunoffFN, "GeoSFM Utilities")
             Exit Sub
         End If
 
-        Dim logFN As String = lOutputPath & "logfilestats.txt"
+        Dim lLogFN As String = lOutputPath & "logfilestats.txt"
 
-        Dim chkfile As New StringBuilder
-        chkfile.AppendLine("Starting Time:" & " " & System.DateTime.Now.ToString)
+        Dim lChkFile As New StringBuilder
+        lChkFile.AppendLine("Starting Time:" & " " & System.DateTime.Now.ToString)
 
-        Dim runofflist As New Collection
+        Dim lRunoffList As New Collection
         Try
             Dim lCurrentRecord As String
-            Dim lStreamReader As New StreamReader(runoffFN)
+            Dim lStreamReader As New StreamReader(lRunoffFN)
             lCurrentRecord = lStreamReader.ReadLine
             Do
                 lCurrentRecord = lStreamReader.ReadLine
                 If lCurrentRecord Is Nothing Then
                     Exit Do
                 Else
-                    runofflist.Add(lCurrentRecord)
+                    lRunoffList.Add(lCurrentRecord)
                 End If
             Loop
             lStreamReader.Close()
         Catch e As ApplicationException
-            Logger.Msg("Problem reading file " & runoffFN & vbCrLf & "Check the contents of this file before continuing.", "Geospatial Stream Flow Model")
+            Logger.Msg("Problem reading file " & lRunoffFN & vbCrLf & "Check the contents of this file before continuing.", "Geospatial Stream Flow Model")
             Exit Sub
         End Try
 
-        Dim runoffsize As Integer = runofflist.Count
-        Dim useyear As Integer = 1
-        If (runoffsize = 0) Then
-            Logger.Msg("The runofffile " & vbCrLf & runoffFN & " is empty", "")
+        Dim lRunoffSize As Integer = lRunoffList.Count
+        Dim lUseYear As Integer = 1
+        If (lRunoffSize = 0) Then
+            Logger.Msg("The runofffile " & vbCrLf & lRunoffFN & " is empty", "")
             Exit Sub
-        ElseIf ((runoffsize < 3285) And (runoffsize > 280)) Then
+        ElseIf ((lRunoffSize < 3285) And (lRunoffSize > 280)) Then
             Logger.Msg("Less than 9 years of data supplied." & vbCrLf & vbCrLf & "Computing bankfull from monthly data...", "")
-            useyear = 12
-        ElseIf (runoffsize < 270) Then
+            lUseYear = 12
+        ElseIf (lRunoffSize < 270) Then
             Logger.Msg("Less than 9 month of data supplied." & vbCrLf & vbCrLf & "Computing bankfull from daily data...", "")
-            useyear = 365
+            lUseYear = 365
         End If
 
-        Dim lrec As String = runofflist(1)
-        Dim dayonestr As String = StrRetRem(lrec)
-        lrec = runofflist(runofflist.Count)
-        Dim enddaystr As String = StrRetRem(lrec)
+        Dim lRec As String = lRunoffList(1)
+        Dim lDayOneStr As String = StrRetRem(lRec)
+        lRec = lRunoffList(lRunoffList.Count)
+        Dim lEndDayStr As String = StrRetRem(lRec)
 
-        Dim startyear As String = ""
-        Dim startday As String = ""
-        startyear = Left(dayonestr, 4)
-        If Not IsNumeric(startyear) Then
+        Dim lStartYear As String = ""
+        Dim lStartDay As String = ""
+        lStartYear = Left(lDayOneStr, 4)
+        If Not IsNumeric(lStartYear) Then
             Logger.Msg("Start year must be a 4 digit number", "GeoSFM Utilities")
             Exit Sub
         End If
-        startday = Right(dayonestr, 3)
-        If Not IsNumeric(startday) Then
+        lStartDay = Right(lDayOneStr, 3)
+        If Not IsNumeric(lStartDay) Then
             Logger.Msg("Start day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
             Exit Sub
         End If
 
-        Dim endyear As String = ""
-        Dim endday As String = ""
-        endyear = Left(enddaystr, 4)
-        If Not IsNumeric(endyear) Then
+        Dim lEndyear As String = ""
+        Dim lEndday As String = ""
+        lEndyear = Left(lEndDayStr, 4)
+        If Not IsNumeric(lEndyear) Then
             Logger.Msg("End year must be a 4 digit number", "GeoSFM Utilities")
             Exit Sub
         End If
-        endday = Right(enddaystr, 3)
-        If Not IsNumeric(endday) Then
+        lEndday = Right(lEndDayStr, 3)
+        If Not IsNumeric(lEndday) Then
             Logger.Msg("End day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
             Exit Sub
         End If
 
         Dim lSDate(5) As Integer
-        lSDate(0) = CInt(startyear)
+        lSDate(0) = CInt(lStartYear)
         lSDate(1) = 1
         lSDate(2) = 1
-        Dim lSJDate As Double = Date2J(lSDate) + startday - 1
+        Dim lSJDate As Double = Date2J(lSDate) + lStartDay - 1
         J2Date(lSJDate, lSDate)
 
-        Dim startmonth As String = lSDate(1).ToString
-        Dim startdayofmonth As String = lSDate(2).ToString
+        Dim lStartMonth As String = lSDate(1).ToString
+        Dim lStartDayofMonth As String = lSDate(2).ToString
 
-        If CInt(endyear) < CInt(startyear) Then
+        If CInt(lEndyear) < CInt(lStartYear) Then
             Logger.Msg("End year must be greater than or equal to start year", "GeoSFM Utilities")
             Exit Sub
         End If
@@ -3368,31 +3368,31 @@ Public Module modGeoSFM
         '        'if(statstype = nil ) then
         '        '  exit    
         '        'end
-        Dim statstype As String = "Max"
+        Dim lStatsType As String = "Max"
 
-        Dim runoffdays As Integer = runofflist.Count
-        Dim basinsize As Integer = 0
-        Dim lstr As String = runofflist(1)
-        Dim lstr1 As String = ""
-        Do While lstr.Length > 0
-            lstr1 = StrRetRem(lstr)
-            basinsize += 1
+        Dim lRunoffDays As Integer = lRunoffList.Count
+        Dim lBasinSize As Integer = 0
+        Dim lStr As String = lRunoffList(1)
+        Dim lStr1 As String = ""
+        Do While lStr.Length > 0
+            lStr1 = StrRetRem(lStr)
+            lBasinSize += 1
         Loop
 
-        Dim numofyears As Integer = CInt(endyear) - CInt(startyear) + 1
+        Dim lNumofYears As Integer = CInt(lEndyear) - CInt(lStartYear) + 1
 
-        Dim paramfile As New StringBuilder
-        paramfile.AppendLine(startyear)
-        paramfile.AppendLine(startmonth)
-        paramfile.AppendLine(startdayofmonth)
-        paramfile.AppendLine(endyear)
-        paramfile.AppendLine(runoffdays.ToString)
-        paramfile.AppendLine(basinsize.ToString)
-        paramfile.AppendLine(statstype.tostring)
-        paramfile.AppendLine(runoffFN)
-        paramfile.AppendLine(monthlyFN)
-        paramfile.AppendLine(annualFN)
-        SaveFileString(paramFN, paramfile.ToString)
+        Dim lParamFile As New StringBuilder
+        lParamFile.AppendLine(lStartYear)
+        lParamFile.AppendLine(lStartMonth)
+        lParamFile.AppendLine(lStartDayofMonth)
+        lParamFile.AppendLine(lEndyear)
+        lParamFile.AppendLine(lRunoffDays.ToString)
+        lParamFile.AppendLine(lBasinSize.ToString)
+        lParamFile.AppendLine(lStatsType.tostring)
+        lParamFile.AppendLine(lRunoffFN)
+        lParamFile.AppendLine(lMonthlyFN)
+        lParamFile.AppendLine(lAnnualFN)
+        SaveFileString(lParamFN, lParamFile.ToString)
 
         '        '
         '        'myfilename = ("$AVEXT\geosfmstats.dll").AsFileName                 'commented in the avenue
@@ -3422,12 +3422,12 @@ Public Module modGeoSFM
         '        'procGetLastError=myproc.call({})
         '        '
 
-        Dim geosfmstatsdllFN As String = ""
+        Dim lGeoSFMstatsDllFN As String = ""
         If FileExists(lOutputPath & "geosfmstats.dll") Then
-            geosfmstatsdllFN = lOutputPath & "geosfmstats.dll"
+            lGeoSFMstatsDllFN = lOutputPath & "geosfmstats.dll"
         ElseIf FileExists(lBasinsBinLoc & "\geosfmstats.dll") Then
             File.Copy(lBasinsBinLoc & "\geosfmstats.dll", lOutputPath & "geosfmstats.dll")
-            geosfmstatsdllFN = lOutputPath & "geosfmstats.dll"
+            lGeoSFMstatsDllFN = lOutputPath & "geosfmstats.dll"
         Else
             Logger.Msg("Unable to locate the program file: geosfmstats.dll " & vbCrLf & vbCrLf & "Install the programs in your BASINS/bin folder.", "Geospatial Stream Flow Model")
             Exit Sub
@@ -3435,12 +3435,12 @@ Public Module modGeoSFM
 
         'aggregateflows()   now appears to be done using geosfmstats.exe 
 
-        Dim geosfmstatsFN As String = ""
+        Dim lGeoSFMstatsFN As String = ""
         If FileExists(lOutputPath & "geosfmstats.exe") Then
-            geosfmstatsFN = lOutputPath & "geosfmstats.exe"
+            lGeoSFMstatsFN = lOutputPath & "geosfmstats.exe"
         ElseIf FileExists(lBasinsBinLoc & "\geosfmstats.exe") Then
             File.Copy(lBasinsBinLoc & "\geosfmstats.exe", lOutputPath & "geosfmstats.exe")
-            geosfmstatsFN = lOutputPath & "geosfmstats.exe"
+            lGeoSFMstatsFN = lOutputPath & "geosfmstats.exe"
         Else
             Logger.Msg("Unable to locate the program file: geosfmstats.exe " & vbCrLf & vbCrLf & "Install the programs in your BASINS/bin folder.", "Geospatial Stream Flow Model")
             Exit Sub
@@ -3460,355 +3460,355 @@ Public Module modGeoSFM
             Threading.Thread.Sleep(50)
         End While
 
-        Dim monthfilesize As Integer = 0
-        If FileExists(monthlyFN) Then
+        Dim lMonthFileSize As Integer = 0
+        If FileExists(lMonthlyFN) Then
             Try
                 Dim lCurrentRecord As String
-                Dim lStreamReader As New StreamReader(monthlyFN)
+                Dim lStreamReader As New StreamReader(lMonthlyFN)
                 Do
                     lCurrentRecord = lStreamReader.ReadLine
                     If lCurrentRecord Is Nothing Then
                         Exit Do
                     Else
-                        monthfilesize = monthfilesize + 1
+                        lMonthFileSize = lMonthFileSize + 1
                     End If
                 Loop
             Catch e As ApplicationException
-                Logger.Msg("Cannot read output file, " & monthlyFN & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+                Logger.Msg("Cannot read output file, " & lMonthlyFN & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
                 Exit Sub
             End Try
         Else
-            Logger.Msg("Cannot open output file, " & monthlyFN & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+            Logger.Msg("Cannot open output file, " & lMonthlyFN & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
             Exit Sub
         End If
 
-        Dim annualfilesize As Integer = 0
-        If FileExists(annualFN) Then
+        Dim lAnnualFileSize As Integer = 0
+        If FileExists(lAnnualFN) Then
             Try
                 Dim lCurrentRecord As String
-                Dim lStreamReader As New StreamReader(annualFN)
+                Dim lStreamReader As New StreamReader(lAnnualFN)
                 Do
                     lCurrentRecord = lStreamReader.ReadLine
                     If lCurrentRecord Is Nothing Then
                         Exit Do
                     Else
-                        annualfilesize = annualfilesize + 1
+                        lAnnualFileSize = lAnnualFileSize + 1
                     End If
                 Loop
             Catch e As ApplicationException
-                Logger.Msg("Cannot read output file, " & annualFN & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+                Logger.Msg("Cannot read output file, " & lAnnualFN & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
                 Exit Sub
             End Try
         Else
-            Logger.Msg("Cannot open output file, " & annualFN & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+            Logger.Msg("Cannot open output file, " & lAnnualFN & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
             Exit Sub
         End If
 
-        Dim dailyfilename As String = runoffFN
+        Dim lDailyFilename As String = lRunoffFN
 
-        Dim resultfilename As String = ""
-        If (useyear = 365) Then
-            resultfilename = dailyfilename
-        ElseIf (useyear = 12) Then
-            resultfilename = monthlyFN
+        Dim lResultFilename As String = ""
+        If (lUseYear = 365) Then
+            lResultFilename = lDailyFilename
+        ElseIf (lUseYear = 12) Then
+            lResultFilename = lMonthlyFN
         Else
-            resultfilename = annualFN
+            lResultFilename = lAnnualFN
         End If
 
         'select parameter to update
-        Dim chksum As Integer = 1
-        Dim chkcnt As Integer = 1
-        Dim chkavg As Integer = 1
-        Dim chkmax As Integer = 1
-        Dim chkmin As Integer = 1
-        Dim chkrng As Integer = 1
-        Dim chkvar As Integer = 1
-        Dim chkstd As Integer = 1
-        Dim chkbkf As Integer = 1
-        Dim chkmed As Integer = 1
-        Dim chkq25 As Integer = 1
-        Dim chkq33 As Integer = 1
-        Dim chkq66 As Integer = 1
-        Dim chkq75 As Integer = 1
+        Dim lChksum As Integer = 1
+        Dim lChkcnt As Integer = 1
+        Dim lChkavg As Integer = 1
+        Dim lChkmax As Integer = 1
+        Dim lChkmin As Integer = 1
+        Dim lChkrng As Integer = 1
+        Dim lChkvar As Integer = 1
+        Dim lChkstd As Integer = 1
+        Dim lChkbkf As Integer = 1
+        Dim lChkmed As Integer = 1
+        Dim lChkq25 As Integer = 1
+        Dim lChkq33 As Integer = 1
+        Dim lChkq66 As Integer = 1
+        Dim lChkq75 As Integer = 1
 
-        Dim updatethr As Boolean = True
+        Dim lUpdatethr As Boolean = True
 
-        Dim theTheme As Integer = -1
-        Dim sumfld As Integer = -1
-        Dim meanfld As Integer = -1
-        Dim maxfld As Integer = -1
-        Dim minfld As Integer = -1
-        Dim stddevfld As Integer = -1
-        Dim varfld As Integer = -1
-        Dim rangefld As Integer = -1
-        Dim countfld As Integer = -1
-        Dim medianfld As Integer = -1
-        Dim Quart25fld As Integer = -1
-        Dim Quart75fld As Integer = -1
-        Dim Quart33fld As Integer = -1
-        Dim Quart66fld As Integer = -1
-        Dim Highflowfld As Integer = -1
-        Dim lowflowfld As Integer = -1
-        Dim Medflowfld As Integer = -1
+        Dim lSubTheme As Integer = -1
+        Dim lSumfld As Integer = -1
+        Dim lMeanfld As Integer = -1
+        Dim lMaxfld As Integer = -1
+        Dim lMinfld As Integer = -1
+        Dim lStddevfld As Integer = -1
+        Dim lVarfld As Integer = -1
+        Dim lRangefld As Integer = -1
+        Dim lCountfld As Integer = -1
+        Dim lMedianfld As Integer = -1
+        Dim lQuart25fld As Integer = -1
+        Dim lQuart75fld As Integer = -1
+        Dim lQuart33fld As Integer = -1
+        Dim lQuart66fld As Integer = -1
+        Dim lHighflowfld As Integer = -1
+        Dim lLowflowfld As Integer = -1
+        Dim lMedflowfld As Integer = -1
         If GisUtil.IsLayer("Subbasins") Then
-            theTheme = GisUtil.LayerIndex("Subbasins")
-            sumfld = AddField(theTheme, "Sum")
-            meanfld = AddField(theTheme, "Mean")
-            maxfld = AddField(theTheme, "Maximum")
-            minfld = AddField(theTheme, "Minimum")
-            stddevfld = AddField(theTheme, "StdDev")
-            varfld = AddField(theTheme, "Variance")
-            rangefld = AddField(theTheme, "Range")
-            countfld = AddField(theTheme, "Count")
-            medianfld = AddField(theTheme, "Median")
-            Quart25fld = AddField(theTheme, "Quart25")
-            Quart75fld = AddField(theTheme, "Quart75")
-            Quart33fld = AddField(theTheme, "Quart33")
-            Quart66fld = AddField(theTheme, "Quart66")
-            Highflowfld = AddField(theTheme, "Highflow")
-            lowflowfld = AddField(theTheme, "Lowflow")
-            Medflowfld = AddField(theTheme, "Medflow")
+            lSubTheme = GisUtil.LayerIndex("Subbasins")
+            lSumfld = AddField(lSubTheme, "Sum")
+            lMeanfld = AddField(lSubTheme, "Mean")
+            lMaxfld = AddField(lSubTheme, "Maximum")
+            lMinfld = AddField(lSubTheme, "Minimum")
+            lStddevfld = AddField(lSubTheme, "StdDev")
+            lVarfld = AddField(lSubTheme, "Variance")
+            lRangefld = AddField(lSubTheme, "Range")
+            lCountfld = AddField(lSubTheme, "Count")
+            lMedianfld = AddField(lSubTheme, "Median")
+            lQuart25fld = AddField(lSubTheme, "Quart25")
+            lQuart75fld = AddField(lSubTheme, "Quart75")
+            lQuart33fld = AddField(lSubTheme, "Quart33")
+            lQuart66fld = AddField(lSubTheme, "Quart66")
+            lHighflowfld = AddField(lSubTheme, "Highflow")
+            lLowflowfld = AddField(lSubTheme, "Lowflow")
+            lMedflowfld = AddField(lSubTheme, "Medflow")
         End If
 
-        Dim pidfield As Integer = GisUtil.FieldIndex(theTheme, "Gridcode")
-        Dim polyidfld As Integer = GisUtil.FieldIndex(theTheme, "Id")
-        Dim pnumrecs As Integer = GisUtil.NumFeatures(theTheme)
-        Dim pidlist As New Collection
-        Dim pidval As String = ""
-        For prec As Integer = 0 To pnumrecs - 1
-            pidval = GisUtil.FieldValue(theTheme, prec, pidfield)
-            pidlist.Add(pidval)
+        Dim lPidfield As Integer = GisUtil.FieldIndex(lSubTheme, "Gridcode")
+        Dim lPolyidfld As Integer = GisUtil.FieldIndex(lSubTheme, "Id")
+        Dim lPNumRecs As Integer = GisUtil.NumFeatures(lSubTheme)
+        Dim lPidList As New Collection
+        Dim lPidVal As String = ""
+        For lPRec As Integer = 0 To lPNumRecs - 1
+            lPidVal = GisUtil.FieldValue(lSubTheme, lPRec, lPidfield)
+            lPidList.Add(lPidVal)
         Next
 
         'read result file into memory
-        Dim numrecs As Integer = 0
-        Dim resultrecs As New Collection
-        If FileExists(resultfilename) Then
+        Dim lNumRecs As Integer = 0
+        Dim lResultRecs As New Collection
+        If FileExists(lResultFilename) Then
             Try
                 Dim lCurrentRecord As String
-                Dim lStreamReader As New StreamReader(resultfilename)
+                Dim lStreamReader As New StreamReader(lResultFilename)
                 Do
                     lCurrentRecord = lStreamReader.ReadLine
                     If lCurrentRecord Is Nothing Then
                         Exit Do
                     Else
-                        numrecs = numrecs + 1
-                        resultrecs.Add(lCurrentRecord)
+                        lNumRecs = lNumRecs + 1
+                        lResultRecs.Add(lCurrentRecord)
                     End If
                 Loop
             Catch e As ApplicationException
-                Logger.Msg("Cannot read output file, " & resultfilename & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+                Logger.Msg("Cannot read output file, " & lResultFilename & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
                 Exit Sub
             End Try
         Else
-            Logger.Msg("Cannot open output file, " & resultfilename & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+            Logger.Msg("Cannot open output file, " & lResultFilename & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
             Exit Sub
         End If
 
-        Dim numflds As Integer = 0
-        lstr = runofflist(1)
-        lstr1 = ""
-        Do While lstr.Length > 0
-            lstr1 = StrRetRem(lstr)
-            numflds += 1
+        Dim lNumFlds As Integer = 0
+        lStr = lRunoffList(1)
+        lStr1 = ""
+        Do While lStr.Length > 0
+            lStr1 = StrRetRem(lStr)
+            lNumFlds += 1
         Loop
 
         'read results into local array
-        Dim resultvals(numrecs, numflds) As Single
-        Dim irec As Integer = 0
-        For Each lrec In resultrecs
-            irec += 1
-            Dim ifield As Integer = -1
-            Do While lrec.Length > 0
-                lstr1 = StrRetRem(lrec)
-                ifield += 1
-                If IsNumeric(lstr1) Then
-                    resultvals(irec, ifield) = lstr1
+        Dim lResultVals(lNumRecs, lNumFlds) As Single
+        Dim lIrec As Integer = 0
+        For Each lRec In lResultRecs
+            lIrec += 1
+            Dim lIfield As Integer = -1
+            Do While lRec.Length > 0
+                lStr1 = StrRetRem(lRec)
+                lIfield += 1
+                If IsNumeric(lStr1) Then
+                    lResultVals(lIrec, lIfield) = lStr1
                 End If
             Loop
         Next
 
-        Dim theSum As Single = 0
-        Dim theCount As Single = 0
-        Dim theMean As Single = 0
-        Dim theMinimum As Single = 0
-        Dim theMaximum As Single = 0
-        Dim theRange As Single = 0
-        Dim theStdDev As Single = 0
-        Dim theVariance As Single = 0
-        Dim theMedian As Single = 0
-        Dim theQuart25 As Single = 0
-        Dim theQuart75 As Single = 0
-        Dim theQuart33 As Single = 0
-        Dim theQuart66 As Single = 0
+        Dim lTheSum As Single = 0
+        Dim lTheCount As Single = 0
+        Dim lTheMean As Single = 0
+        Dim lTheMinimum As Single = 0
+        Dim lTheMaximum As Single = 0
+        Dim lTheRange As Single = 0
+        Dim lTheStdDev As Single = 0
+        Dim lTheVariance As Single = 0
+        Dim lTheMedian As Single = 0
+        Dim lTheQuart25 As Single = 0
+        Dim lTheQuart75 As Single = 0
+        Dim lTheQuart33 As Single = 0
+        Dim lTheQuart66 As Single = 0
 
-        Dim tempcount As Integer = 0
+        Dim lTempCount As Integer = 0
         Dim lMaxMedian As Single = 0
-        For mynum As Integer = 1 To numflds - 1
-            theSum = 0
-            theCount = 0
-            theMinimum = -9999999
-            theMaximum = 9999999
+        For lFieldIndex As Integer = 1 To lNumFlds - 1
+            lTheSum = 0
+            lTheCount = 0
+            lTheMinimum = -9999999
+            lTheMaximum = 9999999
 
-            Dim lSubbasinId As Integer = resultvals(1, mynum)
-            Dim reclist As New atcCollection
-            Dim theValue As String
-            For rec As Integer = 2 To numrecs
-                theValue = resultvals(rec, mynum)
-                If IsNumeric(theValue) Then
-                    reclist.Add(theValue)
-                    theSum = theValue + theSum
-                    theCount = theCount + 1
+            Dim lSubbasinId As Integer = lResultVals(1, lFieldIndex)
+            Dim lRecList As New atcCollection
+            Dim lTheValue As String
+            For lRecIndex As Integer = 2 To lNumRecs
+                lTheValue = lResultVals(lRecIndex, lFieldIndex)
+                If IsNumeric(lTheValue) Then
+                    lRecList.Add(lTheValue)
+                    lTheSum = lTheValue + lTheSum
+                    lTheCount = lTheCount + 1
                 End If
             Next
 
-            If theCount > 0 Then
-                theMean = theSum / theCount
+            If lTheCount > 0 Then
+                lTheMean = lTheSum / lTheCount
             Else
-                theMean = -999
+                lTheMean = -999
             End If
 
-            reclist.SortByValue()
-            Dim recCount As Integer = reclist.Count
+            lRecList.SortByValue()
+            Dim lRecCount As Integer = lRecList.Count
 
-            theMinimum = reclist(0)
-            theMaximum = reclist(recCount - 1)
-            theRange = (theMaximum - theMinimum)
+            lTheMinimum = lRecList(0)
+            lTheMaximum = lRecList(lRecCount - 1)
+            lTheRange = (lTheMaximum - lTheMinimum)
 
-            If ((chkq25 = 1) Or (chkq33 = 1) Or (chkq66 = 1) Or (chkq75 = 1) Or (chkmed = 1) Or (chkbkf = 1)) Then
+            If ((lChkq25 = 1) Or (lChkq33 = 1) Or (lChkq66 = 1) Or (lChkq75 = 1) Or (lChkmed = 1) Or (lChkbkf = 1)) Then
 
-                If (chkmed = 1) Then
-                    If (recCount < 9) Then
+                If (lChkmed = 1) Then
+                    If (lRecCount < 9) Then
                         Logger.Msg("Too few records for flow statistics computation", "Less than 9 records")
                         Exit Sub
-                    ElseIf (((recCount) Mod (2)) = 1) Then
-                        theMedian = reclist((recCount - 1) / 2)
-                    ElseIf (((recCount) Mod (2)) = 0) Then
-                        theMedian = (CSng((reclist((recCount - 2) / 2)) + CSng(reclist((recCount - 1) / 2))) / 2)
+                    ElseIf (((lRecCount) Mod (2)) = 1) Then
+                        lTheMedian = lRecList((lRecCount - 1) / 2)
+                    ElseIf (((lRecCount) Mod (2)) = 0) Then
+                        lTheMedian = (CSng((lRecList((lRecCount - 2) / 2)) + CSng(lRecList((lRecCount - 1) / 2))) / 2)
                     End If
                 End If
 
-                If ((chkq25 = 1) Or (chkq75 = 1)) Then
-                    If (recCount < 9) Then
+                If ((lChkq25 = 1) Or (lChkq75 = 1)) Then
+                    If (lRecCount < 9) Then
                         Logger.Msg("Too few records for flow statistics computation", "Less than 9 records")
                         Exit Sub
-                    ElseIf (((recCount) Mod (2)) = 1) Then
-                        If (((recCount) Mod (4)) = 1) Then
-                            theQuart25 = reclist((recCount - 1) / 4)
-                            theQuart75 = reclist((recCount - 1) * 3 / 4)
-                        ElseIf (((recCount) Mod (4)) = 3) Then
-                            theQuart25 = (CSng((reclist((recCount + 1) / 4)) + CSng(reclist((recCount - 3) / 4))) / 2)
-                            theQuart75 = (CSng((reclist((recCount + 1) * 3 / 4)) + CSng(reclist(((recCount + 1) * 3 / 4) - 1))) / 2)
+                    ElseIf (((lRecCount) Mod (2)) = 1) Then
+                        If (((lRecCount) Mod (4)) = 1) Then
+                            lTheQuart25 = lRecList((lRecCount - 1) / 4)
+                            lTheQuart75 = lRecList((lRecCount - 1) * 3 / 4)
+                        ElseIf (((lRecCount) Mod (4)) = 3) Then
+                            lTheQuart25 = (CSng((lRecList((lRecCount + 1) / 4)) + CSng(lRecList((lRecCount - 3) / 4))) / 2)
+                            lTheQuart75 = (CSng((lRecList((lRecCount + 1) * 3 / 4)) + CSng(lRecList(((lRecCount + 1) * 3 / 4) - 1))) / 2)
                         End If
-                    ElseIf (((recCount) Mod (2)) = 0) Then
-                        If (((recCount) Mod (4)) = 2) Then
-                            theQuart25 = reclist((recCount - 2) / 4)
-                            theQuart75 = reclist((recCount - 2) * 3 / 4)
-                        ElseIf (((recCount) Mod (4)) = 0) Then
-                            theQuart25 = (CSng((reclist((recCount - 4) / 4)) + CSng(reclist((recCount) / 4))) / 2)
-                            theQuart75 = (CSng((reclist((recCount * 3 / 4) - 1)) + CSng(reclist((recCount) * 3 / 4))) / 2)
+                    ElseIf (((lRecCount) Mod (2)) = 0) Then
+                        If (((lRecCount) Mod (4)) = 2) Then
+                            lTheQuart25 = lRecList((lRecCount - 2) / 4)
+                            lTheQuart75 = lRecList((lRecCount - 2) * 3 / 4)
+                        ElseIf (((lRecCount) Mod (4)) = 0) Then
+                            lTheQuart25 = (CSng((lRecList((lRecCount - 4) / 4)) + CSng(lRecList((lRecCount) / 4))) / 2)
+                            lTheQuart75 = (CSng((lRecList((lRecCount * 3 / 4) - 1)) + CSng(lRecList((lRecCount) * 3 / 4))) / 2)
                         End If
                     End If
                 End If
 
-                If ((chkq33 = 1) Or (chkq66 = 1)) Then
-                    If ((((recCount) Mod (3)) = 0) And (recCount >= 9)) Then
-                        theQuart33 = (CSng((reclist((recCount) / 3)) * 2 / 3) + CSng((reclist((recCount - 3) / 3)) * 1 / 3))
-                        theQuart66 = (CSng((reclist((recCount) * 2 / 3)) * 1 / 3) + CSng((reclist((recCount - 1.5) * 2 / 3)) * 2 / 3))
-                    ElseIf ((((recCount) Mod (3)) = 1) And (recCount >= 9)) Then
-                        theQuart33 = (reclist((recCount - 1) / 3))
-                        theQuart66 = (reclist((recCount - 4) * 2 / 3))
-                    ElseIf ((((recCount) Mod (3)) = 2) And (recCount >= 9)) Then
-                        theQuart33 = (CSng((reclist((recCount - 2) / 3)) * 2 / 3) + CSng((reclist((recCount + 1) / 3)) * 1 / 3))
-                        theQuart66 = (CSng((reclist((recCount - 2) * 2 / 3)) * 2 / 3) + CSng((reclist(((recCount - 0.5) * 2 / 3) + 1)) * 1 / 3))
+                If ((lChkq33 = 1) Or (lChkq66 = 1)) Then
+                    If ((((lRecCount) Mod (3)) = 0) And (lRecCount >= 9)) Then
+                        lTheQuart33 = (CSng((lRecList((lRecCount) / 3)) * 2 / 3) + CSng((lRecList((lRecCount - 3) / 3)) * 1 / 3))
+                        lTheQuart66 = (CSng((lRecList((lRecCount) * 2 / 3)) * 1 / 3) + CSng((lRecList((lRecCount - 1.5) * 2 / 3)) * 2 / 3))
+                    ElseIf ((((lRecCount) Mod (3)) = 1) And (lRecCount >= 9)) Then
+                        lTheQuart33 = (lRecList((lRecCount - 1) / 3))
+                        lTheQuart66 = (lRecList((lRecCount - 4) * 2 / 3))
+                    ElseIf ((((lRecCount) Mod (3)) = 2) And (lRecCount >= 9)) Then
+                        lTheQuart33 = (CSng((lRecList((lRecCount - 2) / 3)) * 2 / 3) + CSng((lRecList((lRecCount + 1) / 3)) * 1 / 3))
+                        lTheQuart66 = (CSng((lRecList((lRecCount - 2) * 2 / 3)) * 2 / 3) + CSng((lRecList(((lRecCount - 0.5) * 2 / 3) + 1)) * 1 / 3))
                     Else
-                        theQuart33 = 0
-                        theQuart66 = 0
+                        lTheQuart33 = 0
+                        lTheQuart66 = 0
                     End If
                 End If
             End If
 
-            If ((chkstd = 1) Or (chkvar = 1)) Then
-                Dim theSqDev As Double = 0.0
-                Dim theSumSqDev As Double = 0.0
-                For rec As Integer = 0 To (numrecs - 1)
-                    theValue = resultvals(rec, mynum)
-                    If (IsNumeric(theValue)) Then
-                        theSqDev = (theValue - theMean) * (theValue - theMean)
-                        theSumSqDev = theSqDev + theSumSqDev
+            If ((lChkstd = 1) Or (lChkvar = 1)) Then
+                Dim lTheSqDev As Double = 0.0
+                Dim lTheSumSqDev As Double = 0.0
+                For lRecInx As Integer = 0 To (lNumRecs - 1)
+                    lTheValue = lResultVals(lRecInx, lFieldIndex)
+                    If (IsNumeric(lTheValue)) Then
+                        lTheSqDev = (lTheValue - lTheMean) * (lTheValue - lTheMean)
+                        lTheSumSqDev = lTheSqDev + lTheSumSqDev
                     End If
                 Next
 
-                If (theCount > 1) Then
-                    theVariance = theSumSqDev / (theCount - 1)
-                    theStdDev = Math.Sqrt(theVariance)
+                If (lTheCount > 1) Then
+                    lTheVariance = lTheSumSqDev / (lTheCount - 1)
+                    lTheStdDev = Math.Sqrt(lTheVariance)
                 Else
-                    theVariance = 0
-                    theStdDev = 0
+                    lTheVariance = 0
+                    lTheStdDev = 0
                 End If
             End If
 
-            If theMedian > lMaxMedian Then
-                lMaxMedian = SignificantDigits(theMedian, 4)
+            If lTheMedian > lMaxMedian Then
+                lMaxMedian = SignificantDigits(lTheMedian, 4)
             End If
 
-            GisUtil.StartSetFeatureValue(theTheme)
-            For precs As Integer = 0 To GisUtil.NumFeatures(theTheme) - 1
-                Dim cpid As Integer = GisUtil.FieldValue(theTheme, precs, pidfield)
+            GisUtil.StartSetFeatureValue(lSubTheme)
+            For lPRecs As Integer = 0 To GisUtil.NumFeatures(lSubTheme) - 1
+                Dim cpid As Integer = GisUtil.FieldValue(lSubTheme, lPRecs, lPidfield)
                 If (cpid = lSubbasinId) Then
-                    If (chksum = 1) Then
-                        GisUtil.SetFeatureValueNoStartStop(theTheme, sumfld, precs, SignificantDigits(theSum, 4))
+                    If (lchksum = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(lSubTheme, lSumfld, lPRecs, SignificantDigits(lTheSum, 4))
                     End If
-                    If (chkcnt = 1) Then
-                        GisUtil.SetFeatureValueNoStartStop(theTheme, countfld, precs, SignificantDigits(theCount, 4))
+                    If (lChkcnt = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(lSubTheme, lCountfld, lPRecs, SignificantDigits(lTheCount, 4))
                     End If
-                    If (chkavg = 1) Then
-                        GisUtil.SetFeatureValueNoStartStop(theTheme, meanfld, precs, SignificantDigits(theMean, 4))
+                    If (lChkavg = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(lSubTheme, lMeanfld, lPRecs, SignificantDigits(lTheMean, 4))
                     End If
-                    If (chkmin = 1) Then
-                        GisUtil.SetFeatureValueNoStartStop(theTheme, minfld, precs, SignificantDigits(theMinimum, 4))
+                    If (lChkmin = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(lSubTheme, lMinfld, lPRecs, SignificantDigits(lTheMinimum, 4))
                     End If
-                    If (chkmax = 1) Then
-                        GisUtil.SetFeatureValueNoStartStop(theTheme, maxfld, precs, SignificantDigits(theMaximum, 4))
+                    If (lChkmax = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(lSubTheme, lMaxfld, lPRecs, SignificantDigits(lTheMaximum, 4))
                     End If
-                    If (chkrng = 1) Then
-                        GisUtil.SetFeatureValueNoStartStop(theTheme, rangefld, precs, SignificantDigits(theRange, 4))
+                    If (lChkrng = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(lSubTheme, lRangefld, lPRecs, SignificantDigits(lTheRange, 4))
                     End If
-                    If (chkstd = 1) Then
-                        GisUtil.SetFeatureValueNoStartStop(theTheme, stddevfld, precs, SignificantDigits(theStdDev, 4))
+                    If (lChkstd = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(lSubTheme, lStddevfld, lPRecs, SignificantDigits(lTheStdDev, 4))
                     End If
-                    If (chkvar = 1) Then
-                        GisUtil.SetFeatureValueNoStartStop(theTheme, varfld, precs, theVariance)
+                    If (lChkvar = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(lSubTheme, lVarfld, lPRecs, lTheVariance)
                     End If
-                    If (chkmed = 1) Then
-                        GisUtil.SetFeatureValueNoStartStop(theTheme, medianfld, precs, SignificantDigits(theMedian, 4))
+                    If (lChkmed = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(lSubTheme, lMedianfld, lPRecs, SignificantDigits(lTheMedian, 4))
                     End If
-                    If (chkq25 = 1) Then
-                        GisUtil.SetFeatureValueNoStartStop(theTheme, Quart25fld, precs, SignificantDigits(theQuart25, 4))
+                    If (lChkq25 = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(lSubTheme, lQuart25fld, lPRecs, SignificantDigits(lTheQuart25, 4))
                     End If
-                    If (chkq33 = 1) Then
-                        GisUtil.SetFeatureValueNoStartStop(theTheme, Quart33fld, precs, SignificantDigits(theQuart33, 4))
+                    If (lChkq33 = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(lSubTheme, lQuart33fld, lPRecs, SignificantDigits(lTheQuart33, 4))
                     End If
-                    If (chkq66 = 1) Then
-                        GisUtil.SetFeatureValueNoStartStop(theTheme, Quart66fld, precs, SignificantDigits(theQuart66, 4))
+                    If (lChkq66 = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(lSubTheme, lQuart66fld, lPRecs, SignificantDigits(lTheQuart66, 4))
                     End If
-                    If (chkq75 = 1) Then
-                        GisUtil.SetFeatureValueNoStartStop(theTheme, Quart75fld, precs, SignificantDigits(theQuart75, 4))
+                    If (lChkq75 = 1) Then
+                        GisUtil.SetFeatureValueNoStartStop(lSubTheme, lQuart75fld, lPRecs, SignificantDigits(lTheQuart75, 4))
                     End If
 
-                    If (updatethr = True) Then
-                        Dim mymean As Single = GisUtil.FieldValue(theTheme, precs, meanfld)
-                        Dim mymax As Single = GisUtil.FieldValue(theTheme, precs, maxfld)
-                        Dim mymin As Single = GisUtil.FieldValue(theTheme, precs, minfld)
-                        Dim myhigh As Single = Math.Sqrt(mymean * mymax)
-                        Dim mylow As Single = Math.Sqrt(mymean)
-                        GisUtil.SetFeatureValueNoStartStop(theTheme, Highflowfld, precs, SignificantDigits(myhigh, 4))
-                        GisUtil.SetFeatureValueNoStartStop(theTheme, Medflowfld, precs, SignificantDigits(mymean, 4))
-                        GisUtil.SetFeatureValueNoStartStop(theTheme, lowflowfld, precs, SignificantDigits(mylow, 4))
+                    If (lUpdatethr = True) Then
+                        Dim lMyMean As Single = GisUtil.FieldValue(lSubTheme, lPRecs, lMeanfld)
+                        Dim lMyMax As Single = GisUtil.FieldValue(lSubTheme, lPRecs, lMaxfld)
+                        Dim lMyMin As Single = GisUtil.FieldValue(lSubTheme, lPRecs, lMinfld)
+                        Dim lMyHigh As Single = Math.Sqrt(lMyMean * lMyMax)
+                        Dim lMyLow As Single = Math.Sqrt(lMyMean)
+                        GisUtil.SetFeatureValueNoStartStop(lSubTheme, lHighflowfld, lPRecs, SignificantDigits(lMyHigh, 4))
+                        GisUtil.SetFeatureValueNoStartStop(lSubTheme, lMedflowfld, lPRecs, SignificantDigits(lMyMean, 4))
+                        GisUtil.SetFeatureValueNoStartStop(lSubTheme, lLowflowfld, lPRecs, SignificantDigits(lMyLow, 4))
                     End If
                 End If
             Next
-            GisUtil.StopSetFeatureValue(theTheme)
+            GisUtil.StopSetFeatureValue(lSubTheme)
         Next
 
         'render the map layer by median flow
@@ -3837,21 +3837,21 @@ Public Module modGeoSFM
         lCaptions.Add(lLowRange(3).ToString & " - " & lHighRange(3).ToString)
         lCaptions.Add(lLowRange(4).ToString & " - " & lHighRange(4).ToString)
         lCaptions.Add(lLowRange(5).ToString & " + ")
-        GisUtil.SetLayerRendererWithRanges(theTheme, medianfld, lColors, lCaptions, lLowRange, lHighRange)
+        GisUtil.SetLayerRendererWithRanges(lSubTheme, lMedianfld, lColors, lCaptions, lLowRange, lHighRange)
 
         'write basin attribute table to text file
         Dim lRivStatsFile As New StringBuilder
-        lstr = GisUtil.FieldName(0, theTheme)
-        For lcol As Integer = 1 To GisUtil.NumFields(theTheme) - 1
-            lstr = lstr & ", " & GisUtil.FieldName(lcol, theTheme)
+        lStr = GisUtil.FieldName(0, lSubTheme)
+        For lCol As Integer = 1 To GisUtil.NumFields(lSubTheme) - 1
+            lStr = lStr & ", " & GisUtil.FieldName(lCol, lSubTheme)
         Next
-        lRivStatsFile.AppendLine(lstr)
-        For lrow As Integer = 0 To GisUtil.NumFeatures(theTheme) - 1
-            lstr = GisUtil.FieldValue(theTheme, lrow, 0)
-            For lcol As Integer = 1 To GisUtil.NumFields(theTheme) - 1
-                lstr = lstr & ", " & GisUtil.FieldValue(theTheme, lrow, lcol)
+        lRivStatsFile.AppendLine(lStr)
+        For lRow As Integer = 0 To GisUtil.NumFeatures(lSubTheme) - 1
+            lStr = GisUtil.FieldValue(lSubTheme, lRow, 0)
+            For lCol As Integer = 1 To GisUtil.NumFields(lSubTheme) - 1
+                lStr = lStr & ", " & GisUtil.FieldValue(lSubTheme, lRow, lCol)
             Next
-            lRivStatsFile.AppendLine(lstr)
+            lRivStatsFile.AppendLine(lStr)
         Next
         SaveFileString(lOutputPath & "riverstats.txt", lRivStatsFile.ToString)
 
@@ -3886,103 +3886,103 @@ Public Module modGeoSFM
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
         Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
 
-        Dim resultfilename As String = ""
+        Dim lResultFileName As String = ""
         If aStreamflow Then
-            resultfilename = lOutputPath & "streamflow.txt"
+            lResultFileName = lOutputPath & "streamflow.txt"
         Else
-            resultfilename = lOutputPath & "soilwater.txt"
+            lResultFileName = lOutputPath & "soilwater.txt"
         End If
 
-        If Not FileExists(resultfilename) Then
-            Logger.Msg("Could not open time series file," & vbCrLf & resultfilename, "GeoSFM Utilities")
+        If Not FileExists(lResultFileName) Then
+            Logger.Msg("Could not open time series file," & vbCrLf & lResultFileName, "GeoSFM Utilities")
             Exit Sub
         End If
 
-        Dim theTheme As Integer = -1
-        Dim Highflowfld As Integer = -1
-        Dim lowflowfld As Integer = -1
-        Dim Medflowfld As Integer = -1
+        Dim lSubThemeIndex As Integer = -1
+        Dim lHighFlowFld As Integer = -1
+        Dim lLowFlowFld As Integer = -1
+        Dim lMedFlowFld As Integer = -1
         If GisUtil.IsLayer("Subbasins") Then
-            theTheme = GisUtil.LayerIndex("Subbasins")
-            Highflowfld = AddField(theTheme, "Highflow")
-            lowflowfld = AddField(theTheme, "Lowflow")
-            Medflowfld = AddField(theTheme, "Medflow")
+            lSubThemeIndex = GisUtil.LayerIndex("Subbasins")
+            lHighFlowFld = AddField(lSubThemeIndex, "Highflow")
+            lLowFlowFld = AddField(lSubThemeIndex, "Lowflow")
+            lMedFlowFld = AddField(lSubThemeIndex, "Medflow")
         End If
 
-        If (theTheme = -1) Then
+        If (lSubThemeIndex = -1) Then
             Logger.Msg("The map must contain a layer named 'Subbasins' to use this feature.", "Geospatial Stream Flow Model")
             Exit Sub
         End If
 
-        If (Highflowfld = -1) Then
+        If (lHighFlowFld = -1) Then
             Logger.Msg("High flow field, Highflow, has not been initialized.  Run 'Bankfull and Flow Statistics' to compute this field.", "Geospatial Stream Flow Model")
             Exit Sub
         End If
-        If (lowflowfld = -1) Then
+        If (lLowFlowFld = -1) Then
             Logger.Msg("Low flow field, Lowflow, has not been initialized.  Run 'Bankfull and Flow Statistics' to compute this field.", "Geospatial Stream Flow Model")
             Exit Sub
         End If
-        If (Medflowfld = -1) Then
+        If (lMedFlowFld = -1) Then
             Logger.Msg("Median flow field, Medflow, has not been initialized.  Run 'Bankfull and Flow Statistics' to compute this field.", "Geospatial Stream Flow Model")
             Exit Sub
         End If
 
-        Dim pidfield As Integer = GisUtil.FieldIndex(theTheme, "Gridcode")
-        If pidfield < 0 Then
-            pidfield = GisUtil.FieldIndex(theTheme, "Grid_code")
-            If pidfield < 0 Then
+        Dim lPidField As Integer = GisUtil.FieldIndex(lSubThemeIndex, "Gridcode")
+        If lPidField < 0 Then
+            lPidField = GisUtil.FieldIndex(lSubThemeIndex, "Grid_code")
+            If lPidField < 0 Then
                 Logger.Msg("Subbasins layer must have a field named 'Gridcode'.", "Geospatial Stream Flow Model")
                 Exit Sub
             End If
         End If
 
-        Dim cflowfld As Integer = AddField(theTheme, "FlowNow")
-        Dim cfindexfld As Integer = AddField(theTheme, "IndexNow", 1)
+        Dim lCurFlowFld As Integer = AddField(lSubThemeIndex, "FlowNow")
+        Dim lCurIndexFld As Integer = AddField(lSubThemeIndex, "IndexNow", 1)
 
         'read result file into memory
-        Dim numrecs As Integer = 0
-        Dim resultrecs As New Collection
-        If FileExists(resultfilename) Then
+        Dim lNumRecs As Integer = 0
+        Dim lResultRecs As New Collection
+        If FileExists(lResultFileName) Then
             Try
                 Dim lCurrentRecord As String
-                Dim lStreamReader As New StreamReader(resultfilename)
+                Dim lStreamReader As New StreamReader(lResultFileName)
                 Do
                     lCurrentRecord = lStreamReader.ReadLine
                     If lCurrentRecord Is Nothing Then
                         Exit Do
                     Else
-                        numrecs = numrecs + 1
-                        resultrecs.Add(lCurrentRecord)
+                        lNumRecs = lNumRecs + 1
+                        lResultRecs.Add(lCurrentRecord)
                     End If
                 Loop
             Catch e As ApplicationException
-                Logger.Msg("Cannot read output file, " & resultfilename & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+                Logger.Msg("Cannot read output file, " & lResultFileName & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
                 Exit Sub
             End Try
         Else
-            Logger.Msg("Cannot open output file, " & resultfilename & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+            Logger.Msg("Cannot open output file, " & lResultFileName & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
             Exit Sub
         End If
 
-        Dim numflds As Integer = 0
-        Dim lstr As String = resultrecs(1)
+        Dim lNumFlds As Integer = 0
+        Dim lstr As String = lResultRecs(1)
         Dim lstr1 As String = ""
         Do While lstr.Length > 0
             lstr1 = StrRetRem(lstr)
-            numflds += 1
+            lNumFlds += 1
         Loop
 
         'read results into local array
-        Dim resultvals(numrecs, numflds) As Single
-        Dim irec As Integer = 0
-        For Each lrec As String In resultrecs
-            irec += 1
-            Dim ifield As Integer = -1
-            Do While lrec.Length > 0
-                lstr1 = StrRetRem(lrec)
-                ifield += 1
+        Dim lResultVals(lNumRecs, lNumFlds) As Single
+        Dim lIrec As Integer = 0
+        For Each lRec As String In lResultRecs
+            lIrec += 1
+            Dim lIfield As Integer = -1
+            Do While lRec.Length > 0
+                lstr1 = StrRetRem(lRec)
+                lIfield += 1
                 If IsNumeric(lstr1) Then
-                    resultvals(irec, ifield) = lstr1
+                    lResultVals(lIrec, lIfield) = lstr1
                 End If
             Loop
         Next
@@ -3995,45 +3995,45 @@ Public Module modGeoSFM
         Dim lDaysAfter As Integer = aMapJDate - lJYr + 1
         Dim lDateString As String = lDate(0) & Format(lDaysAfter, "000")
 
-        Dim plotday As Integer = 0
-        For lrow As Integer = 1 To numrecs
-            If resultvals(lrow, 0) = CSng(lDateString) Then
+        Dim lPlotDay As Integer = 0
+        For lRow As Integer = 1 To lNumRecs
+            If lResultVals(lRow, 0) = CSng(lDateString) Then
                 'found the date in the output file
-                plotday = lrow
+                lPlotDay = lRow
             End If
         Next
 
-        If plotday = 0 Then
-            Logger.Msg("Selected day not found in " & resultfilename, "Geospatial Stream Flow Model")
+        If lPlotDay = 0 Then
+            Logger.Msg("Selected day not found in " & lResultFileName, "Geospatial Stream Flow Model")
             Exit Sub
         End If
 
-        Dim theHighflow As Single = 0.0
-        Dim theLowflow As Single = 0.0
-        Dim theMedflow As Single = 0.0
-        Dim theflow As Single = 0.0
-        GisUtil.StartSetFeatureValue(theTheme)
-        For mynum As Integer = 1 To numflds - 1
-            Dim lSubbasinId As Integer = resultvals(1, mynum)
-            For precs As Integer = 0 To GisUtil.NumFeatures(theTheme) - 1
-                Dim cpid As Integer = GisUtil.FieldValue(theTheme, precs, pidfield)
-                If (cpid = lSubbasinId) Then
-                    theHighflow = GisUtil.FieldValue(theTheme, precs, Highflowfld)
-                    theLowflow = GisUtil.FieldValue(theTheme, precs, lowflowfld)
-                    theMedflow = GisUtil.FieldValue(theTheme, precs, Medflowfld)
-                    theflow = resultvals(plotday, mynum)
-                    GisUtil.SetFeatureValueNoStartStop(theTheme, cflowfld, precs, SignificantDigits(theflow, 4))
-                    If (theflow > theHighflow) Then
-                        GisUtil.SetFeatureValueNoStartStop(theTheme, cfindexfld, precs, 3)
-                    ElseIf (theflow < theLowflow) Then
-                        GisUtil.SetFeatureValueNoStartStop(theTheme, cfindexfld, precs, 1)
+        Dim lTheHighflow As Single = 0.0
+        Dim lTheLowflow As Single = 0.0
+        Dim lTheMedflow As Single = 0.0
+        Dim lTheFlow As Single = 0.0
+        GisUtil.StartSetFeatureValue(lSubThemeIndex)
+        For lFieldNum As Integer = 1 To lNumFlds - 1
+            Dim lSubbasinId As Integer = lResultVals(1, lFieldNum)
+            For lPolyRecs As Integer = 0 To GisUtil.NumFeatures(lSubThemeIndex) - 1
+                Dim lCurPolyid As Integer = GisUtil.FieldValue(lSubThemeIndex, lPolyRecs, lPidField)
+                If (lCurPolyid = lSubbasinId) Then
+                    lTheHighflow = GisUtil.FieldValue(lSubThemeIndex, lPolyRecs, lHighFlowFld)
+                    lTheLowflow = GisUtil.FieldValue(lSubThemeIndex, lPolyRecs, lLowFlowFld)
+                    lTheMedflow = GisUtil.FieldValue(lSubThemeIndex, lPolyRecs, lMedFlowFld)
+                    lTheFlow = lResultVals(lPlotDay, lFieldNum)
+                    GisUtil.SetFeatureValueNoStartStop(lSubThemeIndex, lCurFlowFld, lPolyRecs, SignificantDigits(lTheFlow, 4))
+                    If (lTheFlow > lTheHighflow) Then
+                        GisUtil.SetFeatureValueNoStartStop(lSubThemeIndex, lCurIndexFld, lPolyRecs, 3)
+                    ElseIf (lTheFlow < lTheLowflow) Then
+                        GisUtil.SetFeatureValueNoStartStop(lSubThemeIndex, lCurIndexFld, lPolyRecs, 1)
                     Else
-                        GisUtil.SetFeatureValueNoStartStop(theTheme, cfindexfld, precs, 2)
+                        GisUtil.SetFeatureValueNoStartStop(lSubThemeIndex, lCurIndexFld, lPolyRecs, 2)
                     End If
                 End If
             Next
         Next
-        GisUtil.StopSetFeatureValue(theTheme)
+        GisUtil.StopSetFeatureValue(lSubThemeIndex)
 
         'generate thematic map
         Dim lColors As New Collection
@@ -4044,13 +4044,13 @@ Public Module modGeoSFM
         lCaptions.Add("low_flow")
         lCaptions.Add("normal_flow")
         lCaptions.Add("high_flow")
-        GisUtil.SetLayerRendererUniqueValues("Subbasins", cfindexfld, lColors, lCaptions)
+        GisUtil.SetLayerRendererUniqueValues("Subbasins", lCurIndexFld, lColors, lCaptions)
     End Sub
 
     Friend Sub SetFlowTimeseries(ByVal aFlowFileName As String)
         'read result file into memory
-        Dim numrecs As Integer = 0
-        Dim resultrecs As New Collection
+        Dim lNnumRecs As Integer = 0
+        Dim lResultRecs As New Collection
         If FileExists(aFlowFileName) Then
             Try
                 Dim lCurrentRecord As String
@@ -4060,8 +4060,8 @@ Public Module modGeoSFM
                     If lCurrentRecord Is Nothing Then
                         Exit Do
                     Else
-                        numrecs = numrecs + 1
-                        resultrecs.Add(lCurrentRecord)
+                        lNnumRecs = lNnumRecs + 1
+                        lResultRecs.Add(lCurrentRecord)
                     End If
                 Loop
             Catch e As ApplicationException
@@ -4073,64 +4073,64 @@ Public Module modGeoSFM
             Exit Sub
         End If
 
-        Dim numflds As Integer = 0
-        Dim lstr As String = resultrecs(1)
+        Dim lNumFlds As Integer = 0
+        Dim lstr As String = lResultRecs(1)
         Dim lstr1 As String = ""
         Do While lstr.Length > 0
             lstr1 = StrRetRem(lstr)
-            numflds += 1
+            lNumFlds += 1
         Loop
 
         'read results into local array
-        Dim resultvals(numrecs, numflds) As Single
-        Dim irec As Integer = 0
-        For Each lrec As String In resultrecs
-            irec += 1
-            Dim ifield As Integer = -1
-            Do While lrec.Length > 0
-                lstr1 = StrRetRem(lrec)
-                ifield += 1
+        Dim lResultVals(lNnumRecs, lNumFlds) As Single
+        Dim lIrec As Integer = 0
+        For Each lRec As String In lResultRecs
+            lIrec += 1
+            Dim lIfield As Integer = -1
+            Do While lRec.Length > 0
+                lstr1 = StrRetRem(lRec)
+                lIfield += 1
                 If IsNumeric(lstr1) Then
-                    resultvals(irec, ifield) = lstr1
+                    lResultVals(lIrec, lIfield) = lstr1
                 End If
             Loop
         Next
 
         'set the start/end dates
-        Dim startyear As String = ""
-        Dim startday As String = ""
-        startyear = Left(resultvals(2, 0), 4)
-        If Not IsNumeric(startyear) Then
+        Dim lStartYear As String = ""
+        Dim lStartDay As String = ""
+        lStartYear = Left(lResultVals(2, 0), 4)
+        If Not IsNumeric(lStartYear) Then
             Logger.Msg("Problem reading streamflow file:  Start year must be a 4 digit number", "GeoSFM Utilities")
             Exit Sub
         End If
-        startday = Right(resultvals(2, 0), 3)
-        If Not IsNumeric(startday) Then
+        lStartDay = Right(lResultVals(2, 0), 3)
+        If Not IsNumeric(lStartDay) Then
             Logger.Msg("Problem reading streamflow file:  Start day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
             Exit Sub
         End If
-        Dim endyear As String = ""
-        Dim endday As String = ""
-        endyear = Left(resultvals(numrecs, 0), 4)
-        If Not IsNumeric(endyear) Then
+        Dim lEndYear As String = ""
+        Dim lEndDay As String = ""
+        lEndYear = Left(lResultVals(lNnumRecs, 0), 4)
+        If Not IsNumeric(lEndYear) Then
             Logger.Msg("End year must be a 4 digit number", "GeoSFM Utilities")
             Exit Sub
         End If
-        endday = Right(resultvals(numrecs, 0), 3)
-        If Not IsNumeric(endday) Then
+        lEndDay = Right(lResultVals(lNnumRecs, 0), 3)
+        If Not IsNumeric(lEndDay) Then
             Logger.Msg("End day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
             Exit Sub
         End If
         Dim lSDate(5) As Integer
-        lSDate(0) = CInt(startyear)
+        lSDate(0) = CInt(lStartYear)
         lSDate(1) = 1
         lSDate(2) = 1
-        Dim lSJDate As Double = Date2J(lSDate) + startday - 1
+        Dim lSJDate As Double = Date2J(lSDate) + lStartDay - 1
         Dim lEDate(5) As Integer
-        lEDate(0) = CInt(endyear)
+        lEDate(0) = CInt(lEndYear)
         lEDate(1) = 1
         lEDate(2) = 1
-        Dim lEJDate As Double = Date2J(lEDate) + endday - 1
+        Dim lEJDate As Double = Date2J(lEDate) + lEndDay - 1
         Dim lNvals As Double = lEJDate - lSJDate
         Dim lDates(lNvals) As Double
         For lDateIndex As Integer = 0 To lNvals
@@ -4148,10 +4148,10 @@ Public Module modGeoSFM
         'create new data source to receive the data
         Dim lDataSource As New atcTimeseriesSource
 
-        For lTsIndex As Integer = 1 To numflds - 1
+        For lTsIndex As Integer = 1 To lNumFlds - 1
             'now convert the local array into atcTimeseries
             Dim lDsn As Integer = lTsIndex
-            Dim lRchId As String = CInt(resultvals(1, lTsIndex)).ToString
+            Dim lRchId As String = CInt(lResultVals(1, lTsIndex)).ToString
             Dim lGenericTs As New atcData.atcTimeseries(Nothing)
             With lGenericTs.Attributes
                 .SetValue("ID", lDsn)
@@ -4177,7 +4177,7 @@ Public Module modGeoSFM
             Dim lDayCounter As Integer = 0
             Dim lValueCounter As Integer = 1
             Do While lCurDate <= lEJDate 'loop through each day
-                lValues(lDayCounter) = resultvals(lDayCounter, lTsIndex)
+                lValues(lDayCounter) = lResultVals(lDayCounter, lTsIndex)
                 lDayCounter = lDayCounter + 1
                 lCurDate = lCurDate + 1
             Loop
@@ -4199,7 +4199,7 @@ Public Module modGeoSFM
 
             For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
                 lCounter += 1
-                Logger.Progress("Building list of valid station names...", lCounter, lDataSource.DataSets.Count)
+                Logger.Progress("Building list of valid " & aMetConstituent & " station names...", lCounter, lDataSource.DataSets.Count)
 
                 If lDataSet.Attributes.GetValue("Constituent") = aMetConstituent Then
                     Dim lLoc As String = lDataSet.Attributes.GetValue("Location")

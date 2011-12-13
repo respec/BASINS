@@ -10,6 +10,7 @@ Imports System.IO
 
 Public Class frmGeoSFM
     Inherits System.Windows.Forms.Form
+    Dim pStationsRead As Boolean = False
 
 #Region " Windows Form Designer generated code "
 
@@ -3051,16 +3052,6 @@ Public Class frmGeoSFM
         AtcGridSensitivity.SizeAllColumnsToContents()
         AtcGridSensitivity.Refresh()
 
-        lblStatus.Text = "Reading Precipitation Data ..."
-        Me.Refresh()
-        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
-        EnableControls(False)
-        BuildListofValidStationNames("PREC", pPrecStations)
-
-        lblStatus.Text = "Reading Evap Data ..."
-        Me.Refresh()
-        BuildListofValidStationNames("PEVT", pMetStations)
-
         lblStatus.Text = "Update specifications if desired, then click OK to proceed."
         Me.Refresh()
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
@@ -3068,7 +3059,6 @@ Public Class frmGeoSFM
 
         DefaultBasinCharacteristicsGrids()
         DefaultResponseGrids()
-        SetPrecipStationGrid()
     End Sub
 
     Private Sub lblStatus_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lblStatus.TextChanged
@@ -3848,6 +3838,24 @@ Public Class frmGeoSFM
 
     Private Sub tabMain_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles tabMain.SelectedIndexChanged
         Dim lAppEx As ApplicationException
+        If tabMain.SelectedIndex = 3 Then
+            If pStationsRead = False Then
+                lblStatus.Text = "Reading Precipitation Data ..."
+                Me.Refresh()
+                Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+                EnableControls(False)
+                BuildListofValidStationNames("PREC", pPrecStations)
+                lblStatus.Text = "Reading Evap Data ..."
+                Me.Refresh()
+                BuildListofValidStationNames("PEVT", pMetStations)
+                SetPrecipStationGrid()
+                lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+                Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+                Me.Refresh()
+                EnableControls(True)
+                pStationsRead = True
+            End If
+        End If
         If tabMain.SelectedIndex = 6 Or tabMain.SelectedIndex = 7 Then
             'read reaches for sensitivity analysis or calibration 
             cboReachSensitivity.Items.Clear()
