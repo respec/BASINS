@@ -757,47 +757,47 @@ Public Module modGeoSFM
                 lInterflowlag = "120"
             End If
 
-            Dim baseflowlag As String = Format((CStr(lInterflowlag) * 3), "#.####")
+            Dim lBaseFlowLag As String = Format((CStr(lInterflowlag) * 3), "#.####")
 
             'RcnZoneVtab
-            Dim rcnvalue As String = Format(lRcnZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value, "#.0") '(RcnZoneVtab.ReturnValue(Rcnfield, rrecord)).SetFormat("d.d").AsString
+            Dim lRcnValue As String = Format(lRcnZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value, "#.0") '(RcnZoneVtab.ReturnValue(Rcnfield, rrecord)).SetFormat("d.d").AsString
 
             'whcZoneVtab
-            Dim whcvalue As String = Format(lWhcZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value, "###.###")  '(whcZoneVtab.ReturnValue(Whcfield, rrecord)).AsString
+            Dim lWhcValue As String = Format(lWhcZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value, "###.###")  '(whcZoneVtab.ReturnValue(Whcfield, rrecord)).AsString
 
             'DepthZoneVtab
-            Dim depthvalue As String = Format(lDepthZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value, "###.###") '(DepthZoneVtab.ReturnValue(depthfield, rrecord)).AsString
+            Dim lDepthValue As String = Format(lDepthZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value, "###.###") '(DepthZoneVtab.ReturnValue(depthfield, rrecord)).AsString
 
             'TextureZoneVtab
-            Dim texturevalue As String = lTextureZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mode").Value.ToString '(TextureZoneVtab.ReturnValue(texturefield, rrecord)).AsString
+            Dim lTextureValue As String = lTextureZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mode").Value.ToString '(TextureZoneVtab.ReturnValue(texturefield, rrecord)).AsString
 
             ' Soil texture (1=Sand,2=Loam,3=Clay,5=Water)
-            Dim basinlossvalue As String = ""
-            If texturevalue = "1" Then
-                basinlossvalue = "0.95"
-            ElseIf texturevalue = "2" Then
-                basinlossvalue = "0.97"
-            ElseIf texturevalue = "3" Then
-                basinlossvalue = "0.99"
-            ElseIf texturevalue = "5" Then
-                basinlossvalue = "0.98"
+            Dim lBasinLossValue As String = ""
+            If lTextureValue = "1" Then
+                lBasinLossValue = "0.95"
+            ElseIf lTextureValue = "2" Then
+                lBasinLossValue = "0.97"
+            ElseIf lTextureValue = "3" Then
+                lBasinLossValue = "0.99"
+            ElseIf lTextureValue = "5" Then
+                lBasinLossValue = "0.98"
             Else
-                basinlossvalue = "0.99"
+                lBasinLossValue = "0.99"
             End If
 
             'rivdemZoneVtab
-            Dim rivdropvalue As Single = lRivDemZonalStats.ItemByKey(lBasinValue).GetValue("Max") - lRivDemZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Min").Value '(rivdemZoneVtab.ReturnValue(rivdemfield, rrecord))
-            Dim rivslopevalue As String = Format((rivdropvalue * 100) / CStr(lRivlenValue), "0.0000")   '(((rivdropvalue * 100) / CStr(rivlenvalue)).SetFormat("d.dddd")).AsString
-            If Not IsNumeric(rivslopevalue) Then
-                rivslopevalue = "0.0010"
+            Dim lRivdropValue As Single = lRivDemZonalStats.ItemByKey(lBasinValue).GetValue("Max") - lRivDemZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Min").Value '(rivdemZoneVtab.ReturnValue(rivdemfield, rrecord))
+            Dim lRivSlopeValue As String = Format((lRivdropValue * 100) / CStr(lRivlenValue), "0.0000")   '(((rivdropvalue * 100) / CStr(rivlenvalue)).SetFormat("d.dddd")).AsString
+            If Not IsNumeric(lRivSlopeValue) Then
+                lRivSlopeValue = "0.0010"
             End If
-            If CStr(rivslopevalue) < 0.001 Then
-                rivslopevalue = "0.0010"
+            If CStr(lRivSlopeValue) < 0.001 Then
+                lRivSlopeValue = "0.0010"
             End If
 
             Dim lCelerity As String = ""
             Dim lDiffusion As String = ""
-            If CSng(rivslopevalue) < 0.1 Then
+            If CSng(lRivSlopeValue) < 0.1 Then
 
                 If CSng(lUpareaValue) <= 10000 Then
                     lCelerity = "0.3"
@@ -822,7 +822,7 @@ Public Module modGeoSFM
                     lDiffusion = "10000.0"
                 End If
 
-            ElseIf CSng(rivslopevalue) < 0.2 Then
+            ElseIf CSng(lRivSlopeValue) < 0.2 Then
 
                 If (CSng(lUpareaValue) <= 10000) Then
                     lCelerity = "0.4"
@@ -847,7 +847,7 @@ Public Module modGeoSFM
                     lDiffusion = "10000.0"
                 End If
 
-            ElseIf CSng(rivslopevalue) < 0.3 Then
+            ElseIf CSng(lRivSlopeValue) < 0.3 Then
 
                 If (CSng(lUpareaValue) <= 10000) Then
                     lCelerity = "0.6"
@@ -872,7 +872,7 @@ Public Module modGeoSFM
                     lDiffusion = "10000.0"
                 End If
 
-            ElseIf CSng(rivslopevalue) < 0.4 Then
+            ElseIf CSng(lRivSlopeValue) < 0.4 Then
 
                 If (CSng(lUpareaValue) <= 10000) Then
                     lCelerity = "0.8"
@@ -925,29 +925,29 @@ Public Module modGeoSFM
             End If
 
             'DownZoneVtab
-            Dim downvalue As String = lDownZonalStats.ItemByKey(lBasinValue).GetValue("Mode", "").ToString '(DownZoneVtab.ReturnValue(downfield, rrecord)).AsString
+            Dim lDownValue As String = lDownZonalStats.ItemByKey(lBasinValue).GetValue("Mode", "").ToString '(DownZoneVtab.ReturnValue(downfield, rrecord)).AsString
 
             'MaxCoverZoneVtab
-            Dim maxcovervalue As String = Format((lMaxCoverZonalStats.ItemByKey(lBasinValue).GetValue("Mean", GetNaN) / 100), "0.####") '((MaxCoverZoneVtab.ReturnValue(maxcoverfield, rrecord)) / 100).SetFormat("d.ddddd").AsString
-            If maxcovervalue.Length = 0 OrElse CSng(maxcovervalue) <= 0.001 Then
-                maxcovervalue = "0.001"
-            ElseIf CSng(maxcovervalue) >= 1 Then
-                maxcovervalue = "1.0"
+            Dim lMaxcoverValue As String = Format((lMaxCoverZonalStats.ItemByKey(lBasinValue).GetValue("Mean", GetNaN) / 100), "0.####") '((MaxCoverZoneVtab.ReturnValue(maxcoverfield, rrecord)) / 100).SetFormat("d.ddddd").AsString
+            If lMaxcoverValue.Length = 0 OrElse CSng(lMaxcoverValue) <= 0.001 Then
+                lMaxcoverValue = "0.001"
+            ElseIf CSng(lMaxcoverValue) >= 1 Then
+                lMaxcoverValue = "1.0"
             End If
 
-            Dim hasdamvalue As String = "0" '(BasinTable.ReturnValue(hasdamfld, rrecord)).SetFormat("d").AsString
-            Dim rivpolyloss As String = "1.0"
-            Dim hasrating As String = "0"
-            Dim hasflowdata As String = "0"
-            Dim rivwidth As String = Format(6.13 * (CSng(lUpareaValue) ^ (0.347)), "#.###")
-            Dim flowref As String = Format(36 * 0.02832 * ((CSng(lAreaValue) / 2.59) ^ (0.68)), "#.####")
-            Dim runtype As String = "0"
-            Dim mannvalue As String = "0.035"
-            Dim pancoef As String = "0.85"
-            Dim topsoil As String = "0.1"
-            Dim aridity As String = "2"
-            lSBOut.AppendLine(CStr(lBasinValue) + "," + whcvalue + "," + depthvalue + "," + texturevalue + "," + CStr(lDrainValue) + "," + Format(lAreaValue, "#.0") + "," + lInterflowlag + "," + lSlopeValue + "," + baseflowlag + "," + rcnvalue + "," + maxcovervalue + "," + basinlossvalue + "," + pancoef + "," + topsoil + "," + aridity)
-            lSBRiv.AppendLine(CStr(lBasinValue) + "," + Format(lAreaValue, "#.0") + "," + Format(lUpareaValue, "#.0") + "," + rivslopevalue + "," + lRivlenValue + "," + downvalue + "," + mannvalue + "," + lRiverlossValue + "," + rivpolyloss + "," + hasdamvalue + "," + hasrating + "," + hasflowdata + "," + lCelerity + "," + lDiffusion + "," + rivwidth + "," + flowref + "," + runtype)
+            Dim lHasDamValue As String = "0" '(BasinTable.ReturnValue(hasdamfld, rrecord)).SetFormat("d").AsString
+            Dim lRivPolyLoss As String = "1.0"
+            Dim lHasRating As String = "0"
+            Dim lHasFlowData As String = "0"
+            Dim lRivWidth As String = Format(6.13 * (CSng(lUpareaValue) ^ (0.347)), "#.###")
+            Dim lFlowRef As String = Format(36 * 0.02832 * ((CSng(lAreaValue) / 2.59) ^ (0.68)), "#.####")
+            Dim lRunType As String = "0"
+            Dim lMannValue As String = "0.035"
+            Dim lPanCoef As String = "0.85"
+            Dim lTopSoil As String = "0.1"
+            Dim lAridity As String = "2"
+            lSBOut.AppendLine(CStr(lBasinValue) + "," + lWhcValue + "," + lDepthValue + "," + lTextureValue + "," + CStr(lDrainValue) + "," + Format(lAreaValue, "#.0") + "," + lInterflowlag + "," + lSlopeValue + "," + lBaseFlowLag + "," + lRcnValue + "," + lMaxcoverValue + "," + lBasinLossValue + "," + lPanCoef + "," + lTopSoil + "," + lAridity)
+            lSBRiv.AppendLine(CStr(lBasinValue) + "," + Format(lAreaValue, "#.0") + "," + Format(lUpareaValue, "#.0") + "," + lRivSlopeValue + "," + lRivlenValue + "," + lDownValue + "," + lMannValue + "," + lRiverlossValue + "," + lRivPolyLoss + "," + lHasDamValue + "," + lHasRating + "," + lHasFlowData + "," + lCelerity + "," + lDiffusion + "," + lRivWidth + "," + lFlowRef + "," + lRunType)
             lSBOrder.AppendLine(CStr(lBasinValue))
         Next
 
@@ -969,10 +969,11 @@ Public Module modGeoSFM
 
     End Sub
 
-    Friend Sub Response(ByVal veltype As Integer, _
-                        ByVal zonegname As String, ByVal flowlengname As String, _
-                        ByVal outletgname As String, ByVal demgname As String, ByVal facgname As String, ByVal fdirgname As String, _
-                        ByVal UsgsLandCoverGname As String, ByVal OverlandFlowVelocity As Double, ByVal InstreamFlowVelocity As Double)
+    Friend Sub Response(ByVal aVelType As Integer, _
+                        ByVal aZoneGname As String, ByVal aFlowlenGname As String, _
+                        ByVal aOutletGname As String, ByVal aDemGname As String, ByVal aFacGname As String, ByVal aFdirGname As String, _
+                        ByVal aUsgsLandCoverGname As String, ByVal aOverlandFlowVelocity As Double, ByVal aInstreamFlowVelocity As Double, _
+                        ByVal aManningsValues As atcCollection)
 
         ' ***********************************************************************************************
         ' ***********************************************************************************************
@@ -1002,12 +1003,6 @@ Public Module modGeoSFM
         ' ***********************************************************************************************
         ' ***********************************************************************************************
 
-        'TODO: Implement for USGS Land Cover Grid
-
-        If veltype = 1 Then
-            Logger.Msg("'Non-Uniform from USGS Land Cover Grid' option is not yet implemented.", MsgBoxStyle.Critical, "")
-            Exit Sub
-        End If
         'velmethodlist = { "Non-Uniform from USGS Land Cover Grid" , "Non-Uniform with User Supplied Velocities", "Uniform from User Supplied Velocity Value" }
         'If veltype = 1 Then
         '    ' "Non-Uniform from USGS Land Cover Grid"
@@ -1024,109 +1019,140 @@ Public Module modGeoSFM
 
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
         Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
-        Dim OrderFileName As String = lOutputPath & "order.txt"
+        Dim lOrderFileName As String = lOutputPath & "order.txt"
 
-        Dim basingthm As Integer = -1
-        If zonegname = "<none>" Then
-            Logger.Msg("Basin Grid, " + zonegname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+        Dim lBasinGthm As Integer = -1
+        If aZoneGname = "<none>" Then
+            Logger.Msg("Basin Grid, " + aZoneGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
             Exit Sub
         Else
-            basingthm = GisUtil.LayerIndex(zonegname)
+            lBasinGthm = GisUtil.LayerIndex(aZoneGname)
         End If
 
-        Dim flowdirgthm As Integer = -1
-        If fdirgname = "<none>" Then
-            Logger.Msg("Flow Direction Grid, " + fdirgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+        Dim lFlowdirGthm As Integer = -1
+        If aFdirGname = "<none>" Then
+            Logger.Msg("Flow Direction Grid, " + aFdirGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
             Exit Sub
         Else
-            flowdirgthm = GisUtil.LayerIndex(fdirgname)
+            lFlowdirGthm = GisUtil.LayerIndex(aFdirGname)
         End If
-        Dim lFlowDirGridFileName As String = GisUtil.LayerFileName(flowdirgthm)
+        Dim lFlowDirGridFileName As String = GisUtil.LayerFileName(lFlowdirGthm)
 
-        Dim flowlengthm As Integer = -1
-        If flowlengname = "<none>" Then
-            Logger.Msg("Flow Length Grid, " + flowlengname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+        Dim lFlowlenGthm As Integer = -1
+        If aFlowlenGname = "<none>" Then
+            Logger.Msg("Flow Length Grid, " + aFlowlenGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
             Exit Sub
         Else
-            flowlengthm = GisUtil.LayerIndex(flowlengname)
+            lFlowlenGthm = GisUtil.LayerIndex(aFlowlenGname)
         End If
 
-        Dim outgthm As Integer = -1
-        If outletgname = "<none>" Then
-            Logger.Msg("Outlet Grid, " + outletgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+        Dim lOutGthm As Integer = -1
+        If aOutletGname = "<none>" Then
+            Logger.Msg("Outlet Grid, " + aOutletGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
             Exit Sub
         Else
-            outgthm = GisUtil.LayerIndex(outletgname)
+            lOutGthm = GisUtil.LayerIndex(aOutletGname)
         End If
 
-        Dim zonelist As New atcCollection
+        Dim lZoneList As New atcCollection
         Try
             Dim lCurrentRecord As String
-            Dim lStreamReader As New StreamReader(OrderFileName)
+            Dim lStreamReader As New StreamReader(lOrderFileName)
             lCurrentRecord = lStreamReader.ReadLine  'only if first line is a header
             Do
                 lCurrentRecord = lStreamReader.ReadLine
                 If lCurrentRecord Is Nothing Then
                     Exit Do
                 Else
-                    zonelist.Add(lCurrentRecord)
+                    lZoneList.Add(lCurrentRecord)
                 End If
             Loop
         Catch e As ApplicationException
-            Logger.Msg("Cannot determine computational order." & vbCrLf & "Run 'Generate basin file' menu to create order.txt", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+            Logger.Msg("Cannot determine computational order." & vbCrLf & "Run 'Basin Characteristics' to create order.txt", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
             Exit Sub
         End Try
 
-        Dim facgthm As Integer = -1
-        If facgname = "<none>" Then
-            Logger.Msg("Flow Accumulation Grid, " + facgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+        Dim lFacGthm As Integer = -1
+        If aFacGname = "<none>" Then
+            Logger.Msg("Flow Accumulation Grid, " + aFacGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
             Exit Sub
         Else
-            facgthm = GisUtil.LayerIndex(facgname)
+            lFacGthm = GisUtil.LayerIndex(aFacGname)
         End If
-        Dim lFlowAccGridFileName As String = GisUtil.LayerFileName(facgthm)
+        Dim lFlowAccGridFileName As String = GisUtil.LayerFileName(lFacGthm)
 
-        Dim demgthm As Integer = -1
-        If demgname = "<none>" Then
-            Logger.Msg("DEM Grid, " + demgname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+        Dim lDemGthm As Integer = -1
+        If aDemGname = "<none>" Then
+            Logger.Msg("DEM Grid, " + aDemGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
             Exit Sub
         Else
-            demgthm = GisUtil.LayerIndex(demgname)
+            lDemGthm = GisUtil.LayerIndex(aDemGname)
         End If
 
-        Dim mycellsize As Integer = GisUtil.GridGetCellSizeX(basingthm)
-        Dim lZoneLayerIndex As Integer = GisUtil.LayerIndex(zonegname)
+        Dim lCellSize As Integer = GisUtil.GridGetCellSizeX(lBasinGthm)
+        Dim lZoneLayerIndex As Integer = GisUtil.LayerIndex(aZoneGname)
         Dim lZoneFileName As String = GisUtil.LayerFileName(lZoneLayerIndex)
-        Dim lDemFileName As String = GisUtil.LayerFileName(demgthm)
+        Dim lDemFileName As String = GisUtil.LayerFileName(lDemGthm)
         Dim lVelocityGridLayerName As String = "Velocity Grid"
         Dim lVelocityGridLayerIndex As Integer = 0
         Dim lVelocityGridFileName As String = ""
 
-        If (veltype = 1) Then
+        If (aVelType = 1) Then
 
             '  meandrop = demgrid.zonalStats(#GRID_STATYPE_MEAN, basingrid, Prj.MakeNull, basinField, false) 
             '  mindrop = demgrid.zonalStats(#GRID_STATYPE_MIN, basingrid, Prj.MakeNull, basinField, false)
-            Logger.Status("Computing Zonal Statistics for " + demgname + "........")
+            Logger.Status("Computing Zonal Statistics for " + aDemGname + "........")
             Dim lDemZonalStats As New atcCollection
-            lDemZonalStats = GisUtil.GridZonalStatistics(basingthm, demgthm)
-            '  avgdrop = meandrop - mindrop
+            lDemZonalStats = GisUtil.GridZonalStatistics(lBasinGthm, lDemGthm)
 
             '  avgraw = flowlengrid.zonalStats(#GRID_STATYPE_MEAN, basingrid, Prj.MakeNull, basinField, false)
-            Logger.Status("Computing Zonal Statistics for " + flowlengname + "........")
+            Logger.Status("Computing Zonal Statistics for " + aFlowlenGname + "........")
             Dim lFlowLenZonalStats As New atcCollection
-            lFlowLenZonalStats = GisUtil.GridZonalStatistics(basingthm, flowlengthm)
+            lFlowLenZonalStats = GisUtil.GridZonalStatistics(lBasinGthm, lFlowlenGthm)
 
-            'Grid.Con(Yes,No) 
-            '  avglength = (avgraw < mycellsize).con(mycellsize.asgrid, avgraw)
-            '  sloperaw = ((avgdrop * 100) / avglength)
-            '  slopegrid = (sloperaw < 0.001).con(0.001.asgrid, sloperaw)
+            'build a collection of the subbasin ids 
+            Dim lBasinIDs As New atcCollection
+            Dim lZone As Integer = -1
+            Dim lMax As Double = 0.0
+            For Each lBasin As atcDataAttributes In lDemZonalStats
+                lZone = lBasin.GetDefinedValue("Zone").Value
+                If lZone > -1 Then
+                    lBasinIDs.Add(lZone)
+                End If
+            Next
 
-            Dim lcovgthm As Integer = -1
-            If UsgsLandCoverGname = "<none>" Then
-                Logger.Msg("USGS Land Cover Grid, " + UsgsLandCoverGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
+            Dim lSlopeBySubbasin As New atcCollection
+            For Each lBasinID As Integer In lBasinIDs
+                Dim lMeanDrop As Single = lDemZonalStats.ItemByKey(lBasinID).GetDefinedValue("Mean").Value
+                Dim lMinDrop As Single = lDemZonalStats.ItemByKey(lBasinID).GetDefinedValue("Min").Value
+                'avgdrop = meandrop - mindrop
+                Dim lAvgDrop As Single = lMeanDrop - lMinDrop
+                Dim lAvgRaw As Single = lFlowLenZonalStats.ItemByKey(lBasinID).GetDefinedValue("Mean").Value
+                'avglength = (avgraw < mycellsize).con(mycellsize.asgrid, avgraw)
+                Dim lAvgLength As Single = 0.0
+                'Grid.Con(Yes,No) 
+                If lAvgRaw < lCellSize Then
+                    lAvgLength = lCellSize
+                Else
+                    lAvgLength = lAvgRaw
+                End If
+                Dim lSlopeRaw As Single = ((lAvgDrop * 100) / lAvgLength)
+                Dim lSlopeVal As Single
+                'slopegrid = (sloperaw < 0.001).con(0.001.asgrid, sloperaw)
+                If lSlopeRaw < 0.001 Then
+                    lSlopeVal = 0.001
+                Else
+                    lSlopeVal = lSlopeRaw
+                End If
+                lSlopeBySubbasin.Add(lBasinID, lSlopeVal)
+            Next
+
+            Dim lLcovGthm As Integer = -1
+            If aUsgsLandCoverGname = "<none>" Then
+                Logger.Msg("USGS Land Cover Grid, " + aUsgsLandCoverGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
                 Exit Sub
             Else
-                lcovgthm = GisUtil.LayerIndex(UsgsLandCoverGname)
+                lLcovGthm = GisUtil.LayerIndex(aUsgsLandCoverGname)
             End If
 
             '  Mannlist = { "0.03","0.03","0.035","0.033","0.035","0.04","0.05","0.05","0.05","0.06","0.1","0.1","0.12","0.12","0.1","0.035","0.05","0.05","0.03","0.05","0.05","0.05","0.04","0.04" }
@@ -1134,79 +1160,137 @@ Public Module modGeoSFM
             '  lcnamelist = {"Urban and Built-Up Land", "Dryland Cropland and Pasture", "Irrigated Cropland and Pasture", "Mixed Dryland/Irrigated Cropland and Pasture", "Cropland/Grassland Mosaic", "Cropland/Woodland Mosaic", "Grassland", "Shrubland", "Mixed Shrubland/Grassland", "Savanna", "Deciduous Broadleaf Forest", "Deciduous Needleleaf Forest", "Evergreen Broadleaf Forest", "Evergreen Needleleaf Forest", "Mixed Forest", "Water Bodies", "Herbaceous Wetland", "Wooded Wetland", "Barren or Sparsely Vegetated", "Herbaceous Tundra", "Wooded Tundra", "Mixed Tundra", "Bare Ground Tundra", "Snow or Ice" }
 
             '  lccodelist = MsgBox.MultiInput("Specify Mannings (Velocity) Coefficients for each land cover", "Land Cover, Anderson Code, Manning's N", lcnamelist, Mannlist)
-            '  If (lccodelist.isempty) Then
-            '     Exit Sub
-            '  End If
-            '  lcfield = lcovVtab.FindField("lc_code".Lcase)
-            '  If (lcfield = nil) Then
-            '    lcfield = lcovVtab.FindField("lccode".Lcase)
-            '    If (lcfield = nil) Then
-            '      lcfield = lcovVtab.FindField("lu_code".Lcase)
-            '      If (lcfield = nil) Then
-            '        lcfield = lcovVtab.FindField("lucode".Lcase)
-            '        If (lcfield = nil) Then
-            '          lcfldlst = lcovVtab.getfields.deepclone
-            '          lcfield = MsgBox.choiceasstring(lcfldlst, "Select the field containing the" + nl + "Anderson Land Cover Classification Code eg lc_code", "Geospatial Stream Flow Model")
-            '          If (lcfield = nil) Then
-            '            Exit Sub
-            '          End If
-            '        End If
-            '      End If
-            '    End If
-            '  End If
 
             '  lcfile = LineFile.Make((myWkdirname + "roughness.txt").AsFileName, #FILE_PERM_WRITE)
-            '  if (lcfile = nil) then
-            '    msgbox.error("Cannot create roughness.txt file"+nl+"File may be open or held up by another program", "Geospatial Stream Flow Model")
-            '    exit
-            '  end
+            Dim lLcfile As String = lOutputPath & "roughness.txt"
 
-            '  If (lcovVtab.CanEdit.Not) Then
-            '    MsgBox.info("Cannot Edit USGS Land Cover Grid." + nl + "Copy it to a location where you have write access.", "Geospatial Stream Flow Model")
-            '    Exit Sub
-            '  Else
-            '    lcovVtab.seteditable(True)
-            '    mannField = Field.Make("ManningN", #FIELD_DOUBLE, 10, 5)  
-            '    lcovVtab.AddFields({mannfield})
+            'initialize velocity grid 
+            If GisUtil.IsLayer(lVelocityGridLayerName) Then
+                lVelocityGridLayerIndex = GisUtil.LayerIndex(lVelocityGridLayerName)
+                GisUtil.RemoveLayer(lVelocityGridLayerIndex)
+            End If
+            lVelocityGridFileName = FilenameNoExt(lDemFileName) & "Velocity.bgd"
 
-            '    testlocate = 0
+            If FileExists(lVelocityGridFileName) Then
+                IO.File.Delete(lVelocityGridFileName)
+            End If
+            IO.File.Copy(lFlowAccGridFileName, lVelocityGridFileName)
 
-            '    For Each lrec In lcovVtab
-            '      lcvalue = (lcovVtab.ReturnValue(lcfield, lrec))
-            '      If (lcvalue = 0) Then
-            '        lcovVtab.setvalue(mannfield, lrec, 0.05)
-            '      Else
-            '        lstlocate = lcvaluelist.findbyvalue(lcvalue)
-            '        If ((lstlocate = -1) And (testlocate = 0)) Then
-            '          MsgBox.info("Anderson Code of " + lcvalue.asstring + " is not supported in the USGS Land Cover Grid" + nl + "Defaulting to Mannings n of 0.05", "Geospatial Stream Flow Model")
-            '          testlocate = 1
-            '          mannvalue = 0.05
-            '        ElseIf ((lstlocate = -1) And (testlocate = 1)) Then
-            '          mannvalue = 0.05
-            '        Else
-            '          mannvalue = lccodelist.get(lstlocate).asnumber
-            '        End If
-            '          lcovVtab.setvalue(mannfield, lrec, Mannvalue)
-            '      End If
-            '    Next
+            'at each grid cell we know the land use code -> mannings value
+            '                              subbasin id   -> slope
+            '                              flow accumulation 
 
-            '    lcovgrid = lcovgthm.getgrid
-            '    manngrid = lcovgrid.lookup(mannfield.getname)
+            'from flow acc, mannings value and slope we can compute velocity
+
+            Dim lVelGrid As New MapWinGIS.Grid
+            lVelGrid.Open(lVelocityGridFileName)
+
+            Dim lLuGrid As New MapWinGIS.Grid
+            Dim lLuFileName As String = GisUtil.LayerFileName(aUsgsLandCoverGname)
+            lLuGrid.Open(lLuFileName)
+
+            Dim lSubbasinGrid As New MapWinGIS.Grid
+            Dim lSubbasinFileName As String = GisUtil.LayerFileName(lBasinGthm)
+            lSubbasinGrid.Open(lSubbasinFileName)
+
+            Dim lStartRow As Integer = 0
+            Dim lStartCol As Integer = 0
+            Dim lEndRow As Integer = lVelGrid.Header.NumberRows - 1
+            Dim lEndCol As Integer = lVelGrid.Header.NumberCols - 1
+            Dim lFlowacc As Single = 0.0
+            Dim lLuCode As Integer = 0
+
+            Dim lX As Double = 0.0
+            Dim lY As Double = 0.0
+            Dim lLuCol As Integer = 0
+            Dim lLuRow As Integer = 0
+            Dim lManningsN As Single = 0.05
+            Dim lSubid As Integer = 0
+            Dim lSlope As Single = 0.0
+            Dim lMsgDisplayed As Boolean = False
+            Dim lVelocity As Single = 0.0
+            For lRow As Integer = lStartRow To lEndRow
+                For lCol As Integer = lStartCol To lEndCol
+                    'flow accumulation value at this point
+                    lFlowacc = lVelGrid.Value(lCol, lRow)
+                    'get mannings n at this point from land use code
+                    lVelGrid.CellToProj(lCol, lRow, lX, lY)
+                    lLuGrid.ProjToCell(lX, lY, lLuCol, lLuRow)
+                    lLuCode = lLuGrid.Value(lLuCol, lLuRow)
+                    If aManningsValues.Keys.Contains(lLuCode) Then
+                        lManningsN = aManningsValues.ItemByKey(lLuCode)
+                    Else
+                        If lMsgDisplayed = False Then
+                            Logger.Msg("Anderson Code of " & lLuCode.ToString & " is not supported in the USGS Land Cover Grid." & vbCrLf & "Defaulting to Mannings n of 0.05", "Geospatial Stream Flow Model")
+                            lMsgDisplayed = True
+                        End If
+                        lManningsN = 0.05
+                    End If
+                    'get slope at this point based on subbasin
+                    lSubid = lSubbasinGrid.Value(lCol, lRow)
+                    If lSlopeBySubbasin.Keys.Contains(lSubid) Then
+                        lSlope = lSlopeBySubbasin.ItemByKey(lSubid)
+                    Else
+                        lSlope = -1.0
+                    End If
+                    'now compute velocity
+                    If lSlope > -1.0 Then
+                        If lFlowacc <= 1000 Then
+                            lVelocity = (0.015874 / lManningsN) * (lSlope ^ 0.5)
+                        ElseIf lFlowacc <= 2000 Then
+                            lVelocity = (0.0736806 / lManningsN) * (lSlope ^ 0.5)
+                        ElseIf lFlowacc <= 3000 Then
+                            lVelocity = (0.0464159 / lManningsN) * (lSlope ^ 0.5)
+                        ElseIf lFlowacc <= 4000 Then
+                            lVelocity = (0.0736806 / lManningsN) * (lSlope ^ 0.5)
+                        ElseIf lFlowacc <= 5000 Then
+                            lVelocity = (0.1357209 / lManningsN) * (lSlope ^ 0.5)
+                        ElseIf lFlowacc <= 10000 Then
+                            lVelocity = 0.3
+                        ElseIf lFlowacc <= 50000 Then
+                            lVelocity = 0.45
+                        ElseIf lFlowacc <= 100000 Then
+                            lVelocity = 0.6
+                        ElseIf lFlowacc <= 250000 Then
+                            lVelocity = 0.75
+                        ElseIf lFlowacc <= 500000 Then
+                            lVelocity = 0.9
+                        ElseIf lFlowacc <= 750000 Then
+                            lVelocity = 1.2
+                        Else
+                            lVelocity = 1.5
+                        End If
+                        lVelGrid.Value(lCol, lRow) = lVelocity
+                    Else
+                        lVelGrid.Value(lCol, lRow) = 0.0
+                    End If
+                Next
+            Next
+
+            lVelGrid.Save()
+            lVelGrid.Close()
+            lSubbasinGrid.Close()
+            lLuGrid.Close()
+
+            lVelGrid = Nothing
+            lSubbasinGrid = Nothing
+            lLuGrid = Nothing
 
             ' from Manning's equation, v = (1/n)(R^(2/3)(S^0.5) = K (S^0.5)
-            ' for Flowacc = 0-1000, R = 0.002,             k = (1/n)(0.002^(2/3)      = 0.0158740/n
-            ' for Flowacc = 1000-2000, R = 0.005,             k = (1/n)(0.005^(2/3)      = 0.0292402/n
-            ' for Flowacc = 2000-3000, R = 0.01,             k = (1/n)(0.01^(2/3)      = 0.0464159/n
-            ' for Flowacc = 3000-4000, R = 0.02,             k = (1/n)(0.02^(2/3)      = 0.0736806/n   
-            ' for Flowacc = 4000-5000, R = 0.05,             k = (1/n)(0.05^(2/3)      = 0.1357209/n
-            ' for Flowacc = 5000-10000,              vel = 0.3
-            ' for Flowacc = 10000-50000,             vel = 0.45
-            ' for Flowacc = 50000-100000,            vel = 0.6
-            ' for Flowacc = 100000-250000,           vel = 0.75
-            ' for Flowacc = 250000-500000,           vel = 0.9
-            ' for Flowacc = 500000-750000,           vel = 1.2
-            ' for Flowacc = > 750000,                vel = 1.5
+            '    for Flowacc = 0-1000, R = 0.002,             k = (1/n)(0.002^(2/3)      = 0.0158740/n
+            '    for Flowacc = 1000-2000, R = 0.005,             k = (1/n)(0.005^(2/3)      = 0.0292402/n
+            '    for Flowacc = 2000-3000, R = 0.01,             k = (1/n)(0.01^(2/3)      = 0.0464159/n
+            '    for Flowacc = 3000-4000, R = 0.02,             k = (1/n)(0.02^(2/3)      = 0.0736806/n   
+            '    for Flowacc = 4000-5000, R = 0.05,             k = (1/n)(0.05^(2/3)      = 0.1357209/n
+            '    for Flowacc = 5000-10000,              vel = 0.3
+            '    for Flowacc = 10000-50000,             vel = 0.45
+            '    for Flowacc = 50000-100000,            vel = 0.6
+            '    for Flowacc = 100000-250000,           vel = 0.75
+            '    for Flowacc = 250000-500000,           vel = 0.9
+            '    for Flowacc = 500000-750000,           vel = 1.2
+            '    for Flowacc = > 750000,                vel = 1.5
 
+            'note:  comments above do not seem consistent with the way this was coded in avenue
             '    velgrid1 = ((0.1357209).AsGrid / manngrid) * (slopegrid ^ 0.5)
             '    velgrid2 = ((0.0736806).AsGrid / manngrid) * (slopegrid ^ 0.5)
             '    velgrid3 = ((0.0464159).AsGrid / manngrid) * (slopegrid ^ 0.5)
@@ -1223,19 +1307,13 @@ Public Module modGeoSFM
             '    velgridraw = (facgrid <= 1000).con(velgrid1, ((facgrid <= 2000).con(velgrid2, ((facgrid <= 3000).con(velgrid3, ((facgrid <= 4000).con(velgrid4, ((facgrid <= 5000).con(velgrid5, ((facgrid <= 10000).con(velgrid6, ((facgrid <= 50000).con(velgrid7, ((facgrid <= 100000).con(velgrid8, ((facgrid <= 250000).con(velgrid9, ((facgrid <= 500000).con(velgrid10, ((facgrid <= 750000).con(velgrid11, velgrid12)))))))))))))))))))))
             '    velgrid = (velgridraw < 0.01).con((0.01).asgrid, (velgridraw > 1.5).con((1.5).asgrid, velgridraw))
 
-            '    If (file.exists((myWkDirname + "velocity").AsFileName)) Then
-            '      grid.DeleteDataset((myWkDirname + "velocity").AsFileName)
-            '    End If
+            GisUtil.AddLayer(lVelocityGridFileName, lVelocityGridLayerName)
 
-            '    velgthm = Gtheme.Make(velgrid)
-
-            '  End If
-
-        ElseIf (veltype = 2) Then
+        ElseIf (aVelType = 2) Then
             'set velocity grid based on a threshold value
             ' velgrid = (facgrid < 1000).con((OverlandFlowVelocity).asgrid, (InstreamFlowVelocity).asgrid)
             ' velgthm = Gtheme.Make(velgrid)
-            Dim lValue As Double = OverlandFlowVelocity
+            Dim lValue As Double = aOverlandFlowVelocity
             If GisUtil.IsLayer(lVelocityGridLayerName) Then
                 lVelocityGridLayerIndex = GisUtil.LayerIndex(lVelocityGridLayerName)
                 GisUtil.RemoveLayer(lVelocityGridLayerIndex)
@@ -1243,12 +1321,12 @@ Public Module modGeoSFM
             lVelocityGridFileName = FilenameNoExt(lDemFileName) & "Velocity.bgd"
             GisUtil.GridAssignConstant(lVelocityGridFileName, lDemFileName, lValue)
             'now for cells >= 1000, use instream flow velocity
-            lValue = InstreamFlowVelocity
+            lValue = aInstreamFlowVelocity
             GisUtil.GridAssignConstantAboveThreshold(lVelocityGridFileName, lFlowAccGridFileName, 999, lValue)
             GisUtil.AddLayer(lVelocityGridFileName, lVelocityGridLayerName)
         Else
             'set velocity grid to a constant
-            Dim lValue As Double = OverlandFlowVelocity
+            Dim lValue As Double = aOverlandFlowVelocity
             If lValue < 0.01 Then lValue = 0.01
             If GisUtil.IsLayer(lVelocityGridLayerName) Then
                 lVelocityGridLayerIndex = GisUtil.LayerIndex(lVelocityGridLayerName)
@@ -1263,7 +1341,7 @@ Public Module modGeoSFM
 
         '        maskgrid = ((outgrid.isnull) / (outgrid.isnull))
         '        newfdrgrid = flowdirgrid * maskgrid
-        Dim lOutletGridFileName As String = GisUtil.LayerFileName(outgthm)
+        Dim lOutletGridFileName As String = GisUtil.LayerFileName(lOutGthm)
 
         '        invelgrid = (1.AsGrid / velgrid)
         Dim lInverseVelocityGridFileName As String = FilenameNoExt(lVelocityGridFileName) & "InverseVelocity.bgd"
@@ -1294,14 +1372,14 @@ Public Module modGeoSFM
 
         '        newdaysgrid = daysgrid * basingrid / basingrid
         '        numdays = newdaysgrid.GetStatistics.Get(1)
-        Dim numdays As Integer = GisUtil.GridLayerMaximum(lDaysGridLayerIndex)
+        Dim lNumdays As Integer = GisUtil.GridLayerMaximum(lDaysGridLayerIndex)
 
         '        this comment is from the avenue script, not sure what to make of it
         '        ' This is a temporary solution that will be removed when
         '        ' the routing program can read a parameter file
 
-        If (numdays > 22) Then
-            numdays = 22
+        If (lNumdays > 22) Then
+            lNumdays = 22
             'else 
             '  numdays = 22
         End If
@@ -1309,36 +1387,36 @@ Public Module modGeoSFM
         'prepare response file
         Dim lRespOut As New StringBuilder
         Dim lStr As String = """" & "BasinId" & """"
-        For nday As Integer = 0 To numdays - 1
-            lStr = lStr & ", " & """" & "Day" & CStr(nday) & """"
+        For lnday As Integer = 0 To lNumdays - 1
+            lStr = lStr & ", " & """" & "Day" & CStr(lnday) & """"
         Next
         lRespOut.AppendLine(lStr)
 
         'figure out how many cells of each 'day' in each zone
         Dim lCnt As Integer = 0
-        Dim lDaysArray(zonelist.Count, numdays) As Integer
-        For nday As Integer = 0 To numdays - 1
-            Dim lDaysZonalStats As atcCollection = GisUtil.GridZoneCountValue(basingthm, lDaysGridLayerIndex, nday)
+        Dim lDaysArray(lZoneList.Count, lNumdays) As Integer
+        For lnday As Integer = 0 To lNumdays - 1
+            Dim lDaysZonalStats As atcCollection = GisUtil.GridZoneCountValue(lBasinGthm, lDaysGridLayerIndex, lnday)
             lCnt = 0
-            For Each lzone As Integer In zonelist
+            For Each lzone As Integer In lZoneList
                 lCnt += 1
                 If Not lDaysZonalStats.ItemByKey(lzone) Is Nothing Then
-                    lDaysArray(lCnt, nday) = lDaysZonalStats.ItemByKey(lzone)
+                    lDaysArray(lCnt, lnday) = lDaysZonalStats.ItemByKey(lzone)
                 End If
             Next
         Next
 
         lCnt = 0
-        For Each bid As Integer In zonelist
+        For Each lBid As Integer In lZoneList
             lCnt += 1
-            lStr = CStr(bid)
+            lStr = CStr(lBid)
             Dim lSum As Integer = 0
-            For nday As Integer = 0 To numdays - 1
-                lSum += lDaysArray(lCnt, nday)
+            For lnday As Integer = 0 To lNumdays - 1
+                lSum += lDaysArray(lCnt, lnday)
             Next
-            For nday As Integer = 0 To numdays - 1
+            For lnday As Integer = 0 To lNumdays - 1
                 If lSum > 0 Then
-                    lStr = lStr & ", " & Format((lDaysArray(lCnt, nday) / lSum), "0.000000")
+                    lStr = lStr & ", " & Format((lDaysArray(lCnt, lnday) / lSum), "0.000000")
                 Else
                     lStr = lStr & ", 0.000000"
                 End If
@@ -1389,12 +1467,12 @@ Public Module modGeoSFM
 
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
         Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
-        Dim OrderFileName As String = lOutputPath & "order.txt"
+        Dim lOrderFileName As String = lOutputPath & "order.txt"
 
         Dim lSubbasins As New atcCollection
         Try
             Dim lCurrentRecord As String
-            Dim lStreamReader As New StreamReader(OrderFileName)
+            Dim lStreamReader As New StreamReader(lOrderFileName)
             lCurrentRecord = lStreamReader.ReadLine  'only if first line is a header
             Do
                 lCurrentRecord = lStreamReader.ReadLine
@@ -1405,7 +1483,7 @@ Public Module modGeoSFM
                 End If
             Loop
         Catch e As ApplicationException
-            Logger.Msg("Cannot determine computational order." & vbCrLf & "Run 'Generate basin file' menu to create order.txt", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+            Logger.Msg("Cannot determine computational order." & vbCrLf & "Run 'Basin Characteristics' to create order.txt", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
             Exit Sub
         End Try
 
@@ -2310,22 +2388,28 @@ Public Module modGeoSFM
         'read/write balance parameters
         Dim lBalParamFN As String = lOutputPath & "balparam.txt"
         Dim lBalList As New Collection
-        Try
-            Dim lCurrentRecord As String
-            Dim lStreamReader As New StreamReader(lBalParamFN)
-            Do
-                lCurrentRecord = lStreamReader.ReadLine
-                If lCurrentRecord Is Nothing Then
-                    Exit Do
-                Else
-                    lBalList.Add(lCurrentRecord)
-                End If
-            Loop
-            lStreamReader.Close()
-        Catch e As ApplicationException
+        If FileExists(lBalParamFN) Then
+            Try
+                Dim lCurrentRecord As String
+                Dim lStreamReader As New StreamReader(lBalParamFN)
+                Do
+                    lCurrentRecord = lStreamReader.ReadLine
+                    If lCurrentRecord Is Nothing Then
+                        Exit Do
+                    Else
+                        lBalList.Add(lCurrentRecord)
+                    End If
+                Loop
+                lStreamReader.Close()
+            Catch e As ApplicationException
+                Logger.Msg("Problem reading parameters from balparam.txt file," & vbCrLf & "Check the contents of this file before continuing.", "Geospatial Stream Flow Model")
+                Exit Sub
+            End Try
+        Else
             Logger.Msg("Problem reading parameters from balparam.txt file," & vbCrLf & "Check the contents of this file before continuing.", "Geospatial Stream Flow Model")
             Exit Sub
-        End Try
+        End If
+
         'write it out in calibration mode
         Dim lParamFile As New StringBuilder
         For lIndex As Integer = 1 To 9
