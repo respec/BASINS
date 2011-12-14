@@ -216,6 +216,7 @@ Public Class frmCustomMsgBox
             Next
         End If
 
+        pLabelClicked = ""
         If TimeoutSeconds = 0 AndAlso Me.Owner IsNot Nothing Then
             Me.ShowDialog(Me.Owner)
         Else
@@ -223,7 +224,6 @@ Public Class frmCustomMsgBox
             Me.BringToFront()
 
             Dim lTimeLimit As Double = Date.Now.AddSeconds(TimeoutSeconds).ToOADate
-            pLabelClicked = ""
             While pLabelClicked.Length = 0
                 Application.DoEvents()
                 System.Threading.Thread.Sleep(100)
