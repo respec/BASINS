@@ -47,31 +47,31 @@ Public Class frmGeoSFM
     Friend WithEvents lblStatus As System.Windows.Forms.Label
     Friend WithEvents tpgRain As System.Windows.Forms.TabPage
     Friend WithEvents tpgBasin As System.Windows.Forms.TabPage
-    Friend WithEvents Label3 As System.Windows.Forms.Label
+    Friend WithEvents lblProcessed As System.Windows.Forms.Label
     Friend WithEvents cboBC2 As System.Windows.Forms.ComboBox
     Friend WithEvents cboBC1 As System.Windows.Forms.ComboBox
-    Friend WithEvents Label7 As System.Windows.Forms.Label
-    Friend WithEvents Label11 As System.Windows.Forms.Label
+    Friend WithEvents lblGrid As System.Windows.Forms.Label
+    Friend WithEvents lblRunoff As System.Windows.Forms.Label
     Friend WithEvents cboBC5 As System.Windows.Forms.ComboBox
-    Friend WithEvents Label10 As System.Windows.Forms.Label
+    Friend WithEvents lblHillLen As System.Windows.Forms.Label
     Friend WithEvents cboBC4 As System.Windows.Forms.ComboBox
-    Friend WithEvents Label8 As System.Windows.Forms.Label
+    Friend WithEvents lblFlowAcc As System.Windows.Forms.Label
     Friend WithEvents cboBC3 As System.Windows.Forms.ComboBox
-    Friend WithEvents Label19 As System.Windows.Forms.Label
+    Friend WithEvents lblMaxImp As System.Windows.Forms.Label
     Friend WithEvents cboBC13 As System.Windows.Forms.ComboBox
-    Friend WithEvents Label18 As System.Windows.Forms.Label
+    Friend WithEvents lblDownBasin As System.Windows.Forms.Label
     Friend WithEvents cboBC12 As System.Windows.Forms.ComboBox
-    Friend WithEvents Label17 As System.Windows.Forms.Label
+    Friend WithEvents lblStreamLink As System.Windows.Forms.Label
     Friend WithEvents cboBC11 As System.Windows.Forms.ComboBox
-    Friend WithEvents Label16 As System.Windows.Forms.Label
+    Friend WithEvents lblDownstream As System.Windows.Forms.Label
     Friend WithEvents cboBC10 As System.Windows.Forms.ComboBox
-    Friend WithEvents Label15 As System.Windows.Forms.Label
+    Friend WithEvents lblHydraulic As System.Windows.Forms.Label
     Friend WithEvents cboBC9 As System.Windows.Forms.ComboBox
-    Friend WithEvents Label14 As System.Windows.Forms.Label
+    Friend WithEvents lblTexture As System.Windows.Forms.Label
     Friend WithEvents cboBC8 As System.Windows.Forms.ComboBox
-    Friend WithEvents Label13 As System.Windows.Forms.Label
+    Friend WithEvents lblSoil As System.Windows.Forms.Label
     Friend WithEvents cboBC7 As System.Windows.Forms.ComboBox
-    Friend WithEvents Label12 As System.Windows.Forms.Label
+    Friend WithEvents lblWater As System.Windows.Forms.Label
     Friend WithEvents cboBC6 As System.Windows.Forms.ComboBox
     Friend WithEvents tpgResponse As System.Windows.Forms.TabPage
     Friend WithEvents lblMethod As System.Windows.Forms.Label
@@ -228,6 +228,8 @@ Public Class frmGeoSFM
     Friend WithEvents gbxHydrographs As System.Windows.Forms.GroupBox
     Friend WithEvents lblRchHydro As System.Windows.Forms.Label
     Friend WithEvents cboRchHydro As System.Windows.Forms.ComboBox
+    Friend WithEvents LabelModel As System.Windows.Forms.Label
+    Friend WithEvents atxModel As atcControls.atcText
     Friend WithEvents tpgMap As System.Windows.Forms.TabPage
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmGeoSFM))
@@ -236,6 +238,8 @@ Public Class frmGeoSFM
         Me.cmdAbout = New System.Windows.Forms.Button
         Me.tabMain = New System.Windows.Forms.TabControl
         Me.tpgTerrain = New System.Windows.Forms.TabPage
+        Me.LabelModel = New System.Windows.Forms.Label
+        Me.atxModel = New atcControls.atcText
         Me.cmdTerrainNext = New System.Windows.Forms.Button
         Me.Label53 = New System.Windows.Forms.Label
         Me.AtcText1 = New atcControls.atcText
@@ -247,31 +251,31 @@ Public Class frmGeoSFM
         Me.cboDEM = New System.Windows.Forms.ComboBox
         Me.tpgBasin = New System.Windows.Forms.TabPage
         Me.cmdBasinNext = New System.Windows.Forms.Button
-        Me.Label19 = New System.Windows.Forms.Label
+        Me.lblMaxImp = New System.Windows.Forms.Label
         Me.cboBC13 = New System.Windows.Forms.ComboBox
-        Me.Label18 = New System.Windows.Forms.Label
+        Me.lblDownBasin = New System.Windows.Forms.Label
         Me.cboBC12 = New System.Windows.Forms.ComboBox
-        Me.Label17 = New System.Windows.Forms.Label
+        Me.lblStreamLink = New System.Windows.Forms.Label
         Me.cboBC11 = New System.Windows.Forms.ComboBox
-        Me.Label16 = New System.Windows.Forms.Label
+        Me.lblDownstream = New System.Windows.Forms.Label
         Me.cboBC10 = New System.Windows.Forms.ComboBox
-        Me.Label15 = New System.Windows.Forms.Label
+        Me.lblHydraulic = New System.Windows.Forms.Label
         Me.cboBC9 = New System.Windows.Forms.ComboBox
-        Me.Label14 = New System.Windows.Forms.Label
+        Me.lblTexture = New System.Windows.Forms.Label
         Me.cboBC8 = New System.Windows.Forms.ComboBox
-        Me.Label13 = New System.Windows.Forms.Label
+        Me.lblSoil = New System.Windows.Forms.Label
         Me.cboBC7 = New System.Windows.Forms.ComboBox
-        Me.Label12 = New System.Windows.Forms.Label
+        Me.lblWater = New System.Windows.Forms.Label
         Me.cboBC6 = New System.Windows.Forms.ComboBox
-        Me.Label11 = New System.Windows.Forms.Label
+        Me.lblRunoff = New System.Windows.Forms.Label
         Me.cboBC5 = New System.Windows.Forms.ComboBox
-        Me.Label10 = New System.Windows.Forms.Label
+        Me.lblHillLen = New System.Windows.Forms.Label
         Me.cboBC4 = New System.Windows.Forms.ComboBox
-        Me.Label8 = New System.Windows.Forms.Label
+        Me.lblFlowAcc = New System.Windows.Forms.Label
         Me.cboBC3 = New System.Windows.Forms.ComboBox
         Me.cboBC1 = New System.Windows.Forms.ComboBox
-        Me.Label7 = New System.Windows.Forms.Label
-        Me.Label3 = New System.Windows.Forms.Label
+        Me.lblGrid = New System.Windows.Forms.Label
+        Me.lblProcessed = New System.Windows.Forms.Label
         Me.cboBC2 = New System.Windows.Forms.ComboBox
         Me.tpgResponse = New System.Windows.Forms.TabPage
         Me.lblFlow = New System.Windows.Forms.Label
@@ -504,6 +508,8 @@ Public Class frmGeoSFM
         '
         'tpgTerrain
         '
+        Me.tpgTerrain.Controls.Add(Me.LabelModel)
+        Me.tpgTerrain.Controls.Add(Me.atxModel)
         Me.tpgTerrain.Controls.Add(Me.cmdTerrainNext)
         Me.tpgTerrain.Controls.Add(Me.Label53)
         Me.tpgTerrain.Controls.Add(Me.AtcText1)
@@ -520,6 +526,38 @@ Public Class frmGeoSFM
         Me.tpgTerrain.Text = "Terrain Analysis"
         Me.tpgTerrain.UseVisualStyleBackColor = True
         '
+        'LabelModel
+        '
+        Me.LabelModel.AutoSize = True
+        Me.LabelModel.Location = New System.Drawing.Point(36, 30)
+        Me.LabelModel.Name = "LabelModel"
+        Me.LabelModel.Size = New System.Drawing.Size(119, 13)
+        Me.LabelModel.TabIndex = 41
+        Me.LabelModel.Text = "GeoSFM Project Name:"
+        '
+        'atxModel
+        '
+        Me.atxModel.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxModel.DataType = atcControls.atcText.ATCoDataType.ATCoTxt
+        Me.atxModel.DefaultValue = "GeoSFM"
+        Me.atxModel.HardMax = -999
+        Me.atxModel.HardMin = -999
+        Me.atxModel.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxModel.Location = New System.Drawing.Point(161, 27)
+        Me.atxModel.MaxWidth = 20
+        Me.atxModel.Name = "atxModel"
+        Me.atxModel.NumericFormat = "0"
+        Me.atxModel.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxModel.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxModel.SelLength = 0
+        Me.atxModel.SelStart = 0
+        Me.atxModel.Size = New System.Drawing.Size(121, 21)
+        Me.atxModel.SoftMax = -999
+        Me.atxModel.SoftMin = -999
+        Me.atxModel.TabIndex = 40
+        Me.atxModel.ValueDouble = 0
+        Me.atxModel.ValueInteger = 0
+        '
         'cmdTerrainNext
         '
         Me.cmdTerrainNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
@@ -534,7 +572,7 @@ Public Class frmGeoSFM
         'Label53
         '
         Me.Label53.AutoSize = True
-        Me.Label53.Location = New System.Drawing.Point(33, 135)
+        Me.Label53.Location = New System.Drawing.Point(36, 178)
         Me.Label53.Name = "Label53"
         Me.Label53.Size = New System.Drawing.Size(149, 13)
         Me.Label53.TabIndex = 38
@@ -548,7 +586,7 @@ Public Class frmGeoSFM
         Me.AtcText1.HardMax = 9999
         Me.AtcText1.HardMin = 0
         Me.AtcText1.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText1.Location = New System.Drawing.Point(189, 132)
+        Me.AtcText1.Location = New System.Drawing.Point(192, 175)
         Me.AtcText1.MaxWidth = 20
         Me.AtcText1.Name = "AtcText1"
         Me.AtcText1.NumericFormat = "0"
@@ -569,7 +607,7 @@ Public Class frmGeoSFM
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboReach.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboReach.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboReach.Location = New System.Drawing.Point(121, 54)
+        Me.cboReach.Location = New System.Drawing.Point(124, 97)
         Me.cboReach.Name = "cboReach"
         Me.cboReach.Size = New System.Drawing.Size(403, 21)
         Me.cboReach.TabIndex = 31
@@ -578,7 +616,7 @@ Public Class frmGeoSFM
         '
         Me.Label52.AutoSize = True
         Me.Label52.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label52.Location = New System.Drawing.Point(33, 57)
+        Me.Label52.Location = New System.Drawing.Point(36, 100)
         Me.Label52.Name = "Label52"
         Me.Label52.Size = New System.Drawing.Size(82, 13)
         Me.Label52.TabIndex = 30
@@ -591,7 +629,7 @@ Public Class frmGeoSFM
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboSubbasin.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboSubbasin.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboSubbasin.Location = New System.Drawing.Point(121, 27)
+        Me.cboSubbasin.Location = New System.Drawing.Point(124, 70)
         Me.cboSubbasin.Name = "cboSubbasin"
         Me.cboSubbasin.Size = New System.Drawing.Size(403, 21)
         Me.cboSubbasin.TabIndex = 29
@@ -600,7 +638,7 @@ Public Class frmGeoSFM
         '
         Me.Label50.AutoSize = True
         Me.Label50.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label50.Location = New System.Drawing.Point(33, 30)
+        Me.Label50.Location = New System.Drawing.Point(36, 73)
         Me.Label50.Name = "Label50"
         Me.Label50.Size = New System.Drawing.Size(83, 13)
         Me.Label50.TabIndex = 28
@@ -611,7 +649,7 @@ Public Class frmGeoSFM
         '
         Me.Label51.AutoSize = True
         Me.Label51.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label51.Location = New System.Drawing.Point(33, 84)
+        Me.Label51.Location = New System.Drawing.Point(36, 127)
         Me.Label51.Name = "Label51"
         Me.Label51.Size = New System.Drawing.Size(56, 13)
         Me.Label51.TabIndex = 26
@@ -624,7 +662,7 @@ Public Class frmGeoSFM
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboDEM.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboDEM.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboDEM.Location = New System.Drawing.Point(121, 81)
+        Me.cboDEM.Location = New System.Drawing.Point(124, 124)
         Me.cboDEM.Name = "cboDEM"
         Me.cboDEM.Size = New System.Drawing.Size(403, 21)
         Me.cboDEM.TabIndex = 27
@@ -632,31 +670,31 @@ Public Class frmGeoSFM
         'tpgBasin
         '
         Me.tpgBasin.Controls.Add(Me.cmdBasinNext)
-        Me.tpgBasin.Controls.Add(Me.Label19)
+        Me.tpgBasin.Controls.Add(Me.lblMaxImp)
         Me.tpgBasin.Controls.Add(Me.cboBC13)
-        Me.tpgBasin.Controls.Add(Me.Label18)
+        Me.tpgBasin.Controls.Add(Me.lblDownBasin)
         Me.tpgBasin.Controls.Add(Me.cboBC12)
-        Me.tpgBasin.Controls.Add(Me.Label17)
+        Me.tpgBasin.Controls.Add(Me.lblStreamLink)
         Me.tpgBasin.Controls.Add(Me.cboBC11)
-        Me.tpgBasin.Controls.Add(Me.Label16)
+        Me.tpgBasin.Controls.Add(Me.lblDownstream)
         Me.tpgBasin.Controls.Add(Me.cboBC10)
-        Me.tpgBasin.Controls.Add(Me.Label15)
+        Me.tpgBasin.Controls.Add(Me.lblHydraulic)
         Me.tpgBasin.Controls.Add(Me.cboBC9)
-        Me.tpgBasin.Controls.Add(Me.Label14)
+        Me.tpgBasin.Controls.Add(Me.lblTexture)
         Me.tpgBasin.Controls.Add(Me.cboBC8)
-        Me.tpgBasin.Controls.Add(Me.Label13)
+        Me.tpgBasin.Controls.Add(Me.lblSoil)
         Me.tpgBasin.Controls.Add(Me.cboBC7)
-        Me.tpgBasin.Controls.Add(Me.Label12)
+        Me.tpgBasin.Controls.Add(Me.lblWater)
         Me.tpgBasin.Controls.Add(Me.cboBC6)
-        Me.tpgBasin.Controls.Add(Me.Label11)
+        Me.tpgBasin.Controls.Add(Me.lblRunoff)
         Me.tpgBasin.Controls.Add(Me.cboBC5)
-        Me.tpgBasin.Controls.Add(Me.Label10)
+        Me.tpgBasin.Controls.Add(Me.lblHillLen)
         Me.tpgBasin.Controls.Add(Me.cboBC4)
-        Me.tpgBasin.Controls.Add(Me.Label8)
+        Me.tpgBasin.Controls.Add(Me.lblFlowAcc)
         Me.tpgBasin.Controls.Add(Me.cboBC3)
         Me.tpgBasin.Controls.Add(Me.cboBC1)
-        Me.tpgBasin.Controls.Add(Me.Label7)
-        Me.tpgBasin.Controls.Add(Me.Label3)
+        Me.tpgBasin.Controls.Add(Me.lblGrid)
+        Me.tpgBasin.Controls.Add(Me.lblProcessed)
         Me.tpgBasin.Controls.Add(Me.cboBC2)
         Me.tpgBasin.Location = New System.Drawing.Point(4, 46)
         Me.tpgBasin.Name = "tpgBasin"
@@ -676,16 +714,16 @@ Public Class frmGeoSFM
         Me.cmdBasinNext.TabIndex = 48
         Me.cmdBasinNext.Text = "Next >"
         '
-        'Label19
+        'lblMaxImp
         '
-        Me.Label19.AutoSize = True
-        Me.Label19.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label19.Location = New System.Drawing.Point(27, 362)
-        Me.Label19.Name = "Label19"
-        Me.Label19.Size = New System.Drawing.Size(137, 13)
-        Me.Label19.TabIndex = 46
-        Me.Label19.Text = "Max Impervious Cover Grid:"
-        Me.Label19.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblMaxImp.AutoSize = True
+        Me.lblMaxImp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblMaxImp.Location = New System.Drawing.Point(27, 362)
+        Me.lblMaxImp.Name = "lblMaxImp"
+        Me.lblMaxImp.Size = New System.Drawing.Size(137, 13)
+        Me.lblMaxImp.TabIndex = 46
+        Me.lblMaxImp.Text = "Max Impervious Cover Grid:"
+        Me.lblMaxImp.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'cboBC13
         '
@@ -698,16 +736,16 @@ Public Class frmGeoSFM
         Me.cboBC13.Size = New System.Drawing.Size(351, 21)
         Me.cboBC13.TabIndex = 47
         '
-        'Label18
+        'lblDownBasin
         '
-        Me.Label18.AutoSize = True
-        Me.Label18.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label18.Location = New System.Drawing.Point(27, 335)
-        Me.Label18.Name = "Label18"
-        Me.Label18.Size = New System.Drawing.Size(134, 13)
-        Me.Label18.TabIndex = 44
-        Me.Label18.Text = "Downstream Basin ID Grid:"
-        Me.Label18.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblDownBasin.AutoSize = True
+        Me.lblDownBasin.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblDownBasin.Location = New System.Drawing.Point(27, 335)
+        Me.lblDownBasin.Name = "lblDownBasin"
+        Me.lblDownBasin.Size = New System.Drawing.Size(134, 13)
+        Me.lblDownBasin.TabIndex = 44
+        Me.lblDownBasin.Text = "Downstream Basin ID Grid:"
+        Me.lblDownBasin.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'cboBC12
         '
@@ -720,16 +758,16 @@ Public Class frmGeoSFM
         Me.cboBC12.Size = New System.Drawing.Size(351, 21)
         Me.cboBC12.TabIndex = 45
         '
-        'Label17
+        'lblStreamLink
         '
-        Me.Label17.AutoSize = True
-        Me.Label17.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label17.Location = New System.Drawing.Point(27, 309)
-        Me.Label17.Name = "Label17"
-        Me.Label17.Size = New System.Drawing.Size(88, 13)
-        Me.Label17.TabIndex = 42
-        Me.Label17.Text = "Stream Link Grid:"
-        Me.Label17.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblStreamLink.AutoSize = True
+        Me.lblStreamLink.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblStreamLink.Location = New System.Drawing.Point(27, 309)
+        Me.lblStreamLink.Name = "lblStreamLink"
+        Me.lblStreamLink.Size = New System.Drawing.Size(88, 13)
+        Me.lblStreamLink.TabIndex = 42
+        Me.lblStreamLink.Text = "Stream Link Grid:"
+        Me.lblStreamLink.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'cboBC11
         '
@@ -742,16 +780,16 @@ Public Class frmGeoSFM
         Me.cboBC11.Size = New System.Drawing.Size(351, 21)
         Me.cboBC11.TabIndex = 43
         '
-        'Label16
+        'lblDownstream
         '
-        Me.Label16.AutoSize = True
-        Me.Label16.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label16.Location = New System.Drawing.Point(27, 282)
-        Me.Label16.Name = "Label16"
-        Me.Label16.Size = New System.Drawing.Size(152, 13)
-        Me.Label16.TabIndex = 40
-        Me.Label16.Text = "Downstream Flow Length Grid:"
-        Me.Label16.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblDownstream.AutoSize = True
+        Me.lblDownstream.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblDownstream.Location = New System.Drawing.Point(27, 282)
+        Me.lblDownstream.Name = "lblDownstream"
+        Me.lblDownstream.Size = New System.Drawing.Size(152, 13)
+        Me.lblDownstream.TabIndex = 40
+        Me.lblDownstream.Text = "Downstream Flow Length Grid:"
+        Me.lblDownstream.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'cboBC10
         '
@@ -764,16 +802,16 @@ Public Class frmGeoSFM
         Me.cboBC10.Size = New System.Drawing.Size(351, 21)
         Me.cboBC10.TabIndex = 41
         '
-        'Label15
+        'lblHydraulic
         '
-        Me.Label15.AutoSize = True
-        Me.Label15.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label15.Location = New System.Drawing.Point(27, 255)
-        Me.Label15.Name = "Label15"
-        Me.Label15.Size = New System.Drawing.Size(137, 13)
-        Me.Label15.TabIndex = 38
-        Me.Label15.Text = "Hydraulic Conductivity Grid:"
-        Me.Label15.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblHydraulic.AutoSize = True
+        Me.lblHydraulic.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblHydraulic.Location = New System.Drawing.Point(27, 255)
+        Me.lblHydraulic.Name = "lblHydraulic"
+        Me.lblHydraulic.Size = New System.Drawing.Size(137, 13)
+        Me.lblHydraulic.TabIndex = 38
+        Me.lblHydraulic.Text = "Hydraulic Conductivity Grid:"
+        Me.lblHydraulic.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'cboBC9
         '
@@ -786,16 +824,16 @@ Public Class frmGeoSFM
         Me.cboBC9.Size = New System.Drawing.Size(351, 21)
         Me.cboBC9.TabIndex = 39
         '
-        'Label14
+        'lblTexture
         '
-        Me.Label14.AutoSize = True
-        Me.Label14.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label14.Location = New System.Drawing.Point(27, 228)
-        Me.Label14.Name = "Label14"
-        Me.Label14.Size = New System.Drawing.Size(88, 13)
-        Me.Label14.TabIndex = 36
-        Me.Label14.Text = "Soil Texture Grid:"
-        Me.Label14.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblTexture.AutoSize = True
+        Me.lblTexture.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblTexture.Location = New System.Drawing.Point(27, 228)
+        Me.lblTexture.Name = "lblTexture"
+        Me.lblTexture.Size = New System.Drawing.Size(88, 13)
+        Me.lblTexture.TabIndex = 36
+        Me.lblTexture.Text = "Soil Texture Grid:"
+        Me.lblTexture.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'cboBC8
         '
@@ -808,16 +846,16 @@ Public Class frmGeoSFM
         Me.cboBC8.Size = New System.Drawing.Size(351, 21)
         Me.cboBC8.TabIndex = 37
         '
-        'Label13
+        'lblSoil
         '
-        Me.Label13.AutoSize = True
-        Me.Label13.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label13.Location = New System.Drawing.Point(27, 201)
-        Me.Label13.Name = "Label13"
-        Me.Label13.Size = New System.Drawing.Size(81, 13)
-        Me.Label13.TabIndex = 34
-        Me.Label13.Text = "Soil Depth Grid:"
-        Me.Label13.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblSoil.AutoSize = True
+        Me.lblSoil.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblSoil.Location = New System.Drawing.Point(27, 201)
+        Me.lblSoil.Name = "lblSoil"
+        Me.lblSoil.Size = New System.Drawing.Size(81, 13)
+        Me.lblSoil.TabIndex = 34
+        Me.lblSoil.Text = "Soil Depth Grid:"
+        Me.lblSoil.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'cboBC7
         '
@@ -830,16 +868,16 @@ Public Class frmGeoSFM
         Me.cboBC7.Size = New System.Drawing.Size(351, 21)
         Me.cboBC7.TabIndex = 35
         '
-        'Label12
+        'lblWater
         '
-        Me.Label12.AutoSize = True
-        Me.Label12.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label12.Location = New System.Drawing.Point(27, 174)
-        Me.Label12.Name = "Label12"
-        Me.Label12.Size = New System.Drawing.Size(144, 13)
-        Me.Label12.TabIndex = 32
-        Me.Label12.Text = "Water Holding Capacity Grid:"
-        Me.Label12.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblWater.AutoSize = True
+        Me.lblWater.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblWater.Location = New System.Drawing.Point(27, 174)
+        Me.lblWater.Name = "lblWater"
+        Me.lblWater.Size = New System.Drawing.Size(144, 13)
+        Me.lblWater.TabIndex = 32
+        Me.lblWater.Text = "Water Holding Capacity Grid:"
+        Me.lblWater.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'cboBC6
         '
@@ -852,16 +890,16 @@ Public Class frmGeoSFM
         Me.cboBC6.Size = New System.Drawing.Size(351, 21)
         Me.cboBC6.TabIndex = 33
         '
-        'Label11
+        'lblRunoff
         '
-        Me.Label11.AutoSize = True
-        Me.Label11.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label11.Location = New System.Drawing.Point(27, 147)
-        Me.Label11.Name = "Label11"
-        Me.Label11.Size = New System.Drawing.Size(135, 13)
-        Me.Label11.TabIndex = 30
-        Me.Label11.Text = "Runoff Curve Number Grid:"
-        Me.Label11.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblRunoff.AutoSize = True
+        Me.lblRunoff.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblRunoff.Location = New System.Drawing.Point(27, 147)
+        Me.lblRunoff.Name = "lblRunoff"
+        Me.lblRunoff.Size = New System.Drawing.Size(135, 13)
+        Me.lblRunoff.TabIndex = 30
+        Me.lblRunoff.Text = "Runoff Curve Number Grid:"
+        Me.lblRunoff.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'cboBC5
         '
@@ -874,16 +912,16 @@ Public Class frmGeoSFM
         Me.cboBC5.Size = New System.Drawing.Size(351, 21)
         Me.cboBC5.TabIndex = 31
         '
-        'Label10
+        'lblHillLen
         '
-        Me.Label10.AutoSize = True
-        Me.Label10.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label10.Location = New System.Drawing.Point(27, 120)
-        Me.Label10.Name = "Label10"
-        Me.Label10.Size = New System.Drawing.Size(82, 13)
-        Me.Label10.TabIndex = 28
-        Me.Label10.Text = "Hill Length Grid:"
-        Me.Label10.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblHillLen.AutoSize = True
+        Me.lblHillLen.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblHillLen.Location = New System.Drawing.Point(27, 120)
+        Me.lblHillLen.Name = "lblHillLen"
+        Me.lblHillLen.Size = New System.Drawing.Size(82, 13)
+        Me.lblHillLen.TabIndex = 28
+        Me.lblHillLen.Text = "Hill Length Grid:"
+        Me.lblHillLen.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'cboBC4
         '
@@ -896,16 +934,16 @@ Public Class frmGeoSFM
         Me.cboBC4.Size = New System.Drawing.Size(351, 21)
         Me.cboBC4.TabIndex = 29
         '
-        'Label8
+        'lblFlowAcc
         '
-        Me.Label8.AutoSize = True
-        Me.Label8.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label8.Location = New System.Drawing.Point(27, 92)
-        Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(121, 13)
-        Me.Label8.TabIndex = 26
-        Me.Label8.Text = "Flow Accumulation Grid:"
-        Me.Label8.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblFlowAcc.AutoSize = True
+        Me.lblFlowAcc.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblFlowAcc.Location = New System.Drawing.Point(27, 92)
+        Me.lblFlowAcc.Name = "lblFlowAcc"
+        Me.lblFlowAcc.Size = New System.Drawing.Size(121, 13)
+        Me.lblFlowAcc.TabIndex = 26
+        Me.lblFlowAcc.Text = "Flow Accumulation Grid:"
+        Me.lblFlowAcc.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'cboBC3
         '
@@ -929,27 +967,27 @@ Public Class frmGeoSFM
         Me.cboBC1.Size = New System.Drawing.Size(351, 21)
         Me.cboBC1.TabIndex = 25
         '
-        'Label7
+        'lblGrid
         '
-        Me.Label7.AutoSize = True
-        Me.Label7.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label7.Location = New System.Drawing.Point(27, 38)
-        Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(58, 13)
-        Me.Label7.TabIndex = 24
-        Me.Label7.Text = "Basin Grid:"
-        Me.Label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblGrid.AutoSize = True
+        Me.lblGrid.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblGrid.Location = New System.Drawing.Point(27, 38)
+        Me.lblGrid.Name = "lblGrid"
+        Me.lblGrid.Size = New System.Drawing.Size(58, 13)
+        Me.lblGrid.TabIndex = 24
+        Me.lblGrid.Text = "Basin Grid:"
+        Me.lblGrid.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
-        'Label3
+        'lblProcessed
         '
-        Me.Label3.AutoSize = True
-        Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label3.Location = New System.Drawing.Point(27, 65)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(87, 13)
-        Me.Label3.TabIndex = 20
-        Me.Label3.Text = "Processed DEM:"
-        Me.Label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblProcessed.AutoSize = True
+        Me.lblProcessed.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblProcessed.Location = New System.Drawing.Point(27, 65)
+        Me.lblProcessed.Name = "lblProcessed"
+        Me.lblProcessed.Size = New System.Drawing.Size(87, 13)
+        Me.lblProcessed.TabIndex = 20
+        Me.lblProcessed.Text = "Processed DEM:"
+        Me.lblProcessed.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'cboBC2
         '
@@ -2869,7 +2907,7 @@ Public Class frmGeoSFM
         ShowHelp("BASINS Details\Watershed and Instream Model Setup\GeoSFM.html")
     End Sub
 
-    Private Sub frmWASPSetup_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    Private Sub frmGeoSFM_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
         If e.KeyValue = Windows.Forms.Keys.F1 Then
             ShowHelp("BASINS Details\Watershed and Instream Model Setup\GeoSFM.html")
         End If
@@ -2882,6 +2920,9 @@ Public Class frmGeoSFM
     End Sub
 
     Public Sub InitializeUI(ByVal aPlugIn As PlugIn)
+        If Not GisUtil.ProjectFileName Is Nothing Then
+            atxModel.Text = IO.Path.GetFileNameWithoutExtension(GisUtil.ProjectFileName)
+        End If
 
         'set choices for dem layer
         For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
@@ -3122,6 +3163,8 @@ Public Class frmGeoSFM
     End Sub
 
     Private Sub cmdTerrainNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdTerrainNext.Click
+        SetOutputPath(atxModel.Text)
+
         If cboDEM.SelectedIndex = -1 Then
             Logger.Msg("No DEM has been selected." & vbCrLf & "Select a DEM to proceed.", "Geospatial Stream Flow Model")
             Exit Sub
@@ -3136,9 +3179,10 @@ Public Class frmGeoSFM
         Me.Refresh()
 
         'call what was the avenue script 'terrain'
-        Terrain(lDEMLayerName, lSubbasinLayerName, lStreamLayerName, lThresh)
+        If Terrain(lDEMLayerName, lSubbasinLayerName, lStreamLayerName, lThresh) Then
+            tabMain.SelectedIndex = 1
+        End If
 
-        tabMain.SelectedIndex = 1
         lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
         Me.Refresh()
@@ -3225,10 +3269,10 @@ Public Class frmGeoSFM
                 If lLayerName = "Water Holding Capacity" Or lLayerName = "whc" Then
                     cboBC6.SelectedIndex = cboBC6.Items.Count - 1
                 End If
-                If lLayerName = "Soil Depth Grid" Or lLayerName = "soildepth" Then
+                If lLayerName = "Soil Depth Grid" Or lLayerName.Contains("soildepth") Then
                     cboBC7.SelectedIndex = cboBC7.Items.Count - 1
                 End If
-                If lLayerName = "Soil Texture Grid" Or lLayerName = "texture" Then
+                If lLayerName = "Soil Texture Grid" Or lLayerName.Contains("texture") Then
                     cboBC8.SelectedIndex = cboBC8.Items.Count - 1
                 End If
                 If lLayerName = "Hydraulic Conductivity Grid" Or lLayerName = "ks" Then
@@ -3255,6 +3299,7 @@ Public Class frmGeoSFM
     End Sub
 
     Private Sub cmdBasinNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdBasinNext.Click
+        SetOutputPath(atxModel.Text)
 
         Dim lZonegname As String = cboBC1.Items(cboBC1.SelectedIndex)
         Dim lDemgname As String = cboBC2.Items(cboBC2.SelectedIndex)
@@ -3276,11 +3321,12 @@ Public Class frmGeoSFM
         Me.Refresh()
 
         'call what was the avenue script 'basin'
-        Basin(lZonegname, lDemgname, lFacgname, lHlengname, lRcngname, lWhcgname, _
+        If Basin(lZonegname, lDemgname, lFacgname, lHlengname, lRcngname, lWhcgname, _
               lDepthgname, lTexturegname, lDraingname, lFlowlengname, _
-              lRivlinkgname, lDowngname, lMaxcovergname)
+              lRivlinkgname, lDowngname, lMaxcovergname) Then
+            tabMain.SelectedIndex = 2
+        End If
 
-        tabMain.SelectedIndex = 2
         lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
         Me.Refresh()
@@ -3323,6 +3369,8 @@ Public Class frmGeoSFM
     End Sub
 
     Private Sub cmdResponseNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdResponseNext.Click
+        SetOutputPath(atxModel.Text)
+
         Dim lVelMethod As Integer = 0
         If rbnNonUniformUSGS.Checked Then
             lVelMethod = 1
@@ -3357,16 +3405,16 @@ Public Class frmGeoSFM
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         Me.Refresh()
 
-        Response(lVelMethod, lZonegname, lFlowlengname, lOutletGridName, lDemgname, lFacgname, lFlowDirGridName, _
-                 lUSGSLandcoverGridName, lOverlandFlowVelocity, lInstreamFlowVelocity, lManningsFactors)
+        If Response(lVelMethod, lZonegname, lFlowlengname, lOutletGridName, lDemgname, lFacgname, lFlowDirGridName, _
+                 lUSGSLandcoverGridName, lOverlandFlowVelocity, lInstreamFlowVelocity, lManningsFactors) Then
+            tabMain.SelectedIndex = 3
+            SetPrecipStationGrid()
+        End If
 
-        tabMain.SelectedIndex = 3
         lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
         Me.Refresh()
         EnableControls(True)
-
-        SetPrecipStationGrid()
     End Sub
 
     Private Sub SetPrecipStationGrid()
@@ -3375,9 +3423,7 @@ Public Class frmGeoSFM
         Else
 
             'read order file to get subbasin id list
-            Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-            Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
-            Dim OrderFileName As String = lOutputPath & "order.txt"
+            Dim OrderFileName As String = pOutputPath & "order.txt"
 
             Dim lSubbasins As New atcCollection
 
@@ -3439,7 +3485,9 @@ Public Class frmGeoSFM
             AtcGridPrec.SizeAllColumnsToContents()
             AtcGridPrec.Refresh()
             Logger.Dbg("PrecipStationGrid refreshed")
-            SetDates()
+            If pPrecStations.Count > 0 Then
+                SetDates()
+            End If
         End If
     End Sub
 
@@ -3515,6 +3563,8 @@ Public Class frmGeoSFM
     End Sub
 
     Private Sub cmdRainEvapNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdRainEvapNext.Click
+        SetOutputPath(atxModel.Text)
+
         Dim lPrecGageNamesBySubbasin As New Collection
         Dim lEvapGageNamesBySubbasin As New Collection
         Dim lSelectedStation As StationDetails
@@ -3587,9 +3637,10 @@ Public Class frmGeoSFM
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         Me.Refresh()
 
-        RainEvap(lPrecGageNamesBySubbasin, lEvapGageNamesBySubbasin, lSJDate, lEJDate)
+        If RainEvap(lPrecGageNamesBySubbasin, lEvapGageNamesBySubbasin, lSJDate, lEJDate) Then
+            tabMain.SelectedIndex = 4
+        End If
 
-        tabMain.SelectedIndex = 4
         lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
         Me.Refresh()
@@ -3597,6 +3648,8 @@ Public Class frmGeoSFM
     End Sub
 
     Private Sub cmdBalanceNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdBalanceNext.Click
+        SetOutputPath(atxModel.Text)
+
         Dim lIniFract As Single = atxInitial.Text
         Dim lDformat As Integer = 0
         If rbnDaily.Checked Then
@@ -3626,9 +3679,10 @@ Public Class frmGeoSFM
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         Me.Refresh()
 
-        Balance(lIniFract, lDformat, lInimode, lRunmode, lBalType, lSJDate)
+        If Balance(lIniFract, lDformat, lInimode, lRunmode, lBalType, lSJDate) Then
+            tabMain.SelectedIndex = 5
+        End If
 
-        tabMain.SelectedIndex = 5
         lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
         Me.Refresh()
@@ -3636,6 +3690,8 @@ Public Class frmGeoSFM
     End Sub
 
     Private Sub cmdRouteNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdRouteNext.Click
+        SetOutputPath(atxModel.Text)
+
         Dim lForecast As Integer = atxForecast.Text
         Dim lRunmode As Integer = 0
         If rbnCal.Checked Then
@@ -3664,9 +3720,10 @@ Public Class frmGeoSFM
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         Me.Refresh()
 
-        Route(lForecast, lRunmode, lDformat, lRouteMethod, lSJDate)
+        If Route(lForecast, lRunmode, lDformat, lRouteMethod, lSJDate) Then
+            tabMain.SelectedIndex = 6
+        End If
 
-        tabMain.SelectedIndex = 6
         lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
         Me.Refresh()
@@ -3674,6 +3731,8 @@ Public Class frmGeoSFM
     End Sub
 
     Private Sub cmdSensitivityNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSensitivityNext.Click
+        SetOutputPath(atxModel.Text)
+
         Dim lBalType As Integer = 1
         If rbnNonlinear.Checked Then
             lBalType = 2
@@ -3698,9 +3757,10 @@ Public Class frmGeoSFM
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         Me.Refresh()
 
-        Sensitivity(cboReachSensitivity.SelectedIndex, lBalType, lRouteMethod, lParameterRanges)
+        If Sensitivity(cboReachSensitivity.SelectedIndex, lBalType, lRouteMethod, lParameterRanges) Then
+            tabMain.SelectedIndex = 7
+        End If
 
-        tabMain.SelectedIndex = 7
         lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
         Me.Refresh()
@@ -3708,6 +3768,8 @@ Public Class frmGeoSFM
     End Sub
 
     Private Sub cmdCalibrationNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCalibrationNext.Click
+        SetOutputPath(atxModel.Text)
+
         'do a lot of checking here to make sure entries are valid
         If AtcConnectFlows.lstConnections.Items.Count = 0 Then
             Logger.Msg("No calibration timeseries / location connections have been specified.", vbOKOnly, "BASINS GeoSFM Problem")
@@ -3812,16 +3874,21 @@ Public Class frmGeoSFM
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         Me.Refresh()
 
-        Calibrate(lFlowGageNames, lCalibParms, lstMax.SelectedItems(0), lObjFunction, lSJDate, lEJDate)
+        If Calibrate(lFlowGageNames, lCalibParms, lstMax.SelectedItems(0), lObjFunction, lSJDate, lEJDate) Then
+            tabMain.SelectedIndex = 8
+            lblStatus.Text = "Update specifications if desired, then click one of the 'Generate' buttons to view output."
+        Else
+            lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+        End If
 
-        tabMain.SelectedIndex = 8
-        lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
         Me.Refresh()
         EnableControls(True)
     End Sub
 
     Private Sub cmdBankfullNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdBankfullNext.Click
+        SetOutputPath(atxModel.Text)
+
         EnableControls(False)
         lblStatus.Text = "Computing Monthly and Annual Fluxes......."
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
@@ -3829,14 +3896,15 @@ Public Class frmGeoSFM
 
         BankFull()
 
-        tabMain.SelectedIndex = 9
-        lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+        lblStatus.Text = "Update specifications if desired, then click one of the 'Generate' buttons to view output."
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
         Me.Refresh()
         EnableControls(True)
     End Sub
 
     Private Sub cmdMapGenerate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdMapGenerate.Click
+        SetOutputPath(atxModel.Text)
+
         Dim lStreamFlow As Boolean = True
         If rbnSoil.Checked Then
             lStreamFlow = False
@@ -3856,7 +3924,7 @@ Public Class frmGeoSFM
 
         PlotMap(lStreamFlow, lMapJDate)
 
-        lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+        lblStatus.Text = "Update specifications if desired, then click one of the 'Generate' buttons to view output."
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
         Me.Refresh()
         EnableControls(True)
@@ -3911,6 +3979,10 @@ Public Class frmGeoSFM
     End Sub
 
     Private Sub tabMain_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles tabMain.SelectedIndexChanged
+        SetOutputPath(atxModel.Text)
+        lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+        Me.Refresh()
         Dim lAppEx As ApplicationException
         If tabMain.SelectedIndex = 3 Then
             If pStationsRead = False Then
@@ -3932,11 +4004,12 @@ Public Class frmGeoSFM
         End If
         If tabMain.SelectedIndex = 6 Or tabMain.SelectedIndex = 7 Then
             'read reaches for sensitivity analysis or calibration 
+            lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+            Me.Refresh()
             cboReachSensitivity.Items.Clear()
             AtcConnectFlows.lstTarget.Items.Clear()
-            Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-            Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
-            Dim orderfilename As String = lOutputPath & "order.txt"
+            Dim orderfilename As String = pOutputPath & "order.txt"
             If FileExists(orderfilename) Then
                 Dim lCurrentRecord As String
                 Dim lStreamReader As New StreamReader(orderfilename)
@@ -4021,16 +4094,17 @@ Public Class frmGeoSFM
                 lstCalib.Items.Add("Celerity")
                 lstCalib.Items.Add("Diffusion")
             End If
+            lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
+            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+            Me.Refresh()
         ElseIf tabMain.SelectedIndex = 8 Then
-            'plot map tab
+            'output tab
             atxMapYear.Text = atxSYear.Text
             AtxMapMonth.Text = atxSMonth.Text
             AtxMapDay.Text = atxSDay.Text
             'read reaches for hydrograph plot 
             cboRchHydro.Items.Clear()
-            Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-            Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
-            Dim lFlowFileName As String = lOutputPath & "streamflow.txt"
+            Dim lFlowFileName As String = pOutputPath & "streamflow.txt"
             If FileExists(lFlowFileName) Then
                 Try
                     Dim lCurrentRecord As String
@@ -4058,6 +4132,9 @@ Public Class frmGeoSFM
                 Exit Sub
             End If
             cboRchHydro.SelectedIndex = 0
+            lblStatus.Text = "Update specifications if desired, then click one of the 'Generate' buttons to view output."
+            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+            Me.Refresh()
         End If
     End Sub
 
@@ -4103,9 +4180,9 @@ Public Class frmGeoSFM
     End Sub
 
     Private Sub cmdReadStreamflow_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdReadStreamflow.Click
-        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-        Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
-        Dim lFlowFN As String = lOutputPath & "streamflow.txt"
+        SetOutputPath(atxModel.Text)
+
+        Dim lFlowFN As String = pOutputPath & "streamflow.txt"
         SetFlowTimeseries(lFlowFN)
 
         Dim lGroup As New atcTimeseriesGroup
