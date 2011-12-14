@@ -18,7 +18,9 @@ Public Module modGeoSFM
     Declare Sub cungeroute Lib "geosfm.dll" (ByVal aFileName As String)
     'Declare Sub aggregateflow Lib "geosfmstats.dll" ()
 
-    Friend Sub Terrain(ByVal aDEMLayerName As String, ByVal aSubbasinLayerName As String, ByVal aStreamLayerName As String, ByVal aThresh As Integer)
+    Friend pOutputPath As String
+
+    Friend Function Terrain(ByVal aDEMLayerName As String, ByVal aSubbasinLayerName As String, ByVal aStreamLayerName As String, ByVal aThresh As Integer) As Boolean
 
         ' ***********************************************************************************************
         ' ***********************************************************************************************
@@ -262,11 +264,13 @@ Public Module modGeoSFM
             GisUtil.GridDownstreamSubbasins(lOutletGridFileName, lFlowDirGridFileName, lSubbasinGridFileName, lDownstreamGridFileName)
             GisUtil.AddLayer(lDownstreamGridFileName, lDownstreamGridLayerName)
         End If
-    End Sub
 
-    Friend Sub Basin(ByVal aZoneGname As String, ByVal aDemGname As String, ByVal aFacGname As String, ByVal aHlenGname As String, ByVal aRcnGname As String, _
+        Return True
+    End Function
+
+    Friend Function Basin(ByVal aZoneGname As String, ByVal aDemGname As String, ByVal aFacGname As String, ByVal aHlenGname As String, ByVal aRcnGname As String, _
                      ByVal aWhcGname As String, ByVal aDepthGname As String, ByVal aTextureGname As String, ByVal aDrainGname As String, _
-                     ByVal aFlowlenGname As String, ByVal aRivlinkGname As String, ByVal aDownGname As String, ByVal aMaxcoverGname As String)
+                     ByVal aFlowlenGname As String, ByVal aRivlinkGname As String, ByVal aDownGname As String, ByVal aMaxcoverGname As String) As Boolean
 
         ' ***********************************************************************************************
         ' ***********************************************************************************************
@@ -306,13 +310,10 @@ Public Module modGeoSFM
 
         'TODO: Need way to include dam locations
 
-        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-        Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
-
-        Dim lDescFile As String = lOutputPath & "describe.txt"
-        Dim lOutFile As String = lOutputPath & "basin.txt"
-        Dim lRivFile = lOutputPath & "river.txt"
-        Dim lOrderFile = lOutputPath & "order.txt"
+        Dim lDescFile As String = pOutputPath & "describe.txt"
+        Dim lOutFile As String = pOutputPath & "basin.txt"
+        Dim lRivFile = pOutputPath & "river.txt"
+        Dim lOrderFile = pOutputPath & "order.txt"
 
         ' get input grids
         'defaultlist = { "Basins" , "Elevations" , "FlowAcc" , "Hilllength" , "Rcn" , "Whc" , "Soildepth" , "Texture" , "Ks", "FlowLen", "StrLinks", "Downstream", "Maxcover" }
@@ -321,7 +322,7 @@ Public Module modGeoSFM
         Dim lBasinGridIndex As Integer = -1
         If aZoneGname = "<none>" Then
             Logger.Msg("Basin Grid, " + aZoneGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-            Exit Sub
+            Return False
         Else
             lBasinGridIndex = GisUtil.LayerIndex(aZoneGname)
         End If
@@ -329,7 +330,7 @@ Public Module modGeoSFM
         Dim lDemGridIndex As Integer = -1
         If aDemGname = "<none>" Then
             Logger.Msg("DEM Grid, " + aDemGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-            Exit Sub
+            Return False
         Else
             lDemGridIndex = GisUtil.LayerIndex(aDemGname)
         End If
@@ -337,7 +338,7 @@ Public Module modGeoSFM
         Dim lFacGridIndex As Integer = -1
         If aFacGname = "<none>" Then
             Logger.Msg("Flow Accumulation Grid, " + aFacGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-            Exit Sub
+            Return False
         Else
             lFacGridIndex = GisUtil.LayerIndex(aFacGname)
         End If
@@ -345,7 +346,7 @@ Public Module modGeoSFM
         Dim lHlenGridIndex As Integer = -1
         If aHlenGname = "<none>" Then
             Logger.Msg("Hill Length Grid, " + aHlenGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-            Exit Sub
+            Return False
         Else
             lHlenGridIndex = GisUtil.LayerIndex(aHlenGname)
         End If
@@ -353,7 +354,7 @@ Public Module modGeoSFM
         Dim lRcnGridIndex As Integer = -1
         If aRcnGname = "<none>" Then
             Logger.Msg("Runoff Curve Number Grid, " + aRcnGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-            Exit Sub
+            Return False
         Else
             lRcnGridIndex = GisUtil.LayerIndex(aRcnGname)
         End If
@@ -361,7 +362,7 @@ Public Module modGeoSFM
         Dim lWhcGridIndex As Integer = -1
         If aWhcGname = "<none>" Then
             Logger.Msg("Soil Water Holding Capacity Grid, " + aWhcGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-            Exit Sub
+            Return False
         Else
             lWhcGridIndex = GisUtil.LayerIndex(aWhcGname)
         End If
@@ -369,7 +370,7 @@ Public Module modGeoSFM
         Dim lDepthGridIndex As Integer = -1
         If aDepthGname = "<none>" Then
             Logger.Msg("Soil Depth Grid, " + aDepthGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-            Exit Sub
+            Return False
         Else
             lDepthGridIndex = GisUtil.LayerIndex(aDepthGname)
         End If
@@ -377,7 +378,7 @@ Public Module modGeoSFM
         Dim lTextureGridIndex As Integer = -1
         If aTextureGname = "<none>" Then
             Logger.Msg("Soil Texture Grid, " + aTextureGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-            Exit Sub
+            Return False
         Else
             lTextureGridIndex = GisUtil.LayerIndex(aTextureGname)
         End If
@@ -385,7 +386,7 @@ Public Module modGeoSFM
         Dim lDrainGridIndex As Integer = -1
         If aDrainGname = "<none>" Then
             Logger.Msg("Hydraulic Conductivity Grid, " + aDrainGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-            Exit Sub
+            Return False
         Else
             lDrainGridIndex = GisUtil.LayerIndex(aDrainGname)
         End If
@@ -393,7 +394,7 @@ Public Module modGeoSFM
         Dim lFlowlenGridIndex As Integer = -1
         If aFlowlenGname = "<none>" Then
             Logger.Msg("Downstream Flow Length Grid, " + aFlowlenGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-            Exit Sub
+            Return False
         Else
             lFlowlenGridIndex = GisUtil.LayerIndex(aFlowlenGname)
         End If
@@ -401,7 +402,7 @@ Public Module modGeoSFM
         Dim lRivlinkGridIndex As Integer = -1
         If aRivlinkGname = "<none>" Then
             Logger.Msg("Stream Link Grid, " + aRivlinkGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-            Exit Sub
+            Return False
         Else
             lRivlinkGridIndex = GisUtil.LayerIndex(aRivlinkGname)
         End If
@@ -409,7 +410,7 @@ Public Module modGeoSFM
         Dim lDownGridIndex As Integer = -1
         If aDownGname = "<none>" Then
             Logger.Msg("Downstream Basin Id Grid, " + aDownGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-            Exit Sub
+            Return False
         Else
             lDownGridIndex = GisUtil.LayerIndex(aDownGname)
         End If
@@ -417,7 +418,7 @@ Public Module modGeoSFM
         Dim lMaxcoverGridIndex As Integer = -1
         If aMaxcoverGname = "<none>" Then
             Logger.Msg("Maximum Impervious Cover Grid, " + aMaxcoverGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-            Exit Sub
+            Return False
         Else
             lMaxcoverGridIndex = GisUtil.LayerIndex(aMaxcoverGname)
         End If
@@ -955,25 +956,25 @@ Public Module modGeoSFM
         SaveFileString(lRivFile, lSBRiv.ToString)
         SaveFileString(lOrderFile, lSBOrder.ToString)
 
-        If FileExists(lOutputPath & "basin_original.txt") Then
-            IO.File.Delete(lOutputPath & "basin_original.txt")
+        If FileExists(pOutputPath & "basin_original.txt") Then
+            IO.File.Delete(pOutputPath & "basin_original.txt")
         End If
-        IO.File.Copy(lOutFile, lOutputPath & "basin_original.txt")
+        IO.File.Copy(lOutFile, pOutputPath & "basin_original.txt")
 
-        If FileExists(lOutputPath & "river_original.txt") Then
-            IO.File.Delete(lOutputPath & "river_original.txt")
+        If FileExists(pOutputPath & "river_original.txt") Then
+            IO.File.Delete(pOutputPath & "river_original.txt")
         End If
-        IO.File.Copy(lRivFile, lOutputPath & "river_original.txt")
+        IO.File.Copy(lRivFile, pOutputPath & "river_original.txt")
 
         Logger.Msg("Basin Characteristics Computed. Outputs written to: " & vbCrLf & vbCrLf & "      " & lOutFile & vbCrLf & "      " & lOrderFile & vbCrLf & "      " & lRivFile, "Geospatial Stream Flow Model")
+        Return True
+    End Function
 
-    End Sub
-
-    Friend Sub Response(ByVal aVelType As Integer, _
+    Friend Function Response(ByVal aVelType As Integer, _
                         ByVal aZoneGname As String, ByVal aFlowlenGname As String, _
                         ByVal aOutletGname As String, ByVal aDemGname As String, ByVal aFacGname As String, ByVal aFdirGname As String, _
                         ByVal aUsgsLandCoverGname As String, ByVal aOverlandFlowVelocity As Double, ByVal aInstreamFlowVelocity As Double, _
-                        ByVal aManningsValues As atcCollection)
+                        ByVal aManningsValues As atcCollection) As Boolean
 
         ' ***********************************************************************************************
         ' ***********************************************************************************************
@@ -1017,14 +1018,12 @@ Public Module modGeoSFM
         '    '            'labellist = { "Basin Grid" , "Flow Direction Grid", "Flow Length Grid", "Stream Outlet Grid", "Overland Flow Velocity (m/s)", "Computational Order File" }
         'End If
 
-        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-        Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
-        Dim lOrderFileName As String = lOutputPath & "order.txt"
+        Dim lOrderFileName As String = pOutputPath & "order.txt"
 
         Dim lBasinGthm As Integer = -1
         If aZoneGname = "<none>" Then
             Logger.Msg("Basin Grid, " + aZoneGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-            Exit Sub
+            Return False
         Else
             lBasinGthm = GisUtil.LayerIndex(aZoneGname)
         End If
@@ -1032,7 +1031,7 @@ Public Module modGeoSFM
         Dim lFlowdirGthm As Integer = -1
         If aFdirGname = "<none>" Then
             Logger.Msg("Flow Direction Grid, " + aFdirGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-            Exit Sub
+            Return False
         Else
             lFlowdirGthm = GisUtil.LayerIndex(aFdirGname)
         End If
@@ -1041,7 +1040,7 @@ Public Module modGeoSFM
         Dim lFlowlenGthm As Integer = -1
         If aFlowlenGname = "<none>" Then
             Logger.Msg("Flow Length Grid, " + aFlowlenGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-            Exit Sub
+            Return False
         Else
             lFlowlenGthm = GisUtil.LayerIndex(aFlowlenGname)
         End If
@@ -1049,7 +1048,7 @@ Public Module modGeoSFM
         Dim lOutGthm As Integer = -1
         If aOutletGname = "<none>" Then
             Logger.Msg("Outlet Grid, " + aOutletGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-            Exit Sub
+            Return False
         Else
             lOutGthm = GisUtil.LayerIndex(aOutletGname)
         End If
@@ -1069,13 +1068,13 @@ Public Module modGeoSFM
             Loop
         Catch e As ApplicationException
             Logger.Msg("Cannot determine computational order." & vbCrLf & "Run 'Basin Characteristics' to create order.txt", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End Try
 
         Dim lFacGthm As Integer = -1
         If aFacGname = "<none>" Then
             Logger.Msg("Flow Accumulation Grid, " + aFacGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-            Exit Sub
+            Return False
         Else
             lFacGthm = GisUtil.LayerIndex(aFacGname)
         End If
@@ -1084,7 +1083,7 @@ Public Module modGeoSFM
         Dim lDemGthm As Integer = -1
         If aDemGname = "<none>" Then
             Logger.Msg("DEM Grid, " + aDemGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-            Exit Sub
+            Return False
         Else
             lDemGthm = GisUtil.LayerIndex(aDemGname)
         End If
@@ -1150,7 +1149,7 @@ Public Module modGeoSFM
             Dim lLcovGthm As Integer = -1
             If aUsgsLandCoverGname = "<none>" Then
                 Logger.Msg("USGS Land Cover Grid, " + aUsgsLandCoverGname + ", Not Found in the View", MsgBoxStyle.Critical, "")
-                Exit Sub
+                Return False
             Else
                 lLcovGthm = GisUtil.LayerIndex(aUsgsLandCoverGname)
             End If
@@ -1162,7 +1161,7 @@ Public Module modGeoSFM
             '  lccodelist = MsgBox.MultiInput("Specify Mannings (Velocity) Coefficients for each land cover", "Land Cover, Anderson Code, Manning's N", lcnamelist, Mannlist)
 
             '  lcfile = LineFile.Make((myWkdirname + "roughness.txt").AsFileName, #FILE_PERM_WRITE)
-            Dim lLcfile As String = lOutputPath & "roughness.txt"
+            Dim lLcfile As String = pOutputPath & "roughness.txt"
 
             'initialize velocity grid 
             If GisUtil.IsLayer(lVelocityGridLayerName) Then
@@ -1174,107 +1173,20 @@ Public Module modGeoSFM
             If FileExists(lVelocityGridFileName) Then
                 IO.File.Delete(lVelocityGridFileName)
             End If
-            IO.File.Copy(lFlowAccGridFileName, lVelocityGridFileName)
+            'IO.File.Copy(lFlowAccGridFileName, lVelocityGridFileName)
+            GisUtil.GridAssignConstant(lVelocityGridFileName, lDemFileName, 0.0)
+
+            Dim lLuFileName As String = GisUtil.LayerFileName(aUsgsLandCoverGname)
+            Dim lSubbasinFileName As String = GisUtil.LayerFileName(lBasinGthm)
+            Dim lFlowAccFileName As String = GisUtil.LayerFileName(lFacGthm)
 
             'at each grid cell we know the land use code -> mannings value
             '                              subbasin id   -> slope
             '                              flow accumulation 
 
             'from flow acc, mannings value and slope we can compute velocity
-
-            Dim lVelGrid As New MapWinGIS.Grid
-            lVelGrid.Open(lVelocityGridFileName)
-
-            Dim lLuGrid As New MapWinGIS.Grid
-            Dim lLuFileName As String = GisUtil.LayerFileName(aUsgsLandCoverGname)
-            lLuGrid.Open(lLuFileName)
-
-            Dim lSubbasinGrid As New MapWinGIS.Grid
-            Dim lSubbasinFileName As String = GisUtil.LayerFileName(lBasinGthm)
-            lSubbasinGrid.Open(lSubbasinFileName)
-
-            Dim lStartRow As Integer = 0
-            Dim lStartCol As Integer = 0
-            Dim lEndRow As Integer = lVelGrid.Header.NumberRows - 1
-            Dim lEndCol As Integer = lVelGrid.Header.NumberCols - 1
-            Dim lFlowacc As Single = 0.0
-            Dim lLuCode As Integer = 0
-
-            Dim lX As Double = 0.0
-            Dim lY As Double = 0.0
-            Dim lLuCol As Integer = 0
-            Dim lLuRow As Integer = 0
-            Dim lManningsN As Single = 0.05
-            Dim lSubid As Integer = 0
-            Dim lSlope As Single = 0.0
-            Dim lMsgDisplayed As Boolean = False
-            Dim lVelocity As Single = 0.0
-            For lRow As Integer = lStartRow To lEndRow
-                For lCol As Integer = lStartCol To lEndCol
-                    'flow accumulation value at this point
-                    lFlowacc = lVelGrid.Value(lCol, lRow)
-                    'get mannings n at this point from land use code
-                    lVelGrid.CellToProj(lCol, lRow, lX, lY)
-                    lLuGrid.ProjToCell(lX, lY, lLuCol, lLuRow)
-                    lLuCode = lLuGrid.Value(lLuCol, lLuRow)
-                    If aManningsValues.Keys.Contains(lLuCode) Then
-                        lManningsN = aManningsValues.ItemByKey(lLuCode)
-                    Else
-                        If lMsgDisplayed = False Then
-                            Logger.Msg("Anderson Code of " & lLuCode.ToString & " is not supported in the USGS Land Cover Grid." & vbCrLf & "Defaulting to Mannings n of 0.05", "Geospatial Stream Flow Model")
-                            lMsgDisplayed = True
-                        End If
-                        lManningsN = 0.05
-                    End If
-                    'get slope at this point based on subbasin
-                    lSubid = lSubbasinGrid.Value(lCol, lRow)
-                    If lSlopeBySubbasin.Keys.Contains(lSubid) Then
-                        lSlope = lSlopeBySubbasin.ItemByKey(lSubid)
-                    Else
-                        lSlope = -1.0
-                    End If
-                    'now compute velocity
-                    If lSlope > -1.0 Then
-                        If lFlowacc <= 1000 Then
-                            lVelocity = (0.015874 / lManningsN) * (lSlope ^ 0.5)
-                        ElseIf lFlowacc <= 2000 Then
-                            lVelocity = (0.0736806 / lManningsN) * (lSlope ^ 0.5)
-                        ElseIf lFlowacc <= 3000 Then
-                            lVelocity = (0.0464159 / lManningsN) * (lSlope ^ 0.5)
-                        ElseIf lFlowacc <= 4000 Then
-                            lVelocity = (0.0736806 / lManningsN) * (lSlope ^ 0.5)
-                        ElseIf lFlowacc <= 5000 Then
-                            lVelocity = (0.1357209 / lManningsN) * (lSlope ^ 0.5)
-                        ElseIf lFlowacc <= 10000 Then
-                            lVelocity = 0.3
-                        ElseIf lFlowacc <= 50000 Then
-                            lVelocity = 0.45
-                        ElseIf lFlowacc <= 100000 Then
-                            lVelocity = 0.6
-                        ElseIf lFlowacc <= 250000 Then
-                            lVelocity = 0.75
-                        ElseIf lFlowacc <= 500000 Then
-                            lVelocity = 0.9
-                        ElseIf lFlowacc <= 750000 Then
-                            lVelocity = 1.2
-                        Else
-                            lVelocity = 1.5
-                        End If
-                        lVelGrid.Value(lCol, lRow) = lVelocity
-                    Else
-                        lVelGrid.Value(lCol, lRow) = 0.0
-                    End If
-                Next
-            Next
-
-            lVelGrid.Save()
-            lVelGrid.Close()
-            lSubbasinGrid.Close()
-            lLuGrid.Close()
-
-            lVelGrid = Nothing
-            lSubbasinGrid = Nothing
-            lLuGrid = Nothing
+            Logger.Status("Computing Velocity Grid........")
+            GisUtil.GridComputeVelocity(lVelocityGridFileName, lLuFileName, lSubbasinFileName, lFlowAccFileName, aManningsValues, lSlopeBySubbasin)
 
             ' from Manning's equation, v = (1/n)(R^(2/3)(S^0.5) = K (S^0.5)
             '    for Flowacc = 0-1000, R = 0.002,             k = (1/n)(0.002^(2/3)      = 0.0158740/n
@@ -1351,6 +1263,7 @@ Public Module modGeoSFM
         Dim lTravelTimeGridFileName As String = FilenameNoExt(lFlowAccGridFileName) & "TravelTime." & FileExt(lFlowAccGridFileName)
 
         '        inverse velocity grid is used as a weighting factor 
+        Logger.Status("Computing Downstream Flow Length........")
         GisUtil.DownstreamFlowLength(lFlowDirGridFileName, lFlowAccGridFileName, lTravelTimeGridFileName, lOutletGridFileName, lInverseVelocityGridFileName)
 
         '        daysgrid = (flowtimegrid / 86400).floor   'floor returns the greatest integer value less than or equal to aGrid.
@@ -1424,14 +1337,14 @@ Public Module modGeoSFM
             lRespOut.AppendLine(lStr)
         Next
 
-        Dim lOutFile As String = lOutputPath & "response.txt"
+        Dim lOutFile As String = pOutputPath & "response.txt"
         SaveFileString(lOutFile, lRespOut.ToString)
 
-        Logger.Msg("Basin Response Computed. Output file: " & vbCrLf & lOutputPath + "response.txt", "Geospatial Stream Flow Model")
+        Logger.Msg("Basin Response Computed. Output file: " & vbCrLf & pOutputPath + "response.txt", "Geospatial Stream Flow Model")
+        Return True
+    End Function
 
-    End Sub
-
-    Friend Sub RainEvap(ByVal aPrecGageNamesBySubbasin As Collection, ByVal aEvapGageNamesBySubbasin As Collection, ByVal aSJDate As Double, ByVal aEJDate As Double)
+    Friend Function RainEvap(ByVal aPrecGageNamesBySubbasin As Collection, ByVal aEvapGageNamesBySubbasin As Collection, ByVal aSJDate As Double, ByVal aEJDate As Double) As Boolean
         ' ***********************************************************************************************
         ' ***********************************************************************************************
         '
@@ -1465,9 +1378,7 @@ Public Module modGeoSFM
 
         'TODO: Only works for BASINS timeseries at this point, default to using closest stations
 
-        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-        Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
-        Dim lOrderFileName As String = lOutputPath & "order.txt"
+        Dim lOrderFileName As String = pOutputPath & "order.txt"
 
         Dim lSubbasins As New atcCollection
         Try
@@ -1484,7 +1395,7 @@ Public Module modGeoSFM
             Loop
         Catch e As ApplicationException
             Logger.Msg("Cannot determine computational order." & vbCrLf & "Run 'Basin Characteristics' to create order.txt", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End Try
 
         Dim lRainOut As New StringBuilder
@@ -1575,18 +1486,18 @@ Public Module modGeoSFM
             lEvapOut.AppendLine(lEvapString)
         Next
 
-        Dim lOutFile As String = lOutputPath & "rain.txt"
+        Dim lOutFile As String = pOutputPath & "rain.txt"
         SaveFileString(lOutFile, lRainOut.ToString)
 
-        lOutFile = lOutputPath & "evap.txt"
+        lOutFile = pOutputPath & "evap.txt"
         SaveFileString(lOutFile, lEvapOut.ToString)
 
-        Logger.Msg("Processing Complete. Output files: " & vbCrLf & lOutputPath + "rain.txt" & vbCrLf & lOutputPath + "evap.txt", "Geospatial Stream Flow Model")
+        Logger.Msg("Processing Complete. Output files: " & vbCrLf & pOutputPath + "rain.txt" & vbCrLf & pOutputPath + "evap.txt", "Geospatial Stream Flow Model")
+        Return True
+    End Function
 
-    End Sub
-
-    Friend Sub Balance(ByVal inifract As Single, ByVal dformat As Integer, ByVal inimode As Integer, ByVal runmode As Integer, _
-                       ByVal abalancetype As Integer, ByVal aSjDate As Double)
+    Friend Function Balance(ByVal inifract As Single, ByVal dformat As Integer, ByVal inimode As Integer, ByVal runmode As Integer, _
+                            ByVal abalancetype As Integer, ByVal aSjDate As Double) As Boolean
         ' ***********************************************************************************************
         ' ***********************************************************************************************
         '
@@ -1623,48 +1534,45 @@ Public Module modGeoSFM
         'defaults = { "rain.txt", "evap.txt","basin.txt","response.txt", "balparam.txt", "basinrunoffyield.txt", "soilwater.txt", "actualevap.txt", "gwloss.txt", "cswater.txt", "excessflow.txt", "interflow.txt", "baseflow.txt", "massbalance.txt", "logfilesoil.txt", "initial.txt"}
         'inpList = MsgBox.MultiInput("Enter Model Parameters.", "Geospatial Stream Flow Model", labels, defaults)
 
-        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-        Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
-
-        Dim rainfilename As String = lOutputPath & "rain.txt"
-        Dim evapfilename As String = lOutputPath & "evap.txt"
-        Dim basinfilename As String = lOutputPath & "basin.txt"
-        Dim respfilename As String = lOutputPath & "response.txt"
-        Dim paramfilename As String = lOutputPath & "balparam.txt"
-        Dim surpfilename As String = lOutputPath & "basinrunoffyield.txt"
-        Dim storefilename As String = lOutputPath & "soilwater.txt"
-        Dim aevapfilename As String = lOutputPath & "actualevap.txt"
-        Dim gwlossfilename As String = lOutputPath & "gwloss.txt"
-        Dim outswfilename As String = lOutputPath & "cswater.txt"
-        Dim excessfilename As String = lOutputPath & "excessflow.txt"
-        Dim interfilename As String = lOutputPath & "interflow.txt"
-        Dim basefilename As String = lOutputPath & "baseflow.txt"
-        Dim massfilename As String = lOutputPath & "massbalance.txt"
-        Dim logfilename As String = lOutputPath & "logfilesoil.txt"
-        Dim initialfilename As String = lOutputPath & "initial.txt"
-        Dim balfilename As String = lOutputPath & "balfiles.txt"
-        Dim maxtimefilename As String = lOutputPath & "maxtime.txt"
-        Dim testfilename As String = lOutputPath & "testfile.txt"
-        Dim whichmodelFN As String = lOutputPath & "whichmodel.txt"
+        Dim rainfilename As String = pOutputPath & "rain.txt"
+        Dim evapfilename As String = pOutputPath & "evap.txt"
+        Dim basinfilename As String = pOutputPath & "basin.txt"
+        Dim respfilename As String = pOutputPath & "response.txt"
+        Dim paramfilename As String = pOutputPath & "balparam.txt"
+        Dim surpfilename As String = pOutputPath & "basinrunoffyield.txt"
+        Dim storefilename As String = pOutputPath & "soilwater.txt"
+        Dim aevapfilename As String = pOutputPath & "actualevap.txt"
+        Dim gwlossfilename As String = pOutputPath & "gwloss.txt"
+        Dim outswfilename As String = pOutputPath & "cswater.txt"
+        Dim excessfilename As String = pOutputPath & "excessflow.txt"
+        Dim interfilename As String = pOutputPath & "interflow.txt"
+        Dim basefilename As String = pOutputPath & "baseflow.txt"
+        Dim massfilename As String = pOutputPath & "massbalance.txt"
+        Dim logfilename As String = pOutputPath & "logfilesoil.txt"
+        Dim initialfilename As String = pOutputPath & "initial.txt"
+        Dim balfilename As String = pOutputPath & "balfiles.txt"
+        Dim maxtimefilename As String = pOutputPath & "maxtime.txt"
+        Dim testfilename As String = pOutputPath & "testfile.txt"
+        Dim whichmodelFN As String = pOutputPath & "whichmodel.txt"
 
         If Not FileExists(rainfilename) Then
             Logger.Msg("Could not open rain file," & vbCrLf & rainfilename, "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         If Not FileExists(evapfilename) Then
             Logger.Msg("Could not open evap file," & vbCrLf & evapfilename, "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         If Not FileExists(basinfilename) Then
             Logger.Msg("Could not open basin file," & vbCrLf & basinfilename, "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         If Not FileExists(respfilename) Then
             Logger.Msg("Could not open response file," & vbCrLf & respfilename, "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         Dim lRStreamReader As New StreamReader(rainfilename)
@@ -1744,7 +1652,7 @@ Public Module modGeoSFM
         lChkFile.AppendLine(massfilename)
         lChkFile.AppendLine(logfilename)
         lChkFile.AppendLine(initialfilename)
-        lChkFile.AppendLine(lOutputPath)
+        lChkFile.AppendLine(pOutputPath)
         SaveFileString(balfilename, lChkFile.ToString)
 
         'plabels = { "Computation Start Year", "Computation Start Day", "Number of Rain/Evap Days", 
@@ -1817,13 +1725,13 @@ Public Module modGeoSFM
 
         If Not FileExists(surpfilename) Then
             Logger.Msg("An error occurred during the balance computation." & vbCrLf & "Check for possible causes in  " + logfilename, "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         If (runmode = 0) Then
             If Not FileExists(outswfilename) Then
                 Logger.Msg("Could not open current soil water file," & vbCrLf & outswfilename, "Geospatial Stream Flow Model")
-                Exit Sub
+                Return False
             End If
 
             Dim lCurrent As New atcCollection
@@ -1842,7 +1750,7 @@ Public Module modGeoSFM
             GisUtil.StartSetFeatureValue(basinthm)
             Dim lId As String = ""
             For lIndex As Integer = 0 To GisUtil.NumFeatures(basinthm) - 1
-                lId = GisUtil.FieldValue(basinthm, lIndex, 1)
+                lId = GisUtil.FieldValue(basinthm, lIndex, idfield)
                 If Not lCurrent.ItemByKey(lId) Is Nothing Then
                     GisUtil.SetFeatureValue(basinthm, nowfield, lIndex, lCurrent.ItemByKey(lId))
                 End If
@@ -1869,11 +1777,11 @@ Public Module modGeoSFM
         End If
 
         Logger.Msg("Soil Water Balance Complete. Results written to:" & vbCrLf & surpfilename, "Geospatial Stream Flow Model")
+        Return True
+    End Function
 
-    End Sub
-
-    Friend Sub Route(ByVal forecastdays As Integer, ByVal runmode As Integer, ByVal dformat As Integer, _
-                     ByVal aRouteMethod As Integer, ByVal aSjDate As Double)
+    Friend Function Route(ByVal forecastdays As Integer, ByVal runmode As Integer, ByVal dformat As Integer, _
+                          ByVal aRouteMethod As Integer, ByVal aSjDate As Double) As Boolean
         ' ***********************************************************************************************
         ' ***********************************************************************************************
         '
@@ -1908,22 +1816,19 @@ Public Module modGeoSFM
 
         'defaults = { "basinrunoffyield.txt","response.txt","river.txt", "reservoir.txt", "riverdepth.txt", "inflow.txt", "streamflow.txt", "damstatus.txt", "localflow.txt", "routparam.txt", "routfiles.txt", "forecast.txt", "logfileflow.txt", "basply.shp","gridcode", "3","0"}
 
-        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-        Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
-
-        Dim runoffFN As String = lOutputPath & "basinrunoffyield.txt"
-        Dim responseFN As String = lOutputPath & "response.txt"
-        Dim riverFN As String = lOutputPath & "river.txt"
-        Dim reservoirFN As String = lOutputPath & "reservoir.txt"
-        Dim riverdepthFN As String = lOutputPath & "riverdepth.txt"
-        Dim inflowFN As String = lOutputPath & "inflow.txt"
-        Dim flowFN As String = lOutputPath & "streamflow.txt"
-        Dim damsFN As String = lOutputPath & "damstatus.txt"
-        Dim localflowFN As String = lOutputPath & "localflow.txt"
-        Dim routparamFN As String = lOutputPath & "routparam.txt"
-        Dim routfilesFN As String = lOutputPath & "routfiles.txt"
-        Dim forecastFN As String = lOutputPath & "forecast.txt"
-        Dim logFN As String = lOutputPath & "logfileflow.txt"
+        Dim runoffFN As String = pOutputPath & "basinrunoffyield.txt"
+        Dim responseFN As String = pOutputPath & "response.txt"
+        Dim riverFN As String = pOutputPath & "river.txt"
+        Dim reservoirFN As String = pOutputPath & "reservoir.txt"
+        Dim riverdepthFN As String = pOutputPath & "riverdepth.txt"
+        Dim inflowFN As String = pOutputPath & "inflow.txt"
+        Dim flowFN As String = pOutputPath & "streamflow.txt"
+        Dim damsFN As String = pOutputPath & "damstatus.txt"
+        Dim localflowFN As String = pOutputPath & "localflow.txt"
+        Dim routparamFN As String = pOutputPath & "routparam.txt"
+        Dim routfilesFN As String = pOutputPath & "routfiles.txt"
+        Dim forecastFN As String = pOutputPath & "forecast.txt"
+        Dim logFN As String = pOutputPath & "logfileflow.txt"
 
         If (forecastdays > 99) Then
             forecastdays = 99
@@ -1931,26 +1836,26 @@ Public Module modGeoSFM
             forecastdays = 0
         End If
 
-        Dim initialFN As String = lOutputPath & "initial.txt"
-        Dim timesFN As String = lOutputPath & "times.txt"
-        'Dim maxtimeFN As String = lOutputPath & "maxtime.txt"
-        Dim damlinkFN As String = lOutputPath & "damlink.txt"
-        Dim ratingFN As String = lOutputPath & "rating.txt"
-        Dim whichmodelFN As String = lOutputPath & "whichmodel.txt"
+        Dim initialFN As String = pOutputPath & "initial.txt"
+        Dim timesFN As String = pOutputPath & "times.txt"
+        'Dim maxtimeFN As String = pOutputPath & "maxtime.txt"
+        Dim damlinkFN As String = pOutputPath & "damlink.txt"
+        Dim ratingFN As String = pOutputPath & "rating.txt"
+        Dim whichmodelFN As String = pOutputPath & "whichmodel.txt"
 
         If Not FileExists(runoffFN) Then
             Logger.Msg("Could not open runoff file." & vbCrLf & runoffFN, "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         If Not FileExists(responseFN) Then
             Logger.Msg("Could not open response file," & vbCrLf & responseFN, "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         If Not FileExists(riverFN) Then
             Logger.Msg("Could not open river file," & vbCrLf & riverFN, "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         Dim theday As String = System.DateTime.Now.Date.ToString
@@ -1991,7 +1896,7 @@ Public Module modGeoSFM
             Loop
         Catch e As ApplicationException
             Logger.Msg("Problem reading the river file " & riverFN & ".", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End Try
 
         Dim lResponseList As New atcCollection
@@ -2009,12 +1914,12 @@ Public Module modGeoSFM
             Loop
         Catch e As ApplicationException
             Logger.Msg("Problem reading the response file " & responseFN & ".", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End Try
 
         If (lResponseList.Count < lRivList.Count) Then
             Logger.Msg("The response file " + responseFN + " does not contain enough subbasins.", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         Dim resdays As Integer = lResponseList.Count
@@ -2035,14 +1940,14 @@ Public Module modGeoSFM
             Loop
         Catch e As ApplicationException
             Logger.Msg("Problem reading the runoff file " & runoffFN & ".", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End Try
 
         Dim lStr As String = lRunoffList(0)
         Dim dayonestr As String = StrRetRem(lStr)
         Dim timetype As String = "Daily"
         Dim timeinhrs As String = "24"
-        
+
         If dformat = 0 Then
             timetype = "Hourly"
             timeinhrs = "1"
@@ -2103,7 +2008,7 @@ Public Module modGeoSFM
                         Loop
                     Catch e As ApplicationException
                         Logger.Msg("Could not open reservoir characteristics file," & vbCrLf & reservoirFN, MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-                        Exit Sub
+                        Exit Function
                     End Try
 
                     isfirst = isfirst + 1
@@ -2112,12 +2017,12 @@ Public Module modGeoSFM
                 Dim isoperated As Integer = 0
                 Dim resdtime As Single = 0.0
                 Dim lDamoutFile As New StringBuilder
-                Dim lDamoutFileName As String = lOutputPath & "dam" & riverid.ToString & ".txt"
+                Dim lDamoutFileName As String = pOutputPath & "dam" & riverid.ToString & ".txt"
 
                 Dim resvlist As String = ""
                 If lReservoirList.ItemByKey(riverid) Is Nothing Then
                     Logger.Msg("No reservoir characteristic found for basin " & riverid & vbCrLf & "Update " & reservoirFN & " before computing streamflow.", "Geospatial Stream Flow Model")
-                    Exit Sub
+                    Return False
                 Else
                     resvlist = lReservoirList.Item(riverid)
 
@@ -2132,9 +2037,9 @@ Public Module modGeoSFM
                     Dim operateFN As String = StrRetRem(resvlist)
                     Dim withd As Integer = 0
                     If Not FileExists(operateFN) Then
-                        If Not FileExists(lOutputPath & operateFN) Then
+                        If Not FileExists(pOutputPath & operateFN) Then
                             Logger.Msg("Operations file " & operateFN & " for reservoir in basin " & riverid & "Not found." + vbCrLf + "Create the file before computing streamflow", "Geospatial Stream Flow Model")
-                            Exit Sub
+                            Return False
                         End If
                         withd = 1
                     End If
@@ -2156,7 +2061,7 @@ Public Module modGeoSFM
                         Loop
                     Catch e As ApplicationException
                         Logger.Msg("Problem reading reservoir operations file," & vbCrLf & operateFN, MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-                        Exit Sub
+                        Return False
                     End Try
 
                     Dim testflst As String = ""
@@ -2193,7 +2098,7 @@ Public Module modGeoSFM
 
                 Dim lDamLinkFile As New StringBuilder
                 lDamLinkFile.AppendLine(riverid.ToString)
-                lDamLinkFile.AppendLine(lOutputPath & "dam" & riverid.ToString & ".txt")
+                lDamLinkFile.AppendLine(pOutputPath & "dam" & riverid.ToString & ".txt")
                 lDamLinkFile.AppendLine(isoperated.ToString)
                 lDamLinkFile.AppendLine(resdtime.ToString)
                 SaveFileString(damlinkFN, lDamLinkFile.ToString)
@@ -2223,7 +2128,7 @@ Public Module modGeoSFM
                 Loop
             Catch e As ApplicationException
                 Logger.Msg("Could not open whichModel.txt file" & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-                Exit Sub
+                Return False
             End Try
 
             If (whichsize > 2) Then
@@ -2323,15 +2228,28 @@ Public Module modGeoSFM
         lRoutFile.AppendLine(riverdepthFN)
         lRoutFile.AppendLine(inflowFN)
         lRoutFile.AppendLine(logFN)
-        lRoutFile.AppendLine(lOutputPath)
+        lRoutFile.AppendLine(pOutputPath)
         SaveFileString(routfilesFN, lRoutFile.ToString)
+
+        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+
+        Dim geosfmdllFN As String = ""
+        If FileExists(pOutputPath & "geosfm.dll") Then
+            geosfmdllFN = pOutputPath & "geosfm.dll"
+        ElseIf FileExists(lBasinsBinLoc & "\geosfm.dll") Then
+            File.Copy(lBasinsBinLoc & "\geosfm.dll", pOutputPath & "geosfm.dll")
+            geosfmdllFN = pOutputPath & "geosfm.dll"
+        Else
+            Logger.Msg("Unable to locate the program file: geosfm.dll " & vbCrLf & vbCrLf & "Install the programs in your BASINS/bin folder.", "Geospatial Stream Flow Model")
+            Return False
+        End If
 
         If (aRouteMethod = 3) Then
             LAGROUTE(routfilesFN)
         ElseIf (aRouteMethod = 1) Then
             DIFFROUTE(routfilesFN)
         Else
-            cungeroute(routfilesFN)
+            CUNGEROUTE(routfilesFN)
         End If
 
         'timefile.writeelt(myrunoff.asstring)  'commented out in the avenue 
@@ -2339,7 +2257,7 @@ Public Module modGeoSFM
 
         If Not FileExists(flowFN) Then
             Logger.Msg("An error occurred during the routing computations." & vbCrLf & "Check for possible causes in logfileflow.txt", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         lChkFile.AppendLine("Ending Time: " & System.DateTime.Now.ToString)
@@ -2348,11 +2266,11 @@ Public Module modGeoSFM
         SetFlowTimeseries(flowFN)
 
         Logger.Msg("Stream Flow Routing Complete." & vbCrLf & "Results written as BASINS internal timeseries and to file: " & vbCrLf & flowFN, "Geospatial Stream Flow Model")
+        Return True
+    End Function
 
-    End Sub
-
-    Friend Sub Sensitivity(ByVal aSelectedReachIndex As Integer, ByVal aBalanceType As Integer, ByVal aRouteType As Integer, _
-                           ByVal aParameterRanges As atcCollection)
+    Friend Function Sensitivity(ByVal aSelectedReachIndex As Integer, ByVal aBalanceType As Integer, ByVal aRouteType As Integer, _
+                                ByVal aParameterRanges As atcCollection) As Boolean
         ' ***********************************************************************************************
         ' ***********************************************************************************************
         '
@@ -2383,10 +2301,9 @@ Public Module modGeoSFM
         ' ***********************************************************************************************
 
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-        Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
 
         'read/write balance parameters
-        Dim lBalParamFN As String = lOutputPath & "balparam.txt"
+        Dim lBalParamFN As String = pOutputPath & "balparam.txt"
         Dim lBalList As New Collection
         If FileExists(lBalParamFN) Then
             Try
@@ -2403,11 +2320,11 @@ Public Module modGeoSFM
                 lStreamReader.Close()
             Catch e As ApplicationException
                 Logger.Msg("Problem reading parameters from balparam.txt file," & vbCrLf & "Check the contents of this file before continuing.", "Geospatial Stream Flow Model")
-                Exit Sub
+                Return False
             End Try
         Else
             Logger.Msg("Problem reading parameters from balparam.txt file," & vbCrLf & "Check the contents of this file before continuing.", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         'write it out in calibration mode
@@ -2419,7 +2336,7 @@ Public Module modGeoSFM
         SaveFileString(lBalParamFN, lParamFile.ToString)
 
         'read/write routing parameters
-        Dim lRoutParamFN As String = lOutputPath & "routparam.txt"
+        Dim lRoutParamFN As String = pOutputPath & "routparam.txt"
         Dim lRoutList As New Collection
         Try
             Dim lCurrentRecord As String
@@ -2435,7 +2352,7 @@ Public Module modGeoSFM
             lStreamReader.Close()
         Catch e As ApplicationException
             Logger.Msg("Problem reading parameters from routparam.txt file," & vbCrLf & "Check the contents of this file before continuing.", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End Try
         'write it out in calibration mode
         Dim lRParamFile As New StringBuilder
@@ -2450,12 +2367,12 @@ Public Module modGeoSFM
             ntsteps = lRoutList(1)
         End If
 
-        Dim logfileFN As String = lOutputPath & "logfilesarun.txt"
+        Dim logfileFN As String = pOutputPath & "logfilesarun.txt"
         Dim logfile As New StringBuilder
 
         Dim balancetype As Integer = 0
         Dim routetype As Integer = 0
-        Dim whichmodelFN As String = lOutputPath & "whichModel.txt"
+        Dim whichmodelFN As String = pOutputPath & "whichModel.txt"
         If Not FileExists(whichmodelFN) Then
             Dim lWhichFile As New StringBuilder
             lWhichFile.AppendLine("Model Index   Index description")
@@ -2480,7 +2397,7 @@ Public Module modGeoSFM
                 lStreamReader.Close()
             Catch e As ApplicationException
                 Logger.Msg("Could not open whichModel.txt file" & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-                Exit Sub
+                Return False
             End Try
         End If
 
@@ -2503,7 +2420,7 @@ Public Module modGeoSFM
 
         logfile.AppendLine("Routing Models Selected as " & methodtypestr.ToString)
 
-        Dim rangeFileFN As String = lOutputPath & "range.txt"
+        Dim rangeFileFN As String = pOutputPath & "range.txt"
         Dim rangeFile As New StringBuilder
         rangeFile.AppendLine("Min, Max, Name, Description")
         For rindex As Integer = 0 To aParameterRanges.Count - 1
@@ -2513,7 +2430,7 @@ Public Module modGeoSFM
 
         logfile.AppendLine("River and Basin Files Read")
 
-        Dim moscemparamfileFN As String = lOutputPath & "moscem_param.txt"
+        Dim moscemparamfileFN As String = pOutputPath & "moscem_param.txt"
         Dim moscemparamfile As New StringBuilder
         moscemparamfile.AppendLine(1.ToString)
         moscemparamfile.AppendLine(ntsteps)
@@ -2527,41 +2444,41 @@ Public Module modGeoSFM
         logfile.AppendLine("River and Basin Parameter Ranges Confirmed")
 
         Dim geosfmsarunFN As String = ""
-        If FileExists(lOutputPath & "geosfmsarun.exe") Then
-            geosfmsarunFN = lOutputPath & "geosfmsarun.exe"
+        If FileExists(pOutputPath & "geosfmsarun.exe") Then
+            geosfmsarunFN = pOutputPath & "geosfmsarun.exe"
         ElseIf FileExists(lBasinsBinLoc & "\geosfmsarun.exe") Then
-            File.Copy(lBasinsBinLoc & "\geosfmsarun.exe", lOutputPath & "geosfmsarun.exe")
-            geosfmsarunFN = lOutputPath & "geosfmsarun.exe"
+            File.Copy(lBasinsBinLoc & "\geosfmsarun.exe", pOutputPath & "geosfmsarun.exe")
+            geosfmsarunFN = pOutputPath & "geosfmsarun.exe"
         Else
             Logger.Msg("Unable to locate the program file: geosfmsarun.exe " & vbCrLf & vbCrLf & "Install the programs in your BASINS/bin folder.", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         logfile.AppendLine("geosfmsarun.exe program copied to working directory")
 
         Dim geosfmdllFN As String = ""
-        If FileExists(lOutputPath & "geosfm.dll") Then
-            geosfmdllFN = lOutputPath & "geosfm.dll"
+        If FileExists(pOutputPath & "geosfm.dll") Then
+            geosfmdllFN = pOutputPath & "geosfm.dll"
         ElseIf FileExists(lBasinsBinLoc & "\geosfm.dll") Then
-            File.Copy(lBasinsBinLoc & "\geosfm.dll", lOutputPath & "geosfm.dll")
-            geosfmdllFN = lOutputPath & "geosfm.dll"
+            File.Copy(lBasinsBinLoc & "\geosfm.dll", pOutputPath & "geosfm.dll")
+            geosfmdllFN = pOutputPath & "geosfm.dll"
         Else
             Logger.Msg("Unable to locate the program file: geosfm.dll " & vbCrLf & vbCrLf & "Install the programs in your BASINS/bin folder.", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         logfile.AppendLine("geosfm.dll program copied to working directory")
 
-        If Not FileExists(lOutputPath & "dforrt.dll") Then
+        If Not FileExists(pOutputPath & "dforrt.dll") Then
             If FileExists(lBasinsBinLoc & "\dforrt.dll") Then
-                File.Copy(lBasinsBinLoc & "\dforrt.dll", lOutputPath & "dforrt.dll")
+                File.Copy(lBasinsBinLoc & "\dforrt.dll", pOutputPath & "dforrt.dll")
             End If
         End If
 
         Dim lProcess As New Diagnostics.Process
         With lProcess.StartInfo
-            .FileName = lOutputPath & "geosfmsarun.exe"
-            .WorkingDirectory = lOutputPath
+            .FileName = pOutputPath & "geosfmsarun.exe"
+            .WorkingDirectory = pOutputPath
             .Arguments = ""
             .CreateNoWindow = False
             .UseShellExecute = True
@@ -2575,16 +2492,16 @@ Public Module modGeoSFM
         logfile.AppendLine("Calibration Program Successfully Executed!")
         SaveFileString(logfileFN, logfile.ToString)
 
-        Dim SArunOutputFN As String = lOutputPath & "sarunoutput.txt"
+        Dim SArunOutputFN As String = pOutputPath & "sarunoutput.txt"
         If FileExists(SArunOutputFN) Then
             Logger.Msg("Sensitivity Analysis Complete. Results written to: sarunoutput.txt", "Geospatial Stream Flow Model")
         Else
             Logger.Msg("Output file, sarunoutput.txt, not found." & vbCrLf & "Check log file, logfilesarun.txt, for possible errors", "Geospatial Stream Flow Model")
         End If
+        Return True
+    End Function
 
-    End Sub
-
-    Friend Sub Calibrate(ByVal aFlowGageNames As atcCollection, ByVal aCalibParms As Collection, ByVal aMaxRuns As Integer, ByVal aObjFunction As Integer, ByVal aSJDate As Double, ByVal aEJDate As Double)
+    Friend Function Calibrate(ByVal aFlowGageNames As atcCollection, ByVal aCalibParms As Collection, ByVal aMaxRuns As Integer, ByVal aObjFunction As Integer, ByVal aSJDate As Double, ByVal aEJDate As Double) As Boolean
         ' ***********************************************************************************************
         ' ***********************************************************************************************
         '
@@ -2617,10 +2534,9 @@ Public Module modGeoSFM
         'TODO: Need example observed streamflow data to run/debug example
 
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-        Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
 
         'read/write balance parameters
-        Dim lBalParamFN As String = lOutputPath & "balparam.txt"
+        Dim lBalParamFN As String = pOutputPath & "balparam.txt"
         Dim lBalList As New Collection
         Try
             Dim lCurrentRecord As String
@@ -2636,7 +2552,7 @@ Public Module modGeoSFM
             lStreamReader.Close()
         Catch e As ApplicationException
             Logger.Msg("Problem reading parameters from balparam.txt file," & vbCrLf & "Check the contents of this file before continuing.", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End Try
         'write it out in calibration mode
         Dim lParamFile As New StringBuilder
@@ -2647,7 +2563,7 @@ Public Module modGeoSFM
         SaveFileString(lBalParamFN, lParamFile.ToString)
 
         'read/write routing parameters
-        Dim lRoutParamFN As String = lOutputPath & "routparam.txt"
+        Dim lRoutParamFN As String = pOutputPath & "routparam.txt"
         Dim lRoutList As New Collection
         Try
             Dim lCurrentRecord As String
@@ -2663,7 +2579,7 @@ Public Module modGeoSFM
             lStreamReader.Close()
         Catch e As ApplicationException
             Logger.Msg("Problem reading parameters from routparam.txt file," & vbCrLf & "Check the contents of this file before continuing.", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End Try
         'write it out in calibration mode
         Dim lRParamFile As New StringBuilder
@@ -2673,16 +2589,16 @@ Public Module modGeoSFM
         lRParamFile.AppendLine(1.ToString)
         SaveFileString(lRoutParamFN, lRParamFile.ToString)
 
-        Dim balfilesfn As String = lOutputPath & "balfiles.txt"
+        Dim balfilesfn As String = pOutputPath & "balfiles.txt"
         If Not FileExists(balfilesfn) Then
             Logger.Msg("Could not open balfiles.txt file," & vbCrLf & "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
-        Dim routfilesfn As String = lOutputPath & "routfiles.txt"
+        Dim routfilesfn As String = pOutputPath & "routfiles.txt"
         If Not FileExists(routfilesfn) Then
             Logger.Msg("Could not open routfiles.txt file," & vbCrLf & "File may be open or tied up by another program", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         'caliblabels = { "Streamflow Model Parameters File", 
@@ -2702,26 +2618,26 @@ Public Module modGeoSFM
 
         '        inpList = MsgBox.MultiInput("Enter Model Parameters.", "Geospatial Stream Flow Model", caliblabels, calibdefaults)
 
-        Dim parameterFN As String = lOutputPath & "parameter.in"
-        Dim objoptflagFN As String = lOutputPath & "objoptflag.in"
-        Dim obsflowFN As String = lOutputPath & "observed_streamflow.txt"
-        Dim objectiveFN As String = lOutputPath & "objectives.out"
-        Dim paramvalFN As String = lOutputPath & "parameter_values.out"
-        Dim paramconFN As String = lOutputPath & "par_convergence.out"
-        Dim mosceminFN As String = lOutputPath & "moscem.in"
-        Dim moscemparamFN As String = lOutputPath & "moscem_param.txt"
-        Dim whichModelFN As String = lOutputPath & "whichModel.txt"
-        Dim origbasFN As String = lOutputPath & "basin_original.txt"
-        Dim origrivFN As String = lOutputPath & "river_original.txt"
-        Dim basinFN As String = lOutputPath & "basin.txt"
-        Dim riverFN As String = lOutputPath & "river.txt"
-        Dim streamflowFN As String = lOutputPath & "streamflow.txt"
+        Dim parameterFN As String = pOutputPath & "parameter.in"
+        Dim objoptflagFN As String = pOutputPath & "objoptflag.in"
+        Dim obsflowFN As String = pOutputPath & "observed_streamflow.txt"
+        Dim objectiveFN As String = pOutputPath & "objectives.out"
+        Dim paramvalFN As String = pOutputPath & "parameter_values.out"
+        Dim paramconFN As String = pOutputPath & "par_convergence.out"
+        Dim mosceminFN As String = pOutputPath & "moscem.in"
+        Dim moscemparamFN As String = pOutputPath & "moscem_param.txt"
+        Dim whichModelFN As String = pOutputPath & "whichModel.txt"
+        Dim origbasFN As String = pOutputPath & "basin_original.txt"
+        Dim origrivFN As String = pOutputPath & "river_original.txt"
+        Dim basinFN As String = pOutputPath & "basin.txt"
+        Dim riverFN As String = pOutputPath & "river.txt"
+        Dim streamflowFN As String = pOutputPath & "streamflow.txt"
         'timeseriesFN = myWkDirname + inplist.get(14)     commented out in the avenue
         'objpostprocFN = myWkDirname + inplist.get(15)
         'trdoffboundFN = myWkDirname + inplist.get(16)
         'postprocinFN = myWkDirname + inplist.get(17)
 
-        Dim logfilename As String = lOutputPath & "logfilecalib.txt"
+        Dim logfilename As String = pOutputPath & "logfilecalib.txt"
         Dim logfile As New StringBuilder
 
         'paraminFile = LineFile.Make(parameterFN.asfilename,#file_perm_write)
@@ -2798,7 +2714,7 @@ Public Module modGeoSFM
                 'origbasinfile = LineFile.Make(origbasFN.asfilename,#file_perm_read)
             Else
                 Logger.Msg("Could not open basin.txt or basin_original.txt" & vbCrLf & "File(s) may be open or tied up by another program", "Geospatial Stream Flow Model")
-                Exit Sub
+                Return False
             End If
         End If
 
@@ -2808,7 +2724,7 @@ Public Module modGeoSFM
                 'origriverfile = LineFile.Make(origrivFN.asfilename,#file_perm_read)
             Else
                 Logger.Msg("Could not open " & riverFN & " or " & origrivFN & vbCrLf & "File(s) may be open or tied up by another program", "Geospatial Stream Flow Model")
-                Exit Sub
+                Return False
             End If
         End If
 
@@ -2819,10 +2735,10 @@ Public Module modGeoSFM
 
         '        inpostList = MsgBox.MultiInput("Enter Post Processing Parameters.", "Geospatial Stream Flow Model", postlabels, postdefaults)
 
-        Dim timeseriesFN As String = lOutputPath & "timeseries.txt"
-        Dim objpostprocFN As String = lOutputPath & "objectives_postproc.out"
-        Dim trdoffboundFN As String = lOutputPath & "trdoff_bounds.out"
-        Dim postprocinFN As String = lOutputPath & "postproc.in"
+        Dim timeseriesFN As String = pOutputPath & "timeseries.txt"
+        Dim objpostprocFN As String = pOutputPath & "objectives_postproc.out"
+        Dim trdoffboundFN As String = pOutputPath & "trdoff_bounds.out"
+        Dim postprocinFN As String = pOutputPath & "postproc.in"
 
         'objpostprocFile = LineFile.Make(objpostprocFN.asfilename,#file_perm_write)
         'If Not FileExists(objpostprocFN) Then
@@ -2851,11 +2767,11 @@ Public Module modGeoSFM
                 Loop
             Catch e As ApplicationException
                 Logger.Msg("Problem reading basin_original.txt" & vbCrLf & "File(s) may be open or tied up by another program", "Geospatial Stream Flow Model")
-                Exit Sub
+                Return False
             End Try
         Else
             Logger.Msg("Could not open basin_original.txt" & vbCrLf & "File(s) may be open or tied up by another program", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         'store the positions of calibered variables
@@ -2905,11 +2821,11 @@ Public Module modGeoSFM
                 Loop
             Catch e As ApplicationException
                 Logger.Msg("Problem reading river_original.txt" & vbCrLf & "File(s) may be open or tied up by another program", "Geospatial Stream Flow Model")
-                Exit Sub
+                Return False
             End Try
         Else
             Logger.Msg("Could not open river_original.txt" & vbCrLf & "File(s) may be open or tied up by another program", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         Dim headerlst As New Collection
@@ -3154,27 +3070,27 @@ Public Module modGeoSFM
         logfile.AppendLine("Starting Time:" & " " & System.DateTime.Now.ToString)
 
         Dim geosfmcalibFN As String = ""
-        If FileExists(lOutputPath & "geosfmcalib.exe") Then
-            geosfmcalibFN = lOutputPath & "geosfmcalib.exe"
+        If FileExists(pOutputPath & "geosfmcalib.exe") Then
+            geosfmcalibFN = pOutputPath & "geosfmcalib.exe"
         ElseIf FileExists(lBasinsBinLoc & "\geosfmcalib.exe") Then
-            File.Copy(lBasinsBinLoc & "\geosfmcalib.exe", lOutputPath & "geosfmcalib.exe")
-            geosfmcalibFN = lOutputPath & "geosfmcalib.exe"
+            File.Copy(lBasinsBinLoc & "\geosfmcalib.exe", pOutputPath & "geosfmcalib.exe")
+            geosfmcalibFN = pOutputPath & "geosfmcalib.exe"
         Else
             Logger.Msg("Unable to locate the program file: geosfmcalib.exe " & vbCrLf & vbCrLf & "Install the programs in your BASINS/bin folder.", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         logfile.AppendLine("geosfmcalib.exe program copied to working directory")
 
         Dim geosfmdllFN As String = ""
-        If FileExists(lOutputPath & "geosfm.dll") Then
-            geosfmdllFN = lOutputPath & "geosfm.dll"
+        If FileExists(pOutputPath & "geosfm.dll") Then
+            geosfmdllFN = pOutputPath & "geosfm.dll"
         ElseIf FileExists(lBasinsBinLoc & "\geosfm.dll") Then
-            File.Copy(lBasinsBinLoc & "\geosfm.dll", lOutputPath & "geosfm.dll")
-            geosfmdllFN = lOutputPath & "geosfm.dll"
+            File.Copy(lBasinsBinLoc & "\geosfm.dll", pOutputPath & "geosfm.dll")
+            geosfmdllFN = pOutputPath & "geosfm.dll"
         Else
             Logger.Msg("Unable to locate the program file: geosfm.dll " & vbCrLf & vbCrLf & "Install the programs in your BASINS/bin folder.", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         logfile.AppendLine("geosfm.dll program copied to working directory")
@@ -3183,8 +3099,8 @@ Public Module modGeoSFM
 
         Dim lProcess As New Diagnostics.Process
         With lProcess.StartInfo
-            .FileName = lOutputPath & "geosfmcalib.exe"
-            .WorkingDirectory = lOutputPath
+            .FileName = pOutputPath & "geosfmcalib.exe"
+            .WorkingDirectory = pOutputPath
             .Arguments = mosceminFN
             .CreateNoWindow = False
             .UseShellExecute = True
@@ -3210,11 +3126,11 @@ Public Module modGeoSFM
                 Loop
             Catch e As ApplicationException
                 Logger.Msg("Cannot read output file, " & paramconFN & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-                Exit Sub
+                Return False
             End Try
         Else
             Logger.Msg("Cannot open output file, " & paramconFN & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         If (pcfilesize > 1) Then
@@ -3224,7 +3140,7 @@ Public Module modGeoSFM
             logfile.AppendLine("Output parameter convergence file, " + paramconFN + ", is empty.")
             SaveFileString(logfilename, logfile.ToString)
             Logger.Msg("Calibration problems encountered." & vbCrLf & "Output parameter convergence file, " & paramconFN & ", is empty", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         Dim postprocinFile As New StringBuilder
@@ -3250,22 +3166,22 @@ Public Module modGeoSFM
         logfile.AppendLine("Initiating Post Processing Program...")
 
         Dim geosfmpostFN As String = ""
-        If FileExists(lOutputPath & "geosfmpost.exe") Then
-            geosfmpostFN = lOutputPath & "geosfmpost.exe"
+        If FileExists(pOutputPath & "geosfmpost.exe") Then
+            geosfmpostFN = pOutputPath & "geosfmpost.exe"
         ElseIf FileExists(lBasinsBinLoc & "\geosfmpost.exe") Then
-            File.Copy(lBasinsBinLoc & "\geosfmpost.exe", lOutputPath & "geosfmpost.exe")
-            geosfmpostFN = lOutputPath & "geosfmpost.exe"
+            File.Copy(lBasinsBinLoc & "\geosfmpost.exe", pOutputPath & "geosfmpost.exe")
+            geosfmpostFN = pOutputPath & "geosfmpost.exe"
         Else
             Logger.Msg("Unable to locate the program file: geosfmpost.exe " & vbCrLf & vbCrLf & "Install the programs in your BASINS/bin folder.", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         logfile.AppendLine("Performing Model PostProcessing........")
 
         Dim lPProcess As New Diagnostics.Process
         With lPProcess.StartInfo
-            .FileName = lOutputPath & "geosfmpost.exe"
-            .WorkingDirectory = lOutputPath
+            .FileName = pOutputPath & "geosfmpost.exe"
+            .WorkingDirectory = pOutputPath
             .Arguments = "postproc.in"
             .CreateNoWindow = False
             .UseShellExecute = True
@@ -3291,31 +3207,32 @@ Public Module modGeoSFM
                 Loop
             Catch e As ApplicationException
                 Logger.Msg("Cannot read output file, " & timeseriesFN & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-                Exit Sub
+                Return False
             End Try
         Else
             Logger.Msg("Cannot open output file, " & timeseriesFN & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         If (tsfilesize > 1) Then
-            FileCopy(timeseriesFN, lOutputPath & "tmpfile.txt")
+            FileCopy(timeseriesFN, pOutputPath & "tmpfile.txt")
             logfile.AppendLine("Post Processing Program Successfully Executed!")
         Else
             logfile.AppendLine("Problems encounted during post processing.")
             logfile.AppendLine("Output time series file, " & timeseriesFN & ", is empty.")
             SaveFileString(logfilename, logfile.ToString)
             Logger.Msg("Post processing problems encountered." & vbCrLf & "Output time series file, " & timeseriesFN & ", is empty", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         logfile.AppendLine("Ending Time:" & " " & DateTime.Now.ToString)
         SaveFileString(logfilename, logfile.ToString)
 
         Logger.Msg("Model Calibration Run Complete." & vbCrLf & "Results written to: " & vbCrLf & timeseriesFN, "Geospatial Stream Flow Model")
-    End Sub
+        Return True
+    End Function
 
-    Friend Sub BankFull()
+    Friend Function BankFull() As Boolean
         ' ***********************************************************************************************
         ' ***********************************************************************************************
         '
@@ -3345,26 +3262,25 @@ Public Module modGeoSFM
         ' ***********************************************************************************************
 
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-        Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
         
         '        'CREATE A LIST OF INPUT LABELS
         'labels = { "Input Daily Time Series File", "Output Monthly Time Series File", "Output Annual Time Series File" } 
 
         'defaults = { "streamflow.txt", "monthlyflow.txt", "annualflow.txt" }
 
-        Dim lRunoffFN As String = lOutputPath & "streamflow.txt"
-        Dim lMonthlyFN As String = lOutputPath & "monthlyflow.txt"
-        Dim lAnnualFN As String = lOutputPath & "annualflow.txt"
+        Dim lRunoffFN As String = pOutputPath & "streamflow.txt"
+        Dim lMonthlyFN As String = pOutputPath & "monthlyflow.txt"
+        Dim lAnnualFN As String = pOutputPath & "annualflow.txt"
 
-        Dim lChkFN As String = lOutputPath & "times.txt"
-        Dim lParamFN As String = lOutputPath & "statsparam.txt"
+        Dim lChkFN As String = pOutputPath & "times.txt"
+        Dim lParamFN As String = pOutputPath & "statsparam.txt"
 
         If Not FileExists(lRunoffFN) Then
             Logger.Msg("Could not open time series file," & vbCrLf & lRunoffFN, "GeoSFM Utilities")
-            Exit Sub
+            Return False
         End If
 
-        Dim lLogFN As String = lOutputPath & "logfilestats.txt"
+        Dim lLogFN As String = pOutputPath & "logfilestats.txt"
 
         Dim lChkFile As New StringBuilder
         lChkFile.AppendLine("Starting Time:" & " " & System.DateTime.Now.ToString)
@@ -3385,14 +3301,14 @@ Public Module modGeoSFM
             lStreamReader.Close()
         Catch e As ApplicationException
             Logger.Msg("Problem reading file " & lRunoffFN & vbCrLf & "Check the contents of this file before continuing.", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End Try
 
         Dim lRunoffSize As Integer = lRunoffList.Count
         Dim lUseYear As Integer = 1
         If (lRunoffSize = 0) Then
             Logger.Msg("The runofffile " & vbCrLf & lRunoffFN & " is empty", "")
-            Exit Sub
+            Return False
         ElseIf ((lRunoffSize < 3285) And (lRunoffSize > 280)) Then
             Logger.Msg("Less than 9 years of data supplied." & vbCrLf & vbCrLf & "Computing bankfull from monthly data...", "")
             lUseYear = 12
@@ -3411,12 +3327,12 @@ Public Module modGeoSFM
         lStartYear = Left(lDayOneStr, 4)
         If Not IsNumeric(lStartYear) Then
             Logger.Msg("Start year must be a 4 digit number", "GeoSFM Utilities")
-            Exit Sub
+            Return False
         End If
         lStartDay = Right(lDayOneStr, 3)
         If Not IsNumeric(lStartDay) Then
             Logger.Msg("Start day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
-            Exit Sub
+            Return False
         End If
 
         Dim lEndyear As String = ""
@@ -3424,12 +3340,12 @@ Public Module modGeoSFM
         lEndyear = Left(lEndDayStr, 4)
         If Not IsNumeric(lEndyear) Then
             Logger.Msg("End year must be a 4 digit number", "GeoSFM Utilities")
-            Exit Sub
+            Return False
         End If
         lEndday = Right(lEndDayStr, 3)
         If Not IsNumeric(lEndday) Then
             Logger.Msg("End day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
-            Exit Sub
+            Return False
         End If
 
         Dim lSDate(5) As Integer
@@ -3444,7 +3360,7 @@ Public Module modGeoSFM
 
         If CInt(lEndyear) < CInt(lStartYear) Then
             Logger.Msg("End year must be greater than or equal to start year", "GeoSFM Utilities")
-            Exit Sub
+            Return False
         End If
 
         '        'statslist = { "Max" , "Mean"}            'commented in the avenue
@@ -3472,7 +3388,7 @@ Public Module modGeoSFM
         lParamFile.AppendLine(lEndyear)
         lParamFile.AppendLine(lRunoffDays.ToString)
         lParamFile.AppendLine(lBasinSize.ToString)
-        lParamFile.AppendLine(lStatsType.tostring)
+        lParamFile.AppendLine(lStatsType.ToString)
         lParamFile.AppendLine(lRunoffFN)
         lParamFile.AppendLine(lMonthlyFN)
         lParamFile.AppendLine(lAnnualFN)
@@ -3507,33 +3423,33 @@ Public Module modGeoSFM
         '        '
 
         Dim lGeoSFMstatsDllFN As String = ""
-        If FileExists(lOutputPath & "geosfmstats.dll") Then
-            lGeoSFMstatsDllFN = lOutputPath & "geosfmstats.dll"
+        If FileExists(pOutputPath & "geosfmstats.dll") Then
+            lGeoSFMstatsDllFN = pOutputPath & "geosfmstats.dll"
         ElseIf FileExists(lBasinsBinLoc & "\geosfmstats.dll") Then
-            File.Copy(lBasinsBinLoc & "\geosfmstats.dll", lOutputPath & "geosfmstats.dll")
-            lGeoSFMstatsDllFN = lOutputPath & "geosfmstats.dll"
+            File.Copy(lBasinsBinLoc & "\geosfmstats.dll", pOutputPath & "geosfmstats.dll")
+            lGeoSFMstatsDllFN = pOutputPath & "geosfmstats.dll"
         Else
             Logger.Msg("Unable to locate the program file: geosfmstats.dll " & vbCrLf & vbCrLf & "Install the programs in your BASINS/bin folder.", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         'aggregateflows()   now appears to be done using geosfmstats.exe 
 
         Dim lGeoSFMstatsFN As String = ""
-        If FileExists(lOutputPath & "geosfmstats.exe") Then
-            lGeoSFMstatsFN = lOutputPath & "geosfmstats.exe"
+        If FileExists(pOutputPath & "geosfmstats.exe") Then
+            lGeoSFMstatsFN = pOutputPath & "geosfmstats.exe"
         ElseIf FileExists(lBasinsBinLoc & "\geosfmstats.exe") Then
-            File.Copy(lBasinsBinLoc & "\geosfmstats.exe", lOutputPath & "geosfmstats.exe")
-            lGeoSFMstatsFN = lOutputPath & "geosfmstats.exe"
+            File.Copy(lBasinsBinLoc & "\geosfmstats.exe", pOutputPath & "geosfmstats.exe")
+            lGeoSFMstatsFN = pOutputPath & "geosfmstats.exe"
         Else
             Logger.Msg("Unable to locate the program file: geosfmstats.exe " & vbCrLf & vbCrLf & "Install the programs in your BASINS/bin folder.", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         Dim lPProcess As New Diagnostics.Process
         With lPProcess.StartInfo
-            .FileName = lOutputPath & "geosfmstats.exe"
-            .WorkingDirectory = lOutputPath
+            .FileName = pOutputPath & "geosfmstats.exe"
+            .WorkingDirectory = pOutputPath
             .Arguments = ""
             .CreateNoWindow = False
             .UseShellExecute = True
@@ -3559,11 +3475,11 @@ Public Module modGeoSFM
                 Loop
             Catch e As ApplicationException
                 Logger.Msg("Cannot read output file, " & lMonthlyFN & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-                Exit Sub
+                Return False
             End Try
         Else
             Logger.Msg("Cannot open output file, " & lMonthlyFN & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         Dim lAnnualFileSize As Integer = 0
@@ -3581,11 +3497,11 @@ Public Module modGeoSFM
                 Loop
             Catch e As ApplicationException
                 Logger.Msg("Cannot read output file, " & lAnnualFN & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-                Exit Sub
+                Return False
             End Try
         Else
             Logger.Msg("Cannot open output file, " & lAnnualFN & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         Dim lDailyFilename As String = lRunoffFN
@@ -3654,8 +3570,24 @@ Public Module modGeoSFM
             lMedflowfld = AddField(lSubTheme, "Medflow")
         End If
 
-        Dim lPidfield As Integer = GisUtil.FieldIndex(lSubTheme, "Gridcode")
-        Dim lPolyidfld As Integer = GisUtil.FieldIndex(lSubTheme, "Id")
+        Dim lPidfield As Integer = 0
+        If GisUtil.IsField(lSubTheme, "Gridcode") Then
+            lPidfield = GisUtil.FieldIndex(lSubTheme, "Gridcode")
+        Else
+            If GisUtil.IsField(lSubTheme, "PolygonID") Then
+                lPidfield = GisUtil.FieldIndex(lSubTheme, "PolygonID")
+            End If
+        End If
+
+        Dim lPolyidfld As Integer = 0
+        If GisUtil.IsField(lSubTheme, "Id") Then
+            lPolyidfld = GisUtil.FieldIndex(lSubTheme, "Id")
+        Else
+            If GisUtil.IsField(lSubTheme, "PolygonID") Then
+                lPolyidfld = GisUtil.FieldIndex(lSubTheme, "PolygonID")
+            End If
+        End If
+
         Dim lPNumRecs As Integer = GisUtil.NumFeatures(lSubTheme)
         Dim lPidList As New Collection
         Dim lPidVal As String = ""
@@ -3682,11 +3614,11 @@ Public Module modGeoSFM
                 Loop
             Catch e As ApplicationException
                 Logger.Msg("Cannot read output file, " & lResultFilename & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-                Exit Sub
+                Return False
             End Try
         Else
             Logger.Msg("Cannot open output file, " & lResultFilename & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         Dim lNumFlds As Integer = 0
@@ -3764,7 +3696,7 @@ Public Module modGeoSFM
                 If (lChkmed = 1) Then
                     If (lRecCount < 9) Then
                         Logger.Msg("Too few records for flow statistics computation", "Less than 9 records")
-                        Exit Sub
+                        Return False
                     ElseIf (((lRecCount) Mod (2)) = 1) Then
                         lTheMedian = lRecList((lRecCount - 1) / 2)
                     ElseIf (((lRecCount) Mod (2)) = 0) Then
@@ -3775,7 +3707,7 @@ Public Module modGeoSFM
                 If ((lChkq25 = 1) Or (lChkq75 = 1)) Then
                     If (lRecCount < 9) Then
                         Logger.Msg("Too few records for flow statistics computation", "Less than 9 records")
-                        Exit Sub
+                        Return False
                     ElseIf (((lRecCount) Mod (2)) = 1) Then
                         If (((lRecCount) Mod (4)) = 1) Then
                             lTheQuart25 = lRecList((lRecCount - 1) / 4)
@@ -3840,7 +3772,7 @@ Public Module modGeoSFM
             For lPRecs As Integer = 0 To GisUtil.NumFeatures(lSubTheme) - 1
                 Dim cpid As Integer = GisUtil.FieldValue(lSubTheme, lPRecs, lPidfield)
                 If (cpid = lSubbasinId) Then
-                    If (lchksum = 1) Then
+                    If (lChksum = 1) Then
                         GisUtil.SetFeatureValueNoStartStop(lSubTheme, lSumfld, lPRecs, SignificantDigits(lTheSum, 4))
                     End If
                     If (lChkcnt = 1) Then
@@ -3937,13 +3869,13 @@ Public Module modGeoSFM
             Next
             lRivStatsFile.AppendLine(lStr)
         Next
-        SaveFileString(lOutputPath & "riverstats.txt", lRivStatsFile.ToString)
+        SaveFileString(pOutputPath & "riverstats.txt", lRivStatsFile.ToString)
 
-        Logger.Msg("Bankfull and Flow Characteristics Computed. Outputs written to: " & vbCrLf & vbCrLf & "      " & lOutputPath & "riverstats.txt", "Geospatial Stream Flow Model")
+        Logger.Msg("Bankfull and Flow Characteristics Computed. Outputs written to: " & vbCrLf & vbCrLf & "      " & pOutputPath & "riverstats.txt", "Geospatial Stream Flow Model")
+        Return True
+    End Function
 
-    End Sub
-
-    Friend Sub PlotMap(ByVal aStreamflow As Boolean, ByVal aMapJDate As Double)
+    Friend Function PlotMap(ByVal aStreamflow As Boolean, ByVal aMapJDate As Double) As Boolean
         ' ***********************************************************************************************
         ' ***********************************************************************************************
         '
@@ -3968,18 +3900,17 @@ Public Module modGeoSFM
         ' ***********************************************************************************************
 
         Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-        Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\GeoSFM\"   'will need to do more with this
 
         Dim lResultFileName As String = ""
         If aStreamflow Then
-            lResultFileName = lOutputPath & "streamflow.txt"
+            lResultFileName = pOutputPath & "streamflow.txt"
         Else
-            lResultFileName = lOutputPath & "soilwater.txt"
+            lResultFileName = pOutputPath & "soilwater.txt"
         End If
 
         If Not FileExists(lResultFileName) Then
             Logger.Msg("Could not open time series file," & vbCrLf & lResultFileName, "GeoSFM Utilities")
-            Exit Sub
+            Return False
         End If
 
         Dim lSubThemeIndex As Integer = -1
@@ -3988,36 +3919,46 @@ Public Module modGeoSFM
         Dim lMedFlowFld As Integer = -1
         If GisUtil.IsLayer("Subbasins") Then
             lSubThemeIndex = GisUtil.LayerIndex("Subbasins")
-            lHighFlowFld = AddField(lSubThemeIndex, "Highflow")
-            lLowFlowFld = AddField(lSubThemeIndex, "Lowflow")
-            lMedFlowFld = AddField(lSubThemeIndex, "Medflow")
+            If GisUtil.IsField(lSubThemeIndex, "Highflow") Then
+                lHighFlowFld = GisUtil.FieldIndex(lSubThemeIndex, "Highflow")
+            End If
+            If GisUtil.IsField(lSubThemeIndex, "Lowflow") Then
+                lLowFlowFld = GisUtil.FieldIndex(lSubThemeIndex, "Lowflow")
+            End If
+            If GisUtil.IsField(lSubThemeIndex, "Medflow") Then
+                lMedFlowFld = GisUtil.FieldIndex(lSubThemeIndex, "Medflow")
+            End If
         End If
 
         If (lSubThemeIndex = -1) Then
             Logger.Msg("The map must contain a layer named 'Subbasins' to use this feature.", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         If (lHighFlowFld = -1) Then
             Logger.Msg("High flow field, Highflow, has not been initialized.  Run 'Bankfull and Flow Statistics' to compute this field.", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
         If (lLowFlowFld = -1) Then
             Logger.Msg("Low flow field, Lowflow, has not been initialized.  Run 'Bankfull and Flow Statistics' to compute this field.", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
         If (lMedFlowFld = -1) Then
             Logger.Msg("Median flow field, Medflow, has not been initialized.  Run 'Bankfull and Flow Statistics' to compute this field.", "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
-        Dim lPidField As Integer = GisUtil.FieldIndex(lSubThemeIndex, "Gridcode")
-        If lPidField < 0 Then
-            lPidField = GisUtil.FieldIndex(lSubThemeIndex, "Grid_code")
-            If lPidField < 0 Then
-                Logger.Msg("Subbasins layer must have a field named 'Gridcode'.", "Geospatial Stream Flow Model")
-                Exit Sub
+        Dim lPidfield As Integer = 0
+        If GisUtil.IsField(lSubThemeIndex, "Gridcode") Then
+            lPidfield = GisUtil.FieldIndex(lSubThemeIndex, "Gridcode")
+        Else
+            If GisUtil.IsField(lSubThemeIndex, "PolygonID") Then
+                lPidfield = GisUtil.FieldIndex(lSubThemeIndex, "PolygonID")
             End If
+        End If
+        If lPidfield < 0 Then
+            Logger.Msg("Subbasins layer must have a field named 'Gridcode'.", "Geospatial Stream Flow Model")
+            Return False
         End If
 
         Dim lCurFlowFld As Integer = AddField(lSubThemeIndex, "FlowNow")
@@ -4041,11 +3982,11 @@ Public Module modGeoSFM
                 Loop
             Catch e As ApplicationException
                 Logger.Msg("Cannot read output file, " & lResultFileName & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-                Exit Sub
+                Return False
             End Try
         Else
             Logger.Msg("Cannot open output file, " & lResultFileName & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         Dim lNumFlds As Integer = 0
@@ -4089,7 +4030,7 @@ Public Module modGeoSFM
 
         If lPlotDay = 0 Then
             Logger.Msg("Selected day not found in " & lResultFileName, "Geospatial Stream Flow Model")
-            Exit Sub
+            Return False
         End If
 
         Dim lTheHighflow As Single = 0.0
@@ -4100,7 +4041,7 @@ Public Module modGeoSFM
         For lFieldNum As Integer = 1 To lNumFlds - 1
             Dim lSubbasinId As Integer = lResultVals(1, lFieldNum)
             For lPolyRecs As Integer = 0 To GisUtil.NumFeatures(lSubThemeIndex) - 1
-                Dim lCurPolyid As Integer = GisUtil.FieldValue(lSubThemeIndex, lPolyRecs, lPidField)
+                Dim lCurPolyid As Integer = GisUtil.FieldValue(lSubThemeIndex, lPolyRecs, lPidfield)
                 If (lCurPolyid = lSubbasinId) Then
                     lTheHighflow = GisUtil.FieldValue(lSubThemeIndex, lPolyRecs, lHighFlowFld)
                     lTheLowflow = GisUtil.FieldValue(lSubThemeIndex, lPolyRecs, lLowFlowFld)
@@ -4129,7 +4070,9 @@ Public Module modGeoSFM
         lCaptions.Add("normal_flow")
         lCaptions.Add("high_flow")
         GisUtil.SetLayerRendererUniqueValues("Subbasins", lCurIndexFld, lColors, lCaptions)
-    End Sub
+
+        Return True
+    End Function
 
     Friend Sub SetFlowTimeseries(ByVal aFlowFileName As String)
         'read result file into memory
@@ -4154,6 +4097,10 @@ Public Module modGeoSFM
             End Try
         Else
             Logger.Msg("Cannot open output file, " & aFlowFileName & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
+            Exit Sub
+        End If
+
+        If lResultRecs.Count = 0 Then
             Exit Sub
         End If
 
@@ -4336,6 +4283,22 @@ Public Module modGeoSFM
         Logger.Dbg("Found " & aStations.Count & " Stations")
     End Sub
 
+    Friend Sub SetOutputPath(ByVal aProjectName As String)
+        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+        Dim lOutputPath As String = lBasinsBinLoc.Substring(0, lBasinsBinLoc.Length - 3) & "modelout\"
+        If FileExists(lOutputPath) Then
+            lOutputPath = lOutputPath & aProjectName & "\"
+        Else
+            Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
+            lOutputPath = lBasinsFolder & "\modelout\" & aProjectName & "\"
+        End If
+        If Not FileExists(lOutputPath, True) Then
+            MkDir(lOutputPath)
+        End If
+        pOutputPath = lOutputPath
+    End Sub
+    
+        
     Private Function AddField(ByVal aTheme As Integer, ByVal aFieldName As String, Optional ByVal aFieldType As Integer = 2) As Integer
         Dim lfld As Integer = -1
         If GisUtil.IsField(aTheme, aFieldName) Then

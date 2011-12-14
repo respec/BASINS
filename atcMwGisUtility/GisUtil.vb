@@ -2343,6 +2343,9 @@ Public Class GisUtil
             Next
             lStreamGrid.Close()
             lStreamGrid = Nothing
+
+            lWeightingFactorGrid.Close()
+            lWeightingFactorGrid = Nothing
         End If
 
         lOutputGrid.Save()
@@ -2494,6 +2497,111 @@ Public Class GisUtil
 
         lOutputGrid.Save()
         lOutputGrid = Nothing
+    End Sub
+
+    Public Shared Sub GridComputeVelocity(ByVal aVelocityGridFileName As String, ByVal aLuFileName As String, ByVal aSubbasinFileName As String, _
+                                          ByVal aFlowAccFileName As String, ByVal aManningsValues As atcCollection, ByVal aSlopeBySubbasin As atcCollection)
+        'compute flow velocity for GeoSFM, using flow acc, mannings value and slope
+        'at each grid cell we know the land use code -> mannings value
+        '                              subbasin id   -> slope
+        '                              flow accumulation 
+
+        Dim lVelGrid As New MapWinGIS.Grid
+        lVelGrid.Open(aVelocityGridFileName)
+
+        Dim lFlowAccGrid As New MapWinGIS.Grid
+        lFlowAccGrid.Open(aFlowAccFileName)
+
+        Dim lLuGrid As New MapWinGIS.Grid
+        lLuGrid.Open(aLuFileName)
+
+        Dim lSubbasinGrid As New MapWinGIS.Grid
+        lSubbasinGrid.Open(aSubbasinFileName)
+
+        Dim lStartRow As Integer = 0
+        Dim lStartCol As Integer = 0
+        Dim lEndRow As Integer = lFlowAccGrid.Header.NumberRows - 1
+        Dim lEndCol As Integer = lFlowAccGrid.Header.NumberCols - 1
+        Dim lFlowacc As Single = 0.0
+        Dim lLuCode As Integer = 0
+
+        Dim lX As Double = 0.0
+        Dim lY As Double = 0.0
+        Dim lLuCol As Integer = 0
+        Dim lLuRow As Integer = 0
+        Dim lManningsN As Single = 0.05
+        Dim lSubid As Integer = 0
+        Dim lSlope As Single = 0.0
+        Dim lMsgDisplayed As Boolean = False
+        Dim lVelocity As Single = 0.0
+        For lRow As Integer = lStartRow To lEndRow
+            For lCol As Integer = lStartCol To lEndCol
+                'flow accumulation value at this point
+                lFlowacc = lFlowAccGrid.Value(lCol, lRow)
+                'get mannings n at this point from land use code
+                lFlowAccGrid.CellToProj(lCol, lRow, lX, lY)
+                lLuGrid.ProjToCell(lX, lY, lLuCol, lLuRow)
+                lLuCode = lLuGrid.Value(lLuCol, lLuRow)
+                If aManningsValues.Keys.Contains(lLuCode) Then
+                    lManningsN = aManningsValues.ItemByKey(lLuCode)
+                Else
+                    If lMsgDisplayed = False Then
+                        Logger.Msg("Anderson Code of " & lLuCode.ToString & " is not supported in the USGS Land Cover Grid." & vbCrLf & "Defaulting to Mannings n of 0.05", "Geospatial Stream Flow Model")
+                        lMsgDisplayed = True
+                    End If
+                    lManningsN = 0.05
+                End If
+                'get slope at this point based on subbasin
+                lSubid = lSubbasinGrid.Value(lCol, lRow)
+                If aSlopeBySubbasin.Keys.Contains(lSubid) Then
+                    lSlope = aSlopeBySubbasin.ItemByKey(lSubid)
+                Else
+                    lSlope = -1.0
+                End If
+                'now compute velocity
+                If lSlope > -1.0 Then
+                    If lFlowacc <= 1000 Then
+                        lVelocity = (0.015874 / lManningsN) * (lSlope ^ 0.5)
+                    ElseIf lFlowacc <= 2000 Then
+                        lVelocity = (0.0736806 / lManningsN) * (lSlope ^ 0.5)
+                    ElseIf lFlowacc <= 3000 Then
+                        lVelocity = (0.0464159 / lManningsN) * (lSlope ^ 0.5)
+                    ElseIf lFlowacc <= 4000 Then
+                        lVelocity = (0.0736806 / lManningsN) * (lSlope ^ 0.5)
+                    ElseIf lFlowacc <= 5000 Then
+                        lVelocity = (0.1357209 / lManningsN) * (lSlope ^ 0.5)
+                    ElseIf lFlowacc <= 10000 Then
+                        lVelocity = 0.3
+                    ElseIf lFlowacc <= 50000 Then
+                        lVelocity = 0.45
+                    ElseIf lFlowacc <= 100000 Then
+                        lVelocity = 0.6
+                    ElseIf lFlowacc <= 250000 Then
+                        lVelocity = 0.75
+                    ElseIf lFlowacc <= 500000 Then
+                        lVelocity = 0.9
+                    ElseIf lFlowacc <= 750000 Then
+                        lVelocity = 1.2
+                    Else
+                        lVelocity = 1.5
+                    End If
+                    lVelGrid.Value(lCol, lRow) = lVelocity
+                Else
+                    lVelGrid.Value(lCol, lRow) = 0.0
+                End If
+            Next
+        Next
+
+        lVelGrid.Save()
+        lVelGrid.Close()
+        lFlowAccGrid.Close()
+        lSubbasinGrid.Close()
+        lLuGrid.Close()
+
+        lVelGrid = Nothing
+        lFlowAccGrid = Nothing
+        lSubbasinGrid = Nothing
+        lLuGrid = Nothing
     End Sub
 
     Public Shared Function GridGetCellSizeX(ByVal aGridLayerIndex As Integer) As Double
