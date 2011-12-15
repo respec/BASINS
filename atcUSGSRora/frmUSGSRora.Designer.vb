@@ -85,7 +85,7 @@ Partial Class frmUSGSRora
         Me.txtEndDateUser.Location = New System.Drawing.Point(194, 52)
         Me.txtEndDateUser.Name = "txtEndDateUser"
         Me.txtEndDateUser.Size = New System.Drawing.Size(144, 20)
-        Me.txtEndDateUser.TabIndex = 9
+        Me.txtEndDateUser.TabIndex = 2
         '
         'txtStartDateUser
         '
@@ -94,7 +94,7 @@ Partial Class frmUSGSRora
         Me.txtStartDateUser.Location = New System.Drawing.Point(194, 25)
         Me.txtStartDateUser.Name = "txtStartDateUser"
         Me.txtStartDateUser.Size = New System.Drawing.Size(144, 20)
-        Me.txtStartDateUser.TabIndex = 8
+        Me.txtStartDateUser.TabIndex = 1
         '
         'btnExamineData
         '
@@ -102,7 +102,7 @@ Partial Class frmUSGSRora
         Me.btnExamineData.Location = New System.Drawing.Point(244, 80)
         Me.btnExamineData.Name = "btnExamineData"
         Me.btnExamineData.Size = New System.Drawing.Size(94, 23)
-        Me.btnExamineData.TabIndex = 10
+        Me.btnExamineData.TabIndex = 3
         Me.btnExamineData.Text = "Examine Data"
         Me.btnExamineData.UseVisualStyleBackColor = True
         '
@@ -113,7 +113,7 @@ Partial Class frmUSGSRora
         Me.txtDataEnd.Name = "txtDataEnd"
         Me.txtDataEnd.ReadOnly = True
         Me.txtDataEnd.Size = New System.Drawing.Size(119, 20)
-        Me.txtDataEnd.TabIndex = 3
+        Me.txtDataEnd.TabIndex = 12
         '
         'txtDataStart
         '
@@ -122,7 +122,7 @@ Partial Class frmUSGSRora
         Me.txtDataStart.Name = "txtDataStart"
         Me.txtDataStart.ReadOnly = True
         Me.txtDataStart.Size = New System.Drawing.Size(119, 20)
-        Me.txtDataStart.TabIndex = 2
+        Me.txtDataStart.TabIndex = 11
         '
         'lblDataEnd
         '
@@ -167,7 +167,7 @@ Partial Class frmUSGSRora
         Me.btnWriteASCIIOutput.Location = New System.Drawing.Point(210, 82)
         Me.btnWriteASCIIOutput.Name = "btnWriteASCIIOutput"
         Me.btnWriteASCIIOutput.Size = New System.Drawing.Size(128, 23)
-        Me.btnWriteASCIIOutput.TabIndex = 15
+        Me.btnWriteASCIIOutput.TabIndex = 10
         Me.btnWriteASCIIOutput.Text = "Write ASCII Outputs"
         Me.btnWriteASCIIOutput.UseVisualStyleBackColor = True
         '
@@ -181,6 +181,7 @@ Partial Class frmUSGSRora
         Me.chkTabDelimited.TabIndex = 14
         Me.chkTabDelimited.Text = "Tab-Delimited"
         Me.chkTabDelimited.UseVisualStyleBackColor = True
+        Me.chkTabDelimited.Visible = False
         '
         'txtOutputDir
         '
@@ -189,7 +190,7 @@ Partial Class frmUSGSRora
         Me.txtOutputDir.Location = New System.Drawing.Point(78, 20)
         Me.txtOutputDir.Name = "txtOutputDir"
         Me.txtOutputDir.Size = New System.Drawing.Size(260, 20)
-        Me.txtOutputDir.TabIndex = 12
+        Me.txtOutputDir.TabIndex = 8
         '
         'lblOutputDir
         '
@@ -205,7 +206,7 @@ Partial Class frmUSGSRora
         Me.txtOutputRootName.Location = New System.Drawing.Point(114, 49)
         Me.txtOutputRootName.Name = "txtOutputRootName"
         Me.txtOutputRootName.Size = New System.Drawing.Size(121, 20)
-        Me.txtOutputRootName.TabIndex = 13
+        Me.txtOutputRootName.TabIndex = 9
         '
         'lblBaseFilename
         '
@@ -243,14 +244,14 @@ Partial Class frmUSGSRora
         Me.cboAnteRecess.Location = New System.Drawing.Point(129, 106)
         Me.cboAnteRecess.Name = "cboAnteRecess"
         Me.cboAnteRecess.Size = New System.Drawing.Size(86, 21)
-        Me.cboAnteRecess.TabIndex = 15
+        Me.cboAnteRecess.TabIndex = 7
         '
         'btnRecessionIndex
         '
         Me.btnRecessionIndex.Location = New System.Drawing.Point(126, 69)
         Me.btnRecessionIndex.Name = "btnRecessionIndex"
         Me.btnRecessionIndex.Size = New System.Drawing.Size(171, 23)
-        Me.btnRecessionIndex.TabIndex = 14
+        Me.btnRecessionIndex.TabIndex = 6
         Me.btnRecessionIndex.Text = "Browse Recession Index"
         Me.btnRecessionIndex.UseVisualStyleBackColor = True
         '
@@ -286,7 +287,7 @@ Partial Class frmUSGSRora
         Me.txtRecessionIndex.Location = New System.Drawing.Point(126, 43)
         Me.txtRecessionIndex.Name = "txtRecessionIndex"
         Me.txtRecessionIndex.Size = New System.Drawing.Size(89, 20)
-        Me.txtRecessionIndex.TabIndex = 9
+        Me.txtRecessionIndex.TabIndex = 5
         '
         'lblRecessionIndex
         '
@@ -313,7 +314,7 @@ Partial Class frmUSGSRora
         Me.txtDrainageArea.Location = New System.Drawing.Point(126, 17)
         Me.txtDrainageArea.Name = "txtDrainageArea"
         Me.txtDrainageArea.Size = New System.Drawing.Size(89, 20)
-        Me.txtDrainageArea.TabIndex = 6
+        Me.txtDrainageArea.TabIndex = 4
         '
         'lblDrainageAreaUnits
         '
