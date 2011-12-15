@@ -85,12 +85,6 @@
     <Compile Include="clsRecess.vb" />
     <Compile Include="clsRecessionSegment.vb" />
     <Compile Include="clsUSGSStreamFlowAnalysis.vb" />
-    <Compile Include="frmDataSummary.Designer.vb">
-      <DependentUpon>frmDataSummary.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmDataSummary.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="frmMRCControl.Designer.vb">
       <DependentUpon>frmMRCControl.vb</DependentUpon>
     </Compile>
@@ -126,9 +120,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="frmDataSummary.resx">
-      <DependentUpon>frmDataSummary.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="frmMRCControl.resx">
       <DependentUpon>frmMRCControl.vb</DependentUpon>
     </EmbeddedResource>
