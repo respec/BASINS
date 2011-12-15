@@ -333,8 +333,8 @@ Public Class frmUSGSBaseflow
 
     Private Sub btnExamineData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnExamineData.Click
         For Each lTs As atcTimeseries In pDataGroup
-            Dim lfrmDataSummary As New frmDataSummary(atcUSGSScreen.PrintDataSummary(lTs))
-            lfrmDataSummary.txtDataSummary.SelectionStart = 0
+            Dim lfrmDataSummary As New atcUSGSUtility.frmDataSummary(atcUSGSScreen.PrintDataSummary(lTs))
+            lfrmDataSummary.ClearSelection()
             lfrmDataSummary.Show()
         Next
     End Sub

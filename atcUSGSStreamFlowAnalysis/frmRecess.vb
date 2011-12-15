@@ -1234,7 +1234,7 @@ Public Class frmRecess
         If pDataGroup.Count = 0 Then
             lErrMsg &= "- No streamflow data selected" & vbCrLf
         Else
-            If lSDate < 0 OrElse lEDate < 0 Then
+            If lSDate < 0 OrElse lEDate < 0 OrElse lSDate >= lEDate Then
                 lErrMsg &= "- Problematic start and/or end date." & vbCrLf
             Else
                 Dim lTs As atcTimeseries = Nothing
@@ -1520,8 +1520,8 @@ Public Class frmRecess
 
     Private Sub btnExamineData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnExamineData.Click
         For Each lTs As atcTimeseries In pDataGroup
-            Dim lfrmDataSummary As New frmDataSummary(atcUSGSScreen.PrintDataSummary(lTs))
-            lfrmDataSummary.txtDataSummary.SelectionStart = 0
+            Dim lfrmDataSummary As New atcUSGSUtility.frmDataSummary(atcUSGSScreen.PrintDataSummary(lTs))
+            lfrmDataSummary.ClearSelection()
             lfrmDataSummary.Show()
         Next
     End Sub
@@ -1679,6 +1679,11 @@ Public Class frmRecess
             If pRecess.FileOut1Created Then pRecess.FileOut1Created = False
         End If
         pRecess.DoOperation("summary", "")
+        With pDataGroup(0).Attributes
+            .SetValue("RORAKMed", pRecess.RecessionIndex)
+            .SetValue("RORASJD", pLastRunConfigs.GetValue("Start Date"))
+            .SetValue("RORAEJD", pLastRunConfigs.GetValue("End Date"))
+        End With
         txtAnalysisResults.Text = pRecess.Bulletin
         txtAnalysisResults.Visible = True
 

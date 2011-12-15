@@ -44,6 +44,13 @@ Public Class clsRecess
         End Set
     End Property
 
+    Private pRecessionIndex As Double
+    Public ReadOnly Property RecessionIndex() As Double
+        Get
+            Return pRecessionIndex
+        End Get
+    End Property
+
     Private pRecessions As New atcCollection 'collection of clsRecessionSegment
     Public RecessionSegment As clsRecessionSegment = Nothing
 
@@ -1402,7 +1409,7 @@ Public Class clsRecess
             lSW.Close()
             lSW = Nothing
         End If
-
+        pRecessionIndex = lKMed
         'here is the final result
         lMsg.AppendLine(vbCrLf & "Final median recession index: " & String.Format("{0:0.00}", lKMed).PadLeft(8, " "))
         Bulletin = lMsg.ToString
