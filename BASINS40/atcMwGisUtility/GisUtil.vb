@@ -2243,6 +2243,17 @@ Public Class GisUtil
 
     End Sub
 
+    Public Shared Sub GridFromShapefile(ByVal aShapefileLayerIndex As Integer, ByVal aShapefileFieldIndex As Integer, ByVal aBaseGridFileName As String, ByVal aOutputGridFileName As String)
+        'create a grid from a shapefile,
+        'given a shapefile, a field index, and a base grid
+        Dim lShapefileName As String = LayerFileName(aShapefileLayerIndex)
+        Dim lGrid As New MapWinGIS.Grid
+        lGrid.Open(aBaseGridFileName)
+        Dim lFieldName As String = FieldName(aShapefileFieldIndex, aShapefileLayerIndex)
+
+        MapWinGeoProc.Utils.ShapefileToGrid(lShapefileName, aOutputGridFileName, MapWinGIS.GridFileType.UseExtension, lGrid.DataType, lFieldName, lGrid.Header.dX, Nothing)
+    End Sub
+
     Public Shared Sub DownstreamFlowLength(ByVal aFlowDirGridFileName As String, ByVal aFlowAccGridFileName As String, ByVal aLenGridFileName As String, _
                                            Optional ByVal aStreamGridFileName As String = "", Optional ByVal aWeightingFactorGridName As String = "")
         'new sub to compute downstream flow length, not available directly in mapwindow
