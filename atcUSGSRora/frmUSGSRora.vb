@@ -1,9 +1,6 @@
 ﻿Imports atcData
 Imports atcUtility
 Imports atcUSGSUtility
-Imports atcTimeseriesBaseflow
-Imports atcGraph
-Imports ZedGraph
 Imports MapWinUtility
 Imports System.Windows.Forms
 Imports System.Text.RegularExpressions
