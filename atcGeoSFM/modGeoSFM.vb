@@ -131,7 +131,17 @@ Public Module modGeoSFM
             Logger.Status("Computing Subbasin Grid")
             Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(aSubbasinLayerName)
             lSubbasinGridFileName = FilenameNoExt(lDEMFileName) & "Watershed.bgd"
-            'GridFromShapefile(lSubbasinLayerIndex, lPitFillDEMFileName, lSubbasinGridFileName)
+
+            Dim lIDField As Integer = 1
+            If GisUtil.IsField(lSubbasinLayerIndex, "Gridcode") Then
+                lIDField = GisUtil.FieldIndex(lSubbasinLayerIndex, "Gridcode")
+            Else
+                If GisUtil.IsField(lSubbasinLayerIndex, "PolygonID") Then
+                    lIDField = GisUtil.FieldIndex(lSubbasinLayerIndex, "PolygonID")
+                End If
+            End If
+
+            GisUtil.GridFromShapefile(lSubbasinLayerIndex, lIDField, lPitFillDEMFileName, lSubbasinGridFileName)
             GisUtil.AddLayer(lSubbasinGridFileName, lSubbasinGridLayerName)
         End If
 
@@ -144,7 +154,17 @@ Public Module modGeoSFM
             Logger.Status("Computing Stream Grid")
             Dim lStreamLayerIndex As Integer = GisUtil.LayerIndex(aStreamLayerName)
             lStreamGridFileName = FilenameNoExt(lDEMFileName) & "Stream.bgd"
-            'GridFromShapefile(lStreamLayerIndex, lPitFillDEMFileName, lStreamGridFileName)
+
+            Dim lIDField As Integer = 1
+            If GisUtil.IsField(lStreamLayerIndex, "Gridcode") Then
+                lIDField = GisUtil.FieldIndex(lStreamLayerIndex, "Gridcode")
+            Else
+                If GisUtil.IsField(lStreamLayerIndex, "PolygonID") Then
+                    lIDField = GisUtil.FieldIndex(lStreamLayerIndex, "PolygonID")
+                End If
+            End If
+
+            GisUtil.GridFromShapefile(lStreamLayerIndex, lIDField, lPitFillDEMFileName, lStreamGridFileName)
             GisUtil.AddLayer(lStreamGridFileName, lSubbasinGridLayerName)
         End If
 
