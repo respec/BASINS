@@ -111,9 +111,11 @@ Public Class atcDataSource
             Dim lCdlg As New Windows.Forms.OpenFileDialog
             With lCdlg
                 .Title = "Select " & lString & " file to open"
+                If aAttributes IsNot Nothing Then
+                    .Title = aAttributes.GetValue("Dialog Title", .Title)
+                End If
                 .Filter = Filter
                 .FilterIndex = 1
-                '.DefaultExt = aDefaultExt
                 .CheckFileExists = Not CanSave
                 If .ShowDialog() = Windows.Forms.DialogResult.OK Then
                     aSpecification = AbsolutePath(.FileName, CurDir)

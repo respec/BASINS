@@ -553,7 +553,9 @@ Public Class atcDataManager
         lFilesOnly.Add("File")
         Dim lNewSource As atcTimeseriesSource = atcDataManager.UserSelectDataSource(lFilesOnly, "Select a File Type", aNeedToOpen, aNeedToSave)
         If lNewSource IsNot Nothing Then 'user did not cancel
-            If Not atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
+            Dim lAttributes As New atcDataAttributes
+            If aNeedToSave Then lAttributes.SetValue("Dialog Title", "Save data in...")
+            If Not atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, lAttributes) Then
                 If Logger.LastDbgText.Length > 0 Then
                     Logger.Msg(Logger.LastDbgText, "Data Open Problem")
                 End If

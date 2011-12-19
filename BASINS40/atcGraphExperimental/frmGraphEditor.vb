@@ -120,11 +120,15 @@ Public Class frmGraphEditor
                 Return pPane.Y2Axis
             ElseIf radioAxisAux.Checked Then
                 If pPaneAux Is Nothing Then
-                    EnableAuxAxis(pZgc.MasterPane, True, 0.2)
-                    pPaneAux = pZgc.MasterPane.PaneList(0)
-                    pPane = pZgc.MasterPane.PaneList(1)
+                    If MsgBox("Add Auxiliary Graph Now?", MsgBoxStyle.YesNo, "No Auxiliary Graph") = MsgBoxResult.Yes Then
+                        EnableAuxAxis(pZgc.MasterPane, True, 0.2)
+                        pPaneAux = pZgc.MasterPane.PaneList(0)
+                        pPane = pZgc.MasterPane.PaneList(1)
+                        Return pPaneAux.YAxis
+                    End If
+                Else
+                    Return pPaneAux.YAxis
                 End If
-                Return pPaneAux.YAxis
             End If
         End If
         Return Nothing
@@ -470,6 +474,12 @@ Public Class frmGraphEditor
             If lRadio.Checked Then 'Only apply for newly checked, not also for unchecked
                 ApplyAll()
             End If
+        End If
+    End Sub
+
+    Private Sub chkAutoApply_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles chkAutoApply.CheckedChanged
+        If chkAutoApply.Checked Then
+            ApplyAll()
         End If
     End Sub
 
