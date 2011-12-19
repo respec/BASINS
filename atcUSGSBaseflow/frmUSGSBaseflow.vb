@@ -87,18 +87,6 @@ Public Class frmUSGSBaseflow
         pOutputDir = GetSetting("atcUSGSBaseflow", "Defaults", "OutputDir", "")
         OutputFilenameRoot = GetSetting("atcUSGSBaseflow", "Defaults", "BaseOutputFilename", "")
 
-        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodPART", "False") = "True" Then
-            chkMethodPART.Checked = True
-        End If
-        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPFixed", "False") = "True" Then
-            chkMethodHySEPFixed.Checked = True
-        End If
-        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPLocMin", "False") = "True" Then
-            chkMethodHySEPLocMin.Checked = True
-        End If
-        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPSlide", "False") = "True" Then
-            chkMethodHySEPSlide.Checked = True
-        End If
         'atcUSGSStations.StationInfoFile = GetSetting("atcUSGSBaseflow", "Defaults", "Stations", "Station.txt")
 
         RepopulateForm()
@@ -401,6 +389,10 @@ Public Class frmUSGSBaseflow
             SaveSetting("atcUSGSBaseflow", "Defaults", "BaseOutputFilename", OutputFilenameRoot)
         End If
         Logger.Dbg("Output ASCII")
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodPART", chkMethodPART.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPFixed", chkMethodHySEPFixed.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPLocMin", chkMethodHySEPLocMin.Checked)
+        SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPSlide", chkMethodHySEPSlide.Checked)
 
         OutputDir = txtOutputDir.Text.Trim()
         ASCIICommon(pDataGroup(0))
@@ -921,6 +913,18 @@ Public Class frmUSGSBaseflow
 
     Private Sub frmMain_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Opened = True
+        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodPART", "False") = "True" Then
+            chkMethodPART.Checked = True
+        End If
+        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPFixed", "False") = "True" Then
+            chkMethodHySEPFixed.Checked = True
+        End If
+        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPLocMin", "False") = "True" Then
+            chkMethodHySEPLocMin.Checked = True
+        End If
+        If GetSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPSlide", "False") = "True" Then
+            chkMethodHySEPSlide.Checked = True
+        End If
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
@@ -1062,11 +1066,6 @@ Public Class frmUSGSBaseflow
             If chkMethodHySEPFixed.Checked Then pMethods.Add(BFMethods.HySEPFixed)
             If chkMethodHySEPLocMin.Checked Then pMethods.Add(BFMethods.HySEPLocMin)
             If chkMethodHySEPSlide.Checked Then pMethods.Add(BFMethods.HySEPSlide)
-
-            SaveSetting("atcUSGSBaseflow", "Defaults", "MethodPART", chkMethodPART.Checked)
-            SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPFixed", chkMethodHySEPFixed.Checked)
-            SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPLocMin", chkMethodHySEPLocMin.Checked)
-            SaveSetting("atcUSGSBaseflow", "Defaults", "MethodHySEPSlide", chkMethodHySEPSlide.Checked)
         End If
     End Sub
 
