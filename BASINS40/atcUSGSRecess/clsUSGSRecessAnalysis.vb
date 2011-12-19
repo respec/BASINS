@@ -10,7 +10,7 @@ Public Class clsUSGSRecessAnalysis
 
     Public Overrides ReadOnly Property Name() As String
         Get
-            Return "Analysis::USGS Streamflow"
+            Return "Analysis::USGS Recess"
         End Get
     End Property
 
@@ -34,7 +34,7 @@ Public Class clsUSGSRecessAnalysis
             ShowForm(lTimeseriesGroup, lForm)
             Return lForm
         Else
-            Logger.Msg("Need to select at least one daily streamflow dataset", "USGS Streamflow Analysis")
+            Logger.Msg("Need to select at least one daily streamflow dataset", "USGS Recess")
         End If
     End Function
 
