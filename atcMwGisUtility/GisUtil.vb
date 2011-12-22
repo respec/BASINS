@@ -1738,7 +1738,7 @@ Public Class GisUtil
                             lValue = lNaN
                         Else
                             lValue = lValueGrid.Value(lValueCol, lValueRow)
-                            If lValue = lNodataValue Then
+                            If lValue = lNodataValue Or lValue < -100000 Then   'the first condition does not always catch no data values 
                                 lValue = lNaN
                             End If
                         End If
@@ -2355,8 +2355,10 @@ Public Class GisUtil
             lStreamGrid.Close()
             lStreamGrid = Nothing
 
-            lWeightingFactorGrid.Close()
-            lWeightingFactorGrid = Nothing
+            If Not lWeightingFactorGrid Is Nothing Then
+                lWeightingFactorGrid.Close()
+                lWeightingFactorGrid = Nothing
+            End If
         End If
 
         lOutputGrid.Save()

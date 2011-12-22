@@ -964,15 +964,17 @@ Public Module modGeoSFM
             Dim lHasDamValue As String = "0" '(BasinTable.ReturnValue(hasdamfld, rrecord)).SetFormat("d").AsString
             Dim lId As Integer = -1
             If lSubbasinLayerIndex > -1 Then
-                For lIndex As Integer = 0 To GisUtil.NumFeatures(lSubbasinLayerIndex) - 1
-                    lId = GisUtil.FieldValue(lSubbasinLayerIndex, lIndex, lIDField)
-                    If lId = lBasinValue Then
-                        If GisUtil.FieldValue(lSubbasinLayerIndex, lIndex, lHasDamField) = 1 Then
-                            lHasDamValue = "1"
+                If lHasDamField > -1 Then
+                    For lIndex As Integer = 0 To GisUtil.NumFeatures(lSubbasinLayerIndex) - 1
+                        lId = GisUtil.FieldValue(lSubbasinLayerIndex, lIndex, lIDField)
+                        If lId = lBasinValue Then
+                            If GisUtil.FieldValue(lSubbasinLayerIndex, lIndex, lHasDamField) = 1 Then
+                                lHasDamValue = "1"
+                            End If
+                            Exit For
                         End If
-                        Exit For
-                    End If
-                Next
+                    Next
+                End If
             End If
 
             Dim lRivPolyLoss As String = "1.0"
@@ -1379,6 +1381,7 @@ Public Module modGeoSFM
         SaveFileString(lOutFile, lRespOut.ToString)
 
         Logger.Msg("Basin Response Computed. Output file: " & vbCrLf & pOutputPath + "response.txt", "Geospatial Stream Flow Model")
+        System.GC.Collect()
         Return True
     End Function
 
