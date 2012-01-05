@@ -3,7 +3,7 @@ Imports MapWinUtility
 Public Class DownloadDataPlugin
     Implements MapWindow.Interfaces.IPlugin
     Private g_Menus As MapWindow.Interfaces.Menus
-    Private g_MapWin As MapWindow.Interfaces.IMapWin
+    Friend Shared g_MapWin As MapWindow.Interfaces.IMapWin
     Private g_MainForm As Integer
 
     Private Const pMenuLabel As String = "Download Data"
@@ -156,15 +156,6 @@ Public Class DownloadDataPlugin
         End If
     End Function
 
-    Private Sub LoadPlugin(ByVal aPluginName As String)
-        Try
-            Dim lKey As String = g_MapWin.Plugins.GetPluginKey(aPluginName)
-            'If Not g_MapWin.Plugins.PluginIsLoaded(lKey) Then 
-            g_MapWin.Plugins.StartPlugin(lKey)
-        Catch e As Exception
-            Logger.Dbg("Exception loading " & aPluginName & ": " & e.Message)
-        End Try
-    End Sub
 #End Region
 
     Public Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
@@ -183,13 +174,6 @@ Public Class DownloadDataPlugin
             Case pMenuName
                 aHandled = True
                 atcMwGisUtility.GisUtil.MappingObject = g_MapWin
-                LoadPlugin("D4EM Data Download::BASINS")
-                LoadPlugin("D4EM Data Download::NHDPlus")
-                LoadPlugin("D4EM Data Download::NLDAS")
-                LoadPlugin("D4EM Data Download::NWIS")
-                LoadPlugin("D4EM Data Download::NLCD2001")
-                LoadPlugin("D4EM Data Download::STORET")
-
                 If BASINS.NationalProjectIsOpen() Then
                     BASINS.SpecifyAndCreateNewProject()
                 ElseIf g_MapWin.Layers.NumLayers < 1 Then

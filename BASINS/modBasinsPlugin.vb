@@ -25,7 +25,7 @@ Public Module modBasinsPlugin
     Friend g_URL_Home As String = ""
     Friend g_URL_Register As String = ""
 
-    Friend g_BasinsDataDirs As New ArrayList
+    Friend g_BasinsDataDirs As New Generic.List(Of String)
     Friend g_ProgramDir As String = ""
     Friend g_ProgressPanel As Windows.Forms.Panel
     Friend pBuildFrm As frmBuildNew
@@ -49,9 +49,9 @@ Public Module modBasinsPlugin
     Friend Const ShowStatusMenuName As String = "ShowStatus"
     Friend Const ShowStatusMenuString As String = "Show Status Monitor"
 
-    Friend Const HelpMenuName As String = "mnuHelp"
-    Friend Const BasinsHelpMenuName As String = "BasinsHelp"
-    Friend Const BasinsHelpMenuString As String = "BASINS Documentation"
+    Friend Const TopHelpMenuName As String = "mnuHelp"
+    Friend Const OurHelpMenuName As String = "BasinsHelp"
+    Friend OurHelpMenuString As String = "BASINS Documentation"
 
     Friend Const ProgramWebPageMenuName As String = "ProgramWebPage"
     Friend ProgramWebPageMenuString As String = "BASINS Web Page"
@@ -67,42 +67,61 @@ Public Module modBasinsPlugin
     Private Const NationalProjectFilename As String = "national.mwprj"
 
     ''' <summary>
-    ''' 
+    ''' Find all of the data paths for this application on this system and add them to g_BasinsDataDirs
     ''' </summary>
-    ''' <remarks></remarks>
     Friend Sub FindBasinsDrives()
         If g_BasinsDataDirs.Count = 0 Then
             Dim lCheckDir As String = DefaultBasinsDataDir()
             If FileExists(lCheckDir, True, False) Then g_BasinsDataDirs.Add(lCheckDir)
 
-            For Each lDriveInfo As IO.DriveInfo In IO.DriveInfo.GetDrives()
-                With lDriveInfo
-                    If .IsReady AndAlso .DriveType = IO.DriveType.Fixed OrElse .DriveType = IO.DriveType.Network Then
-                        lCheckDir = .Name & BasinsDataPath
-                        If Not g_BasinsDataDirs.Contains(lCheckDir) AndAlso FileExists(lCheckDir, True, False) Then
-                            g_BasinsDataDirs.Add(lCheckDir)
-                        End If
-                    End If
-                End With
-            Next
+            AddExistingDirs(BasinsDataPath)
+
+            If g_BasinsDataDirs.Count = 0 AndAlso Not BasinsDataPath.StartsWith("Basins") Then
+                'If this is not BASINS, and we did not find the application's own data folder, look for a BASINS data folder
+                AddExistingDirs("Basins\data\")
+            End If
 
             Select Case g_BasinsDataDirs.Count
-                Case 0 : Logger.Msg("No BASINS folders found on any drives on this computer", "FindBasinsDrives")
-                Case 1 : Logger.Dbg("Found BASINS Data: " & g_BasinsDataDirs(0))
+                Case 0 : Logger.Msg("No " & BasinsDataPath & " folders found on any drives on this computer", "Find Data")
+                Case 1 : Logger.Dbg("Found data path: " & g_BasinsDataDirs(0))
                 Case Is > 1
                     Dim lAllDirs As String = ""
                     For Each lDir As String In g_BasinsDataDirs
                         lAllDirs &= lDir & "  "
                     Next
-                    Logger.Dbg("Found BASINS Data: " & lAllDirs)
+                    Logger.Dbg("Found data paths: " & lAllDirs)
             End Select
         End If
     End Sub
 
     ''' <summary>
-    ''' 
+    ''' Search all local hard drives for the given path. Add all found paths to g_BasinsDataDirs.
     ''' </summary>
+    ''' <param name="aPathToSearchFor">Search for this path</param>
     ''' <remarks></remarks>
+    Private Sub AddExistingDirs(ByVal aPathToSearchFor As String)
+        For Each lDriveInfo As IO.DriveInfo In IO.DriveInfo.GetDrives
+            Try
+                With lDriveInfo
+                    Dim lCheckDir As String = .Name & aPathToSearchFor
+                    Logger.Status("Checking for " & lCheckDir, True)
+                    If .IsReady AndAlso .DriveType = IO.DriveType.Fixed OrElse .DriveType = IO.DriveType.Network Then
+                        If Not g_BasinsDataDirs.Contains(lCheckDir) AndAlso FileExists(lCheckDir, True, False) Then
+                            g_BasinsDataDirs.Add(lCheckDir)
+                        End If
+                    End If
+                End With
+            Catch 'Skip drives that we cannot successfully check
+            End Try
+        Next
+        Logger.Status("")
+    End Sub
+
+    ''' <summary>
+    ''' 1. Load the nationwide project file shipped with the application, probably "national.mwprj"
+    ''' 2. Select the catalog units layer.
+    ''' 3. Open the form for building a new project.
+    ''' </summary>
     Public Sub LoadNationalProject()
         If Not NationalProjectIsOpen() Then
             Dim lFileName As String = IO.Path.Combine(g_ProgramDir, "Data\national" & g_PathChar & NationalProjectFilename)
@@ -114,7 +133,6 @@ Public Module modBasinsPlugin
                     End If
                 Next
             End If
-
             If FileExists(lFileName) Then  'load national project
 
                 g_Project.Load(lFileName)
@@ -171,36 +189,25 @@ Public Module modBasinsPlugin
     End Sub
 
     ''' <summary>
-    ''' 
+    ''' True if the national project is currently open, False if it is not
     ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
     Public Function NationalProjectIsOpen() As Boolean
-        If (Not g_Project Is Nothing) _
-            AndAlso (Not g_Project.FileName Is Nothing) _
-            AndAlso g_Project.FileName.ToLower.EndsWith(NationalProjectFilename) Then
-            Return True
-        Else
-            Return False
-        End If
+        Return (g_Project IsNot Nothing) _
+            AndAlso (g_Project.FileName IsNot Nothing) _
+            AndAlso g_Project.FileName.ToLower.EndsWith(NationalProjectFilename.ToLower)
     End Function
 
     ''' <summary>
-    ''' check to see if project has both a catalog unit layer and a state layer
+    ''' True if current project has both a catalog unit layer and a state layer
     ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
     Friend Function IsBASINSProject() As Boolean
         Dim lHaveCatLayer As Boolean = False
         Dim lHaveStateLayer As Boolean = False
         For Each lLayer As MapWindow.Interfaces.Layer In g_MapWin.Layers
             Select Case FilenameNoPath(lLayer.FileName).ToLower
-                Case "st.shp" : lHaveStateLayer = True
-                Case "cat.shp" : lHaveCatLayer = True
+                Case "st.shp" : lHaveStateLayer = True : If lHaveCatLayer Then Exit For
+                Case "cat.shp" : lHaveCatLayer = True : If lHaveStateLayer Then Exit For
             End Select
-            If lHaveCatLayer And lHaveStateLayer Then
-                Exit For
-            End If
         Next
         Return lHaveCatLayer And lHaveStateLayer
     End Function
@@ -209,15 +216,18 @@ Public Module modBasinsPlugin
         If g_BasinsDataDirs IsNot Nothing AndAlso g_BasinsDataDirs.Count > 0 Then
             Return g_BasinsDataDirs(0)
         Else
+            Dim lDir As String
             Try
-                Return My.Computer.FileSystem.SpecialDirectories.MyDocuments & g_PathChar & BasinsDataPath
+                lDir = My.Computer.FileSystem.SpecialDirectories.MyDocuments & g_PathChar & BasinsDataPath
+                If IO.Directory.Exists(lDir) Then Return lDir
             Catch
-                Try
-                    Return Environment.GetFolderPath(Environment.SpecialFolder.Personal & g_PathChar & BasinsDataPath)
-                Catch ex As Exception
-                    Return g_PathChar & BasinsDataPath
-                End Try
             End Try
+            Try
+                lDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal & g_PathChar & BasinsDataPath)
+                If IO.Directory.Exists(lDir) Then Return lDir
+            Catch
+            End Try
+            Return g_PathChar & BasinsDataPath
         End If
     End Function
 

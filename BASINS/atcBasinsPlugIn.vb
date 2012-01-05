@@ -80,7 +80,7 @@ Public Class atcBasinsPlugIn
                 g_AppNameShort = "USGS-GW"
                 g_URL_Home = "http://water.usgs.gov/software/lists/groundwater/"
                 g_URL_Register = "http://hspf.com/pub/USGS-GW/register.html"
-                lHelpFilename = FindFile("", g_ProgramDir & "docs\BASINS4.0.chm")
+                lHelpFilename = FindFile("", g_ProgramDir & "docs\USGSToolbox.chm")
                 'TODO: lHelpFilename = FindFile("", g_ProgramDir & "docs\USGStoolbox.chm")
                 BasinsDataPath = "USGS-GWToolbox\data\"
 
@@ -95,6 +95,7 @@ Public Class atcBasinsPlugIn
         ProjectsMenuString = "Open " & g_AppNameShort & " Project"
         RegisterMenuString = "Register as a " & g_AppNameShort & " user"
         ProgramWebPageMenuString = g_AppNameShort & " Web Page"
+        OurHelpMenuString = g_AppNameShort & " Documentation"
 
         GisUtil.MappingObject = g_MapWin
         atcDataManager.MapWindow = g_MapWin
@@ -146,26 +147,30 @@ Public Class atcBasinsPlugIn
 
         atcDataManager.AddMenuIfMissing(ProjectsMenuName, atcDataManager.FileMenuName, ProjectsMenuString, "mnuRecentProjects")
 
-        atcDataManager.AddMenuIfMissing(BasinsHelpMenuName, HelpMenuName, BasinsHelpMenuString, , "mnuOnlineDocs")
-        atcDataManager.AddMenuIfMissing(ProgramWebPageMenuName, HelpMenuName, ProgramWebPageMenuString, , "mnuOnlineDocs")
+        atcDataManager.AddMenuIfMissing(OurHelpMenuName, TopHelpMenuName, OurHelpMenuString, , "mnuOnlineDocs")
+        atcDataManager.AddMenuIfMissing(ProgramWebPageMenuName, TopHelpMenuName, ProgramWebPageMenuString, , "mnuOnlineDocs")
 
-        atcDataManager.AddMenuIfMissing(RegisterMenuName, HelpMenuName, RegisterMenuString, , "mnuShortcuts")
+        atcDataManager.AddMenuIfMissing(RegisterMenuName, TopHelpMenuName, RegisterMenuString, , "mnuShortcuts")
 
         g_Menus.Remove("mnuCheckForUpdates") 'Remove MW update menu so only ours will be present
         g_Menus.Remove("mnuFileBreak5")      'Remove MW separator after mnuCheckForUpdates
 
-        atcDataManager.AddMenuIfMissing(CheckForUpdatesMenuName, HelpMenuName, CheckForUpdatesMenuString, RegisterMenuName)
-        atcDataManager.AddMenuIfMissing(ShowStatusMenuName, HelpMenuName, ShowStatusMenuString, CheckForUpdatesMenuName)
-        atcDataManager.AddMenuIfMissing(SendFeedbackMenuName, HelpMenuName, SendFeedbackMenuString, ShowStatusMenuName)
+        atcDataManager.AddMenuIfMissing(CheckForUpdatesMenuName, TopHelpMenuName, CheckForUpdatesMenuString, RegisterMenuName)
+        atcDataManager.AddMenuIfMissing(ShowStatusMenuName, TopHelpMenuName, ShowStatusMenuString, CheckForUpdatesMenuName)
+        atcDataManager.AddMenuIfMissing(SendFeedbackMenuName, TopHelpMenuName, SendFeedbackMenuString, ShowStatusMenuName)
 
         Dim lMenuItem As MapWindow.Interfaces.MenuItem
         For Each lDataDir As String In g_BasinsDataDirs
             For Each lProjectDir As String In IO.Directory.GetDirectories(lDataDir)
-                Dim DirShortName As String = IO.Path.GetFileName(lProjectDir)
-                'TODO: differentiate between projects in different data dirs If g_BasinsDrives.Length > 0 Then DirShortName = DriveLetter & ": " & DirShortName
-                lMenuItem = atcDataManager.AddMenuIfMissing(ProjectsMenuName & "_" & DirShortName, _
-                                       ProjectsMenuName, DirShortName)
-                lMenuItem.Tooltip = lProjectDir
+                For Each lProjectFilename As String In IO.Directory.GetFiles(lProjectDir, "*.mwprj")
+                    Dim DirShortName As String = lProjectFilename
+                    If g_BasinsDataDirs.Count < 2 Then
+                        'shorten path since we don't need to differentiate between different data dirs
+                        DirShortName = IO.Path.GetFileNameWithoutExtension(lProjectFilename)
+                    End If
+                    lMenuItem = atcDataManager.AddMenuIfMissing(ProjectsMenuName & "_" & DirShortName, ProjectsMenuName, DirShortName)
+                    lMenuItem.Tooltip = lProjectFilename
+                Next
             Next
         Next
 
@@ -198,7 +203,7 @@ Public Class atcBasinsPlugIn
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
         g_MapWin.Menus.Remove(ProjectsMenuName)
-        g_MapWin.Menus.Remove(BasinsHelpMenuName)
+        g_MapWin.Menus.Remove(OurHelpMenuName)
         g_MapWin.Menus.Remove(ProgramWebPageMenuName)
         g_MapWin.Menus.Remove(RegisterMenuName)
         g_MapWin.Menus.Remove(CheckForUpdatesMenuName)
@@ -259,7 +264,7 @@ Public Class atcBasinsPlugIn
                 SendFeedback()
             Case ShowStatusMenuName
                 Logger.Status("SHOW")
-            Case BasinsHelpMenuName
+            Case OurHelpMenuName
                 ShowHelp("")
             Case atcDataManager.LaunchMenuName & "_ArcView3"
                 'create apr if it does not exist, then open it
@@ -349,16 +354,23 @@ Public Class atcBasinsPlugIn
     End Sub
 
     Private Function UserOpenProject(ByVal aDataDirName As String) As Boolean
-        Dim lPrjFileName As String
+        Dim lPrjFileName As String = Nothing
 
         If Not FileExists(aDataDirName, True, False) Then
-            'Look for folder in BASINS dirs
+            'Look for project in BASINS dirs
             For Each lDataDir As String In g_BasinsDataDirs
                 For Each lProjectDir As String In IO.Directory.GetDirectories(lDataDir)
                     If IO.Path.GetFileName(lProjectDir) = aDataDirName Then
                         aDataDirName = lProjectDir
                         GoTo FoundDir
                     End If
+                    For Each lScanProjectFilename As String In IO.Directory.GetFiles(lProjectDir, "*.mwprj")
+                        If lScanProjectFilename.Contains(aDataDirName) Then
+                            aDataDirName = lProjectDir
+                            lPrjFileName = lScanProjectFilename
+                            GoTo FoundDir
+                        End If
+                    Next
                 Next
             Next
         End If
@@ -371,7 +383,10 @@ FoundDir:
                 End If
             End If
 
-            lPrjFileName = aDataDirName & g_PathChar & IO.Path.GetFileNameWithoutExtension(aDataDirName) & ".mwprj"
+            If lPrjFileName Is Nothing Then
+                lPrjFileName = aDataDirName & g_PathChar & IO.Path.GetFileNameWithoutExtension(aDataDirName) & ".mwprj"
+            End If
+
             If FileExists(lPrjFileName) Then
                 Logger.Dbg("Opening project " & lPrjFileName)
                 Return g_Project.Load(lPrjFileName)
@@ -479,6 +494,7 @@ FoundDir:
                 SetCensusRenderer(MWlay)
             End If
         Next
+        Logger.Progress(0, 0)
     End Sub
 
     Public Sub LayerSelected(ByVal aHandle As Integer) Implements MapWindow.Interfaces.IPlugin.LayerSelected

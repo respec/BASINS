@@ -51,11 +51,7 @@ Partial Class frmDownload
         Me.chkNLCD2001_Impervious = New System.Windows.Forms.CheckBox
         Me.chkNLCD2001_LandCover = New System.Windows.Forms.CheckBox
         Me.grpNHDplus = New System.Windows.Forms.GroupBox
-        Me.chkNHDplus_streamgageevent = New System.Windows.Forms.CheckBox
-        Me.chkNHDplus_hydrologicunits = New System.Windows.Forms.CheckBox
         Me.chkNHDplus_hydrography = New System.Windows.Forms.CheckBox
-        Me.chkNHDplus_fac = New System.Windows.Forms.CheckBox
-        Me.chkNHDplus_fdr = New System.Windows.Forms.CheckBox
         Me.chkNHDplus_elev_cm = New System.Windows.Forms.CheckBox
         Me.chkNHDplus_All = New System.Windows.Forms.CheckBox
         Me.chkNHDplus_Catchment = New System.Windows.Forms.CheckBox
@@ -229,7 +225,7 @@ Partial Class frmDownload
         Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISIdaDischarge)
         Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISDailyGW)
         Me.grpNWIS.Controls.Add(Me.panelNWISnoStations)
-        Me.grpNWIS.Location = New System.Drawing.Point(12, 275)
+        Me.grpNWIS.Location = New System.Drawing.Point(12, 231)
         Me.grpNWIS.Name = "grpNWIS"
         Me.grpNWIS.Size = New System.Drawing.Size(460, 65)
         Me.grpNWIS.TabIndex = 26
@@ -315,7 +311,7 @@ Partial Class frmDownload
         'btnHelp
         '
         Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnHelp.Location = New System.Drawing.Point(266, 490)
+        Me.btnHelp.Location = New System.Drawing.Point(266, 456)
         Me.btnHelp.Name = "btnHelp"
         Me.btnHelp.Size = New System.Drawing.Size(59, 23)
         Me.btnHelp.TabIndex = 45
@@ -332,7 +328,7 @@ Partial Class frmDownload
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD2001_Canopy)
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD2001_Impervious)
         Me.grpNLCD2001.Controls.Add(Me.chkNLCD2001_LandCover)
-        Me.grpNLCD2001.Location = New System.Drawing.Point(12, 346)
+        Me.grpNLCD2001.Location = New System.Drawing.Point(12, 302)
         Me.grpNLCD2001.Name = "grpNLCD2001"
         Me.grpNLCD2001.Size = New System.Drawing.Size(460, 42)
         Me.grpNLCD2001.TabIndex = 30
@@ -394,41 +390,16 @@ Partial Class frmDownload
         '
         Me.grpNHDplus.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.grpNHDplus.Controls.Add(Me.chkNHDplus_streamgageevent)
-        Me.grpNHDplus.Controls.Add(Me.chkNHDplus_hydrologicunits)
         Me.grpNHDplus.Controls.Add(Me.chkNHDplus_hydrography)
-        Me.grpNHDplus.Controls.Add(Me.chkNHDplus_fac)
-        Me.grpNHDplus.Controls.Add(Me.chkNHDplus_fdr)
         Me.grpNHDplus.Controls.Add(Me.chkNHDplus_elev_cm)
         Me.grpNHDplus.Controls.Add(Me.chkNHDplus_All)
         Me.grpNHDplus.Controls.Add(Me.chkNHDplus_Catchment)
         Me.grpNHDplus.Location = New System.Drawing.Point(12, 110)
         Me.grpNHDplus.Name = "grpNHDplus"
-        Me.grpNHDplus.Size = New System.Drawing.Size(460, 111)
+        Me.grpNHDplus.Size = New System.Drawing.Size(460, 67)
         Me.grpNHDplus.TabIndex = 12
         Me.grpNHDplus.TabStop = False
         Me.grpNHDplus.Text = "National Hydrography Dataset Plus"
-        '
-        'chkNHDplus_streamgageevent
-        '
-        Me.chkNHDplus_streamgageevent.AutoSize = True
-        Me.chkNHDplus_streamgageevent.Location = New System.Drawing.Point(205, 88)
-        Me.chkNHDplus_streamgageevent.Name = "chkNHDplus_streamgageevent"
-        Me.chkNHDplus_streamgageevent.Size = New System.Drawing.Size(119, 17)
-        Me.chkNHDplus_streamgageevent.TabIndex = 20
-        Me.chkNHDplus_streamgageevent.Text = "Streamgage Events"
-        Me.chkNHDplus_streamgageevent.UseVisualStyleBackColor = True
-        '
-        'chkNHDplus_hydrologicunits
-        '
-        Me.chkNHDplus_hydrologicunits.AutoSize = True
-        Me.chkNHDplus_hydrologicunits.Location = New System.Drawing.Point(205, 65)
-        Me.chkNHDplus_hydrologicunits.Name = "chkNHDplus_hydrologicunits"
-        Me.chkNHDplus_hydrologicunits.Size = New System.Drawing.Size(103, 17)
-        Me.chkNHDplus_hydrologicunits.TabIndex = 19
-        Me.chkNHDplus_hydrologicunits.Text = "Hydrologic Units"
-        Me.ToolTip1.SetToolTip(Me.chkNHDplus_hydrologicunits, "Basin, Region, SubBasin, Subregion, Subwatershed, Watershed")
-        Me.chkNHDplus_hydrologicunits.UseVisualStyleBackColor = True
         '
         'chkNHDplus_hydrography
         '
@@ -440,28 +411,6 @@ Partial Class frmDownload
         Me.chkNHDplus_hydrography.Text = "Hydrography"
         Me.ToolTip1.SetToolTip(Me.chkNHDplus_hydrography, "NHDArea, NHDFlowline, NHDLine, NHDPoint, NHDWaterbody")
         Me.chkNHDplus_hydrography.UseVisualStyleBackColor = True
-        '
-        'chkNHDplus_fac
-        '
-        Me.chkNHDplus_fac.AutoSize = True
-        Me.chkNHDplus_fac.Location = New System.Drawing.Point(6, 88)
-        Me.chkNHDplus_fac.Name = "chkNHDplus_fac"
-        Me.chkNHDplus_fac.Size = New System.Drawing.Size(137, 17)
-        Me.chkNHDplus_fac.TabIndex = 16
-        Me.chkNHDplus_fac.Text = "Flow Accumulation Grid"
-        Me.ToolTip1.SetToolTip(Me.chkNHDplus_fac, "fac grid")
-        Me.chkNHDplus_fac.UseVisualStyleBackColor = True
-        '
-        'chkNHDplus_fdr
-        '
-        Me.chkNHDplus_fdr.AutoSize = True
-        Me.chkNHDplus_fdr.Location = New System.Drawing.Point(6, 65)
-        Me.chkNHDplus_fdr.Name = "chkNHDplus_fdr"
-        Me.chkNHDplus_fdr.Size = New System.Drawing.Size(115, 17)
-        Me.chkNHDplus_fdr.TabIndex = 15
-        Me.chkNHDplus_fdr.Text = "Flow Direction Grid"
-        Me.ToolTip1.SetToolTip(Me.chkNHDplus_fdr, "fdr grid")
-        Me.chkNHDplus_fdr.UseVisualStyleBackColor = True
         '
         'chkNHDplus_elev_cm
         '
@@ -542,7 +491,7 @@ Partial Class frmDownload
         '
         Me.chkClip.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkClip.AutoSize = True
-        Me.chkClip.Location = New System.Drawing.Point(124, 494)
+        Me.chkClip.Location = New System.Drawing.Point(124, 460)
         Me.chkClip.Name = "chkClip"
         Me.chkClip.Size = New System.Drawing.Size(92, 17)
         Me.chkClip.TabIndex = 43
@@ -554,7 +503,7 @@ Partial Class frmDownload
         '
         Me.chkMerge.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkMerge.AutoSize = True
-        Me.chkMerge.Location = New System.Drawing.Point(18, 494)
+        Me.chkMerge.Location = New System.Drawing.Point(18, 460)
         Me.chkMerge.Name = "chkMerge"
         Me.chkMerge.Size = New System.Drawing.Size(56, 17)
         Me.chkMerge.TabIndex = 42
@@ -588,7 +537,7 @@ Partial Class frmDownload
         'btnDownload
         '
         Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDownload.Location = New System.Drawing.Point(396, 490)
+        Me.btnDownload.Location = New System.Drawing.Point(396, 456)
         Me.btnDownload.Name = "btnDownload"
         Me.btnDownload.Size = New System.Drawing.Size(75, 23)
         Me.btnDownload.TabIndex = 47
@@ -619,7 +568,7 @@ Partial Class frmDownload
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(331, 490)
+        Me.btnCancel.Location = New System.Drawing.Point(331, 456)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(59, 23)
         Me.btnCancel.TabIndex = 46
@@ -632,7 +581,7 @@ Partial Class frmDownload
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpSTORET.Controls.Add(Me.chkSTORET_Results)
         Me.grpSTORET.Controls.Add(Me.chkSTORET_Stations)
-        Me.grpSTORET.Location = New System.Drawing.Point(12, 394)
+        Me.grpSTORET.Location = New System.Drawing.Point(12, 350)
         Me.grpSTORET.Name = "grpSTORET"
         Me.grpSTORET.Size = New System.Drawing.Size(460, 42)
         Me.grpSTORET.TabIndex = 36
@@ -668,7 +617,7 @@ Partial Class frmDownload
         Me.grpNWISStations.Controls.Add(Me.chkNWISStations_qw)
         Me.grpNWISStations.Controls.Add(Me.chkNWISStations_measurement)
         Me.grpNWISStations.Controls.Add(Me.chkNWISStations_discharge)
-        Me.grpNWISStations.Location = New System.Drawing.Point(12, 227)
+        Me.grpNWISStations.Location = New System.Drawing.Point(12, 183)
         Me.grpNWISStations.Name = "grpNWISStations"
         Me.grpNWISStations.Size = New System.Drawing.Size(460, 42)
         Me.grpNWISStations.TabIndex = 21
@@ -679,7 +628,7 @@ Partial Class frmDownload
         '
         Me.chkCacheOnly.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkCacheOnly.AutoSize = True
-        Me.chkCacheOnly.Location = New System.Drawing.Point(222, 494)
+        Me.chkCacheOnly.Location = New System.Drawing.Point(222, 460)
         Me.chkCacheOnly.Name = "chkCacheOnly"
         Me.chkCacheOnly.Size = New System.Drawing.Size(81, 17)
         Me.chkCacheOnly.TabIndex = 44
@@ -693,7 +642,7 @@ Partial Class frmDownload
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpNLDAS.Controls.Add(Me.chkNLDAS_GetNLDASParameter)
         Me.grpNLDAS.Controls.Add(Me.chkNLDAS_GetNLDASGrid)
-        Me.grpNLDAS.Location = New System.Drawing.Point(12, 442)
+        Me.grpNLDAS.Location = New System.Drawing.Point(12, 398)
         Me.grpNLDAS.Name = "grpNLDAS"
         Me.grpNLDAS.Size = New System.Drawing.Size(460, 42)
         Me.grpNLDAS.TabIndex = 39
@@ -706,7 +655,7 @@ Partial Class frmDownload
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(484, 525)
+        Me.ClientSize = New System.Drawing.Size(484, 491)
         Me.Controls.Add(Me.grpNLDAS)
         Me.Controls.Add(Me.grpNWISStations)
         Me.Controls.Add(Me.grpNLCD2001)
@@ -776,12 +725,8 @@ Partial Class frmDownload
     Friend WithEvents grpSTORET As System.Windows.Forms.GroupBox
     Friend WithEvents chkSTORET_Stations As System.Windows.Forms.CheckBox
     Friend WithEvents chkNHDplus_elev_cm As System.Windows.Forms.CheckBox
-    Friend WithEvents chkNHDplus_streamgageevent As System.Windows.Forms.CheckBox
-    Friend WithEvents chkNHDplus_hydrologicunits As System.Windows.Forms.CheckBox
     Friend WithEvents chkNHDplus_Catchment As System.Windows.Forms.CheckBox
     Friend WithEvents chkNHDplus_hydrography As System.Windows.Forms.CheckBox
-    Friend WithEvents chkNHDplus_fac As System.Windows.Forms.CheckBox
-    Friend WithEvents chkNHDplus_fdr As System.Windows.Forms.CheckBox
     Friend WithEvents chkNLCD2001_Impervious As System.Windows.Forms.CheckBox
     Friend WithEvents chkNLCD2001_Canopy As System.Windows.Forms.CheckBox
     Friend WithEvents chkNWIS_GetNWISWQ As System.Windows.Forms.CheckBox

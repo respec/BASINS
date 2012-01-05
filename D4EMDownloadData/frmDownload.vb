@@ -1,4 +1,5 @@
 Imports atcUtility
+Imports MapWinUtility
 
 Public Class frmDownload
 
@@ -11,6 +12,7 @@ Public Class frmDownload
     Private pRegionExtentSelectedShapes As String = "Extent of Selected Shapes"
     Private pRegionEnterCoordinates As String = "Enter Coordinates of Rectangle"
     Private pRegionHydrologicUnit As String = "Hydrologic Unit"
+    Private pRegionStationIDs As String = "Station IDs"
 
     Public Function AskUser(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer) As String
         pMapWin = aMapWin
@@ -22,6 +24,7 @@ Public Class frmDownload
         cboRegion.Items.Add(pRegionExtentSelectedLayer)
         cboRegion.Items.Add(pRegionExtentSelectedShapes)
         cboRegion.Items.Add(pRegionEnterCoordinates)
+        cboRegion.Items.Add(pRegionStationIDs)
         If HUC8Layer() IsNot Nothing Then
             Dim lHUC8s As Generic.List(Of String) = HUC8s()
             If lHUC8s.Count = 1 Then
@@ -50,6 +53,54 @@ Public Class frmDownload
             cboRegion.SelectedIndex = 0
         End If
 
+        Dim lGroupMargin As Integer = 6
+        Dim lGroupY As Integer = grpBASINS.Location.Y
+
+        If LoadPlugin("D4EM Data Download::BASINS") Then
+            lGroupY += grpBASINS.Height + lGroupMargin
+        Else
+            grpBASINS.Visible = False
+        End If
+        If LoadPlugin("D4EM Data Download::NHDPlus") Then
+            grpNHDplus.Top = lGroupY
+            lGroupY += grpNHDplus.Height + lGroupMargin
+        Else
+            grpNHDplus.Visible = False
+        End If
+
+        If LoadPlugin("D4EM Data Download::NWIS") Then
+            grpNWISStations.Top = lGroupY
+            lGroupY += grpNWISStations.Height + lGroupMargin
+            grpNWIS.Top = lGroupY
+            lGroupY += grpNWIS.Height + lGroupMargin
+        Else
+            grpNWISStations.Visible = False
+            grpNWIS.Visible = False
+        End If
+
+        If LoadPlugin("D4EM Data Download::NLCD2001") Then
+            grpNLCD2001.Top = lGroupY
+            lGroupY += grpNLCD2001.Height + lGroupMargin
+        Else
+            grpNLCD2001.Visible = False
+        End If
+
+        If LoadPlugin("D4EM Data Download::STORET") Then
+            grpSTORET.Top = lGroupY
+            lGroupY += grpSTORET.Height + lGroupMargin
+        Else
+            grpSTORET.Visible = False
+        End If
+
+        If LoadPlugin("D4EM Data Download::NLDAS") Then
+            grpNLDAS.Top = lGroupY
+            lGroupY += grpNLDAS.Height + lGroupMargin
+        Else
+            grpNLDAS.Visible = False
+        End If
+
+        Height = lGroupY + 85
+
         If GetSetting("DataDownload", "Defaults", "Clip", "").ToLower.Equals("true") Then
             chkClip.Checked = True
         End If
@@ -58,7 +109,7 @@ Public Class frmDownload
             chkMerge.Checked = True
         End If
 
-        SetCheckboxVisibilityFromMap()
+        SetCheckboxVisibilityFromMapOrRegion()
         SetColorsFromAvailability()
 
         Do
@@ -71,7 +122,7 @@ Public Class frmDownload
                                                          MsgBoxStyle.YesNo, "Desired Data Not Specified") = MsgBoxResult.No Then
                         Return CancelString
                     End If
-                ElseIf lXML.Contains("<region>") Then
+                ElseIf lXML.Contains("<region>") OrElse lXML.Contains("<stationid>") Then
                     Return lXML
                 Else
                     Dim lMessage As String = "Unable to determine region to download."
@@ -93,6 +144,18 @@ Public Class frmDownload
                 Return CancelString
             End If
         Loop
+    End Function
+
+    Private Function LoadPlugin(ByVal aPluginName As String) As Boolean
+        Try
+            Dim lKey As String = DownloadDataPlugin.g_MapWin.Plugins.GetPluginKey(aPluginName)
+            'If Not g_MapWin.Plugins.PluginIsLoaded(lKey) Then 
+            DownloadDataPlugin.g_MapWin.Plugins.StartPlugin(lKey)
+            Return True
+        Catch e As Exception
+            Logger.Dbg("Exception loading " & aPluginName & ": " & e.Message)
+        End Try
+        Return False
     End Function
 
     Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
@@ -127,6 +190,8 @@ Public Class frmDownload
                     lExtents = pMapWin.View.SelectedShapes.SelectBounds
                 Case pRegionEnterCoordinates
                     lRegion = frmSpecifyRegion.AskUser(Me.Icon)
+                    'Case pRegionStationIDs
+                    'lRegion = frmSpecifyStations.AskUser(Me.Icon, StationsFromMap)
                 Case Else
                     Dim lHuc8Layer As MapWindow.Interfaces.Layer = HUC8Layer()
                     If lHuc8Layer IsNot Nothing Then
@@ -155,8 +220,16 @@ Public Class frmDownload
 
     'Dim pStationIDs() As String = {}
 
-    Private Function StationsXMLfromMap() As String
+    Private Function StationsXML(ByVal aStations As Generic.List(Of String)) As String
         Dim lStationsXML As String = ""
+        For Each lStation As String In aStations
+            lStationsXML &= "<stationid>" & lStation & "</stationid>" & vbCrLf
+        Next
+        Return lStationsXML
+    End Function
+
+    Private Function StationsFromMap() As Generic.List(Of String)
+        Dim lStations As New Generic.List(Of String)
         If pMapWin.View IsNot Nothing Then
             Dim lSelected As MapWindow.Interfaces.SelectInfo = pMapWin.View.SelectedShapes
             If lSelected.NumSelected > 0 Then
@@ -170,20 +243,34 @@ Public Class frmDownload
                 Next
                 If lKeyField < lLayerShapefile.NumFields Then
                     For lShapeIndex As Integer = 0 To lSelected.NumSelected - 1
-                        lStationsXML &= "<stationid>" & lLayerShapefile.CellValue(lKeyField, lSelected.Item(lShapeIndex).ShapeIndex) & "</stationid>" & vbCrLf
+                        lStations.Add(lLayerShapefile.CellValue(lKeyField, lSelected.Item(lShapeIndex).ShapeIndex))
                     Next
                 End If
-                'Else
-                '    For Each lId As String In pStationIDs
-                '        lStationsXML &= "<stationid>" & lId & "</stationid>" & vbCrLf
-                '    Next
             End If
         End If
-        Return lStationsXML
+        Return lStations
     End Function
 
-    Private Sub SetCheckboxVisibilityFromMap()
+    Private Sub SetCheckboxVisibilityFromMapOrRegion()
         chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.GrayText
+        Dim lStationsRegion As Boolean = False
+        If cboRegion.Text = pRegionStationIDs Then
+            lStationsRegion = True
+            panelNWISnoStations.Visible = False
+            chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
+        End If
+        chkNWIS_GetNWISDailyDischarge.Visible = True
+        chkNWIS_GetNWISIdaDischarge.Visible = True
+        chkNWIS_GetNWISDailyGW.Visible = True
+        chkNWIS_GetNWISWQ.Visible = True
+        chkNWIS_GetNWISMeasurements.Visible = True
+
+        chkNWIS_GetNWISDailyDischarge.Enabled = lStationsRegion
+        chkNWIS_GetNWISIdaDischarge.Enabled = lStationsRegion
+        chkNWIS_GetNWISDailyGW.Enabled = lStationsRegion
+        chkNWIS_GetNWISWQ.Enabled = lStationsRegion
+        chkNWIS_GetNWISMeasurements.Enabled = lStationsRegion
+
         If pMapWin.View IsNot Nothing Then
             Dim lSelected As MapWindow.Interfaces.SelectInfo = pMapWin.View.SelectedShapes
             If lSelected.NumSelected > 0 Then
@@ -290,9 +377,18 @@ Public Class frmDownload
             Dim lXML As String = ""
             Dim lDesiredProjection As String = ""
             Dim lRegionXML As String = ""
-            Dim lRegion As D4EMDataManager.Region = Me.SelectedRegion
+            Dim lStationsXML As String
+            Dim lRegion As D4EMDataManager.Region
+
+            If cboRegion.SelectedItem = pRegionStationIDs Then
+                lRegion = Nothing
+                lStationsXML = StationsXML(frmSpecifyStations.AskUser(Me.Icon, StationsFromMap))
+            Else
+                lRegion = Me.SelectedRegion
+                lStationsXML = StationsXML(StationsFromMap)
+            End If
+
             If lRegion IsNot Nothing Then lRegionXML = lRegion.XML
-            Dim lStationsXML As String = StationsXMLfromMap()
 
             Dim lCacheFolder As String = GetSetting("DataDownload", "defaults", "Cache_dir")
             If lCacheFolder.Length = 0 Then
@@ -539,7 +635,10 @@ Public Class frmDownload
 
     Private Function RegionValid(ByVal aRegionType As String, ByRef aReason As String) As Boolean
         Try
-            If cboRegion.SelectedItem = pRegionEnterCoordinates Then Return True 'Always an option
+            Select Case cboRegion.SelectedItem
+                Case pRegionEnterCoordinates, pRegionStationIDs
+                    Return True 'Always an option
+            End Select
 
             If pMapWin.Project.ProjectProjection.Length = 0 Then
                 aReason = "Need a projection set in File/Settings/Project Projection" & vbCrLf _
@@ -551,10 +650,13 @@ Public Class frmDownload
 
             Select Case aRegionType
                 Case pRegionViewRectangle
+                    If pMapWin Is Nothing OrElse pMapWin.View Is Nothing OrElse pMapWin.View.Extents Is Nothing Then
+                        aReason = "Current view does not have extents defined"
+                        Return False
+                    End If
                     lExtents = pMapWin.View.Extents
-                    aReason = "Current view does not have extents defined"
                 Case pRegionExtentSelectedLayer
-                    If pMapWin.Layers.CurrentLayer < 0 Then
+                    If pMapWin Is Nothing OrElse pMapWin.Layers Is Nothing OrElse pMapWin.Layers.CurrentLayer < 0 Then
                         aReason = "No layer is selected"
                         Return False
                     Else
@@ -562,7 +664,7 @@ Public Class frmDownload
                         aReason = "Current layer does not have extents"
                     End If
                 Case pRegionExtentSelectedShapes
-                    If pMapWin.View.SelectedShapes.NumSelected = 0 Then
+                    If pMapWin Is Nothing OrElse pMapWin.View Is Nothing OrElse pMapWin.View.SelectedShapes Is Nothing OrElse pMapWin.View.SelectedShapes.NumSelected = 0 Then
                         aReason = "No shapes are selected"
                         Return False
                     Else
@@ -594,7 +696,9 @@ Public Class frmDownload
 
     Private Sub cboRegion_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboRegion.SelectedIndexChanged
         Dim lReason As String = ""
-        If Not RegionValid(cboRegion.SelectedItem, lReason) Then
+        If RegionValid(cboRegion.SelectedItem, lReason) Then
+            SetCheckboxVisibilityFromMapOrRegion()
+        Else
             MapWinUtility.Logger.Msg("Cannot use " & cboRegion.SelectedItem & ":" & vbCrLf & lReason, MsgBoxStyle.OkOnly, "Region Type Not Valid")
             cboRegion.SelectedItem = pRegionEnterCoordinates
         End If

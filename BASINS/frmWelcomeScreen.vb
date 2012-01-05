@@ -69,7 +69,6 @@ Public Class frmWelcomeScreen
     Friend WithEvents lblBuildNew As System.Windows.Forms.LinkLabel
     Friend WithEvents lblHelp As System.Windows.Forms.LinkLabel
     Friend WithEvents picProgramLogo As System.Windows.Forms.PictureBox
-    Friend WithEvents lblConvert As System.Windows.Forms.LinkLabel
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmWelcomeScreen))
         Me.lblBuildNew = New System.Windows.Forms.LinkLabel
@@ -82,26 +81,25 @@ Public Class frmWelcomeScreen
         Me.lblProject4 = New System.Windows.Forms.LinkLabel
         Me.picProgramLogo = New System.Windows.Forms.PictureBox
         Me.lblHelp = New System.Windows.Forms.LinkLabel
-        Me.lblConvert = New System.Windows.Forms.LinkLabel
         CType(Me.picProgramLogo, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
-        'lbBuildNew
+        'lblBuildNew
         '
-        resources.ApplyResources(Me.lblBuildNew, "lbBuildNew")
-        Me.lblBuildNew.Name = "lbBuildNew"
+        resources.ApplyResources(Me.lblBuildNew, "lblBuildNew")
+        Me.lblBuildNew.Name = "lblBuildNew"
         Me.lblBuildNew.TabStop = True
         '
-        'lbOpenProject
+        'lblOpenProject
         '
-        resources.ApplyResources(Me.lblOpenProject, "lbOpenProject")
-        Me.lblOpenProject.Name = "lbOpenProject"
+        resources.ApplyResources(Me.lblOpenProject, "lblOpenProject")
+        Me.lblOpenProject.Name = "lblOpenProject"
         Me.lblOpenProject.TabStop = True
         '
-        'cbShowDlg
+        'cboShowDlg
         '
-        resources.ApplyResources(Me.cboShowDlg, "cbShowDlg")
-        Me.cboShowDlg.Name = "cbShowDlg"
+        resources.ApplyResources(Me.cboShowDlg, "cboShowDlg")
+        Me.cboShowDlg.Name = "cboShowDlg"
         '
         'btnClose
         '
@@ -111,31 +109,31 @@ Public Class frmWelcomeScreen
         Me.btnClose.Name = "btnClose"
         Me.btnClose.UseVisualStyleBackColor = False
         '
-        'lbProject1
+        'lblProject1
         '
-        resources.ApplyResources(Me.lblProject1, "lbProject1")
-        Me.lblProject1.Name = "lbProject1"
+        resources.ApplyResources(Me.lblProject1, "lblProject1")
+        Me.lblProject1.Name = "lblProject1"
         Me.lblProject1.TabStop = True
         Me.lblProject1.UseCompatibleTextRendering = True
         '
-        'lbProject2
+        'lblProject2
         '
-        resources.ApplyResources(Me.lblProject2, "lbProject2")
-        Me.lblProject2.Name = "lbProject2"
+        resources.ApplyResources(Me.lblProject2, "lblProject2")
+        Me.lblProject2.Name = "lblProject2"
         Me.lblProject2.TabStop = True
         Me.lblProject2.UseCompatibleTextRendering = True
         '
-        'lbProject3
+        'lblProject3
         '
-        resources.ApplyResources(Me.lblProject3, "lbProject3")
-        Me.lblProject3.Name = "lbProject3"
+        resources.ApplyResources(Me.lblProject3, "lblProject3")
+        Me.lblProject3.Name = "lblProject3"
         Me.lblProject3.TabStop = True
         Me.lblProject3.UseCompatibleTextRendering = True
         '
-        'lbProject4
+        'lblProject4
         '
-        resources.ApplyResources(Me.lblProject4, "lbProject4")
-        Me.lblProject4.Name = "lbProject4"
+        resources.ApplyResources(Me.lblProject4, "lblProject4")
+        Me.lblProject4.Name = "lblProject4"
         Me.lblProject4.TabStop = True
         Me.lblProject4.UseCompatibleTextRendering = True
         '
@@ -145,24 +143,17 @@ Public Class frmWelcomeScreen
         Me.picProgramLogo.Name = "picProgramLogo"
         Me.picProgramLogo.TabStop = False
         '
-        'lbBasinsHelp
+        'lblHelp
         '
-        resources.ApplyResources(Me.lblHelp, "lbBasinsHelp")
-        Me.lblHelp.Name = "lbBasinsHelp"
+        resources.ApplyResources(Me.lblHelp, "lblHelp")
+        Me.lblHelp.Name = "lblHelp"
         Me.lblHelp.TabStop = True
-        '
-        'lbConvert
-        '
-        resources.ApplyResources(Me.lblConvert, "lbConvert")
-        Me.lblConvert.Name = "lbConvert"
-        Me.lblConvert.TabStop = True
         '
         'frmWelcomeScreen
         '
         resources.ApplyResources(Me, "$this")
         Me.BackColor = System.Drawing.Color.White
         Me.CancelButton = Me.btnClose
-        Me.Controls.Add(Me.lblConvert)
         Me.Controls.Add(Me.lblHelp)
         Me.Controls.Add(Me.picProgramLogo)
         Me.Controls.Add(Me.lblProject4)
@@ -236,13 +227,16 @@ Public Class frmWelcomeScreen
 
         cboShowDlg.Checked = lAppInfo.ShowWelcomeScreen
 
-        lblBuildNew.Text = "Build New " & g_AppNameShort & " Project"
+        lblBuildNew.Text = "Build New Project"
         lblBuildNew.LinkArea = New LinkArea(0, lblBuildNew.Text.Length)
 
-        lblOpenProject.Text = "Open Existing " & g_AppNameShort & " Project"
+        lblHelp.Text = "View Documentation"
+        lblHelp.LinkArea = New LinkArea(0, lblHelp.Text.Length)
+
+        lblOpenProject.Text = "Open Existing Project"
         lblOpenProject.LinkArea = New LinkArea(0, lblOpenProject.Text.Length)
 
-        'assume no recent projects
+        'clear recent project labels of designer text
         lblProject1.Visible = False
         lblProject2.Visible = False
         lblProject3.Visible = False
@@ -277,7 +271,7 @@ Public Class frmWelcomeScreen
         Me.Close()
     End Sub
 
-    Private Sub lbConvert_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblConvert.LinkClicked
+    Private Sub lbConvert_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs)
         Logger.Msg("Select the BASINS 3.x Project to convert from the PullDown Menu that appears when you click OK", MsgBoxStyle.OkOnly, "BASINS 4")
         Me.Close()
         SendKeys.Send("%FB")

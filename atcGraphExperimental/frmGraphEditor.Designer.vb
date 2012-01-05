@@ -111,7 +111,6 @@ Partial Class frmGraphEditor
         Me.btnTextAdd = New System.Windows.Forms.Button
         Me.txtText = New System.Windows.Forms.TextBox
         Me.chkAutoApply = New System.Windows.Forms.CheckBox
-        Me.chkProbabilityExceedance = New System.Windows.Forms.CheckBox
         Me.tabsCategory.SuspendLayout()
         Me.tabAxes.SuspendLayout()
         Me.panelProbability.SuspendLayout()
@@ -612,7 +611,6 @@ Partial Class frmGraphEditor
         '
         Me.panelProbability.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.panelProbability.Controls.Add(Me.chkProbabilityExceedance)
         Me.panelProbability.Controls.Add(Me.txtProbabilityDeviations)
         Me.panelProbability.Controls.Add(Me.lblProbabilityDeviations)
         Me.panelProbability.Controls.Add(Me.radioProbablilityReturnPeriod)
@@ -629,10 +627,10 @@ Partial Class frmGraphEditor
         Me.radioProbablilityReturnPeriod.AutoSize = True
         Me.radioProbablilityReturnPeriod.Location = New System.Drawing.Point(150, 5)
         Me.radioProbablilityReturnPeriod.Name = "radioProbablilityReturnPeriod"
-        Me.radioProbablilityReturnPeriod.Size = New System.Drawing.Size(57, 17)
+        Me.radioProbablilityReturnPeriod.Size = New System.Drawing.Size(90, 17)
         Me.radioProbablilityReturnPeriod.TabIndex = 40
         Me.radioProbablilityReturnPeriod.TabStop = True
-        Me.radioProbablilityReturnPeriod.Text = "Return"
+        Me.radioProbablilityReturnPeriod.Text = "Return Period"
         Me.radioProbablilityReturnPeriod.UseVisualStyleBackColor = True
         '
         'radioProbablilityFraction
@@ -1086,16 +1084,6 @@ Partial Class frmGraphEditor
         Me.chkAutoApply.Text = "Apply Automatically"
         Me.chkAutoApply.UseVisualStyleBackColor = True
         '
-        'chkProbabilityExceedance
-        '
-        Me.chkProbabilityExceedance.AutoSize = True
-        Me.chkProbabilityExceedance.Location = New System.Drawing.Point(213, 5)
-        Me.chkProbabilityExceedance.Name = "chkProbabilityExceedance"
-        Me.chkProbabilityExceedance.Size = New System.Drawing.Size(86, 17)
-        Me.chkProbabilityExceedance.TabIndex = 42
-        Me.chkProbabilityExceedance.Text = "Exceedance"
-        Me.chkProbabilityExceedance.UseVisualStyleBackColor = True
-        '
         'frmGraphEditor
         '
         Me.AcceptButton = Me.btnApply
@@ -1221,5 +1209,4 @@ Partial Class frmGraphEditor
     Private WithEvents btnScaleFont As System.Windows.Forms.Button
     Friend WithEvents chkCurveSymbolFillVisible As System.Windows.Forms.CheckBox
     Friend WithEvents cboCurveStyle As System.Windows.Forms.ComboBox
-    Friend WithEvents chkProbabilityExceedance As System.Windows.Forms.CheckBox
 End Class
