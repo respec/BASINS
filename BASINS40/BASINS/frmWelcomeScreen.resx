@@ -118,100 +118,100 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="lbBuildNew.Font" type="System.Drawing.Font, System.Drawing">
+  <data name="lblBuildNew.Font" type="System.Drawing.Font, System.Drawing">
     <value>Microsoft Sans Serif, 9pt</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="lbBuildNew.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+  <data name="lblBuildNew.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
-  <data name="lbBuildNew.LinkArea" type="System.Windows.Forms.LinkArea, System.Windows.Forms">
+  <data name="lblBuildNew.LinkArea" type="System.Windows.Forms.LinkArea, System.Windows.Forms">
     <value>0, 20</value>
   </data>
-  <data name="lbBuildNew.Location" type="System.Drawing.Point, System.Drawing">
+  <data name="lblBuildNew.Location" type="System.Drawing.Point, System.Drawing">
     <value>208, 14</value>
   </data>
-  <data name="lbBuildNew.Size" type="System.Drawing.Size, System.Drawing">
+  <data name="lblBuildNew.Size" type="System.Drawing.Size, System.Drawing">
     <value>192, 15</value>
   </data>
   <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="lbBuildNew.TabIndex" type="System.Int32, mscorlib">
+  <data name="lblBuildNew.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
   </data>
-  <data name="lbBuildNew.Text" xml:space="preserve">
+  <data name="lblBuildNew.Text" xml:space="preserve">
     <value>Build BASINS Project</value>
   </data>
-  <data name="&gt;&gt;lbBuildNew.Name" xml:space="preserve">
-    <value>lbBuildNew</value>
+  <data name="&gt;&gt;lblBuildNew.Name" xml:space="preserve">
+    <value>lblBuildNew</value>
   </data>
-  <data name="&gt;&gt;lbBuildNew.Type" xml:space="preserve">
+  <data name="&gt;&gt;lblBuildNew.Type" xml:space="preserve">
     <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;lbBuildNew.Parent" xml:space="preserve">
+  <data name="&gt;&gt;lblBuildNew.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
-  <data name="&gt;&gt;lbBuildNew.ZOrder" xml:space="preserve">
-    <value>10</value>
-  </data>
-  <data name="lbOpenProject.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Microsoft Sans Serif, 9pt</value>
-  </data>
-  <data name="lbOpenProject.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="lbOpenProject.LinkArea" type="System.Windows.Forms.LinkArea, System.Windows.Forms">
-    <value>0, 28</value>
-  </data>
-  <data name="lbOpenProject.Location" type="System.Drawing.Point, System.Drawing">
-    <value>208, 97</value>
-  </data>
-  <data name="lbOpenProject.Size" type="System.Drawing.Size, System.Drawing">
-    <value>214, 16</value>
-  </data>
-  <data name="lbOpenProject.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="lbOpenProject.Text" xml:space="preserve">
-    <value>Open Existing BASINS Project</value>
-  </data>
-  <data name="&gt;&gt;lbOpenProject.Name" xml:space="preserve">
-    <value>lbOpenProject</value>
-  </data>
-  <data name="&gt;&gt;lbOpenProject.Type" xml:space="preserve">
-    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;lbOpenProject.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;lbOpenProject.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;lblBuildNew.ZOrder" xml:space="preserve">
     <value>9</value>
   </data>
-  <data name="cbShowDlg.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+  <data name="lblOpenProject.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 9pt</value>
+  </data>
+  <data name="lblOpenProject.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
-  <data name="cbShowDlg.Location" type="System.Drawing.Point, System.Drawing">
-    <value>40, 160</value>
+  <data name="lblOpenProject.LinkArea" type="System.Windows.Forms.LinkArea, System.Windows.Forms">
+    <value>0, 28</value>
   </data>
-  <data name="cbShowDlg.Size" type="System.Drawing.Size, System.Drawing">
-    <value>171, 20</value>
+  <data name="lblOpenProject.Location" type="System.Drawing.Point, System.Drawing">
+    <value>208, 70</value>
   </data>
-  <data name="cbShowDlg.TabIndex" type="System.Int32, mscorlib">
-    <value>11</value>
+  <data name="lblOpenProject.Size" type="System.Drawing.Size, System.Drawing">
+    <value>214, 16</value>
   </data>
-  <data name="cbShowDlg.Text" xml:space="preserve">
-    <value>Show this dialog at startup</value>
+  <data name="lblOpenProject.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
   </data>
-  <data name="&gt;&gt;cbShowDlg.Name" xml:space="preserve">
-    <value>cbShowDlg</value>
+  <data name="lblOpenProject.Text" xml:space="preserve">
+    <value>Open Existing BASINS Project</value>
   </data>
-  <data name="&gt;&gt;cbShowDlg.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;lblOpenProject.Name" xml:space="preserve">
+    <value>lblOpenProject</value>
   </data>
-  <data name="&gt;&gt;cbShowDlg.Parent" xml:space="preserve">
+  <data name="&gt;&gt;lblOpenProject.Type" xml:space="preserve">
+    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblOpenProject.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
-  <data name="&gt;&gt;cbShowDlg.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;lblOpenProject.ZOrder" xml:space="preserve">
     <value>8</value>
+  </data>
+  <data name="cboShowDlg.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="cboShowDlg.Location" type="System.Drawing.Point, System.Drawing">
+    <value>40, 160</value>
+  </data>
+  <data name="cboShowDlg.Size" type="System.Drawing.Size, System.Drawing">
+    <value>171, 20</value>
+  </data>
+  <data name="cboShowDlg.TabIndex" type="System.Int32, mscorlib">
+    <value>11</value>
+  </data>
+  <data name="cboShowDlg.Text" xml:space="preserve">
+    <value>Show this dialog at startup</value>
+  </data>
+  <data name="&gt;&gt;cboShowDlg.Name" xml:space="preserve">
+    <value>cboShowDlg</value>
+  </data>
+  <data name="&gt;&gt;cboShowDlg.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cboShowDlg.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;cboShowDlg.ZOrder" xml:space="preserve">
+    <value>7</value>
   </data>
   <data name="btnClose.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
@@ -238,112 +238,145 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;btnClose.ZOrder" xml:space="preserve">
-    <value>7</value>
-  </data>
-  <data name="lbProject1.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Microsoft Sans Serif, 9pt</value>
-  </data>
-  <data name="lbProject1.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="lbProject1.LinkArea" type="System.Windows.Forms.LinkArea, System.Windows.Forms">
-    <value>0, 36</value>
-  </data>
-  <data name="lbProject1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>224, 118</value>
-  </data>
-  <data name="lbProject1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 16</value>
-  </data>
-  <data name="lbProject1.TabIndex" type="System.Int32, mscorlib">
-    <value>13</value>
-  </data>
-  <data name="lbProject1.Text" xml:space="preserve">
-    <value>Project1</value>
-  </data>
-  <data name="&gt;&gt;lbProject1.Name" xml:space="preserve">
-    <value>lbProject1</value>
-  </data>
-  <data name="&gt;&gt;lbProject1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;lbProject1.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;lbProject1.ZOrder" xml:space="preserve">
     <value>6</value>
   </data>
-  <data name="lbProject2.Font" type="System.Drawing.Font, System.Drawing">
+  <data name="lblProject1.Font" type="System.Drawing.Font, System.Drawing">
     <value>Microsoft Sans Serif, 9pt</value>
   </data>
-  <data name="lbProject2.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+  <data name="lblProject1.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
-  <data name="lbProject2.LinkArea" type="System.Windows.Forms.LinkArea, System.Windows.Forms">
+  <data name="lblProject1.LinkArea" type="System.Windows.Forms.LinkArea, System.Windows.Forms">
     <value>0, 36</value>
   </data>
-  <data name="lbProject2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>224, 139</value>
+  <data name="lblProject1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>224, 91</value>
   </data>
-  <data name="lbProject2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 15</value>
-  </data>
-  <data name="lbProject2.TabIndex" type="System.Int32, mscorlib">
-    <value>14</value>
-  </data>
-  <data name="lbProject2.Text" xml:space="preserve">
-    <value>Project2</value>
-  </data>
-  <data name="&gt;&gt;lbProject2.Name" xml:space="preserve">
-    <value>lbProject2</value>
-  </data>
-  <data name="&gt;&gt;lbProject2.Type" xml:space="preserve">
-    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;lbProject2.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;lbProject2.ZOrder" xml:space="preserve">
-    <value>5</value>
-  </data>
-  <data name="lbProject3.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Microsoft Sans Serif, 9pt</value>
-  </data>
-  <data name="lbProject3.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="lbProject3.LinkArea" type="System.Windows.Forms.LinkArea, System.Windows.Forms">
-    <value>0, 36</value>
-  </data>
-  <data name="lbProject3.Location" type="System.Drawing.Point, System.Drawing">
-    <value>224, 159</value>
-  </data>
-  <data name="lbProject3.Size" type="System.Drawing.Size, System.Drawing">
+  <data name="lblProject1.Size" type="System.Drawing.Size, System.Drawing">
     <value>232, 16</value>
   </data>
-  <data name="lbProject3.TabIndex" type="System.Int32, mscorlib">
-    <value>15</value>
+  <data name="lblProject1.TabIndex" type="System.Int32, mscorlib">
+    <value>13</value>
   </data>
-  <data name="lbProject3.Text" xml:space="preserve">
-    <value>Project3</value>
+  <data name="lblProject1.Text" xml:space="preserve">
+    <value>Project1</value>
   </data>
-  <data name="&gt;&gt;lbProject3.Name" xml:space="preserve">
-    <value>lbProject3</value>
+  <data name="&gt;&gt;lblProject1.Name" xml:space="preserve">
+    <value>lblProject1</value>
   </data>
-  <data name="&gt;&gt;lbProject3.Type" xml:space="preserve">
+  <data name="&gt;&gt;lblProject1.Type" xml:space="preserve">
     <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;lbProject3.Parent" xml:space="preserve">
+  <data name="&gt;&gt;lblProject1.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
-  <data name="&gt;&gt;lbProject3.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;lblProject1.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="lblProject2.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 9pt</value>
+  </data>
+  <data name="lblProject2.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="lblProject2.LinkArea" type="System.Windows.Forms.LinkArea, System.Windows.Forms">
+    <value>0, 36</value>
+  </data>
+  <data name="lblProject2.Location" type="System.Drawing.Point, System.Drawing">
+    <value>224, 112</value>
+  </data>
+  <data name="lblProject2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 15</value>
+  </data>
+  <data name="lblProject2.TabIndex" type="System.Int32, mscorlib">
+    <value>14</value>
+  </data>
+  <data name="lblProject2.Text" xml:space="preserve">
+    <value>Project2</value>
+  </data>
+  <data name="&gt;&gt;lblProject2.Name" xml:space="preserve">
+    <value>lblProject2</value>
+  </data>
+  <data name="&gt;&gt;lblProject2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblProject2.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;lblProject2.ZOrder" xml:space="preserve">
     <value>4</value>
+  </data>
+  <data name="lblProject3.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 9pt</value>
+  </data>
+  <data name="lblProject3.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="lblProject3.LinkArea" type="System.Windows.Forms.LinkArea, System.Windows.Forms">
+    <value>0, 36</value>
+  </data>
+  <data name="lblProject3.Location" type="System.Drawing.Point, System.Drawing">
+    <value>224, 132</value>
+  </data>
+  <data name="lblProject3.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 16</value>
+  </data>
+  <data name="lblProject3.TabIndex" type="System.Int32, mscorlib">
+    <value>15</value>
+  </data>
+  <data name="lblProject3.Text" xml:space="preserve">
+    <value>Project3</value>
+  </data>
+  <data name="&gt;&gt;lblProject3.Name" xml:space="preserve">
+    <value>lblProject3</value>
+  </data>
+  <data name="&gt;&gt;lblProject3.Type" xml:space="preserve">
+    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblProject3.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;lblProject3.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="lblProject4.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 9pt</value>
+  </data>
+  <data name="lblProject4.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="lblProject4.LinkArea" type="System.Windows.Forms.LinkArea, System.Windows.Forms">
+    <value>0, 36</value>
+  </data>
+  <data name="lblProject4.Location" type="System.Drawing.Point, System.Drawing">
+    <value>224, 153</value>
+  </data>
+  <data name="lblProject4.Size" type="System.Drawing.Size, System.Drawing">
+    <value>232, 16</value>
+  </data>
+  <data name="lblProject4.TabIndex" type="System.Int32, mscorlib">
+    <value>20</value>
+  </data>
+  <data name="lblProject4.Text" xml:space="preserve">
+    <value>Project4</value>
+  </data>
+  <data name="&gt;&gt;lblProject4.Name" xml:space="preserve">
+    <value>lblProject4</value>
+  </data>
+  <data name="&gt;&gt;lblProject4.Type" xml:space="preserve">
+    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblProject4.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;lblProject4.ZOrder" xml:space="preserve">
+    <value>2</value>
   </data>
   <data name="picProgramLogo.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAJgAAAB5CAIAAABKuH9RAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAAO0wAA
-        DtMBjnu4rgAASUxJREFUeF7tfQdcFNfe9tJF1CQmsaXHdFNMj8aYoqZHjR0VG4qAKCI2kN5he6/swtJ7
+        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAAO0gAA
+        DtIBXDxaSgAASUxJREFUeF7tfQdcFNfe9tJF1CQmsaXHdFNMj8aYoqZHjR0VG4qAKCI2kN5he6/swtJ7
         79Lb0hFU7GAFaQLbC8z3nxkgJrn3vfH1ms97X+d3XGeX2Z2Z88zz7+ccIwRBCI+2/4IeACAfbf8FPUD4
         L7iHR7eAitVHvfDf0QOPgPzvwPERI/9LcHwE5CMg/1t64L/kPh7pyEdA/pf0wH/JbfwbGGkwjI2Nod2B
         v8Km14/Cq1qtnfzwt309gowiYwZ4HdPr9fANvQG5drO3u/eObgxR6dUGRK/UDI8h8KdRAzI6YpBr4JNR
@@ -684,105 +717,39 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;picProgramLogo.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <data name="lbBasinsHelp.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Microsoft Sans Serif, 9pt</value>
-  </data>
-  <data name="lbBasinsHelp.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="lbBasinsHelp.LinkArea" type="System.Windows.Forms.LinkArea, System.Windows.Forms">
-    <value>0, 11</value>
-  </data>
-  <data name="lbBasinsHelp.Location" type="System.Drawing.Point, System.Drawing">
-    <value>208, 69</value>
-  </data>
-  <data name="lbBasinsHelp.Size" type="System.Drawing.Size, System.Drawing">
-    <value>192, 16</value>
-  </data>
-  <data name="lbBasinsHelp.TabIndex" type="System.Int32, mscorlib">
-    <value>18</value>
-  </data>
-  <data name="lbBasinsHelp.Text" xml:space="preserve">
-    <value>BASINS Help</value>
-  </data>
-  <data name="&gt;&gt;lbBasinsHelp.Name" xml:space="preserve">
-    <value>lbBasinsHelp</value>
-  </data>
-  <data name="&gt;&gt;lbBasinsHelp.Type" xml:space="preserve">
-    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;lbBasinsHelp.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;lbBasinsHelp.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="lbConvert.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Microsoft Sans Serif, 9pt</value>
-  </data>
-  <data name="lbConvert.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="lbConvert.LinkArea" type="System.Windows.Forms.LinkArea, System.Windows.Forms">
-    <value>0, 24</value>
-  </data>
-  <data name="lbConvert.Location" type="System.Drawing.Point, System.Drawing">
-    <value>208, 42</value>
-  </data>
-  <data name="lbConvert.Size" type="System.Drawing.Size, System.Drawing">
-    <value>192, 15</value>
-  </data>
-  <data name="lbConvert.TabIndex" type="System.Int32, mscorlib">
-    <value>19</value>
-  </data>
-  <data name="lbConvert.Text" xml:space="preserve">
-    <value>Convert BASINS 3 Project</value>
-  </data>
-  <data name="&gt;&gt;lbConvert.Name" xml:space="preserve">
-    <value>lbConvert</value>
-  </data>
-  <data name="&gt;&gt;lbConvert.Type" xml:space="preserve">
-    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;lbConvert.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;lbConvert.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
-  <data name="lbProject4.Font" type="System.Drawing.Font, System.Drawing">
+  <data name="lblHelp.Font" type="System.Drawing.Font, System.Drawing">
     <value>Microsoft Sans Serif, 9pt</value>
   </data>
-  <data name="lbProject4.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+  <data name="lblHelp.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
-  <data name="lbProject4.LinkArea" type="System.Windows.Forms.LinkArea, System.Windows.Forms">
-    <value>0, 36</value>
+  <data name="lblHelp.LinkArea" type="System.Windows.Forms.LinkArea, System.Windows.Forms">
+    <value>0, 11</value>
   </data>
-  <data name="lbProject4.Location" type="System.Drawing.Point, System.Drawing">
-    <value>224, 180</value>
+  <data name="lblHelp.Location" type="System.Drawing.Point, System.Drawing">
+    <value>208, 42</value>
   </data>
-  <data name="lbProject4.Size" type="System.Drawing.Size, System.Drawing">
-    <value>232, 16</value>
+  <data name="lblHelp.Size" type="System.Drawing.Size, System.Drawing">
+    <value>192, 16</value>
   </data>
-  <data name="lbProject4.TabIndex" type="System.Int32, mscorlib">
-    <value>20</value>
+  <data name="lblHelp.TabIndex" type="System.Int32, mscorlib">
+    <value>18</value>
   </data>
-  <data name="lbProject4.Text" xml:space="preserve">
-    <value>Project4</value>
+  <data name="lblHelp.Text" xml:space="preserve">
+    <value>BASINS Help</value>
   </data>
-  <data name="&gt;&gt;lbProject4.Name" xml:space="preserve">
-    <value>lbProject4</value>
+  <data name="&gt;&gt;lblHelp.Name" xml:space="preserve">
+    <value>lblHelp</value>
   </data>
-  <data name="&gt;&gt;lbProject4.Type" xml:space="preserve">
+  <data name="&gt;&gt;lblHelp.Type" xml:space="preserve">
     <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;lbProject4.Parent" xml:space="preserve">
+  <data name="&gt;&gt;lblHelp.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
-  <data name="&gt;&gt;lbProject4.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;lblHelp.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">

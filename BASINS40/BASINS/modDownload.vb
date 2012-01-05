@@ -78,8 +78,7 @@ Public Module modDownload
                                 CopyFeaturesWithinExtent(lOldDataDir, lNewDataDir)
 
                                 'copy all other files from the old project directory to the new one
-                                Dim lFilenames As NameValueCollection
-                                lFilenames = New NameValueCollection
+                                Dim lFilenames As New NameValueCollection
                                 AddFilesInDir(lFilenames, PathNameOnly(GisUtil.ProjectFileName), True)
                                 For Each lFilename As String In lFilenames
                                     If Not FileExt(lFilename) = "mwprj" And Not FileExt(lFilename) = "bmp" Then
@@ -374,14 +373,14 @@ Public Module modDownload
 
     Public Sub SpecifyAndCreateNewProject()
         pBuildFrm = Nothing
-
+        Dim lProjectName As String = Nothing
         Dim lRegion As String = GetSelectedRegion()
         If lRegion.Length > 0 Then
             If pExistingMapWindowProjectName.Length = 0 Then
                 'This is the normal case for building a new project,
                 'Save national project as the user has zoomed it
                 g_Project.Save(g_Project.FileName)
-                CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
+                lProjectName = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
             Else
                 'build new basins project from mapwindow project
                 Dim lDataPath As String = DefaultBasinsDataDir()
@@ -395,9 +394,11 @@ Public Module modDownload
             End If
         Else
             'prompt about creating a project with no data
-            CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
+            lProjectName = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
         End If
-
+        If Not String.IsNullOrEmpty(lProjectName) Then
+            Logger.Msg(lProjectName, "Created Project")
+        End If
     End Sub
 
     'Returns file name of new project or "" if not built
@@ -572,41 +573,77 @@ StartOver:
             End Try
         Next
         Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
-        Dim lResult As String = lDownloadManager.Execute(lQuery)
-        'Logger.Msg(lResult, "Result of Query from DataManager")
 
-        If Not lResult Is Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
-            If Not aExistingMapWindowProject Then
-                'regular case, not coming from existing mapwindow project
-                ClearLayers()
-                If Not (g_Project.Save(aProjectFileName)) Then
-                    Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save1Failed:" & g_MapWin.LastError)
+        Logger.Status("Building new project")
+        Using lLevel As New ProgressLevel()
+            Dim lResult As String = lDownloadManager.Execute(lQuery)
+            'Logger.Msg(lResult, "Result of Query from DataManager")
+
+            Dim lDisplayMessageBoxes As Boolean = Logger.DisplayMessageBoxes
+
+            If lResult IsNot Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
+                If Not aExistingMapWindowProject Then
+                    'regular case, not coming from existing mapwindow project
+                    ClearLayers()
+                    If Not (g_Project.Save(aProjectFileName)) Then
+                        Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save1Failed:" & g_MapWin.LastError)
+                    End If
+                Else
+                    'open existing mapwindow project again
+                    g_Project.Load(aProjectFileName)
+                    Dim lProjectDir As String = PathNameOnly(aProjectFileName)
+                    Dim lNewShapeName As String = lProjectDir & "\temp\tempextent.shp"
+                    TryDeleteShapefile(lNewShapeName)
                 End If
-            Else
-                'open existing mapwindow project again
-                g_Project.Load(aProjectFileName)
-                Dim lProjectDir As String = PathNameOnly(aProjectFileName)
-                Dim lNewShapeName As String = lProjectDir & "\temp\tempextent.shp"
-                TryDeleteShapefile(lNewShapeName)
-            End If
-            g_Project.Modified = True
-            ProcessDownloadResults(lResult) 'TODO: skip message box describing what has been downloaded?
+                g_Project.Modified = True
 
-            AddAllShapesInDir(aNewDataDir, aNewDataDir)
-            g_MapWin.PreviewMap.Update(MapWindow.Interfaces.ePreviewUpdateExtents.CurrentMapView)
-            If Not aExistingMapWindowProject Then
-                'regular case, not coming from existing mapwindow project
-                'set mapwindow project projection to projection of first layer
-                g_Project.ProjectProjection = lProjection
+                Logger.DisplayMessageBoxes = False
+                ProcessDownloadResults(lResult)
+                Logger.DisplayMessageBoxes = lDisplayMessageBoxes
 
-                Dim lKey As String = g_MapWin.Plugins.GetPluginKey("Tiled Map")
-                If Not String.IsNullOrEmpty(lKey) Then g_MapWin.Plugins.StopPlugin(lKey)
+                AddAllShapesInDir(aNewDataDir, aNewDataDir)
+                g_MapWin.PreviewMap.Update(MapWindow.Interfaces.ePreviewUpdateExtents.CurrentMapView)
+                If Not aExistingMapWindowProject Then
+                    'regular case, not coming from existing mapwindow project
+                    'set mapwindow project projection to projection of first layer
+                    g_Project.ProjectProjection = lProjection
 
-                If Not (g_Project.Save(aProjectFileName)) Then
-                    Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save2Failed:" & g_MapWin.LastError)
+                    Dim lKey As String = g_MapWin.Plugins.GetPluginKey("Tiled Map")
+                    If Not String.IsNullOrEmpty(lKey) Then g_MapWin.Plugins.StopPlugin(lKey)
+
+                    If Not (g_Project.Save(aProjectFileName)) Then
+                        Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save2Failed:" & g_MapWin.LastError)
+                    End If
+                End If
+
+                If g_AppNameShort = "USGS-GW" Then 'Also get some more layers
+                    Dim lRegion As D4EMDataManager.Region 'Use the view extents to include some stations in a buffer outside the original region
+                    With g_MapWin.View.Extents
+                        lRegion = New D4EMDataManager.Region(.yMax, .yMin, .xMin, .xMax, g_MapWin.Project.ProjectProjection)
+                    End With
+                    lQuery = "<function name='GetNWISStations'>" _
+                           & "<arguments> <DataType>gw</DataType> <DataType>discharge</DataType>" _
+                           & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
+                           & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
+                           & "<DesiredProjection>" & lProjection & "</DesiredProjection>" _
+                           & lRegion.XML _
+                           & "<clip>False</clip> <merge>False</merge>" _
+                           & "</arguments> </function>"
+
+                    lResult = lDownloadManager.Execute(lQuery)
+                    If Not lResult Is Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
+                        Logger.DisplayMessageBoxes = False
+                        ProcessDownloadResults(lResult)
+                        Logger.DisplayMessageBoxes = lDisplayMessageBoxes
+                        'Save again after successfully adding more layers
+                        If Not aExistingMapWindowProject AndAlso Not (g_Project.Save(aProjectFileName)) Then
+                            Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save3Failed:" & g_MapWin.LastError)
+                        End If
+                    End If
                 End If
             End If
-        End If
+        End Using
+        Logger.Status("")
     End Sub
 
     'Download new data for an existing project
@@ -642,9 +679,9 @@ StartOver:
             lMessage &= ProcessDownloadResult(lInstructionNode.OuterXml) & vbCrLf
             Application.DoEvents()
         Next
-        If lMessage.Length > 2 Then
+        If lMessage.Length > 2 AndAlso Logger.DisplayMessageBoxes Then
             Logger.Msg(lMessage, "Data Download")
-            If Logger.DisplayMessageBoxes AndAlso lMessage.Contains(" Data file") Then
+            If lMessage.Contains(" Data file") Then
                 atcDataManager.UserManage()
             End If
         End If

@@ -69,7 +69,7 @@ Friend Class atcWdmFileHandle
                 lFileAccess = IO.FileAccess.ReadWrite
             End If
 
-            'Logger.Dbg("atcWdmFileHandle:OpenB4:" & lFileName)
+            Logger.Dbg("atcWdmFileHandle:Opening '" & lFileName & "'")
             Try
                 lFS = IO.File.Open(lFileName, IO.FileMode.Open, lFileAccess, IO.FileShare.Read)
                 pBr = New IO.BinaryReader(lFS)

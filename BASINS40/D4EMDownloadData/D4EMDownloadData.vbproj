@@ -113,6 +113,12 @@
     <Compile Include="frmSpecifyRegion.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmSpecifyStations.Designer.vb">
+      <DependentUpon>frmSpecifyStations.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSpecifyStations.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmWDM.Designer.vb">
       <DependentUpon>frmWDM.vb</DependentUpon>
     </Compile>
@@ -143,6 +149,9 @@
     <EmbeddedResource Include="frmSpecifyRegion.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmSpecifyRegion.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSpecifyStations.resx">
+      <DependentUpon>frmSpecifyStations.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmWDM.resx">
       <SubType>Designer</SubType>
