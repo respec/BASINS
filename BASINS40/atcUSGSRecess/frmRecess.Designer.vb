@@ -26,14 +26,6 @@ Partial Class frmRecess
         Me.tabMain = New System.Windows.Forms.TabControl
         Me.tabConfig = New System.Windows.Forms.TabPage
         Me.chkSaveInterimToFile = New System.Windows.Forms.CheckBox
-        Me.gbRnages = New System.Windows.Forms.GroupBox
-        Me.btnBrowseRangeFile = New System.Windows.Forms.Button
-        Me.TextBox4 = New System.Windows.Forms.TextBox
-        Me.TextBox3 = New System.Windows.Forms.TextBox
-        Me.Label3 = New System.Windows.Forms.Label
-        Me.Label2 = New System.Windows.Forms.Label
-        Me.TextBox2 = New System.Windows.Forms.TextBox
-        Me.Label1 = New System.Windows.Forms.Label
         Me.txtOutputDir = New System.Windows.Forms.TextBox
         Me.lblOutpuDir = New System.Windows.Forms.Label
         Me.txtMinRecessionDays = New System.Windows.Forms.TextBox
@@ -69,7 +61,6 @@ Partial Class frmRecess
         Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem
         Me.tabMain.SuspendLayout()
         Me.tabConfig.SuspendLayout()
-        Me.gbRnages.SuspendLayout()
         Me.gbMonthSeason.SuspendLayout()
         Me.gbDates.SuspendLayout()
         Me.tabAnalysis.SuspendLayout()
@@ -95,7 +86,6 @@ Partial Class frmRecess
         'tabConfig
         '
         Me.tabConfig.Controls.Add(Me.chkSaveInterimToFile)
-        Me.tabConfig.Controls.Add(Me.gbRnages)
         Me.tabConfig.Controls.Add(Me.txtOutputDir)
         Me.tabConfig.Controls.Add(Me.lblOutpuDir)
         Me.tabConfig.Controls.Add(Me.txtMinRecessionDays)
@@ -119,80 +109,6 @@ Partial Class frmRecess
         Me.chkSaveInterimToFile.TabIndex = 11
         Me.chkSaveInterimToFile.Text = "Save Intermediate Results"
         Me.chkSaveInterimToFile.UseVisualStyleBackColor = True
-        '
-        'gbRnages
-        '
-        Me.gbRnages.Controls.Add(Me.btnBrowseRangeFile)
-        Me.gbRnages.Controls.Add(Me.TextBox4)
-        Me.gbRnages.Controls.Add(Me.TextBox3)
-        Me.gbRnages.Controls.Add(Me.Label3)
-        Me.gbRnages.Controls.Add(Me.Label2)
-        Me.gbRnages.Controls.Add(Me.TextBox2)
-        Me.gbRnages.Controls.Add(Me.Label1)
-        Me.gbRnages.Location = New System.Drawing.Point(6, 314)
-        Me.gbRnages.Name = "gbRnages"
-        Me.gbRnages.Size = New System.Drawing.Size(582, 58)
-        Me.gbRnages.TabIndex = 46
-        Me.gbRnages.TabStop = False
-        Me.gbRnages.Text = "Recession Data Display Parameters"
-        Me.gbRnages.Visible = False
-        '
-        'btnBrowseRangeFile
-        '
-        Me.btnBrowseRangeFile.Location = New System.Drawing.Point(453, 29)
-        Me.btnBrowseRangeFile.Name = "btnBrowseRangeFile"
-        Me.btnBrowseRangeFile.Size = New System.Drawing.Size(117, 23)
-        Me.btnBrowseRangeFile.TabIndex = 6
-        Me.btnBrowseRangeFile.Text = "Browse for range file"
-        Me.btnBrowseRangeFile.UseVisualStyleBackColor = True
-        '
-        'TextBox4
-        '
-        Me.TextBox4.Location = New System.Drawing.Point(300, 32)
-        Me.TextBox4.Name = "TextBox4"
-        Me.TextBox4.Size = New System.Drawing.Size(100, 20)
-        Me.TextBox4.TabIndex = 5
-        '
-        'TextBox3
-        '
-        Me.TextBox3.Location = New System.Drawing.Point(156, 33)
-        Me.TextBox3.Name = "TextBox3"
-        Me.TextBox3.Size = New System.Drawing.Size(100, 20)
-        Me.TextBox3.TabIndex = 4
-        '
-        'Label3
-        '
-        Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(297, 16)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(100, 13)
-        Me.Label3.TabIndex = 3
-        Me.Label3.Text = "Maximum Log(Flow)"
-        '
-        'Label2
-        '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(153, 16)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(97, 13)
-        Me.Label2.TabIndex = 2
-        Me.Label2.Text = "Minimum Log(Flow)"
-        '
-        'TextBox2
-        '
-        Me.TextBox2.Location = New System.Drawing.Point(9, 32)
-        Me.TextBox2.Name = "TextBox2"
-        Me.TextBox2.Size = New System.Drawing.Size(100, 20)
-        Me.TextBox2.TabIndex = 1
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(6, 16)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(49, 13)
-        Me.Label1.TabIndex = 0
-        Me.Label1.Text = "Last Day"
         '
         'txtOutputDir
         '
@@ -548,8 +464,6 @@ Partial Class frmRecess
         Me.tabMain.ResumeLayout(False)
         Me.tabConfig.ResumeLayout(False)
         Me.tabConfig.PerformLayout()
-        Me.gbRnages.ResumeLayout(False)
-        Me.gbRnages.PerformLayout()
         Me.gbMonthSeason.ResumeLayout(False)
         Me.gbMonthSeason.PerformLayout()
         Me.gbDates.ResumeLayout(False)
@@ -572,14 +486,6 @@ Partial Class frmRecess
     Friend WithEvents mnuFile As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuFileSelectData As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents gbRnages As System.Windows.Forms.GroupBox
-    Friend WithEvents btnBrowseRangeFile As System.Windows.Forms.Button
-    Friend WithEvents TextBox4 As System.Windows.Forms.TextBox
-    Friend WithEvents TextBox3 As System.Windows.Forms.TextBox
-    Friend WithEvents Label3 As System.Windows.Forms.Label
-    Friend WithEvents Label2 As System.Windows.Forms.Label
-    Friend WithEvents TextBox2 As System.Windows.Forms.TextBox
-    Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents txtOutputDir As System.Windows.Forms.TextBox
     Friend WithEvents lblOutpuDir As System.Windows.Forms.Label
     Friend WithEvents txtMinRecessionDays As System.Windows.Forms.TextBox
