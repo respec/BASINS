@@ -1,6 +1,8 @@
 ﻿Imports atcData
 Imports atcUtility
 Imports atcUSGSUtility
+Imports atcGraph
+Imports ZedGraph
 Imports MapWinUtility
 Imports System.Windows.Forms
 Imports System.Text.RegularExpressions
@@ -194,17 +196,25 @@ Public Class frmUSGSRora
         End If
 
         Dim lDA As Double = 0.0
-        If Not Double.TryParse(txtDrainageArea.Text.Trim, lDA) Then lErrMsg &= "- Drainage Area not set" & vbCrLf
+        If Not Double.TryParse(txtDrainageArea.Text.Trim, lDA) Then
+            lErrMsg &= "- Drainage Area not set" & vbCrLf
+            GoTo Notify
+        ElseIf lDA <= 0 Then
+            lErrMsg &= "- Drainage Area must be greater than zero" & vbCrLf
+            GoTo Notify
+        End If
 
         Dim lIndex As Double = 0.0
         If Not Double.TryParse(txtRecessionIndex.Text.Trim, lIndex) Then lErrMsg &= "- Recession Index not set" & vbCrLf
 
         Dim lAnteRecession As Integer = 0
-        If Not Integer.TryParse(cboAnteRecess.SelectedItem.ToString.Trim, lAnteRecession) Then
+        If cboAnteRecess.SelectedItem Is Nothing Then
             lErrMsg &= "- Antecedent Recession Days not set" & vbCrLf
+        ElseIf Not Integer.TryParse(cboAnteRecess.SelectedItem.ToString.Trim, lAnteRecession) Then
+            lErrMsg &= "- Antecedent Recession Days invalid" & vbCrLf
         Else
             If lAnteRecession <= 0 Then
-                lErrMsg &= "- Antecedent Recession Days invalide" & vbCrLf
+                lErrMsg &= "- Antecedent Recession Days invalid" & vbCrLf
             End If
         End If
 
@@ -229,6 +239,8 @@ Public Class frmUSGSRora
             'Set station.txt
             'Args.SetValue("Station File", atcUSGSStations.StationInfoFile)
         End If
+
+Notify:
         Return lErrMsg
     End Function
 
@@ -512,36 +524,45 @@ Public Class frmUSGSRora
 
         If Not pDidRora Then
             ComputeRora()
+            Dim lResult As String = WriteRoraASCIIOutput()
+            If lResult.StartsWith("Failed") Then
+                Logger.Msg(lResult, "Writing RORA ASCII output failed")
+                pDidRora = False
+            End If
             If Not pDidRora Then Exit Sub
         End If
-
-        Dim lSpecification As String = ""
-        If pDataGroup Is Nothing OrElse pDataGroup.Count = 0 Then
-            Exit Sub
-        End If
-        If Not IO.Directory.Exists(txtOutputDir.Text.Trim()) Then
-            Logger.Msg("Please specify an output directory", "RORA ASCII Output")
-            txtOutputDir.Focus()
-            Exit Sub
-        End If
-        If pRoraAnalysis.OutputFilenameRoot = "" Then
-            Logger.Msg("Please specify a base output filename", "RORA ASCII Output")
-            txtOutputRootName.Focus()
-            Exit Sub
-        Else
-            SaveSetting("atcUSGSRORA", "Defaults", "BaseOutputFilename", pRoraAnalysis.OutputFilenameRoot)
-        End If
-        pRoraAnalysis.OutputDir = txtOutputDir.Text.Trim()
-        pRoraAnalysis.ASCIICommon()
 
 ViewOutput:
         Dim lResponse As String = Logger.MsgCustomOwned("RORA output completed." & vbCrLf & vbCrLf & pRoraAnalysis.Bulletin, "USGS RORA", Me, New String() {"OK", "View Output Files"})
         If lResponse = "View Output Files" Then
+            'pRoraAnalysis.GetRechargeTimeseries(atcTimeUnit.TUMonth)
             Dim lFrmOutput As New frmOutput
             lFrmOutput.Initialize(txtOutputDir.Text.Trim(), txtOutputRootName.Text.Trim())
             lFrmOutput.Show()
         End If
     End Sub
+
+    Private Function WriteRoraASCIIOutput() As String
+        Dim lSpecification As String = ""
+        If pDataGroup Is Nothing OrElse pDataGroup.Count = 0 Then
+            Return "Failed,no data"
+        End If
+        If Not IO.Directory.Exists(txtOutputDir.Text.Trim()) Then
+            Logger.Msg("Please specify an output directory", "RORA ASCII Output")
+            txtOutputDir.Focus()
+            Return "Failed,output directory not specified"
+        End If
+        If pRoraAnalysis.OutputFilenameRoot = "" Then
+            Logger.Msg("Please specify a base output filename", "RORA ASCII Output")
+            txtOutputRootName.Focus()
+            Return "Failed,base output filename not specified"
+        Else
+            SaveSetting("atcUSGSRORA", "Defaults", "BaseOutputFilename", pRoraAnalysis.OutputFilenameRoot)
+        End If
+        pRoraAnalysis.OutputDir = txtOutputDir.Text.Trim()
+        pRoraAnalysis.ASCIICommon()
+        Return "Succeed"
+    End Function
 
     'Private Sub btnGraphTimeseries_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGraphTimeseries.Click
     '    mnuGraphTimeseries_Click(Nothing, Nothing)
@@ -620,13 +641,15 @@ ViewOutput:
     End Function
 
     Private Sub PopulateAnteRecessList()
-        With cboAnteRecess.Items
-            .Clear()
-            For Each lDay As Integer In pRoraAnalysis.RangeOfAnteRecessionDays
-                .Add(lDay.ToString)
-            Next
-        End With
-        cboAnteRecess.SelectedIndex = 0
+        If pRoraAnalysis.RangeOfAnteRecessionDays IsNot Nothing Then
+            With cboAnteRecess.Items
+                .Clear()
+                For Each lDay As Integer In pRoraAnalysis.RangeOfAnteRecessionDays
+                    .Add(lDay.ToString)
+                Next
+            End With
+            cboAnteRecess.SelectedIndex = 0
+        End If
     End Sub
 
     Private Sub btnExamineData_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnExamineData.Click
@@ -680,5 +703,76 @@ ViewOutput:
 
     Private Sub cboAnteRecess_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboAnteRecess.SelectedIndexChanged
         Integer.TryParse(cboAnteRecess.SelectedItem.ToString, pAnteRecess)
+    End Sub
+
+    Private Sub btnGraphRecharge_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGraphRecharge.Click
+        If Not ConfigurationChanged() Then
+            GoTo PlotOutput
+        Else
+            pDidRora = False
+        End If
+
+        If Not pDidRora Then
+            ComputeRora()
+            Dim lResult As String = WriteRoraASCIIOutput()
+            If lResult.StartsWith("Failed") Then
+                Logger.Msg(lResult, "Writing RORA ASCII output failed")
+                pDidRora = False
+            End If
+            If Not pDidRora Then Exit Sub
+        End If
+
+        Dim lSpecification As String = ""
+        If pDataGroup Is Nothing OrElse pDataGroup.Count = 0 Then
+            Exit Sub
+        End If
+
+PlotOutput:
+        DoGraphRecharge("Timeseries")
+    End Sub
+
+    Public Sub DoGraphRecharge(ByVal aGraphType As String)
+        If pDataGroup Is Nothing OrElse pDataGroup.Count = 0 Then
+            Exit Sub
+        End If
+        pRoraAnalysis.GetRechargeTimeseries(atcTimeUnit.TUMonth)
+        Dim lDataGroup As New atcTimeseriesGroup
+        If pRoraAnalysis.TsRecharge IsNot Nothing Then
+            lDataGroup.Add(pRoraAnalysis.TsRecharge)
+        Else
+            Logger.Msg("Recharge timeseries is empty. Unable to generate graph.", "RORA: problem plotting recharge")
+            Exit Sub
+        End If
+
+        Dim lYAxisTitleText As String = "Recharge (inches)"
+        With lDataGroup(0).Attributes
+            .SetValue("Constituent", "Recharge")
+            '.SetValue("Scenario", "Estimated by " & lMethod)
+            .SetValue("Units", lYAxisTitleText)
+            .SetValue("YAxis", "LEFT")
+        End With
+
+        If aGraphType = "Timeseries" Then
+            DisplayTsGraph(lDataGroup)
+        End If
+
+    End Sub
+
+    Private Sub DisplayTsGraph(ByVal aDataGroup As atcTimeseriesGroup)
+        Dim lGraphForm As New atcGraph.atcGraphForm()
+        lGraphForm.Icon = Me.Icon
+        Dim lZgc As ZedGraphControl = lGraphForm.ZedGraphCtrl
+        Dim lGraphTS As New clsGraphTime(aDataGroup, lZgc)
+        lGraphForm.Grapher = lGraphTS
+
+        With lGraphForm.Grapher.ZedGraphCtrl.GraphPane
+            .CurveList.Item(0).Color = Drawing.Color.Blue
+            'With CType(.CurveList.Item(0), LineItem).Symbol
+            '    .Type = SymbolType.TriangleDown
+            '    .IsVisible = True
+            'End With
+        End With
+
+        lGraphForm.Show()
     End Sub
 End Class

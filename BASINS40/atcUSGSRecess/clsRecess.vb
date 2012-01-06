@@ -51,6 +51,13 @@ Public Class clsRecess
         End Get
     End Property
 
+    Private pRecSumResult As String = ""
+    Public ReadOnly Property RecSumResult() As String
+        Get
+            Return pRecSumResult
+        End Get
+    End Property
+
     Private pRecessions As New atcCollection 'collection of clsRecessionSegment
     Public RecessionSegment As clsRecessionSegment = Nothing
 
@@ -299,6 +306,8 @@ Public Class clsRecess
             SaveInterimResults = aArgs.GetValue("SaveInterimResults", False)
         End If
 
+        pRecSumResult = ""
+
         Dim lTs As atcTimeseries = SubsetByDate(aTS, lSdate, lEdate, Nothing)
         FlowData = lTs
 
@@ -438,6 +447,7 @@ Public Class clsRecess
         FlowData = Nothing
         FileOut1Created = False
         FileOut2Created = False
+        pRecSumResult = ""
     End Sub
 
     Public Function RecessAnalysis(Optional ByVal aOperation As String = "") As String
@@ -1392,8 +1402,24 @@ Public Class clsRecess
                 Dim lStrCoeffB As String = String.Format("{0:0.0000}", lCoeffB).PadLeft(10, " ")
                 Dim lStrCoeffC As String = String.Format("{0:0.0000}", lCoeffC).PadLeft(10, " ")
 
-                lSW.WriteLine(lStrInputFile & SeasonLabel & " " & lStrDuration & lListOfChosenSegments.Count & _
-                              lStrKMin & lStrKMed & lStrKMax & lStrMNLogQC & lStrMXLogQC & lStrCoeffA & lStrCoeffB & lStrCoeffC)
+                Dim lDrainageArea As Double = FlowData.Attributes.GetValue("Drainage Area", -99.9)
+                Dim lStrDA As String = ""
+                If lDrainageArea < 0 Then
+                    lStrDA = "N/A".PadLeft(8, " ")
+                Else
+                    lStrDA = String.Format("{0:0.0}", lDrainageArea).PadLeft(8, " ")
+                End If
+                Dim lStaName As String = FlowData.Attributes.GetValue("STANAM", "").ToString.Trim()
+                If lStaName.Length > 0 Then
+                    lStaName = lStaName.Replace(" ", "_")
+                    lStaName = lStaName.Replace(",", "_")
+                End If
+
+                pRecSumResult = lStrInputFile & SeasonLabel & " " & lStrDuration & lListOfChosenSegments.Count & _
+                              lStrKMin & lStrKMed & lStrKMax & lStrMNLogQC & lStrMXLogQC & lStrCoeffA & lStrCoeffB & lStrCoeffC & _
+                              lStrDA & " " & lStaName
+
+                lSW.WriteLine(pRecSumResult)
                 lSW.Flush()
                 lSW.Close()
                 lSW = Nothing

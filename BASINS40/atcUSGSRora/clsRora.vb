@@ -9,7 +9,15 @@ Public Class clsRora
     Public RangeOfAnteRecessionDays As ArrayList
     Public OutputFilenameRoot As String
     Public OutputDir As String
+
     Public TsStreamFlow As atcTimeseries
+    Private pTsRecharge As atcTimeseries
+    Public ReadOnly Property TsRecharge() As atcTimeseries
+        Get
+            Return pTsRecharge
+        End Get
+    End Property
+
     Public RechargeTotal As Double
     'Tc
     Public ReadOnly Property TimeCritical() As Double
@@ -19,7 +27,7 @@ Public Class clsRora
     End Property
 
     Private PARAMRecessIndex As Double
-
+    Private pDrainageArea As Double
     Private piPeak As Integer
     Private pUADepth As Double = 0.0371901
     Private pLog10ToNaturalLog As Double = 2.3025851 'ln(x) = 2.3025851 * log(x)
@@ -45,7 +53,13 @@ Public Class clsRora
         Dim lFileRoraMon14 As String = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_" & pFileRoraMon14)
         Dim lFileRoraQrt15 As String = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_" & pFileRoraQrt15)
         Dim lFileRoraWY16 As String = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_" & pFileRoraWY16)
+        Dim lFileRoraMonCSV As String = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_" & IO.Path.ChangeExtension(pFileRoraMon14, "csv"))
+        Dim lFileRoraAnnCSV As String = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_" & "roraAnn.csv")
         Dim lFlowDataFilename As String = TsStreamFlow.Attributes.GetValue("History 1").replace("read from", "")
+        Dim lStationID As String = TsStreamFlow.Attributes.GetValue("Location")
+        Dim lStationName As String = TsStreamFlow.Attributes.GetValue("STANAM")
+        Dim lDA As String = String.Format("{0:0.0}", TsStreamFlow.Attributes.GetValue("Drainage Area"))
+
         Dim lSeg As clsRecessionSegment = Nothing
         Dim lSW As IO.StreamWriter = Nothing
 
@@ -97,13 +111,24 @@ Public Class clsRora
         '---  LONG-TERM RESULTS ARE DETERMINED AND WRITTEN TO FILE "RORASUM.TXT" ---
         lSW = New IO.StreamWriter(lFileRoraSum10, True)
         lOneLine.Length = 0
-        If lFlowDataFilename.Length > 12 Then
-            Dim lNewName As String = lFlowDataFilename.Substring(lFlowDataFilename.Length - 12)
+        If lFlowDataFilename.Length > 11 Then
+            Dim lNewName As String = lFlowDataFilename.Substring(lFlowDataFilename.LastIndexOf("\") + 1)
+            If lNewName.Length > 11 Then
+                lNewName = lNewName.Substring(0, 11)
+            End If
+
             lOneLine.Append(lNewName)
         Else
             lOneLine.Append(lFlowDataFilename.PadLeft(12, " "))
         End If
-        lOneLine.Append(String.Format("{0:0.00}", TsStreamFlow.Attributes.GetValue("Drainage Area")).PadLeft(7, " ") & "  ")
+        Dim lDrainageArea As Double = TsStreamFlow.Attributes.GetValue("Drainage Area", -99.9)
+        If lDrainageArea < 0 And pDrainageArea <= 0 Then
+            lOneLine.Append(Space(7) & "  ")
+        ElseIf pDrainageArea > 0 Then
+            lOneLine.Append(String.Format("{0:0.00}", pDrainageArea).PadLeft(7, " ") & "  ")
+        Else
+            lOneLine.Append(String.Format("{0:0.00}", lDrainageArea).PadLeft(7, " ") & "  ")
+        End If
         lOneLine.Append(lYearStart.ToString & "-" & lYearEnd.ToString)
 
         Dim liiMaxDay As Integer = 0
@@ -168,7 +193,31 @@ Public Class clsRora
         lTextMonthly.Append("          J     F     M     A     M     J     J     A     S     O     N     D   YEAR")
         lSW.WriteLine(lTextMonthly.ToString) : lSW.Flush()
         lTextMonthly.Length = 0
-        
+
+        Dim lTextMonCSV As New Text.StringBuilder
+        lTextMonCSV.AppendLine("Groundwater Toolbox monthly output for recharge estimates using RORA approach.")
+        lTextMonCSV.AppendLine("Station: USGS " & lStationID & " " & lStationName)
+        lTextMonCSV.AppendLine("Drainage area: " & lDA & " square miles")
+        lTextMonCSV.AppendLine(" ")
+        lTextMonCSV.AppendLine("(IN: monthly recharge for drainage area, in inches)")
+        lTextMonCSV.AppendLine(" ")
+        lTextMonCSV.AppendLine("Month,Date,IN ")
+        Dim lSWMonCSV As New IO.StreamWriter(lFileRoraMonCSV, False)
+        lSWMonCSV.WriteLine(lTextMonCSV) : lSWMonCSV.Flush()
+        lTextMonCSV.Length = 0
+
+        Dim lTextAnnCSV As New Text.StringBuilder
+        lTextAnnCSV.AppendLine("Groundwater Toolbox monthly output for recharge estimates using RORA approach.")
+        lTextAnnCSV.AppendLine("Station: USGS " & lStationID & " " & lStationName)
+        lTextAnnCSV.AppendLine("Drainage area: " & lDA & " square miles")
+        lTextAnnCSV.AppendLine(" ")
+        lTextAnnCSV.AppendLine("(IN: annual recharge for drainage area, in inches)")
+        lTextAnnCSV.AppendLine(" ")
+        lTextAnnCSV.AppendLine("Year,Date,IN ")
+        Dim lSWAnnCSV As New IO.StreamWriter(lFileRoraAnnCSV, False)
+        lSWAnnCSV.WriteLine(lTextAnnCSV) : lSWAnnCSV.Flush()
+        lTextAnnCSV.Length = 0
+
         'Get monthly sum
         Dim lNumYears As Integer = lYearEnd - lYearStart + 1
         Dim lYearByMonthRecharge(lNumYears, 12) As Double
@@ -197,6 +246,7 @@ Public Class clsRora
         Dim lBB As Double
         Dim lCC As Double
         Dim lDD As Double
+        Dim lMonthCount As Integer = 1
         For liYear As Integer = 1 To lNumYears
             lSumYear = 0
             liMiss = 0
@@ -210,13 +260,20 @@ Public Class clsRora
                 End If
             Next
             If liMiss = 1 Then lSumYear = -99.99
+
+            lTextAnnCSV.AppendLine(liYear & "," & liYear + lYearStart - 1 & "," & String.Format("{0:0.00}", lSumYear))
+
             ' 943 FORMAT (1I6, 13F6.2) - write to 14 monthly
             lTextMonthly.Append((liYear + lYearStart - 1).ToString.PadLeft(6, " "))
+
             Dim lMonthlyRechargeValue As Double
             For liMonth = 1 To 12
                 lMonthlyRechargeValue = lYearByMonthRecharge(liYear, liMonth)
                 If lMonthlyRechargeValue = 0 Then lMonthlyRechargeValue = -99.99
                 lTextMonthly.Append(String.Format("{0:0.00}", lMonthlyRechargeValue).PadLeft(6, " "))
+
+                lTextMonCSV.AppendLine(lMonthCount & "," & liMonth & "-" & liYear + lYearStart - 1 & "," & String.Format("{0:0.00}", lMonthlyRechargeValue))
+                lMonthCount += 1
             Next
             lTextMonthly.AppendLine(String.Format("{0:0.00}", lSumYear).PadLeft(6, " "))
 
@@ -272,6 +329,8 @@ Public Class clsRora
         lSW.WriteLine(lTextMonthly.ToString) : lSW.Flush() : lSW.Close() : lSW = Nothing
         lSWQrt.WriteLine(lTextQrt.ToString) : lSWQrt.Flush() : lSWQrt.Close() : lSWQrt = Nothing
         lSWWY.WriteLine(lTextWY.ToString) : lSWWY.Flush() : lSWWY.Close() : lSWWY = Nothing
+        lSWMonCSV.WriteLine(lTextMonCSV.ToString) : lSWMonCSV.Flush() : lSWMonCSV.Close() : lSWMonCSV = Nothing
+        lSWAnnCSV.WriteLine(lTextAnnCSV.ToString) : lSWAnnCSV.Flush() : lSWAnnCSV.Close() : lSWAnnCSV = Nothing
 
         Bulletin = "NUMBER OF PEAKS= " & listOfSegments.Count & vbCrLf
         Bulletin &= "SUMMARY RESULTS WRITTEN TO FILE ""rorasum.txt""" & vbCrLf
@@ -279,11 +338,106 @@ Public Class clsRora
         Bulletin &= "...AND QUARTER-YEAR RESULTS TO FILE ""roraqrt.txt"""
     End Sub
 
+    ''' <summary>
+    ''' Set the monthly or yearly recharge timeseries
+    ''' </summary>
+    ''' <param name="aTimeStep">atcTimeUnit</param>
+    ''' <remarks>Needs to be either for monthly or yearly</remarks>
+    Public Sub GetRechargeTimeseries(ByVal aTimeStep As atcTimeUnit)
+        If listOfSegments Is Nothing OrElse listOfSegments.Count = 0 Then
+            Exit Sub
+        End If
+
+        Dim lSeg As clsRecessionSegment = Nothing
+        Dim lDates As New List(Of Double)
+        Dim lRechargeValues As New List(Of Double)
+
+        'For I As Integer = 0 To listOfSegments.Count - 1
+        '    lSeg = listOfSegments.ItemByIndex(I)
+        '    lDates.Add(lSeg.PeakDayDate)
+        '    lRechargeValues.Add(lSeg.Recharge)
+        'Next
+
+        'Get monthly sum
+        Dim lDate(5) As Integer
+        J2Date(pStartDate, lDate)
+        Dim lYearStart As Integer = lDate(0)
+        J2Date(pEndDate - JulianHour, lDate)
+        Dim lYearEnd As Integer = lDate(0)
+        Dim lNumYears As Integer = lYearEnd - lYearStart + 1
+        Dim lYearByMonthRecharge(lNumYears, 12) As Double
+        Dim laDateMonthStart As Double
+        Dim laDateMonthEnd As Double
+        Dim lMonthComplete As Boolean
+        For I As Integer = 0 To listOfSegments.Count - 1
+            lSeg = listOfSegments.ItemByIndex(I)
+            lMonthComplete = True
+            laDateMonthStart = Date2J(lSeg.PeakDayYear, lSeg.PeakDayMonth, 1, 0, 0, 0)
+            laDateMonthEnd = Date2J(lSeg.PeakDayYear, lSeg.PeakDayMonth, DayMon(lSeg.PeakDayYear, lSeg.PeakDayMonth), 24, 0, 0)
+            If pStartDate > laDateMonthStart OrElse pEndDate < laDateMonthEnd Then
+                lMonthComplete = False
+            End If
+            If lMonthComplete Then
+                lYearByMonthRecharge(lSeg.PeakDayYear - lYearStart + 1, lSeg.PeakDayMonth) += lSeg.Recharge
+            Else
+                lYearByMonthRecharge(lSeg.PeakDayYear - lYearStart + 1, lSeg.PeakDayMonth) = 0
+            End If
+        Next
+
+        Dim lYear As Integer
+        Dim lDateDouble As Double
+        Dim lValue As Double
+        Dim lBeginningTimeAdjusted As Boolean = False
+        For lYearCount As Integer = 1 To lNumYears
+            lYear = lYearCount + lYearStart - 1
+            For lMonth As Integer = 1 To 12
+                If Not lBeginningTimeAdjusted Then
+                    Dim lPrevMonth As Integer
+                    Dim lPrevYear As Integer
+                    If lMonth = 1 Then
+                        lPrevMonth = 12
+                        lPrevYear = lYear - 1
+                    Else
+                        lPrevMonth = lMonth - 1
+                        lPrevYear = lYear
+                    End If
+                    lDateDouble = Date2J(lPrevYear, lPrevMonth, DayMon(lPrevYear, lPrevMonth), 24, 0, 0)
+                    lValue = Double.NaN
+                    lDates.Add(lDateDouble)
+                    lRechargeValues.Add(lValue)
+                    lBeginningTimeAdjusted = True
+                End If
+                lDateDouble = Date2J(lYear, lMonth, DayMon(lYear, lMonth), 24, 0, 0)
+                lValue = lYearByMonthRecharge(lYearCount, lMonth)
+                If lValue > 0 Then
+                    lDates.Add(lDateDouble)
+                    lRechargeValues.Add(lValue)
+                End If
+            Next
+        Next
+
+        pTsRecharge = New atcTimeseries(Nothing)
+        Dim lTsDates As New atcTimeseries(Nothing)
+        lTsDates.Values = lDates.ToArray()
+        pTsRecharge.Values = lRechargeValues.ToArray()
+        pTsRecharge.Dates = lTsDates
+
+        If aTimeStep = atcTimeUnit.TUYear Then
+            pTsRecharge = Aggregate(pTsRecharge, aTimeStep, 1, atcTran.TranSumDiv)
+            pTsRecharge.SetInterval(aTimeStep, 1)
+        Else
+            pTsRecharge.SetInterval(atcTimeUnit.TUMonth, 1)
+        End If
+        
+        'pTsRecharge.Attributes.SetValue("point", True)
+
+    End Sub
+
     Public Sub Rora(ByVal Args As atcDataAttributes)
 
         If Args Is Nothing Then Exit Sub
         'Get parameters
-        Dim lDA As Double = Args.GetValue("Drainage Area")
+        pDrainageArea = Args.GetValue("Drainage Area")
         PARAMRecessIndex = Args.GetValue("Recession Index")
         PARAMAnteRecessDays = Args.GetValue("Antecedent Recession")
         Dim lStart As Double = Args.GetValue("Start Date")
@@ -454,7 +608,7 @@ Public Class clsRora
             Dim lNRecess As Double = .TE - .TS + 1
             .C = lSum / lNRecess
             .DeltaQ = .C / Math.Sqrt(.IndexAfterTimeCritical - .PeakDayIndex)
-            .Recharge = 2.0 * pUADepth * .DeltaQ * PARAMRecessIndex / (pLog10ToNaturalLog * lDA)
+            .Recharge = 2.0 * pUADepth * .DeltaQ * PARAMRecessIndex / (pLog10ToNaturalLog * pDrainageArea)
             RechargeTotal += .Recharge
             .QC = .QB + .DeltaQ
         End With
@@ -485,7 +639,7 @@ Public Class clsRora
                 Dim lNRecess As Double = .TE - .TS + 1
                 .C = lSum / lNRecess
                 .DeltaQ = .C / Math.Sqrt(.IndexAfterTimeCritical - .PeakDayIndex)
-                .Recharge = 2.0 * pUADepth * .DeltaQ * PARAMRecessIndex / (pLog10ToNaturalLog * lDA)
+                .Recharge = 2.0 * pUADepth * .DeltaQ * PARAMRecessIndex / (pLog10ToNaturalLog * pDrainageArea)
                 .QC = .QB + .DeltaQ
                 RechargeTotal += .Recharge
             End With
@@ -528,7 +682,6 @@ Public Class clsRora
         End If
     End Sub
 
-
     ''' <summary>
     '''C ----- SPECIFY THE MAXIMUM ALLOWABLE NUMBER OF DAYS THAT CAN BE USED
     '''C ----- AFTER A PEAK, TO DETERMINE THE GROUND-WATER DISCHARGE AFTER
@@ -540,6 +693,4 @@ Public Class clsRora
     Public Function MaxNumDaysAfterPeak(ByVal aRecessIndex As Double) As Integer
         Return Math.Floor(0.2144 * aRecessIndex)
     End Function
-
-
 End Class

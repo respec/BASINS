@@ -1707,7 +1707,29 @@ Public Class frmRecess
 
     Private Sub btnCurv_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCurv.Click
         Dim lfrmMRC As New frmMRCControl()
-        lfrmMRC.Initialize("")
+        Dim lArgs As atcDataAttributes = Nothing
+        If pRecess IsNot Nothing AndAlso pRecess.RecSumResult.Length > 0 Then
+            Dim lArr() As String = Regex.Split(pRecess.RecSumResult, "\s+")
+            If lArr.Length >= 12 Then
+                Dim lFirstMRC As New clsMRC
+                With lFirstMRC
+                    .RecSum = pRecess.RecSumResult
+                    Dim lDA As Double
+                    If lArr.Length > 12 AndAlso (Not lArr(12).StartsWith("N/A")) AndAlso Double.TryParse(lArr(12), lDA) Then
+                        .DrainageArea = lDA
+                    End If
+                End With
+                If lFirstMRC.BuildMRC() Then
+                    lArgs = New atcDataAttributes
+                    lArgs.SetValue("FirstMRC", lFirstMRC)
+                    Dim lWorkingDir As String = txtOutputDir.Text.Trim()
+                    If lWorkingDir.Length > 0 AndAlso IO.Directory.Exists(lWorkingDir) Then
+                        lArgs.SetValue("WorkingDirectory", lWorkingDir)
+                    End If
+                End If
+            End If
+        End If
+        lfrmMRC.Initialize("", lArgs)
     End Sub
 
     Private Sub frmRecess_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
