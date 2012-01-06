@@ -1354,7 +1354,12 @@ Public Module modGeoSFM
             For Each lzone As Integer In lZoneList
                 lCnt += 1
                 If Not lDaysZonalStats.ItemByKey(lzone) Is Nothing Then
-                    lDaysArray(lCnt, lnday) = lDaysZonalStats.ItemByKey(lzone)
+                    If lnday = 0 Then
+                        'reduce by 1 to eliminate outlet cell from the count
+                        lDaysArray(lCnt, lnday) = lDaysZonalStats.ItemByKey(lzone) - 1
+                    Else
+                        lDaysArray(lCnt, lnday) = lDaysZonalStats.ItemByKey(lzone)
+                    End If
                 End If
             Next
         Next

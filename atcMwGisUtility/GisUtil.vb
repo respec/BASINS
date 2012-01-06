@@ -2315,6 +2315,7 @@ Public Class GisUtil
             Downstream.CheckNeighboringCells(lFlowDirGrid, lMaxCol, lMaxRow, lOutputGrid)
         Else
             'use the streams grid to compute the distance to a stream cell
+            'or outlets grid to compute the distance to an outlet
             Dim lStreamGrid As New MapWinGIS.Grid
             lStreamGrid.Open(aStreamGridFileName)
 
@@ -2328,29 +2329,129 @@ Public Class GisUtil
             lEndRow = lStreamGrid.Header.NumberRows - 1
             lEndCol = lStreamGrid.Header.NumberCols - 1
 
-            'try this -- set flow directions to zero at stream cells 
+            'store orig flow dir in an array for later use
+            Dim lFlowDirArray(lEndCol, lEndRow) As Integer
             For lRow As Integer = lStartRow To lEndRow
                 For lCol As Integer = lStartCol To lEndCol
+                    lFlowDirArray(lCol, lRow) = lFlowDirGrid.Value(lCol, lRow)
                     lTempVal = lStreamGrid.Value(lCol, lRow)
                     If lTempVal > 0 Then
+                        'set the flow dir to zero
                         lFlowDirGrid.Value(lCol, lRow) = 0.0
                     End If
                 Next
             Next
 
+            Dim lFlowAccGrid As New MapWinGIS.Grid
+            lFlowAccGrid.Open(aFlowAccGridFileName)
+            'store orig flow acc in an array for later use
+            Dim lFlowAccArray(lEndCol, lEndRow) As Integer
+            For lRow As Integer = lStartRow To lEndRow
+                For lCol As Integer = lStartCol To lEndCol
+                    If lFlowAccGrid.Value(lCol, lRow) > -1 Then
+                        lFlowAccArray(lCol, lRow) = lFlowAccGrid.Value(lCol, lRow)
+                    End If
+                Next
+            Next
+
+            'this is the assumed flow dir coding from taudem:
+            '4 3 2
+            '5   1
+            '6 7 8
+            Dim lnw As Integer = 8
+            Dim ln As Integer = 7
+            Dim lne As Integer = 6
+            Dim lw As Integer = 1
+            Dim le As Integer = 5
+            Dim lsw As Integer = 2
+            Dim ls As Integer = 3
+            Dim lse As Integer = 4
+
+            If lFlowDirGrid.Maximum > 8 Then
+                'assume arcview coding:
+                '32 64 128
+                '16      1
+                ' 8  4   2
+                lnw = 2
+                ln = 4
+                lne = 8
+                lw = 1
+                le = 16
+                lsw = 128
+                ls = 64
+                lse = 32
+            End If
+
+            Dim lDistanceFactor As Double = Math.Sqrt((lOutputGrid.Header.dX ^ 2) + (lOutputGrid.Header.dY ^ 2))
+            Dim lDistanceFactorX As Double = lOutputGrid.Header.dX
+            Dim lDistanceFactorY As Double = lOutputGrid.Header.dY
+            Dim lDistanceFactorD As Double = Math.Sqrt((lOutputGrid.Header.dX ^ 2) + (lOutputGrid.Header.dY ^ 2))
             For lRow As Integer = lStartRow To lEndRow
                 For lCol As Integer = lStartCol To lEndCol
                     lTempVal = lStreamGrid.Value(lCol, lRow)
+                    If lTempVal = 181 Or lTempVal = 174 Or lTempVal = 74 Or lTempVal = 59 Then
+                        MsgBox("got here")
+                    End If
                     If lTempVal > 0 Then
+                        'this is actually an outlet cell or a stream cell
                         If lWeightingFactorGrid Is Nothing Then
                             lOutputGrid.Value(lCol, lRow) = 0.0
                         Else
-                            lOutputGrid.Value(lCol, lRow) = -1.0 * lOutputGrid.Header.dX * lWeightingFactorGrid.Value(lCol, lRow)
+                            'need to know flow dir of cell upstream of this one
+                            Dim lUpCol As Integer = 0
+                            Dim lUpRow As Integer = 0
+                            Dim lBaseAcc As Integer = lFlowAccArray(lCol, lRow)
+                            Dim lGreatestAcc As Integer = 0
+                            Dim lUpFlowDir As Integer = 0
+                            'check all 8 surrounding cells
+                            If lFlowAccArray(lCol - 1, lRow) < lBaseAcc And lFlowAccArray(lCol - 1, lRow) > lGreatestAcc Then
+                                lUpFlowDir = lFlowDirArray(lCol - 1, lRow)
+                                lGreatestAcc = lFlowAccArray(lCol - 1, lRow)
+                            End If
+                            If lFlowAccArray(lCol - 1, lRow - 1) < lBaseAcc And lFlowAccArray(lCol - 1, lRow - 1) > lGreatestAcc Then
+                                lUpFlowDir = lFlowDirArray(lCol - 1, lRow - 1)
+                                lGreatestAcc = lFlowAccArray(lCol - 1, lRow - 1)
+                            End If
+                            If lFlowAccArray(lCol, lRow - 1) < lBaseAcc And lFlowAccArray(lCol, lRow - 1) > lGreatestAcc Then
+                                lUpFlowDir = lFlowDirArray(lCol, lRow - 1)
+                                lGreatestAcc = lFlowAccArray(lCol, lRow - 1)
+                            End If
+                            If lFlowAccArray(lCol + 1, lRow) < lBaseAcc And lFlowAccArray(lCol + 1, lRow) > lGreatestAcc Then
+                                lUpFlowDir = lFlowDirArray(lCol + 1, lRow)
+                                lGreatestAcc = lFlowAccArray(lCol + 1, lRow)
+                            End If
+                            If lFlowAccArray(lCol + 1, lRow + 1) < lBaseAcc And lFlowAccArray(lCol + 1, lRow + 1) > lGreatestAcc Then
+                                lUpFlowDir = lFlowDirArray(lCol + 1, lRow + 1)
+                                lGreatestAcc = lFlowAccArray(lCol + 1, lRow + 1)
+                            End If
+                            If lFlowAccArray(lCol, lRow + 1) < lBaseAcc And lFlowAccArray(lCol, lRow + 1) > lGreatestAcc Then
+                                lUpFlowDir = lFlowDirArray(lCol, lRow + 1)
+                                lGreatestAcc = lFlowAccArray(lCol, lRow + 1)
+                            End If
+                            If lFlowAccArray(lCol - 1, lRow + 1) < lBaseAcc And lFlowAccArray(lCol - 1, lRow + 1) > lGreatestAcc Then
+                                lUpFlowDir = lFlowDirArray(lCol - 1, lRow + 1)
+                                lGreatestAcc = lFlowAccArray(lCol - 1, lRow + 1)
+                            End If
+                            If lFlowAccArray(lCol + 1, lRow - 1) < lBaseAcc And lFlowAccArray(lCol + 1, lRow - 1) > lGreatestAcc Then
+                                lUpFlowDir = lFlowDirArray(lCol + 1, lRow - 1)
+                                lGreatestAcc = lFlowAccArray(lCol + 1, lRow - 1)
+                            End If
+                            'now compute the distance factor based on that
+                            If lUpFlowDir = lw Or lUpFlowDir = le Then
+                                lDistanceFactor = lDistanceFactorX
+                            ElseIf lUpFlowDir = ln Or lUpFlowDir = ls Then
+                                lDistanceFactor = lDistanceFactorY
+                            Else
+                                'flowing in the diagonal 
+                                lDistanceFactor = lDistanceFactorD
+                            End If
+                            lOutputGrid.Value(lCol, lRow) = -1.0 * lDistanceFactor * lWeightingFactorGrid.Value(lCol, lRow)
                         End If
                         'now call recursive routine to set surrounding cells 
                         Downstream.CheckNeighboringCells(lFlowDirGrid, lCol, lRow, lOutputGrid, lWeightingFactorGrid)
                     End If
                 Next
+                If pStatusShow Then Logger.Progress("Computing Downstream Flow Length", lRow, lEndRow - lStartRow + 1)
             Next
             lStreamGrid.Close()
             lStreamGrid = Nothing
