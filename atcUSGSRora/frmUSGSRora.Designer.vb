@@ -33,7 +33,6 @@ Partial Class frmUSGSRora
         Me.lblDataStart = New System.Windows.Forms.Label
         Me.gbOutputFileSpecs = New System.Windows.Forms.GroupBox
         Me.btnWriteASCIIOutput = New System.Windows.Forms.Button
-        Me.chkTabDelimited = New System.Windows.Forms.CheckBox
         Me.txtOutputDir = New System.Windows.Forms.TextBox
         Me.lblOutputDir = New System.Windows.Forms.Label
         Me.txtOutputRootName = New System.Windows.Forms.TextBox
@@ -54,6 +53,7 @@ Partial Class frmUSGSRora
         Me.mnuFileSelectData = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuAnalysis = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem
+        Me.btnGraphRecharge = New System.Windows.Forms.Button
         Me.gbDates.SuspendLayout()
         Me.gbOutputFileSpecs.SuspendLayout()
         Me.gbParameters.SuspendLayout()
@@ -148,8 +148,8 @@ Partial Class frmUSGSRora
         '
         Me.gbOutputFileSpecs.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbOutputFileSpecs.Controls.Add(Me.btnGraphRecharge)
         Me.gbOutputFileSpecs.Controls.Add(Me.btnWriteASCIIOutput)
-        Me.gbOutputFileSpecs.Controls.Add(Me.chkTabDelimited)
         Me.gbOutputFileSpecs.Controls.Add(Me.txtOutputDir)
         Me.gbOutputFileSpecs.Controls.Add(Me.lblOutputDir)
         Me.gbOutputFileSpecs.Controls.Add(Me.txtOutputRootName)
@@ -170,18 +170,6 @@ Partial Class frmUSGSRora
         Me.btnWriteASCIIOutput.TabIndex = 10
         Me.btnWriteASCIIOutput.Text = "Write ASCII Outputs"
         Me.btnWriteASCIIOutput.UseVisualStyleBackColor = True
-        '
-        'chkTabDelimited
-        '
-        Me.chkTabDelimited.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.chkTabDelimited.AutoSize = True
-        Me.chkTabDelimited.Location = New System.Drawing.Point(113, 86)
-        Me.chkTabDelimited.Name = "chkTabDelimited"
-        Me.chkTabDelimited.Size = New System.Drawing.Size(91, 17)
-        Me.chkTabDelimited.TabIndex = 14
-        Me.chkTabDelimited.Text = "Tab-Delimited"
-        Me.chkTabDelimited.UseVisualStyleBackColor = True
-        Me.chkTabDelimited.Visible = False
         '
         'txtOutputDir
         '
@@ -360,6 +348,16 @@ Partial Class frmUSGSRora
         Me.mnuHelp.Size = New System.Drawing.Size(40, 20)
         Me.mnuHelp.Text = "Help"
         '
+        'btnGraphRecharge
+        '
+        Me.btnGraphRecharge.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnGraphRecharge.Location = New System.Drawing.Point(78, 82)
+        Me.btnGraphRecharge.Name = "btnGraphRecharge"
+        Me.btnGraphRecharge.Size = New System.Drawing.Size(126, 23)
+        Me.btnGraphRecharge.TabIndex = 32
+        Me.btnGraphRecharge.Text = "Plot Monthly Recharge"
+        Me.btnGraphRecharge.UseVisualStyleBackColor = True
+        '
         'frmUSGSRora
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -395,7 +393,6 @@ Partial Class frmUSGSRora
     Friend WithEvents lblDataStart As System.Windows.Forms.Label
     Friend WithEvents gbOutputFileSpecs As System.Windows.Forms.GroupBox
     Friend WithEvents btnWriteASCIIOutput As System.Windows.Forms.Button
-    Friend WithEvents chkTabDelimited As System.Windows.Forms.CheckBox
     Friend WithEvents txtOutputDir As System.Windows.Forms.TextBox
     Friend WithEvents lblOutputDir As System.Windows.Forms.Label
     Friend WithEvents txtOutputRootName As System.Windows.Forms.TextBox
@@ -416,4 +413,5 @@ Partial Class frmUSGSRora
     Friend WithEvents mnuFileSelectData As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuAnalysis As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents btnGraphRecharge As System.Windows.Forms.Button
 End Class

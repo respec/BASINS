@@ -399,7 +399,7 @@ Module modBaseflowUtil
                 .Value(1) = I
                 Select Case ATStep
                     Case "Daily" : .Value(2) = lDate(0) & "-" & lDate(1).ToString.PadLeft(2, "0") & "-" & lDate(2).ToString.PadLeft(2, "0")
-                    Case "Monthly" : .Value(2) = lDate(0) & "-" & lDate(1).ToString.PadLeft(2, "0")
+                    Case "Monthly" : .Value(2) = lDate(1).ToString.PadLeft(2, "0") & "-" & lDate(0)
                     Case "Yearly" : .Value(2) = lDate(0)
                     Case Else : .Value(2) = lDate(0) & "-" & lDate(1) & "-" & lDate(2)
                 End Select
@@ -504,7 +504,7 @@ Module modBaseflowUtil
                 Dim lTsBFToReportPartDailyDepth As atcTimeseries = lTsBFToReportPartDaily * lConversionFactor
 
                 Dim lTsBFToReportPartYearly As atcTimeseries = Aggregate(lTsBFToReportPartMonthly, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
-                Dim lTsBFToReportPartYearlySum As atcTimeseries = Aggregate(lTsBFToReportPartMonthly, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+                Dim lTsBFToReportPartYearlySum As atcTimeseries = Aggregate(lTsBFToReportPartDaily, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
                 Dim lTsBFToReportPartYearlyDepth As atcTimeseries = lTsBFToReportPartYearlySum * lConversionFactor
 
                 'lTsBFToReportPartDaily.Attributes.SetValue(lReportColumnAttributeName, "RateDaily")

@@ -124,7 +124,10 @@ Public Class frmMRCControl
     End Sub
 
     Private Sub RepopulateForm()
-        If FirstMRC IsNot Nothing Then AddMRC(FirstMRC)
+        If FirstMRC IsNot Nothing Then
+            ParseMRCParams(FirstMRC.RecSum, True)
+            AddMRC(FirstMRC)
+        End If
 
         If File.Exists(pFileStationFullName) Then
             PopulateStations()
@@ -143,15 +146,20 @@ Public Class frmMRCControl
 
         With aMRC
             Dim lFoundMatch As Boolean = False
-            'key to use is the RecSum string
-            For Each lItem As String In lstEquations.Items
-                If lItem.ToLower = .RecSum.ToLower Then
-                    lFoundMatch = True
-                    Exit For
+            Dim lArr() As String = Regex.Split(.RecSum, "\s+")
+            Dim lDA As Double
+            If lArr.Length > 12 AndAlso Double.TryParse(lArr(12), lDA) Then
+                Dim lthisEquation As String = MRCToAdd(lArr(0), lArr(12), lArr(1), lArr(7), lArr(8), lArr(9), lArr(10), lArr(11))
+                'key to use is the RecSum string
+                For Each lItem As String In lstEquations.Items
+                    If lItem.ToLower = lthisEquation.ToLower Then
+                        lFoundMatch = True
+                        Exit For
+                    End If
+                Next
+                If Not lFoundMatch Then
+                    lstEquations.Items.Add(lthisEquation)
                 End If
-            Next
-            If Not lFoundMatch Then
-                lstEquations.Items.Add(.RecSum)
             End If
         End With
 
@@ -222,9 +230,9 @@ Public Class frmMRCControl
         While Not lSR.EndOfStream
             lOneLine = lSR.ReadLine()
 
-            'Eliminate lines by pattern, 12 values and last 9 are numeric
+            'Eliminate lines by pattern, at least 12 values and the 3rd to 11th are numeric
             lArr = Regex.Split(lOneLine, "\s+")
-            If lArr.Length <> 12 Then
+            If lArr.Length < 12 Then
                 Continue While
             Else
                 For I As Integer = 3 To 11
@@ -352,12 +360,13 @@ Public Class frmMRCControl
                        IsNumeric(lArrRecSum(7)) AndAlso _
                        IsNumeric(lArrRecSum(8)) Then
 
-                        lMRCToAdd = lArrStation(0) & "," & lArrStation(1) & ",(" & lArrRecSum(1) & "),"
-                        lRange = "(" & lArrRecSum(7) & "~" & lArrRecSum(8) & "),"
-                        lMRCToAdd &= lRange
-                        lEquation = "Coeff.A:" & lArrRecSum(9) & ",Coeff.B:" & lArrRecSum(10) & ",Coeff.C:" & lArrRecSum(11)
-                        lMRCToAdd &= lEquation
+                        'lMRCToAdd = lArrStation(0) & "," & lArrStation(1) & ",(" & lArrRecSum(1) & "),"
+                        'lRange = "(" & lArrRecSum(7) & "~" & lArrRecSum(8) & "),"
+                        'lMRCToAdd &= lRange
+                        'lEquation = "Coeff.A:" & lArrRecSum(9) & ",Coeff.B:" & lArrRecSum(10) & ",Coeff.C:" & lArrRecSum(11)
+                        'lMRCToAdd &= lEquation
 
+                        lMRCToAdd = MRCToAdd(lArrStation(0), lArrStation(1), lArrRecSum(1), lArrRecSum(7), lArrRecSum(8), lArrRecSum(9), lArrRecSum(10), lArrRecSum(11))
                         If Not lstEquations.Items.Contains(lMRCToAdd) Then
                             lstEquations.Items.Add(lMRCToAdd)
                         End If
@@ -367,6 +376,17 @@ Public Class frmMRCControl
         Next
 
     End Sub
+
+    Private Function MRCToAdd(ByVal aStation As String, ByVal aDA As String, ByVal aSeason As String, _
+                              ByVal aLogQMin As String, ByVal aLogQMax As String, _
+                              ByVal aCoeffA As String, ByVal aCoeffB As String, ByVal aCoeffC As String) As String
+        Dim lMRCToAdd As String = aStation & "," & aDA & ",(" & aSeason & "),"
+        Dim lRange As String = "(" & aLogQMin & "~" & aLogQMax & "),"
+        lMRCToAdd &= lRange
+        Dim lEquation As String = "Coeff.A:" & aCoeffA & ",Coeff.B:" & aCoeffB & ",Coeff.C:" & aCoeffC
+        lMRCToAdd &= lEquation
+        Return lMRCToAdd
+    End Function
 
     Private Sub BuildMRCs()
         Dim lStation As String
@@ -453,13 +473,26 @@ Public Class frmMRCControl
             Exit Sub
         End If
 
-        Dim lArr() As String = Regex.Split(lstRecSum.SelectedItem, "\s+")
+        ParseMRCParams(lstRecSum.SelectedItem)
+    End Sub
+
+    Private Sub ParseMRCParams(ByVal aItem As String, Optional ByVal aComplete As Boolean = False)
+        Dim lArr() As String = Regex.Split(aItem, "\s+")
+        If aComplete Then
+            txtStation.Text = lArr(0)
+        End If
         txtSeason.Text = lArr(1)
         txtLogQMin.Text = lArr(7)
         txtLogQMax.Text = lArr(8)
         txtCoefA.Text = lArr(9)
         txtCoefB.Text = lArr(10)
         txtCoefC.Text = lArr(11)
+        Dim lDA As Double
+        If lArr.Length > 12 Then
+            If Not lArr(12).StartsWith("N/A") AndAlso Double.TryParse(lArr(12), lDA) Then
+                txtDA.Text = lDA.ToString
+            End If
+        End If
     End Sub
 
     Private Sub btnMRCAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnMRCAdd.Click
@@ -494,11 +527,15 @@ Public Class frmMRCControl
             Exit Sub
         End If
 
-        lMRCToAdd = txtStation.Text.Trim() & "," & txtDA.Text.Trim() & ",(" & txtSeason.Text.Trim() & "),"
-        Dim lRange As String = "(" & txtLogQMin.Text.Trim() & "~" & txtLogQMax.Text.Trim() & "),"
-        lMRCToAdd &= lRange
-        Dim lEquation As String = "Coeff.A:" & txtCoefA.Text.Trim() & ",Coeff.B:" & txtCoefB.Text.Trim() & ",Coeff.C:" & txtCoefC.Text.Trim()
-        lMRCToAdd &= lEquation
+        'lMRCToAdd = txtStation.Text.Trim() & "," & txtDA.Text.Trim() & ",(" & txtSeason.Text.Trim() & "),"
+        'Dim lRange As String = "(" & txtLogQMin.Text.Trim() & "~" & txtLogQMax.Text.Trim() & "),"
+        'lMRCToAdd &= lRange
+        'Dim lEquation As String = "Coeff.A:" & txtCoefA.Text.Trim() & ",Coeff.B:" & txtCoefB.Text.Trim() & ",Coeff.C:" & txtCoefC.Text.Trim()
+        'lMRCToAdd &= lEquation
+
+        lMRCToAdd = MRCToAdd(txtStation.Text.Trim(), txtDA.Text.Trim(), txtSeason.Text.Trim(), _
+                             txtLogQMin.Text.Trim(), txtLogQMax.Text.Trim(), _
+                             txtCoefA.Text.Trim(), txtCoefB.Text.Trim(), txtCoefC.Text.Trim())
 
         If RecSumStationMatched() AndAlso Not lstEquations.Items.Contains(lMRCToAdd) Then
             lstEquations.Items.Add(lMRCToAdd)

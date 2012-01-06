@@ -56,7 +56,7 @@ Public Class clsMRC
 
         Try
             If pRecSum IsNot Nothing AndAlso pRecSum.Length > 12 Then
-                Dim lArr() As String = pRecSum.Split("\s+")
+                Dim lArr() As String = System.Text.RegularExpressions.Regex.Split(pRecSum, "\s+")
                 Station = lArr(0)
                 Season = lArr(1)
                 Dim lDuration As String = lArr(2)
@@ -122,7 +122,7 @@ Public Class clsMRC
 
         Try
             lResults.AppendLine(" ")
-            lResults.AppendLine(Station & "    " & Season)
+            lResults.AppendLine(Station & "    " & Season & "    " & Equation)
             Dim lFieldLength As Integer = 15
             Dim lStrT As String
             Dim lStrLogQ As String

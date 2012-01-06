@@ -171,7 +171,11 @@ Public Class frmUSGSBaseflow
         'If pMethod = "" Then lErrMsg = "- Method not set" & vbCrLf
         If pMethods.Count = 0 Then lErrMsg = "- Method not set" & vbCrLf
         Dim lDA As Double = 0.0
-        If Not Double.TryParse(txtDrainageArea.Text.Trim, lDA) Then lErrMsg &= "- Drainage Area not set" & vbCrLf
+        If Not Double.TryParse(txtDrainageArea.Text.Trim, lDA) Then
+            lErrMsg &= "- Drainage Area not set" & vbCrLf
+        ElseIf lDA <= 0 Then
+            lErrMsg &= "- Drainage Area must be greater than zero" & vbCrLf
+        End If
 
         If lErrMsg.Length = 0 Then
             'set methods
@@ -708,15 +712,19 @@ Public Class frmUSGSBaseflow
             End With
         End If
         If lGraphType = "CDist" Then
-            Dim lTimeUnitToAggregate As atcTimeUnit = atcTimeUnit.TUMonth
+            'Dim lTimeUnitToAggregate As atcTimeUnit = atcTimeUnit.TUMonth
             lTsRunoff = lTsFlow - lTsBF4Graph
 
             'Convert to depth inch
             Dim lConversionFactor As Double = 0.03719 / lDA
 
-            Dim lGraphTsFlow As atcTimeseries = Aggregate(lTsFlow, lTimeUnitToAggregate, 1, atcTran.TranSumDiv)
-            Dim lGraphTsBF As atcTimeseries = Aggregate(lTsBF4Graph, lTimeUnitToAggregate, 1, atcTran.TranSumDiv)
-            Dim lGraphTsRunoff As atcTimeseries = Aggregate(lTsRunoff, lTimeUnitToAggregate, 1, atcTran.TranSumDiv)
+            'Dim lGraphTsFlow As atcTimeseries = Aggregate(lTsFlow, lTimeUnitToAggregate, 1, atcTran.TranSumDiv)
+            'Dim lGraphTsBF As atcTimeseries = Aggregate(lTsBF4Graph, lTimeUnitToAggregate, 1, atcTran.TranSumDiv)
+            'Dim lGraphTsRunoff As atcTimeseries = Aggregate(lTsRunoff, lTimeUnitToAggregate, 1, atcTran.TranSumDiv)
+
+            Dim lGraphTsFlow As atcTimeseries = lTsFlow.Clone()
+            Dim lGraphTsBF As atcTimeseries = lTsBF4Graph.Clone()
+            Dim lGraphTsRunoff As atcTimeseries = lTsRunoff.Clone()
 
             Dim lGraphTsFlowIn As atcTimeseries = lGraphTsFlow * lConversionFactor
             With lGraphTsFlowIn.Attributes
@@ -959,7 +967,7 @@ Public Class frmUSGSBaseflow
             'Dim lScaleMin As Double = 10
             '.YAxis.Scale.MinAuto = False
             '.YAxis.Scale.Min = lScaleMin
-            .YAxis.Scale.Max = 15
+            '.YAxis.Scale.Max = 15
             .AxisChange()
             .CurveList.Item(0).Color = Drawing.Color.Red
             With CType(.CurveList.Item(0), LineItem).Symbol
@@ -975,19 +983,19 @@ Public Class frmUSGSBaseflow
                 For I As Integer = 1 To lBFCurveCount
                     '.CurveList.Item(I).Color = System.Drawing.Color.FromArgb(lBFInitColor - (I - 1) * 8)
                     .CurveList.Item(I).Color = GetCurveColor(aDataGroup(I))
-                    With CType(.CurveList.Item(I), LineItem).Symbol
-                        .Type = SymbolType.Circle
-                        .IsVisible = True
-                    End With
+                    'With CType(.CurveList.Item(I), LineItem).Symbol
+                    '    .Type = SymbolType.Circle
+                    '    .IsVisible = True
+                    'End With
                 Next
                 lBFInitColor = Drawing.Color.DarkCyan.ToArgb
                 For I As Integer = lBFCurveCount + 1 To aDataGroup.Count - 1
                     '.CurveList.Item(I).Color = System.Drawing.Color.FromArgb(lBFInitColor - (I - 1) * 8)
                     .CurveList.Item(I).Color = GetCurveColor(aDataGroup(I))
-                    With CType(.CurveList.Item(I), LineItem).Symbol
-                        .Type = SymbolType.Square
-                        .IsVisible = True
-                    End With
+                    'With CType(.CurveList.Item(I), LineItem).Symbol
+                    '    .Type = SymbolType.Square
+                    '    .IsVisible = True
+                    'End With
                 Next
 
             Else
@@ -998,10 +1006,10 @@ Public Class frmUSGSBaseflow
                 End With
 
                 .CurveList.Item(2).Color = Drawing.Color.DarkCyan
-                With CType(.CurveList.Item(2), LineItem).Symbol
-                    .Type = SymbolType.Square
-                    .IsVisible = True
-                End With
+                'With CType(.CurveList.Item(2), LineItem).Symbol
+                '    .Type = SymbolType.Square
+                '    .IsVisible = True
+                'End With
             End If
 
             With .Legend.FontSpec

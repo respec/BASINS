@@ -26,7 +26,9 @@ Partial Class frmMRCControl
         Me.tabMRCMain = New System.Windows.Forms.TabControl
         Me.tabConstructMRC = New System.Windows.Forms.TabPage
         Me.gbMRCEquations = New System.Windows.Forms.GroupBox
+        Me.btnMRCClear = New System.Windows.Forms.Button
         Me.txtSeason = New System.Windows.Forms.TextBox
+        Me.btnMRCPlot = New System.Windows.Forms.Button
         Me.lblSeason = New System.Windows.Forms.Label
         Me.txtLogQMax = New System.Windows.Forms.TextBox
         Me.lblMaxLogQ = New System.Windows.Forms.Label
@@ -35,7 +37,6 @@ Partial Class frmMRCControl
         Me.txtStation = New System.Windows.Forms.TextBox
         Me.lblStation = New System.Windows.Forms.Label
         Me.chkAutoMatching = New System.Windows.Forms.CheckBox
-        Me.btnMRCPlot = New System.Windows.Forms.Button
         Me.lstEquations = New System.Windows.Forms.CheckedListBox
         Me.btnMRCAdd = New System.Windows.Forms.Button
         Me.btnMRCDelete = New System.Windows.Forms.Button
@@ -57,7 +58,6 @@ Partial Class frmMRCControl
         Me.panelGraph = New System.Windows.Forms.Panel
         Me.tabMRCTable = New System.Windows.Forms.TabPage
         Me.txtMRCTable = New System.Windows.Forms.TextBox
-        Me.btnMRCClear = New System.Windows.Forms.Button
         Me.tabMRCMain.SuspendLayout()
         Me.tabConstructMRC.SuspendLayout()
         Me.gbMRCEquations.SuspendLayout()
@@ -125,12 +125,32 @@ Partial Class frmMRCControl
         Me.gbMRCEquations.TabStop = False
         Me.gbMRCEquations.Text = "MRC Polynomial Equations (T= Coeff.A * LogQ^2 + Coeff.B * LogQ + Coeff.C)"
         '
+        'btnMRCClear
+        '
+        Me.btnMRCClear.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnMRCClear.Location = New System.Drawing.Point(532, 106)
+        Me.btnMRCClear.Name = "btnMRCClear"
+        Me.btnMRCClear.Size = New System.Drawing.Size(75, 23)
+        Me.btnMRCClear.TabIndex = 32
+        Me.btnMRCClear.Text = "Clear"
+        Me.btnMRCClear.UseVisualStyleBackColor = True
+        '
         'txtSeason
         '
         Me.txtSeason.Location = New System.Drawing.Point(488, 131)
         Me.txtSeason.Name = "txtSeason"
         Me.txtSeason.Size = New System.Drawing.Size(20, 20)
         Me.txtSeason.TabIndex = 11
+        '
+        'btnMRCPlot
+        '
+        Me.btnMRCPlot.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnMRCPlot.Location = New System.Drawing.Point(532, 48)
+        Me.btnMRCPlot.Name = "btnMRCPlot"
+        Me.btnMRCPlot.Size = New System.Drawing.Size(75, 23)
+        Me.btnMRCPlot.TabIndex = 16
+        Me.btnMRCPlot.Text = "Plot MRC"
+        Me.btnMRCPlot.UseVisualStyleBackColor = True
         '
         'lblSeason
         '
@@ -199,16 +219,6 @@ Partial Class frmMRCControl
         Me.chkAutoMatching.TabIndex = 17
         Me.chkAutoMatching.Text = "Auto matching"
         Me.chkAutoMatching.UseVisualStyleBackColor = True
-        '
-        'btnMRCPlot
-        '
-        Me.btnMRCPlot.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnMRCPlot.Location = New System.Drawing.Point(532, 48)
-        Me.btnMRCPlot.Name = "btnMRCPlot"
-        Me.btnMRCPlot.Size = New System.Drawing.Size(75, 23)
-        Me.btnMRCPlot.TabIndex = 16
-        Me.btnMRCPlot.Text = "Plot MRC"
-        Me.btnMRCPlot.UseVisualStyleBackColor = True
         '
         'lstEquations
         '
@@ -416,15 +426,6 @@ Partial Class frmMRCControl
         Me.txtMRCTable.ScrollBars = System.Windows.Forms.ScrollBars.Both
         Me.txtMRCTable.Size = New System.Drawing.Size(652, 440)
         Me.txtMRCTable.TabIndex = 0
-        '
-        'btnMRCClear
-        '
-        Me.btnMRCClear.Location = New System.Drawing.Point(532, 106)
-        Me.btnMRCClear.Name = "btnMRCClear"
-        Me.btnMRCClear.Size = New System.Drawing.Size(75, 23)
-        Me.btnMRCClear.TabIndex = 32
-        Me.btnMRCClear.Text = "Clear"
-        Me.btnMRCClear.UseVisualStyleBackColor = True
         '
         'frmMRCControl
         '
