@@ -544,17 +544,27 @@ Public Module modGeoSFM
         Dim lBasinIDs As New atcCollection
         Dim lZone As Integer = -1
         Dim lMax As Double = 0.0
+        Dim lMean As Double = 0.0
+        Dim lMaxMean As Double = 1.0   'to use for tiebreaker
+        For Each lBasin As atcDataAttributes In lFacZonalStats
+            lMean = lBasin.GetDefinedValue("Mean").Value   'use as tiebreaker in sort
+            If lMean > lMaxMean Then
+                lMaxMean = lMean
+            End If
+        Next
+        Dim lArea As Double = 0.0
         For Each lBasin As atcDataAttributes In lFacZonalStats
             lZone = lBasin.GetDefinedValue("Zone").Value
             lMax = lBasin.GetDefinedValue("Max").Value
+            lMean = lBasin.GetDefinedValue("Mean").Value   'use as tiebreaker in sort
             If lZone > -1 Then
-                lBasinIDs.Add(lZone, lMax)
+                lArea = lMax + (1 - (lMean / lMaxMean))    'this gets us the exact order as the arcview version
+                lBasinIDs.Add(lZone, lArea)
             End If
         Next
         lBasinIDs.SortByValue()
 
         ' Begin writing to the output file
-
         Dim lSBOut As New StringBuilder
         Dim lSBDesc As New StringBuilder
         Dim lSBRiv As New StringBuilder
@@ -1624,12 +1634,16 @@ Public Module modGeoSFM
         Dim lRStreamReader As New StreamReader(lRainFileName)
         Dim lCurrentRecord As String = ""
         Dim lRainSize As Integer = 0
+        Dim lStartYearDayString As String = ""
         Do
             lCurrentRecord = lRStreamReader.ReadLine
             If lCurrentRecord Is Nothing Then
                 Exit Do
             Else
                 lRainSize += 1
+                If lRainSize = 2 Then
+                    lStartYearDayString = lCurrentRecord
+                End If
             End If
         Loop
 
@@ -1665,11 +1679,33 @@ Public Module modGeoSFM
         Loop
         lBasSize = lBasSize - 1
 
-        Dim lDate(6) As Integer
-        J2Date(aSjDate, lDate)
-        Dim lStartYr As Integer = lDate(0)
-        Dim lJYr As Double = Date2J(lStartYr, 1, 1)
-        Dim lStartDy As Integer = aSjDate - lJYr + 1
+        'set the start/end dates
+        Dim lStartYr As Integer
+        Dim lStartDy As Integer
+        If lStartYearDayString.Length > 6 Then
+            Dim lStartYear As String = ""
+            Dim lStartDay As String = ""
+            lStartYear = Left(lStartYearDayString, 4)
+            If Not IsNumeric(lStartYear) Then
+                Logger.Msg("Problem reading streamflow file:  Start year must be a 4 digit number", "GeoSFM Utilities")
+                Exit Function
+            Else
+                lStartYr = CInt(lStartYear)
+            End If
+            lStartDay = Mid(lStartYearDayString, 5, 3)
+            If Not IsNumeric(lStartDay) Then
+                Logger.Msg("Problem reading streamflow file:  Start day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
+                Exit Function
+            Else
+                lStartDy = CInt(lStartDay)
+            End If
+        Else
+            Dim lDate(6) As Integer
+            J2Date(aSjDate, lDate)
+            lStartYr = lDate(0)
+            Dim lJYr As Double = Date2J(lStartYr, 1, 1)
+            lStartDy = aSjDate - lJYr + 1
+        End If
 
         Dim lRespStreamReader As New StreamReader(lRespFileName)
         lCurrentRecord = lRespStreamReader.ReadLine
@@ -1999,11 +2035,34 @@ Public Module modGeoSFM
             lTimeinHrs = "1"
         End If
 
-        Dim lDate(6) As Integer
-        J2Date(aSjDate, lDate)
-        Dim lStartYr As Integer = lDate(0)
-        Dim lJYr As Double = Date2J(lStartYr, 1, 1)
-        Dim lStartDy As Integer = aSjDate - lJYr + 1
+        'set the start/end dates
+        Dim lStartYr As Integer
+        Dim lStartDy As Integer
+        Dim lStartYearDayString As String = Trim(lRunoffList(0))
+        If lStartYearDayString.Length > 6 Then
+            Dim lStartYear As String = ""
+            Dim lStartDay As String = ""
+            lStartYear = Left(lStartYearDayString, 4)
+            If Not IsNumeric(lStartYear) Then
+                Logger.Msg("Problem reading streamflow file:  Start year must be a 4 digit number", "GeoSFM Utilities")
+                Exit Function
+            Else
+                lStartYr = CInt(lStartYear)
+            End If
+            lStartDay = Mid(lStartYearDayString, 5, 3)
+            If Not IsNumeric(lStartDay) Then
+                Logger.Msg("Problem reading streamflow file:  Start day must be a 3 digit number from 1 to 366", "GeoSFM Utilities")
+                Exit Function
+            Else
+                lStartDy = CInt(lStartDay)
+            End If
+        Else
+            Dim lDate(6) As Integer
+            J2Date(aSjDate, lDate)
+            lStartYr = lDate(0)
+            Dim lJYr As Double = Date2J(lStartYr, 1, 1)
+            lStartDy = aSjDate - lJYr + 1
+        End If
 
         Dim lRunoffDays As Integer = lRunoffList.Count
 
