@@ -2389,9 +2389,6 @@ Public Class GisUtil
             For lRow As Integer = lStartRow To lEndRow
                 For lCol As Integer = lStartCol To lEndCol
                     lTempVal = lStreamGrid.Value(lCol, lRow)
-                    If lTempVal = 181 Or lTempVal = 174 Or lTempVal = 74 Or lTempVal = 59 Then
-                        MsgBox("got here")
-                    End If
                     If lTempVal > 0 Then
                         'this is actually an outlet cell or a stream cell
                         If lWeightingFactorGrid Is Nothing Then
@@ -2675,15 +2672,20 @@ Public Class GisUtil
                 'now compute velocity
                 If lSlope > -1.0 Then
                     If lFlowacc <= 1000 Then
-                        lVelocity = (0.015874 / lManningsN) * (lSlope ^ 0.5)
+                        'lVelocity = (0.015874 / lManningsN) * (lSlope ^ 0.5)
+                        lVelocity = (0.1357209 / lManningsN) * (lSlope ^ 0.5)
                     ElseIf lFlowacc <= 2000 Then
+                        'lVelocity = (0.0736806 / lManningsN) * (lSlope ^ 0.5)
                         lVelocity = (0.0736806 / lManningsN) * (lSlope ^ 0.5)
                     ElseIf lFlowacc <= 3000 Then
+                        'lVelocity = (0.0464159 / lManningsN) * (lSlope ^ 0.5)
                         lVelocity = (0.0464159 / lManningsN) * (lSlope ^ 0.5)
                     ElseIf lFlowacc <= 4000 Then
-                        lVelocity = (0.0736806 / lManningsN) * (lSlope ^ 0.5)
+                        'lVelocity = (0.0736806 / lManningsN) * (lSlope ^ 0.5)
+                        lVelocity = (0.0292402 / lManningsN) * (lSlope ^ 0.5)
                     ElseIf lFlowacc <= 5000 Then
-                        lVelocity = (0.1357209 / lManningsN) * (lSlope ^ 0.5)
+                        'lVelocity = (0.1357209 / lManningsN) * (lSlope ^ 0.5)
+                        lVelocity = (0.015874 / lManningsN) * (lSlope ^ 0.5)
                     ElseIf lFlowacc <= 10000 Then
                         lVelocity = 0.3
                     ElseIf lFlowacc <= 50000 Then
@@ -2698,6 +2700,12 @@ Public Class GisUtil
                         lVelocity = 1.2
                     Else
                         lVelocity = 1.5
+                    End If
+                    If lVelocity > 1.5 Then
+                        lVelocity = 1.5
+                    End If
+                    If lVelocity < 0.01 Then
+                        lVelocity = 0.01
                     End If
                     lVelGrid.Value(lCol, lRow) = lVelocity
                 Else
