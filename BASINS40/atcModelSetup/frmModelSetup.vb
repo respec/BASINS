@@ -16,6 +16,10 @@ Public Class frmModelSetup
     Friend pMetBaseDsns As atcCollection
     Friend pMetWdmNames As atcCollection
     Friend pUniqueModelSegmentIds As atcCollection
+    Friend WithEvents gbxSnow As System.Windows.Forms.GroupBox
+    Friend WithEvents rbnDegree As System.Windows.Forms.RadioButton
+    Friend WithEvents chkSnow As System.Windows.Forms.CheckBox
+    Friend WithEvents rbnEnergy As System.Windows.Forms.RadioButton
     Friend pUniqueModelSegmentNames As atcCollection
 
 #Region " Windows Form Designer generated code "
@@ -116,6 +120,10 @@ Public Class frmModelSetup
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmModelSetup))
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage1 = New System.Windows.Forms.TabPage
+        Me.gbxSnow = New System.Windows.Forms.GroupBox
+        Me.rbnDegree = New System.Windows.Forms.RadioButton
+        Me.chkSnow = New System.Windows.Forms.CheckBox
+        Me.rbnEnergy = New System.Windows.Forms.RadioButton
         Me.cboOutlets = New System.Windows.Forms.ComboBox
         Me.cboStreams = New System.Windows.Forms.ComboBox
         Me.cboSubbasins = New System.Windows.Forms.ComboBox
@@ -186,6 +194,7 @@ Public Class frmModelSetup
         Me.ofdMetWDM = New System.Windows.Forms.OpenFileDialog
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
+        Me.gbxSnow.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.TabPage4.SuspendLayout()
         Me.TabPage3.SuspendLayout()
@@ -208,15 +217,16 @@ Public Class frmModelSetup
         Me.TabControl1.Cursor = System.Windows.Forms.Cursors.Default
         Me.TabControl1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TabControl1.ItemSize = New System.Drawing.Size(60, 21)
-        Me.TabControl1.Location = New System.Drawing.Point(16, 16)
+        Me.TabControl1.Location = New System.Drawing.Point(13, 14)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(527, 384)
+        Me.TabControl1.Size = New System.Drawing.Size(532, 402)
         Me.TabControl1.TabIndex = 0
         '
         'TabPage1
         '
-        Me.TabPage1.BackColor = System.Drawing.SystemColors.Control
+        Me.TabPage1.BackColor = System.Drawing.Color.Transparent
+        Me.TabPage1.Controls.Add(Me.gbxSnow)
         Me.TabPage1.Controls.Add(Me.cboOutlets)
         Me.TabPage1.Controls.Add(Me.cboStreams)
         Me.TabPage1.Controls.Add(Me.cboSubbasins)
@@ -229,10 +239,56 @@ Public Class frmModelSetup
         Me.TabPage1.Controls.Add(Me.Label1)
         Me.TabPage1.Location = New System.Drawing.Point(4, 25)
         Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Size = New System.Drawing.Size(519, 355)
+        Me.TabPage1.Size = New System.Drawing.Size(524, 373)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "General"
         Me.TabPage1.UseVisualStyleBackColor = True
+        '
+        'gbxSnow
+        '
+        Me.gbxSnow.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbxSnow.Controls.Add(Me.rbnDegree)
+        Me.gbxSnow.Controls.Add(Me.chkSnow)
+        Me.gbxSnow.Controls.Add(Me.rbnEnergy)
+        Me.gbxSnow.Location = New System.Drawing.Point(12, 241)
+        Me.gbxSnow.Name = "gbxSnow"
+        Me.gbxSnow.Size = New System.Drawing.Size(496, 106)
+        Me.gbxSnow.TabIndex = 13
+        Me.gbxSnow.TabStop = False
+        '
+        'rbnDegree
+        '
+        Me.rbnDegree.AutoSize = True
+        Me.rbnDegree.Location = New System.Drawing.Point(195, 42)
+        Me.rbnDegree.Name = "rbnDegree"
+        Me.rbnDegree.Size = New System.Drawing.Size(219, 17)
+        Me.rbnDegree.TabIndex = 13
+        Me.rbnDegree.Text = "Temperature Index Method (Degree Day)"
+        Me.rbnDegree.UseVisualStyleBackColor = True
+        '
+        'chkSnow
+        '
+        Me.chkSnow.AutoSize = True
+        Me.chkSnow.Location = New System.Drawing.Point(18, 19)
+        Me.chkSnow.Name = "chkSnow"
+        Me.chkSnow.Size = New System.Drawing.Size(142, 17)
+        Me.chkSnow.TabIndex = 11
+        Me.chkSnow.Text = "Include Snow Simulation"
+        Me.chkSnow.UseVisualStyleBackColor = True
+        '
+        'rbnEnergy
+        '
+        Me.rbnEnergy.AutoSize = True
+        Me.rbnEnergy.Checked = True
+        Me.rbnEnergy.Location = New System.Drawing.Point(27, 42)
+        Me.rbnEnergy.Name = "rbnEnergy"
+        Me.rbnEnergy.Size = New System.Drawing.Size(139, 17)
+        Me.rbnEnergy.TabIndex = 12
+        Me.rbnEnergy.TabStop = True
+        Me.rbnEnergy.Text = "Energy Balance Method"
+        Me.rbnEnergy.UseVisualStyleBackColor = True
         '
         'cboOutlets
         '
@@ -241,9 +297,9 @@ Public Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboOutlets.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboOutlets.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboOutlets.Location = New System.Drawing.Point(168, 231)
+        Me.cboOutlets.Location = New System.Drawing.Point(140, 200)
         Me.cboOutlets.Name = "cboOutlets"
-        Me.cboOutlets.Size = New System.Drawing.Size(339, 25)
+        Me.cboOutlets.Size = New System.Drawing.Size(375, 21)
         Me.cboOutlets.TabIndex = 10
         '
         'cboStreams
@@ -253,9 +309,9 @@ Public Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboStreams.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboStreams.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboStreams.Location = New System.Drawing.Point(168, 183)
+        Me.cboStreams.Location = New System.Drawing.Point(140, 159)
         Me.cboStreams.Name = "cboStreams"
-        Me.cboStreams.Size = New System.Drawing.Size(339, 25)
+        Me.cboStreams.Size = New System.Drawing.Size(375, 21)
         Me.cboStreams.TabIndex = 9
         '
         'cboSubbasins
@@ -265,9 +321,9 @@ Public Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboSubbasins.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboSubbasins.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboSubbasins.Location = New System.Drawing.Point(168, 136)
+        Me.cboSubbasins.Location = New System.Drawing.Point(140, 118)
         Me.cboSubbasins.Name = "cboSubbasins"
-        Me.cboSubbasins.Size = New System.Drawing.Size(339, 25)
+        Me.cboSubbasins.Size = New System.Drawing.Size(375, 21)
         Me.cboSubbasins.TabIndex = 8
         '
         'cboLanduse
@@ -277,9 +333,9 @@ Public Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboLanduse.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboLanduse.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboLanduse.Location = New System.Drawing.Point(168, 88)
+        Me.cboLanduse.Location = New System.Drawing.Point(140, 76)
         Me.cboLanduse.Name = "cboLanduse"
-        Me.cboLanduse.Size = New System.Drawing.Size(339, 25)
+        Me.cboLanduse.Size = New System.Drawing.Size(375, 21)
         Me.cboLanduse.TabIndex = 7
         '
         'tbxName
@@ -287,18 +343,18 @@ Public Class frmModelSetup
         Me.tbxName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.tbxName.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.tbxName.Location = New System.Drawing.Point(168, 40)
+        Me.tbxName.Location = New System.Drawing.Point(140, 35)
         Me.tbxName.Name = "tbxName"
-        Me.tbxName.Size = New System.Drawing.Size(173, 23)
+        Me.tbxName.Size = New System.Drawing.Size(237, 20)
         Me.tbxName.TabIndex = 6
         '
         'Label5
         '
         Me.Label5.AutoSize = True
         Me.Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label5.Location = New System.Drawing.Point(11, 234)
+        Me.Label5.Location = New System.Drawing.Point(9, 203)
         Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(140, 17)
+        Me.Label5.Size = New System.Drawing.Size(105, 13)
         Me.Label5.TabIndex = 4
         Me.Label5.Text = "Point Sources Layer:"
         '
@@ -306,9 +362,9 @@ Public Class frmModelSetup
         '
         Me.Label4.AutoSize = True
         Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label4.Location = New System.Drawing.Point(11, 187)
+        Me.Label4.Location = New System.Drawing.Point(9, 162)
         Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(104, 17)
+        Me.Label4.Size = New System.Drawing.Size(77, 13)
         Me.Label4.TabIndex = 3
         Me.Label4.Text = "Streams Layer:"
         '
@@ -316,9 +372,9 @@ Public Class frmModelSetup
         '
         Me.Label3.AutoSize = True
         Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label3.Location = New System.Drawing.Point(11, 140)
+        Me.Label3.Location = New System.Drawing.Point(9, 121)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(118, 17)
+        Me.Label3.Size = New System.Drawing.Size(88, 13)
         Me.Label3.TabIndex = 2
         Me.Label3.Text = "Subbasins Layer:"
         '
@@ -326,9 +382,9 @@ Public Class frmModelSetup
         '
         Me.Label2.AutoSize = True
         Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label2.Location = New System.Drawing.Point(11, 91)
+        Me.Label2.Location = New System.Drawing.Point(9, 79)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(109, 17)
+        Me.Label2.Size = New System.Drawing.Size(83, 13)
         Me.Label2.TabIndex = 1
         Me.Label2.Text = "Land Use Type:"
         '
@@ -336,9 +392,9 @@ Public Class frmModelSetup
         '
         Me.Label1.AutoSize = True
         Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.Location = New System.Drawing.Point(11, 44)
+        Me.Label1.Location = New System.Drawing.Point(9, 38)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(137, 17)
+        Me.Label1.Size = New System.Drawing.Size(105, 13)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "HSPF Project Name:"
         '
@@ -354,7 +410,7 @@ Public Class frmModelSetup
         Me.TabPage2.Controls.Add(Me.lblLandUseLayer)
         Me.TabPage2.Location = New System.Drawing.Point(4, 25)
         Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Size = New System.Drawing.Size(519, 355)
+        Me.TabPage2.Size = New System.Drawing.Size(524, 373)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Land Use"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -371,18 +427,18 @@ Public Class frmModelSetup
         Me.AtcGridPervious.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.AtcGridPervious.LineColor = System.Drawing.Color.Empty
         Me.AtcGridPervious.LineWidth = 0.0!
-        Me.AtcGridPervious.Location = New System.Drawing.Point(14, 148)
+        Me.AtcGridPervious.Location = New System.Drawing.Point(12, 128)
         Me.AtcGridPervious.Name = "AtcGridPervious"
-        Me.AtcGridPervious.Size = New System.Drawing.Size(490, 187)
+        Me.AtcGridPervious.Size = New System.Drawing.Size(501, 231)
         Me.AtcGridPervious.Source = Nothing
         Me.AtcGridPervious.TabIndex = 18
         '
         'cmdChange
         '
         Me.cmdChange.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdChange.Location = New System.Drawing.Point(432, 117)
+        Me.cmdChange.Location = New System.Drawing.Point(453, 101)
         Me.cmdChange.Name = "cmdChange"
-        Me.cmdChange.Size = New System.Drawing.Size(72, 24)
+        Me.cmdChange.Size = New System.Drawing.Size(60, 21)
         Me.cmdChange.TabIndex = 17
         Me.cmdChange.Text = "Change"
         '
@@ -390,9 +446,9 @@ Public Class frmModelSetup
         '
         Me.lblClass.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblClass.Location = New System.Drawing.Point(164, 118)
+        Me.lblClass.Location = New System.Drawing.Point(137, 102)
         Me.lblClass.Name = "lblClass"
-        Me.lblClass.Size = New System.Drawing.Size(260, 20)
+        Me.lblClass.Size = New System.Drawing.Size(309, 18)
         Me.lblClass.TabIndex = 16
         Me.lblClass.Text = "<none>"
         Me.lblClass.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -400,9 +456,9 @@ Public Class frmModelSetup
         'Label20
         '
         Me.Label20.AutoSize = True
-        Me.Label20.Location = New System.Drawing.Point(11, 121)
+        Me.Label20.Location = New System.Drawing.Point(9, 105)
         Me.Label20.Name = "Label20"
-        Me.Label20.Size = New System.Drawing.Size(120, 17)
+        Me.Label20.Size = New System.Drawing.Size(90, 13)
         Me.Label20.TabIndex = 15
         Me.Label20.Text = "Classification File:"
         Me.Label20.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -410,17 +466,17 @@ Public Class frmModelSetup
         'cboDescription
         '
         Me.cboDescription.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboDescription.Location = New System.Drawing.Point(168, 80)
+        Me.cboDescription.Location = New System.Drawing.Point(140, 69)
         Me.cboDescription.Name = "cboDescription"
-        Me.cboDescription.Size = New System.Drawing.Size(168, 25)
+        Me.cboDescription.Size = New System.Drawing.Size(140, 21)
         Me.cboDescription.TabIndex = 12
         '
         'lblDescription
         '
         Me.lblDescription.AutoSize = True
-        Me.lblDescription.Location = New System.Drawing.Point(11, 83)
+        Me.lblDescription.Location = New System.Drawing.Point(9, 72)
         Me.lblDescription.Name = "lblDescription"
-        Me.lblDescription.Size = New System.Drawing.Size(128, 17)
+        Me.lblDescription.Size = New System.Drawing.Size(96, 13)
         Me.lblDescription.TabIndex = 11
         Me.lblDescription.Text = "Classification Field:"
         '
@@ -430,17 +486,17 @@ Public Class frmModelSetup
         Me.cboLandUseLayer.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboLandUseLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboLandUseLayer.Location = New System.Drawing.Point(168, 40)
+        Me.cboLandUseLayer.Location = New System.Drawing.Point(140, 35)
         Me.cboLandUseLayer.Name = "cboLandUseLayer"
-        Me.cboLandUseLayer.Size = New System.Drawing.Size(339, 25)
+        Me.cboLandUseLayer.Size = New System.Drawing.Size(375, 21)
         Me.cboLandUseLayer.TabIndex = 10
         '
         'lblLandUseLayer
         '
         Me.lblLandUseLayer.AutoSize = True
-        Me.lblLandUseLayer.Location = New System.Drawing.Point(11, 44)
+        Me.lblLandUseLayer.Location = New System.Drawing.Point(9, 38)
         Me.lblLandUseLayer.Name = "lblLandUseLayer"
-        Me.lblLandUseLayer.Size = New System.Drawing.Size(113, 17)
+        Me.lblLandUseLayer.Size = New System.Drawing.Size(85, 13)
         Me.lblLandUseLayer.TabIndex = 9
         Me.lblLandUseLayer.Text = "Land Use Layer:"
         '
@@ -466,56 +522,56 @@ Public Class frmModelSetup
         Me.TabPage4.Controls.Add(Me.Label12)
         Me.TabPage4.Location = New System.Drawing.Point(4, 25)
         Me.TabPage4.Name = "TabPage4"
-        Me.TabPage4.Size = New System.Drawing.Size(519, 355)
+        Me.TabPage4.Size = New System.Drawing.Size(524, 373)
         Me.TabPage4.TabIndex = 3
         Me.TabPage4.Text = "Streams"
         Me.TabPage4.UseVisualStyleBackColor = True
         '
         'Label18
         '
-        Me.Label18.Location = New System.Drawing.Point(72, 292)
+        Me.Label18.Location = New System.Drawing.Point(60, 253)
         Me.Label18.Name = "Label18"
-        Me.Label18.Size = New System.Drawing.Size(152, 23)
+        Me.Label18.Size = New System.Drawing.Size(127, 20)
         Me.Label18.TabIndex = 23
         Me.Label18.Text = "Stream Name Field:"
         '
         'Label17
         '
-        Me.Label17.Location = New System.Drawing.Point(72, 260)
+        Me.Label17.Location = New System.Drawing.Point(60, 225)
         Me.Label17.Name = "Label17"
-        Me.Label17.Size = New System.Drawing.Size(168, 23)
+        Me.Label17.Size = New System.Drawing.Size(140, 20)
         Me.Label17.TabIndex = 22
         Me.Label17.Text = "Max Elev Field (meters):"
         '
         'Label16
         '
-        Me.Label16.Location = New System.Drawing.Point(72, 227)
+        Me.Label16.Location = New System.Drawing.Point(60, 197)
         Me.Label16.Name = "Label16"
-        Me.Label16.Size = New System.Drawing.Size(168, 23)
+        Me.Label16.Size = New System.Drawing.Size(140, 20)
         Me.Label16.TabIndex = 21
         Me.Label16.Text = "Min Elev Field (meters):"
         '
         'Label15
         '
-        Me.Label15.Location = New System.Drawing.Point(72, 195)
+        Me.Label15.Location = New System.Drawing.Point(60, 169)
         Me.Label15.Name = "Label15"
-        Me.Label15.Size = New System.Drawing.Size(152, 23)
+        Me.Label15.Size = New System.Drawing.Size(127, 20)
         Me.Label15.TabIndex = 20
         Me.Label15.Text = "Depth Field (meters):"
         '
         'Label14
         '
-        Me.Label14.Location = New System.Drawing.Point(72, 164)
+        Me.Label14.Location = New System.Drawing.Point(60, 142)
         Me.Label14.Name = "Label14"
-        Me.Label14.Size = New System.Drawing.Size(152, 23)
+        Me.Label14.Size = New System.Drawing.Size(127, 20)
         Me.Label14.TabIndex = 19
         Me.Label14.Text = "Width Field (meters):"
         '
         'Label13
         '
-        Me.Label13.Location = New System.Drawing.Point(72, 132)
+        Me.Label13.Location = New System.Drawing.Point(60, 114)
         Me.Label13.Name = "Label13"
-        Me.Label13.Size = New System.Drawing.Size(152, 23)
+        Me.Label13.Size = New System.Drawing.Size(127, 20)
         Me.Label13.TabIndex = 18
         Me.Label13.Text = "Slope Field (percent):"
         '
@@ -524,9 +580,9 @@ Public Class frmModelSetup
         Me.cboStream9.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboStream9.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboStream9.Location = New System.Drawing.Point(248, 288)
+        Me.cboStream9.Location = New System.Drawing.Point(207, 250)
         Me.cboStream9.Name = "cboStream9"
-        Me.cboStream9.Size = New System.Drawing.Size(168, 25)
+        Me.cboStream9.Size = New System.Drawing.Size(233, 21)
         Me.cboStream9.TabIndex = 17
         '
         'cboStream8
@@ -534,9 +590,9 @@ Public Class frmModelSetup
         Me.cboStream8.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboStream8.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboStream8.Location = New System.Drawing.Point(248, 256)
+        Me.cboStream8.Location = New System.Drawing.Point(207, 222)
         Me.cboStream8.Name = "cboStream8"
-        Me.cboStream8.Size = New System.Drawing.Size(168, 25)
+        Me.cboStream8.Size = New System.Drawing.Size(233, 21)
         Me.cboStream8.TabIndex = 16
         '
         'cboStream7
@@ -544,9 +600,9 @@ Public Class frmModelSetup
         Me.cboStream7.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboStream7.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboStream7.Location = New System.Drawing.Point(248, 224)
+        Me.cboStream7.Location = New System.Drawing.Point(207, 194)
         Me.cboStream7.Name = "cboStream7"
-        Me.cboStream7.Size = New System.Drawing.Size(168, 25)
+        Me.cboStream7.Size = New System.Drawing.Size(233, 21)
         Me.cboStream7.TabIndex = 15
         '
         'cboStream6
@@ -554,9 +610,9 @@ Public Class frmModelSetup
         Me.cboStream6.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboStream6.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboStream6.Location = New System.Drawing.Point(248, 192)
+        Me.cboStream6.Location = New System.Drawing.Point(207, 166)
         Me.cboStream6.Name = "cboStream6"
-        Me.cboStream6.Size = New System.Drawing.Size(168, 25)
+        Me.cboStream6.Size = New System.Drawing.Size(233, 21)
         Me.cboStream6.TabIndex = 14
         '
         'cboStream5
@@ -564,9 +620,9 @@ Public Class frmModelSetup
         Me.cboStream5.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboStream5.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboStream5.Location = New System.Drawing.Point(248, 160)
+        Me.cboStream5.Location = New System.Drawing.Point(207, 139)
         Me.cboStream5.Name = "cboStream5"
-        Me.cboStream5.Size = New System.Drawing.Size(168, 25)
+        Me.cboStream5.Size = New System.Drawing.Size(233, 21)
         Me.cboStream5.TabIndex = 13
         '
         'cboStream4
@@ -574,9 +630,9 @@ Public Class frmModelSetup
         Me.cboStream4.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboStream4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboStream4.Location = New System.Drawing.Point(248, 128)
+        Me.cboStream4.Location = New System.Drawing.Point(207, 111)
         Me.cboStream4.Name = "cboStream4"
-        Me.cboStream4.Size = New System.Drawing.Size(168, 25)
+        Me.cboStream4.Size = New System.Drawing.Size(233, 21)
         Me.cboStream4.TabIndex = 12
         '
         'cboStream3
@@ -584,9 +640,9 @@ Public Class frmModelSetup
         Me.cboStream3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboStream3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboStream3.Location = New System.Drawing.Point(248, 96)
+        Me.cboStream3.Location = New System.Drawing.Point(207, 83)
         Me.cboStream3.Name = "cboStream3"
-        Me.cboStream3.Size = New System.Drawing.Size(168, 25)
+        Me.cboStream3.Size = New System.Drawing.Size(233, 21)
         Me.cboStream3.TabIndex = 11
         '
         'cboStream2
@@ -594,9 +650,9 @@ Public Class frmModelSetup
         Me.cboStream2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboStream2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboStream2.Location = New System.Drawing.Point(248, 63)
+        Me.cboStream2.Location = New System.Drawing.Point(207, 55)
         Me.cboStream2.Name = "cboStream2"
-        Me.cboStream2.Size = New System.Drawing.Size(168, 25)
+        Me.cboStream2.Size = New System.Drawing.Size(233, 21)
         Me.cboStream2.TabIndex = 10
         '
         'cboStream1
@@ -604,32 +660,32 @@ Public Class frmModelSetup
         Me.cboStream1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboStream1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboStream1.Location = New System.Drawing.Point(248, 32)
+        Me.cboStream1.Location = New System.Drawing.Point(207, 28)
         Me.cboStream1.Name = "cboStream1"
-        Me.cboStream1.Size = New System.Drawing.Size(168, 25)
+        Me.cboStream1.Size = New System.Drawing.Size(233, 21)
         Me.cboStream1.TabIndex = 9
         '
         'Label10
         '
-        Me.Label10.Location = New System.Drawing.Point(72, 99)
+        Me.Label10.Location = New System.Drawing.Point(60, 86)
         Me.Label10.Name = "Label10"
-        Me.Label10.Size = New System.Drawing.Size(152, 23)
+        Me.Label10.Size = New System.Drawing.Size(127, 20)
         Me.Label10.TabIndex = 8
         Me.Label10.Text = "Length Field (meters):"
         '
         'Label11
         '
-        Me.Label11.Location = New System.Drawing.Point(72, 67)
+        Me.Label11.Location = New System.Drawing.Point(60, 58)
         Me.Label11.Name = "Label11"
-        Me.Label11.Size = New System.Drawing.Size(152, 23)
+        Me.Label11.Size = New System.Drawing.Size(127, 20)
         Me.Label11.TabIndex = 7
         Me.Label11.Text = "Downstream ID Field:"
         '
         'Label12
         '
-        Me.Label12.Location = New System.Drawing.Point(72, 36)
+        Me.Label12.Location = New System.Drawing.Point(60, 31)
         Me.Label12.Name = "Label12"
-        Me.Label12.Size = New System.Drawing.Size(152, 23)
+        Me.Label12.Size = New System.Drawing.Size(127, 20)
         Me.Label12.TabIndex = 6
         Me.Label12.Text = "Subbasin ID Field:"
         '
@@ -643,7 +699,7 @@ Public Class frmModelSetup
         Me.TabPage3.Controls.Add(Me.Label7)
         Me.TabPage3.Location = New System.Drawing.Point(4, 25)
         Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Size = New System.Drawing.Size(519, 355)
+        Me.TabPage3.Size = New System.Drawing.Size(524, 373)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Subbasins"
         Me.TabPage3.UseVisualStyleBackColor = True
@@ -653,16 +709,16 @@ Public Class frmModelSetup
         Me.cboSub3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboSub3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboSub3.Location = New System.Drawing.Point(248, 93)
+        Me.cboSub3.Location = New System.Drawing.Point(207, 81)
         Me.cboSub3.Name = "cboSub3"
-        Me.cboSub3.Size = New System.Drawing.Size(168, 25)
+        Me.cboSub3.Size = New System.Drawing.Size(233, 21)
         Me.cboSub3.TabIndex = 6
         '
         'Label21
         '
-        Me.Label21.Location = New System.Drawing.Point(72, 96)
+        Me.Label21.Location = New System.Drawing.Point(60, 83)
         Me.Label21.Name = "Label21"
-        Me.Label21.Size = New System.Drawing.Size(167, 23)
+        Me.Label21.Size = New System.Drawing.Size(139, 20)
         Me.Label21.TabIndex = 5
         Me.Label21.Text = "Model Segment ID Field:"
         '
@@ -671,9 +727,9 @@ Public Class frmModelSetup
         Me.cboSub2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboSub2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboSub2.Location = New System.Drawing.Point(248, 63)
+        Me.cboSub2.Location = New System.Drawing.Point(207, 55)
         Me.cboSub2.Name = "cboSub2"
-        Me.cboSub2.Size = New System.Drawing.Size(168, 25)
+        Me.cboSub2.Size = New System.Drawing.Size(233, 21)
         Me.cboSub2.TabIndex = 4
         '
         'cboSub1
@@ -681,24 +737,24 @@ Public Class frmModelSetup
         Me.cboSub1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboSub1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboSub1.Location = New System.Drawing.Point(248, 32)
+        Me.cboSub1.Location = New System.Drawing.Point(207, 28)
         Me.cboSub1.Name = "cboSub1"
-        Me.cboSub1.Size = New System.Drawing.Size(168, 25)
+        Me.cboSub1.Size = New System.Drawing.Size(233, 21)
         Me.cboSub1.TabIndex = 3
         '
         'Label8
         '
-        Me.Label8.Location = New System.Drawing.Point(72, 67)
+        Me.Label8.Location = New System.Drawing.Point(60, 58)
         Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(152, 23)
+        Me.Label8.Size = New System.Drawing.Size(127, 20)
         Me.Label8.TabIndex = 1
         Me.Label8.Text = "Slope Field (percent):"
         '
         'Label7
         '
-        Me.Label7.Location = New System.Drawing.Point(72, 36)
+        Me.Label7.Location = New System.Drawing.Point(60, 31)
         Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(152, 23)
+        Me.Label7.Size = New System.Drawing.Size(127, 20)
         Me.Label7.TabIndex = 0
         Me.Label7.Text = "Subbasin ID Field:"
         '
@@ -713,33 +769,33 @@ Public Class frmModelSetup
         Me.TabPage5.Controls.Add(Me.Label6)
         Me.TabPage5.Location = New System.Drawing.Point(4, 25)
         Me.TabPage5.Name = "TabPage5"
-        Me.TabPage5.Size = New System.Drawing.Size(519, 355)
+        Me.TabPage5.Size = New System.Drawing.Size(524, 373)
         Me.TabPage5.TabIndex = 4
         Me.TabPage5.Text = "Point Sources"
         Me.TabPage5.UseVisualStyleBackColor = True
         '
         'lblCustom
         '
-        Me.lblCustom.Location = New System.Drawing.Point(95, 208)
+        Me.lblCustom.Location = New System.Drawing.Point(79, 180)
         Me.lblCustom.Name = "lblCustom"
-        Me.lblCustom.Size = New System.Drawing.Size(320, 24)
+        Me.lblCustom.Size = New System.Drawing.Size(267, 21)
         Me.lblCustom.TabIndex = 18
         Me.lblCustom.Text = "<none>"
         Me.lblCustom.Visible = False
         '
         'chkCustom
         '
-        Me.chkCustom.Location = New System.Drawing.Point(76, 153)
+        Me.chkCustom.Location = New System.Drawing.Point(63, 133)
         Me.chkCustom.Name = "chkCustom"
-        Me.chkCustom.Size = New System.Drawing.Size(351, 41)
+        Me.chkCustom.Size = New System.Drawing.Size(293, 35)
         Me.chkCustom.TabIndex = 17
         Me.chkCustom.Text = "Use custom loading table"
         '
         'chkCalculate
         '
-        Me.chkCalculate.Location = New System.Drawing.Point(76, 107)
+        Me.chkCalculate.Location = New System.Drawing.Point(63, 93)
         Me.chkCalculate.Name = "chkCalculate"
-        Me.chkCalculate.Size = New System.Drawing.Size(351, 40)
+        Me.chkCalculate.Size = New System.Drawing.Size(293, 34)
         Me.chkCalculate.TabIndex = 16
         Me.chkCalculate.Text = "Calculate river mile for each point source"
         Me.chkCalculate.Visible = False
@@ -747,17 +803,17 @@ Public Class frmModelSetup
         'cboPoint
         '
         Me.cboPoint.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboPoint.Location = New System.Drawing.Point(248, 32)
+        Me.cboPoint.Location = New System.Drawing.Point(207, 28)
         Me.cboPoint.Name = "cboPoint"
-        Me.cboPoint.Size = New System.Drawing.Size(167, 25)
+        Me.cboPoint.Size = New System.Drawing.Size(139, 21)
         Me.cboPoint.TabIndex = 13
         '
         'Label19
         '
         Me.Label19.AutoSize = True
-        Me.Label19.Location = New System.Drawing.Point(72, 36)
+        Me.Label19.Location = New System.Drawing.Point(60, 31)
         Me.Label19.Name = "Label19"
-        Me.Label19.Size = New System.Drawing.Size(144, 17)
+        Me.Label19.Size = New System.Drawing.Size(110, 13)
         Me.Label19.TabIndex = 12
         Me.Label19.Text = "Point Source ID Field:"
         '
@@ -765,16 +821,16 @@ Public Class frmModelSetup
         '
         Me.cboYear.AllowDrop = True
         Me.cboYear.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboYear.Location = New System.Drawing.Point(248, 63)
+        Me.cboYear.Location = New System.Drawing.Point(207, 55)
         Me.cboYear.Name = "cboYear"
-        Me.cboYear.Size = New System.Drawing.Size(120, 25)
+        Me.cboYear.Size = New System.Drawing.Size(100, 21)
         Me.cboYear.TabIndex = 15
         '
         'Label6
         '
-        Me.Label6.Location = New System.Drawing.Point(72, 67)
+        Me.Label6.Location = New System.Drawing.Point(60, 58)
         Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(107, 24)
+        Me.Label6.Size = New System.Drawing.Size(89, 21)
         Me.Label6.TabIndex = 14
         Me.Label6.Text = "PCS Year:"
         '
@@ -785,7 +841,7 @@ Public Class frmModelSetup
         Me.TabPage6.Controls.Add(Me.lstMet)
         Me.TabPage6.Location = New System.Drawing.Point(4, 25)
         Me.TabPage6.Name = "TabPage6"
-        Me.TabPage6.Size = New System.Drawing.Size(519, 355)
+        Me.TabPage6.Size = New System.Drawing.Size(524, 373)
         Me.TabPage6.TabIndex = 5
         Me.TabPage6.Text = "Met Stations"
         Me.TabPage6.UseVisualStyleBackColor = True
@@ -794,9 +850,9 @@ Public Class frmModelSetup
         '
         Me.Label22.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Label22.AutoSize = True
-        Me.Label22.Location = New System.Drawing.Point(370, 328)
+        Me.Label22.Location = New System.Drawing.Point(401, 353)
         Me.Label22.Name = "Label22"
-        Me.Label22.Size = New System.Drawing.Size(125, 17)
+        Me.Label22.Size = New System.Drawing.Size(95, 13)
         Me.Label22.TabIndex = 20
         Me.Label22.Text = "* Full Set Available"
         '
@@ -812,9 +868,9 @@ Public Class frmModelSetup
         Me.AtcGridMet.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.AtcGridMet.LineColor = System.Drawing.Color.Empty
         Me.AtcGridMet.LineWidth = 0.0!
-        Me.AtcGridMet.Location = New System.Drawing.Point(21, 97)
+        Me.AtcGridMet.Location = New System.Drawing.Point(17, 84)
         Me.AtcGridMet.Name = "AtcGridMet"
-        Me.AtcGridMet.Size = New System.Drawing.Size(474, 221)
+        Me.AtcGridMet.Size = New System.Drawing.Size(488, 261)
         Me.AtcGridMet.Source = Nothing
         Me.AtcGridMet.TabIndex = 19
         '
@@ -824,10 +880,9 @@ Public Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstMet.FormattingEnabled = True
-        Me.lstMet.ItemHeight = 17
-        Me.lstMet.Location = New System.Drawing.Point(21, 97)
+        Me.lstMet.Location = New System.Drawing.Point(17, 84)
         Me.lstMet.Name = "lstMet"
-        Me.lstMet.Size = New System.Drawing.Size(474, 225)
+        Me.lstMet.Size = New System.Drawing.Size(488, 251)
         Me.lstMet.TabIndex = 1
         '
         'GroupBox1
@@ -836,9 +891,9 @@ Public Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox1.Controls.Add(Me.lblStatus)
         Me.GroupBox1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.GroupBox1.Location = New System.Drawing.Point(16, 408)
+        Me.GroupBox1.Location = New System.Drawing.Point(13, 423)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(527, 55)
+        Me.GroupBox1.Size = New System.Drawing.Size(532, 47)
         Me.GroupBox1.TabIndex = 1
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Status"
@@ -848,9 +903,9 @@ Public Class frmModelSetup
         Me.lblStatus.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblStatus.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblStatus.Location = New System.Drawing.Point(16, 24)
+        Me.lblStatus.Location = New System.Drawing.Point(13, 21)
         Me.lblStatus.Name = "lblStatus"
-        Me.lblStatus.Size = New System.Drawing.Size(496, 16)
+        Me.lblStatus.Size = New System.Drawing.Size(507, 14)
         Me.lblStatus.TabIndex = 0
         Me.lblStatus.Text = "Update specifications if desired, then click OK to proceed."
         '
@@ -858,9 +913,9 @@ Public Class frmModelSetup
         '
         Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdOK.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdOK.Location = New System.Drawing.Point(16, 472)
+        Me.cmdOK.Location = New System.Drawing.Point(13, 478)
         Me.cmdOK.Name = "cmdOK"
-        Me.cmdOK.Size = New System.Drawing.Size(72, 32)
+        Me.cmdOK.Size = New System.Drawing.Size(60, 28)
         Me.cmdOK.TabIndex = 2
         Me.cmdOK.Text = "OK"
         '
@@ -868,9 +923,9 @@ Public Class frmModelSetup
         '
         Me.cmdExisting.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdExisting.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdExisting.Location = New System.Drawing.Point(96, 472)
+        Me.cmdExisting.Location = New System.Drawing.Point(80, 478)
         Me.cmdExisting.Name = "cmdExisting"
-        Me.cmdExisting.Size = New System.Drawing.Size(120, 32)
+        Me.cmdExisting.Size = New System.Drawing.Size(100, 28)
         Me.cmdExisting.TabIndex = 4
         Me.cmdExisting.Text = "Open Existing"
         '
@@ -879,9 +934,9 @@ Public Class frmModelSetup
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCancel.Location = New System.Drawing.Point(224, 472)
+        Me.cmdCancel.Location = New System.Drawing.Point(187, 478)
         Me.cmdCancel.Name = "cmdCancel"
-        Me.cmdCancel.Size = New System.Drawing.Size(88, 32)
+        Me.cmdCancel.Size = New System.Drawing.Size(73, 28)
         Me.cmdCancel.TabIndex = 5
         Me.cmdCancel.Text = "Cancel"
         '
@@ -889,9 +944,9 @@ Public Class frmModelSetup
         '
         Me.cmdHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdHelp.Location = New System.Drawing.Point(368, 472)
+        Me.cmdHelp.Location = New System.Drawing.Point(400, 478)
         Me.cmdHelp.Name = "cmdHelp"
-        Me.cmdHelp.Size = New System.Drawing.Size(79, 32)
+        Me.cmdHelp.Size = New System.Drawing.Size(65, 28)
         Me.cmdHelp.TabIndex = 6
         Me.cmdHelp.Text = "Help"
         '
@@ -899,9 +954,9 @@ Public Class frmModelSetup
         '
         Me.cmdAbout.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdAbout.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdAbout.Location = New System.Drawing.Point(456, 472)
+        Me.cmdAbout.Location = New System.Drawing.Point(473, 478)
         Me.cmdAbout.Name = "cmdAbout"
-        Me.cmdAbout.Size = New System.Drawing.Size(87, 32)
+        Me.cmdAbout.Size = New System.Drawing.Size(72, 28)
         Me.cmdAbout.TabIndex = 7
         Me.cmdAbout.Text = "About"
         '
@@ -934,7 +989,7 @@ Public Class frmModelSetup
         'frmModelSetup
         '
         Me.AcceptButton = Me.cmdOK
-        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.cmdCancel
         Me.ClientSize = New System.Drawing.Size(560, 517)
         Me.Controls.Add(Me.cmdAbout)
@@ -951,6 +1006,8 @@ Public Class frmModelSetup
         Me.TabControl1.ResumeLayout(False)
         Me.TabPage1.ResumeLayout(False)
         Me.TabPage1.PerformLayout()
+        Me.gbxSnow.ResumeLayout(False)
+        Me.gbxSnow.PerformLayout()
         Me.TabPage2.ResumeLayout(False)
         Me.TabPage2.PerformLayout()
         Me.TabPage4.ResumeLayout(False)
@@ -1291,6 +1348,14 @@ Public Class frmModelSetup
             Dim lPSRCalculate As Boolean = chkCalculate.Checked
             Dim lWQConstituents() As String = {}
             Dim lLUInclude() As Integer = {} ' = {61, 71, 81, 91}
+            Dim lSnowOption As Integer = 0
+            If chkSnow.Checked Then
+                If rbnEnergy.Checked Then
+                    lSnowOption = 1
+                Else
+                    lSnowOption = 2
+                End If
+            End If
 
             Dim lStreamLayerName As String = cboStreams.Items(cboStreams.SelectedIndex)
             Dim lStreamFields() As String = {cboStream1.Items(cboStream1.SelectedIndex), _
@@ -1347,13 +1412,15 @@ Public Class frmModelSetup
                              lOutletsLayerName, lPointFieldName, lPointYear, _
                              lLanduseFieldName, lLandUseClassFile, _
                              lSubbasinSegmentName, _
-                             lPSRCustom, lPSRCustomFile, lPSRCalculate) Then
+                             lPSRCustom, lPSRCustomFile, lPSRCalculate, _
+                             lSnowOption) Then
                     Me.Dispose()
                     Me.Close()
 
                     If CreateUCI(lOutputPath & "\" & lBaseOutputName & ".uci", _
                                  lUniqueMetWDMNames, _
-                                 lWQConstituents) Then
+                                 lWQConstituents, , _
+                                 lSnowOption) Then
                         lblStatus.Text = "Completed HSPF Setup"
                         Me.Refresh()
                         StartWinHSPF(lOutputPath & "\" & lBaseOutputName & ".uci")
@@ -1511,6 +1578,7 @@ Public Class frmModelSetup
             cboOutlets.Visible = False
             Label4.Top = 88
             cboStreams.Top = 88
+            gbxSnow.Visible = False
         End If
     End Sub
 

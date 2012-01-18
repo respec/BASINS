@@ -2593,7 +2593,8 @@ x:
                                    ByVal aWQConstituents() As String, _
                                    Optional ByRef aPollutantListFileName As String = "", _
                                    Optional ByRef aMetBaseDsn As Integer = 11, _
-                                   Optional ByVal aMetWdmId As String = "WDM2")
+                                   Optional ByVal aMetWdmId As String = "WDM2", _
+                                   Optional ByVal aSnowOption As Integer = 0)
 
         'get starter uci ready for use defaulting parameters and mass links
         Dim lDefUci As New HspfUci
@@ -2601,7 +2602,7 @@ x:
 
         modCreateUci.CreateUciFromBASINS(aWatershed, Me, aDataSources, _
                                          lDefUci, _
-                                         aPollutantListFileName, aMetBaseDsn, aMetWdmId)
+                                         aPollutantListFileName, aMetBaseDsn, aMetWdmId, aSnowOption)
 
         'add specified pollutants
         If aWQConstituents.Length > 0 Then
@@ -2818,6 +2819,14 @@ x:
                 If aParmName = "SLSUR" Or aParmName = "LSUR" Then
                     lDefaultThisParameter = False
                 End If
+            ElseIf aTableName = "SNOW-FLAGS" Then
+                If aParmName = "SNOPFG" Then
+                    lDefaultThisParameter = False
+                End If
+            ElseIf aTableName = "SNOW-PARM1" Then
+                If aParmName = "LAT" Or aParmName = "MELEV" Then
+                    lDefaultThisParameter = False
+                End If
             ElseIf aTableName = "NQUALS" Then
                 If aParmName = "NQUAL" Then
                     lDefaultThisParameter = False
@@ -2826,6 +2835,14 @@ x:
         ElseIf aOperationName = "IMPLND" Then
             If aTableName = "IWAT-PARM2" Then
                 If aParmName = "SLSUR" Or aParmName = "LSUR" Then
+                    lDefaultThisParameter = False
+                End If
+            ElseIf aTableName = "SNOW-FLAGS" Then
+                If aParmName = "SNOPFG" Then
+                    lDefaultThisParameter = False
+                End If
+            ElseIf aTableName = "SNOW-PARM1" Then
+                If aParmName = "LAT" Or aParmName = "MELEV" Then
                     lDefaultThisParameter = False
                 End If
             ElseIf aTableName = "NQUALS" Then
