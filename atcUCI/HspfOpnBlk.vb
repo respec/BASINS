@@ -316,18 +316,29 @@ Public Class HspfOpnBlk
         Loop
     End Sub
 
-    Public Sub CreateTables(ByVal aBlockDef As HspfBlockDef)
-        Dim lTableNames() As String
+    Public Sub CreateTables(ByVal aBlockDef As HspfBlockDef, Optional ByVal aSnowOption As Integer = 0)
+        Dim lTableNames() As String = {""}
+
         Static PERLNDtabList() As String = {"ACTIVITY", "PRINT-INFO", "GEN-INFO", "PWAT-PARM1", "PWAT-PARM2", "PWAT-PARM3", "PWAT-PARM4", "MON-INTERCEP", "MON-LZETPARM", "PWAT-STATE1"}
+        Static PERLNDSnowTabList() As String = {"ACTIVITY", "PRINT-INFO", "GEN-INFO", "PWAT-PARM1", "PWAT-PARM2", "PWAT-PARM3", "PWAT-PARM4", "MON-INTERCEP", "MON-LZETPARM", "PWAT-STATE1", "ATEMP-DAT", "ICE-FLAG", "SNOW-FLAGS", "SNOW-PARM1", "SNOW-PARM2", "SNOW-INIT1", "SNOW-INIT2"}
         Static IMPLNDtabList() As String = {"ACTIVITY", "PRINT-INFO", "GEN-INFO", "IWAT-PARM1", "IWAT-PARM2", "IWAT-PARM3", "IWAT-STATE1"}
+        Static IMPLNDSnowTabList() As String = {"ACTIVITY", "PRINT-INFO", "GEN-INFO", "IWAT-PARM1", "IWAT-PARM2", "IWAT-PARM3", "IWAT-STATE1", "ATEMP-DAT", "ICE-FLAG", "SNOW-FLAGS", "SNOW-PARM1", "SNOW-PARM2", "SNOW-INIT1", "SNOW-INIT2"}
         Static RCHREStabList() As String = {"ACTIVITY", "PRINT-INFO", "GEN-INFO", "HYDR-PARM1", "HYDR-PARM2", "HYDR-INIT"}
 
         'could do something here with table status info?
         Select Case aBlockDef.Name
             Case "PERLND"
-                lTableNames = PERLNDtabList
+                If aSnowOption = 0 Then
+                    lTableNames = PERLNDtabList
+                Else
+                    lTableNames = PERLNDSnowTabList
+                End If
             Case "IMPLND"
-                lTableNames = IMPLNDtabList
+                If aSnowOption = 0 Then
+                    lTableNames = IMPLNDtabList
+                Else
+                    lTableNames = IMPLNDSnowTabList
+                End If
             Case "RCHRES"
                 lTableNames = RCHREStabList
             Case Else

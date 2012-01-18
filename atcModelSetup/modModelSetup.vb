@@ -49,7 +49,8 @@ Public Module modModelSetup
                               ByVal aSubbasinSegmentName As String, _
                               ByVal aPSRCustom As Boolean, _
                               ByVal aPSRCustomFile As String, _
-                              ByVal aPSRCalculate As Boolean) As Boolean
+                              ByVal aPSRCalculate As Boolean, _
+                              Optional ByVal aSnowOption As Integer = 0) As Boolean
 
         Logger.Status("Preparing to process")
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
@@ -678,7 +679,8 @@ Public Module modModelSetup
     Public Function CreateUCI(ByVal aUciName As String, _
                               ByVal aMetWdmNames As atcCollection, _
                               ByVal aWQConstituents() As String, _
-                              Optional ByVal aCalledFromFrames As Boolean = False) As Boolean
+                              Optional ByVal aCalledFromFrames As Boolean = False, _
+                              Optional ByVal aSnowOption As Integer = 0) As Boolean
         ChDriveDir(PathNameOnly(aUciName))
         'get message file ready
         Dim lMsg As New atcUCI.HspfMsg("hspfmsg.mdb")
@@ -754,7 +756,7 @@ Public Module modModelSetup
                                          lDataSources, _
                                          lStarterUciName, _
                                          aWQConstituents, _
-                                         lPollutantListFileName)
+                                         lPollutantListFileName, , , aSnowOption)
             lHspfUci.Save()
             lCreateUCI = True
         End If

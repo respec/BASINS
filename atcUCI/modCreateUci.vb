@@ -20,7 +20,8 @@ Module modCreateUci
                                    ByRef aStarterUci As HspfUci, _
                                    Optional ByRef aPollutantListFileName As String = "", _
                                    Optional ByRef aMetBaseDsn As Integer = 11, _
-                                   Optional ByRef aMetWdmId As String = "WDM2")
+                                   Optional ByRef aMetWdmId As String = "WDM2", _
+                                   Optional ByVal aSnowOption As Integer = 0)
         pWatershed = aWatershed
 
         aUci.Name = aWatershed.Name & ".uci"
@@ -92,7 +93,7 @@ Module modCreateUci
         Next
         For Each lOpnBlk In aUci.OpnBlks  'perlnd, implnd, etc
             If lOpnBlk.Count > 0 Then
-                lOpnBlk.CreateTables(aUci.Msg.BlockDefs.Item(lOpnBlk.Name))
+                lOpnBlk.CreateTables(aUci.Msg.BlockDefs.Item(lOpnBlk.Name), aSnowOption)
             End If
         Next
 
@@ -115,7 +116,7 @@ Module modCreateUci
         CreateMassLinks(aUci)
 
         'set initial values in uci from BASINS values
-        SetInitValues(aUci)
+        SetInitValues(aUci, aSnowOption)
 
         CreatePointSourceDSNs(aUci, aPollutantListFileName)
 
@@ -129,7 +130,7 @@ Module modCreateUci
         aUci.Edited = False 'all the reads set edited
     End Sub
 
-    Private Sub SetInitValues(ByVal aUci As HspfUci)
+    Private Sub SetInitValues(ByVal aUci As HspfUci, Optional ByVal aSnowOption As Integer = 0)
         'set init values in uci
 
         For Each lOperation As HspfOperation In aUci.OpnBlks.Item("PERLND").Ids
@@ -138,6 +139,10 @@ Module modCreateUci
                     If lLandUse.Type = "PERLND" Or lLandUse.Type = "COMPOSITE" Then
                         Dim lTable As HspfTable = lOperation.Tables.Item("ACTIVITY")
                         lTable.Parms("PWATFG").Value = 1
+                        If aSnowOption > 0 Then
+                            lTable.Parms("AIRTFG").Value = 1
+                            lTable.Parms("SNOWFG").Value = 1
+                        End If
                         lTable = lOperation.Tables.Item("GEN-INFO")
                         lTable.Parms("LSID").Value = lLandUse.Description
                         lTable = lOperation.Tables.Item("PWAT-PARM2")
@@ -146,6 +151,10 @@ Module modCreateUci
                             lTable.Parms("SLSUR").Value = 0.001 'must have some slope
                         End If
                         lTable.Parms("LSUR").Value = DefaultLSURFromSLSUR(lTable.Parms("SLSUR").Value) 'default lsur based on slsur
+                        If aSnowOption > 0 Then
+                            lTable = lOperation.Tables.Item("SNOW-FLAGS")
+                            lTable.Parms("SNOPFG").Value = aSnowOption - 1
+                        End If
                         Exit For
                     End If
                 End If
@@ -158,6 +167,10 @@ Module modCreateUci
                     If lLandUse.Type = "IMPLND" Or lLandUse.Type = "COMPOSITE" Then
                         Dim lTable As HspfTable = lOperation.Tables.Item("ACTIVITY")
                         lTable.Parms("IWATFG").Value = 1
+                        If aSnowOption > 0 Then
+                            lTable.Parms("ATMPFG").Value = 1
+                            lTable.Parms("SNOWFG").Value = 1
+                        End If
                         lTable = lOperation.Tables.Item("GEN-INFO")
                         lTable.Parms("LSID").Value = lLandUse.Description
                         lTable = lOperation.Tables.Item("IWAT-PARM2")
@@ -166,6 +179,10 @@ Module modCreateUci
                             lTable.Parms("SLSUR").Value = 0.001 'must have some slope
                         End If
                         lTable.Parms("LSUR").Value = DefaultLSURFromSLSUR(lTable.Parms("SLSUR").Value) 'default lsur based on slsur
+                        If aSnowOption > 0 Then
+                            lTable = lOperation.Tables.Item("SNOW-FLAGS")
+                            lTable.Parms("SNOPFG").Value = aSnowOption - 1
+                        End If
                         Exit For
                     End If
                 End If
