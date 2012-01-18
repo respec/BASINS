@@ -12,8 +12,8 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("A set of utilities that's not strictly MapWindow but which are helpful when writing plugins")> 
 <Assembly: AssemblyCompany("MapWindow OSS Team - www.mapwindow.org")> 
 <Assembly: AssemblyProduct("MapWindow GIS - MapWinUtility")> 
-<Assembly: AssemblyCopyright("Copyright © 1998-2011 MapWindow OSS Team")> 
-<Assembly: AssemblyTrademark("MapWindow GIS is a trademark of Daniel P. Ames, 2005-2011")> 
+<Assembly: AssemblyCopyright("Copyright © 1998-2012 MapWindow OSS Team")> 
+<Assembly: AssemblyTrademark("MapWindow GIS is a trademark of Daniel P. Ames, 2005-2012")> 
 
 <Assembly: ComVisible(False)> 
 
@@ -30,5 +30,5 @@ Imports System.Runtime.InteropServices
 ' You can specify all the values or you can default the Build and Revision Numbers 
 ' by using the '*' as shown below:
 
-<Assembly: AssemblyVersion("4.8.6.*")> 
-<Assembly: AssemblyFileVersion("4.8.6.0")> 
+<Assembly: AssemblyVersion("4.8.7.*")> 
+<Assembly: AssemblyFileVersion("4.8.7.0")> 
