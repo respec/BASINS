@@ -154,6 +154,11 @@ Module modCreateUci
                         If aSnowOption > 0 Then
                             lTable = lOperation.Tables.Item("SNOW-FLAGS")
                             lTable.Parms("SNOPFG").Value = aSnowOption - 1
+                            lTable = lOperation.Tables.Item("SNOW-PARM1")
+                            lTable.Parms("LAT").Value = SignificantDigits(CompositeLatitude(lLandUse.ModelID, pWatershed.LandUses), 4)
+                            lTable.Parms("MELEV").Value = CompositeElevation(lLandUse.ModelID, pWatershed.LandUses)
+                            lTable = lOperation.Tables.Item("ATEMP-DAT")
+                            lTable.Parms("ELDAT").Value = CompositeElevation(lLandUse.ModelID, pWatershed.LandUses)
                         End If
                         Exit For
                     End If
@@ -182,6 +187,11 @@ Module modCreateUci
                         If aSnowOption > 0 Then
                             lTable = lOperation.Tables.Item("SNOW-FLAGS")
                             lTable.Parms("SNOPFG").Value = aSnowOption - 1
+                            lTable = lOperation.Tables.Item("SNOW-PARM1")
+                            lTable.Parms("LAT").Value = SignificantDigits(CompositeLatitude(lLandUse.ModelID, pWatershed.LandUses), 4)
+                            lTable.Parms("MELEV").Value = CompositeElevation(lLandUse.ModelID, pWatershed.LandUses)
+                            lTable = lOperation.Tables.Item("ATEMP-DAT")
+                            lTable.Parms("ELDAT").Value = CompositeElevation(lLandUse.ModelID, pWatershed.LandUses)
                         End If
                         Exit For
                     End If
@@ -243,6 +253,48 @@ Module modCreateUci
         End If
 
         Return lCompositeSlope
+    End Function
+
+    Private Function CompositeLatitude(ByVal aSegmentId As Integer, ByVal aLandUses As LandUses) As Single
+        'look through all landuses of this model segment, compute composite mean latitude
+        Dim lCompositeLatitude As Single = 0.0
+
+        Dim lTotalArea As Single = 0.0
+        Dim lTotalLatitudeTimesArea As Single = 0.0
+
+        For Each lLanduse As LandUse In aLandUses
+            If lLanduse.ModelID = aSegmentId Then
+                lTotalArea = lTotalArea + lLanduse.Area
+                lTotalLatitudeTimesArea = lTotalLatitudeTimesArea + (lLanduse.Area * lLanduse.MeanLatitude)
+            End If
+        Next
+
+        If lTotalArea > 0 Then
+            lCompositeLatitude = lTotalLatitudeTimesArea / lTotalArea
+        End If
+
+        Return lCompositeLatitude
+    End Function
+
+    Private Function CompositeElevation(ByVal aSegmentId As Integer, ByVal aLandUses As LandUses) As Single
+        'look through all landuses of this model segment, compute composite mean elevation
+        Dim lCompositeElevation As Single = 0.0
+
+        Dim lTotalArea As Single = 0.0
+        Dim lTotalElevationTimesArea As Single = 0.0
+
+        For Each lLanduse As LandUse In aLandUses
+            If lLanduse.ModelID = aSegmentId Then
+                lTotalArea = lTotalArea + lLanduse.Area
+                lTotalElevationTimesArea = lTotalElevationTimesArea + (lLanduse.Area * lLanduse.MeanElevation)
+            End If
+        Next
+
+        If lTotalArea > 0 Then
+            lCompositeElevation = lTotalElevationTimesArea / lTotalArea
+        End If
+
+        Return lCompositeElevation
     End Function
 
     Private Sub CreateMassLinks(ByRef aUci As HspfUci)

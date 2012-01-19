@@ -37,7 +37,7 @@ Public Class LandUses
                     Loop
                     Dim lLandUse As New LandUse
                     If lFieldCount = 6 Then
-                        'this is the normal way
+                        'this is the normal way before the snow enhancements 
                         lLandUse.Description = StrSplit(lCurrentRecord, lDelim, lQuote)
                         lLandUse.Type = CInt(StrSplit(lCurrentRecord, lDelim, lQuote))
                         Dim lReachId As String = StrSplit(lCurrentRecord, lDelim, lQuote)
@@ -45,6 +45,17 @@ Public Class LandUses
                         lLandUse.Area = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
                         lLandUse.Slope = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
                         lLandUse.Distance = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
+                    ElseIf lFieldCount = 8 Then
+                        'this is the normal way after the 1/2012 snow enhancements 
+                        lLandUse.Description = StrSplit(lCurrentRecord, lDelim, lQuote)
+                        lLandUse.Type = CInt(StrSplit(lCurrentRecord, lDelim, lQuote))
+                        Dim lReachId As String = StrSplit(lCurrentRecord, lDelim, lQuote)
+                        lLandUse.Reach = pWatershed.Reaches(lReachId)
+                        lLandUse.Area = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
+                        lLandUse.Slope = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
+                        lLandUse.Distance = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
+                        lLandUse.MeanLatitude = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
+                        lLandUse.MeanElevation = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
                     Else 'if coming from old delineator might not be space delimited
                         lLandUse.Description = StrSplit(lCurrentRecord, lDelim, lQuote)
                         If lCurrentRecord.Length > 23 Then
@@ -106,4 +117,6 @@ Public Class LandUse
     Public Slope As Double        'Average slope of this subbasin, not land use specific
     Public Distance As Double     'Overland flow distance
     Public ModelID As Integer     'Assigned id for this land use type, e.g. 101 for Forest land uses 
+    Public MeanElevation As Single   'mean elevation of this land use within this subbasin (used for snow)
+    Public MeanLatitude As Single    'mean latitude of this land use within this subbasin  (used for snow)
 End Class
