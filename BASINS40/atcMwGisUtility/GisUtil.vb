@@ -1297,7 +1297,8 @@ Public Class GisUtil
     ''' </param>
     Public Shared Sub TabulateAreas(ByVal aGridLayerIndex As Integer, _
                                     ByVal aPolygonLayerIndex As Integer, _
-                                    ByRef aAreaGridPoly(,) As Double)
+                                    ByRef aAreaGridPoly(,) As Double, _
+                                    Optional ByRef aMeanLatGridPoly(,) As Double = Nothing)
         'set input grid
         Dim lInputGrid As MapWinGIS.Grid = GridFromIndex(aGridLayerIndex)
         'set input polygon layer
@@ -1365,9 +1366,19 @@ Public Class GisUtil
         Dim lYPos As Double
         Dim lInsideId As Integer
         Dim lGridValue As Integer
+        'following 3 variables are used in determining mean latitude of each landuse/subbasin combination
+        Dim lXLng As Double
+        Dim lYLat As Double
+        Dim lCountMeanLatLS(aMeanLatGridPoly.GetUpperBound(0), aMeanLatGridPoly.GetUpperBound(1)) As Double
 
         If pStatusShow Then Logger.Status("Tabulating Areas...")
         For lRow As Integer = lStartingRow To lEndingRow
+            If aMeanLatGridPoly IsNot Nothing Then
+                Dim lInputProjection As String = GisUtil.ProjectProjection
+                Dim lOutputProjection As String = "+proj=longlat +datum=NAD83"
+                lInputGrid.CellToProj(lStartingColumn, lRow, lXLng, lYLat)
+                GisUtil.ProjectPoint(lXLng, lYLat, lInputProjection, lOutputProjection)  'used for computing mean latitude
+            End If
             For lCol As Integer = lStartingColumn To lEndingColumn
                 lInputGrid.CellToProj(lCol, lRow, lXPos, lYPos)
                 lInsideId = lPolygonSf.PointInShapefile(lXPos, lYPos)
@@ -1380,6 +1391,13 @@ Public Class GisUtil
                     If lGridValue > -1 And lGridValue <= aAreaGridPoly.GetUpperBound(0) Then
                         'make sure the grid value is not going to blow out the array
                         aAreaGridPoly(lGridValue, lInsideId) += lCellArea
+                    End If
+                    If aMeanLatGridPoly IsNot Nothing Then
+                        If lGridValue > -1 And lGridValue <= aMeanLatGridPoly.GetUpperBound(0) Then
+                            'store weighted average mean latitude
+                            aMeanLatGridPoly(lGridValue, lInsideId) = (lYLat + (aMeanLatGridPoly(lGridValue, lInsideId) * lCountMeanLatLS(lGridValue, lInsideId))) / (lCountMeanLatLS(lGridValue, lInsideId) + 1)
+                            lCountMeanLatLS(lGridValue, lInsideId) += 1
+                        End If
                     End If
                 End If
                 lCellCount += 1
@@ -3939,6 +3957,57 @@ Public Class GisUtil
         lPt = MapWinGeoProc.Utils.Centroid(lSf.Shape(aFeatureIndex))
         aCentroidX = lPt.x
         aCentroidY = lPt.y
+    End Sub
+
+    Public Shared Sub AddCentroidXYtoShapefile(ByVal aShapefileName As String)
+        Dim lSf As New MapWinGIS.Shapefile
+        lSf.Open(aShapefileName)
+
+        Dim lFieldIndex As Integer
+        Dim lXField As Integer = -1
+        For lFieldIndex = 0 To lSf.NumFields - 1
+            If lSf.Field(lFieldIndex).Name.ToUpper = "CentroidX".ToUpper Then 'this is the field we want
+                lXField = lFieldIndex
+            End If
+        Next
+        If lXField < 0 Then
+            Dim lField As New MapWinGIS.Field
+            lField.Name = "CentroidX"
+            lField.Type = MapWinGIS.FieldType.DOUBLE_FIELD
+            lField.Width = 10
+            lSf.StartEditingTable()
+            lFieldIndex = lSf.NumFields
+            Dim lBsuc As Boolean = lSf.EditInsertField(lField, lFieldIndex)
+            lXField = lFieldIndex
+            lSf.StopEditingTable()
+        End If
+
+        Dim lYField As Integer = -1
+        For lFieldIndex = 0 To lSf.NumFields - 1
+            If lSf.Field(lFieldIndex).Name.ToUpper = "CentroidY".ToUpper Then 'this is the field we want
+                lYField = lFieldIndex
+            End If
+        Next
+        If lYField < 0 Then
+            Dim lField As New MapWinGIS.Field
+            lField.Name = "CentroidY"
+            lField.Type = MapWinGIS.FieldType.DOUBLE_FIELD
+            lField.Width = 10
+            lSf.StartEditingTable()
+            lFieldIndex = lSf.NumFields
+            Dim lBsuc As Boolean = lSf.EditInsertField(lField, lFieldIndex)
+            lYField = lFieldIndex
+            lSf.StopEditingTable()
+        End If
+
+        Dim lPt As New MapWinGIS.Point
+        lSf.StartEditingTable()
+        For lShapeIndex As Integer = 0 To lSf.NumShapes - 1
+            lPt = MapWinGeoProc.Utils.Centroid(lSf.Shape(lShapeIndex))
+            lSf.EditCellValue(lXField, lShapeIndex, lPt.x)
+            lSf.EditCellValue(lYField, lShapeIndex, lPt.y)
+        Next
+        lSf.StopEditingTable()
     End Sub
 
     Public Shared Sub LineCentroid(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer, ByRef aCentroidX As Double, ByRef aCentroidY As Double)

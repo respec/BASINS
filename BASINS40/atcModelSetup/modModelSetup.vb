@@ -97,19 +97,16 @@ Public Module modModelSetup
             End If
         Next
 
-        'todo: make into a new class 
         'each land use code, subbasin id, and area is a single land use record
-        Dim lLucodes As New Collection
-        Dim lSubids As New Collection
-        Dim lAreas As New Collection
+        Dim lLandUseSubbasinOverlayRecords As New Collection '(Of LandUseSubbasinOverlayRecord)
         Dim lReclassifyFileName As String = ""
 
         If aLUType = 0 Then
             'usgs giras is the selected land use type
             Logger.Status("Performing overlay for GIRAS landuse")
-            Dim lSuccess As Boolean = CreateLanduseRecordsGIRAS(lSubbasinsSelected, lLucodes, lSubids, lAreas, aSubbasinLayerName, aSubbasinFieldName)
+            Dim lSuccess As Boolean = CreateLanduseRecordsGIRAS(lSubbasinsSelected, lLandUseSubbasinOverlayRecords, aSubbasinLayerName, aSubbasinFieldName)
 
-            If lLucodes.Count = 0 Or Not lSuccess Then
+            If lLandUseSubbasinOverlayRecords.Count = 0 Or Not lSuccess Then
                 'problem occurred, get out
                 Return False
                 Exit Function
@@ -127,7 +124,7 @@ Public Module modModelSetup
         ElseIf aLUType = 1 Or aLUType = 3 Then
             'nlcd grid or other grid is the selected land use type
             Logger.Status("Overlaying Land Use and Subbasins")
-            CreateLanduseRecordsGrid(lSubbasinsSelected, lLucodes, lSubids, lAreas, aSubbasinLayerName, aLandUseThemeName)
+            CreateLanduseRecordsGrid(lSubbasinsSelected, lLandUseSubbasinOverlayRecords, aSubbasinLayerName, aLandUseThemeName)
 
             If aLUType = 1 Then 'nlcd grid
                 If IO.File.Exists(aLandUseClassFile) Then
@@ -151,7 +148,7 @@ Public Module modModelSetup
         ElseIf aLUType = 2 Then
             'other shape
             Logger.Status("Overlaying Land Use and Subbasins")
-            CreateLanduseRecordsShapefile(lSubbasinsSelected, lLucodes, lSubids, lAreas, aSubbasinLayerName, aSubbasinFieldName, aLandUseThemeName, aLandUseFieldName)
+            CreateLanduseRecordsShapefile(lSubbasinsSelected, lLandUseSubbasinOverlayRecords, aSubbasinLayerName, aSubbasinFieldName, aLandUseThemeName, aLandUseFieldName)
 
             lReclassifyFileName = ""
             If aLandUseClassFile <> "<none>" Then
@@ -165,18 +162,22 @@ Public Module modModelSetup
         Dim lFoundLU As Boolean = False
         Dim lInd As Integer
         For Each lLU As Integer In aLUInclude
-            lSub = lSubids(1)
+            lSub = lLandUseSubbasinOverlayRecords(1).SubbasinId
             lInd = 1
-            While lInd <= lSubids.Count
-                If lLucodes(lInd) = lLU Then lFoundLU = True
-                If lSubids(lInd) <> lSub OrElse lInd = lSubids.Count Then
+            While lInd <= lLandUseSubbasinOverlayRecords.Count
+                If lLandUseSubbasinOverlayRecords(lInd).LuCode = lLU Then lFoundLU = True
+                If lLandUseSubbasinOverlayRecords(lInd).SubbasinId <> lSub OrElse lInd = lLandUseSubbasinOverlayRecords.Count Then
                     'new subbasin, if LU not found, need to add it
                     If Not lFoundLU Then
-                        lLucodes.Add(lLU, , lInd)
-                        lSubids.Add(lSub, , lInd)
-                        lAreas.Add(0.001, , lInd)
+                        Dim lRec As New LandUseSubbasinOverlayRecord
+                        lRec.LuCode = lLU
+                        lRec.SubbasinId = lSub
+                        lRec.Area = 0.001
+                        lRec.MeanLatitude = lLandUseSubbasinOverlayRecords(1).MeanLatitude
+                        lRec.MeanElevation = lLandUseSubbasinOverlayRecords(1).MeanElevation
+                        lLandUseSubbasinOverlayRecords.Add(lRec, , lInd)
                         lInd += 1
-                        lSub = lSubids(lInd)
+                        lSub = lLandUseSubbasinOverlayRecords(lInd).SubbasinId
                     End If
                     lFoundLU = False
                 End If
@@ -193,7 +194,7 @@ Public Module modModelSetup
         Dim lChannels As Channels = CreateStreamChannels(lReaches)
 
         'Create LandUses
-        Dim lLandUses As LandUses = CreateLanduses(lSubbasinsSlopes, lLucodes, lSubids, lAreas, lReaches)
+        Dim lLandUses As LandUses = CreateLanduses(lSubbasinsSlopes, lLandUseSubbasinOverlayRecords, lReaches)
 
         'figure out which outlets are in which subbasins
         Dim lOutSubs As New Collection
@@ -217,7 +218,7 @@ Public Module modModelSetup
         'write wsd file
         Logger.Status("Writing WSD file")
         Dim lReclassifyLanduses As LandUses = ReclassifyLandUses(lReclassifyFileName, aGridPervious, lLandUses)
-        WriteWSDFile(lBaseFileName & ".wsd", lReclassifyLanduses)
+        WriteWSDFile(lBaseFileName & ".wsd", lReclassifyLanduses, aSnowOption)
 
         'write rch file 
         Logger.Status("Writing RCH file")
@@ -323,8 +324,8 @@ Public Module modModelSetup
         Return lReaches
     End Function
 
-    Public Function CreateLanduseRecordsGIRAS(ByVal aSubbasinsSelected As atcCollection, ByRef aLucode As Collection, _
-                                              ByRef aSubid As Collection, ByRef aArea As Collection, _
+    Public Function CreateLanduseRecordsGIRAS(ByVal aSubbasinsSelected As atcCollection, _
+                                              ByRef aLandUseSubbasinOverlayRecords As Collection, _
                                               ByVal aSubbasinThemeName As String, ByVal aSubbasinFieldName As String) As Boolean
 
         'perform overlay for GIRAS 
@@ -391,24 +392,37 @@ Public Module modModelSetup
             lFirst = False
         Next
 
+        GisUtil.AddCentroidXYtoShapefile(lLandUsePathName & "\overlay.shp")
+
         'compile areas, slopes and lengths
         Logger.Status("Compiling Overlay Results")
 
         Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
         For i As Integer = 1 To lTable.NumRecords
             lTable.CurrentRecord = i
-            aLucode.Add(lTable.Value(1))
-            aSubid.Add(lTable.Value(2))
-            aArea.Add(CDbl(lTable.Value(3)))
+            Dim lRec As New LandUseSubbasinOverlayRecord
+            lRec.LuCode = lTable.Value(1)
+            lRec.SubbasinId = lTable.Value(2)
+            lRec.Area = CDbl(lTable.Value(3))
+
+            'lRec.MeanElevation =
+            Dim lX As Double = CDbl(lTable.Value(4))
+            Dim lY As Double = CDbl(lTable.Value(5))
+            Dim lInputProjection As String = GisUtil.ProjectProjection
+            Dim lOutputProjection As String = "+proj=longlat +datum=NAD83"
+            GisUtil.ProjectPoint(lX, lY, linputprojection, lOutputProjection)
+            lRec.MeanLatitude = lY
+
+            aLandUseSubbasinOverlayRecords.Add(lRec)
         Next i
 
         Return True
     End Function
 
-    Public Sub CreateLanduseRecordsShapefile(ByVal aSubbasinsSelected As atcCollection, ByRef aLucode As Collection, _
-                                              ByRef aSubid As Collection, ByRef aArea As Collection, _
-                                              ByVal aSubbasinThemeName As String, ByVal aSubbasinFieldName As String, _
-                                              ByVal aLandUseThemeName As String, ByVal aLandUseFieldName As String)
+    Public Sub CreateLanduseRecordsShapefile(ByVal aSubbasinsSelected As atcCollection, _
+                                             ByRef aLandUseSubbasinOverlayRecords As Collection, _
+                                             ByVal aSubbasinThemeName As String, ByVal aSubbasinFieldName As String, _
+                                             ByVal aLandUseThemeName As String, ByVal aLandUseFieldName As String)
 
         'perform overlay for other shapefiles (not GIRAS) 
 
@@ -421,21 +435,34 @@ Public Module modModelSetup
         GisUtil.Overlay(aLandUseThemeName, aLandUseFieldName, aSubbasinThemeName, aSubbasinFieldName, _
                         lLandUsePathName & "\overlay.shp", True)
 
+        GisUtil.AddCentroidXYtoShapefile(lLandUsePathName & "\overlay.shp")
+
         'compile areas and slopes
         Logger.Status("Compiling Overlay Results")
 
         Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
         For i As Integer = 1 To lTable.NumRecords
             lTable.CurrentRecord = i
-            aLucode.Add(lTable.Value(1))
-            aSubid.Add(lTable.Value(2))
-            aArea.Add(CDbl(lTable.Value(3)))
+            Dim lRec As New LandUseSubbasinOverlayRecord
+            lRec.LuCode = lTable.Value(1)
+            lRec.SubbasinId = lTable.Value(2)
+            lRec.Area = CDbl(lTable.Value(3))
+
+            'lRec.MeanElevation =
+            Dim lX As Double = CDbl(lTable.Value(4))
+            Dim lY As Double = CDbl(lTable.Value(5))
+            Dim lInputProjection As String = GisUtil.ProjectProjection
+            Dim lOutputProjection As String = "+proj=longlat +datum=NAD83"
+            GisUtil.ProjectPoint(lX, lY, lInputProjection, lOutputProjection)
+            lRec.MeanLatitude = lY
+
+            aLandUseSubbasinOverlayRecords.Add(lRec)
         Next i
     End Sub
 
-    Public Sub CreateLanduseRecordsGrid(ByVal aSubbasinsSelected As atcCollection, ByRef aLucode As Collection, _
-                                         ByRef aSubid As Collection, ByRef aArea As Collection, _
-                                         ByVal aSubbasinThemeName As String, ByVal aLandUseThemeName As String)
+    Public Sub CreateLanduseRecordsGrid(ByVal aSubbasinsSelected As atcCollection, _
+                                        ByRef aLandUseSubbasinOverlayRecords As Collection, _
+                                        ByVal aSubbasinThemeName As String, ByVal aLandUseThemeName As String)
 
         'perform overlay for land use grid
         Dim lSubbasinLayerIndex As Long = GisUtil.LayerIndex(aSubbasinThemeName)
@@ -448,16 +475,21 @@ Public Module modModelSetup
 
             Dim k As Integer = Convert.ToInt32(GisUtil.GridLayerMaximum(lLanduseLayerIndex))
             Dim lAreaLS(k, GisUtil.NumFeatures(lSubbasinLayerIndex)) As Double
-            GisUtil.TabulateAreas(lLanduseLayerIndex, lSubbasinLayerIndex, lAreaLS)
+            Dim lMeanLatLS(k, GisUtil.NumFeatures(lSubbasinLayerIndex)) As Double
+            GisUtil.TabulateAreas(lLanduseLayerIndex, lSubbasinLayerIndex, lAreaLS, lMeanLatLS)
 
             For Each lShapeindex As String In aSubbasinsSelected.Keys
                 'loop thru each selected subbasin (or all if none selected)
                 Dim lSubid As String = aSubbasinsSelected.ItemByKey(CInt(lShapeindex)).ToString
                 For i As Integer = 1 To Convert.ToInt32(GisUtil.GridLayerMaximum(lLanduseLayerIndex))
                     If lAreaLS(i, lShapeindex) > 0 Then
-                        aLucode.Add(i)
-                        aArea.Add(lAreaLS(i, lShapeindex))
-                        aSubid.Add(lSubid)
+                        Dim lRec As New LandUseSubbasinOverlayRecord
+                        lRec.LuCode = i
+                        lRec.SubbasinId = lSubid
+                        lRec.Area = lAreaLS(i, lShapeindex)
+                        'lRec.MeanElevation =
+                        lRec.MeanLatitude = lMeanLatLS(i, lShapeindex)
+                        aLandUseSubbasinOverlayRecords.Add(lRec)
                     End If
                 Next i
             Next
@@ -502,22 +534,25 @@ Public Module modModelSetup
         Return lChannels
     End Function
 
-    Public Function CreateLanduses(ByVal aSubbasinsSlopes As atcCollection, ByVal aLucodes As Collection, _
-                                    ByVal aSubids As Collection, ByVal aAreas As Collection, ByVal aReaches As Object) As Object
+    Public Function CreateLanduses(ByVal aSubbasinsSlopes As atcCollection, _
+                                   ByVal aLandUseSubbasinOverlayRecords As Collection, ByVal aReaches As Object) As Object
 
         Dim lLandUses As New LandUses
-        For lIndex As Integer = 1 To aLucodes.Count
+        For lIndex As Integer = 1 To aLandUseSubbasinOverlayRecords.Count
             Dim lLandUse As New LandUse
             With lLandUse
-                .Code = aLucodes(lIndex)
-                .ModelID = aSubids(lIndex)
-                .Area = aAreas(lIndex)
-                .Slope = aSubbasinsSlopes.ItemByKey(CInt(aSubids(lIndex)))
+                Dim lRec As LandUseSubbasinOverlayRecord = aLandUseSubbasinOverlayRecords(lIndex)
+                .Code = lRec.LuCode
+                .ModelID = lRec.SubbasinId
+                .Area = lRec.Area
+                .Slope = aSubbasinsSlopes.ItemByKey(CInt(lRec.SubbasinId))
                 .Description = .Code
+                .MeanElevation = lRec.MeanElevation
+                .MeanLatitude = lRec.MeanLatitude
                 '.Distance()
                 '.ImperviousFraction()
                 For Each lReach As Reach In aReaches
-                    If lReach.Id = aSubids(lIndex) Then
+                    If lReach.Id = lRec.SubbasinId Then
                         .Reach = lReach
                         Exit For
                     End If
@@ -527,7 +562,16 @@ Public Module modModelSetup
             Dim lExistIndex As Integer = lLandUses.IndexOf(lLandUse)
             If Not lLandUse.Reach Is Nothing Then
                 If lLandUses.Contains(lLandUse.Description & ":" & lLandUse.Reach.Id) Then  'already have, add area
+                    'compute area-weighted mean elevation and mean latitude 
+                    Dim lArea As Double = lLandUses.Item(lLandUse.Description & ":" & lLandUse.Reach.Id).Area
+                    Dim lElev As Single = lLandUses.Item(lLandUse.Description & ":" & lLandUse.Reach.Id).MeanElevation
+                    Dim lLat As Single = lLandUses.Item(lLandUse.Description & ":" & lLandUse.Reach.Id).MeanLatitude
+                    Dim lWeightedElevation As Single = ((lArea * lElev) + (lLandUse.Area * lLandUse.MeanElevation)) / (lArea + lLandUse.Area)
+                    Dim lWeightedLatitude As Single = ((lArea * lLat) + (lLandUse.Area * lLandUse.MeanLatitude)) / (lArea + lLandUse.Area)
+                    'now add area
                     lLandUses.Item(lLandUse.Description & ":" & lLandUse.Reach.Id).Area += lLandUse.Area
+                    lLandUses.Item(lLandUse.Description & ":" & lLandUse.Reach.Id).MeanElevation = lWeightedElevation
+                    lLandUses.Item(lLandUse.Description & ":" & lLandUse.Reach.Id).MeanLatitude = lWeightedLatitude
                 Else 'new
                     lLandUses.Add(lLandUse)
                 End If
@@ -1131,6 +1175,8 @@ Public Module modModelSetup
 
         Dim lPerArea(lUniqueSubids.Count, lUniqueLugroups.Count) As Double
         Dim lImpArea(lUniqueSubids.Count, lUniqueLugroups.Count) As Double
+        Dim lMeanElevation(lUniqueSubids.Count, lUniqueLugroups.Count) As Double
+        Dim lMeanLatitude(lUniqueSubids.Count, lUniqueLugroups.Count) As Single
         Dim lLength(lUniqueSubids.Count) As Double
         Dim lSlope(lUniqueSubids.Count) As Single
 
@@ -1170,10 +1216,17 @@ Public Module modModelSetup
                     Next j
 
                     With lLandUse
-                        lPerArea(spos, lpos) += (.Area * (100 - lPercentImperv) / 100)
-                        lImpArea(spos, lpos) += (.Area * lPercentImperv / 100)
                         lLength(spos) = 0.0
                         lSlope(spos) = .Slope / 100.0
+                        'compute area-weighted mean elevation and mean latitude 
+                        Dim lArea As Double = lPerArea(spos, lpos) + lImpArea(spos, lpos)
+                        Dim lElev As Single = lMeanElevation(spos, lpos)
+                        Dim lLat As Single = lMeanLatitude(spos, lpos)
+                        lMeanElevation(spos, lpos) = ((lArea * lElev) + (lLandUse.Area * lLandUse.MeanElevation)) / (lArea + lLandUse.Area)
+                        lMeanLatitude(spos, lpos) = ((lArea * lLat) + (lLandUse.Area * lLandUse.MeanLatitude)) / (lArea + lLandUse.Area)
+                        'now update area terms
+                        lPerArea(spos, lpos) += (.Area * (100 - lPercentImperv) / 100)
+                        lImpArea(spos, lpos) += (.Area * lPercentImperv / 100)
                     End With
                 End If
             Next lLandUse
@@ -1255,10 +1308,17 @@ Public Module modModelSetup
 
                                 If lpos > -1 Then
                                     With lLandUse
-                                        lPerArea(spos, lpos) += (.Area * lMultiplier * (100 - lPercentImperv) / 100)
-                                        lImpArea(spos, lpos) += (.Area * lMultiplier * lPercentImperv / 100)
                                         lLength(spos) = 0.0 'were not computing lsur since winhspf does that
                                         lSlope(spos) = .Slope / 100.0
+                                        'compute area-weighted mean elevation and mean latitude 
+                                        Dim lArea As Double = lPerArea(spos, lpos) + lImpArea(spos, lpos)
+                                        Dim lElev As Single = lMeanElevation(spos, lpos)
+                                        Dim lLat As Single = lMeanLatitude(spos, lpos)
+                                        lMeanElevation(spos, lpos) = ((lArea * lElev) + (lLandUse.Area * lLandUse.MeanElevation)) / (lArea + lLandUse.Area)
+                                        lMeanLatitude(spos, lpos) = ((lArea * lLat) + (lLandUse.Area * lLandUse.MeanLatitude)) / (lArea + lLandUse.Area)
+                                        'now update area terms
+                                        lPerArea(spos, lpos) += (.Area * lMultiplier * (100 - lPercentImperv) / 100)
+                                        lImpArea(spos, lpos) += (.Area * lMultiplier * lPercentImperv / 100)
                                     End With
                                 End If
                             End If
@@ -1288,6 +1348,8 @@ Public Module modModelSetup
                             End If
                         Next
                         .Type = "COMPOSITE"
+                        .MeanElevation = lMeanElevation(spos, lpos)
+                        .MeanLatitude = lMeanLatitude(spos, lpos)
                     End With
                     lReclassifyLandUses.Add(lLandUse)
                 End If
@@ -1298,31 +1360,59 @@ Public Module modModelSetup
     End Function
 
     Public Sub WriteWSDFile(ByVal aWsdFileName As String, _
-                            ByVal aLandUses As Object)
+                            ByVal aLandUses As Object, _
+                            Optional ByVal aSnowOption As Integer = 0)
 
         Dim lSB As New StringBuilder
-        lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," & _
-                       """Area""" & "," & """Slope""" & "," & """Distance""")
+        If aSnowOption = 0 Then
+            lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," & _
+                           """Area""" & "," & """Slope""" & "," & """Distance""")
+        Else
+            lSB.AppendLine("""LU Name""" & "," & """Type (1=Impervious, 2=Pervious)""" & "," & """Watershd-ID""" & "," & _
+                           """Area""" & "," & """Slope""" & "," & """Distance""" & "," & """MeanLatitude""" & "," & """MeanElevation""")
+        End If
         For Each lLandUse As LandUse In aLandUses
             Dim lType As String = "2"
             Dim lArea As Double = lLandUse.Area * (1 - lLandUse.ImperviousFraction) / 4046.8564
             If lArea > 0 Then 'or CInt(lArea)
-                lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
-                               lType & "     " & _
-                               lLandUse.ModelID & "     " & _
-                               Format(lArea, "0.0") & "     " & _
-                               Format(lLandUse.Slope, "0.000000") & "     " & _
-                               Format(lLandUse.Distance, "0.0000"))
+                If aSnowOption = 0 Then
+                    lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
+                                   lType & "     " & _
+                                   lLandUse.ModelID & "     " & _
+                                   Format(lArea, "0.0") & "     " & _
+                                   Format(lLandUse.Slope, "0.000000") & "     " & _
+                                   Format(lLandUse.Distance, "0.0000"))
+                Else
+                    lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
+                                   lType & "     " & _
+                                   lLandUse.ModelID & "     " & _
+                                   Format(lArea, "0.0") & "     " & _
+                                   Format(lLandUse.Slope, "0.000000") & "     " & _
+                                   Format(lLandUse.Distance, "0.0000") & "     " & _
+                                   Format(lLandUse.MeanLatitude, "0.0000") & "     " & _
+                                   Format(lLandUse.MeanElevation, "0.00"))
+                End If
             End If
             lType = "1"
             lArea = lLandUse.Area * lLandUse.ImperviousFraction / 4046.8564
             If lArea > 0 Then 'or CInt(lArea)
-                lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
-                               lType & "     " & _
-                               lLandUse.ModelID & "     " & _
-                               Format(lArea, "0.0") & "     " & _
-                               Format(lLandUse.Slope, "0.000000") & "     " & _
-                               Format(lLandUse.Distance, "0.0000"))
+                If aSnowOption = 0 Then
+                    lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
+                                   lType & "     " & _
+                                   lLandUse.ModelID & "     " & _
+                                   Format(lArea, "0.0") & "     " & _
+                                   Format(lLandUse.Slope, "0.000000") & "     " & _
+                                   Format(lLandUse.Distance, "0.0000"))
+                Else
+                    lSB.AppendLine(Chr(34) & lLandUse.Description & Chr(34) & "     " & _
+                                   lType & "     " & _
+                                   lLandUse.ModelID & "     " & _
+                                   Format(lArea, "0.0") & "     " & _
+                                   Format(lLandUse.Slope, "0.000000") & "     " & _
+                                   Format(lLandUse.Distance, "0.0000") & "     " & _
+                                   Format(lLandUse.MeanLatitude, "0.0000") & "     " & _
+                                   Format(lLandUse.MeanElevation, "0.00"))
+                End If
             End If
         Next lLandUse
         SaveFileString(aWsdFileName, lSB.ToString)
@@ -1711,3 +1801,11 @@ Public Module modModelSetup
         SaveFileString(aMapFileName, lSB.ToString)
     End Sub
 End Module
+
+Friend Class LandUseSubbasinOverlayRecord
+    Friend LuCode As String          'land use code
+    Friend SubbasinId As String      'subbasin id 
+    Friend Area As Double            'area of this land use within this subbasin
+    Friend MeanElevation As Single   'mean elevation of this land use within this subbasin (used for snow)
+    Friend MeanLatitude As Single    'mean latitude of this land use within this subbasin  (used for snow)
+End Class
