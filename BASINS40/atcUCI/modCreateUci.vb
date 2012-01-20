@@ -156,9 +156,9 @@ Module modCreateUci
                             lTable.Parms("SNOPFG").Value = aSnowOption - 1
                             lTable = lOperation.Tables.Item("SNOW-PARM1")
                             lTable.Parms("LAT").Value = SignificantDigits(CompositeLatitude(lLandUse.ModelID, pWatershed.LandUses), 4)
-                            lTable.Parms("MELEV").Value = CompositeElevation(lLandUse.ModelID, pWatershed.LandUses)
+                            lTable.Parms("MELEV").Value = SignificantDigits(CompositeElevation(lLandUse.ModelID, pWatershed.LandUses), 3)
                             lTable = lOperation.Tables.Item("ATEMP-DAT")
-                            lTable.Parms("ELDAT").Value = CompositeElevation(lLandUse.ModelID, pWatershed.LandUses)
+                            lTable.Parms("ELDAT").Value = SignificantDigits(CompositeElevation(lLandUse.ModelID, pWatershed.LandUses), 3)
                         End If
                         Exit For
                     End If
@@ -189,9 +189,9 @@ Module modCreateUci
                             lTable.Parms("SNOPFG").Value = aSnowOption - 1
                             lTable = lOperation.Tables.Item("SNOW-PARM1")
                             lTable.Parms("LAT").Value = SignificantDigits(CompositeLatitude(lLandUse.ModelID, pWatershed.LandUses), 4)
-                            lTable.Parms("MELEV").Value = CompositeElevation(lLandUse.ModelID, pWatershed.LandUses)
+                            lTable.Parms("MELEV").Value = SignificantDigits(CompositeElevation(lLandUse.ModelID, pWatershed.LandUses), 3)
                             lTable = lOperation.Tables.Item("ATEMP-DAT")
-                            lTable.Parms("ELDAT").Value = CompositeElevation(lLandUse.ModelID, pWatershed.LandUses)
+                            lTable.Parms("ELDAT").Value = SignificantDigits(CompositeElevation(lLandUse.ModelID, pWatershed.LandUses), 3)
                         End If
                         Exit For
                     End If
