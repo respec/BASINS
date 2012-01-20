@@ -107,8 +107,10 @@ Module modBaseflowUtil
             Next
         End With
 
+        Dim lLocation As String = aTs.Attributes.GetValue("Location", "Unknown")
+        Dim lStaNam As String = aTs.Attributes.GetValue("STANAM", "Unknown")
         Dim lTitleLine1 As String = "Groundwater Toolbox daily output for hydrograph separation."
-        Dim lTitleLine2 As String = "Station: " & aTs.Attributes.GetValue("Location") & " " & aTs.Attributes.GetValue("STANAM").ToString.Replace(",", " ")
+        Dim lTitleLine2 As String = "Station: " & lLocation & " " & lStaNam.Replace(",", " ")
         Dim lTitleLine3 As String = "Drainage area: " & DoubleToString(lDA, , "0.0") & " square miles"
         Dim lTitleLine4 As String = "(CFS: cubic feet per second; IN: flow per drainage area (inches); BFP: Base-Flow Percentage (ratio of base-flow to streamflow multiplied by 100)"
 
@@ -183,7 +185,7 @@ Module modBaseflowUtil
         lTableToReport.Clear()
 
         lTitleLine1 = "Groundwater Toolbox daily output for hydrograph separation."
-        lTitleLine2 = "Station: " & aTs.Attributes.GetValue("Location") & " " & aTs.Attributes.GetValue("STANAM").ToString.Replace(",", " ")
+        lTitleLine2 = "Station: " & lLocation & " " & lStaNam.Replace(",", " ")
         lTitleLine3 = "Drainage area: " & DoubleToString(lDA, , "0.0") & " square miles"
         lTitleLine4 = "Period of analysis: " & DumpDate(lStart) & " to " & DumpDate(lEnd)
         Dim lTitleLine5 As String = "Percent exceedence: Percentage of time flow was equaled or exceeded"
