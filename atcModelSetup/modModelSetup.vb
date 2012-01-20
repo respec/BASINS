@@ -50,7 +50,9 @@ Public Module modModelSetup
                               ByVal aPSRCustom As Boolean, _
                               ByVal aPSRCustomFile As String, _
                               ByVal aPSRCalculate As Boolean, _
-                              Optional ByVal aSnowOption As Integer = 0) As Boolean
+                              Optional ByVal aSnowOption As Integer = 0, _
+                              Optional ByVal aElevationFileName As String = "", _
+                              Optional ByVal aElevationUnits As String = "") As Boolean
 
         Logger.Status("Preparing to process")
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
@@ -104,7 +106,8 @@ Public Module modModelSetup
         If aLUType = 0 Then
             'usgs giras is the selected land use type
             Logger.Status("Performing overlay for GIRAS landuse")
-            Dim lSuccess As Boolean = CreateLanduseRecordsGIRAS(lSubbasinsSelected, lLandUseSubbasinOverlayRecords, aSubbasinLayerName, aSubbasinFieldName)
+            Dim lSuccess As Boolean = CreateLanduseRecordsGIRAS(lSubbasinsSelected, lLandUseSubbasinOverlayRecords, aSubbasinLayerName, aSubbasinFieldName, _
+                                                                aSnowOption, aElevationFileName, aElevationUnits)
 
             If lLandUseSubbasinOverlayRecords.Count = 0 Or Not lSuccess Then
                 'problem occurred, get out
@@ -124,7 +127,8 @@ Public Module modModelSetup
         ElseIf aLUType = 1 Or aLUType = 3 Then
             'nlcd grid or other grid is the selected land use type
             Logger.Status("Overlaying Land Use and Subbasins")
-            CreateLanduseRecordsGrid(lSubbasinsSelected, lLandUseSubbasinOverlayRecords, aSubbasinLayerName, aLandUseThemeName)
+            CreateLanduseRecordsGrid(lSubbasinsSelected, lLandUseSubbasinOverlayRecords, aSubbasinLayerName, aLandUseThemeName, _
+                                     aSnowOption, aElevationFileName, aElevationUnits)
 
             If aLUType = 1 Then 'nlcd grid
                 If IO.File.Exists(aLandUseClassFile) Then
@@ -148,7 +152,8 @@ Public Module modModelSetup
         ElseIf aLUType = 2 Then
             'other shape
             Logger.Status("Overlaying Land Use and Subbasins")
-            CreateLanduseRecordsShapefile(lSubbasinsSelected, lLandUseSubbasinOverlayRecords, aSubbasinLayerName, aSubbasinFieldName, aLandUseThemeName, aLandUseFieldName)
+            CreateLanduseRecordsShapefile(lSubbasinsSelected, lLandUseSubbasinOverlayRecords, aSubbasinLayerName, aSubbasinFieldName, aLandUseThemeName, aLandUseFieldName, _
+                                          aSnowOption, aElevationFileName, aElevationUnits)
 
             lReclassifyFileName = ""
             If aLandUseClassFile <> "<none>" Then
@@ -326,7 +331,10 @@ Public Module modModelSetup
 
     Public Function CreateLanduseRecordsGIRAS(ByVal aSubbasinsSelected As atcCollection, _
                                               ByRef aLandUseSubbasinOverlayRecords As Collection, _
-                                              ByVal aSubbasinThemeName As String, ByVal aSubbasinFieldName As String) As Boolean
+                                              ByVal aSubbasinThemeName As String, ByVal aSubbasinFieldName As String, _
+                                              Optional ByVal aSnowOption As Integer = 0, _
+                                              Optional ByVal aElevationFileName As String = "", _
+                                              Optional ByVal aElevationUnits As String = "") As Boolean
 
         'perform overlay for GIRAS 
         Dim lSubbasinLayerIndex As Long = GisUtil.LayerIndex(aSubbasinThemeName)
@@ -392,12 +400,15 @@ Public Module modModelSetup
             lFirst = False
         Next
 
-        GisUtil.AddCentroidXYtoShapefile(lLandUsePathName & "\overlay.shp")
+        If aSnowOption > 0 Then
+            GisUtil.AddCentroidXYtoShapefile(lLandUsePathName & "\overlay.shp")
+        End If
 
         'compile areas, slopes and lengths
         Logger.Status("Compiling Overlay Results")
 
         Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
+        Dim lMeanElev As Double
         For i As Integer = 1 To lTable.NumRecords
             lTable.CurrentRecord = i
             Dim lRec As New LandUseSubbasinOverlayRecord
@@ -405,13 +416,24 @@ Public Module modModelSetup
             lRec.SubbasinId = lTable.Value(2)
             lRec.Area = CDbl(lTable.Value(3))
 
-            'lRec.MeanElevation =
-            Dim lX As Double = CDbl(lTable.Value(4))
-            Dim lY As Double = CDbl(lTable.Value(5))
-            Dim lInputProjection As String = GisUtil.ProjectProjection
-            Dim lOutputProjection As String = "+proj=longlat +datum=NAD83"
-            GisUtil.ProjectPoint(lX, lY, linputprojection, lOutputProjection)
-            lRec.MeanLatitude = lY
+            If aSnowOption > 0 Then
+                Dim lX As Double = CDbl(lTable.Value(4))
+                Dim lY As Double = CDbl(lTable.Value(5))
+                Dim lInputProjection As String = GisUtil.ProjectProjection
+                Dim lOutputProjection As String = "+proj=longlat +datum=NAD83"
+                GisUtil.ProjectPoint(lX, lY, lInputProjection, lOutputProjection)
+                lRec.MeanLatitude = lY
+                If aElevationFileName.Length > 0 Then
+                    GisUtil.GridMeanInPolygon(aElevationFileName, lLandUsePathName & "\overlay.shp", i - 1, lMeanElev)
+                    If aElevationUnits = "Meters" Then
+                        lRec.MeanElevation = lMeanElev * 3.281
+                    ElseIf aElevationUnits = "Centimeters" Then
+                        lRec.MeanElevation = lMeanElev * 3.281 / 100
+                    Else
+                        lRec.MeanElevation = lMeanElev
+                    End If
+                End If
+            End If
 
             aLandUseSubbasinOverlayRecords.Add(lRec)
         Next i
@@ -422,7 +444,10 @@ Public Module modModelSetup
     Public Sub CreateLanduseRecordsShapefile(ByVal aSubbasinsSelected As atcCollection, _
                                              ByRef aLandUseSubbasinOverlayRecords As Collection, _
                                              ByVal aSubbasinThemeName As String, ByVal aSubbasinFieldName As String, _
-                                             ByVal aLandUseThemeName As String, ByVal aLandUseFieldName As String)
+                                             ByVal aLandUseThemeName As String, ByVal aLandUseFieldName As String, _
+                                             Optional ByVal aSnowOption As Integer = 0, _
+                                             Optional ByVal aElevationFileName As String = "", _
+                                             Optional ByVal aElevationUnits As String = "")
 
         'perform overlay for other shapefiles (not GIRAS) 
 
@@ -435,12 +460,15 @@ Public Module modModelSetup
         GisUtil.Overlay(aLandUseThemeName, aLandUseFieldName, aSubbasinThemeName, aSubbasinFieldName, _
                         lLandUsePathName & "\overlay.shp", True)
 
-        GisUtil.AddCentroidXYtoShapefile(lLandUsePathName & "\overlay.shp")
+        If aSnowOption > 0 Then
+            GisUtil.AddCentroidXYtoShapefile(lLandUsePathName & "\overlay.shp")
+        End If
 
         'compile areas and slopes
         Logger.Status("Compiling Overlay Results")
 
         Dim lTable As IatcTable = atcUtility.atcTableOpener.OpenAnyTable(lLandUsePathName & "\overlay.dbf")
+        Dim lMeanElev As Double
         For i As Integer = 1 To lTable.NumRecords
             lTable.CurrentRecord = i
             Dim lRec As New LandUseSubbasinOverlayRecord
@@ -448,13 +476,24 @@ Public Module modModelSetup
             lRec.SubbasinId = lTable.Value(2)
             lRec.Area = CDbl(lTable.Value(3))
 
-            'lRec.MeanElevation =
-            Dim lX As Double = CDbl(lTable.Value(4))
-            Dim lY As Double = CDbl(lTable.Value(5))
-            Dim lInputProjection As String = GisUtil.ProjectProjection
-            Dim lOutputProjection As String = "+proj=longlat +datum=NAD83"
-            GisUtil.ProjectPoint(lX, lY, lInputProjection, lOutputProjection)
-            lRec.MeanLatitude = lY
+            If aSnowOption > 0 Then
+                Dim lX As Double = CDbl(lTable.Value(4))
+                Dim lY As Double = CDbl(lTable.Value(5))
+                Dim lInputProjection As String = GisUtil.ProjectProjection
+                Dim lOutputProjection As String = "+proj=longlat +datum=NAD83"
+                GisUtil.ProjectPoint(lX, lY, lInputProjection, lOutputProjection)
+                lRec.MeanLatitude = lY
+                If aElevationFileName.Length > 0 Then
+                    GisUtil.GridMeanInPolygon(aElevationFileName, lLandUsePathName & "\overlay.shp", i - 1, lMeanElev)
+                    If aElevationUnits = "Meters" Then
+                        lRec.MeanElevation = lMeanElev * 3.281
+                    ElseIf aElevationUnits = "Centimeters" Then
+                        lRec.MeanElevation = lMeanElev * 3.281 / 100
+                    Else
+                        lRec.MeanElevation = lMeanElev
+                    End If
+                End If
+            End If
 
             aLandUseSubbasinOverlayRecords.Add(lRec)
         Next i
@@ -462,7 +501,10 @@ Public Module modModelSetup
 
     Public Sub CreateLanduseRecordsGrid(ByVal aSubbasinsSelected As atcCollection, _
                                         ByRef aLandUseSubbasinOverlayRecords As Collection, _
-                                        ByVal aSubbasinThemeName As String, ByVal aLandUseThemeName As String)
+                                        ByVal aSubbasinThemeName As String, ByVal aLandUseThemeName As String, _
+                                        Optional ByVal aSnowOption As Integer = 0, _
+                                        Optional ByVal aElevationFileName As String = "", _
+                                        Optional ByVal aElevationUnits As String = "")
 
         'perform overlay for land use grid
         Dim lSubbasinLayerIndex As Long = GisUtil.LayerIndex(aSubbasinThemeName)
@@ -476,7 +518,13 @@ Public Module modModelSetup
             Dim k As Integer = Convert.ToInt32(GisUtil.GridLayerMaximum(lLanduseLayerIndex))
             Dim lAreaLS(k, GisUtil.NumFeatures(lSubbasinLayerIndex)) As Double
             Dim lMeanLatLS(k, GisUtil.NumFeatures(lSubbasinLayerIndex)) As Double
-            GisUtil.TabulateAreas(lLanduseLayerIndex, lSubbasinLayerIndex, lAreaLS, lMeanLatLS)
+            Dim lMeanElevLS(k, GisUtil.NumFeatures(lSubbasinLayerIndex)) As Double
+            If aSnowOption = 0 Then
+                GisUtil.TabulateAreas(lLanduseLayerIndex, lSubbasinLayerIndex, lAreaLS)
+            Else
+                'use extended version to calc mean latitude and elevation for each land use / subbasin combination
+                GisUtil.TabulateAreas(lLanduseLayerIndex, lSubbasinLayerIndex, lAreaLS, lMeanLatLS, lMeanElevLS, aElevationFileName)
+            End If
 
             For Each lShapeindex As String In aSubbasinsSelected.Keys
                 'loop thru each selected subbasin (or all if none selected)
@@ -487,8 +535,18 @@ Public Module modModelSetup
                         lRec.LuCode = i
                         lRec.SubbasinId = lSubid
                         lRec.Area = lAreaLS(i, lShapeindex)
-                        'lRec.MeanElevation =
                         lRec.MeanLatitude = lMeanLatLS(i, lShapeindex)
+                        If aSnowOption > 0 Then
+                            If aElevationFileName.Length > 0 Then
+                                If aElevationUnits = "Meters" Then
+                                    lRec.MeanElevation = lMeanElevLS(i, lShapeindex) * 3.281
+                                ElseIf aElevationUnits = "Centimeters" Then
+                                    lRec.MeanElevation = lMeanElevLS(i, lShapeindex) * 3.281 / 100
+                                Else
+                                    lRec.MeanElevation = lMeanElevLS(i, lShapeindex)
+                                End If
+                            End If
+                        End If
                         aLandUseSubbasinOverlayRecords.Add(lRec)
                     End If
                 Next i

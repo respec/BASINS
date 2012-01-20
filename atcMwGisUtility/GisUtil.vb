@@ -1298,11 +1298,24 @@ Public Class GisUtil
     Public Shared Sub TabulateAreas(ByVal aGridLayerIndex As Integer, _
                                     ByVal aPolygonLayerIndex As Integer, _
                                     ByRef aAreaGridPoly(,) As Double, _
-                                    Optional ByRef aMeanLatGridPoly(,) As Double = Nothing)
+                                    Optional ByRef aMeanLatGridPoly(,) As Double = Nothing, _
+                                    Optional ByRef aMeanElevGridPoly(,) As Double = Nothing, _
+                                    Optional ByVal aElevationFileName As String = "")
+        'the last 3 args are optional extensions that allow calculation of mean latitude and mean elevation 
+        'for each land use and subbasin combination 
+
         'set input grid
         Dim lInputGrid As MapWinGIS.Grid = GridFromIndex(aGridLayerIndex)
         'set input polygon layer
         Dim lPolygonSf As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aPolygonLayerIndex)
+
+        'if we want to compute mean elevation at the same time, need to open the elev grid
+        Dim lElevGrid As New MapWinGIS.Grid
+        If aElevationFileName.Length > 0 Then
+            lElevGrid.Open(aElevationFileName)
+        Else
+            lElevGrid = Nothing
+        End If
 
         Dim lMinX As Double
         Dim lMaxX As Double
@@ -1369,7 +1382,27 @@ Public Class GisUtil
         'following 3 variables are used in determining mean latitude of each landuse/subbasin combination
         Dim lXLng As Double
         Dim lYLat As Double
-        Dim lCountMeanLatLS(aMeanLatGridPoly.GetUpperBound(0), aMeanLatGridPoly.GetUpperBound(1)) As Double
+        Dim lCountMeanLatLS(1, 1) As Integer
+        'following 7 variables are used in determining mean elevation of each landuse/subbasin combination
+        Dim lElevValue As Integer = 0
+        Dim lCountMeanElevLS(1, 1) As Integer
+        Dim lXElev As Double
+        Dim lYElev As Double
+        Dim lColElev As Integer
+        Dim lRowElev As Integer
+        Dim lElevEndingRow As Integer = 0
+        Dim lElevEndingCol As Integer = 0
+        If lElevGrid IsNot Nothing Then
+            lElevEndingRow = lElevGrid.Header.NumberRows
+            lElevEndingCol = lElevGrid.Header.NumberCols
+        End If
+
+        If aMeanLatGridPoly IsNot Nothing Then
+            ReDim lCountMeanLatLS(aMeanLatGridPoly.GetUpperBound(0), aMeanLatGridPoly.GetUpperBound(1))
+        End If
+        If aMeanElevGridPoly IsNot Nothing Then
+            ReDim lCountMeanElevLS(aMeanElevGridPoly.GetUpperBound(0), aMeanElevGridPoly.GetUpperBound(1))
+        End If
 
         If pStatusShow Then Logger.Status("Tabulating Areas...")
         For lRow As Integer = lStartingRow To lEndingRow
@@ -1397,6 +1430,20 @@ Public Class GisUtil
                             'store weighted average mean latitude
                             aMeanLatGridPoly(lGridValue, lInsideId) = (lYLat + (aMeanLatGridPoly(lGridValue, lInsideId) * lCountMeanLatLS(lGridValue, lInsideId))) / (lCountMeanLatLS(lGridValue, lInsideId) + 1)
                             lCountMeanLatLS(lGridValue, lInsideId) += 1
+                        End If
+                    End If
+                    If aMeanElevGridPoly IsNot Nothing AndAlso lElevGrid IsNot Nothing Then
+                        If lGridValue > -1 And lGridValue <= aMeanElevGridPoly.GetUpperBound(0) Then
+                            'find corresponding elevation
+                            lInputGrid.CellToProj(lCol, lRow, lXElev, lYElev)
+                            lElevGrid.ProjToCell(lXElev, lYElev, lColElev, lRowElev)
+                            If lColElev > -1 AndAlso lColElev < lElevEndingCol And _
+                               lRowElev > -1 AndAlso lRowElev < lElevEndingRow Then
+                                lElevValue = lElevGrid.Value(lColElev, lRowElev)
+                                'store weighted average mean elevation
+                                aMeanElevGridPoly(lGridValue, lInsideId) = (lElevValue + (aMeanElevGridPoly(lGridValue, lInsideId) * lCountMeanElevLS(lGridValue, lInsideId))) / (lCountMeanElevLS(lGridValue, lInsideId) + 1)
+                                lCountMeanElevLS(lGridValue, lInsideId) += 1
+                            End If
                         End If
                     End If
                 End If

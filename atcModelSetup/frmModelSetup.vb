@@ -20,6 +20,10 @@ Public Class frmModelSetup
     Friend WithEvents rbnDegree As System.Windows.Forms.RadioButton
     Friend WithEvents chkSnow As System.Windows.Forms.CheckBox
     Friend WithEvents rbnEnergy As System.Windows.Forms.RadioButton
+    Friend WithEvents cboDEM As System.Windows.Forms.ComboBox
+    Friend WithEvents lblGrid As System.Windows.Forms.Label
+    Friend WithEvents cboUnits As System.Windows.Forms.ComboBox
+    Friend WithEvents lblUnits As System.Windows.Forms.Label
     Friend pUniqueModelSegmentNames As atcCollection
 
 #Region " Windows Form Designer generated code "
@@ -121,6 +125,8 @@ Public Class frmModelSetup
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage1 = New System.Windows.Forms.TabPage
         Me.gbxSnow = New System.Windows.Forms.GroupBox
+        Me.cboDEM = New System.Windows.Forms.ComboBox
+        Me.lblGrid = New System.Windows.Forms.Label
         Me.rbnDegree = New System.Windows.Forms.RadioButton
         Me.chkSnow = New System.Windows.Forms.CheckBox
         Me.rbnEnergy = New System.Windows.Forms.RadioButton
@@ -192,6 +198,8 @@ Public Class frmModelSetup
         Me.ofdCustom = New System.Windows.Forms.OpenFileDialog
         Me.ofdClass = New System.Windows.Forms.OpenFileDialog
         Me.ofdMetWDM = New System.Windows.Forms.OpenFileDialog
+        Me.cboUnits = New System.Windows.Forms.ComboBox
+        Me.lblUnits = New System.Windows.Forms.Label
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.gbxSnow.SuspendLayout()
@@ -249,6 +257,10 @@ Public Class frmModelSetup
         Me.gbxSnow.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbxSnow.Controls.Add(Me.cboUnits)
+        Me.gbxSnow.Controls.Add(Me.lblUnits)
+        Me.gbxSnow.Controls.Add(Me.cboDEM)
+        Me.gbxSnow.Controls.Add(Me.lblGrid)
         Me.gbxSnow.Controls.Add(Me.rbnDegree)
         Me.gbxSnow.Controls.Add(Me.chkSnow)
         Me.gbxSnow.Controls.Add(Me.rbnEnergy)
@@ -257,6 +269,28 @@ Public Class frmModelSetup
         Me.gbxSnow.Size = New System.Drawing.Size(496, 106)
         Me.gbxSnow.TabIndex = 13
         Me.gbxSnow.TabStop = False
+        '
+        'cboDEM
+        '
+        Me.cboDEM.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboDEM.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboDEM.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboDEM.Location = New System.Drawing.Point(106, 71)
+        Me.cboDEM.Name = "cboDEM"
+        Me.cboDEM.Size = New System.Drawing.Size(217, 21)
+        Me.cboDEM.TabIndex = 16
+        '
+        'lblGrid
+        '
+        Me.lblGrid.AutoSize = True
+        Me.lblGrid.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblGrid.Location = New System.Drawing.Point(24, 74)
+        Me.lblGrid.Name = "lblGrid"
+        Me.lblGrid.Size = New System.Drawing.Size(76, 13)
+        Me.lblGrid.TabIndex = 15
+        Me.lblGrid.Text = "Elevation Grid:"
+        Me.lblGrid.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'rbnDegree
         '
@@ -986,6 +1020,28 @@ Public Class frmModelSetup
         Me.ofdMetWDM.InitialDirectory = "/BASINS/data/"
         Me.ofdMetWDM.Title = "Select Met WDM File"
         '
+        'cboUnits
+        '
+        Me.cboUnits.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboUnits.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboUnits.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboUnits.Location = New System.Drawing.Point(420, 71)
+        Me.cboUnits.Name = "cboUnits"
+        Me.cboUnits.Size = New System.Drawing.Size(59, 21)
+        Me.cboUnits.TabIndex = 20
+        '
+        'lblUnits
+        '
+        Me.lblUnits.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblUnits.AutoSize = True
+        Me.lblUnits.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblUnits.Location = New System.Drawing.Point(342, 74)
+        Me.lblUnits.Name = "lblUnits"
+        Me.lblUnits.Size = New System.Drawing.Size(72, 13)
+        Me.lblUnits.TabIndex = 19
+        Me.lblUnits.Text = "Vertical Units:"
+        Me.lblUnits.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
         'frmModelSetup
         '
         Me.AcceptButton = Me.cmdOK
@@ -1356,6 +1412,12 @@ Public Class frmModelSetup
                     lSnowOption = 2
                 End If
             End If
+            Dim lElevationLayerName As String = cboDEM.Items(cboDEM.SelectedIndex)
+            Dim lElevationFileName As String = ""
+            If lElevationLayerName <> "<none>" Then
+                lElevationFileName = GisUtil.LayerFileName(lElevationLayerName)
+            End If
+            Dim lElevationUnitsName As String = cboUnits.Items(cboUnits.SelectedIndex)
 
             Dim lStreamLayerName As String = cboStreams.Items(cboStreams.SelectedIndex)
             Dim lStreamFields() As String = {cboStream1.Items(cboStream1.SelectedIndex), _
@@ -1413,7 +1475,7 @@ Public Class frmModelSetup
                              lLanduseFieldName, lLandUseClassFile, _
                              lSubbasinSegmentName, _
                              lPSRCustom, lPSRCustomFile, lPSRCalculate, _
-                             lSnowOption) Then
+                             lSnowOption, lElevationFileName, lElevationUnitsName) Then
                     Me.Dispose()
                     Me.Close()
 
@@ -1438,7 +1500,7 @@ Public Class frmModelSetup
             End If
             EnableControls(True)
             Me.Refresh()
-        End If
+            End If
     End Sub
 
     Private Function SetupAQUATOX(ByVal aOutputPath As String, ByVal aBaseOutputName As String) As Boolean
@@ -1605,13 +1667,18 @@ Public Class frmModelSetup
         cboYear.SelectedIndex = 0
 
         cboOutlets.Items.Add("<none>")
+        cboDEM.Items.Add("<none>")
 
         With AtcGridMet
             .Source = New atcControls.atcGridSource
             .AllowHorizontalScrolling = False
         End With
 
-        For lLayerIndex As Integer = 0 To GisUtil.NumLayers() - 1
+        'fill choices of units
+        cboUnits.Items.Add("Feet")
+        cboUnits.Items.Add("Meters")
+        cboUnits.Items.Add("Centimeters")
+        For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
             Dim lLayerName As String = GisUtil.LayerName(lLayerIndex)
             If GisUtil.LayerType(lLayerIndex) = 3 Then 'PolygonShapefile 
                 cboSubbasins.Items.Add(lLayerName)
@@ -1628,6 +1695,13 @@ Public Class frmModelSetup
                 If lLayerName.ToUpper = "OUTLETS" Then
                     cboOutlets.SelectedIndex = cboOutlets.Items.Count - 1
                 End If
+            ElseIf GisUtil.LayerType(lLayerIndex) = MapWindow.Interfaces.eLayerType.Grid Then  'Grid
+                cboDEM.Items.Add(lLayerName)
+                If GisUtil.LayerFileName(lLayerIndex).IndexOf("\demg\") >= 0 Or GisUtil.LayerFileName(lLayerIndex).IndexOf("\dem\") >= 0 Then
+                    cboDEM.SelectedIndex = cboDEM.Items.Count - 1
+                ElseIf GisUtil.LayerFileName(lLayerIndex).IndexOf("\ned\") >= 0 Then
+                    cboDEM.SelectedIndex = cboDEM.Items.Count - 1
+                End If
             End If
         Next
         If cboSubbasins.Items.Count > 0 And cboSubbasins.SelectedIndex < 0 Then
@@ -1638,6 +1712,9 @@ Public Class frmModelSetup
         End If
         If cboOutlets.Items.Count > 0 And cboOutlets.SelectedIndex < 0 Then
             cboOutlets.SelectedIndex = 0
+        End If
+        If cboDEM.Items.Count > 0 And cboDEM.SelectedIndex < 0 Then
+            cboDEM.SelectedIndex = 0
         End If
 
         tbxName.Text = IO.Path.GetFileNameWithoutExtension(GisUtil.ProjectFileName)
@@ -1746,6 +1823,19 @@ Public Class frmModelSetup
             Else
                 lstMet.Visible = False
                 AtcGridMet.Visible = True
+            End If
+        End If
+    End Sub
+
+    Private Sub cboDEM_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboDEM.SelectedIndexChanged
+        If cboDEM.SelectedIndex > -1 Then
+            'default units 
+            Dim lElevationThemeName As String = cboDEM.Items(cboDEM.SelectedIndex)
+            Dim lElevationLayerIndex As Integer = GisUtil.LayerIndex(lElevationThemeName)
+            If (GisUtil.LayerFileName(lElevationLayerIndex).IndexOf("\ned\") > -1 Or GisUtil.LayerFileName(lElevationLayerIndex).IndexOf("\elev_cm") > -1) Then
+                cboUnits.SelectedIndex = 2
+            Else
+                cboUnits.SelectedIndex = 1
             End If
         End If
     End Sub
