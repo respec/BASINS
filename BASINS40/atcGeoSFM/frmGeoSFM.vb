@@ -230,6 +230,7 @@ Public Class frmGeoSFM
     Friend WithEvents cboRchHydro As System.Windows.Forms.ComboBox
     Friend WithEvents LabelModel As System.Windows.Forms.Label
     Friend WithEvents atxModel As atcControls.atcText
+    Friend WithEvents gbxShapefiles As System.Windows.Forms.GroupBox
     Friend WithEvents tpgMap As System.Windows.Forms.TabPage
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmGeoSFM))
@@ -425,6 +426,7 @@ Public Class frmGeoSFM
         Me.Label44 = New System.Windows.Forms.Label
         Me.Label45 = New System.Windows.Forms.Label
         Me.ComboBox39 = New System.Windows.Forms.ComboBox
+        Me.gbxShapefiles = New System.Windows.Forms.GroupBox
         Me.tabMain.SuspendLayout()
         Me.tpgTerrain.SuspendLayout()
         Me.tpgBasin.SuspendLayout()
@@ -449,11 +451,12 @@ Public Class frmGeoSFM
         Me.gbxMapDates.SuspendLayout()
         Me.gbxMap.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
+        Me.gbxShapefiles.SuspendLayout()
         Me.SuspendLayout()
         '
         'cmdCancel
         '
-        Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdCancel.Location = New System.Drawing.Point(449, 520)
@@ -508,15 +511,12 @@ Public Class frmGeoSFM
         '
         'tpgTerrain
         '
+        Me.tpgTerrain.Controls.Add(Me.gbxShapefiles)
         Me.tpgTerrain.Controls.Add(Me.LabelModel)
         Me.tpgTerrain.Controls.Add(Me.atxModel)
         Me.tpgTerrain.Controls.Add(Me.cmdTerrainNext)
         Me.tpgTerrain.Controls.Add(Me.Label53)
         Me.tpgTerrain.Controls.Add(Me.AtcText1)
-        Me.tpgTerrain.Controls.Add(Me.cboReach)
-        Me.tpgTerrain.Controls.Add(Me.Label52)
-        Me.tpgTerrain.Controls.Add(Me.cboSubbasin)
-        Me.tpgTerrain.Controls.Add(Me.Label50)
         Me.tpgTerrain.Controls.Add(Me.Label51)
         Me.tpgTerrain.Controls.Add(Me.cboDEM)
         Me.tpgTerrain.Location = New System.Drawing.Point(4, 46)
@@ -560,7 +560,7 @@ Public Class frmGeoSFM
         '
         'cmdTerrainNext
         '
-        Me.cmdTerrainNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdTerrainNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdTerrainNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdTerrainNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdTerrainNext.Location = New System.Drawing.Point(555, 341)
@@ -572,7 +572,7 @@ Public Class frmGeoSFM
         'Label53
         '
         Me.Label53.AutoSize = True
-        Me.Label53.Location = New System.Drawing.Point(36, 178)
+        Me.Label53.Location = New System.Drawing.Point(37, 126)
         Me.Label53.Name = "Label53"
         Me.Label53.Size = New System.Drawing.Size(149, 13)
         Me.Label53.TabIndex = 38
@@ -586,7 +586,7 @@ Public Class frmGeoSFM
         Me.AtcText1.HardMax = 9999
         Me.AtcText1.HardMin = 0
         Me.AtcText1.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText1.Location = New System.Drawing.Point(192, 175)
+        Me.AtcText1.Location = New System.Drawing.Point(192, 126)
         Me.AtcText1.MaxWidth = 20
         Me.AtcText1.Name = "AtcText1"
         Me.AtcText1.NumericFormat = "0"
@@ -607,20 +607,20 @@ Public Class frmGeoSFM
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboReach.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboReach.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboReach.Location = New System.Drawing.Point(124, 97)
+        Me.cboReach.Location = New System.Drawing.Point(101, 56)
         Me.cboReach.Name = "cboReach"
-        Me.cboReach.Size = New System.Drawing.Size(403, 21)
+        Me.cboReach.Size = New System.Drawing.Size(363, 21)
         Me.cboReach.TabIndex = 31
         '
         'Label52
         '
         Me.Label52.AutoSize = True
         Me.Label52.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label52.Location = New System.Drawing.Point(36, 100)
+        Me.Label52.Location = New System.Drawing.Point(13, 59)
         Me.Label52.Name = "Label52"
-        Me.Label52.Size = New System.Drawing.Size(82, 13)
+        Me.Label52.Size = New System.Drawing.Size(40, 13)
         Me.Label52.TabIndex = 30
-        Me.Label52.Text = "River Shapefile:"
+        Me.Label52.Text = "Rivers:"
         Me.Label52.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'cboSubbasin
@@ -629,27 +629,27 @@ Public Class frmGeoSFM
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboSubbasin.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboSubbasin.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboSubbasin.Location = New System.Drawing.Point(124, 70)
+        Me.cboSubbasin.Location = New System.Drawing.Point(101, 29)
         Me.cboSubbasin.Name = "cboSubbasin"
-        Me.cboSubbasin.Size = New System.Drawing.Size(403, 21)
+        Me.cboSubbasin.Size = New System.Drawing.Size(363, 21)
         Me.cboSubbasin.TabIndex = 29
         '
         'Label50
         '
         Me.Label50.AutoSize = True
         Me.Label50.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label50.Location = New System.Drawing.Point(36, 73)
+        Me.Label50.Location = New System.Drawing.Point(13, 32)
         Me.Label50.Name = "Label50"
-        Me.Label50.Size = New System.Drawing.Size(83, 13)
+        Me.Label50.Size = New System.Drawing.Size(59, 13)
         Me.Label50.TabIndex = 28
-        Me.Label50.Text = "Basin Shapefile:"
+        Me.Label50.Text = "Subbasins:"
         Me.Label50.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'Label51
         '
         Me.Label51.AutoSize = True
         Me.Label51.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label51.Location = New System.Drawing.Point(36, 127)
+        Me.Label51.Location = New System.Drawing.Point(36, 90)
         Me.Label51.Name = "Label51"
         Me.Label51.Size = New System.Drawing.Size(56, 13)
         Me.Label51.TabIndex = 26
@@ -662,7 +662,7 @@ Public Class frmGeoSFM
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboDEM.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboDEM.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboDEM.Location = New System.Drawing.Point(124, 124)
+        Me.cboDEM.Location = New System.Drawing.Point(124, 87)
         Me.cboDEM.Name = "cboDEM"
         Me.cboDEM.Size = New System.Drawing.Size(403, 21)
         Me.cboDEM.TabIndex = 27
@@ -705,10 +705,10 @@ Public Class frmGeoSFM
         '
         'cmdBasinNext
         '
-        Me.cmdBasinNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdBasinNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdBasinNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdBasinNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdBasinNext.Location = New System.Drawing.Point(558, 345)
+        Me.cmdBasinNext.Location = New System.Drawing.Point(555, 341)
         Me.cmdBasinNext.Name = "cmdBasinNext"
         Me.cmdBasinNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdBasinNext.TabIndex = 48
@@ -1116,10 +1116,10 @@ Public Class frmGeoSFM
         '
         'cmdResponseNext
         '
-        Me.cmdResponseNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdResponseNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdResponseNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdResponseNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdResponseNext.Location = New System.Drawing.Point(558, 346)
+        Me.cmdResponseNext.Location = New System.Drawing.Point(555, 341)
         Me.cmdResponseNext.Name = "cmdResponseNext"
         Me.cmdResponseNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdResponseNext.TabIndex = 51
@@ -1249,10 +1249,10 @@ Public Class frmGeoSFM
         '
         'cmdRainEvapNext
         '
-        Me.cmdRainEvapNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdRainEvapNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdRainEvapNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdRainEvapNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdRainEvapNext.Location = New System.Drawing.Point(556, 343)
+        Me.cmdRainEvapNext.Location = New System.Drawing.Point(555, 341)
         Me.cmdRainEvapNext.Name = "cmdRainEvapNext"
         Me.cmdRainEvapNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdRainEvapNext.TabIndex = 40
@@ -1260,7 +1260,7 @@ Public Class frmGeoSFM
         '
         'gbxSimulationDates
         '
-        Me.gbxSimulationDates.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.gbxSimulationDates.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.gbxSimulationDates.Controls.Add(Me.Label54)
         Me.gbxSimulationDates.Controls.Add(Me.Label55)
@@ -1645,10 +1645,10 @@ Public Class frmGeoSFM
         '
         'cmdBalanceNext
         '
-        Me.cmdBalanceNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdBalanceNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdBalanceNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdBalanceNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdBalanceNext.Location = New System.Drawing.Point(554, 344)
+        Me.cmdBalanceNext.Location = New System.Drawing.Point(555, 341)
         Me.cmdBalanceNext.Name = "cmdBalanceNext"
         Me.cmdBalanceNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdBalanceNext.TabIndex = 52
@@ -1745,10 +1745,10 @@ Public Class frmGeoSFM
         '
         'cmdRouteNext
         '
-        Me.cmdRouteNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdRouteNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdRouteNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdRouteNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdRouteNext.Location = New System.Drawing.Point(555, 340)
+        Me.cmdRouteNext.Location = New System.Drawing.Point(555, 341)
         Me.cmdRouteNext.Name = "cmdRouteNext"
         Me.cmdRouteNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdRouteNext.TabIndex = 53
@@ -1809,10 +1809,10 @@ Public Class frmGeoSFM
         '
         'cmdSensitivityNext
         '
-        Me.cmdSensitivityNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdSensitivityNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdSensitivityNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdSensitivityNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdSensitivityNext.Location = New System.Drawing.Point(558, 353)
+        Me.cmdSensitivityNext.Location = New System.Drawing.Point(555, 341)
         Me.cmdSensitivityNext.Name = "cmdSensitivityNext"
         Me.cmdSensitivityNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdSensitivityNext.TabIndex = 40
@@ -1980,10 +1980,10 @@ Public Class frmGeoSFM
         '
         'cmdCalibrationNext
         '
-        Me.cmdCalibrationNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdCalibrationNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdCalibrationNext.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdCalibrationNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCalibrationNext.Location = New System.Drawing.Point(554, 341)
+        Me.cmdCalibrationNext.Location = New System.Drawing.Point(555, 341)
         Me.cmdCalibrationNext.Name = "cmdCalibrationNext"
         Me.cmdCalibrationNext.Size = New System.Drawing.Size(73, 28)
         Me.cmdCalibrationNext.TabIndex = 40
@@ -2830,6 +2830,22 @@ Public Class frmGeoSFM
         Me.ComboBox39.Size = New System.Drawing.Size(312, 21)
         Me.ComboBox39.TabIndex = 23
         '
+        'gbxShapefiles
+        '
+        Me.gbxShapefiles.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbxShapefiles.Controls.Add(Me.cboReach)
+        Me.gbxShapefiles.Controls.Add(Me.Label50)
+        Me.gbxShapefiles.Controls.Add(Me.cboSubbasin)
+        Me.gbxShapefiles.Controls.Add(Me.Label52)
+        Me.gbxShapefiles.Location = New System.Drawing.Point(39, 173)
+        Me.gbxShapefiles.Name = "gbxShapefiles"
+        Me.gbxShapefiles.Size = New System.Drawing.Size(488, 103)
+        Me.gbxShapefiles.TabIndex = 42
+        Me.gbxShapefiles.TabStop = False
+        Me.gbxShapefiles.Text = "Optional Shapefiles"
+        '
         'frmGeoSFM
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -2885,6 +2901,8 @@ Public Class frmGeoSFM
         Me.gbxMap.ResumeLayout(False)
         Me.gbxMap.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
+        Me.gbxShapefiles.ResumeLayout(False)
+        Me.gbxShapefiles.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub

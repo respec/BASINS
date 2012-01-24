@@ -4790,6 +4790,10 @@ Public Class GisUtil
         End With
     End Sub
 
+    Public Shared Sub SaveProject(ByVal aProjectName As String)
+        Dim lRet As Boolean = GetMappingObject.Project.Save(aProjectName)
+    End Sub
+
 #End Region
 
 End Class
