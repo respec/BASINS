@@ -288,9 +288,9 @@ Public Class atcTimeseriesStatistics
                             Dim lTimeUnit As atcTimeUnit = aTimeseries.Attributes.GetValue("Time Unit", atcTimeUnit.TUUnknown)
                             Select Case lTimeUnit
                                 Case atcTimeUnit.TUYear
-                                    lTimeInterval = JulianYear * 100
-                                Case atcTimeUnit.TUCentury
                                     lTimeInterval = JulianYear
+                                Case atcTimeUnit.TUCentury
+                                    lTimeInterval = JulianYear * 100
                                 Case atcTimeUnit.TUMonth
                                     'TODO: We may want to weight months by length, this seems to treat each month as 30.6875 days
                                     lTimeInterval = JulianYear / 12
