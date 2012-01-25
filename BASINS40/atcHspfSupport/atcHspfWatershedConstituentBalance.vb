@@ -24,6 +24,7 @@ Public Module WatershedConstituentBalance
     ''' <param name="aDecimalPlaces"></param>
     ''' <param name="aSignificantDigits"></param>
     ''' <param name="aFieldWidth"></param>
+    ''' <param name="aSkipZeroOrNoValue"></param>
     ''' <remarks>see HSPFOutputReports script for sample usage</remarks>
     Public Sub ReportsToFiles(ByVal aUci As atcUCI.HspfUci, _
                               ByVal aBalanceType As String, _
@@ -37,14 +38,15 @@ Public Module WatershedConstituentBalance
                      Optional ByVal aSegmentRows As Boolean = False, _
                      Optional ByVal aDecimalPlaces As Integer = 3, _
                      Optional ByVal aSignificantDigits As Integer = 5, _
-                     Optional ByVal aFieldWidth As Integer = 12)
+                     Optional ByVal aFieldWidth As Integer = 12, _
+                     Optional ByVal aSkipZeroOrNoValue As Boolean = True)
         For Each lOutletLocation As String In aOutletLocations
             Dim lReport As atcReport.ReportText = Report(aUci, aBalanceType, _
                                                aOperationTypes, _
                                                aScenario, aScenarioResults, _
                                                aRunMade, lOutletLocation, _
                                                aOutFilePrefix, True, _
-                                               aSegmentRows, aDecimalPlaces, aSignificantDigits, aFieldWidth)
+                                               aSegmentRows, aDecimalPlaces, aSignificantDigits, aFieldWidth, aSkipZeroOrNoValue)
             Dim lPivotString As String = ""
             If aSegmentRows Then
                 lPivotString = "Pivot"
@@ -196,6 +198,7 @@ Public Module WatershedConstituentBalance
     ''' <param name="aDecimalPlaces"></param>
     ''' <param name="aSignificantDigits"></param>
     ''' <param name="aFieldWidth"></param>
+    ''' <param name="aSkipZeroOrNoValue"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Function Report(ByVal aUci As atcUCI.HspfUci, _
