@@ -210,7 +210,8 @@ Public Module WatershedConstituentBalance
                   Optional ByVal aSegmentRows As Boolean = False, _
                   Optional ByVal aDecimalPlaces As Integer = 3, _
                   Optional ByVal aSignificantDigits As Integer = 5, _
-                  Optional ByVal aFieldWidth As Integer = 12) As atcReport.IReport
+                  Optional ByVal aFieldWidth As Integer = 12, _
+                  Optional ByVal aSkipZeroOrNoValue As Boolean = True) As atcReport.IReport
 
         Dim lOutletReport As Boolean = False
         If aOutletLocation.Length > 0 Then
@@ -332,6 +333,7 @@ Public Module WatershedConstituentBalance
                                         lFieldIndex = 1
 
                                         For Each lLocation As String In lLandUseOperations.Keys
+                                            'lLocation e.g. R:69
                                             Dim lLocationDataGroup As atcTimeseriesGroup = lConstituentDataGroup.FindData("Location", lLocation)
                                             If lLocationDataGroup.Count > 0 Then
                                                 lTempDataSet = lLocationDataGroup.Item(0)
@@ -484,6 +486,9 @@ Public Module WatershedConstituentBalance
                 End If
             Next lLandUse
         Next lOperationType
+
+        'For Debug:
+        'lLandUses.Keys -> lLandUses.ItemByKey(aKey).Keys -> R:69
 
         If lOutletReport Then 'watershed summary report at specified output
             If aOutletDetails Then
@@ -661,7 +666,7 @@ Public Module WatershedConstituentBalance
                             If aBalanceType = "Water" Then
                                 lUnitsAdjust = 12
                             End If
-                            If Math.Abs(lValue) > 0.00001 Then
+                            If Math.Abs(lValue) > 0.00001 OrElse Not aSkipZeroOrNoValue Then
                                 If lOperationType = "RCHRES" Then
                                     lSummaryReport.Append(lConstituentName.PadRight(lRowIdLength) & vbTab & _
                                                DecimalAlign(lValue / lTotalArea) & vbTab & _
