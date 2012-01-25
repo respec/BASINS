@@ -991,6 +991,9 @@ Public Module modGeoSFM
 
             'DownZoneVtab
             Dim lDownValue As String = lDownZonalStats.ItemByKey(lBasinValue).GetValue("Mode", "").ToString '(DownZoneVtab.ReturnValue(downfield, rrecord)).AsString
+            If lDownValue.Length = 0 Then
+                lDownValue = "-9999"
+            End If
 
             'MaxCoverZoneVtab
             Dim lMaxcoverValue As String = Format((lMaxCoverZonalStats.ItemByKey(lBasinValue).GetValue("Mean", GetNaN) / 100), "0.####") '((MaxCoverZoneVtab.ReturnValue(maxcoverfield, rrecord)) / 100).SetFormat("d.ddddd").AsString
@@ -1045,6 +1048,7 @@ Public Module modGeoSFM
         End If
         IO.File.Copy(lRivFile, pOutputPath & "river_original.txt")
 
+        Logger.Progress(100, 100)
         Logger.Msg("Basin Characteristics Computed. Outputs written to: " & vbCrLf & vbCrLf & "      " & lOutFile & vbCrLf & "      " & lOrderFile & vbCrLf & "      " & lRivFile, "Geospatial Stream Flow Model")
         Return True
     End Function
@@ -4231,6 +4235,7 @@ Public Module modGeoSFM
                         lResultRecs.Add(lCurrentRecord)
                     End If
                 Loop
+                lStreamReader = Nothing
             Catch e As ApplicationException
                 Logger.Msg("Cannot read output file, " & aFlowFileName & vbCrLf & "File may be open or tied up by another program", MsgBoxStyle.Critical, "Geospatial Stream Flow Model")
                 Exit Sub
