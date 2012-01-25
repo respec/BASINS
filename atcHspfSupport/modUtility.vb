@@ -373,8 +373,10 @@ Public Module Utility
                 Dim lLandUseKeyIndex As Integer = lLandUses.IndexFromKey(lLandUse)
                 If lLandUseKeyIndex = -1 Then
                     lOperations = New atcCollection
-                    lOperations.Add(lOperationKey, lOperationArea)
-                    Dim lId As String = lLocationKey.Substring(0, 2) & Format(lOperation.Id Mod 100, "00")
+                    lOperations.Add(lOperationKey, lOperationArea) 'e.g. R:116 0.0
+                    Dim lOperationId As String = lOperation.Id.ToString
+                    If lOperationId.Length = 1 Then lOperationId = Format(lOperation.Id Mod 100, "00")
+                    Dim lId As String = lLocationKey.Substring(0, 2) & lOperationId
                     If lLandUsesSortedById.IndexOfKey(lId) = -1 Then
                         lLandUsesSortedById.Add(lId, lLandUse)
                     End If
@@ -382,6 +384,8 @@ Public Module Utility
                 Else
                     lOperations = lLandUses.Item(lLandUseKeyIndex)
                     lOperations.Add(lOperationKey, lOperationArea)
+                    'For Debug
+                    'lLandUses.Keys -> lLandUses.ItemByKey(lu).Keys -> "R:69"
                 End If
             End If
         Next
@@ -443,6 +447,10 @@ Public Module Utility
                 End If
             Next
         End If
+
+        'For Debug:
+        'Detect if the final outlet is included
+        'If aLocation = "R:69" Then
         aLocations.Add(aLocation, 0.0)
     End Sub
 
