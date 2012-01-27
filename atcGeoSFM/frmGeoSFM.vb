@@ -136,7 +136,7 @@ Public Class frmGeoSFM
     Friend WithEvents AtcGridMannings As atcControls.atcGrid
     Friend WithEvents tpgTerrain As System.Windows.Forms.TabPage
     Friend WithEvents Label53 As System.Windows.Forms.Label
-    Friend WithEvents AtcText1 As atcControls.atcText
+    Friend WithEvents atxThresh As atcControls.atcText
     Friend WithEvents cboReach As System.Windows.Forms.ComboBox
     Friend WithEvents Label52 As System.Windows.Forms.Label
     Friend WithEvents cboSubbasin As System.Windows.Forms.ComboBox
@@ -239,15 +239,16 @@ Public Class frmGeoSFM
         Me.cmdAbout = New System.Windows.Forms.Button
         Me.tabMain = New System.Windows.Forms.TabControl
         Me.tpgTerrain = New System.Windows.Forms.TabPage
+        Me.gbxShapefiles = New System.Windows.Forms.GroupBox
+        Me.cboReach = New System.Windows.Forms.ComboBox
+        Me.Label50 = New System.Windows.Forms.Label
+        Me.cboSubbasin = New System.Windows.Forms.ComboBox
+        Me.Label52 = New System.Windows.Forms.Label
         Me.LabelModel = New System.Windows.Forms.Label
         Me.atxModel = New atcControls.atcText
         Me.cmdTerrainNext = New System.Windows.Forms.Button
         Me.Label53 = New System.Windows.Forms.Label
-        Me.AtcText1 = New atcControls.atcText
-        Me.cboReach = New System.Windows.Forms.ComboBox
-        Me.Label52 = New System.Windows.Forms.Label
-        Me.cboSubbasin = New System.Windows.Forms.ComboBox
-        Me.Label50 = New System.Windows.Forms.Label
+        Me.atxThresh = New atcControls.atcText
         Me.Label51 = New System.Windows.Forms.Label
         Me.cboDEM = New System.Windows.Forms.ComboBox
         Me.tpgBasin = New System.Windows.Forms.TabPage
@@ -426,9 +427,9 @@ Public Class frmGeoSFM
         Me.Label44 = New System.Windows.Forms.Label
         Me.Label45 = New System.Windows.Forms.Label
         Me.ComboBox39 = New System.Windows.Forms.ComboBox
-        Me.gbxShapefiles = New System.Windows.Forms.GroupBox
         Me.tabMain.SuspendLayout()
         Me.tpgTerrain.SuspendLayout()
+        Me.gbxShapefiles.SuspendLayout()
         Me.tpgBasin.SuspendLayout()
         Me.tpgResponse.SuspendLayout()
         Me.tpgRain.SuspendLayout()
@@ -451,7 +452,6 @@ Public Class frmGeoSFM
         Me.gbxMapDates.SuspendLayout()
         Me.gbxMap.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
-        Me.gbxShapefiles.SuspendLayout()
         Me.SuspendLayout()
         '
         'cmdCancel
@@ -516,7 +516,7 @@ Public Class frmGeoSFM
         Me.tpgTerrain.Controls.Add(Me.atxModel)
         Me.tpgTerrain.Controls.Add(Me.cmdTerrainNext)
         Me.tpgTerrain.Controls.Add(Me.Label53)
-        Me.tpgTerrain.Controls.Add(Me.AtcText1)
+        Me.tpgTerrain.Controls.Add(Me.atxThresh)
         Me.tpgTerrain.Controls.Add(Me.Label51)
         Me.tpgTerrain.Controls.Add(Me.cboDEM)
         Me.tpgTerrain.Location = New System.Drawing.Point(4, 46)
@@ -525,6 +525,66 @@ Public Class frmGeoSFM
         Me.tpgTerrain.TabIndex = 10
         Me.tpgTerrain.Text = "Terrain Analysis"
         Me.tpgTerrain.UseVisualStyleBackColor = True
+        '
+        'gbxShapefiles
+        '
+        Me.gbxShapefiles.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbxShapefiles.Controls.Add(Me.cboReach)
+        Me.gbxShapefiles.Controls.Add(Me.Label50)
+        Me.gbxShapefiles.Controls.Add(Me.cboSubbasin)
+        Me.gbxShapefiles.Controls.Add(Me.Label52)
+        Me.gbxShapefiles.Location = New System.Drawing.Point(39, 173)
+        Me.gbxShapefiles.Name = "gbxShapefiles"
+        Me.gbxShapefiles.Size = New System.Drawing.Size(488, 103)
+        Me.gbxShapefiles.TabIndex = 42
+        Me.gbxShapefiles.TabStop = False
+        Me.gbxShapefiles.Text = "Optional Shapefiles"
+        '
+        'cboReach
+        '
+        Me.cboReach.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboReach.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboReach.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboReach.Location = New System.Drawing.Point(101, 56)
+        Me.cboReach.Name = "cboReach"
+        Me.cboReach.Size = New System.Drawing.Size(363, 21)
+        Me.cboReach.TabIndex = 31
+        '
+        'Label50
+        '
+        Me.Label50.AutoSize = True
+        Me.Label50.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label50.Location = New System.Drawing.Point(13, 32)
+        Me.Label50.Name = "Label50"
+        Me.Label50.Size = New System.Drawing.Size(59, 13)
+        Me.Label50.TabIndex = 28
+        Me.Label50.Text = "Subbasins:"
+        Me.Label50.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'cboSubbasin
+        '
+        Me.cboSubbasin.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboSubbasin.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboSubbasin.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboSubbasin.Location = New System.Drawing.Point(101, 29)
+        Me.cboSubbasin.Name = "cboSubbasin"
+        Me.cboSubbasin.Size = New System.Drawing.Size(363, 21)
+        Me.cboSubbasin.TabIndex = 29
+        '
+        'Label52
+        '
+        Me.Label52.AutoSize = True
+        Me.Label52.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label52.Location = New System.Drawing.Point(13, 59)
+        Me.Label52.Name = "Label52"
+        Me.Label52.Size = New System.Drawing.Size(40, 13)
+        Me.Label52.TabIndex = 30
+        Me.Label52.Text = "Rivers:"
+        Me.Label52.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'LabelModel
         '
@@ -578,72 +638,28 @@ Public Class frmGeoSFM
         Me.Label53.TabIndex = 38
         Me.Label53.Text = "Stream Delineation Threshold:"
         '
-        'AtcText1
+        'atxThresh
         '
-        Me.AtcText1.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcText1.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcText1.DefaultValue = ""
-        Me.AtcText1.HardMax = 9999
-        Me.AtcText1.HardMin = 0
-        Me.AtcText1.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcText1.Location = New System.Drawing.Point(192, 126)
-        Me.AtcText1.MaxWidth = 20
-        Me.AtcText1.Name = "AtcText1"
-        Me.AtcText1.NumericFormat = "0"
-        Me.AtcText1.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcText1.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcText1.SelLength = 0
-        Me.AtcText1.SelStart = 0
-        Me.AtcText1.Size = New System.Drawing.Size(64, 21)
-        Me.AtcText1.SoftMax = -999
-        Me.AtcText1.SoftMin = -999
-        Me.AtcText1.TabIndex = 37
-        Me.AtcText1.ValueDouble = 1000
-        Me.AtcText1.ValueInteger = 1000
-        '
-        'cboReach
-        '
-        Me.cboReach.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboReach.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboReach.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboReach.Location = New System.Drawing.Point(101, 56)
-        Me.cboReach.Name = "cboReach"
-        Me.cboReach.Size = New System.Drawing.Size(363, 21)
-        Me.cboReach.TabIndex = 31
-        '
-        'Label52
-        '
-        Me.Label52.AutoSize = True
-        Me.Label52.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label52.Location = New System.Drawing.Point(13, 59)
-        Me.Label52.Name = "Label52"
-        Me.Label52.Size = New System.Drawing.Size(40, 13)
-        Me.Label52.TabIndex = 30
-        Me.Label52.Text = "Rivers:"
-        Me.Label52.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-        '
-        'cboSubbasin
-        '
-        Me.cboSubbasin.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboSubbasin.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboSubbasin.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboSubbasin.Location = New System.Drawing.Point(101, 29)
-        Me.cboSubbasin.Name = "cboSubbasin"
-        Me.cboSubbasin.Size = New System.Drawing.Size(363, 21)
-        Me.cboSubbasin.TabIndex = 29
-        '
-        'Label50
-        '
-        Me.Label50.AutoSize = True
-        Me.Label50.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label50.Location = New System.Drawing.Point(13, 32)
-        Me.Label50.Name = "Label50"
-        Me.Label50.Size = New System.Drawing.Size(59, 13)
-        Me.Label50.TabIndex = 28
-        Me.Label50.Text = "Subbasins:"
-        Me.Label50.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.atxThresh.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxThresh.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atxThresh.DefaultValue = ""
+        Me.atxThresh.HardMax = 100000
+        Me.atxThresh.HardMin = 0
+        Me.atxThresh.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atxThresh.Location = New System.Drawing.Point(192, 126)
+        Me.atxThresh.MaxWidth = 20
+        Me.atxThresh.Name = "atxThresh"
+        Me.atxThresh.NumericFormat = "0"
+        Me.atxThresh.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atxThresh.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atxThresh.SelLength = 0
+        Me.atxThresh.SelStart = 0
+        Me.atxThresh.Size = New System.Drawing.Size(64, 21)
+        Me.atxThresh.SoftMax = -999
+        Me.atxThresh.SoftMin = -999
+        Me.atxThresh.TabIndex = 37
+        Me.atxThresh.ValueDouble = 1000
+        Me.atxThresh.ValueInteger = 1000
         '
         'Label51
         '
@@ -2830,22 +2846,6 @@ Public Class frmGeoSFM
         Me.ComboBox39.Size = New System.Drawing.Size(312, 21)
         Me.ComboBox39.TabIndex = 23
         '
-        'gbxShapefiles
-        '
-        Me.gbxShapefiles.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.gbxShapefiles.Controls.Add(Me.cboReach)
-        Me.gbxShapefiles.Controls.Add(Me.Label50)
-        Me.gbxShapefiles.Controls.Add(Me.cboSubbasin)
-        Me.gbxShapefiles.Controls.Add(Me.Label52)
-        Me.gbxShapefiles.Location = New System.Drawing.Point(39, 173)
-        Me.gbxShapefiles.Name = "gbxShapefiles"
-        Me.gbxShapefiles.Size = New System.Drawing.Size(488, 103)
-        Me.gbxShapefiles.TabIndex = 42
-        Me.gbxShapefiles.TabStop = False
-        Me.gbxShapefiles.Text = "Optional Shapefiles"
-        '
         'frmGeoSFM
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -2863,6 +2863,8 @@ Public Class frmGeoSFM
         Me.tabMain.ResumeLayout(False)
         Me.tpgTerrain.ResumeLayout(False)
         Me.tpgTerrain.PerformLayout()
+        Me.gbxShapefiles.ResumeLayout(False)
+        Me.gbxShapefiles.PerformLayout()
         Me.tpgBasin.ResumeLayout(False)
         Me.tpgBasin.PerformLayout()
         Me.tpgResponse.ResumeLayout(False)
@@ -2901,8 +2903,6 @@ Public Class frmGeoSFM
         Me.gbxMap.ResumeLayout(False)
         Me.gbxMap.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
-        Me.gbxShapefiles.ResumeLayout(False)
-        Me.gbxShapefiles.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -3190,7 +3190,7 @@ Public Class frmGeoSFM
         Dim lDEMLayerName As String = cboDEM.Items(cboDEM.SelectedIndex)
         Dim lSubbasinLayerName As String = cboSubbasin.Items(cboSubbasin.SelectedIndex)
         Dim lStreamLayerName As String = cboReach.Items(cboReach.SelectedIndex)
-        Dim lThresh As Integer = AtcText1.ValueInteger
+        Dim lThresh As Integer = atxThresh.ValueInteger
         EnableControls(False)
         lblStatus.Text = "Performing Terrain Analysis ..."
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor

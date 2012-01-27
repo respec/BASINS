@@ -19,6 +19,7 @@ Public Module modGeoSFM
     'Declare Sub aggregateflow Lib "geosfmstats.dll" ()
 
     Friend pOutputPath As String
+    Friend pProjectName As String
 
     Friend Function Terrain(ByVal aDEMLayerName As String, ByVal aSubbasinLayerName As String, ByVal aStreamLayerName As String, ByVal aThresh As Integer) As Boolean
 
@@ -779,13 +780,19 @@ Public Module modGeoSFM
             End If
 
             'LengthZoneVtab
-            Dim lAvglength As Single = lLengthZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value - lLengthZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Min").Value '(LengthZoneVtab.ReturnValue(Lenfield, rrecord)) - (LengthZoneVtab.ReturnValue(Lenminfield, rrecord))
+            Dim lAvglength As Single = 0.0
+            If lLengthZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean") IsNot Nothing Then
+                lAvglength = lLengthZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value - lLengthZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Min").Value '(LengthZoneVtab.ReturnValue(Lenfield, rrecord)) - (LengthZoneVtab.ReturnValue(Lenminfield, rrecord))
+            End If
             If (lAvglength < GisUtil.GridGetCellSizeX(lBasinGridIndex)) Then
                 lAvglength = GisUtil.GridGetCellSizeX(lBasinGridIndex)
             End If
 
             'DrainZoneVtab
-            Dim lDrainValue As Single = Format(lDrainZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value, "#.##0") '(DrainZoneVtab.ReturnValue(drainfield, rrecord)).SetFormat("d.ddd").AsString
+            Dim lDrainValue As Single = 0.0
+            If lDrainZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean") IsNot Nothing Then
+                lDrainValue = Format(lDrainZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value, "#.##0") '(DrainZoneVtab.ReturnValue(drainfield, rrecord)).SetFormat("d.ddd").AsString
+            End If
 
             Dim lUpareaValue As Single = (lFacValue * GisUtil.GridGetCellSizeX(lFacGridIndex) * GisUtil.GridGetCellSizeX(lFacGridIndex)) / 1000000.0  '((facvalue.asstring.asnumber * facgrid.GetCellSize * facgrid.GetCellSize) / 1000000.0).SetFormat("d.d").asstring
 
@@ -800,7 +807,10 @@ Public Module modGeoSFM
             'rivlenZoneVtab
             Dim lRiverlossValue As String = "1.0"
 
-            Dim lRivlenValue As String = Format((lRivlenZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Max").Value - lRivlenZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Min").Value), "#.0")  ' (rivlenZoneVtab.ReturnValue(rivlenfield, rrecord)).SetFormat("d.d").AsString
+            Dim lRivlenValue As String = ""
+            If lRivlenZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Max") IsNot Nothing Then
+                lRivlenValue = Format((lRivlenZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Max").Value - lRivlenZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Min").Value), "#.0")  ' (rivlenZoneVtab.ReturnValue(rivlenfield, rrecord)).SetFormat("d.d").AsString
+            End If
             If Not IsNumeric(lRivlenValue) Then
                 lRivlenValue = GisUtil.GridGetCellSizeX(lBasinGridIndex).ToString
             End If
@@ -825,16 +835,28 @@ Public Module modGeoSFM
             Dim lBaseFlowLag As String = Format((CStr(lInterflowlag) * 3), "#.####")
 
             'RcnZoneVtab
-            Dim lRcnValue As String = Format(lRcnZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value, "#.0") '(RcnZoneVtab.ReturnValue(Rcnfield, rrecord)).SetFormat("d.d").AsString
+            Dim lRcnValue As String = "0.0"
+            If lRcnZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean") IsNot Nothing Then
+                lRcnValue = Format(lRcnZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value, "#.0") '(RcnZoneVtab.ReturnValue(Rcnfield, rrecord)).SetFormat("d.d").AsString
+            End If
 
             'whcZoneVtab
-            Dim lWhcValue As String = Format(lWhcZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value, "###.###")  '(whcZoneVtab.ReturnValue(Whcfield, rrecord)).AsString
+            Dim lWhcValue As String = "0.0"
+            If lWhcZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean") IsNot Nothing Then
+                lWhcValue = Format(lWhcZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value, "###.###")  '(whcZoneVtab.ReturnValue(Whcfield, rrecord)).AsString
+            End If
 
             'DepthZoneVtab
-            Dim lDepthValue As String = Format(lDepthZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value, "###.###") '(DepthZoneVtab.ReturnValue(depthfield, rrecord)).AsString
+            Dim lDepthValue As String = "0.0"
+            If lDepthZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean") IsNot Nothing Then
+                lDepthValue = Format(lDepthZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mean").Value, "###.###") '(DepthZoneVtab.ReturnValue(depthfield, rrecord)).AsString
+            End If
 
             'TextureZoneVtab
-            Dim lTextureValue As String = lTextureZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mode").Value.ToString '(TextureZoneVtab.ReturnValue(texturefield, rrecord)).AsString
+            Dim lTextureValue As String = "0.0"
+            If lTextureZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mode") IsNot Nothing Then
+                lTextureValue = lTextureZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Mode").Value.ToString '(TextureZoneVtab.ReturnValue(texturefield, rrecord)).AsString
+            End If
 
             ' Soil texture (1=Sand,2=Loam,3=Clay,5=Water)
             Dim lBasinLossValue As String = ""
@@ -851,8 +873,14 @@ Public Module modGeoSFM
             End If
 
             'rivdemZoneVtab
-            Dim lRivdropValue As Single = lRivDemZonalStats.ItemByKey(lBasinValue).GetValue("Max") - lRivDemZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Min").Value '(rivdemZoneVtab.ReturnValue(rivdemfield, rrecord))
-            Dim lRivSlopeValue As String = Format((lRivdropValue * 100) / CStr(lRivlenValue), "0.0000")   '(((rivdropvalue * 100) / CStr(rivlenvalue)).SetFormat("d.dddd")).AsString
+            Dim lRivdropValue As Single = 0.0
+            If lRivDemZonalStats.ItemByKey(lBasinValue).GetValue("Max") IsNot Nothing Then
+                lRivdropValue = lRivDemZonalStats.ItemByKey(lBasinValue).GetValue("Max") - lRivDemZonalStats.ItemByKey(lBasinValue).GetDefinedValue("Min").Value '(rivdemZoneVtab.ReturnValue(rivdemfield, rrecord))
+            End If
+            Dim lRivSlopeValue As String = 0.0
+            If lRivlenValue > 0 Then
+                lRivSlopeValue = Format((lRivdropValue * 100) / CStr(lRivlenValue), "0.0000")   '(((rivdropvalue * 100) / CStr(rivlenvalue)).SetFormat("d.dddd")).AsString
+            End If
             If Not IsNumeric(lRivSlopeValue) Then
                 lRivSlopeValue = "0.0010"
             End If
@@ -990,13 +1018,19 @@ Public Module modGeoSFM
             End If
 
             'DownZoneVtab
-            Dim lDownValue As String = lDownZonalStats.ItemByKey(lBasinValue).GetValue("Mode", "").ToString '(DownZoneVtab.ReturnValue(downfield, rrecord)).AsString
+            Dim lDownValue As String = ""
+            If lDownZonalStats.ItemByKey(lBasinValue).GetValue("Mode", "") IsNot Nothing Then
+                lDownValue = lDownZonalStats.ItemByKey(lBasinValue).GetValue("Mode", "").ToString '(DownZoneVtab.ReturnValue(downfield, rrecord)).AsString
+            End If
             If lDownValue.Length = 0 Then
                 lDownValue = "-9999"
             End If
 
             'MaxCoverZoneVtab
-            Dim lMaxcoverValue As String = Format((lMaxCoverZonalStats.ItemByKey(lBasinValue).GetValue("Mean", GetNaN) / 100), "0.####") '((MaxCoverZoneVtab.ReturnValue(maxcoverfield, rrecord)) / 100).SetFormat("d.ddddd").AsString
+            Dim lMaxcoverValue As String = ""
+            If lMaxCoverZonalStats.ItemByKey(lBasinValue).GetValue("Mean", GetNaN) IsNot Nothing Then
+                lMaxcoverValue = Format((lMaxCoverZonalStats.ItemByKey(lBasinValue).GetValue("Mean", GetNaN) / 100), "0.####") '((MaxCoverZoneVtab.ReturnValue(maxcoverfield, rrecord)) / 100).SetFormat("d.ddddd").AsString
+            End If
             If lMaxcoverValue.Length = 0 OrElse CSng(lMaxcoverValue) <= 0.001 Then
                 lMaxcoverValue = "0.001"
             ElseIf CSng(lMaxcoverValue) >= 1 Then
@@ -1380,8 +1414,8 @@ Public Module modGeoSFM
 
         If (lNumdays > 22) Then
             lNumdays = 22
-            'else 
-            '  numdays = 22
+        ElseIf lNumdays = 0 Then
+            lNumdays = 2
         End If
 
         'prepare response file
@@ -4331,7 +4365,7 @@ Public Module modGeoSFM
             Dim lGenericTs As New atcData.atcTimeseries(Nothing)
             With lGenericTs.Attributes
                 .SetValue("ID", lDsn)
-                .SetValue("Scenario", "Simulated")
+                .SetValue("Scenario", pProjectName)
                 .SetValue("Constituent", "Flow")
                 .SetValue("Location", "Reach " & lRchId)
                 .SetValue("Description", "Simulated flow from GeoSFM")
@@ -4440,6 +4474,7 @@ Public Module modGeoSFM
         If Not FileExists(lOutputPath, True) Then
             MkDir(lOutputPath)
         End If
+        pProjectName = aProjectName
         pOutputPath = lOutputPath
     End Sub
     
