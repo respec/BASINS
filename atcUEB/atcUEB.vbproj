@@ -24,7 +24,7 @@
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
     <DocumentationFile>atcUEB.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -33,7 +33,7 @@
     <Optimize>true</Optimize>
     <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
     <DocumentationFile>atcUEB.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,7 +41,7 @@
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
     <DocumentationFile>atcUEB.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
@@ -50,7 +50,7 @@
     <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
     <DocumentationFile>atcUEB.xml</DocumentationFile>
     <Optimize>true</Optimize>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
@@ -76,9 +76,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsPlugin.vb" />
+    <Compile Include="clsUEBParameterFile.vb" />
+    <Compile Include="clsUEBSiteFile.vb" />
+    <Compile Include="clsUEBWeather.vb" />
     <Compile Include="frmUEB.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="modUEBUtil.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
