@@ -178,11 +178,20 @@ Public Class atcDataPlugin
         pMapWinWindowHandle = aParentHandle
         atcDataManager.MapWindow = aMapWin
 
-        AddMenuIfMissing(NewDataMenuName, FileMenuName, NewDataMenuString, "mnuNew")
-        AddMenuIfMissing(OpenDataMenuName, FileMenuName, OpenDataMenuString, "mnuOpen")
-        AddMenuIfMissing(ManageDataMenuName, FileMenuName, ManageDataMenuString, OpenDataMenuName)
-        AddMenuIfMissing(SaveDataMenuName, FileMenuName, SaveDataMenuString, "mnuSaveAs")
+        Dim lParentMenu As MapWindow.Interfaces.MenuItem = pMapWin.Menus.Item(FileMenuName)
+        Dim lmnuOpenProjectIntoGroup As MapWindow.Interfaces.MenuItem = lParentMenu.SubItem("mnuOpenProjectIntoGroup")
+        lmnuOpenProjectIntoGroup = pMapWin.Menus.Item("mnuOpenProjectIntoGroup")
+        If lmnuOpenProjectIntoGroup IsNot Nothing Then
+            'Dim lFileBreak1 As MapWindow.Interfaces.MenuItem = lParentMenu.SubItem("mnuFileBreak1")
+            pMapWin.Menus.Remove("mnuOpenProjectIntoGroup")
+            pMapWin.Menus.Remove("mnuFileBreak1")
 
+            AddMenuIfMissing(OpenDataMenuName, FileMenuName, OpenDataMenuString, "mnuFileBreak2") '"mnuOpen")
+            AddMenuIfMissing(ManageDataMenuName, FileMenuName, ManageDataMenuString, OpenDataMenuName)
+            AddMenuIfMissing(NewDataMenuName, FileMenuName, NewDataMenuString, ManageDataMenuName) '"mnuNew")
+            AddMenuIfMissing(SaveDataMenuName, FileMenuName, SaveDataMenuString, NewDataMenuName) '"mnuSaveAs")
+            AddMenuIfMissing("mnuFileBreakData", FileMenuName, "-", SaveDataMenuName)
+        End If
         Dim lSubMenus As New Generic.List(Of String)
         Dim lRest As String = Name.Clone
         While lRest.Contains("::")

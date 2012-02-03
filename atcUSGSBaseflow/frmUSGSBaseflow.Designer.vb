@@ -48,7 +48,7 @@ Partial Class frmUSGSBaseflow
         Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem
         Me.txtOutputRootName = New System.Windows.Forms.TextBox
         Me.lblBaseFilename = New System.Windows.Forms.Label
-        Me.gbOutputFileSpecs = New System.Windows.Forms.GroupBox
+        Me.gbTextOutput = New System.Windows.Forms.GroupBox
         Me.btnWriteASCIIOutput = New System.Windows.Forms.Button
         Me.chkTabDelimited = New System.Windows.Forms.CheckBox
         Me.txtOutputDir = New System.Windows.Forms.TextBox
@@ -66,7 +66,7 @@ Partial Class frmUSGSBaseflow
         Me.gbDrainageArea = New System.Windows.Forms.GroupBox
         Me.gbDates.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
-        Me.gbOutputFileSpecs.SuspendLayout()
+        Me.gbTextOutput.SuspendLayout()
         Me.gbBFMethods.SuspendLayout()
         Me.gbGraph.SuspendLayout()
         Me.gbDrainageArea.SuspendLayout()
@@ -266,22 +266,22 @@ Partial Class frmUSGSBaseflow
         Me.lblBaseFilename.TabIndex = 30
         Me.lblBaseFilename.Text = "Base output filename"
         '
-        'gbOutputFileSpecs
+        'gbTextOutput
         '
-        Me.gbOutputFileSpecs.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.gbTextOutput.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.gbOutputFileSpecs.Controls.Add(Me.btnWriteASCIIOutput)
-        Me.gbOutputFileSpecs.Controls.Add(Me.chkTabDelimited)
-        Me.gbOutputFileSpecs.Controls.Add(Me.txtOutputDir)
-        Me.gbOutputFileSpecs.Controls.Add(Me.lblOutputDir)
-        Me.gbOutputFileSpecs.Controls.Add(Me.txtOutputRootName)
-        Me.gbOutputFileSpecs.Controls.Add(Me.lblBaseFilename)
-        Me.gbOutputFileSpecs.Location = New System.Drawing.Point(12, 274)
-        Me.gbOutputFileSpecs.Name = "gbOutputFileSpecs"
-        Me.gbOutputFileSpecs.Size = New System.Drawing.Size(344, 111)
-        Me.gbOutputFileSpecs.TabIndex = 11
-        Me.gbOutputFileSpecs.TabStop = False
-        Me.gbOutputFileSpecs.Text = "Text Output"
+        Me.gbTextOutput.Controls.Add(Me.btnWriteASCIIOutput)
+        Me.gbTextOutput.Controls.Add(Me.chkTabDelimited)
+        Me.gbTextOutput.Controls.Add(Me.txtOutputDir)
+        Me.gbTextOutput.Controls.Add(Me.lblOutputDir)
+        Me.gbTextOutput.Controls.Add(Me.txtOutputRootName)
+        Me.gbTextOutput.Controls.Add(Me.lblBaseFilename)
+        Me.gbTextOutput.Location = New System.Drawing.Point(12, 274)
+        Me.gbTextOutput.Name = "gbTextOutput"
+        Me.gbTextOutput.Size = New System.Drawing.Size(344, 111)
+        Me.gbTextOutput.TabIndex = 11
+        Me.gbTextOutput.TabStop = False
+        Me.gbTextOutput.Text = "Text Output"
         '
         'btnWriteASCIIOutput
         '
@@ -290,7 +290,7 @@ Partial Class frmUSGSBaseflow
         Me.btnWriteASCIIOutput.Name = "btnWriteASCIIOutput"
         Me.btnWriteASCIIOutput.Size = New System.Drawing.Size(128, 23)
         Me.btnWriteASCIIOutput.TabIndex = 15
-        Me.btnWriteASCIIOutput.Text = "Write ASCII Outputs"
+        Me.btnWriteASCIIOutput.Text = "Write Text Output"
         Me.btnWriteASCIIOutput.UseVisualStyleBackColor = True
         '
         'chkTabDelimited
@@ -303,6 +303,7 @@ Partial Class frmUSGSBaseflow
         Me.chkTabDelimited.TabIndex = 14
         Me.chkTabDelimited.Text = "Tab-Delimited"
         Me.chkTabDelimited.UseVisualStyleBackColor = True
+        Me.chkTabDelimited.Visible = False
         '
         'txtOutputDir
         '
@@ -449,7 +450,7 @@ Partial Class frmUSGSBaseflow
         Me.Controls.Add(Me.gbBFMethods)
         Me.Controls.Add(Me.gbDates)
         Me.Controls.Add(Me.MenuStrip1)
-        Me.Controls.Add(Me.gbOutputFileSpecs)
+        Me.Controls.Add(Me.gbTextOutput)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "frmUSGSBaseflow"
@@ -458,8 +459,8 @@ Partial Class frmUSGSBaseflow
         Me.gbDates.PerformLayout()
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
-        Me.gbOutputFileSpecs.ResumeLayout(False)
-        Me.gbOutputFileSpecs.PerformLayout()
+        Me.gbTextOutput.ResumeLayout(False)
+        Me.gbTextOutput.PerformLayout()
         Me.gbBFMethods.ResumeLayout(False)
         Me.gbBFMethods.PerformLayout()
         Me.gbGraph.ResumeLayout(False)
@@ -490,7 +491,7 @@ Partial Class frmUSGSBaseflow
     Friend WithEvents txtOutputRootName As System.Windows.Forms.TextBox
     Friend WithEvents lblBaseFilename As System.Windows.Forms.Label
     Friend WithEvents mnuGraphBF As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents gbOutputFileSpecs As System.Windows.Forms.GroupBox
+    Friend WithEvents gbTextOutput As System.Windows.Forms.GroupBox
     Friend WithEvents txtOutputDir As System.Windows.Forms.TextBox
     Friend WithEvents lblOutputDir As System.Windows.Forms.Label
     Friend WithEvents chkTabDelimited As System.Windows.Forms.CheckBox

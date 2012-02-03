@@ -66,29 +66,19 @@ Public Class atcBasinsPlugIn
 
         'This is where buttons or menu items are added.
         g_MapWin = aMapWin
-        g_AppNameLong = aMapWin.ApplicationInfo.ApplicationName
+
+        'These should match, but now g_AppNameLong is a constant and we do not set it here.
+        'g_AppNameLong = aMapWin.ApplicationInfo.ApplicationName
+
         Dim lHelpFilename As String = String.Empty
         Select Case g_AppNameLong
             Case "USGS Surface Water Analysis"
-                g_AppNameRegistry = "USGS-SW"
-                g_AppNameShort = "USGS-SW"
-                g_URL_Home = "http://water.usgs.gov/software/lists/surface_water/"
-                g_URL_Register = "http://hspf.com/pub/USGS-SW/register.html"
 
             Case "USGS GW Toolbox"
-                g_AppNameRegistry = "USGS-GW"
-                g_AppNameShort = "USGS-GW"
-                g_URL_Home = "http://water.usgs.gov/software/lists/groundwater/"
-                g_URL_Register = "http://hspf.com/pub/USGS-GW/register.html"
                 lHelpFilename = FindFile("", g_ProgramDir & "docs\USGSToolbox.chm")
-                'TODO: lHelpFilename = FindFile("", g_ProgramDir & "docs\USGStoolbox.chm")
                 BasinsDataPath = "USGS-GWToolbox\data\"
 
             Case Else '"BASINS 4"
-                g_AppNameRegistry = "BASINS4"
-                g_AppNameShort = "BASINS"
-                g_URL_Home = "http://www.epa.gov/waterscience/BASINS/"
-                g_URL_Register = "http://hspf.com/pub/basins4/register.html"
                 lHelpFilename = FindFile("", g_ProgramDir & "docs\BASINS4.0.chm")
         End Select
 
