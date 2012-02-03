@@ -56,8 +56,6 @@ Public Class frmUEB
     Friend WithEvents cmdHelp As System.Windows.Forms.Button
     Friend WithEvents cmdAbout As System.Windows.Forms.Button
     Friend WithEvents TabControl1 As System.Windows.Forms.TabControl
-    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
-    Friend WithEvents lblStatus As System.Windows.Forms.Label
     Friend WithEvents TabPage3 As System.Windows.Forms.TabPage
     Friend WithEvents TabPage7 As System.Windows.Forms.TabPage
     Friend WithEvents TabPage8 As System.Windows.Forms.TabPage
@@ -194,6 +192,12 @@ Public Class frmUEB
         Me.AtcTextIniEnergyContent = New atcControls.atcText()
         Me.AtcTextIniWaterEquiv = New atcControls.atcText()
         Me.TabPage3 = New System.Windows.Forms.TabPage()
+        Me.txtNetRadStation = New System.Windows.Forms.TextBox()
+        Me.txtShortRadStation = New System.Windows.Forms.TextBox()
+        Me.txtRelHStation = New System.Windows.Forms.TextBox()
+        Me.txtWindStation = New System.Windows.Forms.TextBox()
+        Me.txtPrecipStation = New System.Windows.Forms.TextBox()
+        Me.txtAtempStation = New System.Windows.Forms.TextBox()
         Me.txtWeatherFile = New System.Windows.Forms.TextBox()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.lblNetRadStation = New System.Windows.Forms.Label()
@@ -239,8 +243,6 @@ Public Class frmUEB
         Me.lblCParm = New System.Windows.Forms.Label()
         Me.lblAParm = New System.Windows.Forms.Label()
         Me.AtcGridBCMonthly = New atcControls.atcGrid()
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
-        Me.lblStatus = New System.Windows.Forms.Label()
         Me.Label20 = New System.Windows.Forms.Label()
         Me.ComboBox14 = New System.Windows.Forms.ComboBox()
         Me.Label21 = New System.Windows.Forms.Label()
@@ -294,12 +296,6 @@ Public Class frmUEB
         Me.Label45 = New System.Windows.Forms.Label()
         Me.ComboBox39 = New System.Windows.Forms.ComboBox()
         Me.cmdSimulate = New System.Windows.Forms.Button()
-        Me.txtAtempStation = New System.Windows.Forms.TextBox()
-        Me.txtPrecipStation = New System.Windows.Forms.TextBox()
-        Me.txtWindStation = New System.Windows.Forms.TextBox()
-        Me.txtRelHStation = New System.Windows.Forms.TextBox()
-        Me.txtShortRadStation = New System.Windows.Forms.TextBox()
-        Me.txtNetRadStation = New System.Windows.Forms.TextBox()
         Me.TabControl1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
@@ -309,7 +305,6 @@ Public Class frmUEB
         Me.TabPage7.SuspendLayout()
         Me.TabPage8.SuspendLayout()
         Me.TabPage1.SuspendLayout()
-        Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
         'cmdCancel
@@ -317,7 +312,7 @@ Public Class frmUEB
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCancel.Location = New System.Drawing.Point(323, 542)
+        Me.cmdCancel.Location = New System.Drawing.Point(318, 500)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(73, 28)
         Me.cmdCancel.TabIndex = 5
@@ -327,7 +322,7 @@ Public Class frmUEB
         '
         Me.cmdHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdHelp.Location = New System.Drawing.Point(402, 542)
+        Me.cmdHelp.Location = New System.Drawing.Point(397, 500)
         Me.cmdHelp.Name = "cmdHelp"
         Me.cmdHelp.Size = New System.Drawing.Size(65, 28)
         Me.cmdHelp.TabIndex = 6
@@ -337,7 +332,7 @@ Public Class frmUEB
         '
         Me.cmdAbout.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdAbout.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdAbout.Location = New System.Drawing.Point(473, 542)
+        Me.cmdAbout.Location = New System.Drawing.Point(468, 500)
         Me.cmdAbout.Name = "cmdAbout"
         Me.cmdAbout.Size = New System.Drawing.Size(72, 28)
         Me.cmdAbout.TabIndex = 7
@@ -346,8 +341,8 @@ Public Class frmUEB
         'TabControl1
         '
         Me.TabControl1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TabControl1.Controls.Add(Me.TabPage2)
         Me.TabControl1.Controls.Add(Me.TabPage3)
         Me.TabControl1.Controls.Add(Me.TabPage7)
@@ -360,7 +355,7 @@ Public Class frmUEB
         Me.TabControl1.Multiline = True
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(529, 459)
+        Me.TabControl1.Size = New System.Drawing.Size(529, 474)
         Me.TabControl1.TabIndex = 8
         '
         'TabPage2
@@ -375,7 +370,7 @@ Public Class frmUEB
         Me.TabPage2.Controls.Add(Me.GroupBox4)
         Me.TabPage2.Location = New System.Drawing.Point(4, 25)
         Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Size = New System.Drawing.Size(521, 430)
+        Me.TabPage2.Size = New System.Drawing.Size(521, 445)
         Me.TabPage2.TabIndex = 12
         Me.TabPage2.Text = "General"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -384,7 +379,7 @@ Public Class frmUEB
         '
         Me.txtOutputFile.Location = New System.Drawing.Point(121, 175)
         Me.txtOutputFile.Name = "txtOutputFile"
-        Me.txtOutputFile.Size = New System.Drawing.Size(142, 20)
+        Me.txtOutputFile.Size = New System.Drawing.Size(380, 20)
         Me.txtOutputFile.TabIndex = 48
         '
         'Label7
@@ -400,7 +395,7 @@ Public Class frmUEB
         '
         Me.txtProjectName.Location = New System.Drawing.Point(121, 136)
         Me.txtProjectName.Name = "txtProjectName"
-        Me.txtProjectName.Size = New System.Drawing.Size(142, 20)
+        Me.txtProjectName.Size = New System.Drawing.Size(380, 20)
         Me.txtProjectName.TabIndex = 46
         '
         'txtMasterFile
@@ -439,7 +434,7 @@ Public Class frmUEB
         'GroupBox4
         '
         Me.GroupBox4.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox4.Controls.Add(Me.Label50)
         Me.GroupBox4.Controls.Add(Me.AtcTextSnowAge)
         Me.GroupBox4.Controls.Add(Me.Label52)
@@ -569,10 +564,52 @@ Public Class frmUEB
         Me.TabPage3.Controls.Add(Me.GroupBox2)
         Me.TabPage3.Location = New System.Drawing.Point(4, 25)
         Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Size = New System.Drawing.Size(521, 430)
+        Me.TabPage3.Size = New System.Drawing.Size(521, 445)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Weather"
         Me.TabPage3.UseVisualStyleBackColor = True
+        '
+        'txtNetRadStation
+        '
+        Me.txtNetRadStation.Location = New System.Drawing.Point(163, 395)
+        Me.txtNetRadStation.Name = "txtNetRadStation"
+        Me.txtNetRadStation.Size = New System.Drawing.Size(338, 20)
+        Me.txtNetRadStation.TabIndex = 50
+        '
+        'txtShortRadStation
+        '
+        Me.txtShortRadStation.Location = New System.Drawing.Point(163, 370)
+        Me.txtShortRadStation.Name = "txtShortRadStation"
+        Me.txtShortRadStation.Size = New System.Drawing.Size(338, 20)
+        Me.txtShortRadStation.TabIndex = 49
+        '
+        'txtRelHStation
+        '
+        Me.txtRelHStation.Location = New System.Drawing.Point(163, 341)
+        Me.txtRelHStation.Name = "txtRelHStation"
+        Me.txtRelHStation.Size = New System.Drawing.Size(338, 20)
+        Me.txtRelHStation.TabIndex = 48
+        '
+        'txtWindStation
+        '
+        Me.txtWindStation.Location = New System.Drawing.Point(163, 313)
+        Me.txtWindStation.Name = "txtWindStation"
+        Me.txtWindStation.Size = New System.Drawing.Size(338, 20)
+        Me.txtWindStation.TabIndex = 47
+        '
+        'txtPrecipStation
+        '
+        Me.txtPrecipStation.Location = New System.Drawing.Point(163, 289)
+        Me.txtPrecipStation.Name = "txtPrecipStation"
+        Me.txtPrecipStation.Size = New System.Drawing.Size(338, 20)
+        Me.txtPrecipStation.TabIndex = 46
+        '
+        'txtAtempStation
+        '
+        Me.txtAtempStation.Location = New System.Drawing.Point(163, 263)
+        Me.txtAtempStation.Name = "txtAtempStation"
+        Me.txtAtempStation.Size = New System.Drawing.Size(338, 20)
+        Me.txtAtempStation.TabIndex = 45
         '
         'txtWeatherFile
         '
@@ -629,7 +666,7 @@ Public Class frmUEB
         'GroupBox3
         '
         Me.GroupBox3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox3.Controls.Add(Me.rdoMeasuredNet)
         Me.GroupBox3.Controls.Add(Me.rdoRadMeasuredInput)
         Me.GroupBox3.Controls.Add(Me.rdoRadEstimate)
@@ -693,7 +730,7 @@ Public Class frmUEB
         'GroupBox2
         '
         Me.GroupBox2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox2.Controls.Add(Me.lblTimeStep)
         Me.GroupBox2.Controls.Add(Me.atcTextTimeStep)
         Me.GroupBox2.Controls.Add(Me.Label1)
@@ -994,7 +1031,7 @@ Public Class frmUEB
         Me.TabPage7.Controls.Add(Me.AtcGridModelParms)
         Me.TabPage7.Location = New System.Drawing.Point(4, 25)
         Me.TabPage7.Name = "TabPage7"
-        Me.TabPage7.Size = New System.Drawing.Size(521, 430)
+        Me.TabPage7.Size = New System.Drawing.Size(521, 445)
         Me.TabPage7.TabIndex = 8
         Me.TabPage7.Text = "Model Parameters"
         Me.TabPage7.UseVisualStyleBackColor = True
@@ -1020,15 +1057,15 @@ Public Class frmUEB
         Me.AtcGridModelParms.AllowHorizontalScrolling = True
         Me.AtcGridModelParms.AllowNewValidValues = False
         Me.AtcGridModelParms.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.AtcGridModelParms.CellBackColor = System.Drawing.SystemColors.Window
         Me.AtcGridModelParms.Fixed3D = False
         Me.AtcGridModelParms.LineColor = System.Drawing.SystemColors.Control
         Me.AtcGridModelParms.LineWidth = 1.0!
         Me.AtcGridModelParms.Location = New System.Drawing.Point(3, 57)
         Me.AtcGridModelParms.Name = "AtcGridModelParms"
-        Me.AtcGridModelParms.Size = New System.Drawing.Size(511, 360)
+        Me.AtcGridModelParms.Size = New System.Drawing.Size(511, 358)
         Me.AtcGridModelParms.Source = Nothing
         Me.AtcGridModelParms.TabIndex = 0
         '
@@ -1039,7 +1076,7 @@ Public Class frmUEB
         Me.TabPage8.Controls.Add(Me.AtcGridSiteVars)
         Me.TabPage8.Location = New System.Drawing.Point(4, 25)
         Me.TabPage8.Name = "TabPage8"
-        Me.TabPage8.Size = New System.Drawing.Size(521, 430)
+        Me.TabPage8.Size = New System.Drawing.Size(521, 445)
         Me.TabPage8.TabIndex = 9
         Me.TabPage8.Text = "Site Variables"
         Me.TabPage8.UseVisualStyleBackColor = True
@@ -1065,15 +1102,15 @@ Public Class frmUEB
         Me.AtcGridSiteVars.AllowHorizontalScrolling = True
         Me.AtcGridSiteVars.AllowNewValidValues = False
         Me.AtcGridSiteVars.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.AtcGridSiteVars.CellBackColor = System.Drawing.SystemColors.Window
         Me.AtcGridSiteVars.Fixed3D = False
         Me.AtcGridSiteVars.LineColor = System.Drawing.SystemColors.Control
         Me.AtcGridSiteVars.LineWidth = 1.0!
         Me.AtcGridSiteVars.Location = New System.Drawing.Point(3, 47)
         Me.AtcGridSiteVars.Name = "AtcGridSiteVars"
-        Me.AtcGridSiteVars.Size = New System.Drawing.Size(515, 379)
+        Me.AtcGridSiteVars.Size = New System.Drawing.Size(515, 377)
         Me.AtcGridSiteVars.Source = Nothing
         Me.AtcGridSiteVars.TabIndex = 0
         '
@@ -1088,7 +1125,7 @@ Public Class frmUEB
         Me.TabPage1.Controls.Add(Me.AtcGridBCMonthly)
         Me.TabPage1.Location = New System.Drawing.Point(4, 25)
         Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Size = New System.Drawing.Size(521, 430)
+        Me.TabPage1.Size = New System.Drawing.Size(521, 445)
         Me.TabPage1.TabIndex = 11
         Me.TabPage1.Text = "Bristow Campbell Parameters"
         Me.TabPage1.UseVisualStyleBackColor = True
@@ -1178,8 +1215,8 @@ Public Class frmUEB
         Me.AtcGridBCMonthly.AllowHorizontalScrolling = True
         Me.AtcGridBCMonthly.AllowNewValidValues = False
         Me.AtcGridBCMonthly.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.AtcGridBCMonthly.CellBackColor = System.Drawing.Color.Empty
         Me.AtcGridBCMonthly.Fixed3D = False
         Me.AtcGridBCMonthly.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -1187,33 +1224,9 @@ Public Class frmUEB
         Me.AtcGridBCMonthly.LineWidth = 0.0!
         Me.AtcGridBCMonthly.Location = New System.Drawing.Point(0, 97)
         Me.AtcGridBCMonthly.Name = "AtcGridBCMonthly"
-        Me.AtcGridBCMonthly.Size = New System.Drawing.Size(521, 320)
+        Me.AtcGridBCMonthly.Size = New System.Drawing.Size(521, 335)
         Me.AtcGridBCMonthly.Source = Nothing
         Me.AtcGridBCMonthly.TabIndex = 51
-        '
-        'GroupBox1
-        '
-        Me.GroupBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.GroupBox1.Controls.Add(Me.lblStatus)
-        Me.GroupBox1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.GroupBox1.Location = New System.Drawing.Point(15, 480)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(530, 48)
-        Me.GroupBox1.TabIndex = 9
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Status"
-        '
-        'lblStatus
-        '
-        Me.lblStatus.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblStatus.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblStatus.Location = New System.Drawing.Point(13, 21)
-        Me.lblStatus.Name = "lblStatus"
-        Me.lblStatus.Size = New System.Drawing.Size(505, 14)
-        Me.lblStatus.TabIndex = 0
-        Me.lblStatus.Text = "Update specifications if desired, then click OK to proceed."
         '
         'Label20
         '
@@ -1229,7 +1242,7 @@ Public Class frmUEB
         'ComboBox14
         '
         Me.ComboBox14.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox14.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox14.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox14.Location = New System.Drawing.Point(183, 359)
@@ -1251,7 +1264,7 @@ Public Class frmUEB
         'ComboBox15
         '
         Me.ComboBox15.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox15.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox15.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox15.Location = New System.Drawing.Point(183, 333)
@@ -1273,7 +1286,7 @@ Public Class frmUEB
         'ComboBox16
         '
         Me.ComboBox16.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox16.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox16.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox16.Location = New System.Drawing.Point(183, 306)
@@ -1295,7 +1308,7 @@ Public Class frmUEB
         'ComboBox17
         '
         Me.ComboBox17.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox17.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox17.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox17.Location = New System.Drawing.Point(183, 279)
@@ -1317,7 +1330,7 @@ Public Class frmUEB
         'ComboBox18
         '
         Me.ComboBox18.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox18.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox18.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox18.Location = New System.Drawing.Point(183, 252)
@@ -1339,7 +1352,7 @@ Public Class frmUEB
         'ComboBox19
         '
         Me.ComboBox19.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox19.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox19.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox19.Location = New System.Drawing.Point(183, 225)
@@ -1361,7 +1374,7 @@ Public Class frmUEB
         'ComboBox20
         '
         Me.ComboBox20.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox20.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox20.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox20.Location = New System.Drawing.Point(183, 198)
@@ -1383,7 +1396,7 @@ Public Class frmUEB
         'ComboBox21
         '
         Me.ComboBox21.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox21.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox21.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox21.Location = New System.Drawing.Point(183, 171)
@@ -1405,7 +1418,7 @@ Public Class frmUEB
         'ComboBox22
         '
         Me.ComboBox22.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox22.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox22.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox22.Location = New System.Drawing.Point(183, 144)
@@ -1427,7 +1440,7 @@ Public Class frmUEB
         'ComboBox23
         '
         Me.ComboBox23.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox23.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox23.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox23.Location = New System.Drawing.Point(183, 117)
@@ -1449,7 +1462,7 @@ Public Class frmUEB
         'ComboBox24
         '
         Me.ComboBox24.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox24.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox24.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox24.Location = New System.Drawing.Point(183, 90)
@@ -1460,7 +1473,7 @@ Public Class frmUEB
         'ComboBox25
         '
         Me.ComboBox25.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox25.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox25.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox25.Location = New System.Drawing.Point(183, 36)
@@ -1493,7 +1506,7 @@ Public Class frmUEB
         'ComboBox26
         '
         Me.ComboBox26.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox26.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox26.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox26.Location = New System.Drawing.Point(183, 63)
@@ -1515,7 +1528,7 @@ Public Class frmUEB
         'ComboBox27
         '
         Me.ComboBox27.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox27.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox27.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox27.Location = New System.Drawing.Point(183, 359)
@@ -1537,7 +1550,7 @@ Public Class frmUEB
         'ComboBox28
         '
         Me.ComboBox28.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox28.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox28.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox28.Location = New System.Drawing.Point(183, 333)
@@ -1559,7 +1572,7 @@ Public Class frmUEB
         'ComboBox29
         '
         Me.ComboBox29.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox29.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox29.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox29.Location = New System.Drawing.Point(183, 306)
@@ -1581,7 +1594,7 @@ Public Class frmUEB
         'ComboBox30
         '
         Me.ComboBox30.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox30.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox30.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox30.Location = New System.Drawing.Point(183, 279)
@@ -1603,7 +1616,7 @@ Public Class frmUEB
         'ComboBox31
         '
         Me.ComboBox31.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox31.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox31.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox31.Location = New System.Drawing.Point(183, 252)
@@ -1625,7 +1638,7 @@ Public Class frmUEB
         'ComboBox32
         '
         Me.ComboBox32.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox32.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox32.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox32.Location = New System.Drawing.Point(183, 225)
@@ -1647,7 +1660,7 @@ Public Class frmUEB
         'ComboBox33
         '
         Me.ComboBox33.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox33.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox33.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox33.Location = New System.Drawing.Point(183, 198)
@@ -1669,7 +1682,7 @@ Public Class frmUEB
         'ComboBox34
         '
         Me.ComboBox34.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox34.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox34.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox34.Location = New System.Drawing.Point(183, 171)
@@ -1691,7 +1704,7 @@ Public Class frmUEB
         'ComboBox35
         '
         Me.ComboBox35.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox35.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox35.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox35.Location = New System.Drawing.Point(183, 144)
@@ -1713,7 +1726,7 @@ Public Class frmUEB
         'ComboBox36
         '
         Me.ComboBox36.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox36.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox36.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox36.Location = New System.Drawing.Point(183, 117)
@@ -1735,7 +1748,7 @@ Public Class frmUEB
         'ComboBox37
         '
         Me.ComboBox37.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox37.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox37.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox37.Location = New System.Drawing.Point(183, 90)
@@ -1746,7 +1759,7 @@ Public Class frmUEB
         'ComboBox38
         '
         Me.ComboBox38.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox38.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox38.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox38.Location = New System.Drawing.Point(183, 36)
@@ -1779,7 +1792,7 @@ Public Class frmUEB
         'ComboBox39
         '
         Me.ComboBox39.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox39.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox39.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox39.Location = New System.Drawing.Point(183, 63)
@@ -1792,61 +1805,18 @@ Public Class frmUEB
         Me.cmdSimulate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdSimulate.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdSimulate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdSimulate.Location = New System.Drawing.Point(19, 541)
+        Me.cmdSimulate.Location = New System.Drawing.Point(14, 499)
         Me.cmdSimulate.Name = "cmdSimulate"
         Me.cmdSimulate.Size = New System.Drawing.Size(73, 28)
         Me.cmdSimulate.TabIndex = 10
         Me.cmdSimulate.Text = "Simulate"
         '
-        'txtAtempStation
-        '
-        Me.txtAtempStation.Location = New System.Drawing.Point(163, 263)
-        Me.txtAtempStation.Name = "txtAtempStation"
-        Me.txtAtempStation.Size = New System.Drawing.Size(338, 20)
-        Me.txtAtempStation.TabIndex = 45
-        '
-        'txtPrecipStation
-        '
-        Me.txtPrecipStation.Location = New System.Drawing.Point(163, 289)
-        Me.txtPrecipStation.Name = "txtPrecipStation"
-        Me.txtPrecipStation.Size = New System.Drawing.Size(338, 20)
-        Me.txtPrecipStation.TabIndex = 46
-        '
-        'txtWindStation
-        '
-        Me.txtWindStation.Location = New System.Drawing.Point(163, 313)
-        Me.txtWindStation.Name = "txtWindStation"
-        Me.txtWindStation.Size = New System.Drawing.Size(338, 20)
-        Me.txtWindStation.TabIndex = 47
-        '
-        'txtRelHStation
-        '
-        Me.txtRelHStation.Location = New System.Drawing.Point(163, 341)
-        Me.txtRelHStation.Name = "txtRelHStation"
-        Me.txtRelHStation.Size = New System.Drawing.Size(338, 20)
-        Me.txtRelHStation.TabIndex = 48
-        '
-        'txtShortRadStation
-        '
-        Me.txtShortRadStation.Location = New System.Drawing.Point(163, 370)
-        Me.txtShortRadStation.Name = "txtShortRadStation"
-        Me.txtShortRadStation.Size = New System.Drawing.Size(338, 20)
-        Me.txtShortRadStation.TabIndex = 49
-        '
-        'txtNetRadStation
-        '
-        Me.txtNetRadStation.Location = New System.Drawing.Point(163, 395)
-        Me.txtNetRadStation.Name = "txtNetRadStation"
-        Me.txtNetRadStation.Size = New System.Drawing.Size(338, 20)
-        Me.txtNetRadStation.TabIndex = 50
-        '
         'frmUEB
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.cmdCancel
-        Me.ClientSize = New System.Drawing.Size(560, 581)
+        Me.ClientSize = New System.Drawing.Size(560, 537)
         Me.Controls.Add(Me.cmdSimulate)
-        Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.cmdAbout)
         Me.Controls.Add(Me.cmdHelp)
@@ -1872,7 +1842,6 @@ Public Class frmUEB
         Me.TabPage8.PerformLayout()
         Me.TabPage1.ResumeLayout(False)
         Me.TabPage1.PerformLayout()
-        Me.GroupBox1.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -1995,10 +1964,6 @@ Public Class frmUEB
         pWeatherData = New clsUEBWeather
     End Sub
 
-    Private Sub lblStatus_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lblStatus.TextChanged
-        Logger.Dbg(lblStatus.Text)
-    End Sub
-
     Private Sub rdoMeasuredNet_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoMeasuredNet.CheckedChanged
         If rdoMeasuredNet.Checked Then
             txtNetRadStation.Enabled = True
@@ -2024,8 +1989,8 @@ Public Class frmUEB
 
     Private Sub txtWeatherFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtWeatherFile.Click
         Dim cdlg As New Windows.Forms.OpenFileDialog
-        cdlg.Title = "Open UCI file containing base model"
-        cdlg.Filter = "UCI files|*.uci|All Files|*.*"
+        cdlg.Title = "Open UEB Weather File"
+        cdlg.Filter = "UEB Weather files|*.in|All Files|*.*"
         If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
             txtWeatherFile.Text = cdlg.FileName
         End If
@@ -2057,6 +2022,7 @@ Public Class frmUEB
     End Sub
 
     Private Sub txtWeatherFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtWeatherFile.TextChanged
+        pWeatherData.FileName = txtWeatherFile.Text
         If FileExists(txtWeatherFile.Text) Then
             pWeatherData.ReadWeatherFile()
             Dim lDate(5) As Integer
@@ -2070,31 +2036,63 @@ Public Class frmUEB
             AtcTextIniWaterEquiv.Text = pWeatherData.InitialH2OEquiv
             AtcTextSnowAge.Text = pWeatherData.InitialSnowAge
         End If
-        pWeatherData.FileName = txtWeatherFile.Text
+    End Sub
+
+    Private Sub txtParameterFile_Click(sender As Object, e As System.EventArgs) Handles txtParameterFile.Click
+        Dim cdlg As New Windows.Forms.OpenFileDialog
+        cdlg.Title = "Open UEB Parameter File"
+        cdlg.Filter = "UEB Parameter files|*.dat|All Files|*.*"
+        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+            txtParameterFile.Text = cdlg.FileName
+        End If
+
     End Sub
 
     Private Sub txtParameterFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtParameterFile.TextChanged
+        pParmData.FileName = txtParameterFile.Text
         If FileExists(txtParameterFile.Text) Then
             ReadDataFile(txtParameterFile.Text, pParmData.ParameterValue)
             For i As Integer = 1 To clsUEBParameterFile.NumParameters
                 AtcGridModelParms.Source.CellValue(i, 1) = pParmData.ParameterValue(i - 1)
             Next
+            AtcGridModelParms.Refresh()
         End If
-        pParmData.FileName = txtParameterFile.Text
+    End Sub
+
+    Private Sub txtSiteFile_Click(sender As Object, e As System.EventArgs) Handles txtSiteFile.Click
+        Dim cdlg As New Windows.Forms.OpenFileDialog
+        cdlg.Title = "Open UEB Site File"
+        cdlg.Filter = "UEB Site files|*.dat|All Files|*.*"
+        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+            txtSiteFile.Text = cdlg.FileName
+        End If
+
     End Sub
 
     Private Sub txtSiteFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtSiteFile.TextChanged
+        pSiteData.FileName = txtSiteFile.Text
         If FileExists(txtSiteFile.Text) Then
             ReadDataFile(txtSiteFile.Text, pSiteData.VariableValue)
             For i As Integer = 1 To clsUEBSiteFile.NumVariables
                 AtcGridSiteVars.Source.CellValue(i, 1) = pSiteData.VariableValue(i - 1)
             Next
+            AtcGridSiteVars.Refresh()
         End If
-        pSiteData.FileName = txtSiteFile.Text
+    End Sub
+
+    Private Sub txtBCParameterFile_Click(sender As Object, e As System.EventArgs) Handles txtBCParameterFile.Click
+        Dim cdlg As New Windows.Forms.OpenFileDialog
+        cdlg.Title = "Open UEB BC Parameter File"
+        cdlg.Filter = "UEB BC Parameter files|*.dat|All Files|*.*"
+        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+            txtBCParameterFile.Text = cdlg.FileName
+        End If
+
     End Sub
 
     Private Sub txtBCParameterFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtBCParameterFile.TextChanged
         Dim lMonth As Integer
+        pBCParameterFileName = txtBCParameterFile.Text
         If FileExists(txtBCParameterFile.Text) Then
             ReadDataFile(txtBCParameterFile.Text, pBCDataArray)
             AtcTextAParm.ValueDouble = pBCDataArray(0)
@@ -2103,8 +2101,8 @@ Public Class frmUEB
                 lMonth = pBCDataArray(3 * i - 1)
                 AtcGridBCMonthly.Source.CellValue(lMonth, 1) = pBCDataArray(3 * i)
             Next
+            AtcGridBCMonthly.Refresh()
         End If
-        pBCParameterFileName = txtBCParameterFile.Text
     End Sub
 
     Private Sub cmdSimulate_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdSimulate.Click
