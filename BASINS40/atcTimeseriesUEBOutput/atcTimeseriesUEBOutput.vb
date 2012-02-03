@@ -56,6 +56,7 @@ Public Class atcTimeseriesUEBOutput
 
         If Not FileExists(aFileName) Then
             pErrorDescription = "File '" & aFileName & "' not found"
+            Open = False
         Else
             Me.Specification = aFileName
             Dim inStream As New FileStream(aFileName, FileMode.Open, FileAccess.Read)
@@ -189,11 +190,13 @@ Public Class atcTimeseriesUEBOutput
             Catch ex As Exception
                 Logger.Dbg("PROBLEM processing the following record: " & vbCrLf & _
                            "     " & curLine & vbCrLf & "     " & ex.Message)
+                Open = False
             End Try
             inReader.Close()
             inBuffer.Close()
             inStream.Close()
         End If
+
     End Function
 
     Public Overrides Sub ReadData(ByVal aReadMe As atcData.atcDataSet)
