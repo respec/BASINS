@@ -162,7 +162,7 @@ Public Class DownloadDataPlugin
         g_MapWin = MapWin
         g_Menus = MapWin.Menus
         g_MainForm = ParentHandle
-        AddMenuIfMissing(pMenuName, "mnuFile", pMenuLabel, "mnuNew")
+        AddMenuIfMissing(pMenuName, "mnuFile", pMenuLabel, "mnuFileBreak2")
     End Sub
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate

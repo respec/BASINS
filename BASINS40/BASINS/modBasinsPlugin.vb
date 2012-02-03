@@ -19,11 +19,26 @@ Public Module modBasinsPlugin
     Friend g_Plugins As MapWindow.Interfaces.Plugins
     Friend g_Project As MapWindow.Interfaces.Project
     Friend g_MapWinWindowHandle As Integer
-    Friend g_AppNameRegistry As String = "BASINS4" 'For preferences in registry
-    Friend g_AppNameShort As String = "Basins"
-    Friend g_AppNameLong As String = "BASINS 4"
-    Friend g_URL_Home As String = ""
-    Friend g_URL_Register As String = ""
+
+#If ProgramName = "USGS GW Toolbox" Then
+    Friend Const g_AppNameRegistry As String = "USGS-GW" 'For preferences in registry
+    Friend Const g_AppNameShort As String = "USGS-GW"
+    Friend Const g_AppNameLong As String = "USGS GW Toolbox"
+    Friend Const g_URL_Home As String = "http://water.usgs.gov/software/lists/groundwater/"
+    Friend Const g_URL_Register As String = "http://hspf.com/pub/USGS-GW/register.html"
+#ElseIf ProgramName = "USGS Surface Water Analysis" Then
+    Friend Const g_AppNameRegistry As String = "USGS-SW" 'For preferences in registry
+    Friend Const g_AppNameShort As String = "USGS-SW"
+    Friend Const g_AppNameLong As String = "USGS Surface Water Analysis"
+    Friend Const g_URL_Home As String = "http://water.usgs.gov/software/lists/surface_water/"
+    Friend Const g_URL_Register As String = "http://hspf.com/pub/USGS-SW/register.html"
+#Else
+    Friend Const g_AppNameRegistry As String = "BASINS4" 'For preferences in registry
+    Friend Const g_AppNameShort As String = "BASINS"
+    Friend Const g_AppNameLong As String = "BASINS 4"
+    Friend Const g_URL_Home As String = "http://www.epa.gov/waterscience/BASINS/"
+    Friend Const g_URL_Register As String = "http://hspf.com/pub/basins4/register.html"
+#End If
 
     Friend g_BasinsDataDirs As New Generic.List(Of String)
     Friend g_ProgramDir As String = ""
@@ -212,8 +227,12 @@ Public Module modBasinsPlugin
         Return lHaveCatLayer And lHaveStateLayer
     End Function
 
+    ''' <summary>
+    ''' Try two ways of finding a data directory in the user's own directory, default to a directory in the root if not found
+    ''' </summary>
     Public Function DefaultBasinsDataDir() As String
         If g_BasinsDataDirs IsNot Nothing AndAlso g_BasinsDataDirs.Count > 0 Then
+            'Already found at least one data directory, default to the first one
             Return g_BasinsDataDirs(0)
         Else
             Dim lDir As String
@@ -223,7 +242,7 @@ Public Module modBasinsPlugin
             Catch
             End Try
             Try
-                lDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal & g_PathChar & BasinsDataPath)
+                lDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal) & g_PathChar & BasinsDataPath
                 If IO.Directory.Exists(lDir) Then Return lDir
             Catch
             End Try
