@@ -1828,7 +1828,7 @@ Public Class frmModelSetup
     End Sub
 
     Private Sub cboDEM_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboDEM.SelectedIndexChanged
-        If cboDEM.SelectedIndex > -1 Then
+        If cboDEM.SelectedIndex > 0 Then
             'default units 
             Dim lElevationThemeName As String = cboDEM.Items(cboDEM.SelectedIndex)
             Dim lElevationLayerIndex As Integer = GisUtil.LayerIndex(lElevationThemeName)

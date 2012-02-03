@@ -158,7 +158,21 @@ Module modCreateUci
                             lTable.Parms("LAT").Value = SignificantDigits(CompositeLatitude(lLandUse.ModelID, pWatershed.LandUses), 4)
                             lTable.Parms("MELEV").Value = SignificantDigits(CompositeElevation(lLandUse.ModelID, pWatershed.LandUses), 3)
                             lTable = lOperation.Tables.Item("ATEMP-DAT")
-                            lTable.Parms("ELDAT").Value = SignificantDigits(CompositeElevation(lLandUse.ModelID, pWatershed.LandUses), 3)
+                            Dim lGageElev As Single = 0.0
+                            If lOperation.MetSeg.MetSegRecs("ATEM") IsNot Nothing Then
+                                Dim lTmpRec As HspfMetSegRecord = lOperation.MetSeg.MetSegRecs("ATEM")
+                                Dim lVolName As String = lTmpRec.Source.VolName
+                                Dim lVolID As Integer = lTmpRec.Source.VolId
+                                Dim lTimeseries As atcData.atcTimeseries = aUci.GetDataSetFromDsn(WDMInd(lVolName), lVolID)
+                                If lTimeseries IsNot Nothing Then
+                                    If lTimeseries.Attributes.GetValue("ELEV") IsNot Nothing Then
+                                        If IsNumeric(lTimeseries.Attributes.GetValue("ELEV")) Then
+                                            lGageElev = CSng(lTimeseries.Attributes.GetValue("ELEV")) * 3.281 'will be in meters
+                                        End If
+                                    End If
+                                End If
+                            End If
+                            lTable.Parms("ELDAT").Value = SignificantDigits(CompositeElevation(lLandUse.ModelID, pWatershed.LandUses) - lGageElev, 3)  'subtract atemp gage elevation 
                         End If
                         Exit For
                     End If
@@ -191,7 +205,21 @@ Module modCreateUci
                             lTable.Parms("LAT").Value = SignificantDigits(CompositeLatitude(lLandUse.ModelID, pWatershed.LandUses), 4)
                             lTable.Parms("MELEV").Value = SignificantDigits(CompositeElevation(lLandUse.ModelID, pWatershed.LandUses), 3)
                             lTable = lOperation.Tables.Item("ATEMP-DAT")
-                            lTable.Parms("ELDAT").Value = SignificantDigits(CompositeElevation(lLandUse.ModelID, pWatershed.LandUses), 3)
+                            Dim lGageElev As Single = 0.0
+                            If lOperation.MetSeg.MetSegRecs("ATEM") IsNot Nothing Then
+                                Dim lTmpRec As HspfMetSegRecord = lOperation.MetSeg.MetSegRecs("ATEM")
+                                Dim lVolName As String = lTmpRec.Source.VolName
+                                Dim lVolID As Integer = lTmpRec.Source.VolId
+                                Dim lTimeseries As atcData.atcTimeseries = aUci.GetDataSetFromDsn(WDMInd(lVolName), lVolID)
+                                If lTimeseries IsNot Nothing Then
+                                    If lTimeseries.Attributes.GetValue("ELEV") IsNot Nothing Then
+                                        If IsNumeric(lTimeseries.Attributes.GetValue("ELEV")) Then
+                                            lGageElev = CSng(lTimeseries.Attributes.GetValue("ELEV")) * 3.281 'will be in meters
+                                        End If
+                                    End If
+                                End If
+                            End If
+                            lTable.Parms("ELDAT").Value = SignificantDigits(CompositeElevation(lLandUse.ModelID, pWatershed.LandUses) - lGageElev, 3)  'subtract atemp gage elevation 
                         End If
                         Exit For
                     End If
