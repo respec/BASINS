@@ -155,6 +155,12 @@ Public Class frmRecess
                 txtDataStart.Text = pDateFormat.JDateToString(lFirstDate + 1)
                 txtDataEnd.Text = pDateFormat.JDateToString(lLastDate)
             End If
+            If txtStartDateUser.Text.Length = 0 Then
+                txtStartDateUser.Text = txtDataStart.Text
+            End If
+            If txtEndDateUser.Text.Length = 0 Then
+                txtEndDateUser.Text = txtDataEnd.Text
+            End If
             lAllText &= ": " & pDateFormat.JDateToString(lFirstDate + 1) & " to " & pDateFormat.JDateToString(lLastDate)
         End If
 
@@ -1194,34 +1200,35 @@ Public Class frmRecess
     End Sub
 
     Private Sub btnGetAllSegments_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGetAllSegments.Click
-        If Not ConfigurationChanged() Then
-            Exit Sub
-        End If
-        'Dim lArgs As New atcDataAttributes
-        Dim lFormCheckMsg As String = AttributesFromForm(pLastRunConfigs)
-        If lFormCheckMsg.Length > 0 Then
-            Logger.Msg("Please address the following issues before proceed:" & vbCrLf & vbCrLf & lFormCheckMsg, MsgBoxStyle.Information, "Input Needs Correction")
-            Exit Sub
-        End If
+        If ConfigurationChanged() Then
+            'Dim lArgs As New atcDataAttributes
+            Dim lFormCheckMsg As String = AttributesFromForm(pLastRunConfigs)
+            If lFormCheckMsg.Length > 0 Then
+                Logger.Msg("Please address the following issues before proceeding:" & vbCrLf & vbCrLf & lFormCheckMsg, MsgBoxStyle.Information, "Input Needs Correction")
+                Exit Sub
+            End If
 
-        If pRecess IsNot Nothing Then
-            pRecess.Clear()
-            'pRecess = Nothing
-        End If
-        'pRecess = New clsRecess()
-        pRecess.Initialize(pDataGroup(0), pLastRunConfigs)
-        pRecess.RecessGetAllSegments()
-        lstRecessSegments.Items.Clear()
-        For Each lPeakDate As String In pRecess.listOfSegments.Keys
-            lstRecessSegments.Items.Add(lPeakDate)
-        Next
+            If pRecess IsNot Nothing Then
+                pRecess.Clear()
+                'pRecess = Nothing
+            End If
+            'pRecess = New clsRecess()
+            pRecess.Initialize(pDataGroup(0), pLastRunConfigs)
+            pRecess.RecessGetAllSegments()
+            lstRecessSegments.Items.Clear()
+            For Each lPeakDate As String In pRecess.listOfSegments.Keys
+                lstRecessSegments.Items.Add(lPeakDate)
+            Next
 
-        If lstRecessSegments.Items.Count = 0 Then
-            txtAnalysisResults.Text = ""
-            lstTable.Items.Clear()
-            pGraphRecessDatagroup.Clear()
-            RefreshGraphRecess(pGraphRecessDatagroup)
+            If lstRecessSegments.Items.Count = 0 Then
+                txtAnalysisResults.Text = ""
+                lstTable.Items.Clear()
+                pGraphRecessDatagroup.Clear()
+                RefreshGraphRecess(pGraphRecessDatagroup)
+            End If
         End If
+        panelConfiguration.Visible = False
+        panelAnalysis.Visible = True
     End Sub
 
     Private Function AttributesFromForm(ByRef Args As atcDataAttributes) As String
@@ -1738,5 +1745,15 @@ Public Class frmRecess
             Logger.MsgCustomOwned(pMessage, "Reminder", Me, New String() {"OK"})
             pMessage = ""
         End If
+    End Sub
+
+    Private Sub btnConfiguration_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnConfiguration.Click
+        panelAnalysis.Visible = False
+        panelConfiguration.Visible = True
+    End Sub
+
+    Private Sub frmRecess_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        panelConfiguration.Dock = DockStyle.Fill
+        panelAnalysis.Dock = DockStyle.Fill
     End Sub
 End Class

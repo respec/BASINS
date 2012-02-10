@@ -28,6 +28,8 @@ Partial Class frmUSGSBaseflow
         Me.lblDrainageAreaUnits = New System.Windows.Forms.Label
         Me.btnExamineData = New System.Windows.Forms.Button
         Me.gbDates = New System.Windows.Forms.GroupBox
+        Me.lblAnalysisDates = New System.Windows.Forms.Label
+        Me.lblPeriodOfRecord = New System.Windows.Forms.Label
         Me.txtEndDateUser = New System.Windows.Forms.TextBox
         Me.txtStartDateUser = New System.Windows.Forms.TextBox
         Me.txtDataEnd = New System.Windows.Forms.TextBox
@@ -94,7 +96,7 @@ Partial Class frmUSGSBaseflow
         'btnExamineData
         '
         Me.btnExamineData.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnExamineData.Location = New System.Drawing.Point(244, 80)
+        Me.btnExamineData.Location = New System.Drawing.Point(68, 85)
         Me.btnExamineData.Name = "btnExamineData"
         Me.btnExamineData.Size = New System.Drawing.Size(94, 23)
         Me.btnExamineData.TabIndex = 10
@@ -105,6 +107,8 @@ Partial Class frmUSGSBaseflow
         '
         Me.gbDates.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbDates.Controls.Add(Me.lblAnalysisDates)
+        Me.gbDates.Controls.Add(Me.lblPeriodOfRecord)
         Me.gbDates.Controls.Add(Me.txtEndDateUser)
         Me.gbDates.Controls.Add(Me.txtStartDateUser)
         Me.gbDates.Controls.Add(Me.btnExamineData)
@@ -114,16 +118,38 @@ Partial Class frmUSGSBaseflow
         Me.gbDates.Controls.Add(Me.lblDataStart)
         Me.gbDates.Location = New System.Drawing.Point(12, 159)
         Me.gbDates.Name = "gbDates"
-        Me.gbDates.Size = New System.Drawing.Size(344, 109)
+        Me.gbDates.Size = New System.Drawing.Size(344, 114)
         Me.gbDates.TabIndex = 7
         Me.gbDates.TabStop = False
-        Me.gbDates.Text = "Analysis Dates"
+        Me.gbDates.Text = "Define Analysis Dates"
+        '
+        'lblAnalysisDates
+        '
+        Me.lblAnalysisDates.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblAnalysisDates.AutoSize = True
+        Me.lblAnalysisDates.Location = New System.Drawing.Point(191, 16)
+        Me.lblAnalysisDates.Name = "lblAnalysisDates"
+        Me.lblAnalysisDates.Size = New System.Drawing.Size(76, 13)
+        Me.lblAnalysisDates.TabIndex = 12
+        Me.lblAnalysisDates.Text = "Analysis Dates"
+        '
+        'lblPeriodOfRecord
+        '
+        Me.lblPeriodOfRecord.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblPeriodOfRecord.AutoSize = True
+        Me.lblPeriodOfRecord.Location = New System.Drawing.Point(67, 16)
+        Me.lblPeriodOfRecord.Name = "lblPeriodOfRecord"
+        Me.lblPeriodOfRecord.Size = New System.Drawing.Size(87, 13)
+        Me.lblPeriodOfRecord.TabIndex = 11
+        Me.lblPeriodOfRecord.Text = "Period of Record"
         '
         'txtEndDateUser
         '
         Me.txtEndDateUser.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtEndDateUser.Location = New System.Drawing.Point(194, 52)
+        Me.txtEndDateUser.Location = New System.Drawing.Point(194, 58)
         Me.txtEndDateUser.Name = "txtEndDateUser"
         Me.txtEndDateUser.Size = New System.Drawing.Size(144, 20)
         Me.txtEndDateUser.TabIndex = 9
@@ -133,7 +159,7 @@ Partial Class frmUSGSBaseflow
         '
         Me.txtStartDateUser.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtStartDateUser.Location = New System.Drawing.Point(194, 25)
+        Me.txtStartDateUser.Location = New System.Drawing.Point(194, 31)
         Me.txtStartDateUser.Name = "txtStartDateUser"
         Me.txtStartDateUser.Size = New System.Drawing.Size(144, 20)
         Me.txtStartDateUser.TabIndex = 8
@@ -142,7 +168,7 @@ Partial Class frmUSGSBaseflow
         'txtDataEnd
         '
         Me.txtDataEnd.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.txtDataEnd.Location = New System.Drawing.Point(68, 53)
+        Me.txtDataEnd.Location = New System.Drawing.Point(68, 59)
         Me.txtDataEnd.Name = "txtDataEnd"
         Me.txtDataEnd.ReadOnly = True
         Me.txtDataEnd.Size = New System.Drawing.Size(119, 20)
@@ -151,7 +177,7 @@ Partial Class frmUSGSBaseflow
         'txtDataStart
         '
         Me.txtDataStart.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.txtDataStart.Location = New System.Drawing.Point(68, 26)
+        Me.txtDataStart.Location = New System.Drawing.Point(68, 32)
         Me.txtDataStart.Name = "txtDataStart"
         Me.txtDataStart.ReadOnly = True
         Me.txtDataStart.Size = New System.Drawing.Size(119, 20)
@@ -160,7 +186,7 @@ Partial Class frmUSGSBaseflow
         'lblDataEnd
         '
         Me.lblDataEnd.AutoSize = True
-        Me.lblDataEnd.Location = New System.Drawing.Point(6, 52)
+        Me.lblDataEnd.Location = New System.Drawing.Point(6, 58)
         Me.lblDataEnd.Name = "lblDataEnd"
         Me.lblDataEnd.Size = New System.Drawing.Size(52, 13)
         Me.lblDataEnd.TabIndex = 1
@@ -171,7 +197,7 @@ Partial Class frmUSGSBaseflow
         Me.lblDataStart.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblDataStart.AutoSize = True
-        Me.lblDataStart.Location = New System.Drawing.Point(6, 26)
+        Me.lblDataStart.Location = New System.Drawing.Point(6, 32)
         Me.lblDataStart.Name = "lblDataStart"
         Me.lblDataStart.Size = New System.Drawing.Size(55, 13)
         Me.lblDataStart.TabIndex = 0
@@ -183,7 +209,7 @@ Partial Class frmUSGSBaseflow
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFile, Me.mnuAnalysis, Me.mnuHelp})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(368, 27)
+        Me.MenuStrip1.Size = New System.Drawing.Size(368, 24)
         Me.MenuStrip1.TabIndex = 28
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -191,63 +217,63 @@ Partial Class frmUSGSBaseflow
         '
         Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileSelectData, Me.mnuOutput, Me.mnuGraphBF})
         Me.mnuFile.Name = "mnuFile"
-        Me.mnuFile.Size = New System.Drawing.Size(45, 23)
+        Me.mnuFile.Size = New System.Drawing.Size(37, 20)
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
         '
         Me.mnuFileSelectData.Name = "mnuFileSelectData"
-        Me.mnuFileSelectData.Size = New System.Drawing.Size(172, 24)
+        Me.mnuFileSelectData.Size = New System.Drawing.Size(132, 22)
         Me.mnuFileSelectData.Text = "Select Data"
         '
         'mnuOutput
         '
         Me.mnuOutput.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOutputASCII})
         Me.mnuOutput.Name = "mnuOutput"
-        Me.mnuOutput.Size = New System.Drawing.Size(172, 24)
+        Me.mnuOutput.Size = New System.Drawing.Size(132, 22)
         Me.mnuOutput.Text = "Output"
         '
         'mnuOutputASCII
         '
         Me.mnuOutputASCII.Name = "mnuOutputASCII"
-        Me.mnuOutputASCII.Size = New System.Drawing.Size(136, 24)
+        Me.mnuOutputASCII.Size = New System.Drawing.Size(102, 22)
         Me.mnuOutputASCII.Text = "ASCII"
         '
         'mnuGraphBF
         '
         Me.mnuGraphBF.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuGraphTimeseries, Me.mnuGraphDuration, Me.mnuGraphCDistPlot})
         Me.mnuGraphBF.Name = "mnuGraphBF"
-        Me.mnuGraphBF.Size = New System.Drawing.Size(172, 24)
+        Me.mnuGraphBF.Size = New System.Drawing.Size(132, 22)
         Me.mnuGraphBF.Text = "Graph"
         '
         'mnuGraphTimeseries
         '
         Me.mnuGraphTimeseries.Name = "mnuGraphTimeseries"
-        Me.mnuGraphTimeseries.Size = New System.Drawing.Size(187, 24)
+        Me.mnuGraphTimeseries.Size = New System.Drawing.Size(146, 22)
         Me.mnuGraphTimeseries.Text = "TimeSeries"
         '
         'mnuGraphDuration
         '
         Me.mnuGraphDuration.Name = "mnuGraphDuration"
-        Me.mnuGraphDuration.Size = New System.Drawing.Size(187, 24)
+        Me.mnuGraphDuration.Size = New System.Drawing.Size(146, 22)
         Me.mnuGraphDuration.Text = "Duration"
         '
         'mnuGraphCDistPlot
         '
         Me.mnuGraphCDistPlot.Name = "mnuGraphCDistPlot"
-        Me.mnuGraphCDistPlot.Size = New System.Drawing.Size(187, 24)
+        Me.mnuGraphCDistPlot.Size = New System.Drawing.Size(146, 22)
         Me.mnuGraphCDistPlot.Text = "Cummulative"
         '
         'mnuAnalysis
         '
         Me.mnuAnalysis.Name = "mnuAnalysis"
-        Me.mnuAnalysis.Size = New System.Drawing.Size(79, 23)
+        Me.mnuAnalysis.Size = New System.Drawing.Size(62, 20)
         Me.mnuAnalysis.Text = "Analysis"
         '
         'mnuHelp
         '
         Me.mnuHelp.Name = "mnuHelp"
-        Me.mnuHelp.Size = New System.Drawing.Size(53, 23)
+        Me.mnuHelp.Size = New System.Drawing.Size(44, 20)
         Me.mnuHelp.Text = "Help"
         '
         'txtOutputRootName
@@ -510,4 +536,6 @@ Partial Class frmUSGSBaseflow
     Friend WithEvents chkMethodPART As System.Windows.Forms.CheckBox
     Friend WithEvents gbGraph As System.Windows.Forms.GroupBox
     Friend WithEvents gbDrainageArea As System.Windows.Forms.GroupBox
+    Friend WithEvents lblPeriodOfRecord As System.Windows.Forms.Label
+    Friend WithEvents lblAnalysisDates As System.Windows.Forms.Label
 End Class
