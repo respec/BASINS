@@ -448,8 +448,16 @@ Public Class atcTimeseriesRDB
                                 lData.Attributes.SetValue("ID", lRawDataSets.Count + 1)
                                 lData.numValues = lTable.NumRecords - 1
 
+                                lData.Attributes.SetValue("parm_cd", .FieldName(lField).Substring(3, 5))
                                 Select Case .FieldName(lField).Substring(3, 5)
                                     Case "00060" : lData.Attributes.SetValue("Constituent", "FLOW")
+
+                                    Case "61055" : lData.Attributes.SetValue("Constituent", "GW LEVEL") 'Water level, depth below measuring point, feet 
+                                    Case "62611" : lData.Attributes.SetValue("Constituent", "GW LEVEL") 'Groundwater level above NAVD 1988, feet 
+                                    Case "72019" : lData.Attributes.SetValue("Constituent", "GW LEVEL") 'Depth to water level, feet below land surface 
+                                    Case "72020" : lData.Attributes.SetValue("Constituent", "GW LEVEL") 'Elevation above NGVD 1929, feet 
+                                    Case "72150" : lData.Attributes.SetValue("Constituent", "GW LEVEL") 'Groundwater level relative to Mean Sea Level (MSL), feet. 
+
                                     Case Else : lData.Attributes.SetValue("Constituent", .FieldName(lField).Substring(3, 5))
                                 End Select
 
