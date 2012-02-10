@@ -121,6 +121,12 @@ Public Class frmUSGSBaseflow
                 txtDataStart.Text = pDateFormat.JDateToString(lFirstDate + 1)
                 txtDataEnd.Text = pDateFormat.JDateToString(lLastDate)
             End If
+            If txtStartDateUser.Text.Length = 0 Then
+                txtStartDateUser.Text = txtDataStart.Text
+            End If
+            If txtEndDateUser.Text.Length = 0 Then
+                txtEndDateUser.Text = txtDataEnd.Text
+            End If
         End If
 
         txtOutputDir.Text = pOutputDir

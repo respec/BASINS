@@ -344,8 +344,8 @@ Public Class frmMRCControl
         Dim lStationRecSum As String
         Dim lStationStation As String
         Dim lMRCToAdd As String
-        Dim lEquation As String
-        Dim lRange As String
+        'Dim lEquation As String
+        'Dim lRange As String
         For CntRecSum As Integer = 2 To lstRecSum.Items.Count - 1
             lArrRecSum = Regex.Split(lstRecSum.Items(CntRecSum), "\s+")
             lStationRecSum = lArrRecSum(0).Trim.ToLower
