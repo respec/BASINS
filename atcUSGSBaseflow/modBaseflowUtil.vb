@@ -27,6 +27,11 @@ Module modBaseflowUtil
 
         If (lStart < 0 AndAlso lEnd < 0) OrElse lDA < 0 Then Exit Sub
 
+        If lTsGroupFixed.Count > 0 Then ASCIIOriginal(aTs, BFMethods.HySEPFixed)
+        If lTsGroupLocMin.Count > 0 Then ASCIIOriginal(aTs, BFMethods.HySEPLocMin)
+        If lTsGroupSlide.Count > 0 Then ASCIIOriginal(aTs, BFMethods.HySEPSlide)
+        If lTsGroupPart.Count > 0 Then ASCIIOriginal(aTs, BFMethods.PART)
+
         Dim lConversionFactor As Double = pUADepth / lDA
         Dim lTsFlowDaily As atcTimeseries = SubsetByDate(aTs, lStart, lEnd, Nothing)
         Dim lTsFlowDailyDepth As atcTimeseries = lTsFlowDaily * lConversionFactor
@@ -216,6 +221,109 @@ Module modBaseflowUtil
         lSW = Nothing
 
     End Sub
+
+    Private Function ASCIIOriginal(ByVal aStreamFlowTs As atcTimeseries, ByVal aMethod As BFMethods) As Boolean
+
+        Dim lSpecification As String = ""
+        Dim lMethodName As String = ""
+        Select Case aMethod
+            Case BFMethods.HySEPFixed : lMethodName = "HySEPFixed"
+            Case BFMethods.HySEPLocMin : lMethodName = "HySEPLocMin"
+            Case BFMethods.HySEPSlide : lMethodName = "HySEPSlide"
+            Case BFMethods.PART : lMethodName = "Part"
+        End Select
+        'Write original HySEP and PART's output files
+        If aMethod = BFMethods.HySEPFixed OrElse _
+           aMethod = BFMethods.HySEPLocMin OrElse _
+           aMethod = BFMethods.HySEPSlide Then
+            Dim lFilename As String
+            lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_" & lMethodName & ".SBF")
+            ASCIIHySepBSF(aStreamFlowTs, lFilename, aMethod)
+            Dim lFilenamePrt As String = IO.Path.ChangeExtension(lFilename, "PRT")
+            ASCIIHySepMonthly(aStreamFlowTs, lFilenamePrt, aMethod)
+            lSpecification = lFilename
+
+            'If chkTabDelimited.Checked Then
+            'lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_tab" & ".SBF")
+            'ASCIIHySepDelimited(aBaseFlowTsGroup(0), lFilename)
+            'End If
+
+            'With cdlg
+            '    lFilename = AbsolutePath(lFilename, CurDir)
+            '    .FileName = lFilename
+            '    .Filter = ""
+            '    '.FilterIndex = 0
+            '    .DefaultExt = "SBF"
+            'End With
+        ElseIf aMethod = BFMethods.PART Then
+            'With cdlg
+            '    lFilename = AbsolutePath(lFilename, CurDir)
+            '    .FileName = lFilename
+            '    .Filter = ""
+            '    '.FilterIndex = 0
+            '    .DefaultExt = "SBF"
+            'End With
+            Dim lFilename As String = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partday.txt")
+            ASCIIPartDaily(aStreamFlowTs, lFilename)
+            'If chkTabDelimited.Checked Then
+            '    lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partday_tab.txt")
+            '    ASCIIPartDailyDelimited(pDataGroup(0), lFilename)
+            'End If
+
+            lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partmon.txt")
+            lSpecification = lFilename
+            ASCIIPartMonthly(aStreamFlowTs, lFilename)
+            'If chkTabDelimited.Checked Then
+            '    lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partmon_tab.txt")
+            '    ASCIIPartMonthlyDelimited(pDataGroup(0), lFilename)
+            'End If
+
+            lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partqrt.txt")
+            ASCIIPartQuarterly(aStreamFlowTs, lFilename)
+            'If chkTabDelimited.Checked Then
+            '    lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partqrt_tab.txt")
+            '    ASCIIPartQuarterlyDelimited(pDataGroup(0), lFilename)
+            'End If
+
+            lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partWY.txt")
+            ASCIIPartWaterYear(aStreamFlowTs, lFilename)
+            'If chkTabDelimited.Checked Then
+            '    lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partWY_tab.txt")
+            '    ASCIIPartWaterYearDelim(pDataGroup(0), lFilename)
+            'End If
+
+            lFilename = IO.Path.Combine(OutputDir, OutputFilenameRoot & "_partsum.txt")
+            ASCIIPartBFSum(aStreamFlowTs, lFilename)
+        End If
+
+        'With cdlg
+        '    If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+        '        lFilename = AbsolutePath(.FileName, CurDir)
+        '        aFilterIndex = .FilterIndex
+        '        Logger.Dbg("User specified file '" & lFilename & "'")
+        '        Logger.LastDbgText = ""
+        '    Else 'Return empty string if user clicked Cancel
+        '        lFilename = ""
+        '        Logger.Dbg("User Cancelled File Selection Dialog for " & aFileDialogTitle)
+        '        Logger.LastDbgText = "" 'forget about this - user was in control - no additional message box needed
+        '    End If
+        'End With
+
+        'Dim lProcess As New Process
+        'With lProcess
+        '    .StartInfo.FileName = "Notepad.exe"
+        '    .StartInfo.Arguments = lSpecification
+        '    Try
+        '        .Start()
+        '    Catch lException As System.SystemException
+        '        'Dim lExtension As String = FileExt(lSpecification)
+        '        'lProcess.StartInfo.FileName = "Notepad.exe"
+        '        'lProcess.StartInfo.Arguments = lSpecification
+        '        'lProcess.Start()
+        '        .Dispose()
+        '    End Try
+        'End With
+    End Function
 
     Public Function ASCIICommonDurationTable(ByVal aTsGroupStreamFlow As atcCollection, _
                                  ByVal aTsGroupPart As atcCollection, _
@@ -618,16 +726,16 @@ Module modBaseflowUtil
     ''' <param name="aTs">Streamflow timeseries with baseflow group as an attribute</param>
     ''' <param name="aFilename">.BSF output filename</param>
     ''' <remarks></remarks>
-    Public Sub ASCIIHySepBSF(ByVal aTs As atcTimeseries, ByVal aFilename As String, Optional ByVal aBFName As String = "")
+    Public Sub ASCIIHySepBSF(ByVal aTs As atcTimeseries, ByVal aFilename As String, Optional ByVal aBFMethod As BFMethods = BFMethods.HySEPFixed)
 
         Dim lSTAID As String = aTs.Attributes.GetValue("STAID", "12345678")
         Dim lColumnId1 As String = "2" & lSTAID & "   60    3"
         Dim lColumnId2 As String = ("3" & lSTAID).PadRight(16, " ")
 
         Dim lTsBF As atcTimeseries = Nothing
-        If aBFName = "" Then aBFName = "HySep"
+        'If aBFName = "" Then aBFName = "HySep"
         For Each lTs As atcTimeseries In aTs.Attributes.GetDefinedValue("Baseflow").Value
-            If lTs.Attributes.GetValue("Scenario").ToString.StartsWith(aBFName) Then
+            If lTs.Attributes.GetValue("Method") = aBFMethod Then
                 lTsBF = lTs
                 Exit For
             End If
@@ -751,7 +859,7 @@ Module modBaseflowUtil
     ''' <param name="aTs">Streamflow timeseries with baseflow group as an attribute</param>
     ''' <param name="aFilename">.BSF output filename</param>
     ''' <remarks></remarks>
-    Public Sub ASCIIHySepMonthly(ByVal aTs As atcTimeseries, ByVal aFilename As String, Optional ByVal aBFName As String = "")
+    Public Sub ASCIIHySepMonthly(ByVal aTs As atcTimeseries, ByVal aFilename As String, Optional ByVal aBFMethod As BFMethods = BFMethods.HySEPFixed)
         Dim lSW As IO.StreamWriter = Nothing
         Try
             lSW = New IO.StreamWriter(aFilename, False)
@@ -762,9 +870,9 @@ Module modBaseflowUtil
 
         Dim lTsBF As atcTimeseries = Nothing
         Dim lTsFlow As atcTimeseries = Nothing
-        If aBFName = "" Then aBFName = "HySep"
+        'If aBFName = "" Then aBFName = "HySep"
         For Each lTs As atcTimeseries In aTs.Attributes.GetDefinedValue("Baseflow").Value
-            If lTs.Attributes.GetValue("Scenario").ToString.StartsWith(aBFName) Then
+            If lTs.Attributes.GetValue("Method") = aBFMethod Then
                 lTsBF = lTs
                 lTsFlow = SubsetByDate(aTs, lTs.Dates.Value(0), lTs.Dates.Value(lTs.numValues), Nothing)
                 Exit For
@@ -782,7 +890,7 @@ Module modBaseflowUtil
         'Metric Unit: flow in m3/s, depth in centimeter, drainage area in square km
         '1 second-foot for one day covers 1 square mile 0.03719 inch deep (Water Supply Paper by USGS)
         '1 cfs = 0.6462 M gal/d (flow rate conversion)
-        Dim lDA As Double = lTsBF.Attributes.GetValue("DrainageArea", 1.0)
+        Dim lDA As Double = lTsBF.Attributes.GetValue("Drainage Area", 1.0)
         Dim lTsFlowDepthPUA As atcTimeseries = Nothing
         Dim lTsFlowVolumePUA As atcTimeseries = Nothing
         Dim lTsFlowRatePUA As atcTimeseries = Nothing
@@ -836,42 +944,42 @@ Module modBaseflowUtil
         Dim lSnCo10RateBFVolume As atcTimeseriesGroup = lSnMonth.Split(lMonthlyCo10RateBFVolume, Nothing)
 
         '2100
-        Dim lHeader2100 As String = "" & _
-     Space(6) & "   Mean       Mean       Mean     Total   Total   Total    BF/     Base" & _
-     Space(6) & "  stream-     base      surface  stream-   base  surface stream-   flow" & _
-     Space(6) & "   flow       flow      runoff    flow     flow   runoff  flow   (Mgal/d/" & _
-     Space(6) & "  (ft3/s)    (ft3/s)    (ft3/s)    (in)    (in)    (in)    (%)      mi2)" & _
+        Dim lHeader2100 As String = "" & vbCrLf & _
+     Space(6) & "   Mean       Mean       Mean     Total   Total   Total    BF/     Base" & vbCrLf & _
+     Space(6) & "  stream-     base      surface  stream-   base  surface stream-   flow" & vbCrLf & _
+     Space(6) & "   flow       flow      runoff    flow     flow   runoff  flow   (Mgal/d/" & vbCrLf & _
+     Space(6) & "  (ft3/s)    (ft3/s)    (ft3/s)    (in)    (in)    (in)    (%)      mi2)" & vbCrLf & _
      Space(6) & "---------- ---------- ---------- ------- ------- -------  ----- ----------"
 
         '2110
-        Dim lHeader2110 As String = "" & _
-     Space(6) & "   Mean       Mean       Mean     Total   Total   Total    BF/" & _
-     Space(6) & "  stream-     base      surface  stream-   base  surface stream-   Base" & _
-     Space(6) & "   flow       flow      runoff    flow     flow   runoff  flow     flow" & _
-     Space(6) & "  (ft3/s)    (ft3/s)    (ft3/s)    (in)    (in)    (in)    (%)   (Mgal/d)" & _
+        Dim lHeader2110 As String = "" & vbCrLf & _
+     Space(6) & "   Mean       Mean       Mean     Total   Total   Total    BF/" & vbCrLf & _
+     Space(6) & "  stream-     base      surface  stream-   base  surface stream-   Base" & vbCrLf & _
+     Space(6) & "   flow       flow      runoff    flow     flow   runoff  flow     flow" & vbCrLf & _
+     Space(6) & "  (ft3/s)    (ft3/s)    (ft3/s)    (in)    (in)    (in)    (%)   (Mgal/d)" & vbCrLf & _
      Space(6) & "---------- ---------- ---------- ------- ------- -------  ----- ----------"
 
         '2120
-        Dim lHeader2120 As String = "" & _
-     Space(6) & "   Mean       Mean       Mean     Total   Total   Total    BF/     Base" & _
-     Space(6) & "  stream-     base      surface  stream-   base  surface stream-   flow" & _
-     Space(6) & "   flow       flow      runoff    flow     flow   runoff  flow    (ft3/s/" & _
-     Space(6) & "  (ft3/s)    (ft3/s)    (ft3/s)    (in)    (in)    (in)    (%)      mi2)" & _
+        Dim lHeader2120 As String = "" & vbCrLf & _
+     Space(6) & "   Mean       Mean       Mean     Total   Total   Total    BF/     Base" & vbCrLf & _
+     Space(6) & "  stream-     base      surface  stream-   base  surface stream-   flow" & vbCrLf & _
+     Space(6) & "   flow       flow      runoff    flow     flow   runoff  flow    (ft3/s/" & vbCrLf & _
+     Space(6) & "  (ft3/s)    (ft3/s)    (ft3/s)    (in)    (in)    (in)    (%)      mi2)" & vbCrLf & _
      Space(6) & "---------- ---------- ---------- ------- ------- -------  ----- ----------"
 
         '2130
-        Dim lHeader2130 As String = "" & _
-     Space(6) & "   Mean       Mean       Mean     Total   Total   Total    BF/     Base" & _
-     Space(6) & "  stream-     base      surface  stream-   base  surface stream-   flow" & _
-     Space(6) & "   flow       flow      runoff    flow     flow   runoff  flow    (m3/s/" & _
-     Space(6) & "  (m3/s)     (m3/s)     (m3/s)     (cm)    (cm)    (cm)    (%)      km2)" & _
+        Dim lHeader2130 As String = "" & vbCrLf & _
+     Space(6) & "   Mean       Mean       Mean     Total   Total   Total    BF/     Base" & vbCrLf & _
+     Space(6) & "  stream-     base      surface  stream-   base  surface stream-   flow" & vbCrLf & _
+     Space(6) & "   flow       flow      runoff    flow     flow   runoff  flow    (m3/s/" & vbCrLf & _
+     Space(6) & "  (m3/s)     (m3/s)     (m3/s)     (cm)    (cm)    (cm)    (%)      km2)" & vbCrLf & _
      Space(6) & "---------- ---------- ---------- ------- ------- -------  ----- ----------"
 
-        Dim lHeaderEngAll As String = "" & _
-     Space(6) & "   Mean       Mean       Mean     Total   Total   Total    BF/     Base       Base" & _
-     Space(6) & "  stream-     base      surface  stream-   base  surface stream-   flow       flow       Base" & _
-     Space(6) & "   flow       flow      runoff    flow     flow   runoff  flow    (ft3/s/   (Mgal/d/     flow" & _
-     Space(6) & "  (ft3/s)    (ft3/s)    (ft3/s)    (in)    (in)    (in)    (%)      mi2)       mi2)    (Mgal/d)" & _
+        Dim lHeaderEngAll As String = "" & vbCrLf & _
+     Space(6) & "   Mean       Mean       Mean     Total   Total   Total    BF/     Base       Base" & vbCrLf & _
+     Space(6) & "  stream-     base      surface  stream-   base  surface stream-   flow       flow       Base" & vbCrLf & _
+     Space(6) & "   flow       flow      runoff    flow     flow   runoff  flow    (ft3/s/   (Mgal/d/     flow" & vbCrLf & _
+     Space(6) & "  (ft3/s)    (ft3/s)    (ft3/s)    (in)    (in)    (in)    (%)      mi2)       mi2)    (Mgal/d)" & vbCrLf & _
      Space(6) & "---------- ---------- ---------- ------- ------- -------  ----- ---------- ---------- ----------"
 
         '2150 FORMAT (A5,3F11.2,3F8.3,F7.2,F11.3)
@@ -976,7 +1084,7 @@ Module modBaseflowUtil
                 End If
 
                 J2Date(lMonthlyCo1RateFlow.Dates.Value(I), lDate)
-                .Value(1) = String.Format("{0:0.00}", lMonthNames(lDate(1)))
+                .Value(1) = lMonthNames(lDate(1))
                 .Value(2) = String.Format("{0:0.00}", lMonthlyCo1RateFlow.Value(I + 1))
                 .Value(3) = String.Format("{0:0.00}", lMonthlyCo2RateBF.Value(I + 1))
                 .Value(4) = String.Format("{0:0.00}", lMonthlyCo3RateRO.Value(I + 1))
@@ -1039,7 +1147,15 @@ Module modBaseflowUtil
 
         lSW.WriteLine(vbCrLf & vbCrLf)
         lSW.WriteLine(lHeaderEngAll)
-        lSW.WriteLine(lTable.ToString.Replace(",", " "))
+        lTable.MoveFirst()
+        While Not lTable.EOF
+            For I As Integer = 1 To lTable.NumFields
+                lSW.Write(lTable.Value(I).PadLeft(lTable.FieldLength(I)))
+            Next
+            lSW.WriteLine("")
+            lTable.MoveNext()
+        End While
+        'lSW.WriteLine(lTable.ToString.Replace(",", "   "))
 
         'Seasonal-distribution table
         lSW.WriteLine(vbCrLf & vbCrLf)
@@ -1057,10 +1173,16 @@ Module modBaseflowUtil
         lSW.WriteLine("           ---------     ---------     ------")
         Dim lBFinch As String
         Dim lROinch As String
-        For I As Integer = lStartMonth To lEndMonth
-            lBFinch = String.Format("{0:0.000}", lSnCo5DepthBFPUA(I - 1).Attributes.GetValue("Mean")).PadLeft(13, " ")
-            lROinch = String.Format("{0:0.000}", lSnCo6DepthROPUA(I - 1).Attributes.GetValue("Mean")).PadLeft(13, " ")
-            lSW.WriteLine(Space(11) & lMonthNames(I).Trim().PadRight(9, " ") & lBFinch & lROinch)
+        'For I As Integer = lStartMonth To lEndMonth
+        '    lBFinch = String.Format("{0:0.000}", lSnCo5DepthBFPUA(I - 1).Attributes.GetValue("Mean")).PadLeft(13, " ")
+        '    lROinch = String.Format("{0:0.000}", lSnCo6DepthROPUA(I - 1).Attributes.GetValue("Mean")).PadLeft(13, " ")
+        '    lSW.WriteLine(Space(11) & lMonthNames(I).Trim().PadRight(9, " ") & lBFinch & lROinch)
+        'Next
+        For I As Integer = 0 To lSnCo5DepthBFPUA.Count - 1
+            lBFinch = String.Format("{0:0.000}", lSnCo5DepthBFPUA(I).Attributes.GetValue("Mean")).PadLeft(13, " ")
+            lROinch = String.Format("{0:0.000}", lSnCo6DepthROPUA(I).Attributes.GetValue("Mean")).PadLeft(13, " ")
+            J2Date(lSnCo5DepthBFPUA(I).Dates.Value(0), lDate)
+            lSW.WriteLine(Space(11) & lMonthNames(lDate(1)).Trim().PadRight(9, " ") & lBFinch & lROinch)
         Next
 
         lSW.Flush()

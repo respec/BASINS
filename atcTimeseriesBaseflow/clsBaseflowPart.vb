@@ -149,7 +149,7 @@ Public Class clsBaseflowPart
         With lTsBaseflowgroup
             .Add(pTsBaseflow1)
             .Add(pTsBaseflow2)
-            '.Add(pTsBaseflow3)
+            .Add(pTsBaseflow3)
             .Add(pTsBaseflowMonthly)
             '.Add(pTsBaseflow1Monthly)
             '.Add(pTsBaseflow2Monthly)
