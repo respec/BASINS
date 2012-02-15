@@ -297,7 +297,7 @@ Partial Class frmRecess
         '
         Me.scDisplay.Panel2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.scDisplay.Size = New System.Drawing.Size(580, 206)
-        Me.scDisplay.SplitterDistance = 145
+        Me.scDisplay.SplitterDistance = 296
         Me.scDisplay.TabIndex = 39
         '
         'txtAnalysisResults
@@ -310,7 +310,7 @@ Partial Class frmRecess
         Me.txtAnalysisResults.Name = "txtAnalysisResults"
         Me.txtAnalysisResults.ReadOnly = True
         Me.txtAnalysisResults.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtAnalysisResults.Size = New System.Drawing.Size(145, 206)
+        Me.txtAnalysisResults.Size = New System.Drawing.Size(296, 206)
         Me.txtAnalysisResults.TabIndex = 15
         Me.txtAnalysisResults.Visible = False
         Me.txtAnalysisResults.WordWrap = False
@@ -324,7 +324,7 @@ Partial Class frmRecess
         Me.lstTable.ItemHeight = 14
         Me.lstTable.Location = New System.Drawing.Point(0, 0)
         Me.lstTable.Name = "lstTable"
-        Me.lstTable.Size = New System.Drawing.Size(145, 206)
+        Me.lstTable.Size = New System.Drawing.Size(296, 206)
         Me.lstTable.TabIndex = 0
         '
         'btnCurv
@@ -382,19 +382,19 @@ Partial Class frmRecess
         '
         Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileSelectData})
         Me.mnuFile.Name = "mnuFile"
-        Me.mnuFile.Size = New System.Drawing.Size(37, 20)
+        Me.mnuFile.Size = New System.Drawing.Size(35, 20)
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
         '
         Me.mnuFileSelectData.Name = "mnuFileSelectData"
-        Me.mnuFileSelectData.Size = New System.Drawing.Size(132, 22)
+        Me.mnuFileSelectData.Size = New System.Drawing.Size(140, 22)
         Me.mnuFileSelectData.Text = "Select Data"
         '
         'mnuHelp
         '
         Me.mnuHelp.Name = "mnuHelp"
-        Me.mnuHelp.Size = New System.Drawing.Size(44, 20)
+        Me.mnuHelp.Size = New System.Drawing.Size(40, 20)
         Me.mnuHelp.Text = "Help"
         '
         'panelConfiguration
