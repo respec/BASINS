@@ -1202,6 +1202,12 @@ Public Class frmRecess
     Private Sub btnGetAllSegments_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGetAllSegments.Click
         If ConfigurationChanged() Then
             'Dim lArgs As New atcDataAttributes
+            'Reset all listing/graphs when redo
+            txtAnalysisResults.Text = ""
+            lstTable.Items.Clear()
+            pGraphRecessDatagroup.Clear()
+            RefreshGraphRecess(pGraphRecessDatagroup)
+
             Dim lFormCheckMsg As String = AttributesFromForm(pLastRunConfigs)
             If lFormCheckMsg.Length > 0 Then
                 Logger.Msg("Please address the following issues before proceeding:" & vbCrLf & vbCrLf & lFormCheckMsg, MsgBoxStyle.Information, "Input Needs Correction")
