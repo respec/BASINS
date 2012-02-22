@@ -4450,7 +4450,9 @@ Public Module modGeoSFM
                         lStationDetails.StartJDate = lSJDay
                         lStationDetails.EndJDate = lEJDay
                         lStationDetails.Description = lLoc & ":" & lStanam & " " & lDateString
-                        aStations.Add(lStationDetails.Description, lStationDetails)
+                        If Not aStations.Keys.Contains(lStationDetails.Description) Then
+                            aStations.Add(lStationDetails.Description, lStationDetails)
+                        End If
                         'Logger.Dbg("Added " & lStationDetails.Description)
                     End If
                 End If
