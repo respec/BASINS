@@ -66,6 +66,8 @@ Public Class atcBasinsPlugIn
 
         'This is where buttons or menu items are added.
         g_MapWin = aMapWin
+        GisUtil.MappingObject = g_MapWin
+        atcDataManager.MapWindow = g_MapWin
 
         'These should match, but now g_AppNameLong is a constant and we do not set it here.
         'g_AppNameLong = aMapWin.ApplicationInfo.ApplicationName
@@ -86,9 +88,6 @@ Public Class atcBasinsPlugIn
         RegisterMenuString = "Register as a " & g_AppNameShort & " user"
         ProgramWebPageMenuString = g_AppNameShort & " Web Page"
         OurHelpMenuString = g_AppNameShort & " Documentation"
-
-        GisUtil.MappingObject = g_MapWin
-        atcDataManager.MapWindow = g_MapWin
 
         g_MapWinWindowHandle = aParentHandle
         g_MapWin.ApplicationInfo.WelcomePlugin = "plugin" 'tell the main app to Plugins.BroadcastMessage("WELCOME_SCREEN") instead of showing default MW welcome screen

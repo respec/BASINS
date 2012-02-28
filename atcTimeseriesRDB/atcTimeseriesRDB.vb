@@ -19,7 +19,6 @@ Public Class atcTimeseriesRDB
     Inherits atcTimeseriesSource
 
     Private Shared pFilter As String = "USGS RDB Files (*.rdb, *.txt)|*.rdb;*.txt|All Files (*.*)|*.*"
-    Private pErrorDescription As String
     Private pJulianInterval As Double = 1 'Add one day for daily values to record date at end of interval
 
     Public Overrides ReadOnly Property Description() As String
@@ -53,7 +52,9 @@ Public Class atcTimeseriesRDB
         End If
 
         If Not IO.File.Exists(aFileName) Then
-            pErrorDescription = "File '" & aFileName & "' not found"
+            Throw New ApplicationException("File '" & aFileName & "' not found")
+        ElseIf IO.Path.GetFileName(aFileName).ToLower.StartsWith("nwis_stations") Then
+            Throw New ApplicationException("Station file does not contain timeseries data: " & IO.Path.GetFileName(aFileName))
         Else
             Specification = aFileName
             Try
@@ -64,16 +65,20 @@ Public Class atcTimeseriesRDB
                 Dim lInputBuffer As New BufferedStream(lInputStream)
                 Dim lInputReader As New BinaryReader(lInputBuffer)
 
+                Dim lSite As Boolean = False
                 Dim lWQData As Boolean = False
                 Dim lMeasurementsData As Boolean = False
+                Dim lPeriodicGroundwaterData As Boolean = False
                 Dim lIdaData As Boolean = False
                 Dim lDailyDischargeData As Boolean = False
 
                 Dim lAttributes As New atcDataAttributes
-                Dim lCurLine As String 
+                Dim lCurLine As String
 
                 Dim lAttrName As String
                 Dim lAttrValue As String
+                Dim lFirstLine As Boolean = True
+
                 While lInputReader.PeekChar = 35 ' Asc("#")
                     lCurLine = NextLine(lInputReader)
 
@@ -91,11 +96,13 @@ Public Class atcTimeseriesRDB
                         End With
                     End If
 
-                    If lCurLine.Contains("http://") Then
+                    If lFirstLine AndAlso lCurLine.Contains("http://") Then 'This looks like a file we downloaded and prepended the original URL
                         If lCurLine.Contains("qwdata") Then
                             lWQData = True
                         ElseIf lCurLine.Contains("measurement") Then
                             lMeasurementsData = True
+                        ElseIf lCurLine.Contains("gwlevels") Then
+                            lPeriodicGroundwaterData = True
                         ElseIf lCurLine.Contains("dv?") OrElse lCurLine.Contains("provisional") Then
                             lDailyDischargeData = True
                         ElseIf lCurLine.Contains("ida.water.usgs.gov") Then
@@ -104,10 +111,15 @@ Public Class atcTimeseriesRDB
                         If Not lAttributes.ContainsAttribute("URL") Then
                             lAttributes.SetValueIfMissing("URL", lCurLine.Substring(lCurLine.IndexOf("http://")).Trim)
                         End If
+                    ElseIf lCurLine.Contains("Site File") Then
+                        lSite = True
+                        Exit While
                     ElseIf lCurLine.Contains("File created on") Then
                         lAttributes.SetValue("retrieved", lCurLine.Substring(lCurLine.IndexOf("File created on") + 15).Trim)
-                    ElseIf lCurLine.Contains("retrieved:") Then
-                        lAttributes.SetValue("retrieved", lCurLine.Substring(lCurLine.IndexOf("retrieved:") + 10).Trim)
+                    ElseIf lCurLine.ToLower.Contains("retrieved:") Then
+                        lAttributes.SetValue("retrieved", lCurLine.Substring(lCurLine.ToLower.IndexOf("retrieved:") + 10).Trim)
+                    ElseIf lCurLine.ToLower.Contains("download_date") Then
+                        lAttributes.SetValue("retrieved", lCurLine.Substring(lCurLine.ToLower.IndexOf("download_date") + 13).Trim)
                     ElseIf lCurLine.Contains("contains selected water-quality data") Then
                         lWQData = True
                         Exit While
@@ -121,6 +133,9 @@ Public Class atcTimeseriesRDB
                         lMeasurementsData = True
                         Exit While
                     ElseIf lMeasurementsData AndAlso lCurLine.Contains("Stations in this file include") Then
+                        Exit While
+                    ElseIf lCurLine.Contains("groundwater levels") Then
+                        lPeriodicGroundwaterData = True
                         Exit While
                     End If
 
@@ -139,31 +154,38 @@ Public Class atcTimeseriesRDB
                                 Case "alt_va" : lAttributes.SetValue("Elevation", lAttrValue)
                                 Case "drain_area_va" : lAttributes.SetValue("Drainage Area", lAttrValue)
                                 Case Else
-                                    If lAttrName.Length > 0 AndAlso lAttrValue.Length > 0 Then
-                                        lAttributes.SetValue(lAttrName, lAttrValue)
-                                        'Logger.Dbg("Set " & lAttrName & " = " & lAttrValue)
+                                    If lAttrName.Length > 0 Then
+                                        Select Case lAttrValue
+                                            Case "", "-", "--" 'Skip setting non-values
+                                            Case Else
+                                                lAttributes.SetValue(lAttrName, lAttrValue)
+                                        End Select
                                     End If
                             End Select
                         End If
                     End If
+                    lFirstLine = False
                 End While
 
                 lAttributes.AddHistory("Read from " & Specification)
 
-                If lWQData Then
+                If lSite Then
+                    Throw New ApplicationException("Station list does not contain timeseries data: " & IO.Path.GetFileName(aFileName))
+                ElseIf lWQData Then
                     ProcessWaterQualityValues(lInputReader, lAttributes)
                 ElseIf lMeasurementsData Then
                     ProcessMeasurements(lInputReader, lAttributes)
                 ElseIf lIdaData Then
                     ProcessIdaValues(lInputReader, lAttributes)
+                ElseIf lPeriodicGroundwaterData Then
+                    ProcessPeriodicGroundwater(lInputReader, lAttributes)
                 Else 'If lDailyDischargeData Then
                     ProcessDailyValues(lInputReader, lAttributes)
                 End If
 
                 Return True
             Catch lException As Exception
-                Logger.Dbg("Exception reading '" & aFileName & "': " & lException.Message & vbCrLf & lException.StackTrace)
-                Return False
+                Throw New ApplicationException("Exception reading '" & aFileName & "': " & lException.Message, lException)
             End Try
         End If
     End Function
@@ -228,10 +250,102 @@ Public Class atcTimeseriesRDB
                                     Select Case .FieldName(lField)
                                         Case "agency_cd", "site_no", "measurement_dt" 'don't need these as value attributes
                                         Case Else
-                                            lBuilders(lValueFieldIndex).AddValueAttribute(.FieldName(lField), .Value(lField))
+                                            Dim lAttributeValue As String = .Value(lField).Trim
+                                            If lAttributeValue.Length > 0 Then
+                                                lBuilders(lValueFieldIndex).AddValueAttribute(.FieldName(lField), lAttributeValue)
+                                            End If
                                     End Select
                                 End If
                             Next
+                        End If
+                    Next
+                Next
+                Dim lTs As atcTimeseries
+                For lValueFieldIndex = 0 To lLastValueField
+                    If lBuilders(lValueFieldIndex) IsNot Nothing AndAlso lBuilders(lValueFieldIndex).NumValues > 0 Then
+                        lTs = lBuilders(lValueFieldIndex).CreateTimeseries
+                        If lTs.Attributes.GetValue("Count", 0) > 0 Then DataSets.Add(lTs)
+                    End If
+                Next
+            Else
+                Throw New Exception("Unable to open")
+            End If
+        End With
+
+    End Sub
+
+    Sub ProcessPeriodicGroundwater(ByVal aInputReader As BinaryReader, ByVal aAttributes As atcDataAttributes)
+        Dim lStationsRDB As New atcTableRDB
+        With lStationsRDB
+            If .OpenStream(aInputReader.BaseStream) Then
+                Dim lDateField As Integer = .FieldNumber("lev_dt")
+                If lDateField = 0 Then Throw New Exception("Required field missing: lev_dt")
+                Dim lTimeField As Integer = .FieldNumber("lev_tm")
+
+                Dim lValueFieldNames() As String = {"lev_va", "sl_lev_va"}
+                Dim lConstituentNames() As String = {"GW LEVEL", "GW LEVEL"}
+                Dim lDescriptions() As String = {"Water level value in feet below land surface", "Water level value in feet above specific vertical datum"}
+                Dim lUnits() As String = {"ft", "ft"}
+                Dim lLastValueField As Integer = lValueFieldNames.GetUpperBound(0)
+                Dim lValueFieldNumber(lLastValueField) As Integer
+                Dim lBuilders(lLastValueField) As atcTimeseriesBuilder
+                Dim lValueFieldIndex As Integer
+
+                For lValueFieldIndex = 0 To lLastValueField
+                    lValueFieldNumber(lValueFieldIndex) = .FieldNumber(lValueFieldNames(lValueFieldIndex))
+                    If lValueFieldNumber(lValueFieldIndex) = 0 Then
+                        Logger.Dbg("Missing field: " & lValueFieldNames(lValueFieldIndex))
+                    Else
+                        lBuilders(lValueFieldIndex) = New atcTimeseriesBuilder(Me)
+                        With lBuilders(lValueFieldIndex).Attributes
+                            .ChangeTo(aAttributes)
+                            .SetValue("Constituent", lConstituentNames(lValueFieldIndex))
+                            .SetValue("Units", lUnits(lValueFieldIndex))
+                            .SetValue("Point", True)
+                            .SetValue("Scenario", "OBSERVED")
+                            .SetValue("Location", .GetValue("site_no"))
+                            .SetValue("Description", lDescriptions(lValueFieldIndex))
+                            .SetValue("parm_cd", lValueFieldNames(lValueFieldIndex))
+                            .SetValue("ID", lValueFieldIndex + 1)
+                        End With
+                    End If
+                Next
+
+                Dim lDateString As String
+                Dim lTimeString As String
+                Dim lDate As Date
+                Dim lValueString As String
+                Dim lValue As Double
+                For lRecord As Integer = 1 To .NumRecords
+                    .CurrentRecord = lRecord
+                    lDateString = .Value(lDateField)
+                    If lTimeField > 0 Then
+                        lTimeString = .Value(lTimeField).Trim
+                        If lTimeString.Length = 4 Then
+                            lDateString &= " " & lTimeString.Substring(0, 2) & ":" & lTimeString.Substring(2, 2)
+                        End If
+                    End If
+                    lDate = Date.Parse(lDateString)
+
+                    For lValueFieldIndex = 0 To lLastValueField
+                        If lValueFieldNumber(lValueFieldIndex) > 0 Then
+                            lValueString = .Value(lValueFieldNumber(lValueFieldIndex))
+                            If IsNumeric(lValueString) Then
+                                lValue = Double.Parse(lValueString)
+                                lBuilders(lValueFieldIndex).AddValue(lDate, lValue)
+                                For lField As Integer = 1 To .NumFields
+                                    If Array.IndexOf(lValueFieldNumber, lField) < 0 Then 'Not a value field, add it as value attribute
+                                        Select Case .FieldName(lField)
+                                            Case "agency_cd", "site_no", "lev_dt", "lev_tm", "lev_agency_cd" 'don't need these as value attributes
+                                            Case Else
+                                                Dim lAttributeValue As String = .Value(lField).Trim
+                                                If lAttributeValue.Length > 0 Then
+                                                    lBuilders(lValueFieldIndex).AddValueAttribute(.FieldName(lField), lAttributeValue)
+                                                End If
+                                        End Select
+                                    End If
+                                Next
+                            End If
                         End If
                     Next
                 Next
@@ -437,7 +551,7 @@ Public Class atcTimeseriesRDB
                             lConstituentDescription = lValueConstituentDescriptions.ItemByKey(lField)
 
                             Dim lDataKey As String = lLocation & ":" & lConstituentDescription
-                            If Not lData Is Nothing AndAlso lData.Attributes.GetValue("DataKey") = lDataKey Then
+                            If lData IsNot Nothing AndAlso lData.Attributes.GetValue("DataKey") = lDataKey Then
                                 'Already have correct dataset to append to
                             ElseIf lRawDataSets.Keys.Contains(lDataKey) Then
                                 lData = lRawDataSets.ItemByKey(lDataKey)
@@ -448,18 +562,18 @@ Public Class atcTimeseriesRDB
                                 lData.Attributes.SetValue("ID", lRawDataSets.Count + 1)
                                 lData.numValues = lTable.NumRecords - 1
 
-                                lData.Attributes.SetValue("parm_cd", .FieldName(lField).Substring(3, 5))
-                                Select Case .FieldName(lField).Substring(3, 5)
-                                    Case "00060" : lData.Attributes.SetValue("Constituent", "FLOW")
-
-                                    Case "61055" : lData.Attributes.SetValue("Constituent", "GW LEVEL") 'Water level, depth below measuring point, feet 
-                                    Case "62611" : lData.Attributes.SetValue("Constituent", "GW LEVEL") 'Groundwater level above NAVD 1988, feet 
-                                    Case "72019" : lData.Attributes.SetValue("Constituent", "GW LEVEL") 'Depth to water level, feet below land surface 
-                                    Case "72020" : lData.Attributes.SetValue("Constituent", "GW LEVEL") 'Elevation above NGVD 1929, feet 
-                                    Case "72150" : lData.Attributes.SetValue("Constituent", "GW LEVEL") 'Groundwater level relative to Mean Sea Level (MSL), feet. 
-
-                                    Case Else : lData.Attributes.SetValue("Constituent", .FieldName(lField).Substring(3, 5))
+                                Dim lParmCd As String = .FieldName(lField).Substring(3, 5)
+                                lData.Attributes.SetValue("parm_cd", lParmCd)
+                                Dim lConstituent As String = lParmCd
+                                Select Case lConstituent
+                                    Case "00060" : lConstituent = "FLOW"
+                                    Case "61055" : lConstituent = "GW LEVEL" 'Water level, depth below measuring point, feet 
+                                    Case "62611" : lConstituent = "GW LEVEL" 'Groundwater level above NAVD 1988, feet 
+                                    Case "72019" : lConstituent = "GW LEVEL" 'Depth to water level, feet below land surface 
+                                    Case "72020" : lConstituent = "GW LEVEL" 'Elevation above NGVD 1929, feet 
+                                    Case "72150" : lConstituent = "GW LEVEL" 'Groundwater level relative to Mean Sea Level (MSL), feet.
                                 End Select
+                                lData.Attributes.SetValue("Constituent", lConstituent)
 
                                 Select Case .FieldName(lField).Substring(9, 5)
                                     Case "00001" : lData.Attributes.SetValue("TSFORM", "5") 'Maximum
@@ -470,20 +584,23 @@ Public Class atcTimeseriesRDB
                                 lData.Attributes.SetValue("Scenario", "OBSERVED")
                                 lData.Attributes.SetValue("Location", lLocation)
                                 lData.Attributes.SetValue("Description", lConstituentDescription)
+                                If lConstituentDescription.Contains("feet") Then
+                                    lData.Attributes.SetValue("Units", "ft")
+                                End If
                                 lData.Attributes.SetValue("DataKey", lDataKey)
 
                                 lRawDataSets.Add(lDataKey, lData)
                                 lData.Dates.Value(0) = lDate - pJulianInterval
                                 lData.Value(0) = GetNaN()
                             End If
-                            lTSIndex = lData.Attributes.GetValue("Count") + 1
-                            lData.Value(lTSIndex) = lCurValue
-                            lData.Dates.Value(lTSIndex) = lDate
-                            If .FieldName(lField + 1) = .FieldName(lField) & "_cd" AndAlso _
-                               .Value(lField + 1).Contains("e") Then
-                                lData.ValueAttributes(lTSIndex).Add("Estimated", True)
-                            End If
-                            lData.Attributes.SetValue("Count", lTSIndex)
+                                lTSIndex = lData.Attributes.GetValue("Count") + 1
+                                lData.Value(lTSIndex) = lCurValue
+                                lData.Dates.Value(lTSIndex) = lDate
+                                If .FieldName(lField + 1) = .FieldName(lField) & "_cd" AndAlso _
+                                   .Value(lField + 1).Contains("e") Then
+                                    lData.ValueAttributes(lTSIndex).Add("Estimated", True)
+                                End If
+                                lData.Attributes.SetValue("Count", lTSIndex)
                         End If
                     Next
                 End If

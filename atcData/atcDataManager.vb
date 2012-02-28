@@ -15,6 +15,9 @@ Public Class atcDataManager
         Set(ByVal aMapWin As MapWindow.Interfaces.IMapWin)
             If pMapWin Is Nothing AndAlso Not aMapWin Is Nothing Then
                 pMapWin = aMapWin
+                If aMapWin.ApplicationInfo.ApplicationName = "USGS GW Toolbox" Then
+                    pDefaultSelectionAttributes = pDefaultSelectionAttributesGW
+                End If
                 Clear()
             End If
         End Set
@@ -134,6 +137,7 @@ Public Class atcDataManager
     Private Shared pSelectionAttributes As Generic.List(Of String)
     Private Shared pDisplayAttributes As Generic.List(Of String)
     Private Shared pDefaultSelectionAttributes() As String = {"Scenario", "Location", "Constituent"}
+    Private Shared pDefaultSelectionAttributesGW() As String = {"StaNam", "Location", "Constituent", "Description"}
     Private Shared pDefaultDisplayAttributes() As String = {"History 1", "Constituent", "Id", "Min", "Max", "Mean"}
 
     Private Shared pLikelyShapeLocationFieldNames() As String = { _

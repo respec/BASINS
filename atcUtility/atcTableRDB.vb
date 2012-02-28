@@ -97,7 +97,7 @@ TryAgain:
     End Function
 
     Private Function RDBfieldtype(ByVal aDBFfieldType As String) As String
-        Select Case aDBFfieldType
+        Select Case aDBFfieldType.ToUpper
             Case "C" : Return "s"
             Case "N" : Return "n"
             Case Else : Return aDBFfieldType
@@ -121,7 +121,7 @@ TryAgain:
             Return MyBase.FieldType(aFieldNumber)
         End Get
         Set(ByVal newValue As String)
-            Select Case newValue
+            Select Case newValue.ToLower
                 Case "s", "d" : newValue = "C"
                 Case "n" : newValue = "N"
             End Select

@@ -345,6 +345,7 @@ Friend Class frmAbout
             End Try
 
             lblProgramName.Text = g_AppNameLong
+            If g_AppNameLong = "USGS GW Toolbox" Then lblProgramName.Text &= " (Beta)"
             lblProgramName.Left = picProgramLogo.Left + picProgramLogo.Width + 8
             lblPluginVersion.Left = lblProgramName.Left
 

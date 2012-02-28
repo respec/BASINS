@@ -240,38 +240,48 @@ Public Class atcTimeseriesGridSource
                                 If lTs.Dates IsNot Nothing Then
                                     Dim lDateDisplayed As Double = pAllDates.Value(aRow - lAttributeRows + 1)
                                     Dim lIndex As Integer = Array.BinarySearch(lTs.Dates.Values, lDateDisplayed)
+                                    If lIndex >= 0 Then
+                                        If lIsValue Then
+                                            Dim lMaxWidth As Integer = pMaxWidth
+                                            Dim lFormat As String = pFormat
+                                            Dim lExpFormat As String = pExpFormat
+                                            Dim lCantFit As String = pCantFit
+                                            Dim lSignificantDigits As Integer = pSignificantDigits
+                                            With lTs.Attributes
+                                                If .ContainsAttribute("FormatMaxWidth") Then lMaxWidth = .GetValue("FormatMaxWidth")
+                                                If .ContainsAttribute("FormatNumeric") Then lFormat = .GetValue("FormatNumeric")
+                                                If .ContainsAttribute("FormatExp") Then lExpFormat = .GetValue("FormatExp")
+                                                If .ContainsAttribute("FormatCantFit") Then lCantFit = .GetValue("FormatCantFit")
+                                                If .ContainsAttribute("FormatSignificantDigits") Then lSignificantDigits = .GetValue("FormatSignificantDigits")
+                                            End With
 
-                                    If lIsValue Then
-                                        Dim lMaxWidth As Integer = pMaxWidth
-                                        Dim lFormat As String = pFormat
-                                        Dim lExpFormat As String = pExpFormat
-                                        Dim lCantFit As String = pCantFit
-                                        Dim lSignificantDigits As Integer = pSignificantDigits
-                                        With lTs.Attributes
-                                            If .ContainsAttribute("FormatMaxWidth") Then lMaxWidth = .GetValue("FormatMaxWidth")
-                                            If .ContainsAttribute("FormatNumeric") Then lFormat = .GetValue("FormatNumeric")
-                                            If .ContainsAttribute("FormatExp") Then lExpFormat = .GetValue("FormatExp")
-                                            If .ContainsAttribute("FormatCantFit") Then lCantFit = .GetValue("FormatCantFit")
-                                            If .ContainsAttribute("FormatSignificantDigits") Then lSignificantDigits = .GetValue("FormatSignificantDigits")
-                                        End With
-
-                                        If lIndex < 0 Then 'Did not find this exact date in this TS
-                                            lIndex = Not (lIndex) 'BinarySearch returned not(index of next greater value)
-                                            'Test two values closest to lDateDisplayed to see if either is within a millisecond
-                                            If lIndex <= lTs.numValues AndAlso Math.Abs(lTs.Dates.Value(lIndex) - lDateDisplayed) < JulianMillisecond Then
-                                                Return DoubleToString(lTs.Value(lIndex), lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
-                                            ElseIf lIndex > 0 AndAlso Math.Abs(lTs.Dates.Value(lIndex - 1) - lDateDisplayed) < JulianMillisecond Then
-                                                Return DoubleToString(lTs.Value(lIndex - 1), lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
-                                            Else 'No value in this TS is close enough to this date
+                                            If lIndex < 0 Then 'Did not find this exact date in this TS
+                                                lIndex = Not (lIndex) 'BinarySearch returned not(index of next greater value)
+                                                'Test two values closest to lDateDisplayed to see if either is within a millisecond
+                                                If lIndex <= lTs.numValues AndAlso Math.Abs(lTs.Dates.Value(lIndex) - lDateDisplayed) < JulianMillisecond Then
+                                                    Return DoubleToString(lTs.Value(lIndex), lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
+                                                ElseIf lIndex > 0 AndAlso Math.Abs(lTs.Dates.Value(lIndex - 1) - lDateDisplayed) < JulianMillisecond Then
+                                                    Return DoubleToString(lTs.Value(lIndex - 1), lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
+                                                Else 'No value in this TS is close enough to this date
+                                                    Return ""
+                                                End If
+                                            ElseIf Double.IsNaN(lTs.Value(lIndex)) Then
                                                 Return ""
+                                            Else
+                                                Return DoubleToString(lTs.Value(lIndex), lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
                                             End If
-                                        ElseIf Double.IsNaN(lTs.Value(lIndex)) Then
-                                            Return ""
                                         Else
-                                            Return DoubleToString(lTs.Value(lIndex), lMaxWidth, lFormat, lExpFormat, lCantFit, lSignificantDigits)
+                                            If lTs.ValueAttributesExist Then
+                                                Dim lValueAttributes As atcDataAttributes = lTs.ValueAttributes(lIndex)
+                                                If lValueAttributes IsNot Nothing AndAlso lValueAttributes.Count > 0 Then
+                                                    Return lTs.ValueAttributes(lIndex).GetFormattedValue(lValueAttDef.Name)
+                                                Else
+                                                    Return Nothing
+                                                End If
+                                            Else
+                                                Return Nothing
+                                            End If
                                         End If
-                                    Else
-                                        Return lTs.ValueAttributes(lIndex).GetFormattedValue(lValueAttDef.Name)
                                     End If
                                 Else
                                     'Stop
