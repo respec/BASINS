@@ -32,9 +32,9 @@ Module GraphGenScn
     'New things
     Private pWDMFileName As String = ""
     Private pSTAFileName As String = ""
-    Private pFEODataFileNames As List(Of String) = Nothing
-    Private pFEODataFiles As Dictionary(Of String, atcTimeseriesFEQ.atcTimeseriesFEQ) = Nothing
-    Private pTSGroup As atcTimeseriesGroup = Nothing
+    Private pFEODataFileNames As New List(Of String)
+    Private pFEODataFiles As New Dictionary(Of String, atcTimeseriesFEQ.atcTimeseriesFEQ)
+    Private pTSGroup As New atcTimeseriesGroup
     Private pGraphSpec As clsGenScnGraphSpec = Nothing
     Private pTSBlockFileName As String = "" 'this is assumed to be the original GenScn .tsb files (csv)
     Private pTSBlockTab As atcTableDelimited = Nothing
@@ -67,26 +67,29 @@ Module GraphGenScn
             Select Case lKey
                 Case "WDM1"
                     pWDMFileName = AbsolutePath(lValue, lStartPath)
-                    If pTSGroup Is Nothing Then
-                        pTSGroup = New atcTimeseriesGroup()
+                    'check if file exists and quit preemptively here
+                    If Not IO.File.Exists(pWDMFileName) Then
+                        MsgBox("WDM file not found: " & pWDMFileName & vbCrLf & "In file: " & aSTAFile, , "File Not Found")
+                        Exit Sub
                     End If
-                    'could check if these files exists and quit preemptively here
                 Case "FEO"
-                    If pFEODataFileNames Is Nothing Then
-                        pFEODataFileNames = New Generic.List(Of String)
-                    End If
-                    If pFEODataFiles Is Nothing Then
-                        pFEODataFiles = New Dictionary(Of String, atcTimeseriesFEQ.atcTimeseriesFEQ)
-                    End If
                     Dim lFEOFileName As String = AbsolutePath(lValue, lStartPath)
+                    'check if file exists and quit preemptively here
+                    If Not IO.File.Exists(lFEOFileName) Then
+                        MsgBox("FEO file not found: " & lFEOFileName & vbCrLf & "In file: " & aSTAFile, , "File Not Found")
+                        Exit Sub
+                    End If
                     pFEODataFileNames.Add(lFEOFileName)
-                    'could check if these files exists and quit preemptively here
                     If pTSGroup Is Nothing Then
                         pTSGroup = New atcTimeseriesGroup()
                     End If
                 Case "TSB"
                     If lValue.Trim() <> "" Then
                         pTSBlockFileName = AbsolutePath(lValue, lStartPath)
+                        If Not IO.File.Exists(pTSBlockFileName) Then
+                            MsgBox("TSB file not found: " & pTSBlockFileName & vbCrLf & "In file: " & aSTAFile, , "File Not Found")
+                            Exit Sub
+                        End If
                     End If
                 Case "GRF"
                     If lValue.Trim() <> "" Then
@@ -94,6 +97,10 @@ Module GraphGenScn
                         If pGraphSpec Is Nothing Then
                             pGraphSpec = New clsGenScnGraphSpec()
                             pGraphSpec.Specification = AbsolutePath(lValue, lStartPath)
+                            If Not IO.File.Exists(pGraphSpec.Specification) Then
+                                MsgBox("GRF file not found: " & pGraphSpec.Specification & vbCrLf & "In file: " & aSTAFile, , "File Not Found")
+                                Exit Sub
+                            End If
                             pGraphSpec.RetrieveSpecs()
                         End If
                         If lOneLine.Trim = "0" Then
@@ -203,6 +210,10 @@ Module GraphGenScn
             Exit Sub
         End If
 
+        'Make sure statistics are available, for example this enables Timeseries.Attributes.GetValue("Count") to work
+        Dim lStatistics As New atcTimeseriesStatistics.atcTimeseriesStatistics
+        lStatistics.Initialize()
+
         'Get Datasets
         'Open WDM first (assuming there is only one WDM)
         Dim lWDM As New atcWDM.atcDataSourceWDM 'atcWdmVb.atcWDMfile '
@@ -299,9 +310,10 @@ Module GraphGenScn
         For I As Integer = 0 To pTSGroup.Count - 1
             Dim lCons As String = pTSGroup(I).Attributes.GetValue("Constituent")
             lCrvIndex = pGraphSpec.CurveIndex(lCons, I)
+            pTSGroup(I).Attributes.SetValue("CurveColor", Color.FromArgb(pGraphSpec.Crv(lCrvIndex).Color))
             Dim lTimeseriesAxis As String = pTimeseries3Axis
             '1-leftY,2-rightY,3-Aux,4-X
-            Select Case pGraphSpec.Crv(lCrvIndex).CType_Renamed
+            Select Case pGraphSpec.Crv(lCrvIndex).CurveType
                 Case 1
                     lTimeseriesAxis = pTimeseries3Axis
                 Case 2
@@ -352,20 +364,17 @@ Module GraphGenScn
             pGraphSpec.Clear()
             pGraphSpec = Nothing
         End If
-        If pFEODataFileNames IsNot Nothing Then pFEODataFileNames.Clear()
+        pFEODataFileNames.Clear()
         If pTSBlockTab IsNot Nothing Then
             pTSBlockTab.Clear()
             pTSBlockTab = Nothing
         End If
-        If pFEODataFiles IsNot Nothing Then
-            For Each lKey As String In pFEODataFiles.Keys
-                If pFEODataFiles.Item(lKey) IsNot Nothing Then
-                    pFEODataFiles.Item(lKey).Clear()
-                End If
-            Next
-            pFEODataFiles.Clear()
-            pFEODataFiles = Nothing
-        End If
+        For Each lKey As String In pFEODataFiles.Keys
+            If pFEODataFiles.Item(lKey) IsNot Nothing Then
+                pFEODataFiles.Item(lKey).Clear()
+            End If
+        Next
+        pFEODataFiles.Clear()
     End Sub
 
 
@@ -441,6 +450,16 @@ FoundMatch:
             End Select
             lYaxisNames.Add(lTimeseries.Serial, lYAxisName)
         Next
+
+        'If all our datasets are automatically placed on the aux axis, put them all on the left Y instead and skip making the aux axis
+        If lAuxDataSets.Count > 0 AndAlso lLeftDataSets.Count = 0 AndAlso lRightDataSets.Count = 0 Then
+            lLeftDataSets = lAuxDataSets
+            lAuxDataSets = New atcTimeseriesGroup
+            lYaxisNames.Clear()
+            For Each lTimeseries As atcTimeseries In lLeftDataSets
+                lYaxisNames.Add(lTimeseries.Serial, "LEFT")
+            Next
+        End If
 
         Dim lMain As ZedGraph.GraphPane = Nothing
         Dim lAux As ZedGraph.GraphPane = Nothing
@@ -575,7 +594,12 @@ FoundMatch:
         Dim lLoc As String = aTimeseries.Attributes.GetValue("location")
         Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
         Dim lCurveLabel As String = TSCurveLabel(aTimeseries, aCommonTimeUnitName, aCommonScenario, aCommonConstituent, aCommonLocation, aCommonUnits)
-        Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
+        Dim lCurveColor As Color
+        If aTimeseries.Attributes.ContainsAttribute("CurveColor") Then
+            lCurveColor = aTimeseries.Attributes.GetValue("CurveColor")
+        Else
+            lCurveColor = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
+        End If
 
         Dim lPane As GraphPane = aZgc.MasterPane.PaneList(aZgc.MasterPane.PaneList.Count - 1)
         Dim lYAxis As Axis = lPane.YAxis
@@ -911,16 +935,14 @@ Public Sub FormatPaneWithDefaults(ByVal aPane As ZedGraph.GraphPane)
         End If
 
         Dim lCurveOnMainPane As ZedGraph.LineItem = Nothing
-        Dim lLastIndexOfCurvesOnMain As Integer
-        If lPaneAux Is Nothing Then
-            lLastIndexOfCurvesOnMain = lPaneMain.CurveList.Count - 1
-        Else
-            lLastIndexOfCurvesOnMain = lPaneMain.CurveList.Count - 2
+        Dim lLastIndexOfCurvesOnMain As Integer = lPaneMain.CurveList.Count - 1
+        If lPaneAux IsNot Nothing Then
+            lLastIndexOfCurvesOnMain -= lPaneAux.CurveList.Count
         End If
         For i As Integer = 0 To lLastIndexOfCurvesOnMain
             lCurveOnMainPane = lPaneMain.CurveList.Item(i)
             If pGraphSpec.IsReady And pApplyGraphSpec Then
-                lCrvIndex = pGraphSpec.CurveIndex("BluhBluh", i)
+                lCrvIndex = pGraphSpec.CurveIndex(lCurveOnMainPane.Label.Text, i)
                 lCurveOnMainPane.Label.Text = pGraphSpec.Crv(lCrvIndex).LegLbl
                 'If pGraphSpec.Crv(i).LType >= 0 Then
                 '    lObserved.Symbol.Type = pGraphSpec.Crv(i).LType Mod 5
@@ -1008,7 +1030,7 @@ Public Sub FormatPaneWithDefaults(ByVal aPane As ZedGraph.GraphPane)
             '        .MajorStep = (.Max - .Min) / pGraphSpec.Axis(2).NTic
             '    End With
             'End If
-            If pGraphSpec.Axis(3).label IsNot Nothing Then
+            If pGraphSpec.Axis(3).label IsNot Nothing AndAlso lPaneAux IsNot Nothing Then
                 With lPaneAux.YAxis.Scale
                     .MinAuto = False
                     .MaxAuto = False
