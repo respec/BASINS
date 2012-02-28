@@ -389,9 +389,12 @@ Public Class atcTimeseriesStatistics
     'The only element of aArgs is an atcDataGroup or atcTimeseries
     'The attribute(s) will be set to the result(s) of calculation(s)
     Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
-        Dim ltsGroup As atcTimeseriesGroup
+        Dim ltsGroup As atcTimeseriesGroup = Nothing
         If aArgs Is Nothing Then
+#If BatchMode Then
+#Else
             ltsGroup = atcDataManager.UserSelectData("Select data to compute statistics for")
+#End If
         Else
             ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
         End If
