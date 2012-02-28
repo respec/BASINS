@@ -1,0 +1,187 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CC1DFDEB-08A2-4FCC-A3C2-B9B82CC54E44}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <AssemblyKeyContainerName>
+    </AssemblyKeyContainerName>
+    <AssemblyName>atcHSPFParm</AssemblyName>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyMode>None</AssemblyOriginatorKeyMode>
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>Library</OutputType>
+    <OptionCompare>Binary</OptionCompare>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionStrict>Off</OptionStrict>
+    <RootNamespace>atcHSPFParm</RootNamespace>
+    <StartupObject>atcModelSetup.%28None%29</StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <MyType>Windows</MyType>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>atcHSPFParm.xml</DocumentationFile>
+    <BaseAddress>285212672</BaseAddress>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>
+    </DefineConstants>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>false</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>atcHSPFParm.xml</DocumentationFile>
+    <BaseAddress>285212672</BaseAddress>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>
+    </DefineConstants>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <DebugType>pdbonly</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>atcHSPFParm.xml</DocumentationFile>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>atcHSPFParm.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MapWinInterfaces, Version=4.8.2.17282, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System">
+      <Name>System</Name>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <Name>System.Drawing</Name>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <Name>System.Windows.Forms</Name>
+    </Reference>
+    <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility.vbproj">
+      <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
+      <Name>BASINS-MapWinUtility</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcControls\atcControls.vbproj">
+      <Name>atcControls</Name>
+      <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
+      <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcData\atcData.vbproj">
+      <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
+      <Name>atcData</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility.vbproj">
+      <Project>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</Project>
+      <Name>atcMwGisUtility</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSegmentation\atcSegmentation.vbproj">
+      <Project>{813E3F46-36CA-4320-BB05-325EEC553D3D}</Project>
+      <Name>atcSegmentation</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUCI\atcUCI.vbproj">
+      <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>
+      <Name>atcUCI</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
+      <Name>atcUtility</Name>
+      <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
+      <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcWDM\atcWDM.vbproj">
+      <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
+      <Name>atcWDM</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Diagnostics" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clsPlugin.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="frmHSPFParm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="frmHSPFParm.resx">
+      <DependentUpon>frmHSPFParm.vb</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="My Project\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>
