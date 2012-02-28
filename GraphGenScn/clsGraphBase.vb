@@ -19,7 +19,7 @@ Public Class clsGraphBase
         End Get
         Set(ByVal newValue As atcTimeseriesGroup)
             pDataGroup = newValue
-            If Not pZgc Is Nothing AndAlso Not pZgc.IsDisposed AndAlso Not pZgc.MasterPane Is Nothing Then
+            If pZgc IsNot Nothing AndAlso Not pZgc.IsDisposed AndAlso pZgc.MasterPane IsNot Nothing Then
                 For Each lPane As ZedGraph.GraphPane In pZgc.MasterPane.PaneList
                     lPane.CurveList.Clear()
                 Next

@@ -29,13 +29,11 @@ Public Class clsGenScnGraphSpec
         Dim Value As String
     End Structure
     Public Structure GSCrvType
-        'UPGRADE_NOTE: CType was upgraded to CType_Renamed.
-        Dim CType_Renamed As Integer
+        Dim CurveType As Integer
         Dim LType As Integer
         Dim LThck As Integer
         Dim SType As Integer
         Dim Color As Integer
-        'UPGRADE_WARNING: Fixed-length string size must fit in the buffer.
         Public LegLbl As String
     End Structure
     Private pSpecsLoaded As Boolean = True
@@ -46,11 +44,11 @@ Public Class clsGenScnGraphSpec
     End Property
     Const POSMAX As Integer = 18
     Private pSpecification As String = ""
-    Public Property Specification As String
+    Public Property Specification() As String
         Get
             Return pSpecification
         End Get
-        Set(value As String)
+        Set(ByVal value As String)
             pSpecification = value
             If pSpecification = "" Then
                 pSpecsLoaded = False
@@ -69,7 +67,7 @@ Public Class clsGenScnGraphSpec
     Public Gridx As Integer 'grid x:  1=yes
     Public Gridy As Integer
     Public rGridy As Integer
-    Public Var(2 * POSMAX) As GSVarType
+    'Public Var(2 * POSMAX) As GSVarType
     Public Crv(POSMAX) As GSCrvType
     Public dtype(POSMAX) As Integer
     Public XLegLoc, YLegLoc As Single
@@ -192,7 +190,7 @@ Public Class clsGenScnGraphSpec
                 Case "CURVE"
                     i = CInt(StrRetRem(istr))
                     With Crv(i)
-                        .CType_Renamed = CInt(StrRetRem(istr))
+                        .CurveType = CInt(StrRetRem(istr))
                         .LType = CInt(StrRetRem(istr)) - 1
                         .LThck = CInt(StrRetRem(istr))
                         .SType = CInt(StrRetRem(istr))
@@ -216,9 +214,9 @@ Public Class clsGenScnGraphSpec
                     End With
                 Case "VAR"
                     i = CInt(StrRetRem(istr))
-                    Var(i).WchAx = CInt(StrRetRem(istr))
+                    'Var(i).WchAx = CInt(StrRetRem(istr))
                     'Var(i).Trans = CLng(StrRetRem(istr))
-                    Var(i).label = StrRetRem(istr)
+                    'Var(i).label = StrRetRem(istr)
                 Case "LINE"
                     If NumLines > 0 And Not lAlreadyAddedLine Then NumLines = 0
                     Logger.Msg("Adding line " & StrRetRem(istr))
@@ -304,7 +302,7 @@ ReadErr:
         End If
         ReDim Axis(0)
         ReDim Crv(0)
-        ReDim Var(0)
+        'ReDim Var(0)
     End Sub
 
     Public Function CurveIndex(ByVal aCons As String, ByVal aIndex As Integer) As Integer

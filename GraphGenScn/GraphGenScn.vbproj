@@ -194,6 +194,10 @@
       <Project>{28F002DC-4F46-4068-88DC-0B54BCDC0870}</Project>
       <Name>atcTimeseriesFEQGG</Name>
     </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesStatistics\atcTimeseriesStatisticsGG.vbproj">
+      <Project>{7E40E3E6-BF8E-45B5-99AF-4E11DAF039FD}</Project>
+      <Name>atcTimeseriesStatisticsGG</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtilityGG.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Name>atcUtilityGG</Name>
