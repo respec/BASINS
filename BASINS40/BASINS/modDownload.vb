@@ -549,9 +549,15 @@ StartOver:
         If aCacheFolder.Length > 0 Then
             lCacheFolder = aCacheFolder
         End If
+
+        Dim lBasinsDataTypes As String = "<DataType>core31</DataType>"
+        If g_AppNameShort = "USGS-GW" Then
+            lBasinsDataTypes &= "<DataType>nhd</DataType>"
+        End If
+
         lQuery = "<function name='GetBASINS'>" _
                & "<arguments>" _
-               & "<DataType>core31</DataType>" _
+               & lBasinsDataTypes _
                & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
                & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
                & "<DesiredProjection>" & lProjection & "</DesiredProjection>" _
@@ -621,14 +627,17 @@ StartOver:
                     With g_MapWin.View.Extents
                         lRegion = New D4EMDataManager.Region(.yMax, .yMin, .xMin, .xMax, g_MapWin.Project.ProjectProjection)
                     End With
-                    lQuery = "<function name='GetNWISStations'>" _
-                           & "<arguments> <DataType>gw</DataType> <DataType>discharge</DataType>" _
+                    lQuery = "<function name='GetNWISStations'><arguments>" _
+                           & "<DataType>gw_daily</DataType>" _
+                           & "<DataType>gw_periodic</DataType>" _
+                           & "<DataType>discharge</DataType>" _
+                           & "<MinCount>10</MinCount>" _
                            & "<SaveIn>" & aNewDataDir & "</SaveIn>" _
                            & "<CacheFolder>" & lCacheFolder & "</CacheFolder>" _
                            & "<DesiredProjection>" & lProjection & "</DesiredProjection>" _
                            & lRegion.XML _
                            & "<clip>False</clip> <merge>False</merge>" _
-                           & "</arguments> </function>"
+                           & "</arguments></function>"
 
                     lResult = lDownloadManager.Execute(lQuery)
                     If Not lResult Is Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
@@ -640,6 +649,7 @@ StartOver:
                             Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save3Failed:" & g_MapWin.LastError)
                         End If
                     End If
+
                 End If
             End If
         End Using
@@ -681,7 +691,7 @@ StartOver:
         Next
         If lMessage.Length > 2 AndAlso Logger.DisplayMessageBoxes Then
             Logger.Msg(lMessage, "Data Download")
-            If lMessage.Contains(" Data file") Then
+            If lMessage.Contains(" Data file") AndAlso g_AppNameShort <> "USGS-GW" Then
                 atcDataManager.UserManage()
             End If
         End If

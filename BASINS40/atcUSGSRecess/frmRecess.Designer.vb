@@ -58,6 +58,8 @@ Partial Class frmRecess
         Me.panelConfiguration = New System.Windows.Forms.Panel
         Me.panelAnalysis = New System.Windows.Forms.Panel
         Me.btnConfiguration = New System.Windows.Forms.Button
+        Me.lblAnalysisDates = New System.Windows.Forms.Label
+        Me.lblPeriodOfRecord = New System.Windows.Forms.Label
         Me.gbMonthSeason.SuspendLayout()
         Me.gbDates.SuspendLayout()
         Me.scDisplay.Panel1.SuspendLayout()
@@ -70,7 +72,7 @@ Partial Class frmRecess
         'chkSaveInterimToFile
         '
         Me.chkSaveInterimToFile.AutoSize = True
-        Me.chkSaveInterimToFile.Location = New System.Drawing.Point(5, 210)
+        Me.chkSaveInterimToFile.Location = New System.Drawing.Point(6, 210)
         Me.chkSaveInterimToFile.Name = "chkSaveInterimToFile"
         Me.chkSaveInterimToFile.Size = New System.Drawing.Size(150, 17)
         Me.chkSaveInterimToFile.TabIndex = 11
@@ -79,9 +81,11 @@ Partial Class frmRecess
         '
         'txtOutputDir
         '
-        Me.txtOutputDir.Location = New System.Drawing.Point(3, 184)
+        Me.txtOutputDir.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtOutputDir.Location = New System.Drawing.Point(6, 184)
         Me.txtOutputDir.Name = "txtOutputDir"
-        Me.txtOutputDir.Size = New System.Drawing.Size(581, 20)
+        Me.txtOutputDir.Size = New System.Drawing.Size(768, 20)
         Me.txtOutputDir.TabIndex = 10
         '
         'lblOutpuDir
@@ -111,13 +115,14 @@ Partial Class frmRecess
         '
         'gbMonthSeason
         '
+        Me.gbMonthSeason.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.gbMonthSeason.Controls.Add(Me.rdoNoSeason)
         Me.gbMonthSeason.Controls.Add(Me.rdoWinter)
         Me.gbMonthSeason.Controls.Add(Me.rdoFall)
         Me.gbMonthSeason.Controls.Add(Me.rdoSummer)
         Me.gbMonthSeason.Controls.Add(Me.rdoSpring)
         Me.gbMonthSeason.Controls.Add(Me.lstMonths)
-        Me.gbMonthSeason.Location = New System.Drawing.Point(310, 3)
+        Me.gbMonthSeason.Location = New System.Drawing.Point(320, 3)
         Me.gbMonthSeason.Name = "gbMonthSeason"
         Me.gbMonthSeason.Size = New System.Drawing.Size(275, 155)
         Me.gbMonthSeason.TabIndex = 43
@@ -192,6 +197,10 @@ Partial Class frmRecess
         '
         'gbDates
         '
+        Me.gbDates.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbDates.Controls.Add(Me.lblAnalysisDates)
+        Me.gbDates.Controls.Add(Me.lblPeriodOfRecord)
         Me.gbDates.Controls.Add(Me.txtEndDateUser)
         Me.gbDates.Controls.Add(Me.txtStartDateUser)
         Me.gbDates.Controls.Add(Me.btnExamineData)
@@ -201,30 +210,35 @@ Partial Class frmRecess
         Me.gbDates.Controls.Add(Me.lblDataStart)
         Me.gbDates.Location = New System.Drawing.Point(3, 3)
         Me.gbDates.Name = "gbDates"
-        Me.gbDates.Size = New System.Drawing.Size(301, 109)
+        Me.gbDates.Size = New System.Drawing.Size(311, 120)
         Me.gbDates.TabIndex = 42
         Me.gbDates.TabStop = False
         Me.gbDates.Text = "Streamflow Analysis Dates"
         '
         'txtEndDateUser
         '
-        Me.txtEndDateUser.Location = New System.Drawing.Point(162, 52)
+        Me.txtEndDateUser.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtEndDateUser.Location = New System.Drawing.Point(187, 64)
         Me.txtEndDateUser.Name = "txtEndDateUser"
-        Me.txtEndDateUser.Size = New System.Drawing.Size(88, 20)
+        Me.txtEndDateUser.Size = New System.Drawing.Size(118, 20)
         Me.txtEndDateUser.TabIndex = 1
         '
         'txtStartDateUser
         '
-        Me.txtStartDateUser.Location = New System.Drawing.Point(162, 26)
+        Me.txtStartDateUser.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtStartDateUser.Location = New System.Drawing.Point(187, 38)
         Me.txtStartDateUser.Name = "txtStartDateUser"
-        Me.txtStartDateUser.Size = New System.Drawing.Size(88, 20)
+        Me.txtStartDateUser.Size = New System.Drawing.Size(118, 20)
         Me.txtStartDateUser.TabIndex = 0
         '
         'btnExamineData
         '
-        Me.btnExamineData.Location = New System.Drawing.Point(156, 78)
+        Me.btnExamineData.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnExamineData.Location = New System.Drawing.Point(71, 91)
         Me.btnExamineData.Name = "btnExamineData"
-        Me.btnExamineData.Size = New System.Drawing.Size(94, 23)
+        Me.btnExamineData.Size = New System.Drawing.Size(88, 23)
         Me.btnExamineData.TabIndex = 2
         Me.btnExamineData.Text = "Examine Data"
         Me.btnExamineData.UseVisualStyleBackColor = True
@@ -232,25 +246,25 @@ Partial Class frmRecess
         'txtDataEnd
         '
         Me.txtDataEnd.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.txtDataEnd.Location = New System.Drawing.Point(68, 53)
+        Me.txtDataEnd.Location = New System.Drawing.Point(71, 65)
         Me.txtDataEnd.Name = "txtDataEnd"
         Me.txtDataEnd.ReadOnly = True
-        Me.txtDataEnd.Size = New System.Drawing.Size(88, 20)
+        Me.txtDataEnd.Size = New System.Drawing.Size(110, 20)
         Me.txtDataEnd.TabIndex = 3
         '
         'txtDataStart
         '
         Me.txtDataStart.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.txtDataStart.Location = New System.Drawing.Point(68, 26)
+        Me.txtDataStart.Location = New System.Drawing.Point(71, 38)
         Me.txtDataStart.Name = "txtDataStart"
         Me.txtDataStart.ReadOnly = True
-        Me.txtDataStart.Size = New System.Drawing.Size(88, 20)
+        Me.txtDataStart.Size = New System.Drawing.Size(110, 20)
         Me.txtDataStart.TabIndex = 2
         '
         'lblDataEnd
         '
         Me.lblDataEnd.AutoSize = True
-        Me.lblDataEnd.Location = New System.Drawing.Point(6, 52)
+        Me.lblDataEnd.Location = New System.Drawing.Point(9, 64)
         Me.lblDataEnd.Name = "lblDataEnd"
         Me.lblDataEnd.Size = New System.Drawing.Size(52, 13)
         Me.lblDataEnd.TabIndex = 1
@@ -261,7 +275,7 @@ Partial Class frmRecess
         Me.lblDataStart.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblDataStart.AutoSize = True
-        Me.lblDataStart.Location = New System.Drawing.Point(6, 26)
+        Me.lblDataStart.Location = New System.Drawing.Point(9, 38)
         Me.lblDataStart.Name = "lblDataStart"
         Me.lblDataStart.Size = New System.Drawing.Size(55, 13)
         Me.lblDataStart.TabIndex = 0
@@ -333,7 +347,7 @@ Partial Class frmRecess
         Me.btnCurv.Location = New System.Drawing.Point(299, 215)
         Me.btnCurv.Name = "btnCurv"
         Me.btnCurv.Size = New System.Drawing.Size(75, 23)
-        Me.btnCurv.TabIndex = 17
+        Me.btnCurv.TabIndex = 19
         Me.btnCurv.Text = "View MRC >"
         Me.btnCurv.UseVisualStyleBackColor = True
         '
@@ -343,7 +357,7 @@ Partial Class frmRecess
         Me.btnSummary.Location = New System.Drawing.Point(218, 215)
         Me.btnSummary.Name = "btnSummary"
         Me.btnSummary.Size = New System.Drawing.Size(75, 23)
-        Me.btnSummary.TabIndex = 16
+        Me.btnSummary.TabIndex = 18
         Me.btnSummary.Text = "Summary"
         Me.btnSummary.UseVisualStyleBackColor = True
         '
@@ -353,7 +367,7 @@ Partial Class frmRecess
         Me.btnAnalyse.Location = New System.Drawing.Point(137, 215)
         Me.btnAnalyse.Name = "btnAnalyse"
         Me.btnAnalyse.Size = New System.Drawing.Size(75, 23)
-        Me.btnAnalyse.TabIndex = 14
+        Me.btnAnalyse.TabIndex = 17
         Me.btnAnalyse.Text = "Analyse"
         Me.btnAnalyse.UseVisualStyleBackColor = True
         '
@@ -361,7 +375,7 @@ Partial Class frmRecess
         '
         Me.btnGetAllSegments.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnGetAllSegments.AutoSize = True
-        Me.btnGetAllSegments.Location = New System.Drawing.Point(3, 242)
+        Me.btnGetAllSegments.Location = New System.Drawing.Point(3, 247)
         Me.btnGetAllSegments.Name = "btnGetAllSegments"
         Me.btnGetAllSegments.Size = New System.Drawing.Size(79, 23)
         Me.btnGetAllSegments.TabIndex = 12
@@ -374,7 +388,7 @@ Partial Class frmRecess
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFile, Me.mnuHelp})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(789, 24)
+        Me.MenuStrip1.Size = New System.Drawing.Size(789, 27)
         Me.MenuStrip1.TabIndex = 30
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -382,19 +396,19 @@ Partial Class frmRecess
         '
         Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileSelectData})
         Me.mnuFile.Name = "mnuFile"
-        Me.mnuFile.Size = New System.Drawing.Size(35, 20)
+        Me.mnuFile.Size = New System.Drawing.Size(45, 23)
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
         '
         Me.mnuFileSelectData.Name = "mnuFileSelectData"
-        Me.mnuFileSelectData.Size = New System.Drawing.Size(140, 22)
+        Me.mnuFileSelectData.Size = New System.Drawing.Size(172, 24)
         Me.mnuFileSelectData.Text = "Select Data"
         '
         'mnuHelp
         '
         Me.mnuHelp.Name = "mnuHelp"
-        Me.mnuHelp.Size = New System.Drawing.Size(40, 20)
+        Me.mnuHelp.Size = New System.Drawing.Size(53, 23)
         Me.mnuHelp.Text = "Help"
         '
         'panelConfiguration
@@ -409,7 +423,7 @@ Partial Class frmRecess
         Me.panelConfiguration.Controls.Add(Me.txtMinRecessionDays)
         Me.panelConfiguration.Location = New System.Drawing.Point(0, 27)
         Me.panelConfiguration.Name = "panelConfiguration"
-        Me.panelConfiguration.Size = New System.Drawing.Size(603, 268)
+        Me.panelConfiguration.Size = New System.Drawing.Size(777, 273)
         Me.panelConfiguration.TabIndex = 31
         '
         'panelAnalysis
@@ -433,9 +447,27 @@ Partial Class frmRecess
         Me.btnConfiguration.Location = New System.Drawing.Point(3, 215)
         Me.btnConfiguration.Name = "btnConfiguration"
         Me.btnConfiguration.Size = New System.Drawing.Size(128, 23)
-        Me.btnConfiguration.TabIndex = 40
+        Me.btnConfiguration.TabIndex = 16
         Me.btnConfiguration.Text = "< Back to Configuration"
         Me.btnConfiguration.UseVisualStyleBackColor = True
+        '
+        'lblAnalysisDates
+        '
+        Me.lblAnalysisDates.AutoSize = True
+        Me.lblAnalysisDates.Location = New System.Drawing.Point(184, 22)
+        Me.lblAnalysisDates.Name = "lblAnalysisDates"
+        Me.lblAnalysisDates.Size = New System.Drawing.Size(76, 13)
+        Me.lblAnalysisDates.TabIndex = 16
+        Me.lblAnalysisDates.Text = "Analysis Dates"
+        '
+        'lblPeriodOfRecord
+        '
+        Me.lblPeriodOfRecord.AutoSize = True
+        Me.lblPeriodOfRecord.Location = New System.Drawing.Point(68, 22)
+        Me.lblPeriodOfRecord.Name = "lblPeriodOfRecord"
+        Me.lblPeriodOfRecord.Size = New System.Drawing.Size(87, 13)
+        Me.lblPeriodOfRecord.TabIndex = 15
+        Me.lblPeriodOfRecord.Text = "Period of Record"
         '
         'frmRecess
         '
@@ -500,4 +532,6 @@ Partial Class frmRecess
     Friend WithEvents panelConfiguration As System.Windows.Forms.Panel
     Friend WithEvents panelAnalysis As System.Windows.Forms.Panel
     Friend WithEvents btnConfiguration As System.Windows.Forms.Button
+    Friend WithEvents lblAnalysisDates As System.Windows.Forms.Label
+    Friend WithEvents lblPeriodOfRecord As System.Windows.Forms.Label
 End Class

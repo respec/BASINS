@@ -95,7 +95,7 @@ Partial Class frmUSGSBaseflow
         '
         'btnExamineData
         '
-        Me.btnExamineData.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnExamineData.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnExamineData.Location = New System.Drawing.Point(68, 85)
         Me.btnExamineData.Name = "btnExamineData"
         Me.btnExamineData.Size = New System.Drawing.Size(94, 23)
@@ -125,10 +125,8 @@ Partial Class frmUSGSBaseflow
         '
         'lblAnalysisDates
         '
-        Me.lblAnalysisDates.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblAnalysisDates.AutoSize = True
-        Me.lblAnalysisDates.Location = New System.Drawing.Point(191, 16)
+        Me.lblAnalysisDates.Location = New System.Drawing.Point(191, 15)
         Me.lblAnalysisDates.Name = "lblAnalysisDates"
         Me.lblAnalysisDates.Size = New System.Drawing.Size(76, 13)
         Me.lblAnalysisDates.TabIndex = 12
@@ -136,10 +134,8 @@ Partial Class frmUSGSBaseflow
         '
         'lblPeriodOfRecord
         '
-        Me.lblPeriodOfRecord.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblPeriodOfRecord.AutoSize = True
-        Me.lblPeriodOfRecord.Location = New System.Drawing.Point(67, 16)
+        Me.lblPeriodOfRecord.Location = New System.Drawing.Point(65, 15)
         Me.lblPeriodOfRecord.Name = "lblPeriodOfRecord"
         Me.lblPeriodOfRecord.Size = New System.Drawing.Size(87, 13)
         Me.lblPeriodOfRecord.TabIndex = 11
@@ -209,7 +205,7 @@ Partial Class frmUSGSBaseflow
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFile, Me.mnuAnalysis, Me.mnuHelp})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(368, 24)
+        Me.MenuStrip1.Size = New System.Drawing.Size(368, 27)
         Me.MenuStrip1.TabIndex = 28
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -217,63 +213,63 @@ Partial Class frmUSGSBaseflow
         '
         Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileSelectData, Me.mnuOutput, Me.mnuGraphBF})
         Me.mnuFile.Name = "mnuFile"
-        Me.mnuFile.Size = New System.Drawing.Size(37, 20)
+        Me.mnuFile.Size = New System.Drawing.Size(45, 23)
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
         '
         Me.mnuFileSelectData.Name = "mnuFileSelectData"
-        Me.mnuFileSelectData.Size = New System.Drawing.Size(132, 22)
+        Me.mnuFileSelectData.Size = New System.Drawing.Size(172, 24)
         Me.mnuFileSelectData.Text = "Select Data"
         '
         'mnuOutput
         '
         Me.mnuOutput.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOutputASCII})
         Me.mnuOutput.Name = "mnuOutput"
-        Me.mnuOutput.Size = New System.Drawing.Size(132, 22)
+        Me.mnuOutput.Size = New System.Drawing.Size(172, 24)
         Me.mnuOutput.Text = "Output"
         '
         'mnuOutputASCII
         '
         Me.mnuOutputASCII.Name = "mnuOutputASCII"
-        Me.mnuOutputASCII.Size = New System.Drawing.Size(102, 22)
+        Me.mnuOutputASCII.Size = New System.Drawing.Size(136, 24)
         Me.mnuOutputASCII.Text = "ASCII"
         '
         'mnuGraphBF
         '
         Me.mnuGraphBF.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuGraphTimeseries, Me.mnuGraphDuration, Me.mnuGraphCDistPlot})
         Me.mnuGraphBF.Name = "mnuGraphBF"
-        Me.mnuGraphBF.Size = New System.Drawing.Size(132, 22)
+        Me.mnuGraphBF.Size = New System.Drawing.Size(172, 24)
         Me.mnuGraphBF.Text = "Graph"
         '
         'mnuGraphTimeseries
         '
         Me.mnuGraphTimeseries.Name = "mnuGraphTimeseries"
-        Me.mnuGraphTimeseries.Size = New System.Drawing.Size(146, 22)
+        Me.mnuGraphTimeseries.Size = New System.Drawing.Size(187, 24)
         Me.mnuGraphTimeseries.Text = "TimeSeries"
         '
         'mnuGraphDuration
         '
         Me.mnuGraphDuration.Name = "mnuGraphDuration"
-        Me.mnuGraphDuration.Size = New System.Drawing.Size(146, 22)
+        Me.mnuGraphDuration.Size = New System.Drawing.Size(187, 24)
         Me.mnuGraphDuration.Text = "Duration"
         '
         'mnuGraphCDistPlot
         '
         Me.mnuGraphCDistPlot.Name = "mnuGraphCDistPlot"
-        Me.mnuGraphCDistPlot.Size = New System.Drawing.Size(146, 22)
+        Me.mnuGraphCDistPlot.Size = New System.Drawing.Size(187, 24)
         Me.mnuGraphCDistPlot.Text = "Cummulative"
         '
         'mnuAnalysis
         '
         Me.mnuAnalysis.Name = "mnuAnalysis"
-        Me.mnuAnalysis.Size = New System.Drawing.Size(62, 20)
+        Me.mnuAnalysis.Size = New System.Drawing.Size(79, 23)
         Me.mnuAnalysis.Text = "Analysis"
         '
         'mnuHelp
         '
         Me.mnuHelp.Name = "mnuHelp"
-        Me.mnuHelp.Size = New System.Drawing.Size(44, 20)
+        Me.mnuHelp.Size = New System.Drawing.Size(53, 23)
         Me.mnuHelp.Text = "Help"
         '
         'txtOutputRootName

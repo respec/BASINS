@@ -5,6 +5,7 @@ Public Class frmDownload
 
     Public Const CancelString As String = "<Cancel>"
     Private pMapWin As MapWindow.Interfaces.IMapWin
+    Private pApplicationName As String = ""
     Private pOk As Boolean = False
 
     Private pRegionViewRectangle As String = "View Rectangle"
@@ -16,6 +17,7 @@ Public Class frmDownload
 
     Public Function AskUser(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer) As String
         pMapWin = aMapWin
+        pApplicationName = pMapWin.ApplicationInfo.ApplicationName
 
         'The following line hot-wires the form to just do met data download
         'chkBASINS_Met.Checked = True : cboRegion.SelectedIndex = 0 ': Me.Height = 141 ': Return Me.XML
@@ -54,52 +56,51 @@ Public Class frmDownload
         End If
 
         Dim lGroupMargin As Integer = 6
-        Dim lGroupY As Integer = grpBASINS.Location.Y
+        Dim lGroupY As Integer = cboRegion.Top + cboRegion.Height + lGroupMargin
 
-        If LoadPlugin("D4EM Data Download::BASINS") Then
-            lGroupY += grpBASINS.Height + lGroupMargin
-        Else
-            grpBASINS.Visible = False
-        End If
-        If LoadPlugin("D4EM Data Download::NHDPlus") Then
-            grpNHDplus.Top = lGroupY
-            lGroupY += grpNHDplus.Height + lGroupMargin
-        Else
-            grpNHDplus.Visible = False
-        End If
+        Dim lGroups As New Dictionary(Of String, Windows.Forms.GroupBox)
 
-        If LoadPlugin("D4EM Data Download::NWIS") Then
-            grpNWISStations.Top = lGroupY
-            lGroupY += grpNWISStations.Height + lGroupMargin
-            grpNWIS.Top = lGroupY
-            lGroupY += grpNWIS.Height + lGroupMargin
-        Else
-            grpNWISStations.Visible = False
-            grpNWIS.Visible = False
-        End If
+        Select Case pApplicationName
+            Case "USGS GW Toolbox"
+                lGroups.Add("D4EM Data Download::NWIS", grpNWISStations_GW)
+                lGroups.Add("D4EM Data Download::BASINS", grpBASINS)
+                lGroups.Add("D4EM Data Download::NHDPlus", grpNHDplus)
+                lGroups.Add("D4EM Data Download::NLCD2001", grpNLCD2001)
 
-        If LoadPlugin("D4EM Data Download::NLCD2001") Then
-            grpNLCD2001.Top = lGroupY
-            lGroupY += grpNLCD2001.Height + lGroupMargin
-        Else
-            grpNLCD2001.Visible = False
-        End If
+                chkBASINS_LSTORET.Visible = False
+                chkBASINS_Census.Visible = False : chkBASINS_MetStations.Left = chkBASINS_Census.Left
+                chkBASINS_303d.Visible = False : chkBASINS_MetData.Left = chkBASINS_303d.Left
+            Case Else
+                lGroups.Add("D4EM Data Download::BASINS", grpBASINS)
+                lGroups.Add("D4EM Data Download::NHDPlus", grpNHDplus)
+                lGroups.Add("D4EM Data Download::NWIS", grpNWISStations)
+                lGroups.Add("D4EM Data Download::NLCD2001", grpNLCD2001)
+                lGroups.Add("D4EM Data Download::STORET", grpSTORET)
+                lGroups.Add("D4EM Data Download::NLDAS", grpNLDAS)
+        End Select
 
-        If LoadPlugin("D4EM Data Download::STORET") Then
-            grpSTORET.Top = lGroupY
-            lGroupY += grpSTORET.Height + lGroupMargin
-        Else
-            grpSTORET.Visible = False
-        End If
-
-        If LoadPlugin("D4EM Data Download::NLDAS") Then
-            grpNLDAS.Top = lGroupY
-            lGroupY += grpNLDAS.Height + lGroupMargin
-        Else
-            grpNLDAS.Visible = False
-        End If
+        For Each lGroupEntry As KeyValuePair(Of String, Windows.Forms.GroupBox) In lGroups
+            If LoadPlugin(lGroupEntry.Key) Then
+                lGroupEntry.Value.Top = lGroupY
+                lGroupEntry.Value.Visible = True
+                lGroupY += lGroupEntry.Value.Height + lGroupMargin
+                If lGroupEntry.Value Is grpNWISStations Then 'Also show NWIS group for data
+                    grpNWIS.Top = lGroupY
+                    grpNWIS.Visible = True
+                    lGroupY += grpNWIS.Height + lGroupMargin
+                ElseIf lGroupEntry.Value Is grpNWISStations_GW Then
+                    grpNWIS_GW.Top = lGroupY
+                    grpNWIS_GW.Visible = True
+                    lGroupY += grpNWIS_GW.Height + lGroupMargin
+                End If
+            End If
+        Next
 
         Height = lGroupY + 85
+
+        Dim lMinCount As String = GetSetting("DataDownload", "Defaults", "MinCount", "10")
+        Dim lMinCountInt As Integer
+        If Integer.TryParse(lMinCount, lMinCountInt) Then txtMinCount_GW.Text = lMinCountInt
 
         If GetSetting("DataDownload", "Defaults", "Clip", "").ToLower.Equals("true") Then
             chkClip.Checked = True
@@ -166,6 +167,8 @@ Public Class frmDownload
     Private Sub btnDownload_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDownload.Click
         Try
             If cboRegion.SelectedItem IsNot Nothing Then SaveSetting("DataDownload", "Defaults", "RegionTypeName", cboRegion.SelectedItem)
+            Dim lMinCountInt As Integer
+            If Integer.TryParse(txtMinCount_GW.Text, lMinCountInt) Then SaveSetting("DataDownload", "Defaults", "MinCount", lMinCountInt)
             SaveSetting("DataDownload", "Defaults", "Clip", chkClip.Checked.ToString)
             SaveSetting("DataDownload", "Defaults", "Merge", chkMerge.Checked.ToString)
         Catch ex As Exception
@@ -257,69 +260,132 @@ Public Class frmDownload
         If cboRegion.Text = pRegionStationIDs Then
             lStationsRegion = True
             panelNWISnoStations.Visible = False
+            panelNWISnoStations_GW.Visible = False
             chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
         End If
-        chkNWIS_GetNWISDailyDischarge.Visible = True
-        chkNWIS_GetNWISIdaDischarge.Visible = True
-        chkNWIS_GetNWISDailyGW.Visible = True
-        chkNWIS_GetNWISWQ.Visible = True
-        chkNWIS_GetNWISMeasurements.Visible = True
 
-        chkNWIS_GetNWISDailyDischarge.Enabled = lStationsRegion
-        chkNWIS_GetNWISIdaDischarge.Enabled = lStationsRegion
-        chkNWIS_GetNWISDailyGW.Enabled = lStationsRegion
-        chkNWIS_GetNWISWQ.Enabled = lStationsRegion
-        chkNWIS_GetNWISMeasurements.Enabled = lStationsRegion
+        Select Case pApplicationName
+            Case "USGS GW Toolbox"
+                chkNWIS_GetNWISDailyDischarge_GW.Visible = True
+                chkNWIS_GetNWISIdaDischarge_GW.Visible = True
+                chkNWIS_GetNWISDailyGW_GW.Visible = True
+                chkNWIS_GetNWISPeriodicGW_GW.Visible = True
+
+                chkNWIS_GetNWISDailyDischarge_GW.Enabled = lStationsRegion
+                chkNWIS_GetNWISIdaDischarge_GW.Enabled = lStationsRegion
+                chkNWIS_GetNWISDailyGW_GW.Enabled = lStationsRegion
+                chkNWIS_GetNWISPeriodicGW_GW.Enabled = lStationsRegion
+            Case Else
+                chkNWIS_GetNWISDailyDischarge.Visible = True
+                chkNWIS_GetNWISIdaDischarge.Visible = True
+                chkNWIS_GetNWISDailyGW.Visible = True
+                chkNWIS_GetNWISPeriodicGW.Visible = True
+                chkNWIS_GetNWISWQ.Visible = True
+                chkNWIS_GetNWISMeasurements.Visible = True
+
+                chkNWIS_GetNWISDailyDischarge.Enabled = lStationsRegion
+                chkNWIS_GetNWISIdaDischarge.Enabled = lStationsRegion
+                chkNWIS_GetNWISDailyGW.Enabled = lStationsRegion
+                chkNWIS_GetNWISPeriodicGW.Enabled = lStationsRegion
+                chkNWIS_GetNWISWQ.Enabled = lStationsRegion
+                chkNWIS_GetNWISMeasurements.Enabled = lStationsRegion
+        End Select
 
         If pMapWin.View IsNot Nothing Then
             Dim lSelected As MapWindow.Interfaces.SelectInfo = pMapWin.View.SelectedShapes
             If lSelected.NumSelected > 0 Then
                 Dim lLayer As MapWindow.Interfaces.Layer = pMapWin.Layers.Item(pMapWin.Layers.CurrentLayer)
                 Dim lFilename As String = IO.Path.GetFileNameWithoutExtension(lLayer.FileName).ToLower
-                Select Case lFilename
-                    Case "nwis_stations_discharge"
-                        chkNWIS_GetNWISDailyDischarge.Enabled = True
-                        chkNWIS_GetNWISDailyDischarge.Checked = True
-                        chkNWIS_GetNWISIdaDischarge.Enabled = True
-                    Case "nwis_stations_qw"
-                        chkNWIS_GetNWISWQ.Enabled = True
-                        chkNWIS_GetNWISWQ.Checked = True
-                    Case "nwis_stations_measurements"
-                        chkNWIS_GetNWISMeasurements.Enabled = True
-                        chkNWIS_GetNWISMeasurements.Checked = True
-                    Case "nwis_stations_gw"
-                        chkNWIS_GetNWISDailyGW.Enabled = True
-                        chkNWIS_GetNWISDailyGW.Checked = True
-                    Case "nwis_stations_peak" 'download of these data not yet implemented
-                    Case "storet"
-                        chkSTORET_Results.Enabled = True
-                        chkSTORET_Results.Text = "Results"
-                        chkSTORET_Results.Checked = True
-                    Case "nldas_grid", "nldas_grid_center"
-                        chkNLDAS_GetNLDASParameter.Enabled = True
-                        chkNLDAS_GetNLDASParameter.Text = "Precipitation"
-                        chkNLDAS_GetNLDASParameter.Checked = True
+
+                Select Case pApplicationName
+                    Case "USGS GW Toolbox"
+                        Select Case lFilename
+                            Case "nwis_stations_discharge"
+                                chkNWIS_GetNWISDailyDischarge_GW.Enabled = True
+                                chkNWIS_GetNWISDailyDischarge_GW.Checked = True
+                                chkNWIS_GetNWISIdaDischarge_GW.Enabled = True
+                            Case "nwis_stations_gw_daily"
+                                chkNWIS_GetNWISDailyGW_GW.Enabled = True
+                                chkNWIS_GetNWISDailyGW_GW.Checked = True
+                            Case "nwis_stations_gw_periodic"
+                                chkNWIS_GetNWISPeriodicGW_GW.Enabled = True
+                                chkNWIS_GetNWISPeriodicGW_GW.Checked = True
+                            Case Else
+                                If lFilename.StartsWith("met") Then
+                                    chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
+                                    chkBASINS_MetData.Checked = True
+                                End If
+                        End Select
                     Case Else
-                        If lFilename.StartsWith("met") Then
-                            chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
-                            chkBASINS_MetData.Checked = True
-                        End If
+                        Select Case lFilename
+                            Case "nwis_stations_discharge"
+                                chkNWIS_GetNWISDailyDischarge.Enabled = True
+                                chkNWIS_GetNWISDailyDischarge.Checked = True
+                                chkNWIS_GetNWISIdaDischarge.Enabled = True
+                            Case "nwis_stations_qw"
+                                chkNWIS_GetNWISWQ.Enabled = True
+                                chkNWIS_GetNWISWQ.Checked = True
+                            Case "nwis_stations_measurements"
+                                chkNWIS_GetNWISMeasurements.Enabled = True
+                                chkNWIS_GetNWISMeasurements.Checked = True
+                            Case "nwis_stations_gw_daily"
+                                chkNWIS_GetNWISDailyGW.Enabled = True
+                                chkNWIS_GetNWISDailyGW.Checked = True
+                            Case "nwis_stations_gw_periodic"
+                                chkNWIS_GetNWISPeriodicGW.Enabled = True
+                                chkNWIS_GetNWISPeriodicGW.Checked = True
+                            Case "nwis_stations_peak" 'download of these data not yet implemented
+
+                            Case "storet"
+                                chkSTORET_Results.Enabled = True
+                                chkSTORET_Results.Text = "Results"
+                                chkSTORET_Results.Checked = True
+                            Case "nldas_grid", "nldas_grid_center"
+                                chkNLDAS_GetNLDASParameter.Enabled = True
+                                chkNLDAS_GetNLDASParameter.Text = "Precipitation"
+                                chkNLDAS_GetNLDASParameter.Checked = True
+                            Case Else
+                                If lFilename.StartsWith("met") Then
+                                    chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
+                                    chkBASINS_MetData.Checked = True
+                                End If
+                        End Select
                 End Select
             End If
         End If
-        If Not chkNWIS_GetNWISDailyDischarge.Enabled AndAlso _
-           Not chkNWIS_GetNWISIdaDischarge.Enabled AndAlso _
-           Not chkNWIS_GetNWISDailyGW.Enabled AndAlso _
-           Not chkNWIS_GetNWISWQ.Enabled AndAlso _
-           Not chkNWIS_GetNWISMeasurements.Enabled Then
-            panelNWISnoStations.Visible = True
-            panelNWISnoStations.BringToFront()
-            chkNWIS_GetNWISDailyDischarge.Visible = False
-            chkNWIS_GetNWISIdaDischarge.Visible = False
-            chkNWIS_GetNWISMeasurements.Visible = False
-            chkNWIS_GetNWISDailyGW.Visible = False
-            chkNWIS_GetNWISWQ.Visible = False
-        End If
+
+        Select Case pApplicationName
+            Case "USGS GW Toolbox"
+                If Not chkNWIS_GetNWISDailyDischarge_GW.Enabled AndAlso _
+                   Not chkNWIS_GetNWISIdaDischarge_GW.Enabled AndAlso _
+                   Not chkNWIS_GetNWISDailyGW_GW.Enabled AndAlso _
+                   Not chkNWIS_GetNWISPeriodicGW_GW.Enabled Then
+                    panelNWISnoStations_GW.Visible = True
+                    panelNWISnoStations_GW.BringToFront()
+
+                    chkNWIS_GetNWISDailyDischarge_GW.Visible = False
+                    chkNWIS_GetNWISIdaDischarge_GW.Visible = False
+                    chkNWIS_GetNWISDailyGW_GW.Visible = False
+                    chkNWIS_GetNWISPeriodicGW_GW.Visible = False
+                End If
+            Case Else
+                If Not chkNWIS_GetNWISDailyDischarge.Enabled AndAlso _
+                   Not chkNWIS_GetNWISIdaDischarge.Enabled AndAlso _
+                   Not chkNWIS_GetNWISDailyGW.Enabled AndAlso _
+                   Not chkNWIS_GetNWISPeriodicGW.Enabled AndAlso _
+                   Not chkNWIS_GetNWISWQ.Enabled AndAlso _
+                   Not chkNWIS_GetNWISMeasurements.Enabled Then
+                    panelNWISnoStations.Visible = True
+                    panelNWISnoStations.BringToFront()
+
+                    chkNWIS_GetNWISDailyDischarge.Visible = False
+                    chkNWIS_GetNWISIdaDischarge.Visible = False
+                    chkNWIS_GetNWISMeasurements.Visible = False
+                    chkNWIS_GetNWISDailyGW.Visible = False
+                    chkNWIS_GetNWISPeriodicGW.Visible = False
+                    chkNWIS_GetNWISWQ.Visible = False
+                End If
+        End Select
     End Sub
 
     Private Sub SetColorsFromAvailability()
@@ -353,7 +419,7 @@ Public Class frmDownload
                         Case "NWIS.DischargeStations" : chkNWISStations_discharge.BackColor = lColor
                         Case "NWIS.WaterQualityStations" : chkNWISStations_qw.BackColor = lColor
                         Case "NWIS.MeasurementStations" : chkNWISStations_measurement.BackColor = lColor
-                        Case "NWIS.GroundwaterStations" : chkNWISStations_gw.BackColor = lColor
+                        Case "NWIS.GroundwaterStations" : chkNWISStations_gw_daily.BackColor = lColor
                         Case "NWIS.DischargeData" : chkNWIS_GetNWISDailyDischarge.BackColor = lColor
                         Case "NWIS.IdaDischarge" : chkNWIS_GetNWISIdaDischarge.BackColor = lColor
                         Case "NWIS.WaterQualityData" : chkNWIS_GetNWISWQ.BackColor = lColor
@@ -406,6 +472,10 @@ Public Class frmDownload
             Dim lCacheOnly As String = ""
             If chkCacheOnly.Checked Then lCacheOnly = "<CacheOnly>" & chkCacheOnly.Checked & "</CacheOnly>" & vbCrLf
 
+            Dim lCount As String = ""
+            Dim lMinCountInt As Integer
+            If Integer.TryParse(txtMinCount_GW.Text, lMinCountInt) Then lCount = "<MinCount>" & txtMinCount_GW.Text.Trim & "</MinCount>" & vbCrLf
+
             Dim lSaveFolderOnly As String = ""
             Dim lSaveFolder As String = ""
             If Not pMapWin.Project Is Nothing Then
@@ -424,6 +494,7 @@ Public Class frmDownload
                                      & lRegionXML _
                                      & lStationsXML _
                                      & lCacheOnly _
+                                     & lCount _
                                      & "<clip>" & chkClip.Checked & "</clip>" & vbCrLf _
                                      & "<merge>" & chkMerge.Checked & "</merge>" & vbCrLf _
                                      & "<joinattributes>true</joinattributes>" & vbCrLf _
@@ -431,11 +502,18 @@ Public Class frmDownload
                                      & "</function>" & vbCrLf
 
             For Each lControl As Windows.Forms.Control In Me.Controls
-                If lControl.Name.StartsWith("grp") AndAlso lControl.HasChildren Then
+                Dim lControlName As String = lControl.Name
+                If lControlName.EndsWith("_GW") Then 'Treat Groundwater version of controls the same as the BASINS version
+                    lControlName = lControlName.Substring(0, lControlName.Length - 3)
+                End If
+                If lControlName.StartsWith("grp") AndAlso lControl.HasChildren Then
                     Dim lCheckedChildren As String = ""
                     For Each lChild As Windows.Forms.Control In lControl.Controls
                         If lChild.GetType.Name = "CheckBox" AndAlso CType(lChild, Windows.Forms.CheckBox).Checked Then
-                            Dim lChildName As String = lChild.Name.Substring(lControl.Name.Length + 1)
+                            Dim lChildName As String = lChild.Name.Substring(lControlName.Length + 1)
+                            If lChildName.EndsWith("_GW") Then
+                                lChildName = lChildName.Substring(0, lChildName.Length - 3)
+                            End If
                             If lChildName.ToLower.StartsWith("get") Then 'this checkbox has its own function name
 
                                 Dim lWDMxml As String = ""
@@ -480,7 +558,7 @@ Public Class frmDownload
                                                       "Met Data Processing Options")
                         End If
                         If lWDMxml IsNot Nothing Then
-                            lXML &= "<function name='Get" & lControl.Name.Substring(3) & "'>" & vbCrLf _
+                            lXML &= "<function name='Get" & lControlName.Substring(3) & "'>" & vbCrLf _
                                  & "<arguments>" & vbCrLf _
                                  & lCheckedChildren _
                                  & lWDMxml _

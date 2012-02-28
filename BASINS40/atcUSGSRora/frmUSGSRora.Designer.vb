@@ -32,6 +32,7 @@ Partial Class frmUSGSRora
         Me.lblDataEnd = New System.Windows.Forms.Label
         Me.lblDataStart = New System.Windows.Forms.Label
         Me.gbOutputFileSpecs = New System.Windows.Forms.GroupBox
+        Me.btnGraphRecharge = New System.Windows.Forms.Button
         Me.btnWriteASCIIOutput = New System.Windows.Forms.Button
         Me.txtOutputDir = New System.Windows.Forms.TextBox
         Me.lblOutputDir = New System.Windows.Forms.Label
@@ -53,7 +54,8 @@ Partial Class frmUSGSRora
         Me.mnuFileSelectData = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuAnalysis = New System.Windows.Forms.ToolStripMenuItem
         Me.mnuHelp = New System.Windows.Forms.ToolStripMenuItem
-        Me.btnGraphRecharge = New System.Windows.Forms.Button
+        Me.lblAnalysisDates = New System.Windows.Forms.Label
+        Me.lblPeriodOfRecord = New System.Windows.Forms.Label
         Me.gbDates.SuspendLayout()
         Me.gbOutputFileSpecs.SuspendLayout()
         Me.gbParameters.SuspendLayout()
@@ -64,6 +66,8 @@ Partial Class frmUSGSRora
         '
         Me.gbDates.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbDates.Controls.Add(Me.lblAnalysisDates)
+        Me.gbDates.Controls.Add(Me.lblPeriodOfRecord)
         Me.gbDates.Controls.Add(Me.txtEndDateUser)
         Me.gbDates.Controls.Add(Me.txtStartDateUser)
         Me.gbDates.Controls.Add(Me.btnExamineData)
@@ -73,7 +77,7 @@ Partial Class frmUSGSRora
         Me.gbDates.Controls.Add(Me.lblDataStart)
         Me.gbDates.Location = New System.Drawing.Point(12, 27)
         Me.gbDates.Name = "gbDates"
-        Me.gbDates.Size = New System.Drawing.Size(344, 109)
+        Me.gbDates.Size = New System.Drawing.Size(344, 114)
         Me.gbDates.TabIndex = 8
         Me.gbDates.TabStop = False
         Me.gbDates.Text = "Analysis Dates"
@@ -82,7 +86,7 @@ Partial Class frmUSGSRora
         '
         Me.txtEndDateUser.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtEndDateUser.Location = New System.Drawing.Point(194, 52)
+        Me.txtEndDateUser.Location = New System.Drawing.Point(194, 58)
         Me.txtEndDateUser.Name = "txtEndDateUser"
         Me.txtEndDateUser.Size = New System.Drawing.Size(144, 20)
         Me.txtEndDateUser.TabIndex = 2
@@ -91,15 +95,15 @@ Partial Class frmUSGSRora
         '
         Me.txtStartDateUser.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtStartDateUser.Location = New System.Drawing.Point(194, 25)
+        Me.txtStartDateUser.Location = New System.Drawing.Point(194, 31)
         Me.txtStartDateUser.Name = "txtStartDateUser"
         Me.txtStartDateUser.Size = New System.Drawing.Size(144, 20)
         Me.txtStartDateUser.TabIndex = 1
         '
         'btnExamineData
         '
-        Me.btnExamineData.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnExamineData.Location = New System.Drawing.Point(244, 80)
+        Me.btnExamineData.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnExamineData.Location = New System.Drawing.Point(68, 85)
         Me.btnExamineData.Name = "btnExamineData"
         Me.btnExamineData.Size = New System.Drawing.Size(94, 23)
         Me.btnExamineData.TabIndex = 3
@@ -109,7 +113,7 @@ Partial Class frmUSGSRora
         'txtDataEnd
         '
         Me.txtDataEnd.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.txtDataEnd.Location = New System.Drawing.Point(68, 53)
+        Me.txtDataEnd.Location = New System.Drawing.Point(68, 59)
         Me.txtDataEnd.Name = "txtDataEnd"
         Me.txtDataEnd.ReadOnly = True
         Me.txtDataEnd.Size = New System.Drawing.Size(119, 20)
@@ -118,7 +122,7 @@ Partial Class frmUSGSRora
         'txtDataStart
         '
         Me.txtDataStart.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.txtDataStart.Location = New System.Drawing.Point(68, 26)
+        Me.txtDataStart.Location = New System.Drawing.Point(68, 32)
         Me.txtDataStart.Name = "txtDataStart"
         Me.txtDataStart.ReadOnly = True
         Me.txtDataStart.Size = New System.Drawing.Size(119, 20)
@@ -127,7 +131,7 @@ Partial Class frmUSGSRora
         'lblDataEnd
         '
         Me.lblDataEnd.AutoSize = True
-        Me.lblDataEnd.Location = New System.Drawing.Point(6, 52)
+        Me.lblDataEnd.Location = New System.Drawing.Point(6, 58)
         Me.lblDataEnd.Name = "lblDataEnd"
         Me.lblDataEnd.Size = New System.Drawing.Size(52, 13)
         Me.lblDataEnd.TabIndex = 1
@@ -138,7 +142,7 @@ Partial Class frmUSGSRora
         Me.lblDataStart.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblDataStart.AutoSize = True
-        Me.lblDataStart.Location = New System.Drawing.Point(6, 26)
+        Me.lblDataStart.Location = New System.Drawing.Point(6, 32)
         Me.lblDataStart.Name = "lblDataStart"
         Me.lblDataStart.Size = New System.Drawing.Size(55, 13)
         Me.lblDataStart.TabIndex = 0
@@ -154,12 +158,22 @@ Partial Class frmUSGSRora
         Me.gbOutputFileSpecs.Controls.Add(Me.lblOutputDir)
         Me.gbOutputFileSpecs.Controls.Add(Me.txtOutputRootName)
         Me.gbOutputFileSpecs.Controls.Add(Me.lblBaseFilename)
-        Me.gbOutputFileSpecs.Location = New System.Drawing.Point(12, 286)
+        Me.gbOutputFileSpecs.Location = New System.Drawing.Point(12, 291)
         Me.gbOutputFileSpecs.Name = "gbOutputFileSpecs"
         Me.gbOutputFileSpecs.Size = New System.Drawing.Size(344, 111)
         Me.gbOutputFileSpecs.TabIndex = 12
         Me.gbOutputFileSpecs.TabStop = False
         Me.gbOutputFileSpecs.Text = "Text Output"
+        '
+        'btnGraphRecharge
+        '
+        Me.btnGraphRecharge.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnGraphRecharge.Location = New System.Drawing.Point(78, 82)
+        Me.btnGraphRecharge.Name = "btnGraphRecharge"
+        Me.btnGraphRecharge.Size = New System.Drawing.Size(126, 23)
+        Me.btnGraphRecharge.TabIndex = 32
+        Me.btnGraphRecharge.Text = "Plot Monthly Recharge"
+        Me.btnGraphRecharge.UseVisualStyleBackColor = True
         '
         'btnWriteASCIIOutput
         '
@@ -219,7 +233,7 @@ Partial Class frmUSGSRora
         Me.gbParameters.Controls.Add(Me.lblDrainageArea)
         Me.gbParameters.Controls.Add(Me.txtDrainageArea)
         Me.gbParameters.Controls.Add(Me.lblDrainageAreaUnits)
-        Me.gbParameters.Location = New System.Drawing.Point(12, 142)
+        Me.gbParameters.Location = New System.Drawing.Point(12, 147)
         Me.gbParameters.Name = "gbParameters"
         Me.gbParameters.Size = New System.Drawing.Size(344, 138)
         Me.gbParameters.TabIndex = 13
@@ -319,7 +333,7 @@ Partial Class frmUSGSRora
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFile, Me.mnuAnalysis, Me.mnuHelp})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(367, 24)
+        Me.MenuStrip1.Size = New System.Drawing.Size(367, 27)
         Me.MenuStrip1.TabIndex = 14
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -327,42 +341,50 @@ Partial Class frmUSGSRora
         '
         Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileSelectData})
         Me.mnuFile.Name = "mnuFile"
-        Me.mnuFile.Size = New System.Drawing.Size(35, 20)
+        Me.mnuFile.Size = New System.Drawing.Size(45, 23)
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
         '
         Me.mnuFileSelectData.Name = "mnuFileSelectData"
-        Me.mnuFileSelectData.Size = New System.Drawing.Size(140, 22)
+        Me.mnuFileSelectData.Size = New System.Drawing.Size(172, 24)
         Me.mnuFileSelectData.Text = "Select Data"
         '
         'mnuAnalysis
         '
         Me.mnuAnalysis.Name = "mnuAnalysis"
-        Me.mnuAnalysis.Size = New System.Drawing.Size(58, 20)
+        Me.mnuAnalysis.Size = New System.Drawing.Size(79, 23)
         Me.mnuAnalysis.Text = "Analysis"
         '
         'mnuHelp
         '
         Me.mnuHelp.Name = "mnuHelp"
-        Me.mnuHelp.Size = New System.Drawing.Size(40, 20)
+        Me.mnuHelp.Size = New System.Drawing.Size(53, 23)
         Me.mnuHelp.Text = "Help"
         '
-        'btnGraphRecharge
+        'lblAnalysisDates
         '
-        Me.btnGraphRecharge.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnGraphRecharge.Location = New System.Drawing.Point(78, 82)
-        Me.btnGraphRecharge.Name = "btnGraphRecharge"
-        Me.btnGraphRecharge.Size = New System.Drawing.Size(126, 23)
-        Me.btnGraphRecharge.TabIndex = 32
-        Me.btnGraphRecharge.Text = "Plot Monthly Recharge"
-        Me.btnGraphRecharge.UseVisualStyleBackColor = True
+        Me.lblAnalysisDates.AutoSize = True
+        Me.lblAnalysisDates.Location = New System.Drawing.Point(191, 16)
+        Me.lblAnalysisDates.Name = "lblAnalysisDates"
+        Me.lblAnalysisDates.Size = New System.Drawing.Size(76, 13)
+        Me.lblAnalysisDates.TabIndex = 14
+        Me.lblAnalysisDates.Text = "Analysis Dates"
+        '
+        'lblPeriodOfRecord
+        '
+        Me.lblPeriodOfRecord.AutoSize = True
+        Me.lblPeriodOfRecord.Location = New System.Drawing.Point(65, 16)
+        Me.lblPeriodOfRecord.Name = "lblPeriodOfRecord"
+        Me.lblPeriodOfRecord.Size = New System.Drawing.Size(87, 13)
+        Me.lblPeriodOfRecord.TabIndex = 13
+        Me.lblPeriodOfRecord.Text = "Period of Record"
         '
         'frmUSGSRora
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(367, 406)
+        Me.ClientSize = New System.Drawing.Size(367, 411)
         Me.Controls.Add(Me.gbParameters)
         Me.Controls.Add(Me.gbOutputFileSpecs)
         Me.Controls.Add(Me.gbDates)
@@ -414,4 +436,6 @@ Partial Class frmUSGSRora
     Friend WithEvents mnuAnalysis As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents btnGraphRecharge As System.Windows.Forms.Button
+    Friend WithEvents lblAnalysisDates As System.Windows.Forms.Label
+    Friend WithEvents lblPeriodOfRecord As System.Windows.Forms.Label
 End Class
