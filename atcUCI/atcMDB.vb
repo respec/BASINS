@@ -1,5 +1,6 @@
 Imports System.Data.Odbc
 Imports System.Data.OleDb
+Imports System.Reflection
 
 ''' <summary>
 ''' Opens a MDB file and returns tables within it as DataTable
@@ -14,12 +15,18 @@ Public Class atcMDB
     ''' </summary>
     ''' <param name="aFilename">Name of database file to open</param>
     Sub New(ByVal aFilename As String)
-        If My.Computer.Info.OSFullName.Contains("x64") Then
-            'type to use open office - TODO: polish details!!!
-            pDataBaseType = "OO"
-        Else
-            pDataBaseType = "ODBC" ',"OLE",
-        End If
+        Dim lPeKind As PortableExecutableKinds
+        Dim lMachine As ImageFileMachine
+        Me.GetType().Module.GetPEKind(lPeKind, lMachine)
+
+        Select Case lMachine
+            Case ImageFileMachine.AMD64, ImageFileMachine.IA64
+                'type to use open office - TODO: polish details!!!
+                pDataBaseType = "OO"
+            Case ImageFileMachine.I386
+                pDataBaseType = "ODBC" ',"OLE",
+        End Select
+
         Select Case pDataBaseType
             Case "ODBC"
                 pConnection = New OdbcConnection("Driver={Microsoft Access Driver (*.mdb)};Dbq=" & aFilename & ";")
