@@ -4,6 +4,8 @@ Imports atcData.atcDataManager
 Public Class PlugIn
     Inherits atcData.atcDataPlugin
 
+    Private Shared pHSPFParmDB As HSPFParmDB = Nothing
+
     Public Overrides ReadOnly Property Name() As String
         Get
             Return "HSPFParm - Parameter Database for HSPF"
@@ -21,6 +23,9 @@ Public Class PlugIn
         pMapWin = MapWin
         atcData.atcDataManager.AddMenuIfMissing(ModelsMenuName, "", ModelsMenuString, "mnuFile")
         atcData.atcDataManager.AddMenuIfMissing(ModelsMenuName & "_HSPFParm", ModelsMenuName, "HSPFParm")
+        If pHSPFParmDB Is Nothing Then
+            pHSPFParmDB = New HSPFParmDB("")
+        End If
     End Sub
 
     Public Overrides Sub Terminate()
