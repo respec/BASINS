@@ -17,6 +17,9 @@ Module Util_HydroFrack_Report
 
     Private pBaseFolders As New ArrayList
     Private pTestPath As String
+    Private pRunFilePath As String
+    Private pReportFilePath As String
+
     Private pBaseName As String
     Private pOutputLocations As New atcCollection
     Private pGraphSaveFormat As String
@@ -41,17 +44,29 @@ Module Util_HydroFrack_Report
         pGraphSaveHeight = 768
 
         Dim lTestName As String = "Susq020501"
-        'lTestName = "Susq020502"
-        'lTestName = "Susq020503"
+        lTestName = "Susq020502"
+        lTestName = "Susq020503"
+        'lTestName = "SusqCalib"
 
         pConstituents.Add("Water")
         pTestPath = "G:\Admin\GCRPSusq"
+        pTestPath = "G:\Admin\HF_CBP"
+        pRunFilePath = pTestPath & "\" & "Runs" & "\"
+        pReportFilePath = pTestPath & "\" & "Reports" & "\"
 
         Select Case lTestName
             Case "Susq020501"
                 pBaseName = "Susq020501"
+
+                pOutputLocations.Add("R:12")
+                pOutputLocations.Add("R:4")
+                pOutputLocations.Add("R:32")
+                pOutputLocations.Add("R:25")
+                pOutputLocations.Add("R:20")
+                pOutputLocations.Add("R:71")
+                pOutputLocations.Add("R:68")
                 pOutputLocations.Add("R:69")
-                'pOutputLocations.Add("R:110")
+
                 pExpertPrec = True
                 'pWaterYears = True 'TODO: figure this out from run
                 pIdsPerSeg = 25
@@ -72,12 +87,29 @@ Module Util_HydroFrack_Report
                 'pImplndSegmentStarts = pUpatoiImplndSegmentStarts
             Case "Susq020502"
                 pBaseName = "Susq020502"
+                pOutputLocations.Add("R:19")
+                pOutputLocations.Add("R:17")
+                pOutputLocations.Add("R:16")
+                pOutputLocations.Add("R:20")
+                pOutputLocations.Add("R:13")
+                pOutputLocations.Add("R:44")
                 pOutputLocations.Add("R:43")
                 pExpertPrec = True
                 pIdsPerSeg = 25
             Case "Susq020503"
                 pBaseName = "Susq020503"
+                pOutputLocations.Add("R:39")
+                pOutputLocations.Add("R:1")
+                pOutputLocations.Add("R:6")
+                pOutputLocations.Add("R:20")
+                pOutputLocations.Add("R:50")
+                pOutputLocations.Add("R:92")
                 pOutputLocations.Add("R:86")
+                pExpertPrec = True
+                pIdsPerSeg = 25
+            Case "SusqCalib"
+                pBaseName = "SusqCalib"
+                pOutputLocations.Add("R:10")
                 pExpertPrec = True
                 pIdsPerSeg = 25
         End Select
@@ -85,7 +117,8 @@ Module Util_HydroFrack_Report
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Initialize()
-        ChDriveDir(pTestPath)
+        'ChDriveDir(pTestPath)
+        ChDriveDir(pRunFilePath)
         Logger.Dbg("CurrentFolder " & My.Computer.FileSystem.CurrentDirectory)
 
         'open uci file
@@ -119,7 +152,7 @@ Module Util_HydroFrack_Report
 
         'open HBN file
         'TODO: need to allow additional binary output files!
-        Dim lHspfBinFileName As String = pTestPath & "\" & pBaseName & ".hbn"
+        Dim lHspfBinFileName As String = IO.Path.Combine(pRunFilePath, pBaseName & ".hbn")
         Dim lHspfBinDataSource As New atcTimeseriesFileHspfBinOut()
         lHspfBinDataSource.Open(lHspfBinFileName)
 
@@ -130,7 +163,7 @@ Module Util_HydroFrack_Report
                 Format(Day(lRunMade), "00") & Format(Hour(lRunMade), "00") & Format(Minute(lRunMade), "00")
 
         'A folder name is given that has the basename and the time when the run was made.
-        Dim lOutFolderName As String = "Reports_" & pBaseName & "_" & lDateString & "\"
+        Dim lOutFolderName As String = pReportFilePath & "Reports_" & pBaseName & "_" & lDateString & "\"
         TryDelete(lOutFolderName)
         IO.Directory.CreateDirectory(lOutFolderName)
         'dont change name of uci - make it easier to compare with others, foldername contains info about which run
@@ -155,7 +188,7 @@ Module Util_HydroFrack_Report
 
         If pConstituents.Contains("Water") Then
             'open WDM file
-            Dim lWdmFileName As String = pTestPath & "\" & pBaseName & ".wdm"
+            Dim lWdmFileName As String = pRunFilePath & "\" & pBaseName & ".wdm"
             Dim lWdmDataSource As New atcDataSourceWDM()
             lWdmDataSource.Open(lWdmFileName)
             'TODO: allow observed flow to come from a different fileEXPE
@@ -165,9 +198,10 @@ Module Util_HydroFrack_Report
             Dim lExpertSystem As HspfSupport.atcExpertSystem
             For Each lExpertSystemFileName As String In lExpertSystemFileNames
                 Try
-                    Dim lFileCopied As Boolean = False
+                    'Dim lFileCopied As Boolean = False
                     If IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName).ToLower <> pBaseName.ToLower Then
-                        lFileCopied = TryCopy(lExpertSystemFileName, pBaseName & ".exs")
+                        'lFileCopied = TryCopy(lExpertSystemFileName, pBaseName & ".exs")
+                        Continue For
                     End If
                     lExpertSystem = New HspfSupport.atcExpertSystem(lHspfUci, lWdmDataSource)
                     lStr = lExpertSystem.Report
@@ -223,7 +257,7 @@ Module Util_HydroFrack_Report
                                     Dim lPrecDataGroup As atcTimeseriesGroup = lWdmDataSource.DataSets.FindData("ID", lPrecSourceCollection.Keys(lSourceIndex))
                                     If lPrecDataGroup.Count = 0 Then
                                         Dim lPrecWdmDataSource As New atcDataSourceWDM()
-                                        lPrecWdmDataSource.Open(pTestPath & "\FBMet.wdm")
+                                        lPrecWdmDataSource.Open(pRunFilePath & "\FBMet.wdm")
                                         lPrecDataGroup = lPrecWdmDataSource.DataSets.FindData("ID", lPrecSourceCollection.Keys(lSourceIndex))
                                         Logger.Dbg("PrecDataGroupFrom FBMet.wdm " & lPrecDataGroup.Count)
                                     Else
@@ -341,9 +375,9 @@ Module Util_HydroFrack_Report
                     Next
 
                     lExpertSystem = Nothing
-                    If lFileCopied Then
-                        IO.File.Delete(pBaseName & ".exs")
-                    End If
+                    'If lFileCopied Then
+                    '    IO.File.Delete(pBaseName & ".exs")
+                    'End If
                 Catch lEx As ApplicationException
                     Logger.Dbg(lEx.Message)
                 End Try
@@ -426,12 +460,12 @@ BalanceBasin:
                 HspfSupport.WatershedConstituentBalance.ReportsToFiles _
                    (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
                     lHspfBinDataSource, pOutputLocations, lRunMade, _
-                    lOutFolderName, True)
+                    lOutFolderName, True, , , , , False)
                 'now pivoted version
-                'HspfSupport.WatershedConstituentBalance.ReportsToFiles _
-                '   (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                '    lHspfBinDataSource, pOutputLocations, lRunMade, _
-                '    lOutFolderName, True, True)
+                HspfSupport.WatershedConstituentBalance.ReportsToFiles _
+                   (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+                    lHspfBinDataSource, pOutputLocations, lRunMade, _
+                    lOutFolderName, True, True, , , , False)
             End If
         Next
         Logger.Dbg("Reports Written in " & lOutFolderName, "HSPFOutputReports")
