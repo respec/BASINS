@@ -37,7 +37,13 @@ Public Class PlugIn
         If ItemName = ModelsMenuName & "_HSPFParm" Then
             Dim lFormHspfParm As New frmHSPFParm
             GisUtil.MappingObject = pMapWin
-            lFormHspfParm.InitializeUI()
+
+            Dim lPath As String = ""
+            If Not pHSPFParmDB Is Nothing Then
+                lPath = IO.Path.GetDirectoryName(pHSPFParmDB.Name)
+            End If
+
+            lFormHspfParm.InitializeUI(lPath)
             lFormHspfParm.Show()
             Handled = True
         End If
