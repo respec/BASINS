@@ -2,10 +2,12 @@ Imports atcUtility
 Imports atcMwGisUtility
 Imports MapWinUtility
 Imports System.Drawing
+Imports System.Data
 
 Public Class frmHSPFParm
     Inherits System.Windows.Forms.Form
 
+    <CLSCompliant(False)> Public Database As atcUCI.atcMDB
 #Region " Windows Form Designer generated code "
 
     Public Sub New()
@@ -303,7 +305,7 @@ Public Class frmHSPFParm
 
 #End Region
 
-    Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAdd.Click
+    Private Sub cmdAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAdd.Click
         Me.Close()
     End Sub
 
@@ -311,19 +313,19 @@ Public Class frmHSPFParm
         Logger.Msg("BASINS HSPFParm" & vbCrLf & vbCrLf & "Version 2.0", MsgBoxStyle.OkOnly, "BASINS HSPFParm")
     End Sub
 
-    Private Sub cmdExisting_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-
-    End Sub
-
     Private Sub cmdHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdHelp.Click
         ShowHelp("BASINS Details\Watershed and Instream Model Setup\HSPF.html")
     End Sub
 
-    Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdMap.Click
+    Private Sub cmdMap_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdMap.Click
 
     End Sub
 
-    Public Sub InitializeUI(ByVal aPath As String)
+    Private Sub cmdWrite_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdWrite.Click
+
+    End Sub
+
+    Public Sub InitializeUI(ByVal aPath As String, ByVal aDBName As String)
         With agdWatershed
             .Source = New atcControls.atcGridSource
             .AllowHorizontalScrolling = False
@@ -335,7 +337,7 @@ Public Class frmHSPFParm
                 Dim lPointTable As New atcTableDBF
                 lPointTable.OpenFile(lPointDbfName)
                 Dim lNumCols As Integer = lPointTable.NumFields
-                If lNumCols > 6 Then lNumCols = 6
+                'If lNumCols > 6 Then lNumCols = 6
                 .Columns = lNumCols
                 .ColorCells = True
                 .FixedRows = 1
@@ -344,6 +346,21 @@ Public Class frmHSPFParm
                 For lColIndex As Integer = 0 To lNumCols - 1
                     .CellColor(0, lColIndex) = SystemColors.ControlDark
                     .CellValue(0, lColIndex) = lPointTable.FieldName(lColIndex + 1)
+                    If lPointTable.FieldName(lColIndex + 1) = "WATERSNAME" Then
+                        .CellValue(0, lColIndex) = "Project Name"
+                    End If
+                    If lPointTable.FieldName(lColIndex + 1) = "LOCATION" Then
+                        .CellValue(0, lColIndex) = "Location"
+                    End If
+                    If lPointTable.FieldName(lColIndex + 1) = "DRAINAGEAR" Then
+                        .CellValue(0, lColIndex) = "Drainage Area"
+                    End If
+                    If lPointTable.FieldName(lColIndex + 1) = "COMMENTS" Then
+                        .CellValue(0, lColIndex) = "Comments"
+                    End If
+                    If lPointTable.FieldName(lColIndex + 1) = "PHYS" Then
+                        .CellValue(0, lColIndex) = "Physiographic Setting"
+                    End If
                 Next
                 .Rows = 1
                 Dim lNumRows As Integer = lPointTable.NumRecords
@@ -354,12 +371,6 @@ Public Class frmHSPFParm
                     Next
                     lPointTable.MoveNext()
                 Next
-                '.CellValue(0, 0) = "Project Name"
-                '.CellValue(0, 1) = "Location"
-                '.CellValue(0, 2) = "HUC"
-                '.CellValue(0, 3) = "Physiographic Setting"
-                '.CellValue(0, 4) = "Drainage Area"
-                '.CellValue(0, 5) = "Comments"
             End If
         End With
         agdWatershed.SizeAllColumnsToContents()
@@ -370,70 +381,24 @@ Public Class frmHSPFParm
             .AllowHorizontalScrolling = False
         End With
         With agdScenario.Source
-            .Columns = 2
+            .Columns = 4
             .ColorCells = True
             .FixedRows = 1
-            .FixedColumns = 1
+            .FixedColumns = 0
             .CellColor(0, 0) = SystemColors.ControlDark
             .CellColor(0, 1) = SystemColors.ControlDark
-            .Rows = 25
-            .CellValue(0, 0) = "Land Cover"
-            .CellValue(0, 1) = "Mannings (Velocity) Coefficient"
-            .CellValue(1, 0) = "Urban and Built-Up Land"
-            .CellValue(2, 0) = "Dryland Cropland and Pasture"
-            .CellValue(3, 0) = "Irrigated Cropland and Pasture"
-            .CellValue(4, 0) = "Mixed Dryland/Irrigated Cropland and Pasture"
-            .CellValue(5, 0) = "Cropland/Grassland Mosaic"
-            .CellValue(6, 0) = "Cropland/Woodland Mosaic"
-            .CellValue(7, 0) = "Grassland"
-            .CellValue(8, 0) = "Shrubland"
-            .CellValue(9, 0) = "Mixed Shrubland/Grassland"
-            .CellValue(10, 0) = "Savanna"
-            .CellValue(11, 0) = "Deciduous Broadleaf Forest"
-            .CellValue(12, 0) = "Deciduous Needleleaf Forest"
-            .CellValue(13, 0) = "Evergreen Broadleaf Forest"
-            .CellValue(14, 0) = "Evergreen Needleleaf Forest"
-            .CellValue(15, 0) = "Mixed Forest"
-            .CellValue(16, 0) = "Water Bodies"
-            .CellValue(17, 0) = "Herbaceous Wetland"
-            .CellValue(18, 0) = "Wooded Wetland"
-            .CellValue(19, 0) = "Barren or Sparsely Vegetated"
-            .CellValue(20, 0) = "Herbaceous Tundra"
-            .CellValue(21, 0) = "Wooded Tundra"
-            .CellValue(22, 0) = "Mixed Tundra"
-            .CellValue(23, 0) = "Bare Ground Tundra"
-            .CellValue(24, 0) = "Snow or Ice"
-            .CellValue(1, 1) = "0.03"
-            .CellValue(2, 1) = "0.03"
-            .CellValue(3, 1) = "0.035"
-            .CellValue(4, 1) = "0.033"
-            .CellValue(5, 1) = "0.035"
-            .CellValue(6, 1) = "0.04"
-            .CellValue(7, 1) = "0.05"
-            .CellValue(8, 1) = "0.05"
-            .CellValue(9, 1) = "0.05"
-            .CellValue(10, 1) = "0.06"
-            .CellValue(11, 1) = "0.1"
-            .CellValue(12, 1) = "0.1"
-            .CellValue(13, 1) = "0.12"
-            .CellValue(14, 1) = "0.12"
-            .CellValue(15, 1) = "0.1"
-            .CellValue(16, 1) = "0.035"
-            .CellValue(17, 1) = "0.05"
-            .CellValue(18, 1) = "0.05"
-            .CellValue(19, 1) = "0.03"
-            .CellValue(20, 1) = "0.05"
-            .CellValue(21, 1) = "0.05"
-            .CellValue(22, 1) = "0.05"
-            .CellValue(23, 1) = "0.04"
-            .CellValue(24, 1) = "0.04"
-            For lIndex As Integer = 1 To 24
-                .CellColor(lIndex, 0) = SystemColors.ControlDark
-                .CellEditable(lIndex, 1) = True
-            Next
+            .CellColor(0, 2) = SystemColors.ControlDark
+            .CellValue(0, 0) = "Name"
+            .CellValue(0, 1) = "Project Name"
+            .CellValue(0, 2) = "ID"
+            .CellValue(0, 3) = "WatershedID"
+            .Rows = 1
         End With
         agdScenario.SizeAllColumnsToContents()
         agdScenario.Refresh()
+
+        'open the database here
+        Database = New atcUCI.atcMDB(aDBName)
     End Sub
 
     Private Sub frmModelSetup_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
@@ -460,278 +425,350 @@ Public Class frmHSPFParm
         agdValues.Height = gbxValues.Height - 36
     End Sub
 
-    '    Sub RefreshSegment()
+    Sub RefreshScenario()
 
-    '        Dim i&, j&, crit$, nflds&, flds&(2), dispfg%, lwid&, nrow&
+        Dim lScen As DataTable = Database.GetTable("ScenarioData")
+        Dim lWat As DataTable = Database.GetTable("WatershedData")
 
-    '        MousePointer = vbHourglass
+        'save keys of selected watersheds 
+        Dim lWatKeys As New Collection
+        With agdWatershed.Source
+            For lRowIndex As Integer = 0 To .Rows - 1
+                If .CellSelected(lRowIndex, 0) Then
+                    lWatKeys.Add(.CellValue(lRowIndex, 0))
+                End If
+            Next
+        End With
 
-    '        For i = 0 To mnuSeg.Count - 1
-    '            mnuSeg(i).Enabled = True
-    '        Next i
-    '        'set fields to display for scenario table
-    '        nflds = 2
-    '        flds(1) = 1 'Name
-    '        flds(2) = 2 'Description
+        'find indexes of fields of interest from WatershedData table
+        Dim lWatIDFieldIndex As Integer = -1
+        Dim lWatNameFieldIndex As Integer = -1
+        For lCol As Integer = 0 To lWat.Columns.Count - 1
+            If lWat.Columns(lCol).ColumnName = "ID" Then
+                lWatIDFieldIndex = lCol
+            ElseIf lWat.Columns(lCol).ColumnName = "WatershedName" Then
+                lWatNameFieldIndex = lCol
+            End If
+        Next
 
-    '        agdSeg.Visible = False
-    '        mySeg = myDB.OpenRecordset("SegData", dbOpenDynaset)
-    '        'set column headers
-    '        agdSeg.ColSelectable(0) = True
-    '        For j = 1 To nflds
-    '            agdSeg.ColTitle(j - 1) = mySeg.Fields(flds(j)).Name
-    '        Next j
-    '        agdSeg.ColTitle(nflds) = "Scenario"
-    '        agdSeg.ColTitle(nflds + 1) = "Project"
+        'find indexes of fields of interest from ScenarioData table
+        Dim lScenWatIDFieldIndex As Integer = -1
+        Dim lScenIDFieldIndex As Integer = -1
+        Dim lScenNameFieldIndex As Integer = -1
+        For lCol As Integer = 0 To lScen.Columns.Count - 1
+            If lScen.Columns(lCol).ColumnName = "ID" Then
+                lScenIDFieldIndex = lCol
+            ElseIf lScen.Columns(lCol).ColumnName = "WatershedID" Then
+                lScenWatIDFieldIndex = lCol
+            ElseIf lScen.Columns(lCol).ColumnName = "Name" Then
+                lScenNameFieldIndex = lCol
+            End If
+        Next
 
-    '        agdSeg.ClearData()
-    '        nrow = 0
-    '        dispfg = 0
+        Dim lCrit As String = ""
+        Dim lWatName As String = ""
+        Dim lRows As Integer = 0
+        With agdScenario.Source
+            .Rows = 1
+            'look for each watershed id
+            For Each lWatId As String In lWatKeys
+                For lWatRow As Integer = 0 To lWat.Rows.Count - 1
+                    If lWat.Rows(lWatRow).Item(lWatIDFieldIndex).ToString = lWatId Then
+                        lWatName = lWat.Rows(lWatRow).Item(lWatNameFieldIndex).ToString
+                        'find scenarios for this watershed
+                        For lScenRow As Integer = 0 To lScen.Rows.Count - 1
+                            If lScen.Rows(lScenRow).Item(lScenWatIDFieldIndex).ToString = lWatId Then
+                                lRows += 1
+                                .Rows = lRows
+                                .CellValue(lRows, 0) = lScen.Rows(lScenRow).Item(lScenNameFieldIndex).ToString
+                                .CellValue(lRows, 1) = lWatName
+                                .CellValue(lRows, 2) = lScen.Rows(lScenRow).Item(lScenIDFieldIndex).ToString
+                                .CellValue(lRows, 3) = lWatId
+                            End If
+                        Next
+                    End If
+                Next
+            Next
+        End With
 
-    '        For i = 1 To agdScen.Rows
-    '            If agdScen.Selected(i, 0) Then 'list segments for this scenario
-    '                dispfg = 1
-    '                crit = "ScenarioID = " & agdScen.ItemData(i)
-    '                If Len(Filt(2).txt) > 0 Then  'add filter criteria
-    '                    crit = crit & " AND " & Filt(2).txt
-    '                End If
-    '                With mySeg
-    '                    .FindFirst(crit)
-    '                    Do Until .NoMatch
-    '                        nrow = nrow + 1
-    '                        agdSeg.Rows = nrow
-    '                        For j = 1 To nflds
-    '                            agdSeg.TextMatrix(nrow, j - 1) = .Fields(flds(j))
-    '                            If j = 1 Then 'set width of name field to display all info
-    '                                lwid = TextWidth(.Fields(j))
-    '                                If lwid > agdSeg.ColWidth(j - 1) Then
-    '                                    agdSeg.ColWidth(j - 1) = lwid
-    '                                End If
-    '                            End If
-    '                        Next j
-    '                        agdSeg.TextMatrix(nrow, nflds) = agdScen.TextMatrix(i, 0)
-    '                        agdSeg.TextMatrix(nrow, nflds + 1) = agdScen.TextMatrix(i, 1)
-    '                        'save id for future queries
-    '                        agdSeg.ItemData(nrow) = !id
-    '                        .FindNext(crit)
-    '                    Loop
-    '                End With
-    '            End If
-    '        Next i
+        agdScenario.SizeAllColumnsToContents()
+        agdScenario.Refresh()
 
-    '        mySeg.Close()
-    '        agdSeg.Visible = True
-    '        If dispfg = 1 Then
-    '            fraSeg.Visible = True
-    '            Call RefreshTable()
-    '            Call RefreshParm()
-    '        Else
-    '            fraSeg.Visible = False
-    '            fraTab.Visible = False
-    '            fraView.Visible = False
-    '            'mnuMain(5).Enabled = False
-    '        End If
-    '        Call RefreshMenu()
+        RefreshSegment()
+    End Sub
 
-    '        MousePointer = vbDefault
+    Sub RefreshSegment()
 
-    '    End Sub
+        '        Dim i&, j&, crit$, nflds&, flds&(2), dispfg%, lwid&, nrow&
 
-    '    Sub RefreshTable()
+        '        MousePointer = vbHourglass
 
-    '        Dim selstr$, i&, j&, crit$, dispfg%, lwid&, nrow&, OpTypStr$(3)
+        '        For i = 0 To mnuSeg.Count - 1
+        '            mnuSeg(i).Enabled = True
+        '        Next i
+        '        'set fields to display for scenario table
+        '        nflds = 2
+        '        flds(1) = 1 'Name
+        '        flds(2) = 2 'Description
 
-    '        MousePointer = vbHourglass
+        '        agdSeg.Visible = False
+        '        mySeg = myDB.OpenRecordset("SegData", dbOpenDynaset)
+        '        'set column headers
+        '        agdSeg.ColSelectable(0) = True
+        '        For j = 1 To nflds
+        '            agdSeg.ColTitle(j - 1) = mySeg.Fields(flds(j)).Name
+        '        Next j
+        '        agdSeg.ColTitle(nflds) = "Scenario"
+        '        agdSeg.ColTitle(nflds + 1) = "Project"
 
-    '        OpTypStr(1) = "PERLND"
-    '        OpTypStr(2) = "IMPLND"
-    '        OpTypStr(3) = "RCHRES"
+        '        agdSeg.ClearData()
+        '        nrow = 0
+        '        dispfg = 0
 
-    '        'build query based on selected segments
-    '        selstr = "SELECT DISTINCTROW ScenTableList.Name, " & _
-    '                                    "ScenTableList.TabID, " & _
-    '                                    "ScenTableList.OpnTypID " & _
-    '                               "FROM ScenTableList WHERE ("
-    '        For i = 1 To agdSeg.Rows 'look for selected segments
-    '            If agdSeg.Selected(i, 0) Then 'list tables for this segment
-    '                dispfg = 1
-    '                selstr = selstr & "SegID = " & agdSeg.ItemData(i) & " OR "
-    '            End If
-    '        Next i
+        '        For i = 1 To agdScen.Rows
+        '            If agdScen.Selected(i, 0) Then 'list segments for this scenario
+        '                dispfg = 1
+        '                crit = "ScenarioID = " & agdScen.ItemData(i)
+        '                If Len(Filt(2).txt) > 0 Then  'add filter criteria
+        '                    crit = crit & " AND " & Filt(2).txt
+        '                End If
+        '                With mySeg
+        '                    .FindFirst(crit)
+        '                    Do Until .NoMatch
+        '                        nrow = nrow + 1
+        '                        agdSeg.Rows = nrow
+        '                        For j = 1 To nflds
+        '                            agdSeg.TextMatrix(nrow, j - 1) = .Fields(flds(j))
+        '                            If j = 1 Then 'set width of name field to display all info
+        '                                lwid = TextWidth(.Fields(j))
+        '                                If lwid > agdSeg.ColWidth(j - 1) Then
+        '                                    agdSeg.ColWidth(j - 1) = lwid
+        '                                End If
+        '                            End If
+        '                        Next j
+        '                        agdSeg.TextMatrix(nrow, nflds) = agdScen.TextMatrix(i, 0)
+        '                        agdSeg.TextMatrix(nrow, nflds + 1) = agdScen.TextMatrix(i, 1)
+        '                        'save id for future queries
+        '                        agdSeg.ItemData(nrow) = !id
+        '                        .FindNext(crit)
+        '                    Loop
+        '                End With
+        '            End If
+        '        Next i
 
-    '        If dispfg = 1 Then 'display tables for selected segments
-    '            selstr = Left(selstr, Len(selstr) - 3) & ")"
-    '            If Len(Filt(3).txt) > 0 Then  'add filter criteria
-    '                selstr = selstr & " AND " & Filt(3).txt
-    '            End If
-    '            myTab = myDB.OpenRecordset(selstr, dbOpenDynaset)
-    '            'set column headers
-    '            agdTab.ColTitle(0) = "Name"
-    '            agdTab.ColTitle(1) = "Seg Type"
-    '            agdTab.ColSelectable(0) = True
+        '        mySeg.Close()
+        '        agdSeg.Visible = True
+        '        If dispfg = 1 Then
+        '            fraSeg.Visible = True
+        '            Call RefreshTable()
+        '            Call RefreshParm()
+        '        Else
+        '            fraSeg.Visible = False
+        '            fraTab.Visible = False
+        '            fraView.Visible = False
+        '            'mnuMain(5).Enabled = False
+        '        End If
+        '        Call RefreshMenu()
 
-    '            agdTab.ClearData()
-    '            nrow = 0
-    '            With myTab
-    '                Do Until .EOF '.NoMatch
-    '                    nrow = nrow + 1
-    '                    agdTab.Rows = nrow
-    '                    agdTab.TextMatrix(nrow, 0) = !Name
-    '                    'set width of name field to display all info
-    '                    lwid = TextWidth(!Name)
-    '                    If lwid > agdTab.ColWidth(0) Then
-    '                        agdTab.ColWidth(0) = lwid
-    '                    End If
-    '                    agdTab.TextMatrix(nrow, 1) = OpTypStr(!OpnTypID)
-    '                    'update itemdata, not sure what goes here yet!!!
-    '                    agdTab.ItemData(agdTab.Rows) = !TabID
-    '                    .MoveNext()
-    '                Loop
-    '            End With
+        '        MousePointer = vbDefault
 
-    '            myTab.Close()
-    '            fraTab.Visible = True
-    '        Else 'no segments selected for which to display tables
-    '            fraTab.Visible = False
-    '            fraView.Visible = False
-    '            'mnuMain(5).Enabled = False
-    '        End If
+    End Sub
 
-    '        MousePointer = vbDefault
+    Sub RefreshTable()
 
-    '    End Sub
+        '        Dim selstr$, i&, j&, crit$, dispfg%, lwid&, nrow&, OpTypStr$(3)
 
-    '    Sub RefreshParm()
+        '        MousePointer = vbHourglass
 
-    '        Dim selstr$, i&, j&, crit$, dispfg%, lwid&, nrow&, OpTypStr$(3)
+        '        OpTypStr(1) = "PERLND"
+        '        OpTypStr(2) = "IMPLND"
+        '        OpTypStr(3) = "RCHRES"
 
-    '        MousePointer = vbHourglass
+        '        'build query based on selected segments
+        '        selstr = "SELECT DISTINCTROW ScenTableList.Name, " & _
+        '                                    "ScenTableList.TabID, " & _
+        '                                    "ScenTableList.OpnTypID " & _
+        '                               "FROM ScenTableList WHERE ("
+        '        For i = 1 To agdSeg.Rows 'look for selected segments
+        '            If agdSeg.Selected(i, 0) Then 'list tables for this segment
+        '                dispfg = 1
+        '                selstr = selstr & "SegID = " & agdSeg.ItemData(i) & " OR "
+        '            End If
+        '        Next i
 
-    '        'build query based on selected segments
-    '        selstr = "SELECT DISTINCTROW ParmTableData.ParmID, " & _
-    '                                    "ParmTableData.Name, " & _
-    '                                    "ParmTableData.Table, " & _
-    '                                    "ParmTableData.TabID " & _
-    '                               "FROM ParmTableData WHERE ("
-    '        For i = 1 To agdSeg.Rows 'look for selected segments
-    '            If agdSeg.Selected(i, 0) Then 'list tables for this segment
-    '                dispfg = 1
-    '                selstr = selstr & "SegID = " & agdSeg.ItemData(i) & " OR "
-    '            End If
-    '        Next i
+        '        If dispfg = 1 Then 'display tables for selected segments
+        '            selstr = Left(selstr, Len(selstr) - 3) & ")"
+        '            If Len(Filt(3).txt) > 0 Then  'add filter criteria
+        '                selstr = selstr & " AND " & Filt(3).txt
+        '            End If
+        '            myTab = myDB.OpenRecordset(selstr, dbOpenDynaset)
+        '            'set column headers
+        '            agdTab.ColTitle(0) = "Name"
+        '            agdTab.ColTitle(1) = "Seg Type"
+        '            agdTab.ColSelectable(0) = True
 
-    '        If dispfg = 1 Then 'display parms for selected segments
-    '            selstr = RTrim(Left(selstr, Len(selstr) - 3)) & ")"
-    '            If Len(Filt(3).txt) > 0 Then  'add filter criteria
-    '                selstr = selstr & " AND " & Filt(3).txt
-    '            End If
-    '            myTab = myDB.OpenRecordset(selstr, dbOpenDynaset)
-    '            'set column headers
-    '            agdParm.ColTitle(0) = "Name"
-    '            agdParm.ColTitle(1) = "Table"
-    '            agdParm.ColSelectable(0) = True
+        '            agdTab.ClearData()
+        '            nrow = 0
+        '            With myTab
+        '                Do Until .EOF '.NoMatch
+        '                    nrow = nrow + 1
+        '                    agdTab.Rows = nrow
+        '                    agdTab.TextMatrix(nrow, 0) = !Name
+        '                    'set width of name field to display all info
+        '                    lwid = TextWidth(!Name)
+        '                    If lwid > agdTab.ColWidth(0) Then
+        '                        agdTab.ColWidth(0) = lwid
+        '                    End If
+        '                    agdTab.TextMatrix(nrow, 1) = OpTypStr(!OpnTypID)
+        '                    'update itemdata, not sure what goes here yet!!!
+        '                    agdTab.ItemData(agdTab.Rows) = !TabID
+        '                    .MoveNext()
+        '                Loop
+        '            End With
 
-    '            agdParm.ClearData()
-    '            nrow = 0
-    '            With myTab
-    '                Do Until .EOF '.NoMatch
-    '                    nrow = nrow + 1
-    '                    agdParm.Rows = nrow
-    '                    agdParm.TextMatrix(nrow, 0) = !Name
-    '                    'set width of name field to display all info
-    '                    lwid = TextWidth(!Name)
-    '                    If lwid > agdParm.ColWidth(0) Then
-    '                        agdParm.ColWidth(0) = lwid
-    '                    End If
-    '                    agdParm.TextMatrix(nrow, 1) = !Table
-    '                    'update itemdata
-    '                    agdParm.ItemData(nrow) = !ParmID
-    '                    .MoveNext()
-    '                Loop
-    '            End With
+        '            myTab.Close()
+        '            fraTab.Visible = True
+        '        Else 'no segments selected for which to display tables
+        '            fraTab.Visible = False
+        '            fraView.Visible = False
+        '            'mnuMain(5).Enabled = False
+        '        End If
 
-    '            myTab.Close()
-    '            fraTab.Visible = True
-    '        Else 'no segments selected for which to display tables
-    '            fraTab.Visible = False
-    '            fraView.Visible = False
-    '            'mnuMain(5).Enabled = False
-    '        End If
+        '        MousePointer = vbDefault
 
-    '        MousePointer = vbDefault
+    End Sub
 
-    '    End Sub
+    Sub RefreshParm()
 
-    '    Sub ViewParms(ByVal Pid&)
+        '        Dim selstr$, i&, j&, crit$, dispfg%, lwid&, nrow&, OpTypStr$(3)
 
-    '        Dim i&, nrow&, selstr$, lwid&, Alias$, ColHeader$
+        '        MousePointer = vbHourglass
 
-    '        agdView.Cols = 6
-    '        agdView.ColTitle(0) = "Name"
-    '        agdView.ColTitle(1) = "Value"
-    '        agdView.ColTitle(2) = "Segment"
-    '        agdView.ColTitle(3) = "Scenario"
-    '        agdView.ColTitle(4) = "Occur"
-    '        agdView.ColTitle(5) = "Alias"
-    '        agdView.ClearData()
-    '        nrow = 0
+        '        'build query based on selected segments
+        '        selstr = "SELECT DISTINCTROW ParmTableData.ParmID, " & _
+        '                                    "ParmTableData.Name, " & _
+        '                                    "ParmTableData.Table, " & _
+        '                                    "ParmTableData.TabID " & _
+        '                               "FROM ParmTableData WHERE ("
+        '        For i = 1 To agdSeg.Rows 'look for selected segments
+        '            If agdSeg.Selected(i, 0) Then 'list tables for this segment
+        '                dispfg = 1
+        '                selstr = selstr & "SegID = " & agdSeg.ItemData(i) & " OR "
+        '            End If
+        '        Next i
 
-    '        'build query based on selected segments
-    '        selstr = "SELECT DISTINCTROW ParmTableData.SegID, " & _
-    '                                    "ParmTableData.OpnTypID, " & _
-    '                                    "ParmTableData.Name, " & _
-    '                                    "ParmTableData.ParmID, " & _
-    '                                    "ParmTableData.Value, " & _
-    '                                    "ParmTableData.Table, " & _
-    '                                    "ParmTableData.Occur, " & _
-    '                                    "ParmTabledata.AliasInfo " & _
-    '                 "From ParmTableData " & _
-    '                 "WHERE (ParmID = " & Pid & " OR AssocID = " & Pid & ") AND ("
-    '        For i = 1 To agdSeg.Rows 'look for selected segments
-    '            If agdSeg.Selected(i, 0) Then 'list tables for this segment
-    '                selstr = selstr & "SegID = " & agdSeg.ItemData(i) & " OR "
-    '            End If
-    '        Next i
-    '        selstr = RTrim(Left(selstr, Len(selstr) - 3)) & ")"
-    '        myTab = myDB.OpenRecordset(selstr, dbOpenDynaset)
+        '        If dispfg = 1 Then 'display parms for selected segments
+        '            selstr = RTrim(Left(selstr, Len(selstr) - 3)) & ")"
+        '            If Len(Filt(3).txt) > 0 Then  'add filter criteria
+        '                selstr = selstr & " AND " & Filt(3).txt
+        '            End If
+        '            myTab = myDB.OpenRecordset(selstr, dbOpenDynaset)
+        '            'set column headers
+        '            agdParm.ColTitle(0) = "Name"
+        '            agdParm.ColTitle(1) = "Table"
+        '            agdParm.ColSelectable(0) = True
 
-    '        With myTab
-    '            agdView.Header = "    Parameter " & !Name
-    '            fraView.ToolTipText = "HSPF Parameter help from Message File will go here."
-    '            Do Until .EOF
-    '                nrow = nrow + 1
-    '                agdView.Rows = nrow
-    '                agdView.TextMatrix(nrow, 0) = !Name
-    '                agdView.TextMatrix(nrow, 1) = !Value
-    '                agdView.TextMatrix(nrow, 4) = !Occur
-    '                If Len(Trim(!AliasInfo)) > 0 Then
-    '          Call FillInAlias(!Table, !Occur, !OpnTypID, !SegID, Alias, ColHeader)
-    '                    agdView.ColTitle(5) = ColHeader
-    '                Else
-    '          Alias = ""
-    '                End If
-    '        agdView.TextMatrix(nrow, 5) = Alias
-    '                i = 1
-    '                Do While i <= agdSeg.Rows
-    '                    If agdSeg.ItemData(i) = !SegID Then
-    '                        agdView.TextMatrix(nrow, 2) = agdSeg.TextMatrix(i, 0)
-    '                        agdView.TextMatrix(nrow, 3) = agdSeg.TextMatrix(i, 2)
-    '                        i = agdSeg.Rows
-    '                    End If
-    '                    i = i + 1
-    '                Loop
-    '                .MoveNext()
-    '            Loop
-    '        End With
+        '            agdParm.ClearData()
+        '            nrow = 0
+        '            With myTab
+        '                Do Until .EOF '.NoMatch
+        '                    nrow = nrow + 1
+        '                    agdParm.Rows = nrow
+        '                    agdParm.TextMatrix(nrow, 0) = !Name
+        '                    'set width of name field to display all info
+        '                    lwid = TextWidth(!Name)
+        '                    If lwid > agdParm.ColWidth(0) Then
+        '                        agdParm.ColWidth(0) = lwid
+        '                    End If
+        '                    agdParm.TextMatrix(nrow, 1) = !Table
+        '                    'update itemdata
+        '                    agdParm.ItemData(nrow) = !ParmID
+        '                    .MoveNext()
+        '                Loop
+        '            End With
 
-    '        myTab.Close()
+        '            myTab.Close()
+        '            fraTab.Visible = True
+        '        Else 'no segments selected for which to display tables
+        '            fraTab.Visible = False
+        '            fraView.Visible = False
+        '            'mnuMain(5).Enabled = False
+        '        End If
 
-    '        Call HideLikeCol(agdView, 4)
+        '        MousePointer = vbDefault
 
-    '        fraView.Visible = True
-    '        mnuMain(5).Enabled = True
+    End Sub
 
-    '    End Sub
+    Sub ViewParms(ByVal Pid&)
+
+        '        Dim i&, nrow&, selstr$, lwid&, Alias$, ColHeader$
+
+        '        agdView.Cols = 6
+        '        agdView.ColTitle(0) = "Name"
+        '        agdView.ColTitle(1) = "Value"
+        '        agdView.ColTitle(2) = "Segment"
+        '        agdView.ColTitle(3) = "Scenario"
+        '        agdView.ColTitle(4) = "Occur"
+        '        agdView.ColTitle(5) = "Alias"
+        '        agdView.ClearData()
+        '        nrow = 0
+
+        '        'build query based on selected segments
+        '        selstr = "SELECT DISTINCTROW ParmTableData.SegID, " & _
+        '                                    "ParmTableData.OpnTypID, " & _
+        '                                    "ParmTableData.Name, " & _
+        '                                    "ParmTableData.ParmID, " & _
+        '                                    "ParmTableData.Value, " & _
+        '                                    "ParmTableData.Table, " & _
+        '                                    "ParmTableData.Occur, " & _
+        '                                    "ParmTabledata.AliasInfo " & _
+        '                 "From ParmTableData " & _
+        '                 "WHERE (ParmID = " & Pid & " OR AssocID = " & Pid & ") AND ("
+        '        For i = 1 To agdSeg.Rows 'look for selected segments
+        '            If agdSeg.Selected(i, 0) Then 'list tables for this segment
+        '                selstr = selstr & "SegID = " & agdSeg.ItemData(i) & " OR "
+        '            End If
+        '        Next i
+        '        selstr = RTrim(Left(selstr, Len(selstr) - 3)) & ")"
+        '        myTab = myDB.OpenRecordset(selstr, dbOpenDynaset)
+
+        '        With myTab
+        '            agdView.Header = "    Parameter " & !Name
+        '            fraView.ToolTipText = "HSPF Parameter help from Message File will go here."
+        '            Do Until .EOF
+        '                nrow = nrow + 1
+        '                agdView.Rows = nrow
+        '                agdView.TextMatrix(nrow, 0) = !Name
+        '                agdView.TextMatrix(nrow, 1) = !Value
+        '                agdView.TextMatrix(nrow, 4) = !Occur
+        '                If Len(Trim(!AliasInfo)) > 0 Then
+        '          Call FillInAlias(!Table, !Occur, !OpnTypID, !SegID, Alias, ColHeader)
+        '                    agdView.ColTitle(5) = ColHeader
+        '                Else
+        '          Alias = ""
+        '                End If
+        '        agdView.TextMatrix(nrow, 5) = Alias
+        '                i = 1
+        '                Do While i <= agdSeg.Rows
+        '                    If agdSeg.ItemData(i) = !SegID Then
+        '                        agdView.TextMatrix(nrow, 2) = agdSeg.TextMatrix(i, 0)
+        '                        agdView.TextMatrix(nrow, 3) = agdSeg.TextMatrix(i, 2)
+        '                        i = agdSeg.Rows
+        '                    End If
+        '                    i = i + 1
+        '                Loop
+        '                .MoveNext()
+        '            Loop
+        '        End With
+
+        '        myTab.Close()
+
+        '        Call HideLikeCol(agdView, 4)
+
+        '        fraView.Visible = True
+        '        mnuMain(5).Enabled = True
+
+    End Sub
 
     '    Private Sub HideLikeCol(ByVal agd As Object, ByVal scol&)
     '        Dim i&, c1Same As Boolean, c2Same As Boolean
@@ -762,90 +799,92 @@ Public Class frmHSPFParm
     '        End If
     '    End Sub
 
-    '    Sub ViewTable(ByVal Tid&)
+    Sub ViewTable(ByVal Tid&)
 
-    '        Dim i&, j&, ncol&, nrow&, brow&, crit$, selstr$, PrmID&()
-    '        Dim Alias$, ColHeader$
+        '        Dim i&, j&, ncol&, nrow&, brow&, crit$, selstr$, PrmID&()
+        '        Dim Alias$, ColHeader$
 
-    '        myTab = myDB.OpenRecordset("ParmTableList", dbOpenDynaset)
+        '        myTab = myDB.OpenRecordset("ParmTableList", dbOpenDynaset)
 
-    '        agdView.ClearData()
-    '        agdView.Rows = 1
-    '        'build headers for table view
-    '        ncol = 3
-    '        agdView.ColTitle(0) = "Op Num"
-    '        agdView.ColTitle(1) = "Scen"
-    '        'set to no width if not applicable???
-    '        agdView.ColTitle(2) = "Occur"
-    '        agdView.ColTitle(3) = "Alias"
-    '        crit = "TabID = " & Tid
-    '        With myTab
-    '            .FindFirst(crit)
-    '            agdView.Header = "    Table " & myTab!TabName
-    '            Do Until .NoMatch
-    '                ncol = ncol + 1
-    '                agdView.ColTitle(ncol) = !Name
-    '                ReDim Preserve PrmID(ncol)
-    '                PrmID(ncol) = !id
-    '                .FindNext(crit)
-    '            Loop
-    '            .Close()
-    '        End With
-    '        agdView.Cols = ncol + 1
+        '        agdView.ClearData()
+        '        agdView.Rows = 1
+        '        'build headers for table view
+        '        ncol = 3
+        '        agdView.ColTitle(0) = "Op Num"
+        '        agdView.ColTitle(1) = "Scen"
+        '        'set to no width if not applicable???
+        '        agdView.ColTitle(2) = "Occur"
+        '        agdView.ColTitle(3) = "Alias"
+        '        crit = "TabID = " & Tid
+        '        With myTab
+        '            .FindFirst(crit)
+        '            agdView.Header = "    Table " & myTab!TabName
+        '            Do Until .NoMatch
+        '                ncol = ncol + 1
+        '                agdView.ColTitle(ncol) = !Name
+        '                ReDim Preserve PrmID(ncol)
+        '                PrmID(ncol) = !id
+        '                .FindNext(crit)
+        '            Loop
+        '            .Close()
+        '        End With
+        '        agdView.Cols = ncol + 1
 
-    '        'build query based on selected table
-    '        selstr = "SELECT DISTINCTROW ParmTableData.SegID, " & _
-    '                                    "ParmTableData.OpnTypID, " & _
-    '                                    "ParmTableData.Name, " & _
-    '                                    "ParmTableData.Value, " & _
-    '                                    "ParmTableData.ParmID, " & _
-    '                                    "ParmTableData.Table, " & _
-    '                                    "ParmTableData.Occur, " & _
-    '                                    "ParmTabledata.AliasInfo " & _
-    '                 "From ParmTableData " & _
-    '                 "WHERE (TabID = " & Tid & ")"
-    '        myTab = myDB.OpenRecordset(selstr, dbOpenDynaset)
+        '        'build query based on selected table
+        '        selstr = "SELECT DISTINCTROW ParmTableData.SegID, " & _
+        '                                    "ParmTableData.OpnTypID, " & _
+        '                                    "ParmTableData.Name, " & _
+        '                                    "ParmTableData.Value, " & _
+        '                                    "ParmTableData.ParmID, " & _
+        '                                    "ParmTableData.Table, " & _
+        '                                    "ParmTableData.Occur, " & _
+        '                                    "ParmTabledata.AliasInfo " & _
+        '                 "From ParmTableData " & _
+        '                 "WHERE (TabID = " & Tid & ")"
+        '        myTab = myDB.OpenRecordset(selstr, dbOpenDynaset)
 
-    '        nrow = 0
-    '        For i = 1 To agdSeg.Rows 'look for selected segments
-    '            If agdSeg.Selected(i, 0) Then 'list table values for this segment
-    '                crit = "SegID = " & agdSeg.ItemData(i)
-    '                brow = nrow
-    '                With myTab
-    '                    .FindFirst(crit)
-    '                    Do Until .NoMatch
-    '                        nrow = brow + !Occur
-    '                        If nrow > agdView.Rows Or nrow = 1 Then
-    '                            If nrow > 1 Then agdView.Rows = nrow
-    '                            agdView.TextMatrix(nrow, 0) = Right(agdSeg.TextMatrix(i, 0), Len(agdSeg.TextMatrix(i, 0)) - 6)
-    '                            agdView.TextMatrix(nrow, 1) = agdSeg.TextMatrix(i, 2)
-    '                            agdView.TextMatrix(nrow, 2) = !Occur
-    '                            If Len(Trim(!AliasInfo)) > 0 Then
-    '                Call FillInAlias(!Table, !Occur, !OpnTypID, !SegID, Alias, ColHeader)
-    '                                agdView.ColTitle(3) = ColHeader
-    '                            Else
-    '                Alias = ""
-    '                            End If
-    '              agdView.TextMatrix(nrow, 3) = Alias
-    '                        End If
-    '                        For j = 2 To ncol
-    '                            If PrmID(j) = !ParmID Then
-    '                                agdView.TextMatrix(nrow, j) = !Value
-    '                                Exit For
-    '                            End If
-    '                        Next j
-    '                        .FindNext(crit)
-    '                    Loop
-    '                End With
-    '            End If
-    '        Next i
+        '        nrow = 0
+        '        For i = 1 To agdSeg.Rows 'look for selected segments
+        '            If agdSeg.Selected(i, 0) Then 'list table values for this segment
+        '                crit = "SegID = " & agdSeg.ItemData(i)
+        '                brow = nrow
+        '                With myTab
+        '                    .FindFirst(crit)
+        '                    Do Until .NoMatch
+        '                        nrow = brow + !Occur
+        '                        If nrow > agdView.Rows Or nrow = 1 Then
+        '                            If nrow > 1 Then agdView.Rows = nrow
+        '                            agdView.TextMatrix(nrow, 0) = Right(agdSeg.TextMatrix(i, 0), Len(agdSeg.TextMatrix(i, 0)) - 6)
+        '                            agdView.TextMatrix(nrow, 1) = agdSeg.TextMatrix(i, 2)
+        '                            agdView.TextMatrix(nrow, 2) = !Occur
+        '                            If Len(Trim(!AliasInfo)) > 0 Then
+        '                Call FillInAlias(!Table, !Occur, !OpnTypID, !SegID, Alias, ColHeader)
+        '                                agdView.ColTitle(3) = ColHeader
+        '                            Else
+        '                Alias = ""
+        '                            End If
+        '              agdView.TextMatrix(nrow, 3) = Alias
+        '                        End If
+        '                        For j = 2 To ncol
+        '                            If PrmID(j) = !ParmID Then
+        '                                agdView.TextMatrix(nrow, j) = !Value
+        '                                Exit For
+        '                            End If
+        '                        Next j
+        '                        .FindNext(crit)
+        '                    Loop
+        '                End With
+        '            End If
+        '        Next i
 
-    '        myTab.Close()
-    '        Call HideLikeCol(agdView, 2)
-    '        fraView.Visible = True
-    '        mnuMain(5).Enabled = True
+        '        myTab.Close()
+        '        Call HideLikeCol(agdView, 2)
+        '        fraView.Visible = True
+        '        mnuMain(5).Enabled = True
 
-    '    End Sub
+    End Sub
+
+    
 
     '    Private Sub FillInAlias(ByVal Table$, ByVal Occur&, ByVal OpnTypID&, ByVal SegID&, ByVal Alias$, ByVal ColHeader$)
     '        Dim crit$
@@ -1054,51 +1093,6 @@ Public Class frmHSPFParm
 
     '    End Sub
 
-    '    Private Sub Form_Load()
-    '        Dim i%
-
-    '        Map1.SetMapData("", "hspfparm.map", "")
-    '        Map1.CurLayer = 0
-    '        'Map1.ButtonVisible("Edit") = False
-    '        Map1.ButtonVisible("Move") = False
-    '        Map1.ButtonVisible("Add") = False
-    '        For i = 0 To mnuScen.Count - 1
-    '            mnuScen(i).Enabled = False
-    '        Next i
-    '        For i = 0 To mnuSeg.Count - 1
-    '            mnuSeg(i).Enabled = False
-    '        Next i
-
-    '    End Sub
-
-    '    Private Sub Form_Resize()
-
-    '        fraView.Top = sashView.Top + sashView.Height
-    '        If (Height - 600 > fraView.Top) Then fraView.Height = Height - fraView.Top - 600
-    '        If fraView.Height > 360 Then agdView.Height = fraView.Height - 360
-    '        If Height > fraMap.Top + 600 Then
-    '            fraMap.Height = Height - fraMap.Top - 600
-    '            Map1.Height = fraMap.Height - 300
-    '            sashV.Height = Height
-    '            'Else
-    '            '  Height = fraMap.Top + 600
-    '        End If
-
-    '        If Width > fraMap.Left + fraScen.Width + 540 Then
-    '            fraMap.Width = Width - fraScen.Width - 240
-    '            Map1.Width = fraMap.Width - 300
-    '            sashV.Left = fraMap.Left + fraMap.Width
-    '            fraScen.Left = sashV.Left + sashV.Width
-    '            fraSeg.Left = fraScen.Left
-    '            fraTab.Left = fraScen.Left
-    '            fraView.Left = fraScen.Left
-    '            sashView.Left = fraScen.Left
-    '            'Else
-    '            '  Width = fraMap.Left + fraScen.Width + 540
-    '        End If
-
-    '    End Sub
-
     '    Private Sub Form_Terminate()
 
     '        myDB.Close()
@@ -1114,78 +1108,6 @@ Public Class frmHSPFParm
     '        Call RefreshScenario()
 
     '        MousePointer = vbDefault
-
-    '    End Sub
-
-    '    Sub RefreshScenario()
-
-    '        Dim i&, j&, crit$, nflds&, flds&(2), dispfg%, lwid&, nrow&
-    '        Dim WatKeys$(), WatName$
-
-    '        'set fields to display for scenario table (maybe want less)
-    '        nflds = 2
-    '        flds(1) = 1 'Name
-    '        flds(2) = 0 'id
-
-    '        agdScen.Visible = False
-    '        myScen = myDB.OpenRecordset("ScenarioData", dbOpenDynaset)
-    '        myWat = myDB.OpenRecordset("WatershedData", dbOpenDynaset)
-    '        'set column headers
-    '        agdScen.ColTitle(0) = "Name"
-    '        agdScen.ColSelectable(0) = True
-    '        agdScen.ColTitle(1) = "Project Name"
-    '        agdScen.ColTitle(2) = "ID"
-
-    '        agdScen.ClearData()
-    '        nrow = 0
-
-    '        Call frmMain.Map1.GetSelectedKeys(WatKeys())
-    '        If UBound(WatKeys) > 0 Then 'projects selected, display their scenarios
-    '            dispfg = 1
-    '        Else 'no project selected, don't display scenarios
-    '            dispfg = 0
-    '        End If
-    '        For i = 0 To UBound(WatKeys) - 1
-    '            'get project name
-    '            crit = "ID = " & WatKeys(i)
-    '            myWat.FindFirst(crit)
-    '            WatName = myWat!WatershedName
-    '            'find scenarios for this project
-    '            crit = "WatershedID = " & WatKeys(i)
-    '            With myScen
-    '                .FindFirst(crit)
-    '                Do Until .NoMatch
-    '                    nrow = nrow + 1
-    '                    agdScen.Rows = nrow
-    '                    agdScen.TextMatrix(nrow, 0) = .Fields(flds(1))
-    '                    'set width of name field to display all info
-    '                    lwid = TextWidth(.Fields(1))
-    '                    If lwid > agdScen.ColWidth(0) Then
-    '                        agdScen.ColWidth(0) = lwid
-    '                    End If
-    '                    agdScen.TextMatrix(nrow, 1) = WatName
-    '                    For j = 2 To nflds
-    '                        agdScen.TextMatrix(nrow, j) = .Fields(flds(j))
-    '                    Next j
-    '                    'save id for future queries
-    '                    agdScen.ItemData(nrow) = !id
-    '                    .FindNext(crit)
-    '                Loop
-    '            End With
-    '        Next i
-
-    '        myScen.Close()
-    '        myWat.Close()
-    '        agdScen.Visible = True
-    '        If dispfg = 1 Then
-    '            fraScen.Visible = True
-    '            Call RefreshSegment()
-    '        Else
-    '            fraScen.Visible = False
-    '            fraSeg.Visible = False
-    '            fraTab.Visible = False
-    '        End If
-    '        Call RefreshMenu()
 
     '    End Sub
 
@@ -1205,7 +1127,6 @@ Public Class frmHSPFParm
     '            dbg.Show()
     '        End If
     '    End Sub
-
 
     '    Private Sub mnuMain_Click(ByVal Index As Integer)
     '        If Index = 5 Then
@@ -1241,5 +1162,17 @@ Public Class frmHSPFParm
     '            MsgBox("View Summary Not Yet Implemented", vbOKOnly, "View")
     '        End If
     '    End Sub
+
+    Private Sub agdWatershed_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdWatershed.MouseDownCell
+        For lCol As Integer = 0 To agdWatershed.Source.Columns - 1
+            If Not agdWatershed.Source.CellSelected(aRow, lCol) Then
+                agdWatershed.Source.CellSelected(aRow, lCol) = True
+            Else
+                agdWatershed.Source.CellSelected(aRow, lCol) = False
+            End If
+        Next
+        Refresh()
+        RefreshScenario()
+    End Sub
 
 End Class
