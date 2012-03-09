@@ -43,7 +43,12 @@ Public Class PlugIn
                 lPath = IO.Path.GetDirectoryName(pHSPFParmDB.Name)
             End If
 
-            lFormHspfParm.InitializeUI(lPath)
+            Dim lDBName As String = ""
+            If Not pHSPFParmDB Is Nothing Then
+                lDBName = pHSPFParmDB.Name
+            End If
+
+            lFormHspfParm.InitializeUI(lPath, lDBName)
             lFormHspfParm.Show()
             Handled = True
         End If
