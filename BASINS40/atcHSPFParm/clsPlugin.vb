@@ -4,7 +4,7 @@ Imports atcData.atcDataManager
 Public Class PlugIn
     Inherits atcData.atcDataPlugin
 
-    Private Shared pHSPFParmDB As HSPFParmDB = Nothing
+    Friend Shared pHSPFParmDB As HSPFParmDB = Nothing
 
     Public Overrides ReadOnly Property Name() As String
         Get

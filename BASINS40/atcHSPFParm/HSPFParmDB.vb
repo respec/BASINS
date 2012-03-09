@@ -1,6 +1,7 @@
 ﻿Option Strict Off
 Option Explicit On
 
+Imports System.Data
 Imports System.Collections.ObjectModel
 Imports MapWinUtility
 
@@ -8,6 +9,7 @@ Imports MapWinUtility
 
 Public Class HSPFParmDB
     Public Name As String = ""
+    <CLSCompliant(False)> Public Database As atcUCI.atcMDB
 
     Public Sub Open(ByVal aFilename As String)
         Name = aFilename
@@ -22,7 +24,15 @@ Public Class HSPFParmDB
             End If
         End If
 
-        Dim pParmMDB As New atcUCI.atcMDB(Name)
+        Database = New atcUCI.atcMDB(Name)
+
+        Dim lTable As DataTable = Database.GetTable("ParmData")
+        Debug.Print("R:" & lTable.Rows.Count & " C:" & lTable.Columns.Count)
+        lTable = Database.GetTable("WatershedData")
+        Debug.Print("R:" & lTable.Rows.Count & " C:" & lTable.Columns.Count)
+        For lRow As Integer = 0 To lTable.Rows.Count - 1
+            Debug.Print("R:" & lRow & " " & lTable.Rows(lRow).Item(1).ToString)
+        Next
     End Sub
 
     Public Sub New(ByVal aFilename As String)
