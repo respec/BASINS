@@ -31,8 +31,20 @@ Public Class HSPFParmDB
         'lTable = Database.GetTable("WatershedData")
         'Debug.Print("R:" & lTable.Rows.Count & " C:" & lTable.Columns.Count)
         'For lRow As Integer = 0 To lTable.Rows.Count - 1
-        '    Debug.Print("R:" & lRow & " " & lTable.Rows(lRow).Item(1).ToString)
+        '    Debug.Print("R:" & lRow & " ID:" & lTable.Rows(lRow).Item(0).ToString & " Name:" & lTable.Rows(lRow).Item(1).ToString)
         'Next
+        'Dim lId As Integer = 10
+        'Dim lStr As String = "SELECT DISTINCTROW WatershedData.ID, " & _
+        '                                        "WatershedData.WatershedName, " & _
+        '                                        "WatershedData.Location " & _
+        '                                   "From WatershedData " & _
+        '                                 "WHERE (ID = " & lId & ")"
+        'lTable = Database.GetTable(lStr)
+        'Debug.Print("R:" & lTable.Rows.Count & " C:" & lTable.Columns.Count)
+        'For lRow As Integer = 0 To lTable.Rows.Count - 1
+        '    Debug.Print("R:" & lRow & " ID:" & lTable.Rows(lRow).Item(0).ToString & " Name:" & lTable.Rows(lRow).Item(1).ToString)
+        'Next
+
     End Sub
 
     Public Sub New(ByVal aFilename As String)
