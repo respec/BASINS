@@ -83,11 +83,15 @@ Public Class atcMDB
         Else
             pConnection.Open()
             Dim lDataAdapter As Object = Nothing
+            Dim lStr As String = aTableName
+            If Not aTableName.StartsWith("SELECT") Then
+                lStr = "SELECT * from " & aTableName
+            End If
             Select Case pDataBaseType
                 Case "ODBC"
-                    lDataAdapter = New OdbcDataAdapter("SELECT * from " & aTableName, DirectCast(pConnection, OdbcConnection))
+                    lDataAdapter = New OdbcDataAdapter(lStr, DirectCast(pConnection, OdbcConnection))
                 Case "OLE"
-                    lDataAdapter = New OleDbDataAdapter("SELECT * from " & aTableName, DirectCast(pConnection, OleDbConnection))
+                    lDataAdapter = New OleDbDataAdapter(lStr, DirectCast(pConnection, OleDbConnection))
             End Select
             Dim lDataSet As New DataSet
             lDataAdapter.Fill(lDataSet)
