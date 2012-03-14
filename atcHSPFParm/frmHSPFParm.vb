@@ -385,9 +385,6 @@ Public Class frmHSPFParm
             .ColorCells = True
             .FixedRows = 1
             .FixedColumns = 0
-            .CellColor(0, 0) = SystemColors.ControlDark
-            .CellColor(0, 1) = SystemColors.ControlDark
-            .CellColor(0, 2) = SystemColors.ControlDark
             .CellValue(0, 0) = "Name"
             .CellValue(0, 1) = "Project Name"
             .CellValue(0, 2) = "ID"
@@ -396,6 +393,24 @@ Public Class frmHSPFParm
         End With
         agdScenario.SizeAllColumnsToContents()
         agdScenario.Refresh()
+
+        With agdSegment
+            .Source = New atcControls.atcGridSource
+            .AllowHorizontalScrolling = False
+        End With
+        With agdSegment.Source
+            .Columns = 4
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 0
+            .CellValue(0, 0) = "Name"
+            .CellValue(0, 1) = "Description"
+            .CellValue(0, 2) = "Scenario"
+            .CellValue(0, 3) = "Project"
+            .Rows = 1
+        End With
+        agdSegment.SizeAllColumnsToContents()
+        agdSegment.Refresh()
 
         'open the database here
         Database = New atcUCI.atcMDB(aDBName)
@@ -427,67 +442,25 @@ Public Class frmHSPFParm
 
     Sub RefreshScenario()
 
-        Dim lScen As DataTable = Database.GetTable("ScenarioData")
-        Dim lWat As DataTable = Database.GetTable("WatershedData")
-
-        'save keys of selected watersheds 
-        Dim lWatKeys As New Collection
-        With agdWatershed.Source
-            For lRowIndex As Integer = 0 To .Rows - 1
-                If .CellSelected(lRowIndex, 0) Then
-                    lWatKeys.Add(.CellValue(lRowIndex, 0))
-                End If
-            Next
-        End With
-
-        'find indexes of fields of interest from WatershedData table
-        Dim lWatIDFieldIndex As Integer = -1
-        Dim lWatNameFieldIndex As Integer = -1
-        For lCol As Integer = 0 To lWat.Columns.Count - 1
-            If lWat.Columns(lCol).ColumnName = "ID" Then
-                lWatIDFieldIndex = lCol
-            ElseIf lWat.Columns(lCol).ColumnName = "WatershedName" Then
-                lWatNameFieldIndex = lCol
-            End If
-        Next
-
-        'find indexes of fields of interest from ScenarioData table
-        Dim lScenWatIDFieldIndex As Integer = -1
-        Dim lScenIDFieldIndex As Integer = -1
-        Dim lScenNameFieldIndex As Integer = -1
-        For lCol As Integer = 0 To lScen.Columns.Count - 1
-            If lScen.Columns(lCol).ColumnName = "ID" Then
-                lScenIDFieldIndex = lCol
-            ElseIf lScen.Columns(lCol).ColumnName = "WatershedID" Then
-                lScenWatIDFieldIndex = lCol
-            ElseIf lScen.Columns(lCol).ColumnName = "Name" Then
-                lScenNameFieldIndex = lCol
-            End If
-        Next
-
         Dim lCrit As String = ""
-        Dim lWatName As String = ""
-        Dim lRows As Integer = 0
         With agdScenario.Source
             .Rows = 1
-            'look for each watershed id
-            For Each lWatId As String In lWatKeys
-                For lWatRow As Integer = 0 To lWat.Rows.Count - 1
-                    If lWat.Rows(lWatRow).Item(lWatIDFieldIndex).ToString = lWatId Then
-                        lWatName = lWat.Rows(lWatRow).Item(lWatNameFieldIndex).ToString
-                        'find scenarios for this watershed
-                        For lScenRow As Integer = 0 To lScen.Rows.Count - 1
-                            If lScen.Rows(lScenRow).Item(lScenWatIDFieldIndex).ToString = lWatId Then
-                                lRows += 1
-                                .Rows = lRows
-                                .CellValue(lRows, 0) = lScen.Rows(lScenRow).Item(lScenNameFieldIndex).ToString
-                                .CellValue(lRows, 1) = lWatName
-                                .CellValue(lRows, 2) = lScen.Rows(lScenRow).Item(lScenIDFieldIndex).ToString
-                                .CellValue(lRows, 3) = lWatId
-                            End If
-                        Next
-                    End If
-                Next
+            For lWatRow As Integer = 1 To agdWatershed.Source.Rows
+                If agdWatershed.Source.CellSelected(lWatRow, 0) Then 'list scenarios for this watershed
+                    lCrit = "WatershedID = " & agdWatershed.Source.CellValue(lWatRow, 0)
+                    Dim lStr As String = "SELECT DISTINCTROW ScenarioData.Name, " & _
+                                                            "ScenarioData.ID " & _
+                                                            "From ScenarioData " & _
+                                                            "WHERE (" & lCrit & ")"
+                    Dim lTable As DataTable = Database.GetTable(lStr)
+                    For lRow As Integer = 0 To lTable.Rows.Count - 1
+                        .Rows += 1
+                        .CellValue(.Rows - 1, 0) = lTable.Rows(lRow).Item(0).ToString
+                        .CellValue(.Rows - 1, 1) = agdWatershed.Source.CellValue(lWatRow, 1)
+                        .CellValue(.Rows - 1, 2) = lTable.Rows(lRow).Item(1).ToString
+                        .CellValue(.Rows - 1, 3) = agdWatershed.Source.CellValue(lWatRow, 0)
+                    Next
+                End If
             Next
         End With
 
@@ -499,78 +472,36 @@ Public Class frmHSPFParm
 
     Sub RefreshSegment()
 
-        '        Dim i&, j&, crit$, nflds&, flds&(2), dispfg%, lwid&, nrow&
+        Dim lCrit As String = ""
+        With agdSegment.Source
+            .Rows = 1
+            For lScenRow As Integer = 1 To agdScenario.Source.Rows
+                If agdScenario.Source.CellSelected(lScenRow, 0) Then 'list segments for this scenario
+                    lCrit = "ScenarioID = " & agdScenario.Source.CellValue(lScenRow, 3)
+                    '                If Len(Filt(2).txt) > 0 Then  'add filter criteria
+                    '                    crit = crit & " AND " & Filt(2).txt
+                    '                End If
+                    Dim lStr As String = "SELECT DISTINCTROW SegData.Name, " & _
+                                                            "SegData.Description " & _
+                                                            "From SegData " & _
+                                                            "WHERE (" & lCrit & ")"
+                    Dim lTable As DataTable = Database.GetTable(lStr)
+                    For lRow As Integer = 0 To lTable.Rows.Count - 1
+                        .Rows += 1
+                        .CellValue(.Rows - 1, 0) = lTable.Rows(lRow).Item(0).ToString
+                        .CellValue(.Rows - 1, 1) = lTable.Rows(lRow).Item(1).ToString
+                        .CellValue(.Rows - 1, 2) = agdScenario.Source.CellValue(lScenRow, 0)
+                        .CellValue(.Rows - 1, 3) = agdScenario.Source.CellValue(lScenRow, 1)
+                    Next
+                End If
+            Next
+        End With
 
-        '        MousePointer = vbHourglass
+        agdSegment.SizeAllColumnsToContents()
+        agdSegment.Refresh()
 
-        '        For i = 0 To mnuSeg.Count - 1
-        '            mnuSeg(i).Enabled = True
-        '        Next i
-        '        'set fields to display for scenario table
-        '        nflds = 2
-        '        flds(1) = 1 'Name
-        '        flds(2) = 2 'Description
-
-        '        agdSeg.Visible = False
-        '        mySeg = myDB.OpenRecordset("SegData", dbOpenDynaset)
-        '        'set column headers
-        '        agdSeg.ColSelectable(0) = True
-        '        For j = 1 To nflds
-        '            agdSeg.ColTitle(j - 1) = mySeg.Fields(flds(j)).Name
-        '        Next j
-        '        agdSeg.ColTitle(nflds) = "Scenario"
-        '        agdSeg.ColTitle(nflds + 1) = "Project"
-
-        '        agdSeg.ClearData()
-        '        nrow = 0
-        '        dispfg = 0
-
-        '        For i = 1 To agdScen.Rows
-        '            If agdScen.Selected(i, 0) Then 'list segments for this scenario
-        '                dispfg = 1
-        '                crit = "ScenarioID = " & agdScen.ItemData(i)
-        '                If Len(Filt(2).txt) > 0 Then  'add filter criteria
-        '                    crit = crit & " AND " & Filt(2).txt
-        '                End If
-        '                With mySeg
-        '                    .FindFirst(crit)
-        '                    Do Until .NoMatch
-        '                        nrow = nrow + 1
-        '                        agdSeg.Rows = nrow
-        '                        For j = 1 To nflds
-        '                            agdSeg.TextMatrix(nrow, j - 1) = .Fields(flds(j))
-        '                            If j = 1 Then 'set width of name field to display all info
-        '                                lwid = TextWidth(.Fields(j))
-        '                                If lwid > agdSeg.ColWidth(j - 1) Then
-        '                                    agdSeg.ColWidth(j - 1) = lwid
-        '                                End If
-        '                            End If
-        '                        Next j
-        '                        agdSeg.TextMatrix(nrow, nflds) = agdScen.TextMatrix(i, 0)
-        '                        agdSeg.TextMatrix(nrow, nflds + 1) = agdScen.TextMatrix(i, 1)
-        '                        'save id for future queries
-        '                        agdSeg.ItemData(nrow) = !id
-        '                        .FindNext(crit)
-        '                    Loop
-        '                End With
-        '            End If
-        '        Next i
-
-        '        mySeg.Close()
-        '        agdSeg.Visible = True
-        '        If dispfg = 1 Then
-        '            fraSeg.Visible = True
-        '            Call RefreshTable()
-        '            Call RefreshParm()
-        '        Else
-        '            fraSeg.Visible = False
-        '            fraTab.Visible = False
-        '            fraView.Visible = False
-        '            'mnuMain(5).Enabled = False
-        '        End If
-        '        Call RefreshMenu()
-
-        '        MousePointer = vbDefault
+        RefreshTable()
+        RefreshParm()
 
     End Sub
 
@@ -1175,4 +1106,15 @@ Public Class frmHSPFParm
         RefreshScenario()
     End Sub
 
+    Private Sub agdScenario_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdScenario.MouseDownCell
+        For lCol As Integer = 0 To agdScenario.Source.Columns - 1
+            If Not agdScenario.Source.CellSelected(aRow, lCol) Then
+                agdScenario.Source.CellSelected(aRow, lCol) = True
+            Else
+                agdScenario.Source.CellSelected(aRow, lCol) = False
+            End If
+        Next
+        Refresh()
+        RefreshSegment()
+    End Sub
 End Class
