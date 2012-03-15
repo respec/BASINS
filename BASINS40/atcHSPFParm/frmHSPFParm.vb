@@ -44,12 +44,20 @@ Public Class frmHSPFParm
     Friend WithEvents gbxSegment As System.Windows.Forms.GroupBox
     Friend WithEvents gbxTable As System.Windows.Forms.GroupBox
     Friend WithEvents gbxValues As System.Windows.Forms.GroupBox
-    Friend WithEvents cmdDetails As System.Windows.Forms.Button
+    Friend WithEvents cmdWatershedDetails As System.Windows.Forms.Button
     Friend WithEvents agdWatershed As atcControls.atcGrid
     Friend WithEvents agdScenario As atcControls.atcGrid
     Friend WithEvents agdSegment As atcControls.atcGrid
-    Friend WithEvents agdTable As atcControls.atcGrid
     Friend WithEvents agdValues As atcControls.atcGrid
+    Friend WithEvents cmdScenarioDetails As System.Windows.Forms.Button
+    Friend WithEvents cmdNoneSegments As System.Windows.Forms.Button
+    Friend WithEvents cmdAllSegments As System.Windows.Forms.Button
+    Friend WithEvents cmdFilterSegments As System.Windows.Forms.Button
+    Friend WithEvents cmdTableFilter As System.Windows.Forms.Button
+    Friend WithEvents rbnParameters As System.Windows.Forms.RadioButton
+    Friend WithEvents rbnTables As System.Windows.Forms.RadioButton
+    Friend WithEvents agdTable As atcControls.atcGrid
+    Friend WithEvents agdParameter As atcControls.atcGrid
     Friend WithEvents cmdAbout As System.Windows.Forms.Button
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmHSPFParm))
@@ -60,13 +68,21 @@ Public Class frmHSPFParm
         Me.cmdWrite = New System.Windows.Forms.Button
         Me.gbxWatershed = New System.Windows.Forms.GroupBox
         Me.agdWatershed = New atcControls.atcGrid
-        Me.cmdDetails = New System.Windows.Forms.Button
+        Me.cmdWatershedDetails = New System.Windows.Forms.Button
         Me.gbxScenario = New System.Windows.Forms.GroupBox
+        Me.cmdScenarioDetails = New System.Windows.Forms.Button
         Me.agdScenario = New atcControls.atcGrid
         Me.gbxSegment = New System.Windows.Forms.GroupBox
+        Me.cmdNoneSegments = New System.Windows.Forms.Button
+        Me.cmdAllSegments = New System.Windows.Forms.Button
+        Me.cmdFilterSegments = New System.Windows.Forms.Button
         Me.agdSegment = New atcControls.atcGrid
         Me.gbxTable = New System.Windows.Forms.GroupBox
+        Me.agdParameter = New atcControls.atcGrid
+        Me.rbnParameters = New System.Windows.Forms.RadioButton
+        Me.rbnTables = New System.Windows.Forms.RadioButton
         Me.agdTable = New atcControls.atcGrid
+        Me.cmdTableFilter = New System.Windows.Forms.Button
         Me.gbxValues = New System.Windows.Forms.GroupBox
         Me.agdValues = New atcControls.atcGrid
         Me.gbxWatershed.SuspendLayout()
@@ -131,7 +147,7 @@ Public Class frmHSPFParm
         Me.gbxWatershed.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.gbxWatershed.Controls.Add(Me.agdWatershed)
-        Me.gbxWatershed.Controls.Add(Me.cmdDetails)
+        Me.gbxWatershed.Controls.Add(Me.cmdWatershedDetails)
         Me.gbxWatershed.Location = New System.Drawing.Point(12, 46)
         Me.gbxWatershed.Name = "gbxWatershed"
         Me.gbxWatershed.Size = New System.Drawing.Size(536, 93)
@@ -155,20 +171,21 @@ Public Class frmHSPFParm
         Me.agdWatershed.Source = Nothing
         Me.agdWatershed.TabIndex = 10
         '
-        'cmdDetails
+        'cmdWatershedDetails
         '
-        Me.cmdDetails.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdDetails.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdDetails.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdDetails.Location = New System.Drawing.Point(461, 19)
-        Me.cmdDetails.Name = "cmdDetails"
-        Me.cmdDetails.Size = New System.Drawing.Size(59, 22)
-        Me.cmdDetails.TabIndex = 9
-        Me.cmdDetails.Text = "Details"
+        Me.cmdWatershedDetails.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdWatershedDetails.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdWatershedDetails.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdWatershedDetails.Location = New System.Drawing.Point(461, 19)
+        Me.cmdWatershedDetails.Name = "cmdWatershedDetails"
+        Me.cmdWatershedDetails.Size = New System.Drawing.Size(59, 22)
+        Me.cmdWatershedDetails.TabIndex = 9
+        Me.cmdWatershedDetails.Text = "Details"
         '
         'gbxScenario
         '
         Me.gbxScenario.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbxScenario.Controls.Add(Me.cmdScenarioDetails)
         Me.gbxScenario.Controls.Add(Me.agdScenario)
         Me.gbxScenario.Location = New System.Drawing.Point(12, 145)
         Me.gbxScenario.Name = "gbxScenario"
@@ -176,6 +193,17 @@ Public Class frmHSPFParm
         Me.gbxScenario.TabIndex = 10
         Me.gbxScenario.TabStop = False
         Me.gbxScenario.Text = "Scenario"
+        '
+        'cmdScenarioDetails
+        '
+        Me.cmdScenarioDetails.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdScenarioDetails.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdScenarioDetails.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdScenarioDetails.Location = New System.Drawing.Point(461, 19)
+        Me.cmdScenarioDetails.Name = "cmdScenarioDetails"
+        Me.cmdScenarioDetails.Size = New System.Drawing.Size(59, 22)
+        Me.cmdScenarioDetails.TabIndex = 12
+        Me.cmdScenarioDetails.Text = "Details"
         '
         'agdScenario
         '
@@ -189,13 +217,16 @@ Public Class frmHSPFParm
         Me.agdScenario.LineWidth = 1.0!
         Me.agdScenario.Location = New System.Drawing.Point(16, 19)
         Me.agdScenario.Name = "agdScenario"
-        Me.agdScenario.Size = New System.Drawing.Size(504, 57)
+        Me.agdScenario.Size = New System.Drawing.Size(437, 57)
         Me.agdScenario.Source = Nothing
         Me.agdScenario.TabIndex = 11
         '
         'gbxSegment
         '
         Me.gbxSegment.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbxSegment.Controls.Add(Me.cmdNoneSegments)
+        Me.gbxSegment.Controls.Add(Me.cmdAllSegments)
+        Me.gbxSegment.Controls.Add(Me.cmdFilterSegments)
         Me.gbxSegment.Controls.Add(Me.agdSegment)
         Me.gbxSegment.Location = New System.Drawing.Point(12, 244)
         Me.gbxSegment.Name = "gbxSegment"
@@ -203,6 +234,39 @@ Public Class frmHSPFParm
         Me.gbxSegment.TabIndex = 11
         Me.gbxSegment.TabStop = False
         Me.gbxSegment.Text = "Segment"
+        '
+        'cmdNoneSegments
+        '
+        Me.cmdNoneSegments.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdNoneSegments.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdNoneSegments.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdNoneSegments.Location = New System.Drawing.Point(461, 68)
+        Me.cmdNoneSegments.Name = "cmdNoneSegments"
+        Me.cmdNoneSegments.Size = New System.Drawing.Size(59, 22)
+        Me.cmdNoneSegments.TabIndex = 15
+        Me.cmdNoneSegments.Text = "None"
+        '
+        'cmdAllSegments
+        '
+        Me.cmdAllSegments.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdAllSegments.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdAllSegments.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdAllSegments.Location = New System.Drawing.Point(461, 43)
+        Me.cmdAllSegments.Name = "cmdAllSegments"
+        Me.cmdAllSegments.Size = New System.Drawing.Size(59, 22)
+        Me.cmdAllSegments.TabIndex = 14
+        Me.cmdAllSegments.Text = "All"
+        '
+        'cmdFilterSegments
+        '
+        Me.cmdFilterSegments.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdFilterSegments.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdFilterSegments.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdFilterSegments.Location = New System.Drawing.Point(461, 18)
+        Me.cmdFilterSegments.Name = "cmdFilterSegments"
+        Me.cmdFilterSegments.Size = New System.Drawing.Size(59, 22)
+        Me.cmdFilterSegments.TabIndex = 13
+        Me.cmdFilterSegments.Text = "Filter"
         '
         'agdSegment
         '
@@ -216,20 +280,62 @@ Public Class frmHSPFParm
         Me.agdSegment.LineWidth = 1.0!
         Me.agdSegment.Location = New System.Drawing.Point(16, 18)
         Me.agdSegment.Name = "agdSegment"
-        Me.agdSegment.Size = New System.Drawing.Size(504, 57)
+        Me.agdSegment.Size = New System.Drawing.Size(437, 57)
         Me.agdSegment.Source = Nothing
         Me.agdSegment.TabIndex = 12
         '
         'gbxTable
         '
         Me.gbxTable.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbxTable.Controls.Add(Me.agdParameter)
+        Me.gbxTable.Controls.Add(Me.rbnParameters)
+        Me.gbxTable.Controls.Add(Me.rbnTables)
         Me.gbxTable.Controls.Add(Me.agdTable)
+        Me.gbxTable.Controls.Add(Me.cmdTableFilter)
         Me.gbxTable.Location = New System.Drawing.Point(12, 343)
         Me.gbxTable.Name = "gbxTable"
         Me.gbxTable.Size = New System.Drawing.Size(536, 93)
         Me.gbxTable.TabIndex = 12
         Me.gbxTable.TabStop = False
         Me.gbxTable.Text = "Table/Parameter"
+        '
+        'agdParameter
+        '
+        Me.agdParameter.AllowHorizontalScrolling = True
+        Me.agdParameter.AllowNewValidValues = False
+        Me.agdParameter.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.agdParameter.CellBackColor = System.Drawing.SystemColors.Window
+        Me.agdParameter.Fixed3D = False
+        Me.agdParameter.LineColor = System.Drawing.SystemColors.Control
+        Me.agdParameter.LineWidth = 1.0!
+        Me.agdParameter.Location = New System.Drawing.Point(16, 40)
+        Me.agdParameter.Name = "agdParameter"
+        Me.agdParameter.Size = New System.Drawing.Size(433, 35)
+        Me.agdParameter.Source = Nothing
+        Me.agdParameter.TabIndex = 19
+        '
+        'rbnParameters
+        '
+        Me.rbnParameters.AutoSize = True
+        Me.rbnParameters.Location = New System.Drawing.Point(79, 19)
+        Me.rbnParameters.Name = "rbnParameters"
+        Me.rbnParameters.Size = New System.Drawing.Size(78, 17)
+        Me.rbnParameters.TabIndex = 18
+        Me.rbnParameters.Text = "Parameters"
+        Me.rbnParameters.UseVisualStyleBackColor = True
+        '
+        'rbnTables
+        '
+        Me.rbnTables.AutoSize = True
+        Me.rbnTables.Checked = True
+        Me.rbnTables.Location = New System.Drawing.Point(16, 19)
+        Me.rbnTables.Name = "rbnTables"
+        Me.rbnTables.Size = New System.Drawing.Size(57, 17)
+        Me.rbnTables.TabIndex = 17
+        Me.rbnTables.TabStop = True
+        Me.rbnTables.Text = "Tables"
+        Me.rbnTables.UseVisualStyleBackColor = True
         '
         'agdTable
         '
@@ -241,11 +347,22 @@ Public Class frmHSPFParm
         Me.agdTable.Fixed3D = False
         Me.agdTable.LineColor = System.Drawing.SystemColors.Control
         Me.agdTable.LineWidth = 1.0!
-        Me.agdTable.Location = New System.Drawing.Point(16, 18)
+        Me.agdTable.Location = New System.Drawing.Point(16, 40)
         Me.agdTable.Name = "agdTable"
-        Me.agdTable.Size = New System.Drawing.Size(504, 57)
+        Me.agdTable.Size = New System.Drawing.Size(433, 35)
         Me.agdTable.Source = Nothing
-        Me.agdTable.TabIndex = 13
+        Me.agdTable.TabIndex = 16
+        '
+        'cmdTableFilter
+        '
+        Me.cmdTableFilter.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdTableFilter.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdTableFilter.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdTableFilter.Location = New System.Drawing.Point(461, 18)
+        Me.cmdTableFilter.Name = "cmdTableFilter"
+        Me.cmdTableFilter.Size = New System.Drawing.Size(59, 22)
+        Me.cmdTableFilter.TabIndex = 14
+        Me.cmdTableFilter.Text = "Filter"
         '
         'gbxValues
         '
@@ -298,6 +415,7 @@ Public Class frmHSPFParm
         Me.gbxScenario.ResumeLayout(False)
         Me.gbxSegment.ResumeLayout(False)
         Me.gbxTable.ResumeLayout(False)
+        Me.gbxTable.PerformLayout()
         Me.gbxValues.ResumeLayout(False)
         Me.ResumeLayout(False)
 
@@ -381,14 +499,13 @@ Public Class frmHSPFParm
             .AllowHorizontalScrolling = False
         End With
         With agdScenario.Source
-            .Columns = 4
+            .Columns = 3
             .ColorCells = True
             .FixedRows = 1
             .FixedColumns = 0
-            .CellValue(0, 0) = "Name"
-            .CellValue(0, 1) = "Project Name"
-            .CellValue(0, 2) = "ID"
-            .CellValue(0, 3) = "WatershedID"
+            .CellValue(0, 0) = "ID"
+            .CellValue(0, 1) = "Name"
+            .CellValue(0, 2) = "Project Name"
             .Rows = 1
         End With
         agdScenario.SizeAllColumnsToContents()
@@ -403,14 +520,47 @@ Public Class frmHSPFParm
             .ColorCells = True
             .FixedRows = 1
             .FixedColumns = 0
-            .CellValue(0, 0) = "Name"
-            .CellValue(0, 1) = "Description"
-            .CellValue(0, 2) = "Scenario"
-            .CellValue(0, 3) = "Project"
+            .CellValue(0, 0) = "ID"
+            .CellValue(0, 1) = "Name"
+            .CellValue(0, 2) = "Description"
+            .CellValue(0, 3) = "Scenario Name"
+            .CellValue(0, 4) = "Project Name"
             .Rows = 1
         End With
         agdSegment.SizeAllColumnsToContents()
         agdSegment.Refresh()
+
+        With agdTable
+            .Source = New atcControls.atcGridSource
+            .AllowHorizontalScrolling = False
+        End With
+        With agdTable.Source
+            .Columns = 2
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 0
+            .CellValue(0, 0) = "Name"
+            .CellValue(0, 1) = "Segment Type"
+            .Rows = 1
+        End With
+        agdTable.SizeAllColumnsToContents()
+        agdTable.Refresh()
+
+        With agdParameter
+            .Source = New atcControls.atcGridSource
+            .AllowHorizontalScrolling = False
+        End With
+        With agdParameter.Source
+            .Columns = 2
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 0
+            .CellValue(0, 0) = "Name"
+            .CellValue(0, 1) = "Table"
+            .Rows = 1
+        End With
+        agdParameter.SizeAllColumnsToContents()
+        agdParameter.Refresh()
 
         'open the database here
         Database = New atcUCI.atcMDB(aDBName)
@@ -436,7 +586,8 @@ Public Class frmHSPFParm
         agdWatershed.Height = gbxWatershed.Height - 36
         agdScenario.Height = gbxScenario.Height - 36
         agdSegment.Height = gbxSegment.Height - 36
-        agdTable.Height = gbxTable.Height - 36
+        agdTable.Height = gbxTable.Height - 58
+        agdParameter.Height = gbxTable.Height - 58
         agdValues.Height = gbxValues.Height - 36
     End Sub
 
@@ -455,10 +606,9 @@ Public Class frmHSPFParm
                     Dim lTable As DataTable = Database.GetTable(lStr)
                     For lRow As Integer = 0 To lTable.Rows.Count - 1
                         .Rows += 1
-                        .CellValue(.Rows - 1, 0) = lTable.Rows(lRow).Item(0).ToString
-                        .CellValue(.Rows - 1, 1) = agdWatershed.Source.CellValue(lWatRow, 1)
-                        .CellValue(.Rows - 1, 2) = lTable.Rows(lRow).Item(1).ToString
-                        .CellValue(.Rows - 1, 3) = agdWatershed.Source.CellValue(lWatRow, 0)
+                        .CellValue(.Rows - 1, 0) = lTable.Rows(lRow).Item(1).ToString
+                        .CellValue(.Rows - 1, 1) = lTable.Rows(lRow).Item(0).ToString
+                        .CellValue(.Rows - 1, 2) = agdWatershed.Source.CellValue(lWatRow, 1)
                     Next
                 End If
             Next
@@ -477,11 +627,12 @@ Public Class frmHSPFParm
             .Rows = 1
             For lScenRow As Integer = 1 To agdScenario.Source.Rows
                 If agdScenario.Source.CellSelected(lScenRow, 0) Then 'list segments for this scenario
-                    lCrit = "ScenarioID = " & agdScenario.Source.CellValue(lScenRow, 3)
+                    lCrit = "ScenarioID = " & agdScenario.Source.CellValue(lScenRow, 0)
                     '                If Len(Filt(2).txt) > 0 Then  'add filter criteria
                     '                    crit = crit & " AND " & Filt(2).txt
                     '                End If
-                    Dim lStr As String = "SELECT DISTINCTROW SegData.Name, " & _
+                    Dim lStr As String = "SELECT DISTINCTROW SegData.ID, " & _
+                                                            "SegData.Name, " & _
                                                             "SegData.Description " & _
                                                             "From SegData " & _
                                                             "WHERE (" & lCrit & ")"
@@ -490,8 +641,9 @@ Public Class frmHSPFParm
                         .Rows += 1
                         .CellValue(.Rows - 1, 0) = lTable.Rows(lRow).Item(0).ToString
                         .CellValue(.Rows - 1, 1) = lTable.Rows(lRow).Item(1).ToString
-                        .CellValue(.Rows - 1, 2) = agdScenario.Source.CellValue(lScenRow, 0)
+                        .CellValue(.Rows - 1, 2) = lTable.Rows(lRow).Item(2).ToString
                         .CellValue(.Rows - 1, 3) = agdScenario.Source.CellValue(lScenRow, 1)
+                        .CellValue(.Rows - 1, 4) = agdScenario.Source.CellValue(lScenRow, 2)
                     Next
                 End If
             Next
@@ -507,126 +659,72 @@ Public Class frmHSPFParm
 
     Sub RefreshTable()
 
-        '        Dim selstr$, i&, j&, crit$, dispfg%, lwid&, nrow&, OpTypStr$(3)
+        Dim lCrit As String = ""
+        Dim lOpnTyp As Integer = 0
+        With agdTable.Source
+            .Rows = 1
+            For lScenRow As Integer = 1 To agdSegment.Source.Rows
+                If agdSegment.Source.CellSelected(lScenRow, 0) Then 'list tables for this segment
+                    lCrit = "SegID = " & agdSegment.Source.CellValue(lScenRow, 0)
+                    'If Len(Filt(3).txt) > 0 Then  'add filter criteria
+                    '                selstr = selstr & " AND " & Filt(3).txt
+                    '            End If
+                    Dim lStr As String = "SELECT DISTINCTROW ScenTableList.Name, " & _
+                                                            "ScenTableList.TabID, " & _
+                                                            "ScenTableList.OpnTypID " & _
+                                                            "From ScenTableList " & _
+                                                            "WHERE (" & lCrit & ")"
+                    Dim lTable As DataTable = Database.GetTable(lStr)
+                    For lRow As Integer = 0 To lTable.Rows.Count - 1
+                        .Rows += 1
+                        .CellValue(.Rows - 1, 0) = lTable.Rows(lRow).Item(0).ToString
+                        lOpnTyp = lTable.Rows(lRow).Item(2).ToString
+                        If lOpnTyp = 1 Then
+                            .CellValue(.Rows - 1, 1) = "PERLND"
+                        ElseIf lOpnTyp = 2 Then
+                            .CellValue(.Rows - 1, 1) = "IMPLND"
+                        ElseIf lOpnTyp = 3 Then
+                            .CellValue(.Rows - 1, 1) = "RCHRES"
+                        End If
+                    Next
+                End If
+            Next
+        End With
 
-        '        MousePointer = vbHourglass
-
-        '        OpTypStr(1) = "PERLND"
-        '        OpTypStr(2) = "IMPLND"
-        '        OpTypStr(3) = "RCHRES"
-
-        '        'build query based on selected segments
-        '        selstr = "SELECT DISTINCTROW ScenTableList.Name, " & _
-        '                                    "ScenTableList.TabID, " & _
-        '                                    "ScenTableList.OpnTypID " & _
-        '                               "FROM ScenTableList WHERE ("
-        '        For i = 1 To agdSeg.Rows 'look for selected segments
-        '            If agdSeg.Selected(i, 0) Then 'list tables for this segment
-        '                dispfg = 1
-        '                selstr = selstr & "SegID = " & agdSeg.ItemData(i) & " OR "
-        '            End If
-        '        Next i
-
-        '        If dispfg = 1 Then 'display tables for selected segments
-        '            selstr = Left(selstr, Len(selstr) - 3) & ")"
-        '            If Len(Filt(3).txt) > 0 Then  'add filter criteria
-        '                selstr = selstr & " AND " & Filt(3).txt
-        '            End If
-        '            myTab = myDB.OpenRecordset(selstr, dbOpenDynaset)
-        '            'set column headers
-        '            agdTab.ColTitle(0) = "Name"
-        '            agdTab.ColTitle(1) = "Seg Type"
-        '            agdTab.ColSelectable(0) = True
-
-        '            agdTab.ClearData()
-        '            nrow = 0
-        '            With myTab
-        '                Do Until .EOF '.NoMatch
-        '                    nrow = nrow + 1
-        '                    agdTab.Rows = nrow
-        '                    agdTab.TextMatrix(nrow, 0) = !Name
-        '                    'set width of name field to display all info
-        '                    lwid = TextWidth(!Name)
-        '                    If lwid > agdTab.ColWidth(0) Then
-        '                        agdTab.ColWidth(0) = lwid
-        '                    End If
-        '                    agdTab.TextMatrix(nrow, 1) = OpTypStr(!OpnTypID)
-        '                    'update itemdata, not sure what goes here yet!!!
-        '                    agdTab.ItemData(agdTab.Rows) = !TabID
-        '                    .MoveNext()
-        '                Loop
-        '            End With
-
-        '            myTab.Close()
-        '            fraTab.Visible = True
-        '        Else 'no segments selected for which to display tables
-        '            fraTab.Visible = False
-        '            fraView.Visible = False
-        '            'mnuMain(5).Enabled = False
-        '        End If
-
-        '        MousePointer = vbDefault
+        agdTable.SizeAllColumnsToContents()
+        agdTable.Refresh()
 
     End Sub
 
     Sub RefreshParm()
 
-        '        Dim selstr$, i&, j&, crit$, dispfg%, lwid&, nrow&, OpTypStr$(3)
+        Dim lCrit As String = ""
+        With agdParameter.Source
+            .Rows = 1
+            For lScenRow As Integer = 1 To agdSegment.Source.Rows
+                If agdSegment.Source.CellSelected(lScenRow, 0) Then 'list tables for this segment
+                    lCrit = "SegID = " & agdSegment.Source.CellValue(lScenRow, 0)
+                    'If Len(Filt(3).txt) > 0 Then  'add filter criteria
+                    '                selstr = selstr & " AND " & Filt(3).txt
+                    '            End If
+                    Dim lStr As String = "SELECT DISTINCTROW ParmTableData.ParmID, " & _
+                                                            "ParmTableData.Name, " & _
+                                                            "ParmTableData.Table, " & _
+                                                            "ParmTableData.TabID " & _
+                                                            "From ParmTableData " & _
+                                                            "WHERE (" & lCrit & ")"
+                    Dim lTable As DataTable = Database.GetTable(lStr)
+                    For lRow As Integer = 0 To lTable.Rows.Count - 1
+                        .Rows += 1
+                        .CellValue(.Rows - 1, 0) = lTable.Rows(lRow).Item(1).ToString
+                        .CellValue(.Rows - 1, 1) = lTable.Rows(lRow).Item(2).ToString
+                    Next
+                End If
+            Next
+        End With
 
-        '        MousePointer = vbHourglass
-
-        '        'build query based on selected segments
-        '        selstr = "SELECT DISTINCTROW ParmTableData.ParmID, " & _
-        '                                    "ParmTableData.Name, " & _
-        '                                    "ParmTableData.Table, " & _
-        '                                    "ParmTableData.TabID " & _
-        '                               "FROM ParmTableData WHERE ("
-        '        For i = 1 To agdSeg.Rows 'look for selected segments
-        '            If agdSeg.Selected(i, 0) Then 'list tables for this segment
-        '                dispfg = 1
-        '                selstr = selstr & "SegID = " & agdSeg.ItemData(i) & " OR "
-        '            End If
-        '        Next i
-
-        '        If dispfg = 1 Then 'display parms for selected segments
-        '            selstr = RTrim(Left(selstr, Len(selstr) - 3)) & ")"
-        '            If Len(Filt(3).txt) > 0 Then  'add filter criteria
-        '                selstr = selstr & " AND " & Filt(3).txt
-        '            End If
-        '            myTab = myDB.OpenRecordset(selstr, dbOpenDynaset)
-        '            'set column headers
-        '            agdParm.ColTitle(0) = "Name"
-        '            agdParm.ColTitle(1) = "Table"
-        '            agdParm.ColSelectable(0) = True
-
-        '            agdParm.ClearData()
-        '            nrow = 0
-        '            With myTab
-        '                Do Until .EOF '.NoMatch
-        '                    nrow = nrow + 1
-        '                    agdParm.Rows = nrow
-        '                    agdParm.TextMatrix(nrow, 0) = !Name
-        '                    'set width of name field to display all info
-        '                    lwid = TextWidth(!Name)
-        '                    If lwid > agdParm.ColWidth(0) Then
-        '                        agdParm.ColWidth(0) = lwid
-        '                    End If
-        '                    agdParm.TextMatrix(nrow, 1) = !Table
-        '                    'update itemdata
-        '                    agdParm.ItemData(nrow) = !ParmID
-        '                    .MoveNext()
-        '                Loop
-        '            End With
-
-        '            myTab.Close()
-        '            fraTab.Visible = True
-        '        Else 'no segments selected for which to display tables
-        '            fraTab.Visible = False
-        '            fraView.Visible = False
-        '            'mnuMain(5).Enabled = False
-        '        End If
-
-        '        MousePointer = vbDefault
+        agdParameter.SizeAllColumnsToContents()
+        agdParameter.Refresh()
 
     End Sub
 
@@ -815,7 +913,7 @@ Public Class frmHSPFParm
 
     End Sub
 
-    
+
 
     '    Private Sub FillInAlias(ByVal Table$, ByVal Occur&, ByVal OpnTypID&, ByVal SegID&, ByVal Alias$, ByVal ColHeader$)
     '        Dim crit$
@@ -1116,5 +1214,38 @@ Public Class frmHSPFParm
         Next
         Refresh()
         RefreshSegment()
+    End Sub
+
+    Private Sub agdSegment_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdSegment.MouseDownCell
+        For lCol As Integer = 0 To agdSegment.Source.Columns - 1
+            If Not agdSegment.Source.CellSelected(aRow, lCol) Then
+                agdSegment.Source.CellSelected(aRow, lCol) = True
+            Else
+                agdSegment.Source.CellSelected(aRow, lCol) = False
+            End If
+        Next
+        Refresh()
+        RefreshTable()
+        RefreshParm()
+    End Sub
+
+    Private Sub rbnTables_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles rbnTables.CheckedChanged
+        If rbnTables.Checked Then
+            agdTable.Visible = True
+            agdParameter.Visible = False
+        Else
+            agdTable.Visible = False
+            agdParameter.Visible = True
+        End If
+    End Sub
+
+    Private Sub rbnParameters_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles rbnParameters.CheckedChanged
+        If rbnParameters.Checked Then
+            agdTable.Visible = False
+            agdParameter.Visible = True
+        Else
+            agdTable.Visible = True
+            agdParameter.Visible = False
+        End If
     End Sub
 End Class
