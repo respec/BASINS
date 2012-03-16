@@ -7,6 +7,8 @@ Imports System.Data
 Public Class frmHSPFParm
     Inherits System.Windows.Forms.Form
 
+    Friend pTableGridIDs As atcCollection
+
     <CLSCompliant(False)> Public Database As atcUCI.atcMDB
 #Region " Windows Form Designer generated code "
 
@@ -545,6 +547,7 @@ Public Class frmHSPFParm
         End With
         agdTable.SizeAllColumnsToContents()
         agdTable.Refresh()
+        pTableGridIDs = New atcCollection
 
         With agdParameter
             .Source = New atcControls.atcGridSource
@@ -561,6 +564,17 @@ Public Class frmHSPFParm
         End With
         agdParameter.SizeAllColumnsToContents()
         agdParameter.Refresh()
+
+        With agdValues
+            .Source = New atcControls.atcGridSource
+            .AllowHorizontalScrolling = False
+        End With
+        With agdValues.Source
+            .Rows = 0
+            .Columns = 0
+        End With
+        agdValues.SizeAllColumnsToContents()
+        agdValues.Refresh()
 
         'open the database here
         Database = New atcUCI.atcMDB(aDBName)
@@ -661,6 +675,7 @@ Public Class frmHSPFParm
 
         Dim lCrit As String = ""
         Dim lOpnTyp As Integer = 0
+        pTableGridIDs.Clear()
         With agdTable.Source
             .Rows = 1
             For lScenRow As Integer = 1 To agdSegment.Source.Rows
@@ -686,6 +701,7 @@ Public Class frmHSPFParm
                         ElseIf lOpnTyp = 3 Then
                             .CellValue(.Rows - 1, 1) = "RCHRES"
                         End If
+                        pTableGridIDs.Add(lTable.Rows(lRow).Item(1))
                     Next
                 End If
             Next
@@ -728,7 +744,7 @@ Public Class frmHSPFParm
 
     End Sub
 
-    Sub ViewParms(ByVal Pid&)
+    Sub ViewParms(ByVal aParmId As Integer)
 
         '        Dim i&, nrow&, selstr$, lwid&, Alias$, ColHeader$
 
@@ -828,88 +844,83 @@ Public Class frmHSPFParm
     '        End If
     '    End Sub
 
-    Sub ViewTable(ByVal Tid&)
+    Sub ViewTable(ByVal aTableId As Integer)
 
-        '        Dim i&, j&, ncol&, nrow&, brow&, crit$, selstr$, PrmID&()
-        '        Dim Alias$, ColHeader$
+        Dim lCrit As String = ""
+        Dim lOpnTyp As Integer = 0
+        With agdValues.Source
+            .Columns = 4
+            .Rows = 1
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 0
+            'build headers for table view
+            .CellValue(0, 0) = "Op Num"
+            .CellValue(0, 1) = "Scen"
+            'set to no width if not applicable?
+            .CellValue(0, 2) = "Occur"
+            .CellValue(0, 3) = "Alias"
 
-        '        myTab = myDB.OpenRecordset("ParmTableList", dbOpenDynaset)
+            lCrit = "TabID = " & aTableId
+            '            agdView.Header = "    Table " & myTab!TabName
+            Dim lStr As String = "SELECT DISTINCTROW ParmTableList.Name, " & _
+                                                    "ParmTableList.id " & _
+                                                    "From ParmTableList " & _
+                                                    "WHERE (" & lCrit & ")"
+            Dim lTable As DataTable = Database.GetTable(lStr)
+            For lRow As Integer = 0 To lTable.Rows.Count - 1
+                .Columns += 1
+                .CellValue(0, .Columns - 1) = lTable.Rows(lRow).Item(0).ToString()
+                'ReDim Preserve PrmID(ncol)
+                'PrmID(ncol) = !id
+            Next
 
-        '        agdView.ClearData()
-        '        agdView.Rows = 1
-        '        'build headers for table view
-        '        ncol = 3
-        '        agdView.ColTitle(0) = "Op Num"
-        '        agdView.ColTitle(1) = "Scen"
-        '        'set to no width if not applicable???
-        '        agdView.ColTitle(2) = "Occur"
-        '        agdView.ColTitle(3) = "Alias"
-        '        crit = "TabID = " & Tid
-        '        With myTab
-        '            .FindFirst(crit)
-        '            agdView.Header = "    Table " & myTab!TabName
-        '            Do Until .NoMatch
-        '                ncol = ncol + 1
-        '                agdView.ColTitle(ncol) = !Name
-        '                ReDim Preserve PrmID(ncol)
-        '                PrmID(ncol) = !id
-        '                .FindNext(crit)
-        '            Loop
-        '            .Close()
-        '        End With
-        '        agdView.Cols = ncol + 1
+            Dim lSegCrit As String = ""
+            For lSegRow As Integer = 1 To agdSegment.Source.Rows
+                If agdSegment.Source.CellSelected(lSegRow, 0) Then 'list tables for this segment
+                    lSegCrit = " SegID = " & agdSegment.Source.CellValue(lSegRow, 0)
+                    lCrit = lCrit & " AND " & lSegCrit
+                    'now populate table values
+                    lStr = "SELECT DISTINCTROW ParmTableData.SegID, " & _
+                                              "ParmTableData.OpnTypID, " & _
+                                              "ParmTableData.Name, " & _
+                                              "ParmTableData.Value, " & _
+                                              "ParmTableData.ParmID, " & _
+                                              "ParmTableData.Table, " & _
+                                              "ParmTableData.Occur, " & _
+                                              "ParmTabledata.AliasInfo " & _
+                                              "From ParmTableData " & _
+                                              "WHERE (" & lCrit & ")"
+                    lTable = Database.GetTable(lStr)
+                    .Rows += 1
+                    For lRow As Integer = 0 To lTable.Rows.Count - 1
+                        '.CellValue(.Rows - 1, 0) = Right(agdSegment.Source.CellValue(lScenRow, 0), Len(agdSegment.Source.CellValue(lScenRow, 0)) - 6)
+                        .CellValue(.Rows - 1, 0) = agdSegment.Source.CellValue(lSegRow, 0)
+                        .CellValue(.Rows - 1, 1) = agdSegment.Source.CellValue(lSegRow, 2)
+                        .CellValue(.Rows - 1, 2) = lTable.Rows(lRow).Item(6).ToString
+                        'If Len(Trim(lTable.Rows(lRow).Item(7).ToString)) > 0 Then
+                        '    FillInAlias(!Table, !Occur, !OpnTypID, !SegID, Alias, ColHeader)
+                        '    agdView.ColTitle(3) = ColHeader
+                        'Else
+                        '    Alias = ""
+                        'End If
+                        '.CellValue(.Rows - 1, 3) = Alias
+                        .CellValue(.Rows - 1, 3 + lRow) = lTable.Rows(lRow).Item(6).ToString
+                        'For j = 2 To ncol
+                        '    If PrmID(j) = !ParmID Then
+                        '        agdView.TextMatrix(nrow, j) = !Value
+                        '        Exit For
+                        '    End If
+                        'Next j
+                    Next
+                End If
+            Next
+        End With
 
-        '        'build query based on selected table
-        '        selstr = "SELECT DISTINCTROW ParmTableData.SegID, " & _
-        '                                    "ParmTableData.OpnTypID, " & _
-        '                                    "ParmTableData.Name, " & _
-        '                                    "ParmTableData.Value, " & _
-        '                                    "ParmTableData.ParmID, " & _
-        '                                    "ParmTableData.Table, " & _
-        '                                    "ParmTableData.Occur, " & _
-        '                                    "ParmTabledata.AliasInfo " & _
-        '                 "From ParmTableData " & _
-        '                 "WHERE (TabID = " & Tid & ")"
-        '        myTab = myDB.OpenRecordset(selstr, dbOpenDynaset)
+        'HideLikeCol(agdView, 2)
 
-        '        nrow = 0
-        '        For i = 1 To agdSeg.Rows 'look for selected segments
-        '            If agdSeg.Selected(i, 0) Then 'list table values for this segment
-        '                crit = "SegID = " & agdSeg.ItemData(i)
-        '                brow = nrow
-        '                With myTab
-        '                    .FindFirst(crit)
-        '                    Do Until .NoMatch
-        '                        nrow = brow + !Occur
-        '                        If nrow > agdView.Rows Or nrow = 1 Then
-        '                            If nrow > 1 Then agdView.Rows = nrow
-        '                            agdView.TextMatrix(nrow, 0) = Right(agdSeg.TextMatrix(i, 0), Len(agdSeg.TextMatrix(i, 0)) - 6)
-        '                            agdView.TextMatrix(nrow, 1) = agdSeg.TextMatrix(i, 2)
-        '                            agdView.TextMatrix(nrow, 2) = !Occur
-        '                            If Len(Trim(!AliasInfo)) > 0 Then
-        '                Call FillInAlias(!Table, !Occur, !OpnTypID, !SegID, Alias, ColHeader)
-        '                                agdView.ColTitle(3) = ColHeader
-        '                            Else
-        '                Alias = ""
-        '                            End If
-        '              agdView.TextMatrix(nrow, 3) = Alias
-        '                        End If
-        '                        For j = 2 To ncol
-        '                            If PrmID(j) = !ParmID Then
-        '                                agdView.TextMatrix(nrow, j) = !Value
-        '                                Exit For
-        '                            End If
-        '                        Next j
-        '                        .FindNext(crit)
-        '                    Loop
-        '                End With
-        '            End If
-        '        Next i
-
-        '        myTab.Close()
-        '        Call HideLikeCol(agdView, 2)
-        '        fraView.Visible = True
-        '        mnuMain(5).Enabled = True
+        agdValues.SizeAllColumnsToContents()
+        agdValues.Refresh()
 
     End Sub
 
@@ -1247,5 +1258,37 @@ Public Class frmHSPFParm
             agdTable.Visible = True
             agdParameter.Visible = False
         End If
+    End Sub
+
+    Private Sub agdTable_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdTable.MouseDownCell
+        'unselect everything first
+        For lRow As Integer = 0 To agdTable.Source.Rows - 1
+            For lCol As Integer = 0 To agdTable.Source.Columns - 1
+                agdTable.Source.CellSelected(lRow, lCol) = False
+            Next
+        Next
+        For lCol As Integer = 0 To agdTable.Source.Columns - 1
+            agdTable.Source.CellSelected(aRow, lCol) = True
+        Next
+        Dim lTableId As Integer = pTableGridIDs(aRow - 1)
+
+        Refresh()
+        ViewTable(lTableId)
+    End Sub
+
+    Private Sub agdParameter_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdParameter.MouseDownCell
+        'unselect everything first
+        For lRow As Integer = 0 To agdParameter.Source.Rows - 1
+            For lCol As Integer = 0 To agdParameter.Source.Columns - 1
+                agdParameter.Source.CellSelected(lRow, lCol) = False
+            Next
+        Next
+        For lCol As Integer = 0 To agdParameter.Source.Columns - 1
+            agdParameter.Source.CellSelected(aRow, lCol) = True
+        Next
+        Dim lParmId As Integer = agdParameter.Source.CellValue(aRow, 0)
+
+        Refresh()
+        ViewParms(lParmId)
     End Sub
 End Class
