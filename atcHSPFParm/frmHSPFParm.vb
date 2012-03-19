@@ -8,8 +8,8 @@ Public Class frmHSPFParm
     Inherits System.Windows.Forms.Form
 
     Friend pTableGridIDs As atcCollection
-
     <CLSCompliant(False)> Public Database As atcUCI.atcMDB
+
 #Region " Windows Form Designer generated code "
 
     Public Sub New()
@@ -61,6 +61,7 @@ Public Class frmHSPFParm
     Friend WithEvents agdTable As atcControls.atcGrid
     Friend WithEvents agdParameter As atcControls.atcGrid
     Friend WithEvents cmdAbout As System.Windows.Forms.Button
+    Friend WithEvents lblTableParmName As System.Windows.Forms.Label
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmHSPFParm))
         Me.cmdMap = New System.Windows.Forms.Button
@@ -86,6 +87,7 @@ Public Class frmHSPFParm
         Me.agdTable = New atcControls.atcGrid
         Me.cmdTableFilter = New System.Windows.Forms.Button
         Me.gbxValues = New System.Windows.Forms.GroupBox
+        Me.lblTableParmName = New System.Windows.Forms.Label
         Me.agdValues = New atcControls.atcGrid
         Me.gbxWatershed.SuspendLayout()
         Me.gbxScenario.SuspendLayout()
@@ -369,6 +371,7 @@ Public Class frmHSPFParm
         'gbxValues
         '
         Me.gbxValues.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbxValues.Controls.Add(Me.lblTableParmName)
         Me.gbxValues.Controls.Add(Me.agdValues)
         Me.gbxValues.Location = New System.Drawing.Point(12, 442)
         Me.gbxValues.Name = "gbxValues"
@@ -376,6 +379,14 @@ Public Class frmHSPFParm
         Me.gbxValues.TabIndex = 13
         Me.gbxValues.TabStop = False
         Me.gbxValues.Text = "Values"
+        '
+        'lblTableParmName
+        '
+        Me.lblTableParmName.AutoSize = True
+        Me.lblTableParmName.Location = New System.Drawing.Point(13, 16)
+        Me.lblTableParmName.Name = "lblTableParmName"
+        Me.lblTableParmName.Size = New System.Drawing.Size(0, 13)
+        Me.lblTableParmName.TabIndex = 21
         '
         'agdValues
         '
@@ -387,9 +398,9 @@ Public Class frmHSPFParm
         Me.agdValues.Fixed3D = False
         Me.agdValues.LineColor = System.Drawing.SystemColors.Control
         Me.agdValues.LineWidth = 1.0!
-        Me.agdValues.Location = New System.Drawing.Point(16, 18)
+        Me.agdValues.Location = New System.Drawing.Point(16, 35)
         Me.agdValues.Name = "agdValues"
-        Me.agdValues.Size = New System.Drawing.Size(504, 57)
+        Me.agdValues.Size = New System.Drawing.Size(504, 40)
         Me.agdValues.Source = Nothing
         Me.agdValues.TabIndex = 14
         '
@@ -419,6 +430,7 @@ Public Class frmHSPFParm
         Me.gbxTable.ResumeLayout(False)
         Me.gbxTable.PerformLayout()
         Me.gbxValues.ResumeLayout(False)
+        Me.gbxValues.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -678,33 +690,41 @@ Public Class frmHSPFParm
         pTableGridIDs.Clear()
         With agdTable.Source
             .Rows = 1
-            For lScenRow As Integer = 1 To agdSegment.Source.Rows
+            Dim lSelectedCount As Integer = 0
+            For lScenRow As Integer = 1 To agdSegment.Source.Rows - 1
                 If agdSegment.Source.CellSelected(lScenRow, 0) Then 'list tables for this segment
-                    lCrit = "SegID = " & agdSegment.Source.CellValue(lScenRow, 0)
-                    'If Len(Filt(3).txt) > 0 Then  'add filter criteria
-                    '                selstr = selstr & " AND " & Filt(3).txt
-                    '            End If
-                    Dim lStr As String = "SELECT DISTINCTROW ScenTableList.Name, " & _
-                                                            "ScenTableList.TabID, " & _
-                                                            "ScenTableList.OpnTypID " & _
-                                                            "From ScenTableList " & _
-                                                            "WHERE (" & lCrit & ")"
-                    Dim lTable As DataTable = Database.GetTable(lStr)
-                    For lRow As Integer = 0 To lTable.Rows.Count - 1
-                        .Rows += 1
-                        .CellValue(.Rows - 1, 0) = lTable.Rows(lRow).Item(0).ToString
-                        lOpnTyp = lTable.Rows(lRow).Item(2).ToString
-                        If lOpnTyp = 1 Then
-                            .CellValue(.Rows - 1, 1) = "PERLND"
-                        ElseIf lOpnTyp = 2 Then
-                            .CellValue(.Rows - 1, 1) = "IMPLND"
-                        ElseIf lOpnTyp = 3 Then
-                            .CellValue(.Rows - 1, 1) = "RCHRES"
-                        End If
-                        pTableGridIDs.Add(lTable.Rows(lRow).Item(1))
-                    Next
+                    lSelectedCount += 1
+                    If lSelectedCount = 1 Then
+                        lCrit = "SegID = " & agdSegment.Source.CellValue(lScenRow, 0)
+                    Else
+                        lCrit = lCrit & " OR SegID = " & agdSegment.Source.CellValue(lScenRow, 0)
+                    End If
                 End If
             Next
+            If lSelectedCount > 0 Then
+                'If Len(Filt(3).txt) > 0 Then  'add filter criteria
+                '                selstr = selstr & " AND " & Filt(3).txt
+                '            End If
+                Dim lStr As String = "SELECT DISTINCTROW ScenTableList.Name, " & _
+                                                        "ScenTableList.TabID, " & _
+                                                        "ScenTableList.OpnTypID " & _
+                                                        "From ScenTableList " & _
+                                                        "WHERE (" & lCrit & ")"
+                Dim lTable As DataTable = Database.GetTable(lStr)
+                For lRow As Integer = 0 To lTable.Rows.Count - 1
+                    .Rows += 1
+                    .CellValue(.Rows - 1, 0) = lTable.Rows(lRow).Item(0).ToString
+                    lOpnTyp = lTable.Rows(lRow).Item(2).ToString
+                    If lOpnTyp = 1 Then
+                        .CellValue(.Rows - 1, 1) = "PERLND"
+                    ElseIf lOpnTyp = 2 Then
+                        .CellValue(.Rows - 1, 1) = "IMPLND"
+                    ElseIf lOpnTyp = 3 Then
+                        .CellValue(.Rows - 1, 1) = "RCHRES"
+                    End If
+                    pTableGridIDs.Add(lTable.Rows(lRow).Item(1))
+                Next
+            End If
         End With
 
         agdTable.SizeAllColumnsToContents()
@@ -717,26 +737,32 @@ Public Class frmHSPFParm
         Dim lCrit As String = ""
         With agdParameter.Source
             .Rows = 1
-            For lScenRow As Integer = 1 To agdSegment.Source.Rows
-                If agdSegment.Source.CellSelected(lScenRow, 0) Then 'list tables for this segment
+            Dim lSelectedCount As Integer = 0
+            For lScenRow As Integer = 1 To agdSegment.Source.Rows - 1
+                lSelectedCount += 1
+                If lSelectedCount = 1 Then
                     lCrit = "SegID = " & agdSegment.Source.CellValue(lScenRow, 0)
-                    'If Len(Filt(3).txt) > 0 Then  'add filter criteria
-                    '                selstr = selstr & " AND " & Filt(3).txt
-                    '            End If
-                    Dim lStr As String = "SELECT DISTINCTROW ParmTableData.ParmID, " & _
-                                                            "ParmTableData.Name, " & _
-                                                            "ParmTableData.Table, " & _
-                                                            "ParmTableData.TabID " & _
-                                                            "From ParmTableData " & _
-                                                            "WHERE (" & lCrit & ")"
-                    Dim lTable As DataTable = Database.GetTable(lStr)
-                    For lRow As Integer = 0 To lTable.Rows.Count - 1
-                        .Rows += 1
-                        .CellValue(.Rows - 1, 0) = lTable.Rows(lRow).Item(1).ToString
-                        .CellValue(.Rows - 1, 1) = lTable.Rows(lRow).Item(2).ToString
-                    Next
+                Else
+                    lCrit = lCrit & " OR SegID = " & agdSegment.Source.CellValue(lScenRow, 0)
                 End If
             Next
+            If lSelectedCount > 0 Then
+                'If Len(Filt(3).txt) > 0 Then  'add filter criteria
+                '                selstr = selstr & " AND " & Filt(3).txt
+                '            End If
+                Dim lStr As String = "SELECT DISTINCTROW ParmTableData.ParmID, " & _
+                                                        "ParmTableData.Name, " & _
+                                                        "ParmTableData.Table, " & _
+                                                        "ParmTableData.TabID " & _
+                                                        "From ParmTableData " & _
+                                                        "WHERE (" & lCrit & ")"
+                Dim lTable As DataTable = Database.GetTable(lStr)
+                For lRow As Integer = 0 To lTable.Rows.Count - 1
+                    .Rows += 1
+                    .CellValue(.Rows - 1, 0) = lTable.Rows(lRow).Item(1).ToString
+                    .CellValue(.Rows - 1, 1) = lTable.Rows(lRow).Item(2).ToString
+                Next
+            End If
         End With
 
         agdParameter.SizeAllColumnsToContents()
@@ -844,8 +870,9 @@ Public Class frmHSPFParm
     '        End If
     '    End Sub
 
-    Sub ViewTable(ByVal aTableId As Integer)
+    Sub ViewTable(ByVal aTableId As Integer, ByVal aTableName As String)
 
+        Dim lTableCrit As String = ""
         Dim lCrit As String = ""
         Dim lOpnTyp As Integer = 0
         With agdValues.Source
@@ -861,25 +888,23 @@ Public Class frmHSPFParm
             .CellValue(0, 2) = "Occur"
             .CellValue(0, 3) = "Alias"
 
-            lCrit = "TabID = " & aTableId
-            '            agdView.Header = "    Table " & myTab!TabName
+            lTableCrit = "TabID = " & aTableId
+            lblTableParmName.Text = "Table " & aTableName
             Dim lStr As String = "SELECT DISTINCTROW ParmTableList.Name, " & _
                                                     "ParmTableList.id " & _
                                                     "From ParmTableList " & _
-                                                    "WHERE (" & lCrit & ")"
+                                                    "WHERE (" & lTableCrit & ")"
             Dim lTable As DataTable = Database.GetTable(lStr)
             For lRow As Integer = 0 To lTable.Rows.Count - 1
                 .Columns += 1
                 .CellValue(0, .Columns - 1) = lTable.Rows(lRow).Item(0).ToString()
-                'ReDim Preserve PrmID(ncol)
-                'PrmID(ncol) = !id
             Next
 
             Dim lSegCrit As String = ""
             For lSegRow As Integer = 1 To agdSegment.Source.Rows
                 If agdSegment.Source.CellSelected(lSegRow, 0) Then 'list tables for this segment
                     lSegCrit = " SegID = " & agdSegment.Source.CellValue(lSegRow, 0)
-                    lCrit = lCrit & " AND " & lSegCrit
+                    lCrit = lTableCrit & " AND " & lSegCrit
                     'now populate table values
                     lStr = "SELECT DISTINCTROW ParmTableData.SegID, " & _
                                               "ParmTableData.OpnTypID, " & _
@@ -892,27 +917,22 @@ Public Class frmHSPFParm
                                               "From ParmTableData " & _
                                               "WHERE (" & lCrit & ")"
                     lTable = Database.GetTable(lStr)
-                    .Rows += 1
-                    For lRow As Integer = 0 To lTable.Rows.Count - 1
-                        '.CellValue(.Rows - 1, 0) = Right(agdSegment.Source.CellValue(lScenRow, 0), Len(agdSegment.Source.CellValue(lScenRow, 0)) - 6)
-                        .CellValue(.Rows - 1, 0) = agdSegment.Source.CellValue(lSegRow, 0)
-                        .CellValue(.Rows - 1, 1) = agdSegment.Source.CellValue(lSegRow, 2)
-                        .CellValue(.Rows - 1, 2) = lTable.Rows(lRow).Item(6).ToString
-                        'If Len(Trim(lTable.Rows(lRow).Item(7).ToString)) > 0 Then
-                        '    FillInAlias(!Table, !Occur, !OpnTypID, !SegID, Alias, ColHeader)
-                        '    agdView.ColTitle(3) = ColHeader
-                        'Else
-                        '    Alias = ""
-                        'End If
-                        '.CellValue(.Rows - 1, 3) = Alias
-                        .CellValue(.Rows - 1, 3 + lRow) = lTable.Rows(lRow).Item(6).ToString
-                        'For j = 2 To ncol
-                        '    If PrmID(j) = !ParmID Then
-                        '        agdView.TextMatrix(nrow, j) = !Value
-                        '        Exit For
-                        '    End If
-                        'Next j
-                    Next
+                    If lTable.Rows.Count > 0 Then
+                        .Rows += 1
+                        For lRow As Integer = 0 To lTable.Rows.Count - 1
+                            .CellValue(.Rows - 1, 0) = Mid(agdSegment.Source.CellValue(lSegRow, 1), 7)
+                            .CellValue(.Rows - 1, 1) = agdSegment.Source.CellValue(lSegRow, 3)
+                            .CellValue(.Rows - 1, 2) = lTable.Rows(lRow).Item(6).ToString
+                            'If Len(Trim(lTable.Rows(lRow).Item(7).ToString)) > 0 Then
+                            '    FillInAlias(!Table, !Occur, !OpnTypID, !SegID, Alias, ColHeader)
+                            '    agdView.ColTitle(3) = ColHeader
+                            'Else
+                            '    Alias = ""
+                            'End If
+                            '.CellValue(.Rows - 1, 3) = Alias
+                            .CellValue(.Rows - 1, 4 + lRow) = lTable.Rows(lRow).Item(3).ToString
+                        Next
+                    End If
                 End If
             Next
         End With
@@ -1271,9 +1291,10 @@ Public Class frmHSPFParm
             agdTable.Source.CellSelected(aRow, lCol) = True
         Next
         Dim lTableId As Integer = pTableGridIDs(aRow - 1)
+        Dim lTableName As String = agdTable.Source.CellValue(aRow, 0)
 
         Refresh()
-        ViewTable(lTableId)
+        ViewTable(lTableId, lTableName)
     End Sub
 
     Private Sub agdParameter_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdParameter.MouseDownCell
