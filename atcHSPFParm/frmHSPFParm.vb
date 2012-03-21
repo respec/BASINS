@@ -8,6 +8,8 @@ Public Class frmHSPFParm
     Inherits System.Windows.Forms.Form
 
     Friend pTableGridIDs As atcCollection
+    Friend pParmGridIDs As atcCollection
+    Friend pSegmentGridIDs As atcCollection
     <CLSCompliant(False)> Public Database As atcUCI.atcMDB
 
 #Region " Windows Form Designer generated code "
@@ -438,7 +440,49 @@ Public Class frmHSPFParm
 #End Region
 
     Private Sub cmdAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAdd.Click
-        Me.Close()
+        'With cmdProject
+        '    .DialogTitle = "HSPFParm File Open Project"
+        '    .CancelError = True
+        '    .flags = &H1804& 'not read only
+        '    .Filter = "Project files (*.Wat)|*.Wat"
+        '    On Error GoTo err
+        '    .ShowOpen()
+        'End With
+        'Call frmWat.AddWatFromFile(cmdProject.Filename, False)
+
+        ' Call Map1.GetSelectedKeys(WatKeys())
+        '            If UBound(WatKeys) = 1 Then 'only one project select, continue
+        '                On Error GoTo skip
+        '                With cmdUCIFile
+        '                    .flags = &H1000& 'file must exist
+        '                    .Filter = "UCI files (*.uci)|*.uci"
+        '                    .ShowOpen()
+        '                    UCIFile = FilenameOnly(.Filename)
+        '                End With
+        '                ScenExist = False
+        '                If agdScen.Rows > 1 Then
+        '                    i = 1
+        '                    Do While Not ScenExist
+        '                        If UCase(UCIFile) = UCase(agdScen.TextMatrix(i, 1)) Then
+        '                            ScenExist = True
+        '                        Else
+        '                            i = i + 1
+        '                        End If
+        '                        If i >= agdScen.Rows Then Exit Do
+        '                    Loop
+        '                End If
+        '                If Not ScenExist Then
+        '                    'get project name from database (use DBF in future?)
+        '                    myWat = myDB.OpenRecordset("WatershedData", dbOpenDynaset)
+        '                    crit = "ID = " & WatKeys(0)
+        '                    myWat.FindFirst(crit)
+        '                    WatName = myWat!Name
+        '                    myWat.Close()
+        '                    Call frmScn.BuildScn(WatName, " ", " ", UCIFile, " ", " ", " ", " ", " ", " ", _
+        '                                         "11.0", " ", " ", " ", " ", " ")
+        '                Else
+        '                    MsgBox("This Scenario exists in this project. Delete it first!")
+        '                End If
     End Sub
 
     Private Sub cmdAbout_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAbout.Click
@@ -450,11 +494,13 @@ Public Class frmHSPFParm
     End Sub
 
     Private Sub cmdMap_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdMap.Click
-
+        Logger.Msg("Map option is not yet implemented.  This option will refresh the map with the HSPFParm project locations.", MsgBoxStyle.OkOnly, "BASINS HSPFParm")
+        'save the current project and then open the HSPFParm layers on the map
     End Sub
 
     Private Sub cmdWrite_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdWrite.Click
-
+        Logger.Msg("Write option is not yet implemented.  This option will allow the user to write a file of values.", MsgBoxStyle.OkOnly, "BASINS HSPFParm")
+        'frmReport.Show()
     End Sub
 
     Public Sub InitializeUI(ByVal aPath As String, ByVal aDBName As String)
@@ -517,9 +563,9 @@ Public Class frmHSPFParm
             .ColorCells = True
             .FixedRows = 1
             .FixedColumns = 0
-            .CellValue(0, 0) = "ID"
-            .CellValue(0, 1) = "Name"
-            .CellValue(0, 2) = "Project Name"
+            .CellValue(0, 0) = "Name"
+            .CellValue(0, 1) = "Project Name"
+            .CellValue(0, 2) = "ID"
             .Rows = 1
         End With
         agdScenario.SizeAllColumnsToContents()
@@ -530,19 +576,19 @@ Public Class frmHSPFParm
             .AllowHorizontalScrolling = False
         End With
         With agdSegment.Source
-            .Columns = 4
+            .Columns = 3
             .ColorCells = True
             .FixedRows = 1
             .FixedColumns = 0
-            .CellValue(0, 0) = "ID"
-            .CellValue(0, 1) = "Name"
-            .CellValue(0, 2) = "Description"
-            .CellValue(0, 3) = "Scenario Name"
-            .CellValue(0, 4) = "Project Name"
+            .CellValue(0, 0) = "Name"
+            .CellValue(0, 1) = "Description"
+            .CellValue(0, 2) = "Scenario Name"
+            .CellValue(0, 3) = "Project Name"
             .Rows = 1
         End With
         agdSegment.SizeAllColumnsToContents()
         agdSegment.Refresh()
+        pSegmentGridIDs = New atcCollection
 
         With agdTable
             .Source = New atcControls.atcGridSource
@@ -576,6 +622,7 @@ Public Class frmHSPFParm
         End With
         agdParameter.SizeAllColumnsToContents()
         agdParameter.Refresh()
+        pParmGridIDs = New atcCollection
 
         With agdValues
             .Source = New atcControls.atcGridSource
@@ -632,9 +679,9 @@ Public Class frmHSPFParm
                     Dim lTable As DataTable = Database.GetTable(lStr)
                     For lRow As Integer = 0 To lTable.Rows.Count - 1
                         .Rows += 1
-                        .CellValue(.Rows - 1, 0) = lTable.Rows(lRow).Item(1).ToString
-                        .CellValue(.Rows - 1, 1) = lTable.Rows(lRow).Item(0).ToString
-                        .CellValue(.Rows - 1, 2) = agdWatershed.Source.CellValue(lWatRow, 1)
+                        .CellValue(.Rows - 1, 0) = lTable.Rows(lRow).Item(0).ToString
+                        .CellValue(.Rows - 1, 1) = agdWatershed.Source.CellValue(lWatRow, 1)
+                        .CellValue(.Rows - 1, 2) = lTable.Rows(lRow).Item(1).ToString
                     Next
                 End If
             Next
@@ -649,11 +696,12 @@ Public Class frmHSPFParm
     Sub RefreshSegment()
 
         Dim lCrit As String = ""
+        pSegmentGridIDs.Clear()
         With agdSegment.Source
             .Rows = 1
             For lScenRow As Integer = 1 To agdScenario.Source.Rows
                 If agdScenario.Source.CellSelected(lScenRow, 0) Then 'list segments for this scenario
-                    lCrit = "ScenarioID = " & agdScenario.Source.CellValue(lScenRow, 0)
+                    lCrit = "ScenarioID = " & agdScenario.Source.CellValue(lScenRow, 2)
                     '                If Len(Filt(2).txt) > 0 Then  'add filter criteria
                     '                    crit = crit & " AND " & Filt(2).txt
                     '                End If
@@ -665,11 +713,11 @@ Public Class frmHSPFParm
                     Dim lTable As DataTable = Database.GetTable(lStr)
                     For lRow As Integer = 0 To lTable.Rows.Count - 1
                         .Rows += 1
-                        .CellValue(.Rows - 1, 0) = lTable.Rows(lRow).Item(0).ToString
-                        .CellValue(.Rows - 1, 1) = lTable.Rows(lRow).Item(1).ToString
-                        .CellValue(.Rows - 1, 2) = lTable.Rows(lRow).Item(2).ToString
+                        .CellValue(.Rows - 1, 0) = lTable.Rows(lRow).Item(1).ToString
+                        .CellValue(.Rows - 1, 1) = lTable.Rows(lRow).Item(2).ToString
+                        .CellValue(.Rows - 1, 2) = agdScenario.Source.CellValue(lScenRow, 0)
                         .CellValue(.Rows - 1, 3) = agdScenario.Source.CellValue(lScenRow, 1)
-                        .CellValue(.Rows - 1, 4) = agdScenario.Source.CellValue(lScenRow, 2)
+                        pSegmentGridIDs.Add(lTable.Rows(lRow).Item(0))
                     Next
                 End If
             Next
@@ -691,13 +739,13 @@ Public Class frmHSPFParm
         With agdTable.Source
             .Rows = 1
             Dim lSelectedCount As Integer = 0
-            For lScenRow As Integer = 1 To agdSegment.Source.Rows - 1
-                If agdSegment.Source.CellSelected(lScenRow, 0) Then 'list tables for this segment
+            For lSegRow As Integer = 1 To agdSegment.Source.Rows - 1
+                If agdSegment.Source.CellSelected(lSegRow, 0) Then 'list tables for this segment
                     lSelectedCount += 1
                     If lSelectedCount = 1 Then
-                        lCrit = "SegID = " & agdSegment.Source.CellValue(lScenRow, 0)
+                        lCrit = "SegID = " & pSegmentGridIDs(lSegRow - 1)
                     Else
-                        lCrit = lCrit & " OR SegID = " & agdSegment.Source.CellValue(lScenRow, 0)
+                        lCrit = lCrit & " OR SegID = " & pSegmentGridIDs(lSegRow - 1)
                     End If
                 End If
             Next
@@ -735,15 +783,16 @@ Public Class frmHSPFParm
     Sub RefreshParm()
 
         Dim lCrit As String = ""
+        pParmGridIDs.Clear()
         With agdParameter.Source
             .Rows = 1
             Dim lSelectedCount As Integer = 0
-            For lScenRow As Integer = 1 To agdSegment.Source.Rows - 1
+            For lSegRow As Integer = 1 To agdSegment.Source.Rows - 1
                 lSelectedCount += 1
                 If lSelectedCount = 1 Then
-                    lCrit = "SegID = " & agdSegment.Source.CellValue(lScenRow, 0)
+                    lCrit = "SegID = " & pSegmentGridIDs(lSegRow - 1)
                 Else
-                    lCrit = lCrit & " OR SegID = " & agdSegment.Source.CellValue(lScenRow, 0)
+                    lCrit = lCrit & " OR SegID = " & pSegmentGridIDs(lSegRow - 1)
                 End If
             Next
             If lSelectedCount > 0 Then
@@ -761,6 +810,7 @@ Public Class frmHSPFParm
                     .Rows += 1
                     .CellValue(.Rows - 1, 0) = lTable.Rows(lRow).Item(1).ToString
                     .CellValue(.Rows - 1, 1) = lTable.Rows(lRow).Item(2).ToString
+                    pParmGridIDs.Add(lTable.Rows(lRow).Item(0))
                 Next
             End If
         End With
@@ -770,74 +820,70 @@ Public Class frmHSPFParm
 
     End Sub
 
-    Sub ViewParms(ByVal aParmId As Integer)
+    Sub ViewParms(ByVal aParmId As Integer, ByVal aParmName As String)
 
-        '        Dim i&, nrow&, selstr$, lwid&, Alias$, ColHeader$
+        Dim lParmCrit As String = ""
+        Dim lCrit As String = ""
+        Dim lOpnTyp As Integer = 0
+        With agdValues.Source
+            .Columns = 6
+            .Rows = 1
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 0
+            'build headers for parameter view
+            .CellValue(0, 0) = "Name"
+            .CellValue(0, 1) = "Value"
+            .CellValue(0, 2) = "Segment"
+            .CellValue(0, 3) = "Scenario"
+            .CellValue(0, 4) = "Occur"
+            .CellValue(0, 5) = "Alias"
 
-        '        agdView.Cols = 6
-        '        agdView.ColTitle(0) = "Name"
-        '        agdView.ColTitle(1) = "Value"
-        '        agdView.ColTitle(2) = "Segment"
-        '        agdView.ColTitle(3) = "Scenario"
-        '        agdView.ColTitle(4) = "Occur"
-        '        agdView.ColTitle(5) = "Alias"
-        '        agdView.ClearData()
-        '        nrow = 0
+            lParmCrit = "(ParmID = " & aParmId & " OR AssocID = " & aParmId & ")"
+            lblTableParmName.Text = "Parameter " & aParmName
 
-        '        'build query based on selected segments
-        '        selstr = "SELECT DISTINCTROW ParmTableData.SegID, " & _
-        '                                    "ParmTableData.OpnTypID, " & _
-        '                                    "ParmTableData.Name, " & _
-        '                                    "ParmTableData.ParmID, " & _
-        '                                    "ParmTableData.Value, " & _
-        '                                    "ParmTableData.Table, " & _
-        '                                    "ParmTableData.Occur, " & _
-        '                                    "ParmTabledata.AliasInfo " & _
-        '                 "From ParmTableData " & _
-        '                 "WHERE (ParmID = " & Pid & " OR AssocID = " & Pid & ") AND ("
-        '        For i = 1 To agdSeg.Rows 'look for selected segments
-        '            If agdSeg.Selected(i, 0) Then 'list tables for this segment
-        '                selstr = selstr & "SegID = " & agdSeg.ItemData(i) & " OR "
-        '            End If
-        '        Next i
-        '        selstr = RTrim(Left(selstr, Len(selstr) - 3)) & ")"
-        '        myTab = myDB.OpenRecordset(selstr, dbOpenDynaset)
+            Dim lSegCrit As String = ""
+            For lSegRow As Integer = 1 To agdSegment.Source.Rows
+                If agdSegment.Source.CellSelected(lSegRow, 0) Then 'list tables for this segment
+                    lSegCrit = " SegID = " & pSegmentGridIDs(lSegRow - 1)
+                    lCrit = lParmCrit & " AND " & lSegCrit
+                    'now populate table values
+                    Dim lStr As String = "SELECT DISTINCTROW ParmTableData.SegID, " & _
+                                                            "ParmTableData.OpnTypID, " & _
+                                                            "ParmTableData.Name, " & _
+                                                            "ParmTableData.ParmID, " & _
+                                                            "ParmTableData.Value, " & _
+                                                            "ParmTableData.Table, " & _
+                                                            "ParmTableData.Occur, " & _
+                                                            "ParmTabledata.AliasInfo " & _
+                                                            "From ParmTableData " & _
+                                                            "WHERE (" & lCrit & ")"
+                    Dim lTable As DataTable = Database.GetTable(lStr)
+                    If lTable.Rows.Count > 0 Then
+                        .Rows += 1
+                        For lRow As Integer = 0 To lTable.Rows.Count - 1
+                            .CellValue(.Rows - 1, 0) = lTable.Rows(lRow).Item(2).ToString
+                            .CellValue(.Rows - 1, 1) = lTable.Rows(lRow).Item(4).ToString
+                            .CellValue(.Rows - 1, 2) = agdSegment.Source.CellValue(lSegRow, 0)
+                            .CellValue(.Rows - 1, 3) = agdSegment.Source.CellValue(lSegRow, 2)
+                            .CellValue(.Rows - 1, 4) = lTable.Rows(lRow).Item(6).ToString
+                            'If Len(Trim(lTable.Rows(lRow).Item(7).ToString)) > 0 Then
+                            '    FillInAlias(!Table, !Occur, !OpnTypID, !SegID, Alias, ColHeader)
+                            '    agdView.ColTitle(5) = ColHeader
+                            'Else
+                            '    Alias = ""
+                            'End If
+                            '.CellValue(.Rows - 1, 5) = Alias
+                        Next
+                    End If
+                End If
+            Next
+        End With
 
-        '        With myTab
-        '            agdView.Header = "    Parameter " & !Name
-        '            fraView.ToolTipText = "HSPF Parameter help from Message File will go here."
-        '            Do Until .EOF
-        '                nrow = nrow + 1
-        '                agdView.Rows = nrow
-        '                agdView.TextMatrix(nrow, 0) = !Name
-        '                agdView.TextMatrix(nrow, 1) = !Value
-        '                agdView.TextMatrix(nrow, 4) = !Occur
-        '                If Len(Trim(!AliasInfo)) > 0 Then
-        '          Call FillInAlias(!Table, !Occur, !OpnTypID, !SegID, Alias, ColHeader)
-        '                    agdView.ColTitle(5) = ColHeader
-        '                Else
-        '          Alias = ""
-        '                End If
-        '        agdView.TextMatrix(nrow, 5) = Alias
-        '                i = 1
-        '                Do While i <= agdSeg.Rows
-        '                    If agdSeg.ItemData(i) = !SegID Then
-        '                        agdView.TextMatrix(nrow, 2) = agdSeg.TextMatrix(i, 0)
-        '                        agdView.TextMatrix(nrow, 3) = agdSeg.TextMatrix(i, 2)
-        '                        i = agdSeg.Rows
-        '                    End If
-        '                    i = i + 1
-        '                Loop
-        '                .MoveNext()
-        '            Loop
-        '        End With
+        'HideLikeCol(agdView, 4)
 
-        '        myTab.Close()
-
-        '        Call HideLikeCol(agdView, 4)
-
-        '        fraView.Visible = True
-        '        mnuMain(5).Enabled = True
+        agdValues.SizeAllColumnsToContents()
+        agdValues.Refresh()
 
     End Sub
 
@@ -903,7 +949,7 @@ Public Class frmHSPFParm
             Dim lSegCrit As String = ""
             For lSegRow As Integer = 1 To agdSegment.Source.Rows
                 If agdSegment.Source.CellSelected(lSegRow, 0) Then 'list tables for this segment
-                    lSegCrit = " SegID = " & agdSegment.Source.CellValue(lSegRow, 0)
+                    lSegCrit = " SegID = " & pSegmentGridIDs(lSegRow - 1)
                     lCrit = lTableCrit & " AND " & lSegCrit
                     'now populate table values
                     lStr = "SELECT DISTINCTROW ParmTableData.SegID, " & _
@@ -920,8 +966,8 @@ Public Class frmHSPFParm
                     If lTable.Rows.Count > 0 Then
                         .Rows += 1
                         For lRow As Integer = 0 To lTable.Rows.Count - 1
-                            .CellValue(.Rows - 1, 0) = Mid(agdSegment.Source.CellValue(lSegRow, 1), 7)
-                            .CellValue(.Rows - 1, 1) = agdSegment.Source.CellValue(lSegRow, 3)
+                            .CellValue(.Rows - 1, 0) = Mid(agdSegment.Source.CellValue(lSegRow, 0), 7)
+                            .CellValue(.Rows - 1, 1) = agdSegment.Source.CellValue(lSegRow, 2)
                             .CellValue(.Rows - 1, 2) = lTable.Rows(lRow).Item(6).ToString
                             'If Len(Trim(lTable.Rows(lRow).Item(7).ToString)) > 0 Then
                             '    FillInAlias(!Table, !Occur, !OpnTypID, !SegID, Alias, ColHeader)
@@ -943,8 +989,6 @@ Public Class frmHSPFParm
         agdValues.Refresh()
 
     End Sub
-
-
 
     '    Private Sub FillInAlias(ByVal Table$, ByVal Occur&, ByVal OpnTypID&, ByVal SegID&, ByVal Alias$, ByVal ColHeader$)
     '        Dim crit$
@@ -986,179 +1030,6 @@ Public Class frmHSPFParm
     '        End With
     '    End Sub
 
-    '    Private Sub agdParm_Click()
-    '        Dim i&, Pid&
-
-    '        MousePointer = vbHourglass
-
-    '        i = 1
-    '        Do While i <= agdParm.Rows
-    '            If agdParm.Selected(i, 0) Then
-    '                Pid = agdParm.ItemData(i)
-    '                i = agdParm.Rows
-    '            End If
-    '            i = i + 1
-    '        Loop
-
-    '        Call ViewParms(Pid)
-
-    '        MousePointer = vbDefault
-
-    '    End Sub
-
-    '    Private Sub agdScen_Click()
-
-    '        If agdScen.Col = 0 Then 'update segment list
-    '            Call RefreshSegment()
-    '        End If
-
-    '    End Sub
-
-    '    Private Sub agdSeg_Click()
-
-    '        If agdSeg.Col = 0 Then 'update table list
-    '            Call RefreshTable()
-    '            Call RefreshParm()
-    '        End If
-
-    '    End Sub
-
-    '    Private Sub agdTab_Click()
-
-    '        Dim i&, Tid&
-
-    '        MousePointer = vbHourglass
-
-    '        i = 1
-    '        Do While i <= agdTab.Rows
-    '            If agdTab.Selected(i, 0) Then
-    '                Tid = agdTab.ItemData(i)
-    '                i = agdTab.Rows
-    '            End If
-    '            i = i + 1
-    '        Loop
-
-    '        Call ViewTable(Tid)
-
-    '        MousePointer = vbDefault
-
-    '    End Sub
-
-    '    Private Sub cmdBigReg_Click()
-    '        Static sashVOrigLeft&
-
-    '        sashView_Click()
-    '        SashVdragging = True
-    '        If sashView.Top = 0 Then
-    '            sashVOrigLeft = sashV.Left + 180
-    '            Call sashV_MouseMove(0, 0, -5000.0#, 0.0#)
-    '            cmdBigReg.Caption = "-"
-    '        Else
-    '            Call sashV_MouseMove(0, 0, sashVOrigLeft - sashV.Left, 0.0#)
-    '            cmdBigReg.Caption = "+"
-    '        End If
-    '        SashVdragging = False
-    '        'cmdBigReg.Left = fraView.Width - cmdBigReg.Width - 50
-
-    '    End Sub
-
-    '    Private Sub cmdScen_Click(ByVal Index As Integer) '0:add,1:delete,2:view details,3:filter
-
-    '        Dim i&, crit$, WatName$, UCIFile$, ScenExist As Boolean
-    '        Dim WatKeys$()
-
-    '        If Index = 0 Then 'add (hidden on form, avail thru menu, use project add instead
-    '            Call Map1.GetSelectedKeys(WatKeys())
-    '            If UBound(WatKeys) = 1 Then 'only one project select, continue
-    '                On Error GoTo skip
-    '                With cmdUCIFile
-    '                    .flags = &H1000& 'file must exist
-    '                    .Filter = "UCI files (*.uci)|*.uci"
-    '                    .ShowOpen()
-    '                    UCIFile = FilenameOnly(.Filename)
-    '                End With
-    '                ScenExist = False
-    '                If agdScen.Rows > 1 Then
-    '                    i = 1
-    '                    Do While Not ScenExist
-    '                        If UCase(UCIFile) = UCase(agdScen.TextMatrix(i, 1)) Then
-    '                            ScenExist = True
-    '                        Else
-    '                            i = i + 1
-    '                        End If
-    '                        If i >= agdScen.Rows Then Exit Do
-    '                    Loop
-    '                End If
-    '                If Not ScenExist Then
-    '                    'get project name from database (use DBF in future?)
-    '                    myWat = myDB.OpenRecordset("WatershedData", dbOpenDynaset)
-    '                    crit = "ID = " & WatKeys(0)
-    '                    myWat.FindFirst(crit)
-    '                    WatName = myWat!Name
-    '                    myWat.Close()
-    '                    Call frmScn.BuildScn(WatName, " ", " ", UCIFile, " ", " ", " ", " ", " ", " ", _
-    '                                         "11.0", " ", " ", " ", " ", " ")
-    '                Else
-    '                    MsgBox("This Scenario exists in this project. Delete it first!")
-    '                End If
-    '            Else
-    '                MsgBox("Select one and only one Project to which this Scenario will be added.")
-    '            End If
-    'skip:       On Error GoTo 0
-    '        ElseIf Index = 1 Then 'delete
-    '            For i = 1 To agdScen.Rows
-    '                If agdScen.Selected(i, 0) Then
-    '                    Call frmScn.DeleteScenario(agdScen.ItemData(i))
-    '                End If
-    '            Next i
-    '        ElseIf Index = 2 Then 'view
-    '            Load(frmScn)
-    '        Else
-    '            MsgBox("Cant filter Scenarios yet!")
-    '        End If
-    '        Call RefreshScenario()
-
-    '    End Sub
-
-    '    Private Sub cmdSeg_Click(ByVal Index As Integer)
-    '        Dim i%, b As Boolean
-
-    '        If Index = 0 Then 'filter
-    '            If FiltInd <> 2 Then Call frmFilt.ClearFilters()
-    '            FiltInd = 2
-    '            Call frmFilt.InitFilters(agdSeg)
-    '            frmFilt.Show(1)
-    '        ElseIf Index = 1 Then 'view
-    '            MsgBox("Not Currently Implemented")
-    '        Else 'all or none
-    '            If Index = 2 Then 'all
-    '                b = True
-    '            Else
-    '                b = False
-    '            End If
-    '            For i = 1 To agdSeg.Rows
-    '                agdSeg.Selected(i, 1) = b
-    '            Next i
-    '            agdSeg_Click()
-    '        End If
-
-    '    End Sub
-
-    '    Private Sub cmdTab_Click()
-
-    '        If FiltInd <> 3 Then Call frmFilt.ClearFilters()
-    '        FiltInd = 3
-    '        Call frmFilt.InitFilters(agdTab)
-    '        frmFilt.Show(1)
-
-    '    End Sub
-
-    '    Private Sub Form_Terminate()
-
-    '        myDB.Close()
-
-    '    End Sub
-
     '    Private Sub Map1_SelectionChange(ByVal FeatureID As String, ByVal layer As Long, ByVal state As Boolean)
 
     '        '    Debug.Print "picked point " & FeatureID, layer, state
@@ -1169,58 +1040,6 @@ Public Class frmHSPFParm
 
     '        MousePointer = vbDefault
 
-    '    End Sub
-
-    '    Private Sub mnufile_Click(ByVal Index As Integer)
-    '        If Index = 0 Then
-    '            Unload(Me)
-    '        End If
-    '    End Sub
-
-    '    Private Sub mnuHelp_Click(ByVal Index As Integer)
-    '        If Index = 0 Then 'about
-    '            frmAbout.Show(vbModal)
-    '        ElseIf Index = 1 Then 'contents
-    '            'WinHelp Me.hwnd, App.HelpFile, HELP_FINDER, CLng(0)
-    '            OpenFile(App.HelpFile)
-    '        ElseIf Index = 2 Then 'debug
-    '            dbg.Show()
-    '        End If
-    '    End Sub
-
-    '    Private Sub mnuMain_Click(ByVal Index As Integer)
-    '        If Index = 5 Then
-    '            frmReport.Show()
-    '        End If
-    '    End Sub
-
-    '    Private Sub mnuProject_Click(ByVal Index As Integer)
-    '        With cmdProject
-    '            .DialogTitle = "HSPFParm File Open Project"
-    '            .CancelError = True
-    '            .flags = &H1804& 'not read only
-    '            .Filter = "Project files (*.Wat)|*.Wat"
-    '            On Error GoTo err
-    '            .ShowOpen()
-    '        End With
-    '        Call frmWat.AddWatFromFile(cmdProject.Filename, False)
-    'err:
-    '    End Sub
-
-    '    Private Sub mnuScen_Click(ByVal Index As Integer)
-    '        Call cmdScen_Click(Index)
-    '    End Sub
-
-    '    Private Sub mnuSeg_Click(ByVal Index As Integer)
-    '        Call cmdSeg_Click(Index)
-    '    End Sub
-
-    '    Private Sub mnuView_Click(ByVal Index As Integer)
-    '        If Index = 0 Then
-    '            frmView.Show()
-    '        Else
-    '            MsgBox("View Summary Not Yet Implemented", vbOKOnly, "View")
-    '        End If
     '    End Sub
 
     Private Sub agdWatershed_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdWatershed.MouseDownCell
@@ -1307,9 +1126,49 @@ Public Class frmHSPFParm
         For lCol As Integer = 0 To agdParameter.Source.Columns - 1
             agdParameter.Source.CellSelected(aRow, lCol) = True
         Next
-        Dim lParmId As Integer = agdParameter.Source.CellValue(aRow, 0)
+        Dim lParmId As Integer = pParmGridIDs(aRow - 1)
+        Dim lParmName As String = agdParameter.Source.CellValue(aRow, 0)
 
         Refresh()
-        ViewParms(lParmId)
+        ViewParms(lParmId, lParmName)
+    End Sub
+
+    Private Sub cmdWatershedDetails_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdWatershedDetails.Click
+        Logger.Msg("Watershed Details is not yet implemented.  This option will allow the user to view info about the current watershed.", MsgBoxStyle.OkOnly, "BASINS HSPFParm")
+    End Sub
+
+    Private Sub cmdScenarioDetails_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdScenarioDetails.Click
+        'Load(frmScn)
+        'RefreshScenario()
+    End Sub
+
+    Private Sub cmdFilterSegments_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdFilterSegments.Click
+        '            If FiltInd <> 2 Then Call frmFilt.ClearFilters()
+        '            FiltInd = 2
+        '            Call frmFilt.InitFilters(agdSeg)
+        '            frmFilt.Show(1)
+    End Sub
+
+    Private Sub cmdAllSegments_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAllSegments.Click
+        '            b = True
+        '            For i = 1 To agdSeg.Rows
+        '                agdSeg.Selected(i, 1) = b
+        '            Next i
+        '            agdSeg_Click()
+    End Sub
+
+    Private Sub cmdNoneSegments_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdNoneSegments.Click
+        '            b = False
+        '            For i = 1 To agdSeg.Rows
+        '                agdSeg.Selected(i, 1) = b
+        '            Next i
+        '            agdSeg_Click()
+    End Sub
+
+    Private Sub cmdTableFilter_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdTableFilter.Click
+        '        If FiltInd <> 3 Then Call frmFilt.ClearFilters()
+        '        FiltInd = 3
+        '        Call frmFilt.InitFilters(agdTab)
+        '        frmFilt.Show(1)
     End Sub
 End Class
