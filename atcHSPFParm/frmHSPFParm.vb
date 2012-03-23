@@ -10,7 +10,7 @@ Public Class frmHSPFParm
     Friend pTableGridIDs As atcCollection
     Friend pParmGridIDs As atcCollection
     Friend pSegmentGridIDs As atcCollection
-    <CLSCompliant(False)> Public Database As atcUCI.atcMDB
+    <CLSCompliant(False)> Public Database As atcUtility.atcMDB
 
 #Region " Windows Form Designer generated code "
 
@@ -636,7 +636,7 @@ Public Class frmHSPFParm
         agdValues.Refresh()
 
         'open the database here
-        Database = New atcUCI.atcMDB(aDBName)
+        Database = New atcUtility.atcMDB(aDBName)
     End Sub
 
     Private Sub frmModelSetup_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown

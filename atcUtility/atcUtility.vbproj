@@ -99,6 +99,7 @@
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing">
       <Name>System.Drawing</Name>
     </Reference>
@@ -123,6 +124,7 @@
     <Compile Include="atcDateFormat.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="atcMDB.vb" />
     <Compile Include="atcTable.vb">
       <SubType>Code</SubType>
     </Compile>
