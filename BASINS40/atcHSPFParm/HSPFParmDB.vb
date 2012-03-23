@@ -9,7 +9,7 @@ Imports MapWinUtility
 
 Public Class HSPFParmDB
     Public Name As String = ""
-    <CLSCompliant(False)> Public Database As atcUCI.atcMDB
+    <CLSCompliant(False)> Public Database As atcUtility.atcMDB
 
     Public Sub Open(ByVal aFilename As String)
         Name = aFilename
@@ -24,7 +24,7 @@ Public Class HSPFParmDB
             End If
         End If
 
-        'Database = New atcUCI.atcMDB(Name)
+        'Database = New atcUtility.atcMDB(Name)
 
         'Dim lTable As DataTable = Database.GetTable("ParmData")
         'Debug.Print("R:" & lTable.Rows.Count & " C:" & lTable.Columns.Count)

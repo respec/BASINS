@@ -51,7 +51,7 @@ Public Class HspfMsg
         End If
 
         'Logger.Dbg("Opening " & aFilename)
-        Dim lMsgMDb As New atcMDB(aFilename)
+        Dim lMsgMDb As New atcUtility.atcMDB(aFilename)
         Name = aFilename
 
         'Logger.Dbg("BlockDefns")
