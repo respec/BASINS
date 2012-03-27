@@ -788,11 +788,13 @@ Public Class frmHSPFParm
             .Rows = 1
             Dim lSelectedCount As Integer = 0
             For lSegRow As Integer = 1 To agdSegment.Source.Rows - 1
-                lSelectedCount += 1
-                If lSelectedCount = 1 Then
-                    lCrit = "SegID = " & pSegmentGridIDs(lSegRow - 1)
-                Else
-                    lCrit = lCrit & " OR SegID = " & pSegmentGridIDs(lSegRow - 1)
+                If agdSegment.Source.CellSelected(lSegRow, 0) Then 'list parameters for this segment
+                    lSelectedCount += 1
+                    If lSelectedCount = 1 Then
+                        lCrit = "SegID = " & pSegmentGridIDs(lSegRow - 1)
+                    Else
+                        lCrit = lCrit & " OR SegID = " & pSegmentGridIDs(lSegRow - 1)
+                    End If
                 End If
             Next
             If lSelectedCount > 0 Then
@@ -969,14 +971,16 @@ Public Class frmHSPFParm
                             .CellValue(.Rows - 1, 0) = Mid(agdSegment.Source.CellValue(lSegRow, 0), 7)
                             .CellValue(.Rows - 1, 1) = agdSegment.Source.CellValue(lSegRow, 2)
                             .CellValue(.Rows - 1, 2) = lTable.Rows(lRow).Item(6).ToString
-                            'If Len(Trim(lTable.Rows(lRow).Item(7).ToString)) > 0 Then
-                            '    FillInAlias(!Table, !Occur, !OpnTypID, !SegID, Alias, ColHeader)
-                            '    agdView.ColTitle(3) = ColHeader
-                            'Else
-                            '    Alias = ""
-                            'End If
-                            '.CellValue(.Rows - 1, 3) = Alias
-                            .CellValue(.Rows - 1, 4 + lRow) = lTable.Rows(lRow).Item(3).ToString
+                            Dim lAlias As String = ""
+                            Dim lColHeader As String = ""
+                            If Len(Trim(lTable.Rows(lRow).Item(7).ToString)) > 0 Then
+                                FillInAlias(lTable.Rows(lRow).Item(5).ToString, lTable.Rows(lRow).Item(6).ToString, lTable.Rows(lRow).Item(1).ToString, lTable.Rows(lRow).Item(0).ToString, lAlias, lColHeader)
+                                .CellValue(0, 3) = lColHeader
+                            Else
+                                lAlias = ""
+                            End If
+                            .CellValue(.Rows - 1, 3) = lAlias
+                            .CellValue(.Rows - 1, 4 + lRow) = lTable.Rows(lRow).Item(3).ToString   'problem here, need to add another row instead of more columns
                         Next
                     End If
                 End If
@@ -990,45 +994,58 @@ Public Class frmHSPFParm
 
     End Sub
 
-    '    Private Sub FillInAlias(ByVal Table$, ByVal Occur&, ByVal OpnTypID&, ByVal SegID&, ByVal Alias$, ByVal ColHeader$)
-    '        Dim crit$
-    '        Dim myParm As Recordset
+    Private Sub FillInAlias(ByVal aTableName As String, ByVal aOccur As Integer, ByVal aOpnTypID As Integer, ByVal aSegID As Integer, ByRef aAlias As String, ByRef aColHeader As String)
 
-    '    Alias = ""
-    '        crit = "Name = '" & Table & "' AND Occur = " & Occur & " AND OpnTypID = " & OpnTypID
-    '        myRec = myDB.OpenRecordset("TableAliasDefn", dbOpenDynaset)
-    '        With myRec
-    '            .FindFirst(crit)
-    '            If .NoMatch And Occur > 1 Then
-    '                crit = "Name = '" & Table & "' AND Occur = 1 AND OpnTypID = " & OpnTypID
-    '                .FindFirst(crit)
-    '            End If
-    '            If .NoMatch Then
-    '                MsgBox("NO ALIAS")
-    '        Alias = "?"
-    '            Else
-    '                If Len(Trim(!IDVarName)) > 0 Then
-    '                    myParm = myDB.OpenRecordset("ParmData", dbOpenDynaset)
-    '                    crit = "ParmID = " & myRec!IDVar & " AND SegID = " & SegID & " AND Occur = " & Occur
-    '                    myParm.FindFirst(crit)
-    '                    If Not myParm.NoMatch Then
-    '            Alias = myParm!Value & " "
-    '                    End If
-    '                    myParm.Close()
-    '                    ColHeader = !IDVarName
-    '                Else
-    '                    ColHeader = "Alias"
-    '                End If
-    '                If Len(Trim(!AppearName)) > 0 Then
-    '          Alias = Alias & !AppearName
-    '                End If
-    '                If Len(Trim(!SubsKeyName)) > 0 Then
-    '          Alias = Alias & " (see " & !SubsKeyName & " for this seg)"
-    '                End If
-    '            End If
-    '            .Close()
-    '        End With
-    '    End Sub
+        aAlias = ""
+        Dim lCrit As String = "Name = '" & aTableName & "' AND Occur = " & aOccur & " AND OpnTypID = " & aOpnTypID
+        Dim lStr As String = "SELECT DISTINCTROW TableAliasDefn.IDVar, " & _
+                                                "TableAliasDefn.IDVarName, " & _
+                                                "TableAliasDefn.AppearName, " & _
+                                                "TableAliasDefn.SubsKeyName " & _
+                                                "From TableAliasDefn " & _
+                                                "WHERE (" & lCrit & ")"
+        Dim lTable As DataTable = Database.GetTable(lStr)
+        If lTable.Rows.Count = 0 And aOccur > 1 Then
+            lCrit = "Name = '" & aTableName & "' AND Occur = 1 AND OpnTypID = " & aOpnTypID
+            lStr = "SELECT DISTINCTROW TableAliasDefn.IDVar, " & _
+                                      "TableAliasDefn.IDVarName, " & _
+                                      "TableAliasDefn.AppearName, " & _
+                                      "TableAliasDefn.SubsKeyName " & _
+                                      "From TableAliasDefn " & _
+                                      "WHERE (" & lCrit & ")"
+            lTable = Database.GetTable(lStr)
+        End If
+        If lTable.Rows.Count = 0 Then
+            MsgBox("NO ALIAS")
+            aAlias = "?"
+        Else
+            Dim lIDVar As String = lTable.Rows(0).Item(0).ToString
+            Dim lIDVarName As String = lTable.Rows(0).Item(1).ToString
+            Dim lAppearName As String = lTable.Rows(0).Item(2).ToString
+            Dim lSubsKeyName As String = lTable.Rows(0).Item(3).ToString
+
+            If Len(Trim(lIDVarName)) > 0 Then
+                lCrit = "ParmID = " & lIDVar & " AND SegID = " & aSegID & " AND Occur = " & aOccur
+                lStr = "SELECT DISTINCTROW ParmData.ParmID, " & _
+                                          "ParmData.Value " & _
+                                          "From ParmData " & _
+                                          "WHERE (" & lCrit & ")"
+                Dim lParmTable As DataTable = Database.GetTable(lStr)
+                If lParmTable.Rows.Count > 0 Then
+                    aAlias = lParmTable.Rows(0).Item(1).ToString & " "
+                End If
+                aColHeader = lIDVarName
+            Else
+                aColHeader = "Alias"
+            End If
+            If Len(Trim(lAppearName)) > 0 Then
+                aAlias = aAlias & lAppearName
+            End If
+            If Len(Trim(lSubsKeyName)) > 0 Then
+                aAlias = aAlias & " (see " & lSubsKeyName & " for this seg)"
+            End If
+        End If
+    End Sub
 
     '    Private Sub Map1_SelectionChange(ByVal FeatureID As String, ByVal layer As Long, ByVal state As Boolean)
 
@@ -1138,8 +1155,26 @@ Public Class frmHSPFParm
     End Sub
 
     Private Sub cmdScenarioDetails_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdScenarioDetails.Click
-        'Load(frmScn)
-        'RefreshScenario()
+        If agdScenario.Source.Rows < 2 Then
+            Logger.Msg("Select one or more watersheds." & vbCrLf & "Scenario Details are available for selected watersheds.", MsgBoxStyle.OkOnly, "BASINS HSPFParm")
+        Else
+            Dim lIDs As New atcCollection
+            Dim lFirstIndex As Integer = -1
+            Dim lCount As Integer = 0
+            With agdScenario.Source
+                For lRow As Integer = 1 To .Rows - 1
+                    lCount = lCount + 1
+                    lIDs.Add(.CellValue(lRow, 2))
+                    If .CellSelected(lRow, 0) And lFirstIndex < 0 Then
+                        lFirstIndex = lCount
+                    End If
+                Next
+            End With
+
+            Dim lfrmScenarioDetails As New frmScenarioDetails
+            lfrmScenarioDetails.InitializeUI(lIDs, lFirstIndex, Database)
+            lfrmScenarioDetails.Show()
+        End If
     End Sub
 
     Private Sub cmdFilterSegments_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdFilterSegments.Click
