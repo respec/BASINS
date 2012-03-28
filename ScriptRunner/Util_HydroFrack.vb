@@ -19,7 +19,7 @@ Imports Microsoft.Office.Interop
 
 Module Util_HydroFrack
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
-        Dim lTask As Integer = 9
+        Dim lTask As Integer = 10
         Select Case lTask
             Case 1 : ConstructHuc8BasedWaterUseFile() ''Task1. get huc8 based water use
             Case 2 : ClassifyWaterYearsForGraph()
@@ -31,11 +31,97 @@ Module Util_HydroFrack
             Case 81 : ConstructGCRPHspfSubbasinBasedWaterUseFile() 'Step1 of get subbasin based water use
             Case 82 : SumGCRPHspfSubbasinWateruse() 'Step2 of getting subbasin based water use
             Case 83 : BuildGCRPHspfSubbasinWaterUseTimeseries() 'Step3 of getting subbasin based wateruse into WDM
-            Case 9 : ExtractUserDefinedConstituents()
+            Case 9 : ExtractUserSpecifiedConstituents()
+            Case 10 : BuildHydroFrackingTimeseries()
         End Select
     End Sub
 
-    Private Sub ExtractUserDefinedConstituents()
+    Private Sub BuildHydroFrackingTimeseries()
+        'The hydro fracking water use is to be used on the water use 2005 scenario, which is considered as 'current' condition
+        Dim lHydroFrackingDataFile As String = "G:\Admin\GCRPSusq\2010_by_sector_47frackingwithdrawals_reprojected_withSubbasins.xls"
+        Dim lxlApp As New Excel.Application
+        Dim lxlWorkbook As Excel.Workbook = Nothing
+        Dim lxlSheet As Excel.Worksheet = Nothing
+
+        Dim lDateStart As Double = Date2J(1985, 1, 1, 0, 0, 0)
+        Dim lDateEnd As Double = Date2J(2005, 12, 31, 24, 0, 0)
+        Dim lTU As atcTimeUnit = atcTimeUnit.TUMonth
+
+        lxlWorkbook = lxlApp.Workbooks.Open(lHydroFrackingDataFile)
+        lxlSheet = lxlWorkbook.Worksheets(1)
+        Dim lColFlowCfs As Integer = 6
+        Dim lColSubbasin As Integer = 11
+        Dim lColBasinName As Integer = 12
+        Dim lHFWUs As New atcCollection
+        With lxlSheet 'there are only five columns, subbasinid, ps2000, osup2000, ps2005, osup2005 withdrawal in cfs
+            For lRow As Integer = 2 To .UsedRange.Rows.Count
+                Dim lKey As String = .Cells(lRow, lColBasinName).Value & "-" & .Cells(lRow, lColSubbasin).Value
+                If Not lHFWUs.Keys.Contains(lKey) Then
+                    lHFWUs.Add(lKey, Double.Parse(.Cells(lRow, lColFlowCfs).Value))
+                Else
+                    lHFWUs.ItemByKey(lKey) += Double.Parse(.Cells(lRow, lColFlowCfs).Value)
+                End If
+            Next
+        End With
+
+        lxlWorkbook.Close()
+        lxlApp.Quit()
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlSheet)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlWorkbook)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlApp)
+
+        lxlSheet = Nothing
+        lxlWorkbook = Nothing
+        lxlApp = Nothing
+
+        Dim lSusqTransWDM01 As atcWDM.atcDataSourceWDM = New atcWDM.atcDataSourceWDM()
+        If Not lSusqTransWDM01.Open("G:\Admin\GCRPSusq\RunsWithResvWU2005\parms\SusqTrans01.wdm") Then Exit Sub
+        Dim lSusqTransWDM02 As atcWDM.atcDataSourceWDM = New atcWDM.atcDataSourceWDM()
+        If Not lSusqTransWDM02.Open("G:\Admin\GCRPSusq\RunsWithResvWU2005\parms\SusqTrans02.wdm") Then Exit Sub
+        Dim lSusqTransWDM03 As atcWDM.atcDataSourceWDM = New atcWDM.atcDataSourceWDM()
+        If Not lSusqTransWDM03.Open("G:\Admin\GCRPSusq\RunsWithResvWU2005\parms\SusqTrans03.wdm") Then Exit Sub
+        Dim lSusqTransWDM As atcWDM.atcDataSourceWDM = Nothing
+        For Each lKey As String In lHFWUs.Keys
+            Dim m As Match = Regex.Match(lKey, "([0-9]+)\-([0-9]+)", RegexOptions.IgnoreCase)
+            If m.Success Then
+                Dim lSubbasinId As Integer = Integer.Parse(m.Groups(2).Value.Trim)
+                Dim lBasinName As String = m.Groups(1).Value.Trim
+
+                Dim lTsHFrack2005 As atcTimeseries = GCRPSubbasin.BuildWUTimeseries(atcTimeUnit.TUMonth, "HFRAC", 6000 + lSubbasinId, lHFWUs.ItemByKey(lKey), lDateStart, lDateEnd, "R:" & lSubbasinId, "HydroFracking")
+                lSusqTransWDM = Nothing
+                Select Case lBasinName
+                    Case "020501"
+                        lSusqTransWDM = lSusqTransWDM01
+                    Case "020502"
+                        lSusqTransWDM = lSusqTransWDM02
+                    Case "020503"
+                        lSusqTransWDM = lSusqTransWDM03
+                End Select
+
+                If lSusqTransWDM IsNot Nothing Then
+                    'Write Hydro fracking WU timeseries into this WDM
+                    If Not lSusqTransWDM.AddDataset(lTsHFrack2005, atcDataSource.EnumExistAction.ExistReplace) Then
+                        Logger.Dbg("Add lTsHFrack2005 failed.")
+                    End If
+                End If
+
+            End If
+        Next
+
+        'Clean up
+        lHFWUs.Clear()
+        lHFWUs = Nothing
+
+        lSusqTransWDM01.Clear()
+        lSusqTransWDM01 = Nothing
+        lSusqTransWDM02.Clear()
+        lSusqTransWDM02 = Nothing
+        lSusqTransWDM03.Clear()
+        lSusqTransWDM03 = Nothing
+        System.GC.Collect()
+    End Sub
+
+    Private Sub ExtractUserSpecifiedConstituents()
         'read the constituents from a user-defined configuration file
         'to retrieve from a HSPF simulation
         Dim lConfigFile As String = "G:\Admin\GCRPSusq\GetConstituentsWU2000.xml"
@@ -2726,7 +2812,14 @@ Module Util_HydroFrack
             Return lStr.TrimEnd(",")
         End Function
 
-        Public Shared Function BuildWUTimeseries(ByVal aTU As atcTimeUnit, ByVal aCon As String, ByVal aId As Integer, ByVal aWUValue As Double, ByVal aStartDate As Double, ByVal aEndDate As Double) As atcTimeseries
+        Public Shared Function BuildWUTimeseries(ByVal aTU As atcTimeUnit, _
+                                                 ByVal aCon As String, _
+                                                 ByVal aId As Integer, _
+                                                 ByVal aWUValue As Double, _
+                                                 ByVal aStartDate As Double, _
+                                                 ByVal aEndDate As Double, _
+                                                 Optional ByVal aLocation As String = "", _
+                                                 Optional ByVal aScenario As String = "") As atcTimeseries
 
             Dim lTsDates As New atcTimeseries(Nothing)
             lTsDates.Values = NewDates(aStartDate, aEndDate, aTU, 1)
@@ -2739,6 +2832,9 @@ Module Util_HydroFrack
                 .Attributes.SetValue("ID", aId)
                 .Attributes.SetValue("TSTYP", aCon)
                 .Attributes.SetValue("Constituent", aCon)
+
+                If aLocation <> "" Then .Attributes.SetValue("Location", aLocation)
+                If aScenario <> "" Then .Attributes.SetValue("Scenario", aScenario)
 
                 If aWUValue < 0 Then
                     Return Nothing
