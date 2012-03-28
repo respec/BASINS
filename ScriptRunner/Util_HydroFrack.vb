@@ -7,12 +7,15 @@ Imports System.IO
 Imports System.Text
 Imports System.Text.RegularExpressions
 Imports System.Collections.Specialized
+Imports System.Xml
+Imports System.Xml.Linq
 Imports atcMetCmp
 Imports atcData
 Imports atcWDM
 Imports atcGraph
 Imports ZedGraph
 Imports Microsoft.Office.Interop
+
 
 Module Util_HydroFrack
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
@@ -25,27 +28,270 @@ Module Util_HydroFrack
             Case 5 : ClassifyWaterYearsPrecipForGraph()
             Case 6 : ConstructFTableColumnTimeseries()
             Case 7 : ConstructErrorTable()
-            Case 8 : ConstructGCRPHspfSubbasinBasedWaterUseFile()
-            Case 9 : SumGCRPHspfSubbasinWateruse()
-                'Case 10 : BuildGCRPHspfSubbasinWaterUseTimeseries()
+            Case 81 : ConstructGCRPHspfSubbasinBasedWaterUseFile() 'Step1 of get subbasin based water use
+            Case 82 : SumGCRPHspfSubbasinWateruse() 'Step2 of getting subbasin based water use
+            Case 83 : BuildGCRPHspfSubbasinWaterUseTimeseries() 'Step3 of getting subbasin based wateruse into WDM
+            Case 9 : ExtractUserDefinedConstituents()
         End Select
     End Sub
 
+    Private Sub ExtractUserDefinedConstituents()
+        'read the constituents from a user-defined configuration file
+        'to retrieve from a HSPF simulation
+        Dim lConfigFile As String = "G:\Admin\GCRPSusq\GetConstituentsWU2000.xml"
+        lConfigFile = "G:\Admin\GCRPSusq\GetConstituentsWU2005.xml"
+
+        Dim lConfigXML As New Xml.XmlDocument()
+        lConfigXML.Load(lConfigFile)
+
+        Dim lReportHeader As New StringBuilder
+        Dim lReportStr As New StringBuilder
+        Dim lStartFolder As String = lConfigXML.DocumentElement("StartFolder").InnerText
+        Dim lContributingAreas As XmlElement = lConfigXML.DocumentElement("ContributingAreas")
+
+        Dim lSW As New StreamWriter(IO.Path.Combine(lStartFolder, "ReportUserSpecifiedOutput.txt"), False)
+
+        Dim lSimulations As XmlNodeList = lConfigXML.GetElementsByTagName("Simulation")
+        For Each lSimulation As XmlElement In lSimulations
+            Dim lName As String = lSimulation.FirstChild.InnerText
+            Dim lOperation As String = lSimulation.Item("Operation").InnerText
+            Dim lDatasetGroups As XmlNodeList = lSimulation.GetElementsByTagName("DataSets")
+            lReportStr.AppendLine(lName)
+            lReportHeader.Append("Constituent" & vbTab)
+            Dim lHeaderDone As Boolean = False
+            For Each lDatasetGroup As XmlElement In lDatasetGroups
+                Dim lConstituentCommon As String = lDatasetGroup.GetAttribute("Constituent")
+                If lConstituentCommon <> "" Then
+                    lReportStr.Append(lConstituentCommon & vbTab)
+                End If
+                For Each lDataset As XmlElement In lDatasetGroup.GetElementsByTagName("DataSet")
+                    Dim lId As Integer = 0
+                    Integer.TryParse(lDataset.GetAttribute("ID"), lId)
+                    Dim lDatasource As String = lDataset.GetAttribute("History")
+                    Dim lLocation As String = lDataset.GetAttribute("Location")
+                    Dim lConstituent As String = lDataset.GetAttribute("Constituent")
+                    Dim lCArea As Double = 0 'acre
+                    For Each lContributingArea As XmlElement In lContributingAreas.ChildNodes
+                        With lContributingArea
+                            If .GetAttribute("BasinName") = lName AndAlso .GetAttribute("Location") = lLocation Then
+                                lCArea = Double.Parse(.GetAttribute("Area"))
+                                Exit For
+                            End If
+                        End With
+                    Next
+
+                    Dim m As Match = Regex.Match(lDatasource, _
+                    "Read from {([A-Za-z0-9\-]+)}$", _
+                    RegexOptions.IgnoreCase)
+                    If (m.Success) Then
+                        Dim key As String = m.Groups(1).Value
+                        lDatasource = lConfigXML.DocumentElement(key).InnerText
+                        lDatasource = lDatasource.Replace("{StartFolder}", lStartFolder)
+                    End If
+
+                    If Not lHeaderDone Then lReportHeader.Append(lLocation & "_in" & vbTab & lLocation & "_ac-ft" & vbTab)
+                    Dim lDepth As Double = -99.9 'in
+                    Dim lVolume As Double = -99.9 'ac-ft
+                    If lDatasource.ToLower.Contains(".wdm") Then
+                        Dim lWDM As New atcWDM.atcDataSourceWDM
+                        If lWDM.Open(lDatasource) Then
+                            Dim lTs As atcTimeseries = lWDM.DataSets.FindData("ID", lId)(0)
+                            'Dim lMeanAnnual As Double = lTs.Attributes.GetValue(lOperation, -99.0)
+                            'special case adjustment for water use, which is actually the daily value
+                            Dim lMeanAnnual As Double = lTs.Attributes.GetValue("Mean", -99.0)
+                            'convert cf per year to ac-ft
+                            lVolume = lMeanAnnual * JulianYear * 24.0 * 60 * 60 / 43560.0
+                            lDepth = lVolume / lCArea * 12.0
+                        End If
+                        lWDM.Clear()
+                        lWDM = Nothing
+                    ElseIf lDatasource.ToLower.Contains(".uci") Then
+                        'Dim lMsg As New atcUCI.HspfMsg
+                        'lMsg.Open("hspfmsg.mdb")
+                        'Dim lHspfUci As New atcUCI.HspfUci
+                        'lHspfUci.FastReadUciForStarter(lMsg, lDatasource)
+
+                        If lConstituent.Contains("GENER") Then
+                            Dim lCFactorFlow As Double = 0.12787 'from uci *** 1 MGD = 0.12787 ac-ft/hr (flow)
+
+                            Dim lSRUci As New StreamReader(lDatasource)
+                            Dim lOneLine As String
+                            While Not lSRUci.EndOfStream
+                                lOneLine = lSRUci.ReadLine()
+                                Dim lDone As Boolean = False
+                                If lOneLine.StartsWith("NETWORK") Then
+                                    While Not lOneLine.StartsWith("END NETWORK")
+                                        lOneLine = lSRUci.ReadLine()
+                                        If lOneLine.StartsWith("GENER    1") Then
+                                            m = Regex.Match(lOneLine, _
+                                                            "SAME RCHRES(\s+[0-9]+\s+)INFLOW IVOL", _
+                                                            RegexOptions.IgnoreCase)
+                                            If (m.Success) Then
+                                                Dim lReach As String = m.Groups(1).Value.Trim()
+                                                If "R:" & lReach = lLocation Then
+                                                    Dim p As Match = Regex.Match(lOneLine, _
+                                                                                 "GENER    1 OUTPUT TIMSER(\s+[0-9\.]+\s+)SAME RCHRES", _
+                                                                                 RegexOptions.IgnoreCase)
+                                                    If p.Success Then
+                                                        If lVolume < 0 Then lVolume = 0
+                                                        If lDepth < 0 Then lDepth = 0
+                                                        Dim lThisVolume As Double = 0.0
+                                                        Dim lThisDepth As Double = 0.0
+                                                        If Double.TryParse(p.Groups(1).Value.Trim(), lThisVolume) Then
+                                                            lThisVolume *= lCFactorFlow 'convert from MGD to ac-ft/hr
+                                                            lThisVolume *= JulianYear * 24.0 'calculate annual total volume ac-ft
+                                                            lThisDepth = lThisVolume / lCArea * 12.0
+                                                            lVolume += lThisVolume
+                                                            lDepth += lThisDepth
+                                                        End If
+                                                    End If
+                                                End If
+                                            End If
+                                        End If
+                                    End While
+                                    Exit While 'after this block, simply quit
+                                End If
+                            End While
+                            lSRUci.Close()
+                            lSRUci = Nothing
+                        End If 'lConstituent.Contains("GENER")
+                    End If 'branch wdm vs uci data sources
+                    If lDepth > 0 AndAlso lVolume > 0 Then
+                        lReportStr.Append(DoubleToString(lDepth) & vbTab & DoubleToString(lVolume) & vbTab)
+                    Else
+                        lReportStr.Append("None" & vbTab & "None" & vbTab)
+                    End If
+                Next 'lDataset
+                If Not lHeaderDone Then
+                    lHeaderDone = True
+                    lReportHeader.AppendLine("")
+                End If
+                lReportStr.AppendLine("")
+            Next 'lDatasetGroup
+            lSW.WriteLine(lReportHeader.ToString)
+            lSW.WriteLine(lReportStr.ToString)
+            lSW.Flush()
+            lReportHeader.Length = 0
+            lReportStr.Length = 0
+        Next 'lSimulation
+
+        lConfigXML = Nothing
+        lSW.Close()
+        lSW = Nothing
+    End Sub
+
+    Private Function ContributingArea(ByVal axmlElement As XmlElement, ByVal aBasinName As String, ByVal aLocation As String) As Double
+        For Each lContributingArea As XmlElement In axmlElement.ChildNodes
+            With lContributingArea
+                If .GetAttribute("BasinName") = aBasinName AndAlso .GetAttribute("Location") = aLocation Then
+                    Return Double.Parse(.GetAttribute("Area"))
+                End If
+            End With
+        Next
+        Return 0
+    End Function
+
     Private Sub BuildGCRPHspfSubbasinWaterUseTimeseries()
-        'This routine is to be run after task 9 (SumGCRPHspfSubbasinWateruse) whose output is like, GCRP020503SubbasinWaterUse2000.txt
-        'that file is a comma-delimited subbasin and its water use in cfs listing
+        'This routine is to be run after task 82 (SumGCRPHspfSubbasinWateruse) whose output is like, GCRP020503SubbasinWaterUse2000.txt
+        'that file is a comma-delimited subbasin and its water use in cfs listing, e.g. GCRP020501SubbasinWaterUse20002005PSW_OSup.xls
+        'there are 3 files, one for each of the GCRP runs. In Each file, there are two sheets, 'WaterUse' and 'Note'. Use the WaterUse sheet
 
         'In this routine, we will build two timeseries for each subbasin, one for PS, the other for the rest
         'from 1/1/1985 to 12/31/2005, monthly timestep
+
+        'Schematic
+        'Within each GCRP run
+        '   For each subbasin
+        '     2 Water uses in 2 years
+        'So there will be 3 version of the parm\SusqTrans.wdm, one for each GCRP run
+        'dataset id naming convention is as follows
+        '2118 -> PWSup 2000
+        '3118 -> OSup 2000
+        '4118 -> PWSup 2005
+        '5118 -> OSup 2005
+
+        Dim lDirGCRPHspfSubbasinWaterUse As String = "G:\Admin\EPA_HydroFrac_HSPFEval\WaterUse\"
+
+        Dim lDateStart As Double = Date2J(1985, 1, 1, 0, 0, 0)
+        Dim lDateEnd As Double = Date2J(2005, 12, 31, 24, 0, 0)
+        Dim lTU As atcTimeUnit = atcTimeUnit.TUMonth
+
+        Dim lxlApp As New Excel.Application
+        Dim lxlWorkbook As Excel.Workbook = Nothing
+        Dim lxlSheet As Excel.Worksheet = Nothing
+
+        Dim lGCRPRunNames() As String = {"020501", "020502", "020503"}
+        Dim lTsPWSup2000 As atcTimeseries
+        Dim lTsOSup2000 As atcTimeseries
+        Dim lTsPWSup2005 As atcTimeseries
+        Dim lTsOSup2005 As atcTimeseries
+
+        For Each lGCRPRun As String In lGCRPRunNames
+
+            Dim lSusqTransWDMFilename As String = "G:\Admin\GCRPSusq\RunsWithResvWU2000\parms\SusqTrans" & lGCRPRun.Substring(4) & ".wdm"
+            Dim lSusqTransWDM As atcWDM.atcDataSourceWDM = New atcWDM.atcDataSourceWDM()
+            If Not lSusqTransWDM.Open(lSusqTransWDMFilename) Then Continue For
+
+            Dim lFileWU As String = lDirGCRPHspfSubbasinWaterUse & "GCRP" & lGCRPRun & "SubbasinWaterUse20002005PSW_OSup.xls"
+            lxlWorkbook = lxlApp.Workbooks.Open(lFileWU)
+            lxlSheet = lxlWorkbook.Worksheets("WaterUse")
+            With lxlSheet 'there are only five columns, subbasinid, ps2000, osup2000, ps2005, osup2005 withdrawal in cfs
+                For lRow As Integer = 2 To .UsedRange.Rows.Count
+                    Dim lSubbasinId As Integer = .Cells(lRow, 1).Value
+                    Dim lWUPWSup2000 As Double = .Cells(lRow, 2).Value
+                    Dim lWUOSup2000 As Double = .Cells(lRow, 3).Value
+                    Dim lWUPWSup2005 As Double = .Cells(lRow, 4).Value
+                    Dim lWUOSup2005 As Double = .Cells(lRow, 5).Value
+
+                    lTsPWSup2000 = GCRPSubbasin.BuildWUTimeseries(atcTimeUnit.TUMonth, "PWSUP", 2000 + lSubbasinId, lWUPWSup2000, lDateStart, lDateEnd)
+                    lTsOSup2000 = GCRPSubbasin.BuildWUTimeseries(atcTimeUnit.TUMonth, "OSUP", 3000 + lSubbasinId, lWUOSup2000, lDateStart, lDateEnd)
+                    lTsPWSup2005 = GCRPSubbasin.BuildWUTimeseries(atcTimeUnit.TUMonth, "PWSUP", 4000 + lSubbasinId, lWUPWSup2005, lDateStart, lDateEnd)
+                    lTsOSup2005 = GCRPSubbasin.BuildWUTimeseries(atcTimeUnit.TUMonth, "OSUP", 5000 + lSubbasinId, lWUOSup2005, lDateStart, lDateEnd)
+
+                    With lSusqTransWDM
+                        'Write WU timeseries into this WDM
+                        If Not .AddDataset(lTsPWSup2000, atcDataSource.EnumExistAction.ExistReplace) Then
+                            Logger.Dbg("Add lTsPWSup2000 failed.")
+                        End If
+                        If Not .AddDataset(lTsOSup2000, atcDataSource.EnumExistAction.ExistReplace) Then
+                            Logger.Dbg("Add lTsOSup2000 failed.")
+                        End If
+                        If Not .AddDataset(lTsPWSup2005, atcDataSource.EnumExistAction.ExistReplace) Then
+                            Logger.Dbg("Add lTsPWSup2005 failed.")
+                        End If
+                        If Not .AddDataset(lTsOSup2005, atcDataSource.EnumExistAction.ExistReplace) Then
+                            Logger.Dbg("Add lTsOSup2005 failed.")
+                        End If
+                    End With
+
+                Next 'lxlSheet lRow
+            End With 'lxlSheet
+
+            lSusqTransWDM.Clear()
+            lSusqTransWDM = Nothing
+            lxlWorkbook.Close()
+
+            System.GC.Collect()
+        Next 'lGCRPRun
+
+        lxlApp.Quit()
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlSheet)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlWorkbook)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlApp)
+
+        lxlSheet = Nothing
+        lxlWorkbook = Nothing
+        lxlApp = Nothing
 
     End Sub
 
     Private Sub SumGCRPHspfSubbasinWateruse()
         'This routine is to be run after task task 8 (whose output file is white-space delimited, e.g. GCRP020501byCountyWaterUse2000.txt)
         'basically, to sum up the various categories of wateruse for each subbasin
-        'the output file is comma-delimited (e.g. GCRP020501SubbasinWaterUse2000.txt)
+        'the output file is comma-delimited (e.g. GCRP020501SubbasinWaterUse2000.txt), unit is cfs (converted from task 8 output in Mgd)
         'water use categories and column order are the same as those in the excel files used in
         'task 8 (ConstructGCRPHspfSubbasinBasedWaterUseFile)
+
 
         Dim lDirGCRPHspfSubbasinWaterUse As String = "G:\Admin\EPA_HydroFrac_HSPFEval\WaterUse\"
         Dim lYears() As Integer = {2000, 2005}
@@ -67,7 +313,6 @@ Module Util_HydroFrack
                 While Not lSR.EndOfStream
                     line = lSR.ReadLine().Trim() 'The trim is important so as to remove the last delim char
                     lArr = Regex.Split(line, "\s+")
-
                     If Not IsNumeric(lArr(2)) Then
                         lHeaderText = "Subbasins,"
                         For H As Integer = lWUValueStartingColIndex To lArr.Length - 1
@@ -122,7 +367,7 @@ Module Util_HydroFrack
 
         'The wateruse excel files are the source of raw water use data
         'they MUST have the SAME set of wateruse categories in the SAME COLUMN ORDER
-        'this same set in the same order is going to be used by task 9 (SumGCRPHspfSubbasinWateruse)
+        'this same set in the same order is going to be used by task 82 (SumGCRPHspfSubbasinWateruse)
         'mdco2000SelectedWU.xls 'selected original wateruse data 
         'mdco2005SelectedWU.xls
 
@@ -418,7 +663,7 @@ Module Util_HydroFrack
                                 End If
 
                                 lValue = .Cells(lRow, lDataElements(I)).Value * lAreaFraction * lCuPctValue / 100.0
-                                lLinebuilder.Append(DoubleToString(lValue) & " ")
+                                lLinebuilder.Append(DoubleToString(lValue).Replace(",", "") & " ")
                             Next
                             Exit For
                         End If
@@ -462,12 +707,13 @@ Module Util_HydroFrack
     End Sub
 
     Private Sub ConstructErrorTable()
-        Dim lRunDir As String = "G:\Admin\GCRPSusq\ReportsWithReservoirs\"
+
         Dim lReports As New atcCollection()
         With lReports
             .Add("_Susq020501_", "R69 (Susq020501),Susquehanna River at Danville PA,USGS01540500")
             .Add("_Susq020502_", "R43 (Susq020502),West Branch Susquehanna River at Lewisburg PA,USGS01553500")
             .Add("_Susq020503_", "R86 (Susq020503),Susquehanna River at Marietta PA,USGS01576000")
+            .Add("_SusqCalib_", "R10 (Susq02050303),Raystown Branch Juniata River at Saxton PA,USGS01562000")
         End With
 
         Dim lAreas As New atcCollection() 'acres
@@ -475,6 +721,7 @@ Module Util_HydroFrack
             .Add("_Susq020501_", 7186006)
             .Add("_Susq020502_", 4384719)
             .Add("_Susq020503_", 16554811)
+            .Add("_SusqCalib_", 479637.9)
         End With
 
         Dim lFlowsDepthObs As New atcCollection() 'inch
@@ -482,15 +729,25 @@ Module Util_HydroFrack
             .Add("_Susq020501_", 19.68)
             .Add("_Susq020502_", 21.74)
             .Add("_Susq020503_", 20.23)
+            .Add("_SusqCalib_", 17.59)
         End With
 
-        Dim lRoot As New DirectoryInfo("G:\Admin\GCRPSusq\ReportsWithReservoirs\")
+        'Dim lRoot As New DirectoryInfo("G:\Admin\HF_CBP\Reports\")
+        'Important Note: the CBP results are not from run, but from swapping in their 
+        'results into GCRP Run resulting output WDM file and proceed to do a report
+        'the simulation total runoff results are from the Expert output file,
+        'NOT from the multi-basin balance output file!!!
+
+        Dim lRoot As New DirectoryInfo("G:\Admin\GCRPSusq\Reports\")
+        'Dim lRoot As New DirectoryInfo("G:\Admin\GCRPSusq\ReportsWithReservoirs\")
+        'Dim lRoot As New DirectoryInfo("G:\Admin\GCRPSusq\ReportsWithReservoirsWithWU2000\")
+        'Dim lRoot As New DirectoryInfo("G:\Admin\GCRPSusq\ReportsWithReservoirsWithWU2005\")
 
         Dim lFiles As FileInfo() = lRoot.GetFiles("*.*")
         Dim lDirs As DirectoryInfo() = lRoot.GetDirectories("*.*")
 
         'Console.WriteLine("Root Directories")
-        Dim lErrorFileName As String = lRunDir & "ErrorTable.txt"
+        Dim lErrorFileName As String = lRoot.FullName & "ErrorTable.txt"
         Dim lSW As New StreamWriter(lErrorFileName, False)
 
         Dim lDirectoryName As DirectoryInfo
@@ -514,6 +771,11 @@ Module Util_HydroFrack
                 lReportMultBalanceBasinsPath = "Water_Susq020503_Mult_BalanceBasin.txt"
                 lReportDailyMonthly = "DailyMonthlyFlowStats-RCH86.txt"
                 lReportExpertSys = "ExpertSysStats-susq020503.txt"
+            ElseIf lDirectoryName.FullName.Contains("_SusqCalib_") Then
+                lKey = "_SusqCalib_"
+                lReportMultBalanceBasinsPath = "Water_SusqCalib_Mult_BalanceBasin.txt"
+                lReportDailyMonthly = "DailyMonthlyFlowStats-RCH10.txt"
+                lReportExpertSys = "ExpertSysStats-susqcalib.txt"
             End If
 
             lSW.Write(lReports.ItemByKey(lKey) & ",")
@@ -532,9 +794,9 @@ Module Util_HydroFrack
             lSR.Close()
             lSR = Nothing
 
-            lSW.Write(String.Format("{0:0.00}", lDepth) & "," & lFlowsDepthObs.ItemByKey(lKey) & ",")
+            lSW.Write(DoubleToString(lDepth).Replace(",", "") & "," & lFlowsDepthObs.ItemByKey(lKey) & ",")
             Dim lPctChange As Double = (lDepth - lFlowsDepthObs.ItemByKey(lKey)) / lFlowsDepthObs.ItemByKey(lKey) * 100
-            lSW.Write(String.Format("{0:0.00}", lPctChange) & ",")
+            lSW.Write(DoubleToString(lPctChange).Replace(",", "") & ",")
 
             lSR = New StreamReader(IO.Path.Combine(lDirectoryName.FullName, lReportDailyMonthly))
             Dim lDailyR As Double
@@ -576,8 +838,8 @@ Module Util_HydroFrack
             lSR.Close()
             lSR = Nothing
 
-            lSW.Write(String.Format("{0:0.00}", lDailyR) & "," & String.Format("{0:0.00}", lDailyR2) & ",")
-            lSW.Write(String.Format("{0:0.00}", lMonthlyR) & "," & String.Format("{0:0.00}", lMonthlyR2) & ",")
+            lSW.Write(DoubleToString(lDailyR).Replace(",", "") & "," & DoubleToString(lDailyR2).Replace(",", "") & ",")
+            lSW.Write(DoubleToString(lMonthlyR).Replace(",", "") & "," & DoubleToString(lMonthlyR2).Replace(",", "") & ",")
 
             lSR = New StreamReader(IO.Path.Combine(lDirectoryName.FullName, lReportExpertSys))
             Dim lPctPeakDiff As Double
@@ -593,8 +855,8 @@ Module Util_HydroFrack
             lSR.Close()
             lSR = Nothing
 
-            lSW.Write(String.Format("{0:0.00}", lPctPeakDiff) & ",")
-            lSW.WriteLine(String.Format("{0:0.00}", lDailyNSE) & "," & String.Format("{0:0.00}", lMonthlyNSE))
+            lSW.Write(DoubleToString(lPctPeakDiff).Replace(",", "") & ",")
+            lSW.WriteLine(DoubleToString(lDailyNSE).Replace(",", "") & "," & DoubleToString(lMonthlyNSE).Replace(",", ""))
             lSW.Flush()
         Next
 
@@ -2046,6 +2308,8 @@ Module Util_HydroFrack
     Private Sub DurationPlotGCRPvsCBP()
         Dim lWDMDirGCRP As String = "G:\Admin\GCRPSusq\Runs\"
         Dim lWDMDirGCRPWithReservoir As String = "G:\Admin\GCRPSusq\RunsWithReservoirs\"
+        Dim lWDMDirGCRPWithResvWithWU2000 As String = "G:\Admin\GCRPSusq\RunsWithResvWU2000\"
+        Dim lWDMDirGCRPWithResvWithWU2005 As String = "G:\Admin\GCRPSusq\RunsWithResvWU2005\"
         Dim lWDMDirCBP As String = "G:\Admin\HF_CBP\Runs\"
         Dim lGraphDir As String = "G:\Admin\EPA_HydroFrac_HSPFEval\Graphs\"
 
@@ -2067,6 +2331,8 @@ Module Util_HydroFrack
 
         Dim lWDMGCRP As atcWDM.atcDataSourceWDM = Nothing
         Dim lWDMGCRPWithResv As atcWDM.atcDataSourceWDM = Nothing
+        Dim lWDMGCRPWithResvWU2000 As atcWDM.atcDataSourceWDM = Nothing
+        Dim lWDMGCRPWithResvWU2005 As atcWDM.atcDataSourceWDM = Nothing
         Dim lWDMCBP As atcWDM.atcDataSourceWDM = Nothing
 
         Dim lTsObsFlowIn As atcTimeseries
@@ -2075,6 +2341,10 @@ Module Util_HydroFrack
         Dim lTsSimFlowGCRPCfs As atcTimeseries
         Dim lTsSimFlowGCRPWithResvIn As atcTimeseries
         Dim lTsSimFlowGCRPWithResvCfs As atcTimeseries
+        Dim lTsSimFlowGCRPWithResvWU2000In As atcTimeseries
+        Dim lTsSimFlowGCRPWithResvWU2000Cfs As atcTimeseries
+        Dim lTsSimFlowGCRPWithResvWU2005In As atcTimeseries
+        Dim lTsSimFlowGCRPWithResvWU2005Cfs As atcTimeseries
         Dim lTsSimFlowCBPIn As atcTimeseries
         Dim lTsSimFlowCBPCfs As atcTimeseries
         Dim lDsnObsFlow As Integer = 1 'cfs-daily
@@ -2097,6 +2367,25 @@ Module Util_HydroFrack
                     lWDMCBP.Clear() : lWDMCBP = Nothing
                     lWDMGCRP.Clear() : lWDMGCRP = Nothing
                     lWDMGCRPWithResv.Clear() : lWDMGCRPWithResv = Nothing
+                    Continue For
+                End If
+
+                lWDMGCRPWithResvWU2000 = New atcWDM.atcDataSourceWDM()
+                If Not lWDMGCRPWithResvWU2000.Open(lWDMDirGCRPWithResvWithWU2000 & lRun & ".wdm") Then
+                    lWDMCBP.Clear() : lWDMCBP = Nothing
+                    lWDMGCRP.Clear() : lWDMGCRP = Nothing
+                    lWDMGCRPWithResv.Clear() : lWDMGCRPWithResv = Nothing
+                    lWDMGCRPWithResvWU2000.Clear() : lWDMGCRPWithResvWU2000 = Nothing
+                    Continue For
+                End If
+
+                lWDMGCRPWithResvWU2005 = New atcWDM.atcDataSourceWDM()
+                If Not lWDMGCRPWithResvWU2005.Open(lWDMDirGCRPWithResvWithWU2005 & lRun & ".wdm") Then
+                    lWDMCBP.Clear() : lWDMCBP = Nothing
+                    lWDMGCRP.Clear() : lWDMGCRP = Nothing
+                    lWDMGCRPWithResv.Clear() : lWDMGCRPWithResv = Nothing
+                    lWDMGCRPWithResvWU2000.Clear() : lWDMGCRPWithResvWU2000 = Nothing
+                    lWDMGCRPWithResvWU2005.Clear() : lWDMGCRPWithResvWU2005 = Nothing
                     Continue For
                 End If
             End If
@@ -2142,6 +2431,28 @@ Module Util_HydroFrack
                 .SetValue("Scenario", "GCRPWithReservoir")
             End With
 
+            lTsSimFlowGCRPWithResvWU2000In = SubsetByDate(lWDMGCRPWithResvWU2000.DataSets.ItemByKey(lDsnSimFlow), lDateStart, lDateEnd, Nothing)
+            lTsSimFlowGCRPWithResvWU2000In.Attributes.SetValue("Units", "Flow (inches)")
+            lTsSimFlowGCRPWithResvWU2000In.Attributes.SetValue("YAxis", "Left")
+
+            lTsSimFlowGCRPWithResvWU2000Cfs = InchesToCfs(lTsSimFlowGCRPWithResvWU2000In, lArea)
+            With lTsSimFlowGCRPWithResvWU2000Cfs.Attributes
+                .SetValue("Units", "Flow (cfs)")
+                .SetValue("YAxis", "Left")
+                .SetValue("Scenario", "GCRPWithResvWU2000")
+            End With
+
+            lTsSimFlowGCRPWithResvWU2005In = SubsetByDate(lWDMGCRPWithResvWU2005.DataSets.ItemByKey(lDsnSimFlow), lDateStart, lDateEnd, Nothing)
+            lTsSimFlowGCRPWithResvWU2005In.Attributes.SetValue("Units", "Flow (inches)")
+            lTsSimFlowGCRPWithResvWU2005In.Attributes.SetValue("YAxis", "Left")
+
+            lTsSimFlowGCRPWithResvWU2005Cfs = InchesToCfs(lTsSimFlowGCRPWithResvWU2005In, lArea)
+            With lTsSimFlowGCRPWithResvWU2005Cfs.Attributes
+                .SetValue("Units", "Flow (cfs)")
+                .SetValue("YAxis", "Left")
+                .SetValue("Scenario", "GCRPWithResvWU2005")
+            End With
+
             lTsSimFlowCBPIn = SubsetByDate(lWDMCBP.DataSets.ItemByKey(lDsnSimFlow), lDateStart, lDateEnd, Nothing)
             lTsSimFlowCBPIn.Attributes.SetValue("Units", "Flow (inches)")
             lTsSimFlowCBPIn.Attributes.SetValue("YAxis", "Left")
@@ -2155,9 +2466,11 @@ Module Util_HydroFrack
 
             Dim lTsGroup As New atcTimeseriesGroup
             lTsGroup.Add(lTsObsFlowCfs)
+            lTsGroup.Add(lTsSimFlowCBPCfs)
             lTsGroup.Add(lTsSimFlowGCRPCfs)
             lTsGroup.Add(lTsSimFlowGCRPWithResvCfs)
-            lTsGroup.Add(lTsSimFlowCBPCfs)
+            lTsGroup.Add(lTsSimFlowGCRPWithResvWU2000Cfs)
+            lTsGroup.Add(lTsSimFlowGCRPWithResvWU2005Cfs)
 
             Dim lSaveIn As String = lGraphDir & lRun & "_" & lNickName & ".png"
             If IO.File.Exists(lSaveIn) Then
@@ -2168,14 +2481,21 @@ Module Util_HydroFrack
             'clean up
             lWDMGCRP.Clear() : lWDMGCRP = Nothing
             lWDMGCRPWithResv.Clear() : lWDMGCRPWithResv = Nothing
+            lWDMGCRPWithResvWU2000.Clear() : lWDMGCRPWithResvWU2000 = Nothing
+            lWDMGCRPWithResvWU2005.Clear() : lWDMGCRPWithResvWU2005 = Nothing
             lWDMCBP.Clear() : lWDMCBP = Nothing
             lTsObsFlowCfs.Clear()
             lTsSimFlowGCRPCfs.Clear()
             lTsSimFlowGCRPWithResvCfs.Clear()
+            lTsSimFlowGCRPWithResvWU2000Cfs.Clear()
+            lTsSimFlowGCRPWithResvWU2005Cfs.Clear()
+
             lTsSimFlowCBPCfs.Clear()
             lTsSimFlowCBPIn.Clear()
             lTsSimFlowGCRPIn.Clear()
             lTsSimFlowGCRPWithResvIn.Clear()
+            lTsSimFlowGCRPWithResvWU2000In.Clear()
+            lTsSimFlowGCRPWithResvWU2005In.Clear()
         Next
 
         Logger.Dbg("Done graphing duration plots of GCRP vs CBP vs observed flow in CFS.")
@@ -2350,6 +2670,7 @@ Module Util_HydroFrack
             Subbasins.Clear()
         End Sub
     End Class
+
     Public Class GCRPSubbasin
         Public SubbasinId As Integer
         Public WUYear As Integer
@@ -2357,6 +2678,10 @@ Module Util_HydroFrack
         Public WUAreaList As atcCollection
         Public WaterUses2000 As atcCollection
         Public WaterUses2005 As atcCollection
+        'Public WUPWSup2000 As Double
+        'Public WUPWSup2005 As Double
+        'Public WUOSup2000 As Double
+        'Public WUOSup2005 As Double
 
         Public Property NumWUs() As Integer
             Get
@@ -2395,10 +2720,37 @@ Module Util_HydroFrack
 
             Dim lStr As String = SubbasinId.ToString & ","
             For I As Integer = 0 To lWUs.Count - 1
-                lStr &= DoubleToString(lWUs.ItemByIndex(I)) & ","
+                lStr &= DoubleToString(lWUs.ItemByIndex(I)).Replace(",", "") & ","
             Next
 
             Return lStr.TrimEnd(",")
+        End Function
+
+        Public Shared Function BuildWUTimeseries(ByVal aTU As atcTimeUnit, ByVal aCon As String, ByVal aId As Integer, ByVal aWUValue As Double, ByVal aStartDate As Double, ByVal aEndDate As Double) As atcTimeseries
+
+            Dim lTsDates As New atcTimeseries(Nothing)
+            lTsDates.Values = NewDates(aStartDate, aEndDate, aTU, 1)
+
+            Dim lTs As New atcTimeseries(Nothing)
+            With lTs
+                .Dates = lTsDates
+                .numValues = .Dates.numValues
+                .SetInterval(aTU, 1)
+                .Attributes.SetValue("ID", aId)
+                .Attributes.SetValue("TSTYP", aCon)
+                .Attributes.SetValue("Constituent", aCon)
+
+                If aWUValue < 0 Then
+                    Return Nothing
+                End If
+
+                .Value(0) = GetNaN()
+                For I As Integer = 1 To .numValues
+                    .Value(I) = aWUValue
+                Next
+            End With
+
+            Return lTs
         End Function
 
         Public Sub Clear()
