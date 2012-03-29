@@ -862,20 +862,22 @@ Public Class frmHSPFParm
                                                             "WHERE (" & lCrit & ")"
                     Dim lTable As DataTable = Database.GetTable(lStr)
                     If lTable.Rows.Count > 0 Then
-                        .Rows += 1
                         For lRow As Integer = 0 To lTable.Rows.Count - 1
+                            .Rows += 1
                             .CellValue(.Rows - 1, 0) = lTable.Rows(lRow).Item(2).ToString
                             .CellValue(.Rows - 1, 1) = lTable.Rows(lRow).Item(4).ToString
                             .CellValue(.Rows - 1, 2) = agdSegment.Source.CellValue(lSegRow, 0)
                             .CellValue(.Rows - 1, 3) = agdSegment.Source.CellValue(lSegRow, 2)
                             .CellValue(.Rows - 1, 4) = lTable.Rows(lRow).Item(6).ToString
-                            'If Len(Trim(lTable.Rows(lRow).Item(7).ToString)) > 0 Then
-                            '    FillInAlias(!Table, !Occur, !OpnTypID, !SegID, Alias, ColHeader)
-                            '    agdView.ColTitle(5) = ColHeader
-                            'Else
-                            '    Alias = ""
-                            'End If
-                            '.CellValue(.Rows - 1, 5) = Alias
+                            Dim lAlias As String = ""
+                            Dim lColHeader As String = ""
+                            If Len(Trim(lTable.Rows(lRow).Item(7).ToString)) > 0 Then
+                                FillInAlias(lTable.Rows(lRow).Item(5).ToString, lTable.Rows(lRow).Item(6).ToString, lTable.Rows(lRow).Item(1).ToString, lTable.Rows(lRow).Item(0).ToString, lAlias, lColHeader)
+                                .CellValue(0, 5) = lColHeader
+                            Else
+                                lAlias = ""
+                            End If
+                            .CellValue(.Rows - 1, 5) = lAlias
                         Next
                     End If
                 End If
@@ -953,36 +955,52 @@ Public Class frmHSPFParm
                 If agdSegment.Source.CellSelected(lSegRow, 0) Then 'list tables for this segment
                     lSegCrit = " SegID = " & pSegmentGridIDs(lSegRow - 1)
                     lCrit = lTableCrit & " AND " & lSegCrit
-                    'now populate table values
+                    'find max occurrances 
                     lStr = "SELECT DISTINCTROW ParmTableData.SegID, " & _
-                                              "ParmTableData.OpnTypID, " & _
-                                              "ParmTableData.Name, " & _
-                                              "ParmTableData.Value, " & _
-                                              "ParmTableData.ParmID, " & _
-                                              "ParmTableData.Table, " & _
-                                              "ParmTableData.Occur, " & _
-                                              "ParmTabledata.AliasInfo " & _
+                                              "ParmTableData.Occur " & _
                                               "From ParmTableData " & _
                                               "WHERE (" & lCrit & ")"
+                    Dim lMaxOccur As Integer = 1
                     lTable = Database.GetTable(lStr)
-                    If lTable.Rows.Count > 0 Then
-                        .Rows += 1
-                        For lRow As Integer = 0 To lTable.Rows.Count - 1
-                            .CellValue(.Rows - 1, 0) = Mid(agdSegment.Source.CellValue(lSegRow, 0), 7)
-                            .CellValue(.Rows - 1, 1) = agdSegment.Source.CellValue(lSegRow, 2)
-                            .CellValue(.Rows - 1, 2) = lTable.Rows(lRow).Item(6).ToString
-                            Dim lAlias As String = ""
-                            Dim lColHeader As String = ""
-                            If Len(Trim(lTable.Rows(lRow).Item(7).ToString)) > 0 Then
-                                FillInAlias(lTable.Rows(lRow).Item(5).ToString, lTable.Rows(lRow).Item(6).ToString, lTable.Rows(lRow).Item(1).ToString, lTable.Rows(lRow).Item(0).ToString, lAlias, lColHeader)
-                                .CellValue(0, 3) = lColHeader
-                            Else
-                                lAlias = ""
-                            End If
-                            .CellValue(.Rows - 1, 3) = lAlias
-                            .CellValue(.Rows - 1, 4 + lRow) = lTable.Rows(lRow).Item(3).ToString   'problem here, need to add another row instead of more columns
-                        Next
-                    End If
+                    For lRow As Integer = 0 To lTable.Rows.Count - 1
+                        If lTable.Rows(lRow).Item(1) > lMaxOccur Then
+                            lMaxOccur = lTable.Rows(lRow).Item(1)
+                        End If
+                    Next
+                    For lOccur As Integer = 1 To lMaxOccur
+                        Dim lOccurCrit As String = " Occur = " & lOccur.ToString
+                        lCrit = lTableCrit & " AND " & lSegCrit & " AND " & lOccurCrit
+                        'now populate table values
+                        lStr = "SELECT DISTINCTROW ParmTableData.SegID, " & _
+                                                  "ParmTableData.OpnTypID, " & _
+                                                  "ParmTableData.Name, " & _
+                                                  "ParmTableData.Value, " & _
+                                                  "ParmTableData.ParmID, " & _
+                                                  "ParmTableData.Table, " & _
+                                                  "ParmTableData.Occur, " & _
+                                                  "ParmTabledata.AliasInfo " & _
+                                                  "From ParmTableData " & _
+                                                  "WHERE (" & lCrit & ")"
+                        lTable = Database.GetTable(lStr)
+                        If lTable.Rows.Count > 0 Then
+                            .Rows += 1
+                            For lRow As Integer = 0 To lTable.Rows.Count - 1
+                                .CellValue(.Rows - 1, 0) = Mid(agdSegment.Source.CellValue(lSegRow, 0), 7)
+                                .CellValue(.Rows - 1, 1) = agdSegment.Source.CellValue(lSegRow, 2)
+                                .CellValue(.Rows - 1, 2) = lTable.Rows(lRow).Item(6).ToString
+                                Dim lAlias As String = ""
+                                Dim lColHeader As String = ""
+                                If Len(Trim(lTable.Rows(lRow).Item(7).ToString)) > 0 Then
+                                    FillInAlias(lTable.Rows(lRow).Item(5).ToString, lTable.Rows(lRow).Item(6).ToString, lTable.Rows(lRow).Item(1).ToString, lTable.Rows(lRow).Item(0).ToString, lAlias, lColHeader)
+                                    .CellValue(0, 3) = lColHeader
+                                Else
+                                    lAlias = ""
+                                End If
+                                .CellValue(.Rows - 1, 3) = lAlias
+                                .CellValue(.Rows - 1, 4 + lRow) = lTable.Rows(lRow).Item(3).ToString   'problem here, need to add another row instead of more columns
+                            Next
+                        End If
+                    Next
                 End If
             Next
         End With
@@ -1060,40 +1078,46 @@ Public Class frmHSPFParm
     '    End Sub
 
     Private Sub agdWatershed_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdWatershed.MouseDownCell
-        For lCol As Integer = 0 To agdWatershed.Source.Columns - 1
-            If Not agdWatershed.Source.CellSelected(aRow, lCol) Then
-                agdWatershed.Source.CellSelected(aRow, lCol) = True
-            Else
-                agdWatershed.Source.CellSelected(aRow, lCol) = False
-            End If
-        Next
-        Refresh()
-        RefreshScenario()
+        If aRow > 0 Then
+            For lCol As Integer = 0 To agdWatershed.Source.Columns - 1
+                If Not agdWatershed.Source.CellSelected(aRow, lCol) Then
+                    agdWatershed.Source.CellSelected(aRow, lCol) = True
+                Else
+                    agdWatershed.Source.CellSelected(aRow, lCol) = False
+                End If
+            Next
+            Refresh()
+            RefreshScenario()
+        End If
     End Sub
 
     Private Sub agdScenario_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdScenario.MouseDownCell
-        For lCol As Integer = 0 To agdScenario.Source.Columns - 1
-            If Not agdScenario.Source.CellSelected(aRow, lCol) Then
-                agdScenario.Source.CellSelected(aRow, lCol) = True
-            Else
-                agdScenario.Source.CellSelected(aRow, lCol) = False
-            End If
-        Next
-        Refresh()
-        RefreshSegment()
+        If aRow > 0 Then
+            For lCol As Integer = 0 To agdScenario.Source.Columns - 1
+                If Not agdScenario.Source.CellSelected(aRow, lCol) Then
+                    agdScenario.Source.CellSelected(aRow, lCol) = True
+                Else
+                    agdScenario.Source.CellSelected(aRow, lCol) = False
+                End If
+            Next
+            Refresh()
+            RefreshSegment()
+        End If
     End Sub
 
     Private Sub agdSegment_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdSegment.MouseDownCell
-        For lCol As Integer = 0 To agdSegment.Source.Columns - 1
-            If Not agdSegment.Source.CellSelected(aRow, lCol) Then
-                agdSegment.Source.CellSelected(aRow, lCol) = True
-            Else
-                agdSegment.Source.CellSelected(aRow, lCol) = False
-            End If
-        Next
-        Refresh()
-        RefreshTable()
-        RefreshParm()
+        If aRow > 0 Then
+            For lCol As Integer = 0 To agdSegment.Source.Columns - 1
+                If Not agdSegment.Source.CellSelected(aRow, lCol) Then
+                    agdSegment.Source.CellSelected(aRow, lCol) = True
+                Else
+                    agdSegment.Source.CellSelected(aRow, lCol) = False
+                End If
+            Next
+            Refresh()
+            RefreshTable()
+            RefreshParm()
+        End If
     End Sub
 
     Private Sub rbnTables_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles rbnTables.CheckedChanged
@@ -1117,37 +1141,41 @@ Public Class frmHSPFParm
     End Sub
 
     Private Sub agdTable_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdTable.MouseDownCell
-        'unselect everything first
-        For lRow As Integer = 0 To agdTable.Source.Rows - 1
-            For lCol As Integer = 0 To agdTable.Source.Columns - 1
-                agdTable.Source.CellSelected(lRow, lCol) = False
+        If aRow > 0 Then
+            'unselect everything first
+            For lRow As Integer = 0 To agdTable.Source.Rows - 1
+                For lCol As Integer = 0 To agdTable.Source.Columns - 1
+                    agdTable.Source.CellSelected(lRow, lCol) = False
+                Next
             Next
-        Next
-        For lCol As Integer = 0 To agdTable.Source.Columns - 1
-            agdTable.Source.CellSelected(aRow, lCol) = True
-        Next
-        Dim lTableId As Integer = pTableGridIDs(aRow - 1)
-        Dim lTableName As String = agdTable.Source.CellValue(aRow, 0)
+            For lCol As Integer = 0 To agdTable.Source.Columns - 1
+                agdTable.Source.CellSelected(aRow, lCol) = True
+            Next
+            Dim lTableId As Integer = pTableGridIDs(aRow - 1)
+            Dim lTableName As String = agdTable.Source.CellValue(aRow, 0)
 
-        Refresh()
-        ViewTable(lTableId, lTableName)
+            Refresh()
+            ViewTable(lTableId, lTableName)
+        End If
     End Sub
 
     Private Sub agdParameter_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdParameter.MouseDownCell
-        'unselect everything first
-        For lRow As Integer = 0 To agdParameter.Source.Rows - 1
-            For lCol As Integer = 0 To agdParameter.Source.Columns - 1
-                agdParameter.Source.CellSelected(lRow, lCol) = False
+        If aRow > 0 Then
+            'unselect everything first
+            For lRow As Integer = 0 To agdParameter.Source.Rows - 1
+                For lCol As Integer = 0 To agdParameter.Source.Columns - 1
+                    agdParameter.Source.CellSelected(lRow, lCol) = False
+                Next
             Next
-        Next
-        For lCol As Integer = 0 To agdParameter.Source.Columns - 1
-            agdParameter.Source.CellSelected(aRow, lCol) = True
-        Next
-        Dim lParmId As Integer = pParmGridIDs(aRow - 1)
-        Dim lParmName As String = agdParameter.Source.CellValue(aRow, 0)
+            For lCol As Integer = 0 To agdParameter.Source.Columns - 1
+                agdParameter.Source.CellSelected(aRow, lCol) = True
+            Next
+            Dim lParmId As Integer = pParmGridIDs(aRow - 1)
+            Dim lParmName As String = agdParameter.Source.CellValue(aRow, 0)
 
-        Refresh()
-        ViewParms(lParmId, lParmName)
+            Refresh()
+            ViewParms(lParmId, lParmName)
+        End If
     End Sub
 
     Private Sub cmdWatershedDetails_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdWatershedDetails.Click
