@@ -19,7 +19,7 @@ Imports Microsoft.Office.Interop
 
 Module Util_HydroFrack
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
-        Dim lTask As Integer = 10
+        Dim lTask As Integer = 104
         Select Case lTask
             Case 1 : ConstructHuc8BasedWaterUseFile() ''Task1. get huc8 based water use
             Case 2 : ClassifyWaterYearsForGraph()
@@ -33,12 +33,396 @@ Module Util_HydroFrack
             Case 83 : BuildGCRPHspfSubbasinWaterUseTimeseries() 'Step3 of getting subbasin based wateruse into WDM
             Case 9 : ExtractUserSpecifiedConstituents()
             Case 10 : BuildHydroFrackingTimeseries()
+            Case 101 : SRBCSumupOSup2010QuaterData()
+            Case 102 : SRBCOSup2010WholeYear()
+            Case 103 : SRBCOSup2010WholeYearRemoveEmpty()
+            Case 104 : SBRCOSup2010DailyWUDataToGCRPDailyTimeseries()
         End Select
+    End Sub
+
+    Private Sub SBRCOSup2010DailyWUDataToGCRPDailyTimeseries()
+        'put 2010 SRBC data into 2005 run
+        Dim lGCRPWU2005ParmsWDMDir As String = "G:\Admin\GCRPSusq\RunsWithResvWU2005\parms\WDMsWithSRBCWUTsers\"
+        Dim lDataFile As String = "G:\Admin\EPA_HydroFrac_HSPFEval\WaterUse\SRBCOsup2010Data\SRBC2010DailyGallonWU.xls"
+
+        Dim lDateStart As Double = Date2J(1985, 1, 1, 0, 0, 0)
+        Dim lDateEnd As Double = Date2J(2005, 12, 31, 24, 0, 0)
+        Dim lTs As atcTimeseries = Nothing
+        Dim lTsGCRPDates As New atcTimeseries(Nothing)
+        lTsGCRPDates.Values = NewDates(lDateStart, lDateEnd, atcTimeUnit.TUDay, 1)
+
+        Dim lSusqWDM01 As New atcWDM.atcDataSourceWDM
+        If Not lSusqWDM01.Open(lGCRPWU2005ParmsWDMDir & "SusqTrans01.wdm") Then Exit Sub
+        Dim lSusqWDM02 As New atcWDM.atcDataSourceWDM
+        If Not lSusqWDM02.Open(lGCRPWU2005ParmsWDMDir & "SusqTrans02.wdm") Then Exit Sub
+        Dim lSusqWDM03 As New atcWDM.atcDataSourceWDM
+        If Not lSusqWDM03.Open(lGCRPWU2005ParmsWDMDir & "SusqTrans03.wdm") Then Exit Sub
+
+        Dim lxlApp As New Excel.Application
+        Dim lxlWorkbook As Excel.Workbook = Nothing
+        Dim lxlSheet As Excel.Worksheet = Nothing
+        lxlWorkbook = lxlApp.Workbooks.Open(lDataFile)
+        lxlSheet = lxlWorkbook.Worksheets("RemoveEmpty")
+        With lxlSheet
+            Dim lNumDailyValuesInYear2010 As Integer = .UsedRange.Rows.Count - 1
+            'Dim lDailyDates(lNumDailyValuesInYear2010 - 1) As String 'zero-based
+            Dim lArr() As String
+            Dim lIndexFeb28 As Integer
+            Dim lIndexMar1 As Integer
+            For lRow As Integer = 2 To .UsedRange.Rows.Count 'first row is header row
+                'lDailyDates(lRow - 2) = .Cells(lRow, 1).Value
+                'lArr = lDailyDates(lRow - 2).Split("/")
+                lArr = .Cells(lRow, 1).Value.ToString.Split("/")
+                If lArr(0) = 2 AndAlso lArr(1) = 28 Then
+                    lIndexFeb28 = lRow - 2
+                    lIndexMar1 = lIndexFeb28 + 1
+                End If
+            Next
+            'ReDim lDailyDates(0)
+
+            'Dim lDaily2010Values2D(,) As Object = Nothing
+
+            Dim lGCRPDailyValues As New List(Of Double)
+            Dim lSBRC2010DailyValues() As Double
+            For lCol As Integer = 2 To .UsedRange.Columns.Count
+                Dim lBName As String = .Cells(1, lCol).Value.ToString.Split("-")(0)
+                Dim lSBId As String = .Cells(1, lCol).Value.ToString.Split("-")(1)
+                'lDaily2010Values2D = .Range(.Cells(2, lCol), .Cells(.UsedRange.Rows.Count, 2)).Value
+                'transfer into 1-d array, zero-based, also convert from original gallons per day to cfs
+                ReDim lSBRC2010DailyValues(lNumDailyValuesInYear2010 - 1)
+                For lRow As Integer = 2 To .UsedRange.Rows.Count
+                    lSBRC2010DailyValues(lRow - 2) = Double.Parse(.Cells(lRow, lCol).Value) * 0.133680556 / 86400 '1 US gallon = 0.133680556 cubic feet
+                Next
+
+                lGCRPDailyValues.Clear() 'start fresh
+                lGCRPDailyValues.Add(Double.NaN)
+                For lYear As Integer = 1985 To 2005
+                    If Date.IsLeapYear(lYear) Then
+                        Dim lArrPart1(lIndexFeb28) As Double
+                        Array.Copy(lSBRC2010DailyValues, 0, lArrPart1, 0, 31 + 28)
+                        lGCRPDailyValues.AddRange(lArrPart1)
+
+                        lGCRPDailyValues.Add((lSBRC2010DailyValues(lIndexFeb28) + lSBRC2010DailyValues(lIndexMar1)) / 2.0)
+
+                        Dim lArrPart2(UBound(lSBRC2010DailyValues, 1) - lIndexMar1) As Double
+                        For I As Integer = lIndexMar1 To UBound(lSBRC2010DailyValues, 1)
+                            lArrPart2(I - lIndexMar1) = lSBRC2010DailyValues(I)
+                        Next
+
+                        lGCRPDailyValues.AddRange(lArrPart2)
+
+                        ReDim lArrPart1(0)
+                        ReDim lArrPart2(0)
+
+                    Else
+                        lGCRPDailyValues.AddRange(lSBRC2010DailyValues)
+                    End If
+                Next 'lYear
+
+                'Create a Timeserie
+                lTs = New atcTimeseries(Nothing)
+                With lTs
+                    .Dates = lTsGCRPDates
+                    .SetInterval(atcTimeUnit.TUDay, 1)
+                    '.numValues = lTsGCRPDates.numValues
+                    .Values = lGCRPDailyValues.ToArray()
+                    .Attributes.SetValue("ID", 5000 + CInt(lSBId))
+                    .Attributes.SetValue("Constituent", "SOSUP")
+                    .Attributes.SetValue("Location", "R:" & lSBId)
+                    .Attributes.SetValue("Scenario", "SBRCOSup")
+                End With
+
+                'Write to WDM
+                Select Case lBName
+                    Case "020501"
+                        If Not lSusqWDM01.AddDataset(lTs, atcDataSource.EnumExistAction.ExistReplace) Then
+                            Logger.Dbg("Writing " & lBName & "-" & lSBId & " dataset failed in SusqTrans01.wdm")
+                        End If
+                    Case "020502"
+                        If Not lSusqWDM02.AddDataset(lTs, atcDataSource.EnumExistAction.ExistReplace) Then
+                            Logger.Dbg("Writing " & lBName & "-" & lSBId & " dataset failed in SusqTrans02.wdm")
+                        End If
+                    Case "020503"
+                        If Not lSusqWDM03.AddDataset(lTs, atcDataSource.EnumExistAction.ExistReplace) Then
+                            Logger.Dbg("Writing " & lBName & "-" & lSBId & " dataset failed in SusqTrans03.wdm")
+                        End If
+                End Select
+            Next 'lCol
+        End With
+
+        lxlWorkbook.Close()
+        lxlApp.Quit()
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlSheet)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlWorkbook)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlApp)
+
+        lxlSheet = Nothing
+        lxlWorkbook = Nothing
+        lxlApp = Nothing
+
+        lSusqWDM01.Clear()
+        lSusqWDM02.Clear()
+        lSusqWDM03.Clear()
+        lSusqWDM01 = Nothing
+        lSusqWDM02 = Nothing
+        lSusqWDM03 = Nothing
+
+    End Sub
+
+    Private Sub SRBCOSup2010WholeYearRemoveEmpty()
+
+        'This step go through the resulting whole year daily SRBC OSup water use data
+        'and remove those locations that don't have even one day non-zero water use
+        'The 'RemoveEmpty' worksheet starts out as a copy of the 'SRBCQuaterSum' sheet
+        Dim lDataFile As String = "G:\Admin\EPA_HydroFrac_HSPFEval\WaterUse\SRBCOsup2010Data\SRBC2010DailyGallonWU.xls"
+        Dim lxlApp As New Excel.Application
+        Dim lxlWorkbook As Excel.Workbook = Nothing
+        Dim lxlSheet As Excel.Worksheet = Nothing
+        lxlWorkbook = lxlApp.Workbooks.Open(lDataFile)
+        lxlSheet = lxlWorkbook.Worksheets("RemoveEmpty")
+        With lxlSheet
+            Dim lNumColumns As Integer = .UsedRange.Columns.Count
+            Dim lNumRows As Integer = .UsedRange.Rows.Count
+            For lCol As Integer = 2 To lNumColumns
+                Dim lColumnHasNonZeroValues As Boolean = False
+                For lRow As Integer = 2 To lNumRows
+                    If .Cells(lRow, lCol).Value IsNot Nothing AndAlso Double.Parse(.Cells(lRow, lCol).Value) > 0 Then
+                        lColumnHasNonZeroValues = True
+                        Exit For
+                    ElseIf .Cells(lRow, lCol).value Is Nothing Then
+                        .Cells(lRow, lCol).Value = 0
+                    End If
+                Next
+                If Not lColumnHasNonZeroValues Then
+                    .Range(.Cells(1, lCol), .Cells(lNumRows, lCol)).ClearContents()
+                End If
+            Next
+        End With
+
+        lxlWorkbook.Save()
+        lxlWorkbook.Close()
+        lxlApp.Quit()
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlSheet)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlWorkbook)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlApp)
+
+        lxlSheet = Nothing
+        lxlWorkbook = Nothing
+        lxlApp = Nothing
+
+    End Sub
+
+    Private Sub SRBCOSup2010WholeYear()
+        'This step pull water use data from the four quarters' files into one complete year's record for all locations
+        Dim lDataFolder As String = "G:\Admin\EPA_HydroFrac_HSPFEval\WaterUse\SRBCOsup2010Data\"
+        Dim lDatafilenamepart1 As String = "2010_withdraw_q"
+        Dim lDatafilenamepart2 As String = "_reprojected_withSubbasins.xls"
+        Dim lQuarters() As String = {"1", "2", "3", "4"}
+        Dim lxlApp As New Excel.Application
+        Dim lxlWorkbook As Excel.Workbook = Nothing
+        Dim lxlSheet As Excel.Worksheet = Nothing
+        Dim lxlSheetSrc As Excel.Worksheet = Nothing
+
+        'First, build a complete list of locations, SBName-Rchres#
+        Dim lSRBCOSupWUs As New atcCollection
+        For Each lQuarter As String In lQuarters
+            Dim lDataFilename As String = IO.Path.Combine(lDataFolder, lDatafilenamepart1 & lQuarter & lDatafilenamepart2)
+            lxlWorkbook = lxlApp.Workbooks.Open(lDataFilename)
+            lxlSheet = lxlWorkbook.Worksheets("SRBCQuaterSum")
+
+            With lxlSheet
+                For lRow As Integer = 2 To .UsedRange.Rows.Count
+                    Dim lKey As String = .Cells(lRow, 1).Value
+                    If lSRBCOSupWUs.Keys.Contains(lKey) Then
+                        If Not lSRBCOSupWUs.ItemByKey(lKey).Contains(lDataFilename) Then
+                            lSRBCOSupWUs.ItemByKey(lKey) &= lDataFilename & ";"
+                        End If
+                    Else
+                        lSRBCOSupWUs.Add(lKey, lDataFilename & ";")
+                    End If
+                Next
+            End With
+            lxlWorkbook.Close()
+        Next
+        lxlApp.Quit()
+
+        'Build a new excel file that contains the full year of record for all locations, column-wise
+        Dim lNewExceFileName As String = lDataFolder & "SRBC2010DailyGallonWU.xls"
+        If File.Exists(lNewExceFileName) Then
+            TryDelete(lNewExceFileName)
+        End If
+        lxlApp = New Excel.Application
+        Dim lxlWorkbookNew As Excel.Workbook = lxlApp.Workbooks.Add()
+        lxlWorkbookNew.SaveAs(lNewExceFileName)
+        lxlSheet = lxlWorkbookNew.Worksheets.Add()
+        lxlSheet.Name = "SRBC2010DailyGallonWU"
+        With lxlSheet
+            'Set up the date column to the left
+            Dim lRowCounts(4) As Integer
+            Dim lRowTargets(4) As Integer
+            Dim lTargetRow As Integer
+            For Each lQuarter As String In lQuarters
+                Dim lDataFilename As String = IO.Path.Combine(lDataFolder, lDatafilenamepart1 & lQuarter & lDatafilenamepart2)
+                lxlWorkbook = lxlApp.Workbooks.Open(lDataFilename)
+                lxlSheetSrc = lxlWorkbook.Worksheets("SRBCQuaterSum")
+
+                With lxlSheetSrc
+                    lRowCounts(lQuarter) = .UsedRange.Columns.Count - 1
+                    .Range(.Cells(1, 2), .Cells(1, .UsedRange.Columns.Count)).Copy()
+
+                    Select Case lQuarter
+                        Case 1
+                            lTargetRow = 2
+                            lRowTargets(1) = lTargetRow
+                        Case 2
+                            lTargetRow = lRowCounts(1) + 2
+                            lRowTargets(2) = lTargetRow
+                        Case 3
+                            lTargetRow = lRowCounts(1) + lRowCounts(2) + 2
+                            lRowTargets(3) = lTargetRow
+                        Case 4
+                            lTargetRow = lRowCounts(1) + lRowCounts(2) + lRowCounts(3) + 2
+                            lRowTargets(4) = lTargetRow
+                    End Select
+                End With
+                'lxlSheet.Activate()
+                .Range(.Cells(lTargetRow, 1), .Cells(lTargetRow, 1)).PasteSpecial(Paste:=Excel.XlPasteType.xlPasteAll, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=False, Transpose:=True)
+                lxlWorkbook.Close()
+            Next
+            lxlWorkbookNew.Save()
+
+            'Start copy daily values from multiple files into one column per location
+            Dim lColCounter As Integer = 2
+            For Each lKeyLocation As String In lSRBCOSupWUs.Keys
+                .Cells(1, lColCounter).Value = lKeyLocation 'column header
+                Dim lArr() As String = lSRBCOSupWUs.ItemByKey(lKeyLocation).split(";")
+                For Each lFile As String In lArr
+                    If lFile.Length > 0 Then
+                        Dim m As Match = Regex.Match(lFile, _
+                                                     lDatafilenamepart1 & "([1-9])" & lDatafilenamepart2, _
+                                                     RegexOptions.IgnoreCase)
+                        If m.Success Then
+                            lTargetRow = lRowTargets(Integer.Parse(m.Groups(1).Value.Trim()))
+                            lxlWorkbook = lxlApp.Workbooks.Open(lFile)
+                            lxlSheetSrc = lxlWorkbook.Worksheets("SRBCQuaterSum")
+
+                            With lxlSheetSrc
+                                For lRow As Integer = 2 To .UsedRange.Rows.Count
+                                    If lKeyLocation = .Cells(lRow, 1).Value Then
+                                        'found a matching location, copy its row to new target
+                                        .Range(.Cells(lRow, 2), .Cells(lRow, .UsedRange.Columns.Count)).Copy()
+                                        Exit For
+                                    End If
+                                Next
+                            End With 'lxlSheetSrc
+
+                            .Range(.Cells(lTargetRow, lColCounter), .Cells(lTargetRow, lColCounter)).PasteSpecial(Paste:=Excel.XlPasteType.xlPasteAll, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=False, Transpose:=True)
+                            lxlWorkbook.Close()
+                        End If 'm.Success
+                    End If 'lFile.Length > 0
+                Next 'lFile
+
+                lColCounter += 1
+                lxlWorkbookNew.Save()
+            Next 'lKeyLocation
+        End With
+
+        lxlWorkbookNew.Save()
+        lxlWorkbookNew.Close()
+        lxlApp.Quit()
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlSheetSrc)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlSheet)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlWorkbook)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlWorkbookNew)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlApp)
+
+        lxlSheet = Nothing
+        lxlSheetSrc = Nothing
+        lxlWorkbook = Nothing
+        lxlWorkbookNew = Nothing
+        lxlApp = Nothing
+    End Sub
+
+    Private Sub SRBCSumupOSup2010QuaterData()
+        Dim lDataFolder As String = "G:\Admin\EPA_HydroFrac_HSPFEval\WaterUse\SRBCOsup2010Data\"
+        Dim lDatafilenamepart1 As String = "2010_withdraw_q"
+        Dim lDatafilenamepart2 As String = "_reprojected_withSubbasins.xls"
+        Dim lQuarters() As String = {"1", "2", "3", "4"}
+        Dim lxlApp As New Excel.Application
+        Dim lxlWorkbook As Excel.Workbook = Nothing
+        Dim lxlSheet As Excel.Worksheet = Nothing
+        Dim lDailyValuesIter() As Double
+        For Each lQuarter As String In lQuarters
+            Dim lDataFilename As String = IO.Path.Combine(lDataFolder, lDatafilenamepart1 & lQuarter & lDatafilenamepart2)
+            lxlWorkbook = lxlApp.Workbooks.Open(lDataFilename)
+            lxlSheet = lxlWorkbook.Worksheets(1)
+            Dim lSRBCOSupWUs As New atcCollection
+            With lxlSheet 'there are only five columns, subbasinid, ps2000, osup2000, ps2005, osup2005 withdrawal in cfs
+                Dim lColumnCount As Integer = .UsedRange.Columns.Count
+                Dim lColSubbasin As Integer = lColumnCount - 1
+                Dim lKeyIsNew As Boolean
+                For lRow As Integer = 2 To .UsedRange.Rows.Count
+                    Dim lKey As String = .Cells(lRow, lColumnCount).Value & "-" & .Cells(lRow, lColSubbasin).Value
+                    lKeyIsNew = False
+                    If Not lSRBCOSupWUs.Keys.Contains(lKey) Then
+                        Dim lNewDailyGallonValues(lColumnCount - 2 - 2) As Double
+                        lSRBCOSupWUs.Add(lKey, lNewDailyGallonValues)
+                        lDailyValuesIter = lNewDailyGallonValues
+                        lKeyIsNew = True
+                    Else
+                        lDailyValuesIter = lSRBCOSupWUs.ItemByKey(lKey)
+                    End If
+
+                    Dim lValue As Double
+                    For lCol As Integer = 3 To lColumnCount - 2
+                        If Not Double.TryParse(.Cells(lRow, lCol).Value, lValue) Then
+                            lValue = 0.0
+                        End If
+                        If lKeyIsNew Then
+                            lDailyValuesIter(lCol - 3 + 1) = lValue
+                        Else
+                            lDailyValuesIter(lCol - 3 + 1) += lValue
+                        End If
+                    Next
+                Next 'lRow
+            End With
+
+            'Create a new Sheet
+            lxlSheet = lxlWorkbook.Worksheets.Add(lxlSheet)
+            With lxlSheet
+                .Name = "SRBCQuaterSum"
+                For I As Integer = 0 To lSRBCOSupWUs.Count - 1
+                    .Cells(I + 1, 1) = lSRBCOSupWUs.Keys.Item(I)
+                    For d As Integer = 1 To UBound(lSRBCOSupWUs.ItemByIndex(I))
+                        .Cells(I + 1, d + 1).Value = lSRBCOSupWUs.ItemByIndex(I)(d)
+                    Next
+                Next
+            End With
+
+            For Each lDailyValuesIter In lSRBCOSupWUs
+                ReDim lDailyValuesIter(0)
+            Next
+
+            lSRBCOSupWUs.Clear()
+
+            lxlWorkbook.Save()
+            lxlWorkbook.Close()
+
+        Next 'lQuarter
+        lxlApp.Quit()
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlSheet)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlWorkbook)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlApp)
+
+        lxlSheet = Nothing
+        lxlWorkbook = Nothing
+        lxlApp = Nothing
+
     End Sub
 
     Private Sub BuildHydroFrackingTimeseries()
         'The hydro fracking water use is to be used on the water use 2005 scenario, which is considered as 'current' condition
-        Dim lHydroFrackingDataFile As String = "G:\Admin\GCRPSusq\2010_by_sector_47frackingwithdrawals_reprojected_withSubbasins.xls"
+        Dim lHydroFrackingDataFile As String = "G:\Admin\EPA_HydroFrac_HSPFEval\WaterUse\2010_by_sector_47frackingwithdrawals_reprojected_withSubbasins.xls"
         Dim lxlApp As New Excel.Application
         Dim lxlWorkbook As Excel.Workbook = Nothing
         Dim lxlSheet As Excel.Worksheet = Nothing
