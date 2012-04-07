@@ -515,7 +515,6 @@ Public Class frmHSPFParm
                 Dim lPointTable As New atcTableDBF
                 lPointTable.OpenFile(lPointDbfName)
                 Dim lNumCols As Integer = lPointTable.NumFields
-                'If lNumCols > 6 Then lNumCols = 6
                 .Columns = lNumCols
                 .ColorCells = True
                 .FixedRows = 1
@@ -538,6 +537,9 @@ Public Class frmHSPFParm
                     End If
                     If lPointTable.FieldName(lColIndex + 1) = "PHYS" Then
                         .CellValue(0, lColIndex) = "Physiographic Setting"
+                    End If
+                    If lPointTable.FieldName(lColIndex + 1) = "WEATHER" Then
+                        .CellValue(0, lColIndex) = "Weather Regime"
                     End If
                 Next
                 .Rows = 1
@@ -777,6 +779,7 @@ Public Class frmHSPFParm
 
         agdTable.SizeAllColumnsToContents()
         agdTable.Refresh()
+        ClearValues()
 
     End Sub
 
@@ -819,6 +822,7 @@ Public Class frmHSPFParm
 
         agdParameter.SizeAllColumnsToContents()
         agdParameter.Refresh()
+        ClearValues()
 
     End Sub
 
@@ -884,41 +888,54 @@ Public Class frmHSPFParm
             Next
         End With
 
-        'HideLikeCol(agdView, 4)
+        HideLikeCol(4)
 
         agdValues.SizeAllColumnsToContents()
         agdValues.Refresh()
 
     End Sub
 
-    '    Private Sub HideLikeCol(ByVal agd As Object, ByVal scol&)
-    '        Dim i&, c1Same As Boolean, c2Same As Boolean
+    Private Sub HideLikeCol(ByVal aSCol As Integer)
 
-    '        c1Same = True
-    '        c2Same = True
+        Dim lCol1Same As Boolean = True
+        Dim lCol2Same As Boolean = True
 
-    '        If Len(Trim(agd.TextMatrix(1, scol + 1))) > 0 Then
-    '            c2Same = False
-    '        End If
+        With agdValues.Source
+            If Len(Trim(.CellValue(1, aSCol + 1))) > 0 And .CellValue(1, aSCol + 1) IsNot Nothing Then
+                lCol2Same = False
+            End If
 
-    '        If agd.Rows > 1 Then
-    '            For i = 2 To agd.Rows
-    '                If agd.TextMatrix(i, scol) <> agd.TextMatrix(1, scol) Then
-    '                    c1Same = False
-    '                End If
-    '                If Trim(agd.TextMatrix(i, scol + 1)) <> "" Then
-    '                    c2Same = False
-    '                End If
-    '            Next i
-    '        End If
+            If .Rows > 1 Then
+                For i As Integer = 2 To .Rows - 1
+                    If .CellValue(i, aSCol) <> .CellValue(1, aSCol) Then
+                        lCol1Same = False
+                    End If
+                    If Trim(.CellValue(i, aSCol + 1)) <> "" And .CellValue(i, aSCol + 1) IsNot Nothing Then
+                        lCol2Same = False
+                    End If
+                Next i
+            End If
 
-    '        If c1Same Then
-    '            agd.ColWidth(scol) = 0
-    '        End If
-    '        If c2Same Then
-    '            agd.ColWidth(scol + 1) = 0
-    '        End If
-    '    End Sub
+            If lCol1Same Then
+                'need to remove column 
+                For lCol As Integer = aSCol To .Columns - 1
+                    For lRow As Integer = 0 To .Rows - 1
+                        .CellValue(lRow, lCol) = .CellValue(lRow, lCol + 1)
+                    Next
+                Next
+                .Columns = .Columns - 1
+            End If
+            If lCol2Same Then
+                'need to remove column 
+                For lCol As Integer = aSCol To .Columns - 1
+                    For lRow As Integer = 0 To .Rows - 1
+                        .CellValue(lRow, lCol) = .CellValue(lRow, lCol + 1)
+                    Next
+                Next
+                .Columns = .Columns - 1
+            End If
+        End With
+    End Sub
 
     Sub ViewTable(ByVal aTableId As Integer, ByVal aTableName As String)
 
@@ -1005,7 +1022,7 @@ Public Class frmHSPFParm
             Next
         End With
 
-        'HideLikeCol(agdView, 2)
+        HideLikeCol(2)
 
         agdValues.SizeAllColumnsToContents()
         agdValues.Refresh()
@@ -1179,7 +1196,22 @@ Public Class frmHSPFParm
     End Sub
 
     Private Sub cmdWatershedDetails_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdWatershedDetails.Click
-        Logger.Msg("Watershed Details is not yet implemented.  This option will allow the user to view info about the current watershed.", MsgBoxStyle.OkOnly, "BASINS HSPFParm")
+        Dim lIDs As New atcCollection
+        Dim lFirstIndex As Integer = -1
+        Dim lCount As Integer = 0
+        With agdWatershed.Source
+            For lRow As Integer = 1 To .Rows - 1
+                lCount = lCount + 1
+                lIDs.Add(.CellValue(lRow, 0))
+                If .CellSelected(lRow, 0) And lFirstIndex < 0 Then
+                    lFirstIndex = lCount
+                End If
+            Next
+        End With
+
+        Dim lfrmWatershedDetails As New frmWatershedDetails
+        lfrmWatershedDetails.InitializeUI(lIDs, lFirstIndex, agdWatershed.Source)
+        lfrmWatershedDetails.Show()
     End Sub
 
     Private Sub cmdScenarioDetails_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdScenarioDetails.Click
@@ -1213,19 +1245,25 @@ Public Class frmHSPFParm
     End Sub
 
     Private Sub cmdAllSegments_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAllSegments.Click
-        '            b = True
-        '            For i = 1 To agdSeg.Rows
-        '                agdSeg.Selected(i, 1) = b
-        '            Next i
-        '            agdSeg_Click()
+        For lRow As Integer = 1 To agdSegment.Source.Rows - 1
+            For lCol As Integer = 0 To agdSegment.Source.Columns - 1
+                agdSegment.Source.CellSelected(lRow, lCol) = True
+            Next
+        Next
+        Refresh()
+        RefreshTable()
+        RefreshParm()
     End Sub
 
     Private Sub cmdNoneSegments_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdNoneSegments.Click
-        '            b = False
-        '            For i = 1 To agdSeg.Rows
-        '                agdSeg.Selected(i, 1) = b
-        '            Next i
-        '            agdSeg_Click()
+        For lRow As Integer = 1 To agdSegment.Source.Rows - 1
+            For lCol As Integer = 0 To agdSegment.Source.Columns - 1
+                agdSegment.Source.CellSelected(lRow, lCol) = False
+            Next
+        Next
+        Refresh()
+        RefreshTable()
+        RefreshParm()
     End Sub
 
     Private Sub cmdTableFilter_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdTableFilter.Click
@@ -1233,5 +1271,15 @@ Public Class frmHSPFParm
         '        FiltInd = 3
         '        Call frmFilt.InitFilters(agdTab)
         '        frmFilt.Show(1)
+    End Sub
+
+    Private Sub ClearValues()
+        With agdValues.Source
+            .Rows = 0
+            .Columns = 0
+        End With
+        agdValues.SizeAllColumnsToContents()
+        agdValues.Refresh()
+        lblTableParmName.Text = ""
     End Sub
 End Class

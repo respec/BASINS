@@ -175,6 +175,12 @@
     <Compile Include="frmScenarioDetails.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmWatershedDetails.designer.vb">
+      <DependentUpon>frmWatershedDetails.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmWatershedDetails.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="HSPFParmDB.vb" />
   </ItemGroup>
   <ItemGroup>
@@ -183,6 +189,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmScenarioDetails.resx">
       <DependentUpon>frmScenarioDetails.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmWatershedDetails.resx">
+      <DependentUpon>frmWatershedDetails.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

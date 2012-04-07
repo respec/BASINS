@@ -67,6 +67,7 @@ Public Class frmScenarioDetails
     End Sub
 
     Private Sub cmdClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdClose.Click
+        'todo: save back to database?
         Me.Close()
     End Sub
 
