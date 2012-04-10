@@ -10,6 +10,8 @@ Public Class frmHSPFParm
     Friend pTableGridIDs As atcCollection
     Friend pParmGridIDs As atcCollection
     Friend pSegmentGridIDs As atcCollection
+    Friend pSelectedSegmentFilters As atcCollection
+    Friend pSelectedTableFilters As atcCollection
     <CLSCompliant(False)> Public Database As atcUtility.atcMDB
 
 #Region " Windows Form Designer generated code "
@@ -504,6 +506,9 @@ Public Class frmHSPFParm
     End Sub
 
     Public Sub InitializeUI(ByVal aPath As String, ByVal aDBName As String)
+        pSelectedSegmentFilters = New atcCollection
+        pSelectedTableFilters = New atcCollection
+
         With agdWatershed
             .Source = New atcControls.atcGridSource
             .AllowHorizontalScrolling = False
@@ -704,9 +709,25 @@ Public Class frmHSPFParm
             For lScenRow As Integer = 1 To agdScenario.Source.Rows
                 If agdScenario.Source.CellSelected(lScenRow, 0) Then 'list segments for this scenario
                     lCrit = "ScenarioID = " & agdScenario.Source.CellValue(lScenRow, 2)
-                    '                If Len(Filt(2).txt) > 0 Then  'add filter criteria
-                    '                    crit = crit & " AND " & Filt(2).txt
-                    '                End If
+                    If pSelectedSegmentFilters.Count > 0 Then  'add filter criteria
+                        Dim lSelectedSegmentFiltersAsIds As New atcCollection
+                        For Each lSeg As String In pSelectedSegmentFilters
+                            If lSeg = "PERLND" Then
+                                lSelectedSegmentFiltersAsIds.Add(1)
+                            ElseIf lSeg = "IMPLND" Then
+                                lSelectedSegmentFiltersAsIds.Add(2)
+                            ElseIf lSeg = "RCHRES" Then
+                                lSelectedSegmentFiltersAsIds.Add(3)
+                            End If
+                        Next
+                        Dim lFiltText As String = "OpnTypID = "
+                        Dim lFilt As String = ""
+                        lFilt = "(" & lFiltText & lSelectedSegmentFiltersAsIds(0)
+                        For lIndex As Integer = 1 To lSelectedSegmentFiltersAsIds.Count - 1
+                            lFilt = lFilt & " OR " & lFiltText & lSelectedSegmentFiltersAsIds(lIndex)
+                        Next
+                        lCrit = lCrit & " AND " & lFilt & ")"
+                    End If
                     Dim lStr As String = "SELECT DISTINCTROW SegData.ID, " & _
                                                             "SegData.Name, " & _
                                                             "SegData.Description " & _
@@ -752,9 +773,15 @@ Public Class frmHSPFParm
                 End If
             Next
             If lSelectedCount > 0 Then
-                'If Len(Filt(3).txt) > 0 Then  'add filter criteria
-                '                selstr = selstr & " AND " & Filt(3).txt
-                '            End If
+                If pSelectedTableFilters.Count > 0 Then  'add filter criteria
+                    Dim lFiltText As String = "Name = '"
+                    Dim lFilt As String = ""
+                    lFilt = "(" & lFiltText & Mid(pSelectedTableFilters(0), 1, pSelectedTableFilters(0).length - 2)
+                    For lIndex As Integer = 1 To pSelectedTableFilters.Count - 1
+                        lFilt = lFilt & "' OR " & lFiltText & Mid(pSelectedTableFilters(lIndex), 1, pSelectedTableFilters(lIndex).length - 2)
+                    Next
+                    lCrit = lCrit & " AND " & lFilt & "')"
+                End If
                 Dim lStr As String = "SELECT DISTINCTROW ScenTableList.Name, " & _
                                                         "ScenTableList.TabID, " & _
                                                         "ScenTableList.OpnTypID " & _
@@ -801,9 +828,15 @@ Public Class frmHSPFParm
                 End If
             Next
             If lSelectedCount > 0 Then
-                'If Len(Filt(3).txt) > 0 Then  'add filter criteria
-                '                selstr = selstr & " AND " & Filt(3).txt
-                '            End If
+                If pSelectedTableFilters.Count > 0 Then  'add filter criteria
+                    Dim lFiltText As String = "Table = '"
+                    Dim lFilt As String = ""
+                    lFilt = "(" & lFiltText & Mid(pSelectedTableFilters(0), 1, pSelectedTableFilters(0).length - 2)
+                    For lIndex As Integer = 1 To pSelectedTableFilters.Count - 1
+                        lFilt = lFilt & "' OR " & lFiltText & Mid(pSelectedTableFilters(lIndex), 1, pSelectedTableFilters(lIndex).length - 2)
+                    Next
+                    lCrit = lCrit & " AND " & lFilt & "')"
+                End If
                 Dim lStr As String = "SELECT DISTINCTROW ParmTableData.ParmID, " & _
                                                         "ParmTableData.Name, " & _
                                                         "ParmTableData.Table, " & _
@@ -1238,10 +1271,31 @@ Public Class frmHSPFParm
     End Sub
 
     Private Sub cmdFilterSegments_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdFilterSegments.Click
-        '            If FiltInd <> 2 Then Call frmFilt.ClearFilters()
-        '            FiltInd = 2
-        '            Call frmFilt.InitFilters(agdSeg)
-        '            frmFilt.Show(1)
+        Dim lSegments As New atcCollection
+        Dim lTmpStr As String
+        For lScenRow As Integer = 1 To agdScenario.Source.Rows
+            If agdScenario.Source.CellSelected(lScenRow, 0) Then 'list segments for this scenario
+                Dim lCrit As String = "ScenarioID = " & agdScenario.Source.CellValue(lScenRow, 2)
+                Dim lStr As String = "SELECT DISTINCTROW SegData.ID, " & _
+                                                        "SegData.Name, " & _
+                                                        "SegData.Description " & _
+                                                        "From SegData " & _
+                                                        "WHERE (" & lCrit & ")"
+                Dim lTable As DataTable = Database.GetTable(lStr)
+                For lRow As Integer = 0 To lTable.Rows.Count - 1
+                    lTmpStr = Mid(LTrim(lTable.Rows(lRow).Item(1)), 1, 6)
+                    If Not lSegments.Contains(lTmpStr) Then
+                        lSegments.Add(lTmpStr)
+                    End If
+                Next
+            End If
+        Next
+
+        Dim lfrmSegmentFilter As New frmFilter
+        lfrmSegmentFilter.InitializeUI("Segment", lSegments, pSelectedSegmentFilters, Me)
+        If lfrmSegmentFilter.ShowDialog = Windows.Forms.DialogResult.OK Then
+            RefreshSegment()
+        End If
     End Sub
 
     Private Sub cmdAllSegments_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAllSegments.Click
@@ -1267,10 +1321,48 @@ Public Class frmHSPFParm
     End Sub
 
     Private Sub cmdTableFilter_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdTableFilter.Click
-        '        If FiltInd <> 3 Then Call frmFilt.ClearFilters()
-        '        FiltInd = 3
-        '        Call frmFilt.InitFilters(agdTab)
-        '        frmFilt.Show(1)
+        Dim lTables As New atcCollection
+        Dim lSelectedCount As Integer = 0
+        Dim lCrit As String = ""
+        For lSegRow As Integer = 1 To agdSegment.Source.Rows - 1
+            If agdSegment.Source.CellSelected(lSegRow, 0) Then 'list tables for this segment
+                lSelectedCount += 1
+                If lSelectedCount = 1 Then
+                    lCrit = "SegID = " & pSegmentGridIDs(lSegRow - 1)
+                Else
+                    lCrit = lCrit & " OR SegID = " & pSegmentGridIDs(lSegRow - 1)
+                End If
+            End If
+        Next
+        If lSelectedCount > 0 Then
+            Dim lStr As String = "SELECT DISTINCTROW ScenTableList.Name, " & _
+                                                    "ScenTableList.TabID, " & _
+                                                    "ScenTableList.OpnTypID " & _
+                                                    "From ScenTableList " & _
+                                                    "WHERE (" & lCrit & ")"
+            Dim lTable As DataTable = Database.GetTable(lStr)
+            Dim lOpnTyp As Integer = 0
+            Dim lTmp As String = ""
+            For lRow As Integer = 0 To lTable.Rows.Count - 1
+                lTmp = lTable.Rows(lRow).Item(0).ToString
+                lOpnTyp = lTable.Rows(lRow).Item(2).ToString
+                If lOpnTyp = 1 Then
+                    lTmp = lTmp & ":P"
+                ElseIf lOpnTyp = 2 Then
+                    lTmp = lTmp & ":I"
+                ElseIf lOpnTyp = 3 Then
+                    lTmp = lTmp & ":R"
+                End If
+                lTables.Add(lTmp)
+            Next
+        End If
+
+        Dim lfrmTableFilter As New frmFilter
+        lfrmTableFilter.InitializeUI("Table", lTables, pSelectedTableFilters, Me)
+        If lfrmTableFilter.ShowDialog = Windows.Forms.DialogResult.OK Then
+            RefreshTable()
+            RefreshParm()
+        End If
     End Sub
 
     Private Sub ClearValues()

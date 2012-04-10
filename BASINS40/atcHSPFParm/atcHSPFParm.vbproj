@@ -166,6 +166,12 @@
     <Compile Include="clsPlugin.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="frmFilter.designer.vb">
+      <DependentUpon>frmFilter.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmFilter.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmHSPFParm.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -184,6 +190,9 @@
     <Compile Include="HSPFParmDB.vb" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmFilter.resx">
+      <DependentUpon>frmFilter.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmHSPFParm.resx">
       <DependentUpon>frmHSPFParm.vb</DependentUpon>
     </EmbeddedResource>
