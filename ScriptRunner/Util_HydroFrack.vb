@@ -19,7 +19,7 @@ Imports Microsoft.Office.Interop
 
 Module Util_HydroFrack
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
-        Dim lTask As Integer = 104
+        Dim lTask As Integer = 113
         Select Case lTask
             Case 1 : ConstructHuc8BasedWaterUseFile() ''Task1. get huc8 based water use
             Case 2 : ClassifyWaterYearsForGraph()
@@ -32,12 +32,386 @@ Module Util_HydroFrack
             Case 82 : SumGCRPHspfSubbasinWateruse() 'Step2 of getting subbasin based water use
             Case 83 : BuildGCRPHspfSubbasinWaterUseTimeseries() 'Step3 of getting subbasin based wateruse into WDM
             Case 9 : ExtractUserSpecifiedConstituents()
-            Case 10 : BuildHydroFrackingTimeseries()
+            Case 10 : BuildHydroFrackingTimeseriesMonthlyFixedValues()
             Case 101 : SRBCSumupOSup2010QuaterData()
             Case 102 : SRBCOSup2010WholeYear()
             Case 103 : SRBCOSup2010WholeYearRemoveEmpty()
             Case 104 : SBRCOSup2010DailyWUDataToGCRPDailyTimeseries()
+            Case 11 : BuildTwoCountiesWateruseTimeseries()
+
+            Case 112 : HydroFrackingDailyValueSumup()
+            Case 113 : HydroFrackingDailyValueCompleteYear()
         End Select
+    End Sub
+
+    Private Sub HydroFrackingDailyValueCompleteYear()
+        Dim lDataFolder As String = "G:\Admin\EPA_HydroFrac_HSPFEval\WaterUse\"
+        Dim lDataFilename As String = IO.Path.Combine(lDataFolder, "DailyFrackingWithdrawals.xls")
+
+        Dim lxlApp As New Excel.Application
+        Dim lxlWorkbook As Excel.Workbook = Nothing
+        Dim lxlSheet As Excel.Worksheet = Nothing
+        Dim lDurations() As String = {"HFSumJan - June", "HFSumJuly - Dec"}
+        Dim lDuration As String = ""
+        Dim lHFDailyWUs As New atcCollection
+        Dim lColumnCount As Integer = 0
+        Dim lColSubbasin As Integer = 2
+        Dim lColBName As Integer = 3
+        Dim lColDailyValueStart As Integer = 7
+        Dim lNewDailyValues As New List(Of Double)
+        Dim lDailyValuesIter() As Double
+
+        Dim lWriteToWDMs As Boolean = True
+        Dim lCreateFullYearExcelSheet As Boolean = False
+
+        lxlWorkbook = lxlApp.Workbooks.Open(lDataFilename)
+
+        'get total number of days
+        Dim lDays As Integer
+        For Each lDuration In lDurations
+            lxlSheet = lxlWorkbook.Worksheets(lDuration)
+            With lxlSheet
+                lDays += .UsedRange.Columns.Count - 1
+            End With
+        Next
+
+        'build a list of unique locations
+        For Each lDuration In lDurations
+            lxlSheet = lxlWorkbook.Worksheets(lDuration)
+            With lxlSheet
+                lColumnCount = .UsedRange.Columns.Count
+                Dim lKey As String
+                For lRow As Integer = 2 To .UsedRange.Rows.Count
+                    lKey = .Cells(lRow, 1).Value
+                    If Not lHFDailyWUs.Keys.Contains(lKey) Then
+                        ReDim lDailyValuesIter(lDays - 1)
+                        lHFDailyWUs.Add(lKey, lDailyValuesIter)
+                    End If
+                Next
+            End With 'xlsheet
+        Next 'lDuration
+
+        'fill in the daily values
+        For Each lDuration In lDurations
+            lxlSheet = lxlWorkbook.Worksheets(lDuration)
+            Dim lStartDailyIndex As Integer = 0
+            If lDuration.Contains("July") Then
+                lStartDailyIndex = 181
+            End If
+            With lxlSheet
+                lColumnCount = .UsedRange.Columns.Count
+                Dim lKey As String
+                Dim lDailyValue As Double
+                For lRow As Integer = 2 To .UsedRange.Rows.Count
+                    lKey = .Cells(lRow, 1).Value
+                    Dim lDailyValueArray() As Double = lHFDailyWUs.ItemByKey(lKey)
+                    For lCol As Integer = 2 To lColumnCount
+                        If Not Double.TryParse(.Cells(lRow, lCol).value, lDailyValue) Then lDailyValue = 0
+                        lDailyValueArray(lStartDailyIndex + lCol - 2) = lDailyValue
+                    Next 'lCol
+                Next 'lRow
+            End With 'xlsheet
+        Next 'lDuration
+
+        If lWriteToWDMs Then 'write daily hydro fracking values to 6000 series of datasets
+            Dim lWDMDirPaths() As String = {"G:\Admin\GCRPSusq\RunsWithResvWU2005\parms\", "G:\Admin\GCRPSusq\RunsWithResvWU2005\parms\WDMsWithSRBCWUTsers\"}
+            Dim lDateStart As Double = Date2J(1985, 1, 1, 0, 0, 0)
+            Dim lDateEnd As Double = Date2J(2005, 12, 31, 24, 0, 0)
+
+            For Each lWDMDirPath As String In lWDMDirPaths
+                Dim lSusqTransWDM01 As atcWDM.atcDataSourceWDM = New atcWDM.atcDataSourceWDM()
+                If Not lSusqTransWDM01.Open(lWDMDirPath & "SusqTrans01.wdm") Then GoTo ThisWDMDir
+                Dim lSusqTransWDM02 As atcWDM.atcDataSourceWDM = New atcWDM.atcDataSourceWDM()
+                If Not lSusqTransWDM02.Open(lWDMDirPath & "SusqTrans02.wdm") Then GoTo ThisWDMDir
+                Dim lSusqTransWDM03 As atcWDM.atcDataSourceWDM = New atcWDM.atcDataSourceWDM()
+                If Not lSusqTransWDM03.Open(lWDMDirPath & "SusqTrans03.wdm") Then GoTo ThisWDMDir
+                Dim lSusqTransWDM As atcWDM.atcDataSourceWDM = Nothing
+                For Each lKey As String In lHFDailyWUs.Keys
+                    Dim m As Match = Regex.Match(lKey, "([0-9]+)\-([0-9]+)", RegexOptions.IgnoreCase)
+                    If m.Success Then
+                        Dim lBasinName As String = m.Groups(1).Value.Trim
+                        Dim lSubbasinId As Integer = Integer.Parse(m.Groups(2).Value.Trim)
+
+                        Dim lTsHFrack2005 As atcTimeseries = GCRPSubbasin.BuildDailyTimeseries("HFRAC", 6000 + lSubbasinId, lHFDailyWUs.ItemByKey(lKey), False, lDateStart, lDateEnd, "R:" & lSubbasinId, "HydroFra")
+                        If lTsHFrack2005 Is Nothing Then
+                            Logger.Dbg(lKey & "->All Zeros")
+                            Continue For 'bypass those all zero arrays
+                        End If
+
+                        lSusqTransWDM = Nothing
+                        Select Case lBasinName
+                            Case "020501"
+                                lSusqTransWDM = lSusqTransWDM01
+                            Case "020502"
+                                lSusqTransWDM = lSusqTransWDM02
+                            Case "020503"
+                                lSusqTransWDM = lSusqTransWDM03
+                        End Select
+
+                        If lSusqTransWDM IsNot Nothing Then
+                            'Write Hydro fracking WU timeseries into this WDM
+                            If Not lSusqTransWDM.AddDataset(lTsHFrack2005, atcDataSource.EnumExistAction.ExistReplace) Then
+                                Logger.Dbg("Add lTsHFrack2005 failed.")
+                            End If
+                        End If
+                    End If
+                Next
+
+ThisWDMDir:
+                lSusqTransWDM01.Clear()
+                lSusqTransWDM01 = Nothing
+                lSusqTransWDM02.Clear()
+                lSusqTransWDM02 = Nothing
+                lSusqTransWDM03.Clear()
+                lSusqTransWDM03 = Nothing
+                System.GC.Collect()
+            Next
+        End If
+
+        If lCreateFullYearExcelSheet Then
+            'Create a new Sheet
+            Dim lFullYearSheet As String = "HFSumFullYear"
+            Try
+                lxlSheet = lxlWorkbook.Worksheets(lFullYearSheet)
+            Catch ex As Exception
+                lxlSheet = Nothing
+            End Try
+            If lxlSheet IsNot Nothing Then
+                lxlSheet.Delete()
+            End If
+            lxlSheet = lxlWorkbook.Worksheets(lDurations(0))
+            lxlSheet = lxlWorkbook.Worksheets.Add(lxlSheet)
+            With lxlSheet
+                .Name = lFullYearSheet
+                Dim lxlSheet1 As Excel.Worksheet = lxlWorkbook.Worksheets(lDurations(0))
+                Dim lColumnsCount1 As Integer = lxlSheet1.UsedRange.Columns.Count
+                lxlSheet1.Range(lxlSheet1.Cells(1, 2), lxlSheet1.Cells(1, lColumnsCount1)).Copy()
+                .Range(.Cells(2, 1), .Cells(2, 1)).PasteSpecial(Excel.XlPasteType.xlPasteAll, , , Transpose:=True)
+                lxlSheet1 = lxlWorkbook.Worksheets(lDurations(1))
+                Dim lColumnsCount2 As Integer = lxlSheet1.UsedRange.Columns.Count
+                lxlSheet1.Range(lxlSheet1.Cells(1, 2), lxlSheet1.Cells(1, lColumnsCount2)).Copy()
+                .Range(.Cells(lColumnsCount1 - 1 + 2, 1), .Cells(lColumnsCount1 - 1 + 2, 1)).PasteSpecial(Excel.XlPasteType.xlPasteAll, , , Transpose:=True)
+
+                .Cells(1, 1).Value = "Location"
+                For I As Integer = 0 To lHFDailyWUs.Count - 1
+                    .Cells(1, I + 2).Value = lHFDailyWUs.Keys.Item(I)
+                    For d As Integer = 0 To lHFDailyWUs.ItemByIndex(I).Length - 1
+                        .Cells(d + 2, I + 2).Value = lHFDailyWUs.ItemByIndex(I)(d)
+                    Next
+                Next
+            End With 'lxlSheet
+            lxlWorkbook.Save()
+        End If 'lCreateFullYearExcelSheet
+
+        lHFDailyWUs.Clear()
+
+        lxlWorkbook.Close()
+
+        lxlApp.Quit()
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlSheet)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlWorkbook)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlApp)
+
+        lxlSheet = Nothing
+        lxlWorkbook = Nothing
+        lxlApp = Nothing
+    End Sub
+
+
+    Private Sub HydroFrackingDailyValueSumup()
+        Dim lDataFolder As String = "G:\Admin\EPA_HydroFrac_HSPFEval\WaterUse\"
+        Dim lDataFilename As String = IO.Path.Combine(lDataFolder, "DailyFrackingWithdrawals.xls")
+
+        Dim lxlApp As New Excel.Application
+        Dim lxlWorkbook As Excel.Workbook = Nothing
+        Dim lxlSheet As Excel.Worksheet = Nothing
+        Dim lDailyValuesIter() As Double
+        Dim lDuration As String = "Jan - June"
+        lDuration = "July - Dec"
+        lxlWorkbook = lxlApp.Workbooks.Open(lDataFilename)
+        lxlSheet = lxlWorkbook.Worksheets(lDuration)
+        Dim lHFDailyWUs As New atcCollection
+        With lxlSheet
+            Dim lColumnCount As Integer = .UsedRange.Columns.Count
+            Dim lColSubbasin As Integer = 2
+            Dim lColBName As Integer = 3
+            Dim lColDailyValueStart As Integer = 7
+
+            Dim lKeyIsNew As Boolean
+            For lRow As Integer = 2 To .UsedRange.Rows.Count
+                Dim lKey As String = .Cells(lRow, lColBName).Value & "-" & .Cells(lRow, lColSubbasin).Value
+                lKeyIsNew = False
+                If Not lHFDailyWUs.Keys.Contains(lKey) Then
+                    Dim lNewDailyGallonValues(lColumnCount - lColDailyValueStart) As Double 'zero based
+                    lHFDailyWUs.Add(lKey, lNewDailyGallonValues)
+                    lDailyValuesIter = lNewDailyGallonValues
+                    lKeyIsNew = True
+                Else
+                    lDailyValuesIter = lHFDailyWUs.ItemByKey(lKey)
+                End If
+
+                Dim lValue As Double
+                For lCol As Integer = lColDailyValueStart To lColumnCount
+                    If Not Double.TryParse(.Cells(lRow, lCol).Value, lValue) Then
+                        lValue = 0.0
+                    End If
+                    If lKeyIsNew Then
+                        lDailyValuesIter(lCol - lColDailyValueStart) = lValue
+                    Else
+                        lDailyValuesIter(lCol - lColDailyValueStart) += lValue
+                    End If
+                Next
+            Next 'lRow
+
+            .Range(.Cells(1, lColDailyValueStart), .Cells(1, lColumnCount)).Copy()
+        End With
+
+        'Create a new Sheet
+        lxlSheet = lxlWorkbook.Worksheets.Add(lxlSheet)
+        With lxlSheet
+            .Name = "HFSum" & lDuration
+            .Range(.Cells(1, 2), .Cells(1, 2)).PasteSpecial(Excel.XlPasteType.xlPasteAll)
+            .Cells(1, 1).Value = "Location"
+            For I As Integer = 0 To lHFDailyWUs.Count - 1
+                .Cells(I + 2, 1).Value = lHFDailyWUs.Keys.Item(I)
+                For d As Integer = 0 To UBound(lHFDailyWUs.ItemByIndex(I))
+                    .Cells(I + 2, d + 2).Value = lHFDailyWUs.ItemByIndex(I)(d)
+                Next
+            Next
+        End With
+
+        For Each lDailyValuesIter In lHFDailyWUs
+            ReDim lDailyValuesIter(0)
+        Next
+
+        lHFDailyWUs.Clear()
+
+        lxlWorkbook.Save()
+        lxlWorkbook.Close()
+
+        lxlApp.Quit()
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlSheet)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlWorkbook)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlApp)
+
+        lxlSheet = Nothing
+        lxlWorkbook = Nothing
+        lxlApp = Nothing
+    End Sub
+
+    Private Sub BuildTwoCountiesWateruseTimeseries()
+        'put the two-counties more specific PWS data into 020501's wdm
+        'the data were from pre-calculated Excel file as listed below
+        'ground water withdrawal in 8000 series
+        'surface water withdrawal in 7000 series
+        Dim lGCRPWU2005ParmsWDMDir As String = "G:\Admin\GCRPSusq\RunsWithResvWU2005\parms\WDMsWithSRBCWUTsers\"
+        'lGCRPWU2005ParmsWDMDir = "G:\Admin\GCRPSusq\RunsWithResvWU2005\parms\"
+        Dim lSusqWDM01 As New atcWDM.atcDataSourceWDM
+        If Not lSusqWDM01.Open(lGCRPWU2005ParmsWDMDir & "SusqTrans01.wdm") Then Exit Sub
+
+        Dim lDateStart As Double = Date2J(1985, 1, 1, 0, 0, 0)
+        Dim lDateEnd As Double = Date2J(2005, 12, 31, 24, 0, 0)
+        Dim lTs As atcTimeseries = Nothing
+        Dim lTsGCRPDates As New atcTimeseries(Nothing)
+        lTsGCRPDates.Values = NewDates(lDateStart, lDateEnd, atcTimeUnit.TUMonth, 1)
+
+        Dim lTwoCountiesPWSDatasetIdLog As String = lGCRPWU2005ParmsWDMDir & "PWS2010_Brad_SusqCOs_DatasetIds.txt"
+        Dim lSW As New StreamWriter(lTwoCountiesPWSDatasetIdLog, False)
+        lSW.WriteLine("BName" & vbTab & "Subbasin" & vbTab & "Description" & vbTab & "DatasetId" & vbTab & "Constituent" & vbTab & "WDM")
+
+        Dim lDataFilename As String = "G:\Admin\EPA_HydroFrac_HSPFEval\WaterUse\PWS2010_Bradford_Susquehanna.xls"
+        Dim lxlApp As New Excel.Application
+        Dim lxlWorkbook As Excel.Workbook = Nothing
+        Dim lxlSheet As Excel.Worksheet = Nothing
+        lxlWorkbook = lxlApp.Workbooks.Open(lDataFilename)
+        lxlSheet = lxlWorkbook.Worksheets("PWS2010CFS")
+        With lxlSheet
+            Dim lColMonths() As Integer = {3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15} 'for leap year, 4->5
+
+            Dim lGCRPMonthlyValues As New List(Of Double)
+            Dim lTwoCounties2010MonthlyValues(11) As Double
+
+            Dim lDatasetCounter As Integer = 0
+            For lRow As Integer = 2 To .UsedRange.Rows.Count 'one timeseries per row
+                lGCRPMonthlyValues.Clear()
+                lGCRPMonthlyValues.Add(GetNaN)
+                Dim lRchres As String = .Cells(lRow, 1).Value
+                Dim lLocation As String = "R:" & lRchres
+                Dim lDescription As String = .Cells(lRow, 2).Value
+                Dim lDatasetId As Integer
+                'If lDescription.ToLower.Contains("ground") Then
+                '    lDatasetId = 8000
+                'Else
+                '    lDatasetId = 7000 'surface
+                'End If
+
+                lDatasetCounter += 1
+                lDatasetId = 4118 + lDatasetCounter
+                Dim lConstituent As String
+                If lDescription.ToLower.Contains("ground") Then
+                    lConstituent = "PWGWC"
+                Else
+                    lConstituent = "PWSWC"
+                End If
+
+                For lYear As Integer = 1985 To 2005
+                    If Date.IsLeapYear(lYear) Then
+                        lColMonths(1) = 5
+                    Else
+                        lColMonths(1) = 4
+                    End If
+                    For I As Integer = 0 To lColMonths.Length - 1
+                        lTwoCounties2010MonthlyValues(I) = Double.Parse(.Cells(lRow, lColMonths(I)).Value)
+                    Next 'I
+
+                    lGCRPMonthlyValues.AddRange(lTwoCounties2010MonthlyValues)
+
+                Next 'lYear
+
+                'Make New Tser
+                lTs = New atcTimeseries(Nothing)
+                With lTs
+                    .Dates = lTsGCRPDates
+                    .SetInterval(atcTimeUnit.TUMonth, 1)
+                    .Values = lGCRPMonthlyValues.ToArray()
+                    '.Attributes.SetValue("ID", lDatasetId + CInt(lRchres))
+                    .Attributes.SetValue("ID", lDatasetId)
+                    .Attributes.SetValue("Constituent", lConstituent)
+                    .Attributes.SetValue("Location", lLocation)
+                    .Attributes.SetValue("Scenario", "PWS2CO")
+                End With
+
+                'Write to WDM
+                If Not lSusqWDM01.AddDataset(lTs, atcDataSource.EnumExistAction.ExistReplace) Then
+                    Logger.Dbg("Writing 020501-" & lRchres & " dataset failed in SusqTrans01.wdm")
+                Else
+                    lSW.WriteLine("020501" & vbTab & lRchres & vbTab & lDescription & vbTab & lDatasetId & vbTab & lConstituent & vbTab & lSusqWDM01.Specification)
+                End If
+            Next 'lRow
+
+        End With
+
+        lxlWorkbook.Close()
+        lxlApp.Quit()
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlSheet)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlWorkbook)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(lxlApp)
+
+        lxlSheet = Nothing
+        lxlWorkbook = Nothing
+        lxlApp = Nothing
+
+        lSW.Flush()
+        lSW.Close()
+        lSW = Nothing
+
+        lSusqWDM01.Clear()
+        lSusqWDM01 = Nothing
+
+        lTs.Clear()
+        lTs = Nothing
+        lTsGCRPDates.Clear()
+        lTsGCRPDates = Nothing
     End Sub
 
     Private Sub SBRCOSup2010DailyWUDataToGCRPDailyTimeseries()
@@ -420,7 +794,7 @@ Module Util_HydroFrack
 
     End Sub
 
-    Private Sub BuildHydroFrackingTimeseries()
+    Private Sub BuildHydroFrackingTimeseriesMonthlyFixedValues()
         'The hydro fracking water use is to be used on the water use 2005 scenario, which is considered as 'current' condition
         Dim lHydroFrackingDataFile As String = "G:\Admin\EPA_HydroFrac_HSPFEval\WaterUse\2010_by_sector_47frackingwithdrawals_reprojected_withSubbasins.xls"
         Dim lxlApp As New Excel.Application
@@ -756,7 +1130,7 @@ Module Util_HydroFrack
     End Sub
 
     Private Sub SumGCRPHspfSubbasinWateruse()
-        'This routine is to be run after task task 8 (whose output file is white-space delimited, e.g. GCRP020501byCountyWaterUse2000.txt)
+        'This routine is to be run after task task 81 (whose output file is white-space delimited, e.g. GCRP020501byCountyWaterUse2000.txt)
         'basically, to sum up the various categories of wateruse for each subbasin
         'the output file is comma-delimited (e.g. GCRP020501SubbasinWaterUse2000.txt), unit is cfs (converted from task 8 output in Mgd)
         'water use categories and column order are the same as those in the excel files used in
@@ -840,6 +1214,12 @@ Module Util_HydroFrack
         'this same set in the same order is going to be used by task 82 (SumGCRPHspfSubbasinWateruse)
         'mdco2000SelectedWU.xls 'selected original wateruse data 
         'mdco2005SelectedWU.xls
+
+        Dim lApplyConsumptivePct As Boolean = False
+        Dim lAuxFlag As String = ""
+        If Not lApplyConsumptivePct Then
+            lAuxFlag = "Full"
+        End If
 
         Dim lFipsFieldIndexExcel As Integer = 4
         Dim lWUStartColIndexExcel As Integer = 5
@@ -980,7 +1360,7 @@ Module Util_HydroFrack
         Dim lDDTableFilename As String = lAwudsDataDirectory & "DataDictionaryCompare.txt"
         Dim lDD As New DataDictionaries(lDDTableFilename)
 
-        Dim lYearToProcess As Integer = lDataYear(1) 'pick a year to do
+        Dim lYearToProcess As Integer = lDataYear(0) 'pick a year to do
         Dim lFile As String = ""
 
         lxlApp = New Excel.Application()
@@ -994,7 +1374,7 @@ Module Util_HydroFrack
         Dim lNeedToSetHeader As Boolean = True
         For Each lGCRPRun As String In lSubbasinByCountyFiles.Keys
             File1 = lSubbasinByCountyFiles.ItemByKey(lGCRPRun)
-            lFile = IO.Path.Combine(IO.Path.GetDirectoryName(File1), "GCRP" & lGCRPRun & "byCountyWaterUse" & lYearToProcess & ".txt")
+            lFile = IO.Path.Combine(IO.Path.GetDirectoryName(File1), "GCRP" & lGCRPRun & "byCountyWaterUse" & lYearToProcess & lAuxFlag & ".txt")
 
             lOneLine = ""
             ReDim lArrCounty(0)
@@ -1120,7 +1500,7 @@ Module Util_HydroFrack
                                     End If
                                 End If
 
-                                If lHas1995EquivlentCuPctValue Then
+                                If lApplyConsumptivePct AndAlso lHas1995EquivlentCuPctValue Then
                                     If lCounty.CUPcts.GetDefinedValue(lDD.Cat1995) Is Nothing OrElse Not Double.TryParse(lCounty.CUPcts.GetDefinedValue(lDD.Cat1995).Value.ToString, lCuPctValue) Then
                                         lCuPctValue = 100.0
                                     Else
@@ -3231,6 +3611,87 @@ Module Util_HydroFrack
             End With
 
             Return lTs
+        End Function
+
+        Public Shared Function BuildDailyTimeseries(ByVal aCon As String, _
+                                                 ByVal aId As Integer, _
+                                                 ByVal aValues() As Double, _
+                                                 ByVal aLeapYear As Boolean, _
+                                                 ByVal aStartDate As Double, _
+                                                 ByVal aEndDate As Double, _
+                                                 Optional ByVal aLocation As String = "", _
+                                                 Optional ByVal aScenario As String = "") As atcTimeseries
+
+            'this routine specifically build the daily Hydrofracking water withdrawal timeseries for the 
+            'study, it expects a full year (2010 in this case) of daily values
+
+            Dim lTsDates As New atcTimeseries(Nothing)
+            lTsDates.Values = NewDates(aStartDate, aEndDate, atcTimeUnit.TUDay, 1)
+
+            Dim lTs As New atcTimeseries(Nothing)
+            With lTs
+                .Dates = lTsDates
+                .numValues = .Dates.numValues
+                .SetInterval(atcTimeUnit.TUDay, 1)
+                .Attributes.SetValue("ID", aId)
+                .Attributes.SetValue("TSTYP", aCon)
+                .Attributes.SetValue("Constituent", aCon)
+
+                If aLocation <> "" Then .Attributes.SetValue("Location", aLocation)
+                If aScenario <> "" Then .Attributes.SetValue("Scenario", aScenario)
+
+                Dim lAllZeros As Boolean = True
+                For I As Integer = 0 To aValues.Length - 1
+                    If aValues(I) > 0 Then
+                        lAllZeros = False
+                        Exit For
+                    End If
+                Next
+                If lAllZeros Then Return Nothing
+
+                Dim lDate(5) As Integer
+                Dim lDailyValues As New List(Of Double)
+                lDailyValues.Add(GetNaN())
+
+                J2Date(aStartDate, lDate)
+                Dim lYearStart As Integer = lDate(0)
+                J2Date(aEndDate, lDate)
+                Dim lYearEnd As Integer = lDate(0) - 1
+
+                For lYear As Integer = lYearStart To lYearEnd
+                    If Date.IsLeapYear(lYear) Then
+                        If aLeapYear Then
+                            lDailyValues.AddRange(aValues)
+                        Else
+                            For ld As Integer = 0 To 58
+                                lDailyValues.Add(aValues(ld))
+                            Next
+                            lDailyValues.Add((aValues(58) + aValues(59)) / 2.0)
+                            For ld As Integer = 59 To aValues.Length - 1
+                                lDailyValues.Add(aValues(ld))
+                            Next
+                        End If
+                    Else 'not a leap year
+                        If aLeapYear Then
+                            For ld As Integer = 0 To 58
+                                lDailyValues.Add(aValues(ld))
+                            Next
+
+                            For ld As Integer = 60 To aValues.Length - 1
+                                lDailyValues.Add(aValues(ld))
+                            Next
+                        Else
+                            lDailyValues.AddRange(aValues)
+                        End If
+
+                    End If
+                Next 'lYear
+
+                .Values = lDailyValues.ToArray()
+            End With
+
+            Return lTs
+
         End Function
 
         Public Sub Clear()
