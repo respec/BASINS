@@ -12,6 +12,10 @@ Public Class frmHSPFParm
     Friend pSegmentGridIDs As atcCollection
     Friend pSelectedSegmentFilters As atcCollection
     Friend pSelectedTableFilters As atcCollection
+    Friend WithEvents cmdDeleteWatershed As System.Windows.Forms.Button
+    Friend WithEvents cmdAddWatershed As System.Windows.Forms.Button
+    Friend WithEvents cmdDeleteScenario As System.Windows.Forms.Button
+    Friend WithEvents cmdAddScenario As System.Windows.Forms.Button
     <CLSCompliant(False)> Public Database As atcUtility.atcMDB
 
 #Region " Windows Form Designer generated code "
@@ -41,7 +45,6 @@ Public Class frmHSPFParm
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    Friend WithEvents cmdAdd As System.Windows.Forms.Button
     Friend WithEvents cmdMap As System.Windows.Forms.Button
     Friend WithEvents cmdHelp As System.Windows.Forms.Button
     Friend WithEvents cmdWrite As System.Windows.Forms.Button
@@ -69,7 +72,6 @@ Public Class frmHSPFParm
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmHSPFParm))
         Me.cmdMap = New System.Windows.Forms.Button
-        Me.cmdAdd = New System.Windows.Forms.Button
         Me.cmdHelp = New System.Windows.Forms.Button
         Me.cmdAbout = New System.Windows.Forms.Button
         Me.cmdWrite = New System.Windows.Forms.Button
@@ -93,6 +95,10 @@ Public Class frmHSPFParm
         Me.gbxValues = New System.Windows.Forms.GroupBox
         Me.lblTableParmName = New System.Windows.Forms.Label
         Me.agdValues = New atcControls.atcGrid
+        Me.cmdDeleteWatershed = New System.Windows.Forms.Button
+        Me.cmdAddWatershed = New System.Windows.Forms.Button
+        Me.cmdDeleteScenario = New System.Windows.Forms.Button
+        Me.cmdAddScenario = New System.Windows.Forms.Button
         Me.gbxWatershed.SuspendLayout()
         Me.gbxScenario.SuspendLayout()
         Me.gbxSegment.SuspendLayout()
@@ -108,16 +114,6 @@ Public Class frmHSPFParm
         Me.cmdMap.Size = New System.Drawing.Size(84, 28)
         Me.cmdMap.TabIndex = 2
         Me.cmdMap.Text = "View Map"
-        '
-        'cmdAdd
-        '
-        Me.cmdAdd.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdAdd.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdAdd.Location = New System.Drawing.Point(102, 12)
-        Me.cmdAdd.Name = "cmdAdd"
-        Me.cmdAdd.Size = New System.Drawing.Size(84, 28)
-        Me.cmdAdd.TabIndex = 5
-        Me.cmdAdd.Text = "Add Project"
         '
         'cmdHelp
         '
@@ -154,6 +150,8 @@ Public Class frmHSPFParm
         '
         Me.gbxWatershed.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbxWatershed.Controls.Add(Me.cmdDeleteWatershed)
+        Me.gbxWatershed.Controls.Add(Me.cmdAddWatershed)
         Me.gbxWatershed.Controls.Add(Me.agdWatershed)
         Me.gbxWatershed.Controls.Add(Me.cmdWatershedDetails)
         Me.gbxWatershed.Location = New System.Drawing.Point(12, 46)
@@ -193,6 +191,8 @@ Public Class frmHSPFParm
         'gbxScenario
         '
         Me.gbxScenario.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbxScenario.Controls.Add(Me.cmdDeleteScenario)
+        Me.gbxScenario.Controls.Add(Me.cmdAddScenario)
         Me.gbxScenario.Controls.Add(Me.cmdScenarioDetails)
         Me.gbxScenario.Controls.Add(Me.agdScenario)
         Me.gbxScenario.Location = New System.Drawing.Point(12, 145)
@@ -408,11 +408,54 @@ Public Class frmHSPFParm
         Me.agdValues.Source = Nothing
         Me.agdValues.TabIndex = 14
         '
+        'cmdDeleteWatershed
+        '
+        Me.cmdDeleteWatershed.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdDeleteWatershed.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdDeleteWatershed.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdDeleteWatershed.Location = New System.Drawing.Point(461, 68)
+        Me.cmdDeleteWatershed.Name = "cmdDeleteWatershed"
+        Me.cmdDeleteWatershed.Size = New System.Drawing.Size(59, 22)
+        Me.cmdDeleteWatershed.TabIndex = 17
+        Me.cmdDeleteWatershed.Text = "Delete"
+        '
+        'cmdAddWatershed
+        '
+        Me.cmdAddWatershed.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdAddWatershed.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdAddWatershed.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdAddWatershed.Location = New System.Drawing.Point(461, 43)
+        Me.cmdAddWatershed.Name = "cmdAddWatershed"
+        Me.cmdAddWatershed.Size = New System.Drawing.Size(59, 22)
+        Me.cmdAddWatershed.TabIndex = 16
+        Me.cmdAddWatershed.Text = "Add"
+        '
+        'cmdDeleteScenario
+        '
+        Me.cmdDeleteScenario.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdDeleteScenario.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdDeleteScenario.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdDeleteScenario.Location = New System.Drawing.Point(461, 68)
+        Me.cmdDeleteScenario.Name = "cmdDeleteScenario"
+        Me.cmdDeleteScenario.Size = New System.Drawing.Size(59, 22)
+        Me.cmdDeleteScenario.TabIndex = 17
+        Me.cmdDeleteScenario.Text = "Delete"
+        '
+        'cmdAddScenario
+        '
+        Me.cmdAddScenario.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdAddScenario.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdAddScenario.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdAddScenario.Location = New System.Drawing.Point(461, 43)
+        Me.cmdAddScenario.Name = "cmdAddScenario"
+        Me.cmdAddScenario.Size = New System.Drawing.Size(59, 22)
+        Me.cmdAddScenario.TabIndex = 16
+        Me.cmdAddScenario.Text = "Add"
+        '
         'frmHSPFParm
         '
         Me.AcceptButton = Me.cmdMap
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.CancelButton = Me.cmdAdd
         Me.ClientSize = New System.Drawing.Size(560, 584)
         Me.Controls.Add(Me.gbxValues)
         Me.Controls.Add(Me.gbxTable)
@@ -422,7 +465,6 @@ Public Class frmHSPFParm
         Me.Controls.Add(Me.cmdWrite)
         Me.Controls.Add(Me.cmdAbout)
         Me.Controls.Add(Me.cmdHelp)
-        Me.Controls.Add(Me.cmdAdd)
         Me.Controls.Add(Me.cmdMap)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
@@ -441,52 +483,6 @@ Public Class frmHSPFParm
 
 #End Region
 
-    Private Sub cmdAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAdd.Click
-        'With cmdProject
-        '    .DialogTitle = "HSPFParm File Open Project"
-        '    .CancelError = True
-        '    .flags = &H1804& 'not read only
-        '    .Filter = "Project files (*.Wat)|*.Wat"
-        '    On Error GoTo err
-        '    .ShowOpen()
-        'End With
-        'Call frmWat.AddWatFromFile(cmdProject.Filename, False)
-
-        ' Call Map1.GetSelectedKeys(WatKeys())
-        '            If UBound(WatKeys) = 1 Then 'only one project select, continue
-        '                On Error GoTo skip
-        '                With cmdUCIFile
-        '                    .flags = &H1000& 'file must exist
-        '                    .Filter = "UCI files (*.uci)|*.uci"
-        '                    .ShowOpen()
-        '                    UCIFile = FilenameOnly(.Filename)
-        '                End With
-        '                ScenExist = False
-        '                If agdScen.Rows > 1 Then
-        '                    i = 1
-        '                    Do While Not ScenExist
-        '                        If UCase(UCIFile) = UCase(agdScen.TextMatrix(i, 1)) Then
-        '                            ScenExist = True
-        '                        Else
-        '                            i = i + 1
-        '                        End If
-        '                        If i >= agdScen.Rows Then Exit Do
-        '                    Loop
-        '                End If
-        '                If Not ScenExist Then
-        '                    'get project name from database (use DBF in future?)
-        '                    myWat = myDB.OpenRecordset("WatershedData", dbOpenDynaset)
-        '                    crit = "ID = " & WatKeys(0)
-        '                    myWat.FindFirst(crit)
-        '                    WatName = myWat!Name
-        '                    myWat.Close()
-        '                    Call frmScn.BuildScn(WatName, " ", " ", UCIFile, " ", " ", " ", " ", " ", " ", _
-        '                                         "11.0", " ", " ", " ", " ", " ")
-        '                Else
-        '                    MsgBox("This Scenario exists in this project. Delete it first!")
-        '                End If
-    End Sub
-
     Private Sub cmdAbout_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAbout.Click
         Logger.Msg("BASINS HSPFParm" & vbCrLf & vbCrLf & "Version 2.0", MsgBoxStyle.OkOnly, "BASINS HSPFParm")
     End Sub
@@ -501,8 +497,8 @@ Public Class frmHSPFParm
     End Sub
 
     Private Sub cmdWrite_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdWrite.Click
-        Logger.Msg("Write option is not yet implemented.  This option will allow the user to write a file of values.", MsgBoxStyle.OkOnly, "BASINS HSPFParm")
-        'frmReport.Show()
+        Dim lfrmReport As New frmReport
+        lfrmReport.Show()
     End Sub
 
     Public Sub InitializeUI(ByVal aPath As String, ByVal aDBName As String)
@@ -1373,5 +1369,63 @@ Public Class frmHSPFParm
         agdValues.SizeAllColumnsToContents()
         agdValues.Refresh()
         lblTableParmName.Text = ""
+    End Sub
+
+    Private Sub cmdAddWatershed_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAddWatershed.Click
+        'With cmdProject
+        '    .DialogTitle = "HSPFParm File Open Project"
+        '    .CancelError = True
+        '    .flags = &H1804& 'not read only
+        '    .Filter = "Project files (*.Wat)|*.Wat"
+        '    On Error GoTo err
+        '    .ShowOpen()
+        'End With
+        'Call frmWat.AddWatFromFile(cmdProject.Filename, False)
+
+        ' Call Map1.GetSelectedKeys(WatKeys())
+        '            If UBound(WatKeys) = 1 Then 'only one project select, continue
+        '                On Error GoTo skip
+        '                With cmdUCIFile
+        '                    .flags = &H1000& 'file must exist
+        '                    .Filter = "UCI files (*.uci)|*.uci"
+        '                    .ShowOpen()
+        '                    UCIFile = FilenameOnly(.Filename)
+        '                End With
+        '                ScenExist = False
+        '                If agdScen.Rows > 1 Then
+        '                    i = 1
+        '                    Do While Not ScenExist
+        '                        If UCase(UCIFile) = UCase(agdScen.TextMatrix(i, 1)) Then
+        '                            ScenExist = True
+        '                        Else
+        '                            i = i + 1
+        '                        End If
+        '                        If i >= agdScen.Rows Then Exit Do
+        '                    Loop
+        '                End If
+        '                If Not ScenExist Then
+        '                    'get project name from database (use DBF in future?)
+        '                    myWat = myDB.OpenRecordset("WatershedData", dbOpenDynaset)
+        '                    crit = "ID = " & WatKeys(0)
+        '                    myWat.FindFirst(crit)
+        '                    WatName = myWat!Name
+        '                    myWat.Close()
+        '                    Call frmScn.BuildScn(WatName, " ", " ", UCIFile, " ", " ", " ", " ", " ", " ", _
+        '                                         "11.0", " ", " ", " ", " ", " ")
+        '                Else
+        '                    MsgBox("This Scenario exists in this project. Delete it first!")
+        '                End If
+    End Sub
+
+    Private Sub cmdDeleteWatershed_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDeleteWatershed.Click
+
+    End Sub
+
+    Private Sub cmdAddScenario_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAddScenario.Click
+
+    End Sub
+
+    Private Sub cmdDeleteScenario_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDeleteScenario.Click
+
     End Sub
 End Class
