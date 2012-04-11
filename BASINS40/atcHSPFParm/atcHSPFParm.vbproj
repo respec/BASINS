@@ -175,6 +175,12 @@
     <Compile Include="frmHSPFParm.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmReport.designer.vb">
+      <DependentUpon>frmReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmReport.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmScenarioDetails.Designer.vb">
       <DependentUpon>frmScenarioDetails.vb</DependentUpon>
     </Compile>
@@ -195,6 +201,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmHSPFParm.resx">
       <DependentUpon>frmHSPFParm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmReport.resx">
+      <DependentUpon>frmReport.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmScenarioDetails.resx">
       <DependentUpon>frmScenarioDetails.vb</DependentUpon>
