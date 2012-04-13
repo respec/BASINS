@@ -23,7 +23,6 @@ Partial Class frmReport
         Me.cmdClose = New System.Windows.Forms.Button
         Me.cmdAll = New System.Windows.Forms.Button
         Me.cbxUCI = New System.Windows.Forms.CheckBox
-        Me.cmdPrint = New System.Windows.Forms.Button
         Me.cmdSet = New System.Windows.Forms.Button
         Me.cmdWrite = New System.Windows.Forms.Button
         Me.cdSetOut = New System.Windows.Forms.SaveFileDialog
@@ -32,7 +31,7 @@ Partial Class frmReport
         '
         'cmdClose
         '
-        Me.cmdClose.Location = New System.Drawing.Point(205, 135)
+        Me.cmdClose.Location = New System.Drawing.Point(145, 125)
         Me.cmdClose.Name = "cmdClose"
         Me.cmdClose.Size = New System.Drawing.Size(101, 26)
         Me.cmdClose.TabIndex = 24
@@ -42,7 +41,7 @@ Partial Class frmReport
         'cmdAll
         '
         Me.cmdAll.DialogResult = System.Windows.Forms.DialogResult.OK
-        Me.cmdAll.Location = New System.Drawing.Point(89, 135)
+        Me.cmdAll.Location = New System.Drawing.Point(205, 93)
         Me.cmdAll.Name = "cmdAll"
         Me.cmdAll.Size = New System.Drawing.Size(101, 26)
         Me.cmdAll.TabIndex = 23
@@ -61,15 +60,6 @@ Partial Class frmReport
         Me.cbxUCI.TabIndex = 27
         Me.cbxUCI.Text = "Report tables in UCI form"
         Me.cbxUCI.UseVisualStyleBackColor = True
-        '
-        'cmdPrint
-        '
-        Me.cmdPrint.Location = New System.Drawing.Point(205, 93)
-        Me.cmdPrint.Name = "cmdPrint"
-        Me.cmdPrint.Size = New System.Drawing.Size(101, 26)
-        Me.cmdPrint.TabIndex = 28
-        Me.cmdPrint.Text = "Print Table/Parm"
-        Me.cmdPrint.UseVisualStyleBackColor = True
         '
         'cmdSet
         '
@@ -111,7 +101,6 @@ Partial Class frmReport
         Me.Controls.Add(Me.lblFile)
         Me.Controls.Add(Me.cmdWrite)
         Me.Controls.Add(Me.cmdSet)
-        Me.Controls.Add(Me.cmdPrint)
         Me.Controls.Add(Me.cbxUCI)
         Me.Controls.Add(Me.cmdClose)
         Me.Controls.Add(Me.cmdAll)
@@ -127,7 +116,6 @@ Partial Class frmReport
     Friend WithEvents cmdClose As System.Windows.Forms.Button
     Friend WithEvents cmdAll As System.Windows.Forms.Button
     Friend WithEvents cbxUCI As System.Windows.Forms.CheckBox
-    Friend WithEvents cmdPrint As System.Windows.Forms.Button
     Friend WithEvents cmdSet As System.Windows.Forms.Button
     Friend WithEvents cmdWrite As System.Windows.Forms.Button
     Friend WithEvents cdSetOut As System.Windows.Forms.SaveFileDialog

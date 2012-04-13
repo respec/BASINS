@@ -498,6 +498,7 @@ Public Class frmHSPFParm
 
     Private Sub cmdWrite_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdWrite.Click
         Dim lfrmReport As New frmReport
+        lfrmReport.InitializeUI(Me, Database)
         lfrmReport.Show()
     End Sub
 
