@@ -568,7 +568,8 @@ Public Class frmUSGSBaseflow
             If aGraphType = "CDist" Then
                 lTsGraphAll.Add(lTsGroupStock.FindData("Constituent", "FLOW")(0))
             Else
-                lTsGraphAll.Add(lTsFlow)
+                'lTsGraphAll.Add(lTsFlow)
+                lTsGraphAll.Add(lTsGroupStock.FindData("Constituent", "FLOW")(0))
             End If
             Dim lTsGroupBf As atcTimeseriesGroup = lTsGroupStock.FindData("Constituent", "Baseflow")
             lTsGraphAll.AddRange(lTsGroupBf)
