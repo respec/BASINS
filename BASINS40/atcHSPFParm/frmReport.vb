@@ -8,9 +8,9 @@ Public Class frmReport
     <CLSCompliant(False)> Public Database As atcUtility.atcMDB
 
     Friend Class ParmDetail
-        Friend name As String
-        Friend width As Integer
-        Friend startcol As Integer
+        Public Name As String
+        Public Width As Integer
+        Public StartCol As Integer
     End Class
 
     Public Sub New()
@@ -22,6 +22,7 @@ Public Class frmReport
 
     Public Sub InitializeUI(ByVal aParentObj As frmHSPFParm, ByVal aDatabase As atcUtility.atcMDB)
         pParentObj = aParentObj
+        Database = aDatabase
     End Sub
 
     Private Sub cmdAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAll.Click
@@ -84,7 +85,7 @@ Public Class frmReport
             If f = "<none>" Then
                 Logger.Msg("The Report file must be set using the Set File button.", vbOKOnly, "Write Problem")
             Else
-                Dim ltxt As String = pParentObj.lblTableParmName.Text
+                Dim ltxt As String = "    " & pParentObj.lblTableParmName.Text & vbCrLf
                 If Mid(ltxt, 5, 1) <> "T" Or (Mid(ltxt, 5, 1) = "T" And Not cbxUCI.Checked) Then
                     'output header if not doing uci tables
                     AppendFileString(f, ltxt)
@@ -113,15 +114,15 @@ Public Class frmReport
                     Next i
 
                     If Not cbxUCI.Checked Then
-                        ltxt = "  Op Type " & OpTypNam
+                        ltxt = "  Op Type " & OpTypNam & vbCrLf
                         AppendFileString(f, ltxt)
-                        AppendFileString(f, "")
+                        AppendFileString(f, vbCrLf)
                     End If
 
                     Dim crit As String = "TabName = '" & TabNam & "' AND OpnTypID = " & CStr(OpTyp)
 
                     Dim lStr As String = "SELECT DISTINCTROW ParmTableList.Name, " & _
-                                                            "ParmTableList.StartCol " & _
+                                                            "ParmTableList.StartCol, " & _
                                                             "ParmTableList.Width " & _
                                                             "From ParmTableList " & _
                                                             "WHERE (" & crit & ")"
@@ -137,17 +138,21 @@ Public Class frmReport
 
                     If Not cbxUCI.Checked Then
                         ltxt = "Op Num    Scenario  "
-                        If pParentObj.agdTable.Source.Columns = lParmCount + 4 Then
+                        Dim lExtraCols As Integer = 0
+                        If pParentObj.agdValues.Source.Columns = lParmCount + 4 Then
                             'occur column is present 
-                            ltxt = ltxt & pParentObj.agdTable.Source.CellValue(0, 2)
+                            lExtraCols += 1
+                            ltxt = ltxt & pParentObj.agdValues.Source.CellValue(0, 2)
                             Dim k As Integer = Len(ltxt)
                             For i As Integer = k + 1 To 30
                                 ltxt = ltxt & " "
                             Next i
                         End If
-                        If pParentObj.agdTable.Source.Columns = lParmCount + 4 Then
+                        Dim lAliasLen As Integer = 0
+                        If pParentObj.agdValues.Source.Columns > lParmCount + 2 Then
                             'alias column is present 
-                            ltxt = ltxt & pParentObj.agdTable.Source.CellValue(0, 3)
+                            lExtraCols += 1
+                            ltxt = ltxt & pParentObj.agdValues.Source.CellValue(0, 1 + lExtraCols)
                             Dim k As Integer = Len(ltxt)
                             If k > 30 Then
                                 For i As Integer = k + 1 To 40
@@ -158,52 +163,53 @@ Public Class frmReport
                                     ltxt = ltxt & " "
                                 Next i
                             End If
+                            lAliasLen = Len(ltxt)
                         End If
                         ltxt = ltxt & "Desc                "
-                        For j As Integer = 3 To pParentObj.agdTable.Source.Columns
-                            Dim k As Integer = Len(lPDs(j - 2).Name)
-                            Dim w As Integer = lPDs(j - 2).Width
+                        For j As Integer = 0 To lPDs.Count - 1
+                            Dim k As Integer = Len(lPDs(j).Name)
+                            Dim w As Integer = lPDs(j).Width
                             If w > k Then
-                                ltxt = ltxt & lPDs(j - 2).Name
+                                ltxt = ltxt & lPDs(j).Name
                                 For n As Integer = 1 To (w - k)
                                     ltxt = ltxt & " "
                                 Next n
                             ElseIf w <= k Then
-                                ltxt = ltxt & Mid(lPDs(j - 2).Name, 1, w)
+                                ltxt = ltxt & Mid(lPDs(j).Name, 1, w)
                             End If
                         Next j
-                        AppendFileString(f, ltxt)
+                        AppendFileString(f, ltxt & vbCrLf)
                         'initialize min, max, sum for each column
-                        For j As Integer = 1 To pParentObj.agdTable.Source.Columns
+                        For j As Integer = 0 To lPDs.Count - 1
                             Min(j) = 999999
                             Max(j) = -999999
                             sum(j) = 0.0#
                         Next j
                         'fill in values from table
-                        For j As Integer = 1 To pParentObj.agdTable.Source.Rows
-                            ltxt = Trim(pParentObj.agdTable.Source.CellValue(j, 0))
+                        For j As Integer = 1 To pParentObj.agdValues.Source.Rows - 1
+                            ltxt = Trim(pParentObj.agdValues.Source.CellValue(j, 0))
                             Dim curop As Integer = CInt(ltxt)
-                            Dim curseg As String = OpTypNam & pParentObj.agdTable.Source.CellValue(j, 0)
+                            Dim curseg As String = OpTypNam & pParentObj.agdValues.Source.CellValue(j, 0)
                             Dim k As Integer = Len(ltxt)
                             For i As Integer = k To 9
                                 ltxt = ltxt & " "
                             Next i
-                            ltxt = ltxt & Mid(pParentObj.agdTable.Source.CellValue(j, 1), 1, 10)
+                            ltxt = ltxt & Mid(pParentObj.agdValues.Source.CellValue(j, 1), 1, 10)
                             k = Len(ltxt)
                             For i As Integer = k To 19
                                 ltxt = ltxt & " "
                             Next i
-                            If pParentObj.agdTable.Source.Columns = lParmCount + 4 Then
+                            If pParentObj.agdValues.Source.Columns = lParmCount + 4 Then
                                 'occur column is present 
-                                ltxt = ltxt & pParentObj.agdTable.Source.CellValue(j, 2)
+                                ltxt = ltxt & pParentObj.agdValues.Source.CellValue(j, 2)
                                 k = Len(ltxt)
                                 For i As Integer = k To 29
                                     ltxt = ltxt & " "
                                 Next i
                             End If
-                            If pParentObj.agdTable.Source.Columns = lParmCount + 4 Then
+                            If pParentObj.agdValues.Source.Columns > lParmCount + 2 Then
                                 'alias column is present 
-                                ltxt = ltxt & pParentObj.agdTable.Source.CellValue(j, 3)
+                                ltxt = ltxt & pParentObj.agdValues.Source.CellValue(j, 1 + lExtraCols)
                                 k = Len(ltxt)
                                 If k > 30 Then
                                     For i As Integer = k To 39
@@ -213,6 +219,9 @@ Public Class frmReport
                                     For i As Integer = k To 29
                                         ltxt = ltxt & " "
                                     Next i
+                                End If
+                                If Len(ltxt) > lAliasLen Then
+                                    ltxt = Mid(ltxt, 1, lAliasLen)
                                 End If
                             End If
                             Dim desc As String = ""
@@ -229,11 +238,11 @@ Public Class frmReport
                                     ltxt = ltxt & " "
                                 Next i
                             End If
-                            For k = 5 To pParentObj.agdValues.Source.Columns
-                                Dim n As Integer = Len(pParentObj.agdValues.Source.CellValue(j, k - 1))
-                                ltxt = ltxt & pParentObj.agdValues.Source.CellValue(j, k - 1)
+                            For k = 0 To lPDs.Count - 1
+                                Dim n As Integer = Len(pParentObj.agdValues.Source.CellValue(j, k + lExtraCols + 2))
+                                ltxt = ltxt & pParentObj.agdValues.Source.CellValue(j, k + lExtraCols + 2)
                                 'keep sum, min, max
-                                Dim rtemp As Single = Val(pParentObj.agdValues.Source.CellValue(j, k - 1))
+                                Dim rtemp As Single = Val(pParentObj.agdValues.Source.CellValue(j, k + lExtraCols + 2))
                                 sum(k) = sum(k) + rtemp
                                 If rtemp > Max(k) Then
                                     Max(k) = rtemp
@@ -241,102 +250,112 @@ Public Class frmReport
                                 If rtemp < Min(k) Then
                                     Min(k) = rtemp
                                 End If
-                                For i As Integer = n + 1 To lPDs(k - 4).Width
+                                For i As Integer = n + 1 To lPDs(k).Width
                                     ltxt = ltxt & " "
                                 Next i
                             Next k
-                            AppendFileString(f, ltxt)
+                            AppendFileString(f, ltxt & vbCrLf)
                         Next j
-                        AppendFileString(f, "")
+                        AppendFileString(f, vbCrLf)
                         'add lines for min, max, mean
                         ltxt = "Min                "
                         ltxt = ltxt & "                    "
-                        If pParentObj.agdTable.Source.Columns = lParmCount + 4 Then
+                        If pParentObj.agdValues.Source.Columns = lParmCount + 4 Then
                             'occur column is present 
                             ltxt = ltxt & "          "
                         End If
-                        If pParentObj.agdTable.Source.Columns = lParmCount + 4 Then
+                        If pParentObj.agdValues.Source.Columns > lParmCount + 2 Then
                             'alias column is present 
                             ltxt = ltxt & "          "
                         End If
-                        For k As Integer = 5 To pParentObj.agdTable.Source.Columns
+                        For k As Integer = 0 To lPDs.Count - 1
                             Dim txtval As String = Str(Min(k))
                             Dim n As Integer = Len(txtval)
                             ltxt = ltxt & txtval
-                            For i As Integer = n + 1 To lPDs(k - 4).Width
+                            For i As Integer = n + 1 To lPDs(k).Width
                                 ltxt = ltxt & " "
                             Next i
                         Next k
-                        AppendFileString(f, ltxt)
+                        AppendFileString(f, ltxt & vbCrLf)
                         'output max
                         ltxt = "Max                "
                         ltxt = ltxt & "                    "
-                        If pParentObj.agdTable.Source.Columns = lParmCount + 4 Then
+                        If pParentObj.agdValues.Source.Columns = lParmCount + 4 Then
                             'occur column is present 
                             ltxt = ltxt & "          "
                         End If
-                        If pParentObj.agdTable.Source.Columns = lParmCount + 4 Then
+                        If pParentObj.agdValues.Source.Columns > lParmCount + 2 Then
                             'alias column is present 
                             ltxt = ltxt & "          "
                         End If
-                        For k As Integer = 5 To pParentObj.agdTable.Source.Columns
+                        For k As Integer = 0 To lPDs.Count - 1
                             Dim txtval As String = Str(Max(k))
                             Dim n As Integer = Len(txtval)
                             ltxt = ltxt & txtval
-                            For i As Integer = n + 1 To lPDs(k - 4).Width
+                            For i As Integer = n + 1 To lPDs(k).Width
                                 ltxt = ltxt & " "
                             Next i
                         Next k
-                        AppendFileString(f, ltxt)
+                        AppendFileString(f, ltxt & vbCrLf)
                         ltxt = "Mean               "
                         ltxt = ltxt & "                    "
-                        If pParentObj.agdTable.Source.Columns = lParmCount + 4 Then
+                        If pParentObj.agdValues.Source.Columns = lParmCount + 4 Then
                             'occur column is present 
                             ltxt = ltxt & "          "
                         End If
-                        If pParentObj.agdTable.Source.Columns = lParmCount + 4 Then
+                        If pParentObj.agdValues.Source.Columns > lParmCount + 2 Then
                             'alias column is present 
                             ltxt = ltxt & "          "
                         End If
-                        For k As Integer = 5 To pParentObj.agdValues.Source.Columns
-                            Dim rtemp As Single = sum(k) / pParentObj.agdValues.Source.Rows
-                            Dim wid As Integer = lPDs(k - 4).Width
+                        For k As Integer = 0 To lPDs.Count - 1
+                            Dim rtemp As Single = sum(k) / (pParentObj.agdValues.Source.Rows - 1)
+                            Dim wid As Integer = lPDs(k).Width
                             Dim txtval As String = Str(rtemp)
                             Dim n As Integer = Len(txtval)
                             ltxt = ltxt & txtval
-                            For i As Integer = n + 1 To lPDs(k - 4).Width
+                            For i As Integer = n + 1 To lPDs(k).Width
                                 ltxt = ltxt & " "
                             Next i
                         Next k
-                        AppendFileString(f, ltxt)
-                        AppendFileString(f, "")
-                        AppendFileString(f, "")
+                        AppendFileString(f, ltxt & vbCrLf)
+                        AppendFileString(f, vbCrLf)
+                        AppendFileString(f, vbCrLf)
                     Else 'want table in uci form
-                        AppendFileString(f, TabNam)
+                        AppendFileString(f, TabNam & vbCrLf)
                         ltxt = OpTypNam & " ***"
                         For j As Integer = 1 To 80
                             ltxt = ltxt & " "
                         Next j
-                        For j As Integer = 5 To pParentObj.agdValues.Source.Columns
-                            Dim k As Integer = lPDs(j - 4).StartCol
-                            Mid(ltxt, k) = lPDs(j - 4).Name
+                        For j As Integer = 0 To lPDs.Count - 1
+                            Dim k As Integer = lPDs(j).StartCol
+                            Mid(ltxt, k) = lPDs(j).Name
                         Next j
-                        AppendFileString(f, ltxt)
+                        AppendFileString(f, ltxt & vbCrLf)
+                        'figure out if the grid has the extra columns for occur and alias
+                        Dim lExtraCols As Integer = 0
+                        If pParentObj.agdValues.Source.Columns = lParmCount + 4 Then
+                            'occur column is present 
+                            lExtraCols += 1
+                        End If
+                        If pParentObj.agdValues.Source.Columns > lParmCount + 2 Then
+                            'alias column is present 
+                            lExtraCols += 1
+                        End If
                         'fill in each row
-                        For j As Integer = 1 To pParentObj.agdValues.Source.Rows
+                        For j As Integer = 1 To pParentObj.agdValues.Source.Rows - 1
                             ltxt = Trim(pParentObj.agdValues.Source.CellValue(j, 0))
                             For i As Integer = 1 To 80
                                 ltxt = ltxt & " "
                             Next i
-                            For k As Integer = 5 To pParentObj.agdValues.Source.Columns
-                                Dim i As Integer = lPDs(k - 4).StartCol
-                                Mid(ltxt, i) = Trim(pParentObj.agdValues.Source.CellValue(j, k - 1))
+                            For k As Integer = 0 To lPDs.Count - 1
+                                Dim i As Integer = lPDs(k).StartCol
+                                Mid(ltxt, i) = Trim(pParentObj.agdValues.Source.CellValue(j, k + 2 + lExtraCols))
                             Next k
-                            AppendFileString(f, ltxt)
+                            AppendFileString(f, ltxt & vbCrLf)
                         Next j
-                        AppendFileString(f, "END " & TabNam)
-                        AppendFileString(f, "")
-                        AppendFileString(f, "")
+                        AppendFileString(f, "END " & TabNam & vbCrLf)
+                        AppendFileString(f, vbCrLf)
+                        AppendFileString(f, vbCrLf)
                     End If
                 Else
                     'parameter
