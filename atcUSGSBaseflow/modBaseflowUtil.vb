@@ -514,7 +514,7 @@ Module modBaseflowUtil
                     Case Else : .Value(2) = lDate(0) & "-" & lDate(1) & "-" & lDate(2)
                 End Select
 
-                .Value(3) = DoubleToString(lTsFlow.Value(I), , "0")
+                .Value(3) = DoubleToString(lTsFlow.Value(I), , "0.0")
                 .Value(4) = DoubleToString(lTsFlowDepth.Value(I), , "0.00")
                 Dim lLastColumn As Integer = 4
                 If aTsGroupPart.Count > 0 Then
@@ -523,9 +523,9 @@ Module modBaseflowUtil
                     lRO = lTsFlow.Value(I) - lBF
                     lRODepth = lTsFlowDepth.Value(I) - lBFDepth
                     lBFPct = lBF / lTsFlow.Value(I) * 100
-                    .Value(lLastColumn + 1) = DoubleToString(lBF, , "0")
+                    .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
                     .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
-                    .Value(lLastColumn + 3) = DoubleToString(lRO, , "0")
+                    .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
                     .Value(lLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
                     .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
                     lLastColumn += 5
@@ -536,9 +536,9 @@ Module modBaseflowUtil
                     lRO = lTsFlow.Value(I) - lBF
                     lRODepth = lTsFlowDepth.Value(I) - lBFDepth
                     lBFPct = lBF / lTsFlow.Value(I) * 100
-                    .Value(lLastColumn + 1) = DoubleToString(lBF, , "0")
+                    .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
                     .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
-                    .Value(lLastColumn + 3) = DoubleToString(lRO, , "0")
+                    .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
                     .Value(lLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
                     .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
                     lLastColumn += 5
@@ -549,9 +549,9 @@ Module modBaseflowUtil
                     lRO = lTsFlow.Value(I) - lBF
                     lRODepth = lTsFlowDepth.Value(I) - lBFDepth
                     lBFPct = lBF / lTsFlow.Value(I) * 100
-                    .Value(lLastColumn + 1) = DoubleToString(lBF, , "0")
+                    .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
                     .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
-                    .Value(lLastColumn + 3) = DoubleToString(lRO, , "0")
+                    .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
                     .Value(lLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
                     .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
                     lLastColumn += 5
@@ -562,9 +562,9 @@ Module modBaseflowUtil
                     lRO = lTsFlow.Value(I) - lBF
                     lRODepth = lTsFlowDepth.Value(I) - lBFDepth
                     lBFPct = lBF / lTsFlow.Value(I) * 100
-                    .Value(lLastColumn + 1) = DoubleToString(lBF, , "0")
+                    .Value(lLastColumn + 1) = DoubleToString(lBF, , "0.00")
                     .Value(lLastColumn + 2) = DoubleToString(lBFDepth, , "0.00")
-                    .Value(lLastColumn + 3) = DoubleToString(lRO, , "0")
+                    .Value(lLastColumn + 3) = DoubleToString(lRO, , "0.00")
                     .Value(lLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
                     .Value(lLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
                 End If
@@ -2250,7 +2250,8 @@ Module modBaseflowUtil
             lSW.WriteLine("--------------------------------------------------------------------")
         End If
 
-        Dim lDataFilename As String = IO.Path.GetFileName(aTsSF.Attributes.GetValue("History 1")).Substring(0, 10)
+        Dim lDataFilename As String = IO.Path.GetFileName(aTsSF.Attributes.GetValue("History 1"))
+        If lDataFilename.Length > 10 Then lDataFilename = lDataFilename.Substring(0, 10)
         Dim lPadWidth As Integer = 19 - lDataFilename.Trim().Length
         Dim lDrainageAreaStr As String = String.Format("{0:0.00}", lDrainageArea).PadLeft(lPadWidth, " ")
         Dim lSFMean As Double = aTsSF.Attributes.GetValue("Mean")

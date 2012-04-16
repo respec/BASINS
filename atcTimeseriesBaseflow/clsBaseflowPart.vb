@@ -403,9 +403,9 @@ Public Class clsBaseflowPart
 
                         While True 'original loop 402
                             lISearch += 1
-                            If lALLGW(lISearch) <> " "c Or _
-                                lB1D(lISearch, IBASE) <= aTS.Value(lISearch) Or _
-                                lISearch > lCountDays Then
+                            If lISearch > lCountDays OrElse _
+                               lALLGW(lISearch) <> " "c OrElse _
+                                lB1D(lISearch, IBASE) <= aTS.Value(lISearch) Then
                                 Exit While ' loop 402
                             End If
 
