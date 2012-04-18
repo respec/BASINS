@@ -442,6 +442,9 @@ Public Class frmReport
     Private Sub cmdSet_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSet.Click
         If cdSetOut.ShowDialog() = Windows.Forms.DialogResult.OK Then
             lblFile.Text = cdSetOut.FileName
+            If FileExists(lblFile.Text) Then
+                IO.File.Delete(lblFile.Text)
+            End If
         End If
     End Sub
 End Class

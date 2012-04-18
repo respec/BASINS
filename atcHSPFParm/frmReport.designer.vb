@@ -51,14 +51,12 @@ Partial Class frmReport
         'cbxUCI
         '
         Me.cbxUCI.AutoSize = True
-        Me.cbxUCI.Checked = True
-        Me.cbxUCI.CheckState = System.Windows.Forms.CheckState.Checked
         Me.cbxUCI.Location = New System.Drawing.Point(9, 16)
         Me.cbxUCI.Margin = New System.Windows.Forms.Padding(2)
         Me.cbxUCI.Name = "cbxUCI"
-        Me.cbxUCI.Size = New System.Drawing.Size(144, 17)
+        Me.cbxUCI.Size = New System.Drawing.Size(153, 17)
         Me.cbxUCI.TabIndex = 27
-        Me.cbxUCI.Text = "Report tables in UCI form"
+        Me.cbxUCI.Text = "Report tables in UCI format"
         Me.cbxUCI.UseVisualStyleBackColor = True
         '
         'cmdSet
@@ -97,15 +95,18 @@ Partial Class frmReport
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(401, 179)
+        Me.ClientSize = New System.Drawing.Size(391, 160)
         Me.Controls.Add(Me.lblFile)
         Me.Controls.Add(Me.cmdWrite)
         Me.Controls.Add(Me.cmdSet)
         Me.Controls.Add(Me.cbxUCI)
         Me.Controls.Add(Me.cmdClose)
         Me.Controls.Add(Me.cmdAll)
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
+        Me.MaximizeBox = False
+        Me.MinimizeBox = False
         Me.Name = "frmReport"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "HSPFParm Report"

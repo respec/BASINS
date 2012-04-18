@@ -18,6 +18,11 @@ Public Class frmHSPFParm
     Friend WithEvents cmdAddScenario As System.Windows.Forms.Button
     <CLSCompliant(False)> Public Database As atcUtility.atcMDB
 
+    'Variablize report form to prevent multiple open and facilitate BringToFront if already open
+    Friend pfrmReport As frmReport
+
+    Private Const HSPFParmProjectFilename As String = "HSPFParm.mwprj"
+
 #Region " Windows Form Designer generated code "
 
     Public Sub New()
@@ -76,9 +81,13 @@ Public Class frmHSPFParm
         Me.cmdAbout = New System.Windows.Forms.Button
         Me.cmdWrite = New System.Windows.Forms.Button
         Me.gbxWatershed = New System.Windows.Forms.GroupBox
+        Me.cmdDeleteWatershed = New System.Windows.Forms.Button
+        Me.cmdAddWatershed = New System.Windows.Forms.Button
         Me.agdWatershed = New atcControls.atcGrid
         Me.cmdWatershedDetails = New System.Windows.Forms.Button
         Me.gbxScenario = New System.Windows.Forms.GroupBox
+        Me.cmdDeleteScenario = New System.Windows.Forms.Button
+        Me.cmdAddScenario = New System.Windows.Forms.Button
         Me.cmdScenarioDetails = New System.Windows.Forms.Button
         Me.agdScenario = New atcControls.atcGrid
         Me.gbxSegment = New System.Windows.Forms.GroupBox
@@ -95,10 +104,6 @@ Public Class frmHSPFParm
         Me.gbxValues = New System.Windows.Forms.GroupBox
         Me.lblTableParmName = New System.Windows.Forms.Label
         Me.agdValues = New atcControls.atcGrid
-        Me.cmdDeleteWatershed = New System.Windows.Forms.Button
-        Me.cmdAddWatershed = New System.Windows.Forms.Button
-        Me.cmdDeleteScenario = New System.Windows.Forms.Button
-        Me.cmdAddScenario = New System.Windows.Forms.Button
         Me.gbxWatershed.SuspendLayout()
         Me.gbxScenario.SuspendLayout()
         Me.gbxSegment.SuspendLayout()
@@ -144,7 +149,7 @@ Public Class frmHSPFParm
         Me.cmdWrite.Name = "cmdWrite"
         Me.cmdWrite.Size = New System.Drawing.Size(84, 28)
         Me.cmdWrite.TabIndex = 8
-        Me.cmdWrite.Text = "Write to File"
+        Me.cmdWrite.Text = "Report"
         '
         'gbxWatershed
         '
@@ -160,6 +165,28 @@ Public Class frmHSPFParm
         Me.gbxWatershed.TabIndex = 9
         Me.gbxWatershed.TabStop = False
         Me.gbxWatershed.Text = "Watershed"
+        '
+        'cmdDeleteWatershed
+        '
+        Me.cmdDeleteWatershed.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdDeleteWatershed.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdDeleteWatershed.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdDeleteWatershed.Location = New System.Drawing.Point(461, 68)
+        Me.cmdDeleteWatershed.Name = "cmdDeleteWatershed"
+        Me.cmdDeleteWatershed.Size = New System.Drawing.Size(59, 22)
+        Me.cmdDeleteWatershed.TabIndex = 17
+        Me.cmdDeleteWatershed.Text = "Delete"
+        '
+        'cmdAddWatershed
+        '
+        Me.cmdAddWatershed.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdAddWatershed.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdAddWatershed.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdAddWatershed.Location = New System.Drawing.Point(461, 43)
+        Me.cmdAddWatershed.Name = "cmdAddWatershed"
+        Me.cmdAddWatershed.Size = New System.Drawing.Size(59, 22)
+        Me.cmdAddWatershed.TabIndex = 16
+        Me.cmdAddWatershed.Text = "Add"
         '
         'agdWatershed
         '
@@ -201,6 +228,28 @@ Public Class frmHSPFParm
         Me.gbxScenario.TabIndex = 10
         Me.gbxScenario.TabStop = False
         Me.gbxScenario.Text = "Scenario"
+        '
+        'cmdDeleteScenario
+        '
+        Me.cmdDeleteScenario.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdDeleteScenario.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdDeleteScenario.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdDeleteScenario.Location = New System.Drawing.Point(461, 68)
+        Me.cmdDeleteScenario.Name = "cmdDeleteScenario"
+        Me.cmdDeleteScenario.Size = New System.Drawing.Size(59, 22)
+        Me.cmdDeleteScenario.TabIndex = 17
+        Me.cmdDeleteScenario.Text = "Delete"
+        '
+        'cmdAddScenario
+        '
+        Me.cmdAddScenario.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdAddScenario.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdAddScenario.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdAddScenario.Location = New System.Drawing.Point(461, 43)
+        Me.cmdAddScenario.Name = "cmdAddScenario"
+        Me.cmdAddScenario.Size = New System.Drawing.Size(59, 22)
+        Me.cmdAddScenario.TabIndex = 16
+        Me.cmdAddScenario.Text = "Add"
         '
         'cmdScenarioDetails
         '
@@ -408,50 +457,6 @@ Public Class frmHSPFParm
         Me.agdValues.Source = Nothing
         Me.agdValues.TabIndex = 14
         '
-        'cmdDeleteWatershed
-        '
-        Me.cmdDeleteWatershed.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdDeleteWatershed.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdDeleteWatershed.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdDeleteWatershed.Location = New System.Drawing.Point(461, 68)
-        Me.cmdDeleteWatershed.Name = "cmdDeleteWatershed"
-        Me.cmdDeleteWatershed.Size = New System.Drawing.Size(59, 22)
-        Me.cmdDeleteWatershed.TabIndex = 17
-        Me.cmdDeleteWatershed.Text = "Delete"
-        '
-        'cmdAddWatershed
-        '
-        Me.cmdAddWatershed.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdAddWatershed.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdAddWatershed.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdAddWatershed.Location = New System.Drawing.Point(461, 43)
-        Me.cmdAddWatershed.Name = "cmdAddWatershed"
-        Me.cmdAddWatershed.Size = New System.Drawing.Size(59, 22)
-        Me.cmdAddWatershed.TabIndex = 16
-        Me.cmdAddWatershed.Text = "Add"
-        '
-        'cmdDeleteScenario
-        '
-        Me.cmdDeleteScenario.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdDeleteScenario.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdDeleteScenario.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdDeleteScenario.Location = New System.Drawing.Point(461, 68)
-        Me.cmdDeleteScenario.Name = "cmdDeleteScenario"
-        Me.cmdDeleteScenario.Size = New System.Drawing.Size(59, 22)
-        Me.cmdDeleteScenario.TabIndex = 17
-        Me.cmdDeleteScenario.Text = "Delete"
-        '
-        'cmdAddScenario
-        '
-        Me.cmdAddScenario.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdAddScenario.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdAddScenario.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdAddScenario.Location = New System.Drawing.Point(461, 43)
-        Me.cmdAddScenario.Name = "cmdAddScenario"
-        Me.cmdAddScenario.Size = New System.Drawing.Size(59, 22)
-        Me.cmdAddScenario.TabIndex = 16
-        Me.cmdAddScenario.Text = "Add"
-        '
         'frmHSPFParm
         '
         Me.AcceptButton = Me.cmdMap
@@ -492,14 +497,44 @@ Public Class frmHSPFParm
     End Sub
 
     Private Sub cmdMap_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdMap.Click
-        Logger.Msg("Map option is not yet implemented.  This option will refresh the map with the HSPFParm project locations.", MsgBoxStyle.OkOnly, "BASINS HSPFParm")
-        'save the current project and then open the HSPFParm layers on the map
+        'Logger.Msg("Map option is not yet implemented.  This option will refresh the map with the HSPFParm project locations.", MsgBoxStyle.OkOnly, "BASINS HSPFParm")
+
+        If HSPFParmProjectIsOpen() Then
+            'if current mwprj is called HSPFParm, just give it the focus
+        Else
+            'if not, prompt to save the current project and then load the HSPFParm mwprj
+            If Not GisUtil.ProjectFileName Is Nothing AndAlso GisUtil.ProjectFileName.Length > 0 Then
+                'prompt user about saving before opening HSPFParm mwprj
+                Dim lResult As MsgBoxResult = Logger.Msg("Do you want to save the changes to the currently open project?", _
+                                                         MsgBoxStyle.YesNoCancel Or MsgBoxStyle.Exclamation, "Save Changes?")
+                If lResult = MsgBoxResult.No Then
+                    OpenHSPFParmProject()
+                ElseIf lResult = MsgBoxResult.Yes Then
+                    GisUtil.SaveProject(GisUtil.ProjectFileName)
+                    OpenHSPFParmProject()
+                End If
+            Else
+                'no current project, just open hspfparm project 
+                OpenHSPFParmProject()
+            End If
+        End If
     End Sub
 
     Private Sub cmdWrite_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdWrite.Click
-        Dim lfrmReport As New frmReport
-        lfrmReport.InitializeUI(Me, Database)
-        lfrmReport.Show()
+        If IsNothing(pfrmReport) Then
+            pfrmReport = New frmReport
+            pfrmReport.InitializeUI(Me, Database)
+            pfrmReport.Show()
+        Else
+            If pfrmReport.IsDisposed Then
+                Dim pfrmReport As New frmReport
+                pfrmReport.InitializeUI(Me, Database)
+                pfrmReport.Show()
+            Else
+                pfrmReport.WindowState = Windows.Forms.FormWindowState.Normal
+                pfrmReport.BringToFront()
+            End If
+        End If
     End Sub
 
     Public Sub InitializeUI(ByVal aPath As String, ByVal aDBName As String)
@@ -1241,7 +1276,7 @@ Public Class frmHSPFParm
 
         Dim lfrmWatershedDetails As New frmWatershedDetails
         lfrmWatershedDetails.InitializeUI(lIDs, lFirstIndex, agdWatershed.Source)
-        lfrmWatershedDetails.Show()
+        lfrmWatershedDetails.ShowDialog()
     End Sub
 
     Private Sub cmdScenarioDetails_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdScenarioDetails.Click
@@ -1263,7 +1298,7 @@ Public Class frmHSPFParm
 
             Dim lfrmScenarioDetails As New frmScenarioDetails
             lfrmScenarioDetails.InitializeUI(lIDs, lFirstIndex, Database)
-            lfrmScenarioDetails.Show()
+            lfrmScenarioDetails.ShowDialog()
         End If
     End Sub
 
@@ -1370,6 +1405,28 @@ Public Class frmHSPFParm
         agdValues.SizeAllColumnsToContents()
         agdValues.Refresh()
         lblTableParmName.Text = ""
+    End Sub
+
+    Private Function HSPFParmProjectIsOpen() As Boolean
+        If (Not GisUtil.ProjectFileName Is Nothing) _
+            AndAlso (Not GisUtil.ProjectFileName = "") _
+            AndAlso GisUtil.ProjectFileName.EndsWith(HSPFParmProjectFilename) Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+
+    Private Sub OpenHSPFParmProject()
+        Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
+        Dim lFileName As String = IO.Path.Combine(lBasinsFolder, "models\HSPF\HSPFParmData" & g_PathChar & HSPFParmProjectFilename)
+        
+        If FileExists(lFileName) Then  'load hspfparm project
+            GisUtil.LoadProject(lFileName)
+        Else
+            Logger.Msg("Unable to find '" & HSPFParmProjectFilename & "'", "Open HSPFParm Map")
+            Exit Sub
+        End If
     End Sub
 
     Private Sub cmdAddWatershed_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAddWatershed.Click
