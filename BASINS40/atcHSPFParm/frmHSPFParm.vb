@@ -17,6 +17,7 @@ Public Class frmHSPFParm
     Friend WithEvents cmdDeleteScenario As System.Windows.Forms.Button
     Friend WithEvents cmdAddScenario As System.Windows.Forms.Button
     <CLSCompliant(False)> Public Database As atcUtility.atcMDB
+    <CLSCompliant(False)> Protected pMapWinObj As Object
 
     'Variablize report form to prevent multiple open and facilitate BringToFront if already open
     Friend pfrmReport As frmReport
@@ -501,6 +502,9 @@ Public Class frmHSPFParm
 
         If HSPFParmProjectIsOpen() Then
             'if current mwprj is called HSPFParm, just give it the focus
+            If Not pMapWinObj Is Nothing Then
+                pMapWinObj.BringToFront()
+            End If
         Else
             'if not, prompt to save the current project and then load the HSPFParm mwprj
             If Not GisUtil.ProjectFileName Is Nothing AndAlso GisUtil.ProjectFileName.Length > 0 Then
@@ -537,9 +541,10 @@ Public Class frmHSPFParm
         End If
     End Sub
 
-    Public Sub InitializeUI(ByVal aPath As String, ByVal aDBName As String)
+    Public Sub InitializeUI(ByVal aPath As String, ByVal aDBName As String, ByVal aMapWinObj As Object)
         pSelectedSegmentFilters = New atcCollection
         pSelectedTableFilters = New atcCollection
+        pMapWinObj = aMapWinObj
 
         With agdWatershed
             .Source = New atcControls.atcGridSource
@@ -1170,6 +1175,7 @@ Public Class frmHSPFParm
             Next
             Refresh()
             RefreshScenario()
+            SynchMap()
         End If
     End Sub
 
@@ -1426,6 +1432,35 @@ Public Class frmHSPFParm
         Else
             Logger.Msg("Unable to find '" & HSPFParmProjectFilename & "'", "Open HSPFParm Map")
             Exit Sub
+        End If
+    End Sub
+
+    Private Sub SynchMap()
+        If HSPFParmProjectIsOpen() Then
+            Dim lLayerIndex As Integer = GisUtil.LayerIndex("Watershed")
+            GisUtil.ClearSelectedFeatures(lLayerIndex)
+            For lRow As Integer = 1 To agdWatershed.Source.Rows
+                If agdWatershed.Source.CellSelected(lRow, 0) Then
+                    GisUtil.SetSelectedFeature(lLayerIndex, lRow - 1)
+                End If
+            Next
+        End If
+    End Sub
+
+    Public Sub MouseButtonClickUp()
+        'needs work here!!!
+        'will need to do this on other events
+        If HSPFParmProjectIsOpen() Then
+            Dim lLayerIndex As Integer = GisUtil.LayerIndex("Watershed")
+            For lSelectedFeatureIndex As Integer = 0 To GisUtil.NumSelectedFeatures(lLayerIndex) - 1
+                Dim lFeatureIndex As Integer = GisUtil.IndexOfNthSelectedFeatureInLayer(lSelectedFeatureIndex, lLayerIndex)
+                For lCol As Integer = 0 To agdWatershed.Source.Columns - 1
+                    agdWatershed.Source.CellSelected(lFeatureIndex + 1, lCol) = True
+                Next
+                Refresh()
+                RefreshScenario()
+            Next
+            'also need to unselect the records that are no longer selected on the map
         End If
     End Sub
 
