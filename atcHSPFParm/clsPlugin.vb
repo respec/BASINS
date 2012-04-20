@@ -4,6 +4,8 @@ Imports atcData.atcDataManager
 Public Class PlugIn
     Inherits atcData.atcDataPlugin
 
+    Private pFrmHSPFParm As frmHSPFParm
+    Private pInitialized As Boolean
     Friend Shared pHSPFParmDB As HSPFParmDB = Nothing
 
     Public Overrides ReadOnly Property Name() As String
@@ -26,6 +28,7 @@ Public Class PlugIn
         If pHSPFParmDB Is Nothing Then
             pHSPFParmDB = New HSPFParmDB("")
         End If
+        pInitialized = False
     End Sub
 
     Public Overrides Sub Terminate()
@@ -35,7 +38,6 @@ Public Class PlugIn
 
     Public Overrides Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean)
         If ItemName = ModelsMenuName & "_HSPFParm" Then
-            Dim lFormHspfParm As New frmHSPFParm
             GisUtil.MappingObject = pMapWin
 
             Dim lPath As String = ""
@@ -48,9 +50,26 @@ Public Class PlugIn
                 lDBName = pHSPFParmDB.Name
             End If
 
-            lFormHspfParm.InitializeUI(lPath, lDBName)
-            lFormHspfParm.Show()
-            Handled = True
+            Dim lCreateNew As Boolean = True
+            If Not pFrmHSPFParm Is Nothing Then
+                If pFrmHSPFParm.Visible = True Then
+                    pFrmHSPFParm.BringToFront()
+                    lCreateNew = False
+                End If
+            End If
+            If lCreateNew Then
+                pFrmHSPFParm = New frmHSPFParm
+                pFrmHSPFParm.InitializeUI(lPath, lDBName, pMapWin)
+                pFrmHSPFParm.Show()
+                pInitialized = True
+                Handled = True
+            End If
+        End If
+    End Sub
+
+    Public Overrides Sub MapMouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal x As Integer, ByVal y As Integer, ByRef Handled As Boolean)
+        If pInitialized Then
+            pFrmHSPFParm.MouseButtonClickUp()
         End If
     End Sub
 End Class
