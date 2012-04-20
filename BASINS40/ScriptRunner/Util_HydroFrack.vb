@@ -92,6 +92,9 @@ Module Util_HydroFrack
         Next 'lDuration
 
         'fill in the daily values
+        'convert from original gallons per day to cfs
+        '1 US gallon = 0.133680556 cubic feet
+        Dim lG2CFS As Double = 0.133680556
         For Each lDuration In lDurations
             lxlSheet = lxlWorkbook.Worksheets(lDuration)
             Dim lStartDailyIndex As Integer = 0
@@ -107,6 +110,7 @@ Module Util_HydroFrack
                     Dim lDailyValueArray() As Double = lHFDailyWUs.ItemByKey(lKey)
                     For lCol As Integer = 2 To lColumnCount
                         If Not Double.TryParse(.Cells(lRow, lCol).value, lDailyValue) Then lDailyValue = 0
+                        If lDailyValue > 0 Then lDailyValue = lDailyValue * lG2CFS / 86400.0
                         lDailyValueArray(lStartDailyIndex + lCol - 2) = lDailyValue
                     Next 'lCol
                 Next 'lRow
@@ -216,7 +220,6 @@ ThisWDMDir:
         lxlWorkbook = Nothing
         lxlApp = Nothing
     End Sub
-
 
     Private Sub HydroFrackingDailyValueSumup()
         Dim lDataFolder As String = "G:\Admin\EPA_HydroFrac_HSPFEval\WaterUse\"
@@ -3380,6 +3383,7 @@ ThisWDMDir:
         End If
     End Sub
 
+#Region "UtilityClasses"
     Public Class WUState
         Public Name As String
         Public Code As String
@@ -3703,5 +3707,6 @@ ThisWDMDir:
             WaterUses2005 = Nothing
         End Sub
     End Class
+#End Region
 
 End Module
