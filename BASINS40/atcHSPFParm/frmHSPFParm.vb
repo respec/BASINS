@@ -683,6 +683,11 @@ Public Class frmHSPFParm
         Database = New atcUtility.atcMDB(aDBName)
     End Sub
 
+    Private Sub frmHSPFParm_Activated(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Activated
+        'synch up with map here
+        MapSelectedChanged()
+    End Sub
+
     Private Sub frmModelSetup_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
         If e.KeyValue = Windows.Forms.Keys.F1 Then
             ShowHelp("BASINS Details\Watershed and Instream Model Setup\HSPFParm.html")
@@ -1447,20 +1452,34 @@ Public Class frmHSPFParm
         End If
     End Sub
 
-    Public Sub MouseButtonClickUp()
-        'needs work here!!!
+    Public Sub MapSelectedChanged()
         'will need to do this on other events
         If HSPFParmProjectIsOpen() Then
             Dim lLayerIndex As Integer = GisUtil.LayerIndex("Watershed")
-            For lSelectedFeatureIndex As Integer = 0 To GisUtil.NumSelectedFeatures(lLayerIndex) - 1
-                Dim lFeatureIndex As Integer = GisUtil.IndexOfNthSelectedFeatureInLayer(lSelectedFeatureIndex, lLayerIndex)
-                For lCol As Integer = 0 To agdWatershed.Source.Columns - 1
-                    agdWatershed.Source.CellSelected(lFeatureIndex + 1, lCol) = True
-                Next
+            Dim lChangedSomething As Boolean = False
+            For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
+                Dim lTempVal As Boolean = agdWatershed.Source.CellSelected(lFeatureIndex + 1, 0)
+                If GisUtil.IsSelectedFeature(lLayerIndex, lFeatureIndex) Then
+                    'select it on the list
+                    For lCol As Integer = 0 To agdWatershed.Source.Columns - 1
+                        agdWatershed.Source.CellSelected(lFeatureIndex + 1, lCol) = True
+                    Next
+                    If lTempVal = False Then
+                        lChangedSomething = True
+                    End If
+                Else
+                    For lCol As Integer = 0 To agdWatershed.Source.Columns - 1
+                        agdWatershed.Source.CellSelected(lFeatureIndex + 1, lCol) = False
+                    Next
+                    If lTempVal Then
+                        lChangedSomething = True
+                    End If
+                End If
+            Next
+            If lChangedSomething Then
                 Refresh()
                 RefreshScenario()
-            Next
-            'also need to unselect the records that are no longer selected on the map
+            End If
         End If
     End Sub
 
