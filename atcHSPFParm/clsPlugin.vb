@@ -67,9 +67,11 @@ Public Class PlugIn
         End If
     End Sub
 
-    Public Overrides Sub MapMouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal x As Integer, ByVal y As Integer, ByRef Handled As Boolean)
+    <CLSCompliant(False)> _
+    Public Overrides Sub ShapesSelected(ByVal aHandle As Integer, ByVal aSelectInfo As MapWindow.Interfaces.SelectInfo)
+        MyBase.ShapesSelected(aHandle, aSelectInfo)
         If pInitialized Then
-            pFrmHSPFParm.MouseButtonClickUp()
+            pFrmHSPFParm.MapSelectedChanged()
         End If
     End Sub
 End Class
