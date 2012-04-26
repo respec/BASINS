@@ -166,6 +166,12 @@
     <Compile Include="clsPlugin.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="frmAddWatershed.designer.vb">
+      <DependentUpon>frmAddWatershed.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAddWatershed.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmFilter.designer.vb">
       <DependentUpon>frmFilter.vb</DependentUpon>
     </Compile>
@@ -196,6 +202,9 @@
     <Compile Include="HSPFParmDB.vb" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmAddWatershed.resx">
+      <DependentUpon>frmAddWatershed.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmFilter.resx">
       <DependentUpon>frmFilter.vb</DependentUpon>
     </EmbeddedResource>
