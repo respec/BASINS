@@ -1029,6 +1029,19 @@ Public Class GisUtil
         Return True
     End Function
 
+    Public Shared Function IsSelectedFeature(ByVal aLayerIndex As Integer, ByVal aShapeIndex As Integer) As Boolean
+        Dim lsi As MapWindow.Interfaces.SelectInfo = GetMappingObject.View.SelectedShapes
+        Dim lSelected As Boolean = False
+        If CurrentLayer = aLayerIndex Then
+            For lFeature As Integer = 0 To lsi.NumSelected - 1
+                If lsi.Item(lFeature).ShapeIndex = aShapeIndex Then
+                    lSelected = True
+                End If
+            Next
+        End If
+        Return lSelected
+    End Function
+
     Public Shared Function IndexOfNthSelectedFeatureInLayer(ByVal nth As Integer, ByVal aLayerIndex As Integer) As Integer
         Dim lsi As MapWindow.Interfaces.SelectInfo = GetMappingObject.View.SelectedShapes
         Dim lLayer As MapWindow.Interfaces.Layer = LayerFromIndex(aLayerIndex)

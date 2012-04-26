@@ -100,4 +100,18 @@ Public Class atcMDB
             pConnection.Close()
         End If
     End Function
+
+    Public Function InsertRowIntoTable(ByVal aTableName As String, ByVal aFieldValues As Collection) As Boolean
+        pConnection.Open()
+        Dim lCommand As New OdbcCommand
+        lCommand.Connection = pConnection
+        Dim lStr As String = aFieldValues(1)
+        For lIndex As Integer = 2 To aFieldValues.Count
+            lStr = lStr & "," & aFieldValues(lIndex)
+        Next
+        lCommand.CommandText = "INSERT INTO " & aTableName & " VALUES (" & lStr & ")"
+        lCommand.ExecuteNonQuery()
+        pConnection.Close()
+        Return True
+    End Function
 End Class

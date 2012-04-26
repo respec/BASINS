@@ -21,6 +21,7 @@ Public Class frmHSPFParm
 
     'Variablize report form to prevent multiple open and facilitate BringToFront if already open
     Friend pfrmReport As frmReport
+    Friend pfrmAddWatershed As frmAddWatershed
 
     Private Const HSPFParmProjectFilename As String = "HSPFParm.mwprj"
 
@@ -546,13 +547,22 @@ Public Class frmHSPFParm
         pSelectedTableFilters = New atcCollection
         pMapWinObj = aMapWinObj
 
+        'open the database here
+        Database = New atcUtility.atcMDB(aDBName)
+
+        Dim lPointDbfName As String = aPath & "\projdef.dbf"
+        'create the points shapefile if it does not exist
+        'CreatePointShapefile("c:temp\projdef.dbf")  'for testing
+        If Not FileExists(lPointDbfName) Then
+            CreatePointShapefile(lPointDbfName)
+        End If
+
         With agdWatershed
             .Source = New atcControls.atcGridSource
             .AllowHorizontalScrolling = False
         End With
         With agdWatershed.Source
             'populate from point dbf
-            Dim lPointDbfName As String = aPath & "\projdef.dbf"
             If FileExists(lPointDbfName) Then
                 Dim lPointTable As New atcTableDBF
                 lPointTable.OpenFile(lPointDbfName)
@@ -679,13 +689,14 @@ Public Class frmHSPFParm
         agdValues.SizeAllColumnsToContents()
         agdValues.Refresh()
 
-        'open the database here
-        Database = New atcUtility.atcMDB(aDBName)
     End Sub
 
     Private Sub frmHSPFParm_Activated(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Activated
         'synch up with map here
-        MapSelectedChanged()
+        Try
+            MapSelectedChanged()
+        Catch
+        End Try
     End Sub
 
     Private Sub frmModelSetup_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
@@ -720,18 +731,20 @@ Public Class frmHSPFParm
             .Rows = 1
             For lWatRow As Integer = 1 To agdWatershed.Source.Rows
                 If agdWatershed.Source.CellSelected(lWatRow, 0) Then 'list scenarios for this watershed
-                    lCrit = "WatershedID = " & agdWatershed.Source.CellValue(lWatRow, 0)
-                    Dim lStr As String = "SELECT DISTINCTROW ScenarioData.Name, " & _
-                                                            "ScenarioData.ID " & _
-                                                            "From ScenarioData " & _
-                                                            "WHERE (" & lCrit & ")"
-                    Dim lTable As DataTable = Database.GetTable(lStr)
-                    For lRow As Integer = 0 To lTable.Rows.Count - 1
-                        .Rows += 1
-                        .CellValue(.Rows - 1, 0) = lTable.Rows(lRow).Item(0).ToString
-                        .CellValue(.Rows - 1, 1) = agdWatershed.Source.CellValue(lWatRow, 1)
-                        .CellValue(.Rows - 1, 2) = lTable.Rows(lRow).Item(1).ToString
-                    Next
+                    If agdWatershed.Source.CellValue(lWatRow, 0).Trim.Length > 0 Then
+                        lCrit = "WatershedID = " & agdWatershed.Source.CellValue(lWatRow, 0)
+                        Dim lStr As String = "SELECT DISTINCTROW ScenarioData.Name, " & _
+                                                                "ScenarioData.ID " & _
+                                                                "From ScenarioData " & _
+                                                                "WHERE (" & lCrit & ")"
+                        Dim lTable As DataTable = Database.GetTable(lStr)
+                        For lRow As Integer = 0 To lTable.Rows.Count - 1
+                            .Rows += 1
+                            .CellValue(.Rows - 1, 0) = lTable.Rows(lRow).Item(0).ToString
+                            .CellValue(.Rows - 1, 1) = agdWatershed.Source.CellValue(lWatRow, 1)
+                            .CellValue(.Rows - 1, 2) = lTable.Rows(lRow).Item(1).ToString
+                        Next
+                    End If
                 End If
             Next
         End With
@@ -1455,45 +1468,62 @@ Public Class frmHSPFParm
     Public Sub MapSelectedChanged()
         'will need to do this on other events
         If HSPFParmProjectIsOpen() Then
-            Dim lLayerIndex As Integer = GisUtil.LayerIndex("Watershed")
-            Dim lChangedSomething As Boolean = False
-            For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
-                Dim lTempVal As Boolean = agdWatershed.Source.CellSelected(lFeatureIndex + 1, 0)
-                If GisUtil.IsSelectedFeature(lLayerIndex, lFeatureIndex) Then
-                    'select it on the list
-                    For lCol As Integer = 0 To agdWatershed.Source.Columns - 1
-                        agdWatershed.Source.CellSelected(lFeatureIndex + 1, lCol) = True
-                    Next
-                    If lTempVal = False Then
-                        lChangedSomething = True
+            If GisUtil.IsLayer("Watershed") Then
+                Dim lLayerIndex As Integer = GisUtil.LayerIndex("Watershed")
+                Dim lChangedSomething As Boolean = False
+                For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(lLayerIndex) - 1
+                    Dim lTempVal As Boolean = agdWatershed.Source.CellSelected(lFeatureIndex + 1, 0)
+                    If GisUtil.IsSelectedFeature(lLayerIndex, lFeatureIndex) Then
+                        'select it on the list
+                        For lCol As Integer = 0 To agdWatershed.Source.Columns - 1
+                            agdWatershed.Source.CellSelected(lFeatureIndex + 1, lCol) = True
+                        Next
+                        If lTempVal = False Then
+                            lChangedSomething = True
+                        End If
+                    Else
+                        For lCol As Integer = 0 To agdWatershed.Source.Columns - 1
+                            agdWatershed.Source.CellSelected(lFeatureIndex + 1, lCol) = False
+                        Next
+                        If lTempVal Then
+                            lChangedSomething = True
+                        End If
                     End If
-                Else
-                    For lCol As Integer = 0 To agdWatershed.Source.Columns - 1
-                        agdWatershed.Source.CellSelected(lFeatureIndex + 1, lCol) = False
-                    Next
-                    If lTempVal Then
-                        lChangedSomething = True
-                    End If
+                Next
+                If lChangedSomething Then
+                    Refresh()
+                    RefreshScenario()
                 End If
-            Next
-            If lChangedSomething Then
-                Refresh()
-                RefreshScenario()
             End If
         End If
     End Sub
 
     Private Sub cmdAddWatershed_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAddWatershed.Click
-        'With cmdProject
-        '    .DialogTitle = "HSPFParm File Open Project"
-        '    .CancelError = True
-        '    .flags = &H1804& 'not read only
-        '    .Filter = "Project files (*.Wat)|*.Wat"
-        '    On Error GoTo err
-        '    .ShowOpen()
-        'End With
-        'Call frmWat.AddWatFromFile(cmdProject.Filename, False)
+        If HSPFParmProjectIsOpen() AndAlso GisUtil.IsLayer("Watershed") Then
+            If IsNothing(pfrmAddWatershed) Then
+                pfrmAddWatershed = New frmAddWatershed
+                pfrmAddWatershed.InitializeUI(Database, agdWatershed)
+                pfrmAddWatershed.Show()
+            Else
+                If pfrmAddWatershed.IsDisposed Then
+                    Dim pfrmAddWatershed As New frmAddWatershed
+                    pfrmAddWatershed.InitializeUI(Database, agdWatershed)
+                    pfrmAddWatershed.Show()
+                Else
+                    pfrmAddWatershed.WindowState = Windows.Forms.FormWindowState.Normal
+                    pfrmAddWatershed.BringToFront()
+                End If
+            End If
+        Else
+            Logger.Msg("To add a watershed to the database, the HSPFParm map must be displayed and the Watershed layer must be on the map.", "Invalid HSPFParm Map")
+        End If
+    End Sub
 
+    Private Sub cmdDeleteWatershed_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDeleteWatershed.Click
+
+    End Sub
+
+    Private Sub cmdAddScenario_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAddScenario.Click
         ' Call Map1.GetSelectedKeys(WatKeys())
         '            If UBound(WatKeys) = 1 Then 'only one project select, continue
         '                On Error GoTo skip
@@ -1529,15 +1559,46 @@ Public Class frmHSPFParm
         '                End If
     End Sub
 
-    Private Sub cmdDeleteWatershed_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDeleteWatershed.Click
-
-    End Sub
-
-    Private Sub cmdAddScenario_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAddScenario.Click
-
-    End Sub
-
     Private Sub cmdDeleteScenario_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDeleteScenario.Click
 
     End Sub
+
+    Private Sub CreatePointShapefile(ByVal aPointDbfName As String)
+
+        Dim lXPos As New Collection
+        Dim lYPos As New Collection
+        Dim lAttVals As New Collection
+
+        'get data from mdb 
+        'ID, WatershedName, Location, PhysiologicalSetting, WeatherRegime, DrainageArea, HUC, Lat, Long, AlbX, AlbY, Comments
+        Dim lTable As DataTable = Database.GetTable("WatershedData")
+        Dim lTmpId As Integer = 0
+        For lRow As Integer = 0 To lTable.Rows.Count - 1
+            lAttVals.Add(lTable.Rows(lRow).Item(0).ToString)
+            lAttVals.Add(lTable.Rows(lRow).Item(1).ToString)
+            lAttVals.Add(lTable.Rows(lRow).Item(6).ToString)
+            lAttVals.Add(lTable.Rows(lRow).Item(2).ToString)
+            lAttVals.Add(lTable.Rows(lRow).Item(5).ToString)
+            lAttVals.Add(lTable.Rows(lRow).Item(11).ToString)
+            lAttVals.Add(lTable.Rows(lRow).Item(3).ToString)
+            lAttVals.Add(lTable.Rows(lRow).Item(4).ToString)
+            lXPos.Add(lTable.Rows(lRow).Item(8).ToString)
+            lYPos.Add(lTable.Rows(lRow).Item(7).ToString)
+        Next
+
+        Dim lAttNames As New Collection
+        lAttNames.Add("ID")
+        lAttNames.Add("WATERSNAME")
+        lAttNames.Add("HUC")
+        lAttNames.Add("LOCATION")
+        lAttNames.Add("DRAINAGEAR")
+        lAttNames.Add("COMMENTS")
+        lAttNames.Add("PHYS")
+        lAttNames.Add("WEATHER")
+
+        Dim lShapefileName As String = FilenameSetExt(aPointDbfName, "shp")
+        Dim lProjectProjection As String = "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
+        GisUtil.CreatePointShapefile(lShapefileName, lXPos, lYPos, lAttNames, lAttVals, lProjectProjection)
+    End Sub
+
 End Class
