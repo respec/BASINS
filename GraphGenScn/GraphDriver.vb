@@ -310,7 +310,8 @@ Module GraphGenScn
         For I As Integer = 0 To pTSGroup.Count - 1
             Dim lCons As String = pTSGroup(I).Attributes.GetValue("Constituent")
             lCrvIndex = pGraphSpec.CurveIndex(lCons, I)
-            pTSGroup(I).Attributes.SetValue("CurveColor", Color.FromArgb(pGraphSpec.Crv(lCrvIndex).Color))
+            'pTSGroup(I).Attributes.SetValue("CurveColor", Color.FromArgb(pGraphSpec.Crv(lCrvIndex).Color))
+            pTSGroup(I).Attributes.SetValue("CurveColor", ToNewColor(pGraphSpec.Crv(lCrvIndex).Color))
             Dim lTimeseriesAxis As String = pTimeseries3Axis
             '1-leftY,2-rightY,3-Aux,4-X
             Select Case pGraphSpec.Crv(lCrvIndex).CurveType
