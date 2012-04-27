@@ -22,6 +22,7 @@ Public Class frmHSPFParm
     'Variablize report form to prevent multiple open and facilitate BringToFront if already open
     Friend pfrmReport As frmReport
     Friend pfrmAddWatershed As frmAddWatershed
+    Friend pfrmAddScenario As frmAddScenario
 
     Private Const HSPFParmProjectFilename As String = "HSPFParm.mwprj"
 
@@ -1170,18 +1171,6 @@ Public Class frmHSPFParm
         End If
     End Sub
 
-    '    Private Sub Map1_SelectionChange(ByVal FeatureID As String, ByVal layer As Long, ByVal state As Boolean)
-
-    '        '    Debug.Print "picked point " & FeatureID, layer, state
-
-    '        MousePointer = vbHourglass
-
-    '        Call RefreshScenario()
-
-    '        MousePointer = vbDefault
-
-    '    End Sub
-
     Private Sub agdWatershed_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdWatershed.MouseDownCell
         If aRow > 0 Then
             For lCol As Integer = 0 To agdWatershed.Source.Columns - 1
@@ -1444,7 +1433,7 @@ Public Class frmHSPFParm
     Private Sub OpenHSPFParmProject()
         Dim lBasinsFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\Basins")
         Dim lFileName As String = IO.Path.Combine(lBasinsFolder, "models\HSPF\HSPFParmData" & g_PathChar & HSPFParmProjectFilename)
-        
+
         If FileExists(lFileName) Then  'load hspfparm project
             GisUtil.LoadProject(lFileName)
         Else
@@ -1520,47 +1509,126 @@ Public Class frmHSPFParm
     End Sub
 
     Private Sub cmdDeleteWatershed_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDeleteWatershed.Click
-
+        If HSPFParmProjectIsOpen() AndAlso GisUtil.IsLayer("Watershed") Then
+            'are there any selected watersheds?
+            Dim lSelectedCount As Integer = 0
+            Dim lWatershedId As String = ""
+            For lWatRow As Integer = 1 To agdWatershed.Source.Rows
+                If agdWatershed.Source.CellSelected(lWatRow, 0) Then 'list scenarios for this watershed
+                    lSelectedCount += 1
+                    lWatershedId = agdWatershed.Source.CellValue(lWatRow, 0)
+                End If
+            Next
+            If lSelectedCount > 1 Then
+                Logger.Msg("Only one watershed may be deleted at a time.", vbOKOnly, "Watershed Delete Problem")
+            ElseIf lSelectedCount = 0 Then
+                Logger.Msg("Select one watershed for deletion.", vbOKOnly, "Watershed Delete Problem")
+            Else
+                'check to see if any scenarios are associated with this watershed 
+                Dim lCrit As String = ""
+                If lWatershedId.Trim.Length > 0 Then
+                    lCrit = "WatershedID = " & lWatershedId
+                    Dim lStr As String = "SELECT DISTINCTROW ScenarioData.Name, " & _
+                                                            "ScenarioData.ID " & _
+                                                            "From ScenarioData " & _
+                                                            "WHERE (" & lCrit & ")"
+                    Dim lTable As DataTable = Database.GetTable(lStr)
+                    If lTable.Rows.Count > 0 Then
+                        Logger.Msg("Scenarios are associated with this watershed." & vbCrLf & vbCrLf & "Delete these scenarios before deleting this watershed.", vbOKOnly, "Watershed Delete Problem")
+                    Else
+                        'if no scenarios associated, go ahead and delete this watershed
+                        If Database.DeleteRowFromTable("WatershedData", lWatershedId) Then
+                            'also delete location from shapefile
+                            If GisUtil.IsLayer("Watershed") Then
+                                Dim lLayerIndex As Integer = GisUtil.LayerIndex("Watershed")
+                                Dim lFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, "ID")
+                                Dim lFeatureIndex As Integer = GisUtil.FindFeatureIndex(lLayerIndex, lFieldIndex, lWatershedId)
+                                GisUtil.RemoveFeature(lLayerIndex, lFeatureIndex)
+                                With agdWatershed.Source
+                                    Dim lNumRows As Integer = .Rows
+                                    Dim lNumCols As Integer = .Columns
+                                    For lRowIndex As Integer = lFeatureIndex + 1 To lNumRows - 1
+                                        For lColIndex As Integer = 0 To lNumCols - 1
+                                            .CellValue(lRowIndex, lColIndex) = .CellValue(lRowIndex + 1, lColIndex)
+                                            .CellSelected(lRowIndex, lColIndex) = .CellSelected(lRowIndex + 1, lColIndex)
+                                        Next
+                                    Next
+                                    .Rows = .Rows - 1
+                                End With
+                            End If
+                        End If
+                    End If
+                End If
+            End If
+        Else
+            Logger.Msg("To delete a watershed from the database, the HSPFParm map must be displayed and the Watershed layer must be on the map.", "Invalid HSPFParm Map")
+        End If
     End Sub
 
     Private Sub cmdAddScenario_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAddScenario.Click
-        ' Call Map1.GetSelectedKeys(WatKeys())
-        '            If UBound(WatKeys) = 1 Then 'only one project select, continue
-        '                On Error GoTo skip
-        '                With cmdUCIFile
-        '                    .flags = &H1000& 'file must exist
-        '                    .Filter = "UCI files (*.uci)|*.uci"
-        '                    .ShowOpen()
-        '                    UCIFile = FilenameOnly(.Filename)
-        '                End With
-        '                ScenExist = False
-        '                If agdScen.Rows > 1 Then
-        '                    i = 1
-        '                    Do While Not ScenExist
-        '                        If UCase(UCIFile) = UCase(agdScen.TextMatrix(i, 1)) Then
-        '                            ScenExist = True
-        '                        Else
-        '                            i = i + 1
-        '                        End If
-        '                        If i >= agdScen.Rows Then Exit Do
-        '                    Loop
-        '                End If
-        '                If Not ScenExist Then
-        '                    'get project name from database (use DBF in future?)
-        '                    myWat = myDB.OpenRecordset("WatershedData", dbOpenDynaset)
-        '                    crit = "ID = " & WatKeys(0)
-        '                    myWat.FindFirst(crit)
-        '                    WatName = myWat!Name
-        '                    myWat.Close()
-        '                    Call frmScn.BuildScn(WatName, " ", " ", UCIFile, " ", " ", " ", " ", " ", " ", _
-        '                                         "11.0", " ", " ", " ", " ", " ")
-        '                Else
-        '                    MsgBox("This Scenario exists in this project. Delete it first!")
-        '                End If
+        'are there any selected watersheds?
+        Dim lSelectedCount As Integer = 0
+        Dim lWatershedId As String = ""
+        For lWatRow As Integer = 1 To agdWatershed.Source.Rows
+            If agdWatershed.Source.CellSelected(lWatRow, 0) Then 'list scenarios for this watershed
+                lSelectedCount += 1
+                lWatershedId = agdWatershed.Source.CellValue(lWatRow, 0)
+            End If
+        Next
+        If lSelectedCount > 1 Then
+            Logger.Msg("Select only one watershed to which to add the new scenario.", vbOKOnly, "Scenario Add Problem")
+        ElseIf lSelectedCount = 0 Then
+            Logger.Msg("Select one watershed to which to add the new scenario.", vbOKOnly, "Scenario Add Problem")
+        Else
+            'one watershed selected, continue
+            If IsNothing(pfrmAddScenario) Then
+                pfrmAddScenario = New frmAddScenario
+                pfrmAddScenario.InitializeUI(Database, agdScenario, lWatershedId)
+                pfrmAddScenario.Show()
+            Else
+                If pfrmAddScenario.IsDisposed Then
+                    Dim pfrmAddScenario As New frmAddScenario
+                    pfrmAddScenario.InitializeUI(Database, agdScenario, lWatershedId)
+                    pfrmAddScenario.Show()
+                Else
+                    pfrmAddScenario.WindowState = Windows.Forms.FormWindowState.Normal
+                    pfrmAddScenario.BringToFront()
+                End If
+            End If
+        End If
     End Sub
 
     Private Sub cmdDeleteScenario_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDeleteScenario.Click
+        'Dim crit$, pcrit$
+        'Dim myLocScen As Recordset
 
+        'mySeg = myDB.OpenRecordset("SegData", dbOpenDynaset)
+
+        'crit = "ScenarioID = " & scnID
+        'With mySeg
+        '    .FindFirst(crit)
+        '    Do Until .NoMatch
+        '        myParmData = myDB.OpenRecordset("ParmData", dbOpenDynaset)
+        '        pcrit = "SegID = " & !id
+        '        myParmData.FindFirst(pcrit)
+        '        Do Until myParmData.NoMatch
+        '            myParmData.Delete()
+        '            myParmData.FindNext(pcrit)
+        '        Loop
+        '        myParmData.Close()
+        '        .Delete()
+        '        .FindNext(crit)
+        '    Loop
+        '    .Close()
+        'End With
+
+        'myLocScen = myDB.OpenRecordset("ScenarioData", dbOpenDynaset)
+        'crit = "ID = " & scnID
+        'With myLocScen
+        '    .FindFirst(crit)
+        '    .Delete()
+        '    .Close()
+        'End With
     End Sub
 
     Private Sub CreatePointShapefile(ByVal aPointDbfName As String)
