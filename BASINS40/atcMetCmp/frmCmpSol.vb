@@ -71,7 +71,7 @@ Public Class frmCmpSol
         Me.lblLatitude.Name = "lblLatitude"
         Me.lblLatitude.Size = New System.Drawing.Size(130, 13)
         Me.lblLatitude.TabIndex = 3
-        Me.lblLatitude.Text = "Latitude (decimal degress)"
+        Me.lblLatitude.Text = "Latitude (decimal degrees)"
         '
         'txtLatitude
         '
