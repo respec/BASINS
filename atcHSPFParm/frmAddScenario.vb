@@ -4,16 +4,16 @@ Imports System.Data
 Imports atcUCI
 
 Public Class frmAddScenario
-    Friend pScenarioIDs As atcCollection
-    Friend pCurrentIndex As Integer
     Friend pGrid As atcControls.atcGrid
     Friend pUci As atcUCI.HspfUci
+    Friend pWatershedName As String
     <CLSCompliant(False)> Friend Database As atcUtility.atcMDB
 
-    Public Sub InitializeUI(ByVal aDatabase As atcUtility.atcMDB, ByVal aGrid As atcControls.atcGrid, ByVal aWatershedId As String)
+    Public Sub InitializeUI(ByVal aDatabase As atcUtility.atcMDB, ByVal aGrid As atcControls.atcGrid, ByVal aWatershedId As String, ByVal aWatershedName As String)
         Database = aDatabase
         pGrid = aGrid
         txtWatershedId.Text = aWatershedId
+        pWatershedName = aWatershedName
     End Sub
 
     Private Sub cmdClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdClose.Click
@@ -66,6 +66,8 @@ Public Class frmAddScenario
             Exit Sub
         End If
 
+        Logger.Status("SHOW")
+        Logger.Status("Adding Scenario to database...")
         'find next available id number 
         Dim lTable As DataTable = Database.GetTable("ScenarioData")
         Dim lMaxId As Integer = 0
@@ -76,29 +78,187 @@ Public Class frmAddScenario
                 lMaxId = lTmpId
             End If
         Next
+        Dim lNewScenarioId As Integer = lMaxId + 1
 
         'save to database
         Dim lValues As New Collection
-        lValues.Add(lMaxId + 1)
-        'lValues.Add("'" & lProject & "'")
-        'lValues.Add("'" & lLocation & "'")
-        'lValues.Add("'" & lSetting & "'")
-        'lValues.Add("'" & lWeather & "'")
-        'lValues.Add("'" & lArea & "'")
-        'lValues.Add("'" & lHuc & "'")
-        'lValues.Add(lLatitude)
-        'lValues.Add(lLongitude)
-        'lValues.Add(lX)
-        'lValues.Add(lY)
+        lValues.Add(lNewScenarioId)
+        lValues.Add("'" & lName & "'")
+        lValues.Add("'" & lType & "'")
+        lValues.Add("'" & lUciName & "'")
+        lValues.Add(lWatershedId)
+        lValues.Add("'" & lStartDate & "'")
+        lValues.Add("'" & lEndDate & "'")
+        lValues.Add(lUnits)
+        lValues.Add(lNumSegments)
+        lValues.Add(lNumReaches)
+        lValues.Add("'" & lLandUseType & "'")
+        lValues.Add("'" & lChannels & "'")
+        lValues.Add("'" & lWQConstituents & "'")
+        lValues.Add("'" & lSources & "'")
+        lValues.Add("'" & lPurpose & "'")
+        lValues.Add("'" & lVersion & "'")
+        lValues.Add("'" & lReference & "'")
+        lValues.Add("'" & lContactName & "'")
+        lValues.Add("'" & lOrganization & "'")
+        lValues.Add("'" & lPhone & "'")
         lValues.Add("'" & lComments & "'")
         Database.InsertRowIntoTable("ScenarioData", lValues)
 
         If Not pUci Is Nothing Then
-            'GetScenInfo(scnID)
+            'look for perlnd, implnd, rchres operation types
+            If pUci.OpnBlks("PERLND").Count > 0 Then
+                'this operation type exists
+                Logger.Status("Adding PERLND to database...")
+                GetOperInfo("PERLND", lNewScenarioId)
+            End If
+            If pUci.OpnBlks("IMPLND").Count > 0 Then
+                'this operation type exists
+                Logger.Status("Adding IMPLND to database...")
+                GetOperInfo("IMPLND", lNewScenarioId)
+            End If
+            If pUci.OpnBlks("RCHRES").Count > 0 Then
+                'this operation type exists
+                Logger.Status("Adding RCHRES to database...")
+                GetOperInfo("RCHRES", lNewScenarioId)
+            End If
         End If
+        Logger.Status("")
+        Logger.Status("HIDE")
+
+        With pGrid.Source
+            Dim lRow As Integer = .Rows
+            .CellValue(lRow, 0) = lName   'name
+            .CellValue(lRow, 1) = pWatershedName  'wat name
+            .CellValue(lRow, 2) = lNewScenarioId   'id
+        End With
+        pGrid.Refresh()
 
         Me.Close()
     End Sub
+
+    Private Sub GetOperInfo(ByVal aOpName As String, ByVal aScenarioID As Integer)
+        'find next available id number 
+        Dim lTable As DataTable = Database.GetTable("SegData")
+        Dim lNewSegId As Integer = 0
+        Dim lTmpId As Integer = 0
+        lNewSegId = lTable.Rows(lTable.Rows.Count - 1).Item(0).ToString
+
+        'find next available parm data id number 
+        Dim lParmDataTable As DataTable = Database.GetTable("ParmData")
+        Dim lParmDataId As Integer = 0
+        lParmDataId = lParmDataTable.Rows(lParmDataTable.Rows.Count - 1).Item(0).ToString
+
+        Dim lOpTypId As Integer = 0
+        If aOpName = "PERLND" Then
+            lOpTypId = 1
+        ElseIf aOpName = "IMPLND" Then
+            lOpTypId = 2
+        ElseIf aOpName = "RCHRES" Then
+            lOpTypId = 3
+        End If
+
+        Dim lProgressTotal As Integer = 0
+        For Each lOpn As HspfOperation In pUci.OpnBlks(aOpName).Ids
+            lProgressTotal += lOpn.Tables.Count
+        Next
+        Dim lProgressCount As Integer = 0
+        'find information about hspf operation type
+        For Each lOpn As HspfOperation In pUci.OpnBlks(aOpName).Ids
+            lNewSegId += 1
+            Dim lValues As New Collection
+            lValues.Add(lNewSegId)
+            Dim lTmp As String = lOpn.Name & lOpn.Id.ToString.PadLeft(8)
+            lValues.Add("'" & lTmp & "'")
+            lValues.Add("'" & lOpn.Description & "'")
+            lValues.Add(lOpTypId)
+            lValues.Add(aScenarioID)
+            Database.InsertRowIntoTable("SegData", lValues)
+
+            For Each lTab As HspfTable In lOpn.Tables
+                lProgressCount += 1
+                Logger.Progress(lProgressCount, lProgressTotal)
+                Dim lOccur As Integer = 1
+                If lTab.OccurCount > 1 Or lTab.OccurIndex > 1 Then
+                    'get occurrance number 
+                    If lTab.OccurIndex > 0 Then
+                        lOccur = lTab.OccurIndex
+                    Else
+                        lOccur = lTab.OccurNum
+                    End If
+                End If
+                Dim lTableId As Integer = TableIDFromTableName(lTab.Name, lOpTypId)   'like PRINT-INFO 1(PERLND) returns 2
+                If lTableId > 0 Then
+                    For Each lParm As HspfParm In lTab.Parms
+                        lParmDataId += 1
+                        'myParmData = myDB.OpenRecordset("ParmData", dbOpenDynaset)
+                        'ID	    ParmID	SegID	Occur	Value
+                        '1	    1	    1	    1	    0
+                        '157	13	    1	    1	    4
+                        '545033	600	    1364	5	    1.4E3
+                        Dim lParmId As Integer = ParmIDFromParmName(lParm.Name, lTableId)   'like AIRTPR 2 returns 13
+                        If lParmId > 0 Then
+                            Dim lParmValues As New Collection
+                            lParmValues.Add(lParmDataId)
+                            lParmValues.Add(lParmId)
+                            lParmValues.Add(lNewSegId)
+                            lParmValues.Add(lOccur)
+                            lParmValues.Add("'" & lParm.Value & "'")
+                            Database.InsertRowIntoTable("ParmData", lParmValues)
+                        End If
+                    Next
+                End If
+            Next
+
+        Next
+    End Sub
+
+    Private Function TableIDFromTableName(ByVal aTableName As String, ByVal aOpTypId As Integer) As Integer
+        'myParmTableDefn = myDB.OpenRecordset("ParmTableDefn", dbOpenDynaset)
+        'ID	Name	OpnTypID	Alias	TableNumber	Definition
+        '1	ACTIVITY	1	FALSE	1	
+        '222	GQ-VALUES	3	FALSE	55	
+        Dim lTable As DataTable = Database.GetTable("ParmTableDefn")
+        Dim lTmpId As Integer = 0
+        Dim lTmpName As String = ""
+        Dim lOpTypId As Integer = 0
+        Dim lTableId As Integer = 0
+        For lRow As Integer = 0 To lTable.Rows.Count - 1
+            lTmpId = lTable.Rows(lRow).Item(0).ToString
+            lTmpName = lTable.Rows(lRow).Item(1).ToString
+            lOpTypId = lTable.Rows(lRow).Item(2).ToString
+            If aTableName = lTmpName AndAlso aOpTypId = lOpTypId Then
+                lTableId = lTmpId
+                Exit For
+            End If
+        Next
+        Return lTableId
+    End Function
+
+    Private Function ParmIDFromParmName(ByVal aParmName As String, ByVal aTableId As Integer) As Integer
+        'myParmDefn = myDB.OpenRecordset("ParmDefn", dbOpenDynaset)
+        'ID	Name	Assoc	AssocID	ParmTypeID	ParmTableID	Min	Max	Def	StartCol	Width	Definition
+        '1	AIRTFG	 	    0	    2	        1	0	1	0	11	5	
+        '2	SNOWFG	 	    0	    2	        1	0	1	0	16	5	
+        '13	AIRTPR	 	    0	    2	        2	2	6	4	11	5	
+        '1478	BEDDEP	 	0	    3	        204	0	<none>	0	11	10	
+        '1479	SANDFR	 	0	    3	        204	9.999999E-05	1	1	21	10	
+        Dim lTable As DataTable = Database.GetTable("ParmDefn")
+        Dim lTmpId As Integer = 0
+        Dim lTmpName As String = ""
+        Dim lTableId As Integer = 0
+        Dim lParmId As Integer = 0
+        For lRow As Integer = 0 To lTable.Rows.Count - 1
+            lTmpId = lTable.Rows(lRow).Item(0).ToString
+            lTmpName = lTable.Rows(lRow).Item(1).ToString
+            lTableId = lTable.Rows(lRow).Item(5).ToString
+            If aParmName = lTmpName AndAlso aTableId = lTableId Then
+                lParmId = lTmpId
+                Exit For
+            End If
+        Next
+        Return lParmId
+    End Function
 
     Private Sub cmdSet_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSet.Click
         If cdUCI.ShowDialog() = Windows.Forms.DialogResult.OK Then
@@ -109,7 +269,8 @@ Public Class frmAddScenario
 
             txtUCIName.Text = cdUCI.FileName
             Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
-            'Logger.Status("Reading UCI: " & cdUCI.FileName)
+            Logger.Status("SHOW")
+            Logger.Status("Reading UCI: " & cdUCI.FileName)
             pUci.FastReadUciForStarter(pMsg, cdUCI.FileName)
             Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
             'Logger.Status("")
@@ -122,4 +283,5 @@ Public Class frmAddScenario
             txtUnits.Text = pUci.GlobalBlock.EmFg
         End If
     End Sub
+
 End Class

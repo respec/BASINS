@@ -1537,7 +1537,7 @@ Public Class frmHSPFParm
                         Logger.Msg("Scenarios are associated with this watershed." & vbCrLf & vbCrLf & "Delete these scenarios before deleting this watershed.", vbOKOnly, "Watershed Delete Problem")
                     Else
                         'if no scenarios associated, go ahead and delete this watershed
-                        If Database.DeleteRowFromTable("WatershedData", lWatershedId) Then
+                        If Database.DeleteRowFromTable("WatershedData", "ID", lWatershedId) Then
                             'also delete location from shapefile
                             If GisUtil.IsLayer("Watershed") Then
                                 Dim lLayerIndex As Integer = GisUtil.LayerIndex("Watershed")
@@ -1569,10 +1569,12 @@ Public Class frmHSPFParm
         'are there any selected watersheds?
         Dim lSelectedCount As Integer = 0
         Dim lWatershedId As String = ""
+        Dim lWatershedName As String = ""
         For lWatRow As Integer = 1 To agdWatershed.Source.Rows
             If agdWatershed.Source.CellSelected(lWatRow, 0) Then 'list scenarios for this watershed
                 lSelectedCount += 1
                 lWatershedId = agdWatershed.Source.CellValue(lWatRow, 0)
+                lWatershedName = agdWatershed.Source.CellValue(lWatRow, 1)
             End If
         Next
         If lSelectedCount > 1 Then
@@ -1583,12 +1585,12 @@ Public Class frmHSPFParm
             'one watershed selected, continue
             If IsNothing(pfrmAddScenario) Then
                 pfrmAddScenario = New frmAddScenario
-                pfrmAddScenario.InitializeUI(Database, agdScenario, lWatershedId)
+                pfrmAddScenario.InitializeUI(Database, agdScenario, lWatershedId, lWatershedName)
                 pfrmAddScenario.Show()
             Else
                 If pfrmAddScenario.IsDisposed Then
                     Dim pfrmAddScenario As New frmAddScenario
-                    pfrmAddScenario.InitializeUI(Database, agdScenario, lWatershedId)
+                    pfrmAddScenario.InitializeUI(Database, agdScenario, lWatershedId, lWatershedName)
                     pfrmAddScenario.Show()
                 Else
                     pfrmAddScenario.WindowState = Windows.Forms.FormWindowState.Normal
@@ -1599,36 +1601,77 @@ Public Class frmHSPFParm
     End Sub
 
     Private Sub cmdDeleteScenario_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDeleteScenario.Click
-        'Dim crit$, pcrit$
-        'Dim myLocScen As Recordset
+        'are there any selected scenarios?
+        Dim lSelectedCount As Integer = 0
+        Dim lScenarioId As String = ""
+        Dim lScenarioName As String = ""
+        Dim lRemoveRow As Integer = 0
+        For lScenRow As Integer = 1 To agdScenario.Source.Rows
+            If agdScenario.Source.CellSelected(lScenRow, 0) Then
+                lSelectedCount += 1
+                lScenarioId = agdScenario.Source.CellValue(lScenRow, 2)
+                lScenarioName = agdScenario.Source.CellValue(lScenRow, 0)
+                lRemoveRow = lScenRow
+            End If
+        Next
+        If lSelectedCount > 1 Then
+            Logger.Msg("Only one scenario may be deleted at a time.", vbOKOnly, "Scenario Delete Problem")
+        ElseIf lSelectedCount = 0 Then
+            Logger.Msg("Select one scenario for deletion.", vbOKOnly, "Scenario Delete Problem")
+        Else
+            If lScenarioId.Trim.Length > 0 Then
+                'are you sure?
+                If Logger.Msg("Are you sure you want to permanently delete scenario '" & lScenarioName & "'?", vbOKCancel, "Confirm Scenario Delete") = MsgBoxResult.Ok Then
+                    'delete this scenario
 
-        'mySeg = myDB.OpenRecordset("SegData", dbOpenDynaset)
+                    'find segments that belong to this scenario
+                    Dim lTable As DataTable = Database.GetTable("SegData")
+                    Dim lId As Integer = 0
+                    Dim lScenId As Integer = 0
+                    Dim lSegsToRemove As New Collection
+                    For lRow As Integer = 0 To lTable.Rows.Count - 1
+                        lId = lTable.Rows(lRow).Item(0).ToString
+                        lScenId = lTable.Rows(lRow).Item(4).ToString
+                        If lScenId = lScenarioId Then
+                            lSegsToRemove.Add(lId)
+                        End If
+                    Next
 
-        'crit = "ScenarioID = " & scnID
-        'With mySeg
-        '    .FindFirst(crit)
-        '    Do Until .NoMatch
-        '        myParmData = myDB.OpenRecordset("ParmData", dbOpenDynaset)
-        '        pcrit = "SegID = " & !id
-        '        myParmData.FindFirst(pcrit)
-        '        Do Until myParmData.NoMatch
-        '            myParmData.Delete()
-        '            myParmData.FindNext(pcrit)
-        '        Loop
-        '        myParmData.Close()
-        '        .Delete()
-        '        .FindNext(crit)
-        '    Loop
-        '    .Close()
-        'End With
+                    'delete parameters that belong to each segment
+                    Dim lSegId As Integer = 0
+                    For Each lSeg As Integer In lSegsToRemove
+                        Database.DeleteRowFromTable("ParmData", "SegID", lSeg)
+                    Next
 
-        'myLocScen = myDB.OpenRecordset("ScenarioData", dbOpenDynaset)
-        'crit = "ID = " & scnID
-        'With myLocScen
-        '    .FindFirst(crit)
-        '    .Delete()
-        '    .Close()
-        'End With
+                    'now delete segments that belong to this scenario
+                    For lRow As Integer = 0 To lTable.Rows.Count - 1
+                        lId = lTable.Rows(lRow).Item(0).ToString
+                        lScenId = lTable.Rows(lRow).Item(4).ToString
+                        If lScenId = lScenarioId Then
+                            Database.DeleteRowFromTable("SegData", "ID", lId)
+                        End If
+                    Next
+
+                    'finally delete the scenario
+                    If Database.DeleteRowFromTable("ScenarioData", "ID", lScenarioId) Then
+                        'remove this row from scenario grid
+                        With agdScenario.Source
+                            Dim lNumRows As Integer = .Rows
+                            Dim lNumCols As Integer = .Columns
+                            For lRowIndex As Integer = lRemoveRow + 1 To lNumRows - 1
+                                For lColIndex As Integer = 0 To lNumCols - 1
+                                    .CellValue(lRowIndex, lColIndex) = .CellValue(lRowIndex + 1, lColIndex)
+                                    .CellSelected(lRowIndex, lColIndex) = .CellSelected(lRowIndex + 1, lColIndex)
+                                Next
+                            Next
+                            .Rows = .Rows - 1
+                        End With
+                    End If
+
+                    RefreshSegment()
+                End If
+            End If
+        End If
     End Sub
 
     Private Sub CreatePointShapefile(ByVal aPointDbfName As String)

@@ -115,11 +115,11 @@ Public Class atcMDB
         Return True
     End Function
 
-    Public Function DeleteRowFromTable(ByVal aTableName As String, ByVal aID As String) As Boolean
+    Public Function DeleteRowFromTable(ByVal aTableName As String, ByVal aFieldName As String, ByVal aID As String) As Boolean
         pConnection.Open()
         Dim lCommand As New OdbcCommand
         lCommand.Connection = pConnection
-        lCommand.CommandText = "DELETE FROM " & aTableName & " WHERE ID = " & aID
+        lCommand.CommandText = "DELETE FROM " & aTableName & " WHERE " & aFieldName & " = " & aID
         lCommand.ExecuteNonQuery()
         pConnection.Close()
         Return True
