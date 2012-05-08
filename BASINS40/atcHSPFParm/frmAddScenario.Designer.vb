@@ -439,7 +439,7 @@ Partial Class frmAddScenario
         Me.cmdClose.Name = "cmdClose"
         Me.cmdClose.Size = New System.Drawing.Size(64, 25)
         Me.cmdClose.TabIndex = 42
-        Me.cmdClose.Text = "Close"
+        Me.cmdClose.Text = "Cancel"
         Me.cmdClose.UseVisualStyleBackColor = True
         '
         'cmdOK
