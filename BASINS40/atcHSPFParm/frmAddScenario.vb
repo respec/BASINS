@@ -198,6 +198,34 @@ Public Class frmAddScenario
                         '545033	600	    1364	5	    1.4E3
                         Dim lParmId As Integer = ParmIDFromParmName(lParm.Name, lTableId)   'like AIRTPR 2 returns 13
                         If lParmId > 0 Then
+                            If lParm.Def.Typ > 1 Then
+                                'check here to see if this real number is within the normal range
+                                Dim lMax As Single = 0.0
+                                Dim lMin As Single = 0.0
+                                Dim lVal As Single = 0.0
+                                Dim lHSPFMax As Single = lParm.Def.Max
+                                Dim lHSPFMin As Single = lParm.Def.Min
+                                If pUci.GlobalBlock.EmFg = 2 Then
+                                    lHSPFMax = lParm.Def.MetricMax
+                                    lHSPFMin = lParm.Def.MetricMin
+                                End If
+                                ParmMinMax(lParmId, lMin, lMax)
+                                If IsNumeric(lParm.Value) Then
+                                    lVal = CSng(lParm.Value)
+                                    If lVal > lMax Then
+                                        Logger.Msg("The value for parameter " & lParm.Name & " is greater than the greatest value of this parameter " & _
+                                                   "in the HSPFParm database." & vbCrLf & vbCrLf & "Operation: " & lOpn.Name & " " & lOpn.Id & _
+                                                   "   Value: " & lVal & "   Max: " & lMax & "   HSPF Max: " & lHSPFMax, MsgBoxStyle.Critical, _
+                                                   "HSPFParm Value Beyond Normal Range")
+                                    End If
+                                    If lVal < lMin Then
+                                        Logger.Msg("The value for parameter " & lParm.Name & " is lower than the lowest value of this parameter " & _
+                                                   "in the HSPFParm database." & vbCrLf & vbCrLf & "Operation: " & lOpn.Name & " " & lOpn.Id & _
+                                                   "   Value: " & lVal & "   Min: " & lMin & "   HSPF Min: " & lHSPFMin, MsgBoxStyle.Critical, _
+                                                   "HSPFParm Value Beyond Normal Range")
+                                    End If
+                                End If
+                            End If
                             Dim lParmValues As New Collection
                             lParmValues.Add(lParmDataId)
                             lParmValues.Add(lParmId)
@@ -259,6 +287,37 @@ Public Class frmAddScenario
         Next
         Return lParmId
     End Function
+
+    Sub ParmMinMax(ByVal aParmId As Integer, ByRef aMin As Single, ByRef aMax As Single)
+        'find min and max values for this parameter
+        Dim lParmCrit As String = "ParmID = " & aParmId & " OR AssocID = " & aParmId
+        Dim lStr As String = "SELECT DISTINCTROW ParmTableData.SegID, " & _
+                                                "ParmTableData.OpnTypID, " & _
+                                                "ParmTableData.Name, " & _
+                                                "ParmTableData.ParmID, " & _
+                                                "ParmTableData.Value, " & _
+                                                "ParmTableData.Table, " & _
+                                                "ParmTableData.Occur, " & _
+                                                "ParmTabledata.AliasInfo " & _
+                                                "From ParmTableData " & _
+                                                "WHERE (" & lParmCrit & ")"
+        Dim lTable As DataTable = Database.GetTable(lStr)
+        aMin = lTable.Rows(0).Item(4)
+        aMax = lTable.Rows(0).Item(4)
+        Dim lTmp As Single
+        If lTable.Rows.Count > 0 Then
+            For lRow As Integer = 1 To lTable.Rows.Count - 1
+                lTmp = lTable.Rows(lRow).Item(4)
+                If lTmp > aMax Then
+                    aMax = lTmp
+                End If
+                If lTmp < aMin Then
+                    aMin = lTmp
+                End If
+            Next
+        End If
+
+    End Sub
 
     Private Sub cmdSet_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSet.Click
         If cdUCI.ShowDialog() = Windows.Forms.DialogResult.OK Then
