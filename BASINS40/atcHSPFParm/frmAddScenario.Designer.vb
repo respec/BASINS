@@ -67,6 +67,7 @@ Partial Class frmAddScenario
         Me.cmdOK = New System.Windows.Forms.Button
         Me.cdUCI = New System.Windows.Forms.OpenFileDialog
         Me.cmdSet = New System.Windows.Forms.Button
+        Me.cbxRange = New System.Windows.Forms.CheckBox
         Me.SuspendLayout()
         '
         'Label1
@@ -464,11 +465,22 @@ Partial Class frmAddScenario
         Me.cmdSet.Text = "Set"
         Me.cmdSet.UseVisualStyleBackColor = True
         '
+        'cbxRange
+        '
+        Me.cbxRange.AutoSize = True
+        Me.cbxRange.Location = New System.Drawing.Point(54, 550)
+        Me.cbxRange.Name = "cbxRange"
+        Me.cbxRange.Size = New System.Drawing.Size(216, 17)
+        Me.cbxRange.TabIndex = 45
+        Me.cbxRange.Text = "Do range checking on parameter values"
+        Me.cbxRange.UseVisualStyleBackColor = True
+        '
         'frmAddScenario
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(582, 619)
+        Me.Controls.Add(Me.cbxRange)
         Me.Controls.Add(Me.cmdSet)
         Me.Controls.Add(Me.cmdOK)
         Me.Controls.Add(Me.cmdClose)
@@ -563,4 +575,5 @@ Partial Class frmAddScenario
     Friend WithEvents cmdOK As System.Windows.Forms.Button
     Friend WithEvents cdUCI As System.Windows.Forms.OpenFileDialog
     Friend WithEvents cmdSet As System.Windows.Forms.Button
+    Friend WithEvents cbxRange As System.Windows.Forms.CheckBox
 End Class
