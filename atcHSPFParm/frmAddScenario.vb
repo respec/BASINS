@@ -105,22 +105,23 @@ Public Class frmAddScenario
         lValues.Add("'" & lComments & "'")
         Database.InsertRowIntoTable("ScenarioData", lValues)
 
+        Dim lRangeCheck As Boolean = cbxRange.Checked
         If Not pUci Is Nothing Then
             'look for perlnd, implnd, rchres operation types
             If pUci.OpnBlks("PERLND").Count > 0 Then
                 'this operation type exists
                 Logger.Status("Adding PERLND to database...")
-                GetOperInfo("PERLND", lNewScenarioId)
+                GetOperInfo("PERLND", lNewScenarioId, lRangeCheck)
             End If
             If pUci.OpnBlks("IMPLND").Count > 0 Then
                 'this operation type exists
                 Logger.Status("Adding IMPLND to database...")
-                GetOperInfo("IMPLND", lNewScenarioId)
+                GetOperInfo("IMPLND", lNewScenarioId, lRangeCheck)
             End If
             If pUci.OpnBlks("RCHRES").Count > 0 Then
                 'this operation type exists
                 Logger.Status("Adding RCHRES to database...")
-                GetOperInfo("RCHRES", lNewScenarioId)
+                GetOperInfo("RCHRES", lNewScenarioId, lRangeCheck)
             End If
         End If
         Logger.Status("")
@@ -137,7 +138,7 @@ Public Class frmAddScenario
         Me.Close()
     End Sub
 
-    Private Sub GetOperInfo(ByVal aOpName As String, ByVal aScenarioID As Integer)
+    Private Sub GetOperInfo(ByVal aOpName As String, ByVal aScenarioID As Integer, ByVal aRangeCheck As Boolean)
         'find next available id number 
         Dim lTable As DataTable = Database.GetTable("SegData")
         Dim lNewSegId As Integer = 0
@@ -198,7 +199,7 @@ Public Class frmAddScenario
                         '545033	600	    1364	5	    1.4E3
                         Dim lParmId As Integer = ParmIDFromParmName(lParm.Name, lTableId)   'like AIRTPR 2 returns 13
                         If lParmId > 0 Then
-                            If lParm.Def.Typ > 1 Then
+                            If aRangeCheck AndAlso lParm.Def.Typ > 1 Then
                                 'check here to see if this real number is within the normal range
                                 Dim lMax As Single = 0.0
                                 Dim lMin As Single = 0.0
@@ -237,7 +238,6 @@ Public Class frmAddScenario
                     Next
                 End If
             Next
-
         Next
     End Sub
 
@@ -246,20 +246,15 @@ Public Class frmAddScenario
         'ID	Name	OpnTypID	Alias	TableNumber	Definition
         '1	ACTIVITY	1	FALSE	1	
         '222	GQ-VALUES	3	FALSE	55	
-        Dim lTable As DataTable = Database.GetTable("ParmTableDefn")
-        Dim lTmpId As Integer = 0
-        Dim lTmpName As String = ""
-        Dim lOpTypId As Integer = 0
         Dim lTableId As Integer = 0
-        For lRow As Integer = 0 To lTable.Rows.Count - 1
-            lTmpId = lTable.Rows(lRow).Item(0).ToString
-            lTmpName = lTable.Rows(lRow).Item(1).ToString
-            lOpTypId = lTable.Rows(lRow).Item(2).ToString
-            If aTableName = lTmpName AndAlso aOpTypId = lOpTypId Then
-                lTableId = lTmpId
-                Exit For
-            End If
-        Next
+        Dim lCrit As String = " Name = '" & aTableName & "' AND " & " OpnTypID = " & aOpTypId
+        Dim lStr As String = "SELECT DISTINCTROW ParmTableDefn.ID " & _
+                                                "From ParmTableDefn " & _
+                                                "WHERE (" & lCrit & ")"
+        Dim lTable As DataTable = Database.GetTable(lStr)
+        If lTable.Rows.Count > 0 Then
+            lTableId = lTable.Rows(0).Item(0).ToString
+        End If
         Return lTableId
     End Function
 
@@ -271,20 +266,15 @@ Public Class frmAddScenario
         '13	AIRTPR	 	    0	    2	        2	2	6	4	11	5	
         '1478	BEDDEP	 	0	    3	        204	0	<none>	0	11	10	
         '1479	SANDFR	 	0	    3	        204	9.999999E-05	1	1	21	10	
-        Dim lTable As DataTable = Database.GetTable("ParmDefn")
-        Dim lTmpId As Integer = 0
-        Dim lTmpName As String = ""
-        Dim lTableId As Integer = 0
         Dim lParmId As Integer = 0
-        For lRow As Integer = 0 To lTable.Rows.Count - 1
-            lTmpId = lTable.Rows(lRow).Item(0).ToString
-            lTmpName = lTable.Rows(lRow).Item(1).ToString
-            lTableId = lTable.Rows(lRow).Item(5).ToString
-            If aParmName = lTmpName AndAlso aTableId = lTableId Then
-                lParmId = lTmpId
-                Exit For
-            End If
-        Next
+        Dim lCrit As String = " Name = '" & aParmName & "' AND " & " ParmTableID = " & aTableId
+        Dim lStr As String = "SELECT DISTINCTROW ParmDefn.ID " & _
+                                                "From ParmDefn " & _
+                                                "WHERE (" & lCrit & ")"
+        Dim lTable As DataTable = Database.GetTable(lStr)
+        If lTable.Rows.Count > 0 Then
+            lParmId = lTable.Rows(0).Item(0).ToString
+        End If
         Return lParmId
     End Function
 
