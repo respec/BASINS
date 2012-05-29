@@ -35,8 +35,8 @@ Partial Public Class atcTimeseriesNCDC
         gmtDate = 3
         gmtTime = 4
         elemId = 5
-        elemfld1 = 6
-        elemfld2 = 7 'value field
+        elemfld1 = 6 'value field for WND, TMP, and GF1
+        elemfld2 = 7 'value field for AA1 and CIG
         elemfld3 = 8
         elemfld4 = 9
         elemfld5 = 10
@@ -54,6 +54,7 @@ Partial Public Class atcTimeseriesNCDC
 
     Private Class RawData
 
+        Public ColumnIndex As Integer
         Public ValidType As Boolean
         Private pRptType As String
         Public Property RptType() As String
@@ -75,6 +76,7 @@ Partial Public Class atcTimeseriesNCDC
                     Case "FM-16"
                         PointType = False
                         TimeUnit = atcTimeUnit.TUMinute
+                        ValidType = False
                     Case Else
                         ValidType = False
                 End Select
@@ -169,8 +171,12 @@ Partial Public Class atcTimeseriesNCDC
             Dim lStationIdPart1 As String = "unknown"
             Dim lStationIdPart2 As String = "unknown"
             Dim lConstituent As String = "unknown"
+            Dim lConstituentBASINS As String = "unknown"
+
             Dim lRptType As String = ""
             Dim lDate(5) As Integer
+
+            Dim lChosenToBeSkipped As Boolean
 
             'scan through the file for timeseries
             Dim lTable As New atcTableDelimited()
@@ -188,30 +194,56 @@ Partial Public Class atcTimeseriesNCDC
 
                 If .FieldName(1) <> "" Then
                     lRptType = .FieldName(Cols.rptType)
-                    Dim lNewData As New RawData()
-                    With lNewData
-                        .RptType = lRptType
-                        .DateBeg = .DateCalc(lTable.FieldName(Cols.gmtDate), lTable.FieldName(Cols.gmtTime))
-                    End With
-                    If lNewData.ValidType Then
-                        lRptTypeDataGroup.Add(lRptType, lNewData)
-                    Else
-                        lNewData = Nothing
+                    lChosenToBeSkipped = False
+                    If SkipRptType IsNot Nothing Then
+                        lChosenToBeSkipped = SkipRptType.GetValue(lRptType, False)
+                    End If
+
+                    If Not lChosenToBeSkipped Then
+                        Dim lNewData As New RawData()
+                        With lNewData
+                            .RptType = lRptType
+                            If .ValidType Then
+                                .DateBeg = .DateCalc(lTable.FieldName(Cols.gmtDate), lTable.FieldName(Cols.gmtTime))
+                                Select Case lConstituent
+                                    Case "AA1"
+                                        .ColumnIndex = Cols.elemfld2
+                                    Case "WND"
+                                        .ColumnIndex = Cols.elemfld4
+                                    Case "GF1", "TMP", "DEW"
+                                        .ColumnIndex = Cols.elemfld1
+                                End Select
+                                lRptTypeDataGroup.Add(lRptType, lNewData)
+                            End If
+                        End With 'lNewData
                     End If
                 End If
 
                 While Not .EOF
                     lRptType = .Value(Cols.rptType)
                     If Not lRptTypeDataGroup.Keys.Contains(lRptType) Then
-                        Dim lNewData As New RawData()
-                        With lNewData
-                            .RptType = lRptType
-                            .DateBeg = .DateCalc(lTable.Value(Cols.gmtDate), lTable.Value(Cols.gmtTime))
-                        End With
-                        If lNewData.ValidType Then
-                            lRptTypeDataGroup.Add(lRptType, lNewData)
-                        Else
-                            lNewData = Nothing
+                        lChosenToBeSkipped = False
+                        If SkipRptType IsNot Nothing Then
+                            lChosenToBeSkipped = SkipRptType.GetValue(lRptType, False)
+                        End If
+
+                        If Not lChosenToBeSkipped Then
+                            Dim lNewData As New RawData()
+                            With lNewData
+                                .RptType = lRptType
+                                If .ValidType Then
+                                    .DateBeg = .DateCalc(lTable.Value(Cols.gmtDate), lTable.Value(Cols.gmtTime))
+                                    Select Case lConstituent
+                                        Case "AA1"
+                                            .ColumnIndex = Cols.elemfld2
+                                        Case "WND"
+                                            .ColumnIndex = Cols.elemfld4
+                                        Case "GF1", "TMP", "DEW"
+                                            .ColumnIndex = Cols.elemfld1
+                                    End Select
+                                    lRptTypeDataGroup.Add(lRptType, lNewData)
+                                End If
+                            End With 'lNewData
                         End If
                     Else
                         'Set end date
@@ -226,11 +258,20 @@ Partial Public Class atcTimeseriesNCDC
             lTable.Clear()
             lTable = Nothing
 
+            Select Case lConstituent.ToLower
+                Case "aa1" : lConstituentBASINS = "PREC"
+                Case "tmp" : lConstituentBASINS = "ATEM"
+                Case "wnd" : lConstituentBASINS = "WIND"
+                Case "dew" : lConstituentBASINS = "DEWP"
+                Case "gf1" : lConstituentBASINS = "SKYCOND"
+                Case Else : lConstituentBASINS = "UNK"
+            End Select
+
             Dim lTs As atcTimeseries = Nothing
             Dim lDates As atcTimeseries = Nothing
             Dim lNewDates() As Double
             For Each lRptType In lRptTypeDataGroup.Keys
-                pDatasetID += 1
+                'pDatasetID += 1
                 lTs = New atcTimeseries(Me)
                 lDates = New atcTimeseries(Nothing)
                 Dim lRawData As RawData = lRptTypeDataGroup.ItemByKey(lRptType)
@@ -252,9 +293,9 @@ Partial Public Class atcTimeseriesNCDC
                     .SetValue("RptType", lRptType)
                     .SetValue("Location", lStationIdPart1 & lStationIdPart2)
                     .SetValue("History 1", FilenameNoPath(Specification))
-                    .SetValue("Constituent", lConstituent)
-                    .SetValue("FieldIndex", Cols.elemfld2) 'currently only reading the actual value
-                    .SetValue("ID", pDatasetID)
+                    .SetValue("Constituent", lConstituentBASINS)
+                    .SetValue("FieldIndex", lRawData.ColumnIndex) 'currently only reading the actual value
+                    '.SetValue("ID", pDatasetID)
                 End With
                 DataSets.Add(lTs)
             Next 'lRptType
@@ -490,7 +531,7 @@ Partial Public Class atcTimeseriesNCDC
                         If .FieldName(1) <> "" Then
                             Try
                                 ' lTable 
-                                For lDSctr As Integer = 0 To DataSets.Count - 1
+                                For lDSctr As Integer = 0 To lReadValues.Count - 1
                                     lFieldIndex = Integer.Parse(DataSets(lDSctr).Attributes.GetValue("FieldIndex"))
                                     lVd = lReadValues(lDSctr)
 
@@ -516,7 +557,7 @@ Partial Public Class atcTimeseriesNCDC
                         While Not .EOF
                             Try
                                 ' lTable 
-                                For lDSctr As Integer = 0 To DataSets.Count - 1
+                                For lDSctr As Integer = 0 To lReadValues.Count - 1
                                     lFieldIndex = Integer.Parse(DataSets(lDSctr).Attributes.GetValue("FieldIndex"))
                                     lVd = lReadValues(lDSctr)
                                     If lVd.RptType = .Value(Cols.rptType) Then
@@ -623,6 +664,8 @@ Partial Public Class atcTimeseriesNCDC
             lReadValues.Clear()
         End If
     End Sub
+
+    Public SkipRptType As atcDataAttributes
 
     Public Sub New()
         Filter = pFilter
