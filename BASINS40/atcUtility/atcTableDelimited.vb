@@ -14,6 +14,7 @@ Imports MapWinUtility
 Public Class atcTableDelimited
     Inherits atcTable
 
+    Public NumFieldNameRows As Integer = 1
     Protected pFieldNames() As String
     Private pFieldLengths() As Integer
     Private pFieldTypes() As String
@@ -221,12 +222,19 @@ ErrHand:
         For Each lCurrentLine As String In LinesInFile(inReader)
             lRecordCount += 1
             If lRecordCount <= NumHeaderRows Then
-                pHeaderLines.Add(lCurrentLine)
-            ElseIf lRecordCount = NumHeaderRows + 1 Then
+                pHeaderLines(lRecordCount) = lCurrentLine
+            ElseIf lRecordCount = NumHeaderRows + 1 AndAlso NumFieldNameRows > 0 Then
                 NumFields = CountString(lCurrentLine, Delimiter) + 1
                 'Split creates a zero-based array. Prepending pDelimiter inserts blank field name so pFieldNames(1) contains first name
                 'TODO: are quoted ("") - is this correct?
                 pFieldNames = (Delimiter & lCurrentLine).Split(Delimiter)
+            ElseIf lRecordCount <= NumHeaderRows + NumFieldNameRows Then
+                Dim lFieldNamesThisRow() As String = (Delimiter & lCurrentLine).Split(Delimiter)
+                For lFieldIndex As Integer = 1 To pNumFields
+                    If lFieldIndex < lFieldNamesThisRow.Length Then
+                        pFieldNames(lFieldIndex) &= vbTab & lFieldNamesThisRow(lFieldIndex)
+                    End If
+                Next
             Else
                 pRecords.Add(lCurrentLine)
             End If
