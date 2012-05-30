@@ -239,6 +239,9 @@ ErrHand:
                 pRecords.Add(lCurrentLine)
             End If
         Next
+        If NumFields = 0 AndAlso pRecords.Count > 0 Then
+            NumFields = CountString(pRecords(1), Delimiter) + 1
+        End If
         Me.CurrentRecord = 1
         Return True
     End Function
