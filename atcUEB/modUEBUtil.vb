@@ -7,19 +7,24 @@ Module modUEBUtil
     Dim lChrSep() As String = {" ", vbTab, vbCrLf}
 
 
-    Public Sub OpenMasterFile(ByVal aFilename As String, _
-                              ByRef aWeatherFileName As String, ByRef aOutputFileName As String, _
+    Public Sub OpenMasterFile(ByVal aFilename As String, ByRef aRunLabel As String, _
                               ByRef aParameterFileName As String, ByRef aSiteFileName As String, _
-                              ByRef aBCParameterFileName As String, ByRef aRadOpt As Integer)
+                              ByRef aInputVarsFileName As String, ByRef aOutputVarsFileName As String, _
+                              ByRef aWatershedFileName As String, ByRef aAggOutputControlFileName As String, _
+                              ByRef aAggOutputFileName As String)
+
         Dim lPath As String = PathNameOnly(aFilename) & "\"
         Dim lStr As String = WholeFileString(aFilename)
 
-        aWeatherFileName = lPath & StrRetRem(lStr) 'should be weather input file
-        aOutputFileName = lPath & StrRetRem(lStr) 'should be output file
+        aRunLabel = StrRetRem(lStr) 'description of this run
         aParameterFileName = lPath & StrRetRem(lStr) 'should be parameter file
         aSiteFileName = lPath & StrRetRem(lStr) 'should be site file
-        aBCParameterFileName = lPath & StrRetRem(lStr) 'should be B-C parameter file
-        aRadOpt = StrRetRem(lStr) 'should be input radiation option
+        aInputVarsFileName = lPath & StrRetRem(lStr) 'should be input variable file
+        aOutputVarsFileName = lPath & StrRetRem(lStr) 'should be output variable file
+        aWatershedFileName = lPath & StrRetRem(lStr) 'should be watershed grid file
+        aAggOutputControlFileName = StrRetRem(lStr) 'should be aggregated output control file
+        aAggOutputFileName = StrRetRem(lStr) 'should be aggregated output control file
+
     End Sub
 
     Public Sub ReadDataFile(ByVal aFilename As String, ByRef aDataArray() As Double)
@@ -37,17 +42,22 @@ Module modUEBUtil
         Next
     End Sub
 
-    Public Function WriteMasterFile(ByVal aFilename As String, _
-                                    ByRef aWeatherFileName As String, ByRef aOutputFileName As String, _
-                                    ByRef aParameterFileName As String, ByRef aSiteFileName As String, _
-                                    ByRef aBCParameterFileName As String, ByRef aRadOpt As Integer) As Boolean
+    Public Function WriteMasterFile(ByVal aFilename As String, ByRef aRunLabel As String, _
+                              ByRef aParameterFileName As String, ByRef aSiteFileName As String, _
+                              ByRef aInputVarsFileName As String, ByRef aOutputVarsFileName As String, _
+                              ByRef aWatershedFileName As String, ByRef aAggOutputControlFileName As String, _
+                              ByRef aAggOutputFileName As String) As Boolean
 
         Dim lStr As String
 
-        If aWeatherFileName.Length > 0 AndAlso aOutputFileName.Length > 0 AndAlso aParameterFileName.Length > 0 AndAlso _
-           aSiteFileName.Length > 0 AndAlso aBCParameterFileName.Length > 0 Then
+        If aParameterFileName.Length > 0 AndAlso aSiteFileName.Length > 0 AndAlso _
+           aInputVarsFileName.Length > 0 AndAlso aOutputVarsFileName.Length > 0 AndAlso _
+           aWatershedFileName.Length > 0 AndAlso aAggOutputControlFileName.Length > 0 AndAlso _
+           aAggOutputFileName.Length > 0 Then
             Try
-                lStr = aWeatherFileName & " " & aOutputFileName & " " & aParameterFileName & " " & aSiteFileName & " " & aBCParameterFileName & " " & aRadOpt
+                lStr = aRunLabel & vbCrLf & aParameterFileName & vbCrLf & aSiteFileName & vbCrLf & _
+                       aInputVarsFileName & vbCrLf & aOutputVarsFileName & vbCrLf & aWatershedFileName & vbCrLf & _
+                       aAggOutputControlFileName & vbCrLf & aAggOutputFileName
                 SaveFileString(aFilename, lStr)
                 Return True
             Catch ex As Exception
