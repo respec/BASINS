@@ -78,6 +78,7 @@
     <Compile Include="clsPlugin.vb" />
     <Compile Include="clsUEBParameterFile.vb" />
     <Compile Include="clsUEBSiteFile.vb" />
+    <Compile Include="clsUEBVariable.vb" />
     <Compile Include="clsUEBWeather.vb" />
     <Compile Include="frmUEB.vb">
       <SubType>Form</SubType>
@@ -121,6 +122,8 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="Param.dat" />
+    <None Include="SiteInit.dat" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility.vbproj">

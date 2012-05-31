@@ -9,6 +9,7 @@ Imports System.Windows.Forms
 Public Class frmUEB
     Inherits System.Windows.Forms.Form
 
+    Friend pProjectDescription As String
     Friend pParmData As clsUEBParameterFile
     Friend pSiteData As clsUEBSiteFile
     Friend pWeatherData As clsUEBWeather
@@ -23,6 +24,15 @@ Public Class frmUEB
     Friend WithEvents txtRelHStation As System.Windows.Forms.TextBox
     Friend WithEvents txtWindStation As System.Windows.Forms.TextBox
     Friend WithEvents txtPrecipStation As System.Windows.Forms.TextBox
+    Friend WithEvents AtcGridModelParms As atcControls.atcGrid
+    Friend WithEvents txtParameterFile As System.Windows.Forms.TextBox
+    Friend WithEvents Label4 As System.Windows.Forms.Label
+    Friend WithEvents txtSiteFile As System.Windows.Forms.TextBox
+    Friend WithEvents Label5 As System.Windows.Forms.Label
+    Friend WithEvents txtBCParameterFile As System.Windows.Forms.TextBox
+    Friend WithEvents Label6 As System.Windows.Forms.Label
+    Friend WithEvents AtcGridSiteVars As atcControls.atcGrid
+    Friend WithEvents AtcGridBCMonthly As atcControls.atcGrid
     Friend WithEvents txtAtempStation As System.Windows.Forms.TextBox
 
 #Region " Windows Form Designer generated code "
@@ -149,153 +159,136 @@ Public Class frmUEB
     Friend WithEvents AtcTextIniEnergyContent As atcControls.atcText
     Friend WithEvents AtcTextIniWaterEquiv As atcControls.atcText
     Friend WithEvents lblNetRadStation As System.Windows.Forms.Label
-    Friend WithEvents AtcGridModelParms As atcControls.atcGrid
-    Friend WithEvents AtcGridSiteVars As atcControls.atcGrid
-    Friend WithEvents AtcTextCParm As atcControls.atcText
-    Friend WithEvents AtcTextAParm As atcControls.atcText
-    Friend WithEvents lblCParm As System.Windows.Forms.Label
-    Friend WithEvents lblAParm As System.Windows.Forms.Label
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents Label3 As System.Windows.Forms.Label
-    Friend WithEvents Label4 As System.Windows.Forms.Label
-    Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents lblInstructions As System.Windows.Forms.Label
-    Friend WithEvents Label6 As System.Windows.Forms.Label
     Friend WithEvents txtWeatherFile As System.Windows.Forms.TextBox
-    Friend WithEvents txtParameterFile As System.Windows.Forms.TextBox
-    Friend WithEvents txtSiteFile As System.Windows.Forms.TextBox
-    Friend WithEvents txtBCParameterFile As System.Windows.Forms.TextBox
     Friend WithEvents txtMasterFile As System.Windows.Forms.TextBox
     Friend WithEvents txtOutputFile As System.Windows.Forms.TextBox
     Friend WithEvents Label7 As System.Windows.Forms.Label
     Friend WithEvents txtProjectName As System.Windows.Forms.TextBox
-    Friend WithEvents AtcGridBCMonthly As atcControls.atcGrid
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmUEB))
-        Me.cmdCancel = New System.Windows.Forms.Button()
-        Me.cmdHelp = New System.Windows.Forms.Button()
-        Me.cmdAbout = New System.Windows.Forms.Button()
-        Me.TabControl1 = New System.Windows.Forms.TabControl()
-        Me.TabPage2 = New System.Windows.Forms.TabPage()
-        Me.txtOutputFile = New System.Windows.Forms.TextBox()
-        Me.Label7 = New System.Windows.Forms.Label()
-        Me.txtProjectName = New System.Windows.Forms.TextBox()
-        Me.txtMasterFile = New System.Windows.Forms.TextBox()
-        Me.lblInstructions = New System.Windows.Forms.Label()
-        Me.Label2 = New System.Windows.Forms.Label()
-        Me.Label62 = New System.Windows.Forms.Label()
-        Me.GroupBox4 = New System.Windows.Forms.GroupBox()
-        Me.Label50 = New System.Windows.Forms.Label()
-        Me.AtcTextSnowAge = New atcControls.atcText()
-        Me.Label52 = New System.Windows.Forms.Label()
-        Me.Label53 = New System.Windows.Forms.Label()
-        Me.AtcTextIniEnergyContent = New atcControls.atcText()
-        Me.AtcTextIniWaterEquiv = New atcControls.atcText()
-        Me.TabPage3 = New System.Windows.Forms.TabPage()
-        Me.txtNetRadStation = New System.Windows.Forms.TextBox()
-        Me.txtShortRadStation = New System.Windows.Forms.TextBox()
-        Me.txtRelHStation = New System.Windows.Forms.TextBox()
-        Me.txtWindStation = New System.Windows.Forms.TextBox()
-        Me.txtPrecipStation = New System.Windows.Forms.TextBox()
-        Me.txtAtempStation = New System.Windows.Forms.TextBox()
-        Me.txtWeatherFile = New System.Windows.Forms.TextBox()
-        Me.Label3 = New System.Windows.Forms.Label()
-        Me.lblNetRadStation = New System.Windows.Forms.Label()
-        Me.lblShortRadStation = New System.Windows.Forms.Label()
-        Me.lblRelHStation = New System.Windows.Forms.Label()
-        Me.lblPrecipStation = New System.Windows.Forms.Label()
-        Me.GroupBox3 = New System.Windows.Forms.GroupBox()
-        Me.rdoMeasuredNet = New System.Windows.Forms.RadioButton()
-        Me.rdoRadMeasuredInput = New System.Windows.Forms.RadioButton()
-        Me.rdoRadEstimate = New System.Windows.Forms.RadioButton()
-        Me.lblATempStation = New System.Windows.Forms.Label()
-        Me.lblWindStation = New System.Windows.Forms.Label()
-        Me.GroupBox2 = New System.Windows.Forms.GroupBox()
-        Me.lblTimeStep = New System.Windows.Forms.Label()
-        Me.atcTextTimeStep = New atcControls.atcText()
-        Me.Label1 = New System.Windows.Forms.Label()
-        Me.AtcTextEHour = New atcControls.atcText()
-        Me.AtcTextSHour = New atcControls.atcText()
-        Me.Label54 = New System.Windows.Forms.Label()
-        Me.Label55 = New System.Windows.Forms.Label()
-        Me.Label56 = New System.Windows.Forms.Label()
-        Me.Label57 = New System.Windows.Forms.Label()
-        Me.Label58 = New System.Windows.Forms.Label()
-        Me.AtcTextEDay = New atcControls.atcText()
-        Me.AtcTextSDay = New atcControls.atcText()
-        Me.AtcTextSYear = New atcControls.atcText()
-        Me.AtcTextEMon = New atcControls.atcText()
-        Me.AtcTextSMonth = New atcControls.atcText()
-        Me.AtcTextEYear = New atcControls.atcText()
-        Me.TabPage7 = New System.Windows.Forms.TabPage()
-        Me.txtParameterFile = New System.Windows.Forms.TextBox()
-        Me.Label4 = New System.Windows.Forms.Label()
-        Me.AtcGridModelParms = New atcControls.atcGrid()
-        Me.TabPage8 = New System.Windows.Forms.TabPage()
-        Me.txtSiteFile = New System.Windows.Forms.TextBox()
-        Me.Label5 = New System.Windows.Forms.Label()
-        Me.AtcGridSiteVars = New atcControls.atcGrid()
-        Me.TabPage1 = New System.Windows.Forms.TabPage()
-        Me.txtBCParameterFile = New System.Windows.Forms.TextBox()
-        Me.Label6 = New System.Windows.Forms.Label()
-        Me.AtcTextCParm = New atcControls.atcText()
-        Me.AtcTextAParm = New atcControls.atcText()
-        Me.lblCParm = New System.Windows.Forms.Label()
-        Me.lblAParm = New System.Windows.Forms.Label()
-        Me.AtcGridBCMonthly = New atcControls.atcGrid()
-        Me.Label20 = New System.Windows.Forms.Label()
-        Me.ComboBox14 = New System.Windows.Forms.ComboBox()
-        Me.Label21 = New System.Windows.Forms.Label()
-        Me.ComboBox15 = New System.Windows.Forms.ComboBox()
-        Me.Label22 = New System.Windows.Forms.Label()
-        Me.ComboBox16 = New System.Windows.Forms.ComboBox()
-        Me.Label23 = New System.Windows.Forms.Label()
-        Me.ComboBox17 = New System.Windows.Forms.ComboBox()
-        Me.Label24 = New System.Windows.Forms.Label()
-        Me.ComboBox18 = New System.Windows.Forms.ComboBox()
-        Me.Label25 = New System.Windows.Forms.Label()
-        Me.ComboBox19 = New System.Windows.Forms.ComboBox()
-        Me.Label26 = New System.Windows.Forms.Label()
-        Me.ComboBox20 = New System.Windows.Forms.ComboBox()
-        Me.Label27 = New System.Windows.Forms.Label()
-        Me.ComboBox21 = New System.Windows.Forms.ComboBox()
-        Me.Label28 = New System.Windows.Forms.Label()
-        Me.ComboBox22 = New System.Windows.Forms.ComboBox()
-        Me.Label29 = New System.Windows.Forms.Label()
-        Me.ComboBox23 = New System.Windows.Forms.ComboBox()
-        Me.Label30 = New System.Windows.Forms.Label()
-        Me.ComboBox24 = New System.Windows.Forms.ComboBox()
-        Me.ComboBox25 = New System.Windows.Forms.ComboBox()
-        Me.Label31 = New System.Windows.Forms.Label()
-        Me.Label32 = New System.Windows.Forms.Label()
-        Me.ComboBox26 = New System.Windows.Forms.ComboBox()
-        Me.Label33 = New System.Windows.Forms.Label()
-        Me.ComboBox27 = New System.Windows.Forms.ComboBox()
-        Me.Label34 = New System.Windows.Forms.Label()
-        Me.ComboBox28 = New System.Windows.Forms.ComboBox()
-        Me.Label35 = New System.Windows.Forms.Label()
-        Me.ComboBox29 = New System.Windows.Forms.ComboBox()
-        Me.Label36 = New System.Windows.Forms.Label()
-        Me.ComboBox30 = New System.Windows.Forms.ComboBox()
-        Me.Label37 = New System.Windows.Forms.Label()
-        Me.ComboBox31 = New System.Windows.Forms.ComboBox()
-        Me.Label38 = New System.Windows.Forms.Label()
-        Me.ComboBox32 = New System.Windows.Forms.ComboBox()
-        Me.Label39 = New System.Windows.Forms.Label()
-        Me.ComboBox33 = New System.Windows.Forms.ComboBox()
-        Me.Label40 = New System.Windows.Forms.Label()
-        Me.ComboBox34 = New System.Windows.Forms.ComboBox()
-        Me.Label41 = New System.Windows.Forms.Label()
-        Me.ComboBox35 = New System.Windows.Forms.ComboBox()
-        Me.Label42 = New System.Windows.Forms.Label()
-        Me.ComboBox36 = New System.Windows.Forms.ComboBox()
-        Me.Label43 = New System.Windows.Forms.Label()
-        Me.ComboBox37 = New System.Windows.Forms.ComboBox()
-        Me.ComboBox38 = New System.Windows.Forms.ComboBox()
-        Me.Label44 = New System.Windows.Forms.Label()
-        Me.Label45 = New System.Windows.Forms.Label()
-        Me.ComboBox39 = New System.Windows.Forms.ComboBox()
-        Me.cmdSimulate = New System.Windows.Forms.Button()
+        Me.cmdCancel = New System.Windows.Forms.Button
+        Me.cmdHelp = New System.Windows.Forms.Button
+        Me.cmdAbout = New System.Windows.Forms.Button
+        Me.TabControl1 = New System.Windows.Forms.TabControl
+        Me.TabPage2 = New System.Windows.Forms.TabPage
+        Me.txtOutputFile = New System.Windows.Forms.TextBox
+        Me.Label7 = New System.Windows.Forms.Label
+        Me.txtProjectName = New System.Windows.Forms.TextBox
+        Me.txtMasterFile = New System.Windows.Forms.TextBox
+        Me.lblInstructions = New System.Windows.Forms.Label
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.Label62 = New System.Windows.Forms.Label
+        Me.GroupBox4 = New System.Windows.Forms.GroupBox
+        Me.Label50 = New System.Windows.Forms.Label
+        Me.AtcTextSnowAge = New atcControls.atcText
+        Me.Label52 = New System.Windows.Forms.Label
+        Me.Label53 = New System.Windows.Forms.Label
+        Me.AtcTextIniEnergyContent = New atcControls.atcText
+        Me.AtcTextIniWaterEquiv = New atcControls.atcText
+        Me.TabPage3 = New System.Windows.Forms.TabPage
+        Me.txtNetRadStation = New System.Windows.Forms.TextBox
+        Me.txtShortRadStation = New System.Windows.Forms.TextBox
+        Me.txtRelHStation = New System.Windows.Forms.TextBox
+        Me.txtWindStation = New System.Windows.Forms.TextBox
+        Me.txtPrecipStation = New System.Windows.Forms.TextBox
+        Me.txtAtempStation = New System.Windows.Forms.TextBox
+        Me.txtWeatherFile = New System.Windows.Forms.TextBox
+        Me.Label3 = New System.Windows.Forms.Label
+        Me.lblNetRadStation = New System.Windows.Forms.Label
+        Me.lblShortRadStation = New System.Windows.Forms.Label
+        Me.lblRelHStation = New System.Windows.Forms.Label
+        Me.lblPrecipStation = New System.Windows.Forms.Label
+        Me.GroupBox3 = New System.Windows.Forms.GroupBox
+        Me.rdoMeasuredNet = New System.Windows.Forms.RadioButton
+        Me.rdoRadMeasuredInput = New System.Windows.Forms.RadioButton
+        Me.rdoRadEstimate = New System.Windows.Forms.RadioButton
+        Me.lblATempStation = New System.Windows.Forms.Label
+        Me.lblWindStation = New System.Windows.Forms.Label
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox
+        Me.lblTimeStep = New System.Windows.Forms.Label
+        Me.atcTextTimeStep = New atcControls.atcText
+        Me.Label1 = New System.Windows.Forms.Label
+        Me.AtcTextEHour = New atcControls.atcText
+        Me.AtcTextSHour = New atcControls.atcText
+        Me.Label54 = New System.Windows.Forms.Label
+        Me.Label55 = New System.Windows.Forms.Label
+        Me.Label56 = New System.Windows.Forms.Label
+        Me.Label57 = New System.Windows.Forms.Label
+        Me.Label58 = New System.Windows.Forms.Label
+        Me.AtcTextEDay = New atcControls.atcText
+        Me.AtcTextSDay = New atcControls.atcText
+        Me.AtcTextSYear = New atcControls.atcText
+        Me.AtcTextEMon = New atcControls.atcText
+        Me.AtcTextSMonth = New atcControls.atcText
+        Me.AtcTextEYear = New atcControls.atcText
+        Me.TabPage7 = New System.Windows.Forms.TabPage
+        Me.TabPage8 = New System.Windows.Forms.TabPage
+        Me.TabPage1 = New System.Windows.Forms.TabPage
+        Me.AtcGridModelParms = New atcControls.atcGrid
+        Me.txtParameterFile = New System.Windows.Forms.TextBox
+        Me.Label4 = New System.Windows.Forms.Label
+        Me.Label20 = New System.Windows.Forms.Label
+        Me.ComboBox14 = New System.Windows.Forms.ComboBox
+        Me.Label21 = New System.Windows.Forms.Label
+        Me.ComboBox15 = New System.Windows.Forms.ComboBox
+        Me.Label22 = New System.Windows.Forms.Label
+        Me.ComboBox16 = New System.Windows.Forms.ComboBox
+        Me.Label23 = New System.Windows.Forms.Label
+        Me.ComboBox17 = New System.Windows.Forms.ComboBox
+        Me.Label24 = New System.Windows.Forms.Label
+        Me.ComboBox18 = New System.Windows.Forms.ComboBox
+        Me.Label25 = New System.Windows.Forms.Label
+        Me.ComboBox19 = New System.Windows.Forms.ComboBox
+        Me.Label26 = New System.Windows.Forms.Label
+        Me.ComboBox20 = New System.Windows.Forms.ComboBox
+        Me.Label27 = New System.Windows.Forms.Label
+        Me.ComboBox21 = New System.Windows.Forms.ComboBox
+        Me.Label28 = New System.Windows.Forms.Label
+        Me.ComboBox22 = New System.Windows.Forms.ComboBox
+        Me.Label29 = New System.Windows.Forms.Label
+        Me.ComboBox23 = New System.Windows.Forms.ComboBox
+        Me.Label30 = New System.Windows.Forms.Label
+        Me.ComboBox24 = New System.Windows.Forms.ComboBox
+        Me.ComboBox25 = New System.Windows.Forms.ComboBox
+        Me.Label31 = New System.Windows.Forms.Label
+        Me.Label32 = New System.Windows.Forms.Label
+        Me.ComboBox26 = New System.Windows.Forms.ComboBox
+        Me.Label33 = New System.Windows.Forms.Label
+        Me.ComboBox27 = New System.Windows.Forms.ComboBox
+        Me.Label34 = New System.Windows.Forms.Label
+        Me.ComboBox28 = New System.Windows.Forms.ComboBox
+        Me.Label35 = New System.Windows.Forms.Label
+        Me.ComboBox29 = New System.Windows.Forms.ComboBox
+        Me.Label36 = New System.Windows.Forms.Label
+        Me.ComboBox30 = New System.Windows.Forms.ComboBox
+        Me.Label37 = New System.Windows.Forms.Label
+        Me.ComboBox31 = New System.Windows.Forms.ComboBox
+        Me.Label38 = New System.Windows.Forms.Label
+        Me.ComboBox32 = New System.Windows.Forms.ComboBox
+        Me.Label39 = New System.Windows.Forms.Label
+        Me.ComboBox33 = New System.Windows.Forms.ComboBox
+        Me.Label40 = New System.Windows.Forms.Label
+        Me.ComboBox34 = New System.Windows.Forms.ComboBox
+        Me.Label41 = New System.Windows.Forms.Label
+        Me.ComboBox35 = New System.Windows.Forms.ComboBox
+        Me.Label42 = New System.Windows.Forms.Label
+        Me.ComboBox36 = New System.Windows.Forms.ComboBox
+        Me.Label43 = New System.Windows.Forms.Label
+        Me.ComboBox37 = New System.Windows.Forms.ComboBox
+        Me.ComboBox38 = New System.Windows.Forms.ComboBox
+        Me.Label44 = New System.Windows.Forms.Label
+        Me.Label45 = New System.Windows.Forms.Label
+        Me.ComboBox39 = New System.Windows.Forms.ComboBox
+        Me.cmdSimulate = New System.Windows.Forms.Button
+        Me.txtSiteFile = New System.Windows.Forms.TextBox
+        Me.Label5 = New System.Windows.Forms.Label
+        Me.txtBCParameterFile = New System.Windows.Forms.TextBox
+        Me.Label6 = New System.Windows.Forms.Label
+        Me.AtcGridSiteVars = New atcControls.atcGrid
+        Me.AtcGridBCMonthly = New atcControls.atcGrid
         Me.TabControl1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
@@ -341,8 +334,8 @@ Public Class frmUEB
         'TabControl1
         '
         Me.TabControl1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TabControl1.Controls.Add(Me.TabPage2)
         Me.TabControl1.Controls.Add(Me.TabPage3)
         Me.TabControl1.Controls.Add(Me.TabPage7)
@@ -368,9 +361,9 @@ Public Class frmUEB
         Me.TabPage2.Controls.Add(Me.Label2)
         Me.TabPage2.Controls.Add(Me.Label62)
         Me.TabPage2.Controls.Add(Me.GroupBox4)
-        Me.TabPage2.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 46)
         Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Size = New System.Drawing.Size(521, 445)
+        Me.TabPage2.Size = New System.Drawing.Size(521, 424)
         Me.TabPage2.TabIndex = 12
         Me.TabPage2.Text = "General"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -434,7 +427,7 @@ Public Class frmUEB
         'GroupBox4
         '
         Me.GroupBox4.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox4.Controls.Add(Me.Label50)
         Me.GroupBox4.Controls.Add(Me.AtcTextSnowAge)
         Me.GroupBox4.Controls.Add(Me.Label52)
@@ -462,8 +455,8 @@ Public Class frmUEB
         Me.AtcTextSnowAge.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.AtcTextSnowAge.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
         Me.AtcTextSnowAge.DefaultValue = ""
-        Me.AtcTextSnowAge.HardMax = 9999.0R
-        Me.AtcTextSnowAge.HardMin = 0.0R
+        Me.AtcTextSnowAge.HardMax = 9999
+        Me.AtcTextSnowAge.HardMin = 0
         Me.AtcTextSnowAge.InsideLimitsBackground = System.Drawing.Color.White
         Me.AtcTextSnowAge.Location = New System.Drawing.Point(156, 91)
         Me.AtcTextSnowAge.MaxWidth = 20
@@ -474,10 +467,10 @@ Public Class frmUEB
         Me.AtcTextSnowAge.SelLength = 0
         Me.AtcTextSnowAge.SelStart = 0
         Me.AtcTextSnowAge.Size = New System.Drawing.Size(64, 21)
-        Me.AtcTextSnowAge.SoftMax = -999.0R
-        Me.AtcTextSnowAge.SoftMin = -999.0R
+        Me.AtcTextSnowAge.SoftMax = -999
+        Me.AtcTextSnowAge.SoftMin = -999
         Me.AtcTextSnowAge.TabIndex = 38
-        Me.AtcTextSnowAge.ValueDouble = 0.0R
+        Me.AtcTextSnowAge.ValueDouble = 0
         Me.AtcTextSnowAge.ValueInteger = 0
         '
         'Label52
@@ -503,8 +496,8 @@ Public Class frmUEB
         Me.AtcTextIniEnergyContent.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.AtcTextIniEnergyContent.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
         Me.AtcTextIniEnergyContent.DefaultValue = ""
-        Me.AtcTextIniEnergyContent.HardMax = 9999999.0R
-        Me.AtcTextIniEnergyContent.HardMin = 0.0R
+        Me.AtcTextIniEnergyContent.HardMax = 9999999
+        Me.AtcTextIniEnergyContent.HardMin = 0
         Me.AtcTextIniEnergyContent.InsideLimitsBackground = System.Drawing.Color.White
         Me.AtcTextIniEnergyContent.Location = New System.Drawing.Point(156, 37)
         Me.AtcTextIniEnergyContent.MaxWidth = 20
@@ -515,10 +508,10 @@ Public Class frmUEB
         Me.AtcTextIniEnergyContent.SelLength = 0
         Me.AtcTextIniEnergyContent.SelStart = 0
         Me.AtcTextIniEnergyContent.Size = New System.Drawing.Size(64, 21)
-        Me.AtcTextIniEnergyContent.SoftMax = -999.0R
-        Me.AtcTextIniEnergyContent.SoftMin = -999.0R
+        Me.AtcTextIniEnergyContent.SoftMax = -999
+        Me.AtcTextIniEnergyContent.SoftMin = -999
         Me.AtcTextIniEnergyContent.TabIndex = 30
-        Me.AtcTextIniEnergyContent.ValueDouble = 0.0R
+        Me.AtcTextIniEnergyContent.ValueDouble = 0
         Me.AtcTextIniEnergyContent.ValueInteger = 0
         '
         'AtcTextIniWaterEquiv
@@ -526,8 +519,8 @@ Public Class frmUEB
         Me.AtcTextIniWaterEquiv.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.AtcTextIniWaterEquiv.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
         Me.AtcTextIniWaterEquiv.DefaultValue = ""
-        Me.AtcTextIniWaterEquiv.HardMax = 9999.0R
-        Me.AtcTextIniWaterEquiv.HardMin = 0.0R
+        Me.AtcTextIniWaterEquiv.HardMax = 9999
+        Me.AtcTextIniWaterEquiv.HardMin = 0
         Me.AtcTextIniWaterEquiv.InsideLimitsBackground = System.Drawing.Color.White
         Me.AtcTextIniWaterEquiv.Location = New System.Drawing.Point(156, 64)
         Me.AtcTextIniWaterEquiv.MaxWidth = 20
@@ -538,10 +531,10 @@ Public Class frmUEB
         Me.AtcTextIniWaterEquiv.SelLength = 0
         Me.AtcTextIniWaterEquiv.SelStart = 0
         Me.AtcTextIniWaterEquiv.Size = New System.Drawing.Size(64, 21)
-        Me.AtcTextIniWaterEquiv.SoftMax = -999.0R
-        Me.AtcTextIniWaterEquiv.SoftMin = -999.0R
+        Me.AtcTextIniWaterEquiv.SoftMax = -999
+        Me.AtcTextIniWaterEquiv.SoftMin = -999
         Me.AtcTextIniWaterEquiv.TabIndex = 27
-        Me.AtcTextIniWaterEquiv.ValueDouble = 0.0R
+        Me.AtcTextIniWaterEquiv.ValueDouble = 0
         Me.AtcTextIniWaterEquiv.ValueInteger = 0
         '
         'TabPage3
@@ -562,9 +555,9 @@ Public Class frmUEB
         Me.TabPage3.Controls.Add(Me.lblATempStation)
         Me.TabPage3.Controls.Add(Me.lblWindStation)
         Me.TabPage3.Controls.Add(Me.GroupBox2)
-        Me.TabPage3.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage3.Location = New System.Drawing.Point(4, 46)
         Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Size = New System.Drawing.Size(521, 445)
+        Me.TabPage3.Size = New System.Drawing.Size(521, 424)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Weather"
         Me.TabPage3.UseVisualStyleBackColor = True
@@ -666,7 +659,7 @@ Public Class frmUEB
         'GroupBox3
         '
         Me.GroupBox3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox3.Controls.Add(Me.rdoMeasuredNet)
         Me.GroupBox3.Controls.Add(Me.rdoRadMeasuredInput)
         Me.GroupBox3.Controls.Add(Me.rdoRadEstimate)
@@ -730,7 +723,7 @@ Public Class frmUEB
         'GroupBox2
         '
         Me.GroupBox2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox2.Controls.Add(Me.lblTimeStep)
         Me.GroupBox2.Controls.Add(Me.atcTextTimeStep)
         Me.GroupBox2.Controls.Add(Me.Label1)
@@ -768,8 +761,8 @@ Public Class frmUEB
         Me.atcTextTimeStep.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.atcTextTimeStep.DataType = atcControls.atcText.ATCoDataType.ATCoInt
         Me.atcTextTimeStep.DefaultValue = ""
-        Me.atcTextTimeStep.HardMax = 24.0R
-        Me.atcTextTimeStep.HardMin = 1.0R
+        Me.atcTextTimeStep.HardMax = 24
+        Me.atcTextTimeStep.HardMin = 1
         Me.atcTextTimeStep.InsideLimitsBackground = System.Drawing.Color.White
         Me.atcTextTimeStep.Location = New System.Drawing.Point(381, 38)
         Me.atcTextTimeStep.MaxWidth = 20
@@ -780,10 +773,10 @@ Public Class frmUEB
         Me.atcTextTimeStep.SelLength = 0
         Me.atcTextTimeStep.SelStart = 0
         Me.atcTextTimeStep.Size = New System.Drawing.Size(64, 21)
-        Me.atcTextTimeStep.SoftMax = -999.0R
-        Me.atcTextTimeStep.SoftMin = -999.0R
+        Me.atcTextTimeStep.SoftMax = -999
+        Me.atcTextTimeStep.SoftMin = -999
         Me.atcTextTimeStep.TabIndex = 41
-        Me.atcTextTimeStep.ValueDouble = 1.0R
+        Me.atcTextTimeStep.ValueDouble = 1
         Me.atcTextTimeStep.ValueInteger = 1
         '
         'Label1
@@ -800,8 +793,8 @@ Public Class frmUEB
         Me.AtcTextEHour.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.AtcTextEHour.DataType = atcControls.atcText.ATCoDataType.ATCoInt
         Me.AtcTextEHour.DefaultValue = ""
-        Me.AtcTextEHour.HardMax = 24.0R
-        Me.AtcTextEHour.HardMin = 0.0R
+        Me.AtcTextEHour.HardMax = 24
+        Me.AtcTextEHour.HardMin = 0
         Me.AtcTextEHour.InsideLimitsBackground = System.Drawing.Color.White
         Me.AtcTextEHour.Location = New System.Drawing.Point(227, 64)
         Me.AtcTextEHour.MaxWidth = 20
@@ -812,10 +805,10 @@ Public Class frmUEB
         Me.AtcTextEHour.SelLength = 0
         Me.AtcTextEHour.SelStart = 0
         Me.AtcTextEHour.Size = New System.Drawing.Size(44, 21)
-        Me.AtcTextEHour.SoftMax = -999.0R
-        Me.AtcTextEHour.SoftMin = -999.0R
+        Me.AtcTextEHour.SoftMax = -999
+        Me.AtcTextEHour.SoftMin = -999
         Me.AtcTextEHour.TabIndex = 39
-        Me.AtcTextEHour.ValueDouble = 0.0R
+        Me.AtcTextEHour.ValueDouble = 0
         Me.AtcTextEHour.ValueInteger = 0
         '
         'AtcTextSHour
@@ -823,8 +816,8 @@ Public Class frmUEB
         Me.AtcTextSHour.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.AtcTextSHour.DataType = atcControls.atcText.ATCoDataType.ATCoInt
         Me.AtcTextSHour.DefaultValue = ""
-        Me.AtcTextSHour.HardMax = 24.0R
-        Me.AtcTextSHour.HardMin = 0.0R
+        Me.AtcTextSHour.HardMax = 24
+        Me.AtcTextSHour.HardMin = 0
         Me.AtcTextSHour.InsideLimitsBackground = System.Drawing.Color.White
         Me.AtcTextSHour.Location = New System.Drawing.Point(227, 38)
         Me.AtcTextSHour.MaxWidth = 20
@@ -835,10 +828,10 @@ Public Class frmUEB
         Me.AtcTextSHour.SelLength = 0
         Me.AtcTextSHour.SelStart = 0
         Me.AtcTextSHour.Size = New System.Drawing.Size(44, 21)
-        Me.AtcTextSHour.SoftMax = -999.0R
-        Me.AtcTextSHour.SoftMin = -999.0R
+        Me.AtcTextSHour.SoftMax = -999
+        Me.AtcTextSHour.SoftMin = -999
         Me.AtcTextSHour.TabIndex = 38
-        Me.AtcTextSHour.ValueDouble = 0.0R
+        Me.AtcTextSHour.ValueDouble = 0
         Me.AtcTextSHour.ValueInteger = 0
         '
         'Label54
@@ -891,8 +884,8 @@ Public Class frmUEB
         Me.AtcTextEDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.AtcTextEDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
         Me.AtcTextEDay.DefaultValue = ""
-        Me.AtcTextEDay.HardMax = 31.0R
-        Me.AtcTextEDay.HardMin = 1.0R
+        Me.AtcTextEDay.HardMax = 31
+        Me.AtcTextEDay.HardMin = 1
         Me.AtcTextEDay.InsideLimitsBackground = System.Drawing.Color.White
         Me.AtcTextEDay.Location = New System.Drawing.Point(178, 64)
         Me.AtcTextEDay.MaxWidth = 20
@@ -903,10 +896,10 @@ Public Class frmUEB
         Me.AtcTextEDay.SelLength = 0
         Me.AtcTextEDay.SelStart = 0
         Me.AtcTextEDay.Size = New System.Drawing.Size(44, 21)
-        Me.AtcTextEDay.SoftMax = -999.0R
-        Me.AtcTextEDay.SoftMin = -999.0R
+        Me.AtcTextEDay.SoftMax = -999
+        Me.AtcTextEDay.SoftMin = -999
         Me.AtcTextEDay.TabIndex = 32
-        Me.AtcTextEDay.ValueDouble = 31.0R
+        Me.AtcTextEDay.ValueDouble = 31
         Me.AtcTextEDay.ValueInteger = 31
         '
         'AtcTextSDay
@@ -914,8 +907,8 @@ Public Class frmUEB
         Me.AtcTextSDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.AtcTextSDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
         Me.AtcTextSDay.DefaultValue = ""
-        Me.AtcTextSDay.HardMax = 31.0R
-        Me.AtcTextSDay.HardMin = 1.0R
+        Me.AtcTextSDay.HardMax = 31
+        Me.AtcTextSDay.HardMin = 1
         Me.AtcTextSDay.InsideLimitsBackground = System.Drawing.Color.White
         Me.AtcTextSDay.Location = New System.Drawing.Point(178, 38)
         Me.AtcTextSDay.MaxWidth = 20
@@ -926,10 +919,10 @@ Public Class frmUEB
         Me.AtcTextSDay.SelLength = 0
         Me.AtcTextSDay.SelStart = 0
         Me.AtcTextSDay.Size = New System.Drawing.Size(44, 21)
-        Me.AtcTextSDay.SoftMax = -999.0R
-        Me.AtcTextSDay.SoftMin = -999.0R
+        Me.AtcTextSDay.SoftMax = -999
+        Me.AtcTextSDay.SoftMin = -999
         Me.AtcTextSDay.TabIndex = 31
-        Me.AtcTextSDay.ValueDouble = 1.0R
+        Me.AtcTextSDay.ValueDouble = 1
         Me.AtcTextSDay.ValueInteger = 1
         '
         'AtcTextSYear
@@ -937,8 +930,8 @@ Public Class frmUEB
         Me.AtcTextSYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.AtcTextSYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
         Me.AtcTextSYear.DefaultValue = ""
-        Me.AtcTextSYear.HardMax = 9999.0R
-        Me.AtcTextSYear.HardMin = 0.0R
+        Me.AtcTextSYear.HardMax = 9999
+        Me.AtcTextSYear.HardMin = 0
         Me.AtcTextSYear.InsideLimitsBackground = System.Drawing.Color.White
         Me.AtcTextSYear.Location = New System.Drawing.Point(60, 38)
         Me.AtcTextSYear.MaxWidth = 20
@@ -949,10 +942,10 @@ Public Class frmUEB
         Me.AtcTextSYear.SelLength = 0
         Me.AtcTextSYear.SelStart = 0
         Me.AtcTextSYear.Size = New System.Drawing.Size(64, 21)
-        Me.AtcTextSYear.SoftMax = -999.0R
-        Me.AtcTextSYear.SoftMin = -999.0R
+        Me.AtcTextSYear.SoftMax = -999
+        Me.AtcTextSYear.SoftMin = -999
         Me.AtcTextSYear.TabIndex = 30
-        Me.AtcTextSYear.ValueDouble = 2000.0R
+        Me.AtcTextSYear.ValueDouble = 2000
         Me.AtcTextSYear.ValueInteger = 2000
         '
         'AtcTextEMon
@@ -960,8 +953,8 @@ Public Class frmUEB
         Me.AtcTextEMon.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.AtcTextEMon.DataType = atcControls.atcText.ATCoDataType.ATCoInt
         Me.AtcTextEMon.DefaultValue = ""
-        Me.AtcTextEMon.HardMax = 12.0R
-        Me.AtcTextEMon.HardMin = 1.0R
+        Me.AtcTextEMon.HardMax = 12
+        Me.AtcTextEMon.HardMin = 1
         Me.AtcTextEMon.InsideLimitsBackground = System.Drawing.Color.White
         Me.AtcTextEMon.Location = New System.Drawing.Point(129, 64)
         Me.AtcTextEMon.MaxWidth = 20
@@ -972,10 +965,10 @@ Public Class frmUEB
         Me.AtcTextEMon.SelLength = 0
         Me.AtcTextEMon.SelStart = 0
         Me.AtcTextEMon.Size = New System.Drawing.Size(44, 21)
-        Me.AtcTextEMon.SoftMax = -999.0R
-        Me.AtcTextEMon.SoftMin = -999.0R
+        Me.AtcTextEMon.SoftMax = -999
+        Me.AtcTextEMon.SoftMin = -999
         Me.AtcTextEMon.TabIndex = 29
-        Me.AtcTextEMon.ValueDouble = 12.0R
+        Me.AtcTextEMon.ValueDouble = 12
         Me.AtcTextEMon.ValueInteger = 12
         '
         'AtcTextSMonth
@@ -983,8 +976,8 @@ Public Class frmUEB
         Me.AtcTextSMonth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.AtcTextSMonth.DataType = atcControls.atcText.ATCoDataType.ATCoInt
         Me.AtcTextSMonth.DefaultValue = ""
-        Me.AtcTextSMonth.HardMax = 12.0R
-        Me.AtcTextSMonth.HardMin = 1.0R
+        Me.AtcTextSMonth.HardMax = 12
+        Me.AtcTextSMonth.HardMin = 1
         Me.AtcTextSMonth.InsideLimitsBackground = System.Drawing.Color.White
         Me.AtcTextSMonth.Location = New System.Drawing.Point(129, 38)
         Me.AtcTextSMonth.MaxWidth = 20
@@ -995,10 +988,10 @@ Public Class frmUEB
         Me.AtcTextSMonth.SelLength = 0
         Me.AtcTextSMonth.SelStart = 0
         Me.AtcTextSMonth.Size = New System.Drawing.Size(44, 21)
-        Me.AtcTextSMonth.SoftMax = -999.0R
-        Me.AtcTextSMonth.SoftMin = -999.0R
+        Me.AtcTextSMonth.SoftMax = -999
+        Me.AtcTextSMonth.SoftMin = -999
         Me.AtcTextSMonth.TabIndex = 28
-        Me.AtcTextSMonth.ValueDouble = 1.0R
+        Me.AtcTextSMonth.ValueDouble = 1
         Me.AtcTextSMonth.ValueInteger = 1
         '
         'AtcTextEYear
@@ -1006,8 +999,8 @@ Public Class frmUEB
         Me.AtcTextEYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.AtcTextEYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
         Me.AtcTextEYear.DefaultValue = ""
-        Me.AtcTextEYear.HardMax = 9999.0R
-        Me.AtcTextEYear.HardMin = 0.0R
+        Me.AtcTextEYear.HardMax = 9999
+        Me.AtcTextEYear.HardMin = 0
         Me.AtcTextEYear.InsideLimitsBackground = System.Drawing.Color.White
         Me.AtcTextEYear.Location = New System.Drawing.Point(60, 64)
         Me.AtcTextEYear.MaxWidth = 20
@@ -1018,215 +1011,79 @@ Public Class frmUEB
         Me.AtcTextEYear.SelLength = 0
         Me.AtcTextEYear.SelStart = 0
         Me.AtcTextEYear.Size = New System.Drawing.Size(64, 21)
-        Me.AtcTextEYear.SoftMax = -999.0R
-        Me.AtcTextEYear.SoftMin = -999.0R
+        Me.AtcTextEYear.SoftMax = -999
+        Me.AtcTextEYear.SoftMin = -999
         Me.AtcTextEYear.TabIndex = 27
-        Me.AtcTextEYear.ValueDouble = 2000.0R
+        Me.AtcTextEYear.ValueDouble = 2000
         Me.AtcTextEYear.ValueInteger = 2000
         '
         'TabPage7
         '
-        Me.TabPage7.Controls.Add(Me.txtParameterFile)
-        Me.TabPage7.Controls.Add(Me.Label4)
-        Me.TabPage7.Controls.Add(Me.AtcGridModelParms)
-        Me.TabPage7.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage7.Controls.Add(Me.AtcGridSiteVars)
+        Me.TabPage7.Controls.Add(Me.txtSiteFile)
+        Me.TabPage7.Controls.Add(Me.Label5)
+        Me.TabPage7.Location = New System.Drawing.Point(4, 46)
         Me.TabPage7.Name = "TabPage7"
-        Me.TabPage7.Size = New System.Drawing.Size(521, 445)
+        Me.TabPage7.Size = New System.Drawing.Size(521, 424)
         Me.TabPage7.TabIndex = 8
-        Me.TabPage7.Text = "Model Parameters"
+        Me.TabPage7.Text = "Site Variables/Initial Conditions"
         Me.TabPage7.UseVisualStyleBackColor = True
         '
-        'txtParameterFile
+        'TabPage8
         '
-        Me.txtParameterFile.Location = New System.Drawing.Point(92, 15)
-        Me.txtParameterFile.Name = "txtParameterFile"
-        Me.txtParameterFile.Size = New System.Drawing.Size(410, 20)
-        Me.txtParameterFile.TabIndex = 46
+        Me.TabPage8.Controls.Add(Me.AtcGridBCMonthly)
+        Me.TabPage8.Controls.Add(Me.txtBCParameterFile)
+        Me.TabPage8.Controls.Add(Me.Label6)
+        Me.TabPage8.Location = New System.Drawing.Point(4, 46)
+        Me.TabPage8.Name = "TabPage8"
+        Me.TabPage8.Size = New System.Drawing.Size(521, 424)
+        Me.TabPage8.TabIndex = 9
+        Me.TabPage8.Text = "Bristow-Campbell Parameters"
+        Me.TabPage8.UseVisualStyleBackColor = True
         '
-        'Label4
+        'TabPage1
         '
-        Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(9, 18)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(77, 13)
-        Me.Label4.TabIndex = 45
-        Me.Label4.Text = "Parameter File:"
+        Me.TabPage1.Controls.Add(Me.AtcGridModelParms)
+        Me.TabPage1.Controls.Add(Me.txtParameterFile)
+        Me.TabPage1.Controls.Add(Me.Label4)
+        Me.TabPage1.Location = New System.Drawing.Point(4, 46)
+        Me.TabPage1.Name = "TabPage1"
+        Me.TabPage1.Size = New System.Drawing.Size(521, 424)
+        Me.TabPage1.TabIndex = 11
+        Me.TabPage1.Text = "Constant Model Parameters"
+        Me.TabPage1.UseVisualStyleBackColor = True
         '
         'AtcGridModelParms
         '
         Me.AtcGridModelParms.AllowHorizontalScrolling = True
         Me.AtcGridModelParms.AllowNewValidValues = False
-        Me.AtcGridModelParms.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridModelParms.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.AtcGridModelParms.CellBackColor = System.Drawing.SystemColors.Window
         Me.AtcGridModelParms.Fixed3D = False
         Me.AtcGridModelParms.LineColor = System.Drawing.SystemColors.Control
         Me.AtcGridModelParms.LineWidth = 1.0!
-        Me.AtcGridModelParms.Location = New System.Drawing.Point(3, 57)
+        Me.AtcGridModelParms.Location = New System.Drawing.Point(3, 32)
         Me.AtcGridModelParms.Name = "AtcGridModelParms"
-        Me.AtcGridModelParms.Size = New System.Drawing.Size(511, 358)
+        Me.AtcGridModelParms.Size = New System.Drawing.Size(515, 392)
         Me.AtcGridModelParms.Source = Nothing
-        Me.AtcGridModelParms.TabIndex = 0
+        Me.AtcGridModelParms.TabIndex = 60
         '
-        'TabPage8
+        'txtParameterFile
         '
-        Me.TabPage8.Controls.Add(Me.txtSiteFile)
-        Me.TabPage8.Controls.Add(Me.Label5)
-        Me.TabPage8.Controls.Add(Me.AtcGridSiteVars)
-        Me.TabPage8.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage8.Name = "TabPage8"
-        Me.TabPage8.Size = New System.Drawing.Size(521, 445)
-        Me.TabPage8.TabIndex = 9
-        Me.TabPage8.Text = "Site Variables"
-        Me.TabPage8.UseVisualStyleBackColor = True
+        Me.txtParameterFile.Location = New System.Drawing.Point(94, 14)
+        Me.txtParameterFile.Name = "txtParameterFile"
+        Me.txtParameterFile.Size = New System.Drawing.Size(410, 20)
+        Me.txtParameterFile.TabIndex = 59
         '
-        'txtSiteFile
+        'Label4
         '
-        Me.txtSiteFile.Location = New System.Drawing.Point(68, 17)
-        Me.txtSiteFile.Name = "txtSiteFile"
-        Me.txtSiteFile.Size = New System.Drawing.Size(410, 20)
-        Me.txtSiteFile.TabIndex = 48
-        '
-        'Label5
-        '
-        Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(15, 20)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(47, 13)
-        Me.Label5.TabIndex = 47
-        Me.Label5.Text = "Site File:"
-        '
-        'AtcGridSiteVars
-        '
-        Me.AtcGridSiteVars.AllowHorizontalScrolling = True
-        Me.AtcGridSiteVars.AllowNewValidValues = False
-        Me.AtcGridSiteVars.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridSiteVars.CellBackColor = System.Drawing.SystemColors.Window
-        Me.AtcGridSiteVars.Fixed3D = False
-        Me.AtcGridSiteVars.LineColor = System.Drawing.SystemColors.Control
-        Me.AtcGridSiteVars.LineWidth = 1.0!
-        Me.AtcGridSiteVars.Location = New System.Drawing.Point(3, 47)
-        Me.AtcGridSiteVars.Name = "AtcGridSiteVars"
-        Me.AtcGridSiteVars.Size = New System.Drawing.Size(515, 377)
-        Me.AtcGridSiteVars.Source = Nothing
-        Me.AtcGridSiteVars.TabIndex = 0
-        '
-        'TabPage1
-        '
-        Me.TabPage1.Controls.Add(Me.txtBCParameterFile)
-        Me.TabPage1.Controls.Add(Me.Label6)
-        Me.TabPage1.Controls.Add(Me.AtcTextCParm)
-        Me.TabPage1.Controls.Add(Me.AtcTextAParm)
-        Me.TabPage1.Controls.Add(Me.lblCParm)
-        Me.TabPage1.Controls.Add(Me.lblAParm)
-        Me.TabPage1.Controls.Add(Me.AtcGridBCMonthly)
-        Me.TabPage1.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Size = New System.Drawing.Size(521, 445)
-        Me.TabPage1.TabIndex = 11
-        Me.TabPage1.Text = "Bristow Campbell Parameters"
-        Me.TabPage1.UseVisualStyleBackColor = True
-        '
-        'txtBCParameterFile
-        '
-        Me.txtBCParameterFile.Location = New System.Drawing.Point(111, 15)
-        Me.txtBCParameterFile.Name = "txtBCParameterFile"
-        Me.txtBCParameterFile.Size = New System.Drawing.Size(403, 20)
-        Me.txtBCParameterFile.TabIndex = 57
-        '
-        'Label6
-        '
-        Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(15, 18)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(97, 13)
-        Me.Label6.TabIndex = 56
-        Me.Label6.Text = "B-C Parameter File:"
-        '
-        'AtcTextCParm
-        '
-        Me.AtcTextCParm.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcTextCParm.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.AtcTextCParm.DefaultValue = ""
-        Me.AtcTextCParm.HardMax = -999.0R
-        Me.AtcTextCParm.HardMin = -999.0R
-        Me.AtcTextCParm.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcTextCParm.Location = New System.Drawing.Point(325, 58)
-        Me.AtcTextCParm.MaxWidth = 20
-        Me.AtcTextCParm.Name = "AtcTextCParm"
-        Me.AtcTextCParm.NumericFormat = "0.#####"
-        Me.AtcTextCParm.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcTextCParm.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcTextCParm.SelLength = 0
-        Me.AtcTextCParm.SelStart = 0
-        Me.AtcTextCParm.Size = New System.Drawing.Size(97, 20)
-        Me.AtcTextCParm.SoftMax = -999.0R
-        Me.AtcTextCParm.SoftMin = -999.0R
-        Me.AtcTextCParm.TabIndex = 55
-        Me.AtcTextCParm.ValueDouble = 0.0R
-        Me.AtcTextCParm.ValueInteger = 0
-        '
-        'AtcTextAParm
-        '
-        Me.AtcTextAParm.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcTextAParm.DataType = atcControls.atcText.ATCoDataType.ATCoDbl
-        Me.AtcTextAParm.DefaultValue = ""
-        Me.AtcTextAParm.HardMax = -999.0R
-        Me.AtcTextAParm.HardMin = -999.0R
-        Me.AtcTextAParm.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcTextAParm.Location = New System.Drawing.Point(112, 58)
-        Me.AtcTextAParm.MaxWidth = 20
-        Me.AtcTextAParm.Name = "AtcTextAParm"
-        Me.AtcTextAParm.NumericFormat = "0.#####"
-        Me.AtcTextAParm.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcTextAParm.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcTextAParm.SelLength = 0
-        Me.AtcTextAParm.SelStart = 0
-        Me.AtcTextAParm.Size = New System.Drawing.Size(97, 20)
-        Me.AtcTextAParm.SoftMax = -999.0R
-        Me.AtcTextAParm.SoftMin = -999.0R
-        Me.AtcTextAParm.TabIndex = 54
-        Me.AtcTextAParm.ValueDouble = 0.0R
-        Me.AtcTextAParm.ValueInteger = 0
-        '
-        'lblCParm
-        '
-        Me.lblCParm.AutoSize = True
-        Me.lblCParm.Location = New System.Drawing.Point(251, 58)
-        Me.lblCParm.Name = "lblCParm"
-        Me.lblCParm.Size = New System.Drawing.Size(68, 13)
-        Me.lblCParm.TabIndex = 53
-        Me.lblCParm.Text = "Parameter C:"
-        '
-        'lblAParm
-        '
-        Me.lblAParm.AutoSize = True
-        Me.lblAParm.Location = New System.Drawing.Point(38, 58)
-        Me.lblAParm.Name = "lblAParm"
-        Me.lblAParm.Size = New System.Drawing.Size(68, 13)
-        Me.lblAParm.TabIndex = 52
-        Me.lblAParm.Text = "Parameter A:"
-        '
-        'AtcGridBCMonthly
-        '
-        Me.AtcGridBCMonthly.AllowHorizontalScrolling = True
-        Me.AtcGridBCMonthly.AllowNewValidValues = False
-        Me.AtcGridBCMonthly.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridBCMonthly.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGridBCMonthly.Fixed3D = False
-        Me.AtcGridBCMonthly.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AtcGridBCMonthly.LineColor = System.Drawing.Color.Empty
-        Me.AtcGridBCMonthly.LineWidth = 0.0!
-        Me.AtcGridBCMonthly.Location = New System.Drawing.Point(0, 97)
-        Me.AtcGridBCMonthly.Name = "AtcGridBCMonthly"
-        Me.AtcGridBCMonthly.Size = New System.Drawing.Size(521, 335)
-        Me.AtcGridBCMonthly.Source = Nothing
-        Me.AtcGridBCMonthly.TabIndex = 51
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(11, 17)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(77, 13)
+        Me.Label4.TabIndex = 58
+        Me.Label4.Text = "Parameter File:"
         '
         'Label20
         '
@@ -1242,7 +1099,7 @@ Public Class frmUEB
         'ComboBox14
         '
         Me.ComboBox14.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox14.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox14.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox14.Location = New System.Drawing.Point(183, 359)
@@ -1264,7 +1121,7 @@ Public Class frmUEB
         'ComboBox15
         '
         Me.ComboBox15.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox15.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox15.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox15.Location = New System.Drawing.Point(183, 333)
@@ -1286,7 +1143,7 @@ Public Class frmUEB
         'ComboBox16
         '
         Me.ComboBox16.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox16.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox16.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox16.Location = New System.Drawing.Point(183, 306)
@@ -1308,7 +1165,7 @@ Public Class frmUEB
         'ComboBox17
         '
         Me.ComboBox17.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox17.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox17.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox17.Location = New System.Drawing.Point(183, 279)
@@ -1330,7 +1187,7 @@ Public Class frmUEB
         'ComboBox18
         '
         Me.ComboBox18.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox18.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox18.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox18.Location = New System.Drawing.Point(183, 252)
@@ -1352,7 +1209,7 @@ Public Class frmUEB
         'ComboBox19
         '
         Me.ComboBox19.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox19.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox19.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox19.Location = New System.Drawing.Point(183, 225)
@@ -1374,7 +1231,7 @@ Public Class frmUEB
         'ComboBox20
         '
         Me.ComboBox20.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox20.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox20.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox20.Location = New System.Drawing.Point(183, 198)
@@ -1396,7 +1253,7 @@ Public Class frmUEB
         'ComboBox21
         '
         Me.ComboBox21.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox21.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox21.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox21.Location = New System.Drawing.Point(183, 171)
@@ -1418,7 +1275,7 @@ Public Class frmUEB
         'ComboBox22
         '
         Me.ComboBox22.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox22.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox22.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox22.Location = New System.Drawing.Point(183, 144)
@@ -1440,7 +1297,7 @@ Public Class frmUEB
         'ComboBox23
         '
         Me.ComboBox23.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox23.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox23.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox23.Location = New System.Drawing.Point(183, 117)
@@ -1462,7 +1319,7 @@ Public Class frmUEB
         'ComboBox24
         '
         Me.ComboBox24.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox24.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox24.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox24.Location = New System.Drawing.Point(183, 90)
@@ -1473,7 +1330,7 @@ Public Class frmUEB
         'ComboBox25
         '
         Me.ComboBox25.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox25.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox25.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox25.Location = New System.Drawing.Point(183, 36)
@@ -1506,7 +1363,7 @@ Public Class frmUEB
         'ComboBox26
         '
         Me.ComboBox26.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox26.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox26.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox26.Location = New System.Drawing.Point(183, 63)
@@ -1528,7 +1385,7 @@ Public Class frmUEB
         'ComboBox27
         '
         Me.ComboBox27.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox27.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox27.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox27.Location = New System.Drawing.Point(183, 359)
@@ -1550,7 +1407,7 @@ Public Class frmUEB
         'ComboBox28
         '
         Me.ComboBox28.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox28.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox28.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox28.Location = New System.Drawing.Point(183, 333)
@@ -1572,7 +1429,7 @@ Public Class frmUEB
         'ComboBox29
         '
         Me.ComboBox29.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox29.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox29.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox29.Location = New System.Drawing.Point(183, 306)
@@ -1594,7 +1451,7 @@ Public Class frmUEB
         'ComboBox30
         '
         Me.ComboBox30.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox30.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox30.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox30.Location = New System.Drawing.Point(183, 279)
@@ -1616,7 +1473,7 @@ Public Class frmUEB
         'ComboBox31
         '
         Me.ComboBox31.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox31.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox31.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox31.Location = New System.Drawing.Point(183, 252)
@@ -1638,7 +1495,7 @@ Public Class frmUEB
         'ComboBox32
         '
         Me.ComboBox32.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox32.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox32.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox32.Location = New System.Drawing.Point(183, 225)
@@ -1660,7 +1517,7 @@ Public Class frmUEB
         'ComboBox33
         '
         Me.ComboBox33.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox33.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox33.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox33.Location = New System.Drawing.Point(183, 198)
@@ -1682,7 +1539,7 @@ Public Class frmUEB
         'ComboBox34
         '
         Me.ComboBox34.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox34.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox34.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox34.Location = New System.Drawing.Point(183, 171)
@@ -1704,7 +1561,7 @@ Public Class frmUEB
         'ComboBox35
         '
         Me.ComboBox35.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox35.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox35.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox35.Location = New System.Drawing.Point(183, 144)
@@ -1726,7 +1583,7 @@ Public Class frmUEB
         'ComboBox36
         '
         Me.ComboBox36.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox36.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox36.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox36.Location = New System.Drawing.Point(183, 117)
@@ -1748,7 +1605,7 @@ Public Class frmUEB
         'ComboBox37
         '
         Me.ComboBox37.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox37.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox37.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox37.Location = New System.Drawing.Point(183, 90)
@@ -1759,7 +1616,7 @@ Public Class frmUEB
         'ComboBox38
         '
         Me.ComboBox38.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox38.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox38.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox38.Location = New System.Drawing.Point(183, 36)
@@ -1792,7 +1649,7 @@ Public Class frmUEB
         'ComboBox39
         '
         Me.ComboBox39.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox39.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox39.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBox39.Location = New System.Drawing.Point(183, 63)
@@ -1810,6 +1667,73 @@ Public Class frmUEB
         Me.cmdSimulate.Size = New System.Drawing.Size(73, 28)
         Me.cmdSimulate.TabIndex = 10
         Me.cmdSimulate.Text = "Simulate"
+        '
+        'txtSiteFile
+        '
+        Me.txtSiteFile.Location = New System.Drawing.Point(85, 18)
+        Me.txtSiteFile.Name = "txtSiteFile"
+        Me.txtSiteFile.Size = New System.Drawing.Size(410, 20)
+        Me.txtSiteFile.TabIndex = 62
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(32, 21)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(47, 13)
+        Me.Label5.TabIndex = 61
+        Me.Label5.Text = "Site File:"
+        '
+        'txtBCParameterFile
+        '
+        Me.txtBCParameterFile.Location = New System.Drawing.Point(108, 9)
+        Me.txtBCParameterFile.Name = "txtBCParameterFile"
+        Me.txtBCParameterFile.Size = New System.Drawing.Size(403, 20)
+        Me.txtBCParameterFile.TabIndex = 61
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(12, 12)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(97, 13)
+        Me.Label6.TabIndex = 60
+        Me.Label6.Text = "B-C Parameter File:"
+        '
+        'AtcGridSiteVars
+        '
+        Me.AtcGridSiteVars.AllowHorizontalScrolling = True
+        Me.AtcGridSiteVars.AllowNewValidValues = False
+        Me.AtcGridSiteVars.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridSiteVars.CellBackColor = System.Drawing.SystemColors.Window
+        Me.AtcGridSiteVars.Fixed3D = False
+        Me.AtcGridSiteVars.LineColor = System.Drawing.SystemColors.Control
+        Me.AtcGridSiteVars.LineWidth = 1.0!
+        Me.AtcGridSiteVars.Location = New System.Drawing.Point(3, 44)
+        Me.AtcGridSiteVars.Name = "AtcGridSiteVars"
+        Me.AtcGridSiteVars.Size = New System.Drawing.Size(515, 356)
+        Me.AtcGridSiteVars.Source = Nothing
+        Me.AtcGridSiteVars.TabIndex = 63
+        '
+        'AtcGridBCMonthly
+        '
+        Me.AtcGridBCMonthly.AllowHorizontalScrolling = True
+        Me.AtcGridBCMonthly.AllowNewValidValues = False
+        Me.AtcGridBCMonthly.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridBCMonthly.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridBCMonthly.Fixed3D = False
+        Me.AtcGridBCMonthly.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AtcGridBCMonthly.LineColor = System.Drawing.Color.Empty
+        Me.AtcGridBCMonthly.LineWidth = 0.0!
+        Me.AtcGridBCMonthly.Location = New System.Drawing.Point(0, 46)
+        Me.AtcGridBCMonthly.Name = "AtcGridBCMonthly"
+        Me.AtcGridBCMonthly.Size = New System.Drawing.Size(521, 332)
+        Me.AtcGridBCMonthly.Source = Nothing
+        Me.AtcGridBCMonthly.TabIndex = 62
         '
         'frmUEB
         '
@@ -1878,54 +1802,19 @@ Public Class frmUEB
                                "build new UEB project by defining all fields on all tabs." & vbCrLf & _
                                "Existing data files (e.g. Weather, Parameter, ...) may be accessed on other tabs."
 
+        pParmData = New clsUEBParameterFile("")
         With AtcGridModelParms
             .Source = New atcControls.atcGridSource
             .AllowHorizontalScrolling = False
         End With
-        AtcGridModelParms.Clear()
-        With AtcGridModelParms.Source
-            .Columns = 2
-            .ColorCells = True
-            .FixedRows = 1
-            .FixedColumns = 1
-            .Rows = 22
-            .CellValue(0, 0) = "Model Parameter"
-            .CellValue(0, 1) = "Value"
-            For i As Integer = 1 To .Rows
-                .CellColor(i, 0) = SystemColors.ControlDark
-                .CellEditable(i, 1) = True
-                .CellValue(i, 0) = clsUEBParameterFile.ParameterName(i - 1)
-            Next
-        End With
-        AtcGridModelParms.ColumnWidth(0) = 400
+        SetParmGrid()
 
+        pSiteData = New clsUEBSiteFile("")
         With AtcGridSiteVars
             .Source = New atcControls.atcGridSource
             .AllowHorizontalScrolling = False
         End With
-        AtcGridSiteVars.Clear()
-        With AtcGridSiteVars.Source
-            .Columns = 2
-            .ColorCells = True
-            .FixedRows = 1
-            .FixedColumns = 1
-            .Rows = 9
-            For i As Integer = 0 To .Rows - 1
-                .CellColor(i, 0) = SystemColors.ControlDark
-                .CellEditable(i, 1) = True
-            Next
-            .CellValue(0, 0) = "Site Variable"
-            .CellValue(0, 1) = "Value"
-            .CellValue(1, 0) = "Forest cover fraction"
-            .CellValue(2, 0) = "Drift factor"
-            .CellValue(3, 0) = "Atmospheric pressure, Pa"
-            .CellValue(4, 0) = "Ground heat flux, kJ/m^2/hr"
-            .CellValue(5, 0) = "Albedo extinction depth, m"
-            .CellValue(6, 0) = "Slope, degrees"
-            .CellValue(7, 0) = "Aspect, degrees from North"
-            .CellValue(8, 0) = "Latitude, degrees"
-        End With
-        AtcGridSiteVars.ColumnWidth(0) = 300
+        SetSiteGrid()
 
         With AtcGridBCMonthly
             .Source = New atcControls.atcGridSource
@@ -2004,7 +1893,7 @@ Public Class frmUEB
         If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
             Dim lFilename As String = cdlg.FileName
             txtMasterFile.Text = lFilename
-            OpenMasterFile(lFilename, pWeatherData.FileName, pOutputFileName, pParmData.FileName, pSiteData.FileName, pBCParameterFileName, pRadOpt)
+            OpenMasterFile(lFilename, pProjectDescription, pParmData.FileName, pSiteData.FileName, pWeatherData.FileName, pOutputFileName, pBCParameterFileName, pRadOpt)
             txtWeatherFile.Text = pWeatherData.FileName
             txtOutputFile.Text = pOutputFileName
             txtParameterFile.Text = pParmData.FileName
@@ -2038,7 +1927,7 @@ Public Class frmUEB
         End If
     End Sub
 
-    Private Sub txtParameterFile_Click(sender As Object, e As System.EventArgs) Handles txtParameterFile.Click
+    Private Sub txtParameterFile_Click(ByVal sender As Object, ByVal e As System.EventArgs)
         Dim cdlg As New Windows.Forms.OpenFileDialog
         cdlg.Title = "Open UEB Parameter File"
         cdlg.Filter = "UEB Parameter files|*.dat|All Files|*.*"
@@ -2048,18 +1937,16 @@ Public Class frmUEB
 
     End Sub
 
-    Private Sub txtParameterFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtParameterFile.TextChanged
+    Private Sub txtParameterFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs)
         pParmData.FileName = txtParameterFile.Text
-        If FileExists(txtParameterFile.Text) Then
-            ReadDataFile(txtParameterFile.Text, pParmData.ParameterValue)
-            For i As Integer = 1 To clsUEBParameterFile.NumParameters
-                AtcGridModelParms.Source.CellValue(i, 1) = pParmData.ParameterValue(i - 1)
-            Next
-            AtcGridModelParms.Refresh()
+        If FileExists(pParmData.FileName) Then
+            pParmData = Nothing
+            pParmData = New clsUEBParameterFile(pParmData.FileName)
+            SetParmGrid()
         End If
     End Sub
 
-    Private Sub txtSiteFile_Click(sender As Object, e As System.EventArgs) Handles txtSiteFile.Click
+    Private Sub txtSiteFile_Click(ByVal sender As Object, ByVal e As System.EventArgs)
         Dim cdlg As New Windows.Forms.OpenFileDialog
         cdlg.Title = "Open UEB Site File"
         cdlg.Filter = "UEB Site files|*.dat|All Files|*.*"
@@ -2069,18 +1956,16 @@ Public Class frmUEB
 
     End Sub
 
-    Private Sub txtSiteFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtSiteFile.TextChanged
+    Private Sub txtSiteFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs)
         pSiteData.FileName = txtSiteFile.Text
-        If FileExists(txtSiteFile.Text) Then
-            ReadDataFile(txtSiteFile.Text, pSiteData.VariableValue)
-            For i As Integer = 1 To clsUEBSiteFile.NumVariables
-                AtcGridSiteVars.Source.CellValue(i, 1) = pSiteData.VariableValue(i - 1)
-            Next
-            AtcGridSiteVars.Refresh()
+        If FileExists(pSiteData.FileName) Then
+            pSiteData = Nothing
+            pSiteData = New clsUEBSiteFile(pSiteData.FileName)
+            SetSiteGrid()
         End If
     End Sub
 
-    Private Sub txtBCParameterFile_Click(sender As Object, e As System.EventArgs) Handles txtBCParameterFile.Click
+    Private Sub txtBCParameterFile_Click(ByVal sender As Object, ByVal e As System.EventArgs)
         Dim cdlg As New Windows.Forms.OpenFileDialog
         cdlg.Title = "Open UEB BC Parameter File"
         cdlg.Filter = "UEB BC Parameter files|*.dat|All Files|*.*"
@@ -2090,13 +1975,13 @@ Public Class frmUEB
 
     End Sub
 
-    Private Sub txtBCParameterFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtBCParameterFile.TextChanged
+    Private Sub txtBCParameterFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs)
         Dim lMonth As Integer
         pBCParameterFileName = txtBCParameterFile.Text
         If FileExists(txtBCParameterFile.Text) Then
             ReadDataFile(txtBCParameterFile.Text, pBCDataArray)
-            AtcTextAParm.ValueDouble = pBCDataArray(0)
-            AtcTextCParm.ValueDouble = pBCDataArray(1)
+            'AtcTextAParm.ValueDouble = pBCDataArray(0)
+            'AtcTextCParm.ValueDouble = pBCDataArray(1)
             For i As Integer = 1 To 12
                 lMonth = pBCDataArray(3 * i - 1)
                 AtcGridBCMonthly.Source.CellValue(lMonth, 1) = pBCDataArray(3 * i)
@@ -2146,8 +2031,8 @@ Public Class frmUEB
 
         lMsg = ""
         If pBCParameterFileName.Length > 0 Then
-            pBCDataArray(0) = AtcTextAParm.ValueDouble
-            pBCDataArray(1) = AtcTextCParm.ValueDouble
+            'pBCDataArray(0) = AtcTextAParm.ValueDouble
+            'pBCDataArray(1) = AtcTextCParm.ValueDouble
             Dim lMonth As Integer
             For i As Integer = 1 To 12
                 If IsNumeric(AtcGridBCMonthly.Source.CellValue(i, 1)) Then
@@ -2162,6 +2047,53 @@ Public Class frmUEB
                 WriteBCParmsFile(pBCParameterFileName, pBCDataArray)
             End If
         End If
+
+    End Sub
+
+    Private Sub SetParmGrid()
+
+        AtcGridModelParms.Clear()
+        With AtcGridModelParms.Source
+            .Columns = 2
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 1
+            .CellValue(0, 0) = "Model Parameter"
+            .CellValue(0, 1) = "Value"
+            For i As Integer = 1 To pParmData.Variables.Count
+                .CellValue(i, 0) = pParmData.Variables(i - 1).Description
+                .CellColor(i, 0) = SystemColors.ControlDark
+                .CellEditable(i, 1) = True
+                .CellValue(i, 1) = pParmData.Variables(i - 1).Value
+            Next
+        End With
+        AtcGridModelParms.Refresh()
+
+    End Sub
+
+    Private Sub SetSiteGrid()
+
+        AtcGridSiteVars.Clear()
+        With AtcGridSiteVars.Source
+            .Columns = 4
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 1
+            .CellValue(0, 0) = "Site Variable"
+            .CellValue(0, 1) = "Value"
+            .CellValue(0, 2) = "Grid File"
+            .CellValue(0, 3) = "Grid Variable Name"
+            For i As Integer = 1 To pSiteData.Variables.Count
+                .CellValue(i, 0) = pSiteData.Variables(i - 1).Description
+                .CellColor(i, 0) = SystemColors.ControlDark
+                .CellValue(i, 1) = pSiteData.Variables(i - 1).Value
+                .CellEditable(i, 1) = True
+                .CellValue(i, 2) = pSiteData.Variables(i - 1).GridFileName
+                .CellEditable(i, 2) = True
+                .CellValue(i, 3) = pSiteData.Variables(i - 1).GridVariableName
+                .CellEditable(i, 3) = True
+            Next
+        End With
 
     End Sub
 
