@@ -1,0 +1,106 @@
+﻿Site and Initial Condition Input Variables
+USic:  Surface Snow Energy content initial condition (kg m-3)
+0
+0
+WSic:  Surface Snow water equivalent initial condition (m)
+0
+1.2
+Tic:  Snow surface dimensionless age initial condition 
+0
+0
+WCic:  Canopy snow water equivalent initial condition (m)
+0
+0
+df: Drift factor multiplier
+0                
+1.0   
+apr: Average atmospheric pressure         
+0        
+74051   
+Aep: Albedo extinction coefficient             
+0                
+0.1  
+cc: Canopy coverage fraction         
+1  
+ccgridfile.nc 
+cc
+hcan: Canopy height           
+1     
+hcanfile.nc
+hcan
+lai: Leaf area index
+1        
+laifile.nc  
+LAI
+Sbar: Maximum snow load held per unit branch area        
+0               
+6.6
+ycage: Forest age flag for wind speed profile parameterization            
+0             
+12.0  
+slope: A 2-D grid that contains the slope at each grid point     
+1          
+slope.nc
+slope
+aspect: A 2-D grid that contains the aspect at each grid point   
+1        
+aspect.nc
+aspect
+latitude: A 2-D grid that contains the latitude at each grid point    
+1             
+lat.nc
+latitude
+longitude: A 2-D grid that contains the longitude at each grid point    
+1             
+lon.nc
+longitude
+subalb: Albedo (fraction 0-1) of the substrate beneath the snow (ground, or glacier)
+1
+subalb.nc
+subalb
+subtype: Type of beneath snow substrate encoded as (0 = Ground/Non Glacier, 1=Clean Ice/glacier, 2= Debris covered ice/glacier, 3= Glacier snow accumulation zone)
+1
+subtype.nc
+subtype
+gsurf: The fraction of surface melt that runs off (e.g. from a glacier)
+0
+0.98
+ts_last: Surface temperature of the snow the previous day (C) (if unknown enter -9999).  Used for first day force restore surface temperature calculation
+0
+-9999
+b01: Bristow-Campbell B for January (1)
+0
+5.712903     
+b02: Bristow-Campbell B for February (2)
+0
+4.350000   
+b03: Bristow-Campbell B for March(3)
+0
+6.890322   
+b04: Bristow-Campbell B for April (4)
+0
+8.660001   
+b05: Bristow-Campbell B for may (5)
+0
+8.938710   
+b06: Bristow-Campbell B for June (6)
+0
+10.010000   
+b07: Bristow-Campbell B for July (7)
+0
+9.541936     
+b08:  Bristow-Campbell B for August (8)
+0
+9.038710     
+b09: Bristow-Campbell B for September (9)
+0
+7.160001     
+b10: Bristow-Campbell B for October (10)
+0
+8.106450     
+b11: Bristow-Campbell B for November (11)
+0
+5.923332     
+b12: Bristow-Campbell B for December (12)
+0
+5.058064
