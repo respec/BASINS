@@ -1,0 +1,42 @@
+﻿Input Control file
+2011 03 12 12.00 yyyy mm dd hh.hh (starting Date)
+2011 03 23 12.00 yyyy mm dd hh.hh (ending Date)
+3.00 (dt=increment in two consecutive time step in hours)
+6.00 UTC time offset
+Ta: Air temperature  (always required)
+1   
+netCDFFileList.dat  
+ps
+Prec: Precipitation  (always required)
+1   
+netCDFFileList.dat  
+qv2m
+v: Wind speed   (always required)
+1
+netCDFFileList.dat  
+wind
+RH: Relative Humidity   (always required)
+1
+netCDFFileList.dat  
+t2m
+Tmin: Daily Minimum temperature   (always required)
+0
+dailymintempTS.dat   
+Tmax: Daily Maximum temperature   (always required)
+0
+dailymaxtempTS.dat       
+Qsi: Incoming shortwave(kJ/m2/hr)   (only required if irad=1 or 2)
+0
+IncomingShortwaveTS.dat    (only required if irad=2)
+Qli: Long wave radiation(kJ/m2/hr)
+0
+LongwaveRadiationTS.dat
+Qnet: Net radiation(kJ/m2/hr)   (only required if irad=3)
+0  
+NetRadiationTS.dat     
+Snowalb: Snow albedo (0-1).  (only required if ireadalb=1) The albedo of the snow surface to be used when the internal albedo calculations are to be overridden
+0
+snoalbmaps.dat
+Qg: Ground heat flux   (kJ/m2/hr)        
+2               
+0
