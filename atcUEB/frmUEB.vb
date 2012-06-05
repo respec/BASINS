@@ -12,7 +12,7 @@ Public Class frmUEB
     Friend pProjectDescription As String
     Friend pParmData As clsUEBParameterFile
     Friend pSiteData As clsUEBSiteFile
-    Friend pWeatherData As clsUEBWeather
+    'Friend pWeatherData As clsUEBWeather
 
     Friend pBCParameterFileName As String
     Friend pBCDataArray(37) As Double
@@ -1998,12 +1998,14 @@ Public Class frmUEB
 
     Private Sub UpdateInputFiles()
         Dim lMsg As String
+        Dim lValue As String
 
         lMsg = ""
-        If pParmData.FileName.Length > 0 Then 'check 
-            For i As Integer = 1 To clsUEBParameterFile.NumParameters
-                If IsNumeric(AtcGridModelParms.Source.CellValue(i, 1)) Then
-                    pParmData.ParameterValue(i - 1) = AtcGridModelParms.Source.CellValue(i, 1)
+        If pParmData.FileName.Length > 0 Then 'check parameter file inputs
+            For i As Integer = 1 To pParmData.Variables.Count
+                lValue = AtcGridModelParms.Source.CellValue(i, 1)
+                If IsNumeric(lValue) Then
+                    pParmData.Variables(i - 1).Value = lValue
                 Else 'problem with a parameter value
                     lMsg = "Problem processing value on Model Parameters tab in row " & i
                     Exit For
@@ -2015,14 +2017,27 @@ Public Class frmUEB
         End If
 
         lMsg = ""
-        If pSiteData.FileName.Length > 0 Then
-            For i As Integer = 1 To clsUEBSiteFile.NumVariables
-                If IsNumeric(AtcGridSiteVars.Source.CellValue(i, 1)) Then
-                    pSiteData.VariableValue(i - 1) = AtcGridSiteVars.Source.CellValue(i, 1)
-                Else 'problem with a site value
-                    lMsg = "Problem processing value on Site Variables tab in row " & i
-                    Exit For
-                End If
+        If pSiteData.FileName.Length > 0 Then 'check site variable inputs
+            For i As Integer = 1 To pSiteData.Variables.Count
+                With AtcGridSiteVars.Source
+                    If FileExists(.CellValue(i, 2)) Then 'valid NetCDF file entered
+                        pSiteData.Variables(i - 1).GridFileName = .CellValue(i, 2)
+                        If .CellValue(i, 3).Length > 0 Then
+                            'TODO: check validity of Grid Variable name
+                            pSiteData.Variables(i - 1).GridVariableName = .CellValue(i, 3)
+                            pSiteData.Variables(i - 1).SpaceVarying = True
+                        Else
+                            lMsg = "No grid variable specified in row " & i
+                            Exit For
+                        End If
+                    ElseIf IsNumeric(.CellValue(i, 1)) Then
+                        pSiteData.Variables(i - 1).Value = .CellValue(i, 1)
+                        pSiteData.Variables(i - 1).SpaceVarying = False
+                    Else 'problem with a site value
+                        lMsg = "Problem processing value on Site Variables tab in row " & i
+                        Exit For
+                    End If
+                End With
             Next
             If lMsg.Length = 0 Then
                 pSiteData.WriteSiteFile()
@@ -2097,4 +2112,14 @@ Public Class frmUEB
 
     End Sub
 
+    Private Sub AtcGridSiteVars_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridSiteVars.MouseDownCell
+        If aColumn = 2 Then
+            Dim cdlg As New Windows.Forms.OpenFileDialog
+            cdlg.Title = "Open Grid File for " & aGrid.Source.CellValue(aRow, 0)
+            cdlg.Filter = "NetCDF files|*.nc|All Files|*.*"
+            If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+                aGrid.Source.CellValue(aRow, aColumn) = cdlg.FileName
+            End If
+        End If
+    End Sub
 End Class
