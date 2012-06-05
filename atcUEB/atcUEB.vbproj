@@ -76,10 +76,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsPlugin.vb" />
+    <Compile Include="clsUEBInputControl.vb" />
     <Compile Include="clsUEBParameterFile.vb" />
     <Compile Include="clsUEBSiteFile.vb" />
     <Compile Include="clsUEBVariable.vb" />
-    <Compile Include="clsUEBWeather.vb" />
     <Compile Include="frmUEB.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -113,6 +113,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="InputControl.dat" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>

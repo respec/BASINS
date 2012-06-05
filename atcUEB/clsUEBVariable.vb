@@ -25,11 +25,6 @@ Public Class clsUEBVariable
         Return lUEBVar
     End Function
 
-    'Public Sub FromParameterString(ByRef aFileContents As String)
-    '    Description = StrSplit(aFileContents, vbCrLf, "")
-    '    Value = Double.Parse(StrSplit(aFileContents, vbCrLf, ""))
-    'End Sub
-
     Public Function SiteVariableString() As String
         If SpaceVarying Then
             Return Description & vbCrLf & "1" & vbCrLf & GridFileName & vbCrLf & GridVariableName
@@ -67,7 +62,7 @@ Public Class clsUEBVariable
 
     End Function
 
-    Public Sub FromInputVariableString(ByRef aFileContents As String)
+    Public Shared Function FromInputVariableString(ByRef aFileContents As String) As clsUEBVariable
         Dim lUEBVar As New clsUEBVariable
         Dim lVaryingFlag As Integer
 
@@ -87,6 +82,7 @@ Public Class clsUEBVariable
             lUEBVar.SpaceVarying = False
             lUEBVar.Value = Double.Parse(StrSplit(aFileContents, vbCrLf, ""))
         End If
+        Return lUEBVar
 
-    End Sub
+    End Function
 End Class

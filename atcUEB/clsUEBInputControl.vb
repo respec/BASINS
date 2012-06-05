@@ -2,22 +2,62 @@
 Imports atcUtility
 Imports MapWinUtility.Strings
 
-Public Class clsUEBWeather
+Public Class clsUEBInputControl
+
+    'Public FileName As String
+    'Public SJDate As Double
+    'Public TimeStep As Integer
+    'Public NSkip As Integer
+    'Public InitialEnergy As Double
+    'Public InitialH2OEquiv As Double
+    'Public InitialSnowAge As Double
+    'Public ATempTS As atcTimeseries
+    'Public PrecipTS As atcTimeseries
+    'Public WindTS As atcTimeseries
+    'Public RelHTS As atcTimeseries
+    'Public ATempRngTS As atcTimeseries
+    'Public ShortRadTS As atcTimeseries
+    'Public NetRadTS As atcTimeseries
+
+    Public Variables As Generic.List(Of clsUEBVariable)
+    Public Header As String
 
     Public FileName As String
-    Public SJDate As Double
-    Public TimeStep As Integer
-    Public NSkip As Integer
-    Public InitialEnergy As Double
-    Public InitialH2OEquiv As Double
-    Public InitialSnowAge As Double
-    Public ATempTS As atcTimeseries
-    Public PrecipTS As atcTimeseries
-    Public WindTS As atcTimeseries
-    Public RelHTS As atcTimeseries
-    Public ATempRngTS As atcTimeseries
-    Public ShortRadTS As atcTimeseries
-    Public NetRadTS As atcTimeseries
+
+    Public Sub New(ByVal aFilename As String)
+
+        FileName = aFilename
+        Dim lFileContents As String
+        If IO.File.Exists(FileName) Then
+            lFileContents = WholeFileString(FileName)
+        Else
+            lFileContents = GetEmbeddedFileAsString("InputControl.dat")
+        End If
+        'read header line in file
+        Header = StrSplit(lFileContents, vbCrLf, "")
+        While lFileContents.Length > 0
+            Variables.Add(clsUEBVariable.FromInputVariableString(lFileContents))
+        End While
+    End Sub
+
+    Public Function WriteSiteFile() As Boolean
+
+        Dim lStr As String = ""
+
+        If FileName.Length > 0 Then
+            Try
+                For Each lUEBParm As clsUEBVariable In Variables
+                    lStr &= lUEBParm.InputVariableString
+                Next
+                SaveFileString(FileName, lStr)
+                Return True
+            Catch ex As Exception
+                Return False
+            End Try
+        Else
+            Return False
+        End If
+    End Function
 
     Public Sub ReadWeatherFile()
 
