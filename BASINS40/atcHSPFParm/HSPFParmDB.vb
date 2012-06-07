@@ -14,12 +14,12 @@ Public Class HSPFParmDB
     Public Sub Open(ByVal aFilename As String)
         Name = aFilename
         If Name.Length = 0 Then
-            Name = "HSPFParm2003.mdb"
+            Name = "HSPFParmV2.mdb"
         End If
         If Not IO.File.Exists(Name) Then
             Name = GetSetting("HSPF", "ParameterMDB", "Path")
             If Not IO.File.Exists(Name) Then
-                Name = atcUtility.FindFile("Please locate 'HSPFParm2003.mdb' in a writable directory", "HSPFParm2003.mdb")
+                Name = atcUtility.FindFile("Please locate 'HSPFParmV2.mdb' in a writable directory", "HSPFParmV2.mdb")
                 SaveSetting("HSPF", "ParameterMDB", "Path", Name)
             End If
         End If

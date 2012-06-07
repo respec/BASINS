@@ -127,6 +127,11 @@ Public Class frmAddScenario
         Logger.Status("")
         Logger.Status("HIDE")
 
+        If FileExists(pUci.Name) Then 'make a copy of the UCI file just added as a new scenario
+            Dim lArchiveFolder As String = IO.Path.Combine(IO.Path.GetDirectoryName(Database.Name), "Archive")
+            If Not IO.Directory.Exists(lArchiveFolder) Then MkDir(lArchiveFolder)
+            TryCopy(pUci.Name, IO.Path.Combine(lArchiveFolder, IO.Path.GetFileName(pUci.Name)))
+        End If
         With pGrid.Source
             Dim lRow As Integer = .Rows
             .CellValue(lRow, 0) = lName   'name
@@ -146,9 +151,14 @@ Public Class frmAddScenario
         lNewSegId = lTable.Rows(lTable.Rows.Count - 1).Item(0).ToString
 
         'find next available parm data id number 
+        Dim lSQL As String = "SELECT ID FROM ParmData ORDER BY ID DESC;"
+        Dim lTempTable As DataTable = Database.GetTable(lSQL)
+        Dim lParmDataId As Integer = lTempTable.Rows(0).Item(0) + 1
+        lTempTable.Clear()
+        lTempTable = Nothing
+
         Dim lParmDataTable As DataTable = Database.GetTable("ParmData")
-        Dim lParmDataId As Integer = 0
-        lParmDataId = lParmDataTable.Rows(lParmDataTable.Rows.Count - 1).Item(0).ToString
+        'lParmDataId = lParmDataTable.Rows(lParmDataTable.Rows.Count - 1).Item(0).ToString
 
         Dim lOpTypId As Integer = 0
         If aOpName = "PERLND" Then
@@ -201,8 +211,12 @@ Public Class frmAddScenario
                         If lParmId > 0 Then
                             If aRangeCheck AndAlso lParm.Def.Typ > 1 Then
                                 'check here to see if this real number is within the normal range
-                                Dim lMax As Single = 0.0
-                                Dim lMin As Single = 0.0
+                                Dim lMax As Single = 0.0 'max in DB currently
+                                Dim lMin As Single = 0.0 'min in DB currently
+                                Dim lTMax As Single 'typical max
+                                Dim lTMin As Single 'typical min
+                                Dim lPMax As Single 'possible max
+                                Dim lPMin As Single 'possible min
                                 Dim lVal As Single = 0.0
                                 Dim lHSPFMax As Single = lParm.Def.Max
                                 Dim lHSPFMin As Single = lParm.Def.Min
@@ -210,25 +224,46 @@ Public Class frmAddScenario
                                     lHSPFMax = lParm.Def.MetricMax
                                     lHSPFMin = lParm.Def.MetricMin
                                 End If
-                                ParmMinMax(lParmId, lMin, lMax)
+                                ParmMinMax(lParmId, lParm.Name, lParm.Parent.Name, lMin, lMax, lTMin, lTMax, lPMin, lPMax)
                                 If IsNumeric(lParm.Value) Then
                                     lVal = CSng(lParm.Value)
-                                    If lVal > lMax Then
-                                        Logger.Msg("The value for parameter " & lParm.Name & " is greater than the greatest value of this parameter " & _
-                                                   "in the HSPFParm database." & vbCrLf & vbCrLf & "Operation: " & lOpn.Name & " " & lOpn.Id & _
-                                                   "   Value: " & lVal & "   Max: " & lMax & "   HSPF Max: " & lHSPFMax, MsgBoxStyle.Critical, _
-                                                   "HSPFParm Value Beyond Normal Range")
+                                    Dim lMsg As String = "The value (" & lVal & ") for parameter " & lParm.Name & " (Operation: " & lOpn.Name & ", " & lOpn.Id & ")" & " is outside the ranges below:"
+                                    Dim lOutOfRange As Boolean = False
+                                    If lTMin < lTMax Then
+                                        If lVal > lTMax OrElse lVal < lTMin Then
+                                            lOutOfRange = True
+                                            lMsg &= vbCrLf & "Typical Min: " & lTMin & " ~ Typical Max: " & lTMax
+                                        End If
                                     End If
-                                    If lVal < lMin Then
-                                        Logger.Msg("The value for parameter " & lParm.Name & " is lower than the lowest value of this parameter " & _
-                                                   "in the HSPFParm database." & vbCrLf & vbCrLf & "Operation: " & lOpn.Name & " " & lOpn.Id & _
-                                                   "   Value: " & lVal & "   Min: " & lMin & "   HSPF Min: " & lHSPFMin, MsgBoxStyle.Critical, _
-                                                   "HSPFParm Value Beyond Normal Range")
+                                    If lPMin < lPMax Then
+                                        If lVal > lPMax OrElse lVal < lPMin Then
+                                            lOutOfRange = True
+                                            lMsg &= vbCrLf & "Possible Min: " & lPMin & " ~ Possible Max: " & lPMax
+                                        End If
+                                    End If
+                                    'If lVal > lMax Then
+                                    '    Logger.Msg("The value for parameter " & lParm.Name & " is greater than the greatest value of this parameter " & _
+                                    '               "in the HSPFParm database." & vbCrLf & vbCrLf & "Operation: " & lOpn.Name & " " & lOpn.Id & _
+                                    '               "   Value: " & lVal & "   Max: " & lMax & "   HSPF Max: " & lHSPFMax, MsgBoxStyle.Critical, _
+                                    '               "HSPFParm Value Beyond Normal Range")
+                                    'End If
+                                    'If lVal < lMin Then
+                                    '    Logger.Msg("The value for parameter " & lParm.Name & " is lower than the lowest value of this parameter " & _
+                                    '               "in the HSPFParm database." & vbCrLf & vbCrLf & "Operation: " & lOpn.Name & " " & lOpn.Id & _
+                                    '               "   Value: " & lVal & "   Min: " & lMin & "   HSPF Min: " & lHSPFMin, MsgBoxStyle.Critical, _
+                                    '               "HSPFParm Value Beyond Normal Range")
+                                    'End If
+                                    If lMin < lMax AndAlso (lVal > lMax OrElse lVal < lMin) Then
+                                        lOutOfRange = True
+                                        lMsg &= vbCrLf & "Database Min: " & lMin & " ~ Database Max: " & lMax
+                                    End If
+                                    If lOutOfRange Then
+                                        Logger.Msg(lMsg, MsgBoxStyle.Critical, "HSPFParm Value Beyond Normal Range")
                                     End If
                                 End If
                             End If
                             Dim lParmValues As New Collection
-                            lParmValues.Add(lParmDataId)
+                            lParmValues.Add(lParmDataId) 'no need as it is managed by access
                             lParmValues.Add(lParmId)
                             lParmValues.Add(lNewSegId)
                             lParmValues.Add(lOccur)
@@ -278,7 +313,10 @@ Public Class frmAddScenario
         Return lParmId
     End Function
 
-    Sub ParmMinMax(ByVal aParmId As Integer, ByRef aMin As Single, ByRef aMax As Single)
+    Sub ParmMinMax(ByVal aParmId As Integer, ByVal aParmName As String, ByVal aParmTablename As String, _
+                   ByRef aMin As Single, ByRef aMax As Single, _
+                   ByRef aTMin As Single, ByRef aTMax As Single, _
+                   ByRef aPMin As Single, ByRef aPMax As Single)
         'find min and max values for this parameter
         Dim lParmCrit As String = "ParmID = " & aParmId & " OR AssocID = " & aParmId
         Dim lStr As String = "SELECT DISTINCTROW ParmTableData.SegID, " & _
@@ -292,21 +330,125 @@ Public Class frmAddScenario
                                                 "From ParmTableData " & _
                                                 "WHERE (" & lParmCrit & ")"
         Dim lTable As DataTable = Database.GetTable(lStr)
-        aMin = lTable.Rows(0).Item(4)
-        aMax = lTable.Rows(0).Item(4)
         Dim lTmp As Single
-        If lTable.Rows.Count > 0 Then
+        If lTable IsNot Nothing AndAlso lTable.Rows.Count > 0 Then
+            aMin = lTable.Rows(0).Item(4)
+            aMax = lTable.Rows(0).Item(4)
             For lRow As Integer = 1 To lTable.Rows.Count - 1
-                lTmp = lTable.Rows(lRow).Item(4)
-                If lTmp > aMax Then
-                    aMax = lTmp
-                End If
-                If lTmp < aMin Then
-                    aMin = lTmp
+                If Single.TryParse(lTable.Rows(lRow).Item(4).ToString, lTmp) Then
+                    If lTmp > aMax Then
+                        aMax = lTmp
+                    End If
+                    If lTmp < aMin Then
+                        aMin = lTmp
+                    End If
                 End If
             Next
         End If
+        lTable.Clear()
+        lTable = Nothing
 
+        'find typical and possible range
+        aTMin = -9999
+        aTMax = -9999
+        aPMin = -9999
+        aPMax = -9999
+        lStr = "SELECT Name, Unit, TMin, TMax, PMin, PMax, HSPFOPN, HSPFTable " & _
+               "FROM ParmRange " & _
+               "WHERE Name = '" & aParmName.ToUpper() & "'"
+        lTable = Database.GetTable(lStr)
+        If lTable IsNot Nothing Then
+            With lTable
+                If .Rows.Count = 1 Then
+                    SetParmRange(.Rows(0), aTMin, aTMax, aPMin, aPMax)
+                ElseIf lTable.Rows.Count > 1 Then
+                    Dim lTablenameInDB As String
+                    For lRow As Integer = 0 To .Rows.Count - 1
+                        lTablenameInDB = .Rows(lRow).Item("HSPFTable").ToString.Replace(" ", "").Trim()
+                        If lTablenameInDB.ToUpper() = aParmTablename.Replace(" ", "").Trim().ToUpper() Then
+                            SetParmRange(.Rows(lRow), aTMin, aTMax, aPMin, aPMax)
+                            Exit For
+                        End If
+                    Next
+                End If
+            End With 'lTable
+        End If
+        lTable.Clear()
+        lTable = Nothing
+    End Sub
+
+    Private Sub SetParmRange(ByVal aDataRow As DataRow, ByRef aTMin As Single, ByRef aTMax As Single, ByRef aPMin As Single, ByRef aPMax As Single)
+        Dim lRangeTMin As String = aDataRow.Item("TMin").ToString.Replace("""", "").Trim()
+        Dim lRangeTMax As String = aDataRow.Item("TMax").ToString.Replace("""", "").Trim()
+        Dim lRangePMin As String = aDataRow.Item("PMin").ToString.Replace("""", "").Trim()
+        Dim lRangePMax As String = aDataRow.Item("PMax").ToString.Replace("""", "").Trim()
+
+        Dim lArr() As String
+        If Not Single.TryParse(lRangeTMin, aTMin) Then
+            If lRangeTMin.Contains(" ") Then
+                lArr = System.Text.RegularExpressions.Regex.Split(lRangeTMin, "\s+")
+                'If lArr.Length >= 2 AndAlso IsNumeric(lArr(0)) AndAlso IsNumeric(lArr(1)) Then
+                '    aTMin = (Single.Parse(lArr(0)) + Single.Parse(lArr(1))) / 2.0
+                'End If
+                If lArr.Length >= 2 Then
+                    If IsNumeric(lArr(0)) AndAlso IsNumeric(lArr(1)) Then
+                        aTMin = Math.Min(Single.Parse(lArr(0)), Single.Parse(lArr(1)))
+                    Else
+                        If Not Single.TryParse(lArr(0), aTMin) Then Single.TryParse(lArr(1), aTMin)
+                    End If
+                End If
+                ReDim lArr(0)
+            End If
+        End If
+
+        If Not Single.TryParse(lRangeTMax, aTMax) Then
+            If lRangeTMax.Contains(" ") Then
+                lArr = System.Text.RegularExpressions.Regex.Split(lRangeTMax, "\s+")
+                'If lArr.Length >= 2 AndAlso IsNumeric(lArr(0)) AndAlso IsNumeric(lArr(1)) Then
+                '    aTMax = (Single.Parse(lArr(0)) + Single.Parse(lArr(1))) / 2.0
+                'End If
+                If lArr.Length >= 2 Then
+                    If IsNumeric(lArr(0)) AndAlso IsNumeric(lArr(1)) Then
+                        aTMax = Math.Max(Single.Parse(lArr(0)), Single.Parse(lArr(1)))
+                    Else
+                        If Not Single.TryParse(lArr(0), aTMax) Then Single.TryParse(lArr(1), aTMax)
+                    End If
+                End If
+                ReDim lArr(0)
+            End If
+        End If
+
+        If Not Single.TryParse(lRangePMin, aPMin) Then
+            If lRangePMin.Contains(" ") Then
+                lArr = System.Text.RegularExpressions.Regex.Split(lRangePMin, "\s+")
+                'If lArr.Length >= 2 AndAlso IsNumeric(lArr(0)) AndAlso IsNumeric(lArr(1)) Then
+                '    aPMin = (Single.Parse(lArr(0)) + Single.Parse(lArr(1))) / 2.0
+                'End If
+                If IsNumeric(lArr(0)) AndAlso IsNumeric(lArr(1)) Then
+                    aPMin = Math.Min(Single.Parse(lArr(0)), Single.Parse(lArr(1)))
+                Else
+                    If Not Single.TryParse(lArr(0), aPMin) Then Single.TryParse(lArr(1), aPMin)
+                End If
+                ReDim lArr(0)
+            End If
+        End If
+
+        If Not Single.TryParse(lRangePMax, aPMax) Then
+            If lRangePMax.Contains(" ") Then
+                lArr = System.Text.RegularExpressions.Regex.Split(lRangePMax, "\s+")
+                'If lArr.Length >= 2 AndAlso IsNumeric(lArr(0)) AndAlso IsNumeric(lArr(1)) Then
+                '    aPMax = (Single.Parse(lArr(0)) + Single.Parse(lArr(1))) / 2.0
+                'End If
+                If lArr.Length >= 2 Then
+                    If IsNumeric(lArr(0)) AndAlso IsNumeric(lArr(1)) Then
+                        aPMax = Math.Max(Single.Parse(lArr(0)), Single.Parse(lArr(1)))
+                    Else
+                        If Not Single.TryParse(lArr(0), aPMax) Then Single.TryParse(lArr(1), aPMax)
+                    End If
+                End If
+                ReDim lArr(0)
+            End If
+        End If
     End Sub
 
     Private Sub cmdSet_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSet.Click
