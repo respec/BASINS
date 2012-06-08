@@ -10,20 +10,20 @@ Module modUEBUtil
     Public Sub OpenMasterFile(ByVal aFilename As String, ByRef aRunLabel As String, _
                               ByRef aParameterFileName As String, ByRef aSiteFileName As String, _
                               ByRef aInputVarsFileName As String, ByRef aOutputVarsFileName As String, _
-                              ByRef aWatershedFileName As String, ByRef aAggOutputControlFileName As String, _
-                              ByRef aAggOutputFileName As String)
+                              ByRef aWatershedFileName As String)
+        ', ByRef aAggOutputControlFileName As String, ByRef aAggOutputFileName As String)
 
         Dim lPath As String = PathNameOnly(aFilename) & "\"
-        Dim lStr As String = WholeFileString(aFilename)
+        Dim lFileStr As String = WholeFileString(aFilename)
 
-        aRunLabel = StrRetRem(lStr) 'description of this run
-        aParameterFileName = lPath & StrRetRem(lStr) 'should be parameter file
-        aSiteFileName = lPath & StrRetRem(lStr) 'should be site file
-        aInputVarsFileName = lPath & StrRetRem(lStr) 'should be input variable file
-        aOutputVarsFileName = lPath & StrRetRem(lStr) 'should be output variable file
-        aWatershedFileName = lPath & StrRetRem(lStr) 'should be watershed grid file
-        aAggOutputControlFileName = StrRetRem(lStr) 'should be aggregated output control file
-        aAggOutputFileName = StrRetRem(lStr) 'should be aggregated output control file
+        aRunLabel = StrSplit(lFileStr, vbCrLf, "") 'description of this run
+        aParameterFileName = lPath & StrSplit(lFileStr, vbCrLf, "") 'should be parameter file
+        aSiteFileName = lPath & StrSplit(lFileStr, vbCrLf, "") 'should be site file
+        aInputVarsFileName = lPath & StrSplit(lFileStr, vbCrLf, "") 'should be input variable file
+        aOutputVarsFileName = lPath & StrSplit(lFileStr, vbCrLf, "") 'should be output variable file
+        aWatershedFileName = lPath & StrSplit(lFileStr, vbCrLf, "") 'should be watershed grid file
+        'aAggOutputControlFileName = StrSplit(lFileStr, vbCrLf, "") 'should be aggregated output control file
+        'aAggOutputFileName = StrSplit(lFileStr, vbCrLf, "") 'should be aggregated output control file
 
     End Sub
 

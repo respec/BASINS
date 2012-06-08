@@ -114,7 +114,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="InputControl.dat" />
+    <EmbeddedResource Include="InputControl.dat" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
@@ -124,8 +124,9 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
-    <None Include="Param.dat" />
-    <None Include="SiteInit.dat" />
+    <EmbeddedResource Include="OutputControl.dat" />
+    <EmbeddedResource Include="Param.dat" />
+    <EmbeddedResource Include="SiteInit.dat" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\MapWindow4Plugins\MapWinUtility\BASINS-MapWinUtility.vbproj">

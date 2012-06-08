@@ -14,6 +14,7 @@ Public Class frmUEB
     Friend pSiteData As clsUEBSiteFile
     Friend pInputControlData As clsUEBInputControl
     Friend pOutputControlData As clsUEBOutputControl
+    Friend pWatershedGridFileName As String
     'Friend pWeatherData As clsUEBWeather
 
     Friend pBCParameterFileName As String
@@ -1638,7 +1639,7 @@ Public Class frmUEB
         If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
             Dim lFilename As String = cdlg.FileName
             txtMasterFile.Text = lFilename
-            OpenMasterFile(lFilename, pProjectDescription, pParmData.FileName, pSiteData.FileName, pInputControlData.FileName, pOutputControlData.FileName, pBCParameterFileName, pRadOpt)
+            OpenMasterFile(lFilename, pProjectDescription, pParmData.FileName, pSiteData.FileName, pInputControlData.FileName, pOutputControlData.FileName, pWatershedGridFileName)
             txtInputFile.Text = pInputControlData.FileName
             txtWatershedFile.Text = pOutputFileName
             txtParameterFile.Text = pParmData.FileName
