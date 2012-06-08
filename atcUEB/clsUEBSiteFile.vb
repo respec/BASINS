@@ -41,6 +41,7 @@ Public Class clsUEBSiteFile
         End If
         'read header line in file
         Header = StrSplit(lFileContents, vbCrLf, "")
+        Variables = New Generic.List(Of clsUEBVariable)
         While lFileContents.Length > 0
             Variables.Add(clsUEBVariable.FromSiteVariableString(lFileContents))
         End While

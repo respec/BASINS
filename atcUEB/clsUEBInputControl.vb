@@ -30,6 +30,7 @@ Public Class clsUEBInputControl
 
     Public Sub New(ByVal aFilename As String)
 
+        Dim i As Integer
         Dim lStr As String
         Dim lChrSep() As String = {" ", "."}
         Dim lStrArray() As String
@@ -47,17 +48,22 @@ Public Class clsUEBInputControl
         lStr = StrSplit(lFileContents, vbCrLf, "")
         lStr = ReplaceRepeats(lStr, " ") 'remove extra blanks
         lStrArray = lStr.Split(lChrSep, StringSplitOptions.None)
-        Array.Copy(lStrArray, SDate, SDate.Length)
+        For i = 0 To 4
+            SDate(i) = lStrArray(i)
+        Next
         lStr = StrSplit(lFileContents, vbCrLf, "")
         lStr = ReplaceRepeats(lStr, " ") 'remove extra blanks
         lStrArray = lStr.Split(lChrSep, StringSplitOptions.None)
-        Array.Copy(lStrArray, EDate, EDate.Length)
+        For i = 0 To 4
+            EDate(i) = lStrArray(i)
+        Next
         'read time step and UTC offset
         lStr = StrSplit(lFileContents, vbCrLf, "")
-        TimeStep = CInt(StrSplit(lFileContents, " ", ""))
+        TimeStep = CInt(StrSplit(lStr, " ", ""))
         lStr = StrSplit(lFileContents, vbCrLf, "")
-        UTCOffset = CInt(StrSplit(lFileContents, " ", ""))
+        UTCOffset = CInt(StrSplit(lStr, " ", ""))
 
+        Variables = New Generic.List(Of clsUEBVariable)
         While lFileContents.Length > 0
             Variables.Add(clsUEBVariable.FromInputVariableString(lFileContents))
         End While

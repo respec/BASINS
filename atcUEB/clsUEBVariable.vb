@@ -85,4 +85,16 @@ Public Class clsUEBVariable
         Return lUEBVar
 
     End Function
+
+    Public Function OutputVariableString() As String
+        Return Description & vbCrLf & GridFileName
+    End Function
+
+    Public Shared Function FromOutputVariableString(ByRef aFileContents As String) As clsUEBVariable
+        Dim lUEBVar As New clsUEBVariable
+
+        lUEBVar.Description = StrSplit(aFileContents, vbCrLf, "")
+        lUEBVar.GridFileName = StrSplit(aFileContents, vbCrLf, "")
+        Return lUEBVar
+    End Function
 End Class
