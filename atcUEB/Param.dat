@@ -67,7 +67,7 @@ a: A in Bristow-Campbell formula for atmospheric transmittance
 0.8      
 c: C in Bristow-Campbell formula for atmospheric transmittance
 2.4         
-stmflag:  model option for surface temperature approximation 1) the Simple Gradient, almost the same as Original UEB, 2) Simple Gradient approach with shallow snow correction. 3) The classical force-restore approach. 4) Modified force-restore approach. 4 is recommended unless you are doing model development research
+stmflag:  model option for surface temperature approximation 1) Simple Gradient (like original UEB), 2) Simple Gradient w/shallow snow correction, 3) Classical force-restore. 4) Modified force-restore (recommended)
 4
 forwsflag: Wind speed in forest canopy: 1 is observed and 2 is computed from above canopy observation
 1
