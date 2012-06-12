@@ -529,7 +529,7 @@ Public Class frmUEB
         Me.AtcTextUTCOffset.DataType = atcControls.atcText.ATCoDataType.ATCoInt
         Me.AtcTextUTCOffset.DefaultValue = ""
         Me.AtcTextUTCOffset.HardMax = 24
-        Me.AtcTextUTCOffset.HardMin = 1
+        Me.AtcTextUTCOffset.HardMin = 0
         Me.AtcTextUTCOffset.InsideLimitsBackground = System.Drawing.Color.White
         Me.AtcTextUTCOffset.Location = New System.Drawing.Point(450, 64)
         Me.AtcTextUTCOffset.MaxWidth = 20
@@ -1687,117 +1687,77 @@ Public Class frmUEB
     '    End If
     'End Sub
 
-    Private Sub txtWeatherFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtInputFile.Click
-        Dim cdlg As New Windows.Forms.OpenFileDialog
-        cdlg.Title = "Open UEB Weather File"
-        cdlg.Filter = "UEB Weather files|*.in|All Files|*.*"
-        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
-            txtInputFile.Text = cdlg.FileName
-        End If
-
-    End Sub
-
     Private Sub txtMasterFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtMasterFile.Click
         Dim cdlg As New Windows.Forms.OpenFileDialog
         cdlg.Title = "Open UEB master file containing all model data files"
-        cdlg.Filter = "Master Input files|*.in|All Files|*.*"
+        cdlg.Filter = "Master Input files (*.dat)|*.dat|All Files (*.*)|*.*"
         If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
             Dim lFilename As String = cdlg.FileName
             txtMasterFile.Text = lFilename
             OpenMasterFile(lFilename, pProjectDescription, pParmData.FileName, pSiteData.FileName, pInputControlData.FileName, pOutputControlData.FileName, pWatershedGridFileName)
+            txtProjectName.Text = pProjectDescription
             txtInputFile.Text = pInputControlData.FileName
-            txtWatershedFile.Text = pOutputFileName
+            txtWatershedFile.Text = pWatershedGridFileName
             txtParameterFile.Text = pParmData.FileName
             txtSiteFile.Text = pSiteData.FileName
-            txtOutputFile.Text = pBCParameterFileName
-            'Select Case pRadOpt
-            '    Case 0
-            '        rdoRadEstimate.Checked = True
-            '    Case 1
-            '        rdoRadMeasuredInput.Checked = True
-            '    Case 2
-            '        rdoMeasuredNet.Checked = True
-            'End Select
+            txtOutputFile.Text = pOutputControlData.FileName
         End If
     End Sub
 
-    Private Sub txtWeatherFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtInputFile.TextChanged
-        'pWeatherData.FileName = txtWeatherFile.Text
-        'If FileExists(txtWeatherFile.Text) Then
-        '    pWeatherData.ReadWeatherFile()
-        '    Dim lDate(5) As Integer
-        '    J2Date(pWeatherData.SJDate, lDate)
-        '    AtcTextSYear.ValueInteger = lDate(0)
-        '    AtcTextSMonth.ValueInteger = lDate(1)
-        '    AtcTextSDay.ValueInteger = lDate(2)
-        '    AtcTextSHour.ValueInteger = lDate(3)
-        '    atcTextTimeStep.ValueInteger = pWeatherData.TimeStep
-        '    AtcTextIniEnergyContent.Text = pWeatherData.InitialEnergy
-        '    AtcTextIniWaterEquiv.Text = pWeatherData.InitialH2OEquiv
-        '    AtcTextSnowAge.Text = pWeatherData.InitialSnowAge
-        'End If
-    End Sub
-
-    Private Sub txtParameterFile_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+    Private Sub txtParameterFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtParameterFile.Click
         Dim cdlg As New Windows.Forms.OpenFileDialog
         cdlg.Title = "Open UEB Parameter File"
-        cdlg.Filter = "UEB Parameter files|*.dat|All Files|*.*"
+        cdlg.Filter = "UEB Parameter files (*.dat)|*.dat|All Files (*.*)|*.*"
         If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
             txtParameterFile.Text = cdlg.FileName
         End If
 
     End Sub
 
-    Private Sub txtParameterFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs)
+    Private Sub txtParameterFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtParameterFile.TextChanged
         pParmData.FileName = txtParameterFile.Text
-        If FileExists(pParmData.FileName) Then
+        If FileExists(txtParameterFile.Text) Then
             pParmData = Nothing
-            pParmData = New clsUEBParameterFile(pParmData.FileName)
+            pParmData = New clsUEBParameterFile(txtParameterFile.Text)
             SetParmGrid()
         End If
     End Sub
 
-    Private Sub txtSiteFile_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+    Private Sub txtSiteFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtSiteFile.Click
         Dim cdlg As New Windows.Forms.OpenFileDialog
         cdlg.Title = "Open UEB Site File"
-        cdlg.Filter = "UEB Site files|*.dat|All Files|*.*"
+        cdlg.Filter = "UEB Site files (*.dat)|*.dat|All Files (*.*)|*.*"
         If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
             txtSiteFile.Text = cdlg.FileName
         End If
 
     End Sub
 
-    Private Sub txtSiteFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs)
+    Private Sub txtSiteFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtSiteFile.TextChanged
         pSiteData.FileName = txtSiteFile.Text
-        If FileExists(pSiteData.FileName) Then
+        If FileExists(txtSiteFile.Text) Then
             pSiteData = Nothing
-            pSiteData = New clsUEBSiteFile(pSiteData.FileName)
+            pSiteData = New clsUEBSiteFile(txtSiteFile.Text)
             SetSiteGrid()
         End If
     End Sub
 
-    Private Sub txtBCParameterFile_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+    Private Sub txtInputFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtInputFile.Click
         Dim cdlg As New Windows.Forms.OpenFileDialog
-        cdlg.Title = "Open UEB BC Parameter File"
-        cdlg.Filter = "UEB BC Parameter files|*.dat|All Files|*.*"
+        cdlg.Title = "Open UEB Input Control File"
+        cdlg.Filter = "UEB Input Control files (*.dat)|*.dat|All Files (*.*)|*.*"
         If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
-            txtOutputFile.Text = cdlg.FileName
+            txtInputFile.Text = cdlg.FileName
         End If
 
     End Sub
 
-    Private Sub txtBCParameterFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs)
-        Dim lMonth As Integer
-        pBCParameterFileName = txtOutputFile.Text
-        If FileExists(txtOutputFile.Text) Then
-            ReadDataFile(txtOutputFile.Text, pBCDataArray)
-            'AtcTextAParm.ValueDouble = pBCDataArray(0)
-            'AtcTextCParm.ValueDouble = pBCDataArray(1)
-            For i As Integer = 1 To 12
-                lMonth = pBCDataArray(3 * i - 1)
-                AtcGridBCMonthly.Source.CellValue(lMonth, 1) = pBCDataArray(3 * i)
-            Next
-            AtcGridBCMonthly.Refresh()
+    Private Sub txtInputFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtInputFile.TextChanged
+        pInputControlData.FileName = txtInputFile.Text
+        If FileExists(txtInputFile.Text) Then
+            pInputControlData = Nothing
+            pInputControlData = New clsUEBInputControl(txtInputFile.Text)
+            SetInputControl()
         End If
     End Sub
 
@@ -1973,4 +1933,5 @@ Public Class frmUEB
             End If
         End If
     End Sub
+
 End Class
