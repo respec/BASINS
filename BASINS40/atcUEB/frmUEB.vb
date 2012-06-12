@@ -33,6 +33,9 @@ Public Class frmUEB
     Friend WithEvents AtcGridBCMonthly As atcControls.atcGrid
     Friend WithEvents Label8 As System.Windows.Forms.Label
     Friend WithEvents AtcGridInputControl As atcControls.atcGrid
+    Friend WithEvents AtcTextEMinute As atcControls.atcText
+    Friend WithEvents Label9 As System.Windows.Forms.Label
+    Friend WithEvents AtcTextSMinute As atcControls.atcText
     Friend WithEvents AtcTextUTCOffset As atcControls.atcText
 
 #Region " Windows Form Designer generated code "
@@ -165,25 +168,43 @@ Public Class frmUEB
         Me.Label2 = New System.Windows.Forms.Label
         Me.Label62 = New System.Windows.Forms.Label
         Me.TabPage3 = New System.Windows.Forms.TabPage
+        Me.AtcGridInputControl = New atcControls.atcGrid
         Me.txtInputFile = New System.Windows.Forms.TextBox
         Me.Label3 = New System.Windows.Forms.Label
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
+        Me.AtcTextEMinute = New atcControls.atcText
+        Me.Label9 = New System.Windows.Forms.Label
+        Me.AtcTextSMinute = New atcControls.atcText
+        Me.AtcTextUTCOffset = New atcControls.atcText
+        Me.Label8 = New System.Windows.Forms.Label
         Me.lblTimeStep = New System.Windows.Forms.Label
+        Me.atcTextTimeStep = New atcControls.atcText
         Me.Label1 = New System.Windows.Forms.Label
+        Me.AtcTextEHour = New atcControls.atcText
+        Me.AtcTextSHour = New atcControls.atcText
         Me.Label54 = New System.Windows.Forms.Label
         Me.Label55 = New System.Windows.Forms.Label
         Me.Label56 = New System.Windows.Forms.Label
         Me.Label57 = New System.Windows.Forms.Label
         Me.Label58 = New System.Windows.Forms.Label
+        Me.AtcTextEDay = New atcControls.atcText
+        Me.AtcTextSDay = New atcControls.atcText
+        Me.AtcTextSYear = New atcControls.atcText
+        Me.AtcTextEMon = New atcControls.atcText
+        Me.AtcTextSMonth = New atcControls.atcText
+        Me.AtcTextEYear = New atcControls.atcText
         Me.TabPage7 = New System.Windows.Forms.TabPage
+        Me.AtcGridSiteVars = New atcControls.atcGrid
         Me.txtSiteFile = New System.Windows.Forms.TextBox
         Me.Label5 = New System.Windows.Forms.Label
-        Me.TabPage8 = New System.Windows.Forms.TabPage
-        Me.txtOutputFile = New System.Windows.Forms.TextBox
-        Me.Label6 = New System.Windows.Forms.Label
         Me.TabPage1 = New System.Windows.Forms.TabPage
+        Me.AtcGridModelParms = New atcControls.atcGrid
         Me.txtParameterFile = New System.Windows.Forms.TextBox
         Me.Label4 = New System.Windows.Forms.Label
+        Me.TabPage8 = New System.Windows.Forms.TabPage
+        Me.AtcGridBCMonthly = New atcControls.atcGrid
+        Me.txtOutputFile = New System.Windows.Forms.TextBox
+        Me.Label6 = New System.Windows.Forms.Label
         Me.Label20 = New System.Windows.Forms.Label
         Me.ComboBox14 = New System.Windows.Forms.ComboBox
         Me.Label21 = New System.Windows.Forms.Label
@@ -237,28 +258,13 @@ Public Class frmUEB
         Me.Label45 = New System.Windows.Forms.Label
         Me.ComboBox39 = New System.Windows.Forms.ComboBox
         Me.cmdSimulate = New System.Windows.Forms.Button
-        Me.atcTextTimeStep = New atcControls.atcText
-        Me.AtcTextEHour = New atcControls.atcText
-        Me.AtcTextSHour = New atcControls.atcText
-        Me.AtcTextEDay = New atcControls.atcText
-        Me.AtcTextSDay = New atcControls.atcText
-        Me.AtcTextSYear = New atcControls.atcText
-        Me.AtcTextEMon = New atcControls.atcText
-        Me.AtcTextSMonth = New atcControls.atcText
-        Me.AtcTextEYear = New atcControls.atcText
-        Me.AtcGridSiteVars = New atcControls.atcGrid
-        Me.AtcGridBCMonthly = New atcControls.atcGrid
-        Me.AtcGridModelParms = New atcControls.atcGrid
-        Me.Label8 = New System.Windows.Forms.Label
-        Me.AtcTextUTCOffset = New atcControls.atcText
-        Me.AtcGridInputControl = New atcControls.atcGrid
         Me.TabControl1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.TabPage3.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.TabPage7.SuspendLayout()
-        Me.TabPage8.SuspendLayout()
         Me.TabPage1.SuspendLayout()
+        Me.TabPage8.SuspendLayout()
         Me.SuspendLayout()
         '
         'cmdCancel
@@ -266,7 +272,7 @@ Public Class frmUEB
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCancel.Location = New System.Drawing.Point(328, 500)
+        Me.cmdCancel.Location = New System.Drawing.Point(604, 500)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(73, 28)
         Me.cmdCancel.TabIndex = 5
@@ -276,7 +282,7 @@ Public Class frmUEB
         '
         Me.cmdHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdHelp.Location = New System.Drawing.Point(407, 500)
+        Me.cmdHelp.Location = New System.Drawing.Point(683, 500)
         Me.cmdHelp.Name = "cmdHelp"
         Me.cmdHelp.Size = New System.Drawing.Size(65, 28)
         Me.cmdHelp.TabIndex = 6
@@ -286,7 +292,7 @@ Public Class frmUEB
         '
         Me.cmdAbout.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdAbout.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdAbout.Location = New System.Drawing.Point(478, 500)
+        Me.cmdAbout.Location = New System.Drawing.Point(754, 500)
         Me.cmdAbout.Name = "cmdAbout"
         Me.cmdAbout.Size = New System.Drawing.Size(72, 28)
         Me.cmdAbout.TabIndex = 7
@@ -309,7 +315,7 @@ Public Class frmUEB
         Me.TabControl1.Multiline = True
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(539, 474)
+        Me.TabControl1.Size = New System.Drawing.Size(815, 474)
         Me.TabControl1.TabIndex = 8
         '
         'TabPage2
@@ -323,14 +329,14 @@ Public Class frmUEB
         Me.TabPage2.Controls.Add(Me.Label62)
         Me.TabPage2.Location = New System.Drawing.Point(4, 25)
         Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Size = New System.Drawing.Size(531, 445)
+        Me.TabPage2.Size = New System.Drawing.Size(807, 445)
         Me.TabPage2.TabIndex = 12
         Me.TabPage2.Text = "General"
         Me.TabPage2.UseVisualStyleBackColor = True
         '
         'txtWatershedFile
         '
-        Me.txtWatershedFile.Location = New System.Drawing.Point(136, 171)
+        Me.txtWatershedFile.Location = New System.Drawing.Point(136, 266)
         Me.txtWatershedFile.Name = "txtWatershedFile"
         Me.txtWatershedFile.Size = New System.Drawing.Size(380, 20)
         Me.txtWatershedFile.TabIndex = 48
@@ -338,7 +344,7 @@ Public Class frmUEB
         'Label7
         '
         Me.Label7.AutoSize = True
-        Me.Label7.Location = New System.Drawing.Point(18, 178)
+        Me.Label7.Location = New System.Drawing.Point(18, 273)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(112, 13)
         Me.Label7.TabIndex = 47
@@ -346,14 +352,14 @@ Public Class frmUEB
         '
         'txtProjectName
         '
-        Me.txtProjectName.Location = New System.Drawing.Point(136, 64)
+        Me.txtProjectName.Location = New System.Drawing.Point(136, 159)
         Me.txtProjectName.Name = "txtProjectName"
         Me.txtProjectName.Size = New System.Drawing.Size(380, 20)
         Me.txtProjectName.TabIndex = 46
         '
         'txtMasterFile
         '
-        Me.txtMasterFile.Location = New System.Drawing.Point(136, 29)
+        Me.txtMasterFile.Location = New System.Drawing.Point(136, 124)
         Me.txtMasterFile.Name = "txtMasterFile"
         Me.txtMasterFile.Size = New System.Drawing.Size(380, 20)
         Me.txtMasterFile.TabIndex = 45
@@ -369,7 +375,7 @@ Public Class frmUEB
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(18, 32)
+        Me.Label2.Location = New System.Drawing.Point(18, 127)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(97, 13)
         Me.Label2.TabIndex = 33
@@ -378,7 +384,7 @@ Public Class frmUEB
         'Label62
         '
         Me.Label62.AutoSize = True
-        Me.Label62.Location = New System.Drawing.Point(18, 67)
+        Me.Label62.Location = New System.Drawing.Point(18, 162)
         Me.Label62.Name = "Label62"
         Me.Label62.Size = New System.Drawing.Size(99, 13)
         Me.Label62.TabIndex = 31
@@ -392,10 +398,27 @@ Public Class frmUEB
         Me.TabPage3.Controls.Add(Me.GroupBox2)
         Me.TabPage3.Location = New System.Drawing.Point(4, 25)
         Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Size = New System.Drawing.Size(531, 445)
+        Me.TabPage3.Size = New System.Drawing.Size(807, 445)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Input Control"
         Me.TabPage3.UseVisualStyleBackColor = True
+        '
+        'AtcGridInputControl
+        '
+        Me.AtcGridInputControl.AllowHorizontalScrolling = True
+        Me.AtcGridInputControl.AllowNewValidValues = False
+        Me.AtcGridInputControl.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridInputControl.CellBackColor = System.Drawing.SystemColors.Window
+        Me.AtcGridInputControl.Fixed3D = False
+        Me.AtcGridInputControl.LineColor = System.Drawing.SystemColors.Control
+        Me.AtcGridInputControl.LineWidth = 1.0!
+        Me.AtcGridInputControl.Location = New System.Drawing.Point(3, 161)
+        Me.AtcGridInputControl.Name = "AtcGridInputControl"
+        Me.AtcGridInputControl.Size = New System.Drawing.Size(801, 281)
+        Me.AtcGridInputControl.Source = Nothing
+        Me.AtcGridInputControl.TabIndex = 64
         '
         'txtInputFile
         '
@@ -417,6 +440,9 @@ Public Class frmUEB
         '
         Me.GroupBox2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox2.Controls.Add(Me.AtcTextEMinute)
+        Me.GroupBox2.Controls.Add(Me.Label9)
+        Me.GroupBox2.Controls.Add(Me.AtcTextSMinute)
         Me.GroupBox2.Controls.Add(Me.AtcTextUTCOffset)
         Me.GroupBox2.Controls.Add(Me.Label8)
         Me.GroupBox2.Controls.Add(Me.lblTimeStep)
@@ -437,19 +463,129 @@ Public Class frmUEB
         Me.GroupBox2.Controls.Add(Me.AtcTextEYear)
         Me.GroupBox2.Location = New System.Drawing.Point(19, 45)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(493, 96)
+        Me.GroupBox2.Size = New System.Drawing.Size(769, 96)
         Me.GroupBox2.TabIndex = 29
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Simulation Dates"
         '
+        'AtcTextEMinute
+        '
+        Me.AtcTextEMinute.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextEMinute.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtcTextEMinute.DefaultValue = ""
+        Me.AtcTextEMinute.HardMax = 24
+        Me.AtcTextEMinute.HardMin = 0
+        Me.AtcTextEMinute.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextEMinute.Location = New System.Drawing.Point(277, 64)
+        Me.AtcTextEMinute.MaxWidth = 20
+        Me.AtcTextEMinute.Name = "AtcTextEMinute"
+        Me.AtcTextEMinute.NumericFormat = "0"
+        Me.AtcTextEMinute.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextEMinute.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextEMinute.SelLength = 0
+        Me.AtcTextEMinute.SelStart = 0
+        Me.AtcTextEMinute.Size = New System.Drawing.Size(44, 21)
+        Me.AtcTextEMinute.SoftMax = -999
+        Me.AtcTextEMinute.SoftMin = -999
+        Me.AtcTextEMinute.TabIndex = 47
+        Me.AtcTextEMinute.ValueDouble = 0
+        Me.AtcTextEMinute.ValueInteger = 0
+        '
+        'Label9
+        '
+        Me.Label9.AutoSize = True
+        Me.Label9.Location = New System.Drawing.Point(274, 20)
+        Me.Label9.Name = "Label9"
+        Me.Label9.Size = New System.Drawing.Size(39, 13)
+        Me.Label9.TabIndex = 46
+        Me.Label9.Text = "Minute"
+        '
+        'AtcTextSMinute
+        '
+        Me.AtcTextSMinute.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextSMinute.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtcTextSMinute.DefaultValue = ""
+        Me.AtcTextSMinute.HardMax = 24
+        Me.AtcTextSMinute.HardMin = 0
+        Me.AtcTextSMinute.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextSMinute.Location = New System.Drawing.Point(277, 38)
+        Me.AtcTextSMinute.MaxWidth = 20
+        Me.AtcTextSMinute.Name = "AtcTextSMinute"
+        Me.AtcTextSMinute.NumericFormat = "0"
+        Me.AtcTextSMinute.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextSMinute.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextSMinute.SelLength = 0
+        Me.AtcTextSMinute.SelStart = 0
+        Me.AtcTextSMinute.Size = New System.Drawing.Size(44, 21)
+        Me.AtcTextSMinute.SoftMax = -999
+        Me.AtcTextSMinute.SoftMin = -999
+        Me.AtcTextSMinute.TabIndex = 45
+        Me.AtcTextSMinute.ValueDouble = 0
+        Me.AtcTextSMinute.ValueInteger = 0
+        '
+        'AtcTextUTCOffset
+        '
+        Me.AtcTextUTCOffset.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextUTCOffset.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtcTextUTCOffset.DefaultValue = ""
+        Me.AtcTextUTCOffset.HardMax = 24
+        Me.AtcTextUTCOffset.HardMin = 1
+        Me.AtcTextUTCOffset.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextUTCOffset.Location = New System.Drawing.Point(450, 64)
+        Me.AtcTextUTCOffset.MaxWidth = 20
+        Me.AtcTextUTCOffset.Name = "AtcTextUTCOffset"
+        Me.AtcTextUTCOffset.NumericFormat = "0"
+        Me.AtcTextUTCOffset.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextUTCOffset.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextUTCOffset.SelLength = 0
+        Me.AtcTextUTCOffset.SelStart = 0
+        Me.AtcTextUTCOffset.Size = New System.Drawing.Size(35, 21)
+        Me.AtcTextUTCOffset.SoftMax = -999
+        Me.AtcTextUTCOffset.SoftMin = -999
+        Me.AtcTextUTCOffset.TabIndex = 44
+        Me.AtcTextUTCOffset.ValueDouble = 1
+        Me.AtcTextUTCOffset.ValueInteger = 1
+        '
+        'Label8
+        '
+        Me.Label8.AutoSize = True
+        Me.Label8.Location = New System.Drawing.Point(356, 64)
+        Me.Label8.Name = "Label8"
+        Me.Label8.Size = New System.Drawing.Size(83, 13)
+        Me.Label8.TabIndex = 43
+        Me.Label8.Text = "UTC Offset (hrs)"
+        '
         'lblTimeStep
         '
         Me.lblTimeStep.AutoSize = True
-        Me.lblTimeStep.Location = New System.Drawing.Point(297, 38)
+        Me.lblTimeStep.Location = New System.Drawing.Point(356, 38)
         Me.lblTimeStep.Name = "lblTimeStep"
         Me.lblTimeStep.Size = New System.Drawing.Size(78, 13)
         Me.lblTimeStep.TabIndex = 42
         Me.lblTimeStep.Text = "Time Step (hrs)"
+        '
+        'atcTextTimeStep
+        '
+        Me.atcTextTimeStep.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atcTextTimeStep.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.atcTextTimeStep.DefaultValue = ""
+        Me.atcTextTimeStep.HardMax = 24
+        Me.atcTextTimeStep.HardMin = 1
+        Me.atcTextTimeStep.InsideLimitsBackground = System.Drawing.Color.White
+        Me.atcTextTimeStep.Location = New System.Drawing.Point(450, 38)
+        Me.atcTextTimeStep.MaxWidth = 20
+        Me.atcTextTimeStep.Name = "atcTextTimeStep"
+        Me.atcTextTimeStep.NumericFormat = "0"
+        Me.atcTextTimeStep.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.atcTextTimeStep.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.atcTextTimeStep.SelLength = 0
+        Me.atcTextTimeStep.SelStart = 0
+        Me.atcTextTimeStep.Size = New System.Drawing.Size(35, 21)
+        Me.atcTextTimeStep.SoftMax = -999
+        Me.atcTextTimeStep.SoftMin = -999
+        Me.atcTextTimeStep.TabIndex = 41
+        Me.atcTextTimeStep.ValueDouble = 1
+        Me.atcTextTimeStep.ValueInteger = 1
         '
         'Label1
         '
@@ -459,6 +595,52 @@ Public Class frmUEB
         Me.Label1.Size = New System.Drawing.Size(30, 13)
         Me.Label1.TabIndex = 40
         Me.Label1.Text = "Hour"
+        '
+        'AtcTextEHour
+        '
+        Me.AtcTextEHour.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextEHour.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtcTextEHour.DefaultValue = ""
+        Me.AtcTextEHour.HardMax = 24
+        Me.AtcTextEHour.HardMin = 0
+        Me.AtcTextEHour.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextEHour.Location = New System.Drawing.Point(227, 64)
+        Me.AtcTextEHour.MaxWidth = 20
+        Me.AtcTextEHour.Name = "AtcTextEHour"
+        Me.AtcTextEHour.NumericFormat = "0"
+        Me.AtcTextEHour.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextEHour.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextEHour.SelLength = 0
+        Me.AtcTextEHour.SelStart = 0
+        Me.AtcTextEHour.Size = New System.Drawing.Size(44, 21)
+        Me.AtcTextEHour.SoftMax = -999
+        Me.AtcTextEHour.SoftMin = -999
+        Me.AtcTextEHour.TabIndex = 39
+        Me.AtcTextEHour.ValueDouble = 0
+        Me.AtcTextEHour.ValueInteger = 0
+        '
+        'AtcTextSHour
+        '
+        Me.AtcTextSHour.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextSHour.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtcTextSHour.DefaultValue = ""
+        Me.AtcTextSHour.HardMax = 24
+        Me.AtcTextSHour.HardMin = 0
+        Me.AtcTextSHour.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextSHour.Location = New System.Drawing.Point(227, 38)
+        Me.AtcTextSHour.MaxWidth = 20
+        Me.AtcTextSHour.Name = "AtcTextSHour"
+        Me.AtcTextSHour.NumericFormat = "0"
+        Me.AtcTextSHour.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextSHour.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextSHour.SelLength = 0
+        Me.AtcTextSHour.SelStart = 0
+        Me.AtcTextSHour.Size = New System.Drawing.Size(44, 21)
+        Me.AtcTextSHour.SoftMax = -999
+        Me.AtcTextSHour.SoftMin = -999
+        Me.AtcTextSHour.TabIndex = 38
+        Me.AtcTextSHour.ValueDouble = 0
+        Me.AtcTextSHour.ValueInteger = 0
         '
         'Label54
         '
@@ -505,6 +687,144 @@ Public Class frmUEB
         Me.Label58.TabIndex = 33
         Me.Label58.Text = "Year"
         '
+        'AtcTextEDay
+        '
+        Me.AtcTextEDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextEDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtcTextEDay.DefaultValue = ""
+        Me.AtcTextEDay.HardMax = 31
+        Me.AtcTextEDay.HardMin = 1
+        Me.AtcTextEDay.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextEDay.Location = New System.Drawing.Point(178, 64)
+        Me.AtcTextEDay.MaxWidth = 20
+        Me.AtcTextEDay.Name = "AtcTextEDay"
+        Me.AtcTextEDay.NumericFormat = "0"
+        Me.AtcTextEDay.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextEDay.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextEDay.SelLength = 0
+        Me.AtcTextEDay.SelStart = 0
+        Me.AtcTextEDay.Size = New System.Drawing.Size(44, 21)
+        Me.AtcTextEDay.SoftMax = -999
+        Me.AtcTextEDay.SoftMin = -999
+        Me.AtcTextEDay.TabIndex = 32
+        Me.AtcTextEDay.ValueDouble = 31
+        Me.AtcTextEDay.ValueInteger = 31
+        '
+        'AtcTextSDay
+        '
+        Me.AtcTextSDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextSDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtcTextSDay.DefaultValue = ""
+        Me.AtcTextSDay.HardMax = 31
+        Me.AtcTextSDay.HardMin = 1
+        Me.AtcTextSDay.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextSDay.Location = New System.Drawing.Point(178, 38)
+        Me.AtcTextSDay.MaxWidth = 20
+        Me.AtcTextSDay.Name = "AtcTextSDay"
+        Me.AtcTextSDay.NumericFormat = "0"
+        Me.AtcTextSDay.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextSDay.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextSDay.SelLength = 0
+        Me.AtcTextSDay.SelStart = 0
+        Me.AtcTextSDay.Size = New System.Drawing.Size(44, 21)
+        Me.AtcTextSDay.SoftMax = -999
+        Me.AtcTextSDay.SoftMin = -999
+        Me.AtcTextSDay.TabIndex = 31
+        Me.AtcTextSDay.ValueDouble = 1
+        Me.AtcTextSDay.ValueInteger = 1
+        '
+        'AtcTextSYear
+        '
+        Me.AtcTextSYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextSYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtcTextSYear.DefaultValue = ""
+        Me.AtcTextSYear.HardMax = 9999
+        Me.AtcTextSYear.HardMin = 0
+        Me.AtcTextSYear.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextSYear.Location = New System.Drawing.Point(60, 38)
+        Me.AtcTextSYear.MaxWidth = 20
+        Me.AtcTextSYear.Name = "AtcTextSYear"
+        Me.AtcTextSYear.NumericFormat = "0"
+        Me.AtcTextSYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextSYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextSYear.SelLength = 0
+        Me.AtcTextSYear.SelStart = 0
+        Me.AtcTextSYear.Size = New System.Drawing.Size(64, 21)
+        Me.AtcTextSYear.SoftMax = -999
+        Me.AtcTextSYear.SoftMin = -999
+        Me.AtcTextSYear.TabIndex = 30
+        Me.AtcTextSYear.ValueDouble = 2000
+        Me.AtcTextSYear.ValueInteger = 2000
+        '
+        'AtcTextEMon
+        '
+        Me.AtcTextEMon.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextEMon.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtcTextEMon.DefaultValue = ""
+        Me.AtcTextEMon.HardMax = 12
+        Me.AtcTextEMon.HardMin = 1
+        Me.AtcTextEMon.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextEMon.Location = New System.Drawing.Point(129, 64)
+        Me.AtcTextEMon.MaxWidth = 20
+        Me.AtcTextEMon.Name = "AtcTextEMon"
+        Me.AtcTextEMon.NumericFormat = "0"
+        Me.AtcTextEMon.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextEMon.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextEMon.SelLength = 0
+        Me.AtcTextEMon.SelStart = 0
+        Me.AtcTextEMon.Size = New System.Drawing.Size(44, 21)
+        Me.AtcTextEMon.SoftMax = -999
+        Me.AtcTextEMon.SoftMin = -999
+        Me.AtcTextEMon.TabIndex = 29
+        Me.AtcTextEMon.ValueDouble = 12
+        Me.AtcTextEMon.ValueInteger = 12
+        '
+        'AtcTextSMonth
+        '
+        Me.AtcTextSMonth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextSMonth.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtcTextSMonth.DefaultValue = ""
+        Me.AtcTextSMonth.HardMax = 12
+        Me.AtcTextSMonth.HardMin = 1
+        Me.AtcTextSMonth.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextSMonth.Location = New System.Drawing.Point(129, 38)
+        Me.AtcTextSMonth.MaxWidth = 20
+        Me.AtcTextSMonth.Name = "AtcTextSMonth"
+        Me.AtcTextSMonth.NumericFormat = "0"
+        Me.AtcTextSMonth.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextSMonth.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextSMonth.SelLength = 0
+        Me.AtcTextSMonth.SelStart = 0
+        Me.AtcTextSMonth.Size = New System.Drawing.Size(44, 21)
+        Me.AtcTextSMonth.SoftMax = -999
+        Me.AtcTextSMonth.SoftMin = -999
+        Me.AtcTextSMonth.TabIndex = 28
+        Me.AtcTextSMonth.ValueDouble = 1
+        Me.AtcTextSMonth.ValueInteger = 1
+        '
+        'AtcTextEYear
+        '
+        Me.AtcTextEYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextEYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtcTextEYear.DefaultValue = ""
+        Me.AtcTextEYear.HardMax = 9999
+        Me.AtcTextEYear.HardMin = 0
+        Me.AtcTextEYear.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextEYear.Location = New System.Drawing.Point(60, 64)
+        Me.AtcTextEYear.MaxWidth = 20
+        Me.AtcTextEYear.Name = "AtcTextEYear"
+        Me.AtcTextEYear.NumericFormat = "0"
+        Me.AtcTextEYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextEYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextEYear.SelLength = 0
+        Me.AtcTextEYear.SelStart = 0
+        Me.AtcTextEYear.Size = New System.Drawing.Size(64, 21)
+        Me.AtcTextEYear.SoftMax = -999
+        Me.AtcTextEYear.SoftMin = -999
+        Me.AtcTextEYear.TabIndex = 27
+        Me.AtcTextEYear.ValueDouble = 2000
+        Me.AtcTextEYear.ValueInteger = 2000
+        '
         'TabPage7
         '
         Me.TabPage7.Controls.Add(Me.AtcGridSiteVars)
@@ -512,10 +832,27 @@ Public Class frmUEB
         Me.TabPage7.Controls.Add(Me.Label5)
         Me.TabPage7.Location = New System.Drawing.Point(4, 25)
         Me.TabPage7.Name = "TabPage7"
-        Me.TabPage7.Size = New System.Drawing.Size(531, 445)
+        Me.TabPage7.Size = New System.Drawing.Size(807, 445)
         Me.TabPage7.TabIndex = 8
         Me.TabPage7.Text = "Site Vars/Init Conds"
         Me.TabPage7.UseVisualStyleBackColor = True
+        '
+        'AtcGridSiteVars
+        '
+        Me.AtcGridSiteVars.AllowHorizontalScrolling = True
+        Me.AtcGridSiteVars.AllowNewValidValues = False
+        Me.AtcGridSiteVars.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridSiteVars.CellBackColor = System.Drawing.SystemColors.Window
+        Me.AtcGridSiteVars.Fixed3D = False
+        Me.AtcGridSiteVars.LineColor = System.Drawing.SystemColors.Control
+        Me.AtcGridSiteVars.LineWidth = 1.0!
+        Me.AtcGridSiteVars.Location = New System.Drawing.Point(3, 44)
+        Me.AtcGridSiteVars.Name = "AtcGridSiteVars"
+        Me.AtcGridSiteVars.Size = New System.Drawing.Size(801, 377)
+        Me.AtcGridSiteVars.Source = Nothing
+        Me.AtcGridSiteVars.TabIndex = 63
         '
         'txtSiteFile
         '
@@ -533,34 +870,6 @@ Public Class frmUEB
         Me.Label5.TabIndex = 61
         Me.Label5.Text = "Site File:"
         '
-        'TabPage8
-        '
-        Me.TabPage8.Controls.Add(Me.AtcGridBCMonthly)
-        Me.TabPage8.Controls.Add(Me.txtOutputFile)
-        Me.TabPage8.Controls.Add(Me.Label6)
-        Me.TabPage8.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage8.Name = "TabPage8"
-        Me.TabPage8.Size = New System.Drawing.Size(531, 445)
-        Me.TabPage8.TabIndex = 9
-        Me.TabPage8.Text = "Output Control"
-        Me.TabPage8.UseVisualStyleBackColor = True
-        '
-        'txtOutputFile
-        '
-        Me.txtOutputFile.Location = New System.Drawing.Point(115, 9)
-        Me.txtOutputFile.Name = "txtOutputFile"
-        Me.txtOutputFile.Size = New System.Drawing.Size(403, 20)
-        Me.txtOutputFile.TabIndex = 61
-        '
-        'Label6
-        '
-        Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(12, 12)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(97, 13)
-        Me.Label6.TabIndex = 60
-        Me.Label6.Text = "Output Control File:"
-        '
         'TabPage1
         '
         Me.TabPage1.Controls.Add(Me.AtcGridModelParms)
@@ -568,10 +877,26 @@ Public Class frmUEB
         Me.TabPage1.Controls.Add(Me.Label4)
         Me.TabPage1.Location = New System.Drawing.Point(4, 25)
         Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Size = New System.Drawing.Size(531, 445)
+        Me.TabPage1.Size = New System.Drawing.Size(807, 445)
         Me.TabPage1.TabIndex = 11
         Me.TabPage1.Text = "Constant Parameters"
         Me.TabPage1.UseVisualStyleBackColor = True
+        '
+        'AtcGridModelParms
+        '
+        Me.AtcGridModelParms.AllowHorizontalScrolling = True
+        Me.AtcGridModelParms.AllowNewValidValues = False
+        Me.AtcGridModelParms.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridModelParms.CellBackColor = System.Drawing.SystemColors.Window
+        Me.AtcGridModelParms.Fixed3D = False
+        Me.AtcGridModelParms.LineColor = System.Drawing.SystemColors.Control
+        Me.AtcGridModelParms.LineWidth = 1.0!
+        Me.AtcGridModelParms.Location = New System.Drawing.Point(3, 53)
+        Me.AtcGridModelParms.Name = "AtcGridModelParms"
+        Me.AtcGridModelParms.Size = New System.Drawing.Size(801, 392)
+        Me.AtcGridModelParms.Source = Nothing
+        Me.AtcGridModelParms.TabIndex = 60
         '
         'txtParameterFile
         '
@@ -588,6 +913,52 @@ Public Class frmUEB
         Me.Label4.Size = New System.Drawing.Size(77, 13)
         Me.Label4.TabIndex = 58
         Me.Label4.Text = "Parameter File:"
+        '
+        'TabPage8
+        '
+        Me.TabPage8.Controls.Add(Me.AtcGridBCMonthly)
+        Me.TabPage8.Controls.Add(Me.txtOutputFile)
+        Me.TabPage8.Controls.Add(Me.Label6)
+        Me.TabPage8.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage8.Name = "TabPage8"
+        Me.TabPage8.Size = New System.Drawing.Size(807, 445)
+        Me.TabPage8.TabIndex = 9
+        Me.TabPage8.Text = "Output Control"
+        Me.TabPage8.UseVisualStyleBackColor = True
+        '
+        'AtcGridBCMonthly
+        '
+        Me.AtcGridBCMonthly.AllowHorizontalScrolling = True
+        Me.AtcGridBCMonthly.AllowNewValidValues = False
+        Me.AtcGridBCMonthly.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridBCMonthly.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridBCMonthly.Fixed3D = False
+        Me.AtcGridBCMonthly.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AtcGridBCMonthly.LineColor = System.Drawing.Color.Empty
+        Me.AtcGridBCMonthly.LineWidth = 0.0!
+        Me.AtcGridBCMonthly.Location = New System.Drawing.Point(0, 46)
+        Me.AtcGridBCMonthly.Name = "AtcGridBCMonthly"
+        Me.AtcGridBCMonthly.Size = New System.Drawing.Size(807, 353)
+        Me.AtcGridBCMonthly.Source = Nothing
+        Me.AtcGridBCMonthly.TabIndex = 62
+        '
+        'txtOutputFile
+        '
+        Me.txtOutputFile.Location = New System.Drawing.Point(115, 9)
+        Me.txtOutputFile.Name = "txtOutputFile"
+        Me.txtOutputFile.Size = New System.Drawing.Size(403, 20)
+        Me.txtOutputFile.TabIndex = 61
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(12, 12)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(97, 13)
+        Me.Label6.TabIndex = 60
+        Me.Label6.Text = "Output Control File:"
         '
         'Label20
         '
@@ -1172,318 +1543,11 @@ Public Class frmUEB
         Me.cmdSimulate.TabIndex = 10
         Me.cmdSimulate.Text = "Simulate"
         '
-        'atcTextTimeStep
-        '
-        Me.atcTextTimeStep.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atcTextTimeStep.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.atcTextTimeStep.DefaultValue = ""
-        Me.atcTextTimeStep.HardMax = 24
-        Me.atcTextTimeStep.HardMin = 1
-        Me.atcTextTimeStep.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atcTextTimeStep.Location = New System.Drawing.Point(391, 38)
-        Me.atcTextTimeStep.MaxWidth = 20
-        Me.atcTextTimeStep.Name = "atcTextTimeStep"
-        Me.atcTextTimeStep.NumericFormat = "0"
-        Me.atcTextTimeStep.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atcTextTimeStep.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atcTextTimeStep.SelLength = 0
-        Me.atcTextTimeStep.SelStart = 0
-        Me.atcTextTimeStep.Size = New System.Drawing.Size(54, 21)
-        Me.atcTextTimeStep.SoftMax = -999
-        Me.atcTextTimeStep.SoftMin = -999
-        Me.atcTextTimeStep.TabIndex = 41
-        Me.atcTextTimeStep.ValueDouble = 1
-        Me.atcTextTimeStep.ValueInteger = 1
-        '
-        'AtcTextEHour
-        '
-        Me.AtcTextEHour.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcTextEHour.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcTextEHour.DefaultValue = ""
-        Me.AtcTextEHour.HardMax = 24
-        Me.AtcTextEHour.HardMin = 0
-        Me.AtcTextEHour.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcTextEHour.Location = New System.Drawing.Point(227, 64)
-        Me.AtcTextEHour.MaxWidth = 20
-        Me.AtcTextEHour.Name = "AtcTextEHour"
-        Me.AtcTextEHour.NumericFormat = "0"
-        Me.AtcTextEHour.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcTextEHour.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcTextEHour.SelLength = 0
-        Me.AtcTextEHour.SelStart = 0
-        Me.AtcTextEHour.Size = New System.Drawing.Size(44, 21)
-        Me.AtcTextEHour.SoftMax = -999
-        Me.AtcTextEHour.SoftMin = -999
-        Me.AtcTextEHour.TabIndex = 39
-        Me.AtcTextEHour.ValueDouble = 0
-        Me.AtcTextEHour.ValueInteger = 0
-        '
-        'AtcTextSHour
-        '
-        Me.AtcTextSHour.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcTextSHour.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcTextSHour.DefaultValue = ""
-        Me.AtcTextSHour.HardMax = 24
-        Me.AtcTextSHour.HardMin = 0
-        Me.AtcTextSHour.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcTextSHour.Location = New System.Drawing.Point(227, 38)
-        Me.AtcTextSHour.MaxWidth = 20
-        Me.AtcTextSHour.Name = "AtcTextSHour"
-        Me.AtcTextSHour.NumericFormat = "0"
-        Me.AtcTextSHour.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcTextSHour.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcTextSHour.SelLength = 0
-        Me.AtcTextSHour.SelStart = 0
-        Me.AtcTextSHour.Size = New System.Drawing.Size(44, 21)
-        Me.AtcTextSHour.SoftMax = -999
-        Me.AtcTextSHour.SoftMin = -999
-        Me.AtcTextSHour.TabIndex = 38
-        Me.AtcTextSHour.ValueDouble = 0
-        Me.AtcTextSHour.ValueInteger = 0
-        '
-        'AtcTextEDay
-        '
-        Me.AtcTextEDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcTextEDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcTextEDay.DefaultValue = ""
-        Me.AtcTextEDay.HardMax = 31
-        Me.AtcTextEDay.HardMin = 1
-        Me.AtcTextEDay.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcTextEDay.Location = New System.Drawing.Point(178, 64)
-        Me.AtcTextEDay.MaxWidth = 20
-        Me.AtcTextEDay.Name = "AtcTextEDay"
-        Me.AtcTextEDay.NumericFormat = "0"
-        Me.AtcTextEDay.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcTextEDay.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcTextEDay.SelLength = 0
-        Me.AtcTextEDay.SelStart = 0
-        Me.AtcTextEDay.Size = New System.Drawing.Size(44, 21)
-        Me.AtcTextEDay.SoftMax = -999
-        Me.AtcTextEDay.SoftMin = -999
-        Me.AtcTextEDay.TabIndex = 32
-        Me.AtcTextEDay.ValueDouble = 31
-        Me.AtcTextEDay.ValueInteger = 31
-        '
-        'AtcTextSDay
-        '
-        Me.AtcTextSDay.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcTextSDay.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcTextSDay.DefaultValue = ""
-        Me.AtcTextSDay.HardMax = 31
-        Me.AtcTextSDay.HardMin = 1
-        Me.AtcTextSDay.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcTextSDay.Location = New System.Drawing.Point(178, 38)
-        Me.AtcTextSDay.MaxWidth = 20
-        Me.AtcTextSDay.Name = "AtcTextSDay"
-        Me.AtcTextSDay.NumericFormat = "0"
-        Me.AtcTextSDay.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcTextSDay.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcTextSDay.SelLength = 0
-        Me.AtcTextSDay.SelStart = 0
-        Me.AtcTextSDay.Size = New System.Drawing.Size(44, 21)
-        Me.AtcTextSDay.SoftMax = -999
-        Me.AtcTextSDay.SoftMin = -999
-        Me.AtcTextSDay.TabIndex = 31
-        Me.AtcTextSDay.ValueDouble = 1
-        Me.AtcTextSDay.ValueInteger = 1
-        '
-        'AtcTextSYear
-        '
-        Me.AtcTextSYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcTextSYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcTextSYear.DefaultValue = ""
-        Me.AtcTextSYear.HardMax = 9999
-        Me.AtcTextSYear.HardMin = 0
-        Me.AtcTextSYear.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcTextSYear.Location = New System.Drawing.Point(60, 38)
-        Me.AtcTextSYear.MaxWidth = 20
-        Me.AtcTextSYear.Name = "AtcTextSYear"
-        Me.AtcTextSYear.NumericFormat = "0"
-        Me.AtcTextSYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcTextSYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcTextSYear.SelLength = 0
-        Me.AtcTextSYear.SelStart = 0
-        Me.AtcTextSYear.Size = New System.Drawing.Size(64, 21)
-        Me.AtcTextSYear.SoftMax = -999
-        Me.AtcTextSYear.SoftMin = -999
-        Me.AtcTextSYear.TabIndex = 30
-        Me.AtcTextSYear.ValueDouble = 2000
-        Me.AtcTextSYear.ValueInteger = 2000
-        '
-        'AtcTextEMon
-        '
-        Me.AtcTextEMon.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcTextEMon.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcTextEMon.DefaultValue = ""
-        Me.AtcTextEMon.HardMax = 12
-        Me.AtcTextEMon.HardMin = 1
-        Me.AtcTextEMon.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcTextEMon.Location = New System.Drawing.Point(129, 64)
-        Me.AtcTextEMon.MaxWidth = 20
-        Me.AtcTextEMon.Name = "AtcTextEMon"
-        Me.AtcTextEMon.NumericFormat = "0"
-        Me.AtcTextEMon.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcTextEMon.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcTextEMon.SelLength = 0
-        Me.AtcTextEMon.SelStart = 0
-        Me.AtcTextEMon.Size = New System.Drawing.Size(44, 21)
-        Me.AtcTextEMon.SoftMax = -999
-        Me.AtcTextEMon.SoftMin = -999
-        Me.AtcTextEMon.TabIndex = 29
-        Me.AtcTextEMon.ValueDouble = 12
-        Me.AtcTextEMon.ValueInteger = 12
-        '
-        'AtcTextSMonth
-        '
-        Me.AtcTextSMonth.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcTextSMonth.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcTextSMonth.DefaultValue = ""
-        Me.AtcTextSMonth.HardMax = 12
-        Me.AtcTextSMonth.HardMin = 1
-        Me.AtcTextSMonth.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcTextSMonth.Location = New System.Drawing.Point(129, 38)
-        Me.AtcTextSMonth.MaxWidth = 20
-        Me.AtcTextSMonth.Name = "AtcTextSMonth"
-        Me.AtcTextSMonth.NumericFormat = "0"
-        Me.AtcTextSMonth.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcTextSMonth.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcTextSMonth.SelLength = 0
-        Me.AtcTextSMonth.SelStart = 0
-        Me.AtcTextSMonth.Size = New System.Drawing.Size(44, 21)
-        Me.AtcTextSMonth.SoftMax = -999
-        Me.AtcTextSMonth.SoftMin = -999
-        Me.AtcTextSMonth.TabIndex = 28
-        Me.AtcTextSMonth.ValueDouble = 1
-        Me.AtcTextSMonth.ValueInteger = 1
-        '
-        'AtcTextEYear
-        '
-        Me.AtcTextEYear.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcTextEYear.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcTextEYear.DefaultValue = ""
-        Me.AtcTextEYear.HardMax = 9999
-        Me.AtcTextEYear.HardMin = 0
-        Me.AtcTextEYear.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcTextEYear.Location = New System.Drawing.Point(60, 64)
-        Me.AtcTextEYear.MaxWidth = 20
-        Me.AtcTextEYear.Name = "AtcTextEYear"
-        Me.AtcTextEYear.NumericFormat = "0"
-        Me.AtcTextEYear.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcTextEYear.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcTextEYear.SelLength = 0
-        Me.AtcTextEYear.SelStart = 0
-        Me.AtcTextEYear.Size = New System.Drawing.Size(64, 21)
-        Me.AtcTextEYear.SoftMax = -999
-        Me.AtcTextEYear.SoftMin = -999
-        Me.AtcTextEYear.TabIndex = 27
-        Me.AtcTextEYear.ValueDouble = 2000
-        Me.AtcTextEYear.ValueInteger = 2000
-        '
-        'AtcGridSiteVars
-        '
-        Me.AtcGridSiteVars.AllowHorizontalScrolling = True
-        Me.AtcGridSiteVars.AllowNewValidValues = False
-        Me.AtcGridSiteVars.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridSiteVars.CellBackColor = System.Drawing.SystemColors.Window
-        Me.AtcGridSiteVars.Fixed3D = False
-        Me.AtcGridSiteVars.LineColor = System.Drawing.SystemColors.Control
-        Me.AtcGridSiteVars.LineWidth = 1.0!
-        Me.AtcGridSiteVars.Location = New System.Drawing.Point(3, 44)
-        Me.AtcGridSiteVars.Name = "AtcGridSiteVars"
-        Me.AtcGridSiteVars.Size = New System.Drawing.Size(525, 377)
-        Me.AtcGridSiteVars.Source = Nothing
-        Me.AtcGridSiteVars.TabIndex = 63
-        '
-        'AtcGridBCMonthly
-        '
-        Me.AtcGridBCMonthly.AllowHorizontalScrolling = True
-        Me.AtcGridBCMonthly.AllowNewValidValues = False
-        Me.AtcGridBCMonthly.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridBCMonthly.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGridBCMonthly.Fixed3D = False
-        Me.AtcGridBCMonthly.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AtcGridBCMonthly.LineColor = System.Drawing.Color.Empty
-        Me.AtcGridBCMonthly.LineWidth = 0.0!
-        Me.AtcGridBCMonthly.Location = New System.Drawing.Point(0, 46)
-        Me.AtcGridBCMonthly.Name = "AtcGridBCMonthly"
-        Me.AtcGridBCMonthly.Size = New System.Drawing.Size(531, 353)
-        Me.AtcGridBCMonthly.Source = Nothing
-        Me.AtcGridBCMonthly.TabIndex = 62
-        '
-        'AtcGridModelParms
-        '
-        Me.AtcGridModelParms.AllowHorizontalScrolling = True
-        Me.AtcGridModelParms.AllowNewValidValues = False
-        Me.AtcGridModelParms.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridModelParms.CellBackColor = System.Drawing.SystemColors.Window
-        Me.AtcGridModelParms.Fixed3D = False
-        Me.AtcGridModelParms.LineColor = System.Drawing.SystemColors.Control
-        Me.AtcGridModelParms.LineWidth = 1.0!
-        Me.AtcGridModelParms.Location = New System.Drawing.Point(3, 53)
-        Me.AtcGridModelParms.Name = "AtcGridModelParms"
-        Me.AtcGridModelParms.Size = New System.Drawing.Size(525, 392)
-        Me.AtcGridModelParms.Source = Nothing
-        Me.AtcGridModelParms.TabIndex = 60
-        '
-        'Label8
-        '
-        Me.Label8.AutoSize = True
-        Me.Label8.Location = New System.Drawing.Point(297, 64)
-        Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(83, 13)
-        Me.Label8.TabIndex = 43
-        Me.Label8.Text = "UTC Offset (hrs)"
-        '
-        'AtcTextUTCOffset
-        '
-        Me.AtcTextUTCOffset.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.AtcTextUTCOffset.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.AtcTextUTCOffset.DefaultValue = ""
-        Me.AtcTextUTCOffset.HardMax = 24
-        Me.AtcTextUTCOffset.HardMin = 1
-        Me.AtcTextUTCOffset.InsideLimitsBackground = System.Drawing.Color.White
-        Me.AtcTextUTCOffset.Location = New System.Drawing.Point(391, 64)
-        Me.AtcTextUTCOffset.MaxWidth = 20
-        Me.AtcTextUTCOffset.Name = "AtcTextUTCOffset"
-        Me.AtcTextUTCOffset.NumericFormat = "0"
-        Me.AtcTextUTCOffset.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.AtcTextUTCOffset.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.AtcTextUTCOffset.SelLength = 0
-        Me.AtcTextUTCOffset.SelStart = 0
-        Me.AtcTextUTCOffset.Size = New System.Drawing.Size(54, 21)
-        Me.AtcTextUTCOffset.SoftMax = -999
-        Me.AtcTextUTCOffset.SoftMin = -999
-        Me.AtcTextUTCOffset.TabIndex = 44
-        Me.AtcTextUTCOffset.ValueDouble = 1
-        Me.AtcTextUTCOffset.ValueInteger = 1
-        '
-        'AtcGridInputControl
-        '
-        Me.AtcGridInputControl.AllowHorizontalScrolling = True
-        Me.AtcGridInputControl.AllowNewValidValues = False
-        Me.AtcGridInputControl.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridInputControl.CellBackColor = System.Drawing.SystemColors.Window
-        Me.AtcGridInputControl.Fixed3D = False
-        Me.AtcGridInputControl.LineColor = System.Drawing.SystemColors.Control
-        Me.AtcGridInputControl.LineWidth = 1.0!
-        Me.AtcGridInputControl.Location = New System.Drawing.Point(3, 161)
-        Me.AtcGridInputControl.Name = "AtcGridInputControl"
-        Me.AtcGridInputControl.Size = New System.Drawing.Size(525, 281)
-        Me.AtcGridInputControl.Source = Nothing
-        Me.AtcGridInputControl.TabIndex = 64
-        '
         'frmUEB
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.cmdCancel
-        Me.ClientSize = New System.Drawing.Size(570, 537)
+        Me.ClientSize = New System.Drawing.Size(846, 537)
         Me.Controls.Add(Me.cmdSimulate)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.cmdAbout)
@@ -1502,10 +1566,10 @@ Public Class frmUEB
         Me.GroupBox2.PerformLayout()
         Me.TabPage7.ResumeLayout(False)
         Me.TabPage7.PerformLayout()
-        Me.TabPage8.ResumeLayout(False)
-        Me.TabPage8.PerformLayout()
         Me.TabPage1.ResumeLayout(False)
         Me.TabPage1.PerformLayout()
+        Me.TabPage8.ResumeLayout(False)
+        Me.TabPage8.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -1545,22 +1609,23 @@ Public Class frmUEB
         pParmData = New clsUEBParameterFile("")
         With AtcGridModelParms
             .Source = New atcControls.atcGridSource
-            .AllowHorizontalScrolling = False
+            '.AllowHorizontalScrolling = False
         End With
         SetParmGrid()
 
         pSiteData = New clsUEBSiteFile("")
         With AtcGridSiteVars
             .Source = New atcControls.atcGridSource
-            .AllowHorizontalScrolling = False
+            '.AllowHorizontalScrolling = False
         End With
         SetSiteGrid()
 
         pInputControlData = New clsUEBInputControl("")
         With AtcGridInputControl
             .Source = New atcControls.atcGridSource
-            .AllowHorizontalScrolling = False
+            '.AllowHorizontalScrolling = False
         End With
+        SetInputControl()
 
         pOutputControlData = New clsUEBOutputControl("")
 
@@ -1815,7 +1880,7 @@ Public Class frmUEB
 
         AtcGridModelParms.Clear()
         With AtcGridModelParms.Source
-            .Columns = 2
+            '.Columns = 2
             .ColorCells = True
             .FixedRows = 1
             .FixedColumns = 1
@@ -1828,6 +1893,7 @@ Public Class frmUEB
                 .CellValue(i, 1) = pParmData.Variables(i - 1).Value
             Next
         End With
+        AtcGridModelParms.SizeAllColumnsToContents()
         AtcGridModelParms.Refresh()
 
     End Sub
@@ -1859,6 +1925,20 @@ Public Class frmUEB
     End Sub
 
     Private Sub SetInputControl()
+
+        AtcTextSYear.Text = pInputControlData.SDate(0)
+        AtcTextSMonth.Text = pInputControlData.SDate(1)
+        AtcTextSDay.Text = pInputControlData.SDate(2)
+        AtcTextSHour.Text = pInputControlData.SDate(3)
+        AtcTextSMinute.Text = pInputControlData.SDate(4)
+        AtcTextEYear.Text = pInputControlData.EDate(0)
+        AtcTextEMon.Text = pInputControlData.EDate(1)
+        AtcTextEDay.Text = pInputControlData.EDate(2)
+        AtcTextEHour.Text = pInputControlData.EDate(3)
+        AtcTextEMinute.Text = pInputControlData.EDate(4)
+        atcTextTimeStep.Text = pInputControlData.TimeStep
+        AtcTextUTCOffset.Text = pInputControlData.UTCOffset
+
         AtcGridInputControl.Clear()
         With AtcGridInputControl.Source
             .FixedColumns = 1
