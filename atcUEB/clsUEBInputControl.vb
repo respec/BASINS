@@ -32,7 +32,7 @@ Public Class clsUEBInputControl
 
         Dim i As Integer
         Dim lStr As String
-        Dim lChrSep() As String = {" ", "."}
+        Dim lChrSep() As String = {" ", ".", vbTab}
         Dim lStrArray() As String
 
         FileName = aFilename
@@ -49,13 +49,13 @@ Public Class clsUEBInputControl
         lStr = ReplaceRepeats(lStr, " ") 'remove extra blanks
         lStrArray = lStr.Split(lChrSep, StringSplitOptions.None)
         For i = 0 To 4
-            SDate(i) = lStrArray(i)
+            Integer.TryParse(lStrArray(i), SDate(i))
         Next
         lStr = StrSplit(lFileContents, vbCrLf, "")
         lStr = ReplaceRepeats(lStr, " ") 'remove extra blanks
         lStrArray = lStr.Split(lChrSep, StringSplitOptions.None)
         For i = 0 To 4
-            EDate(i) = lStrArray(i)
+            Integer.TryParse(lStrArray(i), EDate(i))
         Next
         'read time step and UTC offset
         lStr = StrSplit(lFileContents, vbCrLf, "")
