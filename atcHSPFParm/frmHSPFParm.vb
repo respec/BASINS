@@ -23,6 +23,7 @@ Public Class frmHSPFParm
     Friend pfrmReport As frmReport
     Friend pfrmAddWatershed As frmAddWatershed
     Friend pfrmAddScenario As frmAddScenario
+    Friend WithEvents btnImport As System.Windows.Forms.Button
 
     Private Const HSPFParmProjectFilename As String = "HSPFParm.mwprj"
 
@@ -107,6 +108,7 @@ Public Class frmHSPFParm
         Me.gbxValues = New System.Windows.Forms.GroupBox
         Me.lblTableParmName = New System.Windows.Forms.Label
         Me.agdValues = New atcControls.atcGrid
+        Me.btnImport = New System.Windows.Forms.Button
         Me.gbxWatershed.SuspendLayout()
         Me.gbxScenario.SuspendLayout()
         Me.gbxSegment.SuspendLayout()
@@ -460,11 +462,21 @@ Public Class frmHSPFParm
         Me.agdValues.Source = Nothing
         Me.agdValues.TabIndex = 14
         '
+        'btnImport
+        '
+        Me.btnImport.Location = New System.Drawing.Point(473, 17)
+        Me.btnImport.Name = "btnImport"
+        Me.btnImport.Size = New System.Drawing.Size(75, 23)
+        Me.btnImport.TabIndex = 14
+        Me.btnImport.Text = "Import"
+        Me.btnImport.UseVisualStyleBackColor = True
+        '
         'frmHSPFParm
         '
         Me.AcceptButton = Me.cmdMap
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.ClientSize = New System.Drawing.Size(560, 584)
+        Me.Controls.Add(Me.btnImport)
         Me.Controls.Add(Me.gbxValues)
         Me.Controls.Add(Me.gbxTable)
         Me.Controls.Add(Me.gbxSegment)
@@ -558,56 +570,7 @@ Public Class frmHSPFParm
             CreatePointShapefile(lPointDbfName)
         End If
 
-        With agdWatershed
-            .Source = New atcControls.atcGridSource
-            .AllowHorizontalScrolling = False
-        End With
-        With agdWatershed.Source
-            'populate from point dbf
-            If FileExists(lPointDbfName) Then
-                Dim lPointTable As New atcTableDBF
-                lPointTable.OpenFile(lPointDbfName)
-                Dim lNumCols As Integer = lPointTable.NumFields
-                .Columns = lNumCols
-                .ColorCells = True
-                .FixedRows = 1
-                .FixedColumns = 0
-                lPointTable.MoveFirst()
-                For lColIndex As Integer = 0 To lNumCols - 1
-                    .CellColor(0, lColIndex) = SystemColors.ControlDark
-                    .CellValue(0, lColIndex) = lPointTable.FieldName(lColIndex + 1)
-                    If lPointTable.FieldName(lColIndex + 1) = "WATERSNAME" Then
-                        .CellValue(0, lColIndex) = "Project Name"
-                    End If
-                    If lPointTable.FieldName(lColIndex + 1) = "LOCATION" Then
-                        .CellValue(0, lColIndex) = "Location"
-                    End If
-                    If lPointTable.FieldName(lColIndex + 1) = "DRAINAGEAR" Then
-                        .CellValue(0, lColIndex) = "Drainage Area"
-                    End If
-                    If lPointTable.FieldName(lColIndex + 1) = "COMMENTS" Then
-                        .CellValue(0, lColIndex) = "Comments"
-                    End If
-                    If lPointTable.FieldName(lColIndex + 1) = "PHYS" Then
-                        .CellValue(0, lColIndex) = "Physiographic Setting"
-                    End If
-                    If lPointTable.FieldName(lColIndex + 1) = "WEATHER" Then
-                        .CellValue(0, lColIndex) = "Weather Regime"
-                    End If
-                Next
-                .Rows = 1
-                Dim lNumRows As Integer = lPointTable.NumRecords
-                For lRowIndex As Integer = 1 To lNumRows
-                    .Rows += 1
-                    For lColIndex As Integer = 0 To lNumCols - 1
-                        .CellValue(lRowIndex, lColIndex) = lPointTable.Value(lColIndex + 1)
-                    Next
-                    lPointTable.MoveNext()
-                Next
-            End If
-        End With
-        agdWatershed.SizeAllColumnsToContents()
-        agdWatershed.Refresh()
+        RefreshWatershedGrid(lPointDbfName)
 
         With agdScenario
             .Source = New atcControls.atcGridSource
@@ -1712,4 +1675,102 @@ Public Class frmHSPFParm
         GisUtil.CreatePointShapefile(lShapefileName, lXPos, lYPos, lAttNames, lAttVals, lProjectProjection)
     End Sub
 
+    Private Sub btnImport_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnImport.Click
+        Dim lInpFilename As String = IO.Path.Combine(IO.Path.GetDirectoryName(Database.Name), "HSPFParmBat.inp")
+        If Not IO.File.Exists(lInpFilename) Then
+            lInpFilename = atcUtility.FindFile("Please locate the import control file", "HSPFParmBat.inp")
+        End If
+        If Not IO.File.Exists(lInpFilename) Then
+            Logger.Msg("No import control file is found. Abort.")
+            Exit Sub
+        End If
+        AddParmData(lInpFilename, Database)
+        Logger.Msg("Done importing HSPF parameters from file:" & vbCrLf & lInpFilename)
+        Logger.Status("Refresh Watersheds...")
+        RefreshWatershedGrid()
+        Logger.Status("")
+    End Sub
+
+    Private Sub RefreshWatershedGrid()
+        Dim lWshdShapefile As String = ""
+        Dim lPointDbfName As String = "projdef.dbf"
+        're-create the points shapefile if DB changes
+        If GisUtil.IsLayer("Watershed") Then
+
+            lWshdShapefile = GisUtil.LayerFileName("Watershed")
+            lPointDbfName = IO.Path.ChangeExtension(lWshdShapefile, "dbf")
+            Dim lLayerIndex As Integer = GisUtil.LayerIndex("Watershed")
+            'Dim lIMap As MapWindow.Interfaces.IMapWin = pMapWinObj
+            'Dim lLayer As MapWindow.Interfaces.Layer = lIMap.Layers(lLayerIndex)
+            'Dim lLayerColor As Object = lLayer.Color
+            Try
+                GisUtil.RemoveLayer(GisUtil.LayerIndex("Watershed"))
+                TryDeleteShapefile(lWshdShapefile)
+                CreatePointShapefile(lPointDbfName)
+                If FileExists(lPointDbfName) Then
+                    If GisUtil.AddLayer(lWshdShapefile, "Watershed") Then
+                        'lLayerIndex = GisUtil.LayerIndex("Watershed")
+                        'lIMap.Layers(lLayerIndex).Color = lLayerColor
+                        'lIMap.Layers(lLayerIndex).Visible = True
+                        RefreshWatershedGrid(lPointDbfName)
+                    End If
+                End If
+            Catch ex As Exception
+                'do nothing
+            End Try
+        End If
+    End Sub
+
+    Private Sub RefreshWatershedGrid(ByVal aPointDbfName As String)
+        With agdWatershed
+            .Source = New atcControls.atcGridSource
+            .AllowHorizontalScrolling = False
+        End With
+        With agdWatershed.Source
+            'populate from point dbf
+            If FileExists(aPointDbfName) Then
+                Dim lPointTable As New atcTableDBF
+                lPointTable.OpenFile(aPointDbfName)
+                Dim lNumCols As Integer = lPointTable.NumFields
+                .Columns = lNumCols
+                .ColorCells = True
+                .FixedRows = 1
+                .FixedColumns = 0
+                lPointTable.MoveFirst()
+                For lColIndex As Integer = 0 To lNumCols - 1
+                    .CellColor(0, lColIndex) = SystemColors.ControlDark
+                    .CellValue(0, lColIndex) = lPointTable.FieldName(lColIndex + 1)
+                    If lPointTable.FieldName(lColIndex + 1) = "WATERSNAME" Then
+                        .CellValue(0, lColIndex) = "Project Name"
+                    End If
+                    If lPointTable.FieldName(lColIndex + 1) = "LOCATION" Then
+                        .CellValue(0, lColIndex) = "Location"
+                    End If
+                    If lPointTable.FieldName(lColIndex + 1) = "DRAINAGEAR" Then
+                        .CellValue(0, lColIndex) = "Drainage Area"
+                    End If
+                    If lPointTable.FieldName(lColIndex + 1) = "COMMENTS" Then
+                        .CellValue(0, lColIndex) = "Comments"
+                    End If
+                    If lPointTable.FieldName(lColIndex + 1) = "PHYS" Then
+                        .CellValue(0, lColIndex) = "Physiographic Setting"
+                    End If
+                    If lPointTable.FieldName(lColIndex + 1) = "WEATHER" Then
+                        .CellValue(0, lColIndex) = "Weather Regime"
+                    End If
+                Next
+                .Rows = 1
+                Dim lNumRows As Integer = lPointTable.NumRecords
+                For lRowIndex As Integer = 1 To lNumRows
+                    .Rows += 1
+                    For lColIndex As Integer = 0 To lNumCols - 1
+                        .CellValue(lRowIndex, lColIndex) = lPointTable.Value(lColIndex + 1)
+                    Next
+                    lPointTable.MoveNext()
+                Next
+            End If
+        End With
+        agdWatershed.SizeAllColumnsToContents()
+        agdWatershed.Refresh()
+    End Sub
 End Class
