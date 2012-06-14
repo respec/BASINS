@@ -43,11 +43,11 @@ tref:  Reference temperature of soil layer in ground heat calculation input
 -0.45 
 dnews:  The threshold depth of for new snow (0.001 m)
 0.001  
-emc:   Emissivity of canopy
+emc:  Emissivity of canopy
 0.5   
 alpha: Scattering coefficient for solar radiation
 0.0   
-alphal:   Scattering coefficient for long wave radiation
+alphal:  Scattering coefficient for long wave radiation
 0.5   
 g: leaf orientation with respect to zenith angle
 0.004626286    
@@ -55,19 +55,19 @@ uc:  Unloading rate coefficient (Per hour) (Hedstrom and Pomeroy, 1998)
 0.25  
 as:  Fraction of extraterrestrial radiation on cloudy day, Shuttleworth (1993)  
 0.5    
-Bs:     (as+bs):Fraction of extraterrestrial radiation on clear day, Shuttleworth 
+Bs:  (as+bs):Fraction of extraterrestrial radiation on clear day, Shuttleworth 
 0.857143      
 lambda: Ratio of direct atm radiation to diffuse, worked out from Dingman 
 1993
 rimax:  Maximum value of Richardson number for stability correction
 0.16
-wcoeff : Wind decay coefficient for the forest
+wcoeff: Wind decay coefficient for the forest
 0.8      
 a: A in Bristow-Campbell formula for atmospheric transmittance
 0.8      
 c: C in Bristow-Campbell formula for atmospheric transmittance
 2.4         
-stmflag:  model option for surface temperature approximation 1) Simple Gradient (like original UEB), 2) Simple Gradient w/shallow snow correction, 3) Classical force-restore. 4) Modified force-restore (recommended)
+stmflag: surface temp approximation option: 1)Gradient (Simple), 2)Gradient (snow correction), 3)Classic force-restore. 4)Modified force-restore (recommended)
 4
 forwsflag: Wind speed in forest canopy: 1 is observed and 2 is computed from above canopy observation
 1

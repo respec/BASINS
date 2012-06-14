@@ -5,6 +5,7 @@ Imports MapWinUtility.Strings
 Public Class clsUEBOutputControl
     Public Variables As Generic.List(Of clsUEBVariable)
     Public PointDetails As Generic.List(Of System.Drawing.Point)
+    Public PointFileNames As Generic.List(Of String)
     Public Header As String
 
     Public FileName As String
@@ -23,14 +24,18 @@ Public Class clsUEBOutputControl
 
         Variables = New Generic.List(Of clsUEBVariable)
         PointDetails = New Generic.List(Of System.Drawing.Point)
+        PointFileNames = New Generic.List(Of String)
         While lFileContents.Length > 0
             If lFileContents.ToLower.StartsWith("pointdetail") Then 'read X/Y pair
                 Dim lStr As String
                 Dim lPt As New System.Drawing.Point
-                lStr = StrSplit(lFileContents, vbCrLf, "")
-                lPt.X = Integer.Parse(StrRetRem(lFileContents))
-                lPt.Y = Integer.Parse(StrRetRem(lFileContents))
+                lStr = StrSplit(lFileContents, vbCrLf, "") 'read "pointdetail" record
+                lStr = StrSplit(lFileContents, vbCrLf, "") 'read coordinate record
+                lPt.X = Integer.Parse(StrRetRem(lStr))
+                lPt.Y = Integer.Parse(StrRetRem(lStr))
                 PointDetails.Add(lPt)
+                lStr = StrSplit(lFileContents, vbCrLf, "")
+                PointFileNames.Add(lStr)
             Else
                 Variables.Add(clsUEBVariable.FromOutputVariableString(lFileContents))
             End If

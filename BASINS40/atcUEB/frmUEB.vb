@@ -30,12 +30,15 @@ Public Class frmUEB
     Friend WithEvents txtOutputFile As System.Windows.Forms.TextBox
     Friend WithEvents Label6 As System.Windows.Forms.Label
     Friend WithEvents AtcGridSiteVars As atcControls.atcGrid
-    Friend WithEvents AtcGridBCMonthly As atcControls.atcGrid
     Friend WithEvents Label8 As System.Windows.Forms.Label
     Friend WithEvents AtcGridInputControl As atcControls.atcGrid
     Friend WithEvents AtcTextEMinute As atcControls.atcText
     Friend WithEvents Label9 As System.Windows.Forms.Label
     Friend WithEvents AtcTextSMinute As atcControls.atcText
+    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents AtcGridGridOutput As atcControls.atcGrid
+    Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
+    Friend WithEvents AtcGridPointOutput As atcControls.atcGrid
     Friend WithEvents AtcTextUTCOffset As atcControls.atcText
 
 #Region " Windows Form Designer generated code "
@@ -202,7 +205,10 @@ Public Class frmUEB
         Me.txtParameterFile = New System.Windows.Forms.TextBox
         Me.Label4 = New System.Windows.Forms.Label
         Me.TabPage8 = New System.Windows.Forms.TabPage
-        Me.AtcGridBCMonthly = New atcControls.atcGrid
+        Me.GroupBox3 = New System.Windows.Forms.GroupBox
+        Me.AtcGridPointOutput = New atcControls.atcGrid
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.AtcGridGridOutput = New atcControls.atcGrid
         Me.txtOutputFile = New System.Windows.Forms.TextBox
         Me.Label6 = New System.Windows.Forms.Label
         Me.Label20 = New System.Windows.Forms.Label
@@ -265,6 +271,8 @@ Public Class frmUEB
         Me.TabPage7.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.TabPage8.SuspendLayout()
+        Me.GroupBox3.SuspendLayout()
+        Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
         'cmdCancel
@@ -916,7 +924,8 @@ Public Class frmUEB
         '
         'TabPage8
         '
-        Me.TabPage8.Controls.Add(Me.AtcGridBCMonthly)
+        Me.TabPage8.Controls.Add(Me.GroupBox3)
+        Me.TabPage8.Controls.Add(Me.GroupBox1)
         Me.TabPage8.Controls.Add(Me.txtOutputFile)
         Me.TabPage8.Controls.Add(Me.Label6)
         Me.TabPage8.Location = New System.Drawing.Point(4, 25)
@@ -926,23 +935,59 @@ Public Class frmUEB
         Me.TabPage8.Text = "Output Control"
         Me.TabPage8.UseVisualStyleBackColor = True
         '
-        'AtcGridBCMonthly
+        'GroupBox3
         '
-        Me.AtcGridBCMonthly.AllowHorizontalScrolling = True
-        Me.AtcGridBCMonthly.AllowNewValidValues = False
-        Me.AtcGridBCMonthly.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.GroupBox3.Controls.Add(Me.AtcGridPointOutput)
+        Me.GroupBox3.Location = New System.Drawing.Point(3, 211)
+        Me.GroupBox3.Name = "GroupBox3"
+        Me.GroupBox3.Size = New System.Drawing.Size(801, 102)
+        Me.GroupBox3.TabIndex = 64
+        Me.GroupBox3.TabStop = False
+        Me.GroupBox3.Text = "Point Detail Output"
+        '
+        'AtcGridPointOutput
+        '
+        Me.AtcGridPointOutput.AllowHorizontalScrolling = True
+        Me.AtcGridPointOutput.AllowNewValidValues = False
+        Me.AtcGridPointOutput.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridPointOutput.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.AtcGridPointOutput.Fixed3D = False
+        Me.AtcGridPointOutput.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AtcGridPointOutput.LineColor = System.Drawing.Color.Empty
+        Me.AtcGridPointOutput.LineWidth = 0.0!
+        Me.AtcGridPointOutput.Location = New System.Drawing.Point(3, 16)
+        Me.AtcGridPointOutput.Name = "AtcGridPointOutput"
+        Me.AtcGridPointOutput.Size = New System.Drawing.Size(795, 83)
+        Me.AtcGridPointOutput.Source = Nothing
+        Me.AtcGridPointOutput.TabIndex = 65
+        '
+        'GroupBox1
+        '
+        Me.GroupBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridBCMonthly.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGridBCMonthly.Fixed3D = False
-        Me.AtcGridBCMonthly.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AtcGridBCMonthly.LineColor = System.Drawing.Color.Empty
-        Me.AtcGridBCMonthly.LineWidth = 0.0!
-        Me.AtcGridBCMonthly.Location = New System.Drawing.Point(0, 46)
-        Me.AtcGridBCMonthly.Name = "AtcGridBCMonthly"
-        Me.AtcGridBCMonthly.Size = New System.Drawing.Size(807, 353)
-        Me.AtcGridBCMonthly.Source = Nothing
-        Me.AtcGridBCMonthly.TabIndex = 62
+        Me.GroupBox1.Controls.Add(Me.AtcGridGridOutput)
+        Me.GroupBox1.Location = New System.Drawing.Point(3, 41)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(801, 148)
+        Me.GroupBox1.TabIndex = 63
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "Grid Output"
+        '
+        'AtcGridGridOutput
+        '
+        Me.AtcGridGridOutput.AllowHorizontalScrolling = True
+        Me.AtcGridGridOutput.AllowNewValidValues = False
+        Me.AtcGridGridOutput.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridGridOutput.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.AtcGridGridOutput.Fixed3D = False
+        Me.AtcGridGridOutput.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AtcGridGridOutput.LineColor = System.Drawing.Color.Empty
+        Me.AtcGridGridOutput.LineWidth = 0.0!
+        Me.AtcGridGridOutput.Location = New System.Drawing.Point(3, 16)
+        Me.AtcGridGridOutput.Name = "AtcGridGridOutput"
+        Me.AtcGridGridOutput.Size = New System.Drawing.Size(795, 129)
+        Me.AtcGridGridOutput.Source = Nothing
+        Me.AtcGridGridOutput.TabIndex = 64
         '
         'txtOutputFile
         '
@@ -1570,6 +1615,8 @@ Public Class frmUEB
         Me.TabPage1.PerformLayout()
         Me.TabPage8.ResumeLayout(False)
         Me.TabPage8.PerformLayout()
+        Me.GroupBox3.ResumeLayout(False)
+        Me.GroupBox1.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -1628,7 +1675,9 @@ Public Class frmUEB
         SetInputControl()
 
         pOutputControlData = New clsUEBOutputControl("")
-
+        AtcGridGridOutput.Source = New atcControls.atcGridSource
+        AtcGridPointOutput.Source = New atcControls.atcGridSource
+        SetOutputControl()
 
         'With AtcGridBCMonthly
         '    .Source = New atcControls.atcGridSource
@@ -1761,6 +1810,25 @@ Public Class frmUEB
         End If
     End Sub
 
+    Private Sub txtOutputFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOutputFile.Click
+        Dim cdlg As New Windows.Forms.OpenFileDialog
+        cdlg.Title = "Open UEB Output Control File"
+        cdlg.Filter = "UEB Output Control files (*.dat)|*.dat|All Files (*.*)|*.*"
+        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+            txtOutputFile.Text = cdlg.FileName
+        End If
+
+    End Sub
+
+    Private Sub txtOutputFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOutputFile.TextChanged
+        pOutputControlData.FileName = txtInputFile.Text
+        If FileExists(txtInputFile.Text) Then
+            pOutputControlData = Nothing
+            pOutputControlData = New clsUEBOutputControl(txtOutputFile.Text)
+            SetOutputControl()
+        End If
+    End Sub
+
     Private Sub cmdSimulate_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdSimulate.Click
 
         UpdateInputFiles()
@@ -1821,9 +1889,9 @@ Public Class frmUEB
             'pBCDataArray(1) = AtcTextCParm.ValueDouble
             Dim lMonth As Integer
             For i As Integer = 1 To 12
-                If IsNumeric(AtcGridBCMonthly.Source.CellValue(i, 1)) Then
+                If IsNumeric(AtcGridGridOutput.Source.CellValue(i, 1)) Then
                     lMonth = pBCDataArray(3 * i - 1)
-                    pBCDataArray(3 * i) = AtcGridBCMonthly.Source.CellValue(lMonth, 1)
+                    pBCDataArray(3 * i) = AtcGridGridOutput.Source.CellValue(lMonth, 1)
                 Else 'problem with a site value
                     lMsg = "Problem processing value on Bristow-Campbell Parameters tab in row " & i
                     Exit For
@@ -1854,6 +1922,7 @@ Public Class frmUEB
             Next
         End With
         AtcGridModelParms.SizeAllColumnsToContents()
+        AtcGridModelParms.ColumnWidth(0) = 600
         AtcGridModelParms.Refresh()
 
     End Sub
@@ -1904,7 +1973,7 @@ Public Class frmUEB
             .FixedColumns = 1
             .FixedRows = 1
             .CellValue(0, 0) = "Input Variable"
-            .CellValue(0, 1) = "Grid File"
+            .CellValue(0, 1) = "Grid File Name"
             .CellValue(0, 2) = "Grid Variable Name"
             .CellValue(0, 3) = "Timeseries File"
             .CellValue(0, 4) = "Constant Value"
@@ -1923,8 +1992,41 @@ Public Class frmUEB
         End With
     End Sub
 
+    Private Sub SetOutputControl()
+        Dim i As Integer
+
+        AtcGridGridOutput.Clear()
+        With AtcGridGridOutput.Source
+            .FixedRows = 1
+            .CellValue(0, 0) = "Output Variable"
+            .CellValue(0, 1) = "Grid File Name"
+            For i = 1 To pOutputControlData.Variables.Count
+                .CellValue(i, 0) = pOutputControlData.Variables(i - 1).Description
+                .CellColor(i, 0) = SystemColors.ControlDark
+                .CellValue(i, 1) = pOutputControlData.Variables(i - 1).GridFileName
+                .CellEditable(i, 1) = True
+            Next
+        End With
+
+        AtcGridPointOutput.Clear()
+        With AtcGridPointOutput.Source
+            .FixedRows = 1
+            .CellValue(0, 0) = "Grid Point Row"
+            .CellValue(0, 1) = "Grid Point Column"
+            .CellValue(0, 2) = "Grid Point File Name"
+            For i = 1 To pOutputControlData.PointDetails.Count
+                .CellValue(i, 0) = pOutputControlData.PointDetails(i - 1).X
+                .CellEditable(i, 0) = True
+                .CellValue(i, 1) = pOutputControlData.PointDetails(i - 1).Y
+                .CellEditable(i, 1) = True
+                .CellValue(i, 2) = pOutputControlData.PointFileNames(i - 1)
+                .CellEditable(i, 2) = True
+            Next
+        End With
+    End Sub
+
     Private Sub AtcGridSiteVars_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridSiteVars.MouseDownCell
-        If aColumn = 2 Then
+        If aColumn = 1 Then
             Dim cdlg As New Windows.Forms.OpenFileDialog
             cdlg.Title = "Open Grid File for " & aGrid.Source.CellValue(aRow, 0)
             cdlg.Filter = "NetCDF files|*.nc|All Files|*.*"
