@@ -2026,13 +2026,28 @@ Public Class frmUEB
     End Sub
 
     Private Sub AtcGridSiteVars_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridSiteVars.MouseDownCell
+        If aColumn = 1 Then GetGridFileName(aGrid, aRow, aColumn)
+    End Sub
+
+    Private Sub AtcGridInputControl_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridInputControl.MouseDownCell
         If aColumn = 1 Then
+            GetGridFileName(aGrid, aRow, aColumn)
+        ElseIf aColumn = 3 Then
             Dim cdlg As New Windows.Forms.OpenFileDialog
-            cdlg.Title = "Open Grid File for " & aGrid.Source.CellValue(aRow, 0)
-            cdlg.Filter = "NetCDF files|*.nc|All Files|*.*"
+            cdlg.Title = "Open Timeseries Data File for " & aGrid.Source.CellValue(aRow, 0)
+            cdlg.Filter = "Timeseries Data files (*.dat)|*.dat|All Files (*.*)|*.*"
             If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
                 aGrid.Source.CellValue(aRow, aColumn) = cdlg.FileName
             End If
+        End If
+    End Sub
+
+    Private Sub GetGridFileName(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer)
+        Dim cdlg As New Windows.Forms.OpenFileDialog
+        cdlg.Title = "Open Grid File for " & aGrid.Source.CellValue(aRow, 0)
+        cdlg.Filter = "NetCDF files|*.nc (*.nc)|All Files (*.*)|*.*"
+        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+            aGrid.Source.CellValue(aRow, aColumn) = cdlg.FileName
         End If
     End Sub
 
