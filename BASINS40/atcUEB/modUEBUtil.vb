@@ -10,8 +10,9 @@ Module modUEBUtil
     Public Sub OpenMasterFile(ByVal aFilename As String, ByRef aRunLabel As String, _
                               ByRef aParameterFileName As String, ByRef aSiteFileName As String, _
                               ByRef aInputVarsFileName As String, ByRef aOutputVarsFileName As String, _
-                              ByRef aWatershedFileName As String)
-        ', ByRef aAggOutputControlFileName As String, ByRef aAggOutputFileName As String)
+                              ByRef aWatershedFileName As String, ByRef aWatershedVariableName As String, _
+                              ByRef aAggOutputControlFileName As String, ByRef aAggOutputFileName As String)
+
 
         Dim lPath As String = PathNameOnly(aFilename) & "\"
         Dim lFileStr As String = WholeFileString(aFilename)
@@ -22,8 +23,9 @@ Module modUEBUtil
         aInputVarsFileName = lPath & StrSplit(lFileStr, vbCrLf, "") 'should be input variable file
         aOutputVarsFileName = lPath & StrSplit(lFileStr, vbCrLf, "") 'should be output variable file
         aWatershedFileName = lPath & StrSplit(lFileStr, vbCrLf, "") 'should be watershed grid file
-        'aAggOutputControlFileName = StrSplit(lFileStr, vbCrLf, "") 'should be aggregated output control file
-        'aAggOutputFileName = StrSplit(lFileStr, vbCrLf, "") 'should be aggregated output control file
+        aWatershedVariableName = StrSplit(lFileStr, vbCrLf, "") 'should be watershed variable name
+        aAggOutputControlFileName = lPath & StrSplit(lFileStr, vbCrLf, "") 'should be aggregated output control file
+        aAggOutputFileName = lPath & StrSplit(lFileStr, vbCrLf, "") 'should be aggregated output file
 
     End Sub
 

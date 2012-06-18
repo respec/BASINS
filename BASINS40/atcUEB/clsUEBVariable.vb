@@ -97,4 +97,11 @@ Public Class clsUEBVariable
         lUEBVar.GridFileName = StrSplit(aFileContents, vbCrLf, "")
         Return lUEBVar
     End Function
+
+    Public Shared Function FromAggOutputVariableString(ByRef aFileContents As String) As clsUEBVariable
+        Dim lUEBVar As New clsUEBVariable
+
+        lUEBVar.Description = StrSplit(aFileContents, vbCrLf, "")
+        Return lUEBVar
+    End Function
 End Class

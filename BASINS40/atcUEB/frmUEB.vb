@@ -15,7 +15,9 @@ Public Class frmUEB
     Friend pInputControlData As clsUEBInputControl
     Friend pOutputControlData As clsUEBOutputControl
     Friend pWatershedGridFileName As String
-    'Friend pWeatherData As clsUEBWeather
+    Friend pWatershedGridVariableName As String
+    Friend pAggOutputControlData As clsUEBAggOutputControl
+    Friend pAggOutputFileName As String
 
     Friend pBCParameterFileName As String
     Friend pBCDataArray(37) As Double
@@ -27,8 +29,6 @@ Public Class frmUEB
     Friend WithEvents Label4 As System.Windows.Forms.Label
     Friend WithEvents txtSiteFile As System.Windows.Forms.TextBox
     Friend WithEvents Label5 As System.Windows.Forms.Label
-    Friend WithEvents txtOutputFile As System.Windows.Forms.TextBox
-    Friend WithEvents Label6 As System.Windows.Forms.Label
     Friend WithEvents AtcGridSiteVars As atcControls.atcGrid
     Friend WithEvents Label8 As System.Windows.Forms.Label
     Friend WithEvents AtcGridInputControl As atcControls.atcGrid
@@ -39,6 +39,27 @@ Public Class frmUEB
     Friend WithEvents AtcGridGridOutput As atcControls.atcGrid
     Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
     Friend WithEvents AtcGridPointOutput As atcControls.atcGrid
+    Friend WithEvents chkFilePrompt As System.Windows.Forms.CheckBox
+    Friend WithEvents Label10 As System.Windows.Forms.Label
+    Friend WithEvents txtWatershedVariable As System.Windows.Forms.TextBox
+    Friend WithEvents GroupBox4 As System.Windows.Forms.GroupBox
+    Friend WithEvents Label11 As System.Windows.Forms.Label
+    Friend WithEvents txtAggOutputFile As System.Windows.Forms.TextBox
+    Friend WithEvents GroupBox5 As System.Windows.Forms.GroupBox
+    Friend WithEvents txtAggOutputControlFile As System.Windows.Forms.TextBox
+    Friend WithEvents txtAggOutputHeader As System.Windows.Forms.TextBox
+    Friend WithEvents Label13 As System.Windows.Forms.Label
+    Friend WithEvents Label12 As System.Windows.Forms.Label
+    Friend WithEvents txtOutputHeader As System.Windows.Forms.TextBox
+    Friend WithEvents Label14 As System.Windows.Forms.Label
+    Friend WithEvents Label6 As System.Windows.Forms.Label
+    Friend WithEvents txtOutputFile As System.Windows.Forms.TextBox
+    Friend WithEvents txtInputHeader As System.Windows.Forms.TextBox
+    Friend WithEvents Label15 As System.Windows.Forms.Label
+    Friend WithEvents txtSiteHeader As System.Windows.Forms.TextBox
+    Friend WithEvents Label16 As System.Windows.Forms.Label
+    Friend WithEvents txtParameterHeader As System.Windows.Forms.TextBox
+    Friend WithEvents Label17 As System.Windows.Forms.Label
     Friend WithEvents AtcTextUTCOffset As atcControls.atcText
 
 #Region " Windows Form Designer generated code "
@@ -163,6 +184,8 @@ Public Class frmUEB
         Me.cmdAbout = New System.Windows.Forms.Button
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage2 = New System.Windows.Forms.TabPage
+        Me.txtWatershedVariable = New System.Windows.Forms.TextBox
+        Me.Label10 = New System.Windows.Forms.Label
         Me.txtWatershedFile = New System.Windows.Forms.TextBox
         Me.Label7 = New System.Windows.Forms.Label
         Me.txtProjectName = New System.Windows.Forms.TextBox
@@ -205,12 +228,22 @@ Public Class frmUEB
         Me.txtParameterFile = New System.Windows.Forms.TextBox
         Me.Label4 = New System.Windows.Forms.Label
         Me.TabPage8 = New System.Windows.Forms.TabPage
+        Me.GroupBox5 = New System.Windows.Forms.GroupBox
+        Me.txtOutputHeader = New System.Windows.Forms.TextBox
+        Me.Label14 = New System.Windows.Forms.Label
+        Me.Label6 = New System.Windows.Forms.Label
+        Me.txtOutputFile = New System.Windows.Forms.TextBox
+        Me.GroupBox4 = New System.Windows.Forms.GroupBox
+        Me.txtAggOutputControlFile = New System.Windows.Forms.TextBox
+        Me.txtAggOutputHeader = New System.Windows.Forms.TextBox
+        Me.Label13 = New System.Windows.Forms.Label
+        Me.Label12 = New System.Windows.Forms.Label
+        Me.Label11 = New System.Windows.Forms.Label
+        Me.txtAggOutputFile = New System.Windows.Forms.TextBox
         Me.GroupBox3 = New System.Windows.Forms.GroupBox
         Me.AtcGridPointOutput = New atcControls.atcGrid
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.AtcGridGridOutput = New atcControls.atcGrid
-        Me.txtOutputFile = New System.Windows.Forms.TextBox
-        Me.Label6 = New System.Windows.Forms.Label
         Me.Label20 = New System.Windows.Forms.Label
         Me.ComboBox14 = New System.Windows.Forms.ComboBox
         Me.Label21 = New System.Windows.Forms.Label
@@ -264,6 +297,13 @@ Public Class frmUEB
         Me.Label45 = New System.Windows.Forms.Label
         Me.ComboBox39 = New System.Windows.Forms.ComboBox
         Me.cmdSimulate = New System.Windows.Forms.Button
+        Me.chkFilePrompt = New System.Windows.Forms.CheckBox
+        Me.Label15 = New System.Windows.Forms.Label
+        Me.txtInputHeader = New System.Windows.Forms.TextBox
+        Me.Label16 = New System.Windows.Forms.Label
+        Me.txtSiteHeader = New System.Windows.Forms.TextBox
+        Me.Label17 = New System.Windows.Forms.Label
+        Me.txtParameterHeader = New System.Windows.Forms.TextBox
         Me.TabControl1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.TabPage3.SuspendLayout()
@@ -271,6 +311,8 @@ Public Class frmUEB
         Me.TabPage7.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.TabPage8.SuspendLayout()
+        Me.GroupBox5.SuspendLayout()
+        Me.GroupBox4.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
@@ -328,6 +370,8 @@ Public Class frmUEB
         '
         'TabPage2
         '
+        Me.TabPage2.Controls.Add(Me.txtWatershedVariable)
+        Me.TabPage2.Controls.Add(Me.Label10)
         Me.TabPage2.Controls.Add(Me.txtWatershedFile)
         Me.TabPage2.Controls.Add(Me.Label7)
         Me.TabPage2.Controls.Add(Me.txtProjectName)
@@ -342,9 +386,25 @@ Public Class frmUEB
         Me.TabPage2.Text = "General"
         Me.TabPage2.UseVisualStyleBackColor = True
         '
+        'txtWatershedVariable
+        '
+        Me.txtWatershedVariable.Location = New System.Drawing.Point(152, 301)
+        Me.txtWatershedVariable.Name = "txtWatershedVariable"
+        Me.txtWatershedVariable.Size = New System.Drawing.Size(380, 20)
+        Me.txtWatershedVariable.TabIndex = 50
+        '
+        'Label10
+        '
+        Me.Label10.AutoSize = True
+        Me.Label10.Location = New System.Drawing.Point(18, 304)
+        Me.Label10.Name = "Label10"
+        Me.Label10.Size = New System.Drawing.Size(134, 13)
+        Me.Label10.TabIndex = 49
+        Me.Label10.Text = "Watershed Variable Name:"
+        '
         'txtWatershedFile
         '
-        Me.txtWatershedFile.Location = New System.Drawing.Point(136, 266)
+        Me.txtWatershedFile.Location = New System.Drawing.Point(152, 266)
         Me.txtWatershedFile.Name = "txtWatershedFile"
         Me.txtWatershedFile.Size = New System.Drawing.Size(380, 20)
         Me.txtWatershedFile.TabIndex = 48
@@ -360,14 +420,14 @@ Public Class frmUEB
         '
         'txtProjectName
         '
-        Me.txtProjectName.Location = New System.Drawing.Point(136, 159)
+        Me.txtProjectName.Location = New System.Drawing.Point(152, 159)
         Me.txtProjectName.Name = "txtProjectName"
         Me.txtProjectName.Size = New System.Drawing.Size(380, 20)
         Me.txtProjectName.TabIndex = 46
         '
         'txtMasterFile
         '
-        Me.txtMasterFile.Location = New System.Drawing.Point(136, 124)
+        Me.txtMasterFile.Location = New System.Drawing.Point(152, 124)
         Me.txtMasterFile.Name = "txtMasterFile"
         Me.txtMasterFile.Size = New System.Drawing.Size(380, 20)
         Me.txtMasterFile.TabIndex = 45
@@ -394,12 +454,14 @@ Public Class frmUEB
         Me.Label62.AutoSize = True
         Me.Label62.Location = New System.Drawing.Point(18, 162)
         Me.Label62.Name = "Label62"
-        Me.Label62.Size = New System.Drawing.Size(99, 13)
+        Me.Label62.Size = New System.Drawing.Size(96, 13)
         Me.Label62.TabIndex = 31
-        Me.Label62.Text = "Project :Description"
+        Me.Label62.Text = "Project Description"
         '
         'TabPage3
         '
+        Me.TabPage3.Controls.Add(Me.txtInputHeader)
+        Me.TabPage3.Controls.Add(Me.Label15)
         Me.TabPage3.Controls.Add(Me.AtcGridInputControl)
         Me.TabPage3.Controls.Add(Me.txtInputFile)
         Me.TabPage3.Controls.Add(Me.Label3)
@@ -422,15 +484,15 @@ Public Class frmUEB
         Me.AtcGridInputControl.Fixed3D = False
         Me.AtcGridInputControl.LineColor = System.Drawing.SystemColors.Control
         Me.AtcGridInputControl.LineWidth = 1.0!
-        Me.AtcGridInputControl.Location = New System.Drawing.Point(3, 161)
+        Me.AtcGridInputControl.Location = New System.Drawing.Point(3, 189)
         Me.AtcGridInputControl.Name = "AtcGridInputControl"
-        Me.AtcGridInputControl.Size = New System.Drawing.Size(801, 281)
+        Me.AtcGridInputControl.Size = New System.Drawing.Size(801, 253)
         Me.AtcGridInputControl.Source = Nothing
         Me.AtcGridInputControl.TabIndex = 64
         '
         'txtInputFile
         '
-        Me.txtInputFile.Location = New System.Drawing.Point(102, 12)
+        Me.txtInputFile.Location = New System.Drawing.Point(112, 12)
         Me.txtInputFile.Name = "txtInputFile"
         Me.txtInputFile.Size = New System.Drawing.Size(410, 20)
         Me.txtInputFile.TabIndex = 44
@@ -469,7 +531,7 @@ Public Class frmUEB
         Me.GroupBox2.Controls.Add(Me.AtcTextEMon)
         Me.GroupBox2.Controls.Add(Me.AtcTextSMonth)
         Me.GroupBox2.Controls.Add(Me.AtcTextEYear)
-        Me.GroupBox2.Location = New System.Drawing.Point(19, 45)
+        Me.GroupBox2.Location = New System.Drawing.Point(19, 76)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(769, 96)
         Me.GroupBox2.TabIndex = 29
@@ -835,6 +897,8 @@ Public Class frmUEB
         '
         'TabPage7
         '
+        Me.TabPage7.Controls.Add(Me.txtSiteHeader)
+        Me.TabPage7.Controls.Add(Me.Label16)
         Me.TabPage7.Controls.Add(Me.AtcGridSiteVars)
         Me.TabPage7.Controls.Add(Me.txtSiteFile)
         Me.TabPage7.Controls.Add(Me.Label5)
@@ -856,15 +920,15 @@ Public Class frmUEB
         Me.AtcGridSiteVars.Fixed3D = False
         Me.AtcGridSiteVars.LineColor = System.Drawing.SystemColors.Control
         Me.AtcGridSiteVars.LineWidth = 1.0!
-        Me.AtcGridSiteVars.Location = New System.Drawing.Point(3, 44)
+        Me.AtcGridSiteVars.Location = New System.Drawing.Point(3, 64)
         Me.AtcGridSiteVars.Name = "AtcGridSiteVars"
-        Me.AtcGridSiteVars.Size = New System.Drawing.Size(801, 377)
+        Me.AtcGridSiteVars.Size = New System.Drawing.Size(801, 357)
         Me.AtcGridSiteVars.Source = Nothing
         Me.AtcGridSiteVars.TabIndex = 63
         '
         'txtSiteFile
         '
-        Me.txtSiteFile.Location = New System.Drawing.Point(85, 18)
+        Me.txtSiteFile.Location = New System.Drawing.Point(116, 12)
         Me.txtSiteFile.Name = "txtSiteFile"
         Me.txtSiteFile.Size = New System.Drawing.Size(410, 20)
         Me.txtSiteFile.TabIndex = 62
@@ -872,14 +936,16 @@ Public Class frmUEB
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(32, 21)
+        Me.Label5.Location = New System.Drawing.Point(32, 15)
         Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(47, 13)
+        Me.Label5.Size = New System.Drawing.Size(78, 13)
         Me.Label5.TabIndex = 61
-        Me.Label5.Text = "Site File:"
+        Me.Label5.Text = "Site File Name:"
         '
         'TabPage1
         '
+        Me.TabPage1.Controls.Add(Me.txtParameterHeader)
+        Me.TabPage1.Controls.Add(Me.Label17)
         Me.TabPage1.Controls.Add(Me.AtcGridModelParms)
         Me.TabPage1.Controls.Add(Me.txtParameterFile)
         Me.TabPage1.Controls.Add(Me.Label4)
@@ -900,15 +966,15 @@ Public Class frmUEB
         Me.AtcGridModelParms.Fixed3D = False
         Me.AtcGridModelParms.LineColor = System.Drawing.SystemColors.Control
         Me.AtcGridModelParms.LineWidth = 1.0!
-        Me.AtcGridModelParms.Location = New System.Drawing.Point(3, 53)
+        Me.AtcGridModelParms.Location = New System.Drawing.Point(3, 62)
         Me.AtcGridModelParms.Name = "AtcGridModelParms"
-        Me.AtcGridModelParms.Size = New System.Drawing.Size(801, 392)
+        Me.AtcGridModelParms.Size = New System.Drawing.Size(801, 383)
         Me.AtcGridModelParms.Source = Nothing
         Me.AtcGridModelParms.TabIndex = 60
         '
         'txtParameterFile
         '
-        Me.txtParameterFile.Location = New System.Drawing.Point(94, 14)
+        Me.txtParameterFile.Location = New System.Drawing.Point(125, 10)
         Me.txtParameterFile.Name = "txtParameterFile"
         Me.txtParameterFile.Size = New System.Drawing.Size(410, 20)
         Me.txtParameterFile.TabIndex = 59
@@ -916,18 +982,18 @@ Public Class frmUEB
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(11, 17)
+        Me.Label4.Location = New System.Drawing.Point(11, 13)
         Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(77, 13)
+        Me.Label4.Size = New System.Drawing.Size(108, 13)
         Me.Label4.TabIndex = 58
-        Me.Label4.Text = "Parameter File:"
+        Me.Label4.Text = "Parameter File Name:"
         '
         'TabPage8
         '
+        Me.TabPage8.Controls.Add(Me.GroupBox5)
+        Me.TabPage8.Controls.Add(Me.GroupBox4)
         Me.TabPage8.Controls.Add(Me.GroupBox3)
         Me.TabPage8.Controls.Add(Me.GroupBox1)
-        Me.TabPage8.Controls.Add(Me.txtOutputFile)
-        Me.TabPage8.Controls.Add(Me.Label6)
         Me.TabPage8.Location = New System.Drawing.Point(4, 25)
         Me.TabPage8.Name = "TabPage8"
         Me.TabPage8.Size = New System.Drawing.Size(807, 445)
@@ -935,12 +1001,123 @@ Public Class frmUEB
         Me.TabPage8.Text = "Output Control"
         Me.TabPage8.UseVisualStyleBackColor = True
         '
+        'GroupBox5
+        '
+        Me.GroupBox5.Controls.Add(Me.txtOutputHeader)
+        Me.GroupBox5.Controls.Add(Me.Label14)
+        Me.GroupBox5.Controls.Add(Me.Label6)
+        Me.GroupBox5.Controls.Add(Me.txtOutputFile)
+        Me.GroupBox5.Location = New System.Drawing.Point(3, 11)
+        Me.GroupBox5.Name = "GroupBox5"
+        Me.GroupBox5.Size = New System.Drawing.Size(404, 78)
+        Me.GroupBox5.TabIndex = 68
+        Me.GroupBox5.TabStop = False
+        Me.GroupBox5.Text = "Main Output"
+        '
+        'txtOutputHeader
+        '
+        Me.txtOutputHeader.Location = New System.Drawing.Point(68, 35)
+        Me.txtOutputHeader.Name = "txtOutputHeader"
+        Me.txtOutputHeader.Size = New System.Drawing.Size(335, 20)
+        Me.txtOutputHeader.TabIndex = 65
+        '
+        'Label14
+        '
+        Me.Label14.AutoSize = True
+        Me.Label14.Location = New System.Drawing.Point(6, 38)
+        Me.Label14.Name = "Label14"
+        Me.Label14.Size = New System.Drawing.Size(45, 13)
+        Me.Label14.TabIndex = 64
+        Me.Label14.Text = "Header:"
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(6, 20)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(62, 13)
+        Me.Label6.TabIndex = 63
+        Me.Label6.Text = "Control File:"
+        '
+        'txtOutputFile
+        '
+        Me.txtOutputFile.Location = New System.Drawing.Point(68, 13)
+        Me.txtOutputFile.Name = "txtOutputFile"
+        Me.txtOutputFile.Size = New System.Drawing.Size(335, 20)
+        Me.txtOutputFile.TabIndex = 62
+        '
+        'GroupBox4
+        '
+        Me.GroupBox4.Controls.Add(Me.txtAggOutputControlFile)
+        Me.GroupBox4.Controls.Add(Me.txtAggOutputHeader)
+        Me.GroupBox4.Controls.Add(Me.Label13)
+        Me.GroupBox4.Controls.Add(Me.Label12)
+        Me.GroupBox4.Controls.Add(Me.Label11)
+        Me.GroupBox4.Controls.Add(Me.txtAggOutputFile)
+        Me.GroupBox4.Location = New System.Drawing.Point(422, 11)
+        Me.GroupBox4.Name = "GroupBox4"
+        Me.GroupBox4.Size = New System.Drawing.Size(378, 78)
+        Me.GroupBox4.TabIndex = 67
+        Me.GroupBox4.TabStop = False
+        Me.GroupBox4.Text = "Aggregated Output"
+        '
+        'txtAggOutputControlFile
+        '
+        Me.txtAggOutputControlFile.Location = New System.Drawing.Point(66, 13)
+        Me.txtAggOutputControlFile.Name = "txtAggOutputControlFile"
+        Me.txtAggOutputControlFile.Size = New System.Drawing.Size(310, 20)
+        Me.txtAggOutputControlFile.TabIndex = 72
+        '
+        'txtAggOutputHeader
+        '
+        Me.txtAggOutputHeader.Location = New System.Drawing.Point(66, 35)
+        Me.txtAggOutputHeader.Name = "txtAggOutputHeader"
+        Me.txtAggOutputHeader.Size = New System.Drawing.Size(310, 20)
+        Me.txtAggOutputHeader.TabIndex = 71
+        '
+        'Label13
+        '
+        Me.Label13.AutoSize = True
+        Me.Label13.Location = New System.Drawing.Point(6, 38)
+        Me.Label13.Name = "Label13"
+        Me.Label13.Size = New System.Drawing.Size(45, 13)
+        Me.Label13.TabIndex = 70
+        Me.Label13.Text = "Header:"
+        '
+        'Label12
+        '
+        Me.Label12.AutoSize = True
+        Me.Label12.Location = New System.Drawing.Point(6, 16)
+        Me.Label12.Name = "Label12"
+        Me.Label12.Size = New System.Drawing.Size(62, 13)
+        Me.Label12.TabIndex = 69
+        Me.Label12.Text = "Control File:"
+        '
+        'Label11
+        '
+        Me.Label11.AutoSize = True
+        Me.Label11.Location = New System.Drawing.Point(6, 60)
+        Me.Label11.Name = "Label11"
+        Me.Label11.Size = New System.Drawing.Size(52, 13)
+        Me.Label11.TabIndex = 68
+        Me.Label11.Text = "Data File:"
+        '
+        'txtAggOutputFile
+        '
+        Me.txtAggOutputFile.Location = New System.Drawing.Point(66, 57)
+        Me.txtAggOutputFile.Name = "txtAggOutputFile"
+        Me.txtAggOutputFile.Size = New System.Drawing.Size(310, 20)
+        Me.txtAggOutputFile.TabIndex = 67
+        '
         'GroupBox3
         '
+        Me.GroupBox3.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox3.Controls.Add(Me.AtcGridPointOutput)
-        Me.GroupBox3.Location = New System.Drawing.Point(3, 211)
+        Me.GroupBox3.Location = New System.Drawing.Point(3, 314)
         Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(801, 102)
+        Me.GroupBox3.Size = New System.Drawing.Size(801, 117)
         Me.GroupBox3.TabIndex = 64
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "Point Detail Output"
@@ -957,7 +1134,7 @@ Public Class frmUEB
         Me.AtcGridPointOutput.LineWidth = 0.0!
         Me.AtcGridPointOutput.Location = New System.Drawing.Point(3, 16)
         Me.AtcGridPointOutput.Name = "AtcGridPointOutput"
-        Me.AtcGridPointOutput.Size = New System.Drawing.Size(795, 83)
+        Me.AtcGridPointOutput.Size = New System.Drawing.Size(795, 98)
         Me.AtcGridPointOutput.Source = Nothing
         Me.AtcGridPointOutput.TabIndex = 65
         '
@@ -966,9 +1143,9 @@ Public Class frmUEB
         Me.GroupBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox1.Controls.Add(Me.AtcGridGridOutput)
-        Me.GroupBox1.Location = New System.Drawing.Point(3, 41)
+        Me.GroupBox1.Location = New System.Drawing.Point(3, 95)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(801, 148)
+        Me.GroupBox1.Size = New System.Drawing.Size(801, 213)
         Me.GroupBox1.TabIndex = 63
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Grid Output"
@@ -985,25 +1162,9 @@ Public Class frmUEB
         Me.AtcGridGridOutput.LineWidth = 0.0!
         Me.AtcGridGridOutput.Location = New System.Drawing.Point(3, 16)
         Me.AtcGridGridOutput.Name = "AtcGridGridOutput"
-        Me.AtcGridGridOutput.Size = New System.Drawing.Size(795, 129)
+        Me.AtcGridGridOutput.Size = New System.Drawing.Size(795, 194)
         Me.AtcGridGridOutput.Source = Nothing
         Me.AtcGridGridOutput.TabIndex = 64
-        '
-        'txtOutputFile
-        '
-        Me.txtOutputFile.Location = New System.Drawing.Point(115, 9)
-        Me.txtOutputFile.Name = "txtOutputFile"
-        Me.txtOutputFile.Size = New System.Drawing.Size(403, 20)
-        Me.txtOutputFile.TabIndex = 61
-        '
-        'Label6
-        '
-        Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(12, 12)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(97, 13)
-        Me.Label6.TabIndex = 60
-        Me.Label6.Text = "Output Control File:"
         '
         'Label20
         '
@@ -1588,11 +1749,72 @@ Public Class frmUEB
         Me.cmdSimulate.TabIndex = 10
         Me.cmdSimulate.Text = "Simulate"
         '
+        'chkFilePrompt
+        '
+        Me.chkFilePrompt.AutoSize = True
+        Me.chkFilePrompt.Checked = True
+        Me.chkFilePrompt.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkFilePrompt.Location = New System.Drawing.Point(155, 506)
+        Me.chkFilePrompt.Name = "chkFilePrompt"
+        Me.chkFilePrompt.Size = New System.Drawing.Size(124, 17)
+        Me.chkFilePrompt.TabIndex = 11
+        Me.chkFilePrompt.Text = "Prompt for File Name"
+        Me.chkFilePrompt.UseVisualStyleBackColor = True
+        '
+        'Label15
+        '
+        Me.Label15.AutoSize = True
+        Me.Label15.Location = New System.Drawing.Point(16, 47)
+        Me.Label15.Name = "Label15"
+        Me.Label15.Size = New System.Drawing.Size(100, 13)
+        Me.Label15.TabIndex = 65
+        Me.Label15.Text = "Control File Header:"
+        '
+        'txtInputHeader
+        '
+        Me.txtInputHeader.Location = New System.Drawing.Point(112, 44)
+        Me.txtInputHeader.Name = "txtInputHeader"
+        Me.txtInputHeader.Size = New System.Drawing.Size(410, 20)
+        Me.txtInputHeader.TabIndex = 66
+        '
+        'Label16
+        '
+        Me.Label16.AutoSize = True
+        Me.Label16.Location = New System.Drawing.Point(32, 41)
+        Me.Label16.Name = "Label16"
+        Me.Label16.Size = New System.Drawing.Size(85, 13)
+        Me.Label16.TabIndex = 64
+        Me.Label16.Text = "Site File Header:"
+        '
+        'txtSiteHeader
+        '
+        Me.txtSiteHeader.Location = New System.Drawing.Point(116, 38)
+        Me.txtSiteHeader.Name = "txtSiteHeader"
+        Me.txtSiteHeader.Size = New System.Drawing.Size(410, 20)
+        Me.txtSiteHeader.TabIndex = 65
+        '
+        'Label17
+        '
+        Me.Label17.AutoSize = True
+        Me.Label17.Location = New System.Drawing.Point(11, 39)
+        Me.Label17.Name = "Label17"
+        Me.Label17.Size = New System.Drawing.Size(115, 13)
+        Me.Label17.TabIndex = 61
+        Me.Label17.Text = "Parameter File Header:"
+        '
+        'txtParameterHeader
+        '
+        Me.txtParameterHeader.Location = New System.Drawing.Point(125, 36)
+        Me.txtParameterHeader.Name = "txtParameterHeader"
+        Me.txtParameterHeader.Size = New System.Drawing.Size(410, 20)
+        Me.txtParameterHeader.TabIndex = 62
+        '
         'frmUEB
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.cmdCancel
         Me.ClientSize = New System.Drawing.Size(846, 537)
+        Me.Controls.Add(Me.chkFilePrompt)
         Me.Controls.Add(Me.cmdSimulate)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.cmdAbout)
@@ -1614,10 +1836,14 @@ Public Class frmUEB
         Me.TabPage1.ResumeLayout(False)
         Me.TabPage1.PerformLayout()
         Me.TabPage8.ResumeLayout(False)
-        Me.TabPage8.PerformLayout()
+        Me.GroupBox5.ResumeLayout(False)
+        Me.GroupBox5.PerformLayout()
+        Me.GroupBox4.ResumeLayout(False)
+        Me.GroupBox4.PerformLayout()
         Me.GroupBox3.ResumeLayout(False)
         Me.GroupBox1.ResumeLayout(False)
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
@@ -1675,6 +1901,7 @@ Public Class frmUEB
         SetInputControl()
 
         pOutputControlData = New clsUEBOutputControl("")
+        pAggOutputControlData = New clsUEBAggOutputControl("")
         AtcGridGridOutput.Source = New atcControls.atcGridSource
         AtcGridPointOutput.Source = New atcControls.atcGridSource
         SetOutputControl()
@@ -1743,13 +1970,18 @@ Public Class frmUEB
         If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
             Dim lFilename As String = cdlg.FileName
             txtMasterFile.Text = lFilename
-            OpenMasterFile(lFilename, pProjectDescription, pParmData.FileName, pSiteData.FileName, pInputControlData.FileName, pOutputControlData.FileName, pWatershedGridFileName)
+            OpenMasterFile(lFilename, pProjectDescription, pParmData.FileName, pSiteData.FileName, _
+                           pInputControlData.FileName, pOutputControlData.FileName, pWatershedGridFileName, _
+                           pWatershedGridVariableName, pAggOutputControlData.FileName, pAggOutputFileName)
             txtProjectName.Text = pProjectDescription
-            txtInputFile.Text = pInputControlData.FileName
-            txtWatershedFile.Text = pWatershedGridFileName
             txtParameterFile.Text = pParmData.FileName
             txtSiteFile.Text = pSiteData.FileName
+            txtInputFile.Text = pInputControlData.FileName
+            txtWatershedFile.Text = pWatershedGridFileName
+            txtWatershedVariable.Text = pWatershedGridVariableName
             txtOutputFile.Text = pOutputControlData.FileName
+            txtAggOutputControlFile.Text = pAggOutputControlData.FileName
+            txtAggOutputFile.Text = pAggOutputFileName
         End If
     End Sub
 
@@ -1810,7 +2042,7 @@ Public Class frmUEB
         End If
     End Sub
 
-    Private Sub txtOutputFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOutputFile.Click
+    Private Sub txtOutputFile_Click(ByVal sender As Object, ByVal e As System.EventArgs)
         Dim cdlg As New Windows.Forms.OpenFileDialog
         cdlg.Title = "Open UEB Output Control File"
         cdlg.Filter = "UEB Output Control files (*.dat)|*.dat|All Files (*.*)|*.*"
@@ -1820,7 +2052,7 @@ Public Class frmUEB
 
     End Sub
 
-    Private Sub txtOutputFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOutputFile.TextChanged
+    Private Sub txtOutputFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs)
         pOutputControlData.FileName = txtInputFile.Text
         If FileExists(txtInputFile.Text) Then
             pOutputControlData = Nothing
@@ -1906,6 +2138,7 @@ Public Class frmUEB
 
     Private Sub SetParmGrid()
 
+        txtParameterHeader.Text = pParmData.Header
         AtcGridModelParms.Clear()
         With AtcGridModelParms.Source
             '.Columns = 2
@@ -1929,6 +2162,7 @@ Public Class frmUEB
 
     Private Sub SetSiteGrid()
 
+        txtSiteHeader.Text = pSiteData.Header
         AtcGridSiteVars.Clear()
         With AtcGridSiteVars.Source
             .Columns = 4
@@ -1955,6 +2189,7 @@ Public Class frmUEB
 
     Private Sub SetInputControl()
 
+        txtInputHeader.Text = pInputControlData.Header
         AtcTextSYear.Text = pInputControlData.SDate(0)
         AtcTextSMonth.Text = pInputControlData.SDate(1)
         AtcTextSDay.Text = pInputControlData.SDate(2)
@@ -1995,6 +2230,8 @@ Public Class frmUEB
     Private Sub SetOutputControl()
         Dim i As Integer
 
+        txtOutputHeader.Text = pOutputControlData.Header
+        txtAggOutputHeader.Text = pAggOutputControlData.Header
         AtcGridGridOutput.Clear()
         With AtcGridGridOutput.Source
             .FixedRows = 1
@@ -2011,6 +2248,7 @@ Public Class frmUEB
         AtcGridPointOutput.Clear()
         With AtcGridPointOutput.Source
             .FixedRows = 1
+            .FixedColumns = 1
             .CellValue(0, 0) = "Grid Point Row"
             .CellValue(0, 1) = "Grid Point Column"
             .CellValue(0, 2) = "Grid Point File Name"
@@ -2026,13 +2264,13 @@ Public Class frmUEB
     End Sub
 
     Private Sub AtcGridSiteVars_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridSiteVars.MouseDownCell
-        If aColumn = 1 Then GetGridFileName(aGrid, aRow, aColumn)
+        If aColumn = 1 Then GetGridFileName(aGrid, aRow, aColumn, False)
     End Sub
 
     Private Sub AtcGridInputControl_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridInputControl.MouseDownCell
         If aColumn = 1 Then
-            GetGridFileName(aGrid, aRow, aColumn)
-        ElseIf aColumn = 3 Then
+            GetGridFileName(aGrid, aRow, aColumn, False)
+        ElseIf aColumn = 3 AndAlso chkFilePrompt.Checked Then
             Dim cdlg As New Windows.Forms.OpenFileDialog
             cdlg.Title = "Open Timeseries Data File for " & aGrid.Source.CellValue(aRow, 0)
             cdlg.Filter = "Timeseries Data files (*.dat)|*.dat|All Files (*.*)|*.*"
@@ -2042,12 +2280,42 @@ Public Class frmUEB
         End If
     End Sub
 
-    Private Sub GetGridFileName(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer)
-        Dim cdlg As New Windows.Forms.OpenFileDialog
-        cdlg.Title = "Open Grid File for " & aGrid.Source.CellValue(aRow, 0)
-        cdlg.Filter = "NetCDF files|*.nc (*.nc)|All Files (*.*)|*.*"
-        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
-            aGrid.Source.CellValue(aRow, aColumn) = cdlg.FileName
+    Private Sub AtcGridGridOutput_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridGridOutput.MouseDownCell
+        If aColumn = 0 Then
+            'AtcGridGridOutput.ValidValues = pOutputControlData.AvailableOutputs
+        ElseIf aColumn = 1 AndAlso chkFilePrompt.Checked Then
+            GetGridFileName(aGrid, aRow, aColumn, True)
+        End If
+    End Sub
+
+    Private Sub AtcGridPointOutput_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridPointOutput.MouseDownCell
+        If aColumn = 2 AndAlso chkFilePrompt.Checked Then
+            Dim cdlg As New Windows.Forms.SaveFileDialog
+            cdlg.CheckFileExists = False
+            cdlg.Title = "Open Point Output File for row/column " & aGrid.Source.CellValue(aRow, 0) & "/" & aGrid.Source.CellValue(aRow, 1)
+            cdlg.Filter = "Point Output files (*.txt)|*.txt|All Files (*.*)|*.*"
+            If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+                aGrid.Source.CellValue(aRow, aColumn) = cdlg.FileName
+            End If
+        End If
+    End Sub
+
+    Private Sub GetGridFileName(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer, ByVal aSave As Boolean)
+        If chkFilePrompt.Checked Then
+            Dim cdlg As FileDialog
+            If aSave Then
+                Dim lSave As New SaveFileDialog
+                lSave.CreatePrompt = False
+                lSave.OverwritePrompt = False
+                cdlg = lSave
+            Else
+                cdlg = New OpenFileDialog
+            End If
+            cdlg.Title = "Open Grid File for " & aGrid.Source.CellValue(aRow, 0)
+            cdlg.Filter = "NetCDF files (*.nc)|*.nc|All Files (*.*)|*.*"
+            If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+                aGrid.Source.CellValue(aRow, aColumn) = cdlg.FileName
+            End If
         End If
     End Sub
 
