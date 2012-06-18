@@ -75,6 +75,7 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="clsUEBAggOutputControl.vb" />
     <Compile Include="clsUEBOutputControl.vb" />
     <Compile Include="clsPlugin.vb" />
     <Compile Include="clsUEBInputControl.vb" />

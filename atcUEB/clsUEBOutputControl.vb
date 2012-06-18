@@ -6,6 +6,7 @@ Public Class clsUEBOutputControl
     Public Variables As Generic.List(Of clsUEBVariable)
     Public PointDetails As Generic.List(Of System.Drawing.Point)
     Public PointFileNames As Generic.List(Of String)
+    Public AvailableOutputs As Generic.List(Of String)
     Public Header As String
 
     Public FileName As String
@@ -17,7 +18,7 @@ Public Class clsUEBOutputControl
         If IO.File.Exists(FileName) Then
             lFileContents = WholeFileString(FileName)
         Else
-            lFileContents = GetEmbeddedFileAsString("OutputControl.dat")
+            lFileContents = ""
         End If
         'read header line in file
         Header = StrSplit(lFileContents, vbCrLf, "")
@@ -40,6 +41,13 @@ Public Class clsUEBOutputControl
                 Variables.Add(clsUEBVariable.FromOutputVariableString(lFileContents))
             End If
         End While
+        'read in available output variables
+        lFileContents = GetEmbeddedFileAsString("OutputControl.dat")
+        AvailableOutputs = New Generic.List(Of String)
+        While lFileContents.Length > 0
+            AvailableOutputs.Add(StrSplit(lFileContents, vbCrLf, ""))
+        End While
+
     End Sub
 
     Public Function WriteOutputControlFile() As Boolean
