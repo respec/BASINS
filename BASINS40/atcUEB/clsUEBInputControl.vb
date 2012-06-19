@@ -69,7 +69,7 @@ Public Class clsUEBInputControl
         End While
     End Sub
 
-    Public Function WriteSiteFile() As Boolean
+    Public Function WriteInputControlFile() As Boolean
 
         Dim lStr As String = ""
 

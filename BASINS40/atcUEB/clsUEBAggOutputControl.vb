@@ -15,7 +15,7 @@ Public Class clsUEBAggOutputControl
         If IO.File.Exists(FileName) Then
             lFileContents = WholeFileString(FileName)
         Else
-            lFileContents = GetEmbeddedFileAsString("Param.dat")
+            lFileContents = ""
         End If
         'read header line in file
         Header = StrSplit(lFileContents, vbCrLf, "")

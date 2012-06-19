@@ -50,8 +50,6 @@ Public Class frmUEB
     Friend WithEvents txtAggOutputFile As System.Windows.Forms.TextBox
     Friend WithEvents GroupBox5 As System.Windows.Forms.GroupBox
     Friend WithEvents txtAggOutputControlFile As System.Windows.Forms.TextBox
-    Friend WithEvents txtAggOutputHeader As System.Windows.Forms.TextBox
-    Friend WithEvents Label13 As System.Windows.Forms.Label
     Friend WithEvents Label12 As System.Windows.Forms.Label
     Friend WithEvents txtOutputHeader As System.Windows.Forms.TextBox
     Friend WithEvents Label14 As System.Windows.Forms.Label
@@ -166,7 +164,7 @@ Public Class frmUEB
     Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
     Friend WithEvents cmdSimulate As System.Windows.Forms.Button
     Friend WithEvents lblTimeStep As System.Windows.Forms.Label
-    Friend WithEvents atcTextTimeStep As atcControls.atcText
+    Friend WithEvents AtcTextTimeStep As atcControls.atcText
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents AtcTextEHour As atcControls.atcText
     Friend WithEvents AtcTextSHour As atcControls.atcText
@@ -209,7 +207,7 @@ Public Class frmUEB
         Me.AtcTextUTCOffset = New atcControls.atcText
         Me.Label8 = New System.Windows.Forms.Label
         Me.lblTimeStep = New System.Windows.Forms.Label
-        Me.atcTextTimeStep = New atcControls.atcText
+        Me.AtcTextTimeStep = New atcControls.atcText
         Me.Label1 = New System.Windows.Forms.Label
         Me.AtcTextEHour = New atcControls.atcText
         Me.AtcTextSHour = New atcControls.atcText
@@ -244,8 +242,6 @@ Public Class frmUEB
         Me.txtOutputFile = New System.Windows.Forms.TextBox
         Me.GroupBox4 = New System.Windows.Forms.GroupBox
         Me.txtAggOutputControlFile = New System.Windows.Forms.TextBox
-        Me.txtAggOutputHeader = New System.Windows.Forms.TextBox
-        Me.Label13 = New System.Windows.Forms.Label
         Me.Label12 = New System.Windows.Forms.Label
         Me.Label11 = New System.Windows.Forms.Label
         Me.txtAggOutputFile = New System.Windows.Forms.TextBox
@@ -535,7 +531,7 @@ Public Class frmUEB
         Me.GroupBox2.Controls.Add(Me.AtcTextUTCOffset)
         Me.GroupBox2.Controls.Add(Me.Label8)
         Me.GroupBox2.Controls.Add(Me.lblTimeStep)
-        Me.GroupBox2.Controls.Add(Me.atcTextTimeStep)
+        Me.GroupBox2.Controls.Add(Me.AtcTextTimeStep)
         Me.GroupBox2.Controls.Add(Me.Label1)
         Me.GroupBox2.Controls.Add(Me.AtcTextEHour)
         Me.GroupBox2.Controls.Add(Me.AtcTextSHour)
@@ -653,28 +649,28 @@ Public Class frmUEB
         Me.lblTimeStep.TabIndex = 42
         Me.lblTimeStep.Text = "Time Step (hrs)"
         '
-        'atcTextTimeStep
+        'AtcTextTimeStep
         '
-        Me.atcTextTimeStep.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atcTextTimeStep.DataType = atcControls.atcText.ATCoDataType.ATCoInt
-        Me.atcTextTimeStep.DefaultValue = ""
-        Me.atcTextTimeStep.HardMax = 24
-        Me.atcTextTimeStep.HardMin = 1
-        Me.atcTextTimeStep.InsideLimitsBackground = System.Drawing.Color.White
-        Me.atcTextTimeStep.Location = New System.Drawing.Point(450, 38)
-        Me.atcTextTimeStep.MaxWidth = 20
-        Me.atcTextTimeStep.Name = "atcTextTimeStep"
-        Me.atcTextTimeStep.NumericFormat = "0"
-        Me.atcTextTimeStep.OutsideHardLimitBackground = System.Drawing.Color.Coral
-        Me.atcTextTimeStep.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
-        Me.atcTextTimeStep.SelLength = 0
-        Me.atcTextTimeStep.SelStart = 0
-        Me.atcTextTimeStep.Size = New System.Drawing.Size(35, 21)
-        Me.atcTextTimeStep.SoftMax = -999
-        Me.atcTextTimeStep.SoftMin = -999
-        Me.atcTextTimeStep.TabIndex = 41
-        Me.atcTextTimeStep.ValueDouble = 1
-        Me.atcTextTimeStep.ValueInteger = 1
+        Me.AtcTextTimeStep.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.AtcTextTimeStep.DataType = atcControls.atcText.ATCoDataType.ATCoInt
+        Me.AtcTextTimeStep.DefaultValue = ""
+        Me.AtcTextTimeStep.HardMax = 24
+        Me.AtcTextTimeStep.HardMin = 1
+        Me.AtcTextTimeStep.InsideLimitsBackground = System.Drawing.Color.White
+        Me.AtcTextTimeStep.Location = New System.Drawing.Point(450, 38)
+        Me.AtcTextTimeStep.MaxWidth = 20
+        Me.AtcTextTimeStep.Name = "AtcTextTimeStep"
+        Me.AtcTextTimeStep.NumericFormat = "0"
+        Me.AtcTextTimeStep.OutsideHardLimitBackground = System.Drawing.Color.Coral
+        Me.AtcTextTimeStep.OutsideSoftLimitBackground = System.Drawing.Color.Yellow
+        Me.AtcTextTimeStep.SelLength = 0
+        Me.AtcTextTimeStep.SelStart = 0
+        Me.AtcTextTimeStep.Size = New System.Drawing.Size(35, 21)
+        Me.AtcTextTimeStep.SoftMax = -999
+        Me.AtcTextTimeStep.SoftMin = -999
+        Me.AtcTextTimeStep.TabIndex = 41
+        Me.AtcTextTimeStep.ValueDouble = 1
+        Me.AtcTextTimeStep.ValueInteger = 1
         '
         'Label1
         '
@@ -1060,14 +1056,14 @@ Public Class frmUEB
         Me.GroupBox5.Controls.Add(Me.txtOutputFile)
         Me.GroupBox5.Location = New System.Drawing.Point(3, 11)
         Me.GroupBox5.Name = "GroupBox5"
-        Me.GroupBox5.Size = New System.Drawing.Size(404, 78)
+        Me.GroupBox5.Size = New System.Drawing.Size(404, 65)
         Me.GroupBox5.TabIndex = 68
         Me.GroupBox5.TabStop = False
         Me.GroupBox5.Text = "Main Output"
         '
         'txtOutputHeader
         '
-        Me.txtOutputHeader.Location = New System.Drawing.Point(68, 35)
+        Me.txtOutputHeader.Location = New System.Drawing.Point(63, 39)
         Me.txtOutputHeader.Name = "txtOutputHeader"
         Me.txtOutputHeader.Size = New System.Drawing.Size(335, 20)
         Me.txtOutputHeader.TabIndex = 65
@@ -1075,7 +1071,7 @@ Public Class frmUEB
         'Label14
         '
         Me.Label14.AutoSize = True
-        Me.Label14.Location = New System.Drawing.Point(6, 38)
+        Me.Label14.Location = New System.Drawing.Point(1, 42)
         Me.Label14.Name = "Label14"
         Me.Label14.Size = New System.Drawing.Size(45, 13)
         Me.Label14.TabIndex = 64
@@ -1084,7 +1080,7 @@ Public Class frmUEB
         'Label6
         '
         Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(6, 20)
+        Me.Label6.Location = New System.Drawing.Point(1, 24)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(62, 13)
         Me.Label6.TabIndex = 63
@@ -1092,7 +1088,7 @@ Public Class frmUEB
         '
         'txtOutputFile
         '
-        Me.txtOutputFile.Location = New System.Drawing.Point(68, 13)
+        Me.txtOutputFile.Location = New System.Drawing.Point(63, 17)
         Me.txtOutputFile.Name = "txtOutputFile"
         Me.txtOutputFile.Size = New System.Drawing.Size(335, 20)
         Me.txtOutputFile.TabIndex = 62
@@ -1100,45 +1096,27 @@ Public Class frmUEB
         'GroupBox4
         '
         Me.GroupBox4.Controls.Add(Me.txtAggOutputControlFile)
-        Me.GroupBox4.Controls.Add(Me.txtAggOutputHeader)
-        Me.GroupBox4.Controls.Add(Me.Label13)
         Me.GroupBox4.Controls.Add(Me.Label12)
         Me.GroupBox4.Controls.Add(Me.Label11)
         Me.GroupBox4.Controls.Add(Me.txtAggOutputFile)
-        Me.GroupBox4.Location = New System.Drawing.Point(422, 11)
+        Me.GroupBox4.Location = New System.Drawing.Point(413, 11)
         Me.GroupBox4.Name = "GroupBox4"
-        Me.GroupBox4.Size = New System.Drawing.Size(378, 78)
+        Me.GroupBox4.Size = New System.Drawing.Size(387, 65)
         Me.GroupBox4.TabIndex = 67
         Me.GroupBox4.TabStop = False
         Me.GroupBox4.Text = "Aggregated Output"
         '
         'txtAggOutputControlFile
         '
-        Me.txtAggOutputControlFile.Location = New System.Drawing.Point(66, 13)
+        Me.txtAggOutputControlFile.Location = New System.Drawing.Point(58, 17)
         Me.txtAggOutputControlFile.Name = "txtAggOutputControlFile"
-        Me.txtAggOutputControlFile.Size = New System.Drawing.Size(310, 20)
+        Me.txtAggOutputControlFile.Size = New System.Drawing.Size(323, 20)
         Me.txtAggOutputControlFile.TabIndex = 72
-        '
-        'txtAggOutputHeader
-        '
-        Me.txtAggOutputHeader.Location = New System.Drawing.Point(66, 35)
-        Me.txtAggOutputHeader.Name = "txtAggOutputHeader"
-        Me.txtAggOutputHeader.Size = New System.Drawing.Size(310, 20)
-        Me.txtAggOutputHeader.TabIndex = 71
-        '
-        'Label13
-        '
-        Me.Label13.AutoSize = True
-        Me.Label13.Location = New System.Drawing.Point(6, 38)
-        Me.Label13.Name = "Label13"
-        Me.Label13.Size = New System.Drawing.Size(45, 13)
-        Me.Label13.TabIndex = 70
-        Me.Label13.Text = "Header:"
         '
         'Label12
         '
         Me.Label12.AutoSize = True
-        Me.Label12.Location = New System.Drawing.Point(6, 16)
+        Me.Label12.Location = New System.Drawing.Point(0, 20)
         Me.Label12.Name = "Label12"
         Me.Label12.Size = New System.Drawing.Size(62, 13)
         Me.Label12.TabIndex = 69
@@ -1147,7 +1125,7 @@ Public Class frmUEB
         'Label11
         '
         Me.Label11.AutoSize = True
-        Me.Label11.Location = New System.Drawing.Point(6, 60)
+        Me.Label11.Location = New System.Drawing.Point(0, 42)
         Me.Label11.Name = "Label11"
         Me.Label11.Size = New System.Drawing.Size(52, 13)
         Me.Label11.TabIndex = 68
@@ -1155,9 +1133,9 @@ Public Class frmUEB
         '
         'txtAggOutputFile
         '
-        Me.txtAggOutputFile.Location = New System.Drawing.Point(66, 57)
+        Me.txtAggOutputFile.Location = New System.Drawing.Point(58, 39)
         Me.txtAggOutputFile.Name = "txtAggOutputFile"
-        Me.txtAggOutputFile.Size = New System.Drawing.Size(310, 20)
+        Me.txtAggOutputFile.Size = New System.Drawing.Size(323, 20)
         Me.txtAggOutputFile.TabIndex = 67
         '
         'GroupBox3
@@ -1194,9 +1172,9 @@ Public Class frmUEB
         Me.GroupBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox1.Controls.Add(Me.AtcGridGridOutput)
-        Me.GroupBox1.Location = New System.Drawing.Point(3, 95)
+        Me.GroupBox1.Location = New System.Drawing.Point(3, 82)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(801, 213)
+        Me.GroupBox1.Size = New System.Drawing.Size(801, 226)
         Me.GroupBox1.TabIndex = 63
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Grid Output"
@@ -1213,7 +1191,7 @@ Public Class frmUEB
         Me.AtcGridGridOutput.LineWidth = 0.0!
         Me.AtcGridGridOutput.Location = New System.Drawing.Point(3, 16)
         Me.AtcGridGridOutput.Name = "AtcGridGridOutput"
-        Me.AtcGridGridOutput.Size = New System.Drawing.Size(795, 194)
+        Me.AtcGridGridOutput.Size = New System.Drawing.Size(795, 207)
         Me.AtcGridGridOutput.Source = Nothing
         Me.AtcGridGridOutput.TabIndex = 64
         '
@@ -2066,10 +2044,29 @@ Public Class frmUEB
     End Sub
 
     Private Sub txtOutputFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOutputFile.TextChanged
-        pOutputControlData.FileName = txtInputFile.Text
-        If FileExists(txtInputFile.Text) Then
+        pOutputControlData.FileName = txtOutputFile.Text
+        If FileExists(txtOutputFile.Text) Then
             pOutputControlData = Nothing
             pOutputControlData = New clsUEBOutputControl(txtOutputFile.Text)
+            SetOutputControl()
+        End If
+    End Sub
+
+    Private Sub txtAggOutputControlFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtAggOutputControlFile.Click
+        Dim cdlg As New Windows.Forms.OpenFileDialog
+        cdlg.Title = "Open UEB Aggregated Output Control File"
+        cdlg.Filter = "UEB Aggregated Output Control files (*.dat)|*.dat|All Files (*.*)|*.*"
+        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+            txtAggOutputControlFile.Text = cdlg.FileName
+        End If
+
+    End Sub
+
+    Private Sub txtAggOutputControlFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtAggOutputControlFile.TextChanged
+        pAggOutputControlData.FileName = txtAggOutputControlFile.Text
+        If FileExists(txtAggOutputControlFile.Text) Then
+            pAggOutputControlData = Nothing
+            pAggOutputControlData = New clsUEBAggOutputControl(txtAggOutputControlFile.Text)
             SetOutputControl()
         End If
     End Sub
@@ -2097,6 +2094,8 @@ Public Class frmUEB
             Next
             If lMsg.Length = 0 Then
                 pParmData.WriteParameterFile()
+            Else
+                MsgBox(lMsg, MsgBoxStyle.Exclamation, "UEB Write Problem")
             End If
         End If
 
@@ -2104,18 +2103,18 @@ Public Class frmUEB
         If pSiteData.FileName.Length > 0 Then 'check site variable inputs
             For i As Integer = 1 To pSiteData.Variables.Count
                 With AtcGridSiteVars.Source
-                    If FileExists(.CellValue(i, 2)) Then 'valid NetCDF file entered
-                        pSiteData.Variables(i - 1).GridFileName = .CellValue(i, 2)
-                        If .CellValue(i, 3).Length > 0 Then
+                    If FileExists(.CellValue(i, 1)) Then 'valid NetCDF file entered
+                        pSiteData.Variables(i - 1).GridFileName = .CellValue(i, 1)
+                        If .CellValue(i, 2).Length > 0 Then
                             'TODO: check validity of Grid Variable name
-                            pSiteData.Variables(i - 1).GridVariableName = .CellValue(i, 3)
+                            pSiteData.Variables(i - 1).GridVariableName = .CellValue(i, 2)
                             pSiteData.Variables(i - 1).SpaceVarying = True
                         Else
                             lMsg = "No grid variable specified in row " & i
                             Exit For
                         End If
-                    ElseIf IsNumeric(.CellValue(i, 1)) Then
-                        pSiteData.Variables(i - 1).Value = .CellValue(i, 1)
+                    ElseIf IsNumeric(.CellValue(i, 3)) Then
+                        pSiteData.Variables(i - 1).Value = Double.Parse(.CellValue(i, 3))
                         pSiteData.Variables(i - 1).SpaceVarying = False
                     Else 'problem with a site value
                         lMsg = "Problem processing value on Site Variables tab in row " & i
@@ -2125,25 +2124,65 @@ Public Class frmUEB
             Next
             If lMsg.Length = 0 Then
                 pSiteData.WriteSiteFile()
+            Else
+                MsgBox(lMsg, MsgBoxStyle.Exclamation, "UEB Write Problem")
             End If
         End If
 
         lMsg = ""
-        If pBCParameterFileName.Length > 0 Then
-            'pBCDataArray(0) = AtcTextAParm.ValueDouble
-            'pBCDataArray(1) = AtcTextCParm.ValueDouble
-            Dim lMonth As Integer
-            For i As Integer = 1 To 12
-                If IsNumeric(AtcGridGridOutput.Source.CellValue(i, 1)) Then
-                    lMonth = pBCDataArray(3 * i - 1)
-                    pBCDataArray(3 * i) = AtcGridGridOutput.Source.CellValue(lMonth, 1)
-                Else 'problem with a site value
-                    lMsg = "Problem processing value on Bristow-Campbell Parameters tab in row " & i
-                    Exit For
-                End If
+        If pInputControlData.FileName.Length > 0 Then
+            If IsNumeric(AtcTextSYear.Text) AndAlso IsNumeric(AtcTextSMonth.Text) AndAlso _
+               IsNumeric(AtcTextSDay.Text) AndAlso IsNumeric(AtcTextSHour.Text) AndAlso _
+               IsNumeric(AtcTextSMinute.Text) AndAlso IsNumeric(AtcTextEYear.Text) AndAlso _
+               IsNumeric(AtcTextEMon.Text) AndAlso IsNumeric(AtcTextEDay.Text) AndAlso _
+               IsNumeric(AtcTextEHour.Text) AndAlso IsNumeric(AtcTextEMinute.Text) AndAlso _
+               IsNumeric(AtcTextTimeStep.Text) AndAlso IsNumeric(AtcTextUTCOffset.Text) Then
+                pInputControlData.SDate(0) = AtcTextSYear.Text
+                pInputControlData.SDate(1) = AtcTextSMonth.Text
+                pInputControlData.SDate(2) = AtcTextSDay.Text
+                pInputControlData.SDate(3) = AtcTextSHour.Text
+                pInputControlData.SDate(4) = AtcTextSMinute.Text
+                pInputControlData.EDate(0) = AtcTextEYear.Text
+                pInputControlData.EDate(1) = AtcTextEMon.Text
+                pInputControlData.EDate(2) = AtcTextEDay.Text
+                pInputControlData.EDate(3) = AtcTextEHour.Text
+                pInputControlData.EDate(4) = AtcTextEMinute.Text
+                pInputControlData.TimeStep = AtcTextTimeStep.Text
+                pInputControlData.UTCOffset = AtcTextUTCOffset.Text
+            Else
+                lMsg = "Problem with Date parameters, please check"
+            End If
+            For i As Integer = 1 To pInputControlData.Variables.Count
+                With AtcGridInputControl.Source
+                    If FileExists(.CellValue(i, 1)) Then 'valid NetCDF file entered
+                        pInputControlData.Variables(i - 1).GridFileName = .CellValue(i, 1)
+                        If .CellValue(i, 2).Length > 0 Then
+                            'TODO: check validity of Grid Variable name
+                            pInputControlData.Variables(i - 1).GridVariableName = .CellValue(i, 2)
+                            pInputControlData.Variables(i - 1).SpaceVarying = True
+                            pInputControlData.Variables(i - 1).TimeVarying = True
+                        Else
+                            lMsg = "No grid variable specified in row " & i
+                            Exit For
+                        End If
+                    ElseIf FileExists(.CellValue(i, 3)) Then 'valid timeseries file entered
+                        pInputControlData.Variables(i - 1).TimeFileName = .CellValue(i, 3)
+                        pInputControlData.Variables(i - 1).TimeVarying = True
+                        pInputControlData.Variables(i - 1).SpaceVarying = False
+                    ElseIf IsNumeric(.CellValue(i, 4)) Then
+                        pInputControlData.Variables(i - 1).Value = Double.Parse(.CellValue(i, 4))
+                        pInputControlData.Variables(i - 1).SpaceVarying = False
+                        pInputControlData.Variables(i - 1).TimeVarying = False
+                    Else 'problem with a site value
+                        lMsg = "Problem processing value on Site Variables tab in row " & i
+                        Exit For
+                    End If
+                End With
             Next
             If lMsg.Length = 0 Then
-                WriteBCParmsFile(pBCParameterFileName, pBCDataArray)
+                pInputControlData.WriteInputControlFile()
+            Else
+                MsgBox(lMsg, MsgBoxStyle.Exclamation, "UEB Write Problem")
             End If
         End If
 
@@ -2213,7 +2252,7 @@ Public Class frmUEB
         AtcTextEDay.Text = pInputControlData.EDate(2)
         AtcTextEHour.Text = pInputControlData.EDate(3)
         AtcTextEMinute.Text = pInputControlData.EDate(4)
-        atcTextTimeStep.Text = pInputControlData.TimeStep
+        AtcTextTimeStep.Text = pInputControlData.TimeStep
         AtcTextUTCOffset.Text = pInputControlData.UTCOffset
 
         AtcGridInputControl.Clear()
@@ -2245,7 +2284,6 @@ Public Class frmUEB
         Dim lVarName As String
 
         txtOutputHeader.Text = pOutputControlData.Header
-        txtAggOutputHeader.Text = pAggOutputControlData.Header
         AtcGridGridOutput.Clear()
         With AtcGridGridOutput.Source
             .FixedRows = 1
@@ -2257,12 +2295,19 @@ Public Class frmUEB
                 .CellValue(i, 0) = AvailableOutputs(i - 1)
                 .CellColor(i, 0) = SystemColors.ControlDark
                 .CellEditable(i, 1) = True
+                .CellValue(i, 2) = "No"
                 .CellEditable(i, 2) = True
             Next
             For i = 0 To pOutputControlData.Variables.Count - 1
                 lVarName = VarName(pOutputControlData.Variables(i).Description)
                 If AvailableOutputs.Keys.Contains(lVarName) Then
                     .CellValue(AvailableOutputs.IndexFromKey(lVarName) + 1, 1) = pOutputControlData.Variables(i).GridFileName
+                End If
+            Next
+            For i = 0 To pAggOutputControlData.Variables.Count - 1
+                lVarName = VarName(pAggOutputControlData.Variables(i).Description)
+                If AvailableOutputs.Keys.Contains(lVarName) Then
+                    .CellValue(AvailableOutputs.IndexFromKey(lVarName) + 1, 2) = "Yes"
                 End If
             Next
         End With
