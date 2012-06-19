@@ -1,0 +1,63 @@
+﻿ATF-BC: Atmospheric transmission factor
+HRI: Radiation index
+Eacl: Clear sky emissivity
+Ema: Atmospheric emissivity
+Ta: Air temperature(C)
+P: Precipitation (m/hr)
+V: Wind speed (m/s)
+RH: Relative humidity
+Qsi: Incoming solar radiation (kJ/m2/hr)
+Qli: Incoming longwave radiation (kJ/m2/hr)
+Qnet: Input net radiation (kJ/m2/hr)
+Cos: Cos of solar zenith angle (Zen)
+Ub: Energy content (kJ/m2)
+SWE: Surface snow water equivalent (m)
+tausn: Dimensionless age of the snow surface
+Prain: Precipitation in the form of rain (m/hr)
+Psnow: Precipitation in the form of snow (m/hr)
+Albedo: Albedo
+Qh: Surface Sensible heat flux (kJ/m2/hr)
+Qe: Surface Latent heat flux (kJ/m2/hr)
+E: Surface sublimation (m)
+Melt: Melt outflow from surfacelayer (m/hr)
+Qm: Surface melt energy (kJ/m2/hr)
+Q: Net surface energy exchange (kJ/m2/hr)
+dMdt: Net surface mass exchange (m/h)
+Tave: Average snow temperature (C)
+Ts: Surface snow temperature (C)
+CumP: Cumulative precipitation (m)
+CumE: Cumulative surface sublimation (m)
+CumMelt: Cumulative surface melt (m)
+NetRads: Modeled surface net radiation (kJ/m2/hr)
+Smelt: Melt generated at surface (m/hr)
+refDep: Depth of penetration of top refreezing (m)
+totRefDep: Total depth of refreezing (m)
+Cf: Cloudiness fraction
+Taufb: Direct solar radiation fraction
+Taufd: Diffuse solar radiation fraction
+Qsib: Direct solar radiation
+Qsid: Diffuse solar radiation
+Taub: Direct solar radiation canopy transmission fraction
+Taud: Diffuse solar radiation canopy transmission fraction
+Qsns: Solar radiation absorbed at surface (kJ/m2/hr)
+Qsnc: Solar radiation absorbed in canopy (kJ/m2/hr)
+Qlns: Longwave radiation absorbed a tsurface (kJ/m2/hr)
+Qlnc: Longwave radiation absorbed in canopy (kJ/m2/hr)
+Vz: Modeled wind beneath canopy (m/s)
+Rkinsc: Was canopy aerodynamic resistance -not used presently
+Rkinc: Aerodynamic resistance of surface (below canopy)
+Inmax: Canopy snow interception capacity (m)
+int: Canopy snow interception (m/hr)
+ieff: Fraction of precipitation intercepted (m/hr)
+Ur: Canopy mass unloading (m/hr)
+SWEc: Canopy snow water equivalent (m)
+Tc: Canopy temperature(C)
+Tac: Air temperature within canopy (C)
+QHc: Canopy sensible heat flux (kJ/m2/hr)
+QEc: Canopy latent heat flux (kJ/m2/hr)
+Ec: Canopy sublimation (m/hr)
+Qpc: Precipitation energy advected to canopy (kJ/m2/hr)
+Qmc: Canopy melt energy (kJ/m2/hr)
+Mc: Melt from canopy (m/hr)
+FMc: Net canopy energy exchange (m/hr)
+MassError: Mass balance closure error (m)

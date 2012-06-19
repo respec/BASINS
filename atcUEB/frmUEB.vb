@@ -1,6 +1,7 @@
 Imports atcUtility
 Imports atcMwGisUtility
 Imports MapWinUtility
+Imports MapWinUtility.Strings
 Imports atcData
 Imports System.Drawing
 Imports System
@@ -18,6 +19,8 @@ Public Class frmUEB
     Friend pWatershedGridVariableName As String
     Friend pAggOutputControlData As clsUEBAggOutputControl
     Friend pAggOutputFileName As String
+
+    Friend AvailableOutputs As atcCollection
 
     Friend pBCParameterFileName As String
     Friend pBCDataArray(37) As Double
@@ -194,6 +197,8 @@ Public Class frmUEB
         Me.Label2 = New System.Windows.Forms.Label
         Me.Label62 = New System.Windows.Forms.Label
         Me.TabPage3 = New System.Windows.Forms.TabPage
+        Me.txtInputHeader = New System.Windows.Forms.TextBox
+        Me.Label15 = New System.Windows.Forms.Label
         Me.AtcGridInputControl = New atcControls.atcGrid
         Me.txtInputFile = New System.Windows.Forms.TextBox
         Me.Label3 = New System.Windows.Forms.Label
@@ -220,10 +225,14 @@ Public Class frmUEB
         Me.AtcTextSMonth = New atcControls.atcText
         Me.AtcTextEYear = New atcControls.atcText
         Me.TabPage7 = New System.Windows.Forms.TabPage
+        Me.txtSiteHeader = New System.Windows.Forms.TextBox
+        Me.Label16 = New System.Windows.Forms.Label
         Me.AtcGridSiteVars = New atcControls.atcGrid
         Me.txtSiteFile = New System.Windows.Forms.TextBox
         Me.Label5 = New System.Windows.Forms.Label
         Me.TabPage1 = New System.Windows.Forms.TabPage
+        Me.txtParameterHeader = New System.Windows.Forms.TextBox
+        Me.Label17 = New System.Windows.Forms.Label
         Me.AtcGridModelParms = New atcControls.atcGrid
         Me.txtParameterFile = New System.Windows.Forms.TextBox
         Me.Label4 = New System.Windows.Forms.Label
@@ -298,12 +307,6 @@ Public Class frmUEB
         Me.ComboBox39 = New System.Windows.Forms.ComboBox
         Me.cmdSimulate = New System.Windows.Forms.Button
         Me.chkFilePrompt = New System.Windows.Forms.CheckBox
-        Me.Label15 = New System.Windows.Forms.Label
-        Me.txtInputHeader = New System.Windows.Forms.TextBox
-        Me.Label16 = New System.Windows.Forms.Label
-        Me.txtSiteHeader = New System.Windows.Forms.TextBox
-        Me.Label17 = New System.Windows.Forms.Label
-        Me.txtParameterHeader = New System.Windows.Forms.TextBox
         Me.TabControl1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.TabPage3.SuspendLayout()
@@ -472,6 +475,22 @@ Public Class frmUEB
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Input Control"
         Me.TabPage3.UseVisualStyleBackColor = True
+        '
+        'txtInputHeader
+        '
+        Me.txtInputHeader.Location = New System.Drawing.Point(112, 44)
+        Me.txtInputHeader.Name = "txtInputHeader"
+        Me.txtInputHeader.Size = New System.Drawing.Size(410, 20)
+        Me.txtInputHeader.TabIndex = 66
+        '
+        'Label15
+        '
+        Me.Label15.AutoSize = True
+        Me.Label15.Location = New System.Drawing.Point(16, 47)
+        Me.Label15.Name = "Label15"
+        Me.Label15.Size = New System.Drawing.Size(100, 13)
+        Me.Label15.TabIndex = 65
+        Me.Label15.Text = "Control File Header:"
         '
         'AtcGridInputControl
         '
@@ -909,6 +928,22 @@ Public Class frmUEB
         Me.TabPage7.Text = "Site Vars/Init Conds"
         Me.TabPage7.UseVisualStyleBackColor = True
         '
+        'txtSiteHeader
+        '
+        Me.txtSiteHeader.Location = New System.Drawing.Point(116, 38)
+        Me.txtSiteHeader.Name = "txtSiteHeader"
+        Me.txtSiteHeader.Size = New System.Drawing.Size(410, 20)
+        Me.txtSiteHeader.TabIndex = 65
+        '
+        'Label16
+        '
+        Me.Label16.AutoSize = True
+        Me.Label16.Location = New System.Drawing.Point(32, 41)
+        Me.Label16.Name = "Label16"
+        Me.Label16.Size = New System.Drawing.Size(85, 13)
+        Me.Label16.TabIndex = 64
+        Me.Label16.Text = "Site File Header:"
+        '
         'AtcGridSiteVars
         '
         Me.AtcGridSiteVars.AllowHorizontalScrolling = True
@@ -955,6 +990,22 @@ Public Class frmUEB
         Me.TabPage1.TabIndex = 11
         Me.TabPage1.Text = "Constant Parameters"
         Me.TabPage1.UseVisualStyleBackColor = True
+        '
+        'txtParameterHeader
+        '
+        Me.txtParameterHeader.Location = New System.Drawing.Point(125, 36)
+        Me.txtParameterHeader.Name = "txtParameterHeader"
+        Me.txtParameterHeader.Size = New System.Drawing.Size(410, 20)
+        Me.txtParameterHeader.TabIndex = 62
+        '
+        'Label17
+        '
+        Me.Label17.AutoSize = True
+        Me.Label17.Location = New System.Drawing.Point(11, 39)
+        Me.Label17.Name = "Label17"
+        Me.Label17.Size = New System.Drawing.Size(115, 13)
+        Me.Label17.TabIndex = 61
+        Me.Label17.Text = "Parameter File Header:"
         '
         'AtcGridModelParms
         '
@@ -1751,6 +1802,7 @@ Public Class frmUEB
         '
         'chkFilePrompt
         '
+        Me.chkFilePrompt.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkFilePrompt.AutoSize = True
         Me.chkFilePrompt.Checked = True
         Me.chkFilePrompt.CheckState = System.Windows.Forms.CheckState.Checked
@@ -1760,54 +1812,6 @@ Public Class frmUEB
         Me.chkFilePrompt.TabIndex = 11
         Me.chkFilePrompt.Text = "Prompt for File Name"
         Me.chkFilePrompt.UseVisualStyleBackColor = True
-        '
-        'Label15
-        '
-        Me.Label15.AutoSize = True
-        Me.Label15.Location = New System.Drawing.Point(16, 47)
-        Me.Label15.Name = "Label15"
-        Me.Label15.Size = New System.Drawing.Size(100, 13)
-        Me.Label15.TabIndex = 65
-        Me.Label15.Text = "Control File Header:"
-        '
-        'txtInputHeader
-        '
-        Me.txtInputHeader.Location = New System.Drawing.Point(112, 44)
-        Me.txtInputHeader.Name = "txtInputHeader"
-        Me.txtInputHeader.Size = New System.Drawing.Size(410, 20)
-        Me.txtInputHeader.TabIndex = 66
-        '
-        'Label16
-        '
-        Me.Label16.AutoSize = True
-        Me.Label16.Location = New System.Drawing.Point(32, 41)
-        Me.Label16.Name = "Label16"
-        Me.Label16.Size = New System.Drawing.Size(85, 13)
-        Me.Label16.TabIndex = 64
-        Me.Label16.Text = "Site File Header:"
-        '
-        'txtSiteHeader
-        '
-        Me.txtSiteHeader.Location = New System.Drawing.Point(116, 38)
-        Me.txtSiteHeader.Name = "txtSiteHeader"
-        Me.txtSiteHeader.Size = New System.Drawing.Size(410, 20)
-        Me.txtSiteHeader.TabIndex = 65
-        '
-        'Label17
-        '
-        Me.Label17.AutoSize = True
-        Me.Label17.Location = New System.Drawing.Point(11, 39)
-        Me.Label17.Name = "Label17"
-        Me.Label17.Size = New System.Drawing.Size(115, 13)
-        Me.Label17.TabIndex = 61
-        Me.Label17.Text = "Parameter File Header:"
-        '
-        'txtParameterHeader
-        '
-        Me.txtParameterHeader.Location = New System.Drawing.Point(125, 36)
-        Me.txtParameterHeader.Name = "txtParameterHeader"
-        Me.txtParameterHeader.Size = New System.Drawing.Size(410, 20)
-        Me.txtParameterHeader.TabIndex = 62
         '
         'frmUEB
         '
@@ -1878,6 +1882,15 @@ Public Class frmUEB
         lblInstructions.Text = "Select existing UEB project by clicking in the Master Project File box OR " & vbCrLf & _
                                "build new UEB project by defining all fields on all tabs." & vbCrLf & _
                                "Existing data files (e.g. Weather, Parameter, ...) may be accessed on other tabs."
+
+        'read in available output variables
+        Dim lFileContents As String = GetEmbeddedFileAsString("OutputVariables.dat")
+        Dim lVarDescription As String
+        AvailableOutputs = New atcCollection
+        While lFileContents.Length > 0
+            lVarDescription = StrSplit(lFileContents, vbCrLf, "")
+            AvailableOutputs.Add(VarName(lVarDescription), lVarDescription)
+        End While
 
         pParmData = New clsUEBParameterFile("")
         With AtcGridModelParms
@@ -2042,7 +2055,7 @@ Public Class frmUEB
         End If
     End Sub
 
-    Private Sub txtOutputFile_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+    Private Sub txtOutputFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOutputFile.Click
         Dim cdlg As New Windows.Forms.OpenFileDialog
         cdlg.Title = "Open UEB Output Control File"
         cdlg.Filter = "UEB Output Control files (*.dat)|*.dat|All Files (*.*)|*.*"
@@ -2052,7 +2065,7 @@ Public Class frmUEB
 
     End Sub
 
-    Private Sub txtOutputFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs)
+    Private Sub txtOutputFile_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOutputFile.TextChanged
         pOutputControlData.FileName = txtInputFile.Text
         If FileExists(txtInputFile.Text) Then
             pOutputControlData = Nothing
@@ -2229,26 +2242,34 @@ Public Class frmUEB
 
     Private Sub SetOutputControl()
         Dim i As Integer
+        Dim lVarName As String
 
         txtOutputHeader.Text = pOutputControlData.Header
         txtAggOutputHeader.Text = pAggOutputControlData.Header
         AtcGridGridOutput.Clear()
         With AtcGridGridOutput.Source
             .FixedRows = 1
+            .FixedColumns = 1
             .CellValue(0, 0) = "Output Variable"
             .CellValue(0, 1) = "Grid File Name"
-            For i = 1 To pOutputControlData.Variables.Count
-                .CellValue(i, 0) = pOutputControlData.Variables(i - 1).Description
+            .CellValue(0, 2) = "Aggregate Output"
+            For i = 1 To AvailableOutputs.Count
+                .CellValue(i, 0) = AvailableOutputs(i - 1)
                 .CellColor(i, 0) = SystemColors.ControlDark
-                .CellValue(i, 1) = pOutputControlData.Variables(i - 1).GridFileName
                 .CellEditable(i, 1) = True
+                .CellEditable(i, 2) = True
+            Next
+            For i = 0 To pOutputControlData.Variables.Count - 1
+                lVarName = VarName(pOutputControlData.Variables(i).Description)
+                If AvailableOutputs.Keys.Contains(lVarName) Then
+                    .CellValue(AvailableOutputs.IndexFromKey(lVarName) + 1, 1) = pOutputControlData.Variables(i).GridFileName
+                End If
             Next
         End With
 
         AtcGridPointOutput.Clear()
         With AtcGridPointOutput.Source
             .FixedRows = 1
-            .FixedColumns = 1
             .CellValue(0, 0) = "Grid Point Row"
             .CellValue(0, 1) = "Grid Point Column"
             .CellValue(0, 2) = "Grid Point File Name"
@@ -2318,5 +2339,13 @@ Public Class frmUEB
             End If
         End If
     End Sub
+
+    Public Shared Function VarName(ByVal aDescription As String) As String
+        If aDescription.Contains(":") Then
+            Return aDescription.Substring(0, aDescription.IndexOf(":")).ToUpper
+        Else
+            Return aDescription.ToUpper
+        End If
+    End Function
 
 End Class
