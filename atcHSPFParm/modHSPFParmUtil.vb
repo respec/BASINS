@@ -139,7 +139,7 @@ Module modHSPFParmUtil
             AddWatershed(lPrj, aParmDB)
             For Each lScn As Scn In lPrj.Scenarios
                 Dim lHspfUci As HspfUci = SetScenario(lScn)
-                AddScenario(lScn, lPrj, lHspfUci, aParmDB, True)
+                AddScenario(lScn, lPrj, lHspfUci, aParmDB, False)
             Next
         Next
     End Sub
@@ -475,13 +475,13 @@ Module modHSPFParmUtil
                 End If
             Next 'hspftable
             If lMsgBuilder.Length > 0 Then
-                'Logger.Msg(lMsgBuilder.ToString(), MsgBoxStyle.Information, "HSPFParm Values " & " (Operation: " & lOpn.Name & ", " & lOpn.Id & ")" & " Beyond Normal Range")
-                Logger.Dbg(lMsgBuilder.ToString())
-                Dim lfrmMsg As New frmBulletin(lMsgBuilder.ToString())
-                lfrmMsg.Text = "HSPFParm Values " & " (Operation: " & lOpn.Name & ", " & lOpn.Id & ")" & " Beyond Normal Range"
-                lfrmMsg.ClearSelection()
-                'lfrmMsg.ShowDialog()
-                lfrmMsg.ShowTimedDialog(6000)
+                Logger.Msg(lMsgBuilder.ToString(), MsgBoxStyle.Information, "HSPFParm Values " & " (Operation: " & lOpn.Name & ", " & lOpn.Id & ")" & " Beyond Normal Range")
+                'Logger.Dbg(lMsgBuilder.ToString())
+                'Dim lfrmMsg As New frmBulletin(lMsgBuilder.ToString())
+                'lfrmMsg.Text = "HSPFParm Values " & " (Operation: " & lOpn.Name & ", " & lOpn.Id & ")" & " Beyond Normal Range"
+                'lfrmMsg.ClearSelection()
+                ''lfrmMsg.ShowDialog()
+                'lfrmMsg.ShowTimedDialog(6000)
             End If
             lMsgBuilder.Length = 0
         Next 'operation
