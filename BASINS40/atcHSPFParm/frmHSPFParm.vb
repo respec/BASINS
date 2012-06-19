@@ -464,11 +464,12 @@ Public Class frmHSPFParm
         '
         'btnImport
         '
-        Me.btnImport.Location = New System.Drawing.Point(473, 17)
+        Me.btnImport.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnImport.Location = New System.Drawing.Point(102, 544)
         Me.btnImport.Name = "btnImport"
-        Me.btnImport.Size = New System.Drawing.Size(75, 23)
+        Me.btnImport.Size = New System.Drawing.Size(78, 28)
         Me.btnImport.TabIndex = 14
-        Me.btnImport.Text = "Import"
+        Me.btnImport.Text = "Batch Import"
         Me.btnImport.UseVisualStyleBackColor = True
         '
         'frmHSPFParm
