@@ -122,7 +122,9 @@ Friend Class frmSelectScript
         With lSource
             MySettings = GetAllSettings("ATCTimeseriesImport", "Scripts")
             .Columns = 2
-            .Rows = UBound(MySettings, 1) - LBound(MySettings, 1) + 3 'the number of scripts found plus title line and first blank line
+            If Not MySettings Is Nothing Then
+                .Rows = UBound(MySettings, 1) - LBound(MySettings, 1) + 3 'the number of scripts found plus title line and first blank line
+            End If
 
             .CellValue(0, 0) = "Description"
             .CellValue(0, 1) = "Script File"
