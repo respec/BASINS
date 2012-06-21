@@ -509,7 +509,7 @@ Public Class frmHSPFParm
     End Sub
 
     Private Sub cmdHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdHelp.Click
-        ShowHelp("BASINS Details\Watershed and Instream Model Setup\HSPF.html")
+        ShowHelp("BASINS Details\Watershed and Instream Model Setup\HSPFParm.html")
     End Sub
 
     Private Sub cmdMap_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdMap.Click
