@@ -27,7 +27,7 @@ Public Class clsUEBAggOutputControl
 
     Public Function WriteAggOutputControlFile() As Boolean
 
-        Dim lStr As String = ""
+        Dim lStr As String = Header & vbCrLf
 
         If FileName.Length > 0 Then
             Try

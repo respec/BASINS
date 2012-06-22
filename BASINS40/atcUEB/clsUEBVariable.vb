@@ -27,9 +27,9 @@ Public Class clsUEBVariable
 
     Public Function SiteVariableString() As String
         If SpaceVarying Then
-            Return Description & vbCrLf & "1" & vbCrLf & GridFileName & vbCrLf & GridVariableName
+            Return Description & vbCrLf & "1" & vbCrLf & GridFileName & vbCrLf & GridVariableName & vbCrLf
         Else
-            Return Description & vbCrLf & "0" & vbCrLf & Value
+            Return Description & vbCrLf & "0" & vbCrLf & Value & vbCrLf
         End If
 
     End Function
@@ -53,11 +53,11 @@ Public Class clsUEBVariable
 
     Public Function InputVariableString() As String
         If SpaceVarying And TimeVarying Then
-            Return Description & vbCrLf & "1" & vbCrLf & GridFileName & vbCrLf & GridVariableName
+            Return Description & vbCrLf & "1" & vbCrLf & GridFileName & vbCrLf & GridVariableName & vbCrLf
         ElseIf TimeVarying Then
-            Return Description & vbCrLf & "0" & vbCrLf & TimeFileName
+            Return Description & vbCrLf & "0" & vbCrLf & TimeFileName & vbCrLf
         Else
-            Return Description & vbCrLf & "2" & vbCrLf & Value
+            Return Description & vbCrLf & "2" & vbCrLf & Value & vbCrLf
         End If
 
     End Function
@@ -87,7 +87,7 @@ Public Class clsUEBVariable
     End Function
 
     Public Function OutputVariableString() As String
-        Return Description & vbCrLf & GridFileName
+        Return Description & vbCrLf & GridFileName & vbCrLf
     End Function
 
     Public Shared Function FromOutputVariableString(ByRef aFileContents As String) As clsUEBVariable

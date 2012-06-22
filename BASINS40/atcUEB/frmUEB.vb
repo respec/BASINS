@@ -1976,6 +1976,10 @@ Public Class frmUEB
         End If
     End Sub
 
+    Private Sub txtProjectName_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtProjectName.TextChanged
+        pProjectDescription = txtProjectName.Text
+    End Sub
+
     Private Sub txtParameterFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtParameterFile.Click
         Dim cdlg As New Windows.Forms.OpenFileDialog
         cdlg.Title = "Open UEB Parameter File"
@@ -2078,111 +2082,173 @@ Public Class frmUEB
     End Sub
 
     Private Sub UpdateInputFiles()
+        Dim i As Integer
         Dim lMsg As String
         Dim lValue As String
 
-        lMsg = ""
-        If pParmData.FileName.Length > 0 Then 'check parameter file inputs
-            For i As Integer = 1 To pParmData.Variables.Count
-                lValue = AtcGridModelParms.Source.CellValue(i, 1)
-                If IsNumeric(lValue) Then
-                    pParmData.Variables(i - 1).Value = lValue
-                Else 'problem with a parameter value
-                    lMsg = "Problem processing value on Model Parameters tab in row " & i
-                    Exit For
+        If WriteMasterFile(txtMasterFile.Text, pProjectDescription, pParmData.FileName, pSiteData.FileName, _
+                           pInputControlData.FileName, pOutputControlData.FileName, pWatershedGridFileName, pWatershedGridVariableName, _
+                           pAggOutputControlData.FileName, pAggOutputFileName) Then
+
+            lMsg = ""
+            If pParmData.FileName.Length > 0 Then 'check parameter file inputs
+                For i = 1 To pParmData.Variables.Count
+                    lValue = AtcGridModelParms.Source.CellValue(i, 1)
+                    If IsNumeric(lValue) Then
+                        pParmData.Variables(i - 1).Value = lValue
+                    Else 'problem with a parameter value
+                        lMsg = "Problem processing value on Model Parameters tab in row " & i
+                        Exit For
+                    End If
+                Next
+                If lMsg.Length = 0 Then
+                    pParmData.WriteParameterFile()
+                Else
+                    MsgBox(lMsg, MsgBoxStyle.Exclamation, "UEB Write Problem")
                 End If
-            Next
-            If lMsg.Length = 0 Then
-                pParmData.WriteParameterFile()
-            Else
-                MsgBox(lMsg, MsgBoxStyle.Exclamation, "UEB Write Problem")
             End If
-        End If
 
-        lMsg = ""
-        If pSiteData.FileName.Length > 0 Then 'check site variable inputs
-            For i As Integer = 1 To pSiteData.Variables.Count
-                With AtcGridSiteVars.Source
-                    If FileExists(.CellValue(i, 1)) Then 'valid NetCDF file entered
-                        pSiteData.Variables(i - 1).GridFileName = .CellValue(i, 1)
-                        If .CellValue(i, 2).Length > 0 Then
-                            'TODO: check validity of Grid Variable name
-                            pSiteData.Variables(i - 1).GridVariableName = .CellValue(i, 2)
-                            pSiteData.Variables(i - 1).SpaceVarying = True
-                        Else
-                            lMsg = "No grid variable specified in row " & i
+            lMsg = ""
+            If pSiteData.FileName.Length > 0 Then 'check site variable inputs
+                For i = 1 To pSiteData.Variables.Count
+                    With AtcGridSiteVars.Source
+                        If FileExists(.CellValue(i, 1)) Then 'valid NetCDF file entered
+                            pSiteData.Variables(i - 1).GridFileName = .CellValue(i, 1)
+                            If .CellValue(i, 2).Length > 0 Then
+                                'TODO: check validity of Grid Variable name
+                                pSiteData.Variables(i - 1).GridVariableName = .CellValue(i, 2)
+                                pSiteData.Variables(i - 1).SpaceVarying = True
+                            Else
+                                lMsg = "No grid variable specified in row " & i
+                                Exit For
+                            End If
+                        ElseIf IsNumeric(.CellValue(i, 3)) Then
+                            pSiteData.Variables(i - 1).Value = Double.Parse(.CellValue(i, 3))
+                            pSiteData.Variables(i - 1).SpaceVarying = False
+                        Else 'problem with a site value
+                            lMsg = "Problem processing value on Site Variables tab in row " & i
                             Exit For
                         End If
-                    ElseIf IsNumeric(.CellValue(i, 3)) Then
-                        pSiteData.Variables(i - 1).Value = Double.Parse(.CellValue(i, 3))
-                        pSiteData.Variables(i - 1).SpaceVarying = False
-                    Else 'problem with a site value
-                        lMsg = "Problem processing value on Site Variables tab in row " & i
-                        Exit For
-                    End If
-                End With
-            Next
-            If lMsg.Length = 0 Then
-                pSiteData.WriteSiteFile()
-            Else
-                MsgBox(lMsg, MsgBoxStyle.Exclamation, "UEB Write Problem")
+                    End With
+                Next
+                If lMsg.Length = 0 Then
+                    pSiteData.WriteSiteFile()
+                Else
+                    MsgBox(lMsg, MsgBoxStyle.Exclamation, "UEB Write Problem")
+                End If
             End If
-        End If
 
-        lMsg = ""
-        If pInputControlData.FileName.Length > 0 Then
-            If IsNumeric(AtcTextSYear.Text) AndAlso IsNumeric(AtcTextSMonth.Text) AndAlso _
-               IsNumeric(AtcTextSDay.Text) AndAlso IsNumeric(AtcTextSHour.Text) AndAlso _
-               IsNumeric(AtcTextSMinute.Text) AndAlso IsNumeric(AtcTextEYear.Text) AndAlso _
-               IsNumeric(AtcTextEMon.Text) AndAlso IsNumeric(AtcTextEDay.Text) AndAlso _
-               IsNumeric(AtcTextEHour.Text) AndAlso IsNumeric(AtcTextEMinute.Text) AndAlso _
-               IsNumeric(AtcTextTimeStep.Text) AndAlso IsNumeric(AtcTextUTCOffset.Text) Then
-                pInputControlData.SDate(0) = AtcTextSYear.Text
-                pInputControlData.SDate(1) = AtcTextSMonth.Text
-                pInputControlData.SDate(2) = AtcTextSDay.Text
-                pInputControlData.SDate(3) = AtcTextSHour.Text
-                pInputControlData.SDate(4) = AtcTextSMinute.Text
-                pInputControlData.EDate(0) = AtcTextEYear.Text
-                pInputControlData.EDate(1) = AtcTextEMon.Text
-                pInputControlData.EDate(2) = AtcTextEDay.Text
-                pInputControlData.EDate(3) = AtcTextEHour.Text
-                pInputControlData.EDate(4) = AtcTextEMinute.Text
-                pInputControlData.TimeStep = AtcTextTimeStep.Text
-                pInputControlData.UTCOffset = AtcTextUTCOffset.Text
-            Else
-                lMsg = "Problem with Date parameters, please check"
+            lMsg = ""
+            If pInputControlData.FileName.Length > 0 Then
+                If IsNumeric(AtcTextSYear.Text) AndAlso IsNumeric(AtcTextSMonth.Text) AndAlso _
+                   IsNumeric(AtcTextSDay.Text) AndAlso IsNumeric(AtcTextSHour.Text) AndAlso _
+                   IsNumeric(AtcTextSMinute.Text) AndAlso IsNumeric(AtcTextEYear.Text) AndAlso _
+                   IsNumeric(AtcTextEMon.Text) AndAlso IsNumeric(AtcTextEDay.Text) AndAlso _
+                   IsNumeric(AtcTextEHour.Text) AndAlso IsNumeric(AtcTextEMinute.Text) AndAlso _
+                   IsNumeric(AtcTextTimeStep.Text) AndAlso IsNumeric(AtcTextUTCOffset.Text) Then
+                    pInputControlData.SDate(0) = AtcTextSYear.Text
+                    pInputControlData.SDate(1) = AtcTextSMonth.Text
+                    pInputControlData.SDate(2) = AtcTextSDay.Text
+                    pInputControlData.SDate(3) = AtcTextSHour.Text
+                    pInputControlData.SDate(4) = AtcTextSMinute.Text
+                    pInputControlData.EDate(0) = AtcTextEYear.Text
+                    pInputControlData.EDate(1) = AtcTextEMon.Text
+                    pInputControlData.EDate(2) = AtcTextEDay.Text
+                    pInputControlData.EDate(3) = AtcTextEHour.Text
+                    pInputControlData.EDate(4) = AtcTextEMinute.Text
+                    pInputControlData.TimeStep = AtcTextTimeStep.Text
+                    pInputControlData.UTCOffset = AtcTextUTCOffset.Text
+                Else
+                    lMsg = "Problem with Start/End Date or Time Step/Offset values."
+                End If
+                If lMsg.Length = 0 Then
+                    For i = 1 To pInputControlData.Variables.Count
+                        With AtcGridInputControl.Source
+                            If FileExists(.CellValue(i, 1)) Then 'valid NetCDF file entered
+                                pInputControlData.Variables(i - 1).GridFileName = .CellValue(i, 1)
+                                If .CellValue(i, 2).Length > 0 Then
+                                    'TODO: check validity of Grid Variable name
+                                    pInputControlData.Variables(i - 1).GridVariableName = .CellValue(i, 2)
+                                    pInputControlData.Variables(i - 1).SpaceVarying = True
+                                    pInputControlData.Variables(i - 1).TimeVarying = True
+                                Else
+                                    lMsg = "No grid variable specified in row " & i
+                                    Exit For
+                                End If
+                            ElseIf FileExists(.CellValue(i, 3)) Then 'valid timeseries file entered
+                                pInputControlData.Variables(i - 1).TimeFileName = .CellValue(i, 3)
+                                pInputControlData.Variables(i - 1).TimeVarying = True
+                                pInputControlData.Variables(i - 1).SpaceVarying = False
+                            ElseIf IsNumeric(.CellValue(i, 4)) Then
+                                pInputControlData.Variables(i - 1).Value = Double.Parse(.CellValue(i, 4))
+                                pInputControlData.Variables(i - 1).SpaceVarying = False
+                                pInputControlData.Variables(i - 1).TimeVarying = False
+                            Else 'problem with a site value
+                                lMsg = "Problem processing value on Site Variables tab in row " & i
+                                Exit For
+                            End If
+                        End With
+                    Next
+                End If
+                If lMsg.Length = 0 Then
+                    pInputControlData.WriteInputControlFile()
+                Else
+                    MsgBox(lMsg, MsgBoxStyle.Exclamation, "UEB Write Problem")
+                End If
             End If
-            For i As Integer = 1 To pInputControlData.Variables.Count
-                With AtcGridInputControl.Source
-                    If FileExists(.CellValue(i, 1)) Then 'valid NetCDF file entered
-                        pInputControlData.Variables(i - 1).GridFileName = .CellValue(i, 1)
-                        If .CellValue(i, 2).Length > 0 Then
-                            'TODO: check validity of Grid Variable name
-                            pInputControlData.Variables(i - 1).GridVariableName = .CellValue(i, 2)
-                            pInputControlData.Variables(i - 1).SpaceVarying = True
-                            pInputControlData.Variables(i - 1).TimeVarying = True
-                        Else
-                            lMsg = "No grid variable specified in row " & i
-                            Exit For
+
+            If pOutputControlData.FileName.Length > 0 Then
+                'build main output list based on grid entries
+                Dim lUEBVar As New clsUEBVariable
+                pOutputControlData.Variables.Clear()
+                For i = 1 To AvailableOutputs.Count
+                    With AtcGridGridOutput.Source
+                        If FileExists(.CellValue(i, 1)) Then 'valid NetCDF file entered
+                            lUEBVar = New clsUEBVariable
+                            lUEBVar.Description = .CellValue(i, 0)
+                            lUEBVar.GridFileName = .CellValue(i, 1)
+                            pOutputControlData.Variables.Add(lUEBVar)
                         End If
-                    ElseIf FileExists(.CellValue(i, 3)) Then 'valid timeseries file entered
-                        pInputControlData.Variables(i - 1).TimeFileName = .CellValue(i, 3)
-                        pInputControlData.Variables(i - 1).TimeVarying = True
-                        pInputControlData.Variables(i - 1).SpaceVarying = False
-                    ElseIf IsNumeric(.CellValue(i, 4)) Then
-                        pInputControlData.Variables(i - 1).Value = Double.Parse(.CellValue(i, 4))
-                        pInputControlData.Variables(i - 1).SpaceVarying = False
-                        pInputControlData.Variables(i - 1).TimeVarying = False
-                    Else 'problem with a site value
-                        lMsg = "Problem processing value on Site Variables tab in row " & i
-                        Exit For
-                    End If
+                    End With
+                Next
+                If pOutputControlData.Variables.Count > 0 Then
+                    pOutputControlData.WriteOutputControlFile()
+                Else
+                    MsgBox("No variables selected for output to " & pOutputControlData.FileName, MsgBoxStyle.Information, "UEB Write")
+                End If
+                With AtcGridPointOutput.Source
+                    pOutputControlData.PointDetails.Clear()
+                    pOutputControlData.PointFileNames.Clear()
+                    For i = .FixedRows To .Rows
+                        If IsNumeric(.CellValue(i, 0)) AndAlso IsNumeric(.CellValue(i, 1)) AndAlso _
+                           .CellValue(i, 2).Length > 0 Then
+                            Dim lPt As New System.Drawing.Point
+                            lPt.X = .CellValue(i, 0)
+                            lPt.Y = .CellValue(i, 1)
+                            pOutputControlData.PointDetails.Add(lPt)
+                            pOutputControlData.PointFileNames.Add(.CellValue(i, 2))
+                        End If
+                    Next
                 End With
-            Next
-            If lMsg.Length = 0 Then
-                pInputControlData.WriteInputControlFile()
-            Else
-                MsgBox(lMsg, MsgBoxStyle.Exclamation, "UEB Write Problem")
+            End If
+            If pAggOutputControlData.FileName.Length > 0 Then
+                'build aggregated output list based on grid entries
+                Dim lUEBVar As New clsUEBVariable
+                pAggOutputControlData.Variables.Clear()
+                For i = 1 To AvailableOutputs.Count
+                    With AtcGridGridOutput.Source
+                        If .CellValue(i, 2) = "Yes" Then
+                            lUEBVar = New clsUEBVariable
+                            lUEBVar.Description = .CellValue(i, 0)
+                            pAggOutputControlData.Variables.Add(lUEBVar)
+                        End If
+                    End With
+                Next
+                If pAggOutputControlData.Variables.Count > 0 Then
+                    pAggOutputControlData.WriteAggOutputControlFile()
+                Else
+                    MsgBox("No variables selected for output to " & pAggOutputControlData.FileName, MsgBoxStyle.Information, "UEB Write")
+                End If
             End If
         End If
 

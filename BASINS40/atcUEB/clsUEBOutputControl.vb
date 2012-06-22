@@ -45,7 +45,8 @@ Public Class clsUEBOutputControl
 
     Public Function WriteOutputControlFile() As Boolean
 
-        Dim lStr As String = ""
+        Dim i As Integer = 0
+        Dim lStr As String = Header & vbCrLf
 
         If FileName.Length > 0 Then
             Try
@@ -53,7 +54,9 @@ Public Class clsUEBOutputControl
                     lStr &= lUEBParm.OutputVariableString
                 Next
                 For Each lPt As System.Drawing.Point In PointDetails
-                    lStr &= "pointdetail: An output point" & vbCrLf & lPt.X & " " & lPt.Y & vbCrLf
+                    lStr &= "pointdetail: An output point" & vbCrLf & lPt.X & " " & lPt.Y & _
+                            vbCrLf & PointFileNames(i) & vbCrLf
+                    i += 1
                 Next
                 SaveFileString(FileName, lStr)
                 Return True
