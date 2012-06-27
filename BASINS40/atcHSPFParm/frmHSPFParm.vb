@@ -1434,6 +1434,7 @@ Public Class frmHSPFParm
                         If lTempVal = False Then
                             lChangedSomething = True
                         End If
+                        agdWatershed.EnsureRowVisible(lFeatureIndex)
                     Else
                         For lCol As Integer = 0 To agdWatershed.Source.Columns - 1
                             agdWatershed.Source.CellSelected(lFeatureIndex + 1, lCol) = False

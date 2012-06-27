@@ -125,9 +125,6 @@ Module modHSPFParmUtil
 
                     ElseIf lOneLine.StartsWith("PRJ") Then
                         Exit While
-                    Else
-                        lOneLine = lSR.ReadLine()
-                        Exit While
                     End If
                 End While
             End If
@@ -272,7 +269,7 @@ Module modHSPFParmUtil
         End If
 
         Logger.Status("SHOW")
-        Logger.Status("Adding Scenario to database...")
+        Logger.Status("Adding Scenario " & lName & " to database...")
         'find next available id number 
         Dim lTable As DataTable = aParmDB.GetTable("ScenarioData")
         Dim lMaxId As Integer = 0
@@ -315,17 +312,17 @@ Module modHSPFParmUtil
             'look for perlnd, implnd, rchres operation types
             If aUci.OpnBlks("PERLND").Count > 0 Then
                 'this operation type exists
-                Logger.Status("Adding PERLND to database...")
+                Logger.Status("Adding PERLND for scenario " & lName & " to database...")
                 GetOperInfo(aParmDB, aUci, "PERLND", lNewScenarioId, lRangeCheck)
             End If
             If aUci.OpnBlks("IMPLND").Count > 0 Then
                 'this operation type exists
-                Logger.Status("Adding IMPLND to database...")
+                Logger.Status("Adding IMPLND for scenario " & lName & " to database...")
                 GetOperInfo(aParmDB, aUci, "IMPLND", lNewScenarioId, lRangeCheck)
             End If
             If aUci.OpnBlks("RCHRES").Count > 0 Then
                 'this operation type exists
-                Logger.Status("Adding RCHRES to database...")
+                Logger.Status("Adding RCHRES for scenario " & lName & " to database...")
                 GetOperInfo(aParmDB, aUci, "RCHRES", lNewScenarioId, lRangeCheck)
             End If
         End If
@@ -379,7 +376,11 @@ Module modHSPFParmUtil
             lValues.Add(lNewSegId)
             Dim lTmp As String = lOpn.Name & lOpn.Id.ToString.PadLeft(8)
             lValues.Add("'" & lTmp & "'")
-            lValues.Add("'" & lOpn.Description & "'")
+            If lOpn.Description.Length > 0 Then
+                lValues.Add("'" & lOpn.Description & "'")
+            Else
+                lValues.Add("'undef'")
+            End If
             lValues.Add(lOpTypId)
             lValues.Add(aScenarioID)
             aParmDB.InsertRowIntoTable("SegData", lValues)
