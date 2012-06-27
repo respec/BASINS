@@ -148,7 +148,7 @@ Public Class HspfGlobalBlk
             pRunInf.Value = ""
         End If
         'Allow room for comments
-        While lRecordType < 0 And lRecordIndex < 50 '(50 is arbitrary to prevent an endless loop)
+        While lRecordType < 0 And lRecordIndex < 100 '(100 is arbitrary to prevent an endless loop)
             GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
         End While
 
