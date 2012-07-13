@@ -88,11 +88,14 @@ Module DFLOWCalcs
             Dim lHigh As Boolean = False
             lArgs.SetValue("HighFlag", lHigh)
 
-            Dim lBoundaryMonth As Integer = 4
+            Dim lBoundaryMonth As Integer = fStartMonth ' 4
             lArgs.SetValue("BoundaryMonth", lBoundaryMonth)
 
-            Dim lBoundaryDay As Integer = 1
+            Dim lBoundaryDay As Integer = fStartDay ' 1
             lArgs.SetValue("BoundaryDay", lBoundaryDay)
+
+            lArgs.SetValue("EndMonth", fEndMonth)
+            lArgs.SetValue("EndDay", fEndDay)
 
             Dim lNdays(1) As Double
             lNdays(0) = aDays
