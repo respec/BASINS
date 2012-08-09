@@ -60,8 +60,8 @@ Public Class frmUEB
     Friend WithEvents txtSiteHeader As System.Windows.Forms.TextBox
     Friend WithEvents Label16 As System.Windows.Forms.Label
     Friend WithEvents txtParameterHeader As System.Windows.Forms.TextBox
-    Friend WithEvents Label17 As System.Windows.Forms.Label
     Friend WithEvents AtcTextUTCOffset As atcControls.atcText
+    Friend WithEvents Label17 As System.Windows.Forms.Label
 
 #Region " Windows Form Designer generated code "
 
@@ -613,8 +613,8 @@ Public Class frmUEB
         Me.AtcTextUTCOffset.Alignment = System.Windows.Forms.HorizontalAlignment.Left
         Me.AtcTextUTCOffset.DataType = atcControls.atcText.ATCoDataType.ATCoInt
         Me.AtcTextUTCOffset.DefaultValue = ""
-        Me.AtcTextUTCOffset.HardMax = 24
-        Me.AtcTextUTCOffset.HardMin = 0
+        Me.AtcTextUTCOffset.HardMax = 12
+        Me.AtcTextUTCOffset.HardMin = -12
         Me.AtcTextUTCOffset.InsideLimitsBackground = System.Drawing.Color.White
         Me.AtcTextUTCOffset.Location = New System.Drawing.Point(450, 64)
         Me.AtcTextUTCOffset.MaxWidth = 20
@@ -2078,6 +2078,12 @@ Public Class frmUEB
     Private Sub cmdSimulate_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdSimulate.Click
 
         UpdateInputFiles()
+        Dim lExeFileName = FindFile("UEBGrid Executable", "UEBGrid.exe")
+        'LaunchProgram(lExeFileName, PathNameOnly(txtMasterFile.Text), FilenameNoPath(txtMasterFile.Text))
+        If FileExists(pAggOutputFileName) Then
+            Dim lUEBTimeseries As New atcTimeseriesUEBGrid.atcDataSourceTimeseriesUEBGrid
+            lUEBTimeseries.Open(pAggOutputFileName)
+        End If
 
     End Sub
 
@@ -2417,6 +2423,11 @@ Public Class frmUEB
             'AtcGridGridOutput.ValidValues = pOutputControlData.AvailableOutputs
         ElseIf aColumn = 1 AndAlso chkFilePrompt.Checked Then
             GetGridFileName(aGrid, aRow, aColumn, True)
+        ElseIf aColumn = 2 Then
+            Dim lUniqueValues As New ArrayList
+            lUniqueValues.Add("No")
+            lUniqueValues.Add("Yes")
+            AtcGridGridOutput.ValidValues = lUniqueValues
         End If
     End Sub
 
