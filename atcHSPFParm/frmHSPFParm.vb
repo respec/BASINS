@@ -1401,7 +1401,7 @@ Public Class frmHSPFParm
         If FileExists(lFileName) Then  'load hspfparm project
             GisUtil.LoadProject(lFileName)
         Else
-            Logger.Msg("Unable to find '" & HSPFParmProjectFilename & "'", "Open HSPFParm Map")
+            Logger.Msg("Unable to find '" & lFileName & "'", "Open HSPFParm Map")
             Exit Sub
         End If
     End Sub

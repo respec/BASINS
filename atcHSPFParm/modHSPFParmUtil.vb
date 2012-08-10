@@ -136,7 +136,11 @@ Module modHSPFParmUtil
             AddWatershed(lPrj, aParmDB)
             For Each lScn As Scn In lPrj.Scenarios
                 Dim lHspfUci As HspfUci = SetScenario(lScn)
-                AddScenario(lScn, lPrj, lHspfUci, aParmDB, False)
+                If lHspfUci IsNot Nothing Then
+                    AddScenario(lScn, lPrj, lHspfUci, aParmDB, False)
+                Else
+                    Logger.Msg("Could not find '" & lScn.UCIFilename & "'", MsgBoxStyle.Information, "No parameter is imported")
+                End If
             Next
         Next
     End Sub
@@ -665,23 +669,28 @@ Module modHSPFParmUtil
     End Sub
 
     Private Function SetScenario(ByRef aScn As Scn) As HspfUci
-        Dim lUci As New HspfUci()
-        Dim pMsg As New HspfMsg
-        pMsg.Open("hspfmsg.mdb")
+        Dim lUci As HspfUci = Nothing
 
-        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
-        Logger.Status("SHOW")
-        Logger.Status("Reading Scenario UCI: " & aScn.UCIFilename)
-        lUci.FastReadUciForStarter(pMsg, aScn.UCIFilename)
-        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
-        'Logger.Status("")
+        If FileExists(aScn.UCIFilename) Then
+            lUci = New HspfUci()
+            Dim pMsg As New HspfMsg
+            pMsg.Open("hspfmsg.mdb")
 
-        aScn.ScnShortName = FilenameNoExt(FilenameNoPath(aScn.UCIFilename))
-        aScn.ReqStartDate = DumpDate(Date2J(lUci.GlobalBlock.SDate(0), lUci.GlobalBlock.SDate(1), lUci.GlobalBlock.SDate(2), lUci.GlobalBlock.SDate(3), lUci.GlobalBlock.SDate(4)))
-        aScn.ReqEndDate = DumpDate(Date2J(lUci.GlobalBlock.EDate(0), lUci.GlobalBlock.EDate(1), lUci.GlobalBlock.EDate(2), lUci.GlobalBlock.EDate(3), lUci.GlobalBlock.EDate(4)))
-        aScn.ReqNumReaches = lUci.OpnBlks("RCHRES").Count
-        aScn.ReqNumSegments = lUci.MetSegs.Count
-        aScn.ReqUnits = lUci.GlobalBlock.EmFg
+            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+            Logger.Status("SHOW")
+            Logger.Status("Reading Scenario UCI: " & aScn.UCIFilename)
+            lUci.FastReadUciForStarter(pMsg, aScn.UCIFilename)
+            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+            'Logger.Status("")
+
+            aScn.ScnShortName = FilenameNoExt(FilenameNoPath(aScn.UCIFilename))
+            aScn.ReqStartDate = DumpDate(Date2J(lUci.GlobalBlock.SDate(0), lUci.GlobalBlock.SDate(1), lUci.GlobalBlock.SDate(2), lUci.GlobalBlock.SDate(3), lUci.GlobalBlock.SDate(4)))
+            aScn.ReqEndDate = DumpDate(Date2J(lUci.GlobalBlock.EDate(0), lUci.GlobalBlock.EDate(1), lUci.GlobalBlock.EDate(2), lUci.GlobalBlock.EDate(3), lUci.GlobalBlock.EDate(4)))
+            aScn.ReqNumReaches = lUci.OpnBlks("RCHRES").Count
+            aScn.ReqNumSegments = lUci.MetSegs.Count
+            aScn.ReqUnits = lUci.GlobalBlock.EmFg
+        End If
+
         Return lUci
     End Function
 
