@@ -24,7 +24,7 @@ Public Class atcTableSQLite
         Dim lDB As System.Data.Common.DbConnection = Nothing
         Try
             Dim lFileAndTableName As String = aFileName
-            Dim lDatabaseName As String = StrSplit(lFileAndTableName, vbTab, "'")
+            Dim lDatabaseName As String = MapWinUtility.Strings.StrSplit(lFileAndTableName, vbTab, "'")
 
             Dim lTableName As String = lFileAndTableName
             ldb = OpenDatabase(lDatabaseName)
@@ -89,7 +89,7 @@ Public Class atcTableSQLite
             Dim lStr As String
             Dim lCmd As System.Data.Common.DbCommand
 
-            Dim lDatabaseName As String = StrSplit(lFileAndTableName, vbTab, "'")
+            Dim lDatabaseName As String = MapWinUtility.Strings.StrSplit(lFileAndTableName, vbTab, "'")
             Dim lTableName As String = lFileAndTableName
 
             Dim lDB As System.Data.Common.DbConnection = OpenDatabase(lDatabaseName)
@@ -259,6 +259,10 @@ Public Class atcTableSQLite
         End If
         pDataTable.Columns.Add(lColumn)
         Return True
+    End Function
+
+    Public Overrides Function FieldNumber(aFieldName As String) As Integer
+
     End Function
 
     Public Overrides Property FieldName(ByVal aFieldNumber As Integer) As String

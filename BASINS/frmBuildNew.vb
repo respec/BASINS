@@ -138,7 +138,7 @@ Public Class frmBuildNew
 
     Private Sub frmBuildNew_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
         If e.KeyValue = Windows.Forms.Keys.F1 Then
-            ShowHelp("BASINS Details\Welcome to BASINS 4 Window\Build BASINS Project.html")
+            ShowHelp("BASINS Details\Welcome to BASINS 4.1 Window\Build BASINS Project.html")
         End If
     End Sub
 

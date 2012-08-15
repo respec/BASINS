@@ -42,7 +42,7 @@ Public Class clsGenScnGraphSpec
             Return pSpecsLoaded
         End Get
     End Property
-    Const POSMAX As Integer = 18
+    Public POSMAX As Integer = 18
     Private pSpecification As String = ""
     Public Property Specification() As String
         Get

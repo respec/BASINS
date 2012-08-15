@@ -298,7 +298,7 @@ Public Module modFile
 
             If Not aHelpTopic.Equals("CLOSE") Then
                 If Not IO.File.Exists(lHelpFilename) Then
-                    lHelpFilename = FindFile("Please locate BASINS 4 help file", "Basins4.0.chm")
+                    lHelpFilename = FindFile("Please locate BASINS 4.1 help file", "Basins4.1.chm")
                 End If
 
                 If IO.File.Exists(lHelpFilename) Then

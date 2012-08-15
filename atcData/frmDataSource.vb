@@ -193,7 +193,7 @@ Friend Class frmDataSource
                     If pCategories Is Nothing OrElse pCategories.Contains(lCategory) Then
                         Dim lCategoryNode As Forms.TreeNode = FindOrCreateNode(treeSources.Nodes, lCategory)
                         If lCategory.Equals("File") OrElse _
-                           GetSetting("BASINS4", "Data Source Categories", lCategory, "Expanded") = "Expanded" Then
+                           GetSetting("BASINS41", "Data Source Categories", lCategory, "Expanded") = "Expanded" Then
                             lCategoryNode.ExpandAll()
                         End If
                         If Not lOperations Is Nothing AndAlso lOperations.Count > 0 Then
@@ -321,13 +321,13 @@ Friend Class frmDataSource
 
     Private Sub treeSources_AfterCollapse(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles treeSources.AfterCollapse
         If Not e.Node Is Nothing AndAlso e.Node.Parent Is Nothing Then
-            SaveSetting("BASINS4", "Data Source Categories", e.Node.Text, "Closed")
+            SaveSetting("BASINS41", "Data Source Categories", e.Node.Text, "Closed")
         End If
     End Sub
 
     Private Sub treeSources_AfterExpand(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles treeSources.AfterExpand
         If Not e.Node Is Nothing AndAlso e.Node.Parent Is Nothing Then
-            SaveSetting("BASINS4", "Data Source Categories", e.Node.Text, "Expanded")
+            SaveSetting("BASINS41", "Data Source Categories", e.Node.Text, "Expanded")
             ResizeToShowBottomNode()
         End If
     End Sub

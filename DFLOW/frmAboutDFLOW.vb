@@ -21,7 +21,7 @@ Public NotInheritable Class frmAboutDFLOW
           "Steady-State Modeling as set forth in Book VI of " & vbCrLf & "the Technical Guidance Manual for Performing " & vbCrLf & _
           "Wasteload Allocations. " & vbCrLf & vbCrLf & _
           "This implementation by AQUA TERRA " & vbCrLf & "Consultants and LimnoTech is integrated into " & vbCrLf & _
-          "US(EPA) 's BASINS 4.0 modeling system. This " & vbCrLf & "supports improved access to data and " & vbCrLf & _
+          "US(EPA) 's BASINS 4.1 modeling system. This " & vbCrLf & "supports improved access to data and " & vbCrLf & _
           "automatic update of USGS calculation routines."
 
 

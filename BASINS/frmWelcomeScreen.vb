@@ -71,16 +71,16 @@ Public Class frmWelcomeScreen
     Friend WithEvents picProgramLogo As System.Windows.Forms.PictureBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmWelcomeScreen))
-        Me.lblBuildNew = New System.Windows.Forms.LinkLabel
-        Me.lblOpenProject = New System.Windows.Forms.LinkLabel
-        Me.cboShowDlg = New System.Windows.Forms.CheckBox
-        Me.btnClose = New System.Windows.Forms.Button
-        Me.lblProject1 = New System.Windows.Forms.LinkLabel
-        Me.lblProject2 = New System.Windows.Forms.LinkLabel
-        Me.lblProject3 = New System.Windows.Forms.LinkLabel
-        Me.lblProject4 = New System.Windows.Forms.LinkLabel
-        Me.picProgramLogo = New System.Windows.Forms.PictureBox
-        Me.lblHelp = New System.Windows.Forms.LinkLabel
+        Me.lblBuildNew = New System.Windows.Forms.LinkLabel()
+        Me.lblOpenProject = New System.Windows.Forms.LinkLabel()
+        Me.cboShowDlg = New System.Windows.Forms.CheckBox()
+        Me.btnClose = New System.Windows.Forms.Button()
+        Me.lblProject1 = New System.Windows.Forms.LinkLabel()
+        Me.lblProject2 = New System.Windows.Forms.LinkLabel()
+        Me.lblProject3 = New System.Windows.Forms.LinkLabel()
+        Me.lblProject4 = New System.Windows.Forms.LinkLabel()
+        Me.picProgramLogo = New System.Windows.Forms.PictureBox()
+        Me.lblHelp = New System.Windows.Forms.LinkLabel()
         CType(Me.picProgramLogo, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -272,7 +272,7 @@ Public Class frmWelcomeScreen
     End Sub
 
     Private Sub lbConvert_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs)
-        Logger.Msg("Select the BASINS 3.x Project to convert from the PullDown Menu that appears when you click OK", MsgBoxStyle.OkOnly, "BASINS 4")
+        Logger.Msg("Select the BASINS 3.x Project to convert from the PullDown Menu that appears when you click OK", MsgBoxStyle.OkOnly, "BASINS 4.1")
         Me.Close()
         SendKeys.Send("%FB")
     End Sub
