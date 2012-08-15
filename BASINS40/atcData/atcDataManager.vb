@@ -13,7 +13,7 @@ Public Class atcDataManager
     <CLSCompliant(False)> _
     Public Shared WriteOnly Property MapWindow() As MapWindow.Interfaces.IMapWin
         Set(ByVal aMapWin As MapWindow.Interfaces.IMapWin)
-            If pMapWin Is Nothing AndAlso Not aMapWin Is Nothing Then
+            If pMapWin Is Nothing AndAlso aMapWin IsNot Nothing Then
                 pMapWin = aMapWin
                 If aMapWin.ApplicationInfo.ApplicationName = "USGS GW Toolbox" Then
                     pDefaultSelectionAttributes = pDefaultSelectionAttributesGW
@@ -571,7 +571,7 @@ Public Class atcDataManager
     Friend Shared Function UserSaveData(ByVal aSpecification As String) As Boolean
         Dim lSaveIn As atcTimeseriesSource = Nothing
         Dim lSaveGroup As atcTimeseriesGroup = atcDataManager.UserSelectData("Select Data to Save")
-        If Not lSaveGroup Is Nothing AndAlso lSaveGroup.Count > 0 Then
+        If lSaveGroup IsNot Nothing AndAlso lSaveGroup.Count > 0 Then
 
             'If we already have specified data source open, skip asking user
             If aSpecification IsNot Nothing AndAlso aSpecification.Length > 0 Then
@@ -583,9 +583,7 @@ Public Class atcDataManager
             End If
 
             If lSaveIn IsNot Nothing AndAlso lSaveIn.Specification.Length > 0 Then
-                For Each lDataSet As atcDataSet In lSaveGroup
-                    lSaveIn.AddDataSet(lDataSet, atcData.atcTimeseriesSource.EnumExistAction.ExistAskUser)
-                Next
+                lSaveIn.AddDatasets(lSaveGroup)
                 Return lSaveIn.Save(lSaveIn.Specification)
             End If
         End If

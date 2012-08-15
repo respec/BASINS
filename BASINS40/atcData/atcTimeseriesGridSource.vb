@@ -142,7 +142,7 @@ Public Class atcTimeseriesGridSource
         End Set
     End Property
 
-    Private Sub CellDataset(ByVal aColumn As Integer, ByRef aTimeseries As atcTimeseries, ByRef aIsValue As Boolean, ByRef aValueAttDef As atcAttributeDefinition)
+    Public Sub CellDataset(ByVal aColumn As Integer, ByRef aTimeseries As atcTimeseries, ByRef aIsValue As Boolean, ByRef aValueAttDef As atcAttributeDefinition)
         Dim lCol As Integer = 0
         Dim lTs As atcTimeseries
         'If aColumn = 3 Then Stop
@@ -317,15 +317,15 @@ Public Class atcTimeseriesGridSource
                         ElseIf Not pAllDates Is Nothing Then
                             'Try
                             Dim lDateDisplayed As Double = pAllDates.Value(aRow - lAttributeRows + 1)
-                            Dim lIndex As Integer = Array.BinarySearch(lTS.Dates.Values, lDateDisplayed)
-
+                            Dim lIndex As Integer = Array.BinarySearch(lTs.Dates.Values, lDateDisplayed)
+                            lTs.Attributes.DiscardCalculated() 'About to modify a value, so discard any previously calculated attributes
                             If lIndex < 0 Then 'Did not find this exact date in this TS
                                 lIndex = Not (lIndex) 'BinarySearch returned not(index of next greater value)
                                 'Test two values closest to lDateDisplayed to see if either is within a millisecond
-                                If lIndex <= lTS.numValues AndAlso Math.Abs(lTS.Dates.Value(lIndex) - lDateDisplayed) < JulianMillisecond Then
-                                    lTS.Value(lIndex) = CDbl(newValue)
-                                ElseIf lIndex > 0 AndAlso Math.Abs(lTS.Dates.Value(lIndex - 1) - lDateDisplayed) < JulianMillisecond Then
-                                    lTS.Value(lIndex - 1) = CDbl(newValue)
+                                If lIndex <= lTs.numValues AndAlso Math.Abs(lTs.Dates.Value(lIndex) - lDateDisplayed) < JulianMillisecond Then
+                                    lTs.Value(lIndex) = CDbl(newValue)
+                                ElseIf lIndex > 0 AndAlso Math.Abs(lTs.Dates.Value(lIndex - 1) - lDateDisplayed) < JulianMillisecond Then
+                                    lTs.Value(lIndex - 1) = CDbl(newValue)
                                 Else
                                     'TODO: exception?
                                 End If
@@ -339,7 +339,7 @@ Public Class atcTimeseriesGridSource
                             'Catch 'was not a Timeseries or could not get a value
                             'End Try
                         Else
-                                'TODO: exception?
+                            'TODO: exception?
                         End If
                     End If
                 Case Else 'Column out of range

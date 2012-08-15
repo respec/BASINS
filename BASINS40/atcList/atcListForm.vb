@@ -48,6 +48,8 @@ Public Class atcListForm
     Friend WithEvents mnuFilterNoData As System.Windows.Forms.MenuItem
     Friend WithEvents mnuDateValueFormats As System.Windows.Forms.MenuItem
     Friend WithEvents mnuViewValueAttributes As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuSaveChanges As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuSaveIn As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -66,12 +68,14 @@ Public Class atcListForm
         Me.mnuViewSep1 = New System.Windows.Forms.MenuItem
         Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem
         Me.mnuViewValues = New System.Windows.Forms.MenuItem
+        Me.mnuViewValueAttributes = New System.Windows.Forms.MenuItem
         Me.mnuFilterNoData = New System.Windows.Forms.MenuItem
         Me.mnuDateValueFormats = New System.Windows.Forms.MenuItem
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.agdMain = New atcControls.atcGrid
-        Me.mnuViewValueAttributes = New System.Windows.Forms.MenuItem
+        Me.mnuSaveChanges = New System.Windows.Forms.MenuItem
+        Me.mnuSaveIn = New System.Windows.Forms.MenuItem
         Me.SuspendLayout()
         '
         'MainMenu1
@@ -81,7 +85,7 @@ Public Class atcListForm
         'mnuFile
         '
         Me.mnuFile.Index = 0
-        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSelectAttributes, Me.mnuFileSep1, Me.mnuFileSave})
+        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSelectAttributes, Me.mnuFileSep1, Me.mnuSaveChanges, Me.mnuSaveIn, Me.mnuFileSave})
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
@@ -101,9 +105,9 @@ Public Class atcListForm
         '
         'mnuFileSave
         '
-        Me.mnuFileSave.Index = 3
+        Me.mnuFileSave.Index = 5
         Me.mnuFileSave.Shortcut = System.Windows.Forms.Shortcut.CtrlS
-        Me.mnuFileSave.Text = "Save"
+        Me.mnuFileSave.Text = "Save Grid As Text"
         '
         'mnuEdit
         '
@@ -150,6 +154,11 @@ Public Class atcListForm
         Me.mnuViewValues.Index = 4
         Me.mnuViewValues.Text = "Timeseries Values"
         '
+        'mnuViewValueAttributes
+        '
+        Me.mnuViewValueAttributes.Index = 5
+        Me.mnuViewValueAttributes.Text = "Value Attributes"
+        '
         'mnuFilterNoData
         '
         Me.mnuFilterNoData.Checked = True
@@ -187,10 +196,15 @@ Public Class atcListForm
         Me.agdMain.Source = Nothing
         Me.agdMain.TabIndex = 0
         '
-        'mnuViewValueAttributes
+        'mnuSaveChanges
         '
-        Me.mnuViewValueAttributes.Index = 5
-        Me.mnuViewValueAttributes.Text = "Value Attributes"
+        Me.mnuSaveChanges.Index = 3
+        Me.mnuSaveChanges.Text = "Save Changes"
+        '
+        'mnuSaveIn
+        '
+        Me.mnuSaveIn.Index = 4
+        Me.mnuSaveIn.Text = "Save In..."
         '
         'atcListForm
         '
@@ -218,6 +232,9 @@ Public Class atcListForm
     Private pExpFormat As String = ""
     Private pCantFit As String = "#"
     Private pSignificantDigits As Integer = 5
+
+    Private pEditedText As String = " (Edited)"
+    Private pEditedGroup As New atcTimeseriesGroup
 
     'Translator class between pDataGroup and agdMain
     Private pSource As atcTimeseriesGridSource
@@ -329,12 +346,41 @@ Public Class atcListForm
         'TODO: could efficiently insert newly added item(s)
     End Sub
 
+    Private Sub agdMain_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdMain.CellEdited
+        Dim lTs As atcTimeseries = Nothing
+        Dim lIsValue As Boolean = True
+        Dim lValueAttDef As atcAttributeDefinition = Nothing
+        pSource.CellDataset(aColumn, lTs, lIsValue, lValueAttDef)
+        If lTs IsNot Nothing Then
+            If Not pEditedGroup.Contains(lTs) Then
+                pEditedGroup.Add(lTs)
+                agdMain.Refresh()
+                If Not Me.Text.EndsWith(pEditedText) Then Me.Text &= pEditedText
+            End If
+        End If
+    End Sub
+
+    'Private Sub pDataGroup_Edited(ByVal aEdited As atcData.atcDataSet) Handles pDataGroup.Edited
+    '    If Not Me.Text.EndsWith(pEditedText) Then Me.Text &= pEditedText
+    '    If Not pEditedGroup.Contains(aEdited) Then pEditedGroup.Add(aEdited)
+    '    agdMain.Refresh()
+    'End Sub
+
     Private Sub pDataGroup_Removed(ByVal aRemoved As atcCollection) Handles pDataGroup.Removed
         If Me.Visible Then PopulateGrid()
         'TODO: could efficiently remove by serial number
     End Sub
 
     Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
+        If pEditedGroup.Count > 0 Then
+            Select Case MapWinUtility.Logger.Msg("Data was edited, save changes?", MsgBoxStyle.YesNoCancel, "BASINS Data")
+                Case MsgBoxResult.Cancel
+                    e.Cancel = True
+                    Return
+                Case MsgBoxResult.Yes
+                    mnuSaveChanges_Click(Nothing, Nothing)
+            End Select
+        End If
         pDataGroup = Nothing
         pSource = Nothing
     End Sub
@@ -533,6 +579,41 @@ Public Class atcListForm
             Height = Math.Min(lScreenArea.Height - 100, lRequestedHeight + 20)
         Catch 'Ignore error if we can't tell how large to make it, or can't rezise
         End Try
+    End Sub
+
+    Private Sub mnuSaveChanges_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSaveChanges.Click
+        Dim lNotSaved As New atcDataGroup
+        For Each lTs As atcTimeseries In pEditedGroup
+            Dim lSaved As Boolean = False
+            Dim lSource As atcDataSource = lTs.Attributes.GetValue("Data Source")
+            If lSource IsNot Nothing AndAlso lSource.CanSave Then
+                lSaved = lSource.AddDataSet(lTs, atcDataSource.EnumExistAction.ExistReplace)
+            End If
+            If Not lSaved Then
+                lNotSaved.Add(lTs)
+            End If
+        Next
+
+        'Second chance to save any that could not be saved in their original file
+        SaveAs(lNotSaved)
+
+        pEditedGroup.Clear()
+        Me.Text = Me.Text.Replace(pEditedText, "")
+    End Sub
+
+    Private Sub mnuSaveIn_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSaveIn.Click
+        SaveAs(pDataGroup)
+        Me.Text = Me.Text.Replace(pEditedText, "")
+    End Sub
+
+    Private Sub SaveAs(ByVal aDataGroup As atcTimeseriesGroup)
+        If aDataGroup IsNot Nothing AndAlso aDataGroup.Count > 0 Then
+            Dim lFormSave As New frmSaveData
+            Dim lSaveSource As atcDataSource = lFormSave.AskUser(aDataGroup)
+            If lSaveSource IsNot Nothing AndAlso Not String.IsNullOrEmpty(lSaveSource.Specification) Then
+                lSaveSource.AddDataSets(aDataGroup)
+            End If
+        End If
     End Sub
 
 End Class

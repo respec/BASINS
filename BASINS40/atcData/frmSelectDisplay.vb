@@ -30,7 +30,6 @@ Public Class frmSelectDisplay
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents btnSave As System.Windows.Forms.Button
     Friend WithEvents btnDiscard As System.Windows.Forms.Button
-    Friend WithEvents btnFrequency As System.Windows.Forms.Button
     Friend WithEvents btnSeasonal As System.Windows.Forms.Button
     Friend WithEvents btnTree As System.Windows.Forms.Button
     Friend WithEvents btnGraph As System.Windows.Forms.Button
@@ -46,7 +45,6 @@ Public Class frmSelectDisplay
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSelectDisplay))
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
-        Me.btnFrequency = New System.Windows.Forms.Button
         Me.btnSeasonal = New System.Windows.Forms.Button
         Me.btnTree = New System.Windows.Forms.Button
         Me.btnGraph = New System.Windows.Forms.Button
@@ -64,29 +62,16 @@ Public Class frmSelectDisplay
         Me.GroupBox1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.GroupBox1.Controls.Add(Me.btnFrequency)
         Me.GroupBox1.Controls.Add(Me.btnSeasonal)
         Me.GroupBox1.Controls.Add(Me.btnTree)
         Me.GroupBox1.Controls.Add(Me.btnGraph)
         Me.GroupBox1.Controls.Add(Me.btnList)
         Me.GroupBox1.Location = New System.Drawing.Point(12, 144)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(211, 165)
+        Me.GroupBox1.Size = New System.Drawing.Size(211, 139)
         Me.GroupBox1.TabIndex = 0
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Display"
-        '
-        'btnFrequency
-        '
-        Me.btnFrequency.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnFrequency.Location = New System.Drawing.Point(6, 135)
-        Me.btnFrequency.Name = "btnFrequency"
-        Me.btnFrequency.Size = New System.Drawing.Size(197, 23)
-        Me.btnFrequency.TabIndex = 8
-        Me.btnFrequency.Tag = "Analysis::Frequency Grid"
-        Me.btnFrequency.Text = "Frequency Grid"
-        Me.btnFrequency.UseVisualStyleBackColor = True
         '
         'btnSeasonal
         '
@@ -184,13 +169,13 @@ Public Class frmSelectDisplay
         Me.btnSelect.Name = "btnSelect"
         Me.btnSelect.Size = New System.Drawing.Size(197, 23)
         Me.btnSelect.TabIndex = 5
-        Me.btnSelect.Text = "Add/Remove Datasets"
+        Me.btnSelect.Text = "Re-Select Datasets"
         Me.btnSelect.UseVisualStyleBackColor = True
         '
         'frmSelectDisplay
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(235, 321)
+        Me.ClientSize = New System.Drawing.Size(235, 295)
         Me.Controls.Add(Me.btnSelect)
         Me.Controls.Add(Me.btnDiscard)
         Me.Controls.Add(Me.btnSave)
@@ -230,7 +215,7 @@ Public Class frmSelectDisplay
         If pTimeseriesGroup.Count <> 1 Then lblDescribeDatasets.Text &= "s"
     End Sub
 
-    Private Sub btn_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnList.Click, btnGraph.Click, btnTree.Click, btnSeasonal.Click, btnFrequency.Click
+    Private Sub btn_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnList.Click, btnGraph.Click, btnTree.Click, btnSeasonal.Click
         atcDataManager.ShowDisplay(sender.tag, pTimeseriesGroup)
     End Sub
 
@@ -251,19 +236,15 @@ Public Class frmSelectDisplay
     End Sub
 
     Private Sub btnSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSave.Click
-        'If SaveData() Then Me.Close()
         SaveData()
     End Sub
 
     Private Function SaveData() As Boolean
-        Dim lSave As New frmSaveData
-        Dim lSaveSource As atcDataSource = lSave.AskUser(pTimeseriesGroup)
-        '    Dim lSaveIn As atcDataSource = UserOpenDataFile(False, True)
-        If Not lSaveSource Is Nothing AndAlso lSaveSource.Specification.Length > 0 Then
+        Dim lFormSave As New frmSaveData
+        Dim lSaveSource As atcDataSource = lFormSave.AskUser(pTimeseriesGroup)
+        If lSaveSource IsNot Nothing AndAlso Not String.IsNullOrEmpty(lSaveSource.Specification) Then
             Return lSaveSource.AddDataSets(pTimeseriesGroup)
         End If
-        '    End If
-        '    Me.Close()
         Return False
     End Function
 
