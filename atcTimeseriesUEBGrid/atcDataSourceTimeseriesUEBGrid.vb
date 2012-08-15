@@ -54,7 +54,6 @@ Public Class atcDataSourceTimeseriesUEBGrid
         Dim lJDate As Double
         Dim lVal As Double
         Dim lDatasets As New atcTimeseriesGroup
-        Dim lData As atcTimeseries
         Dim lGroupBuilder As New atcTimeseriesGroupBuilder(Me)
         Dim lTSBuilder As atcTimeseriesBuilder
 
