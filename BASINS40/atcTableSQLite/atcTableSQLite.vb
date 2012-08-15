@@ -262,7 +262,13 @@ Public Class atcTableSQLite
     End Function
 
     Public Overrides Function FieldNumber(aFieldName As String) As Integer
-
+        aFieldName = aFieldName.ToLower
+        For lFieldIndex As Integer = 1 To pDataTable.Columns.Count - 1
+            If pDataTable.Columns(lFieldIndex - 1).ColumnName.ToLower = aFieldName Then
+                Return lFieldIndex
+            End If
+        Next
+        Return 0
     End Function
 
     Public Overrides Property FieldName(ByVal aFieldNumber As Integer) As String
