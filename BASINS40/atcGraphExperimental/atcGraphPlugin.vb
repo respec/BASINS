@@ -64,7 +64,7 @@ Public Class atcGraphPlugin
                     .Items.Add(pGraphTypeNames(6) & lNeededTwoSuffix)
                 End If
 
-                For Each lCheckedName As String In GetSetting("BASINS4", "Graph", "ChooseGraphs", "").Split(","c)
+                For Each lCheckedName As String In GetSetting("BASINS41", "Graph", "ChooseGraphs", "").Split(","c)
                     lItemIndex = .Items.IndexOf(lCheckedName)
                     If lItemIndex > -1 Then .SetItemChecked(lItemIndex, True)
                 Next
@@ -102,7 +102,7 @@ Public Class atcGraphPlugin
                             Me.Show(lGroup, lGraphTypeName)
                         Next
                     Next
-                    SaveSetting("BASINS4", "Graph", "ChooseGraphs", lAllCheckedItemNames)
+                    SaveSetting("BASINS41", "Graph", "ChooseGraphs", lAllCheckedItemNames)
                 End If
             End With
         End If

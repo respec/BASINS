@@ -242,8 +242,32 @@ ALREADYSET:
             TryDelete(lModelFolder)
         End If
         Dim lTxtInOutFolder As String = lModelFolder & "\TxtInOut" & g_PathChar ' trailing directory separator
-        Dim lSwatInput As New SwatObject.SwatInput(SWATDatabasePath, pBaseModel, lProjectFolder, aNewModelName)
-        lSwatInput.SaveAllTextInput()
+
+        Dim lUseWDM As Boolean = pMetWDM IsNot Nothing AndAlso pMetWDM.DataSets.Count > 0
+        Dim lCopiedTxtInOut As Boolean = False
+        Dim lIteration As String = aNewModelName.Substring(aNewModelName.IndexOf("-") + 1)
+        If IsNumeric(lIteration) AndAlso CInt(lIteration) > 1 Then
+            Dim lPreviousModelName As String = aNewModelName.Replace(lIteration, "001")
+            Dim lPreviousProjectFolder As String = lProjectFolder & g_PathChar & "Scenarios" & g_PathChar & lPreviousModelName & g_PathChar & "TxtInOut" & g_PathChar
+            If IO.File.Exists(lPreviousProjectFolder & "fig.fig") Then
+                For Each lFilename As String In IO.Directory.GetFiles(lPreviousProjectFolder)
+                    Dim lFilenameOnly As String = IO.Path.GetFileName(lFilename)
+                    If Not lFilenameOnly.ToLower.Contains("out") Then
+                        TryCopy(lFilename, lFilename.Replace(lPreviousModelName, aNewModelName))
+                        lCopiedTxtInOut = True
+                    End If
+                Next
+            End If
+        End If
+
+        Dim lSwatInput As SwatObject.SwatInput = Nothing
+        If lUseWDM OrElse Not lCopiedTxtInOut Then
+            lSwatInput = New SwatObject.SwatInput(SWATDatabasePath, pBaseModel, lProjectFolder, aNewModelName)
+        End If
+        If Not lCopiedTxtInOut Then
+            lSwatInput.SaveAllTextInput()
+        End If
+
         Dim lFigFilename As String = IO.Path.Combine(IO.Path.GetDirectoryName(pBaseModel), "fig.fig")
         If IO.File.Exists(lFigFilename) Then
             If TryDelete(lTxtInOutFolder & "fig.fig") Then
@@ -252,8 +276,8 @@ ALREADYSET:
         End If
 
         'write met data
-        Dim lCioItem As SwatObject.SwatInput.clsCIOItem = lSwatInput.CIO.Item
-        If pMetWDM IsNot Nothing AndAlso pMetWDM.DataSets.Count > 0 Then
+        If lUseWDM Then
+            Dim lCioItem As SwatObject.SwatInput.clsCIOItem = lSwatInput.CIO.Item
             modSwatMetData.WriteSwatMetInput(pMetWDM, aModifiedData, lProjectFolder, lTxtInOutFolder, _
                                              atcUtility.Jday(lCioItem.IYR, 1, 1, 0, 0, 0), _
                                              atcUtility.Jday(lCioItem.IYR + lCioItem.NBYR, 1, 1, 0, 0, 0))
@@ -261,6 +285,7 @@ ALREADYSET:
             If pMetPcp.DataSets.Count > 0 Then modSwatMetData.WriteSwatMetInput(pMetPcp, aModifiedData, lTxtInOutFolder)
             If pMetTmp.DataSets.Count > 0 Then modSwatMetData.WriteSwatMetInput(pMetTmp, aModifiedData, lTxtInOutFolder)
         End If
+        If lSwatInput IsNot Nothing Then lSwatInput.Close()
         If aRunModel Then
             ChDir(lTxtInOutFolder)
             'Dim lSWATexeTargetPath As String = lTxtInOutFolder & "Swat2005.exe"
@@ -289,12 +314,35 @@ ALREADYSET:
                     TryCopy(lSWATExe, lTxtInOutFolder & SwatExe())
                 End If
                 lSWATexeTargetPath = IO.Path.Combine(lTxtInOutFolder, SwatExe())
-                Logger.Dbg("StartModel")
-                LaunchProgram(lSWATexeTargetPath, lTxtInOutFolder)
-                Logger.Dbg("DoneModelRun")
+                Logger.Dbg("StartModel: " & lSWATexeTargetPath & " " & lTxtInOutFolder)
+                'LaunchProgram(lSWATexeTargetPath, lTxtInOutFolder)
+                Dim lRunExitCode As Integer = 0
+                Dim lSWATProcess As New Diagnostics.Process
+                With lSWATProcess.StartInfo
+                    .FileName = lSWATExe
+                    .Arguments = lSWATexeTargetPath
+                    .CreateNoWindow = False
+                    .UseShellExecute = True
+                End With
+                lSWATProcess.Start()
+                While Not lSWATProcess.HasExited
+                    If Not g_Running And Not aKeepRunning Then
+                        lSWATProcess.Kill()
+                    End If
+                    Windows.Forms.Application.DoEvents()
+                    Threading.Thread.Sleep(50)
+                End While
+                lRunExitCode = lSWATProcess.ExitCode
+                Logger.Dbg("SWAT Model exit code " & lRunExitCode)
+                If lRunExitCode <> 0 Then
+                    Logger.Dbg("************ SWAT Model Run Problem **************")
+                End If
+                Logger.Dbg("Done SWAT Model Run")
             Else
                 Logger.Dbg("SWAT exe not found, skipping model run")
             End If
+        Else
+            Logger.Dbg("Skipping running SWAT model.")
         End If
         Dim lModified As New atcCollection
 
@@ -354,7 +402,6 @@ ALREADYSET:
         Else
             Logger.Dbg("MissingTmp " & lTmpFileName)
         End If
-
 
         ChDir(lSaveDir)
         Return lModified

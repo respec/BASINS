@@ -81,7 +81,7 @@ Friend Class frmAbout
         'grpMapWindow
         '
         Me.grpMapWindow.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpMapWindow.Controls.Add(Me.lblMapwinVersion)
         Me.grpMapWindow.Controls.Add(Me.picMapWindow)
         Me.grpMapWindow.Controls.Add(Me.lblMapWindowURL)
@@ -163,7 +163,7 @@ Friend Class frmAbout
         'lblProjFile
         '
         Me.lblProjFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblProjFile.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.lblProjFile.ImeMode = System.Windows.Forms.ImeMode.NoControl
         Me.lblProjFile.Location = New System.Drawing.Point(101, 495)
@@ -174,7 +174,7 @@ Friend Class frmAbout
         'lblConfigFile
         '
         Me.lblConfigFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblConfigFile.BackColor = System.Drawing.SystemColors.Control
         Me.lblConfigFile.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.lblConfigFile.ImeMode = System.Windows.Forms.ImeMode.NoControl
@@ -198,9 +198,9 @@ Friend Class frmAbout
         Me.lblProgramName.Font = New System.Drawing.Font("Microsoft Sans Serif", 27.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblProgramName.Location = New System.Drawing.Point(152, 16)
         Me.lblProgramName.Name = "lblProgramName"
-        Me.lblProgramName.Size = New System.Drawing.Size(185, 42)
+        Me.lblProgramName.Size = New System.Drawing.Size(216, 42)
         Me.lblProgramName.TabIndex = 19
-        Me.lblProgramName.Text = "BASINS 4"
+        Me.lblProgramName.Text = "BASINS 4.1"
         '
         'lblPluginVersion
         '
@@ -225,7 +225,7 @@ Friend Class frmAbout
         'grpATC
         '
         Me.grpATC.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpATC.Controls.Add(Me.picATC)
         Me.grpATC.Controls.Add(Me.lblAquaTerraURL)
         Me.grpATC.Location = New System.Drawing.Point(12, 142)
@@ -262,7 +262,7 @@ Friend Class frmAbout
         'grpZedGraph
         '
         Me.grpZedGraph.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpZedGraph.Controls.Add(Me.picZedGraph)
         Me.grpZedGraph.Controls.Add(Me.lblZedGraphURL)
         Me.grpZedGraph.Location = New System.Drawing.Point(12, 402)

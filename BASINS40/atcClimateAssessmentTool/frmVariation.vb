@@ -1319,6 +1319,16 @@ Imports MapWinUtility
                 chkEvents.Enabled = True
                 grpMinMax.Visible = True
                 grpPET.Visible = False
+
+                If lFunction = "AddEvents" OrElse lFunction = "Intensify" Then
+                    txtMax.Text = "10"
+                    txtMin.Text = "10"
+                    txtIncrement.Text = "10"
+                Else
+                    txtMax.Text = "1.1"
+                    txtMin.Text = "1.1"
+                    txtIncrement.Text = "0.1"
+                End If
         End Select
 
         If Not chkEvents.Checked AndAlso (lFunction = "Intensify" OrElse lFunction = "AddEvents") Then

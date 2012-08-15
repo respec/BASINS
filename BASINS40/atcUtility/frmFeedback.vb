@@ -208,13 +208,13 @@ Public Class frmFeedback
         If aName IsNot Nothing AndAlso aName.Length > 0 Then
             txtName.Text = aName
         Else
-            txtName.Text = GetSetting("BASINS4", "Feedback", "Name", "")
+            txtName.Text = GetSetting("BASINS41", "Feedback", "Name", "")
         End If
 
         If aEmail IsNot Nothing AndAlso aEmail.Length > 0 Then
             txtEmail.Text = aEmail
         Else
-            txtEmail.Text = GetSetting("BASINS4", "Feedback", "Email", "")
+            txtEmail.Text = GetSetting("BASINS41", "Feedback", "Email", "")
         End If
 
         If aMessage IsNot Nothing Then txtMessage.Text = aMessage
@@ -275,8 +275,8 @@ Public Class frmFeedback
     End Sub
 
     Private Sub btnSend_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSend.Click
-        SaveSetting("BASINS4", "Feedback", "Name", txtName.Text)
-        SaveSetting("BASINS4", "Feedback", "Email", txtEmail.Text)
+        SaveSetting("BASINS41", "Feedback", "Name", txtName.Text)
+        SaveSetting("BASINS41", "Feedback", "Email", txtEmail.Text)
         pSend = True
         Me.Hide()
     End Sub

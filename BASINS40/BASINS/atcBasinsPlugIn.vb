@@ -80,8 +80,8 @@ Public Class atcBasinsPlugIn
                 lHelpFilename = FindFile("", g_ProgramDir & "docs\USGSToolbox.chm")
                 BasinsDataPath = "USGS-GWToolbox\data\"
 
-            Case Else '"BASINS 4"
-                lHelpFilename = FindFile("", g_ProgramDir & "docs\BASINS4.0.chm")
+            Case Else '"BASINS 4.1"
+                lHelpFilename = FindFile("", g_ProgramDir & "docs\BASINS4.1.chm")
         End Select
 
         ProjectsMenuString = "Open " & g_AppNameShort & " Project"
@@ -331,7 +331,7 @@ Public Class atcBasinsPlugIn
                     & """" & lSavePath & """", AppWinStyle.Hide)
             ElseIf Not aQuiet Then 'If manually checking and UpdateCheck.exe is not found, open update web page
                 Logger.Dbg("Did not find update checker at '" & lUpdateCheckerPath & "'")
-                OpenFile("http://hspf.com/pub/basins4/updates.html")
+                OpenFile("http://hspf.com/pub/basins41/updates.html")
             End If
         Catch ex As Exception
             If aQuiet Then

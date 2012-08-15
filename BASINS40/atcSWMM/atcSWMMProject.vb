@@ -189,11 +189,11 @@ Public Class atcSWMMProject
 
     Public Function RunSimulation() As Boolean
         Dim lRunSimulation As Boolean = False
-        Dim lSWMMExeName As String = GetSetting("BASINS4", "SWMM", "SimulationExeFileName", "")
+        Dim lSWMMExeName As String = GetSetting("BASINS41", "SWMM", "SimulationExeFileName", "")
         If Not IO.File.Exists(lSWMMExeName) Then
             lSWMMExeName = FindFile("Please locate SWMM5 Exe File", "swmm5.exe", "exe")
             If IO.File.Exists(lSWMMExeName) Then
-                SaveSetting("BASINS4", "SWMM", "SimulationExeFileName", "")
+                SaveSetting("BASINS41", "SWMM", "SimulationExeFileName", "")
             End If
         End If
         If IO.File.Exists(lSWMMExeName) Then

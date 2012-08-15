@@ -222,6 +222,7 @@ Module GraphGenScn
             Clear()
             Exit Sub
         End If
+        Dim lMissingCurveIndices As New ArrayList
         With pTSBlockTab
             Dim lScenario As String = ""
             Dim lLocation As String = ""
@@ -272,22 +273,49 @@ Module GraphGenScn
                 End If
 
                 If Not lDataFound Then
-                    Logger.Msg("No data found for " & lScenario & "-" & lLocation & "-" & lConstituent & ", Stop graphing.")
-                    lWDM.Clear()
-                    lWDM = Nothing
-                    Clear()
-                    Exit Sub
+                    'Logger.Msg("No data found for " & .Value(1) & "-" & .Value(2) & "-" & .Value(3) & ", Stop graphing.")
+                    lMissingCurveIndices.Add(.CurrentRecord - 1)
+                    'lWDM.Clear()
+                    'lWDM = Nothing
+                    'Clear()
+                    'Exit Sub
                 End If
 
                 .MoveNext()
             End While
         End With
 
-        If pTSGroup Is Nothing OrElse pTSGroup.Count = 0 Then
+        Dim lAllTimeseriesAreEmpty As Boolean = True
+        For Each lTsInGroup As atcTimeseries In pTSGroup
+            If lTsInGroup.numValues > 1 Then
+                lAllTimeseriesAreEmpty = False
+                Exit For
+            End If
+        Next
+
+        If pTSGroup Is Nothing OrElse pTSGroup.Count = 0 OrElse lAllTimeseriesAreEmpty Then
             Logger.Msg("No data found. Stop graphing.")
             Clear()
             Exit Sub
         Else 'Get the desired duration
+            If lMissingCurveIndices.Count > 0 Then
+                Dim lCrv(pGraphSpec.POSMAX) As clsGenScnGraphSpec.GSCrvType
+                Dim lNewIndex As Integer = 0
+                For C As Integer = 0 To pGraphSpec.Crv.Length - 1
+                    If Not lMissingCurveIndices.Contains(C) Then
+                        lCrv(lNewIndex).Color = pGraphSpec.Crv(C).Color
+                        lCrv(lNewIndex).CurveType = pGraphSpec.Crv(C).CurveType
+                        lCrv(lNewIndex).LegLbl = pGraphSpec.Crv(C).LegLbl
+                        lCrv(lNewIndex).LThck = pGraphSpec.Crv(C).LThck
+                        lCrv(lNewIndex).LType = pGraphSpec.Crv(C).LType
+                        lCrv(lNewIndex).SType = pGraphSpec.Crv(C).SType
+
+                        lNewIndex += 1
+                    End If
+                Next
+                pGraphSpec.Crv = lCrv
+            End If
+
             Dim lStart As Double
             Dim lEnd As Double
             If pSJDay = 0 OrElse pEJDay = 0 Then
@@ -922,12 +950,12 @@ Public Sub FormatPaneWithDefaults(ByVal aPane As ZedGraph.GraphPane)
             'Assuming only PREC is on the top Auxiliary pane
             lCurve = lPaneAux.CurveList.Item(0)
             With lCurve
-                .Line.StepType = StepType.NonStep
                 If pGraphSpec.IsReady And pApplyGraphSpec Then
                     lCrvIndex = pGraphSpec.CurveIndex("PREC", aDataGroup.Count - 1)
                     .Color = ToNewColor(pGraphSpec.Crv(lCrvIndex).Color)
                     .Line.Width = pGraphSpec.Crv(lCrvIndex).LThck
                     .Label.Text = pGraphSpec.Crv(lCrvIndex).LegLbl
+                    .Line.StepType = StepType.ForwardStep
                 Else
                     .Line.Width = 2
                     .Color = Drawing.Color.Red
@@ -937,9 +965,9 @@ Public Sub FormatPaneWithDefaults(ByVal aPane As ZedGraph.GraphPane)
 
         Dim lCurveOnMainPane As ZedGraph.LineItem = Nothing
         Dim lLastIndexOfCurvesOnMain As Integer = lPaneMain.CurveList.Count - 1
-        If lPaneAux IsNot Nothing Then
-            lLastIndexOfCurvesOnMain -= lPaneAux.CurveList.Count
-        End If
+        'If lPaneAux IsNot Nothing Then
+        '    lLastIndexOfCurvesOnMain -= lPaneAux.CurveList.Count
+        'End If
         For i As Integer = 0 To lLastIndexOfCurvesOnMain
             lCurveOnMainPane = lPaneMain.CurveList.Item(i)
             If pGraphSpec.IsReady And pApplyGraphSpec Then
@@ -1008,7 +1036,7 @@ Public Sub FormatPaneWithDefaults(ByVal aPane As ZedGraph.GraphPane)
                     .MaxAuto = False
                     .Min = pGraphSpec.Axis(1).minv
                     .Max = pGraphSpec.Axis(1).maxv
-                    .MajorStep = (.Max - .Min) / pGraphSpec.Axis(1).NTic
+                    .MajorStep = (.Max - .Min) / (pGraphSpec.Axis(1).NTic + 2)
                     lYAxisCross = .Min
                 End With
 

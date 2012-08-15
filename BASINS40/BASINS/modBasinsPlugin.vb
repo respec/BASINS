@@ -33,9 +33,9 @@ Public Module modBasinsPlugin
     Friend Const g_URL_Home As String = "http://water.usgs.gov/software/lists/surface_water/"
     Friend Const g_URL_Register As String = "http://hspf.com/pub/USGS-SW/register.html"
 #Else
-    Friend Const g_AppNameRegistry As String = "BASINS4" 'For preferences in registry
+    Friend Const g_AppNameRegistry As String = "BASINS4.1" 'For preferences in registry
     Friend Const g_AppNameShort As String = "BASINS"
-    Friend Const g_AppNameLong As String = "BASINS 4"
+    Friend Const g_AppNameLong As String = "BASINS 4.1"
     Friend Const g_URL_Home As String = "http://www.epa.gov/waterscience/BASINS/"
     Friend Const g_URL_Register As String = "http://hspf.com/pub/basins4/register.html"
 #End If

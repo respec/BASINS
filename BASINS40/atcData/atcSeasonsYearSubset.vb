@@ -41,20 +41,20 @@ Public Class atcSeasonsYearSubset
 #If BatchMode Then
 #Else
     Public Sub New()
-        Dim lStartMonth As Integer = CInt(GetSetting("BASINS4", "Seasons", "YearSubsetStartMonth", "1"))
-        Dim lStartDay As Integer = CInt(GetSetting("BASINS4", "Seasons", "YearSubsetStartDay", "1"))
-        Dim lEndMonth As Integer = CInt(GetSetting("BASINS4", "Seasons", "YearSubsetEndMonth", "12"))
-        Dim lEndDay As Integer = CInt(GetSetting("BASINS4", "Seasons", "YearSubsetEndDay", "31"))
+        Dim lStartMonth As Integer = CInt(GetSetting("BASINS41", "Seasons", "YearSubsetStartMonth", "1"))
+        Dim lStartDay As Integer = CInt(GetSetting("BASINS41", "Seasons", "YearSubsetStartDay", "1"))
+        Dim lEndMonth As Integer = CInt(GetSetting("BASINS41", "Seasons", "YearSubsetEndMonth", "12"))
+        Dim lEndDay As Integer = CInt(GetSetting("BASINS41", "Seasons", "YearSubsetEndDay", "31"))
 
         Dim lForm As New frmSpecifyYearSubset
         If lForm.AskUser(lStartMonth, lStartDay, lEndMonth, lEndDay) Then
             pStartDate = New Date(1900, lStartMonth, lStartDay, 0, 0, 0, 0)
             pEndDate = New Date(1900, lEndMonth, lEndDay, 0, 0, 0, 0)
 
-            SaveSetting("BASINS4", "Seasons", "YearSubsetStartMonth", lStartMonth)
-            SaveSetting("BASINS4", "Seasons", "YearSubsetStartDay", lStartDay)
-            SaveSetting("BASINS4", "Seasons", "YearSubsetEndMonth", lEndMonth)
-            SaveSetting("BASINS4", "Seasons", "YearSubsetEndDay", lEndDay)
+            SaveSetting("BASINS41", "Seasons", "YearSubsetStartMonth", lStartMonth)
+            SaveSetting("BASINS41", "Seasons", "YearSubsetStartDay", lStartDay)
+            SaveSetting("BASINS41", "Seasons", "YearSubsetEndMonth", lEndMonth)
+            SaveSetting("BASINS41", "Seasons", "YearSubsetEndDay", lEndDay)
         Else
             Throw New Exception("User cancelled")
         End If

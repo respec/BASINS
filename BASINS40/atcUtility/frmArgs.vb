@@ -22,7 +22,7 @@ Public Class frmArgs
             Select Case aArgs.Keys(lArgIndex).GetType.Name
                 Case "String"
                     Dim lKey As String = aArgs.Keys(lArgIndex).ToString
-                    Dim lArgValue As Object = GetSetting("BASINS4", aTitle, lKey, aArgs.ItemByIndex(lArgIndex).ToString)
+                    Dim lArgValue As Object = GetSetting("BASINS41", aTitle, lKey, aArgs.ItemByIndex(lArgIndex).ToString)
                     If lKey.Substring(1, 1) = ":" Then
                         Select Case lKey.Substring(0, 1).ToUpper
                             Case "L" 'Just a label
@@ -102,7 +102,7 @@ Public Class frmArgs
                         Dim lTextbox As Windows.Forms.TextBox = Me.Controls.Item(Me.Controls.IndexOfKey("txt" & lArgIndex))
                         aArgs.ItemByIndex(lArgIndex) = lTextbox.Text
                 End Select
-                SaveSetting("BASINS4", aTitle, lKey, aArgs.ItemByIndex(lArgIndex))
+                SaveSetting("BASINS41", aTitle, lKey, aArgs.ItemByIndex(lArgIndex))
                 lArgIndex += 1
             End While
         End If
