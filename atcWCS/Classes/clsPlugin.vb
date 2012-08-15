@@ -154,11 +154,11 @@ Public Class PlugIn
     Public Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
         pMapWin = MapWin
         gMapWin = MapWin
+        atcDataManager.MapWindow = MapWin
         MapWindowForm = Control.FromHandle(New IntPtr(ParentHandle))
 
         atcDataManager.AddMenuIfMissing(ParentMenuName, "", ParentMenuString, "mnuFile")
-        Dim mnu As MapWindow.Interfaces.MenuItem
-        mnu = pMapWin.Menus.AddMenu(ParentMenuName & "_WCS", ParentMenuName, Nothing, "Watershed Characterization System (WCS)")
+        Dim mnu As MapWindow.Interfaces.MenuItem = atcDataManager.AddMenuIfMissing(ParentMenuName & "_WCS", ParentMenuName, "Watershed Characterization System (WCS)")
         mnu.Enabled = True
     End Sub
 

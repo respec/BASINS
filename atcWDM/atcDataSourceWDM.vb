@@ -118,23 +118,27 @@ Public Class atcDataSourceWDM
             lLabel &= " numbered " & lLowestDSN & " to " & lHighestDSN
         End If
 
+        Dim lCloneTsGroup As New atcTimeseriesGroup
         lHighestNewDSN = lHighestDSN
-        For Each lDataSet As atcDataSet In aDataGroup
+        For Each lDataSet As atcTimeseries In aDataGroup
             lDSN = lDataSet.Attributes.GetValue("dsn", 0)
             If lDSN > lHighestNewDSN AndAlso lDSN < 9999 Then
                 lHighestNewDSN = lDSN
             Else
                 lHighestNewDSN += 1
             End If
-            lDataSet.Attributes.SetValue("New DSN", lHighestNewDSN)
+
+            Dim lClone As atcTimeseries = lDataSet.Clone
+            lClone.Attributes.SetValue("New DSN", lHighestNewDSN)
+            lCloneTsGroup.Add(lClone)
         Next
 #If BatchMode Then
 #Else
         Dim lfrm As New frmSave
-        aDataGroup = lfrm.AskUser(aDataGroup, lLabel, lHighestDSN)
+        lCloneTsGroup = lfrm.AskUser(lCloneTsGroup, lLabel, lHighestDSN)
 #End If
-        If Not aDataGroup Is Nothing AndAlso aDataGroup.Count > 0 Then
-            For Each lDataset As atcTimeseries In aDataGroup
+        If lCloneTsGroup IsNot Nothing AndAlso lCloneTsGroup.Count > 0 Then
+            For Each lDataset As atcTimeseries In lCloneTsGroup
                 Dim lNewDSN As Integer = lDataset.Attributes.GetValue("New DSN", 0)
                 If lNewDSN > 0 Then
                     lDataset.Attributes.SetValue("DSN", lNewDSN)
@@ -160,102 +164,22 @@ Public Class atcDataSourceWDM
     ''' <returns>true if successful, otherwise false</returns>
     ''' <remarks></remarks>
     Public Overrides Function AddDataset(ByVal aDataSet As atcData.atcDataSet, _
-                                Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) _
+                                Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction _
+                                                             = atcData.atcDataSource.EnumExistAction.ExistReplace) _
                                          As Boolean
         Logger.Dbg("atcDataSourceWdm:AddDataset:EntryWithAction:" & aExistAction & ":" & MemUsage())
         Dim lWdmHandle As New atcWdmHandle(0, Specification)
         Try
             Dim lTimser As atcTimeseries = aDataSet
-            Dim lTimserConst As atcTimeseries = Nothing
             Dim lTs As Integer = lTimser.Attributes.GetValue("ts", 0)
             Dim lTu As atcTimeUnit = lTimser.Attributes.GetValue("tu", atcTimeUnit.TUUnknown)
-            Dim lAggr As Integer = lTimser.Attributes.GetValue("aggregation", 0)
             Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 1)
             Dim lTGroup As Integer = aDataSet.Attributes.GetValue("tgroup", 6)
             'Dim lTSBYr As Integer = aDataSet.Attributes.GetValue("tsbyr", 1900)
+            Dim lTimserConst As atcTimeseries = Nothing
 
             If lTs = 0 OrElse lTu = atcTimeUnit.TUUnknown Then ' sparse dataset - fill in dummy values for write
-#If BatchMode Then
-#Else
-                If pAskAboutMissingTuTs Then
-                    Dim lFrmDefaultTimeInterval As New frmDefaultTimeInterval
-                    pAskAboutMissingTuTs = lFrmDefaultTimeInterval.AskUser(lTimser.ToString & " #" & lDsn, pTu, pTs, lAggr)
-                End If
-#End If
-                lTs = pTs
-                lTu = pTu
-                If pTs > 0 AndAlso pTu <> atcTimeUnit.TUUnknown Then
-                    Dim lJulianInterval As Double
-                    Select Case pTu
-                        Case 2 : lJulianInterval = JulianMinute * lTs 'minute
-                        Case 3 : lJulianInterval = JulianHour * lTs 'hour
-                        Case 4 : lJulianInterval = lTs
-                    End Select
-                    lTimserConst = New atcTimeseries(Me)
-                    With lTimserConst
-                        .Attributes.ChangeTo(lTimser.Attributes)
-                        .Dates = New atcTimeseries(Me)
-                        Dim lNumValues As Integer
-                        If lJulianInterval > 0 Then
-                            .Dates.Value(0) = CInt(lTimser.Dates.Value(1)) - 1 'whole day portion
-                            lNumValues = (lTimser.Dates.Value(lTimser.numValues) - .Dates.Value(0)) / lJulianInterval
-                        Else
-                            .Dates.Value(0) = TimAddJ(lTimser.Dates.Value(1), lTu, lTs, -1) 'for monthly data
-                            lNumValues = lTimser.numValues
-                        End If
-                        .numValues = lNumValues
-                        .SetInterval(lTu, lTs)
-                        Dim lIndex As Integer = 1
-                        For lIndexConst As Integer = 1 To lNumValues
-                            Dim lDate As Double
-                            If lJulianInterval > 0 Then
-                                lDate = .Dates.Values(0) + (lJulianInterval * lIndexConst)
-                            Else
-                                lDate = TimAddJ(.Dates.Value(0), lTu, lTs, lIndexConst)
-                            End If
-                            Dim lAggregationCount As Integer = .ValueAttributes(lIndexConst).GetValue("AggregationCount", 0)
-                            .Dates.Values(lIndexConst) = lDate
-                            If lIndex <= lTimser.numValues AndAlso lDate >= (lTimser.Dates.Values(lIndex) - JulianSecond) Then
-                                'todo: this uses only the last value, have a transformation 
-                                lAggregationCount += 1
-                                .ValueAttributes(lIndexConst).Add("AggregationCount", lAggregationCount)
-                                Dim lValue As Double = lTimser.Values(lIndex)
-                                If lAggregationCount = 1 Then 'save this first value
-                                    .Values(lIndexConst) = lValue
-                                Else
-                                    Select Case lAggr
-                                        Case 0 'aver
-                                            .Value(lIndexConst) = ((.Value(lIndexConst) * (lAggregationCount - 1)) + lValue) / lAggregationCount
-                                        Case 1 'sum
-                                            .Value(lIndexConst) += lValue
-                                        Case 2 'min
-                                            If lValue < .Value(lIndexConst) Then
-                                                .Value(lIndexConst) = lValue
-                                            End If
-                                        Case 3 'max
-                                            If lValue > .Value(lIndexConst) Then
-                                                .Value(lIndexConst) = lValue
-                                            End If
-                                        Case 4 'first - no change needed
-                                        Case 5 'last
-                                            .Value(lIndexConst) = lValue
-                                    End Select
-                                End If
-                                lIndexConst -= 1 ' more for this value?
-                                lIndex += 1 'increment the source
-                            ElseIf lIndex > lTimser.numValues Then
-                                Logger.Dbg("OutOfValuesAt:" & lTimser.numValues)
-                            ElseIf lAggregationCount = 0 Then
-                                .Values(lIndexConst) = pNan
-                            End If
-                        Next
-                    End With
-                    'Logger.Dbg(MemUsage)
-                    lTimser = lTimserConst
-                    'Logger.Dbg(MemUsage)
-                Else
-                    Throw New ApplicationException("No Time Units or Time Step on source dataset")
-                End If
+                lTimserConst = Me.FillSparseTS(lTimser, lTs, lTu, lDsn)
             End If
 
             Dim lNvals As Integer = lTimser.numValues
@@ -274,16 +198,18 @@ Public Class atcDataSourceWDM
                                                "dsn " & lTimser.Attributes.GetValue("ID", 0))
             End If
 
-            'aDataSet.Attributes.CalculateAll() 'should we calculdate attributes on request, not here on creation
-
             'Logger.Dbg("atcDataSourceWdm:AddDataset:WdmUnit:Dsn:" & lWdmHandle.Unit & ":" & lDsn)
 
             Dim lDsnExists As Integer = F90_WDCKDT(lWdmHandle.Unit, lDsn)
             If lDsnExists > 0 Then 'dataset exists, what do we do?
                 'Logger.Dbg("atcDataSourceWdm:AddDataset:DatasetAlreadyExists")
-                Dim lExistTimser As atcTimeseries = DataSets.ItemByKey(lDsn)
                 'Change asking user into what the user already chose for all
                 If aExistAction = ExistAskUser Then aExistAction = pExistAskUserAction
+                Dim lExistTimser As atcTimeseries = DataSets.ItemByKey(lDsn)
+                If lExistTimser.Serial = aDataSet.Serial Then
+                    Logger.Dbg("Adding a dataset that already exists in WDM: replacing old version in WDM, DSN=" & lDsn)
+                    aExistAction = ExistReplace
+                End If
                 Select Case aExistAction
                     Case ExistNoAction
                         'Don't add, take no action
@@ -334,7 +260,7 @@ CaseExistRenumber:
             End If
 
             Dim lWriteIt As Boolean = False
-            If lDsnExists > 0 And aExistAction = ExistAppend Then 'just write appended data
+            If lDsnExists > 0 AndAlso aExistAction = ExistAppend Then 'just write appended data
                 lWriteIt = True
             ElseIf DsnBld(lWdmHandle.Unit, lTimser) Then
                 DataSets.Add(lDsn, lTimser)
@@ -363,7 +289,7 @@ CaseExistRenumber:
                     'F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat(0), lNvals, CInt(1), CInt(0), lTu, lV(1), lRet)
                     F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat, lNvals, CInt(1), CInt(0), lTu, lV, lRet)
                 End If
-                If Not lTimserConst Is Nothing Then
+                If lTimserConst IsNot Nothing Then
                     lTimserConst.Clear() 'TODO: maybe just part?
                 End If
                 If lRet <> 0 Then
@@ -385,6 +311,93 @@ CaseExistRenumber:
             lWdmHandle.Dispose()
             Return False
         End Try
+    End Function
+
+    Private Function FillSparseTS(ByRef lTimser As atcTimeseries, ByRef lTs As Integer, ByRef lTu As atcTimeUnit, ByRef lDSN As Integer) As atcTimeseries
+        Dim lTimserConst As atcTimeseries
+        Dim lAggr As Integer = lTimser.Attributes.GetValue("aggregation", 0)
+#If BatchMode Then
+#Else
+        If pAskAboutMissingTuTs Then
+            Dim lFrmDefaultTimeInterval As New frmDefaultTimeInterval
+            pAskAboutMissingTuTs = lFrmDefaultTimeInterval.AskUser(lTimser.ToString & " #" & lDSN, pTu, pTs, lAggr)
+        End If
+#End If
+        lTs = pTs
+        lTu = pTu
+        If pTs > 0 AndAlso pTu <> atcTimeUnit.TUUnknown Then
+            Dim lJulianInterval As Double
+            Select Case pTu
+                Case 2 : lJulianInterval = JulianMinute * lTs 'minute
+                Case 3 : lJulianInterval = JulianHour * lTs 'hour
+                Case 4 : lJulianInterval = lTs
+            End Select
+            lTimserConst = New atcTimeseries(Me)
+            With lTimserConst
+                .Attributes.ChangeTo(lTimser.Attributes)
+                .Dates = New atcTimeseries(Me)
+                Dim lNumValues As Integer
+                If lJulianInterval > 0 Then
+                    .Dates.Value(0) = CInt(lTimser.Dates.Value(1)) - 1 'whole day portion
+                    lNumValues = (lTimser.Dates.Value(lTimser.numValues) - .Dates.Value(0)) / lJulianInterval
+                Else
+                    .Dates.Value(0) = TimAddJ(lTimser.Dates.Value(1), lTu, lTs, -1) 'for monthly data
+                    lNumValues = lTimser.numValues
+                End If
+                .numValues = lNumValues
+                .SetInterval(lTu, lTs)
+                Dim lIndex As Integer = 1
+                For lIndexConst As Integer = 1 To lNumValues
+                    Dim lDate As Double
+                    If lJulianInterval > 0 Then
+                        lDate = .Dates.Values(0) + (lJulianInterval * lIndexConst)
+                    Else
+                        lDate = TimAddJ(.Dates.Value(0), lTu, lTs, lIndexConst)
+                    End If
+                    Dim lAggregationCount As Integer = .ValueAttributes(lIndexConst).GetValue("AggregationCount", 0)
+                    .Dates.Values(lIndexConst) = lDate
+                    If lIndex <= lTimser.numValues AndAlso lDate >= (lTimser.Dates.Values(lIndex) - JulianSecond) Then
+                        'todo: this uses only the last value, have a transformation 
+                        lAggregationCount += 1
+                        .ValueAttributes(lIndexConst).Add("AggregationCount", lAggregationCount)
+                        Dim lValue As Double = lTimser.Values(lIndex)
+                        If lAggregationCount = 1 Then 'save this first value
+                            .Values(lIndexConst) = lValue
+                        Else
+                            Select Case lAggr
+                                Case 0 'aver
+                                    .Value(lIndexConst) = ((.Value(lIndexConst) * (lAggregationCount - 1)) + lValue) / lAggregationCount
+                                Case 1 'sum
+                                    .Value(lIndexConst) += lValue
+                                Case 2 'min
+                                    If lValue < .Value(lIndexConst) Then
+                                        .Value(lIndexConst) = lValue
+                                    End If
+                                Case 3 'max
+                                    If lValue > .Value(lIndexConst) Then
+                                        .Value(lIndexConst) = lValue
+                                    End If
+                                Case 4 'first - no change needed
+                                Case 5 'last
+                                    .Value(lIndexConst) = lValue
+                            End Select
+                        End If
+                        lIndexConst -= 1 ' more for this value?
+                        lIndex += 1 'increment the source
+                    ElseIf lIndex > lTimser.numValues Then
+                        Logger.Dbg("OutOfValuesAt:" & lTimser.numValues)
+                    ElseIf lAggregationCount = 0 Then
+                        .Values(lIndexConst) = pNan
+                    End If
+                Next
+            End With
+            'Logger.Dbg(MemUsage)
+            lTimser = lTimserConst
+            'Logger.Dbg(MemUsage)
+            Return lTimserConst
+        Else
+            Throw New ApplicationException("No Time Units or Time Step on source dataset")
+        End If
     End Function
 
     Public Function WriteAttributes(ByVal aDataSet As atcData.atcDataSet) As Boolean
@@ -1090,7 +1103,7 @@ ParseDate:                          Logger.Dbg(lName & " text date '" & lS & "' 
     End Function
 
     Public Overrides Sub View()
-        Logger.Msg("No Viewer available for WDM files", "View Problem")
+        Logger.Msg("No Viewer available for WDM files", "View")
     End Sub
 
     Protected Overrides Sub Finalize()

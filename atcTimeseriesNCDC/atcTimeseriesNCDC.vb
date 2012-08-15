@@ -253,21 +253,20 @@ Partial Public Class atcTimeseriesNCDC
                     .SetValue("Constituent", lConstituentBASINS)
                     .SetValue("FieldIndex", lRawData.ColumnIndex) 'currently only reading the actual value
                     '.SetValue("ID", pDatasetID)
+
+                    If IO.File.Exists(aFileName & ".station") Then
+                        Dim lStationDetails() As String = IO.File.ReadAllText(aFileName & ".station").Split(",")
+                        If lStationDetails.Length > 6 Then
+                            .SetValue("STANAM", lStationDetails(3))
+                            If IsNumeric(lStationDetails(4)) Then .SetValue("Latitude", lStationDetails(4))
+                            If IsNumeric(lStationDetails(5)) Then .SetValue("Longitude", lStationDetails(5))
+                            If IsNumeric(lStationDetails(6) AndAlso lStationDetails(6) > -900) Then .SetValue("Elevation", CDbl(lStationDetails(6)))
+                        End If
+                    End If
+
                 End With
                 DataSets.Add(lTs)
             Next 'lRptType
-
-            If IO.File.Exists(aFileName & ".station") Then
-                Dim lStationDetails() As String = IO.File.ReadAllText(aFileName & ".station").Split(",")
-                If lStationDetails.Length > 6 Then
-                    With lTs.Attributes
-                        .SetValue("STANAM", lStationDetails(3))
-                        If IsNumeric(lStationDetails(4)) Then .SetValue("Latitude", lStationDetails(4))
-                        If IsNumeric(lStationDetails(5)) Then .SetValue("Longitude", lStationDetails(5))
-                        If IsNumeric(lStationDetails(6) AndAlso lStationDetails(6) > -900) Then .SetValue("Elevation", CDbl(lStationDetails(6)))
-                    End With
-                End If
-            End If
 
             Return True
         Else
