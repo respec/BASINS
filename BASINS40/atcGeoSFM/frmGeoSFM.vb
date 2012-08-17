@@ -4013,6 +4013,7 @@ Public Class frmGeoSFM
                 BuildListofValidStationNames("PREC", pPrecStations)
                 lblStatus.Text = "Reading Evap Data ..."
                 Me.Refresh()
+                pMetStations.Clear()
                 BuildListofValidStationNames("PEVT", pMetStations)
                 SetPrecipStationGrid()
                 lblStatus.Text = "Update specifications if desired, then click 'Next' to proceed."
