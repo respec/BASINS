@@ -4224,6 +4224,7 @@ Public Class frmGeoSFM
         If lGrapher Is Nothing Then
             lForm.Dispose()
         Else
+            lGrapher.ZedGraphCtrl.GraphPane.YAxis.Title.Text = "Flow (cms)"
             lForm.Grapher = lGrapher
             lForm.Show()
         End If

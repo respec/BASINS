@@ -4374,6 +4374,7 @@ Public Module modGeoSFM
                 .SetValue("TS", 1)
                 .SetValue("TSTYPE", "FLOW")
                 .SetValue("Data Source", aFlowFileName)
+                .SetValue("Units", "cms")
             End With
 
             Dim lTsDate As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
