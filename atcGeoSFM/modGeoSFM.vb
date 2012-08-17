@@ -4401,7 +4401,7 @@ Public Module modGeoSFM
 
     Friend Sub BuildListofValidStationNames(ByRef aMetConstituent As String, _
                                             ByVal aStations As atcCollection)
-        aStations.Clear()
+        'aStations.Clear()
 
         For Each lDataSource As atcTimeseriesSource In atcDataManager.DataSources
             Dim lTotalCount As Integer = lDataSource.DataSets.Count
@@ -4449,7 +4449,7 @@ Public Module modGeoSFM
                         lStationDetails.Name = lLoc
                         lStationDetails.StartJDate = lSJDay
                         lStationDetails.EndJDate = lEJDay
-                        lStationDetails.Description = lLoc & ":" & lStanam & " " & lDateString
+                        lStationDetails.Description = lStanam & " " & ":" & lLoc & " " & lDateString
                         If Not aStations.Keys.Contains(lStationDetails.Description) Then
                             aStations.Add(lStationDetails.Description, lStationDetails)
                         End If
@@ -4457,7 +4457,7 @@ Public Module modGeoSFM
                     End If
                 End If
                 'set valuesneedtoberead so that the dates and values will be forgotten, to free up memory
-                lDataSet.ValuesNeedToBeRead = True
+                'lDataSet.ValuesNeedToBeRead = True
             Next
         Next
 

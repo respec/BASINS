@@ -3478,7 +3478,7 @@ Public Class frmGeoSFM
                 .CellColor(0, 2) = SystemColors.ControlDark
                 .Rows = 1 + lSubbasins.Count
                 .CellValue(0, 0) = "Subbasin ID"
-                .CellValue(0, 1) = "Precip Station"
+                .CellValue(0, 1) = "Precip Station/Melt Input"
                 .CellValue(0, 2) = "Evap Station"
                 For lIndex As Integer = 1 To lSubbasins.Count
                     .CellValue(lIndex, 0) = lSubbasins(lIndex - 1)
@@ -3566,7 +3566,7 @@ Public Class frmGeoSFM
         atxEYear.HardMin = lSDate(0)
 
         'default to last calendar year of data
-        lSDate(0) = lEDate(0) - 1
+        lSDate(0) = lEDate(0) '- 1
         lSDate(1) = 1
         lSDate(2) = 1
         lEDate(0) = lSDate(0)
@@ -4008,6 +4008,8 @@ Public Class frmGeoSFM
                 Me.Refresh()
                 Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
                 EnableControls(False)
+                pPrecStations.Clear()
+                BuildListofValidStationNames("Melt", pPrecStations)
                 BuildListofValidStationNames("PREC", pPrecStations)
                 lblStatus.Text = "Reading Evap Data ..."
                 Me.Refresh()
