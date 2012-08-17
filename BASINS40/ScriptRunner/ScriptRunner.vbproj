@@ -102,6 +102,7 @@
     </Compile>
     <Compile Include="ScriptDriver.vb" />
     <Compile Include="SummarizeTimeseries.vb" />
+    <Compile Include="TestWinHSPFOutput.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="frmSelectScript.resx">
@@ -167,6 +168,11 @@
       <Name>atcMwGisUtility</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcReport\atcReport.vbproj">
+      <Project>{EE3BB0CA-BB0A-4FB6-9AB3-E73F57DD4A21}</Project>
+      <Name>atcReport</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcSeasons\atcSeasons.vbproj">
       <Project>{12F7FDD0-A6EC-4ABE-A01B-790AD8CAEF03}</Project>
       <Name>atcSeasons</Name>
@@ -185,6 +191,11 @@
     <ProjectReference Include="..\atcTimeseriesNdayHighLow\atcTimeseriesNdayHighLow.vbproj">
       <Project>{24EEBEFB-2B19-489D-B3AF-9FE00A56346E}</Project>
       <Name>atcTimeseriesNdayHighLow</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesStatistics\atcTimeseriesStatistics.vbproj">
+      <Project>{7E40E3E6-BF8E-45B5-99AF-4E11DAF039FD}</Project>
+      <Name>atcTimeseriesStatistics</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUCI\atcUCI.vbproj">
