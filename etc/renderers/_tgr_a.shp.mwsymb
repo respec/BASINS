@@ -1,0 +1,62 @@
+<MapWinGIS OcxVersion="4.8" FileType="LayerFile" FileVersion="0" Description="">
+  <Layer LayerType="Shapefile" LayerName="_tgr_a" LayerVisible="1" LayerKey="" Filename="">
+    <ShapefileClass>
+      <DefaultDrawingOptions FillBgColor="0" FillColor="16777215" LineColor="2763429">
+        <LinePatternClass Key="" Transparency="255">
+          <LineSegments>
+            <LineSegmentClass LineType="0" Color="2763429" MarkerOutlineColor="7895160" LineWidth="1.000000" MarkerSize="12.000000" MarkerInterval="16.000000" MarkerOffset="0.000000" LineStyle="0" Marker="2" MarkerOrientation="1" MarkerFlipFirst="-1" />
+          </LineSegments>
+        </LinePatternClass>
+      </DefaultDrawingOptions>
+      <ShapefileCategoriesClass ClassificationField="9" FieldType="0">
+        <ShapefileCategoryClass Name="Primary limited access" Expression="[CFCC] = &quot;A11&quot;" Value="A11">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="132" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Primary limited access" Expression="[CFCC] = &quot;A15&quot;" Value="A15">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="132" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Primary non-limited access" Expression="[CFCC] = &quot;A21&quot;" Value="A21">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="0" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Primary non-limited access" Expression="[CFCC] = &quot;A25&quot;" Value="A25">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="0" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Secondary" Expression="[CFCC] = &quot;A31&quot;" Value="A31">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="8026746" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Secondary" Expression="[CFCC] = &quot;A35&quot;" Value="A35">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="8026746" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Local" Expression="[CFCC] = &quot;A41&quot;" Value="A41">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="10921638" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Local" Expression="[CFCC] = &quot;A42&quot;" Value="A42">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="10921638" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Local" Expression="[CFCC] = &quot;A45&quot;" Value="A45">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="10921638" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Other" Expression="[CFCC] = &quot;A51&quot;" Value="A51">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="13158600" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Other" Expression="[CFCC] = &quot;A63&quot;" Value="A63">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="13158600" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Other" Expression="[CFCC] = &quot;A64&quot;" Value="A64">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="13158600" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Other" Expression="[CFCC] = &quot;A71&quot;" Value="A71">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="13158600" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Other" Expression="[CFCC] = &quot;A73&quot;" Value="A73">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="13158600" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Other" Expression="[CFCC] = &quot;A74&quot;" Value="A74">
+          <ShapeDrawingOptionsClass FillBgColor="0" FillColor="16777215" FillColor2="16777215" LineColor="13158600" />
+        </ShapefileCategoryClass>
+      </ShapefileCategoriesClass>
+      <LabelsClass Generated="0" AutoOffset="0" AvoidCollisions="0" Positioning="6" TextRenderingHint="5" />
+      <ChartsClass ValuesFontName="" />
+    </ShapefileClass>
+  </Layer>
+</MapWinGIS>

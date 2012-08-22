@@ -28,6 +28,7 @@ Public Class PlugIn
         atcMwGisUtility.GisUtil.MappingObject = aMapWin
         AddMenuIfMissing(ModelsMenuName, "", ModelsMenuString, "mnuFile")
         AddMenuIfMissing(ModelsMenuName & "_GeoSFM", ModelsMenuName, "GeoSFM")
+        atcData.atcDataManager.LoadPlugin("Timeseries::Statistics")
     End Sub
 
     Public Overrides Sub Terminate()

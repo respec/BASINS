@@ -1252,6 +1252,16 @@ StartOver:
                         IO.File.Copy(lDefaultRendererFilename, lRendererFilename)
                         GetDefaultRenderer = lRendererFilename
                     End If
+                    'also need to copy symbology file for MapWindow 4.8.6 if there is one
+                    Dim lDefaultSymbologyFilename As String = FilenameSetExt(lDefaultRendererFilename, ".shp") & ".mwsymb"
+                    If FileExists(lDefaultSymbologyFilename) And Not FileExists(aLayerFilename & ".mwsymb") Then
+                        IO.File.Copy(lDefaultSymbologyFilename, aLayerFilename & ".mwsymb")
+                    End If
+                    If LCase(aLayerFilename).IndexOf("\landuse" & g_PathChar) > 0 Then
+                        If FileExists(lRenderersPath & "giras.shp.mwsymb") And Not FileExists(aLayerFilename & ".mwsymb") Then
+                            IO.File.Copy(lRenderersPath & "giras.shp.mwsymb", aLayerFilename & ".mwsymb")
+                        End If
+                    End If
                 End If
             End If
         End If
@@ -1756,7 +1766,6 @@ StartOver:
         MWlay.DrawFill = True
         MWlay.LineOrPointSize = 0
         MWlay.OutlineColor = System.Drawing.Color.Black
-
     End Sub
 
     Private Sub SetElevationGridColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal g As MapWinGIS.Grid)

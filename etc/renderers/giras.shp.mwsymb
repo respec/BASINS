@@ -1,0 +1,38 @@
+<MapWinGIS OcxVersion="4.8" FileType="LayerFile" FileVersion="0" Description="">
+  <Layer LayerType="Shapefile" LayerName="Land Use baltmd" LayerVisible="1" LayerKey="" Filename="">
+    <ShapefileClass>
+      <DefaultDrawingOptions FillColor="14996692" LineWidth="0.000000" />
+      <ShapefileCategoriesClass>
+        <ShapefileCategoryClass Name="Urban or Built-up Land" Expression="[LUCODE] &gt;= 1.000000 AND [LUCODE] &lt; 19.000000">
+          <ShapeDrawingOptionsClass FillColor="7895160" FillColor2="7895160" LineWidth="0.000000"/>
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Agricultural Land" Expression="[LUCODE] &gt;= 20.000000 AND [LUCODE] &lt; 29.000000">
+          <ShapeDrawingOptionsClass FillColor="65280" FillColor2="65280" LineWidth="0.000000" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Rangeland" Expression="[LUCODE] &gt;= 30.000000 AND [LUCODE] &lt; 39.000000">
+          <ShapeDrawingOptionsClass FillColor="3124882" FillColor2="3124882" LineWidth="0.000000" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Forest Land" Expression="[LUCODE] &gt;= 40.000000 AND [LUCODE] &lt; 49.000000">
+          <ShapeDrawingOptionsClass FillColor="3303073" FillColor2="3303073" LineWidth="0.000000" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Water" Expression="[LUCODE] &gt;= 50.000000 AND [LUCODE] &lt; 59.000000">
+          <ShapeDrawingOptionsClass FillColor="16711680" FillColor2="16711680" LineWidth="0.000000" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Wetland" Expression="[LUCODE] &gt;= 60.000000 AND [LUCODE] &lt; 69.000000">
+          <ShapeDrawingOptionsClass FillColor="14471424" FillColor2="14471424" LineWidth="0.000000" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Barren Land" Expression="[LUCODE] &gt;= 70.000000 AND [LUCODE] &lt; 79.000000">
+          <ShapeDrawingOptionsClass FillColor="65535" FillColor2="65535" LineWidth="0.000000" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Tundra" Expression="[LUCODE] &gt;= 80.000000 AND [LUCODE] &lt; 89.000000">
+          <ShapeDrawingOptionsClass FillColor="26940" FillColor2="26940" LineWidth="0.000000" />
+        </ShapefileCategoryClass>
+        <ShapefileCategoryClass Name="Perennial Snow or Ice" Expression="[LUCODE] &gt;= 90.000000 AND [LUCODE] &lt;= 99.000000">
+          <ShapeDrawingOptionsClass FillColor="13816530" FillColor2="13816530" LineWidth="0.000000" />
+        </ShapefileCategoryClass>
+      </ShapefileCategoriesClass>
+      <LabelsClass Generated="0" AvoidCollisions="0" Positioning="1" TextRenderingHint="5" />
+      <ChartsClass />
+    </ShapefileClass>
+  </Layer>
+</MapWinGIS>
