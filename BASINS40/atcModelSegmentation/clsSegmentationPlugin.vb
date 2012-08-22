@@ -55,7 +55,8 @@ Public Class PlugIn
     Friend Sub OpenTableEditor(ByVal aSubbasinLayerName As String) Handles pFrmModelSegmentation.OpenTableEditor
         GisUtil.CurrentLayer = GisUtil.LayerIndex(aSubbasinLayerName)
         'TODO: make sure this layer is visible on legend
-        Dim pTableEditor As New frmTableEditor(CType(pMapWin.Layers(pMapWin.Layers.CurrentLayer).GetObject, MapWinGIS.Shapefile), pMapWinForm)
+        'Dim pTableEditor As New frmTableEditor(CType(pMapWin.Layers(pMapWin.Layers.CurrentLayer).GetObject, MapWinGIS.Shapefile), pMapWinForm)  'used to work prior to MapWindow update
+        Dim pTableEditor As New frmTableEditor(pMapWin.Layers(pMapWin.Layers.CurrentLayer).Handle, pMapWinForm)
         'TODO: would be nice to show only the model segment field, but requires changes to the table editor
         pTableEditor.Show()
         'pMapWin.Plugins.BroadcastMessage("TableEditorStart")

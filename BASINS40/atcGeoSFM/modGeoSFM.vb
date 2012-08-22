@@ -101,7 +101,7 @@ Public Module modGeoSFM
             Logger.Status("Step 2 of 11: Computing Flow Direction")
             lFlowDirGridFileName = FilenameNoExt(lDEMFileName) & "FlowDir.bgd"
             lSlopeGridFileName = FilenameNoExt(lDEMFileName) & "Slope.bgd"
-            Dim lRet As Integer = MapWinGeoProc.Hydrology.D8(lPitFillDEMFileName, lFlowDirGridFileName, lSlopeGridFileName, Nothing)
+            Dim lRet As Integer = MapWinGeoProc.Hydrology.D8(lPitFillDEMFileName, lFlowDirGridFileName, lSlopeGridFileName, 8, True, Nothing)
             If Not GisUtil.IsLayer(lFlowDirGridLayerName) Then
                 GisUtil.AddLayer(lFlowDirGridFileName, lFlowDirGridLayerName)
             End If
@@ -121,7 +121,7 @@ Public Module modGeoSFM
         Else
             Logger.Status("Step 3 of 11: Computing Flow Accumulation")
             lFlowAccGridFileName = FilenameNoExt(lDEMFileName) & "FlowAcc.bgd"
-            Dim lRet As Integer = MapWinGeoProc.Hydrology.AreaD8(lFlowDirGridFileName, "", lFlowAccGridFileName, False, False, Nothing)
+            Dim lRet As Integer = MapWinGeoProc.Hydrology.AreaD8(lFlowDirGridFileName, "", lFlowAccGridFileName, False, False, 8, True, Nothing)
             GisUtil.AddLayer(lFlowAccGridFileName, lFlowAccGridLayerName)
             GisUtil.SaveProject(GisUtil.ProjectFileName)
         End If
@@ -194,8 +194,8 @@ Public Module modGeoSFM
             lStreamGridFileName = FilenameNoExt(lDEMFileName) & "Stream.bgd"
             lSubbasinGridFileName = FilenameNoExt(lDEMFileName) & "Watershed.bgd"
 
-            MapWinGeoProc.Hydrology.DelinStreamGrids(lDEMFileName, lPitFillDEMFileName, lFlowDirGridFileName, lSlopeGridFileName, lFlowAccGridFileName, "", lStrahlOrdResultGridFileName, lLongUpslopeResultGridFileName, lTotalUpslopeResultGridFileName, lStreamGridFileName, lStreamOrderResultGridFileName, lTreeDatResultFileName, lCoordDatResultFileName, aThresh, False, False, Nothing)
-            MapWinGeoProc.Hydrology.DelinStreamsAndSubBasins(lFlowDirGridFileName, lTreeDatResultFileName, lCoordDatResultFileName, lStreamShapeResultFileName, lSubbasinGridFileName, Nothing)
+            MapWinGeoProc.Hydrology.DelinStreamGrids(lDEMFileName, lPitFillDEMFileName, lFlowDirGridFileName, lSlopeGridFileName, lFlowAccGridFileName, "", lStrahlOrdResultGridFileName, lLongUpslopeResultGridFileName, lTotalUpslopeResultGridFileName, lStreamGridFileName, lStreamOrderResultGridFileName, lTreeDatResultFileName, lCoordDatResultFileName, lStreamShapeResultFileName, lSubbasinGridFileName, aThresh, False, False, 8, True, Nothing)
+            'MapWinGeoProc.Hydrology.DelinStreamsAndSubBasins(lFlowDirGridFileName, lTreeDatResultFileName, lCoordDatResultFileName, lStreamShapeResultFileName, lSubbasinGridFileName, Nothing)
             MapWinGeoProc.Hydrology.SubbasinsToShape(lFlowDirGridFileName, lSubbasinGridFileName, lSubbasinShapeResultFileName, Nothing)
 
             If Not GisUtil.IsLayer(lSubbasinGridLayerName) Then
@@ -577,7 +577,7 @@ Public Module modGeoSFM
         Dim lMean As Double = 0.0
         Dim lMaxMean As Double = 1.0   'to use for tiebreaker
         For Each lBasin As atcDataAttributes In lFacZonalStats
-            lMean = lBasin.GetDefinedValue("Mean").Value   'use as tiebreaker in sort
+            lMean = lBasin.GetDefinedValue("Mean").Value   'use as tiebreaker in sort   'note mark says use getvalue
             If lMean > lMaxMean Then
                 lMaxMean = lMean
             End If
@@ -1242,23 +1242,24 @@ Public Module modGeoSFM
                 Dim lMeanDrop As Single = lDemZonalStats.ItemByKey(lBasinID).GetDefinedValue("Mean").Value
                 Dim lMinDrop As Single = lDemZonalStats.ItemByKey(lBasinID).GetDefinedValue("Min").Value
                 'avgdrop = meandrop - mindrop
-                Dim lAvgDrop As Single = lMeanDrop - lMinDrop
-                Dim lAvgRaw As Single = lFlowLenZonalStats.ItemByKey(lBasinID).GetDefinedValue("Mean").Value
-                'avglength = (avgraw < mycellsize).con(mycellsize.asgrid, avgraw)
-                Dim lAvgLength As Single = 0.0
-                'Grid.Con(Yes,No) 
-                If lAvgRaw < lCellSize Then
-                    lAvgLength = lCellSize
-                Else
-                    lAvgLength = lAvgRaw
-                End If
-                Dim lSlopeRaw As Single = ((lAvgDrop * 100) / lAvgLength)
-                Dim lSlopeVal As Single
-                'slopegrid = (sloperaw < 0.001).con(0.001.asgrid, sloperaw)
-                If lSlopeRaw < 0.001 Then
-                    lSlopeVal = 0.001
-                Else
-                    lSlopeVal = lSlopeRaw
+                Dim lSlopeVal As Single = 0.001
+                If lFlowLenZonalStats.ItemByKey(lBasinID).ContainsAttribute("Mean") Then
+                    Dim lAvgDrop As Single = lMeanDrop - lMinDrop
+                    Dim lAvgRaw As Single = lFlowLenZonalStats.ItemByKey(lBasinID).GetDefinedValue("Mean").Value
+                    'avglength = (avgraw < mycellsize).con(mycellsize.asgrid, avgraw)
+                    Dim lAvgLength As Single = 0.0
+                    'Grid.Con(Yes,No) 
+                    If lAvgRaw < lCellSize Then
+                        lAvgLength = lCellSize
+                    Else
+                        lAvgLength = lAvgRaw
+                    End If
+                    Dim lSlopeRaw As Single = ((lAvgDrop * 100) / lAvgLength)
+                    'slopegrid = (sloperaw < 0.001).con(0.001.asgrid, sloperaw)
+                    If lSlopeRaw < 0.001 Then
+                    Else
+                        lSlopeVal = lSlopeRaw
+                    End If
                 End If
                 lSlopeBySubbasin.Add(lBasinID, lSlopeVal)
             Next

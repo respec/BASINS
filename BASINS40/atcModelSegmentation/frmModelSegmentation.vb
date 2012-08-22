@@ -110,12 +110,14 @@ Friend Class frmModelSegmentation
 
     Private Sub cmdEditTable_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdEditTable.Click
         Dim lSubbasinLayerName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
-        Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(lSubbasinLayerName)
-        Dim lModelSegFieldIndex As Integer = PlugIn.MetSegFieldIndex(lSubbasinLayerIndex)  'add field if is does not yet exist
+        If GisUtil.IsLayer(lSubbasinLayerName) Then
+            Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(lSubbasinLayerName)
+            Dim lModelSegFieldIndex As Integer = PlugIn.MetSegFieldIndex(lSubbasinLayerIndex)  'add field if is does not yet exist
 
-        If lSubbasinLayerName <> pSubbasinLayerNameUserPrompt Then
-            RaiseEvent OpenTableEditor(lSubbasinLayerName)
-            'Me.Focus()
+            If lSubbasinLayerName <> pSubbasinLayerNameUserPrompt Then
+                RaiseEvent OpenTableEditor(lSubbasinLayerName)
+                'Me.Focus()
+            End If
         End If
     End Sub
 
