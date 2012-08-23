@@ -107,6 +107,13 @@ Public Class frmGraphEditor
         End Select
         chkLegendOutline.Checked = pPane.Legend.Border.IsVisible
         txtLegendFontColor.BackColor = pPane.Legend.FontSpec.FontColor
+
+        If pPaneAux IsNot Nothing Then
+            chkLegendOutlineAux.Checked = pPaneAux.Legend.Border.IsVisible
+            txtLegendFontColorAux.BackColor = pPaneAux.Legend.FontSpec.FontColor
+        End If
+
+
         pSettingControls -= 1
     End Sub
 
@@ -383,6 +390,12 @@ Public Class frmGraphEditor
             '    Case "TopFlushLeft" : .Position = LegendPos.TopFlushLeft
             'End Select
         End With
+        If pPaneAux IsNot Nothing Then
+            With pPaneAux.Legend
+                .Border.IsVisible = chkLegendOutlineAux.Checked
+                .FontSpec.FontColor = txtLegendFontColorAux.BackColor
+            End With
+        End If
     End Sub
 
     Private Sub btnApply_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnApply.Click
@@ -413,6 +426,23 @@ Public Class frmGraphEditor
                 End If
             End If
 
+            If pPaneAux IsNot Nothing Then
+                Dim lAuxFraction As Double
+                If Double.TryParse(txtAuxSize.Text, lAuxFraction) Then
+                    If lAuxFraction > 0.99 Then lAuxFraction /= 100
+                    Dim lOrigAuxHeight As Single = pPaneAux.Rect.Height
+                    Dim lTotalPaneHeight As Single = pPane.Rect.Height + lOrigAuxHeight
+                    Dim lPaneX As Single = Math.Max(pPaneAux.Rect.X, pPane.Rect.X)
+                    Dim lPaneWidth As Single = Math.Min(pPaneAux.Rect.Width, pPane.Rect.Width)
+                    pPaneAux.Rect = New System.Drawing.Rectangle( _
+                            lPaneX, pPaneAux.Rect.Y, _
+                            lPaneWidth, lTotalPaneHeight * lAuxFraction)
+                    pPane.Rect = New System.Drawing.Rectangle( _
+                            lPaneX, pPane.Rect.Y - lOrigAuxHeight + pPaneAux.Rect.Height, _
+                            lPaneWidth, lTotalPaneHeight - pPaneAux.Rect.Height)
+                End If
+            End If
+
             RaiseEvent Apply()
         End If
     End Sub
@@ -422,7 +452,7 @@ Public Class frmGraphEditor
     End Sub
 
     Private Sub txtColor_Click(ByVal sender As Object, ByVal e As System.EventArgs) _
-        Handles txtAxisMinorGridColor.Click, txtAxisMajorGridColor.Click, txtCurveColor.Click, txtLegendFontColor.Click, txtTextColor.Click
+        Handles txtAxisMinorGridColor.Click, txtAxisMajorGridColor.Click, txtCurveColor.Click, txtLegendFontColor.Click, txtLegendFontColorAux.Click, txtTextColor.Click
         ChooseTextBoxBackColor(sender)
     End Sub
 
@@ -444,6 +474,7 @@ Public Class frmGraphEditor
         chkCurveSymbolVisible.CheckedChanged, _
         chkCurveSymbolFillVisible.CheckedChanged, _
         chkLegendOutline.CheckedChanged, _
+        chkLegendOutlineAux.CheckedChanged, _
         chkRangeReverse.CheckedChanged
 
         If chkAutoApply.Checked Then ApplyAll()
@@ -496,10 +527,11 @@ Public Class frmGraphEditor
             Case "Legend"
                 With pPane.Legend
                     .Position = LegendPos.Float
-                    .Location = New Location(e.X / pZgc.Width, e.Y / pZgc.Height, CoordType.PaneFraction)
+                    .Location = New Location((e.X - pPane.Rect.Left) / pZgc.Width, _
+                                             (e.Y - pPane.Rect.Top) / pPane.Rect.Height, _
+                                             CoordType.PaneFraction)
                     .IsVisible = True
                 End With
-                'comboLegendLocation.Text = "Float"
                 RaiseEvent Apply()
             Case "Text"
                 If txtText.Text.Length > 0 Then
@@ -508,8 +540,10 @@ Public Class frmGraphEditor
                         AddTextFromControls()
                         lText = FindTextObject(txtText.Text)
                     End If
-                    If Not lText Is Nothing Then
-                        lText.Location = New Location(e.X / pZgc.Width, e.Y / pZgc.Height, CoordType.PaneFraction)
+                    If lText IsNot Nothing Then
+                        lText.Location = New Location((e.X - pPane.Rect.Left) / pZgc.Width, _
+                                                      (e.Y - pPane.Rect.Top) / pPane.Rect.Height, _
+                                                      CoordType.PaneFraction)
                         RaiseEvent Apply()
                     End If
                 End If
@@ -644,7 +678,18 @@ Public Class frmGraphEditor
 
     Private Sub btnLegendFont_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnLegendFont.Click
         If UserEditFontSpec(pPane.Legend.FontSpec) Then
+            If pPaneAux IsNot Nothing Then pPaneAux.Legend.FontSpec = pPane.Legend.FontSpec.Clone
             If chkAutoApply.Checked Then RaiseEvent Apply()
+        End If
+    End Sub
+
+    Private Sub btnLegendFontAux_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnLegendFontAux.Click
+        If pPaneAux Is Nothing Then
+            MsgBox("There is no aux axis on this graph")
+        Else
+            If UserEditFontSpec(pPaneAux.Legend.FontSpec) Then
+                If chkAutoApply.Checked Then RaiseEvent Apply()
+            End If
         End If
     End Sub
 
@@ -676,7 +721,7 @@ Public Class frmGraphEditor
                 Dim lBorder As ZedGraph.Border = aFontSpec.Border.Clone
                 Dim lAngle As Single = aFontSpec.Angle
                 aFontSpec = New FontSpec( _
-                    .FontFamily.Name, .SizeInPoints * 1.666666, cdlg.Color, _
+                    .FontFamily.Name, .SizeInPoints * 1.333333, cdlg.Color, _
                     .Bold, .Italic, .Underline, _
                     aFontSpec.Fill.Color, aFontSpec.Fill.Brush, aFontSpec.Fill.Type)
                 aFontSpec.Border = lBorder
@@ -693,4 +738,5 @@ Public Class frmGraphEditor
         lGrapher.AddFitLine()
         AddedLineItem()
     End Sub
+
 End Class
