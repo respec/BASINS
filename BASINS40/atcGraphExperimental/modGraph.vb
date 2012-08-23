@@ -303,10 +303,12 @@ FoundMatch:
         Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
         Dim lCurveLabel As String = TSCurveLabel(aTimeseries, aCommonTimeUnitName, aCommonScenario, aCommonConstituent, aCommonLocation, aCommonUnits)
         Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
+        Dim lCurve As LineItem = Nothing
 
         Dim lPane As GraphPane = aZgc.MasterPane.PaneList(aZgc.MasterPane.PaneList.Count - 1)
         Dim lYAxis As Axis = lPane.YAxis
-        Dim lCurve As LineItem = Nothing
+        Dim lXAxisType As ZedGraph.AxisType = AxisTypeFromName(aTimeseries.Attributes.GetValue("GraphXAxisType", "DateDual"))
+        If lPane.XAxis.Type <> lXAxisType Then lPane.XAxis.Type = lXAxisType
 
         Select Case aYAxisName.ToUpper
             Case "AUX"
@@ -331,7 +333,6 @@ FoundMatch:
         lYAxis.Scale.IsVisible = True
 
         With lPane
-            Dim lXAxisType As ZedGraph.AxisType = AxisTypeFromName(aTimeseries.Attributes.GetValue("GraphXAxisType", "DateDual"))
             If .XAxis.Type <> lXAxisType Then .XAxis.Type = lXAxisType
 
             If aTimeseries.Attributes.GetValue("point", False) Then
@@ -443,24 +444,27 @@ FoundMatch:
                 .Margin.Bottom = 10
             End With
             ' Create, format, position aux pane
-            If lPaneAux Is Nothing Then lPaneAux = New ZedGraph.GraphPane
-            FormatPaneWithDefaults(lPaneAux)
-            With lPaneAux
-                .Margin.All = 0
-                .Margin.Top = 10
-                With .XAxis
-                    .Title.IsVisible = False
-                    .Scale.IsVisible = False
-                    .Scale.Max = lPaneMain.XAxis.Scale.Max
-                    .Scale.Min = lPaneMain.XAxis.Scale.Min
+            If lPaneAux Is Nothing Then
+                lPaneAux = New ZedGraph.GraphPane
+                FormatPaneWithDefaults(lPaneAux)
+                With lPaneAux
+                    .Margin.All = 0
+                    .Margin.Top = 10
+                    With .XAxis
+                        .Type = lPaneMain.XAxis.Type
+                        .Title.IsVisible = False
+                        .Scale.IsVisible = False
+                        .Scale.Max = lPaneMain.XAxis.Scale.Max
+                        .Scale.Min = lPaneMain.XAxis.Scale.Min
+                    End With
+                    .X2Axis.IsVisible = False
+                    With .YAxis
+                        .Type = AxisType.Linear
+                        .MinSpace = lPaneMain.YAxis.MinSpace
+                    End With
+                    .Y2Axis.MinSpace = lPaneMain.Y2Axis.MinSpace
                 End With
-                .X2Axis.IsVisible = False
-                With .YAxis
-                    .Type = AxisType.Linear
-                    .MinSpace = lPaneMain.YAxis.MinSpace
-                End With
-                .Y2Axis.MinSpace = lPaneMain.Y2Axis.MinSpace
-            End With
+            End If
 
             With aMasterPane
                 .PaneList.Add(lPaneAux)

@@ -104,21 +104,21 @@ Partial Class frmGraphEditor
         Me.txtLineBcoef = New System.Windows.Forms.TextBox
         Me.tabLegend = New System.Windows.Forms.TabPage
         Me.groupLegendAux = New System.Windows.Forms.GroupBox
+        Me.lblAuxSizePercent = New System.Windows.Forms.Label
+        Me.lblAuxSize = New System.Windows.Forms.Label
+        Me.txtAuxSize = New System.Windows.Forms.TextBox
         Me.chkLegendOutlineAux = New System.Windows.Forms.CheckBox
         Me.btnLegendFontAux = New System.Windows.Forms.Button
         Me.groupLegendMain = New System.Windows.Forms.GroupBox
         Me.btnLegendFont = New System.Windows.Forms.Button
-        Me.chkLegendOutline = New System.Windows.Forms.CheckBox
         Me.lblLegendClickToPlace = New System.Windows.Forms.Label
+        Me.chkLegendOutline = New System.Windows.Forms.CheckBox
         Me.tabText = New System.Windows.Forms.TabPage
         Me.lblTextClickToPlace = New System.Windows.Forms.Label
         Me.btnTextRemove = New System.Windows.Forms.Button
         Me.btnTextAdd = New System.Windows.Forms.Button
         Me.txtText = New System.Windows.Forms.TextBox
         Me.chkAutoApply = New System.Windows.Forms.CheckBox
-        Me.txtAuxSize = New System.Windows.Forms.TextBox
-        Me.lblAuxSize = New System.Windows.Forms.Label
-        Me.lblAuxSizePercent = New System.Windows.Forms.Label
         Me.tabsCategory.SuspendLayout()
         Me.tabAxes.SuspendLayout()
         Me.panelProbability.SuspendLayout()
@@ -193,7 +193,7 @@ Partial Class frmGraphEditor
         Me.comboWhichCurve.FormattingEnabled = True
         Me.comboWhichCurve.Location = New System.Drawing.Point(81, 9)
         Me.comboWhichCurve.Name = "comboWhichCurve"
-        Me.comboWhichCurve.Size = New System.Drawing.Size(398, 21)
+        Me.comboWhichCurve.Size = New System.Drawing.Size(384, 21)
         Me.comboWhichCurve.TabIndex = 0
         Me.toolTip1.SetToolTip(Me.comboWhichCurve, "Select which curve to edit")
         '
@@ -266,7 +266,7 @@ Partial Class frmGraphEditor
         Me.comboWhichText.FormattingEnabled = True
         Me.comboWhichText.Location = New System.Drawing.Point(81, 9)
         Me.comboWhichText.Name = "comboWhichText"
-        Me.comboWhichText.Size = New System.Drawing.Size(398, 21)
+        Me.comboWhichText.Size = New System.Drawing.Size(387, 21)
         Me.comboWhichText.TabIndex = 12
         Me.toolTip1.SetToolTip(Me.comboWhichText, "Select which curve to edit")
         '
@@ -283,7 +283,7 @@ Partial Class frmGraphEditor
         '
         Me.txtTextColor.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtTextColor.BackColor = System.Drawing.Color.Black
-        Me.txtTextColor.Location = New System.Drawing.Point(243, 158)
+        Me.txtTextColor.Location = New System.Drawing.Point(232, 158)
         Me.txtTextColor.Name = "txtTextColor"
         Me.txtTextColor.Size = New System.Drawing.Size(74, 20)
         Me.txtTextColor.TabIndex = 15
@@ -292,7 +292,7 @@ Partial Class frmGraphEditor
         'btnTextFont
         '
         Me.btnTextFont.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnTextFont.Location = New System.Drawing.Point(162, 156)
+        Me.btnTextFont.Location = New System.Drawing.Point(151, 156)
         Me.btnTextFont.Name = "btnTextFont"
         Me.btnTextFont.Size = New System.Drawing.Size(75, 23)
         Me.btnTextFont.TabIndex = 14
@@ -385,7 +385,7 @@ Partial Class frmGraphEditor
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtCurveLabel.Location = New System.Drawing.Point(81, 36)
         Me.txtCurveLabel.Name = "txtCurveLabel"
-        Me.txtCurveLabel.Size = New System.Drawing.Size(398, 20)
+        Me.txtCurveLabel.Size = New System.Drawing.Size(384, 20)
         Me.txtCurveLabel.TabIndex = 16
         '
         'lblCurveLabel
@@ -1020,6 +1020,31 @@ Partial Class frmGraphEditor
         Me.groupLegendAux.TabStop = False
         Me.groupLegendAux.Text = "Auxiliary Legend"
         '
+        'lblAuxSizePercent
+        '
+        Me.lblAuxSizePercent.AutoSize = True
+        Me.lblAuxSizePercent.Location = New System.Drawing.Point(412, 24)
+        Me.lblAuxSizePercent.Name = "lblAuxSizePercent"
+        Me.lblAuxSizePercent.Size = New System.Drawing.Size(15, 13)
+        Me.lblAuxSizePercent.TabIndex = 61
+        Me.lblAuxSizePercent.Text = "%"
+        '
+        'lblAuxSize
+        '
+        Me.lblAuxSize.AutoSize = True
+        Me.lblAuxSize.Location = New System.Drawing.Point(279, 24)
+        Me.lblAuxSize.Name = "lblAuxSize"
+        Me.lblAuxSize.Size = New System.Drawing.Size(86, 13)
+        Me.lblAuxSize.TabIndex = 60
+        Me.lblAuxSize.Text = "Portion Of Frame"
+        '
+        'txtAuxSize
+        '
+        Me.txtAuxSize.Location = New System.Drawing.Point(371, 21)
+        Me.txtAuxSize.Name = "txtAuxSize"
+        Me.txtAuxSize.Size = New System.Drawing.Size(35, 20)
+        Me.txtAuxSize.TabIndex = 59
+        '
         'chkLegendOutlineAux
         '
         Me.chkLegendOutlineAux.AutoSize = True
@@ -1063,6 +1088,15 @@ Partial Class frmGraphEditor
         Me.btnLegendFont.Text = "Font"
         Me.btnLegendFont.UseVisualStyleBackColor = True
         '
+        'lblLegendClickToPlace
+        '
+        Me.lblLegendClickToPlace.AutoSize = True
+        Me.lblLegendClickToPlace.Location = New System.Drawing.Point(279, 24)
+        Me.lblLegendClickToPlace.Name = "lblLegendClickToPlace"
+        Me.lblLegendClickToPlace.Size = New System.Drawing.Size(151, 13)
+        Me.lblLegendClickToPlace.TabIndex = 14
+        Me.lblLegendClickToPlace.Text = "Click on graph to place legend"
+        '
         'chkLegendOutline
         '
         Me.chkLegendOutline.AutoSize = True
@@ -1072,15 +1106,6 @@ Partial Class frmGraphEditor
         Me.chkLegendOutline.TabIndex = 53
         Me.chkLegendOutline.Text = "Outline"
         Me.chkLegendOutline.UseVisualStyleBackColor = True
-        '
-        'lblLegendClickToPlace
-        '
-        Me.lblLegendClickToPlace.AutoSize = True
-        Me.lblLegendClickToPlace.Location = New System.Drawing.Point(279, 24)
-        Me.lblLegendClickToPlace.Name = "lblLegendClickToPlace"
-        Me.lblLegendClickToPlace.Size = New System.Drawing.Size(151, 13)
-        Me.lblLegendClickToPlace.TabIndex = 14
-        Me.lblLegendClickToPlace.Text = "Click on graph to place legend"
         '
         'tabText
         '
@@ -1111,7 +1136,7 @@ Partial Class frmGraphEditor
         'btnTextRemove
         '
         Me.btnTextRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnTextRemove.Location = New System.Drawing.Point(323, 156)
+        Me.btnTextRemove.Location = New System.Drawing.Point(312, 156)
         Me.btnTextRemove.Name = "btnTextRemove"
         Me.btnTextRemove.Size = New System.Drawing.Size(75, 23)
         Me.btnTextRemove.TabIndex = 16
@@ -1121,7 +1146,7 @@ Partial Class frmGraphEditor
         'btnTextAdd
         '
         Me.btnTextAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnTextAdd.Location = New System.Drawing.Point(404, 156)
+        Me.btnTextAdd.Location = New System.Drawing.Point(393, 156)
         Me.btnTextAdd.Name = "btnTextAdd"
         Me.btnTextAdd.Size = New System.Drawing.Size(75, 23)
         Me.btnTextAdd.TabIndex = 17
@@ -1136,7 +1161,7 @@ Partial Class frmGraphEditor
         Me.txtText.Location = New System.Drawing.Point(3, 36)
         Me.txtText.Multiline = True
         Me.txtText.Name = "txtText"
-        Me.txtText.Size = New System.Drawing.Size(476, 114)
+        Me.txtText.Size = New System.Drawing.Size(465, 114)
         Me.txtText.TabIndex = 13
         '
         'chkAutoApply
@@ -1149,31 +1174,6 @@ Partial Class frmGraphEditor
         Me.chkAutoApply.TabIndex = 59
         Me.chkAutoApply.Text = "Apply Automatically"
         Me.chkAutoApply.UseVisualStyleBackColor = True
-        '
-        'txtAuxSize
-        '
-        Me.txtAuxSize.Location = New System.Drawing.Point(357, 21)
-        Me.txtAuxSize.Name = "txtAuxSize"
-        Me.txtAuxSize.Size = New System.Drawing.Size(35, 20)
-        Me.txtAuxSize.TabIndex = 59
-        '
-        'lblAuxSize
-        '
-        Me.lblAuxSize.AutoSize = True
-        Me.lblAuxSize.Location = New System.Drawing.Point(324, 24)
-        Me.lblAuxSize.Name = "lblAuxSize"
-        Me.lblAuxSize.Size = New System.Drawing.Size(27, 13)
-        Me.lblAuxSize.TabIndex = 60
-        Me.lblAuxSize.Text = "Size"
-        '
-        'lblAuxSizePercent
-        '
-        Me.lblAuxSizePercent.AutoSize = True
-        Me.lblAuxSizePercent.Location = New System.Drawing.Point(398, 24)
-        Me.lblAuxSizePercent.Name = "lblAuxSizePercent"
-        Me.lblAuxSizePercent.Size = New System.Drawing.Size(15, 13)
-        Me.lblAuxSizePercent.TabIndex = 61
-        Me.lblAuxSizePercent.Text = "%"
         '
         'frmGraphEditor
         '

@@ -13,7 +13,7 @@ Public Class frmGraphEditor
 
     Private pPane As GraphPane
     Private pPaneAux As GraphPane
-    Private WithEvents pZgc As ZedGraphControl
+    Private pZgc As ZedGraphControl
     Private pDateFormat As atcDateFormat
     Private pSettingControls As Integer = 0
 
@@ -51,8 +51,20 @@ Public Class frmGraphEditor
         SetComboFromCurves()
         SetComboFromTexts()
         SetControlsFromPane()
+
+        RemoveHandler pZgc.ZoomEvent, AddressOf pZgc_ZoomEvent
+        RemoveHandler pZgc.MouseClick, AddressOf pZgc_MouseClick
+
+        AddHandler pZgc.ZoomEvent, AddressOf pZgc_ZoomEvent
+        AddHandler pZgc.MouseClick, AddressOf pZgc_MouseClick
+
         Me.Show()
         chkAutoApply.Checked = lAutoApply
+    End Sub
+
+    Private Sub frmGraphEditor_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        RemoveHandler pZgc.ZoomEvent, AddressOf pZgc_ZoomEvent
+        RemoveHandler pZgc.MouseClick, AddressOf pZgc_MouseClick
     End Sub
 
     Private Sub SetComboFromCurves()
@@ -112,7 +124,6 @@ Public Class frmGraphEditor
             chkLegendOutlineAux.Checked = pPaneAux.Legend.Border.IsVisible
             txtLegendFontColorAux.BackColor = pPaneAux.Legend.FontSpec.FontColor
         End If
-
 
         pSettingControls -= 1
     End Sub
@@ -251,19 +262,31 @@ Public Class frmGraphEditor
                     .Scale.MaxAuto = False
                     .Scale.Max = lTemp
                 End If
+                .Scale.IsReverse = chkRangeReverse.Checked
+
+                .MajorGrid.Color = txtAxisMajorGridColor.BackColor
+                .MajorGrid.IsVisible = chkAxisMajorGridVisible.Checked
+
+                .MinorGrid.Color = txtAxisMinorGridColor.BackColor
+                .MinorGrid.IsVisible = chkAxisMinorGridVisible.Checked
+
+                .MajorTic.IsInside = chkAxisMajorTicsVisible.Checked
+                .MinorTic.IsInside = chkAxisMinorTicsVisible.Checked
+
+                If aAxis Is pPane.XAxis OrElse pPaneAux IsNot Nothing AndAlso aAxis Is pPaneAux.XAxis OrElse aAxis Is pPane.YAxis AndAlso Not pPane.Y2Axis.IsVisible Then
+                    .MajorTic.IsOpposite = .MajorTic.IsInside
+                    .MinorTic.IsOpposite = .MinorTic.IsInside
+                Else
+                    .MajorTic.IsOpposite = False
+                    .MinorTic.IsOpposite = False
+                End If
+
                 If pPaneAux Is Nothing OrElse aAxis IsNot pPaneAux.XAxis Then
                     .Title.Text = txtAxisLabel.Text
                     If aAxis Is pPane.XAxis AndAlso pPaneAux IsNot Nothing Then
                         SetAxisFromControls(pPaneAux.XAxis)
                     End If
                 End If
-                .Scale.IsReverse = chkRangeReverse.Checked
-                .MajorGrid.IsVisible = chkAxisMajorGridVisible.Checked
-                .MajorGrid.Color = txtAxisMajorGridColor.BackColor
-                .MajorTic.IsInside = chkAxisMajorTicsVisible.Checked
-                .MinorGrid.IsVisible = chkAxisMinorGridVisible.Checked
-                .MinorGrid.Color = txtAxisMinorGridColor.BackColor
-                .MinorTic.IsInside = chkAxisMinorTicsVisible.Checked
             End With
         End If
     End Sub
@@ -419,6 +442,14 @@ Public Class frmGraphEditor
                 comboWhichCurve.SelectedIndex = lSelectedCurveIndex
             End If
 
+            Dim lLeftCount As Integer = 0
+            Dim lRightCount As Integer = 0
+            For Each lCurve As CurveItem In pPane.CurveList
+                If lCurve.IsY2Axis Then lRightCount += 1 Else lLeftCount += 1
+            Next
+            pPane.YAxis.IsVisible = (lLeftCount > 0)
+            pPane.Y2Axis.IsVisible = (lRightCount > 0)
+
             If txtText.Text.Length > 0 Then
                 Dim lText As TextObj = FindTextObject(txtText.Text)
                 If lText Is Nothing Then
@@ -427,19 +458,16 @@ Public Class frmGraphEditor
             End If
 
             If pPaneAux IsNot Nothing Then
-                Dim lAuxFraction As Double
-                If Double.TryParse(txtAuxSize.Text, lAuxFraction) Then
-                    If lAuxFraction > 0.99 Then lAuxFraction /= 100
-                    Dim lOrigAuxHeight As Single = pPaneAux.Rect.Height
-                    Dim lTotalPaneHeight As Single = pPane.Rect.Height + lOrigAuxHeight
-                    Dim lPaneX As Single = Math.Max(pPaneAux.Rect.X, pPane.Rect.X)
-                    Dim lPaneWidth As Single = Math.Min(pPaneAux.Rect.Width, pPane.Rect.Width)
-                    pPaneAux.Rect = New System.Drawing.Rectangle( _
-                            lPaneX, pPaneAux.Rect.Y, _
-                            lPaneWidth, lTotalPaneHeight * lAuxFraction)
-                    pPane.Rect = New System.Drawing.Rectangle( _
-                            lPaneX, pPane.Rect.Y - lOrigAuxHeight + pPaneAux.Rect.Height, _
-                            lPaneWidth, lTotalPaneHeight - pPaneAux.Rect.Height)
+                If pPaneAux.CurveList.Count = 0 Then
+                    EnableAuxAxis(pZgc.MasterPane, False, 0.2)
+                Else
+                    Dim lAuxFraction As Double
+                    If Double.TryParse(txtAuxSize.Text, lAuxFraction) Then
+                        If lAuxFraction > 0.99 Then lAuxFraction /= 100
+                    Else
+                        lAuxFraction = 0.2
+                    End If
+                    EnableAuxAxis(pZgc.MasterPane, True, lAuxFraction)
                 End If
             End If
 
@@ -522,7 +550,7 @@ Public Class frmGraphEditor
         If chkAutoApply.Checked Then ApplyAll()
     End Sub
 
-    Private Sub pZgc_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles pZgc.MouseClick
+    Private Sub pZgc_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
         Select Case tabsCategory.SelectedTab.Text
             Case "Legend"
                 With pPane.Legend
@@ -550,7 +578,7 @@ Public Class frmGraphEditor
         End Select
     End Sub
 
-    Private Sub pZgc_ZoomEvent(ByVal sender As ZedGraph.ZedGraphControl, ByVal oldState As ZedGraph.ZoomState, ByVal newState As ZedGraph.ZoomState) Handles pZgc.ZoomEvent
+    Private Sub pZgc_ZoomEvent(ByVal sender As ZedGraph.ZedGraphControl, ByVal oldState As ZedGraph.ZoomState, ByVal newState As ZedGraph.ZoomState)
         SetControlsMinMax(AxisFromCombo())
     End Sub
 
@@ -678,7 +706,6 @@ Public Class frmGraphEditor
 
     Private Sub btnLegendFont_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnLegendFont.Click
         If UserEditFontSpec(pPane.Legend.FontSpec) Then
-            If pPaneAux IsNot Nothing Then pPaneAux.Legend.FontSpec = pPane.Legend.FontSpec.Clone
             If chkAutoApply.Checked Then RaiseEvent Apply()
         End If
     End Sub
