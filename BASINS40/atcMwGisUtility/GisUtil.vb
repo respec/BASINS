@@ -694,7 +694,9 @@ Public Class GisUtil
             Throw New Exception("GisUtil:FieldValue:Error:FeatureIndex:" & aFeatureIndex & ":OutOfRange")
         Else
             Dim lCellValue As Object = lSf.CellValue(aFieldIndex, aFeatureIndex)
-            If lCellValue.GetType.Name = "DBNull" Then
+            If lCellValue Is Nothing Then
+                Return Nothing
+            ElseIf lCellValue.GetType.Name = "DBNull" Then
                 Return Nothing
             Else
                 Return lCellValue
