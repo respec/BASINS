@@ -479,7 +479,7 @@ Public Module WinHSPF
                 End If
             End If
         Else
-                Logger.Msg("A BASINS 4.0 MapWindow project is already open.", vbOKOnly, "WinHSPF View Output")
+            Logger.Msg("A BASINS/MapWindow project is already open.", vbOKOnly, "WinHSPF View Output")
         End If
 
     End Sub

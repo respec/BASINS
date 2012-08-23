@@ -815,7 +815,7 @@ Public Module modModelSetup
         Dim lProjectWDMName As String = IO.Path.GetFileNameWithoutExtension(aUciName) & ".wdm"
 
         'open project wdm
-        lDataSource = atcDataManager.DataSourceBySpecification(lProjectWDMName)
+        lDataSource = atcDataManager.DataSourceBySpecification(IO.Path.GetFullPath(lProjectWDMName))
         If lDataSource Is Nothing Then 'need to open it here
             lDataSource = New atcWDM.atcDataSourceWDM
             If Not lDataSource.Open(lProjectWDMName) Then
