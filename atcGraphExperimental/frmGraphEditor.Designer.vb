@@ -43,6 +43,7 @@ Partial Class frmGraphEditor
         Me.lblProbabilityDeviations = New System.Windows.Forms.Label
         Me.btnAxisFont = New System.Windows.Forms.Button
         Me.btnScaleFont = New System.Windows.Forms.Button
+        Me.txtLegendFontColorAux = New System.Windows.Forms.TextBox
         Me.lblAxisMinorGrid = New System.Windows.Forms.Label
         Me.lblAxisMajorGrid = New System.Windows.Forms.Label
         Me.lblAxisTo = New System.Windows.Forms.Label
@@ -61,6 +62,10 @@ Partial Class frmGraphEditor
         Me.lblCurveWidth = New System.Windows.Forms.Label
         Me.tabsCategory = New System.Windows.Forms.TabControl
         Me.tabAxes = New System.Windows.Forms.TabPage
+        Me.panelProbability = New System.Windows.Forms.Panel
+        Me.radioProbablilityReturnPeriod = New System.Windows.Forms.RadioButton
+        Me.radioProbablilityFraction = New System.Windows.Forms.RadioButton
+        Me.radioProbablilityPercent = New System.Windows.Forms.RadioButton
         Me.chkRangeReverse = New System.Windows.Forms.CheckBox
         Me.radioAxisAux = New System.Windows.Forms.RadioButton
         Me.radioAxisRight = New System.Windows.Forms.RadioButton
@@ -68,10 +73,6 @@ Partial Class frmGraphEditor
         Me.radioAxisBottom = New System.Windows.Forms.RadioButton
         Me.chkAxisMinorTicsVisible = New System.Windows.Forms.CheckBox
         Me.chkAxisMajorTicsVisible = New System.Windows.Forms.CheckBox
-        Me.panelProbability = New System.Windows.Forms.Panel
-        Me.radioProbablilityReturnPeriod = New System.Windows.Forms.RadioButton
-        Me.radioProbablilityFraction = New System.Windows.Forms.RadioButton
-        Me.radioProbablilityPercent = New System.Windows.Forms.RadioButton
         Me.panelAxisType = New System.Windows.Forms.Panel
         Me.radioAxisProbability = New System.Windows.Forms.RadioButton
         Me.radioAxisLogarithmic = New System.Windows.Forms.RadioButton
@@ -102,15 +103,22 @@ Partial Class frmGraphEditor
         Me.lblLineXplus = New System.Windows.Forms.Label
         Me.txtLineBcoef = New System.Windows.Forms.TextBox
         Me.tabLegend = New System.Windows.Forms.TabPage
+        Me.groupLegendAux = New System.Windows.Forms.GroupBox
+        Me.chkLegendOutlineAux = New System.Windows.Forms.CheckBox
+        Me.btnLegendFontAux = New System.Windows.Forms.Button
+        Me.groupLegendMain = New System.Windows.Forms.GroupBox
+        Me.btnLegendFont = New System.Windows.Forms.Button
         Me.chkLegendOutline = New System.Windows.Forms.CheckBox
         Me.lblLegendClickToPlace = New System.Windows.Forms.Label
-        Me.btnLegendFont = New System.Windows.Forms.Button
         Me.tabText = New System.Windows.Forms.TabPage
         Me.lblTextClickToPlace = New System.Windows.Forms.Label
         Me.btnTextRemove = New System.Windows.Forms.Button
         Me.btnTextAdd = New System.Windows.Forms.Button
         Me.txtText = New System.Windows.Forms.TextBox
         Me.chkAutoApply = New System.Windows.Forms.CheckBox
+        Me.txtAuxSize = New System.Windows.Forms.TextBox
+        Me.lblAuxSize = New System.Windows.Forms.Label
+        Me.lblAuxSizePercent = New System.Windows.Forms.Label
         Me.tabsCategory.SuspendLayout()
         Me.tabAxes.SuspendLayout()
         Me.panelProbability.SuspendLayout()
@@ -121,6 +129,8 @@ Partial Class frmGraphEditor
         Me.grpLineYconstant.SuspendLayout()
         Me.grpLineEquation.SuspendLayout()
         Me.tabLegend.SuspendLayout()
+        Me.groupLegendAux.SuspendLayout()
+        Me.groupLegendMain.SuspendLayout()
         Me.tabText.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -262,9 +272,8 @@ Partial Class frmGraphEditor
         '
         'txtLegendFontColor
         '
-        Me.txtLegendFontColor.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtLegendFontColor.BackColor = System.Drawing.Color.LightGray
-        Me.txtLegendFontColor.Location = New System.Drawing.Point(243, 158)
+        Me.txtLegendFontColor.Location = New System.Drawing.Point(199, 21)
         Me.txtLegendFontColor.Name = "txtLegendFontColor"
         Me.txtLegendFontColor.Size = New System.Drawing.Size(74, 20)
         Me.txtLegendFontColor.TabIndex = 55
@@ -332,6 +341,15 @@ Partial Class frmGraphEditor
         Me.btnScaleFont.Text = "Font"
         Me.toolTip1.SetToolTip(Me.btnScaleFont, "Change Font of Text")
         Me.btnScaleFont.UseVisualStyleBackColor = True
+        '
+        'txtLegendFontColorAux
+        '
+        Me.txtLegendFontColorAux.BackColor = System.Drawing.Color.LightGray
+        Me.txtLegendFontColorAux.Location = New System.Drawing.Point(199, 21)
+        Me.txtLegendFontColorAux.Name = "txtLegendFontColorAux"
+        Me.txtLegendFontColorAux.Size = New System.Drawing.Size(74, 20)
+        Me.txtLegendFontColorAux.TabIndex = 58
+        Me.toolTip1.SetToolTip(Me.txtLegendFontColorAux, "Color of Font")
         '
         'lblAxisMinorGrid
         '
@@ -535,6 +553,54 @@ Partial Class frmGraphEditor
         Me.tabAxes.Text = "Axes"
         Me.tabAxes.UseVisualStyleBackColor = True
         '
+        'panelProbability
+        '
+        Me.panelProbability.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.panelProbability.Controls.Add(Me.txtProbabilityDeviations)
+        Me.panelProbability.Controls.Add(Me.lblProbabilityDeviations)
+        Me.panelProbability.Controls.Add(Me.radioProbablilityReturnPeriod)
+        Me.panelProbability.Controls.Add(Me.radioProbablilityFraction)
+        Me.panelProbability.Controls.Add(Me.radioProbablilityPercent)
+        Me.panelProbability.Location = New System.Drawing.Point(74, 32)
+        Me.panelProbability.Name = "panelProbability"
+        Me.panelProbability.Size = New System.Drawing.Size(390, 28)
+        Me.panelProbability.TabIndex = 39
+        Me.panelProbability.Visible = False
+        '
+        'radioProbablilityReturnPeriod
+        '
+        Me.radioProbablilityReturnPeriod.AutoSize = True
+        Me.radioProbablilityReturnPeriod.Location = New System.Drawing.Point(150, 5)
+        Me.radioProbablilityReturnPeriod.Name = "radioProbablilityReturnPeriod"
+        Me.radioProbablilityReturnPeriod.Size = New System.Drawing.Size(90, 17)
+        Me.radioProbablilityReturnPeriod.TabIndex = 40
+        Me.radioProbablilityReturnPeriod.TabStop = True
+        Me.radioProbablilityReturnPeriod.Text = "Return Period"
+        Me.radioProbablilityReturnPeriod.UseVisualStyleBackColor = True
+        '
+        'radioProbablilityFraction
+        '
+        Me.radioProbablilityFraction.AutoSize = True
+        Me.radioProbablilityFraction.Location = New System.Drawing.Point(81, 5)
+        Me.radioProbablilityFraction.Name = "radioProbablilityFraction"
+        Me.radioProbablilityFraction.Size = New System.Drawing.Size(63, 17)
+        Me.radioProbablilityFraction.TabIndex = 39
+        Me.radioProbablilityFraction.TabStop = True
+        Me.radioProbablilityFraction.Text = "Fraction"
+        Me.radioProbablilityFraction.UseVisualStyleBackColor = True
+        '
+        'radioProbablilityPercent
+        '
+        Me.radioProbablilityPercent.AutoSize = True
+        Me.radioProbablilityPercent.Location = New System.Drawing.Point(7, 5)
+        Me.radioProbablilityPercent.Name = "radioProbablilityPercent"
+        Me.radioProbablilityPercent.Size = New System.Drawing.Size(62, 17)
+        Me.radioProbablilityPercent.TabIndex = 38
+        Me.radioProbablilityPercent.TabStop = True
+        Me.radioProbablilityPercent.Text = "Percent"
+        Me.radioProbablilityPercent.UseVisualStyleBackColor = True
+        '
         'chkRangeReverse
         '
         Me.chkRangeReverse.AutoSize = True
@@ -606,54 +672,6 @@ Partial Class frmGraphEditor
         Me.chkAxisMajorTicsVisible.TabIndex = 49
         Me.chkAxisMajorTicsVisible.Text = "tics"
         Me.chkAxisMajorTicsVisible.UseVisualStyleBackColor = True
-        '
-        'panelProbability
-        '
-        Me.panelProbability.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.panelProbability.Controls.Add(Me.txtProbabilityDeviations)
-        Me.panelProbability.Controls.Add(Me.lblProbabilityDeviations)
-        Me.panelProbability.Controls.Add(Me.radioProbablilityReturnPeriod)
-        Me.panelProbability.Controls.Add(Me.radioProbablilityFraction)
-        Me.panelProbability.Controls.Add(Me.radioProbablilityPercent)
-        Me.panelProbability.Location = New System.Drawing.Point(74, 32)
-        Me.panelProbability.Name = "panelProbability"
-        Me.panelProbability.Size = New System.Drawing.Size(390, 28)
-        Me.panelProbability.TabIndex = 39
-        Me.panelProbability.Visible = False
-        '
-        'radioProbablilityReturnPeriod
-        '
-        Me.radioProbablilityReturnPeriod.AutoSize = True
-        Me.radioProbablilityReturnPeriod.Location = New System.Drawing.Point(150, 5)
-        Me.radioProbablilityReturnPeriod.Name = "radioProbablilityReturnPeriod"
-        Me.radioProbablilityReturnPeriod.Size = New System.Drawing.Size(90, 17)
-        Me.radioProbablilityReturnPeriod.TabIndex = 40
-        Me.radioProbablilityReturnPeriod.TabStop = True
-        Me.radioProbablilityReturnPeriod.Text = "Return Period"
-        Me.radioProbablilityReturnPeriod.UseVisualStyleBackColor = True
-        '
-        'radioProbablilityFraction
-        '
-        Me.radioProbablilityFraction.AutoSize = True
-        Me.radioProbablilityFraction.Location = New System.Drawing.Point(81, 5)
-        Me.radioProbablilityFraction.Name = "radioProbablilityFraction"
-        Me.radioProbablilityFraction.Size = New System.Drawing.Size(63, 17)
-        Me.radioProbablilityFraction.TabIndex = 39
-        Me.radioProbablilityFraction.TabStop = True
-        Me.radioProbablilityFraction.Text = "Fraction"
-        Me.radioProbablilityFraction.UseVisualStyleBackColor = True
-        '
-        'radioProbablilityPercent
-        '
-        Me.radioProbablilityPercent.AutoSize = True
-        Me.radioProbablilityPercent.Location = New System.Drawing.Point(7, 5)
-        Me.radioProbablilityPercent.Name = "radioProbablilityPercent"
-        Me.radioProbablilityPercent.Size = New System.Drawing.Size(62, 17)
-        Me.radioProbablilityPercent.TabIndex = 38
-        Me.radioProbablilityPercent.TabStop = True
-        Me.radioProbablilityPercent.Text = "Percent"
-        Me.radioProbablilityPercent.UseVisualStyleBackColor = True
         '
         'panelAxisType
         '
@@ -741,7 +759,7 @@ Partial Class frmGraphEditor
         Me.tabCurves.Location = New System.Drawing.Point(4, 22)
         Me.tabCurves.Name = "tabCurves"
         Me.tabCurves.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabCurves.Size = New System.Drawing.Size(482, 186)
+        Me.tabCurves.Size = New System.Drawing.Size(471, 186)
         Me.tabCurves.TabIndex = 1
         Me.tabCurves.Text = "Curves"
         Me.tabCurves.UseVisualStyleBackColor = True
@@ -849,7 +867,7 @@ Partial Class frmGraphEditor
         Me.tabLines.Controls.Add(Me.grpLineEquation)
         Me.tabLines.Location = New System.Drawing.Point(4, 22)
         Me.tabLines.Name = "tabLines"
-        Me.tabLines.Size = New System.Drawing.Size(482, 186)
+        Me.tabLines.Size = New System.Drawing.Size(471, 186)
         Me.tabLines.TabIndex = 2
         Me.tabLines.Text = "Lines"
         Me.tabLines.UseVisualStyleBackColor = True
@@ -976,45 +994,93 @@ Partial Class frmGraphEditor
         '
         'tabLegend
         '
-        Me.tabLegend.Controls.Add(Me.chkLegendOutline)
-        Me.tabLegend.Controls.Add(Me.lblLegendClickToPlace)
-        Me.tabLegend.Controls.Add(Me.btnLegendFont)
-        Me.tabLegend.Controls.Add(Me.txtLegendFontColor)
+        Me.tabLegend.Controls.Add(Me.groupLegendAux)
+        Me.tabLegend.Controls.Add(Me.groupLegendMain)
         Me.tabLegend.Location = New System.Drawing.Point(4, 22)
         Me.tabLegend.Name = "tabLegend"
-        Me.tabLegend.Size = New System.Drawing.Size(482, 186)
+        Me.tabLegend.Size = New System.Drawing.Size(471, 186)
         Me.tabLegend.TabIndex = 4
         Me.tabLegend.Text = "Legend"
         Me.tabLegend.UseVisualStyleBackColor = True
         '
+        'groupLegendAux
+        '
+        Me.groupLegendAux.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.groupLegendAux.Controls.Add(Me.lblAuxSizePercent)
+        Me.groupLegendAux.Controls.Add(Me.lblAuxSize)
+        Me.groupLegendAux.Controls.Add(Me.txtAuxSize)
+        Me.groupLegendAux.Controls.Add(Me.chkLegendOutlineAux)
+        Me.groupLegendAux.Controls.Add(Me.btnLegendFontAux)
+        Me.groupLegendAux.Controls.Add(Me.txtLegendFontColorAux)
+        Me.groupLegendAux.Location = New System.Drawing.Point(18, 81)
+        Me.groupLegendAux.Name = "groupLegendAux"
+        Me.groupLegendAux.Size = New System.Drawing.Size(441, 48)
+        Me.groupLegendAux.TabIndex = 59
+        Me.groupLegendAux.TabStop = False
+        Me.groupLegendAux.Text = "Auxiliary Legend"
+        '
+        'chkLegendOutlineAux
+        '
+        Me.chkLegendOutlineAux.AutoSize = True
+        Me.chkLegendOutlineAux.Location = New System.Drawing.Point(16, 23)
+        Me.chkLegendOutlineAux.Name = "chkLegendOutlineAux"
+        Me.chkLegendOutlineAux.Size = New System.Drawing.Size(59, 17)
+        Me.chkLegendOutlineAux.TabIndex = 56
+        Me.chkLegendOutlineAux.Text = "Outline"
+        Me.chkLegendOutlineAux.UseVisualStyleBackColor = True
+        '
+        'btnLegendFontAux
+        '
+        Me.btnLegendFontAux.Location = New System.Drawing.Point(118, 19)
+        Me.btnLegendFontAux.Name = "btnLegendFontAux"
+        Me.btnLegendFontAux.Size = New System.Drawing.Size(75, 23)
+        Me.btnLegendFontAux.TabIndex = 57
+        Me.btnLegendFontAux.Text = "Font"
+        Me.btnLegendFontAux.UseVisualStyleBackColor = True
+        '
+        'groupLegendMain
+        '
+        Me.groupLegendMain.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.groupLegendMain.Controls.Add(Me.btnLegendFont)
+        Me.groupLegendMain.Controls.Add(Me.txtLegendFontColor)
+        Me.groupLegendMain.Controls.Add(Me.lblLegendClickToPlace)
+        Me.groupLegendMain.Controls.Add(Me.chkLegendOutline)
+        Me.groupLegendMain.Location = New System.Drawing.Point(18, 12)
+        Me.groupLegendMain.Name = "groupLegendMain"
+        Me.groupLegendMain.Size = New System.Drawing.Size(441, 48)
+        Me.groupLegendMain.TabIndex = 58
+        Me.groupLegendMain.TabStop = False
+        Me.groupLegendMain.Text = "Main Legend"
+        '
+        'btnLegendFont
+        '
+        Me.btnLegendFont.Location = New System.Drawing.Point(118, 19)
+        Me.btnLegendFont.Name = "btnLegendFont"
+        Me.btnLegendFont.Size = New System.Drawing.Size(75, 23)
+        Me.btnLegendFont.TabIndex = 54
+        Me.btnLegendFont.Text = "Font"
+        Me.btnLegendFont.UseVisualStyleBackColor = True
+        '
         'chkLegendOutline
         '
         Me.chkLegendOutline.AutoSize = True
-        Me.chkLegendOutline.Location = New System.Drawing.Point(18, 38)
+        Me.chkLegendOutline.Location = New System.Drawing.Point(16, 23)
         Me.chkLegendOutline.Name = "chkLegendOutline"
         Me.chkLegendOutline.Size = New System.Drawing.Size(59, 17)
-        Me.chkLegendOutline.TabIndex = 51
+        Me.chkLegendOutline.TabIndex = 53
         Me.chkLegendOutline.Text = "Outline"
         Me.chkLegendOutline.UseVisualStyleBackColor = True
         '
         'lblLegendClickToPlace
         '
         Me.lblLegendClickToPlace.AutoSize = True
-        Me.lblLegendClickToPlace.Location = New System.Drawing.Point(15, 10)
+        Me.lblLegendClickToPlace.Location = New System.Drawing.Point(279, 24)
         Me.lblLegendClickToPlace.Name = "lblLegendClickToPlace"
         Me.lblLegendClickToPlace.Size = New System.Drawing.Size(151, 13)
         Me.lblLegendClickToPlace.TabIndex = 14
         Me.lblLegendClickToPlace.Text = "Click on graph to place legend"
-        '
-        'btnLegendFont
-        '
-        Me.btnLegendFont.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnLegendFont.Location = New System.Drawing.Point(162, 156)
-        Me.btnLegendFont.Name = "btnLegendFont"
-        Me.btnLegendFont.Size = New System.Drawing.Size(75, 23)
-        Me.btnLegendFont.TabIndex = 53
-        Me.btnLegendFont.Text = "Font"
-        Me.btnLegendFont.UseVisualStyleBackColor = True
         '
         'tabText
         '
@@ -1027,7 +1093,7 @@ Partial Class frmGraphEditor
         Me.tabText.Controls.Add(Me.txtText)
         Me.tabText.Location = New System.Drawing.Point(4, 22)
         Me.tabText.Name = "tabText"
-        Me.tabText.Size = New System.Drawing.Size(482, 186)
+        Me.tabText.Size = New System.Drawing.Size(471, 186)
         Me.tabText.TabIndex = 3
         Me.tabText.Text = "Text"
         Me.tabText.UseVisualStyleBackColor = True
@@ -1084,6 +1150,31 @@ Partial Class frmGraphEditor
         Me.chkAutoApply.Text = "Apply Automatically"
         Me.chkAutoApply.UseVisualStyleBackColor = True
         '
+        'txtAuxSize
+        '
+        Me.txtAuxSize.Location = New System.Drawing.Point(357, 21)
+        Me.txtAuxSize.Name = "txtAuxSize"
+        Me.txtAuxSize.Size = New System.Drawing.Size(35, 20)
+        Me.txtAuxSize.TabIndex = 59
+        '
+        'lblAuxSize
+        '
+        Me.lblAuxSize.AutoSize = True
+        Me.lblAuxSize.Location = New System.Drawing.Point(324, 24)
+        Me.lblAuxSize.Name = "lblAuxSize"
+        Me.lblAuxSize.Size = New System.Drawing.Size(27, 13)
+        Me.lblAuxSize.TabIndex = 60
+        Me.lblAuxSize.Text = "Size"
+        '
+        'lblAuxSizePercent
+        '
+        Me.lblAuxSizePercent.AutoSize = True
+        Me.lblAuxSizePercent.Location = New System.Drawing.Point(398, 24)
+        Me.lblAuxSizePercent.Name = "lblAuxSizePercent"
+        Me.lblAuxSizePercent.Size = New System.Drawing.Size(15, 13)
+        Me.lblAuxSizePercent.TabIndex = 61
+        Me.lblAuxSizePercent.Text = "%"
+        '
         'frmGraphEditor
         '
         Me.AcceptButton = Me.btnApply
@@ -1112,7 +1203,10 @@ Partial Class frmGraphEditor
         Me.grpLineEquation.ResumeLayout(False)
         Me.grpLineEquation.PerformLayout()
         Me.tabLegend.ResumeLayout(False)
-        Me.tabLegend.PerformLayout()
+        Me.groupLegendAux.ResumeLayout(False)
+        Me.groupLegendAux.PerformLayout()
+        Me.groupLegendMain.ResumeLayout(False)
+        Me.groupLegendMain.PerformLayout()
         Me.tabText.ResumeLayout(False)
         Me.tabText.PerformLayout()
         Me.ResumeLayout(False)
@@ -1209,4 +1303,12 @@ Partial Class frmGraphEditor
     Private WithEvents btnScaleFont As System.Windows.Forms.Button
     Friend WithEvents chkCurveSymbolFillVisible As System.Windows.Forms.CheckBox
     Friend WithEvents cboCurveStyle As System.Windows.Forms.ComboBox
+    Private WithEvents btnLegendFontAux As System.Windows.Forms.Button
+    Private WithEvents txtLegendFontColorAux As System.Windows.Forms.TextBox
+    Friend WithEvents groupLegendAux As System.Windows.Forms.GroupBox
+    Friend WithEvents chkLegendOutlineAux As System.Windows.Forms.CheckBox
+    Friend WithEvents groupLegendMain As System.Windows.Forms.GroupBox
+    Friend WithEvents lblAuxSizePercent As System.Windows.Forms.Label
+    Friend WithEvents lblAuxSize As System.Windows.Forms.Label
+    Friend WithEvents txtAuxSize As System.Windows.Forms.TextBox
 End Class
