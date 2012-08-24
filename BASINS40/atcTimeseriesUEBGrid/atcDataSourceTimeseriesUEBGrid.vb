@@ -47,7 +47,6 @@ Public Class atcDataSourceTimeseriesUEBGrid
             Dim lDate(4) As Integer
             Dim lChrSepVals() As String = {" ", vbTab}
             Dim lStrArray() As String
-            Dim lValStrArray() As String
             Dim lVarName As String
             Dim lWatershedID As Integer
             Dim lJDate As Double

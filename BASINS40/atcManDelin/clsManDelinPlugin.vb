@@ -186,6 +186,8 @@ Public Class ManDelinPlugIn
                             lSlope *= 100
                         ElseIf aElevUnits = "Feet" Then
                             lSlope = lSlope * 100 / 3.281
+                        Else
+                            'If slope is in Centimeters, no need to adjust
                         End If
                         GisUtil.SetFeatureValue(lSubbasinLayerIndex, lSlopeFieldIndex, lSubbasinIndex - 1, lSlope)
                     End If
@@ -248,6 +250,7 @@ Public Class ManDelinPlugIn
                 GisUtil.SetFeatureValue(lSubbasinLayerIndex, lAreaAcresFieldIndex, lSubbasinsIndex - 1, lArea / 4046.86)
                 GisUtil.SetFeatureValue(lSubbasinLayerIndex, lAreaMi2FieldIndex, lSubbasinsIndex - 1, lArea / 2589988)
             Next lSubbasinsIndex
+            'TODO: save edited shapefile table
         End Using
         Logger.Status("")
     End Sub
