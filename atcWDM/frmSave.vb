@@ -110,6 +110,9 @@ Friend Class WDMGridSource
             End If
         End Get
         Set(ByVal Value As String)
+            If aRow >= FixedRows Then
+                pDataGroup(aRow - FixedRows).Attributes.SetValue(pDisplayAttributes(aColumn), Value)
+            End If
         End Set
     End Property
 

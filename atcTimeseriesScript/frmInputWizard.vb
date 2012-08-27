@@ -45,6 +45,9 @@ Friend Class frmInputWizard
     Private RequiredFields() As String = {"", "Value", "Year", "Month", "Day", "Hour", "Minute", "Scenario", "Location", "Constituent", "Description", "Repeating", "Repeats"} 'Array of names
     Private nRequiredFields As Integer = RequiredFields.Length
 
+    Private pDataMappingCol As Integer = -1
+    Private pDataMappingRow As Integer = -1
+
     Public WriteOnly Property TserFile() As atcData.atcTimeseriesSource
         Set(ByVal Value As atcData.atcTimeseriesSource)
             pTserFile = Value
@@ -213,6 +216,10 @@ Friend Class frmInputWizard
         If sender.Checked Then PopulateSample()
     End Sub
 
+    Private Sub agdDataMapping_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdDataMapping.CellEdited
+        SetSelFromGrid(aRow)
+    End Sub
+
     'ToDo: 
     'Private Sub agdDataMapping_CommitChange(ByVal eventSender As System.Object, ByVal eventArgs As AxATCoCtl.__ATCoGrid_CommitChangeEvent) Handles agdDataMapping.CommitChange
     '	If eventArgs.ChangeFromCol = ColMappingCol Then SetSelFromGrid(eventArgs.ChangeFromRow)
@@ -231,35 +238,23 @@ Friend Class frmInputWizard
         With MappingSource
             Dim newrow As Integer
             Dim newcol As Integer
-            If aRow <> lastrow OrElse aColumn <> lastcol Then
-                newrow = aRow
-                newcol = aColumn
-                'If lastrow > nRequiredFields Or lastcol <> ColMappingName Then
-                '    .Row = lastrow
-                '    .Column = lastcol
-                '    ''UPGRADE_NOTE: BackColor was upgraded to CtlBackColor. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
-                '    '               .CellBackColor = .CtlBackColor
-                '    ''UPGRADE_NOTE: ForeColor was upgraded to CtlForeColor. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
-                '    '.CellForeColor = .CtlForeColor
-                '    .Row = newrow
-                '    .Column = newcol
-                'End If
-                If newrow > nRequiredFields Or newcol <> ColMappingName Then
-                    '.CellBackColor = .BackColorSel
-                    '.CellForeColor = .ForeColorSel
-                    '.CellColor(newrow, newcol) = SystemColors.ControlDark
-                End If
-                Dim lUniqueValues As New ArrayList
-                If newcol = ColMappingAttr Then
-                    lUniqueValues.Add("yes")
-                    lUniqueValues.Add("no")
-                End If
-                agdDataMapping.ValidValues = lUniqueValues
-                lastrow = newrow
-                lastcol = newcol
-                SetSelFromGrid(newrow)
+
+            newrow = aRow
+            newcol = aColumn
+
+            Dim lUniqueValues As New ArrayList
+            If newcol = ColMappingAttr Then
+                lUniqueValues.Add("yes")
+                lUniqueValues.Add("no")
             End If
-            .CellEditable(newrow, newcol) = (aRow > nRequiredFields OrElse aColumn <> ColMappingName)
+            agdDataMapping.ValidValues = lUniqueValues
+
+            pDataMappingRow = newrow
+            pDataMappingCol = newcol
+
+            SetSelFromGrid(newrow)
+
+            .CellEditable(newrow, newcol) = (aRow > nRequiredFields OrElse aRow > 0 AndAlso aColumn <> ColMappingName)
         End With
         InRowColChange = False
     End Sub
@@ -303,14 +298,14 @@ Friend Class frmInputWizard
             SettingSelFromGrid = True
 
             If Not FixedColumns Then 'Select column in agdSample
-
                 SelStart = FixedColLeft(row)
-                If SelStart > 0 Then
-                    'If SelStart <> agdSample.SelStartCol Then
-                    '    agdSample.set_Selected(1, SelStart - 1, True)
-                    'End If
-                End If
-
+                For lColumn As Integer = 1 To MappingSource.Columns
+                    Dim lSelect As Boolean = (lColumn = SelStart)
+                    For lRow As Integer = 0 To MappingSource.Rows - 1
+                        agdSample.Source.CellSelected(lRow, lColumn - 1) = lSelect
+                    Next
+                Next
+                agdSample.Refresh()
             Else 'Select column in txtSample
                 SelStart = FixedColLeft(row) - 1
                 If SelStart >= 0 Then
@@ -325,8 +320,11 @@ Friend Class frmInputWizard
                     Else
                         txtRuler1.SelectionLength = 0
                     End If
-                    txtSampleAnyChange(-1)
+                Else
+                    SelLength = 0
+                    txtRuler1.SelectionLength = 0
                 End If
+                txtSampleAnyChange(-1)
             End If
 
             SettingSelFromGrid = False
@@ -386,7 +384,7 @@ Friend Class frmInputWizard
             Else
                 'FoundDDF = True
                 SetWizardFromScript(Script)
-                agdDataMapping.SizeAllColumnsToContents(agdDataMapping.Width, True)
+                agdDataMapping.SizeAllColumnsToContents(agdDataMapping.Width, False)
             End If
         End If
     End Sub
@@ -419,7 +417,7 @@ Friend Class frmInputWizard
             Next
         End With
         agdDataMapping.Initialize(lSource)
-        agdDataMapping.SizeAllColumnsToContents(agdDataMapping.Width, True)
+        agdDataMapping.SizeAllColumnsToContents(agdDataMapping.Width, False)
     End Sub
 
     Private Sub SetColumnFormatFromScript(ByRef scr As clsATCscriptExpression)
@@ -1334,12 +1332,16 @@ ParseFixedDef:
     'UPGRADE_WARNING: Event optDelimiter.CheckedChanged may fire when form is initialized. Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="88B12AE1-6DE0-48A0-86F1-60C0686C026A"'
     Private Sub optDelimiter_CheckedChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles optDelimiterNone.CheckedChanged, optDelimiterSpace.CheckedChanged, optDelimiterTab.CheckedChanged, optDelimiterChar.CheckedChanged
         If eventSender.Checked Then
-            Select Case eventSender.Name
-                Case "optDelimiterNone" : FixedColumns = True
-                Case "optDelimiterSpace" : FixedColumns = False : ColumnDelimiter = " "
-                Case "optDelimiterTab" : FixedColumns = False : ColumnDelimiter = Chr(9)
-                Case "optDelimiterChar" : FixedColumns = False : ColumnDelimiter = txtDelimiter.Text
-            End Select
+
+            If optDelimiterNone.Checked Then
+                FixedColumns = True
+            ElseIf optDelimiterSpace.Checked Then
+                FixedColumns = False : ColumnDelimiter = " "
+            ElseIf optDelimiterTab.Checked Then
+                FixedColumns = False : ColumnDelimiter = Chr(9)
+            ElseIf optDelimiterChar.Checked Then
+                FixedColumns = False : ColumnDelimiter = txtDelimiter.Text
+            End If
 
             If Not FixedColumns Then
                 fraTextSample.Visible = False
@@ -1501,13 +1503,14 @@ ParseFixedDef:
         Next sam
 
         SelStart = SelStart + HScrollSample.Value
-        If SelLength > 0 And Not SettingSelFromGrid Then
+        If SelLength > 0 AndAlso Not SettingSelFromGrid AndAlso pDataMappingRow > -1 Then
             If SelLength < 2 Then
-                MappingSource.CellValue(MappingSource.Rows, ColMappingCol) = SelStart
+                MappingSource.CellValue(pDataMappingRow, ColMappingCol) = SelStart
             Else
-                MappingSource.CellValue(MappingSource.Rows, ColMappingCol) = SelStart & "-" & SelStart + SelLength - 1
+                MappingSource.CellValue(pDataMappingRow, ColMappingCol) = SelStart & "-" & SelStart + SelLength - 1
             End If
             '    SetFixedWidthsFromDataMapping
+            agdDataMapping.Refresh()
         End If
     End Sub
 
@@ -1740,4 +1743,10 @@ ParseFixedDef:
         PopulateTxtSample()
     End Sub
 
+    Private Sub agdSample_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdSample.MouseDownCell
+        If pDataMappingCol > -1 AndAlso pDataMappingRow > -1 Then
+            MappingSource.CellValue(pDataMappingRow, pDataMappingCol) = aColumn + 1
+            agdDataMapping.Refresh()
+        End If
+    End Sub
 End Class
