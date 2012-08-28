@@ -78,7 +78,9 @@ Public Module modBasinsPlugin
     Friend Const DataMenuString As String = "Data"
     Friend pLoadedDataMenu As Boolean = False
 
-    Friend BasinsDataPath As String = "Basins\data\"
+    Private Const Basins40DataPath As String = "Basins\data\"
+    Private Const Basins41DataPath As String = "Basins41\data\"
+    Friend BasinsDataPath As String = Basins41DataPath
     Private Const NationalProjectFilename As String = "national.mwprj"
 
     ''' <summary>
@@ -91,9 +93,19 @@ Public Module modBasinsPlugin
 
             AddExistingDirs(BasinsDataPath)
 
-            If g_BasinsDataDirs.Count = 0 AndAlso Not BasinsDataPath.StartsWith("Basins") Then
-                'If this is not BASINS, and we did not find the application's own data folder, look for a BASINS data folder
-                AddExistingDirs("Basins\data\")
+            Try
+                CheckDataDir(IO.Path.Combine(IO.Path.GetDirectoryName(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly.Location)), "data") & g_PathChar)
+            Catch
+            End Try
+
+            If Not BasinsDataPath.Equals(Basins41DataPath) Then
+                'If this is not BASINS41, also look for a BASINS41 data folder
+                AddExistingDirs(Basins41DataPath)
+            End If
+
+            If Not BasinsDataPath.Equals(Basins40DataPath) Then ' g_BasinsDataDirs.Count = 0 Then
+                'look for older BASINS data folders too
+                AddExistingDirs(Basins40DataPath)
             End If
 
             Select Case g_BasinsDataDirs.Count
@@ -115,21 +127,34 @@ Public Module modBasinsPlugin
     ''' <param name="aPathToSearchFor">Search for this path</param>
     ''' <remarks></remarks>
     Private Sub AddExistingDirs(ByVal aPathToSearchFor As String)
+        Dim lCheckDir As String
         For Each lDriveInfo As IO.DriveInfo In IO.DriveInfo.GetDrives
             Try
                 With lDriveInfo
-                    Dim lCheckDir As String = .Name & aPathToSearchFor
+                    lCheckDir = .Name & aPathToSearchFor
                     Logger.Status("Checking for " & lCheckDir, True)
                     If .IsReady AndAlso .DriveType = IO.DriveType.Fixed OrElse .DriveType = IO.DriveType.Network Then
-                        If Not g_BasinsDataDirs.Contains(lCheckDir) AndAlso FileExists(lCheckDir, True, False) Then
-                            g_BasinsDataDirs.Add(lCheckDir)
-                        End If
+                        CheckDataDir(lCheckDir)
                     End If
                 End With
             Catch 'Skip drives that we cannot successfully check
             End Try
         Next
+        Try
+            CheckDataDir(IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.ProgramFiles, aPathToSearchFor))
+        Catch
+        End Try
+        Try
+            CheckDataDir(IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.MyDocuments, aPathToSearchFor))
+        Catch
+        End Try
         Logger.Status("")
+    End Sub
+
+    Private Sub CheckDataDir(ByVal aDirectory As String)
+        If Not g_BasinsDataDirs.Contains(aDirectory) AndAlso FileExists(aDirectory, True, False) Then
+            g_BasinsDataDirs.Add(aDirectory)
+        End If
     End Sub
 
     ''' <summary>
