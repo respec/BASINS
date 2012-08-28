@@ -1218,55 +1218,6 @@ StartOver:
         Next
     End Sub
 
-    ''' <summary>
-    ''' If the named layer does not have a .mwsr (for shape) or .mwleg (for grid) then look for the default file
-    ''' and put a copy of the default renderer with the layer
-    ''' </summary>
-    Private Function GetDefaultRenderer(ByVal aLayerFilename As String) As String
-        GetDefaultRenderer = ""
-
-        If aLayerFilename IsNot Nothing AndAlso aLayerFilename.Length > 0 Then
-            Dim lRendererExt As String
-            If IO.Path.GetExtension(aLayerFilename).ToLower = ".shp" Then
-                lRendererExt = ".mwsr"
-            Else
-                lRendererExt = ".mwleg"
-            End If
-
-            If lRendererExt IsNot Nothing Then
-                Dim lRendererFilename As String = IO.Path.ChangeExtension(aLayerFilename, lRendererExt)
-
-                If lRendererFilename.Length > 0 AndAlso Not IO.File.Exists(lRendererFilename) Then
-                    Dim lRendererFilenameNoPath As String = IO.Path.GetFileName(lRendererFilename)
-                    Dim lRenderersPath As String = g_ProgramDir & "etc\renderers" & g_PathChar
-                    Dim lDefaultRendererFilename As String = FindFile("", lRenderersPath & lRendererFilenameNoPath)
-                    If Not FileExists(lDefaultRendererFilename) Then
-                        If lRendererFilenameNoPath.Contains("_") Then 'Some layers are named huc8_xxx.shp, renderer is named _xxx & lRendererExt
-                            lDefaultRendererFilename = FindFile("", lRenderersPath & lRendererFilenameNoPath.Substring(lRendererFilenameNoPath.IndexOf("_")))
-                        End If
-                        If Not FileExists(lDefaultRendererFilename) Then 'Try trimming off numbers before extension in layername2.mwleg
-                            lDefaultRendererFilename = FindFile("", lRenderersPath & IO.Path.GetFileNameWithoutExtension(aLayerFilename).TrimEnd("0"c, "1"c, "2"c, "3"c, "4"c, "5"c, "6"c, "7"c, "8"c, "9"c) & lRendererExt)
-                        End If
-                    End If
-                    If FileExists(lDefaultRendererFilename) Then
-                        IO.File.Copy(lDefaultRendererFilename, lRendererFilename)
-                        GetDefaultRenderer = lRendererFilename
-                    End If
-                    'also need to copy symbology file for MapWindow 4.8.6 if there is one
-                    Dim lDefaultSymbologyFilename As String = FilenameSetExt(lDefaultRendererFilename, ".shp") & ".mwsymb"
-                    If FileExists(lDefaultSymbologyFilename) And Not FileExists(aLayerFilename & ".mwsymb") Then
-                        IO.File.Copy(lDefaultSymbologyFilename, aLayerFilename & ".mwsymb")
-                    End If
-                    If LCase(aLayerFilename).IndexOf("\landuse" & g_PathChar) > 0 Then
-                        If FileExists(lRenderersPath & "giras.shp.mwsymb") And Not FileExists(aLayerFilename & ".mwsymb") Then
-                            IO.File.Copy(lRenderersPath & "giras.shp.mwsymb", aLayerFilename & ".mwsymb")
-                        End If
-                    End If
-                End If
-            End If
-        End If
-    End Function
-
     'Given a file name and the XML describing how to render it, add a shape layer to MapWindow
     Private Function AddShapeToMW(ByVal aFilename As String, _
                                   ByRef layerXml As Xml.XmlNode) As MapWindow.Interfaces.Layer
@@ -1290,7 +1241,7 @@ StartOver:
         MWlay = Nothing
 
         Try
-            Dim lRendererName As String = GetDefaultRenderer(aFilename)
+            Dim lRendererName As String = D4EMDataManager.SpatialOperations.GetDefaultRenderer(aFilename)
 
             LayerName = IO.Path.GetFileNameWithoutExtension(aFilename)
             If layerXml Is Nothing Then
@@ -1462,7 +1413,7 @@ StartOver:
         MWlay = Nothing
 
         Try
-            GetDefaultRenderer(aFilename)
+            D4EMDataManager.SpatialOperations.GetDefaultRenderer(aFilename)
 
             g_StatusBar.Item(1).Text = "Opening " & aFilename
 
