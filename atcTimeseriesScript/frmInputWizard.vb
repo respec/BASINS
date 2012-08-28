@@ -218,43 +218,32 @@ Friend Class frmInputWizard
 
     Private Sub agdDataMapping_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdDataMapping.CellEdited
         SetSelFromGrid(aRow)
+        If Not String.IsNullOrEmpty(MappingSource.CellValue(MappingSource.Rows, 0)) Then
+            MappingSource.Rows += 1
+        End If
+        EnableButtons()
     End Sub
 
-    'ToDo: 
-    'Private Sub agdDataMapping_CommitChange(ByVal eventSender As System.Object, ByVal eventArgs As AxATCoCtl.__ATCoGrid_CommitChangeEvent) Handles agdDataMapping.CommitChange
-    '	If eventArgs.ChangeFromCol = ColMappingCol Then SetSelFromGrid(eventArgs.ChangeFromRow)
-    '	With agdDataMapping
-    '		If .MaxOccupiedRow = .rows Then .rows = .rows + 1
-    '	End With
-    'End Sub
-
     Private Sub agdDataMapping_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdDataMapping.MouseDownCell
-        Static lastrow, lastcol As Integer
         Static InRowColChange As Boolean
 
         If InRowColChange Then Exit Sub
         InRowColChange = True
 
         With MappingSource
-            Dim newrow As Integer
-            Dim newcol As Integer
-
-            newrow = aRow
-            newcol = aColumn
-
             Dim lUniqueValues As New ArrayList
-            If newcol = ColMappingAttr Then
+            If aColumn = ColMappingAttr Then
                 lUniqueValues.Add("yes")
                 lUniqueValues.Add("no")
             End If
             agdDataMapping.ValidValues = lUniqueValues
 
-            pDataMappingRow = newrow
-            pDataMappingCol = newcol
+            pDataMappingRow = aRow
+            pDataMappingCol = aColumn
 
-            SetSelFromGrid(newrow)
+            SetSelFromGrid(aRow)
 
-            .CellEditable(newrow, newcol) = (aRow > nRequiredFields OrElse aRow > 0 AndAlso aColumn <> ColMappingName)
+            .CellEditable(aRow, aColumn) = (aRow > nRequiredFields OrElse aRow > 0 AndAlso aColumn <> ColMappingName)
         End With
         InRowColChange = False
     End Sub
@@ -331,36 +320,23 @@ Friend Class frmInputWizard
         End If
     End Sub
 
-
-    ' Subroutine ===============================================
-    ' Name:      EnableButtons
-    ' Purpose:   Enables/Disables 3 command buttons at bottom
-    '            of the form when fields are mapped.
-    '
-    ' Notes: This is the only place where DidMap can get set
-    '        to true. DidMap true means all mapping enteries
-    '        have been made and its OK for the program to
-    '        proceed with data processing.
-    '
+    ''' <summary>
+    ''' Enables/Disables 3 command buttons at bottom of the form depending on whether enough fields are mapped.
+    ''' </summary>
     Private Sub EnableButtons()
-        Dim Idx As Integer
-
         cmdCancel.Enabled = True
-
-        With agdDataMapping
-            For Idx = 1 To MappingSource.Rows
-                'If Trim(Len(.TextMatrix(Idx, 3))) = 0 And _
-                ''   Trim(Len(.TextMatrix(Idx, 4))) = 0 _
-                ''Then
-                '  cmdSaveScript.Enabled = False
-                '  cmdReadData.Enabled = False
-                '  Exit Sub
-                'End If
-            Next
-
-            cmdSaveScript.Enabled = True
-        End With
-
+        'With agdDataMapping
+        '    For Idx As Integer = 1 To MappingSource.Rows
+        '        'If Trim(Len(.TextMatrix(Idx, 3))) = 0 And _
+        '        ''   Trim(Len(.TextMatrix(Idx, 4))) = 0 _
+        '        ''Then
+        '        '  cmdSaveScript.Enabled = False
+        '        '  cmdReadData.Enabled = False
+        '        '  Exit Sub
+        '        'End If
+        '    Next
+        'End With
+        cmdSaveScript.Enabled = True
     End Sub
 
     ''' <summary>Responds to press of "Browse" button by the script filename</summary>
