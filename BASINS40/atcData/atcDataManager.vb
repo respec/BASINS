@@ -53,7 +53,7 @@ Public Class atcDataManager
     Private Shared Function MapLayerLocationField(ByVal aLayerDBF As atcTableDBF) As Integer
         Dim lLocationField As Integer = 0 'One-based field index. Zero indicates we have not found the index yet.
         Dim lLayerListFilename As String = IO.Path.Combine(PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)), "etc" & g_PathChar & "DataDownload" & g_PathChar & "layers.dbf")
-        lLayerListFilename = FindFile("Please locate layers.dbf", lLayerListFilename) 'table containing location field for BASINS layers
+        lLayerListFilename = FindFile("Please locate layers.dbf (installed in etc\DataDownload)", lLayerListFilename) 'table containing location field for BASINS layers
         If FileExists(lLayerListFilename) Then
             Try
                 Dim lLayersDBF As New atcTableDBF

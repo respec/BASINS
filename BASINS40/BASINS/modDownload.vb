@@ -700,11 +700,8 @@ StartOver:
     Private Function ProcessDownloadResult(ByVal aInstructions As String) As String
         Logger.Dbg("ProcessDownloadResult: " & aInstructions)
         Dim lProjectorNode As Xml.XmlNode
-        Dim lInputDirName As String
-        Dim lOutputDirName As String
         Dim lOutputFileName As String
         Dim InputFileList As New NameValueCollection
-        Dim lFileObject As Object
         Dim lCurFilename As String
         Dim lDefaultsXML As Xml.XmlDocument = Nothing
         Dim lSuccess As Boolean
@@ -791,9 +788,9 @@ StartOver:
                             SaveFileString(FilenameNoExt(lOutputFileName) & ".prj", "")
                         End If
                         '    End Select
-                    Case "add_allshapes"
-                        lOutputFileName = lProjectorNode.InnerText
-                        lLayersAdded.AddRange(AddAllShapesInDir(lOutputFileName, lProjectDir))
+                        'Case "add_allshapes"
+                        '    lOutputFileName = lProjectorNode.InnerText
+                        '    lLayersAdded.AddRange(AddAllShapesInDir(lOutputFileName, lProjectDir))
                     Case "remove_data"
                         atcDataManager.RemoveDataSource(lProjectorNode.InnerText.ToLower)
                     Case "remove_layer", "remove_shape", "remove_grid"
@@ -863,113 +860,113 @@ StartOver:
                     Case "project_dir"
                         lProjectDir = lProjectorNode.InnerText
                         If Not lProjectDir.EndsWith(g_PathChar) Then lProjectDir &= g_PathChar
-                    Case "convert_shape"
-                        lOutputFileName = lProjectorNode.Attributes.GetNamedItem("output").InnerText
-                        lCurFilename = lProjectorNode.InnerText
-                        ShapeUtilMerge(lCurFilename, lOutputFileName, lProjectDir & "prj.proj")
-                        'attempt to assign prj file
-                        lOutputProjection = WholeFileString(lProjectDir & "prj.proj")
-                        lOutputProjection = CleanUpUserProjString(lOutputProjection)
-                        Dim sf As New MapWinGIS.Shapefile
-                        sf.Open(lOutputFileName, Nothing)
-                        sf.Projection = lOutputProjection
-                        sf.Close()
-                        'if adding to some specific point layers in basins we need to refresh that map layer
-                        If Right(lOutputFileName, 8) = "pcs3.shp" Or _
-                           Right(lOutputFileName, 8) = "gage.shp" Or _
-                           Right(lOutputFileName, 9) = "wqobs.shp" Then
-                            'get handle of this layer
-                            Dim lLayerHandle As Integer = -1
-                            For i As Integer = 0 To g_MapWin.Layers.NumLayers
-                                Dim lLayer As Layer = g_MapWin.Layers(g_MapWin.Layers.GetHandle(i))
-                                If Not (lLayer Is Nothing) AndAlso lLayer.FileName = lOutputFileName Then
-                                    lLayerHandle = g_MapWin.Layers.GetHandle(i)
-                                End If
-                            Next
-                            If lLayerHandle > -1 Then
-                                Dim llayername As String = g_MapWin.Layers(lLayerHandle).Name
-                                Dim lRGBcolor As Integer = RGB(g_MapWin.Layers(lLayerHandle).Color.R, g_MapWin.Layers(lLayerHandle).Color.G, g_MapWin.Layers(lLayerHandle).Color.B)
-                                Dim lmarkersize As Integer = g_MapWin.Layers(lLayerHandle).LineOrPointSize
-                                Dim ltargroup As Integer = g_MapWin.Layers(lLayerHandle).GroupHandle
-                                Dim lnewpos As Integer = g_MapWin.Layers(lLayerHandle).GroupPosition
-                                Dim MWlay As MapWindow.Interfaces.Layer
-                                Dim shpFile As MapWinGIS.Shapefile
-                                g_MapWin.Layers.Remove(lLayerHandle)
-                                shpFile = New MapWinGIS.Shapefile
-                                shpFile.Open(lOutputFileName)
-                                MWlay = g_MapWin.Layers.Add(shpFile, llayername, lRGBcolor, lRGBcolor, lmarkersize)
-                                g_MapWin.Layers.MoveLayer(MWlay.Handle, lnewpos, ltargroup)
-                            End If
-                        End If
-                    Case "convert_grid"
-                        lOutputFileName = lProjectorNode.Attributes.GetNamedItem("output").InnerText
-                        lCurFilename = lProjectorNode.InnerText
-                        'remove output file
-                        TryDelete(lOutputFileName)
-                        lOutputProjection = WholeFileString(lProjectDir & "prj.proj")
-                        lOutputProjection = CleanUpUserProjString(lOutputProjection)
-                        If InStr(lOutputFileName, "\nlcd" & g_PathChar) > 0 Then
-                            'exception for nlcd data, already in albers
-                            lInputProjection = "+proj=aea +ellps=GRS80 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
-                            If lOutputProjection = "+proj=aea +ellps=clrk66 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m" Then
-                                'special exception, don't bother to reproject with only this slight datum shift
-                                lInputProjection = "+proj=aea +ellps=clrk66 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
-                            End If
-                        Else
-                            lInputProjection = "+proj=longlat +datum=NAD83"
-                        End If
-                        If lInputProjection = lOutputProjection Then
-                            System.IO.File.Copy(lCurFilename, lOutputFileName)
-                        Else
-                            'project it
-                            g_StatusBar(1).Text = "Projecting Grid..."
-                            RefreshView()
-                            DoEvents()
-                            lSuccess = MapWinGeoProc.SpatialReference.ProjectGrid(lInputProjection, lOutputProjection, lCurFilename, lOutputFileName, True)
-                            g_StatusBar(1).Text = ""
-                            If Not FileExists(FilenameNoExt(lOutputFileName) & ".prj") Then
-                                'create .prj file as work-around for bug
-                                SaveFileString(FilenameNoExt(lOutputFileName) & ".prj", "")
-                            End If
-                            If Not lSuccess Then
-                                Logger.Msg("Failed to project grid" & vbCrLf & MapWinGeoProc.Error.GetLastErrorMsg, "ProcessProjectorFile")
-                                System.IO.File.Copy(lCurFilename, lOutputFileName)
-                            End If
-                        End If
-                    Case "convert_dir"
-                        'loop through a directory, projecting all files in it
-                        lInputDirName = lProjectorNode.InnerText
-                        lOutputDirName = lProjectorNode.Attributes.GetNamedItem("output").InnerText
-                        If lOutputDirName Is Nothing OrElse lOutputDirName.Length = 0 Then
-                            lOutputDirName = lInputDirName
-                        End If
-                        If Right(lOutputDirName, 1) <> g_PathChar Then lOutputDirName &= g_PathChar
+                        'Case "convert_shape"
+                        '    lOutputFileName = lProjectorNode.Attributes.GetNamedItem("output").InnerText
+                        '    lCurFilename = lProjectorNode.InnerText
+                        '    ShapeUtilMerge(lCurFilename, lOutputFileName, lProjectDir & "prj.proj")
+                        '    'attempt to assign prj file
+                        '    lOutputProjection = WholeFileString(lProjectDir & "prj.proj")
+                        '    lOutputProjection = CleanUpUserProjString(lOutputProjection)
+                        '    Dim sf As New MapWinGIS.Shapefile
+                        '    sf.Open(lOutputFileName, Nothing)
+                        '    sf.Projection = lOutputProjection
+                        '    sf.Close()
+                        '    'if adding to some specific point layers in basins we need to refresh that map layer
+                        '    If Right(lOutputFileName, 8) = "pcs3.shp" Or _
+                        '       Right(lOutputFileName, 8) = "gage.shp" Or _
+                        '       Right(lOutputFileName, 9) = "wqobs.shp" Then
+                        '        'get handle of this layer
+                        '        Dim lLayerHandle As Integer = -1
+                        '        For i As Integer = 0 To g_MapWin.Layers.NumLayers
+                        '            Dim lLayer As Layer = g_MapWin.Layers(g_MapWin.Layers.GetHandle(i))
+                        '            If Not (lLayer Is Nothing) AndAlso lLayer.FileName = lOutputFileName Then
+                        '                lLayerHandle = g_MapWin.Layers.GetHandle(i)
+                        '            End If
+                        '        Next
+                        '        If lLayerHandle > -1 Then
+                        '            Dim llayername As String = g_MapWin.Layers(lLayerHandle).Name
+                        '            Dim lRGBcolor As Integer = RGB(g_MapWin.Layers(lLayerHandle).Color.R, g_MapWin.Layers(lLayerHandle).Color.G, g_MapWin.Layers(lLayerHandle).Color.B)
+                        '            Dim lmarkersize As Integer = g_MapWin.Layers(lLayerHandle).LineOrPointSize
+                        '            Dim ltargroup As Integer = g_MapWin.Layers(lLayerHandle).GroupHandle
+                        '            Dim lnewpos As Integer = g_MapWin.Layers(lLayerHandle).GroupPosition
+                        '            Dim MWlay As MapWindow.Interfaces.Layer
+                        '            Dim shpFile As MapWinGIS.Shapefile
+                        '            g_MapWin.Layers.Remove(lLayerHandle)
+                        '            shpFile = New MapWinGIS.Shapefile
+                        '            shpFile.Open(lOutputFileName)
+                        '            MWlay = g_MapWin.Layers.Add(shpFile, llayername, lRGBcolor, lRGBcolor, lmarkersize)
+                        '            g_MapWin.Layers.MoveLayer(MWlay.Handle, lnewpos, ltargroup)
+                        '        End If
+                        '    End If
+                        'Case "convert_grid"
+                        '    lOutputFileName = lProjectorNode.Attributes.GetNamedItem("output").InnerText
+                        '    lCurFilename = lProjectorNode.InnerText
+                        '    'remove output file
+                        '    TryDelete(lOutputFileName)
+                        '    lOutputProjection = WholeFileString(lProjectDir & "prj.proj")
+                        '    lOutputProjection = CleanUpUserProjString(lOutputProjection)
+                        '    If InStr(lOutputFileName, "\nlcd" & g_PathChar) > 0 Then
+                        '        'exception for nlcd data, already in albers
+                        '        lInputProjection = "+proj=aea +ellps=GRS80 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
+                        '        If lOutputProjection = "+proj=aea +ellps=clrk66 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m" Then
+                        '            'special exception, don't bother to reproject with only this slight datum shift
+                        '            lInputProjection = "+proj=aea +ellps=clrk66 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
+                        '        End If
+                        '    Else
+                        '        lInputProjection = "+proj=longlat +datum=NAD83"
+                        '    End If
+                        '    If lInputProjection = lOutputProjection Then
+                        '        System.IO.File.Copy(lCurFilename, lOutputFileName)
+                        '    Else
+                        '        'project it
+                        '        g_StatusBar(1).Text = "Projecting Grid..."
+                        '        RefreshView()
+                        '        DoEvents()
+                        '        lSuccess = MapWinGeoProc.SpatialReference.ProjectGrid(lInputProjection, lOutputProjection, lCurFilename, lOutputFileName, True)
+                        '        g_StatusBar(1).Text = ""
+                        '        If Not FileExists(FilenameNoExt(lOutputFileName) & ".prj") Then
+                        '            'create .prj file as work-around for bug
+                        '            SaveFileString(FilenameNoExt(lOutputFileName) & ".prj", "")
+                        '        End If
+                        '        If Not lSuccess Then
+                        '            Logger.Msg("Failed to project grid" & vbCrLf & MapWinGeoProc.Error.GetLastErrorMsg, "ProcessProjectorFile")
+                        '            System.IO.File.Copy(lCurFilename, lOutputFileName)
+                        '        End If
+                        '    End If
+                        'Case "convert_dir"
+                        ''loop through a directory, projecting all files in it
+                        'Dim lInputDirName As String = lProjectorNode.InnerText
+                        'Dim lOutputDirName As String = lProjectorNode.Attributes.GetNamedItem("output").InnerText
+                        'If lOutputDirName Is Nothing OrElse lOutputDirName.Length = 0 Then
+                        '    lOutputDirName = lInputDirName
+                        'End If
+                        'If Right(lOutputDirName, 1) <> g_PathChar Then lOutputDirName &= g_PathChar
 
-                        InputFileList.Clear()
+                        'InputFileList.Clear()
 
-                        AddFilesInDir(InputFileList, lInputDirName, False, "*.shp")
+                        'AddFilesInDir(InputFileList, lInputDirName, False, "*.shp")
 
-                        lOutputProjection = WholeFileString(lProjectDir & "prj.proj")
-                        lOutputProjection = CleanUpUserProjString(lOutputProjection)
-                        Dim sf As New MapWinGIS.Shapefile
+                        'lOutputProjection = WholeFileString(lProjectDir & "prj.proj")
+                        'lOutputProjection = CleanUpUserProjString(lOutputProjection)
+                        'Dim sf As New MapWinGIS.Shapefile
 
-                        For Each lFileObject In InputFileList
-                            lCurFilename = lFileObject
-                            If (FileExt(lCurFilename) = "shp") Then
-                                'this is a shapefile
-                                lOutputFileName = lOutputDirName & FilenameNoPath(lCurFilename)
-                                'change projection and merge
-                                If (FileExists(lOutputFileName) And (InStr(1, lOutputFileName, "\landuse" & g_PathChar) > 0)) Then
-                                    'if the output file exists and it is a landuse shape, dont bother
-                                Else
-                                    ShapeUtilMerge(lCurFilename, lOutputFileName, lProjectDir & "prj.proj")
-                                    'attempt to assign prj file
-                                    sf.Open(lOutputFileName, Nothing)
-                                    sf.Projection = lOutputProjection
-                                    sf.Close()
-                                End If
-                            End If
-                        Next lFileObject
+                        'For Each lFileObject As Object In InputFileList
+                        '    lCurFilename = lFileObject
+                        '    If (FileExt(lCurFilename) = "shp") Then
+                        '        'this is a shapefile
+                        '        lOutputFileName = lOutputDirName & FilenameNoPath(lCurFilename)
+                        '        'change projection and merge
+                        '        If (FileExists(lOutputFileName) And (InStr(1, lOutputFileName, "\landuse" & g_PathChar) > 0)) Then
+                        '            'if the output file exists and it is a landuse shape, dont bother
+                        '        Else
+                        '            ShapeUtilMerge(lCurFilename, lOutputFileName, lProjectDir & "prj.proj")
+                        '            'attempt to assign prj file
+                        '            sf.Open(lOutputFileName, Nothing)
+                        '            sf.Projection = lOutputProjection
+                        '            sf.Close()
+                        '        End If
+                        '    End If
+                        'Next lFileObject
                     Case "message"
                         Logger.Msg(lProjectorNode.InnerText)
                     Case "select_layer"
@@ -982,7 +979,7 @@ StartOver:
                             Logger.Dbg("Failed to select layer '" & lLayerName & "'")
                         End Try
                     Case Else
-                        Logger.Msg("Cannot yet follow directive:" & vbCr & lProjectorNode.Name, "ProcessProjectorFile")
+                        Logger.Msg("Cannot follow directive:" & vbCr & lProjectorNode.Name, "ProcessProjectorFile")
                 End Select
             Next
 
@@ -1105,30 +1102,36 @@ StartOver:
         Return lChosenFileName
     End Function
 
-    Private Sub ShapeUtilMerge(ByVal aCurFilename As String, ByVal aOutputFilename As String, ByVal aProjectionFilename As String)
-        Dim lProgramFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\" & g_AppNameShort, "Base Directory", "C:\" & g_AppNameShort)
-        Dim lShapeUtilExe As String = FindFile("Please locate ShapeUtil.exe", lProgramFolder & "\etc\datadownload\ShapeUtil.exe")
-        If lShapeUtilExe.Length > 0 Then
-            Dim lLayersDbf As String = GetSetting("ShapeMerge", "files", "layers.dbf")
-            If Not FileExists(lLayersDbf) Then
-                Logger.Dbg("Did not find layers.dbf in registry " & lLayersDbf)
-                lLayersDbf = PathNameOnly(lShapeUtilExe) & "\layers.dbf"
-                If FileExists(lLayersDbf) Then
-                    Logger.Dbg("Saving layers.dbf location for ShapeUtil: " & lLayersDbf)
-                    SaveSetting("ShapeMerge", "files", "layers.dbf", lLayersDbf)
-                Else
-                    Logger.Dbg("Did not find layers.dbf in same path as ShapeUtil " & lLayersDbf)
-                End If
-                'Else
-                '   Logger.Dbg("Found " & lLayersDbf)
-            End If
-            'Logger.Msg("MSG2 Merging " & aCurFilename)
-            'Logger.Msg("MSG6 into " & aOutputFilename)
-            Shell(lShapeUtilExe & " """ & aOutputFilename & """ """ & aCurFilename & """ """ & aProjectionFilename & """", AppWinStyle.NormalNoFocus, True)
-        Else
-            Logger.Dbg("Failed to find ShapeUtil.exe for merging " & aCurFilename & " into " & aOutputFilename)
-        End If
-    End Sub
+    '''' <summary>
+    '''' Merge two shapefiles, depend on ShapeUtil.exe to find key field in layers.dbf
+    '''' </summary>
+    '''' <param name="aCurFilename">New layer to merge in</param>
+    '''' <param name="aOutputFilename">Existing layer to add to</param>
+    '''' <param name="aProjectionFilename">file containing projection information</param>
+    '''' <remarks></remarks>
+    'Private Sub ShapeUtilMerge(ByVal aCurFilename As String, ByVal aOutputFilename As String, ByVal aProjectionFilename As String)
+    '    Dim lShapeUtilExe As String = D4EMDataManager.SpatialOperations.ShapeUtilExeFullPath()
+    '    If FileExists(lShapeUtilExe) Then
+    '        Dim lLayersDbf As String = GetSetting("ShapeMerge", "files", "layers.dbf")
+    '        If Not FileExists(lLayersDbf) Then
+    '            Logger.Dbg("Did not find layers.dbf in registry " & lLayersDbf)
+    '            lLayersDbf = IO.Path.Combine(PathNameOnly(lShapeUtilExe), "layers.dbf")
+    '            If FileExists(lLayersDbf) Then
+    '                Logger.Dbg("Saving layers.dbf location for ShapeUtil: " & lLayersDbf)
+    '                SaveSetting("ShapeMerge", "files", "layers.dbf", lLayersDbf)
+    '            Else
+    '                Logger.Dbg("Did not find layers.dbf in same path as ShapeUtil.exe " & lLayersDbf)
+    '            End If
+    '            'Else
+    '            '   Logger.Dbg("Found " & lLayersDbf)
+    '        End If
+    '        'Logger.Msg("MSG2 Merging " & aCurFilename)
+    '        'Logger.Msg("MSG6 into " & aOutputFilename)
+    '        Shell(lShapeUtilExe & " """ & aOutputFilename & """ """ & aCurFilename & """ """ & aProjectionFilename & """", AppWinStyle.NormalNoFocus, True)
+    '    Else
+    '        Logger.Dbg("Failed to find ShapeUtil.exe for merging " & aCurFilename & " into " & aOutputFilename)
+    '    End If
+    'End Sub
 
     Private Function DataDownload(ByRef aCommandLine As String) As Boolean
         Dim lProgramFolder As String = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\" & g_AppNameShort, "Base Directory", "C:\" & g_AppNameShort)
