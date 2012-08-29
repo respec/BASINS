@@ -61,7 +61,7 @@ Public Class atcTimeseriesSTORET
                 Logger.Msg(Specification & vbCrLf & ex.Message, "Could not open STORET file")
                 Return False
             End Try
-            Dim lResultsNode As XmlNode = lDocument.FirstChild
+            Dim lResultsNode As XmlNode = lDocument.ChildNodes(1)
             Dim lNode As XmlNode
 
             Dim lTSBuilders As New atcData.atcTimeseriesGroupBuilder(Me)
@@ -113,16 +113,17 @@ Public Class atcTimeseriesSTORET
                                             lTSBuilder.Attributes.ChangeTo(lActivityAttributes)
                                             lTSBuilder.Attributes.SetValue("Key", lKey)
                                         End If
-                                        Try
-                                            lTSBuilder.AddValue(lDate, Double.Parse(lValueStr))
-                                        Catch
-                                            If lValueStr.Length = 0 Then
-                                                Logger.Dbg("No STORET value found. date " & lDateStr & " for " & lKey & " in " & Specification)
-                                            Else
-                                                Logger.Dbg("Could not parse STORET value '" & lValueStr & "' date " & lDateStr & " for " & lKey & " in " & Specification)
-                                            End If
+                                        If lValueStr.Length = 0 Then
+                                            Logger.Dbg("No STORET value found. date " & lDateStr & " for " & lKey & " in " & Specification)
                                             lTSBuilder.AddValue(lDate, pNaN)
-                                        End Try
+                                        Else
+                                            Dim lValue As Double
+                                            If Not Double.TryParse(lValueStr, lValue) Then
+                                                Logger.Dbg("Could not parse STORET value '" & lValueStr & "' date " & lDateStr & " for " & lKey & " in " & Specification)
+                                                lValue = pNaN
+                                            End If
+                                            lTSBuilder.AddValue(lDate, lValue)
+                                        End If
                                         lTSBuilder.AddValueAttributes(lResultAttributes)
                                 End Select
                             Next
