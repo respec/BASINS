@@ -25,6 +25,7 @@ Public Class frmModelSetup
     Friend WithEvents cboUnits As System.Windows.Forms.ComboBox
     Friend WithEvents lblUnits As System.Windows.Forms.Label
     Friend pUniqueModelSegmentNames As atcCollection
+    Friend pBasinsFolder As String
 
 #Region " Windows Form Designer generated code "
 
@@ -1243,7 +1244,7 @@ Public Class frmModelSetup
             lblLandUseLayer.Visible = False
             cboDescription.Visible = False
             lblDescription.Visible = False
-            lblClass.Text = "/BASINS/etc/giras.dbf"
+            lblClass.Text = pBasinsFolder & "\etc\giras.dbf"
             SetPerviousGrid(AtcGridPervious, lblClass.Text, cboLanduse.SelectedIndex, lLayerNameLandUse, lFieldNameLandUse)
         ElseIf lLandUseType = "Other Shapefile" Then
             cboLandUseLayer.Items.Clear()
@@ -1282,7 +1283,7 @@ Public Class frmModelSetup
             lblLandUseLayer.Visible = True
             cboDescription.Visible = False
             lblDescription.Visible = False
-            lblClass.Text = "/BASINS/etc/nlcd.dbf"
+            lblClass.Text = pBasinsFolder & "\etc\nlcd.dbf"
             SetPerviousGrid(AtcGridPervious, lblClass.Text, cboLanduse.SelectedIndex, lLayerNameLandUse, lFieldNameLandUse)
         Else 'grid
             cboLandUseLayer.Items.Clear()
@@ -1645,6 +1646,8 @@ Public Class frmModelSetup
     End Sub
 
     Public Sub InitializeUI()
+        pBasinsFolder = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\BASINS")
+
         pMetStations = New atcCollection
         pMetBaseDsns = New atcCollection
         pMetWdmNames = New atcCollection

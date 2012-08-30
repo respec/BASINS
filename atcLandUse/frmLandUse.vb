@@ -7,6 +7,7 @@ Public Class frmLandUse
 
     Dim DefaultClassFile As String
     Dim FullClassFile As String
+    Friend pBasinsFolder As String
 
 #Region " Windows Form Designer generated code "
 
@@ -274,7 +275,7 @@ Public Class frmLandUse
             lblDescription.Visible = False
             cboLUID.Visible = False
             lblLUID.Visible = False
-            DefaultClassFile = "/BASINS/etc/giras.dbf"
+            DefaultClassFile = pBasinsFolder & "\etc\giras.dbf"
             FullClassFile = "<none>"
         ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
             cboLandUseLayer.Items.Clear()
@@ -314,8 +315,8 @@ Public Class frmLandUse
             lblDescription.Visible = False
             cboLUID.Visible = False
             lblLUID.Visible = False
-            DefaultClassFile = "/BASINS/etc/nlcd.dbf"
-            FullClassFile = "/BASINS/etc/mlrc.dbf"
+            DefaultClassFile = pBasinsFolder & "\etc\nlcd.dbf"
+            FullClassFile = pBasinsFolder & "\etc\mlrc.dbf"
         Else 'grid
             cboLandUseLayer.Items.Clear()
             For lyr = 0 To GisUtil.NumLayers() - 1
@@ -482,6 +483,8 @@ Public Class frmLandUse
     End Sub
 
     Public Sub InitializeUI()
+        pBasinsFolder = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS", "Base Directory", "C:\BASINS")
+
         Dim ctemp As String
 
         cboLanduse.Items.Add("USGS GIRAS Shapefile")
@@ -507,7 +510,6 @@ Public Class frmLandUse
         If cboSubbasins.Items.Count > 0 And cboSubbasins.SelectedIndex < 0 Then
             cboSubbasins.SelectedIndex = 0
         End If
-
     End Sub
 
     Private Sub frmLandUse_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
