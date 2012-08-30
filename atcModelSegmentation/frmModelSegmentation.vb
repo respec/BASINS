@@ -131,13 +131,13 @@ Friend Class frmModelSegmentation
 
             'save original coloring scheme in case we want to return to it
             'TODO: figure out why this returns Nothing - does not store OutlineColor, etc?
-            Dim lColoringScheme As MapWinGIS.ShapefileColorScheme = GisUtil.GetColoringScheme(lSubbasinLayerIndex)
+            'Dim lColoringScheme As MapWinGIS.ShapefileColorScheme = GisUtil.GetColoringScheme(lSubbasinLayerIndex)
             'do the renderer
             GisUtil.UniqueValuesRenderer(lSubbasinLayerIndex, lModelSegFieldIndex)
-            If Logger.Msg("Do you want to keep this thematic map?", MsgBoxStyle.YesNo, "View Map") = MsgBoxResult.No Then
-                'revert to original renderer
-                GisUtil.ColoringScheme(lSubbasinLayerIndex) = lColoringScheme
-            End If
+            'If Logger.Msg("Do you want to keep this thematic map?", MsgBoxStyle.YesNo, "View Map") = MsgBoxResult.No Then
+            '    'revert to original renderer
+            '    GisUtil.ColoringScheme(lSubbasinLayerIndex) = lColoringScheme
+            'End If
         End If
     End Sub
 

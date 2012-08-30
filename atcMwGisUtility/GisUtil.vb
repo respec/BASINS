@@ -4107,44 +4107,57 @@ Public Class GisUtil
     Public Shared Sub UniqueValuesRenderer(ByVal aLayerIndex As Integer, ByVal aFieldIndex As Integer)
         'build a unique values renderer from a given layer and field
 
-        Dim lMWlayer As MapWindow.Interfaces.Layer
-        lMWlayer = pMapWin.Layers(pMapWin.Layers.GetHandle(aLayerIndex))
+        Dim lMWlayer As MapWindow.Interfaces.Layer = pMapWin.Layers(pMapWin.Layers.GetHandle(aLayerIndex))
 
-        Dim lColorScheme As New MapWinGIS.ShapefileColorScheme
-        lColorScheme.FieldIndex = aFieldIndex
-        lMWlayer.DrawFill = True
 
-        Dim lSf As MapWinGIS.Shapefile
-        lSf = ShapeFileFromIndex(aLayerIndex)
+        Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
 
-        'Get unique values
-        Dim lValuesHt As New Hashtable
-        Dim lIndex As Integer
-        Dim lValue As Object
-        For lIndex = 0 To lSf.NumShapes - 1
-            lValue = lSf.CellValue(aFieldIndex, lIndex)
-            If lValuesHt.ContainsKey(lValue) = False Then
-                lValuesHt.Add(lValue, lValue)
-            End If
-        Next
+        Dim options As MapWinGIS.ShapeDrawingOptions = lSf.DefaultDrawingOptions
+        options.FillVisible = True
 
-        'Create sorted array
-        Dim lValuesArray() As Object
-        ReDim lValuesArray(lValuesHt.Count - 1)
-        lValuesHt.Values().CopyTo(lValuesArray, 0)
-        Array.Sort(lValuesArray)
+        ' set different colors by region ([Region] field is expected in attribute table)
+        lSf.Categories.Generate(aFieldIndex, MapWinGIS.tkClassificationType.ctUniqueValues, 0)
+        lSf.Categories.ApplyExpressions()
 
-        'Create color for each unique value
-        For lIndex = 0 To lValuesArray.Length - 1
-            Dim lBreak As New MapWinGIS.ShapefileColorBreak
-            lBreak.StartColor = System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255)))
-            lBreak.EndColor = lBreak.StartColor
-            lBreak.StartValue = lValuesArray(lIndex)
-            lBreak.EndValue = lValuesArray(lIndex)
-            lBreak.Caption = lValuesArray(lIndex)
-            lColorScheme.Add(lBreak)
-        Next
-        lMWlayer.ColoringScheme = lColorScheme
+        ' apply colors automatically
+        Dim scheme As New MapWinGIS.ColorScheme
+        scheme.SetColors(System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255))),
+                         System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255))))
+        lSf.Categories.ApplyColorScheme(MapWinGIS.tkColorSchemeType.ctSchemeRandom, scheme)
+
+        'lMWlayer.DrawFill = True
+
+        ''Get unique values
+        'Dim lValuesHt As New Hashtable
+        'Dim lIndex As Integer
+        'Dim lValue As Object
+        'For lIndex = 0 To lSf.NumShapes - 1
+        '    lValue = lSf.CellValue(aFieldIndex, lIndex)
+        '    If lValuesHt.ContainsKey(lValue) = False Then
+        '        lValuesHt.Add(lValue, lValue)
+        '    End If
+        'Next
+
+        ''Create sorted array
+        'Dim lValuesArray() As Object
+        'ReDim lValuesArray(lValuesHt.Count - 1)
+        'lValuesHt.Values().CopyTo(lValuesArray, 0)
+        'Array.Sort(lValuesArray)
+
+        'Dim lColorScheme As New MapWinGIS.ShapefileColorScheme
+        'lColorScheme.FieldIndex = aFieldIndex
+
+        ''Create color for each unique value
+        'For lIndex = 0 To lValuesArray.Length - 1
+        '    Dim lBreak As New MapWinGIS.ShapefileColorBreak
+        '    lBreak.StartColor = System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255)))
+        '    lBreak.EndColor = lBreak.StartColor
+        '    lBreak.StartValue = lValuesArray(lIndex)
+        '    lBreak.EndValue = lValuesArray(lIndex)
+        '    lBreak.Caption = lValuesArray(lIndex)
+        '    lColorScheme.Add(lBreak)
+        'Next
+        'lMWlayer.ColoringScheme = lColorScheme
 
     End Sub
 
